@@ -54,6 +54,12 @@ namespace Ogre {
             mesh data; like other resource managers it handles
             the creation of resources (in this case mesh data),
             working within a fixed memory budget.
+        @remarks
+            Ogre loads model files from it's own proprietary
+            format called .mesh. This is because having a single file
+            format is better for runtime performance, and we also have
+            control over pre-processed data (such as
+            collision boxes, LOD reductions etc). 
     */
     class _OgreExport MeshManager: public ResourceManager, public Singleton<MeshManager>, 
         public ManualResourceLoader
@@ -65,12 +71,11 @@ namespace Ogre {
         /** Initialises the manager, only to be called by OGRE internally. */
         void _initialise(void);
 
-        /// Get a resource by name
-        /// @see ResourceManager::getResourceByName
+        /// @copydoc ResourceManager::getResourceByName
         MeshPtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
         /// Create a new mesh
-        /// @see ResourceManager::createResource
+        /// @copydetails ResourceManager::createResource
         MeshPtr create (const String& name, const String& group,
                             bool isManual = false, ManualResourceLoader* loader = 0,
                             const NameValuePairList* createParams = 0);
@@ -79,6 +84,7 @@ namespace Ogre {
 
         /** Create a new mesh, or retrieve an existing one with the same
             name if it already exists.
+            @copydetails ResourceManager::createResource
             @param vertexBufferUsage The usage flags with which the vertex buffer(s)
                 will be created
             @param indexBufferUsage The usage flags with which the index buffer(s) created for 
@@ -87,13 +93,12 @@ namespace Ogre {
                 copies for faster read access
             @param indexBufferShadowed If true, the index buffers will be shadowed by system memory 
                 copies for faster read access
-        @see ResourceManager::createOrRetrieve
         */
         ResourceCreateOrRetrieveResult createOrRetrieve(
             const String& name,
             const String& group,
             bool isManual, ManualResourceLoader* loader,
-            const NameValuePairList* params,
+            const NameValuePairList* createParams,
             HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
             HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
             bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
@@ -102,12 +107,6 @@ namespace Ogre {
             @note
                 If the model has already been created (prepared or loaded), the existing instance
                 will be returned.
-            @remarks
-                Ogre loads model files from it's own proprietary
-                format called .mesh. This is because having a single file
-                format is better for runtime performance, and we also have
-                control over pre-processed data (such as
-                collision boxes, LOD reductions etc).
             @param filename The name of the .mesh file
             @param groupName The name of the resource group to assign the mesh to 
             @param vertexBufferUsage The usage flags with which the vertex buffer(s)
@@ -125,25 +124,7 @@ namespace Ogre {
             bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 
         /** Loads a mesh from a file, making it immediately available for use.
-            @note
-                If the model has already been created (prepared or loaded), the existing instance
-                will be returned.
-            @remarks
-                Ogre loads model files from it's own proprietary
-                format called .mesh. This is because having a single file
-                format is better for runtime performance, and we also have
-                control over pre-processed data (such as
-                collision boxes, LOD reductions etc).
-            @param filename The name of the .mesh file
-            @param groupName The name of the resource group to assign the mesh to 
-            @param vertexBufferUsage The usage flags with which the vertex buffer(s)
-                will be created
-            @param indexBufferUsage The usage flags with which the index buffer(s) created for 
-                this mesh will be created with.
-            @param vertexBufferShadowed If true, the vertex buffers will be shadowed by system memory 
-                copies for faster read access
-            @param indexBufferShadowed If true, the index buffers will be shadowed by system memory 
-                copies for faster read access
+            @copydetails MeshManager::prepare
         */
         MeshPtr load( const String& filename, const String& groupName,
             HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 

@@ -125,11 +125,7 @@ namespace Ogre {
         virtual ~ResourceManager();
 
         /** Creates a new blank resource, but does not immediately load it.
-        @remarks
-            Resource managers handle disparate types of resources, so if you want
-            to get at the detailed interface of this resource, you'll have to 
-            cast the result to the subclass you know you're creating. 
-        @param name The unique name of the resource
+        @param name The unique name of the %Resource
         @param group The name of the resource group to attach this new resource to
         @param isManual Is this resource manually loaded? If so, you should really
             populate the loader parameter in order that the load process
@@ -156,8 +152,7 @@ namespace Ogre {
             in one call so there are no race conditions if using multiple
             threads that could cause getByName() to return null, but create() to
             fail because another thread created a resource in between.
-        @see ResourceManager::createResource
-        @see ResourceManager::getResourceByName
+        @copydetails ResourceManager::createResource
         @return A pair, the first element being the pointer, and the second being 
             an indicator specifying whether the resource was newly created.
         */
@@ -375,7 +370,7 @@ namespace Ogre {
         /** Generic prepare method, used to create a Resource specific to this 
             ResourceManager without using one of the specialised 'prepare' methods
             (containing per-Resource-type parameters).
-        @param name The name of the Resource
+        @param name The name of the %Resource
         @param group The resource group to which this resource will belong
         @param isManual Is the resource to be manually loaded? If so, you should
             provide a value for the loader parameter
@@ -395,17 +390,7 @@ namespace Ogre {
         /** Generic load method, used to create a Resource specific to this 
             ResourceManager without using one of the specialised 'load' methods
             (containing per-Resource-type parameters).
-        @param name The name of the Resource
-        @param group The resource group to which this resource will belong
-        @param isManual Is the resource to be manually loaded? If so, you should
-            provide a value for the loader parameter
-        @param loader The manual loader which is to perform the required actions
-            when this resource is loaded; only applicable when you specify true
-            for the previous parameter
-        @param loadParams Optional pointer to a list of name/value pairs 
-            containing loading parameters for this type of resource.
-        @param backgroundThread Optional boolean which lets the load routine know if it
-            is being run on the background resource loading thread
+        @copydetails ResourceManager::prepare()
         */
         ResourcePtr load(const String& name,
             const String& group, bool isManual = false, 

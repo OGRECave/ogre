@@ -170,6 +170,7 @@ namespace Ogre {
 
         /** Overrides the standard ResourceManager getResourceByName method.
         @param name The name of the program to retrieve
+        @param group The name of the resource group to attach this new resource to
         @param preferHighLevelPrograms If set to true (the default), high level programs will be
             returned in preference to low-level programs.
         */
@@ -218,7 +219,8 @@ namespace Ogre {
         virtual Microcode createMicrocode( const uint32 size ) const;
 
         /** Adds a microcode for a program to the microcode cache.
-        @param name The name of the program.
+        @param name The name of the program
+        @param microcode the program binary
         */
         virtual void addMicrocodeToCache( const String & name, const Microcode & microcode );
 

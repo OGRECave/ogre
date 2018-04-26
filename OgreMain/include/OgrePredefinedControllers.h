@@ -237,14 +237,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     /** Predefined controller function based on a waveform.
         @remarks
-            A waveform function translates parametric input to parametric output based on a wave. The factors
-            affecting the function are:
-            - wave type - the shape of the wave
-            - base - the base value of the output from the wave
-            - frequency - the speed of the wave in cycles per second
-            - phase - the offset of the start of the wave, e.g. 0.5 to start half-way through the wave
-            - amplitude - scales the output so that instead of lying within [0,1] it lies within [0,1] * amplitude
-            - duty cycle - the active width of a PWM signal
+            A waveform function translates parametric input to parametric output based on a wave.
         @par
             Note that for simplicity of integration with the rest of the controller insfrastructure, the output of
             the wave is parametric i.e. 0..1, rather than the typical wave output of [-1,1]. To compensate for this, the
@@ -269,6 +262,11 @@ namespace Ogre {
 
     public:
         /** Default constructor, requires at least a wave type, other parameters can be defaulted unless required.
+            @param wType the shape of the wave
+            @param base the base value of the output from the wave
+            @param frequency the speed of the wave in cycles per second
+            @param phase the offset of the start of the wave, e.g. 0.5 to start half-way through the wave
+            @param amplitude scales the output so that instead of lying within [0,1] it lies within [0,1] * amplitude
             @param
                 deltaInput If true, signifies that the input will be a delta value such that the function should
                 add it to an internal counter before calculating the output.

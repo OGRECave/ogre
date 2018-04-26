@@ -730,8 +730,8 @@ namespace Ogre {
         void declareResource(const String& name, const String& resourceType,
             const String& groupName = DEFAULT_RESOURCE_GROUP_NAME,
             const NameValuePairList& loadParameters = NameValuePairList());
-        /** @overload
-        @param loader Pointer to a ManualResourceLoader implementation which will
+        /** @copydoc declareResource
+            @param loader Pointer to a ManualResourceLoader implementation which will
             be called when the Resource wishes to load. If supplied, the resource
             is manually loaded, otherwise it'll loading from file automatic.
             @note We don't support declare manually loaded resource without loader
@@ -773,12 +773,14 @@ namespace Ogre {
             return openResourceImpl(resourceName, groupName, false, resourceBeingLoaded);
         }
 
-        /** @deprecated use AUTODETECT_RESOURCE_GROUP_NAME instead of searchGroupsIfNotFound
+        /** 
             @param searchGroupsIfNotFound If true, if the resource is not found in 
             the group specified, other groups will be searched. If you're
             loading a real Resource using this option, you <strong>must</strong>
             also provide the resourceBeingLoaded parameter to enable the 
             group membership to be changed
+            @copydetails openResource
+            @deprecated use AUTODETECT_RESOURCE_GROUP_NAME instead of searchGroupsIfNotFound
         */
         OGRE_DEPRECATED DataStreamPtr openResource(const String& resourceName,
                                                    const String& groupName,

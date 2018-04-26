@@ -66,17 +66,18 @@ namespace Ogre {
 
 
         /// Create a new texture
-        /// @see ResourceManager::createResource
+        /// @copydetails ResourceManager::createResource
         TexturePtr create (const String& name, const String& group,
                             bool isManual = false, ManualResourceLoader* loader = 0,
                             const NameValuePairList* createParams = 0);
-        /// Get a resource by name
-        /// @see ResourceManager::getResourceByName
+        /// @copydoc ResourceManager::getResourceByName
         TexturePtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
         using ResourceManager::createOrRetrieve;
 
         /** @overload createOrRetrieve
+            
+            @copydetails ResourceManager::createResource
 
             @param
                 texType The type of texture to load/create, defaults to normal 2D textures
@@ -127,8 +128,10 @@ namespace Ogre {
                 single channel colour texture - useful for fixed-function systems.
             @param 
                 desiredFormat The format you would like to have used instead of
-                the format being based on the contents of the texture
-            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+                the format being based on the contents of the texture; the manager reserves
+                the right to create a different format for the texture if the 
+                original format is not available in this context.
+            @param hwGammaCorrection pass 'true' to enable hardware gamma correction
                 (sRGB) on this texture. The hardware will convert from gamma space
                 to linear space when reading from this texture. Only applicable for 
                 8-bits per channel textures, will be ignored for other types. Has the advantage
@@ -141,33 +144,7 @@ namespace Ogre {
             PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
 
         /** Loads a texture from a file.
-            @param
-                name The file to load, or a String identifier in some cases
-            @param
-                group The name of the resource group to assign the texture to
-            @param
-                texType The type of texture to load/create, defaults to normal 2D textures
-            @param
-                numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
-                the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps())
-                If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
-                level, 1x1x1.
-            @param
-                gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
-                    during loading
-            @param 
-                isAlpha Only applicable to greyscale images. If true, specifies that
-                the image should be loaded into an alpha texture rather than a
-                single channel colour texture - useful for fixed-function systems.
-            @param 
-                desiredFormat The format you would like to have used instead of
-                the format being based on the contents of the texture. Pass PF_UNKNOWN
-                to default.
-            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-                (sRGB) on this texture. The hardware will convert from gamma space
-                to linear space when reading from this texture. Only applicable for 
-                8-bits per channel textures, will be ignored for other types. Has the advantage
-                over pre-applied gamma that the texture precision is maintained.
+            @copydetails TextureManager::prepare
         */
         TexturePtr load(
             const String& name, const String& group, 
@@ -179,33 +156,9 @@ namespace Ogre {
         /** Loads a texture from an Image object.
             @note
                 The texture will create as manual texture without loader.
-            @param
-                name The name to give the resulting texture
-            @param
-                group The name of the resource group to assign the texture to
+            @copydetails TextureManager::prepare
             @param
                 img The Image object which contains the data to load
-            @param
-                texType The type of texture to load/create, defaults to normal 2D textures
-            @param
-                numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
-                the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps())
-                If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
-                level, 1x1x1.
-            @param
-                gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
-            @param 
-                isAlpha Only applicable to greyscale images. If true, specifies that
-                the image should be loaded into an alpha texture rather than a
-                single channel colour texture - useful for fixed-function systems.
-            @param 
-                desiredFormat The format you would like to have used instead of
-                the format being based on the contents of the texture
-            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-                (sRGB) on this texture. The hardware will convert from gamma space
-                to linear space when reading from this texture. Only applicable for 
-                8-bits per channel textures, will be ignored for other types. Has the advantage
-                over pre-applied gamma that the texture precision is maintained.
         */
         virtual TexturePtr loadImage( 
             const String &name, const String& group, const Image &img, 
@@ -296,6 +249,7 @@ namespace Ogre {
             @param fsaa The level of multisampling to use if this is a render target. Ignored
                 if usage does not include TU_RENDERTARGET or if the device does
                 not support it.
+            @param fsaaHint specify "Quality" to enable CSAA on D3D
         */
         virtual TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, uint depth, 
