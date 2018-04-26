@@ -91,7 +91,7 @@ namespace Ogre {
             EGLConfig* chooseGLConfig(const EGLint *attribList, EGLint *nElements);
             EGLConfig* getConfigs(EGLint *nElements);
             EGLBoolean getGLConfigAttrib(EGLConfig fbConfig, EGLint attribute, EGLint *value);
-            void* getProcAddress(const char* name);
+            void* getProcAddress(const char* name) const;
             ::EGLContext createNewContext(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLContext shareList) const;
 
             NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);

@@ -119,7 +119,7 @@ namespace Ogre
         return i->second;
     }
     //-----------------------------------------------------------------------
-    void RibbonTrail::removeNode(Node* n)
+    void RibbonTrail::removeNode(const Node* n)
     {
         NodeList::iterator i = std::find(mNodeList.begin(), mNodeList.end(), n);
         if (i != mNodeList.end())
@@ -132,7 +132,7 @@ namespace Ogre
             BillboardChain::clearChain(chainIndex);
             // mark as free now
             mFreeChains.push_back(chainIndex);
-            n->setListener(0);
+            (*i)->setListener(0);
             mNodeList.erase(i);
             mNodeToChainSegment.erase(mi);
             mNodeToSegMap.erase(mNodeToSegMap.find(n));
@@ -349,7 +349,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void RibbonTrail::nodeDestroyed(const Node* node)
     {
-        removeNode(const_cast<Node*>(node));
+        removeNode(node);
 
     }
     //-----------------------------------------------------------------------

@@ -1692,7 +1692,7 @@ namespace Ogre {
         for (unsigned short lodIndex = 0; lodIndex < (unsigned short)mMeshLodUsageList.size(); ++lodIndex)
         {
             // use getLodLevel to enforce loading of manual mesh lods
-            MeshLodUsage& usage = const_cast<MeshLodUsage&>(getLodLevel(lodIndex));
+            const MeshLodUsage& usage = getLodLevel(lodIndex);
 
             if (!usage.manualName.empty() && lodIndex != 0)
             {

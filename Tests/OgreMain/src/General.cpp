@@ -38,6 +38,8 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreMaterialManager.h"
+#include "OgreConfigFile.h"
+#include "OgreSTBICodec.h"
 
 #include <random>
 using std::minstd_rand;
@@ -185,4 +187,26 @@ TEST(MaterialSerializer, Basic)
     EXPECT_EQ(mat2->getTechniques().size(), mat->getTechniques().size());
     EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getAmbient(), ColourValue::Green);
     EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState("Test TUS")->getTextureFiltering(FT_MIP), FO_POINT);
+}
+
+TEST(Image, FlipV)
+{
+    ResourceGroupManager mgr;
+    STBIImageCodec::startup();
+    ConfigFile cf;
+    cf.load(FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    auto testPath = cf.getSettings("Tests").begin()->second;
+
+    Image ref;
+    ref.load(Root::openFileStream(testPath+"/decal1vflip.png"), "png");
+
+    Image img;
+    img.load(Root::openFileStream(testPath+"/decal1.png"), "png");
+    img.flipAroundX();
+
+    // img.save(testPath+"/decal1vflip.png");
+
+    ASSERT_TRUE(!memcmp(img.getData(), ref.getData(), ref.getSize()));
+
+    STBIImageCodec::shutdown();
 }

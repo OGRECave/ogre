@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef __STBICodec_H__
 #define __STBICodec_H__
 
+#include "OgreSTBICodecExports.h"
 #include "OgreImageCodec.h"
 #include "OgrePlugin.h"
 
@@ -66,9 +67,9 @@ namespace Ogre {
         String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
 
         /// Static method to startup and register the codecs
-        static void startup(void);
+        _OgreSTBICodecExport static void startup(void);
         /// Static method to shutdown and unregister the codecs
-        static void shutdown(void);
+        _OgreSTBICodecExport static void shutdown(void);
     };
 
     class STBIPlugin : public Plugin

@@ -28,6 +28,8 @@ THE SOFTWARE.
 #ifndef _FreeImageCodec_H__
 #define _FreeImageCodec_H__
 
+#include "OgreFreeImageCodecExports.h"
+
 #include "OgreImageCodec.h"
 #include "OgrePlugin.h"
 
@@ -77,9 +79,9 @@ namespace Ogre {
         String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
 
         /// Static method to startup FreeImage and register the FreeImage codecs
-        static void startup(void);
+        _OgreFreeImageCodecExport static void startup(void);
         /// Static method to shutdown FreeImage and unregister the FreeImage codecs
-        static void shutdown(void);
+        _OgreFreeImageCodecExport static void shutdown(void);
     };
 
     class FreeImagePlugin : public Plugin

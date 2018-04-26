@@ -256,7 +256,7 @@ namespace Ogre {
         return status;
     }
 
-    void* EGLSupport::getProcAddress(const char* name)
+    void* EGLSupport::getProcAddress(const char* name) const
     {
         return (void*)eglGetProcAddress(name);
     }

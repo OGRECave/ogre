@@ -362,7 +362,7 @@ namespace Ogre
         /// @copydoc SceneManagerEnumerator::addFactory
         void removeSceneManagerFactory(SceneManagerFactory* fact);
 
-        /// @copydoc SceneManagerEnumerator::getMetaData(const String& )
+        /// @copydoc SceneManagerEnumerator::getMetaData(const String& )const
         const SceneManagerMetaData* getSceneManagerMetaData(const String& typeName) const;
 
         /// @copydoc SceneManagerEnumerator::getMetaData()

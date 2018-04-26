@@ -2281,9 +2281,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                         TextureUnitState::CONTENT_SHADOW, numShadowTextureLights);
                     if (tuindex > pass->getNumTextureUnitStates()) break;
 
-                    // I know, nasty const_cast
-                    TextureUnitState* tu =
-                        const_cast<TextureUnitState*>(pass->getTextureUnitState(tuindex));
+                    TextureUnitState* tu = pass->getTextureUnitState(tuindex);
                     const TexturePtr& shadowTex = mShadowRenderer.mShadowTextures[shadowTexIndex];
                     tu->_setTexturePtr(shadowTex);
                     Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();

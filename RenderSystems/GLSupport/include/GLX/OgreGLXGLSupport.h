@@ -71,7 +71,7 @@ namespace Ogre {
         void initialiseExtensions();
 
         /** @copydoc see GLNativeSupport::getProcAddress */
-        void* getProcAddress(const char* procname);
+        void* getProcAddress(const char* procname) const;
 
         // The remaining functions are internal to the GLX Rendersystem:
 

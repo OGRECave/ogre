@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreFreeImageCodecExports.h"
 #include "OgreFreeImageCodec.h"
 
 #include <FreeImage.h>

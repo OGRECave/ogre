@@ -56,7 +56,7 @@ namespace Ogre {
             virtual String getDisplayName(void);
             CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(CFDictionaryRef fbConfig, GLint attribute, GLint *value);
-            void * getProcAddress(const char* name);
+            void * getProcAddress(const char* name) const;
             NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
 
             RenderWindow * newWindow(const String& name,

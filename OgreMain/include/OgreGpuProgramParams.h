@@ -2383,29 +2383,20 @@ namespace Ogre {
             @note Only applicable to low-level programs.
             @param logicalIndex The logical parameter index
             @param requestedSize The requested size - pass 0 to ignore missing entries
-            @param variability
             and return std::numeric_limits<size_t>::max()
+            @param variability
         */
         size_t _getFloatConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
         /** Gets the physical buffer index associated with a logical double constant index.
-            @note Only applicable to low-level programs.
-            @param logicalIndex The logical parameter index
-            @param requestedSize The requested size - pass 0 to ignore missing entries
-            and return std::numeric_limits<size_t>::max()
+            @copydetails _getFloatConstantPhysicalIndex
         */
         size_t _getDoubleConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
         /** Gets the physical buffer index associated with a logical int constant index.
-            @note Only applicable to low-level programs.
-            @param logicalIndex The logical parameter index
-            @param requestedSize The requested size - pass 0 to ignore missing entries
-            and return std::numeric_limits<size_t>::max()
+            @copydetails _getFloatConstantPhysicalIndex
         */
         size_t _getIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
         /** Gets the physical buffer index associated with a logical unsigned int constant index.
-            @note Only applicable to low-level programs.
-            @param logicalIndex The logical parameter index
-            @param requestedSize The requested size - pass 0 to ignore missing entries
-            and return std::numeric_limits<size_t>::max()
+            @copydetails _getFloatConstantPhysicalIndex
         */
         size_t _getUnsignedIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
         /* Gets the physical buffer index associated with a logical bool constant index.

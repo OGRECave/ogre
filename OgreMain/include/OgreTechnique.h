@@ -182,11 +182,11 @@ namespace Ogre {
         Pass* createPass(void);
         /** Retrieves the Pass with the given index.
          * @deprecated use getPasses() */
-        Pass* getPass(unsigned short index);
+        Pass* getPass(unsigned short index) const;
         /** Retrieves the Pass matching name.
             Returns 0 if name match is not found.
         */
-        Pass* getPass(const String& name);
+        Pass* getPass(const String& name) const;
         /** Retrieves the number of passes.
          * @deprecated use getPasses() */
         unsigned short getNumPasses(void) const;

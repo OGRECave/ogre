@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreSTBICodecExports.h"
 #include "OgreSTBICodec.h"
 #include "OgreLogManager.h"
 #include "OgreDataStream.h"
