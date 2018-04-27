@@ -541,18 +541,6 @@ ShaderGenerator::SchemeCreateOrRetrieveResult ShaderGenerator::createOrRetrieveS
 
     return SchemeCreateOrRetrieveResult(schemeEntry, wasCreated);
 }
-
-#if !OGRE_RESOURCEMANAGER_STRICT
-//-----------------------------------------------------------------------------
-RenderState* ShaderGenerator::getRenderState(const String& schemeName, 
-                                             const String& materialName, 
-                                             unsigned short passIndex)
-{
-    return getRenderState(schemeName, materialName, 
-        ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, passIndex);
-}
-#endif
-
 //-----------------------------------------------------------------------------
 RenderState* ShaderGenerator::getRenderState(const String& schemeName, 
                                      const String& materialName, 
@@ -723,42 +711,6 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
     }
     return false;
 }
-#if !OGRE_RESOURCEMANAGER_STRICT
-//-----------------------------------------------------------------------------
-bool ShaderGenerator::createShaderBasedTechnique(const String& materialName, 
-                                                 const String& srcTechniqueSchemeName, 
-                                                 const String& dstTechniqueSchemeName,
-                                                 bool overProgrammable)
-{
-    return createShaderBasedTechnique(materialName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-        srcTechniqueSchemeName, dstTechniqueSchemeName, overProgrammable);
-}
-#endif
-
-//-----------------------------------------------------------------------------
-bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
-                                                 const String& groupName,
-                                                 const String& srcTechniqueSchemeName,
-                                                 const String& dstTechniqueSchemeName,
-                                                 bool overProgrammable)
-{
-    // Make sure material exists.
-    MaterialPtr srcMat = MaterialManager::getSingleton().getByName(materialName, groupName);
-    if (!srcMat)
-        return false;
-
-    // Update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
-    const String& trueGroupName = srcMat->getGroup();
-
-    // Case the requested material belongs to different group and it is not AUTODETECT_RESOURCE_GROUP_NAME.
-    if (trueGroupName != groupName &&
-        groupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
-    {
-        return false;
-    }
-
-    return createShaderBasedTechnique(*srcMat, srcTechniqueSchemeName, dstTechniqueSchemeName, overProgrammable);
-}
 //-----------------------------------------------------------------------------
 static bool hasFixedFunctionPass(Technique* tech)
 {
@@ -870,18 +822,6 @@ bool ShaderGenerator::createShaderBasedTechnique(const Material& srcMat,
         
     return true;
 }
-
-#if !OGRE_RESOURCEMANAGER_STRICT
-//-----------------------------------------------------------------------------
-bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName, 
-                                                 const String& srcTechniqueSchemeName, 
-                                                 const String& dstTechniqueSchemeName)
-{
-    return removeShaderBasedTechnique(materialName,ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-        srcTechniqueSchemeName,dstTechniqueSchemeName);
-}
-#endif
-
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName, 
                                                  const String& groupName, 

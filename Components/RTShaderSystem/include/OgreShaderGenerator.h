@@ -209,12 +209,6 @@ public:
      */
     RenderState* getRenderState(const String& schemeName, const String& materialName, const String& groupName, unsigned short passIndex);
 
-#if !OGRE_RESOURCEMANAGER_STRICT
-    /// @overload
-    /// @deprecated use ShaderGenerator::getRenderState(const String& schemeName, const String& materialName, const String& groupName, ...)
-    OGRE_DEPRECATED RenderState* getRenderState(const String& schemeName, const String& materialName, unsigned short passIndex);
-#endif
-
     /** 
     Add sub render state factory. Plugins or 3d party applications may implement sub classes of
     SubRenderState interface. Add the matching factory will allow the application to create instances 
@@ -289,16 +283,6 @@ public:
     */
     bool createShaderBasedTechnique(const Material& srcMat, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
-#if !OGRE_RESOURCEMANAGER_STRICT
-    /// @overload
-    /// @deprecated use ShaderGenerator::createShaderBasedTechnique(srcMat, ...)
-    OGRE_DEPRECATED bool createShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
-#endif
-
-    /// @overload
-    /// @deprecated use ShaderGenerator::createShaderBasedTechnique(srcMat, ...)
-    bool createShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
-
     /**
      Remove shader based technique from a given technique.
      Return true upon success. Failure may occur if the given source technique was not previously
@@ -309,11 +293,6 @@ public:
      @param dstTechniqueSchemeName The destination shader based technique scheme name.
      */
     bool removeShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
-
-#if !OGRE_RESOURCEMANAGER_STRICT
-    /// @overload
-    OGRE_DEPRECATED bool removeShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
-#endif
 
     /** 
     Remove all shader based techniques of the given material. 
@@ -410,12 +389,8 @@ public:
     */
     SGMaterialSerializerListener* getMaterialSerializerListener();
 
-    /** Return the current number of generated vertex shaders. */
+    /** Return the current number of generated shaders. */
     size_t getShaderCount(GpuProgramType type) const;
-    /// @deprecated
-    OGRE_DEPRECATED size_t getVertexShaderCount() const { return getShaderCount(GPT_VERTEX_PROGRAM); }
-    /// @deprecated
-    OGRE_DEPRECATED size_t getFragmentShaderCount() const { return getShaderCount(GPT_FRAGMENT_PROGRAM); }
 
     /** Set the vertex shader outputs compaction policy. 
     @see VSOutputCompactPolicy.
