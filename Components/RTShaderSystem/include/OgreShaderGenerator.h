@@ -122,21 +122,16 @@ public:
     @param version
     @remarks The default shader language is cg.
     */
-    void setTargetLanguage(const String& shaderLanguage,const float version = 1.0);
+    void setTargetLanguage(const String& shaderLanguage);
 
     /** 
     Return if hlsl 4.0 shading language is currently in use.        
     */
-    bool IsHlsl4() const { return mShaderLanguage == "hlsl" && mShaderLanguageVersion == 4.0f; }
+    bool IsHlsl4() const { return mIsHLSL4; }
     /** 
     Return the target shader language currently in use.     
     */
     const String& getTargetLanguage() const { return mShaderLanguage; }
-
-    /** 
-    Return the target shader language version currently in use.     
-    */
-    float getTargetLanguageVersion() const { return mShaderLanguageVersion; }
 
     /** 
     Set the output shader target profiles.
@@ -960,8 +955,6 @@ protected:
     SGScriptTranslator mCoreScriptTranslator;
     // The target shader language (currently only cg supported).
     String mShaderLanguage;
-    // The target shader language version.
-    float  mShaderLanguageVersion;
     // The target vertex shader profile. Will be used as argument for program compilation.
     String mVertexShaderProfiles;
     // List of target vertex shader profiles.
@@ -1000,6 +993,8 @@ protected:
     bool mCreateShaderOverProgrammablePass;
     // A flag to indicate finalizing
     bool mIsFinalizing;
+    // flag for HLSL4 specific behaviour
+    bool mIsHLSL4;
 
     uint32 ID_RT_SHADER_SYSTEM;
 private:
