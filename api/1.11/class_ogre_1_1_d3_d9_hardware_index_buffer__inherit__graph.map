@@ -1,0 +1,6 @@
+<map id="Ogre::D3D9HardwareIndexBuffer" name="Ogre::D3D9HardwareIndexBuffer">
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_index_buffer.html" title="Specialisation of HardwareBuffer for vertex index buffers, still abstract. " alt="" coords="5,155,187,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="21,80,171,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="BufferAlloc" alt="" coords="53,5,139,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d9_resource.html" title="Represents a Direct3D rendering resource. " alt="" coords="211,155,359,181"/>
+</map>

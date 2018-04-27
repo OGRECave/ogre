@@ -1,0 +1,5 @@
+<map id="Ogre::D3D11HardwareVertexBuffer" name="Ogre::D3D11HardwareVertexBuffer">
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_vertex_buffer.html" title="Specialisation of HardwareBuffer for a vertex buffer. " alt="" coords="9,155,195,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="27,80,177,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="BufferAlloc" alt="" coords="59,5,145,32"/>
+</map>

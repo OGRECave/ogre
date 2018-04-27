@@ -1,0 +1,6 @@
+<map id="Ogre::VertexDeclaration" name="Ogre::VertexDeclaration">
+<area shape="rect" id="node3" href="$class_ogre_1_1_d3_d11_vertex_declaration.html" title="Specialisation of VertexDeclaration for D3D11. " alt="" coords="5,155,208,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d9_vertex_declaration.html" title="Specialisation of VertexDeclaration for D3D9. " alt="" coords="233,155,429,181"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_g_l_vertex_array_object.html" title="Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage. " alt="" coords="453,155,635,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="VertexDataAlloc" alt="" coords="272,5,389,32"/>
+</map>

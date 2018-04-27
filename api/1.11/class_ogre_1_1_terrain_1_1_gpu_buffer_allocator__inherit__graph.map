@@ -1,0 +1,4 @@
+<map id="Ogre::Terrain::GpuBufferAllocator" name="Ogre::Terrain::GpuBufferAllocator">
+<area shape="rect" id="node3" href="$class_ogre_1_1_terrain_1_1_default_gpu_buffer_allocator.html" title="Standard implementation of a buffer allocator which re&#45;uses buffers. " alt="" coords="5,169,177,211"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="TerrainAlloc" alt="" coords="46,5,137,32"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="Ogre::SimpleRenderable" name="Ogre::SimpleRenderable">
+<area shape="rect" id="node7" href="$class_ogre_1_1_rectangle2_d.html" title="Allows the rendering of a simple 2D rectangle This class renders a simple 2D rectangle; this rectangl..." alt="" coords="95,229,230,256"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_volume_1_1_chunk.html" title="A single volume chunk mesh. " alt="" coords="254,229,402,256"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_wire_bounding_box.html" title="Allows the rendering of a wireframe bounding box. " alt="" coords="427,229,589,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene. " alt="" coords="177,80,322,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters. " alt="" coords="5,5,149,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose..." alt="" coords="174,5,325,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="MovableAlloc" alt="" coords="349,5,449,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement. " alt="" coords="346,80,470,107"/>
+</map>
