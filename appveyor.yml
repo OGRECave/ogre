@@ -16,17 +16,17 @@ branches:
     - stable
 artifacts:
   - path: build/sdk
-    name: ogre-sdk-master-vc15-x64
+    name: ogre-sdk-1.11.0-vc15-x64
 deploy:
 - provider: BinTray
   username: paroj
   api_key:
     secure: 4nFEwKApbHUf7UajsDt6Z7QOl3zzgEz6YbWGSGx5AiPxozWEQHEyGc6c9xE7utWE
-  subject: paroj
+  subject: ogrecave
   repo: ogre
   package: ogre-sdk-vc15-x64
   publish: true
   override: true
-  version: master
+  version: 1.11.0
   on:
     branch: master
