@@ -283,7 +283,6 @@ namespace Ogre {
                         OGRE_CHECK_GL_ERROR(glUniformMatrix4fv(currentUniform->mLocation, glArraySize, 
                                                                GL_FALSE, params->getFloatPointer(def->physicalIndex)));
                         break;
-#if OGRE_NO_GLES3_SUPPORT == 0
                     case GCT_MATRIX_2X3:
                         OGRE_CHECK_GL_ERROR(glUniformMatrix2x3fv(currentUniform->mLocation, glArraySize,
                                                                  GL_FALSE, params->getFloatPointer(def->physicalIndex)));
@@ -308,15 +307,6 @@ namespace Ogre {
                         OGRE_CHECK_GL_ERROR(glUniformMatrix4x3fv(currentUniform->mLocation, glArraySize, 
                                                                  GL_FALSE, params->getFloatPointer(def->physicalIndex)));
                         break;
-#else
-                    case GCT_MATRIX_2X3:
-                    case GCT_MATRIX_2X4:
-                    case GCT_MATRIX_3X2:
-                    case GCT_MATRIX_3X4:
-                    case GCT_MATRIX_4X2:
-                    case GCT_MATRIX_4X3:
-                        break;
-#endif
                     case GCT_INT1:
                         OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize,
                                                          (GLint*)params->getIntPointer(def->physicalIndex)));
@@ -339,11 +329,11 @@ namespace Ogre {
                     case GCT_SAMPLER2DSHADOW:
                     case GCT_SAMPLER3D:
                     case GCT_SAMPLERCUBE:
+                    case GCT_SAMPLER2DARRAY:
                         // Samplers handled like 1-element ints
                         OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, 1, 
                                                          (GLint*)params->getIntPointer(def->physicalIndex)));
                         break;
-                    case GCT_SAMPLER2DARRAY:
                     case GCT_UNKNOWN:
                     case GCT_SUBROUTINE:
                     case GCT_DOUBLE1:

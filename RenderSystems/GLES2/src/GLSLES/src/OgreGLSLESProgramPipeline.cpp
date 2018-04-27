@@ -288,9 +288,7 @@ namespace Ogre
                         case GCT_SAMPLER2DSHADOW:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
-#if OGRE_NO_GLES3_SUPPORT == 0
                         case GCT_SAMPLER2DARRAY:
-#endif
                             shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation,
                                                                         params->getIntPointer(def->physicalIndex),
                                                                         static_cast<GLsizei>(def->elementSize * def->arraySize * sizeof(int)));
@@ -358,14 +356,11 @@ namespace Ogre
                         case GCT_SAMPLER2DSHADOW:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
-#if OGRE_NO_GLES3_SUPPORT == 0
                         case GCT_SAMPLER2DARRAY:
-#endif
                             // Samplers handled like 1-element ints
                             OGRE_CHECK_GL_ERROR(glProgramUniform1ivEXT(progID, currentUniform->mLocation, 1,
                                                                        params->getIntPointer(def->physicalIndex)));
                             break;
-#if OGRE_NO_GLES3_SUPPORT == 0
                         case GCT_MATRIX_2X3:
                             OGRE_CHECK_GL_ERROR(glProgramUniformMatrix2x3fvEXT(progID, currentUniform->mLocation, glArraySize,
                                                                             GL_FALSE, params->getFloatPointer(def->physicalIndex)));
@@ -390,15 +385,6 @@ namespace Ogre
                             OGRE_CHECK_GL_ERROR(glProgramUniformMatrix4x3fvEXT(progID, currentUniform->mLocation, glArraySize,
                                                                             GL_FALSE, params->getFloatPointer(def->physicalIndex)));
                             break;
-#else
-                        case GCT_MATRIX_2X3:
-                        case GCT_MATRIX_2X4:
-                        case GCT_MATRIX_3X2:
-                        case GCT_MATRIX_3X4:
-                        case GCT_MATRIX_4X2:
-                        case GCT_MATRIX_4X3:
-                        case GCT_SAMPLER2DARRAY:
-#endif
                         case GCT_UNKNOWN:
                         case GCT_SUBROUTINE:
                         case GCT_DOUBLE1:
