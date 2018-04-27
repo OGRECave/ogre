@@ -1,0 +1,5 @@
+<map id="Ogre::D3D9HardwarePixelBuffer" name="Ogre::D3D9HardwarePixelBuffer">
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_pixel_buffer.html" title="Specialisation of HardwareBuffer for a pixel buffer. " alt="" coords="22,155,201,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="37,80,186,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="BufferAlloc" alt="" coords="68,5,155,32"/>
+</map>

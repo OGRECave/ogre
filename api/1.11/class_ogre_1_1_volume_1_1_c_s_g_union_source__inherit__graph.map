@@ -1,0 +1,4 @@
+<map id="Ogre::Volume::CSGUnionSource" name="Ogre::Volume::CSGUnionSource">
+<area shape="rect" id="node2" href="$class_ogre_1_1_volume_1_1_c_s_g_operation_source.html" title="Abstract operation volume source holding two sources as operants. " alt="" coords="15,80,210,121"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_volume_1_1_source.html" title="Abstract class defining the density function. " alt="" coords="37,5,188,32"/>
+</map>

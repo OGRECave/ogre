@@ -1,0 +1,6 @@
+<map id="Ogre::TextAreaOverlayElement" name="Ogre::TextAreaOverlayElement">
+<area shape="rect" id="node2" href="$class_ogre_1_1_overlay_element.html" title="Abstract definition of a 2D element to be displayed in an Overlay. " alt="" coords="159,80,309,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style, self&#45;defining parameter set to callers. " alt="" coords="5,5,148,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement. " alt="" coords="172,5,296,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="OverlayAlloc" alt="" coords="321,5,417,32"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::DefaultShadowCameraSetup" name="Ogre::DefaultShadowCameraSetup">
+<area shape="rect" id="node2" href="$class_ogre_1_1_shadow_camera_setup.html" title="This class allows you to plug in new ways to define the camera setup when rendering and projecting sh..." alt="" coords="9,80,195,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="ShadowDataAlloc" alt="" coords="39,5,165,32"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Ogre::D3D9GpuProgramManager" name="Ogre::D3D9GpuProgramManager">
+<area shape="rect" id="node2" href="$class_ogre_1_1_gpu_program_manager.html" title="Ogre::GpuProgramManager" alt="" coords="153,169,335,196"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_resource_manager.html" title="Defines a generic resource handler. " alt="" coords="59,87,223,114"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="ResourceAlloc" alt="" coords="160,5,267,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; GpuProgram\lManager \&gt;" alt="" coords="248,80,445,121"/>
+</map>

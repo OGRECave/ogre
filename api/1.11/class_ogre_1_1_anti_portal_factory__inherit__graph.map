@@ -1,0 +1,5 @@
+<map id="Ogre::AntiPortalFactory" name="Ogre::AntiPortalFactory">
+<area shape="rect" id="node2" href="$class_ogre_1_1_portal_base_factory.html" title="Factory object for creating Portal instances. " alt="" coords="17,155,183,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_movable_object_factory.html" title="Interface definition for a factory class which produces a certain kind of MovableObject, and can be registered with Root in order to allow all clients to produce new instances of this object, integrated with the standard Ogre processing. " alt="" coords="5,80,195,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="MovableAlloc" alt="" coords="50,5,150,32"/>
+</map>

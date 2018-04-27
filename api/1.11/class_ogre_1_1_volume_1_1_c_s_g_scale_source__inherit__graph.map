@@ -1,0 +1,4 @@
+<map id="Ogre::Volume::CSGScaleSource" name="Ogre::Volume::CSGScaleSource">
+<area shape="rect" id="node2" href="$class_ogre_1_1_volume_1_1_c_s_g_unary_source.html" title="Source which does a unary operation to another one. " alt="" coords="5,80,220,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_volume_1_1_source.html" title="Abstract class defining the density function. " alt="" coords="37,5,188,32"/>
+</map>

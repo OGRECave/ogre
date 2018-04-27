@@ -1,0 +1,50 @@
+<map id="Ogre::StringInterface" name="Ogre::StringInterface">
+<area shape="rect" id="node2" href="$class_ogre_1_1_external_texture_source.html" title="IMPORTANT: Plugins must override default dictionary name! Base class that texture plugins derive from..." alt="" coords="201,122,391,149"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_overlay_element.html" title="Abstract definition of a 2D element to be displayed in an Overlay. " alt="" coords="221,173,371,199"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_particle_affector.html" title="Abstract class defining the interface to be implemented by particle affectors. " alt="" coords="222,362,370,389"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_particle_emitter.html" title="Abstract class defining the interface to be implemented by particle emitters. " alt="" coords="224,602,368,629"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1_particle_system.html" title="Class defining particle system based special effects. " alt="" coords="223,653,369,679"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1_particle_system_renderer.html" title="Abstract class defining the interface required to be implemented by classes which provide rendering c..." alt="" coords="196,703,396,730"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource. " alt="" coords="239,906,353,933"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_overlay_container.html" title="A 2D element which contains other OverlayElement instances. " alt="" coords="467,13,626,39"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_text_area_overlay_element.html" title="This class implements an overlay element which contains simple unformatted text. " alt="" coords="445,63,649,90"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_panel_overlay_element.html" title="OverlayElement representing a flat, single&#45;material (or transparent) panel which can contain other el..." alt="" coords="700,13,884,39"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_border_panel_overlay_element.html" title="A specialisation of the PanelOverlayElement to provide a panel with a border. " alt="" coords="957,5,1132,47"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_colour_fader_affector.html" title="This plugin subclass of ParticleAffector allows you to alter the colour of particles. " alt="" coords="459,114,634,141"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_colour_fader_affector2.html" title="This plugin subclass of ParticleAffector allows you to alter the colour of particles. " alt="" coords="455,165,638,191"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_colour_image_affector.html" title="Ogre::ColourImageAffector" alt="" coords="457,215,636,242"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_colour_interpolator_affector.html" title="Ogre::ColourInterpolator\lAffector" alt="" coords="466,267,627,308"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_deflector_plane_affector.html" title="This class defines a ParticleAffector which deflects particles. " alt="" coords="451,333,642,359"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_direction_randomiser_affector.html" title="This class defines a ParticleAffector which applies randomness to the movement of the particles..." alt="" coords="457,384,637,425"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_linear_force_affector.html" title="This class defines a ParticleAffector which applies a linear force to particles in a system..." alt="" coords="461,450,633,477"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_rotation_affector.html" title="This plugin subclass of ParticleAffector allows you to alter the rotation of particles. " alt="" coords="470,501,623,527"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_scale_affector.html" title="This plugin subclass of ParticleAffector allows you to alter the scale of particles. " alt="" coords="478,551,615,578"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_area_emitter.html" title="Particle emitter which emits particles randomly from points inside an area (box, sphere, ellipsoid whatever subclasses choose to be). " alt="" coords="483,602,610,629"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_point_emitter.html" title="Particle emitter which emits particles from a single point. " alt="" coords="481,653,612,679"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_box_emitter.html" title="Particle emitter which emits particles randomly from points inside a box. " alt="" coords="731,526,853,553"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_cylinder_emitter.html" title="Particle emitter which emits particles randomly from points inside a cylinder. " alt="" coords="718,577,866,603"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_ellipsoid_emitter.html" title="Particle emitter which emits particles randomly from points inside an ellipsoid. " alt="" coords="717,627,867,654"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_ring_emitter.html" title="Particle emitter which emits particles randomly from points inside a ring (e.g. " alt="" coords="729,678,855,705"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_hollow_ellipsoid_emitter.html" title="Particle emitter which emits particles randomly from points inside a hollow ellipsoid. " alt="" coords="950,627,1139,654"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1_billboard_particle_renderer.html" title="Specialisation of ParticleSystemRenderer to render particles using a BillboardSet. " alt="" coords="444,703,649,730"/>
+<area shape="rect" id="node30" href="$class_ogre_1_1_bsp_level.html" title="Holds all the data associated with a Binary Space Parition (BSP) based indoor level. " alt="" coords="491,754,603,781"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1_compositor.html" title="Class representing a Compositor object. " alt="" coords="484,805,609,831"/>
+<area shape="rect" id="node32" href="$class_ogre_1_1_font.html" title="Class representing a font in the system. " alt="" coords="505,855,589,882"/>
+<area shape="rect" id="node33" href="$class_ogre_1_1_gpu_program.html" title="Defines a program which runs on the GPU such as a vertex or fragment program. " alt="" coords="481,906,612,933"/>
+<area shape="rect" id="node41" href="$class_ogre_1_1_material.html" title="Class encapsulates rendering properties of an object. " alt="" coords="495,957,599,983"/>
+<area shape="rect" id="node42" href="$class_ogre_1_1_mesh.html" title="Resource holding data about 3D mesh. " alt="" coords="501,1007,592,1034"/>
+<area shape="rect" id="node44" href="$class_ogre_1_1_skeleton.html" title="A collection of Bone objects used to animate a skinned mesh. " alt="" coords="492,1058,601,1085"/>
+<area shape="rect" id="node46" href="$class_ogre_1_1_texture.html" title="Abstract class representing a Texture resource. " alt="" coords="495,1134,598,1161"/>
+<area shape="rect" id="node34" href="$class_ogre_1_1_d3_d9_gpu_program.html" title="Direct3D implementation of a few things common to low&#45;level vertex &amp; fragment programs. " alt="" coords="709,855,875,882"/>
+<area shape="rect" id="node37" href="$class_ogre_1_1_g_l_gpu_program.html" title="Generalised low&#45;level GL program, can be applied to multiple types (eg ARB and NV) ..." alt="" coords="718,906,866,933"/>
+<area shape="rect" id="node40" href="$class_ogre_1_1_high_level_gpu_program.html" title="Abstract base class representing a high&#45;level program (a vertex or fragment program). " alt="" coords="697,957,887,983"/>
+<area shape="rect" id="node35" href="$class_ogre_1_1_d3_d9_gpu_fragment_program.html" title="Direct3D implementation of low&#45;level fragment programs. " alt="" coords="935,805,1155,831"/>
+<area shape="rect" id="node36" href="$class_ogre_1_1_d3_d9_gpu_vertex_program.html" title="Direct3D implementation of low&#45;level vertex programs. " alt="" coords="943,855,1146,882"/>
+<area shape="rect" id="node38" href="$class_ogre_1_1_g_l_arb_gpu_program.html" title="Specialisation of the GL low&#45;level program for ARB programs. " alt="" coords="961,906,1129,933"/>
+<area shape="rect" id="node39" href="$class_ogre_1_1_g_l_gpu_nvparse_program.html" title="Ogre::GLGpuNvparseProgram" alt="" coords="946,957,1143,983"/>
+<area shape="rect" id="node43" href="$class_ogre_1_1_patch_mesh.html" title="Patch specialisation of Mesh. " alt="" coords="730,1007,854,1034"/>
+<area shape="rect" id="node45" href="$class_ogre_1_1_skeleton_instance.html" title="A SkeletonInstance is a single instance of a Skeleton used by a world object. " alt="" coords="713,1058,871,1085"/>
+<area shape="rect" id="node47" href="$class_ogre_1_1_d3_d11_texture.html" title="Specialisation of Texture for D3D11. " alt="" coords="721,1109,863,1135"/>
+<area shape="rect" id="node48" href="$class_ogre_1_1_d3_d9_texture.html" title="Ogre::D3D9Texture" alt="" coords="724,1159,860,1186"/>
+<area shape="rect" id="node49" href="$class_ogre_1_1_g_l_texture_common.html" title="Ogre::GLTextureCommon" alt="" coords="706,1210,878,1237"/>
+</map>

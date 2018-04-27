@@ -1,0 +1,17 @@
+<map id="Ogre::RegionSceneQuery" name="Ogre::RegionSceneQuery">
+<area shape="rect" id="node5" href="$class_ogre_1_1_axis_aligned_box_scene_query.html" title="Specialises the SceneQuery class for querying within an axis aligned box. " alt="" coords="607,85,793,127"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_plane_bounded_volume_list_scene_query.html" title="Specialises the SceneQuery class for querying within a plane&#45;bounded volume. " alt="" coords="607,165,793,207"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_sphere_scene_query.html" title="Specialises the SceneQuery class for querying within a sphere. " alt="" coords="615,249,785,275"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene. " alt="" coords="187,147,317,174"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="SceneMgtAlloc" alt="" coords="5,147,116,174"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_scene_query_listener.html" title="This optional class allows you to receive per&#45;result callbacks from SceneQuery executions instead of ..." alt="" coords="164,198,340,225"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_default_axis_aligned_box_scene_query.html" title="Default implementation of AxisAlignedBoxSceneQuery. " alt="" coords="849,71,1018,112"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_octree_axis_aligned_box_scene_query.html" title="Octree implementation of AxisAlignedBoxSceneQuery. " alt="" coords="1086,5,1275,47"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_p_c_z_axis_aligned_box_scene_query.html" title="PCZ implementation of AxisAlignedBoxSceneQuery. " alt="" coords="1073,71,1288,112"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_default_plane_bounded_volume_list_scene_query.html" title="Default implementation of PlaneBoundedVolumeListSceneQuery. " alt="" coords="841,165,1025,207"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_octree_plane_bounded_volume_list_scene_query.html" title="Octree implementation of PlaneBoundedVolumeListSceneQuery. " alt="" coords="1090,136,1271,177"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_p_c_z_plane_bounded_volume_list_scene_query.html" title="PCZ implementation of PlaneBoundedVolumeListSceneQuery. " alt="" coords="1074,201,1287,243"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_default_sphere_scene_query.html" title="Default implementation of SphereSceneQuery. " alt="" coords="844,260,1023,301"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_octree_sphere_scene_query.html" title="Octree implementation of SphereSceneQuery. " alt="" coords="1075,267,1286,294"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_p_c_z_sphere_scene_query.html" title="PCZ implementation of SphereSceneQuery. " alt="" coords="1081,318,1280,345"/>
+</map>

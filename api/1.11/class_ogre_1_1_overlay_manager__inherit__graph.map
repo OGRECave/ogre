@@ -1,0 +1,5 @@
+<map id="Ogre::OverlayManager" name="Ogre::OverlayManager">
+<area shape="rect" id="node2" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Overlay\lManager \&gt;" alt="" coords="5,5,175,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="199,13,330,39"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="OverlayAlloc" alt="" coords="354,13,450,39"/>
+</map>

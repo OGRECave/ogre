@@ -1,0 +1,6 @@
+<map id="Ogre::PSSMShadowCameraSetup" name="Ogre::PSSMShadowCameraSetup">
+<area shape="rect" id="node2" href="$class_ogre_1_1_li_s_p_s_m_shadow_camera_setup.html" title="Implements the Light Space Perspective Shadow Mapping Algorithm. " alt="" coords="17,244,216,285"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_focused_shadow_camera_setup.html" title="Implements the uniform shadow mapping algorithm in focused mode. " alt="" coords="16,155,217,196"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_shadow_camera_setup.html" title="This class allows you to plug in new ways to define the camera setup when rendering and projecting sh..." alt="" coords="24,80,209,107"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="ShadowDataAlloc" alt="" coords="53,5,180,32"/>
+</map>

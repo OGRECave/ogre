@@ -1,0 +1,11 @@
+<map id="Ogre::Texture" name="Ogre::Texture">
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d11_texture.html" title="Specialisation of Texture for D3D11. " alt="" coords="5,229,148,256"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d9_texture.html" title="Ogre::D3D9Texture" alt="" coords="173,229,309,256"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l_texture_common.html" title="Ogre::GLTextureCommon" alt="" coords="333,229,505,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource. " alt="" coords="183,80,298,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style, self&#45;defining parameter set to callers. " alt="" coords="95,5,237,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="ResourceAlloc" alt="" coords="262,5,369,32"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l3_plus_texture.html" title="Ogre::GL3PlusTexture" alt="" coords="171,304,323,331"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_g_l_e_s2_texture.html" title="Ogre::GLES2Texture" alt="" coords="347,304,491,331"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_g_l_texture.html" title="Ogre::GLTexture" alt="" coords="516,304,635,331"/>
+</map>

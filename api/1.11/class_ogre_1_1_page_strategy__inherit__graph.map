@@ -1,0 +1,5 @@
+<map id="Ogre::PageStrategy" name="Ogre::PageStrategy">
+<area shape="rect" id="node3" href="$class_ogre_1_1_grid2_d_page_strategy.html" title="Page strategy which loads new pages based on a regular 2D grid. " alt="" coords="5,155,184,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_grid3_d_page_strategy.html" title="Page strategy which loads new pages based on a regular 3D grid. " alt="" coords="208,155,387,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="PageAlloc" alt="" coords="155,5,237,32"/>
+</map>

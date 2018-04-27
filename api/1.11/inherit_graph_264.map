@@ -1,0 +1,23 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_ogre_1_1_small_vector_base.html" title="SmallVectorBase &#45; This is all the non&#45;templated stuff common to all SmallVectors. ..." alt="" coords="5,257,164,283"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_small_vector_template_common.html" title="Ogre::SmallVectorTemplate\lCommon\&lt; T \&gt;" alt="" coords="212,108,395,149"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_small_vector_template_common.html" title="Ogre::SmallVectorTemplate\lCommon\&lt; Edge \&gt;" alt="" coords="212,249,395,291"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_small_vector_template_common.html" title="Ogre::SmallVectorTemplate\lCommon\&lt; Triangle * \&gt;" alt="" coords="212,321,395,363"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_small_vector_template_base.html" title="SmallVectorTemplateBase&lt;isPodLike = false&gt; &#45; This is where we put method implementations that are des..." alt="" coords="443,5,626,47"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_small_vector_template_base_3_01_t_00_01true_01_4.html" title="SmallVectorTemplateBase&lt;isPodLike = true&gt; &#45; This is where we put method implementations that are desi..." alt="" coords="443,71,626,112"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_small_vector_template_base.html" title="Ogre::SmallVectorTemplate\lBase\&lt; T, isPodLike\&lt; T \&gt;\l::value \&gt;" alt="" coords="443,137,626,193"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_small_vector_impl.html" title="SmallVectorImpl &#45; This class consists of common code factored out of the SmallVector class to reduce ..." alt="" coords="675,143,861,170"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_small_vector.html" title="SmallVector &#45; This is a &#39;vector&#39; (really, a variable&#45;sized array), optimized for the case when the ar..." alt="" coords="909,64,1047,105"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_small_vector_3_01_t_00_010_01_4.html" title="Specialize SmallVector at N=0. " alt="" coords="909,129,1047,171"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_small_vector.html" title="Ogre::SmallVector\&lt;\l T, S \&gt;" alt="" coords="909,195,1047,236"/>
+<area shape="rect" id="node10" href="$struct_ogre_1_1_vector_set.html" title="VectorSet is basically a helper to use a vector as a small set container. " alt="" coords="1105,202,1270,229"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_small_vector_template_base.html" title="Ogre::SmallVectorTemplate\lBase\&lt; Edge, isPodLike\&lt;\l Edge \&gt;::value \&gt;" alt="" coords="443,242,626,298"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_small_vector_impl.html" title="Ogre::SmallVectorImpl\l\&lt; Edge \&gt;" alt="" coords="691,253,845,295"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_small_vector.html" title="Ogre::SmallVector\&lt;\l Edge, S \&gt;" alt="" coords="909,260,1047,301"/>
+<area shape="rect" id="node15" href="$struct_ogre_1_1_vector_set.html" title="Ogre::VectorSet\&lt; Edge, 8 \&gt;" alt="" coords="1095,267,1280,294"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_small_vector_template_base.html" title="Ogre::SmallVectorTemplate\lBase\&lt; Triangle *, isPodLike\l\&lt; Triangle * \&gt;::value \&gt;" alt="" coords="443,322,627,378"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_small_vector_impl.html" title="Ogre::SmallVectorImpl\l\&lt; Triangle * \&gt;" alt="" coords="691,325,845,367"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_small_vector_impl.html" title="Ogre::SmallVectorImpl\l\&lt; Triangle *\&gt;" alt="" coords="691,391,845,432"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_small_vector.html" title="Ogre::SmallVector\&lt;\l Triangle *, S \&gt;" alt="" coords="909,325,1047,367"/>
+<area shape="rect" id="node20" href="$struct_ogre_1_1_vector_set.html" title="Ogre::VectorSet\&lt; Triangle\l *, 7 \&gt;" alt="" coords="1100,325,1275,367"/>
+</map>
