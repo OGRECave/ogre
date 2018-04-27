@@ -1,0 +1,5 @@
+<map id="Ogre::Bone" name="Ogre::Bone">
+<area shape="rect" id="node4" href="$class_ogre_1_1_tag_point.html" title="A tagged point on a skeleton, which can be used to attach entities to on specific other entities..." alt="" coords="5,229,116,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_node.html" title="Class representing a general&#45;purpose node an articulated scene graph. " alt="" coords="16,80,105,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="NodeAlloc" alt="" coords="19,5,102,32"/>
+</map>

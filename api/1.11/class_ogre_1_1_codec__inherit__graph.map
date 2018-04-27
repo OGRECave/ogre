@@ -1,0 +1,11 @@
+<map id="Ogre::Codec" name="Ogre::Codec">
+<area shape="rect" id="node3" href="$class_ogre_1_1_image_codec.html" title="Codec specialized in images. " alt="" coords="287,157,419,184"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="CodecAlloc" alt="" coords="5,157,95,184"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_a_s_t_c_codec.html" title="Codec specialized in loading ASTC (ARM Adaptive Scalable Texture Compression) images. " alt="" coords="482,5,614,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d_d_s_codec.html" title="Codec specialized in loading DDS (Direct Draw Surface) images. " alt="" coords="485,56,611,83"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_e_t_c_codec.html" title="Codec specialized in loading ETC (Ericsson Texture Compression) images. " alt="" coords="487,107,609,133"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_e_x_r_codec.html" title="Ogre::EXRCodec" alt="" coords="486,157,610,184"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_free_image_codec.html" title="Codec specialized in images loaded using FreeImage. " alt="" coords="469,208,627,235"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_p_v_r_t_c_codec.html" title="Codec specialized in loading PVRTC (PowerVR) images. " alt="" coords="477,259,619,285"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_s_t_b_i_image_codec.html" title="Ogre::STBIImageCodec" alt="" coords="467,309,629,336"/>
+</map>

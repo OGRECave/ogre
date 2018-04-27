@@ -1,0 +1,8 @@
+<map id="Ogre::ShadowCameraSetup" name="Ogre::ShadowCameraSetup">
+<area shape="rect" id="node3" href="$class_ogre_1_1_default_shadow_camera_setup.html" title="Implements default shadow camera setup. " alt="" coords="417,5,611,47"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_focused_shadow_camera_setup.html" title="Implements the uniform shadow mapping algorithm in focused mode. " alt="" coords="413,71,615,112"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_plane_optimal_shadow_camera_setup.html" title="Implements the plane optimal shadow camera algorithm. " alt="" coords="423,136,605,177"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="ShadowDataAlloc" alt="" coords="5,78,132,105"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_li_s_p_s_m_shadow_camera_setup.html" title="Implements the Light Space Perspective Shadow Mapping Algorithm. " alt="" coords="663,71,861,112"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_p_s_s_m_shadow_camera_setup.html" title="Parallel Split Shadow Map (PSSM) shadow camera setup. " alt="" coords="909,78,1132,105"/>
+</map>

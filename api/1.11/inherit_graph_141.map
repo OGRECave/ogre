@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_ogre_1_1_lod_collapse_cost.html" title="Ogre::LodCollapseCost" alt="" coords="5,81,164,108"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_lod_collapse_cost_curvature.html" title="Ogre::LodCollapseCostCurvature" alt="" coords="212,5,427,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_lod_collapse_cost_outside.html" title="Ogre::LodCollapseCostOutside" alt="" coords="218,56,421,83"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_lod_collapse_cost_profiler.html" title="Ogre::LodCollapseCostProfiler" alt="" coords="220,107,419,133"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_lod_collapse_cost_quadric.html" title="Ogre::LodCollapseCostQuadric" alt="" coords="218,157,421,184"/>
+</map>
