@@ -1,0 +1,9 @@
+<map id="Ogre::MultiRenderTarget" name="Ogre::MultiRenderTarget">
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d11_multi_render_target.html" title="Ogre::D3D11MultiRenderTarget" alt="" coords="569,5,776,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d9_multi_render_target.html" title="Ogre::D3D9MultiRenderTarget" alt="" coords="573,56,772,83"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_g_l3_plus_f_b_o_multi_render_target.html" title="MultiRenderTarget for OpenGL. " alt="" coords="570,107,775,149"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l_e_s2_f_b_o_multi_render_target.html" title="MultiRenderTarget for GL ES 2.x. " alt="" coords="574,173,771,214"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l_f_b_o_multi_render_target.html" title="MultiRenderTarget for GL. " alt="" coords="568,239,777,265"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation. " alt="" coords="169,115,307,141"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="RenderSysAlloc" alt="" coords="5,115,121,141"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Ogre::RingEmitter" name="Ogre::RingEmitter">
+<area shape="rect" id="node2" href="$class_ogre_1_1_area_emitter.html" title="Particle emitter which emits particles randomly from points inside an area (box, sphere, ellipsoid whatever subclasses choose to be). " alt="" coords="87,229,213,256"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_particle_emitter.html" title="Abstract class defining the interface to be implemented by particle emitters. " alt="" coords="78,155,222,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style, self&#45;defining parameter set to callers. " alt="" coords="5,80,148,107"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_particle.html" title="Class representing a single particle instance. " alt="" coords="172,80,275,107"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_allocated_object.html" title="FXAlloc" alt="" coords="189,5,257,32"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::TerrainMaterialGenerator" name="Ogre::TerrainMaterialGenerator">
+<area shape="rect" id="node3" href="$class_ogre_1_1_terrain_material_generator_a.html" title="A TerrainMaterialGenerator which can cope with normal mapped, specular mapped terrain. " alt="" coords="5,155,216,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="TerrainAlloc" alt="" coords="65,5,156,32"/>
+</map>

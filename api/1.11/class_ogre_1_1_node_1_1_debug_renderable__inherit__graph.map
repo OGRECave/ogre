@@ -1,0 +1,4 @@
+<map id="Ogre::Node::DebugRenderable" name="Ogre::Node::DebugRenderable">
+<area shape="rect" id="node2" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement. " alt="" coords="5,5,129,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="NodeAlloc" alt="" coords="154,5,237,32"/>
+</map>

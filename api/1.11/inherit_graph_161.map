@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_ogre_1_1_lod_output_provider.html" title="Ogre::LodOutputProvider" alt="" coords="5,56,172,83"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_lod_output_provider_buffer.html" title="Ogre::LodOutputProviderBuffer" alt="" coords="255,5,457,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_lod_output_provider_compressed_mesh.html" title="Ogre::LodOutputProviderCompressedMesh" alt="" coords="220,56,492,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_lod_output_provider_mesh.html" title="Ogre::LodOutputProviderMesh" alt="" coords="257,107,455,133"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_lod_output_provider_compressed_buffer.html" title="Ogre::LodOutputProviderCompressed\lBuffer" alt="" coords="540,49,780,90"/>
+</map>

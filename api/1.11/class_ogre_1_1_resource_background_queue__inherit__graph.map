@@ -1,0 +1,6 @@
+<map id="Ogre::ResourceBackgroundQueue" name="Ogre::ResourceBackgroundQueue">
+<area shape="rect" id="node2" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Resource\lBackgroundQueue \&gt;" alt="" coords="13,5,193,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="ResourceAlloc" alt="" coords="49,71,156,98"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_work_queue_1_1_request_handler.html" title="Interface definition for a handler of requests. " alt="" coords="11,123,195,164"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_work_queue_1_1_response_handler.html" title="Interface definition for a handler of responses. " alt="" coords="5,188,200,229"/>
+</map>

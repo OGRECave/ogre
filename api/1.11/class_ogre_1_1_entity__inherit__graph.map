@@ -1,0 +1,7 @@
+<map id="Ogre::Entity" name="Ogre::Entity">
+<area shape="rect" id="node2" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene. " alt="" coords="177,80,322,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters. " alt="" coords="5,5,149,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose..." alt="" coords="174,5,325,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="MovableAlloc" alt="" coords="349,5,449,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_resource_1_1_listener.html" title="Ogre::Resource::Listener" alt="" coords="347,80,515,107"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$struct_ogre_1_1_vector_base.html" title="Ogre::VectorBase\&lt; dims,\l Real \&gt;" alt="" coords="5,49,176,90"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_vector.html" title="Ogre::Vector\&lt; 2, Real \&gt;" alt="" coords="224,5,387,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_vector.html" title="Ogre::Vector\&lt; 3, Real \&gt;" alt="" coords="224,56,387,83"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_vector.html" title="Ogre::Vector\&lt; 4, Real \&gt;" alt="" coords="224,107,387,133"/>
+</map>

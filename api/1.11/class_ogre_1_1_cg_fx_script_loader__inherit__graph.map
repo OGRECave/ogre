@@ -1,0 +1,5 @@
+<map id="Ogre::CgFxScriptLoader" name="Ogre::CgFxScriptLoader">
+<area shape="rect" id="node2" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; CgFxScript\lLoader \&gt;" alt="" coords="5,5,196,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="221,13,351,39"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="ScriptCompilerAlloc" alt="" coords="376,13,513,39"/>
+</map>

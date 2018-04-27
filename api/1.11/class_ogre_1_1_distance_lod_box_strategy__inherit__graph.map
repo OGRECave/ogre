@@ -1,0 +1,6 @@
+<map id="Ogre::DistanceLodBoxStrategy" name="Ogre::DistanceLodBoxStrategy">
+<area shape="rect" id="node2" href="$class_ogre_1_1_distance_lod_strategy_base.html" title="Level of detail strategy based on distance from camera. " alt="" coords="5,162,216,189"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_lod_strategy.html" title="Strategy for determining level of detail. " alt="" coords="47,80,175,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="LodAlloc" alt="" coords="75,5,147,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Distance\lLodBoxStrategy \&gt;" alt="" coords="240,155,416,196"/>
+</map>

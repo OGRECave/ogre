@@ -1,0 +1,28 @@
+var struct_ogre_1_1_vector_base_3_013_00_01_real_01_4 =
+[
+    [ "VectorBase", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#afcd99d9db1e0e25bab9f7bea0d4a190a", null ],
+    [ "VectorBase", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a9099515f00fb4c790492037a4816c1a9", null ],
+    [ "ptr", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a31881149277650a90648d2af9bda9651", null ],
+    [ "ptr", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a15af017028e0d2ac1e47c803df5f1c17", null ],
+    [ "crossProduct", "group___math.html#gafe9157bbe30e69645edd5c3eddea141f", null ],
+    [ "perpendicular", "group___math.html#ga5b50a2b2697ec1ac684d66af82a03296", null ],
+    [ "operator=", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a19bd0cfc28e7d1b7ed92b83e286899cb", null ],
+    [ "absDotProduct", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a2e8982298226fccf166445c68506f087", null ],
+    [ "midPoint", "group___math.html#ga929562516cfb30c38030d9df84945bf3", null ],
+    [ "randomDeviant", "group___math.html#ga4f54a2dd6b60dd327fcc8347fc4d853d", null ],
+    [ "getRotationTo", "group___math.html#gac6ef79da21101ef5a671b0473b849bc3", null ],
+    [ "positionCloses", "group___math.html#ga24dd46458beb0ea8175bfbf916f09e47", null ],
+    [ "directionEquals", "group___math.html#gad67db81d99c63e2483ff8bc314bfd36c", null ],
+    [ "primaryAxis", "group___math.html#gad52e72c687842e8475a5f24cde8cd858", null ],
+    [ "x", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a2e6b3a89e26268bde6f6347f363a6bd1", null ],
+    [ "y", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a5c89e45e32e3cf01cc54dc05ad6704e5", null ],
+    [ "z", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a0a242b15c4c3a7181cc5a371b3f86fe3", null ],
+    [ "ZERO", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a683a3ae0ddceb4a01a94c0727ca63362", null ],
+    [ "UNIT_X", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a2fe25096ba980b3569e44833ddf155e6", null ],
+    [ "UNIT_Y", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a25a0d767f153bc408453ee85de866c87", null ],
+    [ "UNIT_Z", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#ab8448c3f1c0a210e465a1aa0e551a33a", null ],
+    [ "NEGATIVE_UNIT_X", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#aff2d9ac3a0f7653fc9e5dcef71e80397", null ],
+    [ "NEGATIVE_UNIT_Y", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a42a88148edf0e38db8a1fb4ab5d5b499", null ],
+    [ "NEGATIVE_UNIT_Z", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#ab7cc41b4120afa20f7d74d918ea35dc3", null ],
+    [ "UNIT_SCALE", "struct_ogre_1_1_vector_base_3_013_00_01_real_01_4.html#a89fbc371d11d0363db247d6ef1fa7afa", null ]
+];

@@ -1,0 +1,7 @@
+<map id="Ogre::KeyFrame" name="Ogre::KeyFrame">
+<area shape="rect" id="node3" href="$class_ogre_1_1_numeric_key_frame.html" title="Specialised KeyFrame which stores any numeric value. " alt="" coords="342,5,509,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_transform_key_frame.html" title="Specialised KeyFrame which stores a full transform. " alt="" coords="337,56,514,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_vertex_morph_key_frame.html" title="Specialised KeyFrame which stores absolute vertex positions for a complete buffer, designed to be interpolated with other keys in the same track. " alt="" coords="329,107,521,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_vertex_pose_key_frame.html" title="Specialised KeyFrame which references a Mesh::Pose at a certain influence level, which stores offsets..." alt="" coords="332,157,519,184"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="AnimationAlloc" alt="" coords="5,81,115,108"/>
+</map>

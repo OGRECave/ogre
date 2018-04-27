@@ -1,0 +1,6 @@
+<map id="Ogre::GLES2HardwareBufferManager" name="Ogre::GLES2HardwareBufferManager">
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_buffer_manager.html" title="Singleton wrapper for hardware buffer manager. " alt="" coords="135,169,334,196"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hardware_buffer_manager_base.html" title="Base definition of a hardware buffer manager. " alt="" coords="5,87,235,114"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="BufferAlloc" alt="" coords="77,5,163,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Hardware\lBufferManager \&gt;" alt="" coords="259,80,439,121"/>
+</map>
