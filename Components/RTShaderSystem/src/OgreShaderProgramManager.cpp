@@ -308,47 +308,25 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
     if (success == false)   
         return false;   
     
-    // Create the vertex shader program.
-    GpuProgramPtr vsGpuProgram;
-    
-    vsGpuProgram = createGpuProgram(programSet->getCpuProgram(GPT_VERTEX_PROGRAM), 
-        programWriter,
-        language, 
-        ShaderGenerator::getSingleton().getVertexShaderProfiles(),
-        ShaderGenerator::getSingleton().getVertexShaderProfilesList(),
-        ShaderGenerator::getSingleton().getShaderCachePath());
+    // Create the shader programs
+    for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
+    {
+        auto gpuProgram = createGpuProgram(programSet->getCpuProgram(type), programWriter, language,
+                                           ShaderGenerator::getSingleton().getShaderProfiles(type),
+                                           ShaderGenerator::getSingleton().getShaderProfilesList(type),
+                                           ShaderGenerator::getSingleton().getShaderCachePath());
+        if(!gpuProgram)
+            return false;
 
-    if (!vsGpuProgram)
-        return false;
-
-    programSet->setGpuProgram(vsGpuProgram, GPT_VERTEX_PROGRAM);
+        programSet->setGpuProgram(gpuProgram, type);
+    }
 
     //update flags
     programSet->getGpuProgram(GPT_VERTEX_PROGRAM)->setSkeletalAnimationIncluded(
         programSet->getCpuProgram(GPT_VERTEX_PROGRAM)->getSkeletalAnimationIncluded());
-    // Create the fragment shader program.
-    GpuProgramPtr psGpuProgram;
-
-    psGpuProgram = createGpuProgram(programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM), 
-        programWriter,
-        language, 
-        ShaderGenerator::getSingleton().getFragmentShaderProfiles(),
-        ShaderGenerator::getSingleton().getFragmentShaderProfilesList(),
-        ShaderGenerator::getSingleton().getShaderCachePath());
-
-    if (!psGpuProgram)
-        return false;
-
-    programSet->setGpuProgram(psGpuProgram, GPT_FRAGMENT_PROGRAM);
 
     // Call the post creation of GPU programs method.
-    success = programProcessor->postCreateGpuPrograms(programSet);
-    if (success == false)   
-        return false;   
-
-    
-    return true;
-    
+    return programProcessor->postCreateGpuPrograms(programSet);
 }
 
 

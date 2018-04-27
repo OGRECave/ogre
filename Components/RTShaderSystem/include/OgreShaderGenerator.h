@@ -139,37 +139,21 @@ public:
     float getTargetLanguageVersion() const { return mShaderLanguageVersion; }
 
     /** 
-    Set the output vertex shader target profiles.
-    @param vertexShaderProfiles The target profiles for the vertex shader.  
+    Set the output shader target profiles.
+    @param type shader type
+    @param shaderProfiles The target profiles for the shader.
     */
-    void setVertexShaderProfiles(const String& vertexShaderProfiles);
+    void setShaderProfiles(GpuProgramType type, const String& shaderProfiles);
 
     /** 
-    Get the output vertex shader target profiles.   
+    Get the output shader target profiles.
     */
-    const String& getVertexShaderProfiles() const { return mVertexShaderProfiles; }
+    const String& getShaderProfiles(GpuProgramType type) const;
 
     /** 
-    Get the output vertex shader target profiles as list of strings.    
+    Get the output shader target profiles as list of strings.
     */
-    const StringVector& getVertexShaderProfilesList() const { return mVertexShaderProfilesList; }
-
-
-    /** 
-    Set the output fragment shader target profiles.
-    @param fragmentShaderProfiles The target profiles for the fragment shader.  
-    */
-    void setFragmentShaderProfiles(const String& fragmentShaderProfiles);
-
-    /** 
-    Get the output fragment shader target profiles. 
-    */
-    const String& getFragmentShaderProfiles() const { return mFragmentShaderProfiles; }
-
-    /** 
-    Get the output fragment shader target profiles as list of strings.
-    */
-    const StringVector& getFragmentShaderProfilesList() const { return mFragmentShaderProfilesList; }
+    const StringVector& getShaderProfilesList(GpuProgramType type);
 
     /** 
     Set the output shader cache path. Generated shader code will be written to this path.
