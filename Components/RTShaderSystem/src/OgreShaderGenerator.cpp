@@ -87,8 +87,11 @@ ShaderGenerator::ShaderGenerator() :
             "ShaderGenerator::ShaderGenerator" );
     }
 
-    setVertexShaderProfiles("gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_4_0_level_9_3 vs_4_0_level_9_1 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1 glslv");
-    setFragmentShaderProfiles("ps_4_0 ps_4_0_level_9_3 ps_4_0_level_9_1 ps_3_x ps_3_0 fp40 fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1 glslf");
+    setShaderProfiles(GPT_VERTEX_PROGRAM, "gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_4_0_level_9_3 "
+                                          "vs_4_0_level_9_1 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1 glslv");
+    setShaderProfiles(GPT_FRAGMENT_PROGRAM, "ps_4_0 ps_4_0_level_9_3 ps_4_0_level_9_1 ps_3_x ps_3_0 fp40 "
+                                            "fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 "
+                                            "ps_1_2 ps_1_1 glslf");
 }
 
 //-----------------------------------------------------------------------------
@@ -633,18 +636,52 @@ void ShaderGenerator::_setActiveSceneManager(SceneManager* sceneManager)
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::setVertexShaderProfiles(const String& vertexShaderProfiles)
+void ShaderGenerator::setShaderProfiles(GpuProgramType type, const String& shaderProfiles)
 {
-    mVertexShaderProfiles = vertexShaderProfiles;
-    mVertexShaderProfilesList = StringUtil::split(vertexShaderProfiles);
-}
-//-----------------------------------------------------------------------------
-void ShaderGenerator::setFragmentShaderProfiles(const String& fragmentShaderProfiles)
-{
-    mFragmentShaderProfiles = fragmentShaderProfiles;
-    mFragmentShaderProfilesList = StringUtil::split(fragmentShaderProfiles);
+    switch(type)
+    {
+    case GPT_VERTEX_PROGRAM:
+        mVertexShaderProfiles = shaderProfiles;
+        mVertexShaderProfilesList = StringUtil::split(shaderProfiles);
+        break;
+    case GPT_FRAGMENT_PROGRAM:
+        mFragmentShaderProfiles = shaderProfiles;
+        mFragmentShaderProfilesList = StringUtil::split(shaderProfiles);
+        break;
+    default:
+        OgreAssert(false, "not implemented");
+        break;
+    }
 }
 
+const String& ShaderGenerator::getShaderProfiles(GpuProgramType type) const
+{
+    switch(type)
+    {
+    case GPT_VERTEX_PROGRAM:
+        return mVertexShaderProfiles;
+    case GPT_FRAGMENT_PROGRAM:
+        return mFragmentShaderProfiles;
+    default:
+        return BLANKSTRING;
+    }
+}
+
+const StringVector& ShaderGenerator::getShaderProfilesList(GpuProgramType type)
+{
+    switch(type)
+    {
+    case GPT_VERTEX_PROGRAM:
+        return mVertexShaderProfilesList;
+    case GPT_FRAGMENT_PROGRAM:
+        return mFragmentShaderProfilesList;
+    default:
+        break;
+    }
+
+    static StringVector empty;
+    return empty;
+}
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName, 
                                               const String& srcTechniqueSchemeName, 
