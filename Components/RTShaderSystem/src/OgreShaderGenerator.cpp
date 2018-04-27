@@ -56,7 +56,7 @@ ShaderGenerator::ShaderGenerator() :
     mActiveSceneMgr(NULL), mRenderObjectListener(NULL), mSceneManagerListener(NULL), mScriptTranslatorManager(NULL),
     mMaterialSerializerListener(NULL), mShaderLanguage(""), mProgramManager(NULL), mProgramWriterManager(NULL),
     mFSLayer(0), mFFPRenderStateBuilder(NULL),mActiveViewportValid(false), mVSOutputCompactPolicy(VSOCP_LOW),
-    mCreateShaderOverProgrammablePass(false), mIsFinalizing(false)
+    mCreateShaderOverProgrammablePass(false), mIsFinalizing(false), mIsHLSL4(false)
 {
     mLightCount[0]              = 0;
     mLightCount[1]              = 0;
@@ -79,6 +79,7 @@ ShaderGenerator::ShaderGenerator() :
     else if (hmgr.isLanguageSupported("hlsl"))
     {
         mShaderLanguage = "hlsl";
+        mIsHLSL4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
     }
     else
     {
@@ -146,11 +147,6 @@ bool ShaderGenerator::_initialize()
     // Create the default scheme.
     createScheme(DEFAULT_SCHEME_NAME);
 	
-	if (Root::getSingleton().getRenderSystem()->getName().find("Direct3D11") != String::npos)
-	{
-		this->setTargetLanguage("hlsl",4.0);
-	}
-
 	mResourceGroupListener = new SGResourceGroupListener(this);
 	ResourceGroupManager::getSingleton().addResourceGroupListener(mResourceGroupListener);
 
@@ -1292,17 +1288,8 @@ size_t ShaderGenerator::getShaderCount(GpuProgramType type) const
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::setTargetLanguage(const String& shaderLanguage,const float version)
+void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 {
-	
-	if (Ogre::Root::getSingleton().getRenderSystem()->getName().find("Direct3D11") != String::npos)
-	{
-		if (shaderLanguage != "hlsl" || version < 4.0)
-			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
-			"Direct3D11 supports hlsl 4.0 and above'",
-			"ShaderGenerator::setTargetLanguage");
-	}
-	
     // Make sure that the shader language is supported.
     if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(shaderLanguage) == false)
     {
@@ -1312,10 +1299,9 @@ void ShaderGenerator::setTargetLanguage(const String& shaderLanguage,const float
     }
 
     // Case target language changed -> flush the shaders cache.
-    if (mShaderLanguage != shaderLanguage || mShaderLanguageVersion != version )
+    if (mShaderLanguage != shaderLanguage)
     {
         mShaderLanguage = shaderLanguage;
-        mShaderLanguageVersion = version;
         flushShaderCache();
     }
 }
