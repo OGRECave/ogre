@@ -1,0 +1,5 @@
+<map id="Ogre::PCZone" name="Ogre::PCZone">
+<area shape="rect" id="node3" href="$class_ogre_1_1_default_zone.html" title="Ogre::DefaultZone" alt="" coords="5,155,135,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_octree_zone.html" title="Ogre::OctreeZone" alt="" coords="159,155,285,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="SceneCtlAllocatedObject" alt="" coords="62,5,230,32"/>
+</map>

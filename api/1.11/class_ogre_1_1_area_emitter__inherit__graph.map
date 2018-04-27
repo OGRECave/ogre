@@ -1,0 +1,11 @@
+<map id="Ogre::AreaEmitter" name="Ogre::AreaEmitter">
+<area shape="rect" id="node6" href="$class_ogre_1_1_box_emitter.html" title="Particle emitter which emits particles randomly from points inside a box. " alt="" coords="5,304,128,331"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_cylinder_emitter.html" title="Particle emitter which emits particles randomly from points inside a cylinder. " alt="" coords="153,304,301,331"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_ellipsoid_emitter.html" title="Particle emitter which emits particles randomly from points inside an ellipsoid. " alt="" coords="325,304,475,331"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_ring_emitter.html" title="Particle emitter which emits particles randomly from points inside a ring (e.g. " alt="" coords="499,304,626,331"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_particle_emitter.html" title="Abstract class defining the interface to be implemented by particle emitters. " alt="" coords="241,155,385,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style, self&#45;defining parameter set to callers. " alt="" coords="169,80,311,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_particle.html" title="Class representing a single particle instance. " alt="" coords="335,80,438,107"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_allocated_object.html" title="FXAlloc" alt="" coords="353,5,421,32"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_hollow_ellipsoid_emitter.html" title="Particle emitter which emits particles randomly from points inside a hollow ellipsoid. " alt="" coords="305,379,495,405"/>
+</map>

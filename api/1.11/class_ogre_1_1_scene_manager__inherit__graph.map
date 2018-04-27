@@ -1,0 +1,7 @@
+<map id="Ogre::SceneManager" name="Ogre::SceneManager">
+<area shape="rect" id="node3" href="$class_ogre_1_1_bsp_scene_manager.html" title="Specialisation of the SceneManager class to deal with indoor scenes based on a BSP tree..." alt="" coords="367,5,535,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_default_scene_manager.html" title="Default scene manager. " alt="" coords="357,56,544,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_octree_scene_manager.html" title="Specialized SceneManager that divides the geometry into an octree in order to facilitate spatial quer..." alt="" coords="359,107,543,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_p_c_z_scene_manager.html" title="Specialized SceneManager that uses Portal&#45;Connected&#45;Zones to divide the scene spatially. " alt="" coords="365,157,537,184"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="SceneMgtAlloc" alt="" coords="5,81,116,108"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Ogre::Quake3ShaderManager" name="Ogre::Quake3ShaderManager">
+<area shape="rect" id="node2" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,13,136,39"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Quake3Shader\lManager \&gt;" alt="" coords="160,5,371,47"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="ResourceAlloc" alt="" coords="395,13,501,39"/>
+</map>

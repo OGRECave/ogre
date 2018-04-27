@@ -1,0 +1,6 @@
+<map id="Ogre::PixelCountLodStrategyBase" name="Ogre::PixelCountLodStrategyBase">
+<area shape="rect" id="node4" href="$class_ogre_1_1_absolute_pixel_count_lod_strategy.html" title="Ogre::AbsolutePixelCount\lLodStrategy" alt="" coords="5,229,179,271"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_screen_ratio_pixel_count_lod_strategy.html" title="Ogre::ScreenRatioPixelCount\lLodStrategy" alt="" coords="203,229,397,271"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_lod_strategy.html" title="Strategy for determining level of detail. " alt="" coords="132,80,260,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="LodAlloc" alt="" coords="160,5,232,32"/>
+</map>

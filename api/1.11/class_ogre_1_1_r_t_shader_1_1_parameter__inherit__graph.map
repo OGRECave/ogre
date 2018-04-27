@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::Parameter" name="Ogre::RTShader::Parameter">
+<area shape="rect" id="node3" href="$class_ogre_1_1_r_t_shader_1_1_const_parameter.html" title="Helper template which is the base for our ConstParameters. " alt="" coords="5,155,225,196"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_r_t_shader_1_1_uniform_parameter.html" title="Uniform parameter class. " alt="" coords="249,162,480,189"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="RTShaderSystemAlloc" alt="" coords="162,5,317,32"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="Ogre::Exception" name="Ogre::Exception">
+<area shape="rect" id="node3" href="$class_ogre_1_1_file_not_found_exception.html" title="Ogre::FileNotFoundException" alt="" coords="335,5,529,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_internal_error_exception.html" title="Ogre::InternalErrorException" alt="" coords="339,56,525,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_invalid_call_exception.html" title="Ogre::InvalidCallException" alt="" coords="343,107,521,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_invalid_parameters_exception.html" title="Ogre::InvalidParametersException" alt="" coords="321,157,543,184"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_invalid_state_exception.html" title="Ogre::InvalidStateException" alt="" coords="339,208,525,235"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_i_o_exception.html" title="Ogre::IOException" alt="" coords="367,259,497,285"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_item_identity_exception.html" title="Ogre::ItemIdentityException" alt="" coords="339,309,525,336"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_rendering_a_p_i_exception.html" title="Ogre::RenderingAPIException" alt="" coords="333,360,531,387"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_runtime_assertion_exception.html" title="Ogre::RuntimeAssertionException" alt="" coords="322,411,542,437"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_unimplemented_exception.html" title="Template struct which creates a distinct type for each exception code. " alt="" coords="329,461,535,488"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_d3_d11_rendering_a_p_i_exception.html" title="Ogre::D3D11RenderingAPIException" alt="" coords="591,360,829,387"/>
+</map>

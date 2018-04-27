@@ -1,0 +1,6 @@
+<map id="Ogre::MaterialManager" name="Ogre::MaterialManager">
+<area shape="rect" id="node2" href="$class_ogre_1_1_resource_manager.html" title="Defines a generic resource handler. " alt="" coords="59,87,223,114"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="ResourceAlloc" alt="" coords="160,5,267,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Material\lManager \&gt;" alt="" coords="248,80,419,121"/>
+</map>

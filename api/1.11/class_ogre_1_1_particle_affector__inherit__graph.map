@@ -1,0 +1,13 @@
+<map id="Ogre::ParticleAffector" name="Ogre::ParticleAffector">
+<area shape="rect" id="node4" href="$class_ogre_1_1_colour_fader_affector.html" title="This plugin subclass of ParticleAffector allows you to alter the colour of particles. " alt="" coords="400,5,575,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_colour_fader_affector2.html" title="This plugin subclass of ParticleAffector allows you to alter the colour of particles. " alt="" coords="396,56,579,83"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_colour_image_affector.html" title="Ogre::ColourImageAffector" alt="" coords="398,107,577,133"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_colour_interpolator_affector.html" title="Ogre::ColourInterpolator\lAffector" alt="" coords="407,158,568,199"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_deflector_plane_affector.html" title="This class defines a ParticleAffector which deflects particles. " alt="" coords="392,224,583,251"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_direction_randomiser_affector.html" title="This class defines a ParticleAffector which applies randomness to the movement of the particles..." alt="" coords="397,275,577,317"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_linear_force_affector.html" title="This class defines a ParticleAffector which applies a linear force to particles in a system..." alt="" coords="401,341,573,368"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_rotation_affector.html" title="This plugin subclass of ParticleAffector allows you to alter the rotation of particles. " alt="" coords="411,392,564,419"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_scale_affector.html" title="This plugin subclass of ParticleAffector allows you to alter the scale of particles. " alt="" coords="419,443,556,469"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style, self&#45;defining parameter set to callers. " alt="" coords="5,199,148,225"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="FXAlloc" alt="" coords="43,249,111,276"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Ogre::ShadowRenderable" name="Ogre::ShadowRenderable">
+<area shape="rect" id="node4" href="$class_ogre_1_1_manual_object_1_1_manual_object_section_shadow_renderable.html" title="Nested class to allow shadows. " alt="" coords="41,155,243,211"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement. " alt="" coords="5,5,129,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="ShadowDataAlloc" alt="" coords="153,5,280,32"/>
+</map>

@@ -1,0 +1,14 @@
+<map id="Ogre::GLHardwarePixelBufferCommon" name="Ogre::GLHardwarePixelBufferCommon">
+<area shape="rect" id="node5" href="$class_ogre_1_1_g_l3_plus_hardware_pixel_buffer.html" title="Ogre::GL3PlusHardwarePixel\lBuffer" alt="" coords="807,49,1001,90"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l_e_s2_hardware_pixel_buffer.html" title="Ogre::GLES2HardwarePixel\lBuffer" alt="" coords="811,127,997,169"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_g_l_hardware_pixel_buffer.html" title="Ogre::GLHardwarePixelBuffer" alt="" coords="807,208,1001,235"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_pixel_buffer.html" title="Specialisation of HardwareBuffer for a pixel buffer. " alt="" coords="337,135,516,161"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers. " alt="" coords="140,135,289,161"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="BufferAlloc" alt="" coords="5,135,92,161"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_g_l3_plus_render_buffer.html" title="Renderbuffer surface. " alt="" coords="1050,5,1235,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l3_plus_texture_buffer.html" title="Texture surface. " alt="" coords="1049,56,1236,83"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_g_l_e_s2_render_buffer.html" title="Renderbuffer surface. " alt="" coords="1054,107,1231,133"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_g_l_e_s2_texture_buffer.html" title="Texture surface. " alt="" coords="1053,157,1232,184"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_g_l_render_buffer.html" title="Renderbuffer surface. " alt="" coords="1067,208,1219,235"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_g_l_texture_buffer.html" title="Texture surface. " alt="" coords="1065,259,1220,285"/>
+</map>
