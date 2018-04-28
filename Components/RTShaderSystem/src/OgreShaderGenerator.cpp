@@ -72,14 +72,14 @@ ShaderGenerator::ShaderGenerator() :
     {
         mShaderLanguage = "glsl";
     }
-    else if (hmgr.isLanguageSupported("cg"))
-    {
-        mShaderLanguage = "cg";
-    }
     else if (hmgr.isLanguageSupported("hlsl"))
     {
         mShaderLanguage = "hlsl";
         mIsHLSL4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
+    }
+    else if (hmgr.isLanguageSupported("cg"))
+    {
+        mShaderLanguage = "cg";
     }
     else
     {
