@@ -88,6 +88,10 @@ namespace Ogre {
             LT_SPOTLIGHT = 2,
             /// Virtual point lights, used for Instant Radiosity (Global Illumination fake / approximation)
             LT_VPL = 3,
+            MAX_FORWARD_PLUS_LIGHTS = 4,
+            /// Non-PBR version of Area lights. Not an accurate approximation, but
+            /// they're flexible, useful & cheap. They aren't physically correct at all.
+            LT_AREA_APPROX = 4,
 
             NUM_LIGHT_TYPES
         };
@@ -274,6 +278,14 @@ namespace Ogre {
 
 		bool getAffectParentNode(void) const                        { return mAffectParentNode; }
 
+        /** For area lights and custom 2d shapes, specifies whether the light lits in both
+            directions (positive & negative sides of the plane) or if only towards one.
+        @param bDoubleSided
+            True to enable. Default: false.
+        */
+        void setDoubleSided( bool bDoubleSided );
+        bool getDoubleSided(void) const                             { return mDoubleSided; }
+
         /** Sets the range of a spotlight, i.e. the angle of the inner and outer cones
             and the rate of falloff between them.
         @param innerAngle
@@ -326,6 +338,13 @@ namespace Ogre {
             clipping.
         */
         Real getSpotlightNearClipDistance() const { return mSpotNearClip; }
+
+        /** For custom 2D shape and area lights, sets the dimensions of the rectangle, in half size
+        @param halfSize
+        */
+        void setRectHalfSize( Vector2 halfSize );
+        const Vector2& getRectHalfSize(void) const      { return mRectHalfSize; }
+        Vector2 getDerivedRectHalfSize(void) const;
         
         /** Set a scaling factor to indicate the relative power of a light.
         @remarks
@@ -532,6 +551,8 @@ namespace Ogre {
         Real mPowerScale;
         bool mOwnShadowFarDist;
 		bool mAffectParentNode;
+        bool mDoubleSided;
+        Vector2 mRectHalfSize;
         Real mShadowFarDist;
         Real mShadowFarDistSquared;
 

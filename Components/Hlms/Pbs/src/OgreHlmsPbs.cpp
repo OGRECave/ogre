@@ -980,6 +980,7 @@ namespace Ogre
         int32 numDirectionalLights  = getProperty( HlmsBaseProp::LightsDirNonCaster );
         int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
+        int32 numAreaApproxLights   = getProperty( HlmsBaseProp::LightsAreaApprox );
 
         bool isPssmBlend = getProperty( HlmsBaseProp::PssmBlend ) != 0;
         bool isPssmFade = getProperty( HlmsBaseProp::PssmFade ) != 0;
@@ -1059,12 +1060,13 @@ namespace Ogre
             if( numShadowMapLights > 0 )
             {
                 //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
-                mapSize += ( 6 * 4 * 4 ) * numLights;
+                mapSize += ( 6 * 4 * 4 ) * (numLights + numAreaApproxLights);
             }
             else
             {
                 //Three variables * 4 (padded vec3) * 4 (bytes) * numDirectionalLights
                 mapSize += ( 3 * 4 * 4 ) * numDirectionalLights;
+                mapSize += ( 6 * 4 * 4 ) * numAreaApproxLights;
             }
         }
         else
@@ -1389,21 +1391,35 @@ namespace Ogre
                     *passBufferPtr++ = attenQuadratic;
                     ++passBufferPtr;
 
-                    //vec3 lights[numLights].spotDirection;
+                    const Vector2 rectHalfSize = light->getDerivedRectHalfSize();
+
+                    //vec4 lights[numLights].spotDirection;
                     Vector3 spotDir = viewMatrix3 * light->getDerivedDirection();
                     *passBufferPtr++ = spotDir.x;
                     *passBufferPtr++ = spotDir.y;
                     *passBufferPtr++ = spotDir.z;
-                    ++passBufferPtr;
+                    *passBufferPtr++ = 1.0f / rectHalfSize.x;
 
-                    //vec3 lights[numLights].spotParams;
-                    Radian innerAngle = light->getSpotlightInnerAngle();
-                    Radian outerAngle = light->getSpotlightOuterAngle();
-                    *passBufferPtr++ = 1.0f / ( cosf( innerAngle.valueRadians() * 0.5f ) -
-                                             cosf( outerAngle.valueRadians() * 0.5f ) );
-                    *passBufferPtr++ = cosf( outerAngle.valueRadians() * 0.5f );
-                    *passBufferPtr++ = light->getSpotlightFalloff();
-                    ++passBufferPtr;
+                    //vec4 lights[numLights].spotParams;
+                    if( light->getType() != Light::LT_AREA_APPROX )
+                    {
+                        Radian innerAngle = light->getSpotlightInnerAngle();
+                        Radian outerAngle = light->getSpotlightOuterAngle();
+                        *passBufferPtr++ = 1.0f / ( cosf( innerAngle.valueRadians() * 0.5f ) -
+                                                    cosf( outerAngle.valueRadians() * 0.5f ) );
+                        *passBufferPtr++ = cosf( outerAngle.valueRadians() * 0.5f );
+                        *passBufferPtr++ = light->getSpotlightFalloff();
+                    }
+                    else
+                    {
+                        Quaternion qRot = light->getParentNode()->_getDerivedOrientation();
+                        Vector3 xAxis = viewMatrix3 * qRot.xAxis();
+                        *passBufferPtr++ = xAxis.x;
+                        *passBufferPtr++ = xAxis.y;
+                        *passBufferPtr++ = xAxis.z;
+                    }
+                    *passBufferPtr++ = 1.0f / rectHalfSize.y;
+
                 }
             }
             else
@@ -1443,6 +1459,69 @@ namespace Ogre
                     *passBufferPtr++ = colour.b;
                     ++passBufferPtr;
                 }
+            }
+
+            //Send area lights
+            const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
+            for( int32 i=0; i<numAreaApproxLights; ++i )
+            {
+                const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
+                assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
+
+                Light const *light = globalLightList.lights[idx];
+
+                Vector4 lightPos4 = light->getAs4DVector();
+                Vector3 lightPos = viewMatrix * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
+
+                //vec3 areaApproxLights[numLights].position
+                *passBufferPtr++ = lightPos.x;
+                *passBufferPtr++ = lightPos.y;
+                *passBufferPtr++ = lightPos.z;
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+                *reinterpret_cast<uint32 * RESTRICT_ALIAS>( passBufferPtr ) = light->getLightMask();
+#endif
+                ++passBufferPtr;
+
+                //vec3 areaApproxLights[numLights].diffuse
+                ColourValue colour = light->getDiffuseColour() *
+                                     light->getPowerScale();
+                *passBufferPtr++ = colour.r;
+                *passBufferPtr++ = colour.g;
+                *passBufferPtr++ = colour.b;
+                ++passBufferPtr;
+
+                //vec3 areaApproxLights[numLights].specular
+                colour = light->getSpecularColour() * light->getPowerScale();
+                *passBufferPtr++ = colour.r;
+                *passBufferPtr++ = colour.g;
+                *passBufferPtr++ = colour.b;
+                ++passBufferPtr;
+
+                //vec3 areaApproxLights[numLights].attenuation;
+                Real attenRange     = light->getAttenuationRange();
+                Real attenLinear    = light->getAttenuationLinear();
+                Real attenQuadratic = light->getAttenuationQuadric();
+                *passBufferPtr++ = attenRange;
+                *passBufferPtr++ = attenLinear;
+                *passBufferPtr++ = attenQuadratic;
+                ++passBufferPtr;
+
+                const Vector2 rectHalfSize = light->getDerivedRectHalfSize();
+
+                //vec4 areaApproxLights[numLights].direction;
+                Vector3 areaDir = viewMatrix3 * light->getDerivedDirection();
+                *passBufferPtr++ = areaDir.x;
+                *passBufferPtr++ = areaDir.y;
+                *passBufferPtr++ = areaDir.z;
+                *passBufferPtr++ = 1.0f / rectHalfSize.x;
+
+                //vec4 areaApproxLights[numLights].tangent;
+                Quaternion qRot = light->getParentNode()->_getDerivedOrientation();
+                Vector3 xAxis = viewMatrix3 * qRot.xAxis();
+                *passBufferPtr++ = xAxis.x;
+                *passBufferPtr++ = xAxis.y;
+                *passBufferPtr++ = xAxis.z;
+                *passBufferPtr++ = 1.0f / rectHalfSize.y;
             }
 
             if( shadowNode )

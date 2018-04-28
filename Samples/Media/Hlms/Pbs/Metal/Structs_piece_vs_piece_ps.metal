@@ -22,6 +22,21 @@ struct Light
 @end
 };
 
+struct AreaLight
+{
+	float4 position; //.w contains the objLightMask
+	float3 diffuse;
+	float3 specular;
+	float3 attenuation;
+	//Custom 2D Shape:
+	//  direction.xyz direction
+	//  direction.w invHalfRectSize.x
+	//  tangent.xyz tangent
+	//  tangent.w invHalfRectSize.y
+	float4 direction;
+	float4 tangent;
+};
+
 @insertpiece( DeclCubemapProbeStruct )
 
 //Uniforms that change per pass
@@ -71,6 +86,7 @@ struct PassData
 @property( hlms_pssm_fade )
 	float pssmFadePoint;@end
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end
+	@property( hlms_lights_area_approx )AreaLight areaApproxLights[@value(hlms_lights_area_approx)];@end
 @end @property( hlms_shadowcaster )
 	//Vertex shader
 	@property( exponential_shadow_maps )float4 viewZRow;@end

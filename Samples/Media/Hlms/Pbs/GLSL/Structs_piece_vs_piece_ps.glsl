@@ -16,9 +16,32 @@ struct Light
 	vec3 specular;
 @property( hlms_num_shadow_map_lights )
 	vec3 attenuation;
-	vec3 spotDirection;
-	vec3 spotParams;
+    //Spotlights:
+    //  spotDirection.xyz is direction
+    //  spotParams.xyz contains falloff params
+    //Custom 2D Shape:
+    //  spotDirection.xyz direction
+    //  spotDirection.w customShapeHalfRectSize.x
+    //  spotParams.xyz tangent
+    //  spotParams.w customShapeHalfRectSize.y
+    vec4 spotDirection;
+    vec4 spotParams;
 @end
+};
+
+struct AreaLight
+{
+	vec4 position; //.w contains the objLightMask
+	vec3 diffuse;
+	vec3 specular;
+	vec3 attenuation;
+	//Custom 2D Shape:
+	//  direction.xyz direction
+	//  direction.w invHalfRectSize.x
+	//  tangent.xyz tangent
+	//  tangent.w invHalfRectSize.y
+	vec4 direction;
+	vec4 tangent;
 };
 
 @insertpiece( DeclCubemapProbeStruct )
@@ -73,6 +96,7 @@ layout_constbuffer(binding = 0) uniform PassBuffer
 @property( hlms_pssm_fade )
 	float pssmFadePoint;@end
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end
+	@property( hlms_lights_area_approx )AreaLight areaApproxLights[@value(hlms_lights_area_approx)];@end
 @end @property( hlms_shadowcaster )
 	//Vertex shader
 	@property( exponential_shadow_maps )vec4 viewZRow;@end

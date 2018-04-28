@@ -1,0 +1,88 @@
+@property( hlms_lights_area_approx )
+@piece( DoAreaApproxLights )
+	float3 projectedPosInPlane;
+
+@foreach( hlms_lights_area_approx, n )
+	lightDir = passBuf.areaApproxLights[@n].position.xyz - inPs.pos;
+	projectedPosInPlane.xyz = inPs.pos - dot( -lightDir.xyz, passBuf.areaApproxLights[@n].direction.xyz ) *
+										 passBuf.areaApproxLights[@n].direction.xyz;
+	fDistance = length( lightDir );
+	if( fDistance <= passBuf.areaApproxLights[@n].attenuation.x
+	/*&& dot( -lightDir, passBuf.areaApproxLights[@n].direction.xyz ) > 0*/ @insertpiece( andObjLightMaskCmp ) )
+	{
+		projectedPosInPlane.xyz -= passBuf.areaApproxLights[@n].position.xyz;
+		float3 areaLightBitangent = cross( passBuf.areaApproxLights[@n].tangent.xyz,
+											 passBuf.areaApproxLights[@n].direction.xyz );
+		float2 invHalfRectSize = float2( passBuf.areaApproxLights[@n].direction.w,
+										 passBuf.areaApproxLights[@n].tangent.w );
+		//lightUV is in light space, in range [-0.5; 0.5]
+		float2 lightUV;
+		lightUV.x = dot( projectedPosInPlane.xyz, passBuf.areaApproxLights[@n].tangent.xyz );
+		lightUV.y = dot( projectedPosInPlane.xyz, areaLightBitangent );
+		lightUV.xy *= invHalfRectSize.xy /*/ sqrt( fDistance )*/;
+		//Displace the UV by the normal to account for edge cases when
+		//a surface is close and perpendicular to the light. This is fully a hack and
+		//the values (e.g. 0.25) is completely eye balled.
+		lightUV.xy += float2( dot( passBuf.areaApproxLights[@n].tangent.xyz, nNormal ),
+							  dot( areaLightBitangent, nNormal ) ) * 3.75 * invHalfRectSize.xy;
+		lightUV.xy = clamp( lightUV.xy, -0.5f, 0.5f );
+		float booster = 1.0f - smoothstep( 0.2f, 1.9f, max( abs( lightUV.x ), abs( lightUV.y ) ) );
+		booster = 1.0f + booster * 2.25f;
+		booster = 1.0f;
+
+		float3 closestPoint = passBuf.areaApproxLights[@n].position.xyz +
+				passBuf.areaApproxLights[@n].tangent.xyz * lightUV.x / invHalfRectSize.x +
+				areaLightBitangent.xyz * lightUV.y / invHalfRectSize.y;
+
+		float3 lightDir2 = lightDir / fDistance;
+		lightDir = closestPoint.xyz - inPs.pos;
+		fDistance= length( lightDir );
+
+		float3 toShapeLight = reflect( -viewDir, nNormal );
+		float denom = dot( toShapeLight, -passBuf.areaApproxLights[@n].direction.xyz );
+		float specCol = 0;
+		if( denom > 1e-6f )
+		{
+			float3 p0l0 = passBuf.areaApproxLights[@n].position.xyz - inPs.pos;
+			float t = dot( p0l0, -passBuf.areaApproxLights[@n].direction.xyz ) / denom;
+			if( t >= 0 )
+			{
+				float3 posInShape = inPs.pos.xyz + toShapeLight.xyz * t - passBuf.areaApproxLights[@n].position.xyz;
+				float2 reflClipSpace;
+				reflClipSpace.x = dot( passBuf.areaApproxLights[@n].tangent.xyz, posInShape );
+				reflClipSpace.y = dot( areaLightBitangent, posInShape );
+				/*if( abs( reflClipSpace.x * invHalfRectSize.x ) < 0.5f &&
+					abs( reflClipSpace.y * invHalfRectSize.y ) < 0.5f )
+				{
+					specCol = float3(1);
+				}*/
+				/*if( abs( reflClipSpace.x * invHalfRectSize.x ) < 1.5f &&
+					abs( reflClipSpace.y * invHalfRectSize.y ) < 1.5f )*/
+				{
+//				float2 boxDist = 0.5f / abs( reflClipSpace * invHalfRectSize );
+//				specCol = min( boxDist.x, boxDist.y );
+				specCol = 0.5f / (length( max( abs( reflClipSpace * invHalfRectSize ) - 0.5f, 0.0f ) ) + 0.5f);
+				specCol = min( specCol, 1.0f );
+				float areaPower = 2.3075f;
+				specCol = pow( specCol, areaPower ) * min( areaPower * areaPower, 1.0f );
+				}
+			}
+		}
+
+		lightDir *= 1.0 / fDistance;
+		float fAreaW = dot( lightDir, -passBuf.areaApproxLights[@n].direction.xyz ) * 0.5f + 0.5f;
+		//lightDir = (-passBuf.areaApproxLights[@n].direction.xyz + lightDir) * 0.50f;
+		//lightDir = lerp( lightDir2, lightDir, fAreaW );
+		float globalDot = saturate( dot( -lightDir, passBuf.areaApproxLights[@n].direction.xyz ) );
+		tmpColour = BRDF( lightDir, viewDir, NdotV, passBuf.areaApproxLights[@n].diffuse * (1 - specCol), /*passBuf.areaApproxLights[@n].specular*/float3(0) ) * ( globalDot * globalDot ) * booster;
+		float atten = 1.0 / (0.5 + (passBuf.areaApproxLights[@n].attenuation.y + passBuf.areaApproxLights[@n].attenuation.z * fDistance) * fDistance );
+		finalColour += tmpColour * atten;
+		finalColour += passBuf.areaApproxLights[@n].specular.xyz * specCol * atten * ( globalDot * globalDot );
+		//finalColour.xyz = float3( dot( lightDir, nNormal ) );
+		//finalColour.xyz = float3( lightUV.xy + 0.5f, 0.0f );
+		//finalColour.xyz = float3( closestPoint.xy + 0.5f, 0.0f );
+	}
+@end
+
+@end
+@end

@@ -141,6 +141,9 @@ namespace Ogre
 
         LightGatheringMode  mLightGatheringMode;
         uint16              mNumLightsLimit;
+        uint16              mNumAreaLightsLimit;
+        uint8               mAreaLightsRoundMultiple;
+        uint32              mAreaLightsGlobalLightListStart;
 
         /// Listener for adding extensions. @see setListener.
         /// Pointer is [b]never[/b] null.
@@ -692,6 +695,7 @@ namespace Ogre
         static const IdString LightsDirNonCaster;
         static const IdString LightsPoint;
         static const IdString LightsSpot;
+        static const IdString LightsAreaApprox;
         static const IdString LightsAttenuation;
         static const IdString LightsSpotParams;
 
