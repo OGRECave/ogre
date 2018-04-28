@@ -1,3 +1,5 @@
+//#include "SyntaxHighlightingMisc.h"
+
 @property( hlms_lights_area_approx )
 @piece( DoAreaApproxLights )
 	float3 projectedPosInPlane;
@@ -51,21 +53,13 @@
 				float2 reflClipSpace;
 				reflClipSpace.x = dot( passBuf.areaApproxLights[@n].tangent.xyz, posInShape );
 				reflClipSpace.y = dot( areaLightBitangent, posInShape );
-				/*if( abs( reflClipSpace.x * invHalfRectSize.x ) < 0.5f &&
-					abs( reflClipSpace.y * invHalfRectSize.y ) < 0.5f )
-				{
-					specCol = float3(1);
-				}*/
-				/*if( abs( reflClipSpace.x * invHalfRectSize.x ) < 1.5f &&
-					abs( reflClipSpace.y * invHalfRectSize.y ) < 1.5f )*/
-				{
-//				float2 boxDist = 0.5f / abs( reflClipSpace * invHalfRectSize );
-//				specCol = min( boxDist.x, boxDist.y );
+
 				specCol = 0.5f / (length( max( abs( reflClipSpace * invHalfRectSize ) - 0.5f, 0.0f ) ) + 0.5f);
 				specCol = min( specCol, 1.0f );
-				float areaPower = 2.3075f;
+				float areaPower = ((ROUGHNESS * 10.0f + 1.0f) * 0.005f) /
+								  (ROUGHNESS * ROUGHNESS * ROUGHNESS);
+				areaPower = min( areaPower, 512.0f ); //Prevent INFs.
 				specCol = pow( specCol, areaPower ) * min( areaPower * areaPower, 1.0f );
-				}
 			}
 		}
 
@@ -75,14 +69,13 @@
 		//lightDir = lerp( lightDir2, lightDir, fAreaW );
 		float globalDot = saturate( dot( -lightDir, passBuf.areaApproxLights[@n].direction.xyz ) );
 		tmpColour = BRDF_AreaLightApprox( lightDir, viewDir, NdotV, passBuf.areaApproxLights[@n].diffuse * (1 - specCol),
-											/*passBuf.areaApproxLights[@n].specular*/float3(0, 0, 0)
+										  passBuf.areaApproxLights[@n].specular.xyz * specCol
 										@property( syntax != glsl )
 											, material, nNormal @insertpiece( brdfExtraParams )
 										@end
 											) * ( globalDot * globalDot ) * booster;
 		float atten = 1.0 / (0.5 + (passBuf.areaApproxLights[@n].attenuation.y + passBuf.areaApproxLights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
-		finalColour += passBuf.areaApproxLights[@n].specular.xyz * specCol * atten * ( globalDot * globalDot );
 		//finalColour.xyz = float3( dot( lightDir, nNormal ) );
 		//finalColour.xyz = float3( lightUV.xy + 0.5f, 0.0f );
 		//finalColour.xyz = float3( closestPoint.xy + 0.5f, 0.0f );
@@ -101,37 +94,15 @@ INLINE float3 BRDF_AreaLightApprox
 )
 {
 	float3 halfWay= normalize( lightDir + viewDir );
-	float NdotL = clamp( dot( nNormal, lightDir ), 0.0, 1.0 );
-	float NdotH = clamp( dot( nNormal, halfWay ), 0.0, 1.0 );
-	float VdotH = clamp( dot( viewDir, halfWay ), 0.0, 1.0 );
-
-	float sqR = ROUGHNESS * ROUGHNESS;
-
-	//Roughness/Distribution/NDF term (GGX)
-	//Formula:
-	//	Where alpha = roughness
-	//	R = alpha^2 / [ PI * [ ( NdotH^2 * (alpha^2 - 1) ) + 1 ]^2 ]
-	float f = ( NdotH * sqR - NdotH ) * NdotH + 1.0;
-	float R = sqR / (f * f + 1e-6f);
-
-	//Geometric/Visibility term (Smith GGX Height-Correlated)
-@property( GGX_height_correlated )
-	float Lambda_GGXV = NdotL * sqrt( (-NdotV * sqR + NdotV) * NdotV + sqR );
-	float Lambda_GGXL = NdotV * sqrt( (-NdotL * sqR + NdotL) * NdotL + sqR );
-
-	float G = 0.5 / (( Lambda_GGXV + Lambda_GGXL + 1e-6f ) * 3.141592654);
-@end @property( !GGX_height_correlated )
-	float gL = NdotL * (1-sqR) + sqR;
-	float gV = NdotV * (1-sqR) + sqR;
-	float G = 1.0 / (( gL * gV + 1e-4f ) * 4 * 3.141592654);
-@end
+	float NdotL = saturate( dot( nNormal, lightDir ) );
+	float VdotH = saturate( dot( viewDir, halfWay ) );
 
 	//Formula:
 	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
 	@insertpiece( FresnelType ) fresnelS = @insertpiece( getSpecularFresnel );
 
 	//We should divide Rs by PI, but it was done inside G for performance
-	float3 Rs = ( fresnelS * (R * G) ) * @insertpiece( kS ).xyz * lightSpecular;
+	float3 Rs = fresnelS * @insertpiece( kS ).xyz * lightSpecular;
 
 	//Diffuse BRDF (*Normalized* Disney, see course_notes_moving_frostbite_to_pbr.pdf
 	//"Moving Frostbite to Physically Based Rendering" Sebastien Lagarde & Charles de Rousiers)
