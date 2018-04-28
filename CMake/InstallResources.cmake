@@ -13,15 +13,10 @@
 
 if (WIN32)
   set(OGRE_MEDIA_PATH "Media")
-  if (WINDOWS_STORE OR WINDOWS_PHONE)
-    set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
-    set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
-  else()
-    set(OGRE_MEDIA_DIR_REL "${CMAKE_INSTALL_PREFIX}/${OGRE_MEDIA_PATH}")
-    set(OGRE_TEST_MEDIA_DIR_REL "../Tests/${OGRE_MEDIA_PATH}")
-  endif()
+  set(OGRE_MEDIA_DIR_REL "${CMAKE_INSTALL_PREFIX}/${OGRE_MEDIA_PATH}")
+  set(OGRE_TEST_MEDIA_DIR_REL "../Tests/${OGRE_MEDIA_PATH}")
   set(OGRE_PLUGIN_DIR_REL "${CMAKE_INSTALL_PREFIX}/bin")
-  set(OGRE_SAMPLES_DIR_REL "${CMAKE_INSTALL_PREFIX}/bin")
+  set(OGRE_SAMPLES_DIR_REL ".")
   set(OGRE_CFG_INSTALL_PATH "bin")
 elseif (APPLE)
   set(OGRE_MEDIA_PATH "Media")
@@ -50,6 +45,18 @@ endif ()
 
 # generate OgreConfigPaths.h
 configure_file(${OGRE_TEMPLATES_DIR}/OgreConfigPaths.h.in ${OGRE_BINARY_DIR}/include/OgreConfigPaths.h @ONLY)
+
+if(WIN32)
+  # we want relative paths inside the SDK
+  set(OGRE_PLUGIN_DIR_REL ".")
+  if (WINDOWS_STORE OR WINDOWS_PHONE)
+    set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
+    set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
+  else()
+    set(OGRE_MEDIA_DIR_REL "../${OGRE_MEDIA_PATH}")
+    set(OGRE_TEST_MEDIA_DIR_REL "../Tests/${OGRE_MEDIA_PATH}")
+  endif()
+endif()
 
 # configure plugins.cfg
 if (NOT OGRE_BUILD_RENDERSYSTEM_D3D9)
