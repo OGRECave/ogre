@@ -155,6 +155,7 @@ vec3 qmul( vec4 q, vec3 v )
 @property( (hlms_normal || hlms_qtangent) && !hlms_prepass )
 @insertpiece( DeclareBRDF )
 @insertpiece( DeclareBRDF_InstantRadiosity )
+@insertpiece( DeclareBRDF_AreaLightApprox )
 @end
 
 @property( use_parallax_correct_cubemaps )
@@ -374,7 +375,7 @@ void main()
 		finalColour += BRDF( passBuf.lights[@n].position.xyz, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular );@end
 @end
 
-@property( hlms_lights_point || hlms_lights_spot )	vec3 lightDir;
+@property( hlms_lights_point || hlms_lights_spot || hlms_lights_area_approx )	vec3 lightDir;
 	float fDistance;
 	vec3 tmpColour;
 	float spotCosAngle;@end
@@ -390,9 +391,6 @@ void main()
 		float atten = 1.0 / (0.5 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
-
-    //Custom 2D shape lights
-	@insertpiece( DoAreaApproxLights )
 
 	//Spot lights
 	//spotParams[@value(spot_params)].x = 1.0 / cos( InnerAngle ) - cos( OuterAngle )
@@ -418,6 +416,9 @@ void main()
 		float atten = 1.0 / (0.5 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
+
+	//Custom 2D shape lights
+	@insertpiece( DoAreaApproxLights )
 
 @insertpiece( forward3dLighting )
 @insertpiece( applyIrradianceVolumes )
