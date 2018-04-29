@@ -80,24 +80,6 @@ namespace RTShader {
 		if (mSamplerFromZ.get() == NULL)
 			return false;
 
-		if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
-		{
-			mSamplerFromXState = psProgram->resolveParameter(GCT_SAMPLER_STATE, mTextureSamplerIndexFromX, (uint16)GPV_PER_OBJECT, "tp_sampler_from_xState");
-			mSamplerFromYState = psProgram->resolveParameter(GCT_SAMPLER_STATE, mTextureSamplerIndexFromY, (uint16)GPV_PER_OBJECT, "tp_sampler_from_yState");
-			mSamplerFromZState = psProgram->resolveParameter(GCT_SAMPLER_STATE, mTextureSamplerIndexFromZ, (uint16)GPV_PER_OBJECT, "tp_sampler_from_zState");
-			
-			if (mSamplerFromXState.get() == NULL)
-				return false;
-
-			mSamplerFromY = psProgram->resolveParameter(GCT_SAMPLER2D, mTextureSamplerIndexFromY, (uint16)GPV_GLOBAL, "tp_sampler_from_y");
-			if (mSamplerFromYState.get() == NULL)
-				return false;
-
-			mSamplerFromZ = psProgram->resolveParameter(GCT_SAMPLER2D, mTextureSamplerIndexFromZ, (uint16)GPV_GLOBAL, "tp_sampler_from_z");
-			if (mSamplerFromZState.get() == NULL)
-				return false;
-		}
-
         mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
         if (mPSOutDiffuse.get() == NULL)    
             return false;
@@ -130,34 +112,15 @@ namespace RTShader {
 		vsMain->addAtomAssign(mVSOutNormal, mVSInNormal, FFP_VS_TEXTURING);
 		vsMain->addAtomAssign(mVSOutPosition, mVSInPosition, FFP_VS_TEXTURING);
 
-		if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
-		{
-			FFPTexturing::AddTextureSampleWrapperInvocation(mSamplerFromX, mSamplerFromXState, GCT_SAMPLER2D, psMain, FFP_PS_TEXTURING);
-			FFPTexturing::AddTextureSampleWrapperInvocation(mSamplerFromY, mSamplerFromYState, GCT_SAMPLER2D, psMain, FFP_PS_TEXTURING);
-			FFPTexturing::AddTextureSampleWrapperInvocation(mSamplerFromZ, mSamplerFromZState, GCT_SAMPLER2D, psMain, FFP_PS_TEXTURING);
-		}
-
         FunctionInvocation *curFuncInvocation;
 		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRIPLANAR_TEXTURING, FFP_PS_TEXTURING);
 		curFuncInvocation->pushOperand(mPSInDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSInPosition, Operand::OPS_IN);
 
-		
-		bool isHLSL = Ogre::RTShader::ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
-		
-		if (isHLSL)
-		{
-			curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(mSamplerFromX, psMain), Operand::OPS_IN);
-			curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(mSamplerFromX, psMain), Operand::OPS_IN);
-			curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(mSamplerFromX, psMain), Operand::OPS_IN);
-		}
-		else
-		{
-			curFuncInvocation->pushOperand(mSamplerFromX, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mSamplerFromY, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mSamplerFromZ, Operand::OPS_IN);
-		}
+        curFuncInvocation->pushOperand(mSamplerFromX, Operand::OPS_IN);
+        curFuncInvocation->pushOperand(mSamplerFromY, Operand::OPS_IN);
+        curFuncInvocation->pushOperand(mSamplerFromZ, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSTPParams, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);
         psMain->addAtomInstance(curFuncInvocation); 

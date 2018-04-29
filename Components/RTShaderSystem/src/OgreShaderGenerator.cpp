@@ -56,7 +56,7 @@ ShaderGenerator::ShaderGenerator() :
     mActiveSceneMgr(NULL), mRenderObjectListener(NULL), mSceneManagerListener(NULL), mScriptTranslatorManager(NULL),
     mMaterialSerializerListener(NULL), mShaderLanguage(""), mProgramManager(NULL), mProgramWriterManager(NULL),
     mFSLayer(0), mFFPRenderStateBuilder(NULL),mActiveViewportValid(false), mVSOutputCompactPolicy(VSOCP_LOW),
-    mCreateShaderOverProgrammablePass(false), mIsFinalizing(false), mIsHLSL4(false)
+    mCreateShaderOverProgrammablePass(false), mIsFinalizing(false)
 {
     mLightCount[0]              = 0;
     mLightCount[1]              = 0;
@@ -75,7 +75,6 @@ ShaderGenerator::ShaderGenerator() :
     else if (hmgr.isLanguageSupported("hlsl"))
     {
         mShaderLanguage = "hlsl";
-        mIsHLSL4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
     }
     else if (hmgr.isLanguageSupported("cg"))
     {

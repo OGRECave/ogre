@@ -56,11 +56,6 @@ void HLSLProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
     mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
     mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCUBE";
-    mGpuConstTypeMap[GCT_SAMPLER_WRAPPER1D]     = "SamplerData1D";
-    mGpuConstTypeMap[GCT_SAMPLER_WRAPPER2D]     = "SamplerData2D";
-    mGpuConstTypeMap[GCT_SAMPLER_WRAPPER3D]     = "SamplerData3D";
-    mGpuConstTypeMap[GCT_SAMPLER_WRAPPERCUBE]   = "SamplerDataCube";
-    mGpuConstTypeMap[GCT_SAMPLER_STATE]         = "SamplerState";
     
     mGpuConstTypeMap[GCT_MATRIX_2X2] = "float2x2";
     mGpuConstTypeMap[GCT_MATRIX_2X3] = "float2x3";
@@ -91,11 +86,6 @@ void HLSLProgramWriter::initializeStringMaps()
     mParamSemanticMap[Parameter::SPS_BINORMAL] = "BINORMAL";
     mParamSemanticMap[Parameter::SPS_TANGENT] = "TANGENT";
     mParamSemanticMap[Parameter::SPS_UNKNOWN] = "";
-
-    mGpuConstTypeMapV4[GCT_SAMPLER1D] = "Texture1D";
-    mGpuConstTypeMapV4[GCT_SAMPLER2D] = "Texture2D";
-    mGpuConstTypeMapV4[GCT_SAMPLER3D] = "Texture3D";
-    mGpuConstTypeMapV4[GCT_SAMPLERCUBE] = "TextureCube";
 }
 
 //-----------------------------------------------------------------------
@@ -184,15 +174,7 @@ void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* prog
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter)
 {
-    bool isHlsl4 = Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4();
-
-    GpuConstantType paramType = parameter->getType();
-
-	if (isHlsl4 && paramType >= GCT_SAMPLER1D && paramType <= GCT_SAMPLERCUBE)
-        os<<mGpuConstTypeMapV4[paramType];
-    else
-        os<<mGpuConstTypeMap[paramType];
-
+    os << mGpuConstTypeMap[parameter->getType()];
     os << "\t" << parameter->getName();
 
     if (parameter->isArray() == true)
@@ -200,14 +182,6 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
         os << "[" << parameter->getSize() << "]";   
     }
     if (parameter->isSampler())
-    {
-        if (isHlsl4)
-            os << " : register(t" << parameter->getIndex() << ")";      
-        else
-            os << " : register(s" << parameter->getIndex() << ")";      
-
-    }
-	else if (parameter->getType() == GCT_SAMPLER_STATE)
     {
         os << " : register(s" << parameter->getIndex() << ")";      
     }

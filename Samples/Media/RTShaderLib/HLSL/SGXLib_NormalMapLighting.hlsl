@@ -67,7 +67,7 @@ void SGX_TransformPosition(in float4x4 m,
 }
 
 //-----------------------------------------------------------------------------
-void SGX_FetchNormal(in SamplerData2D s, 
+void SGX_FetchNormal(in sampler2D s, 
 				   in float2 uv, 
 				   out float3 vOut)
 {
@@ -75,7 +75,7 @@ void SGX_FetchNormal(in SamplerData2D s,
 }
 
 //-----------------------------------------------------------------------------
-void SGX_FetchNormal(in SamplerData2D s, 
+void SGX_FetchNormal(in sampler2D s, 
 				   in float2 uv, 
 				   out float4 vOut)
 
@@ -85,7 +85,7 @@ void SGX_FetchNormal(in SamplerData2D s,
 }
 
 //-----------------------------------------------------------------------------
-void SGX_Generate_Parallax_Texcoord(in SamplerData2D normalHeightMap,
+void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 						in float2 texCoord,
 						in float3 eyeVec,
 						in float2 scaleBias,

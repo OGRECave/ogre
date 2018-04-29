@@ -433,7 +433,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
             }
         }
 
-        pGpuProgram->setParameter("enable_backwards_compatibility", "false");
+        pGpuProgram->setParameter("enable_backwards_compatibility", "true");
         pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
     }
     
