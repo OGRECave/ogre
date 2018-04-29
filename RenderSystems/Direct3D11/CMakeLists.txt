@@ -32,7 +32,7 @@ if(OGRE_PROFILING AND DirectX9_FOUND)
   target_link_libraries(RenderSystem_Direct3D11 ${DirectX9_LIBRARY})
 endif()
 if (MINGW)
-  target_link_libraries(RenderSystem_Direct3D11 psapi)
+  target_link_libraries(RenderSystem_Direct3D11 psapi d3dcompiler)
 endif ()
 
 if(WINDOWS_STORE OR WINDOWS_PHONE)

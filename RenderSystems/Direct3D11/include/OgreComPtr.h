@@ -51,8 +51,12 @@ smart pointer internals, but it is preferred as many Direct3D11 samples expect i
 #ifndef __OgreComPtr_H__
 #define __OgreComPtr_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreD3D11Prerequisites.h"
 #include <winerror.h> // for HRESULT
+
+#ifdef __MINGW32__
+typedef long HRESULT;
+#endif
 
 #if !defined(ASSUME_NOEXCEPT) && defined( _MSC_VER )
 #define ASSUME_NOEXCEPT throw () // use non-compliant behavior of VC++ - compile as if exceptions are not possible, performing no run-time checks

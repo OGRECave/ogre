@@ -233,7 +233,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, errorDescription, "D3D11HardwarePixelBuffer::_unmapstaticbuffer");
         }
 
-        mDataForStaticUsageLock.swap(std::vector<int8>()); // i.e. shrink_to_fit
+        mDataForStaticUsageLock.shrink_to_fit();
     }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_unmapstagingbuffer(bool copyback)
