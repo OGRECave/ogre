@@ -18,7 +18,7 @@ float mipmapLevel(float2 coords, float2 texSize)
 	
 
 //-----------------------------------------------------------------------------
-void SGX_Atlas_Sample_Auto_Adjust(in  SamplerData2D sample, 
+void SGX_Atlas_Sample_Auto_Adjust(in  sampler2D sample, 
 		in float2 origTexcoord, 
 		in float2 atlasTexcoord, 
 		in float4 textureData, 
@@ -73,7 +73,7 @@ void SGX_Atlas_Sample_Auto_Adjust(in  SamplerData2D sample,
 	texel = lerp(texel1, texel2, pow(lod - floor(lod),3));
 }
 //-----------------------------------------------------------------------------
-void SGX_Atlas_Sample_Normal(in SamplerData2D sample, 
+void SGX_Atlas_Sample_Normal(in sampler2D sample, 
 		in float2 origTexcoord, 
 		in float2 atlasTexcoord, 
 		in float4 textureData, 

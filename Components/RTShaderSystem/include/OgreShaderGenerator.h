@@ -125,10 +125,6 @@ public:
     void setTargetLanguage(const String& shaderLanguage);
 
     /** 
-    Return if hlsl 4.0 shading language is currently in use.        
-    */
-    bool IsHlsl4() const { return mIsHLSL4; }
-    /** 
     Return the target shader language currently in use.     
     */
     const String& getTargetLanguage() const { return mShaderLanguage; }
@@ -993,8 +989,6 @@ protected:
     bool mCreateShaderOverProgrammablePass;
     // A flag to indicate finalizing
     bool mIsFinalizing;
-    // flag for HLSL4 specific behaviour
-    bool mIsHLSL4;
 
     uint32 ID_RT_SHADER_SYSTEM;
 private:

@@ -98,7 +98,6 @@ protected:
 
     //-----------------------------------------------------------------------------
     typedef std::map<String, GpuProgramPtr>            GpuProgramsMap;
-    typedef std::map<String, String>                   ProgramSourceToNameMap;
     typedef GpuProgramsMap::iterator                    GpuProgramsMapIterator;
     typedef GpuProgramsMap::const_iterator              GpuProgramsMapConstIterator;
 
@@ -219,8 +218,6 @@ protected:
     GpuProgramsMap mFragmentShaderMap;
     // The default program processors.
     ProgramProcessorList mDefaultProgramProcessors;
-    // map the source code of the shaders to a name for them
-    ProgramSourceToNameMap mProgramSourceToNameMap;
 
 private:
     friend class ProgramSet;

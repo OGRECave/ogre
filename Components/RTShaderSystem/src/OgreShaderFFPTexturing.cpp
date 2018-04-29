@@ -83,14 +83,8 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
     
     // Resolve texture sampler parameter.       
     textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSampler");
+    hasError |= !textureUnitParams->mTextureSampler;
 
-    if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4()) 
-    {
-        //Resolve texture sampler state parameter for  hlsl 4.0
-		textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
-        hasError |= !(textureUnitParams->mTextureSamplerState.get());
-    }
-    
     // Resolve texture matrix parameter.
     if (needsTextureMatrix(textureUnitParams->mTextureUnitState))
     {               
@@ -494,103 +488,22 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     return true;
 }
 
-
-ParameterPtr FFPTexturing::GetSamplerWrapperParam(UniformParameterPtr sampler, Function* function)
-{
-	
-	Ogre::String paramName = sampler->getName(); // "lLocalSamplerWrapper_";
-	int samplerType = sampler->getType();
-	int samplerParamDim = samplerType - GCT_SAMPLER1D + 1;
-    if (samplerParamDim <= 3 )
-        paramName +=  StringConverter::toString(samplerParamDim) + "D";
-    else if (samplerParamDim == 4 )
-        paramName +=  "Cube";
-	else 
-		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-		"Sampler wrappers are only for GCT_SAMPLER1D, GCT_SAMPLER2D, GCT_SAMPLER3D and GCT_SAMPLERCUBE",
-		"FFPTexturing::GetSamplerWrapperParam");
-	GpuConstantType margin =  (GpuConstantType)(GCT_SAMPLER_WRAPPER1D -  GCT_SAMPLER1D);
-    GpuConstantType samplerWrapperType = (GpuConstantType)(samplerType + margin);
-
-	ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::SPS_UNKNOWN,-1, paramName,samplerWrapperType);
-    return samplerWrapperParam;
-}
-
-void FFPTexturing::AddTextureSampleWrapperInvocation(UniformParameterPtr textureSampler,UniformParameterPtr textureSamplerState,
-    GpuConstantType samplerType, Function* function, int groupOrder)
-{
-
-    FunctionInvocation* curFuncInvocation = NULL;
-    
-	ParameterPtr samplerWrapperParam = GetSamplerWrapperParam(textureSampler, function);
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT_SAMPLER_WRAPPER, groupOrder);
-    curFuncInvocation->pushOperand(textureSampler, Operand::OPS_IN);
-
-    if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
-        curFuncInvocation->pushOperand(textureSamplerState, Operand::OPS_IN);
-
-    curFuncInvocation->pushOperand(samplerWrapperParam, Operand::OPS_OUT);
-    function->addAtomInstance(curFuncInvocation);
-}
-
 //-----------------------------------------------------------------------
 void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
                                               const ParameterPtr& texel, int groupOrder)
 {
+    FunctionInvocation* curFuncInvocation = NULL;
 
-    Ogre::String targetLanguage =  RTShader::ShaderGenerator::getSingleton().getTargetLanguage();
-
-	if (targetLanguage == "hlsl" 
-		&& textureUnitParams->mTextureSamplerType >= GCT_SAMPLER1D 
-		&& textureUnitParams->mTextureSamplerType <= GCT_SAMPLERCUBE
-		)
-    {
-        FunctionInvocation* curFuncInvocation = NULL;
-        ParameterPtr samplerWrapperParam =  GetSamplerWrapperParam(textureUnitParams->mTextureSampler,psMain);
-        AddTextureSampleWrapperInvocation(textureUnitParams->mTextureSampler,textureUnitParams->mTextureSamplerState,textureUnitParams->mTextureSamplerType,psMain,groupOrder);
-
-            if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
-                curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder);
-            else    
-                curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder);
-
-
-        curFuncInvocation->pushOperand(samplerWrapperParam, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
-        psMain->addAtomInstance(curFuncInvocation);
-        
-        
-    }
+    if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder);
     else
-    { // Old behaviour for CG and GLSL
-        FunctionInvocation* curFuncInvocation = NULL;
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder);
 
-        if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder);
-        else    
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder);
+    curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
+    curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
+    curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
 
-		
-		if (textureUnitParams->mTextureSamplerType == GCT_SAMPLER2DARRAY)
-		{
-			curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
-		
-				curFuncInvocation->pushOperand(textureUnitParams->mTextureSamplerState, Operand::OPS_IN);
-		
-			curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
-		}
-		else
-		{
-			curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
-		}
-		
-        psMain->addAtomInstance(curFuncInvocation);
-    }
-
+    psMain->addAtomInstance(curFuncInvocation);
 }
 
 
