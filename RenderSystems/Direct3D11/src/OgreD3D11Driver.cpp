@@ -30,6 +30,11 @@ THE SOFTWARE.
 #include "OgreD3D11VideoMode.h"
 #include "OgreD3D11Device.h"
 #include "OgreString.h"
+
+#ifdef __MINGW32__
+#define DXGI_ADAPTER_FLAG_SOFTWARE 0
+#endif
+
 namespace Ogre
 {
     //---------------------------------------------------------------------

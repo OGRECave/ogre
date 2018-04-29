@@ -7,7 +7,7 @@
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 
 #include <windows.h>
-#include <Psapi.h>
+#include <psapi.h>
 #include <tlhelp32.h>
 
 #pragma comment(lib,"Psapi.lib")

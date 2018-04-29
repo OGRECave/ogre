@@ -838,7 +838,7 @@ namespace Ogre
 				classStyle |= CS_DBLCLKS;
 
 			HINSTANCE hInst = NULL;
-			static const TCHAR staticVar;
+			static TCHAR staticVar;
 			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
 
 			WNDCLASS wc = { classStyle, DefWindowProc, 0, 0, hInst,
