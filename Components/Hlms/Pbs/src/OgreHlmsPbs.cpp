@@ -823,6 +823,11 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    static bool SortByTextureLightMaskIdx( const Light *_a, const Light *_b )
+    {
+        return _a->mTextureLightMaskIdx < _b->mTextureLightMaskIdx;
+    }
+    //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbs::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                         bool dualParaboloid, SceneManager *sceneManager )
     {
@@ -1489,14 +1494,27 @@ namespace Ogre
                 areaLightHalfMip = mAreaLightMasks->getNumMipmaps() * 0.5f;
             }
 
-            //Send area lights
+            //Send area lights. We need them sorted so textured ones
+            //come first, as that what our shader expects
+            mAreaLights.reserve( numAreaApproxLights );
+            mAreaLights.clear();
             const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
             for( int32 i=0; i<numAreaApproxLights; ++i )
             {
                 const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
                 assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
+                mAreaLights.push_back( globalLightList.lights[idx] );
+            }
 
-                Light const *light = globalLightList.lights[idx];
+            std::sort( mAreaLights.begin(), mAreaLights.end(), SortByTextureLightMaskIdx );
+
+            for( int32 i=0; i<numAreaApproxLights; ++i )
+            {
+                /*const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
+                assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
+
+                Light const *light = globalLightList.lights[idx];*/
+                Light const *light = mAreaLights[i];
 
                 Vector4 lightPos4 = light->getAs4DVector();
                 Vector3 lightPos = viewMatrix * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
@@ -2176,12 +2194,12 @@ namespace Ogre
     {
         mAmbientLightMode = mode;
     }
-	//-----------------------------------------------------------------------------------
-	void HlmsPbs::setAreaLightMasks( const TexturePtr &areaLightMask, float mipmapScale )
-	{
-		mAreaLightMasks = areaLightMask;
-		mAreaLightMipmapScale = mipmapScale;
-	}
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setAreaLightMasks( const TexturePtr &areaLightMask, float mipmapScale )
+    {
+        mAreaLightMasks = areaLightMask;
+        mAreaLightMipmapScale = mipmapScale;
+    }
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
     //-----------------------------------------------------------------------------------
     void HlmsPbs::setPlanarReflections( PlanarReflections *planarReflections )
