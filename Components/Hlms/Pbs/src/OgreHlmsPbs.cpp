@@ -1490,8 +1490,11 @@ namespace Ogre
 
             if( mAreaLightMasks )
             {
-                areaLightNumMipmaps = mAreaLightMasks->getNumMipmaps();
-                areaLightDiffuseStartMip = std::max<uint32>( mAreaLightMasks->getNumMipmaps(), 4u ) - 4u;
+                //Roughness minimum value is 0.02, so we need to map
+                //[0.02; 1.0] -> [0; 1] in the pixel shader that's why we divide by 0.98.
+                //The 2.0 is just arbitrary (it looks good)
+                areaLightNumMipmaps = mAreaLightMasks->getNumMipmaps() / 0.98f * 2.0f;
+                areaLightDiffuseStartMip = mAreaLightMasks->getNumMipmaps() * 0.8f;
             }
 
             //Send area lights. We need them sorted so textured ones
@@ -1541,7 +1544,7 @@ namespace Ogre
                 *passBufferPtr++ = colour.r;
                 *passBufferPtr++ = colour.g;
                 *passBufferPtr++ = colour.b;
-                *passBufferPtr++ = areaLightNumMipmaps * light->mTextureMaskMipScale;
+                *passBufferPtr++ = areaLightNumMipmaps;
 
                 //vec4 areaApproxLights[numLights].attenuation;
                 Real attenRange     = light->getAttenuationRange();

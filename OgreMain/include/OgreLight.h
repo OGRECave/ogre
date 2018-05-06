@@ -555,12 +555,6 @@ namespace Ogre {
         Vector2 mRectHalfSize;
     public:
         uint16 mTextureLightMaskIdx;
-        /// It controls how blurry the texture becomes as objects get distant.
-        /// A value of 0 means the specular reflection is always sharp, even for
-        /// objects whose material has roughness = 1. A high value means the specular
-        /// reflection becomes increasingly blurrier as objects get further away from
-        /// the light (unless it's roughness is very low, like 0.02)
-        Real mTextureMaskMipScale;
     protected:
         Real mShadowFarDist;
         Real mShadowFarDistSquared;

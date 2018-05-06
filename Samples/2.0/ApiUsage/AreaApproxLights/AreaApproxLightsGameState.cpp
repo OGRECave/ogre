@@ -53,7 +53,7 @@ namespace Demo
     {
         mAreaMaskTex = Ogre::TextureManager::getSingleton().createManual(
                            "Area Light Masks", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                           Ogre::TEX_TYPE_2D_ARRAY, 256u, 256u, Ogre::MIP_UNLIMITED,
+                           Ogre::TEX_TYPE_2D_ARRAY, 256u, 256u, 5u,
                            Ogre::PF_L8, Ogre::TU_STATIC_WRITE_ONLY );
 
         Ogre::uint32 texWidth = mAreaMaskTex->getWidth();
@@ -117,6 +117,7 @@ namespace Demo
         Ogre::HlmsPbs *pbs = static_cast<Ogre::HlmsPbs*>( hlms );
 
         pbs->setAreaLightMasks( mAreaMaskTex );
+        pbs->setAreaLightForwardSettings( 2u, 2u );
     }
     //-----------------------------------------------------------------------------------
     void AreaApproxLightsGameState::createAreaPlaneMesh(void)
@@ -147,7 +148,7 @@ namespace Demo
         //a real implementation
         static Ogre::uint32 s_materialCounter = 0;
         const Ogre::String materialName = "LightPlane Material" +
-                                          Ogre::StringConverter::toString( s_materialCounter );
+                                          Ogre::StringConverter::toString( s_materialCounter++ );
         Ogre::HlmsMacroblock macroblock;
         macroblock.mCullMode = Ogre::CULL_NONE;
         Ogre::HlmsDatablock *datablockBase =
@@ -262,32 +263,33 @@ namespace Demo
         light->setPowerScale( Ogre::Math::PI );
         light->setType( Ogre::Light::LT_AREA_APPROX );
         light->setRectHalfSize( Ogre::Vector2( 15.0f, 15.0f ) );
-        lightNode->setPosition( -10.0f, 10.0f, 10.0f );
+        lightNode->setPosition( -10.0f, 6.0f, 10.0f );
         //light->setDirection( Ogre::Vector3( 1, 0, 0 ).normalisedCopy() );
         light->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
         //light->setDirection( Ogre::Vector3( 0, -1, 0 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
         //Set the array index of the light mask in mAreaMaskTex
         light->mTextureLightMaskIdx = 0u;
-        //5.0f is an arbitrary value. It looks good for meters.
-        light->mTextureMaskMipScale = 5.0f;
 
         createPlaneForAreaLight( light );
 
         mLightNodes[1] = lightNode;
 
-        /*light = sceneManager->createLight();
+        light = sceneManager->createLight();
         lightNode = rootNode->createChildSceneNode();
         lightNode->attachObject( light );
         light->setDiffuseColour( 0.2f, 0.4f, 0.8f ); //Cold
         light->setSpecularColour( 0.2f, 0.4f, 0.8f );
         light->setPowerScale( Ogre::Math::PI );
-        light->setType( Ogre::Light::LT_SPOTLIGHT );
-        lightNode->setPosition( 10.0f, 10.0f, -10.0f );
+        light->setType( Ogre::Light::LT_AREA_APPROX );
+        light->setRectHalfSize( Ogre::Vector2( 5.0f, 5.0f ) );
+        lightNode->setPosition( 5.0f, 4.0f, -5.0f );
         light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
 
-        mLightNodes[2] = lightNode;*/
+        createPlaneForAreaLight( light );
+
+        mLightNodes[2] = lightNode;
 
         mCameraController = new CameraController( mGraphicsSystem, false );
 

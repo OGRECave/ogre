@@ -1475,6 +1475,14 @@ namespace Ogre
         mHighQuality = highQuality;
     }
     //-----------------------------------------------------------------------------------
+    void Hlms::setAreaLightForwardSettings( uint16 areaLightsLimit, uint8 areaLightsRoundMultiple )
+    {
+        assert( areaLightsRoundMultiple != 0u );
+        assert( areaLightsLimit == 0 || areaLightsRoundMultiple <= areaLightsLimit );
+        mNumAreaLightsLimit = areaLightsLimit;
+        mAreaLightsRoundMultiple = areaLightsRoundMultiple;
+    }
+    //-----------------------------------------------------------------------------------
     void Hlms::saveAllTexturesFromDatablocks( const String &folderPath,
                                               set<String>::type &savedTextures,
                                               bool saveOitd, bool saveOriginal,
@@ -2502,12 +2510,15 @@ namespace Ogre
             numLightsPerType[Light::LT_POINT]       += numLightsPerType[Light::LT_DIRECTIONAL];
             numLightsPerType[Light::LT_SPOTLIGHT]   += numLightsPerType[Light::LT_POINT];
 
+            //We need to limit the number of area lights before and after rounding
             numLightsPerType[Light::LT_AREA_APPROX] =
                     std::min<uint16>( numLightsPerType[Light::LT_AREA_APPROX], mNumAreaLightsLimit );
             mRealNumAreaLights = numLightsPerType[Light::LT_AREA_APPROX];
             numLightsPerType[Light::LT_AREA_APPROX] =
                     Ogre::alignToNextMultiple( numLightsPerType[Light::LT_AREA_APPROX],
                                                mAreaLightsRoundMultiple );
+            numLightsPerType[Light::LT_AREA_APPROX] =
+                    std::min<uint16>( numLightsPerType[Light::LT_AREA_APPROX], mNumAreaLightsLimit );
 
             //The value is cummulative for each type (order: Directional, point, spot)
             setProperty( HlmsBaseProp::LightsDirectional, shadowCasterDirectional );
