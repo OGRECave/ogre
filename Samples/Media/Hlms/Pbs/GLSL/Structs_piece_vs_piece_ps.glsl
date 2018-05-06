@@ -29,12 +29,15 @@ struct Light
 @end
 };
 
+#define areaLightDiffuseMipmapStart areaApproxLights[0].diffuse.w
+#define areaLightMipmapScale areaApproxLights[0].specular.w
+
 struct AreaLight
 {
 	vec4 position; //.w contains the objLightMask
-	vec3 diffuse;
-	vec3 specular;
-	vec3 attenuation;
+	vec4 diffuse;		//[0].w contains diffuse mipmap start
+	vec4 specular;		//[0].w contains mipmap scale
+	vec4 attenuation;	//.w contains texture array idx
 	//Custom 2D Shape:
 	//  direction.xyz direction
 	//  direction.w invHalfRectSize.x

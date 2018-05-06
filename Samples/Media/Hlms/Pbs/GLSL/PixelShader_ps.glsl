@@ -37,6 +37,7 @@ layout(std140) uniform;
 @end
 
 @insertpiece( DeclPlanarReflTextures )
+@insertpiece( DeclAreaApproxTextures )
 
 @property( hlms_vpos )
 in vec4 gl_FragCoord;

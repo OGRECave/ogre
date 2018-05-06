@@ -142,6 +142,10 @@ namespace Ogre
         bool                    mHasPlanarReflections;
         uint8                   mLastBoundPlanarReflection;
 #endif
+        TexturePtr              mAreaLightMasks;
+        HlmsSamplerblock const  *mAreaLightMasksSamplerblock;
+        float                   mAreaLightMipmapScale;
+        bool                    mUsingAreaLightMasks;
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
@@ -271,6 +275,9 @@ namespace Ogre
         void setIrradianceVolume( IrradianceVolume *irradianceVolume )
                                                     { mIrradianceVolume = irradianceVolume; }
         IrradianceVolume* getIrradianceVolume(void) const  { return mIrradianceVolume; }
+
+		void setAreaLightMasks( const TexturePtr &areaLightMask, float mipmapScale );
+        const TexturePtr& getAreaLightMasks(void) const     { return mAreaLightMasks; }
 
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
         void setPlanarReflections( PlanarReflections *planarReflections );

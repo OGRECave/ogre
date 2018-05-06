@@ -227,6 +227,9 @@ namespace Ogre
         mHasPlanarReflections( false ),
         mLastBoundPlanarReflection( 0u ),
 #endif
+        mAreaLightMasksSamplerblock( 0 ),
+        mAreaLightMipmapScale( 1.0f ),
+        mUsingAreaLightMasks( false ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
@@ -316,6 +319,19 @@ namespace Ogre
                 mPlanarReflectionsSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
             }
 #endif
+            if( !mAreaLightMasksSamplerblock )
+            {
+                samplerblock.mMinFilter     = FO_LINEAR;
+                samplerblock.mMagFilter     = FO_LINEAR;
+                samplerblock.mMipFilter     = FO_LINEAR;
+                samplerblock.mCompareFunction   = NUM_COMPARE_FUNCTIONS;
+
+                samplerblock.mU             = TAM_CLAMP;
+                samplerblock.mV             = TAM_CLAMP;
+                samplerblock.mW             = TAM_CLAMP;
+
+                mAreaLightMasksSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+            }
         }
     }
     //-----------------------------------------------------------------------------------
@@ -363,6 +379,9 @@ namespace Ogre
 
             if( mIrradianceVolume && getProperty( HlmsBaseProp::ShadowCaster ) == 0 )
                 psParams->setNamedConstant( "irradianceVolume", texUnit++ );
+
+            if( mAreaLightMasks && getProperty( HlmsBaseProp::LightsAreaTexMask ) > 0 )
+                psParams->setNamedConstant( "areaLightMasks", texUnit++ );
 
             if( !mPreparedPass.shadowMaps.empty() )
             {
@@ -1461,6 +1480,15 @@ namespace Ogre
                 }
             }
 
+            float areaLightMipScale = 0.0f;
+            float areaLightHalfMip = 0;
+
+            if( mAreaLightMasks )
+            {
+                areaLightMipScale = mAreaLightMasks->getNumMipmaps() / mAreaLightMipmapScale;
+                areaLightHalfMip = mAreaLightMasks->getNumMipmaps() * 0.5f;
+            }
+
             //Send area lights
             const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
             for( int32 i=0; i<numAreaApproxLights; ++i )
@@ -1488,23 +1516,23 @@ namespace Ogre
                 *passBufferPtr++ = colour.r;
                 *passBufferPtr++ = colour.g;
                 *passBufferPtr++ = colour.b;
-                ++passBufferPtr;
+                *passBufferPtr++ = areaLightHalfMip;
 
                 //vec3 areaApproxLights[numLights].specular
                 colour = light->getSpecularColour() * light->getPowerScale();
                 *passBufferPtr++ = colour.r;
                 *passBufferPtr++ = colour.g;
                 *passBufferPtr++ = colour.b;
-                ++passBufferPtr;
+                *passBufferPtr++ = areaLightMipScale;
 
-                //vec3 areaApproxLights[numLights].attenuation;
+                //vec4 areaApproxLights[numLights].attenuation;
                 Real attenRange     = light->getAttenuationRange();
                 Real attenLinear    = light->getAttenuationLinear();
                 Real attenQuadratic = light->getAttenuationQuadric();
                 *passBufferPtr++ = attenRange;
                 *passBufferPtr++ = attenLinear;
                 *passBufferPtr++ = attenQuadratic;
-                ++passBufferPtr;
+                *passBufferPtr++ = static_cast<float>( light->mTextureLightMaskIdx );
 
                 const Vector2 rectHalfSize = light->getDerivedRectHalfSize();
 
@@ -1625,6 +1653,15 @@ namespace Ogre
         if( mHasPlanarReflections )
             mTexUnitSlotStart += 1;
 #endif
+        if( mAreaLightMasks && getProperty( HlmsBaseProp::LightsAreaTexMask ) > 0 )
+        {
+            mTexUnitSlotStart += 1;
+            mUsingAreaLightMasks = true;
+        }
+        else
+        {
+            mUsingAreaLightMasks = false;
+        }
 
         uploadDirtyDatablocks();
 
@@ -1721,6 +1758,14 @@ namespace Ogre
                     *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
                                                                          irradianceTex.get(),
                                                                          samplerblock );
+                    ++texUnit;
+                }
+
+                if( mUsingAreaLightMasks )
+                {
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
+                                                                         mAreaLightMasks.get(),
+                                                                         mAreaLightMasksSamplerblock );
                     ++texUnit;
                 }
 
@@ -2131,6 +2176,12 @@ namespace Ogre
     {
         mAmbientLightMode = mode;
     }
+	//-----------------------------------------------------------------------------------
+	void HlmsPbs::setAreaLightMasks( const TexturePtr &areaLightMask, float mipmapScale )
+	{
+		mAreaLightMasks = areaLightMask;
+		mAreaLightMipmapScale = mipmapScale;
+	}
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
     //-----------------------------------------------------------------------------------
     void HlmsPbs::setPlanarReflections( PlanarReflections *planarReflections )

@@ -105,6 +105,7 @@ namespace Ogre
     const IdString HlmsBaseProp::LightsPoint        = IdString( "hlms_lights_point" );
     const IdString HlmsBaseProp::LightsSpot         = IdString( "hlms_lights_spot" );
     const IdString HlmsBaseProp::LightsAreaApprox   = IdString( "hlms_lights_area_approx" );
+    const IdString HlmsBaseProp::LightsAreaTexMask  = IdString( "hlms_lights_area_tex_mask" );
     const IdString HlmsBaseProp::LightsAttenuation  = IdString( "hlms_lights_attenuation" );
     const IdString HlmsBaseProp::LightsSpotParams   = IdString( "hlms_lights_spotparams" );
 
@@ -2409,6 +2410,7 @@ namespace Ogre
             }
 
             uint numLightsPerType[Light::NUM_LIGHT_TYPES];
+            int32 numAreaApproxLightsWithMask = 0;
             memset( numLightsPerType, 0, sizeof( numLightsPerType ) );
 
             uint shadowCasterDirectional = 0;
@@ -2453,6 +2455,8 @@ namespace Ogre
                             mAreaLightsGlobalLightListStart =
                                     std::min<uint32>( mAreaLightsGlobalLightListStart, itor - begin );
                             ++numLightsPerType[Light::LT_AREA_APPROX];
+                            if( (*itor)->mTextureLightMaskIdx != std::numeric_limits<uint16>::max() )
+                                ++numAreaApproxLightsWithMask;
                         }
                         ++itor;
                     }
@@ -2509,6 +2513,8 @@ namespace Ogre
             setProperty( HlmsBaseProp::LightsPoint,       numLightsPerType[Light::LT_POINT] );
             setProperty( HlmsBaseProp::LightsSpot,        numLightsPerType[Light::LT_SPOTLIGHT] );
             setProperty( HlmsBaseProp::LightsAreaApprox,  numLightsPerType[Light::LT_AREA_APPROX] );
+            if( numAreaApproxLightsWithMask > 0 )
+                setProperty( HlmsBaseProp::LightsAreaTexMask, numAreaApproxLightsWithMask );
         }
         else
         {

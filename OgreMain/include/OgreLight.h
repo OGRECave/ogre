@@ -553,6 +553,9 @@ namespace Ogre {
 		bool mAffectParentNode;
         bool mDoubleSided;
         Vector2 mRectHalfSize;
+    public:
+        uint16 mTextureLightMaskIdx;
+    protected:
         Real mShadowFarDist;
         Real mShadowFarDistSquared;
 
