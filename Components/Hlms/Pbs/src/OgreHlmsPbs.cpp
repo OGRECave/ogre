@@ -228,7 +228,6 @@ namespace Ogre
         mLastBoundPlanarReflection( 0u ),
 #endif
         mAreaLightMasksSamplerblock( 0 ),
-        mAreaLightMipmapScale( 1.0f ),
         mUsingAreaLightMasks( false ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
@@ -1485,12 +1484,12 @@ namespace Ogre
                 }
             }
 
-            float areaLightMipScale = 0.0f;
+            float areaLightNumMipmaps = 0.0f;
             float areaLightHalfMip = 0;
 
             if( mAreaLightMasks )
             {
-                areaLightMipScale = mAreaLightMasks->getNumMipmaps() / mAreaLightMipmapScale;
+                areaLightNumMipmaps = mAreaLightMasks->getNumMipmaps();
                 areaLightHalfMip = mAreaLightMasks->getNumMipmaps() * 0.5f;
             }
 
@@ -1541,7 +1540,7 @@ namespace Ogre
                 *passBufferPtr++ = colour.r;
                 *passBufferPtr++ = colour.g;
                 *passBufferPtr++ = colour.b;
-                *passBufferPtr++ = areaLightMipScale;
+                *passBufferPtr++ = areaLightNumMipmaps * light->mTextureMaskMipScale;
 
                 //vec4 areaApproxLights[numLights].attenuation;
                 Real attenRange     = light->getAttenuationRange();
@@ -2195,10 +2194,9 @@ namespace Ogre
         mAmbientLightMode = mode;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::setAreaLightMasks( const TexturePtr &areaLightMask, float mipmapScale )
+    void HlmsPbs::setAreaLightMasks( const TexturePtr &areaLightMask )
     {
         mAreaLightMasks = areaLightMask;
-        mAreaLightMipmapScale = mipmapScale;
     }
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
     //-----------------------------------------------------------------------------------

@@ -144,7 +144,6 @@ namespace Ogre
 #endif
         TexturePtr              mAreaLightMasks;
         HlmsSamplerblock const  *mAreaLightMasksSamplerblock;
-        float                   mAreaLightMipmapScale;
         LightArray				mAreaLights;
         bool                    mUsingAreaLightMasks;
 
@@ -277,7 +276,7 @@ namespace Ogre
                                                     { mIrradianceVolume = irradianceVolume; }
         IrradianceVolume* getIrradianceVolume(void) const  { return mIrradianceVolume; }
 
-        void setAreaLightMasks( const TexturePtr &areaLightMask, float mipmapScale );
+        void setAreaLightMasks( const TexturePtr &areaLightMask );
         const TexturePtr& getAreaLightMasks(void) const     { return mAreaLightMasks; }
 
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS

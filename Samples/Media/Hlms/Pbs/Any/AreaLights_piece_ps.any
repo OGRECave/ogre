@@ -47,7 +47,7 @@
 											   passBuf.areaApproxLights[@n].attenuation.w,
 											   passBuf.areaLightDiffuseMipmapStart +
 											   sqrt( fDistance ) * ROUGHNESS *
-											   passBuf.areaLightMipmapScale ).x;
+											   passBuf.areaApproxLights[@n].areaLightMipmapScale ).x;
 	@end
 
 		float3 closestPoint = passBuf.areaApproxLights[@n].position.xyz +
@@ -85,7 +85,7 @@
 														reflClipSpace * invHalfRectSize + 0.5f,
 														passBuf.areaApproxLights[@n].attenuation.w,
 														(ROUGHNESS - 0.02f) * fSpecDistance *
-														passBuf.areaLightMipmapScale ).x;
+														passBuf.areaApproxLights[@n].areaLightMipmapScale ).x;
 				@end
 			}
 		}

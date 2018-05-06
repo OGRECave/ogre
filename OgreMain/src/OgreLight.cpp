@@ -54,6 +54,7 @@ namespace Ogre {
           mDoubleSided(false),
           mRectHalfSize(Vector2::UNIT_SCALE),
           mTextureLightMaskIdx( std::numeric_limits<uint16>::max() ),
+          mTextureMaskMipScale( 5.0f ),
           mShadowFarDist(0),
           mShadowFarDistSquared(0),
           mShadowNearClipDist(-1),
