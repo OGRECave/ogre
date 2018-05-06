@@ -144,6 +144,7 @@ namespace Ogre
         uint16              mNumAreaLightsLimit;
         uint8               mAreaLightsRoundMultiple;
         uint32              mAreaLightsGlobalLightListStart;
+        uint32              mRealNumAreaLights;
 
         /// Listener for adding extensions. @see setListener.
         /// Pointer is [b]never[/b] null.

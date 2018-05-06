@@ -1004,6 +1004,7 @@ namespace Ogre
         int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
         int32 numAreaApproxLights   = getProperty( HlmsBaseProp::LightsAreaApprox );
+        const size_t realNumAreaLights = mRealNumAreaLights;
 
         bool isPssmBlend = getProperty( HlmsBaseProp::PssmBlend ) != 0;
         bool isPssmFade = getProperty( HlmsBaseProp::PssmFade ) != 0;
@@ -1485,12 +1486,12 @@ namespace Ogre
             }
 
             float areaLightNumMipmaps = 0.0f;
-            float areaLightHalfMip = 0;
+            float areaLightDiffuseStartMip = 0;
 
             if( mAreaLightMasks )
             {
                 areaLightNumMipmaps = mAreaLightMasks->getNumMipmaps();
-                areaLightHalfMip = mAreaLightMasks->getNumMipmaps() * 0.5f;
+                areaLightDiffuseStartMip = std::max<uint32>( mAreaLightMasks->getNumMipmaps(), 4u ) - 4u;
             }
 
             //Send area lights. We need them sorted so textured ones
@@ -1498,7 +1499,7 @@ namespace Ogre
             mAreaLights.reserve( numAreaApproxLights );
             mAreaLights.clear();
             const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
-            for( int32 i=0; i<numAreaApproxLights; ++i )
+            for( int32 i=0; i<realNumAreaLights; ++i )
             {
                 const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
                 assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
@@ -1507,7 +1508,7 @@ namespace Ogre
 
             std::sort( mAreaLights.begin(), mAreaLights.end(), SortByTextureLightMaskIdx );
 
-            for( int32 i=0; i<numAreaApproxLights; ++i )
+            for( int32 i=0; i<realNumAreaLights; ++i )
             {
                 /*const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
                 assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
@@ -1533,7 +1534,7 @@ namespace Ogre
                 *passBufferPtr++ = colour.r;
                 *passBufferPtr++ = colour.g;
                 *passBufferPtr++ = colour.b;
-                *passBufferPtr++ = areaLightHalfMip;
+                *passBufferPtr++ = areaLightDiffuseStartMip;
 
                 //vec3 areaApproxLights[numLights].specular
                 colour = light->getSpecularColour() * light->getPowerScale();
@@ -1567,6 +1568,45 @@ namespace Ogre
                 *passBufferPtr++ = xAxis.y;
                 *passBufferPtr++ = xAxis.z;
                 *passBufferPtr++ = 1.0f / rectHalfSize.y;
+            }
+
+            for( int32 i=realNumAreaLights; i<numAreaApproxLights; ++i )
+            {
+                //vec3 areaApproxLights[numLights].position
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+
+                //vec3 areaApproxLights[numLights].diffuse
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 1000.0f;
+
+                //vec3 areaApproxLights[numLights].specular
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 1000.0f;
+
+                //vec4 areaApproxLights[numLights].attenuation;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 1;
+                *passBufferPtr++ = 1;
+                *passBufferPtr++ = 0;
+
+                //vec4 areaApproxLights[numLights].direction;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 1.0f;
+
+                //vec4 areaApproxLights[numLights].tangent;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 0;
+                *passBufferPtr++ = 1.0f;
             }
 
             if( shadowNode )

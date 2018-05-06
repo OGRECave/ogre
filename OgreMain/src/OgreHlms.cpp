@@ -221,6 +221,7 @@ namespace Ogre
         mNumAreaLightsLimit( 1u ),
         mAreaLightsRoundMultiple( 1u ),
         mAreaLightsGlobalLightListStart( 0u ),
+        mRealNumAreaLights( 0u ),
         mListener( &c_defaultListener ),
         mRenderSystem( 0 ),
         mShaderProfile( "unset!" ),
@@ -2503,6 +2504,7 @@ namespace Ogre
 
             numLightsPerType[Light::LT_AREA_APPROX] =
                     std::min<uint16>( numLightsPerType[Light::LT_AREA_APPROX], mNumAreaLightsLimit );
+            mRealNumAreaLights = numLightsPerType[Light::LT_AREA_APPROX];
             numLightsPerType[Light::LT_AREA_APPROX] =
                     Ogre::alignToNextMultiple( numLightsPerType[Light::LT_AREA_APPROX],
                                                mAreaLightsRoundMultiple );
