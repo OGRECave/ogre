@@ -164,6 +164,10 @@ namespace Demo
             samplerblock.setFiltering( Ogre::TFO_ANISOTROPIC );
 
             datablock->setTexture( 0, light->mTextureLightMaskIdx, mAreaMaskTex, &samplerblock );
+            datablock->setTextureSwizzle( 0, Ogre::HlmsUnlitDatablock::R_MASK,
+                                          Ogre::HlmsUnlitDatablock::R_MASK,
+                                          Ogre::HlmsUnlitDatablock::R_MASK,
+                                          Ogre::HlmsUnlitDatablock::R_MASK );
         }
 
         datablock->setUseColour( true );
@@ -257,7 +261,7 @@ namespace Demo
         light->setSpecularColour( 0.8f, 0.4f, 0.2f );
         light->setPowerScale( Ogre::Math::PI );
         light->setType( Ogre::Light::LT_AREA_APPROX );
-		light->setRectHalfSize( Ogre::Vector2( 15.0f, 15.0f ) );
+        light->setRectHalfSize( Ogre::Vector2( 15.0f, 15.0f ) );
         lightNode->setPosition( -10.0f, 10.0f, 10.0f );
         //light->setDirection( Ogre::Vector3( 1, 0, 0 ).normalisedCopy() );
         light->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
