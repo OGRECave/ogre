@@ -17,5 +17,5 @@ struct float1
 
 #define outVs_Position outVs.gl_Position
 #define OGRE_SampleLevel( tex, sampler, uv, lod ) tex.sample( sampler, float2( uv ), level( lod ) )
-#define OGRE_SampleArray2DLevel( tex, sampler, uv, arrayIdx, lod ) tex.sample( tex, sampler, float2( uv ), ushort( arrayIdx ), level( lod ) )
+#define OGRE_SampleArray2DLevel( tex, sampler, uv, arrayIdx, lod ) tex.sample( sampler, float2( uv ), ushort( arrayIdx ), level( lod ) )
 @end
