@@ -126,6 +126,7 @@ fragment @insertpiece( output_type ) main_metal
 	@end
 
 	@insertpiece( DeclPlanarReflTextures )
+	@insertpiece( DeclAreaApproxTextures )
 
 	@property( two_sided_lighting )
 		, bool gl_FrontFacing [[front_facing]]

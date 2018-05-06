@@ -35,6 +35,7 @@ struct PS_INPUT
 @end
 
 @insertpiece( DeclPlanarReflTextures )
+@insertpiece( DeclAreaApproxTextures )
 
 @property( two_sided_lighting )
 @piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
