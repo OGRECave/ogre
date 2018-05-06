@@ -140,21 +140,36 @@ namespace Demo
         Ogre::Root *root = mGraphicsSystem->getRoot();
         Ogre::Hlms *hlmsUnlit = root->getHlmsManager()->getHlms( Ogre::HLMS_UNLIT );
 
+        //Setup an unlit material, double-sided, with textures
+        //(if it has one) and same colour as the light.
+        //IMPORTANT: these materials are never destroyed once they're not needed (they will
+        //be destroyed by Ogre on shutdown). Watchout for this to prevent memory leaks in
+        //a real implementation
+        static Ogre::uint32 s_materialCounter = 0;
+        const Ogre::String materialName = "LightPlane Material" +
+                                          Ogre::StringConverter::toString( s_materialCounter );
         Ogre::HlmsMacroblock macroblock;
         macroblock.mCullMode = Ogre::CULL_NONE;
         Ogre::HlmsDatablock *datablockBase =
-                hlmsUnlit->createDatablock( "LightPlane Material", "LightPlane Material",
-                                            macroblock, Ogre::HlmsBlendblock(), Ogre::HlmsParamVec() );
+                hlmsUnlit->createDatablock( materialName, materialName, macroblock,
+                                            Ogre::HlmsBlendblock(), Ogre::HlmsParamVec() );
 
         assert( dynamic_cast<Ogre::HlmsUnlitDatablock*>( datablockBase ) );
         Ogre::HlmsUnlitDatablock *datablock = static_cast<Ogre::HlmsUnlitDatablock*>( datablockBase );
-        Ogre::HlmsSamplerblock samplerblock;
-        samplerblock.mMaxAnisotropy = 8.0f;
-        samplerblock.setFiltering( Ogre::TFO_ANISOTROPIC );
-        datablock->setTexture( 0, light->mTextureLightMaskIdx, mAreaMaskTex, &samplerblock );
+
+        if( light->mTextureLightMaskIdx != std::numeric_limits<Ogre::uint16>::max() )
+        {
+            Ogre::HlmsSamplerblock samplerblock;
+            samplerblock.mMaxAnisotropy = 8.0f;
+            samplerblock.setFiltering( Ogre::TFO_ANISOTROPIC );
+
+            datablock->setTexture( 0, light->mTextureLightMaskIdx, mAreaMaskTex, &samplerblock );
+        }
+
         datablock->setUseColour( true );
         datablock->setColour( light->getDiffuseColour() );
 
+        //Create the plane Item
         Ogre::SceneNode *lightNode = light->getParentSceneNode();
         Ogre::SceneNode *planeNode = lightNode->createChildSceneNode();
 
@@ -164,7 +179,9 @@ namespace Demo
         item->setCastShadows( false );
         item->setDatablock( datablock );
         planeNode->attachObject( item );
-        Ogre::Vector2 rectSize = light->getRectHalfSize();
+
+        //Math the plane size to that of the area light
+        const Ogre::Vector2 rectSize = light->getRectHalfSize();
         planeNode->setScale( rectSize.x, rectSize.y, 1.0f );
     }
     //-----------------------------------------------------------------------------------
