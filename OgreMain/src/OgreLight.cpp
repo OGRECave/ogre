@@ -226,12 +226,6 @@ namespace Ogre {
                                                        Vector3( 1.0f, 1.0f, 0.5f ) ),
                                                  mObjectData.mIndex );
         }
-        else if( mLightType == LT_SPOTLIGHT )
-        {
-            mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3( 0.0f, 0.0f, 0.5f ),
-                                                       Vector3( 1.0f, 1.0f, 0.5f ) ),
-                                                 mObjectData.mIndex );
-        }
         else if( mLightType == LT_AREA_APPROX )
         {
             if( mDoubleSided )
