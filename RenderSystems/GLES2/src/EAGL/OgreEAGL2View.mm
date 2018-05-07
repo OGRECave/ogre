@@ -59,35 +59,6 @@ using namespace Ogre;
 
 - (void)layoutSubviews
 {
-    // Change the viewport orientation based upon the current device orientation.
-    // Note: This only operates on the main viewport, usually the main view.
-
-    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
-    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
-
-    // Return if the orientation is not a valid interface orientation(face up, face down)
-    if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))
-        return;
-
-    // Check if orientation is supported
-    NSString *rotateToOrientation = @"";
-    if(deviceOrientation == UIDeviceOrientationPortrait)
-        rotateToOrientation = @"UIInterfaceOrientationPortrait";
-    else if(deviceOrientation == UIDeviceOrientationPortraitUpsideDown)
-        rotateToOrientation = @"UIInterfaceOrientationPortraitUpsideDown";
-    else if(deviceOrientation == UIDeviceOrientationLandscapeLeft)
-        rotateToOrientation = @"UIInterfaceOrientationLandscapeLeft";
-    else if(deviceOrientation == UIDeviceOrientationLandscapeRight)
-        rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
-
-    NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
-
-    BOOL supported = [supportedOrientations containsObject:rotateToOrientation];
-
-    if (!supported)
-        return;
-
     // Get the window using the name that we saved
     RenderWindow *window = static_cast<RenderWindow *>(Root::getSingleton().getRenderSystem()->getRenderTarget(mWindowName));
 
