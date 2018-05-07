@@ -83,22 +83,24 @@ namespace Demo
         image.generateMipmaps( false, Ogre::Image::FILTER_GAUSSIAN );
 
         {
-            //Ensure all mips have black borders
+            //Ensure the lower mips have black borders. This is done to prevent certain artifacts,
+            //Ensure the higher mips have grey borders. This is done to prevent certain artifacts.
             data = image.getData();
-            for( size_t i=0; i<mAreaMaskTex->getNumMipmaps() + 1u; ++i )
+            for( size_t i=0u; i<mAreaMaskTex->getNumMipmaps() + 1u; ++i )
             {
+                const Ogre::uint8 borderColour = i >= 5u ? 127u : 0u;
                 Ogre::uint32 currWidth = std::max( texWidth >> i, 1u );
                 Ogre::uint32 currHeight = std::max( texHeight >> i, 1u );
 
                 size_t bytesPerRow = Ogre::PixelUtil::getMemorySize( currWidth, 1u, 1u, texFormat );
 
-                memset( data, 0, bytesPerRow );
-                memset( data + bytesPerRow * (currHeight - 1u), 0, bytesPerRow );
+                memset( data, borderColour, bytesPerRow );
+                memset( data + bytesPerRow * (currHeight - 1u), borderColour, bytesPerRow );
 
                 for( size_t y=1; y<currWidth - 1u; ++y )
                 {
-                    data[y*bytesPerRow+0] = 0;
-                    data[y*bytesPerRow+bytesPerRow-1u] = 0;
+                    data[y*bytesPerRow+0] = borderColour;
+                    data[y*bytesPerRow+bytesPerRow-1u] = borderColour;
                 }
 
                 data += bytesPerRow * currHeight;
@@ -361,7 +363,7 @@ namespace Demo
         light->setSpecularColour( 0.8f, 0.4f, 0.2f );
         //Increase the strength 10x to showcase this light. Area approx lights are not
         //physically based so the value is more arbitrary than the other light types
-        light->setPowerScale( Ogre::Math::PI * 10 );
+        light->setPowerScale( Ogre::Math::PI * 4 );
         light->setType( Ogre::Light::LT_AREA_APPROX );
         light->setRectHalfSize( Ogre::Vector2( 15.0f, 15.0f ) );
         lightNode->setPosition( -10.0f, 6.0f, 10.0f );
