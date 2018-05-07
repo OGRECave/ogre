@@ -100,6 +100,10 @@ __inline__ static void trap_instruction(void)
 }
 #elif defined(__aarch64__) && defined(__APPLE__)
 enum { HAVE_TRAP_INSTRUCTION = 0, }; /* use __builtin_trap() on AArch64 iOS */
+__attribute__((gnu_inline, always_inline))
+__inline__ static void trap_instruction(void)
+{
+}
 #elif defined(__aarch64__)
 enum { HAVE_TRAP_INSTRUCTION = 1, };
 __attribute__((gnu_inline, always_inline))
@@ -111,6 +115,10 @@ __inline__ static void trap_instruction(void)
 }
 #else
 enum { HAVE_TRAP_INSTRUCTION = 0, };
+__attribute__((gnu_inline, always_inline))
+__inline__ static void trap_instruction(void)
+{
+}
 #endif
 
 __attribute__((gnu_inline, always_inline))
