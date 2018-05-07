@@ -82,6 +82,29 @@ namespace Demo
         //Generate the mipmaps so roughness works
         image.generateMipmaps( false, Ogre::Image::FILTER_GAUSSIAN );
 
+        {
+            //Ensure all mips have black borders
+            data = image.getData();
+            for( size_t i=0; i<mAreaMaskTex->getNumMipmaps() + 1u; ++i )
+            {
+                Ogre::uint32 currWidth = std::max( texWidth >> i, 1u );
+                Ogre::uint32 currHeight = std::max( texHeight >> i, 1u );
+
+                size_t bytesPerRow = Ogre::PixelUtil::getMemorySize( currWidth, 1u, 1u, texFormat );
+
+                memset( data, 0, bytesPerRow );
+                memset( data + bytesPerRow * (currHeight - 1u), 0, bytesPerRow );
+
+                for( size_t y=1; y<currWidth - 1u; ++y )
+                {
+                    data[y*bytesPerRow+0] = 0;
+                    data[y*bytesPerRow+bytesPerRow-1u] = 0;
+                }
+
+                data += bytesPerRow * currHeight;
+            }
+        }
+
         //Upload to GPU
         Ogre::uint8 const *srcData = image.getData();
         for( size_t i=0; i<mAreaMaskTex->getNumMipmaps() + 1u; ++i )
