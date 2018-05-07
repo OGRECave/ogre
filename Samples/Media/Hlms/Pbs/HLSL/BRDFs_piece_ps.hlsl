@@ -235,4 +235,5 @@ float3 BRDF_IR( float3 lightDir, float3 lightDiffuse,
 	@piece( DeclareObjLightMask )uint objLightMask = worldMaterialIdx[inPs.drawId].z;@end
 	@piece( ObjLightMaskCmp )if( (objLightMask & asuint( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u )@end
 	@piece( andObjLightMaskCmp )&& ((objLightMask & asuint( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u)@end
+	@piece( andObjAreaApproxLightMaskCmp )&& ((objLightMask & asuint( passBuf.areaApproxLights[@n].position.w )) != 0u)@end
 @end

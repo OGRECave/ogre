@@ -27,7 +27,7 @@
                                          passBuf.areaApproxLights[@n].direction.xyz;
     fDistance = length( lightDir );
     if( fDistance <= passBuf.areaApproxLights[@n].attenuation.x
-    /*&& dot( -lightDir, passBuf.areaApproxLights[@n].direction.xyz ) > 0*/ @insertpiece( andObjLightMaskCmp ) )
+    /*&& dot( -lightDir, passBuf.areaApproxLights[@n].direction.xyz ) > 0*/ @insertpiece( andObjAreaApproxLightMaskCmp ) )
     {
         projectedPosInPlane.xyz -= passBuf.areaApproxLights[@n].position.xyz;
         float3 areaLightBitangent = cross( passBuf.areaApproxLights[@n].tangent.xyz,
