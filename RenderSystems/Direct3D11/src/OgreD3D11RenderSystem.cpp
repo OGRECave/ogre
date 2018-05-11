@@ -3293,6 +3293,21 @@ bail:
                 }
             }
 
+            /// Geometry Shader binding
+            {
+                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+                {
+                    mDevice.GetImmediateContext()->GSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+                    if (mDevice.isError())
+                    {
+                        String errorDescription = mDevice.getErrorDescription();
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "D3D11 device cannot set geometry shader resources\nError Description:" + errorDescription,
+                            "D3D11RenderSystem::_render");
+                    }
+                }
+            }
+
             /// Hull Shader binding
             if (mPso->hullShader && mBindingType == TextureUnitState::BT_TESSELLATION_HULL)
             {
