@@ -238,5 +238,5 @@ float3 BRDF_IR( float3 lightDir, float3 lightDiffuse,
 @property( hlms_fine_light_mask )
 	@piece( ObjLightMaskCmp )if( (inPs.objLightMask & as_type<uint>( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u )@end
 	@piece( andObjLightMaskCmp )&& ((inPs.objLightMask & as_type<uint>( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u)@end
-	@piece( andObjAreaApproxLightMaskCmp )&& ((objLightMask & as_type<uint>( passBuf.areaApproxLights[@n].position.w )) != 0u)@end
+	@piece( andObjAreaApproxLightMaskCmp )&& ((inPs.objLightMask & as_type<uint>( passBuf.areaApproxLights[@counter(fineMaskAreaApproxLightIdx)].position.w )) != 0u)@end
 @end
