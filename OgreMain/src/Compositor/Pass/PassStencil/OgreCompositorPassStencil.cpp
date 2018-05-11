@@ -78,6 +78,7 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
+        mRenderSystem->_setViewport( mViewport );
         mRenderSystem->setStencilBufferParams( mDefinition->mStencilRef, mDefinition->mStencilParams );
 
         if( listener )

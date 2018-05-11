@@ -69,7 +69,7 @@ namespace Ogre
     {
         const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
         assert( dynamic_cast<ConstBufferPacked*>( cmd->bufferPacked ) );
-        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBufferCS( cmd->slot );
+        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBufferGS( cmd->slot );
     }
     void CommandBuffer::execute_setConstantBufferHS( CommandBuffer *_this,
                                                      const CbBase * RESTRICT_ALIAS _cmd )

@@ -3,7 +3,7 @@
 @pmax( NumDetailMaps, detail_maps_diffuse, detail_maps_normal )
 @foreach( NumDetailMaps, n )
 	@property( detail_offsets@n )
-		@piece( offsetDetail@n ) * material.detailOffsetScale[@value(currOffsetDetail)].zw + material.detailOffsetScale[@counter(currOffsetDetail)].xy@end
+		@piece( offsetDetail@n ) * material.detailOffsetScale[@n].zw + material.detailOffsetScale[@n].xy@end
 	@end
 @end
 
