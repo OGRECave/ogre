@@ -493,6 +493,11 @@ namespace Ogre
             encodeVector( jsonStr, Vector2( nearClipDistance, farClipDistance ) );
         }
 
+        jsonStr.a( ",\n\t\t\t\"rect_half_size\" : " );
+        encodeVector( jsonStr, light->getRectHalfSize() );
+
+        jsonStr.a( ",\n\t\t\t\"texture_light_mask_idx\" : ", light->mTextureLightMaskIdx );
+
         jsonStr.a( ",\n" );
         flushLwString( jsonStr, outJson );
         exportMovableObject( jsonStr, outJson, light );
