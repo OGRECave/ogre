@@ -46,11 +46,14 @@ THE SOFTWARE.
 #include "Cubemaps/OgreParallaxCorrectedCubemap.h"
 #include "Compositor/OgreCompositorManager2.h"
 
+#include "OgreTextureManager.h"
+
 #include "OgreMeshSerializer.h"
 #include "OgreMesh2Serializer.h"
 #include "OgreFileSystemLayer.h"
 
 #include "OgreLogManager.h"
+
 
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
@@ -1304,6 +1307,18 @@ namespace Ogre
                             mIrradianceVolume->getIrradianceOrigin(),
                             mIrradianceVolume->getIrradianceMaxPower(),
                             mIrradianceVolume->getFadeAttenuationOverDistace() );
+            }
+        }
+
+        if( importFlags & SceneFlags::AreaLightMasks )
+        {
+            itor = d.FindMember( "area_light_masks" );
+            if( itor != d.MemberEnd() && itor->value.IsBool() && itor->value.GetBool() )
+            {
+                TexturePtr areaLightMask = TextureManager::getSingleton().load( "AreaLightMasks.oitd",
+                                                                                "SceneFormatImporter" );
+                HlmsPbs *hlmsPbs = getPbs();
+                hlmsPbs->setAreaLightMasks( areaLightMask );
             }
         }
 

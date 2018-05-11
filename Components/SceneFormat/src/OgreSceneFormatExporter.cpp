@@ -793,6 +793,24 @@ namespace Ogre
         if( exportFlags & SceneFlags::InstantRadiosity )
             exportInstantRadiosity( jsonStr, outJson );
 
+        if( exportFlags & SceneFlags::AreaLightMasks )
+        {
+            const String textureFolder = mCurrentExportFolder + "/textures/";
+            FileSystemLayer::createDirectory( textureFolder );
+
+            HlmsPbs *hlmsPbs = getPbs();
+
+            if( hlmsPbs && hlmsPbs->getAreaLightMasks() )
+            {
+                jsonStr.a( ",\n\t\t\"area_light_masks\" : true" );
+
+                TexturePtr areaLightMask = hlmsPbs->getAreaLightMasks();
+                Image image;
+                areaLightMask->convertToImage( image, true );
+                image.save( mCurrentExportFolder + "/textures/AreaLightMasks.oitd" );
+            }
+        }
+
         jsonStr.a( "\n\t}" );
 
         flushLwString( jsonStr, outJson );

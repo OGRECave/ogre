@@ -72,6 +72,7 @@ namespace Ogre
             /// in an incorrect scene (VPLs will exist twice).
             LightsVpl               = 1u << 14u,
             ParallaxCorrectedCubemap= 1u << 15u,
+            AreaLightMasks          = 1u << 16u,
         };
     }
 
