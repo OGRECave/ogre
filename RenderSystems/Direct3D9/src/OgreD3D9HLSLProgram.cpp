@@ -734,7 +734,7 @@ namespace Ogre {
         if(mTarget == "")
         {
             LogManager::getSingleton().logMessage(
-                "Invalid target for D3D11 shader '" + mName + "' - '" + target + "'");
+                "Invalid target for D3D9 shader '" + mName + "' - '" + target + "'");
         }
     }
 
