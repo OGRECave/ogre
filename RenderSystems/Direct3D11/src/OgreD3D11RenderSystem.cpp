@@ -2440,30 +2440,23 @@ namespace Ogre
             }
             
             /// Vertex Shader binding
-            /*if (mBindingType == TextureUnitState::BindingType::BT_VERTEX)*/
+            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+                mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                if (mDevice.isError())
                 {
-                    mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
                 }
-
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+                mDevice.GetImmediateContext()->VSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+                if (mDevice.isError())
                 {
-                    mDevice.GetImmediateContext()->VSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
                 }
             }
 
@@ -2490,86 +2483,68 @@ namespace Ogre
             }
 
             /// Compute Shader binding
-            if (mBoundComputeProgram && mBindingType == TextureUnitState::BT_COMPUTE)
+            if (mBoundComputeProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+                mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                if (mDevice.isError())
                 {
-                    mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "D3D11 device cannot set compute shader samplers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set compute shader samplers\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
                 }
 
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+                mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+                if (mDevice.isError())
                 {
-                    mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "D3D11 device cannot set compute shader resources\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set compute shader resources\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
                 }
             }
 
             /// Hull Shader binding
-            if (mBoundTessellationHullProgram && mBindingType == TextureUnitState::BT_TESSELLATION_HULL)
+            if (mBoundTessellationHullProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+                mDevice.GetImmediateContext()->HSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                if (mDevice.isError())
                 {
-                    mDevice.GetImmediateContext()->HSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set hull shader samplers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set hull shader samplers\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
                 }
-                
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+
+                mDevice.GetImmediateContext()->HSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+                if (mDevice.isError())
                 {
-                    mDevice.GetImmediateContext()->HSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set hull shader resources\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set hull shader resources\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
                 }
             }
             
             /// Domain Shader binding
-            if (mBoundTessellationDomainProgram && mBindingType == TextureUnitState::BT_TESSELLATION_DOMAIN)
+            if (mBoundTessellationDomainProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+                mDevice.GetImmediateContext()->DSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                if (mDevice.isError())
                 {
-                    mDevice.GetImmediateContext()->DSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set domain shader samplers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set domain shader samplers\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
                 }
 
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+                mDevice.GetImmediateContext()->DSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+                if (mDevice.isError())
                 {
-                    mDevice.GetImmediateContext()->DSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set domain shader resources\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set domain shader resources\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
                 }
             }
         }
