@@ -92,6 +92,6 @@ namespace Demo
 
     const char* MainEntryPoints::getWindowTitle(void)
     {
-        return "Shadow map debugging";
+        return "Area Lights (Fake / Approximation)";
     }
 }
