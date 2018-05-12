@@ -146,8 +146,6 @@ namespace Ogre
         D3D11HLSLProgram* mBoundTessellationDomainProgram;
         D3D11HLSLProgram* mBoundComputeProgram;
 
-        TextureUnitState::BindingType mBindingType;
-
         ComPtr<ID3D11ShaderResourceView> mDSTResView;
         ComPtr<ID3D11BlendState> mBoundBlendState;
         ComPtr<ID3D11RasterizerState> mBoundRasterizer;
@@ -289,7 +287,6 @@ namespace Ogre
         D3D11HLSLProgram* _getBoundTessellationDomainProgram() const;
         D3D11HLSLProgram* _getBoundComputeProgram() const;
         void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
-        void _setBindingType(TextureUnitState::BindingType bindingType);
         void _setTextureCoordSet( size_t unit, size_t index );
         void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
         void _setTextureBorderColour(size_t stage, const ColourValue& colour);

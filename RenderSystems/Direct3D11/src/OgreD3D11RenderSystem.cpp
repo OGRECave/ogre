@@ -1790,11 +1790,6 @@ namespace Ogre
         mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
-    {
-        mBindingType = bindingType;
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureCoordSet( size_t stage, size_t index )
     {
         mTexStageDesc[stage].coordIndex = index;
@@ -3714,8 +3709,6 @@ namespace Ogre
         mBoundTessellationHullProgram = NULL;
         mBoundTessellationDomainProgram = NULL;
         mBoundComputeProgram = NULL;
-
-        mBindingType = TextureUnitState::BT_FRAGMENT;
 
         ZeroMemory( &mBlendDesc, sizeof(mBlendDesc));
 

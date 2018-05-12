@@ -367,7 +367,9 @@ namespace Ogre {
         unsigned int getNumFrames(void) const;
 
 
-        /** The type of unit to bind the texture settings to. */
+        /** The type of unit to bind the texture settings to.
+            @deprecated only D3D9 has separate sampler bindings. All other RenderSystems use unified pipelines.
+         */
         enum BindingType
         {
             /** Regular fragment processing unit - the default. */
@@ -405,10 +407,12 @@ namespace Ogre {
             vertex processing unit with a texture binding, in those cases. For
             rendersystems which have a unified binding for the vertex and fragment
             units, this setting makes no difference.
+        @deprecated see @ref BindingType
         */
         void setBindingType(BindingType bt);
 
         /** Gets the type of unit these texture settings should be bound to.  
+        @deprecated see @ref BindingType
         */
         BindingType getBindingType(void) const;
 
