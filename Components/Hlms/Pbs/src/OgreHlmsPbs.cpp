@@ -951,6 +951,14 @@ namespace Ogre
             if( mIrradianceVolume )
                 setProperty( PbsProperty::IrradianceVolumes, 1 );
 
+            if( mAreaLightMasks )
+            {
+                const size_t numComponents =
+                        PixelUtil::getComponentCount( mAreaLightMasks->getFormat() );
+                if( numComponents > 2u )
+                    setProperty( HlmsBaseProp::LightsAreaTexColour, 1 );
+            }
+
 #ifdef OGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS
             mHasPlanarReflections = false;
             mLastBoundPlanarReflection = 0u;
@@ -1502,16 +1510,16 @@ namespace Ogre
             mAreaLights.reserve( numAreaApproxLights );
             mAreaLights.clear();
             const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
-            for( int32 i=0; i<realNumAreaLights; ++i )
+            for( size_t i=0; i<realNumAreaLights; ++i )
             {
-                const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
+                const size_t idx = mAreaLightsGlobalLightListStart + i;
                 assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
                 mAreaLights.push_back( globalLightList.lights[idx] );
             }
 
             std::sort( mAreaLights.begin(), mAreaLights.end(), SortByTextureLightMaskIdx );
 
-            for( int32 i=0; i<realNumAreaLights; ++i )
+            for( size_t i=0; i<realNumAreaLights; ++i )
             {
                 /*const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
                 assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );

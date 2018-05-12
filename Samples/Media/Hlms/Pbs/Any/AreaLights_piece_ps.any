@@ -19,6 +19,12 @@
 @end
 
 @piece( DoAreaApproxLights )
+	@property( !hlms_lights_area_tex_colour )
+		#define AREA_LIGHTS_TEX_SWIZZLE x
+	@end @property( hlms_lights_area_tex_colour )
+		#define AREA_LIGHTS_TEX_SWIZZLE xyz
+	@end
+
 	float3 projectedPosInPlane;
 
 @foreach( hlms_lights_area_approx, n )
@@ -52,14 +58,20 @@
 		booster = 1.0f + booster * 2.25f;
 		booster = 1.0f;
 
+	@property( @n >= hlms_lights_area_tex_mask || !hlms_lights_area_tex_colour )
 		float diffuseMask = 1.0f;
+	@end
 	@property( @n < hlms_lights_area_tex_mask )
+		@property( hlms_lights_area_tex_colour )
+			float3 diffuseMask;
+		@end
+
 		diffuseMask = OGRE_SampleArray2DLevel( areaLightMasks, areaLightMasksSampler,
 											   lightUVForTex + 0.5f,
 											   passBuf.areaApproxLights[@n].attenuation.w,
 											   passBuf.areaLightDiffuseMipmapStart +
 											   (ROUGHNESS - 0.02f) *
-											   passBuf.areaLightNumMipmaps ).x;
+											   passBuf.areaLightNumMipmaps ).AREA_LIGHTS_TEX_SWIZZLE;
 	@end
 
 		float3 closestPoint = passBuf.areaApproxLights[@n].position.xyz +
@@ -72,7 +84,11 @@
 
 		float3 toShapeLight = reflect( -viewDir, nNormal );
 		float denom = dot( toShapeLight, -passBuf.areaApproxLights[@n].direction.xyz );
-		float specCol = 0;
+		@property( @n >= hlms_lights_area_tex_mask || !hlms_lights_area_tex_colour )
+			float specCol = 0;
+		@end @property( @n < hlms_lights_area_tex_mask && hlms_lights_area_tex_colour )
+			float3 specCol = float3( 0, 0, 0 );
+		@end
 		if( denom > 1e-6f )
 		{
 			float3 p0l0 = passBuf.areaApproxLights[@n].position.xyz - inPs.pos;
@@ -84,19 +100,26 @@
 				reflClipSpace.x = dot( passBuf.areaApproxLights[@n].tangent.xyz, posInShape );
 				reflClipSpace.y = dot( areaLightBitangent, posInShape );
 
-				specCol = 0.5f / (length( max( abs( reflClipSpace * invHalfRectSize ) - 0.5f, 0.0f ) ) + 0.5f);
-				specCol = min( specCol, 1.0f );
+				float specVal;
+				specVal = 0.5f / (length( max( abs( reflClipSpace * invHalfRectSize ) - 0.5f, 0.0f ) ) + 0.5f);
+				specVal = min( specVal, 1.0f );
 				float areaPower = ((ROUGHNESS * 10.0f + 1.0f) * 0.005f) /
 								  (ROUGHNESS * ROUGHNESS * ROUGHNESS);
 				areaPower = min( areaPower, 512.0f ); //Prevent INFs.
-				specCol = pow( specCol, areaPower ) * min( areaPower * areaPower, 1.0f );
+				specVal = pow( specVal, areaPower ) * min( areaPower * areaPower, 1.0f );
+
+				@property( @n >= hlms_lights_area_tex_mask || !hlms_lights_area_tex_colour )
+					specCol = specVal;
+				@end @property( @n < hlms_lights_area_tex_mask && hlms_lights_area_tex_colour )
+					specCol = float3( specVal, specVal, specVal );
+				@end
 
 				@property( @n < hlms_lights_area_tex_mask )
 					specCol *= OGRE_SampleArray2DLevel( areaLightMasks, areaLightMasksSampler,
 														reflClipSpace * invHalfRectSize + 0.5f,
 														passBuf.areaApproxLights[@n].attenuation.w,
 														(ROUGHNESS - 0.02f) *
-														passBuf.areaLightNumMipmaps ).x;
+														passBuf.areaLightNumMipmaps ).AREA_LIGHTS_TEX_SWIZZLE;
 				@end
 			}
 		}

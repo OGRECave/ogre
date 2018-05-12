@@ -108,6 +108,7 @@ namespace Ogre
     const IdString HlmsBaseProp::LightsAreaTexMask  = IdString( "hlms_lights_area_tex_mask" );
     const IdString HlmsBaseProp::LightsAttenuation  = IdString( "hlms_lights_attenuation" );
     const IdString HlmsBaseProp::LightsSpotParams   = IdString( "hlms_lights_spotparams" );
+    const IdString HlmsBaseProp::LightsAreaTexColour= IdString( "hlms_lights_area_tex_colour" );
 
     //Change per scene pass
     const IdString HlmsBaseProp::PsoClipDistances	= IdString( "hlms_pso_clip_distances" );
