@@ -1313,10 +1313,11 @@ namespace Ogre
         if( importFlags & SceneFlags::AreaLightMasks )
         {
             itor = d.FindMember( "area_light_masks" );
-            if( itor != d.MemberEnd() && itor->value.IsBool() && itor->value.GetBool() )
+            if( itor != d.MemberEnd() && itor->value.IsString() )
             {
-                TexturePtr areaLightMask = TextureManager::getSingleton().load( "AreaLightMasks.oitd",
-                                                                                "SceneFormatImporter" );
+                TexturePtr areaLightMask = TextureManager::getSingleton().load(
+                                               String( itor->value.GetString() ) + ".oitd",
+                                               "SceneFormatImporter" );
                 HlmsPbs *hlmsPbs = getPbs();
                 hlmsPbs->setAreaLightMasks( areaLightMask );
             }

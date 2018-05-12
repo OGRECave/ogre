@@ -802,12 +802,12 @@ namespace Ogre
 
             if( hlmsPbs && hlmsPbs->getAreaLightMasks() )
             {
-                jsonStr.a( ",\n\t\t\"area_light_masks\" : true" );
-
                 TexturePtr areaLightMask = hlmsPbs->getAreaLightMasks();
                 Image image;
                 areaLightMask->convertToImage( image, true );
-                image.save( mCurrentExportFolder + "/textures/AreaLightMasks.oitd" );
+
+                jsonStr.a( ",\n\t\t\"area_light_masks\" : \"", areaLightMask->getName().c_str(), "\"" );
+                image.save( mCurrentExportFolder + "/textures/" + areaLightMask->getName() + ".oitd" );
             }
         }
 
