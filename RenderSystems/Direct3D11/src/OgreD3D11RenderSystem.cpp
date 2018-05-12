@@ -2382,27 +2382,6 @@ namespace Ogre
                     "D3D11 device cannot set blend state\nError Description:" + errorDescription,
                     "D3D11RenderSystem::_render");
             }
-            if (mSamplerStatesChanged && mBoundGeometryProgram && mBindingType == TextureUnitState::BT_GEOMETRY)
-            {
-                {
-                    mDevice.GetImmediateContext()->GSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
-                }
-                mDevice.GetImmediateContext()->GSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-            }
         }
 
         if (opState->mRasterizer != mBoundRasterizer)
@@ -2488,6 +2467,28 @@ namespace Ogre
                 }
             }
 
+            /// Geometry Shader binding
+            if (mBoundGeometryProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+            {
+                mDevice.GetImmediateContext()->GSSetSamplers(0, opState->mSamplerStatesCount, opState->mSamplerStates[0].GetAddressOf());
+                if (mDevice.isError())
+                {
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set geometry shader samplers\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
+                }
+
+                mDevice.GetImmediateContext()->GSSetShaderResources(0, opState->mTexturesCount, &opState->mTextures[0]);
+                if (mDevice.isError())
+                {
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "D3D11 device cannot set geometry shader resources\nError Description:" + errorDescription,
+                        "D3D11RenderSystem::_render");
+                }
+            }
+
             /// Compute Shader binding
             if (mBoundComputeProgram && mBindingType == TextureUnitState::BT_COMPUTE)
             {
@@ -2497,19 +2498,19 @@ namespace Ogre
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                             "D3D11 device cannot set compute shader samplers\nError Description:" + errorDescription,
                             "D3D11RenderSystem::_render");
                     }
                 }
-                
+
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
                     mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                             "D3D11 device cannot set compute shader resources\nError Description:" + errorDescription,
                             "D3D11RenderSystem::_render");
                     }
