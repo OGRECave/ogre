@@ -450,8 +450,7 @@ namespace Ogre
         unit, thus minimising render state changes.
         */
         virtual void _setTextureUnitSettings(size_t texUnit, TextureUnitState& tl);
-        /** Set texture unit binding type */
-        virtual void _setBindingType(TextureUnitState::BindingType bindigType);
+        OGRE_DEPRECATED virtual void _setBindingType(TextureUnitState::BindingType bindigType) {}
         /** Turns off a texture unit. */
         virtual void _disableTextureUnit(size_t texUnit);
         /** Disables all texture units from the given unit upwards */

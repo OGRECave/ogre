@@ -313,9 +313,6 @@ namespace Ogre {
         // This method is only ever called to set a texture unit to valid details
         // The method _disableTextureUnit is called to turn a unit off
         const TexturePtr& tex = tl._getTexturePtr();
-        
-        if (mCurrentCapabilities->hasCapability(RSC_COMPLETE_TEXTURE_BINDING))
-            _setBindingType(tl.getBindingType());
 
         // Vertex texture binding (D3D9 only)
         if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
@@ -433,13 +430,6 @@ namespace Ogre {
         _setTextureMatrix(texUnit, tl.getTextureTransform());
 
 
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-            "This rendersystem does not support binding texture to other shaders then fragment", 
-            "RenderSystem::_setBindingType");
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_setVertexTexture(size_t unit, const TexturePtr& tex)
