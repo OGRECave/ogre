@@ -1163,16 +1163,6 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
 }
 
 //-----------------------------------------------------------------------
-Ogre::StringVector Sample_ShaderSystem::getRequiredPlugins()
-{
-    StringVector names;
-    if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") &&
-        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
-        names.push_back("Cg Program Manager");
-    return names;
-}
-
-//-----------------------------------------------------------------------
 void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps )
 {
     if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !(caps->hasCapability(RSC_FRAGMENT_PROGRAM)))

@@ -72,9 +72,6 @@ public:
     /** @see Sample::sliderMoved. */
     virtual void sliderMoved(Slider* slider);
 
-    /** @see Sample::getRequiredPlugins. */
-    StringVector getRequiredPlugins();
-
     /** @see Sample::testCapabilities. */
     void testCapabilities(const RenderSystemCapabilities* caps);
     
