@@ -91,7 +91,7 @@
 		@end @property( @n < hlms_lights_area_tex_mask && hlms_lights_area_tex_colour )
 			float3 specCol = float3( 0, 0, 0 );
 		@end
-		if( denom > 1e-6f )
+		if( denom > 1e-6f || passBuf.areaApproxLights[@n].doubleSided.x != 0.0f )
 		{
 			float3 p0l0 = passBuf.areaApproxLights[@n].position.xyz - inPs.pos;
 			float t = dot( p0l0, -passBuf.areaApproxLights[@n].direction.xyz ) / denom;
@@ -138,6 +138,7 @@
 		//lightDir = (-passBuf.areaApproxLights[@n].direction.xyz + lightDir) * 0.50f;
 		//lightDir = lerp( lightDir2, lightDir, fAreaW );
 		float globalDot = saturate( dot( -lightDir, passBuf.areaApproxLights[@n].direction.xyz ) );
+		globalDot = passBuf.areaApproxLights[@n].doubleSided.x != 0.0f ? 1.0f : globalDot;
 		tmpColour = BRDF_AreaLightApprox( lightDir, viewDir, NdotV,
 										  passBuf.areaApproxLights[@n].diffuse.xyz * diffuseMask,
 										  passBuf.areaApproxLights[@n].specular.xyz * specCol

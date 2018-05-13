@@ -45,6 +45,7 @@ struct AreaLight
 	//  tangent.w invHalfRectSize.y
 	vec4 direction;
 	vec4 tangent;
+	vec4 doubleSided;
 };
 
 @insertpiece( DeclCubemapProbeStruct )

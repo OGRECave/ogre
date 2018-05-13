@@ -1092,14 +1092,15 @@ namespace Ogre
             if( numShadowMapLights > 0 )
             {
                 //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
-                mapSize += ( 6 * 4 * 4 ) * (numLights + numAreaApproxLights);
+                mapSize += ( 6 * 4 * 4 ) * numLights;
             }
             else
             {
                 //Three variables * 4 (padded vec3) * 4 (bytes) * numDirectionalLights
                 mapSize += ( 3 * 4 * 4 ) * numDirectionalLights;
-                mapSize += ( 6 * 4 * 4 ) * numAreaApproxLights;
             }
+
+            mapSize += ( 7 * 4 * 4 ) * numAreaApproxLights;
         }
         else
         {
@@ -1580,6 +1581,12 @@ namespace Ogre
                 *passBufferPtr++ = xAxis.y;
                 *passBufferPtr++ = xAxis.z;
                 *passBufferPtr++ = 1.0f / rectHalfSize.y;
+
+                //vec4 doubleSided;
+                *passBufferPtr++ = light->mDoubleSided ? 1.0f : 0.0f;
+                *passBufferPtr++ = 0.0f;
+                *passBufferPtr++ = 0.0f;
+                *passBufferPtr++ = 0.0f;
             }
 
             for( int32 i=realNumAreaLights; i<numAreaApproxLights; ++i )
@@ -1619,6 +1626,12 @@ namespace Ogre
                 *passBufferPtr++ = 0;
                 *passBufferPtr++ = 0;
                 *passBufferPtr++ = 1.0f;
+
+                //vec4 doubleSided;
+                *passBufferPtr++ = 0.0f;
+                *passBufferPtr++ = 0.0f;
+                *passBufferPtr++ = 0.0f;
+                *passBufferPtr++ = 0.0f;
             }
 
             if( shadowNode )

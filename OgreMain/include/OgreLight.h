@@ -551,7 +551,10 @@ namespace Ogre {
         Real mPowerScale;
         bool mOwnShadowFarDist;
 		bool mAffectParentNode;
+    public:
+        /// Valid only for area lights
         bool mDoubleSided;
+    protected:
         Vector2 mRectHalfSize;
     public:
         uint16 mTextureLightMaskIdx;
