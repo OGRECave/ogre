@@ -31,6 +31,8 @@
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 
+#include "OgreWireAabb.h"
+
 using namespace Demo;
 
 namespace Demo
@@ -204,8 +206,12 @@ namespace Demo
         planeNode->attachObject( item );
 
         //Math the plane size to that of the area light
-        const Ogre::Vector2 rectSize = light->getRectHalfSize();
+        const Ogre::Vector2 rectSize = light->getRectSize();
         planeNode->setScale( rectSize.x, rectSize.y, 1.0f );
+
+        /* For debugging ranges & AABBs
+        Ogre::WireAabb *wireAabb = sceneManager->createWireAabb();
+        wireAabb->track( light );*/
     }
     //-----------------------------------------------------------------------------------
     void AreaApproxLightsGameState::createScene01(void)
@@ -365,7 +371,7 @@ namespace Demo
         //physically based so the value is more arbitrary than the other light types
         light->setPowerScale( Ogre::Math::PI * 4 );
         light->setType( Ogre::Light::LT_AREA_APPROX );
-        light->setRectHalfSize( Ogre::Vector2( 15.0f, 15.0f ) );
+        light->setRectSize( Ogre::Vector2( 15.0f, 15.0f ) );
         lightNode->setPosition( -10.0f, 6.0f, 10.0f );
         //light->setDirection( Ogre::Vector3( 1, 0, 0 ).normalisedCopy() );
         light->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
@@ -387,7 +393,7 @@ namespace Demo
         light->setSpecularColour( 0.2f, 0.4f, 0.8f );
         light->setPowerScale( Ogre::Math::PI );
         light->setType( Ogre::Light::LT_AREA_APPROX );
-        light->setRectHalfSize( Ogre::Vector2( 5.0f, 5.0f ) );
+        light->setRectSize( Ogre::Vector2( 5.0f, 5.0f ) );
         lightNode->setPosition( 5.0f, 4.0f, -5.0f );
         light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );

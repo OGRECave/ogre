@@ -342,9 +342,9 @@ namespace Ogre {
         /** For custom 2D shape and area lights, sets the dimensions of the rectangle, in half size
         @param halfSize
         */
-        void setRectHalfSize( Vector2 halfSize );
-        const Vector2& getRectHalfSize(void) const      { return mRectHalfSize; }
-        Vector2 getDerivedRectHalfSize(void) const;
+        void setRectSize( Vector2 rectSize );
+        const Vector2& getRectSize(void) const          { return mRectSize; }
+        Vector2 getDerivedRectSize(void) const;
         
         /** Set a scaling factor to indicate the relative power of a light.
         @remarks
@@ -550,12 +550,11 @@ namespace Ogre {
         Real mAttenuationQuad;
         Real mPowerScale;
         bool mOwnShadowFarDist;
-		bool mAffectParentNode;
-    public:
+        bool mAffectParentNode;
         /// Valid only for area lights
         bool mDoubleSided;
     protected:
-        Vector2 mRectHalfSize;
+        Vector2 mRectSize;
     public:
         uint16 mTextureLightMaskIdx;
         /// Control the start of mip level for diffuse component for area lights

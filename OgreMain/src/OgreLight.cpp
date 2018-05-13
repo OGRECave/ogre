@@ -52,7 +52,7 @@ namespace Ogre {
           mOwnShadowFarDist(false),
           mAffectParentNode(false),
           mDoubleSided(false),
-          mRectHalfSize(Vector2::UNIT_SCALE),
+          mRectSize(Vector2::UNIT_SCALE),
           mTextureLightMaskIdx( std::numeric_limits<uint16>::max() ),
           mTexLightMaskDiffuseMipStart( (uint16)(0.95f * 65535) ),
           mShadowFarDist(0),
@@ -130,6 +130,8 @@ namespace Ogre {
     void Light::setDoubleSided( bool bDoubleSided )
     {
         mDoubleSided = bDoubleSided;
+        resetAabb();
+        updateLightBounds();
     }
     //-----------------------------------------------------------------------
     void Light::setSpotlightRange(const Radian& innerAngle, const Radian& outerAngle, Real falloff)
@@ -160,20 +162,20 @@ namespace Ogre {
             updateLightBounds();
     }
     //-----------------------------------------------------------------------
-    void Light::setRectHalfSize( Vector2 halfSize )
+    void Light::setRectSize( Vector2 rectSize )
     {
-        if( mRectHalfSize != halfSize )
+        if( mRectSize != rectSize )
         {
-            mRectHalfSize = halfSize;
+            mRectSize = rectSize;
             if( mLightType == LT_AREA_APPROX )
                 updateLightBounds();
         }
     }
     //-----------------------------------------------------------------------
-    Vector2 Light::getDerivedRectHalfSize(void) const
+    Vector2 Light::getDerivedRectSize(void) const
     {
         Vector3 parentScale = mParentNode->_getDerivedScale();
-        return mRectHalfSize * Vector2( parentScale.x, parentScale.y );
+        return mRectSize * Vector2( parentScale.x, parentScale.y );
     }
     //-----------------------------------------------------------------------
     void Light::setAttenuationBasedOnRadius( Real radius, Real lumThreshold )
@@ -232,13 +234,13 @@ namespace Ogre {
             if( mDoubleSided )
             {
                 mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3( 0.0f, 0.0f, 0.0f ),
-                                                           Vector3( 0.5f, 0.5f, 1.0f ) ),
+                                                           Vector3( 1.0f, 1.0f, 1.0f ) ),
                                                      mObjectData.mIndex );
             }
             else
             {
                 mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3( 0.0f, 0.0f, 0.5f ),
-                                                           Vector3( 0.5f, 0.5f, 0.5f ) ),
+                                                           Vector3( 1.0f, 1.0f, 0.5f ) ),
                                                      mObjectData.mIndex );
             }
         }
@@ -284,9 +286,7 @@ namespace Ogre {
                 if( mDoubleSided )
                 {
                     mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3( 0.0f, 0.0f, 0.0f ),
-                                                               Vector3( mRange * 0.5f,
-                                                                        mRange * 0.5f,
-                                                                        mRange ) ),
+                                                               Vector3( mRange ) ),
                                                          mObjectData.mIndex );
                 }
                 else
@@ -294,7 +294,7 @@ namespace Ogre {
                     mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3( 0.0f, 0.0f, -mRange * 0.5f ),
                                                                Vector3( mRange,
                                                                         mRange,
-                                                                        mRange ) * 0.5f ),
+                                                                        mRange * 0.5f ) ),
                                                          mObjectData.mIndex );
                 }
             }

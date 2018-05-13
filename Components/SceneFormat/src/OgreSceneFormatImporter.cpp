@@ -810,9 +810,9 @@ namespace Ogre
             light->setShadowFarClipDistance( nearFar.y );
         }
 
-        tmpIt = lightValue.FindMember( "rect_half_size" );
+        tmpIt = lightValue.FindMember( "rect_size" );
         if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsArray() )
-            light->setRectHalfSize( decodeVector2Array( tmpIt->value ) );
+            light->setRectSize( decodeVector2Array( tmpIt->value ) );
 
         tmpIt = lightValue.FindMember( "texture_light_mask_idx" );
         if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsUint() )

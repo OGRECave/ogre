@@ -1424,14 +1424,14 @@ namespace Ogre
                     *passBufferPtr++ = attenQuadratic;
                     ++passBufferPtr;
 
-                    const Vector2 rectHalfSize = light->getDerivedRectHalfSize();
+                    const Vector2 rectSize = light->getDerivedRectSize();
 
                     //vec4 lights[numLights].spotDirection;
                     Vector3 spotDir = viewMatrix3 * light->getDerivedDirection();
                     *passBufferPtr++ = spotDir.x;
                     *passBufferPtr++ = spotDir.y;
                     *passBufferPtr++ = spotDir.z;
-                    *passBufferPtr++ = 1.0f / rectHalfSize.x;
+                    *passBufferPtr++ = 1.0f / rectSize.x;
 
                     //vec4 lights[numLights].spotParams;
                     if( light->getType() != Light::LT_AREA_APPROX )
@@ -1451,7 +1451,7 @@ namespace Ogre
                         *passBufferPtr++ = xAxis.y;
                         *passBufferPtr++ = xAxis.z;
                     }
-                    *passBufferPtr++ = 1.0f / rectHalfSize.y;
+                    *passBufferPtr++ = 1.0f / rectSize.y;
 
                 }
             }
@@ -1565,14 +1565,14 @@ namespace Ogre
                 *passBufferPtr++ = attenQuadratic;
                 *passBufferPtr++ = static_cast<float>( light->mTextureLightMaskIdx );
 
-                const Vector2 rectHalfSize = light->getDerivedRectHalfSize();
+                const Vector2 rectSize = light->getDerivedRectSize();
 
                 //vec4 areaApproxLights[numLights].direction;
                 Vector3 areaDir = viewMatrix3 * light->getDerivedDirection();
                 *passBufferPtr++ = areaDir.x;
                 *passBufferPtr++ = areaDir.y;
                 *passBufferPtr++ = areaDir.z;
-                *passBufferPtr++ = 1.0f / rectHalfSize.x;
+                *passBufferPtr++ = 1.0f / rectSize.x;
 
                 //vec4 areaApproxLights[numLights].tangent;
                 Quaternion qRot = light->getParentNode()->_getDerivedOrientation();
@@ -1580,10 +1580,10 @@ namespace Ogre
                 *passBufferPtr++ = xAxis.x;
                 *passBufferPtr++ = xAxis.y;
                 *passBufferPtr++ = xAxis.z;
-                *passBufferPtr++ = 1.0f / rectHalfSize.y;
+                *passBufferPtr++ = 1.0f / rectSize.y;
 
                 //vec4 doubleSided;
-                *passBufferPtr++ = light->mDoubleSided ? 1.0f : 0.0f;
+                *passBufferPtr++ = light->getDoubleSided() ? 1.0f : 0.0f;
                 *passBufferPtr++ = 0.0f;
                 *passBufferPtr++ = 0.0f;
                 *passBufferPtr++ = 0.0f;

@@ -350,7 +350,7 @@ namespace Demo
         lightNode->setPosition( 10.0f, 10.0f, 10.0f );
         light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
-        light->setRectHalfSize( Ogre::Vector2( 5.0f, 5.0f ) );
+        light->setRectSize( Ogre::Vector2( 5.0f, 5.0f ) );
 
         {
             Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
