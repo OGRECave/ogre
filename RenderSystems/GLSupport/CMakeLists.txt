@@ -11,7 +11,9 @@
 
 # Add platform specific settings
 
-option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" FALSE)
+if(EGL_FOUND)
+  option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" FALSE)
+endif()
 
 if(ANDROID)
   file(GLOB PLATFORM_HEADERS "include/EGL/Android/*.h" "include/EGL/*.h")

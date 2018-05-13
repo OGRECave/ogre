@@ -106,7 +106,7 @@ if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
 	set(_rendersystems "${_rendersystems}  + OpenGL 3+\n")
 endif ()
 if (OGRE_BUILD_RENDERSYSTEM_GLES2)
-	set(_rendersystems "${_rendersystems}  + OpenGL ES 2.x\n")
+	set(_rendersystems "${_rendersystems}  + OpenGL ES2/ ES3\n")
 endif ()
 
 if (DEFINED _rendersystems)

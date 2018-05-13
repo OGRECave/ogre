@@ -23,136 +23,98 @@
 #  EGL_INCLUDE_DIR  - the EGL include directory
 #  EGL_LIBRARIES    - Link these to use EGL
 
-IF (WIN32)
-  IF (CYGWIN)
+IF(APPLE)
+  create_search_paths(/Developer/Platforms)
+  findpkg_framework(OpenGLES2)
+  set(OPENGLES2_gl_LIBRARY "-framework OpenGLES")
+ELSEIF (WIN32)
+  getenv_path(AMD_SDK_ROOT)
+  getenv_path(MALI_SDK_ROOT)
 
-    FIND_PATH(OPENGLES2_INCLUDE_DIR GLES2/gl2.h )
+  SET(POWERVR_SDK_PATH "C:/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds")
+  FIND_PATH(OPENGLES2_INCLUDE_DIR GLES2/gl2.h
+                  ${ENV_AMD_SDK_ROOT}/include
+                  ${ENV_MALI_SDK_ROOT}/include
+                  ${POWERVR_SDK_PATH}/Include
+                  "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/Include"
+  )
 
-    FIND_LIBRARY(OPENGLES2_gl_LIBRARY libGLESv2 )
+  FIND_PATH(EGL_INCLUDE_DIR EGL/egl.h
+                  ${ENV_AMD_SDK_ROOT}/include
+                  ${ENV_MALI_SDK_ROOT}/include
+                  ${POWERVR_SDK_PATH}/Include
+                  "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/Include"
+  )
 
-  ELSE (CYGWIN)
-
-    IF(BORLAND)
-      SET (OPENGLES2_gl_LIBRARY import32 CACHE STRING "OpenGL ES 2.x library for win32")
-    ELSE(BORLAND)
-        getenv_path(AMD_SDK_ROOT)
-        getenv_path(MALI_SDK_ROOT)
-
-        SET(POWERVR_SDK_PATH "C:/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds")
-        FIND_PATH(OPENGLES2_INCLUDE_DIR GLES2/gl2.h
-                        ${ENV_AMD_SDK_ROOT}/include
-                        ${ENV_MALI_SDK_ROOT}/include
-                        ${POWERVR_SDK_PATH}/Include
-                        "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/Include"
-        )
-
-        FIND_PATH(EGL_INCLUDE_DIR EGL/egl.h
-                        ${ENV_AMD_SDK_ROOT}/include
-                        ${ENV_MALI_SDK_ROOT}/include
-                        ${POWERVR_SDK_PATH}/Include
-                        "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/Include"
-        )
-
-        FIND_LIBRARY(OPENGLES2_gl_LIBRARY
-            NAMES libGLESv2
-            PATHS ${ENV_AMD_SDK_ROOT}/x86
-                  ${ENV_MALI_SDK_ROOT}/bin
-                  ${POWERVR_SDK_PATH}/Windows/x86_32/Lib
-                 "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/WindowsX86/Lib"
-        )
-
-        FIND_LIBRARY(EGL_egl_LIBRARY
-            NAMES libEGL
-            PATHS ${ENV_AMD_SDK_ROOT}/x86
-                  ${ENV_MALI_SDK_ROOT}/bin
-                  ${POWERVR_SDK_PATH}/Windows/x86_32/Lib
-                 "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/WindowsX86/Lib"
-        )
-    ENDIF(BORLAND)
-
-  ENDIF (CYGWIN)
-
-ELSE (WIN32)
-
-  IF (APPLE)
-
-    create_search_paths(/Developer/Platforms)
-    findpkg_framework(OpenGLES2)
-    set(OPENGLES2_gl_LIBRARY "-framework OpenGLES")
-
-  ELSE(APPLE)
-    getenv_path(AMD_SDK_ROOT)
-    getenv_path(MALI_SDK_ROOT)
-
-    FIND_PATH(OPENGLES2_INCLUDE_DIR GLES2/gl2.h
-      ${ENV_AMD_SDK_ROOT}/include
-      ${ENV_MALI_SDK_ROOT}/include
-      /opt/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds/Include
-      /usr/openwin/share/include
-      /opt/graphics/OpenGL/include /usr/X11R6/include
-      /usr/include
-    )
-
-    FIND_LIBRARY(OPENGLES2_gl_LIBRARY
-      NAMES GLESv2
+  FIND_LIBRARY(OPENGLES2_gl_LIBRARY
+      NAMES libGLESv2
       PATHS ${ENV_AMD_SDK_ROOT}/x86
             ${ENV_MALI_SDK_ROOT}/bin
-            /opt/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds/Linux/x86_32/Lib
-            /opt/graphics/OpenGL/lib
-            /usr/openwin/lib
-            /usr/shlib /usr/X11R6/lib
-            /usr/lib
-    )
+            ${POWERVR_SDK_PATH}/Windows/x86_32/Lib
+            "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/WindowsX86/Lib"
+  )
 
-    FIND_PATH(EGL_INCLUDE_DIR EGL/egl.h
-      ${ENV_AMD_SDK_ROOT}/include
-      ${ENV_MALI_SDK_ROOT}/include
-      /opt/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds/Include
-      /usr/openwin/share/include
-      /opt/graphics/OpenGL/include /usr/X11R6/include
-      /usr/include
-    )
-
-    FIND_LIBRARY(EGL_egl_LIBRARY
-      NAMES EGL
+  FIND_LIBRARY(EGL_egl_LIBRARY
+      NAMES libEGL
       PATHS ${ENV_AMD_SDK_ROOT}/x86
             ${ENV_MALI_SDK_ROOT}/bin
-            /opt/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds/Linux/x86_32/Lib
-            /opt/graphics/OpenGL/lib
-            /usr/openwin/lib
-            /usr/shlib /usr/X11R6/lib
-            /usr/lib
-    )
+            ${POWERVR_SDK_PATH}/Windows/x86_32/Lib
+            "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/WindowsX86/Lib"
+  )
+ELSE ()
+  getenv_path(AMD_SDK_ROOT)
+  getenv_path(MALI_SDK_ROOT)
 
-    # On Unix OpenGL most certainly always requires X11.
-    # Feel free to tighten up these conditions if you don't 
-    # think this is always true.
-    # It's not true on OSX.
+  FIND_PATH(OPENGLES2_INCLUDE_DIR GLES2/gl2.h
+    ${ENV_AMD_SDK_ROOT}/include
+    ${ENV_MALI_SDK_ROOT}/include
+    /opt/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds/Include
+    /usr/openwin/share/include
+    /opt/graphics/OpenGL/include /usr/X11R6/include
+    /usr/include
+  )
 
-    IF (OPENGLES2_gl_LIBRARY)
-      IF(NOT X11_FOUND)
-        INCLUDE(FindX11)
-      ENDIF(NOT X11_FOUND)
-      IF (X11_FOUND)
-        IF (NOT APPLE)
-          SET (OPENGLES2_LIBRARIES ${X11_LIBRARIES})
-        ENDIF (NOT APPLE)
-      ENDIF (X11_FOUND)
-    ENDIF (OPENGLES2_gl_LIBRARY)
+  FIND_LIBRARY(OPENGLES2_gl_LIBRARY
+    NAMES GLESv2
+    PATHS ${ENV_AMD_SDK_ROOT}/x86
+          ${ENV_MALI_SDK_ROOT}/bin
+          /opt/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds/Linux/x86_32/Lib
+          /opt/graphics/OpenGL/lib
+          /usr/openwin/lib
+          /usr/shlib /usr/X11R6/lib
+          /usr/lib
+  )
 
-  ENDIF(APPLE)
-ENDIF (WIN32)
+  FIND_PATH(EGL_INCLUDE_DIR EGL/egl.h
+    ${ENV_AMD_SDK_ROOT}/include
+    ${ENV_MALI_SDK_ROOT}/include
+    /opt/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds/Include
+    /usr/openwin/share/include
+    /opt/graphics/OpenGL/include /usr/X11R6/include
+    /usr/include
+  )
 
-SET( OPENGLES2_FOUND "YES" )
+  FIND_LIBRARY(EGL_egl_LIBRARY
+    NAMES EGL
+    PATHS ${ENV_AMD_SDK_ROOT}/x86
+          ${ENV_MALI_SDK_ROOT}/bin
+          /opt/Imagination/PowerVR/GraphicsSDK/SDK_3.1/Builds/Linux/x86_32/Lib
+          /opt/graphics/OpenGL/lib
+          /usr/openwin/lib
+          /usr/shlib /usr/X11R6/lib
+          /usr/lib
+  )
+ENDIF ()
+
 IF(OPENGLES2_gl_LIBRARY)
-
     SET( OPENGLES2_LIBRARIES ${OPENGLES2_gl_LIBRARY} ${OPENGLES2_LIBRARIES})
-    IF(EGL_egl_LIBRARY)
-        SET( EGL_LIBRARIES ${EGL_egl_LIBRARY} ${EGL_LIBRARIES})
-    ENDIF()
-    SET( OPENGLES2_FOUND "YES" )
-
+    SET( OPENGLES2_FOUND TRUE )
 ENDIF(OPENGLES2_gl_LIBRARY)
+
+IF(EGL_egl_LIBRARY)
+  SET( EGL_LIBRARIES ${EGL_egl_LIBRARY} ${EGL_LIBRARIES})
+  SET( EGL_FOUND TRUE)
+ENDIF()
 
 MARK_AS_ADVANCED(
   OPENGLES2_INCLUDE_DIR

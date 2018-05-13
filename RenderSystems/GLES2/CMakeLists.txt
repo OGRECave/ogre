@@ -45,10 +45,6 @@ if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
   )
 endif (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
 
-if(NOT OPENGLES3_FOUND)
-  set(OPENGLES3_INCLUDE_DIR "")
-endif()
-
 # Add system specific settings
 if (APPLE)
   file(GLOB PLATFORM_HEADERS "include/EAGL/*.h")
@@ -59,14 +55,10 @@ if (APPLE)
   set(PLATFORM_HEADER_INSTALL "APPLE")
 endif ()
 
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/EAGL
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include
-  ${OPENGLES3_INCLUDE_DIR} ${OPENGLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR}
-)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include)
 
 add_library(RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} ${GLSLES_FILES})
-target_link_libraries(RenderSystem_GLES2 OgreMain OgreGLSupport ${OPENGLES3_LIBRARIES} ${OPENGLES2_LIBRARIES} ${CMAKE_DL_LIBS})
+target_link_libraries(RenderSystem_GLES2 OgreMain OgreGLSupport ${OPENGLES2_LIBRARIES} ${CMAKE_DL_LIBS})
 target_include_directories(RenderSystem_GLES2 PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GLES2>)
