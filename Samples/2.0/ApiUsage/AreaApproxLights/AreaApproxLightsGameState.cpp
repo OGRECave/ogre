@@ -373,6 +373,8 @@ namespace Demo
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
         //Set the array index of the light mask in mAreaMaskTex
         light->mTextureLightMaskIdx = 0u;
+        //Control the diffuse mip (this is the default value)
+        light->mTexLightMaskDiffuseMipStart = (Ogre::uint16)(0.95f * 65535);
 
         createPlaneForAreaLight( light );
 
@@ -389,6 +391,8 @@ namespace Demo
         lightNode->setPosition( 5.0f, 4.0f, -5.0f );
         light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
+        //When the array index is 0xFFFF, the light won't use a texture.
+        light->mTextureLightMaskIdx = std::numeric_limits<Ogre::uint16>::max();
 
         createPlaneForAreaLight( light );
 

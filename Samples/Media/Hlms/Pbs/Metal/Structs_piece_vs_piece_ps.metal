@@ -23,7 +23,7 @@ struct Light
 };
 
 #define areaLightDiffuseMipmapStart areaApproxLights[0].diffuse.w
-#define areaLightNumMipmaps areaApproxLights[0].specular.w
+#define areaLightNumMipmapsSpecFactor areaApproxLights[0].specular.w
 
 struct AreaLight
 {

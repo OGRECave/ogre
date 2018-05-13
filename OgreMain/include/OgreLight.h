@@ -555,6 +555,10 @@ namespace Ogre {
         Vector2 mRectHalfSize;
     public:
         uint16 mTextureLightMaskIdx;
+        /// Control the start of mip level for diffuse component for area lights
+        /// The value is UNORM, thus the range [0; 65535] maps to [0; 1] where
+        /// 1.0 means to use the highest mip level, and 0 the lowest mip.
+        uint16 mTexLightMaskDiffuseMipStart;
     protected:
         Real mShadowFarDist;
         Real mShadowFarDistSquared;

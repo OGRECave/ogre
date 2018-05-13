@@ -66,12 +66,14 @@
 			float3 diffuseMask;
 		@end
 
+		// 1 / (1 - 0.02) = 1.020408163
+		float diffuseMipsLeft = passBuf.areaLightNumMipmapsSpecFactor * 0.5 -
+								passBuf.areaLightDiffuseMipmapStart * 1.020408163f;
 		diffuseMask = OGRE_SampleArray2DLevel( areaLightMasks, areaLightMasksSampler,
 											   lightUVForTex + 0.5f,
 											   passBuf.areaApproxLights[@n].attenuation.w,
 											   passBuf.areaLightDiffuseMipmapStart +
-											   (ROUGHNESS - 0.02f) *
-											   passBuf.areaLightNumMipmaps ).AREA_LIGHTS_TEX_SWIZZLE;
+											   (ROUGHNESS - 0.02f) * diffuseMipsLeft ).AREA_LIGHTS_TEX_SWIZZLE;
 	@end
 
 		float3 closestPoint = passBuf.areaApproxLights[@n].position.xyz +
@@ -119,7 +121,7 @@
 														reflClipSpace * invHalfRectSize + 0.5f,
 														passBuf.areaApproxLights[@n].attenuation.w,
 														(ROUGHNESS - 0.02f) *
-														passBuf.areaLightNumMipmaps ).AREA_LIGHTS_TEX_SWIZZLE;
+														passBuf.areaLightNumMipmapsSpecFactor ).AREA_LIGHTS_TEX_SWIZZLE;
 				@end
 			}
 		}
