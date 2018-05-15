@@ -444,7 +444,7 @@ namespace Ogre {
             // compile and attach Vertex Program
             if (!mVertexShader->compile(true))
             {
-                // todo error
+                mTriedToLinkAndFailed = true;
                 return;
             }
             mVertexShader->attachToProgramObject(mGLProgramHandle);
@@ -499,7 +499,7 @@ namespace Ogre {
             // compile and attach Geometry Program
             if (!mGeometryProgram->compile(true))
             {
-                // todo error
+                mTriedToLinkAndFailed = true;
                 return;
             }
 
@@ -525,7 +525,7 @@ namespace Ogre {
             // compile and attach Fragment Program
             if (!mFragmentProgram->compile(true))
             {
-                // todo error
+                mTriedToLinkAndFailed = true;
                 return;
             }       
             mFragmentProgram->attachToProgramObject(mGLProgramHandle);
