@@ -97,6 +97,18 @@ namespace Ogre {
     {
         unloadHighLevelImpl();
     }
+
+    void GLSLESProgram::notifyOnContextReset()
+    {
+        try {
+            compile(true);
+        }
+        catch(Exception& e)
+        {
+            // we already compiled this once, this should not happen
+            LogManager::getSingleton().stream(LML_WARNING) << e.what();
+        }
+    }
 #endif
     GLuint GLSLESProgram::createGLProgramHandle() {
         if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
@@ -116,10 +128,6 @@ namespace Ogre {
 
     bool GLSLESProgram::compile(bool checkErrors)
     {
-        if (mCompiled == 1)
-        {
-            return true;
-        }
         // Only create a shader object if glsl es is supported
         if (isSupported())
         {
@@ -176,24 +184,32 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
         }
 
-        if (checkErrors)
-            GLSLES::logObjectInfo("GLSL ES compiling: " + mName, mGLShaderHandle);
-
         OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
 
         // Check for compile errors
-        OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled));
-        if(!mCompiled && checkErrors)
+        int compiled;
+        OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
+
+        if(!checkErrors)
+            return compiled == 1;
+
+        if(!compiled)
         {
-            String message = GLSLES::logObjectInfo("GLSL ES compile log: " + mName, mGLShaderHandle);
+            String message = GLSLES::getObjectInfo(mGLShaderHandle);
             checkAndFixInvalidDefaultPrecisionError(message);
+            OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
         }
 
-        // Log a message that the shader compiled successfully.
-        if (mCompiled && checkErrors)
-            GLSLES::logObjectInfo("GLSL ES compiled: " + mName, mGLShaderHandle);
+        String compileInfo = GLSLES::getObjectInfo(mGLShaderHandle);
 
-        return (mCompiled == 1);
+        if (!compiled)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, getResourceLogName() + " " + compileInfo, "compile");
+
+        // probably we have warnings
+        if (!compileInfo.empty())
+            LogManager::getSingleton().stream(LML_WARNING) << getResourceLogName() << " " << compileInfo;
+
+        return compiled == 1;
     }
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER   
@@ -239,7 +255,6 @@ namespace Ogre {
             
             mGLShaderHandle = 0;
             mGLProgramHandle = 0;
-            mCompiled = 0;
             mLinked = 0;
         }
     }

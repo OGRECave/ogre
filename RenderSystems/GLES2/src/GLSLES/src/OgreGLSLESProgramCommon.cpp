@@ -142,7 +142,6 @@ namespace Ogre {
     void GLSLESProgramCommon::notifyOnContextLost()
     {
         mLinked = false;
-        mTriedToLinkAndFailed = false;
         mUniformRefsBuilt = false;
         getVertexProgram()->getUniformCache()->clearCache();
         mFragmentProgram->getUniformCache()->clearCache();

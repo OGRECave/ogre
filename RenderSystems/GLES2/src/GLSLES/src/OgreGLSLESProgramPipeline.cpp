@@ -69,17 +69,9 @@ namespace Ogre
             {
                 getVertexProgram()->setLinked(true);
                 mLinked |= VERTEX_PROGRAM_LINKED;
-                mTriedToLinkAndFailed = false;
             }
             else
             {
-                if(!getVertexProgram()->compile(true)) {
-                    LogManager::getSingleton().stream(LML_CRITICAL)
-                            << "Vertex Program " << getVertexProgram()->getName()
-                            << " failed to compile. See compile log above for details.";
-                    mTriedToLinkAndFailed = true;
-                    return;
-                }
                 GLuint programHandle = getVertexProgram()->getGLProgramHandle();
 
                 bindFixedAttributes( programHandle );
@@ -94,9 +86,7 @@ namespace Ogre
                     getVertexProgram()->setLinked(linkStatus);
                     mLinked |= VERTEX_PROGRAM_LINKED;
                 }
-                
-                mTriedToLinkAndFailed = !linkStatus;
-                
+
                 GLSLES::logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
 
                 setSkeletalAnimationIncluded(getVertexProgram()->isSkeletalAnimationIncluded());
@@ -116,18 +106,9 @@ namespace Ogre
             {
                 mFragmentProgram->setLinked(true);
                 mLinked |= FRAGMENT_PROGRAM_LINKED;
-                mTriedToLinkAndFailed = false;
             }
             else
             {
-                if(!mFragmentProgram->compile(true)) {
-                    LogManager::getSingleton().stream(LML_CRITICAL)
-                            << "Fragment Program " << mFragmentProgram->getName()
-                            << " failed to compile. See compile log above for details.";
-                    mTriedToLinkAndFailed = true;
-                    return;
-                }
-
                 GLuint programHandle = mFragmentProgram->getGLProgramHandle();
                 OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
                 mFragmentProgram->attachToProgramObject(programHandle);
@@ -139,8 +120,6 @@ namespace Ogre
                     mFragmentProgram->setLinked(linkStatus);
                     mLinked |= FRAGMENT_PROGRAM_LINKED;
                 }
-
-                mTriedToLinkAndFailed = !linkStatus;
 
                 GLSLES::logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
             }
@@ -181,7 +160,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void GLSLESProgramPipeline::activate(void)
     {
-        if (!mLinked && !mTriedToLinkAndFailed)
+        if (!mLinked)
         {
             glGetError(); // Clean up the error. Otherwise will flood log.
             

@@ -182,6 +182,8 @@ namespace Ogre {
         static CmdOutputOperationType msOutputOperationTypeCmd;
         static CmdMaxOutputVertices msMaxOutputVerticesCmd;
 
+        String getResourceLogName() const;
+
         /** Internal load implementation, must be implemented by subclasses.
         */
         void loadFromSource(void);
@@ -192,8 +194,6 @@ namespace Ogre {
         /// Populate the passed parameters with name->index map
         void populateParameterNames(GpuProgramParametersSharedPtr params);
 
-        /// Flag indicating if shader object successfully compiled
-        int mCompiled;
         /// The input operation type for this (geometry) program
         RenderOperation::OperationType mInputOperationType;
         /// The output operation type for this (geometry) program

@@ -59,11 +59,6 @@ namespace Ogre {
     //---------------------------------------------------------------------------
     bool GLSLProgram::compile(bool checkErrors)
     {
-        if (mCompiled == 1)
-        {
-            return true;
-        }
-
         // only create a shader object if glsl is supported
         if (isSupported())
         {
@@ -95,20 +90,24 @@ namespace Ogre {
             glShaderSourceARB(mGLHandle, 1, &source, NULL);
         }
 
-        if (checkErrors)
-        {
-            logObjectInfo("GLSL compiling: " + mName, mGLHandle);
-        }
-
         glCompileShaderARB(mGLHandle);
         // check for compile errors
-        glGetObjectParameterivARB(mGLHandle, GL_OBJECT_COMPILE_STATUS_ARB, &mCompiled);
-        if(checkErrors)
-        {
-            logObjectInfo(mCompiled ? "GLSL compiled: " : "GLSL compile log: "  + mName, mGLHandle);
-        }
+        int compiled = 0;
+        glGetObjectParameterivARB(mGLHandle, GL_OBJECT_COMPILE_STATUS_ARB, &compiled);
 
-        return (mCompiled == 1);
+        if(!checkErrors)
+            return compiled == 1;
+
+        String compileInfo = getObjectInfo(mGLHandle);
+
+        if (!compiled)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, getResourceLogName() + " " + compileInfo, "compile");
+
+        // probably we have warnings
+        if (!compileInfo.empty())
+            LogManager::getSingleton().stream(LML_WARNING) << getResourceLogName() << " " << compileInfo;
+
+        return (compiled == 1);
     }
 
     //-----------------------------------------------------------------------
@@ -124,7 +123,6 @@ namespace Ogre {
         if (isSupported())
         {
             glDeleteObjectARB(mGLHandle);           
-            mCompiled = 0;
             mGLHandle = 0;
 
             // destroy all programs using this shader

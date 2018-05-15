@@ -96,7 +96,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::activate(void)
     {
-        if (!mLinked && !mTriedToLinkAndFailed)
+        if (!mLinked)
         {           
             glGetError(); //Clean up the error. Otherwise will flood log.
 
@@ -441,12 +441,7 @@ namespace Ogre {
     {
         if (mVertexShader)
         {
-            // compile and attach Vertex Program
-            if (!mVertexShader->compile(true))
-            {
-                mTriedToLinkAndFailed = true;
-                return;
-            }
+            // attach Vertex Program
             mVertexShader->attachToProgramObject(mGLProgramHandle);
             setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
 
@@ -496,13 +491,7 @@ namespace Ogre {
 
         if (mGeometryProgram)
         {
-            // compile and attach Geometry Program
-            if (!mGeometryProgram->compile(true))
-            {
-                mTriedToLinkAndFailed = true;
-                return;
-            }
-
+            // attach Geometry Program
             mGeometryProgram->attachToProgramObject(mGLProgramHandle);
 
             //Don't set adjacency flag. We handle it internally and expose "false"
@@ -522,12 +511,7 @@ namespace Ogre {
 
         if (mFragmentProgram)
         {
-            // compile and attach Fragment Program
-            if (!mFragmentProgram->compile(true))
-            {
-                mTriedToLinkAndFailed = true;
-                return;
-            }       
+            // attach Fragment Program
             mFragmentProgram->attachToProgramObject(mGLProgramHandle);
         }
 
@@ -536,7 +520,6 @@ namespace Ogre {
 
         glLinkProgramARB( mGLProgramHandle );
         glGetObjectParameterivARB( mGLProgramHandle, GL_OBJECT_LINK_STATUS_ARB, &mLinked );
-        mTriedToLinkAndFailed = !mLinked;
 
         // force logging and raise exception if not linked
         GLenum glErr = glGetError();
