@@ -100,59 +100,15 @@ namespace Ogre {
             setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
         }
 
-        // Compile and attach Fragment Program
-        if (mFragmentShader)
+        // Compile and attach remaining Programs
+        for (auto shader : {mFragmentShader, mGeometryShader, mHullShader, mDomainShader, mComputeShader})
         {
-            if (!mFragmentShader->compile(true))
+            if (!shader->compile(true))
             {
                 mTriedToLinkAndFailed = true;
                 return;
             }
-            mFragmentShader->attachToProgramObject(mGLProgramHandle);
-        }
-
-        // Compile and attach Geometry Program
-        if (mGeometryShader)
-        {
-            if (!mGeometryShader->compile(true))
-            {
-                return;
-            }
-
-            mGeometryShader->attachToProgramObject(mGLProgramHandle);
-        }
-
-        // Compile and attach Tessellation Control Program
-        if (mHullShader)
-        {
-            if (!mHullShader->compile(true))
-            {
-                return;
-            }
-
-            mHullShader->attachToProgramObject(mGLProgramHandle);
-        }
-
-        // Compile and attach Tessellation Evaluation Program
-        if (mDomainShader)
-        {
-            if (!mDomainShader->compile(true))
-            {
-                return;
-            }
-
-            mDomainShader->attachToProgramObject(mGLProgramHandle);
-        }
-
-        // Compile and attach Compute Program
-        if (mComputeShader)
-        {
-            if (!mComputeShader->compile(true))
-            {
-                return;
-            }
-
-            mComputeShader->attachToProgramObject(mGLProgramHandle);
+            shader->attachToProgramObject(mGLProgramHandle);
         }
 
         bindFixedAttributes(mGLProgramHandle);
