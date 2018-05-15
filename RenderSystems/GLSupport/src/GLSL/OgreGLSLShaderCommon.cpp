@@ -47,6 +47,13 @@ namespace Ogre {
     GLSLShaderCommon::CmdOutputOperationType GLSLShaderCommon::msOutputOperationTypeCmd;
     GLSLShaderCommon::CmdMaxOutputVertices GLSLShaderCommon::msMaxOutputVerticesCmd;
 
+    String GLSLShaderCommon::getResourceLogName() const
+    {
+        if(mLoadFromFile)
+            return "'" + mFilename + "'";
+        return "'"+mName+"'";
+    }
+
     //-----------------------------------------------------------------------
     void GLSLShaderCommon::loadFromSource(void)
     {
@@ -152,7 +159,6 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
-        , mCompiled(0)
         , mInputOperationType(RenderOperation::OT_TRIANGLE_LIST)
         , mOutputOperationType(RenderOperation::OT_TRIANGLE_LIST)
         , mMaxOutputVertices(3)

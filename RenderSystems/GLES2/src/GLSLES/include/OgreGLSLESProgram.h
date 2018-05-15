@@ -137,8 +137,8 @@ namespace Ogre {
         void checkAndFixInvalidDefaultPrecisionError( String &message );
         
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        /** See AndroidResource. */
         virtual void notifyOnContextLost();
+        virtual void notifyOnContextReset();
 #endif
         
     private:

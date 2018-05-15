@@ -61,7 +61,7 @@ namespace Ogre {
 
     void GLSLMonolithicProgram::activate(void)
     {
-        if (!mLinked && !mTriedToLinkAndFailed)
+        if (!mLinked)
         {
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
 
@@ -88,26 +88,16 @@ namespace Ogre {
 
     void GLSLMonolithicProgram::compileAndLink()
     {
-        // Compile and attach Vertex Program
+        // attach Vertex Program
         if (mVertexShader)
         {
-            if (!getVertexShader()->compile(true))
-            {
-                mTriedToLinkAndFailed = true;
-                return;
-            }
             getVertexShader()->attachToProgramObject(mGLProgramHandle);
             setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
         }
 
-        // Compile and attach remaining Programs
+        // attach remaining Programs
         for (auto shader : {mFragmentShader, mGeometryShader, mHullShader, mDomainShader, mComputeShader})
         {
-            if (!shader->compile(true))
-            {
-                mTriedToLinkAndFailed = true;
-                return;
-            }
             shader->attachToProgramObject(mGLProgramHandle);
         }
 
@@ -116,8 +106,6 @@ namespace Ogre {
         // the link
         OGRE_CHECK_GL_ERROR(glLinkProgram( mGLProgramHandle ));
         OGRE_CHECK_GL_ERROR(glGetProgramiv( mGLProgramHandle, GL_LINK_STATUS, &mLinked ));
-
-        mTriedToLinkAndFailed = !mLinked;
 
         logObjectInfo( getCombinedName() + String(" GLSL link result : "), mGLProgramHandle );
 

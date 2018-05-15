@@ -176,15 +176,6 @@ namespace Ogre
                 // unavailable or failed to link.
                 if (!linkStatus)
                 {
-                    if(!program->compile(true)) {
-                        LogManager::getSingleton().stream(LML_CRITICAL)
-                                << program->getShaderTypeLabel(program->getType()) << " Shader "
-                                << program->getName()
-                                << " failed to compile. See compile log above for details.";
-                        mTriedToLinkAndFailed = true;
-                        return;
-                    }
-
                     if( program->getType() == GPT_VERTEX_PROGRAM )
                         bindFixedAttributes( programHandle );
 
@@ -198,8 +189,6 @@ namespace Ogre
 
                 program->setLinked(linkStatus);
                 mLinked = linkStatus;
-
-                mTriedToLinkAndFailed = !linkStatus;
 
                 logObjectInfo( getCombinedName() + String("GLSL program result : "), programHandle );
 
@@ -245,7 +234,7 @@ namespace Ogre
 
     void GLSLSeparableProgram::activate(void)
     {
-        if (!mLinked && !mTriedToLinkAndFailed)
+        if (!mLinked)
         {
             compileAndLink();
 

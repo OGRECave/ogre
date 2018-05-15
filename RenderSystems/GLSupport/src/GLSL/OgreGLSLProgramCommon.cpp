@@ -28,7 +28,6 @@ GLSLProgramCommon::GLSLProgramCommon(GLSLShaderCommon* vertexShader)
       mUniformRefsBuilt(false),
       mGLProgramHandle(0),
       mLinked(false),
-      mTriedToLinkAndFailed(false),
       mSkeletalAnimation(false)
 {
     // init mCustomAttributesIndexes
