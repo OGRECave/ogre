@@ -88,6 +88,8 @@ bool GLSLProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
 //-----------------------------------------------------------------------------
 void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuProgram)
 {
+    const String& group = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+
     if (program->getDependencyCount() > 0)
     {
         // Get all attached shaders so we do not attach shaders twice.
@@ -110,17 +112,19 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
             }                   
 
             // Check if the library shader already compiled
-            if (!HighLevelGpuProgramManager::getSingleton().resourceExists(
-                    subShaderName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME))
+            if (!HighLevelGpuProgramManager::getSingleton().resourceExists(subShaderName, group))
             {
                 // Create the library shader
                 HighLevelGpuProgramPtr pSubGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(subShaderName,
-                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TargetLanguage, program->getType());
+                    group, TargetLanguage, program->getType());
 
                 // Set the source name
                 String sourceName = program->getDependency(i) + ".glsl";
-                pSubGpuProgram->setSourceFile(sourceName);
-                pSubGpuProgram->load();
+
+                // load source code
+                DataStreamPtr stream =
+                    ResourceGroupManager::getSingleton().openResource(sourceName, group);
+                String sourceCode = stream->getAsString();
 
                 // Prepend the current GLSL version
                 int GLSLVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
@@ -135,7 +139,8 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
                     versionLine += "#define texture2DLod textureLod\n";
                 }
 
-                pSubGpuProgram->setSource(versionLine + pSubGpuProgram->getSource());
+                pSubGpuProgram->setSource(versionLine + sourceCode);
+                pSubGpuProgram->load();
 
                 // If we have compile errors than stop processing
                 if (pSubGpuProgram->hasCompileError())
