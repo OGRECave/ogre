@@ -294,13 +294,8 @@ namespace Ogre {
     void GLSLShader::attachToProgramObject(const GLuint programObject)
     {
         // attach child objects
-        GLSLProgramContainerIterator childProgramCurrent = mAttachedGLSLPrograms.begin();
-        GLSLProgramContainerIterator childProgramEnd = mAttachedGLSLPrograms.end();
-
-        for (; childProgramCurrent != childProgramEnd; ++childProgramCurrent)
+        for (auto childShader : mAttachedGLSLPrograms)
         {
-            GLSLShaderCommon* childShader = *childProgramCurrent;
-            childShader->compile(true);
             childShader->attachToProgramObject(programObject);
         }
         OGRE_CHECK_GL_ERROR(glAttachShader(programObject, mGLShaderHandle));
