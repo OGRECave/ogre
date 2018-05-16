@@ -1,4 +1,4 @@
-#version 150
+#version 130
 
 // Need to enable the draw buffers extension
 #extension GL_ARB_draw_buffers : enable
