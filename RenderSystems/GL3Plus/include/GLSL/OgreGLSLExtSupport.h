@@ -42,7 +42,10 @@ namespace Ogre
         @param msg The info log message string is appended to this string
         @param obj The GL object that is used to retrieve the info log
     */
-    String logObjectInfo(const String& msg, const GLuint obj);
+    String logObjectInfo(const String& msg, GLuint obj);
+
+    /// just return the info without logging it
+    String getObjectInfo(GLuint obj);
 
 } // namespace Ogre
 
