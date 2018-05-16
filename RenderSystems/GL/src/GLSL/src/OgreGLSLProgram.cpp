@@ -210,22 +210,9 @@ namespace Ogre {
     void GLSLProgram::attachToProgramObject( const GLhandleARB programObject )
     {
         // attach child objects
-        GLSLProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
-        GLSLProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
-
-        while (childprogramcurrent != childprogramend)
+        for (auto childShader : mAttachedGLSLPrograms)
         {
-
-            GLSLShaderCommon* childShader = *childprogramcurrent;
-            // bug in ATI GLSL linker : modules without main function must be recompiled each time 
-            // they are linked to a different program object
-            // don't check for compile errors since there won't be any
-            // *** minor inconvenience until ATI fixes there driver
-            childShader->compile(false);
-
-            childShader->attachToProgramObject( programObject );
-
-            ++childprogramcurrent;
+            childShader->attachToProgramObject(programObject);
         }
         glAttachObjectARB( programObject, mGLHandle );
         GLenum glErr = glGetError();

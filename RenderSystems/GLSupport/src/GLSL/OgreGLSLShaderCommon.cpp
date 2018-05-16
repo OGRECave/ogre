@@ -126,6 +126,8 @@ namespace Ogre {
         mSource = String (out, out_size);
         if (out < src || out > src + src_len)
             free (out);
+
+        compile(true);
     }
     //---------------------------------------------------------------------------
     void GLSLShaderCommon::unloadImpl()
@@ -197,13 +199,13 @@ namespace Ogre {
         {
             // make sure attached program source gets loaded and compiled
             // don't need a low level implementation for attached shader objects
-            // loadHighLevelImpl will only load the source and compile once
+            // loadHighLevel will only load the source and compile once
             // so don't worry about calling it several times
             GLSLShaderCommon* childShader = static_cast<GLSLShaderCommon*>(hlProgram.get());
             // load the source and attach the child shader only if supported
             if (isSupported())
             {
-                childShader->loadHighLevelImpl();
+                childShader->loadHighLevel();
                 // add to the container
                 mAttachedGLSLPrograms.push_back( childShader );
                 mAttachedShaderNames += name + " ";
