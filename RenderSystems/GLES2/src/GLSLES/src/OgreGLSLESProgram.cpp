@@ -151,10 +151,11 @@ namespace Ogre {
             createGLProgramHandle();
         }
 
+        const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
+
         // Add preprocessor extras and main source
         if (!mSource.empty())
         {
-            const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
             // Fix up the source in case someone forgot to redeclare gl_Position
             if (caps->hasCapability(RSC_GLSL_SSO_REDECLARE) && mType == GPT_VERTEX_PROGRAM)
             {
@@ -193,7 +194,7 @@ namespace Ogre {
         if(!checkErrors)
             return compiled == 1;
 
-        if(!compiled)
+        if(!compiled && caps->getVendor() == GPU_QUALCOMM)
         {
             String message = GLSLES::getObjectInfo(mGLShaderHandle);
             checkAndFixInvalidDefaultPrecisionError(message);
