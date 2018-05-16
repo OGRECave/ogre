@@ -235,11 +235,6 @@ namespace Ogre {
 
         // Check for compile errors
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled));
-        if (!mCompiled && checkErrors)
-        {
-            String message = logObjectInfo("GLSL compile log: " + mName, mGLShaderHandle);
-            checkAndFixInvalidDefaultPrecisionError(message);
-        }
 
         // Log a message that the shader compiled successfully.
         if (mCompiled && checkErrors)
@@ -419,35 +414,6 @@ namespace Ogre {
         //TODO add warning or error
         return 0;
     }
-
-    String GLSLShader::getShaderTypeLabel(GpuProgramType programType)
-    {
-        switch (programType)
-        {
-        case GPT_VERTEX_PROGRAM:
-            return "vertex";
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            return "tessellation evaluation";
-            break;
-        case GPT_HULL_PROGRAM:
-            return "tessellation control";
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            return "geometry";
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            return "fragment";
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            return "compute";
-            break;
-        }
-
-        //TODO add warning or error
-        return 0;
-    }
-
 
     GLuint GLSLShader::getGLProgramHandle() {
         //TODO This should be removed and the compile() function
