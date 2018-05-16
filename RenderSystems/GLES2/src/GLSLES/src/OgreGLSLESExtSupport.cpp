@@ -35,10 +35,23 @@ THE SOFTWARE.
 namespace Ogre
 {
     namespace GLSLES {
-    //-----------------------------------------------------------------------------
-    String logObjectInfo(const String& msg, const GLuint obj)
+    String logObjectInfo(const String& msg, GLuint obj)
     {
-        String logMessage = msg;
+        String logMessage = getObjectInfo(obj);
+
+        if (logMessage.empty())
+            return msg;
+
+        logMessage = msg + "\n" + logMessage;
+
+        LogManager::getSingleton().logMessage(LML_CRITICAL, logMessage);
+
+        return logMessage;
+    }
+
+    String getObjectInfo(const GLuint obj)
+    {
+        String logMessage;
 
         if (obj > 0)
         {
@@ -82,20 +95,12 @@ namespace Ogre
 
                 if (strlen(infoLog) > 0)
                 {
-                    logMessage += "\n" + String(infoLog);
+                    logMessage = String(infoLog);
                 }
 
                 delete [] infoLog;
 
-                if (logMessage.size() > 0)
-                {
-                    // remove ends of line in the end - so there will be no empty lines in the log.
-                    while( logMessage[logMessage.size() - 1] == '\n' )
-                    {
-                        logMessage.erase(logMessage.size() - 1, 1);
-                    }
-                    LogManager::getSingleton().logMessage(LML_CRITICAL, logMessage);
-                }
+                StringUtil::trim(logMessage, false, true);
             }
         }
 

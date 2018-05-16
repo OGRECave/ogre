@@ -32,9 +32,23 @@
 
 namespace Ogre {
 
-    String logObjectInfo(const String& msg, const GLuint obj)
+    String logObjectInfo(const String& msg, GLuint obj)
     {
-        String logMessage = msg;
+        String logMessage = getObjectInfo(obj);
+
+        if (logMessage.empty())
+            return msg;
+
+        logMessage = msg + "\n" + logMessage;
+
+        LogManager::getSingleton().logMessage(LML_CRITICAL, logMessage);
+
+        return logMessage;
+    }
+
+    String getObjectInfo(GLuint obj)
+    {
+        String logMessage;
 
         // Invalid object.
         if (obj <= 0)
@@ -45,15 +59,17 @@ namespace Ogre {
         GLint infologLength = 0;
 
         GLboolean isShader = glIsShader(obj);
-        GLboolean isProgramPipeline = glIsProgramPipeline(obj);
+        GLboolean isProgramPipeline =
+            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
+                RSC_SEPARATE_SHADER_OBJECTS) &&
+            glIsProgramPipeline(obj);
         GLboolean isProgram = glIsProgram(obj);
 
         if (isShader)
         {
             OGRE_CHECK_GL_ERROR(glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
         }
-        else if (isProgramPipeline &&
-                 Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        else if (isProgramPipeline)
         {
             //FIXME Crashes on NVIDIA? See GL3+ GSoC forum
             // posts around 2013-11-25.
@@ -68,7 +84,7 @@ namespace Ogre {
         // if (infologLength <= 1)
         if (infologLength < 1)
         {
-            return logMessage;
+            return "";
         }
 
         GLint charsWritten  = 0;
@@ -80,8 +96,7 @@ namespace Ogre {
         {
             OGRE_CHECK_GL_ERROR(glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog));
         }
-        else if (isProgramPipeline &&
-                 Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        else if (isProgramPipeline)
         {
             OGRE_CHECK_GL_ERROR(glGetProgramPipelineInfoLog(obj, infologLength, &charsWritten, infoLog));
         }
@@ -92,20 +107,11 @@ namespace Ogre {
 
         if (strlen(infoLog) > 0)
         {
-            logMessage += "\n" + String(infoLog);
+            logMessage = String(infoLog);
         }
-
         delete [] infoLog;
 
-        if (logMessage.size() > 0)
-        {
-            // Remove empty lines from the end of the log.
-            while (logMessage[logMessage.size() - 1] == '\n')
-            {
-                logMessage.erase(logMessage.size() - 1, 1);
-            }
-            LogManager::getSingleton().logMessage(LML_CRITICAL, logMessage);
-        }
+        StringUtil::trim(logMessage, false, true);
 
         return logMessage;
     }
