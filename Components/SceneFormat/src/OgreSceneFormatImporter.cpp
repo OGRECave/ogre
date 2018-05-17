@@ -1190,6 +1190,19 @@ namespace Ogre
             if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
                 importPcc( tmpIt->value );
         }
+
+        if( importFlags & SceneFlags::AreaLightMasks )
+        {
+            tmpIt = json.FindMember( "area_light_masks" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsString() )
+            {
+                TexturePtr areaLightMask = TextureManager::getSingleton().load(
+                                               String( tmpIt->value.GetString() ) + ".oitd",
+                                               "SceneFormatImporter" );
+                HlmsPbs *hlmsPbs = getPbs();
+                hlmsPbs->setAreaLightMasks( areaLightMask );
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importScene( const String &filename, const rapidjson::Document &d,
@@ -1307,19 +1320,6 @@ namespace Ogre
                             mIrradianceVolume->getIrradianceOrigin(),
                             mIrradianceVolume->getIrradianceMaxPower(),
                             mIrradianceVolume->getFadeAttenuationOverDistace() );
-            }
-        }
-
-        if( importFlags & SceneFlags::AreaLightMasks )
-        {
-            itor = d.FindMember( "area_light_masks" );
-            if( itor != d.MemberEnd() && itor->value.IsString() )
-            {
-                TexturePtr areaLightMask = TextureManager::getSingleton().load(
-                                               String( itor->value.GetString() ) + ".oitd",
-                                               "SceneFormatImporter" );
-                HlmsPbs *hlmsPbs = getPbs();
-                hlmsPbs->setAreaLightMasks( areaLightMask );
             }
         }
 
