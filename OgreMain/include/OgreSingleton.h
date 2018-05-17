@@ -39,6 +39,7 @@ THE SOFTWARE.
 
 // Added by Steve Streeting for Ogre
 #include "OgrePrerequisites.h"
+#include "OgreException.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #   pragma warning (push)
@@ -72,7 +73,7 @@ namespace Ogre {
     public:
         Singleton( void )
         {
-            assert( !msSingleton );
+            OgreAssert( !msSingleton, "There can be only one singleton" );
 #if defined( _MSC_VER ) && _MSC_VER < 1200   
             int offset = (int)(T*)1 - (int)(Singleton <T>*)(T*)1;
             msSingleton = (T*)((int)this + offset);
