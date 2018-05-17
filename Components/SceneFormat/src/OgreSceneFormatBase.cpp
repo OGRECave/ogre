@@ -46,7 +46,7 @@ namespace Ogre
         "point",
         "spotlight",
         "vpl",
-        "area_approx"
+        "area_approx",
         "NUM_LIGHT_TYPES"
     };
 
