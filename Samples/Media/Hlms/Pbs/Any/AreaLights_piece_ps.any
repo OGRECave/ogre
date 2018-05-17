@@ -126,13 +126,6 @@
 			}
 		}
 
-
-		@property( @n < hlms_lights_area_tex_mask )
-			diffuseMask *= (1.0 - specCol);
-		@end @property( @n >= hlms_lights_area_tex_mask )
-			diffuseMask = (1.0 - specCol);
-		@end
-
 		lightDir *= 1.0 / fDistance;
 		float fAreaW = dot( lightDir, -passBuf.areaApproxLights[@n].direction.xyz ) * 0.5f + 0.5f;
 		//lightDir = (-passBuf.areaApproxLights[@n].direction.xyz + lightDir) * 0.50f;
