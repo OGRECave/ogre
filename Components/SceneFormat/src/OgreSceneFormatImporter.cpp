@@ -1198,7 +1198,7 @@ namespace Ogre
             {
                 TexturePtr areaLightMask = TextureManager::getSingleton().load(
                                                String( tmpIt->value.GetString() ) + ".oitd",
-                                               "SceneFormatImporter" );
+                                               "SceneFormatImporter", TEX_TYPE_2D_ARRAY );
                 HlmsPbs *hlmsPbs = getPbs();
                 hlmsPbs->setAreaLightMasks( areaLightMask );
             }
