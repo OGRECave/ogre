@@ -231,8 +231,6 @@ namespace Ogre
             {
                 bool upToDate = itor->lastFrame == mVaoManager->getFrameCount();
                 itor->lastFrame = mVaoManager->getFrameCount();
-                itor->lastPos   = camera->getDerivedPosition();
-                itor->lastRot   = camera->getDerivedOrientation();
 
                 if( upToDate )
                 {
@@ -244,14 +242,19 @@ namespace Ogre
                         //So we need to generate a new buffer for them (we can't map
                         //the same buffer twice in the same frame)
                         ++itor->currentBufIdx;
-                        if( itor->currentBufIdx > itor->gridBuffers.size() )
+                        if( itor->currentBufIdx >= itor->gridBuffers.size() )
                             itor->gridBuffers.push_back( CachedGridBuffer() );
+
+                        upToDate = false;
                     }
                 }
                 else
                 {
                     itor->currentBufIdx = 0;
                 }
+
+                itor->lastPos = camera->getDerivedPosition();
+                itor->lastRot = camera->getDerivedOrientation();
 
                 *outCachedGrid = &(*itor);
 
