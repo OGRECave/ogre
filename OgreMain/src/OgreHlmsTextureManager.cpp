@@ -584,29 +584,37 @@ namespace Ogre
             uint16 entryIdx = dstArrayIt->createEntry();
             uint16 arrayIdx = dstArrayIt - mTextureArrays[mapType].begin();
 
-            if( texType != TEX_TYPE_3D && texType != TEX_TYPE_CUBE_MAP )
+            dstArrayIt->entries[entryIdx] = TextureArray::NamePair( aliasName, texName );
+            it = mEntries.insert( it, TextureEntry( searchName.name, mapType, arrayIdx, entryIdx ) );
+
+            try
             {
-                if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
+                if( texType != TEX_TYPE_3D && texType != TEX_TYPE_CUBE_MAP )
                 {
-                    copyTextureToArray( *image, dstArrayIt->texture, entryIdx,
-                                        baseMipLevel, dstArrayIt->isNormalMap );
+                    if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
+                    {
+                        copyTextureToArray( *image, dstArrayIt->texture, entryIdx,
+                                            baseMipLevel, dstArrayIt->isNormalMap );
+                    }
+                    else
+                    {
+                        copyTextureToAtlas( *image, dstArrayIt->texture, entryIdx,
+                                            dstArrayIt->sqrtMaxTextures, baseMipLevel,
+                                            dstArrayIt->isNormalMap );
+                    }
                 }
                 else
                 {
-                    copyTextureToAtlas( *image, dstArrayIt->texture, entryIdx,
-                                        dstArrayIt->sqrtMaxTextures, baseMipLevel,
-                                        dstArrayIt->isNormalMap );
+                    copy3DTexture( *image, dstArrayIt->texture, 0,
+                                   std::max<uint32>( image->getNumFaces(), image->getDepth() ),
+                                   baseMipLevel );
                 }
             }
-            else
+            catch( Exception &e )
             {
-                copy3DTexture( *image, dstArrayIt->texture, 0,
-                               std::max<uint32>( image->getNumFaces(), image->getDepth() ),
-                               baseMipLevel );
+                destroyTexture(aliasName);
+                throw;
             }
-
-            dstArrayIt->entries[entryIdx] = TextureArray::NamePair( aliasName, texName );
-            it = mEntries.insert( it, TextureEntry( searchName.name, mapType, arrayIdx, entryIdx ) );
         }
 
         const TextureArray &texArray = mTextureArrays[it->mapType][it->arrayIdx];
