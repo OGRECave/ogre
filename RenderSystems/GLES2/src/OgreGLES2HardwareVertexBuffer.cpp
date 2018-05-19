@@ -40,12 +40,12 @@ namespace Ogre {
                                                        size_t numVertices,
                                                        HardwareBuffer::Usage usage,
                                                        bool useShadowBuffer)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer),
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer || HANDLE_CONTEXT_LOSS),
           mBuffer(GL_ARRAY_BUFFER, mSizeInBytes, usage)
     {
     }
     
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#if HANDLE_CONTEXT_LOSS
     void GLES2HardwareVertexBuffer::notifyOnContextLost()
     {
         mBuffer.destroyBuffer();
