@@ -112,7 +112,7 @@ namespace Ogre {
             ERR_INVALIDPARAMS,
             ERR_RENDERINGAPI_ERROR,
             ERR_DUPLICATE_ITEM,
-            ERR_ITEM_NOT_FOUND,
+            ERR_ITEM_NOT_FOUND = ERR_DUPLICATE_ITEM,
             ERR_FILE_NOT_FOUND,
             ERR_INTERNAL_ERROR,
             ERR_RT_ASSERTION_FAILED,
@@ -264,7 +264,6 @@ namespace Ogre {
             case Exception::ERR_INVALIDPARAMS:          throw InvalidParametersException(number, desc, src, file, line);
             case Exception::ERR_RENDERINGAPI_ERROR:     throw RenderingAPIException(number, desc, src, file, line);
             case Exception::ERR_DUPLICATE_ITEM:         throw ItemIdentityException(number, desc, src, file, line);
-            case Exception::ERR_ITEM_NOT_FOUND:         throw ItemIdentityException(number, desc, src, file, line);
             case Exception::ERR_FILE_NOT_FOUND:         throw FileNotFoundException(number, desc, src, file, line);
             case Exception::ERR_INTERNAL_ERROR:         throw InternalErrorException(number, desc, src, file, line);
             case Exception::ERR_RT_ASSERTION_FAILED:    throw RuntimeAssertionException(number, desc, src, file, line);
