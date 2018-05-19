@@ -48,7 +48,7 @@ namespace Ogre {
                 mBuffer.unlockImpl();
             }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#if HANDLE_CONTEXT_LOSS
             /** See AndroidResource. */
             virtual void notifyOnContextLost();
         

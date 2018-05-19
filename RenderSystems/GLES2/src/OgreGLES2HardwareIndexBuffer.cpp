@@ -40,7 +40,7 @@ namespace Ogre {
                                                      size_t numIndexes,
                                                      HardwareBuffer::Usage usage,
                                                      bool useShadowBuffer)
-        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer),
+        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer || HANDLE_CONTEXT_LOSS),
           mBuffer(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, usage)
     {
         if (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_32BIT_INDEX) &&
@@ -52,7 +52,7 @@ namespace Ogre {
         }
     }
     
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#if HANDLE_CONTEXT_LOSS
     void GLES2HardwareIndexBuffer::notifyOnContextLost()
     {
         mBuffer.destroyBuffer();
