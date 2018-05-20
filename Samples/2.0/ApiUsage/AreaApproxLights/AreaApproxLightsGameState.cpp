@@ -82,7 +82,7 @@ namespace Demo
         }
 
         //Generate the mipmaps so roughness works
-        image.generateMipmaps( false, Ogre::Image::FILTER_GAUSSIAN );
+        image.generateMipmaps( false, Ogre::Image::FILTER_GAUSSIAN_HIGH );
 
         {
             //Ensure the lower mips have black borders. This is done to prevent certain artifacts,
