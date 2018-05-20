@@ -89,7 +89,7 @@ namespace Ogre
         struct LightCount
         {
             //We use LT_DIRECTIONAL (index = 0) to contain the total light count.
-            uint32  lightCount[Light::NUM_LIGHT_TYPES];
+            uint32  lightCount[Light::MAX_FORWARD_PLUS_LIGHTS];
             LightCount() { memset( lightCount, 0, sizeof(lightCount) ); }
         };
 

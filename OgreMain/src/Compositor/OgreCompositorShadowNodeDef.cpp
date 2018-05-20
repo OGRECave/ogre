@@ -283,13 +283,19 @@ namespace Ogre
 
         {
             //These setups are invalid:
-            //  SP D
-            //  S  D
-            //  P  D
-            //  DS P
-            //  S  P
+            //  SP  D
+            //  S   D
+            //  P   D
+            //  DS  P
+            //  S   P
             // "SP  D" means: A shadow map that only supports Spot & Point lights comes
             // before a shadow map that supports directional lights.
+            // The same happens with custom 2D shapes. The order must be respected.
+            // eg. this is also invalid:
+            // SC   P
+            // CS   P
+            // Basically, if lightType N was used for shadowmap A and N-2 was not,
+            // the next shadow map cannot use lightType == N-2.
             bool cannotUseType[Light::NUM_LIGHT_TYPES];
             for( size_t i=0; i<Light::NUM_LIGHT_TYPES; ++i )
                 cannotUseType[i] = false;
@@ -322,13 +328,20 @@ namespace Ogre
                 {
                     //A shadow map that does not support directional
                     //lights cannot come before a shadow map that does.
-                    if( !(*it & (1u << Light::LT_DIRECTIONAL)) )
-                        cannotUseType[Light::LT_DIRECTIONAL] = true;
-
                     //A shadow map that does not support point lights but supports spotlights
                     //cannot come before a shadow map that supports point lights.
-                    if( (*it & (1u << Light::LT_SPOTLIGHT)) && !(*it & (1u << Light::LT_POINT)) )
-                        cannotUseType[Light::LT_POINT] = true;
+                    //for( size_t i=0; i<Light::NUM_LIGHT_TYPES; ++i )
+                    for( size_t i=Light::NUM_LIGHT_TYPES; i--; )
+                    {
+                        if( (*it & (1u << i)) )
+                        {
+                            for( size_t j=i; j--; )
+                            {
+                                if( !(*it & (1u << j)) )
+                                    cannotUseType[j] = true;
+                            }
+                        }
+                    }
                 }
 
                 ++it;

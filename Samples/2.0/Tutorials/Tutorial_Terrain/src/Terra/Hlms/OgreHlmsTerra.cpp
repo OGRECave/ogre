@@ -539,7 +539,7 @@ namespace Ogre
 
         int32 numLights             = getProperty( HlmsBaseProp::LightsSpot );
         int32 numDirectionalLights  = getProperty( HlmsBaseProp::LightsDirNonCaster );
-        int32 numShadowMapLights   = getProperty( HlmsBaseProp::NumShadowMapLights );
+        int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
 
         bool isPssmBlend = getProperty( HlmsBaseProp::PssmBlend ) != 0;

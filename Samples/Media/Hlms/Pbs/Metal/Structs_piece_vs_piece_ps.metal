@@ -22,6 +22,25 @@ struct Light
 @end
 };
 
+#define areaLightDiffuseMipmapStart areaApproxLights[0].diffuse.w
+#define areaLightNumMipmapsSpecFactor areaApproxLights[0].specular.w
+
+struct AreaLight
+{
+	float4 position;	//.w contains the objLightMask
+	float4 diffuse;		//[0].w contains diffuse mipmap start
+	float4 specular;	//[0].w contains mipmap scale
+	float4 attenuation;	//.w contains texture array idx
+	//Custom 2D Shape:
+	//  direction.xyz direction
+	//  direction.w invHalfRectSize.x
+	//  tangent.xyz tangent
+	//  tangent.w invHalfRectSize.y
+	float4 direction;
+	float4 tangent;
+	float4 doubleSided;
+};
+
 @insertpiece( DeclCubemapProbeStruct )
 
 //Uniforms that change per pass
@@ -71,6 +90,7 @@ struct PassData
 @property( hlms_pssm_fade )
 	float pssmFadePoint;@end
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end
+	@property( hlms_lights_area_approx )AreaLight areaApproxLights[@value(hlms_lights_area_approx)];@end
 @end @property( hlms_shadowcaster )
 	//Vertex shader
 	@property( exponential_shadow_maps )float4 viewZRow;@end

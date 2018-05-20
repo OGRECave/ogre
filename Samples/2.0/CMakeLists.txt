@@ -67,6 +67,7 @@ if( OGRE_BUILD_SAMPLES2 AND NOT OGRE_BUILD_SAMPLES2_SKIP )
 	endif()
 
 	add_subdirectory(ApiUsage/AnimationTagPoint)
+	add_subdirectory(ApiUsage/AreaApproxLights)
 	add_subdirectory(ApiUsage/ImportAnimationsShareSkeletonInstance)
 	add_subdirectory(ApiUsage/CustomRenderable)
 	add_subdirectory(ApiUsage/DynamicGeometry)

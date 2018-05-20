@@ -493,6 +493,11 @@ namespace Ogre
             encodeVector( jsonStr, Vector2( nearClipDistance, farClipDistance ) );
         }
 
+        jsonStr.a( ",\n\t\t\t\"rect_size\" : " );
+        encodeVector( jsonStr, light->getRectSize() );
+
+        jsonStr.a( ",\n\t\t\t\"texture_light_mask_idx\" : ", light->mTextureLightMaskIdx );
+
         jsonStr.a( ",\n" );
         flushLwString( jsonStr, outJson );
         exportMovableObject( jsonStr, outJson, light );
@@ -787,6 +792,24 @@ namespace Ogre
 
         if( exportFlags & SceneFlags::InstantRadiosity )
             exportInstantRadiosity( jsonStr, outJson );
+
+        if( exportFlags & SceneFlags::AreaLightMasks )
+        {
+            const String textureFolder = mCurrentExportFolder + "/textures/";
+            FileSystemLayer::createDirectory( textureFolder );
+
+            HlmsPbs *hlmsPbs = getPbs();
+
+            if( hlmsPbs && hlmsPbs->getAreaLightMasks() )
+            {
+                TexturePtr areaLightMask = hlmsPbs->getAreaLightMasks();
+                Image image;
+                areaLightMask->convertToImage( image, true );
+
+                jsonStr.a( ",\n\t\t\"area_light_masks\" : \"", areaLightMask->getName().c_str(), "\"" );
+                image.save( mCurrentExportFolder + "/textures/" + areaLightMask->getName() + ".oitd" );
+            }
+        }
 
         jsonStr.a( "\n\t}" );
 

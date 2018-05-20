@@ -454,7 +454,8 @@ namespace Ogre {
             FILTER_BOX,
             FILTER_TRIANGLE,
             FILTER_BICUBIC,
-            FILTER_GAUSSIAN
+            FILTER_GAUSSIAN,
+            FILTER_GAUSSIAN_HIGH
         };
         /** Scale a 1D, 2D or 3D image volume. 
             @param  src         PixelBox containing the source pointer, dimensions and format

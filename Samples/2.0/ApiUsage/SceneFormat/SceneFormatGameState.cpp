@@ -340,6 +340,18 @@ namespace Demo
         light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
 
+        light = sceneManager->createLight();
+        lightNode = rootNode->createChildSceneNode();
+        lightNode->attachObject( light );
+        light->setDiffuseColour( 0.2f, 0.2f, 0.2f );
+        light->setSpecularColour( 0.2f, 0.2f, 0.2f );
+        light->setPowerScale( Ogre::Math::PI );
+        light->setType( Ogre::Light::LT_AREA_APPROX );
+        lightNode->setPosition( 10.0f, 10.0f, 10.0f );
+        light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
+        light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
+        light->setRectSize( Ogre::Vector2( 5.0f, 5.0f ) );
+
         {
             Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
             assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );

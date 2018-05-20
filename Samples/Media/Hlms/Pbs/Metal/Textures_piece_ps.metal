@@ -22,6 +22,11 @@
 	@add( texUnit, 1 )
 @end
 
+@property( hlms_lights_area_tex_mask )
+	@set( areaLightsApproxTexUnit, texUnit )
+	@add( texUnit, 1 )
+@end
+
 @set( textureRegShadowMapStart, texUnit )
 @add( texUnit, hlms_num_shadow_map_textures )
 

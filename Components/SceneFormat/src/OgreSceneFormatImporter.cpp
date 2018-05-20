@@ -46,11 +46,14 @@ THE SOFTWARE.
 #include "Cubemaps/OgreParallaxCorrectedCubemap.h"
 #include "Compositor/OgreCompositorManager2.h"
 
+#include "OgreTextureManager.h"
+
 #include "OgreMeshSerializer.h"
 #include "OgreMesh2Serializer.h"
 #include "OgreFileSystemLayer.h"
 
 #include "OgreLogManager.h"
+
 
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
@@ -807,6 +810,14 @@ namespace Ogre
             light->setShadowFarClipDistance( nearFar.y );
         }
 
+        tmpIt = lightValue.FindMember( "rect_size" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsArray() )
+            light->setRectSize( decodeVector2Array( tmpIt->value ) );
+
+        tmpIt = lightValue.FindMember( "texture_light_mask_idx" );
+        if( tmpIt != lightValue.MemberEnd() && tmpIt->value.IsUint() )
+            light->mTextureLightMaskIdx = static_cast<uint16>( tmpIt->value.GetUint() );
+
         if( light->getType() == Light::LT_VPL )
             mVplLights.push_back( light );
     }
@@ -1178,6 +1189,19 @@ namespace Ogre
             tmpIt = json.FindMember( "parallax_corrected_cubemaps" );
             if( tmpIt != json.MemberEnd() && tmpIt->value.IsObject() )
                 importPcc( tmpIt->value );
+        }
+
+        if( importFlags & SceneFlags::AreaLightMasks )
+        {
+            tmpIt = json.FindMember( "area_light_masks" );
+            if( tmpIt != json.MemberEnd() && tmpIt->value.IsString() )
+            {
+                TexturePtr areaLightMask = TextureManager::getSingleton().load(
+                                               String( tmpIt->value.GetString() ) + ".oitd",
+                                               "SceneFormatImporter", TEX_TYPE_2D_ARRAY );
+                HlmsPbs *hlmsPbs = getPbs();
+                hlmsPbs->setAreaLightMasks( areaLightMask );
+            }
         }
     }
     //-----------------------------------------------------------------------------------

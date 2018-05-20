@@ -1,0 +1,192 @@
+//#include "SyntaxHighlightingMisc.h"
+
+@property( hlms_lights_area_approx )
+
+@property( hlms_lights_area_tex_mask )
+	@piece( DeclAreaApproxTextures )
+		@property( syntax == glsl )
+			uniform sampler2DArray areaLightMasks;
+		@end
+		@property( syntax == hlsl )
+			Texture2DArray<float> areaLightMasks	: register(t@value(areaLightsApproxTexUnit));
+			SamplerState areaLightMasksSampler		: register(s@value(areaLightsApproxTexUnit));
+		@end
+		@property( syntax == metal )
+			, texture2d_array<float> areaLightMasks	[[texture(@value(areaLightsApproxTexUnit))]]
+			, sampler areaLightMasksSampler			[[sampler(@value(areaLightsApproxTexUnit))]]
+		@end
+	@end
+@end
+
+@piece( DoAreaApproxLights )
+	@property( !hlms_lights_area_tex_colour )
+		#define AREA_LIGHTS_TEX_SWIZZLE x
+	@end @property( hlms_lights_area_tex_colour )
+		#define AREA_LIGHTS_TEX_SWIZZLE xyz
+	@end
+
+	float3 projectedPosInPlane;
+
+@foreach( hlms_lights_area_approx, n )
+	lightDir = passBuf.areaApproxLights[@n].position.xyz - inPs.pos;
+	projectedPosInPlane.xyz = inPs.pos - dot( -lightDir.xyz, passBuf.areaApproxLights[@n].direction.xyz ) *
+										 passBuf.areaApproxLights[@n].direction.xyz;
+	fDistance = length( lightDir );
+	if( fDistance <= passBuf.areaApproxLights[@n].attenuation.x
+	/*&& dot( -lightDir, passBuf.areaApproxLights[@n].direction.xyz ) > 0*/ @insertpiece( andObjAreaApproxLightMaskCmp ) )
+	{
+		projectedPosInPlane.xyz -= passBuf.areaApproxLights[@n].position.xyz;
+		float3 areaLightBitangent = cross( passBuf.areaApproxLights[@n].tangent.xyz,
+											 passBuf.areaApproxLights[@n].direction.xyz );
+		float2 invHalfRectSize = float2( passBuf.areaApproxLights[@n].direction.w,
+										 passBuf.areaApproxLights[@n].tangent.w );
+		//lightUV is in light space, in range [-0.5; 0.5]
+		float2 lightUVForTex;
+		float2 lightUV;
+		lightUV.x = dot( projectedPosInPlane.xyz, passBuf.areaApproxLights[@n].tangent.xyz );
+		lightUV.y = dot( projectedPosInPlane.xyz, areaLightBitangent );
+		lightUV.xy *= invHalfRectSize.xy /*/ sqrt( fDistance )*/;
+		//Displace the UV by the normal to account for edge cases when
+		//a surface is close and perpendicular to the light. This is fully a hack and
+		//the values (e.g. 0.25) is completely eye balled.
+		lightUVForTex.xy = lightUV.xy;
+		lightUV.xy += float2( dot( passBuf.areaApproxLights[@n].tangent.xyz, nNormal ),
+							  dot( areaLightBitangent, nNormal ) ) * 3.75 * invHalfRectSize.xy;
+		lightUV.xy = clamp( lightUV.xy, -0.5f, 0.5f );
+		lightUVForTex = clamp( lightUVForTex.xy, -0.5f, 0.5f );
+		float booster = 1.0f - smoothstep( 0.2f, 1.9f, max( abs( lightUV.x ), abs( lightUV.y ) ) );
+		booster = 1.0f + booster * 2.25f;
+		booster = 1.0f;
+
+	@property( @n >= hlms_lights_area_tex_mask || !hlms_lights_area_tex_colour )
+		float diffuseMask = 1.0f;
+	@end
+	@property( @n < hlms_lights_area_tex_mask )
+		@property( hlms_lights_area_tex_colour )
+			float3 diffuseMask;
+		@end
+
+		// 1 / (1 - 0.02) = 1.020408163
+		float diffuseMipsLeft = passBuf.areaLightNumMipmapsSpecFactor * 0.5 -
+								passBuf.areaLightDiffuseMipmapStart * 1.020408163f;
+		diffuseMask = OGRE_SampleArray2DLevel( areaLightMasks, areaLightMasksSampler,
+											   lightUVForTex + 0.5f,
+											   passBuf.areaApproxLights[@n].attenuation.w,
+											   passBuf.areaLightDiffuseMipmapStart +
+											   (ROUGHNESS - 0.02f) * diffuseMipsLeft ).AREA_LIGHTS_TEX_SWIZZLE;
+	@end
+
+		float3 closestPoint = passBuf.areaApproxLights[@n].position.xyz +
+				passBuf.areaApproxLights[@n].tangent.xyz * lightUV.x / invHalfRectSize.x +
+				areaLightBitangent.xyz * lightUV.y / invHalfRectSize.y;
+
+		float3 lightDir2 = lightDir / fDistance;
+		lightDir = closestPoint.xyz - inPs.pos;
+		fDistance= length( lightDir );
+
+		float3 toShapeLight = reflect( -viewDir, nNormal );
+		float denom = dot( toShapeLight, -passBuf.areaApproxLights[@n].direction.xyz );
+		@property( @n >= hlms_lights_area_tex_mask || !hlms_lights_area_tex_colour )
+			float specCol = 0;
+		@end @property( @n < hlms_lights_area_tex_mask && hlms_lights_area_tex_colour )
+			float3 specCol = float3( 0, 0, 0 );
+		@end
+		if( denom > 1e-6f || passBuf.areaApproxLights[@n].doubleSided.x != 0.0f )
+		{
+			float3 p0l0 = passBuf.areaApproxLights[@n].position.xyz - inPs.pos;
+			float t = dot( p0l0, -passBuf.areaApproxLights[@n].direction.xyz ) / denom;
+			if( t >= 0 )
+			{
+				float3 posInShape = inPs.pos.xyz + toShapeLight.xyz * t - passBuf.areaApproxLights[@n].position.xyz;
+				float2 reflClipSpace;
+				reflClipSpace.x = dot( passBuf.areaApproxLights[@n].tangent.xyz, posInShape );
+				reflClipSpace.y = dot( areaLightBitangent, posInShape );
+
+				float specVal;
+				specVal = 0.5f / (length( max( abs( reflClipSpace * invHalfRectSize ) - 0.5f, 0.0f ) ) + 0.5f);
+				specVal = min( specVal, 1.0f );
+				float areaPower = ((ROUGHNESS * 10.0f + 1.0f) * 0.005f) /
+								  (ROUGHNESS * ROUGHNESS * ROUGHNESS);
+				areaPower = min( areaPower, 512.0f ); //Prevent INFs.
+				specVal = pow( specVal, areaPower ) * min( areaPower * areaPower, 1.0f );
+
+				@property( @n >= hlms_lights_area_tex_mask || !hlms_lights_area_tex_colour )
+					specCol = specVal;
+				@end @property( @n < hlms_lights_area_tex_mask && hlms_lights_area_tex_colour )
+					specCol = float3( specVal, specVal, specVal );
+				@end
+
+				@property( @n < hlms_lights_area_tex_mask )
+					specCol *= OGRE_SampleArray2DLevel( areaLightMasks, areaLightMasksSampler,
+														reflClipSpace * invHalfRectSize + 0.5f,
+														passBuf.areaApproxLights[@n].attenuation.w,
+														(ROUGHNESS - 0.02f) *
+														passBuf.areaLightNumMipmapsSpecFactor ).AREA_LIGHTS_TEX_SWIZZLE;
+				@end
+			}
+		}
+
+		lightDir *= 1.0 / fDistance;
+		float fAreaW = dot( lightDir, -passBuf.areaApproxLights[@n].direction.xyz ) * 0.5f + 0.5f;
+		//lightDir = (-passBuf.areaApproxLights[@n].direction.xyz + lightDir) * 0.50f;
+		//lightDir = lerp( lightDir2, lightDir, fAreaW );
+		float globalDot = saturate( dot( -lightDir, passBuf.areaApproxLights[@n].direction.xyz ) );
+		globalDot = passBuf.areaApproxLights[@n].doubleSided.x != 0.0f ? 1.0f : globalDot;
+		tmpColour = BRDF_AreaLightApprox( lightDir, viewDir, NdotV,
+										  passBuf.areaApproxLights[@n].diffuse.xyz * diffuseMask,
+										  passBuf.areaApproxLights[@n].specular.xyz * specCol
+										@property( syntax != glsl )
+											, material, nNormal @insertpiece( brdfExtraParams )
+										@end
+											) * ( globalDot * globalDot ) * booster;
+		float atten = 1.0 / (0.5 + (passBuf.areaApproxLights[@n].attenuation.y + passBuf.areaApproxLights[@n].attenuation.z * fDistance) * fDistance );
+		finalColour += tmpColour * atten;
+		//finalColour.xyz = float3( dot( lightDir, nNormal ) );
+		//finalColour.xyz = float3( lightUV.xy + 0.5f, 0.0f );
+		//finalColour.xyz = float3( closestPoint.xy + 0.5f, 0.0f );
+	}
+@end
+
+@end
+
+@piece( DeclareBRDF_AreaLightApprox )
+INLINE float3 BRDF_AreaLightApprox
+(
+	float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, float3 lightSpecular
+	@property( syntax != glsl )
+		, Material material, float3 nNormal @insertpiece( brdfExtraParamDefs )
+	@end
+)
+{
+	float3 halfWay= normalize( lightDir + viewDir );
+	float NdotL = saturate( dot( nNormal, lightDir ) );
+	float VdotH = saturate( dot( viewDir, halfWay ) );
+
+	//Formula:
+	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
+	@insertpiece( FresnelType ) fresnelS = @insertpiece( getSpecularFresnel );
+
+	//We should divide Rs by PI, but it was done inside G for performance
+	float3 Rs = fresnelS * @insertpiece( kS ).xyz * lightSpecular;
+
+	//Diffuse BRDF (*Normalized* Disney, see course_notes_moving_frostbite_to_pbr.pdf
+	//"Moving Frostbite to Physically Based Rendering" Sebastien Lagarde & Charles de Rousiers)
+	float energyBias	= ROUGHNESS * 0.5;
+	float energyFactor	= lerp( 1.0, 1.0 / 1.51, ROUGHNESS );
+	float fd90			= energyBias + 2.0 * VdotH * VdotH * ROUGHNESS;
+	float lightScatter	= 1.0 + (fd90 - 1.0) * pow( 1.0 - NdotL, 5.0 );
+	float viewScatter	= 1.0 + (fd90 - 1.0) * pow( 1.0 - NdotV, 5.0 );
+
+@property( fresnel_separate_diffuse )
+	@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
+@end @property( !fresnel_separate_diffuse )
+	float fresnelD = 1.0f - @insertpiece( getMaxFresnelS );@end
+
+	//We should divide Rd by PI, but it is already included in kD
+	float3 Rd = (lightScatter * viewScatter * energyFactor * fresnelD) * @insertpiece( kD ).xyz * lightDiffuse;
+
+	return NdotL * (Rs + Rd);
+}
+@end
+
+@end

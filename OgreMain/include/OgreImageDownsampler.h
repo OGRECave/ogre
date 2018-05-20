@@ -80,6 +80,29 @@ namespace Ogre
     ImageDownsamplerCube downscale2x_A8_cube;
     ImageDownsamplerCube downscale2x_XA88_cube;
 
+    /** Range is [kernelStart; kernelEnd]
+    @param _tmpPtr
+        Temporary buffer. Must be able to hold a copy of _srcDstPtr
+    @param _srcDstPtr
+        Input image to blur, output image blurred
+    @param width
+    @param height
+    @param kernel
+    @param kernelStart
+    @param kernelEnd
+     */
+    typedef void (ImageBlur2D)( uint8 *_tmpPtr, uint8 *_srcDstPtr,
+                                int32 width, int32 height,
+                                const uint8 kernel[5],
+                                const int8 kernelStart, const int8 kernelEnd );
+
+    ImageBlur2D separableBlur_XXXA8888;
+    ImageBlur2D separableBlur_XXX888;
+    ImageBlur2D separableBlur_XX88;
+    ImageBlur2D separableBlur_X8;
+    ImageBlur2D separableBlur_A8;
+    ImageBlur2D separableBlur_XA88;
+
     //-----------------------------------------------------------------------------------
     //Signed versions
     //-----------------------------------------------------------------------------------
@@ -103,6 +126,17 @@ namespace Ogre
     ImageDownsamplerCube downscale2x_Signed_A8_cube;
     ImageDownsamplerCube downscale2x_Signed_XA88_cube;
 
+    //
+    //  Blur Signed versions
+    //
+
+    ImageBlur2D separableBlur_Signed_XXXA8888;
+    ImageBlur2D separableBlur_Signed_XXX888;
+    ImageBlur2D separableBlur_Signed_XX88;
+    ImageBlur2D separableBlur_Signed_X8;
+    ImageBlur2D separableBlur_Signed_A8;
+    ImageBlur2D separableBlur_Signed_XA88;
+
     //-----------------------------------------------------------------------------------
     //Float32 versions
     //-----------------------------------------------------------------------------------
@@ -125,6 +159,17 @@ namespace Ogre
     ImageDownsamplerCube downscale2x_Float32_X_cube;
     ImageDownsamplerCube downscale2x_Float32_A_cube;
     ImageDownsamplerCube downscale2x_Float32_XA_cube;
+
+    //
+    //  Blur Float32 versions
+    //
+
+    ImageBlur2D separableBlur_Float32_XXXA;
+    ImageBlur2D separableBlur_Float32_XXX;
+    ImageBlur2D separableBlur_Float32_XX;
+    ImageBlur2D separableBlur_Float32_X;
+    ImageBlur2D separableBlur_Float32_A;
+    ImageBlur2D separableBlur_Float32_XA;
 
     //-----------------------------------------------------------------------------------
     //sRGB versions
@@ -153,6 +198,19 @@ namespace Ogre
     ImageDownsamplerCube downscale2x_sRGB_XA88_cube;
     ImageDownsamplerCube downscale2x_sRGB_AX88_cube;
 
+    //
+    //  Blur sRGB versions
+    //
+
+    ImageBlur2D separableBlur_sRGB_XXXA8888;
+    ImageBlur2D separableBlur_sRGB_AXXX8888;
+    ImageBlur2D separableBlur_sRGB_XXX888;
+    ImageBlur2D separableBlur_sRGB_XX88;
+    ImageBlur2D separableBlur_sRGB_X8;
+    ImageBlur2D separableBlur_sRGB_A8;
+    ImageBlur2D separableBlur_sRGB_XA88;
+    ImageBlur2D separableBlur_sRGB_AX88;
+
     struct FilterKernel
     {
         uint8   kernel[5][5];
@@ -161,8 +219,15 @@ namespace Ogre
         int8    kernelStartY;
         int8    kernelEndY;
     };
+    struct FilterSeparableKernel
+    {
+        uint8   kernel[5];
+        int8    kernelStart;
+        int8    kernelEnd;
+    };
 
     extern const FilterKernel c_filterKernels[3];
+    extern const FilterSeparableKernel c_filterSeparableKernels[1];
 
     /** @} */
     /** @} */

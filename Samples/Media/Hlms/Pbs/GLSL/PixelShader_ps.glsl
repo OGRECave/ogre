@@ -37,6 +37,7 @@ layout(std140) uniform;
 @end
 
 @insertpiece( DeclPlanarReflTextures )
+@insertpiece( DeclAreaApproxTextures )
 
 @property( hlms_vpos )
 in vec4 gl_FragCoord;
@@ -155,6 +156,7 @@ vec3 qmul( vec4 q, vec3 v )
 @property( (hlms_normal || hlms_qtangent) && !hlms_prepass )
 @insertpiece( DeclareBRDF )
 @insertpiece( DeclareBRDF_InstantRadiosity )
+@insertpiece( DeclareBRDF_AreaLightApprox )
 @end
 
 @property( use_parallax_correct_cubemaps )
@@ -374,7 +376,7 @@ void main()
 		finalColour += BRDF( passBuf.lights[@n].position.xyz, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular );@end
 @end
 
-@property( hlms_lights_point || hlms_lights_spot )	vec3 lightDir;
+@property( hlms_lights_point || hlms_lights_spot || hlms_lights_area_approx )	vec3 lightDir;
 	float fDistance;
 	vec3 tmpColour;
 	float spotCosAngle;@end
@@ -398,7 +400,7 @@ void main()
 @foreach( hlms_lights_spot, n, hlms_lights_point )
 	lightDir = passBuf.lights[@n].position.xyz - inPs.pos;
 	fDistance= length( lightDir );
-@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position.xyz ), passBuf.lights[@n].spotDirection );@end
+@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position.xyz ), passBuf.lights[@n].spotDirection.xyz );@end
 @property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - passBuf.lights[@n].position.xyz ), zAxis( passBuf.lights[@n].spotQuaternion ) );@end
 	if( fDistance <= passBuf.lights[@n].attenuation.x && spotCosAngle >= passBuf.lights[@n].spotParams.y @insertpiece( andObjLightMaskCmp ) )
 	{
@@ -415,6 +417,9 @@ void main()
 		float atten = 1.0 / (0.5 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
+
+	//Custom 2D shape lights
+	@insertpiece( DoAreaApproxLights )
 
 @insertpiece( forward3dLighting )
 @insertpiece( applyIrradianceVolumes )

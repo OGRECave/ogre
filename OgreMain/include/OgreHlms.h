@@ -141,6 +141,10 @@ namespace Ogre
 
         LightGatheringMode  mLightGatheringMode;
         uint16              mNumLightsLimit;
+        uint16              mNumAreaLightsLimit;
+        uint8               mAreaLightsRoundMultiple;
+        uint32              mAreaLightsGlobalLightListStart;
+        uint32              mRealNumAreaLights;
 
         /// Listener for adding extensions. @see setListener.
         /// Pointer is [b]never[/b] null.
@@ -361,6 +365,43 @@ namespace Ogre
         */
         void setHighQuality( bool highQuality );
         bool getHighQuality(void) const                     { return mHighQuality; }
+
+        /** Area lights use regular Forward.
+        @param areaLightsLimit
+            Maximum number of area lights that will be considered by the shader.
+            Default value is 1.
+            Use 0 to disable area lights.
+        @param areaLightsRoundMultiple
+            To prevent frequent shader recompiles, you can round the number of area lights
+            to the next multiple.
+
+            For example when areaLightsRoundMultiple = 1, if there are two area lights
+            in the frustum, shader 'A' will be used. If the camera moves and now only
+            one are light is in the frustum, shader 'B' will be used.
+
+            This maximizes GPU performance, but if the number of area lights is constantly
+            jumping, you may see a lot of recompiles until all variations are cached, which
+            can be very slow.
+
+            By setting for example, areaLightsRoundMultiple = 2, we will always generate
+            shader variations that use 2 area lights, even if there's only 1 area light in
+            the camera (if there's none, we use a different variation). The unused slot
+            will just output black.
+            If there's 3 area lights, the shader variation will be compiled to use 4.
+            This sacrifices some pixel shader GPU performance, but prevents permutation
+            explosion.
+
+            By setting areaLightsLimit = areaLightsRoundMultiple, you will minimize the number
+            of permutations and stabilize frame rates; but average framerate may be lower if
+            there are less area lights.
+
+            Default value is 1.
+            This value cannot be 0.
+            This value must be <= areaLightsLimit, unless areaLightsLimit is 0.
+        */
+        void setAreaLightForwardSettings( uint16 areaLightsLimit, uint8 areaLightsRoundMultiple );
+        uint16 getAreaLightsLimit(void) const               { return mNumAreaLightsLimit; }
+        uint8 getAreaLightsRoundMultiple(void) const        { return mAreaLightsRoundMultiple; }
 
 #if !OGRE_NO_JSON
         /** Loads datablock values from a JSON value. @see HlmsJson.
@@ -692,8 +733,11 @@ namespace Ogre
         static const IdString LightsDirNonCaster;
         static const IdString LightsPoint;
         static const IdString LightsSpot;
+        static const IdString LightsAreaApprox;
+        static const IdString LightsAreaTexMask;
         static const IdString LightsAttenuation;
         static const IdString LightsSpotParams;
+        static const IdString LightsAreaTexColour;
 
         //Change per scene pass
         static const IdString PsoClipDistances;

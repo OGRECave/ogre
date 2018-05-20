@@ -589,6 +589,7 @@ namespace Ogre {
 
         ImageDownsampler2D *downsampler2DFunc       = 0;
         ImageDownsamplerCube *downsamplerCubeFunc   = 0;
+        ImageBlur2D *separableBlur2DFunc            = 0;
 
         switch( mFormat )
         {
@@ -597,11 +598,13 @@ namespace Ogre {
             {
                 downsampler2DFunc   = downscale2x_X8;
                 downsamplerCubeFunc = downscale2x_X8_cube;
+                separableBlur2DFunc = separableBlur_X8;
             }
             else
             {
                 downsampler2DFunc   = downscale2x_sRGB_X8;
                 downsamplerCubeFunc = downscale2x_sRGB_X8_cube;
+                separableBlur2DFunc = separableBlur_sRGB_X8;
             }
             break;
         case PF_A8:
@@ -609,11 +612,13 @@ namespace Ogre {
             {
                 downsampler2DFunc   = downscale2x_A8;
                 downsamplerCubeFunc = downscale2x_A8_cube;
+                separableBlur2DFunc = separableBlur_A8;
             }
             else
             {
                 downsampler2DFunc   = downscale2x_sRGB_A8;
                 downsamplerCubeFunc = downscale2x_sRGB_A8_cube;
+                separableBlur2DFunc = separableBlur_sRGB_X8;
             }
             break;
         case PF_BYTE_LA:
@@ -621,11 +626,13 @@ namespace Ogre {
             {
                 downsampler2DFunc   = downscale2x_XA88;
                 downsamplerCubeFunc = downscale2x_XA88_cube;
+                separableBlur2DFunc = separableBlur_XA88;
             }
             else
             {
                 downsampler2DFunc   = downscale2x_sRGB_XA88;
                 downsamplerCubeFunc = downscale2x_sRGB_XA88_cube;
+                separableBlur2DFunc = separableBlur_sRGB_XA88;
             }
             break;
         case PF_RG8: case PF_R8G8_UINT:
@@ -633,11 +640,13 @@ namespace Ogre {
             {
                 downsampler2DFunc   = downscale2x_XX88;
                 downsamplerCubeFunc = downscale2x_XX88_cube;
+                separableBlur2DFunc = separableBlur_XX88;
             }
             else
             {
                 downsampler2DFunc   = downscale2x_sRGB_XX88;
                 downsamplerCubeFunc = downscale2x_sRGB_XX88_cube;
+                separableBlur2DFunc = separableBlur_sRGB_XX88;
             }
             break;
         case PF_R8G8B8: case PF_B8G8R8:
@@ -645,11 +654,13 @@ namespace Ogre {
             {
                 downsampler2DFunc   = downscale2x_XXX888;
                 downsamplerCubeFunc = downscale2x_XXX888_cube;
+                separableBlur2DFunc = separableBlur_XXX888;
             }
             else
             {
                 downsampler2DFunc   = downscale2x_sRGB_XXX888;
                 downsamplerCubeFunc = downscale2x_sRGB_XXX888_cube;
+                separableBlur2DFunc = separableBlur_sRGB_XXX888;
             }
             break;
         case PF_R8G8B8A8: case PF_B8G8R8A8:
@@ -657,11 +668,13 @@ namespace Ogre {
             {
                 downsampler2DFunc   = downscale2x_XXXA8888;
                 downsamplerCubeFunc = downscale2x_XXXA8888_cube;
+                separableBlur2DFunc = separableBlur_XXXA8888;
             }
             else
             {
                 downsampler2DFunc   = downscale2x_sRGB_XXXA8888;
                 downsamplerCubeFunc = downscale2x_sRGB_XXXA8888_cube;
+                separableBlur2DFunc = separableBlur_sRGB_XXXA8888;
             }
             break;
         case PF_A8B8G8R8: case PF_A8R8G8B8:
@@ -670,44 +683,54 @@ namespace Ogre {
             {
                 downsampler2DFunc   = downscale2x_XXXA8888;
                 downsamplerCubeFunc = downscale2x_XXXA8888_cube;
+                separableBlur2DFunc = separableBlur_XXXA8888;
             }
             else
             {
                 downsampler2DFunc   = downscale2x_sRGB_AXXX8888;
                 downsamplerCubeFunc = downscale2x_sRGB_AXXX8888_cube;
+                separableBlur2DFunc = separableBlur_sRGB_XXXA8888;
             }
             break;
         case PF_R8_SNORM: case PF_R8_SINT:
             downsampler2DFunc   = downscale2x_Signed_X8;
             downsamplerCubeFunc = downscale2x_Signed_X8_cube;
+            separableBlur2DFunc = separableBlur_Signed_X8;
             break;
         case PF_R8G8_SNORM: case PF_R8G8_SINT:
             downsampler2DFunc   = downscale2x_Signed_XX88;
             downsamplerCubeFunc = downscale2x_Signed_XX88_cube;
+            separableBlur2DFunc = separableBlur_Signed_XX88;
             break;
         case PF_R8G8B8_SNORM: case PF_R8G8B8_SINT:
             downsampler2DFunc   = downscale2x_Signed_XXX888;
             downsamplerCubeFunc = downscale2x_Signed_XXX888_cube;
+            separableBlur2DFunc = separableBlur_Signed_XXX888;
             break;
         case PF_R8G8B8A8_SNORM: case PF_R8G8B8A8_SINT:
             downsampler2DFunc   = downscale2x_Signed_XXXA8888;
             downsamplerCubeFunc = downscale2x_Signed_XXXA8888_cube;
+            separableBlur2DFunc = separableBlur_Signed_XXXA8888;
             break;
         case PF_FLOAT32_RGBA:
             downsampler2DFunc   = downscale2x_Float32_XXXA;
             downsamplerCubeFunc = downscale2x_Float32_XXXA_cube;
+            separableBlur2DFunc = separableBlur_Float32_XXXA;
             break;
         case PF_FLOAT32_RGB:
             downsampler2DFunc   = downscale2x_Float32_XXX;
             downsamplerCubeFunc = downscale2x_Float32_XXX_cube;
+            separableBlur2DFunc = separableBlur_Float32_XXX;
             break;
         case PF_FLOAT32_GR:
             downsampler2DFunc   = downscale2x_Float32_XX;
             downsamplerCubeFunc = downscale2x_Float32_XX_cube;
+            separableBlur2DFunc = separableBlur_Float32_XX;
             break;
         case PF_FLOAT32_R:
             downsampler2DFunc   = downscale2x_Float32_X;
             downsamplerCubeFunc = downscale2x_Float32_X_cube;
+            separableBlur2DFunc = separableBlur_Float32_X;
             break;
         default: //Keep compiler happy
             break;
@@ -742,6 +765,13 @@ namespace Ogre {
             memcpy( this->getPixelBox( i ).data, tempBox.data, tempBox.getConsecutiveSize() );
         }
 
+        uint8 *tmpBuffer1 = 0;
+        if( filter == FILTER_GAUSSIAN_HIGH )
+        {
+            const size_t bufSize = calculateSize( 1u, getNumFaces(), mWidth, mHeight, mDepth, mFormat );
+            tmpBuffer1 = OGRE_ALLOC_T( uint8, bufSize, MEMCATEGORY_GENERAL );
+        }
+
         uint32 dstWidth  = mWidth;
         uint32 dstHeight = mHeight;
 
@@ -756,6 +786,8 @@ namespace Ogre {
             filterIdx = 1; break;
         case FILTER_GAUSSIAN:
             filterIdx = 2; break;
+        case FILTER_GAUSSIAN_HIGH:
+            filterIdx = 1; break;
         default: // Keep compiler happy
             break;
         }
@@ -788,13 +820,45 @@ namespace Ogre {
             }
             else
             {
-                (*downsampler2DFunc)( reinterpret_cast<uint8*>( this->getPixelBox( 0, i ).data ),
-                                      reinterpret_cast<uint8*>( this->getPixelBox( 0, i - 1 ).data ),
-                                      dstWidth, dstHeight, srcWidth,
-                                      chosenFilter.kernel,
-                                      chosenFilter.kernelStartX, chosenFilter.kernelEndX,
-                                      chosenFilter.kernelStartY, chosenFilter.kernelEndY );
+                if( filter != FILTER_GAUSSIAN_HIGH )
+                {
+                    (*downsampler2DFunc)( reinterpret_cast<uint8*>( this->getPixelBox( 0, i ).data ),
+                                          reinterpret_cast<uint8*>( this->getPixelBox( 0, i - 1 ).data ),
+                                          dstWidth, dstHeight, srcWidth,
+                                          chosenFilter.kernel,
+                                          chosenFilter.kernelStartX, chosenFilter.kernelEndX,
+                                          chosenFilter.kernelStartY, chosenFilter.kernelEndY );
+                }
+                else
+                {
+                    //Copy 'this' to temp
+                    memcpy( temp.mBuffer, this->getPixelBox( 0, i - 1 ).data,
+                            this->getPixelBox( 0, i - 1 ).getConsecutiveSize() );
+
+                    //The image right now is in both 'this' and temp. We can't touch 'this',
+                    //So we blur temp, and use tmpBuffer1 to store intermediate results
+                    const FilterSeparableKernel &separableKernel = c_filterSeparableKernels[0];
+                    (*separableBlur2DFunc)( tmpBuffer1,
+                                            reinterpret_cast<uint8*>( temp.mBuffer ),
+                                            srcWidth, srcHeight,
+                                            separableKernel.kernel,
+                                            separableKernel.kernelStart, separableKernel.kernelEnd );
+
+                    //Now that temp is blurred, bilinear downsample its contents into 'this'.
+                    (*downsampler2DFunc)( reinterpret_cast<uint8*>( this->getPixelBox( 0, i ).data ),
+                                          reinterpret_cast<uint8*>( temp.mBuffer ),
+                                          dstWidth, dstHeight, srcWidth,
+                                          chosenFilter.kernel,
+                                          chosenFilter.kernelStartX, chosenFilter.kernelEndX,
+                                          chosenFilter.kernelStartY, chosenFilter.kernelEndY );
+                }
             }
+        }
+
+        if( tmpBuffer1 )
+        {
+            OGRE_FREE( tmpBuffer1, MEMCATEGORY_GENERAL );
+            tmpBuffer1 = 0;
         }
 
         return true;

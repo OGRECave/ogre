@@ -527,7 +527,8 @@ namespace Ogre
                 ++itor;
             }
 
-            mSceneManager->cullLights( camera, Light::LT_POINT, Light::NUM_LIGHT_TYPES, mCurrentLightList );
+            mSceneManager->cullLights( camera, Light::LT_POINT,
+                                       Light::MAX_FORWARD_PLUS_LIGHTS, mCurrentLightList );
 
             //Restore shadow casting lights
             itor = shadowCastingLights.begin();
@@ -542,7 +543,8 @@ namespace Ogre
         }
         else
         {
-            mSceneManager->cullLights( camera, Light::LT_POINT, Light::NUM_LIGHT_TYPES, mCurrentLightList );
+            mSceneManager->cullLights( camera, Light::LT_POINT,
+                                       Light::MAX_FORWARD_PLUS_LIGHTS, mCurrentLightList );
         }
 
         const size_t numLights = mCurrentLightList.size();
