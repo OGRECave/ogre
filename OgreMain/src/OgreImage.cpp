@@ -737,7 +737,7 @@ namespace Ogre {
         }
 
         if( (mDepth == 1 && getNumFaces() == 1 && !downsampler2DFunc) ||
-            (getNumFaces() == 6 && !downsamplerCubeFunc) )
+            (getNumFaces() == 6 && (!downsamplerCubeFunc || filter == FILTER_GAUSSIAN_HIGH)) )
         {
             return false;
         }
@@ -838,6 +838,12 @@ namespace Ogre {
                     //The image right now is in both 'this' and temp. We can't touch 'this',
                     //So we blur temp, and use tmpBuffer1 to store intermediate results
                     const FilterSeparableKernel &separableKernel = c_filterSeparableKernels[0];
+                    (*separableBlur2DFunc)( tmpBuffer1,
+                                            reinterpret_cast<uint8*>( temp.mBuffer ),
+                                            srcWidth, srcHeight,
+                                            separableKernel.kernel,
+                                            separableKernel.kernelStart, separableKernel.kernelEnd );
+                    //Filter again...
                     (*separableBlur2DFunc)( tmpBuffer1,
                                             reinterpret_cast<uint8*>( temp.mBuffer ),
                                             srcWidth, srcHeight,
