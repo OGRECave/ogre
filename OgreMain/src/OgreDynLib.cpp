@@ -97,8 +97,11 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         if(!mInst)
         {
+            name = mName;
+            if(name.substr(name.find_last_of(".") + 1) != "framework")
+                name += ".framework";
             // Try again as a framework
-            mInst = (DYNLIB_HANDLE)FRAMEWORK_LOAD( mName );
+            mInst = (DYNLIB_HANDLE)FRAMEWORK_LOAD( name );
         }
 #endif
         if( !mInst )
