@@ -4,7 +4,7 @@ GUIDE TO BUILDING OGRE
 Ogre uses [CMake](https://cmake.org/) as its build system on all supported platforms.
 This guide will explain to you how to use CMake to build Ogre from source.
 CMake is available from https://cmake.org/download/. You need a CMake
-version >= 2.8.6.
+version >= 3.3.
 
 What is CMake?
 -------------------
@@ -69,8 +69,7 @@ then build it according to its documentation.
 * POCO: http://pocoproject.org (+)
 * TBB: http://www.threadingbuildingblocks.org (+)
 
-(+) used to build threaded versions of Ogre. 
-You can use either C++11, POCO or TBB instead of Boost. When using Boost, only the boost-thread, boost-system and boost-date-time libraries are required.
+(+) can be used for threading instead of `std::thread`
 
 Running CMake
 ------------------
@@ -81,9 +80,11 @@ code* enter the path to the Ogre source directory (the directory which
 contains this file). In the field *Where to build the binaries* enter
 the path to the build directory you created.
 Hit *Configure*. A dialogue will appear asking you to select a generator.
-Choose the appropriate one for your platform and compiler. On Unix, you
-most likely want to use *Unix Makefiles*; for Visual Studio select the
-appropriate version and platform (Win32 | Win64); on Apple use Xcode.
+Choose the appropriate one for your platform and compiler.
+
+Check the [CMake documentation](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html) for details on which one is appropriate for your platform and compiler.  
+**Note** on OSX, you must to use the Xcode generator to get a proper SampleBrowser .app bundle.
+
 Click *Finish*. CMake will now gather some information about your
 build environment and try to locate the dependencies. It will then show
 a list of build options. You can adjust the settings to your liking; for
@@ -121,17 +122,14 @@ Installing Ogre
 Once the build is complete, you can optionally have the build system
 copy the built libraries and headers to a clean location. We recommend
 you do this step as it will make it easier to use Ogre in your projects.
-In Visual Studio, just select and build the target *INSTALL*. This will
-create the folder `sdk` inside your build directory and copy all the
-required libraries there. For Makefile based generators, type:
+In Visual Studio, just select and build the target *INSTALL*. For Makefile based generators, type:
 
 ```sh
 make install  # (or sudo make install, if root privileges are required)
 ```
 
-On Linux Ogre will by default be installed to `/usr/local`. You can change
-the install location by changing the variable `CMAKE_INSTALL_PREFIX` in
-CMake.
+On Linux Ogre will be installed to `/usr/local` by default. On Windows this will create the folder `sdk` inside your build directory and copy all the
+required libraries there. You can change the install location by changing the variable `CMAKE_INSTALL_PREFIX` in CMake.
 
 
 Building Ogre on Mac OS X for iOS OS
@@ -139,7 +137,9 @@ Building Ogre on Mac OS X for iOS OS
 
 To build Ogre for iOS, you need to specify the ios cross toolchain to cmake as
 
-`cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/ios.toolchain.xcode.cmake -G Xcode .`
+```
+cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/ios.toolchain.xcode.cmake -G Xcode .
+```
 
 Unfortunately, you will now have to do a few manual steps to
 make the generated build system work properly.
@@ -215,19 +215,17 @@ Building Ogre on Ubuntu for Android
 
 To build Ogre for Android, you need to specify the ios cross toolchain to cmake as
 
-`cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/android.toolchain.cmake -DANDROID_NDK=path/to/android-ndk .`
+```
+cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/android.toolchain.cmake -DANDROID_NDK=path/to/android-ndk .
+```
 
-this will build the core Ogre libraries. Also if your `PATH` contains the `ndk-build` and `android` executables it will generate the SampleBrowser APK.
+this will build the core Ogre libraries. Also if your `PATH` contains the `android` executable it will generate the SampleBrowser APK.
 
-To manually build the SampleBrowser, navigate your command prompt to the SampleBrowserNDK subfolder in your OGRE build folder and run:
+To manually generate the APK and install it on your device, run
 
-`ndk-build .`
-
-this will build the native library. Then run
-
-`ant debug install`
-
-to generate the APK and install it on your device.
+```
+ant debug install
+```
 
 Building Ogre for HTML5 (Emscripten)
 -----------------------------------------
