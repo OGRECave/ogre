@@ -96,35 +96,23 @@ namespace Ogre {
 
     void* mac_loadFramework(String name)
 	{
-        String fullPath;
-        if (name[0] != '/') { // just framework name, like "OgreTerrain"
-            // path/OgreTerrain.framework/OgreTerrain
-            fullPath = macFrameworksPath() + "/" + name + ".framework/" + name;
-        }
-        else { // absolute path, like "/Library/Frameworks/OgreTerrain.framework"
-            size_t lastSlashPos = name.find_last_of('/');
-            size_t extensionPos = name.rfind(".framework");
+        size_t lastSlashPos = name.find_last_of('/');
+        size_t extensionPos = name.rfind(".framework");
 
-            if (lastSlashPos != String::npos && extensionPos != String::npos) {
-                String realName = name.substr(lastSlashPos + 1, extensionPos - lastSlashPos - 1);
+        if (lastSlashPos != String::npos && extensionPos != String::npos && extensionPos > lastSlashPos)
+        {
+            // path, like "/Library/Frameworks/OgreTerrain.framework", append /OgreTerrain
+            String realName = name.substr(lastSlashPos + 1, extensionPos - lastSlashPos - 1);
 
-                fullPath = name + "/" + realName; 
-            }
-            else {
-                fullPath = name;
-            }
+            name += "/" + realName; 
         }
 
-    return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-}
+        return dlopen(name.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    }
 
     void* mac_loadDylib(const char* name)
     {
-        String fullPath=name;
-        if(name[0]!='/')
-            fullPath = macPluginPath()+"/"+fullPath;
-
-        return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+        return dlopen(name, RTLD_LAZY | RTLD_GLOBAL);
     }
 	
     String macBundlePath()
@@ -147,11 +135,6 @@ namespace Ogre {
         return String(path);
     }
     
-    String macPluginPath()
-	{
-		return macBundlePath() + "/Contents/Plugins/";
-	}
-
     String macCachePath()
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -159,11 +142,6 @@ namespace Ogre {
         
         return [cachesDirectory cStringUsingEncoding:NSASCIIStringEncoding];
     }
-
-    String macFrameworksPath()
-	{
-		return macBundlePath() + "/Contents/Frameworks/";
-	}
 
     String macTempFileName()
     {
