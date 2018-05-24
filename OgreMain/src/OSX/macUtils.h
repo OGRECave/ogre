@@ -35,7 +35,7 @@ namespace Ogre {
     bool mac_unloadExeBundle(CFBundleRef bundle);
     void* mac_loadDylib(const char* name);
     void* mac_loadFramework(String name);
-    _OgreExport String macBundlePath();
-    _OgreExport String macCachePath();
-    _OgreExport String macTempFileName(void);
+    String macBundlePath();
+    String macCachePath();
+    String macTempFileName(void);
 }
