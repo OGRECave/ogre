@@ -192,8 +192,8 @@ namespace Ogre {
     void Rectangle2D::setUVs( const Ogre::Vector2 &topLeft, const Ogre::Vector2 &bottomLeft,
                                 const Ogre::Vector2 &topRight, const Ogre::Vector2 &bottomRight)
     {
-        if( mRenderOp.vertexData->vertexDeclaration->getElementCount() <= TEXCOORD_BINDING )
-            return; //Vertex data wasn't built with UV buffer
+        OgreAssert(mRenderOp.vertexData->vertexDeclaration->getElementCount() > TEXCOORD_BINDING,
+                   "Vertex data wasn't built with UV buffer");
 
         HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(TEXCOORD_BINDING);
