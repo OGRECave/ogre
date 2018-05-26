@@ -5,6 +5,7 @@
     - @subpage setup
     - @subpage tut_FirstScene
     - @subpage tut_LightsCamerasShadows
+    - @subpage working-with-numpy
 - Components
     - @subpage rtss
     - @subpage hlms
