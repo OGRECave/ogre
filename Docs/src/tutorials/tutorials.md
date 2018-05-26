@@ -1,6 +1,7 @@
 # Tutorials {#tutorials}
 
 - Getting Started
+    - @subpage building-ogre
     - @subpage setup
     - @subpage tut_FirstScene
     - @subpage tut_LightsCamerasShadows
