@@ -46,6 +46,7 @@ if(DOXYGEN_FOUND)
         ${OGRE_SOURCE_DIR}/Docs/src/high-level-programs.md
         ${OGRE_SOURCE_DIR}/Docs/src/particle-scripts.md
         ${OGRE_SOURCE_DIR}/Docs/src/hardware-buffers.md
+        ${OGRE_SOURCE_DIR}/BuildingOgre.md
         ${TUTORIALS}
         ${BASIC_TUTORIALS})
     string(REPLACE ";" " \\\n" CMAKE_DOXYGEN_INPUT_LIST "${CMAKE_DOXYGEN_INPUT_LIST}")
