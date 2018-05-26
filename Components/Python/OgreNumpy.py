@@ -53,5 +53,7 @@ def view(o):
         tp = ctypes.POINTER(ctypes.c_uint8)
         shape = (o.getHeight(), o.getWidth(), Ogre.PixelUtil.getNumElemBytes(o.format))
         ptr = o.data
+    else:
+        raise TypeError("do not know how to map '{}'".format(type(o).__name__))
          
     return npc.as_array(ctypes.cast(int(ptr), tp), shape)
