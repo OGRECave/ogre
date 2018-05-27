@@ -1,7 +1,5 @@
 # RTSS: Run Time Shader System {#rtss}
 
-This component is used to generate shaders on the fly based on object material properties, scene setup and other user definitions.
-
 @tableofcontents
 
 # Core features of the system {#core-feats}
@@ -16,8 +14,7 @@ This component is used to generate shaders on the fly based on object material p
 
 # System overview {#rtss_overview}
 
-The RTSS is not another Uber shader with an exploding amount of @c \#ifdefs that make it increasingly difficult to add new functionality. 
-Instead, it manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
+The RTSS manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
 These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @ref FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, @ref FFP_FUNC_LIGHT_POINT_DIFFUSE.
 
 Correctly ordering these functions, providing them with the right input values and interconnecting them is the main purpose of the RTSS.
@@ -323,32 +320,3 @@ A couple of notes on debugging shaders coming from the RTSS:
   * Once a shader is written to the disk, as long as you don't change the code behind it, the same shader will be picked up in the next application run even if its content has changed. If you have compilation or visual problems with the shader you can try to manually tinker with it without compiling the code again and again.
 * Find the file OgreShaderProgramManager.cpp and add a breakpoint at `pGpuProgram.setNull();` (in createGpuProgram). If a shader will fail to compile it will usually fail there. Once that happens you can find the shader name under the `programName` parameter, then look for it in the cache directory you created.
 * Other common problems with creating shaders in RTSS usually occur from defining vertex shader parameters and using them in the pixel shader and vice versa. so watch out for those.
-
-# Historical background {#history}
-When the early graphic cards came into the market they contained a fixed but large set of functions with which you could influence how 3D object were rendered. These included influencing object positions using matrices, calculating the effect of textures on a pixel, calculating the effect of lights on vertices and so on. These set of functions and their implementation in hardware became later known as the graphic card fixed pipeline (or Fixed Function Pipeline).
-
-As graphic cards became more powerful and graphic application became more complex, a need for new ways to manipulate the rendering of 3D models became apparent. This need saw the introduction of shaders. 
-
-Shaders are small custom made programs that run directly on the graphics card. Using these programs, one could replace the calculations that were made by the fixed pipeline and add new functionality. However there was a catch: If shaders are used on an object, the object can no longer use any of the functionality of the fixed pipeline. Any calculation that was used in the fixed pipeline needed to be recreated in the shaders. With early graphics applications this was not problematic. Shaders were simple and their numbers were kept low. However as applications grew in complexity this meant that the need for shaders grew as well. As a programmer you were left with 2 choices, both bad. Either create an exuberant amount of small shaders that soon became too many to effectively maintain. Or create an uber shader, a huge complex shader, that soon became too complex to effectively maintain as well.
-
-The RTSS seeks to fix those problems by automatically generating shaders based on the operations previously required from the fixed pipeline and new capabilities required by the user.
-
-With the introduction of the version 11 of Direct3D, a new reason for having an RTSS like system became apparent. With D3D11 support for fixed pipeline functionality was removed. Meaning, you can only render objects using shaders. The RTSS becomes an excellent tool for this purpose.
-
-# Pros and Cons {#pros-cons}
-Writing shading programs became a very common task when developing 3D based application during the last couple of years.
-Most of the visual effects used by 3D based applications involve shader programs.
-Here is just a short list of some common effects using shaders
-* Hardware animation (a.k.a hardware skinning)
-* Soft shadows
-* Normal/Bump maps
-* Specular maps
-* Advanced multi-texturing effects
-
-Writing shaders by hand is in many cases the best solution as one has full control of the shader code and hence optimizations based on the target scene nature can be made, etc.
-
-So why use a runtime shader system anyway?
-
-* Save development time e.g. when your target scene has dynamic lights and the number changes, fog changes, ... and the number of material attributes increases the total count of needed shaders dramatically. It can easily cross 100 and it becomes a time consuming development task.
-* Reusable code - once you've written the shader extension you can use it anywhere due to its independent nature.
-* Custom shaders extension library - enjoy the shared library of effects created by the community. Unlike hand written shader code, which may require many adjustments to be plugged into your own shader code, using the extensions library requires minimum changes.

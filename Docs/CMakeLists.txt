@@ -46,6 +46,8 @@ if(DOXYGEN_FOUND)
         ${OGRE_SOURCE_DIR}/Docs/src/high-level-programs.md
         ${OGRE_SOURCE_DIR}/Docs/src/particle-scripts.md
         ${OGRE_SOURCE_DIR}/Docs/src/hardware-buffers.md
+        ${OGRE_SOURCE_DIR}/Docs/src/hlms.md
+        ${OGRE_SOURCE_DIR}/Docs/src/rtss.md
         ${OGRE_SOURCE_DIR}/BuildingOgre.md
         ${TUTORIALS}
         ${BASIC_TUTORIALS})

@@ -7,15 +7,11 @@ It is a different take to the Uber shader management, but instead of using plain
 Additionally it allows you to define a set of abstract properties that are then used to
 configure the shader generation.
 
-Basically it solves the same problem like the @ref rtss : automatically generate
-a shader based on an abstract description so you do not have to write them yourself.
-
-But while the RTSS uses the classical @ref Material-Scripts and several C++ classes 
-to glue code together, the HLMS instead relies on textual shader templates.
-
 Currently there is only the Physically Based Shading (PBS) material implementation based on the HLMS
 that does not read the classical Materials and therefore does not respect 
 the settings for fog, diffuse_color etc.
+
+@attention This documentation was originally written for %Ogre 2.1, so not all details apply to the actual HLMS backport.
 
 @tableofcontents
 
@@ -67,30 +63,6 @@ The Toon Shading has its own C++ implementation and set of shaders.
 It is theoretically possible to implement both Toon & PBS in the same
 C++ module, but that would be crazy, hard to maintain and not very
 modular.
-
-# Compared to classical materials {#materials}
-
-Materials are still useful for:
-
--   Quick iteration. You need to write a shader, just define the
-    material and start coding. Why would you deal with the template’s
-    syntax or a C++ module when you can just write a script and
-    start coding?. The HLMS though comes with a Command line tool to
-    know how your template translates into a final shader (which is very
-    handy for iteration, it’s fast, and will check for syntax errors!),
-    but it’s most useful when you want to write your own C++ module or
-    change the template, not when you want to just experiment. Besides,
-    old timers are used to writing materials.
-
--   Postprocessing effects. Materials are much better suited for this.
-    Materials are data driven, easy to write. Postprocessing FXs don’t
-    need an awful lot of permutations (i.e. having to deal with shadow
-    mapping, instancing, skeleton animation, facial animation). And
-    they’re at no performance disadvantage compared to HLMS: Each FX is
-    a fullscreen pass that needs different shaders, different textures,
-    its own uniforms. Basically, API overhead we can’t optimize. But it
-    doesn’t matter much either, because it’s not like there are 100
-    fullscreen passes. Usually there’s less than 10.
 
 #  Material parameters are stored in “Blocks” {#data}
 

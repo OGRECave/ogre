@@ -5,6 +5,7 @@ Manual {#manual}
 - @subpage The-Core-Objects
 - @subpage Scripts
 - @subpage High-level-Programs
+- @subpage Runtime-Shader-Generation
 - @subpage Mesh-Tools
 - @subpage Hardware-Buffers
 - @subpage Shadows
