@@ -356,8 +356,6 @@ namespace Ogre {
         ParticleIterator _getIterator(void);
 
         /** Sets the name of the material to be used for this billboard set.
-            @param
-                name The new name of the material to use for this set.
         */
         virtual void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 

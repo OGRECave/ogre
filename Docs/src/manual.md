@@ -378,25 +378,25 @@ By default Ogre treats all non-transparent objects as shadow casters and receive
 <dl compact="compact">
 <dt>Turning off shadow casting on the light</dt> <dd>
 
-Calling Light::setCastsShadows(false) will mean this light casts no shadows at all.
+Calling `Light::setCastShadows(false)` will mean this light casts no shadows at all.
 
 </dd> <dt>Turn off shadow receipt on a material</dt> <dd>
 
-Calling Material::setReceiveShadows(false) will prevent any objects using this material from receiving shadows.
+Calling `Material::setReceiveShadows(false)` will prevent any objects using this material from receiving shadows.
 
 </dd> <dt>Turn off shadow casting on individual objects</dt> <dd>
 
-Calling MovableObject::setCastsShadows(false) will disable shadow casting for this object.
+Calling `MovableObject::setCastShadows(false)` will disable shadow casting for this object.
 
 </dd> <dt>Turn off shadows on an entire rendering queue group</dt> <dd>
 
-Calling RenderQueueGroup::setShadowsEnabled(false) will turn off both shadow casting and receiving on an entire rendering queue group. This is useful because Ogre has to do light setup tasks per group in order to preserve the inter-group ordering. Ogre automatically disables shadows on a number of groups automatically, such as RENDER\_QUEUE\_BACKGROUND, RENDER\_QUEUE\_OVERLAY, RENDER\_QUEUE\_SKIES\_EARLY and RENDER\_QUEUE\_SKIES\_LATE. If you choose to use more rendering queues (and by default, you won’t be using any more than this plus the ’standard’ queue, so ignore this if you don’t know what it means!), be aware that each one can incur a light setup cost, and you should disable shadows on the additional ones you use if you can.
+Calling `RenderQueueGroup::setShadowsEnabled(false)` will turn off both shadow casting and receiving on an entire rendering queue group. This is useful because Ogre has to do light setup tasks per group in order to preserve the inter-group ordering. Ogre automatically disables shadows on a number of groups automatically, such as `RENDER_QUEUE_BACKGROUND, RENDER_QUEUE_OVERLAY, RENDER_QUEUE_SKIES_EARLY` and `RENDER_QUEUE_SKIES_LATE`. If you choose to use more rendering queues (and by default, you won’t be using any more than this plus the ’standard’ queue, so ignore this if you don’t know what it means!), be aware that each one can incur a light setup cost, and you should disable shadows on the additional ones you use if you can.
 
 </dd> </dl>
 
 # Stencil Shadows {#Stencil-Shadows}
 
-Stencil shadows are a method by which a ’mask’ is created for the screen using a feature called the stencil buffer. This mask can be used to exclude areas of the screen from subsequent renders, and thus it can be used to either include or exclude areas in shadow. They are enabled by calling SceneManager::setShadowTechnique with a parameter of either `SHADOWTYPE_STENCIL_ADDITIVE` or `SHADOWTYPE_STENCIL_MODULATIVE`. Because the stencil can only mask areas to be either ’enabled’ or ’disabled’, stencil shadows have ’hard’ edges, that is to say clear dividing lines between light and shadow - it is not possible to soften these edges.
+Stencil shadows are a method by which a ’mask’ is created for the screen using a feature called the stencil buffer. This mask can be used to exclude areas of the screen from subsequent renders, and thus it can be used to either include or exclude areas in shadow. They are enabled by calling Ogre::SceneManager::setShadowTechnique with a parameter of either `SHADOWTYPE_STENCIL_ADDITIVE` or `SHADOWTYPE_STENCIL_MODULATIVE`. Because the stencil can only mask areas to be either ’enabled’ or ’disabled’, stencil shadows have ’hard’ edges, that is to say clear dividing lines between light and shadow - it is not possible to soften these edges.
 
 In order to generate the stencil, ’shadow volumes’ are rendered by extruding the silhouette of the shadow caster away from the light. Where these shadow volumes intersect other objects (or the caster, since self-shadowing is supported using this technique), the stencil is updated, allowing subsequent operations to differentiate between light and shadow. How exactly this is used to render the shadows depends on whether [Modulative Shadows](#Modulative-Shadows) or [Additive Light Masking](#Additive-Light-Masking) is being used. Objects can both cast and receive stencil shadows, so self-shadowing is inbuilt. 
 

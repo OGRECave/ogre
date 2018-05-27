@@ -33,7 +33,7 @@ if(DOXYGEN_FOUND)
     file(GLOB BASIC_TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/basictutorials/*.md)
 
     set(CMAKE_DOXYGEN_INPUT_LIST
-        ${OGRE_SOURCE_DIR}/OgreMain
+        ${OGRE_SOURCE_DIR}/OgreMain/include
         ${OGRE_SOURCE_DIR}/Components
         ${OGRE_SOURCE_DIR}/PlugIns
         ${OGRE_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md

@@ -119,7 +119,6 @@ public:
     /** 
     Set the target shader language.
     @param shaderLanguage The output shader language to use.
-    @param version
     @remarks The default shader language is cg.
     */
     void setTargetLanguage(const String& shaderLanguage);
