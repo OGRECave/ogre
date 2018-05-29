@@ -767,9 +767,7 @@ The maximum number of lights which can be used when rendering fixed-function mat
 
 Default: max\_lights 8<br>
 
-<a name="iteration"></a><a name="iteration-1"></a>
-
-## iteration
+## iteration {#iteration}
 
 Sets whether or not this pass is iterated, i.e. issued more than once.
 

@@ -18,17 +18,17 @@ classes.
 | MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
 
 ## Index Of Contents
-* [What's New?](Docs/1.10-Notes.md)  
+* [What's New?](Docs/1.11-Notes.md)  
 A summary of the new and altered features in this release.
 * [Features](http://www.ogre3d.org/about/features)  
 A summary of OGRE's main features.
-* [Building the core OGRE libraries](BuildingOgre.md)  
+* [Building the core OGRE libraries](https://ogrecave.github.io/ogre/api/latest/building-ogre.html)  
 If you're using the full source release, this will help you build it. If you're using a precompiled SDK then most of the work has already been done for you, and you should use the sample projects to see how to compile your own code against OGRE.
-* [The OGRE Manual](https://ogrecave.github.io/ogre/api/1.10/manual.html)  
+* [The OGRE Manual](https://ogrecave.github.io/ogre/api/latest/manual.html)  
 A high-level guide to the major parts of the engine and script reference.
-* [API Reference](https://ogrecave.github.io/ogre/api/1.10/)  
+* [API Reference](https://ogrecave.github.io/ogre/api/latest/)  
 The full OGRE API documentation, as generated from the (heavily!) commented source.
-* [The OGRE Tutorials](https://ogrecave.github.io/ogre/api/1.10/tutorials.html)  
+* [The OGRE Tutorials](https://ogrecave.github.io/ogre/api/latest/tutorials.html)  
 A gold mine of tutorials, tips and code snippets which will help you get up to speed with the engine.
 
 ## Contributing

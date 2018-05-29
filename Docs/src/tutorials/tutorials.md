@@ -7,8 +7,6 @@
     - @subpage tut_LightsCamerasShadows
     - @subpage working-with-numpy
 - Components
-    - @subpage rtss
-    - @subpage hlms
     - @subpage trays
     - @subpage volume
 - @subpage profiler

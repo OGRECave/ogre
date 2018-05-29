@@ -33,7 +33,7 @@ if(DOXYGEN_FOUND)
     file(GLOB BASIC_TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/basictutorials/*.md)
 
     set(CMAKE_DOXYGEN_INPUT_LIST
-        ${OGRE_SOURCE_DIR}/OgreMain
+        ${OGRE_SOURCE_DIR}/OgreMain/include
         ${OGRE_SOURCE_DIR}/Components
         ${OGRE_SOURCE_DIR}/PlugIns
         ${OGRE_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md
@@ -46,6 +46,8 @@ if(DOXYGEN_FOUND)
         ${OGRE_SOURCE_DIR}/Docs/src/high-level-programs.md
         ${OGRE_SOURCE_DIR}/Docs/src/particle-scripts.md
         ${OGRE_SOURCE_DIR}/Docs/src/hardware-buffers.md
+        ${OGRE_SOURCE_DIR}/Docs/src/hlms.md
+        ${OGRE_SOURCE_DIR}/Docs/src/rtss.md
         ${OGRE_SOURCE_DIR}/BuildingOgre.md
         ${TUTORIALS}
         ${BASIC_TUTORIALS})
