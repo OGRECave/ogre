@@ -41,15 +41,12 @@ namespace Ogre {
         assert( msSingleton );  return ( *msSingleton );  
     }
     //---------------------------------------------------------------------
-    HardwareBufferManager::HardwareBufferManager(HardwareBufferManagerBase* imp)
-        : HardwareBufferManagerBase(), mImpl(imp)
+    HardwareBufferManager::HardwareBufferManager()
     {
-
     }
     //---------------------------------------------------------------------
     HardwareBufferManager::~HardwareBufferManager()
     {
-        // mImpl must be deleted by the creator
     }
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------

@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Implementation of HardwareBufferManager for D3D11. */
-    class _OgreD3D11Export D3D11HardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreD3D11Export D3D11HardwareBufferManager : public HardwareBufferManager
     {
     protected:
         D3D11Device & mlpD3DDevice;
@@ -45,8 +45,8 @@ namespace Ogre {
         void destroyVertexDeclarationImpl(VertexDeclaration* decl);
 
     public:
-        D3D11HardwareBufferManagerBase(D3D11Device & device);
-        ~D3D11HardwareBufferManagerBase();
+        D3D11HardwareBufferManager(D3D11Device & device);
+        ~D3D11HardwareBufferManager();
         /// Creates a vertex buffer
         HardwareVertexBufferSharedPtr 
             createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
@@ -68,22 +68,7 @@ namespace Ogre {
                                                            bool useShadowBuffer = false, const String& name = "");
     };
 
-    /// D3D11HardwareBufferManagerBase as a Singleton
-    class _OgreD3D11Export D3D11HardwareBufferManager : public HardwareBufferManager
-    {
-    public:
-        D3D11HardwareBufferManager(D3D11Device & device)
-            : HardwareBufferManager(OGRE_NEW D3D11HardwareBufferManagerBase(device)) 
-        {
-
-        }
-        ~D3D11HardwareBufferManager()
-        {
-            OGRE_DELETE mImpl;
-        }
-    };
-
-
+    typedef D3D11HardwareBufferManager D3D11HardwareBufferManagerBase;
 }
 
 

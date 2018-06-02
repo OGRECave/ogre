@@ -38,23 +38,23 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    GLES2HardwareBufferManagerBase::GLES2HardwareBufferManagerBase()
+    GLES2HardwareBufferManager::GLES2HardwareBufferManager()
     {
         mRenderSystem = getGLES2RenderSystem();
     }
 
-    GLES2HardwareBufferManagerBase::~GLES2HardwareBufferManagerBase()
+    GLES2HardwareBufferManager::~GLES2HardwareBufferManager()
     {
         destroyAllDeclarations();
         destroyAllBindings();
     }
 
-    GLES2StateCacheManager * GLES2HardwareBufferManagerBase::getStateCacheManager()
+    GLES2StateCacheManager * GLES2HardwareBufferManager::getStateCacheManager()
     {
         return mRenderSystem->_getStateCacheManager();
     }
 
-    void GLES2HardwareBufferManagerBase::notifyContextDestroyed(GLContext* context)
+    void GLES2HardwareBufferManager::notifyContextDestroyed(GLContext* context)
     {
         OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);
         for(VertexDeclarationList::iterator it = mVertexDeclarations.begin(), it_end = mVertexDeclarations.end(); it != it_end; ++it)
@@ -62,7 +62,7 @@ namespace Ogre {
     }
 
     HardwareVertexBufferSharedPtr
-        GLES2HardwareBufferManagerBase::createVertexBuffer(size_t vertexSize,
+        GLES2HardwareBufferManager::createVertexBuffer(size_t vertexSize,
                                                       size_t numVerts,
                                                       HardwareBuffer::Usage usage,
                                                       bool useShadowBuffer)
@@ -79,7 +79,7 @@ namespace Ogre {
         return HardwareVertexBufferSharedPtr(buf);
     }
 
-    HardwareIndexBufferSharedPtr GLES2HardwareBufferManagerBase::createIndexBuffer(HardwareIndexBuffer::IndexType itype,
+    HardwareIndexBufferSharedPtr GLES2HardwareBufferManager::createIndexBuffer(HardwareIndexBuffer::IndexType itype,
                                                                               size_t numIndexes,
                                                                               HardwareBuffer::Usage usage,
                                                                               bool useShadowBuffer)
@@ -96,7 +96,7 @@ namespace Ogre {
         return HardwareIndexBufferSharedPtr(buf);
     }
 
-    RenderToVertexBufferSharedPtr GLES2HardwareBufferManagerBase::createRenderToVertexBuffer()
+    RenderToVertexBufferSharedPtr GLES2HardwareBufferManager::createRenderToVertexBuffer()
     {
         if(mRenderSystem->hasMinGLVersion(3, 0))
             return RenderToVertexBufferSharedPtr(new GLES2RenderToVertexBuffer());
@@ -105,18 +105,18 @@ namespace Ogre {
         return RenderToVertexBufferSharedPtr();
     }
 
-    VertexDeclaration* GLES2HardwareBufferManagerBase::createVertexDeclarationImpl(void)
+    VertexDeclaration* GLES2HardwareBufferManager::createVertexDeclarationImpl(void)
     {
         return OGRE_NEW GLVertexArrayObject();
     }
 
-    void GLES2HardwareBufferManagerBase::destroyVertexDeclarationImpl(VertexDeclaration* decl)
+    void GLES2HardwareBufferManager::destroyVertexDeclarationImpl(VertexDeclaration* decl)
     {
         if(decl)
             OGRE_DELETE decl;
     }
 
-    GLenum GLES2HardwareBufferManagerBase::getGLType(VertexElementType type)
+    GLenum GLES2HardwareBufferManager::getGLType(VertexElementType type)
     {
         switch(type)
         {
@@ -170,13 +170,13 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    Ogre::HardwareUniformBufferSharedPtr GLES2HardwareBufferManagerBase::createUniformBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name )
+    Ogre::HardwareUniformBufferSharedPtr GLES2HardwareBufferManager::createUniformBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name )
     {
         if(!mRenderSystem->hasMinGLVersion(3, 0))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                 "GLES2 does not support uniform buffer objects",
-                "GLES2HardwareBufferManagerBase::createUniformBuffer");
+                "GLES2HardwareBufferManager::createUniformBuffer");
         }
 
         GLES2HardwareUniformBuffer* buf =
@@ -188,11 +188,11 @@ namespace Ogre {
         return HardwareUniformBufferSharedPtr(buf);
     }
     //---------------------------------------------------------------------
-    Ogre::HardwareCounterBufferSharedPtr GLES2HardwareBufferManagerBase::createCounterBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name )
+    Ogre::HardwareCounterBufferSharedPtr GLES2HardwareBufferManager::createCounterBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name )
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                     "GLES2 does not support atomic counter buffers",
-                    "GLES2HardwareBufferManagerBase::createCounterBuffer");
+                    "GLES2HardwareBufferManager::createCounterBuffer");
     }
 
 }
