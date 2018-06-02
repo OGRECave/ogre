@@ -144,6 +144,14 @@ endif()
 # must come last in case of static build
 list(APPEND OGRE_LIBRARIES OgreMain)
 
+foreach(_comp ${OGRE_FIND_COMPONENTS})
+  list (FIND OGRE_COMPONENTS ${_comp} _index)
+  if (_index EQUAL -1 AND OGRE_FIND_REQUIRED_${_comp})
+    set(OGRE_FOUND False)
+    set(OGRE_NOT_FOUND_MESSAGE "Component '${_comp}' is required but was not found")
+  endif()
+endforeach()
+
 if(NOT OGRE_FIND_QUIETLY)
     message(STATUS "Found OGRE")
     message(STATUS "  static     : ${OGRE_STATIC}")
