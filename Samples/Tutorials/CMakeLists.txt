@@ -2,8 +2,8 @@ cmake_minimum_required (VERSION 2.8)
 project(OgreTutorialsSample)
 
 ## [discover_ogre]
-# specify which version you need
-find_package(OGRE 1.11 REQUIRED)
+# specify which version and components you need
+find_package(OGRE 1.11 REQUIRED COMPONENTS Bites RTShaderSystem)
 
 # copy resource.cfg next to our binaries where OGRE looks for it
 file(COPY ${OGRE_CONFIG_DIR}/resources.cfg DESTINATION ${CMAKE_BINARY_DIR})
