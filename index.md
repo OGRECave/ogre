@@ -4,13 +4,13 @@
 OGRE is a scene-oriented, flexible 3D engine written in C++ designed to make it easier and more intuitive for developers to produce games and demos utilising 3D hardware. The class library abstracts all the details of using the underlying system libraries like Direct3D and OpenGL and provides an interface based on world objects and other intuitive classes.
 
 * [Features](http://www.ogre3d.org/about/features)
-* [Manual](https://ogrecave.github.io/ogre/api/1.10/manual.html)
+* [Manual](https://ogrecave.github.io/ogre/api/latest/manual.html)
 
 # Latest release
 The latest release is [![GitHub release](https://img.shields.io/github/release/ogrecave/ogre.svg)](https://github.com/OGRECave/ogre/releases/latest). For more information see:
 
-* [API documentation](https://ogrecave.github.io/ogre/api/1.10/)
-* [New and Noteworthy](https://github.com/OGRECave/ogre/blob/v1.10.4/Docs/1.10-Notes.md) (compared to v1.9)
+* [API documentation](https://ogrecave.github.io/ogre/api/latest/)
+* [New and Noteworthy](https://github.com/OGRECave/ogre/blob/v1.11.0/Docs/1.11-Notes.md) (compared to v1.10)
 * [API/ ABI changes](https://abi-laboratory.pro/tracker/timeline/ogre/) (since v1.7)
 
 ## Try it
