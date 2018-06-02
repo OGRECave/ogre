@@ -37,19 +37,19 @@ THE SOFTWARE.
 
 namespace Ogre {
 	//-----------------------------------------------------------------------
-	D3D11HardwareBufferManagerBase::D3D11HardwareBufferManagerBase(D3D11Device & device)
+	D3D11HardwareBufferManager::D3D11HardwareBufferManager(D3D11Device & device)
 		: mlpD3DDevice(device)
 	{
 	}
 	//-----------------------------------------------------------------------
-	D3D11HardwareBufferManagerBase::~D3D11HardwareBufferManagerBase()
+	D3D11HardwareBufferManager::~D3D11HardwareBufferManager()
 	{
 		destroyAllDeclarations();
 		destroyAllBindings();
 	}
 	//-----------------------------------------------------------------------
 	HardwareVertexBufferSharedPtr
-		D3D11HardwareBufferManagerBase::
+		D3D11HardwareBufferManager::
 		createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage,
 		bool useShadowBuffer)
 	{
@@ -64,7 +64,7 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	HardwareVertexBufferSharedPtr
-		D3D11HardwareBufferManagerBase::
+		D3D11HardwareBufferManager::
 		createStreamOutputVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage,
 		bool useShadowBuffer)
 	{
@@ -79,7 +79,7 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	HardwareIndexBufferSharedPtr
-		D3D11HardwareBufferManagerBase::
+		D3D11HardwareBufferManager::
 		createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes,
 		HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
@@ -95,13 +95,13 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	RenderToVertexBufferSharedPtr
-		D3D11HardwareBufferManagerBase::createRenderToVertexBuffer()
+		D3D11HardwareBufferManager::createRenderToVertexBuffer()
 	{
 		return RenderToVertexBufferSharedPtr(new D3D11RenderToVertexBuffer(mlpD3DDevice, this));
 	}
 	//-----------------------------------------------------------------------
 	HardwareUniformBufferSharedPtr
-		D3D11HardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+		D3D11HardwareBufferManager::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
 	{
 		assert(sizeBytes > 0);
 		D3D11HardwareUniformBuffer* uni = 0;
@@ -138,20 +138,20 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	HardwareCounterBufferSharedPtr
-		D3D11HardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
+		D3D11HardwareBufferManager::createCounterBuffer(size_t sizeBytes,
 		HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
 	{
 		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 			"*** not implemented ***",
-			"D3D11HardwareBufferManagerBase::createCounterBuffer");
+			"D3D11HardwareBufferManager::createCounterBuffer");
 	}
 	//-----------------------------------------------------------------------
-	VertexDeclaration* D3D11HardwareBufferManagerBase::createVertexDeclarationImpl(void)
+	VertexDeclaration* D3D11HardwareBufferManager::createVertexDeclarationImpl(void)
 	{
 		return new D3D11VertexDeclaration(mlpD3DDevice);
 	}
 	//-----------------------------------------------------------------------
-	void D3D11HardwareBufferManagerBase::destroyVertexDeclarationImpl(VertexDeclaration* decl)
+	void D3D11HardwareBufferManager::destroyVertexDeclarationImpl(VertexDeclaration* decl)
 	{
 		delete decl;
 	}
