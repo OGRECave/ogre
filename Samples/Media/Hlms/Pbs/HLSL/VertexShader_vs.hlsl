@@ -28,8 +28,14 @@ struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
 	float4 gl_Position: SV_Position;
-	@foreach( n, hlms_pso_clip_distances )
-		float gl_ClipDistance@n : SV_ClipDistance@n;
+
+	@pdiv( full_pso_clip_distances, hlms_pso_clip_distances, 4 )
+	@pmod( partial_pso_clip_distances, hlms_pso_clip_distances, 4 )
+	@foreach( full_pso_clip_distances, n )
+		float4 gl_ClipDistance@n : SV_ClipDistance@n;
+	@end
+	@property( partial_pso_clip_distances )
+		float@value( partial_pso_clip_distances ) gl_ClipDistance@value( full_pso_clip_distances ) : SV_ClipDistance@value( full_pso_clip_distances );
 	@end
 };
 
