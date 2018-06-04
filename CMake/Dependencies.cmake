@@ -152,6 +152,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+        -DWITH_PNG=OFF
         -DWITH_BZip2=OFF # tries to use it on iOS otherwise
         # workaround for broken iOS toolchain in freetype
         -DPROJECT_SOURCE_DIR=${CMAKE_BINARY_DIR}/freetype-2.9
