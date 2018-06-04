@@ -118,46 +118,6 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             --build ${CMAKE_BINARY_DIR}/zlib-1.2.11 ${BUILD_COMMAND_OPTS})
     endif()
 
-    if(MSVC OR MINGW) # other platforms dont need this
-        message(STATUS "Building libpng")
-        find_package(ZLIB)
-        file(DOWNLOAD
-            ftp://ftp-osl.osuosl.org/pub/libpng/src/libpng16/libpng-1.6.34.tar.gz
-            ${OGRE_BINARY_DIR}/libpng-1.6.34.tar.gz)
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            -E tar xf libpng-1.6.34.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
-        # Patching No CMAKE_ASM_COMPILER could be found with MSVC 2015 on project( ASM )
-        # https://gitlab.kitware.com/cmake/cmake/issues/17532
-        # https://github.com/glennrp/libpng/commit/f07b985ddb73329bead8a46df3e0e80081e3acc4
-        file(READ ${OGRE_BINARY_DIR}/libpng-1.6.34/CMakeLists.txt filedata)
-        string(REPLACE
-            "project(libpng ASM C)"
-            "project(libpng C ASM)"
-            filedata "${filedata}")
-        file(WRITE ${OGRE_BINARY_DIR}/libpng-1.6.34/CMakeLists.txt "${filedata}" )
-
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            -E make_directory ${OGRE_BINARY_DIR}/libpng-build)
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            -DPNG_STATIC=TRUE
-            -DPNG_SHARED=${OGREDEPS_SHARED}
-            -DZLIB_LIBRARY=${ZLIB_LIBRARIES}
-            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIRS}
-            -G ${CMAKE_GENERATOR}
-            -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-            ${CROSS}
-            ${OGRE_BINARY_DIR}/libpng-1.6.34
-            WORKING_DIRECTORY ${OGRE_BINARY_DIR}/libpng-build)
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            --build ${OGRE_BINARY_DIR}/libpng-build ${BUILD_COMMAND_OPTS})
-
-        file(GLOB PNG_LIBRARIES "${OGRE_BINARY_DIR}/Dependencies/lib/libpng*.lib")
-        list(SORT PNG_LIBRARIES)
-        message("PNG_LIBRARIES: ${PNG_LIBRARIES}")
-    endif()
-
     message(STATUS "Building ZZIPlib")
     file(DOWNLOAD
         https://github.com/paroj/ZZIPlib/archive/master.tar.gz
@@ -192,6 +152,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+        -DWITH_PNG=OFF
         -DWITH_BZip2=OFF # tries to use it on iOS otherwise
         # workaround for broken iOS toolchain in freetype
         -DPROJECT_SOURCE_DIR=${CMAKE_BINARY_DIR}/freetype-2.9
