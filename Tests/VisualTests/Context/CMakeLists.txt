@@ -104,7 +104,6 @@ if (APPLE)
       COMMAND ditto ${OGRE_SOURCE_DIR}/Tests/Media ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Media
     )
   else()
-    set(OGRE_OSX_BUILD_CONFIGURATION "$(PLATFORM_NAME)/$(CONFIGURATION)")
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE TRUE)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_ICON_FILE SampleBrowser_OSX.icns)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
@@ -116,9 +115,7 @@ if (APPLE)
 		${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/TestContext.app/Contents)
 	add_custom_command(TARGET TestContext POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework
-		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreMeshLodGenerator.framework
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 		COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
@@ -140,104 +137,19 @@ if (APPLE)
 		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources
 		)
 
-  add_custom_command(TARGET TestContext POST_BUILD
+  	add_custom_command(TARGET TestContext POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/PlayPenTests.dylib 
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/PlayPenTests.dylib 
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/VTests.dylib 
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/VTests.dylib 
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
 	)
 
-	# now plugins
-	if (OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_SDK_BUILD)
+	foreach(FWK ${FRAMEWORKS})
 		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/RenderSystem_GL.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif ()
-	if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/RenderSystem_GL3Plus.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif ()
-	if (OGRE_BUILD_PLUGIN_BSP OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_BSPSceneManager.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_PLUGIN_CG OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_CgProgramManager.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_PLUGIN_OCTREE OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_OctreeSceneManager.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_PLUGIN_PCZ OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_PCZSceneManager.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/    
-			)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_OctreeZone.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_PLUGIN_PFX OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_ParticleFX.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	
-	# Components
-    add_custom_command(TARGET TestContext POST_BUILD
-        COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreBites.framework 
-        ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-        )
-    
-	if (OGRE_BUILD_COMPONENT_PAGING OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgrePaging.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_COMPONENT_PROPERTY OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreProperty.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreRTShaderSystem.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_COMPONENT_TERRAIN OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreTerrain.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_COMPONENT_VOLUME OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreVolume.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
-	if (OGRE_BUILD_COMPONENT_OVERLAY OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreOverlay.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif()
+		COMMAND ARGS if [ -d ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ]\; then ln -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/${FWK}.framework\; fi
+		)
+	endforeach()
 	endif()
 endif()
 
