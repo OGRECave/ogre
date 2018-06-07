@@ -190,7 +190,8 @@ namespace Ogre
                 program->setLinked(linkStatus);
                 mLinked = linkStatus;
 
-                logObjectInfo( getCombinedName() + String("GLSL program result : "), programHandle );
+                if(!mLinked)
+                	logObjectInfo( getCombinedName() + String("GLSL program result : "), programHandle );
 
                 if (program->getType() == GPT_VERTEX_PROGRAM)
                     setSkeletalAnimationIncluded(program->isSkeletalAnimationIncluded());
