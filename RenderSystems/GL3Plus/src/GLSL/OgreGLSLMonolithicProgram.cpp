@@ -98,7 +98,8 @@ namespace Ogre {
         // attach remaining Programs
         for (auto shader : {mFragmentShader, mGeometryShader, mHullShader, mDomainShader, mComputeShader})
         {
-            shader->attachToProgramObject(mGLProgramHandle);
+        	if(shader)
+        		shader->attachToProgramObject(mGLProgramHandle);
         }
 
         bindFixedAttributes(mGLProgramHandle);
