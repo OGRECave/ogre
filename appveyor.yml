@@ -16,7 +16,7 @@ branches:
     - stable
 artifacts:
   - path: build/sdk
-    name: ogre-sdk-master-vc15-x64
+    name: ogre-sdk-1.11.1-vc15-x64
 deploy:
 - provider: BinTray
   username: paroj
@@ -27,6 +27,6 @@ deploy:
   package: ogre-sdk-vc15-x64
   publish: true
   override: true
-  version: master
+  version: 1.11.1
   on:
     branch: master
