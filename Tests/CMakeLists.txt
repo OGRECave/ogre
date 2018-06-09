@@ -76,7 +76,6 @@ if (OGRE_BUILD_TESTS)
     if(ANDROID)
         list(APPEND SOURCE_FILES ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
         list(APPEND OGRE_LIBRARIES EGL log android)
-        add_definitions(-Wl,-pie)
     endif()
     
     if(UNIX)
