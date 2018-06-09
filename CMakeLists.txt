@@ -51,10 +51,6 @@ set(CMAKE_MODULE_PATH
   "${OGRE_SOURCE_DIR}/CMake/Packages"
 )
 
-if(CMAKE_CROSSCOMPILING)
-  set(CMAKE_FIND_ROOT_PATH ${OGRE_DEPENDENCIES_DIR} "${CMAKE_FIND_ROOT_PATH}")
-endif()
-
 include(CMakeDependentOption)
 include(MacroLogFeature)
 include(OgreConfigTargets)
@@ -95,7 +91,7 @@ if (WIN32)
 endif ()
 
 # Set compiler specific build flags
-if (UNIX OR MINGW)
+if (NOT ANDROID AND UNIX OR MINGW)
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
   if (OGRE_GCC_HAS_SSE)
