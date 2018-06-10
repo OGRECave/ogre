@@ -21,8 +21,7 @@ endif()
 
 macro(ogre_python_module target)
     set_target_properties(${SWIG_MODULE_${target}_REAL_NAME} PROPERTIES 
-                        DEBUG_POSTFIX ""
-                        INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+                        DEBUG_POSTFIX "")
     install(TARGETS ${SWIG_MODULE_${target}_REAL_NAME} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
     install(FILES ${CMAKE_BINARY_DIR}/Components/Python/${target}.py DESTINATION ${PYTHON_SITE_PACKAGES})
 endmacro()
