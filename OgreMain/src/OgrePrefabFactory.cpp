@@ -56,7 +56,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void PrefabFactory::createPlane(Mesh* mesh)
     {
-        SubMesh* sub = mesh->createSubMesh();
+        //! [manual_plane_geometry]
         float vertices[32] = {
             -100, -100, 0,  // pos
             0,0,1,          // normal
@@ -71,11 +71,19 @@ namespace Ogre {
             0,0,1,
             0,0 
         };
-        mesh->sharedVertexData = OGRE_NEW VertexData();
+
+        uint16 faces[6] = {0,1,2,
+                           0,2,3 };
+        //! [manual_plane_geometry]
+
+        //! [vertex_data]
+        mesh->sharedVertexData = new VertexData();
         mesh->sharedVertexData->vertexCount = 4;
         VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
         VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
+        //! [vertex_data]
 
+        //! [vertex_decl]
         size_t offset = 0;
         decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
         offset += VertexElement::getTypeSize(VET_FLOAT3);
@@ -83,27 +91,27 @@ namespace Ogre {
         offset += VertexElement::getTypeSize(VET_FLOAT3);
         decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
         offset += VertexElement::getTypeSize(VET_FLOAT2);
+        //! [vertex_decl]
 
-        HardwareVertexBufferSharedPtr vbuf = 
+        //! [vertex_buffer]
+        HardwareVertexBufferSharedPtr vbuf =
             HardwareBufferManager::getSingleton().createVertexBuffer(
-            offset, 4, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                offset, 4, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        vbuf->writeData(0, vbuf->getSizeInBytes(), vertices, true);
         bind->setBinding(0, vbuf);
 
-        vbuf->writeData(0, vbuf->getSizeInBytes(), vertices, true);
+        HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().createIndexBuffer(
+            HardwareIndexBuffer::IT_16BIT, 6, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        ibuf->writeData(0, ibuf->getSizeInBytes(), faces, true);
+        //! [vertex_buffer]
 
+        //! [sub_mesh]
+        SubMesh* sub = mesh->createSubMesh();
         sub->useSharedVertices = true;
-        HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
-            createIndexBuffer(
-            HardwareIndexBuffer::IT_16BIT, 
-            6, 
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-
-        unsigned short faces[6] = {0,1,2,
-            0,2,3 };
         sub->indexData->indexBuffer = ibuf;
         sub->indexData->indexCount = 6;
-        sub->indexData->indexStart =0;
-        ibuf->writeData(0, ibuf->getSizeInBytes(), faces, true);
+        sub->indexData->indexStart = 0;
+        //! [sub_mesh]
 
         mesh->_setBounds(AxisAlignedBox(-100,-100,0,100,100,0), true);
         mesh->_setBoundingSphereRadius(Math::Sqrt(100*100+100*100));

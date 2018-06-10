@@ -9,8 +9,10 @@
 - Components
     - @subpage trays
     - @subpage volume
-- @subpage profiler
-- @subpage ShadowMappingOgre
-- @subpage deferred
-- @subpage External-Texture-Sources
-- @subpage pczscenemanager
+- In Depth
+    - @subpage manual-mesh-creation
+    - @subpage profiler
+    - @subpage External-Texture-Sources
+    - @subpage ShadowMappingOgre
+    - @subpage deferred
+    - @subpage pczscenemanager
