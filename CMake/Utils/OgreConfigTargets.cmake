@@ -313,13 +313,6 @@ function(ogre_config_sample_common SAMPLENAME)
   if (OGRE_PROJECT_FOLDERS)
     set_property(TARGET ${LIBNAME} PROPERTY FOLDER Samples)
   endif ()
-
-  # set install RPATH for Unix systems
-  if (UNIX AND OGRE_FULL_RPATH)
-    set_property(TARGET ${SAMPLENAME} APPEND PROPERTY
-      INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY})
-    set_property(TARGET ${SAMPLENAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
-  endif ()
   
   if (APPLE)
     # On OS X, create .app bundle
@@ -424,13 +417,6 @@ function(ogre_config_tool TOOLNAME)
   #set _d debug postfix
   if (WIN32)
 	set_property(TARGET ${TOOLNAME} APPEND PROPERTY DEBUG_POSTFIX "_d")
-  endif ()
-
-  # set install RPATH for Unix systems
-  if (UNIX AND OGRE_FULL_RPATH)
-    set_property(TARGET ${TOOLNAME} APPEND PROPERTY
-      INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY})
-    set_property(TARGET ${TOOLNAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
   endif ()
 
   if (OGRE_INSTALL_TOOLS)

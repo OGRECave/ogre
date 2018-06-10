@@ -182,13 +182,6 @@ if (WIN32 AND NOT (WINDOWS_STORE OR WINDOWS_PHONE))
 	set_property(TARGET SampleBrowser APPEND PROPERTY DEBUG_POSTFIX "_d")
 endif ()
 
-# set install RPATH for Unix systems
-if (UNIX AND OGRE_FULL_RPATH)
-	set_property(TARGET SampleBrowser APPEND PROPERTY
-		INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY})
-	set_property(TARGET SampleBrowser PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif ()
-
 if (WINDOWS_STORE OR WINDOWS_PHONE)
 	set_target_properties(SampleBrowser PROPERTIES VS_WINRT_COMPONENT "true")
 endif()
