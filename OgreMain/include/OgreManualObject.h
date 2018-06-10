@@ -45,16 +45,16 @@ namespace Ogre
     */
     /** Class providing a much simplified interface to generating manual
         objects with custom geometry.
-    @remarks
+
         Building one-off geometry objects manually usually requires getting
         down and dirty with the vertex buffer and vertex declaration API, 
         which some people find a steep learning curve. This class gives you 
         a simpler interface specifically for the purpose of building a 
         3D object simply and quickly. Note that if you intend to instance your
         object you will still need to become familiar with the Mesh class. 
-    @par
+
         This class draws heavily on the interface for OpenGL 
-        immediate-mode (glBegin, glVertex, glNormal etc), since this
+        immediate-mode (@c glBegin, @c glVertex, @c glNormal etc), since this
         is generally well-liked by people. There are a couple of differences
         in the results though - internally this class still builds hardware 
         buffers which can be re-used, so you can render the resulting object
@@ -63,10 +63,10 @@ namespace Ogre
         all OGRE objects. This makes this object more efficient than the 
         equivalent GL immediate-mode commands, so it's feasible to use it for
         large objects if you really want to.
-    @par
+
         To construct some geometry with this object:
           -# If you know roughly how many vertices (and indices, if you use them)
-             you're going to submit, call estimateVertexCount and estimateIndexCount.
+             you're going to submit, call estimateVertexCount() and estimateIndexCount().
              This is not essential but will make the process more efficient by saving
              memory reallocations.
           -# Call begin() to begin entering data
@@ -91,14 +91,14 @@ namespace Ogre
         MovableObject you should attach the object to a SceneNode to make it 
         visible. Other aspects like the relative render order can be controlled
         using standard MovableObject methods like setRenderQueueGroup.
-    @par
+
         You can also use beginUpdate() to alter the geometry later on if you wish.
         If you do this, you should call setDynamic(true) before your first call 
-        to begin(), and also consider using estimateVertexCount / estimateIndexCount
+        to begin(), and also consider using estimateVertexCount() / estimateIndexCount()
         if your geometry is going to be growing, to avoid buffer recreation during
         growth.
-    @par
-        Note that like all OGRE geometry, triangles should be specified in 
+
+        @note like all OGRE geometry, triangles should be specified in 
         anti-clockwise winding order (whether you're doing it with just
         vertices, or using indexes too). That is to say that the front of the
         face is the one where the vertices are listed in anti-clockwise order.

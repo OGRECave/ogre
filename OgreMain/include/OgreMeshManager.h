@@ -134,10 +134,10 @@ namespace Ogre {
 
         /** Creates a new Mesh specifically for manual definition rather
             than loading from an object file. 
-        @remarks
-            Note that once you've defined your mesh, you must call Mesh::_setBounds and
-            Mesh::_setBoundingRadius in order to define the bounds of your mesh. In previous
-            versions of OGRE you could call Mesh::_updateBounds, but OGRE's support of 
+
+            Note that once you've defined your mesh, you must call Mesh::_setBounds
+            in order to define the bounds of your mesh. In previous
+            versions of OGRE could auto-compute that, but OGRE's support of 
             write-only vertex buffers makes this no longer appropriate.
         @param name The name to give the new mesh
         @param groupName The name of the resource group to assign the mesh to 
