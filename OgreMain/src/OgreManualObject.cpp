@@ -203,7 +203,7 @@ namespace Ogre {
         position(pos.x, pos.y, pos.z);
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::position(Real x, Real y, Real z)
+    void ManualObject::position(float x, float y, float z)
     {
         if (!mCurrentSection)
         {
@@ -245,7 +245,7 @@ namespace Ogre {
         normal(norm.x, norm.y, norm.z);
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::normal(Real x, Real y, Real z)
+    void ManualObject::normal(float x, float y, float z)
     {
         if (!mCurrentSection)
         {
@@ -271,7 +271,7 @@ namespace Ogre {
         tangent(tan.x, tan.y, tan.z);
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::tangent(Real x, Real y, Real z)
+    void ManualObject::tangent(float x, float y, float z)
     {
         if (!mCurrentSection)
         {
@@ -292,7 +292,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    void ManualObject::textureCoord(Real u)
+    void ManualObject::textureCoord(float u)
     {
         if (!mCurrentSection)
         {
@@ -314,7 +314,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::textureCoord(Real u, Real v)
+    void ManualObject::textureCoord(float u, float v)
     {
         if (!mCurrentSection)
         {
@@ -336,7 +336,7 @@ namespace Ogre {
         ++mTexCoordIndex;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::textureCoord(Real u, Real v, Real w)
+    void ManualObject::textureCoord(float u, float v, float w)
     {
         if (!mCurrentSection)
         {
@@ -359,7 +359,7 @@ namespace Ogre {
         ++mTexCoordIndex;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::textureCoord(Real x, Real y, Real z, Real w)
+    void ManualObject::textureCoord(float x, float y, float z, float w)
     {
         if (!mCurrentSection)
         {
@@ -403,7 +403,7 @@ namespace Ogre {
         colour(col.r, col.g, col.b, col.a);
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::colour(Real r, Real g, Real b, Real a)
+    void ManualObject::colour(float r, float g, float b, float a)
     {
         if (!mCurrentSection)
         {
