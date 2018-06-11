@@ -315,52 +315,40 @@ Techniques can have the following nested elements:
 ## texture
 
 This declares a render texture for use in subsequent [target passes](#Compositor-Target-Passes).
+@par
+Format: texture &lt;Name&gt; &lt;Width&gt; &lt;Height&gt; &lt;Pixel_Format&gt; \[&lt;MRT Pixel_Format2&gt;\] \[&lt;MRT Pixel_FormatN&gt;\] \[pooled\] \[gamma\] \[no\_fsaa\] \[depth\_pool &lt;poolId&gt;\] \[&lt;scope&gt;\]
 
-
-
-Format: texture &lt;Name&gt; &lt;Width&gt; &lt;Height&gt; &lt;Pixel Format&gt; \[&lt;MRT Pixel Format2&gt;\] \[&lt;MRT Pixel FormatN&gt;\] \[pooled\] \[gamma\] \[no\_fsaa\] \[depth\_pool &lt;poolId&gt;\] \[&lt;scope&gt;\]
-
-Here is a description of the parameters:
-
-<dl compact="compact">
-<dt>Name</dt> <dd>
-
+@param Name
 A name to give the render texture, which must be unique within this compositor. This name is used to reference the texture in [target passes](#Compositor-Target-Passes), when the texture is rendered to, and in [passes](#Compositor-Passes), when the texture is used as input to a material rendering a fullscreen quad.
 
-</dd> <dt>Width, Height</dt> <dd>
-
+@param Width
+@param Height
 The dimensions of the render texture. You can either specify a fixed width and height, or you can request that the texture is based on the physical dimensions of the viewport to which the compositor is attached. The options for the latter are ’target\_width’, ’target\_height’, ’target\_width\_scaled &lt;factor&gt;’ and ’target\_height\_scaled &lt;factor&gt;’ - where ’factor’ is the amount by which you wish to multiply the size of the main target to derive the dimensions.
 
-</dd> <dt>Pixel Format</dt> <dd>
-
+@param Pixel_Format
 The pixel format of the render texture. This affects how much memory it will take, what colour channels will be available, and what precision you will have within those channels. The available options are PF\_A8R8G8B8, PF\_R8G8B8A8, PF\_R8G8B8, PF\_FLOAT16\_RGBA, PF\_FLOAT16\_RGB, PF\_FLOAT16\_R, PF\_FLOAT32\_RGBA, PF\_FLOAT32\_RGB, and PF\_FLOAT32\_R.
 
-</dd> <dt>pooled</dt> <dd>
-
+@param pooled
 If present, this directive makes this texture ’pooled’ among compositor instances, which can save some memory.
 
-</dd> <dt>gamma</dt> <dd>
-
+@param gamma
 If present, this directive means that sRGB gamma correction will be enabled on writes to this texture. You should remember to include the opposite sRGB conversion when you read this texture back in another material, such as a quad. This option will automatically enabled if you use a render\_scene pass on this texture and the viewport on which the compositor is based has sRGB write support enabled.
 
-</dd> <dt>no\_fsaa</dt> <dd>
-
+@param no\_fsaa
 If present, this directive disables the use of anti-aliasing on this texture. FSAA is only used if this texture is subject to a render\_scene pass and FSAA was enabled on the original viewport on which this compositor is based; this option allows you to override it and disable the FSAA if you wish.
 
-</dd> <dt>depth\_pool</dt> <dd>
-
+@param depth\_pool
 When present, this directive has to be followed by an integer. This directive is unrelated to the "pooled" directive. This one sets from which Depth buffer pool the depth buffer will be chosen from. All RTs from all compositors (including render windows if the render system API allows it) with the same pool ID share the same depth buffers (following the rules of the current render system APIs, (check RenderSystemCapabilities flags to find the rules). When the pool ID is 0, no depth buffer is used. This can be helpful for passes that don’t require a Depth buffer at all, potentially saving performance and memory. Default value is 1.
 
-</dd> <dt>scope</dt> <dd>
-
+@param scope
 If present, this directive sets the scope for the texture for being accessed by other compositors using the [texture\_ref](#compositor_005ftexture_005fref) directive. There are three options : ’local\_scope’ (which is also the default) means that only the compositor defining the texture can access it. ’chain\_scope’ means that the compositors after this compositor in the chain can reference its textures, and ’global\_scope’ means that the entire application can access the texture. This directive also affects the creation of the textures (global textures are created once and thus can’t be used with the pooled directive, and can’t rely on viewport size).
 
-</dd> </dl>
-
+@par
 Example: texture rt0 512 512 PF\_R8G8B8A8<br> Example: texture rt1 target\_width target\_height PF\_FLOAT32\_RGB
 
 You can in fact repeat this element if you wish. If you do so, that means that this render texture becomes a Multiple Render Target (MRT), when the GPU writes to multiple textures at once. It is imperative that if you use MRT that the shaders that render to it render to ALL the targets. Not doing so can cause undefined results. It is also important to note that although you can use different pixel formats for each target in a MRT, each one should have the same total bit depth since most cards do not support independent bit depths. If you try to use this feature on cards that do not support the number of MRTs you’ve asked for, the technique will be skipped (so you ought to write a fallback technique).
 
+@par
 Example : texture mrt\_output target\_width target\_height PF\_FLOAT16\_RGBA PF\_FLOAT16\_RGBA chain\_scope
 
 <a name="compositor_005ftexture_005fref"></a><a name="texture_005fref"></a>
@@ -369,29 +357,21 @@ Example : texture mrt\_output target\_width target\_height PF\_FLOAT16\_RGBA PF\
 
 This declares a reference of a texture from another compositor to be used in this compositor.
 
+@par
+Format: texture\_ref &lt;Local_Name&gt; &lt;Reference_Compositor&gt; &lt;Reference_Texture_Name&gt;
 
-
-Format: texture\_ref &lt;Local Name&gt; &lt;Reference Compositor&gt; &lt;Reference Texture Name&gt;
-
-Here is a description of the parameters:
-
-<dl compact="compact">
-<dt>Local Name</dt> <dd>
-
+@param Local_Name
 A name to give the referenced texture, which must be unique within this compositor. This name is used to reference the texture in [target passes](#Compositor-Target-Passes), when the texture is rendered to, and in [passes](#Compositor-Passes), when the texture is used as input to a material rendering a fullscreen quad.
 
-</dd> <dt>Reference Compositor</dt> <dd>
-
+@param Reference_Compositor
 The name of the compositor that we are referencing a texture from
 
-</dd> <dt>Reference Texture Name</dt> <dd>
-
+@param Reference_Texture_Name
 The name of the texture in the compositor that we are referencing
-
-</dd> </dl>
 
 Make sure that the texture being referenced is scoped accordingly (either chain or global scope) and placed accordingly during chain creation (if referencing a chain-scoped texture, the compositor must be present in the chain and placed before the compositor referencing it).
 
+@par
 Example : texture\_ref GBuffer GBufferCompositor mrt\_output
 
 <a name="compositor_005fscheme"></a><a name="scheme-2"></a>
@@ -400,8 +380,7 @@ Example : texture\_ref GBuffer GBufferCompositor mrt\_output
 
 This gives a compositor technique a scheme name, allowing you to manually switch between different techniques for this compositor when instantiated on a viewport by calling CompositorInstance::setScheme.
 
-
-
+@par
 Format: material\_scheme &lt;Name&gt; 
 
 <a name="compositor_005flogic"></a><a name="compositor_005flogic-1"></a>
@@ -410,8 +389,7 @@ Format: material\_scheme &lt;Name&gt;
 
 This connects between a compositor and code that it requires in order to function correctly. When an instance of this compositor will be created, the compositor logic will be notified and will have the chance to prepare the compositor’s operation (for example, adding a listener).
 
-
-
+@par
 Format: compositor\_logic &lt;Name&gt;
 
 Registration of compositor logics is done by name through CompositorManager::registerCompositorLogic.
@@ -440,50 +418,77 @@ The contents of both are identical, the only real difference is that you can onl
 
 ## input
 
-Sets input mode of the target, which tells the target pass what is pulled in before any of its own passes are rendered. Format: input (none | previous) Default: input none
+Sets input mode of the target, which tells the target pass what is pulled in before any of its own passes are rendered.
 
-<dl compact="compact">
-<dt>none</dt> <dd>
+@par
+Format: input (none | previous)
+@par
+Default: input none
 
+@param none
 The target will have nothing as input, all the contents of the target must be generated using its own passes. Note this does not mean the target will be empty, just no data will be pulled in. For it to truly be blank you’d need a ’clear’ pass within this target.
 
-</dd> <dt>previous</dt> <dd>
-
+@param previous
 The target will pull in the previous contents of the viewport. This will be either the original scene if this is the first compositor in the chain, or it will be the output from the previous compositor in the chain if the viewport has multiple compositors enabled.
 
 </dd> </dl> <a name="only_005finitial"></a><a name="only_005finitial-1"></a>
 
 ## only\_initial
 
-If set to on, this target pass will only execute once initially after the effect has been enabled. This could be useful to perform once-off renders, after which the static contents are used by the rest of the compositor. Format: only\_initial (on | off) Default: only\_initial off
+If set to on, this target pass will only execute once initially after the effect has been enabled. This could be useful to perform once-off renders, after which the static contents are used by the rest of the compositor.
+
+@par
+Format: only\_initial (on | off) 
+@par
+Default: only\_initial off
 
 <a name="visibility_005fmask"></a><a name="visibility_005fmask-1"></a>
 
 ## visibility\_mask
 
-Sets the visibility mask for any render\_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to Viewport::setVisibilityMask. Format: visibility\_mask &lt;mask&gt; Default: visibility\_mask 4294967295
+Sets the visibility mask for any render\_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to Viewport::setVisibilityMask.
+@par
+Format: visibility\_mask &lt;mask&gt;
+@par
+Default: visibility\_mask 4294967295
 
 <a name="compositor_005flod_005fbias"></a><a name="lod_005fbias"></a>
 
 ## lod\_bias
 
-Set the scene LOD bias for any render\_scene passes performed in this target pass. The default is 1.0, everything below that means lower quality, higher means higher quality. Format: lod\_bias &lt;lodbias&gt; Default: lod\_bias 1.0
+Set the scene LOD bias for any render\_scene passes performed in this target pass. The default is 1.0, everything below that means lower quality, higher means higher quality.
+@par
+Format: lod\_bias &lt;lodbias&gt;
+@par
+Default: lod\_bias 1.0
 
 <a name="compositor_005fshadows"></a><a name="shadows"></a>
 
 ## shadows
 
-Sets whether shadows should be rendered during any render\_scene pass performed in this target pass. The default is ’on’. Format: shadows (on | off) Default: shadows on
+Sets whether shadows should be rendered during any render\_scene pass performed in this target pass.
+
+@par
+Format: shadows (on | off)
+@par
+Default: shadows on
 
 <a name="material_005fscheme"></a><a name="material_005fscheme-1"></a>
 
 ## material\_scheme
 
-If set, indicates the material scheme to use for any render\_scene pass. Useful for performing special-case rendering effects. Format: material\_scheme &lt;scheme name&gt; Default: None
+If set, indicates the material scheme to use for any render\_scene pass. Useful for performing special-case rendering effects.
+
+@par
+Format: material\_scheme &lt;scheme name&gt;
+@par
+Default: None
 
 ## Compositor Passes {#Compositor-Passes}
 
-A pass is a single rendering action to be performed in a target pass.  Format: ’pass’ (render\_quad | clear | stencil | render\_scene | render\_custom) \[custom name\] { }
+A pass is a single rendering action to be performed in a target pass.  
+@par
+Format: ’pass’ (render\_quad | clear | stencil | render\_scene | render\_custom) \[custom name\] { }
 
 There are four types of pass:
 
@@ -535,48 +540,61 @@ For passes of type ’render\_quad’, sets the material used to render the quad
 
 ## input
 
-For passes of type ’render\_quad’, this is how you map one or more local render textures (See [compositor\_texture](#compositor_005ftexture)) into the material you’re using to render the fullscreen quad. To bind more than one texture, repeat this attribute with different sampler indexes. Format: input &lt;sampler&gt; &lt;Name&gt; \[&lt;MRTIndex&gt;\]
+For passes of type ’render\_quad’, this is how you map one or more local render textures (See [compositor\_texture](#compositor_005ftexture)) into the material you’re using to render the fullscreen quad. To bind more than one texture, repeat this attribute with different sampler indexes.
 
-<dl compact="compact">
-<dt>sampler</dt> <dd>
+@par
+Format: input &lt;sampler&gt; &lt;Name&gt; \[&lt;MRTIndex&gt;\]
 
+@param sampler
 The texture sampler to set, must be a number in the range \[0, OGRE\_MAX\_TEXTURE\_LAYERS-1\].
-
-</dd> <dt>Name</dt> <dd>
-
+@param Name
 The name of the local render texture to bind, as declared in [compositor\_texture](#compositor_005ftexture) and rendered to in one or more [target pass](#Compositor-Target-Passes).
-
-</dd> <dt>MRTIndex</dt> <dd>
-
+@param MRTIndex
 If the local texture that you’re referencing is a Multiple Render Target (MRT), this identifies the surface from the MRT that you wish to reference (0 is the first surface, 1 the second etc).
 
-</dd> </dl>
-
+@par
 Example: input 0 rt0
 
 <a name="compositor_005fpass_005fidentifier"></a><a name="identifier"></a>
 
 ## identifier
 
-Associates a numeric identifier with the pass. This is useful for registering a listener with the compositor (CompositorInstance::addListener), and being able to identify which pass it is that’s being processed when you get events regarding it. Numbers between 0 and 2^32 are allowed. Format: identifier &lt;number&gt; Example: identifier 99945 Default: identifier 0
+Associates a numeric identifier with the pass. This is useful for registering a listener with the compositor (CompositorInstance::addListener), and being able to identify which pass it is that’s being processed when you get events regarding it. Numbers between 0 and 2^32 are allowed. 
+
+@par
+Format: identifier &lt;number&gt; 
+@par
+Example: identifier 99945 Default: identifier 0
 
 <a name="first_005frender_005fqueue"></a><a name="first_005frender_005fqueue-1"></a>
 
 ## first\_render\_queue
 
-For passes of type ’render\_scene’, this sets the first render queue id that is included in the render. Defaults to the value of RENDER\_QUEUE\_SKIES\_EARLY. Format: first\_render\_queue &lt;id&gt; Default: first\_render\_queue 0
+For passes of type ’render\_scene’, this sets the first render queue id that is included in the render. Defaults to the value of RENDER\_QUEUE\_SKIES\_EARLY. 
+@par
+Format: first\_render\_queue &lt;id&gt; 
+@par
+Default: first\_render\_queue 0
 
 <a name="last_005frender_005fqueue"></a><a name="last_005frender_005fqueue-1"></a>
 
 ## last\_render\_queue
 
-For passes of type ’render\_scene’, this sets the last render queue id that is included in the render. Defaults to the value of RENDER\_QUEUE\_SKIES\_LATE. Format: last\_render\_queue &lt;id&gt; Default: last\_render\_queue 95
+For passes of type ’render\_scene’, this sets the last render queue id that is included in the render. Defaults to the value of RENDER\_QUEUE\_SKIES\_LATE. 
+@par
+Format: last\_render\_queue &lt;id&gt; 
+@par
+Default: last\_render\_queue 95
 
 <a name="compositor_005fpass_005fmaterial_005fscheme"></a><a name="material_005fscheme-2"></a>
 
 ## material\_scheme
 
-If set, indicates the material scheme to use for this pass only. Useful for performing special-case rendering effects. This will overwrite the scheme if set at the target scope as well. Format: material\_scheme &lt;scheme name&gt; Default: None
+If set, indicates the material scheme to use for this pass only. Useful for performing special-case rendering effects. This will overwrite the scheme if set at the target scope as well. 
+@par
+Format: material\_scheme &lt;scheme name&gt; 
+@par
+Default: None
 
 # Clear Section {#Clear-Section}
 
@@ -593,25 +611,40 @@ Here are the attributes you can use in a ’clear’ section of a .compositor sc
 
     Sets the buffers cleared by this pass.
 
-    Format: buffers \[colour\] \[depth\] \[stencil\] Default: buffers colour depth
+    @par
+    Format: buffers \[colour\] \[depth\] \[stencil\] 
+    @par
+    Default: buffers colour depth
 
     <a name="compositor_005fclear_005fcolour_005fvalue"></a><a name="colour_005fvalue"></a>
 
     ## colour\_value
 
-    Set the colour used to fill the colour buffer by this pass, if the colour buffer is being cleared ([buffers](#compositor_005fclear_005fbuffers)).  Format: colour\_value &lt;red&gt; &lt;green&gt; &lt;blue&gt; &lt;alpha&gt; Default: colour\_value 0 0 0 0
+    Set the colour used to fill the colour buffer by this pass, if the colour buffer is being cleared ([buffers](#compositor_005fclear_005fbuffers)).
+    @par
+    Format: colour\_value &lt;red&gt; &lt;green&gt; &lt;blue&gt; &lt;alpha&gt; 
+    @par
+    Default: colour\_value 0 0 0 0
 
     <a name="compositor_005fclear_005fdepth_005fvalue"></a><a name="depth_005fvalue"></a>
 
     ## depth\_value
 
-    Set the depth value used to fill the depth buffer by this pass, if the depth buffer is being cleared ([buffers](#compositor_005fclear_005fbuffers)).  Format: depth\_value &lt;depth&gt; Default: depth\_value 1.0
+    Set the depth value used to fill the depth buffer by this pass, if the depth buffer is being cleared ([buffers](#compositor_005fclear_005fbuffers)).  
+    @par
+    Format: depth\_value &lt;depth&gt; 
+    @par
+    Default: depth\_value 1.0
 
     <a name="compositor_005fclear_005fstencil_005fvalue"></a><a name="stencil_005fvalue"></a>
 
     ## stencil\_value
 
-    Set the stencil value used to fill the stencil buffer by this pass, if the stencil buffer is being cleared ([buffers](#compositor_005fclear_005fbuffers)).  Format: stencil\_value &lt;value&gt; Default: stencil\_value 0.0
+    Set the stencil value used to fill the stencil buffer by this pass, if the stencil buffer is being cleared ([buffers](#compositor_005fclear_005fbuffers)).  
+    @par
+    Format: stencil\_value &lt;value&gt; 
+    @par
+    Default: stencil\_value 0.0
 
 # Stencil Section {#Stencil-Section}
 
@@ -632,7 +665,9 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     ## check
 
-    Enables or disables the stencil check, thus enabling the use of the rest of the features in this section. The rest of the options in this section do nothing if the stencil check is off. Format: check (on | off)
+    Enables or disables the stencil check, thus enabling the use of the rest of the features in this section. The rest of the options in this section do nothing if the stencil check is off. 
+    @par
+    Format: check (on | off)
 
     <a name="compositor_005fstencil_005fcomp_005ffunc"></a><a name="comp_005ffunc"></a>
 
@@ -640,25 +675,41 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     Sets the function used to perform the following comparison: (ref\_value & mask) comp\_func (Stencil Buffer Value & mask)
 
-    What happens as a result of this comparison will be one of 3 actions on the stencil buffer, depending on whether the test fails, succeeds but with the depth buffer check still failing, or succeeds with the depth buffer check passing too. You set the actions in the [fail\_op](#compositor_005fstencil_005ffail_005fop), [depth\_fail\_op](#compositor_005fstencil_005fdepth_005ffail_005fop) and [pass\_op](#compositor_005fstencil_005fpass_005fop) respectively. If the stencil check fails, no colour or depth are written to the frame buffer. Format: comp\_func (always\_fail | always\_pass | less | less\_equal | not\_equal | greater\_equal | greater) Default: comp\_func always\_pass
+    What happens as a result of this comparison will be one of 3 actions on the stencil buffer, depending on whether the test fails, succeeds but with the depth buffer check still failing, or succeeds with the depth buffer check passing too. You set the actions in the [fail\_op](#compositor_005fstencil_005ffail_005fop), [depth\_fail\_op](#compositor_005fstencil_005fdepth_005ffail_005fop) and [pass\_op](#compositor_005fstencil_005fpass_005fop) respectively. If the stencil check fails, no colour or depth are written to the frame buffer. 
+    @par
+    Format: comp\_func (always\_fail | always\_pass | less | less\_equal | not\_equal | greater\_equal | greater)
+    @par
+    Default: comp\_func always\_pass
 
     <a name="compositor_005fstencil_005fref_005fvalue"></a><a name="ref_005fvalue"></a>
 
     ## ref\_value
 
-    Sets the reference value used to compare with the stencil buffer as described in [comp\_func](#compositor_005fstencil_005fcomp_005ffunc). Format: ref\_value &lt;value&gt; Default: ref\_value 0.0
+    Sets the reference value used to compare with the stencil buffer as described in [comp\_func](#compositor_005fstencil_005fcomp_005ffunc). 
+    @par
+    Format: ref\_value &lt;value&gt; 
+    @par
+    Default: ref\_value 0.0
 
     <a name="compositor_005fstencil_005fmask"></a><a name="mask"></a>
 
     ## mask
 
-    Sets the mask used to compare with the stencil buffer as described in [comp\_func](#compositor_005fstencil_005fcomp_005ffunc). Format: mask &lt;value&gt; Default: mask 4294967295
+    Sets the mask used to compare with the stencil buffer as described in [comp\_func](#compositor_005fstencil_005fcomp_005ffunc). 
+    @par
+    Format: mask &lt;value&gt; 
+    @par
+    Default: mask 4294967295
 
     <a name="compositor_005fstencil_005ffail_005fop"></a><a name="fail_005fop"></a>
 
     ## fail\_op
 
-    Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) and depth comparison is that both fail. Format: fail\_op (keep | zero | replace | increment | decrement | increment\_wrap | decrement\_wrap | invert) Default: depth\_fail\_op keep These actions mean:
+    Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) and depth comparison is that both fail. 
+    @par
+    Format: fail\_op (keep | zero | replace | increment | decrement | increment\_wrap | decrement\_wrap | invert)
+    @par
+    Default: depth\_fail\_op keep These actions mean:
 
     <dl compact="compact">
     <dt>keep</dt> <dd>
@@ -699,19 +750,30 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) passes but the depth comparison fails. 
 
-    Format: depth\_fail\_op (keep | zero | replace | increment | decrement | increment\_wrap | decrement\_wrap | invert) Default: depth\_fail\_op keep
+    @par
+    Format: depth\_fail\_op (keep | zero | replace | increment | decrement | increment\_wrap | decrement\_wrap | invert)
+    @par
+    Default: depth\_fail\_op keep
 
     <a name="compositor_005fstencil_005fpass_005fop"></a><a name="pass_005fop"></a>
 
     ## pass\_op
 
-    Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) and the depth comparison pass.  Format: pass\_op (keep | zero | replace | increment | decrement | increment\_wrap | decrement\_wrap | invert) Default: pass\_op keep
+    Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) and the depth comparison pass.  
+    @par
+    Format: pass\_op (keep | zero | replace | increment | decrement | increment\_wrap | decrement\_wrap | invert)
+    @par
+    Default: pass\_op keep
 
     <a name="compositor_005fstencil_005ftwo_005fsided"></a><a name="two_005fsided"></a>
 
     ## two\_sided
 
-    Enables or disables two-sided stencil operations, which means the inverse of the operations applies to back-facing polygons. Format: two\_sided (on | off) Default: two\_sided off
+    Enables or disables two-sided stencil operations, which means the inverse of the operations applies to back-facing polygons.
+    @par
+    Format: two\_sided (on | off)
+    @par
+    Default: two\_sided off
 
 
 # Applying a Compositor {#Applying-a-Compositor}
@@ -719,7 +781,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 Adding a compositor instance to a viewport is very simple. All you need to do is:
 
 ```cpp
-CompositorManager::getSingleton().addCompositor(viewport, compositorName);
+Ogre::CompositorManager::getSingleton().addCompositor(viewport, compositorName);
 ```
 
 
@@ -727,7 +789,7 @@ CompositorManager::getSingleton().addCompositor(viewport, compositorName);
 Where viewport is a pointer to your viewport, and compositorName is the name of the compositor to create an instance of. By doing this, a new instance of a compositor will be added to a new compositor chain on that viewport. You can call the method multiple times to add further compositors to the chain on this viewport. By default, each compositor which is added is disabled, but you can change this state by calling:
 
 ```cpp
-CompositorManager::getSingleton().setCompositorEnabled(viewport, compositorName, enabledOrDisabled);
+Ogre::CompositorManager::getSingleton().setCompositorEnabled(viewport, compositorName, enabledOrDisabled);
 ```
 
 For more information on defining and using compositors, see Demo\_Compositor in the Samples area, together with the Examples.compositor script in the media area.
@@ -909,10 +971,11 @@ These attributes are valid within the braces of a ’container’ or ’element�
 
 Sets the units which will be used to size and position this element.
 
+@par
 Format: metrics\_mode &lt;pixels|relative&gt;<br> Example: metrics\_mode pixels<br>
 
 This can be used to change the way that all measurement attributes in the rest of this element are interpreted. In relative mode, they are interpreted as being a parametric value from 0 to 1, as a proportion of the width / height of the screen. In pixels mode, they are simply pixel offsets.
-
+@par
 Default: metrics\_mode relative<br>
 
 <a name="horz_005falign"></a><a name="horz_005falign-1"></a>
@@ -920,13 +983,13 @@ Default: metrics\_mode relative<br>
 ## horz\_align
 
 Sets the horizontal alignment of this element, in terms of where the horizontal origin is.
-
+@par
 Format: horz\_align &lt;left|center|right&gt;<br> Example: horz\_align center
 
 This can be used to change where the origin is deemed to be for the purposes of any horizontal positioning attributes of this element. By default the origin is deemed to be the left edge of the screen, but if you change this you can center or right-align your elements. Note that setting the alignment to center or right does not automatically force your elements to appear in the center or the right edge, you just have to treat that point as the origin and adjust your coordinates appropriately. This is more flexible because you can choose to position your element anywhere relative to that origin. For example, if your element was 10 pixels wide, you would use a ’left’ property of -10 to align it exactly to the right edge, or -20 to leave a gap but still make it stick to the right edge.
 
 Note that you can use this property in both relative and pixel modes, but it is most useful in pixel mode.
-
+@par
 Default: horz\_align left<br>
 
 <a name="vert_005falign"></a><a name="vert_005falign-1"></a>
@@ -934,13 +997,13 @@ Default: horz\_align left<br>
 ## vert\_align
 
 Sets the vertical alignment of this element, in terms of where the vertical origin is.
-
+@par
 Format: vert\_align &lt;top|center|bottom&gt;<br> Example: vert\_align center
 
 This can be used to change where the origin is deemed to be for the purposes of any vertical positioning attributes of this element. By default the origin is deemed to be the top edge of the screen, but if you change this you can center or bottom-align your elements. Note that setting the alignment to center or bottom does not automatically force your elements to appear in the center or the bottom edge, you just have to treat that point as the origin and adjust your coordinates appropriately. This is more flexible because you can choose to position your element anywhere relative to that origin. For example, if your element was 50 pixels high, you would use a ’top’ property of -50 to align it exactly to the bottom edge, or -70 to leave a gap but still make it stick to the bottom edge.
 
 Note that you can use this property in both relative and pixel modes, but it is most useful in pixel mode.
-
+@par
 Default: vert\_align top<br>
 
 <a name="left"></a><a name="left-1"></a>
@@ -948,11 +1011,11 @@ Default: vert\_align top<br>
 ## left
 
 Sets the horizontal position of the element relative to it’s parent.
-
+@par
 Format: left &lt;value&gt;<br> Example: left 0.5
 
 Positions are relative to the parent (the top-left of the screen if the parent is an overlay, the top-left of the parent otherwise) and are expressed in terms of a proportion of screen size. Therefore 0.5 is half-way across the screen.
-
+@par
 Default: left 0<br>
 
 <a name="overlaytopelement"></a><a name="top"></a>
@@ -960,11 +1023,11 @@ Default: left 0<br>
 ## top
 
 Sets the vertical position of the element relative to it’s parent.
-
+@par
 Format: top &lt;value&gt;<br> Example: top 0.5
 
 Positions are relative to the parent (the top-left of the screen if the parent is an overlay, the top-left of the parent otherwise) and are expressed in terms of a proportion of screen size. Therefore 0.5 is half-way down the screen.
-
+@par
 Default: top 0<br>
 
 <a name="width"></a><a name="width-1"></a>
@@ -972,11 +1035,11 @@ Default: top 0<br>
 ## width
 
 Sets the width of the element as a proportion of the size of the screen.
-
+@par
 Format: width &lt;value&gt;<br> Example: width 0.25
 
 Sizes are relative to the size of the screen, so 0.25 is a quarter of the screen. Sizes are not relative to the parent; this is common in windowing systems where the top and left are relative but the size is absolute.
-
+@par
 Default: width 1<br>
 
 <a name="height"></a><a name="height-1"></a>
@@ -984,11 +1047,11 @@ Default: width 1<br>
 ## height
 
 Sets the height of the element as a proportion of the size of the screen.
-
+@par
 Format: height &lt;value&gt;<br> Example: height 0.25
 
 Sizes are relative to the size of the screen, so 0.25 is a quarter of the screen. Sizes are not relative to the parent; this is common in windowing systems where the top and left are relative but the size is absolute.
-
+@par
 Default: height 1<br>
 
 <a name="overlay_005fmaterial"></a><a name="material-3"></a>
@@ -996,11 +1059,11 @@ Default: height 1<br>
 ## material
 
 Sets the name of the material to use for this element.
-
+@par
 Format: material &lt;name&gt;<br> Example: material Examples/TestMaterial
 
 This sets the base material which this element will use. Each type of element may interpret this differently; for example the OGRE element ’Panel’ treats this as the background of the panel, whilst ’BorderPanel’ interprets this as the material for the center area only. Materials should be defined in .material scripts. Note that using a material in an overlay element automatically disables lighting and depth checking on this material. Therefore you should not use the same material as is used for real 3D objects for an overlay.
-
+@par
 Default: none<br>
 
 <a name="caption"></a><a name="caption-1"></a>
@@ -1008,21 +1071,21 @@ Default: none<br>
 ## caption
 
 Sets a text caption for the element.
-
+@par
 Format: caption &lt;string&gt;<br> Example: caption This is a caption
 
 Not all elements support captions, so each element is free to disregard this if it wants. However, a general text caption is so common to many elements that it is included in the generic interface to make it simpler to use. This is a common feature in GUI systems.
-
-Default: blank<br>
+@par
+Default: blank
 
 <a name="rotation"></a><a name="rotation-1"></a>
 
 ## rotation
 
 Sets the rotation of the element.
-
+@par
 Format: rotation &lt;angle\_in\_degrees&gt; &lt;axis\_x&gt; &lt;axis\_y&gt; &lt;axis\_z&gt; Example: rotation 30 0 0 1
-
+@par
 Default: none
 
 # Standard OverlayElements {#Standard-OverlayElements}
