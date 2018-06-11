@@ -14,14 +14,14 @@ How do external texture source plugins benefit OGRE? Well, the main answer is: a
 
 # ExternalTextureSource Class
 
-The ExternalTextureSource class is the base class that Texture Source PlugIns must be derived from. It provides a generic framework (via StringInterface class) with a very limited amount of functionality. The most common of parameters can be set through the TexturePlugInSource class interface or via the StringInterface commands contained within this class. While this may seem like duplication of code, it is not. By using the string command interface, it becomes extremely easy for derived plugins to add any new types of parameters that it may need.
+The Ogre::ExternalTextureSource class is the base class that Texture Source PlugIns must be derived from. It provides a generic framework (via StringInterface class) with a very limited amount of functionality. The most common of parameters can be set through the TexturePlugInSource class interface or via the StringInterface commands contained within this class. While this may seem like duplication of code, it is not. By using the string command interface, it becomes extremely easy for derived plugins to add any new types of parameters that it may need.
 
 Default Command Parameters defined in ExternalTextureSource base class are:
 
--   Parameter Name: "filename" Argument Type: Ogre::String Sets a filename plugin will read from
--   Parameter Name: "play\_mode" Argument Type: Ogre::String Sets initial play mode to be used by the plugin - "play", "loop", "pause"
--   Parameter Name: "set\_T\_P\_S" Argument Type: Ogre::String Used to set the technique, pass, and texture unit level to apply this texture to. As an example: To set a technique level of 1, a pass level of 2, and a texture unit level of 3, send this string "1 2 3".
--   Parameter Name: "frames\_per\_second" Argument Type: Ogre::String Set a Frames per second update speed. (Integer Values only)
+@param filename Sets a filename plugin will read from
+@param play_mode Sets initial play mode to be used by the plugin - "play", "loop", "pause"
+@param set_T_P_S Used to set the technique, pass, and texture unit level to apply this texture to. As an example: To set a technique level of 1, a pass level of 2, and a texture unit level of 3, send this string "1 2 3".
+@param frames_per_second Set a Frames per second update speed. (Integer Values only)
 
 <a name="ExternalTextureSourceManager-Class"></a>
 
@@ -29,7 +29,9 @@ Default Command Parameters defined in ExternalTextureSource base class are:
 
 ExternalTextureSourceManager is responsible for keeping track of loaded Texture Source PlugIns. It also aids in the creation of texture source textures from scripts. It also is the interface you should use when dealing with texture source plugins.
 
-Note: The function prototypes shown below are mockups - param names are simplified to better illustrate purpose here... Steps needed to create a new texture via ExternalTextureSourceManager:
+@note The function prototypes shown below are mockups - param names are simplified to better illustrate purpose here... 
+
+Steps needed to create a new texture via ExternalTextureSourceManager:
 
 -   Obviously, the first step is to have the desired plugin included in plugin.cfg for it to be loaded.
 -   Set the desired PlugIn as Active via AdvancedTextureManager::getSingleton().SetCurrentPlugIn( String Type ); – type is whatever the plugin registers as handling (e.g. "video", "flash", "whatever", etc).
