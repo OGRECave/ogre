@@ -91,10 +91,11 @@ Here are the attributes you can use in a `rtshader_system` section of a .materia
 
 Force a specific lighting model.
 
+@par
 Format1: `lighting_stage <ffp|per_pixel>`
-
+@par
 Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [none|bilinear|trilinear|anisotropic] [max_anisotropy] [mipmap_bias]`
-
+@par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0	bilinear 1 -1.0`
 
 @see Ogre::RTShader::NormalMapLighting::NormalMapSpace
@@ -105,7 +106,7 @@ Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0	bi
 ### light_count
 
 Override dynamic light count. Allows to customize which lights the RTSS will consider.
-
+@par
 Format: `light_count <pointLights> <directionalLights> <spotLights>`
 
 <a name="triplanarTexturing"></a>
@@ -113,9 +114,9 @@ Format: `light_count <pointLights> <directionalLights> <spotLights>`
 ### triplanarTexturing
 
 Force [triplanar texturing](https://www.volume-gfx.com/volume-rendering/triplanar-texturing/)
-
+@par
 Format: `triplanarTexturing <textureScale> <plateauSize> <transitionSpeed> <textureFromX> <textureFromY> <textureFromZ>`
-
+@par
 Example: `triplanarTexturing 0.05 0.2 4.0 BumpyMetal.jpg egyptrockyfull.jpg MtlPlat2.jpg`
 
 @param textureScale texture coordinates are multiplied by this.
@@ -130,7 +131,7 @@ Valid values are [0; 0.57] not bigger to avoid division by zero
 
 ### integrated_pssm4
 Integrated PSSM shadow receiver with 3 splits. Custom split points.
-
+@par
 Format: `integrated_pssm4 <sp0> <sp1> <sp2> <sp3>`
 
 <a name="layered_blend"></a>
@@ -138,9 +139,9 @@ Format: `integrated_pssm4 <sp0> <sp1> <sp2> <sp3>`
 ### layered_blend
 
 Apply photoshop-like blend effects to texture layers
-
+@par
 Format: `layered_blend <effect>`
-
+@par
 Example: layered_blend luminosity
 
 @note only applicable inside a texture_unit section
@@ -153,9 +154,9 @@ Example: layered_blend luminosity
 ### source_modifier
 
 Apply custom modulate effect to texture layer
-
+@par
 Format: `source_modifier <operation> custom <parameterNum>`
-
+@par
 Example: `source_modifier src1_inverse_modulate custom 2`
 
 @note only applicable inside a texture_unit section

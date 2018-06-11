@@ -72,7 +72,9 @@ The outermost section of a material definition does not have a lot of attributes
 
 ## lod\_strategy
 
-Sets the name of the LOD strategy to use. Defaults to ’Distance’ which means LOD changes based on distance from the camera. Also supported is ’PixelCount’ which changes LOD based on an estimate of the screen-space pixels affected.  Format: lod\_strategy &lt;name&gt;<br> Default: lod\_strategy Distance
+Sets the name of the LOD strategy to use. Defaults to ’Distance’ which means LOD changes based on distance from the camera. Also supported is ’PixelCount’ which changes LOD based on an estimate of the screen-space pixels affected. 
+@par
+Format: lod\_strategy &lt;name&gt;<br> Default: lod\_strategy Distance
 
 <a name="lod_005fvalues"></a>
 <a name="lod_005fvalues-1"></a>
@@ -81,8 +83,9 @@ Sets the name of the LOD strategy to use. Defaults to ’Distance’ which means
 
 This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for [lod\_strategy](#lod_005fstrategy) - it is a list of distances for the ’Distance’ strategy, and a list of pixel counts for the ’PixelCount’ strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. Implicitly, all materials activate LOD index 0 for values less than the first entry, so you do not have to specify ’0’ at the start of the list. You must ensure that there is at least one Technique with a [lod\_index](#lod_005findex) value for each value in the list (so if you specify 3 values, you must have techniques for LOD indexes 0, 1, 2 and 3). Note you must always have at least one Technique at lod\_index 0.
 
+@par
 Format: lod\_values &lt;value0&gt; &lt;value1&gt; &lt;value2&gt; ...<br> Default: none
-
+@par
 Example: <br> lod\_strategy Distance lod\_values 300.0 600.5 1200
 
 The above example would cause the material to use the best Technique at lod\_index 0 up to a distance of 300 world units, the best from lod\_index 1 from 300 up to 600, lod\_index 2 from 600 to 1200, and lod\_index 3 from 1200 upwards.
@@ -98,6 +101,7 @@ The above example would cause the material to use the best Technique at lod\_ind
 
 This attribute controls whether objects using this material can have shadows cast upon them.
 
+@par
 Format: receive\_shadows &lt;on|off&gt;<br> Default: on
 
 Whether or not an object receives a shadow is the combination of a number of factors, See @ref Shadows for full details; however this allows you to make a material opt-out of receiving shadows if required. Note that transparent materials never receive shadows so this option only has an effect on solid materials.
@@ -108,6 +112,7 @@ Whether or not an object receives a shadow is the combination of a number of fac
 
 This attribute controls whether transparent materials can cast certain kinds of shadow.
 
+@par
 Format: transparency\_casts\_shadows &lt;on|off&gt;<br> 
 Default: off 
 
@@ -119,6 +124,7 @@ Whether or not an object casts a shadow is the combination of a number of factor
 
 This attribute associates a texture alias with a texture name.
 
+@par
 Format: set\_texture\_alias &lt;alias name&gt; &lt;texture name&gt;
 
 This attribute can be used to set the textures used in texture unit states that were inherited from another material.(See @ref Texture-Aliases)
@@ -142,6 +148,7 @@ In a material script, techniques must be listed in order of preference, i.e. the
 
 To help clearly identify what each technique is used for, the technique can be named but its optional. Techniques not named within the script will take on a name that is the technique index number. For example: the first technique in a material is index 0, its name would be "0" if it was not given a name in the script. The technique name must be unique within the material or else the final technique is the resulting merge of all techniques with the same name in the material. A warning message is posted in the Ogre.log if this occurs. Named techniques can help when inheriting a material and modifying an existing technique: (See @ref Script-Inheritance)
 
+@par
 Format: technique name
 
 Techniques have only a small number of attributes of their own:
@@ -159,6 +166,7 @@ Techniques have only a small number of attributes of their own:
 
 Sets the ’scheme’ this Technique belongs to. Material schemes are used to control top-level switching from one set of techniques to another. For example, you might use this to define ’high’, ’medium’ and ’low’ complexity levels on materials to allow a user to pick a performance / quality ratio. Another possibility is that you have a fully HDR-enabled pipeline for top machines, rendering all objects using unclamped shaders, and a simpler pipeline for others; this can be implemented using schemes. The active scheme is typically controlled at a viewport level, and the active one defaults to ’Default’.
 
+@par
 Format: scheme &lt;name&gt;<br> Example: scheme hdr<br> Default: scheme Default
 
 <a name="lod_005findex"></a><a name="lod_005findex-1"></a>
@@ -167,12 +175,15 @@ Format: scheme &lt;name&gt;<br> Example: scheme hdr<br> Default: scheme Default
 
 Sets the level-of-detail (LOD) index this Technique belongs to. 
 
+@par
 Format: lod\_index &lt;number&gt;<br> NB Valid values are 0 (highest level of detail) to 65535, although this is unlikely. You should not leave gaps in the LOD indexes between Techniques.
 
+@par
 Example: lod\_index 1
 
 All techniques must belong to a LOD index, by default they all belong to index 0, i.e. the highest LOD. Increasing indexes denote lower levels of detail. You can (and often will) assign more than one technique to the same LOD index, what this means is that OGRE will pick the best technique of the ones listed at the same LOD index. For readability, it is advised that you list your techniques in order of LOD, then in order of preference, although the latter is the only prerequisite (OGRE determines which one is ’best’ by which one is listed first). You must always have at least one Technique at lod\_index 0. The distance at which a LOD level is applied is determined by the lod\_distances attribute of the containing material, See [lod\_distances](#lod_005fdistances) for details.
 
+@par
 Default: lod\_index 0
 
 Techniques also contain one or more @ref Passes (and there must be at least one).
@@ -195,9 +206,15 @@ When using @ref Texture_002dbased-Shadows you can specify an alternate material 
 
 Although Ogre does a good job of detecting the capabilities of graphics cards and setting the supportability of techniques from that, occasionally card-specific behaviour exists which is not necessarily detectable and you may want to ensure that your materials go down a particular path to either use or avoid that behaviour. This is what these rules are for - you can specify matching rules so that a technique will be considered supportable only on cards from a particular vendor, or which match a device name pattern, or will be considered supported only if they **don’t** fulfil such matches. The format of the rules are as follows:
 
-gpu\_vendor\_rule &lt;include|exclude&gt; &lt;vendor\_name&gt;<br> gpu\_device\_rule &lt;include|exclude&gt; &lt;device\_pattern&gt; \[case\_sensitive\]<br> <br> An ’include’ rule means that the technique will only be supported if one of the include rules is matched (if no include rules are provided, anything will pass). An ’exclude’ rules means that the technique is considered unsupported if any of the exclude rules are matched. You can provide as many rules as you like, although &lt;vendor\_name&gt; and &lt;device\_pattern&gt; must obviously be unique. The valid list of &lt;vendor\_name&gt; values is currently ’nvidia’, ’ati’, ’intel’, ’s3’, ’matrox’ and ’3dlabs’. &lt;device\_pattern&gt; can be any string, and you can use wildcards (’\*’) if you need to match variants. Here’s an example:
+@par
+gpu\_vendor\_rule &lt;include|exclude&gt; &lt;vendor\_name&gt;<br> gpu\_device\_rule &lt;include|exclude&gt; &lt;device\_pattern&gt; \[case\_sensitive\]
 
-gpu\_vendor\_rule include nvidia<br> gpu\_vendor\_rule include intel<br> gpu\_device\_rule exclude \*950\*<br> <br> These rules, if all included in one technique, will mean that the technique will only be considered supported on graphics cards made by NVIDIA and Intel, and so long as the device name doesn’t have ’950’ in it.
+An ’include’ rule means that the technique will only be supported if one of the include rules is matched (if no include rules are provided, anything will pass). An ’exclude’ rules means that the technique is considered unsupported if any of the exclude rules are matched. You can provide as many rules as you like, although &lt;vendor\_name&gt; and &lt;device\_pattern&gt; must obviously be unique. The valid list of &lt;vendor\_name&gt; values is currently ’nvidia’, ’ati’, ’intel’, ’s3’, ’matrox’ and ’3dlabs’. &lt;device\_pattern&gt; can be any string, and you can use wildcards (’\*’) if you need to match variants. Here’s an example:
+
+@par
+gpu\_vendor\_rule include nvidia<br> gpu\_vendor\_rule include intel<br> gpu\_device\_rule exclude \*950\*
+
+These rules, if all included in one technique, will mean that the technique will only be considered supported on graphics cards made by NVIDIA and Intel, and so long as the device name doesn’t have ’950’ in it.
 
 Note that these rules can only mark a technique ’unsupported’ when it would otherwise be considered ’supported’ judging by the hardware capabilities. Even if a technique passes these rules, it is still subject to the usual hardware support tests.
 
@@ -262,13 +279,13 @@ Here are the attributes you can use in a ’pass’ section of a .material scrip
 ## ambient
 
 Sets the ambient colour reflectance properties of this pass. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification 
-
+@par
 Format: ambient (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
-
+@par
 Example: ambient 0.0 0.8 0.0
 
 The base colour of a pass is determined by how much red, green and blue light is reflects at each vertex. This property determines how much ambient light (directionless global light) is reflected. It is also possible to make the ambient reflectance track the vertex colour as defined in the mesh by using the keyword vertexcolour instead of the colour values. The default is full white, meaning objects are completely globally illuminated. Reduce this if you want to see diffuse or specular light effects, or change the blend of colours to make the object have a base colour other than white. This setting has no effect if dynamic lighting is disabled using the ’lighting off’ attribute, or if any texture layer has a ’colour\_op replace’ attribute.
-
+@par
 Default: ambient 1.0 1.0 1.0 1.0
 
 <a name="diffuse"></a><a name="diffuse-1"></a>
@@ -276,13 +293,13 @@ Default: ambient 1.0 1.0 1.0 1.0
 ## diffuse
 
 Sets the diffuse colour reflectance properties of this pass. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
-
+@par
 Format: diffuse (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
-
+@par
 Example: diffuse 1.0 0.5 0.5
 
 The base colour of a pass is determined by how much red, green and blue light is reflects at each vertex. This property determines how much diffuse light (light from instances of the Light class in the scene) is reflected. It is also possible to make the diffuse reflectance track the vertex colour as defined in the mesh by using the keyword vertexcolour instead of the colour values. The default is full white, meaning objects reflect the maximum white light they can from Light objects. This setting has no effect if dynamic lighting is disabled using the ’lighting off’ attribute, or if any texture layer has a ’colour\_op replace’ attribute.
-
+@par
 Default: diffuse 1.0 1.0 1.0 1.0
 
 <a name="specular"></a><a name="specular-1"></a>
@@ -290,13 +307,13 @@ Default: diffuse 1.0 1.0 1.0 1.0
 ## specular
 
 Sets the specular colour reflectance properties of this pass. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
-
+@par
 Format: specular (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour) &lt;shininess&gt;<br> NB valid colour values are between 0.0 and 1.0. Shininess can be any value greater than 0.
-
+@par
 Example: specular 1.0 1.0 1.0 12.5
 
 The base colour of a pass is determined by how much red, green and blue light is reflects at each vertex. This property determines how much specular light (highlights from instances of the Light class in the scene) is reflected. It is also possible to make the diffuse reflectance track the vertex colour as defined in the mesh by using the keyword vertexcolour instead of the colour values. The default is to reflect no specular light. The colour of the specular highlights is determined by the colour parameters, and the size of the highlights by the separate shininess parameter.. The higher the value of the shininess parameter, the sharper the highlight i.e. the radius is smaller. Beware of using shininess values in the range of 0 to 1 since this causes the the specular colour to be applied to the whole surface that has the material applied to it. When the viewing angle to the surface changes, ugly flickering will also occur when shininess is in the range of 0 to 1. Shininess values between 1 and 128 work best in both DirectX and OpenGL renderers. This setting has no effect if dynamic lighting is disabled using the ’lighting off’ attribute, or if any texture layer has a ’colour\_op replace’ attribute.
-
+@par
 Default: specular 0.0 0.0 0.0 0.0 0.0
 
 <a name="emissive"></a><a name="emissive-1"></a>
@@ -304,13 +321,13 @@ Default: specular 0.0 0.0 0.0 0.0 0.0
 ## emissive
 
 Sets the amount of self-illumination an object has. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
-
+@par
 Format: emissive (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
-
+@par
 Example: emissive 1.0 0.0 0.0
 
 If an object is self-illuminating, it does not need external sources to light it, ambient or otherwise. It’s like the object has it’s own personal ambient light. Unlike the name suggests, this object doesn’t act as a light source for other objects in the scene (if you want it to, you have to create a light which is centered on the object). It is also possible to make the emissive colour track the vertex colour as defined in the mesh by using the keyword vertexcolour instead of the colour values. This setting has no effect if dynamic lighting is disabled using the ’lighting off’ attribute, or if any texture layer has a ’colour\_op replace’ attribute.
-
+@par
 Default: emissive 0.0 0.0 0.0 0.0
 
 <a name="scene_005fblend"></a><a name="scene_005fblend-1"></a>
@@ -318,9 +335,9 @@ Default: emissive 0.0 0.0 0.0 0.0
 ## scene\_blend
 
 Sets the kind of blending this pass has with the existing contents of the scene. Whereas the texture blending operations seen in the texture\_unit entries are concerned with blending between texture layers, this blending is about combining the output of this pass as a whole with the existing contents of the rendering target. This blending therefore allows object transparency and other special effects. There are 2 formats, one using predefined blend types, the other allowing a roll-your-own approach using source and destination factors.
-
+@par
 Format1: scene\_blend &lt;add|modulate|alpha\_blend|colour\_blend&gt;
-
+@par
 Example: scene\_blend add
 
 This is the simpler form, where the most commonly used blending modes are enumerated using a single parameter. Valid &lt;blend\_type&gt; parameters are:
@@ -343,9 +360,9 @@ Colour the scene based on the brightness of the input colours, but don’t darke
 The alpha value of the rendering output is used as a mask. Equivalent to ’scene\_blend src\_alpha one\_minus\_src\_alpha’
 
 </dd> </dl> <br>
-
+@par
 Format2: scene\_blend &lt;src\_factor&gt; &lt;dest\_factor&gt;
-
+@par
 Example: scene\_blend one one\_minus\_dest\_alpha
 
 This version of the method allows complete control over the blending operation, by specifying the source and destination blending factors. The resulting colour which is written to the rendering target is (texture \* sourceFactor) + (scene\_pixel \* destFactor). Valid values for both parameters are:
@@ -392,7 +409,7 @@ The texel alpha value
 1 - (src\_alpha)
 
 </dd> </dl> <br>
-
+@par
 Default: scene\_blend one zero (opaque)  Also see [separate\_scene\_blend](#separate_005fscene_005fblend).
 
 <a name="separate_005fscene_005fblend"></a><a name="separate_005fscene_005fblend-1"></a>
@@ -400,15 +417,15 @@ Default: scene\_blend one zero (opaque)  Also see [separate\_scene\_blend](#sepa
 ## separate\_scene\_blend
 
 This option operates in exactly the same way as [scene\_blend](#scene_005fblend), except that it allows you to specify the operations to perform between the rendered pixel and the frame buffer separately for colour and alpha components. By nature this option is only useful when rendering to targets which have an alpha channel which you’ll use for later processing, such as a render texture.
-
+@par
 Format1: separate\_scene\_blend &lt;simple\_colour\_blend&gt; &lt;simple\_alpha\_blend&gt;
-
+@par
 Example: separate\_scene\_blend add modulate
 
 This example would add colour components but multiply alpha components. The blend modes available are as in [scene\_blend](#scene_005fblend). The more advanced form is also available:
-
+@par
 Format2: separate\_scene\_blend &lt;colour\_src\_factor&gt; &lt;colour\_dest\_factor&gt; &lt;alpha\_src\_factor&gt; &lt;alpha\_dest\_factor&gt;
-
+@par
 Example: separate\_scene\_blend one one\_minus\_dest\_alpha one one 
 
 Again the options available in the second format are the same as those in the second format of [scene\_blend](#scene_005fblend).
@@ -418,7 +435,7 @@ Again the options available in the second format are the same as those in the se
 ## scene\_blend\_op
 
 This directive changes the operation which is applied between the two components of the scene blending equation, which by default is ’add’ (sourceFactor \* source + destFactor \* dest). You may change this to ’add’, ’subtract’, ’reverse\_subtract’, ’min’ or ’max’.
-
+@par
 Format: scene\_blend\_op &lt;add|subtract|reverse\_subtract|min|max&gt; Default: scene\_blend\_op add
 
 <a name="separate_005fscene_005fblend_005fop"></a><a name="separate_005fscene_005fblend_005fop-1"></a>
@@ -426,7 +443,7 @@ Format: scene\_blend\_op &lt;add|subtract|reverse\_subtract|min|max&gt; Default:
 ## separate\_scene\_blend\_op
 
 This directive is as scene\_blend\_op, except that you can set the operation for colour and alpha separately.
-
+@par
 Format: separate\_scene\_blend\_op &lt;colourOp&gt; &lt;alphaOp&gt; Default: separate\_scene\_blend\_op add add
 
 <a name="depth_005fcheck"></a><a name="depth_005fcheck-1"></a>
@@ -434,7 +451,7 @@ Format: separate\_scene\_blend\_op &lt;colourOp&gt; &lt;alphaOp&gt; Default: sep
 ## depth\_check
 
 Sets whether or not this pass renders with depth-buffer checking on or not.
-
+@par
 Format: depth\_check &lt;on|off&gt;
 
 If depth-buffer checking is on, whenever a pixel is about to be written to the frame buffer the depth buffer is checked to see if the pixel is in front of all other pixels written at that point. If not, the pixel is not written. If depth checking is off, pixels are written no matter what has been rendered before. Also see depth\_func for more advanced depth check configuration.
@@ -446,11 +463,11 @@ Default: depth\_check on
 ## depth\_write
 
 Sets whether or not this pass renders with depth-buffer writing on or not.<br>
-
+@par
 Format: depth\_write &lt;on|off&gt;
 
 If depth-buffer writing is on, whenever a pixel is written to the frame buffer the depth buffer is updated with the depth value of that new pixel, thus affecting future rendering operations if future pixels are behind this one. If depth writing is off, pixels are written without updating the depth buffer. Depth writing should normally be on but can be turned off when rendering static backgrounds or when rendering a collection of transparent objects at the end of a scene so that they overlap each other correctly.
-
+@par
 Default: depth\_write on<br>
 
 <a name="depth_005ffunc"></a><a name="depth_005ffunc-1"></a>
@@ -458,7 +475,7 @@ Default: depth\_write on<br>
 ## depth\_func
 
 Sets the function used to compare depth values when depth checking is on.
-
+@par
 Format: depth\_func &lt;func&gt;
 
 If depth checking is enabled (see depth\_check) a comparison occurs between the depth value of the pixel to be written and the current contents of the buffer. This comparison is normally less\_equal, i.e. the pixel is written if it is closer (or at the same distance) than the current contents. The possible functions are:
@@ -497,7 +514,7 @@ Write if (new\_Z &gt;= existing\_Z)
 Write if (new\_Z &gt;existing\_Z)
 
 </dd> </dl> <br>
-
+@par
 Default: depth\_func less\_equal
 
 <a name="depth_005fbias"></a><a name="depth_005fbias-1"></a>
@@ -505,7 +522,7 @@ Default: depth\_func less\_equal
 ## depth\_bias
 
 Sets the bias applied to the depth value of this pass. Can be used to make coplanar polygons appear on top of others e.g. for decals. 
-
+@par
 Format: depth\_bias &lt;constant\_bias&gt; \[&lt;slopescale\_bias&gt;\]
 
 The final depth bias value is constant\_bias \* minObservableDepth + maxSlope \* slopescale\_bias. Slope scale biasing is relative to the angle of the polygon to the camera, which makes for a more appropriate bias value, but this is ignored on some older hardware. Constant biasing is expressed as a factor of the minimum depth value, so a value of 1 will nudge the depth by one ’notch’ if you will. Also see [iteration\_depth\_bias](#iteration_005fdepth_005fbias)
@@ -515,7 +532,7 @@ The final depth bias value is constant\_bias \* minObservableDepth + maxSlope \*
 ## iteration\_depth\_bias
 
 Sets an additional bias derived from the number of times a given pass has been iterated. Operates just like [depth\_bias](#depth_005fbias) except that it applies an additional bias factor to the base depth\_bias value, multiplying the provided value by the number of times this pass has been iterated before, through one of the [iteration](#iteration) variants. So the first time the pass will get the depth\_bias value, the second time it will get depth\_bias + iteration\_depth\_bias, the third time it will get depth\_bias + iteration\_depth\_bias \* 2, and so on. The default is zero. 
-
+@par
 Format: iteration\_depth\_bias &lt;bias\_per\_iteration&gt;
 
  <a name="alpha_005frejection"></a><a name="alpha_005frejection-1"></a>
@@ -523,13 +540,13 @@ Format: iteration\_depth\_bias &lt;bias\_per\_iteration&gt;
 ## alpha\_rejection
 
 Sets the way the pass will have use alpha to totally reject pixels from the pipeline.
-
+@par
 Format: alpha\_rejection &lt;function&gt; &lt;value&gt;
-
+@par
 Example: alpha\_rejection greater\_equal 128
 
 The function parameter can be any of the options listed in the material depth\_function attribute. The value parameter can theoretically be any value between 0 and 255, but is best limited to 0 or 128 for hardware compatibility.
-
+@par
 Default: alpha\_rejection always\_pass
 
 <a name="alpha_005fto_005fcoverage"></a><a name="alpha_005fto_005fcoverage-1"></a>
@@ -537,9 +554,9 @@ Default: alpha\_rejection always\_pass
 ## alpha\_to\_coverage
 
 Sets whether this pass will use ’alpha to coverage’, a way to multisample alpha texture edges so they blend more seamlessly with the background. This facility is typically only available on cards from around 2006 onwards, but it is safe to enable it anyway - Ogre will just ignore it if the hardware does not support it. The common use for alpha to coverage is foliage rendering and chain-link fence style textures. 
-
+@par
 Format: alpha\_to\_coverage &lt;on|off&gt;
-
+@par
 Default: alpha\_to\_coverage off <a name="light_005fscissor"></a>
 
 <a name="light_005fscissor-1"></a>
@@ -547,7 +564,7 @@ Default: alpha\_to\_coverage off <a name="light_005fscissor"></a>
 ## light\_scissor
 
 Sets whether when rendering this pass, rendering will be limited to a screen-space scissor rectangle representing the coverage of the light(s) being used in this pass, derived from their attenuation ranges.
-
+@par
 Format: light\_scissor &lt;on|off&gt; Default: light\_scissor off
 
 This option is usually only useful if this pass is an additive lighting pass, and is at least the second one in the technique. Ie areas which are not affected by the current light(s) will never need to be rendered. If there is more than one light being passed to the pass, then the scissor is defined to be the rectangle which covers all lights in screen-space. Directional lights are ignored since they are infinite.
@@ -559,7 +576,7 @@ This option does not need to be specified if you are using a standard additive s
 ## light\_clip\_planes
 
 Sets whether when rendering this pass, triangle setup will be limited to clipping volume covered by the light. Directional lights are ignored, point lights clip to a cube the size of the attenuation range or the light, and spotlights clip to a pyramid bounding the spotlight angle and attenuation range.
-
+@par
 Format: light\_clip\_planes &lt;on|off&gt; Default: light\_clip\_planes off
 
 This option will only function if there is a single non-directional light being used in this pass. If there is more than one light, or only directional lights, then no clipping will occur. If there are no lights at all then the objects won’t be rendered at all.
@@ -573,7 +590,7 @@ When using a standard additive shadow mode, i.e. SHADOWTYPE\_STENCIL\_ADDITIVE o
 When using an additive lighting mode (SHADOWTYPE\_STENCIL\_ADDITIVE or SHADOWTYPE\_TEXTURE\_ADDITIVE), the scene is rendered in 3 discrete stages, ambient (or pre-lighting), per-light (once per light, with shadowing) and decal (or post-lighting). Usually OGRE figures out how to categorise your passes automatically, but there are some effects you cannot achieve without manually controlling the illumination. For example specular effects are muted by the typical sequence because all textures are saved until the ’decal’ stage which mutes the specular effect. Instead, you could do texturing within the per-light stage if it’s possible for your material and thus add the specular on after the decal texturing, and have no post-light rendering. 
 
 If you assign an illumination stage to a pass you have to assign it to all passes in the technique otherwise it will be ignored. Also note that whilst you can have more than one pass in each group, they cannot alternate, i.e. all ambient passes will be before all per-light passes, which will also be before all decal passes. Within their categories the passes will retain their ordering though.
-
+@par
 Format: illumination\_stage &lt;ambient|per\_light|decal&gt; Default: none (autodetect)
 
 <a name="normalise_005fnormals"></a><a name="normalise_005fnormals-1"></a>
@@ -581,11 +598,11 @@ Format: illumination\_stage &lt;ambient|per\_light|decal&gt; Default: none (auto
 ## normalise\_normals
 
 Sets whether or not this pass renders with all vertex normals being automatically re-normalised.<br>
-
+@par
 Format: normalise\_normals &lt;on|off&gt;
 
 Scaling objects causes normals to also change magnitude, which can throw off your lighting calculations. By default, the SceneManager detects this and will automatically re-normalise normals for any scaled object, but this has a cost. If you’d prefer to control this manually, call SceneManager::setNormaliseNormalsOnScale(false) and then use this option on materials which are sensitive to normals being resized. 
-
+@par
 Default: normalise\_normals off<br>
 
 <a name="transparent_005fsorting"></a><a name="transparent_005fsorting-1"></a>
@@ -593,13 +610,13 @@ Default: normalise\_normals off<br>
 ## transparent\_sorting
 
 Sets if transparent textures should be sorted by depth or not.
-
+@par
 Format: transparent\_sorting &lt;on|off|force&gt;
 
 By default all transparent materials are sorted such that renderables furthest away from the camera are rendered first. This is usually the desired behaviour but in certain cases this depth sorting may be unnecessary and undesirable. If for example it is necessary to ensure the rendering order does not change from one frame to the next. In this case you could set the value to ’off’ to prevent sorting.
 
 You can also use the keyword ’force’ to force transparent sorting on, regardless of other circumstances. Usually sorting is only used when the pass is also transparent, and has a depth write or read which indicates it cannot reliably render without sorting. By using ’force’, you tell OGRE to sort this pass no matter what other circumstances are present.
-
+@par
 Default: transparent\_sorting on
 
 <a name="cull_005fhardware"></a><a name="cull_005fhardware-1"></a>
@@ -607,11 +624,11 @@ Default: transparent\_sorting on
 ## cull\_hardware
 
 Sets the hardware culling mode for this pass.
-
+@par
 Format: cull\_hardware &lt;clockwise|anticlockwise|none&gt;
 
 A typical way for the hardware rendering engine to cull triangles is based on the ’vertex winding’ of triangles. Vertex winding refers to the direction in which the vertices are passed or indexed to in the rendering operation as viewed from the camera, and will wither be clockwise or anticlockwise (that’s ’counterclockwise’ for you Americans out there ;). If the option ’cull\_hardware clockwise’ is set, all triangles whose vertices are viewed in clockwise order from the camera will be culled by the hardware. ’anticlockwise’ is the reverse (obviously), and ’none’ turns off hardware culling so all triangles are rendered (useful for creating 2-sided passes).
-
+@par
 Default: cull\_hardware clockwise<br> NB this is the same as OpenGL’s default but the opposite of Direct3D’s default (because Ogre uses a right-handed coordinate system like OpenGL).
 
 <a name="cull_005fsoftware"></a><a name="cull_005fsoftware-1"></a>
@@ -619,11 +636,11 @@ Default: cull\_hardware clockwise<br> NB this is the same as OpenGL’s default 
 ## cull\_software
 
 Sets the software culling mode for this pass.
-
+@par
 Format: cull\_software &lt;back|front|none&gt;
 
 In some situations the engine will also cull geometry in software before sending it to the hardware renderer. This setting only takes effect on SceneManager’s that use it (since it is best used on large groups of planar world geometry rather than on movable geometry since this would be expensive), but if used can cull geometry before it is sent to the hardware. In this case the culling is based on whether the ’back’ or ’front’ of the triangle is facing the camera - this definition is based on the face normal (a vector which sticks out of the front side of the polygon perpendicular to the face). Since Ogre expects face normals to be on anticlockwise side of the face, ’cull\_software back’ is the software equivalent of ’cull\_hardware clockwise’ setting, which is why they are both the default. The naming is different to reflect the way the culling is done though, since most of the time face normals are pre-calculated and they don’t have to be the way Ogre expects - you could set ’cull\_hardware none’ and completely cull in software based on your own face normals, if you have the right SceneManager which uses them.
-
+@par
 Default: cull\_software back
 
 <a name="lighting"></a><a name="lighting-1"></a>
@@ -631,11 +648,11 @@ Default: cull\_software back
 ## lighting
 
 Sets whether or not dynamic lighting is turned on for this pass or not. If lighting is turned off, all objects rendered using the pass will be fully lit. **This attribute has no effect if a vertex program is used.**
-
+@par
 Format: lighting &lt;on|off&gt;
 
 Turning dynamic lighting off makes any ambient, diffuse, specular, emissive and shading properties for this pass redundant. When lighting is turned on, objects are lit according to their vertex normals for diffuse and specular light, and globally for ambient and emissive.
-
+@par
 Default: lighting on
 
 <a name="shading"></a><a name="shading-1"></a>
@@ -643,7 +660,7 @@ Default: lighting on
 ## shading
 
 Sets the kind of shading which should be used for representing dynamic lighting for this pass.
-
+@par
 Format: shading &lt;flat|gouraud|phong&gt;
 
 When dynamic lighting is turned on, the effect is to generate colour values at each vertex. Whether these values are interpolated across the face (and how) depends on this setting.
@@ -662,7 +679,7 @@ Colour at each vertex is linearly interpolated across the face.
 Vertex normals are interpolated across the face, and these are used to determine colour at each pixel. Gives a more natural lighting effect but is more expensive and works better at high levels of tessellation. Not supported on all hardware.
 
 </dd> </dl>
-
+@par
 Default: shading gouraud
 
 <a name="polygon_005fmode"></a><a name="polygon_005fmode-1"></a>
@@ -670,7 +687,7 @@ Default: shading gouraud
 ## polygon\_mode
 
 Sets how polygons should be rasterised, i.e. whether they should be filled in, or just drawn as lines or points.
-
+@par
 Format: polygon\_mode &lt;solid|wireframe|points&gt;
 
 <dl compact="compact">
@@ -687,7 +704,7 @@ Polygons are drawn in outline only.
 Only the points of each polygon are rendered.
 
 </dd> </dl>
-
+@par
 Default: polygon\_mode solid
 
 <a name="polygon_005fmode_005foverrideable"></a><a name="polygon_005fmode_005foverrideable-1"></a>
@@ -695,7 +712,7 @@ Default: polygon\_mode solid
 ## polygon\_mode\_overrideable
 
 Sets whether or not the [polygon\_mode](#polygon_005fmode) set on this pass can be downgraded by the camera, if the camera itself is set to a lower polygon mode. If set to false, this pass will always be rendered at its own chosen polygon mode no matter what the camera says. The default is true.
-
+@par
 Format: polygon\_mode\_overrideable &lt;true|false&gt;
 
 <a name="fog_005foverride"></a><a name="fog_005foverride-1"></a>
@@ -703,36 +720,24 @@ Format: polygon\_mode\_overrideable &lt;true|false&gt;
 ## fog\_override
 
 Tells the pass whether it should override the scene fog settings, and enforce it’s own. Very useful for things that you don’t want to be affected by fog when the rest of the scene is fogged, or vice versa. Note that this only affects fixed-function fog - the original scene fog parameters are still sent to shaders which use the fog\_params parameter binding (this allows you to turn off fixed function fog and calculate it in the shader instead; if you want to disable shader fog you can do that through shader parameters anyway). 
-
+@par
 Format: fog\_override &lt;override?&gt; \[&lt;type&gt; &lt;colour&gt; &lt;density&gt; &lt;start&gt; &lt;end&gt;\]
-
+@par
 Default: fog\_override false
 
-If you specify ’true’ for the first parameter and you supply the rest of the parameters, you are telling the pass to use these fog settings in preference to the scene settings, whatever they might be. If you specify ’true’ but provide no further parameters, you are telling this pass to never use fogging no matter what the scene says. Here is an explanation of the parameters:<br>
+If you specify ’true’ for the first parameter and you supply the rest of the parameters, you are telling the pass to use these fog settings in preference to the scene settings, whatever they might be. If you specify ’true’ but provide no further parameters, you are telling this pass to never use fogging no matter what the scene says.
 
-<dl compact="compact">
-<dt>type</dt> <dd>
+@param type **none** = No fog, equivalent of just using ’fog\_override true’<br> **linear** = Linear fog from the &lt;start&gt; and &lt;end&gt; distances<br> **exp** = Fog increases exponentially from the camera (fog = 1/e^(distance \* density)), use &lt;density&gt; param to control it<br> **exp2** = Fog increases at the square of FOG\_EXP, i.e. even quicker (fog = 1/e^(distance \* density)^2), use &lt;density&gt; param to control it
 
-**none** = No fog, equivalent of just using ’fog\_override true’<br> **linear** = Linear fog from the &lt;start&gt; and &lt;end&gt; distances<br> **exp** = Fog increases exponentially from the camera (fog = 1/e^(distance \* density)), use &lt;density&gt; param to control it<br> **exp2** = Fog increases at the square of FOG\_EXP, i.e. even quicker (fog = 1/e^(distance \* density)^2), use &lt;density&gt; param to control it
+@param colour Sequence of 3 floating point values from 0 to 1 indicating the red, green and blue intensities
 
-</dd> <dt>colour</dt> <dd>
+@param density The density parameter used in the ’exp’ or ’exp2’ fog types. Not used in linear mode but param must still be there as a placeholder
 
-Sequence of 3 floating point values from 0 to 1 indicating the red, green and blue intensities
+@param start The start distance from the camera of linear fog. Must still be present in other modes, even though it is not used.
 
-</dd> <dt>density</dt> <dd>
+@param end The end distance from the camera of linear fog. Must still be present in other modes, even though it is not used.
 
-The density parameter used in the ’exp’ or ’exp2’ fog types. Not used in linear mode but param must still be there as a placeholder
-
-</dd> <dt>start</dt> <dd>
-
-The start distance from the camera of linear fog. Must still be present in other modes, even though it is not used.
-
-</dd> <dt>end</dt> <dd>
-
-The end distance from the camera of linear fog. Must still be present in other modes, even though it is not used.
-
-</dd> </dl> <br>
-
+@par
 Example: fog\_override true exp 1 1 1 0.002 100 10000
 
 <a name="colour_005fwrite"></a><a name="colour_005fwrite-1"></a>
@@ -740,38 +745,44 @@ Example: fog\_override true exp 1 1 1 0.002 100 10000
 ## colour\_write
 
 Sets whether or not this pass renders with colour writing on or not.<br>
-
+@par
 Format: colour\_write &lt;on|off&gt;
 
 If colour writing is off no visible pixels are written to the screen during this pass. You might think this is useless, but if you render with colour writing off, and with very minimal other settings, you can use this pass to initialise the depth buffer before subsequently rendering other passes which fill in the colour data. This can give you significant performance boosts on some newer cards, especially when using complex fragment programs, because if the depth check fails then the fragment program is never run. 
-
+@par
 Default: colour\_write on<br>
 
 <a name="start_005flight"></a><a name="start_005flight-1"></a>
 
 ## start\_light
 
-Sets the first light which will be considered for use with this pass. Format: start\_light &lt;number&gt;
+Sets the first light which will be considered for use with this pass.
+@par
+Format: start\_light &lt;number&gt;
 
 You can use this attribute to offset the starting point of the lights for this pass. In other words, if you set start\_light to 2 then the first light to be processed in that pass will be the third actual light in the applicable list. You could use this option to use different passes to process the first couple of lights versus the second couple of lights for example, or use it in conjunction with the [iteration](#iteration) option to start the iteration from a given point in the list (e.g. doing the first 2 lights in the first pass, and then iterating every 2 lights from then on perhaps). 
-
+@par
 Default: start\_light 0<br>
 
 <a name="max_005flights"></a><a name="max_005flights-1"></a>
 
 ## max\_lights
 
-Sets the maximum number of lights which will be considered for use with this pass. Format: max\_lights &lt;number&gt;
+Sets the maximum number of lights which will be considered for use with this pass.
+@par
+Format: max\_lights &lt;number&gt;
 
 The maximum number of lights which can be used when rendering fixed-function materials is set by the rendering system, and is typically set at 8. When you are using the programmable pipeline (See [Using Vertex/Geometry/Fragment Programs in a Pass](@ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass)) this limit is dependent on the program you are running, or, if you use ’iteration once\_per\_light’ or a variant (See @ref iteration), it effectively only bounded by the number of passes you are willing to use. If you are not using pass iteration, the light limit applies once for this pass. If you are using pass iteration, the light limit applies across all iterations of this pass - for example if you have 12 lights in range with an ’iteration once\_per\_light’ setup but your max\_lights is set to 4 for that pass, the pass will only iterate 4 times. 
-
+@par
 Default: max\_lights 8<br>
 
 ## iteration {#iteration}
 
 Sets whether or not this pass is iterated, i.e. issued more than once.
-
-Format 1: iteration &lt;once | once\_per\_light&gt; \[lightType\] Format 2: iteration &lt;number&gt; \[&lt;per\_light&gt; \[lightType\]\] Format 3: iteration &lt;number&gt; \[&lt;per\_n\_lights&gt; &lt;num\_lights&gt; \[lightType\]\] Examples:
+@par
+Format 1: iteration &lt;once | once\_per\_light&gt; \[lightType\] Format 2: iteration &lt;number&gt; \[&lt;per\_light&gt; \[lightType\]\] 
+@par
+Format 3: iteration &lt;number&gt; \[&lt;per\_n\_lights&gt; &lt;num\_lights&gt; \[lightType\]\] Examples:
 
 <dl compact="compact">
 <dt>iteration once</dt> <dd>
@@ -899,7 +910,7 @@ material Fur
 This setting allows you to change the size of points when rendering a point list, or a list of point sprites. The interpretation of this command depends on the [point\_size\_attenuation](#point_005fsize_005fattenuation) option - if it is off (the default), the point size is in screen pixels, if it is on, it expressed as normalised screen coordinates (1.0 is the height of the screen) when the point is at the origin. 
 
 @note Some drivers have an upper limit on the size of points they support - this can even vary between APIs on the same card! Don’t rely on point sizes that cause the points to get very large on screen, since they may get clamped on some cards. Upper sizes can range from 64 to 256 pixels.
-
+@par
 Format: point\_size &lt;size&gt; Default: point\_size 1.0
 
 <a name="point_005fsprites"></a><a name="point_005fsprites-1"></a>
@@ -907,7 +918,7 @@ Format: point\_size &lt;size&gt; Default: point\_size 1.0
 ## point\_sprites
 
 This setting specifies whether or not hardware point sprite rendering is enabled for this pass. Enabling it means that a point list is rendered as a list of quads rather than a list of dots. It is very useful to use this option if you’re using a BillboardSet and only need to use point oriented billboards which are all of the same size. You can also use it for any other point list render. 
-
+@par
 Format: point\_sprites &lt;on|off&gt; Default: point\_sprites off
 
 <a name="point_005fsize_005fattenuation"></a><a name="point_005fsize_005fattenuation-1"></a>
@@ -919,7 +930,7 @@ Defines whether point size is attenuated with view space distance, and in what f
 You only have to provide the final 3 parameters if you turn attenuation on. The formula for attenuation is that the size of the point is multiplied by 1 / (constant + linear \* dist + quadratic \* d^2); therefore turning it off is equivalent to (constant = 1, linear = 0, quadratic = 0) and standard perspective attenuation is (constant = 0, linear = 1, quadratic = 0). The latter is assumed if you leave out the final 3 parameters when you specify ’on’.
 
 Note that the resulting attenuated size is clamped to the minimum and maximum point size, see the next section.
-
+@par
 Format: point\_size\_attenuation &lt;on|off&gt; \[constant linear quadratic\] Default: point\_size\_attenuation off
 
 <a name="point_005fsize_005fmin"></a><a name="point_005fsize_005fmin-1"></a>
@@ -927,7 +938,7 @@ Format: point\_size\_attenuation &lt;on|off&gt; \[constant linear quadratic\] De
 ## point\_size\_min
 
 Sets the minimum point size after attenuation ([point\_size\_attenuation](#point_005fsize_005fattenuation)). For details on the size metrics, See [point\_size](#point_005fsize).
-
+@par
 Format: point\_size\_min &lt;size&gt; Default: point\_size\_min 0
 
 <a name="point_005fsize_005fmax"></a><a name="point_005fsize_005fmax-1"></a>
@@ -935,7 +946,7 @@ Format: point\_size\_min &lt;size&gt; Default: point\_size\_min 0
 ## point\_size\_max
 
 Sets the maximum point size after attenuation ([point\_size\_attenuation](#point_005fsize_005fattenuation)). For details on the size metrics, See [point\_size](#point_005fsize). A value of 0 means the maximum is set to the same as the max size reported by the current card. 
-
+@par
 Format: point\_size\_max &lt;size&gt; Default: point\_size\_max 0
 
 
@@ -983,9 +994,9 @@ You can also use a nested ’texture\_source’ section in order to use a specia
 ## texture\_alias
 
 Sets the alias name for this texture unit.
-
+@par
 Format: texture\_alias &lt;name&gt;
-
+@par
 Example: texture\_alias NormalMap
 
 Setting the texture alias name is useful if this material is to be inherited by other other materials and only the textures will be changed in the new material.(See @ref Texture-Aliases) Default: If a texture\_unit has a name then the texture\_alias defaults to the texture\_unit name.
@@ -995,9 +1006,9 @@ Setting the texture alias name is useful if this material is to be inherited by 
 ## texture
 
 Sets the name of the static texture image this layer will use.
-
+@par
 Format: texture &lt;texturename&gt; \[&lt;type&gt;\] \[unlimited | numMipMaps\] \[alpha\] \[&lt;PixelFormat&gt;\] \[gamma\]
-
+@par
 Example: texture funkywall.jpg
 
 This setting is mutually exclusive with the anim\_texture attribute. Note that the texture file cannot include spaces. Those of you Windows users who like spaces in filenames, please get over it and use underscores instead. 
@@ -1042,19 +1053,19 @@ informs the renderer that you want the graphics hardware to perform gamma correc
 ## anim\_texture
 
 Sets the images to be used in an animated texture layer. In this case an animated texture layer means one which has multiple frames, each of which is a separate image file. There are 2 formats, one for implicitly determined image names, one for explicitly named images.
-
+@par
 Format1 (short): anim\_texture &lt;base\_name&gt; &lt;num\_frames&gt; &lt;duration&gt;
-
+@par
 Example: anim\_texture flame.jpg 5 2.5
 
 This sets up an animated texture layer made up of 5 frames named flame\_0.jpg, flame\_1.jpg, flame\_2.jpg etc, with an animation length of 2.5 seconds (2fps). If duration is set to 0, then no automatic transition takes place and frames must be changed manually in code.
-
+@par
 Format2 (long): anim\_texture &lt;frame1&gt; &lt;frame2&gt; ... &lt;duration&gt;
-
+@par
 Example: anim\_texture flamestart.jpg flamemore.png flameagain.jpg moreflame.jpg lastflame.tga 2.5
 
 This sets up the same duration animation but from 5 separately named image files. The first format is more concise, but the second is provided if you cannot make your images conform to the naming standard required for it. 
-
+@par
 Default: none
 
 <a name="cubic_005ftexture"></a><a name="cubic_005ftexture-1"></a>
@@ -1062,11 +1073,11 @@ Default: none
 ## cubic\_texture
 
 Sets the images used in a cubic texture, i.e. one made up of 6 individual images making up the faces of a cube or 1 cube texture if supported by the texture format(DDS for example) and rendersystem.. These kinds of textures are used for reflection maps (if hardware supports cubic reflection maps) or skyboxes. There are 2 formats, a brief format expecting image names of a particular format and a more flexible but longer format for arbitrarily named textures.
-
+@par
 Format1 (short): cubic\_texture &lt;base\_name&gt; &lt;combinedUVW|separateUV&gt;
 
 The base\_name in this format is something like ’skybox.jpg’, and the system will expect you to provide skybox\_fr.jpg, skybox\_bk.jpg, skybox\_up.jpg, skybox\_dn.jpg, skybox\_lf.jpg, and skybox\_rt.jpg for the individual faces.
-
+@par
 Format2 (long): cubic\_texture &lt;front&gt; &lt;back&gt; &lt;left&gt; &lt;right&gt; &lt;up&gt; &lt;down&gt; separateUV
 
 In this case each face is specified explicitly, incase you don’t want to conform to the image naming standards above. You can only use this for the separateUV version since the combinedUVW version requires a single texture name to be assigned to the combined 3D texture (see below).
@@ -1088,7 +1099,7 @@ The 6 textures are combined into a single ’cubic’ texture map which is then 
 
 </dd>
 </dl> <br>
-
+@par
 Default: none
 
 <a name="binding_005ftype"></a><a name="binding_005ftype-1"></a>
@@ -1096,9 +1107,9 @@ Default: none
 ## binding\_type
 
 Tells this texture unit to bind to either the fragment processing unit or the vertex processing unit (for @ref Vertex-Texture-Fetch). 
-
+@par
 Format: binding\_type &lt;vertex|fragment&gt;
-
+@par
 Default: binding\_type fragment
 
 <a name="content_005ftype"></a><a name="content_005ftype-1"></a>
@@ -1122,7 +1133,10 @@ This option allows you to reference a texture from a compositor, and is only val
 
 </dd> </dl>
 
-Format: content\_type &lt;named|shadow|compositor&gt; \[&lt;Referenced Compositor Name&gt;\] \[&lt;Referenced Texture Name&gt;\] \[&lt;Referenced MRT Index&gt;\]  Default: content\_type named  Example: content\_type compositor DepthCompositor OutputTexture 
+@par
+Format: content\_type &lt;named|shadow|compositor&gt; \[&lt;Referenced Compositor Name&gt;\] \[&lt;Referenced Texture Name&gt;\] \[&lt;Referenced MRT Index&gt;\]
+@par
+Default: content\_type named  Example: content\_type compositor DepthCompositor OutputTexture 
 
 <a name="tex_005fcoord_005fset"></a><a name="tex_005fcoord_005fset-1"></a>
 
@@ -1131,11 +1145,11 @@ Format: content\_type &lt;named|shadow|compositor&gt; \[&lt;Referenced Composito
 Sets which texture coordinate set is to be used for this texture layer. A mesh can define multiple sets of texture coordinates, this sets which one this material uses.
 
 @note Only has an effect with the fixed-function pipeline or the @ref RTShader
-
+@par
 Format: tex\_coord\_set &lt;set\_num&gt;
-
+@par
 Example: tex\_coord\_set 2
-
+@par
 Default: tex\_coord\_set 0
 
 <a name="tex_005faddress_005fmode"></a><a name="tex_005faddress_005fmode-1"></a>
@@ -1143,7 +1157,7 @@ Default: tex\_coord\_set 0
 ## tex\_address\_mode
 
 Defines what happens when texture coordinates exceed 1.0 for this texture layer.You can use the simple format to specify the addressing mode for all 3 potential texture coordinates at once, or you can use the 2/3 parameter extended format to specify a different mode per texture coordinate. 
-
+@par
 Simple Format: tex\_address\_mode &lt;uvw\_mode&gt; <br> Extended Format: tex\_address\_mode &lt;u\_mode&gt; &lt;v\_mode&gt; \[&lt;w\_mode&gt;\]
 
 <dl compact="compact">
@@ -1164,7 +1178,7 @@ Texture flips every boundary, meaning texture is mirrored every 1.0 u or v
 Values outside the range \[0.0, 1.0\] are set to the border colour, you might also set the [tex\_border\_colour](#tex_005fborder_005fcolour) attribute too.
 
 </dd> </dl> <br>
-
+@par
 Default: tex\_address\_mode wrap
 
 <a name="tex_005fborder_005fcolour"></a><a name="tex_005fborder_005fcolour-1"></a>
@@ -1172,11 +1186,11 @@ Default: tex\_address\_mode wrap
 ## tex\_border\_colour
 
 Sets the border colour of border texture address mode (see [tex\_address\_mode](#tex_005faddress_005fmode)). 
-
+@par
 Format: tex\_border\_colour &lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]<br> NB valid colour values are between 0.0 and 1.0.
-
+@par
 Example: tex\_border\_colour 0.0 1.0 0.3
-
+@par
 Default: tex\_border\_colour 0.0 0.0 0.0 1.0
 
 <a name="filtering"></a><a name="filtering-1"></a>
@@ -1232,7 +1246,7 @@ Only valid for min and mag modes, makes the filter compensate for camera-space s
 ## max\_anisotropy
 
 Sets the maximum degree of anisotropy that the renderer will try to compensate for when filtering textures. The degree of anisotropy is the ratio between the height of the texture segment visible in a screen space region versus the width - so for example a floor plane, which stretches on into the distance and thus the vertical texture coordinates change much faster than the horizontal ones, has a higher anisotropy than a wall which is facing you head on (which has an anisotropy of 1 if your line of sight is perfectly perpendicular to it). You should set the max\_anisotropy value to something greater than 1 to begin compensating; higher values can compensate for more acute angles. The maximum value is determined by the hardware, but it is usually 8 or 16.  In order for this to be used, you have to set the minification and/or the magnification [filtering](#filtering) option on this texture to anisotropic.
-
+@par
 Format: max\_anisotropy &lt;value&gt;<br> Default: max\_anisotropy 1
 
 <a name="mipmap_005fbias"></a><a name="mipmap_005fbias-1"></a>
@@ -1240,7 +1254,7 @@ Format: max\_anisotropy &lt;value&gt;<br> Default: max\_anisotropy 1
 ## mipmap\_bias
 
 Sets the bias value applied to the mipmapping calculation, thus allowing you to alter the decision of which level of detail of the texture to use at any distance. The bias value is applied after the regular distance calculation, and adjusts the mipmap level by 1 level for each unit of bias. Negative bias values force larger mip levels to be used, positive bias values force smaller mip levels to be used. The bias is a floating point value so you can use values in between whole numbers for fine tuning. In order for this option to be used, your hardware has to support mipmap biasing (exposed through the render system capabilities), and your minification [filtering](#filtering) has to be set to point or linear.
-
+@par
 Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
 
 <a name="colour_005fop"></a><a name="colour_005fop-1"></a>
@@ -1248,7 +1262,7 @@ Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
 ## colour\_op
 
 Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer). @note Only has an effect with the fixed-function pipeline or the @ref RTShader
-
+@par
 Format: colour\_op &lt;replace|add|modulate|alpha\_blend&gt;
 
 This method is the simplest way to blend texture layers, because it requires only one parameter, gives you the most common blending types, and automatically sets up 2 blending methods: one for if single-pass multitexturing hardware is available, and another for if it is not and the blending must be achieved through multiple rendering passes. It is, however, quite limited and does not expose the more flexible multitexturing operations, simply because these can’t be automatically supported in multipass fallback mode. If want to use the fancier options, use [colour\_op\_ex](#colour_005fop_005fex), but you’ll either have to be sure that enough multitexturing units will be available, or you should explicitly set a fallback using [colour\_op\_multipass\_fallback](#colour_005fop_005fmultipass_005ffallback).<br>
@@ -1271,7 +1285,7 @@ Multiply colour components together.
 Blend based on texture alpha.
 
 </dd> </dl> <br>
-
+@par
 Default: colour\_op modulate
 
 <a name="colour_005fop_005fex"></a><a name="colour_005fop_005fex-1"></a>
@@ -1279,9 +1293,9 @@ Default: colour\_op modulate
 ## colour\_op\_ex
 
 This is an extended version of the [colour\_op](#colour_005fop) attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blending, but you are limited to the number of texture units which are available in hardware. @note Only has an effect with the fixed-function pipeline or the @ref RTShader
-
+@par
 Format: colour\_op\_ex &lt;operation&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manual\_factor&gt;\] \[&lt;manual\_colour1&gt;\] \[&lt;manual\_colour2&gt;\]
-
+@par
 Example colour\_op\_ex add\_signed src\_manual src\_current 0.5
 
 See the Attention note below about the issues between multipass and multitexturing that using this method can create. Texture colour operations determine how the final colour of the surface appears when rendered. Texture units are used to combine colour values from various sources (e.g. the diffuse colour of the surface from lighting calculations, combined with the colour of the texture). This method allows you to specify the ’operation’ to be used, i.e. the calculation such as adds or multiplies, and which values to use as arguments, such as a fixed value or a value from a previous calculation.
@@ -1380,7 +1394,7 @@ For example ’modulate’ takes the colour results of the previous layer, and m
 Note that the last parameter is only required if you decide to pass a value manually into the operation. Hence you only need to fill these in if you use the ’blend\_manual’ operation.
 
 @attention Ogre tries to use multitexturing hardware to blend texture layers together. However, if it runs out of texturing units (e.g. 2 of a GeForce2, 4 on a GeForce3) it has to fall back on multipass rendering, i.e. rendering the same object multiple times with different textures. This is both less efficient and there is a smaller range of blending operations which can be performed. For this reason, if you use this method you really should set the colour\_op\_multipass\_fallback attribute to specify which effect you want to fall back on if sufficient hardware is not available (the default is just ’modulate’ which is unlikely to be what you want if you’re doing swanky blending here). If you wish to avoid having to do this, use the simpler colour\_op attribute which allows less flexible blending options but sets up the multipass fallback automatically, since it only allows operations which have direct multipass equivalents.
-
+@par
 Default: none (colour\_op modulate)<br>
 
 <a name="colour_005fop_005fmultipass_005ffallback"></a><a name="colour_005fop_005fmultipass_005ffallback-1"></a>
@@ -1388,9 +1402,9 @@ Default: none (colour\_op modulate)<br>
 ## colour\_op\_multipass\_fallback
 
 Sets the multipass fallback operation for this layer, if you used colour\_op\_ex and not enough multitexturing hardware is available.
-
+@par
 Format: colour\_op\_multipass\_fallback &lt;src\_factor&gt; &lt;dest\_factor&gt;
-
+@par
 Example: colour\_op\_multipass\_fallback one one\_minus\_dest\_alpha
 
 Because some of the effects you can create using colour\_op\_ex are only supported under multitexturing hardware, if the hardware is lacking the system must fallback on multipass rendering, which unfortunately doesn’t support as many effects. This attribute is for you to specify the fallback operation which most suits you.
@@ -1408,7 +1422,7 @@ Behaves in exactly the same away as [colour\_op\_ex](#colour_005fop_005fex) exce
 ## env\_map
 
 Turns on/off texture coordinate effect that makes this layer an environment map. @note Only has an effect with the fixed-function pipeline or the @ref RTShader
-
+@par
 Format: env\_map &lt;off|spherical|planar|cubic\_reflection|cubic\_normal&gt;
 
 Environment maps make an object look reflective by using automatic texture coordinate generation depending on the relationship between the objects vertices or normals and the eye.
@@ -1431,7 +1445,7 @@ A more advanced form of reflection mapping which uses a group of 6 textures maki
 Generates 3D texture coordinates containing the camera space normal vector from the normal information held in the vertex data. Again, full use of this feature requires a [cubic\_texture](#cubic_005ftexture) with the ’combinedUVW’ option.
 
 </dd> </dl> <br>
-
+@par
 Default: env\_map off<br>
 
 <a name="scroll"></a><a name="scroll-1"></a>
@@ -1439,7 +1453,7 @@ Default: env\_map off<br>
 ## scroll
 
 Sets a fixed scroll offset for the texture.
-
+@par
 Format: scroll &lt;x&gt; &lt;y&gt;
 
 This method offsets the texture in this layer by a fixed amount. Useful for small adjustments without altering texture coordinates in models. However if you wish to have an animated scroll effect, see the [scroll\_anim](#scroll_005fanim) attribute.
@@ -1451,7 +1465,7 @@ This method offsets the texture in this layer by a fixed amount. Useful for smal
 ## scroll\_anim
 
 Sets up an animated scroll for the texture layer. Useful for creating fixed-speed scrolling effects on a texture layer (for varying scroll speeds, see [wave\_xform](#wave_005fxform)). 
-
+@par
 Format: scroll\_anim &lt;xspeed&gt; &lt;yspeed&gt;<br>
 
 @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
@@ -1460,7 +1474,7 @@ Format: scroll\_anim &lt;xspeed&gt; &lt;yspeed&gt;<br>
 ## rotate
 
 Rotates a texture to a fixed angle. This attribute changes the rotational orientation of a texture to a fixed angle, useful for fixed adjustments. If you wish to animate the rotation, see [rotate\_anim](#rotate_005fanim).
-
+@par
 Format: rotate &lt;angle&gt;
 
 The parameter is a anti-clockwise angle in degrees.
@@ -1472,6 +1486,7 @@ The parameter is a anti-clockwise angle in degrees.
 ## rotate\_anim
 
 Sets up an animated rotation effect of this layer. Useful for creating fixed-speed rotation animations (for varying speeds, see [wave\_xform](#wave_005fxform)). 
+@par
 Format: rotate\_anim &lt;revs\_per\_second&gt;
 
 The parameter is a number of anti-clockwise revolutions per second.
@@ -1483,7 +1498,7 @@ The parameter is a number of anti-clockwise revolutions per second.
 ## scale
 
 Adjusts the scaling factor applied to this texture layer. Useful for adjusting the size of textures without making changes to geometry. This is a fixed scaling factor, if you wish to animate this see [wave\_xform](#wave_005fxform).
-
+@par
 Format: scale &lt;x\_scale&gt; &lt;y\_scale&gt;
 
 Valid scale values are greater than 0, with a scale factor of 2 making the texture twice as big in that dimension etc.
@@ -1495,9 +1510,9 @@ Valid scale values are greater than 0, with a scale factor of 2 making the textu
 ## wave\_xform
 
 Sets up a transformation animation based on a wave function. Useful for more advanced texture layer transform effects. You can add multiple instances of this attribute to a single texture layer if you wish.
-
+@par
 Format: wave\_xform &lt;xform\_type&gt; &lt;wave\_type&gt; &lt;base&gt; &lt;frequency&gt; &lt;phase&gt; &lt;amplitude&gt;
-
+@par
 Example: wave\_xform scale\_x sine 1.0 0.2 0.0 5.0
 
 @param xform\_type
@@ -1571,7 +1586,7 @@ The range of the output of the wave will be {base, base+amplitude}. So the examp
 ## transform
 
 This attribute allows you to specify a static 4x4 transformation matrix for the texture unit, thus replacing the individual scroll, rotate and scale attributes mentioned above.
-
+@par
 Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m33
 
 The indexes of the 4x4 matrix value above are expressed as m&lt;row&gt;&lt;col&gt;.
@@ -1735,9 +1750,14 @@ shared_params YourSharedParamsName
 }
 ```
 
-As you can see, you need to use the keyword ’shared\_params’ and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the [param\_named](#param_005fnamed) syntax. The definition of these lines is: Format: shared\_param\_name &lt;param\_name&gt; &lt;param\_type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
+As you can see, you need to use the keyword ’shared\_params’ and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the [param\_named](#param_005fnamed) syntax. The definition of these lines is: 
+@par
+Format: shared\_param\_name &lt;param\_name&gt; &lt;param\_type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
 
-The param\_name must be unique within the set, and the param\_type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4. The array\_size option allows you to define arrays of param\_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param\_type with whitespace). If you wish, you can also initialise the parameters by providing a list of values.
+@param param_name must be unique within the set
+@param param_type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4. 
+@param array_size allows you to define arrays of param\_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param\_type with whitespace). 
+@param initial_values If you wish, you can also initialise the parameters by providing a list of values.
 
 Once you have defined the shared parameters, you can reference them inside default\_params and params blocks using [shared\_params\_ref](#shared_005fparams_005fref). You can also obtain a reference to them in your code via GpuProgramManager::getSharedParameters, and update the values for all instances using them.
 
@@ -1771,8 +1791,10 @@ material BumpMap2 : BumpMap1
 
 Texture aliases are useful for when only the textures used in texture units need to be specified for a cloned material. In the source material i.e. the original material to be cloned, each texture unit can be given a texture alias name. The cloned material in the script can then specify what textures should be used for each texture alias. Note that texture aliases are a more specific version of [Script Variables](#Script-Variables) which can be used to easily set other values.
 
-Using texture aliases within texture units:<br> Format:<br> texture\_alias &lt;name&gt;
-
+Using texture aliases within texture units:
+@par
+Format: texture\_alias &lt;name&gt;
+@par
 Default: &lt;name&gt; will default to texture\_unit &lt;name&gt; if set
 
 ```cpp
@@ -1891,7 +1913,8 @@ Note that the GLSL and HLSL techniques use the same textures. For each texture u
 
 Now we want to clone the material but only want to change the textures used. We could copy and paste the whole material but if we decide to change the base material later then we also have to update the copied material in the script. With set\_texture\_alias, copying a material is very easy now. set\_texture\_alias is specified at the top of the material definition. All techniques using the specified texture alias will be effected by set\_texture\_alias.
 
-Format:<br> set\_texture\_alias &lt;alias name&gt; &lt;texture name&gt;<br>
+@par
+Format: set\_texture\_alias &lt;alias name&gt; &lt;texture name&gt;<br>
 
 ```cpp
 material fxTest : TSNormalSpecMapping
