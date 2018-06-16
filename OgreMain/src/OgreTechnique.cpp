@@ -627,7 +627,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void Technique::setAmbient(Real red, Real green, Real blue)
+    void Technique::setAmbient(float red, float green, float blue)
     {
         setAmbient(ColourValue(red, green, blue));
         
@@ -644,7 +644,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Technique::setDiffuse(Real red, Real green, Real blue, Real alpha)
+    void Technique::setDiffuse(float red, float green, float blue, float alpha)
     {
         Passes::iterator i, iend;
         iend = mPasses.end();
@@ -659,7 +659,7 @@ namespace Ogre {
         setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
     }
     //-----------------------------------------------------------------------
-    void Technique::setSpecular(Real red, Real green, Real blue, Real alpha)
+    void Technique::setSpecular(float red, float green, float blue, float alpha)
     {
         Passes::iterator i, iend;
         iend = mPasses.end();
@@ -684,7 +684,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Technique::setSelfIllumination(Real red, Real green, Real blue)
+    void Technique::setSelfIllumination(float red, float green, float blue)
     {
         setSelfIllumination(ColourValue(red, green, blue));
     }

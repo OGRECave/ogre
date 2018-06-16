@@ -422,7 +422,7 @@ namespace Ogre {
         return mPointMaxSize;
     }
     //-----------------------------------------------------------------------
-    void Pass::setAmbient(Real red, Real green, Real blue)
+    void Pass::setAmbient(float red, float green, float blue)
     {
         mAmbient.r = red;
         mAmbient.g = green;
@@ -435,7 +435,7 @@ namespace Ogre {
         mAmbient = ambient;
     }
     //-----------------------------------------------------------------------
-    void Pass::setDiffuse(Real red, Real green, Real blue, Real alpha)
+    void Pass::setDiffuse(float red, float green, float blue, float alpha)
     {
         mDiffuse.r = red;
         mDiffuse.g = green;
@@ -448,7 +448,7 @@ namespace Ogre {
         mDiffuse = diffuse;
     }
     //-----------------------------------------------------------------------
-    void Pass::setSpecular(Real red, Real green, Real blue, Real alpha)
+    void Pass::setSpecular(float red, float green, float blue, float alpha)
     {
         mSpecular.r = red;
         mSpecular.g = green;
@@ -466,7 +466,7 @@ namespace Ogre {
         mShininess = val;
     }
     //-----------------------------------------------------------------------
-    void Pass::setSelfIllumination(Real red, Real green, Real blue)
+    void Pass::setSelfIllumination(float red, float green, float blue)
     {
         mEmissive.r = red;
         mEmissive.g = green;

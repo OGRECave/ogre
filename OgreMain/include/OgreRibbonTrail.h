@@ -127,7 +127,7 @@ namespace Ogre {
         @note
             Only used if this instance is using vertex colours.
         */
-        virtual void setInitialColour(size_t chainIndex, Real r, Real g, Real b, Real a = 1.0);
+        virtual void setInitialColour(size_t chainIndex, float r, float g, float b, float a = 1.0);
         /** Get the starting ribbon colour. */
         virtual const ColourValue& getInitialColour(size_t chainIndex) const;
 
@@ -157,7 +157,7 @@ namespace Ogre {
         @param chainIndex The index of the chain
         @param r,g,b,a The amount to subtract from each colour channel per second
         */
-        virtual void setColourChange(size_t chainIndex, Real r, Real g, Real b, Real a);
+        virtual void setColourChange(size_t chainIndex, float r, float g, float b, float a);
 
         /** Get the per-second fading amount */
         virtual const ColourValue& getColourChange(size_t chainIndex) const;

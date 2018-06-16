@@ -317,7 +317,7 @@ namespace Ogre {
             This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
             or if this is a programmable pass.
         */
-        void setAmbient(Real red, Real green, Real blue);
+        void setAmbient(float red, float green, float blue);
 
         /// @overload
         void setAmbient(const ColourValue& ambient);
@@ -332,7 +332,7 @@ namespace Ogre {
             This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
             or if this is a programmable pass.
         */
-        void setDiffuse(Real red, Real green, Real blue, Real alpha);
+        void setDiffuse(float red, float green, float blue, float alpha);
 
         /// @overload
         void setDiffuse(const ColourValue& diffuse);
@@ -349,7 +349,7 @@ namespace Ogre {
             This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
             or if this is a programmable pass.
         */
-        void setSpecular(Real red, Real green, Real blue, Real alpha);
+        void setSpecular(float red, float green, float blue, float alpha);
 
         /// @overload
         void setSpecular(const ColourValue& specular);
@@ -370,13 +370,13 @@ namespace Ogre {
             This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
             or if this is a programmable pass.
         */
-        void setSelfIllumination(Real red, Real green, Real blue);
+        void setSelfIllumination(float red, float green, float blue);
 
         /** Sets the amount of self-illumination an object has.
             @see
             setSelfIllumination
         */
-        void setEmissive(Real red, Real green, Real blue)
+        void setEmissive(float red, float green, float blue)
         {
             setSelfIllumination(red, green, blue);
         }
