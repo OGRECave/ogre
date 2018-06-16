@@ -1511,11 +1511,15 @@ namespace Ogre
             mAreaLights.reserve( numAreaApproxLights );
             mAreaLights.clear();
             const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
-            for( size_t i=0; i<realNumAreaLights; ++i )
-            {
-                const size_t idx = mAreaLightsGlobalLightListStart + i;
-                assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
-                mAreaLights.push_back( globalLightList.lights[idx] );
+            size_t areaLightNumber = 0;
+            for( size_t idx = mAreaLightsGlobalLightListStart;
+                 idx<globalLightList.lights.size() && areaLightNumber < realNumAreaLights; ++idx )
+            {                
+                if( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX )
+                {
+                    mAreaLights.push_back( globalLightList.lights[idx] );
+                    areaLightNumber++;
+                }
             }
 
             std::sort( mAreaLights.begin(), mAreaLights.end(), SortByTextureLightMaskIdx );
