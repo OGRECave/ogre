@@ -61,14 +61,14 @@ namespace Ogre {
         others. */
     enum CompareFunction
     {
-        CMPF_ALWAYS_FAIL,
-        CMPF_ALWAYS_PASS,
-        CMPF_LESS,
-        CMPF_LESS_EQUAL,
-        CMPF_EQUAL,
-        CMPF_NOT_EQUAL,
-        CMPF_GREATER_EQUAL,
-        CMPF_GREATER
+        CMPF_ALWAYS_FAIL,  //!< Never writes a pixel to the render target
+        CMPF_ALWAYS_PASS,  //!< Always writes a pixel to the render target
+        CMPF_LESS,         //!< Write if (new_Z < existing_Z)
+        CMPF_LESS_EQUAL,   //!< Write if (new_Z <= existing_Z)
+        CMPF_EQUAL,        //!< Write if (new_Z == existing_Z)
+        CMPF_NOT_EQUAL,    //!< Write if (new_Z != existing_Z)
+        CMPF_GREATER_EQUAL,//!< Write if (new_Z >= existing_Z)
+        CMPF_GREATER       //!< Write if (new_Z >= existing_Z)
     };
 
     /** High-level filtering options providing shortcuts to settings the
@@ -107,12 +107,12 @@ namespace Ogre {
         FO_ANISOTROPIC
     };
 
-    /** Light shading modes. */
+    /** %Light shading modes. */
     enum ShadeOptions
     {
-        SO_FLAT,
-        SO_GOURAUD,
-        SO_PHONG
+        SO_FLAT, //!< No interpolation takes place. Each face is shaded with a single colour determined from the first vertex in the face.
+        SO_GOURAUD, //!< Colour at each vertex is linearly interpolated across the face.
+        SO_PHONG //!< Vertex normals are interpolated across the face, and these are used to determine colour at each pixel. Gives a more natural lighting effect but is more expensive and works better at high levels of tessellation. Not supported on all hardware.
     };
 
     /** Fog modes. */
@@ -176,11 +176,11 @@ namespace Ogre {
     /** The polygon mode to use when rasterising. */
     enum PolygonMode
     {
-        /// Only points are rendered.
+        /// Only the points of each polygon are rendered.
         PM_POINTS = 1,
-        /// Wireframe models are rendered.
+        /// Polygons are drawn in outline only.
         PM_WIREFRAME = 2,
-        /// Solid polygons are rendered.
+        /// The normal situation - polygons are filled in.
         PM_SOLID = 3
     };
 

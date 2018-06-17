@@ -279,13 +279,16 @@ Here are the attributes you can use in a ’pass’ section of a .material scrip
 
 ## ambient
 
-Sets the ambient colour reflectance properties of this pass. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification 
+Sets the ambient colour reflectance properties of this pass.
+
 @par
 Format: ambient (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
+
+@copydetails Ogre::Pass::setAmbient
+@note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+
 @par
 Example: ambient 0.0 0.8 0.0
-
-The base colour of a pass is determined by how much red, green and blue light is reflects at each vertex. This property determines how much ambient light (directionless global light) is reflected. It is also possible to make the ambient reflectance track the vertex colour as defined in the mesh by using the keyword vertexcolour instead of the colour values. The default is full white, meaning objects are completely globally illuminated. Reduce this if you want to see diffuse or specular light effects, or change the blend of colours to make the object have a base colour other than white. This setting has no effect if dynamic lighting is disabled using the ’lighting off’ attribute, or if any texture layer has a ’colour\_op replace’ attribute.
 @par
 Default: ambient 1.0 1.0 1.0 1.0
 
@@ -293,13 +296,15 @@ Default: ambient 1.0 1.0 1.0 1.0
 
 ## diffuse
 
-Sets the diffuse colour reflectance properties of this pass. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+Sets the diffuse colour reflectance properties of this pass.
 @par
 Format: diffuse (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
+
+@copydetails Ogre::Pass::setDiffuse
+@note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+
 @par
 Example: diffuse 1.0 0.5 0.5
-
-The base colour of a pass is determined by how much red, green and blue light is reflects at each vertex. This property determines how much diffuse light (light from instances of the Light class in the scene) is reflected. It is also possible to make the diffuse reflectance track the vertex colour as defined in the mesh by using the keyword vertexcolour instead of the colour values. The default is full white, meaning objects reflect the maximum white light they can from Light objects. This setting has no effect if dynamic lighting is disabled using the ’lighting off’ attribute, or if any texture layer has a ’colour\_op replace’ attribute.
 @par
 Default: diffuse 1.0 1.0 1.0 1.0
 
@@ -307,13 +312,21 @@ Default: diffuse 1.0 1.0 1.0 1.0
 
 ## specular
 
-Sets the specular colour reflectance properties of this pass. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+Sets the specular colour reflectance properties of this pass.
 @par
 Format: specular (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour) &lt;shininess&gt;<br> NB valid colour values are between 0.0 and 1.0. Shininess can be any value greater than 0.
+
+
+This property determines how much specular light (highlights from instances of the Light class in the scene) is reflected. The default is to reflect no specular light. The colour of the specular highlights is determined by the colour parameters, and the size of the highlights by the separate shininess parameter.
+It is also possible to make the specular reflectance track the vertex colour as defined in
+the mesh instead of the colour values.
+
+@copydetails Ogre::Pass::setShininess
+@note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+
 @par
 Example: specular 1.0 1.0 1.0 12.5
 
-The base colour of a pass is determined by how much red, green and blue light is reflects at each vertex. This property determines how much specular light (highlights from instances of the Light class in the scene) is reflected. It is also possible to make the diffuse reflectance track the vertex colour as defined in the mesh by using the keyword vertexcolour instead of the colour values. The default is to reflect no specular light. The colour of the specular highlights is determined by the colour parameters, and the size of the highlights by the separate shininess parameter.. The higher the value of the shininess parameter, the sharper the highlight i.e. the radius is smaller. Beware of using shininess values in the range of 0 to 1 since this causes the the specular colour to be applied to the whole surface that has the material applied to it. When the viewing angle to the surface changes, ugly flickering will also occur when shininess is in the range of 0 to 1. Shininess values between 1 and 128 work best in both DirectX and OpenGL renderers. This setting has no effect if dynamic lighting is disabled using the ’lighting off’ attribute, or if any texture layer has a ’colour\_op replace’ attribute.
 @par
 Default: specular 0.0 0.0 0.0 0.0 0.0
 
@@ -321,13 +334,17 @@ Default: specular 0.0 0.0 0.0 0.0 0.0
 
 ## emissive
 
-Sets the amount of self-illumination an object has. @note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+Sets the amount of self-illumination an object has.
+
 @par
 Format: emissive (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
+
+Unlike the name suggests, this object doesn’t act as a light source for other objects in the scene (if you want it to, you have to create a light which is centered on the object).
+@copydetails Ogre::Pass::setSelfIllumination
+@note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+
 @par
 Example: emissive 1.0 0.0 0.0
-
-If an object is self-illuminating, it does not need external sources to light it, ambient or otherwise. It’s like the object has it’s own personal ambient light. Unlike the name suggests, this object doesn’t act as a light source for other objects in the scene (if you want it to, you have to create a light which is centered on the object). It is also possible to make the emissive colour track the vertex colour as defined in the mesh by using the keyword vertexcolour instead of the colour values. This setting has no effect if dynamic lighting is disabled using the ’lighting off’ attribute, or if any texture layer has a ’colour\_op replace’ attribute.
 @par
 Default: emissive 0.0 0.0 0.0 0.0
 
@@ -335,83 +352,52 @@ Default: emissive 0.0 0.0 0.0 0.0
 
 ## scene\_blend
 
-Sets the kind of blending this pass has with the existing contents of the scene. Whereas the texture blending operations seen in the texture\_unit entries are concerned with blending between texture layers, this blending is about combining the output of this pass as a whole with the existing contents of the rendering target. This blending therefore allows object transparency and other special effects. There are 2 formats, one using predefined blend types, the other allowing a roll-your-own approach using source and destination factors.
+Sets the kind of blending this pass has with the existing contents of the scene. 
+
+Whereas the texture blending operations seen in the texture\_unit entries are concerned with blending between texture layers, this blending is about combining the output of this pass as a whole with the existing contents of the rendering target. This blending therefore allows object transparency and other special effects. 
+
+There are 2 formats, one using predefined blend types, the other allowing a roll-your-own approach using source and destination factors.
 @par
-Format1: scene\_blend &lt;add|modulate|alpha\_blend|colour\_blend&gt;
+Format1: scene\_blend &lt;blend\_type&gt; 
 @par
 Example: scene\_blend add
 
-This is the simpler form, where the most commonly used blending modes are enumerated using a single parameter. Valid &lt;blend\_type&gt; parameters are:
+This is the simpler form, where the most commonly used blending modes are enumerated using a single parameter.
 
+@param blend_type
 <dl compact="compact">
-<dt>add</dt> <dd>
+<dt>add</dt>
+<dd>@copybrief Ogre::SBT_ADD 
 
-The colour of the rendering output is added to the scene. Good for explosions, flares, lights, ghosts etc. Equivalent to ’scene\_blend one one’.
+Equivalent to ’scene_blend one one’.</dd>
+<dt>modulate</dt> 
+<dd>@copybrief Ogre::SBT_MODULATE 
 
-</dd> <dt>modulate</dt> <dd>
+Equivalent to ’scene_blend dest_colour zero’.</dd>
+<dt>colour_blend</dt>
+<dd>@copybrief Ogre::SBT_TRANSPARENT_COLOUR 
 
-The colour of the rendering output is multiplied with the scene contents. Generally colours and darkens the scene, good for smoked glass, semi-transparent objects etc. Equivalent to ’scene\_blend dest\_colour zero’.
+Equivalent to ’scene_blend src_colour one_minus_src_colour’</dd>
+<dt>alpha_blend</dt>
+<dd>@copybrief Ogre::SBT_TRANSPARENT_ALPHA 
 
-</dd> <dt>colour\_blend</dt> <dd>
+Equivalent to ’scene_blend src_alpha one_minus_src_alpha’</dd>
+</dl>
 
-Colour the scene based on the brightness of the input colours, but don’t darken. Equivalent to ’scene\_blend src\_colour one\_minus\_src\_colour’
-
-</dd> <dt>alpha\_blend</dt> <dd>
-
-The alpha value of the rendering output is used as a mask. Equivalent to ’scene\_blend src\_alpha one\_minus\_src\_alpha’
-
-</dd> </dl> <br>
 @par
-Format2: scene\_blend &lt;src\_factor&gt; &lt;dest\_factor&gt;
+Format2: scene\_blend &lt;sourceFactor&gt; &lt;destFactor&gt;
+
+@copydetails Ogre::Pass::setSceneBlending(const SceneBlendFactor, const SceneBlendFactor)
+
+Valid values for both parameters are one of Ogre::SceneBlendFactor without the `SBF_` prefix. E.g. `SBF_DEST_COLOUR` becomes `dest_colour`.
+
 @par
 Example: scene\_blend one one\_minus\_dest\_alpha
 
-This version of the method allows complete control over the blending operation, by specifying the source and destination blending factors. The resulting colour which is written to the rendering target is (texture \* sourceFactor) + (scene\_pixel \* destFactor). Valid values for both parameters are:
-
-<dl compact="compact">
-<dt>one</dt> <dd>
-
-Constant value of 1.0
-
-</dd> <dt>zero</dt> <dd>
-
-Constant value of 0.0
-
-</dd> <dt>dest\_colour</dt> <dd>
-
-The existing pixel colour
-
-</dd> <dt>src\_colour</dt> <dd>
-
-The texture pixel (texel) colour
-
-</dd> <dt>one\_minus\_dest\_colour</dt> <dd>
-
-1 - (dest\_colour)
-
-</dd> <dt>one\_minus\_src\_colour</dt> <dd>
-
-1 - (src\_colour)
-
-</dd> <dt>dest\_alpha</dt> <dd>
-
-The existing pixel alpha value
-
-</dd> <dt>src\_alpha</dt> <dd>
-
-The texel alpha value
-
-</dd> <dt>one\_minus\_dest\_alpha</dt> <dd>
-
-1 - (dest\_alpha)
-
-</dd> <dt>one\_minus\_src\_alpha</dt> <dd>
-
-1 - (src\_alpha)
-
-</dd> </dl> <br>
 @par
-Default: scene\_blend one zero (opaque)  Also see [separate\_scene\_blend](#separate_005fscene_005fblend).
+Default: scene\_blend one zero (opaque)  
+
+Also see [separate\_scene\_blend](#separate_005fscene_005fblend).
 
 <a name="separate_005fscene_005fblend"></a><a name="separate_005fscene_005fblend-1"></a>
 
@@ -435,9 +421,13 @@ Again the options available in the second format are the same as those in the se
 
 ## scene\_blend\_op
 
-This directive changes the operation which is applied between the two components of the scene blending equation, which by default is ’add’ (sourceFactor \* source + destFactor \* dest). You may change this to ’add’, ’subtract’, ’reverse\_subtract’, ’min’ or ’max’.
+This directive changes the operation which is applied between the two components of the scene blending equation
+
 @par
-Format: scene\_blend\_op &lt;add|subtract|reverse\_subtract|min|max&gt; Default: scene\_blend\_op add
+Format: scene\_blend\_op &lt;op&gt; 
+
+@copydoc Ogre::Pass::setSceneBlendingOperation
+You may change this to ’add’, ’subtract’, ’reverse_subtract’, ’min’ or ’max’.
 
 <a name="separate_005fscene_005fblend_005fop"></a><a name="separate_005fscene_005fblend_005fop-1"></a>
 
@@ -455,7 +445,7 @@ Sets whether or not this pass renders with depth-buffer checking on or not.
 @par
 Format: depth\_check &lt;on|off&gt;
 
-If depth-buffer checking is on, whenever a pixel is about to be written to the frame buffer the depth buffer is checked to see if the pixel is in front of all other pixels written at that point. If not, the pixel is not written. If depth checking is off, pixels are written no matter what has been rendered before. Also see depth\_func for more advanced depth check configuration.
+@copydetails Ogre::Pass::setDepthCheckEnabled
 
 Default: depth\_check on
 
@@ -463,11 +453,13 @@ Default: depth\_check on
 
 ## depth\_write
 
-Sets whether or not this pass renders with depth-buffer writing on or not.<br>
+Sets whether or not this pass renders with depth-buffer writing on or not.
+
 @par
 Format: depth\_write &lt;on|off&gt;
 
-If depth-buffer writing is on, whenever a pixel is written to the frame buffer the depth buffer is updated with the depth value of that new pixel, thus affecting future rendering operations if future pixels are behind this one. If depth writing is off, pixels are written without updating the depth buffer. Depth writing should normally be on but can be turned off when rendering static backgrounds or when rendering a collection of transparent objects at the end of a scene so that they overlap each other correctly.
+@copydetails Ogre::Pass::setDepthWriteEnabled
+
 @par
 Default: depth\_write on<br>
 
@@ -479,42 +471,10 @@ Sets the function used to compare depth values when depth checking is on.
 @par
 Format: depth\_func &lt;func&gt;
 
-If depth checking is enabled (see depth\_check) a comparison occurs between the depth value of the pixel to be written and the current contents of the buffer. This comparison is normally less\_equal, i.e. the pixel is written if it is closer (or at the same distance) than the current contents. The possible functions are:
+@copydetails Ogre::Pass::setDepthFunction
 
-<dl compact="compact">
-<dt>always\_fail</dt> <dd>
+@param func one of Ogre::CompareFunction without the `CMPF_` prefix. E.g. `CMPF_LESS_EQUAL` becomes `less_equal`.
 
-Never writes a pixel to the render target
-
-</dd> <dt>always\_pass</dt> <dd>
-
-Always writes a pixel to the render target
-
-</dd> <dt>less</dt> <dd>
-
-Write if (new\_Z &lt; existing\_Z)
-
-</dd> <dt>less\_equal</dt> <dd>
-
-Write if (new\_Z &lt;= existing\_Z)
-
-</dd> <dt>equal</dt> <dd>
-
-Write if (new\_Z == existing\_Z)
-
-</dd> <dt>not\_equal</dt> <dd>
-
-Write if (new\_Z != existing\_Z)
-
-</dd> <dt>greater\_equal</dt> <dd>
-
-Write if (new\_Z &gt;= existing\_Z)
-
-</dd> <dt>greater</dt> <dd>
-
-Write if (new\_Z &gt;existing\_Z)
-
-</dd> </dl> <br>
 @par
 Default: depth\_func less\_equal
 
@@ -522,11 +482,13 @@ Default: depth\_func less\_equal
 
 ## depth\_bias
 
-Sets the bias applied to the depth value of this pass. Can be used to make coplanar polygons appear on top of others e.g. for decals. 
+Sets the bias applied to the depth value of this pass.
 @par
-Format: depth\_bias &lt;constant\_bias&gt; \[&lt;slopescale\_bias&gt;\]
+Format: depth\_bias &lt;constantBias&gt; \[&lt;slopeScaleBias&gt;\]
 
-The final depth bias value is constant\_bias \* minObservableDepth + maxSlope \* slopescale\_bias. Slope scale biasing is relative to the angle of the polygon to the camera, which makes for a more appropriate bias value, but this is ignored on some older hardware. Constant biasing is expressed as a factor of the minimum depth value, so a value of 1 will nudge the depth by one ’notch’ if you will. Also see [iteration\_depth\_bias](#iteration_005fdepth_005fbias)
+@copydetails Ogre::Pass::setDepthBias
+
+Also see [iteration\_depth\_bias](#iteration_005fdepth_005fbias)
 
 <a name="iteration_005fdepth_005fbias"></a><a name="iteration_005fdepth_005fbias-1"></a>
 
@@ -554,43 +516,46 @@ Default: alpha\_rejection always\_pass
 
 ## alpha\_to\_coverage
 
-Sets whether this pass will use ’alpha to coverage’, a way to multisample alpha texture edges so they blend more seamlessly with the background. This facility is typically only available on cards from around 2006 onwards, but it is safe to enable it anyway - Ogre will just ignore it if the hardware does not support it. The common use for alpha to coverage is foliage rendering and chain-link fence style textures. 
+Sets whether this pass will use ’alpha to coverage’,
+
 @par
 Format: alpha\_to\_coverage &lt;on|off&gt;
+
+@copydetails Ogre::Pass::setAlphaToCoverageEnabled
+
 @par
 Default: alpha\_to\_coverage off <a name="light_005fscissor"></a>
 
 <a name="light_005fscissor-1"></a>
 
-## light\_scissor
+## light_scissor
 
-Sets whether when rendering this pass, rendering will be limited to a screen-space scissor rectangle representing the coverage of the light(s) being used in this pass, derived from their attenuation ranges.
+Sets whether when rendering this pass, rendering will be limited to a screen-space scissor rectangle representing the coverage of the light(s) being used in this pass.
 @par
 Format: light\_scissor &lt;on|off&gt; Default: light\_scissor off
 
-This option is usually only useful if this pass is an additive lighting pass, and is at least the second one in the technique. Ie areas which are not affected by the current light(s) will never need to be rendered. If there is more than one light being passed to the pass, then the scissor is defined to be the rectangle which covers all lights in screen-space. Directional lights are ignored since they are infinite.
+@copydetails Ogre::Pass::setLightScissoringEnabled
 
-This option does not need to be specified if you are using a standard additive shadow mode, i.e. SHADOWTYPE\_STENCIL\_ADDITIVE or SHADOWTYPE\_TEXTURE\_ADDITIVE, since it is the default behaviour to use a scissor for each additive shadow pass. However, if you’re not using shadows, or you’re using [Integrated Texture Shadows](#Integrated-Texture-Shadows) where passes are specified in a custom manner, then this could be of use to you.
+@see @ref Integrated-Texture-Shadows
 
 <a name="light_005fclip_005fplanes"></a><a name="light_005fclip_005fplanes-1"></a>
 
 ## light\_clip\_planes
 
-Sets whether when rendering this pass, triangle setup will be limited to clipping volume covered by the light. Directional lights are ignored, point lights clip to a cube the size of the attenuation range or the light, and spotlights clip to a pyramid bounding the spotlight angle and attenuation range.
+Sets whether when rendering this pass, triangle setup will be limited to clipping volume covered by the light.
 @par
 Format: light\_clip\_planes &lt;on|off&gt; Default: light\_clip\_planes off
 
-This option will only function if there is a single non-directional light being used in this pass. If there is more than one light, or only directional lights, then no clipping will occur. If there are no lights at all then the objects won’t be rendered at all.
+@copydetails Ogre::Pass::setLightClipPlanesEnabled
 
-When using a standard additive shadow mode, i.e. SHADOWTYPE\_STENCIL\_ADDITIVE or SHADOWTYPE\_TEXTURE\_ADDITIVE, you have the option of enabling clipping for all light passes by calling SceneManager::setShadowUseLightClipPlanes regardless of this pass setting, since rendering is done lightwise anyway. This is off by default since using clip planes is not always faster - it depends on how much of the scene the light volumes cover. Generally the smaller your lights are the more chance you’ll see a benefit rather than a penalty from clipping. If you’re not using shadows, or you’re using [Integrated Texture Shadows](#Integrated-Texture-Shadows) where passes are specified in a custom manner, then specify the option per-pass using this attribute. A specific note about OpenGL: user clip planes are completely ignored when you use an ARB vertex program. This means light clip planes won’t help much if you use ARB vertex programs on GL, although OGRE will perform some optimisation of its own, in that if it sees that the clip volume is completely off-screen, it won’t perform a render at all. When using GLSL, user clipping can be used but you have to use gl\_ClipVertex in your shader, see the GLSL documentation for more information. In Direct3D user clip planes are always respected.
+@see @ref Integrated-Texture-Shadows
 
 <a name="illumination_005fstage"></a><a name="illumination_005fstage-1"></a>
 
 ## illumination\_stage
 
-When using an additive lighting mode (SHADOWTYPE\_STENCIL\_ADDITIVE or SHADOWTYPE\_TEXTURE\_ADDITIVE), the scene is rendered in 3 discrete stages, ambient (or pre-lighting), per-light (once per light, with shadowing) and decal (or post-lighting). Usually OGRE figures out how to categorise your passes automatically, but there are some effects you cannot achieve without manually controlling the illumination. For example specular effects are muted by the typical sequence because all textures are saved until the ’decal’ stage which mutes the specular effect. Instead, you could do texturing within the per-light stage if it’s possible for your material and thus add the specular on after the decal texturing, and have no post-light rendering. 
+@copydetails Ogre::Pass::setIlluminationStage
 
-If you assign an illumination stage to a pass you have to assign it to all passes in the technique otherwise it will be ignored. Also note that whilst you can have more than one pass in each group, they cannot alternate, i.e. all ambient passes will be before all per-light passes, which will also be before all decal passes. Within their categories the passes will retain their ordering though.
 @par
 Format: illumination\_stage &lt;ambient|per\_light|decal&gt; Default: none (autodetect)
 
@@ -602,7 +567,8 @@ Sets whether or not this pass renders with all vertex normals being automaticall
 @par
 Format: normalise\_normals &lt;on|off&gt;
 
-Scaling objects causes normals to also change magnitude, which can throw off your lighting calculations. By default, the SceneManager detects this and will automatically re-normalise normals for any scaled object, but this has a cost. If you’d prefer to control this manually, call SceneManager::setNormaliseNormalsOnScale(false) and then use this option on materials which are sensitive to normals being resized. 
+@copydetails Ogre::Pass::setNormaliseNormals
+
 @par
 Default: normalise\_normals off<br>
 
@@ -628,7 +594,8 @@ Sets the hardware culling mode for this pass.
 @par
 Format: cull\_hardware &lt;clockwise|anticlockwise|none&gt;
 
-A typical way for the hardware rendering engine to cull triangles is based on the ’vertex winding’ of triangles. Vertex winding refers to the direction in which the vertices are passed or indexed to in the rendering operation as viewed from the camera, and will wither be clockwise or anticlockwise (that’s ’counterclockwise’ for you Americans out there ;). If the option ’cull\_hardware clockwise’ is set, all triangles whose vertices are viewed in clockwise order from the camera will be culled by the hardware. ’anticlockwise’ is the reverse (obviously), and ’none’ turns off hardware culling so all triangles are rendered (useful for creating 2-sided passes).
+@copydetails Ogre::Pass::setCullingMode
+
 @par
 Default: cull\_hardware clockwise<br> NB this is the same as OpenGL’s default but the opposite of Direct3D’s default (because Ogre uses a right-handed coordinate system like OpenGL).
 
@@ -640,7 +607,8 @@ Sets the software culling mode for this pass.
 @par
 Format: cull\_software &lt;back|front|none&gt;
 
-In some situations the engine will also cull geometry in software before sending it to the hardware renderer. This setting only takes effect on SceneManager’s that use it (since it is best used on large groups of planar world geometry rather than on movable geometry since this would be expensive), but if used can cull geometry before it is sent to the hardware. In this case the culling is based on whether the ’back’ or ’front’ of the triangle is facing the camera - this definition is based on the face normal (a vector which sticks out of the front side of the polygon perpendicular to the face). Since Ogre expects face normals to be on anticlockwise side of the face, ’cull\_software back’ is the software equivalent of ’cull\_hardware clockwise’ setting, which is why they are both the default. The naming is different to reflect the way the culling is done though, since most of the time face normals are pre-calculated and they don’t have to be the way Ogre expects - you could set ’cull\_hardware none’ and completely cull in software based on your own face normals, if you have the right SceneManager which uses them.
+@copydetails Ogre::Pass::setManualCullingMode
+
 @par
 Default: cull\_software back
 
@@ -648,11 +616,12 @@ Default: cull\_software back
 
 ## lighting
 
-Sets whether or not dynamic lighting is turned on for this pass or not. If lighting is turned off, all objects rendered using the pass will be fully lit. **This attribute has no effect if a vertex program is used.**
+Sets whether or not dynamic lighting is turned on for this pass or not.
+
 @par
 Format: lighting &lt;on|off&gt;
 
-Turning dynamic lighting off makes any ambient, diffuse, specular, emissive and shading properties for this pass redundant. When lighting is turned on, objects are lit according to their vertex normals for diffuse and specular light, and globally for ambient and emissive.
+@copydetails Ogre::Pass::setLightingEnabled
 @par
 Default: lighting on
 
@@ -662,24 +631,12 @@ Default: lighting on
 
 Sets the kind of shading which should be used for representing dynamic lighting for this pass.
 @par
-Format: shading &lt;flat|gouraud|phong&gt;
+Format: shading &lt;mode&gt;
 
-When dynamic lighting is turned on, the effect is to generate colour values at each vertex. Whether these values are interpolated across the face (and how) depends on this setting.
+@copydetails Ogre::Pass::setShadingMode
 
-<dl compact="compact">
-<dt>flat</dt> <dd>
+@param mode one of Ogre::ShadeOptions without the `SO_` prefix. E.g. `SO_FLAT` becomes `flat`.
 
-No interpolation takes place. Each face is shaded with a single colour determined from the first vertex in the face.
-
-</dd> <dt>gouraud</dt> <dd>
-
-Colour at each vertex is linearly interpolated across the face.
-
-</dd> <dt>phong</dt> <dd>
-
-Vertex normals are interpolated across the face, and these are used to determine colour at each pixel. Gives a more natural lighting effect but is more expensive and works better at high levels of tessellation. Not supported on all hardware.
-
-</dd> </dl>
 @par
 Default: shading gouraud
 
@@ -687,24 +644,13 @@ Default: shading gouraud
 
 ## polygon\_mode
 
-Sets how polygons should be rasterised, i.e. whether they should be filled in, or just drawn as lines or points.
+@copydetails Ogre::Pass::setPolygonMode
+
 @par
-Format: polygon\_mode &lt;solid|wireframe|points&gt;
+Format: polygon_mode &lt;solid|wireframe|points&gt;
 
-<dl compact="compact">
-<dt>solid</dt> <dd>
+@param mode one of Ogre::PolygonMode without the `PM_` prefix. E.g. `PM_SOLID` becomes `solid`.
 
-The normal situation - polygons are filled in.
-
-</dd> <dt>wireframe</dt> <dd>
-
-Polygons are drawn in outline only.
-
-</dd> <dt>points</dt> <dd>
-
-Only the points of each polygon are rendered.
-
-</dd> </dl>
 @par
 Default: polygon\_mode solid
 
@@ -712,9 +658,12 @@ Default: polygon\_mode solid
 
 ## polygon\_mode\_overrideable
 
-Sets whether or not the [polygon\_mode](#polygon_005fmode) set on this pass can be downgraded by the camera, if the camera itself is set to a lower polygon mode. If set to false, this pass will always be rendered at its own chosen polygon mode no matter what the camera says. The default is true.
+Sets whether or not the [polygon\_mode](#polygon_005fmode) set on this pass can be downgraded by the camera
+
 @par
-Format: polygon\_mode\_overrideable &lt;true|false&gt;
+Format: polygon\_mode\_overrideable &lt;override&gt;
+
+@copydetails Ogre::Pass::setPolygonModeOverrideable
 
 <a name="fog_005foverride"></a><a name="fog_005foverride-1"></a>
 
@@ -745,11 +694,13 @@ Example: fog\_override true exp 1 1 1 0.002 100 10000
 
 ## colour\_write
 
-Sets whether or not this pass renders with colour writing on or not.<br>
+Sets whether this pass renders with colour writing on or not.
+
 @par
 Format: colour\_write &lt;on|off&gt;
 
-If colour writing is off no visible pixels are written to the screen during this pass. You might think this is useless, but if you render with colour writing off, and with very minimal other settings, you can use this pass to initialise the depth buffer before subsequently rendering other passes which fill in the colour data. This can give you significant performance boosts on some newer cards, especially when using complex fragment programs, because if the depth check fails then the fragment program is never run. 
+@copydetails Ogre::Pass::setColourWriteEnabled
+
 @par
 Default: colour\_write on<br>
 
@@ -761,7 +712,8 @@ Sets the first light which will be considered for use with this pass.
 @par
 Format: start\_light &lt;number&gt;
 
-You can use this attribute to offset the starting point of the lights for this pass. In other words, if you set start\_light to 2 then the first light to be processed in that pass will be the third actual light in the applicable list. You could use this option to use different passes to process the first couple of lights versus the second couple of lights for example, or use it in conjunction with the [iteration](#iteration) option to start the iteration from a given point in the list (e.g. doing the first 2 lights in the first pass, and then iterating every 2 lights from then on perhaps). 
+@copydetails Ogre::Pass::setStartLight
+
 @par
 Default: start\_light 0<br>
 
@@ -908,9 +860,8 @@ material Fur
 
 ## point\_size
 
-This setting allows you to change the size of points when rendering a point list, or a list of point sprites. The interpretation of this command depends on the [point\_size\_attenuation](#point_005fsize_005fattenuation) option - if it is off (the default), the point size is in screen pixels, if it is on, it expressed as normalised screen coordinates (1.0 is the height of the screen) when the point is at the origin. 
+@copydetails Ogre::Pass::setPointSize
 
-@note Some drivers have an upper limit on the size of points they support - this can even vary between APIs on the same card! Don’t rely on point sizes that cause the points to get very large on screen, since they may get clamped on some cards. Upper sizes can range from 64 to 256 pixels.
 @par
 Format: point\_size &lt;size&gt; Default: point\_size 1.0
 
@@ -918,7 +869,8 @@ Format: point\_size &lt;size&gt; Default: point\_size 1.0
 
 ## point\_sprites
 
-This setting specifies whether or not hardware point sprite rendering is enabled for this pass. Enabling it means that a point list is rendered as a list of quads rather than a list of dots. It is very useful to use this option if you’re using a BillboardSet and only need to use point oriented billboards which are all of the same size. You can also use it for any other point list render. 
+@copydetails Ogre::Pass::setPointSpritesEnabled
+
 @par
 Format: point\_sprites &lt;on|off&gt; Default: point\_sprites off
 
@@ -926,13 +878,13 @@ Format: point\_sprites &lt;on|off&gt; Default: point\_sprites off
 
 ## point\_size\_attenuation
 
-Defines whether point size is attenuated with view space distance, and in what fashion. This option is especially useful when you’re using point sprites (See [point\_sprites](#point_005fsprites)) since it defines how they reduce in size as they get further away from the camera. You can also disable this option to make point sprites a constant screen size (like points), or enable it for points so they change size with distance.
+Defines whether point size is attenuated with view space distance, and in what fashion.
 
-You only have to provide the final 3 parameters if you turn attenuation on. The formula for attenuation is that the size of the point is multiplied by 1 / (constant + linear \* dist + quadratic \* d^2); therefore turning it off is equivalent to (constant = 1, linear = 0, quadratic = 0) and standard perspective attenuation is (constant = 0, linear = 1, quadratic = 0). The latter is assumed if you leave out the final 3 parameters when you specify ’on’.
-
-Note that the resulting attenuated size is clamped to the minimum and maximum point size, see the next section.
 @par
-Format: point\_size\_attenuation &lt;on|off&gt; \[constant linear quadratic\] Default: point\_size\_attenuation off
+Format: point\_size\_attenuation &lt;enabled&gt; \[constant linear quadratic\] Default: point\_size\_attenuation off
+
+@copydetails Ogre::Pass::setPointAttenuation
+
 
 <a name="point_005fsize_005fmin"></a><a name="point_005fsize_005fmin-1"></a>
 

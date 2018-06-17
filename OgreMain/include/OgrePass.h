@@ -309,15 +309,18 @@ namespace Ogre {
         const String& getName(void) const { return mName; }
 
         /** Sets the ambient colour reflectance properties of this pass.
-            @remarks
-            The base colour of a pass is determined by how much red, green and blue light is reflects
-            (provided texture layer #0 has a blend mode other than LBO_REPLACE). This property determines how
-            much ambient light (directionless global light) is reflected. The default is full white, meaning
-            objects are completely globally illuminated. Reduce this if you want to see diffuse or specular light
-            effects, or change the blend of colours to make the object have a base colour other than white.
-            @note
-            This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
-            or if this is a programmable pass.
+
+        This property determines how much ambient light (directionless global light) is
+        reflected. The default is full white, meaning objects are completely globally
+        illuminated. Reduce this if you want to see diffuse or specular light effects, or change
+        the blend of colours to make the object have a base colour other than white.
+
+        It is also possible to make the ambient reflectance track the vertex colour as defined in
+        the mesh instead of the colour values.
+        @note
+        This setting has no effect if dynamic lighting is disabled (see
+        Ogre::Pass::setLightingEnabled), or, if any texture layer has a Ogre::LBO_REPLACE
+        attribute.
         */
         void setAmbient(float red, float green, float blue);
 
@@ -325,14 +328,17 @@ namespace Ogre {
         void setAmbient(const ColourValue& ambient);
 
         /** Sets the diffuse colour reflectance properties of this pass.
-            @remarks
-            The base colour of a pass is determined by how much red, green and blue light is reflects
-            (provided texture layer #0 has a blend mode other than LBO_REPLACE). This property determines how
-            much diffuse light (light from instances of the Light class in the scene) is reflected. The default
-            is full white, meaning objects reflect the maximum white light they can from Light objects.
-            @note
-            This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
-            or if this is a programmable pass.
+
+        This property determines how much diffuse light (light from instances
+        of the Light class in the scene) is reflected. The default is full white, meaning objects
+        reflect the maximum white light they can from Light objects.
+
+        It is also possible to make the diffuse reflectance track the vertex colour as defined in
+        the mesh instead of the colour values.
+        @note
+        This setting has no effect if dynamic lighting is disabled (see
+        Ogre::Pass::setLightingEnabled), or, if any texture layer has a Ogre::LBO_REPLACE
+        attribute.
         */
         void setDiffuse(float red, float green, float blue, float alpha);
 
@@ -340,16 +346,18 @@ namespace Ogre {
         void setDiffuse(const ColourValue& diffuse);
 
         /** Sets the specular colour reflectance properties of this pass.
-            @remarks
-            The base colour of a pass is determined by how much red, green and blue light is reflects
-            (provided texture layer #0 has a blend mode other than LBO_REPLACE). This property determines how
-            much specular light (highlights from instances of the Light class in the scene) is reflected.
-            The default is to reflect no specular light.
-            @note
-            The size of the specular highlights is determined by the separate 'shininess' property.
-            @note
-            This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
-            or if this is a programmable pass.
+
+        This property determines how much specular light (highlights from instances of the Light
+        class in the scene) is reflected. The default is to reflect no specular light.
+
+        It is also possible to make the specular reflectance track the vertex colour as defined in
+        the mesh instead of the colour values.
+        @note
+        The size of the specular highlights is determined by the separate 'shininess' property.
+        @note
+        This setting has no effect if dynamic lighting is disabled (see
+        Ogre::Pass::setLightingEnabled), or, if any texture layer has a Ogre::LBO_REPLACE
+        attribute.
         */
         void setSpecular(float red, float green, float blue, float alpha);
 
@@ -357,40 +365,45 @@ namespace Ogre {
         void setSpecular(const ColourValue& specular);
 
         /** Sets the shininess of the pass, affecting the size of specular highlights.
-            @note
-            This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
-            or if this is a programmable pass.
+
+        The higher the value of the shininess parameter, the sharper the highlight i.e. the radius
+        is smaller. Beware of using shininess values in the range of 0 to 1 since this causes the
+        the specular colour to be applied to the whole surface that has the material applied to it.
+        When the viewing angle to the surface changes, ugly flickering will also occur when
+        shininess is in the range of 0 to 1. Shininess values between 1 and 128 work best in both
+        DirectX and OpenGL renderers.
+        @note
+        This setting has no effect if dynamic lighting is disabled (see
+        Ogre::Pass::setLightingEnabled), or, if any texture layer has a Ogre::LBO_REPLACE
+        attribute.
         */
         void setShininess(Real val);
 
         /** Sets the amount of self-illumination an object has.
-            @remarks
-            If an object is self-illuminating, it does not need external sources to light it, ambient or
-            otherwise. It's like the object has it's own personal ambient light. This property is rarely useful since
-            you can already specify per-pass ambient light, but is here for completeness.
-            @note
-            This setting has no effect if dynamic lighting is disabled (see Pass::setLightingEnabled),
-            or if this is a programmable pass.
+
+        If an object is self-illuminating, it does not need external sources to light it, ambient or
+        otherwise. It's like the object has it's own personal ambient light. This property is rarely useful since
+        you can already specify per-pass ambient light, but is here for completeness.
+
+        It is also possible to make the emissive reflectance track the vertex colour as defined in
+        the mesh instead of the colour values.
+        @note
+        This setting has no effect if dynamic lighting is disabled (see
+        Ogre::Pass::setLightingEnabled), or, if any texture layer has a Ogre::LBO_REPLACE
+        attribute.
         */
         void setSelfIllumination(float red, float green, float blue);
-
-        /** Sets the amount of self-illumination an object has.
-            @see
-            setSelfIllumination
-        */
-        void setEmissive(float red, float green, float blue)
-        {
-            setSelfIllumination(red, green, blue);
-        }
 
         /// @overload
         void setSelfIllumination(const ColourValue& selfIllum);
 
-        /// @overload
-        void setEmissive(const ColourValue& emissive)
+        /// @copydoc setSelfIllumination
+        void setEmissive(float red, float green, float blue)
         {
-            setSelfIllumination(emissive);
+            setSelfIllumination(red, green, blue);
         }
+        /// @overload
+        void setEmissive(const ColourValue& emissive) { setSelfIllumination(emissive); }
 
         /** Sets which material properties follow the vertex colour
          */
@@ -413,26 +426,28 @@ namespace Ogre {
         Real getPointSize(void) const;
 
         /** Sets the point size of this pass.
-            @remarks
+
             This setting allows you to change the size of points when rendering
             a point list, or a list of point sprites. The interpretation of this
-            command depends on the Pass::setPointSizeAttenuation option - if it
+            command depends on the Ogre::Pass::setPointAttenuation option - if it
             is off (the default), the point size is in screen pixels, if it is on,
             it expressed as normalised screen coordinates (1.0 is the height of
             the screen) when the point is at the origin.
             @note
-            Some drivers have an upper limit on the size of points they support
-            - this can even vary between APIs on the same card! Don't rely on
-            point sizes that cause the point sprites to get very large on screen,
-            since they may get clamped on some cards. Upper sizes can range from
-            64 to 256 pixels.
+            Some drivers have an upper limit on the size of points they support - this can even vary
+            between APIs on the same card! Don't rely on point sizes that cause the point sprites to
+            get very large on screen, since they may get clamped on some cards. Upper sizes can range
+            from 64 to 256 pixels.
         */
         void setPointSize(Real ps);
 
-        /** Sets whether or not rendering points using OT_POINT_LIST will
-            render point sprites (textured quads) or plain points (dots).
-            @param enabled True enables point sprites, false returns to normal
-            point rendering.
+        /** Sets whether points will be rendered as textured quads or plain dots
+
+            This setting specifies whether or not hardware point sprite rendering is enabled for
+            this pass. Enabling it means that a point list is rendered as a list of quads rather than
+            a list of dots. It is very useful to use this option if you are using a BillboardSet and
+            only need to use point oriented billboards which are all of the same size. You can also
+            use it for any other point list render.
         */
         void setPointSpritesEnabled(bool enabled);
 
@@ -442,15 +457,17 @@ namespace Ogre {
         bool getPointSpritesEnabled(void) const;
 
         /** Sets how points are attenuated with distance.
-        @remarks
+
             When performing point rendering or point sprite rendering,
             point size can be attenuated with distance. The equation for
-            doing this is attenuation = 1 / (constant + linear * dist + quadratic * d^2).
-        @par
+            doing this is 
+            
+            $$attenuation = 1 / (constant + linear * dist + quadratic * d^2)$$
+
             For example, to disable distance attenuation (constant screensize)
             you would set constant to 1, and linear and quadratic to 0. A
             standard perspective attenuation would be 0, 1, 0 respectively.
-        @note
+
             The resulting size is clamped to the minimum and maximum point
             size.
         @param enabled Whether point attenuation is enabled
@@ -587,13 +604,13 @@ namespace Ogre {
         }
 
         /** Sets the kind of blending this pass has with the existing contents of the scene.
-            @remarks
+
             Whereas the texture blending operations seen in the TextureUnitState class are concerned with
             blending between texture layers, this blending is about combining the output of the Pass
             as a whole with the existing contents of the rendering target. This blending therefore allows
             object transparency and other special effects. If all passes in a technique have a scene
             blend, then the whole technique is considered to be transparent.
-            @par
+
             This method allows you to select one of a number of predefined blending types. If you require more
             control than this, use the alternative version of this method which allows you to specify source and
             destination blend factors.
@@ -605,18 +622,11 @@ namespace Ogre {
         void setSceneBlending( const SceneBlendType sbt );
 
         /** Sets the kind of blending this pass has with the existing contents of the scene, separately for color and alpha channels
-            @remarks
-            Whereas the texture blending operations seen in the TextureUnitState class are concerned with
-            blending between texture layers, this blending is about combining the output of the Pass
-            as a whole with the existing contents of the rendering target. This blending therefore allows
-            object transparency and other special effects. If all passes in a technique have a scene
-            blend, then the whole technique is considered to be transparent.
-            @par
+
             This method allows you to select one of a number of predefined blending types. If you require more
             control than this, use the alternative version of this method which allows you to specify source and
             destination blend factors.
-            @note
-            This method is applicable for both the fixed-function and programmable pipelines.
+
             @param
             sbt One of the predefined SceneBlendType blending types for the color channel
             @param
@@ -625,54 +635,27 @@ namespace Ogre {
         void setSeparateSceneBlending( const SceneBlendType sbt, const SceneBlendType sbta );
 
         /** Allows very fine control of blending this Pass with the existing contents of the scene.
-            @remarks
-            Whereas the texture blending operations seen in the TextureUnitState class are concerned with
-            blending between texture layers, this blending is about combining the output of the material
-            as a whole with the existing contents of the rendering target. This blending therefore allows
-            object transparency and other special effects.
-            @par
+
             This version of the method allows complete control over the blending operation, by specifying the
             source and destination blending factors. The result of the blending operation is:
-            <span align="center">
-            final = (texture * sourceFactor) + (pixel * destFactor)
-            </span>
-            @par
-            Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
+
+            $$final = (passOutput * sourceFactor) + (frameBuffer * destFactor)$$
+
+            Each of the factors is specified as one of a number of options, as specified in the Ogre::SceneBlendFactor
             enumerated type.
             @param
-            sourceFactor The source factor in the above calculation, i.e. multiplied by the texture colour components.
+            sourceFactor The source factor in the above calculation, i.e. multiplied by the output of the %Pass.
             @param
-            destFactor The destination factor in the above calculation, i.e. multiplied by the pixel colour components.
-            @note
-            This method is applicable for both the fixed-function and programmable pipelines.
+            destFactor The destination factor in the above calculation, i.e. multiplied by the Frame Buffer contents.
         */
         void setSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor);
 
         /** Allows very fine control of blending this Pass with the existing contents of the scene.
-            @remarks
-            Whereas the texture blending operations seen in the TextureUnitState class are concerned with
-            blending between texture layers, this blending is about combining the output of the material
-            as a whole with the existing contents of the rendering target. This blending therefore allows
-            object transparency and other special effects.
-            @par
-            This version of the method allows complete control over the blending operation, by specifying the
-            source and destination blending factors. The result of the blending operation is:
-            <span align="center">
-            final = (texture * sourceFactor) + (pixel * destFactor)
-            </span>
-            @par
-            Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
-            enumerated type.
+            @copydetails Ogre::Pass::setSceneBlending( const SceneBlendFactor, const SceneBlendFactor)
             @param
-            sourceFactor The source factor in the above calculation, i.e. multiplied by the texture colour components.
+            sourceFactorAlpha The alpha source factor in the above calculation, i.e. multiplied by the output of the %Pass.
             @param
-            destFactor The destination factor in the above calculation, i.e. multiplied by the pixel colour components.
-            @param
-            sourceFactorAlpha The alpha source factor in the above calculation, i.e. multiplied by the texture alpha component.
-            @param
-            destFactorAlpha The alpha destination factor in the above calculation, i.e. multiplied by the pixel alpha component.
-            @note
-            This method is applicable for both the fixed-function and programmable pipelines.
+            destFactorAlpha The alpha destination factor in the above calculation, i.e. multiplied by the Frame Buffer alpha.
         */
         void setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha );
 
@@ -696,11 +679,11 @@ namespace Ogre {
         SceneBlendFactor getDestBlendFactorAlpha() const;
 
         /** Sets the specific operation used to blend source and destination pixels together.
-            @remarks
-            By default this operation is +, which creates this equation
-            <span align="center">
-            final = (texture * sourceFactor) + (pixel * destFactor)
-            </span>
+
+            By default this operation is Ogre::SBO_ADD, which creates this equation
+
+            $$final = (passOutput * sourceFactor) + (frameBuffer * destFactor)$$
+
             By setting this to something other than SBO_ADD you can change the operation to achieve
             a different effect.
             @param op The blending operation mode to use for this pass
@@ -708,16 +691,11 @@ namespace Ogre {
         void setSceneBlendingOperation(SceneBlendOperation op);
 
         /** Sets the specific operation used to blend source and destination pixels together.
-            @remarks
-            By default this operation is +, which creates this equation
-            <span align="center">
-            final = (texture * sourceFactor) + (pixel * destFactor)
-            </span>
-            By setting this to something other than SBO_ADD you can change the operation to achieve
-            a different effect.
+
             This function allows more control over blending since it allows you to select different blending
             modes for the color and alpha channels
-            @param op The blending operation mode to use for color channels in this pass
+
+            @copydetails Pass::setSceneBlendingOperation
             @param alphaOp The blending operation mode to use for alpha channels in this pass
         */
         void setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
@@ -735,30 +713,27 @@ namespace Ogre {
         bool isTransparent(void) const;
 
         /** Sets whether or not this pass renders with depth-buffer checking on or not.
-            @remarks
+
             If depth-buffer checking is on, whenever a pixel is about to be written to the frame buffer
             the depth buffer is checked to see if the pixel is in front of all other pixels written at that
             point. If not, the pixel is not written.
-            @par
+
             If depth checking is off, pixels are written no matter what has been rendered before.
             Also see setDepthFunction for more advanced depth check configuration.
-            @see
-            setDepthFunction
+            @see Ogre::CompareFunction
         */
         void setDepthCheckEnabled(bool enabled);
 
         /** Returns whether or not this pass renders with depth-buffer checking on or not.
-            @see
-            setDepthCheckEnabled
         */
         bool getDepthCheckEnabled(void) const;
 
         /** Sets whether or not this pass renders with depth-buffer writing on or not.
-            @remarks
+
             If depth-buffer writing is on, whenever a pixel is written to the frame buffer
             the depth buffer is updated with the depth value of that new pixel, thus affecting future
             rendering operations if future pixels are behind this one.
-            @par
+
             If depth writing is off, pixels are written without updating the depth buffer Depth writing should
             normally be on but can be turned off when rendering static backgrounds or when rendering a collection
             of transparent objects at the end of a scene so that they overlap each other correctly.
@@ -766,17 +741,14 @@ namespace Ogre {
         void setDepthWriteEnabled(bool enabled);
 
         /** Returns whether or not this pass renders with depth-buffer writing on or not.
-            @see
-            setDepthWriteEnabled
         */
         bool getDepthWriteEnabled(void) const;
 
         /** Sets the function used to compare depth values when depth checking is on.
-            @remarks
+
             If depth checking is enabled (see setDepthCheckEnabled) a comparison occurs between the depth
             value of the pixel to be written and the current contents of the buffer. This comparison is
-            normally CMPF_LESS_EQUAL, i.e. the pixel is written if it is closer (or at the same distance)
-            than the current contents. If you wish you can change this comparison using this method.
+            normally Ogre::CMPF_LESS_EQUAL.
         */
         void setDepthFunction( CompareFunction func );
         /** Returns the function used to compare depth values when depth checking is on.
@@ -785,32 +757,32 @@ namespace Ogre {
         */
         CompareFunction getDepthFunction(void) const;
 
-        /** Sets whether or not colour buffer writing is enabled for this Pass.
-            @remarks
-            For some effects, you might wish to turn off the colour write operation
-            when rendering geometry; this means that only the depth buffer will be
-            updated (provided you have depth buffer writing enabled, which you
-            probably will do, although you may wish to only update the stencil
-            buffer for example - stencil buffer state is managed at the RenderSystem
-            level only, not the Material since you are likely to want to manage it
-            at a higher level).
+        /** Sets whether or not colour buffer writing is enabled for this %Pass.
+
+            If colour writing is off no visible pixels are written to the screen during this pass.
+            You might think this is useless, but if you render with colour writing off, and with very
+            minimal other settings, you can use this pass to initialise the depth buffer before
+            subsequently rendering other passes which fill in the colour data. This can give you
+            significant performance boosts on some newer cards, especially when using complex
+            fragment programs, because if the depth check fails then the fragment program is never
+            run.
         */
         void setColourWriteEnabled(bool enabled);
         /** Determines if colour buffer writing is enabled for this pass. */
         bool getColourWriteEnabled(void) const;
 
-        /** Sets the culling mode for this pass  based on the 'vertex winding'.
-            @remarks
+        /** Sets the culling mode for this pass based on the 'vertex winding'.
+
             A typical way for the rendering engine to cull triangles is based on the 'vertex winding' of
             triangles. Vertex winding refers to the direction in which the vertices are passed or indexed
             to in the rendering operation as viewed from the camera, and will wither be clockwise or
             anticlockwise (that's 'counterclockwise' for you Americans out there ;) The default is
-            CULL_CLOCKWISE i.e. that only triangles whose vertices are passed/indexed in anticlockwise order
+            Ogre::CULL_CLOCKWISE i.e. that only triangles whose vertices are passed/indexed in anticlockwise order
             are rendered - this is a common approach and is used in 3D studio models for example. You can
             alter this culling mode if you wish but it is not advised unless you know what you are doing.
-            @par
-            You may wish to use the CULL_NONE option for mesh data that you cull yourself where the vertex
-            winding is uncertain.
+
+            You may wish to use the Ogre::CULL_NONE option for mesh data that you cull yourself where the vertex
+            winding is uncertain or for creating 2-sided passes.
         */
         void setCullingMode( CullingMode mode );
 
@@ -819,17 +791,21 @@ namespace Ogre {
         CullingMode getCullingMode(void) const;
 
         /** Sets the manual culling mode, performed by CPU rather than hardware.
-            @remarks
-            In some situations you want to use manual culling of triangles rather than sending the
-            triangles to the hardware and letting it cull them. This setting only takes effect on SceneManager's
-            that use it (since it is best used on large groups of planar world geometry rather than on movable
-            geometry since this would be expensive), but if used can cull geometry before it is sent to the
-            hardware.
-            @note
-            The default for this setting is MANUAL_CULL_BACK.
-            @param
-            mode The mode to use - see enum ManualCullingMode for details
 
+            In some situations you want to use manual culling of triangles rather than sending the
+            triangles to the hardware and letting it cull them. This setting only takes effect on
+            SceneManager's that use it (since it is best used on large groups of planar world geometry rather
+            than on movable geometry since this would be expensive), but if used can cull geometry before it is
+            sent to the hardware.
+
+            In this case the culling is based on whether the ’back’ or ’front’ of the triangle is facing the
+            camera - this definition is based on the face normal (a vector which sticks out of the front side of
+            the polygon perpendicular to the face). Since %Ogre expects face normals to be on anticlockwise side
+            of the face, Ogre::MANUAL_CULL_BACK is the software equivalent of Ogre::CULL_CLOCKWISE setting,
+            which is why they are both the default. The naming is different to reflect the way the culling is
+            done though, since most of the time face normals are pre-calculated and they don’t have to be the
+            way %Ogre expects - you could set Ogre::CULL_NONE and completely cull in software based on your
+            own face normals, if you have the right SceneManager which uses them.
         */
         void setManualCullingMode( ManualCullingMode mode );
 
@@ -840,12 +816,13 @@ namespace Ogre {
         ManualCullingMode getManualCullingMode(void) const;
 
         /** Sets whether or not dynamic lighting is enabled.
-            @param
-            enabled
-            If true, dynamic lighting is performed on geometry with normals supplied, geometry without
-            normals will not be displayed.
-            @par
-            If false, no lighting is applied and all geometry will be full brightness.
+
+            Turning dynamic lighting off makes any ambient, diffuse, specular, emissive and shading
+            properties for this pass redundant. 
+            If lighting is turned off, all objects rendered using the pass will be fully lit.
+            When lighting is turned on, objects are lit according
+            to their vertex normals for diffuse and specular light, and globally for ambient and
+            emissive.
         */
         void setLightingEnabled(bool enabled);
 
@@ -866,7 +843,7 @@ namespace Ogre {
         unsigned short getMaxSimultaneousLights(void) const;
 
         /** Sets the light index that this pass will start at in the light list.
-            @remarks
+
             Normally the lights passed to a pass will start from the beginning
             of the light list for this object. This option allows you to make this
             pass start from a higher light index, for example if one of your earlier
@@ -885,8 +862,10 @@ namespace Ogre {
         uint32 getLightMask() const;
 
         /** Sets the type of light shading required
-            @note
-            The default shading method is Gouraud shading.
+
+            When dynamic lighting is turned on, the effect is to generate colour values at each
+            vertex. Whether these values are interpolated across the face (and how) depends on this
+            setting. The default shading method is Ogre::SO_GOURAUD.
         */
         void setShadingMode( ShadeOptions mode );
 
@@ -895,8 +874,9 @@ namespace Ogre {
         ShadeOptions getShadingMode(void) const;
 
         /** Sets the type of polygon rendering required
-            @note
-            The default shading method is Solid
+            
+            Sets how polygons should be rasterised, i.e. whether they should be filled in, or just drawn as lines or points.
+            The default shading method is Ogre::PM_SOLID.
         */
         void setPolygonMode( PolygonMode mode );
 
@@ -904,10 +884,10 @@ namespace Ogre {
          */
         PolygonMode getPolygonMode(void) const;
 
-        /** Sets whether this pass's chosen detail level can be
-            overridden (downgraded) by the camera setting.
-            @param override true means that a lower camera detail will override this
-            pass's detail level, false means it won't (default true).
+        /** Sets whether the PolygonMode set on this pass can be downgraded by the camera
+
+         @param override If set to false, this pass will always be rendered at its own chosen polygon mode no matter what the
+         camera says. The default is true.
         */
         void setPolygonModeOverrideable(bool override)
         {
@@ -989,23 +969,26 @@ namespace Ogre {
         Real getFogDensity(void) const;
 
         /** Sets the depth bias to be used for this material.
-            @remarks
+
             When polygons are coplanar, you can get problems with 'depth fighting' where
             the pixels from the two polys compete for the same screen pixel. This is particularly
             a problem for decals (polys attached to another surface to represent details such as
             bulletholes etc.).
-            @par
+
             A way to combat this problem is to use a depth bias to adjust the depth buffer value
             used for the decal such that it is slightly higher than the true value, ensuring that
             the decal appears on top. There are two aspects to the biasing, a constant
             bias value and a slope-relative biasing value, which varies according to the
             maximum depth slope relative to the camera, ie:
-            <pre>finalBias = maxSlope * slopeScaleBias + constantBias</pre>
-            Note that slope scale bias, whilst more accurate, may be ignored by old hardware.
-            @param constantBias The constant bias value, expressed as a factor of the
-            minimum observable depth
-            @param slopeScaleBias The slope-relative bias value, expressed as a factor
-            of the depth slope
+
+            $$finalBias = maxSlope * slopeScaleBias + constantBias$$
+
+            Slope scale biasing is relative to the angle of the polygon to the camera, which makes
+            for a more appropriate bias value, but this is ignored on some older hardware. Constant
+            biasing is expressed as a factor of the minimum depth value, so a value of 1 will nudge
+            the depth by one ’notch’ if you will.
+            @param constantBias The constant bias value
+            @param slopeScaleBias The slope-relative bias value
         */
         void setDepthBias(float constantBias, float slopeScaleBias = 0.0f);
 
@@ -1053,11 +1036,13 @@ namespace Ogre {
         unsigned char getAlphaRejectValue(void) const { return mAlphaRejectVal; }
 
         /** Sets whether to use alpha to coverage (A2C) when blending alpha rejected values.
-            @remarks
+
             Alpha to coverage performs multisampling on the edges of alpha-rejected
             textures to produce a smoother result. It is only supported when multisampling
             is already enabled on the render target, and when the hardware supports
             alpha to coverage (see RenderSystemCapabilities).
+            The common use for alpha to coverage is foliage rendering and chain-link fence style
+            textures.
         */
         void setAlphaToCoverageEnabled(bool enabled);
 
@@ -1522,13 +1507,13 @@ namespace Ogre {
         void setTextureAnisotropy(unsigned int maxAniso);
         /** If set to true, this forces normals to be normalised dynamically
             by the hardware for this pass.
-            @remarks
+
             This option can be used to prevent lighting variations when scaling an
             object - normally because this scaling is hardware based, the normals
             get scaled too which causes lighting to become inconsistent. By default the
             SceneManager detects scaled objects and does this for you, but
             this has an overhead so you might want to turn that off through
-            SceneManager::setNormaliseNormalsOnScale(false) and only do it per-Pass
+            Ogre::SceneManager::setNormaliseNormalsOnScale(false) and only do it per-Pass
             when you need to.
         */
         void setNormaliseNormals(bool normalise) { mNormaliseNormals = normalise; }
@@ -1598,19 +1583,19 @@ namespace Ogre {
 
         /** Sets whether or not this pass will be clipped by a scissor rectangle
             encompassing the lights that are being used in it.
-            @remarks
+
             In order to cut down on fillrate when you have a number of fixed-range
             lights in the scene, you can enable this option to request that
             during rendering, only the region of the screen which is covered by
             the lights is rendered. This region is the screen-space rectangle
             covering the union of the spheres making up the light ranges. Directional
             lights are ignored for this.
-            @par
+
             This is only likely to be useful for multipass additive lighting
             algorithms, where the scene has already been 'seeded' with an ambient
             pass and this pass is just adding light in affected areas.
-            @note
-            When using SHADOWTYPE_STENCIL_ADDITIVE or SHADOWTYPE_TEXTURE_ADDITIVE,
+
+            When using Ogre::SHADOWTYPE_STENCIL_ADDITIVE or Ogre::SHADOWTYPE_TEXTURE_ADDITIVE,
             this option is implicitly used for all per-light passes and does
             not need to be specified. If you are not using shadows or are using
             a modulative or an integrated shadow technique then this could be useful.
@@ -1622,28 +1607,42 @@ namespace Ogre {
         */
         bool getLightScissoringEnabled() const { return mLightScissoring; }
 
-        /** Gets whether or not this pass will be clipped by user clips planes
+        /** Sets whether or not this pass will be clipped by user clips planes
             bounding the area covered by the light.
-            @remarks
+
+            This option will only function if there is a single non-directional light being used in
+            this pass. If there is more than one light, or only directional lights, then no clipping
+            will occur. If there are no lights at all then the objects won’t be rendered at all.
+
             In order to cut down on the geometry set up to render this pass
             when you have a single fixed-range light being rendered through it,
             you can enable this option to request that during triangle setup,
             clip planes are defined to bound the range of the light. In the case
             of a point light these planes form a cube, and in the case of
             a spotlight they form a pyramid. Directional lights are never clipped.
-            @par
+
             This option is only likely to be useful for multipass additive lighting
             algorithms, where the scene has already been 'seeded' with an ambient
             pass and this pass is just adding light in affected areas. In addition,
             it will only be honoured if there is exactly one non-directional light
             being used in this pass. Also, these clip planes override any user clip
             planes set on Camera.
-            @note
-            When using SHADOWTYPE_STENCIL_ADDITIVE or SHADOWTYPE_TEXTURE_ADDITIVE,
+
+            When using Ogre::SHADOWTYPE_STENCIL_ADDITIVE or Ogre::SHADOWTYPE_TEXTURE_ADDITIVE,
             this option is automatically used for all per-light passes if you
-            enable SceneManager::setShadowUseLightClipPlanes and does
+            enable Ogre::SceneManager::setShadowUseLightClipPlanes and does
             not need to be specified. It is disabled by default since clip planes have
             a cost of their own which may not always exceed the benefits they give you.
+            Generally the smaller your lights are the more chance you’ll see a benefit rather than
+            a penalty from clipping.
+
+            @note A specific note about OpenGL: user clip planes are completely ignored when you use
+            an ARB vertex program. This means light clip planes won’t help much if you use ARB
+            vertex programs on GL, although OGRE will perform some optimisation of its own, in that
+            if it sees that the clip volume is completely off-screen, it won’t perform a render at
+            all. When using GLSL, user clipping can be used but you have to use gl_ClipVertex in your
+            shader, see the GLSL documentation for more information. In Direct3D user clip planes are
+            always respected.
         */
         void setLightClipPlanesEnabled(bool enabled) { mLightClipPlanes = enabled; }
         /** Gets whether or not this pass will be clipped by user clips planes
@@ -1652,19 +1651,19 @@ namespace Ogre {
         bool getLightClipPlanesEnabled() const { return mLightClipPlanes; }
 
         /** Manually set which illumination stage this pass is a member of.
-            @remarks
-            When using an additive lighting mode (SHADOWTYPE_STENCIL_ADDITIVE or
-            SHADOWTYPE_TEXTURE_ADDITIVE), the scene is rendered in 3 discrete
+
+            When using an additive lighting mode (Ogre::SHADOWTYPE_STENCIL_ADDITIVE or
+            Ogre::SHADOWTYPE_TEXTURE_ADDITIVE), the scene is rendered in 3 discrete
             stages, ambient (or pre-lighting), per-light (once per light, with
             shadowing) and decal (or post-lighting). Usually OGRE figures out how
             to categorise your passes automatically, but there are some effects you
             cannot achieve without manually controlling the illumination. For example
             specular effects are muted by the typical sequence because all textures
-            are saved until the IS_DECAL stage which mutes the specular effect.
+            are saved until the Ogre::IS_DECAL stage which mutes the specular effect.
             Instead, you could do texturing within the per-light stage if it's
             possible for your material and thus add the specular on after the
             decal texturing, and have no post-light rendering.
-            @par
+
             If you assign an illumination stage to a pass you have to assign it
             to all passes in the technique otherwise it will be ignored. Also note
             that whilst you can have more than one pass in each group, they cannot
