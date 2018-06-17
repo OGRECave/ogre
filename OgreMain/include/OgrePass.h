@@ -222,6 +222,8 @@ namespace Ogre {
         std::unique_ptr<GpuProgramUsage> mShadowReceiverFragmentProgramUsage;
         /// Number of pass iterations to perform
         size_t mPassIterationCount;
+        /// line width
+        float mLineWidth;
         /// Point size, applies when not using per-vertex point size
         Real mPointSize;
         Real mPointMinSize;
@@ -393,6 +395,15 @@ namespace Ogre {
         /** Sets which material properties follow the vertex colour
          */
         void setVertexColourTracking(TrackVertexColourType tracking);
+
+        /**
+         * set the line width for this pass
+         *
+         * This property determines what width is used to render lines.
+         * @note some drivers only support a value of 1.0 here
+         */
+        void setLineWidth(float width) { mLineWidth = width; }
+        float getLineWidth() const { return mLineWidth; }
 
         /** Gets the point size of the pass.
             @remarks

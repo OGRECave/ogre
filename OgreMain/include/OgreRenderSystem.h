@@ -516,6 +516,11 @@ namespace Ogre
         virtual void _setPointParameters(Real size, bool attenuationEnabled, 
             Real constant, Real linear, Real quadratic, Real minSize, Real maxSize) {};
 
+        /**
+         * Set the line width when drawing as RenderOperation::OT_LINE_LIST/ RenderOperation::OT_LINE_STRIP
+         * @param width only value of 1.0 might be supported. Check for RSC_WIDE_LINES.
+         */
+        virtual void _setLineWidth(float width) {};
 
         /**
         Sets the texture to bind to a given texture unit.

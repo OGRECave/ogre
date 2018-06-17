@@ -859,6 +859,9 @@ namespace Ogre
         // Support for subroutine
         ID_SUBROUTINE,
 
+        // added during 1.11. re-sort for 1.12
+        ID_LINE_WIDTH,
+
         ID_END_BUILTIN_IDS
     };
     /** @} */

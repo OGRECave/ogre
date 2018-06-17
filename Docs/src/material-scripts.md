@@ -269,6 +269,7 @@ Here are the attributes you can use in a ’pass’ section of a .material scrip
 -   [point\_size\_attenuation](#point_005fsize_005fattenuation)
 -   [point\_size\_min](#point_005fsize_005fmin)
 -   [point\_size\_max](#point_005fsize_005fmax)
+-   [line_width](#line_width)
 
 <a name="Attribute-Descriptions"></a>
 
@@ -949,6 +950,14 @@ Sets the maximum point size after attenuation ([point\_size\_attenuation](#point
 @par
 Format: point\_size\_max &lt;size&gt; Default: point\_size\_max 0
 
+<a name="line_width"></a>
+## line_width
+@copydetails Ogre::Pass::setLineWidth
+
+@par
+Format: line_width &lt;width&gt; 
+@par
+Default: line_width 1
 
 # Texture Units {#Texture-Units}
 

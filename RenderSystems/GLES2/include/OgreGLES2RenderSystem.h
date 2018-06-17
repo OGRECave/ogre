@@ -181,6 +181,8 @@ namespace Ogre {
 
             void _setTextureMipmapBias(size_t unit, float bias) { };   // Not supported
 
+            void _setLineWidth(float width);
+
             void _setViewport(Viewport *vp);
 
             void _beginFrame(void);

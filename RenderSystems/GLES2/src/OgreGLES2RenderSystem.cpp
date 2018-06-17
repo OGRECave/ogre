@@ -500,6 +500,12 @@ namespace Ogre {
 
             rsc->setCapability(RSC_PRIMITIVE_RESTART);
         }
+
+        GLfloat lineWidth[2] = {1, 1};
+        glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidth);
+        if(lineWidth[1] != 1 && lineWidth[1] != lineWidth[0])
+            rsc->setCapability(RSC_WIDE_LINES);
+
         return rsc;
     }
 
@@ -855,6 +861,11 @@ namespace Ogre {
         if(getCapabilities()->hasCapability(RSC_TEXTURE_3D))
             mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_R_OES, getTextureAddressingMode(uvw.w));
         mStateCacheManager->activateGLTextureUnit(0);
+    }
+
+    void GLES2RenderSystem::_setLineWidth(float width)
+    {
+        OGRE_CHECK_GL_ERROR(glLineWidth(width));
     }
 
     GLenum GLES2RenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const

@@ -2273,6 +2273,26 @@ namespace Ogre{
                         }
                     }
                     break;
+                case ID_LINE_WIDTH:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "line_width must have at most 1 argument");
+                    }
+                    else
+                    {
+                        Real val = 0.0f;
+                        if(getReal(prop->values.front(), &val))
+                            mPass->setLineWidth(val);
+                        else
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               prop->values.front()->getValue() + " is not a valid number");
+                    }
+                    break;
                 case ID_POINT_SIZE:
                     if(prop->values.empty())
                     {

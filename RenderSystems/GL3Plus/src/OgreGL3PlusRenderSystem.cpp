@@ -518,6 +518,11 @@ namespace Ogre {
         if( hasMinGLVersion(4, 3) || checkExtension("GL_ARB_ES3_compatibility"))
             rsc->setCapability(RSC_PRIMITIVE_RESTART);
 
+        GLfloat lineWidth[2] = {1, 1};
+        glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidth);
+        if(lineWidth[1] != 1 && lineWidth[1] != lineWidth[0])
+            rsc->setCapability(RSC_WIDE_LINES);
+
         return rsc;
     }
 
@@ -895,6 +900,11 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[stage], GL_TEXTURE_LOD_BIAS, bias));
             mStateCacheManager->activateGLTextureUnit(0);
         }
+    }
+
+    void GL3PlusRenderSystem::_setLineWidth(float width)
+    {
+        OGRE_CHECK_GL_ERROR(glLineWidth(width));
     }
 
     GLenum GL3PlusRenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const

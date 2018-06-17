@@ -579,6 +579,11 @@ namespace Ogre {
             rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
         }
 
+        GLfloat lineWidth[2] = {1, 1};
+        glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidth);
+        if(lineWidth[1] != 1 && lineWidth[1] != lineWidth[0])
+            rsc->setCapability(RSC_WIDE_LINES);
+
         return rsc;
     }
 
@@ -1390,6 +1395,12 @@ namespace Ogre {
 
         mStateCacheManager->setPointParameters(val, minSize, maxSize);
     }
+
+    void GLRenderSystem::_setLineWidth(float width)
+    {
+        glLineWidth(width);
+    }
+
     //---------------------------------------------------------------------
     void GLRenderSystem::_setPointSpritesEnabled(bool enabled)
     {

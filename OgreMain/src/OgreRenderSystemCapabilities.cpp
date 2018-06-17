@@ -244,6 +244,9 @@ namespace Ogre {
             " * Point Sprites: "
             + StringConverter::toString(hasCapability(RSC_POINT_SPRITES), true));
         pLog->logMessage(
+            " * Wide Lines: "
+            + StringConverter::toString(hasCapability(RSC_WIDE_LINES), true));
+        pLog->logMessage(
             " * Hardware Gamma: "
             + StringConverter::toString(hasCapability(RSC_HW_GAMMA), true));
         pLog->logMessage(
