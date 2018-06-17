@@ -275,6 +275,7 @@ namespace Ogre
         /// This function sets up the initial values in word id map
         void initWordMap();
     private:
+        friend String getPropertyName(const ScriptCompiler *compiler, uint32 id);
         // Resource group
         String mGroup;
         // The word -> id conversion table

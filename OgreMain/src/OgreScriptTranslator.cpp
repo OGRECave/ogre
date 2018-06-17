@@ -67,6 +67,60 @@ namespace Ogre{
         }
     }
 
+    String getPropertyName(const ScriptCompiler *compiler, uint32 id)
+    {
+        for(auto& kv : compiler->mIds)
+            if(kv.second == id)
+                return kv.first;
+        OgreAssertDbg(false,  "should not get here");
+        return "unknown";
+    }
+
+    template <typename T>
+    bool getValue(const AbstractNodePtr &node, T& result);
+    template<> bool getValue(const AbstractNodePtr &node, Real& result)
+    {
+        return ScriptTranslator::getReal(node, &result);
+    }
+    template<> bool getValue(const AbstractNodePtr &node, bool& result)
+    {
+        return ScriptTranslator::getBoolean(node, &result);
+    }
+    template<> bool getValue(const AbstractNodePtr &node, uint32& result)
+    {
+        return ScriptTranslator::getUInt(node, &result);
+    }
+    template<> bool getValue(const AbstractNodePtr &node, String& result)
+    {
+        return ScriptTranslator::getString(node, &result);
+    }
+
+    template <typename T>
+    static bool getValue(PropertyAbstractNode* prop, ScriptCompiler *compiler, T& val)
+    {
+        if(prop->values.empty())
+        {
+            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+        }
+        else if(prop->values.size() > 1)
+        {
+            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                               getPropertyName(compiler, prop->id) +
+                                   " must have at most 1 argument");
+        }
+        else
+        {
+            if(getValue(prop->values.front(), val))
+                return true;
+            else
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                   prop->values.front()->getValue() + " is not a valid value for " +
+                                       getPropertyName(compiler, prop->id));
+        }
+
+        return false;
+    }
+
     void ScriptTranslator::processNode(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
         if(node->type != ANT_OBJECT)
@@ -606,6 +660,8 @@ namespace Ogre{
         obj->context = Any(mMaterial);
         mMaterial->_notifyOrigin(obj->file);
 
+        bool bval;
+
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
             if((*i)->type == ANT_PROPERTY)
@@ -687,44 +743,12 @@ namespace Ogre{
                     }
                     break;
                 case ID_RECEIVE_SHADOWS:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "receive_shadows only supports 1 argument");
-                    }
-                    else
-                    {
-                        bool val = true;
-                        if(getBoolean(prop->values.front(), &val))
-                            mMaterial->setReceiveShadows(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "receive_shadows argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mMaterial->setReceiveShadows(bval);
                     break;
                 case ID_TRANSPARENCY_CASTS_SHADOWS:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "transparency_casts_shadows only supports 1 argument");
-                    }
-                    else
-                    {
-                        bool val = true;
-                        if(getBoolean(prop->values.front(), &val))
-                            mMaterial->setTransparencyCastsShadows(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "transparency_casts_shadows argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mMaterial->setTransparencyCastsShadows(bval);
                     break;
                 case ID_SET_TEXTURE_ALIAS:
                     if(prop->values.empty())
@@ -789,6 +813,9 @@ namespace Ogre{
         if(!obj->name.empty())
             mTechnique->setName(obj->name);
 
+        uint32 uival;
+        String sval;
+
         // Set the properties for the material
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -798,95 +825,27 @@ namespace Ogre{
                 switch(prop->id)
                 {
                 case ID_SCHEME:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "scheme only supports 1 argument");
-                    }
-                    else
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
-                        String scheme;
-                        if(getString(*i0, &scheme))
-                            mTechnique->setSchemeName(scheme);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "scheme must have 1 string argument");
-                    }
+                    if(getValue(prop, compiler, sval))
+                        mTechnique->setSchemeName(sval);
                     break;
                 case ID_LOD_INDEX:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "lod_index only supports 1 argument");
-                    }
-                    else
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
-                        uint32 v = 0;
-                        if(getUInt(*i0, &v))
-                            mTechnique->setLodIndex(static_cast<unsigned short>(v));
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "lod_index cannot accept argument \"" + (*i0)->getValue() + "\"");
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mTechnique->setLodIndex(static_cast<uint16>(uival));
                     break;
                 case ID_SHADOW_CASTER_MATERIAL:
-                    if(prop->values.empty())
+                    if(getValue(prop, compiler, sval))
                     {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "shadow_caster_material only accepts 1 argument");
-                    }
-                    else
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
-                        String matName;
-                        if(getString(*i0, &matName))
-                        {
-                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, matName);
-                            compiler->_fireEvent(&evt, 0);
-                            mTechnique->setShadowCasterMaterial(evt.mName); // Use the processed name
-                        }
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "shadow_caster_material cannot accept argument \"" + (*i0)->getValue() + "\"");
+                        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, sval);
+                        compiler->_fireEvent(&evt, 0);
+                        mTechnique->setShadowCasterMaterial(evt.mName); // Use the processed name
                     }
                     break;
                 case ID_SHADOW_RECEIVER_MATERIAL:
-                    if(prop->values.empty())
+                    if(getValue(prop, compiler, sval))
                     {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "shadow_receiver_material only accepts 1 argument");
-                    }
-                    else
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
-                        String matName;
-                        if(getString(*i0, &matName))
-                        {
-                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, matName);
-                            compiler->_fireEvent(&evt, 0);
-                            mTechnique->setShadowReceiverMaterial(evt.mName);
-                        }
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "shadow_receiver_material_name cannot accept argument \"" + (*i0)->getValue() + "\"");
+                        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, sval);
+                        compiler->_fireEvent(&evt, 0);
+                        mTechnique->setShadowReceiverMaterial(evt.mName); // Use the processed name
                     }
                     break;
                 case ID_GPU_VENDOR_RULE:
@@ -1030,6 +989,10 @@ namespace Ogre{
         // Get the name of the technique
         if(!obj->name.empty())
             mPass->setName(obj->name);
+
+        Real fval;
+        bool bval;
+        uint32 uival;
 
         // Set the properties for the material
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
@@ -1471,44 +1434,12 @@ namespace Ogre{
                     }
                     break;
                 case ID_DEPTH_CHECK:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "depth_check must have 1 argument");
-                    }
-                    else
-                    {
-                        bool val = true;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setDepthCheckEnabled(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "depth_check third argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setDepthCheckEnabled(bval);
                     break;
                 case ID_DEPTH_WRITE:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "depth_write must have 1 argument");
-                    }
-                    else
-                    {
-                        bool val = true;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setDepthWriteEnabled(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "depth_write third argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setDepthWriteEnabled(bval);
                     break;
                 case ID_DEPTH_BIAS:
                     if(prop->values.empty())
@@ -1558,24 +1489,8 @@ namespace Ogre{
                     }
                     break;
                 case ID_ITERATION_DEPTH_BIAS:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "iteration_depth_bias must have 1 argument");
-                    }
-                    else
-                    {
-                        float val = 0.0f;
-                        if(getFloat(prop->values.front(), &val))
-                            mPass->setIterationDepthBias(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid float value");
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mPass->setIterationDepthBias(fval);
                     break;
                 case ID_ALPHA_REJECTION:
                     if(prop->values.empty())
@@ -1611,64 +1526,16 @@ namespace Ogre{
                     }
                     break;
                 case ID_ALPHA_TO_COVERAGE:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "alpha_to_coverage must have 1 argument");
-                    }
-                    else
-                    {
-                        bool val = true;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setAlphaToCoverageEnabled(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "alpha_to_coverage argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setAlphaToCoverageEnabled(bval);
                     break;
                 case ID_LIGHT_SCISSOR:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "light_scissor must have only 1 argument");
-                    }
-                    else
-                    {
-                        bool val = false;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setLightScissoringEnabled(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid boolean");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setLightScissoringEnabled(bval);
                     break;
                 case ID_LIGHT_CLIP_PLANES:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "light_clip_planes must have at most 1 argument");
-                    }
-                    else
-                    {
-                        bool val = false;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setLightClipPlanesEnabled(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid boolean");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setLightClipPlanesEnabled(bval);
                     break;
                 case ID_TRANSPARENT_SORTING:
                     if(prop->values.empty())
@@ -1819,44 +1686,12 @@ namespace Ogre{
                     }
                     break;
                 case ID_NORMALISE_NORMALS:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "normalise_normals must have at most 1 argument");
-                    }
-                    else
-                    {
-                        bool val = false;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setNormaliseNormals(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid boolean");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setNormaliseNormals(bval);
                     break;
                 case ID_LIGHTING:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "lighting must have at most 1 argument");
-                    }
-                    else
-                    {
-                        bool val = false;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setLightingEnabled(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid boolean");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setLightingEnabled(bval);
                     break;
                 case ID_SHADING:
                     if(prop->values.empty())
@@ -1935,24 +1770,8 @@ namespace Ogre{
                     }
                     break;
                 case ID_POLYGON_MODE_OVERRIDEABLE:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "polygon_mode_overrideable must have at most 1 argument");
-                    }
-                    else
-                    {
-                        bool val = false;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setPolygonModeOverrideable(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid boolean");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setPolygonModeOverrideable(bval);
                     break;
                 case ID_FOG_OVERRIDE:
                     if(prop->values.empty())
@@ -2060,79 +1879,20 @@ namespace Ogre{
                     }
                     break;
                 case ID_COLOUR_WRITE:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "colour_write must have at most 1 argument");
-                    }
-                    else
-                    {
-                        bool val = false;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setColourWriteEnabled(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid boolean");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setColourWriteEnabled(bval);
                     break;
                 case ID_MAX_LIGHTS:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "max_lights must have at most 1 argument");
-                    }
-                    else
-                    {
-                        uint32 val = 0;
-                        if(getUInt(prop->values.front(), &val))
-                            mPass->setMaxSimultaneousLights(static_cast<unsigned short>(val));
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid integer");
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mPass->setMaxSimultaneousLights(uival);
                     break;
                 case ID_START_LIGHT:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "start_light must have at most 1 argument");
-                    }
-                    else
-                    {
-                        uint32 val = 0;
-                        if(getUInt(prop->values.front(), &val))
-                            mPass->setStartLight(static_cast<unsigned short>(val));
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid integer");
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mPass->setStartLight(static_cast<uint16>(uival));
                     break;
                 case ID_LIGHT_MASK:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else
-                    {
-                        uint32 val = 0;
-                        if(getUInt(prop->values.front(), &val))
-                            mPass->setLightMask(static_cast<unsigned short>(val));
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid integer");
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mPass->setLightMask(static_cast<uint16>(uival));
                     break;
                 case ID_ITERATION:
                     if(prop->values.empty())
@@ -2274,64 +2034,16 @@ namespace Ogre{
                     }
                     break;
                 case ID_LINE_WIDTH:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "line_width must have at most 1 argument");
-                    }
-                    else
-                    {
-                        Real val = 0.0f;
-                        if(getReal(prop->values.front(), &val))
-                            mPass->setLineWidth(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid number");
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mPass->setLineWidth(fval);
                     break;
                 case ID_POINT_SIZE:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "point_size must have at most 1 argument");
-                    }
-                    else
-                    {
-                        Real val = 0.0f;
-                        if(getReal(prop->values.front(), &val))
-                            mPass->setPointSize(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid number");
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mPass->setPointSize(fval);
                     break;
                 case ID_POINT_SPRITES:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "point_sprites must have at most 1 argument");
-                    }
-                    else
-                    {
-                        bool val = false;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setPointSpritesEnabled(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid boolean");
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setPointSpritesEnabled(bval);
                     break;
                 case ID_POINT_SIZE_ATTENUATION:
                     if(prop->values.empty())
@@ -2418,44 +2130,12 @@ namespace Ogre{
                     }
                     break;
                 case ID_POINT_SIZE_MIN:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "point_size_min must have at most 1 argument");
-                    }
-                    else
-                    {
-                        Real val = 0.0f;
-                        if(getReal(prop->values.front(), &val))
-                            mPass->setPointMinSize(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid number");
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mPass->setPointMinSize(fval);
                     break;
                 case ID_POINT_SIZE_MAX:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "point_size_max must have at most 1 argument");
-                    }
-                    else
-                    {
-                        Real val = 0.0f;
-                        if(getReal(prop->values.front(), &val))
-                            mPass->setPointMaxSize(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid number");
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mPass->setPointMaxSize(fval);
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
@@ -2681,6 +2361,11 @@ namespace Ogre{
         if(!obj->name.empty())
             mUnit->setName(obj->name);
 
+        bool bval;
+        Real fval;
+        uint32 uival;
+        String sval;
+
         // Set the properties for the material
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -2690,24 +2375,8 @@ namespace Ogre{
                 switch(prop->id)
                 {
                 case ID_TEXTURE_ALIAS:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "texture_alias must have at most 1 argument");
-                    }
-                    else
-                    {
-                        String val;
-                        if(getString(prop->values.front(), &val))
-                            mUnit->setTextureNameAlias(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid texture alias");
-                    }
+                    if(getValue(prop, compiler, sval))
+                        mUnit->setTextureNameAlias(sval);
                     break;
                 case ID_TEXTURE:
                     if(prop->values.empty())
@@ -2957,24 +2626,8 @@ namespace Ogre{
                     }
                     break;
                 case ID_TEX_COORD_SET:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "tex_coord_set must have at most 1 argument");
-                    }
-                    else
-                    {
-                        uint32 val = 0;
-                        if(getUInt(prop->values.front(), &val))
-                            mUnit->setTextureCoordSet(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not supported as an integer argument");
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mUnit->setTextureCoordSet(uival);
                     break;
                 case ID_TEX_ADDRESS_MODE:
                     {
@@ -3199,36 +2852,8 @@ namespace Ogre{
                     }
                     break;
                 case ID_CMPTEST:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "compare_test must have at most 1 argument");
-                    }
-                    else
-                    {
-                        if(prop->values.front()->type == ANT_ATOM)
-                        {
-                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-                            bool enabled = false;
-                            switch(atom->id)
-                            {
-                            case ScriptCompiler::ID_ON:
-                                enabled=true;
-                                break;
-                            case ScriptCompiler::ID_OFF:
-                                enabled=false;
-                                break;
-                            default:
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   prop->values.front()->getValue() + " is not a valid parameter");
-                            }
-                            mUnit->setTextureCompareEnabled(enabled);
-                        }
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mUnit->setTextureCompareEnabled(bval);
                     break;
                 case ID_CMPFUNC:
                     if(prop->values.empty())
@@ -3282,44 +2907,12 @@ namespace Ogre{
                     }
                     break;
                 case ID_MAX_ANISOTROPY:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "max_anisotropy must have at most 1 argument");
-                    }
-                    else
-                    {
-                        uint32 val = 0;
-                        if(getUInt(prop->values.front(), &val))
-                            mUnit->setTextureAnisotropy(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid integer argument");
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mUnit->setTextureAnisotropy(uival);
                     break;
                 case ID_MIPMAP_BIAS:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "mipmap_bias must have at most 1 argument");
-                    }
-                    else
-                    {
-                        Real val = 0.0f;
-                        if(getReal(prop->values.front(), &val))
-                            mUnit->setTextureMipmapBias(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid number argument");
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mUnit->setTextureMipmapBias(fval);
                     break;
                 case ID_COLOUR_OP:
                     if(prop->values.empty())
@@ -3861,44 +3454,12 @@ namespace Ogre{
                     }
                     break;
                 case ID_ROTATE:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "rotate must have at most 1 argument");
-                    }
-                    else
-                    {
-                        Real angle;
-                        if(getReal(prop->values.front(), &angle))
-                            mUnit->setTextureRotate(Degree(angle));
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid number value");
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mUnit->setTextureRotate(Degree(fval));
                     break;
                 case ID_ROTATE_ANIM:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "rotate_anim must have at most 1 argument");
-                    }
-                    else
-                    {
-                        Real angle;
-                        if(getReal(prop->values.front(), &angle))
-                            mUnit->setRotateAnimation(angle);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid number value");
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mUnit->setRotateAnimation(fval);
                     break;
                 case ID_SCALE:
                     if(prop->values.empty())
@@ -5889,6 +5450,8 @@ namespace Ogre{
         mTechnique = compositor->createTechnique();
         obj->context = Any(mTechnique);
 
+        String sval;
+
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
             if((*i)->type == ANT_OBJECT)
@@ -6111,46 +5674,12 @@ namespace Ogre{
                     }
                     break;
                 case ID_SCHEME:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "scheme only supports 1 argument");
-                    }
-                    else
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
-                        String scheme;
-                        if(getString(*i0, &scheme))
-                            mTechnique->setSchemeName(scheme);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "scheme must have 1 string argument");
-                    }
+                    if(getValue(prop, compiler, sval))
+                        mTechnique->setSchemeName(sval);
                     break;
                 case ID_COMPOSITOR_LOGIC:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "compositor logic only supports 1 argument");
-                    }
-                    else
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
-                        String logicName;
-                        if(getString(*i0, &logicName))
-                            mTechnique->setCompositorLogicName(logicName);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "compositor logic must have 1 string argument");
-                    }
+                    if(getValue(prop, compiler, sval))
+                        mTechnique->setCompositorLogicName(sval);
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
@@ -6188,6 +5717,11 @@ namespace Ogre{
             mTarget = technique->getOutputTargetPass();
         }
         obj->context = Any(mTarget);
+
+        bool bval;
+        Real fval;
+        uint32 uival;
+        String sval;
 
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -6235,124 +5769,24 @@ namespace Ogre{
                     }
                     break;
                 case ID_ONLY_INITIAL:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        bool val;
-                        if(getBoolean(prop->values.front(), &val))
-                        {
-                            mTarget->setOnlyInitial(val);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mTarget->setOnlyInitial(bval);
                     break;
                 case ID_VISIBILITY_MASK:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        uint32 val;
-                        if(getUInt(prop->values.front(), &val))
-                        {
-                            mTarget->setVisibilityMask(val);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mTarget->setVisibilityMask(uival);
                     break;
                 case ID_LOD_BIAS:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        float val;
-                        if(getFloat(prop->values.front(), &val))
-                        {
-                            mTarget->setLodBias(val);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mTarget->setLodBias(fval);
                     break;
                 case ID_MATERIAL_SCHEME:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        String val;
-                        if(getString(prop->values.front(), &val))
-                        {
-                            mTarget->setMaterialScheme(val);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
+                    if(getValue(prop, compiler, sval))
+                        mTarget->setMaterialScheme(sval);
                     break;
                 case ID_SHADOWS_ENABLED:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        bool val;
-                        if(getBoolean(prop->values.front(), &val))
-                        {
-                            mTarget->setShadowsEnabled(val);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mTarget->setShadowsEnabled(bval);
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
@@ -6417,6 +5851,11 @@ namespace Ogre{
             return;
         }
 
+        Real fval;
+        bool bval;
+        uint32 uival;
+        String sval;
+
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
             if((*i)->type == ANT_OBJECT)
@@ -6429,18 +5868,8 @@ namespace Ogre{
                 switch(prop->id)
                 {
                 case ID_CHECK:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                        bool val;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setStencilCheck(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setStencilCheck(bval);
                     break;
                 case ID_COMP_FUNC:
                     {
@@ -6457,32 +5886,12 @@ namespace Ogre{
                     }
                     break;
                 case ID_REF_VALUE:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                        uint32 val;
-                        if(getUInt(prop->values.front(), &val))
-                            mPass->setStencilRefValue(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mPass->setStencilRefValue(uival);
                     break;
                 case ID_MASK:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                        uint32 val;
-                        if(getUInt(prop->values.front(), &val))
-                            mPass->setStencilMask(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mPass->setStencilMask(uival);
                     break;
                 case ID_FAIL_OP:
                     {
@@ -6527,32 +5936,12 @@ namespace Ogre{
                     }
                     break;
                 case ID_TWO_SIDED:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                        bool val;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setStencilTwoSidedOperation(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setStencilTwoSidedOperation(bval);
                     break;
                 case ID_READ_BACK_AS_TEXTURE:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                        bool val;
-                        if(getBoolean(prop->values.front(), &val))
-                            mPass->setStencilReadBackAsTextureOperation(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    }
+                    if(getValue(prop, compiler, bval))
+                        mPass->setStencilReadBackAsTextureOperation(bval);
                     break;
                 case ID_BUFFERS:
                     {
@@ -6597,57 +5986,19 @@ namespace Ogre{
                     }
                     break;
                 case ID_DEPTH_VALUE:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                        Real val;
-                        if(getReal(prop->values.front(), &val))
-                            mPass->setClearDepth(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    }
+                    if(getValue(prop, compiler, fval))
+                        mPass->setClearDepth(fval);
                     break;
                 case ID_STENCIL_VALUE:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                        uint32 val;
-                        if(getUInt(prop->values.front(), &val))
-                            mPass->setClearStencil(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mPass->setClearStencil(uival);
                     break;
                 case ID_MATERIAL:
-                    if(prop->values.empty())
+                    if(getValue(prop, compiler, sval))
                     {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        String val;
-                        if(getString(prop->values.front(), &val))
-                        {
-                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, val);
-                            compiler->_fireEvent(&evt, 0);
-                            mPass->setMaterialName(evt.mName);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
+                        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, sval);
+                        compiler->_fireEvent(&evt, 0);
+                        mPass->setMaterialName(evt.mName);
                     }
                     break;
                 case ID_INPUT:
@@ -6687,100 +6038,20 @@ namespace Ogre{
                     }
                     break;
                 case ID_IDENTIFIER:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        uint32 val;
-                        if(getUInt(prop->values.front(), &val))
-                        {
-                            mPass->setIdentifier(val);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mPass->setIdentifier(uival);
                     break;
                 case ID_FIRST_RENDER_QUEUE:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        uint32 val;
-                        if(getUInt(prop->values.front(), &val))
-                        {
-                            mPass->setFirstRenderQueue(static_cast<uint8>(val));
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mPass->setFirstRenderQueue(static_cast<uint8>(uival));
                     break;
                 case ID_LAST_RENDER_QUEUE:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        uint32 val;
-                        if(getUInt(prop->values.front(), &val))
-                        {
-                            mPass->setLastRenderQueue(static_cast<uint8>(val));
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
+                    if(getValue(prop, compiler, uival))
+                        mPass->setLastRenderQueue(static_cast<uint8>(uival));
                     break;
                 case ID_MATERIAL_SCHEME:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else if (prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    else
-                    {
-                        String val;
-                        if(getString(prop->values.front(), &val))
-                        {
-                            mPass->setMaterialScheme(val);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
+                    if(getValue(prop, compiler, sval))
+                        mPass->setMaterialScheme(sval);
                     break;
                 case ID_QUAD_NORMALS:
                     if(prop->values.empty())

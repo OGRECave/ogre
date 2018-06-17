@@ -107,6 +107,8 @@ namespace Ogre{
         /// Converts the node to a GpuConstantType enum and returns true if successful
         static bool getConstantType(AbstractNodeList::const_iterator i, GpuConstantType *op); 
 
+        template<typename T>
+        friend bool getValue(const AbstractNodePtr &node, T& result);
     };
 
     /** The ScriptTranslatorManager manages the lifetime and access to
