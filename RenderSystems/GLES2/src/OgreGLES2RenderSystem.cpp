@@ -831,10 +831,6 @@ namespace Ogre {
         mStateCacheManager->activateGLTextureUnit(0);
     }
 
-    void GLES2RenderSystem::_setTextureCoordSet(size_t stage, size_t index)
-    {
-    }
-
     GLint GLES2RenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
     {
         switch (tam)

@@ -1790,11 +1790,6 @@ namespace Ogre
         mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTextureCoordSet( size_t stage, size_t index )
-    {
-        mTexStageDesc[stage].coordIndex = index;
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
     {
         mTexStageDesc[unit].samplerDesc.MipLODBias = bias;

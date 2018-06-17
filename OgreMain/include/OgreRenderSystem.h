@@ -557,8 +557,9 @@ namespace Ogre
 
         @param unit Texture unit as above
         @param index The index of the texture coordinate set to use.
+        @deprecated only needed for fixed function APIs
         */
-        virtual void _setTextureCoordSet(size_t unit, size_t index) = 0;
+        virtual void _setTextureCoordSet(size_t unit, size_t index) {}
 
         /**
         Sets a method for automatically calculating texture coordinates for a stage.
