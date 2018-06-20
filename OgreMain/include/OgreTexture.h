@@ -361,8 +361,11 @@ namespace Ogre {
         */
         void setDesiredBitDepths(ushort integerBits, ushort floatBits);
 
-        /** Sets whether luminace pixel format will treated as alpha format when load this texture.
-        */
+        /** specify that a single channel (luminance) texture should be loaded as alpha
+
+          rather than the default which is to load it into the red channel. This can be helpful if
+          you want to use alpha-only textures in the fixed function pipeline.
+         */
         void setTreatLuminanceAsAlpha(bool asAlpha);
 
         /** Gets whether luminace pixel format will treated as alpha format when load this texture.

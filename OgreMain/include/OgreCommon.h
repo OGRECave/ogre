@@ -75,13 +75,17 @@ namespace Ogre {
         minification, magnification and mip filters. */
     enum TextureFilterOptions
     {
-        /// Equal to: min=FO_POINT, mag=FO_POINT, mip=FO_NONE
+        /// No filtering or mipmapping is used. 
+        /// Equal to: min=Ogre::FO_POINT, mag=Ogre::FO_POINT, mip=Ogre::FO_NONE
         TFO_NONE,
-        /// Equal to: min=FO_LINEAR, mag=FO_LINEAR, mip=FO_POINT
+        /// 2x2 box filtering is performed when magnifying or reducing a texture, and a mipmap is picked from the list but no filtering is done between the levels of the mipmaps. 
+        /// Equal to: min=Ogre::FO_LINEAR, mag=Ogre::FO_LINEAR, mip=Ogre::FO_POINT
         TFO_BILINEAR,
-        /// Equal to: min=FO_LINEAR, mag=FO_LINEAR, mip=FO_LINEAR
+        /// 2x2 box filtering is performed when magnifying and reducing a texture, and the closest 2 mipmaps are filtered together. 
+        /// Equal to: min=Ogre::FO_LINEAR, mag=Ogre::FO_LINEAR, mip=Ogre::FO_LINEAR
         TFO_TRILINEAR,
-        /// Equal to: min=FO_ANISOTROPIC, max=FO_ANISOTROPIC, mip=FO_LINEAR
+        /// This is the same as ’trilinear’, except the filtering algorithm takes account of the slope of the triangle in relation to the camera rather than simply doing a 2x2 pixel filter in all cases.
+        /// Equal to: min=Ogre::FO_ANISOTROPIC, max=Ogre::FO_ANISOTROPIC, mip=Ogre::FO_LINEAR
         TFO_ANISOTROPIC
     };
 
@@ -103,7 +107,9 @@ namespace Ogre {
         FO_POINT,
         /// Average of a 2x2 pixel area, denotes bilinear for MIN and MAG, trilinear for MIP
         FO_LINEAR,
-        /// Similar to FO_LINEAR, but compensates for the angle of the texture plane
+        /// Similar to FO_LINEAR, but compensates for the angle of the texture plane. Note that in
+        /// order for this to make any difference, you must also set the
+        /// TextureUnitState::setTextureAnisotropy attribute too.
         FO_ANISOTROPIC
     };
 

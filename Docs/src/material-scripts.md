@@ -998,8 +998,7 @@ Alternatively 1 cube texture can be used if supported by the texture format(DDS 
 @param numMipMaps
 specify the number of mipmaps to generate for this texture. The default is ’unlimited’ which means mips down to 1x1 size are generated. You can specify a fixed number (even 0) if you like instead. Note that if you use the same texture in many material scripts, the number of mipmaps generated will conform to the number specified in the first texture\_unit used to load the texture - so be consistent with your usage.
 
-@param alpha
-specify that a single channel (luminance) texture should be loaded as alpha, rather than the default which is to load it into the red channel. This can be helpful if you want to use alpha-only textures in the fixed function pipeline.  
+@param alpha @copydoc Ogre::Texture::setTreatLuminanceAsAlpha
 Default: none
 
 @param PixelFormat
@@ -1013,13 +1012,15 @@ informs the renderer that you want the graphics hardware to perform gamma correc
 
 ## anim\_texture
 
-Sets the images to be used in an animated texture layer. In this case an animated texture layer means one which has multiple frames, each of which is a separate image file. There are 2 formats, one for implicitly determined image names, one for explicitly named images.
+Sets the images to be used in an animated texture layer. There are 2 formats, one for implicitly determined image names, one for explicitly named images.
 @par
-Format1 (short): anim\_texture &lt;base\_name&gt; &lt;num\_frames&gt; &lt;duration&gt;
+Format1 (short): anim\_texture &lt;name&gt; &lt;numFrames&gt; &lt;duration&gt;
+
+@copydetails Ogre::TextureUnitState::setAnimatedTextureName
+
 @par
 Example: anim\_texture flame.jpg 5 2.5
 
-This sets up an animated texture layer made up of 5 frames named flame\_0.jpg, flame\_1.jpg, flame\_2.jpg etc, with an animation length of 2.5 seconds (2fps). If duration is set to 0, then no automatic transition takes place and frames must be changed manually in code.
 @par
 Format2 (long): anim\_texture &lt;frame1&gt; &lt;frame2&gt; ... &lt;duration&gt;
 @par
@@ -1067,8 +1068,10 @@ Default: none
 
 ## binding\_type
 
-Tells this texture unit to bind to either the fragment processing unit or the vertex processing unit (for @ref Vertex-Texture-Fetch). 
-@par
+@copydetails Ogre::TextureUnitState::setBindingType
+
+@see @ref Vertex-Texture-Fetch
+
 Format: binding\_type &lt;vertex|fragment&gt;
 @par
 Default: binding\_type fragment
@@ -1077,12 +1080,16 @@ Default: binding\_type fragment
 
 ## content\_type
 
-Tells this texture unit where it should get its content from. The default is to get texture content from a named texture, as defined with the [texture](#texture), [cubic\_texture](#cubic_005ftexture), [anim\_texture](#anim_005ftexture) attributes. However you can also pull texture information from other automated sources. The options are:
+Tells this texture unit where it should get its content from. The default is to get texture content from a named texture, as defined with the [texture](#texture), [cubic\_texture](#cubic_005ftexture), [anim\_texture](#anim_005ftexture) attributes. However you can also pull texture information from other automated sources.
 
+@par
+Format: content\_type &lt;type&gt; \[&lt;compositorName&gt;\] \[&lt;textureName&gt;\] \[&lt;mrtIndex&gt;\]
+
+@param type
 <dl compact="compact">
 <dt>named</dt> <dd>
 
-The default option, this derives texture content from a texture name, loaded by ordinary means from a file or having been manually created with a given name.
+@copydoc Ogre::TextureUnitState::CONTENT_NAMED
 
 </dd> <dt>shadow</dt> <dd>
 
@@ -1090,24 +1097,30 @@ This option allows you to pull in a shadow texture, and is only valid when you u
 
 </dd> <dt>compositor</dt> <dd>
 
-This option allows you to reference a texture from a compositor, and is only valid when the pass is rendered within a compositor sequence. This can be either in a render\_scene directive inside a compositor script, or in a general pass in a viewport that has a compositor attached. Note that this is a reference only, meaning that it does not change the render order. You must make sure that the order is reasonable for what you are trying to achieve (for example, texture pooling might cause the referenced texture to be overwritten by something else by the time it is referenced).  The extra parameters for the content\_type are only required for this type:  The first is the name of the compositor being referenced. (Required)  The second is the name of the texture to reference in the compositor. (Required)  The third is the index of the texture to take, in case of an MRT. (Optional)
+@copydoc Ogre::TextureUnitState::CONTENT_COMPOSITOR This can be either in a render\_scene directive inside a compositor script, or in a general pass in a viewport that has a compositor attached. Note that this is a reference only, meaning that it does not change the render order. You must make sure that the order is reasonable for what you are trying to achieve (for example, texture pooling might cause the referenced texture to be overwritten by something else by the time it is referenced).
 
 </dd> </dl>
 
+@copydetails Ogre::TextureUnitState::setCompositorReference
+
 @par
-Format: content\_type &lt;named|shadow|compositor&gt; \[&lt;Referenced Compositor Name&gt;\] \[&lt;Referenced Texture Name&gt;\] \[&lt;Referenced MRT Index&gt;\]
+Example: content\_type compositor DepthCompositor OutputTexture 
+
 @par
-Default: content\_type named  Example: content\_type compositor DepthCompositor OutputTexture 
+Default: content\_type named
+
 
 <a name="tex_005fcoord_005fset"></a><a name="tex_005fcoord_005fset-1"></a>
 
 ## tex\_coord\_set
 
-Sets which texture coordinate set is to be used for this texture layer. A mesh can define multiple sets of texture coordinates, this sets which one this material uses.
+@copydoc Ogre::TextureUnitState::setTextureCoordSet
 
-@note Only has an effect with the fixed-function pipeline or the @ref RTShader
 @par
 Format: tex\_coord\_set &lt;set\_num&gt;
+
+@note Only has an effect with the fixed-function pipeline or the @ref rtss
+
 @par
 Example: tex\_coord\_set 2
 @par
@@ -1121,24 +1134,8 @@ Defines what happens when texture coordinates exceed 1.0 for this texture layer.
 @par
 Simple Format: tex\_address\_mode &lt;uvw\_mode&gt; <br> Extended Format: tex\_address\_mode &lt;u\_mode&gt; &lt;v\_mode&gt; \[&lt;w\_mode&gt;\]
 
-<dl compact="compact">
-<dt>wrap</dt> <dd>
+Valid values for both are one of Ogre::TextureUnitState::TextureAddressingMode without the `TAM_` prefix. E.g. `TAM_WRAP` becomes `wrap`.
 
-Any value beyond 1.0 wraps back to 0.0. Texture is repeated.
-
-</dd> <dt>clamp</dt> <dd>
-
-Values beyond 1.0 are clamped to 1.0. Texture ’streaks’ beyond 1.0 since last line of pixels is used across the rest of the address space. Useful for textures which need exact coverage from 0.0 to 1.0 without the ’fuzzy edge’ wrap gives when combined with filtering.
-
-</dd> <dt>mirror</dt> <dd>
-
-Texture flips every boundary, meaning texture is mirrored every 1.0 u or v
-
-</dd> <dt>border</dt> <dd>
-
-Values outside the range \[0.0, 1.0\] are set to the border colour, you might also set the [tex\_border\_colour](#tex_005fborder_005fcolour) attribute too.
-
-</dd> </dl> <br>
 @par
 Default: tex\_address\_mode wrap
 
@@ -1161,60 +1158,54 @@ Default: tex\_border\_colour 0.0 0.0 0.0 1.0
 Sets the type of texture filtering used when magnifying or minifying a texture. There are 2 formats to this attribute, the simple format where you simply specify the name of a predefined set of filtering options, and the complex format, where you individually set the minification, magnification, and mip filters yourself.
 
 ### Simple Format
-Format: filtering &lt;none|bilinear|trilinear|anisotropic&gt;<br> Default: filtering bilinear With this format, you only need to provide a single parameter which is one of the following:
+With this format, you only need to provide a single parameter
+
+@par
+Format: filtering &lt;none|bilinear|trilinear|anisotropic&gt;<br> Default: filtering bilinear 
 
 <dl compact="compact">
 <dt>none</dt> <dd>
-
-No filtering or mipmapping is used. This is equivalent to the complex format ’filtering point point none’.
-
-</dd> <dt>bilinear</dt> <dd>
-
-2x2 box filtering is performed when magnifying or reducing a texture, and a mipmap is picked from the list but no filtering is done between the levels of the mipmaps. This is equivalent to the complex format ’filtering linear linear point’.
-
-</dd> <dt>trilinear</dt> <dd>
-
-2x2 box filtering is performed when magnifying and reducing a texture, and the closest 2 mipmaps are filtered together. This is equivalent to the complex format ’filtering linear linear linear’.
-
-</dd> <dt>anisotropic</dt> <dd>
-
-This is the same as ’trilinear’, except the filtering algorithm takes account of the slope of the triangle in relation to the camera rather than simply doing a 2x2 pixel filter in all cases. This makes triangles at acute angles look less fuzzy. Equivalent to the complex format ’filtering anisotropic anisotropic linear’. Note that in order for this to make any difference, you must also set the [max\_anisotropy](#max_005fanisotropy) attribute too.
-
+@copydoc Ogre::TFO_NONE
+</dd> 
+<dt>bilinear</dt> <dd> 
+@copydoc Ogre::TFO_BILINEAR 
+</dd> 
+<dt>trilinear</dt> <dd> 
+@copydoc Ogre::TFO_TRILINEAR
+</dd> 
+<dt>anisotropic</dt> <dd> 
+@copydoc Ogre::TFO_ANISOTROPIC
 </dd> </dl> 
 
 ### Complex Format
-Format: filtering &lt;minification&gt; &lt;magnification&gt; &lt;mip&gt;<br> Default: filtering linear linear point This format gives you complete control over the minification, magnification, and mip filters. Each parameter can be one of the following:
+This format gives you complete control over the minification, magnification, and mip filters. 
 
-<dl compact="compact">
-<dt>none</dt> <dd>
+@par
+Format: filtering &lt;minFilter&gt; &lt;magFilter&gt; &lt;mipFilter&gt;
+@par
+Default: filtering linear linear point 
 
-Nothing - only a valid option for the ’mip’ filter , since this turns mipmapping off completely. The lowest setting for min and mag is ’point’.
+Each parameter can be one of Ogre::FilterOptions without the `FO_` prefix. E.g. `FO_LINEAR` becomes `linear`.
 
-</dd> <dt>point</dt> <dd>
+@copydetails Ogre::TextureUnitState::setTextureFiltering(FilterOptions,FilterOptions,FilterOptions)
 
-Pick the closet pixel in min or mag modes. In mip mode, this picks the closet matching mipmap.
-
-</dd> <dt>linear</dt> <dd>
-
-Filter a 2x2 box of pixels around the closest one. In the ’mip’ filter this enables filtering between mipmap levels.
-
-</dd> <dt>anisotropic</dt> <dd>
-
-Only valid for min and mag modes, makes the filter compensate for camera-space slope of the triangles. Note that in order for this to make any difference, you must also set the [max\_anisotropy](#max_005fanisotropy) attribute too.
-
-</dd> </dl> <a name="max_005fanisotropy"></a><a name="max_005fanisotropy-1"></a>
+<a name="max_005fanisotropy"></a><a name="max_005fanisotropy-1"></a>
 
 ## max\_anisotropy
 
-Sets the maximum degree of anisotropy that the renderer will try to compensate for when filtering textures. The degree of anisotropy is the ratio between the height of the texture segment visible in a screen space region versus the width - so for example a floor plane, which stretches on into the distance and thus the vertical texture coordinates change much faster than the horizontal ones, has a higher anisotropy than a wall which is facing you head on (which has an anisotropy of 1 if your line of sight is perfectly perpendicular to it). You should set the max\_anisotropy value to something greater than 1 to begin compensating; higher values can compensate for more acute angles. The maximum value is determined by the hardware, but it is usually 8 or 16.  In order for this to be used, you have to set the minification and/or the magnification [filtering](#filtering) option on this texture to anisotropic.
+@copybrief Ogre::TextureUnitState::setTextureAnisotropy
+
 @par
-Format: max\_anisotropy &lt;value&gt;<br> Default: max\_anisotropy 1
+Format: max\_anisotropy &lt;maxAniso&gt;<br> Default: max\_anisotropy 1
+
+@copydetails Ogre::TextureUnitState::setTextureAnisotropy
 
 <a name="mipmap_005fbias"></a><a name="mipmap_005fbias-1"></a>
 
 ## mipmap\_bias
 
-Sets the bias value applied to the mipmapping calculation, thus allowing you to alter the decision of which level of detail of the texture to use at any distance. The bias value is applied after the regular distance calculation, and adjusts the mipmap level by 1 level for each unit of bias. Negative bias values force larger mip levels to be used, positive bias values force smaller mip levels to be used. The bias is a floating point value so you can use values in between whole numbers for fine tuning. In order for this option to be used, your hardware has to support mipmap biasing (exposed through the render system capabilities), and your minification [filtering](#filtering) has to be set to point or linear.
+@copydetails Ogre::TextureUnitState::setTextureMipmapBias
+
 @par
 Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
 
@@ -1222,30 +1213,14 @@ Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
 
 ## colour\_op
 
-Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer). @note Only has an effect with the fixed-function pipeline or the @ref RTShader
+@note Only has an effect with the fixed-function pipeline or the @ref rtss
+
+Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer).
 @par
-Format: colour\_op &lt;replace|add|modulate|alpha\_blend&gt;
+Format: colour\_op &lt;op&gt;
 
-This method is the simplest way to blend texture layers, because it requires only one parameter, gives you the most common blending types, and automatically sets up 2 blending methods: one for if single-pass multitexturing hardware is available, and another for if it is not and the blending must be achieved through multiple rendering passes. It is, however, quite limited and does not expose the more flexible multitexturing operations, simply because these can’t be automatically supported in multipass fallback mode. If want to use the fancier options, use [colour\_op\_ex](#colour_005fop_005fex), but you’ll either have to be sure that enough multitexturing units will be available, or you should explicitly set a fallback using [colour\_op\_multipass\_fallback](#colour_005fop_005fmultipass_005ffallback).<br>
+@copydetails Ogre::TextureUnitState::setColourOperation Without the `LBO_` prefix. E.g. `LBO_REPLACE` becomes `replace`.
 
-<dl compact="compact">
-<dt>replace</dt> <dd>
-
-Replace all colour with texture with no adjustment.
-
-</dd> <dt>add</dt> <dd>
-
-Add colour components together.
-
-</dd> <dt>modulate</dt> <dd>
-
-Multiply colour components together.
-
-</dd> <dt>alpha\_blend</dt> <dd>
-
-Blend based on texture alpha.
-
-</dd> </dl> <br>
 @par
 Default: colour\_op modulate
 
@@ -1253,108 +1228,16 @@ Default: colour\_op modulate
 
 ## colour\_op\_ex
 
-This is an extended version of the [colour\_op](#colour_005fop) attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blending, but you are limited to the number of texture units which are available in hardware. @note Only has an effect with the fixed-function pipeline or the @ref RTShader
+@note Only has an effect with the fixed-function pipeline or the @ref rtss
 @par
-Format: colour\_op\_ex &lt;operation&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manual\_factor&gt;\] \[&lt;manual\_colour1&gt;\] \[&lt;manual\_colour2&gt;\]
+Format: colour\_op\_ex &lt;op&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manualBlend&gt;\] \[&lt;arg1&gt;\] \[&lt;arg2&gt;\]
 @par
 Example colour\_op\_ex add\_signed src\_manual src\_current 0.5
 
-See the Attention note below about the issues between multipass and multitexturing that using this method can create. Texture colour operations determine how the final colour of the surface appears when rendered. Texture units are used to combine colour values from various sources (e.g. the diffuse colour of the surface from lighting calculations, combined with the colour of the texture). This method allows you to specify the ’operation’ to be used, i.e. the calculation such as adds or multiplies, and which values to use as arguments, such as a fixed value or a value from a previous calculation.
+@copydetails Ogre::TextureUnitState::setColourOperationEx
 
-@param operation
-<dl compact="compact">
-<dt>source1</dt> <dd>
+Each parameter can be one of Ogre::LayerBlendOperationEx or Ogre::LayerBlendSource without the prefix. E.g. `LBX_MODULATE_X4` becomes `modulate_x4`.
 
-Use source1 without modification
-
-</dd> <dt>source2</dt> <dd>
-
-Use source2 without modification
-
-</dd> <dt>modulate</dt> <dd>
-
-Multiply source1 and source2 together.
-
-</dd> <dt>modulate\_x2</dt> <dd>
-
-Multiply source1 and source2 together, then by 2 (brightening).
-
-</dd> <dt>modulate\_x4</dt> <dd>
-
-Multiply source1 and source2 together, then by 4 (brightening).
-
-</dd> <dt>add</dt> <dd>
-
-Add source1 and source2 together.
-
-</dd> <dt>add\_signed</dt> <dd>
-
-Add source1 and source2 then subtract 0.5.
-
-</dd> <dt>add\_smooth</dt> <dd>
-
-Add source1 and source2, subtract the product
-
-</dd> <dt>subtract</dt> <dd>
-
-Subtract source2 from source1
-
-</dd> <dt>blend\_diffuse\_alpha</dt> <dd>
-
-Use interpolated alpha value from vertices to scale source1, then add source2 scaled by (1-alpha).
-
-</dd> <dt>blend\_texture\_alpha</dt> <dd>
-
-As blend\_diffuse\_alpha but use alpha from texture
-
-</dd> <dt>blend\_current\_alpha</dt> <dd>
-
-As blend\_diffuse\_alpha but use current alpha from previous stages (same as blend\_diffuse\_alpha for first layer)
-
-</dd> <dt>blend\_manual</dt> <dd>
-
-As blend\_diffuse\_alpha but use a constant manual alpha value specified in &lt;manual&gt;
-
-</dd> <dt>dotproduct</dt> <dd>
-
-The dot product of source1 and source2
-
-</dd> <dt>blend\_diffuse\_colour</dt> <dd>
-
-Use interpolated colour value from vertices to scale source1, then add source2 scaled by (1-colour).
-
-</dd> </dl>
-
-@param source1
-@param source2
-<dl compact="compact">
-<dt>src\_current</dt> <dd>
-
-The colour as built up from previous stages.
-
-</dd> <dt>src\_texture</dt> <dd>
-
-The colour derived from the texture assigned to this layer.
-
-</dd> <dt>src\_diffuse</dt> <dd>
-
-The interpolated diffuse colour from the vertices (same as ’src\_current’ for first layer).
-
-</dd> <dt>src\_specular</dt> <dd>
-
-The interpolated specular colour from the vertices.
-
-</dd> <dt>src\_manual</dt> <dd>
-
-The manual colour specified at the end of the command.
-
-</dd> </dl> <br>
-
-For example ’modulate’ takes the colour results of the previous layer, and multiplies them with the new texture being applied. Bear in mind that colours are RGB values from 0.0-1.0 so multiplying them together will result in values in the same range, ’tinted’ by the multiply. Note however that a straight multiply normally has the effect of darkening the textures - for this reason there are brightening operations like modulate\_x2. Note that because of the limitations on some underlying APIs (Direct3D included) the ’texture’ argument can only be used as the first argument, not the second. 
-
-Note that the last parameter is only required if you decide to pass a value manually into the operation. Hence you only need to fill these in if you use the ’blend\_manual’ operation.
-
-@attention Ogre tries to use multitexturing hardware to blend texture layers together. However, if it runs out of texturing units (e.g. 2 of a GeForce2, 4 on a GeForce3) it has to fall back on multipass rendering, i.e. rendering the same object multiple times with different textures. This is both less efficient and there is a smaller range of blending operations which can be performed. For this reason, if you use this method you really should set the colour\_op\_multipass\_fallback attribute to specify which effect you want to fall back on if sufficient hardware is not available (the default is just ’modulate’ which is unlikely to be what you want if you’re doing swanky blending here). If you wish to avoid having to do this, use the simpler colour\_op attribute which allows less flexible blending options but sets up the multipass fallback automatically, since it only allows operations which have direct multipass equivalents.
 @par
 Default: none (colour\_op modulate)<br>
 
@@ -1368,21 +1251,24 @@ Format: colour\_op\_multipass\_fallback &lt;src\_factor&gt; &lt;dest\_factor&gt;
 @par
 Example: colour\_op\_multipass\_fallback one one\_minus\_dest\_alpha
 
-Because some of the effects you can create using colour\_op\_ex are only supported under multitexturing hardware, if the hardware is lacking the system must fallback on multipass rendering, which unfortunately doesn’t support as many effects. This attribute is for you to specify the fallback operation which most suits you.
-
-The parameters are the same as in the scene\_blend attribute; this is because multipass rendering IS effectively scene blending, since each layer is rendered on top of the last using the same mechanism as making an object transparent, it’s just being rendered in the same place repeatedly to get the multitexture effect. If you use the simpler (and less flexible) colour\_op attribute you don’t need to call this as the system sets up the fallback for you.
+@copydetails Ogre::TextureUnitState::setColourOpMultipassFallback
 
 <a name="alpha_005fop_005fex"></a><a name="alpha_005fop_005fex-1"></a>
 
 ## alpha\_op\_ex
 
-Behaves in exactly the same away as [colour\_op\_ex](#colour_005fop_005fex) except that it determines how alpha values are combined between texture layers rather than colour values.The only difference is that the 2 manual colours at the end of colour\_op\_ex are just single floating-point values in alpha\_op\_ex. @note Only has an effect with the fixed-function pipeline or the @ref RTShader
+@note Only has an effect with the fixed-function pipeline or the @ref rtss
+
+@par
+Format: alpha\_op\_ex &lt;op&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manualBlend&gt;\] \[&lt;arg1&gt;\] \[&lt;arg2&gt;\]
+
+@copydetails Ogre::TextureUnitState::setAlphaOperation
 
 <a name="env_005fmap"></a><a name="env_005fmap-1"></a>
 
 ## env\_map
 
-Turns on/off texture coordinate effect that makes this layer an environment map. @note Only has an effect with the fixed-function pipeline or the @ref RTShader
+Turns on/off texture coordinate effect that makes this layer an environment map. @note Only has an effect with the fixed-function pipeline or the @ref rtss
 @par
 Format: env\_map &lt;off|spherical|planar|cubic\_reflection|cubic\_normal&gt;
 
@@ -1413,11 +1299,11 @@ Default: env\_map off<br>
 
 ## scroll
 
-Sets a fixed scroll offset for the texture.
+@copybrief Ogre::TextureUnitState::setTextureScroll 
 @par
-Format: scroll &lt;x&gt; &lt;y&gt;
+Format: scroll &lt;u&gt; &lt;v&gt;
 
-This method offsets the texture in this layer by a fixed amount. Useful for small adjustments without altering texture coordinates in models. However if you wish to have an animated scroll effect, see the [scroll\_anim](#scroll_005fanim) attribute.
+@copydetails Ogre::TextureUnitState::setTextureScroll
 
 @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
@@ -1425,20 +1311,23 @@ This method offsets the texture in this layer by a fixed amount. Useful for smal
 
 ## scroll\_anim
 
-Sets up an animated scroll for the texture layer. Useful for creating fixed-speed scrolling effects on a texture layer (for varying scroll speeds, see [wave\_xform](#wave_005fxform)). 
+@copybrief Ogre::TextureUnitState::setScrollAnimation 
 @par
-Format: scroll\_anim &lt;xspeed&gt; &lt;yspeed&gt;<br>
+Format: scroll\_anim &lt;uSpeed&gt; &lt;vSpeed&gt;<br>
+
+@copydetails Ogre::TextureUnitState::setScrollAnimation 
 
 @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 <a name="rotate"></a><a name="rotate-1"></a>
 
 ## rotate
 
-Rotates a texture to a fixed angle. This attribute changes the rotational orientation of a texture to a fixed angle, useful for fixed adjustments. If you wish to animate the rotation, see [rotate\_anim](#rotate_005fanim).
+@copybrief Ogre::TextureUnitState::setTextureRotate
+
 @par
 Format: rotate &lt;angle&gt;
 
-The parameter is a anti-clockwise angle in degrees.
+@copydetails Ogre::TextureUnitState::setTextureRotate
 
 @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
@@ -1446,11 +1335,12 @@ The parameter is a anti-clockwise angle in degrees.
 
 ## rotate\_anim
 
-Sets up an animated rotation effect of this layer. Useful for creating fixed-speed rotation animations (for varying speeds, see [wave\_xform](#wave_005fxform)). 
-@par
-Format: rotate\_anim &lt;revs\_per\_second&gt;
+@copybrief Ogre::TextureUnitState::setRotateAnimation 
 
-The parameter is a number of anti-clockwise revolutions per second.
+@par
+Format: rotate\_anim &lt;speed&gt;
+
+@copydetails Ogre::TextureUnitState::setRotateAnimation 
 
 @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
@@ -1458,11 +1348,13 @@ The parameter is a number of anti-clockwise revolutions per second.
 
 ## scale
 
-Adjusts the scaling factor applied to this texture layer. Useful for adjusting the size of textures without making changes to geometry. This is a fixed scaling factor, if you wish to animate this see [wave\_xform](#wave_005fxform).
-@par
-Format: scale &lt;x\_scale&gt; &lt;y\_scale&gt;
+@copybrief Ogre::TextureUnitState::setTextureScale
 
-Valid scale values are greater than 0, with a scale factor of 2 making the texture twice as big in that dimension etc.
+@par
+Format: scale &lt;uScale&gt; &lt;vScale&gt;
+
+@copydetails Ogre::TextureUnitState::setTextureScale
+
 
  @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
@@ -1470,21 +1362,24 @@ Valid scale values are greater than 0, with a scale factor of 2 making the textu
 
 ## wave\_xform
 
-Sets up a transformation animation based on a wave function. Useful for more advanced texture layer transform effects. You can add multiple instances of this attribute to a single texture layer if you wish.
+@copybrief Ogre::TextureUnitState::setTransformAnimation
+
 @par
-Format: wave\_xform &lt;xform\_type&gt; &lt;wave\_type&gt; &lt;base&gt; &lt;frequency&gt; &lt;phase&gt; &lt;amplitude&gt;
+Format: wave\_xform &lt;ttype&gt; &lt;waveType&gt; &lt;base&gt; &lt;frequency&gt; &lt;phase&gt; &lt;amplitude&gt;
 @par
 Example: wave\_xform scale\_x sine 1.0 0.2 0.0 5.0
 
-@param xform\_type
+@copydetails Ogre::TextureUnitState::setTransformAnimation
+
+ttype is one of
 <dl compact="compact">
 <dt>scroll\_x</dt> <dd>
 
-Animate the x scroll value
+Animate the u scroll value
 
 </dd> <dt>scroll\_y</dt> <dd>
 
-Animate the y scroll value
+Animate the v scroll value
 
 </dd> <dt>rotate</dt> <dd>
 
@@ -1492,53 +1387,15 @@ Animate the rotate value
 
 </dd> <dt>scale\_x</dt> <dd>
 
-Animate the x scale value
+Animate the u scale value
 
 </dd> <dt>scale\_y</dt> <dd>
 
-Animate the y scale value
+Animate the v scale value
 
 </dd> </dl>
 
-@param wave\_type
-<dl compact="compact">
-<dt>sine</dt> <dd>
-
-A typical sine wave which smoothly loops between min and max values
-
-</dd> <dt>triangle</dt> <dd>
-
-An angled wave which increases & decreases at constant speed, changing instantly at the extremes
-
-</dd> <dt>square</dt> <dd>
-
-Max for half the wavelength, min for the rest with instant transition between
-
-</dd> <dt>sawtooth</dt> <dd>
-
-Gradual steady increase from min to max over the period with an instant return to min at the end.
-
-</dd> <dt>inverse\_sawtooth</dt> <dd>
-
-Gradual steady decrease from max to min over the period, with an instant return to max at the end.
-
-</dd> </dl> 
-
-@param base
-The base value, the minimum if amplitude &gt; 0, the maximum if amplitude &lt; 0
-
-@param frequency
-The number of wave iterations per second, i.e. speed
-
-@param phase
-Offset of the wave start
-
-@param amplitude
-The size of the wave
-
-<br>
-
-The range of the output of the wave will be {base, base+amplitude}. So the example above scales the texture in the x direction between 1 (normal size) and 5 along a sine wave at one cycle every 5 second (0.2 waves per second).
+waveType is one of Ogre::WaveformType without the `WFT_` prefix. E.g. `WFT_SQUARE` becomes `square`.
 
 @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
 
