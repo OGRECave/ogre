@@ -201,29 +201,24 @@ namespace Ogre {
     };
 
     /** Types of blending that you can specify between an object and the existing contents of the scene.
-        @remarks
-            As opposed to the LayerBlendType, which classifies blends between texture layers, these blending
-            types blend between the output of the texture units and the pixels already in the viewport,
-            allowing for object transparency, glows, etc.
-        @par
-            These types are provided to give quick and easy access to common effects. You can also use
-            the more manual method of supplying source and destination blending factors.
-            See Material::setSceneBlending for more details.
+
+        As opposed to the LayerBlendType, which classifies blends between texture layers, these blending
+        types blend between the output of the texture units and the pixels already in the viewport,
+        allowing for object transparency, glows, etc.
+
+        These types are provided to give quick and easy access to common effects. You can also use
+        the more manual method of supplying source and destination blending factors.
+        See Material::setSceneBlending for more details.
         @see
-            Material::setSceneBlending
+            Pass::setSceneBlending
     */
     enum SceneBlendType
     {
-        /// Make the object transparent based on the final alpha values in the texture
-        SBT_TRANSPARENT_ALPHA,
-        /// Make the object transparent based on the colour values in the texture (brighter = more opaque)
-        SBT_TRANSPARENT_COLOUR,
-        /// Add the texture values to the existing scene content
-        SBT_ADD,
-        /// Multiply the 2 colours together
-        SBT_MODULATE,
-        /// The default blend mode where source replaces destination
-        SBT_REPLACE
+        SBT_TRANSPARENT_ALPHA, //!< The alpha value of the rendering output is used as a mask.
+        SBT_TRANSPARENT_COLOUR, //!< Colour the scene based on the brightness of the input colours, but don’t darken.
+        SBT_ADD, //!< The colour of the rendering output is added to the scene. Good for explosions, flares, lights, ghosts etc. 
+        SBT_MODULATE, //!< The colour of the rendering output is multiplied with the scene contents. Generally colours and darkens the scene, good for smoked glass, semi-transparent objects etc.
+        SBT_REPLACE //!< The default blend mode where source replaces destination
         // TODO : more
     };
 
@@ -233,17 +228,16 @@ namespace Ogre {
     */
     enum SceneBlendFactor
     {
-        SBF_ONE,
-        SBF_ZERO,
-        SBF_DEST_COLOUR,
-        SBF_SOURCE_COLOUR,
-        SBF_ONE_MINUS_DEST_COLOUR,
-        SBF_ONE_MINUS_SOURCE_COLOUR,
-        SBF_DEST_ALPHA,
-        SBF_SOURCE_ALPHA,
-        SBF_ONE_MINUS_DEST_ALPHA,
-        SBF_ONE_MINUS_SOURCE_ALPHA
-
+        SBF_ONE, //!< Constant value of 1.0
+        SBF_ZERO, //!< Constant value of 0.0
+        SBF_DEST_COLOUR, //!< The existing pixel colour
+        SBF_SOURCE_COLOUR, //!< The texture pixel (texel) colour
+        SBF_ONE_MINUS_DEST_COLOUR, //!< 1 - SBF_DEST_COLOUR
+        SBF_ONE_MINUS_SOURCE_COLOUR, //!< 1 - SBF_SOURCE_COLOUR
+        SBF_DEST_ALPHA, //!< The existing pixel alpha value
+        SBF_SOURCE_ALPHA, //!< The texel alpha value
+        SBF_ONE_MINUS_DEST_ALPHA, //!< 1 - SBF_DEST_ALPHA
+        SBF_ONE_MINUS_SOURCE_ALPHA //!< 1 - SBF_SOURCE_ALPHA
     };
 
     /** Blending operations controls how objects are blended into the scene. The default operation

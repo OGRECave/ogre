@@ -184,7 +184,7 @@ namespace Ogre {
         return mSpotFalloff;
     }
     //-----------------------------------------------------------------------
-    void Light::setDiffuseColour(Real red, Real green, Real blue)
+    void Light::setDiffuseColour(float red, float green, float blue)
     {
         mDiffuse.r = red;
         mDiffuse.b = blue;
@@ -201,7 +201,7 @@ namespace Ogre {
         return mDiffuse;
     }
     //-----------------------------------------------------------------------
-    void Light::setSpecularColour(Real red, Real green, Real blue)
+    void Light::setSpecularColour(float red, float green, float blue)
     {
         mSpecular.r = red;
         mSpecular.b = blue;

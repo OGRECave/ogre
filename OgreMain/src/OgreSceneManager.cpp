@@ -1091,6 +1091,10 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         }
     }
 
+    // Line width
+    if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_WIDE_LINES))
+        mDestRenderSystem->_setLineWidth(pass->getLineWidth());
+
     // Set point parameters
     mDestRenderSystem->_setPointParameters(
         pass->getPointSize(),

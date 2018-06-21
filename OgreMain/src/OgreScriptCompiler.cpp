@@ -1231,6 +1231,8 @@ namespace Ogre
 
         mIds["subroutine"] = ID_SUBROUTINE;
 
+        mIds["line_width"] = ID_LINE_WIDTH;
+
 		mLargestRegisteredWordId = ID_END_BUILTIN_IDS;
 	}
 

@@ -311,7 +311,7 @@ namespace Ogre {
             property there.
         @see Pass::setAmbient
         */
-        void setAmbient(Real red, Real green, Real blue);
+        void setAmbient(float red, float green, float blue);
 
         /// @overload
         void setAmbient(const ColourValue& ambient);
@@ -324,7 +324,7 @@ namespace Ogre {
             property there.
         @see Pass::setDiffuse
         */
-        void setDiffuse(Real red, Real green, Real blue, Real alpha);
+        void setDiffuse(float red, float green, float blue, float alpha);
 
         /// @overload
         void setDiffuse(const ColourValue& diffuse);
@@ -337,7 +337,7 @@ namespace Ogre {
             property there.
         @see Pass::setSpecular
         */
-        void setSpecular(Real red, Real green, Real blue, Real alpha);
+        void setSpecular(float red, float green, float blue, float alpha);
 
         /// @overload
         void setSpecular(const ColourValue& specular);
@@ -360,7 +360,7 @@ namespace Ogre {
             property there.
         @see Pass::setSelfIllumination
         */
-        void setSelfIllumination(Real red, Real green, Real blue);
+        void setSelfIllumination(float red, float green, float blue);
 
         /// @overload
         void setSelfIllumination(const ColourValue& selfIllum);

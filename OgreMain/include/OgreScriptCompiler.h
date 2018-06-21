@@ -275,6 +275,7 @@ namespace Ogre
         /// This function sets up the initial values in word id map
         void initWordMap();
     private:
+        friend String getPropertyName(const ScriptCompiler *compiler, uint32 id);
         // Resource group
         String mGroup;
         // The word -> id conversion table
@@ -858,6 +859,9 @@ namespace Ogre
 
         // Support for subroutine
         ID_SUBROUTINE,
+
+        // added during 1.11. re-sort for 1.12
+        ID_LINE_WIDTH,
 
         ID_END_BUILTIN_IDS
     };

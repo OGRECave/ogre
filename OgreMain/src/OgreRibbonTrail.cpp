@@ -218,7 +218,7 @@ namespace Ogre
         setInitialColour(chainIndex, col.r, col.g, col.b, col.a);
     }
     //-----------------------------------------------------------------------
-    void RibbonTrail::setInitialColour(size_t chainIndex, Real r, Real g, Real b, Real a)
+    void RibbonTrail::setInitialColour(size_t chainIndex, float r, float g, float b, float a)
     {
         if (chainIndex >= mChainCount)
         {
@@ -267,7 +267,7 @@ namespace Ogre
             valuePerSecond.r, valuePerSecond.g, valuePerSecond.b, valuePerSecond.a);
     }
     //-----------------------------------------------------------------------
-    void RibbonTrail::setColourChange(size_t chainIndex, Real r, Real g, Real b, Real a)
+    void RibbonTrail::setColourChange(size_t chainIndex, float r, float g, float b, float a)
     {
         if (chainIndex >= mChainCount)
         {

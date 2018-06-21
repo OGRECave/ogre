@@ -516,6 +516,11 @@ namespace Ogre
         virtual void _setPointParameters(Real size, bool attenuationEnabled, 
             Real constant, Real linear, Real quadratic, Real minSize, Real maxSize) {};
 
+        /**
+         * Set the line width when drawing as RenderOperation::OT_LINE_LIST/ RenderOperation::OT_LINE_STRIP
+         * @param width only value of 1.0 might be supported. Check for RSC_WIDE_LINES.
+         */
+        virtual void _setLineWidth(float width) {};
 
         /**
         Sets the texture to bind to a given texture unit.
@@ -552,8 +557,9 @@ namespace Ogre
 
         @param unit Texture unit as above
         @param index The index of the texture coordinate set to use.
+        @deprecated only needed for fixed function APIs
         */
-        virtual void _setTextureCoordSet(size_t unit, size_t index) = 0;
+        virtual void _setTextureCoordSet(size_t unit, size_t index) {}
 
         /**
         Sets a method for automatically calculating texture coordinates for a stage.

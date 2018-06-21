@@ -184,7 +184,7 @@ namespace Ogre
         */
         virtual void position(const Vector3& pos);
         /// @overload
-        virtual void position(Real x, Real y, Real z);
+        virtual void position(float x, float y, float z);
 
         /** Add a vertex normal to the current vertex.
         @remarks
@@ -193,7 +193,7 @@ namespace Ogre
         */
         virtual void normal(const Vector3& norm);
         /// @overload
-        virtual void normal(Real x, Real y, Real z);
+        virtual void normal(float x, float y, float z);
 
         /** Add a vertex tangent to the current vertex.
         @remarks
@@ -204,7 +204,7 @@ namespace Ogre
         */
         virtual void tangent(const Vector3& tan);
         /// @overload
-        virtual void tangent(Real x, Real y, Real z);
+        virtual void tangent(float x, float y, float z);
 
         /** Add a texture coordinate to the current vertex.
         @remarks
@@ -214,13 +214,13 @@ namespace Ogre
             most common. There are several versions of this method for the 
             variations in number of dimensions.
         */
-        virtual void textureCoord(Real u);
+        virtual void textureCoord(float u);
         /// @overload
-        virtual void textureCoord(Real u, Real v);
+        virtual void textureCoord(float u, float v);
         /// @overload
-        virtual void textureCoord(Real u, Real v, Real w);
+        virtual void textureCoord(float u, float v, float w);
         /// @overload
-        virtual void textureCoord(Real x, Real y, Real z, Real w);
+        virtual void textureCoord(float x, float y, float z, float w);
         /// @overload
         virtual void textureCoord(const Vector2& uv);
         /// @overload
@@ -232,7 +232,7 @@ namespace Ogre
         */
         virtual void colour(const ColourValue& col);
         /// @overload
-        virtual void colour(Real r, Real g, Real b, Real a = 1.0f);
+        virtual void colour(float r, float g, float b, float a = 1.0f);
 
         /** Add a vertex index to construct faces / lines / points via indexing
             rather than just by a simple list of vertices. 

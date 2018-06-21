@@ -114,7 +114,6 @@ namespace Ogre {
         //! [sub_mesh]
 
         mesh->_setBounds(AxisAlignedBox(-100,-100,0,100,100,0), true);
-        mesh->_setBoundingSphereRadius(Math::Sqrt(100*100+100*100));
     }
     //---------------------------------------------------------------------
     void PrefabFactory::createCube(Mesh* mesh)
@@ -278,8 +277,6 @@ namespace Ogre {
 
         mesh->_setBounds(AxisAlignedBox(-CUBE_HALF_SIZE, -CUBE_HALF_SIZE, -CUBE_HALF_SIZE,
             CUBE_HALF_SIZE, CUBE_HALF_SIZE, CUBE_HALF_SIZE), true);
-
-        mesh->_setBoundingSphereRadius(CUBE_HALF_SIZE);
     }
     //---------------------------------------------------------------------
     void PrefabFactory::createSphere(Mesh* mesh)

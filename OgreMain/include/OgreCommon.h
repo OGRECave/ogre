@@ -61,27 +61,31 @@ namespace Ogre {
         others. */
     enum CompareFunction
     {
-        CMPF_ALWAYS_FAIL,
-        CMPF_ALWAYS_PASS,
-        CMPF_LESS,
-        CMPF_LESS_EQUAL,
-        CMPF_EQUAL,
-        CMPF_NOT_EQUAL,
-        CMPF_GREATER_EQUAL,
-        CMPF_GREATER
+        CMPF_ALWAYS_FAIL,  //!< Never writes a pixel to the render target
+        CMPF_ALWAYS_PASS,  //!< Always writes a pixel to the render target
+        CMPF_LESS,         //!< Write if (new_Z < existing_Z)
+        CMPF_LESS_EQUAL,   //!< Write if (new_Z <= existing_Z)
+        CMPF_EQUAL,        //!< Write if (new_Z == existing_Z)
+        CMPF_NOT_EQUAL,    //!< Write if (new_Z != existing_Z)
+        CMPF_GREATER_EQUAL,//!< Write if (new_Z >= existing_Z)
+        CMPF_GREATER       //!< Write if (new_Z >= existing_Z)
     };
 
     /** High-level filtering options providing shortcuts to settings the
         minification, magnification and mip filters. */
     enum TextureFilterOptions
     {
-        /// Equal to: min=FO_POINT, mag=FO_POINT, mip=FO_NONE
+        /// No filtering or mipmapping is used. 
+        /// Equal to: min=Ogre::FO_POINT, mag=Ogre::FO_POINT, mip=Ogre::FO_NONE
         TFO_NONE,
-        /// Equal to: min=FO_LINEAR, mag=FO_LINEAR, mip=FO_POINT
+        /// 2x2 box filtering is performed when magnifying or reducing a texture, and a mipmap is picked from the list but no filtering is done between the levels of the mipmaps. 
+        /// Equal to: min=Ogre::FO_LINEAR, mag=Ogre::FO_LINEAR, mip=Ogre::FO_POINT
         TFO_BILINEAR,
-        /// Equal to: min=FO_LINEAR, mag=FO_LINEAR, mip=FO_LINEAR
+        /// 2x2 box filtering is performed when magnifying and reducing a texture, and the closest 2 mipmaps are filtered together. 
+        /// Equal to: min=Ogre::FO_LINEAR, mag=Ogre::FO_LINEAR, mip=Ogre::FO_LINEAR
         TFO_TRILINEAR,
-        /// Equal to: min=FO_ANISOTROPIC, max=FO_ANISOTROPIC, mip=FO_LINEAR
+        /// This is the same as ’trilinear’, except the filtering algorithm takes account of the slope of the triangle in relation to the camera rather than simply doing a 2x2 pixel filter in all cases.
+        /// Equal to: min=Ogre::FO_ANISOTROPIC, max=Ogre::FO_ANISOTROPIC, mip=Ogre::FO_LINEAR
         TFO_ANISOTROPIC
     };
 
@@ -103,16 +107,18 @@ namespace Ogre {
         FO_POINT,
         /// Average of a 2x2 pixel area, denotes bilinear for MIN and MAG, trilinear for MIP
         FO_LINEAR,
-        /// Similar to FO_LINEAR, but compensates for the angle of the texture plane
+        /// Similar to FO_LINEAR, but compensates for the angle of the texture plane. Note that in
+        /// order for this to make any difference, you must also set the
+        /// TextureUnitState::setTextureAnisotropy attribute too.
         FO_ANISOTROPIC
     };
 
-    /** Light shading modes. */
+    /** %Light shading modes. */
     enum ShadeOptions
     {
-        SO_FLAT,
-        SO_GOURAUD,
-        SO_PHONG
+        SO_FLAT, //!< No interpolation takes place. Each face is shaded with a single colour determined from the first vertex in the face.
+        SO_GOURAUD, //!< Colour at each vertex is linearly interpolated across the face.
+        SO_PHONG //!< Vertex normals are interpolated across the face, and these are used to determine colour at each pixel. Gives a more natural lighting effect but is more expensive and works better at high levels of tessellation. Not supported on all hardware.
     };
 
     /** Fog modes. */
@@ -176,11 +182,11 @@ namespace Ogre {
     /** The polygon mode to use when rasterising. */
     enum PolygonMode
     {
-        /// Only points are rendered.
+        /// Only the points of each polygon are rendered.
         PM_POINTS = 1,
-        /// Wireframe models are rendered.
+        /// Polygons are drawn in outline only.
         PM_WIREFRAME = 2,
-        /// Solid polygons are rendered.
+        /// The normal situation - polygons are filled in.
         PM_SOLID = 3
     };
 

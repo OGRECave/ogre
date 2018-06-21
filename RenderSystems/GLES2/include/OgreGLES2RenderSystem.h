@@ -173,13 +173,13 @@ namespace Ogre {
 
             void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
 
-            void _setTextureCoordSet(size_t stage, size_t index);
-
             void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
 
             void _setTextureBorderColour(size_t stage, const ColourValue& colour) { };   // Not supported
 
             void _setTextureMipmapBias(size_t unit, float bias) { };   // Not supported
+
+            void _setLineWidth(float width);
 
             void _setViewport(Viewport *vp);
 

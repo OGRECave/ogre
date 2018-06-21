@@ -115,7 +115,7 @@ namespace Ogre {
             Diffuse light simulates the typical light emanating from light sources and affects the base colour
             of objects together with ambient light.
         */
-        void setDiffuseColour(Real red, Real green, Real blue);
+        void setDiffuseColour(float red, float green, float blue);
 
         /// @overload
         void setDiffuseColour(const ColourValue& colour);
@@ -133,7 +133,7 @@ namespace Ogre {
             Specular light affects the appearance of shiny highlights on objects, and is also dependent on the
             'shininess' Material value.
         */
-        void setSpecularColour(Real red, Real green, Real blue);
+        void setSpecularColour(float red, float green, float blue);
 
         /// @overload
         void setSpecularColour(const ColourValue& colour);
