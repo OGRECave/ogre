@@ -432,8 +432,6 @@ namespace Ogre {
         if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_float") || checkExtension("GL_OES_texture_half_float"))
             rsc->setCapability(RSC_TEXTURE_FLOAT);
 
-        rsc->setCapability(RSC_TEXTURE_1D);
-
         if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_3D"))
             rsc->setCapability(RSC_TEXTURE_3D);
 
