@@ -59,21 +59,23 @@ using namespace Ogre;
 
 - (void)layoutSubviews
 {
+    [super layoutSubviews];
+    
     // Get the window using the name that we saved
     RenderWindow *window = static_cast<RenderWindow *>(Root::getSingleton().getRenderSystem()->getRenderTarget(mWindowName));
 
     if(window != NULL)
     {
-        // Get the window size and initialize temp variables
-        unsigned int width = (uint)self.bounds.size.width;
-        unsigned int height = (uint)self.bounds.size.height;
-
-        // Resize the window
-        window->resize(width, height);
+        // Resize underlying frame buffer
+        window->windowMovedOrResized();
         
         // After rotation the aspect ratio of the viewport has changed, update that as well.
         if(window->getNumViewports() > 0)
         {
+            // Get the view size and initialize temp variables
+            unsigned int width = (uint)self.bounds.size.width;
+            unsigned int height = (uint)self.bounds.size.height;
+            
             Ogre::Viewport *viewPort = window->getViewport(0);
             viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
         }
