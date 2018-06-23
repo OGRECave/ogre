@@ -177,7 +177,6 @@ namespace Ogre {
 //            return;
 
         int size = 0;
-        int newSize = -1;
 
         VideoModes::iterator mode;
         VideoModes::iterator end = mVideoModes.end();
@@ -192,7 +191,6 @@ namespace Ogre {
                     mode->first.first < newMode->first.first ||
                     mode->first.second < newMode->first.second)
                 {
-                    newSize = size;
                     newMode = &(*mode);
                 }
             }

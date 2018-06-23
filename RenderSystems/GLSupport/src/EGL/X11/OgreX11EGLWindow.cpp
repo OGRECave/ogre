@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 extern "C"
 {
-    int safeXErrorHandler(Display *display, XErrorEvent *event)
+    static int safeXErrorHandler(Display *display, XErrorEvent *event)
     {
         // Ignore all XErrorEvents
         return 0;
@@ -264,7 +264,7 @@ namespace Ogre {
             }
 
             XTextProperty titleprop;
-            char *lst = (char*)title.c_str();
+            char *lst = const_cast<char*>(title.c_str());
             XStringListToTextProperty((char **)&lst, 1, &titleprop);
             XSetWMProperties((Display*)mNativeDisplay, (Window)mWindow, &titleprop,
                 NULL, NULL, 0, sizeHints, wmHints, NULL);
@@ -422,7 +422,7 @@ namespace Ogre {
                            bool fullScreen, const NameValuePairList *miscParams)
     {
         String title = name;
-        uint samples = 0;
+        int samples = 0;
         int gamma;
         short frequency = 0;
         bool vsync = false;
