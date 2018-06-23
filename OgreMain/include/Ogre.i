@@ -161,6 +161,7 @@ JNIEnv* OgreJNIGetEnv() {
 %include "OgreSharedPtr.h"
 %ignore Ogre::Any::getType; // deprecated
 %ignore Ogre::Any::destroy; // deprecated
+%ignore Ogre::Any::isEmpty; // deprecated
 %include "OgreAny.h"
 %include "OgreIteratorWrapper.h"
 %include "OgreMath.h"
@@ -178,6 +179,9 @@ ADD_REPR(Vector3)
 ADD_REPR(Vector4)
 %include "OgreMatrix3.h"
 ADD_REPR(Matrix3)
+%ignore Ogre::TransformBase::extract3x3Matrix; // deprecated
+%ignore Ogre::TransformBase::extractQuaternion; // deprecated
+%ignore Ogre::Matrix4::concatenate; // deprecated
 %include "OgreMatrix4.h"
 ADD_REPR(Matrix4)
 %include "OgreQuaternion.h"
@@ -236,14 +240,12 @@ SHARED_PTR(FileHandleDataStream);
 // More Data Types
 %include "OgreColourValue.h"
 ADD_REPR(ColourValue)
-%ignore Ogre::PixelUtil::isValidExtent; // deprecated
 %include "OgrePixelFormat.h"
 %include "OgreBlendMode.h"
 %include "OgreRay.h"
 %include "OgreSceneQuery.h"
 %include "OgreNameGenerator.h"
 %include "OgreController.h"
-%ignore Ogre::RenderSystemCapabilities::calculateSize; // deprecated
 %include "OgreRenderSystemCapabilities.h"
 %ignore Ogre::GpuProgramParameters::getAutoConstantIterator; // deprecated
 %include "OgreGpuProgramParams.h"
@@ -270,8 +272,6 @@ SHARED_PTR(StringInterface);
     %include "OgreParticleEmitter.h"
         %include "OgreParticleEmitterFactory.h"
     SHARED_PTR(Resource);
-    %ignore Ogre::Resource::setManuallyLoaded;
-    %ignore Ogre::Resource::setToLoaded;
     %include "OgreResource.h"
         SHARED_PTR(Texture);
         %include "OgreTexture.h"
@@ -324,7 +324,6 @@ SHARED_PTR(HardwareUniformBuffer);
     %include "OgreTextureManager.h"
     %include "OgreGpuProgramManager.h"
     %include "OgreHighLevelGpuProgramManager.h"
-%ignore Ogre::UnifiedHighLevelGpuProgram::setPrioriry;
 SHARED_PTR(UnifiedHighLevelGpuProgram);
 %include "OgreUnifiedHighLevelGpuProgram.h"
 // animations
@@ -356,12 +355,7 @@ SHARED_PTR(Skeleton);
 SHARED_PTR(Material);
 %template(Techniques) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
-%ignore Ogre::RenderSystem::addClipPlane(Real, Real, Real, Real);
-%ignore Ogre::RenderSystem::getFixedPipelineEnabled;
-%ignore Ogre::RenderSystem::setFixedPipelineEnabled;
-%ignore Ogre::RenderSystem::setVertexDeclaration;
-%ignore Ogre::RenderSystem::setVertexBufferBinding;
-%ignore Ogre::RenderSystem::_setTexture(size_t, bool, const String&);
+%ignore Ogre::RenderSystem::_setBindingType;
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 #ifdef SWIGJAVA
@@ -370,7 +364,6 @@ SHARED_PTR(Material);
 %include "OgreCompositorInstance.h"
 %include "OgreCompositionPass.h"
 %include "OgreMaterialSerializer.h"
-%ignore Ogre::UserObjectBindings::getEmptyUserAny;
 %include "OgreUserObjectBindings.h"
 %rename(MaterialManager_Listener) Ogre::MaterialManager::Listener;
 %include "OgreMaterialManager.h"
@@ -383,6 +376,7 @@ SHARED_PTR(Material);
     %include "OgreMovablePlane.h"
     %ignore Ogre::Light::setPosition;
     %ignore Ogre::Light::getPosition;
+    %ignore Ogre::Light::getDirection;
     %include "OgreLight.h"
     %include "OgreNode.h"
         %include "OgreBone.h"
@@ -461,15 +455,6 @@ SHARED_PTR(Mesh);
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&, FrameBuffer); // deprecated
-%ignore Ogre::RenderTarget::getStatistics(float&, float&, float&, float&) const;
-%ignore Ogre::RenderTarget::getLastFPS;
-%ignore Ogre::RenderTarget::getAverageFPS;
-%ignore Ogre::RenderTarget::getBestFPS;
-%ignore Ogre::RenderTarget::getWorstFPS;
-%ignore Ogre::RenderTarget::getBestFrameTime;
-%ignore Ogre::RenderTarget::getWorstFrameTime;
-%ignore Ogre::RenderTarget::getTriangleCount;
-%ignore Ogre::RenderTarget::getBatchCount;
 %include "OgreRenderTarget.h"
 #ifdef __ANDROID__
     %ignore Ogre::RenderWindow::_notifySurfaceCreated(void*);
@@ -494,19 +479,15 @@ SHARED_PTR(Mesh);
 %ignore Ogre::SceneManager::setShadowTextureCasterMaterial(const String&);
 %ignore Ogre::SceneManager::setShadowTextureReceiverMaterial(const String&);
 %include "OgreSceneManager.h"
+%ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask);
+%ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&);
 %include "OgreSceneManagerEnumerator.h"
 %include "OgreConfigDialog.h"
 %template(RenderSystemList) std::vector<Ogre::RenderSystem*>;
-%ignore Ogre::Root::showConfigDialog(); // deprecated
-%ignore Ogre::Root::addResourceLocation; // deprecated
-%ignore Ogre::Root::removeResourceLocation; // deprecated
-%ignore Ogre::Root::getErrorDescription; // deprecated
 %ignore Ogre::Root::getSceneManagerMetaDataIterator;
 %ignore Ogre::Root::getSceneManagerIterator;
 %ignore Ogre::Root::createSceneManager(SceneTypeMask);
 %ignore Ogre::Root::createSceneManager(SceneTypeMask, const String&);
-%ignore Ogre::Root::setFreqUpdatedBuffersUploadOption;
-%ignore Ogre::Root::getFreqUpdatedBuffersUploadOption;
 %include "OgreRoot.h"
 // dont wrap: platform specific
 // %include "OgreWindowEventUtilities.h"
