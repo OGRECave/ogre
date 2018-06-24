@@ -1,22 +1,6 @@
-/*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
-
-Copyright (c) 2000-2014 Torus Knot Software Ltd
-Also see acknowledgements in Readme.html
-
-You may use this sample code for anything you like, it is not covered by the
-same license as the rest of the engine.
------------------------------------------------------------------------------
-*/
-/*
------------------------------------------------------------------------------
-Filename:    StaticPluginLoader.h
-Description: Utility class to load plugins statically
------------------------------------------------------------------------------
-*/
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
 
 #ifndef __StaticPluginLoader_H__
 #define __StaticPluginLoader_H__
