@@ -23,11 +23,12 @@ addons:
     - libgl1-mesa-dev
     - libglu1-mesa-dev # legacy GL RenderSystem only
     - python3-dev
-    - python3-lxml     # for validate script
+    - python3-lxml     # for xml validation script
     - nvidia-cg-dev
     - libpugixml-dev
     - swig3.0
-    - mono-mcs
+    - mono-mcs # compile C# bindings
+    - qtbase5-dev # QtOgreBites
 before_script:
     - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew update && brew install freetype libzzip sdl2 pugixml ; fi
 osx_image: xcode11.3

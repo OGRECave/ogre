@@ -296,6 +296,8 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
         INTERFACE_LINK_LIBRARIES "${SDL2_LIBRARIES}"
     )
   endif()
+
+  find_package(Qt5 COMPONENTS Core Gui QUIET)
 endif()
 
 #######################################################################
