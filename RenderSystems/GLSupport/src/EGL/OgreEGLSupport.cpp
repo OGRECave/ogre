@@ -56,6 +56,7 @@ namespace Ogre {
         ConfigOption optDisplayFrequency;
         ConfigOption optFSAA;
         ConfigOption optVSync;
+        ConfigOption optSRGB;
 
         optFullScreen.name = "Full Screen";
         optFullScreen.immutable = false;
@@ -75,10 +76,16 @@ namespace Ogre {
         optFSAA.name = "FSAA";
         optFSAA.immutable = false;
 
+        optSRGB.name = "sRGB Gamma Conversion";
+        optSRGB.immutable = false;
+
         optFullScreen.possibleValues.push_back("No");
         optFullScreen.possibleValues.push_back("Yes");
-
         optFullScreen.currentValue = optFullScreen.possibleValues[0];
+
+        optSRGB.possibleValues.push_back("No");
+        optSRGB.possibleValues.push_back("Yes");
+        optSRGB.currentValue = optSRGB.possibleValues[0];
 
         VideoModes::const_iterator value = mVideoModes.begin();
         VideoModes::const_iterator end = mVideoModes.end();
@@ -111,6 +118,7 @@ namespace Ogre {
         mOptions[optDisplayFrequency.name] = optDisplayFrequency;
         mOptions[optFSAA.name] = optFSAA;
         mOptions[optVSync.name] = optVSync;
+        mOptions[optSRGB.name] = optSRGB;
 
         refreshConfig();
     }
