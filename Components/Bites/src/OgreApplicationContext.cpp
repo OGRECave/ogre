@@ -420,16 +420,8 @@ void ApplicationContext::initAppForAndroid(AAssetManager* assetMgr, ANativeWindo
 
 Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName)
 {
-    Ogre::MemoryDataStreamPtr stream;
-    AAsset* asset = AAssetManager_open(mAAssetMgr, fileName.c_str(), AASSET_MODE_BUFFER);
-    if(asset)
-    {
-        off_t length = AAsset_getLength(asset);
-        stream.reset(new Ogre::MemoryDataStream(length, true, true));
-        memcpy(stream->getPtr(), AAsset_getBuffer(asset), length);
-        AAsset_close(asset);
-    }
-    return stream;
+    Ogre::Archive* apk = Ogre::ArchiveManager::getSingleton().load("", "APKFileSystem", true);
+    return apk->open(fileName);
 }
 
 void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
@@ -555,7 +547,8 @@ void ApplicationContext::locateResources()
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAAssetMgr) );
     Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAAssetMgr) );
-    cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
+    Ogre::Archive* apk = Ogre::ArchiveManager::getSingleton().load("", "APKFileSystem", true);
+    cf.load(apk->open(mFSLayer->getConfigFilePath("resources.cfg")));
 #else
     Ogre::String resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
     if (Ogre::FileSystemLayer::fileExists(resourcesPath) || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
