@@ -17,6 +17,9 @@ set(_features "${_features}-----------------------------------------------------
 #summarise components
 if (OGRE_BUILD_COMPONENT_BITES)
 	set(_components "${_components}  + Bites\n")
+	if(Qt5_FOUND)
+	set(_components "${_components}  + Bites Qt Support\n")
+	endif()
 endif ()
 if (OGRE_BUILD_COMPONENT_HLMS)
 	set(_components "${_components}  + HLMS [DEPRECATED]\n")
