@@ -33,6 +33,7 @@
 #include "OgreTrays.h"
 #include "OgreConfigFile.h"
 #include "OgreTechnique.h"
+#include "OgreArchiveManager.h"
 
 #define ENABLE_SHADERS_CACHE 1
 
@@ -896,7 +897,8 @@ namespace OgreBites
             Ogre::StringVector unloadedSamplePlugins;
             Ogre::ConfigFile cfg;
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            cfg.load(openAPKFile(mFSLayer->getConfigFilePath("samples.cfg")));
+            Ogre::Archive* apk = Ogre::ArchiveManager::getSingleton().load("", "APKFileSystem", true);
+            cfg.load(apk->open(mFSLayer->getConfigFilePath("samples.cfg")));
 #else
             cfg.load(mFSLayer->getConfigFilePath("samples.cfg"));
 #endif

@@ -283,7 +283,7 @@ namespace OgreBites
         static Ogre::String getDefaultMediaDir();
     protected:
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);
+        OGRE_DEPRECATED Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);
         AAssetManager* mAAssetMgr;
         AConfiguration* mAConfig;
 #endif
