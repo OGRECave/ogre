@@ -2230,46 +2230,45 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
     {
-        //              if (mask & (uint16)GPV_GLOBAL)
-        //              {
-        //TODO We could maybe use GL_EXT_bindable_uniform here to produce Dx10-style
-        // shared constant buffers, but GPU support seems fairly weak?
-        // check the match to constant buffers & use rendersystem data hooks to store
-        // for now, just copy
-        params->_copySharedParams();
-
-        switch (gptype)
+        if (mask & (uint16)GPV_GLOBAL)
         {
-        case GPT_VERTEX_PROGRAM:
-            mActiveVertexGpuProgramParameters = params;
-            mCurrentVertexShader->bindSharedParameters(params, mask);
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mActiveFragmentGpuProgramParameters = params;
-            mCurrentFragmentShader->bindSharedParameters(params, mask);
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mActiveGeometryGpuProgramParameters = params;
-            mCurrentGeometryShader->bindSharedParameters(params, mask);
-            break;
-        case GPT_HULL_PROGRAM:
-            mActiveTessellationHullGpuProgramParameters = params;
-            mCurrentHullShader->bindSharedParameters(params, mask);
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            mActiveTessellationDomainGpuProgramParameters = params;
-            mCurrentDomainShader->bindSharedParameters(params, mask);
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mActiveComputeGpuProgramParameters = params;
-            mCurrentComputeShader->bindSharedParameters(params, mask);
-            break;
-        default:
-            break;
+            // TODO We could maybe use GL_EXT_bindable_uniform here to produce Dx10-style
+            // shared constant buffers, but GPU support seems fairly weak?
+            // check the match to constant buffers & use rendersystem data hooks to store
+            // for now, just copy
+            params->_copySharedParams();
+
+            switch (gptype)
+            {
+            case GPT_VERTEX_PROGRAM:
+                mActiveVertexGpuProgramParameters = params;
+                mCurrentVertexShader->bindSharedParameters(params, mask);
+                break;
+            case GPT_FRAGMENT_PROGRAM:
+                mActiveFragmentGpuProgramParameters = params;
+                mCurrentFragmentShader->bindSharedParameters(params, mask);
+                break;
+            case GPT_GEOMETRY_PROGRAM:
+                mActiveGeometryGpuProgramParameters = params;
+                mCurrentGeometryShader->bindSharedParameters(params, mask);
+                break;
+            case GPT_HULL_PROGRAM:
+                mActiveTessellationHullGpuProgramParameters = params;
+                mCurrentHullShader->bindSharedParameters(params, mask);
+                break;
+            case GPT_DOMAIN_PROGRAM:
+                mActiveTessellationDomainGpuProgramParameters = params;
+                mCurrentDomainShader->bindSharedParameters(params, mask);
+                break;
+            case GPT_COMPUTE_PROGRAM:
+                mActiveComputeGpuProgramParameters = params;
+                mCurrentComputeShader->bindSharedParameters(params, mask);
+                break;
+            default:
+                break;
+            }
         }
-        //              }
-        //        else
-        //        {
+
         switch (gptype)
         {
         case GPT_VERTEX_PROGRAM:
@@ -2299,9 +2298,8 @@ namespace Ogre {
         default:
             break;
         }
-        //        }
 
-        //FIXME This needs to be moved somewhere texture specific.
+        // FIXME This needs to be moved somewhere texture specific.
         // Update image bindings for image load/store
         // static_cast<GL3PlusTextureManager*>(mTextureManager)->bindImages();
     }
