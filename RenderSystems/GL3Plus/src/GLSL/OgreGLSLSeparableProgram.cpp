@@ -183,6 +183,11 @@ namespace Ogre
                     OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
                     OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
 
+                    if( !linkStatus )
+                    {
+                        logObjectInfo("Error linking program " + programName, programHandle);
+                    }
+
                     // Binary cache needs an update.
                     microcodeAvailableInCache = false;
                 }
