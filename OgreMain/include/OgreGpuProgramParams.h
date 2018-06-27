@@ -1563,7 +1563,7 @@ namespace Ogre {
         size_t mActivePassIterationIndex;
 
         /// Return the variability for an auto constant
-        uint16 deriveVariability(AutoConstantType act);
+        static uint16 deriveVariability(AutoConstantType act);
 
         void copySharedParamSetUsage(const GpuSharedParamUsageList& srcList);
 
