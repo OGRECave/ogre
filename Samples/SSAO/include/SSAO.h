@@ -631,67 +631,64 @@ protected:
     void sliderMoved(Slider* slider)
     {
         if (slider->getName() == SSAO_CREASE_MINIMUM_NAME)
-            setUniform("SSAO/CreaseShading", "SSAO/CreaseShading", "cMinimumCrease", slider->getValue(), false, 1);
+            setUniform("SSAO/CreaseShading", "cMinimumCrease", slider->getValue());
         
         else if (slider->getName() == SSAO_CREASE_BIAS_NAME)
-            setUniform("SSAO/CreaseShading", "SSAO/CreaseShading", "cBias", slider->getValue(), false, 1);
+            setUniform("SSAO/CreaseShading", "cBias", slider->getValue());
         
         else if (slider->getName() == SSAO_CREASE_AVERAGER_NAME)
-            setUniform("SSAO/CreaseShading", "SSAO/CreaseShading", "cAverager", slider->getValue(), false, 1);
+            setUniform("SSAO/CreaseShading", "cAverager", slider->getValue());
         
         else if (slider->getName() == SSAO_CREASE_RANGE_NAME)
-            setUniform("SSAO/CreaseShading", "SSAO/CreaseShading", "cRange", slider->getValue() * slider->getValue(), false, 1);
+            setUniform("SSAO/CreaseShading", "cRange", slider->getValue() * slider->getValue());
         
         else if (slider->getName() == SSAO_CREASE_KERNELSIZE_NAME)
-            setUniform("SSAO/CreaseShading", "SSAO/CreaseShading", "cKernelSize", slider->getValue(), false, 1);
+            setUniform("SSAO/CreaseShading", "cKernelSize", slider->getValue());
         
         else if (slider->getName() == SSAO_SAMPLE_LENGTH_SCREENSPACE)
         {
-            setUniform("SSAO/Crytek", "SSAO/Crytek", "cSampleLengthScreenSpace", slider->getValue()/100.0f, false, 1);
-            setUniform("SSAO/HorizonBased", "SSAO/HorizonBased", "cSampleLengthScreenSpace", slider->getValue()/100.0f, false, 1);
-            setUniform("SSAO/HemisphereMC", "SSAO/HemisphereMC", "cSampleLengthScreenSpace", slider->getValue()/100.0f, false, 1);
-            setUniform("SSAO/Volumetric", "SSAO/Volumetric", "cSampleLengthScreenSpace", slider->getValue()/100.0f, false, 1);
+            setUniform("SSAO/Crytek", "cSampleLengthScreenSpace", slider->getValue()/100.0f);
+            setUniform("SSAO/HorizonBased", "cSampleLengthScreenSpace", slider->getValue()/100.0f);
+            setUniform("SSAO/HemisphereMC", "cSampleLengthScreenSpace", slider->getValue()/100.0f);
+            setUniform("SSAO/Volumetric", "cSampleLengthScreenSpace", slider->getValue()/100.0f);
         }
         else if (slider->getName() == SSAO_SAMPLE_LENGTH_WORLDSPACE)
         {
-            setUniform("SSAO/Crytek", "SSAO/Crytek", "cSampleLengthWorldSpace", slider->getValue(), false, 1);
-            setUniform("SSAO/HorizonBased", "SSAO/HorizonBased", "cSampleLengthWorldSpace", slider->getValue(), false, 1);
-            setUniform("SSAO/HemisphereMC", "SSAO/HemisphereMC", "cSampleLengthWorldSpace", slider->getValue(), false, 1);
-            setUniform("SSAO/Volumetric", "SSAO/Volumetric", "cSampleLengthWorldSpace", slider->getValue(), false, 1);
+            setUniform("SSAO/Crytek", "cSampleLengthWorldSpace", slider->getValue());
+            setUniform("SSAO/HorizonBased", "cSampleLengthWorldSpace", slider->getValue());
+            setUniform("SSAO/HemisphereMC", "cSampleLengthWorldSpace", slider->getValue());
+            setUniform("SSAO/Volumetric", "cSampleLengthWorldSpace", slider->getValue());
         }
         
         else if (slider->getName() == SSAO_ANGLE_BIAS_NAME)
-            setUniform("SSAO/HorizonBased", "SSAO/HorizonBased", "cAngleBias", slider->getValue(), false, 1);
+            setUniform("SSAO/HorizonBased", "cAngleBias", slider->getValue());
         
         else if (slider->getName() == SSAO_CRYTEK_OFFSET_SCALE_NAME)
-            setUniform("SSAO/Crytek", "SSAO/Crytek", "cOffsetScale", slider->getValue()/100, false, 1);
+            setUniform("SSAO/Crytek", "cOffsetScale", slider->getValue()/100);
         
         else if (slider->getName() == SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME)
-            setUniform("SSAO/Crytek", "SSAO/Crytek", "cEdgeHighlight", 2.0f - slider->getValue(), false, 1);
+            setUniform("SSAO/Crytek", "cEdgeHighlight", 2.0f - slider->getValue());
         
         else if (slider->getName() == SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME)
-            setUniform("SSAO/Crytek", "SSAO/Crytek", "cDefaultAccessibility", slider->getValue(), false, 1);
+            setUniform("SSAO/Crytek", "cDefaultAccessibility", slider->getValue());
         
         else if (slider->getName() == SSAO_UNSHARP_KERNEL_BIAS_NAME)
         {
-            setUniform("SSAO/UnsharpMask", "SSAO/UnsharpMask/GaussianBlurY", "cKernelWidthBias", slider->getValue(), false, 1);
-            setUniform("SSAO/UnsharpMask", "SSAO/UnsharpMask/GaussianBlurX", "cKernelWidthBias", slider->getValue(), false, 1);
+            setUniform("SSAO/UnsharpMask/GaussianBlurY", "cKernelWidthBias", slider->getValue());
+            setUniform("SSAO/UnsharpMask/GaussianBlurX", "cKernelWidthBias", slider->getValue());
         }
         
         else if (slider->getName() == SSAO_UNSHARP_LAMBDA_NAME)
-            setUniform("SSAO/UnsharpMask", "SSAO/UnsharpMask", "cLambda", slider->getValue() * slider->getValue(), false, 1);
+            setUniform("SSAO/UnsharpMask", "cLambda", slider->getValue() * slider->getValue());
         
         else if (slider->getName() == SSAO_BILATERAL_PHOTOMETRIC_EXPONENT)
         {
-            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/X", "cPhotometricExponent", slider->getValue(), false, 2);
-            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/Y", "cPhotometricExponent", slider->getValue(), false, 2);
+            setUniform("SSAO/HorizonBased/CrossBilateralFilter/X", "cPhotometricExponent", slider->getValue());
+            setUniform("SSAO/HorizonBased/CrossBilateralFilter/Y", "cPhotometricExponent", slider->getValue());
         }
         
         else if(slider->getName() == SSAO_SAMPLE_LENGTH_EXPONENT_NAME)
-            setUniform("SSAO/HemisphereMC", "SSAO/HemisphereMC", "cSampleLengthExponent", slider->getValue(), false, 1);
-        
-        CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, true);
-        CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, true);
+            setUniform("SSAO/HemisphereMC", "cSampleLengthExponent", slider->getValue());
     }
     
     void checkBoxToggled(OgreBites::CheckBox *box) 
@@ -716,12 +713,11 @@ protected:
         }
         else if (box->getName() == SSAO_SAMPLE_SPACE_NAME)
         {
-            setUniform("SSAO/Crytek", "SSAO/Crytek", "cSampleInScreenspace", box->isChecked(), false, 1);
-            setUniform("SSAO/HorizonBased", "SSAO/HorizonBased", "cSampleInScreenspace", box->isChecked(), false, 1);
-            setUniform("SSAO/HemisphereMC", "SSAO/HemisphereMC", "cSampleInScreenspace", box->isChecked(), false, 1);
-            setUniform("SSAO/Volumetric", "SSAO/Volumetric", "cSampleInScreenspace", box->isChecked(), false, 1);
-            CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, true);
-            
+            setUniform("SSAO/Crytek", "cSampleInScreenspace", box->isChecked());
+            setUniform("SSAO/HorizonBased", "cSampleInScreenspace", box->isChecked());
+            setUniform("SSAO/HemisphereMC", "cSampleInScreenspace", box->isChecked());
+            setUniform("SSAO/Volumetric", "cSampleInScreenspace", box->isChecked());
+
             if (box->isChecked()) // we sample in screen space 
             {
                 mTrayMgr->removeWidgetFromTray(SSAO_SAMPLE_LENGTH_WORLDSPACE);
@@ -779,25 +775,15 @@ protected:
 
     /**
      * Set the uniform value in the compositor
-     * @param compositor The name of the compositor
      * @param material The material that contains the uniform
      * @param uniform The name of the uniform parameter
      * @param value The value
-     * @param setVisible Whether to set the compositor to visible or not.
-     * @param position The position at which the compositor should be added again.
-     * defaults to -1, which means that the compositor is readded at the end of the chain.
      */
-    void setUniform(Ogre::String compositor, Ogre::String material, Ogre::String uniform, float value, bool setVisible, int position = -1)
+    void setUniform(const String& material, const String& uniform, float value)
     {
-        // remove compositor first???
-        CompositorManager::getSingleton().removeCompositor(mViewport, compositor);
-        
         MaterialManager::getSingleton().getByName(material)->getTechnique(0)->
         getPass(0)->getFragmentProgramParameters()->setNamedConstant(uniform, value);
-        
-        // adding again
-        CompositorManager::getSingleton().addCompositor(mViewport, compositor, position);
-        CompositorManager::getSingleton().setCompositorEnabled(mViewport, compositor, setVisible);
+        CompositorManager::getSingleton().getCompositorChain(mViewport)->_markDirty();
     }
 };
 
