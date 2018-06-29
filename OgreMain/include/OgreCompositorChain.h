@@ -57,10 +57,13 @@ namespace Ogre {
         typedef std::vector<CompositorInstance*> Instances;
         typedef VectorIterator<Instances> InstanceIterator;
         
-        /// Identifier for "last" compositor in chain.
-        static const size_t LAST = (size_t)-1;
-        /// Identifier for best technique.
-        static const size_t BEST = 0;
+        enum {
+            /// Identifier for best technique.
+            BEST = 0,
+            /// Identifier for "last" compositor in chain.
+            LAST = (size_t)-1,
+            NPOS = LAST
+        };
         
         /** Apply a compositor. Initially, the filter is enabled.
         @param filter
@@ -78,29 +81,33 @@ namespace Ogre {
         */
         void removeCompositor(size_t position=LAST);
         
-        /** Get the number of compositors.
-        */
-        size_t getNumCompositors();
+        /// @deprecated use getCompositorInstances
+        OGRE_DEPRECATED size_t getNumCompositors();
         
         /** Remove all compositors.
         */
         void removeAllCompositors();
         
-        /** Get compositor instance by position.
-        */
-        CompositorInstance *getCompositor(size_t index);
+        /// @deprecated use getCompositorInstances
+        OGRE_DEPRECATED CompositorInstance *getCompositor(size_t index);
 
         /** Get compositor instance by name. Returns null if not found.
         */
-        CompositorInstance *getCompositor(const String& name);
+        CompositorInstance* getCompositor(const String& name);
+
+        /// Get compositor position by name. Returns #NPOS if not found.
+        size_t getCompositorPosition(const String& name);
 
         /** Get the original scene compositor instance for this chain (internal use). 
         */
         CompositorInstance* _getOriginalSceneCompositor(void) { return mOriginalScene; }
 
-        /** Get an iterator over the compositor instances. The first compositor in this list is applied first, the last one is applied last.
+        /** The compositor instances. The first compositor in this list is applied first, the last one is applied last.
         */
-        InstanceIterator getCompositors();
+        const Instances& getCompositorInstances() const { return mInstances; }
+
+        /// @deprecated use getCompositorInstances
+        OGRE_DEPRECATED InstanceIterator getCompositors();
     
         /** Enable or disable a compositor, by position. Disabling a compositor stops it from rendering
             but does not free any resources. This can be more efficient than using removeCompositor and 
@@ -110,21 +117,13 @@ namespace Ogre {
         */
         void setCompositorEnabled(size_t position, bool state);
 
-        /** @see RenderTargetListener::preRenderTargetUpdate */
-        virtual void preRenderTargetUpdate(const RenderTargetEvent& evt);
-        /** @see RenderTargetListener::postRenderTargetUpdate */
-        virtual void postRenderTargetUpdate(const RenderTargetEvent& evt);
-        /** @see RenderTargetListener::preViewportUpdate */
-        virtual void preViewportUpdate(const RenderTargetViewportEvent& evt);
-        /** @see RenderTargetListener::postViewportUpdate */
-        virtual void postViewportUpdate(const RenderTargetViewportEvent& evt);
-
-        /** @see Viewport::Listener::viewportCameraChanged */
-        virtual void viewportCameraChanged(Viewport* viewport);
-        /** @see Viewport::Listener::viewportDimensionsChanged */
-        virtual void viewportDimensionsChanged(Viewport* viewport);
-        /** @see Viewport::Listener::viewportDestroyed */
-        virtual void viewportDestroyed(Viewport* viewport);
+        void preRenderTargetUpdate(const RenderTargetEvent& evt);
+        void postRenderTargetUpdate(const RenderTargetEvent& evt);
+        void preViewportUpdate(const RenderTargetViewportEvent& evt);
+        void postViewportUpdate(const RenderTargetViewportEvent& evt);
+        void viewportCameraChanged(Viewport* viewport);
+        void viewportDimensionsChanged(Viewport* viewport);
+        void viewportDestroyed(Viewport* viewport);
 
         /** Mark state as dirty, and to be recompiled next frame.
         */
@@ -211,12 +210,8 @@ namespace Ogre {
         public:
             RQListener() : mOperation(0), mSceneManager(0), mRenderSystem(0), mViewport(0) {}
 
-            /** @copydoc RenderQueueListener::renderQueueStarted
-            */
-            virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, bool& skipThisInvocation);
-            /** @copydoc RenderQueueListener::renderQueueEnded
-            */
-            virtual void renderQueueEnded(uint8 queueGroupId, const String& invocation, bool& repeatThisInvocation);
+            void renderQueueStarted(uint8 queueGroupId, const String& invocation, bool& skipThisInvocation);
+            void renderQueueEnded(uint8 queueGroupId, const String& invocation, bool& repeatThisInvocation);
 
             /** Set current operation and target. */
             void setOperation(CompositorInstance::TargetOperation *op,SceneManager *sm,RenderSystem *rs);

@@ -818,11 +818,9 @@ void CompositorInstance::deriveTextureRenderTargetOptions(
                 // this may be rendering the scene implicitly
                 // Can't check mPreviousInstance against mChain->_getOriginalSceneCompositor()
                 // at this time, so check the position
-                CompositorChain::InstanceIterator instit = mChain->getCompositors();
                 renderingScene = true;
-                while(instit.hasMoreElements())
+                for(CompositorInstance* inst : mChain->getCompositorInstances())
                 {
-                    CompositorInstance* inst = instit.getNext();
                     if (inst == this)
                         break;
                     else if (inst->getEnabled())
@@ -1048,11 +1046,9 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
                 //Find the instance and check if it is before us
                 CompositorInstance* refCompInst = 0;
                 OgreAssert(mChain, "Undefined compositor chain");
-                CompositorChain::InstanceIterator it = mChain->getCompositors();
                 bool beforeMe = true;
-                while (it.hasMoreElements())
+                for (CompositorInstance* nextCompInst : mChain->getCompositorInstances())
                 {
-                    CompositorInstance* nextCompInst = it.getNext();
                     if (nextCompInst->getCompositor()->getName() == texDef->refCompName)
                     {
                         refCompInst = nextCompInst;
@@ -1158,11 +1154,9 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
                 //Find the instance and check if it is before us
                 CompositorInstance* refCompInst = 0;
                 OgreAssert(mChain, "Undefined compositor chain");
-                CompositorChain::InstanceIterator it = mChain->getCompositors();
                 bool beforeMe = true;
-                while (it.hasMoreElements())
+                for (CompositorInstance* nextCompInst : mChain->getCompositorInstances())
                 {
-                    CompositorInstance* nextCompInst = it.getNext();
                     if (nextCompInst->getCompositor()->getName() == texDef->refCompName)
                     {
                         refCompInst = nextCompInst;

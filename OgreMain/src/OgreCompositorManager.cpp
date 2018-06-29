@@ -175,29 +175,19 @@ CompositorInstance *CompositorManager::addCompositor(Viewport *vp, const String 
 void CompositorManager::removeCompositor(Viewport *vp, const String &compositor)
 {
     CompositorChain *chain = getCompositorChain(vp);
-    for(size_t pos=0; pos < chain->getNumCompositors(); ++pos)
-    {
-        CompositorInstance *instance = chain->getCompositor(pos);
-        if(instance->getCompositor()->getName() == compositor)
-        {
-            chain->removeCompositor(pos);
-            break;
-        }
-    }
+    size_t pos = chain->getCompositorPosition(compositor);
+
+    if(pos != CompositorChain::NPOS)
+        chain->removeCompositor(pos);
 }
 //-----------------------------------------------------------------------
 void CompositorManager::setCompositorEnabled(Viewport *vp, const String &compositor, bool value)
 {
     CompositorChain *chain = getCompositorChain(vp);
-    for(size_t pos=0; pos < chain->getNumCompositors(); ++pos)
-    {
-        CompositorInstance *instance = chain->getCompositor(pos);
-        if(instance->getCompositor()->getName() == compositor)
-        {
-            chain->setCompositorEnabled(pos, value);
-            break;
-        }
-    }
+    size_t pos = chain->getCompositorPosition(compositor);
+
+    if(pos != CompositorChain::NPOS)
+        chain->setCompositorEnabled(pos, value);
 }
 //---------------------------------------------------------------------
 void CompositorManager::_reconstructAllCompositorResources()
@@ -209,10 +199,8 @@ void CompositorManager::_reconstructAllCompositorResources()
     for (Chains::iterator i = mChains.begin(); i != mChains.end(); ++i)
     {
         CompositorChain* chain = i->second;
-        CompositorChain::InstanceIterator instIt = chain->getCompositors();
-        while (instIt.hasMoreElements())
+        for (CompositorInstance* inst : chain->getCompositorInstances())
         {
-            CompositorInstance* inst = instIt.getNext();
             if (inst->getEnabled())
             {
                 inst->setEnabled(false);
