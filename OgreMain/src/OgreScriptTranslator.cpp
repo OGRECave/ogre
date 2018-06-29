@@ -2264,7 +2264,7 @@ namespace Ogre{
                     evt.mName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME))
             {
                 compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file,
-                                   node->line);
+                                   node->line, evt.mName);
                 return NULL;
             }
         }
