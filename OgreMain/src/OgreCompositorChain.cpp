@@ -182,6 +182,9 @@ CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t 
 //-----------------------------------------------------------------------
 void CompositorChain::removeCompositor(size_t index)
 {
+    if(index == LAST)
+        index = mInstances.size() - 1;
+
     assert (index < mInstances.size() && "Index out of bounds.");
     Instances::iterator i = mInstances.begin() + index;
     OGRE_DELETE *i;
