@@ -234,16 +234,21 @@ CompositorInstance *CompositorChain::getCompositor(size_t index)
     return mInstances[index];
 }
 //-----------------------------------------------------------------------
-CompositorInstance *CompositorChain::getCompositor(const String& name)
+size_t CompositorChain::getCompositorPosition(const String& name)
 {
     for (Instances::iterator it = mInstances.begin(); it != mInstances.end(); ++it) 
     {
         if ((*it)->getCompositor()->getName() == name) 
         {
-            return *it;
+            return std::distance(mInstances.begin(), it);
         }
     }
-    return 0;
+    return NPOS;
+}
+CompositorInstance *CompositorChain::getCompositor(const String& name)
+{
+    size_t idx = getCompositorPosition(name);
+    return idx == NPOS ? NULL : mInstances[idx];
 }
 //-----------------------------------------------------------------------
 CompositorChain::InstanceIterator CompositorChain::getCompositors()
@@ -253,7 +258,7 @@ CompositorChain::InstanceIterator CompositorChain::getCompositors()
 //-----------------------------------------------------------------------
 void CompositorChain::setCompositorEnabled(size_t position, bool state)
 {
-    CompositorInstance* inst = getCompositor(position);
+    CompositorInstance* inst = mInstances[position];
     if (!state && inst->getEnabled())
     {
         // If we're disabling a 'middle' compositor in a chain, we have to be
