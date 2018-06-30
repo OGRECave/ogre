@@ -92,14 +92,4 @@ namespace OgreBites {
             mPixelBuffer->unlock();
         }
     }
-
-    bool Sample_Compute::frameRenderingQueued(const FrameEvent& evt)
-    {
-        // update uniform buffer value
-        Real seconds = Root::getSingleton().getTimer()->getMilliseconds()/1000.0f;
-        GpuSharedParametersPtr param = GpuProgramManager::getSingleton().getSharedParameters("DataBlock");
-        param->setNamedConstant("roll", seconds);
-
-        return SdkSample::frameRenderingQueued(evt); 
-    }
 }

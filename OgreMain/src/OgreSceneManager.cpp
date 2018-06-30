@@ -4569,41 +4569,15 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
         if (mGpuParamsDirty)
             pass->_updateAutoParams(mAutoParamDataSource.get(), mGpuParamsDirty);
 
-        if (pass->hasVertexProgram())
+        for (int i = 0; i < GPT_COUNT; i++)
         {
-            mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
-                pass->getVertexProgramParameters(), mGpuParamsDirty);
+            GpuProgramType t = (GpuProgramType)i;
+            if (pass->hasGpuProgram(t))
+            {
+                mDestRenderSystem->bindGpuProgramParameters(t, pass->getGpuProgramParameters(t),
+                                                            mGpuParamsDirty);
+            }
         }
-
-        if (pass->hasGeometryProgram())
-        {
-            mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
-                pass->getGeometryProgramParameters(), mGpuParamsDirty);
-        }
-
-        if (pass->hasFragmentProgram())
-        {
-            mDestRenderSystem->bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
-                pass->getFragmentProgramParameters(), mGpuParamsDirty);
-        }
-
-        if (pass->hasTessellationHullProgram())
-        {
-            mDestRenderSystem->bindGpuProgramParameters(GPT_HULL_PROGRAM, 
-                pass->getTessellationHullProgramParameters(), mGpuParamsDirty);
-        }
-
-        if (pass->hasTessellationDomainProgram())
-        {
-            mDestRenderSystem->bindGpuProgramParameters(GPT_DOMAIN_PROGRAM, 
-                pass->getTessellationDomainProgramParameters(), mGpuParamsDirty);
-        }
-
-                // if (pass->hasComputeProgram())
-        // {
-                //     mDestRenderSystem->bindGpuProgramParameters(GPT_COMPUTE_PROGRAM, 
-                //                                                 pass->getComputeProgramParameters(), mGpuParamsDirty);
-        // }
 
         mGpuParamsDirty = 0;
     }

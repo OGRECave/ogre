@@ -31,7 +31,6 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
     Sample_Compute();
     void testCapabilities(const RenderSystemCapabilities* caps);
     void setupContent(void);
-    bool frameRenderingQueued(const FrameEvent& evt);
 };
 }
 #endif  // end _CompositorDemo_H_

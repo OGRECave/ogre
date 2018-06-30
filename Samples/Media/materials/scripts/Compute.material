@@ -1,10 +1,6 @@
 //////////
 // GLSL //
 //////////
-shared_params DataBlock {
-    shared_param_named roll float 1.0
-}
-
 compute_program Compute/CS_GLSL glsl
 {
         source ComputeCS.glsl
@@ -13,6 +9,10 @@ compute_program Compute/CS_GLSL glsl
         // the texture size is 256x256x1 and the group size is 16x16x1
         // so we have to launch 16x16x1 groups
         compute_group_dimensions 16 16 1
+        default_params
+        {
+            param_named_auto roll time
+        }
         //TODO is this necessary?
         // placement postrender
         //TODO how to handle glMemoryBarrier?
