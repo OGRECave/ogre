@@ -1428,9 +1428,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
         // Set autoparams for finite dir light extrusion
         mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowRenderer.mShadowDirLightExtrudeDist);
 
-        // Tell rendersystem
-        mDestRenderSystem->setAmbientLight(mAutoParamDataSource->getAmbientLightColour());
-
         // Tell params about render target
         mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
 
@@ -1958,6 +1955,8 @@ void SceneManager::renderObjects(const QueuedRenderableCollection& objs,
                                  const LightList* manualLightList,
                                  bool transparentShadowCastersMode)
 {
+    mDestRenderSystem->setAmbientLight(mAutoParamDataSource->getAmbientLightColour());
+
     mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
     mActiveQueuedRenderableVisitor->manualLightList = manualLightList;
     mActiveQueuedRenderableVisitor->transparentShadowCastersMode = transparentShadowCastersMode;
@@ -3828,9 +3827,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
     // Set autoparams for finite dir light extrusion
     mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowRenderer.mShadowDirLightExtrudeDist);
-
-    // Tell params about current ambient light
-    mDestRenderSystem->setAmbientLight(mAutoParamDataSource->getAmbientLightColour());
 
     // Tell params about render target
     mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
