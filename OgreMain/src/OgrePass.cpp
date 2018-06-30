@@ -174,6 +174,7 @@ namespace Ogre {
         , mFogEnd(1.0)
         , mFogDensity(0.001)
         , mPassIterationCount(1)
+        , mLineWidth(1.0f)
         , mPointSize(1.0f)
         , mPointMinSize(0.0f)
         , mPointMaxSize(0.0f)
@@ -259,6 +260,7 @@ namespace Ogre {
         mPolygonMode = oth.mPolygonMode;
         mPolygonModeOverrideable = oth.mPolygonModeOverrideable;
         mPassIterationCount = oth.mPassIterationCount;
+        mLineWidth = oth.mLineWidth;
         mPointSize = oth.mPointSize;
         mPointMinSize = oth.mPointMinSize;
         mPointMaxSize = oth.mPointMaxSize;
