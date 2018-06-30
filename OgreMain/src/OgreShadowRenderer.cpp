@@ -317,13 +317,11 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
     {
         // Use simple black / white mask if additive
         mSceneManager->setAmbientLight(ColourValue::Black);
-        mDestRenderSystem->setAmbientLight(0, 0, 0);
     }
     else
     {
         // Use shadow colour as caster colour if modulative
         mSceneManager->setAmbientLight(mShadowColour);
-        mDestRenderSystem->setAmbientLight(mShadowColour);
     }
 
     while (groupIt.hasMoreElements())
@@ -346,7 +344,6 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
 
     // reset ambient light
     mSceneManager->setAmbientLight(currAmbient);
-    mDestRenderSystem->setAmbientLight(currAmbient);
 }
 //-----------------------------------------------------------------------
 void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObjects(
@@ -628,7 +625,6 @@ void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
     // Override auto param ambient to force vertex programs to go full-bright
     ColourValue currAmbient = mSceneManager->getAmbientLight();
     mSceneManager->setAmbientLight(ColourValue::White);
-    mDestRenderSystem->setAmbientLight(1, 1, 1);
 
     while (groupIt.hasMoreElements())
     {
@@ -643,8 +639,6 @@ void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
 
     // reset ambient
     mSceneManager->setAmbientLight(currAmbient);
-    mDestRenderSystem->setAmbientLight(currAmbient);
-
 }
 //---------------------------------------------------------------------
 void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
