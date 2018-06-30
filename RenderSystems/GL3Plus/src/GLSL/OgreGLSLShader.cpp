@@ -468,6 +468,11 @@ namespace Ogre {
             // program->updateShaderStorageBlock(params, mask, mType);
 
         }
+        catch (InvalidParametersException& e)
+        {
+            LogManager::getSingleton().logError("binding shared parameters failed: " +
+                                                e.getDescription());
+        }
         catch (Exception&) {}
     }
 
