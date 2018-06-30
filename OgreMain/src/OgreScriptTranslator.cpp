@@ -3660,8 +3660,8 @@ namespace Ogre{
             return;
         }
 
-        std::list<std::pair<String,String> > customParameters;
-        String source;
+        std::vector<std::pair<PropertyAbstractNode*, String> > customParameters;
+        String source, profiles;
         AbstractNodePtr params;
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -3686,7 +3686,7 @@ namespace Ogre{
                 }
                 else
                 {
-                    String name = prop->name, value;
+                    String value;
                     bool first = true;
                     for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
                     {
@@ -3709,7 +3709,11 @@ namespace Ogre{
                             }
                         }
                     }
-                    customParameters.push_back(std::make_pair(name, value));
+
+                    if(prop->name == "profiles")
+                        profiles = value;
+                    else
+                        customParameters.push_back(std::make_pair(prop, value));
                 }
             }
             else if((*i)->type == ANT_OBJECT)
@@ -3748,9 +3752,18 @@ namespace Ogre{
         prog->setVertexTextureFetchRequired(false);
         prog->_notifyOrigin(obj->file);
 
+        // special case for Cg
+        if(!profiles.empty())
+            prog->setParameter("profiles", profiles);
+
         // Set the custom parameters
-        for(std::list<std::pair<String,String> >::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
-            prog->setParameter(i->first, i->second);
+        for(const auto& p : customParameters)
+        {
+            if(prog->isSupported() && !prog->setParameter(p.first->name, p.second))
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, p.first->file, p.first->line, p.first->name);
+            }
+        }
 
         // Set up default parameters
         if(prog->isSupported() && params)
