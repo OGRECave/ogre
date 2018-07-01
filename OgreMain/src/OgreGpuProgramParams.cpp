@@ -723,8 +723,10 @@ namespace Ogre
                     e.dstDefinition = instdef;
                     mCopyDataList.push_back(e);
                 }
+                else
+                    LogManager::getSingleton().logWarning("cannot copy shared parameter '" + pName +
+                                                          "' - type or variability mismatch");
             }
-
         }
 
         mCopyDataVersion = mSharedParams->getVersion();
