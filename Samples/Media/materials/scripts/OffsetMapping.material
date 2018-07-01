@@ -357,7 +357,6 @@ vertex_program Examples/OffsetMappingIntegratedShadowsVPhlsl hlsl
 vertex_program Examples/OffsetMappingIntegratedShadowsVPglsl glsl 
 { 
    source OffsetMappingShadowsVp.glsl
-	syntax glsl150
    default_params
    {
         param_named_auto worldViewProj worldviewproj_matrix 
@@ -379,7 +378,6 @@ fragment_program Examples/OffsetMappingIntegratedShadowsFPhlsl hlsl
 fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl
 {
 	source OffsetMappingShadowsFp.glsl
-	syntax glsl150
 	default_params
 	{
 		// assign samplers as required by GLSL
