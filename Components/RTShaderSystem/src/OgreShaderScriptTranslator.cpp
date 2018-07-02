@@ -184,20 +184,19 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
                     }
                     else
                     {
-                        int lightCount[3];
-
-                        if (false == SGScriptTranslator::getInts(prop->values.begin(), prop->values.end(), lightCount, 3))
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                        else
+                        std::vector<int> lightCount;
+                        if (getVector(prop->values.begin(), prop->values.end(), lightCount, 3))
                         {
                             shaderGenerator->createScheme(dstTechniqueSchemeName);
                             RenderState* renderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, 
                                 material->getName(), material->getGroup(), pass->getIndex());
 
-                            renderState->setLightCount(lightCount);
+                            renderState->setLightCount(lightCount.data());
                             renderState->setLightCountAutoUpdate(false);
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                         }
                     }                   
                 }
