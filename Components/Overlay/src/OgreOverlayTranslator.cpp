@@ -66,9 +66,9 @@ void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
 
     if (attrib == "glyph")
     {
-        float coords[4];
+        std::vector<float> coords;
         if (prop->values.size() != 5 || !getString(prop->values.front(), &val) ||
-            !getFloats(++prop->values.begin(), prop->values.end(), coords, 4))
+            !getVector(++prop->values.begin(), prop->values.end(), coords, 4))
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return;

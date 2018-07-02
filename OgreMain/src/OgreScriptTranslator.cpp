@@ -78,9 +78,13 @@ namespace Ogre{
 
     template <typename T>
     bool getValue(const AbstractNodePtr &node, T& result);
-    template<> bool getValue(const AbstractNodePtr &node, Real& result)
+    template<> bool getValue(const AbstractNodePtr &node, float& result)
     {
-        return ScriptTranslator::getReal(node, &result);
+        return ScriptTranslator::getFloat(node, &result);
+    }
+    template<> bool getValue(const AbstractNodePtr &node, double& result)
+    {
+        return ScriptTranslator::getDouble(node, &result);
     }
     template<> bool getValue(const AbstractNodePtr &node, bool& result)
     {
@@ -89,6 +93,10 @@ namespace Ogre{
     template<> bool getValue(const AbstractNodePtr &node, uint32& result)
     {
         return ScriptTranslator::getUInt(node, &result);
+    }
+    template<> bool getValue(const AbstractNodePtr &node, int32& result)
+    {
+        return ScriptTranslator::getInt(node, &result);
     }
     template<> bool getValue(const AbstractNodePtr &node, String& result)
     {
@@ -506,6 +514,28 @@ namespace Ogre{
         return false;
     }
 
+    template <typename T>
+    static bool _getVector(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end,
+                          std::vector<T>& vals, int count)
+    {
+        vals.reserve(count);
+        int n = 0;
+        while (n < count)
+        {
+            if (i != end)
+            {
+                T v;
+                if (!getValue(*i++, v))
+                    return false;
+                vals.push_back(v);
+            }
+            ++n;
+        }
+
+        vals.resize(count);
+        return true;
+    }
+
     void ScriptTranslator::processNode(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
         if(node->type != ANT_OBJECT)
@@ -764,6 +794,10 @@ namespace Ogre{
 
         return success;
     }
+    bool ScriptTranslator::getVector(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, std::vector<int>& vals, size_t count)
+    {
+        return _getVector(i, end, vals, count);
+    }
     //----------------------------------------------------------------------------
     bool ScriptTranslator::getFloats(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, float *vals, int count)
     {
@@ -789,6 +823,10 @@ namespace Ogre{
             success = false;
 
         return success;
+    }
+    bool ScriptTranslator::getVector(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, std::vector<float>& vals, size_t count)
+    {
+        return _getVector(i, end, vals, count);
     }
     //----------------------------------------------------------------------------
     bool ScriptTranslator::getDoubles(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, double *vals, int count)
@@ -910,7 +948,9 @@ namespace Ogre{
     {
 
         String val;
-        getString(*i, &val);
+        if(!getString(*i, &val))
+            return false;
+
         if (val.find("float") != String::npos)
         {
             int count = 1;
@@ -2210,22 +2250,22 @@ namespace Ogre{
                 switch(child->id)
                 {
                 case ID_FRAGMENT_PROGRAM_REF:
-                    translateFragmentProgramRef(compiler, child);
+                    translateProgramRef(GPT_FRAGMENT_PROGRAM, compiler, child);
                     break;
                 case ID_VERTEX_PROGRAM_REF:
-                    translateVertexProgramRef(compiler, child);
+                    translateProgramRef(GPT_VERTEX_PROGRAM, compiler, child);
                     break;
                 case ID_GEOMETRY_PROGRAM_REF:
-                    translateGeometryProgramRef(compiler, child);
+                    translateProgramRef(GPT_GEOMETRY_PROGRAM, compiler, child);
                     break;
                 case ID_TESSELLATION_HULL_PROGRAM_REF:
-                    translateTessellationHullProgramRef(compiler, child);
+                    translateProgramRef(GPT_HULL_PROGRAM, compiler, child);
                     break;
                 case ID_TESSELLATION_DOMAIN_PROGRAM_REF:
-                    translateTessellationDomainProgramRef(compiler, child);
+                    translateProgramRef(GPT_DOMAIN_PROGRAM, compiler, child);
                     break;
                 case ID_COMPUTE_PROGRAM_REF:
-                    translateComputeProgramRef(compiler, child);
+                    translateProgramRef(GPT_COMPUTE_PROGRAM, compiler, child);
                     break;
                 case ID_SHADOW_CASTER_VERTEX_PROGRAM_REF:
                     translateShadowCasterVertexProgramRef(compiler, child);
@@ -2273,80 +2313,15 @@ namespace Ogre{
     }
 
     //-------------------------------------------------------------------------
-    void PassTranslator::translateFragmentProgramRef(Ogre::ScriptCompiler *compiler, Ogre::ObjectAbstractNode *node)
+    void PassTranslator::translateProgramRef(GpuProgramType type, ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
         Pass *pass = getPass(compiler, node);
         if(!pass) return;
 
-        pass->setFragmentProgram(node->name);
-        if(pass->getFragmentProgram()->isSupported())
+        pass->setGpuProgram(type, node->name);
+        if(pass->getGpuProgram(type)->isSupported())
         {
-            GpuProgramParametersSharedPtr params = pass->getFragmentProgramParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, params, node);
-        }
-    }
-    //-------------------------------------------------------------------------
-    void PassTranslator::translateVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
-    {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
-
-        pass->setVertexProgram(node->name);
-        if(pass->getVertexProgram()->isSupported())
-        {
-            GpuProgramParametersSharedPtr params = pass->getVertexProgramParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, params, node);
-        }
-    }
-    //-------------------------------------------------------------------------
-    void PassTranslator::translateGeometryProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
-    {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
-
-        pass->setGeometryProgram(node->name);
-        if(pass->getGeometryProgram()->isSupported())
-        {
-            GpuProgramParametersSharedPtr params = pass->getGeometryProgramParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, params, node);
-        }
-    }
-    //-------------------------------------------------------------------------
-    void PassTranslator::translateTessellationHullProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
-    {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
-
-        pass->setTessellationHullProgram(node->name);
-        if(pass->getTessellationHullProgram()->isSupported())
-        {
-            GpuProgramParametersSharedPtr params = pass->getTessellationHullProgramParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, params, node);
-        }
-    }
-    //-------------------------------------------------------------------------
-    void PassTranslator::translateTessellationDomainProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
-    {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
-
-        pass->setTessellationDomainProgram(node->name);
-        if(pass->getTessellationDomainProgram()->isSupported())
-        {
-            GpuProgramParametersSharedPtr params = pass->getTessellationDomainProgramParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, params, node);
-        }
-    }
-    //-------------------------------------------------------------------------
-    void PassTranslator::translateComputeProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
-    {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
-
-        pass->setComputeProgram(node->name);
-        if(pass->getComputeProgram()->isSupported())
-        {
-            GpuProgramParametersSharedPtr params = pass->getComputeProgramParameters();
+            GpuProgramParametersSharedPtr params = pass->getGpuProgramParameters(type);
             GpuProgramTranslator::translateProgramParameters(compiler, params, node);
         }
     }
@@ -3670,19 +3645,8 @@ namespace Ogre{
                 PropertyAbstractNode *prop = (PropertyAbstractNode*)(*i).get();
                 if(prop->id == ID_SOURCE)
                 {
-                    if(!prop->values.empty())
-                    {
-                        if(prop->values.front()->type == ANT_ATOM)
-                            source = ((AtomAbstractNode*)prop->values.front().get())->value;
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "source file expected");
-                    }
-                    else
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
-                                           "source file expected");
-                    }
+                    if(!getValue(prop, compiler, source))
+                        return;
                 }
                 else
                 {
@@ -3774,10 +3738,13 @@ namespace Ogre{
 
     }
     //-------------------------------------------------------------------------
-    static int parseProgramParameterDimensions(String& declarator, String type)
+    static int parseProgramParameterDimensions(String& declarator, const char* type)
     {
         // Assume 1 unless otherwise specified
         int dimensions = 1;
+
+        if(declarator.size() == strlen(type))
+            return dimensions;
 
         size_t start = declarator.find_first_not_of(type);
 
@@ -3810,6 +3777,7 @@ namespace Ogre{
     {
         size_t animParametricsCount = 0;
 
+        String value;
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
             if((*i)->type == ANT_PROPERTY)
@@ -3818,26 +3786,11 @@ namespace Ogre{
                 switch(prop->id)
                 {
                 case ID_SHARED_PARAMS_REF:
+                    if(getValue(prop, compiler, value))
                     {
-                        if(prop->values.size() != 1)
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "shared_params_ref requires a single parameter");
-                            continue;
-                        }
-
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
-                        if((*i0)->type != ANT_ATOM)
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "shared parameter set name expected");
-                            continue;
-                        }
-                        AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get();
-
                         try
                         {
-                            params->addSharedParameters(atom0->value);
+                            params->addSharedParameters(value);
                         }
                         catch(Exception& e)
                         {
@@ -3979,33 +3932,30 @@ namespace Ogre{
                             //TODO This should probably converted into a function of type.
                             else
                             {
-                                // Find the type and number of parameters
-                                // bool isValid = true;
                                 // GpuProgramParameters::ElementType type = GpuProgramParameters::ET_FLOAT;
-                                int count = 1;
+                                int count;
+
+                                // First, clear out any offending auto constants
+                                if (named)
+                                    params->clearNamedAutoConstant(name);
+                                else
+                                    params->clearAutoConstant(index);
+
                                 if (atom1->value.find("float") != String::npos)
                                 {
                                     // type = GpuProgramParameters::ET_FLOAT;
-                                    if (atom1->value.size() >= 6)
-                                        count = parseProgramParameterDimensions(atom1->value, String("float"));
-
-                                    // First, clear out any offending auto constants
-                                    if (named)
-                                        params->clearNamedAutoConstant(name);
-                                    else
-                                        params->clearAutoConstant(index);
-
+                                    count = parseProgramParameterDimensions(atom1->value, "float");
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
-                                    float *vals = OGRE_ALLOC_T(float, roundedCount, MEMCATEGORY_SCRIPTING);
-                                    if (getFloats(k, prop->values.end(), vals, roundedCount))
+                                    std::vector<float> vals;
+                                    if (_getVector(k, prop->values.end(), vals, roundedCount))
                                     {
                                         try
                                         {
                                             if (named)
-                                                params->setNamedConstant(name, vals, count, 1);
+                                                params->setNamedConstant(name, vals.data(), count, 1);
                                             else
-                                                params->setConstant(index, vals, roundedCount/4);
+                                                params->setConstant(index, vals.data(), roundedCount/4);
                                         }
                                         catch (Exception& e)
                                         {
@@ -4018,31 +3968,21 @@ namespace Ogre{
                                         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
                                                            "incorrect float constant declaration");
                                     }
-                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
                                 }
                                 else if (atom1->value.find("uint") != String::npos)
                                 {
-                                    // type = GpuProgramParameters::ET_UINT;
-                                    if (atom1->value.size() >= 5)
-                                        count = parseProgramParameterDimensions(atom1->value, String("uint"));
-
-                                    // First, clear out any offending auto constants
-                                    if (named)
-                                        params->clearNamedAutoConstant(name);
-                                    else
-                                        params->clearAutoConstant(index);
-
+                                    count = parseProgramParameterDimensions(atom1->value, "uint");
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
-                                    uint *vals = OGRE_ALLOC_T(uint, roundedCount, MEMCATEGORY_SCRIPTING);
-                                    if (getUInts(k, prop->values.end(), vals, roundedCount))
+                                    std::vector<uint> vals;
+                                    if (_getVector(k, prop->values.end(), vals, roundedCount))
                                     {
                                         try
                                         {
                                             if (named)
-                                                params->setNamedConstant(name, vals, count, 1);
+                                                params->setNamedConstant(name, vals.data(), count, 1);
                                             else
-                                                params->setConstant(index, vals, roundedCount/4);
+                                                params->setConstant(index, vals.data(), roundedCount/4);
                                         }
                                         catch (Exception& e)
                                         {
@@ -4055,31 +3995,21 @@ namespace Ogre{
                                         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
                                                            "incorrect unsigned integer constant declaration");
                                     }
-                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
                                 }
                                 else if (atom1->value.find("int") != String::npos)
                                 {
-                                    // type = GpuProgramParameters::ET_INT;
-                                    if (atom1->value.size() >= 4)
-                                        count = parseProgramParameterDimensions(atom1->value, String("int"));
-
-                                    // First, clear out any offending auto constants
-                                    if (named)
-                                        params->clearNamedAutoConstant(name);
-                                    else
-                                        params->clearAutoConstant(index);
-
+                                    count = parseProgramParameterDimensions(atom1->value, "int");
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
-                                    int *vals = OGRE_ALLOC_T(int, roundedCount, MEMCATEGORY_SCRIPTING);
-                                    if (getInts(k, prop->values.end(), vals, roundedCount))
+                                    std::vector<int> vals;
+                                    if (_getVector(k, prop->values.end(), vals, roundedCount))
                                     {
                                         try
                                         {
                                             if (named)
-                                                params->setNamedConstant(name, vals, count, 1);
+                                                params->setNamedConstant(name, vals.data(), count, 1);
                                             else
-                                                params->setConstant(index, vals, roundedCount/4);
+                                                params->setConstant(index, vals.data(), roundedCount/4);
                                         }
                                         catch (Exception& e)
                                         {
@@ -4092,31 +4022,21 @@ namespace Ogre{
                                         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
                                                            "incorrect integer constant declaration");
                                     }
-                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
                                 }
                                 else if (atom1->value.find("double") != String::npos)
                                 {
-                                    // type = GpuProgramParameters::ET_DOUBLE;
-                                    if (atom1->value.size() >= 7)
-                                        count = parseProgramParameterDimensions(atom1->value, String("double"));
-
-                                    // First, clear out any offending auto constants
-                                    if (named)
-                                        params->clearNamedAutoConstant(name);
-                                    else
-                                        params->clearAutoConstant(index);
-
+                                    count = parseProgramParameterDimensions(atom1->value, "double");
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
-                                    double *vals = OGRE_ALLOC_T(double, roundedCount, MEMCATEGORY_SCRIPTING);
-                                    if (getDoubles(k, prop->values.end(), vals, roundedCount))
+                                    std::vector<double> vals;
+                                    if (_getVector(k, prop->values.end(), vals, roundedCount))
                                     {
                                         try
                                         {
                                             if (named)
-                                                params->setNamedConstant(name, vals, count, 1);
+                                                params->setNamedConstant(name, vals.data(), count, 1);
                                             else
-                                                params->setConstant(index, vals, roundedCount/4);
+                                                params->setConstant(index, vals.data(), roundedCount/4);
                                         }
                                         catch (Exception& e)
                                         {
@@ -4129,31 +4049,22 @@ namespace Ogre{
                                         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
                                                            "incorrect double constant declaration");
                                     }
-                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
                                 }                                
                                 else if (atom1->value.find("bool") != String::npos)
                                 {
-                                    // type = GpuProgramParameters::ET_BOOL;
-                                    if (atom1->value.size() >= 5)
-                                        count = parseProgramParameterDimensions(atom1->value, String("bool"));
-
-                                    // First, clear out any offending auto constants
-                                    if (named)
-                                        params->clearNamedAutoConstant(name);
-                                    else
-                                        params->clearAutoConstant(index);
-
+                                    count = parseProgramParameterDimensions(atom1->value, "bool");
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
-                                    uint *vals = OGRE_ALLOC_T(uint, roundedCount, MEMCATEGORY_SCRIPTING);
-                                    if (getBooleans(k, prop->values.end(), vals, roundedCount))
+                                    std::vector<bool> tmp;
+                                    if (_getVector(k, prop->values.end(), tmp, roundedCount))
                                     {
+                                        std::vector<uint> vals(tmp.begin(), tmp.end());
                                         try
                                         {
                                             if (named)
-                                                params->setNamedConstant(name, vals, count, 1);
+                                                params->setNamedConstant(name, vals.data(), count, 1);
                                             else
-                                                params->setConstant(index, vals, roundedCount/4);
+                                                params->setConstant(index, vals.data(), roundedCount/4);
                                         }
                                         catch (Exception& e)
                                         {
@@ -4166,151 +4077,12 @@ namespace Ogre{
                                         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
                                                            "incorrect boolean constant declaration");
                                     }
-                                    OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
                                 }
                                 else
                                 {
                                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                        "incorrect type specified; only variants of int, uint, float, double, and bool allowed");
-                                    // isValid = false;
                                 }
-
-                                // if (isValid)
-                                // {
-                                //     // First, clear out any offending auto constants
-                                //     if (named)
-                                //         params->clearNamedAutoConstant(name);
-                                //     else
-                                //         params->clearAutoConstant(index);
-
-                                //     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
-
-                                //     if (type == GpuProgramParameters::ET_FLOAT)
-                                //     {
-                                //       float *vals = OGRE_ALLOC_T(float, roundedCount, MEMCATEGORY_SCRIPTING);
-                                //         if (getFloats(k, prop->values.end(), vals, roundedCount))
-                                //         {
-                                //             try
-                                //             {
-                                //                 if (named)
-                                //                     params->setNamedConstant(name, vals, count, 1);
-                                //                 else
-                                //                     params->setConstant(index, vals, roundedCount/4);
-                                //             }
-                                //             catch (...)
-                                //             {
-                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                //                                    "setting of constant failed");
-                                //             }
-                                //         }
-                                //         else
-                                //         {
-                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                //                                "incorrect float constant declaration");
-                                //         }
-                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);  
-                                //     }
-                                //     else if (type == GpuProgramParameters::ET_INT)
-                                //     {
-                                //         int *vals = OGRE_ALLOC_T(int, roundedCount, MEMCATEGORY_SCRIPTING);
-                                //         if (getInts(k, prop->values.end(), vals, roundedCount))
-                                //         {
-                                //             try
-                                //             {
-                                //                 if (named)
-                                //                     params->setNamedConstant(name, vals, count, 1);
-                                //                 else
-                                //                     params->setConstant(index, vals, roundedCount/4);
-                                //             }
-                                //             catch (...)
-                                //             {
-                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                //                                    "setting of constant failed");
-                                //             }
-                                //         }
-                                //         else
-                                //         {
-                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                //                                "incorrect integer constant declaration");
-                                //         }
-                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
-                                //     }
-                                //     else if (type == GpuProgramParameters::ET_DOUBLE)
-                                //     {
-                                //         double *vals = OGRE_ALLOC_T(double, roundedCount, MEMCATEGORY_SCRIPTING);
-                                //         if (getDoubles(k, prop->values.end(), vals, roundedCount))
-                                //         {
-                                //             try
-                                //             {
-                                //                 if (named)
-                                //                     params->setNamedConstant(name, vals, count, 1);
-                                //                 else
-                                //                     params->setConstant(index, vals, roundedCount/4);
-                                //             }
-                                //             catch (...)
-                                //             {
-                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                //                                    "setting of constant failed");
-                                //             }
-                                //         }
-                                //         else
-                                //         {
-                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                //                                "incorrect double constant declaration");
-                                //         }
-                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
-                                //     }
-                                //     else if (type == GpuProgramParameters::ET_UINT)
-                                //     {
-                                //         uint *vals = OGRE_ALLOC_T(uint, roundedCount, MEMCATEGORY_SCRIPTING);
-                                //         if (getUInts(k, prop->values.end(), vals, roundedCount))
-                                //         {
-                                //             try
-                                //             {
-                                //                 if (named)
-                                //                     params->setNamedConstant(name, vals, count, 1);
-                                //                 else
-                                //                     params->setConstant(index, vals, roundedCount/4);
-                                //             }
-                                //             catch (...)
-                                //             {
-                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                //                                    "setting of constant failed");
-                                //             }
-                                //         }
-                                //         else
-                                //         {
-                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                //                                "incorrect unsigned integer constant declaration");
-                                //         }
-                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
-                                //     }
-                                //     else if (type == GpuProgramParameters::ET_BOOL)
-                                //     {
-                                //         bool *vals = OGRE_ALLOC_T(bool, roundedCount, MEMCATEGORY_SCRIPTING);
-                                //         if (getBooleans(k, prop->values.end(), vals, roundedCount))
-                                //         {
-                                //             try
-                                //             {
-                                //                 if (named)
-                                //                     params->setNamedConstant(name, vals, count, 1);
-                                //                 else
-                                //                     params->setConstant(index, vals, roundedCount/4);
-                                //             }
-                                //             catch (...)
-                                //             {
-                                //                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                //                                    "setting of constant failed");
-                                //             }
-                                //         }
-                                //         else
-                                //         {
-                                //             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                //                                "incorrect boolean constant declaration");
-                                //         }
-                                //         OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
-                                //     }
-                                // }
                             }
                         }
                         else
@@ -4580,90 +4352,6 @@ namespace Ogre{
     }
 
     //-------------------------------------------------------------------------
-    namespace {
-        
-    template <class T> T parseParam(const Ogre::String& param, BaseConstantType baseType); // unimplemented
-    template <> int parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return StringConverter::parseInt(str); }
-    template <> uint parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return baseType == BCT_BOOL ? (uint)StringConverter::parseBool(str) : StringConverter::parseUnsignedInt(str); }
-    template <> float parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return (float)StringConverter::parseReal(str); }
-    template <> double parseParam<>(const Ogre::String& str, BaseConstantType baseType) { return (double)StringConverter::parseReal(str); }
-
-    template <class T>
-    void translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters* sharedParams, PropertyAbstractNode *prop, String pName, BaseConstantType baseType, GpuConstantType constType)
-    {
-        std::vector<T> values;
-
-        size_t arraySz = 1;
-
-        AbstractNodeList::const_iterator otherValsi = prop->values.begin();
-        std::advance(otherValsi, 2);
-
-        for (; otherValsi != prop->values.end(); ++otherValsi)
-        {
-            if((*otherValsi)->type != ANT_ATOM)
-                continue;
-
-            AtomAbstractNode *atom = (AtomAbstractNode*)(*otherValsi).get();
-
-            if (atom->value.at(0) == '[' && atom->value.at(atom->value.size() - 1) == ']')
-            {
-                String arrayStr = atom->value.substr(1, atom->value.size() - 2);
-                if(!StringConverter::isNumber(arrayStr))
-                {
-                    compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                       "invalid array size");
-                    continue;
-                }
-                arraySz = StringConverter::parseInt(arrayStr);
-            }
-            else if (baseType == BCT_FLOAT || baseType == BCT_INT || baseType == BCT_DOUBLE || baseType == BCT_UINT || baseType == BCT_BOOL)
-            {
-                values.push_back(parseParam<T>(atom->value, baseType));
-            }
-            else
-            {
-                // This should never be reached.
-                compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                   atom->value + " invalid - extra parameters to shared_param_named");
-                continue;
-            }
-
-        } // each extra param
-
-        // define constant entry
-        try
-        {
-            sharedParams->addConstantDefinition(pName, constType, arraySz);
-        }
-        catch(Exception& e)
-        {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                               e.getDescription());
-            // continue;
-            return;
-        }
-
-        // initial values
-        size_t elemsExpected = GpuConstantDefinition::getElementSize(constType, false) * arraySz;
-        // size_t elemsFound = isFloat ? mFloats.size() : mInts.size();
-        size_t elemsFound = values.size();
-        if (elemsFound)
-        {
-            if (elemsExpected != elemsFound)
-            {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                   "Wrong number of values supplied for parameter type");
-                // continue;
-                return;
-            }
-
-            sharedParams->setNamedConstant(pName, &values[0], elemsFound);
-        }
-    }
-        
-    }
-
-    //-------------------------------------------------------------------------
     void SharedParamsTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
         ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
@@ -4691,81 +4379,126 @@ namespace Ogre{
             return;
         }
 
-
         for (AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
-            if ((*i)->type == ANT_PROPERTY)
+            if ((*i)->type != ANT_PROPERTY)
+                continue;
+
+            PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+            if (prop->id != ID_SHARED_PARAM_NAMED)
+                continue;
+
+            if (prop->values.size() < 2)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
-                switch (prop->id)
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                   "shared_param_named - expected 2 or more arguments");
+                continue;
+            }
+
+            AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
+
+            String pName;
+            GpuConstantType constType;
+
+            if (!getValue(*i0, pName) || !getConstantType(i1, &constType))
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                   "name and parameter type expected");
+                continue;
+            }
+
+            AbstractNodeList::const_iterator arrayStart = getNodeAt(prop->values, 2), arrayEnd = prop->values.end();
+            size_t arraySz = 1;
+
+            if (arrayStart != arrayEnd)
+            {
+                String value;
+                getValue(*arrayStart, value);
+
+                if (value.front() == '[' && value.back() == ']')
                 {
-                case ID_SHARED_PARAM_NAMED:
+                    arraySz = StringConverter::parseInt(value.substr(1, value.size() - 2), 0);
+                    if(!arraySz)
                     {
-                        if (prop->values.size() < 2)
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "shared_param_named - expected 2 or more arguments");
-                            continue;
-                        }
-
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
-
-                        if ((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "name and parameter type expected");
-                            continue;
-                        }
-
-
-                        AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get();
-
-                        String pName = atom0->value;
-                        GpuConstantType constType = GCT_UNKNOWN;
-                        //size_t arraySz = 1;
-                        if (!getConstantType(i1, &constType))
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "invalid parameter type");
-                            continue;
-                        }
-
-                        // bool isFloat = GpuConstantDefinition::isFloat(constType);
-                        // bool isInt = GpuConstantDefinition::isInt(constType);
-                        // bool isDouble = GpuConstantDefinition::isDouble(constType);
-                        // bool isUInt = GpuConstantDefinition::isUnsignedInt(constType);
-                        // bool isBool = GpuConstantDefinition::isBool(constType);
-
-                        // FloatConstantList mFloats;
-                        // IntConstantList mInts;
-                        // DoubleConstantList mDoubles;
-                        // UnsignedIntConstantList mUInts;
-
-                        BaseConstantType baseType = GpuConstantDefinition::getBaseType(constType);
-
-                        switch (baseType)
-                        {
-                        case BCT_FLOAT:
-                            translateSharedParamNamed <float> (compiler, sharedParams, prop, pName, baseType, constType);
-                            break;
-                        case BCT_INT:
-                            translateSharedParamNamed <int> (compiler, sharedParams, prop, pName, baseType, constType);
-                            break;
-                        case BCT_DOUBLE:
-                            translateSharedParamNamed <double> (compiler, sharedParams, prop, pName, baseType, constType);
-                            break;
-                        case BCT_UINT:
-                        case BCT_BOOL:
-                            translateSharedParamNamed <uint> (compiler, sharedParams, prop, pName, baseType, constType);
-                            break;
-                        default:
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "invalid parameter type");
-                            break;
-                        }
+                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                           "invalid array size");
+                        continue;
                     }
-
+                    arrayStart++;
                 }
+            }
+
+            // define constant entry
+            try
+            {
+                sharedParams->addConstantDefinition(pName, constType, arraySz);
+            }
+            catch(Exception& e)
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                   e.getDescription());
+                continue;
+            }
+
+            // amount of individual numbers to read
+            arraySz *= GpuConstantDefinition::getElementSize(constType, false);
+
+            switch (GpuConstantDefinition::getBaseType(constType))
+            {
+            case BCT_FLOAT:
+            {
+                std::vector<float> values;
+                if(_getVector(arrayStart, arrayEnd, values, arraySz))
+                    sharedParams->setNamedConstant(pName, &values[0], arraySz);
+                else
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                break;
+            }
+            case BCT_INT:
+            {
+                std::vector<int> values;
+                if(_getVector(arrayStart, arrayEnd, values, arraySz))
+                    sharedParams->setNamedConstant(pName, &values[0], arraySz);
+                else
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                break;
+            }
+            case BCT_DOUBLE:
+            {
+                std::vector<double> values;
+                if(_getVector(arrayStart, arrayEnd, values, arraySz))
+                    sharedParams->setNamedConstant(pName, &values[0], arraySz);
+                else
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                break;
+            }
+            case BCT_UINT:
+            {
+                std::vector<uint> values;
+                if(_getVector(arrayStart, arrayEnd, values, arraySz))
+                {
+                    sharedParams->setNamedConstant(pName, &values[0], arraySz);
+                }
+                else
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                break;
+            }
+            case BCT_BOOL:
+            {
+                std::vector<bool> tmp;
+                if(_getVector(arrayStart, arrayEnd, tmp, arraySz))
+                {
+                    std::vector<uint> values(tmp.begin(), tmp.end());
+                    sharedParams->setNamedConstant(pName, &values[0], arraySz);
+                }
+                else
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                break;
+            }
+            default:
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                   "invalid parameter type");
+                break;
             }
         }
     }
