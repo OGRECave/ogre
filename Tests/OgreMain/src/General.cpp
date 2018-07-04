@@ -173,7 +173,7 @@ TEST(MaterialSerializer, Basic)
 
     // export to string
     MaterialSerializer ser;
-    ser.queueForExport(mat);
+    ser.queueForExport(mat, /* clearQueued = */ true, /* exportDefaults = */ true);
     auto str = ser.getQueuedAsString();
 
     // printf("%s\n", str.c_str());
