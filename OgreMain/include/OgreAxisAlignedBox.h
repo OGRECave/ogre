@@ -307,7 +307,7 @@ namespace Ogre {
 
             corners[0] = getCorner(FAR_LEFT_BOTTOM);
             corners[1] = getCorner(FAR_LEFT_TOP);
-            corners[2] = getCorner(FAR_LEFT_TOP);
+            corners[2] = getCorner(FAR_RIGHT_TOP);
             corners[3] = getCorner(FAR_RIGHT_BOTTOM);
 
             corners[4] = getCorner(NEAR_RIGHT_TOP);
