@@ -49,14 +49,14 @@ namespace Ogre {
 
     enum BaseConstantType
     {
-        BCT_FLOAT = 1,
-        BCT_INT = 2,
-        BCT_DOUBLE = 3,
-        BCT_UINT = 4,
-        BCT_BOOL = 5,
-        BCT_SAMPLER = 6,
-        BCT_SUBROUTINE = 7,
-        BCT_UNKNOWN = 99
+        BCT_FLOAT = 0,
+        BCT_INT = 0x10,
+        BCT_DOUBLE = 0x20,
+        BCT_UINT = 0x30,
+        BCT_BOOL = 0x40,
+        BCT_SAMPLER = 0x50,
+        BCT_SUBROUTINE = 0x60,
+        BCT_UNKNOWN = 0x70
     };
 
     /** Enumeration of the types of constant we may encounter in programs.
@@ -66,54 +66,54 @@ namespace Ogre {
     */
     enum GpuConstantType
     {
-        GCT_FLOAT1 = 1,
-        GCT_FLOAT2 = 2,
-        GCT_FLOAT3 = 3,
-        GCT_FLOAT4 = 4,
-        GCT_SAMPLER1D = 5,
-        GCT_SAMPLER2D = 6,
-        GCT_SAMPLER3D = 7,
-        GCT_SAMPLERCUBE = 8,
-        GCT_SAMPLERRECT = 9,
-        GCT_SAMPLER1DSHADOW = 10,
-        GCT_SAMPLER2DSHADOW = 11,
-        GCT_SAMPLER2DARRAY = 12,
-        GCT_MATRIX_2X2 = 13,
-        GCT_MATRIX_2X3 = 14,
-        GCT_MATRIX_2X4 = 15,
-        GCT_MATRIX_3X2 = 16,
-        GCT_MATRIX_3X3 = 17,
-        GCT_MATRIX_3X4 = 18,
-        GCT_MATRIX_4X2 = 19,
-        GCT_MATRIX_4X3 = 20,
-        GCT_MATRIX_4X4 = 21,
-        GCT_INT1 = 22,
-        GCT_INT2 = 23,
-        GCT_INT3 = 24,
-        GCT_INT4 = 25,
-        GCT_SUBROUTINE = 26,
-        GCT_DOUBLE1 = 27,
-        GCT_DOUBLE2 = 28,
-        GCT_DOUBLE3 = 29,
-        GCT_DOUBLE4 = 30,
-        GCT_MATRIX_DOUBLE_2X2 = 31,
-        GCT_MATRIX_DOUBLE_2X3 = 32,
-        GCT_MATRIX_DOUBLE_2X4 = 33,
-        GCT_MATRIX_DOUBLE_3X2 = 34,
-        GCT_MATRIX_DOUBLE_3X3 = 35,
-        GCT_MATRIX_DOUBLE_3X4 = 36,
-        GCT_MATRIX_DOUBLE_4X2 = 37,
-        GCT_MATRIX_DOUBLE_4X3 = 38,
-        GCT_MATRIX_DOUBLE_4X4 = 39,
-        GCT_UINT1 = 40,
-        GCT_UINT2 = 41,
-        GCT_UINT3 = 42,
-        GCT_UINT4 = 43,
-        GCT_BOOL1 = 44,
-        GCT_BOOL2 = 45,
-        GCT_BOOL3 = 46,
-        GCT_BOOL4 = 47,
-        GCT_UNKNOWN = 99
+        GCT_FLOAT1 = BCT_FLOAT + 1,
+        GCT_FLOAT2 = BCT_FLOAT + 2,
+        GCT_FLOAT3 = BCT_FLOAT + 3,
+        GCT_FLOAT4 = BCT_FLOAT + 4,
+        GCT_SAMPLER1D = BCT_SAMPLER + 1,
+        GCT_SAMPLER2D = BCT_SAMPLER + 2,
+        GCT_SAMPLER3D = BCT_SAMPLER + 3,
+        GCT_SAMPLERCUBE = BCT_SAMPLER + 4,
+        GCT_SAMPLERRECT = BCT_SAMPLER +5,
+        GCT_SAMPLER1DSHADOW = BCT_SAMPLER + 6,
+        GCT_SAMPLER2DSHADOW = BCT_SAMPLER + 7,
+        GCT_SAMPLER2DARRAY = BCT_SAMPLER + 8,
+        GCT_MATRIX_2X2 = BCT_FLOAT + 5,
+        GCT_MATRIX_2X3 = BCT_FLOAT + 6,
+        GCT_MATRIX_2X4 = BCT_FLOAT + 7,
+        GCT_MATRIX_3X2 = BCT_FLOAT + 8,
+        GCT_MATRIX_3X3 = BCT_FLOAT + 9,
+        GCT_MATRIX_3X4 = BCT_FLOAT + 10,
+        GCT_MATRIX_4X2 = BCT_FLOAT + 11,
+        GCT_MATRIX_4X3 = BCT_FLOAT + 12,
+        GCT_MATRIX_4X4 = BCT_FLOAT + 13,
+        GCT_INT1 = BCT_INT + 1,
+        GCT_INT2 = BCT_INT + 2,
+        GCT_INT3 = BCT_INT + 3,
+        GCT_INT4 = BCT_INT + 4,
+        GCT_SUBROUTINE = BCT_SUBROUTINE,
+        GCT_DOUBLE1 = BCT_DOUBLE + 1,
+        GCT_DOUBLE2 = BCT_DOUBLE + 2,
+        GCT_DOUBLE3 = BCT_DOUBLE + 3,
+        GCT_DOUBLE4 = BCT_DOUBLE + 4,
+        GCT_MATRIX_DOUBLE_2X2 = BCT_DOUBLE + 5,
+        GCT_MATRIX_DOUBLE_2X3 = BCT_DOUBLE + 6,
+        GCT_MATRIX_DOUBLE_2X4 = BCT_DOUBLE + 7,
+        GCT_MATRIX_DOUBLE_3X2 = BCT_DOUBLE + 8,
+        GCT_MATRIX_DOUBLE_3X3 = BCT_DOUBLE + 9,
+        GCT_MATRIX_DOUBLE_3X4 = BCT_DOUBLE + 10,
+        GCT_MATRIX_DOUBLE_4X2 = BCT_DOUBLE + 11,
+        GCT_MATRIX_DOUBLE_4X3 = BCT_DOUBLE + 12,
+        GCT_MATRIX_DOUBLE_4X4 = BCT_DOUBLE + 13,
+        GCT_UINT1 = BCT_UINT + 1,
+        GCT_UINT2 = BCT_UINT + 2,
+        GCT_UINT3 = BCT_UINT + 3,
+        GCT_UINT4 = BCT_UINT + 4,
+        GCT_BOOL1 = BCT_BOOL + 1,
+        GCT_BOOL2 = BCT_BOOL + 2,
+        GCT_BOOL3 = BCT_BOOL + 3,
+        GCT_BOOL4 = BCT_BOOL + 4,
+        GCT_UNKNOWN = BCT_UNKNOWN
     };
 
     /** The variability of a GPU parameter, as derived from auto-params targeting it.
@@ -161,173 +161,33 @@ namespace Ogre {
         // Binding goes in logicalIndex, but where does offset go?
         //size_t offset;
 
-        bool isFloat() const
-        {
-            return isFloat(constType);
-        }
+        bool isFloat() const { return isFloat(constType); }
+        static bool isFloat(GpuConstantType c) { return getBaseType(c) == BCT_FLOAT; }
 
-        static bool isFloat(GpuConstantType c)
-        {
-            switch(c)
-            {
-            case GCT_FLOAT1:
-            case GCT_FLOAT2:
-            case GCT_FLOAT3:
-            case GCT_FLOAT4:
-            case GCT_MATRIX_2X2:
-            case GCT_MATRIX_2X3:
-            case GCT_MATRIX_2X4:
-            case GCT_MATRIX_3X2:
-            case GCT_MATRIX_3X3:
-            case GCT_MATRIX_3X4:
-            case GCT_MATRIX_4X2:
-            case GCT_MATRIX_4X3:
-            case GCT_MATRIX_4X4:
-                return true;
-            default:
-                return false;
-            };
-        }
+        bool isDouble() const { return isDouble(constType); }
+        static bool isDouble(GpuConstantType c) { return getBaseType(c) == BCT_DOUBLE; }
 
-        bool isDouble() const
-        {
-            return isDouble(constType);
-        }
+        bool isInt() const { return isInt(constType); }
+        static bool isInt(GpuConstantType c) { return getBaseType(c) == BCT_INT; }
 
-        static bool isDouble(GpuConstantType c)
-        {
-            switch(c)
-            {
-            case GCT_DOUBLE1:
-            case GCT_DOUBLE2:
-            case GCT_DOUBLE3:
-            case GCT_DOUBLE4:
-            case GCT_MATRIX_DOUBLE_2X2:
-            case GCT_MATRIX_DOUBLE_2X3:
-            case GCT_MATRIX_DOUBLE_2X4:
-            case GCT_MATRIX_DOUBLE_3X2:
-            case GCT_MATRIX_DOUBLE_3X3:
-            case GCT_MATRIX_DOUBLE_3X4:
-            case GCT_MATRIX_DOUBLE_4X2:
-            case GCT_MATRIX_DOUBLE_4X3:
-            case GCT_MATRIX_DOUBLE_4X4:
-                return true;
-            default:
-                return false;
-            };
-        }
+        bool isUnsignedInt() const { return isUnsignedInt(constType); }
+        static bool isUnsignedInt(GpuConstantType c) { return getBaseType(c) == BCT_UINT; }
 
-        bool isInt() const
-        {
-            return isInt(constType);
-        }
+        bool isBool() const { return isBool(constType); }
+        static bool isBool(GpuConstantType c) { return getBaseType(c) == BCT_BOOL; }
 
-        static bool isInt(GpuConstantType c)
-        {
-            switch(c)
-            {
-            case GCT_INT1:
-            case GCT_INT2:
-            case GCT_INT3:
-            case GCT_INT4:
-                return true;
-            default:
-                return false;
-            };
-        }
+        bool isSampler() const { return isSampler(constType); }
+        static bool isSampler(GpuConstantType c) { return getBaseType(c) == BCT_SAMPLER; }
 
-        bool isUnsignedInt() const
-        {
-            return isUnsignedInt(constType);
-        }
-
-        static bool isUnsignedInt(GpuConstantType c)
-        {
-            switch(c)
-            {
-            case GCT_UINT1:
-            case GCT_UINT2:
-            case GCT_UINT3:
-            case GCT_UINT4:
-                return true;
-            default:
-                return false;
-            };
-        }
-
-        bool isBool() const
-        {
-            return isBool(constType);
-        }
-
-        static bool isBool(GpuConstantType c)
-        {
-            switch(c)
-            {
-            case GCT_BOOL1:
-            case GCT_BOOL2:
-            case GCT_BOOL3:
-            case GCT_BOOL4:
-                return true;
-            default:
-                return false;
-            };
-        }
-
-        bool isSampler() const
-        {
-            return isSampler(constType);
-        }
-
-        static bool isSampler(GpuConstantType c)
-        {
-            switch(c)
-            {
-            case GCT_SAMPLER1D:
-            case GCT_SAMPLER2D:
-            case GCT_SAMPLER2DARRAY:
-            case GCT_SAMPLER3D:
-            case GCT_SAMPLERCUBE:
-            case GCT_SAMPLER1DSHADOW:
-            case GCT_SAMPLER2DSHADOW:
-                return true;
-            default:
-                return false;
-            };
-
-        }
-
-        bool isSubroutine() const
-        {
-            return isSubroutine(constType);
-        }
-
-        static bool isSubroutine(GpuConstantType c)
-        {
-            return c == GCT_SUBROUTINE;
-        }
+        bool isSubroutine() const { return isSubroutine(constType); }
+        static bool isSubroutine(GpuConstantType c) { return getBaseType(c) == BCT_SUBROUTINE; }
 
         static BaseConstantType getBaseType(GpuConstantType ctype)
         {
-            if (isFloat(ctype))
-                return BCT_FLOAT;
-            else if (isDouble(ctype))
-                return BCT_DOUBLE;
-            else if (isInt(ctype))
-                return BCT_INT;
-            else if (isUnsignedInt(ctype))
-                return BCT_UINT;
-            else if (isBool(ctype))
-                return BCT_BOOL;
-            else if (isSampler(ctype))
-                return BCT_SAMPLER;
-            else if (isSubroutine(ctype))
-                return BCT_SUBROUTINE;
-            else
-                return BCT_UNKNOWN;
+            return BaseConstantType(ctype / 0x10 * 0x10);
         }
 
-        /** Get the element size of a given type, including whether to pad the
+        /** Get the number of elements of a given type, including whether to pad the
             elements into multiples of 4 (e.g. SM1 and D3D does, GLSL doesn't)
         */
         static size_t getElementSize(GpuConstantType ctype, bool padToMultiplesOf4)
@@ -395,11 +255,6 @@ namespace Ogre {
             {
                 switch(ctype)
                 {
-                case GCT_INT1:
-                case GCT_FLOAT1:
-                case GCT_DOUBLE1:
-                case GCT_UINT1:
-                case GCT_BOOL1:
                 case GCT_SAMPLER1D:
                 case GCT_SAMPLER2D:
                 case GCT_SAMPLER2DARRAY:
@@ -408,24 +263,6 @@ namespace Ogre {
                 case GCT_SAMPLER1DSHADOW:
                 case GCT_SAMPLER2DSHADOW:
                     return 1;
-                case GCT_FLOAT2:
-                case GCT_INT2:
-                case GCT_DOUBLE2:
-                case GCT_UINT2:
-                case GCT_BOOL2:
-                    return 2;
-                case GCT_FLOAT3:
-                case GCT_INT3:
-                case GCT_DOUBLE3:
-                case GCT_UINT3:
-                case GCT_BOOL3:
-                    return 3;
-                case GCT_FLOAT4:
-                case GCT_INT4:
-                case GCT_DOUBLE4:
-                case GCT_UINT4:
-                case GCT_BOOL4:
-                    return 4;
                 case GCT_MATRIX_2X2:
                 case GCT_MATRIX_DOUBLE_2X2:
                     return 4;
@@ -451,7 +288,7 @@ namespace Ogre {
                 case GCT_MATRIX_DOUBLE_4X4:
                     return 16;
                 default:
-                    return 4;
+                    return ctype % 0x10;
                 };
 
             }
