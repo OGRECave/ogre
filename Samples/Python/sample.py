@@ -39,7 +39,8 @@ def main():
     rgm.addResourceLocation(arch + "/GLSL", "FileSystem", "General")
 
     if not root.restoreConfig():
-        root.showConfigDialog(Ogre.ConfigDialog())
+        root.showConfigDialog(None)
+        root.saveConfig()
 
     win = root.initialise(True)
 
@@ -78,8 +79,9 @@ def main():
     ent = scn_mgr.createEntity("Sinbad.mesh")
     node = scn_mgr.getRootSceneNode().createChildSceneNode()
     node.attachObject(ent)
-
-    root.startRendering()
+    
+    while not root.endRenderingQueued():
+        root.renderOneFrame()
 
 if __name__ == "__main__":
     main()
