@@ -79,7 +79,12 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
         ent = scn_mgr.createEntity("Sinbad.mesh")
         node = scn_mgr.getRootSceneNode().createChildSceneNode()
         node.attachObject(ent)
-
+    
+    def shutdown(self):
+        # manually destroy in reverse creation order
+        del app.ctrls
+        del app.trays
+    
 if __name__ == "__main__":
     app = SampleApp()
     app.initApp()
