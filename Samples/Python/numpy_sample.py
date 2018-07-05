@@ -64,7 +64,5 @@ def main():
     pyplot.imsave("screenshot.png", OgreNumpy.view(pb))
     ## [zero_copy_view]
 
-    app.closeApp()
-
 if __name__ == "__main__":
     main()
