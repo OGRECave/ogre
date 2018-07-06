@@ -13,6 +13,8 @@ else()
 endif()
 
 if(NOT JNI_FOUND OR NOT SWIG_FOUND)
+	set(OGRE_BUILD_COMPONENT_JAVA OFF CACHE BOOL "" FORCE)
+	message(WARNING "Java Component disabled because SWIG or Java was not found")
     return()
 endif()
 
