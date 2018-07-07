@@ -91,9 +91,9 @@ This method is tedious for materials that only have slight variations to their p
 ```cpp
 material test2 : test1
 {
-  technique 0
+  technique
   {
-    pass 4
+    pass "Fifth Pass"
     {
       ambient 0.5 0.7 0.3 1.0
     }
@@ -101,7 +101,7 @@ material test2 : test1
 }
 ```
 
-The parent pass name must be known and the pass must be in the correct technique in order for this to work correctly. Specifying the technique name and the pass name is the best method. If the parent technique/pass are not named then use their index values for their name as done in the example.
+The parent pass name must be known and the pass must be in the correct technique in order for this to work correctly. Specifying the technique name and the pass name is the best method.
 
 ### Advanced Script Inheritance {#Advanced-Script-Inheritance}
 
