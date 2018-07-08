@@ -183,9 +183,6 @@ namespace Ogre {
         mPointAttenuationCoeffs[0] = 1.0f;
         mPointAttenuationCoeffs[1] = mPointAttenuationCoeffs[2] = 0.0f;
 
-        // default name to index
-        mName = StringConverter::toString(mIndex);
-
         // init the hash inline
         _recalculateHash();
    }

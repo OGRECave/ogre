@@ -745,7 +745,7 @@ namespace Ogre
             }
 
             // Now make matches based on index
-            // Loop through destination children searching for name-matching overrides
+            // Loop through destination children searching for index-matching overrides
             for(AbstractNodeList::iterator i = dest.children.begin(); i != dest.children.end(); ++i)
             {
                 if((*i)->type == ANT_OBJECT)
@@ -762,7 +762,7 @@ namespace Ogre
                             for(size_t j = overrideIndex; j < overrides.size(); ++j)
                             {
                                 ObjectAbstractNode *temp = static_cast<ObjectAbstractNode*>(overrides[j].first.get());
-                                if(temp->name.empty() && temp->cls == node->cls && overrides[j].second == dest.children.end())
+                                if(temp->name.empty() && node->name.empty() && temp->cls == node->cls && overrides[j].second == dest.children.end())
                                 {
                                     overrides[j] = std::make_pair(overrides[j].first, i);
                                     break;
