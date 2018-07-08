@@ -699,13 +699,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real BillboardChain::getSquaredViewDepth(const Camera* cam) const
     {
-        Vector3 min, max, mid, dist;
-        min = mAABB.getMinimum();
-        max = mAABB.getMaximum();
-        mid = ((max - min) * 0.5) + min;
-        dist = cam->getDerivedPosition() - mid;
-
-        return dist.squaredLength();
+        return (cam->getDerivedPosition() - mAABB.getCenter()).squaredLength();
     }
     //-----------------------------------------------------------------------
     Real BillboardChain::getBoundingRadius(void) const
