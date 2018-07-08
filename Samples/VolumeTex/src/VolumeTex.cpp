@@ -25,7 +25,6 @@ same license as the rest of the engine.
 #include "Julia.h"
 
 namespace {
-TexturePtr ptex;
 SimpleRenderable *vrend;
 SimpleRenderable *trend;
 SceneNode *snode,*fnode;

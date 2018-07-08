@@ -52,6 +52,7 @@ public:
 
 protected:
 
+    TexturePtr ptex;
     float global_real, global_imag, global_theta;
 
     void setupView(void)
