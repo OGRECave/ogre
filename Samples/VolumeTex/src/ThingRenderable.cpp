@@ -168,13 +168,6 @@ Ogre::Real ThingRenderable::getBoundingRadius() const
 }
 Ogre::Real ThingRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
 {
-    Ogre::Vector3 min, max, mid, dist;
-
-    min = mBox.getMinimum();
-    max = mBox.getMaximum();
-    mid = ((min - max) * 0.5) + min;
-    dist = cam->getDerivedPosition() - mid;
-                                                                        
-    return dist.squaredLength();
+    return (cam->getDerivedPosition() - mBox.getCenter()).squaredLength();
 }
 
