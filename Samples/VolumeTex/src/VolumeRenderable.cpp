@@ -76,10 +76,13 @@ void VolumeRenderable::_notifyCurrentCamera( Camera* cam )
     rotMat = tempMat;
     rotMat.setTrans(Vector3(0.5f, 0.5f, 0.5f));
 
-    // RTSS creates and switches to a second technique
-    Pass* pass = mMaterial->getTechniques().size() == 1 ? mMaterial->getTechnique(0)->getPass(0)
-                                                        : mMaterial->getBestTechnique()->getPass(0);
-    pass->getTextureUnitState(0)->setTextureTransform(rotMat);
+    Technique* tech = mMaterial->getBestTechnique();
+
+    // set the texture transform anyway, so the RTSS picks it up when it runs
+    if(!tech)
+        tech = mMaterial->getTechniques().front();
+
+    tech->getPass(0)->getTextureUnitState(0)->setTextureTransform(rotMat);
 }
 
 
