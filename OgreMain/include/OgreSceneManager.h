@@ -48,6 +48,7 @@ Torus Knot Software Ltd.
 #include "OgreRenderSystem.h"
 #include "OgreLodListener.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreManualObject.h"
 #include "OgreNameGenerator.h"
 
 namespace Ogre {
