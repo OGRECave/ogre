@@ -1051,6 +1051,7 @@ namespace Ogre
         mIds["exp"] = ID_EXP;
         mIds["exp2"] = ID_EXP2;
         mIds["colour_write"] = ID_COLOUR_WRITE;
+        mIds["colour_mask"] = ID_COLOUR_MASK;
         mIds["max_lights"] = ID_MAX_LIGHTS;
         mIds["start_light"] = ID_START_LIGHT;
         mIds["iteration"] = ID_ITERATION;

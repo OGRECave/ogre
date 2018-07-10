@@ -153,6 +153,7 @@ namespace Ogre {
         , mPointSpritesEnabled(false)
         , mPointAttenuationEnabled(false)
         , mContentTypeLookupBuilt(false)
+        , mColourMask{true, true, true, true}
         , mAlphaRejectVal(0)
         , mDepthFunc(CMPF_LESS_EQUAL)
         , mDepthBiasConstant(0.0f)
@@ -239,6 +240,7 @@ namespace Ogre {
         mTransparentSorting = oth.mTransparentSorting;
         mTransparentSortingForced = oth.mTransparentSortingForced;
         mColourWrite = oth.mColourWrite;
+        std::copy(std::begin(oth.mColourMask), std::end(oth.mColourMask), std::begin(mColourMask));
         mDepthFunc = oth.mDepthFunc;
         mDepthBiasConstant = oth.mDepthBiasConstant;
         mDepthBiasSlopeScale = oth.mDepthBiasSlopeScale;
@@ -912,6 +914,19 @@ namespace Ogre {
     bool Pass::getColourWriteEnabled(void) const
     {
         return mColourWrite;
+    }
+    //-----------------------------------------------------------------------
+    void Pass::setColourMask(bool red, bool green, bool blue, bool alpha)
+    {
+        mColourMask[0] = red;
+        mColourMask[1] = green;
+        mColourMask[2] = blue;
+        mColourMask[3] = alpha;
+    }
+    //-----------------------------------------------------------------------
+    const bool* Pass::getColourMask() const
+    {
+        return mColourMask;
     }
     //-----------------------------------------------------------------------
     void Pass::setCullingMode( CullingMode mode)
