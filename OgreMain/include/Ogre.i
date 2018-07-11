@@ -342,6 +342,7 @@ SHARED_PTR(Skeleton);
 %ignore Ogre::Skeleton::getRootBone;
 %ignore Ogre::Skeleton::getRootBoneIterator;
 %ignore Ogre::Skeleton::getBoneIterator;
+%template(BoneList) std::vector<Ogre::Bone*>;
 %include "OgreSkeleton.h"
     SHARED_PTR(SkeletonInstance);
     %include "OgreSkeletonInstance.h"
@@ -471,6 +472,9 @@ SHARED_PTR(Mesh);
     %include "OgreRenderWindow.h"
     %include "OgreRenderTexture.h"
 %include "OgreViewport.h"
+%ignore Ogre::CompositorChain::getNumCompositors;
+%ignore Ogre::CompositorChain::getCompositor;
+%ignore Ogre::CompositorChain::getCompositors;
 %include "OgreCompositorChain.h"
 %include "OgreShadowTextureManager.h"
 %include "OgreRenderQueueSortingGrouping.h"
