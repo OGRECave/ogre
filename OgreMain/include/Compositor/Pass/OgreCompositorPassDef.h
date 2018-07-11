@@ -168,7 +168,7 @@ namespace Ogre
             mVpScissorLeft( 0 ), mVpScissorTop( 0 ),
             mVpScissorWidth( 1 ), mVpScissorHeight( 1 ),
             mShadowMapIdx( -1 ),
-            mNumInitialPasses( -1 ), mIdentifier( 0 ),
+            mNumInitialPasses( ~0 ), mIdentifier( 0 ),
             mBeginRtUpdate( true ), mEndRtUpdate( true ),
             mColourWrite( true ),
             mReadOnlyDepth( false ),

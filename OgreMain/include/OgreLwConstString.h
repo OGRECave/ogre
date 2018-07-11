@@ -109,7 +109,7 @@ namespace Ogre
         {
             pos = std::min( pos, mSize );
             const char *result = strstr( mStrPtr + pos, val );
-            return result ? result - mStrPtr : (size_t)(-1);
+            return result ? result - mStrPtr : (size_t)(~0);
         }
 
         size_t find( const LwConstString *val, size_t pos = 0 ) const
@@ -121,19 +121,19 @@ namespace Ogre
         {
             pos = std::min( pos, mSize );
             const char *result = strchr( mStrPtr + pos, c );
-            return result ? result - mStrPtr : (size_t)(-1);
+            return result ? result - mStrPtr : (size_t)(~0);
         }
 
         size_t find_first_of( const char *val, size_t pos = 0 ) const
         {
             pos = std::min( pos, mSize );
             const char *result = strpbrk( mStrPtr + pos, val );
-            return result ? result - mStrPtr : (size_t)(-1);
+            return result ? result - mStrPtr : (size_t)(~0);
         }
 
-        size_t find_last_of( char c, size_t pos = -1 ) const
+        size_t find_last_of( char c, size_t pos = ~0 ) const
         {
-            size_t retVal = -1;
+            size_t retVal = ~0;
 
             size_t curr = 0;
             const char *s = mStrPtr;

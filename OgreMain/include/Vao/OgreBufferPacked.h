@@ -101,7 +101,7 @@ namespace Ogre
     };
 
     /** Helper class to that will free the pointer on the destructor. Usage:
-            SafeDelete dataPtrContainer( data );
+            FreeOnDestructor dataPtrContainer( data );
             vaoManager->createVertexBuffer( vertexElements, vertexCount,
                                             mVertexBufferDefaultType,
                                             data, keepAsShadow );
@@ -124,6 +124,11 @@ namespace Ogre
             if( ptr )
                 OGRE_FREE_SIMD( ptr, MEMCATEGORY_GEOMETRY );
         }
+
+    private:
+		//Prevent being able to copy this object
+        FreeOnDestructor(const FreeOnDestructor&);
+        FreeOnDestructor& operator=(const FreeOnDestructor&);
     };
 
     class _OgreExport BufferPacked : public GpuResource, public BufferPackedAlloc
@@ -139,8 +144,8 @@ namespace Ogre
         size_t mInternalBufferStart;  /// In elements
         size_t mFinalBufferStart;     /// In elements, includes dynamic buffer frame offset
         size_t mNumElements;
-        uint32 mBytesPerElement;
-        uint32 mNumElementsPadding;
+        size_t mBytesPerElement;
+        size_t mNumElementsPadding;
 
         BufferType      mBufferType;
         VaoManager      *mVaoManager;
@@ -275,15 +280,15 @@ namespace Ogre
         /// differs from getMappingState's behavior.
         bool isCurrentlyMapped(void) const;
 
-        uint32 getNumElements(void) const       { return mNumElements; }
-        uint32 getBytesPerElement(void) const   { return mBytesPerElement; }
-        uint32 getTotalSizeBytes(void) const    { return mNumElements * mBytesPerElement; }
+        size_t getNumElements(void) const       { return mNumElements; }
+        size_t getBytesPerElement(void) const   { return mBytesPerElement; }
+        size_t getTotalSizeBytes(void) const    { return mNumElements * mBytesPerElement; }
 
         size_t _getInternalBufferStart(void) const              { return mInternalBufferStart; }
         size_t _getFinalBufferStart(void) const                 { return mFinalBufferStart; }
-        uint32 _getInternalTotalSizeBytes(void) const   { return (mNumElements + mNumElementsPadding) *
+        size_t _getInternalTotalSizeBytes(void) const   { return (mNumElements + mNumElementsPadding) *
                                                                  mBytesPerElement; }
-        uint32 _getInternalNumElements(void) const      { return mNumElements + mNumElementsPadding; }
+        size_t _getInternalNumElements(void) const      { return mNumElements + mNumElementsPadding; }
 
         const void* getShadowCopy(void) const   { return mShadowCopy; }
 
