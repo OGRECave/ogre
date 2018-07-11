@@ -261,6 +261,7 @@ Here are the attributes you can use in a ’pass’ section of a .material scrip
 -   [polygon\_mode\_overrideable](#polygon_005fmode_005foverrideable)
 -   [fog\_override](#fog_005foverride)
 -   [colour\_write](#colour_005fwrite)
+-   [colour\_mask](#colour_005fmask)
 -   [max\_lights](#max_005flights)
 -   [start\_light](#start_005flight)
 -   [iteration](#iteration)
@@ -703,6 +704,18 @@ Format: colour\_write &lt;on|off&gt;
 
 @par
 Default: colour\_write on<br>
+
+<a name="colour_005fmask"></a><a name="colour_005fmask-1"></a>
+
+## colour\_mask
+
+Sets whether a colour channel will be written to by this pass.<br>
+
+Format: colour\_mask &lt;on|off&gt; &lt;on|off&gt; &lt;on|off&gt; &lt;on|off&gt;
+
+The first parameter is for the red channel, the second one for the green channel, the third for the blue channel and the last one for the alpha channel.
+
+Default: colour\_mask on on on on<br>
 
 <a name="start_005flight"></a><a name="start_005flight-1"></a>
 
