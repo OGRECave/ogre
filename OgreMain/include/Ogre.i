@@ -315,11 +315,13 @@ SHARED_PTR(HardwareUniformBuffer);
 %ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool, Resource*) const;
 %ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool) const;
 %include "OgreResourceGroupManager.h"
-// overloaded by specfic managers (GpuProgram, Texture)
+#if SWIG_VERSION < 0x030012
+// conflicts with overloaded versions (GpuProgram, Texture)
 %ignore Ogre::ResourceManager::getResourceByName;
 %ignore Ogre::ResourceManager::createOrRetrieve;
 %ignore Ogre::ResourceManager::prepare;
 %ignore Ogre::ResourceManager::load;
+#endif
 %include "OgreResourceManager.h"
     %include "OgreTextureManager.h"
     %include "OgreGpuProgramManager.h"
