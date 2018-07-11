@@ -126,7 +126,7 @@ namespace Ogre
         }
 
     private:
-		//Prevent being able to copy this object
+        //Prevent being able to copy this object
         FreeOnDestructor(const FreeOnDestructor&);
         FreeOnDestructor& operator=(const FreeOnDestructor&);
     };
