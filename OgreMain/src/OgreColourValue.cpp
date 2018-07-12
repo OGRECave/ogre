@@ -165,13 +165,11 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-    void ColourValue::setAsABGR(const ABGR val)
+    void ColourValue::setAsABGR(ABGR val32)
 #else
-    void ColourValue::setAsRGBA(const RGBA val)
+    void ColourValue::setAsRGBA(RGBA val32)
 #endif
     {
-        uint32 val32 = val;
-
         // Convert from 32bit pattern
         // (RGBA = 8888)
 
@@ -189,13 +187,11 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-    void ColourValue::setAsBGRA(const BGRA val)
+    void ColourValue::setAsBGRA(BGRA val32)
 #else
-    void ColourValue::setAsARGB(const ARGB val)
+    void ColourValue::setAsARGB(ARGB val32)
 #endif
     {
-        uint32 val32 = val;
-
         // Convert from 32bit pattern
         // (ARGB = 8888)
 
@@ -213,13 +209,11 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-    void ColourValue::setAsARGB(const ARGB val)
+    void ColourValue::setAsARGB(ARGB val32)
 #else
-    void ColourValue::setAsBGRA(const BGRA val)
+    void ColourValue::setAsBGRA(BGRA val32)
 #endif
     {
-        uint32 val32 = val;
-
         // Convert from 32bit pattern
         // (ARGB = 8888)
 
@@ -237,13 +231,11 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-    void ColourValue::setAsRGBA(const RGBA val)
+    void ColourValue::setAsRGBA(RGBA val32)
 #else
-    void ColourValue::setAsABGR(const ABGR val)
+    void ColourValue::setAsABGR(ABGR val32)
 #endif
     {
-        uint32 val32 = val;
-
         // Convert from 32bit pattern
         // (ABGR = 8888)
 
@@ -360,41 +352,41 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void ColourValue::getHSB(float* hue, float* saturation, float* brightness) const
+    void ColourValue::getHSB(float& hue, float& saturation, float& brightness) const
     {
 
         float vMin = std::min(r, std::min(g, b));
         float vMax = std::max(r, std::max(g, b));
         float delta = vMax - vMin;
 
-        *brightness = vMax;
+        brightness = vMax;
 
         if (Math::RealEqual(delta, 0.0f, 1e-6))
         {
             // grey
-            *hue = 0;
-            *saturation = 0;
+            hue = 0;
+            saturation = 0;
         }
         else                                    
         {
             // a colour
-            *saturation = delta / vMax;
+            saturation = delta / vMax;
 
             float deltaR = (((vMax - r) / 6.0f) + (delta / 2.0f)) / delta;
             float deltaG = (((vMax - g) / 6.0f) + (delta / 2.0f)) / delta;
             float deltaB = (((vMax - b) / 6.0f) + (delta / 2.0f)) / delta;
 
             if (Math::RealEqual(r, vMax))
-                *hue = deltaB - deltaG;
+                hue = deltaB - deltaG;
             else if (Math::RealEqual(g, vMax))
-                *hue = 0.3333333f + deltaR - deltaB;
+                hue = 0.3333333f + deltaR - deltaB;
             else if (Math::RealEqual(b, vMax)) 
-                *hue = 0.6666667f + deltaG - deltaR;
+                hue = 0.6666667f + deltaG - deltaR;
 
-            if (*hue < 0.0f) 
-                *hue += 1.0f;
-            if (*hue > 1.0f)
-                *hue -= 1.0f;
+            if (hue < 0.0f)
+                hue += 1.0f;
+            if (hue > 1.0f)
+                hue -= 1.0f;
         }
 
         

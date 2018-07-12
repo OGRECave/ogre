@@ -92,19 +92,19 @@ namespace Ogre {
 
         /** Sets colour as RGBA.
         */
-        void setAsRGBA(const RGBA val);
+        void setAsRGBA(RGBA val);
 
         /** Sets colour as ARGB.
         */
-        void setAsARGB(const ARGB val);
+        void setAsARGB(ARGB val);
 
         /** Sets colour as BGRA.
         */
-        void setAsBGRA(const BGRA val);
+        void setAsBGRA(BGRA val);
 
         /** Sets colour as ABGR.
         */
-        void setAsABGR(const ABGR val);
+        void setAsABGR(ABGR val);
 
         /** Clamps colour value to the range [0, 1].
         */
@@ -141,7 +141,7 @@ namespace Ogre {
         }
 
         /// Array accessor operator
-        inline float operator [] ( const size_t i ) const
+        float operator [] ( const size_t i ) const
         {
             assert( i < 4 );
 
@@ -149,7 +149,7 @@ namespace Ogre {
         }
 
         /// Array accessor operator
-        inline float& operator [] ( const size_t i )
+        float& operator [] ( const size_t i )
         {
             assert( i < 4 );
 
@@ -157,19 +157,19 @@ namespace Ogre {
         }
 
         /// Pointer accessor for direct copying
-        inline float* ptr()
+        float* ptr()
         {
             return &r;
         }
         /// Pointer accessor for direct copying
-        inline const float* ptr() const
+        const float* ptr() const
         {
             return &r;
         }
 
         
         // arithmetic operations
-        inline ColourValue operator + ( const ColourValue& rkVector ) const
+        ColourValue operator + ( const ColourValue& rkVector ) const
         {
             ColourValue kSum;
 
@@ -181,7 +181,7 @@ namespace Ogre {
             return kSum;
         }
 
-        inline ColourValue operator - ( const ColourValue& rkVector ) const
+        ColourValue operator - ( const ColourValue& rkVector ) const
         {
             ColourValue kDiff;
 
@@ -193,7 +193,7 @@ namespace Ogre {
             return kDiff;
         }
 
-        inline ColourValue operator * (const float fScalar ) const
+        ColourValue operator * (const float fScalar ) const
         {
             ColourValue kProd;
 
@@ -205,7 +205,7 @@ namespace Ogre {
             return kProd;
         }
 
-        inline ColourValue operator * ( const ColourValue& rhs) const
+        ColourValue operator * ( const ColourValue& rhs) const
         {
             ColourValue kProd;
 
@@ -217,7 +217,7 @@ namespace Ogre {
             return kProd;
         }
 
-        inline ColourValue operator / ( const ColourValue& rhs) const
+        ColourValue operator / ( const ColourValue& rhs) const
         {
             ColourValue kProd;
 
@@ -229,7 +229,7 @@ namespace Ogre {
             return kProd;
         }
 
-        inline ColourValue operator / (const float fScalar ) const
+        ColourValue operator / (const float fScalar ) const
         {
             assert( fScalar != 0.0 );
 
@@ -244,7 +244,7 @@ namespace Ogre {
             return kDiv;
         }
 
-        inline friend ColourValue operator * (const float fScalar, const ColourValue& rkVector )
+        friend ColourValue operator * (const float fScalar, const ColourValue& rkVector )
         {
             ColourValue kProd;
 
@@ -257,7 +257,7 @@ namespace Ogre {
         }
 
         // arithmetic updates
-        inline ColourValue& operator += ( const ColourValue& rkVector )
+        ColourValue& operator += ( const ColourValue& rkVector )
         {
             r += rkVector.r;
             g += rkVector.g;
@@ -267,7 +267,7 @@ namespace Ogre {
             return *this;
         }
 
-        inline ColourValue& operator -= ( const ColourValue& rkVector )
+        ColourValue& operator -= ( const ColourValue& rkVector )
         {
             r -= rkVector.r;
             g -= rkVector.g;
@@ -277,7 +277,7 @@ namespace Ogre {
             return *this;
         }
 
-        inline ColourValue& operator *= (const float fScalar )
+        ColourValue& operator *= (const float fScalar )
         {
             r *= fScalar;
             g *= fScalar;
@@ -286,7 +286,7 @@ namespace Ogre {
             return *this;
         }
 
-        inline ColourValue& operator /= (const float fScalar )
+        ColourValue& operator /= (const float fScalar )
         {
             assert( fScalar != 0.0 );
 
@@ -312,9 +312,13 @@ namespace Ogre {
         @param saturation Output saturation level, [0,1]
         @param brightness Output brightness level, [0,1]
         */
-        void getHSB(float* hue, float* saturation, float* brightness) const;
+        void getHSB(float& hue, float& saturation, float& brightness) const;
 
-
+        /// @deprecated
+        OGRE_DEPRECATED void getHSB(float* hue, float* saturation, float* brightness) const
+        {
+            getHSB(*hue, *saturation, *brightness);
+        }
 
         /** Function for writing to a stream.
         */
