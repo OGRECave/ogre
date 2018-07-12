@@ -209,6 +209,11 @@ namespace Ogre
             m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
             m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
         }
+        
+        inline Matrix4 (const Real* arr)
+        {
+            memcpy(m,arr,16*sizeof(Real));
+        }
 
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling 3x3 matrix.
          */
