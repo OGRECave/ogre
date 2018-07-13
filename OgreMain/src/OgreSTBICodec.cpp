@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreSTBICodec.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
+#include "OgreDataStream.h"
 
 #if __OGRE_HAVE_NEON
 #define STBI_NEON
