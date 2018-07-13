@@ -133,7 +133,7 @@ namespace Ogre
 
         size_t find_last_of( char c, size_t pos = ~0 ) const
         {
-            size_t retVal = ~0;
+            size_t retVal = size_t(~0);
 
             size_t curr = 0;
             const char *s = mStrPtr;

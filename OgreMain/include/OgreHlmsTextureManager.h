@@ -184,7 +184,7 @@ namespace Ogre
             uint16          entryIdx;
 
             TextureEntry( IdString _name ) :
-                name( _name ), mapType( NUM_TEXTURE_TYPES ), arrayIdx( ~0 ), entryIdx( ~0 ) {}
+                name( _name ), mapType( NUM_TEXTURE_TYPES ), arrayIdx( uint16(~0) ), entryIdx( uint16(~0) ) {}
 
             TextureEntry( IdString _name, TextureMapType _mapType, uint16 _arrayIdx, uint16 _entryIdx ) :
                 name( _name ), mapType( _mapType ), arrayIdx( _arrayIdx ), entryIdx( _entryIdx ) {}
