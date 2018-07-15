@@ -279,6 +279,7 @@ namespace Ogre
                 mBoneWorldMatrices  = static_cast<Affine3*>(OGRE_MALLOC_SIMD( sizeof(Affine3) *
                                                                     mSkeletonInstance->getNumBones(),
                                                                     MEMCATEGORY_ANIMATION));
+                std::fill(mBoneWorldMatrices, mBoneWorldMatrices + mSkeletonInstance->getNumBones(), Affine3::IDENTITY);
             }
 
             mAnimationState = OGRE_NEW AnimationStateSet();
