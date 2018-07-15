@@ -984,6 +984,7 @@ namespace Ogre {
                 {
                     mBoneWorldMatrices =
                         static_cast<Affine3*>(OGRE_MALLOC_SIMD(sizeof(Affine3) * mNumBoneMatrices, MEMCATEGORY_ANIMATION));
+                    std::fill(mBoneWorldMatrices, mBoneWorldMatrices + mNumBoneMatrices, Affine3::IDENTITY);
                 }
 
                 OptimisedUtil::getImplementation()->concatenateAffineMatrices(
