@@ -89,30 +89,20 @@ namespace Ogre {
             return toString(val.valueAngleUnits(), precision, width, fill, flags);
         }
         /** Converts an int to a String. */
-        static String toString(int val, unsigned short width = 0, 
+        static String toString(int32 val, unsigned short width = 0,
             char fill = ' ', 
             std::ios::fmtflags flags = std::ios::fmtflags(0));
-
-#if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         /** Converts an unsigned int to a String. */
-        static String toString(unsigned int val, 
-            unsigned short width = 0, char fill = ' ', 
+        static String toString(uint32 val, unsigned short width = 0,
+            char fill = ' ',
             std::ios::fmtflags flags = std::ios::fmtflags(0));
-
-        #if OGRE_COMPILER == OGRE_COMPILER_MSVC || defined(__MINGW32__)
-        /** Converts an unsigned long to a String. */
-        static String toString(unsigned long val, 
-            unsigned short width = 0, char fill = ' ', 
-            std::ios::fmtflags flags = std::ios::fmtflags(0));
-        #endif
-#else
+        // provide both long long and long to catch size_t on all platforms
         /** Converts an unsigned long to a String. */
         static String toString(unsigned long val,
             unsigned short width = 0, char fill = ' ', 
             std::ios::fmtflags flags = std::ios::fmtflags(0));
-#endif
-        /** Converts a size_t to a String. */
-        static String toString(size_t val,
+        /** Converts an unsigned long long to a String. */
+        static String toString(unsigned long long val,
             unsigned short width = 0, char fill = ' ', 
             std::ios::fmtflags flags = std::ios::fmtflags(0));
 
@@ -168,105 +158,174 @@ namespace Ogre {
         */
         static String toString(const StringVector& val);
 
+        /** Converts a String to a basic value type
+            @return whether the conversion was successful
+        */
+        static bool parse(const String& str, ColourValue& v);
+        static bool parse(const String& str, Quaternion& v);
+        static bool parse(const String& str, Matrix4& v);
+        static bool parse(const String& str, Matrix3& v);
+        static bool parse(const String& str, Vector4& v);
+        static bool parse(const String& str, Vector3& v);
+        static bool parse(const String& str, Vector2& v);
+        static bool parse(const String& str, int32& v);
+        static bool parse(const String& str, uint32& v);
+        static bool parse(const String& str, int64& v);
+        // provide both long long and long to catch size_t on all platforms
+        static bool parse(const String& str, unsigned long& v);
+        static bool parse(const String& str, unsigned long long& v);
+        static bool parse(const String& str, bool& v);
+        static bool parse(const String& str, double& v);
+        static bool parse(const String& str, float& v);
+
         /** Converts a String to a Real. 
         @return
             0.0 if the value could not be parsed, otherwise the Real version of the String.
         */
-        static Real parseReal(const String& val, Real defaultValue = 0);
+        static Real parseReal(const String& val, Real defaultValue = 0)
+        {
+            Real ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Converts a String to a Angle. 
         @return
             0.0 if the value could not be parsed, otherwise the Angle version of the String.
         */
-        static inline Radian parseAngle(const String& val, Radian defaultValue = Radian(0)) {
+        static Radian parseAngle(const String& val, Radian defaultValue = Radian(0)) {
             return Angle(parseReal(val, defaultValue.valueRadians()));
         }
         /** Converts a String to a whole number. 
         @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static int parseInt(const String& val, int defaultValue = 0);
+        static int32 parseInt(const String& val, int32 defaultValue = 0)
+        {
+            int32 ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Converts a String to a whole number. 
         @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static unsigned int parseUnsignedInt(const String& val, unsigned int defaultValue = 0);
+        static uint32 parseUnsignedInt(const String& val, uint32 defaultValue = 0)
+        {
+            uint32 ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Converts a String to a whole number. 
         @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static long parseLong(const String& val, long defaultValue = 0);
+        static int64 parseLong(const String& val, int64 defaultValue = 0)
+        {
+            int64 ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Converts a String to a whole number. 
         @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static unsigned long parseUnsignedLong(const String& val, unsigned long defaultValue = 0);
+        static uint64 parseUnsignedLong(const String& val, uint64 defaultValue = 0)
+        {
+            uint64 ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Converts a String to size_t. 
         @return
             defaultValue if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static size_t parseSizeT(const String& val, size_t defaultValue = 0);
+        static size_t parseSizeT(const String& val, size_t defaultValue = 0)
+        {
+            size_t ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Converts a String to a boolean. 
         @remarks
             Returns true if case-insensitive match of the start of the string
             matches "true", "yes", "1", or "on", false if "false", "no", "0" 
             or "off".
         */
-        static bool parseBool(const String& val, bool defaultValue = 0);
+        static bool parseBool(const String& val, bool defaultValue = 0)
+        {
+            bool ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Parses a Vector2 out of a String.
         @remarks
             Format is "x y" ie. 2 Real components, space delimited. Failure to parse returns
             Vector2::ZERO.
         */
-        static Vector2 parseVector2(const String& val, const Vector2& defaultValue = Vector2::ZERO);
+        static Vector2 parseVector2(const String& val, const Vector2& defaultValue = Vector2::ZERO)
+        {
+            Vector2 ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Parses a Vector3 out of a String.
         @remarks
             Format is "x y z" ie. 3 Real components, space delimited. Failure to parse returns
             Vector3::ZERO.
         */
-        static Vector3 parseVector3(const String& val, const Vector3& defaultValue = Vector3::ZERO);
+        static Vector3 parseVector3(const String& val, const Vector3& defaultValue = Vector3::ZERO)
+        {
+            Vector3 ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Parses a Vector4 out of a String.
         @remarks
             Format is "x y z w" ie. 4 Real components, space delimited. Failure to parse returns
             Vector4::ZERO.
         */
-        static Vector4 parseVector4(const String& val, const Vector4& defaultValue = Vector4::ZERO);
+        static Vector4 parseVector4(const String& val, const Vector4& defaultValue = Vector4::ZERO)
+        {
+            Vector4 ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Parses a Matrix3 out of a String.
         @remarks
             Format is "00 01 02 10 11 12 20 21 22" where '01' means row 0 column 1 etc.
             Failure to parse returns Matrix3::IDENTITY.
         */
-        static Matrix3 parseMatrix3(const String& val, const Matrix3& defaultValue = Matrix3::IDENTITY);
+        static Matrix3 parseMatrix3(const String& val, const Matrix3& defaultValue = Matrix3::IDENTITY)
+        {
+            Matrix3 ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Parses a Matrix4 out of a String.
         @remarks
             Format is "00 01 02 03 10 11 12 13 20 21 22 23 30 31 32 33" where 
             '01' means row 0 column 1 etc. Failure to parse returns Matrix4::IDENTITY.
         */
-        static Matrix4 parseMatrix4(const String& val, const Matrix4& defaultValue = Matrix4::IDENTITY);
+        static Matrix4 parseMatrix4(const String& val, const Matrix4& defaultValue = Matrix4::IDENTITY)
+        {
+            Matrix4 ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Parses a Quaternion out of a String. 
         @remarks
             Format is "w x y z" (i.e. 4x Real values, space delimited). 
             Failure to parse returns Quaternion::IDENTITY.
         */
-        static Quaternion parseQuaternion(const String& val, const Quaternion& defaultValue = Quaternion::IDENTITY);
+        static Quaternion parseQuaternion(const String& val, const Quaternion& defaultValue = Quaternion::IDENTITY)
+        {
+            Quaternion ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
         /** Parses a ColourValue out of a String. 
         @remarks
             Format is "r g b a" (i.e. 4x Real values, space delimited), or "r g b" which implies
             an alpha value of 1.0 (opaque). Failure to parse returns ColourValue::Black.
         */
-        static ColourValue parseColourValue(const String& val, const ColourValue& defaultValue = ColourValue::Black);
+        static ColourValue parseColourValue(const String& val, const ColourValue& defaultValue = ColourValue::Black)
+        {
+            ColourValue ret;
+            return parse(val, ret) ? ret : defaultValue;
+        }
 
-        /** Parses a StringVector from a string.
-        @remarks
-            Strings must not contain spaces since space is used as a delimiter in
-            the output.
-        */
-        static StringVector parseStringVector(const String& val);
+        /// @deprecated use StringUtil::split
+        OGRE_DEPRECATED static StringVector parseStringVector(const String& val) { return StringUtil::split(val); }
         /** Checks the String is a valid number value. */
         static bool isNumber(const String& val);
 
-        /** templated parse call that forwards to StringConverter::parse*(str)
-         useful for template metaprogramming */
-        template <typename T> static void parse(const String& str, T& v); // no implementation so we get compile time error for unknown types
 
 		/** Converts a ColourBufferType to a String.
 		@remarks
@@ -297,50 +356,6 @@ namespace Ogre {
         template<typename T>
         static String _toString(T val, uint16 width, char fill, std::ios::fmtflags flags);
     };
-
-    template<> inline void StringConverter::parse(const String& str, ColourValue& v) {
-        v = Ogre::StringConverter::parseColourValue(str);
-    }
-    template<> inline void StringConverter::parse(const String& str, Quaternion& v) {
-        v = Ogre::StringConverter::parseQuaternion(str);
-    }
-    template<> inline void StringConverter::parse(const String& str, Matrix4& v) {
-        v = Ogre::StringConverter::parseMatrix4(str);
-    }
-    template<> inline void StringConverter::parse(const String& str, Matrix3& v) {
-        v = Ogre::StringConverter::parseMatrix3(str);
-    }
-    template<> inline void StringConverter::parse(const String& str, Vector4& v) {
-        v = Ogre::StringConverter::parseVector4(str);
-    }
-    template<> inline void StringConverter::parse(const String& str, Vector3& v) {
-        v = Ogre::StringConverter::parseVector3(str);
-    }
-    template<> inline void StringConverter::parse(const String& str, Vector2& v) {
-        v = Ogre::StringConverter::parseVector2(str);
-    }
-    template<> inline void StringConverter::parse(const String& str, size_t& v) {
-        v = Ogre::StringConverter::parseSizeT(str);
-    }
-    /*possibly same as size_t template<> inline void StringConverter::parse(const String& str, unsigned int& v) {
-        v = Ogre::StringConverter::parseUnsignedInt(str);
-    }*/
-    template<> inline void StringConverter::parse(const String& str, long& v) {
-        v = Ogre::StringConverter::parseLong(str);
-    }
-    /*possibly same as size_t template<> inline void StringConverter::parse(const String& str, unsigned long& v) {
-        v = Ogre::StringConverter::parseUnsignedLong(str);
-    }*/
-    template<> inline void StringConverter::parse(const String& str, bool& v) {
-        v = Ogre::StringConverter::parseBool(str);
-    }
-    template<> inline void StringConverter::parse(const String& str, int& v) {
-        v = Ogre::StringConverter::parseInt(str);
-    }
-    template<> inline void StringConverter::parse(const String& str, Real& v) {
-        v = Ogre::StringConverter::parseReal(str);
-    }
-
     /** @} */
     /** @} */
 

@@ -656,30 +656,28 @@ namespace Ogre
 
 			if (!syntaxError)
 			{
-				char *endPtr;
-
 				// Arg 1 (var)
 				String counterVar;
 				counterVar = argValues[0];
 
 				// Agr 2 (start)
-				long start = strtol(argValues[1].c_str(), &endPtr, 10);
-				if (argValues[1].c_str() == endPtr)
+				size_t start;
+				if (!StringConverter::parse(argValues[1], start))
 				{
 					//This isn't a number. Let's try if it's a variable
 					start = properties.getProperty(argValues[1], 0);
 				}
 
 				// Arg 3 (count)
-				long count = strtol(argValues[2].c_str(), &endPtr, 10);
-				if (argValues[2].c_str() == endPtr)
+				size_t count;
+				if (!StringConverter::parse(argValues[1], count))
 				{
 					//This isn't a number. Let's try if it's a variable
 					count = properties.getProperty(argValues[2], 0);
 				}
 
 				// Repeat the block
-				for (int i = 0; i < count; ++i)
+				for (size_t i = 0; i < count; ++i)
 					repeat(outBuffer, blockSubString, blockSubString.getSize(), start + i, counterVar);
 			}
 
