@@ -1519,36 +1519,21 @@ namespace Ogre{
                             }
                             else
                             {
-                                AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
-                                    i1 = getNodeAt(prop->values, 1),
-                                    i2 = getNodeAt(prop->values, 2);
-                                ColourValue val(0.0f, 0.0f, 0.0f, 1.0f);
-                                if(getFloat(*i0, &val.r) && getFloat(*i1, &val.g) && getFloat(*i2, &val.b))
+                                ColourValue val;
+                                if(getColour(prop->values.begin(), prop->values.end(), &val))
                                 {
                                     if(prop->values.size() == 4)
                                     {
+                                        mPass->setShininess(val.a);
+                                        val.a = 1.0f;
                                         mPass->setSpecular(val);
-
-                                        AbstractNodeList::const_iterator i3 = getNodeAt(prop->values, 3);
-                                        Real shininess = 0.0f;
-                                        if(getReal(*i3, &shininess))
-                                            mPass->setShininess(shininess);
-                                        else
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "specular fourth argument must be a valid number for shininess attribute");
                                     }
                                     else
                                     {
-                                        AbstractNodeList::const_iterator i3 = getNodeAt(prop->values, 3);
-                                        if(!getFloat(*i3, &val.a))
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "specular fourth argument must be a valid color component value");
-                                        else
-                                            mPass->setSpecular(val);
+                                        mPass->setSpecular(val);
 
-                                        AbstractNodeList::const_iterator i4 = getNodeAt(prop->values, 4);
-                                        Real shininess = 0.0f;
-                                        if(getReal(*i4, &shininess))
+                                        Real shininess;
+                                        if(getReal(*getNodeAt(prop->values, 4), &shininess))
                                             mPass->setShininess(shininess);
                                         else
                                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
