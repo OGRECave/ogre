@@ -185,7 +185,7 @@ TEST_F(StringTests,ParseLong)
 //--------------------------------------------------------------------------
 TEST_F(StringTests,ParseUnsignedLong)
 {
-    unsigned long r = 4294967295UL;
+    unsigned long r = ~0;
 
     String s = StringConverter::toString(r);
     unsigned long t = StringConverter::parseUnsignedLong(s);
@@ -195,7 +195,7 @@ TEST_F(StringTests,ParseUnsignedLong)
 //--------------------------------------------------------------------------
 TEST_F(StringTests,ParseSizeT)
 {
-    size_t r = 223546;
+    size_t r = ~0;
 
     String s = StringConverter::toString(r);
     size_t t = StringConverter::parseSizeT(s);
