@@ -261,7 +261,6 @@ Here are the attributes you can use in a ’pass’ section of a .material scrip
 -   [polygon\_mode\_overrideable](#polygon_005fmode_005foverrideable)
 -   [fog\_override](#fog_005foverride)
 -   [colour\_write](#colour_005fwrite)
--   [colour\_mask](#colour_005fmask)
 -   [max\_lights](#max_005flights)
 -   [start\_light](#start_005flight)
 -   [iteration](#iteration)
@@ -695,10 +694,13 @@ Example: fog\_override true exp 1 1 1 0.002 100 10000
 
 ## colour\_write
 
-Sets whether this pass renders with colour writing on or not.
+Sets whether this pass renders with colour writing on or not. Alternatively, it can also be used to enable/disable colour writing specific channels.
+In the second format, the parameters are in the red, green, blue, alpha order.
 
 @par
-Format: colour\_write &lt;on|off&gt;
+Format 1: colour\_write &lt;on|off&gt;
+@par
+Format 2: colour\_write &lt;on|off&gt; &lt;on|off&gt; &lt;on|off&gt; &lt;on|off&gt;
 
 @copydetails Ogre::Pass::setColourWriteEnabled
 
@@ -706,18 +708,6 @@ Format: colour\_write &lt;on|off&gt;
 Default: colour\_write on<br>
 
 <a name="colour_005fmask"></a><a name="colour_005fmask-1"></a>
-
-## colour\_mask
-
-Sets whether a colour channel will be written to by this pass.<br>
-
-Format: colour\_mask &lt;on|off&gt; &lt;on|off&gt; &lt;on|off&gt; &lt;on|off&gt;
-
-The first parameter is for the red channel, the second one for the green channel, the third for the blue channel and the last one for the alpha channel.
-
-Default: colour\_mask on on on on<br>
-
-<a name="start_005flight"></a><a name="start_005flight-1"></a>
 
 ## start\_light
 
