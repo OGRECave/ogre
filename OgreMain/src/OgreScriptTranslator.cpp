@@ -1966,8 +1966,37 @@ namespace Ogre{
                     }
                     break;
                 case ID_COLOUR_WRITE:
-                    if(getValue(prop, compiler, bval))
-                        mPass->setColourWriteEnabled(bval);
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() == 1)
+                    {
+                        if(getValue(prop, compiler, bval))
+                            mPass->setColourWriteEnabled(bval);
+                    }
+                    else if(prop->values.size() != 4)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "colour_write must have exactly 1 or 4 arguments");
+                    }
+                    else
+                    {
+                        bool colourMask[] = {false ,false ,false, false};
+
+                        uint8 channelIndex = 0;
+                        for(AbstractNodePtr abstractNode : prop->values)
+                        {
+                            if(!getBoolean(abstractNode, &colourMask[channelIndex++]))
+                            {
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   abstractNode->getValue() + " is not a valid boolean");
+                                break;
+                            }
+                        }
+
+                        mPass->setColourWriteEnabled(colourMask[0], colourMask[1], colourMask[2], colourMask[3]);
+                    }
                     break;
                 case ID_MAX_LIGHTS:
                     if(getValue(prop, compiler, uival))

@@ -739,6 +739,16 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    void Technique::setColourWriteEnabled(bool red, bool green, bool blue, bool alpha)
+    {
+        Passes::iterator i, iend;
+        iend = mPasses.end();
+        for (i = mPasses.begin(); i != iend; ++i)
+        {
+            (*i)->setColourWriteEnabled(red, green, blue, alpha);
+        }
+    }
+    //-----------------------------------------------------------------------
     void Technique::setCullingMode( CullingMode mode )
     {
         Passes::iterator i, iend;

@@ -139,7 +139,10 @@ namespace Ogre {
         /// Determines if we should use separate blending operations for color and alpha channels
         bool mSeparateBlendOperation : 1;
         /// Colour buffer settings
-        bool mColourWrite : 1;
+        bool mColourWriteR : 1;
+        bool mColourWriteG : 1;
+        bool mColourWriteB : 1;
+        bool mColourWriteA : 1;
         // Depth buffer settings
         bool mDepthCheck : 1;
         bool mDepthWrite : 1;
@@ -768,11 +771,17 @@ namespace Ogre {
             run.
         */
         void setColourWriteEnabled(bool enabled);
-        /** Determines if colour buffer writing is enabled for this pass. */
+        /** Determines if colour buffer writing is enabled for this pass i.e. when at least one
+            colour channel is enabled for writing.
+         */
         bool getColourWriteEnabled(void) const;
 
-        /** Sets the culling mode for this pass based on the 'vertex winding'.
+        /// Sets which colour buffer channels are enabled for writing for this Pass
+        void setColourWriteEnabled(bool red, bool green, bool blue, bool alpha);
+        /// Determines which colour buffer channels are enabled for writing for this pass.
+        void getColourWriteEnabled(bool& red, bool& green, bool& blue, bool& alpha) const;
 
+        /** Sets the culling mode for this pass based on the 'vertex winding'.
             A typical way for the rendering engine to cull triangles is based on the 'vertex winding' of
             triangles. Vertex winding refers to the direction in which the vertices are passed or indexed
             to in the rendering operation as viewed from the camera, and will wither be clockwise or
