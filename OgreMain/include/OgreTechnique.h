@@ -405,6 +405,11 @@ namespace Ogre {
         */
         void setColourWriteEnabled(bool enabled);
 
+        /** Sets which colour buffer channels are enabled for writing for each Pass.
+         @see Pass::setColourWriteEnabled
+         */
+        void setColourWriteEnabled(bool red, bool green, bool blue, bool alpha);
+
         /** Sets the culling mode for each pass  based on the 'vertex winding'.
         @note
             This property actually exists on the Pass class. For simplicity, this method allows 

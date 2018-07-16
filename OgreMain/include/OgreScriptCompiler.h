@@ -675,7 +675,6 @@ namespace Ogre
             ID_EXP,
             ID_EXP2,
         ID_COLOUR_WRITE,
-        ID_COLOUR_MASK,
         ID_MAX_LIGHTS,
         ID_START_LIGHT,
         ID_ITERATION,

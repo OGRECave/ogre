@@ -1215,17 +1215,11 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
     mDestRenderSystem->_setAlphaRejectSettings(pass->getAlphaRejectFunction(),
                                                pass->getAlphaRejectValue(),
                                                pass->isAlphaToCoverageEnabled());
-    // Set colour write mode and colour mask.
-    bool colWrite = pass->getColourWriteEnabled();
-    const bool *colMask = pass->getColourMask();
-    if(!colWrite)
-    {
-        mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
-    }
-    else
-    {
-        mDestRenderSystem->_setColourBufferWriteEnabled(colMask[0], colMask[1], colMask[2], colMask[3]);
-    }
+    // Set colour write mode.
+    bool colWriteR, colWriteG, colWriteB, colWriteA;
+    pass->getColourWriteEnabled(colWriteR, colWriteG, colWriteB, colWriteA);
+    mDestRenderSystem->_setColourBufferWriteEnabled(colWriteR, colWriteG, colWriteB, colWriteA);
+
     // Culling mode
     if (isShadowTechniqueTextureBased() && mIlluminationStage == IRS_RENDER_TO_TEXTURE &&
         mShadowCasterRenderBackFaces && pass->getCullingMode() == CULL_CLOCKWISE)

@@ -135,7 +135,10 @@ namespace Ogre {
         , mHashDirtyQueued(false)
         , mSeparateBlend(false)
         , mSeparateBlendOperation(false)
-        , mColourWrite(true)
+        , mColourWriteR(true)
+        , mColourWriteG(true)
+        , mColourWriteB(true)
+        , mColourWriteA(true)
         , mDepthCheck(true)
         , mDepthWrite(true)
         , mAlphaToCoverageEnabled(false)
@@ -153,7 +156,6 @@ namespace Ogre {
         , mPointSpritesEnabled(false)
         , mPointAttenuationEnabled(false)
         , mContentTypeLookupBuilt(false)
-        , mColourMask{true, true, true, true}
         , mAlphaRejectVal(0)
         , mDepthFunc(CMPF_LESS_EQUAL)
         , mDepthBiasConstant(0.0f)
@@ -239,8 +241,10 @@ namespace Ogre {
         mAlphaToCoverageEnabled = oth.mAlphaToCoverageEnabled;
         mTransparentSorting = oth.mTransparentSorting;
         mTransparentSortingForced = oth.mTransparentSortingForced;
-        mColourWrite = oth.mColourWrite;
-        std::copy(std::begin(oth.mColourMask), std::end(oth.mColourMask), std::begin(mColourMask));
+        mColourWriteR = oth.mColourWriteR;
+        mColourWriteG = oth.mColourWriteG;
+        mColourWriteB = oth.mColourWriteB;
+        mColourWriteA = oth.mColourWriteA;
         mDepthFunc = oth.mDepthFunc;
         mDepthBiasConstant = oth.mDepthBiasConstant;
         mDepthBiasSlopeScale = oth.mDepthBiasSlopeScale;
@@ -908,25 +912,32 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Pass::setColourWriteEnabled(bool enabled)
     {
-        mColourWrite = enabled;
+        mColourWriteR = enabled;
+        mColourWriteG = enabled;
+        mColourWriteB = enabled;
+        mColourWriteA = enabled;
     }
     //-----------------------------------------------------------------------
-    bool Pass::getColourWriteEnabled(void) const
+    bool Pass::getColourWriteEnabled() const
     {
-        return mColourWrite;
+        return mColourWriteR || mColourWriteG || mColourWriteB || mColourWriteA;
     }
     //-----------------------------------------------------------------------
-    void Pass::setColourMask(bool red, bool green, bool blue, bool alpha)
+
+    void Pass::setColourWriteEnabled(bool red, bool green, bool blue, bool alpha)
     {
-        mColourMask[0] = red;
-        mColourMask[1] = green;
-        mColourMask[2] = blue;
-        mColourMask[3] = alpha;
+        mColourWriteR = red;
+        mColourWriteG = green;
+        mColourWriteB = blue;
+        mColourWriteA = alpha;
     }
     //-----------------------------------------------------------------------
-    const bool* Pass::getColourMask() const
+    void Pass::getColourWriteEnabled(bool& red, bool& green, bool& blue, bool& alpha) const
     {
-        return mColourMask;
+        red = mColourWriteR;
+        green = mColourWriteG;
+        blue = mColourWriteB;
+        alpha = mColourWriteA;
     }
     //-----------------------------------------------------------------------
     void Pass::setCullingMode( CullingMode mode)
@@ -1592,7 +1603,7 @@ namespace Ogre {
         // programs are expected to indicate they are ambient only by
         // setting the state so it matches one of the conditions above, even
         // though this state is not used in rendering.
-        return (!mLightingEnabled || !mColourWrite ||
+        return (!mLightingEnabled || !getColourWriteEnabled() ||
             (mDiffuse == ColourValue::Black &&
              mSpecular == ColourValue::Black));
     }

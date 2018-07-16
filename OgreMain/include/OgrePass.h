@@ -139,7 +139,10 @@ namespace Ogre {
         /// Determines if we should use separate blending operations for color and alpha channels
         bool mSeparateBlendOperation : 1;
         /// Colour buffer settings
-        bool mColourWrite : 1;
+        bool mColourWriteR : 1;
+        bool mColourWriteG : 1;
+        bool mColourWriteB : 1;
+        bool mColourWriteA : 1;
         // Depth buffer settings
         bool mDepthCheck : 1;
         bool mDepthWrite : 1;
@@ -167,9 +170,6 @@ namespace Ogre {
         bool mPointSpritesEnabled : 1;
         bool mPointAttenuationEnabled : 1;
         mutable bool mContentTypeLookupBuilt : 1;
-
-        /// Channels enabled for writing.
-        bool mColourMask[4];
 
         uchar mAlphaRejectVal;
 
@@ -771,13 +771,15 @@ namespace Ogre {
             run.
         */
         void setColourWriteEnabled(bool enabled);
-        /** Determines if colour buffer writing is enabled for this pass. */
+        /** Determines if colour buffer writing is enabled for this pass i.e. when at least one
+            colour channel is enabled for writing.
+         */
         bool getColourWriteEnabled(void) const;
 
-        /** Sets which colour channels can or cannot be written into by this pass. */
-        void setColourMask(bool red, bool green, bool blue, bool alpha);
-        /** Returns the array containing whether or not a colour channel can be written to. */
-        const bool* getColourMask() const;
+        /// Sets which colour buffer channels are enabled for writing for this Pass
+        void setColourWriteEnabled(bool red, bool green, bool blue, bool alpha);
+        /// Determines which colour buffer channels are enabled for writing for this pass.
+        void getColourWriteEnabled(bool& red, bool& green, bool& blue, bool& alpha) const;
 
         /** Sets the culling mode for this pass based on the 'vertex winding'.
             A typical way for the rendering engine to cull triangles is based on the 'vertex winding' of
