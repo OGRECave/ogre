@@ -21,7 +21,7 @@ var class_ogre_1_1_sub_mesh =
     [ "dearrangeToInefficient", "class_ogre_1_1_sub_mesh.html#a244e6747e18fb380ce59d2f7f6556809", null ],
     [ "destroyVaos", "class_ogre_1_1_sub_mesh.html#aaa37dfcd68b3707d91f4f71588f61efd", null ],
     [ "getBoneAssignments", "class_ogre_1_1_sub_mesh.html#a097a13dea725a042fcf994f6c9d7a9de", null ],
-    [ "getMaterialName", "class_ogre_1_1_sub_mesh.html#ae4a06b4b382430d9d06d966a51cba601", null ],
+    [ "getMaterialName", "class_ogre_1_1_sub_mesh.html#acc12dd4a452669f7376210e86c578638", null ],
     [ "importFromV1", "class_ogre_1_1_sub_mesh.html#adc52498993f5d2dfc2b840d729856780", null ],
     [ "operator delete", "class_ogre_1_1_sub_mesh.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_sub_mesh.html#a1c727e879a260c37b00ce5505fe8e144", null ],

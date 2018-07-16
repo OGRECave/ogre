@@ -1,8 +1,10 @@
 var class_ogre_1_1_profile_instance =
 [
-    [ "ProfileChildren", "class_ogre_1_1_profile_instance.html#a2eca5d3e4e0cc6991b99ef7d5dd3c7b5", null ],
+    [ "ProfileChildrenMap", "class_ogre_1_1_profile_instance.html#a57bcfc956ed84e6e4a85bf485a98d7c3", null ],
+    [ "ProfileChildrenVec", "class_ogre_1_1_profile_instance.html#a0d07b5ee2f25241fed784e92accd86c1", null ],
     [ "ProfileInstance", "class_ogre_1_1_profile_instance.html#a4921211276e29e72155077235687cf54", null ],
     [ "~ProfileInstance", "class_ogre_1_1_profile_instance.html#af16b392bd516cb3acacc99d598d0ad39", null ],
+    [ "destroyAllChildren", "class_ogre_1_1_profile_instance.html#a41f4675a0f1e9bebe386851423f2e682", null ],
     [ "logResults", "class_ogre_1_1_profile_instance.html#af43228f1e8e2ab70809bbb14d27ae773", null ],
     [ "operator delete", "class_ogre_1_1_profile_instance.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_profile_instance.html#a1c727e879a260c37b00ce5505fe8e144", null ],
@@ -23,7 +25,8 @@ var class_ogre_1_1_profile_instance =
     [ "watchForMin", "class_ogre_1_1_profile_instance.html#ac74d2469a34877f6f65a563efb04bfd8", null ],
     [ "Profiler", "class_ogre_1_1_profile_instance.html#ad73e5645d5b7b84a00d4a5d07b8d8078", null ],
     [ "accum", "class_ogre_1_1_profile_instance.html#af01c402b5996d7672e6a2bb5b078faab", null ],
-    [ "children", "class_ogre_1_1_profile_instance.html#a4a9856f2b9b2933d1d3af61438f1359d", null ],
+    [ "children", "class_ogre_1_1_profile_instance.html#ad3f5b9c9b50015e40f9fea6ff5a68549", null ],
+    [ "childrenMap", "class_ogre_1_1_profile_instance.html#aa53d0905541623e980f89185860ca066", null ],
     [ "currTime", "class_ogre_1_1_profile_instance.html#ad19af15bb373d720d1b2caf30cf92ed6", null ],
     [ "frame", "class_ogre_1_1_profile_instance.html#a08c87da13e23c3899052faab7680da30", null ],
     [ "frameNumber", "class_ogre_1_1_profile_instance.html#a40b76f9c74bd13e1b07db0559af27dc5", null ],

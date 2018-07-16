@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nativescalefactor',['nativeScaleFactor',['../interface_ogre_metal_view.html#a41d3e64f9c1e3c8630c9611f983c8ef3',1,'OgreMetalView']]]
+  ['device',['device',['../interface_ogre_metal_view.html#a8109dbb7dbe15e834f8a02a4c93172f0',1,'OgreMetalView']]]
 ];

@@ -5,6 +5,11 @@ var class_ogre_1_1_render_queue =
       [ "V1_FAST", "class_ogre_1_1_render_queue.html#ad2b57c9b40e33d4b64f613a5a6147367aae5865e2c1ce44806f2538863c9dda44", null ],
       [ "FAST", "class_ogre_1_1_render_queue.html#ad2b57c9b40e33d4b64f613a5a6147367afaf209c76453b55e28708a165b37386e", null ]
     ] ],
+    [ "RqSortMode", "class_ogre_1_1_render_queue.html#acbc6e62a79b77d38cf3881c796e0078b", [
+      [ "DisableSort", "class_ogre_1_1_render_queue.html#acbc6e62a79b77d38cf3881c796e0078ba00d99f921af963915cd1e94fa6f769b8", null ],
+      [ "NormalSort", "class_ogre_1_1_render_queue.html#acbc6e62a79b77d38cf3881c796e0078ba5cee263978f56c804e527cb86a6eada0", null ],
+      [ "StableSort", "class_ogre_1_1_render_queue.html#acbc6e62a79b77d38cf3881c796e0078ba99c6ffffec769f9ecd91d930c8ab63d6", null ]
+    ] ],
     [ "RenderQueue", "class_ogre_1_1_render_queue.html#abb653f126d0d03d73e28468a89c3c24d", null ],
     [ "~RenderQueue", "class_ogre_1_1_render_queue.html#abeedbfecbb98d295978226f18f1ba5bd", null ],
     [ "addRenderableV1", "class_ogre_1_1_render_queue.html#a504e8bf8d6496ea3b88ead7e6cef8aa0", null ],
@@ -12,8 +17,8 @@ var class_ogre_1_1_render_queue =
     [ "clear", "class_ogre_1_1_render_queue.html#ab9ad30891c9ca786c3843b1c1941beb1", null ],
     [ "clearState", "class_ogre_1_1_render_queue.html#a4615375687b3c1a7afc48fc798a1aa07", null ],
     [ "frameEnded", "class_ogre_1_1_render_queue.html#a71820e3616618fca482d1ebec0f4b7e9", null ],
-    [ "getRenderQueueMode", "class_ogre_1_1_render_queue.html#a88582e8449aa9c8d584a6f0ef309fb87", null ],
-    [ "getSortRenderQueue", "class_ogre_1_1_render_queue.html#a181a8653485851d3edde0fe66bb3c6b4", null ],
+    [ "getRenderQueueMode", "class_ogre_1_1_render_queue.html#ac113ddcd8ae99c73e4427cef76e033f8", null ],
+    [ "getSortRenderQueue", "class_ogre_1_1_render_queue.html#a652a1bc479b30271d302248746f47530", null ],
     [ "operator delete", "class_ogre_1_1_render_queue.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_render_queue.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_render_queue.html#acb46d4b0a597156d9ba5abc39d127792", null ],
@@ -27,5 +32,5 @@ var class_ogre_1_1_render_queue =
     [ "render", "class_ogre_1_1_render_queue.html#a4556b635533a3b9cc3aee165442e2a4d", null ],
     [ "renderSingleObject", "class_ogre_1_1_render_queue.html#a7cdd43e3bd6ce4350d4a4b66b58a934b", null ],
     [ "setRenderQueueMode", "class_ogre_1_1_render_queue.html#a70f6d85d6cde43a1b4badf25ed09fca5", null ],
-    [ "setSortRenderQueue", "class_ogre_1_1_render_queue.html#acbd84c30ccf9876c865f73305b667492", null ]
+    [ "setSortRenderQueue", "class_ogre_1_1_render_queue.html#aeb41ed3f50a9e7e270d81d045e8a23e6", null ]
 ];

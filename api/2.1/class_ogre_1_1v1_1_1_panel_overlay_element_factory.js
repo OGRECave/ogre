@@ -2,7 +2,7 @@ var class_ogre_1_1v1_1_1_panel_overlay_element_factory =
 [
     [ "createOverlayElement", "class_ogre_1_1v1_1_1_panel_overlay_element_factory.html#a99334bf1c692def612a3063ab97fe5f7", null ],
     [ "destroyOverlayElement", "class_ogre_1_1v1_1_1_panel_overlay_element_factory.html#a8c367ce3e3962f091b1d112e4036fae0", null ],
-    [ "getTypeName", "class_ogre_1_1v1_1_1_panel_overlay_element_factory.html#a484de592e520e42e1a7ec796e611b6e7", null ],
+    [ "getTypeName", "class_ogre_1_1v1_1_1_panel_overlay_element_factory.html#aca33cf1d2a0224ff90b0e9912b63e170", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_panel_overlay_element_factory.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_panel_overlay_element_factory.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_panel_overlay_element_factory.html#acb46d4b0a597156d9ba5abc39d127792", null ],

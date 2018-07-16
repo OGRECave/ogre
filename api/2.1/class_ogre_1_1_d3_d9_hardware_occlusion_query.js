@@ -5,7 +5,7 @@ var class_ogre_1_1_d3_d9_hardware_occlusion_query =
     [ "beginOcclusionQuery", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#acea9a09b582738af4f7497b79181ab71", null ],
     [ "endOcclusionQuery", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#aab645a1644bc652b7843d9b6459a7dbb", null ],
     [ "getLastQuerysPixelcount", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a7cfe92f369eedb757df18d264d23cb9a", null ],
-    [ "getLastQuerysPixelcount", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#ae90c7bb824d1fdffe1ea35549217a5c7", null ],
+    [ "getLastQuerysPixelcount", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#ad1c71c786e262908a3aa805287b815e3", null ],
     [ "isStillOutstanding", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#ae49db96481f5d845767dcfcc7b076d20", null ],
     [ "lockDeviceAccess", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#aa97afae987b0c0f16c3e232a7317fad5", null ],
     [ "notifyOnDeviceCreate", "class_ogre_1_1_d3_d9_hardware_occlusion_query.html#a7b0b0ad594195deeb8e5ef40aaa7bce8", null ],

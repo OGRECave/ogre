@@ -14,12 +14,12 @@ var class_ogre_1_1_s_t_l_allocator =
     [ "STLAllocator", "class_ogre_1_1_s_t_l_allocator.html#af85d3e2726cef7ec1f1d24f2ed3b0675", null ],
     [ "STLAllocator", "class_ogre_1_1_s_t_l_allocator.html#a3d97ea3f530a55614990908f19ccd533", null ],
     [ "STLAllocator", "class_ogre_1_1_s_t_l_allocator.html#ac80a6c2569f5812937287072c04d23ea", null ],
-    [ "address", "class_ogre_1_1_s_t_l_allocator.html#ad85c5a0fc7665135ab6965b1a6578a0b", null ],
-    [ "address", "class_ogre_1_1_s_t_l_allocator.html#ab0c9ec3f0b3d15832db68093828df934", null ],
+    [ "address", "class_ogre_1_1_s_t_l_allocator.html#a6612f5f0613e94729e714bda4b8bec93", null ],
+    [ "address", "class_ogre_1_1_s_t_l_allocator.html#abbf348ef209c5e0e1f00ca1a8645c969", null ],
     [ "allocate", "class_ogre_1_1_s_t_l_allocator.html#a219db3b3227be55452bf297cdb7bea89", null ],
     [ "construct", "class_ogre_1_1_s_t_l_allocator.html#a04d59556081dfe8d64d660b336b6fc28", null ],
     [ "construct", "class_ogre_1_1_s_t_l_allocator.html#ad6ebf2ce6e910595ef613fc955e6df10", null ],
     [ "deallocate", "class_ogre_1_1_s_t_l_allocator.html#afc5b83dfdc2263f0c6dbebe62c4681a9", null ],
     [ "destroy", "class_ogre_1_1_s_t_l_allocator.html#ad4101ccdcdc6c5336a2ebd5169c55ff9", null ],
-    [ "max_size", "class_ogre_1_1_s_t_l_allocator.html#a34af39aff69a8cb62b7548df92fa8aad", null ]
+    [ "max_size", "class_ogre_1_1_s_t_l_allocator.html#a7162d2ac5666953fb4bfd2472ccf4764", null ]
 ];

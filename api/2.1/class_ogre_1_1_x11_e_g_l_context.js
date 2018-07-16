@@ -1,12 +1,12 @@
 var class_ogre_1_1_x11_e_g_l_context =
 [
-    [ "X11EGLContext", "class_ogre_1_1_x11_e_g_l_context.html#ae2a5e7dd7216b3480db37a955e6fa062", null ],
+    [ "X11EGLContext", "class_ogre_1_1_x11_e_g_l_context.html#ab64c62f21853a949bb655e239f035329", null ],
     [ "~X11EGLContext", "class_ogre_1_1_x11_e_g_l_context.html#ad0a72d5f9ec90b58e450f13955a065a2", null ],
-    [ "_createInternalResources", "class_ogre_1_1_x11_e_g_l_context.html#a73baf3f0554f173fbb62ad43ad074508", null ],
+    [ "_createInternalResources", "class_ogre_1_1_x11_e_g_l_context.html#aa7b87d8031a667931b402d8f96346da8", null ],
     [ "_destroyInternalResources", "class_ogre_1_1_x11_e_g_l_context.html#a0f2b47f53f419897c04ccf676ace35e5", null ],
-    [ "clone", "class_ogre_1_1_x11_e_g_l_context.html#a78d96621c205c3699a3f15c93d0a4f38", null ],
+    [ "clone", "class_ogre_1_1_x11_e_g_l_context.html#a7b601d8101ac0fdaf23139558942bcf6", null ],
     [ "endCurrent", "class_ogre_1_1_x11_e_g_l_context.html#a08612fd3eea707121938bb0197e454c6", null ],
-    [ "getDrawable", "class_ogre_1_1_x11_e_g_l_context.html#a25c0b54b245d25ebe86668c48b4602bc", null ],
+    [ "getDrawable", "class_ogre_1_1_x11_e_g_l_context.html#a1773206dd73cb2d134a18f0c90db2335", null ],
     [ "getInitialized", "class_ogre_1_1_x11_e_g_l_context.html#abd71a4bfddbdf111e429e9ff825af985", null ],
     [ "releaseContext", "class_ogre_1_1_x11_e_g_l_context.html#a15cc115c6f857dad066218f1225c4283", null ],
     [ "setCurrent", "class_ogre_1_1_x11_e_g_l_context.html#aa817ff5a5ae3fbb16d8ad182016b212d", null ],

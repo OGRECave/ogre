@@ -1,8 +1,8 @@
 var class_ogre_1_1_volume_1_1_iso_surface_m_c =
 [
     [ "IsoSurfaceMC", "class_ogre_1_1_volume_1_1_iso_surface_m_c.html#aa9f22f872e92ebdcf19ca8d047cf4a67", null ],
-    [ "addMarchingCubesTriangles", "class_ogre_1_1_volume_1_1_iso_surface_m_c.html#a26e83ee0a5b5b0d49fd5aa65301e9269", null ],
-    [ "addMarchingSquaresTriangles", "class_ogre_1_1_volume_1_1_iso_surface_m_c.html#ad0661670da019439bb40d6f5b39988b9", null ],
+    [ "addMarchingCubesTriangles", "class_ogre_1_1_volume_1_1_iso_surface_m_c.html#a39db556a83891a0201330c748c80821c", null ],
+    [ "addMarchingSquaresTriangles", "class_ogre_1_1_volume_1_1_iso_surface_m_c.html#ae28ca071c68a271362ec9dc103f0a72c", null ],
     [ "operator delete", "class_ogre_1_1_volume_1_1_iso_surface_m_c.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_volume_1_1_iso_surface_m_c.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_volume_1_1_iso_surface_m_c.html#acb46d4b0a597156d9ba5abc39d127792", null ],

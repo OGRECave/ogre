@@ -66,6 +66,8 @@ var _ogre_render_system_capabilities_8h =
       [ "RSC_TEXTURE_GATHER", "_ogre_render_system_capabilities_8h.html#gga3d2965b7f378ebdcfe8a4a6cf74c3de7aee2c79b850493fd5422cbdf94f1e03e2", null ],
       [ "RSC_UAV", "_ogre_render_system_capabilities_8h.html#gga3d2965b7f378ebdcfe8a4a6cf74c3de7a6565eb8e21bc01c73a39360b09f9ef8c", null ],
       [ "RSC_EXPLICIT_API", "_ogre_render_system_capabilities_8h.html#gga3d2965b7f378ebdcfe8a4a6cf74c3de7aedc680ed5b99636dd91aeeab936829ec", null ],
+      [ "RSC_CONST_BUFFER_SLOTS_IN_SHADER", "_ogre_render_system_capabilities_8h.html#gga3d2965b7f378ebdcfe8a4a6cf74c3de7ad988742e51c0867cc5027d883a153329", null ],
+      [ "RSC_TEXTURE_COMPRESSION_ASTC", "_ogre_render_system_capabilities_8h.html#gga3d2965b7f378ebdcfe8a4a6cf74c3de7ac29028b670542d2cf3762ce21d81c467", null ],
       [ "RSC_PERSTAGECONSTANT", "_ogre_render_system_capabilities_8h.html#gga3d2965b7f378ebdcfe8a4a6cf74c3de7a4a6cb9244a2fd89591cfeb06960336e1", null ],
       [ "RSC_GL1_5_NOVBO", "_ogre_render_system_capabilities_8h.html#gga3d2965b7f378ebdcfe8a4a6cf74c3de7af6f7e8732a517446f1008d86e653509b", null ],
       [ "RSC_FBO", "_ogre_render_system_capabilities_8h.html#gga3d2965b7f378ebdcfe8a4a6cf74c3de7a8a0ececdc95122ac3063fc4f27d6402c", null ],

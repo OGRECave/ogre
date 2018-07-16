@@ -6,7 +6,7 @@ var class_ogre_1_1v1_1_1_metal_hardware_buffer_common =
     [ "copyData", "class_ogre_1_1v1_1_1_metal_hardware_buffer_common.html#a7e167c554b0ef1445da0bd341f14a7c0", null ],
     [ "getBufferName", "class_ogre_1_1v1_1_1_metal_hardware_buffer_common.html#acfe3af663833128e92d0f3f0dfc59d5c", null ],
     [ "getBufferNameForGpuWrite", "class_ogre_1_1v1_1_1_metal_hardware_buffer_common.html#ab49da9874868089d7fdaa81aa2acabb8", null ],
-    [ "getSizeBytes", "class_ogre_1_1v1_1_1_metal_hardware_buffer_common.html#a5dad4a4c61585b01d0b9738316422019", null ],
+    [ "getSizeBytes", "class_ogre_1_1v1_1_1_metal_hardware_buffer_common.html#a6130dabe05c2d52b0cc2702b300745ab", null ],
     [ "lockImpl", "class_ogre_1_1v1_1_1_metal_hardware_buffer_common.html#a838c31e0a1f534364b7303091c7d5e92", null ],
     [ "readData", "class_ogre_1_1v1_1_1_metal_hardware_buffer_common.html#a3ad80e3c2044e1c34688c4c8d659a80f", null ],
     [ "unlockImpl", "class_ogre_1_1v1_1_1_metal_hardware_buffer_common.html#a52a220f8c2860fc9f2aeb6aa4c1b5e5b", null ],

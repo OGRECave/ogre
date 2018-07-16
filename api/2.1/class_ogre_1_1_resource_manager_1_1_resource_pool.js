@@ -4,7 +4,7 @@ var class_ogre_1_1_resource_manager_1_1_resource_pool =
     [ "~ResourcePool", "class_ogre_1_1_resource_manager_1_1_resource_pool.html#aac2cb15bdfaa605297e31e85d452e278", null ],
     [ "addItem", "class_ogre_1_1_resource_manager_1_1_resource_pool.html#abafd7c72963d86ef829c0373fe50aa7f", null ],
     [ "clear", "class_ogre_1_1_resource_manager_1_1_resource_pool.html#a9009c4131abf1318693a01474755850f", null ],
-    [ "getName", "class_ogre_1_1_resource_manager_1_1_resource_pool.html#a17fbceb5bab468d35335a15424c3031d", null ],
+    [ "getName", "class_ogre_1_1_resource_manager_1_1_resource_pool.html#a9af1bcf036305b2e1b1ec1fd13150a39", null ],
     [ "operator delete", "class_ogre_1_1_resource_manager_1_1_resource_pool.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_resource_manager_1_1_resource_pool.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_resource_manager_1_1_resource_pool.html#acb46d4b0a597156d9ba5abc39d127792", null ],

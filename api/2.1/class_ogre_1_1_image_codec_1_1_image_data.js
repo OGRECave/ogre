@@ -1,7 +1,7 @@
 var class_ogre_1_1_image_codec_1_1_image_data =
 [
     [ "ImageData", "class_ogre_1_1_image_codec_1_1_image_data.html#ae79def312c157ada9d4aedcd38c911bf", null ],
-    [ "dataType", "class_ogre_1_1_image_codec_1_1_image_data.html#afc7b6885d56ad2e733613c50eff80780", null ],
+    [ "dataType", "class_ogre_1_1_image_codec_1_1_image_data.html#acb43ce0afff8b8a7b47ebd56c04959bc", null ],
     [ "operator delete", "class_ogre_1_1_image_codec_1_1_image_data.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_image_codec_1_1_image_data.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_image_codec_1_1_image_data.html#acb46d4b0a597156d9ba5abc39d127792", null ],

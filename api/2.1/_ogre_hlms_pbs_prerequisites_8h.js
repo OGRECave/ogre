@@ -32,6 +32,7 @@ var _ogre_hlms_pbs_prerequisites_8h =
       [ "PBSM_DETAIL1_NM", "_ogre_hlms_pbs_prerequisites_8h.html#a342a992a9d37255505fc5fbb7f0584d9a87644aea54141d4c202c2e3b1796c883", null ],
       [ "PBSM_DETAIL2_NM", "_ogre_hlms_pbs_prerequisites_8h.html#a342a992a9d37255505fc5fbb7f0584d9a1d824feba8ee4c7c8b593d319436d479", null ],
       [ "PBSM_DETAIL3_NM", "_ogre_hlms_pbs_prerequisites_8h.html#a342a992a9d37255505fc5fbb7f0584d9a2870ccbe223b90a0779da345c5ed0838", null ],
+      [ "PBSM_EMISSIVE", "_ogre_hlms_pbs_prerequisites_8h.html#ae13b0f0b5217cbcc8aa6107daac70daeacba5463bf2848b1537559137ed6adff3", null ],
       [ "PBSM_REFLECTION", "_ogre_hlms_pbs_prerequisites_8h.html#a342a992a9d37255505fc5fbb7f0584d9ae02253e0f9107cb0467f64a069d78e19", null ],
       [ "NUM_PBSM_SOURCES", "_ogre_hlms_pbs_prerequisites_8h.html#a342a992a9d37255505fc5fbb7f0584d9a5ed85b93ea3aceffa7d2f8f599ed4fff", null ],
       [ "NUM_PBSM_TEXTURE_TYPES", "_ogre_hlms_pbs_prerequisites_8h.html#a342a992a9d37255505fc5fbb7f0584d9a9f7d0920edc207a07f006330febab2ee", null ]

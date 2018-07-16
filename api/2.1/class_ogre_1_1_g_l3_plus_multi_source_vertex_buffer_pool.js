@@ -4,7 +4,7 @@ var class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool =
     [ "~GL3PlusMultiSourceVertexBufferPool", "class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool.html#a8c87594868fd7656f58a4ffd6c6e07dd", null ],
     [ "createVertexBuffers", "class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool.html#a30f6b1292697ba1273f680341b5d443e", null ],
     [ "destroyVertexBuffers", "class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool.html#a8dca320b959449700c90d6e80f98068f", null ],
-    [ "getBytesOffsetToSource", "class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool.html#a0d3f3b13fa40a01a5b8396b044344550", null ],
+    [ "getBytesOffsetToSource", "class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool.html#a73ba80e47fcfcc1c3cfc20af94d964b7", null ],
     [ "operator delete", "class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_g_l3_plus_multi_source_vertex_buffer_pool.html#acb46d4b0a597156d9ba5abc39d127792", null ],

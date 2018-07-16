@@ -2,7 +2,7 @@ var class_ogre_1_1v1_1_1_index_data =
 [
     [ "IndexData", "class_ogre_1_1v1_1_1_index_data.html#a53b8d766d619f04ba8c017e8a1353cdc", null ],
     [ "~IndexData", "class_ogre_1_1v1_1_1_index_data.html#a8e238447641062bcadd3f7f878a51305", null ],
-    [ "clone", "class_ogre_1_1v1_1_1_index_data.html#a991de9de93e94a7540c8060e6d92de56", null ],
+    [ "clone", "class_ogre_1_1v1_1_1_index_data.html#a0e52259f35801faa6d3406ca4cd12801", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_index_data.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_index_data.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_index_data.html#acb46d4b0a597156d9ba5abc39d127792", null ],

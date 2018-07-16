@@ -15,7 +15,7 @@ var class_ogre_1_1_material_serializer =
     [ "endSection", "class_ogre_1_1_material_serializer.html#adf543cc3f4c912ef1035f07cc542d78b", null ],
     [ "exportMaterial", "class_ogre_1_1_material_serializer.html#a9738a042ee8b40f84feabd61f89d88a3", null ],
     [ "exportQueued", "class_ogre_1_1_material_serializer.html#aad0415f95d43e60cce716cd3cca59739", null ],
-    [ "getQueuedAsString", "class_ogre_1_1_material_serializer.html#a04ec59e9a863616dfdd6bbb5b8d2da24", null ],
+    [ "getQueuedAsString", "class_ogre_1_1_material_serializer.html#af682adbc3c11a1a4a3de3645604208d1", null ],
     [ "operator delete", "class_ogre_1_1_material_serializer.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_material_serializer.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_material_serializer.html#acb46d4b0a597156d9ba5abc39d127792", null ],

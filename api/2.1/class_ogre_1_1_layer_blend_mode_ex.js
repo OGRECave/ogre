@@ -1,7 +1,7 @@
 var class_ogre_1_1_layer_blend_mode_ex =
 [
-    [ "operator!=", "class_ogre_1_1_layer_blend_mode_ex.html#a1ea4fff299261c723f025337c513dc88", null ],
-    [ "operator==", "class_ogre_1_1_layer_blend_mode_ex.html#a4c678a65c3a32728622812d2784c2e6d", null ],
+    [ "operator!=", "class_ogre_1_1_layer_blend_mode_ex.html#a92074f86847e7e5c065bd94498396ade", null ],
+    [ "operator==", "class_ogre_1_1_layer_blend_mode_ex.html#a1a5c33d25313f28b75fe67903766b5fe", null ],
     [ "alphaArg1", "class_ogre_1_1_layer_blend_mode_ex.html#a8af3aad5d2de939d0d9bff3049c82928", null ],
     [ "alphaArg2", "class_ogre_1_1_layer_blend_mode_ex.html#a9dde2b63904e61319b175094f8fc67f0", null ],
     [ "blendType", "class_ogre_1_1_layer_blend_mode_ex.html#ac2cb8de7b805400726882f7003a4bcda", null ],

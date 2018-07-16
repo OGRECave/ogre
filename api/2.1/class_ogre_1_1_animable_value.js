@@ -23,7 +23,7 @@ var class_ogre_1_1_animable_value =
     [ "applyDeltaValue", "class_ogre_1_1_animable_value.html#a8a546dead00468e8de1a93a853c5bb59", null ],
     [ "applyDeltaValue", "class_ogre_1_1_animable_value.html#a83b671f2ba59e036b6256ad64cca2ffe", null ],
     [ "applyDeltaValue", "class_ogre_1_1_animable_value.html#a662bf10183dd75b2786eb4343c63db8c", null ],
-    [ "getType", "class_ogre_1_1_animable_value.html#a801dea01990f3cb16def8185159a9e55", null ],
+    [ "getType", "class_ogre_1_1_animable_value.html#ad0d304b3016677c9579fa7f598d30153", null ],
     [ "operator delete", "class_ogre_1_1_animable_value.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_animable_value.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_animable_value.html#acb46d4b0a597156d9ba5abc39d127792", null ],

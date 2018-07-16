@@ -1,8 +1,8 @@
 var struct_ogre_1_1_hlms_macroblock =
 [
     [ "HlmsMacroblock", "struct_ogre_1_1_hlms_macroblock.html#a59013785563e6a19b27a03943b85acdd", null ],
-    [ "operator!=", "struct_ogre_1_1_hlms_macroblock.html#a053b192a445a63cf400a5eeacc673b21", null ],
-    [ "operator==", "struct_ogre_1_1_hlms_macroblock.html#ae4c314e5aec2426a9312203496f71c34", null ],
+    [ "operator!=", "struct_ogre_1_1_hlms_macroblock.html#a40a3623c935d1a2e43f9676392fbeaff", null ],
+    [ "operator==", "struct_ogre_1_1_hlms_macroblock.html#accab50d79b1fb2cbe0d02d0cd57160cf", null ],
     [ "mAllowGlobalDefaults", "struct_ogre_1_1_hlms_macroblock.html#a8202a5d073a92de41e05e2b6fe50ff26", null ],
     [ "mBlockType", "struct_ogre_1_1_hlms_macroblock.html#ae0a844b4cc3a0bba5e822b66b553bcbe", null ],
     [ "mCullMode", "struct_ogre_1_1_hlms_macroblock.html#a0b69626f1e6edb6eb6a21cf48f4ebb2a", null ],

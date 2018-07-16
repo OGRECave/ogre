@@ -1,7 +1,7 @@
 var class_ogre_1_1_metal_plugin =
 [
     [ "MetalPlugin", "class_ogre_1_1_metal_plugin.html#a6c7e655606a460a6a297013255b7c547", null ],
-    [ "getName", "class_ogre_1_1_metal_plugin.html#ace4a14fcadbb606209f40adbd6196e89", null ],
+    [ "getName", "class_ogre_1_1_metal_plugin.html#a81f8f4b826607e682345acafbf74f41b", null ],
     [ "initialise", "class_ogre_1_1_metal_plugin.html#ac16b36ae0986ed72e0b20af3302fda35", null ],
     [ "install", "class_ogre_1_1_metal_plugin.html#a6b89b559a7ae8f04742e344fc1a9f51d", null ],
     [ "operator delete", "class_ogre_1_1_metal_plugin.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],

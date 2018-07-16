@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['tagpoint',['TagPoint',['../class_ogre_1_1_tag_point.html',1,'Ogre']]],
-  ['tagpoint',['TagPoint',['../class_ogre_1_1v1_1_1_tag_point.html',1,'Ogre::v1']]],
+  ['tagpoint',['TagPoint',['../class_ogre_1_1_tag_point.html',1,'Ogre::TagPoint'],['../class_ogre_1_1v1_1_1_tag_point.html',1,'Ogre::v1::TagPoint']]],
   ['tangentspacecalc',['TangentSpaceCalc',['../class_ogre_1_1v1_1_1_tangent_space_calc.html',1,'Ogre::v1']]],
   ['targetrenderstate',['TargetRenderState',['../class_ogre_1_1_r_t_shader_1_1_target_render_state.html',1,'Ogre::RTShader']]],
   ['technique',['Technique',['../class_ogre_1_1_technique.html',1,'Ogre']]],
@@ -44,8 +43,7 @@ var searchData=
   ['textureframecontrollervalue',['TextureFrameControllerValue',['../class_ogre_1_1_texture_frame_controller_value.html',1,'Ogre']]],
   ['texturelocation',['TextureLocation',['../struct_ogre_1_1_hlms_texture_manager_1_1_texture_location.html',1,'Ogre::HlmsTextureManager']]],
   ['texturemanager',['TextureManager',['../class_ogre_1_1_texture_manager.html',1,'Ogre']]],
-  ['texturesource',['TextureSource',['../struct_ogre_1_1_compositor_pass_uav_def_1_1_texture_source.html',1,'Ogre::CompositorPassUavDef']]],
-  ['texturesource',['TextureSource',['../class_ogre_1_1_volume_1_1_texture_source.html',1,'Ogre::Volume']]],
+  ['texturesource',['TextureSource',['../struct_ogre_1_1_compositor_pass_uav_def_1_1_texture_source.html',1,'Ogre::CompositorPassUavDef::TextureSource'],['../class_ogre_1_1_volume_1_1_texture_source.html',1,'Ogre::Volume::TextureSource']]],
   ['texturesourcetranslator',['TextureSourceTranslator',['../class_ogre_1_1_texture_source_translator.html',1,'Ogre']]],
   ['textureunitstate',['TextureUnitState',['../class_ogre_1_1_texture_unit_state.html',1,'Ogre']]],
   ['textureunittranslator',['TextureUnitTranslator',['../class_ogre_1_1_texture_unit_translator.html',1,'Ogre']]],
@@ -55,14 +53,14 @@ var searchData=
   ['threshold',['Threshold',['../struct_ogre_1_1_hlms_texture_manager_1_1_threshold.html',1,'Ogre::HlmsTextureManager']]],
   ['timeindex',['TimeIndex',['../class_ogre_1_1v1_1_1_time_index.html',1,'Ogre::v1']]],
   ['timer',['Timer',['../class_ogre_1_1_timer.html',1,'Ogre']]],
+  ['trackedrenderable',['TrackedRenderable',['../struct_ogre_1_1_planar_reflections_1_1_tracked_renderable.html',1,'Ogre::PlanarReflections']]],
   ['transform',['Transform',['../struct_ogre_1_1_transform.html',1,'Ogre']]],
   ['transformkeyframe',['TransformKeyFrame',['../class_ogre_1_1v1_1_1_transform_key_frame.html',1,'Ogre::v1']]],
   ['trect',['TRect',['../struct_ogre_1_1_t_rect.html',1,'Ogre']]],
   ['trect_3c_20float_20_3e',['TRect&lt; float &gt;',['../struct_ogre_1_1_t_rect.html',1,'Ogre']]],
   ['trect_3c_20long_20_3e',['TRect&lt; long &gt;',['../struct_ogre_1_1_t_rect.html',1,'Ogre']]],
   ['trect_3c_20real_20_3e',['TRect&lt; Real &gt;',['../struct_ogre_1_1_t_rect.html',1,'Ogre']]],
-  ['triangle',['Triangle',['../struct_ogre_1_1v1_1_1_edge_data_1_1_triangle.html',1,'Ogre::v1::EdgeData']]],
-  ['triangle',['Triangle',['../struct_ogre_1_1_lod_data_1_1_triangle.html',1,'Ogre::LodData']]],
+  ['triangle',['Triangle',['../struct_ogre_1_1_lod_data_1_1_triangle.html',1,'Ogre::LodData::Triangle'],['../struct_ogre_1_1v1_1_1_edge_data_1_1_triangle.html',1,'Ogre::v1::EdgeData::Triangle']]],
   ['triplanartexturing',['TriplanarTexturing',['../class_ogre_1_1_r_t_shader_1_1_triplanar_texturing.html',1,'Ogre::RTShader']]],
   ['triplanartexturingfactory',['TriplanarTexturingFactory',['../class_ogre_1_1_r_t_shader_1_1_triplanar_texturing_factory.html',1,'Ogre::RTShader']]]
 ];

@@ -10,8 +10,8 @@ var class_ogre_1_1_const_vector_iterator =
     [ "current", "class_ogre_1_1_const_vector_iterator.html#ab2daa0557a06aebd61686b13c865b6c0", null ],
     [ "end", "class_ogre_1_1_const_vector_iterator.html#a0fd0df9bbfe0fc16939600b37de81739", null ],
     [ "getNext", "class_ogre_1_1_const_vector_iterator.html#a2460c8adb6819235849de954db6a0f64", null ],
-    [ "hasMoreElements", "class_ogre_1_1_const_vector_iterator.html#a468ebc8ca34585ed3ef17a432ee22704", null ],
+    [ "hasMoreElements", "class_ogre_1_1_const_vector_iterator.html#abd1f3f1f5143828a6296347d5b0b9d04", null ],
     [ "moveNext", "class_ogre_1_1_const_vector_iterator.html#aaf01f897bea391797dc2bb9fb8374a5f", null ],
-    [ "peekNext", "class_ogre_1_1_const_vector_iterator.html#aa9fb7dc63c70c2065eea12083c2467fb", null ],
-    [ "peekNextPtr", "class_ogre_1_1_const_vector_iterator.html#aafbb3662aba1dc76c617ce52724f2c66", null ]
+    [ "peekNext", "class_ogre_1_1_const_vector_iterator.html#adc1cbc2e629b20b8a959646eddb720c5", null ],
+    [ "peekNextPtr", "class_ogre_1_1_const_vector_iterator.html#ac3c1e21df4a61841624487652fbaedc0", null ]
 ];

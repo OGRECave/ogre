@@ -2,8 +2,8 @@ var class_ogre_1_1_volume_1_1_dual_grid_generator =
 [
     [ "DualGridGenerator", "class_ogre_1_1_volume_1_1_dual_grid_generator.html#a069bddc9db0c2f673c22f2c6f7658dd1", null ],
     [ "generateDualGrid", "class_ogre_1_1_volume_1_1_dual_grid_generator.html#a5a03ad87197adde6425628e45da8650a", null ],
-    [ "getDualCell", "class_ogre_1_1_volume_1_1_dual_grid_generator.html#a3d44c67d1f903bbd9a6145ed8e93adbc", null ],
-    [ "getDualCellCount", "class_ogre_1_1_volume_1_1_dual_grid_generator.html#af296331735adee16e49ce6eeb7948a07", null ],
+    [ "getDualCell", "class_ogre_1_1_volume_1_1_dual_grid_generator.html#af5e519b50f802e5dc5c5daa77be863a9", null ],
+    [ "getDualCellCount", "class_ogre_1_1_volume_1_1_dual_grid_generator.html#a6daa049586de80dc65140d95c1a2772f", null ],
     [ "getDualGrid", "class_ogre_1_1_volume_1_1_dual_grid_generator.html#a9b386d4dc87a1e7b4800ff4bd87bd6f2", null ],
     [ "operator delete", "class_ogre_1_1_volume_1_1_dual_grid_generator.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_volume_1_1_dual_grid_generator.html#a1c727e879a260c37b00ce5505fe8e144", null ],

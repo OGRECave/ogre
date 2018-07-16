@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['windows',['Windows',['../SettingUpOgreWindows.html',1,'SettingUpOgre']]]
+  ['windows',['Windows',['../_setting_up_ogre_windows.html',1,'SettingUpOgre']]]
 ];

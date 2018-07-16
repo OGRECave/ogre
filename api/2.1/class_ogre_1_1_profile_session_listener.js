@@ -9,7 +9,7 @@ var class_ogre_1_1_profile_session_listener =
     [ "changeEnableState", "class_ogre_1_1_profile_session_listener.html#a890e4c31d485fd9842beece13d2752e9", null ],
     [ "displayResults", "class_ogre_1_1_profile_session_listener.html#a113fcfa3b7e251bccbaf12c9b58790b5", null ],
     [ "finializeSession", "class_ogre_1_1_profile_session_listener.html#a4e5b4b6405ab857d9eb381975010eaa1", null ],
-    [ "getDisplayMode", "class_ogre_1_1_profile_session_listener.html#af85982f1cda7438afc39dd439fd11e14", null ],
+    [ "getDisplayMode", "class_ogre_1_1_profile_session_listener.html#ae1e613f73f9d96f4a9a6531f58a25262", null ],
     [ "initializeSession", "class_ogre_1_1_profile_session_listener.html#a2a55689ef0b65d011ecbe5e618ec6061", null ],
     [ "setDisplayMode", "class_ogre_1_1_profile_session_listener.html#a0c25d6616ec6529f589ff8a39c60b3d8", null ]
 ];

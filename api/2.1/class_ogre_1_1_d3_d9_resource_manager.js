@@ -2,8 +2,8 @@ var class_ogre_1_1_d3_d9_resource_manager =
 [
     [ "D3D9ResourceManager", "class_ogre_1_1_d3_d9_resource_manager.html#a2e5c4329b1c7abf2af86ca8e7040f218", null ],
     [ "~D3D9ResourceManager", "class_ogre_1_1_d3_d9_resource_manager.html#a6217a2bec646ee530dcc0ae3959c3376", null ],
-    [ "getAutoHardwareBufferManagement", "class_ogre_1_1_d3_d9_resource_manager.html#ad59ab6f081f1dbb63e3daf2533fad838", null ],
-    [ "getCreationPolicy", "class_ogre_1_1_d3_d9_resource_manager.html#a887a9ea51d743c01d36c24984b85fc50", null ],
+    [ "getAutoHardwareBufferManagement", "class_ogre_1_1_d3_d9_resource_manager.html#a9d762f5d1068593badc1b096a2d6277b", null ],
+    [ "getCreationPolicy", "class_ogre_1_1_d3_d9_resource_manager.html#a6892530d485dfb4f9ecedf035b02636e", null ],
     [ "lockDeviceAccess", "class_ogre_1_1_d3_d9_resource_manager.html#abf59ec939708ee86f69c49d8794e79f9", null ],
     [ "notifyOnDeviceCreate", "class_ogre_1_1_d3_d9_resource_manager.html#aca7e782d7860488f1888191a0b92e9cc", null ],
     [ "notifyOnDeviceDestroy", "class_ogre_1_1_d3_d9_resource_manager.html#a9774eeae04c96fe13a03cc506994ac41", null ],

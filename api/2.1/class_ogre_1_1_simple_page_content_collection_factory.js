@@ -4,7 +4,7 @@ var class_ogre_1_1_simple_page_content_collection_factory =
     [ "~SimplePageContentCollectionFactory", "class_ogre_1_1_simple_page_content_collection_factory.html#a21a3fd66fa62c377913b4f92f954cf98", null ],
     [ "createInstance", "class_ogre_1_1_simple_page_content_collection_factory.html#a3c3ba445b4c7b3428d5b8a0c998c1afa", null ],
     [ "destroyInstance", "class_ogre_1_1_simple_page_content_collection_factory.html#a1d05d1e51b58261f5f2e2cfa23980408", null ],
-    [ "getName", "class_ogre_1_1_simple_page_content_collection_factory.html#a7fe0f293245eff3b9a0cb9ad23c0a522", null ],
+    [ "getName", "class_ogre_1_1_simple_page_content_collection_factory.html#a8222077065b33306a243ead936e34885", null ],
     [ "operator delete", "class_ogre_1_1_simple_page_content_collection_factory.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_simple_page_content_collection_factory.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_simple_page_content_collection_factory.html#acb46d4b0a597156d9ba5abc39d127792", null ],

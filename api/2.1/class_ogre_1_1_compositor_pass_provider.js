@@ -11,5 +11,6 @@ var class_ogre_1_1_compositor_pass_provider =
     [ "operator new", "class_ogre_1_1_compositor_pass_provider.html#ac4bdf968b7b9af8a5239a27da73d5711", null ],
     [ "operator new", "class_ogre_1_1_compositor_pass_provider.html#ab78a921e54419be677839cdf15d1f0b8", null ],
     [ "operator new[]", "class_ogre_1_1_compositor_pass_provider.html#a4be37baef81876985aa1071ad5acc6dd", null ],
-    [ "operator new[]", "class_ogre_1_1_compositor_pass_provider.html#afa2943846ba6a2b5824a12857139cf5e", null ]
+    [ "operator new[]", "class_ogre_1_1_compositor_pass_provider.html#afa2943846ba6a2b5824a12857139cf5e", null ],
+    [ "translateCustomPass", "class_ogre_1_1_compositor_pass_provider.html#a3faf3c61e46b3ca1d8dd9e40396c82df", null ]
 ];

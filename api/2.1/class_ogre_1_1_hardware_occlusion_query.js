@@ -4,7 +4,7 @@ var class_ogre_1_1_hardware_occlusion_query =
     [ "~HardwareOcclusionQuery", "class_ogre_1_1_hardware_occlusion_query.html#a713fc5b2a2e0ab14843fc381f8d93f99", null ],
     [ "beginOcclusionQuery", "class_ogre_1_1_hardware_occlusion_query.html#a40efe70ae4a5877fadd5ef40b2e5fcf3", null ],
     [ "endOcclusionQuery", "class_ogre_1_1_hardware_occlusion_query.html#aae324a11ce1f97199024d1ee38a297c2", null ],
-    [ "getLastQuerysPixelcount", "class_ogre_1_1_hardware_occlusion_query.html#ae90c7bb824d1fdffe1ea35549217a5c7", null ],
+    [ "getLastQuerysPixelcount", "class_ogre_1_1_hardware_occlusion_query.html#ad1c71c786e262908a3aa805287b815e3", null ],
     [ "isStillOutstanding", "class_ogre_1_1_hardware_occlusion_query.html#abdc85b8e78de55492c8d2d730150e08d", null ],
     [ "operator delete", "class_ogre_1_1_hardware_occlusion_query.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_hardware_occlusion_query.html#a1c727e879a260c37b00ce5505fe8e144", null ],

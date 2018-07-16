@@ -13,5 +13,6 @@ var searchData=
   ['contenttype',['ContentType',['../class_ogre_1_1_texture_unit_state.html#a35a108a68c71c8267af4af8c1a819030',1,'Ogre::TextureUnitState']]],
   ['cornerenum',['CornerEnum',['../class_ogre_1_1_axis_aligned_box.html#a771c83dfb946e6d66c9ddf09fba7e5b3',1,'Ogre::AxisAlignedBox']]],
   ['cpufeatures',['CpuFeatures',['../class_ogre_1_1_platform_information.html#af7f9306631264031789d89af0642a807',1,'Ogre::PlatformInformation']]],
-  ['cullingmode',['CullingMode',['../group___general.html#gac173244ed7d950d0acd726e4f323ecdb',1,'Ogre']]]
+  ['cullingmode',['CullingMode',['../group___general.html#gac173244ed7d950d0acd726e4f323ecdb',1,'Ogre']]],
+  ['customparameterbits',['CustomParameterBits',['../class_ogre_1_1_planar_reflections.html#aef23063b9860dc2511f94643d68a5144',1,'Ogre::PlanarReflections']]]
 ];

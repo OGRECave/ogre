@@ -4,7 +4,7 @@ var class_ogre_1_1v1_1_1_ribbon_trail_factory =
     [ "~RibbonTrailFactory", "class_ogre_1_1v1_1_1_ribbon_trail_factory.html#a7761d088c8883b91d08f8a2eb93ebc22", null ],
     [ "createInstance", "class_ogre_1_1v1_1_1_ribbon_trail_factory.html#a0fbd15da3201007d58dcaf2eddc9ea62", null ],
     [ "destroyInstance", "class_ogre_1_1v1_1_1_ribbon_trail_factory.html#adf8884966a54e4128672260ac22f5a3c", null ],
-    [ "getType", "class_ogre_1_1v1_1_1_ribbon_trail_factory.html#a1a13800ba296157bb498f0b6a5ad6531", null ],
+    [ "getType", "class_ogre_1_1v1_1_1_ribbon_trail_factory.html#a59d2f42de0942dfefcb08fb264e3a7e0", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_ribbon_trail_factory.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_ribbon_trail_factory.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_ribbon_trail_factory.html#acb46d4b0a597156d9ba5abc39d127792", null ],

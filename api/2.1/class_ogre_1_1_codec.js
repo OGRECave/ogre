@@ -15,7 +15,7 @@ var class_ogre_1_1_codec =
     [ "getExtensions", "class_ogre_1_1_codec.html#a6092324fd74dd0221f7c63ca8bec4fc1", null ],
     [ "getType", "class_ogre_1_1_codec.html#ada1a5477ab6a563565f1b3599d7b806a", null ],
     [ "isCodecRegistered", "class_ogre_1_1_codec.html#ae5b74cfd0cb797a2ac139b4adb7ac557", null ],
-    [ "magicNumberMatch", "class_ogre_1_1_codec.html#ae875657d0aa27ef91d934470f00dd9b5", null ],
+    [ "magicNumberMatch", "class_ogre_1_1_codec.html#a270be35471eb9ef28fdbd4b7dced21b9", null ],
     [ "magicNumberToFileExt", "class_ogre_1_1_codec.html#af90756f690827353e18347d328bc5180", null ],
     [ "operator delete", "class_ogre_1_1_codec.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_codec.html#a1c727e879a260c37b00ce5505fe8e144", null ],

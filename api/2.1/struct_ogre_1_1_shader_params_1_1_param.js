@@ -1,7 +1,7 @@
 var struct_ogre_1_1_shader_params_1_1_param =
 [
-    [ "getManualValue", "struct_ogre_1_1_shader_params_1_1_param.html#a912e088f2e37a9a129e2ea001934815e", null ],
-    [ "getManualValue", "struct_ogre_1_1_shader_params_1_1_param.html#aa11c153db33efc72c40426c2579cb9e7", null ],
+    [ "getManualValue", "struct_ogre_1_1_shader_params_1_1_param.html#a450dd434d655d8fa6ef9ad86e5d1066b", null ],
+    [ "getManualValue", "struct_ogre_1_1_shader_params_1_1_param.html#abeff2dc30e617ce4d180a9d519fe2eda", null ],
     [ "setManualValue", "struct_ogre_1_1_shader_params_1_1_param.html#ab83852d923f92e5d5326370774d2925b", null ],
     [ "setManualValue", "struct_ogre_1_1_shader_params_1_1_param.html#a13f397d05b843785118d5b3a7508dc4b", null ],
     [ "setManualValue", "struct_ogre_1_1_shader_params_1_1_param.html#a5deadcaad266ed7365822e9cd347a991", null ],

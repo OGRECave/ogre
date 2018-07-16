@@ -1,11 +1,11 @@
 var searchData=
 [
-  ['x11eglcontext',['X11EGLContext',['../class_ogre_1_1_x11_e_g_l_context.html#ae2a5e7dd7216b3480db37a955e6fa062',1,'Ogre::X11EGLContext']]],
+  ['x11eglcontext',['X11EGLContext',['../class_ogre_1_1_x11_e_g_l_context.html#ab64c62f21853a949bb655e239f035329',1,'Ogre::X11EGLContext']]],
   ['x11eglsupport',['X11EGLSupport',['../class_ogre_1_1_x11_e_g_l_support.html#afb18742080a07659c7fd5809be375374',1,'Ogre::X11EGLSupport']]],
   ['x11eglwindow',['X11EGLWindow',['../class_ogre_1_1_x11_e_g_l_window.html#ad68ece32d3ad9cd7fa573c23ede26245',1,'Ogre::X11EGLWindow']]],
   ['xallocsizehints',['XAllocSizeHints',['../_ogre_x11_e_g_l_support_8h.html#a680301d2a4d46f94803ff0d63fddaa9d',1,'OgreX11EGLSupport.h']]],
   ['xallocwmhints',['XAllocWMHints',['../_ogre_x11_e_g_l_support_8h.html#aab67f606d663825099c9966beae8b846',1,'OgreX11EGLSupport.h']]],
-  ['xaxis',['xAxis',['../class_ogre_1_1_array_quaternion.html#a7a69709497dcf5fbdb2dcf6f10be45f8',1,'Ogre::ArrayQuaternion::xAxis(void) const '],['../class_ogre_1_1_array_quaternion.html#a7a69709497dcf5fbdb2dcf6f10be45f8',1,'Ogre::ArrayQuaternion::xAxis(void) const '],['../class_ogre_1_1_array_quaternion.html#a7a69709497dcf5fbdb2dcf6f10be45f8',1,'Ogre::ArrayQuaternion::xAxis(void) const '],['../class_ogre_1_1_quaternion.html#ad6d7ef864ec7bf39db133a0fd67cce26',1,'Ogre::Quaternion::xAxis()']]],
+  ['xaxis',['xAxis',['../class_ogre_1_1_array_quaternion.html#a497e06d0ba8d4d550e781446b595a159',1,'Ogre::ArrayQuaternion::xAxis(void) const'],['../class_ogre_1_1_array_quaternion.html#a497e06d0ba8d4d550e781446b595a159',1,'Ogre::ArrayQuaternion::xAxis(void) const'],['../class_ogre_1_1_array_quaternion.html#a497e06d0ba8d4d550e781446b595a159',1,'Ogre::ArrayQuaternion::xAxis(void) const'],['../class_ogre_1_1_quaternion.html#a58a45c5dd46ceee8dbf81dfced570dbe',1,'Ogre::Quaternion::xAxis()']]],
   ['xclosedisplay',['XCloseDisplay',['../_ogre_x11_e_g_l_support_8h.html#a10d83d1f69ba9c38afde9da17cfe2405',1,'OgreX11EGLSupport.h']]],
   ['xcreatecolormap',['XCreateColormap',['../_ogre_x11_e_g_l_support_8h.html#a30ae54ad919dae8588835ae717509d0f',1,'OgreX11EGLSupport.h']]],
   ['xcreatewindow',['XCreateWindow',['../_ogre_x11_e_g_l_support_8h.html#aa4169ce536fca992c649729b4b80c67a',1,'OgreX11EGLSupport.h']]],

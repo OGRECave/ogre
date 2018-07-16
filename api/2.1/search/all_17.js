@@ -1,16 +1,13 @@
 var searchData=
 [
-  ['x',['x',['../class_ogre_1_1_array_quaternion.html#a3448a741c10d57a7ad6d23fc5eb10543',1,'Ogre::ArrayQuaternion::x()'],['../class_ogre_1_1_dual_quaternion.html#a1afbb66b83f2085f452bb663ceafc9dc',1,'Ogre::DualQuaternion::x()'],['../class_ogre_1_1_quaternion.html#a32c5680516b41bc4ba3159bf4d4abaf1',1,'Ogre::Quaternion::x()'],['../class_ogre_1_1_vector2.html#af3eb55ba6d289477e9aa52b8de341380',1,'Ogre::Vector2::x()'],['../class_ogre_1_1_vector3.html#a27be092ad0b7e0504ddf4db5cd565f14',1,'Ogre::Vector3::x()'],['../class_ogre_1_1_vector4.html#ac1f14b711795b4d13140e992d9a3e6cf',1,'Ogre::Vector4::x()'],['../struct_ogre_1_1_terrain_group_1_1_terrain_slot.html#a371c7d7ea4a4413f46dd5477c29b374c',1,'Ogre::TerrainGroup::TerrainSlot::x()'],['../struct_ogre_1_1_volume_1_1_vertex.html#a3a9f6c743d07cc2702991ff6cbfce1b6',1,'Ogre::Volume::Vertex::x()'],['../struct_x_window_attributes.html#aea82c1660444377ca478712690c77a19',1,'XWindowAttributes::x()']]],
+  ['x',['x',['../struct_ogre_1_1_shadow_node_helper_1_1_resolution.html#aea5ac676e1d7a40e0d461974d081fc41',1,'Ogre::ShadowNodeHelper::Resolution::x()'],['../class_ogre_1_1_array_quaternion.html#a3448a741c10d57a7ad6d23fc5eb10543',1,'Ogre::ArrayQuaternion::x()'],['../class_ogre_1_1_dual_quaternion.html#a1afbb66b83f2085f452bb663ceafc9dc',1,'Ogre::DualQuaternion::x()'],['../class_ogre_1_1_quaternion.html#a32c5680516b41bc4ba3159bf4d4abaf1',1,'Ogre::Quaternion::x()'],['../class_ogre_1_1_vector2.html#af3eb55ba6d289477e9aa52b8de341380',1,'Ogre::Vector2::x()'],['../class_ogre_1_1_vector3.html#a27be092ad0b7e0504ddf4db5cd565f14',1,'Ogre::Vector3::x()'],['../class_ogre_1_1_vector4.html#ac1f14b711795b4d13140e992d9a3e6cf',1,'Ogre::Vector4::x()'],['../struct_ogre_1_1_terrain_group_1_1_terrain_slot.html#a371c7d7ea4a4413f46dd5477c29b374c',1,'Ogre::TerrainGroup::TerrainSlot::x()'],['../struct_ogre_1_1_volume_1_1_vertex.html#a3a9f6c743d07cc2702991ff6cbfce1b6',1,'Ogre::Volume::Vertex::x()'],['../struct_x_window_attributes.html#aea82c1660444377ca478712690c77a19',1,'XWindowAttributes::x()']]],
   ['x11bool',['X11Bool',['../_ogre_x11_e_g_l_support_8h.html#ab739a825d0792ad43c1f19d79736b181',1,'OgreX11EGLSupport.h']]],
-  ['x11eglcontext',['X11EGLContext',['../class_ogre_1_1_x11_e_g_l_context.html#ae2a5e7dd7216b3480db37a955e6fa062',1,'Ogre::X11EGLContext']]],
-  ['x11eglcontext',['X11EGLContext',['../class_ogre_1_1_x11_e_g_l_context.html',1,'Ogre']]],
-  ['x11eglsupport',['X11EGLSupport',['../class_ogre_1_1_x11_e_g_l_support.html',1,'Ogre']]],
-  ['x11eglsupport',['X11EGLSupport',['../class_ogre_1_1_x11_e_g_l_support.html#afb18742080a07659c7fd5809be375374',1,'Ogre::X11EGLSupport']]],
-  ['x11eglwindow',['X11EGLWindow',['../class_ogre_1_1_x11_e_g_l_window.html#ad68ece32d3ad9cd7fa573c23ede26245',1,'Ogre::X11EGLWindow']]],
-  ['x11eglwindow',['X11EGLWindow',['../class_ogre_1_1_x11_e_g_l_window.html',1,'Ogre']]],
+  ['x11eglcontext',['X11EGLContext',['../class_ogre_1_1_x11_e_g_l_context.html',1,'Ogre::X11EGLContext'],['../class_ogre_1_1_x11_e_g_l_context.html#ab64c62f21853a949bb655e239f035329',1,'Ogre::X11EGLContext::X11EGLContext()']]],
+  ['x11eglsupport',['X11EGLSupport',['../class_ogre_1_1_x11_e_g_l_support.html',1,'Ogre::X11EGLSupport'],['../class_ogre_1_1_x11_e_g_l_support.html#afb18742080a07659c7fd5809be375374',1,'Ogre::X11EGLSupport::X11EGLSupport()']]],
+  ['x11eglwindow',['X11EGLWindow',['../class_ogre_1_1_x11_e_g_l_window.html',1,'Ogre::X11EGLWindow'],['../class_ogre_1_1_x11_e_g_l_window.html#ad68ece32d3ad9cd7fa573c23ede26245',1,'Ogre::X11EGLWindow::X11EGLWindow()']]],
   ['xallocsizehints',['XAllocSizeHints',['../_ogre_x11_e_g_l_support_8h.html#a680301d2a4d46f94803ff0d63fddaa9d',1,'OgreX11EGLSupport.h']]],
   ['xallocwmhints',['XAllocWMHints',['../_ogre_x11_e_g_l_support_8h.html#aab67f606d663825099c9966beae8b846',1,'OgreX11EGLSupport.h']]],
-  ['xaxis',['xAxis',['../class_ogre_1_1_array_quaternion.html#a7a69709497dcf5fbdb2dcf6f10be45f8',1,'Ogre::ArrayQuaternion::xAxis(void) const '],['../class_ogre_1_1_array_quaternion.html#a7a69709497dcf5fbdb2dcf6f10be45f8',1,'Ogre::ArrayQuaternion::xAxis(void) const '],['../class_ogre_1_1_array_quaternion.html#a7a69709497dcf5fbdb2dcf6f10be45f8',1,'Ogre::ArrayQuaternion::xAxis(void) const '],['../class_ogre_1_1_quaternion.html#ad6d7ef864ec7bf39db133a0fd67cce26',1,'Ogre::Quaternion::xAxis()']]],
+  ['xaxis',['xAxis',['../class_ogre_1_1_array_quaternion.html#a497e06d0ba8d4d550e781446b595a159',1,'Ogre::ArrayQuaternion::xAxis(void) const'],['../class_ogre_1_1_array_quaternion.html#a497e06d0ba8d4d550e781446b595a159',1,'Ogre::ArrayQuaternion::xAxis(void) const'],['../class_ogre_1_1_array_quaternion.html#a497e06d0ba8d4d550e781446b595a159',1,'Ogre::ArrayQuaternion::xAxis(void) const'],['../class_ogre_1_1_quaternion.html#a58a45c5dd46ceee8dbf81dfced570dbe',1,'Ogre::Quaternion::xAxis()']]],
   ['xclientmessageevent',['XClientMessageEvent',['../struct_x_client_message_event.html',1,'']]],
   ['xclientmessageeventdata',['XClientMessageEventData',['../struct_x_client_message_event_data.html',1,'']]],
   ['xclosedisplay',['XCloseDisplay',['../_ogre_x11_e_g_l_support_8h.html#a10d83d1f69ba9c38afde9da17cfe2405',1,'OgreX11EGLSupport.h']]],
@@ -53,5 +50,6 @@ var searchData=
   ['xvisualidfromvisual',['XVisualIDFromVisual',['../_ogre_x11_e_g_l_support_8h.html#a5c320d2dfe131dc7e450142e83ee149b',1,'OgreX11EGLSupport.h']]],
   ['xvisualinfo',['XVisualInfo',['../struct_x_visual_info.html',1,'']]],
   ['xwindowattributes',['XWindowAttributes',['../struct_x_window_attributes.html',1,'']]],
-  ['xwmhints',['XWMHints',['../struct_x_w_m_hints.html',1,'']]]
+  ['xwmhints',['XWMHints',['../struct_x_w_m_hints.html',1,'']]],
+  ['xyhalfsize',['xyHalfSize',['../struct_ogre_1_1_array_actor_plane.html#a97985b96875c32fa0d8e519ef2e7f417',1,'Ogre::ArrayActorPlane']]]
 ];

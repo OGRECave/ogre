@@ -2,9 +2,9 @@ var class_ogre_1_1_shadow_texture_definition =
 [
     [ "ShadowTextureDefinition", "class_ogre_1_1_shadow_texture_definition.html#a3ebc57adba68081e8ccddfd38a764f10", null ],
     [ "_setSharesSetupWithIdx", "class_ogre_1_1_shadow_texture_definition.html#aa3dc808f23fdd0c33b1fcf1f02bc5783", null ],
-    [ "getSharesSetupWith", "class_ogre_1_1_shadow_texture_definition.html#a9d65e82e9b3287817c2224856b669e96", null ],
-    [ "getTextureName", "class_ogre_1_1_shadow_texture_definition.html#ad29a82b7da7ad19dd6f016fecc06d995", null ],
-    [ "getTextureNameStr", "class_ogre_1_1_shadow_texture_definition.html#a389e61f62d2ad0508a9c40d0631bbd24", null ],
+    [ "getSharesSetupWith", "class_ogre_1_1_shadow_texture_definition.html#ac05b4994513eb9bad227e3e14baa5573", null ],
+    [ "getTextureName", "class_ogre_1_1_shadow_texture_definition.html#a3159585f3a32eae40af7d5f38a70b75b", null ],
+    [ "getTextureNameStr", "class_ogre_1_1_shadow_texture_definition.html#a02f3d90da7a3f58246359cde30a89662", null ],
     [ "operator delete", "class_ogre_1_1_shadow_texture_definition.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_shadow_texture_definition.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_shadow_texture_definition.html#acb46d4b0a597156d9ba5abc39d127792", null ],
@@ -22,6 +22,8 @@ var class_ogre_1_1_shadow_texture_definition =
     [ "pssmLambda", "class_ogre_1_1_shadow_texture_definition.html#ae4cbfdcb5d1bc9c1f6063cc1a5d80d71", null ],
     [ "shadowMapTechnique", "class_ogre_1_1_shadow_texture_definition.html#a1c82ba62c6bd28831012501ece8a226d", null ],
     [ "split", "class_ogre_1_1_shadow_texture_definition.html#ac6402ed16c96fb2a1f609210149367b5", null ],
+    [ "splitBlend", "class_ogre_1_1_shadow_texture_definition.html#aa3ac2972f9e469cd082cd53192c9413e", null ],
+    [ "splitFade", "class_ogre_1_1_shadow_texture_definition.html#a1cd3c1275e1b00eb38cbf805d25646b2", null ],
     [ "splitPadding", "class_ogre_1_1_shadow_texture_definition.html#a9b5126de096e92c457fdb3e9eb568f1b", null ],
     [ "uvLength", "class_ogre_1_1_shadow_texture_definition.html#a6b5048cef58070a4608897ab718eb9c4", null ],
     [ "uvOffset", "class_ogre_1_1_shadow_texture_definition.html#a9415b07e2e36a433b61767818fa214d8", null ]

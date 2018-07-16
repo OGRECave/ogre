@@ -2,9 +2,9 @@ var class_ogre_1_1v1_1_1_numeric_key_frame =
 [
     [ "NumericKeyFrame", "class_ogre_1_1v1_1_1_numeric_key_frame.html#a1ffe63f029d802c2eaaf0a3d57f536d0", null ],
     [ "~NumericKeyFrame", "class_ogre_1_1v1_1_1_numeric_key_frame.html#a50a32e7c6a1019f9da42ffc8e90eeb0a", null ],
-    [ "_clone", "class_ogre_1_1v1_1_1_numeric_key_frame.html#a522d2a5d16aa0939a4ffdb93cc893f46", null ],
-    [ "getTime", "class_ogre_1_1v1_1_1_numeric_key_frame.html#af8a7943cf950be16329188550cc3870f", null ],
-    [ "getValue", "class_ogre_1_1v1_1_1_numeric_key_frame.html#ae4be9d211f79d482e001e2875563577a", null ],
+    [ "_clone", "class_ogre_1_1v1_1_1_numeric_key_frame.html#a6c9a5199c503f9e581b816514e7a2d91", null ],
+    [ "getTime", "class_ogre_1_1v1_1_1_numeric_key_frame.html#af61b8c914e1e64700458d0e1875936b7", null ],
+    [ "getValue", "class_ogre_1_1v1_1_1_numeric_key_frame.html#a2b84d7859e7360e8a0052177775a009e", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_numeric_key_frame.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_numeric_key_frame.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_numeric_key_frame.html#acb46d4b0a597156d9ba5abc39d127792", null ],

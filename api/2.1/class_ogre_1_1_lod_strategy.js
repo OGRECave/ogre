@@ -6,8 +6,8 @@ var class_ogre_1_1_lod_strategy =
     [ "getBaseValue", "class_ogre_1_1_lod_strategy.html#a11c15567a651d4e46856030f6d34b789", null ],
     [ "getIndex", "class_ogre_1_1_lod_strategy.html#a275a99620c8507f3d34fb12ad3f98cec", null ],
     [ "getIndex", "class_ogre_1_1_lod_strategy.html#aa97570f960384c50ffe6319dbb5981f8", null ],
-    [ "getName", "class_ogre_1_1_lod_strategy.html#a4dc72d5700c871cb12a1409c7e71e08b", null ],
-    [ "getValue", "class_ogre_1_1_lod_strategy.html#aae80184002889618f1a7668e25078c05", null ],
+    [ "getName", "class_ogre_1_1_lod_strategy.html#a6ffe63d24cfcaf5c0d6028fe61baa80e", null ],
+    [ "getValue", "class_ogre_1_1_lod_strategy.html#adeb7d40e283838e2f04139fc183c95d0", null ],
     [ "isSorted", "class_ogre_1_1_lod_strategy.html#a0632e960cea07fc780420db0614f2040", null ],
     [ "lodSet", "class_ogre_1_1_lod_strategy.html#a2400dc929b5f7727f0d69336b3b1e05d", null ],
     [ "lodUpdateImpl", "class_ogre_1_1_lod_strategy.html#a44ca92b0906532d0f7f99984bca6c193", null ],
@@ -23,5 +23,5 @@ var class_ogre_1_1_lod_strategy =
     [ "operator new[]", "class_ogre_1_1_lod_strategy.html#afa2943846ba6a2b5824a12857139cf5e", null ],
     [ "sort", "class_ogre_1_1_lod_strategy.html#aca8fdfeda9ae762ed441aa9aaea5589a", null ],
     [ "transformBias", "class_ogre_1_1_lod_strategy.html#aeaf5bcfb7457356cb921366769490705", null ],
-    [ "transformUserValue", "class_ogre_1_1_lod_strategy.html#aaa120bf9341ff0cada367395900b43a6", null ]
+    [ "transformUserValue", "class_ogre_1_1_lod_strategy.html#a60e9908806b839380729aae13b9a959a", null ]
 ];

@@ -19,6 +19,7 @@ var searchData=
   ['no_5fcorners',['NO_CORNERS',['../class_ogre_1_1_compositor_pass_quad_def.html#ad8aef1ad03925bb5348dd6b0c008c0d9ab3b1383fb726c7e84da6b51d8ece1b5d',1,'Ogre::CompositorPassQuadDef']]],
   ['no_5fside',['NO_SIDE',['../class_ogre_1_1_plane.html#aa5d44b14d6f032f3e0a26e83589180bcaad112821a6c39f0097136ba5df53052a',1,'Ogre::Plane']]],
   ['none',['None',['../class_ogre_1_1_hlms_pbs_datablock.html#adf6c922e4527b98a3a98aa573b382ceba58da4571019c3fa5e4f54ba299fb1a9d',1,'Ogre::HlmsPbsDatablock::None()'],['../group___terrain.html#gga4e7b31c45dc1afba816f7d9bc71a301baf4ad13488a8b22a4309fdd0a7fb70db8',1,'Ogre::NONE()']]],
+  ['normalsort',['NormalSort',['../class_ogre_1_1_render_queue.html#acbc6e62a79b77d38cf3881c796e0078ba5cee263978f56c804e527cb86a6eada0',1,'Ogre::RenderQueue']]],
   ['num_5fbasic_5fblocks',['NUM_BASIC_BLOCKS',['../group___resources.html#ggaf7c7c73e6a7e3dfb3e74484e3a971346aa676709141e3a45e7275eceecf266596',1,'Ogre']]],
   ['num_5fbuffer_5fpacked_5ftypes',['NUM_BUFFER_PACKED_TYPES',['../namespace_ogre.html#ab66e67b60d5f40dacf69ea55b82868abab2ddfb05e8a692b97b0516f5729e4916',1,'Ogre']]],
   ['num_5fcompare_5ffunctions',['NUM_COMPARE_FUNCTIONS',['../group___general.html#gga0212b4eb264f207d84c1df9425208c7aaaca094fbaf9f2b5b12a375e0de08be43',1,'Ogre']]],

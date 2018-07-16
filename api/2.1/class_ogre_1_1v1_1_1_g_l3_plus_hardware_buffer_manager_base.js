@@ -33,7 +33,7 @@ var class_ogre_1_1v1_1_1_g_l3_plus_hardware_buffer_manager_base =
     [ "deallocateScratch", "class_ogre_1_1v1_1_1_g_l3_plus_hardware_buffer_manager_base.html#a2b03b3afb7c0f5d5cbf9f81273cfb237", null ],
     [ "destroyVertexBufferBinding", "class_ogre_1_1v1_1_1_g_l3_plus_hardware_buffer_manager_base.html#aaec7f834aff615ec9efd3169658950b0", null ],
     [ "destroyVertexDeclaration", "class_ogre_1_1v1_1_1_g_l3_plus_hardware_buffer_manager_base.html#a5b732d773d680492f36f23c5d217bade", null ],
-    [ "getGLMapBufferThreshold", "class_ogre_1_1v1_1_1_g_l3_plus_hardware_buffer_manager_base.html#a2869a5dbf17489b41a8f2c060d9a9864", null ],
+    [ "getGLMapBufferThreshold", "class_ogre_1_1v1_1_1_g_l3_plus_hardware_buffer_manager_base.html#ae7e328f5e1494acb5594cc32f7f9a8d1", null ],
     [ "getGLType", "class_ogre_1_1v1_1_1_g_l3_plus_hardware_buffer_manager_base.html#a8bfd17628ae9c6b8cd052c43a15803df", null ],
     [ "getGLUsage", "class_ogre_1_1v1_1_1_g_l3_plus_hardware_buffer_manager_base.html#aebf5631e8199ca7c3bfc0def98c6864e", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_g_l3_plus_hardware_buffer_manager_base.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],

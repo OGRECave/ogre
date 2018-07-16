@@ -27,8 +27,10 @@ var searchData=
   ['_5fogrenullexport',['_OgreNULLExport',['../_ogre_n_u_l_l_prerequisites_8h.html#a2523ee6e2a5424e8c3e5628f1f9bbd2c',1,'OgreNULLPrerequisites.h']]],
   ['_5fogreoverlayexport',['_OgreOverlayExport',['../_ogre_overlay_prerequisites_8h.html#a17b4cbca9d40bcecaa0ce48a611defe2',1,'OgreOverlayPrerequisites.h']]],
   ['_5fogrepagingexport',['_OgrePagingExport',['../_ogre_paging_prerequisites_8h.html#a12507ffbcb05d7b7af41403ff7db8a5c',1,'OgrePagingPrerequisites.h']]],
+  ['_5fogreplanarreflectionsexport',['_OgrePlanarReflectionsExport',['../_ogre_planar_reflections_prerequisites_8h.html#a0041ba8498c00b0e84c8def6d2a1722b',1,'OgrePlanarReflectionsPrerequisites.h']]],
   ['_5fogrepropertyexport',['_OgrePropertyExport',['../_ogre_property_prerequisites_8h.html#af28d18a1b484acf19bec2841bc9ec96f',1,'OgrePropertyPrerequisites.h']]],
   ['_5fogrertssexport',['_OgreRTSSExport',['../_ogre_shader_prerequisites_8h.html#a2e7039d2e7e0e3a2feb2008cc7f4be43',1,'OgreShaderPrerequisites.h']]],
+  ['_5fogresceneformatexport',['_OgreSceneFormatExport',['../_ogre_scene_format_prerequisites_8h.html#aa8f76fb7d5a33d5fc8b933a27ee29f1c',1,'OgreSceneFormatPrerequisites.h']]],
   ['_5fogreterrainexport',['_OgreTerrainExport',['../_ogre_terrain_prerequisites_8h.html#a2fbe49b54cb4b3c3e2757cd3ac167068',1,'OgreTerrainPrerequisites.h']]],
   ['_5fogrevolumeexport',['_OgreVolumeExport',['../_ogre_volume_prerequisites_8h.html#a80959029d5b89f04fa997c0e9777026a',1,'OgreVolumePrerequisites.h']]],
   ['_5fsnprintf',['_snprintf',['../_ogre_lw_string_8h.html#aabb8b876e7495cfb11a152cdf728815c',1,'OgreLwString.h']]]

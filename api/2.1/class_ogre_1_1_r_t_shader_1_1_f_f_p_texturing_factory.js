@@ -6,7 +6,7 @@ var class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing_factory =
     [ "createOrRetrieveInstance", "class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing_factory.html#a54a6f6eba1624fef1de9c20eb7b0a6b5", null ],
     [ "destroyAllInstances", "class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing_factory.html#ab89670718152dcb35f2428cf5909ed99", null ],
     [ "destroyInstance", "class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing_factory.html#a23839e5fc35257e4ffb9076e2aaf9409", null ],
-    [ "getType", "class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing_factory.html#a15071fd38823cf02306d4175baba2d50", null ],
+    [ "getType", "class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing_factory.html#ada66be2fb77792675367a9197672e4e3", null ],
     [ "operator delete", "class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing_factory.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing_factory.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_r_t_shader_1_1_f_f_p_texturing_factory.html#acb46d4b0a597156d9ba5abc39d127792", null ],

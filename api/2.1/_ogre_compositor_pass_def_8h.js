@@ -14,5 +14,6 @@ var _ogre_compositor_pass_def_8h =
       [ "PASS_MIPMAP", "_ogre_compositor_pass_def_8h.html#gga6f176e5de375550ba7f1c8dccde8345aa43539099735fda358fe3b01e3536933f", null ],
       [ "PASS_COMPUTE", "_ogre_compositor_pass_def_8h.html#gga6f176e5de375550ba7f1c8dccde8345aa973bc7a5a948dd54130595d7539eb7ba", null ],
       [ "PASS_CUSTOM", "_ogre_compositor_pass_def_8h.html#gga6f176e5de375550ba7f1c8dccde8345aa8be4347345faa339a4c663a8c5da1c51", null ]
-    ] ]
+    ] ],
+    [ "CompositorPassTypeEnumNames", "_ogre_compositor_pass_def_8h.html#ga88c007cd7c351ae388b1a7dba5b652fe", null ]
 ];

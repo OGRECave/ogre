@@ -19,5 +19,6 @@ var searchData=
   ['unusedidx',['UnusedIdx',['../struct_ogre_1_1_lod0_stripifier_1_1_remap_info.html#a9003866124335b787f1075cd7acf1ff7ac6983abf66e01db92591f25e5fb5131a',1,'Ogre::Lod0Stripifier::RemapInfo']]],
   ['uo_5fkeep_5fpersistent',['UO_KEEP_PERSISTENT',['../namespace_ogre.html#a118de288d2577e6d95183777f40e57c7a90da4f4a421faca3c661eefa7c174283',1,'Ogre']]],
   ['uo_5funmap_5fall',['UO_UNMAP_ALL',['../namespace_ogre.html#a118de288d2577e6d95183777f40e57c7a0d49a586d96b1a994b7949b92c7b23e8',1,'Ogre']]],
-  ['upperdistance',['UpperDistance',['../class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735a5afc36549e882fb2e57afae6adab3626',1,'Ogre::ObjectDataArrayMemoryManager']]]
+  ['upperdistance',['UpperDistance',['../class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735a5afc36549e882fb2e57afae6adab3626',1,'Ogre::ObjectDataArrayMemoryManager']]],
+  ['useactiveactor',['UseActiveActor',['../class_ogre_1_1_planar_reflections.html#aef23063b9860dc2511f94643d68a5144a8e1d29960d0fddea25d2490406ce8147',1,'Ogre::PlanarReflections']]]
 ];

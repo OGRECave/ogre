@@ -4,6 +4,7 @@ var class_ogre_1_1_pixel_util =
     [ "bulkPixelConversion", "class_ogre_1_1_pixel_util.html#a0cae4443af5f8feb1c2f4f0905277c34", null ],
     [ "bulkPixelConversion", "class_ogre_1_1_pixel_util.html#a9f6e459a0f92c0c8e6bf4f20ee3a771a", null ],
     [ "bulkPixelVerticalFlip", "class_ogre_1_1_pixel_util.html#a3d8f29c8c1181ba98e22e342169970fd", null ],
+    [ "calculateSizeBytes", "class_ogre_1_1_pixel_util.html#ad27d6389824bcfe21185f6728af8974e", null ],
     [ "convertForNormalMapping", "class_ogre_1_1_pixel_util.html#acbe531d3eabd46c52a860a16a3b779a3", null ],
     [ "getBitDepths", "class_ogre_1_1_pixel_util.html#a91159ec54a34fca27ccc7621c9b6d957", null ],
     [ "getBitMasks", "class_ogre_1_1_pixel_util.html#a9fc6dbbd70a1f24b18db99cb1d2dae5d", null ],

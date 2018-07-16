@@ -1,9 +1,9 @@
 var class_ogre_1_1_property_def =
 [
     [ "PropertyDef", "class_ogre_1_1_property_def.html#a41cc7c20c02222c76f11d43489695551", null ],
-    [ "getDescription", "class_ogre_1_1_property_def.html#a36af51365e6f5ef64b2875ffbe96a004", null ],
-    [ "getName", "class_ogre_1_1_property_def.html#aa9fbb3c56557f180a179dfe915388a5c", null ],
-    [ "getType", "class_ogre_1_1_property_def.html#a42127e0d5069c7b25c67eb53326536e0", null ],
+    [ "getDescription", "class_ogre_1_1_property_def.html#a57023174a36bbcc6cb378f0273b5371f", null ],
+    [ "getName", "class_ogre_1_1_property_def.html#af0784b3ec70fe66b701cccd755779bf4", null ],
+    [ "getType", "class_ogre_1_1_property_def.html#a448d55d84545d7a3fdbb8a5b76cfdf16", null ],
     [ "getTypeForValue", "class_ogre_1_1_property_def.html#af1f43d6fa9c867fbbac7c847c2331a4a", null ],
     [ "getTypeForValue", "class_ogre_1_1_property_def.html#a11706d14ed57ce015ad363550c8b4a35", null ],
     [ "getTypeForValue", "class_ogre_1_1_property_def.html#ac8d97b00ddd7991fd1c6d844fcea22b7", null ],

@@ -1,7 +1,7 @@
 var class_ogre_1_1_texture_frame_controller_value =
 [
     [ "TextureFrameControllerValue", "class_ogre_1_1_texture_frame_controller_value.html#a9a1644686bc16e783116d7fbd0735852", null ],
-    [ "getValue", "class_ogre_1_1_texture_frame_controller_value.html#abf2dc15178cafd35eabe8a1de7e0b5f1", null ],
+    [ "getValue", "class_ogre_1_1_texture_frame_controller_value.html#a5e7bcfebbd2be4feefc6f1a6490ed830", null ],
     [ "operator delete", "class_ogre_1_1_texture_frame_controller_value.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_texture_frame_controller_value.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_texture_frame_controller_value.html#acb46d4b0a597156d9ba5abc39d127792", null ],

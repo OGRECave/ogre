@@ -11,7 +11,7 @@ var class_ogre_1_1_shader_params =
     ] ],
     [ "ShaderParams", "class_ogre_1_1_shader_params.html#a12e4a52470f92c2ea468410fefd5c0c3", null ],
     [ "findParameter", "class_ogre_1_1_shader_params.html#aa2b05265860eb28361eabbaf715c72be", null ],
-    [ "getUpdateCounter", "class_ogre_1_1_shader_params.html#ab82746de12d883e11d00ef429c872fed", null ],
+    [ "getUpdateCounter", "class_ogre_1_1_shader_params.html#a769576d7fd715c499aff44046cbbf231", null ],
     [ "operator delete", "class_ogre_1_1_shader_params.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_shader_params.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_shader_params.html#acb46d4b0a597156d9ba5abc39d127792", null ],

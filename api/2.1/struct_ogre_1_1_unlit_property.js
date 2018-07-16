@@ -21,6 +21,8 @@ var struct_ogre_1_1_unlit_property =
     [ "Diffuse", "struct_ogre_1_1_unlit_property.html#a7daa3e5d206d23dd0ae056df835cd2ec", null ],
     [ "DiffuseMap", "struct_ogre_1_1_unlit_property.html#a0db5d5ca5d3519481a3d624f67a7cc35", null ],
     [ "DiffuseMapPtrs", "struct_ogre_1_1_unlit_property.html#adab24bbbddb099959b2bf82ec1def9fd", null ],
+    [ "ExponentialShadowMaps", "struct_ogre_1_1_unlit_property.html#ad9c01dc8780b5ddf5610f602dda22cc0", null ],
+    [ "HasPlanarReflections", "struct_ogre_1_1_unlit_property.html#a92a6f00127166a1ecef2f5c4568c10b2", null ],
     [ "HwGammaRead", "struct_ogre_1_1_unlit_property.html#a8d2a9993a056eba4047ad05c12a888b1", null ],
     [ "HwGammaWrite", "struct_ogre_1_1_unlit_property.html#aa79107c2d56a34a83c70df5b6b442e05", null ],
     [ "MaterialsPerBuffer", "struct_ogre_1_1_unlit_property.html#af49b63d7f27d790ba58f0643a679b33f", null ],

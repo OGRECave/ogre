@@ -1,8 +1,8 @@
 var class_ogre_1_1_atom_abstract_node =
 [
     [ "AtomAbstractNode", "class_ogre_1_1_atom_abstract_node.html#a360729aa927fc675fc7acd4b61747632", null ],
-    [ "clone", "class_ogre_1_1_atom_abstract_node.html#a14b7919da7de36ffb381cf0ea2997b8a", null ],
-    [ "getValue", "class_ogre_1_1_atom_abstract_node.html#a0a634104ae5f20f6606969b893c66974", null ],
+    [ "clone", "class_ogre_1_1_atom_abstract_node.html#a1c7ee546821b5189b2af42abd0bd6045", null ],
+    [ "getValue", "class_ogre_1_1_atom_abstract_node.html#a58a01ae62e0a9496b672445eb1b6467e", null ],
     [ "operator delete", "class_ogre_1_1_atom_abstract_node.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_atom_abstract_node.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_atom_abstract_node.html#acb46d4b0a597156d9ba5abc39d127792", null ],

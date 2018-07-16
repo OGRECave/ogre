@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['layersizedidupdate',['layerSizeDidUpdate',['../interface_ogre_metal_view.html#a43b0c6402e5a55d1076551fc88dea996',1,'OgreMetalView']]]
+  ['contentscalefactor',['contentScaleFactor',['../interface_ogre_metal_view.html#a283c28df8ca674d6d7e8f8b1efe65f02',1,'OgreMetalView']]]
 ];

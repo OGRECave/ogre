@@ -34,7 +34,7 @@ var class_ogre_1_1_script_compiler =
     [ "compile", "class_ogre_1_1_script_compiler.html#a3f68dccf295d809da7b12f2583f16504", null ],
     [ "formatErrorCode", "class_ogre_1_1_script_compiler.html#a5bfebc6051cf6b32abe9c8a040dfc3a4", null ],
     [ "getListener", "class_ogre_1_1_script_compiler.html#af4b29944fbe75bafde74bbdf7a66af83", null ],
-    [ "getResourceGroup", "class_ogre_1_1_script_compiler.html#ab5e8d7c0f4978384d025a1ad2d6892d3", null ],
+    [ "getResourceGroup", "class_ogre_1_1_script_compiler.html#ab2070c4346f02085e6f66a1ffeca6ca4", null ],
     [ "operator delete", "class_ogre_1_1_script_compiler.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_script_compiler.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_script_compiler.html#acb46d4b0a597156d9ba5abc39d127792", null ],

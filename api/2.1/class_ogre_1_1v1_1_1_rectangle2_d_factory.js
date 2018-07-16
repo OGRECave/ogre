@@ -4,7 +4,7 @@ var class_ogre_1_1v1_1_1_rectangle2_d_factory =
     [ "~Rectangle2DFactory", "class_ogre_1_1v1_1_1_rectangle2_d_factory.html#aa25f6164e12ff81ee1ec942d1744ac50", null ],
     [ "createInstance", "class_ogre_1_1v1_1_1_rectangle2_d_factory.html#a0fbd15da3201007d58dcaf2eddc9ea62", null ],
     [ "destroyInstance", "class_ogre_1_1v1_1_1_rectangle2_d_factory.html#a6043da467a469e924c6f977fb52af45c", null ],
-    [ "getType", "class_ogre_1_1v1_1_1_rectangle2_d_factory.html#a6f6a4a879ffddcb0d1fe3a7d73b38179", null ],
+    [ "getType", "class_ogre_1_1v1_1_1_rectangle2_d_factory.html#af1944c08a11a5bf0dc7c2d9da4df39f4", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_rectangle2_d_factory.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_rectangle2_d_factory.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_rectangle2_d_factory.html#acb46d4b0a597156d9ba5abc39d127792", null ],

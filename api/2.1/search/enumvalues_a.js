@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['latest_5fversion',['LATEST_VERSION',['../class_ogre_1_1_scene_format_base.html#a04a65f7c590e0e1c5a3fb14adaf166a7ac99a63b058c40d9b2f623cbae803bcf2',1,'Ogre::SceneFormatBase']]],
   ['lb_5fblendadd',['LB_BlendAdd',['../class_ogre_1_1_r_t_shader_1_1_layered_blending.html#a348ad9775bac739ead7bde9ffd612a32a147c2a98aa2876d43a8dd16db5d6e64e',1,'Ogre::RTShader::LayeredBlending']]],
   ['lb_5fblendaverage',['LB_BlendAverage',['../class_ogre_1_1_r_t_shader_1_1_layered_blending.html#a348ad9775bac739ead7bde9ffd612a32a61293a27b4a204188a8931c186d8c920',1,'Ogre::RTShader::LayeredBlending']]],
   ['lb_5fblendcolor',['LB_BlendColor',['../class_ogre_1_1_r_t_shader_1_1_layered_blending.html#a348ad9775bac739ead7bde9ffd612a32adf84021b1100dc8ffcb37aca70998394',1,'Ogre::RTShader::LayeredBlending']]],
@@ -63,6 +64,8 @@ var searchData=
   ['lightgatherforwardplus',['LightGatherForwardPlus',['../class_ogre_1_1_hlms.html#a6e629e7a87a40040e12d2bfb4ff80d58a792d2cdce23b4018b9c149540ebb1a93',1,'Ogre::Hlms']]],
   ['lightgathernone',['LightGatherNone',['../class_ogre_1_1_hlms.html#a6e629e7a87a40040e12d2bfb4ff80d58aa53123a5601281132955a27422df66bc',1,'Ogre::Hlms']]],
   ['lightmask',['LightMask',['../class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735a413c495624baf53a2489abe5972519ee',1,'Ogre::ObjectDataArrayMemoryManager']]],
+  ['lights',['Lights',['../namespace_ogre_1_1_scene_flags.html#af3190017d83d94455e645c506aa1681ba9116754b875c4e6c60a159495035eaff',1,'Ogre::SceneFlags']]],
+  ['lightsvpl',['LightsVpl',['../namespace_ogre_1_1_scene_flags.html#af3190017d83d94455e645c506aa1681ba4cd22db20c201c57c4f2390e0c7575a2',1,'Ogre::SceneFlags']]],
   ['ll_5fboreme',['LL_BOREME',['../group___general.html#gga122d6319a25f910b8b1bf6fe52f91f6baeed15d58e0e6e1eaa9d23039e5fc546c',1,'Ogre']]],
   ['ll_5flow',['LL_LOW',['../group___general.html#gga122d6319a25f910b8b1bf6fe52f91f6bac3ff7e1e5965d9c0116088cd7bc77c9f',1,'Ogre']]],
   ['ll_5fnormal',['LL_NORMAL',['../group___general.html#gga122d6319a25f910b8b1bf6fe52f91f6bafc58e360523f5eb025af8e681ef494ef',1,'Ogre']]],
@@ -80,6 +83,7 @@ var searchData=
   ['localradius',['LocalRadius',['../class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735a1da538a5ee8e890351fe5eb3c6c21806',1,'Ogre::ObjectDataArrayMemoryManager']]],
   ['lowercpuoverhead',['LowerCpuOverhead',['../class_ogre_1_1_const_buffer_pool.html#a7b0944b993468357cdd0c2e1de6e50baa01f75c704092838a00d34d9640f3cd96',1,'Ogre::ConstBufferPool']]],
   ['lowergpuoverhead',['LowerGpuOverhead',['../class_ogre_1_1_const_buffer_pool.html#a7b0944b993468357cdd0c2e1de6e50baac1c28fda56a8c6500407117bda754c9d',1,'Ogre::ConstBufferPool']]],
+  ['lt_5farea_5fapprox',['LT_AREA_APPROX',['../class_ogre_1_1_light.html#a4f1dea084d1497c6f49e802ade940dbcaf7bed0743d1dfef2117f8c21dd51e91e',1,'Ogre::Light']]],
   ['lt_5fdirectional',['LT_DIRECTIONAL',['../class_ogre_1_1_light.html#a4f1dea084d1497c6f49e802ade940dbca4c5582d28848ce40c2b652488494b4a3',1,'Ogre::Light']]],
   ['lt_5fpoint',['LT_POINT',['../class_ogre_1_1_light.html#a4f1dea084d1497c6f49e802ade940dbca0d59bfdcfeb338dbfe06e2e2999e752f',1,'Ogre::Light']]],
   ['lt_5fspotlight',['LT_SPOTLIGHT',['../class_ogre_1_1_light.html#a4f1dea084d1497c6f49e802ade940dbca8fc40a1ccfb026944417ef92b7ddaefe',1,'Ogre::Light']]],

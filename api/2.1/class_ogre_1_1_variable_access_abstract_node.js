@@ -1,8 +1,8 @@
 var class_ogre_1_1_variable_access_abstract_node =
 [
     [ "VariableAccessAbstractNode", "class_ogre_1_1_variable_access_abstract_node.html#a24354dd9607adb0795d178377495957d", null ],
-    [ "clone", "class_ogre_1_1_variable_access_abstract_node.html#aaf2b15c3324a54a9c6edeb8628567f0c", null ],
-    [ "getValue", "class_ogre_1_1_variable_access_abstract_node.html#ad0e5495a2fcf195dbbeb372c4ffbf11a", null ],
+    [ "clone", "class_ogre_1_1_variable_access_abstract_node.html#a92c1dbf959f13312beee3f9ecf2a1146", null ],
+    [ "getValue", "class_ogre_1_1_variable_access_abstract_node.html#a4987991ccbfbcd117e610f5a4338bc46", null ],
     [ "operator delete", "class_ogre_1_1_variable_access_abstract_node.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_variable_access_abstract_node.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_variable_access_abstract_node.html#acb46d4b0a597156d9ba5abc39d127792", null ],

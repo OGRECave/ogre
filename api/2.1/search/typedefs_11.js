@@ -42,6 +42,7 @@ var searchData=
   ['resourceptr',['ResourcePtr',['../namespace_ogre.html#a4697cc0c72aef3b488c7e058adf734ed',1,'Ogre']]],
   ['resourcesimdallocobject',['ResourceSimdAllocObject',['../namespace_ogre.html#a56b6c2db08ea6c4b41e9d6f50ec4d761',1,'Ogre']]],
   ['resourcesimdallocpolicy',['ResourceSimdAllocPolicy',['../namespace_ogre.html#a21882659ab6ddd5e11551446039e028b',1,'Ogre']]],
+  ['resourcetotexextensionmap',['ResourceToTexExtensionMap',['../class_ogre_1_1_hlms_manager.html#ab2fa2976944a06ae29b3b24c98b955d3',1,'Ogre::HlmsManager']]],
   ['resourcewithgroupmap',['ResourceWithGroupMap',['../class_ogre_1_1_resource_manager.html#ae63717cade7ab9c72046cb079cca95e8',1,'Ogre::ResourceManager']]],
   ['result_5ftype',['result_type',['../structstd_1_1tr1_1_1hash_3_01_ogre_1_1_shared_ptr_3_01_t_01_4_01_4.html#a92fe2717408e51be270266c05d4f2847',1,'std::tr1::hash&lt; Ogre::SharedPtr&lt; T &gt; &gt;']]],
   ['reverse_5fiterator',['reverse_iterator',['../class_ogre_1_1_hashed_vector.html#a96a361e91069936d53fb954b07acf424',1,'Ogre::HashedVector::reverse_iterator()'],['../class_ogre_1_1_small_vector_template_common.html#af5c75e8908b1e44ae53d8c12d784ed96',1,'Ogre::SmallVectorTemplateCommon::reverse_iterator()'],['../class_ogre_1_1_small_vector_template_common.html#af5c75e8908b1e44ae53d8c12d784ed96',1,'Ogre::SmallVectorTemplateCommon::reverse_iterator()']]],

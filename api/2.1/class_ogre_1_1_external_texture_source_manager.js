@@ -3,7 +3,7 @@ var class_ogre_1_1_external_texture_source_manager =
     [ "ExternalTextureSourceManager", "class_ogre_1_1_external_texture_source_manager.html#afb679d92039ce0c47a43aba93cda77cd", null ],
     [ "~ExternalTextureSourceManager", "class_ogre_1_1_external_texture_source_manager.html#a02498f0fe5568e492d77d04b12345011", null ],
     [ "destroyAdvancedTexture", "class_ogre_1_1_external_texture_source_manager.html#ac555acdb2331964338efe376b156ff83", null ],
-    [ "getCurrentPlugIn", "class_ogre_1_1_external_texture_source_manager.html#a57795017d3d3db938246b677729b4f16", null ],
+    [ "getCurrentPlugIn", "class_ogre_1_1_external_texture_source_manager.html#a01221254a3321182e78cbb0484f35b42", null ],
     [ "getExternalTextureSource", "class_ogre_1_1_external_texture_source_manager.html#a86b661273b9654089472178e6927e33f", null ],
     [ "getSingleton", "class_ogre_1_1_external_texture_source_manager.html#a48ff44556145b75d887f4162ff44237b", null ],
     [ "getSingletonPtr", "class_ogre_1_1_external_texture_source_manager.html#a70c7067c51f73b0fbf2dcf77d582bb08", null ],

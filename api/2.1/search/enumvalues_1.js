@@ -39,6 +39,10 @@ var searchData=
   ['blendchannelblue',['BlendChannelBlue',['../struct_ogre_1_1_hlms_blendblock.html#a893b37752fa27b00400cf4e2ab4cf4c1ae7be1138987febe83dc15887b4bae057',1,'Ogre::HlmsBlendblock']]],
   ['blendchannelgreen',['BlendChannelGreen',['../struct_ogre_1_1_hlms_blendblock.html#a893b37752fa27b00400cf4e2ab4cf4c1a8bede65d7286a8222e3be931d02e4daf',1,'Ogre::HlmsBlendblock']]],
   ['blendchannelred',['BlendChannelRed',['../struct_ogre_1_1_hlms_blendblock.html#a893b37752fa27b00400cf4e2ab4cf4c1ac7e0bad72e386979b0eea85a9d7984a1',1,'Ogre::HlmsBlendblock']]],
+  ['blinnphong',['BlinnPhong',['../namespace_ogre_1_1_pbs_brdf.html#ae5bb5c2b5a05b4ce98b74822dedf3ffeaa7cf32a096da6ac2f93c0a8d43728ad7',1,'Ogre::PbsBrdf']]],
+  ['blinnphongfulllegacy',['BlinnPhongFullLegacy',['../namespace_ogre_1_1_pbs_brdf.html#ae5bb5c2b5a05b4ce98b74822dedf3ffeaaedeed1afec63a1109536ce0e5590453',1,'Ogre::PbsBrdf']]],
+  ['blinnphonglegacymath',['BlinnPhongLegacyMath',['../namespace_ogre_1_1_pbs_brdf.html#ae5bb5c2b5a05b4ce98b74822dedf3ffea2e1b811603889c8526097ac5bda85639',1,'Ogre::PbsBrdf']]],
+  ['blinnphongseparatediffusefresnel',['BlinnPhongSeparateDiffuseFresnel',['../namespace_ogre_1_1_pbs_brdf.html#ae5bb5c2b5a05b4ce98b74822dedf3ffea4ad9cc159387af81440cf905581a2ad1',1,'Ogre::PbsBrdf']]],
   ['block_5fblend',['BLOCK_BLEND',['../group___resources.html#ggaf7c7c73e6a7e3dfb3e74484e3a971346a3a6423f23da35c333b612e1c935c64ec',1,'Ogre']]],
   ['block_5fmacro',['BLOCK_MACRO',['../group___resources.html#ggaf7c7c73e6a7e3dfb3e74484e3a971346a1a4fa9fb476e4d9098a50aaba8b969d4',1,'Ogre']]],
   ['block_5fsampler',['BLOCK_SAMPLER',['../group___resources.html#ggaf7c7c73e6a7e3dfb3e74484e3a971346a713127682fe0b6a745f1179d6758b378',1,'Ogre']]],
@@ -65,5 +69,6 @@ var searchData=
   ['bt_5ftessellation_5fdomain',['BT_TESSELLATION_DOMAIN',['../class_ogre_1_1_texture_unit_state.html#a411bcf3e69280ce146f09ddc73d9e7e8ab49cb1270c042c02e106a0af5feb2627',1,'Ogre::TextureUnitState']]],
   ['bt_5ftessellation_5fhull',['BT_TESSELLATION_HULL',['../class_ogre_1_1_texture_unit_state.html#a411bcf3e69280ce146f09ddc73d9e7e8a64c2b3822fbb577f7ed8749e82b9119a',1,'Ogre::TextureUnitState']]],
   ['bt_5fvertex',['BT_VERTEX',['../class_ogre_1_1_texture_unit_state.html#a411bcf3e69280ce146f09ddc73d9e7e8a857de1fa5e307a5a5b0df779ad4a470e',1,'Ogre::TextureUnitState']]],
+  ['buildinstantradiosity',['BuildInstantRadiosity',['../namespace_ogre_1_1_scene_flags.html#af3190017d83d94455e645c506aa1681baceb12ece684abf5f97d151487dbc7e5a',1,'Ogre::SceneFlags']]],
   ['by_5fdistance',['BY_DISTANCE',['../group___terrain.html#gga4e7b31c45dc1afba816f7d9bc71a301ba8b40189aba8887f4cdb96d967cd80460',1,'Ogre']]]
 ];

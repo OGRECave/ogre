@@ -2,7 +2,7 @@ var struct_ogre_1_1_texture_definition_base_1_1_buffer_definition =
 [
     [ "BufferDefinition", "struct_ogre_1_1_texture_definition_base_1_1_buffer_definition.html#ac2bbf66794a1656078a167cd6fc0f954", null ],
     [ "_setName", "struct_ogre_1_1_texture_definition_base_1_1_buffer_definition.html#a9f6a31fbf66d0d93fd0ec8cbfff5173a", null ],
-    [ "getName", "struct_ogre_1_1_texture_definition_base_1_1_buffer_definition.html#a964e2bae718974624174f5a5c0aaf1d3", null ],
+    [ "getName", "struct_ogre_1_1_texture_definition_base_1_1_buffer_definition.html#af03dba65f8e1e5e91a5b47f0cedea20d", null ],
     [ "operator delete", "struct_ogre_1_1_texture_definition_base_1_1_buffer_definition.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "struct_ogre_1_1_texture_definition_base_1_1_buffer_definition.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "struct_ogre_1_1_texture_definition_base_1_1_buffer_definition.html#acb46d4b0a597156d9ba5abc39d127792", null ],

@@ -2,7 +2,7 @@ var class_ogre_1_1_texture_definition_base_1_1_texture_definition =
 [
     [ "TextureDefinition", "class_ogre_1_1_texture_definition_base_1_1_texture_definition.html#a2ae731e2833d8a157fd174cfa323e3b1", null ],
     [ "_setName", "class_ogre_1_1_texture_definition_base_1_1_texture_definition.html#af91257f5f60c05e94277db7b6ca23850", null ],
-    [ "getName", "class_ogre_1_1_texture_definition_base_1_1_texture_definition.html#a5d9e23544f48fee90f86c83eaa5cc63c", null ],
+    [ "getName", "class_ogre_1_1_texture_definition_base_1_1_texture_definition.html#a1b5348d4ebfa771922ac12532d6b737f", null ],
     [ "operator delete", "class_ogre_1_1_texture_definition_base_1_1_texture_definition.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_texture_definition_base_1_1_texture_definition.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_texture_definition_base_1_1_texture_definition.html#acb46d4b0a597156d9ba5abc39d127792", null ],

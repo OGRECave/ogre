@@ -1,7 +1,7 @@
 var class_ogre_1_1_g_l_e_s2_plugin =
 [
     [ "GLES2Plugin", "class_ogre_1_1_g_l_e_s2_plugin.html#a6fd35960105ff9ee7f92bc9bcb948530", null ],
-    [ "getName", "class_ogre_1_1_g_l_e_s2_plugin.html#a3aca87457d7468f436a68a4cbbaf287d", null ],
+    [ "getName", "class_ogre_1_1_g_l_e_s2_plugin.html#a981f66db6c0d4f2b8445e90fde339f9f", null ],
     [ "initialise", "class_ogre_1_1_g_l_e_s2_plugin.html#abc32f9504be080a8d866bc5b24a95851", null ],
     [ "install", "class_ogre_1_1_g_l_e_s2_plugin.html#a11a9f8b3a25c275d1d35b2a9db5f0ac6", null ],
     [ "operator delete", "class_ogre_1_1_g_l_e_s2_plugin.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],

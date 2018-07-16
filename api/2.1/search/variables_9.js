@@ -50,6 +50,7 @@ var searchData=
   ['islast',['isLast',['../struct_ogre_1_1_terrain_lod_manager_1_1_lod_info.html#a3d3eaf36cee2c6b6cb64bad691cd98f6',1,'Ogre::TerrainLodManager::LodInfo']]],
   ['isnormalmap',['isNormalMap',['../struct_ogre_1_1_hlms_texture_manager_1_1_default_texture_parameters.html#af20ba996be15bc6bd869f9f4468d08e5',1,'Ogre::HlmsTextureManager::DefaultTextureParameters']]],
   ['isremoved',['isRemoved',['../struct_ogre_1_1_lod_data_1_1_triangle.html#ad3d2f1e41bdf70e19007938074b2cf0e',1,'Ogre::LodData::Triangle']]],
+  ['isreserved',['isReserved',['../struct_ogre_1_1_active_actor_data.html#aa30b9da70843a43b033ff04c28f4073e',1,'Ogre::ActiveActorData']]],
   ['issky',['isSky',['../struct_ogre_1_1_static_face_group.html#aa58eb0dbf0fdf7e625c80e7dbb0e76f9',1,'Ogre::StaticFaceGroup']]],
   ['isstatic',['isStatic',['../struct_ogre_1_1_light_closest.html#aabcad38af292fdfc1e2179c1a9be4ac3',1,'Ogre::LightClosest']]],
   ['isupdate',['isUpdate',['../struct_ogre_1_1_volume_1_1_chunk_request.html#ab1953c58a16e1edfde6a843134cac2ff',1,'Ogre::Volume::ChunkRequest']]],

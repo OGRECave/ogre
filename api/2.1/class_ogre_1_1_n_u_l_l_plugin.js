@@ -1,7 +1,7 @@
 var class_ogre_1_1_n_u_l_l_plugin =
 [
     [ "NULLPlugin", "class_ogre_1_1_n_u_l_l_plugin.html#a8efc357100706eeada94595f8bd1f7d8", null ],
-    [ "getName", "class_ogre_1_1_n_u_l_l_plugin.html#ab5cdb6259bb76c9088b5fc8740add512", null ],
+    [ "getName", "class_ogre_1_1_n_u_l_l_plugin.html#ab53310665fb6d7b97884ecd54d657ae1", null ],
     [ "initialise", "class_ogre_1_1_n_u_l_l_plugin.html#a605bb0484d6030e7e82c9c3f7ac7db30", null ],
     [ "install", "class_ogre_1_1_n_u_l_l_plugin.html#ac85e8e638352de0583f58f3bbbefba61", null ],
     [ "operator delete", "class_ogre_1_1_n_u_l_l_plugin.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],

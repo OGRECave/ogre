@@ -22,6 +22,9 @@ var _ogre_config_8h =
     [ "OGRE_NO_ZIP_ARCHIVE", "_ogre_config_8h.html#a4b04b998fabc8a26346379c4c0df88d1", null ],
     [ "OGRE_PRETEND_TEXTURE_UNITS", "_ogre_config_8h.html#a25da6395d80814d615a4db506aac2be0", null ],
     [ "OGRE_PROFILING", "_ogre_config_8h.html#a32f2c6d9561997c849e610d3b4b34a35", null ],
+    [ "OGRE_PROFILING_INTERNAL", "_ogre_config_8h.html#a268014666a1105684cef31468fdc2739", null ],
+    [ "OGRE_PROFILING_NONE", "_ogre_config_8h.html#aaeddf292e931b918e3d8be1dc5169c33", null ],
+    [ "OGRE_PROFILING_REMOTERY", "_ogre_config_8h.html#a8d5bdf21e8ef9cb00e86aa32b3935c07", null ],
     [ "OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR", "_ogre_config_8h.html#a256169d3baf21a2ccf37a7f893d09186", null ],
     [ "OGRE_THREAD_PROVIDER", "_ogre_config_8h.html#a654b381200aff99c37d46d6ea7683da1", null ],
     [ "OGRE_THREAD_SUPPORT", "_ogre_config_8h.html#afa59b2959a6c7c31903b38cb2a99f28d", null ]

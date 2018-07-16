@@ -6,6 +6,7 @@ var struct_ogre_1_1_update_lod_request =
     [ "addToRenderQueue", "struct_ogre_1_1_update_lod_request.html#aeeff72fea003054d702406641ec70616", null ],
     [ "camera", "struct_ogre_1_1_update_lod_request.html#ab9d074277283049cb49cae5ad50adef8", null ],
     [ "casterPass", "struct_ogre_1_1_update_lod_request.html#a0e98b3dbbac76a171614fcd1000a600e", null ],
+    [ "cullingLights", "struct_ogre_1_1_update_lod_request.html#a1d3f5565a1f0cef3c484ac9898121dd6", null ],
     [ "firstRq", "struct_ogre_1_1_update_lod_request.html#a62752fab01670dfd49c6ef4f5d1e63b2", null ],
     [ "lastRq", "struct_ogre_1_1_update_lod_request.html#ad755d947a31cb517bf34b254577a5257", null ],
     [ "lodBias", "struct_ogre_1_1_update_lod_request.html#ab273fe7d1f1eee28cbc7a7f991ac08d1", null ],

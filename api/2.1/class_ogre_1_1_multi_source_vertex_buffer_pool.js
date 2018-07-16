@@ -4,7 +4,7 @@ var class_ogre_1_1_multi_source_vertex_buffer_pool =
     [ "~MultiSourceVertexBufferPool", "class_ogre_1_1_multi_source_vertex_buffer_pool.html#a909390a0179b1a39edf075ffb6a6ad01", null ],
     [ "createVertexBuffers", "class_ogre_1_1_multi_source_vertex_buffer_pool.html#a5fff16cb763770bd4b639d4c0b4d840c", null ],
     [ "destroyVertexBuffers", "class_ogre_1_1_multi_source_vertex_buffer_pool.html#a8dca320b959449700c90d6e80f98068f", null ],
-    [ "getBytesOffsetToSource", "class_ogre_1_1_multi_source_vertex_buffer_pool.html#a0d3f3b13fa40a01a5b8396b044344550", null ],
+    [ "getBytesOffsetToSource", "class_ogre_1_1_multi_source_vertex_buffer_pool.html#a73ba80e47fcfcc1c3cfc20af94d964b7", null ],
     [ "operator delete", "class_ogre_1_1_multi_source_vertex_buffer_pool.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_multi_source_vertex_buffer_pool.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_multi_source_vertex_buffer_pool.html#acb46d4b0a597156d9ba5abc39d127792", null ],
