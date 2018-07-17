@@ -815,12 +815,12 @@ namespace Ogre {
             NameValuePairList::const_iterator ni = params->find("maxElements");
             if (ni != params->end())
             {
-                maxElements = StringConverter::parseUnsignedLong(ni->second);
+                maxElements = StringConverter::parseSizeT(ni->second);
             }
             ni = params->find("numberOfChains");
             if (ni != params->end())
             {
-                numberOfChains = StringConverter::parseUnsignedLong(ni->second);
+                numberOfChains = StringConverter::parseSizeT(ni->second);
             }
             ni = params->find("useTextureCoords");
             if (ni != params->end())

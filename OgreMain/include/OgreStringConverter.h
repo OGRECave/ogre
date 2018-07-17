@@ -212,20 +212,14 @@ namespace Ogre {
             uint32 ret;
             return parse(val, ret) ? ret : defaultValue;
         }
-        /** Converts a String to a whole number. 
-        @return
-            0.0 if the value could not be parsed, otherwise the numeric version of the String.
-        */
-        static int64 parseLong(const String& val, int64 defaultValue = 0)
+        /// @deprecated
+        OGRE_DEPRECATED static int64 parseLong(const String& val, int64 defaultValue = 0)
         {
             int64 ret;
             return parse(val, ret) ? ret : defaultValue;
         }
-        /** Converts a String to a whole number. 
-        @return
-            0.0 if the value could not be parsed, otherwise the numeric version of the String.
-        */
-        static uint64 parseUnsignedLong(const String& val, uint64 defaultValue = 0)
+        /// @deprecated
+        OGRE_DEPRECATED static uint64 parseUnsignedLong(const String& val, uint64 defaultValue = 0)
         {
             uint64 ret;
             return parse(val, ret) ? ret : defaultValue;

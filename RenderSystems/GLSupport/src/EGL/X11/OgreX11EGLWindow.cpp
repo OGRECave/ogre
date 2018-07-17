@@ -124,12 +124,12 @@ namespace Ogre {
                 if (tokens.size() == 3)
                 {
                     // deprecated display:screen:xid format
-                    mParentWindow = (Window)StringConverter::parseUnsignedLong(tokens[2]);
+                    mParentWindow = (Window)StringConverter::parseSizeT(tokens[2]);
                 }
                 else
                 {
                     // xid format
-                    mParentWindow = (Window)StringConverter::parseUnsignedLong(tokens[0]);
+                    mParentWindow = (Window)StringConverter::parseSizeT(tokens[0]);
                 }
             }
             else if ((opt = miscParams->find("externalWindowHandle")) != end)
@@ -144,17 +144,17 @@ namespace Ogre {
                 {
                     // Old display:screen:xid format
                     // The old EGL code always created a "parent" window in this case:
-                    mParentWindow = (Window)StringConverter::parseUnsignedLong(tokens[2]);
+                    mParentWindow = (Window)StringConverter::parseSizeT(tokens[2]);
                 }
                 else if (tokens.size() == 4)
                 {
                     // Old display:screen:xid:visualinfo format
-                    mExternalWindow = (Window)StringConverter::parseUnsignedLong(tokens[2]);
+                    mExternalWindow = (Window)StringConverter::parseSizeT(tokens[2]);
                 }
                 else
                 {
                     // xid format
-                    mExternalWindow = (Window)StringConverter::parseUnsignedLong(tokens[0]);
+                    mExternalWindow = (Window)StringConverter::parseSizeT(tokens[0]);
                 }
             }
 
