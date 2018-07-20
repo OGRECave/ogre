@@ -107,6 +107,12 @@ namespace Ogre {
 #define OGRE_FALLTHROUGH
 #endif
 
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+#define OGRE_NODISCARD __attribute__((__warn_unused_result__))
+#else
+#define OGRE_NODISCARD
+#endif
+
 /* define OGRE_NORETURN macro */
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #	define OGRE_NORETURN __declspec(noreturn)

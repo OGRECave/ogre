@@ -37,6 +37,7 @@ using namespace std;
 #define _OgrePrivate
 #define OGRE_DEPRECATED
 #define OGRE_NORETURN
+#define OGRE_NODISCARD
 #define OGRE_STATIC_MUTEX(arg)
 #define OGRE_MUTEX(arg)
 

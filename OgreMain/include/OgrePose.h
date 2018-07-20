@@ -117,7 +117,7 @@ namespace Ogre {
         /** Clone this pose and create another one configured exactly the same
             way (only really useful for cloning holders of this class).
         */
-        Pose* clone(void) const;
+        Pose* clone(void) const OGRE_NODISCARD;
     protected:
         /// Target geometry index
         ushort mTarget;
