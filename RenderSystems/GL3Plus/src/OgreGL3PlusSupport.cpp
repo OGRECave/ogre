@@ -69,14 +69,6 @@ namespace Ogre {
         }
     }
 
-    bool GL3PlusSupport::hasMinGLVersion(int major, int minor) const
-    {
-        if (mVersion.major == major) {
-            return mVersion.minor >= minor;
-        }
-        return mVersion.major > major;
-    }
-
     bool GL3PlusSupport::checkExtension(const String& ext) const
     {
         return extensionList.find(ext) != extensionList.end() || mNative->checkExtension(ext);

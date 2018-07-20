@@ -57,6 +57,11 @@ namespace Ogre {
         /** Returns the current context */
         GLContext* _getCurrentContext() { return mCurrentContext; }
 
+        /**
+        * Check if GL Version is supported
+        */
+        bool hasMinGLVersion(int major, int minor) const;
+
         String validateConfigOptions() { return BLANKSTRING; }
 
         /** Unregister a render target->context mapping. If the context of target

@@ -201,11 +201,6 @@ namespace Ogre {
         mGLSupport->setConfigOption(name, value);
     }
 
-    bool GL3PlusRenderSystem::hasMinGLVersion(int major, int minor) const
-    {
-        return mGLSupport->hasMinGLVersion(major, minor);
-    }
-
     bool GL3PlusRenderSystem::checkExtension(const String& ext) const
     {
         return mGLSupport->checkExtension(ext);
