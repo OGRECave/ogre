@@ -490,7 +490,7 @@ namespace Ogre {
         @param mgr Optional HardwareBufferManager to use for creating the clone
             (if null, use the current default).
         */
-        VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0) const;
+        VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0) const OGRE_NODISCARD;
 
         inline bool operator== (const VertexDeclaration& rhs) const
         {

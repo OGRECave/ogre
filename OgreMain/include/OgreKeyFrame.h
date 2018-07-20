@@ -65,7 +65,7 @@ namespace Ogre
         Real getTime(void) const { return mTime; }
 
         /** Clone a keyframe (internal use only) */
-        virtual KeyFrame* _clone(AnimationTrack* newParent) const;
+        virtual KeyFrame* _clone(AnimationTrack* newParent) const OGRE_NODISCARD;
 
 
     protected:

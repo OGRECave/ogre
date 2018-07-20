@@ -60,7 +60,7 @@ namespace Ogre {
         /** Destroy the overlay element factory */
         virtual ~OverlayElementFactory () {}
         /** Creates a new OverlayElement instance with the name supplied. */
-        virtual OverlayElement* createOverlayElement(const String& instanceName) = 0;
+        virtual OverlayElement* createOverlayElement(const String& instanceName) OGRE_NODISCARD = 0;
         /** Destroys a OverlayElement which this factory created previously. */
         virtual void destroyOverlayElement(OverlayElement* pElement) { delete pElement; }
         /** Gets the string uniquely identifying the type of element this factory creates. */

@@ -118,7 +118,7 @@ namespace Ogre
 
         const String& getName() const { return FACTORY_NAME; }
 
-        PageContentCollection* createInstance() 
+        PageContentCollection* createInstance() OGRE_NODISCARD
         {
             return OGRE_NEW SimplePageContentCollection(this); 
         }

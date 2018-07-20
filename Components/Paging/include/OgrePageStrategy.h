@@ -107,7 +107,7 @@ namespace Ogre
             This data will be held by a given PagedWorldSection and the structure of
             the data will be specific to the PageStrategy subclass.
         */
-        virtual PageStrategyData* createData() = 0;
+        virtual PageStrategyData* createData() OGRE_NODISCARD = 0;
 
         /** Destroy a PageStrategyData instance containing the data specific to this
         PageStrategy. 
