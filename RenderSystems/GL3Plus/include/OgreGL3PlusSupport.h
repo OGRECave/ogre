@@ -92,38 +92,6 @@ namespace Ogre
             }
 
             /**
-            * Get shader cache path
-            */
-            const String& getShaderCachePath(void) const
-            {
-                return mShaderCachePath;
-            }
-
-            /**
-            * Get shader library path
-            */
-            const String& getShaderLibraryPath(void) const
-            {
-                return mShaderLibraryPath;
-            }
-
-            /**
-            * Set shader cache path
-            */
-            void setShaderCachePath(String path)
-            {
-                mShaderCachePath = path;
-            }
-
-            /**
-            * Set shader library path
-            */
-            void setShaderLibraryPath(String path)
-            {
-                mShaderLibraryPath = path;
-            }
-
-            /**
             * Check if GL Version is supported
             */
             bool hasMinGLVersion(int major, int minor) const;
@@ -166,10 +134,7 @@ namespace Ogre
 
         private:
             DriverVersion mVersion;
-
             String mVendor;
-            String mShaderCachePath;
-            String mShaderLibraryPath;
 
             GLNativeSupport* mNative;
 
