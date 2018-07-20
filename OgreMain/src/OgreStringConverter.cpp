@@ -36,6 +36,11 @@ THE SOFTWARE.
 #   define newlocale(cat, loc, base) 0
 #endif
 
+#ifdef __MINGW32__
+#define _strtoull_l _strtoul_l
+#define _strtoll_l _strtol_l
+#endif
+
 namespace Ogre {
     locale_t StringConverter::_numLocale = newlocale(LC_NUMERIC_MASK, OGRE_DEFAULT_LOCALE, NULL);
 
@@ -86,36 +91,25 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    String StringConverter::toString(int val,
+    String StringConverter::toString(int32 val,
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         return _toString(val, width, fill, flags);
     }
-#if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     //-----------------------------------------------------------------------
-    String StringConverter::toString(unsigned int val,
+    String StringConverter::toString(uint32 val,
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         return _toString(val, width, fill, flags);
     }
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC || defined(__MINGW32__)
     //-----------------------------------------------------------------------
     String StringConverter::toString(unsigned long val,
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         return _toString(val, width, fill, flags);
     }
-#endif
-#else
     //-----------------------------------------------------------------------
-    String StringConverter::toString(unsigned long val,
-        unsigned short width, char fill, std::ios::fmtflags flags)
-    {
-        return _toString(val, width, fill, flags);
-    }
-#endif
-    //-----------------------------------------------------------------------
-    String StringConverter::toString(size_t val,
+    String StringConverter::toString(unsigned long long val,
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
         return _toString(val, width, fill, flags);
@@ -240,224 +234,133 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    Real StringConverter::parseReal(const String& val, Real defaultValue)
+    bool StringConverter::parse(const String& val, float& ret)
     {
         char* end;
-        Real ret = (Real)strtod_l(val.c_str(), &end, _numLocale);
-        return val.c_str() == end ? defaultValue : ret;
+        ret = (float)strtod_l(val.c_str(), &end, _numLocale);
+        return val.c_str() != end;
     }
-    //-----------------------------------------------------------------------
-    int StringConverter::parseInt(const String& val, int defaultValue)
+    bool StringConverter::parse(const String& val, double& ret)
     {
         char* end;
-        int ret = (int)strtol_l(val.c_str(), &end, 0, _numLocale);
-        return val.c_str() == end ? defaultValue : ret;
+        ret = strtod_l(val.c_str(), &end, _numLocale);
+        return val.c_str() != end;
     }
     //-----------------------------------------------------------------------
-    unsigned int StringConverter::parseUnsignedInt(const String& val, unsigned int defaultValue)
+    bool StringConverter::parse(const String& val, int32& ret)
     {
         char* end;
-        unsigned int ret = (unsigned int)strtoul_l(val.c_str(), &end, 0, _numLocale);
-        return val.c_str() == end ? defaultValue : ret;
+        ret = (int32)strtol_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
     }
     //-----------------------------------------------------------------------
-    long StringConverter::parseLong(const String& val, long defaultValue)
+    bool StringConverter::parse(const String& val, int64& ret)
     {
         char* end;
-        long ret = strtol_l(val.c_str(), &end, 0, _numLocale);
-        return val.c_str() == end ? defaultValue : ret;
+        ret = strtoll_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
     }
     //-----------------------------------------------------------------------
-    unsigned long StringConverter::parseUnsignedLong(const String& val, unsigned long defaultValue)
+    bool StringConverter::parse(const String& val, unsigned long& ret)
     {
         char* end;
-        unsigned long ret = strtoul_l(val.c_str(), &end, 0, _numLocale);
-        return val.c_str() == end ? defaultValue : ret;
+        ret = strtoull_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
     }
-    //-----------------------------------------------------------------------
-    size_t StringConverter::parseSizeT(const String& val, size_t defaultValue)
+    bool StringConverter::parse(const String& val, unsigned long long& ret)
     {
-        size_t ret;
-        return sscanf(val.c_str(),
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1900
-                "%Iu"
-#else
-                "%zu"
-#endif
-                , &ret) == 1 ? ret : defaultValue;
+        char* end;
+        ret = strtoull_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
     }
     //-----------------------------------------------------------------------
-    bool StringConverter::parseBool(const String& val, bool defaultValue)
+    bool StringConverter::parse(const String& val, uint32& ret)
+    {
+        char* end;
+        ret = (uint32)strtoul_l(val.c_str(), &end, 0, _numLocale);
+        return val.c_str() != end;
+    }
+    bool StringConverter::parse(const String& val, bool& ret)
     {
         //FIXME Returns both parsed value and error in same value - ambiguous.
         // Suggested alternatives: implement exception handling or make either
         // error or parsed value a parameter.
         if ((StringUtil::startsWith(val, "true") || StringUtil::startsWith(val, "yes")
              || StringUtil::startsWith(val, "1") ||  StringUtil::startsWith(val, "on")))
-            return true;
+            ret = true;
         else if ((StringUtil::startsWith(val, "false") || StringUtil::startsWith(val, "no")
                   || StringUtil::startsWith(val, "0") ||  StringUtil::startsWith(val, "off")))
+            ret = false;
+        else
             return false;
-        else
-            return defaultValue;
+
+        return true;
     }
-    //-----------------------------------------------------------------------
-    Vector2 StringConverter::parseVector2(const String& val, const Vector2& defaultValue)
+
+    static bool parseReals(const String& val, Real* dst, size_t n)
     {
         // Split on space
         std::vector<String> vec = StringUtil::split(val);
+        if(vec.size() != n)
+            return false;
 
-        if (vec.size() != 2)
-        {
-            return defaultValue;
-        }
-        else
-        {
-            return Vector2(parseReal(vec[0], defaultValue[0]), parseReal(vec[1], defaultValue[1]));
-        }
+        bool ret = true;
+        for(size_t i = 0; i < n; i++)
+            ret &= StringConverter::parse(vec[i], dst[i]);
+        return ret;
     }
+
     //-----------------------------------------------------------------------
-    Vector3 StringConverter::parseVector3(const String& val, const Vector3& defaultValue)
+    bool StringConverter::parse(const String& val, Vector2& ret)
     {
-        // Split on space
-        std::vector<String> vec = StringUtil::split(val);
-
-        if (vec.size() != 3)
-        {
-            return defaultValue;
-        }
-        else
-        {
-            return Vector3(parseReal(vec[0], defaultValue[0]),
-                           parseReal(vec[1], defaultValue[1]),
-                           parseReal(vec[2], defaultValue[2]));
-        }
+        return parseReals(val, ret.ptr(), 2);
     }
     //-----------------------------------------------------------------------
-    Vector4 StringConverter::parseVector4(const String& val, const Vector4& defaultValue)
+    bool StringConverter::parse(const String& val, Vector3& ret)
     {
-        // Split on space
-        std::vector<String> vec = StringUtil::split(val);
-
-        if (vec.size() != 4)
-        {
-            return defaultValue;
-        }
-        else
-        {
-            return Vector4(parseReal(vec[0], defaultValue[0]),
-                           parseReal(vec[1], defaultValue[1]),
-                           parseReal(vec[2], defaultValue[2]),
-                           parseReal(vec[3], defaultValue[3]));
-        }
+        return parseReals(val, ret.ptr(), 3);
     }
     //-----------------------------------------------------------------------
-    Matrix3 StringConverter::parseMatrix3(const String& val, const Matrix3& defaultValue)
+    bool StringConverter::parse(const String& val, Vector4& ret)
     {
-        // Split on space
-        std::vector<String> vec = StringUtil::split(val);
-
-        if (vec.size() != 9)
-        {
-            return defaultValue;
-        }
-        else
-        {
-            return Matrix3(parseReal(vec[0], defaultValue[0][0]),
-                           parseReal(vec[1], defaultValue[0][1]),
-                           parseReal(vec[2], defaultValue[0][2]),
-
-                           parseReal(vec[3], defaultValue[1][0]),
-                           parseReal(vec[4], defaultValue[1][1]),
-                           parseReal(vec[5], defaultValue[1][2]),
-
-                           parseReal(vec[6], defaultValue[2][0]),
-                           parseReal(vec[7], defaultValue[2][1]),
-                           parseReal(vec[8], defaultValue[2][2]));
-        }
+        return parseReals(val, ret.ptr(), 4);
     }
     //-----------------------------------------------------------------------
-    Matrix4 StringConverter::parseMatrix4(const String& val, const Matrix4& defaultValue)
+    bool StringConverter::parse(const String& val, Matrix3& ret)
     {
-        // Split on space
-        std::vector<String> vec = StringUtil::split(val);
-
-        if (vec.size() != 16)
-        {
-            return defaultValue;
-        }
-        else
-        {
-            return Matrix4(parseReal(vec[0], defaultValue[0][0]),
-                           parseReal(vec[1], defaultValue[0][1]),
-                           parseReal(vec[2], defaultValue[0][2]),
-                           parseReal(vec[3], defaultValue[0][3]),
-                           
-                           parseReal(vec[4], defaultValue[1][0]),
-                           parseReal(vec[5], defaultValue[1][1]),
-                           parseReal(vec[6], defaultValue[1][2]),
-                           parseReal(vec[7], defaultValue[1][3]),
-                           
-                           parseReal(vec[8], defaultValue[2][0]),
-                           parseReal(vec[9], defaultValue[2][1]),
-                           parseReal(vec[10], defaultValue[2][2]),
-                           parseReal(vec[11], defaultValue[2][3]),
-                           
-                           parseReal(vec[12], defaultValue[3][0]),
-                           parseReal(vec[13], defaultValue[3][1]),
-                           parseReal(vec[14], defaultValue[3][2]),
-                           parseReal(vec[15], defaultValue[3][3]));
-        }
+        return parseReals(val, &ret[0][0], 9);
     }
     //-----------------------------------------------------------------------
-    Quaternion StringConverter::parseQuaternion(const String& val, const Quaternion& defaultValue)
+    bool StringConverter::parse(const String& val, Matrix4& ret)
     {
-        // Split on space
-        std::vector<String> vec = StringUtil::split(val);
-
-        if (vec.size() != 4)
-        {
-            return defaultValue;
-        }
-        else
-        {
-            return Quaternion(parseReal(vec[0], defaultValue[0]),
-                              parseReal(vec[1], defaultValue[1]),
-                              parseReal(vec[2], defaultValue[2]),
-                              parseReal(vec[3], defaultValue[3]));
-        }
+        return parseReals(val, &ret[0][0], 16);
     }
     //-----------------------------------------------------------------------
-    ColourValue StringConverter::parseColourValue(const String& val, const ColourValue& defaultValue)
+    bool StringConverter::parse(const String& val, Quaternion& ret)
+    {
+        return parseReals(val, ret.ptr(), 4);
+    }
+    //-----------------------------------------------------------------------
+    bool StringConverter::parse(const String& val, ColourValue& ret)
     {
         // Split on space
         std::vector<String> vec = StringUtil::split(val);
 
         if (vec.size() == 4)
         {
-            return ColourValue(parseReal(vec[0], defaultValue[0]),
-                               parseReal(vec[1], defaultValue[1]),
-                               parseReal(vec[2], defaultValue[2]),
-                               parseReal(vec[3], defaultValue[3]));
+            return parse(vec[0], ret.r) && parse(vec[1], ret.g) && parse(vec[2], ret.b) &&
+                   parse(vec[3], ret.a);
         }
         else if (vec.size() == 3)
         {
-            return ColourValue(parseReal(vec[0], defaultValue[0]),
-                               parseReal(vec[1], defaultValue[1]),
-                               parseReal(vec[2], defaultValue[2]),
-                               1.0f);
+            ret.a = 1.0f;
+            return parse(vec[0], ret.r) && parse(vec[1], ret.g) && parse(vec[2], ret.b);
         }
         else
         {
-            return defaultValue;
+            return false;
         }
     }
-    //-----------------------------------------------------------------------
-    StringVector StringConverter::parseStringVector(const String& val)
-    {
-        return StringUtil::split(val);
-    }
-
     //-----------------------------------------------------------------------
     bool StringConverter::isNumber(const String& val)
     {

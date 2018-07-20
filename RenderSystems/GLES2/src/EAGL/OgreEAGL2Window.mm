@@ -240,7 +240,7 @@ namespace Ogre {
             
             if ((option = miscParams->find("externalSharegroup")) != miscParams->end())
             {
-                group = (__bridge EAGLSharegroup *)(void*)StringConverter::parseUnsignedLong(option->second);
+                group = (__bridge EAGLSharegroup *)(void*)StringConverter::parseSizeT(option->second);
                 LogManager::getSingleton().logMessage("iOS: Using an external EAGLSharegroup");
             }
             else
@@ -352,21 +352,21 @@ namespace Ogre {
 
             if ((opt = miscParams->find("externalWindowHandle")) != end)
             {
-                mWindow = (__bridge UIWindow *)(void*)StringConverter::parseUnsignedLong(opt->second);
+                mWindow = (__bridge UIWindow *)(void*)StringConverter::parseSizeT(opt->second);
                 mIsExternal = true;
                 LogManager::getSingleton().logMessage("iOS: Using an external window handle");
             }
         
             if ((opt = miscParams->find("externalViewHandle")) != end)
             {
-                mView = (__bridge EAGL2View *)(void*)StringConverter::parseUnsignedLong(opt->second);
+                mView = (__bridge EAGL2View *)(void*)StringConverter::parseSizeT(opt->second);
                 mUsingExternalView = true;
                 LogManager::getSingleton().logMessage("iOS: Using an external view handle");
             }
         
             if ((opt = miscParams->find("externalViewControllerHandle")) != end)
             {
-                mViewController = (__bridge EAGL2ViewController *)(void*)StringConverter::parseUnsignedLong(opt->second);
+                mViewController = (__bridge EAGL2ViewController *)(void*)StringConverter::parseSizeT(opt->second);
                 if(mViewController.view != nil)
                     mView = (EAGL2View *)mViewController.view;
                 mUsingExternalViewController = true;

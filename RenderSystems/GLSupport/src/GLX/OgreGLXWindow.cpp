@@ -201,12 +201,12 @@ namespace Ogre
                 if (tokens.size() == 3)
                 {
                     // deprecated display:screen:xid format
-                    parentWindow = StringConverter::parseUnsignedLong(tokens[2]);
+                    StringConverter::parse(tokens[2], parentWindow);
                 }
                 else
                 {
                     // xid format
-                    parentWindow = StringConverter::parseUnsignedLong(tokens[0]);
+                    StringConverter::parse(tokens[0], parentWindow);
                 }
 
                 // reset drawable in case currentGLContext was used
@@ -225,17 +225,17 @@ namespace Ogre
                 {
                     // Old display:screen:xid format
                     // The old GLX code always created a "parent" window in this case:
-                    parentWindow = StringConverter::parseUnsignedLong(tokens[2]);
+                    StringConverter::parse(tokens[2], parentWindow);
                 }
                 else if (tokens.size() == 4)
                 {
                     // Old display:screen:xid:visualinfo format
-                    externalWindow = StringConverter::parseUnsignedLong(tokens[2]);
+                    StringConverter::parse(tokens[2], externalWindow);
                 }
                 else
                 {
                     // xid format
-                    externalWindow = StringConverter::parseUnsignedLong(tokens[0]);
+                    StringConverter::parse(tokens[0], externalWindow);
                 }
             }
 

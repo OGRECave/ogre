@@ -593,9 +593,7 @@ namespace Ogre{
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        char* end;
-        *result = (float)strtod_l(atom->value.c_str(), &end, StringConverter::_numLocale);
-        return atom->value.c_str() != end;
+        return StringConverter::parse(atom->value, *result);
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getDouble(const Ogre::AbstractNodePtr &node, double *result)
@@ -604,9 +602,7 @@ namespace Ogre{
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        char* end;
-        *result = strtod_l(atom->value.c_str(), &end, StringConverter::_numLocale);
-        return atom->value.c_str() != end;
+        return StringConverter::parse(atom->value, *result);
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getInt(const Ogre::AbstractNodePtr &node, int *result)
@@ -615,9 +611,7 @@ namespace Ogre{
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        char* end;
-        *result = (int)strtol_l(atom->value.c_str(), &end, 0, StringConverter::_numLocale);
-        return atom->value.c_str() != end;
+        return StringConverter::parse(atom->value, *result);
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getUInt(const Ogre::AbstractNodePtr &node, uint *result)
@@ -626,9 +620,7 @@ namespace Ogre{
             return false;
 
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        char* end;
-        *result = (uint)strtoul_l(atom->value.c_str(), &end, 0, StringConverter::_numLocale);
-        return atom->value.c_str() != end;
+        return StringConverter::parse(atom->value, *result);
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result, int maxEntries)

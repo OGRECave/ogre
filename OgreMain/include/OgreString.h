@@ -37,6 +37,8 @@ THE SOFTWARE.
 #   define strtod_l _strtod_l
 #   define strtoul_l _strtoul_l
 #   define strtol_l _strtol_l
+#   define strtoull_l _strtoull_l
+#   define strtoll_l _strtoll_l
 #   define stricmp _stricmp
 #   define strnicmp _strnicmp
 #else
@@ -49,6 +51,8 @@ THE SOFTWARE.
 #   define strtod_l(ptr, end, l) strtod(ptr, end)
 #   define strtoul_l(ptr, end, base, l) strtoul(ptr, end, base)
 #   define strtol_l(ptr, end, base, l) strtol(ptr, end, base)
+#   define strtoull_l(ptr, end, base, l) strtoull(ptr, end, base)
+#   define strtoll_l(ptr, end, base, l) strtoll(ptr, end, base)
 #endif
 
 // If compiling with make on macOS, these headers need to be included to get
