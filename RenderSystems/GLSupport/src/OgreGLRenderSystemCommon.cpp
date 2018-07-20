@@ -34,6 +34,14 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
+    bool GLRenderSystemCommon::hasMinGLVersion(int major, int minor) const
+    {
+        if (mDriverVersion.major == major) {
+            return mDriverVersion.minor >= minor;
+        }
+        return mDriverVersion.major > major;
+    }
+
     void GLRenderSystemCommon::_makeProjectionMatrix(const Radian& fovy, Real aspect,
                                                     Real nearPlane, Real farPlane,
                                                     Matrix4& dest, bool forGpuProgram)

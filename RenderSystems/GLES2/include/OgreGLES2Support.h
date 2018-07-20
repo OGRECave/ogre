@@ -92,11 +92,6 @@ namespace Ogre
             }
 
             /**
-            * Check if GL Version is supported
-            */
-            bool hasMinGLVersion(int major, int minor) const;
-
-            /**
             * Get the address of a function
             */
             void *getProcAddress(const char* procname) {

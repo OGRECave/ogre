@@ -41,8 +41,8 @@ namespace Ogre {
         assert(pcVer && "Problems getting GL version string using glGetString");
        
         String tmpStr = (const char*)pcVer;
-        LogManager::getSingleton().logMessage("GL_VERSION = " + tmpStr);
-        mVersion = tmpStr.substr(0, tmpStr.find(' '));
+        mVersion.fromString(tmpStr.substr(0, tmpStr.find(' ')));
+        LogManager::getSingleton().logMessage("GL_VERSION = " + mVersion.toString());
 
         // Get vendor
         const GLubyte* pcVendor = glGetString(GL_VENDOR);
@@ -69,43 +69,6 @@ namespace Ogre {
         {
             extensionList.insert(str);
         }
-    }
-
-    bool GLSupport::hasMinGLVersion(const String& v) const
-    {
-        unsigned int first, second, third;
-        unsigned int cardFirst, cardSecond, cardThird;
-        if(v == mVersion)
-            return true;
-
-        String::size_type pos = v.find('.');
-        if(pos == String::npos)
-            return false;
-
-        String::size_type pos1 = v.rfind('.');
-        if(pos1 == String::npos)
-            return false;
-
-        first = ::atoi(v.substr(0, pos).c_str());
-        second = ::atoi(v.substr(pos + 1, pos1 - (pos + 1)).c_str());
-        third = ::atoi(v.substr(pos1 + 1, v.length()).c_str());
-
-        pos = mVersion.find('.');
-        if(pos == String::npos)
-            return false;
-
-        pos1 = mVersion.rfind('.');
-        if(pos1 == String::npos)
-            return false;
-
-        cardFirst  = ::atoi(mVersion.substr(0, pos).c_str());
-        cardSecond = ::atoi(mVersion.substr(pos + 1, pos1 - (pos + 1)).c_str());
-        cardThird  = ::atoi(mVersion.substr(pos1 + 1, mVersion.length()).c_str());
-
-        if(first <= cardFirst && second <= cardSecond && third <= cardThird)
-          return true;
-
-        return false;
     }
 
     bool GLSupport::checkExtension(const String& ext) const

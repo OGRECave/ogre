@@ -188,11 +188,6 @@ namespace Ogre {
         mGLSupport->setConfigOption(name, value);
     }
 
-    bool GLES2RenderSystem::hasMinGLVersion(int major, int minor) const
-    {
-        return mGLSupport->hasMinGLVersion(major, minor);
-    }
-
     bool GLES2RenderSystem::checkExtension(const String& ext) const
     {
         return mGLSupport->checkExtension(ext);

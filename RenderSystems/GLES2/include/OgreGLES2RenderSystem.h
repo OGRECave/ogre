@@ -243,7 +243,6 @@ namespace Ogre {
             // ----------------------------------
             // GLES2RenderSystem specific members
             // ----------------------------------
-            bool hasMinGLVersion(int major, int minor) const;
             bool checkExtension(const String& ext) const;
         
             GLES2StateCacheManager * _getStateCacheManager() { return mStateCacheManager; }

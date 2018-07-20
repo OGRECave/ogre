@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreRenderWindow.h"
 #include "OgreConfigOptionMap.h"
 #include "OgreGLPBuffer.h"
+#include "OgreRenderSystemCapabilities.h"
 
 #include "OgreGLNativeSupport.h"
 
@@ -103,15 +104,10 @@ public:
     /**
     * Get version information
     */
-    const String& getGLVersion(void) const
+    const DriverVersion& getGLVersion(void) const
     {
         return mVersion;
     }
-
-    /**
-    * Compare GL version numbers
-    */
-    bool hasMinGLVersion(const String& v) const;
 
     /**
     * Check if an extension is available
@@ -142,7 +138,7 @@ protected:
     // This contains the complete list of supported extensions
     std::set<String> extensionList;
 private:
-    String mVersion;
+    DriverVersion mVersion;
     String mVendor;
 
     GLNativeSupport* mNative;

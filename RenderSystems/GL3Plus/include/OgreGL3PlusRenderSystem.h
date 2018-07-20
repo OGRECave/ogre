@@ -263,7 +263,6 @@ namespace Ogre {
         // ----------------------------------
         // GL3PlusRenderSystem specific members
         // ----------------------------------
-        bool hasMinGLVersion(int major, int minor) const;
         bool checkExtension(const String& ext) const;
 
         GL3PlusStateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
