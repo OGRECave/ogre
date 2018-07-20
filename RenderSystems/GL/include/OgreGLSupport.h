@@ -59,14 +59,6 @@ public:
         mNative->setConfigOption(name, value);
     }
 
-    /**
-    * Make sure all the extra options are valid
-    * @return string with error message
-    */
-    String validateConfig() {
-        return mNative->validateConfig();
-    }
-
     ConfigOptionMap& getConfigOptions(void) {
         return mNative->getConfigOptions();
     }

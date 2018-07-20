@@ -192,12 +192,6 @@ namespace Ogre {
         mGLSupport->setConfigOption(name, value);
     }
 
-    String GLRenderSystem::validateConfigOptions(void)
-    {
-        // XXX Return an error string if something is invalid
-        return mGLSupport->validateConfig();
-    }
-
     RenderWindow* GLRenderSystem::_initialise(bool autoCreateWindow, const String& windowTitle)
     {
         mGLSupport->start();

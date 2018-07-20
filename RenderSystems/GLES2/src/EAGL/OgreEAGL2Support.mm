@@ -136,12 +136,6 @@ namespace Ogre {
         //setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Media/RTShaderLib");
     }
 
-    String EAGL2Support::validateConfig(void)
-    {
-        // TODO - DJR
-        return BLANKSTRING;
-    }
-
     String EAGL2Support::getDisplayName(void)
     {
         return "todo";

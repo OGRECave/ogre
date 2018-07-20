@@ -188,12 +188,6 @@ namespace Ogre {
         mGLSupport->setConfigOption(name, value);
     }
 
-    String GLES2RenderSystem::validateConfigOptions(void)
-    {
-        // XXX Return an error string if something is invalid
-        return mGLSupport->validateConfig();
-    }
-
     bool GLES2RenderSystem::hasMinGLVersion(int major, int minor) const
     {
         return mGLSupport->hasMinGLVersion(major, minor);

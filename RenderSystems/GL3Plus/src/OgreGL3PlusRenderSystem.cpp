@@ -201,12 +201,6 @@ namespace Ogre {
         mGLSupport->setConfigOption(name, value);
     }
 
-    String GL3PlusRenderSystem::validateConfigOptions(void)
-    {
-        // XXX Return an error string if something is invalid
-        return mGLSupport->validateConfig();
-    }
-
     bool GL3PlusRenderSystem::hasMinGLVersion(int major, int minor) const
     {
         return mGLSupport->hasMinGLVersion(major, minor);

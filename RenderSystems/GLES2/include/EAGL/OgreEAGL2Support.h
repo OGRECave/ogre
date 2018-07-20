@@ -52,7 +52,6 @@ namespace Ogre {
             void start(void);
             void stop(void);
             void addConfig(void);
-            String validateConfig(void);
             virtual String getDisplayName(void);
             CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(CFDictionaryRef fbConfig, GLint attribute, GLint *value);
