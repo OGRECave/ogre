@@ -57,6 +57,8 @@ namespace Ogre {
         /** Returns the current context */
         GLContext* _getCurrentContext() { return mCurrentContext; }
 
+        String validateConfigOptions() { return BLANKSTRING; }
+
         /** Unregister a render target->context mapping. If the context of target
             is the current context, change the context to the main context so it
             can be destroyed safely.

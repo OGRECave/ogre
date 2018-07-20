@@ -76,14 +76,6 @@ namespace Ogre
                 option->second.currentValue = value;
             }
 
-           /**
-            * Make sure all the extra options are valid
-            * @return string with error message
-            */
-            virtual String validateConfig() {
-                return "";
-            }
-
             virtual NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen) = 0;
 
             /// @copydoc RenderSystem::_createRenderWindow
