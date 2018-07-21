@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
+#include "OgreProfiler.h"
 
 namespace Ogre
 {
@@ -272,6 +273,8 @@ namespace Ogre
     //---------------------------------------------------------------------------
     void HighLevelGpuProgram::loadHighLevelImpl(void)
     {
+        OgreProfileExhaustive( "HighLevelGpuProgram::loadHighLevelImpl" );
+
         if (mLoadFromFile)
         {
             // find & load source code

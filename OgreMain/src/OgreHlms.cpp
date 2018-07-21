@@ -52,6 +52,8 @@ THE SOFTWARE.
 
 #include "OgreHlmsListener.h"
 
+#include "OgreProfiler.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     #include "iOS/macUtils.h"
 #endif
@@ -1845,6 +1847,8 @@ namespace Ogre
                                                    uint32 finalHash,
                                                    const QueuedRenderable &queuedRenderable )
     {
+        OgreProfileExhaustive( "Hlms::createShaderCacheEntry" );
+
         //Set the properties by merging the cache from the pass, with the cache from renderable
         mSetProperties.clear();
         //If retVal is null, we did something wrong earlier
@@ -2163,6 +2167,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash )
     {
+        OgreProfileExhaustive( "Hlms::calculateHashFor" );
+
         mSetProperties.clear();
 
         setProperty( HlmsBaseProp::Skeleton, renderable->hasSkeletonAnimation() );

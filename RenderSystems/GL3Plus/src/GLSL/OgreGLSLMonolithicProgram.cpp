@@ -36,6 +36,7 @@
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreStringConverter.h"
+#include "OgreProfiler.h"
 
 namespace Ogre {
 
@@ -113,6 +114,8 @@ namespace Ogre {
 
     void GLSLMonolithicProgram::activate(void)
     {
+        OgreProfileExhaustive( "GLSLMonolithicProgram::activate" );
+
         if (!mLinked && !mTriedToLinkAndFailed)
         {
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
@@ -137,6 +140,8 @@ namespace Ogre {
 
     void GLSLMonolithicProgram::compileAndLink()
     {
+        OgreProfileExhaustive( "GLSLMonolithicProgram::compileAndLink" );
+
         mVertexArrayObject = new GL3PlusOldVertexArrayObject();
         mVertexArrayObject->bind();
 
@@ -252,6 +257,8 @@ namespace Ogre {
 
     void GLSLMonolithicProgram::buildGLUniformReferences(void)
     {
+        OgreProfileExhaustive( "GLSLMonolithicProgram::buildGLUniformReferences" );
+
         if (!mUniformRefsBuilt)
         {
             const GpuConstantDefinitionMap* vertParams = 0;

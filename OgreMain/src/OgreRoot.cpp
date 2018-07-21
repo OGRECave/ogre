@@ -317,9 +317,10 @@ namespace Ogre {
             << "Best time: \t"  << mFrameStats->getBestTime() << " ms\n"
             << "Worst time: \t" << mFrameStats->getWorstTime()<< " ms";
 
-#if OGRE_PROFILING
+#if OGRE_PROFILING && OGRE_PROFILING != OGRE_PROFILING_INTERNAL_OFFLINE
         OGRE_DELETE mProfiler;
 #endif
+
         shutdown();
 
         OGRE_DELETE mSceneManagerEnum;
@@ -409,6 +410,9 @@ namespace Ogre {
         mAutoWindow = 0;
         mFirstTimePostWindowInit = false;
 
+#if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
+        OGRE_DELETE mProfiler;
+#endif
 
         StringInterface::cleanupDictionary ();
     }

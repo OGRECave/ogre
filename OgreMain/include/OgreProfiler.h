@@ -45,6 +45,8 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #include "OgreSingleton.h"
 #if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
     #include "Remotery.h"
+#elif OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
+    #include "OgreOfflineProfiler.h"
 #endif
 #include "OgreHeaderPrefix.h"
 
@@ -53,6 +55,9 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #   define OgreProfileL2( a, line ) Ogre::Profile _OgreProfileInstance##line( (a) )
 #   define OgreProfileL( a, line ) OgreProfileL2( a, line )
 #   define OgreProfile( a ) OgreProfileL( a, __LINE__ )
+#   if OGRE_PROFILING_EXHAUSTIVE
+#       define OgreProfileExhaustive( a )           OgreProfile( a )
+#   endif
 #   define OgreProfileBegin( a ) Ogre::Profiler::getSingleton().beginProfile( (a) )
 #   define OgreProfileBeginDynamic( a ) OgreProfileBegin( a )
 #   define OgreProfileBeginDynamicHashed( a, hash ) OgreProfileBegin( a )
@@ -85,6 +90,9 @@ namespace Ogre
         static rmtU32 rmt_sample_hash_##line = 0;                                   \
         _rmt_BeginCPUSample( name, flags, &rmt_sample_hash_##line );                \
     })
+#   if OGRE_PROFILING_EXHAUSTIVE
+#       define OgreProfileExhaustive( a )           OgreProfile( a )
+#   endif
 #   define Ogre_rmt_BeginCPUSampleL( name, flags, line ) Ogre_rmt_BeginCPUSampleL2( name, flags, line )
 #   define OgreProfileBegin( name ) Ogre_rmt_BeginCPUSampleL( name, RMTSF_Aggregate, __LINE__ )
 #   define OgreProfileBeginDynamic( name )                                          \
@@ -126,9 +134,31 @@ namespace Ogre
         }
     };
 }
-
+#elif OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
+#   define OgreProfilerUseStableMarkers         Ogre::Profiler::getSingleton().getUseStableMarkers()
+#   define OgreProfileL2( a, line )             Ogre::Profile _OgreProfileInstance##line( (a) )
+#   define OgreProfileL( a, line )              OgreProfileL2( a, line )
+#   define OgreProfile( a )                     OgreProfileL( a, __LINE__ )
+#   if OGRE_PROFILING_EXHAUSTIVE
+#       define OgreProfileExhaustive( a )           OgreProfile( a )
+#   endif
+#   define OgreProfileBegin( a )                Ogre::Profiler::getSingleton().beginProfile( (a) )
+#   define OgreProfileBeginDynamic( a )         OgreProfileBegin( a )
+#   define OgreProfileBeginDynamicHashed( a, hash ) OgreProfileBegin( a )
+#   define OgreProfileEnd( a )                  Ogre::Profiler::getSingleton().endProfile( (a) )
+#   define OgreProfileGroup( a, g )             OgreProfile( a )
+#   define OgreProfileBeginGroup( a, g )        OgreProfileBegin( a )
+#   define OgreProfileEndGroup( a, g )          OgreProfileEnd( a )
+#   define OgreProfileBeginGPUEvent( e )
+#   define OgreProfileEndGPUEvent( e )
+#   define OgreProfileMarkGPUEvent( e )
+#   define OgreProfileGpuBegin( a )
+#   define OgreProfileGpuBeginDynamic( a )
+#   define OgreProfileGpuBeginDynamicHashed( a, hash )
+#   define OgreProfileGpuEnd( a )
 #else
 #   define OgreProfilerUseStableMarkers true
+#   define OgreProfileExhaustive( a )
 #   define OgreProfile( a )
 #   define OgreProfileBegin( a )
 #   define OgreProfileBeginDynamic( a )
@@ -144,6 +174,10 @@ namespace Ogre
 #   define OgreProfileGpuBeginDynamic( a )
 #   define OgreProfileGpuBeginDynamicHashed( a, hash )
 #   define OgreProfileGpuEnd( a )
+#endif
+
+#if OGRE_PROFILING && !OGRE_PROFILING_EXHAUSTIVE
+#   define OgreProfileExhaustive( a )
 #endif
 
 namespace Ogre {
@@ -546,6 +580,10 @@ namespace Ogre {
             */
             static Profiler* getSingletonPtr(void);
 
+#if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
+            OfflineProfiler& getOfflineProfiler(void)       { return mOfflineProfiler; }
+#endif
+
         protected:
             friend class ProfileInstance;
 
@@ -564,6 +602,10 @@ namespace Ogre {
 
             /** Handles a change of the profiler's enabled state*/
             void changeEnableState();
+
+#if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
+            OfflineProfiler mOfflineProfiler;
+#endif
 
             // lol. Uses typedef; put's original container type in name.
             typedef set<String>::type DisabledProfileMap;

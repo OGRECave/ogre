@@ -53,6 +53,7 @@ THE SOFTWARE.
 #include "Animation/OgreSkeletonManager.h"
 
 #include "OgreMesh2.h"
+#include "OgreProfiler.h"
 
 namespace Ogre {
 namespace v1 {
@@ -207,6 +208,8 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void Mesh::postLoadImpl(void)
     {
+        OgreProfileExhaustive( "v1::Mesh::postLoadImpl" );
+
         // Prepare for shadow volumes?
         if (MeshManager::getSingleton().getPrepareAllMeshesForShadowVolumes())
         {
@@ -245,6 +248,8 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void Mesh::prepareImpl()
     {
+        OgreProfileExhaustive( "v1::Mesh::prepareImpl" );
+
         // Load from specified 'name'
         if (getCreator()->getVerbose())
             LogManager::getSingleton().logMessage("Mesh: Loading "+mName+".");
@@ -263,6 +268,8 @@ namespace v1 {
     }
     void Mesh::loadImpl()
     {
+        OgreProfileExhaustive( "v1::Mesh::loadImpl" );
+
         MeshSerializer serializer;
         serializer.setListener(MeshManager::getSingleton().getListener());
 
@@ -291,6 +298,7 @@ namespace v1 {
     void Mesh::unloadImpl()
     {
         // Teardown submeshes
+        OgreProfileExhaustive( "v1::Mesh::unloadImpl" );
 
         // mSubMeshList is iterated in submesh destructor, so pop after deleting
         while ( !mSubMeshList.empty() )

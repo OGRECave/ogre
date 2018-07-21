@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 
 #include "OgrePass.h"
+#include "OgreProfiler.h"
 
 namespace Ogre
 {
@@ -184,6 +185,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsDatablock::clone( String name ) const
     {
+        OgreProfileExhaustive( "HlmsDatablock::clone" );
+
         HlmsDatablock *datablock = mCreator->createDatablock( name, name,
                                                               HlmsMacroblock(), HlmsBlendblock(),
                                                               HlmsParamVec() );
@@ -210,6 +213,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setMacroblock( const HlmsMacroblock &macroblock, bool casterBlock )
     {
+        OgreProfileExhaustive( "HlmsDatablock::setMacroblockRef" );
+
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
         const HlmsMacroblock *oldBlock = mMacroblock[casterBlock];
@@ -245,6 +250,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setMacroblock( const HlmsMacroblock *macroblock, bool casterBlock )
     {
+        OgreProfileExhaustive( "HlmsDatablock::setMacroblockPtr" );
+
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
         hlmsManager->addReference( macroblock );
@@ -280,6 +287,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setBlendblock( const HlmsBlendblock &blendblock, bool casterBlock )
     {
+        OgreProfileExhaustive( "HlmsDatablock::setBlendblockRef" );
+
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
         const HlmsBlendblock *oldBlock = mBlendblock[casterBlock];
@@ -301,6 +310,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setBlendblock( const HlmsBlendblock *blendblock, bool casterBlock )
     {
+        OgreProfileExhaustive( "HlmsDatablock::setBlendblockPtr" );
+
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
         hlmsManager->addReference( blendblock );
@@ -393,6 +404,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::flushRenderables(void)
     {
+        OgreProfileExhaustive( "HlmsDatablock::flushRenderables" );
+
         vector<Renderable*>::type::const_iterator itor = mLinkedRenderables.begin();
         vector<Renderable*>::type::const_iterator end  = mLinkedRenderables.end();
 

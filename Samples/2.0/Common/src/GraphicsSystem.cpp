@@ -278,7 +278,14 @@ namespace Demo
 
 #if OGRE_PROFILING
         Ogre::Profiler::getSingleton().setEnabled( true );
+    #if OGRE_PROFILING == OGRE_PROFILING_INTERNAL
         Ogre::Profiler::getSingleton().endProfile( "" );
+    #endif
+    #if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
+        Ogre::Profiler::getSingleton().getOfflineProfiler().setDumpPathsOnShutdown(
+                    mWriteAccessFolder + "ProfilePerFrame.csv",
+                    mWriteAccessFolder + "ProfileAccum.csv" );
+    #endif
 #endif
     }
     //-----------------------------------------------------------------------------------

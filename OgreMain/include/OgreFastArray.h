@@ -82,8 +82,11 @@ namespace Ogre
             {
                 mCapacity = std::max( mSize + newElements, mCapacity + (mCapacity >> 1) + 1 );
                 T *data = (T*)::operator new( mCapacity * sizeof(T) );
-                memcpy( data, mData, mSize * sizeof(T) );
-                ::operator delete( mData );
+                if( mData )
+                {
+                    memcpy( data, mData, mSize * sizeof(T) );
+                    ::operator delete( mData );
+                }
                 mData = data;
             }
         }
@@ -160,9 +163,17 @@ namespace Ogre
 
         ~FastArray()
         {
+            destroy();
+        }
+
+        void destroy()
+        {
             for( size_t i=0; i<mSize; ++i )
                 mData[i].~T();
             ::operator delete( mData );
+            mSize = 0;
+            mCapacity = 0;
+            mData = 0;
         }
 
         size_t size() const                     { return mSize; }

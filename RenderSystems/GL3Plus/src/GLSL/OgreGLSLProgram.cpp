@@ -31,6 +31,7 @@
 #include "OgreGpuProgramManager.h"
 #include "OgreGLSLShader.h"
 #include "OgreRoot.h"
+#include "OgreProfiler.h"
 
 #include "Vao/OgreGL3PlusVaoManager.h"
 
@@ -267,6 +268,8 @@ namespace Ogre {
 
     void GLSLProgram::extractLayoutQualifiers(void)
     {
+        OgreProfileExhaustive( "GLSLProgram::extractLayoutQualifiers" );
+
         // Format is:
         //      layout(location = 0) attribute vec4 vertex;
 

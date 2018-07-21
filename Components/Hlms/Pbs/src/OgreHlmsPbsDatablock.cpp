@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreLogManager.h"
 #include "Cubemaps/OgreCubemapProbe.h"
+#include "OgreProfiler.h"
 
 #include "OgreHlmsPbsDatablock.cpp.inc"
 

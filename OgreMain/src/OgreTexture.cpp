@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreRenderSystemCapabilities.h"
+#include "OgreProfiler.h"
 
 namespace Ogre {
     //--------------------------------------------------------------------------
@@ -195,6 +196,8 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     void Texture::_loadImages( const ConstImagePtrList& images )
     {
+        OgreProfileExhaustive( "Texture::_loadImages" );
+
         if(images.size() < 1)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot load empty vector of images",
              "Texture::loadImages");

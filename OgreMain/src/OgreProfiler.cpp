@@ -85,7 +85,7 @@ namespace Ogre {
         , mCurrentFrame(0)
         , mTimer(0)
         , mTotalFrameTime(0)
-        , mEnabled(false)
+        , mEnabled( OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE )
         , mUseStableMarkers(false)
         , mNewEnableState(false)
         , mProfileMask(0xFFFFFFFF)
@@ -158,6 +158,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Profiler::setEnabled(bool enabled) 
     {
+#if OGRE_PROFILING != OGRE_PROFILING_INTERNAL_OFFLINE
         if (!mInitialized && enabled) 
         {
             for( TProfileSessionListener::iterator i = mListeners.begin(); i != mListeners.end(); ++i )
@@ -190,6 +191,9 @@ namespace Ogre {
             }
 #endif
         }
+#else
+        mEnabled = enabled;
+#endif
         // We store this enable/disable request until the frame ends
         // (don't want to screw up any open profiles!)
         mNewEnableState = enabled;
@@ -239,6 +243,9 @@ namespace Ogre {
         if (!mEnabled) 
             return;
 
+#if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
+        mOfflineProfiler.profileBegin( profileName.c_str() );
+#else
         // mask groups
         if ((groupID & mProfileMask) == 0)
             return;
@@ -287,10 +294,16 @@ namespace Ogre {
         // we do this at the very end of the function to get the most
         // accurate timing results
         mCurrent->currTime = mTimer->getMicroseconds();
+#endif
     }
     //-----------------------------------------------------------------------
     void Profiler::endProfile(const String& profileName, uint32 groupID) 
     {
+#if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
+        if( !mEnabled )
+            return;
+        mOfflineProfiler.profileEnd();
+#else
         if(!mEnabled) 
         {
             // if the profiler received a request to be enabled or disabled
@@ -399,6 +412,7 @@ namespace Ogre {
             // we display everything to the screen
             displayResults();
         }
+#endif
     }
     //-----------------------------------------------------------------------
     void Profiler::beginGPUEvent(const String& event)

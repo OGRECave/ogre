@@ -532,8 +532,10 @@ set( OGRE_PROFILING_PROVIDER "none" CACHE STRING
 	overhead so you may want to ship your game with this option disabled.
 	none - Profiling OFF
 	internal - Use internal profiling with on-screen overlays
-	remotery - Use Remotery. https://github.com/Celtoys/Remotery"
+	remotery - Use Remotery. https://github.com/Celtoys/Remotery
+	offline - Use internal profiling that generates a CSV file for offline analysis"
 )
+option(OGRE_PROFILING_EXHAUSTIVE "When a valid profiler provider is set, includes exhaustive information of Ogre calls to better find culprit of big slowdowns or hitches, particularly why load times are slow. Best used with 'offline' profiler provider" FALSE)
 
 if( NOT Remotery_FOUND AND OGRE_PROFILING_PROVIDER STREQUAL "remotery" )
 	message( STATUS "WARNING: Remotery not found! Forcing profiling to disable" )

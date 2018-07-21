@@ -64,6 +64,7 @@ THE SOFTWARE.
 #endif
 
 #include "OgreLogManager.h"
+#include "OgreProfiler.h"
 
 namespace Ogre
 {
@@ -339,6 +340,8 @@ namespace Ogre
                                                             uint32 finalHash,
                                                             const QueuedRenderable &queuedRenderable )
     {
+        OgreProfileExhaustive( "HlmsPbs::createShaderCacheEntry" );
+
         const HlmsCache *retVal = Hlms::createShaderCacheEntry( renderableHash, passCache, finalHash,
                                                                 queuedRenderable );
 
@@ -830,6 +833,8 @@ namespace Ogre
     HlmsCache HlmsPbs::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                         bool dualParaboloid, SceneManager *sceneManager )
     {
+        OgreProfileExhaustive( "HlmsPbs::preparePassHash" );
+
         mSetProperties.clear();
 
         if( shadowNode && mShadowFilter == ExponentialShadowMaps )

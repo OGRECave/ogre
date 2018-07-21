@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
 #include "OgreLogManager.h"
+#include "OgreProfiler.h"
 
 namespace Ogre
 {
@@ -299,6 +300,8 @@ namespace Ogre
                                                                         TextureMapType mapType,
                                                                         Image *imgSource )
     {
+        OgreProfileExhaustive( "HlmsTextureManager::createOrRetrieveTexture" );
+
         TextureEntry searchName( aliasName );
         TextureEntryVec::iterator it = std::lower_bound( mEntries.begin(), mEntries.end(), searchName );
 
