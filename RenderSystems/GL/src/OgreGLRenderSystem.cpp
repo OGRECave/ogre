@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 
 #include "OgreGLRenderSystem.h"
-#include "OgreGLSupport.h"
+#include "OgreGLNativeSupport.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreLight.h"
@@ -130,7 +130,7 @@ namespace Ogre {
         mRenderInstanceAttribsBound.reserve(100);
 
         // Get our GLSupport
-        mGLSupport = new GLSupport(getGLSupport(GLNativeSupport::CONTEXT_COMPATIBILITY));
+        mGLSupport = getGLSupport(GLNativeSupport::CONTEXT_COMPATIBILITY);
 
         for( i=0; i<MAX_LIGHTS; i++ )
             mLights[i] = NULL;
@@ -434,7 +434,7 @@ namespace Ogre {
             rsc->addShaderProfile("gp4gp");
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_get_program_binary"))
+        if (checkExtension("GL_ARB_get_program_binary"))
         {
             // states 3.0 here: http://developer.download.nvidia.com/opengl/specs/GL_ARB_get_program_binary.txt
             // but not here: http://www.opengl.org/sdk/docs/man4/xhtml/glGetProgramBinary.xml
@@ -531,7 +531,7 @@ namespace Ogre {
         }
 
         // Check GLSupport for PBuffer support
-        if(mGLSupport->supportsPBuffers())
+        if(GLEW_ARB_pixel_buffer_object || GLEW_EXT_pixel_buffer_object)
         {
             // Use PBuffers
             rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -544,7 +544,7 @@ namespace Ogre {
         rsc->setMaxPointSize(ps);
 
         // Vertex texture fetching
-        if (mGLSupport->checkExtension("GL_ARB_vertex_shader"))
+        if (checkExtension("GL_ARB_vertex_shader"))
         {
             GLint vUnits;
             glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, &vUnits);
@@ -560,7 +560,7 @@ namespace Ogre {
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
 
         // Alpha to coverage?
-        if (mGLSupport->checkExtension("GL_ARB_multisample"))
+        if (checkExtension("GL_ARB_multisample"))
         {
             // Alpha to coverage always 'supported' when MSAA is available
             // although card may ignore it if it doesn't specifically support A2C
@@ -960,8 +960,6 @@ namespace Ogre {
             // set up glew and GLSupport
             initialiseContext(win);
 
-            mDriverVersion = mGLSupport->getGLVersion();
-
             const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
             StringVector tokens = StringUtil::split(shadingLangVersion, ". ");
             mNativeShadingLanguageVersion = (StringConverter::parseUnsignedInt(tokens[0]) * 100) + StringConverter::parseUnsignedInt(tokens[1]);
@@ -1063,7 +1061,7 @@ namespace Ogre {
             mCurrentContext->setCurrent();
 
         // Setup GLSupport
-        mGLSupport->initialiseExtensions();
+        initialiseExtensions();
 
         LogManager::getSingleton().logMessage("***************************");
         LogManager::getSingleton().logMessage("*** GL Renderer Started ***");
@@ -3095,7 +3093,7 @@ namespace Ogre {
 
         // Check for FSAA
         // Enable the extension if it was enabled by the GLSupport
-        if (mGLSupport->checkExtension("GL_ARB_multisample"))
+        if (checkExtension("GL_ARB_multisample"))
         {
             int fsaa_active = false;
             glGetIntegerv(GL_SAMPLE_BUFFERS_ARB,(GLint*)&fsaa_active);
@@ -3106,7 +3104,7 @@ namespace Ogre {
             }            
         }
 
-		if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map"))
+		if (checkExtension("GL_ARB_seamless_cube_map"))
 		{
             // Enable seamless cube maps
             glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -3539,4 +3537,40 @@ namespace Ogre {
         PixelUtil::bulkPixelVerticalFlip(dst);
     }
 	//---------------------------------------------------------------------
+    void GLRenderSystem::initialiseExtensions(void)
+    {
+        // Set version string
+        const GLubyte* pcVer = glGetString(GL_VERSION);
+        assert(pcVer && "Problems getting GL version string using glGetString");
+
+        String tmpStr = (const char*)pcVer;
+        mDriverVersion.fromString(tmpStr.substr(0, tmpStr.find(' ')));
+        LogManager::getSingleton().logMessage("GL_VERSION = " + mDriverVersion.toString());
+
+        // Get vendor
+        const GLubyte* pcVendor = glGetString(GL_VENDOR);
+        tmpStr = (const char*)pcVendor;
+        LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
+        mVendor = tmpStr.substr(0, tmpStr.find(' '));
+
+        // Get renderer
+        const GLubyte* pcRenderer = glGetString(GL_RENDERER);
+        tmpStr = (const char*)pcRenderer;
+        LogManager::getSingleton().logMessage("GL_RENDERER = " + tmpStr);
+
+        // Set extension list
+        StringStream ext;
+        String str;
+
+        const GLubyte* pcExt = glGetString(GL_EXTENSIONS);
+        assert(pcExt && "Problems getting GL extension string using glGetString");
+        LogManager::getSingleton().logMessage("GL_EXTENSIONS = " + String((const char*)pcExt));
+
+        ext << pcExt;
+
+        while(ext >> str)
+        {
+            mExtensionList.insert(str);
+        }
+    }
 }

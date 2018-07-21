@@ -27,7 +27,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreGL3PlusRenderSystem.h"
-#include "OgreGL3PlusSupport.h"
 
 #include "OgreGLUtil.h"
 #include "OgreRenderSystem.h"
@@ -123,7 +122,7 @@ static void APIENTRY GLDebugCallback(GLenum source,
 
 namespace Ogre {
 
-    static GL3PlusSupport* glsupport;
+    static GLNativeSupport* glsupport;
     static GL3WglProc get_proc(const char* proc) {
         return (GL3WglProc)glsupport->getProcAddress(proc);
     }
@@ -144,7 +143,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage(getName() + " created.");
 
         // Get our GLSupport
-        mGLSupport = new GL3PlusSupport(getGLSupport());
+        mGLSupport = getGLSupport();
         glsupport = mGLSupport;
 
         initConfigOptions();
@@ -201,11 +200,6 @@ namespace Ogre {
         mGLSupport->setConfigOption(name, value);
     }
 
-    bool GL3PlusRenderSystem::checkExtension(const String& ext) const
-    {
-        return mGLSupport->checkExtension(ext);
-    }
-
     RenderWindow* GL3PlusRenderSystem::_initialise(bool autoCreateWindow,
                                                    const String& windowTitle)
     {
@@ -236,7 +230,7 @@ namespace Ogre {
         }
 
         rsc->setRenderSystemName(getName());
-        rsc->parseVendorFromString(mGLSupport->getGLVendor());
+        rsc->parseVendorFromString(mVendor);
 
         // Check for hardware mipmapping support.
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
@@ -664,7 +658,6 @@ namespace Ogre {
         if (!mGLInitialised)
         {
             initialiseContext(win);
-            mDriverVersion = mGLSupport->getGLVersion();
 
             if (mDriverVersion.major < 3)
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -1972,7 +1965,7 @@ namespace Ogre {
         }
 
         // Setup GL3PlusSupport
-        mGLSupport->initialiseExtensions();
+        initialiseExtensions();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GL3PlusStateCacheManager>();
 
@@ -2526,5 +2519,43 @@ namespace Ogre {
         glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 
         PixelUtil::bulkPixelVerticalFlip(dst);
+    }
+
+    void GL3PlusRenderSystem::initialiseExtensions(void)
+    {
+        // get driver version.
+        // this is the recommended way for GL3 see: https://www.opengl.org/wiki/Get_Context_Info
+        glGetIntegerv(GL_MAJOR_VERSION, &mDriverVersion.major);
+        glGetIntegerv(GL_MINOR_VERSION, &mDriverVersion.minor);
+
+        LogManager::getSingleton().logMessage("GL_VERSION = " + mDriverVersion.toString());
+
+        // Get vendor
+        const GLubyte* pcVendor = glGetString(GL_VENDOR);
+        String tmpStr = (const char*)pcVendor;
+        LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
+        mVendor = tmpStr.substr(0, tmpStr.find(' '));
+
+        // Get renderer
+        const GLubyte* pcRenderer = glGetString(GL_RENDERER);
+        tmpStr = (const char*)pcRenderer;
+        LogManager::getSingleton().logMessage("GL_RENDERER = " + tmpStr);
+
+        // Set extension list
+        Log::Stream log = LogManager::getSingleton().stream();
+        String str;
+
+        GLint numExt;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &numExt);
+
+        log << "GL_EXTENSIONS = ";
+        for(int i = 0; i < numExt; i++)
+        {
+            const GLubyte* pcExt = glGetStringi(GL_EXTENSIONS, i);
+            assert(pcExt && "Problems getting GL extension string using glGetString");
+            str = String((const char*)pcExt);
+            log << str << " ";
+            mExtensionList.insert(str);
+        }
     }
 }

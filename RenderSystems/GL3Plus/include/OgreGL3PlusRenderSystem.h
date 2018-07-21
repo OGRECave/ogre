@@ -87,9 +87,6 @@ namespace Ogre {
         /// Store last stencil mask state
         uint32 mStencilWriteMask;
 
-        /// GL support class, used for creating windows etc.
-        GL3PlusSupport *mGLSupport;
-
         typedef std::list<GL3PlusContext*> GL3PlusContextList;
         /// List of background thread contexts
         GL3PlusContextList mBackgroundContextList;
@@ -138,7 +135,10 @@ namespace Ogre {
         void bindVertexElementToGpu(const VertexElement& elem,
                                     const HardwareVertexBufferSharedPtr& vertexBuffer,
                                     const size_t vertexStart);
-
+        /** Initialises GL extensions, must be done AFTER the GL context has been
+            established.
+        */
+        void initialiseExtensions();
     public:
         // Default constructor / destructor
         GL3PlusRenderSystem();
@@ -257,14 +257,11 @@ namespace Ogre {
         void preExtraThreadsStarted();
         void postExtraThreadsStarted();
         void setClipPlanesImpl(const Ogre::PlaneList& planeList);
-        GL3PlusSupport* getGLSupportRef() { return mGLSupport; }
 
 
         // ----------------------------------
         // GL3PlusRenderSystem specific members
         // ----------------------------------
-        bool checkExtension(const String& ext) const;
-
         GL3PlusStateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
 
         /** Create VAO on current context */

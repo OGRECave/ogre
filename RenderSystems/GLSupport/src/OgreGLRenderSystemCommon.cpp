@@ -34,6 +34,12 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
+
+    bool GLRenderSystemCommon::checkExtension(const String& ext) const
+    {
+        return mExtensionList.find(ext) != mExtensionList.end() || mGLSupport->checkExtension(ext);
+    }
+
     bool GLRenderSystemCommon::hasMinGLVersion(int major, int minor) const
     {
         if (mDriverVersion.major == major) {

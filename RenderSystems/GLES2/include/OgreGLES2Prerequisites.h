@@ -79,7 +79,7 @@ extern float EAGLCurrentOSVersion;
 #endif
 
 namespace Ogre {
-    class GLES2Support;
+    class GLNativeSupport;
     class GLES2GpuProgram;
     class GLES2Texture;
     typedef shared_ptr<GLES2GpuProgram> GLES2GpuProgramPtr;

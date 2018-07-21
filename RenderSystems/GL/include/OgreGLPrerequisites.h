@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     // Forward declarations
-    class GLSupport;
+    class GLNativeSupport;
     class GLRenderSystem;
     class GLTexture;
     class GLTextureManager;

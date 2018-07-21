@@ -28,9 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2Texture.h"
 #include "OgreGLES2PixelFormat.h"
-#include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
-#include "OgreGLES2Support.h"
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRoot.h"
 #include "OgreBitwise.h"
