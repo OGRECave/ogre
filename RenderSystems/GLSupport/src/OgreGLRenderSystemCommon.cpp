@@ -28,12 +28,245 @@ THE SOFTWARE.
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreGLContext.h"
 #include "OgreFrustum.h"
+#include "OgreGLNativeSupport.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #include <OgreEGLWindow.h>
 #endif
 
 namespace Ogre {
+    static void removeDuplicates(std::vector<String>& c)
+    {
+        std::sort(c.begin(), c.end());
+        auto p = std::unique(c.begin(), c.end());
+        c.erase(p, c.end());
+    }
+
+    String GLRenderSystemCommon::VideoMode::getDescription() const
+    {
+        char tmp[128];
+        // specify width for correct lexicographical sorting
+        sprintf( tmp, "%4d x %4d", width, height);
+        return String(tmp);
+    }
+
+    void GLRenderSystemCommon::initConfigOptions()
+    {
+        mOptions = mGLSupport->getConfigOptions();
+
+        // FS setting possibilities
+        ConfigOption optFullScreen;
+        optFullScreen.name = "Full Screen";
+        optFullScreen.possibleValues.push_back( "No" );
+        optFullScreen.possibleValues.push_back( "Yes" );
+        optFullScreen.currentValue = optFullScreen.possibleValues[0];
+        optFullScreen.immutable = false;
+        mOptions[optFullScreen.name] = optFullScreen;
+
+        ConfigOption optDisplayFrequency;
+        optDisplayFrequency.name = "Display Frequency";
+        optDisplayFrequency.immutable = false;
+        mOptions[optDisplayFrequency.name] = optDisplayFrequency;
+
+        ConfigOption optVideoMode;
+        optVideoMode.name = "Video Mode";
+        optVideoMode.immutable = false;
+        for (const auto& mode : mGLSupport->getVideoModes())
+        {
+            optVideoMode.possibleValues.push_back(mode.getDescription());
+        }
+        removeDuplicates(optVideoMode.possibleValues); // also sorts
+        optVideoMode.currentValue = optVideoMode.possibleValues[0];
+        mOptions[optVideoMode.name] = optVideoMode;
+
+        ConfigOption optFSAA;
+        optFSAA.name = "FSAA";
+        optFSAA.immutable = false;
+        for (int sampleLevel : mGLSupport->getFSAALevels())
+        {
+            optFSAA.possibleValues.push_back(StringConverter::toString(sampleLevel));
+        }
+        if (!optFSAA.possibleValues.empty())
+        {
+            removeDuplicates(optFSAA.possibleValues);
+            optFSAA.currentValue = optFSAA.possibleValues[0];
+        }
+        mOptions[optFSAA.name] = optFSAA;
+
+        ConfigOption optVSync;
+        optVSync.name = "VSync";
+        optVSync.immutable = false;
+        optVSync.possibleValues.push_back("No");
+        optVSync.possibleValues.push_back("Yes");
+        optVSync.currentValue = optVSync.possibleValues[1];
+        mOptions[optVSync.name] = optVSync;
+
+        ConfigOption optSRGB;
+        optSRGB.name = "sRGB Gamma Conversion";
+        optSRGB.immutable = false;
+        optSRGB.possibleValues.push_back("No");
+        optSRGB.possibleValues.push_back("Yes");
+        optSRGB.currentValue = optSRGB.possibleValues[0];
+        mOptions[optSRGB.name] = optSRGB;
+
+        // TODO remove this on next release
+        ConfigOption optRTTMode;
+        optRTTMode.name = "RTT Preferred Mode";
+        optRTTMode.possibleValues.push_back("FBO");
+        optRTTMode.currentValue = optRTTMode.possibleValues[0];
+        optRTTMode.immutable = true;
+        mOptions[optRTTMode.name] = optRTTMode;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        ConfigOption optStereoMode;
+        optStereoMode.name = "Stereo Mode";
+        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
+        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
+        optStereoMode.currentValue = optStereoMode.possibleValues[0];
+        optStereoMode.immutable = false;
+
+        mOptions[optStereoMode.name] = optStereoMode;
+#endif
+
+        refreshConfig();
+    }
+
+    void GLRenderSystemCommon::refreshConfig()
+    {
+        // set bpp and refresh rate as appropriate
+        ConfigOptionMap::iterator optVideoMode = mOptions.find("Video Mode");
+        ConfigOptionMap::iterator optDisplayFrequency = mOptions.find("Display Frequency");
+        ConfigOptionMap::iterator optFullScreen = mOptions.find("Full Screen");
+        ConfigOptionMap::iterator optColourDepth = mOptions.find("Colour Depth");
+
+        // coulour depth is optional
+        if (optColourDepth != mOptions.end())
+        {
+            for (const auto& mode : mGLSupport->getVideoModes())
+            {
+                if (mode.getDescription() == optVideoMode->second.currentValue)
+                {
+                    optColourDepth->second.possibleValues.push_back(
+                        StringConverter::toString((unsigned int)mode.bpp));
+                }
+            }
+
+            removeDuplicates(optColourDepth->second.possibleValues);
+        }
+
+        // we can only set refresh rate in full screen mode
+        bool isFullscreen = false;
+        if( optFullScreen != mOptions.end())
+            isFullscreen = optFullScreen->second.currentValue == "Yes";
+
+        if (optVideoMode == mOptions.end() || optDisplayFrequency == mOptions.end())
+            return;
+
+        optDisplayFrequency->second.possibleValues.clear();
+        if( !isFullscreen )
+        {
+            optDisplayFrequency->second.possibleValues.push_back( "N/A" );
+        }
+        else
+        {
+            for (const auto& mode : mGLSupport->getVideoModes())
+            {
+                if (mode.getDescription() == optVideoMode->second.currentValue)
+                {
+                    String frequency = StringConverter::toString(mode.refreshRate) + " Hz";
+                    optDisplayFrequency->second.possibleValues.push_back(frequency);
+
+                    if(optColourDepth != mOptions.end())
+                        optColourDepth->second.possibleValues.push_back(
+                            StringConverter::toString((unsigned int)mode.bpp));
+                }
+            }
+
+            removeDuplicates(optDisplayFrequency->second.possibleValues);
+        }
+
+        if (!optDisplayFrequency->second.possibleValues.empty())
+        {
+            optDisplayFrequency->second.currentValue = optDisplayFrequency->second.possibleValues[0];
+        }
+        else
+        {
+            optVideoMode->second.currentValue = mGLSupport->getVideoModes()[0].getDescription();
+            optDisplayFrequency->second.currentValue = StringConverter::toString(mGLSupport->getVideoModes()[0].refreshRate) + " Hz";
+        }
+    }
+
+    //-------------------------------------------------------------------------------------------------//
+    NameValuePairList GLRenderSystemCommon::parseOptions(uint& w, uint& h, bool& fullscreen)
+    {
+        ConfigOptionMap::iterator opt;
+        ConfigOptionMap::iterator end = mOptions.end();
+        NameValuePairList miscParams;
+
+        opt = mOptions.find("Full Screen");
+        if (opt == mOptions.end())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find full screen options!", "parseOptions");
+        fullscreen = opt->second.currentValue == "Yes";
+
+        opt = mOptions.find("Video Mode");
+        if (opt == mOptions.end())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find video mode options!", "parseOptions");
+        String val = opt->second.currentValue;
+        String::size_type pos = val.find('x');
+        if (pos == String::npos)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid Video Mode provided", "parseOptions");
+
+        w = StringConverter::parseUnsignedInt(val.substr(0, pos));
+        h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
+
+        if((opt = mOptions.find("Display Frequency")) != end)
+            miscParams["displayFrequency"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("FSAA")) != end)
+            miscParams["FSAA"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("VSync")) != end)
+            miscParams["vsync"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
+            miscParams["gamma"] = opt->second.currentValue;
+
+        // backend specific options. Presence determined by getConfigOptions
+        if((opt = mOptions.find("Colour Depth")) != end)
+            miscParams["colourDepth"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("VSync Interval")) != end)
+            miscParams["vsyncInterval"] = opt->second.currentValue;
+
+        if((opt = mOptions.find("hidden")) != end)
+            miscParams[ "hidden" ] = opt->second.currentValue;
+
+        if((opt = mOptions.find("Content Scaling Factor")) != end)
+            miscParams["contentScalingFactor"] = opt->second.currentValue;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        opt = mOptions.find("Stereo Mode");
+        if (opt == mOptions.end())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "parseOptions");
+        miscParams["stereoMode"] = opt->second.currentValue;
+#endif
+
+        return miscParams;
+    }
+
+    void GLRenderSystemCommon::setConfigOption(const String &name, const String &value)
+    {
+        ConfigOptionMap::iterator option = mOptions.find(name);
+        if (option == mOptions.end()) {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Option named " + name + " does not exist.",
+                        "GLNativeSupport::setConfigOption");
+        }
+        option->second.currentValue = value;
+
+        if( name == "Video Mode" || name == "Full Screen" )
+            refreshConfig();
+    }
 
     bool GLRenderSystemCommon::checkExtension(const String& ext) const
     {

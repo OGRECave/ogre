@@ -301,14 +301,6 @@ namespace Ogre {
         mIsFullScreen = fullScreen;
         mName = name;
         
-        // Check the configuration. This may be overridden later by the value sent via miscParams
-        ConfigOptionMap::const_iterator configOpt;
-        ConfigOptionMap::const_iterator configEnd = mGLSupport->getConfigOptions().end();
-        if ((configOpt = mGLSupport->getConfigOptions().find("Content Scaling Factor")) != configEnd)
-        {
-            mContentScalingFactor = StringConverter::parseReal(configOpt->second.currentValue);
-        }
-
         if (miscParams)
         {
             NameValuePairList::const_iterator opt;

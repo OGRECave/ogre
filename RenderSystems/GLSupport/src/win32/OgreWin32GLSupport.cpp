@@ -60,8 +60,10 @@ namespace Ogre {
 #endif
     } 
 
-    void Win32GLSupport::addConfig()
+    ConfigOptionMap Win32GLSupport::getConfigOptions()
     {
+        ConfigOptionMap mOptions;
+        
         //TODO: EnumDisplayDevices http://msdn.microsoft.com/library/en-us/gdi/devcons_2303.asp
         /*vector<string> DisplayDevices;
         DISPLAY_DEVICE DisplayDevice;
@@ -70,58 +72,23 @@ namespace Ogre {
         while (EnumDisplayDevices(NULL, i++, &DisplayDevice, 0) {
             DisplayDevices.push_back(DisplayDevice.DeviceName);
         }*/
-          
-        ConfigOption optFullScreen;
-        ConfigOption optVideoMode;
-        ConfigOption optColourDepth;
-        ConfigOption optDisplayFrequency;
-        ConfigOption optVSync;
-        ConfigOption optVSyncInterval;
-        ConfigOption optFSAA;
-        ConfigOption optRTTMode;
-        ConfigOption optSRGB;
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		ConfigOption optStereoMode;
-#endif
-
-        // FS setting possibilities
-        optFullScreen.name = "Full Screen";
-        optFullScreen.possibleValues.push_back("Yes");
-        optFullScreen.possibleValues.push_back("No");
-        optFullScreen.currentValue = "No";
-        optFullScreen.immutable = false;
 
         // Video mode possibilities
         DEVMODE DevMode;
         DevMode.dmSize = sizeof(DEVMODE);
-        optVideoMode.name = "Video Mode";
-        optVideoMode.immutable = false;
         for (DWORD i = 0; EnumDisplaySettings(NULL, i, &DevMode); ++i)
         {
             if (DevMode.dmBitsPerPel < 16 || DevMode.dmPelsHeight < 480)
                 continue;
-            mDevModes.push_back(DevMode);
-            StringStream str;
-            str << DevMode.dmPelsWidth << " x " << DevMode.dmPelsHeight;
-            optVideoMode.possibleValues.push_back(str.str());
+            mVideoModes.push_back({DevMode.dmPelsWidth, DevMode.dmPelsHeight,
+                                   short(DevMode.dmDisplayFrequency), uint8(DevMode.dmBitsPerPel)});
         }
-        removeDuplicates(optVideoMode.possibleValues);
-        optVideoMode.currentValue = optVideoMode.possibleValues.front();
 
+        ConfigOption optColourDepth;
         optColourDepth.name = "Colour Depth";
         optColourDepth.immutable = false;
-        optColourDepth.currentValue.clear();
 
-        optDisplayFrequency.name = "Display Frequency";
-        optDisplayFrequency.immutable = false;
-        optDisplayFrequency.currentValue.clear();
-
-        optVSync.name = "VSync";
-        optVSync.immutable = false;
-        optVSync.possibleValues.push_back("No");
-        optVSync.possibleValues.push_back("Yes");
-        optVSync.currentValue = "Yes";
-
+        ConfigOption optVSyncInterval;
         optVSyncInterval.name = "VSync Interval";
         optVSyncInterval.immutable = false;
         optVSyncInterval.possibleValues.push_back( "1" );
@@ -130,191 +97,10 @@ namespace Ogre {
         optVSyncInterval.possibleValues.push_back( "4" );
         optVSyncInterval.currentValue = "1";
 
-        optFSAA.name = "FSAA";
-        optFSAA.immutable = false;
-        optFSAA.possibleValues.push_back("0");
-        for (std::vector<int>::iterator it = mFSAALevels.begin(); it != mFSAALevels.end(); ++it)
-        {
-            String val = StringConverter::toString(*it);
-            optFSAA.possibleValues.push_back(val);
-            /* not implementing CSAA in GL for now
-            if (*it >= 8)
-                optFSAA.possibleValues.push_back(val + " [Quality]");
-            */
-
-        }
-        optFSAA.currentValue = "0";
-
-        optRTTMode.name = "RTT Preferred Mode";
-        optRTTMode.possibleValues.push_back("FBO");
-        optRTTMode.possibleValues.push_back("PBuffer");
-        optRTTMode.possibleValues.push_back("Copy");
-        optRTTMode.currentValue = "FBO";
-        optRTTMode.immutable = false;
-
-
-        // SRGB on auto window
-        optSRGB.name = "sRGB Gamma Conversion";
-        optSRGB.possibleValues.push_back("Yes");
-        optSRGB.possibleValues.push_back("No");
-        optSRGB.currentValue = "No";
-        optSRGB.immutable = false;
-
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		optStereoMode.name = "Stereo Mode";
-		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
-		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
-		optStereoMode.currentValue = optStereoMode.possibleValues[0];
-		optStereoMode.immutable = false;
-		
-		mOptions[optStereoMode.name] = optStereoMode;
-#endif
-
-        mOptions[optFullScreen.name] = optFullScreen;
-        mOptions[optVideoMode.name] = optVideoMode;
         mOptions[optColourDepth.name] = optColourDepth;
-        mOptions[optDisplayFrequency.name] = optDisplayFrequency;
-        mOptions[optVSync.name] = optVSync;
         mOptions[optVSyncInterval.name] = optVSyncInterval;
-        mOptions[optFSAA.name] = optFSAA;
-        mOptions[optRTTMode.name] = optRTTMode;
-        mOptions[optSRGB.name] = optSRGB;
 
-        refreshConfig();
-    }
-
-    void Win32GLSupport::refreshConfig()
-    {
-        ConfigOptionMap::iterator optVideoMode = mOptions.find("Video Mode");
-        ConfigOptionMap::iterator moptColourDepth = mOptions.find("Colour Depth");
-        ConfigOptionMap::iterator moptDisplayFrequency = mOptions.find("Display Frequency");
-        if(optVideoMode == mOptions.end() || moptColourDepth == mOptions.end() || moptDisplayFrequency == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find mOptions!", "Win32GLSupport::refreshConfig");
-        ConfigOption* optColourDepth = &moptColourDepth->second;
-        ConfigOption* optDisplayFrequency = &moptDisplayFrequency->second;
-
-        const String& val = optVideoMode->second.currentValue;
-        String::size_type pos = val.find('x');
-        if (pos == String::npos)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid Video Mode provided", "Win32GLSupport::refreshConfig");
-        DWORD width = StringConverter::parseUnsignedInt(val.substr(0, pos));
-        DWORD height = StringConverter::parseUnsignedInt(val.substr(pos+1, String::npos));
-
-        for(std::vector<DEVMODE>::const_iterator i = mDevModes.begin(); i != mDevModes.end(); ++i)
-        {
-            if (i->dmPelsWidth != width || i->dmPelsHeight != height)
-                continue;
-            optColourDepth->possibleValues.push_back(StringConverter::toString((unsigned int)i->dmBitsPerPel));
-            optDisplayFrequency->possibleValues.push_back(StringConverter::toString((unsigned int)i->dmDisplayFrequency));
-        }
-        removeDuplicates(optColourDepth->possibleValues);
-        removeDuplicates(optDisplayFrequency->possibleValues);
-        optColourDepth->currentValue = optColourDepth->possibleValues.back();
-        bool freqValid = std::find(optDisplayFrequency->possibleValues.begin(),
-            optDisplayFrequency->possibleValues.end(),
-            optDisplayFrequency->currentValue) != optDisplayFrequency->possibleValues.end();
-
-        if ( (optDisplayFrequency->currentValue != "N/A") && !freqValid )           
-            optDisplayFrequency->currentValue = optDisplayFrequency->possibleValues.front();
-    }
-
-    void Win32GLSupport::setConfigOption(const String &name, const String &value)
-    {
-        GLNativeSupport::setConfigOption(name, value);
-
-        if( name == "Video Mode" )
-            refreshConfig();
-
-        if( name == "Full Screen" )
-        {
-            ConfigOptionMap::iterator it = mOptions.find( "Display Frequency" );
-            if( value == "No" )
-            {
-                it->second.currentValue = "N/A";
-                it->second.immutable = true;
-            }
-            else
-            {
-                if (it->second.currentValue.empty() || it->second.currentValue == "N/A")
-                    it->second.currentValue = it->second.possibleValues.front();
-                it->second.immutable = false;
-            }
-        }
-    }
-
-    NameValuePairList Win32GLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
-    {
-        ConfigOptionMap::iterator opt = mOptions.find("Full Screen");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find full screen options!", "Win32GLSupport::createWindow");
-        fullscreen = (opt->second.currentValue == "Yes");
-
-        opt = mOptions.find("Video Mode");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find video mode options!", "Win32GLSupport::createWindow");
-        String val = opt->second.currentValue;
-        String::size_type pos = val.find('x');
-        if (pos == String::npos)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid Video Mode provided", "Win32GLSupport::createWindow");
-
-        w = StringConverter::parseUnsignedInt(val.substr(0, pos));
-        h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
-
-        // Parse optional parameters
-        NameValuePairList winOptions;
-        opt = mOptions.find("Colour Depth");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Colour Depth options!", "Win32GLSupport::createWindow");
-        unsigned int colourDepth =
-            StringConverter::parseUnsignedInt(opt->second.currentValue);
-        winOptions["colourDepth"] = StringConverter::toString(colourDepth);
-
-        opt = mOptions.find("VSync");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync options!", "Win32GLSupport::createWindow");
-        bool vsync = (opt->second.currentValue == "Yes");
-        winOptions["vsync"] = StringConverter::toString(vsync);
-
-        opt = mOptions.find("VSync Interval");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync Interval options!", "Win32GLSupport::createWindow");
-        winOptions["vsyncInterval"] = opt->second.currentValue;
-
-        opt = mOptions.find("Display Frequency");
-        if (opt != mOptions.end())
-        {
-            unsigned int displayFrequency =
-                StringConverter::parseUnsignedInt(opt->second.currentValue);
-            winOptions["displayFrequency"] = StringConverter::toString(displayFrequency);
-        }
-
-        opt = mOptions.find("FSAA");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find FSAA options!", "Win32GLSupport::createWindow");
-        StringVector aavalues = StringUtil::split(opt->second.currentValue, " ", 1);
-        unsigned int multisample = StringConverter::parseUnsignedInt(aavalues[0]);
-        String multisample_hint;
-        if (aavalues.size() > 1)
-            multisample_hint = aavalues[1];
-
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-        opt = mOptions.find("Stereo Mode");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "Win32GLSupport::createWindow");
-        winOptions["stereoMode"] = opt->second.currentValue;
-        mStereoMode = StringConverter::parseStereoMode(opt->second.currentValue);
-#endif
-
-        winOptions["FSAA"] = StringConverter::toString(multisample);
-        winOptions["FSAAHint"] = multisample_hint;
-
-        opt = mOptions.find("sRGB Gamma Conversion");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find sRGB options!", "Win32GLSupport::createWindow");
-        bool hwGamma = (opt->second.currentValue == "Yes");
-        winOptions["gamma"] = StringConverter::toString(hwGamma);
-
-        return winOptions;
+        return mOptions;
     }
 
     BOOL CALLBACK Win32GLSupport::sCreateMonitorsInfoEnumProc(
@@ -583,7 +369,7 @@ namespace Ogre {
                             mFSAALevels.push_back(samples);
                         }
                     }
-                    removeDuplicates(mFSAALevels);
+                    mFSAALevels.push_back(0);
                 }
             }
             

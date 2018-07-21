@@ -57,21 +57,27 @@ namespace Ogre {
     class _OgrePrivate EGLSupport : public GLNativeSupport
     {
         protected:
-            void refreshConfig(void);
-
             EGLDisplay mGLDisplay;
             NativeDisplayType mNativeDisplay;
 
             bool mIsExternalDisplay;
-            bool mRandr;
-            typedef std::pair<uint, uint> ScreenSize;
-            typedef short Rate;
-            typedef std::pair<ScreenSize, Rate> VideoMode;
-            typedef std::vector<VideoMode> VideoModes;
-            VideoModes mVideoModes;
+            struct EGLVideoMode {
+                typedef std::pair<uint, uint> ScreenSize;
+                typedef short Rate;
+                ScreenSize first;
+                Rate second;
+                EGLVideoMode() {}
+                EGLVideoMode(const VideoMode& m) : first(m.width, m.height), second(m.refreshRate) {}
+
+                bool operator!=(const EGLVideoMode& o) const
+                {
+                    return first != o.first || second != o.second;
+                }
+            };
+            typedef std::vector<EGLVideoMode> EGLVideoModes;
+
             VideoMode mOriginalMode;
             VideoMode mCurrentMode;
-            StringVector mSampleLevels;
 
             EGLint mEGLMajor, mEGLMinor;
 
@@ -83,8 +89,6 @@ namespace Ogre {
 
             void start(void);
             void stop(void);
-            void addConfig(void);
-            void setConfigOption(const String &name, const String &value);
             virtual String getDisplayName (void);
             EGLDisplay getGLDisplay(void);
             void setGLDisplay(EGLDisplay val);
@@ -93,8 +97,6 @@ namespace Ogre {
             EGLBoolean getGLConfigAttrib(EGLConfig fbConfig, EGLint attribute, EGLint *value);
             void* getProcAddress(const char* name) const;
             ::EGLContext createNewContext(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLContext shareList) const;
-
-            NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
 
             RenderWindow* newWindow(const String& name,
                                     unsigned int width, unsigned int height,

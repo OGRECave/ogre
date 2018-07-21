@@ -31,11 +31,11 @@ THE SOFTWARE.
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreRenderSystem.h"
 #include "OgreRenderWindow.h"
-#include "OgreGLNativeSupport.h"
 
 namespace Ogre {
     class GLContext;
     class GLSLProgramCommon;
+    class GLNativeSupport;
 
     class _OgreGLExport GLRenderSystemCommon : public RenderSystem
     {
@@ -53,7 +53,27 @@ namespace Ogre {
         std::set<String> mExtensionList;
         String mVendor;
 
+        // Stored options
+        ConfigOptionMap mOptions;
+
+        void initConfigOptions();
+        void refreshConfig();
+        NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
     public:
+        struct VideoMode {
+            uint32 width;
+            uint32 height;
+            int16 refreshRate;
+            uint8  bpp;
+
+            String getDescription() const;
+        };
+        typedef std::vector<VideoMode>    VideoModes;
+
+        ConfigOptionMap& getConfigOptions() { return mOptions; }
+
+        void setConfigOption(const String &name, const String &value);
+
         virtual ~GLRenderSystemCommon() {}
 
         /** @copydoc RenderTarget::copyContentsToMemory */

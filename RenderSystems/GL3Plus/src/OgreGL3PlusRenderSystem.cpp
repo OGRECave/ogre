@@ -185,21 +185,6 @@ namespace Ogre {
         return strName;
     }
 
-    void GL3PlusRenderSystem::initConfigOptions(void)
-    {
-        mGLSupport->addConfig();
-    }
-
-    ConfigOptionMap& GL3PlusRenderSystem::getConfigOptions(void)
-    {
-        return mGLSupport->getConfigOptions();
-    }
-
-    void GL3PlusRenderSystem::setConfigOption(const String &name, const String &value)
-    {
-        mGLSupport->setConfigOption(name, value);
-    }
-
     RenderWindow* GL3PlusRenderSystem::_initialise(bool autoCreateWindow,
                                                    const String& windowTitle)
     {
@@ -209,7 +194,7 @@ namespace Ogre {
         if(autoCreateWindow) {
             uint w, h;
             bool fullscreen;
-            NameValuePairList misc = mGLSupport->parseOptions(w, h, fullscreen);
+            NameValuePairList misc = parseOptions(w, h, fullscreen);
             autoWindow = _createRenderWindow(windowTitle, w, h, fullscreen, &misc);
         }
         RenderSystem::_initialise(autoCreateWindow, windowTitle);

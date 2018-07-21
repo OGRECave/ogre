@@ -53,37 +53,19 @@ namespace Ogre {
     {
     }
 
-    void EAGL2Support::addConfig(void)
+    ConfigOptionMap EAGL2Support::getConfigOptions(void)
     {
-        ConfigOption optFullScreen;
-        ConfigOption optVideoMode;
+        ConfigOptionMap mOptions;
         ConfigOption optDisplayFrequency;
         ConfigOption optContentScalingFactor;
-        ConfigOption optFSAA;
-        ConfigOption optRTTMode;
-
-        optFullScreen.name = "Full Screen";
-        optFullScreen.possibleValues.push_back("Yes");
-        optFullScreen.possibleValues.push_back("No");
-        optFullScreen.currentValue = "Yes";
-        optFullScreen.immutable = false;
         
         // Get the application frame size.  On all iPhones(including iPhone 4) this will be 320 x 480
         // The iPad, at least with iPhone OS 3.2 will report 768 x 1024
         CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-
-        optVideoMode.name = "Video Mode";
-        optVideoMode.possibleValues.push_back("320 x 480");
-        optVideoMode.possibleValues.push_back("320 x 568");
-        optVideoMode.possibleValues.push_back("768 x 1024");
-        optVideoMode.currentValue = StringConverter::toString(screenSize.width) + " x " + 
-                                    StringConverter::toString(screenSize.height);
-        optVideoMode.immutable = false;
-
-        optDisplayFrequency.name = "Display Frequency";
-        optDisplayFrequency.possibleValues.push_back("0 Hz");
-        optDisplayFrequency.currentValue = "0 Hz";
-        optDisplayFrequency.immutable = false;
+        mVideoModes.push_back({uint32(screenSize.width), uint32(screenSize.height), 0});
+        mVideoModes.push_back({320, 480, 0});
+        mVideoModes.push_back({320, 568, 0});
+        mVideoModes.push_back({768, 1024, 0});
 
         optContentScalingFactor.name = "Content Scaling Factor";
         optContentScalingFactor.possibleValues.push_back( "1.0" );
@@ -93,26 +75,12 @@ namespace Ogre {
         optContentScalingFactor.currentValue = StringConverter::toString([UIScreen mainScreen].scale);
         optContentScalingFactor.immutable = false;
         
-        optFSAA.name = "FSAA";
-        optFSAA.possibleValues.push_back( "0" );
-        optFSAA.possibleValues.push_back( "2" );
-        optFSAA.possibleValues.push_back( "4" );
-        optFSAA.possibleValues.push_back( "8" );
-        optFSAA.currentValue = "0";
-        optFSAA.immutable = false;
+        mFSAALevels.push_back(0);
+        mFSAALevels.push_back(2);
+        mFSAALevels.push_back(4);
+        mFSAALevels.push_back(8);
 
-        optRTTMode.name = "RTT Preferred Mode";
-        optRTTMode.possibleValues.push_back("Copy");
-        optRTTMode.possibleValues.push_back("FBO");
-        optRTTMode.currentValue = "FBO";
-        optRTTMode.immutable = false;
-
-        mOptions[optFullScreen.name] = optFullScreen;
-        mOptions[optVideoMode.name] = optVideoMode;
-        mOptions[optDisplayFrequency.name] = optDisplayFrequency;
         mOptions[optContentScalingFactor.name] = optContentScalingFactor;
-        mOptions[optFSAA.name] = optFSAA;
-        mOptions[optRTTMode.name] = optRTTMode;
         
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
         ConfigOption optOrientation;
@@ -124,16 +92,14 @@ namespace Ogre {
         optOrientation.immutable = false;
         mOptions[optOrientation.name] = optOrientation;
 #endif
-        
-        // FIXME: these are probably unused
-        // Set the shader cache path
-        //NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        //NSString *cachesDirectory = [paths objectAtIndex:0];
 
-        //setShaderCachePath([[cachesDirectory stringByAppendingString:@"/"] cStringUsingEncoding:NSASCIIStringEncoding]);
-        
-        // Set the shader library path
-        //setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Media/RTShaderLib");
+        optDisplayFrequency.name = "Display Frequency";
+        optDisplayFrequency.possibleValues.push_back("0 Hz");
+        optDisplayFrequency.currentValue = "0 Hz";
+        optDisplayFrequency.immutable = false;
+        mOptions[optDisplayFrequency.name] = optDisplayFrequency;
+
+        return mOptions;
     }
 
     String EAGL2Support::getDisplayName(void)
@@ -224,51 +190,6 @@ namespace Ogre {
         return glConfig;
     }
     
-    NameValuePairList EAGL2Support::parseOptions(uint& w, uint& h, bool& fullscreen)
-    {
-        ConfigOptionMap::iterator opt;
-        ConfigOptionMap::iterator end = mOptions.end();
-        NameValuePairList miscParams;
-
-        CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-        fullscreen = false;
-        w = (uint)screenSize.width, h = (uint)screenSize.height;
-
-        if ((opt = mOptions.find("Full Screen")) != end)
-        {
-            fullscreen = (opt->second.currentValue == "Yes");
-        }
-
-        if ((opt = mOptions.find("Display Frequency")) != end)
-        {
-            miscParams["displayFrequency"] = opt->second.currentValue;
-        }
-
-        if ((opt = mOptions.find("Content Scaling Factor")) != end)
-        {
-            miscParams["contentScalingFactor"] = opt->second.currentValue;
-        }
-
-        if ((opt = mOptions.find("Video Mode")) != end)
-        {
-            String val = opt->second.currentValue;
-            String::size_type pos = val.find('x');
-
-            if (pos != String::npos)
-            {
-                w = StringConverter::parseUnsignedInt(val.substr(0, pos));
-                h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
-            }
-        }
-
-        if ((opt = mOptions.find("FSAA")) != end)
-        {
-            miscParams["FSAA"] = opt->second.currentValue;
-        }
-
-        return miscParams;
-    }
-
     RenderWindow * EAGL2Support::newWindow(const String &name,
                                         unsigned int width, unsigned int height,
                                         bool fullScreen,

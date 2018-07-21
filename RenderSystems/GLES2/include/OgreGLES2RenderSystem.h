@@ -136,10 +136,6 @@ namespace Ogre {
 
             const String& getName(void) const;
 
-            ConfigOptionMap& getConfigOptions(void);
-
-            void setConfigOption(const String &name, const String &value);
-
             RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render NativeWindowType");
 
             virtual RenderSystemCapabilities* createRenderSystemCapabilities() const;

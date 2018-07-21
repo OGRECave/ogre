@@ -70,8 +70,6 @@ namespace Ogre {
 
         GLint mLargestSupportedAnisotropy;
 
-        void initConfigOptions(void);
-
         /// Store last colour write state
         bool mColourWrite[4];
 
@@ -151,10 +149,6 @@ namespace Ogre {
         // ----------------------------------
 
         const String& getName(void) const;
-
-        ConfigOptionMap& getConfigOptions(void);
-
-        void setConfigOption(const String &name, const String &value);
 
         RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
 

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreConfigOptionMap.h"
 #include "OgrePixelFormat.h"
 #include "OgreException.h"
+#include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre
 {
@@ -48,6 +49,7 @@ namespace Ogre
     class _OgreGLExport GLNativeSupport
     {
         public:
+            typedef GLRenderSystemCommon::VideoModes VideoModes;
             typedef std::set<String> ExtensionList;
 
             enum ContextProfile {
@@ -58,25 +60,6 @@ namespace Ogre
 
             GLNativeSupport(int profile) : mContextProfile(ContextProfile(profile)) {}
             virtual ~GLNativeSupport() {}
-
-            /**
-            * Add any special config values to the system.
-            * Must have a "Full Screen" value that is a bool and a "Video Mode" value
-            * that is a string in the form of wxh
-            */
-            virtual void addConfig() = 0;
-
-            virtual void setConfigOption(const String& name, const String& value) {
-                ConfigOptionMap::iterator option = mOptions.find(name);
-                if (option == mOptions.end()) {
-                    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                                "Option named " + name + " does not exist.",
-                                "GLNativeSupport::setConfigOption");
-                }
-                option->second.currentValue = value;
-            }
-
-            virtual NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen) = 0;
 
             /// @copydoc RenderSystem::_createRenderWindow
             virtual RenderWindow* newWindow(const String &name,
@@ -112,28 +95,24 @@ namespace Ogre
             */
             virtual void stop() = 0;
 
-            ConfigOptionMap& getConfigOptions() {
-                return mOptions;
-            }
+            /**
+            * Add any special config values to the system.
+            */
+            virtual ConfigOptionMap getConfigOptions() { return ConfigOptionMap(); }
 
+            const std::vector<int>& getFSAALevels() const { return mFSAALevels; }
+            const VideoModes& getVideoModes() const { return mVideoModes; }
         protected:
-            // TODO: remove the members here: this should be a pure interface
+            typedef GLRenderSystemCommon::VideoMode VideoMode;
 
-            // Stored options
-            ConfigOptionMap mOptions;
+            // Allowed video modes
+            VideoModes mVideoModes;
+            std::vector<int> mFSAALevels;
 
             // Supported platform extensions (e.g EGL_*, GLX_*)
             ExtensionList extensionList;
 
             ContextProfile mContextProfile;
-
-            template<class C>
-            static void removeDuplicates(C& c)
-            {
-                std::sort(c.begin(), c.end());
-                typename C::iterator p = std::unique(c.begin(), c.end());
-                c.erase(p, c.end());
-            }
     };
     /** @} */
     /** @} */
