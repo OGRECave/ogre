@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLES2Support.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre {
     class GLES2StateCacheManager;

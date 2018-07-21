@@ -37,7 +37,7 @@
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLUtil.h"
 #include "OgreRoot.h"
-#include "OgreGLES2Support.h"
+#include "OgreGLNativeSupport.h"
 
 namespace Ogre
 {

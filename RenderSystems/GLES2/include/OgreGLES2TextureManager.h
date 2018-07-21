@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreGLES2Prerequisites.h"
 #include "OgreTextureManager.h"
 #include "OgreGLES2Texture.h"
-#include "OgreGLES2Support.h"
+#include "OgreGLNativeSupport.h"
 
 namespace Ogre {
     /** GL ES-specific implementation of a TextureManager */

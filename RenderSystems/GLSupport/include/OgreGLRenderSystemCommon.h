@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreRenderSystem.h"
 #include "OgreRenderWindow.h"
+#include "OgreGLNativeSupport.h"
 
 namespace Ogre {
     class GLContext;
@@ -44,6 +45,14 @@ namespace Ogre {
 
         /* The current GL context  - main thread only */
         GLContext* mCurrentContext;
+
+        // GL support class, used for creating windows etc.
+        GLNativeSupport* mGLSupport;
+
+        // This contains the complete list of supported extensions
+        std::set<String> mExtensionList;
+        String mVendor;
+
     public:
         virtual ~GLRenderSystemCommon() {}
 
@@ -61,6 +70,11 @@ namespace Ogre {
         * Check if GL Version is supported
         */
         bool hasMinGLVersion(int major, int minor) const;
+
+        /**
+        * Check if an extension is available
+        */
+        bool checkExtension(const String& ext) const;
 
         String validateConfigOptions() { return BLANKSTRING; }
 

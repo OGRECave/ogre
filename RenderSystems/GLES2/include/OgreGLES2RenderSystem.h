@@ -70,9 +70,6 @@ namespace Ogre {
             /// Holds texture type settings for every stage
             GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
 
-            /// GL support class, used for creating windows etc.
-            GLES2Support *mGLSupport;
-
             /// State cache manager which responsible to reduce redundant state changes
             GLES2StateCacheManager* mStateCacheManager;
 
@@ -114,6 +111,11 @@ namespace Ogre {
             void bindVertexElementToGpu(const VertexElement& elem,
                                         const HardwareVertexBufferSharedPtr& vertexBuffer,
                                         const size_t vertexStart);
+
+            /** Initialises GL extensions, must be done AFTER the GL context has been
+                established.
+            */
+            void initialiseExtensions();
 
             // Mipmap count of the actual bounded texture
             size_t mCurTexMipCount;
@@ -238,13 +240,10 @@ namespace Ogre {
             void preExtraThreadsStarted();
             void postExtraThreadsStarted();
             void setClipPlanesImpl(const Ogre::PlaneList& planeList) {}
-            GLES2Support* getGLSupportRef() { return mGLSupport; }
 
             // ----------------------------------
             // GLES2RenderSystem specific members
-            // ----------------------------------
-            bool checkExtension(const String& ext) const;
-        
+            // ----------------------------------        
             GLES2StateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
         
             /** Create VAO on current context */

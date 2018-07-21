@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 #include "OgreGLHardwarePixelBuffer.h"
-#include "OgreGLSupport.h"
+#include "OgreGLNativeSupport.h"
 
 namespace Ogre {
 //-----------------------------------------------------------------------------  
@@ -65,7 +65,7 @@ namespace Ogre {
         }
     }
 //-----------------------------------------------------------------------------  
-    GLPBRTTManager::GLPBRTTManager(GLSupport *support, RenderTarget *mainwindow):
+    GLPBRTTManager::GLPBRTTManager(GLNativeSupport *support, RenderTarget *mainwindow):
         mSupport(support),
         mMainWindow(mainwindow),
         mMainContext(0)

@@ -53,7 +53,7 @@ namespace Ogre {
     class _OgreGLExport GLPBRTTManager: public GLRTTManager
     {
     public:
-        GLPBRTTManager(GLSupport *support, RenderTarget *mainwindow);
+        GLPBRTTManager(GLNativeSupport *support, RenderTarget *mainwindow);
         virtual ~GLPBRTTManager();
         
         /** @copydoc GLRTTManager::createRenderTexture
@@ -86,7 +86,7 @@ namespace Ogre {
         GLContext *getContextFor(PixelComponentType ctype, uint32 width, uint32 height);
     protected:
         /** GLSupport reference, used to create PBuffers */
-        GLSupport *mSupport;
+        GLNativeSupport *mSupport;
         /** Primary window reference */
         RenderTarget *mMainWindow;
         /** Primary window context */

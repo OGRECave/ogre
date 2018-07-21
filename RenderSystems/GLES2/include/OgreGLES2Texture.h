@@ -30,12 +30,13 @@ THE SOFTWARE.
 #define __GLES2Texture_H__
 
 #include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2Support.h"
+#include "OgreGLNativeSupport.h"
 #include "OgrePlatform.h"
 #include "OgreRenderTexture.h"
 #include "OgreGLTextureCommon.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreGLES2ManagedResource.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre {
     class _OgreGLES2Export GLES2Texture : public GLTextureCommon MANAGED_RESOURCE

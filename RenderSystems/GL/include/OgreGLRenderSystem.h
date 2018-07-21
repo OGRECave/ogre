@@ -109,10 +109,7 @@ namespace Ogre {
 
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;
-        
-        /// GL support class, used for creating windows etc.
-        GLSupport* mGLSupport;
-        
+
         /// Internal method to set pos / direction of a light
         void setGLLightPositionDirection(Light* lt, GLenum lightindex);
 
@@ -166,6 +163,11 @@ namespace Ogre {
         void bindVertexElementToGpu(const VertexElement& elem,
                                     const HardwareVertexBufferSharedPtr& vertexBuffer,
                                     const size_t vertexStart);
+
+        /** Initialises GL extensions, must be done AFTER the GL context has been
+            established.
+        */
+        void initialiseExtensions();
     public:
         // Default constructor / destructor
         GLRenderSystem();
@@ -343,7 +345,6 @@ namespace Ogre {
         void unregisterThread();
         void preExtraThreadsStarted();
         void postExtraThreadsStarted();
-        GLSupport* getGLSupportRef() { return mGLSupport; }
 
         // ----------------------------------
         // GLRenderSystem specific members

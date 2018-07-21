@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef __EAGL2Support_H__
 #define __EAGL2Support_H__
 
-#include "OgreGLES2Support.h"
+#include "OgreGLNativeSupport.h"
 
 #ifdef __OBJC__
 // Forward declarations

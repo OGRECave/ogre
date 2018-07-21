@@ -106,7 +106,7 @@ static void gl2ext_to_gl3core() {
 namespace Ogre {
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    static GLES2Support* glsupport;
+    static GLNativeSupport* glsupport;
     static GLESWglProc get_proc(const char* proc) {
         return (GLESWglProc)glsupport->getProcAddress(proc);
     }
@@ -131,7 +131,7 @@ namespace Ogre {
         mResourceManager = OGRE_NEW GLES2ManagedResourceManager();
 #endif
         
-        mGLSupport = new GLES2Support(getGLSupport(GLNativeSupport::CONTEXT_ES));
+        mGLSupport = getGLSupport(GLNativeSupport::CONTEXT_ES);
         
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_WIN32
         glsupport = mGLSupport;
@@ -188,11 +188,6 @@ namespace Ogre {
         mGLSupport->setConfigOption(name, value);
     }
 
-    bool GLES2RenderSystem::checkExtension(const String& ext) const
-    {
-        return mGLSupport->checkExtension(ext);
-    }
-
     RenderWindow* GLES2RenderSystem::_initialise(bool autoCreateWindow,
                                                  const String& windowTitle)
     {
@@ -226,7 +221,7 @@ namespace Ogre {
         }
 
         rsc->setRenderSystemName(getName());
-        rsc->parseVendorFromString(mGLSupport->getGLVendor());
+        rsc->parseVendorFromString(mVendor);
 
         // Multitexturing support and set number of texture units
         GLint units;
@@ -629,7 +624,6 @@ namespace Ogre {
         if (!mGLInitialised)
         {
             initialiseContext(win);
-            mDriverVersion = mGLSupport->getGLVersion();
 
             // Get the shader language version
             const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
@@ -1839,7 +1833,7 @@ namespace Ogre {
         }
 
         // Setup GLSupport
-        mGLSupport->initialiseExtensions();
+        initialiseExtensions();
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GLES2StateCacheManager>();
 
@@ -2290,4 +2284,61 @@ namespace Ogre {
         PixelUtil::bulkPixelVerticalFlip(dst);
     }
 
+    void GLES2RenderSystem::initialiseExtensions(void)
+    {
+        String tmpStr;
+#if 1
+        // Set version string
+        const GLubyte* pcVer = glGetString(GL_VERSION);
+        assert(pcVer && "Problems getting GL version string using glGetString");
+        tmpStr = (const char*)pcVer;
+
+        // format explained here:
+        // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glGetString.xml
+        size_t offset = sizeof("OpenGL ES ") - 1;
+        if(tmpStr.length() > offset) {
+            mDriverVersion.fromString(tmpStr.substr(offset, tmpStr.find(' ', offset)));
+        }
+#else
+        // GLES3 way, but should work with ES2 as well, so disabled for now
+        glGetIntegerv(GL_MAJOR_VERSION, &mVersion.major);
+        glGetIntegerv(GL_MINOR_VERSION, &mVersion.minor);
+#endif
+
+        LogManager::getSingleton().logMessage("GL_VERSION = " + mDriverVersion.toString());
+
+
+        // Get vendor
+        const GLubyte* pcVendor = glGetString(GL_VENDOR);
+        tmpStr = (const char*)pcVendor;
+        LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
+        mVendor = tmpStr.substr(0, tmpStr.find(' '));
+
+        // Get renderer
+        const GLubyte* pcRenderer = glGetString(GL_RENDERER);
+        tmpStr = (const char*)pcRenderer;
+        LogManager::getSingleton().logMessage("GL_RENDERER = " + tmpStr);
+
+        // Set extension list
+        StringStream ext;
+        String str;
+
+        const GLubyte* pcExt = glGetString(GL_EXTENSIONS);
+        OgreAssert(pcExt, "Problems getting GL extension string using glGetString");
+        ext << pcExt;
+
+        Log::Stream log = LogManager::getSingleton().stream();
+        log << "GL_EXTENSIONS = ";
+        while (ext >> str)
+        {
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+            // emscripten gives us both prefixed (GL_) and unprefixed (EXT_) forms
+            // use prefixed form (GL_EXT) unless its a WebGL extension (WEBGL_)
+            if ((str.substr(0, 3) != "GL_" && str.substr(0, 6) != "WEBGL_") || str.substr(0, 9) == "GL_WEBGL_")
+                continue;
+#endif
+            log << str << " ";
+            mExtensionList.insert(str);
+        }
     }
+}
