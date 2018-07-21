@@ -71,9 +71,9 @@ namespace Ogre {
 
                 screenSizes = XRRConfigSizes(screenConfig, &nSizes);
 
-                mCurrentMode.first.first = screenSizes[currentSizeID].width;
-                mCurrentMode.first.second = screenSizes[currentSizeID].height;
-                mCurrentMode.second = XRRConfigCurrentRate(screenConfig);
+                mCurrentMode.width = screenSizes[currentSizeID].width;
+                mCurrentMode.height = screenSizes[currentSizeID].height;
+                mCurrentMode.refreshRate = XRRConfigCurrentRate(screenConfig);
 
                 mOriginalMode = mCurrentMode;
 
@@ -88,9 +88,9 @@ namespace Ogre {
                     {
                         VideoMode mode;
 
-                        mode.first.first = screenSizes[sizeID].width;
-                        mode.first.second = screenSizes[sizeID].height;
-                        mode.second = rates[rate];
+                        mode.width = screenSizes[sizeID].width;
+                        mode.height = screenSizes[sizeID].height;
+                        mode.refreshRate = rates[rate];
 
                         mVideoModes.push_back(mode);
                     }
@@ -99,9 +99,9 @@ namespace Ogre {
             }
         } else
         {
-            mCurrentMode.first.first = DisplayWidth(mNativeDisplay, DefaultScreen(mNativeDisplay));
-            mCurrentMode.first.second = DisplayHeight(mNativeDisplay, DefaultScreen(mNativeDisplay));
-            mCurrentMode.second = 0;
+            mCurrentMode.width = DisplayWidth(mNativeDisplay, DefaultScreen(mNativeDisplay));
+            mCurrentMode.height = DisplayHeight(mNativeDisplay, DefaultScreen(mNativeDisplay));
+            mCurrentMode.refreshRate = 0;
 
             mOriginalMode = mCurrentMode;
 
@@ -122,13 +122,11 @@ namespace Ogre {
             if (caveat != EGL_SLOW_CONFIG)
             {
                 getGLConfigAttrib(glConfigs[config], EGL_SAMPLES, &samples);
-                mSampleLevels.push_back(StringConverter::toString(samples));
+                mFSAALevels.push_back(samples);
             }
         }
 
         free(glConfigs);
-
-        removeDuplicates(mSampleLevels);
     }
 
     X11EGLSupport::~X11EGLSupport()
@@ -173,16 +171,14 @@ namespace Ogre {
 
     void X11EGLSupport::switchMode(uint& width, uint& height, short& frequency)
     {
-//        if (!mRandr)
-//            return;
-
         int size = 0;
 
-        VideoModes::iterator mode;
-        VideoModes::iterator end = mVideoModes.end();
-        VideoMode *newMode = 0;
+        EGLVideoModes eglVideoModes(mVideoModes.begin(), mVideoModes.end());
+        EGLVideoModes::iterator mode;
+        EGLVideoModes::iterator end = eglVideoModes.end();
+        EGLVideoMode *newMode = 0;
 
-        for(mode = mVideoModes.begin(); mode != end; size++)
+        for(mode = eglVideoModes.begin(); mode != end; size++)
         {
             if (mode->first.first >= width &&
                 mode->first.second >= height)
@@ -195,7 +191,7 @@ namespace Ogre {
                 }
             }
 
-            VideoMode* lastMode = &(*mode);
+            EGLVideoMode* lastMode = &(*mode);
 
             while (++mode != end && mode->first == lastMode->first)
             {
@@ -211,7 +207,7 @@ namespace Ogre {
             newMode->first.first = DisplayWidth(mNativeDisplay, 0);
             newMode->first.second = DisplayHeight(mNativeDisplay, 0);
             newMode->second = 0; // TODO: Hardcoding refresh rate for LCD's
-            mCurrentMode = *newMode;
+            mCurrentMode = {newMode->first.first, newMode->first.second, newMode->second};
         }
     }
 

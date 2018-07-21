@@ -47,12 +47,16 @@ namespace Ogre {
         mNativeDisplay = EGL_DEFAULT_DISPLAY;
         mGLDisplay = getGLDisplay();
         
-        mCurrentMode.first.first = 1280; 
-        mCurrentMode.first.second = 800; 
-        mCurrentMode.second = 0;
+        mCurrentMode.width = 1280;
+        mCurrentMode.height = 800;
+        mCurrentMode.refreshRate = 0;
         mOriginalMode = mCurrentMode;
         mVideoModes.push_back(mCurrentMode);
+    }
 
+    ConfigOptionMap AndroidEGLSupport::getConfigOptions()
+    {
+        ConfigOptionMap mOptions = EGLSupport::getConfigOptions();
         ConfigOption optOrientation;
         optOrientation.name = "Orientation";
         optOrientation.immutable = false;
@@ -61,6 +65,7 @@ namespace Ogre {
         optOrientation.currentValue = optOrientation.possibleValues[0];
         
         mOptions[optOrientation.name] = optOrientation;
+        return mOptions;
     }
 
     AndroidEGLSupport::~AndroidEGLSupport()
@@ -70,8 +75,6 @@ namespace Ogre {
     
     void AndroidEGLSupport::switchMode( uint& width, uint& height, short& frequency )
     {
-        if (!mRandr)
-            return;
     }
     
     RenderWindow* AndroidEGLSupport::newWindow( const String &name, unsigned int width, unsigned int height, bool fullScreen, const NameValuePairList *miscParams)

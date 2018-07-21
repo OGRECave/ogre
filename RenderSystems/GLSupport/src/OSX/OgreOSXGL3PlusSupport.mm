@@ -48,27 +48,12 @@ GLNativeSupport* getGLSupport(int profile)
     return new OSXGLSupport(profile);
 }
 
-void OSXGLSupport::addConfig( void )
+ConfigOptionMap OSXGLSupport::getConfigOptions()
 {
-	ConfigOption optFullScreen;
-	ConfigOption optVideoMode;
+	ConfigOptionMap mOptions;
 	ConfigOption optBitDepth;
-	ConfigOption optFSAA;
-	ConfigOption optRTTMode;
 	ConfigOption optHiddenWindow;
-	ConfigOption optVsync;
-	ConfigOption optSRGB;
     ConfigOption optContentScalingFactor;
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-	ConfigOption optStereoMode;
-#endif
-
-	// FS setting possibilities
-	optFullScreen.name = "Full Screen";
-	optFullScreen.possibleValues.push_back( "Yes" );
-	optFullScreen.possibleValues.push_back( "No" );
-	optFullScreen.currentValue = "No";
-	optFullScreen.immutable = false;
 
     // Hidden window setting possibilities
 	optHiddenWindow.name = "hidden";
@@ -76,33 +61,11 @@ void OSXGLSupport::addConfig( void )
 	optHiddenWindow.possibleValues.push_back( "No" );
 	optHiddenWindow.currentValue = "No";
 	optHiddenWindow.immutable = false;
-
-    // FS setting possibilities
-	optVsync.name = "VSync";
-	optVsync.possibleValues.push_back( "Yes" );
-	optVsync.possibleValues.push_back( "No" );
-	optVsync.currentValue = "Yes";
-	optVsync.immutable = false;
+	mOptions[optHiddenWindow.name] = optHiddenWindow;
 
 	optBitDepth.name = "Colour Depth";
-	optBitDepth.possibleValues.push_back( "32" );
-	optBitDepth.possibleValues.push_back( "16" );
 	optBitDepth.currentValue = "32";
 	optBitDepth.immutable = false;
-
-    optRTTMode.name = "RTT Preferred Mode";
-	optRTTMode.possibleValues.push_back( "FBO" );
-	optRTTMode.possibleValues.push_back( "PBuffer" );
-	optRTTMode.possibleValues.push_back( "Copy" );
-	optRTTMode.currentValue = "FBO";
-	optRTTMode.immutable = false;
-
-	// SRGB on auto window
-	optSRGB.name = "sRGB Gamma Conversion";
-	optSRGB.possibleValues.push_back("Yes");
-	optSRGB.possibleValues.push_back("No");
-	optSRGB.currentValue = "No";
-	optSRGB.immutable = false;
 
     optContentScalingFactor.name = "Content Scaling Factor";
     optContentScalingFactor.possibleValues.push_back( "1.0" );
@@ -112,20 +75,8 @@ void OSXGLSupport::addConfig( void )
     optContentScalingFactor.currentValue = StringConverter::toString((float)[NSScreen mainScreen].backingScaleFactor);
     optContentScalingFactor.immutable = false;
 
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-	optStereoMode.name = "Stereo Mode";
-	optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
-	optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
-	optStereoMode.currentValue = optStereoMode.possibleValues[0];
-	optStereoMode.immutable = false;
-#endif
-
-    mOptions[ optFullScreen.name ] = optFullScreen;
 	mOptions[ optBitDepth.name ] = optBitDepth;
     mOptions[ optContentScalingFactor.name ] = optContentScalingFactor;
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-	mOptions[ optStereoMode.name ] = optStereoMode;
-#endif
 
 	CGLRendererInfoObj rend;
 	GLint nrend = 0, maxSamples = 0;
@@ -135,20 +86,10 @@ void OSXGLSupport::addConfig( void )
     CGLDestroyRendererInfo(rend);
 
     // FSAA possibilities
-    optFSAA.name = "FSAA";
-    optFSAA.possibleValues.push_back( "0" );
-
     for(int i = 0; i <= maxSamples; i += 2)
-        optFSAA.possibleValues.push_back( StringConverter::toString(i) );
-
-    optFSAA.currentValue = "0";
-    optFSAA.immutable = false;
-
-    mOptions[ optFSAA.name ] = optFSAA;
+        mFSAALevels.push_back( i );
 
 	// Video mode possibilities
-	optVideoMode.name = "Video Mode";
-	optVideoMode.immutable = false;
 	CFArrayRef displayModes = CGDisplayCopyAllDisplayModes(CGMainDisplayID(), NULL);
 	CFIndex numModes = CFArrayGetCount(displayModes);
 	CFMutableArrayRef goodModes = NULL;
@@ -203,88 +144,15 @@ void OSXGLSupport::addConfig( void )
 		
 		size_t fWidth  = CGDisplayModeGetWidth(resolution);
 		size_t fHeight = CGDisplayModeGetHeight(resolution);
-		String resoString = StringConverter::toString(fWidth) + " x " + StringConverter::toString(fHeight);
-		optVideoMode.possibleValues.push_back(resoString);
+		// allow 16 and 32 bpp
+		mVideoModes.push_back({uint32(fWidth), uint32(fHeight),0, 16});
+		mVideoModes.push_back({uint32(fWidth), uint32(fHeight),0, 32});
     }
 	
     // Release memory
     CFRelease(goodModes);
 
-    optRTTMode.name = "RTT Preferred Mode";
-	optRTTMode.possibleValues.push_back( "FBO" );
-	optRTTMode.possibleValues.push_back( "PBuffer" );
-	optRTTMode.possibleValues.push_back( "Copy" );
-	optRTTMode.currentValue = "FBO";
-	optRTTMode.immutable = false;
-
-	mOptions[optFullScreen.name] = optFullScreen;
-	mOptions[optVideoMode.name] = optVideoMode;
-    mOptions[optFSAA.name] = optFSAA;
-	mOptions[optRTTMode.name] = optRTTMode;
-	mOptions[optHiddenWindow.name] = optHiddenWindow;
-	mOptions[optVsync.name] = optVsync;
-	mOptions[optSRGB.name] = optSRGB;
-
-    // FIXME: not available here. unsused anyway?
-    //setShaderCachePath(Ogre::macCachePath() + "/org.ogre3d.RTShaderCache");
-    //setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Resources/RTShaderLib/GLSL150");
-}
-
-NameValuePairList OSXGLSupport::parseOptions(uint& w, uint& h, bool& fullscreen)
-{
-    ConfigOptionMap::iterator opt = mOptions.find( "Full Screen" );
-    if( opt == mOptions.end() )
-        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find full screen options!", "OSXGLSupport::createWindow" );
-    fullscreen = ( opt->second.currentValue == "Yes" );
-    opt = mOptions.find( "Video Mode" );
-    if( opt == mOptions.end() )
-        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Can't find video mode options!", "OSXGLSupport::createWindow" );
-    String val = opt->second.currentValue;
-    String::size_type pos = val.find( 'x' );
-    if( pos == String::npos )
-        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Invalid Video Mode provided", "OSXGLSupport::createWindow" );
-
-    w = StringConverter::parseUnsignedInt( val.substr( 0, pos ) );
-    h = StringConverter::parseUnsignedInt( val.substr( pos + 1 ) );
-
-    // Parse FSAA config
-    NameValuePairList winOptions;
-    opt = mOptions.find( "FSAA" );
-    if( opt != mOptions.end() )
-    {
-        winOptions[ "FSAA" ] = opt->second.currentValue;
-    }
-
-    opt = mOptions.find( "hidden" );
-    if( opt != mOptions.end() )
-    {
-        winOptions[ "hidden" ] = opt->second.currentValue;
-    }
-
-    opt = mOptions.find( "VSync" );
-    if( opt != mOptions.end() )
-    {
-        winOptions[ "vsync" ] = opt->second.currentValue;
-    }
-
-    opt = mOptions.find( "Content Scaling Factor" );
-    if( opt != mOptions.end() )
-    {
-        winOptions["contentScalingFactor"] = opt->second.currentValue;
-    }
-
-    opt = mOptions.find( "sRGB Gamma Conversion" );
-    if( opt != mOptions.end() )
-        winOptions["gamma"] = opt->second.currentValue;
-
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-    opt = mOptions.find("Stereo Mode");
-    if (opt == mOptions.end())
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "OSXGLSupport::createWindow");
-    winOptions["stereoMode"] = opt->second.currentValue;
-#endif
-
-    return winOptions;
+	return mOptions;
 }
 
 RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, unsigned int height, 

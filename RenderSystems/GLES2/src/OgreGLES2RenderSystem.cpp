@@ -137,7 +137,7 @@ namespace Ogre {
         glsupport = mGLSupport;
 #endif
 
-        mGLSupport->addConfig();
+        initConfigOptions();
 
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
@@ -178,16 +178,6 @@ namespace Ogre {
         return strName;
     }
 
-    ConfigOptionMap& GLES2RenderSystem::getConfigOptions(void)
-    {
-        return mGLSupport->getConfigOptions();
-    }
-
-    void GLES2RenderSystem::setConfigOption(const String &name, const String &value)
-    {
-        mGLSupport->setConfigOption(name, value);
-    }
-
     RenderWindow* GLES2RenderSystem::_initialise(bool autoCreateWindow,
                                                  const String& windowTitle)
     {
@@ -200,7 +190,7 @@ namespace Ogre {
         if(autoCreateWindow) {
             uint w, h;
             bool fullscreen;
-            NameValuePairList misc = mGLSupport->parseOptions(w, h, fullscreen);
+            NameValuePairList misc = parseOptions(w, h, fullscreen);
             autoWindow = _createRenderWindow(windowTitle, w, h, fullscreen, &misc);
         }
         RenderSystem::_initialise(autoCreateWindow, windowTitle);

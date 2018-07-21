@@ -46,14 +46,6 @@ namespace Ogre {
         Atom mAtomFullScreen;
         Atom mAtomState;
 
-        /** @copydoc see GLNativeSupport::addConfig */
-        void addConfig(void);
-
-        /** @copydoc see GLNativeSupport::setConfigOption */
-        void setConfigOption(const String &name, const String &value);
-
-        NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
-
         /// @copydoc RenderSystem::createRenderWindow
         RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height,
                                 bool fullScreen, const NameValuePairList *miscParams = 0);
@@ -194,26 +186,30 @@ namespace Ogre {
         XVisualInfo* getVisualFromFBConfig(GLXFBConfig fbConfig);
 
     private:
-
-        /**
-         * Refresh config options to reflect dependencies
-         */
-        void refreshConfig(void);
-
         Display* mGLDisplay; // used for GL/GLX commands
         Display* mXDisplay;  // used for other X commands and events
         bool mIsExternalDisplay;
 
-        typedef std::pair<uint, uint>      ScreenSize;
-        typedef short                                      Rate;
-        typedef std::pair<ScreenSize, Rate> VideoMode;
-        typedef std::vector<VideoMode>    VideoModes;
+        struct GLXVideoMode
+        {
+            typedef std::pair<uint, uint>      ScreenSize;
+            typedef short                      Rate;
+            ScreenSize first;
+            Rate second;
 
-        VideoModes mVideoModes;
+            GLXVideoMode() {}
+            GLXVideoMode(const VideoMode& m) : first(m.width, m.height), second(m.refreshRate) {}
+
+            bool operator!=(const GLXVideoMode& o) const
+            {
+                return first != o.first || second != o.second;
+            }
+        };
+        typedef std::vector<GLXVideoMode>    GLXVideoModes;
+
         VideoMode  mOriginalMode;
         VideoMode  mCurrentMode;
 
-        StringVector mSampleLevels;
         int mGLXVerMajor, mGLXVerMinor;
     };
 }
