@@ -38,7 +38,10 @@ namespace Ogre
         mTlsHandle = OGRE_TLS_INVALID_HANDLE;
     }
     //-----------------------------------------------------------------------------------
-    OfflineProfiler::PerThreadData::PerThreadData( size_t bytesPerPool ) :
+    OfflineProfiler::PerThreadData::PerThreadData( bool startPaused, size_t bytesPerPool ) :
+        mPaused( startPaused ),
+        mPauseRequest( startPaused ),
+        mResetRequest( false ),
         mRoot( 0 ),
         mCurrentSample( 0 ),
         mTimer( OGRE_NEW Ogre::Timer() ),
@@ -124,8 +127,34 @@ namespace Ogre
         return newSample;
     }
     //-----------------------------------------------------------------------------------
+    void OfflineProfiler::PerThreadData::setPauseRequest( bool bPause )
+    {
+        mPauseRequest = bPause;
+    }
+    //-----------------------------------------------------------------------------------
+    void OfflineProfiler::PerThreadData::requestReset(void)
+    {
+        mResetRequest = true;
+    }
+    //-----------------------------------------------------------------------------------
     void OfflineProfiler::PerThreadData::profileBegin( const char *name )
     {
+        if( mPaused != mPauseRequest )
+            mPaused = mPauseRequest;
+
+        if( mResetRequest )
+        {
+            destroyAllPools();
+            createNewPool();
+            mTotalAccumTime = 0;
+            mCurrentSample = allocateSample( 0 );
+            mRoot = mCurrentSample;
+            mResetRequest = false;
+        }
+
+        if( mPaused )
+            return;
+
         mMutex.lock();
         IdString nameHash( name );
 
@@ -155,6 +184,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void OfflineProfiler::PerThreadData::profileEnd(void)
     {
+        if( mPaused )
+            return;
+
         //Measure before the lock! Other threads will not be using our mTimer anyway
         const uint64 usEnd = mTimer->getMicroseconds();
 
@@ -173,7 +205,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     OfflineProfiler::PerThreadData* OfflineProfiler::allocatePerThreadData(void)
     {
-        PerThreadData *perThreadData = new PerThreadData( mBytesPerPool );
+        PerThreadData *perThreadData = new PerThreadData( mPaused, mBytesPerPool );
 
         mMutex.lock();
         mThreadData.push_back( perThreadData );
@@ -290,6 +322,32 @@ namespace Ogre
             outFile.write( (const char*)&csvStringAccum[0], csvStringAccum.size() );
             outFile.close();
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void OfflineProfiler::setPaused( bool bPaused )
+    {
+        if( mPaused == bPaused )
+            return;
+
+        mPaused = bPaused;
+
+        mMutex.lock();
+
+        PerThreadDataArray::const_iterator itor = mThreadData.begin();
+        PerThreadDataArray::const_iterator end  = mThreadData.end();
+
+        while( itor != end )
+        {
+            (*itor)->setPauseRequest( bPaused );
+            ++itor;
+        }
+
+        mMutex.unlock();
+    }
+    //-----------------------------------------------------------------------------------
+    bool OfflineProfiler::isPaused(void) const
+    {
+        return mPaused;
     }
     //-----------------------------------------------------------------------------------
     void OfflineProfiler::profileBegin( const char *name )

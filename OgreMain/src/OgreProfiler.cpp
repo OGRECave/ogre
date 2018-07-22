@@ -193,6 +193,7 @@ namespace Ogre {
         }
 #else
         mEnabled = enabled;
+        mOfflineProfiler.setPaused( !enabled );
 #endif
         // We store this enable/disable request until the frame ends
         // (don't want to screw up any open profiles!)
@@ -235,6 +236,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Profiler::beginProfile(const String& profileName, uint32 groupID) 
     {
+#if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
+        mOfflineProfiler.profileBegin( profileName.c_str() );
+#else
         // regardless of whether or not we are enabled, we need the application's root profile (ie the first profile started each frame)
         // we need this so bogus profiles don't show up when users enable profiling mid frame
         // so we check
@@ -242,10 +246,6 @@ namespace Ogre {
         // if the profiler is enabled
         if (!mEnabled) 
             return;
-
-#if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
-        mOfflineProfiler.profileBegin( profileName.c_str() );
-#else
         // mask groups
         if ((groupID & mProfileMask) == 0)
             return;
@@ -300,8 +300,6 @@ namespace Ogre {
     void Profiler::endProfile(const String& profileName, uint32 groupID) 
     {
 #if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
-        if( !mEnabled )
-            return;
         mOfflineProfiler.profileEnd();
 #else
         if(!mEnabled) 

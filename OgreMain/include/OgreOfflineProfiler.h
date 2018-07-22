@@ -35,6 +35,9 @@ namespace Ogre
 
         class PerThreadData
         {
+            bool                mPaused;
+            bool                mPauseRequest;
+            bool                mResetRequest;
             ProfileSample       *mRoot;
             ProfileSample       *mCurrentSample;
             Timer               *mTimer;
@@ -45,6 +48,12 @@ namespace Ogre
             size_t              mCurrMemoryPoolOffset;
             size_t              mBytesPerPool;
 
+            /** Protects:
+                    * mCurrentSample
+                    * mMemoryPool
+                    * mCurrMemoryPoolOffset
+                    * mTotalAccumTime
+            */
             LightweightMutex    mMutex;
 
             void createNewPool(void);
@@ -57,8 +66,11 @@ namespace Ogre
                              String &outCsvString, map<IdString, ProfileSample>::type &accumStats,
                              uint32 stackDepth );
         public:
-            PerThreadData( size_t bytesPerPool );
+            PerThreadData( bool startPaused, size_t bytesPerPool );
             ~PerThreadData();
+
+            void setPauseRequest( bool bPause );
+            void requestReset(void);
 
             void profileBegin( const char *name );
             void profileEnd(void);
@@ -68,6 +80,8 @@ namespace Ogre
         };
 
         typedef FastArray<PerThreadData*> PerThreadDataArray;
+
+        bool                mPaused;
 
         LightweightMutex	mMutex;		//Protects mThreadData
         TlsHandle			mTlsHandle;
@@ -83,6 +97,33 @@ namespace Ogre
     public:
         OfflineProfiler();
         ~OfflineProfiler();
+
+        /** Pauses collection of samples. Note that other threads may be in the middle of a
+            collection (i.e. they've called profileBegin but haven't yet called profileEnd).
+            Threads will pause after their collection ends (i.e. only after they end up
+            calling profileEnd).
+
+            Likewise, if you resume sampling, a thread that already called profileBegin while
+            it was paused, thus it will resume sampling in its next profileBegin call.
+
+            TL;DR: It is thread safe, but do not assume pause is immediate (i.e. worker threads
+            may still add a new sample after calling setPaused( true ))
+        @param bPaused
+            True to pause. False to resume.
+        */
+        void setPaused( bool bPaused );
+
+        /// Returns true if sampling is paused. Note that some worker threads may still be
+        /// collecting samples even if this returns true (and likewise, they may take a
+        /// bit of time to resume again)
+        ///
+        /// @see    OfflineProfiler::setPaused
+        bool isPaused(void) const;
+
+        /// Destroys all collected samples and starts over. Worker threads will
+        /// honour this request as soon as they see it (which is the next time
+        /// they call profileBegin).
+        void reset(void);
 
         void profileBegin( const char *name );
         void profileEnd(void);
