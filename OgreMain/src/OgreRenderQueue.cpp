@@ -370,7 +370,7 @@ namespace Ogre
 
             if( !mRenderQueues[i].mSorted )
             {
-                OgreProfileGroup( "Sorting", OGREPROF_RENDERING );
+                OgreProfileGroupAggregate( "Sorting", OGREPROF_RENDERING );
 
                 size_t numRenderables = 0;
                 QueuedRenderableArrayPerThread::const_iterator itor = perThreadQueue.begin();

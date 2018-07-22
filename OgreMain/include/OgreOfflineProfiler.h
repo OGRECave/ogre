@@ -1,5 +1,9 @@
 
+#ifndef _OgreOfflineProfiler_H_
+#define _OgreOfflineProfiler_H_
+
 #include "OgrePrerequisites.h"
+#include "OgreProfilerCommon.h"
 #include "OgreIdString.h"
 #include "Threading/OgreLightweightMutex.h"
 #include "Threading/OgreThreads.h"
@@ -72,7 +76,7 @@ namespace Ogre
             void setPauseRequest( bool bPause );
             void requestReset(void);
 
-            void profileBegin( const char *name );
+            void profileBegin( const char *name, ProfileSampleFlags::ProfileSampleFlags flags );
             void profileEnd(void);
 
             void dumpProfileResultsStr( String &outCsvStringPerFrame, String &outCsvStringAccum );
@@ -125,7 +129,7 @@ namespace Ogre
         /// they call profileBegin).
         void reset(void);
 
-        void profileBegin( const char *name );
+        void profileBegin( const char *name, ProfileSampleFlags::ProfileSampleFlags flags );
         void profileEnd(void);
 
         /** Dumps CSV data into two CSV files
@@ -158,3 +162,5 @@ namespace Ogre
         void setDumpPathsOnShutdown( const String &fullPathPerFrame, const String &fullPathAccum );
     };
 }
+
+#endif

@@ -59,11 +59,12 @@ namespace Ogre {
         assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
-    Profile::Profile(const String& profileName, uint32 groupID) 
+    Profile::Profile( const String& profileName, ProfileSampleFlags::ProfileSampleFlags flags,
+                      uint32 groupID )
         : mName(profileName)
         , mGroupID(groupID)
     {
-        Ogre::Profiler::getSingleton().beginProfile(profileName, groupID);
+        Ogre::Profiler::getSingleton().beginProfile(profileName, groupID, flags);
     }
     //-----------------------------------------------------------------------
     Profile::~Profile()
@@ -234,10 +235,11 @@ namespace Ogre {
         mDisabledProfiles.erase(profileName);
     }
     //-----------------------------------------------------------------------
-    void Profiler::beginProfile(const String& profileName, uint32 groupID) 
+    void Profiler::beginProfile( const String& profileName, uint32 groupID,
+                                 ProfileSampleFlags::ProfileSampleFlags flags )
     {
 #if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
-        mOfflineProfiler.profileBegin( profileName.c_str() );
+        mOfflineProfiler.profileBegin( profileName.c_str(), flags );
 #else
         // regardless of whether or not we are enabled, we need the application's root profile (ie the first profile started each frame)
         // we need this so bogus profiles don't show up when users enable profiling mid frame

@@ -137,7 +137,8 @@ namespace Ogre
         mResetRequest = true;
     }
     //-----------------------------------------------------------------------------------
-    void OfflineProfiler::PerThreadData::profileBegin( const char *name )
+    void OfflineProfiler::PerThreadData::profileBegin( const char *name,
+                                                       ProfileSampleFlags::ProfileSampleFlags flags )
     {
         if( mPaused != mPauseRequest )
             mPaused = mPauseRequest;
@@ -161,7 +162,7 @@ namespace Ogre
         ProfileSample *sample = 0;
 
         //Look if our last sibling has the same name (i.e. similar behavior to RMTSF_Aggregate)
-        if( !mCurrentSample->children.empty() )
+        if( flags == ProfileSampleFlags::Aggregate && !mCurrentSample->children.empty() )
         {
             if( mCurrentSample->children.back()->nameHash == nameHash )
                 sample = mCurrentSample->children.back();
@@ -350,14 +351,14 @@ namespace Ogre
         return mPaused;
     }
     //-----------------------------------------------------------------------------------
-    void OfflineProfiler::profileBegin( const char *name )
+    void OfflineProfiler::profileBegin( const char *name, ProfileSampleFlags::ProfileSampleFlags flags )
     {
         PerThreadData *perThreadData = reinterpret_cast<PerThreadData*>( Threads::GetTls( mTlsHandle ) );
 
         if( !perThreadData )
             perThreadData = allocatePerThreadData();
 
-        perThreadData->profileBegin( name );
+        perThreadData->profileBegin( name, flags );
     }
     //-----------------------------------------------------------------------------------
     void OfflineProfiler::profileEnd(void)
