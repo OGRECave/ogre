@@ -1,4 +1,6 @@
 
+#include "OgreStableHeaders.h"
+
 #include "OgreOfflineProfiler.h"
 #include "OgreTimer.h"
 #include "OgreLwString.h"
