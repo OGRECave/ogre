@@ -68,9 +68,6 @@ namespace Ogre
 
         /// Direct3D rendering device
         D3D11Device     mDevice;
-        
-        // Stored options
-        ConfigOptionMap mOptions;
 
         /// List of D3D drivers installed (video cards)
         D3D11DriverList* mDriverList;
@@ -226,7 +223,6 @@ namespace Ogre
         virtual void initConfigOptions(void);
 
         // Overridden RenderSystem functions
-        ConfigOptionMap& getConfigOptions(void);
         String validateConfigOptions(void);
         RenderWindow* _initialise( bool autoCreateWindow, const String& windowTitle = "OGRE Render Window"  );
         /// @copydoc RenderSystem::_createRenderWindow

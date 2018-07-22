@@ -54,14 +54,7 @@ namespace Ogre {
     {
         mOptions = mGLSupport->getConfigOptions();
 
-        // FS setting possibilities
-        ConfigOption optFullScreen;
-        optFullScreen.name = "Full Screen";
-        optFullScreen.possibleValues.push_back( "No" );
-        optFullScreen.possibleValues.push_back( "Yes" );
-        optFullScreen.currentValue = optFullScreen.possibleValues[0];
-        optFullScreen.immutable = false;
-        mOptions[optFullScreen.name] = optFullScreen;
+        RenderSystem::initConfigOptions();
 
         ConfigOption optDisplayFrequency;
         optDisplayFrequency.name = "Display Frequency";
@@ -93,22 +86,6 @@ namespace Ogre {
         }
         mOptions[optFSAA.name] = optFSAA;
 
-        ConfigOption optVSync;
-        optVSync.name = "VSync";
-        optVSync.immutable = false;
-        optVSync.possibleValues.push_back("No");
-        optVSync.possibleValues.push_back("Yes");
-        optVSync.currentValue = optVSync.possibleValues[1];
-        mOptions[optVSync.name] = optVSync;
-
-        ConfigOption optSRGB;
-        optSRGB.name = "sRGB Gamma Conversion";
-        optSRGB.immutable = false;
-        optSRGB.possibleValues.push_back("No");
-        optSRGB.possibleValues.push_back("Yes");
-        optSRGB.currentValue = optSRGB.possibleValues[0];
-        mOptions[optSRGB.name] = optSRGB;
-
         // TODO remove this on next release
         ConfigOption optRTTMode;
         optRTTMode.name = "RTT Preferred Mode";
@@ -116,17 +93,6 @@ namespace Ogre {
         optRTTMode.currentValue = optRTTMode.possibleValues[0];
         optRTTMode.immutable = true;
         mOptions[optRTTMode.name] = optRTTMode;
-
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-        ConfigOption optStereoMode;
-        optStereoMode.name = "Stereo Mode";
-        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
-        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
-        optStereoMode.currentValue = optStereoMode.possibleValues[0];
-        optStereoMode.immutable = false;
-
-        mOptions[optStereoMode.name] = optStereoMode;
-#endif
 
         refreshConfig();
     }

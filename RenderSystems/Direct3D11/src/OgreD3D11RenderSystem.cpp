@@ -301,23 +301,19 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::initConfigOptions()
     {
+        RenderSystem::initConfigOptions();
+
         ConfigOption optDevice;
         ConfigOption optVideoMode;
-        ConfigOption optFullScreen;
-        ConfigOption optVSync;
         ConfigOption optVSyncInterval;
 		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optFPUMode;
         ConfigOption optNVPerfHUD;
-        ConfigOption optSRGB;
         ConfigOption optMinFeatureLevels;
         ConfigOption optMaxFeatureLevels;
         ConfigOption optExceptionsErrorLevel;
         ConfigOption optDriverType;
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		ConfigOption optStereoMode;
-#endif
 
         optDevice.name = "Rendering Device";
         optDevice.currentValue = "(default)";
@@ -334,18 +330,6 @@ namespace Ogre
         optVideoMode.currentValue = "800 x 600 @ 32-bit colour";
         optVideoMode.immutable = false;
 
-        optFullScreen.name = "Full Screen";
-        optFullScreen.possibleValues.push_back( "Yes" );
-        optFullScreen.possibleValues.push_back( "No" );
-        optFullScreen.currentValue = "Yes";
-        optFullScreen.immutable = false;
-
-        optVSync.name = "VSync";
-        optVSync.immutable = false;
-        optVSync.possibleValues.push_back( "Yes" );
-        optVSync.possibleValues.push_back( "No" );
-        optVSync.currentValue = "No";
-
         optVSyncInterval.name = "VSync Interval";
         optVSyncInterval.immutable = false;
         optVSyncInterval.possibleValues.push_back( "1" );
@@ -360,7 +344,6 @@ namespace Ogre
 		optBackBufferCount.possibleValues.push_back( "1" );
 		optBackBufferCount.possibleValues.push_back( "2" );
 		optBackBufferCount.currentValue = "Auto";
-
 
         optAA.name = "FSAA";
         optAA.immutable = false;
@@ -383,13 +366,6 @@ namespace Ogre
         optNVPerfHUD.name = "Allow NVPerfHUD";
         optNVPerfHUD.possibleValues.push_back( "Yes" );
         optNVPerfHUD.possibleValues.push_back( "No" );
-
-        // SRGB on auto window
-        optSRGB.name = "sRGB Gamma Conversion";
-        optSRGB.possibleValues.push_back("Yes");
-        optSRGB.possibleValues.push_back("No");
-        optSRGB.currentValue = "No";
-        optSRGB.immutable = false;      
 
         // min feature level
         optMinFeatureLevels;
@@ -453,25 +429,12 @@ namespace Ogre
         optDriverType.currentValue = "Hardware";
         optDriverType.immutable = false;
 
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		optStereoMode.name = "Stereo Mode";
-		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
-		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
-		optStereoMode.currentValue = optStereoMode.possibleValues[0];
-		optStereoMode.immutable = false;
-		
-		mOptions[optStereoMode.name] = optStereoMode;
-#endif
-
         mOptions[optDevice.name] = optDevice;
         mOptions[optVideoMode.name] = optVideoMode;
-        mOptions[optFullScreen.name] = optFullScreen;
-        mOptions[optVSync.name] = optVSync;
         mOptions[optVSyncInterval.name] = optVSyncInterval;
         mOptions[optAA.name] = optAA;
         mOptions[optFPUMode.name] = optFPUMode;
         mOptions[optNVPerfHUD.name] = optNVPerfHUD;
-        mOptions[optSRGB.name] = optSRGB;
         mOptions[optMinFeatureLevels.name] = optMinFeatureLevels;
         mOptions[optMaxFeatureLevels.name] = optMaxFeatureLevels;
         mOptions[optExceptionsErrorLevel.name] = optExceptionsErrorLevel;
@@ -669,12 +632,6 @@ namespace Ogre
         }
 
         return BLANKSTRING;
-    }
-    //---------------------------------------------------------------------
-    ConfigOptionMap& D3D11RenderSystem::getConfigOptions()
-    {
-        // return a COPY of the current config options
-        return mOptions;
     }
     //---------------------------------------------------------------------
     RenderWindow* D3D11RenderSystem::_initialise( bool autoCreateWindow, const String& windowTitle )

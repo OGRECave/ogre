@@ -964,5 +964,44 @@ namespace Ogre {
     {
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found.", "RenderSystem::getCustomAttribute");
     }
+
+    void RenderSystem::initConfigOptions()
+    {
+        // FS setting possibilities
+        ConfigOption optFullScreen;
+        optFullScreen.name = "Full Screen";
+        optFullScreen.possibleValues.push_back( "No" );
+        optFullScreen.possibleValues.push_back( "Yes" );
+        optFullScreen.currentValue = optFullScreen.possibleValues[0];
+        optFullScreen.immutable = false;
+        mOptions[optFullScreen.name] = optFullScreen;
+
+        ConfigOption optVSync;
+        optVSync.name = "VSync";
+        optVSync.immutable = false;
+        optVSync.possibleValues.push_back("No");
+        optVSync.possibleValues.push_back("Yes");
+        optVSync.currentValue = optVSync.possibleValues[1];
+        mOptions[optVSync.name] = optVSync;
+
+        ConfigOption optSRGB;
+        optSRGB.name = "sRGB Gamma Conversion";
+        optSRGB.immutable = false;
+        optSRGB.possibleValues.push_back("No");
+        optSRGB.possibleValues.push_back("Yes");
+        optSRGB.currentValue = optSRGB.possibleValues[0];
+        mOptions[optSRGB.name] = optSRGB;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        ConfigOption optStereoMode;
+        optStereoMode.name = "Stereo Mode";
+        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
+        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
+        optStereoMode.currentValue = optStereoMode.possibleValues[0];
+        optStereoMode.immutable = false;
+
+        mOptions[optStereoMode.name] = optStereoMode;
+#endif
+    }
 }
 

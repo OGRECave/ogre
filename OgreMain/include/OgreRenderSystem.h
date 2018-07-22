@@ -151,7 +151,7 @@ namespace Ogre
         A 'map' of options, i.e. a list of options which is also
         indexed by option name.
         */
-        virtual ConfigOptionMap& getConfigOptions(void) = 0;
+        ConfigOptionMap& getConfigOptions() { return mOptions; }
 
         /** Sets an option for this API
         @remarks
@@ -1447,8 +1447,10 @@ namespace Ogre
         bool mTexProjRelative;
         Vector3 mTexProjRelativeOrigin;
 
+        // Stored options
+        ConfigOptionMap mOptions;
 
-
+        virtual void initConfigOptions();
     };
     /** @} */
     /** @} */
