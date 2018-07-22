@@ -51,6 +51,7 @@ THE SOFTWARE.
 #include "OgreTimer.h"
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
+#include "OgreProfiler.h"
 
 namespace Ogre
 {
@@ -526,6 +527,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::createDelayedImmutableBuffers(void)
     {
+        OgreProfileExhaustive( "D3D11VaoManager::createDelayedImmutableBuffers" );
+
         bool immutableBuffersCreated = false;
 
         for( size_t i=0; i<NumInternalBufferTypes; ++i )
@@ -636,6 +639,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::reorganizeImmutableVaos(void)
     {
+        OgreProfileExhaustive( "D3D11VaoManager::reorganizeImmutableVaos" );
+
         VertexArrayObjectSet::const_iterator itor = mVertexArrayObjects.begin();
         VertexArrayObjectSet::const_iterator end  = mVertexArrayObjects.end();
 
@@ -1067,6 +1072,8 @@ namespace Ogre
                                                         IndexBufferPacked *indexBuffer,
                                                         OperationType opType )
     {
+        OgreProfileExhaustive( "D3D11VaoManager::findVao" );
+
         Vao vao;
 
         vao.operationType = opType;
@@ -1156,6 +1163,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::releaseVao( VertexArrayObject *vao )
     {
+        OgreProfileExhaustive( "D3D11VaoManager::releaseVao" );
+
         D3D11VertexArrayObject *glVao = static_cast<D3D11VertexArrayObject*>( vao );
 
         VaoVec::iterator itor = mVaos.begin();
@@ -1405,6 +1414,8 @@ namespace Ogre
 
         if( currentTimeMs >= mNextStagingBufferTimestampCheckpoint )
         {
+            OgreProfileExhaustive( "D3D11VaoManager::_update zero-ref staging buffers" );
+
             mNextStagingBufferTimestampCheckpoint = (unsigned long)(~0);
 
             for( size_t i=0; i<2; ++i )

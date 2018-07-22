@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "Vao/OgreAsyncTicket.h"
 
 #include "Vao/OgreStagingBuffer.h"
+#include "OgreProfiler.h"
 
 namespace Ogre
 {
@@ -66,6 +67,8 @@ namespace Ogre
     const void* AsyncTicket::map(void)
     {
         assert( !mHasBeenMapped );
+
+        OgreProfileExhaustive( "AsyncTicket::map" );
 
         mHasBeenMapped = true;
         return mapImpl();

@@ -4619,6 +4619,8 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_clearStateAndFlushCommandBuffer(void)
     {
+        OgreProfileExhaustive( "D3D11RenderSystem::_clearStateAndFlushCommandBuffer" );
+
         mDevice.GetImmediateContext()->ClearState();
         mDevice.GetImmediateContext()->Flush();
     }

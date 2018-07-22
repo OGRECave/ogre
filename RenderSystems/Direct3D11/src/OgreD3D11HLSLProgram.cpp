@@ -43,6 +43,8 @@ THE SOFTWARE.
 #include "Vao/OgreVertexBufferPacked.h"
 #include "Vao/OgreVertexArrayObject.h"
 
+#include "OgreProfiler.h"
+
 #define  HLSL_PROGRAM_DEFINE_VS "HLSL_VS"
 #define  HLSL_PROGRAM_DEFINE_PS "HLSL_PS"
 #define  HLSL_PROGRAM_DEFINE_GS "HLSL_GS"
@@ -450,6 +452,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::compileMicrocode(void)
     {
+        OgreProfileExhaustive( "D3D11HLSLProgram::compileMicrocode" );
+
         // If we are running from the cache, we should not be trying to compile/reflect on shaders.
 #if defined(ENABLE_SHADERS_CACHE_LOAD) && (ENABLE_SHADERS_CACHE_LOAD == 1)
         String message = "Cannot compile/reflect D3D11 shader: " + mName + " in shipping code\n";
@@ -546,6 +550,8 @@ namespace Ogre {
         }
         else
         {
+            OgreProfileExhaustive( "D3D11HLSLProgram::compileMicrocode post compile" );
+
 #if OGRE_DEBUG_MODE
             // Log warnings if any
             const char* warnings = static_cast<const char*>(errors ? errors->GetBufferPointer() : 0);
@@ -636,6 +642,8 @@ namespace Ogre {
 
             if (shaderDesc.ConstantBuffers > 0)
             {
+                OgreProfileExhaustive( "D3D11HLSLProgram::compileMicrocode ConstantBuffer reflection" );
+
                 for (unsigned int v=0; v < shaderDesc.ConstantBuffers; v++)
                 {
                     ID3D11ShaderReflectionConstantBuffer* shaderReflectionConstantBuffer;
@@ -1097,6 +1105,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::analizeMicrocode()
     {
+        OgreProfileExhaustive( "D3D11HLSLProgram::analizeMicrocode" );
+
         UINT bufferCount = 0;
         UINT pointerCount = 0;
         UINT typeCount = 0;
@@ -1282,6 +1292,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::buildConstantDefinitions() const
     {
+        OgreProfileExhaustive( "D3D11HLSLProgram::buildConstantDefinitions" );
+
         createParameterMappingStructures(true);
 
         for(unsigned int i = 0 ; i < mD3d11ShaderVariableSubparts.size() ; i++)
@@ -1977,6 +1989,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     ID3D11InputLayout* D3D11HLSLProgram::getLayoutForPso( const VertexElement2VecVec &vertexElements )
     {
+        OgreProfileExhaustive( "D3D11HLSLProgram::getLayoutForPso" );
+
         size_t numShaderInputs = getNumInputs();
         size_t numShaderInputsFound = 0;
 
@@ -2115,6 +2129,8 @@ namespace Ogre {
                                                UINT &outNumBuffers, GpuProgramParametersSharedPtr params,
                                                uint16 variabilityMask )
     {
+        OgreProfileExhaustive( "D3D11HLSLProgram::getConstantBuffers" );
+
         UINT numBuffers = 0;
 
         // Update the Constant Buffers
