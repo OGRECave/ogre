@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgrePixelFormat.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
+#include "OgreProfiler.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -98,6 +99,8 @@ namespace Ogre {
                                        int numMipmaps, Real gamma, bool isAlpha,
                                        PixelFormat desiredFormat, bool hwGamma)
     {
+        OgreProfileExhaustive( "TextureManager::prepare" );
+
         ResourceCreateOrRetrieveResult res =
             createOrRetrieve(name,group,false,0,0,texType,numMipmaps,gamma,isAlpha,desiredFormat,hwGamma);
         TexturePtr tex = res.first.staticCast<Texture>();
@@ -109,6 +112,8 @@ namespace Ogre {
                                     int numMipmaps, Real gamma, bool isAlpha, PixelFormat desiredFormat,
                                     bool hwGamma)
     {
+        OgreProfileExhaustive( "TextureManager::load" );
+
         ResourceCreateOrRetrieveResult res =
             createOrRetrieve(name,group,false,0,0,texType,numMipmaps,gamma,isAlpha,desiredFormat,hwGamma);
         TexturePtr tex = res.first.staticCast<Texture>();
@@ -121,6 +126,8 @@ namespace Ogre {
         const Image &img, TextureType texType, int numMipmaps, Real gamma, bool isAlpha, 
         PixelFormat desiredFormat, bool hwGamma)
     {
+        OgreProfileExhaustive( "TextureManager::loadImage" );
+
         TexturePtr tex = createResource(name, group, true).staticCast<Texture>();
 
         tex->setTextureType(texType);
@@ -140,6 +147,8 @@ namespace Ogre {
         PixelFormat format, TextureType texType, 
         int numMipmaps, Real gamma, bool hwGamma)
     {
+        OgreProfileExhaustive( "TextureManager::loadRawData" );
+
         TexturePtr tex = createResource(name, group, true).staticCast<Texture>();
 
         tex->setTextureType(texType);
@@ -157,6 +166,8 @@ namespace Ogre {
         PixelFormat format, int usage, ManualResourceLoader* loader, bool hwGamma, 
         uint fsaa, const String& fsaaHint, bool explicitResolve, bool shareableDepthBuffer)
     {
+        OgreProfileExhaustive( "TextureManager::createManual" );
+
         TexturePtr ret;
         ret.setNull();
 

@@ -149,6 +149,8 @@ namespace Ogre
     void HlmsTextureManager::copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx,
                                                  uint8 srcBaseMip, bool isNormalMap )
     {
+        OgreProfileExhaustive( "HlmsTextureManager::copyTextureToArray" );
+
         //TODO: Deal with mipmaps (& cubemaps & 3D? does it work?). We could have:
         //  * Original image has mipmaps, we use them all
         //  * Original image has mipmaps, we discard them
@@ -179,6 +181,8 @@ namespace Ogre
                                                  uint16 entryIdx, uint16 sqrtMaxTextures,
                                                  uint8 srcBaseMip, bool isNormalMap )
     {
+        OgreProfileExhaustive( "HlmsTextureManager::copyTextureToAtlas" );
+
         //TODO: Deal with mipmaps (& cubemaps & 3D? does it work?).
         size_t xBlock = entryIdx % sqrtMaxTextures;
         size_t yBlock = entryIdx / sqrtMaxTextures;
@@ -228,6 +232,8 @@ namespace Ogre
     void HlmsTextureManager::copy3DTexture( const Image &srcImage, TexturePtr dst,
                                             uint16 sliceStart, uint16 sliceEnd, uint8 srcBaseMip )
     {
+        OgreProfileExhaustive( "HlmsTextureManager::copy3DTexture" );
+
         for( uint16 i=sliceStart; i<sliceEnd; ++i )
         {
             uint8 minMipmaps = std::min<uint8>( srcImage.getNumMipmaps() - srcBaseMip,
