@@ -783,6 +783,7 @@ namespace Ogre {
 
             if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
             {
+                OgreProfileExhaustive( "D3D11HLSLProgram::compileMicrocode save microcode to cache" );
 
 #define SIZE_OF_DATA_START(curlist, memberType) + sizeof(uint16) +  curlist.size() * ( 0
 #define SIZE_OF_DATA_END )
