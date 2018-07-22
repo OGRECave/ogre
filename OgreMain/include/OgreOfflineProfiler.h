@@ -1,6 +1,8 @@
 
 #include "OgrePrerequisites.h"
 #include "OgreIdString.h"
+#include "Threading/OgreLightweightMutex.h"
+#include "Threading/OgreThreads.h"
 
 namespace Ogre
 {
@@ -31,28 +33,52 @@ namespace Ogre
             FastArray<ProfileSample*>   children;
         };
 
-        ProfileSample       *mRoot;
-        ProfileSample       *mCurrentSample;
-        Timer               *mTimer;
+        class PerThreadData
+        {
+            ProfileSample       *mRoot;
+            ProfileSample       *mCurrentSample;
+            Timer               *mTimer;
 
-        uint64              mTotalAccumTime;
+            uint64              mTotalAccumTime;
 
-        FastArray<uint8_t*> mMemoryPool;
-        size_t              mCurrMemoryPoolOffset;
+            FastArray<uint8_t*> mMemoryPool;
+            size_t              mCurrMemoryPoolOffset;
+            size_t              mBytesPerPool;
+
+            LightweightMutex    mMutex;
+
+            void createNewPool(void);
+            void destroyAllPools(void);
+            ProfileSample* allocateSample( ProfileSample *parent );
+
+            static void destroySampleAndChildren( ProfileSample *sample );
+
+            void dumpSample( ProfileSample *sample, LwString &tmpStr,
+                             String &outCsvString, map<IdString, ProfileSample>::type &accumStats,
+                             uint32 stackDepth );
+        public:
+            PerThreadData( size_t bytesPerPool );
+            ~PerThreadData();
+
+            void profileBegin( const char *name );
+            void profileEnd(void);
+
+            void dumpProfileResultsStr( String &outCsvStringPerFrame, String &outCsvStringAccum );
+            void dumpProfileResults( const String &fullPathPerFrame, const String &fullPathAccum );
+        };
+
+        typedef FastArray<PerThreadData*> PerThreadDataArray;
+
+        LightweightMutex	mMutex;		//Protects mThreadData
+        TlsHandle			mTlsHandle;
+        PerThreadDataArray	mThreadData;
+
         size_t              mBytesPerPool;
 
         String              mOnShutdownPerFramePath;
         String              mOnShutdownAccumPath;
 
-        void destroySampleAndChildren( ProfileSample *sample );
-
-        void createNewPool(void);
-        void destroyAllPools(void);
-        ProfileSample* allocateSample( ProfileSample *parent );
-
-        void dumpSample( ProfileSample *sample, LwString &tmpStr,
-                         String &outCsvString, map<IdString, ProfileSample>::type &accumStats,
-                         uint32 stackDepth );
+        PerThreadData* allocatePerThreadData(void);
 
     public:
         OfflineProfiler();
@@ -61,35 +87,31 @@ namespace Ogre
         void profileBegin( const char *name );
         void profileEnd(void);
 
-        /// Destroys all collected samples and starts over
-        void reset(void);
-
-        /** Dumps CSV data into the input strings
-        @param outCsvStringPerFrame [out]
-            CSV data containing per-frame stats
-        @param outCsvStringAccum [out]
-            CSV data containing accumulated stats from all frames for each sample name
-            Useful as summary
-        */
-        void dumpProfileResultsStr( String &outCsvStringPerFrame, String &outCsvStringAccum );
-
         /** Dumps CSV data into two CSV files
         @param fullPathPerFrame
-            Full path to csv to generate where to dump the per-frame CSV data.
+            Full path to csv without extension to generate where to dump the per-frame CSV data.
             Empty string to skip it.
+            Note that the CSV extension will be appended, and the actual filename
+            my vary as there will be one file per thread that was collected.
         @param fullPathAccum
-            Full path to csv to generate where to dump the accumulated CSV data.
+            Full path to csv without extension to generate where to dump the per-frame CSV data.
             Empty string to skip it.
+            Note that the CSV extension will be appended, and the actual filename
+            my vary as there will be one file per thread that was collected.
         */
         void dumpProfileResults( const String &fullPathPerFrame, const String &fullPathAccum );
 
         /** Ogre will call dumpProfileResults for your on shutdown if you set these paths
         @param fullPathPerFrame
-            Full path to csv to generate where to dump the per-frame CSV data.
+            Full path to csv without extension to generate where to dump the per-frame CSV data.
             Empty string to skip it.
+            Note that the CSV extension will be appended, and the actual filename
+            my vary as there will be one file per thread that was collected.
         @param fullPathAccum
-            Full path to csv to generate where to dump the accumulated CSV data.
+            Full path to csv without extension to generate where to dump the per-frame CSV data.
             Empty string to skip it.
+            Note that the CSV extension will be appended, and the actual filename
+            my vary as there will be one file per thread that was collected.
         @see    OfflineProfiler::dumpProfileResults
         */
         void setDumpPathsOnShutdown( const String &fullPathPerFrame, const String &fullPathAccum );

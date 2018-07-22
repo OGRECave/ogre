@@ -75,4 +75,28 @@ namespace Ogre
         timeToSleep.tv_sec  = milliseconds / 1000;
         nanosleep( &timeToSleep, 0 );
     }
+    //-----------------------------------------------------------------------------------
+    bool Threads::CreateTls( TlsHandle *outTls )
+    {
+        int result = pthread_key_create( outTls, NULL );
+        if( result )
+            *outTls = OGRE_TLS_INVALID_HANDLE;
+
+        return result == 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void Threads::DestroyTls( TlsHandle tlsHandle )
+    {
+        pthread_key_delete( tlsHandle );
+    }
+    //-----------------------------------------------------------------------------------
+    void Threads::SetTls( TlsHandle tlsHandle, void *value )
+    {
+        pthread_setspecific( tlsHandle, value );
+    }
+    //-----------------------------------------------------------------------------------
+    void* Threads::GetTls( TlsHandle tlsHandle )
+    {
+        return pthread_getspecific( tlsHandle );
+    }
 }

@@ -283,8 +283,8 @@ namespace Demo
     #endif
     #if OGRE_PROFILING == OGRE_PROFILING_INTERNAL_OFFLINE
         Ogre::Profiler::getSingleton().getOfflineProfiler().setDumpPathsOnShutdown(
-                    mWriteAccessFolder + "ProfilePerFrame.csv",
-                    mWriteAccessFolder + "ProfileAccum.csv" );
+                    mWriteAccessFolder + "ProfilePerFrame",
+                    mWriteAccessFolder + "ProfileAccum" );
     #endif
 #endif
     }

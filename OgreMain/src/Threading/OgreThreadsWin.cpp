@@ -81,4 +81,28 @@ namespace Ogre
     {
         ::Sleep( milliseconds );
     }
+    //-----------------------------------------------------------------------------------
+    bool Threads::CreateTls( TlsHandle *outTls )
+    {
+        *outTls = TlsAlloc();
+        if( *outTls == TLS_OUT_OF_INDEXES )
+            *outTls = OGRE_TLS_INVALID_HANDLE;
+
+        return *outTls == OGRE_TLS_INVALID_HANDLE;
+    }
+    //-----------------------------------------------------------------------------------
+    void Threads::DestroyTls( TlsHandle tlsHandle )
+    {
+        TlsFree( tlsHandle );
+    }
+    //-----------------------------------------------------------------------------------
+    void Threads::SetTls( TlsHandle tlsHandle, void *value )
+    {
+        TlsSetValue( tlsHandle, value );
+    }
+    //-----------------------------------------------------------------------------------
+    void* Threads::GetTls( TlsHandle tlsHandle )
+    {
+        return TlsGetValue( tlsHandle );
+    }
 }

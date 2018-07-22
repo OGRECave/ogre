@@ -126,6 +126,14 @@ namespace Ogre
     typedef void* (OGRE_THREAD_CALL_CONVENTION *THREAD_ENTRY_POINT)( void *lpThreadParameter );
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    typedef uint32 TlsHandle;
+#else
+    typedef pthread_key_t TlsHandle;
+#endif
+
+    #define OGRE_TLS_INVALID_HANDLE 0xFFFFFFFF
+
     class _OgreExport Threads
     {
     public:
@@ -181,6 +189,26 @@ namespace Ogre
         /// Sleeps for a **minimum** of the specified time of milliseconds. Actual time spent
         /// sleeping may vary widely depending on OS and other variables. Do not feed 0.
         static void Sleep( uint32 milliseconds );
+
+        /** Allocates a Thread Local Storage handle to use
+        @param outTls [out]
+            Handle to TLS.
+            On failure this handle is set to OGRE_TLS_INVALID_HANDLE
+        @return
+            True on success, false on failure.
+            TLS allocation can fail if the system ran out of handles,
+            or it ran out of memory.
+        */
+        static bool CreateTls( TlsHandle *outTls );
+
+        /** Destroys a Thread Local Storage handle created with CreateTls
+        @param tlsHandle
+            Handle to destroy
+        */
+        static void DestroyTls( TlsHandle tlsHandle );
+
+        static void SetTls( TlsHandle tlsHandle, void *value );
+        static void* GetTls( TlsHandle tlsHandle );
     };
 }
 
