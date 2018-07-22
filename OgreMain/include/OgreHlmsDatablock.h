@@ -266,6 +266,7 @@ namespace Ogre
         HlmsMacroblock const *mMacroblock[2];
         HlmsBlendblock const *mBlendblock[2];
 
+        bool    mIgnoreFlushRenderables;
         uint8   mAlphaTestCmp;  /// @see CompareFunction
         float   mAlphaTestThreshold;
     public:
