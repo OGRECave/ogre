@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 #include "OgrePixelBox.h"
 
+#include "OgreProfiler.h"
+
 namespace {
 #include "OgrePixelConversions.h"
 }
@@ -1246,6 +1248,8 @@ namespace Ogre {
                src.getHeight() == dst.getHeight() &&
                src.getDepth() == dst.getDepth() &&
                (dst.format == PF_R8G8_SNORM || dst.format == PF_RG8 || dst.format == PF_BYTE_LA)  );
+
+        OgreProfileExhaustive( "PixelUtil::convertForNormalMapping" );
 
         const PixelFormatDescription &srcDesc = getDescriptionFor( src.format );
 
