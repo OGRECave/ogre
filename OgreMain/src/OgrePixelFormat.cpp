@@ -1249,7 +1249,7 @@ namespace Ogre {
                src.getDepth() == dst.getDepth() &&
                (dst.format == PF_R8G8_SNORM || dst.format == PF_RG8 || dst.format == PF_BYTE_LA)  );
 
-        OgreProfileExhaustive( "PixelUtil::convertForNormalMapping" );
+        OgreProfileExhaustiveAggr( "PixelUtil::convertForNormalMapping" );
 
         const PixelFormatDescription &srcDesc = getDescriptionFor( src.format );
 

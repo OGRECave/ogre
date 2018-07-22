@@ -114,7 +114,7 @@ namespace Ogre {
 
     void GLSLMonolithicProgram::activate(void)
     {
-        OgreProfileExhaustive( "GLSLMonolithicProgram::activate" );
+        OgreProfileExhaustiveAggr( "GLSLMonolithicProgram::activate" );
 
         if (!mLinked && !mTriedToLinkAndFailed)
         {

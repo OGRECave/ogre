@@ -58,6 +58,7 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #   define OgreProfile( a ) OgreProfileL( a, __LINE__ )
 #   if OGRE_PROFILING_EXHAUSTIVE
 #       define OgreProfileExhaustive( a )           OgreProfile( a )
+#       define OgreProfileExhaustiveAggr( a )       OgreProfile( a )
 #   endif
 #   define OgreProfileBegin( a ) Ogre::Profiler::getSingleton().beginProfile( (a) )
 #   define OgreProfileBeginDynamic( a ) OgreProfileBegin( a )
@@ -94,6 +95,7 @@ namespace Ogre
     })
 #   if OGRE_PROFILING_EXHAUSTIVE
 #       define OgreProfileExhaustive( a )           OgreProfile( a )
+#       define OgreProfileExhaustiveAggr( a )       OgreProfileL( a, ProfileSampleFlags::Aggregate, __LINE__ )
 #   endif
 #   define Ogre_rmt_BeginCPUSampleL( name, flags, line ) Ogre_rmt_BeginCPUSampleL2( name, flags, line )
 #   define OgreProfileBegin( name ) Ogre_rmt_BeginCPUSampleL( name, RMTSF_Aggregate, __LINE__ )
@@ -144,6 +146,7 @@ namespace Ogre
 #   define OgreProfile( a )                     OgreProfileL( a, ProfileSampleFlags::FlagsNone, __LINE__ )
 #   if OGRE_PROFILING_EXHAUSTIVE
 #       define OgreProfileExhaustive( a )       OgreProfile( a )
+#       define OgreProfileExhaustiveAggr( a )   OgreProfileL( a, ProfileSampleFlags::Aggregate, __LINE__ )
 #   endif
 #   define OgreProfileBegin( a )                Ogre::Profiler::getSingleton().beginProfile( (a) )
 #   define OgreProfileBeginDynamic( a )         OgreProfileBegin( a )
@@ -163,6 +166,7 @@ namespace Ogre
 #else
 #   define OgreProfilerUseStableMarkers true
 #   define OgreProfileExhaustive( a )
+#   define OgreProfileExhaustiveAggr( a )
 #   define OgreProfile( a )
 #   define OgreProfileBegin( a )
 #   define OgreProfileBeginDynamic( a )
@@ -183,6 +187,7 @@ namespace Ogre
 
 #if OGRE_PROFILING && !OGRE_PROFILING_EXHAUSTIVE
 #   define OgreProfileExhaustive( a )
+#   define OgreProfileExhaustiveAggr( a )
 #endif
 
 namespace Ogre {

@@ -429,7 +429,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::flushRenderables(void)
     {
-        OgreProfileExhaustive( "HlmsDatablock::flushRenderables" );
+        OgreProfileExhaustiveAggr( "HlmsDatablock::flushRenderables" );
 
         vector<Renderable*>::type::const_iterator itor = mLinkedRenderables.begin();
         vector<Renderable*>::type::const_iterator end  = mLinkedRenderables.end();
