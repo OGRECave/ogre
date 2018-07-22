@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 #include "OgreHlmsManager.h"
-
+#include "OgreProfiler.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -274,6 +274,8 @@ namespace v1 {
 
         if( !mReferencedInputLayouts[layoutId].refCount )
         {
+            OgreProfileExhaustive( "HardwareBufferManagerBase::_removeInputLayoutReference 0 refCount" );
+
             Ogre::HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
             hlmsManager->_notifyV1InputLayoutDestroyed( layoutId );
 
@@ -289,6 +291,8 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void HardwareBufferManagerBase::_updateDirtyInputLayouts(void)
     {
+        OgreProfileExhaustive( "HardwareBufferManagerBase::_updateDirtyInputLayouts" );
+
         VertexDeclarationVec::const_iterator itor = mDirtyInputLayouts.begin();
         VertexDeclarationVec::const_iterator end  = mDirtyInputLayouts.end();
 
