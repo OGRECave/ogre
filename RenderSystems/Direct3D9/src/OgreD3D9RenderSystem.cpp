@@ -206,27 +206,23 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9RenderSystem::initConfigOptions()
     {
+        RenderSystem::initConfigOptions();
+
         D3D9DriverList* driverList;
         D3D9Driver* driver;
 
         ConfigOption optDevice;
         ConfigOption optAllowDirectX9Ex;
         ConfigOption optVideoMode;
-        ConfigOption optFullScreen;
         ConfigOption optMultihead;
-        ConfigOption optVSync;
         ConfigOption optVSyncInterval;
 		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optFPUMode;
         ConfigOption optNVPerfHUD;
-        ConfigOption optSRGB;
         ConfigOption optResourceCeationPolicy;
         ConfigOption optMultiDeviceMemHint;
         ConfigOption optEnableFixedPipeline;
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-        ConfigOption optStereoMode;
-#endif
 
         driverList = this->getDirect3DDrivers();
 
@@ -244,12 +240,6 @@ namespace Ogre
         optVideoMode.name = "Video Mode";
         optVideoMode.currentValue = "800 x 600 @ 32-bit colour";
         optVideoMode.immutable = false;
-
-        optFullScreen.name = "Full Screen";
-        optFullScreen.possibleValues.push_back( "Yes" );
-        optFullScreen.possibleValues.push_back( "No" );
-        optFullScreen.currentValue = "Yes";
-        optFullScreen.immutable = false;
 
         optMultihead.name = "Use Multihead";
         optMultihead.possibleValues.push_back( "Auto" );
@@ -278,12 +268,6 @@ namespace Ogre
             if( j==0 )
                 optDevice.currentValue = driver->DriverDescription();
         }
-
-        optVSync.name = "VSync";
-        optVSync.immutable = false;
-        optVSync.possibleValues.push_back( "Yes" );
-        optVSync.possibleValues.push_back( "No" );
-        optVSync.currentValue = "No";
 
         optVSyncInterval.name = "VSync Interval";
         optVSyncInterval.immutable = false;
@@ -322,14 +306,6 @@ namespace Ogre
         optNVPerfHUD.possibleValues.push_back( "Yes" );
         optNVPerfHUD.possibleValues.push_back( "No" );
 
-
-        // SRGB on auto window
-        optSRGB.name = "sRGB Gamma Conversion";
-        optSRGB.possibleValues.push_back("Yes");
-        optSRGB.possibleValues.push_back("No");
-        optSRGB.currentValue = "No";
-        optSRGB.immutable = false;
-
         // Multiple device memory usage hint.
         optMultiDeviceMemHint.name = "Multi device memory hint";
         optMultiDeviceMemHint.possibleValues.push_back("Use minimum system memory");
@@ -343,28 +319,15 @@ namespace Ogre
         optEnableFixedPipeline.currentValue = "Yes";
         optEnableFixedPipeline.immutable = false;
 
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-        optStereoMode.name = "Stereo Mode";
-        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
-        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
-        optStereoMode.currentValue = optStereoMode.possibleValues[0];
-        optStereoMode.immutable = false;
-
-        mOptions[optStereoMode.name] = optStereoMode;
-#endif
-
         mOptions[optDevice.name] = optDevice;
         mOptions[optAllowDirectX9Ex.name] = optAllowDirectX9Ex;
         mOptions[optVideoMode.name] = optVideoMode;
-        mOptions[optFullScreen.name] = optFullScreen;
         mOptions[optMultihead.name] = optMultihead;
-        mOptions[optVSync.name] = optVSync;
         mOptions[optVSyncInterval.name] = optVSyncInterval;
 		mOptions[optBackBufferCount.name] = optBackBufferCount;
         mOptions[optAA.name] = optAA;
         mOptions[optFPUMode.name] = optFPUMode;
         mOptions[optNVPerfHUD.name] = optNVPerfHUD;
-        mOptions[optSRGB.name] = optSRGB;
         mOptions[optResourceCeationPolicy.name] = optResourceCeationPolicy;
         mOptions[optMultiDeviceMemHint.name] = optMultiDeviceMemHint;
         mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
@@ -660,12 +623,6 @@ namespace Ogre
 			mVSync = false;
 
         return BLANKSTRING;
-    }
-    //---------------------------------------------------------------------
-    ConfigOptionMap& D3D9RenderSystem::getConfigOptions()
-    {
-        // return a COPY of the current config options
-        return mOptions;
     }
     //---------------------------------------------------------------------
     RenderWindow* D3D9RenderSystem::_initialise( bool autoCreateWindow, const String& windowTitle )

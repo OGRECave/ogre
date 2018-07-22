@@ -68,9 +68,7 @@ namespace Ogre
         
     private:
         /// Direct3D
-        IDirect3D9*  mD3D;      
-        // Stored options
-        ConfigOptionMap mOptions;
+        IDirect3D9*  mD3D;
         // TODO: remove following fields, use values directly from mOptions map as other render systems does
         size_t mFSAASamples;
         String mFSAAHint;
@@ -200,7 +198,6 @@ namespace Ogre
         virtual void initConfigOptions();
 
         // Overridden RenderSystem functions
-        ConfigOptionMap& getConfigOptions();
         String validateConfigOptions();
         RenderWindow* _initialise( bool autoCreateWindow, const String& windowTitle = "OGRE Render Window"  );
         /// @copydoc RenderSystem::_createRenderWindow

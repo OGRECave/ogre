@@ -53,9 +53,6 @@ namespace Ogre {
         std::set<String> mExtensionList;
         String mVendor;
 
-        // Stored options
-        ConfigOptionMap mOptions;
-
         void initConfigOptions();
         void refreshConfig();
         NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
@@ -69,8 +66,6 @@ namespace Ogre {
             String getDescription() const;
         };
         typedef std::vector<VideoMode>    VideoModes;
-
-        ConfigOptionMap& getConfigOptions() { return mOptions; }
 
         void setConfigOption(const String &name, const String &value);
 
