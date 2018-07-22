@@ -105,28 +105,24 @@ namespace Ogre
 
         ProfileSample *sample = 0;
 
-        //Look for a sibling with the same name (i.e. same behavior as RMTSF_Aggregate)
+        //Look if our last sibling has the same name (i.e. similar behavior to RMTSF_Aggregate)
+        if( !mCurrentSample->children.empty() )
         {
-            FastArray<ProfileSample*>::const_iterator itor = mCurrentSample->children.begin();
-            FastArray<ProfileSample*>::const_iterator end  = mCurrentSample->children.end();
-
-            while( itor != end && (*itor)->nameHash != nameHash )
-                ++itor;
-
-            if( itor != end )
-                sample = *itor;
+            if( mCurrentSample->children.back()->nameHash == nameHash )
+                sample = mCurrentSample->children.back();
         }
 
         if( !sample )
         {
             sample = allocateSample( mCurrentSample );
             mCurrentSample->children.push_back( sample );
+
+            strcpy( (char*)sample->nameStr, name );
+            sample->nameStr[OGRE_OFFLINE_PROFILER_NAME_STR_LENGTH-1u] = '\0';
+            sample->nameHash = nameHash;
+            sample->usStart = mTimer->getMicroseconds();
         }
 
-        strcpy( (char*)sample->nameStr, name );
-        sample->nameStr[OGRE_OFFLINE_PROFILER_NAME_STR_LENGTH-1u] = '\0';
-        sample->nameHash = nameHash;
-        sample->usStart = mTimer->getMicroseconds();
         mCurrentSample = sample;
     }
     //-----------------------------------------------------------------------------------
@@ -134,7 +130,7 @@ namespace Ogre
     {
         const uint64 usEnd = mTimer->getMicroseconds();
         const uint64 usTaken = usEnd - mCurrentSample->usStart;
-        mCurrentSample->usTaken += usTaken;
+        mCurrentSample->usTaken = usTaken;
         mCurrentSample = mCurrentSample->parent;
 
         OGRE_ASSERT_HIGH( mCurrentSample &&
