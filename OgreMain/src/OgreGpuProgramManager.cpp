@@ -28,9 +28,11 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-
+#include "OgreStreamSerialiser.h"
 
 namespace Ogre {
+    static uint32 CACHE_CHUNK_ID = StreamSerialiser::makeIdentifier("OGPC"); // Ogre Gpu Program cache
+
     //-----------------------------------------------------------------------
     template<> GpuProgramManager* Singleton<GpuProgramManager>::msSingleton = 0;
     GpuProgramManager* GpuProgramManager::getSingletonPtr(void)
@@ -297,9 +299,12 @@ namespace Ogre {
                 "GpuProgramManager::saveMicrocodeCache");
         }
         
+        StreamSerialiser serialiser(stream);
+        serialiser.writeChunkBegin(CACHE_CHUNK_ID, 1);
+
         // write the size of the array
         uint32 sizeOfArray = static_cast<uint32>(mMicrocodeCache.size());
-        stream->write(&sizeOfArray, sizeof(uint32));
+        serialiser.write(&sizeOfArray);
         
         // loop the array and save it
         MicrocodeMap::const_iterator iter = mMicrocodeCache.begin();
@@ -307,51 +312,64 @@ namespace Ogre {
         for ( ; iter != iterE ; ++iter )
         {
             // saves the name of the shader
-            {
-                const String & nameOfShader = iter->first;
-                uint32 stringLength = static_cast<uint32>(nameOfShader.size());
-                stream->write(&stringLength, sizeof(uint32));               
-                stream->write(&nameOfShader[0], stringLength);
-            }
+            const String & nameOfShader = iter->first;
+            serialiser.write(&nameOfShader);
+
             // saves the microcode
-            {
-                const Microcode & microcodeOfShader = iter->second;
-                uint32 microcodeLength = static_cast<uint32>(microcodeOfShader->size());
-                stream->write(&microcodeLength, sizeof(uint32));                
-                stream->write(microcodeOfShader->getPtr(), microcodeLength);
-            }
+            const Microcode & microcodeOfShader = iter->second;
+            uint32 microcodeLength = static_cast<uint32>(microcodeOfShader->size());
+            serialiser.write(&microcodeLength);
+            serialiser.writeData(microcodeOfShader->getPtr(), 1, microcodeLength);
         }
+
+        serialiser.writeChunkEnd(CACHE_CHUNK_ID);
     }
     //---------------------------------------------------------------------
     void GpuProgramManager::loadMicrocodeCache( DataStreamPtr stream )
     {
         mMicrocodeCache.clear();
 
+        StreamSerialiser serialiser(stream);
+        const StreamSerialiser::Chunk* chunk;
+
+        try
+        {
+            chunk = serialiser.readChunkBegin();
+        }
+        catch (const InvalidStateException& e)
+        {
+            LogManager::getSingleton().logWarning("Could not load Microcode Cache: " +
+                                                  e.getDescription());
+            return;
+        }
+
+        if(chunk->id != CACHE_CHUNK_ID || chunk->version != 1)
+        {
+            LogManager::getSingleton().logWarning("Invalid Microcode Cache");
+            return;
+        }
         // write the size of the array
         uint32 sizeOfArray = 0;
-        stream->read(&sizeOfArray, sizeof(uint32));
+        serialiser.read(&sizeOfArray);
         
         // loop the array and load it
-
         for ( uint32 i = 0 ; i < sizeOfArray ; i++ )
         {
-            String nameOfShader;
             // loads the name of the shader
-            uint32 stringLength  = 0;
-            stream->read(&stringLength, sizeof(uint32));
-            nameOfShader.resize(stringLength);              
-            stream->read(&nameOfShader[0], stringLength);
+            String nameOfShader;
+            serialiser.read(&nameOfShader);
 
             // loads the microcode
             uint32 microcodeLength = 0;
-            stream->read(&microcodeLength, sizeof(uint32));     
+            serialiser.read(&microcodeLength);
 
             Microcode microcodeOfShader(OGRE_NEW MemoryDataStream(nameOfShader, microcodeLength));      
             microcodeOfShader->seek(0);
-            stream->read(microcodeOfShader->getPtr(), microcodeLength);
+            serialiser.readData(microcodeOfShader->getPtr(), 1, microcodeLength);
 
             mMicrocodeCache.insert(make_pair(nameOfShader, microcodeOfShader));
         }
+        serialiser.readChunkEnd(CACHE_CHUNK_ID);
 
         // if cache is not modified, mark it as clean.
         mCacheDirty = false;
