@@ -80,7 +80,7 @@ MACRO(_PCH_GET_COMPILE_FLAGS _out_compile_flags)
                item MATCHES "/usr/include$")
           # workaround for GCC 6.x bug
         else()
-          LIST(APPEND ${_out_compile_flags} "${_PCH_isystem_prefix}\"${item}\"")
+          LIST(APPEND ${_out_compile_flags} "${_PCH_isystem_prefix} \"${item}\"")
         endif()
     ENDFOREACH(item)
 
@@ -90,7 +90,7 @@ MACRO(_PCH_GET_COMPILE_FLAGS _out_compile_flags)
                item MATCHES "/usr/include$")
           # workaround for GCC 6.x bug
         else()
-          LIST(APPEND ${_out_compile_flags} "${_PCH_isystem_prefix}\"${item}\"")
+          LIST(APPEND ${_out_compile_flags} "${_PCH_isystem_prefix} \"${item}\"")
         endif()
     ENDFOREACH(item)
 
