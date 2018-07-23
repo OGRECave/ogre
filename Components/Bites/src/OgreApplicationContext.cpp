@@ -711,7 +711,7 @@ void ApplicationContext::reconfigure(const Ogre::String &renderer, Ogre::NameVal
 
 void ApplicationContext::shutdown()
 {
-    if (Ogre::GpuProgramManager::getSingleton().isCacheDirty())
+    if (Ogre::GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
     {
         Ogre::String path = mFSLayer->getWritablePath(SHADER_CACHE_FILENAME);
         std::fstream outFile(path.c_str(), std::ios::out | std::ios::binary);
@@ -722,6 +722,8 @@ void ApplicationContext::shutdown()
             Ogre::DataStreamPtr ostream(new Ogre::FileStreamDataStream(path, &outFile, false));
             Ogre::GpuProgramManager::getSingleton().saveMicrocodeCache(ostream);
         }
+        else
+            Ogre::LogManager::getSingleton().logWarning("Cannot open shader cache for writing "+path);
     }
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
