@@ -69,7 +69,7 @@ if (WIN32 AND MSVC)
   if (MSVC_VERSION EQUAL 1900)
     set(COMPILER_PREFIX "vc13")
   endif ()  
-  if (MSVC_VERSION GREATER_EQUAL 1911)
+  if (NOT (MSVC_VERSION LESS 1911))
     set(COMPILER_PREFIX "vc14")
   endif ()
   
