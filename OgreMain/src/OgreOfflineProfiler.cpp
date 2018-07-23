@@ -137,6 +137,16 @@ namespace Ogre
         mResetRequest = true;
     }
     //-----------------------------------------------------------------------------------
+    void OfflineProfiler::PerThreadData::reset(void)
+    {
+        destroyAllPools();
+        createNewPool();
+        mTotalAccumTime = 0;
+        mCurrentSample = allocateSample( 0 );
+        mRoot = mCurrentSample;
+        mResetRequest = false;
+    }
+    //-----------------------------------------------------------------------------------
     void OfflineProfiler::PerThreadData::profileBegin( const char *name,
                                                        ProfileSampleFlags::ProfileSampleFlags flags )
     {
@@ -144,14 +154,7 @@ namespace Ogre
             mPaused = mPauseRequest;
 
         if( mResetRequest )
-        {
-            destroyAllPools();
-            createNewPool();
-            mTotalAccumTime = 0;
-            mCurrentSample = allocateSample( 0 );
-            mRoot = mCurrentSample;
-            mResetRequest = false;
-        }
+            reset();
 
         if( mPaused )
             return;
@@ -300,6 +303,8 @@ namespace Ogre
 
         outCsvStringPerFrame.swap( csvString0 );
         outCsvStringAccum.swap( csvString1 );
+
+        reset();
         mMutex.unlock();
     }
     //-----------------------------------------------------------------------------------
@@ -349,6 +354,22 @@ namespace Ogre
     bool OfflineProfiler::isPaused(void) const
     {
         return mPaused;
+    }
+    //-----------------------------------------------------------------------------------
+    void OfflineProfiler::reset(void)
+    {
+        mMutex.lock();
+
+        PerThreadDataArray::const_iterator itor = mThreadData.begin();
+        PerThreadDataArray::const_iterator end  = mThreadData.end();
+
+        while( itor != end )
+        {
+            (*itor)->requestReset();
+            ++itor;
+        }
+
+        mMutex.unlock();
     }
     //-----------------------------------------------------------------------------------
     void OfflineProfiler::profileBegin( const char *name, ProfileSampleFlags::ProfileSampleFlags flags )

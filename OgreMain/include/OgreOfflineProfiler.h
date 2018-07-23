@@ -69,6 +69,9 @@ namespace Ogre
             void dumpSample( ProfileSample *sample, LwString &tmpStr,
                              String &outCsvString, map<IdString, ProfileSample>::type &accumStats,
                              uint32 stackDepth );
+
+            void reset(void);
+
         public:
             PerThreadData( bool startPaused, size_t bytesPerPool );
             ~PerThreadData();
