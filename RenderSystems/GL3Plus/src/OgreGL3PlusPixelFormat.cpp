@@ -99,7 +99,7 @@ namespace Ogre  {
             {GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, GL_RGBA8},    // PF_X8R8G8B8
             {GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, GL_RGBA8},    // PF_X8B8G8R8
             {GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, GL_RGBA8},        // PF_R8G8B8A8
-            {GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, GL_DEPTH_COMPONENT16}, // PF_DEPTH
+            {GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, GL_DEPTH_COMPONENT16}, // PF_DEPTH16
             {GL_RGBA, GL_UNSIGNED_SHORT, GL_RGBA16},             // PF_SHORT_RGBA
             {GL_RGB, GL_UNSIGNED_BYTE_3_3_2, GL_R3_G3_B2},       // PF_R3G3B2
             {GL_RED, GL_HALF_FLOAT, GL_R16F},                    // PF_FLOAT16_R
@@ -338,7 +338,7 @@ namespace Ogre  {
         case GL_DEPTH_COMPONENT32:
         case GL_DEPTH_COMPONENT32F:
         case GL_DEPTH_COMPONENT:
-            return PF_DEPTH;
+            return PF_DEPTH16;
         case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
             return PF_DXT1;
         case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
