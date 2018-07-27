@@ -191,10 +191,10 @@ void TextureBlitTest::setupContent()
         Ogre::TEX_TYPE_2D,
         TextureSize, TextureSize,
         0,
-        Ogre::PF_DEPTH,
+        Ogre::PF_DEPTH16,
         Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
 
-    Ogre::PixelBox dpb(DepthImage.width, DepthImage.height, 1, Ogre::PF_DEPTH, (void *)DepthImage.pixel_data);
+    Ogre::PixelBox dpb(DepthImage.width, DepthImage.height, 1, Ogre::PF_DEPTH16, (void *)DepthImage.pixel_data);
     Ogre::HardwarePixelBufferSharedPtr dbuffer = m_depthTexture->getBuffer();
     dbuffer->blitFromMemory(dpb);
 

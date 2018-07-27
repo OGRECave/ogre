@@ -459,7 +459,7 @@ namespace Ogre
         case DXGI_FORMAT_R16G16_SNORM:              return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16_SINT:               return PF_R16G16_SINT;
         case DXGI_FORMAT_R32_TYPELESS:              return PF_UNKNOWN;
-        case DXGI_FORMAT_D32_FLOAT:                 return PF_DEPTH;
+        case DXGI_FORMAT_D32_FLOAT:                 return PF_DEPTH16;
         case DXGI_FORMAT_R32_FLOAT:                 return PF_FLOAT32_R;
         case DXGI_FORMAT_R32_UINT:                  return PF_UNKNOWN;
         case DXGI_FORMAT_R32_SINT:                  return PF_UNKNOWN;
