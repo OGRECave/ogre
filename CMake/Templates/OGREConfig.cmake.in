@@ -134,6 +134,18 @@ endif()
 if(@OGRE_BUILD_RENDERSYSTEM_D3D11@)
     ogre_declare_plugin(RenderSystem Direct3D11)
 endif()
+
+if(@OGRE_BUILD_PLUGIN_STBI@)
+    ogre_declare_plugin(Codec STBI)
+endif()
+
+if(@OGRE_BUILD_PLUGIN_FREEIMAGE@)
+    ogre_declare_plugin(Codec FreeImage)
+endif()
+
+if(@OGRE_BUILD_PLUGIN_EXRCODEC@)
+    ogre_declare_plugin(Codec EXR)
+endif()
 cmake_policy(POP)
 
 if(@OGRE_STATIC@)
