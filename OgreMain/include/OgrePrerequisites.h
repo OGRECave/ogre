@@ -253,9 +253,10 @@ namespace Ogre {
     class TransformKeyFrame;
     class Timer;
     class UserObjectBindings;
-    class Vector2;
-    class Vector3;
-    class Vector4;
+    template <int dims, typename T> class Vector;
+    typedef Vector<2, Real> Vector2;
+    typedef Vector<3, Real> Vector3;
+    typedef Vector<4, Real> Vector4;
     class Viewport;
     class VertexAnimationTrack;
     class VertexBufferBinding;
