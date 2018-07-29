@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreResourceGroupManager.h"
 #include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
+#include "RenderSystems/Direct3D11/include/OgreD3D11HardwareBuffer.h"
 
 namespace Ogre
 {
@@ -108,6 +109,16 @@ namespace v1
     */
     class _OgreExport ManualObject : public MovableObject
     {
+
+        /** Return the HardwareBuffer::Usage that correspound to the input parameters */
+        inline Ogre::v1::HardwareBuffer::Usage getHardwareBufferUsage(bool isDynamic, bool isWriteOnly) const
+        {
+            if (isDynamic)
+                return isWriteOnly ? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY : HardwareBuffer::HBU_DYNAMIC;
+            else
+                return isWriteOnly ? HardwareBuffer::HBU_STATIC_WRITE_ONLY : HardwareBuffer::HBU_STATIC;
+        }
+
     public:
         ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager );
         virtual ~ManualObject();
@@ -162,6 +173,16 @@ namespace v1
         virtual void setDynamic(bool dyn) { mDynamic = dyn; }
         /** Gets whether this object is marked as dynamic */
         virtual bool getDynamic() const { return mDynamic; }
+
+        /** Use before defining geometry to indicate that you intend to be able
+            to read back from the geometry buffers again down the line (object
+            convertion to v2, physics engine body creation...
+         */
+        virtual void setReadable(bool readable) { mWriteOnly = !readable; }
+        /** Same as setReadable, but with the invese scemantic */
+        virtual void setWriteOnly(bool writeOnly) { setReadable(!writeOnly); }
+        /** Gets wheter this object has geometry buffer marked as write only */
+        virtual bool getWriteOnly() const { return mWriteOnly; }
 
         /** Start the definition of an update to a part of the object.
         @remarks
@@ -437,6 +458,8 @@ namespace v1
     protected:
         /// Dynamic?
         bool mDynamic;
+        /// Write only?
+        bool mWriteOnly;
         /// List of subsections
         SectionList mSectionList;
         /// Current section
