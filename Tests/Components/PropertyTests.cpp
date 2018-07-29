@@ -30,12 +30,7 @@ THE SOFTWARE.
 
 #include <gtest/gtest.h>
 
-// use std::bind regardless of whether we are using boost or not
-#if __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
 #include <functional>
-#else
-#include <tr1/functional>
-#endif
 
 using namespace Ogre;
 //--------------------------------------------------------------------------
@@ -50,11 +45,7 @@ public:
 //--------------------------------------------------------------------------
 
 TEST(Property, StringProp) {
-#if __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
     using namespace std;
-#else
-    using namespace std::tr1;
-#endif
 
     PropertyDefMap propertyDefs;
     Foo foo;

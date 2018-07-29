@@ -74,12 +74,7 @@ namespace Ogre {
         Singleton( void )
         {
             OgreAssert( !msSingleton, "There can be only one singleton" );
-#if defined( _MSC_VER ) && _MSC_VER < 1200   
-            int offset = (int)(T*)1 - (int)(Singleton <T>*)(T*)1;
-            msSingleton = (T*)((int)this + offset);
-#else
-        msSingleton = static_cast< T* >( this );
-#endif
+            msSingleton = static_cast< T* >( this );
         }
         ~Singleton( void )
             {  assert( msSingleton );  msSingleton = 0;  }
