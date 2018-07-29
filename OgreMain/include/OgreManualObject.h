@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreResourceGroupManager.h"
 #include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
-#include "RenderSystems/Direct3D11/include/OgreD3D11HardwareBuffer.h"
+#include "OgreHardwareBuffer.h"
 
 namespace Ogre
 {
