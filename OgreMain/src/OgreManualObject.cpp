@@ -50,7 +50,7 @@ namespace v1 {
     ManualObject::ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager,
                                 SceneManager *manager )
         : MovableObject( id, objectMemoryManager, manager, 1 ),
-          mDynamic(false), mCurrentSection(0), mFirstVertex(true),
+          mDynamic(false), mWriteOnly(true), mCurrentSection(0), mFirstVertex(true),
           mTempVertexPending(false),
           mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
           mTempIndexBuffer(0), mTempIndexSize(TEMP_INITIAL_INDEX_SIZE),
@@ -722,28 +722,26 @@ namespace v1 {
             {
                 // Make the vertex buffer larger if estimated vertex count higher
                 // to allow for user-configured growth area
-                size_t vertexCount = std::max(rop->vertexData->vertexCount, 
+                const size_t vertexCount = std::max(rop->vertexData->vertexCount,
                     mEstVertexCount);
                 vbuf =
                     HardwareBufferManager::getSingleton().createVertexBuffer(
                         mDeclSize,
                         vertexCount,
-                        mDynamic? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY : 
-                            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                        getHardwareBufferUsage(mDynamic, mWriteOnly));
                 rop->vertexData->vertexBufferBinding->setBinding(0, vbuf);
             }
             if (ibufNeedsCreating)
             {
                 // Make the index buffer larger if estimated index count higher
                 // to allow for user-configured growth area
-                size_t indexCount = std::max(rop->indexData->indexCount, 
+                const size_t indexCount = std::max(rop->indexData->indexCount,
                     mEstIndexCount);
                 rop->indexData->indexBuffer =
                     HardwareBufferManager::getSingleton().createIndexBuffer(
                         indexType,
                         indexCount,
-                        mDynamic? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY : 
-                            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                        getHardwareBufferUsage(mDynamic, mWriteOnly));
             }
             // Write vertex data
             vbuf->writeData(
