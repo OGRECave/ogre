@@ -29,9 +29,7 @@ THE SOFTWARE.
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #include <excpt.h>      // For SEH values
-    #if _MSC_VER >= 1400
-        #include <intrin.h>
-    #endif
+#include <intrin.h>
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
 #include <signal.h>
 #include <setjmp.h>
@@ -152,7 +150,6 @@ namespace Ogre {
     static uint _performCpuid(int query, CpuidResult& result)
     {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-    #if _MSC_VER >= 1400 
         int CPUInfo[4];
         __cpuid(CPUInfo, query);
         result._eax = CPUInfo[0];
@@ -160,19 +157,6 @@ namespace Ogre {
         result._ecx = CPUInfo[2];
         result._edx = CPUInfo[3];
         return result._eax;
-    #else
-        __asm
-        {
-            mov     edi, result
-            mov     eax, query
-            cpuid
-            mov     [edi]._eax, eax
-            mov     [edi]._ebx, ebx
-            mov     [edi]._edx, edx
-            mov     [edi]._ecx, ecx
-            // Return values in eax, no return statement requirement here for VC.
-        }
-    #endif
 #elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
         __asm__
