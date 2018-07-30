@@ -306,97 +306,43 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     switch (textureUnitParams->mTexCoordCalcMethod)
     {
     case TEXCALC_NONE:
-        if (textureUnitParams->mTextureMatrix.get() == NULL)
-        {
-            texCoordCalcFunc =
-                OGRE_NEW AssignmentAtom(textureUnitParams->mVSOutputTexCoord,
-                                        textureUnitParams->mVSInputTexCoord, FFP_VS_TEXTURING);
-        }
-        else
-        {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM_TEXCOORD,  FFP_VS_TEXTURING);
-
-            texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSInputTexCoord, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
-        }                       
+        texCoordCalcFunc =
+            OGRE_NEW AssignmentAtom(textureUnitParams->mVSOutputTexCoord,
+                                    textureUnitParams->mVSInputTexCoord, FFP_VS_TEXTURING);                    
         break;
 
     case TEXCALC_ENVIRONMENT_MAP:
     case TEXCALC_ENVIRONMENT_MAP_PLANAR:
-        if (textureUnitParams->mTextureMatrix.get() == NULL)
-        {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING);
+        texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING);
 
-            //TODO: Add field member mWorldViewITMatrix 
-            texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);   
-            texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);    
-            texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN); 
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
-        }
-        else
-        {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING);
-
-            texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);   
-            texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);    
-            texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN); 
-            texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
-        }           
+        //TODO: Add field member mWorldViewITMatrix 
+        texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);   
+        texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);    
+        texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+        texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);
+        texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);
+        texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);         
         break;
 
             
     case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
-        if (textureUnitParams->mTextureMatrix.get() == NULL)
-        {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING);
+        texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING);
 
-            texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);                    
-            texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN); 
-            texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);                
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
-        }
-        else
-        {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING);
-
-            texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);                    
-            texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);  
-            texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN); 
-            texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);                
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
-        }           
+        texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);
+        texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+        texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);            
+        texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN); 
+        texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);                
+        texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);          
         break;
 
     case TEXCALC_ENVIRONMENT_MAP_NORMAL:
-        if (textureUnitParams->mTextureMatrix.get() == NULL)
-        {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING);
+        texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING);
 
-            texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);    
-            texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN); 
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
-        }
-        else
-        {
-            texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING);
-
-            texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);    
-            texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
-            texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN); 
-            texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
-        }           
+        texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+        texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);
+        texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN); 
+        texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);          
         break;
 
     case TEXCALC_PROJECTIVE_TEXTURE:
@@ -407,12 +353,21 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
         texCoordCalcFunc->pushOperand(textureUnitParams->mTextureViewProjImageMatrix, Operand::OPS_IN); 
         texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);        
         texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
-
         break;
+    default:
+        return false;
     }
 
-    if (texCoordCalcFunc != NULL)
+    vsMain->addAtomInstance(texCoordCalcFunc);
+
+    if (textureUnitParams->mTextureMatrix)
+    {
+        texCoordCalcFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM_TEXCOORD,  FFP_VS_TEXTURING);
+        texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
+        texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_IN);
+        texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
         vsMain->addAtomInstance(texCoordCalcFunc);
+    }
 
     return true;
 }
