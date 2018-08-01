@@ -49,6 +49,7 @@ namespace Ogre
         OgreMetalView       *mMetalView;
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         NSWindow            *mWindow;
+        id                  mResizeObserver;
 #endif
 
         MetalRenderSystem   *mRenderSystem;
@@ -81,3 +82,4 @@ namespace Ogre
 }
 
 #endif
+
