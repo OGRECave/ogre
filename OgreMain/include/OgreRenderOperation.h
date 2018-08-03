@@ -90,7 +90,18 @@ namespace Ogre {
             OT_PATCH_29_CONTROL_POINT   = 35,
             OT_PATCH_30_CONTROL_POINT   = 36,
             OT_PATCH_31_CONTROL_POINT   = 37,
-            OT_PATCH_32_CONTROL_POINT   = 38
+            OT_PATCH_32_CONTROL_POINT   = 38,
+            // max valid base OT_ = (1 << 6) - 1
+            /// Mark that the index buffer contains adjacency information
+            OT_DETAIL_ADJACENCY_BIT     = 1 << 6,
+            /// like OT_POINT_LIST but with adjacency information for the geometry shader
+            OT_LINE_LIST_ADJ            = OT_LINE_LIST | OT_DETAIL_ADJACENCY_BIT,
+            /// like OT_LINE_STRIP but with adjacency information for the geometry shader
+            OT_LINE_STRIP_ADJ           = OT_LINE_STRIP | OT_DETAIL_ADJACENCY_BIT,
+            /// like OT_TRIANGLE_LIST but with adjacency information for the geometry shader
+            OT_TRIANGLE_LIST_ADJ        = OT_TRIANGLE_LIST | OT_DETAIL_ADJACENCY_BIT,
+            /// like OT_TRIANGLE_STRIP but with adjacency information for the geometry shader
+            OT_TRIANGLE_STRIP_ADJ       = OT_TRIANGLE_STRIP | OT_DETAIL_ADJACENCY_BIT,
         };
 
         /// Vertex source data

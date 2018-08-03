@@ -53,7 +53,7 @@ MeshPtr ProceduralTools::generateTetrahedra()
         ("TetrahedraMesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     SubMesh* tetrahedraSubMesh = tetrahedraMesh->createSubMesh();
-    tetrahedraSubMesh->operationType = RenderOperation::OT_LINE_LIST;
+    tetrahedraSubMesh->operationType = RenderOperation::OT_LINE_LIST_ADJ;
     //tetrahedraSubMesh->operationType = RenderOperation::OT_TRIANGLE_STRIP;
     tetrahedraSubMesh->setMaterialName("Ogre/Isosurf/TessellateTetrahedra");
     //tetrahedraSubMesh->setMaterialName("BaseWhiteNoLighting");

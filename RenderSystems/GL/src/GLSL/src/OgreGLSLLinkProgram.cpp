@@ -39,7 +39,7 @@ THE SOFTWARE.
 namespace Ogre {
     namespace GLSL {
 
-    static GLint getGLGeometryInputPrimitiveType(RenderOperation::OperationType operationType, bool requiresAdjacency)
+    static GLint getGLGeometryInputPrimitiveType(RenderOperation::OperationType operationType)
     {
         switch (operationType)
         {
@@ -47,13 +47,19 @@ namespace Ogre {
             return GL_POINTS;
         case RenderOperation::OT_LINE_LIST:
         case RenderOperation::OT_LINE_STRIP:
-            return requiresAdjacency ? GL_LINES_ADJACENCY_EXT : GL_LINES;
+			return GL_LINES;
+        case RenderOperation::OT_LINE_LIST_ADJ:
+        case RenderOperation::OT_LINE_STRIP_ADJ:
+			return GL_LINES_ADJACENCY_EXT;
+        case RenderOperation::OT_TRIANGLE_LIST_ADJ:
+        case RenderOperation::OT_TRIANGLE_STRIP_ADJ:
+            return GL_TRIANGLES_ADJACENCY_EXT;
         default:
         case RenderOperation::OT_TRIANGLE_LIST:
         case RenderOperation::OT_TRIANGLE_STRIP:
         case RenderOperation::OT_TRIANGLE_FAN:
-            return requiresAdjacency ? GL_TRIANGLES_ADJACENCY_EXT : GL_TRIANGLES;
-        }
+            return GL_TRIANGLES;
+		}
     }
     //-----------------------------------------------------------------------
     static GLint getGLGeometryOutputPrimitiveType(RenderOperation::OperationType operationType)
@@ -498,7 +504,7 @@ namespace Ogre {
 
             RenderOperation::OperationType inputOperationType = mGeometryProgram->getInputOperationType();
             glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_INPUT_TYPE_EXT,
-                getGLGeometryInputPrimitiveType(inputOperationType, mGeometryProgram->isAdjacencyInfoRequired()));
+                getGLGeometryInputPrimitiveType(inputOperationType));
 
             RenderOperation::OperationType outputOperationType = mGeometryProgram->getOutputOperationType();
 

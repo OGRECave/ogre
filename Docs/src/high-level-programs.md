@@ -598,15 +598,6 @@ If your vertex program makes use of [Vertex Texture Fetch](#Vertex-Texture-Fetch
    uses_vertex_texture_fetch true
 ```
 
-# Adjacency information in Geometry Programs {#Adjacency-information-in-Geometry-Programs}
-
-Some geometry programs require adjacency information from the geometry. It means that a geometry shader doesn’t only get the information of the primitive it operates on, it also has access to its neighbours (in the case of lines or triangles). This directive will tell Ogre to send the information to the geometry shader.
-
-```cpp
-   uses_adjacency_information true
-```
-
-
 # Vertex Texture Fetch {#Vertex-Texture-Fetch}
 
 More recent generations of video card allow you to perform a read from a texture in the vertex program rather than just the fragment program, as is traditional. This allows you to, for example, read the contents of a texture and displace vertices based on the intensity of the colour contained within.

@@ -198,8 +198,7 @@ namespace Ogre {
 				}
 				else if (mInputOp == CG_LINE_ADJ)
 				{
-					mDelegate->setParameter("input_operation_type", "line_strip");
-					mDelegate->setAdjacencyInfoRequired(true);
+					mDelegate->setParameter("input_operation_type", "line_strip_adj");
 				}
 				else if (mInputOp == CG_TRIANGLE)
 				{
@@ -207,8 +206,7 @@ namespace Ogre {
 				}
 				else if (mInputOp == CG_TRIANGLE_ADJ)
 				{
-					mDelegate->setParameter("input_operation_type", "triangle_strip");
-					mDelegate->setAdjacencyInfoRequired(true);
+					mDelegate->setParameter("input_operation_type", "triangle_strip_adj");
 				}
 
 				if (mOutputOp == CG_POINT_OUT)

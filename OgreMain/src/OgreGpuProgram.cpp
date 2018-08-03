@@ -509,8 +509,10 @@ namespace Ogre
     }
     void GpuProgram::CmdAdjacency::doSet(void* target, const String& val)
     {
+        LogManager::getSingleton().logWarning("'uses_adjacency_information' is deprecated. "
+        "Set the respective RenderOperation::OpertionType instead.");
         GpuProgram* t = static_cast<GpuProgram*>(target);
-        t->setAdjacencyInfoRequired(StringConverter::parseBool(val));
+        t->mNeedsAdjacencyInfo = StringConverter::parseBool(val);
     }
     //-----------------------------------------------------------------------
     String GpuProgram::CmdComputeGroupDims::doGet(const void* target) const

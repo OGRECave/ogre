@@ -2668,9 +2668,12 @@ namespace Ogre
         }
         else
         {
-            //rendering without tessellation.
-            bool useAdjacency = (mGeometryProgramBound && mBoundGeometryProgram && mBoundGeometryProgram->isAdjacencyInfoRequired());
-            switch( op.operationType )
+            //rendering without tessellation.   
+            int operationType = op.operationType;
+            if(mGeometryProgramBound && mBoundGeometryProgram && mBoundGeometryProgram->isAdjacencyInfoRequired())
+                operationType |= RenderOperation::OT_DETAIL_ADJACENCY_BIT;
+
+            switch( operationType )
             {
             case RenderOperation::OT_POINT_LIST:
                 primType = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
@@ -2678,23 +2681,43 @@ namespace Ogre
                 break;
 
             case RenderOperation::OT_LINE_LIST:
-                primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+                primType = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2;
                 break;
 
+            case RenderOperation::OT_LINE_LIST_ADJ:
+                primType = D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
+                primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 4;
+                break;
+
             case RenderOperation::OT_LINE_STRIP:
-                primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+                primType = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 1;
                 break;
 
+            case RenderOperation::OT_LINE_STRIP_ADJ:
+                primType = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+                primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
+                break;
+
             case RenderOperation::OT_TRIANGLE_LIST:
-                primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+                primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 3;
                 break;
 
+            case RenderOperation::OT_TRIANGLE_LIST_ADJ:
+                primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ;
+                primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 6;
+                break;
+
             case RenderOperation::OT_TRIANGLE_STRIP:
-                primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+                primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
+                break;
+
+            case RenderOperation::OT_TRIANGLE_STRIP_ADJ:
+                primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
+                primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2 - 2;
                 break;
 
             case RenderOperation::OT_TRIANGLE_FAN:
