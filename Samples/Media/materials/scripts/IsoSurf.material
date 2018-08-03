@@ -20,7 +20,6 @@ geometry_program Ogre/Isosurf/TessellateTetrahedraGS_HLSL hlsl
 	source isosurf.hlsl
 	entry_point mainGS
 	target gs_4_0
-	uses_adjacency_information true
 
 	default_params
 	{
@@ -57,7 +56,6 @@ geometry_program Ogre/Isosurf/TessellateTetrahedraGS_CG cg
 	source isosurf.cg
 	entry_point mainGS
 	profiles gpu_gp gp4_gp
-	uses_adjacency_information true
 
 	default_params
 	{
@@ -92,7 +90,6 @@ geometry_program Ogre/Isosurf/TessellateTetrahedraGS_GLSL glsl
 {
 	source IsosurfGS.glsl
 	syntax glsl150
-	uses_adjacency_information true
 
 	default_params
 	{

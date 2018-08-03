@@ -326,13 +326,9 @@ namespace Ogre {
     */
     virtual bool isVertexTextureFetchRequired(void) const { return mVertexTextureFetch; }
 
-    /** Sets whether this geometry program requires adjacency information
-        from the input primitives.
-    */
+    /// @deprecated
     virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
-    /** Returns whether this geometry program requires adjacency information
-        from the input primitives.
-    */
+    /// @deprecated
     virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
     /** Sets the number of process groups dispatched by this compute
         program.

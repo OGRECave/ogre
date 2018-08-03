@@ -9,7 +9,7 @@
 	material 			CDATA 			#REQUIRED
 	usesharedvertices	(true|false)	"true"
 	use32bitindexes		(true|false)	"false"
-	operationtype       (triangle_list|triangle_strip|triangle_fan)	"triangle_list">
+	operationtype       (line_list|line_strip|point_list|triangle_list|triangle_strip|triangle_fan|line_list_adj|line_strip_adj|triangle_list_adj|triangle_strip_adj)	"triangle_list">
 <!ELEMENT textures (texture+)>
 <!ELEMENT texture EMPTY>
 <!ATTLIST texture

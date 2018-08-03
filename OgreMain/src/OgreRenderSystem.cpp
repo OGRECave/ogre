@@ -626,45 +626,17 @@ namespace Ogre {
         case RenderOperation::OT_TRIANGLE_LIST:
             mFaceCount += (val / 3);
             break;
+        case RenderOperation::OT_TRIANGLE_LIST_ADJ:
+            mFaceCount += (val / 6);
+            break;
+        case RenderOperation::OT_TRIANGLE_STRIP_ADJ:
+            mFaceCount += (val / 2 - 2);
+            break;
         case RenderOperation::OT_TRIANGLE_STRIP:
         case RenderOperation::OT_TRIANGLE_FAN:
             mFaceCount += (val - 2);
             break;
-        case RenderOperation::OT_POINT_LIST:
-        case RenderOperation::OT_LINE_LIST:
-        case RenderOperation::OT_LINE_STRIP:
-        case RenderOperation::OT_PATCH_1_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_2_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_3_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_4_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_5_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_6_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_7_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_8_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_9_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_10_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_11_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_12_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_13_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_14_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_15_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_16_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_17_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_18_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_19_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_20_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_21_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_22_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_23_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_24_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_25_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_26_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_27_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_28_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_29_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_30_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_31_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_32_CONTROL_POINT:
+        default:
             break;
         }
 

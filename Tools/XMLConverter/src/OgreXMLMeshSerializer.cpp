@@ -257,6 +257,18 @@ namespace Ogre {
         case RenderOperation::OT_TRIANGLE_STRIP:
             subMeshNode->SetAttribute("operationtype", "triangle_strip");
             break;
+        case RenderOperation::OT_TRIANGLE_LIST_ADJ:
+            subMeshNode->SetAttribute("operationtype", "triangle_list_adj");
+            break;
+        case RenderOperation::OT_TRIANGLE_STRIP_ADJ:
+            subMeshNode->SetAttribute("operationtype", "triangle_strip_adj");
+            break;
+        case RenderOperation::OT_LINE_LIST_ADJ:
+            subMeshNode->SetAttribute("operationtype", "line_list_adj");
+            break;
+        case RenderOperation::OT_LINE_STRIP_ADJ:
+            subMeshNode->SetAttribute("operationtype", "line_strip_adj");
+            break;
         default:
             OgreAssert(false, "Patch control point operations not supported");
             break;
@@ -746,7 +758,24 @@ namespace Ogre {
                     sm->operationType = RenderOperation::OT_POINT_LIST;
                     readFaces = false;
                 }
-
+                else if (!strcmp(optype, "triangle_list_adj"))
+                {
+                    sm->operationType = RenderOperation::OT_TRIANGLE_LIST_ADJ;
+                }
+                else if (!strcmp(optype, "triangle_strip_adj"))
+                {
+                    sm->operationType = RenderOperation::OT_TRIANGLE_STRIP_ADJ;
+                }
+                else if (!strcmp(optype, "line_strip_adj"))
+                {
+                    sm->operationType = RenderOperation::OT_LINE_STRIP_ADJ;
+                    readFaces = false;
+                }
+                else if (!strcmp(optype, "line_list_adj"))
+                {
+                    sm->operationType = RenderOperation::OT_LINE_LIST_ADJ;
+                    readFaces = false;
+                }
             }
 
             const char* tmp = smElem->Attribute("usesharedvertices");
