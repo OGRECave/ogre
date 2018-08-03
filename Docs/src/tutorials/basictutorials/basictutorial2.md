@@ -17,7 +17,7 @@ is not a SceneNode (it actually inherits from the Frustum class), but for moveme
 like a SceneNode.
 
 @note Starting from version 1.10 functionality related to rotate and translate camera are deprecated. 
-You should attach camera to Ogre::SceneNode and do all transofrmation with this node.
+You should attach camera to Ogre::SceneNode and do all transformation with this node.
 
 # Creating a Camera {#bt2CreatingaCamera}
 We will now cover camera creation part which we just applied in previous tutorial. We remeber that now we need to have SceneNode for camera. The first step will be doing is creating that SceneNode and asking the SceneManager to create a new Camera. Add the following to create SceneNode and Camera:
