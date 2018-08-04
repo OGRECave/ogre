@@ -63,6 +63,12 @@ THE SOFTWARE.
 #   include <xlocale.h>
 #endif
 
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+#define OGRE_FORMAT_PRINTF(string_idx, first_to_check) __attribute__ ((format (printf, string_idx, first_to_check)))
+#else
+#define OGRE_FORMAT_PRINTF(A, B)
+#endif
+
 namespace Ogre {
     /** \addtogroup Core
      *  @{
@@ -200,6 +206,12 @@ namespace Ogre {
             @return An updated string with the sub-string replaced
         */
         static const String replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat);
+
+        /** create a string from a printf expression
+         *
+         * @note this function - like printf - uses a locale dependent decimal point
+         */
+        static String format(const char* fmt, ...) OGRE_FORMAT_PRINTF(1, 2);
     };
 
     typedef ::std::hash< _StringBase > _StringHash;
