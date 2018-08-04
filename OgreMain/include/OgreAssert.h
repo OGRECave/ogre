@@ -51,13 +51,13 @@ namespace Assert
                                      const char* file,
                                      int line );
 
-    Handler GetHandler();
-    void SetHandler( Handler newHandler );
+    _OgreExport Handler GetHandler();
+    _OgreExport void SetHandler( Handler newHandler );
 
-    FailBehavior ReportFailure( const char* condition,
-                                const char* file,
-                                int line,
-                                const char* msg, ... );
+    _OgreExport FailBehavior ReportFailure( const char* condition,
+                                            const char* file,
+                                            int line,
+                                            const char* msg, ... );
 }
 }
 
