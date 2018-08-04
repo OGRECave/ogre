@@ -35,7 +35,7 @@ A gold mine of tutorials, tips and code snippets which will help you get up to s
 We welcome all contributions to OGRE, be that new
 plugins, bugfixes, extensions, tutorials, documentation, example
 applications, artwork or pretty much anything else! If you would like
-to contribute to the development of OGRE, please create a pull request on [bitbucket](https://bitbucket.org/sinbad/ogre/pull-requests/) or [github](https://github.com/OGRECave/ogre/pulls).
+to contribute to the development of OGRE, please create a [pull request](https://github.com/OGRECave/ogre/pulls).
 
 ## Getting Support
 Please use our [community support forums](http://forums.ogre3d.org/) if you need help or
