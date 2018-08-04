@@ -906,9 +906,7 @@ namespace Ogre
 					op2Value = op1Value;
 
 					//@value & @counter write, the others are invisible
-					char tmp[16];
-					sprintf(tmp, "%i", op1Value);
-					outBuffer += tmp;
+					outBuffer += StringUtil::format("%i", op1Value);
 
 					if (keyword == 0)
 					{

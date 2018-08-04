@@ -187,18 +187,15 @@ protected:
         Vector3 knotDiff(-3.7, 0, 0);
         for (int i=0; i < 5; i++)
         {
-            char cloneName[16];
-            sprintf(cloneName, "Knot%d", i);
-            Entity* cloneKnot = knotEnt->clone(cloneName);
+            Entity* cloneKnot = knotEnt->clone(StringUtil::format("Knot%d", i));
             Vector3 clonePos = knotStartPos + knotDiff*i;
             SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
             cloneNode->attachObject(cloneKnot);
             setEntityHeight(cloneKnot, 3);
             cloneNode->yaw(Degree(i*17));
             cloneNode->roll(Degree(i*31));
-            
-            sprintf(cloneName, "KnotLight%d", i);
-            Light* knotLight = mSceneMgr->createLight(cloneName);
+
+            Light* knotLight = mSceneMgr->createLight(StringUtil::format("KnotLight%d", i));
             SceneNode* ln = rootNode->createChildSceneNode(clonePos + Vector3(0,3,0));
             ln->setDirection(Vector3::NEGATIVE_UNIT_Y);
             ln->attachObject(knotLight);
@@ -219,9 +216,7 @@ protected:
         Vector3 headDiff(-3.7,0,0);
         for (int i=0; i < 12; i++) 
         {
-            char cloneName[16];
-            sprintf(cloneName, "OgreHead%d", i);
-            Entity* cloneHead = ogreHead->clone(cloneName);
+            Entity* cloneHead = ogreHead->clone(StringUtil::format("OgreHead%d", i));
             Vector3 clonePos = headStartPos[i%2] + headDiff*(i/2);
             if ((i/2) >= 4) clonePos.x -= 0.75;
             SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
@@ -239,9 +234,7 @@ protected:
         Vector3 woodDiff(0, 0.3, 0);
         for (int i=0; i < 5; i++)
         {
-            char cloneName[16];
-            sprintf(cloneName, "WoodPallet%d", i);
-            Entity* clonePallet = woodPallet->clone(cloneName);
+            Entity* clonePallet = woodPallet->clone(StringUtil::format("WoodPallet%d", i));
             Vector3 clonePos = woodStartPos + woodDiff*i;
             SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
             cloneNode->attachObject(clonePallet);

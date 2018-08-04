@@ -176,11 +176,7 @@ namespace Ogre
             res.append("invalid parameters were passed.\n");
             break;
         default:
-            {
-            char tmp[64];
-            sprintf(tmp, "hr = 0x%08X\n", lastResult);
-            res.append(tmp);
-            }
+            res = StringUtil::format("hr = 0x%08X\n", lastResult);
         }
 
         if (mInfoQueue)

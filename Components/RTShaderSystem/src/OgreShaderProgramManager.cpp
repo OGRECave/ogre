@@ -471,9 +471,7 @@ String ProgramManager::generateHash(const String& programString)
     MurmurHash3_128(programString.c_str(), programString.size(), 0, hash);
 
     //Generate the string
-    char str[33];
-    sprintf(str, "%08x%08x%08x%08x", hash[0], hash[1], hash[2], hash[3]);
-    return String(str);
+    return StringUtil::format("%08x%08x%08x%08x", hash[0], hash[1], hash[2], hash[3]);
 }
 
 

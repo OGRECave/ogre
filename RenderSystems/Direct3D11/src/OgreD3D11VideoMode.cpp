@@ -32,7 +32,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     String D3D11VideoMode::getDescription() const
     {
-        char tmp[128];
         unsigned int colourDepth = 16;
         if( mModeDesc.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
             mModeDesc.Format == DXGI_FORMAT_R32G32B32A32_TYPELESS ||
@@ -46,8 +45,7 @@ namespace Ogre
             )
             colourDepth = 32;
 
-        sprintf( tmp, "%d x %d @ %d-bit colour", mModeDesc.Width, mModeDesc.Height, colourDepth );
-        return String(tmp);
+        return StringUtil::format("%d x %d @ %d-bit colour", mModeDesc.Width, mModeDesc.Height, colourDepth);
     }
     //---------------------------------------------------------------------
     unsigned int D3D11VideoMode::getColourDepth() const

@@ -564,9 +564,7 @@ namespace Ogre {
                     
                     // allow 8 digit hex number. there should never be that many texture units.
                     // This sprintf replaced a call to StringConverter::toString for performance reasons
-                    char buff[9] = {0};
-                    sprintf(buff, "%lx", static_cast<long>(idx));
-                    state->setName( buff );
+                    state->setName( StringUtil::format("%lx", static_cast<long>(idx)));
                     
                     /** since the name was never set and a default one has been made, clear the alias name
                      so that when the texture unit name is set by the user, the alias name will be set to
