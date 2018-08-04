@@ -101,18 +101,12 @@ TEST(BitwiseTests,IntReadWrite)
 }
 //--------------------------------------------------------------------------
 TEST(BitwiseTests,Half)
-{    
-    /*
-    for(int x=0; x<0x100; x++)
+{
+    for(float f : {1.f, -1.f, INFINITY, 65504.f})
     {
-        float f = (float)x/255.0f;
-        uint32 fi = *reinterpret_cast<uint32*>(&f);
         uint16 g = Bitwise::floatToHalf(f);
         float h = Bitwise::halfToFloat(g);
-        uint32 hi = *reinterpret_cast<uint32*>(&h);
-        int i = h*256.0f;
-        std::cerr << x << " " << fi << " " << std::hex << std::setw(4) << g << " " << hi << " " << i << std::endl;
+        EXPECT_EQ(f, h);
     }
-    */
 }
 //--------------------------------------------------------------------------
