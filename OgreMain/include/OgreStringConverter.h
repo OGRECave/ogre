@@ -58,12 +58,16 @@ namespace Ogre {
         like int and Real just use the underlying C runtime library atof and atoi family methods,
         however custom types like Vector3, ColourValue and Matrix4 are also supported by this class
         using custom formats.
-    @author
-        Steve Streeting
     */
     class _OgreExport StringConverter
     {
     public:
+        static String toString(int32 val) { return std::to_string(val); };
+        static String toString(uint32 val) { return std::to_string(val); };
+        static String toString(unsigned long val) { return std::to_string(val); };
+        static String toString(unsigned long long val) { return std::to_string(val); };
+        static String toString(long val) { return std::to_string(val); };
+
         /** Converts a float to a String. */
         static String toString(float val, unsigned short precision = 6,
                                unsigned short width = 0, char fill = ' ',
@@ -88,27 +92,27 @@ namespace Ogre {
         {
             return toString(val.valueAngleUnits(), precision, width, fill, flags);
         }
-        /** Converts an int to a String. */
-        static String toString(int32 val, unsigned short width = 0,
+        /// @deprecated use StringUtil::format
+        OGRE_DEPRECATED static String toString(int32 val, unsigned short width,
             char fill = ' ', 
             std::ios::fmtflags flags = std::ios::fmtflags(0));
-        /** Converts an unsigned int to a String. */
-        static String toString(uint32 val, unsigned short width = 0,
+        /// @deprecated use StringUtil::format
+        OGRE_DEPRECATED static String toString(uint32 val, unsigned short width,
             char fill = ' ',
             std::ios::fmtflags flags = std::ios::fmtflags(0));
         // provide both long long and long to catch size_t on all platforms
-        /** Converts an unsigned long to a String. */
-        static String toString(unsigned long val,
-            unsigned short width = 0, char fill = ' ', 
+        /// @deprecated use StringUtil::format
+        OGRE_DEPRECATED static String toString(unsigned long val,
+            unsigned short width, char fill = ' ',
             std::ios::fmtflags flags = std::ios::fmtflags(0));
-        /** Converts an unsigned long long to a String. */
-        static String toString(unsigned long long val,
-            unsigned short width = 0, char fill = ' ', 
+        /// @deprecated use StringUtil::format
+        OGRE_DEPRECATED static String toString(unsigned long long val,
+            unsigned short width, char fill = ' ',
             std::ios::fmtflags flags = std::ios::fmtflags(0));
 
-        /** Converts a long to a String. */
-        static String toString(long val, 
-            unsigned short width = 0, char fill = ' ', 
+        /// @deprecated use StringUtil::format
+        OGRE_DEPRECATED static String toString(long val,
+            unsigned short width, char fill = ' ',
             std::ios::fmtflags flags = std::ios::fmtflags(0));
 
         /** Converts a boolean to a String. 
