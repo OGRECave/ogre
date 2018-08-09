@@ -267,7 +267,10 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
-        mTarget->setFsaaResolveDirty();
+        if( mDefinition->mIsResolve )
+            mTarget->setFsaaResolved();
+        else
+            mTarget->setFsaaResolveDirty();
 
         sceneManager->_setCurrentCompositorPass( this );
 

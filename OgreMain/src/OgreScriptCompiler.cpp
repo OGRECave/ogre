@@ -1234,6 +1234,7 @@ namespace Ogre
         mIds["no_gamma"]            = ID_NO_GAMMA;
         mIds["no_fsaa"]             = ID_NO_FSAA;
         mIds["explicit_resolve"]    = ID_EXPLICIT_RESOLVE;
+        mIds["resolve"]             = ID_RESOLVE;
         mIds["depth_pool"]          = ID_DEPTH_POOL;
         mIds["depth_texture"]       = ID_DEPTH_TEXTURE;
         mIds["depth_format"]        = ID_DEPTH_FORMAT;

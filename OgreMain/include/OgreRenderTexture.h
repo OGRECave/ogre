@@ -108,6 +108,7 @@ namespace Ogre
         */
         virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
         virtual void setFsaaResolveDirty(void);
+        virtual void setFsaaResolved();
         virtual void swapBuffers(void);
 
         virtual void getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS],
