@@ -8376,11 +8376,14 @@ namespace Ogre{
                     }
                     else
                     {
-                        if( !getBoolean( prop->values.front(), &passQuad->mIsResolve ) )
+                        String name;
+                        if( !getString( prop->values.front(), &name ) )
                         {
-                            compiler->addError( ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                    "resolve argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"" );
+                            compiler->addError( ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line );
                         }
+
+                        passQuad->mIsResolve = true;
+                        passQuad->mFsaaTextureName = name;
                     }
                     break;
                 case ID_VIEWPORT:

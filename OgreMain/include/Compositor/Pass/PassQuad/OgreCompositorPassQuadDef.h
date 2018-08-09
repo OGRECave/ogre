@@ -92,7 +92,8 @@ namespace Ogre
         @remarks
             @See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
         */
-        bool    mIsResolve;
+        bool     mIsResolve;
+        IdString mFsaaTextureName;
 
         /** When true, the camera will be rotated 90°, -90° or 180° depending on the value of
             mRtIndex and then restored to its original rotation after we're done.
