@@ -442,7 +442,7 @@ namespace Ogre {
             /* Bytes per element */
             2,
             /* Flags */
-            PFF_LUMINANCE | PFF_DEPTH,
+            PFF_LUMINANCE | PFF_DEPTH | PFF_NATIVEENDIAN,
             /* Component type and count */
             PCT_SHORT, 1,
             /* rbits, gbits, bbits, abits */
