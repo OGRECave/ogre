@@ -2782,6 +2782,11 @@ namespace Ogre{
                         mUnit->setTextureCompareEnabled(bval);
                     break;
                 case ID_CMPFUNC:
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
+                        prop->line,
+                        "compare_func is deprecated. Use comp_func.");
+                    OGRE_FALLTHROUGH;
+                case ID_COMP_FUNC:
                     CompareFunction func;
                     if(getValue(prop, compiler, func))
                         mUnit->setTextureCompareFunction(func);
