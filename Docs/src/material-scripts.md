@@ -946,6 +946,8 @@ Here are the attributes you can use in a ’texture\_unit’ section of a .mater
 -   [transform](#transform)
 -   [binding\_type](#binding_005ftype)
 -   [content\_type](#content_005ftype)
+-   [compare_test](#compare_test)
+-   [comp_func](#comp_func)
 
 You can also use a nested ’texture\_source’ section in order to use a special add-in as a source of texture data, See @ref External-Texture-Sources for details.
 
@@ -1413,6 +1415,27 @@ Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m3
 The indexes of the 4x4 matrix value above are expressed as m&lt;row&gt;&lt;col&gt;.
 
  @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+
+<a name="compare_test"></a>
+## compare_test
+
+@copydoc Ogre::TextureUnitState::setTextureCompareEnabled
+
+@par
+Format: compare_test on
+
+@par
+Default: compare_test off
+
+<a name="comp_func"></a>
+
+## comp_func
+
+The comparison func to use when @c compare_test is enabled
+@par
+Format: comp_func &lt;func&gt;
+
+@param func one of Ogre::CompareFunction without the `CMPF_` prefix. E.g. `CMPF_LESS_EQUAL` becomes `less_equal`.
 
 # Declaring GPU Programs {#Declaring-Vertex_002fGeometry_002fFragment-Programs}
 
