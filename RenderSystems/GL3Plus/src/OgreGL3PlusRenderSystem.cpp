@@ -1353,14 +1353,24 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
     {
-        // TODO: Sampler objects, GL 3.3 or GL_ARB_sampler_objects required. For example:
-        //        OGRE_CHECK_GL_ERROR(glSamplerParameteri(m_rt_ss, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE));
-        //        OGRE_CHECK_GL_ERROR(glSamplerParameteri(m_rt_ss, GL_TEXTURE_COMPARE_FUNC, GL_NEVER));
+        if (!mStateCacheManager->activateGLTextureUnit(unit))
+            return;
+
+        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
+                                            GL_TEXTURE_COMPARE_FUNC,
+                                            convertCompareFunction(function));
+        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
     {
-        // TODO: GL 3.3 or later or GL_ARB_sampler_objects
+        if (!mStateCacheManager->activateGLTextureUnit(unit))
+            return;
+
+        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
+                                            GL_TEXTURE_COMPARE_MODE,
+                                            compare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
+        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)

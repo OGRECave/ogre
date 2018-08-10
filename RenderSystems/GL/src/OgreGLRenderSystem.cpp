@@ -2274,12 +2274,25 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
     {
-        //TODO: implement (opengl 3 only?)
+        if (!mStateCacheManager->activateGLTextureUnit(unit) || !GLEW_VERSION_2_0)
+            return;
+
+        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
+                                            GL_TEXTURE_COMPARE_FUNC,
+                                            convertCompareFunction(function));
+        mStateCacheManager->activateGLTextureUnit(0);
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
     {
-        //TODO: implement (opengl 3 only?)
+        // actually ARB_shadow would be enough..
+        if (!mStateCacheManager->activateGLTextureUnit(unit) || !GLEW_VERSION_2_0)
+            return;
+
+        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
+                                            GL_TEXTURE_COMPARE_MODE,
+                                            compare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
+        mStateCacheManager->activateGLTextureUnit(0);
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
