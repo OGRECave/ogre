@@ -289,6 +289,14 @@ namespace Ogre
         if( listener )
             listener->passPosExecute( this );
 
+        if( mDefinition->mIsResolve )
+        {
+            TexturePtr tex = mParentNode->getDefinedTexture( mDefinition->mFsaaTextureName, 0 );
+
+            if( !tex.isNull() )
+                tex->getBuffer()->getRenderTarget()->setFsaaResolved();
+        }
+
         //Call endUpdate if we're the last pass in a row to use this RT
         if( mDefinition->mEndRtUpdate )
             mTarget->_endUpdate();
