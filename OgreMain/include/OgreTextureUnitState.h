@@ -905,6 +905,12 @@ namespace Ogre {
         /// Returns true if texture filtering was not set explicitly and is determined by MaterialManager.
         bool isDefaultFiltering() const     { return mIsDefaultFiltering; }
 
+        /** Enables or disables the comparison test for depth textures.
+         *
+         * When enabled, sampling the texture returns how the sampled value compares against a
+         * reference value instead of the sampled value itself. Combined with linear filtering this
+         * can be used to implement hardware PCF for shadow maps.
+         */
         void setTextureCompareEnabled(bool enabled);
         bool getTextureCompareEnabled() const;
     
