@@ -2160,12 +2160,24 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
     {
-        //no effect in GLES2 rendersystem
+        if (!mStateCacheManager->activateGLTextureUnit(unit) || !hasMinGLVersion(3, 0))
+            return;
+
+        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
+                                            GL_TEXTURE_COMPARE_FUNC,
+                                            convertCompareFunction(function));
+        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
     {
-        //no effect in GLES2 rendersystem
+        if (!mStateCacheManager->activateGLTextureUnit(unit) || !hasMinGLVersion(3, 0))
+            return;
+
+        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
+                                            GL_TEXTURE_COMPARE_MODE,
+                                            compare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
+        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::bindVertexElementToGpu(
