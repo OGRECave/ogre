@@ -813,8 +813,6 @@ namespace Ogre {
             // Bind zero texture.
             mStateCacheManager->bindGLTexture(GL_TEXTURE_2D, 0);
         }
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
@@ -843,7 +841,6 @@ namespace Ogre {
                          getTextureAddressingMode(uvw.v));
         mStateCacheManager->setTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_R,
                          getTextureAddressingMode(uvw.w));
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
@@ -852,7 +849,6 @@ namespace Ogre {
         if (mStateCacheManager->activateGLTextureUnit(stage))
         {
             OGRE_CHECK_GL_ERROR(glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, border));
-            mStateCacheManager->activateGLTextureUnit(0);
         }
     }
 
@@ -861,7 +857,6 @@ namespace Ogre {
         if (mStateCacheManager->activateGLTextureUnit(stage))
         {
             OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[stage], GL_TEXTURE_LOD_BIAS, bias));
-            mStateCacheManager->activateGLTextureUnit(0);
         }
     }
 
@@ -1347,8 +1342,6 @@ namespace Ogre {
                                                 getCombinedMinMipFilter());
             break;
         }
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
@@ -1359,7 +1352,6 @@ namespace Ogre {
         mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                             GL_TEXTURE_COMPARE_FUNC,
                                             convertCompareFunction(function));
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
@@ -1370,7 +1362,6 @@ namespace Ogre {
         mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                             GL_TEXTURE_COMPARE_MODE,
                                             compare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
@@ -1383,8 +1374,6 @@ namespace Ogre {
 
         maxAnisotropy = std::min<uint>(mLargestSupportedAnisotropy, maxAnisotropy);
         mStateCacheManager->setTexParameteri(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_render(const RenderOperation& op)
@@ -1440,8 +1429,6 @@ namespace Ogre {
                 bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0);
             }
         }
-
-        mStateCacheManager->activateGLTextureUnit(0);
 
         // Launch compute shader job(s).
         if (mCurrentComputeShader) // && mComputeProgramPosition == CP_PRERENDER && mComputeProgramExecutions <= compute_execution_cap)

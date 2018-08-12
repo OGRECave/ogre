@@ -798,8 +798,6 @@ namespace Ogre {
             // Bind zero texture
             mStateCacheManager->bindGLTexture(GL_TEXTURE_2D, 0);
         }
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     GLint GLES2RenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
@@ -827,7 +825,6 @@ namespace Ogre {
 
         if(getCapabilities()->hasCapability(RSC_TEXTURE_3D))
             mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_R_OES, getTextureAddressingMode(uvw.w));
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_setLineWidth(float width)
@@ -1360,8 +1357,6 @@ namespace Ogre {
                 
                 break;
         }
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
@@ -1378,8 +1373,6 @@ namespace Ogre {
 
         mStateCacheManager->setTexParameterf(mTextureTypes[unit],
                                               GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)maxAnisotropy);
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_render(const RenderOperation& op)
@@ -2166,7 +2159,6 @@ namespace Ogre {
         mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                             GL_TEXTURE_COMPARE_FUNC,
                                             convertCompareFunction(function));
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
@@ -2177,7 +2169,6 @@ namespace Ogre {
         mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                             GL_TEXTURE_COMPARE_MODE,
                                             compare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
-        mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::bindVertexElementToGpu(

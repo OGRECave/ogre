@@ -1384,8 +1384,6 @@ namespace Ogre {
             glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE,
                       enabled ? GL_TRUE : GL_FALSE);
         }
-        mStateCacheManager->activateGLTextureUnit(0);
-
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
@@ -1435,8 +1433,6 @@ namespace Ogre {
             // bind zero texture
             mStateCacheManager->bindGLTexture(GL_TEXTURE_2D, 0);
         }
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTextureCoordSet(size_t stage, size_t index)
@@ -1588,7 +1584,6 @@ namespace Ogre {
         default:
             break;
         }
-        mStateCacheManager->activateGLTextureUnit(0);
     }
     //-----------------------------------------------------------------------------
     GLint GLRenderSystem::getTextureAddressingMode(
@@ -1619,7 +1614,6 @@ namespace Ogre {
                          getTextureAddressingMode(uvw.v));
         mStateCacheManager->setTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_R,
                          getTextureAddressingMode(uvw.w));
-        mStateCacheManager->activateGLTextureUnit(0);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
@@ -1628,7 +1622,6 @@ namespace Ogre {
         if (mStateCacheManager->activateGLTextureUnit(stage))
         {
             glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, border);
-            mStateCacheManager->activateGLTextureUnit(0);
         }
     }
     //-----------------------------------------------------------------------------
@@ -1639,7 +1632,6 @@ namespace Ogre {
             if (mStateCacheManager->activateGLTextureUnit(stage))
             {
                 glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
-                    mStateCacheManager->activateGLTextureUnit(0);
             }
         }
     }
@@ -1669,7 +1661,6 @@ namespace Ogre {
         }
 
         glMatrixMode(GL_MODELVIEW);
-        mStateCacheManager->activateGLTextureUnit(0);
     }
     //-----------------------------------------------------------------------------
     GLint GLRenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const
@@ -2268,8 +2259,6 @@ namespace Ogre {
                 getCombinedMinMipFilter());
             break;
         }
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
@@ -2280,7 +2269,6 @@ namespace Ogre {
         mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                             GL_TEXTURE_COMPARE_FUNC,
                                             convertCompareFunction(function));
-        mStateCacheManager->activateGLTextureUnit(0);
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
@@ -2292,7 +2280,6 @@ namespace Ogre {
         mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                             GL_TEXTURE_COMPARE_MODE,
                                             compare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
-        mStateCacheManager->activateGLTextureUnit(0);
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
@@ -2308,8 +2295,6 @@ namespace Ogre {
             maxAnisotropy = largest_supported_anisotropy ?
                 static_cast<uint>(largest_supported_anisotropy) : 1;
         glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm)
@@ -2526,8 +2511,6 @@ namespace Ogre {
             glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, cv1);
         if (bm.source2 == LBS_MANUAL)
             glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, cv2);
-
-        mStateCacheManager->activateGLTextureUnit(0);
     }
     //---------------------------------------------------------------------
     void GLRenderSystem::setGLLightPositionDirection(Light* lt, GLenum lightindex)
