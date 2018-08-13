@@ -93,6 +93,8 @@ namespace Ogre
 
         void collectLightForSlice( size_t slice, size_t threadId );
 
+        void collectObjs( const Camera *camera );
+
     public:
         ForwardClustered( uint32 width, uint32 height, uint32 numSlices, uint32 lightsPerCell,
                    float minDistance, float maxDistance, SceneManager *sceneManager );

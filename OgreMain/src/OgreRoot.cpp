@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 // Ogre includes
 #include "OgreStableHeaders.h"
-
+#
 #include "OgreRoot.h"
 
 #include "OgreRenderSystem.h"
@@ -51,6 +51,7 @@ THE SOFTWARE.
 #include "OgrePlugin.h"
 #include "OgreFileSystem.h"
 #include "OgreResourceBackgroundQueue.h"
+#include "OgreDecal.h"
 #include "OgreEntity.h"
 #include "OgreItem.h"
 #include "OgreBillboardSet.h"
@@ -276,6 +277,8 @@ namespace Ogre {
         mAutoWindow = 0;
 
         // instantiate and register base movable factories
+        mDecalFactory = OGRE_NEW DecalFactory();
+        addMovableObjectFactory(mDecalFactory);
         mEntityFactory = OGRE_NEW v1::EntityFactory();
         addMovableObjectFactory(mEntityFactory);
         mItemFactory = OGRE_NEW ItemFactory();
@@ -381,6 +384,7 @@ namespace Ogre {
         OGRE_DELETE mResourceBackgroundQueue;
         OGRE_DELETE mResourceGroupManager;
 
+        OGRE_DELETE mDecalFactory;
         OGRE_DELETE mEntityFactory;
         OGRE_DELETE mItemFactory;
         OGRE_DELETE mLightFactory;

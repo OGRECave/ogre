@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 #include "OgreViewport.h"
 #include "OgreCamera.h"
+#include "OgreDecal.h"
 
 #include "Math/Array/OgreArraySphere.h"
 #include "Math/Array/OgreBooleanMask.h"
@@ -48,6 +49,9 @@ THE SOFTWARE.
 #include "OgreWireAabb.h"
 
 #include "OgreProfiler.h"
+
+#define TODO_mLightsPerCell_minus_3_is_wrong
+#define TODO_missing_aabb_frustum_check
 
 namespace Ogre
 {
@@ -469,6 +473,102 @@ namespace Ogre
             ++itLight;
         }
 
+        uint16 numDecals = 0;
+        const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
+        for( size_t rqId=MinDecalRq; rqId<=MaxDecalRq; ++rqId )
+        {
+            MovableObject::MovableObjectArray::const_iterator itor = objsPerRqInThread0[rqId].begin();
+            MovableObject::MovableObjectArray::const_iterator end  = objsPerRqInThread0[rqId].end();
+
+            while( itor != end )
+            {
+                MovableObject *decal = *itor;
+
+                Node *node = decal->getParentNode();
+
+                Aabb localAabbScalar = decal->getLocalAabb();
+                localAabbScalar.mHalfSize *= node->_getDerivedScale();
+
+                ArrayQuaternion objOrientation;
+                objOrientation.setAll( node->_getDerivedOrientation() );
+
+                ArrayAabb localObb;
+                localObb.setAll( localAabbScalar );
+
+                for( size_t j=0; j<numPackedFrustumsPerSlice; ++j )
+                {
+                    const FrustumRegion * RESTRICT_ALIAS frustumRegion =
+                            mFrustumRegions.get() + frustumStartIdx + j;
+
+                    ArrayReal dotResult;
+                    ArrayMaskR mask;
+                    ArrayVector3 newPlaneNormal;
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[0].normal;
+
+                    dotResult = frustumRegion->plane[0].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::CompareGreater( dotResult, frustumRegion->plane[0].negD );
+
+                    dotResult = frustumRegion->plane[1].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[1].negD ) );
+
+                    dotResult = frustumRegion->plane[2].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[2].negD ) );
+
+                    dotResult = frustumRegion->plane[3].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[3].negD ) );
+
+                    dotResult = frustumRegion->plane[4].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[4].negD ) );
+
+                    dotResult = frustumRegion->plane[5].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[5].negD ) );
+
+                    const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
+
+                    TODO_missing_aabb_frustum_check;
+
+                    for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+                    {
+                        if( IS_BIT_SET( k, scalarMask ) )
+                        {
+                            const size_t idx = (frustumStartIdx + j) * ARRAY_PACKED_REALS + k;
+                            FastArray<LightCount>::iterator numLightsInCell =
+                                    mLightCountInCell.begin() + idx;
+
+                            //assert( numLightsInCell < mLightCountInCell.end() );
+
+                            TODO_mLightsPerCell_minus_3_is_wrong;
+                            //mLightsPerCell - 3 because three slots is reserved
+                            //for the number of lights in cell per type
+                            if( numLightsInCell->lightCount[0] < mLightsPerCell - 3u )
+                            {
+                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mLightsPerCell +
+                                                                   (numLightsInCell->lightCount[0] + 3u);
+                                *cellElem = numDecals * 6;
+                                ++numLightsInCell->lightCount[0];
+                                ++numLightsInCell->decalCount;
+                            }
+                        }
+                    }
+                }
+
+                ++numDecals;
+                ++itor;
+            }
+        }
+
         {
             //Now write all the light counts
             FastArray<LightCount>::const_iterator itor = mLightCountInCell.begin() +
@@ -490,6 +590,55 @@ namespace Ogre
                 gridIdx += cellSize;
                 ++itor;
             }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    inline bool OrderObjsByDistanceToCamera( const MovableObject *left, const MovableObject *right )
+    {
+        return left->getCachedDistanceToCameraAsReal() < right->getCachedDistanceToCameraAsReal();
+    }
+
+    void ForwardClustered::collectObjs( const Camera *camera )
+    {
+        const bool didCollect = mSceneManager->_collectForwardPlusObjects( camera );
+
+        VisibleObjectsPerThreadArray &objsPerThread = mSceneManager->_getTmpVisibleObjectsList();
+        VisibleObjectsPerRq &objsPerRqInThread0 = *objsPerThread.begin();
+
+        if( didCollect )
+        {
+            //Merge objects collected in all threads into just thread0
+            VisibleObjectsPerThreadArray::const_iterator itor = objsPerThread.begin() + 1u;
+            VisibleObjectsPerThreadArray::const_iterator end  = objsPerThread.end();
+
+            while( itor != end )
+            {
+                const size_t numRqs = objsPerRqInThread0.size();
+
+                const VisibleObjectsPerRq &objsPerRq = *itor;
+
+                OGRE_ASSERT_MEDIUM( numRqs == objsPerRq.size() );
+
+                for( size_t rqId=0; rqId<numRqs; ++rqId )
+                    objsPerRqInThread0[rqId].appendPOD( objsPerRq[rqId].begin(),
+                                                        objsPerRq[rqId].end() );
+
+                ++itor;
+            }
+
+            //Sort the objects by distance to camera
+            const size_t numRqs = objsPerRqInThread0.size();
+            for( size_t rqId=0; rqId<numRqs; ++rqId )
+            {
+                std::sort( objsPerRqInThread0[rqId].begin(), objsPerRqInThread0[rqId].end(),
+                           OrderObjsByDistanceToCamera );
+            }
+        }
+        else
+        {
+            const size_t numRqs = objsPerRqInThread0.size();
+            for( size_t rqId=0; rqId<numRqs; ++rqId )
+                objsPerRqInThread0[rqId].clear();
         }
     }
     //-----------------------------------------------------------------------------------
@@ -546,6 +695,8 @@ namespace Ogre
             mSceneManager->cullLights( camera, Light::LT_POINT,
                                        Light::MAX_FORWARD_PLUS_LIGHTS, mCurrentLightList );
         }
+
+        collectObjs( camera );
 
         const size_t numLights = mCurrentLightList.size();
 

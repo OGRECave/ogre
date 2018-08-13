@@ -64,6 +64,9 @@ namespace Ogre
 
         typedef vector<CachedGridBuffer>::type CachedGridBufferVec;
 
+        static const size_t MinDecalRq;     // Inclusive
+        static const size_t MaxDecalRq;     // Inclusive
+
     protected:
         static const size_t NumBytesPerLight;
 
@@ -90,6 +93,7 @@ namespace Ogre
         {
             //We use LT_DIRECTIONAL (index = 0) to contain the total light count.
             uint32  lightCount[Light::MAX_FORWARD_PLUS_LIGHTS];
+            uint32  decalCount;
             LightCount() { memset( lightCount, 0, sizeof(lightCount) ); }
         };
 
@@ -126,7 +130,7 @@ namespace Ogre
 
         /// The const version will not create a new cache if not found, and
         /// output a null pointer instead (also returns false in that case).
-        bool getCachedGridFor( Camera *camera, const CachedGrid **outCachedGrid ) const;
+        bool getCachedGridFor( const Camera *camera, const CachedGrid **outCachedGrid ) const;
 
         /// Check if some of the caches are really old and delete them
         void deleteOldGridBuffers(void);
@@ -140,6 +144,8 @@ namespace Ogre
         void _changeRenderSystem( RenderSystem *newRs );
 
         virtual void collectLights( Camera *camera ) = 0;
+
+        bool isCacheDirty( const Camera *camera ) const;
 
         /// Cache the return value as internally we perform an O(N) search
         TexBufferPacked* getGridBuffer( Camera *camera ) const;

@@ -449,6 +449,7 @@ namespace Ogre {
         NodeMemoryManager       mNodeMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
         ObjectMemoryManager     mEntityMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
         ObjectMemoryManager     mLightMemoryManager;
+        ObjectMemoryManager     mForwardPlusMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
         SkeletonAnimManager     mSkeletonAnimationManager;
         NodeMemoryManager       mTagPointNodeMemoryManager;
         /// Filled and cleared every frame in HighLevelCull()
@@ -457,7 +458,10 @@ namespace Ogre {
         ObjectMemoryManagerVec  mEntitiesMemoryManagerCulledList;
         ObjectMemoryManagerVec  mEntitiesMemoryManagerUpdateList;
         ObjectMemoryManagerVec  mLightsMemoryManagerCulledList;
+        ObjectMemoryManagerVec  mForwardPlusMemoryManagerCullList;
         SkeletonAnimManagerVec  mSkeletonAnimManagerCulledList;
+
+        uint32                  mNumDecals;
 
         /** Minimum depth level at which mNodeMemoryManager[SCENE_STATIC] is dirty.
         @remarks
@@ -1448,6 +1452,10 @@ namespace Ogre {
         */
         virtual void destroyAllEntities(void);
 
+        virtual Decal* createDecal( SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
+        virtual void destroyDecal( Decal *decal );
+        virtual void destroyAllDecals(void);
+
         /** Creates a 2D rectangle that can be displayed for screen space effects or
             showing a basic GUI.
             Notice that due to engine's requirements, you need to attach this object
@@ -1929,6 +1937,10 @@ namespace Ogre {
             Uses the internally stored AnimationState objects to apply animation to SceneNodes.
         */
         virtual void _applySceneAnimations(void);
+
+        /// Returns true if collection code was run. When false, you cannot
+        /// trust the contents of _getTmpVisibleObjectsList to be empty
+        bool _collectForwardPlusObjects( const Camera *camera );
 
         /** Performs the frustum culling that will later be needed by _renderPhase02
             @remarks

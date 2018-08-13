@@ -41,6 +41,8 @@ THE SOFTWARE.
 namespace Ogre
 {
     //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
+    const size_t ForwardPlusBase::MinDecalRq = 0;
+    const size_t ForwardPlusBase::MaxDecalRq = 127;
     const size_t ForwardPlusBase::NumBytesPerLight = 6 * 4 * 4;
 
     ForwardPlusBase::ForwardPlusBase( SceneManager *sceneManager ) :
@@ -289,7 +291,8 @@ namespace Ogre
         return false;
     }
     //-----------------------------------------------------------------------------------
-    bool ForwardPlusBase::getCachedGridFor( Camera *camera, const CachedGrid **outCachedGrid ) const
+    bool ForwardPlusBase::getCachedGridFor( const Camera *camera,
+                                            const CachedGrid **outCachedGrid ) const
     {
         const uint32 visibilityMask = camera->getLastViewport()->getLightVisibilityMask();
 
@@ -363,6 +366,12 @@ namespace Ogre
                 ++itor;
             }
         }
+    }
+    //-----------------------------------------------------------------------------------
+    bool ForwardPlusBase::isCacheDirty( const Camera *camera ) const
+    {
+        CachedGrid const *outCachedGrid = 0;
+        return getCachedGridFor( camera, &outCachedGrid );
     }
     //-----------------------------------------------------------------------------------
     TexBufferPacked* ForwardPlusBase::getGridBuffer( Camera *camera ) const
