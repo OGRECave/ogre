@@ -42,6 +42,9 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreTechnique.h"
 
+#include "OgreRenderTexture.h"
+#include "OgreHardwarePixelBuffer.h"
+
 namespace Ogre
 {
     void CompositorPassQuadDef::addQuadTextureSource( size_t texUnitIdx, const String &textureName,
