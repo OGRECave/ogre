@@ -1754,7 +1754,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureAddressingMode( size_t stage, 
-        const TextureUnitState::UVWAddressingMode& uvw )
+        const Sampler::UVWAddressingMode& uvw )
     {
         // record the stage state
         mTexStageDesc[stage].samplerDesc.AddressU = D3D11Mappings::get(uvw.u);

@@ -1139,7 +1139,7 @@ Defines what happens when texture coordinates exceed 1.0 for this texture layer.
 @par
 Simple Format: tex\_address\_mode &lt;uvw\_mode&gt; <br> Extended Format: tex\_address\_mode &lt;u\_mode&gt; &lt;v\_mode&gt; \[&lt;w\_mode&gt;\]
 
-Valid values for both are one of Ogre::TextureUnitState::TextureAddressingMode without the `TAM_` prefix. E.g. `TAM_WRAP` becomes `wrap`.
+Valid values for both are one of Ogre::TextureAddressingMode without the `TAM_` prefix. E.g. `TAM_WRAP` becomes `wrap`.
 
 @par
 Default: tex\_address\_mode wrap
@@ -1419,7 +1419,7 @@ The indexes of the 4x4 matrix value above are expressed as m&lt;row&gt;&lt;col&g
 <a name="compare_test"></a>
 ## compare_test
 
-@copydoc Ogre::TextureUnitState::setTextureCompareEnabled
+@copydoc Ogre::Sampler::setCompareEnabled
 
 @par
 Format: compare_test on

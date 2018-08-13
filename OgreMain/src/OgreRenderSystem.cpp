@@ -307,6 +307,32 @@ namespace Ogre {
     {
         return mActiveViewport;
     }
+    void RenderSystem::_setSampler(size_t texUnit, const Sampler& s)
+    {
+        //Set texture layer compare state and function
+        _setTextureUnitCompareEnabled(texUnit,s.getCompareEnabled());
+        _setTextureUnitCompareFunction(texUnit,s.getCompareFunction());
+
+        // Set texture layer filtering
+        _setTextureUnitFiltering(texUnit, s.getFiltering(FT_MIN), s.getFiltering(FT_MAG),
+                                 s.getFiltering(FT_MIP));
+
+        // Set texture layer filtering
+        _setTextureLayerAnisotropy(texUnit, s.getAnisotropy());
+
+        // Set mipmap biasing
+        _setTextureMipmapBias(texUnit, s.getMipmapBias());
+
+        // Texture addressing mode
+        const Sampler::UVWAddressingMode& uvw = s.getAddressingMode();
+        _setTextureAddressingMode(texUnit, uvw);
+
+        // Set texture border colour only if required
+        if (uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER)
+        {
+            _setTextureBorderColour(texUnit, s.getBorderColour());
+        }
+    }
     //-----------------------------------------------------------------------
     void RenderSystem::_setTextureUnitSettings(size_t texUnit, TextureUnitState& tl)
     {
@@ -343,39 +369,12 @@ namespace Ogre {
         // Set texture coordinate set
         _setTextureCoordSet(texUnit, tl.getTextureCoordSet());
 
-        //Set texture layer compare state and function 
-        _setTextureUnitCompareEnabled(texUnit,tl.getTextureCompareEnabled());
-        _setTextureUnitCompareFunction(texUnit,tl.getTextureCompareFunction());
-
-
-        // Set texture layer filtering
-        _setTextureUnitFiltering(texUnit, 
-            tl.getTextureFiltering(FT_MIN), 
-            tl.getTextureFiltering(FT_MAG), 
-            tl.getTextureFiltering(FT_MIP));
-
-        // Set texture layer filtering
-        _setTextureLayerAnisotropy(texUnit, tl.getTextureAnisotropy());
-
-        // Set mipmap biasing
-        _setTextureMipmapBias(texUnit, tl.getTextureMipmapBias());
+        _setSampler(texUnit, *tl.getSampler());
 
         // Set blend modes
         // Note, colour before alpha is important
         _setTextureBlendMode(texUnit, tl.getColourBlendMode());
         _setTextureBlendMode(texUnit, tl.getAlphaBlendMode());
-
-        // Texture addressing mode
-        const TextureUnitState::UVWAddressingMode& uvw = tl.getTextureAddressingMode();
-        _setTextureAddressingMode(texUnit, uvw);
-
-        // Set texture border colour only if required
-        if (uvw.u == TextureUnitState::TAM_BORDER ||
-            uvw.v == TextureUnitState::TAM_BORDER ||
-            uvw.w == TextureUnitState::TAM_BORDER)
-        {
-            _setTextureBorderColour(texUnit, tl.getTextureBorderColour());
-        }
 
         // Set texture effects
         TextureUnitState::EffectMap::iterator effi;

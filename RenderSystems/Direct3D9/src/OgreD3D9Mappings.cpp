@@ -100,7 +100,7 @@ namespace Ogre
         return 0;
     }
     //---------------------------------------------------------------------
-    D3DTEXTUREADDRESS D3D9Mappings::get(TextureUnitState::TextureAddressingMode tam, const D3DCAPS9& devCaps)
+    D3DTEXTUREADDRESS D3D9Mappings::get(TextureAddressingMode tam, const D3DCAPS9& devCaps)
     {
         switch( tam )
         {

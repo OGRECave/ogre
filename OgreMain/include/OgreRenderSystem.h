@@ -450,6 +450,8 @@ namespace Ogre
         unit, thus minimising render state changes.
         */
         virtual void _setTextureUnitSettings(size_t texUnit, TextureUnitState& tl);
+        /// set the sampler settings for the given texture unit
+        virtual void _setSampler(size_t texUnit, Sampler& s);
         OGRE_DEPRECATED virtual void _setBindingType(TextureUnitState::BindingType bindigType) {}
         /** Turns off a texture unit. */
         virtual void _disableTextureUnit(size_t texUnit);
@@ -615,7 +617,7 @@ namespace Ogre
         virtual void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy) = 0;
 
         /** Sets the texture addressing mode for a texture unit.*/
-        virtual void _setTextureAddressingMode(size_t unit, const TextureUnitState::UVWAddressingMode& uvw) = 0;
+        virtual void _setTextureAddressingMode(size_t unit, const Sampler::UVWAddressingMode& uvw) = 0;
 
         /** Sets the texture border colour for a texture unit.*/
         virtual void _setTextureBorderColour(size_t unit, const ColourValue& colour) = 0;

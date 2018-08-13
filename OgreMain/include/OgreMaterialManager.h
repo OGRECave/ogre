@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreResourceManager.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreTextureUnitState.h"
 
 namespace Ogre {
 
@@ -118,22 +119,6 @@ namespace Ogre {
         };
 
     protected:
-
-        /// Default Texture filtering - minification
-        FilterOptions mDefaultMinFilter;
-        /// Default Texture filtering - magnification
-        FilterOptions mDefaultMagFilter;
-        /// Default Texture filtering - mipmapping
-        FilterOptions mDefaultMipFilter;
-        /// Default Texture filtering - comparison
-        FilterOptions mDefaultCompare;
-
-        bool            mDefaultCompareEnabled;
-        CompareFunction mDefaultCompareFunction;
-
-        /// Default Texture anisotropy
-        unsigned int mDefaultMaxAniso;
-
         /// Default settings
         MaterialPtr mDefaultSettings;
 

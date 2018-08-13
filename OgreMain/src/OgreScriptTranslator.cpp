@@ -463,7 +463,7 @@ namespace Ogre{
         return true;
     }
 
-    template<> bool getValue(const AbstractNodePtr& node, TextureUnitState::TextureAddressingMode& result)
+    template<> bool getValue(const AbstractNodePtr& node, TextureAddressingMode& result)
     {
         if(node->type != ANT_ATOM)
             return false;
@@ -2674,7 +2674,7 @@ namespace Ogre{
                             AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
                                 i1 = getNodeAt(prop->values, 1),
                                 i2 = getNodeAt(prop->values, 2);
-                            TextureUnitState::UVWAddressingMode mode;
+                            Sampler::UVWAddressingMode mode;
 
                             if(!getValue(*i0, mode.u))
                             {

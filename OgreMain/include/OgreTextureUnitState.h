@@ -42,9 +42,188 @@ namespace Ogre {
     /** \addtogroup Materials
     *  @{
     */
+
+    /** Class which determines how a TextureUnitState accesses data from a Texture
+
+        There are a number of parameters affecting how texture data is featched.
+        Most notably @ref FilterOptions and @ref TextureAddressingMode.
+     */
+    class _OgreExport Sampler {
+    public:
+        /** Texture addressing mode for each texture coordinate. */
+        struct UVWAddressingMode
+        {
+            TextureAddressingMode u, v, w;
+        };
+
+        Sampler();
+        virtual ~Sampler();
+
+        /** Set the texture filtering for this unit, using the simplified interface.
+
+            You also have the option of specifying the minification, magnification
+            and mip filter individually if you want more control over filtering
+            options. See the alternative setTextureFiltering methods for details.
+        @param filterType
+            The high-level filter type to use.
+        */
+        void setFiltering(TextureFilterOptions filterType);
+        /** Set a single filtering option on this texture unit.
+        @param ftype
+            The filtering type to set.
+        @param opts
+            The filtering option to set.
+        */
+        void setFiltering(FilterType ftype, FilterOptions opts);
+        /** Set a the detailed filtering options on this texture unit.
+        @param minFilter
+            The filtering to use when reducing the size of the texture.
+            Can be Ogre::FO_POINT, Ogre::FO_LINEAR or Ogre::FO_ANISOTROPIC.
+        @param magFilter
+            The filtering to use when increasing the size of the texture.
+            Can be Ogre::FO_POINT, Ogre::FO_LINEAR or Ogre::FO_ANISOTROPIC.
+        @param mipFilter
+            The filtering to use between mip levels.
+            Can be Ogre::FO_NONE (turns off mipmapping), Ogre::FO_POINT or Ogre::FO_LINEAR (trilinear filtering).
+        */
+        void setFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter);
+        /// Get the texture filtering for the given type.
+        FilterOptions getFiltering(FilterType ftype) const;
+
+        /** Gets the texture addressing mode for a given coordinate,
+            i.e. what happens at uv values above 1.0.
+        @note
+            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
+        */
+        const UVWAddressingMode& getAddressingMode() const { return mAddressMode; }
+
+        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
+
+            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
+            This is a shortcut method which sets the addressing mode for all
+            coordinates at once; you can also call the more specific method
+            to set the addressing mode per coordinate.
+
+            This is a shortcut method which sets the addressing mode for all
+            coordinates at once; you can also call the more specific method
+            to set the addressing mode per coordinate.
+        */
+        void setAddressingMode(TextureAddressingMode tam) { setAddressingMode({tam, tam, tam}); }
+
+        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
+
+            The default is #TAM_WRAP i.e. the texture repeats over values of 1.0.
+        */
+        void setAddressingMode(TextureAddressingMode u, TextureAddressingMode v,
+                               TextureAddressingMode w)
+        {
+            setAddressingMode({u, v, w});
+        }
+        /// @overload
+        void setAddressingMode(const UVWAddressingMode& uvw);
+
+        /** Sets the anisotropy level to be used for this texture level.
+
+        The degree of anisotropy is the ratio between the height of the texture segment visible in a
+        screen space region versus the width - so for example a floor plane, which stretches on into
+        the distance and thus the vertical texture coordinates change much faster than the
+        horizontal ones, has a higher anisotropy than a wall which is facing you head on (which has
+        an anisotropy of 1 if your line of sight is perfectly perpendicular to it).The maximum value
+        is determined by the hardware, but it is usually 8 or 16.
+
+        In order for this to be used, you have to set the minification and/or the magnification
+        option on this texture to Ogre::FO_ANISOTROPIC.
+        @param maxAniso
+            The maximal anisotropy level, should be between 2 and the maximum
+            supported by hardware (1 is the default, ie. no anisotrophy).
+        */
+        void setAnisotropy(unsigned int maxAniso)
+        {
+            mMaxAniso = maxAniso;
+            mDirty = true;
+        }
+        /// Get this layer texture anisotropy level.
+        unsigned int getAnisotropy() const { return mMaxAniso; }
+
+        /** Sets the bias value applied to the mipmap calculation.
+
+            You can alter the mipmap calculation by biasing the result with a
+            single floating point value. After the mip level has been calculated,
+            this bias value is added to the result to give the final mip level.
+            Lower mip levels are larger (higher detail), so a negative bias will
+            force the larger mip levels to be used, and a positive bias
+            will cause smaller mip levels to be used. The bias values are in
+            mip levels, so a -1 bias will force mip levels one larger than by the
+            default calculation.
+
+            In order for this option to be used, your hardware has to support mipmap biasing
+            (exposed through Ogre::RSC_MIPMAP_LOD_BIAS), and your minification filtering has to be
+            set to point or linear.
+        */
+        void setMipmapBias(float bias)
+        {
+            mMipmapBias = bias;
+            mDirty = true;
+        }
+        /** Gets the bias value applied to the mipmap calculation.
+        @see TextureUnitState::setTextureMipmapBias
+        */
+        float getMipmapBias(void) const { return mMipmapBias; }
+
+        /** Enables or disables the comparison test for depth textures.
+         *
+         * When enabled, sampling the texture returns how the sampled value compares against a
+         * reference value instead of the sampled value itself. Combined with linear filtering this
+         * can be used to implement hardware PCF for shadow maps.
+         */
+        void setCompareEnabled(bool enabled)
+        {
+            mCompareEnabled = enabled;
+            mDirty = true;
+        }
+        bool getCompareEnabled() const { return mCompareEnabled; }
+
+        void setCompareFunction(CompareFunction function)
+        {
+            mCompareFunc = function;
+            mDirty = true;
+        }
+        CompareFunction getCompareFunction() const { return mCompareFunc; }
+
+        /** Sets the texture border colour.
+
+            The default is ColourValue::Black, and this value only used when addressing mode
+            is TAM_BORDER.
+        */
+        void setBorderColour(const ColourValue& colour)
+        {
+            mBorderColour = colour;
+            mDirty = true;
+        }
+        const ColourValue& getBorderColour(void) const { return mBorderColour; }
+
+    protected:
+        UVWAddressingMode mAddressMode;
+        ColourValue mBorderColour;
+        /// Texture filtering - minification.
+        FilterOptions mMinFilter;
+        /// Texture filtering - magnification.
+        FilterOptions mMagFilter;
+        /// Texture filtering - mipmapping.
+        FilterOptions mMipFilter;
+        CompareFunction mCompareFunc;
+        /// Texture anisotropy.
+        unsigned int mMaxAniso;
+        /// Mipmap bias (always float, not Real).
+        float mMipmapBias;
+        bool mCompareEnabled : 1;
+        bool mDirty : 1; // flag for derived classes to sync with implementation
+    };
+    typedef std::shared_ptr<Sampler> SamplerPtr;
+
     /** Class representing the state of a single texture unit during a Pass of a
         Technique, of a Material.
-    @remarks
+
         Texture units are pipelines for retrieving texture data for rendering onto
         your objects in the world. Using them is common to both the fixed-function and 
         the programmable (vertex and fragment program) pipeline, but some of the 
@@ -52,7 +231,7 @@ namespace Ogre {
         setting a texture rotation will have no effect if you use the programmable
         pipeline, because this is overridden by the fragment program). The effect
         of each setting as regards the 2 pipelines is commented in each setting.
-    @par
+
         When I use the term 'fixed-function pipeline' I mean traditional rendering
         where you do not use vertex or fragment programs (shaders). Programmable 
         pipeline means that for this pass you are using vertex or fragment programs.
@@ -107,30 +286,15 @@ namespace Ogre {
             TT_ROTATE
         };
 
-        /** Texture addressing modes - default is TAM_WRAP.
-        */
-        enum TextureAddressingMode
-        {
-            /// %Any value beyond 1.0 wraps back to 0.0. %Texture is repeated.
-            TAM_WRAP,
-            /// %Texture flips every boundary, meaning texture is mirrored every 1.0 u or v
-            TAM_MIRROR,
-            /// Values beyond 1.0 are clamped to 1.0. %Texture ’streaks’ beyond 1.0 since last line
-            /// of pixels is used across the rest of the address space. Useful for textures which
-            /// need exact coverage from 0.0 to 1.0 without the ’fuzzy edge’ wrap gives when
-            /// combined with filtering.
-            TAM_CLAMP,
-            /// %Texture coordinates outside the range [0.0, 1.0] are set to the border colour.
-            TAM_BORDER,
-            /// Unknown
-            TAM_UNKNOWN = 99
-        };
 
-        /** Texture addressing mode for each texture coordinate. */
-        struct UVWAddressingMode
-        {
-            TextureAddressingMode u, v, w;
-        };
+        static const Ogre::TextureAddressingMode TAM_WRAP = Ogre::TAM_WRAP;
+        static const Ogre::TextureAddressingMode TAM_MIRROR = Ogre::TAM_MIRROR;
+        static const Ogre::TextureAddressingMode TAM_CLAMP = Ogre::TAM_CLAMP;
+        static const Ogre::TextureAddressingMode TAM_BORDER = Ogre::TAM_BORDER;
+        static const Ogre::TextureAddressingMode TAM_UNKNOWN = Ogre::TAM_UNKNOWN;
+
+        OGRE_DEPRECATED typedef Ogre::TextureAddressingMode TextureAddressingMode;
+        OGRE_DEPRECATED typedef Sampler::UVWAddressingMode UVWAddressingMode;
 
         /** Enum identifying the frame indexes for faces of a cube map (not the composite 3D type.
         */
@@ -538,52 +702,63 @@ namespace Ogre {
         /// Get texture rotation effects angle value.
         const Radian& getTextureRotate(void) const;
 
-        /** Gets the texture addressing mode for a given coordinate, 
-            i.e. what happens at uv values above 1.0.
-        @note
-            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
-        */
-        const UVWAddressingMode& getTextureAddressingMode(void) const;
+        /// get the associated sampler
+        const SamplerPtr& getSampler() const { return mSampler; }
+        void setSampler(const SamplerPtr& sampler) { mSampler = sampler; }
 
-        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
+        /// @copydoc Sampler::setAddressingMode
+        const Sampler::UVWAddressingMode& getTextureAddressingMode(void) const
+        {
+            return mSampler->getAddressingMode();
+        }
+        /// @copydoc Sampler::setAddressingMode
+        void setTextureAddressingMode( Ogre::TextureAddressingMode tam) { _getLocalSampler()->setAddressingMode(tam); }
+        /// @copydoc Sampler::setAddressingMode
+        void setTextureAddressingMode(Ogre::TextureAddressingMode u, Ogre::TextureAddressingMode v,
+                                      Ogre::TextureAddressingMode w)
+        {
+            _getLocalSampler()->setAddressingMode(u, v, w);
+        }
+        /// @copydoc Sampler::setAddressingMode
+        void setTextureAddressingMode( const Sampler::UVWAddressingMode& uvw) { _getLocalSampler()->setAddressingMode(uvw); }
+        /// @copydoc Sampler::setBorderColour
+        void setTextureBorderColour(const ColourValue& colour) { _getLocalSampler()->setBorderColour(colour); }
+        /// @copydoc Sampler::getBorderColour
+        const ColourValue& getTextureBorderColour() const { return mSampler->getBorderColour(); }
+        /// @copydoc Sampler::setFiltering
+        void setTextureFiltering(TextureFilterOptions filterType)
+        {
+            _getLocalSampler()->setFiltering(filterType);
+        }
+        /// @copydoc Sampler::setFiltering
+        void setTextureFiltering(FilterType ftype, FilterOptions opts)
+        {
+            _getLocalSampler()->setFiltering(ftype, opts);
+        }
+        /// @copydoc Sampler::setFiltering
+        void setTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter)
+        {
+            _getLocalSampler()->setFiltering(minFilter, magFilter, mipFilter);
+        }
+        /// @copydoc Sampler::getFiltering
+        FilterOptions getTextureFiltering(FilterType ftype) const { return mSampler->getFiltering(ftype); }
+        /// @copydoc Sampler::setCompareEnabled
+        void setTextureCompareEnabled(bool enabled) { _getLocalSampler()->setCompareEnabled(enabled); }
+        /// @copydoc Sampler::getCompareEnabled
+        bool getTextureCompareEnabled() const { return mSampler->getCompareEnabled(); }
+        /// @copydoc Sampler::setCompareFunction
+        void setTextureCompareFunction(CompareFunction function) { _getLocalSampler()->setCompareFunction(function); }
+        /// @copydoc Sampler::getCompareFunction
+        CompareFunction getTextureCompareFunction() const { return mSampler->getCompareFunction(); }
+        /// @copydoc Sampler::setAnisotropy
+        void setTextureAnisotropy(unsigned int maxAniso) { _getLocalSampler()->setAnisotropy(maxAniso); }
+        /// @copydoc Sampler::getAnisotropy
+        unsigned int getTextureAnisotropy() const { return mSampler->getAnisotropy(); }
+        /// @copydoc Sampler::setMipmapBias
+        void setTextureMipmapBias(float bias) { _getLocalSampler()->setMipmapBias(bias); }
+        /// @copydoc Sampler::getMipmapBias
+        float getTextureMipmapBias(void) const { return mSampler->getMipmapBias(); }
 
-            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
-            This is a shortcut method which sets the addressing mode for all
-            coordinates at once; you can also call the more specific method
-            to set the addressing mode per coordinate.
-
-            This is a shortcut method which sets the addressing mode for all
-            coordinates at once; you can also call the more specific method
-            to set the addressing mode per coordinate.
-        */
-        void setTextureAddressingMode( TextureAddressingMode tam);
-
-        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
-
-            The default is #TAM_WRAP i.e. the texture repeats over values of 1.0.
-        */
-        void setTextureAddressingMode( TextureAddressingMode u, 
-            TextureAddressingMode v, TextureAddressingMode w);
-
-        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
-
-            The default is #TAM_WRAP i.e. the texture repeats over values of 1.0.
-        */
-        void setTextureAddressingMode( const UVWAddressingMode& uvw);
-
-        /** Sets the texture border colour.
-
-            The default is ColourValue::Black, and this value only used when addressing mode
-            is TAM_BORDER.
-        */
-        void setTextureBorderColour(const ColourValue& colour);
-
-        /** Sets the texture border colour.
-
-            The default is ColourValue::Black, and this value only used when addressing mode
-            is TAM_BORDER.
-        */
-        const ColourValue& getTextureBorderColour(void) const;
 
         /** Setting advanced blending options.
 
@@ -872,90 +1047,8 @@ namespace Ogre {
         /// Get the animated-texture animation duration.
         Real getAnimationDuration(void) const;
 
-        /** Set the texture filtering for this unit, using the simplified interface.
-
-            You also have the option of specifying the minification, magnification
-            and mip filter individually if you want more control over filtering
-            options. See the alternative setTextureFiltering methods for details.
-        @param filterType
-            The high-level filter type to use.
-        */
-        void setTextureFiltering(TextureFilterOptions filterType);
-        /** Set a single filtering option on this texture unit. 
-        @param ftype
-            The filtering type to set.
-        @param opts
-            The filtering option to set.
-        */
-        void setTextureFiltering(FilterType ftype, FilterOptions opts);
-        /** Set a the detailed filtering options on this texture unit. 
-        @param minFilter
-            The filtering to use when reducing the size of the texture. 
-            Can be Ogre::FO_POINT, Ogre::FO_LINEAR or Ogre::FO_ANISOTROPIC.
-        @param magFilter
-            The filtering to use when increasing the size of the texture.
-            Can be Ogre::FO_POINT, Ogre::FO_LINEAR or Ogre::FO_ANISOTROPIC.
-        @param mipFilter
-            The filtering to use between mip levels.
-            Can be Ogre::FO_NONE (turns off mipmapping), Ogre::FO_POINT or Ogre::FO_LINEAR (trilinear filtering).
-        */
-        void setTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter);
-        /// Get the texture filtering for the given type.
-        FilterOptions getTextureFiltering(FilterType ftpye) const;
-        /// Returns true if texture filtering was not set explicitly and is determined by MaterialManager.
-        bool isDefaultFiltering() const     { return mIsDefaultFiltering; }
-
-        /** Enables or disables the comparison test for depth textures.
-         *
-         * When enabled, sampling the texture returns how the sampled value compares against a
-         * reference value instead of the sampled value itself. Combined with linear filtering this
-         * can be used to implement hardware PCF for shadow maps.
-         */
-        void setTextureCompareEnabled(bool enabled);
-        bool getTextureCompareEnabled() const;
-    
-        void setTextureCompareFunction(CompareFunction function);
-        CompareFunction getTextureCompareFunction() const;
-
-        /** Sets the anisotropy level to be used for this texture level.
-
-        The degree of anisotropy is the ratio between the height of the texture segment visible in a
-        screen space region versus the width - so for example a floor plane, which stretches on into
-        the distance and thus the vertical texture coordinates change much faster than the
-        horizontal ones, has a higher anisotropy than a wall which is facing you head on (which has
-        an anisotropy of 1 if your line of sight is perfectly perpendicular to it).The maximum value
-        is determined by the hardware, but it is usually 8 or 16.
-
-        In order for this to be used, you have to set the minification and/or the magnification
-        option on this texture to Ogre::FO_ANISOTROPIC.
-        @param maxAniso
-            The maximal anisotropy level, should be between 2 and the maximum
-            supported by hardware (1 is the default, ie. no anisotrophy).
-        */
-        void setTextureAnisotropy(unsigned int maxAniso);
-        /// Get this layer texture anisotropy level.
-        unsigned int getTextureAnisotropy() const;
-
-        /** Sets the bias value applied to the mipmap calculation.
-
-            You can alter the mipmap calculation by biasing the result with a
-            single floating point value. After the mip level has been calculated,
-            this bias value is added to the result to give the final mip level.
-            Lower mip levels are larger (higher detail), so a negative bias will
-            force the larger mip levels to be used, and a positive bias
-            will cause smaller mip levels to be used. The bias values are in
-            mip levels, so a -1 bias will force mip levels one larger than by the
-            default calculation.
-
-            In order for this option to be used, your hardware has to support mipmap biasing
-            (exposed through Ogre::RSC_MIPMAP_LOD_BIAS), and your minification filtering has to be
-            set to point or linear.
-        */
-        void setTextureMipmapBias(float bias) { mMipmapBias = bias; }
-        /** Gets the bias value applied to the mipmap calculation.
-        @see TextureUnitState::setTextureMipmapBias
-        */
-        float getTextureMipmapBias(void) const { return mMipmapBias; }
+        /// Returns true if this texture unit is using the default Sampler
+        bool isDefaultFiltering() const;
 
         /** Set the compositor reference for this texture unit state.
 
@@ -1048,6 +1141,9 @@ namespace Ogre {
             if it exists.
         */
         Controller<Real>* _getAnimController() const { return mAnimController; }
+
+        /// return a sampler local to this TUS instead of the shared global one
+        const SamplerPtr& _getLocalSampler();
 protected:
         // State
         /// The current animation frame.
@@ -1058,8 +1154,6 @@ protected:
         bool mCubic; /// Is this a series of 6 2D textures to make up a cube?
 
         unsigned int mTextureCoordSetIndex;
-        UVWAddressingMode mAddressMode;
-        ColourValue mBorderColour;
 
         LayerBlendModeEx mColourBlendMode;
         SceneBlendFactor mColourBlendFallbackSrc;
@@ -1075,23 +1169,6 @@ protected:
         Radian mRotate;
         mutable Matrix4 mTexModMatrix;
 
-        /// Texture filtering - minification.
-        FilterOptions mMinFilter;
-        /// Texture filtering - magnification.
-        FilterOptions mMagFilter;
-        /// Texture filtering - mipmapping.
-        FilterOptions mMipFilter;
-
-        bool mCompareEnabled;
-        CompareFunction mCompareFunc;
-
-        /// Texture anisotropy.
-        unsigned int mMaxAniso;
-        /// Mipmap bias (always float, not Real).
-        float mMipmapBias;
-
-        bool mIsDefaultAniso;
-        bool mIsDefaultFiltering;
         /// Binding type (fragment, vertex, tesselation hull and domain pipeline).
         BindingType mBindingType;
         /// Content type of texture (normal loaded texture, auto-texture).
@@ -1104,6 +1181,7 @@ protected:
         // allow for fast copying of the basic members.
         //
         mutable std::vector<TexturePtr> mFramePtrs;
+        SamplerPtr mSampler;
         String mName;               ///< Optional name for the TUS.
         String mTextureNameAlias;   ///< Optional alias for texture frames.
         EffectMap mEffects;

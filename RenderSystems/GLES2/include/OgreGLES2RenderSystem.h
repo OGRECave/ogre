@@ -106,7 +106,7 @@ namespace Ogre {
             GLSLESProgram* mCurrentVertexProgram;
             GLSLESProgram* mCurrentFragmentProgram;
 
-            GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
+            GLint getTextureAddressingMode(TextureAddressingMode tam) const;
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
             void bindVertexElementToGpu(const VertexElement& elem,
                                         const HardwareVertexBufferSharedPtr& vertexBuffer,
@@ -169,7 +169,7 @@ namespace Ogre {
 
             void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
 
-            void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
+            void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
 
             void _setTextureBorderColour(size_t stage, const ColourValue& colour) { };   // Not supported
 

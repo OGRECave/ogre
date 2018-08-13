@@ -39,7 +39,7 @@ namespace Ogre
 	{
 	public:
 		/// return a D3D11 equivalent for a Ogre TextureAddressingMode value
-		static D3D11_TEXTURE_ADDRESS_MODE get(TextureUnitState::TextureAddressingMode tam);
+		static D3D11_TEXTURE_ADDRESS_MODE get(TextureAddressingMode tam);
 		/// return a D3D11 equivalent for a Ogre SceneBlendFactor value
 		static D3D11_BLEND get(SceneBlendFactor sbf, bool forAlpha);
 		/// return a D3D11 equivalent for a Ogre SceneBlendOperation value

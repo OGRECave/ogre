@@ -1329,7 +1329,7 @@ namespace Ogre {
                 WT_MIRRORCLAMPTOBORDER // MirrorClampToBorder
             };
             virtual void createState();
-            TextureUnitState::TextureAddressingMode getOgreTextureAddressingMode( CGstateassignment cgStateAssignment );
+            TextureAddressingMode getOgreTextureAddressingMode( CGstateassignment cgStateAssignment );
         public:
             CgWrapSamplerStateListener(const SamplerStateType samplerStateType);
             virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );

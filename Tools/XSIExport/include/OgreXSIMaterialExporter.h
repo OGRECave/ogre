@@ -97,7 +97,7 @@ namespace Ogre {
         void clearPassQueue(void);
 
         SceneBlendFactor convertSceneBlend(short xsiVal);
-        TextureUnitState::TextureAddressingMode convertAddressingMode(short xsiVal);
+        TextureAddressingMode convertAddressingMode(short xsiVal);
         void convertTexGenOGL(TextureUnitState* tex, long xsiVal, XSI::Shader& shader);
         void convertTexGenDX(TextureUnitState* tex, long xsiVal, XSI::Shader& shader);
     };
