@@ -314,7 +314,7 @@ namespace Ogre
         Vector(T _x, T _y, T _z) : VectorBase<dims, T>(_x, _y, _z) {}
         Vector(T _x, T _y, T _z, T _w) : VectorBase<dims, T>(_x, _y, _z, _w) {}
 
-        template <int N = dims, typename = typename std::enable_if<N == 4>::type>
+        template <int N = dims, typename std::enable_if<N == 4>::type* = nullptr>
         explicit Vector(const Vector3& rhs, T fW = 1.0f) : VectorBase<dims, T>(rhs.x, rhs.y, rhs.z, fW) {}
 
         template<typename U>
