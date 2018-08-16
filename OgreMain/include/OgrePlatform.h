@@ -310,15 +310,15 @@ namespace Ogre {
 #   if !defined(NDEBUG) && !defined(_DEBUG) && !defined(DEBUG) && !defined(OGRE_IGNORE_UNKNOWN_DEBUG)
 #       pragma message (\
          "Ogre can't tell whether this is a debug build. If it is, please add _DEBUG to the preprocessor definitions. "\
-         "Otherwise, you can set OGRE_IGNORE_UNKNOWN_DEBUG to surpress this warning. Ogre will assume this is not a "\
+         "Otherwise, you can set OGRE_IGNORE_UNKNOWN_DEBUG to suppress this warning. Ogre will assume this is not a "\
          "debug build by default. To add _DEBUG with g++, invoke g++ with the argument -D _DEBUG. To add it in CMake, "\
-         "include set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_DEBUG \"_DEBUG\") in the upper "\
+         "include “if (CMAKE_BUILD_TYPE STREQUAL "Debug") add_compile_definitions(_DEBUG) endif()” in the upper "\
          "CMakeLists.txt file. IDE's usually provide the possibility to add preprocessor definitions in the build "\
          "settings. You can also manually set OGRE_DEBUG_MODE to either 1 or 0 instead of adding _DEBUG.")
 #   endif
 #   if defined(NDEBUG) && defined(_DEBUG) && !defined(OGRE_IGNORE_DEBUG_FLAG_CONTRADICTION)
 #       pragma message (\
-         "You have both NDEBUG and _DEBUG defined. Ogre will assume you're running a debug build. To surpress this "\
+         "You have both NDEBUG and _DEBUG defined. Ogre will assume you're running a debug build. To suppress this "\
          "warning, set OGRE_IGNORE_DEBUG_FLAG_CONTRADICTION.")
 #   endif
 
