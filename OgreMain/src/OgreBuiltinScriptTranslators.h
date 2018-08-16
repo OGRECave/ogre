@@ -78,6 +78,12 @@ namespace Ogre{
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
     };
 
+    struct SamplerTranslator : public ScriptTranslator
+    {
+        static void translateSamplerParam(ScriptCompiler *compiler, const SamplerPtr& sampler, PropertyAbstractNode* node);
+        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+    };
+
     class TextureSourceTranslator : public ScriptTranslator
     {
     public:
@@ -169,7 +175,6 @@ namespace Ogre{
         CompositionPassTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
     };
-
     /**************************************************************************
      * BuiltinScriptTranslatorManager
      *************************************************************************/
@@ -181,6 +186,7 @@ namespace Ogre{
         TechniqueTranslator mTechniqueTranslator;
         PassTranslator mPassTranslator;
         TextureUnitTranslator mTextureUnitTranslator;
+        SamplerTranslator mSamplerTranslator;
         TextureSourceTranslator mTextureSourceTranslator;
         GpuProgramTranslator mGpuProgramTranslator;
         SharedParamsTranslator mSharedParamsTranslator;

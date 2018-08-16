@@ -109,6 +109,12 @@ vertex_program Ogre/CelShadingVP unified
 //    shared_param_named specular float4 0.3 0.5 0.3 1.0
 //}
 
+sampler CelShading
+{
+	tex_address_mode clamp
+	filtering none
+}
+
 material Examples/CelShading
 {
 	technique
@@ -131,20 +137,17 @@ material Examples/CelShading
 			texture_unit
 			{
 				texture cel_shading_diffuse.png 1d
-				tex_address_mode clamp
-				filtering none
+				sampler_ref CelShading
 			}
 			texture_unit
 			{
 				texture cel_shading_specular.png 1d
-				tex_address_mode clamp
-				filtering none
+				sampler_ref CelShading
 			}
 			texture_unit
 			{
 				texture cel_shading_edge.png 1d
-				tex_address_mode clamp
-				filtering none
+				sampler_ref CelShading
 			}
 		}
 	}

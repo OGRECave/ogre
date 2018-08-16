@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgreDepthBuffer.h"
 #include "OgreParticleSystem.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreGpuProgramUsage.h"
 
 namespace Ogre{
 
@@ -2324,7 +2325,14 @@ namespace Ogre{
         Pass *pass = getPass(compiler, node);
         if(!pass) return;
 
-        pass->setGpuProgram(type, node->name);
+        auto program = GpuProgramUsage::_getProgramByName(node->name, pass->getResourceGroup(), type);
+        if (!program) {
+            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file,
+                               node->line, node->name);
+            return;
+        }
+
+        pass->setGpuProgram(type, program);
         if(pass->getGpuProgram(type)->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getGpuProgramParameters(type);
@@ -2392,6 +2400,193 @@ namespace Ogre{
     {
     }
     //-------------------------------------------------------------------------
+    void SamplerTranslator::translateSamplerParam(ScriptCompiler* compiler, const SamplerPtr& sampler, PropertyAbstractNode* prop)
+    {
+        bool bval;
+        Real fval;
+        uint32 uival;
+
+        switch(prop->id)
+        {
+        case ID_TEX_ADDRESS_MODE:
+            {
+                if(prop->values.empty())
+                {
+                    compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                }
+                else
+                {
+                    AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
+                        i1 = getNodeAt(prop->values, 1),
+                        i2 = getNodeAt(prop->values, 2);
+                    Sampler::UVWAddressingMode mode;
+
+                    if(!getValue(*i0, mode.u))
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                           (*i0)->getValue() + " not supported as first argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
+                    }
+                    mode.v = mode.u;
+                    mode.w = mode.u;
+
+                    if(i1 != prop->values.end())
+                    {
+                        if(!getValue(*i1, mode.v))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               (*i1)->getValue() + " not supported as second argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
+                        }
+                    }
+
+                    if(i2 != prop->values.end())
+                    {
+                        if(!getValue(*i2, mode.w))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               (*i2)->getValue() + " not supported as third argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
+                        }
+                    }
+
+                    sampler->setAddressingMode(mode);
+                }
+            }
+            break;
+        case ID_TEX_BORDER_COLOUR:
+            if(prop->values.empty())
+            {
+                compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+            }
+            else
+            {
+                ColourValue val;
+                if(getColour(prop->values.begin(), prop->values.end(), &val))
+                    sampler->setBorderColour(val);
+                else
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                       "tex_border_colour only accepts a colour argument");
+            }
+            break;
+        case ID_FILTERING:
+            if(prop->values.empty())
+            {
+                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+            }
+            else if(prop->values.size() == 1)
+            {
+                if(prop->values.front()->type == ANT_ATOM)
+                {
+                    AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
+                    switch(atom->id)
+                    {
+                    case ID_NONE:
+                        sampler->setFiltering(TFO_NONE);
+                        break;
+                    case ID_BILINEAR:
+                        sampler->setFiltering(TFO_BILINEAR);
+                        break;
+                    case ID_TRILINEAR:
+                        sampler->setFiltering(TFO_TRILINEAR);
+                        break;
+                    case ID_ANISOTROPIC:
+                        sampler->setFiltering(TFO_ANISOTROPIC);
+                        break;
+                    default:
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                           prop->values.front()->getValue() + " not supported as first argument (must be \"none\", \"bilinear\", \"trilinear\", or \"anisotropic\")");
+                    }
+                }
+                else
+                {
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                       prop->values.front()->getValue() + " not supported as first argument (must be \"none\", \"bilinear\", \"trilinear\", or \"anisotropic\")");
+                }
+            }
+            else if(prop->values.size() == 3)
+            {
+                AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
+                    i1 = getNodeAt(prop->values, 1),
+                    i2 = getNodeAt(prop->values, 2);
+                FilterOptions tmin, tmax, tmip;
+                if (getValue(*i0, tmin) && getValue(*i1, tmax) && getValue(*i2, tmip))
+                {
+                    sampler->setFiltering(tmin, tmax, tmip);
+                }
+                else
+                {
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                }
+            }
+            else
+            {
+                compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                   "filtering must have either 1 or 3 arguments");
+            }
+            break;
+        case ID_CMPTEST:
+            if(getValue(prop, compiler, bval))
+                sampler->setCompareEnabled(bval);
+            break;
+        case ID_CMPFUNC:
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
+                prop->line,
+                "compare_func is deprecated. Use comp_func.");
+            OGRE_FALLTHROUGH;
+        case ID_COMP_FUNC:
+            CompareFunction func;
+            if(getValue(prop, compiler, func))
+                sampler->setCompareFunction(func);
+            break;
+        case ID_MAX_ANISOTROPY:
+            if(getValue(prop, compiler, uival))
+                sampler->setAnisotropy(uival);
+            break;
+        case ID_MIPMAP_BIAS:
+            if(getValue(prop, compiler, fval))
+                sampler->setMipmapBias(fval);
+            break;
+        }
+    }
+    void SamplerTranslator::translate(ScriptCompiler *compiler, const Ogre::AbstractNodePtr &node)
+    {
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
+
+        if(obj->name.empty())
+        {
+            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
+            return;
+        }
+
+        SamplerPtr sampler = TextureManager::getSingleton().createSampler(obj->name);
+
+        // Set the properties for the material
+        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_PROPERTY)
+            {
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
+                switch(prop->id)
+                {
+                case ID_TEX_ADDRESS_MODE:
+                case ID_TEX_BORDER_COLOUR:
+                case ID_FILTERING:
+                case ID_CMPTEST:
+                case ID_COMP_FUNC:
+                case ID_MAX_ANISOTROPY:
+                case ID_MIPMAP_BIAS:
+                    translateSamplerParam(compiler, sampler, prop);
+                    break;
+                default:
+                    compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
+                                       "token \"" + prop->name + "\" is not recognized");
+                }
+            }
+            else if((*i)->type == ANT_OBJECT)
+            {
+                processNode(compiler, *i);
+            }
+        }
+    }
+
     void TextureUnitTranslator::translate(ScriptCompiler *compiler, const Ogre::AbstractNodePtr &node)
     {
         ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
@@ -2404,7 +2599,6 @@ namespace Ogre{
         if(!obj->name.empty())
             mUnit->setName(obj->name);
 
-        bool bval;
         Real fval;
         uint32 uival;
         String sval;
@@ -2417,6 +2611,27 @@ namespace Ogre{
                 PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
+                case ID_TEX_ADDRESS_MODE:
+                case ID_TEX_BORDER_COLOUR:
+                case ID_FILTERING:
+                case ID_CMPTEST:
+                case ID_CMPFUNC:
+                case ID_COMP_FUNC:
+                case ID_MAX_ANISOTROPY:
+                case ID_MIPMAP_BIAS:
+                    SamplerTranslator::translateSamplerParam(compiler, mUnit->_getLocalSampler(), prop);
+                    break;
+                case ID_SAMPLER_REF:
+                    if(getValue(prop, compiler, sval))
+                    {
+                        auto sampler = TextureManager::getSingleton().getSampler(sval);
+                        if(sampler)
+                            mUnit->setSampler(sampler);
+                        else
+                            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT,
+                                               prop->file, prop->line, sval);
+                    }
+                    break;
                 case ID_TEXTURE_ALIAS:
                     if(getValue(prop, compiler, sval))
                         mUnit->setTextureNameAlias(sval);
@@ -2663,142 +2878,7 @@ namespace Ogre{
                     if(getValue(prop, compiler, uival))
                         mUnit->setTextureCoordSet(uival);
                     break;
-                case ID_TEX_ADDRESS_MODE:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        }
-                        else
-                        {
-                            AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
-                                i1 = getNodeAt(prop->values, 1),
-                                i2 = getNodeAt(prop->values, 2);
-                            Sampler::UVWAddressingMode mode;
 
-                            if(!getValue(*i0, mode.u))
-                            {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   (*i0)->getValue() + " not supported as first argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
-                            }
-                            mode.v = mode.u;
-                            mode.w = mode.u;
-
-                            if(i1 != prop->values.end())
-                            {
-                                if(!getValue(*i1, mode.v))
-                                {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*i1)->getValue() + " not supported as second argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
-                                }
-                            }
-
-                            if(i2 != prop->values.end())
-                            {
-                                if(!getValue(*i2, mode.w))
-                                {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*i2)->getValue() + " not supported as third argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
-                                }
-                            }
-
-                            mUnit->setTextureAddressingMode(mode);
-                        }
-                    }
-                    break;
-                case ID_TEX_BORDER_COLOUR:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else
-                    {
-                        ColourValue val;
-                        if(getColour(prop->values.begin(), prop->values.end(), &val))
-                            mUnit->setTextureBorderColour(val);
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "tex_border_colour only accepts a colour argument");
-                    }
-                    break;
-                case ID_FILTERING:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() == 1)
-                    {
-                        if(prop->values.front()->type == ANT_ATOM)
-                        {
-                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-                            switch(atom->id)
-                            {
-                            case ID_NONE:
-                                mUnit->setTextureFiltering(TFO_NONE);
-                                break;
-                            case ID_BILINEAR:
-                                mUnit->setTextureFiltering(TFO_BILINEAR);
-                                break;
-                            case ID_TRILINEAR:
-                                mUnit->setTextureFiltering(TFO_TRILINEAR);
-                                break;
-                            case ID_ANISOTROPIC:
-                                mUnit->setTextureFiltering(TFO_ANISOTROPIC);
-                                break;
-                            default:
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   prop->values.front()->getValue() + " not supported as first argument (must be \"none\", \"bilinear\", \"trilinear\", or \"anisotropic\")");
-                            }
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " not supported as first argument (must be \"none\", \"bilinear\", \"trilinear\", or \"anisotropic\")");
-                        }
-                    }
-                    else if(prop->values.size() == 3)
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
-                            i1 = getNodeAt(prop->values, 1),
-                            i2 = getNodeAt(prop->values, 2);
-                        FilterOptions tmin, tmax, tmip;
-                        if (getValue(*i0, tmin) && getValue(*i1, tmax) && getValue(*i2, tmip))
-                        {
-                            mUnit->setTextureFiltering(tmin, tmax, tmip);
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
-                    }
-                    else
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "filtering must have either 1 or 3 arguments");
-                    }
-                    break;
-                case ID_CMPTEST:
-                    if(getValue(prop, compiler, bval))
-                        mUnit->setTextureCompareEnabled(bval);
-                    break;
-                case ID_CMPFUNC:
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
-                        prop->line,
-                        "compare_func is deprecated. Use comp_func.");
-                    OGRE_FALLTHROUGH;
-                case ID_COMP_FUNC:
-                    CompareFunction func;
-                    if(getValue(prop, compiler, func))
-                        mUnit->setTextureCompareFunction(func);
-                    break;
-                case ID_MAX_ANISOTROPY:
-                    if(getValue(prop, compiler, uival))
-                        mUnit->setTextureAnisotropy(uival);
-                    break;
-                case ID_MIPMAP_BIAS:
-                    if(getValue(prop, compiler, fval))
-                        mUnit->setTextureMipmapBias(fval);
-                    break;
                 case ID_COLOUR_OP:
                     LayerBlendOperation cop;
                     if(getValue(prop, compiler, cop))
@@ -5451,6 +5531,8 @@ namespace Ogre{
                 translator = &mCompositionTargetPassTranslator;
             else if(obj->id == ID_PASS && parent && (parent->id == ID_TARGET || parent->id == ID_TARGET_OUTPUT))
                 translator = &mCompositionPassTranslator;
+            else if(obj->id == ID_SAMPLER)
+                translator = &mSamplerTranslator;
         }
 
         return translator;

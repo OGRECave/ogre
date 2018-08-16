@@ -920,18 +920,13 @@ Here are the attributes you can use in a ’texture\_unit’ section of a .mater
 
 <a name="Available-Texture-Layer-Attributes"></a>
 
-# Available Texture Layer Attributes
+## Available Texture Layer Attributes
 
 -   [texture\_alias](#texture_005falias)
 -   [texture](#texture)
 -   [anim\_texture](#anim_005ftexture)
 -   [cubic\_texture](#cubic_005ftexture)
 -   [tex\_coord\_set](#tex_005fcoord_005fset)
--   [tex\_address\_mode](#tex_005faddress_005fmode)
--   [tex\_border\_colour](#tex_005fborder_005fcolour)
--   [filtering](#filtering)
--   [max\_anisotropy](#max_005fanisotropy)
--   [mipmap\_bias](#mipmap_005fbias)
 -   [colour\_op](#colour_005fop)
 -   [colour\_op\_ex](#colour_005fop_005fex)
 -   [colour\_op\_multipass\_fallback](#colour_005fop_005fmultipass_005ffallback)
@@ -946,14 +941,15 @@ Here are the attributes you can use in a ’texture\_unit’ section of a .mater
 -   [transform](#transform)
 -   [binding\_type](#binding_005ftype)
 -   [content\_type](#content_005ftype)
--   [compare_test](#compare_test)
--   [comp_func](#comp_func)
+-   [sampler_ref](#sampler_ref)
+
+Additionally you can use all attributes of @ref Samplers directly to implicitly create a Ogre::Sampler contained in this TextureUnit.
 
 You can also use a nested ’texture\_source’ section in order to use a special add-in as a source of texture data, See @ref External-Texture-Sources for details.
 
 <a name="Attribute-Descriptions-1"></a>
 
-# Attribute Descriptions
+## Attribute Descriptions
 
 <a name="texture_005falias"></a><a name="texture_005falias-1"></a>
 
@@ -1130,89 +1126,6 @@ Format: tex\_coord\_set &lt;set\_num&gt;
 Example: tex\_coord\_set 2
 @par
 Default: tex\_coord\_set 0
-
-<a name="tex_005faddress_005fmode"></a><a name="tex_005faddress_005fmode-1"></a>
-
-## tex\_address\_mode
-
-Defines what happens when texture coordinates exceed 1.0 for this texture layer.You can use the simple format to specify the addressing mode for all 3 potential texture coordinates at once, or you can use the 2/3 parameter extended format to specify a different mode per texture coordinate. 
-@par
-Simple Format: tex\_address\_mode &lt;uvw\_mode&gt; <br> Extended Format: tex\_address\_mode &lt;u\_mode&gt; &lt;v\_mode&gt; \[&lt;w\_mode&gt;\]
-
-Valid values for both are one of Ogre::TextureAddressingMode without the `TAM_` prefix. E.g. `TAM_WRAP` becomes `wrap`.
-
-@par
-Default: tex\_address\_mode wrap
-
-<a name="tex_005fborder_005fcolour"></a><a name="tex_005fborder_005fcolour-1"></a>
-
-## tex\_border\_colour
-
-Sets the border colour of border texture address mode (see [tex\_address\_mode](#tex_005faddress_005fmode)). 
-@par
-Format: tex\_border\_colour &lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]<br> NB valid colour values are between 0.0 and 1.0.
-@par
-Example: tex\_border\_colour 0.0 1.0 0.3
-@par
-Default: tex\_border\_colour 0.0 0.0 0.0 1.0
-
-<a name="filtering"></a><a name="filtering-1"></a>
-
-## filtering
-
-Sets the type of texture filtering used when magnifying or minifying a texture. There are 2 formats to this attribute, the simple format where you simply specify the name of a predefined set of filtering options, and the complex format, where you individually set the minification, magnification, and mip filters yourself.
-
-### Simple Format
-With this format, you only need to provide a single parameter
-
-@par
-Format: filtering &lt;none|bilinear|trilinear|anisotropic&gt;<br> Default: filtering bilinear 
-
-<dl compact="compact">
-<dt>none</dt> <dd>
-@copydoc Ogre::TFO_NONE
-</dd> 
-<dt>bilinear</dt> <dd> 
-@copydoc Ogre::TFO_BILINEAR 
-</dd> 
-<dt>trilinear</dt> <dd> 
-@copydoc Ogre::TFO_TRILINEAR
-</dd> 
-<dt>anisotropic</dt> <dd> 
-@copydoc Ogre::TFO_ANISOTROPIC
-</dd> </dl> 
-
-### Complex Format
-This format gives you complete control over the minification, magnification, and mip filters. 
-
-@par
-Format: filtering &lt;minFilter&gt; &lt;magFilter&gt; &lt;mipFilter&gt;
-@par
-Default: filtering linear linear point 
-
-Each parameter can be one of Ogre::FilterOptions without the `FO_` prefix. E.g. `FO_LINEAR` becomes `linear`.
-
-@copydetails Ogre::TextureUnitState::setTextureFiltering(FilterOptions,FilterOptions,FilterOptions)
-
-<a name="max_005fanisotropy"></a><a name="max_005fanisotropy-1"></a>
-
-## max\_anisotropy
-
-@copybrief Ogre::TextureUnitState::setTextureAnisotropy
-
-@par
-Format: max\_anisotropy &lt;maxAniso&gt;<br> Default: max\_anisotropy 1
-
-@copydetails Ogre::TextureUnitState::setTextureAnisotropy
-
-<a name="mipmap_005fbias"></a><a name="mipmap_005fbias-1"></a>
-
-## mipmap\_bias
-
-@copydetails Ogre::TextureUnitState::setTextureMipmapBias
-
-@par
-Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
 
 <a name="colour_005fop"></a><a name="colour_005fop-1"></a>
 
@@ -1415,6 +1328,130 @@ Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m3
 The indexes of the 4x4 matrix value above are expressed as m&lt;row&gt;&lt;col&gt;.
 
  @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+
+<a name="sampler_ref"></a>
+## sampler_ref
+
+By default all texture units use a shared default Sampler object. This parameter allows you to explicitly set a different one.
+
+@par
+Format: sampler_ref &lt;name&gt;
+
+@par
+Example: sampler_ref mySampler
+
+# Samplers {#Samplers}
+
+Samplers allow you to quickly change the settings for all associated Textures. Typically you have many Textures but only a few sampling states in your application.
+
+```cpp
+sampler mySampler
+{
+    filtering bilinear
+    max_anisotropy 16
+}
+
+...
+    texture_unit
+    {
+        texture myTexture.dds
+        sampler_ref mySampler
+    }
+...
+```
+
+## Available parameters
+
+-   [filtering](#filtering)
+-   [max\_anisotropy](#max_005fanisotropy)
+-   [tex\_address\_mode](#tex_005faddress_005fmode)
+-   [tex\_border\_colour](#tex_005fborder_005fcolour)
+-   [mipmap\_bias](#mipmap_005fbias)
+-   [compare_test](#compare_test)
+-   [comp_func](#comp_func)
+
+<a name="tex_005faddress_005fmode"></a><a name="tex_005faddress_005fmode-1"></a>
+
+## tex\_address\_mode
+
+Defines what happens when texture coordinates exceed 1.0 for this texture layer.You can use the simple format to specify the addressing mode for all 3 potential texture coordinates at once, or you can use the 2/3 parameter extended format to specify a different mode per texture coordinate. 
+@par
+Simple Format: tex\_address\_mode &lt;uvw\_mode&gt; <br> Extended Format: tex\_address\_mode &lt;u\_mode&gt; &lt;v\_mode&gt; \[&lt;w\_mode&gt;\]
+
+Valid values for both are one of Ogre::TextureAddressingMode without the `TAM_` prefix. E.g. `TAM_WRAP` becomes `wrap`.
+
+@par
+Default: tex\_address\_mode wrap
+
+<a name="tex_005fborder_005fcolour"></a><a name="tex_005fborder_005fcolour-1"></a>
+
+## tex\_border\_colour
+
+Sets the border colour of border texture address mode (see [tex\_address\_mode](#tex_005faddress_005fmode)). 
+@par
+Format: tex\_border\_colour &lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]<br> NB valid colour values are between 0.0 and 1.0.
+@par
+Example: tex\_border\_colour 0.0 1.0 0.3
+@par
+Default: tex\_border\_colour 0.0 0.0 0.0 1.0
+
+<a name="filtering"></a><a name="filtering-1"></a>
+
+## filtering
+
+Sets the type of texture filtering used when magnifying or minifying a texture. There are 2 formats to this attribute, the simple format where you simply specify the name of a predefined set of filtering options, and the complex format, where you individually set the minification, magnification, and mip filters yourself.
+
+### Simple Format
+With this format, you only need to provide a single parameter
+
+@par
+Format: filtering &lt;none|bilinear|trilinear|anisotropic&gt;<br> Default: filtering bilinear 
+
+<dl compact="compact">
+<dt>none</dt> <dd>
+@copydoc Ogre::TFO_NONE
+</dd> 
+<dt>bilinear</dt> <dd> 
+@copydoc Ogre::TFO_BILINEAR 
+</dd> 
+<dt>trilinear</dt> <dd> 
+@copydoc Ogre::TFO_TRILINEAR
+</dd> 
+<dt>anisotropic</dt> <dd> 
+@copydoc Ogre::TFO_ANISOTROPIC
+</dd> </dl> 
+
+### Complex Format
+This format gives you complete control over the minification, magnification, and mip filters. 
+
+@par
+Format: filtering &lt;minFilter&gt; &lt;magFilter&gt; &lt;mipFilter&gt;
+@par
+Default: filtering linear linear point 
+
+Each parameter can be one of Ogre::FilterOptions without the `FO_` prefix. E.g. `FO_LINEAR` becomes `linear`.
+
+@copydetails Ogre::TextureUnitState::setTextureFiltering(FilterOptions,FilterOptions,FilterOptions)
+
+<a name="max_005fanisotropy"></a><a name="max_005fanisotropy-1"></a>
+
+## max\_anisotropy
+
+@copybrief Ogre::TextureUnitState::setTextureAnisotropy
+
+@par
+Format: max\_anisotropy &lt;maxAniso&gt;<br> Default: max\_anisotropy 1
+
+@copydetails Ogre::TextureUnitState::setTextureAnisotropy
+
+<a name="mipmap_005fbias"></a><a name="mipmap_005fbias-1"></a>
+
+## mipmap\_bias
+
+@copydetails Ogre::TextureUnitState::setTextureMipmapBias
+
+@par
+Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
 
 <a name="compare_test"></a>
 ## compare_test
