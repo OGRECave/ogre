@@ -993,7 +993,7 @@ namespace Ogre
             }
 
             //filtering
-            if (mDefaults || !pTex->isDefaultFiltering())
+            if (TextureManager::getSingletonPtr() && (mDefaults || !pTex->isDefaultFiltering()))
             {
                 writeAttribute(4, "filtering");
                 writeValue(
