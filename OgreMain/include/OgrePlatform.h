@@ -302,13 +302,31 @@ namespace Ogre {
 // We perform intensive validation without concerns for performance
 #define OGRE_DEBUG_HIGH     3
 
-// on Apple & Windows we override OgreBuildSettings.h for convenience
-// see https://bitbucket.org/sinbad/ogre/pull-requests/728
-// Win32 compilers use _DEBUG for specifying debug builds, for MinGW, we use DEBUG
-#if (defined(_DEBUG) || defined(DEBUG))
-#   define OGRE_DEBUG_MODE OGRE_DEBUG_LEVEL_DEBUG
-#else
-#   define OGRE_DEBUG_MODE OGRE_DEBUG_LEVEL_RELEASE
+// We cannot tell whether something is a debug build or not simply by checking NDEBUG because it's perfectly valid for a
+// user to #undef NDEBUG to get assertions in a release build. DEBUG is set automatically on MSVC and _DEBUG is set 
+// automatically on MINGW. Some environments don't provide any debug flags besides NDEBUG by default, so we issue a 
+// warning here.
+#ifndef OGRE_DEBUG_MODE
+#   if !defined(NDEBUG) && !defined(_DEBUG) && !defined(DEBUG) && !defined(OGRE_IGNORE_UNKNOWN_DEBUG)
+#       pragma message (\
+         "Ogre can't tell whether this is a debug build. If it is, please add _DEBUG to the preprocessor definitions. "\
+         "Otherwise, you can set OGRE_IGNORE_UNKNOWN_DEBUG to suppress this warning. Ogre will assume this is not a "\
+         "debug build by default. To add _DEBUG with g++, invoke g++ with the argument -D _DEBUG. To add it in CMake, "\
+         "include “if (CMAKE_BUILD_TYPE STREQUAL "Debug") add_compile_definitions(_DEBUG) endif()” in the upper "\
+         "CMakeLists.txt file. IDE's usually provide the possibility to add preprocessor definitions in the build "\
+         "settings. You can also manually set OGRE_DEBUG_MODE to either 1 or 0 instead of adding _DEBUG.")
+#   endif
+#   if defined(NDEBUG) && defined(_DEBUG) && !defined(OGRE_IGNORE_DEBUG_FLAG_CONTRADICTION)
+#       pragma message (\
+         "You have both NDEBUG and _DEBUG defined. Ogre will assume you're running a debug build. To suppress this "\
+         "warning, set OGRE_IGNORE_DEBUG_FLAG_CONTRADICTION.")
+#   endif
+
+#   if defined(_DEBUG) || defined(DEBUG)
+#       define OGRE_DEBUG_MODE OGRE_DEBUG_LEVEL_DEBUG
+#   else
+#       define OGRE_DEBUG_MODE OGRE_DEBUG_LEVEL_RELEASE
+#   endif
 #endif
 
 #if OGRE_DEBUG_MODE >= OGRE_DEBUG_LOW
