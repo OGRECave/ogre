@@ -123,8 +123,6 @@ namespace Ogre {
 
         unsigned short mCurrentLights;
 
-        GLuint getCombinedMinMipFilter(void) const;
-
         GLGpuProgram* mCurrentVertexProgram;
         GLGpuProgram* mCurrentFragmentProgram;
         GLGpuProgram* mCurrentGeometryProgram;
@@ -241,6 +239,8 @@ namespace Ogre {
         void _setPointSpritesEnabled(bool enabled);
 
         void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
+
+        void _setSampler(size_t unit, Sampler& sampler);
 
         void _setTextureCoordSet(size_t stage, size_t index);
 

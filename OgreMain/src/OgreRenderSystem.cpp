@@ -307,32 +307,6 @@ namespace Ogre {
     {
         return mActiveViewport;
     }
-    void RenderSystem::_setSampler(size_t texUnit, const Sampler& s)
-    {
-        //Set texture layer compare state and function
-        _setTextureUnitCompareEnabled(texUnit,s.getCompareEnabled());
-        _setTextureUnitCompareFunction(texUnit,s.getCompareFunction());
-
-        // Set texture layer filtering
-        _setTextureUnitFiltering(texUnit, s.getFiltering(FT_MIN), s.getFiltering(FT_MAG),
-                                 s.getFiltering(FT_MIP));
-
-        // Set texture layer filtering
-        _setTextureLayerAnisotropy(texUnit, s.getAnisotropy());
-
-        // Set mipmap biasing
-        _setTextureMipmapBias(texUnit, s.getMipmapBias());
-
-        // Texture addressing mode
-        const Sampler::UVWAddressingMode& uvw = s.getAddressingMode();
-        _setTextureAddressingMode(texUnit, uvw);
-
-        // Set texture border colour only if required
-        if (uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER)
-        {
-            _setTextureBorderColour(texUnit, s.getBorderColour());
-        }
-    }
     //-----------------------------------------------------------------------
     void RenderSystem::_setTextureUnitSettings(size_t texUnit, TextureUnitState& tl)
     {

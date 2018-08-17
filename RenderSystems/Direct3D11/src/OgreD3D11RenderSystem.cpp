@@ -1746,6 +1746,30 @@ namespace Ogre
         }
         mSamplerStatesChanged = true;
     }
+    void D3D11RenderSystem::_setSampler(size_t unit, Sampler& sampler)
+    {
+        mSamplerStatesChanged = true;
+
+        const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
+        mTexStageDesc[unit].samplerDesc.AddressU = D3D11Mappings::get(uvw.u);
+        mTexStageDesc[unit].samplerDesc.AddressV = D3D11Mappings::get(uvw.v);
+        mTexStageDesc[unit].samplerDesc.AddressW = D3D11Mappings::get(uvw.w);
+        mTexStageDesc[unit].samplerDesc.MipLODBias = sampler.getMipmapBias();
+
+        if (uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER)
+            D3D11Mappings::get(sampler.getBorderColour(), mTexStageDesc[unit].samplerDesc.BorderColor);
+
+        mTexStageDesc[unit].samplerDesc.MaxAnisotropy = sampler.getAnisotropy();
+        mTexStageDesc[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(sampler.getCompareFunction());
+
+        FilterMinification[unit] = sampler.getFiltering(FT_MIN);
+        FilterMagnification[unit] = sampler.getFiltering(FT_MAG);
+        FilterMips[unit] = sampler.getFiltering(FT_MIP);
+
+        mTexStageDesc[unit].samplerDesc.Filter =
+            D3D11Mappings::get(FilterMinification[unit], FilterMagnification[unit], FilterMips[unit],
+                               sampler.getCompareEnabled());
+    }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
     {

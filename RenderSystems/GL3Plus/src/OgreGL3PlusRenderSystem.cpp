@@ -127,6 +127,48 @@ namespace Ogre {
         return (GL3WglProc)glsupport->getProcAddress(proc);
     }
 
+    static GLint getCombinedMinMipFilter(FilterOptions min, FilterOptions mip)
+    {
+        switch(min)
+        {
+        case FO_ANISOTROPIC:
+        case FO_LINEAR:
+            switch (mip)
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // linear min, linear mip
+                return GL_LINEAR_MIPMAP_LINEAR;
+            case FO_POINT:
+                // linear min, point mip
+                return GL_LINEAR_MIPMAP_NEAREST;
+            case FO_NONE:
+                // linear min, no mip
+                return GL_LINEAR;
+            }
+            break;
+        case FO_POINT:
+        case FO_NONE:
+            switch (mip)
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // nearest min, linear mip
+                return GL_NEAREST_MIPMAP_LINEAR;
+            case FO_POINT:
+                // nearest min, point mip
+                return GL_NEAREST_MIPMAP_NEAREST;
+            case FO_NONE:
+                // nearest min, no mip
+                return GL_NEAREST;
+            }
+            break;
+        }
+
+        // should never get here
+        return 0;
+    }
+
     GL3PlusRenderSystem::GL3PlusRenderSystem()
         : mDepthWrite(true),
           mScissorsEnabled(false),
@@ -815,6 +857,52 @@ namespace Ogre {
         }
     }
 
+    void GL3PlusRenderSystem::_setSampler(size_t unit, Sampler& sampler)
+    {
+        if (!mStateCacheManager->activateGLTextureUnit(unit))
+            return;
+
+        GLenum target = mTextureTypes[unit];
+
+        const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
+        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
+        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
+        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_R, getTextureAddressingMode(uvw.w));
+
+        if (uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER)
+            OGRE_CHECK_GL_ERROR(glTexParameterfv( target, GL_TEXTURE_BORDER_COLOR, sampler.getBorderColour().ptr()));
+        OGRE_CHECK_GL_ERROR(glTexParameterf(target, GL_TEXTURE_LOD_BIAS, sampler.getMipmapBias()));
+
+        if (mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
+            mStateCacheManager->setTexParameteri(
+                target, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+                std::min<uint>(mLargestSupportedAnisotropy, sampler.getAnisotropy()));
+
+        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_COMPARE_MODE,
+                                             sampler.getCompareEnabled() ? GL_COMPARE_REF_TO_TEXTURE
+                                                                         : GL_NONE);
+        if (sampler.getCompareEnabled())
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_COMPARE_FUNC,
+                                                 convertCompareFunction(sampler.getCompareFunction()));
+
+        // Combine with existing mip filter
+        mStateCacheManager->setTexParameteri(
+            target, GL_TEXTURE_MIN_FILTER,
+            getCombinedMinMipFilter(sampler.getFiltering(FT_MIN), sampler.getFiltering(FT_MIP)));
+
+        switch (sampler.getFiltering(FT_MAG))
+        {
+        case FO_ANISOTROPIC: // GL treats linear and aniso the same
+        case FO_LINEAR:
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            break;
+        case FO_POINT:
+        case FO_NONE:
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            break;
+        }
+    }
+
     GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const
     {
         switch (tam)
@@ -845,10 +933,9 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
     {
-        GLfloat border[4] = { colour.r, colour.g, colour.b, colour.a };
         if (mStateCacheManager->activateGLTextureUnit(stage))
         {
-            OGRE_CHECK_GL_ERROR(glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, border));
+            OGRE_CHECK_GL_ERROR(glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, colour.ptr()));
         }
     }
 
@@ -1258,48 +1345,6 @@ namespace Ogre {
         }
     }
 
-    GLint GL3PlusRenderSystem::getCombinedMinMipFilter(void) const
-    {
-        switch(mMinFilter)
-        {
-        case FO_ANISOTROPIC:
-        case FO_LINEAR:
-            switch (mMipFilter)
-            {
-            case FO_ANISOTROPIC:
-            case FO_LINEAR:
-                // linear min, linear mip
-                return GL_LINEAR_MIPMAP_LINEAR;
-            case FO_POINT:
-                // linear min, point mip
-                return GL_LINEAR_MIPMAP_NEAREST;
-            case FO_NONE:
-                // linear min, no mip
-                return GL_LINEAR;
-            }
-            break;
-        case FO_POINT:
-        case FO_NONE:
-            switch (mMipFilter)
-            {
-            case FO_ANISOTROPIC:
-            case FO_LINEAR:
-                // nearest min, linear mip
-                return GL_NEAREST_MIPMAP_LINEAR;
-            case FO_POINT:
-                // nearest min, point mip
-                return GL_NEAREST_MIPMAP_NEAREST;
-            case FO_NONE:
-                // nearest min, no mip
-                return GL_NEAREST;
-            }
-            break;
-        }
-
-        // should never get here
-        return 0;
-    }
-
     void GL3PlusRenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions fo)
     {
         if (!mStateCacheManager->activateGLTextureUnit(unit))
@@ -1311,9 +1356,8 @@ namespace Ogre {
             mMinFilter = fo;
 
             // Combine with existing mip filter
-            mStateCacheManager->setTexParameteri(mTextureTypes[unit],
-                                                GL_TEXTURE_MIN_FILTER,
-                                                getCombinedMinMipFilter());
+            mStateCacheManager->setTexParameteri(mTextureTypes[unit], GL_TEXTURE_MIN_FILTER,
+                                                 getCombinedMinMipFilter(mMinFilter, mMipFilter));
             break;
 
         case FT_MAG:
@@ -1337,9 +1381,8 @@ namespace Ogre {
             mMipFilter = fo;
 
             // Combine with existing min filter
-            mStateCacheManager->setTexParameteri(mTextureTypes[unit],
-                                                GL_TEXTURE_MIN_FILTER,
-                                                getCombinedMinMipFilter());
+            mStateCacheManager->setTexParameteri(mTextureTypes[unit], GL_TEXTURE_MIN_FILTER,
+                                                 getCombinedMinMipFilter(mMinFilter, mMipFilter));
             break;
         }
     }

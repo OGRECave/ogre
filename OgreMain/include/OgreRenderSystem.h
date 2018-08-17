@@ -451,7 +451,7 @@ namespace Ogre
         */
         virtual void _setTextureUnitSettings(size_t texUnit, TextureUnitState& tl);
         /// set the sampler settings for the given texture unit
-        virtual void _setSampler(size_t texUnit, Sampler& s);
+        virtual void _setSampler(size_t texUnit, Sampler& s) = 0;
         OGRE_DEPRECATED virtual void _setBindingType(TextureUnitState::BindingType bindigType) {}
         /** Turns off a texture unit. */
         virtual void _disableTextureUnit(size_t texUnit);

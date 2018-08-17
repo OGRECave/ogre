@@ -112,6 +112,48 @@ namespace Ogre {
     }
 #endif
 
+    static GLint getCombinedMinMipFilter(FilterOptions min, FilterOptions mip)
+    {
+        switch(min)
+        {
+        case FO_ANISOTROPIC:
+        case FO_LINEAR:
+            switch (mip)
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // linear min, linear mip
+                return GL_LINEAR_MIPMAP_LINEAR;
+            case FO_POINT:
+                // linear min, point mip
+                return GL_LINEAR_MIPMAP_NEAREST;
+            case FO_NONE:
+                // linear min, no mip
+                return GL_LINEAR;
+            }
+            break;
+        case FO_POINT:
+        case FO_NONE:
+            switch (mip)
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // nearest min, linear mip
+                return GL_NEAREST_MIPMAP_LINEAR;
+            case FO_POINT:
+                // nearest min, point mip
+                return GL_NEAREST_MIPMAP_NEAREST;
+            case FO_NONE:
+                // nearest min, no mip
+                return GL_NEAREST;
+            }
+            break;
+        }
+
+        // should never get here
+        return 0;
+    }
+
     GLES2RenderSystem::GLES2RenderSystem()
         : mStateCacheManager(0),
           mGpuProgramManager(0),
@@ -800,6 +842,58 @@ namespace Ogre {
         }
     }
 
+    void GLES2RenderSystem::_setSampler(size_t unit, Sampler& sampler)
+    {
+        if (!mStateCacheManager->activateGLTextureUnit(unit))
+            return;
+
+        GLenum target = mTextureTypes[unit];
+
+        const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
+        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
+        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
+        if(getCapabilities()->hasCapability(RSC_TEXTURE_3D))
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_R, getTextureAddressingMode(uvw.w));
+
+        if ((uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER) && checkExtension("GL_EXT_texture_border_clamp"))
+            OGRE_CHECK_GL_ERROR(glTexParameterfv( target, GL_TEXTURE_BORDER_COLOR_EXT, sampler.getBorderColour().ptr()));
+
+        // only via shader..
+        // OGRE_CHECK_GL_ERROR(glTexParameterf(target, GL_TEXTURE_LOD_BIAS, sampler.getTextureMipmapBias()));
+
+        if (mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
+            mStateCacheManager->setTexParameteri(
+                target, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+                std::min<uint>(getCapabilities()->getMaxSupportedAnisotropy(), sampler.getAnisotropy()));
+
+        if(hasMinGLVersion(3, 0))
+        {
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_COMPARE_MODE,
+                                                 sampler.getCompareEnabled() ? GL_COMPARE_REF_TO_TEXTURE
+                                                                                    : GL_NONE);
+            if(sampler.getCompareEnabled())
+                mStateCacheManager->setTexParameteri(target, GL_TEXTURE_COMPARE_FUNC,
+                                                 convertCompareFunction(sampler.getCompareFunction()));
+        }
+
+        // Combine with existing mip filter
+        mStateCacheManager->setTexParameteri(
+            target, GL_TEXTURE_MIN_FILTER,
+            getCombinedMinMipFilter(sampler.getFiltering(FT_MIN), sampler.getFiltering(FT_MIP)));
+
+        switch (sampler.getFiltering(FT_MAG))
+        {
+        case FO_ANISOTROPIC: // GL treats linear and aniso the same
+        case FO_LINEAR:
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            break;
+        case FO_POINT:
+        case FO_NONE:
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            break;
+        }
+    }
+
     GLint GLES2RenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const
     {
         switch (tam)
@@ -1262,48 +1356,6 @@ namespace Ogre {
         }
     }
 
-    GLint GLES2RenderSystem::getCombinedMinMipFilter(void) const
-    {
-        switch(mMinFilter)
-        {
-            case FO_ANISOTROPIC:
-            case FO_LINEAR:
-                switch (mMipFilter)
-                {
-                    case FO_ANISOTROPIC:
-                    case FO_LINEAR:
-                        // linear min, linear mip
-                        return GL_LINEAR_MIPMAP_LINEAR;
-                    case FO_POINT:
-                        // linear min, point mip
-                        return GL_LINEAR_MIPMAP_NEAREST;
-                    case FO_NONE:
-                        // linear min, no mip
-                        return GL_LINEAR;
-                }
-                break;
-            case FO_POINT:
-            case FO_NONE:
-                switch (mMipFilter)
-                {
-                    case FO_ANISOTROPIC:
-                    case FO_LINEAR:
-                        // nearest min, linear mip
-                        return GL_NEAREST_MIPMAP_LINEAR;
-                    case FO_POINT:
-                        // nearest min, point mip
-                        return GL_NEAREST_MIPMAP_NEAREST;
-                    case FO_NONE:
-                        // nearest min, no mip
-                        return GL_NEAREST;
-                }
-                break;
-        }
-
-        // should never get here
-        return 0;
-    }
-
     void GLES2RenderSystem::_setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
                 FilterOptions magFilter, FilterOptions mipFilter)
     {       
@@ -1328,7 +1380,7 @@ namespace Ogre {
                 // Combine with existing mip filter
                 mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                 GL_TEXTURE_MIN_FILTER,
-                                getCombinedMinMipFilter());
+                                getCombinedMinMipFilter(mMinFilter, mMipFilter));
                 break;
             case FT_MAG:
                 switch (fo)
@@ -1353,7 +1405,7 @@ namespace Ogre {
                 // Combine with existing min filter
                 mStateCacheManager->setTexParameteri(mTextureTypes[unit],
                                                      GL_TEXTURE_MIN_FILTER,
-                                                     getCombinedMinMipFilter());
+                                                     getCombinedMinMipFilter(mMinFilter, mMipFilter));
                 
                 break;
         }

@@ -101,8 +101,6 @@ namespace Ogre {
 
             GLenum mPolygonMode;
 
-            GLint getCombinedMinMipFilter(void) const;
-
             GLSLESProgram* mCurrentVertexProgram;
             GLSLESProgram* mCurrentFragmentProgram;
 
@@ -168,6 +166,8 @@ namespace Ogre {
             bool areFixedFunctionLightsInViewSpace() const { return true; }
 
             void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
+
+            void _setSampler(size_t unit, Sampler& sampler);
 
             void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
 

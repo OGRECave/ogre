@@ -56,7 +56,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void RenderSystemCapabilities::log(Log* pLog)
+    void RenderSystemCapabilities::log(Log* pLog) const
     {
         pLog->logMessage("RenderSystem capabilities");
         pLog->logMessage("-------------------------");
