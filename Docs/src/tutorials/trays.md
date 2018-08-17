@@ -1,6 +1,6 @@
 # Trays GUI System {#trays}
 
-Ever wanted really simple GUI controls for your sample? Don't want to write one from scratch, but CEGUI's just a little too much? The Trays system was created to address this issue. It's a simple GUI system based on the OGRE Overlay system and designed just for samples. Because it's simple, you're not going to be able to skin it or build very unique interfaces, but you'll also find it much easier to use. The entire system is based on the OGRE Overlay system.
+Ever wanted really simple GUI controls for your sample? Don't want to write one from scratch, but CEGUI's just a little too much? The Trays system was created to address this issue. It's a simple GUI system based on the OGRE @ref Overlays system and designed just for samples. Because it's simple, you're not going to be able to skin it or build very unique interfaces, but you'll also find it much easier to use.
 
 @tableofcontents
 
@@ -9,39 +9,24 @@ Why trays? The concept of trays is central to the system in that it removes the 
 ![](Gui2.jpg)
 
 # TrayManager {#traymanager}
-To use Trays, you have to create an TrayManager. This is the class through which you will create and manage all your widgets, manipulate the cursor, change the backdrop image, adjust tray properties, pop up dialogs, show/hide the loading bar, etc. You can have multiple tray managers in one application. For example, the OGRE Sample Browser uses its own tray manager and hides it when a sample is running, and the SDK samples also have their own tray managers, which are hidden when the samples are paused by the browser. The TrayManager requires "Trays.zip", so you can only create it after loading that resource. Also, make sure you're using the OgreBites namespace (Trays is part of the OgreBites Samples Framework). Create your tray manager like so:
+To use Trays, you have to create an TrayManager. This is the class through which you will create and manage all your widgets, manipulate the cursor, change the backdrop image, adjust tray properties, pop up dialogs, show/hide the loading bar, etc. You can have multiple tray managers in one application. For example, the OGRE Sample Browser uses its own tray manager and hides it when a sample is running, and the SDK samples also have their own tray managers, which are hidden when the samples are paused by the browser. 
+
+@note The TrayManager requires `Trays.zip`, so you can only create it after loading that resource. Also, make sure you're correctly initialized the @ref Overlays Component as the Trays Framework depends on it.
+
+Create your tray manager like so:
 ```cpp
-OgreBites::TrayManager* mTrayMgr = new OgreBites::TrayManager("InterfaceName", mWindow, this);
+OgreBites::TrayManager* mTrayMgr = new OgreBites::TrayManager("InterfaceName", mWindow);
 ```
-You must pass in a name for your interface, an `Ogre::RenderWindow` and an `OgreBites::TrayListener`. You can extend your sample or sample context to be a tray listener. Destroy your tray manager like so:
+You must pass in a name for your interface and a Ogre::RenderWindow. Optionally pass a `OgreBites::TrayListener` as a third argument if you want to be notified on e.g. button press. You can extend your sample or sample context to be a tray listener. Remember to destroy your tray manager like so:
 ```cpp
 delete mTrayMgr;
-mTrayMgr = 0;
 ```
-Once you have your tray manager, make sure you relay your OIS events to it.
+Once you have your tray manager, make sure you relay input events to it.
 ```cpp
-bool mousePressed(const OgreBites::MouseButtonEvent& evt)
-{
-    if (mTrayMgr->injectMouseDown(evt)) return true;
-    /* normal mouse processing here... */
-    return true;
-}
-
-bool mouseReleased(const OgreBites::MouseButtonEvent& evt)
-{
-    if (mTrayMgr->injectMouseUp(evt)) return true;
-    /* normal mouse processing here... */
-    return true;
-}
-
-bool mouseMoved(const OgreBites::MouseMotionEvent& evt)
-{
-    if (mTrayMgr->injectMouseMove(evt)) return true;
-    /* normal mouse processing here... */
-    return true;
-}
+addInputListener(mTrayMgr);
 ```
-The injection methods return true if the event was relevant to the tray manager, and should not be processed again by you. For example, if you click a button that is over an interactive part of your scene, you want the button to be pressed, but you don't want the scene interaction to take place. So the injection methods double as filters for your mouse events.
+@note In case you also want to handle the events yourself:
+The listener methods on TrayManager return true if the event was relevant to the tray manager, and should not be processed again by you. For example, if you click a button that is over an interactive part of your scene, you want the button to be pressed, but you don't want the scene interaction to take place. So the listener methods double as filters for your mouse events.
 
 You're now free to create widgets! Try adding a button to the top-left tray:
 ```cpp
@@ -124,7 +109,7 @@ Button* b;
 b = (Button*)mTrayMgr->getWidget("MyButton");  // by name
 b = (Button*)mTrayMgr->getWidget(TL_LEFT, 0);  // by tray and position
 b = (Button*)mTrayMgr->getWidget(TL_LEFT, "MyButton");  // by tray and name
-b = (Button*)mTrayMgr->getWidgetIterator(TL_LEFT).getNext();  // by iterator
+b = (Button*)mTrayMgr->getWidgets(TL_LEFT).front();  // by tray
 ```
 Counting widgets:
 ```cpp
