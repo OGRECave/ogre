@@ -447,8 +447,12 @@ namespace Ogre {
         lodCameraPos.setAll( lodCamera->_getCachedDerivedPosition() );
 
         // Flip the bit from shadow caster, and leave only that in "includeNonCasters"
-        ArrayInt includeNonCasters = Mathlib::SetAll( ((sceneVisibilityFlags & LAYER_SHADOW_CASTER) ^ -1)
-                                                        & LAYER_SHADOW_CASTER );
+        Ogre::uint32 includeNonCastersTest = (((sceneVisibilityFlags & LAYER_SHADOW_CASTER) ^ -1) & LAYER_SHADOW_CASTER);
+
+        ArrayInt includeNonCasters = Mathlib::SetAll(includeNonCastersTest);
+
+        const bool isShadowMappingCasterPass = includeNonCastersTest == 0;
+
         sceneVisibilityFlags &= RESERVED_VISIBILITY_FLAGS;
 
         ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
@@ -476,7 +480,7 @@ namespace Ogre {
             ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
                                                                         (objData.mWorldRadius);
             ArrayReal * RESTRICT_ALIAS upperDistance = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
-                                                                        (objData.mUpperDistance);
+                                                                        (objData.mUpperDistance[isShadowMappingCasterPass]);
 
             //Test all 6 planes and AND the dot product. If one is false, then we're not visible
             ArrayReal dotResult;
