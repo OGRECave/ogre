@@ -921,7 +921,7 @@ namespace Ogre
                 else
                 {
                     // Error
-                    addError(CE_UNDEFINEDVARIABLE, var->file, var->line);
+                    addError(CE_UNDEFINEDVARIABLE, var->file, var->line, var->name);
                 }
 
                 // Remove the variable node

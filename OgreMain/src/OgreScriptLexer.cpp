@@ -288,7 +288,7 @@ namespace Ogre{
             token->type = TID_RBRACKET;
         else if(lexeme.size() == 1 && lexeme[0] == colon)
             token->type = TID_COLON;
-        else if(lexeme[0] == var)
+        else if(lexeme.size() > 1 && lexeme[0] == var)
             token->type = TID_VARIABLE;
         else
         {
