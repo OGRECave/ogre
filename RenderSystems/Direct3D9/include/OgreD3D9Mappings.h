@@ -72,7 +72,7 @@ namespace Ogre
         /// return a D3D9 equivalent for a Ogre TexCoordCalsMethod value
         static DWORD get(TexCoordCalcMethod m, const D3DCAPS9& caps);
         /// return a D3D9 equivalent for a Ogre TextureAddressingMode value
-        static D3DTEXTUREADDRESS get(TextureUnitState::TextureAddressingMode tam, const D3DCAPS9& devCaps);
+        static D3DTEXTUREADDRESS get(TextureAddressingMode tam, const D3DCAPS9& devCaps);
         /// return a D3D9 equivalent for a Ogre LayerBlendType value
         static D3DTEXTURESTAGESTATETYPE get(LayerBlendType lbt);
         /// return a D3D9 equivalent for a Ogre LayerBlendOperationEx value

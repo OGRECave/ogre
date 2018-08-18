@@ -711,7 +711,7 @@ namespace Ogre
             mMaxSupportedAnisotropy = s;
         }
         /// Get the maximum supported anisotropic filtering
-        Real getMaxSupportedAnisotropy()
+        Real getMaxSupportedAnisotropy() const
         {
             return mMaxSupportedAnisotropy;
         }
@@ -775,7 +775,7 @@ namespace Ogre
 
 
         /** Write the capabilities to the pass in Log */
-        void log(Log* pLog);
+        void log(Log* pLog) const;
 
         // Support for new shader stages in shader model 5.0
         /// The number of floating-point constants tessellation Hull programs support

@@ -686,7 +686,7 @@ namespace Ogre {
         {
 
             // addressing mode
-            TextureUnitState::UVWAddressingMode uvwadd;
+            Sampler::UVWAddressingMode uvwadd;
             uvwadd.u = convertAddressingMode(param.GetValue());
             // default other dimensions incase not supplied
             uvwadd.v = uvwadd.u;
@@ -928,7 +928,7 @@ namespace Ogre {
         };
     }
     //-------------------------------------------------------------------------
-    TextureUnitState::TextureAddressingMode 
+    TextureAddressingMode 
     XsiMaterialExporter::convertAddressingMode(short xsiVal)
     {
         // same for OGL and DX

@@ -113,6 +113,25 @@ namespace Ogre {
         FO_ANISOTROPIC
     };
 
+    /** Texture addressing modes - default is TAM_WRAP.
+    */
+    enum TextureAddressingMode
+    {
+        /// %Any value beyond 1.0 wraps back to 0.0. %Texture is repeated.
+        TAM_WRAP,
+        /// %Texture flips every boundary, meaning texture is mirrored every 1.0 u or v
+        TAM_MIRROR,
+        /// Values beyond 1.0 are clamped to 1.0. %Texture ’streaks’ beyond 1.0 since last line
+        /// of pixels is used across the rest of the address space. Useful for textures which
+        /// need exact coverage from 0.0 to 1.0 without the ’fuzzy edge’ wrap gives when
+        /// combined with filtering.
+        TAM_CLAMP,
+        /// %Texture coordinates outside the range [0.0, 1.0] are set to the border colour.
+        TAM_BORDER,
+        /// Unknown
+        TAM_UNKNOWN = 99
+    };
+
     /** %Light shading modes. */
     enum ShadeOptions
     {

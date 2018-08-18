@@ -220,7 +220,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 }
 
 //-----------------------------------------------------------------------
-const char* TextureAtlasSampler::getAdressingFunctionName(TextureUnitState::TextureAddressingMode mode)
+const char* TextureAtlasSampler::getAdressingFunctionName(TextureAddressingMode mode)
 {
     switch (mode)
     {

@@ -45,14 +45,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MaterialManager::MaterialManager()
     {
-        mDefaultMinFilter = FO_LINEAR;
-        mDefaultMagFilter = FO_LINEAR;
-        mDefaultMipFilter = FO_POINT;
-        mDefaultCompareEnabled  = false;
-        mDefaultCompareFunction = CMPF_GREATER_EQUAL;
-
-        mDefaultMaxAniso = 1;
-
         // Loading order
         mLoadOrder = 100.0f;
         // Scripting is supported by this manager
@@ -139,70 +131,33 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MaterialManager::setDefaultTextureFiltering(TextureFilterOptions fo)
     {
-        switch (fo)
-        {
-        case TFO_NONE:
-            setDefaultTextureFiltering(FO_POINT, FO_POINT, FO_NONE);
-            break;
-        case TFO_BILINEAR:
-            setDefaultTextureFiltering(FO_LINEAR, FO_LINEAR, FO_POINT);
-            break;
-        case TFO_TRILINEAR:
-            setDefaultTextureFiltering(FO_LINEAR, FO_LINEAR, FO_LINEAR);
-            break;
-        case TFO_ANISOTROPIC:
-            setDefaultTextureFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, FO_LINEAR);
-            break;
-        }
+        TextureManager::getSingleton().getDefaultSampler()->setFiltering(fo);
     }
     //-----------------------------------------------------------------------
     void MaterialManager::setDefaultAnisotropy(unsigned int maxAniso)
     {
-        mDefaultMaxAniso = maxAniso;
+        TextureManager::getSingleton().getDefaultSampler()->setAnisotropy(maxAniso);
     }
     //-----------------------------------------------------------------------
     unsigned int MaterialManager::getDefaultAnisotropy() const
     {
-        return mDefaultMaxAniso;
+        return TextureManager::getSingleton().getDefaultSampler()->getAnisotropy();
     }
     //-----------------------------------------------------------------------
     void MaterialManager::setDefaultTextureFiltering(FilterType ftype, FilterOptions opts)
     {
-        switch (ftype)
-        {
-        case FT_MIN:
-            mDefaultMinFilter = opts;
-            break;
-        case FT_MAG:
-            mDefaultMagFilter = opts;
-            break;
-        case FT_MIP:
-            mDefaultMipFilter = opts;
-            break;
-        }
+        TextureManager::getSingleton().getDefaultSampler()->setFiltering(ftype, opts);
     }
     //-----------------------------------------------------------------------
     void MaterialManager::setDefaultTextureFiltering(FilterOptions minFilter,
         FilterOptions magFilter, FilterOptions mipFilter)
     {
-        mDefaultMinFilter = minFilter;
-        mDefaultMagFilter = magFilter;
-        mDefaultMipFilter = mipFilter;
+        TextureManager::getSingleton().getDefaultSampler()->setFiltering(minFilter, magFilter, mipFilter);
     }
     //-----------------------------------------------------------------------
     FilterOptions MaterialManager::getDefaultTextureFiltering(FilterType ftype) const
     {
-        switch (ftype)
-        {
-        case FT_MIN:
-            return mDefaultMinFilter;
-        case FT_MAG:
-            return mDefaultMagFilter;
-        case FT_MIP:
-            return mDefaultMipFilter;
-        }
-        // to keep compiler happy
-        return mDefaultMinFilter;
+        return TextureManager::getSingleton().getDefaultSampler()->getFiltering(ftype);
     }
     //-----------------------------------------------------------------------
     unsigned short MaterialManager::_getSchemeIndex(const String& schemeName)

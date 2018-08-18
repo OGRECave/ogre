@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreResourceManager.h"
 #include "OgreTexture.h"
 #include "OgreSingleton.h"
-
+#include "OgreTextureUnitState.h"
 
 namespace Ogre {
 
@@ -64,6 +64,28 @@ namespace Ogre {
         TextureManager(void);
         virtual ~TextureManager();
 
+        /// create a new sampler
+        SamplerPtr createSampler(const String& name = BLANKSTRING)
+        {
+            SamplerPtr ret = _createSamplerImpl();
+            if(!name.empty())
+            {
+                OgreAssert(mNamedSamplers.find(name) == mNamedSamplers.end(),
+                           ("Sampler '" + name + "' already exists").c_str());
+                mNamedSamplers[name] = ret;
+            }
+            return ret;
+        }
+
+        /// retrieve an named sampler
+        const SamplerPtr& getSampler(const String& name) const
+        {
+            static SamplerPtr nullPtr;
+            auto it = mNamedSamplers.find(name);
+            if(it == mNamedSamplers.end())
+                return nullPtr;
+            return it->second;
+        }
 
         /// Create a new texture
         /// @copydetails ResourceManager::createResource
@@ -396,6 +418,9 @@ namespace Ogre {
         /// Internal method to create a warning texture (bound when a texture unit is blank)
         const TexturePtr& _getWarningTexture();
 
+        /// get the default sampler
+        const SamplerPtr& getDefaultSampler();
+
         /// @copydoc Singleton::getSingleton()
         static TextureManager& getSingleton(void);
         /// @copydoc Singleton::getSingleton()
@@ -403,10 +428,14 @@ namespace Ogre {
 
     protected:
 
+        virtual SamplerPtr _createSamplerImpl() { return std::make_shared<Sampler>(); }
+
         ushort mPreferredIntegerBitDepth;
         ushort mPreferredFloatBitDepth;
         uint32 mDefaultNumMipmaps;
         TexturePtr mWarningTexture;
+        SamplerPtr mDefaultSampler;
+        std::map<String, SamplerPtr> mNamedSamplers;
     };
     /** @} */
     /** @} */

@@ -29,16 +29,98 @@ THE SOFTWARE.
 
 #include "OgreTextureUnitState.h"
 #include "OgreControllerManager.h"
+#include "OgreTextureManager.h"
 
 namespace Ogre {
+    // allow operation without hardware support
+    static SamplerPtr DUMMY_SAMPLER = std::make_shared<Sampler>();
 
+    Sampler::Sampler()
+        : mBorderColour(ColourValue::Black)
+        , mMinFilter(FO_LINEAR)
+        , mMagFilter(FO_LINEAR)
+        , mMipFilter(FO_POINT)
+        , mCompareFunc(CMPF_GREATER_EQUAL)
+        , mMaxAniso(1)
+        , mMipmapBias(0)
+        , mCompareEnabled(false)
+        , mDirty(true)
+    {
+        setAddressingMode(TAM_WRAP);
+    }
+    Sampler::~Sampler() {}
+    //-----------------------------------------------------------------------
+    void Sampler::setAddressingMode(const UVWAddressingMode& uvw)
+    {
+        mAddressMode = uvw;
+        mDirty = true;
+    }
+
+    //-----------------------------------------------------------------------
+    void Sampler::setFiltering(TextureFilterOptions filterType)
+    {
+        switch (filterType)
+        {
+        case TFO_NONE:
+            setFiltering(FO_POINT, FO_POINT, FO_NONE);
+            break;
+        case TFO_BILINEAR:
+            setFiltering(FO_LINEAR, FO_LINEAR, FO_POINT);
+            break;
+        case TFO_TRILINEAR:
+            setFiltering(FO_LINEAR, FO_LINEAR, FO_LINEAR);
+            break;
+        case TFO_ANISOTROPIC:
+            setFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, Root::getSingleton().getRenderSystem()->hasAnisotropicMipMapFilter() ? FO_ANISOTROPIC : FO_LINEAR);
+            break;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void Sampler::setFiltering(FilterType ft, FilterOptions fo)
+    {
+        switch (ft)
+        {
+        case FT_MIN:
+            mMinFilter = fo;
+            break;
+        case FT_MAG:
+            mMagFilter = fo;
+            break;
+        case FT_MIP:
+            mMipFilter = fo;
+            break;
+        }
+        mDirty = true;
+    }
+    //-----------------------------------------------------------------------
+    void Sampler::setFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter)
+    {
+        mMinFilter = minFilter;
+        mMagFilter = magFilter;
+        mMipFilter = mipFilter;
+        mDirty = true;
+    }
+    //-----------------------------------------------------------------------
+    FilterOptions Sampler::getFiltering(FilterType ft) const
+    {
+        switch (ft)
+        {
+        case FT_MIN:
+            return mMinFilter;
+        case FT_MAG:
+            return mMagFilter;
+        case FT_MIP:
+            return mMipFilter;
+        }
+        // to keep compiler happy
+        return mMinFilter;
+    }
     //-----------------------------------------------------------------------
     TextureUnitState::TextureUnitState(Pass* parent)
         : mCurrentFrame(0)
         , mAnimDuration(0)
         , mCubic(false)
         , mTextureCoordSetIndex(0)
-        , mBorderColour(ColourValue::Black)
         , mTextureLoadFailed(false)
         , mGamma(1)
         , mRecalcTexMatrix(false)
@@ -48,17 +130,9 @@ namespace Ogre {
         , mVScale(1)
         , mRotate(0)
         , mTexModMatrix(Matrix4::IDENTITY)
-        , mMinFilter(FO_LINEAR)
-        , mMagFilter(FO_LINEAR)
-        , mMipFilter(FO_POINT)
-        , mCompareEnabled(false)
-        , mCompareFunc(CMPF_GREATER_EQUAL)
-        , mMaxAniso(MaterialManager::getSingleton().getDefaultAnisotropy())
-        , mMipmapBias(0)
-        , mIsDefaultAniso(true)
-        , mIsDefaultFiltering(true)
         , mBindingType(BT_FRAGMENT)
         , mContentType(CONTENT_NAMED)
+        , mSampler(TextureManager::getSingletonPtr() ? TextureManager::getSingleton().getDefaultSampler() : DUMMY_SAMPLER)
         , mParent(parent)
         , mAnimController(0)
     {
@@ -68,7 +142,6 @@ namespace Ogre {
         mAlphaBlendMode.source1 = LBS_TEXTURE;
         mAlphaBlendMode.source2 = LBS_CURRENT;
         setColourOperation(LBO_MODULATE);
-        setTextureAddressingMode(TAM_WRAP);
 
         if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
         {
@@ -91,7 +164,6 @@ namespace Ogre {
         , mAnimDuration(0)
         , mCubic(false)
         , mTextureCoordSetIndex(0)
-        , mBorderColour(ColourValue::Black)
         , mTextureLoadFailed(false)
         , mGamma(1)
         , mRecalcTexMatrix(false)
@@ -101,15 +173,9 @@ namespace Ogre {
         , mVScale(1)
         , mRotate(0)
         , mTexModMatrix(Matrix4::IDENTITY)
-        , mMinFilter(FO_LINEAR)
-        , mMagFilter(FO_LINEAR)
-        , mMipFilter(FO_POINT)
-        , mMaxAniso(MaterialManager::getSingleton().getDefaultAnisotropy())
-        , mMipmapBias(0)
-        , mIsDefaultAniso(true)
-        , mIsDefaultFiltering(true)
         , mBindingType(BT_FRAGMENT)
         , mContentType(CONTENT_NAMED)
+        , mSampler(TextureManager::getSingletonPtr() ? TextureManager::getSingleton().getDefaultSampler() : DUMMY_SAMPLER)
         , mParent(parent)
         , mAnimController(0)
     {
@@ -119,7 +185,6 @@ namespace Ogre {
         mAlphaBlendMode.source1 = LBS_TEXTURE;
         mAlphaBlendMode.source2 = LBS_CURRENT;
         setColourOperation(LBO_MODULATE);
-        setTextureAddressingMode(TAM_WRAP);
 
         setTextureName(texName);
         setTextureCoordSet(texCoordSet);
@@ -147,6 +212,7 @@ namespace Ogre {
         memcpy( (uchar*)this, &oth, (const uchar *)(&oth.mFramePtrs) - (const uchar *)(&oth) );
         // copy complex members
         mFramePtrs = oth.mFramePtrs;
+        mSampler = oth.mSampler;
         mName    = oth.mName;
         mEffects = oth.mEffects;
 
@@ -719,46 +785,6 @@ namespace Ogre {
         return mAlphaBlendMode;
     }
     //-----------------------------------------------------------------------
-    const TextureUnitState::UVWAddressingMode& 
-    TextureUnitState::getTextureAddressingMode(void) const
-    {
-        return mAddressMode;
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureAddressingMode(
-        TextureUnitState::TextureAddressingMode tam)
-    {
-        mAddressMode.u = tam;
-        mAddressMode.v = tam;
-        mAddressMode.w = tam;
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureAddressingMode(
-        TextureUnitState::TextureAddressingMode u, 
-        TextureUnitState::TextureAddressingMode v,
-        TextureUnitState::TextureAddressingMode w)
-    {
-        mAddressMode.u = u;
-        mAddressMode.v = v;
-        mAddressMode.w = w;
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureAddressingMode(
-        const TextureUnitState::UVWAddressingMode& uvw)
-    {
-        mAddressMode = uvw;
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureBorderColour(const ColourValue& colour)
-    {
-        mBorderColour = colour;
-    }
-    //-----------------------------------------------------------------------
-    const ColourValue& TextureUnitState::getTextureBorderColour(void) const
-    {
-        return mBorderColour;
-    }
-    //-----------------------------------------------------------------------
     void TextureUnitState::setEnvironmentMap(bool enable, EnvMapType envMapType)
     {
         if (enable)
@@ -1197,103 +1223,6 @@ namespace Ogre {
     {
         return mEffects;
     }
-
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureFiltering(TextureFilterOptions filterType)
-    {
-        switch (filterType)
-        {
-        case TFO_NONE:
-            setTextureFiltering(FO_POINT, FO_POINT, FO_NONE);
-            break;
-        case TFO_BILINEAR:
-            setTextureFiltering(FO_LINEAR, FO_LINEAR, FO_POINT);
-            break;
-        case TFO_TRILINEAR:
-            setTextureFiltering(FO_LINEAR, FO_LINEAR, FO_LINEAR);
-            break;
-        case TFO_ANISOTROPIC:
-            setTextureFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, Root::getSingleton().getRenderSystem()->hasAnisotropicMipMapFilter() ? FO_ANISOTROPIC : FO_LINEAR);
-            break;
-        }
-        mIsDefaultFiltering = false;
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureFiltering(FilterType ft, FilterOptions fo)
-    {
-        switch (ft)
-        {
-        case FT_MIN:
-            mMinFilter = fo;
-            break;
-        case FT_MAG:
-            mMagFilter = fo;
-            break;
-        case FT_MIP:
-            mMipFilter = fo;
-            break;
-        }
-        mIsDefaultFiltering = false;
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureFiltering(FilterOptions minFilter, 
-        FilterOptions magFilter, FilterOptions mipFilter)
-    {
-        mMinFilter = minFilter;
-        mMagFilter = magFilter;
-        mMipFilter = mipFilter;
-        mIsDefaultFiltering = false;
-    }
-    //-----------------------------------------------------------------------
-    FilterOptions TextureUnitState::getTextureFiltering(FilterType ft) const
-    {
-        if(mIsDefaultFiltering)
-            return MaterialManager::getSingleton().getDefaultTextureFiltering(ft);
-
-        switch (ft)
-        {
-        case FT_MIN:
-            return mMinFilter;
-        case FT_MAG:
-            return mMagFilter;
-        case FT_MIP:
-            return mMipFilter;
-        }
-        // to keep compiler happy
-        return mMinFilter;
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureCompareEnabled(bool enabled)
-    {
-        mCompareEnabled=enabled;
-    }
-    //-----------------------------------------------------------------------
-    bool TextureUnitState::getTextureCompareEnabled() const
-    {
-        return mCompareEnabled;
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureCompareFunction(CompareFunction function)
-    {
-        mCompareFunc=function;
-    }
-    //-----------------------------------------------------------------------
-    CompareFunction TextureUnitState::getTextureCompareFunction() const
-    {
-        return mCompareFunc;
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureAnisotropy(unsigned int maxAniso)
-    {
-        mMaxAniso = maxAniso;
-        mIsDefaultAniso = false;
-    }
-    //-----------------------------------------------------------------------
-    unsigned int TextureUnitState::getTextureAnisotropy() const
-    {
-        return mIsDefaultAniso? MaterialManager::getSingleton().getDefaultAnisotropy() : mMaxAniso;
-    }
-
     //-----------------------------------------------------------------------
     void TextureUnitState::_unprepare(void)
     {
@@ -1445,18 +1374,15 @@ namespace Ogre {
         memSize += sizeof(int);
         memSize += sizeof(float);
         memSize += sizeof(Real) * 5;
-        memSize += sizeof(bool) * 8;
+        memSize += sizeof(bool) * 6;
         memSize += sizeof(size_t);
         memSize += sizeof(TextureType);
         memSize += sizeof(PixelFormat);
-        memSize += sizeof(UVWAddressingMode);
-        memSize += sizeof(ColourValue);
+        memSize += sizeof(SamplerPtr);
         memSize += sizeof(LayerBlendModeEx) * 2;
         memSize += sizeof(SceneBlendFactor) * 2;
         memSize += sizeof(Radian);
         memSize += sizeof(Matrix4);
-        memSize += sizeof(FilterOptions) * 3;
-        memSize += sizeof(CompareFunction);
         memSize += sizeof(BindingType);
         memSize += sizeof(ContentType);
         memSize += sizeof(String) * 4;
@@ -1465,5 +1391,17 @@ namespace Ogre {
         memSize += mEffects.size() * sizeof(TextureEffect);
 
         return memSize;
+    }
+
+    bool TextureUnitState::isDefaultFiltering() const {
+        return mSampler == TextureManager::getSingleton().getDefaultSampler();
+    }
+
+    const SamplerPtr& TextureUnitState::_getLocalSampler()
+    {
+        if(isDefaultFiltering())
+            mSampler = TextureManager::getSingleton().createSampler();
+
+        return mSampler;
     }
 }

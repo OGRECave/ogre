@@ -836,7 +836,7 @@ namespace Ogre
         return "point";
     }
     //-----------------------------------------------------------------------
-    static String convertTexAddressMode(TextureUnitState::TextureAddressingMode tam)
+    static String convertTexAddressMode(TextureAddressingMode tam)
     {
         switch (tam)
         {
@@ -959,7 +959,7 @@ namespace Ogre
             }
 
             //addressing mode
-            const TextureUnitState::UVWAddressingMode& uvw =
+            const Sampler::UVWAddressingMode& uvw =
                 pTex->getTextureAddressingMode();
             if (mDefaults ||
                 uvw.u != Ogre::TextureUnitState::TAM_WRAP ||
@@ -993,7 +993,7 @@ namespace Ogre
             }
 
             //filtering
-            if (mDefaults || !pTex->isDefaultFiltering())
+            if (TextureManager::getSingletonPtr() && (mDefaults || !pTex->isDefaultFiltering()))
             {
                 writeAttribute(4, "filtering");
                 writeValue(

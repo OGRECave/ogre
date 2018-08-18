@@ -313,4 +313,12 @@ namespace Ogre {
 
         return mWarningTexture;
     }
+
+    const SamplerPtr& TextureManager::getDefaultSampler()
+    {
+        if(!mDefaultSampler)
+            mDefaultSampler = createSampler();
+
+        return mDefaultSampler;
+    }
 }

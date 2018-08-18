@@ -81,7 +81,7 @@ namespace Ogre {
             SceneBlendFactor blendDest;
             bool customBlend;
             CompareFunction depthFunc;
-            TextureUnitState::TextureAddressingMode addressMode;
+            TextureAddressingMode addressMode;
             // TODO - alphaFunc
             GenFunc rgbGenFunc;
             WaveType rgbGenWave;

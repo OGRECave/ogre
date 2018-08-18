@@ -862,6 +862,8 @@ namespace Ogre
 
         // added during 1.11. re-sort for 1.12
         ID_LINE_WIDTH,
+        ID_SAMPLER,
+        ID_SAMPLER_REF,
 
         ID_END_BUILTIN_IDS
     };

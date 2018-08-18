@@ -118,8 +118,6 @@ namespace Ogre {
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
 #endif
 
-        GLint getCombinedMinMipFilter(void) const;
-
         GLSLShader* mCurrentVertexShader;
         GLSLShader* mCurrentFragmentShader;
         GLSLShader* mCurrentGeometryShader;
@@ -127,7 +125,6 @@ namespace Ogre {
         GLSLShader* mCurrentDomainShader;
         GLSLShader* mCurrentComputeShader;
 
-        GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
         void bindVertexElementToGpu(const VertexElement& elem,
@@ -187,7 +184,9 @@ namespace Ogre {
 
         void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
 
-        void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
+        void _setSampler(size_t unit, Sampler& sampler);
+
+        void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
 
         void _setTextureBorderColour(size_t stage, const ColourValue& colour);
 
@@ -288,8 +287,8 @@ namespace Ogre {
          */
         void _setRenderTarget(RenderTarget *target);
 
-        GLint convertCompareFunction(CompareFunction func) const;
-        GLint convertStencilOp(StencilOperation op, bool invert = false) const;
+        static GLint convertCompareFunction(CompareFunction func);
+        static GLint convertStencilOp(StencilOperation op, bool invert = false);
 
         void bindGpuProgram(GpuProgram* prg);
         void unbindGpuProgram(GpuProgramType gptype);
