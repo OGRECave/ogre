@@ -39,6 +39,18 @@ namespace Ogre {
     typedef std::vector<GL3PlusTexturePtr> GL3PlusTexturePtrList;
     typedef std::vector<TexturePtr> TexturePtrList;
 
+    class _OgreGL3PlusExport GL3PlusSampler : public Sampler
+    {
+    public:
+        GL3PlusSampler(GL3PlusRenderSystem* rs);
+        ~GL3PlusSampler();
+        void bind(uint32 unit);
+        static GLint getCombinedMinMipFilter(FilterOptions min, FilterOptions mip);
+        static GLint getTextureAddressingMode(TextureAddressingMode tam);
+    private:
+        uint32 mSamplerId;
+    };
+
     /** GL3Plus-specific implementation of a TextureManager */
     class _OgreGL3PlusExport GL3PlusTextureManager : public TextureManager
     {
@@ -67,6 +79,8 @@ namespace Ogre {
                              const NameValuePairList* createParams);
 
         GL3PlusRenderSystem* mRenderSystem;
+
+        SamplerPtr _createSamplerImpl();
 
     private:
         /// Register a texture as an image texture used in image load/store.

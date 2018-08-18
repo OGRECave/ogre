@@ -125,7 +125,6 @@ namespace Ogre {
         GLSLShader* mCurrentDomainShader;
         GLSLShader* mCurrentComputeShader;
 
-        GLint getTextureAddressingMode(TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
         void bindVertexElementToGpu(const VertexElement& elem,
@@ -288,8 +287,8 @@ namespace Ogre {
          */
         void _setRenderTarget(RenderTarget *target);
 
-        GLint convertCompareFunction(CompareFunction func) const;
-        GLint convertStencilOp(StencilOperation op, bool invert = false) const;
+        static GLint convertCompareFunction(CompareFunction func);
+        static GLint convertStencilOp(StencilOperation op, bool invert = false);
 
         void bindGpuProgram(GpuProgram* prg);
         void unbindGpuProgram(GpuProgramType gptype);
