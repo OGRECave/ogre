@@ -78,7 +78,7 @@ namespace Ogre
         RealAsUint  * RESTRICT_ALIAS    mDistanceToCamera;
 
         /// Upper distance to still render. Ours is mUpperDistance[mIndex]
-        Real        * RESTRICT_ALIAS    mUpperDistance;
+        Real        * RESTRICT_ALIAS    mUpperDistance[2];
 
         /// Flags determining whether this object is visible (compared to SceneManager mask)
         uint32      * RESTRICT_ALIAS    mVisibilityFlags;
@@ -102,11 +102,12 @@ namespace Ogre
             mWorldAabb( 0 ),
             mWorldRadius( 0 ),
             mDistanceToCamera( 0 ),
-            mUpperDistance( 0 ),
             mVisibilityFlags( 0 ),
             mQueryFlags( 0 ),
             mLightMask( 0 )
         {
+            mUpperDistance[0] = 0;
+            mUpperDistance[1] = 0;
         }
 
         /// @copydoc Transform::copy
@@ -125,7 +126,8 @@ namespace Ogre
             mLocalRadius[mIndex]        = inCopy.mLocalRadius[inCopy.mIndex];
             mWorldRadius[mIndex]        = inCopy.mWorldRadius[inCopy.mIndex];
             mDistanceToCamera[mIndex]   = inCopy.mDistanceToCamera[mIndex];
-            mUpperDistance[mIndex]      = inCopy.mUpperDistance[inCopy.mIndex];
+            mUpperDistance[0][mIndex]   = inCopy.mUpperDistance[0][inCopy.mIndex];
+            mUpperDistance[1][mIndex]   = inCopy.mUpperDistance[1][inCopy.mIndex];
             mVisibilityFlags[mIndex]    = inCopy.mVisibilityFlags[inCopy.mIndex];
             mQueryFlags[mIndex]         = inCopy.mQueryFlags[inCopy.mIndex];
             mLightMask[mIndex]          = inCopy.mLightMask[inCopy.mIndex];
@@ -143,7 +145,8 @@ namespace Ogre
             mLocalRadius        += ARRAY_PACKED_REALS;
             mWorldRadius        += ARRAY_PACKED_REALS;
             mDistanceToCamera   += ARRAY_PACKED_REALS;
-            mUpperDistance      += ARRAY_PACKED_REALS;
+            mUpperDistance[0]   += ARRAY_PACKED_REALS;
+            mUpperDistance[1]   += ARRAY_PACKED_REALS;
             mVisibilityFlags    += ARRAY_PACKED_REALS;
             mQueryFlags         += ARRAY_PACKED_REALS;
             mLightMask          += ARRAY_PACKED_REALS;
@@ -158,7 +161,8 @@ namespace Ogre
             mLocalRadius        += ARRAY_PACKED_REALS * numAdvance;
             mWorldRadius        += ARRAY_PACKED_REALS * numAdvance;
             mDistanceToCamera   += ARRAY_PACKED_REALS * numAdvance;
-            mUpperDistance      += ARRAY_PACKED_REALS * numAdvance;
+            mUpperDistance[0]   += ARRAY_PACKED_REALS * numAdvance;
+            mUpperDistance[1]   += ARRAY_PACKED_REALS * numAdvance;
             mVisibilityFlags    += ARRAY_PACKED_REALS * numAdvance;
             mQueryFlags         += ARRAY_PACKED_REALS * numAdvance;
             mLightMask          += ARRAY_PACKED_REALS * numAdvance;
@@ -188,7 +192,8 @@ namespace Ogre
             ++mWorldAabb;
             mWorldRadius        += ARRAY_PACKED_REALS;
             mDistanceToCamera   += ARRAY_PACKED_REALS;
-            mUpperDistance      += ARRAY_PACKED_REALS;
+            mUpperDistance[0]   += ARRAY_PACKED_REALS;
+            mUpperDistance[1]   += ARRAY_PACKED_REALS;
             mVisibilityFlags    += ARRAY_PACKED_REALS;
         }
 

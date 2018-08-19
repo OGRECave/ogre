@@ -35,7 +35,8 @@ THE SOFTWARE.
 
 #include "OgreVisibilityFlags.h"
 #include "OgreMaterialManager.h"
-
+#include "OgreRenderSystem.h"
+#include "OgreRoot.h"
 namespace Ogre
 {
     /** \addtogroup Core
@@ -154,6 +155,9 @@ namespace Ogre
         {
             //Change base defaults
             mIncludeOverlays = true;
+            //retrieve the rendersystem default scheme name, which can be different from DEFAULT_SCHEME_NAME if RS doesn't have fixed function support.
+            RenderSystem* rs = Root::getSingleton().getRenderSystem();
+            mMaterialScheme = rs->_getDefaultViewportMaterialScheme();
         }
 
         void setVisibilityMask( uint32 visibilityMask )

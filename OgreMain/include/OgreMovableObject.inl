@@ -109,13 +109,30 @@ namespace Ogre
     inline void MovableObject::setRenderingDistance( Real dist )
     {
         assert( dist > 0.0f );
-        if( dist > 0.0f )
-            mObjectData.mUpperDistance[mObjectData.mIndex] = dist;
+        if (dist > 0.0f)
+        {
+            mObjectData.mUpperDistance[0][mObjectData.mIndex] = dist;
+            mObjectData.mUpperDistance[1][mObjectData.mIndex] = min(dist, mObjectData.mUpperDistance[1][mObjectData.mIndex]);
+        }
     }
     //-----------------------------------------------------------------------------------
     inline Real MovableObject::getRenderingDistance(void) const
     {
-        return mObjectData.mUpperDistance[mObjectData.mIndex];
+        return mObjectData.mUpperDistance[0][mObjectData.mIndex];
+    }
+    //-----------------------------------------------------------------------------------
+    inline void MovableObject::setShadowRenderingDistance(Real dist)
+    {
+        assert(dist > 0.0f);
+        if (dist > 0.0f)
+        {
+            mObjectData.mUpperDistance[1][mObjectData.mIndex] = min(dist, mObjectData.mUpperDistance[0][mObjectData.mIndex]);
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    inline Real MovableObject::getShadowRenderingDistance(void) const
+    {
+        return mObjectData.mUpperDistance[1][mObjectData.mIndex];
     }
     //-----------------------------------------------------------------------------------
     inline void MovableObject::setVisible( bool visible )
