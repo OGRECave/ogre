@@ -790,6 +790,11 @@ namespace Ogre
         return -1 * v;
     }
 
+    template <int N, typename T> static inline Vector<N, T> operator+(Vector<N, T> v)
+    {
+        return v;
+    }
+
     template <int N, typename T>
     static inline Vector<N, T> operator*(const Vector<N, T>& v, Real s)
     {
