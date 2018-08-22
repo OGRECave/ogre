@@ -6,7 +6,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsCg cg
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeights_vp
-    profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1 arbvp1
+    profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1
 	includes_skeletal_animation true
 	
 	default_params
@@ -20,7 +20,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseCg cg
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp
-    profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1 arbvp1
+    profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1
 	includes_skeletal_animation true
 
 	default_params
@@ -36,7 +36,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg cg
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeightsCaster_vp
-    profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1 arbvp1
+    profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1
 	includes_skeletal_animation true
 }
 
@@ -44,7 +44,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhaseCaster_vp
-	profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1 arbvp1
+	profiles vp40 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vs_1_1
 	includes_skeletal_animation true
 }
 
@@ -150,9 +150,9 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster
 ///////////////////////////////////////////////////////////////////////////
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeights unified
 {
+    delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsHLSL
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsGLSL
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsCg
 	
 	default_params
 	{
@@ -168,9 +168,9 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeights unified
 
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster unified
 {	
+    delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterHLSL
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterGLSL
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg
 	
 	default_params
 	{
@@ -182,9 +182,9 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster unified
 
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhase unified
 {
+    delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseHLSL
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseGLSL
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseCg
 	
 	default_params
 	{
@@ -201,9 +201,9 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhase unified
 
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster unified
 {
+    delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterHLSL
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterGLSL
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterCg
 	
 	default_params
 	{
