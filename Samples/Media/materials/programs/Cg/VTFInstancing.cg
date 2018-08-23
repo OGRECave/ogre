@@ -22,7 +22,7 @@ struct VS_INPUT
 
 #include "InstancingVertexInterpolators.cg"
 #ifdef ST_DUAL_QUATERNION
-#include "DualQuaternion_Common.cg"
+#include "DualQuaternionSkinning_Shadow.cg"
 #endif
 
 //---------------------------------------------
@@ -70,7 +70,7 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	blendDQ /= length(blendDQ[0]);
 #endif
 	//Only dealing with one weight so normalization of the dual quaternion and weighting are unnecessary
-	worldPos = float4(calculateBlendPosition(input.Position.xyz, blendDQ), 1.0);
+	worldPos = float4(calculateBlendPosition(input.Position, blendDQ), 1.0);
 	worldNorm = calculateBlendNormal(input.Normal.xyz, blendDQ);
 #else
 	float3x4 worldMatrix;
