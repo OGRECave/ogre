@@ -629,7 +629,9 @@ namespace Ogre {
 					// do we need to replace the definition of the parameter? (GLSL only)
 					if (glsl)
 					{
-						if (it->second.constType == GCT_MATRIX_2X2)
+					    if(it->second.arraySize > 1)
+					        LogManager::getSingleton().logWarning("Incomplete Cg-GLSL mapping - '"+oldName+"' is an mat array");
+					    else if (it->second.constType == GCT_MATRIX_2X2)
 							beg = findAndMark("uniform vec2 "+newName+"[2]", "uniform mat2 "+oldName, beg);
 						else if (it->second.constType == GCT_MATRIX_3X3)
 							beg = findAndMark("uniform vec3 "+newName+"[3]", "uniform mat3 "+oldName, beg);
@@ -727,13 +729,13 @@ namespace Ogre {
 		// Cg logs its renamings in the comments at the beginning of the
 		// processed source file. We can get them from there.
 		// We'll also get rid of those comments to trim down source code size.
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE || 1
 		LogManager::getSingleton().stream() << "Cg high level output for " << getName() << ":\n" << hlSource;
 #endif
 		hlSource = HighLevelOutputFixer(hlSource, mParametersMap, mSamplerRegisterMap, 
 			mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || 
 			mSelectedCgProfile == CG_PROFILE_GLSLG).output;
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE || 1
 		LogManager::getSingleton().stream() << "Cleaned high level output for " << getName() << ":\n" << hlSource;
 #endif
 	}
