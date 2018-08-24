@@ -187,24 +187,9 @@ Materials can either be set up programmatically, by calling Ogre::MaterialManage
 
 Basically everything about the appearance of an object apart from it’s shape is controlled by the Material class.
 
-The SceneManager class manages the master list of materials available to the scene. The list can be added to by the application by calling Ogre::MaterialManager::create, or by loading a Mesh (which will in turn load material properties). Whenever materials are added to the SceneManager, they start off with a default set of properties; these are defined by OGRE as the following:
+The Ogre::MaterialManager class manages the master list of materials available to the scene. The list can be added to by the application by calling Ogre::MaterialManager::create, or by loading a Mesh (which will in turn load material properties).
 
--   ambient reflectance = ColourValue::White (full)
--   diffuse reflectance = ColourValue::White (full)
--   specular reflectance = ColourValue::Black (none)
--   emissive = ColourValue::Black (none)
--   shininess = 0 (not shiny)
--   No texture layers (& hence no textures)
--   SourceBlendFactor = SBF\_ONE, DestBlendFactor = SBF\_ZERO (opaque)
--   Depth buffer checking on
--   Depth buffer writing on
--   Depth buffer comparison function = CMPF\_LESS\_EQUAL
--   Culling mode = CULL\_CLOCKWISE
--   Ambient lighting in scene = ColourValue(0.5, 0.5, 0.5) (mid-grey)
--   Dynamic lighting enabled
--   Gourad shading mode
--   Solid polygon mode
--   Bilinear texture filtering
+@copydetails Ogre::MaterialManager::getDefaultSettings()
 
 You can alter these settings by calling Ogre::MaterialManager::getDefaultSettings() and making the required changes to the Material which is returned.
 
