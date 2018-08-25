@@ -61,14 +61,14 @@ namespace Ogre
 
     // Base STL allocator class.
     template<typename T>
-    struct STLAllocatorBase
+    struct _OgreExport STLAllocatorBase
     {   // base class for generic allocators
         typedef T value_type;
     };
 
     // Base STL allocator class. (const T version).
     template<typename T>
-    struct STLAllocatorBase<const T>
+    struct _OgreExport STLAllocatorBase<const T>
     {   // base class for generic allocators for const T
         typedef T value_type;
     };
@@ -78,7 +78,7 @@ namespace Ogre
         typename T,
         typename AllocPolicy
         >
-    class STLAllocator : public STLAllocatorBase<T>
+    class _OgreExport STLAllocator : public STLAllocatorBase<T>
     {
     public :
         /// define our types, as per ISO C++
@@ -104,7 +104,7 @@ namespace Ogre
         { }
 
         /// dtor
-        virtual ~STLAllocator()
+        ~STLAllocator()
         { }
 
         /// copy ctor - done component wise
