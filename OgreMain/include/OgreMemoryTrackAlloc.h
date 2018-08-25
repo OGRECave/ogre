@@ -82,7 +82,7 @@ namespace Ogre
     /** @See TrackAllocPolicy
     */
     template <size_t Alignment = 0>
-    class TrackAlignedAllocPolicy
+    class _OgreExport TrackAlignedAllocPolicy
     {
     public:
         // compile-time check alignment is available.
