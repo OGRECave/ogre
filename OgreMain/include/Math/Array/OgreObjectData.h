@@ -77,8 +77,13 @@ namespace Ogre
         */
         RealAsUint  * RESTRICT_ALIAS    mDistanceToCamera;
 
+#if OGRE_COMPILER != OGRE_COMPILER_CLANG
         /// Upper distance to still render. Ours is mUpperDistance[mIndex]
         Real        * RESTRICT_ALIAS    mUpperDistance[2];
+#else
+        /// Upper distance to still render. Ours is mUpperDistance[mIndex]
+        Real        *                   mUpperDistance[2];
+#endif
 
         /// Flags determining whether this object is visible (compared to SceneManager mask)
         uint32      * RESTRICT_ALIAS    mVisibilityFlags;
