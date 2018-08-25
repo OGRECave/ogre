@@ -50,7 +50,7 @@
 #       include <ext/hash_set>
 #   endif
 #elif (OGRE_COMPILER == OGRE_COMPILER_CLANG)
-#   if defined(_LIBCPP_VERSION)
+#   if defined(_LIBCPP_VERSION) || __cplusplus >= 201103L
 #       include <unordered_map>
 #       include <unordered_set>
 #   else

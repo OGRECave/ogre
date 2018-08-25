@@ -83,7 +83,7 @@ namespace Ogre {
     #       define OGRE_HashMultiSet ::__gnu_cxx::hash_multiset
     #    endif
     #elif OGRE_COMPILER == OGRE_COMPILER_CLANG
-    #    if defined(_LIBCPP_VERSION)
+    #    if defined(_LIBCPP_VERSION) || __cplusplus >= 201103L
     #       define OGRE_HashMap ::std::unordered_map
     #       define OGRE_HashMultiMap ::std::unordered_multimap
     #       define OGRE_HashSet ::std::unordered_set

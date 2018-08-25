@@ -204,7 +204,7 @@ namespace Ogre {
     typedef ::std::tr1::hash< _StringBase > _StringHash;
 #   endif
 #elif OGRE_COMPILER == OGRE_COMPILER_CLANG
-#   if defined(_LIBCPP_VERSION)
+#   if defined(_LIBCPP_VERSION) || __cplusplus >= 201103L
     typedef ::std::hash< _StringBase > _StringHash;
 #   else
     typedef ::std::tr1::hash< _StringBase > _StringHash;
