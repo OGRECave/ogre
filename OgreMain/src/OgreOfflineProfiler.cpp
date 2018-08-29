@@ -11,6 +11,7 @@
 namespace Ogre
 {
     OfflineProfiler::OfflineProfiler() :
+        mPaused( false ),
         mTlsHandle( OGRE_TLS_INVALID_HANDLE ),
         mBytesPerPool( sizeof( ProfileSample ) * 10000 )
     {

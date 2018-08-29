@@ -970,7 +970,8 @@ void SceneManager::setForward3D( bool bEnable, uint32 width, uint32 height, uint
 }
 //-----------------------------------------------------------------------
 void SceneManager::setForwardClustered( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
-                                        uint32 lightsPerCell, float minDistance, float maxDistance )
+                                        uint32 lightsPerCell, uint32 decalsPerCell,
+                                        float minDistance, float maxDistance )
 {
     OGRE_DELETE mForwardPlusSystem;
     mForwardPlusSystem = 0;
@@ -979,7 +980,7 @@ void SceneManager::setForwardClustered( bool bEnable, uint32 width, uint32 heigh
     if( bEnable )
     {
         mForwardPlusSystem = OGRE_NEW ForwardClustered( width, height, numSlices, lightsPerCell,
-                                                        minDistance, maxDistance, this );
+                                                        decalsPerCell, minDistance, maxDistance, this );
 
         if( mDestRenderSystem )
             mForwardPlusSystem->_changeRenderSystem( mDestRenderSystem );

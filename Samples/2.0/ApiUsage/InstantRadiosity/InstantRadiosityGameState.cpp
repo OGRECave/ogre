@@ -192,7 +192,7 @@ namespace Demo
         mCameraController->mCameraBaseSpeed = 1.0f;
         mCameraController->mCameraSpeedBoost = 10.0f;
 
-        sceneManager->setForwardClustered( true, 16, 8, 24, 96, 2, 50 );
+        sceneManager->setForwardClustered( true, 16, 8, 24, 96, 0, 2, 50 );
         //Required by InstantRadiosity
         sceneManager->getForwardPlus()->setEnableVpls( true );
 

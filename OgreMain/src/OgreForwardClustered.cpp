@@ -50,7 +50,6 @@ THE SOFTWARE.
 
 #include "OgreProfiler.h"
 
-#define TODO_mLightsPerCell_minus_3_is_wrong
 #define TODO_missing_aabb_frustum_check
 
 namespace Ogre
@@ -60,6 +59,7 @@ namespace Ogre
 
     ForwardClustered::ForwardClustered( uint32 width, uint32 height,
                                         uint32 numSlices, uint32 lightsPerCell,
+                                        uint32 decalsPerCell,
                                         float minDistance, float maxDistance,
                                         SceneManager *sceneManager ) :
         ForwardPlusBase( sceneManager ),
@@ -69,7 +69,10 @@ namespace Ogre
         /*mWidth( 1 ),
         mHeight( 1 ),
         mNumSlices( 2 ),*/
-        mLightsPerCell( lightsPerCell + 3u ),
+        mReservedSlotsPerCell( ((lightsPerCell > 0u) ? 3u : 0u) + ((decalsPerCell > 0u) ? 1u : 0u) ),
+        mObjsPerCell( lightsPerCell + decalsPerCell + mReservedSlotsPerCell ),
+        mLightsPerCell( lightsPerCell ),
+        mDecalsPerCell( decalsPerCell ),
         mGridBuffer( 0 ),
         mCurrentCamera( 0 ),
         mMinDistance( minDistance ),
@@ -314,12 +317,11 @@ namespace Ogre
 
                             //assert( numLightsInCell < mLightCountInCell.end() );
 
-                            //mLightsPerCell - 3 because three slots is reserved
-                            //for the number of lights in cell per type
-                            if( numLightsInCell->lightCount[0] < mLightsPerCell - 3u )
+                            if( numLightsInCell->lightCount[0] < mLightsPerCell )
                             {
-                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mLightsPerCell +
-                                        (numLightsInCell->lightCount[0] + 3u);
+                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
+                                                                   (numLightsInCell->lightCount[0] +
+                                                                   mReservedSlotsPerCell);
                                 *cellElem = i * 6;
                                 ++numLightsInCell->lightCount[0];
                                 ++numLightsInCell->lightCount[lightType];
@@ -455,12 +457,11 @@ namespace Ogre
 
                             //assert( numLightsInCell < mLightCountInCell.end() );
 
-                            //mLightsPerCell - 3 because three slots is reserved
-                            //for the number of lights in cell per type
-                            if( numLightsInCell->lightCount[0] < mLightsPerCell - 3u )
+                            if( numLightsInCell->lightCount[0] < mLightsPerCell )
                             {
-                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mLightsPerCell +
-                                        (numLightsInCell->lightCount[0] + 3u);
+                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
+                                                                   (numLightsInCell->lightCount[0] +
+                                                                   mReservedSlotsPerCell);
                                 *cellElem = i * 6;
                                 ++numLightsInCell->lightCount[0];
                                 ++numLightsInCell->lightCount[lightType];
@@ -549,15 +550,12 @@ namespace Ogre
 
                             //assert( numLightsInCell < mLightCountInCell.end() );
 
-                            TODO_mLightsPerCell_minus_3_is_wrong;
-                            //mLightsPerCell - 3 because three slots is reserved
-                            //for the number of lights in cell per type
-                            if( numLightsInCell->lightCount[0] < mLightsPerCell - 3u )
+                            if( numLightsInCell->decalCount < mDecalsPerCell )
                             {
-                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mLightsPerCell +
-                                                                   (numLightsInCell->lightCount[0] + 3u);
+                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
+                                                                   mLightsPerCell +
+                                                                   mReservedSlotsPerCell;
                                 *cellElem = numDecals * 6;
-                                ++numLightsInCell->lightCount[0];
                                 ++numLightsInCell->decalCount;
                             }
                         }
@@ -576,7 +574,7 @@ namespace Ogre
             FastArray<LightCount>::const_iterator end  = mLightCountInCell.begin() +
                     (frustumStartIdx + numPackedFrustumsPerSlice) * ARRAY_PACKED_REALS;
 
-            const size_t cellSize = mLightsPerCell;
+            const size_t cellSize = mObjsPerCell;
             size_t gridIdx = frustumStartIdx * ARRAY_PACKED_REALS * cellSize;
 
             while( itor != end )
@@ -709,7 +707,7 @@ namespace Ogre
         {
             gridBuffers.gridBuffer = mVaoManager->createTexBuffer( PF_R16_UINT,
                                                                    mWidth * mHeight * mNumSlices *
-                                                                   mLightsPerCell * sizeof(uint16),
+                                                                   mObjsPerCell * sizeof(uint16),
                                                                    BT_DYNAMIC_PERSISTENT, 0, false );
         }
 
@@ -817,7 +815,7 @@ namespace Ogre
 
         hlms->_setProperty( HlmsBaseProp::FwdClusteredWidthxHeight, mWidth * mHeight );
         hlms->_setProperty( HlmsBaseProp::FwdClusteredWidth,        mWidth );
-        hlms->_setProperty( HlmsBaseProp::FwdClusteredLightsPerCell,mLightsPerCell );
+        hlms->_setProperty( HlmsBaseProp::FwdClusteredLightsPerCell,mObjsPerCell );
     }
     //-----------------------------------------------------------------------------------
     void ForwardClustered::setDebugFrustum( bool bEnableDebugFrustumWireAabb )

@@ -61,7 +61,10 @@ namespace Ogre
         uint32  mWidth;
         uint32  mHeight;
         uint32  mNumSlices;
-        uint32  mLightsPerCell;
+        size_t  mReservedSlotsPerCell;
+        size_t  mObjsPerCell;
+        size_t  mLightsPerCell;
+        size_t  mDecalsPerCell;
 
         RawSimdUniquePtr<FrustumRegion, MEMCATEGORY_SCENE_CONTROL> mFrustumRegions;
 
@@ -97,7 +100,8 @@ namespace Ogre
 
     public:
         ForwardClustered( uint32 width, uint32 height, uint32 numSlices, uint32 lightsPerCell,
-                   float minDistance, float maxDistance, SceneManager *sceneManager );
+                          uint32 decalsPerCell, float minDistance, float maxDistance,
+                          SceneManager *sceneManager );
         virtual ~ForwardClustered();
 
         virtual ForwardPlusMethods getForwardPlusMethod(void) const { return MethodForwardClustered; }

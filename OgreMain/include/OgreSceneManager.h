@@ -1321,6 +1321,8 @@ namespace Ogre {
             but on reverse.
         @param lightsPerCell
             The maximum number of lights a cell in the grid can hold.
+        @param decalsPerCell
+            Maximum number of decals a cell in the grid can hold. 0 to disable decals.
         @param minDistance
             Bias towards the camera for grid.
         @param maxDistance
@@ -1330,7 +1332,8 @@ namespace Ogre {
                            uint32 lightsPerCell, float minDistance, float maxDistance );
 
         void setForwardClustered( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
-                                  uint32 lightsPerCell, float minDistance, float maxDistance );
+                                  uint32 lightsPerCell, uint32 decalsPerCell, float minDistance,
+                                  float maxDistance );
 
         ForwardPlusBase* getForwardPlus(void)                       { return mForwardPlusSystem; }
         ForwardPlusBase* _getActivePassForwardPlus(void)            { return mForwardPlusImpl; }

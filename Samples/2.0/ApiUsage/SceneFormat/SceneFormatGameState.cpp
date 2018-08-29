@@ -420,7 +420,7 @@ namespace Demo
             mInstantRadiosity->mCellSize = 5.0f;
             mInstantRadiosity->build();
 
-            sceneManager->setForwardClustered( true, 16, 8, 24, 96, 2, 50 );
+            sceneManager->setForwardClustered( true, 16, 8, 24, 96, 0, 2, 50 );
             //Required by InstantRadiosity
             sceneManager->getForwardPlus()->setEnableVpls( true );
         }
