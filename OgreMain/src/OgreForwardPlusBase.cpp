@@ -38,19 +38,23 @@ THE SOFTWARE.
 
 #include "OgreHlms.h"
 
+#include "OgreDecal.h"
+
 namespace Ogre
 {
     //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
-    const size_t ForwardPlusBase::MinDecalRq = 0;
-    const size_t ForwardPlusBase::MaxDecalRq = 127;
+    const size_t ForwardPlusBase::MinDecalRq = 0u;
+    const size_t ForwardPlusBase::MaxDecalRq = 4u;
     const size_t ForwardPlusBase::NumBytesPerLight = 6 * 4 * 4;
+    const size_t ForwardPlusBase::NumBytesPerDecal = 4 * 4 * 4;
 
-    ForwardPlusBase::ForwardPlusBase( SceneManager *sceneManager ) :
+    ForwardPlusBase::ForwardPlusBase( SceneManager *sceneManager, bool decalsEnabled ) :
         mVaoManager( 0 ),
         mSceneManager( sceneManager ),
         mDebugMode( false ),
         mFadeAttenuationRange( true ),
-        mEnableVpls( false )
+        mEnableVpls( false ),
+        mDecalsEnabled( decalsEnabled )
   #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
     ,   mFineLightMaskGranularity( true )
   #endif
@@ -134,13 +138,35 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    size_t ForwardPlusBase::calculateBytesNeeded( size_t numLights, size_t numDecals )
+    {
+        size_t totalBytes = numLights * NumBytesPerLight;
+        if( numDecals > 0u )
+        {
+            totalBytes = alignToNextMultiple( totalBytes, NumBytesPerDecal );
+            totalBytes += numDecals * NumBytesPerDecal;
+        }
+
+        return totalBytes;
+    }
+    //-----------------------------------------------------------------------------------
     void ForwardPlusBase::fillGlobalLightListBuffer( Camera *camera,
                                                      TexBufferPacked *globalLightListBuffer )
     {
         //const LightListInfo &globalLightList = mSceneManager->getGlobalLightList();
         const size_t numLights = mCurrentLightList.size();
 
-        if( !numLights )
+        size_t numDecals = 0;
+        size_t actualMaxDecalRq = 0;
+        const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
+        if( mDecalsEnabled )
+        {
+            actualMaxDecalRq = std::min( MaxDecalRq, objsPerRqInThread0.size() );
+            for( size_t rqId=MinDecalRq; rqId<=actualMaxDecalRq; ++rqId )
+                numDecals += objsPerRqInThread0[rqId].size();
+        }
+
+        if( !numLights && !numDecals )
             return;
 
         Matrix4 viewMatrix = camera->getViewMatrix();
@@ -148,7 +174,7 @@ namespace Ogre
         viewMatrix.extract3x3Matrix( viewMatrix3 );
 
         float * RESTRICT_ALIAS lightData = reinterpret_cast<float * RESTRICT_ALIAS>(
-                    globalLightListBuffer->map( 0, NumBytesPerLight * numLights ) );
+                    globalLightListBuffer->map( 0, calculateBytesNeeded( numLights, numDecals ) ) );
         LightArray::const_iterator itLights = mCurrentLightList.begin();
         LightArray::const_iterator enLights = mCurrentLightList.end();
 
@@ -209,6 +235,45 @@ namespace Ogre
             ++lightData;
 
             ++itLights;
+        }
+
+        //Align to the start of decals
+        lightData += 2u * 4u;
+
+        const Matrix4 viewMat = camera->getViewMatrix();
+
+        for( size_t rqId=MinDecalRq; rqId<=actualMaxDecalRq; ++rqId )
+        {
+            MovableObject::MovableObjectArray::const_iterator itor = objsPerRqInThread0[rqId].begin();
+            MovableObject::MovableObjectArray::const_iterator end  = objsPerRqInThread0[rqId].end();
+
+            while( itor != end )
+            {
+                OGRE_ASSERT_HIGH( dynamic_cast<Decal*>( *itor ) );
+                Decal *decal = static_cast<Decal*>( *itor );
+
+                const Matrix4 worldMat = decal->_getParentNodeFullTransform();
+                Matrix4 invWorldView = viewMat.concatenateAffine( worldMat );
+                invWorldView.inverseAffine();
+
+#if !OGRE_DOUBLE_PRECISION
+                memcpy( lightData, invWorldView[0], sizeof(float) * 12u );
+                lightData += 12u;
+#else
+                for( size_t i=0; i<3u; ++i )
+                {
+                    *lightData++ = static_cast<float>( invWorldView[i][0] );
+                    *lightData++ = static_cast<float>( invWorldView[i][1] );
+                    *lightData++ = static_cast<float>( invWorldView[i][2] );
+                    *lightData++ = static_cast<float>( invWorldView[i][3] );
+                }
+#endif
+                memcpy( lightData, &decal->mDiffuseIdx, sizeof(uint32) * 3u );
+                lightData += 3u;
+                *lightData++ = 0.0f;
+
+                ++itor;
+            }
         }
 
         globalLightListBuffer->unmap( UO_KEEP_PERSISTENT );

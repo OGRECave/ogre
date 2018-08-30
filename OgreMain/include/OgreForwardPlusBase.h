@@ -69,6 +69,7 @@ namespace Ogre
 
     protected:
         static const size_t NumBytesPerLight;
+        static const size_t NumBytesPerDecal;
 
         struct CachedGrid
         {
@@ -110,9 +111,12 @@ namespace Ogre
         bool    mFadeAttenuationRange;
         /// VPLs = Virtual Point Lights. Used by InstantRadiosity.
         bool    mEnableVpls;
+        bool    mDecalsEnabled;
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
         bool    mFineLightMaskGranularity;
 #endif
+
+        static size_t calculateBytesNeeded( size_t numLights, size_t numDecals );
 
         void fillGlobalLightListBuffer( Camera *camera, TexBufferPacked *globalLightListBuffer );
 
@@ -136,7 +140,7 @@ namespace Ogre
         void deleteOldGridBuffers(void);
 
     public:
-        ForwardPlusBase( SceneManager *sceneManager );
+        ForwardPlusBase( SceneManager *sceneManager, bool decalsEnabled );
         virtual ~ForwardPlusBase();
 
         virtual ForwardPlusMethods getForwardPlusMethod(void) const = 0;

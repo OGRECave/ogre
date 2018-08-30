@@ -51,18 +51,17 @@ THE SOFTWARE.
 #include "OgreProfiler.h"
 
 #define TODO_missing_aabb_frustum_check
+#define TODO_add_decalsStartOffset;
+#define TODO_add_decalsIndexIsNotnumDecalsDot6;
 
 namespace Ogre
 {
-    //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
-    const size_t c_numBytesPerLight = 6 * 4 * 4;
-
     ForwardClustered::ForwardClustered( uint32 width, uint32 height,
                                         uint32 numSlices, uint32 lightsPerCell,
                                         uint32 decalsPerCell,
                                         float minDistance, float maxDistance,
                                         SceneManager *sceneManager ) :
-        ForwardPlusBase( sceneManager ),
+        ForwardPlusBase( sceneManager, decalsPerCell > 0u ),
         mWidth( width ),
         mHeight( height ),
         mNumSlices( numSlices ),
@@ -476,7 +475,8 @@ namespace Ogre
 
         uint16 numDecals = 0;
         const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
-        for( size_t rqId=MinDecalRq; rqId<=MaxDecalRq; ++rqId )
+        const size_t actualMaxDecalRq = std::min( MaxDecalRq, objsPerRqInThread0.size() );
+        for( size_t rqId=MinDecalRq; rqId<=actualMaxDecalRq; ++rqId )
         {
             MovableObject::MovableObjectArray::const_iterator itor = objsPerRqInThread0[rqId].begin();
             MovableObject::MovableObjectArray::const_iterator end  = objsPerRqInThread0[rqId].end();
@@ -555,6 +555,8 @@ namespace Ogre
                                 uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
                                                                    mLightsPerCell +
                                                                    mReservedSlotsPerCell;
+                                TODO_add_decalsStartOffset;
+                                TODO_add_decalsIndexIsNotnumDecalsDot6;
                                 *cellElem = numDecals * 6;
                                 ++numLightsInCell->decalCount;
                             }
@@ -596,8 +598,10 @@ namespace Ogre
         return left->getCachedDistanceToCameraAsReal() < right->getCachedDistanceToCameraAsReal();
     }
 
-    void ForwardClustered::collectObjs( const Camera *camera )
+    void ForwardClustered::collectObjs( const Camera *camera, size_t &outNumDecals )
     {
+        size_t numDecals = 0;
+
         const bool didCollect = mSceneManager->_collectForwardPlusObjects( camera );
 
         VisibleObjectsPerThreadArray &objsPerThread = mSceneManager->_getTmpVisibleObjectsList();
@@ -618,8 +622,10 @@ namespace Ogre
                 OGRE_ASSERT_MEDIUM( numRqs == objsPerRq.size() );
 
                 for( size_t rqId=0; rqId<numRqs; ++rqId )
+                {
                     objsPerRqInThread0[rqId].appendPOD( objsPerRq[rqId].begin(),
                                                         objsPerRq[rqId].end() );
+                }
 
                 ++itor;
             }
@@ -628,6 +634,9 @@ namespace Ogre
             const size_t numRqs = objsPerRqInThread0.size();
             for( size_t rqId=0; rqId<numRqs; ++rqId )
             {
+                if( MinDecalRq >= rqId && rqId <= MaxDecalRq )
+                    numDecals += objsPerRqInThread0[rqId].size();
+
                 std::sort( objsPerRqInThread0[rqId].begin(), objsPerRqInThread0[rqId].end(),
                            OrderObjsByDistanceToCamera );
             }
@@ -638,6 +647,8 @@ namespace Ogre
             for( size_t rqId=0; rqId<numRqs; ++rqId )
                 objsPerRqInThread0[rqId].clear();
         }
+
+        outNumDecals = numDecals;
     }
     //-----------------------------------------------------------------------------------
     inline bool OrderLightByDistanceToCamera( const Light *left, const Light *right )
@@ -694,7 +705,8 @@ namespace Ogre
                                        Light::MAX_FORWARD_PLUS_LIGHTS, mCurrentLightList );
         }
 
-        collectObjs( camera );
+        size_t numDecals;
+        collectObjs( camera, numDecals );
 
         const size_t numLights = mCurrentLightList.size();
 
@@ -711,8 +723,10 @@ namespace Ogre
                                                                    BT_DYNAMIC_PERSISTENT, 0, false );
         }
 
+        const size_t bufferBytesNeeded = calculateBytesNeeded( std::max<size_t>( numLights, 96u ),
+                                                               std::max<size_t>( numDecals, 16u ) );
         if( !gridBuffers.globalLightListBuffer ||
-            gridBuffers.globalLightListBuffer->getNumElements() < c_numBytesPerLight * numLights )
+            gridBuffers.globalLightListBuffer->getNumElements() < bufferBytesNeeded )
         {
             if( gridBuffers.globalLightListBuffer )
             {
@@ -723,8 +737,7 @@ namespace Ogre
 
             gridBuffers.globalLightListBuffer = mVaoManager->createTexBuffer(
                                                                     PF_FLOAT32_RGBA,
-                                                                    c_numBytesPerLight *
-                                                                    std::max<size_t>( numLights, 96 ),
+                                                                    bufferBytesNeeded,
                                                                     BT_DYNAMIC_PERSISTENT, 0, false );
         }
 

@@ -10,6 +10,11 @@ namespace Ogre
     class Decal : public MovableObject
     {
     public:
+        uint32 mDiffuseIdx;
+        uint32 mNormalMapIdx;
+        uint32 mEmissiveIdx;
+
+    public:
         Decal( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager* manager );
         virtual ~Decal();
 
