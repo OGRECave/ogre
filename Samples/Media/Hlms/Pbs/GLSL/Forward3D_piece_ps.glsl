@@ -212,6 +212,67 @@
 	}
 @end
 
+@property( hlms_enable_decals )
+	numLightsInGrid	= bufferFetch( f3dGrid, int(sampleOffset + 3u) ).x;TODO_hardcoded_3;
+
+	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
+
+	for( uint i=0; i<numLightsInGrid; ++i )
+	{
+		//Get the light index
+		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + @value( hlms_decals_start )) ).x;
+
+		float4 invWorldView0	= texelFetch( f3dLightList, int(idx) ).xyzw;
+		float4 invWorldView1	= texelFetch( f3dLightList, int(idx + 1u) ).xyzw;
+		float4 invWorldView2	= texelFetch( f3dLightList, int(idx + 2u) ).xyzw;
+		float4 texIndices		= texelFetch( f3dLightList, int(idx + 3u) ).xyzw;
+
+		float3 localPos;
+		localPos.x = dot( invWorldView0.xyzw, float4( inPs.pos.xyz, 1.0f ) );
+		localPos.y = dot( invWorldView1.xyzw, float4( inPs.pos.xyz, 1.0f ) );
+		localPos.z = dot( invWorldView2.xyzw, float4( inPs.pos.xyz, 1.0f ) );
+
+		float2 decalUV = localPos.xz + 0.5f;
+
+		@property( hlms_decals_diffuse )
+			float4 decalDiffuse = OGRE_SampleArray2D( decalsDiffuseTex, decalsSampler,
+													  decalUV.xy, floatBitsToUint( texIndices.x ) ).xyzw;
+		@end
+		@property( hlms_decals_normals )
+			float2 decalNormals = OGRE_SampleArray2D( decalsNormalsTex, decalsSampler,
+													  decalUV.xy, floatBitsToUint( texIndices.y ) ).xy;
+		@end
+		@property( hlms_decals_emissive )
+			float3 decalEmissive = OGRE_SampleArray2D( decalsEmissiveTex, decalsSampler,
+													   decalUV.xy, floatBitsToUint( texIndices.z ) ).xyz;
+		@end
+
+		@property( hlms_decals_diffuse )
+			float decalMask = decalDiffuse.w;
+		@end
+		@property( !hlms_decals_diffuse )
+			float decalMask = 1.0f;
+		@end
+
+		//Mask the decal entirely if localPos is outside the debox
+		float3 absLocalPos = abs( localPos.xyz );
+		decalMask = (absLocalPos.x > 0.5f || absLocalPos.y > 0.5f ||
+					 absLocalPos.z > 0.5f) ? 0.0f : decalMask;
+
+		@property( hlms_decals_diffuse )
+			diffuseCol.xyz  = lerp( diffuseCol.xyz, decalDiffuse.xyz, decalMask );
+		@end
+		@property( hlms_decals_normals )
+			tsNormal.xyz    = float3( tsNormal.xy + decalNormals.xy * decalMask, tsNormal.z );
+			tsNormal.xyz	= normalize( tsNormal.xyz );
+		@end
+		@property( hlms_decals_emissive )
+			finalColour		+= (absLocalPos.x > 0.5f || absLocalPos.y > 0.5f ||
+								absLocalPos.z > 0.5f) ? 0.0f : decalEmissive.xyz;
+
+	}
+@end
+
 	@property( hlms_forwardplus_debug )
 		@property( hlms_forwardplus == forward3d )
 			float occupancy = (totalNumLightsInGrid / passBuf.f3dGridHWW[0].w);
