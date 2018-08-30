@@ -1,8 +1,13 @@
 @property( hlms_forwardplus )
+
+@pmul( skip_header_in_lighting, hlms_prepass, hlms_enable_decals )
+
 @property( hlms_forwardplus_fine_light_mask )
 	@piece( andObjLightMaskFwdPlusCmp )&& ((objLightMask & floatBitsToUint( lightDiffuse.w )) != 0u)@end
 @end
-@piece( forward3dLighting )
+
+/// The header is automatically inserted. Whichever subsystem needs it first, will call it
+@piece( forward3dHeader )
 	@property( hlms_forwardplus_covers_entire_target )
 		#define FWDPLUS_APPLY_OFFSET_Y(v) (v)
 		#define FWDPLUS_APPLY_OFFSET_X(v) (v)
@@ -84,6 +89,12 @@
 
 		sampleOffset *= @value( fwd_clustered_lights_per_cell )u;
 	@end
+@end
+
+@piece( forward3dLighting )
+	@property( !skip_header_in_lighting )@insertpiece( forward3dHeader )@end
+
+	finalColour += finalDecalEmissive;
 
 	uint numLightsInGrid = bufferFetch( f3dGrid, int(sampleOffset) ).x;
 
@@ -92,7 +103,7 @@
 	for( uint i=0u; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
-		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + 3u) ).x;
+		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + @value( hlms_reserved_slots )u) ).x;
 
 		//Get the light
 		vec4 posAndType = bufferFetch( f3dLightList, int(idx) );
@@ -130,7 +141,7 @@
 	for( uint i=prevLightCount; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
-		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + 3u) ).x;
+		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + @value( hlms_reserved_slots )u) ).x;
 
 		//Get the light
 		vec4 posAndType = bufferFetch( f3dLightList, int(idx) );
@@ -184,7 +195,7 @@
 	for( uint i=prevLightCount; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
-		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + 3u) ).x;
+		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + @value( hlms_reserved_slots )u) ).x;
 
 		//Get the light
 		vec4 posAndType = bufferFetch( f3dLightList, int(idx) );
@@ -213,14 +224,21 @@
 @end
 
 @property( hlms_enable_decals )
-	numLightsInGrid	= bufferFetch( f3dGrid, int(sampleOffset + 3u) ).x;TODO_hardcoded_3;
+/// Perform decals *after* sampling the diffuse colour.
+@piece( forwardPlusDoDecals )
+	@insertpiece( forward3dHeader )
+
+	float3 finalDecalTsNormal = float3( 0.0f, 0.0f, 1.0f );
+	float3 finalDecalEmissive = float3( 0.0f, 0.0f, 0.0f );
+
+	numLightsInGrid	= bufferFetch( f3dGrid, int(sampleOffset + @value(hlms_decals_offset)) ).x;
 
 	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
 
 	for( uint i=0; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
-		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + @value( hlms_decals_start )) ).x;
+		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + @value( hlms_reserved_slots )u) ).x;
 
 		float4 invWorldView0	= texelFetch( f3dLightList, int(idx) ).xyzw;
 		float4 invWorldView1	= texelFetch( f3dLightList, int(idx + 1u) ).xyzw;
@@ -261,16 +279,28 @@
 
 		@property( hlms_decals_diffuse )
 			diffuseCol.xyz  = lerp( diffuseCol.xyz, decalDiffuse.xyz, decalMask );
+			TODO_ensure_diffuseCol_is_forced;
 		@end
 		@property( hlms_decals_normals )
-			tsNormal.xyz    = float3( tsNormal.xy + decalNormals.xy * decalMask, tsNormal.z );
-			tsNormal.xyz	= normalize( tsNormal.xyz );
+			finalDecalTsNormal.xy += decalNormals.xy;
 		@end
 		@property( hlms_decals_emissive )
-			finalColour		+= (absLocalPos.x > 0.5f || absLocalPos.y > 0.5f ||
-								absLocalPos.z > 0.5f) ? 0.0f : decalEmissive.xyz;
+			finalDecalEmissive	+= (absLocalPos.x > 0.5f || absLocalPos.y > 0.5f ||
+									absLocalPos.z > 0.5f) ? 0.0f : decalEmissive.xyz;
+		@end
 
 	}
+@end
+@property( hlms_decals_normals )
+	/// Apply decals normal *after* sampling the tangent space normals (and detail normals too).
+	@piece( forwardPlusApplyDecalsNormal )
+		finalDecalTsNormal.xyz = normalize( finalDecalTsNormal.xyz );
+		nNormal.xy	+= finalDecalTsNormal.xy;
+		nNormal.z	*= finalDecalTsNormal.z;
+		//Do not normalize as later normalize( TBN * nNormal ) will take care of it
+		TODO_ensure_normal_map_is_forced;
+	@end
+@end
 @end
 
 	@property( hlms_forwardplus_debug )

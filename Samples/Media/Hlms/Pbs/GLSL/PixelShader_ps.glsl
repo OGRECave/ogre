@@ -244,6 +244,8 @@ void main()
 		if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
 			discard;
 	@end
+
+	@insertpiece( forwardPlusDoDecals )
 @end
 
 @property( !hlms_use_prepass )
@@ -288,6 +290,8 @@ void main()
 		nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
 
 	@insertpiece( custom_ps_posSampleNormal )
+
+	@insertpiece( forwardPlusApplyDecalsNormal )
 
 	@property( normal_map )
 		nNormal = normalize( TBN * nNormal );
