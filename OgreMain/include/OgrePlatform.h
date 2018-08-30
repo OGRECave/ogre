@@ -302,19 +302,21 @@ namespace Ogre {
 // We perform intensive validation without concerns for performance
 #define OGRE_DEBUG_HIGH     3
 
-// We cannot tell whether something is a debug build or not simply by checking NDEBUG because it's perfectly valid for a
-// user to #undef NDEBUG to get assertions in a release build. DEBUG is set automatically on MSVC and _DEBUG is set 
-// automatically on MINGW. Some environments don't provide any debug flags besides NDEBUG by default, so we issue a 
+// We cannot tell whether something is a debug build or not simply by checking NDEBUG because
+// it's perfectly valid for a user to #undef NDEBUG to get assertions in a release build.
+// DEBUG is set automatically on MSVC and _DEBUG is set automatically on MINGW.
+// Some environments don't provide any debug flags besides NDEBUG by default, so we issue a
 // warning here.
 #ifndef OGRE_DEBUG_MODE
 #   if !defined(NDEBUG) && !defined(_DEBUG) && !defined(DEBUG) && !defined(OGRE_IGNORE_UNKNOWN_DEBUG)
 #       pragma message (\
-         "Ogre can't tell whether this is a debug build. If it is, please add _DEBUG to the preprocessor definitions. "\
-         "Otherwise, you can set OGRE_IGNORE_UNKNOWN_DEBUG to suppress this warning. Ogre will assume this is not a "\
-         "debug build by default. To add _DEBUG with g++, invoke g++ with the argument -D _DEBUG. To add it in CMake, "\
-         "include “if (CMAKE_BUILD_TYPE STREQUAL \"Debug\") add_compile_definitions(_DEBUG) endif()” in the upper "\
-         "CMakeLists.txt file. IDE's usually provide the possibility to add preprocessor definitions in the build "\
-         "settings. You can also manually set OGRE_DEBUG_MODE to either 1 or 0 instead of adding _DEBUG.")
+    "Ogre can't tell whether this is a debug build. If it is, please add _DEBUG to the preprocessor "\
+    "definitions. Otherwise, you can set OGRE_IGNORE_UNKNOWN_DEBUG to suppress this warning. Ogre will "\
+    "assume this is not a debug build by default. To add _DEBUG with g++, invoke g++ with the argument "\
+    "-D_DEBUG. To add it in CMake, include "\
+    "set( CMAKE_CXX_FLAGS_DEBUG \"${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1 -D_DEBUG=1\" ) at the top of your "\
+    "CMakeLists.txt file. IDEs usually provide the possibility to add preprocessor definitions in the build "\
+    "settings. You can also manually set OGRE_DEBUG_MODE to either 1 or 0 instead of adding _DEBUG." )
 #   endif
 #   if defined(NDEBUG) && defined(_DEBUG) && !defined(OGRE_IGNORE_DEBUG_FLAG_CONTRADICTION)
 #       pragma message (\
