@@ -102,7 +102,7 @@ namespace Ogre
         platform dependent alignment.
     */
     template <size_t Alignment = 0>
-    class _OgreExport NedPoolingAlignedPolicy
+    class NedPoolingAlignedPolicy
     {
     public:
         // compile-time check alignment is available.
