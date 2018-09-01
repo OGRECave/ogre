@@ -51,8 +51,6 @@ THE SOFTWARE.
 #include "OgreProfiler.h"
 
 #define TODO_missing_aabb_frustum_check
-#define TODO_add_decalsStartOffset;
-#define TODO_add_decalsIndexIsNotnumDecalsDot6;
 
 namespace Ogre
 {
@@ -72,6 +70,8 @@ namespace Ogre
         mObjsPerCell( lightsPerCell + decalsPerCell + mReservedSlotsPerCell ),
         mLightsPerCell( lightsPerCell ),
         mDecalsPerCell( decalsPerCell ),
+        mDecalsStartOffset( alignToNextMultiple( (mLightsPerCell * NumBytesPerLight) >> 2u,
+                                                 NumBytesPerDecal >> 2u ) ),
         mGridBuffer( 0 ),
         mCurrentCamera( 0 ),
         mMinDistance( minDistance ),
@@ -473,7 +473,8 @@ namespace Ogre
             ++itLight;
         }
 
-        uint16 numDecals = 0;
+        uint16 numDecals = mDecalsStartOffset >> 2u;
+
         const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
         const size_t actualMaxDecalRq = std::min( MaxDecalRq, objsPerRqInThread0.size() );
         for( size_t rqId=MinDecalRq; rqId<=actualMaxDecalRq; ++rqId )
@@ -555,9 +556,7 @@ namespace Ogre
                                 uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
                                                                    mLightsPerCell +
                                                                    mReservedSlotsPerCell;
-                                TODO_add_decalsStartOffset;
-                                TODO_add_decalsIndexIsNotnumDecalsDot6;
-                                *cellElem = numDecals * 6;
+                                *cellElem = numDecals * 4u;
                                 ++numLightsInCell->decalCount;
                             }
                         }
@@ -577,16 +576,29 @@ namespace Ogre
                     (frustumStartIdx + numPackedFrustumsPerSlice) * ARRAY_PACKED_REALS;
 
             const size_t cellSize = mObjsPerCell;
+            const bool hasLights = mLightsPerCell > 0u;
+            const bool hasDecals = mDecalsEnabled;
             size_t gridIdx = frustumStartIdx * ARRAY_PACKED_REALS * cellSize;
 
             while( itor != end )
             {
                 uint32 accumLight = itor->lightCount[1];
-                mGridBuffer[gridIdx+0u] = static_cast<uint16>( accumLight );
-                accumLight += itor->lightCount[2];
-                mGridBuffer[gridIdx+1u] = static_cast<uint16>( accumLight );
-                accumLight += itor->lightCount[3];
-                mGridBuffer[gridIdx+2u] = static_cast<uint16>( accumLight );
+                size_t idx = 0;
+                if( hasLights )
+                {
+                    mGridBuffer[gridIdx+0u] = static_cast<uint16>( accumLight );
+                    accumLight += itor->lightCount[2];
+                    mGridBuffer[gridIdx+1u] = static_cast<uint16>( accumLight );
+                    accumLight += itor->lightCount[3];
+                    mGridBuffer[gridIdx+2u] = static_cast<uint16>( accumLight );
+
+                    idx = 3u;
+                }
+                if( hasDecals )
+                {
+                    mGridBuffer[gridIdx+idx+0u] = static_cast<uint16>( itor->decalCount );
+                    ++idx;
+                }
                 gridIdx += cellSize;
                 ++itor;
             }
