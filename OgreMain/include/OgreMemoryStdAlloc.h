@@ -104,7 +104,7 @@ namespace Ogre
 
 	*/
 	template <size_t Alignment = 0>
-    class _OgreExport StdAlignedAllocPolicy
+	class StdAlignedAllocPolicy
 	{
 	public:
 		// compile-time check alignment is available.

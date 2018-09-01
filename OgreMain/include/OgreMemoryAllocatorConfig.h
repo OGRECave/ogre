@@ -198,8 +198,8 @@ namespace Ogre
 
     // configurable category, for general malloc
     // notice how we ignore the category here, you could specialise
-    template <MemoryCategory Cat> class _OgreExport CategorisedAllocPolicy : public NedPoolingPolicy{};
-    template <MemoryCategory Cat, size_t align = 0> class _OgreExport CategorisedAlignAllocPolicy : public NedPoolingAlignedPolicy<align>{};
+    template <MemoryCategory Cat> class CategorisedAllocPolicy : public NedPoolingPolicy{};
+    template <MemoryCategory Cat, size_t align = 0> class CategorisedAlignAllocPolicy : public NedPoolingAlignedPolicy<align>{};
 }
 
 #elif OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NED
@@ -213,8 +213,8 @@ namespace Ogre
 
     // configurable category, for general malloc
     // notice how we ignore the category here, you could specialise
-    template <MemoryCategory Cat> class _OgreExport CategorisedAllocPolicy : public NedAllocPolicy{};
-    template <MemoryCategory Cat, size_t align = 0> class _OgreExport CategorisedAlignAllocPolicy : public NedAlignedAllocPolicy<align>{};
+    template <MemoryCategory Cat> class CategorisedAllocPolicy : public NedAllocPolicy{};
+    template <MemoryCategory Cat, size_t align = 0> class CategorisedAlignAllocPolicy : public NedAlignedAllocPolicy<align>{};
 }
 
 #elif OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_STD
@@ -228,8 +228,8 @@ namespace Ogre
 
     // configurable category, for general malloc
     // notice how we ignore the category here
-    template <MemoryCategory Cat> class _OgreExport CategorisedAllocPolicy : public StdAllocPolicy{};
-    template <MemoryCategory Cat, size_t align = 0> class _OgreExport CategorisedAlignAllocPolicy : public StdAlignedAllocPolicy<align>{};
+    template <MemoryCategory Cat> class CategorisedAllocPolicy : public StdAllocPolicy{};
+    template <MemoryCategory Cat, size_t align = 0> class CategorisedAlignAllocPolicy : public StdAlignedAllocPolicy<align>{};
 
     // if you wanted to specialise the allocation per category, here's how it might work:
     // template <> class CategorisedAllocPolicy<MEMCATEGORY_SCENE_OBJECTS> : public YourSceneObjectAllocPolicy{};
@@ -249,8 +249,8 @@ namespace Ogre
 
     // configurable category, for general malloc
     // notice how we ignore the category here, you could specialise
-    template <MemoryCategory Cat> class _OgreExport CategorisedAllocPolicy : public TrackAllocPolicy{};
-    template <MemoryCategory Cat, size_t align = 0> class _OgreExport CategorisedAlignAllocPolicy : public TrackAlignedAllocPolicy<align>{};
+    template <MemoryCategory Cat> class CategorisedAllocPolicy : public TrackAllocPolicy{};
+    template <MemoryCategory Cat, size_t align = 0> class CategorisedAlignAllocPolicy : public TrackAlignedAllocPolicy<align>{};
 }
 
 #else
