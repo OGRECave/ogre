@@ -302,6 +302,17 @@ namespace Ogre {
                     return pf;
             }
         }
+
+        // allow look-up by alias name
+        if(tmp == "PF_BYTE_RGB")
+            return PF_BYTE_RGB;
+        if(tmp == "PF_BYTE_RGBA")
+            return PF_BYTE_RGBA;
+        if(tmp == "PF_BYTE_BGR")
+            return PF_BYTE_BGR;
+        if(tmp == "PF_BYTE_BGRA")
+            return PF_BYTE_BGRA;
+
         return PF_UNKNOWN;
     }
     //-----------------------------------------------------------------------

@@ -2,7 +2,7 @@ compositor SSAO/Post/Modulate
 {
     technique 
     {
-		texture ssao target_width target_height PF_A8R8G8B8 chain_scope
+		texture ssao target_width target_height PF_BYTE_RGBA chain_scope
         
 	    target ssao
         {
@@ -74,7 +74,7 @@ compositor SSAO/Post/CrossBilateralFilter
 {
     technique
     {
-        texture accessibility target_width target_height PF_R8G8B8A8
+        texture accessibility target_width target_height PF_BYTE_RGBA
 
         target accessibility
         {
