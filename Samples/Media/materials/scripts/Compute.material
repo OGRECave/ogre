@@ -6,15 +6,6 @@ compute_program Compute/CS_GLSL glsl
         source ComputeCS.glsl
         syntax glsl430
 
-        // the texture size is 256x256x1 and the group size is 16x16x1
-        // so we have to launch 16x16x1 groups
-        compute_group_dimensions 16 16 1
-        default_params
-        {
-            param_named_auto roll time
-        }
-        //TODO is this necessary?
-        // placement postrender
         //TODO how to handle glMemoryBarrier?
         // do other programs need to support this?
         // should be able to handle multiple barriers via bit ops
@@ -22,55 +13,36 @@ compute_program Compute/CS_GLSL glsl
         // post_memory_barrier texture
 }
 
-vertex_program Compute/VS_GLSL glsl
-{
-        source ComputeVS.glsl
-        syntax glsl150
-
-        default_params
-        {
-            param_named_auto WorldViewProj worldviewproj_matrix
-        }
-}
-
-fragment_program Compute/PS_GLSL glsl
-{
-        source ComputeFS.glsl
-        syntax glsl430
-}
-
 compute_program Compute/CS unified
 {
         delegate Compute/CS_GLSL
 }
-
-vertex_program Compute/VS unified
-{
-        delegate Compute/VS_GLSL
-}
-
-fragment_program Compute/PS unified
-{
-        delegate Compute/PS_GLSL
-}
-
-material Compute
+material Compute/Compositor
 {
     technique
     {
         pass
         {
+            compute_program_ref Compute/CS 
+            {
+                param_named_auto roll time
+            }
+        }
+    }
+}
+
+material Compute/Show
+{
+    technique
+    {
+        pass
+        {
+            lighting off
             texture_unit
             {
-              //texture data.csv
-              // FIXME not implemented in script parser
-              //image_bind 0 read X8R8B8G8
+                filtering none
+                tex_address_mode clamp
             }
-
-            compute_program_ref Compute/CS {}
-
-            vertex_program_ref Compute/VS {}
-            fragment_program_ref Compute/PS {}
         }
     }
 }

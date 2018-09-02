@@ -48,8 +48,9 @@ namespace OgreBites {
 
         Ogre::MeshManager::getSingleton().createPlane("PlaneMesh", "General", plane, 20, 20);
         mOgreEnt = mSceneMgr->createEntity("Plane", "PlaneMesh");
-        mOgreEnt->setMaterialName("Compute");
-        //mOgreEnt->setMaterialName("BaseWhiteNoLighting");
+
+        MaterialPtr mat = MaterialManager::getSingleton().getByName("Compute/Show");
+        mOgreEnt->setMaterial(mat);
         SceneNode* ogre = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         ogre->setPosition(0, 0, 0);
         ogre->setDirection(0,0,1);
@@ -65,11 +66,14 @@ namespace OgreBites {
             TEX_TYPE_2D, // Texture type
             256, 256, 1, // Width, Height, Depth
             0,           // Number of mipmaps
-            PF_B8G8R8A8,  // Pixel format  //TODO support formats from GL3+
+            PF_BYTE_RGBA, // Pixel format
             TU_DYNAMIC   // usage
         );
 
+        // make it accessible to the compute shader (write)
         mImage->createShaderAccessPoint(0);
+        // make it accessible for normal sampling (read)
+        mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTexture(mImage);
 
         mPixelBuffer = mImage->getBuffer(0,0);
 
@@ -79,17 +83,20 @@ namespace OgreBites {
 
         // Update the contents of pb here
         // Image data starts at pb.data and has format pb.format
-        // Here we assume data.format is PF_X8R8G8B8 so we can address pixels as uint32.
+        // we can address pixels as uint32.
         {
             uint* data = reinterpret_cast<uint*>(pb.data);
             size_t height = pb.getHeight();
             size_t width = pb.getWidth();
 
-            // 0xXXRRGGBB -> fill the buffer with yellow pixels
-            std::fill(data, data + width * height, 0x00FFFF00);
+            // 0xAABBGGRR -> fill the buffer with yellow pixels
+            std::fill(data, data + width * height, 0x0000FFFF);
 
             // Unlock the buffer again (frees it for use by the GPU)
             mPixelBuffer->unlock();
         }
+
+        CompositorManager::getSingleton().addCompositor(mViewport, "Compute");
+        CompositorManager::getSingleton().setCompositorEnabled(mViewport, "Compute", true);
     }
 }
