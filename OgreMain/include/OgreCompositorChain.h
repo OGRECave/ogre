@@ -200,7 +200,6 @@ namespace Ogre {
         void destroyResources(void);
         
         /** Internal method to get a unique name of a compositor
-        @param viewport Pointer to a viewport used for generating the compositor name.
         */
         const String getCompositorName() const;
 
