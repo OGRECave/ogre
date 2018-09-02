@@ -1331,6 +1331,20 @@ namespace Ogre {
         mStateCacheManager->setTexParameteri(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
     }
 
+    void GL3PlusRenderSystem::_dispatchCompute(const Vector3i& workgroupDim)
+    {
+        // if(mComputeProgramExecutions <= compute_execution_cap)
+
+        //FIXME give user control over when and what memory barriers are created
+        // if (mPreComputeMemoryBarrier)
+        OGRE_CHECK_GL_ERROR(glMemoryBarrier(GL_ALL_BARRIER_BITS));
+        OGRE_CHECK_GL_ERROR(glDispatchCompute(workgroupDim[0], workgroupDim[1], workgroupDim[2]));
+        // if (mPostComputeMemoryBarrier)
+        //     OGRE_CHECK_GL_ERROR(glMemoryBarrier(toGL(MB_TEXTURE)));
+        // if (compute_execution_cap > 0)
+        //     mComputeProgramExecutions++;
+    }
+
     void GL3PlusRenderSystem::_render(const RenderOperation& op)
     {
         // Call super class.
@@ -1386,19 +1400,9 @@ namespace Ogre {
         }
 
         // Launch compute shader job(s).
-        if (mCurrentComputeShader) // && mComputeProgramPosition == CP_PRERENDER && mComputeProgramExecutions <= compute_execution_cap)
+        if (mCurrentComputeShader)
         {
-            //FIXME give user control over when and what memory barriers are created
-            // if (mPreComputeMemoryBarrier)
-            OGRE_CHECK_GL_ERROR(glMemoryBarrier(GL_ALL_BARRIER_BITS));
-            Vector3 workgroupDim = mCurrentComputeShader->getComputeGroupDimensions();
-            OGRE_CHECK_GL_ERROR(glDispatchCompute(int(workgroupDim[0]),
-                                                  int(workgroupDim[1]),
-                                                  int(workgroupDim[2])));
-            // if (mPostComputeMemoryBarrier)
-            //     OGRE_CHECK_GL_ERROR(glMemoryBarrier(toGL(MB_TEXTURE)));
-            // if (compute_execution_cap > 0)
-            //     mComputeProgramExecutions++;
+            _dispatchCompute(Vector3i(mCurrentComputeShader->getComputeGroupDimensions()));
         }
 
         int operationType = op.operationType;

@@ -2173,6 +2173,19 @@ namespace Ogre
     };
 
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::_dispatchCompute(const Vector3i& workgroupDim)
+    {
+        // Bound unordered access views
+        mDevice.GetImmediateContext()->Dispatch(workgroupDim[0], workgroupDim[1], workgroupDim[2]);
+
+        // unbind
+        ID3D11UnorderedAccessView* views[] = { 0 };
+        ID3D11ShaderResourceView* srvs[] = { 0 };
+        mDevice.GetImmediateContext()->CSSetShaderResources( 0, 1, srvs );
+        mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( 0, 1, views, NULL );
+        mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
+    }
+
     void D3D11RenderSystem::_render(const RenderOperation& op)
     {
 
@@ -2612,15 +2625,7 @@ namespace Ogre
         // Handle computing
         if(mBoundComputeProgram)
         {
-            // Bound unordered access views
-            mDevice.GetImmediateContext()->Dispatch(1, 1, 1);
-
-            ID3D11UnorderedAccessView* views[] = { 0 };
-            ID3D11ShaderResourceView* srvs[] = { 0 };
-            mDevice.GetImmediateContext()->CSSetShaderResources( 0, 1, srvs );
-            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( 0, 1, views, NULL );
-            mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
-
+            _dispatchCompute(Vector3i(mBoundComputeProgram->getComputeGroupDimensions()));
             return;
         }
         else if(mBoundTessellationHullProgram && mBoundTessellationDomainProgram)
