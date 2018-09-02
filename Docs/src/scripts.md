@@ -276,13 +276,11 @@ Within a Target Pass, there are one or more individual [passes](#Compositor-Pass
 
 </dd> </dl>
 
-# Format {#Format-1}
-
 @snippet Samples/Media/materials/scripts/Examples.compositor manual_sample
 
-The major components of a compositor are the [techniques](#Compositor-Techniques), the [target passes](#Compositor-Target-Passes) and the [passes](#Compositor-Passes), which are covered in detail in the following sections.
+The major components of a compositor are the @ref Compositor-Techniques, the @ref Compositor-Target-Passes and the @ref Compositor-Passes, which are covered in detail in the following sections.
 
-## Techniques {#Compositor-Techniques}
+# Techniques {#Compositor-Techniques}
 
 A compositor technique is much like a [material technique](@ref Techniques) in that it describes one approach to achieving the effect you’re looking for. A compositor definition can have more than one technique if you wish to provide some fallback should the hardware not support the technique you’d prefer to use. Techniques are evaluated for hardware support based on 2 things:
 
@@ -299,6 +297,7 @@ This one is slightly more complicated. When you request a [texture](#compositor_
 
 As with material techniques, compositor techniques are evaluated in the order you define them in the script, so techniques declared first are preferred over those declared later.
 
+@par
 Format: technique { }
 
 Techniques can have the following nested elements:
@@ -394,13 +393,23 @@ Format: compositor\_logic &lt;Name&gt;
 
 Registration of compositor logics is done by name through CompositorManager::registerCompositorLogic.
 
-## Target Passes {#Compositor-Target-Passes}
+# Target Passes {#Compositor-Target-Passes}
 
 A target pass is the action of rendering to a given target, either a render texture or the final output. You can update the same render texture multiple times by adding more than one target pass to your compositor script - this is very useful for ’ping pong’ renders between a couple of render textures to perform complex convolutions that cannot be done in a single render, such as blurring.
 
-There are two types of target pass, the sort that updates a render texture: Format: target &lt;Name&gt; { } ... and the sort that defines the final output render: Format: target\_output { }
+There are two types of target pass, the sort that updates a render texture
 
-The contents of both are identical, the only real difference is that you can only have a single target\_output entry, whilst you can have many target entries. Here are the attributes you can use in a ’target’ or ’target\_output’ section of a .compositor script:
+@par
+Format: target &lt;Name&gt; { }
+
+and the sort that defines the final output render
+
+@par
+Format: target\_output { }
+
+The contents of both are identical, the only real difference is that you can only have a single target\_output entry, whilst you can have many target entries. 
+
+Here are the attributes you can use in a ’target’ or ’target\_output’ section of a .compositor script:
 
 -   [input](#compositor_005ftarget_005finput)
 -   [only\_initial](#only_005finitial)
@@ -412,7 +421,7 @@ The contents of both are identical, the only real difference is that you can onl
 
 <a name="Attribute-Descriptions-2"></a>
 
-# Attribute Descriptions
+## Attribute Descriptions
 
 <a name="compositor_005ftarget_005finput"></a><a name="input"></a>
 
@@ -484,7 +493,7 @@ Format: material\_scheme &lt;scheme name&gt;
 @par
 Default: None
 
-## Compositor Passes {#Compositor-Passes}
+# Compositor Passes {#Compositor-Passes}
 
 A pass is a single rendering action to be performed in a target pass.  
 @par
@@ -519,7 +528,7 @@ Here are the attributes you can use in a ’pass’ section of a .compositor scr
 
 <a name="Available-Pass-Attributes"></a>
 
-# Available Pass Attributes
+## Available Pass Attributes
 
 -   [material](#material)
 -   [input](#compositor_005fpass_005finput)
@@ -596,9 +605,12 @@ Format: material\_scheme &lt;scheme name&gt;
 @par
 Default: None
 
-# Clear Section {#Clear-Section}
+## Clear Section {#Clear-Section}
 
-For passes of type ’clear’, this section defines the buffer clearing parameters.  Format: clear { }
+For passes of type ’clear’, this section defines the buffer clearing parameters.  
+
+@par
+Format: pass clear { }
 
 Here are the attributes you can use in a ’clear’ section of a .compositor script:
 
@@ -646,11 +658,12 @@ Here are the attributes you can use in a ’clear’ section of a .compositor sc
     @par
     Default: stencil\_value 0.0
 
-# Stencil Section {#Stencil-Section}
+## Stencil Section {#Stencil-Section}
 
 For passes of type ’stencil’, this section defines the stencil operation parameters. 
 
-Format: stencil { }
+@par
+Format: pass stencil { }
 
 Here are the attributes you can use in a ’stencil’ section of a .compositor script:
 
