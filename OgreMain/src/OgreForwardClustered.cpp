@@ -844,6 +844,7 @@ namespace Ogre
 
         if( mDecalsEnabled )
         {
+            hlms->_setProperty( HlmsBaseProp::EnableDecals, 1 );
             if( mSceneManager->getDecalsDiffuse() )
                 hlms->_setProperty( HlmsBaseProp::DecalsDiffuse,    1 );
             if( mSceneManager->getDecalsNormals() )
