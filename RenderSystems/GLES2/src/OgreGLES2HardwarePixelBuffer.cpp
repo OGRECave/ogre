@@ -653,19 +653,12 @@ namespace Ogre {
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         OGRE_CHECK_GL_ERROR(glTexParameteri(src->mTarget, GL_TEXTURE_BASE_LEVEL, 0));
-
-        // Detach texture from temporary framebuffer
-        if(mFormat == PF_DEPTH)
-        {
-            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                                                          GL_RENDERBUFFER, 0));
-        }
-        else
 #endif
-        {
-            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                                          GL_RENDERBUFFER, 0));
-        }
+        // Detach texture from temporary framebuffer
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(
+            GL_FRAMEBUFFER, PixelUtil::isDepth(mFormat) ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0,
+            GL_RENDERBUFFER, 0));
+
         // Restore old framebuffer
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
         if(tempTex)

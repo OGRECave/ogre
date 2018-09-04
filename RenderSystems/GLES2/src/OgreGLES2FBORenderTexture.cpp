@@ -182,7 +182,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
     }
 
-    void GLES2FBOManager::_createTempFramebuffer(PixelFormat pixFmt, GLuint internalFormat, GLuint fmt, GLenum type, GLuint &fb, GLuint &tid)
+    void GLES2FBOManager::_createTempFramebuffer(GLuint internalFormat, GLuint fmt, GLenum type, GLuint &fb, GLuint &tid)
     {
         // Create and attach framebuffer
         glGenFramebuffers(1, &fb);
@@ -202,7 +202,8 @@ namespace Ogre {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, type, 0);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+            glFramebufferTexture2D(GL_FRAMEBUFFER,
+                                   fmt == GL_DEPTH_COMPONENT ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0,
                                    GL_TEXTURE_2D, tid, 0);
         }
     }
@@ -347,7 +348,7 @@ namespace Ogre {
                 continue;
 
             // Create and attach framebuffer
-            _createTempFramebuffer((PixelFormat)x, internalFormat, fmt, type, fb, tid);
+            _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
 
             // Ignore status in case of fmt==GL_NONE, because no implementation will accept
             // a buffer without *any* attachment. Buffers with only stencil and depth attachment
@@ -390,7 +391,7 @@ namespace Ogre {
                                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                                 glDeleteFramebuffers(1, &fb);
 
-                                _createTempFramebuffer((PixelFormat)x, internalFormat, fmt, type, fb, tid);
+                                _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
                             }
                         }
                     }
@@ -413,7 +414,7 @@ namespace Ogre {
                             glBindFramebuffer(GL_FRAMEBUFFER, 0);
                             glDeleteFramebuffers(1, &fb);
 
-                            _createTempFramebuffer((PixelFormat)x, internalFormat, fmt, type, fb, tid);
+                            _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
                         }
                     }
                 }
@@ -456,7 +457,7 @@ namespace Ogre {
         // [best supported for internal format]
         size_t bestmode = 0;
         int bestscore = -1;
-        bool requestDepthOnly = internalFormat == PF_DEPTH;
+        bool requestDepthOnly = PixelUtil::isDepth(internalFormat);
 
         for(size_t mode = 0; mode < props.modes.size(); mode++)
         {
@@ -486,10 +487,7 @@ namespace Ogre {
             }
         }
         *depthFormat = depthFormats[props.modes[bestmode].depth];
-        if(requestDepthOnly)
-            *stencilFormat = 0;
-        else
-            *stencilFormat = stencilFormats[props.modes[bestmode].stencil];
+        *stencilFormat = requestDepthOnly ? 0 : stencilFormats[props.modes[bestmode].stencil];
     }
 
     GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name, 

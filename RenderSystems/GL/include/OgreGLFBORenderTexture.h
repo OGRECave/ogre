@@ -107,7 +107,7 @@ namespace Ogre {
         void detectFBOFormats();
         GLuint _tryFormat(GLenum depthFormat, GLenum stencilFormat);
         bool _tryPackedFormat(GLenum packedFormat);
-        void _createTempFramebuffer(GLuint fmt, GLuint &fb, GLuint &tid);
+        void _createTempFramebuffer(GLuint internalfmt, GLuint fmt, GLenum type, GLuint &fb, GLuint &tid);
     };
     
 

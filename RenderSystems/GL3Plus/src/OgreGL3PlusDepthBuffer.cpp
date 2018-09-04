@@ -136,10 +136,7 @@ namespace Ogre
                         bSameStencil = stencilFormat == mStencilBuffer->getGLFormat();
                 }
 
-                if(internalFormat == PF_DEPTH)
-                    retVal = bSameDepth;
-                else
-                    retVal = bSameDepth && bSameStencil;
+                retVal = PixelUtil::isDepth(internalFormat) ? bSameDepth : (bSameDepth && bSameStencil);
             }
         }
 

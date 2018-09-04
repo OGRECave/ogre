@@ -51,8 +51,10 @@ namespace Ogre
                 mBitDepth = 16;
                 break;
             case GL_DEPTH_COMPONENT24:
-            case GL_DEPTH_COMPONENT32:
             case GL_DEPTH24_STENCIL8_EXT:
+	            mBitDepth = 24;
+	            break;
+            case GL_DEPTH_COMPONENT32:
                 mBitDepth = 32;
                 break;
             }
@@ -131,7 +133,7 @@ namespace Ogre
                         bSameStencil = stencilFormat == mStencilBuffer->getGLFormat();
                 }
 
-                retVal = bSameDepth && bSameStencil;
+                retVal = PixelUtil::isDepth(internalFormat) ? bSameDepth : (bSameDepth && bSameStencil);
             }
         }
 
