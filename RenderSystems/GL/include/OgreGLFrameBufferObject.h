@@ -77,9 +77,11 @@ namespace Ogre {
         GLsizei getFSAA();
         
         GLFBOManager *getManager() { return mManager; }
+        GLContext* getContext() { return mContext; }
         const GLSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
     private:
         GLFBOManager *mManager;
+        GLContext* mContext;
         GLsizei mNumSamples;
         GLuint mFB;
         GLuint mMultisampleFB;

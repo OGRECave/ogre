@@ -55,6 +55,10 @@ namespace Ogre {
         {
             *static_cast<GLFrameBufferObject **>(pData) = &mFB;
         }
+        else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
+        {
+            *static_cast<GLContext**>(pData) = mFB.getContext();
+        }
         else if (name == "GL_FBOID")
         {
             *static_cast<GLuint*>(pData) = mFB.getGLFBOID();
@@ -141,7 +145,7 @@ static const size_t depthBits[] =
         glDeleteFramebuffersEXT(1, &mTempFBO);      
     }
 
-    void GLFBOManager::_createTempFramebuffer(GLuint fmt, GLuint &fb, GLuint &tid)
+    void GLFBOManager::_createTempFramebuffer(GLuint internalfmt, GLuint fmt, GLenum type, GLuint &fb, GLuint &tid)
     {
         // NB we bypass state cache, this method is only called on startup and not after
         // GLStateCacheManager::initializeCache
@@ -165,8 +169,10 @@ static const size_t depthBits[] =
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+            glTexImage2D(GL_TEXTURE_2D, 0, internalfmt, PROBE_SIZE, PROBE_SIZE, 0, fmt, type, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+                                      fmt == GL_DEPTH_COMPONENT ? GL_DEPTH_ATTACHMENT_EXT
+                                                                : GL_COLOR_ATTACHMENT0_EXT,
                                       GL_TEXTURE_2D, tid, 0);
         }
         else
@@ -294,7 +300,10 @@ static const size_t depthBits[] =
             mProps[x].valid = false;
 
             // Fetch GL format token
-            GLenum fmt = GLPixelUtil::getGLInternalFormat((PixelFormat)x);
+            GLint internalFormat = GLPixelUtil::getGLInternalFormat((PixelFormat)x);
+            GLenum fmt = GLPixelUtil::getGLOriginFormat((PixelFormat)x);
+            GLenum type = GLPixelUtil::getGLOriginDataType((PixelFormat)x);
+
             if(fmt == GL_NONE && x != 0)
                 continue;
 
@@ -309,7 +318,7 @@ static const size_t depthBits[] =
                 continue;
 
             // Create and attach framebuffer
-            _createTempFramebuffer(fmt, fb, tid);
+            _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
 
             // Check status
             GLuint status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -359,7 +368,7 @@ static const size_t depthBits[] =
                                 // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
                                 glFinish();
 
-                                _createTempFramebuffer(fmt, fb, tid);
+                                _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
                             }
                         }
                     }
@@ -386,7 +395,7 @@ static const size_t depthBits[] =
                             // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
                             glFinish();
 
-                            _createTempFramebuffer(fmt, fb, tid);
+                            _createTempFramebuffer(internalFormat, fmt, type, fb, tid);
                         }
                     }
                 }
@@ -429,6 +438,7 @@ static const size_t depthBits[] =
         /// [best supported for internal format]
         size_t bestmode=0;
         int bestscore=-1;
+        bool requestDepthOnly = PixelUtil::isDepth(internalFormat);
         for(size_t mode=0; mode<props.modes.size(); mode++)
         {
 #if 0
@@ -447,13 +457,13 @@ static const size_t depthBits[] =
             /// desirability == 2000...3000  if depth, no stencil
             /// desirability == 3000+        if depth and stencil
             /// beyond this, the total numer of bits (stencil+depth) is maximised
-            if(props.modes[mode].stencil)
+            if(props.modes[mode].stencil && !requestDepthOnly)
                 desirability += 1000;
             if(props.modes[mode].depth)
                 desirability += 2000;
             if(depthBits[props.modes[mode].depth]==24) // Prefer 24 bit for now
                 desirability += 500;
-            if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_EXT) // Prefer 24/8 packed 
+            if((depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_EXT) && !requestDepthOnly) // Prefer 24/8 packed
                 desirability += 5000;
             desirability += stencilBits[props.modes[mode].stencil] + depthBits[props.modes[mode].depth];
             
@@ -464,7 +474,7 @@ static const size_t depthBits[] =
             }
         }
         *depthFormat = depthFormats[props.modes[bestmode].depth];
-        *stencilFormat = stencilFormats[props.modes[bestmode].stencil];
+        *stencilFormat = requestDepthOnly ? 0 : stencilFormats[props.modes[bestmode].stencil];
     }
 
     GLFBORenderTexture *GLFBOManager::createRenderTexture(const String &name, 

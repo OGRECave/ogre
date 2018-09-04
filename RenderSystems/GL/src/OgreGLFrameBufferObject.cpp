@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreGLHardwarePixelBuffer.h"
 #include "OgreGLFBORenderTexture.h"
 #include "OgreGLDepthBuffer.h"
+#include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
 
@@ -41,6 +42,9 @@ namespace Ogre {
     GLFrameBufferObject::GLFrameBufferObject(GLFBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
+        GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+        mContext = rs->_getCurrentContext();
+
         // Generate framebuffer object
         glGenFramebuffersEXT(1, &mFB);
         // check multisampling
@@ -129,6 +133,8 @@ namespace Ogre {
         // Bind simple buffer to add colour attachments
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
 
+        bool isDepth = PixelUtil::isDepth(getFormat());
+
         // Bind all attachment points to frame buffer
         for(unsigned int x=0; x<maxSupportedMRTs; ++x)
         {
@@ -150,7 +156,9 @@ namespace Ogre {
                     ss << "Attachment " << x << " has incompatible format.";
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GLFrameBufferObject::initialise");
                 }
-                mColour[x].buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0_EXT+x, mColour[x].zoffset);
+
+                mColour[x].buffer->bindToFramebuffer(
+                    isDepth ? GL_DEPTH_ATTACHMENT_EXT : (GL_COLOR_ATTACHMENT0_EXT + x), mColour[x].zoffset);
             }
             else
             {
@@ -191,7 +199,7 @@ namespace Ogre {
             // Fill attached colour buffers
             if(mColour[x].buffer)
             {
-                bufs[x] = GL_COLOR_ATTACHMENT0_EXT + x;
+                bufs[x] = isDepth ? GL_DEPTH_ATTACHMENT_EXT : (GL_COLOR_ATTACHMENT0_EXT + x);
                 // Keep highest used buffer + 1
                 n = x+1;
             }
@@ -200,16 +208,17 @@ namespace Ogre {
                 bufs[x] = GL_NONE;
             }
         }
-        if(glDrawBuffers)
+
+        if(!isDepth)
         {
-            // Drawbuffer extension supported, use it
-            glDrawBuffers(n, bufs);
+            if(glDrawBuffers)
+                // Drawbuffer extension supported, use it
+                glDrawBuffers(n, bufs);
+            else
+                // In this case, the capabilities will not show more than 1 simultaneaous render target.
+                glDrawBuffer(bufs[0]);
         }
-        else
-        {
-            // In this case, the capabilities will not show more than 1 simultaneaous render target.
-            glDrawBuffer(bufs[0]);
-        }
+
         if (mMultisampleFB)
         {
             // we need a read buffer because we'll be blitting to mFB
