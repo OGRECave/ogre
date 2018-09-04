@@ -131,7 +131,7 @@ namespace Ogre
                         bSameStencil = stencilFormat == mStencilBuffer->getGLFormat();
                 }
 
-                retVal = bSameDepth && bSameStencil;
+                retVal = PixelUtil::isDepth(internalFormat) ? bSameDepth : (bSameDepth && bSameStencil);
             }
         }
 

@@ -149,7 +149,7 @@ namespace Ogre {
         return mRenderSystem->_getStateCacheManager();
     }
 
-    void GL3PlusFBOManager::_createTempFramebuffer(int ogreFormat, GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
+    void GL3PlusFBOManager::_createTempFramebuffer(GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
     {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &fb));
         mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, fb );
@@ -175,14 +175,9 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, dataType, 0));
 
-            if (ogreFormat == PF_DEPTH)
-            {
-                OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tid, 0));
-            }
-            else
-            {
-                OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tid, 0));
-            }
+            OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(
+                GL_DRAW_FRAMEBUFFER, fmt == GL_DEPTH_COMPONENT ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0,
+                GL_TEXTURE_2D, tid, 0));
         }
         else
         {
@@ -321,7 +316,7 @@ namespace Ogre {
                 formatSupported = params == GL_FULL_SUPPORT;
             } else {
                 // Create and attach framebuffer
-                _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
+                _createTempFramebuffer(internalFormat, originFormat, dataType, fb, tid);
 
                 // Check status
                 GLuint status;
@@ -437,7 +432,7 @@ namespace Ogre {
         // [best supported for internal format]
         size_t bestmode=0;
         int bestscore=-1;
-        bool requestDepthOnly = internalFormat == PF_DEPTH;
+        bool requestDepthOnly = PixelUtil::isDepth(internalFormat);
         for(size_t mode=0; mode<props.modes.size(); mode++)
         {
             int desirability = 0;
@@ -464,10 +459,7 @@ namespace Ogre {
             }
         }
         *depthFormat = depthFormats[props.modes[bestmode].depth];
-        if(requestDepthOnly)
-            *stencilFormat = 0;
-        else
-            *stencilFormat = stencilFormats[props.modes[bestmode].stencil];
+        *stencilFormat = requestDepthOnly ? 0 : stencilFormats[props.modes[bestmode].stencil];
     }
 
     GL3PlusFBORenderTexture *GL3PlusFBOManager::createRenderTexture(const String &name,

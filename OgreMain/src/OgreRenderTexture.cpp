@@ -44,7 +44,7 @@ namespace Ogre
         mColourDepth = static_cast<unsigned int>(
             Ogre::PixelUtil::getNumElemBits(mBuffer->getFormat()));
 
-        if(mBuffer->getFormat() == PF_DEPTH)
+        if(PixelUtil::isDepth(mBuffer->getFormat()))
             mDepthBufferPoolId = DepthBuffer::POOL_NO_DEPTH;
     }
     RenderTexture::~RenderTexture()
