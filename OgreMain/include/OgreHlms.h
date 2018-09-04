@@ -769,6 +769,9 @@ namespace Ogre
         static const IdString FwdClusteredWidthxHeight;
         static const IdString FwdClusteredWidth;
         static const IdString FwdClusteredLightsPerCell;
+        static const IdString DecalsDiffuse;
+        static const IdString DecalsNormals;
+        static const IdString DecalsEmissive;
 
         static const IdString Forward3D;
         static const IdString ForwardClustered;

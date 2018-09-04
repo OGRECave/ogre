@@ -490,6 +490,10 @@ namespace Ogre {
         ForwardPlusBase *mForwardPlusSystem;
         ForwardPlusBase *mForwardPlusImpl;
 
+        bool mDecalsDiffuse;
+        bool mDecalsNormals;
+        bool mDecalsEmissive;
+
         /// Updated every frame, has enough memory to hold all lights.
         /// The order is not deterministic, it depends on the number
         /// of worker threads.
@@ -1337,6 +1341,10 @@ namespace Ogre {
 
         ForwardPlusBase* getForwardPlus(void)                       { return mForwardPlusSystem; }
         ForwardPlusBase* _getActivePassForwardPlus(void)            { return mForwardPlusImpl; }
+
+        bool getDecalsDiffuse(void) const                           { return mDecalsDiffuse; }
+        bool getDecalsNormals(void) const                           { return mDecalsNormals; }
+        bool getDecalsEmissive(void) const                          { return mDecalsEmissive; }
 
         /// For internal use.
         /// @see CompositorPassSceneDef::mEnableForwardPlus

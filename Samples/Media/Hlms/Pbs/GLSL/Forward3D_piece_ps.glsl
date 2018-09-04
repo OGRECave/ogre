@@ -279,7 +279,6 @@
 
 		@property( hlms_decals_diffuse )
 			diffuseCol.xyz  = lerp( diffuseCol.xyz, decalDiffuse.xyz, decalMask );
-			TODO_ensure_diffuseCol_is_forced;
 		@end
 		@property( hlms_decals_normals )
 			finalDecalTsNormal.xy += decalNormals.xy;
@@ -293,12 +292,17 @@
 @end
 @property( hlms_decals_normals )
 	/// Apply decals normal *after* sampling the tangent space normals (and detail normals too).
+	/// hlms_decals_normals will be unset if the Renderable cannot support normal maps (has no Tangents)
 	@piece( forwardPlusApplyDecalsNormal )
 		finalDecalTsNormal.xyz = normalize( finalDecalTsNormal.xyz );
-		nNormal.xy	+= finalDecalTsNormal.xy;
-		nNormal.z	*= finalDecalTsNormal.z;
+		@property( normal_map_tex || detail_maps_normal )
+			nNormal.xy	+= finalDecalTsNormal.xy;
+			nNormal.z	*= finalDecalTsNormal.z;
+		@end
+		@property( !normal_map_tex && !detail_maps_normal )
+			nNormal.xyz = finalDecalTsNormal.xyz;
+		@end
 		//Do not normalize as later normalize( TBN * nNormal ) will take care of it
-		TODO_ensure_normal_map_is_forced;
 	@end
 @end
 @end

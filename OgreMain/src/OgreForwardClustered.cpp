@@ -841,6 +841,16 @@ namespace Ogre
         hlms->_setProperty( HlmsBaseProp::FwdClusteredWidthxHeight, mWidth * mHeight );
         hlms->_setProperty( HlmsBaseProp::FwdClusteredWidth,        mWidth );
         hlms->_setProperty( HlmsBaseProp::FwdClusteredLightsPerCell,mObjsPerCell );
+
+        if( mDecalsEnabled )
+        {
+            if( mSceneManager->getDecalsDiffuse() )
+                hlms->_setProperty( HlmsBaseProp::DecalsDiffuse,    1 );
+            if( mSceneManager->getDecalsNormals() )
+                hlms->_setProperty( HlmsBaseProp::DecalsNormals,    1 );
+            if( mSceneManager->getDecalsEmissive() )
+                hlms->_setProperty( HlmsBaseProp::DecalsEmissive,   1 );
+        }
     }
     //-----------------------------------------------------------------------------------
     void ForwardClustered::setDebugFrustum( bool bEnableDebugFrustumWireAabb )

@@ -684,13 +684,25 @@ namespace Ogre
         bool usesNormalMap = !datablock->getTexture( PBSM_NORMAL ).isNull();
         for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
             usesNormalMap |= !datablock->getTexture( i ).isNull();
-        setProperty( PbsProperty::NormalMap, usesNormalMap );
 
         /*setProperty( HlmsBaseProp::, !datablock->getTexture( PBSM_DETAIL0 ).isNull() );
         setProperty( HlmsBaseProp::DiffuseMap, !datablock->getTexture( PBSM_DETAIL1 ).isNull() );*/
         bool normalMapCanBeSupported = (getProperty( HlmsBaseProp::Normal ) &&
                                         getProperty( HlmsBaseProp::Tangent )) ||
                                         getProperty( HlmsBaseProp::QTangent );
+
+        if( getProperty( HlmsBaseProp::DecalsNormals ) )
+        {
+            //If decals normals are enabled, we need to generate the TBN matrix.
+            //If normals maps cannot be supported, we need to disable hlms_decals_normals
+            //for this particular object.
+            if( normalMapCanBeSupported )
+                usesNormalMap = true;
+            else
+                setProperty( HlmsBaseProp::DecalsNormals, 0 );
+        }
+
+        setProperty( PbsProperty::NormalMap, usesNormalMap );
 
         if( !normalMapCanBeSupported && usesNormalMap )
         {

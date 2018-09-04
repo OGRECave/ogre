@@ -145,6 +145,9 @@ namespace Ogre
     const IdString HlmsBaseProp::FwdClusteredWidthxHeight  = IdString( "fwd_clustered_width_x_height" );
     const IdString HlmsBaseProp::FwdClusteredWidth         = IdString( "fwd_clustered_width" );
     const IdString HlmsBaseProp::FwdClusteredLightsPerCell = IdString( "fwd_clustered_lights_per_cell" );
+    const IdString HlmsBaseProp::DecalsDiffuse      = IdString( "hlms_decals_diffuse" );
+    const IdString HlmsBaseProp::DecalsNormals      = IdString( "hlms_decals_normals" );
+    const IdString HlmsBaseProp::DecalsEmissive     = IdString( "hlms_decals_emissive" );
     const IdString HlmsBaseProp::Forward3D          = IdString( "forward3d" );
     const IdString HlmsBaseProp::ForwardClustered   = IdString( "forward_clustered" );
     const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
