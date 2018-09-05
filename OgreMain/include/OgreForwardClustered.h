@@ -65,7 +65,6 @@ namespace Ogre
         size_t  mObjsPerCell;
         size_t  mLightsPerCell;
         size_t  mDecalsPerCell;
-        size_t  mDecalsStartOffset;
 
         RawSimdUniquePtr<FrustumRegion, MEMCATEGORY_SCENE_CONTROL> mFrustumRegions;
 

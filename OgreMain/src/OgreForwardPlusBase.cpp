@@ -237,8 +237,11 @@ namespace Ogre
             ++itLights;
         }
 
-        //Align to the start of decals
-        lightData += 2u * 4u;
+        if( numLights > 0u )
+        {
+            //Align to the start of decals
+            lightData += 2u * 4u;
+        }
 
         const Matrix4 viewMat = camera->getViewMatrix();
 
@@ -254,7 +257,7 @@ namespace Ogre
 
                 const Matrix4 worldMat = decal->_getParentNodeFullTransform();
                 Matrix4 invWorldView = viewMat.concatenateAffine( worldMat );
-                invWorldView.inverseAffine();
+                invWorldView = invWorldView.inverseAffine();
 
 #if !OGRE_DOUBLE_PRECISION
                 memcpy( lightData, invWorldView[0], sizeof(float) * 12u );

@@ -16,7 +16,7 @@ namespace Ogre
         mNormalMapIdx( 0 ),
         mEmissiveIdx( 0 )
     {
-        Aabb aabb( Vector3::ZERO, Vector3::UNIT_SCALE );
+        Aabb aabb( Vector3::ZERO, Vector3::UNIT_SCALE * 0.5f );
         mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
         mObjectData.mWorldAabb->setFromAabb( aabb, mObjectData.mIndex );
         const float radius = aabb.getRadius();

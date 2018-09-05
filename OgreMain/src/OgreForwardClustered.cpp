@@ -73,8 +73,6 @@ namespace Ogre
         mObjsPerCell( lightsPerCell + decalsPerCell + mReservedSlotsPerCell ),
         mLightsPerCell( lightsPerCell ),
         mDecalsPerCell( decalsPerCell ),
-        mDecalsStartOffset( alignToNextMultiple( (mLightsPerCell * NumBytesPerLight) >> 2u,
-                                                 NumBytesPerDecal >> 2u ) ),
         mGridBuffer( 0 ),
         mCurrentCamera( 0 ),
         mMinDistance( minDistance ),
@@ -476,7 +474,7 @@ namespace Ogre
             ++itLight;
         }
 
-        uint16 numDecals = mDecalsStartOffset >> 2u;
+        uint16 numDecals = static_cast<uint16>( alignToNextMultiple( numLights * 6u, 4u ) >> 2u );
 
         const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
         const size_t actualMaxDecalRq = std::min( MaxDecalRq, objsPerRqInThread0.size() );
