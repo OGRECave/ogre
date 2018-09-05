@@ -293,8 +293,10 @@ namespace Ogre {
     
     bool GLES2StateCacheManager::activateGLTextureUnit(uchar unit)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if (mActiveTextureUnit == unit)
             return true;
+#endif
 
         if (unit >= Root::getSingleton().getRenderSystem()->getCapabilities()->getNumTextureUnits())
             return false;
@@ -346,7 +348,9 @@ namespace Ogre {
     
     void GLES2StateCacheManager::setDepthMask(GLboolean mask)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mDepthMask != mask)
+#endif
         {
             mDepthMask = mask;
             
@@ -366,7 +370,9 @@ namespace Ogre {
     
     void GLES2StateCacheManager::setClearDepth(GLclampf depth)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mClearDepth != depth)
+#endif
         {
             mClearDepth = depth;
             
@@ -376,10 +382,12 @@ namespace Ogre {
     
     void GLES2StateCacheManager::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if((mClearColour[0] != red) ||
            (mClearColour[1] != green) ||
            (mClearColour[2] != blue) ||
            (mClearColour[3] != alpha))
+#endif
         {
             mClearColour[0] = red;
             mClearColour[1] = green;
@@ -392,10 +400,12 @@ namespace Ogre {
     
     void GLES2StateCacheManager::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if((mColourMask[0] != red) ||
            (mColourMask[1] != green) ||
            (mColourMask[2] != blue) ||
            (mColourMask[3] != alpha))
+#endif
         {
             mColourMask[0] = red;
             mColourMask[1] = green;
@@ -408,7 +418,9 @@ namespace Ogre {
     
     void GLES2StateCacheManager::setStencilMask(GLuint mask)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mStencilMask != mask)
+#endif
         {
             mStencilMask = mask;
             
@@ -448,7 +460,9 @@ namespace Ogre {
 
     void GLES2StateCacheManager::setCullFace(GLenum face)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mCullFace != face)
+#endif
         {
             mCullFace = face;
             
