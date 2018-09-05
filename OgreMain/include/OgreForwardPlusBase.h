@@ -194,6 +194,8 @@ namespace Ogre
         void setEnableVpls( bool enable )                               { mEnableVpls = enable; }
         bool getEnableVpls(void) const                                  { return mEnableVpls; }
 
+        bool getDecalsEnabled(void) const                               { return mDecalsEnabled; }
+
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
         /// Toggles whether light masks will be obeyed per object & per light by doing:
         /// if( movableObject->getLightMask() & light->getLightMask() )

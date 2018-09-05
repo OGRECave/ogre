@@ -6,6 +6,19 @@
 	@piece( andObjLightMaskFwdPlusCmp )&& ((objLightMask & floatBitsToUint( lightDiffuse.w )) != 0u)@end
 @end
 
+@property( hlms_enable_decals )
+@piece( DeclDecalsSamplers )
+	@property( hlms_decals_diffuse )uniform sampler2DArray decalsDiffuseTex;@end
+	@property( hlms_decals_normals )uniform sampler2DArray decalsNormalsTex;@end
+	@property( hlms_decals_diffuse == hlms_decals_emissive )
+		#define decalsEmissiveTex decalsDiffuseTex
+	@end
+	@property( hlms_decals_diffuse != hlms_decals_emissive )
+		uniform sampler2DArray decalsEmissiveTex;
+	@end
+@end
+@end
+
 /// The header is automatically inserted. Whichever subsystem needs it first, will call it
 @piece( forward3dHeader )
 	@property( hlms_forwardplus_covers_entire_target )
@@ -256,7 +269,7 @@
 			float4 decalDiffuse = OGRE_SampleArray2D( decalsDiffuseTex, decalsSampler,
 													  decalUV.xy, floatBitsToUint( texIndices.x ) ).xyzw;
 		@end
-		@property( hlms_decals_normals )
+		@property( hlms_decals_normals && normal_map )
 			float2 decalNormals = OGRE_SampleArray2D( decalsNormalsTex, decalsSampler,
 													  decalUV.xy, floatBitsToUint( texIndices.y ) ).xy;
 		@end
@@ -280,7 +293,7 @@
 		@property( hlms_decals_diffuse )
 			diffuseCol.xyz  = lerp( diffuseCol.xyz, decalDiffuse.xyz, decalMask );
 		@end
-		@property( hlms_decals_normals )
+		@property( hlms_decals_normals && normal_map )
 			finalDecalTsNormal.xy += decalNormals.xy;
 		@end
 		@property( hlms_decals_emissive )
@@ -290,7 +303,7 @@
 
 	}
 @end
-@property( hlms_decals_normals )
+@property( hlms_decals_normals && normal_map )
 	/// Apply decals normal *after* sampling the tangent space normals (and detail normals too).
 	/// hlms_decals_normals will be unset if the Renderable cannot support normal maps (has no Tangents)
 	@piece( forwardPlusApplyDecalsNormal )

@@ -490,9 +490,9 @@ namespace Ogre {
         ForwardPlusBase *mForwardPlusSystem;
         ForwardPlusBase *mForwardPlusImpl;
 
-        bool mDecalsDiffuse;
-        bool mDecalsNormals;
-        bool mDecalsEmissive;
+        TexturePtr mDecalsDiffuseTex;
+        TexturePtr mDecalsNormalsTex;
+        TexturePtr mDecalsEmissiveTex;
 
         /// Updated every frame, has enough memory to hold all lights.
         /// The order is not deterministic, it depends on the number
@@ -1342,9 +1342,9 @@ namespace Ogre {
         ForwardPlusBase* getForwardPlus(void)                       { return mForwardPlusSystem; }
         ForwardPlusBase* _getActivePassForwardPlus(void)            { return mForwardPlusImpl; }
 
-        bool getDecalsDiffuse(void) const                           { return mDecalsDiffuse; }
-        bool getDecalsNormals(void) const                           { return mDecalsNormals; }
-        bool getDecalsEmissive(void) const                          { return mDecalsEmissive; }
+        const TexturePtr& getDecalsDiffuse(void) const              { return mDecalsDiffuseTex; }
+        const TexturePtr& getDecalsNormals(void) const              { return mDecalsNormalsTex; }
+        const TexturePtr& getDecalsEmissive(void) const             { return mDecalsEmissiveTex; }
 
         /// For internal use.
         /// @see CompositorPassSceneDef::mEnableForwardPlus

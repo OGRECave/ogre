@@ -147,6 +147,9 @@ namespace Ogre
         LightArray				mAreaLights;
         bool                    mUsingAreaLightMasks;
 
+        TexturePtr              mDecalsTextures[3];
+        HlmsSamplerblock const  *mDecalsSamplerblock;
+
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
         uint32 mLastTextureHash;

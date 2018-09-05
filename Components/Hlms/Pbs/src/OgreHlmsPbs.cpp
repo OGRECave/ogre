@@ -230,6 +230,7 @@ namespace Ogre
 #endif
         mAreaLightMasksSamplerblock( 0 ),
         mUsingAreaLightMasks( false ),
+        mDecalsSamplerblock( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
@@ -384,6 +385,16 @@ namespace Ogre
 
             if( mAreaLightMasks && getProperty( HlmsBaseProp::LightsAreaTexMask ) > 0 )
                 psParams->setNamedConstant( "areaLightMasks", texUnit++ );
+
+            if( mGridBuffer && getProperty( HlmsBaseProp::EnableDecals ) )
+            {
+                if( mDecalsTextures[0] )
+                    psParams->setNamedConstant( "decalsDiffuseTex", texUnit++ );
+                if( mDecalsTextures[1] )
+                    psParams->setNamedConstant( "decalsNormalsTex", texUnit++ );
+                if( mDecalsTextures[2] && mDecalsTextures[0] != mDecalsTextures[2] )
+                    psParams->setNamedConstant( "decalsEmissiveTex", texUnit++ );
+            }
 
             if( !mPreparedPass.shadowMaps.empty() )
             {
@@ -691,16 +702,8 @@ namespace Ogre
                                         getProperty( HlmsBaseProp::Tangent )) ||
                                         getProperty( HlmsBaseProp::QTangent );
 
-        if( getProperty( HlmsBaseProp::DecalsNormals ) )
-        {
-            //If decals normals are enabled, we need to generate the TBN matrix.
-            //If normals maps cannot be supported, we need to disable hlms_decals_normals
-            //for this particular object.
-            if( normalMapCanBeSupported )
-                usesNormalMap = true;
-            else
-                setProperty( HlmsBaseProp::DecalsNormals, 0 );
-        }
+        //If decals normals are enabled, we need to generate the TBN matrix.
+        usesNormalMap |= normalMapCanBeSupported && getProperty( HlmsBaseProp::DecalsNormals );
 
         setProperty( PbsProperty::NormalMap, usesNormalMap );
 
@@ -1042,6 +1045,10 @@ namespace Ogre
         mGridBuffer             = 0;
         mGlobalLightListBuffer  = 0;
 
+        mDecalsTextures[0].setNull();
+        mDecalsTextures[1].setNull();
+        mDecalsTextures[2].setNull();
+
         if( !casterPass )
         {
             ForwardPlusBase *forwardPlus = sceneManager->_getActivePassForwardPlus();
@@ -1050,6 +1057,13 @@ namespace Ogre
                 mapSize += forwardPlus->getConstBufferSize();
                 mGridBuffer             = forwardPlus->getGridBuffer( camera );
                 mGlobalLightListBuffer  = forwardPlus->getGlobalLightListBuffer( camera );
+
+                if( forwardPlus->getDecalsEnabled() )
+                {
+                    mDecalsTextures[0] = sceneManager->getDecalsDiffuse();
+                    mDecalsTextures[1] = sceneManager->getDecalsNormals();
+                    mDecalsTextures[2] = sceneManager->getDecalsEmissive();
+                }
             }
 
             if( mParallaxCorrectedCubemap )
@@ -1766,6 +1780,15 @@ namespace Ogre
             mUsingAreaLightMasks = false;
         }
 
+        for( size_t i=0; i<3u; ++i )
+        {
+            if( mDecalsTextures[i] &&
+                (i != 2u || mDecalsTextures[2] != mDecalsTextures[0]) )
+            {
+                ++mTexUnitSlotStart;
+            }
+        }
+
         uploadDirtyDatablocks();
 
         return retVal;
@@ -1870,6 +1893,18 @@ namespace Ogre
                                                                          mAreaLightMasks.get(),
                                                                          mAreaLightMasksSamplerblock );
                     ++texUnit;
+                }
+
+                for( size_t i=0; i<3u; ++i )
+                {
+                    if( mDecalsTextures[i] &&
+                        (i != 2u || mDecalsTextures[2] != mDecalsTextures[0]) )
+                    {
+                        *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
+                                                                             mDecalsTextures[i].get(),
+                                                                             mDecalsSamplerblock );
+                        ++texUnit;
+                    }
                 }
 
                 //We changed HlmsType, rebind the shared textures.

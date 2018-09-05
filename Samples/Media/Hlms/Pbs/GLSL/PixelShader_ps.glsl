@@ -163,6 +163,8 @@ vec3 qmul( vec4 q, vec3 v )
 @insertpiece( DeclParallaxLocalCorrect )
 @end
 
+@insertpiece( DeclDecalsSamplers )
+
 @insertpiece( DeclShadowMapMacros )
 @insertpiece( DeclShadowSamplers )
 @insertpiece( DeclShadowSamplingFuncs )
