@@ -492,7 +492,7 @@ namespace Ogre
                 //Aabb localAabbScalar = decal->getLocalAabb();
                 Aabb localAabbScalar;
                 localAabbScalar.mCenter    = node->_getDerivedPosition();
-                localAabbScalar.mHalfSize  = node->_getDerivedScale();
+                localAabbScalar.mHalfSize  = node->_getDerivedScale() * 0.5f;
 
                 ArrayQuaternion objOrientation;
                 objOrientation.setAll( node->_getDerivedOrientation() );
