@@ -531,11 +531,9 @@ namespace Ogre {
         static const String& getFormatName(PixelFormat srcformat);
 
         /** Returns whether the format can be packed or unpacked with the packColour()
-        and unpackColour() functions. This is generally not true for compressed and
-        depth formats as they are special. It can only be true for formats with a
+        and unpackColour() functions. This is generally not true for compressed
+        formats as they are special. It can only be true for formats with a
         fixed element size.
-          @return 
-               true if yes, otherwise false
         */
         static bool isAccessible(PixelFormat srcformat);
         
