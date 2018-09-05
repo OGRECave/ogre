@@ -1342,6 +1342,10 @@ namespace Ogre {
         ForwardPlusBase* getForwardPlus(void)                       { return mForwardPlusSystem; }
         ForwardPlusBase* _getActivePassForwardPlus(void)            { return mForwardPlusImpl; }
 
+        void setDecalsDiffuse( const TexturePtr &tex )              { mDecalsDiffuseTex = tex; }
+        void setDecalsNormals( const TexturePtr &tex )              { mDecalsNormalsTex = tex; }
+        void setDecalsEmissive( const TexturePtr &tex )             { mDecalsEmissiveTex = tex; }
+
         const TexturePtr& getDecalsDiffuse(void) const              { return mDecalsDiffuseTex; }
         const TexturePtr& getDecalsNormals(void) const              { return mDecalsNormalsTex; }
         const TexturePtr& getDecalsEmissive(void) const             { return mDecalsEmissiveTex; }

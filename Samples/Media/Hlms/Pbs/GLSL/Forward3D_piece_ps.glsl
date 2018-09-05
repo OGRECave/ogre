@@ -1,7 +1,5 @@
 @property( hlms_forwardplus )
 
-@pmul( skip_header_in_lighting, hlms_prepass, hlms_enable_decals )
-
 @property( hlms_forwardplus_fine_light_mask )
 	@piece( andObjLightMaskFwdPlusCmp )&& ((objLightMask & floatBitsToUint( lightDiffuse.w )) != 0u)@end
 @end
@@ -13,7 +11,7 @@
 	@property( hlms_decals_diffuse == hlms_decals_emissive )
 		#define decalsEmissiveTex decalsDiffuseTex
 	@end
-	@property( hlms_decals_diffuse != hlms_decals_emissive )
+	@property( hlms_decals_emissive && hlms_decals_diffuse != hlms_decals_emissive )
 		uniform sampler2DArray decalsEmissiveTex;
 	@end
 @end
@@ -102,18 +100,23 @@
 
 		sampleOffset *= @value( fwd_clustered_lights_per_cell )u;
 	@end
+
+	@property( hlms_forwardplus_debug )uint totalNumLightsInGrid = 0u;@end
 @end
 
 @piece( forward3dLighting )
-	@property( !skip_header_in_lighting )@insertpiece( forward3dHeader )@end
+	@property( !hlms_enable_decals )
+		@insertpiece( forward3dHeader )
+		uint numLightsInGrid;
+	@end
 
 	@property( hlms_decals_emissive )
 		finalColour += finalDecalEmissive;
 	@end
 
-	uint numLightsInGrid = bufferFetch( f3dGrid, int(sampleOffset) ).x;
+	numLightsInGrid = bufferFetch( f3dGrid, int(sampleOffset) ).x;
 
-	@property( hlms_forwardplus_debug )uint totalNumLightsInGrid = numLightsInGrid;@end
+	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
 
 	for( uint i=0u; i<numLightsInGrid; ++i )
 	{
@@ -238,15 +241,37 @@
 	}
 @end
 
+	@property( hlms_forwardplus_debug )
+		@property( hlms_forwardplus == forward3d )
+			float occupancy = (totalNumLightsInGrid / passBuf.f3dGridHWW[0].w);
+		@end @property( hlms_forwardplus != forward3d )
+			float occupancy = (totalNumLightsInGrid / float( @value( fwd_clustered_lights_per_cell ) ));
+		@end
+		vec3 occupCol = vec3( 0.0, 0.0, 0.0 );
+		if( occupancy < 1.0 / 3.0 )
+			occupCol.z = occupancy;
+		else if( occupancy < 2.0 / 3.0 )
+			occupCol.y = occupancy;
+		else
+			occupCol.x = occupancy;
+
+		finalColour.xyz = mix( finalColour.xyz, occupCol.xyz, 0.55f ) * 2;
+	@end
+@end
+
 @property( hlms_enable_decals )
 /// Perform decals *after* sampling the diffuse colour.
 @piece( forwardPlusDoDecals )
 	@insertpiece( forward3dHeader )
 
-	float3 finalDecalTsNormal = float3( 0.0f, 0.0f, 1.0f );
-	float3 finalDecalEmissive = float3( 0.0f, 0.0f, 0.0f );
+	@property( hlms_decals_normals && normal_map )
+		float3 finalDecalTsNormal = float3( 0.0f, 0.0f, 1.0f );
+	@end
+	@property( hlms_decals_emissive )
+		float3 finalDecalEmissive = float3( 0.0f, 0.0f, 0.0f );
+	@end
 
-	numLightsInGrid	= bufferFetch( f3dGrid, int(sampleOffset + @value(hlms_decals_offset)) ).x;
+	uint numLightsInGrid = bufferFetch( f3dGrid, int(sampleOffset + @value(hlms_decals_offset)) ).x;
 
 	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
 
@@ -304,39 +329,24 @@
 		@end
 
 	}
-@end
-@property( hlms_decals_normals && normal_map )
-	/// Apply decals normal *after* sampling the tangent space normals (and detail normals too).
-	/// hlms_decals_normals will be unset if the Renderable cannot support normal maps (has no Tangents)
-	@piece( forwardPlusApplyDecalsNormal )
-		finalDecalTsNormal.xyz = normalize( finalDecalTsNormal.xyz );
-		@property( normal_map_tex || detail_maps_normal )
-			nNormal.xy	+= finalDecalTsNormal.xy;
-			nNormal.z	*= finalDecalTsNormal.z;
-		@end
-		@property( !normal_map_tex && !detail_maps_normal )
-			nNormal.xyz = finalDecalTsNormal.xyz;
-		@end
-		//Do not normalize as later normalize( TBN * nNormal ) will take care of it
-	@end
-@end
-@end
 
-	@property( hlms_forwardplus_debug )
-		@property( hlms_forwardplus == forward3d )
-			float occupancy = (totalNumLightsInGrid / passBuf.f3dGridHWW[0].w);
-		@end @property( hlms_forwardplus != forward3d )
-			float occupancy = (totalNumLightsInGrid / float( @value( fwd_clustered_lights_per_cell ) ));
+	@property( hlms_decals_normals && normal_map )
+		/// Apply decals normal *after* sampling the tangent space normals (and detail normals too).
+		/// hlms_decals_normals will be unset if the Renderable cannot support normal maps (has no Tangents)
+		@piece( forwardPlusApplyDecalsNormal )
+			finalDecalTsNormal.xyz = normalize( finalDecalTsNormal.xyz );
+			@property( normal_map_tex || detail_maps_normal )
+				nNormal.xy	+= finalDecalTsNormal.xy;
+				nNormal.z	*= finalDecalTsNormal.z;
+			@end
+			@property( !normal_map_tex && !detail_maps_normal )
+				nNormal.xyz = finalDecalTsNormal.xyz;
+			@end
+			//Do not normalize as later normalize( TBN * nNormal ) will take care of it
 		@end
-		vec3 occupCol = vec3( 0.0, 0.0, 0.0 );
-		if( occupancy < 1.0 / 3.0 )
-			occupCol.z = occupancy;
-		else if( occupancy < 2.0 / 3.0 )
-			occupCol.y = occupancy;
-		else
-			occupCol.x = occupancy;
-
-		finalColour.xyz = mix( finalColour.xyz, occupCol.xyz, 0.55f ) * 2;
 	@end
-@end
+
+@end /// forwardPlusDoDecals
+@end /// hlms_enable_decals
+
 @end

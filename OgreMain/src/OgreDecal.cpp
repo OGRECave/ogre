@@ -11,7 +11,10 @@
 namespace Ogre
 {
     Decal::Decal( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager ) :
-        MovableObject( id, objectMemoryManager, manager, 0 )
+        MovableObject( id, objectMemoryManager, manager, 0 ),
+        mDiffuseIdx( 0 ),
+        mNormalMapIdx( 0 ),
+        mEmissiveIdx( 0 )
     {
         Aabb aabb( Vector3::ZERO, Vector3::UNIT_SCALE );
         mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );

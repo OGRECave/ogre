@@ -246,9 +246,9 @@ void main()
 		if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
 			discard;
 	@end
+@end
 
 	@insertpiece( forwardPlusDoDecals )
-@end
 
 @property( !hlms_use_prepass )
 	@property( !normal_map )

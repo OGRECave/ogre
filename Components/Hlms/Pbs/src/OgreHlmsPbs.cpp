@@ -1060,9 +1060,13 @@ namespace Ogre
 
                 if( forwardPlus->getDecalsEnabled() )
                 {
-                    mDecalsTextures[0] = sceneManager->getDecalsDiffuse();
-                    mDecalsTextures[1] = sceneManager->getDecalsNormals();
-                    mDecalsTextures[2] = sceneManager->getDecalsEmissive();
+                    const PrePassMode prePassMode = sceneManager->getCurrentPrePassMode();
+                    if( prePassMode != PrePassCreate )
+                        mDecalsTextures[0] = sceneManager->getDecalsDiffuse();
+                    if( prePassMode != PrePassUse )
+                        mDecalsTextures[1] = sceneManager->getDecalsNormals();
+                    if( prePassMode != PrePassCreate )
+                        mDecalsTextures[2] = sceneManager->getDecalsEmissive();
                 }
             }
 

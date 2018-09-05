@@ -844,18 +844,19 @@ namespace Ogre
 
         if( mDecalsEnabled )
         {
+            const PrePassMode prePassMode = mSceneManager->getCurrentPrePassMode();
             bool hasDecalsTex = false;
-            if( mSceneManager->getDecalsDiffuse() )
+            if( mSceneManager->getDecalsDiffuse() && prePassMode != PrePassCreate )
             {
                 hlms->_setProperty( HlmsBaseProp::DecalsDiffuse,    1 );
                 hasDecalsTex = true;
             }
-            if( mSceneManager->getDecalsNormals() )
+            if( mSceneManager->getDecalsNormals() && prePassMode != PrePassUse )
             {
                 hlms->_setProperty( HlmsBaseProp::DecalsNormals,    1 );
                 hasDecalsTex = true;
             }
-            if( mSceneManager->getDecalsEmissive() )
+            if( mSceneManager->getDecalsEmissive() && prePassMode != PrePassCreate )
             {
                 hlms->_setProperty( HlmsBaseProp::DecalsEmissive,   1 );
                 hasDecalsTex = true;
