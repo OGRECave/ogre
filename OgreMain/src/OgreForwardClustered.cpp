@@ -844,13 +844,24 @@ namespace Ogre
 
         if( mDecalsEnabled )
         {
-            hlms->_setProperty( HlmsBaseProp::EnableDecals, 1 );
+            bool hasDecalsTex = false;
             if( mSceneManager->getDecalsDiffuse() )
+            {
                 hlms->_setProperty( HlmsBaseProp::DecalsDiffuse,    1 );
+                hasDecalsTex = true;
+            }
             if( mSceneManager->getDecalsNormals() )
+            {
                 hlms->_setProperty( HlmsBaseProp::DecalsNormals,    1 );
+                hasDecalsTex = true;
+            }
             if( mSceneManager->getDecalsEmissive() )
+            {
                 hlms->_setProperty( HlmsBaseProp::DecalsEmissive,   1 );
+                hasDecalsTex = true;
+            }
+
+            hlms->_setProperty( HlmsBaseProp::EnableDecals, hasDecalsTex );
         }
     }
     //-----------------------------------------------------------------------------------

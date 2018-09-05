@@ -107,7 +107,9 @@
 @piece( forward3dLighting )
 	@property( !skip_header_in_lighting )@insertpiece( forward3dHeader )@end
 
-	finalColour += finalDecalEmissive;
+	@property( hlms_decals_emissive )
+		finalColour += finalDecalEmissive;
+	@end
 
 	uint numLightsInGrid = bufferFetch( f3dGrid, int(sampleOffset) ).x;
 
