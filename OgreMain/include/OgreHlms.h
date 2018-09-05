@@ -770,6 +770,7 @@ namespace Ogre
         static const IdString FwdClusteredWidth;
         static const IdString FwdClusteredLightsPerCell;
         static const IdString EnableDecals;
+        static const IdString FwdPlusDecalsSlotOffset;
         static const IdString DecalsDiffuse;
         static const IdString DecalsNormals;
         static const IdString DecalsEmissive;

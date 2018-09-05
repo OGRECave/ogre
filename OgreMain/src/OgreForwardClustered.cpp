@@ -54,6 +54,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    static const size_t c_reservedLightSlotsPerCell     = 3u;
+    static const size_t c_reservedDecalsSlotsPerCell    = 1u;
+
     ForwardClustered::ForwardClustered( uint32 width, uint32 height,
                                         uint32 numSlices, uint32 lightsPerCell,
                                         uint32 decalsPerCell,
@@ -320,7 +323,7 @@ namespace Ogre
                             {
                                 uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
                                                                    (numLightsInCell->lightCount[0] +
-                                                                   mReservedSlotsPerCell);
+                                                                   c_reservedLightSlotsPerCell);
                                 *cellElem = i * 6;
                                 ++numLightsInCell->lightCount[0];
                                 ++numLightsInCell->lightCount[lightType];
@@ -460,7 +463,7 @@ namespace Ogre
                             {
                                 uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
                                                                    (numLightsInCell->lightCount[0] +
-                                                                   mReservedSlotsPerCell);
+                                                                   c_reservedLightSlotsPerCell);
                                 *cellElem = i * 6;
                                 ++numLightsInCell->lightCount[0];
                                 ++numLightsInCell->lightCount[lightType];
@@ -555,7 +558,8 @@ namespace Ogre
                             {
                                 uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
                                                                    mLightsPerCell +
-                                                                   mReservedSlotsPerCell;
+                                                                   c_reservedLightSlotsPerCell +
+                                                                   c_reservedDecalsSlotsPerCell;
                                 *cellElem = numDecals * 4u;
                                 ++numLightsInCell->decalCount;
                             }
@@ -578,12 +582,12 @@ namespace Ogre
             const size_t cellSize = mObjsPerCell;
             const bool hasLights = mLightsPerCell > 0u;
             const bool hasDecals = mDecalsEnabled;
+            const size_t decalOffsetStart = mLightsPerCell + c_reservedLightSlotsPerCell;
             size_t gridIdx = frustumStartIdx * ARRAY_PACKED_REALS * cellSize;
 
             while( itor != end )
             {
                 uint32 accumLight = itor->lightCount[1];
-                size_t idx = 0;
                 if( hasLights )
                 {
                     mGridBuffer[gridIdx+0u] = static_cast<uint16>( accumLight );
@@ -591,14 +595,9 @@ namespace Ogre
                     mGridBuffer[gridIdx+1u] = static_cast<uint16>( accumLight );
                     accumLight += itor->lightCount[3];
                     mGridBuffer[gridIdx+2u] = static_cast<uint16>( accumLight );
-
-                    idx = 3u;
                 }
                 if( hasDecals )
-                {
-                    mGridBuffer[gridIdx+idx+0u] = static_cast<uint16>( itor->decalCount );
-                    ++idx;
-                }
+                    mGridBuffer[gridIdx+decalOffsetStart+0u] = static_cast<uint16>( itor->decalCount );
                 gridIdx += cellSize;
                 ++itor;
             }
@@ -861,6 +860,10 @@ namespace Ogre
                 hlms->_setProperty( HlmsBaseProp::DecalsEmissive,   1 );
                 hasDecalsTex = true;
             }
+
+            const size_t decalOffsetStart = mLightsPerCell + c_reservedLightSlotsPerCell;
+            hlms->_setProperty( HlmsBaseProp::FwdPlusDecalsSlotOffset,
+                                static_cast<int32>( decalOffsetStart ) );
 
             hlms->_setProperty( HlmsBaseProp::EnableDecals, hasDecalsTex );
         }
