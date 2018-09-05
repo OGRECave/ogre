@@ -510,31 +510,35 @@ namespace Ogre
                     ArrayVector3 newPlaneNormal;
 
                     newPlaneNormal = objOrientation * frustumRegion->plane[0].normal;
-
                     dotResult = frustumRegion->plane[0].normal.dotProduct( localObb.mCenter ) +
                                 newPlaneNormal.absDotProduct( localObb.mHalfSize );
                     mask = Mathlib::CompareGreater( dotResult, frustumRegion->plane[0].negD );
 
+                    newPlaneNormal = objOrientation * frustumRegion->plane[1].normal;
                     dotResult = frustumRegion->plane[1].normal.dotProduct( localObb.mCenter ) +
                                 newPlaneNormal.absDotProduct( localObb.mHalfSize );
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
                                                                         frustumRegion->plane[1].negD ) );
 
+                    newPlaneNormal = objOrientation * frustumRegion->plane[2].normal;
                     dotResult = frustumRegion->plane[2].normal.dotProduct( localObb.mCenter ) +
                                 newPlaneNormal.absDotProduct( localObb.mHalfSize );
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
                                                                         frustumRegion->plane[2].negD ) );
 
+                    newPlaneNormal = objOrientation * frustumRegion->plane[3].normal;
                     dotResult = frustumRegion->plane[3].normal.dotProduct( localObb.mCenter ) +
                                 newPlaneNormal.absDotProduct( localObb.mHalfSize );
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
                                                                         frustumRegion->plane[3].negD ) );
 
+                    newPlaneNormal = objOrientation * frustumRegion->plane[4].normal;
                     dotResult = frustumRegion->plane[4].normal.dotProduct( localObb.mCenter ) +
                                 newPlaneNormal.absDotProduct( localObb.mHalfSize );
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
                                                                         frustumRegion->plane[4].negD ) );
 
+                    newPlaneNormal = objOrientation * frustumRegion->plane[5].normal;
                     dotResult = frustumRegion->plane[5].normal.dotProduct( localObb.mCenter ) +
                                 newPlaneNormal.absDotProduct( localObb.mHalfSize );
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
