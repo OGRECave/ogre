@@ -16,6 +16,9 @@ namespace Ogre
         mNormalMapIdx( 0 ),
         mEmissiveIdx( 0 )
     {
+        //NOTE: For performance reasons, ForwardClustered::collectLightForSlice ignores
+        //mLocalAabb & mWorldAabb and assumes its local AABB is this aabb we set as
+        //default. To change its shape, use node scaling
         Aabb aabb( Vector3::ZERO, Vector3::UNIT_SCALE * 0.5f );
         mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
         mObjectData.mWorldAabb->setFromAabb( aabb, mObjectData.mIndex );
