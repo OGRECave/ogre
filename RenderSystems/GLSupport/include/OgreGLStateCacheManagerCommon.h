@@ -44,10 +44,13 @@ namespace Ogre
      a specific texture, material, buffer, etc. But this may be the same as the
      current status of the state machine and is therefore redundant and causes
      unnecessary work to be performed by OpenGL.
-     @par
+
      Instead we are caching the state so that we can check whether it actually
      does need to be updated. This leads to improved performance all around and 
      can be somewhat dramatic in some cases.
+
+     @warning caching does not work with multiple windows, sharing the same context.
+     They will erroneously get different state caches.
      */
     class _OgreGLExport GLStateCacheManagerCommon : public StateCacheAlloc
     {

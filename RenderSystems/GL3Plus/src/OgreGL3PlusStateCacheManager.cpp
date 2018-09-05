@@ -349,8 +349,10 @@ namespace Ogre {
     
     bool GL3PlusStateCacheManager::activateGLTextureUnit(size_t unit)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if (mActiveTextureUnit == unit)
             return true;
+#endif
 
         if (unit >= Root::getSingleton().getRenderSystem()->getCapabilities()->getNumTextureUnits())
             return false;
@@ -376,7 +378,9 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::setDepthMask(GLboolean mask)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mDepthMask != mask)
+#endif
         {
             mDepthMask = mask;
             
@@ -386,7 +390,9 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::setDepthFunc(GLenum func)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mDepthFunc != func)
+#endif
         {
             mDepthFunc = func;
             
@@ -396,7 +402,9 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::setClearDepth(GLclampf depth)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mClearDepth != depth)
+#endif
         {
             mClearDepth = depth;
             
@@ -406,10 +414,12 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if((mClearColour[0] != red) ||
            (mClearColour[1] != green) ||
            (mClearColour[2] != blue) ||
            (mClearColour[3] != alpha))
+#endif
         {
             mClearColour[0] = red;
             mClearColour[1] = green;
@@ -422,10 +432,12 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if((mColourMask[0] != red) ||
            (mColourMask[1] != green) ||
            (mColourMask[2] != blue) ||
            (mColourMask[3] != alpha))
+#endif
         {
             mColourMask[0] = red;
             mColourMask[1] = green;
@@ -438,7 +450,9 @@ namespace Ogre {
     
     void GL3PlusStateCacheManager::setStencilMask(GLuint mask)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mStencilMask != mask)
+#endif
         {
             mStencilMask = mask;
             
@@ -493,7 +507,9 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::setCullFace(GLenum face)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if(mCullFace != face)
+#endif
         {
             mCullFace = face;
             
@@ -541,7 +557,9 @@ namespace Ogre {
 
     void GL3PlusStateCacheManager::setPointSize(GLfloat size)
     {
+#ifdef OGRE_ENABLE_STATE_CACHE
         if (mPointSize != size)
+#endif
         {
             mPointSize = size;
             OGRE_CHECK_GL_ERROR(glPointSize(mPointSize));
