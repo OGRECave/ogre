@@ -304,14 +304,14 @@ Techniques can have the following nested elements:
 
 -   [texture](#compositor_005ftexture)
 -   [texture\_ref](#compositor_005ftexture_005fref)
--   [scheme](#compositor_005fscheme)
+-   [material_scheme](#compositor_005fscheme)
 -   [compositor\_logic](#compositor_005flogic)
 -   [target](#Compositor-Target-Passes)
 -   [target\_output](#Compositor-Target-Passes)
 
 <a name="compositor_005ftexture"></a><a name="texture-2"></a>
 
-## texture
+## texture {#compositor-texture}
 
 This declares a render texture for use in subsequent [target passes](#Compositor-Target-Passes).
 @par
@@ -321,11 +321,17 @@ Format: texture &lt;Name&gt; &lt;Width&gt; &lt;Height&gt; &lt;Pixel_Format&gt; \
 A name to give the render texture, which must be unique within this compositor. This name is used to reference the texture in [target passes](#Compositor-Target-Passes), when the texture is rendered to, and in [passes](#Compositor-Passes), when the texture is used as input to a material rendering a fullscreen quad.
 
 @param Width
-@param Height
-The dimensions of the render texture. You can either specify a fixed width and height, or you can request that the texture is based on the physical dimensions of the viewport to which the compositor is attached. The options for the latter are ’target\_width’, ’target\_height’, ’target\_width\_scaled &lt;factor&gt;’ and ’target\_height\_scaled &lt;factor&gt;’ - where ’factor’ is the amount by which you wish to multiply the size of the main target to derive the dimensions.
+@param Height 
+@parblock
+The dimensions of the render texture. You can either specify a fixed width and height, or you can request that the texture is based on the physical dimensions of the viewport to which the compositor is attached. The options for the latter are either of
+- @c target_width and @c target_height
+- @c target_width_scaled &lt;factor&gt; and @c target_height_scaled &lt;factor&gt;
 
+where ’factor’ is the amount by which you wish to multiply the size of the main target to derive the dimensions.
+@endparblock
 @param Pixel_Format
-The pixel format of the render texture. This affects how much memory it will take, what colour channels will be available, and what precision you will have within those channels. The available options are PF\_A8R8G8B8, PF\_R8G8B8A8, PF\_R8G8B8, PF\_FLOAT16\_RGBA, PF\_FLOAT16\_RGB, PF\_FLOAT16\_R, PF\_FLOAT32\_RGBA, PF\_FLOAT32\_RGB, and PF\_FLOAT32\_R.
+The pixel format of the render texture. This affects how much memory it will take, what colour channels will be available, and what precision you will have within those channels.
+See Ogre::PixelFormat. You can in fact repeat this element if you wish. If you do so, that means that this render texture becomes a Multiple Render Target (MRT), when the GPU writes to multiple textures at once.
 
 @param pooled
 If present, this directive makes this texture ’pooled’ among compositor instances, which can save some memory.
@@ -338,17 +344,24 @@ If present, this directive disables the use of anti-aliasing on this texture. FS
 
 @param depth\_pool
 When present, this directive has to be followed by an integer. This directive is unrelated to the "pooled" directive. This one sets from which Depth buffer pool the depth buffer will be chosen from. All RTs from all compositors (including render windows if the render system API allows it) with the same pool ID share the same depth buffers (following the rules of the current render system APIs, (check RenderSystemCapabilities flags to find the rules). When the pool ID is 0, no depth buffer is used. This can be helpful for passes that don’t require a Depth buffer at all, potentially saving performance and memory. Default value is 1.
+Ignored with depth pixel formats.
 
 @param scope
-If present, this directive sets the scope for the texture for being accessed by other compositors using the [texture\_ref](#compositor_005ftexture_005fref) directive. There are three options : ’local\_scope’ (which is also the default) means that only the compositor defining the texture can access it. ’chain\_scope’ means that the compositors after this compositor in the chain can reference its textures, and ’global\_scope’ means that the entire application can access the texture. This directive also affects the creation of the textures (global textures are created once and thus can’t be used with the pooled directive, and can’t rely on viewport size).
+If present, this directive sets the scope for the texture for being accessed by other compositors using the [texture\_ref](#compositor_005ftexture_005fref) directive. There are three options : 
+1. @c local_scope (which is also the default) means that only the compositor defining the texture can access it. 
+2. @c chain_scope means that the compositors after this compositor in the chain can reference its textures, and 
+3. @c global_scope means that the entire application can access the texture. This directive also affects the creation of the textures (global textures are created once and thus can’t be used with the pooled directive, and can’t rely on viewport size).
 
 @par
-Example: texture rt0 512 512 PF\_R8G8B8A8<br> Example: texture rt1 target\_width target\_height PF\_FLOAT32\_RGB
-
-You can in fact repeat this element if you wish. If you do so, that means that this render texture becomes a Multiple Render Target (MRT), when the GPU writes to multiple textures at once. It is imperative that if you use MRT that the shaders that render to it render to ALL the targets. Not doing so can cause undefined results. It is also important to note that although you can use different pixel formats for each target in a MRT, each one should have the same total bit depth since most cards do not support independent bit depths. If you try to use this feature on cards that do not support the number of MRTs you’ve asked for, the technique will be skipped (so you ought to write a fallback technique).
-
+Example: texture rt0 512 512 PF\_R8G8B8A8
+@par
+Example: texture rt1 target\_width target\_height PF\_FLOAT32\_RGB
 @par
 Example : texture mrt\_output target\_width target\_height PF\_FLOAT16\_RGBA PF\_FLOAT16\_RGBA chain\_scope
+
+@note
+It is imperative that if you use MRT that the shaders that render to it render to ALL the targets. Not doing so can cause undefined results. It is also important to note that although you can use different pixel formats for each target in a MRT, each one should have the same total bit depth since most cards do not support independent bit depths. If you try to use this feature on cards that do not support the number of MRTs you’ve asked for, the technique will be skipped (so you ought to write a fallback technique).
+
 
 <a name="compositor_005ftexture_005fref"></a><a name="texture_005fref"></a>
 
@@ -415,7 +428,7 @@ Here are the attributes you can use in a ’target’ or ’target\_output’ se
 -   [only\_initial](#only_005finitial)
 -   [visibility\_mask](#visibility_005fmask)
 -   [lod\_bias](#compositor_005flod_005fbias)
--   [material\_scheme](#material_005fscheme)
+-   [material_scheme](#material_005fscheme)
 -   [shadows](#compositor_005fshadows)
 -   [pass](#Compositor-Passes)
 
