@@ -738,9 +738,12 @@ void CompositorInstance::createResources(bool forResizeOnly)
             }
         }
         
-        //Set DepthBuffer pool for sharing
-        rendTarget->setDepthBufferPool( def->depthBufferId );
-        
+        if(!PixelUtil::isDepth(rendTarget->suggestPixelFormat()))
+        {
+            //Set DepthBuffer pool for sharing
+            rendTarget->setDepthBufferPool( def->depthBufferId );
+        }
+
         /// Set up viewport over entire texture
         rendTarget->setAutoUpdated( false );
         
