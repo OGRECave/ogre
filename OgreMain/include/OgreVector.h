@@ -323,6 +323,10 @@ namespace Ogre
                 ptr()[i] = _ptr[i];
         }
 
+        template<typename U>
+        explicit Vector(const Vector<dims, U>& o) : Vector(o.ptr()) {}
+
+
         explicit Vector(T s)
         {
             for (int i = 0; i < dims; i++)

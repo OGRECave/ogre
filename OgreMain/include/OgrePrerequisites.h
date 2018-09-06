@@ -255,7 +255,9 @@ namespace Ogre {
     class UserObjectBindings;
     template <int dims, typename T> class Vector;
     typedef Vector<2, Real> Vector2;
+    typedef Vector<2, int> Vector2i;
     typedef Vector<3, Real> Vector3;
+    typedef Vector<3, int> Vector3i;
     typedef Vector<4, Real> Vector4;
     class Viewport;
     class VertexAnimationTrack;

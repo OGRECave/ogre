@@ -266,10 +266,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool PixelUtil::isAccessible(PixelFormat srcformat)
     {
-        if (srcformat == PF_UNKNOWN)
-            return false;
-        unsigned int flags = getFlags(srcformat);
-        return !((flags & PFF_COMPRESSED) || (flags & PFF_DEPTH));
+        return (srcformat != PF_UNKNOWN) && !isCompressed(srcformat);
     }
     //-----------------------------------------------------------------------
     PixelComponentType PixelUtil::getComponentType(PixelFormat fmt)

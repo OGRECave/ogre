@@ -37,9 +37,8 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mIdentifier(0),
     mFirstRenderQueue(RENDER_QUEUE_BACKGROUND),
     mLastRenderQueue(RENDER_QUEUE_SKIES_LATE),
-    mMaterialScheme(BLANKSTRING),
     mClearBuffers(FBT_COLOUR|FBT_DEPTH),
-    mClearColour(0.0,0.0,0.0,0.0),
+    mClearColour(ColourValue::ZERO),
     mAutomaticColour(false),
     mClearDepth(1.0f),
     mClearStencil(0),
@@ -53,10 +52,7 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mStencilTwoSidedOperation(false),
     mStencilReadBackAsTexture(false),
     mQuadCornerModified(false),
-    mQuadLeft(-1),
-    mQuadTop(1),
-    mQuadRight(1),
-    mQuadBottom(-1),
+    mQuad(-1, 1, 1, -1),
     mQuadFarCorners(false),
     mQuadFarCornersViewSpace(false)
 {
@@ -290,17 +286,17 @@ bool CompositionPass::getStencilReadBackAsTextureOperation() const
 void CompositionPass::setQuadCorners(Real left,Real top,Real right,Real bottom)
 {
     mQuadCornerModified=true;
-    mQuadLeft = left;
-    mQuadTop = top;
-    mQuadRight = right;
-    mQuadBottom = bottom;
+    mQuad.left = left;
+    mQuad.top = top;
+    mQuad.right = right;
+    mQuad.bottom = bottom;
 }
 bool CompositionPass::getQuadCorners(Real & left,Real & top,Real & right,Real & bottom) const
 {
-    left = mQuadLeft;
-    top = mQuadTop;
-    right = mQuadRight;
-    bottom = mQuadBottom;
+    left = mQuad.left;
+    top = mQuad.top;
+    right = mQuad.right;
+    bottom = mQuad.bottom;
     return mQuadCornerModified;
 }
 void CompositionPass::setQuadFarCorners(bool farCorners, bool farCornersViewSpace)

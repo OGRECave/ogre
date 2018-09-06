@@ -4385,7 +4385,7 @@ namespace Ogre{
                             }
                             else
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, atom1->value);
                             }
                         }
                         else
@@ -5067,7 +5067,7 @@ namespace Ogre{
                                     PixelFormat format = PixelUtil::getFormatFromName(atom->value, true);
                                     if (format == PF_UNKNOWN)
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, atom->value);
                                         return;
                                     }
                                     formats.push_back(format);

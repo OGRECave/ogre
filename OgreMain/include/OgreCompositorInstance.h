@@ -346,7 +346,7 @@ namespace Ogre {
         /** Collect rendering passes. Here, passes are converted into render target operations
             and queued with queueRenderSystemOp.
         */
-        virtual void collectPasses(TargetOperation &finalState, CompositionTargetPass *target);
+        virtual void collectPasses(TargetOperation &finalState, const CompositionTargetPass *target);
         
         /** Create a local dummy material with one technique but no passes.
             The material is detached from the Material Manager to make sure it is destroyed
@@ -379,7 +379,7 @@ namespace Ogre {
         void queueRenderSystemOp(TargetOperation &finalState, RenderSystemOperation *op);
 
         /// Util method for assigning a local texture name to a MRT attachment
-        String getMRTTexLocalName(const String& baseName, size_t attachment);
+        static String getMRTTexLocalName(const String& baseName, size_t attachment);
 
         /** Search for options like AA and hardware gamma which we may want to 
             inherit from the main render target to which we're attached. 

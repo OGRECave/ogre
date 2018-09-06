@@ -76,8 +76,7 @@ void CompositorChain::destroyResources(void)
 //-----------------------------------------------------------------------
 const String CompositorChain::getCompositorName() const
 {
-    static const String compositorPrefix = String("Ogre/Scene/");
-    return compositorPrefix + StringConverter::toString((size_t)mViewport);
+    return StringUtil::format("Ogre/Scene/%zu", (size_t)mViewport);
 }
 //-----------------------------------------------------------------------
 void CompositorChain::createOriginalScene()
@@ -116,9 +115,7 @@ void CompositorChain::createOriginalScene()
     {
         scene = CompositorManager::getSingleton().create(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         CompositionTechnique *t = scene->createTechnique();
-        t->setSchemeName(BLANKSTRING);
         CompositionTargetPass *tp = t->getOutputTargetPass();
-        tp->setVisibilityMask(0xFFFFFFFF);
         {
             CompositionPass *pass = tp->createPass();
             pass->setType(CompositionPass::PT_CLEAR);
@@ -131,13 +128,9 @@ void CompositorChain::createOriginalScene()
             pass->setLastRenderQueue(RENDER_QUEUE_SKIES_LATE);
         }
 
-
         /// Create base "original scene" compositor
         scene = static_pointer_cast<Compositor>(CompositorManager::getSingleton().load(compName,
             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME));
-
-
-
     }
     mOriginalScene = OGRE_NEW CompositorInstance(scene->getSupportedTechnique(), this);
 }
@@ -488,7 +481,7 @@ void CompositorChain::_compile()
     // force default scheme so materials for compositor quads will determined correctly
     MaterialManager& matMgr = MaterialManager::getSingleton();
     String prevMaterialScheme = matMgr.getActiveScheme();
-    matMgr.setActiveScheme(MaterialManager::DEFAULT_SCHEME_NAME);
+    matMgr.setActiveScheme(Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme());
     
     /// Set previous CompositorInstance for each compositor in the list
     CompositorInstance *lastComposition = mOriginalScene;
