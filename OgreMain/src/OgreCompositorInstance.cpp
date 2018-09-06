@@ -175,7 +175,7 @@ public:
     {
         mat->load();
         instance->_fireNotifyMaterialSetup(pass_id, mat);
-        technique = mat->getTechnique(0);
+        technique = mat->getBestTechnique();
         assert(technique);
     }
     MaterialPtr mat;
