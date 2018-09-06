@@ -50,8 +50,6 @@ THE SOFTWARE.
 
 #include "OgreProfiler.h"
 
-#define TODO_missing_aabb_frustum_check
-
 namespace Ogre
 {
     static const size_t c_reservedLightSlotsPerCell     = 3u;
@@ -500,6 +498,22 @@ namespace Ogre
                 ArrayAabb localObb;
                 localObb.setAll( localAabbScalar );
 
+                ArrayVector3 orientedHalfSize = objOrientation * localObb.mHalfSize;
+
+                ArrayPlane obbPlane[6];
+                obbPlane[0].normal= objOrientation.xAxis();
+                obbPlane[0].negD  = obbPlane[0].normal.dotProduct( localObb.mCenter - orientedHalfSize );
+                obbPlane[1].normal= -obbPlane[0].normal;
+                obbPlane[1].negD  = obbPlane[1].normal.dotProduct( localObb.mCenter + orientedHalfSize );
+                obbPlane[2].normal= objOrientation.yAxis();
+                obbPlane[2].negD  = obbPlane[2].normal.dotProduct( localObb.mCenter - orientedHalfSize );
+                obbPlane[3].normal= -obbPlane[2].normal;
+                obbPlane[3].negD  = obbPlane[3].normal.dotProduct( localObb.mCenter + orientedHalfSize );
+                obbPlane[4].normal= objOrientation.zAxis();
+                obbPlane[4].negD  = obbPlane[4].normal.dotProduct( localObb.mCenter - orientedHalfSize );
+                obbPlane[5].normal= -obbPlane[4].normal;
+                obbPlane[5].negD  = obbPlane[5].normal.dotProduct( localObb.mCenter + orientedHalfSize );
+
                 for( size_t j=0; j<numPackedFrustumsPerSlice; ++j )
                 {
                     const FrustumRegion * RESTRICT_ALIAS frustumRegion =
@@ -544,9 +558,27 @@ namespace Ogre
                     mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
                                                                         frustumRegion->plane[5].negD ) );
 
-                    const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
+                    if( BooleanMask4::getScalarMask( mask ) != 0 )
+                    {
+                        //Test all 8 frustum corners against each of the 6 obb planes.
+                        for( int k=0; k<6; ++k )
+                        {
+                            ArrayMaskR vertexMask = ARRAY_MASK_ZERO;
 
-                    TODO_missing_aabb_frustum_check;
+                            for( int l=0; l<8; ++l )
+                            {
+                                dotResult = obbPlane[k].normal.dotProduct(
+                                                frustumRegion->corners[l] ) - obbPlane[k].negD;
+                                vertexMask = Mathlib::Or( vertexMask,
+                                                          Mathlib::CompareGreater( dotResult,
+                                                                                   ARRAY_REAL_ZERO ) );
+                            }
+
+                            mask = Mathlib::And( mask, vertexMask );
+                        }
+                    }
+
+                    const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
 
                     for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
                     {
