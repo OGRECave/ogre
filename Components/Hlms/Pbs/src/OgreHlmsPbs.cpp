@@ -333,6 +333,20 @@ namespace Ogre
 
                 mAreaLightMasksSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
             }
+
+            if( !mDecalsSamplerblock )
+            {
+                samplerblock.mMinFilter     = FO_LINEAR;
+                samplerblock.mMagFilter     = FO_LINEAR;
+                samplerblock.mMipFilter     = FO_LINEAR;
+                samplerblock.mCompareFunction   = NUM_COMPARE_FUNCTIONS;
+
+                samplerblock.mU             = TAM_CLAMP;
+                samplerblock.mV             = TAM_CLAMP;
+                samplerblock.mW             = TAM_CLAMP;
+
+                mDecalsSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+            }
         }
     }
     //-----------------------------------------------------------------------------------

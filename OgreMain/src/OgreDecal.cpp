@@ -31,6 +31,39 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
+    void Decal::setDiffuseTexture( const TexturePtr &diffuseTex, uint32 diffuseIdx )
+    {
+        mDiffuseTexture = diffuseTex;
+        mDiffuseIdx = diffuseIdx;
+    }
+    //-----------------------------------------------------------------------------------
+    const TexturePtr& Decal::getDiffuseTexture(void) const
+    {
+        return mDiffuseTexture;
+    }
+    //-----------------------------------------------------------------------------------
+    void Decal::setNormalTexture( const TexturePtr &normalTex, uint32 normalIdx )
+    {
+        mNormalTexture = normalTex;
+        mNormalMapIdx = normalIdx;
+    }
+    //-----------------------------------------------------------------------------------
+    const TexturePtr& Decal::getNormalTexture(void) const
+    {
+        return mNormalTexture;
+    }
+    //-----------------------------------------------------------------------------------
+    void Decal::setEmissiveTexture( const TexturePtr &emissiveTex, uint32 emissiveIdx )
+    {
+        mEmissiveTexture = emissiveTex;
+        mEmissiveIdx = emissiveIdx;
+    }
+    //-----------------------------------------------------------------------------------
+    const TexturePtr& Decal::getEmissiveTexture(void) const
+    {
+        return mEmissiveTexture;
+    }
+    //-----------------------------------------------------------------------------------
     const String& Decal::getMovableType(void) const
     {
         return DecalFactory::FACTORY_TYPE_NAME;

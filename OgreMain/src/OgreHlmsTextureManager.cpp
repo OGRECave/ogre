@@ -152,7 +152,7 @@ namespace Ogre
                                             uint16 numSlices, uint8 numMipmaps, PixelFormat pixelFormat,
                                             bool isNormalMap, bool hwGammaCorrection )
     {
-        TextureArray textureArray( numSlices, numSlices * numSlices, true,
+        TextureArray textureArray( 1u, numSlices, true,
                                    isNormalMap, uniqueSpecialId );
 
         textureArray.texture = TextureManager::getSingleton().createManual(
@@ -337,7 +337,7 @@ namespace Ogre
                         LogManager::getSingleton().logMessage( errorMsg.c_str(), LML_CRITICAL );
                     }
 
-                    if( textureArray.texture->getNumMipmaps() == numMipmaps )
+                    if( textureArray.texture->getNumMipmaps() != numMipmaps )
                     {
                         errorMsg.clear();
                         errorMsg.a( "Different number of mipmaps. Requested: ",

@@ -9,6 +9,11 @@ namespace Ogre
 {
     class Decal : public MovableObject
     {
+    protected:
+        TexturePtr  mDiffuseTexture;
+        TexturePtr  mNormalTexture;
+        TexturePtr  mEmissiveTexture;
+
     public:
         uint32 mDiffuseIdx;
         uint32 mNormalMapIdx;
@@ -17,6 +22,14 @@ namespace Ogre
     public:
         Decal( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager* manager );
         virtual ~Decal();
+
+        void setDiffuseTexture( const TexturePtr &diffuseTex, uint32 diffuseIdx );
+        void setNormalTexture( const TexturePtr &normalTex, uint32 normalIdx );
+        void setEmissiveTexture( const TexturePtr &emissiveTex, uint32 emissiveIdx );
+
+        const TexturePtr& getDiffuseTexture(void) const;
+        const TexturePtr& getNormalTexture(void) const;
+        const TexturePtr& getEmissiveTexture(void) const;
 
         //Overrides from MovableObject
         virtual const String& getMovableType(void) const;

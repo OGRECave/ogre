@@ -329,7 +329,7 @@
 		@end
 
 	}
-
+@end /// forwardPlusDoDecals
 	@property( hlms_decals_normals && normal_map )
 		/// Apply decals normal *after* sampling the tangent space normals (and detail normals too).
 		/// hlms_decals_normals will be unset if the Renderable cannot support normal maps (has no Tangents)
@@ -345,8 +345,6 @@
 			//Do not normalize as later normalize( TBN * nNormal ) will take care of it
 		@end
 	@end
-
-@end /// forwardPlusDoDecals
 @end /// hlms_enable_decals
 
 @end
