@@ -235,20 +235,20 @@ An important note is that this will recognize the above pattern no matter where 
 
 @page Compositor-Scripts Compositor Scripts
 
-The compositor framework is a subsection of the OGRE API that allows you to easily define full screen post-processing effects. Compositor scripts offer you the ability to define compositor effects in a script which can be reused and modified easily, rather than having to use the API to define them. You still need to use code to instantiate a compositor against one of your visible viewports, but this is a much simpler process than actually defining the compositor itself.
+The compositor framework is a subsection of the OGRE API that allows you to easily define how to assemble the final image. A typical use-case are full screen post-processing effects - however Compositors are not limited to that. Compositor scripts offer you the ability to define rendering pipelines in a script which can be reused and modified easily, rather than having to use the API to define them. You still need to use code to instantiate a compositor against one of your visible viewports, but this is a much simpler process than actually defining the compositor itself.
 
 @tableofcontents
 
 # Compositor Fundamentals {#Compositor-Fundamentals}
 
-Performing post-processing effects generally involves first rendering the scene to a texture, either in addition to or instead of the main window. Once the scene is in a texture, you can then pull the scene image into a fragment program and perform operations on it by rendering it through full screen quad. The target of this post processing render can be the main result (e.g. a window), or it can be another render texture so that you can perform multi-stage convolutions on the image. You can even ’ping-pong’ the render back and forth between a couple of render textures to perform convolutions which require many iterations, without using a separate texture for each stage. Eventually you’ll want to render the result to the final output, which you do with a full screen quad. This might replace the whole window (thus the main window doesn’t need to render the scene itself), or it might be a combinational effect. 
+Compositing generally involves rendering the scene to a texture, either in addition to or instead of the main window. Once the scene is in a texture, you can then pull the scene image into a fragment program and perform operations on it by rendering it through full screen quad. The target of this post processing render can be the main result (e.g. a window), or it can be another render texture so that you can perform multi-stage convolutions on the image. You can even ’ping-pong’ the render back and forth between a couple of render textures to perform convolutions which require many iterations, without using a separate texture for each stage. Eventually you’ll want to render the result to the final output, which you do with a full screen quad. This might replace the whole window (thus the main window doesn’t need to render the scene itself), or it might be a combinational effect. 
 
 So that we can discuss how to implement these techniques efficiently, a number of definitions are required:
 
 <dl compact="compact">
 <dt>Compositor</dt> <dd>
 
-Definition of a fullscreen effect that can be applied to a user viewport. This is what you’re defining when writing compositor scripts as detailed in this section.
+Definition of a rendering pipeline that can be applied to a user viewport. This is what you’re defining when writing compositor scripts as detailed in this section.
 
 </dd> <dt>Compositor Instance</dt> <dd>
 
