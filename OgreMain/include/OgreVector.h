@@ -576,6 +576,167 @@ namespace Ogre
         @remarks NB assumes 'this' is pointing AWAY FROM the plane, invert if it is not.
         */
         Vector reflect(const Vector& normal) const { return *this - (2 * dotProduct(normal) * normal); }
+
+        // Vector: arithmetic updates
+        Vector& operator*=(Real s)
+        {
+            for (int i = 0; i < dims; i++)
+                ptr()[i] *= s;
+            return *this;
+        }
+
+        Vector& operator/=(Real s)
+        {
+            assert( s != 0.0 ); // legacy assert
+            Real fInv = 1.0f/s;
+            for (int i = 0; i < dims; i++)
+                ptr()[i] *= fInv;
+            return *this;
+        }
+
+        Vector& operator+=(Real s)
+        {
+            for (int i = 0; i < dims; i++)
+                ptr()[i] += s;
+            return *this;
+        }
+
+        Vector& operator-=(Real s)
+        {
+            for (int i = 0; i < dims; i++)
+                ptr()[i] -= s;
+            return *this;
+        }
+
+        Vector& operator+=(const Vector& b)
+        {
+            for (int i = 0; i < dims; i++)
+                ptr()[i] += b[i];
+            return *this;
+        }
+
+        Vector& operator-=(const Vector& b)
+        {
+            for (int i = 0; i < dims; i++)
+                ptr()[i] -= b[i];
+            return *this;
+        }
+
+        Vector& operator*=(const Vector& b)
+        {
+            for (int i = 0; i < dims; i++)
+                ptr()[i] *= b[i];
+            return *this;
+        }
+
+        Vector& operator/=(const Vector& b)
+        {
+            for (int i = 0; i < dims; i++)
+                ptr()[i] /= b[i];
+            return *this;
+        }
+
+        // Scalar * Vector
+        friend Vector operator*(Real s, Vector v)
+        {
+            v *= s;
+            return v;
+        }
+
+        friend Vector operator+(Real s, Vector v)
+        {
+            v += s;
+            return v;
+        }
+
+        friend Vector operator-(Real s, const Vector& v)
+        {
+            Vector ret;
+            for (int i = 0; i < dims; i++)
+                ret[i] = s - v[i];
+            return ret;
+        }
+
+        friend Vector operator/(Real s, const Vector& v)
+        {
+            Vector ret;
+            for (int i = 0; i < dims; i++)
+                ret[i] = s / v[i];
+            return ret;
+        }
+
+        // Vector * Scalar
+        Vector operator-() const
+        {
+            return -1 * *this;
+        }
+
+        const Vector& operator+() const
+        {
+            return *this;
+        }
+
+        Vector operator*(Real s) const
+        {
+            return s * *this;
+        }
+
+        Vector operator/(Real s) const
+        {
+            assert( s != 0.0 ); // legacy assert
+            Real fInv = 1.0f / s;
+            return fInv * *this;
+        }
+
+        Vector operator-(Real s) const
+        {
+            return -s + *this;
+        }
+
+        Vector operator+(Real s) const
+        {
+            return s + *this;
+        }
+
+        // Vector * Vector
+        Vector operator+(const Vector& b) const
+        {
+            Vector ret = *this;
+            ret += b;
+            return ret;
+        }
+
+        Vector operator-(const Vector& b) const
+        {
+            Vector ret = *this;
+            ret -= b;
+            return ret;
+        }
+
+        Vector operator*(const Vector& b) const
+        {
+            Vector ret = *this;
+            ret *= b;
+            return ret;
+        }
+
+        Vector operator/(const Vector& b) const
+        {
+            Vector ret = *this;
+            ret /= b;
+            return ret;
+        }
+
+        friend std::ostream& operator<<(std::ostream& o, const Vector& v)
+        {
+            o << "Vector" << dims << "(";
+            for (int i = 0; i < dims; i++) {
+                o << v[i];
+                if(i != dims - 1) o << ", ";
+            }
+            o <<  ")";
+            return o;
+        }
     };
 
     inline Vector2 VectorBase<2, Real>::midPoint( const Vector2& vec ) const
@@ -712,185 +873,6 @@ namespace Ogre
                 return y > 0 ? UNIT_Y : NEGATIVE_UNIT_Y;
             else
                 return z > 0 ? UNIT_Z : NEGATIVE_UNIT_Z;
-    }
-
-    // Vector: arithmetic updates
-    template <int N, typename T>
-    static inline Vector<N, T>& operator*=(Vector<N, T>& v, Real s)
-    {
-        for (int i = 0; i < N; i++)
-            v[i] *= s;
-        return v;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T>& operator/=(Vector<N, T>& v, Real s)
-    {
-        assert( s != 0.0 ); // legacy assert
-        Real fInv = 1.0f/s;
-        for (int i = 0; i < N; i++)
-            v[i] *= fInv;
-        return v;
-    }
-
-
-    template <int N, typename T>
-    static inline Vector<N, T>& operator+=(Vector<N, T>& v, Real s)
-    {
-        for (int i = 0; i < N; i++)
-            v[i] += s;
-        return v;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T>& operator-=(Vector<N, T>& v, Real s)
-    {
-        for (int i = 0; i < N; i++)
-            v[i] -= s;
-        return v;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator+=(Vector<N, T>& a, const Vector<N, T>& b)
-    {
-        for (int i = 0; i < N; i++)
-            a[i] += b[i];
-        return a;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator-=(Vector<N, T>& a, const Vector<N, T>& b)
-    {
-        for (int i = 0; i < N; i++)
-            a[i] -= b[i];
-        return a;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator*=(Vector<N, T>& a, const Vector<N, T>& b)
-    {
-        for (int i = 0; i < N; i++)
-            a[i] *= b[i];
-        return a;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T>& operator/=(Vector<N, T>& a, const Vector<N, T>& b)
-    {
-        for (int i = 0; i < N; i++)
-            a[i] /= b[i];
-        return a;
-    }
-
-    // Scalar * Vector
-    template <int N, typename T>
-    static inline Vector<N, T> operator*(Real s, Vector<N, T> v)
-    {
-        v *= s;
-        return v;
-    }
-
-    template <int N, typename T> static inline Vector<N, T> operator-(Vector<N, T> v)
-    {
-        return -1 * v;
-    }
-
-    template <int N, typename T> static inline Vector<N, T> operator+(Vector<N, T> v)
-    {
-        return v;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator*(const Vector<N, T>& v, Real s)
-    {
-        return s * v;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator/(Real s, const Vector<N, T>& v)
-    {
-        Vector<N, T> ret;
-        for (int i = 0; i < N; i++)
-            ret[i] = s / v[i];
-        return ret;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator/(const Vector<N, T>& v, Real s)
-    {
-        assert( s != 0.0 ); // legacy assert
-        Real fInv = 1.0f / s;
-        return fInv * v;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator+(Real s, const Vector<N, T>& v)
-    {
-        return v + s;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator-(Vector<N, T> v, Real s)
-    {
-        v -= s;
-        return v;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator-(Real s, const Vector<N, T>& v)
-    {
-        Vector<N, T> ret;
-        for (int i = 0; i < N; i++)
-            ret[i] = s - v[i];
-        return ret;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator+(Vector<N, T> v, Real s)
-    {
-        v += s;
-        return v;
-    }
-
-    // Vector * Vector
-    template <int N, typename T>
-    static inline Vector<N, T> operator+(Vector<N, T> a, const Vector<N, T>& b)
-    {
-        a += b;
-        return a;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator-(Vector<N, T> a, const Vector<N, T>& b)
-    {
-        a -= b;
-        return a;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator*(Vector<N, T> a, const Vector<N, T>& b)
-    {
-        a *= b;
-        return a;
-    }
-
-    template <int N, typename T>
-    static inline Vector<N, T> operator/(Vector<N, T> a, const Vector<N, T>& b)
-    {
-        a /= b;
-        return a;
-    }
-
-    template <int N, typename T>
-    static inline std::ostream& operator<<(std::ostream& o, const Vector<N, T>& v)
-    {
-        o << "Vector" << N << "(";
-        for (int i = 0; i < N; i++) {
-            o << v[i];
-            if(i != N - 1) o << ", ";
-        }
-        o <<  ")";
-        return o;
     }
     /** @} */
     /** @} */
