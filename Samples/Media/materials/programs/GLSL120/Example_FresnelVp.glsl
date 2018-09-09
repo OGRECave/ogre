@@ -1,8 +1,8 @@
-#version 150
+#version 120
 
-in vec4 uv0;
-in vec4 position;
-in vec3 normal;
+attribute vec4 uv0;
+attribute vec4 position;
+attribute vec3 normal;
 
 uniform mat4 worldViewProjMatrix;
 uniform vec3 eyePosition; // object space
@@ -11,10 +11,10 @@ uniform float scale;  // the amount to scale the noise texture by
 uniform float scroll; // the amount by which to scroll the noise
 uniform float noise;  // the noise perturb as a factor of the time
 
-out vec3 noiseCoord;
-out vec4 projectionCoord;
-out vec3 eyeDir;
-out vec3 oNormal;
+varying vec3 noiseCoord;
+varying vec4 projectionCoord;
+varying vec3 eyeDir;
+varying vec3 oNormal;
 
 // Vertex program for fresnel reflections / refractions
 void main()

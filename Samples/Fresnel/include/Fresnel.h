@@ -22,7 +22,7 @@ public:
     {
         StringVector names;
 		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl")
 		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
             names.push_back("Cg Program Manager");
         return names;

@@ -614,12 +614,6 @@ vertex_program Examples/FresnelRefractReflectVPCg cg
 	entry_point main_vp
 	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
 }
-vertex_program Examples/FresnelRefractReflectVPold cg
-{
-	source Example_Fresnel.cg
-	entry_point main_vp_old
-	profiles vs_1_1 arbvp1
-}
 vertex_program Examples/FresnelRefractReflectVPGLSLES glsles
 {
 	source Example_FresnelVp.glsles
@@ -629,7 +623,7 @@ vertex_program Examples/FresnelRefractReflectVPGLSLES glsles
 vertex_program Examples/FresnelRefractReflectVPGLSL glsl
 {
 	source Example_FresnelVp.glsl
-	syntax glsl150
+	syntax glsl
 }
 
 vertex_program Examples/FresnelRefractReflectVP unified
@@ -646,13 +640,6 @@ fragment_program Examples/FresnelRefractReflectFPCg cg
 	// sorry, ps_1_1 and fp20 can't do this
 	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
-
-// fragment_program Examples/FresnelRefractReflectPS asm
-// {
-// 	source Example_FresnelPS.asm
-// 	// sorry, only for ps_1_4 :)
-// 	syntax ps_1_4
-// }
 
 fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
 {
@@ -671,7 +658,7 @@ fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
 fragment_program Examples/FresnelRefractReflectFPGLSL glsl
 {
 	source Example_FresnelFp.glsl
-	syntax glsl150
+	syntax glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -736,61 +723,6 @@ material Examples/FresnelReflectionRefraction
 		
 			
 	}
-
-        // Please test this code on OpenGL before reenabling it
-	// ATI 8500 +
-	// technique
-	// {
-	// 	pass
-	// 	{
-	// 		vertex_program_ref Examples/FresnelRefractReflectVPold
-	// 		{
-	// 			param_named_auto worldViewProjMatrix worldviewproj_matrix
-	// 			param_named_auto eyePosition camera_position_object_space
-	// 			param_named fresnelBias float -0.3
-	// 			param_named fresnelScale float 1.4
-	// 			param_named fresnelPower float 8
-	// 			param_named_auto timeVal time_0_1 20
-	// 			param_named scroll float 1 
-	// 			param_named scale float 4 
-	// 			param_named noise float 1
-	// 			// scroll and noisePos will need updating per frame
-	// 		}
-
-	// 		// for ATI RADEON 8500 - 9200
-	// 		fragment_program_ref Examples/FresnelRefractReflectPS
-	// 		{
-	// 			// distortionRange
-	// 			param_indexed 0  float 0.025  
-	// 			// tintColour
-	// 			param_indexed 1  float4 0.05 0.12 0.15 1
-	// 		}
-
-	// 		// Noise
-	// 		texture_unit
-	// 		{
-	// 			// Perlin noise volume
-	// 			texture perlinvolume.dds 3d
-	// 			// min / mag filtering, no mip
-	// 			filtering linear linear none
-	// 		}
-	// 		// Reflection
-	// 		texture_unit
-	// 		{
-	// 			// Will be filled in at runtime
-	// 			texture Reflection
-	// 			tex_address_mode clamp
-	// 		}
-	// 		// Refraction
-	// 		texture_unit
-	// 		{
-	// 			// Will be filled in at runtime
-	// 			texture Refraction
-	// 			tex_address_mode clamp
-	// 		}
-	// 	}
-	// }
-
 }
 
 // Normal-mapped Athene statue
