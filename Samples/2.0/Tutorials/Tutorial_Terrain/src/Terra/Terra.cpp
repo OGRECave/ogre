@@ -154,6 +154,8 @@ namespace Ogre
 
         createNormalTexture();
 
+        m_prevLightDir = Vector3::ZERO;
+
         delete m_shadowMapper;
         m_shadowMapper = new ShadowMapper( mManager, m_compositorManager );
         m_shadowMapper->createShadowMap( getId(), m_heightMapTex );
