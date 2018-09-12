@@ -235,12 +235,12 @@ void main()
 	@foreach( detail_maps_diffuse, n )
 		@insertpiece( blend_mode_idx@n ) @add( t, 1 ) @end
 
-		/// Apply the material's diffuse over the textures
-		@property( !transparent_mode )
-			diffuseCol.xyz *= material.kD.xyz;
-		@end @property( transparent_mode )
-			diffuseCol.xyz *= material.kD.xyz * diffuseCol.w * diffuseCol.w;
-		@end
+	/// Apply the material's diffuse over the textures
+	@property( !transparent_mode )
+	    diffuseCol.xyz *= material.kD.xyz;
+	@end @property( transparent_mode )
+	    diffuseCol.xyz *= material.kD.xyz * diffuseCol.w * diffuseCol.w;
+	@end
 
 	@property( alpha_test )
 		if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
