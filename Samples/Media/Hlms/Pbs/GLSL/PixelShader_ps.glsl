@@ -79,7 +79,7 @@ in block
 	uniform sampler3D irradianceVolume;
 @end
 
-@property( !roughness_map )#define ROUGHNESS material.kS.w@end
+@property( !roughness_map && !hlms_decals_diffuse )#define ROUGHNESS material.kS.w@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 @property( use_envprobe_map )uniform samplerCube	texEnvProbeMap;@end
 
@@ -96,9 +96,9 @@ in block
 @property( use_envprobe_map )	uint envMapIdx;@end
 
 vec4 diffuseCol;
-@property( specular_map && !metallic_workflow && !fresnel_workflow )vec3 specularCol;@end
-@property( metallic_workflow || (specular_map && fresnel_workflow) )@insertpiece( FresnelType ) F0;@end
-@property( roughness_map )float ROUGHNESS;@end
+@property( specular_map && !metallic_workflow && !fresnel_workflow && !hlms_decals_diffuse )vec3 specularCol;@end
+@property( metallic_workflow || (specular_map && fresnel_workflow) || hlms_decals_diffuse )@insertpiece( FresnelType ) F0;@end
+@property( roughness_map || hlms_decals_diffuse )float ROUGHNESS;@end
 
 Material material;
 @property( hlms_normal || hlms_qtangent )vec3 nNormal;@end
@@ -248,6 +248,9 @@ void main()
 	@end
 @end
 
+	@insertpiece( SampleSpecularMap )
+	@insertpiece( SampleRoughnessMap )
+
 	@insertpiece( forwardPlusDoDecals )
 
 @property( !hlms_use_prepass )
@@ -301,8 +304,6 @@ void main()
 
 	@insertpiece( DoDirectionalShadowMaps )
 
-	@insertpiece( SampleRoughnessMap )
-
 @end @property( hlms_use_prepass )
 	ivec2 iFragCoord = ivec2( gl_FragCoord.x,
 							  @property( !hlms_forwardplus_flipY )passBuf.windowHeight.x - @end
@@ -351,8 +352,6 @@ void main()
 		ROUGHNESS = shadowRoughness.y * 0.98 + 0.02; /// ROUGHNESS is a constant otherwise
 	@end
 @end
-
-@insertpiece( SampleSpecularMap )
 
 @property( !hlms_prepass )
 	//Everything's in Camera space

@@ -28,8 +28,17 @@
 												vec3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
 													  specularIdx) ).@insertpiece( FresnelSwizzle ) * material.F0.@insertpiece( FresnelSwizzle );@end
 	@end
+	@property( !specular_map && hlms_decals_diffuse )
+		//We'll need write access to F0
+		@piece( SampleSpecularMap ) F0 = material.F0.@insertpiece( FresnelSwizzle );@end
+	@end
 	@property( !specular_map || fresnel_workflow )
-		@piece( kS )material.kS@end
+		@property( !hlms_decals_diffuse )
+			@piece( kS )material.kS@end
+		@end
+		@property( hlms_decals_diffuse )
+			@piece( kS )specularCol@end
+		@end
 	@end
 @end @property( metallic_workflow )
 @piece( SampleSpecularMap )
@@ -47,7 +56,12 @@
 	@property( transparent_mode )F0 *= diffuseCol.w;@end
 @end /// SampleSpecularMap
 
-	@piece( kS )material.kS.xyz@end
+	@property( !hlms_decals_diffuse )
+		@piece( kS )material.kS.xyz@end
+	@end
+	@property( hlms_decals_diffuse )
+		@piece( kS )specularCol.xyz@end
+	@end
 @end
 @end
 
@@ -58,6 +72,10 @@
 												  roughnessIdx) ).x;
 		ROUGHNESS = max( ROUGHNESS, 0.001f );
 	@end
+@end
+@property( !roughness_map && hlms_decals_diffuse )
+	//We'll need write access to ROUGHNESS
+	@piece( SampleRoughnessMap )ROUGHNESS = material.kS.w;@end
 @end
 
 @foreach( detail_maps_normal, n )

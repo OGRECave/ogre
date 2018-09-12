@@ -31,7 +31,7 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void Decal::setDiffuseTexture( const TexturePtr &diffuseTex, uint32 diffuseIdx )
+    void Decal::setDiffuseTexture( const TexturePtr &diffuseTex, uint16 diffuseIdx )
     {
         mDiffuseTexture = diffuseTex;
         mDiffuseIdx = diffuseIdx;
@@ -42,7 +42,7 @@ namespace Ogre
         return mDiffuseTexture;
     }
     //-----------------------------------------------------------------------------------
-    void Decal::setNormalTexture( const TexturePtr &normalTex, uint32 normalIdx )
+    void Decal::setNormalTexture( const TexturePtr &normalTex, uint16 normalIdx )
     {
         mNormalTexture = normalTex;
         mNormalMapIdx = normalIdx;
@@ -53,7 +53,7 @@ namespace Ogre
         return mNormalTexture;
     }
     //-----------------------------------------------------------------------------------
-    void Decal::setEmissiveTexture( const TexturePtr &emissiveTex, uint32 emissiveIdx )
+    void Decal::setEmissiveTexture( const TexturePtr &emissiveTex, uint16 emissiveIdx )
     {
         mEmissiveTexture = emissiveTex;
         mEmissiveIdx = emissiveIdx;
@@ -62,6 +62,16 @@ namespace Ogre
     const TexturePtr& Decal::getEmissiveTexture(void) const
     {
         return mEmissiveTexture;
+    }
+    //-----------------------------------------------------------------------------------
+    void Decal::setMetalness( float value )
+    {
+        mMetalness = value;
+    }
+    //-----------------------------------------------------------------------------------
+    float Decal::getMetalness(void) const
+    {
+        return mMetalness;
     }
     //-----------------------------------------------------------------------------------
     const String& Decal::getMovableType(void) const

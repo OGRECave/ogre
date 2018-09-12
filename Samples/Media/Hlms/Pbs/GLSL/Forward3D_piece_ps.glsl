@@ -293,16 +293,19 @@
 		float2 decalUV = localPos.xz + 0.5f;
 
 		@property( hlms_decals_diffuse )
+			ushort decalDiffuseIdx = floatBitsToUint( texIndices.x ) & 0xFFFFu;
 			float4 decalDiffuse = OGRE_SampleArray2D( decalsDiffuseTex, decalsSampler,
-													  decalUV.xy, floatBitsToUint( texIndices.x ) ).xyzw;
+													  decalUV.xy, decalDiffuseIdx ).xyzw;
 		@end
 		@property( hlms_decals_normals && normal_map )
+			ushort decalNormalsIdx = floatBitsToUint( texIndices.x ) >> 16u;
 			float2 decalNormals = OGRE_SampleArray2D( decalsNormalsTex, decalsSampler,
-													  decalUV.xy, floatBitsToUint( texIndices.y ) ).xy;
+													  decalUV.xy, decalNormalsIdx ).xy;
 		@end
 		@property( hlms_decals_emissive )
+			ushort decalEmissiveIdx = floatBitsToUint( texIndices.y ) & 0xFFFFu;
 			float3 decalEmissive = OGRE_SampleArray2D( decalsEmissiveTex, decalsSampler,
-													   decalUV.xy, floatBitsToUint( texIndices.z ) ).xyz;
+													   decalUV.xy, decalEmissiveIdx ).xyz;
 		@end
 
 		@property( hlms_decals_diffuse )
@@ -318,7 +321,21 @@
 					 absLocalPos.z > 0.5f) ? 0.0f : decalMask;
 
 		@property( hlms_decals_diffuse )
-			diffuseCol.xyz  = lerp( diffuseCol.xyz, decalDiffuse.xyz, decalMask );
+			float decalMetalness = texIndices.z;
+			float3 decalF0 = lerp( float3( 0.03f ), decalDiffuse.xyz, decalMetalness );
+			decalDiffuse.xyz = decalDiffuse.xyz - decalDiffuse.xyz * decalMetalness;
+
+			diffuseCol.xyz  = lerp( diffuseCol.xyz, decalDiffuse.xyz * 0.318309886f, decalMask );
+			ROUGHNESS		= lerp( ROUGHNESS, texIndices.w, decalMask );
+
+			@property( !metallic_workflow && !fresnel_workflow && !fresnel_scalar )
+				specularCol	= lerp( specularCol.xyz, decalF0, decalMask );
+				F0			= lerp( F0, decalMetalness, decalMask );
+			@end
+			@property( metallic_workflow || fresnel_workflow || fresnel_scalar )
+				specularCol	= lerp( specularCol.xyz, float3( 1.0f ), decalMask );
+				F0.xyz		= lerp( F0.xyz, decalF0.xyz, decalMask );
+			@end
 		@end
 		@property( hlms_decals_normals && normal_map )
 			finalDecalTsNormal.xy += decalNormals.xy * decalMask;
