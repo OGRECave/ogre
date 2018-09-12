@@ -311,6 +311,10 @@ namespace Ogre
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable );
 
+        /// This function gets called right before starting parsing all templates, and after
+        /// the renderable properties have been merged with the pass properties.
+        virtual void notifyPropertiesMergedPreGenerationStep(void);
+
         virtual HlmsDatablock* createDatablockImpl( IdString datablockName,
                                                     const HlmsMacroblock *macroblock,
                                                     const HlmsBlendblock *blendblock,

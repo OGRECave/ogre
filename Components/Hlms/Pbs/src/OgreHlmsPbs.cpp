@@ -716,9 +716,6 @@ namespace Ogre
                                         getProperty( HlmsBaseProp::Tangent )) ||
                                         getProperty( HlmsBaseProp::QTangent );
 
-        //If decals normals are enabled, we need to generate the TBN matrix.
-        usesNormalMap |= normalMapCanBeSupported && getProperty( HlmsBaseProp::DecalsNormals );
-
         setProperty( PbsProperty::NormalMap, usesNormalMap );
 
         if( !normalMapCanBeSupported && usesNormalMap )
@@ -827,6 +824,19 @@ namespace Ogre
             setProperty( PbsProperty::MaterialsPerBuffer, static_cast<int>( 2 ) );
         else
             setProperty( PbsProperty::MaterialsPerBuffer, static_cast<int>( mSlotsPerPool ) );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::notifyPropertiesMergedPreGenerationStep(void)
+    {
+        if( getProperty( HlmsBaseProp::DecalsNormals ) )
+        {
+            //If decals normals are enabled, we need to generate the TBN matrix.
+            bool normalMapCanBeSupported = (getProperty( HlmsBaseProp::Normal ) &&
+                                            getProperty( HlmsBaseProp::Tangent )) ||
+                                            getProperty( HlmsBaseProp::QTangent );
+
+            setProperty( PbsProperty::NormalMap, normalMapCanBeSupported );
+        }
     }
     //-----------------------------------------------------------------------------------
     bool HlmsPbs::requiredPropertyByAlphaTest( IdString keyName )

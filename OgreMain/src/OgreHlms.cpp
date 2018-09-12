@@ -1884,6 +1884,8 @@ namespace Ogre
                 setProperty( *itor++, 1 );
         }
 
+        notifyPropertiesMergedPreGenerationStep();
+
         GpuProgramPtr shaders[NumShaderTypes];
         //Generate the shaders
         for( size_t i=0; i<NumShaderTypes; ++i )
@@ -2071,6 +2073,10 @@ namespace Ogre
 
         const HlmsCache* retVal = addShaderCache( finalHash, pso );
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::notifyPropertiesMergedPreGenerationStep()
+    {
     }
     //-----------------------------------------------------------------------------------
     uint16 Hlms::calculateHashForV1( Renderable *renderable )

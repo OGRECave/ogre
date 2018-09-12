@@ -321,11 +321,11 @@
 			diffuseCol.xyz  = lerp( diffuseCol.xyz, decalDiffuse.xyz, decalMask );
 		@end
 		@property( hlms_decals_normals && normal_map )
-			finalDecalTsNormal.xy += decalNormals.xy;
+			finalDecalTsNormal.xy += decalNormals.xy * decalMask;
 		@end
 		@property( hlms_decals_emissive )
 			finalDecalEmissive	+= (absLocalPos.x > 0.5f || absLocalPos.y > 0.5f ||
-									absLocalPos.z > 0.5f) ? 0.0f : decalEmissive.xyz;
+									absLocalPos.z > 0.5f) ? 0.0f : (decalEmissive.xyz * decalMask);
 		@end
 
 	}

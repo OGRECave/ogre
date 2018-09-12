@@ -7,7 +7,7 @@
 
 namespace Ogre
 {
-    class Decal : public MovableObject
+    class _OgreExport Decal : public MovableObject
     {
     protected:
         TexturePtr  mDiffuseTexture;

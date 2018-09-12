@@ -181,6 +181,8 @@ namespace Ogre
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces );
         virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces );
 
+        virtual void notifyPropertiesMergedPreGenerationStep(void);
+
         static bool requiredPropertyByAlphaTest( IdString propertyName );
 
         virtual void destroyAllBuffers(void);
