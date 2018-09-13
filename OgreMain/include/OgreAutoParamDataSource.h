@@ -80,6 +80,7 @@ namespace Ogre {
         mutable Affine3 mViewMatrix;
         mutable Matrix4 mProjectionMatrix;
         mutable Real mDirLightExtrusionDistance;
+        mutable Real mPointLightExtrusionDistance;
         mutable Vector4 mLodCameraPosition;
         mutable Vector4 mLodCameraPositionObjectSpace;
 
@@ -140,8 +141,10 @@ namespace Ogre {
         void setCurrentRenderTarget(const RenderTarget* target);
         /** Sets the current viewport */
         void setCurrentViewport(const Viewport* viewport);
-        /** Sets the shadow extrusion distance to be used for point lights. */
+        /** Sets the shadow extrusion distance to be used for dir lights. */
         void setShadowDirLightExtrusionDistance(Real dist);
+        /** Sets the shadow extrusion distance to be used for point lights. */
+        void setShadowPointLightExtrusionDistance(Real dist);
         /** Sets the main camera's scene bounding information */
         void setMainCamBoundsInfo(VisibleObjectsBoundsInfo* info);
         /** Set the current scene manager for enquiring on demand */

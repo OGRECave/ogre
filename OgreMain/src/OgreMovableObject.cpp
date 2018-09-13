@@ -390,7 +390,21 @@ namespace Ogre {
     {
         if (mParentNode)
         {
-            return getExtrusionDistance(mParentNode->_getDerivedPosition(), l);
+            // exclude distance from the light to the shadow caster from the extrusion
+            Real extrusionDistance = l->getAttenuationRange() - getWorldBoundingBox().distance(l->getDerivedPosition());
+            if(extrusionDistance < 0)
+                extrusionDistance = 0;
+            
+            // Take into account that extrusion would be done in object-space,
+            // and non-uniformly scaled objects would cast non-uniformly scaled shadows.
+            Matrix3 m3 = _getParentNodeFullTransform().linear();
+            Real c0 = m3.GetColumn(0).squaredLength(), c1 = m3.GetColumn(1).squaredLength(), c2 = m3.GetColumn(2).squaredLength();
+            Real minScale = Math::Sqrt(std::min(std::min(c0, c1), c2));
+            Real maxScale = Math::Sqrt(std::max(std::max(c0, c1), c2));
+            if(minScale > 0.0)
+                extrusionDistance *= (maxScale / minScale);
+            
+            return extrusionDistance;
         }
         else
         {

@@ -194,8 +194,6 @@ namespace Ogre {
         /** Get the distance to extrude for a point/spot light. */
         virtual Real getPointExtrusionDistance(const Light* l) const = 0;
     protected:
-        /// Helper method for calculating extrusion distance.
-        Real getExtrusionDistance(const Vector3& objectPos, const Light* light) const;
         /** Tells the caster to perform the tasks necessary to update the 
             edge data's light listing. Can be overridden if the subclass needs 
             to do additional things. 
