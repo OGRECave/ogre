@@ -43,7 +43,7 @@
 			@piece( kS )material.kS@end
 		@end
 		@property( hlms_decals_diffuse )
-			@property( !fresnel_workflow )
+			@property( !specular_map )
 				//We'll need write access to F0 & specularCol
 				@piece( SampleSpecularMap )
 					F0 = material.F0.@insertpiece( FresnelSwizzle );

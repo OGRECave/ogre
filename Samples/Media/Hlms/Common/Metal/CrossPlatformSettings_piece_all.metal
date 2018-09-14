@@ -28,4 +28,6 @@ struct float1
 #define OGRE_SampleGrad( tex, sampler, uv, ddx, ddy ) tex.sample( sampler, uv, gradient2d( ddx, ddy ) )
 #define OGRE_ddx( val ) dfdx( val )
 #define OGRE_ddy( val ) dfdy( val )
+
+#define bufferFetch( buffer, idx ) buffer[idx]
 @end

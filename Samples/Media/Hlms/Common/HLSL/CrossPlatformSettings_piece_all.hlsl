@@ -1,4 +1,6 @@
 @piece( SetCrossPlatformSettings )
+#define ushort uint
+
 #define toFloat3x3( x ) ((float3x3)(x))
 
 #define INLINE
@@ -18,4 +20,6 @@
 #define OGRE_SampleGrad( tex, sampler, uv, ddx, ddy ) tex.SampleGrad( sampler, uv, ddx, ddy )
 #define OGRE_ddx( val ) ddx( val )
 #define OGRE_ddy( val ) ddy( val )
+
+#define bufferFetch( buffer, idx ) buffer.Load( idx )
 @end

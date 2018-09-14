@@ -50,7 +50,7 @@ Buffer<float4> f3dLightList : register(t2);@end
 	SamplerState		irradianceVolumeSampler	: register(s@value(irradianceVolumeTexUnit));
 @end
 
-@property( !roughness_map )#define ROUGHNESS material.kS.w@end
+@property( !roughness_map && !hlms_decals_diffuse )#define ROUGHNESS material.kS.w@end
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( use_envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));
 SamplerState envMapSamplerState : register(s@value(envMapReg));@end
@@ -118,6 +118,8 @@ float3 qmul( float4 q, float3 v )
 @insertpiece( DeclParallaxLocalCorrect )
 @end
 
+@insertpiece( DeclDecalsSamplers )
+
 @insertpiece( DeclShadowMapMacros )
 @insertpiece( DeclShadowSamplers )
 @insertpiece( DeclShadowSamplingFuncs )
@@ -149,9 +151,9 @@ float3 qmul( float4 q, float3 v )
 @property( use_envprobe_map )	uint envMapIdx;@end
 
 float4 diffuseCol;
-@property( specular_map && !metallic_workflow && !fresnel_workflow )float3 specularCol;@end
-@property( metallic_workflow || (specular_map && fresnel_workflow) )@insertpiece( FresnelType ) F0;@end
-@property( roughness_map )float ROUGHNESS;@end
+@property( specular_map && !metallic_workflow && !fresnel_workflow || hlms_decals_diffuse )float3 specularCol;@end
+@property( metallic_workflow || (specular_map && fresnel_workflow) || hlms_decals_diffuse )@insertpiece( FresnelType ) F0;@end
+@property( roughness_map || hlms_decals_diffuse )float ROUGHNESS;@end
 
 @property( hlms_normal || hlms_qtangent )	float3 nNormal;@end
 
@@ -229,6 +231,11 @@ float4 diffuseCol;
 	@end
 @end
 
+	@insertpiece( SampleSpecularMap )
+	@insertpiece( SampleRoughnessMap )
+
+	@insertpiece( forwardPlusDoDecals )
+
 @property( !hlms_use_prepass )
 	@property( !normal_map )
 		// Geometric normal
@@ -272,13 +279,13 @@ float4 diffuseCol;
 
 	@insertpiece( custom_ps_posSampleNormal )
 
+	@insertpiece( forwardPlusApplyDecalsNormal )
+
 	@property( normal_map )
 		nNormal = normalize( mul( nNormal, TBN ) );
 	@end
 
 	@insertpiece( DoDirectionalShadowMaps )
-
-	@insertpiece( SampleRoughnessMap )
 
 @end @property( hlms_use_prepass )
 	int2 iFragCoord = int2( gl_FragCoord.xy );
@@ -327,8 +334,6 @@ float4 diffuseCol;
 		ROUGHNESS = shadowRoughness.y * 0.98 + 0.02; /// ROUGHNESS is a constant otherwise
 	@end
 @end
-
-	@insertpiece( SampleSpecularMap )
 
 @property( !hlms_prepass )
 	//Everything's in Camera space

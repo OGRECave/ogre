@@ -97,45 +97,81 @@
 @property( !hlms_prepass )
 @property( !metallic_workflow )
 	@property( specular_map && !fresnel_workflow )
-		@piece( SampleSpecularMap )	specularCol = textureMaps[@value( specular_map_idx )].Sample(
-													samplerState@value(specular_map_idx),
-													float3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
-															specularIdx) ).xyz * material.kS.xyz;@end
+		@piece( SampleSpecularMap )
+			specularCol = textureMaps[@value( specular_map_idx )].Sample(
+							samplerState@value(specular_map_idx),
+							float3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
+									specularIdx) ).xyz * material.kS.xyz;
+			@property( hlms_decals_diffuse )
+				F0 = material.F0.@insertpiece( FresnelSwizzle );
+			@end
+		@end
 		@piece( specularExtraParamDef ), float3 specularCol@end
 		@piece( specularExtraParam ), specularCol.xyz@end
 		@piece( kS )specularCol@end
 	@end
 	@property( specular_map && fresnel_workflow )
-		@piece( SampleSpecularMap )	F0 = textureMaps[@value( specular_map_idx )].Sample(
-													samplerState@value(specular_map_idx),
-													float3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
-															specularIdx) ).@insertpiece( FresnelSwizzle ) * material.F0.@insertpiece( FresnelSwizzle );@end
-		@piece( specularExtraParamDef ), @insertpiece( FresnelType ) F0@end
-		@piece( specularExtraParam ), F0@end
+		@piece( SampleSpecularMap )
+			F0 = textureMaps[@value( specular_map_idx )].Sample(
+							samplerState@value(specular_map_idx),
+							float3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
+									specularIdx) ).@insertpiece( FresnelSwizzle ) * material.F0.@insertpiece( FresnelSwizzle );
+			@property( hlms_decals_diffuse )
+				specularCol.xyz = material.kS.xyz;
+			@end
+		@end
+		@piece( metallicExtraParamDef ), @insertpiece( FresnelType ) F0@end
+		@piece( metallicExtraParam ), F0@end
 	@end
 	@property( !specular_map || fresnel_workflow )
-		@piece( kS )material.kS@end
+		@property( !hlms_decals_diffuse )
+			@piece( kS )material.kS@end
+		@end
+		@property( hlms_decals_diffuse )
+			@property( !specular_map )
+				//We'll need write access to F0 & specularCol
+				@piece( SampleSpecularMap )
+					F0 = material.F0.@insertpiece( FresnelSwizzle );
+					specularCol.xyz = material.kS.xyz;
+				@end
+				@piece( metallicExtraParamDef ), @insertpiece( FresnelType ) F0@end
+				@piece( metallicExtraParam ), F0@end
+			@end
+			@piece( specularExtraParamDef ), float3 specularCol@end
+			@piece( specularExtraParam ), specularCol.xyz@end
+			@piece( kS )specularCol@end
+		@end
 	@end
-@end @property( metallic_workflow )
-@piece( SampleSpecularMap )
-	@property( specular_map )
-		float metalness = textureMaps[@value( specular_map_idx )].Sample(
-													samplerState@value(specular_map_idx),
-													float3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
-															specularIdx) ).x * material.F0.x;
-		F0 = lerp( float( 0.03f ).xxx, @insertpiece( kD ).xyz * 3.14159f, metalness );
-		@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * metalness;
-	@end @property( !specular_map )
-		F0 = lerp( float( 0.03f ).xxx, @insertpiece( kD ).xyz * 3.14159f, material.F0.x );
-		@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * material.F0.x;
-	@end
-	@property( hlms_alphablend )F0 *= material.F0.w;@end
-	@property( transparent_mode )F0 *= diffuseCol.w;@end
-@end /// SampleSpecularMap
+@end
+@property( metallic_workflow )
+	@piece( SampleSpecularMap )
+		@property( specular_map )
+			float metalness = textureMaps[@value( specular_map_idx )].Sample(
+														samplerState@value(specular_map_idx),
+														float3( UV_SPECULAR( inPs.uv@value(uv_specular).xy ),
+																specularIdx) ).x * material.F0.x;
+			F0 = lerp( float( 0.03f ).xxx, @insertpiece( kD ).xyz * 3.14159f, metalness );
+			@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * metalness;
+		@end @property( !specular_map )
+			F0 = lerp( float( 0.03f ).xxx, @insertpiece( kD ).xyz * 3.14159f, material.F0.x );
+			@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * material.F0.x;
+		@end
+		@property( hlms_alphablend )F0 *= material.F0.w;@end
+		@property( transparent_mode )F0 *= diffuseCol.w;@end
+		@property( hlms_decals_diffuse )specularCol.xyz = material.kS.xyz;@end
+	@end /// SampleSpecularMap
 
-	@piece( kS )material.kS.xyz@end
 	@piece( metallicExtraParamDef ), float3 F0@end
 	@piece( metallicExtraParam ), F0@end
+
+	@property( !hlms_decals_diffuse )
+		@piece( kS )material.kS.xyz@end
+	@end
+	@property( hlms_decals_diffuse )
+		@piece( specularExtraParamDef ), float3 specularCol@end
+		@piece( specularExtraParam ), specularCol.xyz@end
+		@piece( kS )specularCol@end
+	@end
 @end
 @end
 
@@ -145,6 +181,12 @@
 													float3( UV_ROUGHNESS( inPs.uv@value(uv_roughness).xy ),
 															roughnessIdx) ).x;
 	ROUGHNESS = max( ROUGHNESS, 0.001f );@end
+	@piece( roughnessExtraParamDef ), float ROUGHNESS@end
+	@piece( roughnessExtraParam ), ROUGHNESS@end
+@end
+@property( !roughness_map && hlms_decals_diffuse )
+	//We'll need write access to ROUGHNESS
+	@piece( SampleRoughnessMap )ROUGHNESS = material.kS.w;@end
 	@piece( roughnessExtraParamDef ), float ROUGHNESS@end
 	@piece( roughnessExtraParam ), ROUGHNESS@end
 @end
