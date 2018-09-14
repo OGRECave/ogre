@@ -271,9 +271,8 @@ namespace Ogre
                     *lightData++ = static_cast<float>( invWorldView[i][3] );
                 }
 #endif
-                memcpy( lightData, &decal->mDiffuseIdx, sizeof(uint32) * 3u );
-                lightData += 3u;
-                *lightData++ = 0.0f;
+                memcpy( lightData, &decal->mDiffuseIdx, sizeof(uint32) * 4u );
+                lightData += 4u;
 
                 ++itor;
             }

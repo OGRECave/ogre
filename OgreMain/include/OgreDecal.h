@@ -59,7 +59,7 @@ namespace Ogre
         uint16 mDiffuseIdx;
         uint16 mNormalMapIdx;
         uint16 mEmissiveIdx;
-        uint16 mPadding;
+        uint16 mIgnoreDiffuseAlpha;
         float mMetalness;
         float mRoughness;
 
@@ -74,6 +74,17 @@ namespace Ogre
         const TexturePtr& getDiffuseTexture(void) const;
         const TexturePtr& getNormalTexture(void) const;
         const TexturePtr& getEmissiveTexture(void) const;
+
+        /** When diffuse textures are used (globally), the alpha component of the diffuse texture
+            will be used to mask all the other textures (e.g. normal & emissive maps).
+
+            When bIgnore = true, the alpha component of the diffuse texture won't be used on
+            normal & emissive maps.
+        @param bIgnore
+            True to ignore the alpha on the other maps. False otherwise. Default: False
+        */
+        void setIgnoreAlphaDiffuse( bool bIgnore );
+        bool getIgnoreAlphaDiffuse(void) const;
 
         /// Value for Metalness. Must be in range [0; 1]
         void setMetalness( float value );

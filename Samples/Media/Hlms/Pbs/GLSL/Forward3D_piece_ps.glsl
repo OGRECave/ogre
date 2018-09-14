@@ -308,19 +308,18 @@
 													   decalUV.xy, decalEmissiveIdx ).xyz;
 		@end
 
-		@property( hlms_decals_diffuse )
-			float decalMask = decalDiffuse.w;
-		@end
-		@property( !hlms_decals_diffuse )
-			float decalMask = 1.0f;
+		@property( hlms_decals_diffuse && (hlms_decals_normals || hlms_decals_emissive) )
+			bool ignoreAlphaDiffuse = (floatBitsToUint( texIndices.y ) & 0xFFFF0000u) != 0u;
 		@end
 
 		//Mask the decal entirely if localPos is outside the debox
 		float3 absLocalPos = abs( localPos.xyz );
-		decalMask = (absLocalPos.x > 0.5f || absLocalPos.y > 0.5f ||
-					 absLocalPos.z > 0.5f) ? 0.0f : decalMask;
+		bool isOutsideDecal = absLocalPos.x > 0.5f || absLocalPos.y > 0.5f || absLocalPos.z > 0.5f;
+
+		float decalMask;
 
 		@property( hlms_decals_diffuse )
+			decalMask = isOutsideDecal ? 0.0f : decalDiffuse.w;
 			float decalMetalness = texIndices.z;
 			float3 decalF0 = lerp( float3( 0.03f ), decalDiffuse.xyz, decalMetalness );
 			decalDiffuse.xyz = decalDiffuse.xyz - decalDiffuse.xyz * decalMetalness;
@@ -336,6 +335,10 @@
 				specularCol	= lerp( specularCol.xyz, float3( 1.0f ), decalMask );
 				F0.xyz		= lerp( F0.xyz, decalF0.xyz, decalMask );
 			@end
+		@end
+		@property( hlms_decals_diffuse && (hlms_decals_normals || hlms_decals_emissive) )
+			decalMask = ignoreAlphaDiffuse ? 1.0f : decalMask;
+			decalMask = isOutsideDecal ? 0.0f : decalMask;
 		@end
 		@property( hlms_decals_normals && normal_map )
 			finalDecalTsNormal.xy += decalNormals.xy * decalMask;

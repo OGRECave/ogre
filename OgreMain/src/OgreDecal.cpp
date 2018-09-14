@@ -14,7 +14,10 @@ namespace Ogre
         MovableObject( id, objectMemoryManager, manager, 0 ),
         mDiffuseIdx( 0 ),
         mNormalMapIdx( 0 ),
-        mEmissiveIdx( 0 )
+        mEmissiveIdx( 0 ),
+        mIgnoreDiffuseAlpha( 0 ),
+        mMetalness( 1.0f ),
+        mRoughness( 1.0f )
     {
         //NOTE: For performance reasons, ForwardClustered::collectLightForSlice ignores
         //mLocalAabb & mWorldAabb and assumes its local AABB is this aabb we set as
@@ -62,6 +65,21 @@ namespace Ogre
     const TexturePtr& Decal::getEmissiveTexture(void) const
     {
         return mEmissiveTexture;
+    }
+    //-----------------------------------------------------------------------------------
+    void Decal::setIgnoreAlphaDiffuse( bool bIgnore )
+    {
+        mIgnoreDiffuseAlpha = bIgnore ? 1u : 0u;
+    }
+    //-----------------------------------------------------------------------------------
+    bool Decal::getIgnoreAlphaDiffuse(void) const
+    {
+        return mIgnoreDiffuseAlpha != 0u;
+    }
+    //-----------------------------------------------------------------------------------
+    void Decal::setRoughness( float roughness )
+    {
+        mRoughness = std::max( roughness, 0.02f );
     }
     //-----------------------------------------------------------------------------------
     void Decal::setMetalness( float value )
