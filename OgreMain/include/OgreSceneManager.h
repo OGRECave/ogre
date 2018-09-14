@@ -1342,8 +1342,27 @@ namespace Ogre {
         ForwardPlusBase* getForwardPlus(void)                       { return mForwardPlusSystem; }
         ForwardPlusBase* _getActivePassForwardPlus(void)            { return mForwardPlusImpl; }
 
+        /** Sets the decal texture for diffuse. Should be a RGBA8 or similar colour format.
+        @remarks
+            If the emissive texture (see SceneManager::setDecalsEmissive) is the same as
+            the diffuse, Hlms can perform a performance optimization and use fewer texture
+            slots.
+
+            You still need to enable a Forward+ solution that supports decals, such as
+            SceneManager::setForwardClusted; otherwise decals won't be rendered.
+        @param tex
+            Null pointer to disable diffuse texture for all decals, globablly.
+        */
         void setDecalsDiffuse( const TexturePtr &tex )              { mDecalsDiffuseTex = tex; }
+        /** Sets the decal texture normal maps. Should be RG8_SNORM or BC5_SNORM.
+
+            @see    SceneManager::setDecalsDiffuse
+        @param tex
+            Null pointer to disable normal map textures for all decals, globally.
+        */
         void setDecalsNormals( const TexturePtr &tex )              { mDecalsNormalsTex = tex; }
+        /// See SceneManager::setDecalsDiffuse. Setting this texture to the same as diffuse
+        /// incurs in a performance optimization.
         void setDecalsEmissive( const TexturePtr &tex )             { mDecalsEmissiveTex = tex; }
 
         const TexturePtr& getDecalsDiffuse(void) const              { return mDecalsDiffuseTex; }
