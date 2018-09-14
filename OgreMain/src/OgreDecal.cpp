@@ -69,11 +69,6 @@ namespace Ogre
         mMetalness = value;
     }
     //-----------------------------------------------------------------------------------
-    float Decal::getMetalness(void) const
-    {
-        return mMetalness;
-    }
-    //-----------------------------------------------------------------------------------
     const String& Decal::getMovableType(void) const
     {
         return DecalFactory::FACTORY_TYPE_NAME;

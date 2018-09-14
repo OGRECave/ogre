@@ -28,6 +28,8 @@
 #define float3x3 mat3
 #define float4x4 mat4
 
+#define ushort uint
+
 #define toFloat3x3( x ) mat3( x )
 
 #define mul( x, y ) ((x) * (y))
