@@ -12,7 +12,7 @@
 		float3 finalDecalEmissive = float3( 0.0f, 0.0f, 0.0f );
 	@end
 
-	uint numLightsInGrid = bufferFetch( f3dGrid, int(sampleOffset + @value(hlms_forwardplus_decals_slot_offset)u) ).x;
+	ushort numLightsInGrid = bufferFetch( f3dGrid, int(sampleOffset + @value(hlms_forwardplus_decals_slot_offset)u) ).x;
 
 	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
 

@@ -151,7 +151,7 @@ float3 qmul( float4 q, float3 v )
 @property( use_envprobe_map )	uint envMapIdx;@end
 
 float4 diffuseCol;
-@property( specular_map && !metallic_workflow && !fresnel_workflow || hlms_decals_diffuse )float3 specularCol;@end
+@property( (specular_map && !metallic_workflow && !fresnel_workflow) || hlms_decals_diffuse )float3 specularCol;@end
 @property( metallic_workflow || (specular_map && fresnel_workflow) || hlms_decals_diffuse )@insertpiece( FresnelType ) F0;@end
 @property( roughness_map || hlms_decals_diffuse )float ROUGHNESS;@end
 
