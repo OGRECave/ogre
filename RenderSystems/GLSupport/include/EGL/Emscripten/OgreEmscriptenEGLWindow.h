@@ -54,6 +54,7 @@ namespace Ogre {
         int mCSAA;
         int mOldWidth;
         int mOldHeight;
+        String mCanvasSelector;
         
     protected:
         virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);

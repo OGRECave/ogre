@@ -379,6 +379,8 @@ NativeWindowPair ApplicationContext::createWindow(const Ogre::String& name, Ogre
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     SDL_GL_CreateContext(ret.native);
     miscParams["currentGLContext"] = "true";
+    miscParams["parentWindowHandle"] = ropts["parentWindowHandle"].currentValue;
+
 #else
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
