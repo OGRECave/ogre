@@ -32,6 +32,11 @@
 	@add( texUnit, 1 )
 @end
 
+@property( hlms_enable_decals )
+	@set( decalsTexUnit, texUnit )
+	@add( texUnit, hlms_enable_decals )
+@end
+
 @set( textureRegShadowMapStart, texUnit )
 @add( texUnit, hlms_num_shadow_map_textures )
 

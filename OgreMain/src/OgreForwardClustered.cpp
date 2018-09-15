@@ -880,28 +880,28 @@ namespace Ogre
         if( mDecalsEnabled )
         {
             const PrePassMode prePassMode = mSceneManager->getCurrentPrePassMode();
-            bool hasDecalsTex = false;
+            int32 numDecalsTex = 0;
             if( mSceneManager->getDecalsDiffuse() && prePassMode != PrePassCreate )
             {
                 hlms->_setProperty( HlmsBaseProp::DecalsDiffuse,    1 );
-                hasDecalsTex = true;
+                ++numDecalsTex;
             }
             if( mSceneManager->getDecalsNormals() && prePassMode != PrePassUse )
             {
                 hlms->_setProperty( HlmsBaseProp::DecalsNormals,    1 );
-                hasDecalsTex = true;
+                ++numDecalsTex;
             }
             if( mSceneManager->getDecalsEmissive() && prePassMode != PrePassCreate )
             {
                 hlms->_setProperty( HlmsBaseProp::DecalsEmissive,   1 );
-                hasDecalsTex = true;
+                ++numDecalsTex;
             }
 
             const size_t decalOffsetStart = mLightsPerCell + c_reservedLightSlotsPerCell;
             hlms->_setProperty( HlmsBaseProp::FwdPlusDecalsSlotOffset,
                                 static_cast<int32>( decalOffsetStart ) );
 
-            hlms->_setProperty( HlmsBaseProp::EnableDecals, hasDecalsTex );
+            hlms->_setProperty( HlmsBaseProp::EnableDecals, numDecalsTex );
         }
     }
     //-----------------------------------------------------------------------------------
