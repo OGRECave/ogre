@@ -15,7 +15,6 @@
 # folder where the required dependencies may be found.
 set(OGRE_DEPENDENCIES_DIR "" CACHE PATH "Path to prebuilt OGRE dependencies")
 option(OGRE_BUILD_DEPENDENCIES "automatically build Ogre Dependencies (freetype, zzip)" TRUE)
-
 include(FindPkgMacros)
 getenv_path(OGRE_DEPENDENCIES_DIR)
 if(OGRE_BUILD_PLATFORM_EMSCRIPTEN)
@@ -125,16 +124,36 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         ${OGRE_BINARY_DIR}/ZZIPlib-master.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
         -E tar xf ZZIPlib-master.tar.gz WORKING_DIRECTORY ${OGRE_BINARY_DIR})
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DZLIB_ROOT=${OGREDEPS_PATH}
-        -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-        -G ${CMAKE_GENERATOR}
-        -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-        ${CROSS}
-        ${CMAKE_BINARY_DIR}/ZZIPlib-master
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ZZIPlib-master)
+        
+        
+    if( ${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten" )    
+        execute_process(COMMAND ${CMAKE_COMMAND}
+            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DZLIB_ROOT=${OGREDEPS_PATH}
+            -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+            -DZLIB_LIBRARY=${CMAKE_BINARY_DIR}/Dependencies/lib
+            -DZLIB_INCLUDE_DIR=${CMAKE_BINARY_DIR}/Dependencies/include
+            -G ${CMAKE_GENERATOR}
+            -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
+            ${CROSS}
+            ${CMAKE_BINARY_DIR}/ZZIPlib-master
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ZZIPlib-master)
+        
+    else()
+       execute_process(COMMAND ${CMAKE_COMMAND}
+            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DZLIB_ROOT=${OGREDEPS_PATH}
+            -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+            -G ${CMAKE_GENERATOR}
+            -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
+            ${CROSS}
+            ${CMAKE_BINARY_DIR}/ZZIPlib-master
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ZZIPlib-master)
+        
+    endif()
+
     execute_process(COMMAND ${CMAKE_COMMAND} 
         --build ${CMAKE_BINARY_DIR}/ZZIPlib-master ${BUILD_COMMAND_OPTS})
     
