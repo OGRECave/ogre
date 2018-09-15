@@ -114,6 +114,10 @@
 		@piece( specularExtraParamDef ), float3 specularCol@end
 		@piece( specularExtraParam ), specularCol.xyz@end
 		@piece( kS )specularCol@end
+		@property( hlms_decals_diffuse )
+			@piece( metallicExtraParamDef ), @insertpiece( FresnelType ) F0@end
+			@piece( metallicExtraParam ), F0@end
+		@end
 	@end
 	@property( specular_map && fresnel_workflow )
 		@piece( SampleSpecularMap )
