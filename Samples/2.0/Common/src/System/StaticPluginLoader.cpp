@@ -29,6 +29,12 @@ THE SOFTWARE.
 #include "System/StaticPluginLoader.h"
 
 #ifdef OGRE_STATIC_LIB
+    #ifdef OGRE_BUILD_RENDERSYSTEM_GL3PLUS
+        #include "OgreGL3PlusPlugin.h"
+    #endif
+    #ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
+        #include "OgreD3D11Plugin.h"
+    #endif
     #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
         #include "OgreMetalPlugin.h"
     #endif
@@ -38,10 +44,17 @@ THE SOFTWARE.
 namespace Demo
 {
     StaticPluginLoader::StaticPluginLoader()
-#ifdef OGRE_STATIC_LIB
+#if defined( OGRE_STATIC_LIB )
         :
+        mDummy( 0 )
+    #ifdef OGRE_BUILD_RENDERSYSTEM_GL3PLUS
+    ,   mGL3PlusPlugin( 0 )
+    #endif
+    #ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
+    ,   mD3D11PlusPlugin( 0 )
+    #endif
     #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
-        mMetalPlugin( 0 )
+    ,   mMetalPlugin( 0 )
     #endif
 #endif
     {
@@ -50,6 +63,14 @@ namespace Demo
     StaticPluginLoader::~StaticPluginLoader()
     {
 #ifdef OGRE_STATIC_LIB
+    #ifdef OGRE_BUILD_RENDERSYSTEM_GL3PLUS
+        OGRE_DELETE mGL3PlusPlugin;
+        mGL3PlusPlugin = 0;
+    #endif
+    #ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
+        OGRE_DELETE mD3D11PlusPlugin;
+        mD3D11PlusPlugin = 0;
+    #endif
     #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
         OGRE_DELETE mMetalPlugin;
         mMetalPlugin = 0;
@@ -60,6 +81,16 @@ namespace Demo
     void StaticPluginLoader::install( Ogre::Root *root )
     {
 #ifdef OGRE_STATIC_LIB
+    #ifdef OGRE_BUILD_RENDERSYSTEM_GL3PLUS
+        if( !mGL3PlusPlugin )
+            mGL3PlusPlugin = OGRE_NEW Ogre::GL3PlusPlugin();
+        root->installPlugin( mGL3PlusPlugin );
+    #endif
+    #ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
+        if( !mD3D11PlusPlugin )
+            mD3D11PlusPlugin = OGRE_NEW Ogre::D3D11Plugin();
+        root->installPlugin( mD3D11PlusPlugin );
+    #endif
     #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
         if( !mMetalPlugin )
             mMetalPlugin = OGRE_NEW Ogre::MetalPlugin();
