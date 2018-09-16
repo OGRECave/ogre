@@ -23,4 +23,5 @@
 #define OGRE_ddy( val ) ddy( val )
 
 #define bufferFetch( buffer, idx ) buffer.Load( idx )
+#define bufferFetch1( buffer, idx ) buffer.Load( idx ).x
 @end

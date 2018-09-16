@@ -9,7 +9,7 @@
     #define layout_constbuffer(x) layout( std140, x )
 @end
 @property( GL_ARB_texture_buffer_range )
-    #define bufferFetch texelFetch
+	#define bufferFetch texelFetch
 @end
 
 #define float2 vec2
@@ -50,6 +50,8 @@
 #define OGRE_SampleArray2DGrad( tex, sampler, uv, arrayIdx, ddx, ddy ) textureGrad( tex, vec3( uv, arrayIdx ), ddx, ddy )
 #define OGRE_ddx( val ) dFdx( val )
 #define OGRE_ddy( val ) dFdy( val )
+
+#define bufferFetch1( buffer, idx ) texelFetch( buffer, idx ).x
 @end
 
 @property( !GL_ARB_texture_buffer_range || !GL_ARB_shading_language_420pack )

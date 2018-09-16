@@ -73,8 +73,6 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 @insertpiece( DeclParallaxLocalCorrect )
 @end
 
-@insertpiece( DeclDecalsSamplers )
-
 @insertpiece( DeclShadowMapMacros )
 @insertpiece( DeclShadowSamplingFuncs )
 
@@ -142,6 +140,7 @@ fragment @insertpiece( output_type ) main_metal
 		, sampler envMapSamplerState [[sampler(@value(envMapReg))]]@end
 	@foreach( numSamplerStates, n )
 		, sampler samplerState@n [[sampler(@counter(samplerStateStart))]]@end
+	@insertpiece( DeclDecalsSamplers )
 	@insertpiece( DeclShadowSamplers )
 )
 {

@@ -26,9 +26,10 @@ struct float1
 #define OGRE_SampleArray2D( tex, sampler, uv, arrayIdx ) tex.sample( sampler, float2( uv ), arrayIdx )
 #define OGRE_SampleArray2DLevel( tex, sampler, uv, arrayIdx, lod ) tex.sample( sampler, float2( uv ), ushort( arrayIdx ), level( lod ) )
 #define OGRE_SampleGrad( tex, sampler, uv, ddx, ddy ) tex.sample( sampler, uv, gradient2d( ddx, ddy ) )
-#define OGRE_SampleArray2DGrad( tex, sampler, uv, ddx, ddy ) tex.sample( sampler, uv, ushort( arrayIdx ), gradient2d( ddx, ddy ) )
+#define OGRE_SampleArray2DGrad( tex, sampler, uv, arrayIdx, ddx, ddy ) tex.sample( sampler, uv, ushort( arrayIdx ), gradient2d( ddx, ddy ) )
 #define OGRE_ddx( val ) dfdx( val )
 #define OGRE_ddy( val ) dfdy( val )
 
 #define bufferFetch( buffer, idx ) buffer[idx]
+#define bufferFetch1( buffer, idx ) buffer[idx]
 @end

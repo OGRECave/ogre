@@ -12,7 +12,7 @@
 		float3 finalDecalEmissive = float3( 0.0f, 0.0f, 0.0f );
 	@end
 
-	ushort numLightsInGrid = bufferFetch( f3dGrid, int(sampleOffset + @value(hlms_forwardplus_decals_slot_offset)u) ).x;
+	ushort numLightsInGrid = bufferFetch1( f3dGrid, int(sampleOffset + @value(hlms_forwardplus_decals_slot_offset)u) );
 
 	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
 
@@ -22,7 +22,7 @@
 	for( uint i=0u; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
-		uint idx = bufferFetch( f3dGrid, int(sampleOffset + i + @value(hlms_forwardplus_decals_slot_offset)u + 1u) ).x;
+		uint idx = bufferFetch1( f3dGrid, int(sampleOffset + i + @value(hlms_forwardplus_decals_slot_offset)u + 1u) );
 
 		float4 invWorldView0	= bufferFetch( f3dLightList, int(idx) ).xyzw;
 		float4 invWorldView1	= bufferFetch( f3dLightList, int(idx + 1u) ).xyzw;
