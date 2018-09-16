@@ -10,7 +10,12 @@
 		@end
 	@end
 @end @property( metallic_workflow || (specular_map && fresnel_workflow) || hlms_decals_diffuse )
-	@piece( F0 )F0@end
+	@property( !fresnel_scalar )
+		@piece( F0 )float1(F0)@end
+	@end
+	@property( fresnel_scalar )
+		@piece( F0 )F0@end
+	@end
 @end
 
 @property( !fresnel_scalar )
