@@ -74,6 +74,18 @@ namespace Demo
             */
             Ogre::HlmsManager *hlmsManager = mRoot->getHlmsManager();
             Ogre::HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
+            /*
+            These pool IDs must be unique per texture array, to ensure textures go into the
+            right array.
+            However you'll see here that both decalDiffuseId & decalNormalId are the same.
+            This is because normal maps, being TEXTURE_TYPE_NORMALS and of a different format
+            (RG8_SNORM instead of RGBA8_UNORM) will end up in different arrays anyway.
+
+            For example if you want to load diffuse decals into one array, and textures for
+            area lights into a different array, then you would use different pool IDs:
+                decalDiffuseId = 1;
+                areaLightsId = 2;
+            */
             const Ogre::uint32 decalDiffuseId = 1;
             const Ogre::uint32 decalNormalId = 1;
 

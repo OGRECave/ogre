@@ -53,10 +53,6 @@ namespace Demo
             const Ogre::uint32 decalNormalId = 1;
             Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
             Ogre::HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
-            hlmsTextureManager->reservePoolId( decalDiffuseId, Ogre::HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
-                                               512u, 512u, 8u, 9u, Ogre::PF_R8G8B8A8, false, true );
-            hlmsTextureManager->reservePoolId( decalNormalId, Ogre::HlmsTextureManager::TEXTURE_TYPE_NORMALS,
-                                               512u, 512u, 8u, 9u, Ogre::PF_R8G8_SNORM, true, false );
 
             Ogre::WireAabb *wireAabb = sceneManager->createWireAabb();
 
