@@ -80,6 +80,9 @@ namespace Demo
             However you'll see here that both decalDiffuseId & decalNormalId are the same.
             This is because normal maps, being TEXTURE_TYPE_NORMALS and of a different format
             (RG8_SNORM instead of RGBA8_UNORM) will end up in different arrays anyway.
+            So the reasons they will end up in different pools anyway is because:
+                1. One uses TEXTURE_TYPE_DIFFUSE, the other TEXTURE_TYPE_NORMALS
+                2. One uses RGBA8_UNORM, the other RG8_SNORM
 
             For example if you want to load diffuse decals into one array, and textures for
             area lights into a different array, then you would use different pool IDs:
