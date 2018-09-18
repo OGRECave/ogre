@@ -252,13 +252,8 @@ namespace Ogre {
             return false;
         }
 
-        // Assume non-floating point is supported always
-        if (!PixelUtil::isFloatingPoint(nativeFormat))
-        {
-            return true;
-        }
-
-        return false;
+        // floating point is mandatory for GL3
+        return true;
     }
 
     // void GL3PlusTextureManager::registerImage(TexturePtr texture)

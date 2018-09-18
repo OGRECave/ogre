@@ -112,7 +112,8 @@ namespace Ogre {
         {
             return true;
         }
-
-        return false;
+        
+        // check for floating point extension
+        return mRenderSystem->checkExtension("GL_OES_texture_float_linear");
     }
 }
