@@ -347,11 +347,6 @@ namespace Ogre
          */
         void _setRenderTarget(RenderTarget *target);
 
-        /** Check whether or not filtering is supported for the precise texture format requested
-        with the given usage options.
-        */
-        bool _checkTextureFilteringSupported(TextureType ttype, PixelFormat format, int usage);
-
         void determineFSAASettings(uint fsaa, const String& fsaaHint, DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings);
 
         /// @copydoc RenderSystem::getDisplayMonitorCount

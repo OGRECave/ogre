@@ -1286,11 +1286,6 @@ namespace Ogre
         return true;
     }
     //-----------------------------------------------------------------------
-    bool D3D11RenderSystem::_checkTextureFilteringSupported(TextureType ttype, PixelFormat format, int usage)
-    {
-        return true;
-    }
-    //-----------------------------------------------------------------------
     MultiRenderTarget * D3D11RenderSystem::createMultiRenderTarget(const String & name)
     {
         MultiRenderTarget *retval;
