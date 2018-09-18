@@ -288,6 +288,19 @@ namespace Ogre {
         
     }
 
+    bool TextureManager::isHardwareFilteringSupported(TextureType ttype, PixelFormat format,
+                                                      int usage, bool preciseFormatOnly)
+    {
+        if (format == PF_UNKNOWN)
+            return false;
+
+        // Check native format
+        if (preciseFormatOnly && !isFormatSupported(ttype, format, usage))
+            return false;
+
+        return true;
+    }
+
     const TexturePtr& TextureManager::_getWarningTexture()
     {
         if(mWarningTexture)

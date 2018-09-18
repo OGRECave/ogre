@@ -65,17 +65,4 @@ namespace Ogre
 
         return D3D11Mappings::_getPF(d3dPF);
     }
-    //---------------------------------------------------------------------
-    bool D3D11TextureManager::isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
-        bool preciseFormatOnly)
-    {
-        if (!preciseFormatOnly)
-            format = getNativeFormat(ttype, format, usage);
-
-        D3D11RenderSystem* rs = static_cast<D3D11RenderSystem*>(
-            Root::getSingleton().getRenderSystem());
-
-        return rs->_checkTextureFilteringSupported(ttype, format, usage);
-    }
-    //---------------------------------------------------------------------
 }

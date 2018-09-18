@@ -95,23 +95,13 @@ namespace Ogre {
     bool GLES2TextureManager::isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
             bool preciseFormatOnly)
     {
-        if (format == PF_UNKNOWN)
-        {
+        // precise format check
+        if (!TextureManager::isHardwareFilteringSupported(ttype, format, usage, preciseFormatOnly))
             return false;
-        }
-
-        // Check native format
-        PixelFormat nativeFormat = getNativeFormat(ttype, format, usage);
-        if (preciseFormatOnly && format != nativeFormat)
-        {
-            return false;
-        }
 
         // Assume non-floating point is supported always
-        if (!PixelUtil::isFloatingPoint(nativeFormat))
-        {
+        if (!PixelUtil::isFloatingPoint(getNativeFormat(ttype, format, usage)))
             return true;
-        }
         
         // check for floating point extension
         return mRenderSystem->checkExtension("GL_OES_texture_float_linear");

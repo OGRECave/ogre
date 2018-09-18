@@ -396,7 +396,7 @@ namespace Ogre {
         @return true if the texture filtering is supported.
         */
         virtual bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
-            bool preciseFormatOnly = false) = 0;
+            bool preciseFormatOnly = false);
 
         /** Sets the default number of mipmaps to be used for loaded textures, for when textures are
             loaded automatically (e.g. by Material class) or when 'load' is called with the default
