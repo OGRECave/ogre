@@ -75,6 +75,10 @@ if(CMAKE_CROSSCOMPILING)
     if(APPLE_IOS)
         set(CROSS ${CROSS}
             -DIOS_PLATFORM=${IOS_PLATFORM})
+    else()
+        # this should help discovering zlib, but on ios it breaks it
+        set(CROSS ${CROSS}
+            -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH})
     endif()
 endif()
 
