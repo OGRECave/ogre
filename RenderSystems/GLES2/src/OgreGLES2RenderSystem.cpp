@@ -181,15 +181,6 @@ namespace Ogre {
 
         initConfigOptions();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        ConfigOption parentWindowHandleConfig;
-        parentWindowHandleConfig.name = "parentWindowHandle";
-        parentWindowHandleConfig.currentValue = "#canvas";
-        parentWindowHandleConfig.immutable = false;
-        
-        mOptions["parentWindowHandle"] = parentWindowHandleConfig;
-#endif
-        
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
             // Dummy value
