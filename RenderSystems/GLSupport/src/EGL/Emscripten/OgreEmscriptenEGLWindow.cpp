@@ -89,7 +89,17 @@ namespace Ogre {
         mWidth = width;
         mHeight = height;
         
-        emscripten_set_canvas_size(mWidth, mHeight);
+
+        EMSCRIPTEN_RESULT result = emscripten_set_canvas_element_size(mCanvasSelector.c_str(), width, height);
+        
+        if(result < 0)
+        {
+           OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+             "Unexpected failure at emscripten_set_canvas_element_size with selector=" + mCanvasSelector,
+             "EmscriptenEGLWindow::resize");
+        }
+        
+        
         LogManager::getSingleton().logMessage("EmscriptenEGLWindow::resize w:" + Ogre::StringConverter::toString(mWidth) + " h:" + Ogre::StringConverter::toString(mHeight));
         
         windowMovedOrResized();
@@ -122,6 +132,7 @@ namespace Ogre {
         mHeight = height;
         mLeft = 0;
         mTop = 0;
+        mCanvasSelector = "#canvas";
         void* eglContext = nullptr;
          
         if (miscParams)
@@ -174,6 +185,11 @@ namespace Ogre {
             {
                 mCSAA = Ogre::StringConverter::parseInt(opt->second);
             }
+            
+            if((opt = miscParams->find("parentWindowHandle")) != end)
+            {
+                mCanvasSelector = opt->second;
+            }
         }
         
         initNativeCreatedWindow(miscParams);
@@ -206,7 +222,15 @@ namespace Ogre {
         
         mContext = createEGLContext();
         mContext->setCurrent();
-        emscripten_set_canvas_size(width, height);
+        EMSCRIPTEN_RESULT result = emscripten_set_canvas_element_size(mCanvasSelector.c_str(), width, height);
+        
+        if(result < 0)
+        {
+           OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+             "Unexpected failure at emscripten_set_canvas_element_size with selector=" + mCanvasSelector ,
+             "EmscriptenEGLWindow::create");
+        }
+        
         mOldWidth = width;
         mOldHeight = height;
         switchFullScreen(fullScreen);
