@@ -232,6 +232,8 @@ namespace Ogre
             return "object name expected";
         case CE_OBJECTALLOCATIONERROR:
             return "object allocation error";
+        case CE_OBJECTBASENOTFOUND:
+            return "base object not found";
         case CE_INVALIDPARAMETERS:
             return "invalid parameters";
         case CE_DUPLICATEOVERRIDE:
@@ -614,8 +616,7 @@ namespace Ogre
                             overlayObject(**j, *obj);
                         }
                     } else {
-                        addError(CE_OBJECTBASENOTFOUND, obj->file, obj->line,
-                            "base object named \"" + base + "\" not found in script definition");
+                        addError(CE_OBJECTBASENOTFOUND, obj->file, obj->line, base);
                     }
                 }
 
