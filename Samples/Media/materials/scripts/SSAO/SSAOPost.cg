@@ -1,14 +1,3 @@
-void noFilter_fp (
-    in float2 uv : TEXCOORD0,
-    out float4 oColor0 : COLOR0,
-
-    uniform sampler sOcclusion : register(s0)
-)
-{
-    oColor0 = float4(tex2D(sOcclusion, uv).xyz, 1);
-} 
-
-
 // a very simple 4x4 box filter
 // the kernel has the following form
 //   o o o o
