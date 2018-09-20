@@ -5,22 +5,6 @@ SamplerState g_samLinear
     AddressV = Wrap;
 };
 
-struct noFilterIn
-{
-	float4 position : SV_POSITION;
-    float2 uv : TEXCOORD0;
-};
-
-float4 noFilter_fp (
-	noFilterIn input,
-    uniform Texture2D sOcclusion : register(s0)
-) : SV_Target
-{
-    float4 oColor0 = float4(sOcclusion.Sample(g_samLinear, input.uv).xyz, 1);
-	return oColor0;
-} 
-
-
 // a very simple 4x4 box filter
 // the kernel has the following form
 //   o o o o

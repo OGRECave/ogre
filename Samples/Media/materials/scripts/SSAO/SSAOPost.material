@@ -1,10 +1,3 @@
-fragment_program SSAO/Post/NoFilter_fp_hlsl hlsl
-{
-    source SSAOPost.hlsl
-    entry_point noFilter_fp
-    target ps_4_0
-}
-
 fragment_program SSAO/Post/BoxFilter_fp_hlsl hlsl
 {
     source SSAOPost.hlsl
@@ -33,13 +26,6 @@ fragment_program SSAO/HorizonBased/CrossBilateralFilter/Y_fp_hlsl hlsl
     target ps_4_0
 }
 
-fragment_program SSAO/Post/NoFilter_fp_cg cg
-{
-    source SSAOPost.cg
-    entry_point noFilter_fp
-    profiles ps_3_0 arbfp1
-}
-
 fragment_program SSAO/Post/BoxFilter_fp_cg cg
 {
     source SSAOPost.cg
@@ -66,16 +52,6 @@ fragment_program SSAO/HorizonBased/CrossBilateralFilter/Y_fp_cg cg
     source SSAOPost.cg
     entry_point crossBilateralFilterY_fp
     profiles ps_3_0 arbfp1
-}
-
-fragment_program SSAO/Post/NoFilter_fp_glsl glsl
-{
-    source NoFilterFP.glsl
-    	
-	default_params
-	{
-		param_named sOcclusion int 0
-	}
 }
 
 fragment_program SSAO/Post/BoxFilter_fp_glsl glsl
@@ -121,13 +97,6 @@ fragment_program SSAO/HorizonBased/CrossBilateralFilter/Y_fp_glsl glsl
 	}
 }
 
-fragment_program SSAO/Post/NoFilter_fp unified
-{
-	delegate SSAO/Post/NoFilter_fp_glsl
-	delegate SSAO/Post/NoFilter_fp_hlsl
-	delegate SSAO/Post/NoFilter_fp_cg 
-}
-
 fragment_program SSAO/Post/BoxFilter_fp unified
 {
 	delegate SSAO/Post/BoxFilter_fp_glsl
@@ -165,9 +134,7 @@ material SSAO/Post/NoFilter
             cull_hardware none
 			cull_software none
 			depth_check off
-			
-			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
-            fragment_program_ref SSAO/Post/NoFilter_fp {}
+            lighting off
 
             texture_unit
             {
