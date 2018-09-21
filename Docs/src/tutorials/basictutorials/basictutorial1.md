@@ -222,6 +222,8 @@ When you're building your application you can just leave every plugin activated.
 
 Ogre uses several configuration files (\*.cfg). They control things like which plugins are loaded and where your application will search for resource files. We will briefly introduce you to each of these files. You'll slowly read more about them as you progress through the tutorials as well.
 
+You can place these files the same directory as your executable or in any of [the default lookup paths described here](@ref Ogre::FileSystemLayer::getConfigFilePath).
+
 ### Plugin Configuration {#PluginConfiguration}
 
 **plugins.cfg**
