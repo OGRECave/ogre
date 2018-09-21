@@ -1,4 +1,4 @@
-#version 150
+#version 120
 
 // General functions
 // parameters
@@ -6,14 +6,14 @@ uniform vec4 lightPosition; // object space
 uniform vec3 eyePosition;   // object space
 uniform mat4 worldViewProj;
 
-in vec4 vertex;
-in vec3 normal;
-in vec3 tangent;
-in vec4 uv0;
+attribute vec4 vertex;
+attribute vec3 normal;
+attribute vec3 tangent;
+attribute vec4 uv0;
 
-out vec4 oUv0;
-out vec3 oTSLightDir;
-out vec3 oTSHalfAngle;
+varying vec4 oUv0;
+varying vec3 oTSLightDir;
+varying vec3 oTSHalfAngle;
 
 /* Vertex program which includes specular component */
 void main()

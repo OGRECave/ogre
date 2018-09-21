@@ -1,4 +1,4 @@
-#version 150
+#version 120
 
 // General functions
 
@@ -12,11 +12,9 @@ uniform vec4 lightDiffuse;
 uniform vec4 lightSpecular;
 uniform sampler2D normalMap;
 
-in vec4 oUv0;
-in vec3 oTSLightDir;
-in vec3 oTSHalfAngle;
-
-out vec4 fragColour;
+varying vec4 oUv0;
+varying vec3 oTSLightDir;
+varying vec3 oTSHalfAngle;
 
 // NOTE: GLSL does not have the saturate function.  But it is equivalent to clamp(val, 0.0, 1.0)
 
@@ -30,12 +28,12 @@ void main()
 	vec3 halfAngle = normalize(oTSHalfAngle);
 
 	// get bump map vector, again expand from range-compressed
-	vec3 bumpVec = expand(texture(normalMap, oUv0.xy).xyz);
+	vec3 bumpVec = expand(texture2D(normalMap, oUv0.xy).xyz);
 
 	// Pre-raise the specular exponent to the eight power
 	float specFactor = pow(clamp(dot(bumpVec, halfAngle), 0.0, 1.0), 4.0);
 
 	// Calculate dot product for diffuse
-	fragColour = (lightDiffuse * clamp(dot(bumpVec, lightVec), 0.0, 1.0)) + 
+	gl_FragColor = (lightDiffuse * clamp(dot(bumpVec, lightVec), 0.0, 1.0)) + 
 			(lightSpecular * specFactor);
 }
