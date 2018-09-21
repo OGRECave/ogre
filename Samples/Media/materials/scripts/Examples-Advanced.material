@@ -177,7 +177,7 @@ vertex_program Examples/BumpMapVPGLSLES glsles
 vertex_program Examples/BumpMapVPGLSL glsl
 {
 	source Example_BumpMappingVp.glsl
-	syntax glsl150
+	syntax glsl
 }
 
 vertex_program Examples/BumpMapVP unified
@@ -205,7 +205,7 @@ vertex_program Examples/BumpMapVPTangentParityGLSLES glsles
 vertex_program Examples/BumpMapVPTangentParityGLSL glsl
 {
 	source BumpMapVPTangentParity.glsl
-	syntax glsl150
+	syntax glsl
 }
 
 vertex_program Examples/BumpMapVPTangentParity unified
@@ -237,7 +237,7 @@ fragment_program Examples/BumpMapFPGLSLES glsles
 fragment_program Examples/BumpMapFPGLSL glsl
 {
 	source Example_BumpMappingFp.glsl
-	syntax glsl150
+	syntax glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -270,7 +270,7 @@ vertex_program Examples/BumpMapVPShadowRcvGLSLES glsles
 vertex_program Examples/BumpMapVPShadowRcvGLSL glsl
 {
 	source Example_BumpMappingShadowRcvVp.glsl
-	syntax glsl150
+	syntax glsl
 }
 
 vertex_program Examples/BumpMapVPShadowRcv unified
@@ -304,7 +304,7 @@ fragment_program Examples/BumpMapFPShadowRcvGLSLES glsles
 fragment_program Examples/BumpMapFPShadowRcvGLSL glsl
 {
 	source Example_BumpMappingShadowRcvFp.glsl
-	syntax glsl150
+	syntax glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -338,7 +338,7 @@ vertex_program Examples/BumpMapVPSpecularGLSLES glsles
 vertex_program Examples/BumpMapVPSpecularGLSL glsl
 {
 	source Example_BumpMappingSpecularVp.glsl
-	syntax glsl150
+	syntax glsl
 }
 
 vertex_program Examples/BumpMapVPSpecular unified
@@ -371,7 +371,7 @@ fragment_program Examples/BumpMapFPSpecularGLSLES glsles
 fragment_program Examples/BumpMapFPSpecularGLSL glsl
 {
 	source Example_BumpMappingSpecularFp.glsl
-	syntax glsl150
+	syntax glsl
 	default_params
 	{
 		// assign samplers as required by GLSL

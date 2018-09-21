@@ -1,4 +1,4 @@
-#version 150
+#version 120
 
 /* Bump mapping vertex program for shadow receiving
    In this program, we want to calculate the tangent space light vector
@@ -13,14 +13,14 @@ uniform mat4 worldViewProj;
 uniform mat4 worldMatrix;
 uniform mat4 texViewProj;
 
-in vec4 vertex;
-in vec3 normal;
-in vec3 tangent;
-in vec4 uv0;
+attribute vec4 vertex;
+attribute vec3 normal;
+attribute vec3 tangent;
+attribute vec4 uv0;
 
-out vec4 uvproj;
-out vec4 oUv0;
-out vec3 oTSLightDir;
+varying vec4 uvproj;
+varying vec4 oUv0;
+varying vec3 oTSLightDir;
 
 void main()
 {

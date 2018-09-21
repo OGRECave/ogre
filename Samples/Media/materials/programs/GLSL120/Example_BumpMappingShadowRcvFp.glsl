@@ -1,4 +1,4 @@
-#version 150
+#version 120
 
 // General functions
 
@@ -12,11 +12,9 @@ uniform sampler2D shadowMap;
 uniform sampler2D normalMap;
 uniform vec4 lightDiffuse;
 
-in vec4 uvproj;
-in vec4 oUv0;
-in vec3 oTSLightDir;
-
-out vec4 fragColour;
+varying vec4 uvproj;
+varying vec4 oUv0;
+varying vec3 oTSLightDir;
 
 void main()
 {
@@ -24,11 +22,11 @@ void main()
 	vec3 lightVec = expand(normalize(oTSLightDir).xyz);
 
 	// get bump map vector, again expand from range-compressed
-	vec3 bumpVec = expand(texture(normalMap, oUv0.xy).xyz);
+	vec3 bumpVec = expand(texture2D(normalMap, oUv0.xy).xyz);
 
 	// get shadow value
-	vec3 shadow = textureProj(shadowMap, uvproj).xyz;
+	vec3 shadow = texture2DProj(shadowMap, uvproj).xyz;
 
 	// Calculate dot product
-	fragColour = vec4(shadow * lightDiffuse.xyz * dot(bumpVec, lightVec), 1.0);
+	gl_FragColor = vec4(shadow * lightDiffuse.xyz * dot(bumpVec, lightVec), 1.0);
 }

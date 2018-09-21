@@ -1,4 +1,4 @@
-#version 150
+#version 120
 
 /* Bump mapping vertex program
    In this program, we want to calculate the tangent space light vector
@@ -10,13 +10,13 @@
 uniform vec4 lightPosition; // object space
 uniform mat4 worldViewProj;
 
-in vec4 vertex;
-in vec3 normal;
-in vec3 tangent;
-in vec4 uv0;
+attribute vec4 vertex;
+attribute vec3 normal;
+attribute vec4 tangent;
+attribute vec2 uv0;
 
-out vec4 oUv0;
-out vec3 oTSLightDir;
+varying vec2 oUv0;
+varying vec3 oTSLightDir;
 
 void main()
 {
@@ -35,12 +35,12 @@ void main()
     // already normalised)
 
     // Fixed handedness
-    vec3 binormal = cross(normal, tangent);
+    vec3 binormal = cross(normal, tangent.xyz) * tangent.www;
 
     // Form a rotation matrix out of the vectors, column major for glsl es
     mat3 rotation = mat3(vec3(tangent[0], binormal[0], normal[0]),
-                         vec3(tangent[1], binormal[1], normal[1]),
-                         vec3(tangent[2], binormal[2], normal[2]));
+                          vec3(tangent[1], binormal[1], normal[1]),
+                          vec3(tangent[2], binormal[2], normal[2]));
 
     // Transform the light vector according to this matrix
     oTSLightDir = rotation * lightDir;
