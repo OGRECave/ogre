@@ -198,23 +198,23 @@ The library and configuration files for Ogre can be found in the 'bin' folder of
 
 Ogre is divided into three shared library groups: main library, plugins, and third-party libraries.
 
-### Main library {#Mainlibrary}
+### Main library
 
-The main library group contains the Ogre library itself and the shared libraries it relies on. The Ogre library is contained within OgreMain.dll or libOgreMain.so depending on your platform. This library must be included in all of your Ogre applications. OgreMain.dll requires a few other libraries like cg.dll.
+The main library group contains the Ogre library itself and the shared libraries it relies on. The Ogre library is contained within @c OgreMain.dll or @c libOgreMain.so depending on your platform. This library must be included in all of your Ogre applications. OgreMain only depends on @c libz and @c libzzip.
 
-### Plugins {#Plugins}
+### Plugins
 
-The second group of shared libraries are the plugins. Ogre pushes a good portion of its functionality into shared libraries so that they may be turned on or off easily. The core plugins that are included with Ogre have names that start with "Plugin_". You can also write your own plugins.
+The second group of shared libraries are the plugins. Ogre pushes a good portion of its functionality into shared libraries so that they may be turned on or off easily. The core plugins that are included with Ogre have names that start with "Plugin_" and "Codec_". You can also write your own plugins.
 
 Ogre also uses plugins for the different render systems (such as OpenGL, DirectX, etc). These plugins start with "RenderSystem_". This is also so that you can add only the systems you will need. This can be useful if you write shaders that rely on a particular system, because you can simply remove the incompatible system so that the program won't try to run incorrect code. This also means you can write your own plugins if you want to extend Ogre into another render system.
 
-### Third-party Plugins {#ThirdpartyPlugins}
+### Third-party Plugins
 
 The last major group contains third-party libraries and other general support libraries. Ogre is focused sharply on being a graphics rendering library. This group makes it easy to integrate external libraries to add things like physics, input, and GUI systems. These libraries are used together to form a full game development environment. You might find this piecemeal approach a little strange, but it is a very common design pattern in large software projects. It is harder to comprehend at first, but it is a much more flexible approach when you want to start building more complicated scenes.
 
 The Ogre demos and SDK include some of these third-party libraries. The [Simple DirectMedia](https://www.libsdl.org/) can be used to manage input events and distribute them to Ogre. You can also make use of Cg, which is used by CgProgramManager. This library allows you to produce materials with custom shaders. There are other libraries (not included with Ogre) that offer functionality such as sound and physics.
 
-### Testing vs Release {#TestingvsRelease}
+### Testing vs Release
 
 When you're building your application you can just leave every plugin activated. This will allow you to experiment with using them or not. But when you get ready to distribute a release build of your work, then you will want to deactivate any of the plugins you are not using.
 
@@ -224,9 +224,7 @@ Ogre uses several configuration files (\*.cfg). They control things like which p
 
 You can place these files the same directory as your executable or in any of [the default lookup paths described here](@ref Ogre::FileSystemLayer::getConfigFilePath).
 
-### Plugin Configuration {#PluginConfiguration}
-
-**plugins.cfg**
+### plugins.cfg
 
 This file tells Ogre which plugins to load. You modify this file when you want to load a different set of plugins. It is often most useful to simply "comment out" lines instead of removing them, because you never know when a stroke of inspiration will mean you want to reload some unused plugins. Here is some sample content:
 
@@ -247,9 +245,7 @@ PluginFolder=/usr/local/lib/OGRE
 
 By default, Ogre would have been looking in '/usr/lib/OGRE'. This is where it would be placed if you installed Ogre from a package manager. You may have to do something similar on Mac.
 
-### Resource Configuration {#ResourceConfiguration}
-
-**resources.cfg**
+### resources.cfg
 
 This file contains a list of the directories Ogre will use to search for resources. Resources include scripts, meshes, textures, GUI layouts, and others. You can also use both absolute and relative paths in this file, but you still cannot use environment variables. Ogre will **not** search subdirectories, so you have to manually enter them. Here is an example:
 
@@ -263,25 +259,11 @@ FileSystem=../media/models
 
 Here is an example of a relative path being used and the need to list subdirectories. Including the '../media' directory did not automatically include the '../media/models' directory. This is so that Ogre doesn't get greedy and waste time loading up unneeded resources.
 
-### Media Configuration {#MediaConfiguration}
+### ogre.cfg
 
-**media.cfg**
+This file is generated by the Render Settings dialog that appears when you run your application. **Do not** distribute this file with your application. This file will be specific to your own setup. This file will contain your choices for things like screen resolution. Do not modify this file directly. Change the settings with the dialog and it will be automatically updated.
 
-This file provides Ogre with more detailed information about some resources. It is unlikely that you will need to modify this file for quite a long time. More information can be found in the Ogre manual.
-
-### Ogre Configuration {#OgreConfiguration}
-
-**ogre.cfg**
-
-This file is generated by the Render Settings dialog that appears when you run your application. This file will be specific to your own setup. **Do not** distribute this file with your application. This file will contain your choices for things like screen resolution. Do not modify this file directly. Change the settings with the dialog and it will be automatically updated.
-
-### Quake 3 Settings Configuration {#Quake3SettingsConfiguration}
-
-**quake3settings.cfg**
-
-This file is used by the BSPSceneManager. You would only need this file if you were using that SceneManager (the tutorials will not). This should not be distributed with your application.
-
-That covers all of the configuration files that Ogre manipulates directly. Ogre will look for these files in the same directory as your executable and it must find 'plugins.cfg', 'resources.cfg', and 'media.cfg' to function properly. Later tutorials will cover more of their use.
+That covers all of the configuration files that Ogre manipulates directly. Ogre must find 'plugins.cfg' and 'resources.cfg' to function properly. Later tutorials will cover more of their use.
 
 # Conclusion {#Conclusion1}
 
