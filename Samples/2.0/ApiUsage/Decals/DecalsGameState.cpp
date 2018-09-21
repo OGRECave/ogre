@@ -36,14 +36,85 @@ namespace Demo
         mAnimateObjects( true ),
         mNumSpheres( 0 ),
         mTransparencyMode( Ogre::HlmsPbsDatablock::None ),
-        mTransparencyValue( 1.0f )
+        mTransparencyValue( 1.0f ),
+        mDecalDebugVisual( 0 )
     {
         memset( mSceneNode, 0, sizeof(mSceneNode) );
+    }
+    //-----------------------------------------------------------------------------------
+    void DecalsGameState::createDecalDebugData(void)
+    {
+        Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "DebugDecalPlane",
+                                            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                            Ogre::Plane( Ogre::Vector3::UNIT_Y, 0.0f ), 2.0f, 2.0f,
+                                            1, 1, false, 1, 4.0f, 4.0f, Ogre::Vector3::UNIT_X,
+                                            Ogre::v1::HardwareBuffer::HBU_STATIC,
+                                            Ogre::v1::HardwareBuffer::HBU_STATIC );
+
+        Ogre::MeshPtr planeMesh = Ogre::MeshManager::getSingleton().createManual(
+                    "DebugDecalPlane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+
+        planeMesh->importV1( planeMeshV1.get(), true, true, false );
+        Ogre::v1::MeshManager::getSingleton().remove( planeMeshV1 );
+
+        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+        Ogre::Hlms *hlmsUnlit = hlmsManager->getHlms( Ogre::HLMS_UNLIT );
+
+        Ogre::HlmsMacroblock macroblock;
+        macroblock.mDepthWrite = false;
+        macroblock.mCullMode = Ogre::CULL_NONE;
+        Ogre::HlmsBlendblock blendblock;
+        blendblock.setBlendType( Ogre::SBT_ADD );
+
+        Ogre::HlmsParamVec params;
+        params.push_back( std::pair<Ogre::IdString, Ogre::String>( "diffuse", "0.2 0.0 0.0" ) );
+        hlmsUnlit->createDatablock( "DebugDecalMat", "DebugDecalMat", macroblock, blendblock, params );
+
+        params.clear();
+        params.push_back( std::pair<Ogre::IdString, Ogre::String>( "diffuse", "0.15 0.2 0.0" ) );
+        hlmsUnlit->createDatablock( "DebugDecalMatPlane", "DebugDecalMatPlane", macroblock, blendblock, params );
+    }
+    //-----------------------------------------------------------------------------------
+    DebugDecalVisual* DecalsGameState::attachDecalDebugHelper( Ogre::SceneNode *decalNode )
+    {
+        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+
+        Ogre::Item *plane = sceneManager->createItem( "DebugDecalPlane" );
+        Ogre::Item *cube = sceneManager->createItem( "Cube_d.mesh" );
+
+        cube->setDatablockOrMaterialName( "DebugDecalMat" );
+        plane->setDatablockOrMaterialName( "DebugDecalMatPlane" );
+
+        Ogre::SceneNode *sceneNode = decalNode->createChildSceneNode(
+                                         decalNode->isStatic() ? Ogre::SCENE_STATIC : Ogre::SCENE_DYNAMIC );
+        sceneNode->attachObject( plane );
+        sceneNode->attachObject( cube );
+        sceneNode->setScale( Ogre::Vector3( 0.5f ) );
+
+        DebugDecalVisual *retVal = new DebugDecalVisual();
+        retVal->plane       = plane;
+        retVal->cube        = cube;
+        retVal->sceneNode   = sceneNode;
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void DecalsGameState::destroyDecalDebugHelper( DebugDecalVisual *decalDebugVisual )
+    {
+        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+        sceneManager->destroyItem( decalDebugVisual->cube );
+        sceneManager->destroyItem( decalDebugVisual->plane );
+        decalDebugVisual->sceneNode->getParentSceneNode()->removeAndDestroyChild(
+                    decalDebugVisual->sceneNode );
+
+        delete decalDebugVisual;
     }
     //-----------------------------------------------------------------------------------
     void DecalsGameState::createScene01(void)
     {
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+
+        createDecalDebugData();
 
         sceneManager->setForwardClustered( true, 16, 8, 24, 96, 4, 2, 50 );
         //sceneManager->setForwardClustered( true, 128, 64, 8, 96, 4, 2, 50 );
@@ -92,6 +163,9 @@ namespace Demo
             light->setCastShadows( false );
             wireAabb->track( light );*/
             g_decalNode = sceneNode;
+
+            mDecalDebugVisual = attachDecalDebugHelper( sceneNode );
+            mDecalDebugVisual->sceneNode->setVisible( false );
         }
 
         const float armsLength = 2.5f;
@@ -275,6 +349,15 @@ namespace Demo
         TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
+    void DecalsGameState::destroyScene(void)
+    {
+        if( mDecalDebugVisual )
+        {
+            destroyDecalDebugHelper( mDecalDebugVisual );
+            mDecalDebugVisual = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void DecalsGameState::update( float timeSinceLast )
     {
         if( mAnimateObjects )
@@ -303,6 +386,8 @@ namespace Demo
         outText += mTransparencyMode == Ogre::HlmsPbsDatablock::Fade ? "[Fade]" : "[Transparent]";
         outText += "\n+/- to change transparency. [";
         outText += Ogre::StringConverter::toString( mTransparencyValue ) + "]";
+        outText += "\nPress F6 to show/hide Decal's debug visualization. ";
+        outText += mDecalDebugVisual->cube->isVisible() ? "[On]" : "[Off]";
     }
     //-----------------------------------------------------------------------------------
     void DecalsGameState::setTransparencyToMaterials(void)
@@ -369,6 +454,10 @@ namespace Demo
                                                             Ogre::HlmsPbsDatablock::Fade;
             if( mTransparencyValue != 1.0f )
                 setTransparencyToMaterials();
+        }
+        else if( arg.keysym.sym == SDLK_F6 )
+        {
+            mDecalDebugVisual->sceneNode->setVisible( !mDecalDebugVisual->cube->isVisible() );
         }
         else if( arg.keysym.scancode == SDL_SCANCODE_KP_PLUS )
         {
