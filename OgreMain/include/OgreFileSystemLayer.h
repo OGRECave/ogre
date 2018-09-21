@@ -36,24 +36,20 @@ namespace Ogre
 {
     /** Provides methods to find out where the Ogre config files are stored
         and where logs and settings files should be written to.
-        @remarks
-            In modern multi-user OS, a standard user account will often not
-            have write access to the path where the SampleBrowser is stored.
-            In order to still be able to store graphics settings and log
-            output and for the user to overwrite the default Ogre config files, 
-            this class tries to create a folder inside the user's home directory. 
-            Specialised implementations for each individual platform must
-            subclass this abstract interface.
-      */
 
-    /** Implementation for the FileSystemLayer interface. */
+        In modern multi-user OS, a standard user account will often not
+        have write access to the path where the application is stored.
+        In order to still be able to store graphics settings and log
+        output and for the user to overwrite the default Ogre config files,
+        this class tries to create a folder inside the user's home directory.
+      */
     class _OgreExport FileSystemLayer : public FileSystemLayerAlloc
     {
     public:
         /** Creates a concrete platform-dependent implementation of FileSystemLayer.
          @param subdir
          A subdirectory inside the user's path to distinguish between
-         different Ogre releases.
+         different Ogre applications.
          */
         FileSystemLayer(const Ogre::String& subdir)
         {
@@ -63,14 +59,19 @@ namespace Ogre
             prepareUserHome(subdir);
         }
         
-        /** Search for the given config file in the user's home path. If it can't
-         be found there, the function falls back to the system-wide install
-         path for Ogre config files. (Usually the same place where the
-         SampleBrowser resides, or a special config path above that path.)
-         @param filename
-         The config file name (without path)
-         @return
-         The full path to the config file.
+        /** Search for the given config file in a set of predefined locations
+
+         The search order is
+         1. Subdirectory in user Home (see @ref getWritablePath)
+         2. Executable path
+         3. Special system-wide config paths (only on Linux)
+         4. Current working directory
+
+         @param filename The config file name (without path)
+         @return The full path to the config file
+
+         @note on windows the "_d" suffix is appended to the basename in debug mode.
+         E.g. "resource.cfg" becomes "resources_d.cfg"
          */
         Ogre::String getConfigFilePath(Ogre::String filename) const
         {
@@ -99,14 +100,21 @@ namespace Ogre
             // 3. fallback to current working dir
             return filename;
         }
-        
-        /** Find a path where the given filename can be written to. This path 
-         will usually be in the user's home directory. This function should
-         be used for any output like logs and graphics settings.
-         @param filename
-         Name of the file.
-         @return
-         The full path to a writable location for the given filename.
+
+        /** Find a path where the given filename can be written to. This path
+         will usually be a subdirectory in the user's home directory.
+         This function should be used for any output like logs and graphics settings.
+
+         | Platform         | Location |
+         |------------------|----------|
+         | Windows          | Documents/Ogre/$subdir/ |
+         | Linux            | ~/.cache/$subdir/ |
+         | OSX              | ~/Library/Application Support/Ogre/$subdir/ |
+         | iOS              | NSDocumentDirectory |
+         | Android / Emscripten | n/a |
+
+         @param filename Name of the file.
+         @return The full path to a writable location for the given filename.
          */
         Ogre::String getWritablePath(const Ogre::String& filename) const
         {

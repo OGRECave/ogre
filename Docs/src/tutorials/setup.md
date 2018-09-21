@@ -49,6 +49,7 @@ finally we start everything as
 OgreBites itself is also a good starting point if you need more control over the Camera or the Window creation.
 For instance to render into an existing Qt Window.
 
+@see Ogre::FileSystemLayer::getConfigFilePath
 @see Ogre::Root::renderOneFrame
 @see Ogre::RenderSystem::_createRenderWindow
 @see Ogre::RenderSystem::preExtraThreadsStarted
