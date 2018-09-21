@@ -1255,10 +1255,8 @@ namespace Ogre
         mOctreeWorldAABB.setNull();
 
         // need to use object iterator here.
-        SceneNode::ObjectIterator oit = mAssociatedNode->getAttachedObjectIterator();
-        while( oit.hasMoreElements() )
+        for (auto m : mAssociatedNode->getAttachedObjects())
         {
-            MovableObject * m = oit.getNext();
             // merge world bounds of object
             mOctreeWorldAABB.merge( m->getWorldBoundingBox(true) );
         }

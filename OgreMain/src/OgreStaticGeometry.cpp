@@ -512,10 +512,8 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     void StaticGeometry::addSceneNode(const SceneNode* node)
     {
-        SceneNode::ConstObjectIterator obji = node->getAttachedObjectIterator();
-        while (obji.hasMoreElements())
+        for (auto mobj : node->getAttachedObjects())
         {
-            MovableObject* mobj = obji.getNext();
             if (mobj->getMovableType() == "Entity")
             {
                 addEntity(static_cast<Entity*>(mobj),
