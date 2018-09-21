@@ -94,12 +94,12 @@ Force a specific lighting model.
 @par
 Format1: `lighting_stage <ffp|per_pixel>`
 @par
-Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [none|bilinear|trilinear|anisotropic] [max_anisotropy] [mipmap_bias]`
+Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [samplerName]`
 @par
-Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0	bilinear 1 -1.0`
+Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
 @see Ogre::RTShader::NormalMapLighting::NormalMapSpace
-@see Ogre::TextureFilterOptions
+@see @ref Samplers
 
 <a name="light_count"></a>
 

@@ -131,42 +131,31 @@ public:
     */
     const String& getNormalMapTextureName() const { return mNormalMapTextureName; }
 
-    /** 
-    Set the normal map filtering attributes.
-    @param minFilter The desired min filter.
-    @param magFilter The desired mag filter.
-    @param mipFilter The desired mip filter.
-    */
+    /// @deprecated use setNormalMapSampler
     void setNormalMapFiltering(const FilterOptions minFilter, const FilterOptions magFilter, const FilterOptions mipFilter) 
-    { mNormalMapMinFilter = minFilter; mNormalMapMagFilter = magFilter; mNormalMapMipFilter = mipFilter; }
+    { mNormalMapSampler->setFiltering(minFilter, magFilter, mipFilter); }
 
-    /** 
-    Return the normal map filtering attributes.
-    @param minFilter The desired min filter.
-    @param magFilter The desired mag filter.
-    @param mipFilter The desired mip filter.
-    */
-    void getNormalMapFiltering(FilterOptions& minFilter, FilterOptions& magFilter, FilterOptions& mipFilter) const
-    { minFilter = mNormalMapMinFilter; magFilter = mNormalMapMagFilter ; mipFilter = mNormalMapMipFilter; }
+    /// @deprecated use getNormalMapSampler
+    OGRE_DEPRECATED void getNormalMapFiltering(FilterOptions& minFilter, FilterOptions& magFilter, FilterOptions& mipFilter) const
+    { minFilter = mNormalMapSampler->getFiltering(FT_MIN); magFilter = mNormalMapSampler->getFiltering(FT_MAG) ; mipFilter = mNormalMapSampler->getFiltering(FT_MIP); }
 
-    /** Setup the normal map anisotropy value. 
-    @param anisotropy The anisotropy value.
-    */
-    void setNormalMapAnisotropy(unsigned int anisotropy) { mNormalMapAnisotropy = anisotropy; }
+    /// @deprecated use setNormalMapSampler
+    void setNormalMapAnisotropy(unsigned int anisotropy) { mNormalMapSampler->setAnisotropy(anisotropy); }
 
+    /// @deprecated use getNormalMapSampler
+    OGRE_DEPRECATED unsigned int getNormalMapAnisotropy() const { return mNormalMapSampler->getAnisotropy(); }
 
-    /** Return the normal map anisotropy value. */
-    unsigned int getNormalMapAnisotropy() const { return mNormalMapAnisotropy; }
+    /// @deprecated use setNormalMapSampler
+    void setNormalMapMipBias(Real mipBias) { mNormalMapSampler->setMipmapBias(mipBias); }
 
-    
-    /** Setup the normal map map mip bias value. 
-    @param mipBias The map mip bias value.
-    */
-    void setNormalMapMipBias(Real mipBias) { mNormalMapMipBias = mipBias; }
+    /// @deprecated use getNormalMapSampler
+    OGRE_DEPRECATED Real getNormalMapMipBias() const { return mNormalMapSampler->getMipmapBias(); }
 
+    /// return the normal map sampler
+    const SamplerPtr& getNormalMapSampler() const { return mNormalMapSampler; }
 
-    /** Return the normal map mip bias value. */
-    Real getNormalMapMipBias() const { return mNormalMapMipBias; }
+    /// set the normal map sampler
+    void setNormalMapSampler(const SamplerPtr& sampler) { mNormalMapSampler = sampler; }
 
 // Protected methods
 protected:
@@ -214,16 +203,8 @@ protected:
     unsigned short mNormalMapSamplerIndex;
     // Vertex shader input texture coordinate set index.
     unsigned int mVSTexCoordSetIndex;
-    // The normal map min filter.
-    FilterOptions mNormalMapMinFilter;
-    // The normal map mag filter.
-    FilterOptions mNormalMapMagFilter;
-    // The normal map mip filter.
-    FilterOptions mNormalMapMipFilter;
-    // The normal map max anisotropy value.
-    unsigned int mNormalMapAnisotropy;
-    // The normal map mip map bias.
-    Real mNormalMapMipBias;
+    // The normal map sampler
+    SamplerPtr mNormalMapSampler;
     // The normal map space.
     NormalMapSpace mNormalMapSpace;
     // World matrix parameter.
@@ -245,7 +226,7 @@ protected:
     // Vertex shader local light direction.
     ParameterPtr mVSLocalDir;
     // Normal map texture sampler parameter.
-    UniformParameterPtr mNormalMapSampler;
+    UniformParameterPtr mPSNormalMapSampler;
     // Pixel shader normal parameter.
     ParameterPtr mPSNormal;
     // Vertex shader input texture coordinates.

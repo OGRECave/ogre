@@ -41,11 +41,8 @@ NormalMapLighting::NormalMapLighting() : PerPixelLighting()
     mNormalMapSamplerIndex          = 0;
     mVSTexCoordSetIndex             = 0;
     mNormalMapSpace                 = NMS_TANGENT;
-    mNormalMapMinFilter             = FO_LINEAR;
-    mNormalMapMagFilter             = FO_LINEAR;
-    mNormalMapMipFilter             = FO_POINT;
-    mNormalMapAnisotropy            = 1;
-    mNormalMapMipBias               = -1.0;
+    mNormalMapSampler = TextureManager::getSingleton().createSampler();
+    mNormalMapSampler->setMipmapBias(-1.0);
 }
 
 //-----------------------------------------------------------------------
@@ -226,7 +223,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
     
     // Resolve normal map texture sampler parameter.        
-    mNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
+    mPSNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
 
     // Get surface ambient colour if need to.
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
@@ -369,7 +366,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
             !(mVSLocalDir.get()) || !(mVSWorldPosition.get()) || !(mWorldMatrix.get()) || !(mWorldInvRotMatrix.get());
     }
 
-    hasError |= !(mNormalMapSampler.get()) || !(mDerivedSceneColour.get()) || !(mSurfaceShininess.get()) || !(mVSInNormal.get()) || 
+    hasError |= !(mPSNormalMapSampler.get()) || !(mDerivedSceneColour.get()) || !(mSurfaceShininess.get()) || !(mVSInNormal.get()) || 
         !(mVSInTexcoord.get()) || !(mVSOutTexcoord.get()) || !(mPSInTexcoord.get()) || !(mPSDiffuse.get()) || !(mPSOutDiffuse.get()) ||
         !(mPSTempDiffuseColour.get());
 
@@ -803,7 +800,7 @@ bool NormalMapLighting::addPSNormalFetchInvocation(Function* psMain, const int g
 {
     FunctionInvocation* curFuncInvocation = NULL;
     curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_FETCHNORMAL, groupOrder);
-	curFuncInvocation->pushOperand(mNormalMapSampler, Operand::OPS_IN);
+	curFuncInvocation->pushOperand(mPSNormalMapSampler, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSInTexcoord, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_OUT);	
     psMain->addAtomInstance(curFuncInvocation);     
@@ -951,10 +948,7 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
     mSpecularEnable = rhsLighting.mSpecularEnable;
     mNormalMapSpace = rhsLighting.mNormalMapSpace;
     mNormalMapTextureName = rhsLighting.mNormalMapTextureName;
-    mNormalMapMinFilter = rhsLighting.mNormalMapMinFilter;
-    mNormalMapMagFilter = rhsLighting.mNormalMapMagFilter;
-    mNormalMapMipFilter = rhsLighting.mNormalMapMipFilter;
-    mNormalMapMipBias = rhsLighting.mNormalMapMipBias;
+    mNormalMapSampler = rhsLighting.mNormalMapSampler;
 }
 
 //-----------------------------------------------------------------------
@@ -965,10 +959,8 @@ bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass
 
     TextureUnitState* normalMapTexture = dstPass->createTextureUnitState();
 
-    normalMapTexture->setTextureName(mNormalMapTextureName);    
-    normalMapTexture->setTextureFiltering(mNormalMapMinFilter, mNormalMapMagFilter, mNormalMapMipFilter);
-    normalMapTexture->setTextureAnisotropy(mNormalMapAnisotropy);
-    normalMapTexture->setTextureMipmapBias(mNormalMapMipBias);
+    normalMapTexture->setTextureName(mNormalMapTextureName);
+    normalMapTexture->setSampler(mNormalMapSampler);
     mNormalMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
     return true;
@@ -1052,7 +1044,7 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 
                 // Read texture filtering format.
                 if (prop->values.size() >= 5)
-                {                   
+                {
                     ++it;
                     if (false == SGScriptTranslator::getString(*it, &strValue))
                     {
@@ -1079,6 +1071,14 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                     {
                         normalMapSubRenderState->setNormalMapFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, FO_LINEAR);
                     }
+                    else
+                    {
+                        // sampler reference
+                        normalMapSubRenderState->setNormalMapSampler(TextureManager::getSingleton().getSampler(strValue));
+                        return subRenderState;
+                    }
+
+                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, "use sampler reference");
                 }
 
                 // Read max anisotropy value.

@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreSubMesh.h"
 #include "OgreEntity.h"
 #include "OgreSubEntity.h"
+#include "OgreTextureManager.h"
 
 #include "OgreShaderFunction.h"
 #include "OgreShaderFunctionAtom.h"
