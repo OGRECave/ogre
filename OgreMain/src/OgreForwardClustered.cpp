@@ -514,6 +514,8 @@ namespace Ogre
                 obbPlane[5].normal= -obbPlane[4].normal;
                 obbPlane[5].negD  = obbPlane[5].normal.dotProduct( localObb.mCenter + orientedHalfSize );
 
+                objOrientation = objOrientation.Inverse();
+
                 for( size_t j=0; j<numPackedFrustumsPerSlice; ++j )
                 {
                     const FrustumRegion * RESTRICT_ALIAS frustumRegion =
