@@ -203,7 +203,8 @@ namespace Ogre
             CE_UNEXPECTEDTOKEN,
             CE_OBJECTBASENOTFOUND,
             CE_UNSUPPORTEDBYRENDERSYSTEM,
-            CE_REFERENCETOANONEXISTINGOBJECT
+            CE_REFERENCETOANONEXISTINGOBJECT,
+            CE_DEPRECATEDSYMBOL
         };
         static String formatErrorCode(uint32 code);
     public:

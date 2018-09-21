@@ -205,7 +205,11 @@ namespace Ogre
         ss << "ScriptCompiler - " << ScriptCompiler::formatErrorCode(code) << " in " << file << "(" << line << ")";
         if(!msg.empty())
             ss << ": " << msg;
-        LogManager::getSingleton().logError(ss.str());
+        
+        if(code == ScriptCompiler::CE_DEPRECATEDSYMBOL)
+            LogManager::getSingleton().logWarning(ss.str());
+        else
+            LogManager::getSingleton().logError(ss.str());
     }
 
     bool ScriptCompilerListener::handleEvent(ScriptCompiler *compiler, ScriptCompilerEvent *evt, void *retval)
@@ -244,6 +248,8 @@ namespace Ogre
             return "reference to a non existing object";
         case CE_UNEXPECTEDTOKEN:
             return "unexpected token";
+        case CE_DEPRECATEDSYMBOL:
+            return "deprecated symbol";
         default:
             return "unknown error";
         }

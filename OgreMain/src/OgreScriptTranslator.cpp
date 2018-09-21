@@ -1110,9 +1110,9 @@ namespace Ogre{
                         LodStrategy *strategy = DistanceLodSphereStrategy::getSingletonPtr();
                         mMaterial->setLodStrategy(strategy);
 
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
+                        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
                                            prop->line,
-                                           "lod_distances is deprecated. Use lod_values.");
+                                           "lod_distances. Use lod_values.");
 
                         // Read in LOD distances
                         Material::LodValueList lods;
@@ -2527,9 +2527,9 @@ namespace Ogre{
                 sampler->setCompareEnabled(bval);
             break;
         case ID_CMPFUNC:
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
+            compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
                 prop->line,
-                "compare_func is deprecated. Use comp_func.");
+                "compare_func. Use comp_func.");
             OGRE_FALLTHROUGH;
         case ID_COMP_FUNC:
             CompareFunction func;
@@ -2820,9 +2820,9 @@ namespace Ogre{
                             mUnit->setCubicTextureName(evt.mName, atom1->id == ID_COMBINED_UVW);
 
                             if(mUnit->is3D())
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
+                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
                                                    prop->line,
-                                                   "'cubic_texture .. combinedUVW' is deprecated. Use 'texture .. cubic' instead.");
+                                                   "'cubic_texture .. combinedUVW'. Use 'texture .. cubic' instead.");
                         }
                         else
                         {
