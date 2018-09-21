@@ -617,7 +617,6 @@ vertex_program Examples/FresnelRefractReflectVPCg cg
 vertex_program Examples/FresnelRefractReflectVPGLSLES glsles
 {
 	source Example_FresnelVp.glsles
-	entry_point main
 	profiles glsles
 }
 vertex_program Examples/FresnelRefractReflectVPGLSL glsl
@@ -644,7 +643,6 @@ fragment_program Examples/FresnelRefractReflectFPCg cg
 fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
 {
 	source Example_FresnelFp.glsles
-	entry_point main
 	profiles glsles
 	default_params
 	{
