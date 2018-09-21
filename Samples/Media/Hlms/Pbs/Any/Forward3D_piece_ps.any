@@ -87,8 +87,10 @@
 				F0.xyz		= lerp( F0.xyz, decalF0.xyz, decalMask );
 			@end
 		@end
-		@property( hlms_decals_diffuse && (hlms_decals_normals || hlms_decals_emissive) )
-			decalMask = ignoreAlphaDiffuse ? 1.0f : decalMask;
+		@property( hlms_decals_normals || hlms_decals_emissive )
+			@property( hlms_decals_diffuse )
+				decalMask = ignoreAlphaDiffuse ? 1.0f : decalMask;
+			@end
 			decalMask = isOutsideDecal ? 0.0f : decalMask;
 		@end
 		@property( hlms_decals_normals && normal_map )
