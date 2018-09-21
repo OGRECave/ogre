@@ -984,13 +984,7 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
         // toggle its visibility and billboard set visibility.
         else if (lightName == DIRECTIONAL_LIGHT_NAME)
         {
-            SceneNode::ObjectIterator it = mDirectionalLightNode->getAttachedObjectIterator();
-
-            while (it.hasMoreElements())  
-            {
-                MovableObject* o = it.getNext();
-                o->setVisible(visible);
-            }
+            mDirectionalLightNode->setVisible(visible, false);
         }
 
         // Spot light has no scene node representation.

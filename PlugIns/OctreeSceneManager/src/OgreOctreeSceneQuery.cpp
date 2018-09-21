@@ -83,11 +83,8 @@ void OctreeIntersectionSceneQuery::execute(IntersectionSceneQueryListener* liste
             std::list< SceneNode * >::iterator nit = list.begin();
             while( nit != list.end() )
             {
-                SceneNode::ObjectIterator oit = (*nit) -> getAttachedObjectIterator();
-                while( oit.hasMoreElements() )
+                for (auto m : (*nit)->getAttachedObjects())
                 {
-                    MovableObject * m = oit.getNext();
-
                     if( m != e &&
                             set.find( MovablePair(e,m)) == set.end() &&
                             set.find( MovablePair(m,e)) == set.end() &&
@@ -142,10 +139,8 @@ void OctreeAxisAlignedBoxSceneQuery::execute(SceneQueryListener* listener)
     std::list< SceneNode * >::iterator it = _list.begin();
     while( it != _list.end() )
     {
-        SceneNode::ObjectIterator oit = (*it) -> getAttachedObjectIterator();
-        while( oit.hasMoreElements() )
+        for (auto m : (*it)->getAttachedObjects())
         {
-            MovableObject * m = oit.getNext();
             if( (m->getQueryFlags() & mQueryMask) && 
                 (m->getTypeFlags() & mQueryTypeMask) && 
                 m->isInScene() &&
@@ -193,10 +188,8 @@ void OctreeRaySceneQuery::execute(RaySceneQueryListener* listener)
     std::list< SceneNode * >::iterator it = _list.begin();
     while( it != _list.end() )
     {
-        SceneNode::ObjectIterator oit = (*it) -> getAttachedObjectIterator();
-        while( oit.hasMoreElements() )
+        for (auto m : (*it)->getAttachedObjects())
         {
-            MovableObject * m = oit.getNext();
             if( (m->getQueryFlags() & mQueryMask) && 
                 (m->getTypeFlags() & mQueryTypeMask) && m->isInScene() )
             {
@@ -252,10 +245,8 @@ void OctreeSphereSceneQuery::execute(SceneQueryListener* listener)
     std::list< SceneNode * >::iterator it = _list.begin();
     while( it != _list.end() )
     {
-        SceneNode::ObjectIterator oit = (*it) -> getAttachedObjectIterator();
-        while( oit.hasMoreElements() )
+        for (auto m : (*it)->getAttachedObjects())
         {
-            MovableObject * m = oit.getNext();
             if( (m->getQueryFlags() & mQueryMask) && 
                 (m->getTypeFlags() & mQueryTypeMask) && 
                 m->isInScene() && 
@@ -314,10 +305,8 @@ void OctreePlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listene
             // avoid double-check same scene node
             if (!checkedSceneNodes.insert(*it).second)
                 continue;
-            SceneNode::ObjectIterator oit = (*it) -> getAttachedObjectIterator();
-            while( oit.hasMoreElements() )
+            for (auto m : (*it)->getAttachedObjects())
             {
-                MovableObject * m = oit.getNext();
                 if( (m->getQueryFlags() & mQueryMask) && 
                     (m->getTypeFlags() & mQueryTypeMask) && 
                     m->isInScene() &&

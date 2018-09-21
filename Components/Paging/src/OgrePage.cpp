@@ -74,9 +74,8 @@ namespace Ogre
         if (mDebugNode)
         {
             // destroy while we have the chance
-            SceneNode::ObjectIterator it = mDebugNode->getAttachedObjectIterator();
-            while(it.hasMoreElements())
-                mParent->getSceneManager()->destroyMovableObject(it.getNext());
+            for (auto mo : mDebugNode->getAttachedObjects())
+                mParent->getSceneManager()->destroyMovableObject(mo);
             mDebugNode->removeAndDestroyAllChildren();
             mParent->getSceneManager()->destroySceneNode(mDebugNode);
 
