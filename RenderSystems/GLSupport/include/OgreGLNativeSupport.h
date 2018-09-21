@@ -102,6 +102,8 @@ namespace Ogre
 
             const std::vector<int>& getFSAALevels() const { return mFSAALevels; }
             const VideoModes& getVideoModes() const { return mVideoModes; }
+
+            ContextProfile getContextProfile() const { return mContextProfile; }
         protected:
             typedef GLRenderSystemCommon::VideoMode VideoMode;
 

@@ -182,6 +182,11 @@ namespace Ogre {
         } 
     }
 
+    PixelFormat EGLWindow::suggestPixelFormat() const
+    {
+        return mGLSupport->getContextProfile() == GLNativeSupport::CONTEXT_ES ? PF_BYTE_RGBA : PF_BYTE_RGB;
+    }
+
     void EGLWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
         if(src.right > mWidth || src.bottom > mHeight || src.front != 0 || src.back != 1

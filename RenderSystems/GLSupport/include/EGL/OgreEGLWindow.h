@@ -114,6 +114,8 @@ namespace Ogre {
             virtual void getCustomAttribute(const String& name, void* pData);
 
             bool requiresTextureFlipping() const;
+
+            PixelFormat suggestPixelFormat() const;
     };
 }
 

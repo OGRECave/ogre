@@ -108,6 +108,8 @@ namespace Ogre
         
         bool requiresTextureFlipping() const { return false; }
 
+        PixelFormat suggestPixelFormat() const;
+
     private:
         bool mClosed;
         bool mVisible;
