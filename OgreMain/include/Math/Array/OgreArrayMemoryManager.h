@@ -370,6 +370,7 @@ namespace Ogre
             WorldRadius,
             DistanceToCamera,
             UpperDistance,
+            ShadowUpperDistance,
             VisibilityFlags,
             QueryFlags,
             LightMask,

@@ -47,6 +47,7 @@ namespace Ogre
         1 * sizeof( Ogre::Real ),       //ArrayMemoryManager::WorldRadius
         1 * sizeof( Ogre::RealAsUint ), //ArrayMemoryManager::DistanceToCamera
         1 * sizeof( Ogre::Real ),       //ArrayMemoryManager::SquaredUpperDistance
+        1 * sizeof( Ogre::Real ),       //ArrayMemoryManager::ShadowUpperDistance
         1 * sizeof( Ogre::uint32 ),     //ArrayMemoryManager::VisibilityFlags
         1 * sizeof( Ogre::uint32 ),     //ArrayMemoryManager::QueryFlags
         1 * sizeof( Ogre::uint32 ),     //ArrayMemoryManager::LightMask
@@ -61,6 +62,7 @@ namespace Ogre
         cleanerFlat,                    //ArrayMemoryManager::WorldRadius
         cleanerFlat,                    //ArrayMemoryManager::DistanceToCamera
         cleanerFlat,                    //ArrayMemoryManager::SquaredUpperDistance
+        cleanerFlat,                    //ArrayMemoryManager::ShadowUpperDistance
         cleanerFlat,                    //ArrayMemoryManager::VisibilityFlags
         cleanerFlat,                    //ArrayMemoryManager::QueryFlags
         cleanerFlat,                    //ArrayMemoryManager::LightMask
@@ -113,8 +115,10 @@ namespace Ogre
                                                 nextSlotBase * mElementsMemSizes[WorldRadius] );
         outData.mDistanceToCamera   = reinterpret_cast<RealAsUint*>( mMemoryPools[DistanceToCamera] +
                                                 nextSlotBase * mElementsMemSizes[DistanceToCamera] );
-        outData.mUpperDistance      = reinterpret_cast<Real*>( mMemoryPools[UpperDistance] +
+        outData.mUpperDistance[0]   = reinterpret_cast<Real*>( mMemoryPools[UpperDistance] +
                                                 nextSlotBase * mElementsMemSizes[UpperDistance] );
+        outData.mUpperDistance[1]  = reinterpret_cast<Real*>(mMemoryPools[ShadowUpperDistance] +
+                                                nextSlotBase * mElementsMemSizes[ShadowUpperDistance]);
         outData.mVisibilityFlags    = reinterpret_cast<uint32*>( mMemoryPools[VisibilityFlags] +
                                                 nextSlotBase * mElementsMemSizes[VisibilityFlags] );
         outData.mQueryFlags         = reinterpret_cast<uint32*>( mMemoryPools[QueryFlags] +
@@ -130,7 +134,8 @@ namespace Ogre
         outData.mLocalRadius[nextSlotIdx]           = std::numeric_limits<Real>::infinity();
         outData.mWorldRadius[nextSlotIdx]           = std::numeric_limits<Real>::infinity();
         outData.mDistanceToCamera[nextSlotIdx]      = 0;
-        outData.mUpperDistance[nextSlotIdx]         = std::numeric_limits<Real>::max();
+        outData.mUpperDistance[0][nextSlotIdx]      = std::numeric_limits<Real>::max();
+        outData.mUpperDistance[1][nextSlotIdx]      = std::numeric_limits<Real>::max();
         outData.mVisibilityFlags[nextSlotIdx]       = MovableObject::getDefaultVisibilityFlags();
         outData.mQueryFlags[nextSlotIdx]            = MovableObject::getDefaultQueryFlags();
         outData.mLightMask[nextSlotIdx]             = 0xFFFFFFFF;

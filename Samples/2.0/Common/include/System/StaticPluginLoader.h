@@ -37,6 +37,9 @@ namespace Ogre
     #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
         class MetalPlugin;
     #endif
+    #ifdef OGRE_BUILD_RENDERSYSTEM_GL3PLUS
+        class GL3PlusPlugin;
+    #endif
 #endif
     class Root;
 }
@@ -47,6 +50,13 @@ namespace Demo
     class StaticPluginLoader
     {
 #ifdef OGRE_STATIC_LIB
+        unsigned int    mDummy;
+    #ifdef OGRE_BUILD_RENDERSYSTEM_GL3PLUS
+        Ogre::GL3PlusPlugin         *mGL3PlusPlugin;
+    #endif
+    #ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
+        Ogre::D3D11Plugin           *mD3D11PlusPlugin;
+    #endif
     #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
         Ogre::MetalPlugin           *mMetalPlugin;
     #endif

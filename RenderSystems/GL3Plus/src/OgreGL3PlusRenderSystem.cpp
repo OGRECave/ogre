@@ -784,7 +784,7 @@ namespace Ogre {
             bool supportsArbBufferStorage   = mDriverVersion.hasMinVersion( 4, 4 ) ||
                     mGLSupport->checkExtension("GL_ARB_buffer_storage");
             bool emulateTexBuffers          = !(mHasGL43 ||
-                    mGLSupport->checkExtension("GL_ARB_buffer_storage"));
+                    mGLSupport->checkExtension("GL_ARB_texture_buffer_range"));
             bool supportsIndirectBuffers    = mDriverVersion.hasMinVersion( 4, 6 ) ||
                     mGLSupport->checkExtension("GL_ARB_multi_draw_indirect");
             bool supportsBaseInstance       = mDriverVersion.hasMinVersion( 4, 2 ) ||

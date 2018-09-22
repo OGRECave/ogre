@@ -121,6 +121,7 @@ namespace v1
         /// Depth buffers never resolve; only colour buffers do. (we need mFsaaResolveDirty to be always
         /// true so that the proper path is taken in GL3PlusTexture::getGLID)
         virtual void setFsaaResolveDirty(void)  {}
+        virtual void setFsaaResolved()          {}
 
         virtual void setDepthBufferPool( uint16 poolId );
 

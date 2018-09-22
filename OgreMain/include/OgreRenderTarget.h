@@ -181,6 +181,11 @@ namespace Ogre {
             mMipmapsDirty = true;
         }
 
+        virtual void setFsaaResolved()
+        {
+            mFsaaResolveDirty = false;
+        }
+
         /** Adds a viewport to the rendering target.
             @remarks
                 A viewport is the rectangle into which rendering output is sent. This method adds
