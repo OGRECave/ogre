@@ -1056,7 +1056,9 @@ namespace Ogre
         int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
         int32 numAreaApproxLights   = getProperty( HlmsBaseProp::LightsAreaApprox );
+        int32 numAreaLtcLights      = getProperty( HlmsBaseProp::LightsAreaLtc );
         const size_t realNumAreaApproxLights = mRealNumAreaApproxLights;
+        const size_t realNumAreaLtcLights = mRealNumAreaLtcLights;
 
         bool isPssmBlend = getProperty( HlmsBaseProp::PssmBlend ) != 0;
         bool isPssmFade = getProperty( HlmsBaseProp::PssmFade ) != 0;
@@ -1404,7 +1406,8 @@ namespace Ogre
                 *passBufferPtr++ = *shadowNode->getPssmFade(0);
             }
 
-            passBufferPtr += alignToNextMultiple( numPssmSplits + numPssmBlendsAndFade, 4 ) - ( numPssmSplits + numPssmBlendsAndFade );
+            passBufferPtr += alignToNextMultiple( numPssmSplits + numPssmBlendsAndFade, 4 ) -
+                             ( numPssmSplits + numPssmBlendsAndFade );
 
             if( numShadowMapLights > 0 )
             {
@@ -1577,7 +1580,7 @@ namespace Ogre
                 if( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX )
                 {
                     mAreaLights.push_back( globalLightList.lights[idx] );
-                    areaLightNumber++;
+                    ++areaLightNumber;
                 }
             }
 
@@ -1585,10 +1588,6 @@ namespace Ogre
 
             for( size_t i=0; i<realNumAreaApproxLights; ++i )
             {
-                /*const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
-                assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
-
-                Light const *light = globalLightList.lights[idx];*/
                 Light const *light = mAreaLights[i];
 
                 Vector4 lightPos4 = light->getAs4DVector();
@@ -1696,6 +1695,83 @@ namespace Ogre
                 *passBufferPtr++ = 0.0f;
                 *passBufferPtr++ = 0.0f;
             }
+
+            mAreaLights.reserve( numAreaLtcLights );
+            mAreaLights.clear();
+            areaLightNumber = 0;
+            for( size_t idx = mAreaLightsGlobalLightListStart;
+                 idx<globalLightList.lights.size() && areaLightNumber < realNumAreaLtcLights; ++idx )
+            {
+                if( globalLightList.lights[idx]->getType() == Light::LT_AREA_LTC )
+                {
+                    mAreaLights.push_back( globalLightList.lights[idx] );
+                    ++areaLightNumber;
+                }
+            }
+
+            //std::sort( mAreaLights.begin(), mAreaLights.end(), SortByTextureLightMaskIdx );
+
+            for( size_t i=0; i<realNumAreaLtcLights; ++i )
+            {
+                /*const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
+                assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
+
+                Light const *light = globalLightList.lights[idx];*/
+                Light const *light = mAreaLights[i];
+
+                Vector4 lightPos4 = light->getAs4DVector();
+                Vector3 lightPos = viewMatrix * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
+
+                //vec3 areaLtcLights[numLights].position
+                *passBufferPtr++ = lightPos.x;
+                *passBufferPtr++ = lightPos.y;
+                *passBufferPtr++ = lightPos.z;
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+                *reinterpret_cast<uint32 * RESTRICT_ALIAS>( passBufferPtr ) = light->getLightMask();
+#endif
+                ++passBufferPtr;
+
+                const Real attenRange   = light->getAttenuationRange();
+
+                //vec3 areaLtcLights[numLights].diffuse
+                ColourValue colour = light->getDiffuseColour() *
+                                     light->getPowerScale();
+                *passBufferPtr++ = colour.r;
+                *passBufferPtr++ = colour.g;
+                *passBufferPtr++ = colour.b;
+                *passBufferPtr++ = attenRange;
+
+                //vec3 areaLtcLights[numLights].specular
+                colour = light->getSpecularColour() * light->getPowerScale();
+                *passBufferPtr++ = colour.r;
+                *passBufferPtr++ = colour.g;
+                *passBufferPtr++ = colour.b;
+                *passBufferPtr++ = light->getDoubleSided() ? 1.0f : 0.0f;
+
+                const Vector2 rectSize = light->getDerivedRectSize();
+                Quaternion qRot = light->getParentNode()->_getDerivedOrientation();
+                Vector3 xAxis = (viewMatrix3 * qRot.xAxis()) * rectSize.x;
+                Vector3 yAxis = (viewMatrix3 * qRot.yAxis()) * rectSize.y;
+
+                Vector3 rectPoints[4];
+                //vec4 areaLtcLights[numLights].points[4];
+                rectPoints[0] = lightPos + xAxis + yAxis;
+                rectPoints[1] = lightPos + xAxis - yAxis;
+                rectPoints[2] = lightPos - xAxis - yAxis;
+                rectPoints[3] = lightPos - xAxis + yAxis;
+
+                for( size_t j=0; j<4u; ++j )
+                {
+                    *passBufferPtr++ = rectPoints[j].x;
+                    *passBufferPtr++ = rectPoints[j].y;
+                    *passBufferPtr++ = rectPoints[j].z;
+                    *passBufferPtr++ = 1.0f;
+                }
+            }
+
+            memset( passBufferPtr, 0,
+                    (numAreaLtcLights - realNumAreaLtcLights) * sizeof(float) * 4u * 7u );
+            passBufferPtr += 4u * 7u;
 
             if( shadowNode )
             {
