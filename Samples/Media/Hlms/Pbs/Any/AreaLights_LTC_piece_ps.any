@@ -43,12 +43,12 @@ Adapted to Ogre by Matias N. Goldberg
 			uniform sampler2DArray ltcMatrix;
 		@end
 		@property( syntax == hlsl )
-			Texture2DArray<float4> ltcMatrix	: register(t@value());
-			SamplerState ltcSampler				: register(s@value());
+			Texture2DArray<float4> ltcMatrix	: register(t@value(ltcMatrixTexUnit));
+			SamplerState ltcSampler				: register(s@value(ltcMatrixTexUnit));
 		@end
 		@property( syntax == metal )
-			, texture2d_array<half> ltcMatrix	[[texture(@value())]]
-			, sampler ltcSampler				[[sampler(@value())]]
+			, texture2d_array<half> ltcMatrix	[[texture(@value(ltcMatrixTexUnit))]]
+			, sampler ltcSampler				[[sampler(@value(ltcMatrixTexUnit))]]
 		@end
 	@end
 @end

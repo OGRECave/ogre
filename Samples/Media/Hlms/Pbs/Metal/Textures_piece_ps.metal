@@ -27,6 +27,11 @@
 	@add( texUnit, 1 )
 @end
 
+@property( hlms_lights_area_ltc )
+	@set( ltcMatrixTexUnit, texUnit )
+	@add( texUnit, 1 )
+@end
+
 @property( hlms_enable_decals )
 	@set( decalsTexUnit, texUnit )
 	@add( texUnit, hlms_enable_decals )
