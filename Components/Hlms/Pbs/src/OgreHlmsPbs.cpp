@@ -1771,7 +1771,7 @@ namespace Ogre
 
             memset( passBufferPtr, 0,
                     (numAreaLtcLights - realNumAreaLtcLights) * sizeof(float) * 4u * 7u );
-            passBufferPtr += 4u * 7u;
+            passBufferPtr += (numAreaLtcLights - realNumAreaLtcLights) * 4u * 7u;
 
             if( shadowNode )
             {
