@@ -1162,6 +1162,7 @@ namespace Ogre
             }
 
             mapSize += ( 7 * 4 * 4 ) * numAreaApproxLights;
+            mapSize += ( 7 * 4 * 4 ) * numAreaLtcLights;
         }
         else
         {
@@ -1713,10 +1714,6 @@ namespace Ogre
 
             for( size_t i=0; i<realNumAreaLtcLights; ++i )
             {
-                /*const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
-                assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
-
-                Light const *light = globalLightList.lights[idx];*/
                 Light const *light = mAreaLights[i];
 
                 Vector4 lightPos4 = light->getAs4DVector();
@@ -1748,16 +1745,16 @@ namespace Ogre
                 *passBufferPtr++ = colour.b;
                 *passBufferPtr++ = light->getDoubleSided() ? 1.0f : 0.0f;
 
-                const Vector2 rectSize = light->getDerivedRectSize();
+                const Vector2 rectSize = light->getDerivedRectSize() * 0.5f;
                 Quaternion qRot = light->getParentNode()->_getDerivedOrientation();
                 Vector3 xAxis = (viewMatrix3 * qRot.xAxis()) * rectSize.x;
                 Vector3 yAxis = (viewMatrix3 * qRot.yAxis()) * rectSize.y;
 
                 Vector3 rectPoints[4];
                 //vec4 areaLtcLights[numLights].points[4];
-                rectPoints[0] = lightPos + xAxis + yAxis;
+                rectPoints[0] = lightPos - xAxis - yAxis;
                 rectPoints[1] = lightPos + xAxis - yAxis;
-                rectPoints[2] = lightPos - xAxis - yAxis;
+                rectPoints[2] = lightPos + xAxis + yAxis;
                 rectPoints[3] = lightPos - xAxis + yAxis;
 
                 for( size_t j=0; j<4u; ++j )

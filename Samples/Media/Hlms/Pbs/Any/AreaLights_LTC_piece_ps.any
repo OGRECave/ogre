@@ -53,6 +53,7 @@ Adapted to Ogre by Matias N. Goldberg
 	@end
 @end
 
+@piece( DeclAreaLtcLightFuncs )
 INLINE float3 IntegrateEdgeVec( float3 v1, float3 v2 )
 {
 	float x = dot(v1, v2);
@@ -263,6 +264,7 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, mat3 Minv, float3 point
 
 	return sum;
 }
+@end
 
 
 @piece( DoAreaLtcLights )

@@ -76,6 +76,8 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 @insertpiece( DeclShadowMapMacros )
 @insertpiece( DeclShadowSamplingFuncs )
 
+@insertpiece( DeclAreaLtcLightFuncs )
+
 constexpr sampler shadowSampler = sampler( coord::normalized,
 										   address::clamp_to_edge,
 										   filter::linear,
@@ -390,6 +392,7 @@ float4 diffuseCol;
 
 	//Custom 2D shape lights
 	@insertpiece( DoAreaApproxLights )
+	@insertpiece( DoAreaLtcLights )
 
 @insertpiece( forward3dLighting )
 @insertpiece( applyIrradianceVolumes )

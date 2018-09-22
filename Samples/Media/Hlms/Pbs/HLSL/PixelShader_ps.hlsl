@@ -124,6 +124,8 @@ float3 qmul( float4 q, float3 v )
 @insertpiece( DeclShadowSamplers )
 @insertpiece( DeclShadowSamplingFuncs )
 
+@insertpiece( DeclAreaLtcLightFuncs )
+
 @insertpiece( DeclOutputType )
 
 @insertpiece( custom_ps_functions )
@@ -407,6 +409,7 @@ float4 diffuseCol;
 
 	//Custom 2D shape lights
 	@insertpiece( DoAreaApproxLights )
+	@insertpiece( DoAreaLtcLights )
 
 @insertpiece( forward3dLighting )
 @insertpiece( applyIrradianceVolumes )

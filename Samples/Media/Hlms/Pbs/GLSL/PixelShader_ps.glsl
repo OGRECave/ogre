@@ -169,6 +169,8 @@ vec3 qmul( vec4 q, vec3 v )
 @insertpiece( DeclShadowSamplers )
 @insertpiece( DeclShadowSamplingFuncs )
 
+@insertpiece( DeclAreaLtcLightFuncs )
+
 @insertpiece( custom_ps_functions )
 
 void main()
@@ -425,6 +427,7 @@ void main()
 
 	//Custom 2D shape lights
 	@insertpiece( DoAreaApproxLights )
+	@insertpiece( DoAreaLtcLights )
 
 @insertpiece( forward3dLighting )
 @insertpiece( applyIrradianceVolumes )
