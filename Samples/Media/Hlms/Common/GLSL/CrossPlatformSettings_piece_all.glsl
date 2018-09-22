@@ -35,6 +35,7 @@
 #define mul( x, y ) ((x) * (y))
 #define saturate(x) clamp( (x), 0.0, 1.0 )
 #define lerp mix
+#define rsqrt inversesqrt
 #define INLINE
 
 #define finalDrawId drawId

@@ -67,7 +67,7 @@ INLINE float3 IntegrateEdgeVec( float3 v1, float3 v2 )
 	float b = 3.4175940 + (4.1616724 + y)*y;
 	float v = a / b;
 
-	float theta_sintheta = (x > 0.0) ? v : 0.5*inversesqrt(max(1.0 - x*x, 1e-7)) - v;
+	float theta_sintheta = (x > 0.0) ? v : 0.5*rsqrt(max(1.0 - x*x, 1e-7)) - v;
 
 	return cross( v1, v2 ) * theta_sintheta;
 }
@@ -188,7 +188,7 @@ INLINE void ClipQuadToHorizon( inout float3 L[5], out int n )
 		L[4] = L[0];
 }
 
-INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, mat3 Minv, float3 points[4], bool twoSided )
+INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv, float3 points[4], bool twoSided )
 {
 	// construct orthonormal basis around N
 	float3 T1, T2;
@@ -196,7 +196,7 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, mat3 Minv, float3 point
 	T2 = cross(N, T1);
 
 	// rotate area light in (T1, T2, N) basis
-	Minv = mul( Minv, transpose( mat3( T1, T2, N ) ) );
+	Minv = mul( Minv, transpose( float3x3( T1, T2, N ) ) );
 
 	// polygon (allocate 5 vertices for clipping)
 	float3 L[5];
@@ -246,7 +246,7 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, mat3 Minv, float3 point
 		ClipQuadToHorizon( L, n );
 
 		if( n == 0 )
-			return float3(0, 0, 0);
+			return 0;
 		// project onto sphere
 		L[0] = normalize( L[0] );
 		L[1] = normalize( L[1] );
@@ -283,7 +283,7 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, mat3 Minv, float3 point
 		float4 ltc0 = OGRE_SampleArray2DLevel( ltcMatrix, ltcSampler, ltcUV, 0, 0 );
 		float4 ltc1 = OGRE_SampleArray2DLevel( ltcMatrix, ltcSampler, ltcUV, 1, 0 );
 
-		mat3 Minv = mat3(
+		float3x3 Minv = float3x3(
 			float3(ltc0.x, 0, ltc0.y),
 			float3(  0,  1,    0),
 			float3(ltc0.z, 0, ltc0.w)
@@ -306,8 +306,9 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, mat3 Minv, float3 point
 			ltcSpecular.xyz *= @insertpiece( F0 ).xyz * ltc1.x + (1.0 - @insertpiece( F0 ).xyz) * ltc1.y;
 		@end
 
-		float ltcDiffuse = LTC_Evaluate( nNormal.xyz, viewDir.xyz, inPs.pos.xyz, mat3(1),
-										passBuf.areaLtcLights[@n].points, doubleSidedLtc );
+		float ltcDiffuse = LTC_Evaluate( nNormal.xyz, viewDir.xyz, inPs.pos.xyz,
+										 float3x3( float3( 1, 0, 0 ), float3( 0, 1, 0 ), float3( 0, 0, 1 ) ),
+										 passBuf.areaLtcLights[@n].points, doubleSidedLtc );
 
 		finalColour += passBuf.areaLtcLights[@n].diffuse.xyz * ltcDiffuse * @insertpiece( kD ).xyz;
 		finalColour += passBuf.areaLtcLights[@n].specular.xyz * ltcSpecular * @insertpiece( kS ).xyz;
