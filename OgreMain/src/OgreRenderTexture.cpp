@@ -95,6 +95,20 @@ namespace Ogre
         RenderTarget::setFsaaResolveDirty();
     }
     //-----------------------------------------------------------------------------
+    void MultiRenderTarget::setFsaaResolved()
+    {
+        BoundSufaceList::const_iterator itor = mBoundSurfaces.begin();
+        BoundSufaceList::const_iterator end  = mBoundSurfaces.end();
+
+        while( itor != end )
+        {
+            (*itor)->setFsaaResolved();
+            ++itor;
+        }
+
+        RenderTarget::setFsaaResolved();
+    }
+    //-----------------------------------------------------------------------------
     void MultiRenderTarget::swapBuffers(void)
     {
         BoundSufaceList::const_iterator itor = mBoundSurfaces.begin();

@@ -40,6 +40,7 @@ if( OGRE_STATIC )
 	#include_directories(${OGRE_SOURCE_DIR}/PlugIns/ParticleFX/include)
 	include_directories( ${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include )
 	include_directories( ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include )
+	include_directories( ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include/GLSL )
 	include_directories( ${OGRE_SOURCE_DIR}/RenderSystems/Metal/include )
 endif()
 

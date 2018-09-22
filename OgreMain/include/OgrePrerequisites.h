@@ -96,7 +96,7 @@ namespace Ogre {
     #       define OGRE_HASHMULTIMAP_NAME unordered_multimap
     #       define OGRE_HASHSET_NAME unordered_set
     #       define OGRE_HASHMULTISET_NAME unordered_multiset
-    #    if defined(_LIBCPP_VERSION)
+    #    if defined(_LIBCPP_VERSION) || __cplusplus >= 201103L
     #       define OGRE_HASH_NAMESPACE ::std
     #    else
     #       define OGRE_HASH_NAMESPACE ::std::tr1

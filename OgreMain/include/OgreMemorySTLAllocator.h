@@ -104,7 +104,7 @@ namespace Ogre
         { }
 
         /// dtor
-        virtual ~STLAllocator()
+        ~STLAllocator()
         { }
 
         /// copy ctor - done component wise

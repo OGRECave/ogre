@@ -42,6 +42,9 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreTechnique.h"
 
+#include "OgreRenderTexture.h"
+#include "OgreHardwarePixelBuffer.h"
+
 namespace Ogre
 {
     void CompositorPassQuadDef::addQuadTextureSource( size_t texUnitIdx, const String &textureName,
@@ -288,6 +291,14 @@ namespace Ogre
 
         if( listener )
             listener->passPosExecute( this );
+
+        if( mDefinition->mIsResolve )
+        {
+            TexturePtr tex = mParentNode->getDefinedTexture( mDefinition->mFsaaTextureName, 0 );
+
+            if( !tex.isNull() )
+                tex->getBuffer()->getRenderTarget()->setFsaaResolved();
+        }
 
         //Call endUpdate if we're the last pass in a row to use this RT
         if( mDefinition->mEndRtUpdate )
