@@ -562,7 +562,7 @@ As mentioned above in the directional lights section, the rendering of shadows f
 
 Shadows fade out before the shadow far distance so that the termination of shadow is not abrupt. You can configure the start and end points of this fade by calling the SceneManager::setShadowTextureFadeStart and SceneManager::setShadowTextureFadeEnd methods, both take distances as a proportion of the shadow far distance. Because of the inaccuracies caused by using a square texture and a radial fade distance, you cannot use 1.0 as the fade end, if you do you’ll see artifacts at the extreme edges. The default values are 0.7 and 0.9, which serve most purposes but you can change them if you like.
 
-# Texture shadows and vertex / fragment programs
+# Texture shadows and vertex / fragment programs {#texture_shadows_and_shaders}
 
 When rendering shadow casters into a modulative shadow texture, Ogre turns off all textures, and all lighting contributions except for ambient light, which it sets to the colour of the shadow ([Shadow Colour](#Shadow-Colour)). For additive shadows, it render the casters into a black & white texture instead. This is enough to render shadow casters for fixed-function material techniques, however where a vertex program is used Ogre doesn’t have so much control. If you use a vertex program in the **first pass** of your technique, then you must also tell ogre which vertex program you want it to use when rendering the shadow caster; see [Shadows and Vertex Programs](#Shadows-and-Vertex-Programs) for full details.
 
@@ -612,21 +612,21 @@ There are 2 modulative shadow techniques; stencil-based (See [Stencil Shadows](#
 
 ## Shadow Colour
 
-The colour which is used to darken the areas in shadow is set by SceneManager::setShadowColour; it defaults to a dark grey (so that the underlying colour still shows through a bit).
+The colour which is used to darken the areas in shadow is set by Ogre::SceneManager::setShadowColour; it defaults to a dark grey (so that the underlying colour still shows through a bit).
 
-Note that if you’re using texture shadows you have the additional option of using [Integrated Texture Shadows](#Integrated-Texture-Shadows) rather than being forced to have a separate pass of the scene to render shadows. In this case the ’modulative’ aspect of the shadow technique just affects the colour of the shadow texture. 
+Note that if you’re using texture shadows you have the additional option of using @ref Integrated-Texture-Shadows rather than being forced to have a separate pass of the scene to render shadows. In this case the ’modulative’ aspect of the shadow technique just affects the colour of the shadow texture. 
 
 # Additive Light Masking {#Additive-Light-Masking}
 
 Additive light masking is about rendering the scene many times, each time representing a single light contribution whose influence is masked out in areas of shadow. Each pass is combined with (added to) the previous one such that when all the passes are complete, all the light contribution has correctly accumulated in the scene, and each light has been prevented from affecting areas which it should not be able to because of shadow casters. This is an effective technique which results in very realistic looking lighting, but it comes at a price: more rendering passes.
 
-As many technical papers (and game marketing) will tell you, rendering realistic lighting like this requires multiple passes. Being a friendly sort of engine, Ogre frees you from most of the hard work though, and will let you use the exact same material definitions whether you use this lighting technique or not (for the most part, see [Pass Classification and Vertex Programs](#Pass-Classification-and-Vertex-Programs)). In order to do this technique, Ogre automatically categorises the [Passes](#Passes) you define in your materials into 3 types:
+As many technical papers (and game marketing) will tell you, rendering realistic lighting like this requires multiple passes. Being a friendly sort of engine, Ogre frees you from most of the hard work though, and will let you use the exact same material definitions whether you use this lighting technique or not (for the most part, see @ref Pass-Classification-and-Vertex-Programs). In order to do this technique, Ogre automatically categorises the @ref Passes you define in your materials into 3 types:
 
 1.  ambient Passes categorised as ’ambient’ include any base pass which is not lit by any particular light, i.e. it occurs even if there is no ambient light in the scene. The ambient pass always happens first, and sets up the initial depth value of the fragments, and the ambient colour if applicable. It also includes any emissive / self illumination contribution. Only textures which affect ambient light (e.g. ambient occlusion maps) should be rendered in this pass.
 2.  diffuse/specular Passes categorised as ’diffuse/specular’ (or ’per-light’) are rendered once per light, and each pass contributes the diffuse and specular colour from that single light as reflected by the diffuse / specular terms in the pass. Areas in shadow from that light are masked and are thus not updated. The resulting masked colour is added to the existing colour in the scene. Again, no textures are used in this pass (except for textures used for lighting calculations such as normal maps).
 3.  decal Passes categorised as ’decal’ add the final texture colour to the scene, which is modulated by the accumulated light built up from all the ambient and diffuse/specular passes.
 
-In practice, [Passes](#Passes) rarely fall nicely into just one of these categories. For each Technique, Ogre compiles a list of ’Illumination Passes’, which are derived from the user defined passes, but can be split, to ensure that the divisions between illumination pass categories can be maintained. For example, if we take a very simple material definition:
+In practice, @ref Passes rarely fall nicely into just one of these categories. For each Technique, Ogre compiles a list of ’Illumination Passes’, which are derived from the user defined passes, but can be split, to ensure that the divisions between illumination pass categories can be maintained. For example, if we take a very simple material definition:
 
 ```cpp
 material TestIllumination
@@ -687,15 +687,11 @@ material TestIlluminationSplitIllumination
 
 So as you can see, even a simple material requires a minimum of 3 passes when using this shadow technique, and in fact it requires (num\_lights + 2) passes in the general sense. You can use more passes in your original material and Ogre will cope with that too, but be aware that each pass may turn into multiple ones if it uses more than one type of light contribution (ambient vs diffuse/specular) and / or has texture units. The main nice thing is that you get the full multipass lighting behaviour even if you don’t define your materials in terms of it, meaning that your material definitions can remain the same no matter what lighting approach you decide to use.
 
-<a name="Manually-Categorising-Illumination-Passes"></a><a name="Manually-Categorising-Illumination-Passes-1"></a>
-
-## Manually Categorising Illumination Passes
+## Manually Categorising Illumination Passes {#Manually-Categorising-Illumination-Passes}
 
 Alternatively, if you want more direct control over the categorisation of your passes, you can use the [illumination\_stage](#illumination_005fstage) option in your pass to explicitly assign a pass unchanged to an illumination stage. This way you can make sure you know precisely how your material will be rendered under additive lighting conditions.
 
-<a name="Pass-Classification-and-Vertex-Programs"></a><a name="Pass-Classification-and-Vertex-Programs-1"></a>
-
-## Pass Classification and Vertex Programs
+## Pass Classification and Vertex Programs {#Pass-Classification-and-Vertex-Programs}
 
 Ogre is pretty good at classifying and splitting your passes to ensure that the multipass rendering approach required by additive lighting works correctly without you having to change your material definitions. However, there is one exception; when you use vertex programs, the normal lighting attributes ambient, diffuse, specular etc are not used, because all of that is determined by the vertex program. Ogre has no way of knowing what you’re doing inside that vertex program, so you have to tell it.
 
@@ -705,100 +701,13 @@ Note that when classifying a diffuse/specular programmable pass, Ogre checks to 
 
 So clearly, when you use additive light masking as a shadow technique, you need to make sure that programmable passes you use are properly set up so that they can be classified correctly. However, also note that the changes you have to make to ensure the classification is correct does not affect the way the material renders when you choose not to use additive lighting, so the principle that you should be able to use the same material definitions for all lighting scenarios still holds. Here is an example of a programmable material which will be classified correctly by the illumination pass classifier:
 
-```cpp
-// Per-pixel normal mapping Any number of lights, diffuse and specular
-material Examples/BumpMapping/MultiLightSpecular
-{
-    technique
-    {
-        // Base ambient pass
-        pass
-        {
-            // ambient only, not needed for rendering, but as information
-            // to lighting pass categorisation routine
-            ambient 1 1 1
-            diffuse 0 0 0 
-            specular 0 0 0 0
-            // Really basic vertex program
-            vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
-            {
-                param_named_auto worldViewProj worldviewproj_matrix
-                param_named_auto ambient ambient_light_colour
-            }
-        }
-        // Now do the lighting pass
-        // NB we don't do decal texture here because this is repeated per light
-        pass
-        {
-            // set ambient off, not needed for rendering, but as information
-            // to lighting pass categorisation routine
-            ambient 0 0 0 
-            // do this for each light
-            iteration once_per_light
-            scene_blend add
-
-            // Vertex program reference
-            vertex_program_ref Examples/BumpMapVPSpecular
-            {
-                param_named_auto lightPosition light_position_object_space 0
-                param_named_auto eyePosition camera_position_object_space
-                param_named_auto worldViewProj worldviewproj_matrix
-            }
-
-            // Fragment program
-            fragment_program_ref Examples/BumpMapFPSpecular
-            {
-                param_named_auto lightDiffuse light_diffuse_colour 0 
-                param_named_auto lightSpecular light_specular_colour 0
-            }
-            
-            // Base bump map
-            texture_unit
-            {
-                texture NMBumpsOut.png
-                colour_op replace
-            }
-            // Normalisation cube map
-            texture_unit
-            {
-                texture nm.png cubic
-                tex_coord_set 1
-                tex_address_mode clamp
-            }
-            // Normalisation cube map #2
-            texture_unit
-            {
-                texture nm.png cubic
-                tex_coord_set 1
-                tex_address_mode clamp
-            }
-        }
-        
-        // Decal pass
-        pass
-        {
-            lighting off
-            // Really basic vertex program
-            vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
-            {
-                param_named_auto worldViewProj worldviewproj_matrix
-                param_named ambient float4 1 1 1 1
-            }
-            scene_blend dest_colour zero
-            texture_unit
-            {
-                texture RustedMetal.jpg 
-            }
-        }
-    }
-}
-```
+@snippet Samples/Media/materials/scripts/Examples-Advanced.material normal_map_multipass
 
 Note that if you’re using texture shadows you have the additional option of using [Integrated Texture Shadows](#Integrated-Texture-Shadows) rather than being forced to use this explicit sequence - allowing you to compress the number of passes into a much smaller number at the expense of defining an upper number of shadow casting lights. In this case the ’additive’ aspect of the shadow technique just affects the colour of the shadow texture and it’s up to you to combine the shadow textures in your receivers however you like. 
 
 <a name="Static-Lighting"></a>
 
-## Static Lighting
+## Static Lighting {#Static-Lighting}
 
 Despite their power, additive lighting techniques have an additional limitation; they do not combine well with pre-calculated static lighting in the scene. This is because they are based on the principle that shadow is an absence of light, but since static lighting in the scene already includes areas of light and shadow, additive lighting cannot remove light to create new shadows. Therefore, if you use the additive lighting technique you must either use it exclusively as your lighting solution (and you can combine it with per-pixel lighting to create a very impressive dynamic lighting solution), or you must use [Integrated Texture Shadows](#Integrated-Texture-Shadows) to combine the static lighting according to your chosen approach.
 
