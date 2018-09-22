@@ -128,7 +128,7 @@ namespace Demo
             Ogre::WireAabb *wireAabb = sceneManager->createWireAabb();
 
             Ogre::Decal *decal = sceneManager->createDecal();
-            Ogre::SceneNode *sceneNode = sceneManager->createSceneNode();
+            Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode()->createChildSceneNode();
             sceneNode->attachObject( decal );
             sceneNode->setPosition( Ogre::Vector3( 0, 0.4, 0 ) );
             sceneNode->setOrientation( Ogre::Quaternion( Ogre::Degree( 45.0f ), Ogre::Vector3::UNIT_Y ) );
