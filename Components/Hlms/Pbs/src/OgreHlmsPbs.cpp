@@ -1056,7 +1056,7 @@ namespace Ogre
         int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
         int32 numAreaApproxLights   = getProperty( HlmsBaseProp::LightsAreaApprox );
-        const size_t realNumAreaLights = mRealNumAreaLights;
+        const size_t realNumAreaApproxLights = mRealNumAreaApproxLights;
 
         bool isPssmBlend = getProperty( HlmsBaseProp::PssmBlend ) != 0;
         bool isPssmFade = getProperty( HlmsBaseProp::PssmFade ) != 0;
@@ -1572,7 +1572,7 @@ namespace Ogre
             const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
             size_t areaLightNumber = 0;
             for( size_t idx = mAreaLightsGlobalLightListStart;
-                 idx<globalLightList.lights.size() && areaLightNumber < realNumAreaLights; ++idx )
+                 idx<globalLightList.lights.size() && areaLightNumber < realNumAreaApproxLights; ++idx )
             {                
                 if( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX )
                 {
@@ -1583,7 +1583,7 @@ namespace Ogre
 
             std::sort( mAreaLights.begin(), mAreaLights.end(), SortByTextureLightMaskIdx );
 
-            for( size_t i=0; i<realNumAreaLights; ++i )
+            for( size_t i=0; i<realNumAreaApproxLights; ++i )
             {
                 /*const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
                 assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
@@ -1652,7 +1652,7 @@ namespace Ogre
                 *passBufferPtr++ = 0.0f;
             }
 
-            for( int32 i=realNumAreaLights; i<numAreaApproxLights; ++i )
+            for( int32 i=realNumAreaApproxLights; i<numAreaApproxLights; ++i )
             {
                 //vec3 areaApproxLights[numLights].position
                 *passBufferPtr++ = 0;

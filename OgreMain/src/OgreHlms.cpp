@@ -107,6 +107,7 @@ namespace Ogre
     const IdString HlmsBaseProp::LightsPoint        = IdString( "hlms_lights_point" );
     const IdString HlmsBaseProp::LightsSpot         = IdString( "hlms_lights_spot" );
     const IdString HlmsBaseProp::LightsAreaApprox   = IdString( "hlms_lights_area_approx" );
+    const IdString HlmsBaseProp::LightsAreaLtc      = IdString( "hlms_lights_area_ltc" );
     const IdString HlmsBaseProp::LightsAreaTexMask  = IdString( "hlms_lights_area_tex_mask" );
     const IdString HlmsBaseProp::LightsAttenuation  = IdString( "hlms_lights_attenuation" );
     const IdString HlmsBaseProp::LightsSpotParams   = IdString( "hlms_lights_spotparams" );
@@ -229,7 +230,8 @@ namespace Ogre
         mNumAreaLightsLimit( 1u ),
         mAreaLightsRoundMultiple( 1u ),
         mAreaLightsGlobalLightListStart( 0u ),
-        mRealNumAreaLights( 0u ),
+        mRealNumAreaApproxLights( 0u ),
+        mRealNumAreaLtcLights( 0u ),
         mListener( &c_defaultListener ),
         mRenderSystem( 0 ),
         mShaderProfile( "unset!" ),
@@ -2465,6 +2467,7 @@ namespace Ogre
                 //Always gather directional & area lights.
                 numLightsPerType[Light::LT_DIRECTIONAL] = 0;
                 numLightsPerType[Light::LT_AREA_APPROX] = 0;
+                numLightsPerType[Light::LT_AREA_LTC] = 0;
                 {
                     mAreaLightsGlobalLightListStart = std::numeric_limits<uint32>::max();
                     const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
@@ -2484,6 +2487,12 @@ namespace Ogre
                             ++numLightsPerType[Light::LT_AREA_APPROX];
                             if( (*itor)->mTextureLightMaskIdx != std::numeric_limits<uint16>::max() )
                                 ++numAreaApproxLightsWithMask;
+                        }
+                        else if( lightType == Light::LT_AREA_LTC )
+                        {
+                            mAreaLightsGlobalLightListStart =
+                                    std::min<uint32>( mAreaLightsGlobalLightListStart, itor - begin );
+                            ++numLightsPerType[Light::LT_AREA_LTC];
                         }
                         ++itor;
                     }
@@ -2529,14 +2538,28 @@ namespace Ogre
             numLightsPerType[Light::LT_SPOTLIGHT]   += numLightsPerType[Light::LT_POINT];
 
             //We need to limit the number of area lights before and after rounding
-            numLightsPerType[Light::LT_AREA_APPROX] =
-                    std::min<uint16>( numLightsPerType[Light::LT_AREA_APPROX], mNumAreaLightsLimit );
-            mRealNumAreaLights = numLightsPerType[Light::LT_AREA_APPROX];
-            numLightsPerType[Light::LT_AREA_APPROX] =
-                    Ogre::alignToNextMultiple( numLightsPerType[Light::LT_AREA_APPROX],
-                                               mAreaLightsRoundMultiple );
-            numLightsPerType[Light::LT_AREA_APPROX] =
-                    std::min<uint16>( numLightsPerType[Light::LT_AREA_APPROX], mNumAreaLightsLimit );
+            {
+                //Approx area lights
+                numLightsPerType[Light::LT_AREA_APPROX] =
+                        std::min<uint16>( numLightsPerType[Light::LT_AREA_APPROX], mNumAreaLightsLimit );
+                mRealNumAreaApproxLights = numLightsPerType[Light::LT_AREA_APPROX];
+                numLightsPerType[Light::LT_AREA_APPROX] =
+                        Ogre::alignToNextMultiple( numLightsPerType[Light::LT_AREA_APPROX],
+                        mAreaLightsRoundMultiple );
+                numLightsPerType[Light::LT_AREA_APPROX] =
+                        std::min<uint16>( numLightsPerType[Light::LT_AREA_APPROX], mNumAreaLightsLimit );
+            }
+            {
+                //LTC area lights
+                numLightsPerType[Light::LT_AREA_LTC] =
+                        std::min<uint16>( numLightsPerType[Light::LT_AREA_LTC], mNumAreaLightsLimit );
+                mRealNumAreaLtcLights = numLightsPerType[Light::LT_AREA_LTC];
+                numLightsPerType[Light::LT_AREA_LTC] =
+                        Ogre::alignToNextMultiple( numLightsPerType[Light::LT_AREA_LTC],
+                        mAreaLightsRoundMultiple );
+                numLightsPerType[Light::LT_AREA_LTC] =
+                        std::min<uint16>( numLightsPerType[Light::LT_AREA_LTC], mNumAreaLightsLimit );
+            }
 
             //The value is cummulative for each type (order: Directional, point, spot)
             setProperty( HlmsBaseProp::LightsDirectional, shadowCasterDirectional );
@@ -2544,6 +2567,7 @@ namespace Ogre
             setProperty( HlmsBaseProp::LightsPoint,       numLightsPerType[Light::LT_POINT] );
             setProperty( HlmsBaseProp::LightsSpot,        numLightsPerType[Light::LT_SPOTLIGHT] );
             setProperty( HlmsBaseProp::LightsAreaApprox,  numLightsPerType[Light::LT_AREA_APPROX] );
+            setProperty( HlmsBaseProp::LightsAreaLtc,     numLightsPerType[Light::LT_AREA_LTC] );
             if( numAreaApproxLightsWithMask > 0 )
                 setProperty( HlmsBaseProp::LightsAreaTexMask, numAreaApproxLightsWithMask );
         }

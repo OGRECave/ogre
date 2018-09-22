@@ -89,6 +89,7 @@ namespace Ogre {
         case LT_SPOTLIGHT:
         case LT_VPL:
         case LT_AREA_APPROX:
+        case LT_AREA_LTC:
             resetAabb();
             updateLightBounds();
             break;
@@ -167,7 +168,7 @@ namespace Ogre {
         if( mRectSize != rectSize )
         {
             mRectSize = rectSize;
-            if( mLightType == LT_AREA_APPROX )
+            if( mLightType == LT_AREA_APPROX || mLightType == LT_AREA_LTC )
                 updateLightBounds();
         }
     }
@@ -229,7 +230,7 @@ namespace Ogre {
                                                        Vector3( 1.0f, 1.0f, 0.5f ) ),
                                                  mObjectData.mIndex );
         }
-        else if( mLightType == LT_AREA_APPROX )
+        else if( mLightType == LT_AREA_APPROX || mLightType == LT_AREA_LTC )
         {
             if( mDoubleSided )
             {
@@ -279,7 +280,7 @@ namespace Ogre {
                 mParentNode->setScale( tanHalfAngleRange, tanHalfAngleRange, mRange );
             }
         }
-        else if( mLightType == LT_AREA_APPROX )
+        else if( mLightType == LT_AREA_APPROX || mLightType == LT_AREA_LTC )
         {
             if( !mAffectParentNode )
             {
@@ -641,6 +642,8 @@ namespace Ogre {
                     light->setType(Light::LT_SPOTLIGHT);
                 else if (ni->second == "area_approx")
                     light->setType(Light::LT_AREA_APPROX);
+                else if (ni->second == "area_ltc")
+                    light->setType(Light::LT_AREA_LTC);
                 else
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Invalid light type '" + ni->second + "'.",

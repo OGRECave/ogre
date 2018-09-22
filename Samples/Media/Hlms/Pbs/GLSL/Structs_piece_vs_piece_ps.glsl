@@ -48,6 +48,14 @@ struct AreaLight
 	vec4 doubleSided;
 };
 
+struct AreaLtcLight
+{
+	vec4 position;		//.w contains the objLightMask
+	vec4 diffuse;		//.w contains attenuation range
+	vec4 specular;		//.w contains doubleSided
+	vec3 points[4];
+};
+
 @insertpiece( DeclCubemapProbeStruct )
 
 //Uniforms that change per pass
@@ -101,6 +109,7 @@ layout_constbuffer(binding = 0) uniform PassBuffer
 	float pssmFadePoint;@end
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end
 	@property( hlms_lights_area_approx )AreaLight areaApproxLights[@value(hlms_lights_area_approx)];@end
+	@property( hlms_lights_area_ltc )AreaLtcLight areaLtcLights[@value(hlms_lights_area_ltc)];@end
 @end @property( hlms_shadowcaster )
 	//Vertex shader
 	@property( exponential_shadow_maps )vec4 viewZRow;@end

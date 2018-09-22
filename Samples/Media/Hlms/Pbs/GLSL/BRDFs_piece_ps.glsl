@@ -236,4 +236,5 @@ vec3 BRDF_IR( vec3 lightDir, vec3 lightDiffuse )
 	@piece( ObjLightMaskCmp )if( (objLightMask & floatBitsToUint( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u )@end
 	@piece( andObjLightMaskCmp )&& ((objLightMask & floatBitsToUint( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u)@end
 	@piece( andObjAreaApproxLightMaskCmp )&& ((objLightMask & floatBitsToUint( passBuf.areaApproxLights[@counter(fineMaskAreaApproxLightIdx)].position.w )) != 0u)@end
+	@piece( andObjAreaLtcLightMaskCmp )&& ((objLightMask & floatBitsToUint( passBuf.areaLtcLights[@counter(fineMaskAreaApproxLightIdx)].position.w )) != 0u)@end
 @end

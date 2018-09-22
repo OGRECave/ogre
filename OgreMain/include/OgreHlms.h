@@ -144,7 +144,8 @@ namespace Ogre
         uint16              mNumAreaLightsLimit;
         uint8               mAreaLightsRoundMultiple;
         uint32              mAreaLightsGlobalLightListStart;
-        uint32              mRealNumAreaLights;
+        uint32              mRealNumAreaApproxLights;
+        uint32              mRealNumAreaLtcLights;
 
         /// Listener for adding extensions. @see setListener.
         /// Pointer is [b]never[/b] null.
@@ -738,6 +739,7 @@ namespace Ogre
         static const IdString LightsPoint;
         static const IdString LightsSpot;
         static const IdString LightsAreaApprox;
+        static const IdString LightsAreaLtc;
         static const IdString LightsAreaTexMask;
         static const IdString LightsAttenuation;
         static const IdString LightsSpotParams;
