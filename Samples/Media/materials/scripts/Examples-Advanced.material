@@ -386,12 +386,10 @@ fragment_program Examples/BumpMapFPSpecular unified
 	delegate Examples/BumpMapFPSpecularCg
 }
 
-// Any number of lights, diffuse
+//![normal_map_multipass]
+// Per-pixel normal mapping. Any number of lights, diffuse only
 material Examples/BumpMapping/MultiLight
 {
-
-	// This is the preferred technique which uses both vertex and
-	// fragment programs, supports coloured lights
 	technique
 	{
 		// Base ambient pass
@@ -399,34 +397,14 @@ material Examples/BumpMapping/MultiLight
 		{
 			// base colours, not needed for rendering, but as information
 			// to lighting pass categorisation routine
-			ambient 1 1 1
-			diffuse 0 0 0 
-			specular 0 0 0 0 
-			// Really basic vertex program
-			// NB we don't use fixed function here because GL does not like
-			// mixing fixed function and vertex programs, depth fighting can
-			// be an issue
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-				param_named_auto ambient ambient_light_colour
-			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-			}
-			
+			diffuse 0 0 0
 		}
 		// Now do the lighting pass
 		// NB we don't do decal texture here because this is repeated per light
 		pass perlight
 		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 0 0 0 
-			
 			// do this for each light
 			iteration once_per_light
-
-		
 			scene_blend add
 
 			// Vertex program reference
@@ -467,31 +445,17 @@ material Examples/BumpMapping/MultiLight
 		// Decal pass
 		pass decal
 		{
-			// base colours, not needed for rendering, but as information
-			// to lighting pass categorisation routine
+			// hint to pass categorisation routine, that this is decal only
 			lighting off
-			// Really basic vertex program
-			// NB we don't use fixed function here because GL does not like
-			// mixing fixed function and vertex programs, depth fighting can
-			// be an issue
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-				param_named ambient float4 1 1 1 1
-			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-			}
 			scene_blend dest_colour zero
 			texture_unit decalmap
 			{
 				texture RustedMetal.jpg 
 			}
-			
 		}
 	}
-
-
 }
+//![normal_map_multipass]
 
 // Any number of lights, diffuse and specular.
 material Examples/BumpMapping/MultiLightSpecular : Examples/BumpMapping/MultiLight
