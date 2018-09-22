@@ -37,7 +37,7 @@ void SGX_ConstructTBNMatrix(in vec3 vNormal,
 				   in vec3 vTangent, 
 				   out mat3 vOut)
 {
-	vec3 vBinormal = cross(vTangent, vNormal);
+	vec3 vBinormal = cross(vNormal, vTangent);
 
 	vOut[0][0] = vTangent.x;
 	vOut[1][0] = vTangent.y;
