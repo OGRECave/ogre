@@ -246,6 +246,7 @@ namespace Ogre
         void reservePoolId( uint32 uniqueSpecialId, TextureMapType mapType, uint32 width, uint32 height,
                             uint16 numSlices, uint8 numMipmaps, PixelFormat pixelFormat,
                             bool isNormalMap, bool hwGammaCorrection );
+        bool hasPoolId( uint32 uniqueSpecialId, TextureMapType mapType ) const;
 
         struct TextureLocation
         {

@@ -124,6 +124,7 @@ float3 qmul( float4 q, float3 v )
 @insertpiece( DeclShadowSamplers )
 @insertpiece( DeclShadowSamplingFuncs )
 
+@insertpiece( DeclAreaLtcTextures )
 @insertpiece( DeclAreaLtcLightFuncs )
 
 @insertpiece( DeclOutputType )

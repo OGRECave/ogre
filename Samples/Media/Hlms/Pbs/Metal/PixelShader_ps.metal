@@ -144,6 +144,7 @@ fragment @insertpiece( output_type ) main_metal
 		, sampler samplerState@n [[sampler(@counter(samplerStateStart))]]@end
 	@insertpiece( DeclDecalsSamplers )
 	@insertpiece( DeclShadowSamplers )
+	@insertpiece( DeclAreaLtcTextures )
 )
 {
 	PS_OUTPUT outPs;

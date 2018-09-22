@@ -54,6 +54,10 @@ Adapted to Ogre by Matias N. Goldberg
 @end
 
 @piece( DeclAreaLtcLightFuncs )
+#define LUT_SIZE  64.0
+#define LUT_SCALE ((LUT_SIZE - 1.0)/LUT_SIZE)
+#define LUT_BIAS  (0.5/LUT_SIZE)
+
 INLINE float3 IntegrateEdgeVec( float3 v1, float3 v2 )
 {
 	float x = dot(v1, v2);

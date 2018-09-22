@@ -147,6 +147,9 @@ namespace Ogre
         LightArray				mAreaLights;
         bool                    mUsingAreaLightMasks;
 
+        bool                    mUsingLtcMatrix;
+        TexturePtr              mLtcMatrixTexture;
+
         TexturePtr              mDecalsTextures[3];
         HlmsSamplerblock const  *mDecalsSamplerblock;
 
@@ -217,6 +220,8 @@ namespace Ogre
 
         virtual void postCommandBufferExecution( CommandBuffer *commandBuffer );
         virtual void frameEnded(void);
+
+        void loadLtcMatrix(void);
 
         /** Fill the provided string and string vector with all the sub-folder needed to instantiate
             an HlmsPbs object with the default distribution of the HlmsResources.

@@ -169,6 +169,7 @@ vec3 qmul( vec4 q, vec3 v )
 @insertpiece( DeclShadowSamplers )
 @insertpiece( DeclShadowSamplingFuncs )
 
+@insertpiece( DeclAreaLtcTextures )
 @insertpiece( DeclAreaLtcLightFuncs )
 
 @insertpiece( custom_ps_functions )

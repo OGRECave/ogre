@@ -9,6 +9,9 @@
 #include "OgreConfigFile.h"
 #include "Compositor/OgreCompositorManager2.h"
 
+#include "OgreHlmsManager.h"
+#include "OgreHlmsPbs.h"
+
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
 #include "System/MainEntryPoints.h"
@@ -51,6 +54,16 @@ namespace Demo
             dataFolder += "2.0/scripts/materials/PbsMaterials";
 
             addResourceLocation( dataFolder, "FileSystem", "General" );
+        }
+
+        virtual void loadResources(void)
+        {
+            GraphicsSystem::loadResources();
+
+            Ogre::Hlms *hlms = mRoot->getHlmsManager()->getHlms( Ogre::HLMS_PBS );
+            OGRE_ASSERT_HIGH( dynamic_cast<Ogre::HlmsPbs*>( hlms ) );
+            Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlms );
+            hlmsPbs->loadLtcMatrix();
         }
 
     public:

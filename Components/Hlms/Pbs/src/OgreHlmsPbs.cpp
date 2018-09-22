@@ -230,6 +230,7 @@ namespace Ogre
 #endif
         mAreaLightMasksSamplerblock( 0 ),
         mUsingAreaLightMasks( false ),
+        mUsingLtcMatrix( false ),
         mDecalsSamplerblock( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
@@ -399,6 +400,9 @@ namespace Ogre
 
             if( mAreaLightMasks && getProperty( HlmsBaseProp::LightsAreaTexMask ) > 0 )
                 psParams->setNamedConstant( "areaLightMasks", texUnit++ );
+
+            if( mLtcMatrixTexture && getProperty( HlmsBaseProp::LightsAreaLtc ) > 0 )
+                psParams->setNamedConstant( "ltcMatrix", texUnit++ );
 
             if( mGridBuffer && getProperty( HlmsBaseProp::EnableDecals ) )
             {
@@ -1881,6 +1885,16 @@ namespace Ogre
             mUsingAreaLightMasks = false;
         }
 
+        if( mLtcMatrixTexture && getProperty( HlmsBaseProp::LightsAreaLtc ) > 0 )
+        {
+            mTexUnitSlotStart += 1;
+            mUsingLtcMatrix = true;
+        }
+        else
+        {
+            mUsingLtcMatrix = false;
+        }
+
         for( size_t i=0; i<3u; ++i )
         {
             if( mDecalsTextures[i] &&
@@ -1992,6 +2006,14 @@ namespace Ogre
                 {
                     *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
                                                                          mAreaLightMasks.get(),
+                                                                         mAreaLightMasksSamplerblock );
+                    ++texUnit;
+                }
+
+                if( mUsingLtcMatrix )
+                {
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
+                                                                         mLtcMatrixTexture.get(),
                                                                          mAreaLightMasksSamplerblock );
                     ++texUnit;
                 }
@@ -2364,6 +2386,32 @@ namespace Ogre
     {
         HlmsBufferManager::frameEnded();
         mCurrentPassBuffer  = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::loadLtcMatrix(void)
+    {
+        HlmsTextureManager *hlmsTextureManager = mHlmsManager->getTextureManager();
+
+        const uint32 poolId = 992044u;
+
+        if( !hlmsTextureManager->hasPoolId( poolId, HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA ) )
+        {
+            hlmsTextureManager->reservePoolId( poolId, HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
+                                               64u, 64u, 2u, 0u, PF_FLOAT16_RGBA, false, false );
+        }
+        HlmsTextureManager::TextureLocation texLocation0, texLocation1;
+        texLocation0 = hlmsTextureManager->createOrRetrieveTexture(
+                           "ltcMatrix0.dds", "ltcMatrix0.dds",
+                           HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA, poolId );
+        texLocation1 = hlmsTextureManager->createOrRetrieveTexture(
+                           "ltcMatrix1.dds", "ltcMatrix1.dds",
+                           HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA, poolId );
+
+        OGRE_ASSERT_LOW( texLocation0.texture == texLocation1.texture );
+        OGRE_ASSERT_LOW( texLocation0.xIdx == 0u );
+        OGRE_ASSERT_LOW( texLocation1.xIdx == 1u );
+
+        mLtcMatrixTexture = texLocation0.texture;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::getDefaultPaths( String &outDataFolderPath, StringVector &outLibraryFoldersPaths )

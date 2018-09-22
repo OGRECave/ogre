@@ -168,6 +168,17 @@ namespace Ogre
         mTextureArrays[mapType].push_back( textureArray );
     }
     //-----------------------------------------------------------------------------------
+    bool HlmsTextureManager::hasPoolId( uint32 uniqueSpecialId, TextureMapType mapType ) const
+    {
+        TextureArrayVec::const_iterator itor = mTextureArrays[mapType].begin();
+        TextureArrayVec::const_iterator end  = mTextureArrays[mapType].end();
+
+        while( itor != end && itor->uniqueSpecialId != uniqueSpecialId )
+            ++itor;
+
+        return itor != end;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsTextureManager::copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx,
                                                  uint8 srcBaseMip, bool isNormalMap )
     {
