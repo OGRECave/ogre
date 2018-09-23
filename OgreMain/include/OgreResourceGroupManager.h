@@ -63,7 +63,7 @@ namespace Ogre {
     */
     /** This class defines an interface which is called back during
         resource group loading to indicate the progress of the load. 
-    @remarks
+
         Resource group loading is in 2 phases - creating resources from 
         declarations (which includes parsing scripts), and loading
         resources. Note that you don't necessarily have to have both; it
@@ -225,13 +225,13 @@ namespace Ogre {
         resources in a group. It also provides facilities to monitor resource
         loading per group (to do progress bars etc), provided the resources 
         that are required are pre-registered.
-    @par
+
         Defining new resource groups,  and declaring the resources you intend to
         use in advance is optional, however it is a very useful feature. In addition, 
         if a ResourceManager supports the definition of resources through scripts, 
         then this is the class which drives the locating of the scripts and telling
         the ResourceManager to parse them. 
-    @par
+
         There are several states that a resource can be in (the concept, not the
         object instance in this case):
         <ol>
@@ -441,7 +441,7 @@ namespace Ogre {
         virtual ~ResourceGroupManager();
 
         /** Create a resource group.
-        @remarks
+
             A resource group allows you to define a set of resources that can 
             be loaded / unloaded as a unit. For example, it might be all the 
             resources used for the level of a game. There is always one predefined
@@ -457,7 +457,7 @@ namespace Ogre {
             #AUTODETECT_RESOURCE_GROUP_NAME; using this
             causes the group name to be derived at load time by searching for 
             the resource in the resource locations of each group in turn.
-        @par
+
             Once you have defined a resource group, resources which will be loaded
             as part of it are defined in one of 3 ways:
             <ol>
