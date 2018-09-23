@@ -143,7 +143,10 @@ ResourceManagers ensure that resources are only loaded once and shared throughou
 
 Most of the time you won’t interact with resource managers directly. Resource managers will be called by other parts of the OGRE system as required, for example when you request for a texture to be added to a Material, the Ogre::TextureManager will be called for you. If you like, you can call the appropriate resource manager directly to preload resources (if for example you want to prevent disk access later on) but most of the time it’s ok to let OGRE decide when to do it.
 
-One thing you will want to do is to tell the resource managers where to look for resources. You do this via Root::getSingleton().addResourceLocation, which actually passes the information on to Ogre::ResourceGroupManager. 
+One thing you will want to do is to tell the resource managers where to look for resources. You do this via Ogre::ResourceGroupManager::addResourceLocation. 
+
+As its name already tells, the ResourceGroupManager keeps resources organized in Groups. These define a set of Resources that shall be loaded / unloaded as a unit. For example, it might be all the resources used for the level of a game.
+By default the "General" group is used, which will only be unloaded on shutdown. To define your own groups use Ogre::ResourceGroupManager::createResourceGroup.
 
 Because there is only ever 1 instance of each resource manager in the engine, if you do want to get a reference to a resource manager use the following syntax:
 
