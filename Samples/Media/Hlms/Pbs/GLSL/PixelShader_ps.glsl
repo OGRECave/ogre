@@ -384,7 +384,7 @@ void main()
 		finalColour += BRDF( passBuf.lights[@n].position.xyz, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular );@end
 @end
 
-@property( hlms_lights_point || hlms_lights_spot || hlms_lights_area_approx )	vec3 lightDir;
+@property( hlms_lights_point || hlms_lights_spot || hlms_lights_area_approx || hlms_lights_area_ltc )	vec3 lightDir;
 	float fDistance;
 	vec3 tmpColour;
 	float spotCosAngle;@end

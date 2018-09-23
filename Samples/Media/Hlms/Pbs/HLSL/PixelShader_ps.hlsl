@@ -366,7 +366,7 @@ float4 diffuseCol;
 		finalColour += BRDF( passBuf.lights[@n].position.xyz, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) );@end
 @end
 
-@property( hlms_lights_point || hlms_lights_spot || hlms_lights_area_approx )	float3 lightDir;
+@property( hlms_lights_point || hlms_lights_spot || hlms_lights_area_approx || hlms_lights_area_ltc )	float3 lightDir;
 	float fDistance;
 	float3 tmpColour;
 	float spotCosAngle;@end
