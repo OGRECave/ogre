@@ -81,6 +81,7 @@ namespace Demo
         AreaApproxLightsGameState *gfxGameState = new AreaApproxLightsGameState(
         "Shows how to setup texture masks for the Area Light fake approximations.\n"
         "using Overlays and the Unlit Hlms implementation.\n"
+        "Also shows photorealistic area lights using Linearly Transformed Cosines (LTC).\n"
         "Please note area lights use regular Forward (not Forward+) and cannot have\n"
         "shadow mapping.\n"
         "This sample depends on the media files:\n"
@@ -105,6 +106,6 @@ namespace Demo
 
     const char* MainEntryPoints::getWindowTitle(void)
     {
-        return "Area Lights (Fake / Approximation)";
+        return "Area Lights (Fake / Approximation & Realistic / LTC)";
     }
 }

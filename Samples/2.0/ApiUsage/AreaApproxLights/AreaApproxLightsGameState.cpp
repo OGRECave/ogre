@@ -156,7 +156,7 @@ namespace Demo
         Ogre::v1::MeshManager::getSingleton().remove( lightPlaneMeshV1 );
     }
     //-----------------------------------------------------------------------------------
-    void AreaApproxLightsGameState::createPlaneForAreaLight( Ogre::Light *light )
+    Ogre::HlmsUnlitDatablock* AreaApproxLightsGameState::createPlaneForAreaLight( Ogre::Light *light )
     {
         Ogre::Root *root = mGraphicsSystem->getRoot();
         Ogre::Hlms *hlmsUnlit = root->getHlmsManager()->getHlms( Ogre::HLMS_UNLIT );
@@ -212,6 +212,8 @@ namespace Demo
         /* For debugging ranges & AABBs
         Ogre::WireAabb *wireAabb = sceneManager->createWireAabb();
         wireAabb->track( light );*/
+
+        return datablock;
     }
     //-----------------------------------------------------------------------------------
     void AreaApproxLightsGameState::createScene01(void)
@@ -382,8 +384,9 @@ namespace Demo
         //Control the diffuse mip (this is the default value)
         light->mTexLightMaskDiffuseMipStart = (Ogre::uint16)(0.95f * 65535);
 
-        createPlaneForAreaLight( light );
+        mAreaLightPlaneDatablocks[0] = createPlaneForAreaLight( light );
 
+        mAreaLights[0] = light;
         mLightNodes[1] = lightNode;
 
         light = sceneManager->createLight();
@@ -400,8 +403,9 @@ namespace Demo
         //When the array index is 0xFFFF, the light won't use a texture.
         light->mTextureLightMaskIdx = std::numeric_limits<Ogre::uint16>::max();
 
-        createPlaneForAreaLight( light );
+        mAreaLightPlaneDatablocks[1] = createPlaneForAreaLight( light );
 
+        mAreaLights[1] = light;
         mLightNodes[2] = lightNode;
 
         mCameraController = new CameraController( mGraphicsSystem, false );
@@ -433,6 +437,9 @@ namespace Demo
         TutorialGameState::generateDebugText( timeSinceLast, outText );
         outText += "\nPress F2 to toggle animation. ";
         outText += mAnimateObjects ? "[On]" : "[Off]";
+        outText += "\nPress F3 to toggle PBR LTC. ";
+        outText += mAreaLights[0]->getType() == Ogre::Light::LT_AREA_APPROX ? "[Approximation]" :
+                                                                              "[LTC]";
     }
     //-----------------------------------------------------------------------------------
     void AreaApproxLightsGameState::keyReleased( const SDL_KeyboardEvent &arg )
@@ -446,6 +453,23 @@ namespace Demo
         if( arg.keysym.sym == SDLK_F2 )
         {
             mAnimateObjects = !mAnimateObjects;
+        }
+        else if( arg.keysym.sym == SDLK_F3 )
+        {
+            for( int i=0; i<2; ++i )
+            {
+                mAreaLights[i]->setType( mAreaLights[i]->getType() == Ogre::Light::LT_AREA_APPROX ?
+                                             Ogre::Light::LT_AREA_LTC : Ogre::Light::LT_AREA_APPROX );
+
+                if( mAreaLights[i]->mTextureLightMaskIdx != std::numeric_limits<Ogre::uint16>::max() )
+                {
+                    Ogre::HlmsUnlitDatablock *datablock = mAreaLightPlaneDatablocks[i];
+                    if( mAreaLights[i]->getType() == Ogre::Light::LT_AREA_APPROX )
+                        datablock->setTexture( 0, mAreaLights[i]->mTextureLightMaskIdx, mAreaMaskTex );
+                    else
+                        datablock->setTexture( 0, 0, Ogre::TexturePtr() );
+                }
+            }
         }
         else
         {
