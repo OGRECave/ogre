@@ -193,18 +193,17 @@ namespace Ogre {
             const String& name, const String& groupName, 
             const String& language, GpuProgramType gptype)
     {
-        ResourcePtr ret = ResourcePtr(
-            getFactory(language)->create(this, name, getNextHandle(), 
-            groupName, false, 0));
-
-        HighLevelGpuProgramPtr prg = static_pointer_cast<HighLevelGpuProgram>(ret);
+        HighLevelGpuProgram* prg =
+            getFactory(language)->create(this, name, getNextHandle(), groupName, false, 0);
         prg->setType(gptype);
         prg->setSyntaxCode(language);
 
+        ResourcePtr ret(prg);
         addImpl(ret);
         // Tell resource group manager
-        ResourceGroupManager::getSingleton()._notifyResourceCreated(ret);
-        return prg;
+        if(ret)
+            ResourceGroupManager::getSingleton()._notifyResourceCreated(ret);
+        return static_pointer_cast<HighLevelGpuProgram>(ret);
     }
     //---------------------------------------------------------------------------
     HighLevelGpuProgramFactory::~HighLevelGpuProgramFactory() 

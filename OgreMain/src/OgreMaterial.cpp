@@ -190,16 +190,11 @@ namespace Ogre {
     MaterialPtr Material::clone(const String& newName, bool changeGroup, 
         const String& newGroup) const
     {
-        MaterialPtr newMat;
-        if (changeGroup)
-        {
-            newMat = MaterialManager::getSingleton().create(newName, newGroup);
-        }
-        else
-        {
-            newMat = MaterialManager::getSingleton().create(newName, mGroup);
-        }
-        
+        MaterialPtr newMat =
+            MaterialManager::getSingleton().create(newName, changeGroup ? newGroup : mGroup);
+
+        if(!newMat) // interception by collision handler
+            return newMat;
 
         // Keep handle (see below, copy overrides everything)
         ResourceHandle newHandle = newMat->getHandle();
@@ -216,9 +211,6 @@ namespace Ogre {
         newMat->mHandle = newHandle;
 
         return newMat;
-
-
-
     }
     //-----------------------------------------------------------------------
     void Material::copyDetailsTo(MaterialPtr& mat) const
