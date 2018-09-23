@@ -112,7 +112,8 @@ namespace Ogre {
 
         addImpl(ret);
         // Tell resource group manager
-        ResourceGroupManager::getSingleton()._notifyResourceCreated(ret);
+        if(ret)
+            ResourceGroupManager::getSingleton()._notifyResourceCreated(ret);
         return ret;
     }
     //---------------------------------------------------------------------------

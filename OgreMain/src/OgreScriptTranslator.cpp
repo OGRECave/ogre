@@ -3778,7 +3778,9 @@ namespace Ogre{
         if(!processed)
         {
             prog = HighLevelGpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(), language, translateIDToGpuProgramType(obj->id)).get();
-            prog->setSourceFile(source);
+
+            if(prog) // duplicate definition resolved by "use previous"
+                prog->setSourceFile(source);
         }
 
         // Check that allocation worked

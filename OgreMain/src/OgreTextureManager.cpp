@@ -155,7 +155,6 @@ namespace Ogre {
         uint fsaa, const String& fsaaHint)
     {
         TexturePtr ret;
-        ret.reset();
 
         // Check for 3D texture support
         const RenderSystemCapabilities* caps =
@@ -169,6 +168,10 @@ namespace Ogre {
             usage = (usage & ~(int)TU_STATIC) | (int)TU_DYNAMIC;
         }
         ret = create(name, group, true, loader);
+
+        if(!ret)
+            return ret;
+
         ret->setTextureType(texType);
         ret->setWidth(width);
         ret->setHeight(height);
