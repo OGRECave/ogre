@@ -337,7 +337,7 @@ namespace Ogre {
         {
             // Shared vertex / fragment textures or no vertex texture support
             // Bind texture (may be blank)
-            _setTexture(texUnit, true, tex);
+            _setTexture(texUnit, true, tl.isTextureLoadFailing() ? sNullTexPtr : tex);
         }
 
         // Set texture coordinate set
