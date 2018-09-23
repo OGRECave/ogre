@@ -54,9 +54,9 @@
 							  dot( areaLightBitangent, nNormal ) ) * 3.75 * invHalfRectSize.xy;
 		lightUV.xy = clamp( lightUV.xy, -0.5f, 0.5f );
 		lightUVForTex = clamp( lightUVForTex.xy, -0.5f, 0.5f );
-		float booster = 1.0f - smoothstep( 0.2f, 1.9f, max( abs( lightUV.x ), abs( lightUV.y ) ) );
-		booster = 1.0f + booster * 2.25f;
-		booster = 1.0f;
+//		float booster = 1.0f - smoothstep( 0.2f, 1.9f, max( abs( lightUV.x ), abs( lightUV.y ) ) );
+//		booster = 1.0f + booster * 2.25f;
+		float booster = lerp( 1.0f, 4.0f, ROUGHNESS );
 
 	@property( @n >= hlms_lights_area_tex_mask || !hlms_lights_area_tex_colour )
 		float diffuseMask = 1.0f;
@@ -127,7 +127,7 @@
 		}
 
 		lightDir *= 1.0 / fDistance;
-		float fAreaW = dot( lightDir, -passBuf.areaApproxLights[@n].direction.xyz ) * 0.5f + 0.5f;
+		//float fAreaW = dot( lightDir, -passBuf.areaApproxLights[@n].direction.xyz ) * 0.5f + 0.5f;
 		//lightDir = (-passBuf.areaApproxLights[@n].direction.xyz + lightDir) * 0.50f;
 		//lightDir = lerp( lightDir2, lightDir, fAreaW );
 		float globalDot = saturate( dot( -lightDir, passBuf.areaApproxLights[@n].direction.xyz ) );

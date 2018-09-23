@@ -15,6 +15,8 @@ namespace Demo
         Ogre::SceneNode     *mSceneNode[16];
 
         Ogre::SceneNode     *mLightNodes[3];
+        Ogre::Light         *mAreaLights[2];
+        Ogre::HlmsUnlitDatablock *mAreaLightPlaneDatablocks[2];
 
         bool                mAnimateObjects;
 
@@ -22,7 +24,7 @@ namespace Demo
 
         void createAreaMask(void);
         void createAreaPlaneMesh(void);
-        void createPlaneForAreaLight( Ogre::Light *light );
+        Ogre::HlmsUnlitDatablock* createPlaneForAreaLight( Ogre::Light *light );
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 

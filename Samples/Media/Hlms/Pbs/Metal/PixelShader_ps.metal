@@ -23,7 +23,7 @@ struct PS_INPUT
 	@insertpiece( Common_Matrix_Conversions )
 @end
 
-@property( !roughness_map )#define ROUGHNESS material.kS.w@end
+@property( !roughness_map && !hlms_decals_diffuse )#define ROUGHNESS material.kS.w@end
 
 @property( normal_map )
 @property( hlms_qtangent )
@@ -75,6 +75,8 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 
 @insertpiece( DeclShadowMapMacros )
 @insertpiece( DeclShadowSamplingFuncs )
+
+@insertpiece( DeclAreaLtcLightFuncs )
 
 constexpr sampler shadowSampler = sampler( coord::normalized,
 										   address::clamp_to_edge,
@@ -140,7 +142,9 @@ fragment @insertpiece( output_type ) main_metal
 		, sampler envMapSamplerState [[sampler(@value(envMapReg))]]@end
 	@foreach( numSamplerStates, n )
 		, sampler samplerState@n [[sampler(@counter(samplerStateStart))]]@end
+	@insertpiece( DeclDecalsSamplers )
 	@insertpiece( DeclShadowSamplers )
+	@insertpiece( DeclAreaLtcTextures )
 )
 {
 	PS_OUTPUT outPs;
@@ -162,9 +166,9 @@ fragment @insertpiece( output_type ) main_metal
 @property( use_envprobe_map )	ushort envMapIdx;@end
 
 float4 diffuseCol;
-@property( specular_map && !metallic_workflow && !fresnel_workflow )float3 specularCol;@end
-@property( metallic_workflow || (specular_map && fresnel_workflow) )@insertpiece( FresnelType ) F0;@end
-@property( roughness_map )float ROUGHNESS;@end
+@property( (specular_map && !metallic_workflow && !fresnel_workflow) || hlms_decals_diffuse )float3 specularCol;@end
+@property( metallic_workflow || (specular_map && fresnel_workflow) || hlms_decals_diffuse )@insertpiece( FresnelType ) F0;@end
+@property( roughness_map || hlms_decals_diffuse )float ROUGHNESS;@end
 
 @property( hlms_normal || hlms_qtangent )	float3 nNormal;@end
 
@@ -239,6 +243,11 @@ float4 diffuseCol;
 	@end
 @end
 
+	@insertpiece( SampleSpecularMap )
+	@insertpiece( SampleRoughnessMap )
+
+	@insertpiece( forwardPlusDoDecals )
+
 @property( !hlms_use_prepass )
 	@property( !normal_map )
 		// Geometric normal
@@ -283,14 +292,14 @@ float4 diffuseCol;
 		nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
 
 	@insertpiece( custom_ps_posSampleNormal )
+
+	@insertpiece( forwardPlusApplyDecalsNormal )
 	
 	@property( normal_map )
 		nNormal = normalize( TBN * nNormal );
 	@end
 
 	@insertpiece( DoDirectionalShadowMaps )
-
-	@insertpiece( SampleRoughnessMap )
 
 @end @property( hlms_use_prepass )
 	ushort2 iFragCoord = ushort2( inPs.gl_FragCoord.xy );
@@ -311,8 +320,6 @@ float4 diffuseCol;
 		ROUGHNESS = shadowRoughness.y * 0.98 + 0.02; /// ROUGHNESS is a constant otherwise
 	@end
 @end
-
-	@insertpiece( SampleSpecularMap )
 
 @property( !hlms_prepass )
 	//Everything's in Camera space
@@ -342,7 +349,7 @@ float4 diffuseCol;
 		finalColour += BRDF( passBuf.lights[@n].position.xyz, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) );@end
 @end
 
-@property( hlms_lights_point || hlms_lights_spot || hlms_lights_area_approx )	float3 lightDir;
+@property( hlms_lights_point || hlms_lights_spot || hlms_lights_area_approx || hlms_lights_area_ltc )	float3 lightDir;
 	float fDistance;
 	float3 tmpColour;
 	float spotCosAngle;@end
@@ -386,6 +393,7 @@ float4 diffuseCol;
 
 	//Custom 2D shape lights
 	@insertpiece( DoAreaApproxLights )
+	@insertpiece( DoAreaLtcLights )
 
 @insertpiece( forward3dLighting )
 @insertpiece( applyIrradianceVolumes )

@@ -92,6 +92,11 @@ namespace Ogre {
             /// Non-PBR version of Area lights. Not an accurate approximation, but
             /// they're flexible, useful & cheap. They aren't physically correct at all.
             LT_AREA_APPROX = 4,
+            /// PBR version of Area lights using Linearly Transformed Cosines as researched
+            /// by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt.
+            /// It's slower than LT_AREA_APPROX, and does not currently support textures.
+            /// However it's physically accurate.
+            LT_AREA_LTC = 5,
 
             NUM_LIGHT_TYPES
         };

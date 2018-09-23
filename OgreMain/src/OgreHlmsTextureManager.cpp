@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
 #include "OgreLogManager.h"
+#include "OgreLwString.h"
 #include "OgreProfiler.h"
 
 namespace Ogre
@@ -144,6 +145,38 @@ namespace Ogre
                 pixelBufferBuf->unlock();
             }
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsTextureManager::reservePoolId( uint32 uniqueSpecialId, TextureMapType mapType,
+                                            uint32 width, uint32 height,
+                                            uint16 numSlices, uint8 numMipmaps, PixelFormat pixelFormat,
+                                            bool isNormalMap, bool hwGammaCorrection )
+    {
+        TextureArray textureArray( 1u, numSlices, true,
+                                   isNormalMap, uniqueSpecialId );
+
+        textureArray.texture = TextureManager::getSingleton().createManual(
+                                    "ReservedPoolHlmsTexture/" +
+                                    StringConverter::toString( mTextureId++ ),
+                                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                    TEX_TYPE_2D_ARRAY, width, height, numSlices, numMipmaps,
+                                    pixelFormat,
+                                    TU_DEFAULT & ~TU_AUTOMIPMAP, 0,
+                                    hwGammaCorrection,
+                                    0, BLANKSTRING, false );
+
+        mTextureArrays[mapType].push_back( textureArray );
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsTextureManager::hasPoolId( uint32 uniqueSpecialId, TextureMapType mapType ) const
+    {
+        TextureArrayVec::const_iterator itor = mTextureArrays[mapType].begin();
+        TextureArrayVec::const_iterator end  = mTextureArrays[mapType].end();
+
+        while( itor != end && itor->uniqueSpecialId != uniqueSpecialId )
+            ++itor;
+
+        return itor != end;
     }
     //-----------------------------------------------------------------------------------
     void HlmsTextureManager::copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx,
@@ -256,11 +289,9 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureArrayVec::iterator HlmsTextureManager::findSuitableArray(
-                                                                            TextureMapType mapType,
-                                                                            uint32 width, uint32 height,
-                                                                            uint32 depth, uint32 faces,
-                                                                            PixelFormat format,
-                                                                            uint8 numMipmaps )
+            TextureMapType mapType, uint32 width, uint32 height,
+            uint32 depth, uint32 faces, PixelFormat format, uint8 numMipmaps,
+            uint32 uniqueSpecialId, const String &textureName )
     {
         TextureArrayVec::iterator retVal = mTextureArrays[mapType].end();
 
@@ -284,7 +315,65 @@ namespace Ogre
                 textureArray.texture->getFormat() == format &&
                 textureArray.texture->getNumMipmaps() == numMipmaps )
             {
-                retVal = itor;
+                if( textureArray.uniqueSpecialId == uniqueSpecialId )
+                    retVal = itor;
+            }
+            else
+            {
+                if( textureArray.uniqueSpecialId && textureArray.uniqueSpecialId == uniqueSpecialId )
+                {
+                    LogManager::getSingleton().logMessage(
+                                "Texture " + textureName + " was requested with special ID, but it "
+                                "cannot be assigned to the array of the special ID! Reason:",
+                            LML_CRITICAL );
+
+                    char tmpBuffer[512];
+                    LwString errorMsg( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+
+                    if( textureArray.activeEntries >= textureArray.maxTextures )
+                    {
+                        errorMsg.clear();
+                        errorMsg.a( "Exceeded entry limit: ",
+                                    textureArray.activeEntries, "/", textureArray.maxTextures );
+                        LogManager::getSingleton().logMessage( errorMsg.c_str(), LML_CRITICAL );
+                    }
+
+                    if( textureArray.texture->getFormat() != format )
+                    {
+                        errorMsg.clear();
+                        errorMsg.a( "Different format. Requested: ",
+                                    PixelUtil::getFormatName( format ).c_str(), "; should've been: ",
+                                    PixelUtil::getFormatName(
+                                        textureArray.texture->getFormat() ).c_str() );
+                        LogManager::getSingleton().logMessage( errorMsg.c_str(), LML_CRITICAL );
+                    }
+
+                    if( textureArray.texture->getNumMipmaps() != numMipmaps )
+                    {
+                        errorMsg.clear();
+                        errorMsg.a( "Different number of mipmaps. Requested: ",
+                                    numMipmaps, "; should've been: ",
+                                    textureArray.texture->getNumMipmaps() );
+                        LogManager::getSingleton().logMessage( errorMsg.c_str(), LML_CRITICAL );
+                    }
+
+                    if( arrayTexWidth != width ||
+                        arrayTexHeight != height ||
+                        (textureArray.texture->getTextureType() == TEX_TYPE_3D &&
+                         textureArray.texture->getDepth() != depth)  ||
+                        textureArray.texture->getNumFaces() != faces )
+                    {
+                        errorMsg.clear();
+                        errorMsg.a( "Different resolution. Requested: ",
+                                    width, "x", height, "x", depth );
+                        errorMsg.a( "x", faces );
+                        errorMsg.a( "\nvs: ",
+                                    arrayTexWidth, "x", arrayTexHeight, "x",
+                                    textureArray.texture->getDepth() );
+                        errorMsg.a( "x", static_cast<uint32>( textureArray.texture->getNumFaces() ) );
+                        LogManager::getSingleton().logMessage( errorMsg.c_str(), LML_CRITICAL );
+                    }
+                }
             }
 
             ++itor;
@@ -304,6 +393,7 @@ namespace Ogre
                                                                         const String &aliasName,
                                                                         const String &texName,
                                                                         TextureMapType mapType,
+                                                                        uint32 uniqueSpecialId,
                                                                         Image *imgSource )
     {
         OgreProfileExhaustive( "HlmsTextureManager::createOrRetrieveTexture" );
@@ -315,9 +405,11 @@ namespace Ogre
 
         assert( !aliasName.empty() && "Alias name can't be left empty!" );
 
+        const bool missingFromCache = it == mEntries.end() || it->name != searchName.name;
+
         try
         {
-        if( it == mEntries.end() || it->name != searchName.name )
+        if( missingFromCache )
         {
             LogManager::getSingleton().logMessage( "Texture: loading " + texName + " as " + aliasName );
 
@@ -496,7 +588,8 @@ namespace Ogre
             //Find an array where we can put it. If there is none, we'll have have to create a new one
             TextureArrayVec::iterator dstArrayIt = findSuitableArray( mapType, width, height, depth,
                                                                       faces, imageFormat,
-                                                                      numMipmaps - baseMipLevel );
+                                                                      numMipmaps - baseMipLevel,
+                                                                      uniqueSpecialId, aliasName );
 
             if( dstArrayIt == mTextureArrays[mapType].end() )
             {
@@ -574,7 +667,8 @@ namespace Ogre
                 }
 
                 TextureArray textureArray( limit, limitSquared, true,
-                                           mDefaultTextureParameters[mapType].isNormalMap );
+                                           mDefaultTextureParameters[mapType].isNormalMap,
+                                           uniqueSpecialId );
 
                 textureArray.texture = TextureManager::getSingleton().createManual(
                                             "HlmsTextureManager/" +
@@ -627,6 +721,17 @@ namespace Ogre
         }
 
         const TextureArray &texArray = mTextureArrays[it->mapType][it->arrayIdx];
+
+        if( !missingFromCache && uniqueSpecialId && uniqueSpecialId == texArray.uniqueSpecialId )
+        {
+            LogManager::getSingleton().logMessage(
+                        "Texture " + aliasName + " was requested with special ID, but it "
+                        "was already loaded in a pool with a different ID! You should ensure the "
+                        "texture is first loaded with the desired pool ID, or you can use a different "
+                        "alias name to clone it and have it in two different pools",
+                    LML_CRITICAL );
+        }
+
         retVal.texture = texArray.texture;
 
         if( !texArray.texture->isTextureTypeArray() )
@@ -874,7 +979,7 @@ namespace Ogre
                         PixelUtil::bulkPixelConversion( image.getPixelBox( 0 ), cubeMap.getPixelBox( i ) );
                     }
 
-                    TextureArray textureArray( 1, 1, false, false );
+                    TextureArray textureArray( 1, 1, false, false, 0 );
 
                     textureArray.texture = TextureManager::getSingleton().createManual(
                                                 "HlmsTextureManager/" +

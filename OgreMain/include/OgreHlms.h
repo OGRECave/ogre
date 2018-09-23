@@ -144,7 +144,8 @@ namespace Ogre
         uint16              mNumAreaLightsLimit;
         uint8               mAreaLightsRoundMultiple;
         uint32              mAreaLightsGlobalLightListStart;
-        uint32              mRealNumAreaLights;
+        uint32              mRealNumAreaApproxLights;
+        uint32              mRealNumAreaLtcLights;
 
         /// Listener for adding extensions. @see setListener.
         /// Pointer is [b]never[/b] null.
@@ -310,6 +311,10 @@ namespace Ogre
                                                          const HlmsCache &passCache,
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable );
+
+        /// This function gets called right before starting parsing all templates, and after
+        /// the renderable properties have been merged with the pass properties.
+        virtual void notifyPropertiesMergedPreGenerationStep(void);
 
         virtual HlmsDatablock* createDatablockImpl( IdString datablockName,
                                                     const HlmsMacroblock *macroblock,
@@ -734,6 +739,7 @@ namespace Ogre
         static const IdString LightsPoint;
         static const IdString LightsSpot;
         static const IdString LightsAreaApprox;
+        static const IdString LightsAreaLtc;
         static const IdString LightsAreaTexMask;
         static const IdString LightsAttenuation;
         static const IdString LightsSpotParams;
@@ -769,6 +775,11 @@ namespace Ogre
         static const IdString FwdClusteredWidthxHeight;
         static const IdString FwdClusteredWidth;
         static const IdString FwdClusteredLightsPerCell;
+        static const IdString EnableDecals;
+        static const IdString FwdPlusDecalsSlotOffset;
+        static const IdString DecalsDiffuse;
+        static const IdString DecalsNormals;
+        static const IdString DecalsEmissive;
 
         static const IdString Forward3D;
         static const IdString ForwardClustered;

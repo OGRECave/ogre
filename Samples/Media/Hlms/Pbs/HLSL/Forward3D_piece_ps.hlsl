@@ -2,7 +2,23 @@
 @property( hlms_forwardplus_fine_light_mask )
 	@piece( andObjLightMaskFwdPlusCmp )&& ((objLightMask & asuint( lightDiffuse.w )) != 0u)@end
 @end
-@piece( forward3dLighting )
+
+@property( hlms_enable_decals )
+@piece( DeclDecalsSamplers )
+	SamplerState decalsSampler : register(s@value(decalsTexUnit));
+	@property( hlms_decals_diffuse )Texture2DArray decalsDiffuseTex : register(t@counter(decalsTexUnit));@end
+	@property( hlms_decals_normals )Texture2DArray<float2> decalsNormalsTex : register(t@counter(decalsTexUnit));@end
+	@property( hlms_decals_diffuse == hlms_decals_emissive )
+		#define decalsEmissiveTex decalsDiffuseTex
+	@end
+	@property( hlms_decals_emissive && hlms_decals_diffuse != hlms_decals_emissive )
+		Texture2DArray decalsEmissiveTex : register(t@counter(decalsTexUnit));
+	@end
+@end
+@end
+
+/// The header is automatically inserted. Whichever subsystem needs it first, will call it
+@piece( forward3dHeader )
 	@property( hlms_forwardplus_covers_entire_target )
 		#define FWDPLUS_APPLY_OFFSET_Y(v) (v)
 		#define FWDPLUS_APPLY_OFFSET_X(v) (v)
@@ -72,7 +88,20 @@
 		sampleOffset *= @value( fwd_clustered_lights_per_cell )u;
 	@end
 
-	uint numLightsInGrid = f3dGrid.Load( int(sampleOffset) ).x;
+	@property( hlms_forwardplus_debug )uint totalNumLightsInGrid = 0u;@end
+@end
+
+@piece( forward3dLighting )
+	@property( !hlms_enable_decals )
+		@insertpiece( forward3dHeader )
+		uint numLightsInGrid;
+	@end
+
+	@property( hlms_decals_emissive )
+		finalColour += finalDecalEmissive;
+	@end
+
+	numLightsInGrid = f3dGrid.Load( int(sampleOffset) ).x;
 
 	@property( hlms_forwardplus_debug )uint totalNumLightsInGrid = numLightsInGrid;@end
 

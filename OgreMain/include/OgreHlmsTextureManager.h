@@ -165,9 +165,13 @@ namespace Ogre
             uint16      activeEntries;
             NamePairVec entries;
 
-            TextureArray( uint16 _sqrtMaxTextures, uint16 _maxTextures, bool _automatic, bool _isNormalMap ) :
+            uint32      uniqueSpecialId;
+
+            TextureArray( uint16 _sqrtMaxTextures, uint16 _maxTextures, bool _automatic, bool _isNormalMap,
+                          uint32 _uniqueSpecialId ) :
                 sqrtMaxTextures( _sqrtMaxTextures ), maxTextures( _maxTextures ),
-                automatic( _automatic ), isNormalMap( _isNormalMap ), activeEntries( 0 )
+                automatic( _automatic ), isNormalMap( _isNormalMap ), activeEntries( 0 ),
+                uniqueSpecialId( _uniqueSpecialId )
             {
                 entries.resize( maxTextures );
             }
@@ -216,9 +220,11 @@ namespace Ogre
         static void copy3DTexture( const Image &srcImage, TexturePtr dst,
                                    uint16 sliceStart, uint16 sliceEnd, uint8 srcBaseMip );
 
+        /// The parameter textureName is for logging purposes
         TextureArrayVec::iterator findSuitableArray( TextureMapType mapType, uint32 width, uint32 height,
                                                      uint32 depth, uint32 faces, PixelFormat format,
-                                                     uint8 numMipmaps );
+                                                     uint8 numMipmaps, uint32 uniqueSpecialId,
+                                                     const String &textureName );
 
         /// Looks for the first image it can successfully load from the pack, and extracts its parameters.
         /// Returns false if failed to retrieve parameters.
@@ -236,6 +242,11 @@ namespace Ogre
             Some settings in mDefaultTextureParameters will be reset
         */
         void _changeRenderSystem( RenderSystem *newRs );
+
+        void reservePoolId( uint32 uniqueSpecialId, TextureMapType mapType, uint32 width, uint32 height,
+                            uint16 numSlices, uint8 numMipmaps, PixelFormat pixelFormat,
+                            bool isNormalMap, bool hwGammaCorrection );
+        bool hasPoolId( uint32 uniqueSpecialId, TextureMapType mapType ) const;
 
         struct TextureLocation
         {
@@ -270,6 +281,14 @@ namespace Ogre
             call with aliasName as "Tree Wood", and the next calls to
             createOrRetrieveTexture( "Tree Wood", mapType ) will refer to this texture
             NOTE: aliasName cannot be blank/empty.
+        @param uniqueSpecialId
+            Textures loaded with a value uniqueSpecialId != 0 will tried to be pooled together
+            inside the same pool that has the same uniqueSpecialId.
+            If we have to create more than one pool, you will get log warnings.
+            This pool ID is intended for Decals and Area Lights as Ogre implementations only allow
+            one global texture per pass; thus all decal/area light texture must have the same
+            resolution, pixel format and live in the same array texture.
+            See HlmsTextureManager::reservePoolId
         @param imgSource
             When null, texture is loaded from texName as a file. When not null, texture is
             loaded from imgSource and texName is ignored (still used in logging messages though).
@@ -279,6 +298,7 @@ namespace Ogre
         TextureLocation createOrRetrieveTexture( const String &aliasName,
                                                  const String &texName,
                                                  TextureMapType mapType,
+                                                 uint32 uniqueSpecialId = 0,
                                                  Image *imgSource = 0 );
 
         /// Destroys a texture. If the array has multiple entries, the entry for this texture is

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 #include "OgreViewport.h"
 #include "OgreCamera.h"
+#include "OgreDecal.h"
 
 #include "Math/Array/OgreArraySphere.h"
 #include "Math/Array/OgreBooleanMask.h"
@@ -51,21 +52,25 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
-    const size_t c_numBytesPerLight = 6 * 4 * 4;
+    static const size_t c_reservedLightSlotsPerCell     = 3u;
+    static const size_t c_reservedDecalsSlotsPerCell    = 1u;
 
     ForwardClustered::ForwardClustered( uint32 width, uint32 height,
                                         uint32 numSlices, uint32 lightsPerCell,
+                                        uint32 decalsPerCell,
                                         float minDistance, float maxDistance,
                                         SceneManager *sceneManager ) :
-        ForwardPlusBase( sceneManager ),
+        ForwardPlusBase( sceneManager, decalsPerCell > 0u ),
         mWidth( width ),
         mHeight( height ),
         mNumSlices( numSlices ),
         /*mWidth( 1 ),
         mHeight( 1 ),
         mNumSlices( 2 ),*/
-        mLightsPerCell( lightsPerCell + 3u ),
+        mReservedSlotsPerCell( ((lightsPerCell > 0u) ? 3u : 0u) + ((decalsPerCell > 0u) ? 1u : 0u) ),
+        mObjsPerCell( lightsPerCell + decalsPerCell + mReservedSlotsPerCell ),
+        mLightsPerCell( lightsPerCell ),
+        mDecalsPerCell( decalsPerCell ),
         mGridBuffer( 0 ),
         mCurrentCamera( 0 ),
         mMinDistance( minDistance ),
@@ -310,12 +315,11 @@ namespace Ogre
 
                             //assert( numLightsInCell < mLightCountInCell.end() );
 
-                            //mLightsPerCell - 3 because three slots is reserved
-                            //for the number of lights in cell per type
-                            if( numLightsInCell->lightCount[0] < mLightsPerCell - 3u )
+                            if( numLightsInCell->lightCount[0] < mLightsPerCell )
                             {
-                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mLightsPerCell +
-                                        (numLightsInCell->lightCount[0] + 3u);
+                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
+                                                                   (numLightsInCell->lightCount[0] +
+                                                                   c_reservedLightSlotsPerCell);
                                 *cellElem = i * 6;
                                 ++numLightsInCell->lightCount[0];
                                 ++numLightsInCell->lightCount[lightType];
@@ -451,12 +455,11 @@ namespace Ogre
 
                             //assert( numLightsInCell < mLightCountInCell.end() );
 
-                            //mLightsPerCell - 3 because three slots is reserved
-                            //for the number of lights in cell per type
-                            if( numLightsInCell->lightCount[0] < mLightsPerCell - 3u )
+                            if( numLightsInCell->lightCount[0] < mLightsPerCell )
                             {
-                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mLightsPerCell +
-                                        (numLightsInCell->lightCount[0] + 3u);
+                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
+                                                                   (numLightsInCell->lightCount[0] +
+                                                                   c_reservedLightSlotsPerCell);
                                 *cellElem = i * 6;
                                 ++numLightsInCell->lightCount[0];
                                 ++numLightsInCell->lightCount[lightType];
@@ -469,6 +472,144 @@ namespace Ogre
             ++itLight;
         }
 
+        uint16 numDecals = static_cast<uint16>( alignToNextMultiple( numLights * 6u, 4u ) >> 2u );
+
+        const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
+        const size_t actualMaxDecalRq = std::min( MaxDecalRq, objsPerRqInThread0.size() );
+        for( size_t rqId=MinDecalRq; rqId<=actualMaxDecalRq; ++rqId )
+        {
+            MovableObject::MovableObjectArray::const_iterator itor = objsPerRqInThread0[rqId].begin();
+            MovableObject::MovableObjectArray::const_iterator end  = objsPerRqInThread0[rqId].end();
+
+            while( itor != end )
+            {
+                MovableObject *decal = *itor;
+
+                Node *node = decal->getParentNode();
+
+                //Aabb localAabbScalar = decal->getLocalAabb();
+                Aabb localAabbScalar;
+                localAabbScalar.mCenter    = node->_getDerivedPosition();
+                localAabbScalar.mHalfSize  = node->_getDerivedScale() * 0.5f;
+
+                ArrayQuaternion objOrientation;
+                objOrientation.setAll( node->_getDerivedOrientation() );
+
+                ArrayAabb localObb;
+                localObb.setAll( localAabbScalar );
+
+                ArrayVector3 orientedHalfSize = objOrientation * localObb.mHalfSize;
+
+                ArrayPlane obbPlane[6];
+                obbPlane[0].normal= objOrientation.xAxis();
+                obbPlane[0].negD  = obbPlane[0].normal.dotProduct( localObb.mCenter - orientedHalfSize );
+                obbPlane[1].normal= -obbPlane[0].normal;
+                obbPlane[1].negD  = obbPlane[1].normal.dotProduct( localObb.mCenter + orientedHalfSize );
+                obbPlane[2].normal= objOrientation.yAxis();
+                obbPlane[2].negD  = obbPlane[2].normal.dotProduct( localObb.mCenter - orientedHalfSize );
+                obbPlane[3].normal= -obbPlane[2].normal;
+                obbPlane[3].negD  = obbPlane[3].normal.dotProduct( localObb.mCenter + orientedHalfSize );
+                obbPlane[4].normal= objOrientation.zAxis();
+                obbPlane[4].negD  = obbPlane[4].normal.dotProduct( localObb.mCenter - orientedHalfSize );
+                obbPlane[5].normal= -obbPlane[4].normal;
+                obbPlane[5].negD  = obbPlane[5].normal.dotProduct( localObb.mCenter + orientedHalfSize );
+
+                objOrientation = objOrientation.Inverse();
+
+                for( size_t j=0; j<numPackedFrustumsPerSlice; ++j )
+                {
+                    const FrustumRegion * RESTRICT_ALIAS frustumRegion =
+                            mFrustumRegions.get() + frustumStartIdx + j;
+
+                    ArrayReal dotResult;
+                    ArrayMaskR mask;
+                    ArrayVector3 newPlaneNormal;
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[0].normal;
+                    dotResult = frustumRegion->plane[0].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::CompareGreater( dotResult, frustumRegion->plane[0].negD );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[1].normal;
+                    dotResult = frustumRegion->plane[1].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[1].negD ) );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[2].normal;
+                    dotResult = frustumRegion->plane[2].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[2].negD ) );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[3].normal;
+                    dotResult = frustumRegion->plane[3].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[3].negD ) );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[4].normal;
+                    dotResult = frustumRegion->plane[4].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[4].negD ) );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[5].normal;
+                    dotResult = frustumRegion->plane[5].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[5].negD ) );
+
+                    if( BooleanMask4::getScalarMask( mask ) != 0 )
+                    {
+                        //Test all 8 frustum corners against each of the 6 obb planes.
+                        for( int k=0; k<6; ++k )
+                        {
+                            ArrayMaskR vertexMask = ARRAY_MASK_ZERO;
+
+                            for( int l=0; l<8; ++l )
+                            {
+                                dotResult = obbPlane[k].normal.dotProduct(
+                                                frustumRegion->corners[l] ) - obbPlane[k].negD;
+                                vertexMask = Mathlib::Or( vertexMask,
+                                                          Mathlib::CompareGreater( dotResult,
+                                                                                   ARRAY_REAL_ZERO ) );
+                            }
+
+                            mask = Mathlib::And( mask, vertexMask );
+                        }
+                    }
+
+                    const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
+
+                    for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+                    {
+                        if( IS_BIT_SET( k, scalarMask ) )
+                        {
+                            const size_t idx = (frustumStartIdx + j) * ARRAY_PACKED_REALS + k;
+                            FastArray<LightCount>::iterator numLightsInCell =
+                                    mLightCountInCell.begin() + idx;
+
+                            //assert( numLightsInCell < mLightCountInCell.end() );
+
+                            if( numLightsInCell->decalCount < mDecalsPerCell )
+                            {
+                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
+                                                                   mLightsPerCell +
+                                                                   c_reservedLightSlotsPerCell +
+                                                                   c_reservedDecalsSlotsPerCell;
+                                *cellElem = numDecals * 4u;
+                                ++numLightsInCell->decalCount;
+                            }
+                        }
+                    }
+                }
+
+                ++numDecals;
+                ++itor;
+            }
+        }
+
         {
             //Now write all the light counts
             FastArray<LightCount>::const_iterator itor = mLightCountInCell.begin() +
@@ -476,21 +617,87 @@ namespace Ogre
             FastArray<LightCount>::const_iterator end  = mLightCountInCell.begin() +
                     (frustumStartIdx + numPackedFrustumsPerSlice) * ARRAY_PACKED_REALS;
 
-            const size_t cellSize = mLightsPerCell;
+            const size_t cellSize = mObjsPerCell;
+            const bool hasLights = mLightsPerCell > 0u;
+            const bool hasDecals = mDecalsEnabled;
+            const size_t decalOffsetStart = mLightsPerCell + c_reservedLightSlotsPerCell;
             size_t gridIdx = frustumStartIdx * ARRAY_PACKED_REALS * cellSize;
 
             while( itor != end )
             {
                 uint32 accumLight = itor->lightCount[1];
-                mGridBuffer[gridIdx+0u] = static_cast<uint16>( accumLight );
-                accumLight += itor->lightCount[2];
-                mGridBuffer[gridIdx+1u] = static_cast<uint16>( accumLight );
-                accumLight += itor->lightCount[3];
-                mGridBuffer[gridIdx+2u] = static_cast<uint16>( accumLight );
+                if( hasLights )
+                {
+                    mGridBuffer[gridIdx+0u] = static_cast<uint16>( accumLight );
+                    accumLight += itor->lightCount[2];
+                    mGridBuffer[gridIdx+1u] = static_cast<uint16>( accumLight );
+                    accumLight += itor->lightCount[3];
+                    mGridBuffer[gridIdx+2u] = static_cast<uint16>( accumLight );
+                }
+                if( hasDecals )
+                    mGridBuffer[gridIdx+decalOffsetStart+0u] = static_cast<uint16>( itor->decalCount );
                 gridIdx += cellSize;
                 ++itor;
             }
         }
+    }
+    //-----------------------------------------------------------------------------------
+    inline bool OrderObjsByDistanceToCamera( const MovableObject *left, const MovableObject *right )
+    {
+        return left->getCachedDistanceToCameraAsReal() < right->getCachedDistanceToCameraAsReal();
+    }
+
+    void ForwardClustered::collectObjs( const Camera *camera, size_t &outNumDecals )
+    {
+        size_t numDecals = 0;
+
+        const bool didCollect = mSceneManager->_collectForwardPlusObjects( camera );
+
+        VisibleObjectsPerThreadArray &objsPerThread = mSceneManager->_getTmpVisibleObjectsList();
+        VisibleObjectsPerRq &objsPerRqInThread0 = *objsPerThread.begin();
+
+        if( didCollect )
+        {
+            //Merge objects collected in all threads into just thread0
+            VisibleObjectsPerThreadArray::const_iterator itor = objsPerThread.begin() + 1u;
+            VisibleObjectsPerThreadArray::const_iterator end  = objsPerThread.end();
+
+            while( itor != end )
+            {
+                const size_t numRqs = objsPerRqInThread0.size();
+
+                const VisibleObjectsPerRq &objsPerRq = *itor;
+
+                OGRE_ASSERT_MEDIUM( numRqs == objsPerRq.size() );
+
+                for( size_t rqId=0; rqId<numRqs; ++rqId )
+                {
+                    objsPerRqInThread0[rqId].appendPOD( objsPerRq[rqId].begin(),
+                                                        objsPerRq[rqId].end() );
+                }
+
+                ++itor;
+            }
+
+            //Sort the objects by distance to camera
+            const size_t numRqs = objsPerRqInThread0.size();
+            for( size_t rqId=0; rqId<numRqs; ++rqId )
+            {
+                if( MinDecalRq >= rqId && rqId <= MaxDecalRq )
+                    numDecals += objsPerRqInThread0[rqId].size();
+
+                std::sort( objsPerRqInThread0[rqId].begin(), objsPerRqInThread0[rqId].end(),
+                           OrderObjsByDistanceToCamera );
+            }
+        }
+        else
+        {
+            const size_t numRqs = objsPerRqInThread0.size();
+            for( size_t rqId=0; rqId<numRqs; ++rqId )
+                objsPerRqInThread0[rqId].clear();
+        }
+
+        outNumDecals = numDecals;
     }
     //-----------------------------------------------------------------------------------
     inline bool OrderLightByDistanceToCamera( const Light *left, const Light *right )
@@ -547,6 +754,9 @@ namespace Ogre
                                        Light::MAX_FORWARD_PLUS_LIGHTS, mCurrentLightList );
         }
 
+        size_t numDecals;
+        collectObjs( camera, numDecals );
+
         const size_t numLights = mCurrentLightList.size();
 
         //Sort by distance to camera
@@ -558,12 +768,14 @@ namespace Ogre
         {
             gridBuffers.gridBuffer = mVaoManager->createTexBuffer( PF_R16_UINT,
                                                                    mWidth * mHeight * mNumSlices *
-                                                                   mLightsPerCell * sizeof(uint16),
+                                                                   mObjsPerCell * sizeof(uint16),
                                                                    BT_DYNAMIC_PERSISTENT, 0, false );
         }
 
+        const size_t bufferBytesNeeded = calculateBytesNeeded( std::max<size_t>( numLights, 96u ),
+                                                               std::max<size_t>( numDecals, 16u ) );
         if( !gridBuffers.globalLightListBuffer ||
-            gridBuffers.globalLightListBuffer->getNumElements() < c_numBytesPerLight * numLights )
+            gridBuffers.globalLightListBuffer->getNumElements() < bufferBytesNeeded )
         {
             if( gridBuffers.globalLightListBuffer )
             {
@@ -574,8 +786,7 @@ namespace Ogre
 
             gridBuffers.globalLightListBuffer = mVaoManager->createTexBuffer(
                                                                     PF_FLOAT32_RGBA,
-                                                                    c_numBytesPerLight *
-                                                                    std::max<size_t>( numLights, 96 ),
+                                                                    bufferBytesNeeded,
                                                                     BT_DYNAMIC_PERSISTENT, 0, false );
         }
 
@@ -666,7 +877,34 @@ namespace Ogre
 
         hlms->_setProperty( HlmsBaseProp::FwdClusteredWidthxHeight, mWidth * mHeight );
         hlms->_setProperty( HlmsBaseProp::FwdClusteredWidth,        mWidth );
-        hlms->_setProperty( HlmsBaseProp::FwdClusteredLightsPerCell,mLightsPerCell );
+        hlms->_setProperty( HlmsBaseProp::FwdClusteredLightsPerCell,mObjsPerCell );
+
+        if( mDecalsEnabled )
+        {
+            const PrePassMode prePassMode = mSceneManager->getCurrentPrePassMode();
+            int32 numDecalsTex = 0;
+            if( mSceneManager->getDecalsDiffuse() && prePassMode != PrePassCreate )
+            {
+                hlms->_setProperty( HlmsBaseProp::DecalsDiffuse,    1 );
+                ++numDecalsTex;
+            }
+            if( mSceneManager->getDecalsNormals() && prePassMode != PrePassUse )
+            {
+                hlms->_setProperty( HlmsBaseProp::DecalsNormals,    1 );
+                ++numDecalsTex;
+            }
+            if( mSceneManager->getDecalsEmissive() && prePassMode != PrePassCreate )
+            {
+                hlms->_setProperty( HlmsBaseProp::DecalsEmissive,   1 );
+                ++numDecalsTex;
+            }
+
+            const size_t decalOffsetStart = mLightsPerCell + c_reservedLightSlotsPerCell;
+            hlms->_setProperty( HlmsBaseProp::FwdPlusDecalsSlotOffset,
+                                static_cast<int32>( decalOffsetStart ) );
+
+            hlms->_setProperty( HlmsBaseProp::EnableDecals, numDecalsTex );
+        }
     }
     //-----------------------------------------------------------------------------------
     void ForwardClustered::setDebugFrustum( bool bEnableDebugFrustumWireAabb )

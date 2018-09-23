@@ -230,6 +230,8 @@ namespace Ogre
 #endif
         mAreaLightMasksSamplerblock( 0 ),
         mUsingAreaLightMasks( false ),
+        mUsingLtcMatrix( false ),
+        mDecalsSamplerblock( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
@@ -332,6 +334,20 @@ namespace Ogre
 
                 mAreaLightMasksSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
             }
+
+            if( !mDecalsSamplerblock )
+            {
+                samplerblock.mMinFilter     = FO_LINEAR;
+                samplerblock.mMagFilter     = FO_LINEAR;
+                samplerblock.mMipFilter     = FO_LINEAR;
+                samplerblock.mCompareFunction   = NUM_COMPARE_FUNCTIONS;
+
+                samplerblock.mU             = TAM_CLAMP;
+                samplerblock.mV             = TAM_CLAMP;
+                samplerblock.mW             = TAM_CLAMP;
+
+                mDecalsSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+            }
         }
     }
     //-----------------------------------------------------------------------------------
@@ -384,6 +400,19 @@ namespace Ogre
 
             if( mAreaLightMasks && getProperty( HlmsBaseProp::LightsAreaTexMask ) > 0 )
                 psParams->setNamedConstant( "areaLightMasks", texUnit++ );
+
+            if( mLtcMatrixTexture && getProperty( HlmsBaseProp::LightsAreaLtc ) > 0 )
+                psParams->setNamedConstant( "ltcMatrix", texUnit++ );
+
+            if( mGridBuffer && getProperty( HlmsBaseProp::EnableDecals ) )
+            {
+                if( mDecalsTextures[0] )
+                    psParams->setNamedConstant( "decalsDiffuseTex", texUnit++ );
+                if( mDecalsTextures[1] )
+                    psParams->setNamedConstant( "decalsNormalsTex", texUnit++ );
+                if( mDecalsTextures[2] && mDecalsTextures[0] != mDecalsTextures[2] )
+                    psParams->setNamedConstant( "decalsEmissiveTex", texUnit++ );
+            }
 
             if( !mPreparedPass.shadowMaps.empty() )
             {
@@ -684,13 +713,14 @@ namespace Ogre
         bool usesNormalMap = !datablock->getTexture( PBSM_NORMAL ).isNull();
         for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
             usesNormalMap |= !datablock->getTexture( i ).isNull();
-        setProperty( PbsProperty::NormalMap, usesNormalMap );
 
         /*setProperty( HlmsBaseProp::, !datablock->getTexture( PBSM_DETAIL0 ).isNull() );
         setProperty( HlmsBaseProp::DiffuseMap, !datablock->getTexture( PBSM_DETAIL1 ).isNull() );*/
         bool normalMapCanBeSupported = (getProperty( HlmsBaseProp::Normal ) &&
                                         getProperty( HlmsBaseProp::Tangent )) ||
                                         getProperty( HlmsBaseProp::QTangent );
+
+        setProperty( PbsProperty::NormalMap, usesNormalMap );
 
         if( !normalMapCanBeSupported && usesNormalMap )
         {
@@ -798,6 +828,19 @@ namespace Ogre
             setProperty( PbsProperty::MaterialsPerBuffer, static_cast<int>( 2 ) );
         else
             setProperty( PbsProperty::MaterialsPerBuffer, static_cast<int>( mSlotsPerPool ) );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::notifyPropertiesMergedPreGenerationStep(void)
+    {
+        if( getProperty( HlmsBaseProp::DecalsNormals ) )
+        {
+            //If decals normals are enabled, we need to generate the TBN matrix.
+            bool normalMapCanBeSupported = (getProperty( HlmsBaseProp::Normal ) &&
+                                            getProperty( HlmsBaseProp::Tangent )) ||
+                                            getProperty( HlmsBaseProp::QTangent );
+
+            setProperty( PbsProperty::NormalMap, normalMapCanBeSupported );
+        }
     }
     //-----------------------------------------------------------------------------------
     bool HlmsPbs::requiredPropertyByAlphaTest( IdString keyName )
@@ -1017,7 +1060,9 @@ namespace Ogre
         int32 numShadowMapLights    = getProperty( HlmsBaseProp::NumShadowMapLights );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
         int32 numAreaApproxLights   = getProperty( HlmsBaseProp::LightsAreaApprox );
-        const size_t realNumAreaLights = mRealNumAreaLights;
+        int32 numAreaLtcLights      = getProperty( HlmsBaseProp::LightsAreaLtc );
+        const size_t realNumAreaApproxLights = mRealNumAreaApproxLights;
+        const size_t realNumAreaLtcLights = mRealNumAreaLtcLights;
 
         bool isPssmBlend = getProperty( HlmsBaseProp::PssmBlend ) != 0;
         bool isPssmFade = getProperty( HlmsBaseProp::PssmFade ) != 0;
@@ -1030,6 +1075,10 @@ namespace Ogre
         mGridBuffer             = 0;
         mGlobalLightListBuffer  = 0;
 
+        mDecalsTextures[0].setNull();
+        mDecalsTextures[1].setNull();
+        mDecalsTextures[2].setNull();
+
         if( !casterPass )
         {
             ForwardPlusBase *forwardPlus = sceneManager->_getActivePassForwardPlus();
@@ -1038,6 +1087,17 @@ namespace Ogre
                 mapSize += forwardPlus->getConstBufferSize();
                 mGridBuffer             = forwardPlus->getGridBuffer( camera );
                 mGlobalLightListBuffer  = forwardPlus->getGlobalLightListBuffer( camera );
+
+                if( forwardPlus->getDecalsEnabled() )
+                {
+                    const PrePassMode prePassMode = sceneManager->getCurrentPrePassMode();
+                    if( prePassMode != PrePassCreate )
+                        mDecalsTextures[0] = sceneManager->getDecalsDiffuse();
+                    if( prePassMode != PrePassUse )
+                        mDecalsTextures[1] = sceneManager->getDecalsNormals();
+                    if( prePassMode != PrePassCreate )
+                        mDecalsTextures[2] = sceneManager->getDecalsEmissive();
+                }
             }
 
             if( mParallaxCorrectedCubemap )
@@ -1106,6 +1166,7 @@ namespace Ogre
             }
 
             mapSize += ( 7 * 4 * 4 ) * numAreaApproxLights;
+            mapSize += ( 7 * 4 * 4 ) * numAreaLtcLights;
         }
         else
         {
@@ -1350,7 +1411,8 @@ namespace Ogre
                 *passBufferPtr++ = *shadowNode->getPssmFade(0);
             }
 
-            passBufferPtr += alignToNextMultiple( numPssmSplits + numPssmBlendsAndFade, 4 ) - ( numPssmSplits + numPssmBlendsAndFade );
+            passBufferPtr += alignToNextMultiple( numPssmSplits + numPssmBlendsAndFade, 4 ) -
+                             ( numPssmSplits + numPssmBlendsAndFade );
 
             if( numShadowMapLights > 0 )
             {
@@ -1518,23 +1580,19 @@ namespace Ogre
             const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
             size_t areaLightNumber = 0;
             for( size_t idx = mAreaLightsGlobalLightListStart;
-                 idx<globalLightList.lights.size() && areaLightNumber < realNumAreaLights; ++idx )
+                 idx<globalLightList.lights.size() && areaLightNumber < realNumAreaApproxLights; ++idx )
             {                
                 if( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX )
                 {
                     mAreaLights.push_back( globalLightList.lights[idx] );
-                    areaLightNumber++;
+                    ++areaLightNumber;
                 }
             }
 
             std::sort( mAreaLights.begin(), mAreaLights.end(), SortByTextureLightMaskIdx );
 
-            for( size_t i=0; i<realNumAreaLights; ++i )
+            for( size_t i=0; i<realNumAreaApproxLights; ++i )
             {
-                /*const size_t idx = mAreaLightsGlobalLightListStart + (size_t)i;
-                assert( globalLightList.lights[idx]->getType() == Light::LT_AREA_APPROX );
-
-                Light const *light = globalLightList.lights[idx];*/
                 Light const *light = mAreaLights[i];
 
                 Vector4 lightPos4 = light->getAs4DVector();
@@ -1598,7 +1656,7 @@ namespace Ogre
                 *passBufferPtr++ = 0.0f;
             }
 
-            for( int32 i=realNumAreaLights; i<numAreaApproxLights; ++i )
+            for( int32 i=realNumAreaApproxLights; i<numAreaApproxLights; ++i )
             {
                 //vec3 areaApproxLights[numLights].position
                 *passBufferPtr++ = 0;
@@ -1642,6 +1700,79 @@ namespace Ogre
                 *passBufferPtr++ = 0.0f;
                 *passBufferPtr++ = 0.0f;
             }
+
+            mAreaLights.reserve( numAreaLtcLights );
+            mAreaLights.clear();
+            areaLightNumber = 0;
+            for( size_t idx = mAreaLightsGlobalLightListStart;
+                 idx<globalLightList.lights.size() && areaLightNumber < realNumAreaLtcLights; ++idx )
+            {
+                if( globalLightList.lights[idx]->getType() == Light::LT_AREA_LTC )
+                {
+                    mAreaLights.push_back( globalLightList.lights[idx] );
+                    ++areaLightNumber;
+                }
+            }
+
+            //std::sort( mAreaLights.begin(), mAreaLights.end(), SortByTextureLightMaskIdx );
+
+            for( size_t i=0; i<realNumAreaLtcLights; ++i )
+            {
+                Light const *light = mAreaLights[i];
+
+                Vector4 lightPos4 = light->getAs4DVector();
+                Vector3 lightPos = viewMatrix * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
+
+                //vec3 areaLtcLights[numLights].position
+                *passBufferPtr++ = lightPos.x;
+                *passBufferPtr++ = lightPos.y;
+                *passBufferPtr++ = lightPos.z;
+#if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
+                *reinterpret_cast<uint32 * RESTRICT_ALIAS>( passBufferPtr ) = light->getLightMask();
+#endif
+                ++passBufferPtr;
+
+                const Real attenRange   = light->getAttenuationRange();
+
+                //vec3 areaLtcLights[numLights].diffuse
+                ColourValue colour = light->getDiffuseColour() *
+                                     light->getPowerScale();
+                *passBufferPtr++ = colour.r;
+                *passBufferPtr++ = colour.g;
+                *passBufferPtr++ = colour.b;
+                *passBufferPtr++ = attenRange;
+
+                //vec3 areaLtcLights[numLights].specular
+                colour = light->getSpecularColour() * light->getPowerScale();
+                *passBufferPtr++ = colour.r;
+                *passBufferPtr++ = colour.g;
+                *passBufferPtr++ = colour.b;
+                *passBufferPtr++ = light->getDoubleSided() ? 1.0f : 0.0f;
+
+                const Vector2 rectSize = light->getDerivedRectSize() * 0.5f;
+                Quaternion qRot = light->getParentNode()->_getDerivedOrientation();
+                Vector3 xAxis = (viewMatrix3 * qRot.xAxis()) * rectSize.x;
+                Vector3 yAxis = (viewMatrix3 * qRot.yAxis()) * rectSize.y;
+
+                Vector3 rectPoints[4];
+                //vec4 areaLtcLights[numLights].points[4];
+                rectPoints[0] = lightPos - xAxis - yAxis;
+                rectPoints[1] = lightPos + xAxis - yAxis;
+                rectPoints[2] = lightPos + xAxis + yAxis;
+                rectPoints[3] = lightPos - xAxis + yAxis;
+
+                for( size_t j=0; j<4u; ++j )
+                {
+                    *passBufferPtr++ = rectPoints[j].x;
+                    *passBufferPtr++ = rectPoints[j].y;
+                    *passBufferPtr++ = rectPoints[j].z;
+                    *passBufferPtr++ = 1.0f;
+                }
+            }
+
+            memset( passBufferPtr, 0,
+                    (numAreaLtcLights - realNumAreaLtcLights) * sizeof(float) * 4u * 7u );
+            passBufferPtr += (numAreaLtcLights - realNumAreaLtcLights) * 4u * 7u;
 
             if( shadowNode )
             {
@@ -1754,6 +1885,25 @@ namespace Ogre
             mUsingAreaLightMasks = false;
         }
 
+        if( mLtcMatrixTexture && getProperty( HlmsBaseProp::LightsAreaLtc ) > 0 )
+        {
+            mTexUnitSlotStart += 1;
+            mUsingLtcMatrix = true;
+        }
+        else
+        {
+            mUsingLtcMatrix = false;
+        }
+
+        for( size_t i=0; i<3u; ++i )
+        {
+            if( mDecalsTextures[i] &&
+                (i != 2u || mDecalsTextures[2] != mDecalsTextures[0]) )
+            {
+                ++mTexUnitSlotStart;
+            }
+        }
+
         uploadDirtyDatablocks();
 
         return retVal;
@@ -1858,6 +2008,26 @@ namespace Ogre
                                                                          mAreaLightMasks.get(),
                                                                          mAreaLightMasksSamplerblock );
                     ++texUnit;
+                }
+
+                if( mUsingLtcMatrix )
+                {
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
+                                                                         mLtcMatrixTexture.get(),
+                                                                         mAreaLightMasksSamplerblock );
+                    ++texUnit;
+                }
+
+                for( size_t i=0; i<3u; ++i )
+                {
+                    if( mDecalsTextures[i] &&
+                        (i != 2u || mDecalsTextures[2] != mDecalsTextures[0]) )
+                    {
+                        *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true,
+                                                                             mDecalsTextures[i].get(),
+                                                                             mDecalsSamplerblock );
+                        ++texUnit;
+                    }
                 }
 
                 //We changed HlmsType, rebind the shared textures.
@@ -2216,6 +2386,32 @@ namespace Ogre
     {
         HlmsBufferManager::frameEnded();
         mCurrentPassBuffer  = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::loadLtcMatrix(void)
+    {
+        HlmsTextureManager *hlmsTextureManager = mHlmsManager->getTextureManager();
+
+        const uint32 poolId = 992044u;
+
+        if( !hlmsTextureManager->hasPoolId( poolId, HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA ) )
+        {
+            hlmsTextureManager->reservePoolId( poolId, HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
+                                               64u, 64u, 2u, 0u, PF_FLOAT16_RGBA, false, false );
+        }
+        HlmsTextureManager::TextureLocation texLocation0, texLocation1;
+        texLocation0 = hlmsTextureManager->createOrRetrieveTexture(
+                           "ltcMatrix0.dds", "ltcMatrix0.dds",
+                           HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA, poolId );
+        texLocation1 = hlmsTextureManager->createOrRetrieveTexture(
+                           "ltcMatrix1.dds", "ltcMatrix1.dds",
+                           HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA, poolId );
+
+        OGRE_ASSERT_LOW( texLocation0.texture == texLocation1.texture );
+        OGRE_ASSERT_LOW( texLocation0.xIdx == 0u );
+        OGRE_ASSERT_LOW( texLocation1.xIdx == 1u );
+
+        mLtcMatrixTexture = texLocation0.texture;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::getDefaultPaths( String &outDataFolderPath, StringVector &outLibraryFoldersPaths )

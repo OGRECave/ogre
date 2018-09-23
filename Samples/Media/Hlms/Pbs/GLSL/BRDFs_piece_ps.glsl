@@ -1,11 +1,11 @@
-@property( !metallic_workflow && (!specular_map || !fresnel_workflow) )
+@property( !metallic_workflow && (!specular_map || !fresnel_workflow) && !hlms_decals_diffuse )
 	@property( !transparent_mode )
 		@piece( F0 )material.F0@end
 	@end @property( transparent_mode )
 		//Premultiply F0.xyz with the alpha from the texture, but only in transparent mode.
 		@piece( F0 )(material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w)@end
 	@end
-@end @property( metallic_workflow || (specular_map && fresnel_workflow) )
+@end @property( metallic_workflow || (specular_map && fresnel_workflow) || hlms_decals_diffuse )
 	@piece( F0 )F0@end
 @end
 
@@ -236,4 +236,5 @@ vec3 BRDF_IR( vec3 lightDir, vec3 lightDiffuse )
 	@piece( ObjLightMaskCmp )if( (objLightMask & floatBitsToUint( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u )@end
 	@piece( andObjLightMaskCmp )&& ((objLightMask & floatBitsToUint( passBuf.lights[@counter(fineMaskLightIdx)].position.w )) != 0u)@end
 	@piece( andObjAreaApproxLightMaskCmp )&& ((objLightMask & floatBitsToUint( passBuf.areaApproxLights[@counter(fineMaskAreaApproxLightIdx)].position.w )) != 0u)@end
+	@piece( andObjAreaLtcLightMaskCmp )&& ((objLightMask & floatBitsToUint( passBuf.areaLtcLights[@counter(fineMaskAreaApproxLightIdx)].position.w )) != 0u)@end
 @end

@@ -64,8 +64,12 @@ namespace Ogre
 
         typedef vector<CachedGridBuffer>::type CachedGridBufferVec;
 
+        static const size_t MinDecalRq;     // Inclusive
+        static const size_t MaxDecalRq;     // Inclusive
+
     protected:
         static const size_t NumBytesPerLight;
+        static const size_t NumBytesPerDecal;
 
         struct CachedGrid
         {
@@ -90,6 +94,7 @@ namespace Ogre
         {
             //We use LT_DIRECTIONAL (index = 0) to contain the total light count.
             uint32  lightCount[Light::MAX_FORWARD_PLUS_LIGHTS];
+            uint32  decalCount;
             LightCount() { memset( lightCount, 0, sizeof(lightCount) ); }
         };
 
@@ -106,9 +111,12 @@ namespace Ogre
         bool    mFadeAttenuationRange;
         /// VPLs = Virtual Point Lights. Used by InstantRadiosity.
         bool    mEnableVpls;
+        bool    mDecalsEnabled;
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
         bool    mFineLightMaskGranularity;
 #endif
+
+        static size_t calculateBytesNeeded( size_t numLights, size_t numDecals );
 
         void fillGlobalLightListBuffer( Camera *camera, TexBufferPacked *globalLightListBuffer );
 
@@ -126,13 +134,13 @@ namespace Ogre
 
         /// The const version will not create a new cache if not found, and
         /// output a null pointer instead (also returns false in that case).
-        bool getCachedGridFor( Camera *camera, const CachedGrid **outCachedGrid ) const;
+        bool getCachedGridFor( const Camera *camera, const CachedGrid **outCachedGrid ) const;
 
         /// Check if some of the caches are really old and delete them
         void deleteOldGridBuffers(void);
 
     public:
-        ForwardPlusBase( SceneManager *sceneManager );
+        ForwardPlusBase( SceneManager *sceneManager, bool decalsEnabled );
         virtual ~ForwardPlusBase();
 
         virtual ForwardPlusMethods getForwardPlusMethod(void) const = 0;
@@ -140,6 +148,8 @@ namespace Ogre
         void _changeRenderSystem( RenderSystem *newRs );
 
         virtual void collectLights( Camera *camera ) = 0;
+
+        bool isCacheDirty( const Camera *camera ) const;
 
         /// Cache the return value as internally we perform an O(N) search
         TexBufferPacked* getGridBuffer( Camera *camera ) const;
@@ -183,6 +193,8 @@ namespace Ogre
 
         void setEnableVpls( bool enable )                               { mEnableVpls = enable; }
         bool getEnableVpls(void) const                                  { return mEnableVpls; }
+
+        bool getDecalsEnabled(void) const                               { return mDecalsEnabled; }
 
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
         /// Toggles whether light masks will be obeyed per object & per light by doing:

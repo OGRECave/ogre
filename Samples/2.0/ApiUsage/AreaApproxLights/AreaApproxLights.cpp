@@ -9,6 +9,9 @@
 #include "OgreConfigFile.h"
 #include "Compositor/OgreCompositorManager2.h"
 
+#include "OgreHlmsManager.h"
+#include "OgreHlmsPbs.h"
+
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
 #include "System/MainEntryPoints.h"
@@ -53,6 +56,16 @@ namespace Demo
             addResourceLocation( dataFolder, "FileSystem", "General" );
         }
 
+        virtual void loadResources(void)
+        {
+            GraphicsSystem::loadResources();
+
+            Ogre::Hlms *hlms = mRoot->getHlmsManager()->getHlms( Ogre::HLMS_PBS );
+            OGRE_ASSERT_HIGH( dynamic_cast<Ogre::HlmsPbs*>( hlms ) );
+            Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlms );
+            hlmsPbs->loadLtcMatrix();
+        }
+
     public:
         AreaApproxLightsGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
@@ -68,6 +81,8 @@ namespace Demo
         AreaApproxLightsGameState *gfxGameState = new AreaApproxLightsGameState(
         "Shows how to setup texture masks for the Area Light fake approximations.\n"
         "using Overlays and the Unlit Hlms implementation.\n"
+        "Also shows photorealistic area lights using Linearly Transformed Cosines (LTC).\n"
+        "LTC area lights currently do not support textures. Approximation does.\n"
         "Please note area lights use regular Forward (not Forward+) and cannot have\n"
         "shadow mapping.\n"
         "This sample depends on the media files:\n"
@@ -92,6 +107,6 @@ namespace Demo
 
     const char* MainEntryPoints::getWindowTitle(void)
     {
-        return "Area Lights (Fake / Approximation)";
+        return "Area Lights (Fake / Approximation & Realistic / LTC)";
     }
 }

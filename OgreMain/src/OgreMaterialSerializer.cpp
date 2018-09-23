@@ -373,6 +373,7 @@ namespace Ogre
                         break;
                     case Light::LT_VPL:
                     case Light::LT_AREA_APPROX:
+                    case Light::LT_AREA_LTC:
                     case Light::NUM_LIGHT_TYPES: //Keep compiler happy
                         break;
                     };
