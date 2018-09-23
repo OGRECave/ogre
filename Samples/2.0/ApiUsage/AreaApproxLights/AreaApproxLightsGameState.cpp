@@ -371,7 +371,7 @@ namespace Demo
         light->setSpecularColour( 0.8f, 0.4f, 0.2f );
         //Increase the strength 10x to showcase this light. Area approx lights are not
         //physically based so the value is more arbitrary than the other light types
-        light->setPowerScale( Ogre::Math::PI * 4 );
+        light->setPowerScale( Ogre::Math::PI );
         light->setType( Ogre::Light::LT_AREA_APPROX );
         light->setRectSize( Ogre::Vector2( 15.0f, 15.0f ) );
         lightNode->setPosition( -10.0f, 6.0f, 10.0f );
@@ -438,8 +438,8 @@ namespace Demo
         outText += "\nPress F2 to toggle animation. ";
         outText += mAnimateObjects ? "[On]" : "[Off]";
         outText += "\nPress F3 to toggle PBR LTC. ";
-        outText += mAreaLights[0]->getType() == Ogre::Light::LT_AREA_APPROX ? "[Approximation]" :
-                                                                              "[LTC]";
+        outText += mAreaLights[0]->getType() == Ogre::Light::LT_AREA_APPROX ?
+                    "[Approximation (Textured)]" : "[LTC (No texture)]";
     }
     //-----------------------------------------------------------------------------------
     void AreaApproxLightsGameState::keyReleased( const SDL_KeyboardEvent &arg )
