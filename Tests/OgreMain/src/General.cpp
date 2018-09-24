@@ -40,6 +40,11 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreConfigFile.h"
 #include "OgreSTBICodec.h"
+#include "OgreHighLevelGpuProgramManager.h"
+#include "OgreMeshManager.h"
+#include "OgreMesh.h"
+#include "OgreSkeletonManager.h"
+#include "OgreCompositorManager.h"
 
 #include <random>
 using std::minstd_rand;
@@ -210,4 +215,39 @@ TEST(Image, FlipV)
     ASSERT_TRUE(!memcmp(img.getData(), ref.getData(), ref.getSize()));
 
     STBIImageCodec::shutdown();
+}
+
+struct TestResourceLoadingListener : public ResourceLoadingListener
+{
+    DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) { return DataStreamPtr(); }
+    void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) {}
+    bool resourceCollision(Resource *resource, ResourceManager *resourceManager) { return false; }
+};
+
+typedef RootWithoutRenderSystemFixture ResourceLoading;
+TEST_F(ResourceLoading, CollsionUseExisting)
+{
+    TestResourceLoadingListener listener;
+    ResourceGroupManager::getSingleton().setLoadingListener(&listener);
+
+    MaterialPtr mat = MaterialManager::getSingleton().create("Collision", "Tests");
+    EXPECT_TRUE(mat);
+    EXPECT_FALSE(MaterialManager::getSingleton().create("Collision", "Tests"));
+    EXPECT_FALSE(mat->clone("Collision"));
+
+    MeshPtr mesh = MeshManager::getSingleton().create("Collision", "Tests");
+    EXPECT_TRUE(mesh);
+    EXPECT_FALSE(MeshManager::getSingleton().create("Collision", "Tests"));
+    EXPECT_FALSE(mesh->clone("Collision"));
+
+    EXPECT_TRUE(SkeletonManager::getSingleton().create("Collision", "Tests"));
+    EXPECT_FALSE(SkeletonManager::getSingleton().create("Collision", "Tests"));
+
+    EXPECT_TRUE(CompositorManager::getSingleton().create("Collision", "Tests"));
+    EXPECT_FALSE(CompositorManager::getSingleton().create("Collision", "Tests"));
+
+    EXPECT_TRUE(HighLevelGpuProgramManager::getSingleton().createProgram(
+        "Collision", "Tests", "null", GPT_VERTEX_PROGRAM));
+    EXPECT_FALSE(HighLevelGpuProgramManager::getSingleton().createProgram(
+        "Collision", "Tests", "null", GPT_VERTEX_PROGRAM));
 }
