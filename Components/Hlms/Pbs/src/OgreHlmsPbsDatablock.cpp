@@ -1256,99 +1256,14 @@ namespace Ogre
                 texLocation.divisor = 1;
                 const String *aliasNamePtr = hlmsTextureManager->findAliasName( texLocation );
 
-                const String aliasName = aliasNamePtr ? *aliasNamePtr : texture->getName();
-
-                //Render Targets are... complicated. Let's not, for now.
-                if( savedTextures.find( aliasName ) == savedTextures.end() &&
-                    (aliasNamePtr || i == PBSM_REFLECTION) &&
-                    !(texture->getUsage() & TU_RENDERTARGET) )
+                if( aliasNamePtr || i == PBSM_REFLECTION )
                 {
-                    DataStreamPtr inFile;
-                    if( saveOriginal )
-                    {
-                        String resourceName;
-                        if( aliasNamePtr )
-                        {
-                            const String *resNamePtr =
-                                    hlmsTextureManager->findResourceNameFromAlias( aliasName );
-                            if( resNamePtr )
-                                resourceName = *resNamePtr;
-                            else
-                                resourceName = aliasName;
-                        }
-                        else
-                            resourceName = aliasName;
-
-                        String savingFilename = aliasName;
-                        if( listener )
-                        {
-                            listener->savingChangeTextureNameOriginal( aliasName, resourceName,
-                                                                       savingFilename );
-                        }
-
-                        try
-                        {
-                            inFile = ResourceGroupManager::getSingleton().openResource(
-                                         resourceName, texture->getGroup() );
-                        }
-                        catch( FileNotFoundException &e )
-                        {
-                            //Try opening as an absolute path
-                            std::fstream *ifs = OGRE_NEW_T( std::fstream, MEMCATEGORY_GENERAL )(
-                                                    resourceName.c_str(),
-                                                    std::ios::binary|std::ios::in );
-
-                            if( ifs->is_open() )
-                            {
-                                inFile = DataStreamPtr( OGRE_NEW FileStreamDataStream( resourceName,
-                                                                                       ifs, true ) );
-                            }
-                            else
-                            {
-                                LogManager::getSingleton().logMessage(
-                                            "WARNING: Could not find texture file " + aliasName +
-                                            " (" + resourceName + ") for copying to export location. "
-                                            "Error: " + e.getFullDescription() );
-                            }
-                        }
-                        catch( Exception &e )
-                        {
-                            LogManager::getSingleton().logMessage(
-                                        "WARNING: Could not find texture file " + aliasName +
-                                        " (" + resourceName + ") for copying to export location. "
-                                        "Error: " + e.getFullDescription() );
-                        }
-
-                        if( inFile )
-                        {
-                            size_t fileSize = inFile->size();
-                            vector<uint8>::type fileData;
-                            fileData.resize( fileSize );
-                            inFile->read( &fileData[0], fileData.size() );
-                            std::ofstream outFile( (folderPath + "/" + savingFilename).c_str(),
-                                                   std::ios::binary | std::ios::out );
-                            outFile.write( (const char*)&fileData[0], fileData.size() );
-                            outFile.close();
-                        }
-                    }
-
-                    if( saveOitd )
-                    {
-                        String texName = aliasName;
-                        if( listener )
-                            listener->savingChangeTextureNameOitd( aliasName, texName );
-                        const uint32 numSlices = i == PBSM_REFLECTION ? 6u : 1u;
-
-                        Image image;
-                        texture->convertToImage( image, true, 0u, texLocation.xIdx, numSlices );
-
-                        image.save( folderPath + "/" + texName + ".oitd" );
-                    }
-
-                    savedTextures.insert( aliasName );
+                    const uint32 numSlices = i == PBSM_REFLECTION ? 6u : 1u;
+                    hlmsTextureManager->saveTexture( texLocation, folderPath, savedTextures,
+                                                     saveOitd, saveOriginal, texLocation.xIdx,
+                                                     numSlices, listener );
                 }
             }
         }
-
     }
 }

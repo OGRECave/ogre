@@ -125,11 +125,14 @@ namespace Demo
 
             /*
                 Now actually load the decals we want into the array.
+                Note aliases are all lowercase! Ogre automatically aliases
+                all resources as lowercase, thus we need to do that too, or else
+                the texture will end up being loaded twice
             */
-            hlmsTextureManager->createOrRetrieveTexture( "floor_diffuse.PNG", "floor_diffuse.PNG",
+            hlmsTextureManager->createOrRetrieveTexture( "floor_diffuse.png", "floor_diffuse.PNG",
                                                          Ogre::HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
                                                          decalDiffuseId );
-            hlmsTextureManager->createOrRetrieveTexture( "floor_bump.PNG", "floor_bump.PNG",
+            hlmsTextureManager->createOrRetrieveTexture( "floor_bump.png", "floor_bump.PNG",
                                                          Ogre::HlmsTextureManager::TEXTURE_TYPE_NORMALS,
                                                          decalNormalId );
         }

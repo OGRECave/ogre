@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
 #include "OgreLogManager.h"
+#include "OgreHlmsDatablock.h"
 #include "OgreLwString.h"
 #include "OgreProfiler.h"
 
@@ -837,6 +838,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     const String* HlmsTextureManager::findResourceNameFromAlias( IdString aliasName ) const
     {
+        uint32 poolId = 0;
+        return findResourceNameFromAlias( aliasName, poolId );
+    }
+    //-----------------------------------------------------------------------------------
+    const String* HlmsTextureManager::findResourceNameFromAlias( IdString aliasName,
+                                                                 uint32 &outPoolId ) const
+    {
         const String *retVal = 0;
 
         TextureEntry searchName( aliasName );
@@ -847,6 +855,7 @@ namespace Ogre
         {
             const TextureArray &texArray = mTextureArrays[it->mapType][it->arrayIdx];
             retVal = &texArray.entries[it->entryIdx].resourceName;
+            outPoolId = texArray.uniqueSpecialId;
         }
 
         return retVal;
@@ -1031,6 +1040,100 @@ namespace Ogre
                          "Oops! Work in Progress, sorry!",
                          "HlmsTextureManager::createFromTexturePack" );
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsTextureManager::saveTexture( const HlmsTextureManager::TextureLocation &texLocation,
+                                          const String &folderPath, set<String>::type &savedTextures,
+                                          bool saveOitd, bool saveOriginal,
+                                          uint32 slice, uint32 numSlices,
+                                          HlmsTextureExportListener *listener )
+    {
+        //Render Targets are... complicated. Let's not, for now.
+        if( texLocation.texture->getUsage() & TU_RENDERTARGET )
+            return;
+
+        const String *aliasNamePtr = findAliasName( texLocation );
+        const String aliasName = aliasNamePtr ? *aliasNamePtr : texLocation.texture->getName();
+
+        if( savedTextures.find( aliasName ) != savedTextures.end() )
+            return; //Texture already saved
+
+        DataStreamPtr inFile;
+        if( saveOriginal )
+        {
+            String resourceName;
+            if( aliasNamePtr )
+            {
+                const String *resNamePtr = findResourceNameFromAlias( aliasName );
+                if( resNamePtr )
+                    resourceName = *resNamePtr;
+                else
+                    resourceName = aliasName;
+            }
+            else
+                resourceName = aliasName;
+
+            String savingFilename = aliasName;
+            if( listener )
+                listener->savingChangeTextureNameOriginal( aliasName, resourceName, savingFilename );
+            try
+            {
+                inFile = ResourceGroupManager::getSingleton().openResource(
+                             resourceName, texLocation.texture->getGroup() );
+            }
+            catch( FileNotFoundException &e )
+            {
+                //Try opening as an absolute path
+                std::fstream *ifs = OGRE_NEW_T( std::fstream, MEMCATEGORY_GENERAL )(
+                                        resourceName.c_str(),
+                                        std::ios::binary|std::ios::in );
+
+                if( ifs->is_open() )
+                {
+                    inFile = DataStreamPtr( OGRE_NEW FileStreamDataStream( resourceName, ifs, true ) );
+                }
+                else
+                {
+                    LogManager::getSingleton().logMessage(
+                                "WARNING: Could not find texture file " + aliasName +
+                                " (" + resourceName + ") for copying to export location. "
+                                "Error: " + e.getFullDescription() );
+                }
+            }
+            catch( Exception &e )
+            {
+                LogManager::getSingleton().logMessage(
+                            "WARNING: Could not find texture file " + aliasName +
+                            " (" + resourceName + ") for copying to export location. "
+                            "Error: " + e.getFullDescription() );
+            }
+
+            if( inFile )
+            {
+                size_t fileSize = inFile->size();
+                vector<uint8>::type fileData;
+                fileData.resize( fileSize );
+                inFile->read( &fileData[0], fileData.size() );
+                std::ofstream outFile( (folderPath + "/" + savingFilename).c_str(),
+                                       std::ios::binary | std::ios::out );
+                outFile.write( (const char*)&fileData[0], fileData.size() );
+                outFile.close();
+            }
+        }
+
+        if( saveOitd )
+        {
+            String texName = aliasName;
+            if( listener )
+                listener->savingChangeTextureNameOitd( aliasName, texName );
+
+            Image image;
+            texLocation.texture->convertToImage( image, true, 0u, slice, numSlices );
+
+            image.save( folderPath + "/" + texName + ".oitd" );
+        }
+
+        savedTextures.insert( aliasName );
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureLocation HlmsTextureManager::getBlankTexture(void) const

@@ -312,9 +312,40 @@ namespace Ogre
         /// Note the returned pointer may be invalidated if new calls are made to
         /// createOrRetrieveTexture or destroyTexture
         const String* findAliasName( const TextureLocation &textureLocation ) const;
-        const String* findResourceNameFromAlias( IdString alias ) const;
+        const String* findResourceNameFromAlias( IdString aliasName ) const;
+        /// Output outPoolId is left untouched if returned pointer is null
+        const String* findResourceNameFromAlias( IdString aliasName, uint32 &outPoolId ) const;
 
         void createFromTexturePack( const HlmsTexturePack &pack );
+
+        /** Saves a texture to the given folder. Even if the texture was not created
+            by HlmsTextureManager.
+
+            We will not save RenderTargets.
+
+            If the texture is managed by HlmsTextureManager, further information to
+            obtain the original filename (even if it's aliased) will be used.
+        @param texLocation
+        @param folderPath
+            Folder where to dump the textures.
+        @param savedTextures [in/out]
+            Set of texture names. Textures whose name is already in the set won't be saved again.
+            Textures that were saved will be inserted into the set.
+        @param saveOitd
+            When true, we will download the texture from GPU and save it in OITD format.
+            OITD is faster to load as it's stored in Ogre's native format it understands,
+            but it cannot be opened by traditional image editors; also OITD is not backwards
+            compatible with older versions of Ogre.
+        @param saveOriginal
+            When true, we will attempt to read the raw filestream of the original texture
+            and save it (i.e. copy the original png/dds/etc file).
+        @param listener
+        */
+        void saveTexture( const HlmsTextureManager::TextureLocation &texLocation,
+                          const String &folderPath, set<String>::type &savedTextures,
+                          bool saveOitd, bool saveOriginal,
+                          uint32 slice, uint32 numSlices,
+                          HlmsTextureExportListener *listener );
 
         /// Returns the precreated blank texture
         TextureLocation getBlankTexture(void) const;

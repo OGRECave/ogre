@@ -37,7 +37,9 @@ THE SOFTWARE.
 #include "OgreItem.h"
 #include "OgreMesh2.h"
 #include "OgreEntity.h"
+#include "OgreDecal.h"
 #include "OgreHlms.h"
+#include "OgreHlmsTextureManager.h"
 
 #include "OgreMeshSerializer.h"
 #include "OgreMesh2Serializer.h"
@@ -547,6 +549,76 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void SceneFormatExporter::exportDecalTex( LwString &jsonStr, String &outJson,
+                                              const DecalTex &decalTex,
+                                              set<String>::type &savedTextures,
+                                              uint32 exportFlags )
+    {
+        if( !decalTex.texture )
+            return;
+
+        HlmsManager *hlmsManager = mRoot->getHlmsManager();
+        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
+
+        HlmsTextureManager::TextureLocation texLocation;
+        texLocation.texture = decalTex.texture;
+        texLocation.xIdx = decalTex.xIdx;
+        texLocation.yIdx = 0;
+        texLocation.divisor = 1;
+        const String *aliasName = hlmsTextureManager->findAliasName( texLocation );
+        if( aliasName )
+        {
+            uint32 poolId = 0;
+            const String *resName = hlmsTextureManager->findResourceNameFromAlias( *aliasName, poolId );
+            jsonStr.a( "\n\t\t\t\"", decalTex.texTypeName ,"_managed\" : [ \"", aliasName->c_str(),
+                       "\", \"", resName->c_str(), "\", " );
+            jsonStr.a( poolId, " ]," );
+
+            if( exportFlags & (SceneFlags::TexturesOitd|SceneFlags::TexturesOriginal) )
+            {
+                hlmsTextureManager->saveTexture( texLocation, mCurrentExportFolder + "/textures/",
+                                                 savedTextures, exportFlags & SceneFlags::TexturesOitd,
+                                                 exportFlags & SceneFlags::TexturesOriginal,
+                                                 texLocation.xIdx, 1u, mListener );
+            }
+        }
+        else
+        {
+            //Texture not managed by HlmsTextureManager
+            jsonStr.a( "\n\t\t\t\"", decalTex.texTypeName, "_raw\" : [ \"",
+                       decalTex.texture->getName().c_str(), "\", " );
+            jsonStr.a( decalTex.xIdx, " ]," );
+
+            if( exportFlags & SceneFlags::TexturesOitd )
+            {
+                hlmsTextureManager->saveTexture( texLocation, mCurrentExportFolder + "/textures/",
+                                                 savedTextures, true, false,
+                                                 0, decalTex.texture->getDepth(), mListener );
+            }
+        }
+
+        flushLwString( jsonStr, outJson );
+    }
+    //-----------------------------------------------------------------------------------
+    void SceneFormatExporter::exportDecal( LwString &jsonStr, String &outJson, Decal *decal,
+                                           set<String>::type &savedTextures,
+                                           uint32 exportFlags )
+    {
+        DecalTex decalTex( decal->getDiffuseTexture(),
+                           static_cast<uint16>( decal->mDiffuseIdx ), "diffuse" );
+        exportDecalTex( jsonStr, outJson, decalTex, savedTextures, exportFlags );
+        decalTex = DecalTex( decal->getNormalTexture(),
+                             static_cast<uint16>( decal->mNormalMapIdx ), "normal" );
+        exportDecalTex( jsonStr, outJson, decalTex, savedTextures, exportFlags );
+        decalTex = DecalTex( decal->getEmissiveTexture(),
+                             static_cast<uint16>( decal->mEmissiveIdx ), "emissive" );
+        exportDecalTex( jsonStr, outJson, decalTex, savedTextures, exportFlags );
+
+        jsonStr.a( "\n" );
+        flushLwString( jsonStr, outJson );
+        exportMovableObject( jsonStr, outJson, decal );
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatExporter::exportInstantRadiosity( LwString &jsonStr, String &outJson )
     {
         if( !mInstantRadiosity )
@@ -816,7 +888,8 @@ namespace Ogre
         flushLwString( jsonStr, outJson );
     }
     //-----------------------------------------------------------------------------------
-    void SceneFormatExporter::_exportScene( String &outJson, uint32 exportFlags )
+    void SceneFormatExporter::_exportScene( String &outJson, set<String>::type &savedTextures,
+                                            uint32 exportFlags )
     {
         mNodeToIdxMap.clear();
         mExportedMeshes.clear();
@@ -989,6 +1062,39 @@ namespace Ogre
             }
         }
 
+        if( exportFlags & SceneFlags::Decals )
+        {
+            SceneManager::MovableObjectIterator movableObjects =
+                    mSceneManager->getMovableObjectIterator( DecalFactory::FACTORY_TYPE_NAME );
+
+            if( movableObjects.hasMoreElements() )
+            {
+                outJson += ",\n\t\"decals\" :\n\t[\n";
+
+                bool firstObject = true;
+
+                while( movableObjects.hasMoreElements() )
+                {
+                    MovableObject *mo = movableObjects.getNext();
+                    Decal *decal = static_cast<Decal*>( mo );
+                    if( mListener->exportDecal( decal ) )
+                    {
+                        if( firstObject )
+                        {
+                            outJson += "\n\t\t{";
+                            firstObject = false;
+                        }
+                        else
+                            outJson += ",\n\t\t{";
+                        exportDecal( jsonStr, outJson, decal, savedTextures, exportFlags );
+                        outJson += "\n\t\t}";
+                    }
+                }
+
+                outJson += "\n\t]";
+            }
+        }
+
         if( exportFlags & SceneFlags::SceneSettings )
             exportSceneSettings( jsonStr, outJson , exportFlags );
 
@@ -1000,17 +1106,23 @@ namespace Ogre
     void SceneFormatExporter::exportScene( String &outJson, uint32 exportFlags )
     {
         mCurrentExportFolder.clear();
-        _exportScene( outJson, exportFlags & ~(SceneFlags::Meshes | SceneFlags::MeshesV1) );
+        set<String>::type savedTextures;
+        _exportScene( outJson, savedTextures,
+                      exportFlags & ~(SceneFlags::Meshes | SceneFlags::MeshesV1) );
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatExporter::exportSceneToFile( const String &folderPath, uint32 exportFlags )
     {
         mCurrentExportFolder = folderPath;
+        const String textureFolder = folderPath + "/textures/";
         FileSystemLayer::createDirectory( mCurrentExportFolder );
+        if( exportFlags & (SceneFlags::TexturesOitd|SceneFlags::TexturesOriginal)  )
+            FileSystemLayer::createDirectory( textureFolder );
 
+        set<String>::type savedTextures;
         {
             String jsonString;
-            _exportScene( jsonString, exportFlags );
+            _exportScene( jsonString, savedTextures, exportFlags );
 
             const String scenePath = folderPath + "/scene.json";
             std::ofstream file( scenePath.c_str(), std::ios::binary | std::ios::out );
@@ -1036,10 +1148,6 @@ namespace Ogre
 
         if( exportFlags & (SceneFlags::TexturesOitd|SceneFlags::TexturesOriginal)  )
         {
-            const String textureFolder = folderPath + "/textures/";
-            FileSystemLayer::createDirectory( textureFolder );
-
-            set<String>::type savedTextures;
             HlmsManager *hlmsManager = mRoot->getHlmsManager();
             for( size_t i=HLMS_LOW_LEVEL + 1u; i<HLMS_MAX; ++i )
             {
