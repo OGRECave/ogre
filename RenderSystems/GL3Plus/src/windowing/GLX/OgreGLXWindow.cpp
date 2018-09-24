@@ -150,7 +150,15 @@ namespace Ogre
                 }
 
                 glxContext = glXGetCurrentContext();
-                glxDrawable = glXGetCurrentDrawable();
+
+                // Trying to reuse the drawable here will actually
+                // cause the context sharing to break so it is hidden
+                // behind this extra option
+                if ((opt = miscParams->find("currentGLDrawable")) != end &&
+                    StringConverter::parseBool(opt->second))
+                {
+                    glxDrawable = glXGetCurrentDrawable();
+                }
             }
 
             // Note: Some platforms support AA inside ordinary windows
@@ -320,6 +328,19 @@ namespace Ogre
                 int result;
                 result = mGLSupport->getFBConfigAttrib( fbConfig, GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT,
                                                         &gamma );
+                if( result != Success )
+                    gamma = 0;
+            }
+
+            mHwGamma = (gamma != 0);
+        }
+        else
+        {
+            if (gamma != 0)
+            {
+                int result;
+                result = mGLSupport->getFBConfigAttrib( fbConfig, GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT,
+                    &gamma );
                 if( result != Success )
                     gamma = 0;
             }
