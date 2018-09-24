@@ -47,6 +47,7 @@ namespace Ogre
         "spotlight",
         "vpl",
         "area_approx",
+        "area_ltc",
         "NUM_LIGHT_TYPES"
     };
 
