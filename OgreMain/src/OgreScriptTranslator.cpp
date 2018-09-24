@@ -3580,16 +3580,6 @@ namespace Ogre{
             }
         }
 
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported(syntax))
-        {
-            compiler->addError(ScriptCompiler::CE_UNSUPPORTEDBYRENDERSYSTEM, obj->file, obj->line, ", Shader name: " + obj->name);
-            // Register the unsupported program so that materials that use it know that
-            // it exists but is unsupported.
-            GpuProgramPtr unsupportedProg = static_pointer_cast<GpuProgram>(GpuProgramManager::getSingleton().create(obj->name,
-                                                                                     compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax));
-            return;
-        }
-
         // Allocate the program
         GpuProgram *prog = 0;
         CreateGpuProgramScriptCompilerEvent evt(obj->file, obj->name, compiler->getResourceGroup(), source, syntax, translateIDToGpuProgramType(obj->id));
