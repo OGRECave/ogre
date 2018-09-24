@@ -194,9 +194,10 @@ namespace Ogre {
     };
 
     /**
-     @remarks   This class allows users to override resource loading behavior.
-                By overriding this class' methods, you can change how resources
-                are loaded and the behavior for resource name collisions.
+    This class allows users to override resource loading behavior.
+
+    By overriding this class' methods, you can change how resources
+    are loaded and the behavior for resource name collisions.
     */
     class ResourceLoadingListener
     {
@@ -207,7 +208,7 @@ namespace Ogre {
         virtual DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) = 0;
 
         /** This event is called when a resource stream has been opened, but not processed yet. 
-        @remarks
+
             You may alter the stream if you wish or alter the incoming pointer to point at
             another stream if you wish.
         */
@@ -215,7 +216,9 @@ namespace Ogre {
 
         /** This event is called when a resource collides with another existing one in a resource manager
 
-            return false to skip registration of the conflicting resource and continue using the previous instance.
+            @param resource the new resource that conflicts with an existing one
+            @param resourceManager the according resource manager 
+            @return false to skip registration of the conflicting resource and continue using the previous instance.
           */
         virtual bool resourceCollision(Resource *resource, ResourceManager *resourceManager) = 0;
     };
