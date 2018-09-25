@@ -301,7 +301,7 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv, float3 p
 			float3 ltcSpecular;
 			ltcSpecular.x = LTC_Evaluate( nNormal.xyz, viewDir.xyz, inPs.pos.xyz, Minv,
 										  passBuf.areaLtcLights[@n].points, doubleSidedLtc );
-			ltcSpecular.yz = ltcSpecular.x;
+			ltcSpecular.yz = ltcSpecular.xx;
 			// BRDF shadowing and Fresnel
 			ltcSpecular.xyz *= @insertpiece( F0 ).xyz * ltc1.x + (1.0 - @insertpiece( F0 ).xyz) * ltc1.y;
 		@end
