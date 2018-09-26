@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreMesh2.h"
 #include "OgreEntity.h"
 #include "OgreHlms.h"
+#include "OgreHlmsTextureManager.h"
 
 #include "OgreHlmsPbs.h"
 #include "InstantRadiosity/OgreInstantRadiosity.h"
@@ -53,7 +54,6 @@ THE SOFTWARE.
 #include "OgreFileSystemLayer.h"
 
 #include "OgreLogManager.h"
-
 
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
@@ -1374,6 +1374,23 @@ namespace Ogre
         resourceGroupManager.addResourceLocation( folderPath + "/textures/",
                                                   "FileSystem", "SceneFormatImporter" );
 
+        {
+            DataStreamPtr stream = resourceGroupManager.openResource( "textureMetadataCache.json",
+                                                                      "SceneFormatImporter" );
+            vector<char>::type fileData;
+            fileData.resize( stream->size() + 1 );
+            if( !fileData.empty() )
+            {
+                stream->read( &fileData[0], stream->size() );
+                //Add null terminator just in case (to prevent bad input)
+                fileData.back() = '\0';
+
+                HlmsManager *hlmsManager = mRoot->getHlmsManager();
+                HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
+                hlmsTextureManager->importTextureMetadataCache( stream->getName(), &fileData[0] );
+            }
+        }
+
         DataStreamPtr stream = resourceGroupManager.openResource( "scene.json", "SceneFormatImporter" );
         vector<char>::type fileData;
         fileData.resize( stream->size() + 1 );
@@ -1410,7 +1427,7 @@ namespace Ogre
             if( useOitd )
                 hlmsManager->mAdditionalTextureExtensionsPerGroup.erase( "SceneFormatImporter" );
 
-            importScene( stream->getName(), &fileData[0], importFlags );
+            importScene( stream->getName(), d, importFlags );
 
             resourceGroupManager.removeResourceLocation( folderPath + "/textures/", "SceneFormatImporter" );
             resourceGroupManager.removeResourceLocation( folderPath + "/v2/", "SceneFormatImporter" );

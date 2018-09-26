@@ -141,6 +141,15 @@ namespace Ogre
             NUM_TEXTURE_TYPES
         };
 
+        struct MetadataCacheEntry
+        {
+            TextureMapType mapType;
+            uint32 poolId;
+            MetadataCacheEntry();
+        };
+
+        typedef map<IdString, MetadataCacheEntry>::type MetadataCacheMap;
+
     protected:
         struct TextureArray
         {
@@ -161,6 +170,7 @@ namespace Ogre
             uint16      maxTextures;
             bool        automatic;
             bool        isNormalMap;
+            bool        manuallyReserved;
 
             uint16      activeEntries;
             NamePairVec entries;
@@ -168,9 +178,10 @@ namespace Ogre
             uint32      uniqueSpecialId;
 
             TextureArray( uint16 _sqrtMaxTextures, uint16 _maxTextures, bool _automatic, bool _isNormalMap,
-                          uint32 _uniqueSpecialId ) :
+                          bool _manuallyReserved, uint32 _uniqueSpecialId ) :
                 sqrtMaxTextures( _sqrtMaxTextures ), maxTextures( _maxTextures ),
-                automatic( _automatic ), isNormalMap( _isNormalMap ), activeEntries( 0 ),
+                automatic( _automatic ), isNormalMap( _isNormalMap ),
+                manuallyReserved( _manuallyReserved ), activeEntries( 0 ),
                 uniqueSpecialId( _uniqueSpecialId )
             {
                 entries.resize( maxTextures );
@@ -206,6 +217,7 @@ namespace Ogre
 
         TextureEntryVec     mEntries;
         TextureArrayVec     mTextureArrays[NUM_TEXTURE_TYPES];
+        MetadataCacheMap    mMetadataCache;
 
         DefaultTextureParameters    mDefaultTextureParameters[NUM_TEXTURE_TYPES];
         size_t              mTextureId;
@@ -346,6 +358,21 @@ namespace Ogre
                           bool saveOitd, bool saveOriginal,
                           uint32 slice, uint32 numSlices,
                           HlmsTextureExportListener *listener );
+
+        /** Retrieves an entry in the metadata cache that was loaded via
+            HlmsTextureManager::importTextureMetadataCache.
+
+            Note that this texture may not even have been ever loaded yet.
+        @param aliasName
+            Alias of the resource.
+        @return
+            Null if not found. The cache entry otherwise.
+        */
+        const HlmsTextureManager::MetadataCacheEntry* getMetadataCacheEntry( IdString aliasName ) const;
+        void importTextureMetadataCache( const String &filename, const char *jsonString );
+        void exportTextureMetadataCache( String &outJson );
+        void clearTextureMetadataCache(void);
+        HlmsTextureManager::MetadataCacheMap& getTextureMetadataCache(void) { return mMetadataCache; }
 
         /// Returns the precreated blank texture
         TextureLocation getBlankTexture(void) const;
