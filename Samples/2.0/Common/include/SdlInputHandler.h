@@ -48,8 +48,8 @@ namespace Demo
         bool        mMouseInWindow;
         bool        mWindowHasFocus;
 
-        Uint16      mWarpX;
-        Uint16      mWarpY;
+        int         mWarpX;
+        int         mWarpY;
         bool        mWarpCompensate;
 
         void updateMouseSettings(void);
