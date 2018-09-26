@@ -133,8 +133,6 @@ namespace Ogre {
         , mBlendOperation(SBO_ADD)
         , mAlphaBlendOperation(SBO_ADD)
         , mHashDirtyQueued(false)
-        , mSeparateBlend(false)
-        , mSeparateBlendOperation(false)
         , mColourWriteR(true)
         , mColourWriteG(true)
         , mColourWriteB(true)
@@ -228,11 +226,8 @@ namespace Ogre {
         mDestBlendFactor = oth.mDestBlendFactor;
         mSourceBlendFactorAlpha = oth.mSourceBlendFactorAlpha;
         mDestBlendFactorAlpha = oth.mDestBlendFactorAlpha;
-        mSeparateBlend = oth.mSeparateBlend;
-
         mBlendOperation = oth.mBlendOperation;
         mAlphaBlendOperation = oth.mAlphaBlendOperation;
-        mSeparateBlendOperation = oth.mSeparateBlendOperation;
 
         mDepthCheck = oth.mDepthCheck;
         mDepthWrite = oth.mDepthWrite;
@@ -752,8 +747,8 @@ namespace Ogre {
     {
         mSourceBlendFactor = sourceFactor;
         mDestBlendFactor = destFactor;
-
-        mSeparateBlend = false;
+        mSourceBlendFactorAlpha = sourceFactor;
+        mDestBlendFactorAlpha = destFactor;
     }
     //-----------------------------------------------------------------------
     void Pass::setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha )
@@ -762,8 +757,6 @@ namespace Ogre {
         mDestBlendFactor = destFactor;
         mSourceBlendFactorAlpha = sourceFactorAlpha;
         mDestBlendFactorAlpha = destFactorAlpha;
-
-        mSeparateBlend = true;
     }
     //-----------------------------------------------------------------------
     SceneBlendFactor Pass::getSourceBlendFactor(void) const
@@ -788,20 +781,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Pass::hasSeparateSceneBlending() const
     {
-        return mSeparateBlend;
+        return true;
     }
     //-----------------------------------------------------------------------
     void Pass::setSceneBlendingOperation(SceneBlendOperation op)
     {
         mBlendOperation = op;
-        mSeparateBlendOperation = false;
+        mAlphaBlendOperation = op;
     }
     //-----------------------------------------------------------------------
     void Pass::setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp)
     {
         mBlendOperation = op;
         mAlphaBlendOperation = alphaOp;
-        mSeparateBlendOperation = true;
     }
     //-----------------------------------------------------------------------
     SceneBlendOperation Pass::getSceneBlendingOperation() const
@@ -816,7 +808,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Pass::hasSeparateSceneBlendingOperations() const
     {
-        return mSeparateBlendOperation;
+        return true;
     }
     //-----------------------------------------------------------------------
     bool Pass::isTransparent(void) const

@@ -1785,43 +1785,6 @@ namespace Ogre {
         // to keep compiler happy
         return GL_ONE;
     }
-
-    void GLRenderSystem::_setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op )
-    {
-        GLint sourceBlend = getBlendMode(sourceFactor);
-        GLint destBlend = getBlendMode(destFactor);
-        if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, false);
-        }
-        else
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, true);
-            mStateCacheManager->setBlendFunc(sourceBlend, destBlend);
-        }
-
-        GLint func = GL_FUNC_ADD;
-        switch(op)
-        {
-        case SBO_ADD:
-            func = GL_FUNC_ADD;
-            break;
-        case SBO_SUBTRACT:
-            func = GL_FUNC_SUBTRACT;
-            break;
-        case SBO_REVERSE_SUBTRACT:
-            func = GL_FUNC_REVERSE_SUBTRACT;
-            break;
-        case SBO_MIN:
-            func = GL_MIN;
-            break;
-        case SBO_MAX:
-            func = GL_MAX;
-            break;
-        }
-
-        mStateCacheManager->setBlendEquation(func);
-    }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setSeparateSceneBlending(
         SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
@@ -1841,10 +1804,7 @@ namespace Ogre {
         else
         {
             mStateCacheManager->setEnabled(GL_BLEND, true);
-            if(GLEW_VERSION_1_4)
-                glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
-            else if(GLEW_EXT_blend_func_separate)
-                glBlendFuncSeparateEXT(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+            mStateCacheManager->setBlendFunc(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
         }
 
         GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;

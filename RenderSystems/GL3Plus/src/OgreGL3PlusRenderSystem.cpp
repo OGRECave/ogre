@@ -929,43 +929,6 @@ namespace Ogre {
         return GL_ONE;
     }
 
-    void GL3PlusRenderSystem::_setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op)
-    {
-        GLenum sourceBlend = getBlendMode(sourceFactor);
-        GLenum destBlend = getBlendMode(destFactor);
-        if (sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, false);
-        }
-        else
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, true);
-            mStateCacheManager->setBlendFunc(sourceBlend, destBlend);
-        }
-
-        GLint func = GL_FUNC_ADD;
-        switch(op)
-        {
-        case SBO_ADD:
-            func = GL_FUNC_ADD;
-            break;
-        case SBO_SUBTRACT:
-            func = GL_FUNC_SUBTRACT;
-            break;
-        case SBO_REVERSE_SUBTRACT:
-            func = GL_FUNC_REVERSE_SUBTRACT;
-            break;
-        case SBO_MIN:
-            func = GL_MIN;
-            break;
-        case SBO_MAX:
-            func = GL_MAX;
-            break;
-        }
-
-        mStateCacheManager->setBlendEquation(func);
-    }
-
     void GL3PlusRenderSystem::_setSeparateSceneBlending(
         SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
         SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
@@ -984,7 +947,7 @@ namespace Ogre {
         else
         {
             mStateCacheManager->setEnabled(GL_BLEND, true);
-            OGRE_CHECK_GL_ERROR(glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha));
+            mStateCacheManager->setBlendFunc(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
         }
 
         GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;

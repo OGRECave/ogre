@@ -87,6 +87,10 @@ namespace Ogre
         /// Stores the current blend equation
         uint32 mBlendEquationRGB;
         uint32 mBlendEquationAlpha;
+        uint32 mBlendFuncSource;
+        uint32 mBlendFuncDest;
+        uint32 mBlendFuncSourceAlpha;
+        uint32 mBlendFuncDestAlpha;
         /// Stores the currently active texture unit
         size_t mActiveTextureUnit;
     public:

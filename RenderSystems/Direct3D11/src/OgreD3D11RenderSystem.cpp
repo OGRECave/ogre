@@ -1789,35 +1789,10 @@ namespace Ogre
         mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op /*= SBO_ADD*/ )
-    {
-        if( sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
-        {
-            mBlendDesc.RenderTarget[0].BlendEnable = FALSE;
-        }
-        else
-        {
-            mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-            mBlendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(sourceFactor, false);
-            mBlendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(destFactor, false);
-            mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactor, true);
-            mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactor, true);
-            mBlendDesc.RenderTarget[0].BlendOp = mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(op);
-            
-            // feature level 9 and below does not support alpha to coverage.
-            if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
-                mBlendDesc.AlphaToCoverageEnable = false;
-            else
-                mBlendDesc.AlphaToCoverageEnable = mSceneAlphaToCoverage;
-
-            mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
-        }
-        mBlendDescChanged = true;
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op /*= SBO_ADD*/, SceneBlendOperation alphaOp /*= SBO_ADD*/ )
     {
-        if( sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
+        if( sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
+            sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
         {
             mBlendDesc.RenderTarget[0].BlendEnable = FALSE;
         }

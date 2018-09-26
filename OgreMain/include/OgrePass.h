@@ -134,10 +134,6 @@ namespace Ogre {
 
         /// Needs to be dirtied when next loaded
         bool mHashDirtyQueued : 1;
-        /// Used to determine if separate alpha blending should be used for color and alpha channels
-        bool mSeparateBlend : 1;
-        /// Determines if we should use separate blending operations for color and alpha channels
-        bool mSeparateBlendOperation : 1;
         /// Colour buffer settings
         bool mColourWriteR : 1;
         bool mColourWriteG : 1;
@@ -662,8 +658,8 @@ namespace Ogre {
         */
         void setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha );
 
-        /** Return true if this pass uses separate scene blending */
-        bool hasSeparateSceneBlending() const;
+        /// @deprecated
+        OGRE_DEPRECATED bool hasSeparateSceneBlending() const;
 
         /** Retrieves the source blending factor for the material (as set using Materiall::setSceneBlending).
          */
@@ -703,8 +699,8 @@ namespace Ogre {
         */
         void setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
 
-        /** Returns true if this pass uses separate scene blending operations. */
-        bool hasSeparateSceneBlendingOperations() const;
+        /// @deprecated
+        OGRE_DEPRECATED bool hasSeparateSceneBlendingOperations() const;
 
         /** Returns the current blending operation */
         SceneBlendOperation getSceneBlendingOperation() const;
