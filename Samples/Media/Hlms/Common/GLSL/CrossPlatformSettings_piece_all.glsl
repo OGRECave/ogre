@@ -31,6 +31,7 @@
 #define ushort uint
 
 #define toFloat3x3( x ) mat3( x )
+#define buildFloat3x3( row0, row1, row2 ) mat3( row0, row1, row2 )
 
 #define mul( x, y ) ((x) * (y))
 #define saturate(x) clamp( (x), 0.0, 1.0 )

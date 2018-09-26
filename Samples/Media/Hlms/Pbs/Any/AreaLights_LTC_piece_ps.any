@@ -196,7 +196,7 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv, float3 p
 	T2 = cross(N, T1);
 
 	// rotate area light in (T1, T2, N) basis
-	Minv = mul( Minv, transpose( float3x3( T1, T2, N ) ) );
+	Minv = mul( Minv, transpose( buildFloat3x3( T1, T2, N ) ) );
 
 	// polygon (allocate 5 vertices for clipping)
 	float3 L[5];
@@ -283,7 +283,7 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv, float3 p
 		float4 ltc0 = OGRE_SampleArray2DLevel( ltcMatrix, ltcSampler, ltcUV, 0, 0 );
 		float4 ltc1 = OGRE_SampleArray2DLevel( ltcMatrix, ltcSampler, ltcUV, 1, 0 );
 
-		float3x3 Minv = float3x3(
+		float3x3 Minv = buildFloat3x3(
 			float3(ltc0.x, 0, ltc0.y),
 			float3(  0,  1,    0),
 			float3(ltc0.z, 0, ltc0.w)
@@ -307,7 +307,7 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv, float3 p
 		@end
 
 		float ltcDiffuse = LTC_Evaluate( nNormal.xyz, viewDir.xyz, inPs.pos.xyz,
-										 float3x3( float3( 1, 0, 0 ), float3( 0, 1, 0 ), float3( 0, 0, 1 ) ),
+										 buildFloat3x3( float3( 1, 0, 0 ), float3( 0, 1, 0 ), float3( 0, 0, 1 ) ),
 										 passBuf.areaLtcLights[@n].points, doubleSidedLtc );
 
 		finalColour += passBuf.areaLtcLights[@n].diffuse.xyz * ltcDiffuse * @insertpiece( kD ).xyz;
