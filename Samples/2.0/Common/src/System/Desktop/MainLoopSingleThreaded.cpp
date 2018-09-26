@@ -91,6 +91,7 @@ int Demo::MainEntryPoints::mainAppSingleThreaded( int argc, const char *argv[] )
         SdlInputHandler *inputHandler = graphicsSystem->getInputHandler();
         inputHandler->setGrabMousePointer( true );
         inputHandler->setMouseVisible( false );
+        inputHandler->setMouseRelative( true );
     #endif
 
         Ogre::Timer timer;

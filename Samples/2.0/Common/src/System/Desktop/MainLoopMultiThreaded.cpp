@@ -123,6 +123,7 @@ unsigned long renderThreadApp( Ogre::ThreadHandle *threadHandle )
     SdlInputHandler *inputHandler = graphicsSystem->getInputHandler();
     inputHandler->setGrabMousePointer( true );
     inputHandler->setMouseVisible( false );
+    inputHandler->setMouseRelative( true );
     #endif
 
     Ogre::RenderWindow *renderWindow = graphicsSystem->getRenderWindow();
