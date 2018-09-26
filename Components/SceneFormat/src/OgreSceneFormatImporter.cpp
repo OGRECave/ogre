@@ -1296,6 +1296,46 @@ namespace Ogre
                 hlmsPbs->setAreaLightMasks( areaLightMask );
             }
         }
+
+        if( importFlags & SceneFlags::Decals )
+        {
+            HlmsManager *hlmsManager = mRoot->getHlmsManager();
+            HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
+
+            char tmpBuffer[32];
+            LwString keyName( LwString::FromEmptyPointer( tmpBuffer, sizeof( tmpBuffer ) ) );
+            const char *texTypes[3] = { "diffuse", "normals", "emissive" };
+            TexturePtr textures[3];
+
+            for( int i=0; i<3; ++i )
+            {
+                keyName.clear();
+                keyName.a( "decals_", texTypes[i],"_managed" );
+                tmpIt = json.FindMember( keyName.c_str() );
+                if( tmpIt != json.MemberEnd() && tmpIt->value.IsString() )
+                {
+                    //TextureType shouldn't matter because that alias should've been loaded by now
+                    HlmsTextureManager::TextureLocation texLocation =
+                            hlmsTextureManager->createOrRetrieveTexture(
+                                tmpIt->value.GetString(), HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
+                    textures[i] = texLocation.texture;
+                }
+
+                keyName.clear();
+                keyName.a( "decals_", texTypes[i],"_raw" );
+                tmpIt = json.FindMember( keyName.c_str() );
+                if( tmpIt != json.MemberEnd() && tmpIt->value.IsString() )
+                {
+                    textures[i] = TextureManager::getSingleton().load(
+                                      tmpIt->value.GetString(),
+                                      "SceneFormatImporter", TEX_TYPE_2D_ARRAY );
+                }
+            }
+
+            mSceneManager->setDecalsDiffuse( textures[0] );
+            mSceneManager->setDecalsNormals( textures[1] );
+            mSceneManager->setDecalsEmissive( textures[2] );
+        }
     }
     //-----------------------------------------------------------------------------------
     void SceneFormatImporter::importScene( const String &filename, const rapidjson::Document &d,
