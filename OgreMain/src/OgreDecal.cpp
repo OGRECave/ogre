@@ -56,6 +56,9 @@ namespace Ogre
         const float radius = aabb.getRadius();
         mObjectData.mLocalRadius[mObjectData.mIndex] = radius;
         mObjectData.mWorldRadius[mObjectData.mIndex] = radius;
+
+        //Disable shadow casting by default. Otherwise it's a waste or resources
+        setCastShadows( false );
     }
     //-----------------------------------------------------------------------------------
     Decal::~Decal()
