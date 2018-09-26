@@ -65,6 +65,10 @@ namespace Ogre
         char mFloatBinTmpString[24][64];
         char mDoubleBinTmpString[4][384];
 
+        String      mDecalsTexNames[3];
+        TexturePtr  mDecalsTex[3];
+        bool        mDecalsTexManaged[3];
+
         static const char* toQuotedStr( bool value );
         static void toQuotedStr( LwString &jsonStr, Light::LightTypes lightType );
 
@@ -99,7 +103,7 @@ namespace Ogre
         void exportLight( LwString &jsonStr, String &outJson, Light *light );
         void exportEntity( LwString &jsonStr, String &outJson, v1::Entity *entity, bool exportMesh );
         void exportDecalTex( LwString &jsonStr, String &outJson, const DecalTex &decalTex,
-                             set<String>::type &savedTextures, uint32 exportFlags );
+                             set<String>::type &savedTextures, uint32 exportFlags, int texTypeIndex );
         void exportDecal( LwString &jsonStr, String &outJson, Decal *decal,
                           set<String>::type &savedTextures, uint32 exportFlags );
         void exportInstantRadiosity( LwString &jsonStr, String &outJson );

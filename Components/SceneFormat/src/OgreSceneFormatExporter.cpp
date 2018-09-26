@@ -74,6 +74,13 @@ namespace Ogre
     {
         memset( mFloatBinTmpString, 0, sizeof( mFloatBinTmpString ) );
         memset( mDoubleBinTmpString, 0, sizeof( mDoubleBinTmpString ) );
+
+        for( int i=0; i<3; ++i )
+        {
+            mDecalsTexNames[i].clear();
+            mDecalsTex[i].reset();
+            mDecalsTexManaged[i] = false;
+        }
     }
     //-----------------------------------------------------------------------------------
     SceneFormatExporter::~SceneFormatExporter()
@@ -552,7 +559,7 @@ namespace Ogre
     void SceneFormatExporter::exportDecalTex( LwString &jsonStr, String &outJson,
                                               const DecalTex &decalTex,
                                               set<String>::type &savedTextures,
-                                              uint32 exportFlags )
+                                              uint32 exportFlags, int texTypeIndex )
     {
         if( !decalTex.texture )
             return;
@@ -568,6 +575,11 @@ namespace Ogre
         const String *aliasName = hlmsTextureManager->findAliasName( texLocation );
         if( aliasName )
         {
+            if( decalTex.texture == mDecalsTex[texTypeIndex] && mDecalsTexNames[texTypeIndex].empty() )
+            {
+                mDecalsTexNames[texTypeIndex] = *aliasName;
+                mDecalsTexManaged[texTypeIndex] = true;
+            }
             uint32 poolId = 0;
             const String *resName = hlmsTextureManager->findResourceNameFromAlias( *aliasName, poolId );
             jsonStr.a( "\n\t\t\t\"", decalTex.texTypeName ,"_managed\" : [ \"", aliasName->c_str(),
@@ -584,6 +596,12 @@ namespace Ogre
         }
         else
         {
+            if( decalTex.texture == mDecalsTex[texTypeIndex] && mDecalsTexNames[texTypeIndex].empty() )
+            {
+                mDecalsTexNames[texTypeIndex] = decalTex.texture->getName() + ".oitd";
+                mDecalsTexManaged[texTypeIndex] = false;
+            }
+
             //Texture not managed by HlmsTextureManager
             jsonStr.a( "\n\t\t\t\"", decalTex.texTypeName, "_raw\" : [ \"",
                        decalTex.texture->getName().c_str(), ".oitd\", " );
@@ -606,13 +624,13 @@ namespace Ogre
     {
         DecalTex decalTex( decal->getDiffuseTexture(),
                            static_cast<uint16>( decal->mDiffuseIdx ), "diffuse" );
-        exportDecalTex( jsonStr, outJson, decalTex, savedTextures, exportFlags );
+        exportDecalTex( jsonStr, outJson, decalTex, savedTextures, exportFlags, 0 );
         decalTex = DecalTex( decal->getNormalTexture(),
                              static_cast<uint16>( decal->mNormalMapIdx ), "normal" );
-        exportDecalTex( jsonStr, outJson, decalTex, savedTextures, exportFlags );
+        exportDecalTex( jsonStr, outJson, decalTex, savedTextures, exportFlags, 1 );
         decalTex = DecalTex( decal->getEmissiveTexture(),
                              static_cast<uint16>( decal->mEmissiveIdx ), "emissive" );
-        exportDecalTex( jsonStr, outJson, decalTex, savedTextures, exportFlags );
+        exportDecalTex( jsonStr, outJson, decalTex, savedTextures, exportFlags, 2 );
 
         jsonStr.a( "\n" );
         flushLwString( jsonStr, outJson );
@@ -883,6 +901,26 @@ namespace Ogre
             }
         }
 
+        if( exportFlags & SceneFlags::Decals )
+        {
+            //When the texture is managed type:
+            //  "decals_diffuse_managed" : "alias_name_of_any_texture_using_it"
+            //which we gathered in exportDecal()
+            //When it's not managed, type instead:
+            //  "decals_diffuse_raw" : "tex_name.oitd"
+            //which was also filled in exportDecal()
+            const char *texTypes[3] = { "diffuse", "normals", "emissive" };
+            for( int i=0; i<3; ++i )
+            {
+                if( !mDecalsTexNames[i].empty() )
+                {
+                    const char *texMode = mDecalsTexManaged[i] ? "_managed" : "_raw";
+                    jsonStr.a( ",\n\t\t\"decals_", texTypes[i], texMode,"\" : \"",
+                               mDecalsTexNames[i].c_str(), "\"" );
+                }
+            }
+        }
+
         jsonStr.a( "\n\t}" );
 
         flushLwString( jsonStr, outJson );
@@ -894,6 +932,17 @@ namespace Ogre
         mNodeToIdxMap.clear();
         mExportedMeshes.clear();
         mExportedMeshesV1.clear();
+
+        for( int i=0; i<3; ++i )
+        {
+            mDecalsTexNames[i].clear();
+            mDecalsTex[i].reset();
+            mDecalsTexManaged[i] = false;
+        }
+
+        mDecalsTex[0] = mSceneManager->getDecalsDiffuse();
+        mDecalsTex[1] = mSceneManager->getDecalsNormals();
+        mDecalsTex[2] = mSceneManager->getDecalsEmissive();
 
         mListener->setSceneFlags( exportFlags, this );
 
