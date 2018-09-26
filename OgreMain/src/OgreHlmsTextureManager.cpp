@@ -1292,9 +1292,9 @@ namespace Ogre
         jsonStr.a( "{" );
         jsonStr.a( "\n\t\"reserved_pool_ids\" :\n\t[" );
 
+        bool firstIteration = true;
         for( int i=0; i<NUM_TEXTURE_TYPES; ++i )
         {
-            bool firstIteration = true;
             TextureArrayVec::const_iterator itor = mTextureArrays[i].begin();
             TextureArrayVec::const_iterator end  = mTextureArrays[i].end();
 
@@ -1330,7 +1330,7 @@ namespace Ogre
         }
 
         jsonStr.a( "\n\t],\n\t\"textures\" :\n\t{" );
-        bool firstIteration = true;
+        firstIteration = true;
         TextureEntryVec::const_iterator itor = mEntries.begin();
         TextureEntryVec::const_iterator end  = mEntries.end();
 

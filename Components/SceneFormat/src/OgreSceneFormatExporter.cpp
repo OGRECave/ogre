@@ -586,7 +586,7 @@ namespace Ogre
         {
             //Texture not managed by HlmsTextureManager
             jsonStr.a( "\n\t\t\t\"", decalTex.texTypeName, "_raw\" : [ \"",
-                       decalTex.texture->getName().c_str(), "\", " );
+                       decalTex.texture->getName().c_str(), ".oitd\", " );
             jsonStr.a( decalTex.xIdx, " ]," );
 
             if( exportFlags & SceneFlags::TexturesOitd )

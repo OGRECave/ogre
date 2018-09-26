@@ -70,6 +70,7 @@ namespace Ogre
         String  mDefaultPccWorkspaceName;
 
         bool mUseBinaryFloatingPoint;
+        bool mUsingOitd;
 
         LightArray mVplLights;
 
@@ -111,6 +112,8 @@ namespace Ogre
         void importEntities( const rapidjson::Value &json );
         void importLight( const rapidjson::Value &lightValue );
         void importLights( const rapidjson::Value &json );
+        void importDecal( const rapidjson::Value &decalValue );
+        void importDecals( const rapidjson::Value &json );
         void importInstantRadiosity( const rapidjson::Value &irValue );
         void importPcc( const rapidjson::Value &pccValue );
         void importSceneSettings( const rapidjson::Value &json, uint32 importFlags );
