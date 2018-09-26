@@ -241,14 +241,17 @@ namespace Demo
 
         SDL_GetWindowSize( mSdlWindow, &width, &height );
 
-        const int FUDGE_FACTOR_X = width;
-        const int FUDGE_FACTOR_Y = height;
+        const int centerScreenX = width >> 1;
+        const int centerScreenY = height >> 1;
+
+        const int FUDGE_FACTOR_X = (width >> 2) - 1;
+        const int FUDGE_FACTOR_Y = (height >> 2) - 1;
 
         //Warp the mouse if it's about to go outside the window
-        if( evt.x - FUDGE_FACTOR_X < 0  || evt.x + FUDGE_FACTOR_X > width ||
-            evt.y - FUDGE_FACTOR_Y < 0  || evt.y + FUDGE_FACTOR_Y > height )
+        if( evt.x <= centerScreenX - FUDGE_FACTOR_X || evt.x >= centerScreenX + FUDGE_FACTOR_X ||
+            evt.y <= centerScreenY - FUDGE_FACTOR_Y || evt.y >= centerScreenY + FUDGE_FACTOR_Y )
         {
-            warpMouse( width / 2, height / 2 );
+            warpMouse( centerScreenX, centerScreenY );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -258,7 +261,10 @@ namespace Demo
             return false;
 
         //This was a warp event, signal the caller to eat it.
-        if( evt.x == mWarpX && evt.y == mWarpY )
+        //The if statement is broken in Windows 10, an issue with SetCursorPos. See:
+        //https://github.com/gottebp/windows10-setcursorpos-bug-demonstration
+        //https://discourse.libsdl.org/t/win10-fall-creators-update-breaks-mouse-warping/23526/2
+        //if( evt.x == mWarpX && evt.y == mWarpY )
         {
             mWarpCompensate = false;
             return true;
