@@ -119,7 +119,8 @@ namespace Ogre
         uint32 getWidth(void) const                                     { return mWidth; }
         uint32 getHeight(void) const                                    { return mHeight; }
         uint32 getNumSlices(void) const                                 { return mNumSlices; }
-        uint32 getLightsPerCell(void) const                             { return mLightsPerCell; }
+        uint32 getLightsPerCell(void) const             { return static_cast<uint32>( mLightsPerCell ); }
+        uint32 getDecalsPerCell(void) const             { return static_cast<uint32>( mDecalsPerCell ); }
         float getMinDistance(void) const                                { return mMinDistance; }
         float getMaxDistance(void) const                                { return mMaxDistance; }
 
