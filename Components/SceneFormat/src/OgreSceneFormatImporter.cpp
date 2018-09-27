@@ -1036,12 +1036,14 @@ namespace Ogre
                 tmpIt->value[0].IsString() && tmpIt->value[1].IsString() && tmpIt->value[2].IsUint() )
             {
                 const char *aliasName = tmpIt->value[0].GetString();
-                const char *textureName = tmpIt->value[1].GetString();
+                //Real texture name is lost in 2.1. Needs 2.2
+                //const char *textureName = tmpIt->value[1].GetString();
                 const uint32 poolId = tmpIt->value[2].GetUint();
 
                 HlmsTextureManager::TextureLocation texLocation =
                         hlmsTextureManager->createOrRetrieveTexture(
-                            aliasName, textureName + additionalExtension,
+                            //aliasName, textureName + additionalExtension,
+                            aliasName, aliasName + additionalExtension,
                             i != 1 ? HlmsTextureManager::TEXTURE_TYPE_DIFFUSE :
                                      HlmsTextureManager::TEXTURE_TYPE_NORMALS, poolId );
                 decalTex[i].texture = texLocation.texture;

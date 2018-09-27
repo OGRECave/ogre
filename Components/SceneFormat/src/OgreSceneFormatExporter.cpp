@@ -872,6 +872,7 @@ namespace Ogre
                            forwardImpl->getNumSlices(), ", ", forwardImpl->getLightsPerCell() );
                 jsonStr.a( ", ", encodeFloat( forwardImpl->getMinDistance() ), ", ",
                            encodeFloat( forwardImpl->getMaxDistance() ), "]" );
+                jsonStr.a( ",\n\t\t\t\"decals_per_cell\" : ", forwardImpl->getDecalsPerCell() );
             }
 
             jsonStr.a( "\n\t\t}" );
