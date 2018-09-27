@@ -21,7 +21,7 @@ file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 # setup target
 add_library(OgreOverlay ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgreOverlay PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreOverlay PUBLIC OgreMain PRIVATE "${FREETYPE_LIBRARIES}" "${ZLIB_LIBRARIES}")
+target_link_libraries(OgreOverlay PUBLIC OgreMain PRIVATE "${FREETYPE_LIBRARIES}" ZLIB::ZLIB)
 target_include_directories(OgreOverlay PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   $<INSTALL_INTERFACE:include/OGRE/Overlay>
