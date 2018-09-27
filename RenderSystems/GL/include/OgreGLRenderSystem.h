@@ -257,13 +257,7 @@ namespace Ogre {
 
         void _setTextureMatrix(size_t stage, const Matrix4& xform);
 
-        void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
-
         void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
-
-        void _setSceneBlendingOperation(SceneBlendOperation op);
-
-        void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
 
         void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage);
 

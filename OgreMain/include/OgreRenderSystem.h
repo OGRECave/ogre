@@ -639,17 +639,11 @@ namespace Ogre
         */
         virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) {}
 
-        /** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-        The result of the blending operation is:
-        <p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
-        Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
-        enumerated type.
-        By changing the operation you can change addition between the source and destination pixels to a different operator.
-        @param sourceFactor The source factor in the above calculation, i.e. multiplied by the texture colour components.
-        @param destFactor The destination factor in the above calculation, i.e. multiplied by the pixel colour components.
-        @param op The blend operation mode for combining pixels
-        */
-        virtual void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD) = 0;
+        /// @deprecated use _setSeparateSceneBlending
+        OGRE_DEPRECATED void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD)
+        {
+            _setSeparateSceneBlending(sourceFactor, destFactor, sourceFactor, destFactor, op, op);
+        }
 
         /** Sets the global blending factors for combining subsequent renders with the existing frame contents.
         The result of the blending operation is:

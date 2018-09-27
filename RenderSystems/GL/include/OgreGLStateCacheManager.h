@@ -65,10 +65,6 @@ namespace Ogre
         TexUnitsMap mTexUnitsMap;
         /// Stores the current polygon rendering mode
         GLenum mPolygonMode;
-        /// Stores the current blend source function
-        GLenum mBlendFuncSource;
-        /// Stores the current blend destination function
-        GLenum mBlendFuncDest;
         /// Stores the last bound texture id
         GLuint mLastBoundTexID;
 
@@ -132,19 +128,11 @@ namespace Ogre
          */
         bool activateGLTextureUnit(size_t unit);
 
-        /** Sets the current blend equation setting.
-         @param eq The blend equation to use.
-         */
-        void setBlendEquation(GLenum eq);
-
         /// Set the blend equation for RGB and alpha separately.
         void setBlendEquation(GLenum eqRGB, GLenum eqA);
 
-        /** Sets the blending function.
-         @param source The blend mode for the source.
-         @param dest The blend mode for the destination
-         */
-        void setBlendFunc(GLenum source, GLenum dest);
+        /// Set the blend function for RGB and alpha separately.
+        void setBlendFunc(GLenum source, GLenum dest, GLenum sourceA, GLenum destA);
 
         void setShadeModel(GLenum model);
 

@@ -1067,29 +1067,10 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
     // The rest of the settings are the same no matter whether we use programs or not
 
     // Set scene blending
-    if ( pass->hasSeparateSceneBlending( ) )
-    {
-        mDestRenderSystem->_setSeparateSceneBlending(
-            pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
-            pass->getSourceBlendFactorAlpha(), pass->getDestBlendFactorAlpha(),
-            pass->getSceneBlendingOperation(),
-            pass->hasSeparateSceneBlendingOperations() ? pass->getSceneBlendingOperation() : pass->getSceneBlendingOperationAlpha() );
-    }
-    else
-    {
-        if(pass->hasSeparateSceneBlendingOperations( ) )
-        {
-            mDestRenderSystem->_setSeparateSceneBlending(
-                pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
-                pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
-                pass->getSceneBlendingOperation(), pass->getSceneBlendingOperationAlpha() );
-        }
-        else
-        {
-            mDestRenderSystem->_setSceneBlending(
-                pass->getSourceBlendFactor(), pass->getDestBlendFactor(), pass->getSceneBlendingOperation() );
-        }
-    }
+    mDestRenderSystem->_setSeparateSceneBlending(
+        pass->getSourceBlendFactor(), pass->getDestBlendFactor(), pass->getSourceBlendFactorAlpha(),
+        pass->getDestBlendFactorAlpha(), pass->getSceneBlendingOperation(),
+        pass->getSceneBlendingOperationAlpha());
 
     // Line width
     if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_WIDE_LINES))

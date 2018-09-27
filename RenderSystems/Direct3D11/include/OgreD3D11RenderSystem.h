@@ -285,7 +285,6 @@ namespace Ogre
         void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
         void _setTextureBorderColour(size_t stage, const ColourValue& colour);
         void _setTextureMipmapBias(size_t unit, float bias);
-        void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD);
         void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
             SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD);
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );

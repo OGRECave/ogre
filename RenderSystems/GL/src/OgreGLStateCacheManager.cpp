@@ -100,6 +100,8 @@ namespace Ogre {
         // stored values match the GL state
         mBlendFuncSource = GL_ONE;
         mBlendFuncDest = GL_ZERO;
+        mBlendFuncSourceAlpha = GL_ONE;
+        mBlendFuncDestAlpha = GL_ZERO;
         
         mClearColour[0] = mClearColour[1] = mClearColour[2] = mClearColour[3] = 0.0f;
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
@@ -291,17 +293,18 @@ namespace Ogre {
         return true;
     }
 
-    void GLStateCacheManager::setBlendFunc(GLenum source, GLenum dest)
+    void GLStateCacheManager::setBlendFunc(GLenum source, GLenum dest, GLenum sourceA, GLenum destA)
     {
-#if 0
-        // TODO glBlendFuncSeparate missing
-        if(mBlendFuncSource != source || mBlendFuncDest != dest)
+#ifdef OGRE_ENABLE_STATE_CACHE
+        if(mBlendFuncSource != source || mBlendFuncDest != dest || sourceA != mBlendFuncSourceAlpha || destA != mBlendFuncDestAlpha )
 #endif
         {
             mBlendFuncSource = source;
             mBlendFuncDest = dest;
+            mBlendFuncSourceAlpha = sourceA;
+            mBlendFuncDestAlpha = destA;
             
-            glBlendFunc(source, dest);
+            glBlendFuncSeparate(source, dest, sourceA, destA);
         }
     }
 
@@ -446,26 +449,6 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManager::setBlendEquation(GLenum eq)
-    {
-#ifdef OGRE_ENABLE_STATE_CACHE
-        if(mBlendEquationRGB != eq || mBlendEquationAlpha != eq)
-#endif
-        {
-            mBlendEquationRGB = eq;
-            mBlendEquationAlpha = eq;
-
-            if(GLEW_VERSION_1_4 || GLEW_ARB_imaging)
-            {
-                glBlendEquation(eq);
-            }
-            else if(GLEW_EXT_blend_minmax && (eq == GL_MIN || eq == GL_MAX))
-            {
-                glBlendEquationEXT(eq);
-            }
-        }
-    }
-
     void GLStateCacheManager::setBlendEquation(GLenum eqRGB, GLenum eqAlpha)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
@@ -482,6 +465,10 @@ namespace Ogre {
             else if(GLEW_EXT_blend_equation_separate)
             {
                 glBlendEquationSeparateEXT(eqRGB, eqAlpha);
+            }
+            else
+            {
+                glBlendEquation(eqRGB);
             }
         }
     }

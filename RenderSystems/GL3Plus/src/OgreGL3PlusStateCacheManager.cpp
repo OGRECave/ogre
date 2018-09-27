@@ -362,17 +362,18 @@ namespace Ogre {
         return true;
     }
 
-    void GL3PlusStateCacheManager::setBlendFunc(GLenum source, GLenum dest)
+    void GL3PlusStateCacheManager::setBlendFunc(GLenum source, GLenum dest, GLenum sourceA, GLenum destA)
     {
-#if 0
-        // TODO glBlendFuncSeparate missing
-        if(mBlendFuncSource != source || mBlendFuncDest != dest)
+#ifdef OGRE_ENABLE_STATE_CACHE
+        if(mBlendFuncSource != source || mBlendFuncDest != dest || sourceA != mBlendFuncSourceAlpha || destA != mBlendFuncDestAlpha )
 #endif
         {
             mBlendFuncSource = source;
             mBlendFuncDest = dest;
+            mBlendFuncSourceAlpha = sourceA;
+            mBlendFuncDestAlpha = destA;
             
-            glBlendFunc(source, dest);
+            OGRE_CHECK_GL_ERROR(glBlendFuncSeparate(source, dest, sourceA, destA));
         }
     }
 
@@ -514,19 +515,6 @@ namespace Ogre {
             mCullFace = face;
             
             glCullFace(face);
-        }
-    }
-
-    void GL3PlusStateCacheManager::setBlendEquation(GLenum eq)
-    {
-#ifdef OGRE_ENABLE_STATE_CACHE
-        if(mBlendEquationRGB != eq || mBlendEquationAlpha != eq)
-#endif
-        {
-            mBlendEquationRGB = eq;
-            mBlendEquationAlpha = eq;
-
-            OGRE_CHECK_GL_ERROR(glBlendEquation(eq));
         }
     }
 
