@@ -21,15 +21,14 @@ target_link_libraries(Codec_STBI PUBLIC OgreMain)
 
 target_include_directories(Codec_STBI PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-  $<INSTALL_INTERFACE:include/OGRE/Plugins/STBICodec>
-  PRIVATE "${ZLIB_INCLUDE_DIRS}")
+  $<INSTALL_INTERFACE:include/OGRE/Plugins/STBICodec>)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   # workaround gcc5 bug on Ubuntu 16.04 regarding __builtin_cpu_supports
   target_link_libraries(Codec_STBI PRIVATE gcc)
 endif()
 if(OGRE_CONFIG_ENABLE_ZIP)
-  target_link_libraries(Codec_STBI PRIVATE "${ZLIB_LIBRARIES}")
+  target_link_libraries(Codec_STBI PRIVATE ZLIB::ZLIB)
 endif()
 
 ogre_config_framework(Codec_STBI)

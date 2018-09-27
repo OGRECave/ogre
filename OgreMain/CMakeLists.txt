@@ -73,7 +73,7 @@ if(NOT WIN32)
     list(APPEND PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp")
 endif()
 
-include_directories("${ZLIB_INCLUDE_DIRS}" "${ZZip_INCLUDE_DIRS}")
+include_directories("${ZZip_INCLUDE_DIRS}")
 # Configure threading files
 file(GLOB THREAD_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h")
 include_directories("include/Threading" "src/")
@@ -164,7 +164,7 @@ if (OGRE_CONFIG_ENABLE_ZIP)
   endif()
 
   list(APPEND LIBRARIES "${ZZip_LIBRARIES}")
-  list(APPEND LIBRARIES "${ZLIB_LIBRARIES}")
+  list(APPEND LIBRARIES ZLIB::ZLIB)
 endif ()
 
 set (TARGET_LINK_FLAGS "")
