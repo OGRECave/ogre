@@ -55,7 +55,6 @@ namespace Ogre {
         // This means CULL clockwise vertices, i.e. front of poly is counter-clockwise
         // This makes it the same as OpenGL and other right-handed systems
         , mCullingMode(CULL_CLOCKWISE)
-        , mWBuffer(false)
         , mBatchCount(0)
         , mFaceCount(0)
         , mVertexCount(0)
@@ -505,12 +504,13 @@ namespace Ogre {
     }
     bool RenderSystem::getWBufferEnabled(void) const
     {
-        return mWBuffer;
+        return mCurrentCapabilities->hasCapability(RSC_WBUFFER);
     }
     //-----------------------------------------------------------------------
     void RenderSystem::setWBufferEnabled(bool enabled)
     {
-        mWBuffer = enabled;
+        enabled ? mCurrentCapabilities->setCapability(RSC_WBUFFER)
+                : mCurrentCapabilities->unsetCapability(RSC_WBUFFER);
     }
     //-----------------------------------------------------------------------
     void RenderSystem::shutdown(void)

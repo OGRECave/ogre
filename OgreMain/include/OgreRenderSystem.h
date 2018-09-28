@@ -261,17 +261,11 @@ namespace Ogre
         */
         virtual void setLightingEnabled(bool enabled) {}
 
-        /** Sets whether or not W-buffers are enabled if they are available for this renderer.
-        @param
-        enabled If true and the renderer supports them W-buffers will be used.  If false 
-        W-buffers will not be used even if available.  W-buffers are enabled by default 
-        for 16bit depth buffers and disabled for all other depths.
-        */
-        void setWBufferEnabled(bool enabled);
+        /// @deprecated use RSC_WBUFFER
+        OGRE_DEPRECATED void setWBufferEnabled(bool enabled);
 
-        /** Returns true if the renderer will try to use W-buffers when available.
-        */
-        bool getWBufferEnabled(void) const;
+        /// @deprecated use RSC_WBUFFER
+        OGRE_DEPRECATED bool getWBufferEnabled(void) const;
 
         /** Creates a new rendering window.
         @remarks
@@ -1363,8 +1357,6 @@ namespace Ogre
         Viewport* mActiveViewport;
 
         CullingMode mCullingMode;
-
-        bool mWBuffer;
 
         size_t mBatchCount;
         size_t mFaceCount;
