@@ -172,8 +172,8 @@ namespace Ogre {
     mutable GpuLogicalBufferStructPtr mIntLogicalToPhysical;
     /// @copydoc mFloatLogicalToPhysical
     mutable GpuLogicalBufferStructPtr mUIntLogicalToPhysical;
-    /// @copydoc mFloatLogicalToPhysical
-    mutable GpuLogicalBufferStructPtr mBoolLogicalToPhysical;
+    /// static nullPtr
+    static GpuLogicalBufferStructPtr mBoolLogicalToPhysical;
     /** Parameter name -> ConstantDefinition map, shared instance used by all parameter objects.
         This is a shared pointer because if the program is recompiled and the parameters
         change, this definition will alter, but previous params may reference the old def.

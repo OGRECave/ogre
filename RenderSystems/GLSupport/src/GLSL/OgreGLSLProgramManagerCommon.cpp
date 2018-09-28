@@ -168,11 +168,6 @@ namespace Ogre {
                         def.physicalIndex = defs.uintBufferSize;
                         defs.uintBufferSize += def.arraySize * def.elementSize;
                     }
-                    // else if (def.isBool())
-                    // {
-                    //     def.physicalIndex = defs.boolBufferSize;
-                    //     defs.boolBufferSize += def.arraySize * def.elementSize;
-                    // }
                     else
                     {
                         LogManager::getSingleton().logMessage("Could not parse type of GLSL Uniform: '"
