@@ -121,6 +121,24 @@ namespace Ogre
         void setRoughness( float roughness );
         float getRoughness(void) const              { return mRoughness; }
 
+        /** Helper function to set width, height and depth of the decal.
+            This is a helper function because these parameters actually live in the parent scene node
+
+            All the function does is literally:
+            @code
+                if( mParentNode )
+                    mParentNode->setScale( planeDimensions.x, depth, planeDimensions.y );
+            @endcode
+        @param planeDimensions
+            planeDimensions.x = width
+            planeDimensions.y = height
+        @param depth
+            Decals are 2D by nature. The depth of the decal indicates its influence on the objects.
+            Decals are like oriented boxes, and everything inside the box will be affected by
+            the decal.
+        */
+        void setRectSize( Vector2 planeDimensions, Real depth );
+
         //Overrides from MovableObject
         virtual const String& getMovableType(void) const;
 

@@ -118,6 +118,12 @@ namespace Ogre
         mMetalness = value;
     }
     //-----------------------------------------------------------------------------------
+    void Decal::setRectSize( Vector2 planeDimensions, Real depth )
+    {
+        if( mParentNode )
+            mParentNode->setScale( planeDimensions.x, depth, planeDimensions.y );
+    }
+    //-----------------------------------------------------------------------------------
     const String& Decal::getMovableType(void) const
     {
         return DecalFactory::FACTORY_TYPE_NAME;
