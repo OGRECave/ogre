@@ -430,6 +430,8 @@ namespace Ogre {
         static uint8 getMaxMipmapCount( uint32 width, uint32 height );
         static uint8 getMaxMipmapCount( uint32 width, uint32 height, uint32 depth );
 
+        /// WARNING: numMipmaps includes the mip 0. That means numMipmaps > 0,
+        /// and that you should use texture->getNumMipmaps + 1u
         static size_t calculateSizeBytes( uint32 width, uint32 height, uint32 depth,
                                           uint32 slices, PixelFormat format, uint8 numMipmaps );
 

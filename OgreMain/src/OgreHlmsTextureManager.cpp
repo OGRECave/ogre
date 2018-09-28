@@ -153,10 +153,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsTextureManager::reservePoolId( uint32 uniqueSpecialId, TextureMapType mapType,
-                                            uint32 width, uint32 height,
-                                            uint16 numSlices, uint8 numMipmaps, PixelFormat pixelFormat,
-                                            bool isNormalMap, bool hwGammaCorrection )
+    TexturePtr HlmsTextureManager::reservePoolId( uint32 uniqueSpecialId, TextureMapType mapType,
+                                                  uint32 width, uint32 height,
+                                                  uint16 numSlices, uint8 numMipmaps,
+                                                  PixelFormat pixelFormat,
+                                                  bool isNormalMap, bool hwGammaCorrection )
     {
         TextureArray textureArray( 1u, numSlices, true,
                                    isNormalMap, true, uniqueSpecialId );
@@ -172,6 +173,8 @@ namespace Ogre
                                     0, BLANKSTRING, false );
 
         mTextureArrays[mapType].push_back( textureArray );
+
+        return textureArray.texture;
     }
     //-----------------------------------------------------------------------------------
     bool HlmsTextureManager::hasPoolId( uint32 uniqueSpecialId, TextureMapType mapType ) const

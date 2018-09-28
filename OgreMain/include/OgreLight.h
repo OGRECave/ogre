@@ -537,6 +537,20 @@ namespace Ogre {
             false-positives (The function should not return any false-negatives).
         */
         bool isInLightRange(const Ogre::AxisAlignedBox& container) const;
+
+        /** Sets a textured for types of light that support it. At the time of
+            writing only LT_AREA_APPROX supports it.
+        @remarks
+            Note that HlmsPbs only supports one 2D Array texture active at a time.
+            i.e. you must call hlmsPbs->setAreaLightMasks( texture );
+            and if that texture belongs to a different pool as the one you're
+            inputting here, the wrong texture will be displayed!
+        @param texture
+            Texture. Can be monochrome or coloured. Must be a 2D Array texture.
+        @param sliceIdx
+            Slice to the texture.
+        */
+        void setTexture( const TexturePtr &texture, uint16 sliceIdx );
     
     protected:
 

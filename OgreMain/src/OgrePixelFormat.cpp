@@ -179,6 +179,8 @@ namespace Ogre {
     size_t PixelUtil::calculateSizeBytes( uint32 width, uint32 height, uint32 depth,
                                           uint32 slices, PixelFormat format, uint8 numMipmaps )
     {
+        OGRE_ASSERT_LOW( numMipmaps > 0 );
+
         size_t totalBytes = 0;
         while( (width > 1u || height > 1u || depth > 1u) && numMipmaps > 0 )
         {

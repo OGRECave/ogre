@@ -610,6 +610,14 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    void Light::setTexture( const TexturePtr &texture, uint16 sliceIdx )
+    {
+        if( !texture )
+            mTextureLightMaskIdx = std::numeric_limits<Ogre::uint16>::max();
+        else
+            mTextureLightMaskIdx = sliceIdx;
+    }
+    //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     String LightFactory::FACTORY_TYPE_NAME = "Light";

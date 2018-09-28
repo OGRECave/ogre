@@ -255,9 +255,24 @@ namespace Ogre
         */
         void _changeRenderSystem( RenderSystem *newRs );
 
-        void reservePoolId( uint32 uniqueSpecialId, TextureMapType mapType, uint32 width, uint32 height,
-                            uint16 numSlices, uint8 numMipmaps, PixelFormat pixelFormat,
-                            bool isNormalMap, bool hwGammaCorrection );
+        /** Reserves a specific pool ID with the given parameters and immediately creates
+            that texture.
+        @param uniqueSpecialId
+        @param mapType
+        @param width
+        @param height
+        @param numSlices
+        @param numMipmaps
+        @param pixelFormat
+        @param isNormalMap
+        @param hwGammaCorrection
+        @return
+            Created texture for the pool.
+        */
+        TexturePtr reservePoolId( uint32 uniqueSpecialId, TextureMapType mapType,
+                                  uint32 width, uint32 height,
+                                  uint16 numSlices, uint8 numMipmaps, PixelFormat pixelFormat,
+                                  bool isNormalMap, bool hwGammaCorrection );
         bool hasPoolId( uint32 uniqueSpecialId, TextureMapType mapType ) const;
 
         struct TextureLocation
