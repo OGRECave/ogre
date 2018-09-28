@@ -44,6 +44,8 @@ namespace Ogre
     GpuProgram::CmdComputeGroupDims GpuProgram::msComputeGroupDimsCmd;
     
 
+    GpuLogicalBufferStructPtr GpuProgram::mBoolLogicalToPhysical;
+
     //-----------------------------------------------------------------------------
     GpuProgram::GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader) 

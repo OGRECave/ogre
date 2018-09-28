@@ -1736,36 +1736,6 @@ namespace Ogre
             }
 
         }
-
-        // // bool params
-        // GpuLogicalBufferStructPtr boolLogical = params->getBoolLogicalBufferStruct();
-        // if( boolLogical )
-        // {
-        //     OGRE_LOCK_MUTEX(boolLogical->mutex);
-
-        //     for(GpuLogicalIndexUseMap::const_iterator i = boolLogical->map.begin();
-        //         i != boolLogical->map.end(); ++i)
-        //     {
-        //         size_t logicalIndex = i->first;
-        //         const GpuLogicalIndexUse& logicalUse = i->second;
-
-        //         const GpuProgramParameters::AutoConstantEntry* autoEntry = 
-        //             params->findBoolAutoConstantEntry(logicalIndex);
-        //         const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
-        //         if (defaultParams)
-        //         {
-        //             defaultAutoEntry = defaultParams->findBoolAutoConstantEntry(logicalIndex);
-        //         }
-
-        //         writeGpuProgramParameter("param_indexed", 
-        //                                  StringConverter::toString(logicalIndex), autoEntry, 
-        //                                  defaultAutoEntry, false, false, false, false,
-        //                                  logicalUse.physicalIndex, logicalUse.currentSize,
-        //                                  params, defaultParams, level, useMainBuffer);
-        //     }
-
-        // }
-
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGpuProgramParameter(
