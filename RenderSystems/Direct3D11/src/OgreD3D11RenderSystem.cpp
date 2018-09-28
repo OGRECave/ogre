@@ -755,18 +755,7 @@ namespace Ogre
             miscParams["vsyncInterval"] = opt->second.currentValue;
 
             autoWindow = this->_createRenderWindow( windowTitle, width, height, 
-                fullScreen, &miscParams );
-
-            // If we have 16bit depth buffer enable w-buffering.
-            assert( autoWindow );
-            if ( autoWindow->getColourDepth() == 16 ) 
-            { 
-                mWBuffer = true;
-            } 
-            else 
-            {
-                mWBuffer = false;
-            }           
+                fullScreen, &miscParams );         
         }
 
         LogManager::getSingleton().logMessage("***************************************");

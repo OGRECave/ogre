@@ -743,17 +743,6 @@ namespace Ogre
 
             autoWindow = _createRenderWindow( windowTitle, width, height, 
                 fullScreen, &miscParams );
-
-            // If we have 16bit depth buffer enable w-buffering.
-            assert( autoWindow );
-            if ( autoWindow->getColourDepth() == 16 ) 
-            { 
-                mWBuffer = true;
-            } 
-            else 
-            {
-                mWBuffer = false;
-            }
         }
 
         LogManager::getSingleton().logMessage("***************************************");
@@ -966,6 +955,7 @@ namespace Ogre
         rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
         rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
+        rsc->setCapability(RSC_WBUFFER); 
 
         for (uint i=0; i < mDeviceManager->getDeviceCount(); ++i)
         {
@@ -1094,6 +1084,8 @@ namespace Ogre
             if ((rkCurCaps.RasterCaps & D3DPRASTERCAPS_MIPMAPLODBIAS) == 0)         
                 rsc->unsetCapability(RSC_MIPMAP_LOD_BIAS);          
 
+            if((rkCurCaps.RasterCaps & D3DPRASTERCAPS_WBUFFER) == 0)
+                rsc->unsetCapability(RSC_WBUFFER); 
 
             // Do we support per-stage src_manual constants?
             // HACK - ATI drivers seem to be buggy and don't support per-stage constants properly?
@@ -2632,8 +2624,8 @@ namespace Ogre
 
         if( enabled )
         {
-            // Use w-buffer if available and enabled
-            if( mWBuffer && mDeviceManager->getActiveDevice()->getD3D9DeviceCaps().RasterCaps & D3DPRASTERCAPS_WBUFFER )
+            // If we have 16bit depth buffer enable w-buffering.
+            if((mActiveRenderTarget->getColourDepth() == 16) && mCurrentCapabilities->hasCapability(RSC_WBUFFER) )
                 hr = __SetRenderState( D3DRS_ZENABLE, D3DZB_USEW );
             else
                 hr = __SetRenderState( D3DRS_ZENABLE, D3DZB_TRUE );

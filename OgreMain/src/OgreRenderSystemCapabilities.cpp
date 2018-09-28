@@ -317,6 +317,9 @@ namespace Ogre {
             pLog->logMessage(
                 " * DirectX per stage constants: "
                 + StringConverter::toString(hasCapability(RSC_PERSTAGECONSTANT), true));
+            pLog->logMessage(
+                " * W-Buffer supported: "
+                + StringConverter::toString(hasCapability(RSC_WBUFFER), true));
         }
     }
     //---------------------------------------------------------------------
