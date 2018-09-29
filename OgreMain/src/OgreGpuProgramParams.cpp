@@ -1408,27 +1408,81 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    GpuLogicalIndexUse* GpuProgramParameters::_getFloatConstantLogicalIndexUse(
+    template <typename T> bool isElementType(GpuProgramParameters::ElementType)
+    {
+        return false;
+    }
+    template <> bool isElementType<float>(GpuProgramParameters::ElementType et)
+    {
+        return et == GpuProgramParameters::ET_REAL;
+    }
+    template <> bool isElementType<int>(GpuProgramParameters::ElementType et)
+    {
+        return et == GpuProgramParameters::ET_INT;
+    }
+
+    template <typename T> bool isDefType(const GpuConstantDefinition&)
+    {
+        return false;
+    }
+
+    template <> bool isDefType<float>(const GpuConstantDefinition& def)
+    {
+        return def.isFloat();
+    }
+
+    template <> bool isDefType<double>(const GpuConstantDefinition& def)
+    {
+        return def.isDouble();
+    }
+
+    template <> bool isDefType<int>(const GpuConstantDefinition& def)
+    {
+        return def.isInt();
+    }
+    template <> bool isDefType<uint>(const GpuConstantDefinition& def)
+    {
+        return def.isUnsignedInt();
+    }
+
+    template <typename T> void incrementBufferSize(GpuNamedConstantsPtr& consts, size_t inc) {}
+    template <> void incrementBufferSize<float>(GpuNamedConstantsPtr& consts, size_t inc)
+    {
+        consts->floatBufferSize += inc;
+    }
+    template <> void incrementBufferSize<double>(GpuNamedConstantsPtr& consts, size_t inc)
+    {
+        consts->doubleBufferSize += inc;
+    }
+    template <> void incrementBufferSize<int>(GpuNamedConstantsPtr& consts, size_t inc)
+    {
+        consts->intBufferSize += inc;
+    }
+    template <> void incrementBufferSize<uint>(GpuNamedConstantsPtr& consts, size_t inc)
+    {
+        consts->uintBufferSize += inc;
+    }
+
+    template <typename T>
+    GpuLogicalIndexUse* GpuProgramParameters::getConstantLogicalIndexUse(
+        const GpuLogicalBufferStructPtr& logicalToPhysical, std::vector<T>& constants,
         size_t logicalIndex, size_t requestedSize, uint16 variability)
     {
-        if (!mFloatLogicalToPhysical)
-            return 0;
-
         GpuLogicalIndexUse* indexUse = 0;
-        OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
+        OGRE_LOCK_MUTEX(logicalToPhysical->mutex);
 
-        GpuLogicalIndexUseMap::iterator logi = mFloatLogicalToPhysical->map.find(logicalIndex);
-        if (logi == mFloatLogicalToPhysical->map.end())
+        auto logi = logicalToPhysical->map.find(logicalIndex);
+        if (logi == logicalToPhysical->map.end())
         {
             if (requestedSize)
             {
-                size_t physicalIndex = mFloatConstants.size();
+                size_t physicalIndex = constants.size();
 
                 // Expand at buffer end
-                mFloatConstants.insert(mFloatConstants.end(), requestedSize, 0.0f);
+                constants.insert(constants.end(), requestedSize, 0);
 
                 // Record extended size for future GPU params re-using this information
-                mFloatLogicalToPhysical->bufferSize = mFloatConstants.size();
+                logicalToPhysical->bufferSize = constants.size();
 
                 // low-level programs will not know about mapping ahead of time, so
                 // populate it. Other params objects will be able to just use this
@@ -1442,7 +1496,7 @@ namespace Ogre
                 for (size_t logicalNum = 0; logicalNum < count; ++logicalNum)
                 {
                     GpuLogicalIndexUseMap::iterator it =
-                        mFloatLogicalToPhysical->map.insert(
+                            logicalToPhysical->map.insert(
                             GpuLogicalIndexUseMap::value_type(
                                 logicalIndex + logicalNum,
                                 GpuLogicalIndexUse(currPhys, requestedSize, variability))).first;
@@ -1472,36 +1526,33 @@ namespace Ogre
                 // of the original use, or perhaps a variable length we can't predict
                 // until first actual runtime use e.g. world matrix array
                 size_t insertCount = requestedSize - logi->second.currentSize;
-                FloatConstantList::iterator insertPos = mFloatConstants.begin();
+                auto insertPos = constants.begin();
                 std::advance(insertPos, physicalIndex);
-                mFloatConstants.insert(insertPos, insertCount, 0.0f);
+                constants.insert(insertPos, insertCount, 0);
+
                 // shift all physical positions after this one
-                for (GpuLogicalIndexUseMap::iterator i = mFloatLogicalToPhysical->map.begin();
-                     i != mFloatLogicalToPhysical->map.end(); ++i)
+                for (auto& p : logicalToPhysical->map)
                 {
-                    if (i->second.physicalIndex > physicalIndex)
-                        i->second.physicalIndex += insertCount;
+                    if (p.second.physicalIndex > physicalIndex)
+                        p.second.physicalIndex += insertCount;
                 }
-                mFloatLogicalToPhysical->bufferSize += insertCount;
-                for (AutoConstantList::iterator i = mAutoConstants.begin();
-                     i != mAutoConstants.end(); ++i)
+                logicalToPhysical->bufferSize += insertCount;
+                for (auto& ac : mAutoConstants)
                 {
-                    const GpuProgramParameters::AutoConstantDefinition* def = getAutoConstantDefinition(i->paramType);
-                    if (i->physicalIndex > physicalIndex &&
-                        def && def->elementType == ET_REAL)
+                    auto def = getAutoConstantDefinition(ac.paramType);
+                    if (ac.physicalIndex > physicalIndex && def && isElementType<T>(def->elementType))
                     {
-                        i->physicalIndex += insertCount;
+                        ac.physicalIndex += insertCount;
                     }
                 }
                 if (mNamedConstants)
                 {
-                    for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
-                         i != mNamedConstants->map.end(); ++i)
+                    for (auto& p : mNamedConstants->map)
                     {
-                        if (i->second.isFloat() && i->second.physicalIndex > physicalIndex)
-                            i->second.physicalIndex += insertCount;
+                        if (isDefType<T>(p.second) && p.second.physicalIndex > physicalIndex)
+                            p.second.physicalIndex += insertCount;
                     }
-                    mNamedConstants->floatBufferSize += insertCount;
+                    incrementBufferSize<T>(mNamedConstants, insertCount);
                 }
 
                 logi->second.currentSize += insertCount;
@@ -1512,114 +1563,24 @@ namespace Ogre
             indexUse->variability = variability;
 
         return indexUse;
+    }
 
+    GpuLogicalIndexUse* GpuProgramParameters::_getFloatConstantLogicalIndexUse(
+        size_t logicalIndex, size_t requestedSize, uint16 variability)
+    {
+        if (!mFloatLogicalToPhysical)
+            return NULL;
+        return getConstantLogicalIndexUse(mFloatLogicalToPhysical, mFloatConstants, logicalIndex,
+                                          requestedSize, variability);
     }
     //---------------------------------------------------------------------
     GpuLogicalIndexUse* GpuProgramParameters::_getDoubleConstantLogicalIndexUse(
         size_t logicalIndex, size_t requestedSize, uint16 variability)
     {
         if (!mDoubleLogicalToPhysical)
-            return 0;
-
-        GpuLogicalIndexUse* indexUse = 0;
-        OGRE_LOCK_MUTEX(mDoubleLogicalToPhysical->mutex);
-
-        GpuLogicalIndexUseMap::iterator logi = mDoubleLogicalToPhysical->map.find(logicalIndex);
-        if (logi == mDoubleLogicalToPhysical->map.end())
-        {
-            if (requestedSize)
-            {
-                size_t physicalIndex = mDoubleConstants.size();
-
-                // Expand at buffer end
-                mDoubleConstants.insert(mDoubleConstants.end(), requestedSize, 0.0f);
-
-                // Record extended size for future GPU params re-using this information
-                mDoubleLogicalToPhysical->bufferSize = mDoubleConstants.size();
-
-                // low-level programs will not know about mapping ahead of time, so
-                // populate it. Other params objects will be able to just use this
-                // accepted mapping since the constant structure will be the same
-
-                // Set up a mapping for all items in the count
-                size_t currPhys = physicalIndex;
-                size_t count = requestedSize / 4;
-                GpuLogicalIndexUseMap::iterator insertedIterator;
-
-                for (size_t logicalNum = 0; logicalNum < count; ++logicalNum)
-                {
-                    GpuLogicalIndexUseMap::iterator it =
-                        mDoubleLogicalToPhysical->map.insert(
-                            GpuLogicalIndexUseMap::value_type(
-                                logicalIndex + logicalNum,
-                                GpuLogicalIndexUse(currPhys, requestedSize, variability))).first;
-                    currPhys += 4;
-
-                    if (logicalNum == 0)
-                        insertedIterator = it;
-                }
-
-                indexUse = &(insertedIterator->second);
-            }
-            else
-            {
-                // no match & ignore
-                return 0;
-            }
-
-        }
-        else
-        {
-            size_t physicalIndex = logi->second.physicalIndex;
-            indexUse = &(logi->second);
-            // check size
-            if (logi->second.currentSize < requestedSize)
-            {
-                // init buffer entry wasn't big enough; could be a mistake on the part
-                // of the original use, or perhaps a variable length we can't predict
-                // until first actual runtime use e.g. world matrix array
-                size_t insertCount = requestedSize - logi->second.currentSize;
-                DoubleConstantList::iterator insertPos = mDoubleConstants.begin();
-                std::advance(insertPos, physicalIndex);
-                mDoubleConstants.insert(insertPos, insertCount, 0.0f);
-                // shift all physical positions after this one
-                for (GpuLogicalIndexUseMap::iterator i = mDoubleLogicalToPhysical->map.begin();
-                     i != mDoubleLogicalToPhysical->map.end(); ++i)
-                {
-                    if (i->second.physicalIndex > physicalIndex)
-                        i->second.physicalIndex += insertCount;
-                }
-                mDoubleLogicalToPhysical->bufferSize += insertCount;
-                for (AutoConstantList::iterator i = mAutoConstants.begin();
-                     i != mAutoConstants.end(); ++i)
-                {
-                    const GpuProgramParameters::AutoConstantDefinition* def = getAutoConstantDefinition(i->paramType);
-                    if (i->physicalIndex > physicalIndex &&
-                        def && def->elementType == ET_REAL)
-                    {
-                        i->physicalIndex += insertCount;
-                    }
-                }
-                if (mNamedConstants)
-                {
-                    for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
-                         i != mNamedConstants->map.end(); ++i)
-                    {
-                        if (i->second.isDouble() && i->second.physicalIndex > physicalIndex)
-                            i->second.physicalIndex += insertCount;
-                    }
-                    mNamedConstants->doubleBufferSize += insertCount;
-                }
-
-                logi->second.currentSize += insertCount;
-            }
-        }
-
-        if (indexUse)
-            indexUse->variability = variability;
-
-        return indexUse;
-
+            return NULL;
+        return getConstantLogicalIndexUse(mDoubleLogicalToPhysical, mDoubleConstants, logicalIndex,
+                                          requestedSize, variability);
     }
     //---------------------------------------------------------------------()
     GpuLogicalIndexUse* GpuProgramParameters::_getIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability)
@@ -1629,107 +1590,10 @@ namespace Ogre
                         "This is not a low-level parameter parameter object",
                         "GpuProgramParameters::_getIntConstantPhysicalIndex");
 
-        GpuLogicalIndexUse* indexUse = 0;
-        OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
-
-        GpuLogicalIndexUseMap::iterator logi = mIntLogicalToPhysical->map.find(logicalIndex);
-        if (logi == mIntLogicalToPhysical->map.end())
-        {
-            if (requestedSize)
-            {
-                size_t physicalIndex = mIntConstants.size();
-
-                // Expand at buffer end
-                mIntConstants.insert(mIntConstants.end(), requestedSize, 0);
-
-                // Record extended size for future GPU params re-using this information
-                mIntLogicalToPhysical->bufferSize = mIntConstants.size();
-
-                // low-level programs will not know about mapping ahead of time, so
-                // populate it. Other params objects will be able to just use this
-                // accepted mapping since the constant structure will be the same
-
-                // Set up a mapping for all items in the count
-                size_t currPhys = physicalIndex;
-                size_t count = requestedSize / 4;
-                GpuLogicalIndexUseMap::iterator insertedIterator;
-                for (size_t logicalNum = 0; logicalNum < count; ++logicalNum)
-                {
-                    GpuLogicalIndexUseMap::iterator it =
-                        mIntLogicalToPhysical->map.insert(
-                            GpuLogicalIndexUseMap::value_type(
-                                logicalIndex + logicalNum,
-                                GpuLogicalIndexUse(currPhys, requestedSize, variability))).first;
-                    if (logicalNum == 0)
-                        insertedIterator = it;
-                    currPhys += 4;
-                }
-                indexUse = &(insertedIterator->second);
-
-            }
-            else
-            {
-                // no match
-                return 0;
-            }
-
-        }
-        else
-        {
-            size_t physicalIndex = logi->second.physicalIndex;
-            indexUse = &(logi->second);
-
-            // check size
-            if (logi->second.currentSize < requestedSize)
-            {
-                // init buffer entry wasn't big enough; could be a mistake on the part
-                // of the original use, or perhaps a variable length we can't predict
-                // until first actual runtime use e.g. world matrix array
-                size_t insertCount = requestedSize - logi->second.currentSize;
-                IntConstantList::iterator insertPos = mIntConstants.begin();
-                std::advance(insertPos, physicalIndex);
-                mIntConstants.insert(insertPos, insertCount, 0);
-                // shift all physical positions after this one
-                for (GpuLogicalIndexUseMap::iterator i = mIntLogicalToPhysical->map.begin();
-                     i != mIntLogicalToPhysical->map.end(); ++i)
-                {
-                    if (i->second.physicalIndex > physicalIndex)
-                        i->second.physicalIndex += insertCount;
-                }
-                mIntLogicalToPhysical->bufferSize += insertCount;
-                for (AutoConstantList::iterator i = mAutoConstants.begin();
-                     i != mAutoConstants.end(); ++i)
-                {
-                    const GpuProgramParameters::AutoConstantDefinition* def = getAutoConstantDefinition(i->paramType);
-                    if (i->physicalIndex > physicalIndex &&
-                        def && def->elementType == ET_INT)
-                    {
-                        i->physicalIndex += insertCount;
-                    }
-                }
-                if (mNamedConstants)
-                {
-                    for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
-                         i != mNamedConstants->map.end(); ++i)
-                    {
-                        if (!i->second.isFloat() && i->second.physicalIndex > physicalIndex)
-                            i->second.physicalIndex += insertCount;
-                    }
-                    mNamedConstants->intBufferSize += insertCount;
-                }
-
-                logi->second.currentSize += insertCount;
-            }
-        }
-
-        if (indexUse)
-            indexUse->variability = variability;
-
-        return indexUse;
-
+        return getConstantLogicalIndexUse(mIntLogicalToPhysical, mIntConstants, logicalIndex,
+                                          requestedSize, variability);
     }
     //---------------------------------------------------------------------()
-    //TODO double check that this is implemented correctly
     GpuLogicalIndexUse* GpuProgramParameters::_getUnsignedIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability)
     {
         if (!mUnsignedIntLogicalToPhysical)
@@ -1737,104 +1601,8 @@ namespace Ogre
                         "This is not a low-level parameter parameter object",
                         "GpuProgramParameters::_getUnsignedIntConstantPhysicalIndex");
 
-        GpuLogicalIndexUse* indexUse = 0;
-        OGRE_LOCK_MUTEX(mUnsignedIntLogicalToPhysical->mutex);
-
-        GpuLogicalIndexUseMap::iterator logi = mUnsignedIntLogicalToPhysical->map.find(logicalIndex);
-        if (logi == mUnsignedIntLogicalToPhysical->map.end())
-        {
-            if (requestedSize)
-            {
-                size_t physicalIndex = mUnsignedIntConstants.size();
-
-                // Expand at buffer end
-                mUnsignedIntConstants.insert(mUnsignedIntConstants.end(), requestedSize, 0);
-
-                // Record extended size for future GPU params re-using this information
-                mUnsignedIntLogicalToPhysical->bufferSize = mUnsignedIntConstants.size();
-
-                // low-level programs will not know about mapping ahead of time, so
-                // populate it. Other params objects will be able to just use this
-                // accepted mapping since the constant structure will be the same
-
-                // Set up a mapping for all items in the count
-                size_t currPhys = physicalIndex;
-                size_t count = requestedSize / 4;
-                GpuLogicalIndexUseMap::iterator insertedIterator;
-                for (size_t logicalNum = 0; logicalNum < count; ++logicalNum)
-                {
-                    GpuLogicalIndexUseMap::iterator it =
-                        mUnsignedIntLogicalToPhysical->map.insert(
-                            GpuLogicalIndexUseMap::value_type(
-                                logicalIndex + logicalNum,
-                                GpuLogicalIndexUse(currPhys, requestedSize, variability))).first;
-                    if (logicalNum == 0)
-                        insertedIterator = it;
-                    currPhys += 4;
-                }
-                indexUse = &(insertedIterator->second);
-
-            }
-            else
-            {
-                // no match
-                return 0;
-            }
-
-        }
-        else
-        {
-            size_t physicalIndex = logi->second.physicalIndex;
-            indexUse = &(logi->second);
-
-            // check size
-            if (logi->second.currentSize < requestedSize)
-            {
-                // init buffer entry wasn't big enough; could be a mistake on the part
-                // of the original use, or perhaps a variable length we can't predict
-                // until first actual runtime use e.g. world matrix array
-                size_t insertCount = requestedSize - logi->second.currentSize;
-                UnsignedIntConstantList::iterator insertPos = mUnsignedIntConstants.begin();
-                std::advance(insertPos, physicalIndex);
-                mUnsignedIntConstants.insert(insertPos, insertCount, 0);
-                // shift all physical positions after this one
-                for (GpuLogicalIndexUseMap::iterator i = mUnsignedIntLogicalToPhysical->map.begin();
-                     i != mUnsignedIntLogicalToPhysical->map.end(); ++i)
-                {
-                    if (i->second.physicalIndex > physicalIndex)
-                        i->second.physicalIndex += insertCount;
-                }
-                mUnsignedIntLogicalToPhysical->bufferSize += insertCount;
-                // for (AutoConstantList::iterator i = mAutoConstants.begin();
-                //      i != mAutoConstants.end(); ++i)
-                // {
-                //     const GpuProgramParameters::AutoConstantDefinition* def = getAutoConstantDefinition(i->paramType);
-                //     if (i->physicalIndex > physicalIndex &&
-                //         def && def->elementType == ET_UINT)
-                //     {
-                //         i->physicalIndex += insertCount;
-                //     }
-                // }
-                if (mNamedConstants)
-                {
-                    for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
-                         i != mNamedConstants->map.end(); ++i)
-                    {
-                        if (!i->second.isFloat() && i->second.physicalIndex > physicalIndex)
-                            i->second.physicalIndex += insertCount;
-                    }
-                    mNamedConstants->uintBufferSize += insertCount;
-                }
-
-                logi->second.currentSize += insertCount;
-            }
-        }
-
-        if (indexUse)
-            indexUse->variability = variability;
-
-        return indexUse;
-
+        return getConstantLogicalIndexUse(mUnsignedIntLogicalToPhysical, mUnsignedIntConstants, logicalIndex,
+                                          requestedSize, variability);
     }
     //-----------------------------------------------------------------------------
     size_t GpuProgramParameters::_getFloatConstantPhysicalIndex(
@@ -1865,55 +1633,32 @@ namespace Ogre
         return indexUse ? indexUse->physicalIndex : 0;
     }
     //-----------------------------------------------------------------------------
+    static size_t getLogicalIndexForPhysicalIndex(const GpuLogicalBufferStructPtr& logicalToPhysical,
+                                                  size_t physicalIndex)
+    {
+        // perhaps build a reverse map of this sometime (shared in GpuProgram)
+        for (const auto& p : logicalToPhysical->map)
+        {
+            if (p.second.physicalIndex == physicalIndex)
+                return p.first;
+        }
+        return std::numeric_limits<size_t>::max();
+    }
     size_t GpuProgramParameters::getFloatLogicalIndexForPhysicalIndex(size_t physicalIndex)
     {
-        // perhaps build a reverse map of this sometime (shared in GpuProgram)
-        for (GpuLogicalIndexUseMap::iterator i = mFloatLogicalToPhysical->map.begin();
-             i != mFloatLogicalToPhysical->map.end(); ++i)
-        {
-            if (i->second.physicalIndex == physicalIndex)
-                return i->first;
-        }
-        return std::numeric_limits<size_t>::max();
-
+        return getLogicalIndexForPhysicalIndex(mFloatLogicalToPhysical, physicalIndex);
     }
-    //-----------------------------------------------------------------------------
     size_t GpuProgramParameters::getDoubleLogicalIndexForPhysicalIndex(size_t physicalIndex)
     {
-        // perhaps build a reverse map of this sometime (shared in GpuProgram)
-        for (GpuLogicalIndexUseMap::iterator i = mDoubleLogicalToPhysical->map.begin();
-             i != mDoubleLogicalToPhysical->map.end(); ++i)
-        {
-            if (i->second.physicalIndex == physicalIndex)
-                return i->first;
-        }
-        return std::numeric_limits<size_t>::max();
+        return getLogicalIndexForPhysicalIndex(mDoubleLogicalToPhysical, physicalIndex);
     }
-    //-----------------------------------------------------------------------------
     size_t GpuProgramParameters::getIntLogicalIndexForPhysicalIndex(size_t physicalIndex)
     {
-        // perhaps build a reverse map of this sometime (shared in GpuProgram)
-        for (GpuLogicalIndexUseMap::iterator i = mIntLogicalToPhysical->map.begin();
-             i != mIntLogicalToPhysical->map.end(); ++i)
-        {
-            if (i->second.physicalIndex == physicalIndex)
-                return i->first;
-        }
-        return std::numeric_limits<size_t>::max();
-
+        return getLogicalIndexForPhysicalIndex(mIntLogicalToPhysical, physicalIndex);
     }
-    //-----------------------------------------------------------------------------
     size_t GpuProgramParameters::getUnsignedIntLogicalIndexForPhysicalIndex(size_t physicalIndex)
     {
-        // perhaps build a reverse map of this sometime (shared in GpuProgram)
-        for (GpuLogicalIndexUseMap::iterator i = mUnsignedIntLogicalToPhysical->map.begin();
-             i != mUnsignedIntLogicalToPhysical->map.end(); ++i)
-        {
-            if (i->second.physicalIndex == physicalIndex)
-                return i->first;
-        }
-        return std::numeric_limits<size_t>::max();
-
+        return getLogicalIndexForPhysicalIndex(mUnsignedIntLogicalToPhysical, physicalIndex);
     }
     //-----------------------------------------------------------------------------
     size_t GpuProgramParameters::getBoolLogicalIndexForPhysicalIndex(size_t physicalIndex)

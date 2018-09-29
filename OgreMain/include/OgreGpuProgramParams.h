@@ -359,12 +359,6 @@ namespace Ogre {
         size_t calculateSize(void) const;
 
     protected:
-        /** Indicates whether all array entries will be generated and added to the definitions map
-            @remarks
-            Normally, the number of array entries added to the definitions map is capped at 16
-            to save memory. Setting this value to <code>true</code> allows all of the entries
-            to be generated and added to the map.
-        */
         static bool msGenerateAllConstantDefinitionArrayEntries;
     };
 
@@ -1341,6 +1335,13 @@ namespace Ogre {
             or high-level programs which pass params this way. */
         GpuLogicalBufferStructPtr mUnsignedIntLogicalToPhysical;
         static GpuLogicalBufferStructPtr mBoolLogicalToPhysical; // nullPtr
+
+        template <typename T>
+        GpuLogicalIndexUse*
+        getConstantLogicalIndexUse(const GpuLogicalBufferStructPtr& logicalToPhysical,
+                                   std::vector<T>& constants, size_t logicalIndex,
+                                   size_t requestedSize, uint16 variability);
+
         /** Gets the low-level structure for a logical index.
          */
         GpuLogicalIndexUse* _getFloatConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
@@ -1679,29 +1680,17 @@ namespace Ogre {
         /// @deprecated
         OGRE_DEPRECATED const GpuLogicalBufferStructPtr& getBoolLogicalBufferStruct() const { return mBoolLogicalToPhysical; }
 
-        /** Retrieves the logical index relating to a physical index in the float
+        /** Retrieves the logical index relating to a physical index in the
             buffer, for programs which support that (low-level programs and
             high-level programs which use logical parameter indexes).
             @return std::numeric_limits<size_t>::max() if not found
         */
         size_t getFloatLogicalIndexForPhysicalIndex(size_t physicalIndex);
-        /** Retrieves the logical index relating to a physical index in the double
-            buffer, for programs which support that (low-level programs and
-            high-level programs which use logical parameter indexes).
-            @return std::numeric_limits<size_t>::max() if not found
-        */
+        /// @copydoc getFloatLogicalIndexForPhysicalIndex
         size_t getDoubleLogicalIndexForPhysicalIndex(size_t physicalIndex);
-        /** Retrieves the logical index relating to a physical index in the int
-            buffer, for programs which support that (low-level programs and
-            high-level programs which use logical parameter indexes).
-            @return std::numeric_limits<size_t>::max() if not found
-        */
+        /// @copydoc getFloatLogicalIndexForPhysicalIndex
         size_t getIntLogicalIndexForPhysicalIndex(size_t physicalIndex);
-        /** Retrieves the logical index relating to a physical index in the uint
-            buffer, for programs which support that (low-level programs and
-            high-level programs which use logical parameter indexes).
-            @return std::numeric_limits<size_t>::max() if not found
-        */
+        /// @copydoc getFloatLogicalIndexForPhysicalIndex
         size_t getUnsignedIntLogicalIndexForPhysicalIndex(size_t physicalIndex);
         /// @deprecated
         OGRE_DEPRECATED size_t getBoolLogicalIndexForPhysicalIndex(size_t physicalIndex);
@@ -1863,8 +1852,8 @@ namespace Ogre {
          */
         void setIgnoreMissingParams(bool state) { mIgnoreMissingParams = state; }
 
-        /** Sets a single value constant floating-point parameter to the program.
-            @remarks
+        /** Sets a single value constant parameter to the program.
+
             Different types of GPU programs support different types of constant parameters.
             For example, it's relatively common to find that vertex programs only support
             floating point constants, and that fragment programs only support integer (fixed point)
@@ -1872,7 +1861,7 @@ namespace Ogre {
             graphics card being used. You should consult the documentation for the type of
             low level program you are using, or alternatively use the methods
             provided on RenderSystemCapabilities to determine the options.
-            @par
+
             Another possible limitation is that some systems only allow constants to be set
             on certain boundaries, e.g. in sets of 4 values for example. Again, see
             RenderSystemCapabilities for full details.
@@ -1883,69 +1872,20 @@ namespace Ogre {
             @param val The value to set
         */
         void setNamedConstant(const String& name, Real val);
-        /** Sets a single value constant integer parameter to the program.
-            @remarks
-            Different types of GPU programs support different types of constant parameters.
-            For example, it's relatively common to find that vertex programs only support
-            floating point constants, and that fragment programs only support integer (fixed point)
-            parameters. This can vary depending on the program version supported by the
-            graphics card being used. You should consult the documentation for the type of
-            low level program you are using, or alternatively use the methods
-            provided on RenderSystemCapabilities to determine the options.
-            @par
-            Another possible limitation is that some systems only allow constants to be set
-            on certain boundaries, e.g. in sets of 4 values for example. Again, see
-            RenderSystemCapabilities for full details.
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param val The value to set
-        */
+        /// @overload
         void setNamedConstant(const String& name, int val);
-        /** Sets a single value constant unsigned integer parameter to the program.
-            @remarks
-            Different types of GPU programs support different types of constant parameters.
-            For example, it's relatively common to find that vertex programs only support
-            floating point constants, and that fragment programs only support integer (fixed point)
-            parameters. This can vary depending on the program version supported by the
-            graphics card being used. You should consult the documentation for the type of
-            low level program you are using, or alternatively use the methods
-            provided on RenderSystemCapabilities to determine the options.
-            @par
-            Another possible limitation is that some systems only allow constants to be set
-            on certain boundaries, e.g. in sets of 4 values for example. Again, see
-            RenderSystemCapabilities for full details.
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param val The value to set
-        */
+        /// @overload
         void setNamedConstant(const String& name, uint val);
-        /** Sets a Vector4 parameter to the program.
-            @param name The name of the parameter
-            @param vec The value to set
-        */
-        void setNamedConstant(const String& name, const Vector4& vec);
-        /** Sets a Vector3 parameter to the program.
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param vec The value to set
-        */
-        void setNamedConstant(const String& name, const Vector3& vec);
-        /** Sets a Vector2 parameter to the program.
-            @param name The name of the parameter
-            @param vec The value to set
-        */
-        void setNamedConstant(const String& name, const Vector2& vec);
-        /** Sets a Matrix4 parameter to the program.
-            @param name The name of the parameter
-            @param m The value to set
-        */
-        void setNamedConstant(const String& name, const Matrix4& m);
+        /// @overload
+        void setNamedConstant(const String& name, const Vector4& val);
+        /// @overload
+        void setNamedConstant(const String& name, const Vector3& val);
+        /// @overload
+        void setNamedConstant(const String& name, const Vector2& val);
+        /// @overload
+        void setNamedConstant(const String& name, const Matrix4& val);
+        /// @overload
+        void setNamedConstant(const String& name, const ColourValue& colour);
         /** Sets a list of Matrix4 parameters to the program.
             @param name The name of the parameter; this must be the first index of an array,
             for examples 'matrices[0]'
@@ -1954,13 +1894,8 @@ namespace Ogre {
             @param numEntries Number of Matrix4 entries
         */
         void setNamedConstant(const String& name, const Matrix4* m, size_t numEntries);
-        /** Sets a ColourValue parameter to the program.
-            @param name The name of the parameter
-            @param colour The value to set
-        */
-        void setNamedConstant(const String& name, const ColourValue& colour);
-        /** Sets a multiple value constant floating-point parameter to the program.
-            @par
+        /** Sets a multiple value constant parameter to the program.
+
             Some systems only allow constants to be set on certain boundaries,
             e.g. in sets of 4 values for example. The 'multiple' parameter allows
             you to control that although you should only change it if you know
@@ -1977,58 +1912,13 @@ namespace Ogre {
         */
         void setNamedConstant(const String& name, const float *val, size_t count,
                               size_t multiple = 4);
-        /** Sets a multiple value constant floating-point parameter to the program.
-            @par
-            Some systems only allow constants to be set on certain boundaries,
-            e.g. in sets of 4 values for example. The 'multiple' parameter allows
-            you to control that although you should only change it if you know
-            your chosen language supports that (at the time of writing, only
-            GLSL allows constants which are not a multiple of 4).
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param val Pointer to the values to write
-            @param count The number of 'multiples' of floats to write
-            @param multiple The number of raw entries in each element to write,
-            the default is 4 so count = 1 would write 4 floats.
-        */
+        /// @overload
         void setNamedConstant(const String& name, const double *val, size_t count,
                               size_t multiple = 4);
-        /** Sets a multiple value constant integer parameter to the program.
-            @par
-            Some systems only allow constants to be set on certain boundaries,
-            e.g. in sets of 4 values for example. The 'multiple' parameter allows
-            you to control that although you should only change it if you know
-            your chosen language supports that (at the time of writing, only
-            GLSL allows constants which are not a multiple of 4).
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param val Pointer to the values to write
-            @param count The number of 'multiples' of floats to write
-            @param multiple The number of raw entries in each element to write,
-            the default is 4 so count = 1 would write 4 floats.
-        */
+        /// @overload
         void setNamedConstant(const String& name, const int *val, size_t count,
                               size_t multiple = 4);
-        /** Sets a multiple value constant unsigned integer parameter to the program.
-            @par
-            Some systems only allow constants to be set on certain boundaries,
-            e.g. in sets of 4 values for example. The 'multiple' parameter allows
-            you to control that although you should only change it if you know
-            your chosen language supports that (at the time of writing, only
-            GLSL allows constants which are not a multiple of 4).
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param val Pointer to the values to write
-            @param count The number of 'multiples' of floats to write
-            @param multiple The number of raw entries in each element to write,
-            the default is 4 so count = 1 would write 4 floats.
-        */
+        /// @overload
         void setNamedConstant(const String& name, const uint *val, size_t count,
                               size_t multiple = 4);
         /** Sets up a constant which will automatically be updated by the system.
