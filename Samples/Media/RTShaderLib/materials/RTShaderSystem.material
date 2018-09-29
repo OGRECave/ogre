@@ -82,9 +82,7 @@ material RTSS/NormalMapping_MultiPass
 		{
 			// base colours, not needed for rendering, but as information
 			// to lighting pass categorisation routine
-			ambient 1 1 1
-			diffuse 0 0 0 
-			specular 0 0 0 0 
+			diffuse 0 0 0
 			
 			// RT Shader system section.			
  			rtshader_system

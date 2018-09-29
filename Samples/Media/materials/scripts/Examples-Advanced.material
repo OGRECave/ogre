@@ -407,6 +407,10 @@ material Examples/BumpMapping/MultiLight
 			iteration once_per_light
 			scene_blend add
 
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 0 0 0
+
 			// Vertex program reference
 			vertex_program_ref Examples/BumpMapVP
 			{
