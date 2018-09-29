@@ -85,6 +85,65 @@ namespace Ogre {
         mEventNames.push_back("RenderSystemCapabilitiesCreated");
     }
 
+    void RenderSystem::initFixedFunctionParams()
+    {
+        if(mFixedFunctionParams)
+            return;
+
+        GpuLogicalBufferStructPtr nullPtr;
+        GpuLogicalBufferStructPtr logicalBufferStruct(new GpuLogicalBufferStruct());
+        mFixedFunctionParams.reset(new GpuProgramParameters);
+        mFixedFunctionParams->_setLogicalIndexes(logicalBufferStruct, nullPtr, nullPtr);
+        mFixedFunctionParams->setAutoConstant(0, GpuProgramParameters::ACT_WORLD_MATRIX);
+        mFixedFunctionParams->setAutoConstant(4, GpuProgramParameters::ACT_VIEW_MATRIX);
+        mFixedFunctionParams->setAutoConstant(8, GpuProgramParameters::ACT_PROJECTION_MATRIX);
+        mFixedFunctionParams->setAutoConstant(12, GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR);
+        mFixedFunctionParams->setAutoConstant(13, GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
+        mFixedFunctionParams->setAutoConstant(14, GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
+        mFixedFunctionParams->setAutoConstant(15, GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR);
+        mFixedFunctionParams->setAutoConstant(16, GpuProgramParameters::ACT_SURFACE_SHININESS);
+        mFixedFunctionParams->setAutoConstant(17, GpuProgramParameters::ACT_POINT_PARAMS);
+        mFixedFunctionParams->setConstant(18, Vector4::ZERO); // ACT_FOG_PARAMS
+        mFixedFunctionParams->setConstant(19, Vector4::ZERO); // ACT_FOG_COLOUR
+        mFixedFunctionParams->setAutoConstant(20, GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
+
+        // allocate per light parameters. slots 21..69
+        for(int i = 0; i < OGRE_MAX_SIMULTANEOUS_LIGHTS; i++)
+        {
+            size_t light_offset = 21 + i * 6;
+            mFixedFunctionParams->setConstant(light_offset + 0, Vector4::ZERO); // position
+            mFixedFunctionParams->setConstant(light_offset + 1, Vector4::ZERO); // direction
+            mFixedFunctionParams->setConstant(light_offset + 2, Vector4::ZERO); // diffuse
+            mFixedFunctionParams->setConstant(light_offset + 3, Vector4::ZERO); // specular
+            mFixedFunctionParams->setConstant(light_offset + 4, Vector4::ZERO); // attenuation
+            mFixedFunctionParams->setConstant(light_offset + 5, Vector4::ZERO); // spotlight
+        }
+    }
+
+    void RenderSystem::setFFPLightParams(size_t index, bool enabled)
+    {
+        if(!mFixedFunctionParams)
+            return;
+
+        size_t light_offset = 21 + 6 * index;
+        if (!enabled)
+        {
+            mFixedFunctionParams->clearAutoConstant(light_offset + 0);
+            mFixedFunctionParams->clearAutoConstant(light_offset + 1);
+            mFixedFunctionParams->clearAutoConstant(light_offset + 2);
+            mFixedFunctionParams->clearAutoConstant(light_offset + 3);
+            mFixedFunctionParams->clearAutoConstant(light_offset + 4);
+            mFixedFunctionParams->clearAutoConstant(light_offset + 5);
+            return;
+        }
+        mFixedFunctionParams->setAutoConstant(light_offset + 0, GpuProgramParameters::ACT_LIGHT_POSITION, index);
+        mFixedFunctionParams->setAutoConstant(light_offset + 1, GpuProgramParameters::ACT_LIGHT_DIRECTION, index);
+        mFixedFunctionParams->setAutoConstant(light_offset + 2, GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, index);
+        mFixedFunctionParams->setAutoConstant(light_offset + 3, GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR, index);
+        mFixedFunctionParams->setAutoConstant(light_offset + 4, GpuProgramParameters::ACT_LIGHT_ATTENUATION, index);
+        mFixedFunctionParams->setAutoConstant(light_offset + 5, GpuProgramParameters::ACT_SPOTLIGHT_PARAMS, index);
+    }
+
     //-----------------------------------------------------------------------
     RenderSystem::~RenderSystem()
     {

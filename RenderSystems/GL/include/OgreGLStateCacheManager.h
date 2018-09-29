@@ -222,7 +222,7 @@ namespace Ogre
         void setMaterialSpecular(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
         void setMaterialShininess(GLfloat shininess);
         void setPointSize(GLfloat size);
-        void setPointParameters(GLfloat* attenuation, float minSize, float maxSize);
+        void setPointParameters(const GLfloat* attenuation, float minSize = -1, float maxSize = -1);
 
         void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 

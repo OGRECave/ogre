@@ -89,7 +89,6 @@ mSuppressRenderStateChanges(false),
 mSuppressShadows(false),
 mCameraRelativeRendering(false),
 mLastLightHash(0),
-mLastLightLimit(0),
 mGpuParamsDirty((uint16)GPV_ALL)
 {
     mShadowCasterQueryListener.reset(new ShadowCasterSceneQueryListener(this));
@@ -891,7 +890,6 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
     GpuProgram* fprog = pass->hasFragmentProgram() ? pass->getFragmentProgram().get() : 0;
 
     bool passSurfaceAndLightParams = !vprog || vprog->getPassSurfaceAndLightStates();
-    bool passFogParams = !fprog || fprog->getPassFogStates();
 
     if (vprog)
     {
@@ -973,18 +971,6 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 
     if (passSurfaceAndLightParams)
     {
-        // Set surface reflectance properties, only valid if lighting is enabled
-        if (pass->getLightingEnabled())
-        {
-            mDestRenderSystem->_setSurfaceParams(
-                pass->getAmbient(),
-                pass->getDiffuse(),
-                pass->getSpecular(),
-                pass->getSelfIllumination(),
-                pass->getShininess(),
-                pass->getVertexColourTracking() );
-        }
-
         // Dynamic lighting enabled?
         mDestRenderSystem->setLightingEnabled(pass->getLightingEnabled());
     }
@@ -1035,18 +1021,14 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         newFogDensity = mFogDensity;
     }
 
-    if (passFogParams)
-    {
-        mDestRenderSystem->_setFog(newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
-    }
-    else
-    {
-        // In D3D9, it applies to shaders prior to version vs_3_0 and ps_3_0.
-        mDestRenderSystem->_setFog(FOG_NONE);
-    }
     mAutoParamDataSource->setFog(newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
 
     // The rest of the settings are the same no matter whether we use programs or not
+
+    if(mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION) && passSurfaceAndLightParams)
+    {
+        mFixedFunctionParams = mDestRenderSystem->getFixedFunctionParams(pass->getVertexColourTracking(), newFogMode);
+    }
 
     // Set scene blending
     mDestRenderSystem->setColourBlendState(pass->getBlendState());
@@ -1056,14 +1038,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         mDestRenderSystem->_setLineWidth(pass->getLineWidth());
 
     // Set point parameters
-    mDestRenderSystem->_setPointParameters(
-        pass->getPointSize(),
-        pass->isPointAttenuationEnabled(),
-        pass->getPointAttenuationConstant(),
-        pass->getPointAttenuationLinear(),
-        pass->getPointAttenuationQuadratic(),
-        pass->getPointMinSize(),
-        pass->getPointMaxSize());
+    mDestRenderSystem->_setPointParameters(pass->isPointAttenuationEnabled(), pass->getPointMinSize(),
+                                           pass->getPointMaxSize());
 
     if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
         mDestRenderSystem->_setPointSpritesEnabled(pass->getPointSpritesEnabled());
@@ -1121,7 +1097,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             ++shadowTexIndex;
             ++shadowTexUnitIndex;
         }
-        else if (mIlluminationStage == IRS_NONE && pass->hasVertexProgram())
+        else if (mIlluminationStage == IRS_NONE)
         {
             // Manually set texture projector for shaders if present
             // This won't get set any other way if using manual projection
@@ -1279,8 +1255,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	mDestRenderSystem->setDrawBuffer(mCurrentViewport->getDrawBuffer());
 	
     // reset light hash so even if light list is the same, we refresh the content every frame
-    LightList emptyLightList;
-    useLights(emptyLightList, 0, true);
+    useLights(NULL, 0);
 
     if (isShadowTechniqueInUse())
     {
@@ -1446,19 +1421,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     // Set rasterisation mode
     mDestRenderSystem->_setPolygonMode(camera->getPolygonMode());
 
-    // Set initial camera state
-    mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
-    
-    mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
-
-    if (mCameraRelativeRendering)
-    {
-        mCachedViewMatrix.setTrans(Vector3::ZERO);
-    }
     mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
-
-    
-    setViewMatrix(mCachedViewMatrix);
 
     // Render scene content
     {
@@ -1907,8 +1870,6 @@ void SceneManager::renderObjects(const QueuedRenderableCollection& objs,
                                  const LightList* manualLightList,
                                  bool transparentShadowCastersMode)
 {
-    mDestRenderSystem->setAmbientLight(mAutoParamDataSource->getAmbientLightColour());
-
     mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
     mActiveQueuedRenderableVisitor->manualLightList = manualLightList;
     mActiveQueuedRenderableVisitor->transparentShadowCastersMode = transparentShadowCastersMode;
@@ -1975,30 +1936,32 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
     }// for each priority
 }
 //-----------------------------------------------------------------------
-void SceneManager::setWorldTransform(Renderable* rend, bool fixedFunction)
+void SceneManager::setWorldTransform(Renderable* rend)
 {
-    // Set world transformation
-    if (fixedFunction)
+    // Issue view / projection changes if any
+    // Check view matrix
+    if (rend->getUseIdentityView())
     {
-        mDestRenderSystem->_setWorldMatrix(mAutoParamDataSource->getWorldMatrix());
+        mGpuParamsDirty |= (uint16)GPV_GLOBAL;
+        mResetIdentityView = true;
     }
 
-    // Issue view / projection changes if any
-    useRenderableViewProjMode(rend, fixedFunction);
+    if (rend->getUseIdentityProjection())
+    {
+        mGpuParamsDirty |= (uint16)GPV_GLOBAL;
+
+        mResetIdentityProj = true;
+    }
 
     // mark per-object params as dirty
     mGpuParamsDirty |= (uint16)GPV_PER_OBJECT;
 }
 //-----------------------------------------------------------------------
 void SceneManager::issueRenderWithLights(Renderable* rend, const Pass* pass,
-                                         const LightList* pLightListToUse, bool fixedFunction,
+                                         const LightList* pLightListToUse,
                                          bool lightScissoringClipping)
 {
-    // Do we need to update light states?
-    // Only do this if fixed-function vertex lighting applies
-    if (pLightListToUse && (pass->isProgrammable() || pass->getLightingEnabled()))
-        useLights(*pLightListToUse, pass->getMaxSimultaneousLights(), fixedFunction);
-
+    useLights(pLightListToUse, pass->getMaxSimultaneousLights());
     fireRenderSingleObject(rend, pass, mAutoParamDataSource.get(), pLightListToUse, false);
 
     // optional light scissoring & clipping
@@ -2038,15 +2001,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 {
     OgreProfileBeginGPUEvent("Material: " + pass->getParent()->getParent()->getName());
 
-    GpuProgram* vprog = pass->hasVertexProgram() ? pass->getVertexProgram().get() : 0;
-
-    // pass the FFP transform state to shader
-    bool passTransformState = !vprog || vprog->getPassTransformStates();
-
     // Tell auto params object about the renderable change
     mAutoParamDataSource->setCurrentRenderable(rend);
 
-    setWorldTransform(rend, passTransformState);
+    setWorldTransform(rend);
 
     if(mSuppressRenderStateChanges)
     {
@@ -2055,14 +2013,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         mDestRenderSystem->setCurrentPassIterationCount(1);
         _issueRenderOp(rend, NULL);
         // Reset view / projection changes if any
-        resetViewProjMode(passTransformState);
+        resetViewProjMode();
         OgreProfileEndGPUEvent("Material: " + pass->getParent()->getParent()->getName());
         return;
     }
-
-    // pass the FFP lighting state to shader
-    bool passLightParams =
-        pass->getLightingEnabled() && (!vprog || vprog->getPassSurfaceAndLightStates());
 
     // Reissue any texture gen settings which are dependent on view matrix
     size_t unit = 0;
@@ -2136,11 +2090,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             (manualLightList && (manualLightList->size() != 1 ||
                                  manualLightList->front()->getType() == pass->getOnlyLightType())))
         {
-            issueRenderWithLights(rend, pass, manualLightList, passLightParams, lightScissoringClipping);
+            issueRenderWithLights(rend, pass, manualLightList, lightScissoringClipping);
         }
 
         // Reset view / projection changes if any
-        resetViewProjMode(passTransformState);
+        resetViewProjMode();
         OgreProfileEndGPUEvent("Material: " + pass->getParent()->getParent()->getName());
         return;
     }
@@ -2312,11 +2266,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         }
         depthInc += pass->getPassIterationCount();
 
-        issueRenderWithLights(rend, pass, pLightListToUse, passLightParams, lightScissoringClipping);
+        issueRenderWithLights(rend, pass, pLightListToUse, lightScissoringClipping);
     } // possibly iterate per light
     
     // Reset view / projection changes if any
-    resetViewProjMode(passTransformState);
+    resetViewProjMode();
     OgreProfileEndGPUEvent("Material: " + pass->getParent()->getParent()->getName());
 }
 //-----------------------------------------------------------------------
@@ -2572,27 +2526,19 @@ void SceneManager::manualRender(RenderOperation* rend,
     if (doBeginEndFrame)
         mDestRenderSystem->_beginFrame();
 
-    mDestRenderSystem->_setWorldMatrix(worldMatrix);
-    setViewMatrix(viewMatrix);
-    mDestRenderSystem->_setProjectionMatrix(projMatrix);
-
     _setPass(pass);
-    // Do we need to update GPU program parameters?
-    if (pass->isProgrammable())
+    mAutoParamDataSource->setCurrentRenderable(0);
+    if (vp)
     {
-        mAutoParamDataSource->setCurrentRenderable(0);
-        if (vp)
-        {
-            mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
-        }
-        mAutoParamDataSource->setCurrentSceneManager(this);
-        mAutoParamDataSource->setWorldMatrices(&worldMatrix, 1);
-        Camera dummyCam(BLANKSTRING, 0);
-        dummyCam.setCustomViewMatrix(true, viewMatrix);
-        dummyCam.setCustomProjectionMatrix(true, projMatrix);
-        mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
-        updateGpuProgramParameters(pass);
+        mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
     }
+    mAutoParamDataSource->setCurrentSceneManager(this);
+    mAutoParamDataSource->setWorldMatrices(&worldMatrix, 1);
+    Camera dummyCam(BLANKSTRING, 0);
+    dummyCam.setCustomViewMatrix(true, viewMatrix);
+    dummyCam.setCustomProjectionMatrix(true, projMatrix);
+    mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
+    updateGpuProgramParameters(pass);
     mDestRenderSystem->_render(*rend);
 
     if (doBeginEndFrame)
@@ -2611,29 +2557,23 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
     if (doBeginEndFrame)
         mDestRenderSystem->_beginFrame();
 
-    setViewMatrix(viewMatrix);
-    mDestRenderSystem->_setProjectionMatrix(projMatrix);
-
     _setPass(pass);
     Camera dummyCam(BLANKSTRING, 0);
     dummyCam.setCustomViewMatrix(true, viewMatrix);
     dummyCam.setCustomProjectionMatrix(true, projMatrix);
-    // Do we need to update GPU program parameters?
-    if (pass->isProgrammable())
+
+    if (vp)
     {
-        if (vp)
-        {
-            mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
-        }
-        
-		const Camera* oldCam = mAutoParamDataSource->getCurrentCamera();
-
-		mAutoParamDataSource->setCurrentSceneManager(this);
-        mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
-        updateGpuProgramParameters(pass);
-
-		mAutoParamDataSource->setCurrentCamera(oldCam, false);
+        mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
     }
+
+    const Camera* oldCam = mAutoParamDataSource->getCurrentCamera();
+
+    mAutoParamDataSource->setCurrentSceneManager(this);
+    mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
+    updateGpuProgramParameters(pass);
+
+    mAutoParamDataSource->setCurrentCamera(oldCam, false);
 
     renderSingleObject(rend, pass, lightScissoringClipping, doLightIteration, manualLightList);
 
@@ -2642,44 +2582,11 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
 
 }
 //---------------------------------------------------------------------
-void SceneManager::useRenderableViewProjMode(const Renderable* pRend, bool fixedFunction)
-{
-    // Check view matrix
-    bool useIdentityView = pRend->getUseIdentityView();
-    if (useIdentityView)
-    {
-        // Using identity view now, change it
-        if (fixedFunction)
-            setViewMatrix(Affine3::IDENTITY);
-        mGpuParamsDirty |= (uint16)GPV_GLOBAL;
-        mResetIdentityView = true;
-    }
-
-    bool useIdentityProj = pRend->getUseIdentityProjection();
-    if (useIdentityProj)
-    {
-        // Use identity projection matrix, still need to take RS depth into account.
-        if (fixedFunction)
-        {
-            Matrix4 mat;
-            mDestRenderSystem->_convertProjectionMatrix(Matrix4::IDENTITY, mat);
-            mDestRenderSystem->_setProjectionMatrix(mat);
-        }
-        mGpuParamsDirty |= (uint16)GPV_GLOBAL;
-
-        mResetIdentityProj = true;
-    }
-
-    
-}
-//---------------------------------------------------------------------
-void SceneManager::resetViewProjMode(bool fixedFunction)
+void SceneManager::resetViewProjMode()
 {
     if (mResetIdentityView)
     {
         // Coming back to normal from identity view
-        if (fixedFunction)
-            setViewMatrix(mCachedViewMatrix);
         mGpuParamsDirty |= (uint16)GPV_GLOBAL;
 
         mResetIdentityView = false;
@@ -2688,8 +2595,6 @@ void SceneManager::resetViewProjMode(bool fixedFunction)
     if (mResetIdentityProj)
     {
         // Coming back from flat projection
-        if (fixedFunction)
-            mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
         mGpuParamsDirty |= (uint16)GPV_GLOBAL;
 
         mResetIdentityProj = false;
@@ -3773,20 +3678,8 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
 
     // Set rasterisation mode
     mDestRenderSystem->_setPolygonMode(mCameraInProgress->getPolygonMode());
-
-    // Set initial camera state
-    mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
     
-    mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
-
-    if (mCameraRelativeRendering)
-    {
-        mCachedViewMatrix.setTrans(Vector3::ZERO);
-    }
     mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, mCameraInProgress->getDerivedPosition());
-
-    
-    setViewMatrix(mCachedViewMatrix);
     delete context;
 }
 //---------------------------------------------------------------------
@@ -4436,37 +4329,22 @@ void SceneManager::_handleLodEvents()
     mEntityMaterialLodChangedEvents.clear();
 }
 //---------------------------------------------------------------------
-void SceneManager::setViewMatrix(const Affine3& m)
+void SceneManager::useLights(const LightList* lights, ushort limit)
 {
-    mDestRenderSystem->_setViewMatrix(m);
-    if (mDestRenderSystem->areFixedFunctionLightsInViewSpace())
-    {
-        // reset light hash if we've got lights already set
-        if(mLastLightHash)
-            mLastLightHash = 0;
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::useLights(const LightList& lights, ushort limit, bool fixedFunction)
-{
-    bool updateGpu = lights.getHash() != mLastLightHash;
-    bool updateFF = fixedFunction && (updateGpu || limit != mLastLightLimit);
+    static LightList NULL_LIGHTS;
+    lights = lights ? lights : &NULL_LIGHTS;
 
-    if(updateGpu)
+    if(lights->getHash() != mLastLightHash)
     {
-        mLastLightHash = lights.getHash();
+        mLastLightHash = lights->getHash();
 
         // Update any automatic gpu params for lights
         // Other bits of information will have to be looked up
-        mAutoParamDataSource->setCurrentLightList(&lights);
+        mAutoParamDataSource->setCurrentLightList(lights);
         mGpuParamsDirty |= GPV_LIGHTS;
     }
 
-    if (updateFF)
-    {
-        mDestRenderSystem->_useLights(lights, limit);
-        mLastLightLimit = limit;
-    }
+    mDestRenderSystem->_useLights(std::min<ushort>(limit, lights->size()));
 }
 //---------------------------------------------------------------------
 void SceneManager::bindGpuProgram(GpuProgram* prog)
@@ -4486,14 +4364,12 @@ void SceneManager::_markGpuParamsDirty(uint16 mask)
 //---------------------------------------------------------------------
 void SceneManager::updateGpuProgramParameters(const Pass* pass)
 {
+    if (!mGpuParamsDirty)
+        return;
+
     if (pass->isProgrammable())
     {
-
-        if (!mGpuParamsDirty)
-            return;
-
-        if (mGpuParamsDirty)
-            pass->_updateAutoParams(mAutoParamDataSource.get(), mGpuParamsDirty);
+        pass->_updateAutoParams(mAutoParamDataSource.get(), mGpuParamsDirty);
 
         for (int i = 0; i < GPT_COUNT; i++)
         {
@@ -4504,10 +4380,16 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
                                                             mGpuParamsDirty);
             }
         }
-
-        mGpuParamsDirty = 0;
     }
 
+    // GLSL and HLSL2 allow FFP state access
+    if(mFixedFunctionParams)
+    {
+        mFixedFunctionParams->_updateAutoParams(mAutoParamDataSource.get(), mGpuParamsDirty);
+        mDestRenderSystem->applyFixedFunctionParams(mFixedFunctionParams, mGpuParamsDirty);
+    }
+
+    mGpuParamsDirty = 0;
 }
 //---------------------------------------------------------------------
 void SceneManager::_issueRenderOp(Renderable* rend, const Pass* pass)
