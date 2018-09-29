@@ -170,8 +170,6 @@ namespace Ogre {
     mutable GpuLogicalBufferStructPtr mDoubleLogicalToPhysical;
     /// @copydoc mFloatLogicalToPhysical
     mutable GpuLogicalBufferStructPtr mIntLogicalToPhysical;
-    /// @copydoc mFloatLogicalToPhysical
-    mutable GpuLogicalBufferStructPtr mUIntLogicalToPhysical;
     /// static nullPtr
     static GpuLogicalBufferStructPtr mBoolLogicalToPhysical;
     /** Parameter name -> ConstantDefinition map, shared instance used by all parameter objects.

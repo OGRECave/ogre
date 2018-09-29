@@ -1707,35 +1707,6 @@ namespace Ogre
             }
 
         }
-
-        // uint params
-        GpuLogicalBufferStructPtr uintLogical = params->getUnsignedIntLogicalBufferStruct();
-        if( uintLogical )
-        {
-            OGRE_LOCK_MUTEX(uintLogical->mutex);
-
-            for(GpuLogicalIndexUseMap::const_iterator i = uintLogical->map.begin();
-                i != uintLogical->map.end(); ++i)
-            {
-                size_t logicalIndex = i->first;
-                const GpuLogicalIndexUse& logicalUse = i->second;
-
-                const GpuProgramParameters::AutoConstantEntry* autoEntry = 
-                    params->findUnsignedIntAutoConstantEntry(logicalIndex);
-                const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
-                if (defaultParams)
-                {
-                    defaultAutoEntry = defaultParams->findUnsignedIntAutoConstantEntry(logicalIndex);
-                }
-
-                writeGpuProgramParameter("param_indexed", 
-                                         StringConverter::toString(logicalIndex), autoEntry, 
-                                         defaultAutoEntry, false, false, false, true,
-                                         logicalUse.physicalIndex, logicalUse.currentSize,
-                                         params, defaultParams, level, useMainBuffer);
-            }
-
-        }
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGpuProgramParameter(

@@ -314,13 +314,10 @@ namespace Ogre {
         size_t doubleBufferSize;
         /// Total size of the int buffer required
         size_t intBufferSize;
-        /// Total size of the uint buffer required
-        size_t uintBufferSize;
         /// Map of parameter names to GpuConstantDefinition
         GpuConstantDefinitionMap map;
 
-    GpuNamedConstants() : floatBufferSize(0), doubleBufferSize(0),
-            intBufferSize(0), uintBufferSize(0) {  }
+        GpuNamedConstants() : floatBufferSize(0), doubleBufferSize(0), intBufferSize(0) {}
 
         /** Generate additional constant entries for arrays based on a base definition.
             @remarks
@@ -456,8 +453,6 @@ namespace Ogre {
         DoubleConstantList mDoubleConstants;
         /// List of int constant values.
         IntConstantList mIntConstants;
-        /// List of unsigned int constant values.
-        UnsignedIntConstantList mUnsignedIntConstants;
 
         /// Optional data the rendersystem might want to store.
         mutable Any mRenderSystemData;
@@ -578,17 +573,23 @@ namespace Ogre {
         /// Get a pointer to the 'nth' item in the int buffer
         const int* getIntPointer(size_t pos) const { return &mIntConstants[pos]; }
         /// Get a pointer to the 'nth' item in the uint buffer
-        uint* getUnsignedIntPointer(size_t pos) { _markDirty(); return &mUnsignedIntConstants[pos]; }
+        uint* getUnsignedIntPointer(size_t pos) { _markDirty(); return (uint*)&mIntConstants[pos]; }
         /// Get a pointer to the 'nth' item in the uint buffer
-        const uint* getUnsignedIntPointer(size_t pos) const { return &mUnsignedIntConstants[pos]; }
+        const uint* getUnsignedIntPointer(size_t pos) const { return (const uint*)&mIntConstants[pos]; }
         /// Get a reference to the list of float constants
         const FloatConstantList& getFloatConstantList() const { return mFloatConstants; }
         /// Get a reference to the list of double constants
         const DoubleConstantList& getDoubleConstantList() const { return mDoubleConstants; }
         /// Get a reference to the list of int constants
         const IntConstantList& getIntConstantList() const { return mIntConstants; }
-        /// Get a reference to the list of uint constants
-        const UnsignedIntConstantList& getUnsignedIntConstantList() const { return mUnsignedIntConstants; }
+        /// @deprecated use getIntConstantList
+        OGRE_DEPRECATED const UnsignedIntConstantList& getUnsignedIntConstantList() const
+        {
+            static UnsignedIntConstantList tmp;
+            tmp.clear();
+            tmp.insert(tmp.end(), mIntConstants.begin(), mIntConstants.end());
+            return tmp;
+        }
         /** Internal method that the RenderSystem might use to store optional data. */
         void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
         /** Internal method that the RenderSystem might use to store optional data. */
@@ -1320,8 +1321,6 @@ namespace Ogre {
         DoubleConstantList mDoubleConstants;
         /// Packed list of integer constants (physical indexing)
         IntConstantList mIntConstants;
-        /// Packed list of unsigned integer constants (physical indexing)
-        UnsignedIntConstantList mUnsignedIntConstants;
         /** Logical index to physical index map - for low-level programs
             or high-level programs which pass params this way. */
         GpuLogicalBufferStructPtr mFloatLogicalToPhysical;
@@ -1331,9 +1330,6 @@ namespace Ogre {
         /** Logical index to physical index map - for low-level programs
             or high-level programs which pass params this way. */
         GpuLogicalBufferStructPtr mIntLogicalToPhysical;
-        /** Logical index to physical index map - for low-level programs
-            or high-level programs which pass params this way. */
-        GpuLogicalBufferStructPtr mUnsignedIntLogicalToPhysical;
         static GpuLogicalBufferStructPtr mBoolLogicalToPhysical; // nullPtr
 
         template <typename T>
@@ -1351,9 +1347,8 @@ namespace Ogre {
         /** Gets the physical buffer index associated with a logical int constant index.
          */
         GpuLogicalIndexUse* _getIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical uint constant index.
-         */
-        GpuLogicalIndexUse* _getUnsignedIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
+        /// @deprecated use _getIntConstantLogicalIndexUse
+        OGRE_DEPRECATED GpuLogicalIndexUse* _getUnsignedIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
         /// Mapping from parameter names to def - high-level programs are expected to populate this
         GpuNamedConstantsPtr mNamedConstants;
         /// List of automatically updated parameters
@@ -1390,10 +1385,19 @@ namespace Ogre {
         /** Internal method for providing a link to a name->definition map for parameters. */
         void _setNamedConstants(const GpuNamedConstantsPtr& constantmap);
 
-        /** Internal method for providing a link to a logical index->physical index map for parameters. */
-        void _setLogicalIndexes(const GpuLogicalBufferStructPtr& floatIndexMap, const GpuLogicalBufferStructPtr& doubleIndexMap,
+        /** Internal method for providing a link to a logical index->physical index map for
+         * parameters. */
+        void _setLogicalIndexes(const GpuLogicalBufferStructPtr& floatIndexMap,
+                                const GpuLogicalBufferStructPtr& doubleIndexMap,
+                                const GpuLogicalBufferStructPtr& intIndexMap);
+
+        /// @deprecated
+        OGRE_DEPRECATED void _setLogicalIndexes(const GpuLogicalBufferStructPtr& floatIndexMap, const GpuLogicalBufferStructPtr& doubleIndexMap,
                                 const GpuLogicalBufferStructPtr&  intIndexMap, const GpuLogicalBufferStructPtr&  uintIndexMap,
-                                const GpuLogicalBufferStructPtr&  boolIndexMap);
+                                const GpuLogicalBufferStructPtr&  boolIndexMap)
+        {
+            _setLogicalIndexes(floatIndexMap, doubleIndexMap, intIndexMap);
+        }
 
 
         /// Does this parameter set include named parameters?
@@ -1671,12 +1675,8 @@ namespace Ogre {
             Only applicable to low-level programs.
         */
         const GpuLogicalBufferStructPtr& getIntLogicalBufferStruct() const { return mIntLogicalToPhysical; }
-        /** Get the current list of mappings from low-level logical param indexes
-            to physical buffer locations in the integer buffer.
-            @note
-            Only applicable to low-level programs.
-        */
-        const GpuLogicalBufferStructPtr& getUnsignedIntLogicalBufferStruct() const { return mUnsignedIntLogicalToPhysical; }
+        /// @deprecated use getIntLogicalBufferStruct
+        OGRE_DEPRECATED const GpuLogicalBufferStructPtr& getUnsignedIntLogicalBufferStruct() const { return mIntLogicalToPhysical; }
         /// @deprecated
         OGRE_DEPRECATED const GpuLogicalBufferStructPtr& getBoolLogicalBufferStruct() const { return mBoolLogicalToPhysical; }
 
@@ -1690,8 +1690,8 @@ namespace Ogre {
         size_t getDoubleLogicalIndexForPhysicalIndex(size_t physicalIndex);
         /// @copydoc getFloatLogicalIndexForPhysicalIndex
         size_t getIntLogicalIndexForPhysicalIndex(size_t physicalIndex);
-        /// @copydoc getFloatLogicalIndexForPhysicalIndex
-        size_t getUnsignedIntLogicalIndexForPhysicalIndex(size_t physicalIndex);
+        /// @deprecated use getIntLogicalIndexForPhysicalIndex
+        OGRE_DEPRECATED size_t getUnsignedIntLogicalIndexForPhysicalIndex(size_t physicalIndex);
         /// @deprecated
         OGRE_DEPRECATED size_t getBoolLogicalIndexForPhysicalIndex(size_t physicalIndex);
 
@@ -1714,12 +1714,18 @@ namespace Ogre {
         int* getIntPointer(size_t pos) { return &mIntConstants[pos]; }
         /// Get a pointer to the 'nth' item in the int buffer
         const int* getIntPointer(size_t pos) const { return &mIntConstants[pos]; }
-        /// Get a reference to the list of uint constants
-        const UnsignedIntConstantList& getUnsignedIntConstantList() const { return mUnsignedIntConstants; }
+        /// @deprecated use getIntConstantList
+        OGRE_DEPRECATED const UnsignedIntConstantList& getUnsignedIntConstantList() const
+        {
+            static UnsignedIntConstantList tmp;
+            tmp.clear();
+            tmp.insert(tmp.end(), mIntConstants.begin(), mIntConstants.end());
+            return tmp;
+        }
         /// Get a pointer to the 'nth' item in the uint buffer
-        uint* getUnsignedIntPointer(size_t pos) { return &mUnsignedIntConstants[pos]; }
+        uint* getUnsignedIntPointer(size_t pos) { return (uint*)&mIntConstants[pos]; }
         /// Get a pointer to the 'nth' item in the uint buffer
-        const uint* getUnsignedIntPointer(size_t pos) const { return &mUnsignedIntConstants[pos]; }
+        const uint* getUnsignedIntPointer(size_t pos) const { return (const uint*)&mIntConstants[pos]; }
         /// Get a reference to the list of auto constant bindings
         const AutoConstantList& getAutoConstantList() const { return mAutoConstants; }
 
@@ -1994,10 +2000,8 @@ namespace Ogre {
             @copydetails _getFloatConstantPhysicalIndex
         */
         size_t _getIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical unsigned int constant index.
-            @copydetails _getFloatConstantPhysicalIndex
-        */
-        size_t _getUnsignedIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
+        /// @deprecated use _getIntConstantPhysicalIndex
+        OGRE_DEPRECATED size_t _getUnsignedIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
         /** Sets whether or not we need to transpose the matrices passed in from the rest of OGRE.
             @remarks
             D3D uses transposed matrices compared to GL and OGRE; this is not important when you

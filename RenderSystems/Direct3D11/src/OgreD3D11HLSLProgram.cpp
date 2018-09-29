@@ -1255,15 +1255,10 @@ namespace Ogre {
                 currentBuffer = mFloatLogicalToPhysical.get();
                 currentBufferSize = &mConstantDefs->floatBufferSize;
             }
-            else if (def.isInt())
+            else if (def.isInt() || def.isUnsignedInt())
             {
                 currentBuffer = mIntLogicalToPhysical.get();
                 currentBufferSize = &mConstantDefs->intBufferSize;
-            }
-            else if (def.isUnsignedInt())
-            {
-                currentBuffer = mUIntLogicalToPhysical.get();
-                currentBufferSize = &mConstantDefs->uintBufferSize;
             }
 
             if (currentBuffer != NULL && currentBufferSize != NULL)
