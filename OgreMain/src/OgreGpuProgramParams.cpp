@@ -301,7 +301,6 @@ namespace Ogre
         writeInts(((const uint32*)&pConsts->floatBufferSize), 1);
         writeInts(((const uint32*)&pConsts->doubleBufferSize), 1);
         writeInts(((const uint32*)&pConsts->intBufferSize), 1);
-        writeInts(((const uint32*)&pConsts->uintBufferSize), 1);
 
         // simple export of all the named constants, no chunks
         // name, physical index
@@ -337,7 +336,6 @@ namespace Ogre
         readInts(stream, ((uint32*)&pDest->floatBufferSize), 1);
         readInts(stream, ((uint32*)&pDest->doubleBufferSize), 1);
         readInts(stream, ((uint32*)&pDest->intBufferSize), 1);
-        readInts(stream, ((uint32*)&pDest->uintBufferSize), 1);
 
         while (!stream->eof())
         {
@@ -380,7 +378,6 @@ namespace Ogre
         memSize += sizeof(float) * mFloatConstants.size();
         memSize += sizeof(double) * mDoubleConstants.size();
         memSize += sizeof(int) * mIntConstants.size(); 
-        memSize += sizeof(uint) * mUnsignedIntConstants.size(); 
         memSize += mName.size() * sizeof(char);
         memSize += sizeof(Any);
         memSize += sizeof(size_t);
@@ -418,15 +415,10 @@ namespace Ogre
             def.physicalIndex = mDoubleConstants.size();
             mDoubleConstants.resize(mDoubleConstants.size() + def.arraySize * def.elementSize);
         }
-        else if (def.isInt() || def.isSampler() || def.isSubroutine())
+        else if (def.isInt() || def.isSampler() || def.isSubroutine() || def.isUnsignedInt() || def.isBool())
         {
             def.physicalIndex = mIntConstants.size();
             mIntConstants.resize(mIntConstants.size() + def.arraySize * def.elementSize);
-        }
-        else if (def.isUnsignedInt() || def.isBool())
-        {
-            def.physicalIndex = mUnsignedIntConstants.size();
-            mUnsignedIntConstants.resize(mUnsignedIntConstants.size() + def.arraySize * def.elementSize);
         }
         else 
         {
@@ -476,7 +468,7 @@ namespace Ogre
                 std::advance(en, numElems);
                 mFloatConstants.erase(beg, en);
             }
-            else if (def.isInt() || def.isSampler() || def.isSubroutine())
+            else if (def.isInt() || def.isSampler() || def.isSubroutine() || def.isUnsignedInt() || def.isBool())
             {
                 mNamedConstants.intBufferSize -= numElems;
 
@@ -485,15 +477,6 @@ namespace Ogre
                 IntConstantList::iterator en = beg;
                 std::advance(en, numElems);
                 mIntConstants.erase(beg, en);
-            }
-            else if (def.isUnsignedInt() || def.isBool()) {
-                mNamedConstants.uintBufferSize -= numElems;
-
-                UnsignedIntConstantList::iterator beg = mUnsignedIntConstants.begin();
-                std::advance(beg, def.physicalIndex);
-                UnsignedIntConstantList::iterator en = beg;
-                std::advance(en, numElems);
-                mUnsignedIntConstants.erase(beg, en);
             }
             else {
                 //TODO exception handling
@@ -510,11 +493,9 @@ namespace Ogre
         mNamedConstants.floatBufferSize = 0;
         mNamedConstants.doubleBufferSize = 0;
         mNamedConstants.intBufferSize = 0;
-        mNamedConstants.uintBufferSize = 0;
         mFloatConstants.clear();
         mDoubleConstants.clear();
         mIntConstants.clear();
-        mUnsignedIntConstants.clear();
     }
     //---------------------------------------------------------------------
     GpuConstantDefinitionIterator GpuSharedParameters::getConstantDefinitionIterator(void) const
@@ -635,7 +616,7 @@ namespace Ogre
         if (i != mNamedConstants.map.end())
         {
             const GpuConstantDefinition& def = i->second;
-            memcpy(&mUnsignedIntConstants[def.physicalIndex], val,
+            memcpy(&mIntConstants[def.physicalIndex], val,
                    sizeof(uint) * std::min(count, def.elementSize * def.arraySize));
         }
 
@@ -883,12 +864,10 @@ namespace Ogre
         mFloatConstants = oth.mFloatConstants;
         mDoubleConstants = oth.mDoubleConstants;
         mIntConstants  = oth.mIntConstants;
-        mUnsignedIntConstants  = oth.mUnsignedIntConstants;
         mAutoConstants = oth.mAutoConstants;
         mFloatLogicalToPhysical = oth.mFloatLogicalToPhysical;
         mDoubleLogicalToPhysical = oth.mDoubleLogicalToPhysical;
         mIntLogicalToPhysical = oth.mIntLogicalToPhysical;
-        mUnsignedIntLogicalToPhysical = oth.mUnsignedIntLogicalToPhysical;
         mNamedConstants = oth.mNamedConstants;
         copySharedParamSetUsage(oth.mSharedParamSets);
 
@@ -917,7 +896,6 @@ namespace Ogre
         memSize += sizeof(float) * mFloatConstants.size();
         memSize += sizeof(double) * mDoubleConstants.size();
         memSize += sizeof(int) * mIntConstants.size();
-        memSize += sizeof(uint) * mUnsignedIntConstants.size();
         memSize += sizeof(Any);
         memSize += sizeof(size_t);
         memSize += sizeof(bool) * 2;
@@ -935,8 +913,6 @@ namespace Ogre
             memSize += mDoubleLogicalToPhysical->bufferSize;
         if(mIntLogicalToPhysical)
             memSize += mIntLogicalToPhysical->bufferSize;
-        if(mUnsignedIntLogicalToPhysical)
-            memSize += mUnsignedIntLogicalToPhysical->bufferSize;
 
         return memSize;
     }
@@ -964,25 +940,15 @@ namespace Ogre
             mIntConstants.insert(mIntConstants.end(),
                                  namedConstants->intBufferSize - mIntConstants.size(), 0);
         }
-        if (namedConstants->uintBufferSize > mUnsignedIntConstants.size())
-        {
-            mUnsignedIntConstants.insert(mUnsignedIntConstants.end(),
-                                 namedConstants->uintBufferSize - mUnsignedIntConstants.size(), 0);
-        }
     }
     //---------------------------------------------------------------------
-    void GpuProgramParameters::_setLogicalIndexes(
-        const GpuLogicalBufferStructPtr& floatIndexMap,
-        const GpuLogicalBufferStructPtr& doubleIndexMap,
-        const GpuLogicalBufferStructPtr& intIndexMap,
-        const GpuLogicalBufferStructPtr& uintIndexMap,
-        const GpuLogicalBufferStructPtr& boolIndexMap
-    )
+    void GpuProgramParameters::_setLogicalIndexes(const GpuLogicalBufferStructPtr& floatIndexMap,
+                                                  const GpuLogicalBufferStructPtr& doubleIndexMap,
+                                                  const GpuLogicalBufferStructPtr& intIndexMap)
     {
         mFloatLogicalToPhysical = floatIndexMap;
         mDoubleLogicalToPhysical = doubleIndexMap;
         mIntLogicalToPhysical = intIndexMap;
-        mUnsignedIntLogicalToPhysical = uintIndexMap;
 
         // resize the internal buffers
         // Note that these will only contain something after the first parameter
@@ -1003,11 +969,6 @@ namespace Ogre
         {
             mIntConstants.insert(mIntConstants.end(),
                                  intIndexMap->bufferSize - mIntConstants.size(), 0);
-        }
-        if (uintIndexMap &&  uintIndexMap->bufferSize > mUnsignedIntConstants.size())
-        {
-            mUnsignedIntConstants.insert(mUnsignedIntConstants.end(),
-                                 uintIndexMap->bufferSize - mUnsignedIntConstants.size(), 0);
         }
     }
     //---------------------------------------------------------------------()
@@ -1119,9 +1080,9 @@ namespace Ogre
         // Raw buffer size is 4x count
         size_t rawCount = count * 4;
         // get physical index
-        assert(mUnsignedIntLogicalToPhysical && "GpuProgram hasn't set up the logical -> physical map!");
+        assert(mIntLogicalToPhysical && "GpuProgram hasn't set up the logical -> physical map!");
 
-        size_t physicalIndex = _getUnsignedIntConstantPhysicalIndex(index, rawCount, GPV_GLOBAL);
+        size_t physicalIndex = _getIntConstantPhysicalIndex(index, rawCount, GPV_GLOBAL);
         // Copy
         _writeRawConstants(physicalIndex, val, rawCount);
     }
@@ -1230,8 +1191,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     void GpuProgramParameters::_writeRawConstants(size_t physicalIndex, const uint* val, size_t count)
     {
-        assert(physicalIndex + count <= mUnsignedIntConstants.size());
-        memcpy(&mUnsignedIntConstants[physicalIndex], val, sizeof(uint) * count);
+        assert(physicalIndex + count <= mIntConstants.size());
+        memcpy(&mIntConstants[physicalIndex], val, sizeof(uint) * count);
     }
     //-----------------------------------------------------------------------------
     void GpuProgramParameters::_readRawConstants(size_t physicalIndex, size_t count, float* dest)
@@ -1440,10 +1401,6 @@ namespace Ogre
     {
         return def.isInt();
     }
-    template <> bool isDefType<uint>(const GpuConstantDefinition& def)
-    {
-        return def.isUnsignedInt();
-    }
 
     template <typename T> void incrementBufferSize(GpuNamedConstantsPtr& consts, size_t inc) {}
     template <> void incrementBufferSize<float>(GpuNamedConstantsPtr& consts, size_t inc)
@@ -1457,10 +1414,6 @@ namespace Ogre
     template <> void incrementBufferSize<int>(GpuNamedConstantsPtr& consts, size_t inc)
     {
         consts->intBufferSize += inc;
-    }
-    template <> void incrementBufferSize<uint>(GpuNamedConstantsPtr& consts, size_t inc)
-    {
-        consts->uintBufferSize += inc;
     }
 
     template <typename T>
@@ -1596,13 +1549,7 @@ namespace Ogre
     //---------------------------------------------------------------------()
     GpuLogicalIndexUse* GpuProgramParameters::_getUnsignedIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability)
     {
-        if (!mUnsignedIntLogicalToPhysical)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "This is not a low-level parameter parameter object",
-                        "GpuProgramParameters::_getUnsignedIntConstantPhysicalIndex");
-
-        return getConstantLogicalIndexUse(mUnsignedIntLogicalToPhysical, mUnsignedIntConstants, logicalIndex,
-                                          requestedSize, variability);
+        return _getIntConstantLogicalIndexUse(logicalIndex, requestedSize, variability);
     }
     //-----------------------------------------------------------------------------
     size_t GpuProgramParameters::_getFloatConstantPhysicalIndex(
@@ -1629,8 +1576,7 @@ namespace Ogre
     size_t GpuProgramParameters::_getUnsignedIntConstantPhysicalIndex(
         size_t logicalIndex, size_t requestedSize, uint16 variability)
     {
-        GpuLogicalIndexUse* indexUse = _getUnsignedIntConstantLogicalIndexUse(logicalIndex, requestedSize, variability);
-        return indexUse ? indexUse->physicalIndex : 0;
+        return _getIntConstantPhysicalIndex(logicalIndex, requestedSize, variability);
     }
     //-----------------------------------------------------------------------------
     static size_t getLogicalIndexForPhysicalIndex(const GpuLogicalBufferStructPtr& logicalToPhysical,
@@ -1658,7 +1604,7 @@ namespace Ogre
     }
     size_t GpuProgramParameters::getUnsignedIntLogicalIndexForPhysicalIndex(size_t physicalIndex)
     {
-        return getLogicalIndexForPhysicalIndex(mUnsignedIntLogicalToPhysical, physicalIndex);
+        return getIntLogicalIndexForPhysicalIndex(physicalIndex);
     }
     //-----------------------------------------------------------------------------
     size_t GpuProgramParameters::getBoolLogicalIndexForPhysicalIndex(size_t physicalIndex)
@@ -2825,13 +2771,13 @@ namespace Ogre
     const GpuProgramParameters::AutoConstantEntry*
     GpuProgramParameters::findUnsignedIntAutoConstantEntry(size_t logicalIndex)
     {
-        if (!mUnsignedIntLogicalToPhysical)
+        if (!mIntLogicalToPhysical)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "This is not a low-level parameter parameter object",
                         "GpuProgramParameters::findUnsignedIntAutoConstantEntry");
 
         return _findRawAutoConstantEntryUnsignedInt(
-            _getUnsignedIntConstantPhysicalIndex(logicalIndex, 0, GPV_GLOBAL));
+            _getIntConstantPhysicalIndex(logicalIndex, 0, GPV_GLOBAL));
     }
     //---------------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantEntry*
@@ -2916,7 +2862,6 @@ namespace Ogre
         mFloatConstants = source.getFloatConstantList();
         mDoubleConstants = source.getDoubleConstantList();
         mIntConstants = source.getIntConstantList();
-        mUnsignedIntConstants = source.getUnsignedIntConstantList();
         mAutoConstants = source.getAutoConstantList();
         mCombinedVariability = source.mCombinedVariability;
         copySharedParamSetUsage(source.mSharedParamSets);

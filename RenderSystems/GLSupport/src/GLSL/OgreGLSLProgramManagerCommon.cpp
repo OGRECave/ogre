@@ -158,15 +158,10 @@ namespace Ogre {
                         def.physicalIndex = defs.doubleBufferSize;
                         defs.doubleBufferSize += def.arraySize * def.elementSize;
                     }
-                    else if (def.isInt() || def.isSampler())
+                    else if (def.isInt() || def.isSampler() || def.isUnsignedInt() || def.isBool())
                     {
                         def.physicalIndex = defs.intBufferSize;
                         defs.intBufferSize += def.arraySize * def.elementSize;
-                    }
-                    else if (def.isUnsignedInt() || def.isBool())
-                    {
-                        def.physicalIndex = defs.uintBufferSize;
-                        defs.uintBufferSize += def.arraySize * def.elementSize;
                     }
                     else
                     {
