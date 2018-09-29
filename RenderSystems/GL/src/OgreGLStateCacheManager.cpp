@@ -605,8 +605,9 @@ namespace Ogre {
         }
     }
 
-    void GLStateCacheManager::setPointParameters(GLfloat *attenuation, float minSize, float maxSize)
+    void GLStateCacheManager::setPointParameters(const GLfloat *attenuation, float minSize, float maxSize)
     {
+        if(minSize > -1)
 #ifdef OGRE_ENABLE_STATE_CACHE
         if (minSize != mPointSizeMin)
 #endif
@@ -616,6 +617,8 @@ namespace Ogre {
             if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS))
                 glPointParameterf(GL_POINT_SIZE_MIN, mPointSizeMin);
         }
+
+        if(maxSize > -1)
 #ifdef OGRE_ENABLE_STATE_CACHE
         if (maxSize != mPointSizeMax)
 #endif
@@ -625,6 +628,8 @@ namespace Ogre {
             if (caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS))
                 glPointParameterf(GL_POINT_SIZE_MAX, mPointSizeMax);
         }
+
+        if(attenuation)
 #ifdef OGRE_ENABLE_STATE_CACHE
         if (attenuation[0] != mPointAttenuation[0] || attenuation[1] != mPointAttenuation[1] || attenuation[2] != mPointAttenuation[2])
 #endif

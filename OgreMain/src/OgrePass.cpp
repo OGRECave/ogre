@@ -358,9 +358,9 @@ namespace Ogre {
         Real constant, Real linear, Real quadratic)
     {
         mPointAttenuationEnabled = enabled;
-        mPointAttenuationCoeffs[0] = constant;
-        mPointAttenuationCoeffs[1] = linear;
-        mPointAttenuationCoeffs[2] = quadratic;
+        mPointAttenuationCoeffs[0] = enabled ? constant : 1.0f;
+        mPointAttenuationCoeffs[1] = enabled ? linear : 0.0f;
+        mPointAttenuationCoeffs[2] = enabled ? quadratic : 0.0f;
     }
     //-----------------------------------------------------------------------
     bool Pass::isPointAttenuationEnabled(void) const

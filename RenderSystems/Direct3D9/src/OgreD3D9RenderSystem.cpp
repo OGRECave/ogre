@@ -140,6 +140,125 @@ namespace Ogre
         mEventNames.push_back("DeviceLost");
         mEventNames.push_back("DeviceRestored");            
     }
+
+    const GpuProgramParametersPtr& D3D9RenderSystem::getFixedFunctionParams(TrackVertexColourType tracking,
+                                                                            FogMode fog)
+    {
+        _setSurfaceTracking(tracking);
+        _setFog(fog);
+
+        return mFixedFunctionParams;
+    }
+
+    void D3D9RenderSystem::applyFixedFunctionParams(const GpuProgramParametersSharedPtr& params, uint16 mask)
+    {
+        D3DMATERIAL9 material;
+        D3DLIGHT9 d3dLight;
+
+        // Autoconstant index is not a physical index
+        for (const auto& ac : params->getAutoConstants())
+        {
+            // Only update needed slots
+            if (ac.variability & mask)
+            {
+                HRESULT hr;
+                const float* ptr = params->getFloatPointer(ac.physicalIndex);
+                switch(ac.paramType)
+                {
+                case GpuProgramParameters::ACT_WORLD_MATRIX:
+                    _setWorldMatrix((const Matrix4&)ptr);
+                    break;
+                case GpuProgramParameters::ACT_VIEW_MATRIX:
+                    _setViewMatrix((const Matrix4&)ptr);
+                    break;
+                case GpuProgramParameters::ACT_PROJECTION_MATRIX:
+                    _setProjectionMatrix((const Matrix4&)ptr);
+                    break;
+                case GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR:
+                    material.Ambient = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3]);
+                    break;
+                case GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR:
+                    material.Diffuse = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3] );
+                    break;
+                case GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR:
+                    material.Specular = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3]);
+                    break;
+                case GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR:
+                    material.Emissive = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3]);
+                    break;
+                case GpuProgramParameters::ACT_SURFACE_SHININESS:
+                    material.Power = ptr[0];
+
+                    // last material param -> apply
+                    hr = getActiveD3D9Device()->SetMaterial( &material );
+                    if( FAILED( hr ) )
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting D3D material", "D3D9RenderSystem::applyFixedFunctionParams" );
+                    break;
+                case GpuProgramParameters::ACT_POINT_PARAMS:
+                {
+                    float size = ptr[0];
+                    // detect attenuation
+                    if(ptr[1] != 1.0f || ptr[2] != 0.0f || ptr[3] != 0.0f)
+                        size /= mActiveViewport->getActualHeight(); // data source scales points by height
+                    __SetFloatRenderState(D3DRS_POINTSIZE, size);
+                    __SetFloatRenderState(D3DRS_POINTSCALE_A, ptr[1]);
+                    __SetFloatRenderState(D3DRS_POINTSCALE_B, ptr[2]);
+                    __SetFloatRenderState(D3DRS_POINTSCALE_C, ptr[3]);
+                    break;
+                }
+                case GpuProgramParameters::ACT_FOG_PARAMS:
+                    hr = __SetFloatRenderState( D3DRS_FOGDENSITY, ptr[0] );
+                    hr = __SetFloatRenderState( D3DRS_FOGSTART, ptr[1] );
+                    hr = __SetFloatRenderState( D3DRS_FOGEND, ptr[2] );
+                    break;
+                case GpuProgramParameters::ACT_FOG_COLOUR:
+                    hr = __SetRenderState( D3DRS_FOGCOLOR, ColourValue(ptr[0], ptr[1], ptr[2], ptr[3]).getAsARGB());
+                    break;
+                case GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR:
+                    hr = __SetRenderState( D3DRS_AMBIENT, D3DCOLOR_COLORVALUE( ptr[0], ptr[1], ptr[2], 1.0f ) );
+                    break;
+                case GpuProgramParameters::ACT_LIGHT_POSITION:
+                    d3dLight.Type = ptr[3] ? D3DLIGHT_POINT : D3DLIGHT_DIRECTIONAL;
+                    d3dLight.Position = D3DXVECTOR3( ptr[0], ptr[1], ptr[2] );
+                    break;
+                case GpuProgramParameters::ACT_LIGHT_DIRECTION:
+                    d3dLight.Direction = D3DXVECTOR3( ptr[0], ptr[1], ptr[2] );
+                    break;
+                case GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR:
+                    d3dLight.Diffuse = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3] );
+                    break;
+                case GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR:
+                    d3dLight.Specular = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3] );
+                    break;
+                case GpuProgramParameters::ACT_LIGHT_ATTENUATION:
+                    d3dLight.Range = ptr[0];
+                    d3dLight.Attenuation0 = ptr[1];
+                    d3dLight.Attenuation1 = ptr[2];
+                    d3dLight.Attenuation2 = ptr[3];
+                    break;
+                case GpuProgramParameters::ACT_SPOTLIGHT_PARAMS:
+                    if(ptr[3]) d3dLight.Type = D3DLIGHT_SPOT;
+                    d3dLight.Theta = std::acos(ptr[0])*2;
+                    d3dLight.Phi = std::acos(ptr[1])*2;
+                    d3dLight.Falloff = ptr[2];
+
+                    // last light param -> apply
+                    if( FAILED( hr = getActiveD3D9Device()->SetLight( static_cast<DWORD>(ac.data), &d3dLight ) ) )
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set light details", "D3D9RenderSystem::setD3D9Light" );
+
+                    if( FAILED( hr = getActiveD3D9Device()->LightEnable( static_cast<DWORD>(ac.data), TRUE ) ) )
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to enable light", "D3D9RenderSystem::setD3D9Light" );
+                    break;
+                default:
+                    OgreAssert(false, "unknown autoconstant");
+                    break;
+                }
+                if( FAILED( hr ) )
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting render state", "D3D9RenderSystem::applyFixedFunctionParams" );
+            }
+        }
+    }
+
     //---------------------------------------------------------------------
     D3D9RenderSystem::~D3D9RenderSystem()
     {       
@@ -1138,6 +1257,8 @@ namespace Ogre
             mRealCapabilities = rsc;
             mRealCapabilities->addShaderProfile("hlsl");
 
+            initFixedFunctionParams(); // create params
+
             // if we are using custom capabilities, then 
             // mCurrentCapabilities has already been loaded
             if(!mUseCustomCapabilities)
@@ -1638,22 +1759,24 @@ namespace Ogre
             "Failed to set render stat D3DRS_AMBIENT", "D3D9RenderSystem::setAmbientLight" );
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_useLights(const LightList& lights, unsigned short limit)
+    void D3D9RenderSystem::_useLights(unsigned short limit)
     {
         IDirect3DDevice9* activeDevice = getActiveD3D9Device();
-        LightList::const_iterator i, iend;
-        iend = lights.end();
+
+        if(mCurrentLights[activeDevice] == limit)
+            return;
+
         unsigned short num = 0;
-        for (i = lights.begin(); i != iend && num < limit; ++i, ++num)
+        for (; num < limit; ++num)
         {
-            setD3D9Light(num, *i);
+            setD3D9Light(num, true);
         }
         // Disable extra lights
         for (; num < mCurrentLights[activeDevice]; ++num)
         {
-            setD3D9Light(num, NULL);
+            setD3D9Light(num, false);
         }
-        mCurrentLights[activeDevice] = std::min(limit, static_cast<unsigned short>(lights.size()));
+        mCurrentLights[activeDevice] = limit;
 
     }
     //---------------------------------------------------------------------
@@ -1673,71 +1796,17 @@ namespace Ogre
             "Failed to set render state D3DRS_LIGHTING", "D3D9RenderSystem::setLightingEnabled" );
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::setD3D9Light( size_t index, Light* lt )
+    void D3D9RenderSystem::setD3D9Light( size_t index, bool enabled)
     {
+        setFFPLightParams(index, enabled);
         HRESULT hr;
 
-        D3DLIGHT9 d3dLight;
-        ZeroMemory( &d3dLight, sizeof(d3dLight) );
-
-        if (!lt)
+        if (!enabled)
         {
             if( FAILED( hr = getActiveD3D9Device()->LightEnable( static_cast<DWORD>(index), FALSE) ) )
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                 "Unable to disable light", "D3D9RenderSystem::setD3D9Light" );
         }
-        else
-        {
-            switch( lt->getType() )
-            {
-            case Light::LT_POINT:
-                d3dLight.Type = D3DLIGHT_POINT;
-                break;
-
-            case Light::LT_DIRECTIONAL:
-                d3dLight.Type = D3DLIGHT_DIRECTIONAL;
-                break;
-
-            case Light::LT_SPOTLIGHT:
-                d3dLight.Type = D3DLIGHT_SPOT;
-                d3dLight.Falloff = lt->getSpotlightFalloff();
-                d3dLight.Theta = lt->getSpotlightInnerAngle().valueRadians();
-                d3dLight.Phi = lt->getSpotlightOuterAngle().valueRadians();
-                break;
-            }
-
-            ColourValue col;
-            col = lt->getDiffuseColour();
-            d3dLight.Diffuse = D3DXCOLOR( col.r, col.g, col.b, col.a );
-
-            col = lt->getSpecularColour();
-            d3dLight.Specular = D3DXCOLOR( col.r, col.g, col.b, col.a );
-
-            Vector3 vec;
-            if( lt->getType() != Light::LT_DIRECTIONAL )
-            {
-                vec = lt->getDerivedPosition(true);
-                d3dLight.Position = D3DXVECTOR3( vec.x, vec.y, vec.z );
-            }
-            if( lt->getType() != Light::LT_POINT )
-            {
-                vec = lt->getDerivedDirection();
-                d3dLight.Direction = D3DXVECTOR3( vec.x, vec.y, vec.z );
-            }
-
-            d3dLight.Range = lt->getAttenuationRange();
-            d3dLight.Attenuation0 = lt->getAttenuationConstant();
-            d3dLight.Attenuation1 = lt->getAttenuationLinear();
-            d3dLight.Attenuation2 = lt->getAttenuationQuadric();
-
-            if( FAILED( hr = getActiveD3D9Device()->SetLight( static_cast<DWORD>(index), &d3dLight ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set light details", "D3D9RenderSystem::setD3D9Light" );
-
-            if( FAILED( hr = getActiveD3D9Device()->LightEnable( static_cast<DWORD>(index), TRUE ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to enable light", "D3D9RenderSystem::setD3D9Light" );
-        }
-
-
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_setViewMatrix( const Matrix4 &m )
@@ -1764,6 +1833,12 @@ namespace Ogre
     {
         // save latest matrix
         mDxProjMat = D3D9Mappings::makeD3DXMatrix( m );
+
+        // Convert right-handed to left-handed
+        mDxProjMat._31 = -mDxProjMat._31;
+        mDxProjMat._32 = -mDxProjMat._32;
+        mDxProjMat._33 = -mDxProjMat._33;
+        mDxProjMat._34 = -mDxProjMat._34;
 
         if( mActiveRenderTarget->requiresTextureFlipping() )
         {
@@ -1794,22 +1869,8 @@ namespace Ogre
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot set D3D9 world matrix", "D3D9RenderSystem::_setWorldMatrix" );
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setSurfaceParams( const ColourValue &ambient, const ColourValue &diffuse,
-        const ColourValue &specular, const ColourValue &emissive, Real shininess,
-        TrackVertexColourType tracking )
+    void D3D9RenderSystem::_setSurfaceTracking( TrackVertexColourType tracking )
     {
-
-        D3DMATERIAL9 material;
-        material.Diffuse = D3DXCOLOR( diffuse.r, diffuse.g, diffuse.b, diffuse.a );
-        material.Ambient = D3DXCOLOR( ambient.r, ambient.g, ambient.b, ambient.a );
-        material.Specular = D3DXCOLOR( specular.r, specular.g, specular.b, specular.a );
-        material.Emissive = D3DXCOLOR( emissive.r, emissive.g, emissive.b, emissive.a );
-        material.Power = shininess;
-
-        HRESULT hr = getActiveD3D9Device()->SetMaterial( &material );
-        if( FAILED( hr ) )
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting D3D material", "D3D9RenderSystem::_setSurfaceParams" );
-
 
         if(tracking != TVC_NONE) 
         {
@@ -1826,24 +1887,19 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setPointParameters(Real size, 
-        bool attenuationEnabled, Real constant, Real linear, Real quadratic,
-        Real minSize, Real maxSize)
+    void D3D9RenderSystem::_setPointParameters(bool attenuationEnabled, Real minSize, Real maxSize)
     {
         if(attenuationEnabled)
         {
             // scaling required
             __SetRenderState(D3DRS_POINTSCALEENABLE, TRUE);
-            __SetFloatRenderState(D3DRS_POINTSCALE_A, constant);
-            __SetFloatRenderState(D3DRS_POINTSCALE_B, linear);
-            __SetFloatRenderState(D3DRS_POINTSCALE_C, quadratic);
         }
         else
         {
             // no scaling required
             __SetRenderState(D3DRS_POINTSCALEENABLE, FALSE);
         }
-        __SetFloatRenderState(D3DRS_POINTSIZE, size);
+
         __SetFloatRenderState(D3DRS_POINTSIZE_MIN, minSize);
         if (maxSize == 0.0f)
             maxSize = mCurrentCapabilities->getMaxPointSize();
@@ -2609,7 +2665,7 @@ namespace Ogre
             "D3D9RenderSystem::_setColourBufferWriteEnabled");
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setFog( FogMode mode, const ColourValue& colour, Real densitiy, Real start, Real end )
+    void D3D9RenderSystem::_setFog( FogMode mode)
     {
         HRESULT hr;
 
@@ -2631,6 +2687,9 @@ namespace Ogre
             // just disable
             hr = __SetRenderState(fogType, D3DFOG_NONE );
             hr = __SetRenderState(D3DRS_FOGENABLE, FALSE);
+
+            mFixedFunctionParams->clearAutoConstant(18);
+            mFixedFunctionParams->clearAutoConstant(19);
         }
         else
         {
@@ -2639,10 +2698,8 @@ namespace Ogre
             hr = __SetRenderState( fogTypeNot, D3DFOG_NONE );
             hr = __SetRenderState( fogType, D3D9Mappings::get(mode) );
 
-            hr = __SetRenderState( D3DRS_FOGCOLOR, colour.getAsARGB() );
-            hr = __SetFloatRenderState( D3DRS_FOGSTART, start );
-            hr = __SetFloatRenderState( D3DRS_FOGEND, end );
-            hr = __SetFloatRenderState( D3DRS_FOGDENSITY, densitiy );
+            mFixedFunctionParams->setAutoConstant(18, GpuProgramParameters::ACT_FOG_PARAMS);
+            mFixedFunctionParams->setAutoConstant(19, GpuProgramParameters::ACT_FOG_COLOUR);
         }
 
         if( FAILED( hr ) )

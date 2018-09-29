@@ -177,11 +177,9 @@ namespace Ogre {
         std::vector<StaticFaceGroup*>::const_iterator faceGrpi;
         static RenderOperation patchOp;
         
+        mAutoParamDataSource->setCurrentRenderable(0);
         // no world transform required
-        mDestRenderSystem->_setWorldMatrix(Matrix4::IDENTITY);
-        // Set view / proj
-        setViewMatrix(mCachedViewMatrix);
-        mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
+        mAutoParamDataSource->setWorldMatrices(&Affine3::IDENTITY, 1);
 
         // For each material in turn, cache rendering data & render
         MaterialFaceGroupMap::const_iterator mati;
@@ -217,15 +215,7 @@ namespace Ogre {
                 Pass* pass = passes[p];
                 _setPass(pass);
 
-                // Do we need to update GPU program parameters?
-                if (pass->isProgrammable())
-                {
-                    mAutoParamDataSource->setCurrentRenderable(0);
-                    mAutoParamDataSource->setCurrentSceneManager(this);
-                    mAutoParamDataSource->setWorldMatrices(&Affine3::IDENTITY, 1);
-                    mAutoParamDataSource->setCurrentCamera(mCameraInProgress, false);
-                    updateGpuProgramParameters(pass);
-                }
+                updateGpuProgramParameters(pass);
                 mDestRenderSystem->_render(mRenderOp);
             } 
 

@@ -122,7 +122,7 @@ namespace Ogre
         void refreshD3DSettings();
         void refreshFSAAOptions();
         
-        void setD3D9Light( size_t index, Light* light );
+        void setD3D9Light( size_t index, bool enabled);
         
         // state management methods, very primitive !!!
         HRESULT __SetRenderState(D3DRENDERSTATETYPE state, DWORD value);
@@ -196,6 +196,9 @@ namespace Ogre
         ~D3D9RenderSystem();
 
         virtual void initConfigOptions();
+
+        const GpuProgramParametersPtr& getFixedFunctionParams(TrackVertexColourType tracking, FogMode fog);
+        void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 variabilityMask);
 
         // Overridden RenderSystem functions
         String validateConfigOptions();
@@ -273,15 +276,14 @@ namespace Ogre
         void setNormaliseNormals(bool normalise);
 
         // Low-level overridden members, mainly for internal use
-        void _useLights(const LightList& lights, unsigned short limit);
+        void _useLights(unsigned short limit);
         void _setWorldMatrix( const Matrix4 &m );
         void _setViewMatrix( const Matrix4 &m );
         void _setProjectionMatrix( const Matrix4 &m );
-        void _setSurfaceParams( const ColourValue &ambient, const ColourValue &diffuse, const ColourValue &specular, const ColourValue &emissive, Real shininess, TrackVertexColourType tracking );
+        void _setSurfaceTracking( TrackVertexColourType tracking );
         void _setPointSpritesEnabled(bool enabled);
-        void _setPointParameters(Real size, bool attenuationEnabled, 
-            Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
-        void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
+        void _setPointParameters(bool attenuationEnabled, Real minSize, Real maxSize);
+        void _setTexture(size_t unit, bool enabled, const TexturePtr& texPtr);
         void _setSampler(size_t unit, Sampler& sampler);
         void _setVertexTexture(size_t unit, const TexturePtr& tex);
         void _disableTextureUnit(size_t texUnit);
@@ -307,7 +309,7 @@ namespace Ogre
         void _setDepthBufferWriteEnabled(bool enabled = true);
         void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );
         void _setDepthBias(float constantBias, float slopeScaleBias);
-        void _setFog( FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0 );
+        void _setFog( FogMode mode);
         void _convertProjectionMatrix(const Matrix4& matrix,
             Matrix4& dest, bool forGpuProgram = false);
         void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 

@@ -60,12 +60,6 @@ namespace Ogre {
         /// Rendering loop control
         bool mStopRendering;
 
-        /** Array of up to 8 lights, indexed as per API
-            Note that a null value indicates a free slot
-          */ 
-        #define MAX_LIGHTS 8
-        Light* mLights[MAX_LIGHTS];
-
         /// View matrix to set world against
         Matrix4 mViewMatrix;
         Matrix4 mWorldMatrix;
@@ -84,14 +78,12 @@ namespace Ogre {
         /// Number of fixed-function texture units
         unsigned short mFixedFunctionTextureUnits;
 
-        void setGLLight(size_t index, Light* lt);
+        void setGLLight(size_t index, bool lt);
         void makeGLMatrix(GLfloat gl_matrix[16], const Matrix4& m);
  
         GLint getBlendMode(SceneBlendFactor ogreBlend) const;
         GLint getTextureAddressingMode(TextureAddressingMode tam) const;
                 void initialiseContext(RenderWindow* primary);
-
-        void setLights();
 
         /// Store last colour write state
         bool mColourWrite[4];
@@ -107,9 +99,6 @@ namespace Ogre {
 
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;
-
-        /// Internal method to set pos / direction of a light
-        void setGLLightPositionDirection(Light* lt, GLenum lightindex);
 
         bool mUseAutoTextureMatrix;
         GLfloat mAutoTextureMatrix[16];
@@ -173,6 +162,10 @@ namespace Ogre {
         // Overridden RenderSystem functions
         // ----------------------------------
 
+        const GpuProgramParametersPtr& getFixedFunctionParams(TrackVertexColourType tracking, FogMode fog);
+
+        void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 variabilityMask);
+
         const String& getName(void) const;
 
         void _initialise() override;
@@ -182,8 +175,6 @@ namespace Ogre {
         void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
         void shutdown(void);
-
-        void setAmbientLight(float r, float g, float b);
 
         void setShadingType(ShadeOptions so);
 
@@ -216,9 +207,7 @@ namespace Ogre {
         // Low-level overridden members
         // -----------------------------
 
-        void _useLights(const LightList& lights, unsigned short limit);
-
-        bool areFixedFunctionLightsInViewSpace() const { return true; }
+        void _useLights(unsigned short limit);
 
         void _setWorldMatrix(const Matrix4 &m);
 
@@ -226,13 +215,9 @@ namespace Ogre {
 
         void _setProjectionMatrix(const Matrix4 &m);
 
-        void _setSurfaceParams(const ColourValue &ambient,
-            const ColourValue &diffuse, const ColourValue &specular,
-            const ColourValue &emissive, Real shininess,
-            TrackVertexColourType tracking);
+        void _setSurfaceTracking(TrackVertexColourType tracking);
 
-        void _setPointParameters(Real size, bool attenuationEnabled, 
-            Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
+        void _setPointParameters(bool attenuationEnabled, Real minSize, Real maxSize);
 
         void _setLineWidth(float width);
 
@@ -281,7 +266,7 @@ namespace Ogre {
 
         void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
 
-        void _setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end);
+        void _setFog(FogMode mode);
 
         void setClipPlane (ushort index, Real A, Real B, Real C, Real D);
 

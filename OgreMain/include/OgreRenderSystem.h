@@ -234,14 +234,13 @@ namespace Ogre
         */
         virtual void shutdown(void);
 
+        virtual const GpuProgramParametersPtr& getFixedFunctionParams(TrackVertexColourType tracking,
+                                                                      FogMode fog)
+        {
+            return mFixedFunctionParams;
+        }
 
-        /** Sets the colour & strength of the ambient (global directionless) light in the world.
-        @deprecated only needed for fixed function APIs
-        */
-        virtual void setAmbientLight(float r, float g, float b) {}
-
-        /// @overload
-        void setAmbientLight(const ColourValue& c) { setAmbientLight(c.r, c.g, c.b); }
+        virtual void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 variabilityMask) {}
 
         /** Sets the type of light shading required (default = Gouraud).
         @deprecated only needed for fixed function APIs
@@ -415,25 +414,12 @@ namespace Ogre
         // They can be called by library user if required
         // ------------------------------------------------------------------------
 
-
         /** Tells the rendersystem to use the attached set of lights (and no others) 
         up to the number specified (this allows the same list to be used with different
         count limits)
         @deprecated only needed for fixed function APIs
         */
-        virtual void _useLights(const LightList& lights, unsigned short limit) {}
-        /** Are fixed-function lights provided in view space? Affects optimisation. 
-        */
-        virtual bool areFixedFunctionLightsInViewSpace() const { return false; }
-        /** Sets the world transform matrix.
-         * @deprecated only needed for fixed function APIs */
-        virtual void _setWorldMatrix(const Matrix4 &m) {}
-        /** Sets the view transform matrix
-         * @deprecated only needed for fixed function APIs */
-        virtual void _setViewMatrix(const Matrix4 &m) {}
-        /** Sets the projection transform matrix
-         * @deprecated only needed for fixed function APIs*/
-        virtual void _setProjectionMatrix(const Matrix4 &m) {}
+        virtual void _useLights(unsigned short limit) {}
         /** Utility function for setting all the properties of a texture unit at once.
         This method is also worth using over the individual texture unit settings because it
         only sets those settings which are different from the current settings for this
@@ -447,44 +433,6 @@ namespace Ogre
         virtual void _disableTextureUnit(size_t texUnit);
         /** Disables all texture units from the given unit upwards */
         virtual void _disableTextureUnitsFrom(size_t texUnit);
-        /** Sets the surface properties to be used for future rendering.
-
-        This method sets the the properties of the surfaces of objects
-        to be rendered after it. In this context these surface properties
-        are the amount of each type of light the object reflects (determining
-        it's colour under different types of light), whether it emits light
-        itself, and how shiny it is. Textures are not dealt with here,
-        see the _setTetxure method for details.
-        This method is used by _setMaterial so does not need to be called
-        direct if that method is being used.
-
-        @param ambient The amount of ambient (sourceless and directionless)
-        light an object reflects. Affected by the colour/amount of ambient light in the scene.
-        @param diffuse The amount of light from directed sources that is
-        reflected (affected by colour/amount of point, directed and spot light sources)
-        @param specular The amount of specular light reflected. This is also
-        affected by directed light sources but represents the colour at the
-        highlights of the object.
-        @param emissive The colour of light emitted from the object. Note that
-        this will make an object seem brighter and not dependent on lights in
-        the scene, but it will not act as a light, so will not illuminate other
-        objects. Use a light attached to the same SceneNode as the object for this purpose.
-        @param shininess A value which only has an effect on specular highlights (so
-        specular must be non-black). The higher this value, the smaller and crisper the
-        specular highlights will be, imitating a more highly polished surface.
-        This value is not constrained to 0.0-1.0, in fact it is likely to
-        be more (10.0 gives a modest sheen to an object).
-        @param tracking A bit field that describes which of the ambient, diffuse, specular
-        and emissive colours follow the vertex colour of the primitive. When a bit in this field is set
-        its ColourValue is ignored. This is a combination of TVC_AMBIENT, TVC_DIFFUSE, TVC_SPECULAR(note that the shininess value is still
-        taken from shininess) and TVC_EMISSIVE. TVC_NONE means that there will be no material property
-        tracking the vertex colours.
-        @deprecated only needed for fixed function APIs
-        */
-        virtual void _setSurfaceParams(const ColourValue &ambient,
-            const ColourValue &diffuse, const ColourValue &specular,
-            const ColourValue &emissive, Real shininess,
-            TrackVertexColourType tracking = TVC_NONE) {}
 
         /** Sets whether or not rendering points using OT_POINT_LIST will 
         render point sprites (textured quads) or plain points.
@@ -494,19 +442,10 @@ namespace Ogre
         */  
         virtual void _setPointSpritesEnabled(bool enabled) {};
 
-        /** Sets the size of points and how they are attenuated with distance.
-        @remarks
-        When performing point rendering or point sprite rendering,
-        point size can be attenuated with distance. The equation for
-        doing this is attenuation = 1 / (constant + linear * dist + quadratic * d^2) .
-        @par
-        For example, to disable distance attenuation (constant screensize) 
-        you would set constant to 1, and linear and quadratic to 0. A
-        standard perspective attenuation would be 0, 1, 0 respectively.
+        /**
         @deprecated only needed for fixed function APIs
         */
-        virtual void _setPointParameters(Real size, bool attenuationEnabled, 
-            Real constant, Real linear, Real quadratic, Real minSize, Real maxSize) {};
+        virtual void _setPointParameters(bool attenuationEnabled, Real minSize, Real maxSize) {}
 
         /**
          * Set the line width when drawing as RenderOperation::OT_LINE_LIST/ RenderOperation::OT_LINE_STRIP
@@ -789,20 +728,6 @@ namespace Ogre
 
         */
         virtual void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) = 0;
-        /** Sets the fogging mode for future geometry.
-        @param mode Set up the mode of fog as described in the FogMode enum, or set to FOG_NONE to turn off.
-        @param colour The colour of the fog. Either set this to the same as your viewport background colour,
-        or to blend in with a skydome or skybox.
-        @param expDensity The density of the fog in FOG_EXP or FOG_EXP2 mode, as a value between 0 and 1. The default is 1. i.e. completely opaque, lower values can mean
-        that fog never completely obscures the scene.
-        @param linearStart Distance at which linear fog starts to encroach. The distance must be passed
-        as a parametric value between 0 and 1, with 0 being the near clipping plane, and 1 being the far clipping plane. Only applicable if mode is FOG_LINEAR.
-        @param linearEnd Distance at which linear fog becomes completely opaque.The distance must be passed
-        as a parametric value between 0 and 1, with 0 being the near clipping plane, and 1 being the far clipping plane. Only applicable if mode is FOG_LINEAR.
-        @deprecated only needed for fixed function APIs
-        */
-        virtual void _setFog(FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0) {}
-
 
         /** The RenderSystem will keep a count of tris rendered, this resets the count. */
         virtual void _beginGeometryCount(void);
@@ -1367,6 +1292,11 @@ namespace Ogre
         ConfigOptionMap mOptions;
 
         virtual void initConfigOptions();
+
+        GpuProgramParametersSharedPtr mFixedFunctionParams;
+
+        void initFixedFunctionParams();
+        void setFFPLightParams(size_t index, bool enabled);
     };
     /** @} */
     /** @} */
