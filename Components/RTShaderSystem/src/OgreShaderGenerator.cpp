@@ -1443,7 +1443,7 @@ ShaderGenerator::SGPass::~SGPass()
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::buildTargetRenderState()
 {   
-    if(mSrcPass->isProgrammable() && !mParent->overProgrammablePass()) return;
+    if(mSrcPass->isProgrammable() && !mParent->overProgrammablePass() && !isIlluminationPass()) return;
     const String& schemeName = mParent->getDestinationTechniqueSchemeName();
     const RenderState* renderStateGlobal = ShaderGenerator::getSingleton().getRenderState(schemeName);
     
@@ -1593,7 +1593,7 @@ void ShaderGenerator::SGTechnique::createIlluminationSGPasses()
 		if(p->pass == p->originalPass)
 			continue;
 
-		SGPass* passEntry = OGRE_NEW SGPass(this, p->originalPass, p->pass, p->stage);
+		SGPass* passEntry = OGRE_NEW SGPass(this, p->pass, p->pass, p->stage);
 
 		const Any& origPassUserData = p->originalPass->getUserObjectBindings().getUserAny(SGPass::UserKey);
 		if(origPassUserData.has_value())
