@@ -10,7 +10,7 @@
 #####################################################
 # Install dependencies 
 #####################################################
-if (NOT APPLE AND NOT WIN32)
+if (NOT APPLE AND NOT WIN32 AND NOT EMSCRIPTEN)
   return()
 endif()
 
