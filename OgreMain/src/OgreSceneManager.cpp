@@ -784,8 +784,8 @@ void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
 
     if (i == mSceneNodes.end())
     {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + (*i)->getName() + "' not found.",
-            "SceneManager::destroySceneNode");
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode not found.",
+                    "SceneManager::_destroySceneNode");
     }
 
     // Find any scene nodes which are tracking this node, and turn them off
