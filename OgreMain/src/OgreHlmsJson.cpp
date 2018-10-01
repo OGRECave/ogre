@@ -466,7 +466,12 @@ namespace Ogre
                 CompareFunction alphaTestCmp = parseCompareFunction( array[0].GetString() );
                 if( alphaTestCmp == NUM_COMPARE_FUNCTIONS )
                     alphaTestCmp = CMPF_ALWAYS_PASS;
-                datablock->setAlphaTest( alphaTestCmp );
+
+                bool alphaTestShadowCasterOnly = false;
+                if( arraySize > 2 && array[2].IsBool() )
+                    alphaTestShadowCasterOnly = array[2].GetBool();
+
+                datablock->setAlphaTest( alphaTestCmp, alphaTestShadowCasterOnly );
             }
 
             if( arraySize > 1 && array[1].IsNumber() )
@@ -957,6 +962,8 @@ namespace Ogre
             toQuotedStr( datablock->getAlphaTest(), outString );
             outString += ", ";
             outString += StringConverter::toString( datablock->getAlphaTestThreshold() );
+            outString += ", ";
+            outString += StringConverter::toString( datablock->getAlphaTestShadowCasterOnly() );
             outString += ']';
         }
 

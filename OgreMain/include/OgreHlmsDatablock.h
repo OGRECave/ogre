@@ -268,6 +268,7 @@ namespace Ogre
 
         bool    mIgnoreFlushRenderables;
         uint8   mAlphaTestCmp;  /// @see CompareFunction
+        bool    mAlphaTestShadowCasterOnly;
         float   mAlphaTestThreshold;
     public:
         float   mShadowConstantBias;
@@ -356,8 +357,9 @@ namespace Ogre
             Note: CMPF_ALWAYS_FAIL is not supported. Set a negative threshold to
             workaround this issue.
         */
-        virtual void setAlphaTest( CompareFunction compareFunction );
+        virtual void setAlphaTest( CompareFunction compareFunction, bool shadowCasterOnly = false );
         CompareFunction getAlphaTest(void) const;
+        bool            getAlphaTestShadowCasterOnly(void) const;
 
         /** Alpha test's threshold. @see setAlphaTest
         @param threshold

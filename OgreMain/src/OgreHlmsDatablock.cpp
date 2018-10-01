@@ -104,6 +104,7 @@ namespace Ogre
         mType( creator->getType() ),
         mIgnoreFlushRenderables( false ),
         mAlphaTestCmp( CMPF_ALWAYS_PASS ),
+        mAlphaTestShadowCasterOnly( false ),
         mAlphaTestThreshold( 0.5f ),
         mShadowConstantBias( 0.01f )
     {
@@ -148,9 +149,17 @@ namespace Ogre
                     {
                         Real val = -1.0f;
                         val = StringConverter::parseReal( *itor, -1.0f );
+
+                        bool error;
+                        bool shadowCasterOnly = StringConverter::parseBool( *itor, false, &error );
+
                         if( val >= 0 )
                         {
                             mAlphaTestThreshold = val;
+                        }
+                        else if( !error )
+                        {
+                            mAlphaTestShadowCasterOnly = shadowCasterOnly;
                         }
                         else
                         {
@@ -201,6 +210,7 @@ namespace Ogre
         datablock->setBlendblock( const_cast<HlmsBlendblock*>( mBlendblock[1] ), true );
 
         datablock->mAlphaTestCmp = mAlphaTestCmp;
+        datablock->mAlphaTestShadowCasterOnly = mAlphaTestShadowCasterOnly;
         datablock->mAlphaTestThreshold = mAlphaTestThreshold;
 
         datablock->mShadowConstantBias = mShadowConstantBias;
@@ -355,11 +365,12 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsDatablock::setAlphaTest( CompareFunction compareFunction )
+    void HlmsDatablock::setAlphaTest( CompareFunction compareFunction, bool shadowCasterOnly )
     {
-        if( mAlphaTestCmp != compareFunction )
+        if( mAlphaTestCmp != compareFunction || mAlphaTestShadowCasterOnly != shadowCasterOnly )
         {
             mAlphaTestCmp = static_cast<CompareFunction>( compareFunction );
+            mAlphaTestShadowCasterOnly = shadowCasterOnly;
             flushRenderables();
         }
     }
@@ -367,6 +378,11 @@ namespace Ogre
     CompareFunction HlmsDatablock::getAlphaTest(void) const
     {
         return static_cast<CompareFunction>( mAlphaTestCmp );
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsDatablock::getAlphaTestShadowCasterOnly(void) const
+    {
+        return mAlphaTestShadowCasterOnly;
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setAlphaTestThreshold( float threshold )

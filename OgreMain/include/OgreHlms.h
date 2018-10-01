@@ -787,6 +787,7 @@ namespace Ogre
 
         //Change per material (hash can be cached on the renderable)
         static const IdString AlphaTest;
+        static const IdString AlphaTestShadowCasterOnly;
         static const IdString AlphaBlend;
 
         static const IdString Syntax;
