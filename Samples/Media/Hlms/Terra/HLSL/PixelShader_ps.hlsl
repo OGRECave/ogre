@@ -328,7 +328,7 @@ float3 qmul( float4 q, float3 v )
 @end
 
 	@property( debug_pssm_splits )
-		outPs.colour0.xyz = lerp( outPs.colour0.xyz, debugPssmSplit.xyz, 0.2f );
+		psOut.colour0.xyz = lerp( psOut.colour0.xyz, debugPssmSplit.xyz, 0.2f );
 	@end
 
 	@insertpiece( custom_ps_posExecution )
