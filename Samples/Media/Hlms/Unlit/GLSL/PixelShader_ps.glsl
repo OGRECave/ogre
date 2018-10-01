@@ -70,7 +70,7 @@ void main()
 
 	@insertpiece( custom_ps_preLights )
 
-@property( alpha_test )
+@property( alpha_test && !alpha_test_shadow_caster_only )
 	if( material.alpha_test_threshold.x @insertpiece( alpha_test_cmp_func ) outColour.a )
 		discard;@end
 

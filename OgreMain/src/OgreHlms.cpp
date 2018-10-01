@@ -156,7 +156,8 @@ namespace Ogre
     const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
 
     //Change per material (hash can be cached on the renderable)
-    const IdString HlmsBaseProp::AlphaTest      = IdString( "alpha_test" );
+    const IdString HlmsBaseProp::AlphaTest                 = IdString( "alpha_test" );
+    const IdString HlmsBaseProp::AlphaTestShadowCasterOnly = IdString( "alpha_test_shadow_caster_only" );
     const IdString HlmsBaseProp::AlphaBlend     = IdString( "hlms_alphablend" );
 
     const IdString HlmsBaseProp::Syntax         = IdString( "syntax" );
@@ -2197,6 +2198,7 @@ namespace Ogre
         HlmsDatablock *datablock = renderable->getDatablock();
 
         setProperty( HlmsBaseProp::AlphaTest, datablock->getAlphaTest() != CMPF_ALWAYS_PASS );
+        setProperty( HlmsBaseProp::AlphaTestShadowCasterOnly, datablock->getAlphaTestShadowCasterOnly() );
         setProperty( HlmsBaseProp::AlphaBlend, datablock->getBlendblock(false)->mIsTransparent );
 
         if( renderable->getUseIdentityWorldMatrix() )
