@@ -394,19 +394,31 @@ namespace Ogre {
         return ret;
     }
     //-----------------------------------------------------------------------
-    bool StringConverter::parseBool(const String& val, bool defaultValue)
+    bool StringConverter::parseBool(const String& val, bool defaultValue, bool* error)
     {
-        //FIXME Returns both parsed value and error in same value - ambiguous.
-        // Suggested alternatives: implement exception handling or make either
-        // error or parsed value a parameter.
         if ((StringUtil::startsWith(val, "true") || StringUtil::startsWith(val, "yes")
              || StringUtil::startsWith(val, "1") ||  StringUtil::startsWith(val, "on")))
+        {
+            if (error)
+                *error = false;
+
             return true;
+        }
         else if ((StringUtil::startsWith(val, "false") || StringUtil::startsWith(val, "no")
                   || StringUtil::startsWith(val, "0") ||  StringUtil::startsWith(val, "off")))
+        {
+            if (error)
+                *error = false;
+
             return false;
+        }
         else
+        {
+            if (error)
+                *error = true;
+
             return defaultValue;
+        }
     }
     //-----------------------------------------------------------------------
     Vector2 StringConverter::parseVector2(const String& val, const Vector2& defaultValue)

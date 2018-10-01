@@ -221,7 +221,7 @@ namespace Ogre {
             matches "true", "yes", "1", or "on", false if "false", "no", "0" 
             or "off".
         */
-        static bool parseBool(const String& val, bool defaultValue = 0);
+        static bool parseBool(const String& val, bool defaultValue = 0, bool* error = NULL);
         /** Parses a Vector2 out of a String.
         @remarks
             Format is "x y" ie. 2 Real components, space delimited. Failure to parse returns
