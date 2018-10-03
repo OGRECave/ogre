@@ -72,7 +72,7 @@ namespace Ogre {
             resourceGroup);
         Ogre::Pass* ogrePass = mat->getTechnique(0)->getPass(0);
 
-        LogManager::getSingleton().logMessage("Using Q3 shader " + mName, LML_CRITICAL);
+        LogManager::getSingleton().logMessage("Using Q3 shader " + mName, LML_TRIVIAL);
         for (int p = 0; p < numPasses; ++p)
         {
             TextureUnitState* t;
