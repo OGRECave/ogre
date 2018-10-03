@@ -1304,7 +1304,7 @@ namespace Ogre
         if ( mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
             descDepth.Format            = DXGI_FORMAT_D24_UNORM_S8_UINT;
         else
-            descDepth.Format            = DXGI_FORMAT_R32_TYPELESS;
+            descDepth.Format            = DXGI_FORMAT_R24G8_TYPELESS;
 
         descDepth.SampleDesc.Count      = BBDesc.SampleDesc.Count;
         descDepth.SampleDesc.Quality    = BBDesc.SampleDesc.Quality;
@@ -1341,7 +1341,7 @@ namespace Ogre
         if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
         {
             D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-            viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
+            viewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
             viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
             viewDesc.Texture2D.MostDetailedMip = 0;
             viewDesc.Texture2D.MipLevels = 1;
@@ -1360,11 +1360,7 @@ namespace Ogre
         D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
         ZeroMemory( &descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC) );
 
-        if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
-            descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        else
-            descDSV.Format = DXGI_FORMAT_D32_FLOAT;
-
+        descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
         descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
         descDSV.Flags = 0 /* D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL */;    // TODO: Allows bind depth buffer as depth view AND texture simultaneously.
                                                                                             // TODO: Decide how to expose this feature
