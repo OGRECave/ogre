@@ -481,7 +481,7 @@ namespace Ogre {
             }
             else
             {
-                LogManager::getSingleton().logMessage("!!! Unknown Face Type !!!", LML_CRITICAL);
+                LogManager::getSingleton().logError("Unknown Face Type");
             }
 
             // progress reporting
