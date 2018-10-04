@@ -5256,6 +5256,8 @@ namespace Ogre{
             mPass->setType(CompositionPass::PT_RENDERQUAD);
         else if(type == "render_scene")
             mPass->setType(CompositionPass::PT_RENDERSCENE);
+        else if(type == "compute")
+            mPass->setType(CompositionPass::PT_COMPUTE);
         else if(type == "render_custom") {
             mPass->setType(CompositionPass::PT_RENDERCUSTOM);
             String customType;
@@ -5269,8 +5271,7 @@ namespace Ogre{
         }
         else
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,
-                               "pass types must be \"clear\", \"stencil\", \"render_quad\", \"render_scene\" or \"render_custom\".");
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, type);
             return;
         }
 
@@ -5438,6 +5439,13 @@ namespace Ogre{
                     if(getValue(prop, compiler, sval))
                         mPass->setMaterialScheme(sval);
                     break;
+                case ID_THREAD_GROUPS:
+                {
+                    std::vector<int> g;
+                    if(_getVector(prop->values.begin(), prop->values.end(), g, 3))
+                        mPass->setThreadGroups({g[0], g[1], g[2]});
+                    break;
+                }
                 case ID_QUAD_NORMALS:
                     if(prop->values.empty())
                     {

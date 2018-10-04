@@ -57,7 +57,8 @@ namespace Ogre {
             PT_STENCIL,         //!< Set stencil operation
             PT_RENDERSCENE,     //!< Render the scene or part of it
             PT_RENDERQUAD,      //!< Render a full screen quad
-            PT_RENDERCUSTOM     //!< Render a custom sequence
+            PT_RENDERCUSTOM,    //!< Render a custom sequence
+            PT_COMPUTE          //!< dispatch a compute shader
         };
         
         /** Set the type of composition pass */
@@ -323,6 +324,9 @@ namespace Ogre {
         */
         const String& getCustomType() const;
 
+        void setThreadGroups(Vector3i g) { mThreadGroups = g; }
+        Vector3i getThreadGroups() { return mThreadGroups; }
+
     private:
         /// Parent technique
         CompositionTargetPass *mParent;
@@ -358,6 +362,8 @@ namespace Ogre {
         StencilOperation mStencilFailOp;
         StencilOperation mStencilDepthFailOp;
         StencilOperation mStencilPassOp;
+        Vector3i mThreadGroups;
+
         bool mStencilTwoSidedOperation;
         bool mStencilReadBackAsTexture;
 
