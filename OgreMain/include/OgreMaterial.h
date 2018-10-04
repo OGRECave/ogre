@@ -50,8 +50,8 @@ namespace Ogre {
     *  @{
     */
     /** Class encapsulates rendering properties of an object.
-    @remarks
-    Ogre's material class encapsulates ALL aspects of the visual appearance,
+
+    %Ogre's material class encapsulates *all* aspects of the visual appearance,
     of an object. It also includes other flags which 
     might not be traditionally thought of as material properties such as 
     culling modes and depth buffer settings, but these affect the 
@@ -60,7 +60,7 @@ namespace Ogre {
     different to Direct3D which treats a material as just the colour 
     components (diffuse, specular) and not texture maps etc. An Ogre 
     Material can be thought of as equivalent to a 'Shader'.
-    @par
+
     A Material can be rendered in multiple different ways depending on the
     hardware available. You may configure a Material to use high-complexity
     fragment shaders, but these won't work on every card; therefore a Technique
@@ -68,8 +68,8 @@ namespace Ogre {
     to create fallback techniques with lower hardware requirements if you decide to
     use advanced features. In addition, you also might want lower-detail techniques
     for distant geometry.
-    @par
-    Each technique can be made up of multiple passes. A fixed-function pass
+
+    Each Technique can be made up of multiple passes. A fixed-function Pass
     may combine multiple texture layers using multitexturing, but Ogre can 
     break that into multiple passes automatically if the active card cannot
     handle that many simultaneous textures. Programmable passes, however, cannot
@@ -78,11 +78,11 @@ namespace Ogre {
     which the card can do. If, at the end of the day, the card cannot handle any of the
     techniques which are listed for the material, the engine will render the 
     geometry plain white, which should alert you to the problem.
-    @par
-    Ogre comes configured with a number of default settings for a newly 
+
+    %Ogre comes configured with a number of default settings for a newly 
     created material. These can be changed if you wish by retrieving the 
     default material settings through 
-    SceneManager::getDefaultMaterialSettings. Any changes you make to the 
+    MaterialManager::getDefaultSettings. Any changes you make to the
     Material returned from this method will apply to any materials created 
     from this point onward.
     */
