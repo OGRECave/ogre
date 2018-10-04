@@ -504,28 +504,15 @@ namespace Ogre
             }
 
             // scene blend factor
-            if (pPass->hasSeparateSceneBlending())
+            if (mDefaults ||
+                pPass->getSourceBlendFactor() != SBF_ONE ||
+                pPass->getDestBlendFactor() != SBF_ZERO ||
+                pPass->getSourceBlendFactorAlpha() != SBF_ONE ||
+                pPass->getDestBlendFactorAlpha() != SBF_ZERO)
             {
-                if (mDefaults ||
-                    pPass->getSourceBlendFactor() != SBF_ONE ||
-                    pPass->getDestBlendFactor() != SBF_ZERO ||
-                    pPass->getSourceBlendFactorAlpha() != SBF_ONE ||
-                    pPass->getDestBlendFactorAlpha() != SBF_ZERO)
-                {
-                    writeAttribute(3, "separate_scene_blend");
-                    writeSceneBlendFactor(pPass->getSourceBlendFactor(), pPass->getDestBlendFactor(), 
-                        pPass->getSourceBlendFactorAlpha(), pPass->getDestBlendFactorAlpha());
-                }
-            }
-            else
-            {
-                if (mDefaults ||
-                    pPass->getSourceBlendFactor() != SBF_ONE ||
-                    pPass->getDestBlendFactor() != SBF_ZERO)
-                {
-                    writeAttribute(3, "scene_blend");
-                    writeSceneBlendFactor(pPass->getSourceBlendFactor(), pPass->getDestBlendFactor());
-                }
+                writeAttribute(3, "separate_scene_blend");
+                writeSceneBlendFactor(pPass->getSourceBlendFactor(), pPass->getDestBlendFactor(),
+                    pPass->getSourceBlendFactorAlpha(), pPass->getDestBlendFactorAlpha());
             }
 
 
