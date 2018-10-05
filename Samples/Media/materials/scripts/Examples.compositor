@@ -787,3 +787,22 @@ compositor Dither
     }
 }
 
+compositor Compute
+{
+    technique
+    {
+        target_output
+        {
+            // just do normal rendering
+            input previous
+            // execute compute shaders post-render
+            pass compute
+            {
+                material Compute/Compositor
+                // the texture size is 256x256x1 and we have 16x16x1 threads per group
+                // so we have to launch 16x16x1 groups
+                thread_groups 16 16 1
+            }
+        }
+    }
+}

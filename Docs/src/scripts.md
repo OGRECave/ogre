@@ -512,7 +512,7 @@ A pass is a single rendering action to be performed in a target pass.
 @par
 Format: ’pass’ (render\_quad | clear | stencil | render\_scene | render\_custom) \[custom name\] { }
 
-There are four types of pass:
+There are the following types of a pass:
 
 <dl compact="compact">
 <dt>clear</dt> <dd>
@@ -531,9 +531,13 @@ This kind of pass performs a regular rendering of the scene. It will use the [vi
 
 This kind of pass renders a quad over the entire render target, using a given material. You will undoubtedly want to pull in the results of other target passes into this operation to perform fullscreen effects.
 
+</dd> <dt>compute</dt> <dd>
+
+This kind of a pass dispatches a compute shader as attached to the given material. Compute shaders are independent from normal rendering pipeline as triggered by `render_scene` or `render_quad`. They do not have any predefined input/ outputs but rather read/ write to any buffers you attach to them.
+
 </dd> <dt>render\_custom</dt> <dd>
 
-This kind of pass is just a callback to user code for the composition pass specified in the custom name (and registered via CompositorManager::registerCustomCompositionPass) and allows the user to create custom render operations for more advanced effects. This is the only pass type that requires the custom name parameter.
+This kind of pass is just a callback to user code for the composition pass specified in the custom name (and registered via Ogre::CompositorManager::registerCustomCompositionPass) and allows the user to create custom render operations for more advanced effects. This is the only pass type that requires the custom name parameter.
 
 </dd> </dl>
 
@@ -544,6 +548,7 @@ Here are the attributes you can use in a ’pass’ section of a .compositor scr
 ## Available Pass Attributes
 
 -   [material](#material)
+-   [thread_groups](#thread_groups)
 -   [input](#compositor_005fpass_005finput)
 -   [identifier](#compositor_005fpass_005fidentifier)
 -   [first\_render\_queue](#first_005frender_005fqueue)
@@ -556,7 +561,23 @@ Here are the attributes you can use in a ’pass’ section of a .compositor scr
 
 ## material
 
-For passes of type ’render\_quad’, sets the material used to render the quad. You will want to use shaders in this material to perform fullscreen effects, and use the [input](#compositor_005fpass_005finput) attribute to map other texture targets into the texture bindings needed by this material. Format: material &lt;Name&gt;
+For passes of type `render_quad` and `compute`, sets the material to be used. With `compute` passes only the compute shader is used and pnly global auto parameter can be accessed.
+For `render_quad` you will want to use shaders in this material to perform fullscreen effects, and use the [input](#compositor_005fpass_005finput) attribute to map other texture targets into the texture bindings needed by this material. 
+
+@par
+Format: material &lt;Name&gt;
+
+<a name="thread_groups"></a>
+
+## thread_groups
+
+Passes of type `compute` operate on an absract "compute space". This space is typically diveded into threads and thread groups (work groups). The size of a thread group is defined inside the compute shader itself. This defines how many groups should be launched.
+
+@par
+Example: if you want to process a 256x256px image and have a thread group size of 16x16x1, you want to specify `16 16 1` here as well.
+
+@par
+Format: thread_groups &lt;groups_x&gt; &lt;groups_y&gt; &lt;groups_z&gt;
 
 <a name="compositor_005fpass_005finput"></a><a name="input-1"></a>
 

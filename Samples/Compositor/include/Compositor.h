@@ -157,6 +157,9 @@ void Sample_Compositor::registerCompositors(void)
         // Don't add the TestMRT compositor, it needs extra scene setup so doesn't currently work.
         if (Ogre::StringUtil::startsWith(compositorName, "TestMRT", false))
             continue;
+        // Don't add the Compute compositors, thats a different demo.
+        if (Ogre::StringUtil::startsWith(compositorName, "Compute", false))
+            continue;
 
         mCompositorNames.push_back(compositorName);
         int addPosition = -1;

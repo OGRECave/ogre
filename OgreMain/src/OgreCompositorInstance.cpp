@@ -173,7 +173,6 @@ public:
       mQuadFarCornersViewSpace(false),
       mQuad(-1, 1, 1, -1)
     {
-        mat->load();
         instance->_fireNotifyMaterialSetup(pass_id, mat);
         technique = mat->getBestTechnique();
         assert(technique);
@@ -283,6 +282,38 @@ public:
     }
 };
 
+class RSComputeOperation : public CompositorInstance::RenderSystemOperation
+{
+public:
+    MaterialPtr mat;
+    Technique *technique;
+    Vector3i thread_groups;
+    CompositorInstance *instance;
+    uint32 pass_id;
+
+    RSComputeOperation(CompositorInstance *inInstance, uint32 inPass_id, MaterialPtr inMat):
+      mat(inMat), instance(inInstance), pass_id(inPass_id)
+    {
+        instance->_fireNotifyMaterialSetup(pass_id, mat);
+        technique = mat->getBestTechnique();
+    }
+
+    void execute(SceneManager *sm, RenderSystem *rs)
+    {
+        // Fire listener
+        instance->_fireNotifyMaterialRender(pass_id, mat);
+        // Queue passes from mat
+        for(auto* pass : technique->getPasses())
+        {
+            auto params = pass->getGpuProgramParameters(GPT_COMPUTE_PROGRAM);
+            params->_updateAutoParams(sm->_getAutoParamDataSource(), GPV_GLOBAL);
+            rs->bindGpuProgram(pass->getComputeProgram()->_getBindingDelegate());
+            rs->bindGpuProgramParameters(GPT_COMPUTE_PROGRAM, params, GPV_GLOBAL);
+            rs->_dispatchCompute(thread_groups);
+        }
+    }
+};
+
 void CompositorInstance::collectPasses(TargetOperation &finalState, const CompositionTargetPass *target)
 {
     /// Here, passes are converted into render target operations
@@ -292,6 +323,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
 
     for (CompositionPass* pass : target->getPasses())
     {
+        bool isCompute = false;
         switch(pass->getType())
         {
         case CompositionPass::PT_CLEAR:
@@ -350,6 +382,9 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
 
             break;
         }
+        case CompositionPass::PT_COMPUTE:
+            isCompute = true;
+            OGRE_FALLTHROUGH;
         case CompositionPass::PT_RENDERQUAD: {
             srcmat = pass->getMaterial();
             if(!srcmat)
@@ -378,6 +413,15 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
                 /// Create new target pass
                 targetpass = localMat->getTechnique(0)->createPass();
                 (*targetpass) = (*srcpass);
+
+                if (isCompute && !targetpass->hasGpuProgram(GPT_COMPUTE_PROGRAM))
+                {
+                    LogManager::getSingleton().logError(
+                        "in compilation of Compositor " + mCompositor->getName() + ": material " +
+                        srcmat->getName() + " has no compute program");
+                    continue;
+                }
+
                 /// Set up inputs
                 for(size_t x=0; x<pass->getNumInputs(); ++x)
                 {
@@ -399,13 +443,24 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
                 }
             }
 
-            RSQuadOperation * rsQuadOperation = OGRE_NEW RSQuadOperation(this,pass->getIdentifier(),localMat);
-            FloatRect quad;
-            if (pass->getQuadCorners(quad))
-                rsQuadOperation->setQuadCorners(quad);
-            rsQuadOperation->setQuadFarCorners(pass->getQuadFarCorners(), pass->getQuadFarCornersViewSpace());
-            
-            queueRenderSystemOp(finalState,rsQuadOperation);
+            localMat->load();
+
+            if (isCompute)
+            {
+                auto computeOperation = new RSComputeOperation(this, pass->getIdentifier(), localMat);
+                computeOperation->thread_groups = pass->getThreadGroups();
+                queueRenderSystemOp(finalState, computeOperation);
+            }
+            else
+            {
+                auto rsQuadOperation = new RSQuadOperation(this, pass->getIdentifier(), localMat);
+                FloatRect quad;
+                if (pass->getQuadCorners(quad))
+                    rsQuadOperation->setQuadCorners(quad);
+                rsQuadOperation->setQuadFarCorners(pass->getQuadFarCorners(),
+                                                   pass->getQuadFarCornersViewSpace());
+                queueRenderSystemOp(finalState, rsQuadOperation);
+            }
             }
             break;
         case CompositionPass::PT_RENDERCUSTOM:

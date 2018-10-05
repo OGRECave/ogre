@@ -414,9 +414,16 @@ namespace Ogre {
             @param format Texture format to be read in by shader. For OpenGL this may be different than the bound texture format.
         */
         virtual void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE,
-                                             int mipmapLevel = 0, int textureArrayIndex = 0,
-                                             PixelFormat* format = NULL) {}
-
+                                        int mipmapLevel = 0, int textureArrayIndex = 0,
+                                        PixelFormat format = PF_UNKNOWN) {}
+        /// @deprecated
+        OGRE_DEPRECATED void createShaderAccessPoint(uint bindPoint, TextureAccess access,
+                                                     int mipmapLevel, int textureArrayIndex,
+                                                     PixelFormat* format)
+        {
+            createShaderAccessPoint(bindPoint, access, mipmapLevel, textureArrayIndex,
+                                    format ? *format : PF_UNKNOWN);
+        }
 
     protected:
         uint32 mHeight;

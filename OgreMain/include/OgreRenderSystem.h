@@ -1008,6 +1008,8 @@ namespace Ogre
         */
         virtual void _render(const RenderOperation& op);
 
+        virtual void _dispatchCompute(const Vector3i& workgroupDim) {}
+
         /** Gets the capabilities of the render system. */
         const RenderSystemCapabilities* getCapabilities(void) const { return mCurrentCapabilities; }
 

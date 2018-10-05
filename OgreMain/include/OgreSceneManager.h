@@ -3447,6 +3447,8 @@ namespace Ogre {
         void _handleLodEvents();
 
         IlluminationRenderStage _getCurrentRenderStage() {return mIlluminationStage;}
+
+        const AutoParamDataSource* _getAutoParamDataSource() { return mAutoParamDataSource.get(); }
     };
 
     /** Default implementation of IntersectionSceneQuery. */

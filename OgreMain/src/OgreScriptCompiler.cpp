@@ -1241,6 +1241,7 @@ namespace Ogre
         mIds["line_width"] = ID_LINE_WIDTH;
         mIds["sampler"] = ID_SAMPLER;
         mIds["sampler_ref"] = ID_SAMPLER_REF;
+        mIds["thread_groups"] = ID_THREAD_GROUPS;
 
 		mLargestRegisteredWordId = ID_END_BUILTIN_IDS;
 	}

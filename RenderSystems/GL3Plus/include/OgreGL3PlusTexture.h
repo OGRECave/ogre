@@ -51,7 +51,7 @@ namespace Ogre {
 
         void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE,
                                      int mipmapLevel = 0, int textureArrayIndex = 0,
-                                     PixelFormat* format = NULL);
+                                     PixelFormat format = PF_UNKNOWN);
     protected:
         /// @copydoc Texture::createInternalResourcesImpl
         void createInternalResourcesImpl(void);

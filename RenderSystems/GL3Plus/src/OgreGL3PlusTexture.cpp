@@ -421,7 +421,7 @@ namespace Ogre {
 
     void GL3PlusTexture::createShaderAccessPoint(uint bindPoint, TextureAccess access, 
                                                  int mipmapLevel, int textureArrayIndex, 
-                                                 PixelFormat* format)
+                                                 PixelFormat format)
     {
         GLenum GlAccess = 0;
 
@@ -436,25 +436,11 @@ namespace Ogre {
         case TA_READ_WRITE:
             GlAccess = GL_READ_WRITE;
             break;
-        default:
-            //TODO error handling
-            break;
         }
 
-        if (!format) format = &mFormat;
-        GLenum GlFormat = GL3PlusPixelUtil::getClosestGLImageInternalFormat(*format);
-
-        GLboolean isArrayTexture;
-
-        switch(mTextureType)
-        {
-        case TEX_TYPE_2D_ARRAY:
-            isArrayTexture = GL_TRUE;
-            break;
-        default:
-            isArrayTexture = GL_FALSE;
-            break;
-        }
+        if (format == PF_UNKNOWN) format = mFormat;
+        GLenum GlFormat = GL3PlusPixelUtil::getClosestGLImageInternalFormat(format);
+        GLboolean isArrayTexture = mTextureType == TEX_TYPE_2D_ARRAY;
 
         // TODO
         // * add memory barrier
