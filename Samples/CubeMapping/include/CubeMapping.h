@@ -37,8 +37,6 @@ public:
 
     void preRenderTargetUpdate(const RenderTargetEvent& evt)
     {
-        mHead->setVisible(false);  // hide the head
-
         // point the camera in the right direction based on which face of the cubemap this is
         mCubeCameraNode->setOrientation(Quaternion::IDENTITY);
         if (evt.source == mTargets[0]) mCubeCameraNode->yaw(Degree(-90));
@@ -46,11 +44,6 @@ public:
         else if (evt.source == mTargets[2]) mCubeCameraNode->pitch(Degree(90));
         else if (evt.source == mTargets[3]) mCubeCameraNode->pitch(Degree(-90));
         else if (evt.source == mTargets[5]) mCubeCameraNode->yaw(Degree(180));
-    }
-
-    void postRenderTargetUpdate(const RenderTargetEvent& evt)
-    {
-        mHead->setVisible(true);  // unhide the head
     }
 
 protected:
@@ -70,6 +63,7 @@ protected:
         // create an ogre head, give it the dynamic cube map material, and place it at the origin
         mHead = mSceneMgr->createEntity("CubeMappedHead", "ogrehead.mesh");
         mHead->setMaterialName("Examples/DynamicCubeMap");
+        mHead->setVisibilityFlags(0xF); // hide from reflection
         mSceneMgr->getRootSceneNode()->attachObject(mHead);
 
         mPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();  // create a pivot node
@@ -125,7 +119,9 @@ protected:
         for (unsigned int i = 0; i < 6; i++)
         {
             mTargets[i] = tex->getBuffer(i)->getRenderTarget();
-            mTargets[i]->addViewport(cubeCamera)->setOverlaysEnabled(false);
+            Viewport* vp = mTargets[i]->addViewport(cubeCamera);
+            vp->setVisibilityMask(0xF0);
+            vp->setOverlaysEnabled(false);
             mTargets[i]->addListener(this);
         }
     }
