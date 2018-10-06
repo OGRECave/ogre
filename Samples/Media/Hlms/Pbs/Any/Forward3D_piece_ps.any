@@ -98,8 +98,11 @@
 		@property( hlms_decals_normals || hlms_decals_emissive )
 			@property( hlms_decals_diffuse )
 				decalMask = ignoreAlphaDiffuse ? 1.0f : decalMask;
+				decalMask = isOutsideDecal ? 0.0f : decalMask;
 			@end
-			decalMask = isOutsideDecal ? 0.0f : decalMask;
+			@property( !hlms_decals_diffuse )
+				decalMask = isOutsideDecal ? 0.0f : 1.0f;
+			@end
 		@end
 		@property( hlms_decals_normals && normal_map )
 			finalDecalTsNormal.xy += decalNormals.xy * decalMask;
