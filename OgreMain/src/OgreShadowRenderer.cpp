@@ -1009,7 +1009,9 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
         mShadowStencilPass->getAlphaRejectValue(), mShadowStencilPass->isAlphaToCoverageEnabled());
 
     // Turn off colour writing and depth writing
-    mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
+    ColourBlendState disabled;
+    disabled.writeR = disabled.writeG = disabled.writeB = disabled.writeA = false;
+    mDestRenderSystem->setColourBlendState(disabled);
     mDestRenderSystem->_disableTextureUnitsFrom(0);
     mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
     mDestRenderSystem->setStencilCheckEnabled(true);
@@ -1126,13 +1128,11 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
             mSceneManager->_setPass(mShadowDebugPass);
             renderShadowVolumeObjects(iShadowRenderables, mShadowDebugPass, &lightList, flags,
                 true, false, false);
-            mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
+            mDestRenderSystem->setColourBlendState(disabled);
             mDestRenderSystem->_setDepthBufferFunction(CMPF_LESS);
         }
     }
 
-    // revert colour write state
-    mDestRenderSystem->_setColourBufferWriteEnabled(true, true, true, true);
     // revert depth state
     mDestRenderSystem->_setDepthBufferParams();
 

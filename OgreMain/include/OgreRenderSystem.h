@@ -633,25 +633,22 @@ namespace Ogre
         */
         virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) {}
 
-        /// @deprecated use _setSeparateSceneBlending
+        /// Sets the global blending factors for combining subsequent renders with the existing frame contents.
+        virtual void setColourBlendState(const ColourBlendState& state)
+        {
+            _setSeparateSceneBlending(state.sourceFactor, state.destFactor, state.sourceFactorAlpha,
+                                      state.destFactorAlpha, state.operation, state.alphaOperation);
+            _setColourBufferWriteEnabled(state.writeR, state.writeG, state.writeB, state.writeA);
+        }
+
+        /// @deprecated use setColourBlendState
         OGRE_DEPRECATED void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD)
         {
             _setSeparateSceneBlending(sourceFactor, destFactor, sourceFactor, destFactor, op, op);
         }
 
-        /** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-        The result of the blending operation is:
-        <p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
-        Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
-        enumerated type.
-        @param sourceFactor The source factor in the above calculation, i.e. multiplied by the texture colour components.
-        @param destFactor The destination factor in the above calculation, i.e. multiplied by the pixel colour components.
-        @param sourceFactorAlpha The source factor in the above calculation for the alpha channel, i.e. multiplied by the texture alpha components.
-        @param destFactorAlpha The destination factor in the above calculation for the alpha channel, i.e. multiplied by the pixel alpha components.
-        @param op The blend operation mode for combining pixels
-        @param alphaOp The blend operation mode for combining pixel alpha values
-        */
-        virtual void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
+        /// @deprecated use setColourBlendState
+        virtual void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha,
             SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD) = 0;
 
         /** Sets the global alpha rejection approach for future renders.
@@ -771,13 +768,7 @@ namespace Ogre
         for the new pixel to be written.
         */
         virtual void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL) = 0;
-        /** Sets whether or not colour buffer writing is enabled, and for which channels. 
-        @remarks
-        For some advanced effects, you may wish to turn off the writing of certain colour
-        channels, or even all of the colour channels so that only the depth buffer is updated
-        in a rendering pass. However, the chances are that you really want to use this option
-        through the Material class.
-        @param red, green, blue, alpha Whether writing is enabled for each of the 4 colour channels. */
+        /// @deprecated use setColourBlendState
         virtual void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha) = 0;
         /** Sets the depth bias, NB you should use the Material version of this. 
         @remarks
