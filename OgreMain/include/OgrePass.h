@@ -119,26 +119,10 @@ namespace Ogre {
         Real mShininess;
         TrackVertexColourType mTracking;
         //-------------------------------------------------------------------------
-
-        //-------------------------------------------------------------------------
-        // Blending factors
-        SceneBlendFactor mSourceBlendFactor;
-        SceneBlendFactor mDestBlendFactor;
-        SceneBlendFactor mSourceBlendFactorAlpha;
-        SceneBlendFactor mDestBlendFactorAlpha;
-
-        //-------------------------------------------------------------------------
-        // Blending operations
-        SceneBlendOperation mBlendOperation;
-        SceneBlendOperation mAlphaBlendOperation;
+        ColourBlendState mBlendState;
 
         /// Needs to be dirtied when next loaded
         bool mHashDirtyQueued : 1;
-        /// Colour buffer settings
-        bool mColourWriteR : 1;
-        bool mColourWriteG : 1;
-        bool mColourWriteB : 1;
-        bool mColourWriteA : 1;
         // Depth buffer settings
         bool mDepthCheck : 1;
         bool mDepthWrite : 1;
@@ -636,12 +620,10 @@ namespace Ogre {
         /** Allows very fine control of blending this Pass with the existing contents of the scene.
 
             This version of the method allows complete control over the blending operation, by specifying the
-            source and destination blending factors. The result of the blending operation is:
+            source and destination blending factors.
 
-            $$final = (passOutput * sourceFactor) + (frameBuffer * destFactor)$$
+            @copydetails Ogre::ColourBlendState
 
-            Each of the factors is specified as one of a number of options, as specified in the Ogre::SceneBlendFactor
-            enumerated type.
             @param
             sourceFactor The source factor in the above calculation, i.e. multiplied by the output of the %Pass.
             @param
@@ -661,30 +643,28 @@ namespace Ogre {
         /// @deprecated
         OGRE_DEPRECATED bool hasSeparateSceneBlending() const;
 
-        /** Retrieves the source blending factor for the material (as set using Materiall::setSceneBlending).
+        /// Retrieves the complete blend state of this pass
+        const ColourBlendState& getBlendState() const { return mBlendState; }
+
+        /** Retrieves the source blending factor for the material
          */
         SceneBlendFactor getSourceBlendFactor() const;
 
-        /** Retrieves the destination blending factor for the material (as set using Materiall::setSceneBlending).
+        /** Retrieves the destination blending factor for the material
          */
         SceneBlendFactor getDestBlendFactor() const;
 
-        /** Retrieves the alpha source blending factor for the material (as set using Materiall::setSeparateSceneBlending).
+        /** Retrieves the alpha source blending factor for the material
          */
         SceneBlendFactor getSourceBlendFactorAlpha() const;
 
-        /** Retrieves the alpha destination blending factor for the material (as set using Materiall::setSeparateSceneBlending).
+        /** Retrieves the alpha destination blending factor for the material
          */
         SceneBlendFactor getDestBlendFactorAlpha() const;
 
         /** Sets the specific operation used to blend source and destination pixels together.
 
-            By default this operation is Ogre::SBO_ADD, which creates this equation
-
-            $$final = (passOutput * sourceFactor) + (frameBuffer * destFactor)$$
-
-            By setting this to something other than SBO_ADD you can change the operation to achieve
-            a different effect.
+            @see Ogre::ColourBlendState
             @param op The blending operation mode to use for this pass
         */
         void setSceneBlendingOperation(SceneBlendOperation op);

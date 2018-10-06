@@ -1067,10 +1067,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
     // The rest of the settings are the same no matter whether we use programs or not
 
     // Set scene blending
-    mDestRenderSystem->_setSeparateSceneBlending(
-        pass->getSourceBlendFactor(), pass->getDestBlendFactor(), pass->getSourceBlendFactorAlpha(),
-        pass->getDestBlendFactorAlpha(), pass->getSceneBlendingOperation(),
-        pass->getSceneBlendingOperationAlpha());
+    mDestRenderSystem->setColourBlendState(pass->getBlendState());
 
     // Line width
     if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_WIDE_LINES))
@@ -1196,10 +1193,6 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
     mDestRenderSystem->_setAlphaRejectSettings(pass->getAlphaRejectFunction(),
                                                pass->getAlphaRejectValue(),
                                                pass->isAlphaToCoverageEnabled());
-    // Set colour write mode.
-    bool colWriteR, colWriteG, colWriteB, colWriteA;
-    pass->getColourWriteEnabled(colWriteR, colWriteG, colWriteB, colWriteA);
-    mDestRenderSystem->_setColourBufferWriteEnabled(colWriteR, colWriteG, colWriteB, colWriteA);
 
     // Culling mode
     if (isShadowTechniqueTextureBased() && mIlluminationStage == IRS_RENDER_TO_TEXTURE &&
