@@ -41,7 +41,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${TINYXML_INCLUDE_DIR})
 add_definitions(-DTIXML_USE_STL)
 
 if(UNIX)
-    add_definitions(-Wno-shadow) # inside tinyxml sources
+    add_definitions(-Wno-shadow -Wno-implicit-fallthrough) # inside tinyxml sources
 endif()
 
 add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
