@@ -597,7 +597,8 @@ namespace Ogre
                                 uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
                                                                    mLightsPerCell +
                                                                    c_reservedLightSlotsPerCell +
-                                                                   c_reservedDecalsSlotsPerCell;
+                                                                   c_reservedDecalsSlotsPerCell +
+                                                                   numLightsInCell->decalCount;
                                 *cellElem = numDecals * 4u;
                                 ++numLightsInCell->decalCount;
                             }
