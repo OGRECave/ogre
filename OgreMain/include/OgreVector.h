@@ -43,7 +43,7 @@ namespace Ogre
     *  @{
     */
     /// helper class to implement legacy API. Notably x, y, z access
-    template <int dims, typename T> struct _OgreExport VectorBase
+    template <int dims, typename T> struct VectorBase
     {
         VectorBase() {}
         VectorBase(T _x, T _y)
