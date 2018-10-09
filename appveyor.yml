@@ -1,6 +1,8 @@
 platform: x64
 configuration: Release
-image: Visual Studio 2017
+image: 
+ - Visual Studio 2017
+ - Visual Studio 2013
 
 build_script:
  - cmake -P ci-build.cmake
@@ -30,3 +32,4 @@ deploy:
   version: master
   on:
     branch: master
+    image: "Visual Studio 2017"
