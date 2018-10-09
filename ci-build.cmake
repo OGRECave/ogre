@@ -38,7 +38,11 @@ endif()
 
 if(DEFINED ENV{APPVEYOR})
     set(CMAKE_BUILD_TYPE Release)
-    set(GENERATOR -G "Visual Studio 15")
+    if("$ENV{APPVEYOR_BUILD_WORKER_IMAGE}" STREQUAL "Visual Studio 2017")
+        set(GENERATOR -G "Visual Studio 15")
+    else()
+        set(GENERATOR -G "Visual Studio 12")
+    endif()
     set(RENDERSYSTEMS
         -DOGRE_BUILD_RENDERSYSTEM_D3D9=TRUE
         -DOGRE_BUILD_RENDERSYSTEM_GL=TRUE
