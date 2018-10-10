@@ -151,7 +151,7 @@ namespace Ogre {
 
         if (!result.second)
         {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() +
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, getResourceType()+" with the name " + res->getName() +
                 " already exists.", "ResourceManager::add");
         }
 
@@ -160,7 +160,7 @@ namespace Ogre {
             mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
         if (!resultHandle.second)
         {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " +
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, getResourceType()+" with the handle " +
                 StringConverter::toString((long) (res->getHandle())) +
                 " already exists.", "ResourceManager::add");
         }
