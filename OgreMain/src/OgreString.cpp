@@ -481,7 +481,7 @@ namespace Ogre {
     {
         // try to use a stack buffer and fall back to heap for large strings
         char sbuf[1024];
-        int bsize = sizeof(sbuf);
+        size_t bsize = sizeof(sbuf);
         std::vector<char> hbuf;
         char* pbuf = sbuf;
 
@@ -493,7 +493,7 @@ namespace Ogre {
             va_end(va);
 
             OgreAssert(len >= 0, "Check format string for errors");
-            if (len >= bsize)
+            if (size_t(len) >= bsize)
             {
                 hbuf.resize(len + 1);
                 pbuf = hbuf.data();
