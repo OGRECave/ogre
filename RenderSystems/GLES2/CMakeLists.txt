@@ -47,6 +47,7 @@ endif (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
 
 # Add system specific settings
 if (APPLE)
+  add_definitions(-DGLES_SILENCE_DEPRECATION)
   file(GLOB PLATFORM_HEADERS "include/EAGL/*.h")
   file(GLOB PLATFORM_SOURCES "src/EAGL/*.mm")
 
