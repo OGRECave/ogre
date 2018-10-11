@@ -61,10 +61,6 @@ namespace Ogre {
         /// Map between device to texture resources.
         DeviceToTextureResourcesMap mMapDeviceToTextureResources;
 
-
-        /// Vector of pointers to subsurfaces
-        typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
-        SurfaceList mSurfaceList;
         /// cube texture individual face names
         String                          mCubeFaceNames[6];  
         /// The memory pool being used
@@ -184,7 +180,7 @@ namespace Ogre {
 
 
         /// @copydoc Texture::getBuffer
-        HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
+        const HardwarePixelBufferSharedPtr& getBuffer(size_t face, size_t mipmap);
         
         /// retrieves a pointer to the actual texture
         IDirect3DBaseTexture9 *getTexture();        

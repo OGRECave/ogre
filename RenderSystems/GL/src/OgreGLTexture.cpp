@@ -289,7 +289,6 @@ namespace Ogre {
     
     void GLTexture::freeInternalResourcesImpl()
     {
-        mSurfaceList.clear();
         if (GLStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
         {
             glDeleteTextures(1, &mTextureID);

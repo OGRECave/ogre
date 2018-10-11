@@ -51,25 +51,6 @@ void GLTextureCommon::readImage(LoadedImages& imgs, const String& name, const St
         img.resize(w, h);
 }
 
-HardwarePixelBufferSharedPtr GLTextureCommon::getBuffer(size_t face, size_t mipmap)
-{
-    if (face >= getNumFaces())
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Face index out of range",
-                    "GLTextureCommon::getBuffer");
-    }
-
-    if (mipmap > mNumMipmaps)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmap index out of range",
-                    "GLTextureCommon::getBuffer");
-    }
-
-    unsigned long idx = face * (mNumMipmaps + 1) + mipmap;
-    assert(idx < mSurfaceList.size());
-    return mSurfaceList[idx];
-}
-
 void GLTextureCommon::getCustomAttribute(const String& name, void* pData)
 {
     if (name == "GLID")
