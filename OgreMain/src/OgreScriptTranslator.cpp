@@ -517,10 +517,10 @@ namespace Ogre{
 
     template <typename T>
     static bool _getVector(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end,
-                          std::vector<T>& vals, int count)
+                          std::vector<T>& vals, size_t count)
     {
         vals.reserve(count);
-        int n = 0;
+        size_t n = 0;
         while (n < count)
         {
             if (i != end)
