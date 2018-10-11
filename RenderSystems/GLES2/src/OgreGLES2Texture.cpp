@@ -365,7 +365,6 @@ namespace Ogre {
 
     void GLES2Texture::freeInternalResourcesImpl()
     {
-        mSurfaceList.clear();
         if (GLES2StateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
         {
             OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));

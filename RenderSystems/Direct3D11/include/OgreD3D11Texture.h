@@ -60,10 +60,6 @@ namespace Ogre {
 		/// overridden from Texture
 		void loadImage(const Image &img);
 
-
-		/// @copydoc Texture::getBuffer
-		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
-
 		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex.Get(); }
 		/// retrieves a pointer to the actual texture
 		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView.Get(); }
@@ -165,10 +161,6 @@ namespace Ogre {
 
         D3D11_SHADER_RESOURCE_VIEW_DESC mSRVDesc;
         bool mAutoMipMapGeneration;
-
-        /// Vector of pointers to subsurfaces
-        typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
-        SurfaceList                     mSurfaceList;
     };
 
     /// RenderTexture implementation for D3D11

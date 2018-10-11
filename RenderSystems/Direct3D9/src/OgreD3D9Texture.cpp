@@ -80,8 +80,7 @@ namespace Ogre
             OGRE_DELETE_T(textureResource, TextureResources, MEMCATEGORY_RENDERSYS);
             ++it;
         }       
-        mMapDeviceToTextureResources.clear();
-        mSurfaceList.clear();       
+        mMapDeviceToTextureResources.clear();      
     }
     /****************************************************************************************/
     void D3D9Texture::copyToTexture(TexturePtr& target)
@@ -1822,16 +1821,8 @@ namespace Ogre
     }
     #undef GETLEVEL
     /****************************************************************************************/
-    HardwarePixelBufferSharedPtr D3D9Texture::getBuffer(size_t face, size_t mipmap) 
+    const HardwarePixelBufferSharedPtr& D3D9Texture::getBuffer(size_t face, size_t mipmap)
     {
-        if(face >= getNumFaces())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "A three dimensional cube has six faces",
-                    "D3D9Texture::getBuffer");
-        if(mipmap > mNumMipmaps)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmap index out of range",
-                    "D3D9Texture::getBuffer");
-        size_t idx = face*(mNumMipmaps+1) + mipmap;
-
         IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getActiveD3D9Device();
         TextureResources* textureResources = getTextureResources(d3d9Device);
         if (textureResources == NULL || textureResources->pBaseTex == NULL)
@@ -1839,10 +1830,9 @@ namespace Ogre
             createTextureResources(d3d9Device);
             textureResources = getTextureResources(d3d9Device);         
         }
-    
         assert(textureResources != NULL);
-        assert(idx < mSurfaceList.size());
-        return mSurfaceList[idx];
+
+        return Texture::getBuffer(face, mipmap);
     }
     //---------------------------------------------------------------------
     bool D3D9Texture::useDefaultPool()

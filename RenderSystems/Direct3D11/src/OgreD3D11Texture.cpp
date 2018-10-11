@@ -166,7 +166,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::freeInternalResourcesImpl()
     {
-        mSurfaceList.clear();
         mpTex.Reset();
         mpShaderResourceView.Reset();
         mp1DTex.Reset();
@@ -740,19 +739,6 @@ namespace Ogre
                 if(depth > 1 && getTextureType() != TEX_TYPE_2D_ARRAY) depth /= 2;
             }
         }
-    }
-    //---------------------------------------------------------------------
-    HardwarePixelBufferSharedPtr D3D11Texture::getBuffer(size_t face, size_t mipmap) 
-    {
-        if(face >= getNumFaces())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "A three dimensional cube has six faces",
-            "D3D11Texture::getBuffer");
-        if(mipmap > mNumMipmaps)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmap index out of range",
-            "D3D11Texture::getBuffer");
-        size_t idx = face*(mNumMipmaps+1) + mipmap;
-        assert(idx < mSurfaceList.size());
-        return mSurfaceList[idx];
     }
     //---------------------------------------------------------------------
     void D3D11Texture::prepareImpl( void )

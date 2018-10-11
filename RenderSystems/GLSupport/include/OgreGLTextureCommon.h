@@ -56,8 +56,6 @@ public:
     }
 
 protected:
-    HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
-
     /** Returns the maximum number of Mipmaps that can be generated until we reach
         the mininum format possible. This does not count the base level.
 
@@ -82,10 +80,6 @@ protected:
     LoadedImages mLoadedImages;
 
     void readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT);
-
-    /// Vector of pointers to subsurfaces
-    typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
-    SurfaceList mSurfaceList;
 
     uint mTextureID;
 };

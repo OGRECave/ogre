@@ -244,14 +244,14 @@ namespace Ogre {
         
         if (TextureManager::getSingleton().getVerbose()) {
             // Say what we're doing
-            StringStream str;
+            Log::Stream str = LogManager::getSingleton().stream();
             str << "Texture: " << mName << ": Loading " << faces << " faces"
-                << "(" << PixelUtil::getFormatName(images[0]->getFormat()) << "," <<
-                images[0]->getWidth() << "x" << images[0]->getHeight() << "x" << images[0]->getDepth() <<
-                ")";
+                << "(" << PixelUtil::getFormatName(images[0]->getFormat()) << ","
+                << images[0]->getWidth() << "x" << images[0]->getHeight() << "x"
+                << images[0]->getDepth() << ")";
             if (!(mMipmapsHardwareGenerated && mNumMipmaps == 0))
             {
-                str << " with " << static_cast<int>(mNumMipmaps);
+                str << " with " << mNumMipmaps;
                 if(mUsage & TU_AUTOMIPMAP)
                 {
                     if (mMipmapsHardwareGenerated)
@@ -269,15 +269,10 @@ namespace Ogre {
                     str << " from Image.";
             }
 
-            // Scoped
-            {
-                // Print data about first destination surface
-                HardwarePixelBufferSharedPtr buf = getBuffer(0, 0); 
-                str << " Internal format is " << PixelUtil::getFormatName(buf->getFormat()) << 
-                "," << buf->getWidth() << "x" << buf->getHeight() << "x" << buf->getDepth() << ".";
-            }
-            LogManager::getSingleton().logMessage( 
-                    LML_NORMAL, str.str());
+            // Print data about first destination surface
+            const auto& buf = getBuffer(0, 0);
+            str << " Internal format is " << PixelUtil::getFormatName(buf->getFormat()) << ","
+                << buf->getWidth() << "x" << buf->getHeight() << "x" << buf->getDepth() << ".";
         }
         
         // Main loading loop
@@ -344,6 +339,7 @@ namespace Ogre {
     {
         if (mInternalResourcesCreated)
         {
+            mSurfaceList.clear();
             freeInternalResourcesImpl();
             mInternalResourcesCreated = false;
         }
@@ -420,6 +416,23 @@ namespace Ogre {
         return BLANKSTRING;
 
     }
+    const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap)
+    {
+        if (face >= getNumFaces())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Face index out of range", "Texture::getBuffer");
+        }
+
+        if (mipmap > mNumMipmaps)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmap index out of range", "Texture::getBuffer");
+        }
+
+        unsigned long idx = face * (mNumMipmaps + 1) + mipmap;
+        assert(idx < mSurfaceList.size());
+        return mSurfaceList[idx];
+    }
+
     //---------------------------------------------------------------------
     void Texture::convertToImage(Image& destImage, bool includeMipMaps)
     {
