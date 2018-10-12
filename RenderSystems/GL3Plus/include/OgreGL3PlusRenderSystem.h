@@ -251,8 +251,6 @@ namespace Ogre {
         void unregisterThread();
         void preExtraThreadsStarted();
         void postExtraThreadsStarted();
-        void setClipPlanesImpl(const Ogre::PlaneList& planeList);
-
 
         // ----------------------------------
         // GL3PlusRenderSystem specific members

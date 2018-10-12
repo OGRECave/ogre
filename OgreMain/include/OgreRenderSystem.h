@@ -1054,15 +1054,15 @@ namespace Ogre
         uint16 getNativeShadingLanguageVersion() const { return mNativeShadingLanguageVersion; }
 
         /** Sets the user clipping region.
+        @deprecated only needed for fixed function APIs
         */
         virtual void setClipPlanes(const PlaneList& clipPlanes);
 
-        /** Add a user clipping plane. */
-        void addClipPlane (const Plane &p);
+        /// @deprecated use setClipPlanes
+        OGRE_DEPRECATED void addClipPlane (const Plane &p);
 
-        /** Clears the user clipping region.
-        */
-        void resetClipPlanes();
+        /// @deprecated use setClipPlanes
+        OGRE_DEPRECATED void resetClipPlanes();
 
         /** Utility method for initialising all render targets attached to this rendering system. */
         void _initRenderTargets(void);
@@ -1415,8 +1415,8 @@ namespace Ogre
         RenderSystemCapabilities* mCurrentCapabilities;
         bool mUseCustomCapabilities;
 
-        /// Internal method used to set the underlying clip planes when needed
-        virtual void setClipPlanesImpl(const PlaneList& clipPlanes) = 0;
+        /// @deprecated only needed for fixed function APIs
+        virtual void setClipPlanesImpl(const PlaneList& clipPlanes) {}
 
         /** Initialize the render system from the capabilities*/
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary) = 0;

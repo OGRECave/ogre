@@ -2268,10 +2268,6 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusRenderSystem::setClipPlanesImpl(const PlaneList& planeList)
-    {
-    }
-
     void GL3PlusRenderSystem::registerThread()
     {
         OGRE_LOCK_MUTEX(mThreadInitMutex);

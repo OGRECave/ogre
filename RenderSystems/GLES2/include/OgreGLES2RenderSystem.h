@@ -235,7 +235,6 @@ namespace Ogre {
             void unregisterThread();
             void preExtraThreadsStarted();
             void postExtraThreadsStarted();
-            void setClipPlanesImpl(const Ogre::PlaneList& planeList) {}
 
             // ----------------------------------
             // GLES2RenderSystem specific members
