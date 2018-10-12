@@ -1410,11 +1410,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
         // Set camera window clipping planes (if any)
         if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
         {
-            mDestRenderSystem->resetClipPlanes();
-            if (camera->isWindowSet())  
-            {
-                mDestRenderSystem->setClipPlanes(camera->getWindowPlanes());
-            }
+            mDestRenderSystem->setClipPlanes(camera->isWindowSet() ? camera->getWindowPlanes() : PlaneList());
         }
 
         // Prepare render queue for receiving new objects
@@ -3589,7 +3585,7 @@ void SceneManager::resetLightClip()
     if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
         return;
 
-    mDestRenderSystem->resetClipPlanes();
+    mDestRenderSystem->setClipPlanes(PlaneList());
 }
 //---------------------------------------------------------------------
 const ColourValue& SceneManager::getShadowColour(void) const
@@ -3810,11 +3806,7 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     // Set camera window clipping planes (if any)
     if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
     {
-        mDestRenderSystem->resetClipPlanes();
-        if (camera->isWindowSet())  
-        {
-            mDestRenderSystem->setClipPlanes(camera->getWindowPlanes());
-        }
+        mDestRenderSystem->setClipPlanes(camera->isWindowSet() ? camera->getWindowPlanes() : PlaneList());
     }
     mCameraInProgress = context->camera;
     mDestRenderSystem->_resumeFrame(context->rsContext);

@@ -199,8 +199,6 @@ namespace Ogre
 #endif
 
     protected:
-        void setClipPlanesImpl(const PlaneList& clipPlanes);
-
         /**
          * With DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL flag render target views are unbound
          * from us each Present(), and we need the way to reestablish connection.
