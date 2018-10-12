@@ -64,7 +64,7 @@ protected:
     uint32 getMaxMipmaps();
 
     void prepareImpl(void);
-
+    void loadImpl(void);
     void unprepareImpl(void)
     {
         mLoadedImages.clear();

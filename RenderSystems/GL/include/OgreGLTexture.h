@@ -53,8 +53,6 @@ namespace Ogre {
     protected:
         /// @copydoc Texture::createInternalResourcesImpl
         void createInternalResourcesImpl(void);
-        /// @copydoc Resource::loadImpl
-        void loadImpl(void);
         /// @copydoc Texture::freeInternalResourcesImpl
         void freeInternalResourcesImpl(void);
 

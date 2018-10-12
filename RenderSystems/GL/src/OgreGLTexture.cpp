@@ -261,29 +261,6 @@ namespace Ogre {
         // Get final internal format
         mFormat = getBuffer(0,0)->getFormat();
     }
-    
-    void GLTexture::loadImpl()
-    {
-        if( mUsage & TU_RENDERTARGET )
-        {
-            createRenderTexture();
-            return;
-        }
-
-        LoadedImages loadedImages;
-        // Now the only copy is on the stack and will be cleaned in case of
-        // exceptions being thrown from _loadImages
-        std::swap(loadedImages, mLoadedImages);
-
-        // Call internal _loadImages, not loadImage since that's external and 
-        // will determine load status etc again
-        ConstImagePtrList imagePtrs;
-        for (size_t i=0 ; i<loadedImages.size() ; ++i) {
-            imagePtrs.push_back(&loadedImages[i]);
-        }
-
-        _loadImages(imagePtrs);
-    }
 
     //*************************************************************************
     
