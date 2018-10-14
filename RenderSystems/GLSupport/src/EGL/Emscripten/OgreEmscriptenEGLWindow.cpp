@@ -51,11 +51,11 @@ namespace Ogre {
           mMSAA(0),
           mCSAA(0)
     {
-        emscripten_set_fullscreenchange_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::fullscreenCallback);
+        // already handled by resize
+        //emscripten_set_fullscreenchange_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::fullscreenCallback);
         emscripten_set_webglcontextlost_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextLostCallback);
         emscripten_set_webglcontextrestored_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextRestoredCallback);
-        // we can not correctly switch back from fullscreen if we do this
-        //emscripten_set_resize_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
+        emscripten_set_resize_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
     }
 
     EmscriptenEGLWindow::~EmscriptenEGLWindow()
@@ -100,20 +100,27 @@ namespace Ogre {
         }
         
         
-        LogManager::getSingleton().logMessage("EmscriptenEGLWindow::resize w:" + Ogre::StringConverter::toString(mWidth) + " h:" + Ogre::StringConverter::toString(mHeight));
+        LogManager::getSingleton().logMessage("EmscriptenEGLWindow::resize "+mCanvasSelector+" w:" + Ogre::StringConverter::toString(mWidth) + " h:" + Ogre::StringConverter::toString(mHeight));
         
-        windowMovedOrResized();
+        // Notify viewports of resize
+        ViewportList::iterator it = mViewportList.begin();
+        while( it != mViewportList.end() )
+            (*it++).second->_updateDimensions();
     }
 
     void EmscriptenEGLWindow::windowMovedOrResized()
     {
-        if(mActive)
-        {   
-            // Notify viewports of resize
-            ViewportList::iterator it = mViewportList.begin();
-            while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();
-        }
+        if(!mActive) return;
+
+        int w, h;
+        emscripten_get_canvas_element_size(mCanvasSelector.c_str(), &w, &h);
+        mWidth = w;
+        mHeight = h;
+
+        // Notify viewports of resize
+        ViewportList::iterator it = mViewportList.begin();
+        while( it != mViewportList.end() )
+            (*it++).second->_updateDimensions();
     }
     
     void EmscriptenEGLWindow::switchFullScreen(bool fullscreen)
@@ -382,7 +389,7 @@ namespace Ogre {
     EM_BOOL EmscriptenEGLWindow::canvasWindowResized(int eventType, const EmscriptenUiEvent *event, void *userData)
     {
         EmscriptenEGLWindow* thiz = static_cast<EmscriptenEGLWindow*>(userData);
-        thiz->resize(event->documentBodyClientWidth, event->documentBodyClientHeight);
+        thiz->windowMovedOrResized();
         return EMSCRIPTEN_RESULT_SUCCESS;
     }
     
