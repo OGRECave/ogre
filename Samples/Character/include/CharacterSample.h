@@ -78,6 +78,9 @@ protected:
         mSceneMgr->setShadowColour(ColourValue(0.5, 0.5, 0.5));
         mSceneMgr->setShadowTextureSize(1024);
         mSceneMgr->setShadowTextureCount(1);
+        mSceneMgr->setShadowDirLightTextureOffset(0);
+        mSceneMgr->setShadowFarDistance(50);
+        mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(new FocusedShadowCameraSetup()));
 
         // disable default camera control so the character can do its own
         mCameraMan->setStyle(CS_MANUAL);
