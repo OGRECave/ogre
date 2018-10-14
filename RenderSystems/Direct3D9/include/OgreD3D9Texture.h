@@ -180,7 +180,7 @@ namespace Ogre {
 
 
         /// @copydoc Texture::getBuffer
-        const HardwarePixelBufferSharedPtr& getBuffer(size_t face, size_t mipmap);
+        HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
         
         /// retrieves a pointer to the actual texture
         IDirect3DBaseTexture9 *getTexture();        
