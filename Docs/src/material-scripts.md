@@ -532,11 +532,11 @@ Default: alpha\_to\_coverage off <a name="light_005fscissor"></a>
 
 Sets whether when rendering this pass, rendering will be limited to a screen-space scissor rectangle representing the coverage of the light(s) being used in this pass.
 @par
-Format: light\_scissor &lt;on|off&gt; Default: light\_scissor off
+Format: light\_scissor &lt;on|off&gt; 
+@par
+Default: light\_scissor off
 
 @copydetails Ogre::Pass::setLightScissoringEnabled
-
-@see @ref Integrated-Texture-Shadows
 
 <a name="light_005fclip_005fplanes"></a><a name="light_005fclip_005fplanes-1"></a>
 
@@ -544,7 +544,9 @@ Format: light\_scissor &lt;on|off&gt; Default: light\_scissor off
 
 Sets whether when rendering this pass, triangle setup will be limited to clipping volume covered by the light.
 @par
-Format: light\_clip\_planes &lt;on|off&gt; Default: light\_clip\_planes off
+Format: light\_clip\_planes &lt;on|off&gt; 
+@par
+Default: light\_clip\_planes off
 
 @copydetails Ogre::Pass::setLightClipPlanesEnabled
 

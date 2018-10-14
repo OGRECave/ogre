@@ -1583,7 +1583,7 @@ namespace Ogre {
             When using Ogre::SHADOWTYPE_STENCIL_ADDITIVE or Ogre::SHADOWTYPE_TEXTURE_ADDITIVE,
             this option is implicitly used for all per-light passes and does
             not need to be specified. If you are not using shadows or are using
-            a modulative or an integrated shadow technique then this could be useful.
+            a modulative or @ref Integrated-Texture-Shadows then this could be useful.
 
         */
         void setLightScissoringEnabled(bool enabled) { mLightScissoring = enabled; }
