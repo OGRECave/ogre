@@ -357,14 +357,10 @@ namespace Ogre
             mSrcHeight = mHeight;
         }
 
-        // PF_L8 maps to DXGI_FORMAT_R8_UNORM and grayscale textures became "redscale", without green and blue components.
-        // This can be fixed by shader modification, but here we can only convert PF_L8 to PF_R8G8B8 manually to fix the issue.
-        // Note, that you can use PF_R8 to explicitly request "redscale" behavior for grayscale textures, avoiding overhead.
-        if(mFormat == PF_L8)
-            mFormat = PF_R8G8B8;
+        mFormat = D3D11Mappings::_getClosestSupportedPF(mFormat);
 
         // Choose closest supported D3D format
-        mD3DFormat = D3D11Mappings::_getGammaFormat(D3D11Mappings::_getPF(D3D11Mappings::_getClosestSupportedPF(mFormat)), isHardwareGammaEnabled());
+        mD3DFormat = D3D11Mappings::_getGammaFormat(D3D11Mappings::_getPF(mFormat), isHardwareGammaEnabled());
 
         mFSAAType.Count = 1;
         mFSAAType.Quality = 0;
@@ -709,7 +705,6 @@ namespace Ogre
     {
         // Create new list of surfaces
         mSurfaceList.clear();
-        PixelFormat format = D3D11Mappings::_getClosestSupportedPF(mFormat);
         size_t depth = mDepth;
 
         for(size_t face=0; face<getNumFaces(); ++face)
@@ -728,7 +723,7 @@ namespace Ogre
                     height, 
                     depth,
                     face,
-                    format,
+                    mFormat,
                     (HardwareBuffer::Usage)mUsage
                     ); 
 
