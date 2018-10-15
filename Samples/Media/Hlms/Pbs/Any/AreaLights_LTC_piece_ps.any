@@ -47,7 +47,7 @@ Adapted to Ogre by Matias N. Goldberg
 			SamplerState ltcSampler				: register(s@value(ltcMatrixTexUnit));
 		@end
 		@property( syntax == metal )
-			, texture2d_array<half> ltcMatrix	[[texture(@value(ltcMatrixTexUnit))]]
+			, texture2d_array<float> ltcMatrix	[[texture(@value(ltcMatrixTexUnit))]]
 			, sampler ltcSampler				[[sampler(@value(ltcMatrixTexUnit))]]
 		@end
 	@end
@@ -78,7 +78,12 @@ INLINE float IntegrateEdge( float3 v1, float3 v2 )
 	return IntegrateEdgeVec( v1, v2 ).z;
 }
 
+@property( syntax == metal )
+INLINE void ClipQuadToHorizon( thread float3 L[5], thread int &n )
+@end
+@property( syntax != metal )
 INLINE void ClipQuadToHorizon( inout float3 L[5], out int n )
+@end
 {
 	// detect clipping config
 	int config = 0;
@@ -189,7 +194,9 @@ INLINE void ClipQuadToHorizon( inout float3 L[5], out int n )
 		L[4] = L[0];
 }
 
-INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv, float3 points[4], bool twoSided )
+INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv,
+							@property( syntax == metal )constant@end float3 points[4],
+							bool twoSided )
 {
 	// construct orthonormal basis around N
 	float3 T1, T2;
