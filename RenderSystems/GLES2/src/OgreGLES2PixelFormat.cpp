@@ -268,8 +268,12 @@ namespace Ogre {
 
     void GLES2PixelUtil::useSizedFormats()
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN // still just Editors Draft
         memcpy(_pixelFormats, _pixelFormatsSized, sizeof(_pixelFormatsSized));
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        // disable formats that require swizzling
+        _pixelFormats[PF_L8].internalFormat = GL_NONE;
+        _pixelFormats[PF_L16].internalFormat = GL_NONE;
+        _pixelFormats[PF_BYTE_LA].internalFormat = GL_NONE;
 #endif
     }
 
