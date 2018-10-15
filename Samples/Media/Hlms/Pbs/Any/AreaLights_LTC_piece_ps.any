@@ -53,6 +53,7 @@ Adapted to Ogre by Matias N. Goldberg
 	@end
 @end
 
+@property( hlms_lights_area_ltc )
 @piece( DeclAreaLtcLightFuncs )
 #define LUT_SIZE  64.0
 #define LUT_SCALE ((LUT_SIZE - 1.0)/LUT_SIZE)
@@ -269,8 +270,10 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv, float3 p
 	return sum;
 }
 @end
+@end
 
 
+@property( hlms_lights_area_ltc )
 @piece( DoAreaLtcLights )
 @foreach( hlms_lights_area_ltc, n )
 	lightDir = passBuf.areaLtcLights[@n].position.xyz - inPs.pos;
@@ -313,5 +316,6 @@ INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv, float3 p
 		finalColour += passBuf.areaLtcLights[@n].diffuse.xyz * ltcDiffuse * @insertpiece( kD ).xyz;
 		finalColour += passBuf.areaLtcLights[@n].specular.xyz * ltcSpecular * @insertpiece( kS ).xyz;
 	}
+@end
 @end
 @end
