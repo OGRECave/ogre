@@ -99,7 +99,9 @@ protected:
 
         // initialise the texture to have full luminance
         mConstantTexBuf.resize(mTexBuf->getSizeInBytes(), 0xff);
-        mTexBuf->writeData(0, mConstantTexBuf.size(), &mConstantTexBuf[0]);
+
+        mBox = PixelBox(TEXTURE_SIZE, TEXTURE_SIZE, 1, PF_L8, mConstantTexBuf.data());
+        mTexBuf->blitFromMemory(mBox);
 
         // create a penguin and attach him to our penguin node
         Entity* penguin = mSceneMgr->createEntity("Penguin", "penguin.mesh");
@@ -163,7 +165,7 @@ protected:
             }
         }
 
-        mTexBuf->writeData(0, mConstantTexBuf.size(), &mConstantTexBuf[0]);
+        mTexBuf->blitFromMemory(mBox);
     }
 
     void cleanupContent()
@@ -175,6 +177,7 @@ protected:
     const unsigned int TEXTURE_SIZE;
     const unsigned int SQR_BRUSH_RADIUS;
     HardwarePixelBufferSharedPtr mTexBuf;
+    PixelBox mBox;
     std::vector<uint8> mConstantTexBuf;
     Real mPlaneSize;
     RaySceneQuery* mCursorQuery;
