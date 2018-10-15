@@ -103,7 +103,7 @@
 
 	numLightsInGrid = f3dGrid.Load( int(sampleOffset) ).x;
 
-	@property( hlms_forwardplus_debug )uint totalNumLightsInGrid = numLightsInGrid;@end
+	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
 
 	for( uint i=0u; i<numLightsInGrid; ++i )
 	{

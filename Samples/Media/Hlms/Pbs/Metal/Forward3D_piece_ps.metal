@@ -99,7 +99,7 @@
 	@end
 	numLightsInGrid = f3dGrid[int(sampleOffset)];
 
-	@property( hlms_forwardplus_debug )ushort totalNumLightsInGrid = numLightsInGrid;@end
+	@property( hlms_forwardplus_debug )totalNumLightsInGrid += numLightsInGrid;@end
 
 	for( ushort i=0u; i<numLightsInGrid; ++i )
 	{
