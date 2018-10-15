@@ -337,7 +337,7 @@ namespace Ogre {
     class _OgreExport PixelBox: public Box, public ImageAlloc {
     public:
         /// Parameter constructor for setting the members manually
-        PixelBox() {}
+        PixelBox() : data(NULL), format(PF_UNKNOWN) {}
         ~PixelBox() {}
         /** Constructor providing extents in the form of a Box object. This constructor
             assumes the pixel data is laid out consecutively in memory. (this
