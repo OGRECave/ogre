@@ -32,4 +32,4 @@ deploy:
   version: 1.11.3
   on:
     branch: master
-    image: "Visual Studio 2017"
+    APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
