@@ -175,6 +175,67 @@ namespace Demo
         hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
     }
     //-----------------------------------------------------------------------------------
+    Ogre::TexturePtr SceneFormatGameState::createRawDecalDiffuseTex()
+    {
+        //The diffuse texture create it in RAW mode, just to test it. That is, we create the 2D Array
+        //texture manually, without the aid of HlmsTextureManager.
+        //Because of simplicity, we use two Image instances, one to load the diffuse texture,
+        //another to create an array of 8 slices, with the other 7 slices set to black.
+        //It's not efficient, but this is for testing
+        Ogre::Image origImage;
+        //Load floor diffuse
+        origImage.load( "floor_diffuse.PNG",
+                        Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+
+        const Ogre::uint32 imgWidth = origImage.getWidth();
+        const Ogre::uint32 imgHeight = origImage.getHeight();
+        const size_t imageSize = Ogre::PixelUtil::calculateSizeBytes( imgWidth, imgHeight,
+                                                                      1u, 1u, Ogre::PF_R8G8B8A8,
+                                                                      origImage.getNumMipmaps() + 1u );
+
+        Ogre::Image combinedImage;
+        Ogre::uint8 *combinedImageData = reinterpret_cast<Ogre::uint8*>(
+                                            OGRE_MALLOC( imageSize * 8u,
+                                                         Ogre::MEMCATEGORY_GENERAL ) );
+        //Set all slices to black
+        memset( combinedImageData, 0u, imageSize * 8u );
+        //Copy floor to slice 0 (RGB -> RGBA)
+        for( size_t y=0; y<imgHeight; ++y )
+        {
+            const Ogre::uint8 *srcLine = &origImage.getData()[y * imgWidth * 3u];
+            for( size_t x=0; x<imgWidth; ++x )
+            {
+                combinedImageData[y * imgWidth * 4u + x * 4u + 0u] = srcLine[x * 3u + 0u];
+                combinedImageData[y * imgWidth * 4u + x * 4u + 1u] = srcLine[x * 3u + 1u];
+                combinedImageData[y * imgWidth * 4u + x * 4u + 2u] = srcLine[x * 3u + 2u];
+                combinedImageData[y * imgWidth * 4u + x * 4u + 3u] = 0xFF;
+            }
+        }
+
+        //Load grass diffuse
+        origImage.load( "grassWalpha.tga",
+                        Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+        //Copy grass to slice 1 (RGBA -> RGBA)
+        memcpy( combinedImageData + imageSize, origImage.getData(), imageSize );
+
+        combinedImage.loadDynamicImage( combinedImageData, imgWidth,
+                                        imgHeight, 8u,
+                                        origImage.getFormat(), true );
+
+        //Create raw texture
+        Ogre::TexturePtr rawTex =
+                Ogre::TextureManager::getSingleton().createManual(
+                    "RawDecalTextureTest", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                    Ogre::TEX_TYPE_2D_ARRAY, combinedImage.getWidth(), combinedImage.getHeight(),
+                    combinedImage.getDepth(), combinedImage.getNumMipmaps(), combinedImage.getFormat(),
+                    Ogre::TU_STATIC_WRITE_ONLY, 0, true );
+        rawTex->loadImage( combinedImage );
+
+        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+        sceneManager->setDecalsDiffuse( rawTex );
+        return rawTex;
+    }
+    //-----------------------------------------------------------------------------------
     void SceneFormatGameState::generateScene(void)
     {
         destroyInstantRadiosity();
@@ -190,41 +251,18 @@ namespace Demo
 
             //Ogre::WireAabb *wireAabb = sceneManager->createWireAabb();
 
+            //Create the floor decal
             Ogre::Decal *decal = sceneManager->createDecal();
             Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode()->createChildSceneNode();
             sceneNode->attachObject( decal );
             sceneNode->setPosition( Ogre::Vector3( 0, 0.0, 5.0f ) );
-            sceneNode->setOrientation( Ogre::Quaternion( Ogre::Degree( 45.0f ), Ogre::Vector3::UNIT_Y ) );
+            sceneNode->setOrientation( Ogre::Quaternion( Ogre::Degree( 45.0f ),
+                                                         Ogre::Vector3::UNIT_Y ) );
             sceneNode->setScale( Ogre::Vector3( 5.0f, 0.5f, 5.0f ) );
             //wireAabb->track( decal );
 
-            //The diffuse texture create it in RAW mode, just to test it. That is, we create the 2D Array
-            //texture manually, without the aid of HlmsTextureManager.
-            //Because of simplicity, we use two Image instances, one to load the diffuse texture,
-            //another to create an array of 8 slices, with the other 7 slices set to black.
-            //It's not efficient, but this is for testing
-            Ogre::Image floorDiffuseOrig;
-            floorDiffuseOrig.load( "floor_diffuse.PNG",
-                               Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
-            Ogre::Image floorDiffuse;
-            Ogre::uint8 *floorDiffuseData = reinterpret_cast<Ogre::uint8*>(
-                                                OGRE_MALLOC( floorDiffuseOrig.getSize() * 8u,
-                                                             Ogre::MEMCATEGORY_GENERAL ) );
-            memset( floorDiffuseData, 0u, floorDiffuseOrig.getSize() * 8u );
-            memcpy( floorDiffuseData, floorDiffuseOrig.getData(), floorDiffuseOrig.getSize() );
-            floorDiffuse.loadDynamicImage( floorDiffuseData, floorDiffuseOrig.getWidth(),
-                                           floorDiffuseOrig.getHeight(), 8u,
-                                           floorDiffuseOrig.getFormat(), true );
-
-            Ogre::TexturePtr rawTex =
-                    Ogre::TextureManager::getSingleton().createManual(
-                        "RawDecalTextureTest", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                        Ogre::TEX_TYPE_2D_ARRAY, floorDiffuse.getWidth(), floorDiffuse.getHeight(),
-                        floorDiffuse.getDepth(), floorDiffuse.getNumMipmaps(), floorDiffuse.getFormat(),
-                        Ogre::TU_STATIC_WRITE_ONLY, 0, true );
-            rawTex->loadImage( floorDiffuse );
-            decal->setDiffuseTexture( rawTex, 0 );
-            sceneManager->setDecalsDiffuse( rawTex );
+            Ogre::TexturePtr rawTex = createRawDecalDiffuseTex();
+            decal->setDiffuseTexture( rawTex, 0 ); //Slice 0 = floor
 
             //The normal map create it in managed mode, that is with the help of HlmsTextureManager
             const Ogre::uint32 decalNormalId = 1;
@@ -236,6 +274,36 @@ namespace Demo
                                                                        decalNormalId );
             decal->setNormalTexture( texLocation.texture, texLocation.xIdx );
             sceneManager->setDecalsNormals( texLocation.texture );
+
+            //Create the grass decal
+            decal = sceneManager->createDecal();
+            sceneNode = sceneManager->getRootSceneNode()->createChildSceneNode();
+            sceneNode->attachObject( decal );
+            sceneNode->setPosition( Ogre::Vector3( 0, 0.0, 5.0f ) );
+            sceneNode->setOrientation( Ogre::Quaternion( Ogre::Degree( 45.0f ),
+                                                         Ogre::Vector3::UNIT_Y ) );
+            sceneNode->setScale( Ogre::Vector3( 2.0f, 0.5f, 2.0f ) );
+
+            decal->setDiffuseTexture( rawTex, 1 ); //Slice 1 = grass
+
+            //The normal map create it in managed mode, that is with the help of HlmsTextureManager
+            //However we create a black image to deal
+            Ogre::Image blackImage;
+            const Ogre::uint32 normalTexWidth = texLocation.texture->getWidth();
+            const Ogre::uint32 normalTexHeight = texLocation.texture->getHeight();
+            Ogre::uint8 *blackBuffer = reinterpret_cast<Ogre::uint8*>(
+                                           OGRE_MALLOC( normalTexWidth * normalTexHeight * 2u,
+                                                        Ogre::MEMCATEGORY_RESOURCE ) );
+            memset( blackBuffer, 0, normalTexWidth * normalTexHeight * 2u );
+            blackImage.loadDynamicImage( blackBuffer, normalTexWidth, normalTexHeight, 1u,
+                                         Ogre::PF_R8G8_SNORM, true );
+            texLocation =
+                    hlmsTextureManager->createOrRetrieveTexture( "decals_disabled_normals",
+                                                                 "decals_disabled_normals",
+                                                                 Ogre::HlmsTextureManager::
+                                                                 TEXTURE_TYPE_NORMALS,
+                                                                 decalNormalId, &blackImage );
+            decal->setNormalTexture( texLocation.texture, texLocation.xIdx );
         }
 
         {

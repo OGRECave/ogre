@@ -1065,7 +1065,7 @@ namespace Ogre
                                                              TEX_TYPE_2D_ARRAY, MIP_DEFAULT, 1.0f,
                                                              false, PF_UNKNOWN, i != 1 );
                 decalTex[i].texture = texture;
-                decalTex[i].xIdx    = arrayIdx;
+                decalTex[i].xIdx    = static_cast<uint16>( arrayIdx );
             }
         }
 

@@ -28,6 +28,7 @@ namespace Demo
         void destroyInstantRadiosity(void);
         void destroyParallaxCorrectCubemaps(void);
 
+        Ogre::TexturePtr createRawDecalDiffuseTex();
         void generateScene(void);
         void exportScene(void);
         void importScene(void);
