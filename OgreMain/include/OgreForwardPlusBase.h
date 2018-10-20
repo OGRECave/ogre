@@ -90,12 +90,22 @@ namespace Ogre
             CachedGridBufferVec     gridBuffers;
         };
 
+        enum ObjTypes
+        {
+            ObjType_Decal = 0,
+            NumObjTypes
+        };
+
         struct LightCount
         {
             //We use LT_DIRECTIONAL (index = 0) to contain the total light count.
             uint32  lightCount[Light::MAX_FORWARD_PLUS_LIGHTS];
-            uint32  decalCount;
-            LightCount() { memset( lightCount, 0, sizeof(lightCount) ); }
+            uint32  objCount[NumObjTypes];
+            LightCount()
+            {
+                memset( lightCount, 0, sizeof(lightCount) );
+                memset( objCount, 0, sizeof(objCount) );
+            }
         };
 
         typedef vector<CachedGrid>::type CachedGridVec;

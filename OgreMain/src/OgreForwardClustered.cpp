@@ -147,6 +147,155 @@ namespace Ogre
             collectLightForSlice( threadId + numThreads * slicesPerThread, threadId );
     }
     //-----------------------------------------------------------------------------------
+    uint16 ForwardClustered::collectObjsForSlice( const size_t numPackedFrustumsPerSlice,
+                                                  const size_t frustumStartIdx,
+                                                  uint16 initialNumObjs,
+                                                  size_t minRq, size_t maxRq,
+                                                  size_t currObjsPerCell,
+                                                  size_t cellOffsetStart,
+                                                  ObjTypes objType,
+                                                  uint16 numFloat4PerObj )
+    {
+        uint16 numObjs = initialNumObjs;
+
+        const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
+        const size_t actualMaxRq = std::min( maxRq, objsPerRqInThread0.size() );
+        for( size_t rqId=minRq; rqId<=actualMaxRq; ++rqId )
+        {
+            MovableObject::MovableObjectArray::const_iterator itor = objsPerRqInThread0[rqId].begin();
+            MovableObject::MovableObjectArray::const_iterator end  = objsPerRqInThread0[rqId].end();
+
+            while( itor != end )
+            {
+                MovableObject *decal = *itor;
+
+                Node *node = decal->getParentNode();
+
+                //Aabb localAabbScalar = decal->getLocalAabb();
+                Aabb localAabbScalar;
+                localAabbScalar.mCenter    = node->_getDerivedPosition();
+                localAabbScalar.mHalfSize  = node->_getDerivedScale() * 0.5f;
+
+                ArrayQuaternion objOrientation;
+                objOrientation.setAll( node->_getDerivedOrientation() );
+
+                ArrayAabb localObb;
+                localObb.setAll( localAabbScalar );
+
+                ArrayVector3 orientedHalfSize = objOrientation * localObb.mHalfSize;
+
+                ArrayPlane obbPlane[6];
+                obbPlane[0].normal= objOrientation.xAxis();
+                obbPlane[0].negD  = obbPlane[0].normal.dotProduct( localObb.mCenter - orientedHalfSize );
+                obbPlane[1].normal= -obbPlane[0].normal;
+                obbPlane[1].negD  = obbPlane[1].normal.dotProduct( localObb.mCenter + orientedHalfSize );
+                obbPlane[2].normal= objOrientation.yAxis();
+                obbPlane[2].negD  = obbPlane[2].normal.dotProduct( localObb.mCenter - orientedHalfSize );
+                obbPlane[3].normal= -obbPlane[2].normal;
+                obbPlane[3].negD  = obbPlane[3].normal.dotProduct( localObb.mCenter + orientedHalfSize );
+                obbPlane[4].normal= objOrientation.zAxis();
+                obbPlane[4].negD  = obbPlane[4].normal.dotProduct( localObb.mCenter - orientedHalfSize );
+                obbPlane[5].normal= -obbPlane[4].normal;
+                obbPlane[5].negD  = obbPlane[5].normal.dotProduct( localObb.mCenter + orientedHalfSize );
+
+                objOrientation = objOrientation.Inverse();
+
+                for( size_t j=0; j<numPackedFrustumsPerSlice; ++j )
+                {
+                    const FrustumRegion * RESTRICT_ALIAS frustumRegion =
+                            mFrustumRegions.get() + frustumStartIdx + j;
+
+                    ArrayReal dotResult;
+                    ArrayMaskR mask;
+                    ArrayVector3 newPlaneNormal;
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[0].normal;
+                    dotResult = frustumRegion->plane[0].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::CompareGreater( dotResult, frustumRegion->plane[0].negD );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[1].normal;
+                    dotResult = frustumRegion->plane[1].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[1].negD ) );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[2].normal;
+                    dotResult = frustumRegion->plane[2].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[2].negD ) );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[3].normal;
+                    dotResult = frustumRegion->plane[3].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[3].negD ) );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[4].normal;
+                    dotResult = frustumRegion->plane[4].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[4].negD ) );
+
+                    newPlaneNormal = objOrientation * frustumRegion->plane[5].normal;
+                    dotResult = frustumRegion->plane[5].normal.dotProduct( localObb.mCenter ) +
+                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
+                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
+                                                                        frustumRegion->plane[5].negD ) );
+
+                    if( BooleanMask4::getScalarMask( mask ) != 0 )
+                    {
+                        //Test all 8 frustum corners against each of the 6 obb planes.
+                        for( int k=0; k<6; ++k )
+                        {
+                            ArrayMaskR vertexMask = ARRAY_MASK_ZERO;
+
+                            for( int l=0; l<8; ++l )
+                            {
+                                dotResult = obbPlane[k].normal.dotProduct(
+                                                frustumRegion->corners[l] ) - obbPlane[k].negD;
+                                vertexMask = Mathlib::Or( vertexMask,
+                                                          Mathlib::CompareGreater( dotResult,
+                                                                                   ARRAY_REAL_ZERO ) );
+                            }
+
+                            mask = Mathlib::And( mask, vertexMask );
+                        }
+                    }
+
+                    const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
+
+                    for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+                    {
+                        if( IS_BIT_SET( k, scalarMask ) )
+                        {
+                            const size_t idx = (frustumStartIdx + j) * ARRAY_PACKED_REALS + k;
+                            FastArray<LightCount>::iterator numLightsInCell =
+                                    mLightCountInCell.begin() + idx;
+
+                            //assert( numLightsInCell < mLightCountInCell.end() );
+
+                            if( numLightsInCell->objCount[objType] < currObjsPerCell )
+                            {
+                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
+                                                                   cellOffsetStart +
+                                                                   numLightsInCell->objCount[objType];
+                                *cellElem = numObjs * numFloat4PerObj;
+                                ++numLightsInCell->objCount[objType];
+                            }
+                        }
+                    }
+                }
+
+                ++numObjs;
+                ++itor;
+            }
+        }
+
+        return numObjs;
+    }
+    //-----------------------------------------------------------------------------------
     void ForwardClustered::collectLightForSlice( size_t slice, size_t threadId )
     {
         const size_t frustumStartIdx = slice * (mWidth / ARRAY_PACKED_REALS) * mHeight;
@@ -472,144 +621,17 @@ namespace Ogre
             ++itLight;
         }
 
-        uint16 numDecals = static_cast<uint16>( alignToNextMultiple( numLights * 6u, 4u ) >> 2u );
+        const bool hasDecals = mDecalsEnabled;
+        const size_t decalOffsetStart = mLightsPerCell + c_reservedLightSlotsPerCell;
 
+        uint16 numDecals = static_cast<uint16>( alignToNextMultiple( numLights * 6u, 4u ) >> 2u );
         const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
         const size_t actualMaxDecalRq = std::min( MaxDecalRq, objsPerRqInThread0.size() );
-        for( size_t rqId=MinDecalRq; rqId<=actualMaxDecalRq; ++rqId )
-        {
-            MovableObject::MovableObjectArray::const_iterator itor = objsPerRqInThread0[rqId].begin();
-            MovableObject::MovableObjectArray::const_iterator end  = objsPerRqInThread0[rqId].end();
-
-            while( itor != end )
-            {
-                MovableObject *decal = *itor;
-
-                Node *node = decal->getParentNode();
-
-                //Aabb localAabbScalar = decal->getLocalAabb();
-                Aabb localAabbScalar;
-                localAabbScalar.mCenter    = node->_getDerivedPosition();
-                localAabbScalar.mHalfSize  = node->_getDerivedScale() * 0.5f;
-
-                ArrayQuaternion objOrientation;
-                objOrientation.setAll( node->_getDerivedOrientation() );
-
-                ArrayAabb localObb;
-                localObb.setAll( localAabbScalar );
-
-                ArrayVector3 orientedHalfSize = objOrientation * localObb.mHalfSize;
-
-                ArrayPlane obbPlane[6];
-                obbPlane[0].normal= objOrientation.xAxis();
-                obbPlane[0].negD  = obbPlane[0].normal.dotProduct( localObb.mCenter - orientedHalfSize );
-                obbPlane[1].normal= -obbPlane[0].normal;
-                obbPlane[1].negD  = obbPlane[1].normal.dotProduct( localObb.mCenter + orientedHalfSize );
-                obbPlane[2].normal= objOrientation.yAxis();
-                obbPlane[2].negD  = obbPlane[2].normal.dotProduct( localObb.mCenter - orientedHalfSize );
-                obbPlane[3].normal= -obbPlane[2].normal;
-                obbPlane[3].negD  = obbPlane[3].normal.dotProduct( localObb.mCenter + orientedHalfSize );
-                obbPlane[4].normal= objOrientation.zAxis();
-                obbPlane[4].negD  = obbPlane[4].normal.dotProduct( localObb.mCenter - orientedHalfSize );
-                obbPlane[5].normal= -obbPlane[4].normal;
-                obbPlane[5].negD  = obbPlane[5].normal.dotProduct( localObb.mCenter + orientedHalfSize );
-
-                objOrientation = objOrientation.Inverse();
-
-                for( size_t j=0; j<numPackedFrustumsPerSlice; ++j )
-                {
-                    const FrustumRegion * RESTRICT_ALIAS frustumRegion =
-                            mFrustumRegions.get() + frustumStartIdx + j;
-
-                    ArrayReal dotResult;
-                    ArrayMaskR mask;
-                    ArrayVector3 newPlaneNormal;
-
-                    newPlaneNormal = objOrientation * frustumRegion->plane[0].normal;
-                    dotResult = frustumRegion->plane[0].normal.dotProduct( localObb.mCenter ) +
-                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
-                    mask = Mathlib::CompareGreater( dotResult, frustumRegion->plane[0].negD );
-
-                    newPlaneNormal = objOrientation * frustumRegion->plane[1].normal;
-                    dotResult = frustumRegion->plane[1].normal.dotProduct( localObb.mCenter ) +
-                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
-                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion->plane[1].negD ) );
-
-                    newPlaneNormal = objOrientation * frustumRegion->plane[2].normal;
-                    dotResult = frustumRegion->plane[2].normal.dotProduct( localObb.mCenter ) +
-                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
-                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion->plane[2].negD ) );
-
-                    newPlaneNormal = objOrientation * frustumRegion->plane[3].normal;
-                    dotResult = frustumRegion->plane[3].normal.dotProduct( localObb.mCenter ) +
-                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
-                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion->plane[3].negD ) );
-
-                    newPlaneNormal = objOrientation * frustumRegion->plane[4].normal;
-                    dotResult = frustumRegion->plane[4].normal.dotProduct( localObb.mCenter ) +
-                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
-                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion->plane[4].negD ) );
-
-                    newPlaneNormal = objOrientation * frustumRegion->plane[5].normal;
-                    dotResult = frustumRegion->plane[5].normal.dotProduct( localObb.mCenter ) +
-                                newPlaneNormal.absDotProduct( localObb.mHalfSize );
-                    mask = Mathlib::And( mask, Mathlib::CompareGreater( dotResult,
-                                                                        frustumRegion->plane[5].negD ) );
-
-                    if( BooleanMask4::getScalarMask( mask ) != 0 )
-                    {
-                        //Test all 8 frustum corners against each of the 6 obb planes.
-                        for( int k=0; k<6; ++k )
-                        {
-                            ArrayMaskR vertexMask = ARRAY_MASK_ZERO;
-
-                            for( int l=0; l<8; ++l )
-                            {
-                                dotResult = obbPlane[k].normal.dotProduct(
-                                                frustumRegion->corners[l] ) - obbPlane[k].negD;
-                                vertexMask = Mathlib::Or( vertexMask,
-                                                          Mathlib::CompareGreater( dotResult,
-                                                                                   ARRAY_REAL_ZERO ) );
-                            }
-
-                            mask = Mathlib::And( mask, vertexMask );
-                        }
-                    }
-
-                    const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
-
-                    for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
-                    {
-                        if( IS_BIT_SET( k, scalarMask ) )
-                        {
-                            const size_t idx = (frustumStartIdx + j) * ARRAY_PACKED_REALS + k;
-                            FastArray<LightCount>::iterator numLightsInCell =
-                                    mLightCountInCell.begin() + idx;
-
-                            //assert( numLightsInCell < mLightCountInCell.end() );
-
-                            if( numLightsInCell->decalCount < mDecalsPerCell )
-                            {
-                                uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
-                                                                   mLightsPerCell +
-                                                                   c_reservedLightSlotsPerCell +
-                                                                   c_reservedDecalsSlotsPerCell +
-                                                                   numLightsInCell->decalCount;
-                                *cellElem = numDecals * 4u;
-                                ++numLightsInCell->decalCount;
-                            }
-                        }
-                    }
-                }
-
-                ++numDecals;
-                ++itor;
-            }
-        }
+        numDecals = collectObjsForSlice( numPackedFrustumsPerSlice, frustumStartIdx,
+                                         numDecals, MinDecalRq, actualMaxDecalRq,
+                                         mDecalsPerCell,
+                                         decalOffsetStart + c_reservedDecalsSlotsPerCell,
+                                         ObjType_Decal, 4u );
 
         {
             //Now write all the light counts
@@ -619,8 +641,8 @@ namespace Ogre
                     (frustumStartIdx + numPackedFrustumsPerSlice) * ARRAY_PACKED_REALS;
 
             const size_t cellSize = mObjsPerCell;
-            const bool hasLights = mLightsPerCell > 0u;
-            const bool hasDecals = mDecalsEnabled;
+            //const bool hasLights = mLightsPerCell > 0u;
+            const bool hasLights = true;
             const size_t decalOffsetStart = mLightsPerCell + c_reservedLightSlotsPerCell;
             size_t gridIdx = frustumStartIdx * ARRAY_PACKED_REALS * cellSize;
 
@@ -636,7 +658,10 @@ namespace Ogre
                     mGridBuffer[gridIdx+2u] = static_cast<uint16>( accumLight );
                 }
                 if( hasDecals )
-                    mGridBuffer[gridIdx+decalOffsetStart+0u] = static_cast<uint16>( itor->decalCount );
+                {
+                    mGridBuffer[gridIdx+decalOffsetStart+0u] =
+                            static_cast<uint16>( itor->objCount[ObjType_Decal] );
+                }
                 gridIdx += cellSize;
                 ++itor;
             }
