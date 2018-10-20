@@ -439,52 +439,52 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void Texture::convertToImage( Image &destImage, bool includeMipMaps, uint32 mipmapBias,
-                                  uint32 firstSlice, uint32 numSlices )
+                                  uint32 zOrSliceStart, uint32 depthOrSlices )
     {
         mipmapBias = std::min<uint32>( mipmapBias, getNumMipmaps() );
 
-        const uint32 startingWidth  = std::max( getWidth() >> mipmapBias, 1u );
-        const uint32 startingHeight = std::max( getHeight() >> mipmapBias, 1u );
-        uint32 startingDepth = 1u;
+        const uint32 texDepthOrSlices =
+                mTextureType == TEX_TYPE_3D ?
+                    std::max( std::max<uint32>(
+                                  getDepth(), static_cast<uint32>( getNumFaces() ) ) >> mipmapBias,
+                              1u ) :
+                    std::max( getDepth(), static_cast<uint32>( getNumFaces() ) );
 
-        if( mTextureType == TEX_TYPE_3D )
-            startingDepth = std::max( getDepth() >> mipmapBias, 1u );
-        else if( mTextureType == TEX_TYPE_2D_ARRAY )
-            startingDepth = getDepth();
-
-        uint32 firstZ   = 0;
-        uint32 numZ     = startingDepth;
-
-        if( mTextureType != TEX_TYPE_CUBE_MAP )
-        {
-            firstZ  = firstSlice;
-            numZ    = numSlices;
-
-            firstSlice = 0u;
-            numSlices = 1u;
-
-            if( numZ == 0 )
-                numZ = startingDepth - firstZ;
-            if( firstZ >= startingDepth ||
-                firstZ + numZ > startingDepth )
-            {
-                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                             "Invalid firstSlice and numSlices parameters",
-                             "Texture::convertToImage" );
-            }
-        }
-
-        if( numSlices == 0 )
-            numSlices = getNumFaces() - firstSlice;
-        if( firstSlice >= getNumFaces() ||
-            firstSlice + numSlices > getNumFaces() )
+        if( depthOrSlices == 0 )
+            depthOrSlices = texDepthOrSlices - zOrSliceStart;
+        if( zOrSliceStart >= texDepthOrSlices ||
+            zOrSliceStart + depthOrSlices > texDepthOrSlices )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "Invalid firstSlice and numSlices parameters",
+                         "Invalid zOrSliceStart and depthOrSlices parameters",
                          "Texture::convertToImage" );
         }
 
-        const size_t numMips = includeMipMaps ? (getNumMipmaps() - mipmapBias + 1) : 1;
+        uint32 startingWidth  = std::max( getWidth() >> mipmapBias, 1u );
+        uint32 startingHeight = std::max( getHeight() >> mipmapBias, 1u );
+        //Convert to depth & numSlices based on Ogre 2.2 conventions
+        uint32 startingDepth = mTextureType == TEX_TYPE_3D ?
+                                   std::max( depthOrSlices >> mipmapBias, 1u ) : 1u;
+        const uint32 numSlices = mTextureType != TEX_TYPE_3D ? depthOrSlices : 1u;
+
+        uint32 zStart       = mTextureType == TEX_TYPE_3D ? (zOrSliceStart >> mipmapBias) : 0u;
+        uint32 sliceStart   = mTextureType != TEX_TYPE_3D ? zOrSliceStart : 0u;
+
+        //Array textures either:
+        //  1. NumSlices = 1
+        //  2. Num mipmaps = 1
+        //But cannot have both > 1 at the same time.
+        if( mTextureType == TEX_TYPE_2D_ARRAY && includeMipMaps && depthOrSlices > 1u )
+        {
+            includeMipMaps = false;
+            LogManager::getSingleton().logMessage(
+                        "WARNING: Texture::convertToImage cannot convert TEX_TYPE_2D_ARRAY with "
+                        "depthOrSlices > 1 and mipmaps included. Either download only 1 slice, "
+                        "or set includeMipMaps to false. Setting includeMipMaps to false for you. "
+                        "If you want this feature, move to Ogre 2.2" );
+        }
+
+        const size_t numMips = includeMipMaps ? (getNumMipmaps() - mipmapBias + 1u) : 1u;
         const size_t dataSize = Image::calculateSize( numMips, numSlices,
                                                       startingWidth, startingHeight,
                                                       startingDepth, getFormat() );
@@ -494,20 +494,35 @@ namespace Ogre {
         // faces, then mips
         void* currentPixData = pixData;
 
-        for( size_t face=0; face<numSlices; ++face )
+        //Convert depth & slices back to 2.1 conventions, which make no sense but is required
+        const size_t loopNumFaces =
+                mTextureType == TEX_TYPE_CUBE_MAP ? std::max( startingDepth, numSlices ) : 1u;
+        const size_t loopSliceStart =
+                mTextureType == TEX_TYPE_CUBE_MAP ? std::max( zStart, sliceStart ) : 0u;
+
+        for( size_t face=loopSliceStart; face<loopSliceStart + loopNumFaces; ++face )
         {
-            uint32 width  = startingWidth;
+            size_t loopDepth =
+                    mTextureType != TEX_TYPE_CUBE_MAP ? std::max( startingDepth, numSlices ) : 1u;
+            size_t loopZStart =
+                    mTextureType != TEX_TYPE_CUBE_MAP ? std::max( zStart, sliceStart ) : 0u;
+
+            uint32 width = startingWidth;
             uint32 height = startingHeight;
-            uint32 depth  = numZ;
-            for (size_t mip = 0; mip < numMips; ++mip)
+
+            for( size_t mip = mipmapBias; mip < mipmapBias + numMips; ++mip )
             {
-                size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
+                for( size_t z=loopZStart; z<loopZStart + loopDepth; ++z )
+                {
+                    size_t mipDataSize = PixelUtil::getMemorySize( width, height, 1u, getFormat() );
 
-                Box srcBox( 0, 0, firstZ, width, height, firstZ + depth );
-                Ogre::PixelBox pixBox(width, height, depth, getFormat(), currentPixData);
-                getBuffer(face + firstSlice, mip)->blitToMemory( srcBox, pixBox );
+                    Box srcBox( 0, 0, static_cast<uint32>( z ),
+                                width, height, static_cast<uint32>( z + 1u ) );
+                    Ogre::PixelBox pixBox( width, height, 1u, getFormat(), currentPixData );
+                    getBuffer( face, mip )->blitToMemory( srcBox, pixBox );
 
-                currentPixData = (void*)((char*)currentPixData + mipDataSize);
+                    currentPixData = (void*)((char*)currentPixData + mipDataSize);
+                }
 
                 if( width != 1 )
                     width >>= 1u;
@@ -515,17 +530,18 @@ namespace Ogre {
                     height >>= 1u;
                 if( mTextureType == TEX_TYPE_3D )
                 {
-                    firstZ >>= 1u;
-                    if( depth != 1 )
-                        depth >>= 1u;
+                    loopZStart >>= 1u;
+                    if( loopDepth != 1u )
+                        loopDepth >>= 1u;
                 }
             }
         }
 
+        uint32 loopDepth = mTextureType != TEX_TYPE_CUBE_MAP ? std::max( startingDepth, numSlices ) : 1u;
         // load, and tell Image to delete the memory when it's done.
         destImage.loadDynamicImage( (Ogre::uchar*)pixData, startingWidth, startingHeight,
-                                    numZ, getFormat(), true,
-                                    numSlices, numMips - 1 );
+                                    loopDepth, getFormat(), true,
+                                    loopNumFaces, static_cast<uint8>( numMips - 1u ) );
     }
     //--------------------------------------------------------------------------
     void Texture::getCustomAttribute(const String&, void*)
