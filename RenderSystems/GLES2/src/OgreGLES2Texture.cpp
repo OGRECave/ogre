@@ -413,7 +413,7 @@ namespace Ogre {
         }
         else if (mTextureType == TEX_TYPE_CUBE_MAP)
         {
-            if(getSourceFileType() == "dds")
+            if(getSourceFileType() == "dds" || getSourceFileType() == "oitd")
             {
                 // XX HACK there should be a better way to specify whether 
                 // all faces are in the same file or not
