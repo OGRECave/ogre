@@ -32,6 +32,10 @@
 #include "InstantRadiosity/OgreInstantRadiosity.h"
 #include "OgreIrradianceVolume.h"
 
+#include "OgreDecal.h"
+#include "OgreWireAabb.h"
+#include "OgreTextureManager.h"
+
 #include "OgreFileSystemLayer.h"
 
 using namespace Demo;
@@ -179,6 +183,60 @@ namespace Demo
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
         const float armsLength = 2.5f;
+
+        {
+            Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+            Ogre::HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
+
+            //Ogre::WireAabb *wireAabb = sceneManager->createWireAabb();
+
+            Ogre::Decal *decal = sceneManager->createDecal();
+            Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode()->createChildSceneNode();
+            sceneNode->attachObject( decal );
+            sceneNode->setPosition( Ogre::Vector3( 0, 0.0, 5.0f ) );
+            sceneNode->setOrientation( Ogre::Quaternion( Ogre::Degree( 45.0f ), Ogre::Vector3::UNIT_Y ) );
+            sceneNode->setScale( Ogre::Vector3( 5.0f, 0.5f, 5.0f ) );
+            //wireAabb->track( decal );
+
+            //The diffuse texture create it in RAW mode, just to test it. That is, we create the 2D Array
+            //texture manually, without the aid of HlmsTextureManager.
+            //Because of simplicity, we use two Image instances, one to load the diffuse texture,
+            //another to create an array of 8 slices, with the other 7 slices set to black.
+            //It's not efficient, but this is for testing
+            Ogre::Image floorDiffuseOrig;
+            floorDiffuseOrig.load( "floor_diffuse.PNG",
+                               Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+            Ogre::Image floorDiffuse;
+            Ogre::uint8 *floorDiffuseData = reinterpret_cast<Ogre::uint8*>(
+                                                OGRE_MALLOC( floorDiffuseOrig.getSize() * 8u,
+                                                             Ogre::MEMCATEGORY_GENERAL ) );
+            memset( floorDiffuseData, 0u, floorDiffuseOrig.getSize() * 8u );
+            memcpy( floorDiffuseData, floorDiffuseOrig.getData(), floorDiffuseOrig.getSize() );
+            floorDiffuse.loadDynamicImage( floorDiffuseData, floorDiffuseOrig.getWidth(),
+                                           floorDiffuseOrig.getHeight(), 8u,
+                                           floorDiffuseOrig.getFormat(), true );
+
+            Ogre::TexturePtr rawTex =
+                    Ogre::TextureManager::getSingleton().createManual(
+                        "RawDecalTextureTest", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                        Ogre::TEX_TYPE_2D_ARRAY, floorDiffuse.getWidth(), floorDiffuse.getHeight(),
+                        floorDiffuse.getDepth(), floorDiffuse.getNumMipmaps(), floorDiffuse.getFormat(),
+                        Ogre::TU_STATIC_WRITE_ONLY, 0, true );
+            rawTex->loadImage( floorDiffuse );
+            decal->setDiffuseTexture( rawTex, 0 );
+            sceneManager->setDecalsDiffuse( rawTex );
+
+            //The normal map create it in managed mode, that is with the help of HlmsTextureManager
+            const Ogre::uint32 decalNormalId = 1;
+            Ogre::HlmsTextureManager::TextureLocation texLocation;
+            texLocation = hlmsTextureManager->createOrRetrieveTexture( "floor_bump.png",
+                                                                       "floor_bump.PNG",
+                                                                       Ogre::HlmsTextureManager::
+                                                                       TEXTURE_TYPE_NORMALS,
+                                                                       decalNormalId );
+            decal->setNormalTexture( texLocation.texture, texLocation.xIdx );
+            sceneManager->setDecalsNormals( texLocation.texture );
+        }
 
         {
             Ogre::Item *item = sceneManager->createItem(
@@ -420,7 +478,7 @@ namespace Demo
             mInstantRadiosity->mCellSize = 5.0f;
             mInstantRadiosity->build();
 
-            sceneManager->setForwardClustered( true, 16, 8, 24, 96, 0, 2, 50 );
+            sceneManager->setForwardClustered( true, 16, 8, 24, 96, 8, 2, 50 );
             //Required by InstantRadiosity
             sceneManager->getForwardPlus()->setEnableVpls( true );
         }

@@ -79,6 +79,9 @@ compositor_node LocalCubemapsRenderingNode
 		//Render overlays
 		pass render_scene
 		{
+			//Set a shadow node so Forward+ can reuse the cache from
+			//the previous render_scene pass
+			shadows		LocalCubemapsShadowNode reuse
 			rq_first	251
 		}
 
