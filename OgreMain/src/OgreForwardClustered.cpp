@@ -147,17 +147,15 @@ namespace Ogre
             collectLightForSlice( threadId + numThreads * slicesPerThread, threadId );
     }
     //-----------------------------------------------------------------------------------
-    uint16 ForwardClustered::collectObjsForSlice( const size_t numPackedFrustumsPerSlice,
-                                                  const size_t frustumStartIdx,
-                                                  uint16 initialNumObjs,
-                                                  size_t minRq, size_t maxRq,
-                                                  size_t currObjsPerCell,
-                                                  size_t cellOffsetStart,
-                                                  ObjTypes objType,
-                                                  uint16 numFloat4PerObj )
+    void ForwardClustered::collectObjsForSlice( const size_t numPackedFrustumsPerSlice,
+                                                const size_t frustumStartIdx,
+                                                uint16 offsetStart,
+                                                size_t minRq, size_t maxRq,
+                                                size_t currObjsPerCell,
+                                                size_t cellOffsetStart,
+                                                ObjTypes objType,
+                                                uint16 numFloat4PerObj )
     {
-        uint16 numObjs = initialNumObjs;
-
         const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
         const size_t actualMaxRq = std::min( maxRq, objsPerRqInThread0.size() );
         for( size_t rqId=minRq; rqId<=actualMaxRq; ++rqId )
@@ -281,19 +279,17 @@ namespace Ogre
                                 uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
                                                                    cellOffsetStart +
                                                                    numLightsInCell->objCount[objType];
-                                *cellElem = numObjs * numFloat4PerObj;
+                                *cellElem = offsetStart;
                                 ++numLightsInCell->objCount[objType];
                             }
                         }
                     }
                 }
 
-                ++numObjs;
+                offsetStart += numFloat4PerObj;
                 ++itor;
             }
         }
-
-        return numObjs;
     }
     //-----------------------------------------------------------------------------------
     void ForwardClustered::collectLightForSlice( size_t slice, size_t threadId )
@@ -624,16 +620,13 @@ namespace Ogre
         const bool hasDecals = mDecalsEnabled;
         const size_t decalOffsetStart = mLightsPerCell + c_reservedLightSlotsPerCell;
 
-        uint16 numDecals = static_cast<uint16>(
-                               alignToNextMultiple( numLights * c_ForwardPlusNumFloat4PerLight,
-                                                    c_ForwardPlusNumFloat4PerDecal ) >> 2u );
         const VisibleObjectsPerRq &objsPerRqInThread0 = mSceneManager->_getTmpVisibleObjectsList()[0];
         const size_t actualMaxDecalRq = std::min( MaxDecalRq, objsPerRqInThread0.size() );
-        numDecals = collectObjsForSlice( numPackedFrustumsPerSlice, frustumStartIdx,
-                                         numDecals, MinDecalRq, actualMaxDecalRq,
-                                         mDecalsPerCell,
-                                         decalOffsetStart + c_reservedDecalsSlotsPerCell,
-                                         ObjType_Decal, (uint16)c_ForwardPlusNumFloat4PerDecal );
+        collectObjsForSlice( numPackedFrustumsPerSlice, frustumStartIdx,
+                             mDecalFloat4Offset, MinDecalRq, actualMaxDecalRq,
+                             mDecalsPerCell,
+                             decalOffsetStart + c_reservedDecalsSlotsPerCell,
+                             ObjType_Decal, (uint16)c_ForwardPlusNumFloat4PerDecal );
 
         {
             //Now write all the light counts
@@ -645,7 +638,6 @@ namespace Ogre
             const size_t cellSize = mObjsPerCell;
             //const bool hasLights = mLightsPerCell > 0u;
             const bool hasLights = true;
-            const size_t decalOffsetStart = mLightsPerCell + c_reservedLightSlotsPerCell;
             size_t gridIdx = frustumStartIdx * ARRAY_PACKED_REALS * cellSize;
 
             while( itor != end )
@@ -871,7 +863,7 @@ namespace Ogre
         const float viewportHeight = static_cast<float>( viewport->getActualHeight() );
         const float viewportWidthOffset = static_cast<float>( viewport->getActualLeft() );
         float viewportHeightOffset = static_cast<float>( viewport->getActualTop() );
-        
+
         //The way ogre represents viewports is top = 0 bottom = 1. As a result if 'texture flipping'
         //is required then all is ok. However if it is not required then viewport offsets are
         //actually represented from the bottom up.

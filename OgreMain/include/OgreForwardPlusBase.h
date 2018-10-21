@@ -46,6 +46,7 @@ namespace Ogre
 
     static const size_t c_ForwardPlusNumFloat4PerLight = 6u;
     static const size_t c_ForwardPlusNumFloat4PerDecal = 4u;
+    static const size_t c_ForwardPlusNumFloat4PerCubemapProbe = 7u;
 
     /** ForwardPlusBase */
     class _OgreExport ForwardPlusBase : public HlmsAlloc
@@ -128,6 +129,8 @@ namespace Ogre
 #if !OGRE_NO_FINE_LIGHT_MASK_GRANULARITY
         bool    mFineLightMaskGranularity;
 #endif
+        //How many float4 to skip before Decals start in globalLightListBuffer
+        uint16 mDecalFloat4Offset;
 
         static size_t calculateBytesNeeded( size_t numLights, size_t numDecals );
 
