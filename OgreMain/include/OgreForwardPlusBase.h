@@ -44,6 +44,9 @@ namespace Ogre
 
     class CompositorShadowNode;
 
+    static const size_t c_ForwardPlusNumFloat4PerLight = 6u;
+    static const size_t c_ForwardPlusNumFloat4PerDecal = 4u;
+
     /** ForwardPlusBase */
     class _OgreExport ForwardPlusBase : public HlmsAlloc
     {

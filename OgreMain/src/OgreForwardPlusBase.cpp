@@ -42,11 +42,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
+    //N variables * 4 (vec4 or padded vec3) * 4 (bytes per float)
     const size_t ForwardPlusBase::MinDecalRq = 0u;
     const size_t ForwardPlusBase::MaxDecalRq = 4u;
-    const size_t ForwardPlusBase::NumBytesPerLight = 6 * 4 * 4;
-    const size_t ForwardPlusBase::NumBytesPerDecal = 4 * 4 * 4;
+    const size_t ForwardPlusBase::NumBytesPerLight = c_ForwardPlusNumFloat4PerLight * 4u * 4u;
+    const size_t ForwardPlusBase::NumBytesPerDecal = c_ForwardPlusNumFloat4PerDecal * 4u * 4u;
 
     ForwardPlusBase::ForwardPlusBase( SceneManager *sceneManager, bool decalsEnabled ) :
         mVaoManager( 0 ),
@@ -240,8 +240,10 @@ namespace Ogre
         if( numLights > 0u )
         {
             //Align to the start of decals
-            size_t decalsStart = alignToNextMultiple( numLights * 6u, 4u ) >> 2u;
-            lightData += (decalsStart * 4u - numLights * 6u) * 4u;
+            size_t decalsStart = alignToNextMultiple( numLights * c_ForwardPlusNumFloat4PerLight,
+                                                      c_ForwardPlusNumFloat4PerDecal ) >> 2u;
+            lightData += (decalsStart * c_ForwardPlusNumFloat4PerDecal -
+                          numLights * c_ForwardPlusNumFloat4PerLight) << 2u;
         }
 
         const Matrix4 viewMat = camera->getViewMatrix();
