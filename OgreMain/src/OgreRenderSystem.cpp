@@ -60,6 +60,11 @@ namespace Ogre {
         , mTextureManager(0)
         , mVaoManager(0)
         , mActiveViewport(0)
+#if OGRE_DEBUG_MODE >= OGRE_DEBUG_HIGH
+        , mDebugShaders(true)
+#else
+        , mDebugShaders(false)
+#endif
         , mWBuffer(false)
         , mBatchCount(0)
         , mFaceCount(0)
@@ -1083,6 +1088,11 @@ namespace Ogre {
     void RenderSystem::getCustomAttribute(const String& name, void* pData)
     {
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found.", "RenderSystem::getCustomAttribute");
+    }
+    //---------------------------------------------------------------------
+    void RenderSystem::setDebugShaders( bool bDebugShaders )
+    {
+        mDebugShaders = bDebugShaders;
     }
 }
 

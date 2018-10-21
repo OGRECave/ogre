@@ -250,7 +250,8 @@ bail:
 		// This flag is required in order to enable compatibility with Direct2D.
 		deviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif
-		if(OGRE_DEBUG_MODE && !IsWorkingUnderNsight() && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
+        if( OGRE_DEBUG_MODE >= OGRE_DEBUG_HIGH && !IsWorkingUnderNsight() &&
+            D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel() )
 		{
 			deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 		}
@@ -468,7 +469,7 @@ bail:
         optExceptionsErrorLevel.possibleValues.push_back("Error");
         optExceptionsErrorLevel.possibleValues.push_back("Warning");
         optExceptionsErrorLevel.possibleValues.push_back("Info (exception on any message)");
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE >= OGRE_DEBUG_HIGH
         optExceptionsErrorLevel.currentValue = "Info (exception on any message)";
 #else
         optExceptionsErrorLevel.currentValue = "No information queue exceptions";
@@ -806,7 +807,7 @@ bail:
 
             if ("No information queue exceptions" == infoQType)
             {
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE >= OGRE_DEBUG_HIGH
                 // a debug build should always enable the debug layer and report errors
                 D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
 #else

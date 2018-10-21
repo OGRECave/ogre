@@ -482,15 +482,24 @@ namespace Ogre {
 
 
         UINT compileFlags=0;
-        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-#if OGRE_DEBUG_MODE
-        compileFlags |= D3DCOMPILE_DEBUG;
-        // Skip optimization only if we have enough instruction slots (>=256) and not feature level 9 hardware
-        if (mTarget != "ps_2_0" && mTarget != "ps_4_0_level_9_1" && rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
-            compileFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-        compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
-#endif
+        D3D11RenderSystem *rsys = static_cast<D3D11RenderSystem*>(
+                                      Root::getSingleton().getRenderSystem() );
+
+        if( rsys->getDebugShaders() )
+        {
+            compileFlags |= D3DCOMPILE_DEBUG;
+            // Skip optimization only if we have enough instruction slots (>=256)
+            // and not feature level 9 hardware
+            if( mTarget != "ps_2_0" && mTarget != "ps_4_0_level_9_1" &&
+                rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0 )
+            {
+                compileFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+            }
+        }
+        else
+        {
+            compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
+        }
 
         if (mColumnMajorMatrices)
         {

@@ -1461,6 +1461,21 @@ namespace Ogre
         /// Checks for the presense of an API-specific extension (eg. Vulkan, GL)
         virtual bool checkExtension( const String &ext ) const      { return false; }
 
+        /** Instructs the RenderSystem to compile shaders without optimizations
+            and with debug information, for easier debugging on APIs that support it.
+            Default is true if OGRE_DEBUG_MODE >= OGRE_DEBUG_HIGH, else false
+
+            This setting takes effect for shaders compiled afterwards. Already
+            compiled shaders won't change unless you manually rebuild them.
+
+            It is highly recommended you disable the Microcode cache before changing
+            the default, or else debug shaders may contaminate your cache, or
+            alternatively a shader from the cache may be used which may have been
+            compiled with a different setting.
+        */
+        void setDebugShaders( bool bDebugShaders );
+        bool getDebugShaders(void) const                        { return mDebugShaders; }
+
         virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const = 0;
    
     protected:
@@ -1497,6 +1512,7 @@ namespace Ogre
         // Active viewport (dest for future rendering operations)
         Viewport* mActiveViewport;
 
+        bool mDebugShaders;
         bool mWBuffer;
 
         size_t mBatchCount;
