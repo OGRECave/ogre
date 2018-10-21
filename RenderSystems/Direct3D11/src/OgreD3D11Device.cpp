@@ -168,10 +168,23 @@ namespace Ogre
         case E_INVALIDARG:
             res.append("invalid parameters were passed.\n");
             break;
+        case DXGI_ERROR_DEVICE_REMOVED:
+        {
+            HRESULT deviceRemovedReason = mD3D11Device->GetDeviceRemovedReason();
+            char tmp[64];
+            sprintf(tmp, "deviceRemovedReason = 0x%08X\n", (unsigned)deviceRemovedReason);
+            res.append(tmp);
+        }
+            //No 'break', fallthrough to the next switch statement
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+            __attribute__ ((fallthrough));
+#elif __cplusplus >= 201703L
+            [[fallthrough]];
+#endif
         default:
             {
             char tmp[64];
-            sprintf(tmp, "hr = 0x%08X\n", lastResult);
+            sprintf(tmp, "hr = 0x%08X\n", (unsigned)lastResult);
             res.append(tmp);
             }
         }
