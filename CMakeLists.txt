@@ -511,6 +511,7 @@ option(OGRE_LEGACY_ANIMATIONS "Use the skeletal animation from 1.x. It's much sl
 option(OGRE_SIMD_SSE2 "Enable SIMD (Include SSE2 files)." TRUE)
 option(OGRE_SIMD_NEON "Enable SIMD (Include NEON files)." TRUE)
 option(OGRE_RESTRICT_ALIASING "Restrict aliasing." TRUE)
+option(OGRE_IDSTRING_ALWAYS_READABLE "Always keep readable strings on IdString, even in Release builds." FALSE)
 cmake_dependent_option(OGRE_CONFIG_STATIC_LINK_CRT "Statically link the MS CRT dlls (msvcrt)" FALSE "MSVC" FALSE)
 set(OGRE_LIB_DIRECTORY "lib${LIB_SUFFIX}" CACHE STRING "Install path for libraries, e.g. 'lib64' on some 64-bit Linux distros.")
 if (WIN32)

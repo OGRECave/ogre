@@ -29,6 +29,7 @@ THE SOFTWARE.
 #ifndef __OgreIdString__
 #define __OgreIdString__
 
+#include "OgrePrerequisites.h"
 #include "Hash/MurmurHash3.h"
 #include <stdio.h>  // sprintf
 #include <string.h> // strlen
@@ -37,7 +38,7 @@ THE SOFTWARE.
 #define OGRE_HASH_FUNC MurmurHash3_x86_32
 #define OGRE_HASH_BITS 32
 
-#if OGRE_DEBUG_MODE == 0
+#if OGRE_DEBUG_MODE == 0 && OGRE_IDSTRING_ALWAYS_READABLE == 0
     #define OGRE_COPY_DEBUG_STRING( _Expression ) ((void)0)
     #define OGRE_APPEND_DEBUG_STRING( _Expression ) ((void)0)
 #else
@@ -96,14 +97,14 @@ namespace Ogre
         static const uint32_t Seed = 0x3A8EFA67; //It's a prime number :)
 
         uint32      mHash;
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
         #define OGRE_DEBUG_STR_SIZE 32
         char        mDebugString[OGRE_DEBUG_STR_SIZE];
 #endif
 
         IdString() : mHash( 0 )
         {
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
             mDebugString[0] = '\0';
 #endif
         }
@@ -126,7 +127,7 @@ namespace Ogre
             OGRE_COPY_DEBUG_STRING( value );
         }
 
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
         #if OGRE_COMPILER == OGRE_COMPILER_MSVC
             #pragma warning( push )
             #pragma warning( disable: 4996 ) //Unsecure CRT deprecation warning
@@ -255,7 +256,7 @@ namespace Ogre
         /// Returns "[Hash 0x0a0100ef]" strings in Release mode, readable string in debug
         std::string getFriendlyText() const
         {
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
             return std::string( mDebugString );
 #else
             return getReleaseText();
@@ -288,7 +289,7 @@ namespace Ogre
         */
         void getFriendlyText( char *outCStr, size_t stringSize ) const
         {
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
             size_t minSize = std::min<size_t>( OGRE_DEBUG_STR_SIZE, stringSize );
             memcpy( outCStr, mDebugString, minSize );
             outCStr[minSize - 1u] = '\0';
