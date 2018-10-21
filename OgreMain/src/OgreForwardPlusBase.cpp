@@ -241,9 +241,9 @@ namespace Ogre
         {
             //Align to the start of decals
             size_t decalsStart = alignToNextMultiple( numLights * c_ForwardPlusNumFloat4PerLight,
-                                                      c_ForwardPlusNumFloat4PerDecal ) >> 2u;
-            lightData += (decalsStart * c_ForwardPlusNumFloat4PerDecal -
-                          numLights * c_ForwardPlusNumFloat4PerLight) << 2u;
+                                                      c_ForwardPlusNumFloat4PerDecal );
+            //Alignment happens in increments of float4, hence the "<< 2u"
+            lightData += (decalsStart - numLights * c_ForwardPlusNumFloat4PerLight) << 2u;
         }
 
         const Matrix4 viewMat = camera->getViewMatrix();
