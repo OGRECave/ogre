@@ -1796,7 +1796,10 @@ namespace Ogre {
             return;
 
         // Enable primitive restarting with fixed indices depending upon the data type
+        // https://www.khronos.org/registry/webgl/specs/latest/2.0/#NO_PRIMITIVE_RESTART_FIXED_INDEX
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         OGRE_CHECK_GL_ERROR(glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX));
+#endif
     }
 
     void GLES2RenderSystem::initialiseContext(RenderWindow* primary)
