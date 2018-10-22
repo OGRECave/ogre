@@ -330,6 +330,11 @@ Texture).
 
 Default: on.
 
+-   profiling\_id "name";
+
+User defined text for identifying this pass by name in profilers and
+GPU debuggers
+
 ### clear {#CompositorNodesPassesClear}
 
 The syntax for clear passes is the same as 1.x; except that by default
