@@ -1888,6 +1888,10 @@ namespace Ogre
         }
 
         notifyPropertiesMergedPreGenerationStep();
+        mListener->propertiesMergedPreGenerationStep( mShaderProfile, passCache,
+                                                      renderableCache.setProperties,
+                                                      renderableCache.pieces,
+                                                      mSetProperties, queuedRenderable );
 
         GpuProgramPtr shaders[NumShaderTypes];
         //Generate the shaders

@@ -57,6 +57,30 @@ namespace Ogre
     class _OgreExport HlmsListener
     {
     public:
+        /** Similar to HlmsListener::shaderCacheEntryCreated, but it gets called before creating
+            any shader. The main difference is that there is no hlmsCacheEntry (because it hasn't been
+            generated yet) and the properties are before they are transformed by the templates
+        @brief propertiesMergedPreGenerationStep
+        @param shaderProfile
+        @param passCache
+            Properties used by this pass
+        @param renderableCacheProperties
+            Properties assigned to the renderable
+        @param renderableCachePieces
+            Pieces that can be inserted, belonging to the renderable.
+            The PiecesMap pointer cannot be null
+        @param properties
+            Combined properties of both renderableCacheProperties & passCache.setProperties
+        @param queuedRenderable
+        */
+        virtual void propertiesMergedPreGenerationStep(
+                const String &shaderProfile,
+                const HlmsCache &passCache,
+                const HlmsPropertyVec &renderableCacheProperties,
+                const PiecesMap renderableCachePieces[NumShaderTypes],
+                const HlmsPropertyVec &properties,
+                const QueuedRenderable &queuedRenderable ) {}
+
         /** Called after the shader was created/compiled, and right before
             bindGpuProgramParameters (relevant information for OpenGL programs).
         @param shaderProfile
