@@ -1,5 +1,5 @@
 # Deferred Shading {#deferred}
-This wiki article is complementary to the deferred shading demo that is part of the Ogre SDK. It will reference the code quite a bit and explain some of the decisions made when implementing the deferred shading framework for the demo.
+This tutorial is complementary to the deferred shading sample that is part of Ogre. It will reference the code quite a bit and explain some of the decisions made when implementing the deferred shading framework for the demo.
 
 @tableofcontents
 
@@ -149,9 +149,6 @@ There are four target passes in this compositor.
 2. Render the objects that are in the GBuffer render queues but didn't get rendered to the GBuffer
 3. Render the post-GBuffer render queue objects
 4. Output the result
-
-### Why do we need four target passes ?
-This is mainly a limitation of Ogre. Ideally, we could use a single target_output pass and do all the passes there. The problem is that material_scheme is at the target scope and not at the pass scope. This is hard to change, because material schemes are resolved during scene preparing time and not during scene rendering. So even if the scope would change, it would not affect the rendering, as the material scheme will not get tested after we switch to it. Perhaps this will be addressed, and then this compositor will get simplified.
 
 ## Rendering the light geometry {#lightgeom}
 The geometry that we want to render to calculate lighting information doesn't really fit in any classic category. It is not really a part of the scene, as the light geometry aren't objects in the world. But it is geometry (not always a quad) that needs to be rendered.
