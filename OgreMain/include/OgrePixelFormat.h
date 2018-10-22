@@ -557,14 +557,8 @@ namespace Ogre {
         */
         static PixelFormat getFormatFromName(const String& name, bool accessibleOnly = false, bool caseSensitive = false);
 
-        /** Gets the BNF expression of the pixel-formats.
-            @note                   The string returned by this function is intended to be used as a BNF expression
-                                    to work with Compiler2Pass.
-            @param  accessibleOnly  If true, only accessible pixel format will take into account, otherwise all
-                                    pixel formats list in PixelFormat enumeration will being returned.
-            @return                A string contains the BNF expression.
-        */
-        static String getBNFExpressionOfPixelFormats(bool accessibleOnly = false);
+        /// @deprecated do not use
+        OGRE_DEPRECATED static String getBNFExpressionOfPixelFormats(bool accessibleOnly = false);
 
         /** Returns the similar format but acoording with given bit depths.
             @param fmt      The original foamt.
