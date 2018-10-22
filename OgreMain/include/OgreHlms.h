@@ -246,7 +246,9 @@ namespace Ogre
         */
         static size_t findNextCharacter( const String &buffer, size_t startPos, char character );
 
-        static void findBlockEnd( SubStringRef &outSubString , bool &syntaxError );
+        /// Returns true if we found an @end, false if we found
+        /// \@else instead (can only happen if allowsElse=true).
+        static bool findBlockEnd( SubStringRef &outSubString, bool &syntaxError, bool allowsElse=false );
 
         bool evaluateExpression( SubStringRef &outSubString, bool &outSyntaxError ) const;
         int32 evaluateExpressionRecursive( ExpressionVec &expression, bool &outSyntaxError ) const;

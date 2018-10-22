@@ -51,6 +51,7 @@ THE SOFTWARE.
 #include "OgreLwString.h"
 
 #include "OgreHlmsListener.h"
+#include "OgreBitset.h"
 
 #include "OgreProfiler.h"
 
@@ -435,14 +436,21 @@ namespace Ogre
         return defaultVal;
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::findBlockEnd( SubStringRef &outSubString, bool &syntaxError )
+    bool Hlms::findBlockEnd( SubStringRef &outSubString, bool &syntaxError, bool allowsElse )
     {
+        bool isElse = false;
+
         const char *blockNames[] =
         {
             "foreach",
             "property",
-            "piece"
+            "piece",
+            "else"
         };
+
+        cbitset32<2048> allowedElses;
+        if( allowsElse )
+            allowedElses.set( 0 );
 
         String::const_iterator it = outSubString.begin();
         String::const_iterator en = outSubString.end();
@@ -460,18 +468,38 @@ namespace Ogre
                 {
                     --nesting;
                     it += sizeof( "end" ) - 1;
+                    isElse = false;
                     continue;
                 }
                 else
                 {
-                    for( size_t i=0; i<sizeof( blockNames ) / sizeof( char* ); ++i )
+                    if( allowsElse )
+                        idx = subString.find( "else" );
+                    if( idx == 0 )
                     {
-                        size_t idxBlock = subString.find( blockNames[i] );
-                        if( idxBlock == 0 )
+                        if( !allowedElses.test( static_cast<size_t>( nesting ) ) )
                         {
-                            it = subString.begin() + strlen( blockNames[i] );
-                            ++nesting;
-                            break;
+                            syntaxError = true;
+                            printf( "Unexpected @else while looking for @end\nNear: '%s'\n",
+                                    &(*subString.begin()) );
+                        }
+                        --nesting;
+                        it += sizeof( "else" ) - 1;
+                        isElse = true;
+                        continue;
+                    }
+                    else
+                    {
+                        for( size_t i=0; i<sizeof( blockNames ) / sizeof( char* ); ++i )
+                        {
+                            size_t idxBlock = subString.find( blockNames[i] );
+                            if( idxBlock == 0 )
+                            {
+                                it = subString.begin() + strlen( blockNames[i] );
+                                ++nesting;
+                                allowedElses.setValue( static_cast<size_t>( nesting ), i == 1u );
+                                break;
+                            }
                         }
                     }
                 }
@@ -483,7 +511,10 @@ namespace Ogre
         assert( nesting >= -1 );
 
         if( it != en && nesting < 0 )
-            outSubString.setEnd( it - outSubString.getOriginalBuffer().begin() - (sizeof( "end" ) - 1) );
+        {
+            int keywordLength = (isElse ? sizeof( "else" ) : sizeof( "end" )) - 1;
+            outSubString.setEnd( it - outSubString.getOriginalBuffer().begin() - keywordLength );
+        }
         else
         {
             syntaxError = true;
@@ -497,6 +528,8 @@ namespace Ogre
                     "without matching @end\nNear: '%s'\n", calculateLineCount( outSubString ),
                     tmpData );
         }
+
+        return isElse;
     }
     //-----------------------------------------------------------------------------------
     bool Hlms::evaluateExpression( SubStringRef &outSubString, bool &outSyntaxError ) const
@@ -1142,13 +1175,26 @@ namespace Ogre
             bool result = evaluateExpression( subString, syntaxError );
 
             SubStringRef blockSubString = subString;
-            findBlockEnd( blockSubString, syntaxError );
+            bool isElse = findBlockEnd( blockSubString, syntaxError, true );
 
             if( result && !syntaxError )
                 copy( outBuffer, blockSubString, blockSubString.getSize() );
 
-            subString.setStart( blockSubString.getEnd() + sizeof( "@end" ) );
-            pos = subString.find( "@property" );
+            if( !isElse )
+            {
+                subString.setStart( blockSubString.getEnd() + sizeof( "@end" ) );
+                pos = subString.find( "@property" );
+            }
+            else
+            {
+                subString.setStart( blockSubString.getEnd() + sizeof( "@else" ) );
+                blockSubString = subString;
+                findBlockEnd( blockSubString, syntaxError );
+                if( !syntaxError && !result )
+                    copy( outBuffer, blockSubString, blockSubString.getSize() );
+                subString.setStart( blockSubString.getEnd() + sizeof( "@end" ) );
+                pos = subString.find( "@property" );
+            }
         }
 
         copy( outBuffer, subString, subString.getSize() );
