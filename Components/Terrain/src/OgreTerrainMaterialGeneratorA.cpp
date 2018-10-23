@@ -98,8 +98,7 @@ namespace Ogre
         {
             mShaderLanguage = "hlsl";
         }
-        else if (hmgr.isLanguageSupported("glsl")
-                 && Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() >= 150)
+        else if (hmgr.isLanguageSupported("glsl"))
         {
             mShaderLanguage = "glsl";
         }
