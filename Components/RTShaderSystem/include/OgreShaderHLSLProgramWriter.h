@@ -29,16 +29,11 @@ THE SOFTWARE.
 #define __ShaderProgramWriterHLSL_H__
 
 #include "OgreShaderProgramWriterManager.h"
-#include "OgreShaderProgramWriter.h"
+#include "OgreShaderCGProgramWriter.h"
 #include "OgreShaderParameter.h"
 
 namespace Ogre {
     namespace RTShader {
-
-        class Function;
-        class FunctionAtom;
-        class Program;
-
 /** \addtogroup Optional
 *  @{
 */
@@ -49,7 +44,7 @@ namespace Ogre {
 /** HLSL target language writer implementation.
 @see ProgramWriter.
 */
-class _OgreRTSSExport HLSLProgramWriter : public ProgramWriter
+class _OgreRTSSExport HLSLProgramWriter : public CGProgramWriter
 {
 
     // Interface.
@@ -63,51 +58,11 @@ public:
     virtual ~HLSLProgramWriter();
 
     /** 
-    @see ProgramWriter::writeSourceCode.
-    */
-    virtual void writeSourceCode(std::ostream& os, Program* program);
-
-    /** 
     @see ProgramWriter::getTargetLanguage.
     */
     virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
     static String TargetLanguage;
-
-    // Protected methods.
-protected:
-
-    /** Initialize string maps. */
-    void initializeStringMaps();
-
-    /** Write the program dependencies. */
-    void writeProgramDependencies(std::ostream& os, Program* program);
-
-    /** Write a uniform parameter. */
-    void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
-
-    /** Write a function parameter. */
-    void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
-
-    /** Write a local parameter. */
-    void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
-
-    /** Write a function declaration. */
-    void writeFunctionDeclaration(std::ostream& os, Function* function);
-
-    /** Write function atom instance. */
-    void writeAtomInstance(std::ostream& os, FunctionAtom* atom);   
-
-protected:
-    typedef std::map<GpuConstantType, const char*>     GpuConstTypeToStringMap;
-    typedef std::map<Parameter::Semantic, const char*> ParamSemanticToStringMap;
-
-    // Attributes.
-protected:
-    // Map between GPU constant type to string value.
-    GpuConstTypeToStringMap mGpuConstTypeMap;
-    // Map between parameter semantic to string value.
-    ParamSemanticToStringMap mParamSemanticMap;
 };
 
 /** HLSL program writer factory implementation.
