@@ -189,7 +189,7 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic)
+void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
 {
 
     os << mGpuConstTypeMap[parameter->getType()];
@@ -201,11 +201,7 @@ void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr pa
         os << "[" << parameter->getSize() << "]";   
     }
 
-    if(forcedSemantic)
-    {
-        os << " : " << forcedSemantic;
-    }
-    else if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
+    if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
     {
         os << " : ";
         
@@ -252,17 +248,12 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
     size_t paramsCount = inParams.size() + outParams.size();
     size_t curParamIndex = 0;
 
-    bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-
     // Write input parameters.
     for (it=inParams.begin(); it != inParams.end(); ++it)
     {                   
         os << "\t in ";
 
-        const char* forcedSemantic = 
-            (isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
-
-        writeFunctionParameter(os, *it, forcedSemantic);
+        writeFunctionParameter(os, *it);
 
         if (curParamIndex + 1 != paramsCount)       
             os << ", " << std::endl;
@@ -275,11 +266,7 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
     {
         os << "\t out ";
 
-        const char* forcedSemantic = 
-            (isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN) ? "SV_Target" :
-            (isVs4 && function->getFunctionType() == Function::FFT_VS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
-
-        writeFunctionParameter(os, *it, forcedSemantic);
+        writeFunctionParameter(os, *it);
 
         if (curParamIndex + 1 != paramsCount)               
             os << ", " << std::endl;

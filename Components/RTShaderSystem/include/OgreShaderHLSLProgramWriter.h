@@ -87,7 +87,7 @@ protected:
     void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
 
     /** Write a function parameter. */
-    void writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic);
+    void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
 
     /** Write a local parameter. */
     void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
