@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreGLNativeSupport.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-#include <OgreEGLWindow.h>
+#include "OgreEGLWindow.h"
 #endif
 
 namespace Ogre {

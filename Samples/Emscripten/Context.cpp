@@ -26,7 +26,7 @@
  -----------------------------------------------------------------------------
  */
 
-#include <OgreZip.h>
+#include "OgreZip.h"
 
 #include "SamplePlugin.h"
 #include "CharacterSample.h"

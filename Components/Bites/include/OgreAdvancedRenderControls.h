@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreCamera.h"
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-#include <OgreRTShaderSystem.h>
+#include "OgreRTShaderSystem.h"
 #endif
 
 namespace OgreBites {

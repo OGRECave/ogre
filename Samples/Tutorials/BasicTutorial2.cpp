@@ -31,12 +31,12 @@ THE SOFTWARE
 #include <exception>
 #include <iostream>
 
-#include <Ogre.h>
-#include <OgreApplicationContext.h>
-#include <OgreInput.h>
-#include <OgreRTShaderSystem.h>
-#include <OgreApplicationContext.h>
-#include <OgreCameraMan.h>
+#include "Ogre.h"
+#include "OgreApplicationContext.h"
+#include "OgreInput.h"
+#include "OgreRTShaderSystem.h"
+#include "OgreApplicationContext.h"
+#include "OgreCameraMan.h"
 
 using namespace Ogre;
 using namespace OgreBites;

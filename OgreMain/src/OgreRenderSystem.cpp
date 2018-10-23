@@ -38,7 +38,7 @@ THE SOFTWARE.
 #include "OgreHardwareOcclusionQuery.h"
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-#include <OgreRTShaderConfig.h>
+#include "OgreRTShaderConfig.h"
 #endif
 
 namespace Ogre {

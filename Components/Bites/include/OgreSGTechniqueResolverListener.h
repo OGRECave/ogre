@@ -29,8 +29,8 @@
 #pragma once
 
 #include "OgreBitesPrerequisites.h"
-#include <OgreRTShaderSystem.h>
-#include <OgreMaterialManager.h>
+#include "OgreRTShaderSystem.h"
+#include "OgreMaterialManager.h"
 
 /** \addtogroup Optional
 *  @{

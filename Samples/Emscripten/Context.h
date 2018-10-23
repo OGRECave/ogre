@@ -29,10 +29,10 @@
 #ifndef __SAMPLE_H__
 #define __SAMPLE_H__
 
-#include <Ogre.h>
-#include <OgreTrays.h>
-#include <OgreCameraMan.h>
-#include <OgreApplicationContext.h>
+#include "Ogre.h"
+#include "OgreTrays.h"
+#include "OgreCameraMan.h"
+#include "OgreApplicationContext.h"
 
 #include "SampleContext.h"
 

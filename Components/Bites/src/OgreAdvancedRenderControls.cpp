@@ -6,8 +6,8 @@
  */
 
 #include "OgreAdvancedRenderControls.h"
-#include <OgreTextureManager.h>
-#include <OgreMaterialManager.h>
+#include "OgreTextureManager.h"
+#include "OgreMaterialManager.h"
 
 #include "OgreTrays.h"
 

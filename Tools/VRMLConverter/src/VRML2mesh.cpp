@@ -1,9 +1,9 @@
 #include <vrmllib/nodes.h>
 #include <vrmllib/file.h>
 
-#include <Ogre.h>
-#include <OgreDefaultHardwareBufferManager.h>
-#include <OgreLodStrategyManager.h>
+#include "Ogre.h"
+#include "OgreDefaultHardwareBufferManager.h"
+#include "OgreLodStrategyManager.h"
 
 using namespace Ogre;
 using namespace vrmllib;
