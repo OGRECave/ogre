@@ -1697,6 +1697,9 @@ namespace Ogre
 
         while( itor != end )
         {
+            if( itor->second.visibleToManager )
+                mHlmsManager->_datablockDestroyed( itor->first );
+
             OGRE_DELETE itor->second.datablock;
             ++itor;
         }
