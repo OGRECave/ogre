@@ -845,8 +845,21 @@ namespace Ogre {
         GLenum target = mTextureTypes[unit];
 
         if (target == GL_TEXTURE_EXTERNAL_OES)
-            return;        
+        {
+            LogManager::getSingleton().logMessage("ogres: before TEXTURE_WRAP_S: " + StringConverter::toString(glGetError()));
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            LogManager::getSingleton().logMessage("ogres: before TEXTURE_WRAP_T: " + StringConverter::toString(glGetError()));
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            LogManager::getSingleton().logMessage("ogres: before TEXTURE_MIN_FILTER: " + StringConverter::toString(glGetError()));
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            LogManager::getSingleton().logMessage("ogres: before TEXTURE_MAG_FILTER: " + StringConverter::toString(glGetError()));
+            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            LogManager::getSingleton().logMessage("ogres: after TEXTURE_MAG_FILTER: " + StringConverter::toString(glGetError()));
+            return; 
+        }
 
+
+                   
 
         const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
         mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
