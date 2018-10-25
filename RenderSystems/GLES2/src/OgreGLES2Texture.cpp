@@ -70,6 +70,8 @@ namespace Ogre {
                 return GL_TEXTURE_3D_OES;
             case TEX_TYPE_2D_ARRAY:
                 return GL_TEXTURE_2D_ARRAY;
+            case TEX_TYPE_EXTERNAL_OES:
+                return GL_TEXTURE_EXTERNAL_OES;
             default:
                 return 0;
         };
@@ -127,8 +129,13 @@ namespace Ogre {
             mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);
 
         // Set some misc default parameters, these can of course be changed later
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
+        if(mTextureType == TEX_TYPE_EXTERNAL_OES)
+        {
+            mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        } else {
+            mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MIN_FILTER, ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
+        }
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
@@ -413,5 +420,9 @@ namespace Ogre {
                     depth = depth / 2;
             }
         }
+    }
+
+    uint GLES2Texture::getTextureId() {
+        return mTextureID;
     }
 }

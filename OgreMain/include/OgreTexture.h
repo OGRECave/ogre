@@ -96,7 +96,9 @@ namespace Ogre {
         /// 2D texture array
         TEX_TYPE_2D_ARRAY = 5,
         /// 2D non-square texture, used in combination with 2D texture coordinates
-        TEX_TYPE_2D_RECT = 6
+        TEX_TYPE_2D_RECT = 6,
+        /// texture type for oes
+        TEX_TYPE_EXTERNAL_OES = 7
     };
 
     /** Enum identifying special mipmap numbers
@@ -125,6 +127,11 @@ namespace Ogre {
             const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
 
         virtual ~Texture() {}
+
+
+        virtual uint getTextureId() {
+            return 0;
+        }
         
         /** Sets the type of texture; can only be changed before load() 
         */

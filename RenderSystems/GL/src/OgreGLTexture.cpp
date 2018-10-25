@@ -95,6 +95,8 @@ namespace Ogre {
                 return GL_TEXTURE_CUBE_MAP;
             case TEX_TYPE_2D_ARRAY:
                 return GL_TEXTURE_2D_ARRAY_EXT;
+            case TEX_TYPE_EXTERNAL_OES:
+                return GL_TEXTURE_EXTERNAL_OES;
             default:
                 return 0;
         };
