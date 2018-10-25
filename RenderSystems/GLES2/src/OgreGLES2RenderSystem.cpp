@@ -839,13 +839,13 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setSampler(size_t unit, Sampler& sampler)
     {
+        if (!mStateCacheManager->activateGLTextureUnit(unit))
+            return;
+
         GLenum target = mTextureTypes[unit];
 
         if (target == GL_TEXTURE_EXTERNAL_OES)
-            return;
-
-        if (!mStateCacheManager->activateGLTextureUnit(unit))
-            return;
+            return;        
 
 
         const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
