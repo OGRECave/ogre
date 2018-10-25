@@ -405,6 +405,16 @@ namespace Ogre {
         */
         virtual void getCustomAttribute(const String& name, void* pData);
         
+        /** simplified API for bindings
+         * 
+         * @overload
+         */
+        uint getCustomAttribute(const String& name)
+        {
+            uint ret = 0;
+            getCustomAttribute(name, &ret);
+            return ret;
+        }
 
         /** Enable read and/or write privileges to the texture from shaders.
             @param bindPoint The buffer binding location for shader access. For OpenGL this must be unique and is not related to the texture binding point.
