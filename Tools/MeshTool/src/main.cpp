@@ -934,7 +934,7 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
         {
             cout << "Trying to read " << source << " as a v1 mesh..." << endl;
             v1MeshPtr = v1::MeshManager::getSingleton().createManual(
-                        "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+                        "conversionSrcV1", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
             meshSerializer->importMesh( stream, v1MeshPtr.get() );
             retVal = true;
             cout << "Success!" << endl;
@@ -942,6 +942,8 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
         catch( Exception & )
         {
             cout << "Failed." << endl;
+            if( v1MeshPtr )
+                v1::MeshManager::getSingleton().remove( v1MeshPtr );
             v1MeshPtr.setNull();
         }
 
@@ -951,7 +953,7 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
             {
                 cout << "Trying to read " << source << " as a v2 mesh..." << endl;
                 v2MeshPtr = MeshManager::getSingleton().createManual(
-                            "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+                            "conversionSrcV2", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
                 stream->seek( 0 );
                 meshSerializer2.importMesh( stream, v2MeshPtr.get() );
                 retVal = true;
@@ -990,7 +992,7 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
             if( !stricmp(root->Value(), "mesh") )
             {
                 v1MeshPtr = v1::MeshManager::getSingleton().createManual(
-                            "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+                            "conversionSrcXML", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
 
                 VertexElementType colourElementType = VET_COLOUR_ABGR;
                 if( opts.destColourFormatSet )
@@ -1038,7 +1040,7 @@ void saveMesh( const String &destination, v1::MeshPtr &v1Mesh, MeshPtr &v2Mesh,
         {
             if( opts.exportAsV1 && v1Mesh.isNull() )
             {
-                v1Mesh = v1::MeshManager::getSingleton().createManual( "conversion",
+                v1Mesh = v1::MeshManager::getSingleton().createManual( "conversionDstV1",
                                                                        ResourceGroupManager::
                                                                        DEFAULT_RESOURCE_GROUP_NAME );
                 v1Mesh->importV2( v2Mesh.get() );
@@ -1085,7 +1087,8 @@ void saveMesh( const String &destination, v1::MeshPtr &v1Mesh, MeshPtr &v2Mesh,
         if( v1Mesh.isNull() && !v2Mesh.isNull() )
         {
             v1Mesh = v1::MeshManager::getSingleton().createManual(
-                                    "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+                                    "conversionDstXML",
+                         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
             v1Mesh->importV2( v2Mesh.get() );
         }
 
