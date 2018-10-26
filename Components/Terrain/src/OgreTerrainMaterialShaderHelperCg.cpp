@@ -41,18 +41,30 @@ namespace Ogre
     {
         HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
         String progName = getVertexProgramName(prof, terrain, tt);
+
+        String lang = mgr.isLanguageSupported("hlsl") ? "hlsl" : "cg";
+
         HighLevelGpuProgramPtr ret = mgr.getByName(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         if (!ret)
         {
-            ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-                "cg", GPT_VERTEX_PROGRAM);
+            ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                    lang, GPT_VERTEX_PROGRAM);
         }
         else
         {
             ret->unload();
         }
 
-        ret->setParameter("profiles", "vs_4_0 vs_3_0 vs_2_0 arbvp1");
+        if(lang == "hlsl")
+        {
+            ret->setParameter("enable_backwards_compatibility", "true");
+            ret->setParameter("target", "vs_4_0 vs_3_0 vs_2_0");
+        }
+        else
+        {
+            ret->setParameter("profiles", "vs_4_0 vs_3_0 vs_2_0 arbvp1");
+        }
+
         ret->setParameter("entry_point", "main_vp");
 
         return ret;
@@ -66,21 +78,32 @@ namespace Ogre
         HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
         String progName = getFragmentProgramName(prof, terrain, tt);
 
+        String lang = mgr.isLanguageSupported("hlsl") ? "hlsl" : "cg";
+
         HighLevelGpuProgramPtr ret = mgr.getByName(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         if (!ret)
         {
-            ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-                "cg", GPT_FRAGMENT_PROGRAM);
+            ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                    lang, GPT_FRAGMENT_PROGRAM);
         }
         else
         {
             ret->unload();
         }
         
-        if(prof->isLayerNormalMappingEnabled() || prof->isLayerParallaxMappingEnabled())
-            ret->setParameter("profiles", "ps_4_0 ps_3_0 ps_2_x fp40 arbfp1");
+
+        if(lang == "hlsl")
+        {
+            ret->setParameter("enable_backwards_compatibility", "true");
+            ret->setParameter("target", "ps_4_0 ps_3_0 ps_2_x");
+        }
         else
-            ret->setParameter("profiles", "ps_4_0 ps_3_0 ps_2_0 fp30 arbfp1");
+        {
+            if(prof->isLayerNormalMappingEnabled() || prof->isLayerParallaxMappingEnabled())
+                ret->setParameter("profiles", "ps_4_0 ps_3_0 ps_2_x fp40 arbfp1");
+            else
+                ret->setParameter("profiles", "ps_4_0 ps_3_0 ps_2_0 fp30 arbfp1");
+        }
         ret->setParameter("entry_point", "main_fp");
 
         return ret;
