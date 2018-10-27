@@ -49,7 +49,34 @@ namespace Ogre
     *  @{
     */
 
-    /** HLMS stands for "High Level Material System". */
+    /** HLMS stands for "High Level Material System".
+
+        The Hlms has multiple caches:
+
+        mRenderableCache
+            This cache contains all the properties set to a Renderable class and can be evaluated
+            early, when a Renderable is assigned a datablock i.e. inside Renderable::setDatablock.
+            Contains properties such as whether the material has normal mapping, if the mesh
+            has UV sets, evaluates if the material requires tangents for normal mapping, etc.
+            The main function in charge of filling this cache is Hlms::calculateHashFor
+
+        mPassCache
+            This cache contains per-pass information, such as how many lights are in the scene,
+            whether this is a shadow mapping pass, etc.
+            The main function in charge of filling this cache is Hlms::preparePassHash
+
+        mShaderCodeCache
+            Contains a cache of unique shaders (from Hlms templates -> actual valid shader code)
+            based on the properties merged from mRenderableCache & mPassCache.
+            However it is possible that two shaders are exactly the same and thus be duplicated,
+            this can happen if two combinations of properties end up producing the exact same code.
+            The Microcode cache (GpuProgramManager::setSaveMicrocodesToCache) can help with that issue.
+
+        mShaderCache
+            Contains a cache of the PSOs. The difference between this and mShaderCodeCache is
+            that PSOs require additional information, such as HlmsMacroblock. HlmsBlendblock.
+            For more information of all that is required, see HlmsPso
+    */
     class _OgreExport Hlms : public HlmsAlloc
     {
     public:
@@ -115,11 +142,30 @@ namespace Ogre
             }
         };
 
+        struct ShaderCodeCache
+        {
+            /// Contains merged properties (pass and renderable's)
+            RenderableCache mergedCache;
+            GpuProgramPtr   shaders[NumShaderTypes];
+
+            ShaderCodeCache( const PiecesMap *_pieces ) :
+                mergedCache( HlmsPropertyVec(), _pieces )
+            {
+            }
+
+            bool operator == ( const ShaderCodeCache &_r ) const
+            {
+                return this->mergedCache == _r.mergedCache;
+            }
+        };
+
         typedef vector<PassCache>::type PassCacheVec;
         typedef vector<RenderableCache>::type RenderableCacheVec;
+        typedef vector<ShaderCodeCache>::type ShaderCodeCacheVec;
 
         PassCacheVec        mPassCache;
         RenderableCacheVec  mRenderableCache;
+        ShaderCodeCacheVec  mShaderCodeCache;
         HlmsCacheVec        mShaderCache;
 
         HlmsPropertyVec mSetProperties;
@@ -191,6 +237,8 @@ namespace Ogre
 
         void setProperty( IdString key, int32 value );
         int32 getProperty( IdString key, int32 defaultVal=0 ) const;
+
+        void unsetProperty( IdString key );
 
         enum ExpressionType
         {
@@ -292,13 +340,23 @@ namespace Ogre
         */
         void applyStrongMacroblockRules( HlmsPso &pso );
 
+        /** Compiles input properties and adds it to the shader code cache
+        @param finalHash
+            This value is used to give the shader a name and for debug purposes, that's all.
+        @param codeCache [in/out]
+            All variables must be filled except for ShaderCodeCache::shaders which is the output
+        */
+        void compileShaderCode( ShaderCodeCache &codeCache );
+
+        const ShaderCodeCacheVec& getShaderCodeCache(void) const    { return mShaderCodeCache; }
+
         /** Creates a shader based on input parameters. Caller is responsible for ensuring
             this shader hasn't already been created.
             Shader template files will be processed and then compiled.
         @param renderableHash
-            The hash calculated in from @calculateHashFor that lives in @Renderable
+            The hash calculated in from Hlms::calculateHashFor that lives in Renderable
         @param passCache
-            The return value of @preparePassHash
+            The return value of Hlms::preparePassHash
         @param finalHash
             A hash calculated on the pass' & renderable' hash. Must be unique. Caller is
             responsible for ensuring this hash stays unique.
