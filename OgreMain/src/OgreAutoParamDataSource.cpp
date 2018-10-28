@@ -34,12 +34,6 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 
 namespace Ogre {
-    const Matrix4 PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE(
-        0.5,    0,    0,  0.5, 
-        0,   -0.5,    0,  0.5, 
-        0,      0,    1,    0,
-        0,      0,    0,    1);
-
     //-----------------------------------------------------------------------------
     AutoParamDataSource::AutoParamDataSource()
         : mWorldMatrixCount(0),
@@ -676,14 +670,14 @@ namespace Ogre {
                     mCurrentTextureProjector[index]->calcViewMatrixRelative(
                         mCurrentCamera->getDerivedPosition(), viewMatrix);
                     mTextureViewProjMatrix[index] = 
-                        PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+                        Matrix4::CLIPSPACE2DTOIMAGESPACE *
                         mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
                         viewMatrix;
                 }
                 else
                 {
                     mTextureViewProjMatrix[index] = 
-                        PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+                        Matrix4::CLIPSPACE2DTOIMAGESPACE *
                         mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
                         mCurrentTextureProjector[index]->getViewMatrix();
                 }
@@ -756,7 +750,7 @@ namespace Ogre {
                 // The view matrix here already includes camera-relative changes if necessary
                 // since they are built into the frustum position
                 mSpotlightViewProjMatrix[index] = 
-                    PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+                    Matrix4::CLIPSPACE2DTOIMAGESPACE *
                     frust.getProjectionMatrixWithRSDepth() * 
                     frust.getViewMatrix();
 
