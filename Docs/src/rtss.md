@@ -79,6 +79,7 @@ for more examples see `Samples/Media/RTShaderLib/materials/RTShaderSystem.materi
 Here are the attributes you can use in a `rtshader_system` section of a .material script:
 
 - [lighting_stage](#lighting_stage)
+- [fog_stage](#fog_stage)
 - [light_count](#light_count)
 - [triplanarTexturing](#triplanarTexturing)
 - [integrated_pssm4](#integrated_pssm4)
@@ -100,6 +101,17 @@ Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 Sa
 
 @see Ogre::RTShader::NormalMapLighting::NormalMapSpace
 @see @ref Samplers
+
+<a name="fog_stage"></a>
+
+### fog_stage
+
+Force a specific fog calculation
+
+@par
+Format: `fog_stage ffp <per_vertex|per_pixel>`
+@par
+Example: `fog_stage ffp per_pixel`
 
 <a name="light_count"></a>
 
