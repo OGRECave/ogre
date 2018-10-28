@@ -47,15 +47,27 @@ namespace Ogre
 
     class HlmsJsonListener;
 
+#define OGRE_HLMS_MAX_LIFETIME_MACROBLOCKS 4096
+#define OGRE_HLMS_MAX_LIFETIME_BLENDBLOCKS 4096
+
 #define OGRE_HLMS_NUM_MACROBLOCKS 32
 #define OGRE_HLMS_NUM_BLENDBLOCKS 32
 #define OGRE_HLMS_NUM_SAMPLERBLOCKS 64
 #define OGRE_HLMS_NUM_INPUT_LAYOUTS 128
 
-//Biggest value between all three
+//Biggest value between all three (Input Layouts is not a block)
 #define OGRE_HLMS_MAX_BASIC_BLOCKS OGRE_HLMS_NUM_SAMPLERBLOCKS
 
-    /** HLMS stands for "High Level Material System". */
+    /** HLMS stands for "High Level Material System".
+
+        HlmsMacroblock & HlmsBlendblock pointers are never recycled when their reference counts reach 0.
+        This allows us to better cache PSOs instead of destroying them every time materials are
+        destroyed.
+
+        A user can only create up to OGRE_HLMS_MAX_LIFETIME_MACROBLOCKS &
+        OGRE_HLMS_MAX_LIFETIME_BLENDBLOCKS.
+        If for some reason you need more, increase these values (they're macros) and recompile Ogre
+    */
     class _OgreExport HlmsManager :
         #if !OGRE_NO_JSON
             public ScriptLoader,
@@ -65,12 +77,15 @@ namespace Ogre
     public:
         typedef vector<uint16>::type BlockIdxVec;
     protected:
+        typedef vector<HlmsMacroblock>::type HlmsMacroblockVec;
+        typedef vector<HlmsBlendblock>::type HlmsBlendblockVec;
+
         Hlms    *mRegisteredHlms[HLMS_MAX];
         bool    mDeleteRegisteredOnExit[HLMS_MAX];
         HlmsCompute *mComputeHlms;
 
-        HlmsMacroblock      mMacroblocks[OGRE_HLMS_NUM_MACROBLOCKS];
-        HlmsBlendblock      mBlendblocks[OGRE_HLMS_NUM_BLENDBLOCKS];
+        HlmsMacroblockVec   mMacroblocks;
+        HlmsBlendblockVec   mBlendblocks;
         HlmsSamplerblock    mSamplerblocks[OGRE_HLMS_NUM_SAMPLERBLOCKS];
         BlockIdxVec         mActiveBlocks[NUM_BASIC_BLOCKS];
         BlockIdxVec         mFreeBlockIds[NUM_BASIC_BLOCKS];
@@ -78,9 +93,9 @@ namespace Ogre
 
         struct InputLayouts
         {
+            uint32                  refCount;
             OperationType           opType;
             VertexElement2VecVec    vertexElements;
-            uint32                  refCount;
         };
 
         typedef vector<uint8>::type InputLayoutsIdVec;
@@ -111,8 +126,11 @@ namespace Ogre
 #endif
 
         void renderSystemDestroyAllBlocks(void);
-        uint16 getFreeBasicBlock( uint8 type );
+        uint16 getFreeBasicBlock( uint8 type, BasicBlock *basicBlock );
         void destroyBasicBlock( BasicBlock *block );
+
+        template <typename T, HlmsBasicBlock type, size_t maxLimit>
+        T* getBasicBlock( typename vector<T>::type &container, const T &baseParams );
 
     public:
         HlmsManager();
@@ -129,18 +147,25 @@ namespace Ogre
 
         HlmsCompute* getComputeHlms(void)               { return mComputeHlms; }
 
-        /** Creates a macroblock that matches the same parameter as the input. If it already exists,
-            returns the existing one.
-        @par
+        /** Creates a macroblock that matches the same parameter as the input.
+            If it already exists, returns the existing one.
+
             Macroblocks must be destroyed with destroyMacroblock.
             Don't try to delete the pointer directly.
-        @par
+
             Calling this function will increase the reference count of the block.
             Make sure to call destroyMacroblock after you're done using it; which will
             decrease the reference count (it won't be actually destroyed until the
             reference is 0).
-        @par
+
             Up to 32 different macroblocks are supported at the same time.
+
+            VERY IMPORTANT:
+
+            You can only create up to OGRE_HLMS_MAX_LIFETIME_MACROBLOCKS different macroblocks
+            throghout the entire lifetime of HlmsManager, EVEN if you call destroyMacroblock
+            on them, as we need to ensure caches of HlmsPso remain valid.
+
         @param baseParams
             A macroblock reference to base the parameters. This reference may live on the stack,
             on the heap, etc; it's RS-specific data does not have to be filled.
@@ -154,17 +179,24 @@ namespace Ogre
         */
         const HlmsMacroblock* getMacroblock( const HlmsMacroblock &baseParams );
 
-        /// Destroys a macroblock created by @getMacroblock. Blocks are manually reference counted
-        /// and calling this function will decrease the count.
-        /// The object will actually be destroyed when the count reaches 0.
+        /// Destroys a macroblock created by HlmsManager::getMacroblock.
+        /// Blocks are manually reference counted and calling this function will decrease the count.
+        ///
+        /// The internal object (BasicBlock::mRsData) will actually be destroyed when the count
+        /// reaches 0; however the actual pointer is never deallocated throghout the lifetime of
+        /// HlmsManager, it is only deactivated.
+        ///
+        /// This guarantees caches of HlmsPso that once a Macroblock is created,
+        /// its pointer always valid.
+        ///
         /// When count reaches 0, it will perform an O(N) search but N <= OGRE_HLMS_NUM_MACROBLOCKS
         void destroyMacroblock( const HlmsMacroblock *macroblock );
 
-        /// @See getMacroblock. This is the same for blend states
+        /// See HlmsManager::getMacroblock. This is the same for blend states
         /// The block's reference count will be increased. Use destroyBlendblock to decrease it.
         const HlmsBlendblock* getBlendblock( const HlmsBlendblock &baseParams );
 
-        /// @See destroyMacroblock
+        /// @see    destroyMacroblock
         void destroyBlendblock( const HlmsBlendblock *Blendblock );
 
         /** @See getMacroblock. This is the same for Sampler states
@@ -310,8 +342,8 @@ namespace Ogre
         virtual Real getLoadingOrder(void) const;
 #endif
 
-        /// Gets the indices of active blocks @see _getBlocks @see _getMacroblock
-        /// @see _getBlendblock @see _getSamplerblock
+        /// Gets the indices of active blocks
+        /// @see    HlmsManager::_getBlocks
         const BlockIdxVec& _getActiveBlocksIndices( const HlmsBasicBlock &blockType ) const;
 
         /// Gets all blocks of a given type. This is an advanced function useful in retrieving

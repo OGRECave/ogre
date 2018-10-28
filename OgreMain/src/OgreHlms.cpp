@@ -1920,6 +1920,7 @@ namespace Ogre
         mSetProperties = codeCache.mergedCache.setProperties;
         unsetProperty( HlmsPsoProp::Macroblock );
         unsetProperty( HlmsPsoProp::Blendblock );
+        unsetProperty( HlmsPsoProp::OperationTypeV1 );
         mSetProperties.swap( codeCache.mergedCache.setProperties );
 
         //Generate the shaders
@@ -2303,8 +2304,10 @@ namespace Ogre
         else if( renderable->getUseIdentityProjection() )
             setProperty( HlmsBaseProp::IdentityViewProj, 1 );
 
-        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(false)->mId );
-        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(false)->mId );
+        setProperty( HlmsPsoProp::Macroblock,
+                     renderable->getDatablock()->getMacroblock(false)->mLifetimeId );
+        setProperty( HlmsPsoProp::Blendblock,
+                     renderable->getDatablock()->getBlendblock(false)->mLifetimeId );
 
         PiecesMap pieces[NumShaderTypes];
         if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
@@ -2327,8 +2330,10 @@ namespace Ogre
                     pieces[PixelShader][HlmsBasePieces::AlphaTestCmpFunc];
         }
         calculateHashForPreCaster( renderable, piecesCaster );
-        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(true)->mId );
-        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(true)->mId );
+        setProperty( HlmsPsoProp::Macroblock,
+                     renderable->getDatablock()->getMacroblock(true)->mLifetimeId );
+        setProperty( HlmsPsoProp::Blendblock,
+                     renderable->getDatablock()->getBlendblock(true)->mLifetimeId );
         uint32 renderableCasterHash = this->addRenderableCache( mSetProperties, piecesCaster );
 
         outHash         = renderableHash;
@@ -2860,103 +2865,6 @@ namespace Ogre
             datablock->setMacroblock( datablock->getMacroblock( false ), false );
 
             ++itor;
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void Hlms::_notifyMacroblockDestroyed( uint16 id )
-    {
-        bool wasUsedInWeakRefs = false;
-        bool hasPsosWithStrongRefs = false;
-        HlmsMacroblock macroblock;
-        HlmsCacheVec::iterator itor = mShaderCache.begin();
-        HlmsCacheVec::iterator end  = mShaderCache.end();
-
-        while( itor != end )
-        {
-            if( (*itor)->pso.pass.hasStrongMacroblock() )
-                hasPsosWithStrongRefs = true;
-
-            if( (*itor)->pso.macroblock->mId == id )
-            {
-                mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                if( !(*itor)->pso.pass.hasStrongMacroblock() )
-                {
-                    wasUsedInWeakRefs = true;
-                    macroblock = *(*itor)->pso.macroblock;
-                }
-                delete *itor;
-                itor = mShaderCache.erase( itor );
-                end  = mShaderCache.end();
-            }
-            else
-            {
-                ++itor;
-            }
-        }
-
-        if( hasPsosWithStrongRefs && wasUsedInWeakRefs )
-        {
-            //It's possible we made a hard clone of this macroblock with depth writes
-            //disabled. We need to remove these cloned PSOs to avoid wasting memory.
-            macroblock.mDepthWrite = false;
-            vector<const HlmsMacroblock*>::type macroblocksToDelete;
-            itor = mShaderCache.begin();
-            end  = mShaderCache.end();
-
-            while( itor != end )
-            {
-                if( (*itor)->pso.pass.hasStrongMacroblock() && *(*itor)->pso.macroblock == macroblock )
-                    macroblocksToDelete.push_back( (*itor)->pso.macroblock );
-                ++itor;
-            }
-
-            //We need to delete the macroblocks at the end because destroying a
-            //macroblock could trigger _notifyMacroblockDestroyed, thus invalidating
-            //iterators in mShaderCache.
-            vector<const HlmsMacroblock*>::type::const_iterator itMacroblock =
-                    macroblocksToDelete.begin();
-            vector<const HlmsMacroblock*>::type::const_iterator enMacroblock =
-                    macroblocksToDelete.end();
-            while( itMacroblock != enMacroblock )
-            {
-                mHlmsManager->destroyMacroblock( *itMacroblock );
-                ++itMacroblock;
-            }
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void Hlms::_notifyBlendblockDestroyed( uint16 id )
-    {
-        vector<const HlmsMacroblock*>::type macroblocksToDelete;
-        HlmsCacheVec::iterator itor = mShaderCache.begin();
-        HlmsCacheVec::iterator end  = mShaderCache.end();
-
-        while( itor != end )
-        {
-            if( (*itor)->pso.blendblock->mId == id )
-            {
-                mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                if( (*itor)->pso.pass.hasStrongMacroblock() )
-                    macroblocksToDelete.push_back( (*itor)->pso.macroblock );
-                delete *itor;
-                itor = mShaderCache.erase( itor );
-                end  = mShaderCache.end();
-            }
-            else
-            {
-                ++itor;
-            }
-        }
-
-        //We need to delete the macroblocks at the end because destroying a
-        //macroblock could trigger _notifyMacroblockDestroyed, thus invalidating
-        //iterators in mShaderCache.
-        vector<const HlmsMacroblock*>::type::const_iterator itMacroblock = macroblocksToDelete.begin();
-        vector<const HlmsMacroblock*>::type::const_iterator enMacroblock = macroblocksToDelete.end();
-        while( itMacroblock != enMacroblock )
-        {
-            mHlmsManager->destroyMacroblock( *itMacroblock );
-            ++itMacroblock;
         }
     }
     //-----------------------------------------------------------------------------------

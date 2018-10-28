@@ -743,18 +743,12 @@ namespace Ogre
         /// Internal use. @see HlmsManager::setShadowMappingUseBackFaces
         void _notifyShadowMappingBackFaceSetting(void);
 
-        /// When a macroblock is destroyed, the PSO is no longer valid. We need to destroy it.
-        /// Otherwise when we try to reuse a macroblock with the same internal ID but different
+        /// When an input layout is destroyed, the PSO is no longer valid. We need to destroy it.
+        /// Otherwise when we try to reuse a layout with the same internal ID but different
         /// settings, the old (wrong) PSO will be used.
-        void _notifyMacroblockDestroyed( uint16 id );
-
-        /// @copydoc _notifyMacroblockDestroyed
-        void _notifyBlendblockDestroyed( uint16 id );
-
-        /// @copydoc _notifyMacroblockDestroyed
         void _notifyInputLayoutDestroyed( uint16 id );
 
-        /// @copydoc _notifyMacroblockDestroyed
+        /// @copydoc _notifyInputLayoutDestroyed
         void _notifyV1InputLayoutDestroyed( uint16 id );
 
         void _clearShaderCache(void);

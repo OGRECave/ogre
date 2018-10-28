@@ -159,8 +159,10 @@ namespace Ogre
             }
         }
 
-        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(false)->mId );
-        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(false)->mId );
+        setProperty( HlmsPsoProp::Macroblock,
+                     renderable->getDatablock()->getMacroblock(false)->mLifetimeId );
+        setProperty( HlmsPsoProp::Blendblock,
+                     renderable->getDatablock()->getBlendblock(false)->mLifetimeId );
 
         Technique *technique = mat->getBestTechnique( renderable->getCurrentMaterialLod(), renderable );
         Pass *pass = technique->getPass( 0 );
@@ -170,8 +172,10 @@ namespace Ogre
         outHash = this->addRenderableCache( mSetProperties, (const PiecesMap*)0 );
 
         setProperty( HlmsBaseProp::ShadowCaster, true );
-        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(true)->mId );
-        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(true)->mId );
+        setProperty( HlmsPsoProp::Macroblock,
+                     renderable->getDatablock()->getMacroblock(true)->mLifetimeId );
+        setProperty( HlmsPsoProp::Blendblock,
+                     renderable->getDatablock()->getBlendblock(true)->mLifetimeId );
 
         outCasterHash = this->addRenderableCache( mSetProperties, (const PiecesMap*)0 );
     }
