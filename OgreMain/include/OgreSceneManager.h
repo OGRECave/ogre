@@ -522,7 +522,6 @@ namespace Ogre {
         uint8 mWorldGeometryRenderQueue;
         
         unsigned long mLastFrameNumber;
-        Affine3 mTempXform[256];
         bool mResetIdentityView;
         bool mResetIdentityProj;
 
@@ -1049,7 +1048,6 @@ namespace Ogre {
         /// Whether to use camera-relative rendering
         bool mCameraRelativeRendering;
         Affine3 mCachedViewMatrix;
-        Vector3 mCameraRelativePosition;
 
         /// Last light sets
         uint32 mLastLightHash;
