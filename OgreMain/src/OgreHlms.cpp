@@ -1911,6 +1911,76 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    HighLevelGpuProgramPtr Hlms::compileShaderCode( const String &source,
+                                                    const String &debugFilenameOutput,
+                                                    uint32 finalHash,
+                                                    ShaderType shaderType )
+    {
+        HighLevelGpuProgramManager *gpuProgramManager =
+                HighLevelGpuProgramManager::getSingletonPtr();
+
+        HighLevelGpuProgramPtr gp = gpuProgramManager->createProgram(
+                    StringConverter::toString( finalHash ) + ShaderFiles[shaderType],
+                    ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                    mShaderProfile, static_cast<GpuProgramType>(shaderType) );
+        gp->setSource( source, debugFilenameOutput );
+
+        if( mShaderTargets[shaderType] )
+        {
+            //D3D-specific
+            gp->setParameter( "target", *mShaderTargets[shaderType] );
+            gp->setParameter( "entry_point", "main" );
+        }
+
+        gp->setBuildParametersFromReflection( false );
+        gp->setSkeletalAnimationIncluded( getProperty( HlmsBaseProp::Skeleton ) != 0 );
+        gp->setMorphAnimationIncluded( false );
+        gp->setPoseAnimationIncluded( getProperty( HlmsBaseProp::Pose ) != 0 );
+        gp->setVertexTextureFetchRequired( false );
+
+        gp->load();
+
+        return gp;
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::_compileShaderFromPreprocessedSource( const RenderableCache &mergedCache,
+                                                     const String source[NumShaderTypes] )
+    {
+        const uint32 finalHash = mType * 100000000u +
+                                 static_cast<uint32>( mShaderCodeCache.size() );
+
+        ShaderCodeCache codeCache( mergedCache.pieces );
+        codeCache.mergedCache.setProperties = mergedCache.setProperties;
+
+        for( size_t i=0; i<NumShaderTypes; ++i )
+        {
+            if( !source[i].empty() )
+            {
+                String debugFilenameOutput;
+                std::ofstream debugDumpFile;
+                if( mDebugOutput )
+                {
+                    debugFilenameOutput = mOutputPath + "./" +
+                                          StringConverter::toString( finalHash ) +
+                                          ShaderFiles[i] + mShaderFileExt;
+                    debugDumpFile.open( debugFilenameOutput.c_str(), std::ios::out | std::ios::binary );
+
+                    if( mDebugOutputProperties )
+                    {
+                        mSetProperties.swap( codeCache.mergedCache.setProperties );
+                        dumpProperties( debugDumpFile );
+                        mSetProperties.swap( codeCache.mergedCache.setProperties );
+                    }
+                }
+
+                codeCache.shaders[i] = compileShaderCode( source[i], "", finalHash,
+                                                          static_cast<ShaderType>( i ) );
+            }
+        }
+
+        mShaderCodeCache.push_back( codeCache );
+    }
+    //-----------------------------------------------------------------------------------
     void Hlms::compileShaderCode( ShaderCodeCache &codeCache )
     {
         //Give the shaders friendly base-10 names
@@ -1922,6 +1992,15 @@ namespace Ogre
         unsetProperty( HlmsPsoProp::Blendblock );
         unsetProperty( HlmsPsoProp::OperationTypeV1 );
         mSetProperties.swap( codeCache.mergedCache.setProperties );
+
+        {
+            //Add RenderSystem-specific properties
+            IdStringVec::const_iterator itor = mRsSpecificExtensions.begin();
+            IdStringVec::const_iterator end  = mRsSpecificExtensions.end();
+
+            while( itor != end )
+                setProperty( *itor++, 1 );
+        }
 
         //Generate the shaders
         for( size_t i=0; i<NumShaderTypes; ++i )
@@ -1965,7 +2044,7 @@ namespace Ogre
                     debugDumpFile.open( debugFilenameOutput.c_str(), std::ios::out | std::ios::binary );
 
                     //We need to dump the properties before processing the files, as these
-                    //may be overwritten or polñuted by the files, thus hiding why we
+                    //may be overwritten or polluted by the files, thus hiding why we
                     //got this permutation.
                     if( mDebugOutputProperties )
                         dumpProperties( debugDumpFile );
@@ -2028,31 +2107,8 @@ namespace Ogre
                 //Don't create and compile if template requested not to
                 if( !getProperty( HlmsBaseProp::DisableStage ) )
                 {
-                    HighLevelGpuProgramManager *gpuProgramManager =
-                            HighLevelGpuProgramManager::getSingletonPtr();
-
-                    HighLevelGpuProgramPtr gp = gpuProgramManager->createProgram(
-                                StringConverter::toString( finalHash ) + ShaderFiles[i],
-                                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                mShaderProfile, static_cast<GpuProgramType>(i) );
-                    gp->setSource( outString, debugFilenameOutput );
-
-                    if( mShaderTargets[i] )
-                    {
-                        //D3D-specific
-                        gp->setParameter( "target", *mShaderTargets[i] );
-                        gp->setParameter( "entry_point", "main" );
-                    }
-
-                    gp->setBuildParametersFromReflection( false );
-                    gp->setSkeletalAnimationIncluded( getProperty( HlmsBaseProp::Skeleton ) != 0 );
-                    gp->setMorphAnimationIncluded( false );
-                    gp->setPoseAnimationIncluded( getProperty( HlmsBaseProp::Pose ) != 0 );
-                    gp->setVertexTextureFetchRequired( false );
-
-                    gp->load();
-
-                    codeCache.shaders[i] = gp;
+                    codeCache.shaders[i] = compileShaderCode( outString, debugFilenameOutput,
+                                                              finalHash, static_cast<ShaderType>( i ) );
                 }
 
                 //Reset the disable flag.
@@ -2088,15 +2144,6 @@ namespace Ogre
                 setProperty( itor->keyName, itor->value );
                 ++itor;
             }
-        }
-
-        {
-            //Add RenderSystem-specific properties
-            IdStringVec::const_iterator itor = mRsSpecificExtensions.begin();
-            IdStringVec::const_iterator end  = mRsSpecificExtensions.end();
-
-            while( itor != end )
-                setProperty( *itor++, 1 );
         }
 
         notifyPropertiesMergedPreGenerationStep();

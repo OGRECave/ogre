@@ -80,6 +80,8 @@ namespace Ogre
     class _OgreExport Hlms : public HlmsAlloc
     {
     public:
+        friend class HlmsDiskCache;
+
         enum LightGatheringMode
         {
             LightGatherForward,
@@ -339,6 +341,15 @@ namespace Ogre
             PSO to (potentially) modify.
         */
         void applyStrongMacroblockRules( HlmsPso &pso );
+
+    protected:
+        HighLevelGpuProgramPtr compileShaderCode( const String &source,
+                                                  const String &debugFilenameOutput,
+                                                  uint32 finalHash, ShaderType shaderType );
+
+    public:
+        void _compileShaderFromPreprocessedSource( const RenderableCache &mergedCache,
+                                                   const String source[NumShaderTypes] );
 
         /** Compiles input properties and adds it to the shader code cache
         @param finalHash
