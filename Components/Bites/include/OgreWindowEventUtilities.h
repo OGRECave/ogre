@@ -34,6 +34,16 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreHeaderPrefix.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#  if !defined(WIN32_LEAN_AND_MEAN)
+#   define WIN32_LEAN_AND_MEAN
+#  endif
+#  if !defined(NOMINMAX) && defined(_MSC_VER)
+#   define NOMINMAX // required to stop windows.h messing up std::min
+#  endif
+#  include <windows.h>
+#endif
+
 /** \addtogroup Optional
 *  @{
 */
@@ -149,6 +159,12 @@ namespace OgreBites
             The RenderWindow to remove from list
         */
         static void _removeRenderWindow(Ogre::RenderWindow* window);
+
+        // backwards compatibility
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        //! Internal winProc (RenderWindow's use this when creating the Win32 Window)
+        static LRESULT CALLBACK _WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+#endif
     };
 }
 /** @} */
