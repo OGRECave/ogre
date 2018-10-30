@@ -249,6 +249,7 @@ SHARED_PTR(FileHandleDataStream);
 // More Data Types
 %include "OgreColourValue.h"
 ADD_REPR(ColourValue)
+%ignore Ogre::PixelUtil::getBNFExpressionOfPixelFormats;
 %include "OgrePixelFormat.h"
 %include "OgreBlendMode.h"
 %include "OgreRay.h"
@@ -392,6 +393,7 @@ SHARED_PTR(Material);
     %include "OgreLight.h"
     %include "OgreNode.h"
         %include "OgreBone.h"
+        %ignore Ogre::SceneNode::getAttachedObjectIterator;
         %include "OgreSceneNode.h"
     SHARED_PTR(ShadowCameraSetup);
     SHARED_PTR(DefaultShadowCameraSetup);
@@ -456,6 +458,8 @@ SHARED_PTR(Mesh);
     %include "OgrePatchMesh.h"
 %include "OgreMeshManager.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
+%ignore Ogre::Pass::hasSeparateSceneBlending;
+%ignore Ogre::Pass::hasSeparateSceneBlendingOperations;
 %template(TextureUnitStates) std::vector<Ogre::TextureUnitState*>;
 %include "OgrePass.h"
     %ignore Ogre::Technique::getGPUVendorRuleIterator;

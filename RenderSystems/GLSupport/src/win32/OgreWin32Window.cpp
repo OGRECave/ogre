@@ -108,6 +108,7 @@ namespace Ogre {
         int left = -1; // Defaults to screen center
         int top = -1; // Defaults to screen center
         HWND parent = 0;
+        WNDPROC windowProc = DefWindowProc;
         String title = name;
         bool hidden = false;
         String border;
@@ -240,6 +241,8 @@ namespace Ogre {
             if ((opt = miscParams->find("parentWindowHandle")) != end)
                 parent = (HWND)StringConverter::parseSizeT(opt->second);
 
+            if ((opt = miscParams->find("windowProc")) != end)
+                windowProc = reinterpret_cast<WNDPROC>(StringConverter::parseSizeT(opt->second));
 
             // monitor index
             if ((opt = miscParams->find("monitorIndex")) != end)
@@ -380,7 +383,7 @@ namespace Ogre {
                 classStyle |= CS_DBLCLKS;
 
             // register class and create window
-            WNDCLASS wc = { classStyle, DefWindowProc, 0, 0, hInst,
+            WNDCLASS wc = { classStyle, windowProc, 0, 0, hInst,
                 LoadIcon(NULL, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
                 (HBRUSH)GetStockObject(BLACK_BRUSH), NULL, "OgreGLWindow" };
             RegisterClass(&wc);

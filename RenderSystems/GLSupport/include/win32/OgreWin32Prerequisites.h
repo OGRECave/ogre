@@ -53,8 +53,8 @@ typedef void GLvoid;
 
 #include <GL/wglext.h>
 
-#include <OgreGLSupportPrerequisites.h>
-#include <OgrePrerequisites.h>
+#include "OgreGLSupportPrerequisites.h"
+#include "OgrePrerequisites.h"
 
 namespace Ogre {
     // Forward declarations

@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __OgreOSXCocoaContext_H__
 
 #include "OgreGLContext.h"
-#include <OgrePrerequisites.h>
+#include "OgrePrerequisites.h"
 
 #import <AppKit/NSOpenGL.h>
 

@@ -342,21 +342,14 @@ namespace Ogre
         // Only supporting one pass
         Pass* pass = tech->createPass();
 
-        GpuProgramManager& gmgr = GpuProgramManager::getSingleton();
         HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
         if (!mShaderGen)
         {
-            bool check2x = mLayerNormalMappingEnabled || mLayerParallaxMappingEnabled;
-            if (hmgr.isLanguageSupported("hlsl") &&
-                ((check2x && gmgr.isSyntaxSupported("ps_4_0")) ))
-            {
-                mShaderGen = OGRE_NEW ShaderHelperHLSL();
-            }
-            else if (hmgr.isLanguageSupported("glsl") || hmgr.isLanguageSupported("glsles"))
+            if (hmgr.isLanguageSupported("glsl") || hmgr.isLanguageSupported("glsles"))
             {
                 mShaderGen = OGRE_NEW ShaderHelperGLSL();
             }
-            else if (hmgr.isLanguageSupported("cg"))
+            else if (hmgr.isLanguageSupported("cg") || hmgr.isLanguageSupported("hlsl"))
             {
                 mShaderGen = OGRE_NEW ShaderHelperCg();
             }
@@ -377,21 +370,20 @@ namespace Ogre
             // global normal map
             TextureUnitState* tu = pass->createTextureUnitState();
             tu->setTextureName(terrain->getTerrainNormalMap()->getName());
-            // Bugfix for D3D11 Render System
-            // tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+            tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 
             // global colour map
             if (terrain->getGlobalColourMapEnabled() && isGlobalColourMapEnabled())
             {
                 tu = pass->createTextureUnitState(terrain->getGlobalColourMap()->getName());
-                //tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+                tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
             }
 
             // light map
             if (isLightmapEnabled())
             {
                 tu = pass->createTextureUnitState(terrain->getLightmap()->getName());
-                //tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+                tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
             }
 
             // blend maps
@@ -401,7 +393,7 @@ namespace Ogre
             for (uint i = 0; i < numBlendTextures; ++i)
             {
                 tu = pass->createTextureUnitState(terrain->getBlendTextureName(i));
-                //tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+                tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
             }
 
             // layer textures

@@ -26,9 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include <Ogre.h>
-#include <OgreInstancedEntity.h>
-#include <OgreInstanceBatchShader.h>
+#include "Ogre.h"
+#include "OgreInstancedEntity.h"
+#include "OgreInstanceBatchShader.h"
 #include "RootWithoutRenderSystemFixture.h"
 
 using namespace Ogre;

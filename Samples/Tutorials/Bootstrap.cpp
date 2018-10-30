@@ -1,5 +1,5 @@
-#include <Ogre.h>
-#include <OgreApplicationContext.h>
+#include "Ogre.h"
+#include "OgreApplicationContext.h"
 
 class MyTestApp : public OgreBites::ApplicationContext, public OgreBites::InputListener
 {

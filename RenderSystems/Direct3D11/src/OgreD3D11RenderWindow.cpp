@@ -664,6 +664,7 @@ namespace Ogre
         D3D11RenderWindowSwapChainBased::create(name, width, height, fullScreen, miscParams);
 
         HWND parentHWnd = 0;
+        WNDPROC windowProc = DefWindowProc;
         HWND externalHandle = 0;
         String title = name;
 
@@ -699,6 +700,9 @@ namespace Ogre
             opt = miscParams->find("parentWindowHandle");
             if(opt != miscParams->end())
                 parentHWnd = (HWND)StringConverter::parseSizeT(opt->second);
+            opt = miscParams->find("windowProc");
+            if (opt != miscParams->end())
+                windowProc = reinterpret_cast<WNDPROC>(StringConverter::parseSizeT(opt->second));
             // externalWindowHandle     -> externalHandle
             opt = miscParams->find("externalWindowHandle");
             if(opt != miscParams->end())
@@ -841,7 +845,7 @@ namespace Ogre
 			static TCHAR staticVar;
 			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
 
-			WNDCLASS wc = { classStyle, DefWindowProc, 0, 0, hInst,
+			WNDCLASS wc = { classStyle, windowProc, 0, 0, hInst,
 				LoadIcon(0, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
 				(HBRUSH)GetStockObject(BLACK_BRUSH), 0, OGRE_D3D11_WIN_CLASS_NAME };
 			RegisterClass(&wc);

@@ -309,25 +309,6 @@ namespace {
 
     String mGeneralFs_glsles = glsles_prefix + mGeneralFs_glsl;
 
-	 String mModulate_Fs_hlsl_4_0 =
-        "uniform float4 shadowColor;\n"
-        "float4 ShadowBlend_ps(float4 position : SV_POSITION) : SV_Target\n"
-        "{\n"
-        "   return shadowColor;\n"
-        "}";
-
-
-	 String mModulate_Vs_hlsl_4_0 =
-        "void ShadowBlend_vs\n"
-        "(\n"
-        "in float4 inPos : POSITION,\n"
-        "out float4 pos : SV_POSITION,\n"
-        "uniform float4x4 worldViewProj\n"
-        ")\n"
-        "{\n"
-        "   pos = mul(worldViewProj, inPos);\n"
-        "}";
-
 	 String mModulate_Fs_cg =
 		 "uniform float4 shadowColor; \n"
 		 "float4 ShadowBlend_ps() : COLOR\n"
@@ -383,6 +364,7 @@ namespace Ogre {
 
 		program->setSource(source);
 		program->setParameter("entry_point", entryPoint);
+		program->setParameter("enable_backwards_compatibility", "true"); // for D3D11
 		if (language == "cg")
 			program->setParameter("profiles", target);
 		else
@@ -393,8 +375,7 @@ namespace Ogre {
 
 	void ShadowVolumeExtrudeProgram::initialiseModulationPassPrograms(void)
 	{
-		bool vs_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-		bool ps_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0_level_9_1");
+		bool hlsl = GpuProgramManager::getSingleton().isSyntaxSupported("hlsl");
 		bool glsl = GpuProgramManager::getSingleton().isSyntaxSupported("glsl");
 		bool glsles = GpuProgramManager::getSingleton().isSyntaxSupported("glsles");
 
@@ -428,22 +409,21 @@ namespace Ogre {
 		}
 		else
 		{
-			if (ps_4_0 && vs_4_0)
+			if (hlsl)
 			{
-				vsTarget = "vs_4_0_level_9_1";
-				fsTarget = "ps_4_0_level_9_1";
+				vsTarget = "vs_4_0_level_9_1 vs_2_0";
+				fsTarget = "ps_4_0_level_9_1 ps_2_0";
 				language = "hlsl";
-				vsProgram = mModulate_Vs_hlsl_4_0;
-				fsProgram = mModulate_Fs_hlsl_4_0;
 			}
 			else
 			{
 				vsTarget = "vs_2_0";
 				fsTarget = "ps_2_0";
 				language = "cg";
-				vsProgram = mModulate_Vs_cg;
-				fsProgram = mModulate_Fs_cg;
 			}
+
+            vsProgram = mModulate_Vs_cg;
+            fsProgram = mModulate_Fs_cg;
 		}
 
 		//Add vertex program

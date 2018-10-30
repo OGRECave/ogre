@@ -227,16 +227,24 @@ namespace Ogre {
         */
         void resetStatistics(void);
 
-        /** Gets a custom (maybe platform-specific) attribute.
-            @remarks
-                This is a nasty way of satisfying any API's need to see platform-specific details.
-                It horrid, but D3D needs this kind of info. At least it's abstracted.
-            @param
-                name The name of the attribute.
-            @param
-                pData Pointer to memory of the right kind of structure to receive the info.
+        /** Retrieve a platform or API-specific piece of information
+            This is a nasty way of satisfying any API's need to see platform-specific details.
+            It horrid, but D3D needs this kind of info. At least it's abstracted.
+            @param name The name of the attribute.
+            @param pData Pointer to memory of the right kind of structure to receive the info.
         */
         virtual void getCustomAttribute(const String& name, void* pData);
+
+        /** simplified API for bindings
+         * 
+         * @overload
+         */
+        uint getCustomAttribute(const String& name)
+        {
+            uint ret = 0;
+            getCustomAttribute(name, &ret);
+            return ret;
+        }
 
         /** Add a listener to this RenderTarget which will be called back before & after rendering.
         @remarks
