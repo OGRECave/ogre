@@ -272,7 +272,11 @@ namespace Ogre {
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
 
-        if (texPtr->getTextureType() == TEX_TYPE_CUBE_MAP)
+        if (texPtr->getTextureType() == TEX_TYPE_EXTERNAL_OES || texPtr->getTextureType() == TEX_TYPE_2D_RECT)
+        {
+            setTextureAddressingMode( TAM_CLAMP );
+        }
+        else if (texPtr->getTextureType() == TEX_TYPE_CUBE_MAP)
         {
             // delegate to cubic texture implementation
             setCubicTexture(&texPtr, true);

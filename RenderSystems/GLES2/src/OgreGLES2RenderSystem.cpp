@@ -844,12 +844,6 @@ namespace Ogre {
 
         GLenum target = mTextureTypes[unit];
 
-        if (target == GL_TEXTURE_EXTERNAL_OES)
-        {
-            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        }                   
-
         const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
         mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
         mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
