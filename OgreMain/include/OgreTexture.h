@@ -128,11 +128,6 @@ namespace Ogre {
 
         virtual ~Texture() {}
 
-
-        virtual uint getTextureId() {
-            return 0;
-        }
-        
         /** Sets the type of texture; can only be changed before load() 
         */
         void setTextureType(TextureType ttype ) { mTextureType = ttype; }

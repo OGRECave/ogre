@@ -421,8 +421,4 @@ namespace Ogre {
             }
         }
     }
-
-    uint GLES2Texture::getTextureId() {
-        return mTextureID;
-    }
 }

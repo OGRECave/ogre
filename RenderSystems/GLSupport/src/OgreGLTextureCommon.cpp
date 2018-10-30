@@ -33,10 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    
-uint GLTextureCommon::getTextureId() {
-    return 0;
-}
 
 void GLTextureCommon::readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT)
 {

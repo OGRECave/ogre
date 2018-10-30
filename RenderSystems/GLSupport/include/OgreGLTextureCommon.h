@@ -45,8 +45,6 @@ public:
     {
     }
 
-    virtual uint getTextureId();
-
     uint getGLID() const { return mTextureID; }
 
     void getCustomAttribute(const String& name, void* pData);
