@@ -856,19 +856,6 @@ namespace Ogre
         /** Sets how to rasterise triangles, as points, wireframe or solid polys. */
         virtual void _setPolygonMode(PolygonMode level) = 0;
 
-        /** Turns depth-stencil buffer checking on or off. 
-        @remarks
-        An inactive depth-stencil buffer can be read by a shader as a texture. An 
-        application that reads a depth-stencil buffer as a texture renders in two
-        passes, the first pass writes to the depth-stencil buffer and the second
-        pass reads from the buffer. This allows a shader to compare depth or
-        stencil values previously written to the buffer against the value for
-        the pixel currrently being rendered. The result of the comparison can
-        be used to create effects such as shadow mapping or soft particles
-        in a particle system.
-        */
-        // virtual void setDepthCheckEnabled(bool enabled) = 0;
-
         /** Turns stencil buffer checking on or off. 
         @remarks
         Stencilling (masking off areas of the rendering target based on the stencil 
@@ -876,22 +863,6 @@ namespace Ogre
         disabled.
         */
         virtual void setStencilCheckEnabled(bool enabled) = 0;
-        /** Determines if this system supports hardware accelerated stencil buffer. 
-        @remarks
-        Note that the lack of this function doesn't mean you can't do stencilling, but
-        the stencilling operations will be provided in software, which will NOT be
-        fast.
-        @par
-        Generally hardware stencils are only supported in 32-bit colour modes, because
-        the stencil buffer shares the memory of the z-buffer, and in most cards the 
-        z-buffer has to be the same depth as the colour buffer. This means that in 32-bit
-        mode, 24 bits of the z-buffer are depth and 8 bits are stencil. In 16-bit mode there
-        is no room for a stencil (although some cards support a 15:1 depth:stencil option,
-        this isn't useful for very much) so 8 bits of stencil are provided in software.
-        This can mean that if you use stencilling, your applications may be faster in 
-        32-but colour than in 16-bit, which may seem odd to some people.
-        */
-        /*virtual bool hasHardwareStencil(void) = 0;*/
 
         /** This method allows you to set all the stencil buffer parameters in one call.
         @remarks
