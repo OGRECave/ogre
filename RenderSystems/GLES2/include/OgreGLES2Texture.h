@@ -52,7 +52,6 @@ namespace Ogre {
             // Takes the OGRE texture type (1d/2d/3d/cube) and returns the appropriate GL one
             GLenum getGLES2TextureTarget(void) const;
             
-            
         protected:
             /// @copydoc Texture::createInternalResourcesImpl
             void createInternalResourcesImpl(void);

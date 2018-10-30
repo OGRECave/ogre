@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-
 void GLTextureCommon::readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT)
 {
     imgs.push_back(Image());
