@@ -129,13 +129,12 @@ namespace Ogre {
             mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);
 
         // Set some misc default parameters, these can of course be changed later
-        if(mTextureType == TEX_TYPE_EXTERNAL_OES)
-        {
-            mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        } else {
-            mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
-                                                            GL_TEXTURE_MIN_FILTER, ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
+        if(mTextureType == TEX_TYPE_EXTERNAL_OES && mNumRequestedMipmaps > 0) {
+            LogManager::getSingleton().logError("Mipmaps are not available for TEX_TYPE_EXTERNAL_OES");
         }
+
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, 
+                                                            GL_TEXTURE_MIN_FILTER, ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
