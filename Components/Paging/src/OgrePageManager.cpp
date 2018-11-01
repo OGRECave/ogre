@@ -67,7 +67,12 @@ namespace Ogre
     PageManager::~PageManager()
     {
         Root::getSingleton().removeFrameListener(&mEventRouter);
-
+        for (auto c : mCameraList)
+        {
+            c->removeListener(&mEventRouter);
+        }
+        mCameraList.clear();
+        
         OGRE_DELETE mGrid3DPageStrategy;
         OGRE_DELETE mGrid2DPageStrategy;
         OGRE_DELETE mSimpleCollectionFactory;
