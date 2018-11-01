@@ -93,8 +93,10 @@ void help(void)
     cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
     cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
     cout << "             Options are: 2.1, 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
-    cout << "-v2          Force export the mesh as a v2 object. Keeps the original format otherwise." << endl;
-    cout << "-v1          Force export the mesh as a v1 object. Keeps the original format otherwise." << endl;
+    cout << "-v2          Export the mesh as a v2 object. Keeps the original format otherwise." << endl;
+    cout << "             Use this format if you load the mesh by the SceneManager::createItem() method." << endl;
+    cout << "-v1          Export the mesh as a v1 object. Keeps the original format otherwise." << endl;
+    cout << "             Use this if you load the mesh by the SceneManager::createEntity() method or if you import from v1 to v2 at runtime." << endl;
     cout << "-O puqs    = Optimize vertex buffers for shaders." << endl;
     cout << "             p converts POSITION to 16-bit floats" << endl;
     cout << "             q converts normal tangent and bitangent (28-36 bytes) to QTangents (8 bytes)." << endl;
