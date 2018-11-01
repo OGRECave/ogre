@@ -174,16 +174,16 @@ namespace Ogre {
         // (RGBA = 8888)
 
         // Red
-        r = ((val32 >> 24) & 0xFF) / 255.0f;
+        r = float((val32 >> 24) & 0xFF) / 255.0f;
 
         // Green
-        g = ((val32 >> 16) & 0xFF) / 255.0f;
+        g = float((val32 >> 16) & 0xFF) / 255.0f;
 
         // Blue
-        b = ((val32 >> 8) & 0xFF) / 255.0f;
+        b = float((val32 >> 8) & 0xFF) / 255.0f;
 
         // Alpha
-        a = (val32 & 0xFF) / 255.0f;
+        a = float(val32 & 0xFF) / 255.0f;
     }
     //---------------------------------------------------------------------
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
@@ -196,16 +196,16 @@ namespace Ogre {
         // (ARGB = 8888)
 
         // Alpha
-        a = ((val32 >> 24) & 0xFF) / 255.0f;
+        a = float((val32 >> 24) & 0xFF) / 255.0f;
 
         // Red
-        r = ((val32 >> 16) & 0xFF) / 255.0f;
+        r = float((val32 >> 16) & 0xFF) / 255.0f;
 
         // Green
-        g = ((val32 >> 8) & 0xFF) / 255.0f;
+        g = float((val32 >> 8) & 0xFF) / 255.0f;
 
         // Blue
-        b = (val32 & 0xFF) / 255.0f;
+        b = float(val32 & 0xFF) / 255.0f;
     }
     //---------------------------------------------------------------------
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
@@ -218,16 +218,16 @@ namespace Ogre {
         // (ARGB = 8888)
 
         // Blue
-        b = ((val32 >> 24) & 0xFF) / 255.0f;
+        b = float((val32 >> 24) & 0xFF) / 255.0f;
 
         // Green
-        g = ((val32 >> 16) & 0xFF) / 255.0f;
+        g = float((val32 >> 16) & 0xFF) / 255.0f;
 
         // Red
-        r = ((val32 >> 8) & 0xFF) / 255.0f;
+        r = float((val32 >> 8) & 0xFF) / 255.0f;
 
         // Alpha
-        a = (val32 & 0xFF) / 255.0f;
+        a = float(val32 & 0xFF) / 255.0f;
     }
     //---------------------------------------------------------------------
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
@@ -240,16 +240,16 @@ namespace Ogre {
         // (ABGR = 8888)
 
         // Alpha
-        a = ((val32 >> 24) & 0xFF) / 255.0f;
+        a = float((val32 >> 24) & 0xFF) / 255.0f;
 
         // Blue
-        b = ((val32 >> 16) & 0xFF) / 255.0f;
+        b = float((val32 >> 16) & 0xFF) / 255.0f;
 
         // Green
-        g = ((val32 >> 8) & 0xFF) / 255.0f;
+        g = float((val32 >> 8) & 0xFF) / 255.0f;
 
         // Red
-        r = (val32 & 0xFF) / 255.0f;
+        r = float(val32 & 0xFF) / 255.0f;
     }
     //---------------------------------------------------------------------
     bool ColourValue::operator==(const ColourValue& rhs) const
@@ -268,19 +268,11 @@ namespace Ogre {
     void ColourValue::setHSB(float hue, float saturation, float brightness)
     {
         // wrap hue
-        if (hue > 1.0f)
-        {
-            hue -= (int)hue;
-        }
-        else if (hue < 0.0f)
-        {
-            hue += (int)hue + 1;
-        }
+        hue = std::fmod(hue, 1.0f);
+
         // clamp saturation / brightness
-        saturation = std::min(saturation, 1.0f);
-        saturation = std::max(saturation, 0.0f);
-        brightness = std::min(brightness, 1.0f);
-        brightness = std::max(brightness, 0.0f);
+        saturation = Math::saturate(saturation);
+        brightness = Math::saturate(brightness);
 
         if (brightness == 0.0f)
         {   
@@ -361,7 +353,7 @@ namespace Ogre {
 
         brightness = vMax;
 
-        if (Math::RealEqual(delta, 0.0f, 1e-6))
+        if (Math::RealEqual(delta, 0.0f, 1e-6f))
         {
             // grey
             hue = 0;
