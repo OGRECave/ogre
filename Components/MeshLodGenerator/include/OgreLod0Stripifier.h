@@ -60,7 +60,7 @@ namespace Ogre
 	struct Lod0Stripifier::RemapInfo
 	{
 		RemapInfo() : usedCount(0) { }
-		void prepare(unsigned originalSize) { usedCount = 0; indexMap.resize(originalSize, UnusedIdx); }
+		void prepare(size_t originalSize) { usedCount = 0; indexMap.resize(originalSize, UnusedIdx); }
 		template<typename IDX> void markUsedIndices(IDX* indices, size_t indexCount)
 		{
 			for(IDX *idx = indices, *idx_end = idx + indexCount; idx < idx_end; ++idx)
@@ -102,7 +102,7 @@ namespace Ogre
 
 			RemapInfo& remapInfo = remapInfos[submesh->useSharedVertices ? 0 : 1 + i];
 
-			for(ushort lod = mesh->getNumLodLevels() - 1; lod != 0; --lod) // intentionally skip lod0, visit in reverse order to improve vertex locality for high lods
+			for(int lod = mesh->getNumLodLevels() - 1; lod > 0; --lod) // intentionally skip lod0, visit in reverse order to improve vertex locality for high lods
 			{
 				IndexData *lodIndexData = submesh->mLodFaceList[lod - 1];
 				void* ptr = lodIndexData->indexBuffer->lock(
@@ -316,7 +316,7 @@ namespace Ogre
 				performVertexDataRemap(submesh->vertexData, remapInfo);
 			performBoneAssignmentRemap(submesh, remapInfo);
 
-			for(ushort lod = numLods - 1; lod != 0; --lod) // intentionally skip lod0
+			for(int lod = numLods - 1; lod > 0; --lod) // intentionally skip lod0
 			{
 				IndexData *lodIndexData = submesh->mLodFaceList[lod - 1]; // lod0 is stored separately
 				performIndexDataRemap(lodIndexData, remapInfo);
@@ -328,8 +328,8 @@ namespace Ogre
 		}
 
 		for(ushort lod = 1; lod < numLods - 1; ++lod)
-			mesh->_setLodUsage(lod, mesh->getLodLevel(lod + 1));
-		mesh->_setLodInfo(numLods - 1);
+			mesh->_setLodUsage(lod, mesh->getLodLevel(ushort(lod + 1)));
+		mesh->_setLodInfo(ushort(numLods - 1));
 
 
 		PoseList::const_iterator it;

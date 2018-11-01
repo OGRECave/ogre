@@ -79,7 +79,7 @@ namespace Ogre
         @param farDist The far plane to use for the last split
         @param lambda Factor to use to reduce the split size 
         */
-        void calculateSplitPoints(uint splitCount, Real nearDist, Real farDist, Real lambda = 0.95);
+        void calculateSplitPoints(uint splitCount, Real nearDist, Real farDist, Real lambda = 0.95f);
 
         /** Manually configure a new splitting scheme.
         @param newSplitPoints A list which is splitCount + 1 entries long, containing the

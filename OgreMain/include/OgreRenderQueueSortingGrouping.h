@@ -264,7 +264,7 @@ namespace Ogre {
         */
         void addOrganisationMode(OrganisationMode om) 
         { 
-            mOrganisationMode |= om; 
+            mOrganisationMode |= uint8(om);
         }
 
         /// Add a renderable to the collection using a given pass
@@ -641,7 +641,7 @@ namespace Ogre {
         */
         void addOrganisationMode(QueuedRenderableCollection::OrganisationMode om)
         {
-            mOrganisationMode |= om;
+            mOrganisationMode |= uint8(om);
 
             PriorityMap::iterator i, iend;
             iend = mPriorityGroups.end();

@@ -232,7 +232,7 @@ namespace Ogre {
         {
             if(value <= 0.0f) return 0;
             else if (value >= 1.0f) return (1<<bits)-1;
-            else return (unsigned int)(value * (1<<bits));     
+            else return (unsigned int)(value * float(1<<bits));
         }
 
         /**

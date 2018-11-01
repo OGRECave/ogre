@@ -567,9 +567,9 @@ namespace OgreBites
         */
         Ogre::Real getSnappedValue(Ogre::Real percentage)
         {
-            percentage = Ogre::Math::Clamp<Ogre::Real>(percentage, 0, 1);
+            percentage = Ogre::Math::saturate(percentage);
             unsigned int whichMarker = (unsigned int) (percentage * (mMaxValue - mMinValue) / mInterval + 0.5);
-            return whichMarker * mInterval + mMinValue;
+            return float(whichMarker) * mInterval + mMinValue;
         }
 
         Ogre::TextAreaOverlayElement* mTextArea;
@@ -928,7 +928,7 @@ namespace OgreBites
         script parsing takes up most time, so the default value is 0.7.
         */
         void showLoadingBar(unsigned int numGroupsInit = 1, unsigned int numGroupsLoad = 1,
-            Ogre::Real initProportion = 0.7);
+            Ogre::Real initProportion = 0.7f);
 
         void hideLoadingBar();
 
@@ -1079,7 +1079,7 @@ namespace OgreBites
 
         void resourceGroupScriptingStarted(const Ogre::String& groupName, size_t scriptCount)
         {
-            mLoadInc = mGroupInitProportion / scriptCount;
+            mLoadInc = mGroupInitProportion / float(scriptCount);
             mLoadBar->setCaption("Parsing...");
             windowUpdate();
         }
@@ -1098,7 +1098,7 @@ namespace OgreBites
 
         void resourceGroupLoadStarted(const Ogre::String& groupName, size_t resourceCount)
         {
-            mLoadInc = mGroupLoadProportion / resourceCount;
+            mLoadInc = mGroupLoadProportion / float(resourceCount);
             mLoadBar->setCaption("Loading...");
             windowUpdate();
         }
