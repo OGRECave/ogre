@@ -222,6 +222,8 @@ namespace Ogre {
                             width, height, depth, 0, 
                             size, &tmpdata[0]);
                         break;
+                    case TEX_TYPE_EXTERNAL_OES:
+                        LogManager::getSingleton().logError("Mipmaps are not available for TEX_TYPE_EXTERNAL_OES");
                 };
                 
                 if(width > 1)
@@ -262,6 +264,9 @@ namespace Ogre {
                 case TEX_TYPE_2D_ARRAY:
                 case TEX_TYPE_3D:
                     OGRE_CHECK_GL_ERROR(glTexStorage3D(getGLES2TextureTarget(), GLsizei(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                    break;
+                case TEX_TYPE_EXTERNAL_OES:
+                    // No available for TEX_TYPE_EXTERNAL_OES
                     break;
             }
             return;
