@@ -195,7 +195,7 @@ INLINE void ClipQuadToHorizon( inout float3 L[5], out int n )
 }
 
 INLINE float LTC_Evaluate( float3 N, float3 V, float3 P, float3x3 Minv,
-							@property( syntax == metal )constant@end float3 points[4],
+							@property( syntax == metal )constant@end  float3 points[4],
 							bool twoSided )
 {
 	// construct orthonormal basis around N
