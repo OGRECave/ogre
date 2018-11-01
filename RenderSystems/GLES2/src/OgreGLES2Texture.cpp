@@ -266,7 +266,7 @@ namespace Ogre {
                     OGRE_CHECK_GL_ERROR(glTexStorage3D(getGLES2TextureTarget(), GLsizei(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height), GLsizei(depth)));
                     break;
                 case TEX_TYPE_EXTERNAL_OES:
-                    // No available for TEX_TYPE_EXTERNAL_OES
+                    // Not available for TEX_TYPE_EXTERNAL_OES
                     break;
             }
             return;

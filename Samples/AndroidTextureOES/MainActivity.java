@@ -133,7 +133,7 @@ public class MainActivity extends Activity {
                 1080,
                 1920,
                 0,
-                PixelFormat.PF_R8G8B8A8
+                PixelFormat.PF_UNKNOWN
         );
 
         textureId = texturePtr.getCustomAttribute("GLID");

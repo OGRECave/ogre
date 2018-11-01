@@ -262,7 +262,9 @@ namespace Ogre {
                 case TEX_TYPE_3D:
                     OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
                     break;
-                }
+                case TEX_TYPE_EXTERNAL_OES:
+                    // Not available for TEX_TYPE_EXTERNAL_OES
+                    break;
             }
             else
             {
