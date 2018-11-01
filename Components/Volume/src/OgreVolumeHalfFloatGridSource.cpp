@@ -74,9 +74,7 @@ namespace Volume {
 #endif
         if (!ser.readChunkBegin(VOLUME_CHUNK_ID, VOLUME_CHUNK_VERSION))
         {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                "Invalid volume file given!",
-                __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Invalid volume file given!");
         }
         
         // Read header

@@ -124,9 +124,7 @@ namespace Ogre {
         EGL_CHECK_ERROR
         if (!ret)
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to make context current",
-                        __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to make context current");
         }
     }
 

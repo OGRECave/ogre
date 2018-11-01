@@ -297,9 +297,7 @@ namespace Ogre {
 
                 break;
             default:
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                    "Unsupported render operation type", 
-                    __FUNCTION__);
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported render operation type");
             }
             facesNode->SetAttribute("count", 
                 StringConverter::toString(numFaces));
@@ -825,8 +823,8 @@ namespace Ogre {
 
                         break;
                     default:
-                        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "operationType not implemented", 
-                            __FUNCTION__);
+                        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                                    "operationType not implemented");
                     }
 
                     // Allocate space

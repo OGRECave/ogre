@@ -222,9 +222,7 @@ namespace Ogre {
 
         if (eglGetConfigAttrib(glDisplay, glConfig, EGL_NATIVE_VISUAL_ID, &vid) == EGL_FALSE)
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to get VISUAL_ID from glConfig",
-                        __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to get VISUAL_ID from glConfig");
             return 0;
         }
         EGL_CHECK_ERROR
@@ -243,9 +241,7 @@ namespace Ogre {
                             &tmp, &n);
         if (vi == 0)
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to get X11 VISUAL",
-                        __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to get X11 VISUAL");
             return 0;
         }
 

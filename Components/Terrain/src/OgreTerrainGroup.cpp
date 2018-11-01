@@ -964,8 +964,7 @@ namespace Ogre
     void TerrainGroup::loadGroupDefinition(StreamSerialiser& ser)
     {
         if (!ser.readChunkBegin(CHUNK_ID, CHUNK_VERSION))
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Stream does not contain TerrainGroup data", __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Stream does not contain TerrainGroup data");
 
         // Base details
         ser.read(&mAlignment);

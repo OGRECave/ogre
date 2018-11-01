@@ -1050,7 +1050,7 @@ namespace Ogre {
             {
                 OGRE_DELETE_T(fs, basic_fstream, MEMCATEGORY_GENERAL);
                 OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
-                "Can't open " + filename + " for writing", __FUNCTION__);
+                            "Can't open " + filename + " for writing");
             }
 
             stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, fs));
@@ -1076,8 +1076,7 @@ namespace Ogre {
         if(!*ifs)
         {
             OGRE_DELETE_T(ifs, basic_ifstream, MEMCATEGORY_GENERAL);
-            OGRE_EXCEPT(
-                Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!");
         }
         return DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, ifs));
     }

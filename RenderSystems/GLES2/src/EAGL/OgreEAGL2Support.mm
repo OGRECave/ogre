@@ -206,9 +206,7 @@ namespace Ogre {
         EAGLES2Context *context = new EAGLES2Context(drawable, group);
         if (context == NULL)
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to create new context",
-                        __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to create new context");
             return context;
         }
 

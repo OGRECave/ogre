@@ -1338,8 +1338,7 @@ namespace Ogre {
     {
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting Frustrum orientation mode is not supported",
-                    __FUNCTION__);
+                    "Setting Frustrum orientation mode is not supported");
 #endif
         mOrientationMode = orientationMode;
         invalidateFrustum();
@@ -1349,8 +1348,7 @@ namespace Ogre {
     {
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting Frustrum orientation mode is not supported",
-                    __FUNCTION__);
+                    "Getting Frustrum orientation mode is not supported");
 #endif
         return mOrientationMode;
     }

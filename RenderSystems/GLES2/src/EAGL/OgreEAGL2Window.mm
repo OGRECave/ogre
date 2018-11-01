@@ -428,9 +428,7 @@ namespace Ogre {
         if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER] == NO)
         {
             glGetError();
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Failed to swap buffers in ",
-                        __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to swap buffers in ");
         }
     }
 
@@ -479,7 +477,7 @@ namespace Ogre {
         || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight() || dst.getDepth() != 1
         || dst.getWidth() != dst.rowPitch /* GLES2 does not support GL_PACK_ROW_LENGTH, nor iOS supports GL_NV_pack_subimage */)
 		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", __FUNCTION__ );
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.");
 		}
 
 		if (buffer == FB_AUTO)

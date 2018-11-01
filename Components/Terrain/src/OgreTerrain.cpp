@@ -1127,8 +1127,7 @@ namespace Ogre
             load();
         else
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-            "Error while preparing " + filename + ", see log for details", 
-            __FUNCTION__);
+            "Error while preparing " + filename + ", see log for details");
     }
     //---------------------------------------------------------------------
     void Terrain::load(StreamSerialiser& stream)
@@ -1137,8 +1136,7 @@ namespace Ogre
             load();
         else
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-            "Error while preparing from stream, see log for details", 
-            __FUNCTION__);
+            "Error while preparing from stream, see log for details");
     }
     //---------------------------------------------------------------------
     void Terrain::load(int lodLevel, bool synchronous)
@@ -4335,7 +4333,7 @@ namespace Ogre
         {
             if (isLoaded())
                 OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                "Cannot alter the allocator when loaded!", __FUNCTION__);
+                "Cannot alter the allocator when loaded!");
 
             mCustomGpuBufferAllocator = alloc;
         }

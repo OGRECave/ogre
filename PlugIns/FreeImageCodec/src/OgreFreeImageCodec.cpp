@@ -315,9 +315,8 @@ namespace Ogre {
             if (conversionRequired)
                 OGRE_FREE(convBox.data, MEMCATEGORY_GENERAL);
 
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "FreeImage_AllocateT failed - possibly out of memory. ", 
-                __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "FreeImage_AllocateT failed - possibly out of memory. ");
         }
 
         if (requiredFormat == PF_L8 || requiredFormat == PF_A8)

@@ -174,8 +174,7 @@ namespace Ogre
         if (texCoordSet > 8)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Requested options require too many texture coordinate sets! Try reducing the number of layers.",
-                        __FUNCTION__);
+                        "Requested options require too many texture coordinate sets! Try reducing the number of layers.");
         }
 
         outStream << "void main(void) {\n";
@@ -361,8 +360,7 @@ namespace Ogre
         if (currentSamplerIdx > 16)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Requested options require too many texture samplers! Try reducing the number of layers.",
-                        __FUNCTION__);
+                        "Requested options require too many texture samplers! Try reducing the number of layers.");
         }
 
         outStream << "void main(void) {\n"
