@@ -116,8 +116,8 @@ namespace Ogre
              Vector3 lightSpacePos = q.Inverse() * pos;
              
              //snap to nearest texel
-             lightSpacePos.x -= fmod(lightSpacePos.x, worldTexelSize);
-             lightSpacePos.y -= fmod(lightSpacePos.y, worldTexelSize);
+             lightSpacePos.x -= std::fmod(lightSpacePos.x, worldTexelSize);
+             lightSpacePos.y -= std::fmod(lightSpacePos.y, worldTexelSize);
 
              //convert back to world space
              pos = q * lightSpacePos;

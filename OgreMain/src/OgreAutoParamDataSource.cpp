@@ -908,28 +908,28 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getTime_0_X(Real x) const
     {
-        return fmod(this->getTime(), x);
+        return std::fmod(this->getTime(), x);
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getCosTime_0_X(Real x) const
     { 
-        return cos(this->getTime_0_X(x)); 
+        return std::cos(this->getTime_0_X(x));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getSinTime_0_X(Real x) const
     { 
-        return sin(this->getTime_0_X(x)); 
+        return std::sin(this->getTime_0_X(x));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getTanTime_0_X(Real x) const
     { 
-        return tan(this->getTime_0_X(x)); 
+        return std::tan(this->getTime_0_X(x));
     }
     //-----------------------------------------------------------------------------
     Vector4 AutoParamDataSource::getTime_0_X_packed(Real x) const
     {
         Real t = this->getTime_0_X(x);
-        return Vector4(t, sin(t), cos(t), tan(t));
+        return Vector4(t, std::sin(t), std::cos(t), std::tan(t));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getTime_0_1(Real x) const
@@ -939,23 +939,23 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getCosTime_0_1(Real x) const
     { 
-        return cos(this->getTime_0_1(x)); 
+        return std::cos(this->getTime_0_1(x));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getSinTime_0_1(Real x) const
     { 
-        return sin(this->getTime_0_1(x)); 
+        return std::sin(this->getTime_0_1(x));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getTanTime_0_1(Real x) const
     { 
-        return tan(this->getTime_0_1(x)); 
+        return std::tan(this->getTime_0_1(x));
     }
     //-----------------------------------------------------------------------------
     Vector4 AutoParamDataSource::getTime_0_1_packed(Real x) const
     {
         Real t = this->getTime_0_1(x);
-        return Vector4(t, sin(t), cos(t), tan(t));
+        return Vector4(t, std::sin(t), std::cos(t), std::tan(t));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getTime_0_2Pi(Real x) const
@@ -965,23 +965,23 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getCosTime_0_2Pi(Real x) const
     { 
-        return cos(this->getTime_0_2Pi(x)); 
+        return std::cos(this->getTime_0_2Pi(x));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getSinTime_0_2Pi(Real x) const
     { 
-        return sin(this->getTime_0_2Pi(x)); 
+        return std::sin(this->getTime_0_2Pi(x));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getTanTime_0_2Pi(Real x) const
     { 
-        return tan(this->getTime_0_2Pi(x)); 
+        return std::tan(this->getTime_0_2Pi(x));
     }
     //-----------------------------------------------------------------------------
     Vector4 AutoParamDataSource::getTime_0_2Pi_packed(Real x) const
     {
         Real t = this->getTime_0_2Pi(x);
-        return Vector4(t, sin(t), cos(t), tan(t));
+        return Vector4(t, std::sin(t), std::cos(t), std::tan(t));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getFrameTime(void) const
