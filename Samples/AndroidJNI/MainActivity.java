@@ -26,9 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-package org.Ogre.example;
+package org.ogre.example;
 
-import org.Ogre.*;
+import org.ogre.*;
 
 import android.app.Activity;
 import android.hardware.Sensor;

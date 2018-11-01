@@ -29,7 +29,7 @@ else()
 	add_definitions(-Wno-strict-aliasing -Wno-cast-qual -Wno-shadow -Wno-missing-declarations)
 endif()
 
-set(CMAKE_SWIG_FLAGS -w401,314 -package org.Ogre)
+set(CMAKE_SWIG_FLAGS -w401,314 -package org.ogre)
 
 if (APPLE AND NOT ANDROID)
 	# we are using libc++ on OSX
@@ -37,7 +37,7 @@ if (APPLE AND NOT ANDROID)
 endif()
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/java/libs")
-set(CMAKE_SWIG_OUTDIR "${OGRE_BINARY_DIR}/java/src/org/Ogre")
+set(CMAKE_SWIG_OUTDIR "${OGRE_BINARY_DIR}/java/src/org/ogre")
 
 if(ANDROID)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${ANDROID_NDK_ABI_NAME}")
@@ -79,7 +79,7 @@ if(${Java_FOUND})
 	set(JAR_NAME "${OGRE_BINARY_DIR}/java/Ogre-${OGRE_VERSION}.jar")
 	file(MAKE_DIRECTORY ${CLASS_OUTPUT_PATH})
 	add_custom_command(TARGET ${SWIG_MODULE_OgreJNI_REAL_NAME} POST_BUILD
-    	COMMAND "${Java_JAVAC_EXECUTABLE}" -d ${CLASS_OUTPUT_PATH} "${OGRE_BINARY_DIR}/java/src/org/Ogre/*.java" 
+    	COMMAND "${Java_JAVAC_EXECUTABLE}" -d ${CLASS_OUTPUT_PATH} "${OGRE_BINARY_DIR}/java/src/org/ogre/*.java"
 		COMMAND "${Java_JAR_EXECUTABLE}" cf ${JAR_NAME} -C ${CLASS_OUTPUT_PATH} .
 	)
 endif()
