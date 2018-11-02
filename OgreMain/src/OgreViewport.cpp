@@ -225,8 +225,7 @@ namespace Ogre {
     {
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting Viewport orientation mode is not supported",
-                    __FUNCTION__);
+                    "Setting Viewport orientation mode is not supported");
 #endif
         mOrientationMode = orientationMode;
 
@@ -256,8 +255,7 @@ namespace Ogre {
     {
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting Viewport orientation mode is not supported",
-                    __FUNCTION__);
+                    "Getting Viewport orientation mode is not supported");
 #endif
         return mOrientationMode;
     }
@@ -266,8 +264,7 @@ namespace Ogre {
     {
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting default Viewport orientation mode is not supported",
-                    __FUNCTION__);
+                    "Setting default Viewport orientation mode is not supported");
 #endif
         mDefaultOrientationMode = orientationMode;
     }
@@ -276,8 +273,7 @@ namespace Ogre {
     {
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting default Viewport orientation mode is not supported",
-                    __FUNCTION__);
+                    "Getting default Viewport orientation mode is not supported");
 #endif
         return mDefaultOrientationMode;
     }

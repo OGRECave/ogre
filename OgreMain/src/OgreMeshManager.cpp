@@ -427,8 +427,7 @@ namespace Ogre
     {
         if ((params.xsegments + 1) * (params.ysegments + 1) > 65536)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Plane tessellation is too high, must generate max 65536 vertices", 
-                __FUNCTION__);
+                "Plane tessellation is too high, must generate max 65536 vertices");
         SubMesh *pSub = pMesh->createSubMesh();
 
         // Set up vertex data
@@ -578,8 +577,7 @@ namespace Ogre
     {
         if ((params.xsegments + 1) * (params.ysegments + 1) > 65536)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Plane tessellation is too high, must generate max 65536 vertices", 
-                __FUNCTION__);
+                "Plane tessellation is too high, must generate max 65536 vertices");
         SubMesh *pSub = pMesh->createSubMesh();
 
         // Set options
@@ -736,8 +734,7 @@ namespace Ogre
 
         if ((params.xsegments + 1) * (params.ySegmentsToKeep + 1) > 65536)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Plane tessellation is too high, must generate max 65536 vertices", 
-                __FUNCTION__);
+                "Plane tessellation is too high, must generate max 65536 vertices");
         SubMesh *pSub = pMesh->createSubMesh();
 
 

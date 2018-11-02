@@ -410,7 +410,7 @@ namespace Ogre {
             interval The sampling interval used to generate particles, apply affectors etc. The lower this
             is the more realistic the fast-forward, but it takes more iterations to do it.
         */
-        void fastForward(Real time, Real interval = 0.1);
+        void fastForward(Real time, Real interval = 0.1f);
 
         /** Sets a 'speed factor' on this particle system, which means it scales the elapsed
             real time which has passed by this factor before passing it to the emitters, affectors,

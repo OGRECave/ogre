@@ -243,7 +243,7 @@ namespace Ogre
             else
             {
                 Real costheta = v1.dotProduct(v2) / (len1 * len2);
-                anglesum += acos(costheta);
+                anglesum += std::acos(costheta);
             }
         }
 

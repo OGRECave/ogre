@@ -321,7 +321,7 @@ namespace Ogre
         template<typename U>
         explicit Vector(const U* _ptr) {
             for (int i = 0; i < dims; i++)
-                ptr()[i] = _ptr[i];
+                ptr()[i] = T(_ptr[i]);
         }
 
         template<typename U>
@@ -373,7 +373,7 @@ namespace Ogre
         @param tolerance The amount that each element of the vector may vary by
             and still be considered equal
         */
-        bool positionEquals(const Vector& rhs, Real tolerance = 1e-03) const
+        bool positionEquals(const Vector& rhs, Real tolerance = 1e-03f) const
         {
             for (int i = 0; i < dims; i++)
                 if (!Math::RealEqual(ptr()[i], rhs[i], tolerance))

@@ -255,7 +255,7 @@ namespace Ogre {
             therefore be careful if your code relies in the order of the operands.
             This is specially important in IK animation.
         */
-        inline bool orientationEquals( const Quaternion& other, Real tolerance = 1e-3 ) const
+        inline bool orientationEquals( const Quaternion& other, Real tolerance = 1e-3f ) const
         {
             Real d = this->Dot(other);
             return 1 - d*d < tolerance;

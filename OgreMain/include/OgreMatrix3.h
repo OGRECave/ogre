@@ -145,8 +145,8 @@ namespace Ogre
 
         // utilities
         Matrix3 Transpose () const;
-        bool Inverse (Matrix3& rkInverse, Real fTolerance = 1e-06) const;
-        Matrix3 Inverse (Real fTolerance = 1e-06) const;
+        bool Inverse (Matrix3& rkInverse, Real fTolerance = 1e-06f) const;
+        Matrix3 Inverse (Real fTolerance = 1e-06f) const;
         Real Determinant () const;
 
         Matrix3 transpose() const { return Transpose(); }

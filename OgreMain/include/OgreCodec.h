@@ -82,8 +82,8 @@ namespace Ogre {
         {
             CodecList::iterator i = msMapCodecs.find(pCodec->getType());
             if (i != msMapCodecs.end())
-                OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-                    pCodec->getType() + " already has a registered codec. ", __FUNCTION__);
+                OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+                            pCodec->getType() + " already has a registered codec.");
 
             msMapCodecs[pCodec->getType()] = pCodec;
         }

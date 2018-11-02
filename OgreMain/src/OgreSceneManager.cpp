@@ -1472,7 +1472,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     if (mCameraRelativeRendering)
     {
         mCachedViewMatrix.setTrans(Vector3::ZERO);
-        mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
     }
     mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
 
@@ -1997,34 +1996,16 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
 void SceneManager::setWorldTransform(Renderable* rend, bool fixedFunction)
 {
     // Set world transformation
-    ushort numMatrices = rend->getNumWorldTransforms();
-    
-    if (numMatrices > 0)
+    if (fixedFunction)
     {
-        rend->getWorldTransforms(reinterpret_cast<Matrix4*>(mTempXform));
-
-        if (mCameraRelativeRendering && !rend->getUseIdentityView())
-        {
-            for (ushort i = 0; i < numMatrices; ++i)
-            {
-                mTempXform[i].setTrans(mTempXform[i].getTrans() - mCameraRelativePosition);
-            }
-        }
-
-        if (fixedFunction)
-        {
-            // Set hardware matrix to nothing for vertex blending
-            mDestRenderSystem->_setWorldMatrix(numMatrices > 1 ? Matrix4::IDENTITY : *mTempXform);
-        }
+        mDestRenderSystem->_setWorldMatrix(mAutoParamDataSource->getWorldMatrix());
     }
+
     // Issue view / projection changes if any
     useRenderableViewProjMode(rend, fixedFunction);
 
     // mark per-object params as dirty
     mGpuParamsDirty |= (uint16)GPV_PER_OBJECT;
-
-    // Tell auto params object about the world matrices, eliminated query from renderable again
-    mAutoParamDataSource->setWorldMatrices(mTempXform, numMatrices);
 }
 //-----------------------------------------------------------------------
 void SceneManager::issueRenderWithLights(Renderable* rend, const Pass* pass,
@@ -2078,11 +2059,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     // pass the FFP transform state to shader
     bool passTransformState = !vprog || vprog->getPassTransformStates();
 
-    if (pass->isProgrammable())
-    {
-        // Tell auto params object about the renderable change
-        mAutoParamDataSource->setCurrentRenderable(rend);
-    }
+    // Tell auto params object about the renderable change
+    mAutoParamDataSource->setCurrentRenderable(rend);
 
     setWorldTransform(rend, passTransformState);
 
@@ -2119,7 +2097,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     // Assume first world matrix representative - shaders that use multiple
     // matrices should control renormalisation themselves
     if ((pass->getNormaliseNormals() || mNormaliseNormalsOnScale) &&
-        mTempXform[0].linear().hasScale())
+        mAutoParamDataSource->getWorldMatrix().linear().hasScale())
         mDestRenderSystem->setNormaliseNormals(true);
     else
         mDestRenderSystem->setNormaliseNormals(false);
@@ -2130,7 +2108,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     {
         CullingMode cullMode = mPassCullingMode;
 
-        if (mTempXform[0].linear().hasNegativeScale())
+        if (mAutoParamDataSource->getWorldMatrix().linear().hasNegativeScale())
         {
             switch(mPassCullingMode)
             {
@@ -3822,7 +3800,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     if (mCameraRelativeRendering)
     {
         mCachedViewMatrix.setTrans(Vector3::ZERO);
-        mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
     }
     mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, mCameraInProgress->getDerivedPosition());
 

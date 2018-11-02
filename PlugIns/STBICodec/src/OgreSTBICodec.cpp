@@ -51,7 +51,7 @@ static Ogre::uchar* custom_zlib_compress(Ogre::uchar* data, int data_len, int* o
     if (ret != Z_OK)
     {
         free(dest);
-        OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR, "compress failed", __FUNCTION__);
+        OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR, "compress failed");
     }
 
     *out_len = destLen;

@@ -1231,8 +1231,7 @@ namespace Ogre {
         if (!programUsage)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "This pass does not have this program type assigned!",
-                __FUNCTION__);
+                "This pass does not have this program type assigned!");
         }
         programUsage->setParameters(params);
     }
@@ -1338,8 +1337,7 @@ namespace Ogre {
         if (!programUsage)
         {
             OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
-                "This pass does not have this program type assigned!",
-                __FUNCTION__);
+                "This pass does not have this program type assigned!");
         }
         return programUsage->getParameters();
     }

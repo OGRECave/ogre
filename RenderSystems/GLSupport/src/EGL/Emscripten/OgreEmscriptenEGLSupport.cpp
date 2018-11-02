@@ -85,8 +85,7 @@ namespace Ogre {
                 if (eglGetConfigAttrib(mGLDisplay, configs[config], attribList[attrib], &value) == EGL_FALSE)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                                "Failed to get config attribute",
-                                __FUNCTION__);
+                                "Failed to get config attribute");
 
                     *nElements = 0;
                     free(configs);

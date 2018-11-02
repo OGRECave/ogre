@@ -298,11 +298,7 @@ namespace Ogre
         Real input = getAdjustedInput(source * mFrequency);
         Real output = 0;
         // For simplicity, factor input down to {0,1)
-        // Use looped subtract rather than divide / round
-        while (input >= 1.0)
-            input -= 1.0;
-        while (input < 0.0)
-            input += 1.0;
+        input = std::fmod(input, Real(1));
 
         // Calculate output in -1..1 range
         switch (mWaveType)

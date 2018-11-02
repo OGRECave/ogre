@@ -317,9 +317,7 @@ namespace Volume {
         if (parameters->baseError == (Real)0.0 || parameters->errorMultiplicator == (Real)0.0 ||
             parameters->sceneManager == 0 || parameters->src == 0)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Invalid parameters given!",
-                __FUNCTION__);
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid parameters given!");
         }
         
         isRoot = true;

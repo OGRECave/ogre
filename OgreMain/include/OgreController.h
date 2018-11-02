@@ -65,13 +65,8 @@ namespace Ogre {
         {
             if (mDeltaInput)
             {
-                mDeltaCount += input;
                 // Wrap
-                while (mDeltaCount >= 1.0)
-                    mDeltaCount -= 1.0;
-                while (mDeltaCount < 0.0)
-                    mDeltaCount += 1.0;
-
+                mDeltaCount = std::fmod(mDeltaCount + input, 1.0f);
                 return mDeltaCount;
             }
             else

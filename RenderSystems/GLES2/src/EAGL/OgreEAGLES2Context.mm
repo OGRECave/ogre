@@ -67,8 +67,7 @@ namespace Ogre {
         if (!mContext || ![EAGLContext setCurrentContext:mContext])
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Unable to create a suitable EAGLContext",
-                        __FUNCTION__);
+                        "Unable to create a suitable EAGLContext");
         }
 
 #ifdef __IPHONE_7_1
@@ -115,8 +114,7 @@ namespace Ogre {
         {
             glGetError();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Failed to bind the drawable to a renderbuffer object",
-                        __FUNCTION__);
+                        "Failed to bind the drawable to a renderbuffer object");
             return false;
         }
 
@@ -159,8 +157,7 @@ namespace Ogre {
             {
                 glGetError();
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Failed to make a complete FSAA framebuffer object",
-                            __FUNCTION__);
+                            "Failed to make a complete FSAA framebuffer object");
                 return false;
             }
         }
@@ -182,8 +179,7 @@ namespace Ogre {
         {
             glGetError();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Failed to make a complete framebuffer object",
-                        __FUNCTION__);
+                        "Failed to make a complete framebuffer object");
             return false;
         }
 
@@ -229,8 +225,7 @@ namespace Ogre {
         if (!ret)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Failed to make context current",
-                        __FUNCTION__);
+                        "Failed to make context current");
         }
     }
 

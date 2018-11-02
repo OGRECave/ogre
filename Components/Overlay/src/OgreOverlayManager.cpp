@@ -579,8 +579,7 @@ namespace Ogre {
     {
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting ViewPort orientation mode is not supported",
-                    __FUNCTION__);
+                    "Getting ViewPort orientation mode is not supported");
 #endif
         return mLastViewportOrientationMode;
     }

@@ -840,66 +840,21 @@ namespace Ogre
         virtual void _convertProjectionMatrix(const Matrix4& matrix,
             Matrix4& dest, bool forGpuProgram = false) = 0;
 
-        /** Builds a perspective projection matrix suitable for this render system.
-        @remarks
-        Because different APIs have different requirements (some incompatible) for the
-        projection matrix, this method allows each to implement their own correctly and pass
-        back a generic OGRE matrix for storage in the engine.
-        */
-        virtual void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
+        /// @deprecated use Frustum::getProjectionMatrixRS
+        OGRE_DEPRECATED virtual void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane,
             Matrix4& dest, bool forGpuProgram = false) = 0;
-
-        /** Builds a perspective projection matrix for the case when frustum is
-        not centered around camera.
-        @remarks
-        Viewport coordinates are in camera coordinate frame, i.e. camera is 
-        at the origin.
-        */
-        virtual void _makeProjectionMatrix(Real left, Real right, Real bottom, Real top, 
+        /// @deprecated use Frustum::getProjectionMatrixRS
+        OGRE_DEPRECATED virtual void _makeProjectionMatrix(Real left, Real right, Real bottom, Real top,
             Real nearPlane, Real farPlane, Matrix4& dest, bool forGpuProgram = false) = 0;
-        /** Builds an orthographic projection matrix suitable for this render system.
-        @remarks
-        Because different APIs have different requirements (some incompatible) for the
-        projection matrix, this method allows each to implement their own correctly and pass
-        back a generic OGRE matrix for storage in the engine.
-        */
-        virtual void _makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
+        /// @deprecated use Frustum::getProjectionMatrixRS
+        OGRE_DEPRECATED virtual void _makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane,
             Matrix4& dest, bool forGpuProgram = false) = 0;
-
-        /** Update a perspective projection matrix to use 'oblique depth projection'.
-        @remarks
-        This method can be used to change the nature of a perspective 
-        transform in order to make the near plane not perpendicular to the 
-        camera view direction, but to be at some different orientation. 
-        This can be useful for performing arbitrary clipping (e.g. to a 
-        reflection plane) which could otherwise only be done using user
-        clip planes, which are more expensive, and not necessarily supported
-        on all cards.
-        @param matrix The existing projection matrix. Note that this must be a
-        perspective transform (not orthographic), and must not have already
-        been altered by this method. The matrix will be altered in-place.
-        @param plane The plane which is to be used as the clipping plane. This
-        plane must be in CAMERA (view) space.
-        @param forGpuProgram Is this for use with a Gpu program or fixed-function
-        */
-        virtual void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, 
+        /// @deprecated use Frustum::getProjectionMatrixRS
+        OGRE_DEPRECATED virtual void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
             bool forGpuProgram) = 0;
 
         /** Sets how to rasterise triangles, as points, wireframe or solid polys. */
         virtual void _setPolygonMode(PolygonMode level) = 0;
-
-        /** Turns depth-stencil buffer checking on or off. 
-        @remarks
-        An inactive depth-stencil buffer can be read by a shader as a texture. An 
-        application that reads a depth-stencil buffer as a texture renders in two
-        passes, the first pass writes to the depth-stencil buffer and the second
-        pass reads from the buffer. This allows a shader to compare depth or
-        stencil values previously written to the buffer against the value for
-        the pixel currrently being rendered. The result of the comparison can
-        be used to create effects such as shadow mapping or soft particles
-        in a particle system.
-        */
-        // virtual void setDepthCheckEnabled(bool enabled) = 0;
 
         /** Turns stencil buffer checking on or off. 
         @remarks
@@ -908,22 +863,6 @@ namespace Ogre
         disabled.
         */
         virtual void setStencilCheckEnabled(bool enabled) = 0;
-        /** Determines if this system supports hardware accelerated stencil buffer. 
-        @remarks
-        Note that the lack of this function doesn't mean you can't do stencilling, but
-        the stencilling operations will be provided in software, which will NOT be
-        fast.
-        @par
-        Generally hardware stencils are only supported in 32-bit colour modes, because
-        the stencil buffer shares the memory of the z-buffer, and in most cards the 
-        z-buffer has to be the same depth as the colour buffer. This means that in 32-bit
-        mode, 24 bits of the z-buffer are depth and 8 bits are stencil. In 16-bit mode there
-        is no room for a stencil (although some cards support a 15:1 depth:stencil option,
-        this isn't useful for very much) so 8 bits of stencil are provided in software.
-        This can mean that if you use stencilling, your applications may be faster in 
-        32-but colour than in 16-bit, which may seem odd to some people.
-        */
-        /*virtual bool hasHardwareStencil(void) = 0;*/
 
         /** This method allows you to set all the stencil buffer parameters in one call.
         @remarks

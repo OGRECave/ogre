@@ -363,7 +363,7 @@ namespace Ogre
             // It's point or spotlight
             Vector4 displacement = oldPt - pinhole;
             Vector3 displace3    = Vector3(displacement.x, displacement.y, displacement.z);
-            Real dotProd = fabs(displace3.dotProduct(worldPlane.normal));
+            Real dotProd = std::fabs(displace3.dotProduct(worldPlane.normal));
             static const Real NEAR_FACTOR = 0.05;
             newPt = pinhole + (displacement * (cam->getNearClipDistance() * NEAR_FACTOR / dotProd));
         }
