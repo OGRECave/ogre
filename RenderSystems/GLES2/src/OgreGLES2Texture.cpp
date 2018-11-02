@@ -130,7 +130,7 @@ namespace Ogre {
 
         // Set some misc default parameters, these can of course be changed later
         if(mTextureType == TEX_TYPE_EXTERNAL_OES && mNumRequestedMipmaps > 0) {
-            LogManager::getSingleton().logError("Mipmaps are not available for TEX_TYPE_EXTERNAL_OES");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmaps are not available for TEX_TYPE_EXTERNAL_OES", "GLES2Texture::_createGLTexResource");
         }
 
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, 
@@ -223,7 +223,7 @@ namespace Ogre {
                             size, &tmpdata[0]);
                         break;
                     case TEX_TYPE_EXTERNAL_OES:
-                        LogManager::getSingleton().logError("Mipmaps are not available for TEX_TYPE_EXTERNAL_OES");
+                        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attempt to create mipmap for TEX_TYPE_EXTERNAL_OES, should never happen", "GLES2Texture::_createGLTexResource");
                 };
                 
                 if(width > 1)

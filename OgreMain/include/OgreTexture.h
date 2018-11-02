@@ -97,7 +97,7 @@ namespace Ogre {
         TEX_TYPE_2D_ARRAY = 5,
         /// 2D non-square texture, used in combination with 2D texture coordinates
         TEX_TYPE_2D_RECT = 6,
-        /// texture type for oes
+        /// GLES2 only OES texture type
         TEX_TYPE_EXTERNAL_OES = 7
     };
 
