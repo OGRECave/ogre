@@ -25,6 +25,7 @@ if(ANDROID AND OGRE_BUILD_COMPONENT_JAVA)
     SET(HAS_CODE "true")
 
     SET(MAIN_ACTIVITY "org.ogre.example.MainActivity")
+    SET(ANDROID_ADDITIONAL_PERMISSION "<uses-permission android:name=\"android.permission.CAMERA\" />")
     SET(HEADERS "")
     SET(SAMPLE_LDLIBS "")
 
