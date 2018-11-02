@@ -70,6 +70,8 @@ namespace Ogre {
                 return GL_TEXTURE_3D_OES;
             case TEX_TYPE_2D_ARRAY:
                 return GL_TEXTURE_2D_ARRAY;
+            case TEX_TYPE_EXTERNAL_OES:
+                return GL_TEXTURE_EXTERNAL_OES;
             default:
                 return 0;
         };
@@ -127,7 +129,11 @@ namespace Ogre {
             mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);
 
         // Set some misc default parameters, these can of course be changed later
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
+        if(mTextureType == TEX_TYPE_EXTERNAL_OES && mNumRequestedMipmaps > 0) {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmaps are not available for TEX_TYPE_EXTERNAL_OES", "GLES2Texture::_createGLTexResource");
+        }
+
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, 
                                                             GL_TEXTURE_MIN_FILTER, ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -216,6 +222,8 @@ namespace Ogre {
                             width, height, depth, 0, 
                             size, &tmpdata[0]);
                         break;
+                    case TEX_TYPE_EXTERNAL_OES:
+                        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attempt to create mipmap for TEX_TYPE_EXTERNAL_OES, should never happen", "GLES2Texture::_createGLTexResource");
                 };
                 
                 if(width > 1)
@@ -256,6 +264,9 @@ namespace Ogre {
                 case TEX_TYPE_2D_ARRAY:
                 case TEX_TYPE_3D:
                     OGRE_CHECK_GL_ERROR(glTexStorage3D(getGLES2TextureTarget(), GLsizei(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                    break;
+                case TEX_TYPE_EXTERNAL_OES:
+                    // Not available for TEX_TYPE_EXTERNAL_OES
                     break;
             }
             return;

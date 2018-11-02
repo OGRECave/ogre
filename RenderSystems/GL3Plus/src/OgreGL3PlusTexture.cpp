@@ -262,6 +262,13 @@ namespace Ogre {
                 case TEX_TYPE_3D:
                     OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
                     break;
+                case TEX_TYPE_EXTERNAL_OES:
+                    OGRE_EXCEPT(
+                        Exception::ERR_RENDERINGAPI_ERROR,
+                        "Attempt to store texture for unsupported TEX_TYPE_EXTERNAL_OES, should never happen",
+                        "GL3PlusTexture::createInternalResourcesImpl"
+                    );
+                    break;
                 }
             }
             else
@@ -321,6 +328,13 @@ namespace Ogre {
                                                              width, height, 0,
                                                              originFormat, datatype, NULL));
                         }
+                        break;
+                    case TEX_TYPE_EXTERNAL_OES:
+                        OGRE_EXCEPT(
+                            Exception::ERR_RENDERINGAPI_ERROR,
+                            "Attempt to create mipmaps for unsupported TEX_TYPE_EXTERNAL_OES, should never happen",
+                            "GL3PlusTexture::createInternalResourcesImpl"
+                        );
                         break;
                     default:
                         break;

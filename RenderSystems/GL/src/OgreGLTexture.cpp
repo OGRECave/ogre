@@ -113,6 +113,14 @@ namespace Ogre {
                 "2D texture arrays not supported before OpenGL 2.0", 
                 "GLTexture::createInternalResourcesImpl");
 
+        if (mTextureType == TEX_TYPE_EXTERNAL_OES) {
+            OGRE_EXCEPT(
+                Exception::ERR_RENDERINGAPI_ERROR,
+                "TEX_TYPE_EXTERNAL_OES is not available for openGL",
+                "GLTexture::createInternalResourcesImpl"
+            );
+        }
+
         // Convert to nearest power-of-two size if required
         mWidth = GLPixelUtil::optionalPO2(mWidth);      
         mHeight = GLPixelUtil::optionalPO2(mHeight);
@@ -205,6 +213,13 @@ namespace Ogre {
                         break;
                     case TEX_TYPE_2D_RECT:
                         break;
+                    case TEX_TYPE_EXTERNAL_OES:
+                        OGRE_EXCEPT(
+                            Exception::ERR_RENDERINGAPI_ERROR,
+                            "Attempt to create mipmaps for unsupported TEX_TYPE_EXTERNAL_OES, should never happen",
+                            "GLTexture::createInternalResourcesImpl"
+                        );
+                        break;
                 };
                 if(width>1)
                     width = width/2;
@@ -247,6 +262,13 @@ namespace Ogre {
                         }
                         break;
                     case TEX_TYPE_2D_RECT:
+                        break;
+                    case TEX_TYPE_EXTERNAL_OES:
+                        OGRE_EXCEPT(
+                            Exception::ERR_RENDERINGAPI_ERROR,
+                            "Attempt to create mipmaps for unsupported TEX_TYPE_EXTERNAL_OES, should never happen",
+                            "GLTexture::createInternalResourcesImpl"
+                        );
                         break;
                 };
                 if(width>1)
