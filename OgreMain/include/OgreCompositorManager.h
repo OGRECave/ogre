@@ -97,11 +97,11 @@ namespace Ogre {
 
         /** Returns whether exists compositor chain for a viewport.
         */
-        bool hasCompositorChain(Viewport *vp) const;
+        bool hasCompositorChain(const Viewport *vp) const;
 
         /** Remove the compositor chain from a viewport if exists.
         */
-        void removeCompositorChain(Viewport *vp);
+        void removeCompositorChain(const Viewport *vp);
 
         /** Add a compositor to a viewport. By default, it is added to end of the chain,
             after the other compositors.
@@ -167,22 +167,31 @@ namespace Ogre {
 
 		/** Check if a compositor logic exists
 		*/
-		bool getHasCompositorLogic(const String& name);
+		bool hasCompositorLogic(const String& name);
+
+		/// @deprecated use hasCompositorLogic
+		OGRE_DEPRECATED bool getHasCompositorLogic(const String& name) { return hasCompositorLogic(name); }
 		
         /** Register a custom composition pass.
         */
         void registerCustomCompositionPass(const String& name, CustomCompositionPass* customPass);
 
+        void unregisterCustomCompositionPass(const String& name);
+
+        /// @deprecated use unregisterCustomCompositionPass
+		OGRE_DEPRECATED void unRegisterCustomCompositionPass(const String& name) { unregisterCustomCompositionPass(name); }
+
         /** Get a custom composition pass by its name 
         */
-		void unRegisterCustomCompositionPass(const String& name);
-		
         CustomCompositionPass* getCustomCompositionPass(const String& name);
 
 		/** Check if a compositor pass exists
-		*/		
-		bool getHasCompositionPass(const String& name);
+		*/
+        bool hasCustomCompositionPass(const String& name);
 		
+        /// @deprecated use hasCustomCompositionPass
+        OGRE_DEPRECATED bool getHasCompositionPass(const String& name) { return hasCustomCompositionPass(name); }
+
         /**
         Relocates a compositor chain from one viewport to another
         @param sourceVP The viewport to take the chain from
@@ -197,7 +206,7 @@ namespace Ogre {
         static CompositorManager* getSingletonPtr(void);
     
     private:
-        typedef std::map<Viewport*, CompositorChain*> Chains;
+        typedef std::map<const Viewport*, CompositorChain*> Chains;
         Chains mChains;
 
         /** Clear composition chains for all viewports
