@@ -279,6 +279,9 @@ namespace Ogre {
         case GL_SAMPLER_2D_SHADOW_EXT:
             defToUpdate.constType = GCT_SAMPLER2DSHADOW;
             break;
+        case GL_SAMPLER_EXTERNAL_OES:
+            defToUpdate.constType = GCT_SAMPLER_EXTERNAL_OES;
+            break;
         case GL_INT:
             defToUpdate.constType = GCT_INT1;
             break;
