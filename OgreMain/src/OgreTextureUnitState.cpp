@@ -272,33 +272,33 @@ namespace Ogre {
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
 
+        if (texPtr->getTextureType() == TEX_TYPE_CUBE_MAP)
+        {
+            // delegate to cubic texture implementation
+            setCubicTexture(&texPtr, true);
+            return;
+        }
+        
         if (texPtr->getTextureType() == TEX_TYPE_EXTERNAL_OES || texPtr->getTextureType() == TEX_TYPE_2D_RECT)
         {
             setTextureAddressingMode( TAM_CLAMP );
         }
-        else if (texPtr->getTextureType() == TEX_TYPE_CUBE_MAP)
+
+        mFramePtrs.resize(1);
+        mFramePtrs[0] = texPtr;
+
+        mCurrentFrame = 0;
+        mCubic = false;
+
+        // Load immediately ?
+        if (isLoaded())
         {
-            // delegate to cubic texture implementation
-            setCubicTexture(&texPtr, true);
+            _load(); // reload
         }
-        else
+        // Tell parent to recalculate hash
+        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
         {
-            mFramePtrs.resize(1);
-            mFramePtrs[0] = texPtr;
-
-            mCurrentFrame = 0;
-            mCubic = false;
-
-            // Load immediately ?
-            if (isLoaded())
-            {
-                _load(); // reload
-            }
-            // Tell parent to recalculate hash
-            if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-            {
-                mParent->_dirtyHash();
-            }
+            mParent->_dirtyHash();
         }
     }
     //-----------------------------------------------------------------------
