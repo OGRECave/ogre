@@ -62,20 +62,17 @@ THE SOFTWARE.
 namespace Ogre
 {
     const int HlmsBits::HlmsTypeBits    = 3;
-    const int HlmsBits::RenderableBits  = 14;
+    const int HlmsBits::RenderableBits  = 21;
     const int HlmsBits::PassBits        = 8;
-    const int HlmsBits::InputLayoutBits = 7;
 
     const int HlmsBits::HlmsTypeShift   = 32 - HlmsTypeBits;
     const int HlmsBits::RenderableShift = HlmsTypeShift - RenderableBits;
     const int HlmsBits::PassShift       = RenderableShift - PassBits;
-    const int HlmsBits::InputLayoutShift= PassShift - InputLayoutBits;
 
     const int HlmsBits::RendarebleHlmsTypeMask = (1 << (HlmsTypeBits + RenderableBits)) - 1;
     const int HlmsBits::HlmsTypeMask    = (1 << HlmsTypeBits) - 1;
     const int HlmsBits::RenderableMask  = (1 << RenderableBits) - 1;
     const int HlmsBits::PassMask        = (1 << PassBits) - 1;
-    const int HlmsBits::InputLayoutMask = (1 << InputLayoutBits) - 1;
 
     //Change per mesh (hash can be cached on the renderable)
     const IdString HlmsBaseProp::Skeleton           = IdString( "hlms_skeleton" );
@@ -193,7 +190,7 @@ namespace Ogre
 
     const IdString HlmsPsoProp::Macroblock      = IdString( "PsoMacroblock" );
     const IdString HlmsPsoProp::Blendblock      = IdString( "PsoBlendblock" );
-    const IdString HlmsPsoProp::OperationTypeV1 = IdString( "OperationTypeV1" );
+    const IdString HlmsPsoProp::InputLayoutId   = IdString( "InputLayoutId" );
 
     const String ShaderFiles[] = { "VertexShader_vs", "PixelShader_ps", "GeometryShader_gs",
                                    "HullShader_hs", "DomainShader_ds" };
@@ -1990,7 +1987,7 @@ namespace Ogre
         mSetProperties = codeCache.mergedCache.setProperties;
         unsetProperty( HlmsPsoProp::Macroblock );
         unsetProperty( HlmsPsoProp::Blendblock );
-        unsetProperty( HlmsPsoProp::OperationTypeV1 );
+        unsetProperty( HlmsPsoProp::InputLayoutId );
         mSetProperties.swap( codeCache.mergedCache.setProperties );
 
         {
@@ -2244,13 +2241,10 @@ namespace Ogre
             ++itor;
         }
 
-        //v1::VertexDeclaration doesn't hold opType information. We need to save it now so
-        //the PSO hash value ends up being unique (otherwise two identical vertex declarations
-        //but one with tri strips another with indexed tri lists will use the same PSO!).
-        //Fortunately, v1 meshes do not allow LODs with different operation types
-        //(unlike v2 objects), so we can save this information here instead of doing it at
-        //getMaterial time.
-        setProperty( HlmsPsoProp::OperationTypeV1, op.operationType );
+        //v1::VertexDeclaration doesn't hold opType information. We need to save it now.
+        //This means we do not allow LODs with different operation types or vertex layouts
+        uint16 inputLayoutId = vertexDecl->_getInputLayoutId( mHlmsManager, op.operationType );
+        setProperty( HlmsPsoProp::InputLayoutId, inputLayoutId );
 
         return numTexCoords;
     }
@@ -2282,6 +2276,9 @@ namespace Ogre
 
             ++itor;
         }
+
+        //We do not allow LODs with different operation types or vertex layouts
+        setProperty( HlmsPsoProp::InputLayoutId, vao->getInputLayoutId() );
 
         return numTexCoords;
     }
@@ -2847,7 +2844,7 @@ namespace Ogre
     const HlmsCache* Hlms::getMaterial( HlmsCache const *lastReturnedValue,
                                         const HlmsCache &passCache,
                                         const QueuedRenderable &queuedRenderable,
-                                        uint8 inputLayout, bool casterPass )
+                                        bool casterPass )
     {
         uint32 finalHash;
         uint32 hash[2];
@@ -2862,10 +2859,8 @@ namespace Ogre
                 "Too many material / meshes variations" );
         assert( (hash[1] >> HlmsBits::PassShift) <= HlmsBits::PassMask &&
                 "Should never happen (we assert in preparePassHash)" );
-        assert( (inputLayout >> HlmsBits::InputLayoutShift) <= HlmsBits::InputLayoutMask &&
-                "Too many vertex formats." );
 
-        finalHash = hash[0] | hash[1] | inputLayout;
+        finalHash = hash[0] | hash[1];
 
         if( lastReturnedValue->hash != finalHash )
         {
@@ -2912,96 +2907,6 @@ namespace Ogre
             datablock->setMacroblock( datablock->getMacroblock( false ), false );
 
             ++itor;
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void Hlms::_notifyInputLayoutDestroyed( uint16 id )
-    {
-        vector<const HlmsMacroblock*>::type macroblocksToDelete;
-        HlmsCacheVec::iterator itor = mShaderCache.begin();
-        HlmsCacheVec::iterator end  = mShaderCache.end();
-
-        while( itor != end )
-        {
-            const uint8 inputLayout = ( (*itor)->hash >> HlmsBits::InputLayoutShift ) &
-                                        HlmsBits::InputLayoutMask;
-            if( inputLayout == id )
-            {
-                if( getProperty( (*itor)->setProperties, HlmsPsoProp::OperationTypeV1, -1 ) == -1 )
-                {
-                    //This is a v2 input layout.
-                    mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                    if( (*itor)->pso.pass.hasStrongMacroblock() )
-                        macroblocksToDelete.push_back( (*itor)->pso.macroblock );
-                    delete *itor;
-                    itor = mShaderCache.erase( itor );
-                    end  = mShaderCache.end();
-                }
-                else
-                {
-                    ++itor;
-                }
-            }
-            else
-            {
-                ++itor;
-            }
-        }
-
-        //We need to delete the macroblocks at the end because destroying a
-        //macroblock could trigger _notifyMacroblockDestroyed, thus invalidating
-        //iterators in mShaderCache.
-        vector<const HlmsMacroblock*>::type::const_iterator itMacroblock = macroblocksToDelete.begin();
-        vector<const HlmsMacroblock*>::type::const_iterator enMacroblock = macroblocksToDelete.end();
-        while( itMacroblock != enMacroblock )
-        {
-            mHlmsManager->destroyMacroblock( *itMacroblock );
-            ++itMacroblock;
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void Hlms::_notifyV1InputLayoutDestroyed( uint16 id )
-    {
-        vector<const HlmsMacroblock*>::type macroblocksToDelete;
-        HlmsCacheVec::iterator itor = mShaderCache.begin();
-        HlmsCacheVec::iterator end  = mShaderCache.end();
-
-        while( itor != end )
-        {
-            const uint8 inputLayout = ( (*itor)->hash >> HlmsBits::InputLayoutShift ) &
-                                        HlmsBits::InputLayoutMask;
-            if( inputLayout == id )
-            {
-                if( getProperty( (*itor)->setProperties, HlmsPsoProp::OperationTypeV1, -1 ) != -1 )
-                {
-                    //This is a v1 input layout.
-                    mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
-                    if( (*itor)->pso.pass.hasStrongMacroblock() )
-                        macroblocksToDelete.push_back( (*itor)->pso.macroblock );
-                    delete *itor;
-                    itor = mShaderCache.erase( itor );
-                    end  = mShaderCache.end();
-                }
-                else
-                {
-                    ++itor;
-                }
-            }
-            else
-            {
-                ++itor;
-            }
-        }
-
-        //We need to delete the macroblocks at the end because destroying a
-        //macroblock could trigger _notifyMacroblockDestroyed, thus invalidating
-        //iterators in mShaderCache.
-        vector<const HlmsMacroblock*>::type::const_iterator itMacroblock = macroblocksToDelete.begin();
-        vector<const HlmsMacroblock*>::type::const_iterator enMacroblock = macroblocksToDelete.end();
-        while( itMacroblock != enMacroblock )
-        {
-            mHlmsManager->destroyMacroblock( *itMacroblock );
-            ++itMacroblock;
         }
     }
     //-----------------------------------------------------------------------------------

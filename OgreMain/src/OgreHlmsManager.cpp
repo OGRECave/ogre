@@ -79,14 +79,6 @@ namespace Ogre
             mFreeBlockIds[BLOCK_SAMPLER].push_back( (OGRE_HLMS_NUM_SAMPLERBLOCKS - 1) - i );
         }
 
-        mFreeInputLayouts.reserve( OGRE_HLMS_NUM_INPUT_LAYOUTS );
-        for( uint8 i=0; i<OGRE_HLMS_NUM_INPUT_LAYOUTS; ++i )
-        {
-            mInputLayouts[i].opType = OT_POINT_LIST;
-            mInputLayouts[i].refCount = 0;
-            mFreeInputLayouts.push_back( (OGRE_HLMS_NUM_INPUT_LAYOUTS - 1) - i );
-        }
-
 #if !OGRE_NO_JSON
         mScriptPatterns.push_back( "*.material.json" );
         ResourceGroupManager::getSingleton()._registerScriptLoader(this);
@@ -375,79 +367,33 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    uint8 HlmsManager::_addInputLayoutId( VertexElement2VecVec vertexElements, OperationType opType )
+    uint16 HlmsManager::_getInputLayoutId( const VertexElement2VecVec &vertexElements,
+                                           OperationType opType )
     {
-        InputLayoutsIdVec::const_iterator itor = mActiveInputLayouts.begin();
-        InputLayoutsIdVec::const_iterator end  = mActiveInputLayouts.end();
+        InputLayoutsVec::const_iterator itor = mInputLayouts.begin();
+        InputLayoutsVec::const_iterator end  = mInputLayouts.end();
 
         while( itor != end &&
-               (mInputLayouts[*itor].vertexElements != vertexElements ||
-                mInputLayouts[*itor].opType != opType) )
+               (itor->vertexElements != vertexElements /*|| itor->opType != opType*/) )
         {
             ++itor;
         }
 
-        uint8 retVal = 0;
-        if( itor != end )
+        if( itor == end )
         {
-            //Already exists
-            retVal = *itor;
-        }
-        else
-        {
-            if( mFreeInputLayouts.empty() )
-            {
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
-                             "Can't have more than 256 active input layouts! "
-                             "You have too many different vertex formats.",
-                             "HlmsManager::_addInputLayoutId" );
-            }
+            OGRE_ASSERT_LOW( mInputLayouts.size() < (1u << 10u) && "Too many input layouts!!!" );
 
-            retVal = mFreeInputLayouts.back();
-            mFreeInputLayouts.pop_back();
-
-            mActiveInputLayouts.push_back( retVal );
-
-            mInputLayouts[retVal].opType            = opType;
-            mInputLayouts[retVal].vertexElements    = vertexElements;
-            mInputLayouts[retVal].refCount          = 0;
+            mInputLayouts.push_back( InputLayouts() );
+//            mInputLayouts.back().opType         = opType;
+            mInputLayouts.back().vertexElements = vertexElements;
+            itor = mInputLayouts.end();
         }
 
-        ++mInputLayouts[retVal].refCount;
+        //Store the idx in the first 10 bits, store the operation type in the last 6.
+        uint16 retVal = static_cast<uint16>( itor - mInputLayouts.begin() );
+        retVal |= opType << 10u;
 
         return retVal;
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsManager::_removeInputLayoutIdReference( uint8 layoutId )
-    {
-        --mInputLayouts[layoutId].refCount;
-
-        if( !mInputLayouts[layoutId].refCount )
-        {
-            for( int i=0; i<HLMS_MAX; ++i )
-            {
-                if( mRegisteredHlms[i] )
-                    mRegisteredHlms[i]->_notifyInputLayoutDestroyed( layoutId );
-            }
-
-            InputLayoutsIdVec::iterator itor = std::find( mActiveInputLayouts.begin(),
-                                                          mActiveInputLayouts.end(),
-                                                          layoutId );
-
-            assert( itor != mActiveInputLayouts.end() );
-            mActiveInputLayouts.erase( itor );
-
-            mFreeInputLayouts.push_back( layoutId );
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsManager::_notifyV1InputLayoutDestroyed( uint8 v1LayoutId )
-    {
-        for( int i=0; i<HLMS_MAX; ++i )
-        {
-            if( mRegisteredHlms[i] )
-                mRegisteredHlms[i]->_notifyV1InputLayoutDestroyed( v1LayoutId );
-        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsManager::_datablockAdded( HlmsDatablock *datablock )

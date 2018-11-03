@@ -664,8 +664,7 @@ namespace Ogre
             Structure containing all necessary shaders
         */
         const HlmsCache* getMaterial( HlmsCache const *lastReturnedValue, const HlmsCache &passCache,
-                                      const QueuedRenderable &queuedRenderable, uint8 inputLayout,
-                                      bool casterPass );
+                                      const QueuedRenderable &queuedRenderable, bool casterPass );
 
         /** Fills the constant buffers. Gets executed right before drawing the mesh.
         @param cache
@@ -753,14 +752,6 @@ namespace Ogre
 
         /// Internal use. @see HlmsManager::setShadowMappingUseBackFaces
         void _notifyShadowMappingBackFaceSetting(void);
-
-        /// When an input layout is destroyed, the PSO is no longer valid. We need to destroy it.
-        /// Otherwise when we try to reuse a layout with the same internal ID but different
-        /// settings, the old (wrong) PSO will be used.
-        void _notifyInputLayoutDestroyed( uint16 id );
-
-        /// @copydoc _notifyInputLayoutDestroyed
-        void _notifyV1InputLayoutDestroyed( uint16 id );
 
         void _clearShaderCache(void);
 
@@ -879,7 +870,7 @@ namespace Ogre
     {
         static const IdString Macroblock;
         static const IdString Blendblock;
-        static const IdString OperationTypeV1;
+        static const IdString InputLayoutId;
     };
 
     struct _OgreExport HlmsBasePieces
@@ -892,7 +883,6 @@ namespace Ogre
         static const int HlmsTypeBits;
         static const int RenderableBits;
         static const int PassBits;
-        static const int InputLayoutBits;
 
         static const int HlmsTypeShift;
         static const int RenderableShift;

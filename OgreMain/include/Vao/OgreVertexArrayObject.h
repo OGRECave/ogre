@@ -78,9 +78,9 @@ namespace Ogre
         ///     In OpenGL mInputLayoutId is always 0. mVaoName changes when either the
         ///     layout or the internal vertex/index buffer changes
         ///
-        ///     In the rest of the systems same vertex layouts share the same ID,
+        ///     In the rest of the systems, same vertex layouts share the same ID,
         ///     mVaoName changes when the vertex/index buffer needs to change.
-        uint8 mInputLayoutId;
+        uint16 mInputLayoutId;
 
         uint32                  mPrimStart;
         uint32                  mPrimCount;
@@ -100,7 +100,7 @@ namespace Ogre
 
         uint32 getRenderQueueId(void) const                             { return mRenderQueueId; }
         uint32 getVaoName(void) const                                   { return mVaoName; }
-        uint8 getInputLayoutId(void) const                              { return mInputLayoutId; }
+        uint16 getInputLayoutId(void) const                             { return mInputLayoutId; }
 
         const VertexBufferPackedVec& getVertexBuffers(void) const       { return mVertexBuffers; }
         IndexBufferPacked* getIndexBuffer(void) const                   { return mIndexBuffer; }

@@ -710,7 +710,7 @@ namespace Ogre
     {
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         VertexElement2VecVec vertexElements = VertexArrayObject::getVertexDeclaration( vertexBuffers );
-        const uint8 inputLayout = hlmsManager->_addInputLayoutId( vertexElements, opType );
+        const uint8 inputLayout = hlmsManager->_getInputLayoutId( vertexElements, opType );
 
         VaoVec::iterator itor = findVao( vertexBuffers, indexBuffer, opType );
 

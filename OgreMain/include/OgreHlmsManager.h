@@ -53,7 +53,6 @@ namespace Ogre
 #define OGRE_HLMS_NUM_MACROBLOCKS 32
 #define OGRE_HLMS_NUM_BLENDBLOCKS 32
 #define OGRE_HLMS_NUM_SAMPLERBLOCKS 64
-#define OGRE_HLMS_NUM_INPUT_LAYOUTS 128
 
 //Biggest value between all three (Input Layouts is not a block)
 #define OGRE_HLMS_MAX_BASIC_BLOCKS OGRE_HLMS_NUM_SAMPLERBLOCKS
@@ -93,16 +92,13 @@ namespace Ogre
 
         struct InputLayouts
         {
-            uint32                  refCount;
-            OperationType           opType;
+            //OperationType           opType;
             VertexElement2VecVec    vertexElements;
         };
 
-        typedef vector<uint8>::type InputLayoutsIdVec;
-        InputLayoutsIdVec   mActiveInputLayouts;
-        InputLayoutsIdVec   mFreeInputLayouts;
-        /// @see HlmsBits::InputLayoutBits
-        InputLayouts        mInputLayouts[OGRE_HLMS_NUM_INPUT_LAYOUTS];
+        typedef vector<InputLayouts>::type InputLayoutsVec;
+
+        InputLayoutsVec     mInputLayouts;
 
         RenderSystem        *mRenderSystem;
         bool                mShadowMappingUseBackFaces;
@@ -211,10 +207,25 @@ namespace Ogre
         /// @See destroyMacroblock
         void destroySamplerblock( const HlmsSamplerblock *Samplerblock );
 
-        uint8 _addInputLayoutId( VertexElement2VecVec vertexElements, OperationType opType );
-        void _removeInputLayoutIdReference( uint8 layoutId );
+        /** Always returns a unique ID for the given vertexElement / OperationType combination,
+            necessary by Hlms to generate a unique PSO.
 
-        void _notifyV1InputLayoutDestroyed( uint8 v1LayoutId );
+            We store the OperationType in the last 6 bits because of v1 reasons,
+            since v1::VertexDeclaration does not store OperationType, thus it cannot cache
+            beforehand, and calling this function from Hlms::calculateHashForV1 would make
+            material asignment to SubEntity more expensive than it is.
+
+            That means there 10 bits left for vertexElements, and that's how many different
+            vertex elements you can create (1024).
+
+            @see    v1::VertexDeclaration::_getInputLayoutId
+        @param vertexElements
+        @param opType
+        @return
+            The returned value is deterministic, however it depends on the order in which
+            _getInputLayoutId is called.
+        */
+        uint16 _getInputLayoutId( const VertexElement2VecVec &vertexElements, OperationType opType );
 
         /** Internal function used by Hlms types to tell us a datablock has been created
             so that we can return it when the user calls @getDatablock.
