@@ -5231,35 +5231,47 @@ namespace Ogre{
     {
         ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
-        CompositionTargetPass *target = any_cast<CompositionTargetPass*>(obj->parent->context);
-        mPass = target->createPass();
-        obj->context = Any(mPass);
-
         // The name is the type of the pass
-        if(obj->values.empty())
+        if(obj->values.empty() || obj->values.front()->type != ANT_ATOM)
         {
             compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, obj->file, obj->line);
             return;
         }
-        String type;
-        if(!getString(obj->values.front(), &type))
+
+        AtomAbstractNode* atom = static_cast<AtomAbstractNode*>(obj->values.front().get());
+
+        CompositionPass::PassType ptype;
+        switch(atom->id)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
-            return;
+            case ID_CLEAR:
+                ptype = CompositionPass::PT_CLEAR;
+                break;
+            case ID_STENCIL:
+                ptype = CompositionPass::PT_STENCIL;
+                break;
+            case ID_RENDER_QUAD:
+                ptype = CompositionPass::PT_RENDERQUAD;
+                break;
+            case ID_RENDER_SCENE:
+                ptype = CompositionPass::PT_RENDERSCENE;
+                break;
+            case ID_COMPUTE:
+                ptype = CompositionPass::PT_COMPUTE;
+                break;
+            case ID_RENDER_CUSTOM:
+                ptype = CompositionPass::PT_RENDERCUSTOM;
+                break;
+            default:
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, atom->value);
+                return;
         }
 
-        if(type == "clear")
-            mPass->setType(CompositionPass::PT_CLEAR);
-        else if(type == "stencil")
-            mPass->setType(CompositionPass::PT_STENCIL);
-        else if(type == "render_quad")
-            mPass->setType(CompositionPass::PT_RENDERQUAD);
-        else if(type == "render_scene")
-            mPass->setType(CompositionPass::PT_RENDERSCENE);
-        else if(type == "compute")
-            mPass->setType(CompositionPass::PT_COMPUTE);
-        else if(type == "render_custom") {
-            mPass->setType(CompositionPass::PT_RENDERCUSTOM);
+        CompositionTargetPass *target = any_cast<CompositionTargetPass*>(obj->parent->context);
+        mPass = target->createPass(ptype);
+        obj->context = Any(mPass);
+
+        if(mPass->getType() == CompositionPass::PT_RENDERCUSTOM) 
+        {
             String customType;
             //This is the ugly one liner for safe access to the second parameter.
             if (obj->values.size() < 2 || !getString(*(++(obj->values.begin())), &customType))
@@ -5268,11 +5280,6 @@ namespace Ogre{
                 return;
             }
             mPass->setCustomType(customType);
-        }
-        else
-        {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, type);
-            return;
         }
 
         Real fval;
@@ -5461,7 +5468,7 @@ namespace Ogre{
                     {
                         if(prop->values.front()->type == ANT_ATOM)
                         {
-                            AtomAbstractNode *atom = static_cast<AtomAbstractNode*>(prop->values.front().get());
+                            atom = static_cast<AtomAbstractNode*>(prop->values.front().get());
                             if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE)
                                 mPass->setQuadFarCorners(true, true);
                             else if(atom->id == ID_CAMERA_FAR_CORNERS_WORLD_SPACE)

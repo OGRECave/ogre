@@ -1242,6 +1242,7 @@ namespace Ogre
         mIds["sampler"] = ID_SAMPLER;
         mIds["sampler_ref"] = ID_SAMPLER_REF;
         mIds["thread_groups"] = ID_THREAD_GROUPS;
+        mIds["render_custom"] = ID_RENDER_CUSTOM;
 
 		mLargestRegisteredWordId = ID_END_BUILTIN_IDS;
 	}
@@ -1442,6 +1443,11 @@ namespace Ogre
                         atom->line = (*iter)->line;
                         atom->type = ANT_ATOM;
                         atom->value = (*iter)->token;
+
+                        auto idpos = mCompiler->mIds.find(atom->value);
+                        if(idpos != mCompiler->mIds.end())
+                            atom->id = idpos->second;
+
                         impl->values.push_back(AbstractNodePtr(atom));
                     }
                     ++iter;
