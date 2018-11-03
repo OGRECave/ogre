@@ -208,6 +208,18 @@ namespace Ogre {
 
             os << std::endl;
 
+            for(const auto& p : program->getParameters())
+            {
+                if(p->getType() != GCT_SAMPLER_EXTERNAL_OES)
+                    continue;
+                if(mGLSLVersion > 100)
+                    os << "#extension GL_OES_EGL_image_external_essl3 : require\n";
+                else
+                    os << "#extension GL_OES_EGL_image_external : require\n";
+
+                break;
+            }
+
             // Default precision declaration is required in fragment and vertex shaders.
             os << "precision highp float;" << std::endl;
             os << "precision highp int;" << std::endl;
