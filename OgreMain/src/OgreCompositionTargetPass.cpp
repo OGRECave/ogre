@@ -121,9 +121,10 @@ bool CompositionTargetPass::getShadowsEnabled(void) const
     return mShadowsEnabled;
 }
 //-----------------------------------------------------------------------
-CompositionPass *CompositionTargetPass::createPass()
+CompositionPass *CompositionTargetPass::createPass(CompositionPass::PassType type)
 {
     CompositionPass *t = OGRE_NEW CompositionPass(this);
+    t->setType(type);
     mPasses.push_back(t);
     return t;
 }
