@@ -180,8 +180,10 @@ namespace Ogre
 
             while( itor != end )
             {
-                size_t renderableHash = hlms->addRenderableCache( itor->renderableCache.setProperties,
-                                                                  itor->renderableCache.pieces );
+                uint32 renderableHash =
+                        static_cast<uint32 >(
+                            hlms->addRenderableCache( itor->renderableCache.setProperties,
+                                                      itor->renderableCache.pieces ) );
 
                 uint32 passHash = 0;
                 {
@@ -204,10 +206,8 @@ namespace Ogre
                     passHash = (uint32)(it - hlms->mPassCache.begin()) << (uint32)HlmsBits::PassShift;
                 }
 
-                hlms->createShaderCacheEntry( renderableHash, passHash, , );
-
-//                const uint32 inputLayout    = (finalHash >> HlmsBits::InputLayoutShift) &
-//                                              (uint32)HlmsBits::InputLayoutMask;
+                //const uint32 finalHash = renderableHash | passHash;
+                //hlms->createShaderCacheEntry( renderableHash, passHash, finalHash, );
 
                 ++itor;
             }
@@ -459,43 +459,54 @@ namespace Ogre
                         vertexElements.back().mInstancingStepRate = instancingStepRate;
                     }
                 }
+
+                read( dataStream, pso.pso.operationType );
+                read( dataStream, pso.pso.enablePrimitiveRestart );
+                read( dataStream, pso.pso.sampleMask );
+                read( dataStream, pso.pso.pass );
+
+                read( dataStream, pso.macroblock.mScissorTestEnabled );
+                read( dataStream, pso.macroblock.mDepthCheck );
+                read( dataStream, pso.macroblock.mDepthWrite );
+                read( dataStream, pso.macroblock.mDepthFunc );
+                read( dataStream, pso.macroblock.mDepthBiasConstant );
+                read( dataStream, pso.macroblock.mDepthBiasSlopeScale );
+                read( dataStream, pso.macroblock.mCullMode );
+                read( dataStream, pso.macroblock.mPolygonMode );
+
+                read( dataStream, pso.blendblock.mAlphaToCoverageEnabled );
+                read( dataStream, pso.blendblock.mBlendChannelMask );
+    //          read( dataStream, pso.blendblock.mIsTransparent );
+                read( dataStream, pso.blendblock.mSeparateBlend );
+                read( dataStream, pso.blendblock.mSourceBlendFactor );
+                read( dataStream, pso.blendblock.mDestBlendFactor );
+                read( dataStream, pso.blendblock.mSourceBlendFactorAlpha );
+                read( dataStream, pso.blendblock.mDestBlendFactorAlpha );
+                read( dataStream, pso.blendblock.mBlendOperation );
+                read( dataStream, pso.blendblock.mBlendOperationAlpha );
+
+                //We retrieve the Macroblock & Blendblock from HlmsManager and immediately remove them
+                //This allows us to create a permanent pointer, while the actual internal pointer is
+                //released (i.e. it becomes inactive)
+                pso.pso.macroblock = mHlmsManager->getMacroblock( pso.macroblock );
+                mHlmsManager->destroyMacroblock( pso.pso.macroblock );
+
+                pso.pso.blendblock = mHlmsManager->getBlendblock( pso.blendblock );
+                mHlmsManager->destroyBlendblock( pso.pso.blendblock );
+
+                uint16 inputLayoutId = mHlmsManager->_getInputLayoutId( pso.pso.vertexElements,
+                                                                        pso.pso.operationType );
+
+                //Reset these properties because they may be different now
+                Hlms::setProperty( pso.renderableCache.setProperties, HlmsPsoProp::Macroblock,
+                                   pso.pso.macroblock->mLifetimeId );
+                Hlms::setProperty( pso.renderableCache.setProperties, HlmsPsoProp::Blendblock,
+                                   pso.pso.blendblock->mLifetimeId );
+                Hlms::setProperty( pso.renderableCache.setProperties, HlmsPsoProp::InputLayoutId,
+                                   inputLayoutId );
+
+                mCache.pso.push_back( pso );
             }
-
-            read( dataStream, pso.pso.operationType );
-            read( dataStream, pso.pso.enablePrimitiveRestart );
-            read( dataStream, pso.pso.sampleMask );
-            read( dataStream, pso.pso.pass );
-
-            read( dataStream, pso.macroblock.mScissorTestEnabled );
-            read( dataStream, pso.macroblock.mDepthCheck );
-            read( dataStream, pso.macroblock.mDepthWrite );
-            read( dataStream, pso.macroblock.mDepthFunc );
-            read( dataStream, pso.macroblock.mDepthBiasConstant );
-            read( dataStream, pso.macroblock.mDepthBiasSlopeScale );
-            read( dataStream, pso.macroblock.mCullMode );
-            read( dataStream, pso.macroblock.mPolygonMode );
-
-            read( dataStream, pso.blendblock.mAlphaToCoverageEnabled );
-            read( dataStream, pso.blendblock.mBlendChannelMask );
-//          read( dataStream, pso.blendblock.mIsTransparent );
-            read( dataStream, pso.blendblock.mSeparateBlend );
-            read( dataStream, pso.blendblock.mSourceBlendFactor );
-            read( dataStream, pso.blendblock.mDestBlendFactor );
-            read( dataStream, pso.blendblock.mSourceBlendFactorAlpha );
-            read( dataStream, pso.blendblock.mDestBlendFactorAlpha );
-            read( dataStream, pso.blendblock.mBlendOperation );
-            read( dataStream, pso.blendblock.mBlendOperationAlpha );
-
-            //We retrieve the Macroblock & Blendblock from HlmsManager and immediately remove them
-            //This allows us to create a permanent pointer, while the actual internal pointer is
-            //released (i.e. it becomes inactive)
-            pso.pso.macroblock = mHlmsManager->getMacroblock( pso.macroblock );
-            mHlmsManager->destroyMacroblock( pso.pso.macroblock );
-
-            pso.pso.blendblock = mHlmsManager->getBlendblock( pso.blendblock );
-            mHlmsManager->destroyBlendblock( pso.pso.blendblock );
-
-            mCache.pso.push_back( pso );
         }
     }
 }

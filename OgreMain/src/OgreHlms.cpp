@@ -430,6 +430,17 @@ namespace Ogre
             mSetProperties.erase( it );
     }
     //-----------------------------------------------------------------------------------
+    void Hlms::setProperty( HlmsPropertyVec &properties, IdString key, int32 value )
+    {
+        HlmsProperty p( key, value );
+        HlmsPropertyVec::iterator it = std::lower_bound( properties.begin(), properties.end(),
+                                                         p, OrderPropertyByIdString );
+        if( it == properties.end() || it->keyName != p.keyName )
+            properties.insert( it, p );
+        else
+            *it = p;
+    }
+    //-----------------------------------------------------------------------------------
     int32 Hlms::getProperty( const HlmsPropertyVec &properties, IdString key, int32 defaultVal )
     {
         HlmsProperty p( key, 0 );

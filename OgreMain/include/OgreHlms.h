@@ -747,6 +747,8 @@ namespace Ogre
                                                 { return getProperty( key, defaultVal ); }
 
         /// Utility helper, mostly useful to HlmsListener implementations.
+        static void setProperty( HlmsPropertyVec &properties, IdString key, int32 value );
+        /// Utility helper, mostly useful to HlmsListener implementations.
         static int32 getProperty( const HlmsPropertyVec &properties,
                                   IdString key, int32 defaultVal=0 );
 
