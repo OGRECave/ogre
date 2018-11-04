@@ -80,6 +80,7 @@ namespace Ogre
             {
                 // Wrap
                 mTimePos = std::fmod(mTimePos, mLength);
+                if(mTimePos < 0) mTimePos += mLength;
             }
             else
             {
