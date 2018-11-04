@@ -80,17 +80,19 @@ namespace Ogre
         Property & Piece info       These are the properties set by the Hlms to describe information
                  |                  about the mesh, the material and the pass (e.g. does it have
                  |                  normals? does it use normal mapping? Is this a shadow mapping pass?)
-                 |                  This info is used to run the Hlms parser on the templates.
+                 |                  This info is used to run the Hlms parser on the templates to
+                 |                  produce the preprocessed shaders for the next step.
                  |                  HlmsDiskCache stores it in
                  |                  HlmsDiskCache::Cache::sourceCode::mergedCache
-                 |                  This information is API & platform agnostic.
+                 |                  This information is API & platform agnostic. In certain cases, the
+                 |                  cache may still be used even if the templates have changed.
                  |
                  v
          Preprocessed Shader        These are the templates processed by the Hlms. There is up to 1
                  |                  for each shader stage. The produced output is valid shader code
-                 |                  and specific to each RenderSystem API (OpenGL, D3D11, Metal)
+                 |                  but specific to each RenderSystem API (OpenGL, D3D11, Metal)
                  |                  While parsing the templates is fast, it's not free; specially in
-                 |                  debug builds
+                 |                  debug builds.
                  |                  HlmsDiskCache stores this in
                  |                  HlmsDiskCache::Cache::sourceCode::sourceFile
                  |

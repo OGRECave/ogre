@@ -175,7 +175,9 @@ namespace Ogre
             {
                 mTemplatesOutOfDate = true;
                 LogManager::getSingleton().logMessage(
-                            "INFO: The cached Hlms is out of date. The templates have changed." );
+                            "WARNING: The cached Hlms is out of date. The templates have changed. "
+                            "We will parse the templates again. If you experience crashes or shader "
+                            "compiler errors, delete the cache" );
             }
         }
 
