@@ -282,7 +282,7 @@ namespace Demo
         BaseSystem::initialize();
 
 #if OGRE_PROFILING
-        Ogre::Profiler::getSingleton().setEnabled( false );
+        Ogre::Profiler::getSingleton().setEnabled( true );
     #if OGRE_PROFILING == OGRE_PROFILING_INTERNAL
         Ogre::Profiler::getSingleton().endProfile( "" );
     #endif
