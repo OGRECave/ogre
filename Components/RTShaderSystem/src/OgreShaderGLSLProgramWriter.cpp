@@ -109,6 +109,15 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     // Write the current version (this force the driver to more fulfill the glsl standard)
     os << "#version "<< mGLSLVersion << std::endl;
 
+    if(mGLSLVersion > 120)
+    {
+        // Redefine texture functions to maintain reusability
+        os << "#define texture2D texture" << std::endl;
+        os << "#define texture3D texture" << std::endl;
+        os << "#define textureCube texture" << std::endl;
+        os << "#define texture2DLod textureLod" << std::endl;
+    }
+
     // Generate source code header.
     writeProgramTitle(os, program);
     os<< std::endl;
