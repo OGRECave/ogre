@@ -2028,6 +2028,8 @@ namespace Ogre
     void Hlms::_compileShaderFromPreprocessedSource( const RenderableCache &mergedCache,
                                                      const String source[NumShaderTypes] )
     {
+        OgreProfileExhaustive( "Hlms::_compileShaderFromPreprocessedSource" );
+
         const uint32 finalHash = mType * 100000000u +
                                  static_cast<uint32>( mShaderCodeCache.size() );
 
@@ -2065,14 +2067,12 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::compileShaderCode( ShaderCodeCache &codeCache )
     {
+        OgreProfileExhaustive( "Hlms::compileShaderCode" );
+
         //Give the shaders friendly base-10 names
         const uint32 finalHash = mType * 100000000u + static_cast<uint32>( mShaderCodeCache.size() );
 
         mSetProperties = codeCache.mergedCache.setProperties;
-        unsetProperty( HlmsPsoProp::Macroblock );
-        unsetProperty( HlmsPsoProp::Blendblock );
-        unsetProperty( HlmsPsoProp::InputLayoutId );
-        mSetProperties.swap( codeCache.mergedCache.setProperties );
 
         {
             //Add RenderSystem-specific properties
@@ -2235,6 +2235,9 @@ namespace Ogre
 
         //Retrieve the shader code from the code cache
         ShaderCodeCache codeCache( renderableCache.pieces );
+        unsetProperty( HlmsPsoProp::Macroblock );
+        unsetProperty( HlmsPsoProp::Blendblock );
+        unsetProperty( HlmsPsoProp::InputLayoutId );
         codeCache.mergedCache.setProperties.swap( mSetProperties );
         {
             ShaderCodeCacheVec::iterator itCodeCache = std::find( mShaderCodeCache.begin(),
