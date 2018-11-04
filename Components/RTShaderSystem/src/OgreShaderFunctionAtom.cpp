@@ -337,15 +337,6 @@ bool FunctionInvocation::FunctionInvocationLessThan::operator ()(FunctionInvocat
         GpuConstantType leftType    = itLHSOps->getParameter()->getType();
         GpuConstantType rightType   = itRHSOps->getParameter()->getType();
         
-        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
-        {
-            if (leftType == GCT_SAMPLER1D)
-                leftType = GCT_SAMPLER2D;
-
-            if (rightType == GCT_SAMPLER1D)
-                rightType = GCT_SAMPLER2D;
-        }
-
         // If a swizzle mask is being applied to the parameter, generate the GpuConstantType to
         // perform the parameter type comparison the way that the compiler will see it.
         if ((itLHSOps->getFloatCount(itLHSOps->getMask()) > 0) ||

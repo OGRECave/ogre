@@ -867,12 +867,16 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
     curParams.mTextureSamplerIndex = index;
     curParams.mTextureUnitState    = textureUnitState;
 
+    bool isGLES2 = Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos;
+
     switch (curParams.mTextureUnitState->getTextureType())
     {
     case TEX_TYPE_1D:
         curParams.mTextureSamplerType = GCT_SAMPLER1D;
         curParams.mVSInTextureCoordinateType = GCT_FLOAT1;
-        break;
+        if(!isGLES2) // no 1D texture support
+            break;
+        OGRE_FALLTHROUGH;
     case TEX_TYPE_2D:
         curParams.mTextureSamplerType = GCT_SAMPLER2D;
         curParams.mVSInTextureCoordinateType = GCT_FLOAT2;
