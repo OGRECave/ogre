@@ -775,6 +775,7 @@ namespace Ogre
             }
             else if( itor->keyName != PbsProperty::HwGammaRead &&
                      itor->keyName != PbsProperty::UvDiffuse &&
+                     itor->keyName != HlmsPsoProp::InputLayoutId &&
                      itor->keyName != HlmsBaseProp::Skeleton &&
                      itor->keyName != HlmsBaseProp::BonesPerVertex &&
                      itor->keyName != HlmsBaseProp::DualParaboloidMapping &&

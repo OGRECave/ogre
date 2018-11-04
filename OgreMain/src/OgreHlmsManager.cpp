@@ -388,7 +388,7 @@ namespace Ogre
             mInputLayouts.push_back( InputLayouts() );
 //            mInputLayouts.back().opType         = opType;
             mInputLayouts.back().vertexElements = vertexElements;
-            itor = mInputLayouts.end();
+            itor = mInputLayouts.end() - 1u;
         }
 
         //Store the idx in the first 10 bits, store the operation type in the last 6.
