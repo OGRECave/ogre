@@ -342,7 +342,6 @@ namespace Ogre
         */
         void applyStrongMacroblockRules( HlmsPso &pso );
 
-    protected:
         HighLevelGpuProgramPtr compileShaderCode( const String &source,
                                                   const String &debugFilenameOutput,
                                                   uint32 finalHash, ShaderType shaderType );
@@ -352,8 +351,6 @@ namespace Ogre
                                                    const String source[NumShaderTypes] );
 
         /** Compiles input properties and adds it to the shader code cache
-        @param finalHash
-            This value is used to give the shader a name and for debug purposes, that's all.
         @param codeCache [in/out]
             All variables must be filled except for ShaderCodeCache::shaders which is the output
         */
@@ -361,6 +358,7 @@ namespace Ogre
 
         const ShaderCodeCacheVec& getShaderCodeCache(void) const    { return mShaderCodeCache; }
 
+    protected:
         /** Creates a shader based on input parameters. Caller is responsible for ensuring
             this shader hasn't already been created.
             Shader template files will be processed and then compiled.
@@ -424,6 +422,7 @@ namespace Ogre
         const String& getTypeNameStr(void) const            { return mTypeNameStr; }
         void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
         HlmsManager* getHlmsManager(void) const             { return mHlmsManager; }
+        const String& getShaderProfile(void) const          { return mShaderProfile; }
 
         /** Sets the quality of the Hlms. This function is most relevant for mobile and
             almost or completely ignored by Desktop.

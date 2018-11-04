@@ -82,6 +82,7 @@ namespace Ogre
         bool        mTemplatesOutOfDate;
         Cache       mCache;
         HlmsManager *mHlmsManager;
+        String      mShaderProfile;
 
         void save( DataStreamPtr &dataStream, const String &string );
         void save( DataStreamPtr &dataStream, const HlmsPropertyVec &properties );

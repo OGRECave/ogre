@@ -1992,8 +1992,7 @@ namespace Ogre
     void Hlms::compileShaderCode( ShaderCodeCache &codeCache )
     {
         //Give the shaders friendly base-10 names
-        const uint32 finalHash = mType * 100000000u +
-                                 static_cast<uint32>( mShaderCodeCache.size() );
+        const uint32 finalHash = mType * 100000000u + static_cast<uint32>( mShaderCodeCache.size() );
 
         mSetProperties = codeCache.mergedCache.setProperties;
         unsetProperty( HlmsPsoProp::Macroblock );

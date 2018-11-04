@@ -476,12 +476,12 @@ namespace Demo
 
                 try
                 {
-                    Ogre::DataStreamPtr diskCacheFile = rwAccessFolderArchive->open( filename );
-                    diskCache.loadFrom( diskCacheFile );
-                    diskCache.applyTo( hlms );
-                }
-                catch( Ogre::FileNotFoundException& )
-                {
+                    if( rwAccessFolderArchive->exists( filename ) )
+                    {
+                        Ogre::DataStreamPtr diskCacheFile = rwAccessFolderArchive->open( filename );
+                        diskCache.loadFrom( diskCacheFile );
+                        diskCache.applyTo( hlms );
+                    }
                 }
                 catch( Ogre::Exception& )
                 {

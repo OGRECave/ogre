@@ -40,6 +40,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    static const uint16 c_hlmsDiskCacheVersion = 0u;
+
     HlmsDiskCache::HlmsDiskCache( HlmsManager *hlmsManager ) :
         mTemplatesOutOfDate( false ),
         mHlmsManager( hlmsManager )
@@ -56,6 +58,7 @@ namespace Ogre
         mTemplatesOutOfDate = false;
         mCache.sourceCode.clear();
         mCache.pso.clear();
+        mShaderProfile.clear();
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
@@ -97,6 +100,7 @@ namespace Ogre
         clearCache();
 
         mCache.type = hlms->getType();
+        mShaderProfile = hlms->getShaderProfile();
 
         {
             //Copy shaders
@@ -137,6 +141,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDiskCache::applyTo( Hlms *hlms )
     {
+        LogManager::getSingleton().logMessage( "Applying HlmsDiskCache " +
+                                               StringConverter::toString( hlms->getType() ) );
+
         if( mCache.type != hlms->getType() )
         {
             LogManager::getSingleton().logMessage(
@@ -146,6 +153,15 @@ namespace Ogre
                         StringConverter::toString( hlms->getType() ) +
                         ". HlmsDiskCache won't be applied." );
             return;
+        }
+
+        if( mShaderProfile != hlms->getShaderProfile() )
+        {
+            mTemplatesOutOfDate = true;
+            LogManager::getSingleton().logMessage(
+                        "INFO: The cached Hlms is for shader profile in '" + mShaderProfile +
+                        "' but it does not match the current one '" + hlms->getShaderProfile() +
+                        "'. This increases loading times." );
         }
 
         hlms->clearShaderCache();
@@ -263,8 +279,12 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDiskCache::saveTo( DataStreamPtr &dataStream )
     {
+        LogManager::getSingleton().logMessage( "Saving HlmsDiskCache to " + dataStream->getName() );
+
+        write<uint16>( dataStream, c_hlmsDiskCacheVersion );
         write( dataStream, mCache.templateHash );
         write( dataStream, mCache.type );
+        save( dataStream, mShaderProfile );
 
         {
             //Save shaders
@@ -404,10 +424,17 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDiskCache::loadFrom( DataStreamPtr &dataStream )
     {
+        LogManager::getSingleton().logMessage( "Loading HlmsDiskCache from " + dataStream->getName() );
+
         clearCache();
+
+        const uint16 version = read<uint16>( dataStream );
+        if( version != c_hlmsDiskCacheVersion )
+            LogManager::getSingleton().logMessage( "HlmsDiskCache: Version mismatch. Not loading." );
 
         read( dataStream, mCache.templateHash );
         read( dataStream, mCache.type );
+        load( dataStream, mShaderProfile );
 
         {
             //Load shaders
