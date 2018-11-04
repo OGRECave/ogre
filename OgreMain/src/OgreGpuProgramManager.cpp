@@ -208,7 +208,7 @@ namespace Ogre {
         return mSharedParametersMap;
     }
     //---------------------------------------------------------------------
-    bool GpuProgramManager::getSaveMicrocodesToCache()
+    bool GpuProgramManager::getSaveMicrocodesToCache() const
     {
         return mSaveMicrocodesToCache;
     }
@@ -244,14 +244,14 @@ namespace Ogre {
         return rs->getName() + "_" + name;
     }
     //---------------------------------------------------------------------
-    bool GpuProgramManager::isMicrocodeAvailableInCache( const String & name ) const
+    bool GpuProgramManager::isMicrocodeAvailableInCache( uint32 id ) const
     {
-        return mMicrocodeCache.find(addRenderSystemToName(name)) != mMicrocodeCache.end();
+        return mMicrocodeCache.find(id) != mMicrocodeCache.end();
     }
     //---------------------------------------------------------------------
-    const GpuProgramManager::Microcode & GpuProgramManager::getMicrocodeFromCache( const String & name ) const
+    const GpuProgramManager::Microcode & GpuProgramManager::getMicrocodeFromCache( uint32 id ) const
     {
-        return mMicrocodeCache.find(addRenderSystemToName(name))->second;
+        return mMicrocodeCache.find(id)->second;
     }
     //---------------------------------------------------------------------
     GpuProgramManager::Microcode GpuProgramManager::createMicrocode( const uint32 size ) const
@@ -259,13 +259,12 @@ namespace Ogre {
         return Microcode(OGRE_NEW MemoryDataStream(size));  
     }
     //---------------------------------------------------------------------
-    void GpuProgramManager::addMicrocodeToCache( const String & name, const GpuProgramManager::Microcode & microcode )
+    void GpuProgramManager::addMicrocodeToCache( uint32 id, const GpuProgramManager::Microcode & microcode )
     {   
-        String nameWithRenderSystem = addRenderSystemToName(name);
-        MicrocodeMap::iterator foundIter = mMicrocodeCache.find(nameWithRenderSystem);
+        auto foundIter = mMicrocodeCache.find(id);
         if ( foundIter == mMicrocodeCache.end() )
         {
-            mMicrocodeCache.insert(make_pair(nameWithRenderSystem, microcode));
+            mMicrocodeCache.insert(make_pair(id, microcode));
             // if cache is modified, mark it as dirty.
             mCacheDirty = true;
         }
@@ -276,10 +275,9 @@ namespace Ogre {
         }       
     }
     //---------------------------------------------------------------------
-    void GpuProgramManager::removeMicrocodeFromCache( const String & name )
+    void GpuProgramManager::removeMicrocodeFromCache( uint32 id )
     {
-        String nameWithRenderSystem = addRenderSystemToName(name);
-        MicrocodeMap::iterator foundIter = mMicrocodeCache.find(nameWithRenderSystem);
+        auto foundIter = mMicrocodeCache.find(id);
 
         if (foundIter != mMicrocodeCache.end())
         {
@@ -301,23 +299,20 @@ namespace Ogre {
         }
         
         StreamSerialiser serialiser(stream);
-        serialiser.writeChunkBegin(CACHE_CHUNK_ID, 1);
+        serialiser.writeChunkBegin(CACHE_CHUNK_ID, 2);
 
         // write the size of the array
         uint32 sizeOfArray = static_cast<uint32>(mMicrocodeCache.size());
         serialiser.write(&sizeOfArray);
         
         // loop the array and save it
-        MicrocodeMap::const_iterator iter = mMicrocodeCache.begin();
-        MicrocodeMap::const_iterator iterE = mMicrocodeCache.end();
-        for ( ; iter != iterE ; ++iter )
+        for ( const auto& entry : mMicrocodeCache )
         {
-            // saves the name of the shader
-            const String & nameOfShader = iter->first;
-            serialiser.write(&nameOfShader);
+            // saves the id of the shader
+            serialiser.write(&entry.first);
 
             // saves the microcode
-            const Microcode & microcodeOfShader = iter->second;
+            const Microcode & microcodeOfShader = entry.second;
             uint32 microcodeLength = static_cast<uint32>(microcodeOfShader->size());
             serialiser.write(&microcodeLength);
             serialiser.writeData(microcodeOfShader->getPtr(), 1, microcodeLength);
@@ -344,7 +339,7 @@ namespace Ogre {
             return;
         }
 
-        if(chunk->id != CACHE_CHUNK_ID || chunk->version != 1)
+        if(chunk->id != CACHE_CHUNK_ID || chunk->version != 2)
         {
             LogManager::getSingleton().logWarning("Invalid Microcode Cache");
             return;
@@ -356,19 +351,19 @@ namespace Ogre {
         // loop the array and load it
         for ( uint32 i = 0 ; i < sizeOfArray ; i++ )
         {
-            // loads the name of the shader
-            String nameOfShader;
-            serialiser.read(&nameOfShader);
+            // loads the id of the shader
+            uint32 id;
+            serialiser.read(&id);
 
             // loads the microcode
             uint32 microcodeLength = 0;
             serialiser.read(&microcodeLength);
 
-            Microcode microcodeOfShader(OGRE_NEW MemoryDataStream(nameOfShader, microcodeLength));      
+            Microcode microcodeOfShader(OGRE_NEW MemoryDataStream(microcodeLength));
             microcodeOfShader->seek(0);
             serialiser.readData(microcodeOfShader->getPtr(), 1, microcodeLength);
 
-            mMicrocodeCache.insert(make_pair(nameOfShader, microcodeOfShader));
+            mMicrocodeCache.insert(make_pair(id, microcodeOfShader));
         }
         serialiser.readChunkEnd(CACHE_CHUNK_ID);
 
