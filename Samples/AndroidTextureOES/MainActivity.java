@@ -93,35 +93,12 @@ public class MainActivity extends Activity {
         cameraNode.attachObject(camera);
         cameraNode.setPosition(0f, 0f, 15f);
 
-        final HighLevelGpuProgramPtr fragmentShader = HighLevelGpuProgramManager.getSingleton().createProgram(
-                "Fragment",
-                "General",
-                "glsles",
-                GpuProgramType.GPT_FRAGMENT_PROGRAM
-        );
-        fragmentShader.setSourceFile("CameraToOES.frag");
-        fragmentShader.load();
-
-        final HighLevelGpuProgramPtr vertexShader = HighLevelGpuProgramManager.getSingleton().createProgram(
-                "Vertex",
-                "General",
-                "glsles",
-                GpuProgramType.GPT_VERTEX_PROGRAM
-        );
-        vertexShader.setSourceFile("CameraToOES.vert");
-        vertexShader.load();
-
         final MaterialPtr material = MaterialManager.getSingleton().create(
                 "PlaneMat",
                 ResourceGroupManager.getDEFAULT_RESOURCE_GROUP_NAME()
         );
 
         final Pass pass = material.getTechniques().get(0).getPass(0);
-        pass.setFragmentProgram(fragmentShader.getName());
-        pass.setVertexProgram(vertexShader.getName());
-
-
-        final TextureUnitState textureUnitState = pass.createTextureUnitState();
         pass.setDepthCheckEnabled(false);
         pass.setDepthWriteEnabled(false);
         pass.setLightingEnabled(false);
@@ -138,13 +115,15 @@ public class MainActivity extends Activity {
 
         textureId = texturePtr.getCustomAttribute("GLID");
 
-        textureUnitState.setTexture(texturePtr);
+        pass.createTextureUnitState().setTexture(texturePtr);
 
         final AxisAlignedBox bb = new AxisAlignedBox();
         bb.setInfinite();
 
         rect = new Rectangle2D(true);
         rect.setCorners(-1.0f, 1.0f, 1.0f, -1.0f);
+        // 90 deg rotate:
+        rect.setUVs(new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, 0), new Vector2(1, 0));
         rect.setMaterial(material);
         rect.setRenderQueueGroup((short) OgreJNI.RENDER_QUEUE_BACKGROUND_get());
         rect.setBoundingBox(bb);
