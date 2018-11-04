@@ -63,7 +63,7 @@ namespace Ogre {
         /// Compiles and links the the vertex and fragment programs
         void compileAndLink();
         /// Get the the binary data of a program from the microcode cache
-        void getMicrocodeFromCache();
+        void getMicrocodeFromCache(uint32 id);
     public:
         /// Constructor should only be used by GLSLLinkProgramManager
         GLSLLinkProgram(GLSLProgram* vertexProgram, GLSLProgram* geometryProgram, GLSLProgram* fragmentProgram);

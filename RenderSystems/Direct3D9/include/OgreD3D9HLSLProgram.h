@@ -162,10 +162,10 @@ namespace Ogre {
         OptimisationLevel mOptimisationLevel;
 
         /** Gets the microcode from the microcode cache. */
-        void getMicrocodeFromCache(void);
+        void getMicrocodeFromCache(uint32 id);
         /** Compiles the microcode from the program source. */
         void compileMicrocode(void);
-        void addMicrocodeToCache();
+        void addMicrocodeToCache(uint32 id);
     public:
         D3D9HLSLProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);

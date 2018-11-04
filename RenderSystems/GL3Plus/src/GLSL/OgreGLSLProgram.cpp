@@ -109,6 +109,19 @@ namespace Ogre {
         }
     }
 
+    uint32 GLSLProgram::getCombinedHash()
+    {
+        uint32 hash = 0;
+        GpuProgram* progs[] = {mVertexShader, mFragmentShader, mGeometryShader,
+                               mHullShader,   mDomainShader,   mComputeShader};
+        for (auto p : progs)
+        {
+            if(!p) continue;
+            hash = FastHash(p->getSource().c_str(), p->getSource().size(), hash);
+        }
+        return hash;
+    }
+
     void GLSLProgram::setTransformFeedbackVaryings(const std::vector<String>& nameStrings)
     {
         // Get program object ID.
@@ -123,7 +136,8 @@ namespace Ogre {
             programId = glslGpuProgram->getGLProgramHandle();
 
             // force re-link
-            GpuProgramManager::getSingleton().removeMicrocodeFromCache(glslGpuProgram->getName());
+            uint32 hash = FastHash(glslGpuProgram->getSource().c_str(), glslGpuProgram->getSource().size());
+            GpuProgramManager::getSingleton().removeMicrocodeFromCache(hash);
             glslGpuProgram->setLinked(false);
         }
         else
@@ -131,7 +145,7 @@ namespace Ogre {
             programId = getGLProgramHandle();
 
             // force re-link
-            GpuProgramManager::getSingleton().removeMicrocodeFromCache(getCombinedName());
+            GpuProgramManager::getSingleton().removeMicrocodeFromCache(getCombinedHash());
         }
         mLinked = false;
 
@@ -166,10 +180,10 @@ namespace Ogre {
 #endif
     }
 
-    void GLSLProgram::getMicrocodeFromCache(void)
+    void GLSLProgram::getMicrocodeFromCache(uint32 id)
     {
         GpuProgramManager::Microcode cacheMicrocode =
-            GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
+            GpuProgramManager::getSingleton().getMicrocodeFromCache(id);
 
         cacheMicrocode->seek(0);
 

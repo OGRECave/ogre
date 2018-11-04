@@ -141,7 +141,7 @@ namespace Ogre
             {
                 GLint linkStatus = 0;
 
-                String programName = program->getName();
+                uint32 hash = FastHash(program->getSource().c_str(), program->getSource().size());
 
                 GLuint programHandle = program->getGLProgramHandle();
 
@@ -150,11 +150,11 @@ namespace Ogre
                 OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
 
                 // Use precompiled program if possible.
-                bool microcodeAvailableInCache = GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(programName);
+                bool microcodeAvailableInCache = GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash);
                 if (microcodeAvailableInCache)
                 {
                     GpuProgramManager::Microcode cacheMicrocode =
-                        GpuProgramManager::getSingleton().getMicrocodeFromCache(programName);
+                        GpuProgramManager::getSingleton().getMicrocodeFromCache(hash);
                     cacheMicrocode->seek(0);
 
                     GLenum binaryFormat = 0;
@@ -169,7 +169,7 @@ namespace Ogre
 
                     OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
                     if (!linkStatus)
-                        logObjectInfo("Could not use cached binary " + programName, programHandle);
+                        logObjectInfo("Could not use cached binary " + program->getName(), programHandle);
                 }
 
                 // Compilation needed if precompiled program is
@@ -204,7 +204,7 @@ namespace Ogre
                     GLint binaryLength = 0;
 
                     OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
-
+                    printf("write %d\n", binaryLength);
                     // Create microcode.
                     GpuProgramManager::Microcode newMicrocode =
                         GpuProgramManager::getSingleton().createMicrocode((unsigned long)binaryLength + sizeof(GLenum));
@@ -221,7 +221,7 @@ namespace Ogre
                     // newMicrocode->read(&binaryFormat, sizeof(GLenum));
                     // newMicrocode->read(&binaryData[0], binaryLength);
 
-                    GpuProgramManager::getSingleton().addMicrocodeToCache(programName, newMicrocode);
+                    GpuProgramManager::getSingleton().addMicrocodeToCache(hash, newMicrocode);
                 }
             }
             else

@@ -56,16 +56,17 @@ namespace Ogre
         OGRE_CHECK_GL_ERROR(glGenProgramPipelinesEXT(1, &mGLProgramHandle));
         //OGRE_CHECK_GL_ERROR(glBindProgramPipelineEXT(mGLProgramHandle));
 
+        uint32 vhash = 0, fhash = 0;
+
         // Compile and attach Vertex Program
         if(getVertexProgram())
         {
+            vhash = FastHash(mVertexShader->getSource().c_str(), mVertexShader->getSource().size());
             if(getVertexProgram()->isLinked())
             {
                 mLinked |= VERTEX_PROGRAM_LINKED;
             }
-            else if(getMicrocodeFromCache(
-                    getVertexProgram()->getName(),
-                    getVertexProgram()->createGLProgramHandle()))
+            else if (getMicrocodeFromCache(vhash, getVertexProgram()->createGLProgramHandle()))
             {
                 getVertexProgram()->setLinked(true);
                 mLinked |= VERTEX_PROGRAM_LINKED;
@@ -96,13 +97,12 @@ namespace Ogre
         // Compile and attach Fragment Program
         if(mFragmentProgram)
         {
+            fhash = FastHash(mFragmentProgram->getSource().c_str(), mFragmentProgram->getSource().size());
             if(mFragmentProgram->isLinked())
             {
                 mLinked |= FRAGMENT_PROGRAM_LINKED;
             }
-            else if(getMicrocodeFromCache(
-                    mFragmentProgram->getName(),
-                    mFragmentProgram->createGLProgramHandle()))
+            else if (getMicrocodeFromCache(fhash, mFragmentProgram->createGLProgramHandle()))
             {
                 mFragmentProgram->setLinked(true);
                 mLinked |= FRAGMENT_PROGRAM_LINKED;
@@ -130,12 +130,12 @@ namespace Ogre
             if(getVertexProgram() && getVertexProgram()->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_VERTEX_SHADER_BIT_EXT, getVertexProgram()->getGLProgramHandle()));
-                _writeToCache(getVertexProgram()->getName(), getVertexProgram()->getGLProgramHandle());
+                _writeToCache(vhash, getVertexProgram()->getGLProgramHandle());
             }
             if(mFragmentProgram && mFragmentProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_FRAGMENT_SHADER_BIT_EXT, mFragmentProgram->getGLProgramHandle()));
-                _writeToCache(mFragmentProgram->getName(), mFragmentProgram->getGLProgramHandle());
+                _writeToCache(fhash, mFragmentProgram->getGLProgramHandle());
             }
 
             // Validate pipeline

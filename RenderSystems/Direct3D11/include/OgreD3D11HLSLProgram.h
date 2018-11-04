@@ -286,7 +286,7 @@ namespace Ogre {
 
         void createConstantBuffer(const UINT ByteWidth);
         void analizeMicrocode();
-        void getMicrocodeFromCache(void);
+        void getMicrocodeFromCache(uint32 id);
         void compileMicrocode(void);
     public:
         D3D11HLSLProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -356,7 +356,7 @@ namespace Ogre {
         unsigned int getNumInputs(void)const;
         unsigned int getNumOutputs(void)const;
 
-        String getNameForMicrocodeCache();
+        uint32 getNameForMicrocodeCache();
 
         const D3D11_SIGNATURE_PARAMETER_DESC & getInputParamDesc(unsigned int index) const;
         const D3D11_SIGNATURE_PARAMETER_DESC & getOutputParamDesc(unsigned int index) const;    

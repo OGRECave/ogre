@@ -114,10 +114,18 @@ namespace Ogre {
                 reportGLSLError( glErr, "GLSLLinkProgram::activate", "Error Creating GLSL Program Object", 0 );
             }
 
-            if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
-                 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
+            uint32 hash = 0;
+            GpuProgram* progs[] = {mVertexShader, mGeometryProgram, mFragmentProgram};
+            for(auto p : progs)
             {
-                getMicrocodeFromCache();
+                if(!p) continue;
+                hash = FastHash(p->getSource().c_str(), p->getSource().size(), hash);
+            }
+
+            if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
+                 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
+            {
+                getMicrocodeFromCache(hash);
             }
             else
             {
@@ -147,10 +155,10 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLLinkProgram::getMicrocodeFromCache(void)
+    void GLSLLinkProgram::getMicrocodeFromCache(uint32 id)
     {
         GpuProgramManager::Microcode cacheMicrocode = 
-            GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
+            GpuProgramManager::getSingleton().getMicrocodeFromCache(id);
         
         GLenum binaryFormat = *((GLenum *)(cacheMicrocode->getPtr()));
         uint8 * programBuffer = cacheMicrocode->getPtr() + sizeof(GLenum);
@@ -445,6 +453,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::compileAndLink()
     {
+        uint32 hash = 0;
         if (mVertexShader)
         {
             // attach Vertex Program
@@ -462,6 +471,8 @@ namespace Ogre {
 
             size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
             const String& vpSource = mVertexShader->getSource();
+
+            hash = FastHash(vpSource.c_str(), vpSource.size(), hash);
             for (size_t i = 0; i < numAttribs; ++i)
             {
                 const CustomAttribute& a = msCustomAttributes[i];
@@ -497,6 +508,7 @@ namespace Ogre {
 
         if (mGeometryProgram)
         {
+            hash = FastHash(mGeometryProgram->getSource().c_str(), mGeometryProgram->getSource().size(), hash);
             // attach Geometry Program
             mGeometryProgram->attachToProgramObject(mGLProgramHandle);
 
@@ -517,6 +529,7 @@ namespace Ogre {
 
         if (mFragmentProgram)
         {
+            hash = FastHash(mFragmentProgram->getSource().c_str(), mFragmentProgram->getSource().size(), hash);
             // attach Fragment Program
             mFragmentProgram->attachToProgramObject(mGLProgramHandle);
         }
@@ -545,8 +558,6 @@ namespace Ogre {
             if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
             {
                 // add to the microcode to the cache
-                String name;
-                name = getCombinedName();
 
                 // get buffer size
                 GLint binaryLength = 0;
@@ -568,7 +579,7 @@ namespace Ogre {
                 memcpy(newMicrocode->getPtr(), &binaryFormat, sizeof(GLenum));
 
                 // add to the microcode to the cache
-                GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
+                GpuProgramManager::getSingleton().addMicrocodeToCache(hash, newMicrocode);
             }
         }
     }

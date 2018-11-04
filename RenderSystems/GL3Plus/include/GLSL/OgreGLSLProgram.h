@@ -115,9 +115,11 @@ namespace Ogre {
         /// Linked compute shader.
         GLSLShader* mComputeShader;
 
+        uint32 getCombinedHash();
+
         Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
-        void getMicrocodeFromCache(void);
+        void getMicrocodeFromCache(uint32 id);
     };
 
 
