@@ -53,7 +53,7 @@ namespace Ogre
     {
         D3D11VertexArrayObjectShared    *mSharedData;
 
-        D3D11VertexArrayObject( uint32 vaoName, uint32 renderQueueId, uint8 inputLayoutId,
+        D3D11VertexArrayObject( uint32 vaoName, uint32 renderQueueId, uint16 inputLayoutId,
                                 const VertexBufferPackedVec &vertexBuffers,
                                 IndexBufferPacked *indexBuffer,
                                 OperationType opType,

@@ -93,7 +93,7 @@ namespace Ogre
         OperationType mOperationType;
 
     public:
-        VertexArrayObject( uint32 vaoName, uint32 renderQueueId, uint8 inputLayoutId,
+        VertexArrayObject( uint32 vaoName, uint32 renderQueueId, uint16 inputLayoutId,
                            const VertexBufferPackedVec &vertexBuffers,
                            IndexBufferPacked *indexBuffer,
                            OperationType operationType );
