@@ -223,7 +223,7 @@ bool RTShaderSRSTexturedFog::addFunctionInvocations(ProgramSet* programSet)
     curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);  
     vsMain->addAtomInstance(curFuncInvocation);     
     
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, FFP_PS_FOG);
+    curFuncInvocation = OGRE_NEW SampleTextureAtom(FFP_PS_FOG);
     curFuncInvocation->pushOperand(mBackgroundTextureSampler, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSInPosView, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mFogColour, Operand::OPS_OUT);

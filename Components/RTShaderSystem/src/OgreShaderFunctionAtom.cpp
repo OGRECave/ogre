@@ -452,5 +452,53 @@ void AssignmentAtom::writeSourceCode(std::ostream& os, const String& targetLangu
     os << ";";
 }
 
+String SampleTextureAtom::Type = "SampleTextureAtom";
+SampleTextureAtom::SampleTextureAtom(ParameterPtr lhs, ParameterPtr sampler, ParameterPtr texcoord, int groupOrder)
+{
+    // do this backwards for compatibility with FFP_FUNC_SAMPLE_TEXTURE calls
+    pushOperand(sampler, Operand::OPS_IN);
+    pushOperand(texcoord, Operand::OPS_IN);
+    pushOperand(lhs, Operand::OPS_OUT);
+    mGroupExecutionOrder = groupOrder;
+}
+
+void SampleTextureAtom::writeSourceCode(std::ostream& os, const String& targetLanguage) const
+{
+    OperandVector::const_iterator outOp = mOperands.begin();
+    // find the output operand
+    while(outOp->getSemantic() != Operand::OPS_OUT)
+        outOp++;
+    writeOperands(os, outOp, mOperands.end());
+    os << "\t=\t";
+
+    bool is_glsl = targetLanguage[0] == 'g';
+
+    os << (is_glsl ? "texture" : "tex");
+    const auto& sampler = mOperands.front().getParameter();
+    switch(sampler->getType())
+    {
+    case GCT_SAMPLER1D:
+        os << "1D";
+        break;
+    case GCT_SAMPLER_EXTERNAL_OES:
+    case GCT_SAMPLER2D:
+        os << "2D";
+        break;
+    case GCT_SAMPLER3D:
+        os << "3D";
+        break;
+    case GCT_SAMPLERCUBE:
+        os << (is_glsl ? "Cube" : "CUBE");
+        break;
+    default:
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "unknown sampler");
+        break;
+    }
+
+    os << "(";
+    writeOperands(os, mOperands.begin(), outOp);
+    os << ");";
+}
+
 }
 }

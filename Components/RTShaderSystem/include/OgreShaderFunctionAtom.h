@@ -270,6 +270,18 @@ public:
     static String Type;
 };
 
+/// shorthand for "dst = texture*(sampler, uv);" instead of using FFP_SampleTexture
+class _OgreRTSSExport SampleTextureAtom : public FunctionInvocation
+{
+public:
+    explicit SampleTextureAtom(int groupOrder) { mGroupExecutionOrder = groupOrder; }
+    SampleTextureAtom(ParameterPtr lhs, ParameterPtr sampler, ParameterPtr texcoord, int groupOrder);
+    void writeSourceCode(std::ostream& os, const String& targetLanguage) const;
+    const String& getFunctionAtomType() { return Type; }
+
+    static String Type;
+};
+
 typedef std::vector<FunctionAtom*>                 FunctionAtomInstanceList;
 typedef FunctionAtomInstanceList::iterator          FunctionAtomInstanceIterator;
 typedef FunctionAtomInstanceList::const_iterator    FunctionAtomInstanceConstIterator;
