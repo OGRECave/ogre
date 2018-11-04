@@ -59,6 +59,14 @@ THE SOFTWARE.
     #include "iOS/macUtils.h"
 #endif
 
+#include "Hash/MurmurHash3.h"
+
+#if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32
+    #define OGRE_HASH128_FUNC MurmurHash3_x86_128
+#else
+    #define OGRE_HASH128_FUNC MurmurHash3_x64_128
+#endif
+
 namespace Ogre
 {
     const int HlmsBits::HlmsTypeBits    = 3;
@@ -279,6 +287,72 @@ namespace Ogre
             mHlmsManager->unregisterHlms( mType );
             mHlmsManager = 0;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    static void hashFileConcatenate( DataStreamPtr &inFile, FastArray<uint8> &fileContents )
+    {
+        const size_t fileSize = inFile->size();
+        fileContents.resize( fileSize + sizeof(uint64) * 2u );
+
+        uint64 hashResult[2];
+        memset( hashResult, 0, sizeof(hashResult) );
+        inFile->read( fileContents.begin() + 8u, fileContents.size() );
+        OGRE_HASH128_FUNC( fileContents.begin(), fileContents.size(), IdString::Seed, hashResult );
+        memcpy( fileContents.begin(), hashResult, sizeof(uint64) * 2u );
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::hashPieceFiles( Archive *archive, const StringVector &pieceFiles,
+                               FastArray<uint8> &fileContents ) const
+    {
+        StringVector::const_iterator itor = pieceFiles.begin();
+        StringVector::const_iterator end  = pieceFiles.end();
+
+        while( itor != end )
+        {
+            //Only open piece files with current render system extension
+            const String::size_type extPos0 = itor->find( mShaderFileExt );
+            const String::size_type extPos1 = itor->find( ".any" );
+            if( extPos0 == itor->size() - mShaderFileExt.size() ||
+                extPos1 == itor->size() - 4u )
+            {
+                DataStreamPtr inFile = archive->open( *itor );
+                hashFileConcatenate( inFile, fileContents );
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::getTemplateChecksum( uint64 outHash[2] ) const
+    {
+        FastArray<uint8> fileContents;
+        fileContents.resize( sizeof(uint64) * 2u, 0 );
+
+        for( size_t i=0; i<NumShaderTypes; ++i )
+        {
+            const String filename = ShaderFiles[i] + mShaderFileExt;
+            if( mDataFolder->exists( filename ) )
+            {
+                //Library piece files first
+                LibraryVec::const_iterator itor = mLibrary.begin();
+                LibraryVec::const_iterator end  = mLibrary.end();
+
+                while( itor != end )
+                {
+                    hashPieceFiles( itor->dataFolder, itor->pieceFiles[i], fileContents );
+                    ++itor;
+                }
+
+                //Main piece files
+                hashPieceFiles( mDataFolder, mPieceFiles[i], fileContents );
+
+                //The shader file
+                DataStreamPtr inFile = mDataFolder->open( filename );
+                hashFileConcatenate( inFile, fileContents );
+            }
+        }
+
+        memcpy( outHash, fileContents.begin(), sizeof(uint64) * 2u );
     }
     //-----------------------------------------------------------------------------------
     void Hlms::setCommonProperties(void)
@@ -3076,3 +3150,5 @@ namespace Ogre
         this->value.swap( other.value );
     }
 }
+
+#undef OGRE_HASH128_FUNC

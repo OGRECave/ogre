@@ -56,6 +56,8 @@ namespace Ogre
     void HlmsDiskCache::clearCache(void)
     {
         mTemplatesOutOfDate = false;
+        memset( mCache.templateHash, 0, sizeof( mCache.templateHash ) );
+        mCache.type = 255;
         mCache.sourceCode.clear();
         mCache.pso.clear();
         mShaderProfile.clear();
@@ -101,6 +103,7 @@ namespace Ogre
 
         mCache.type = hlms->getType();
         mShaderProfile = hlms->getShaderProfile();
+        hlms->getTemplateChecksum( mCache.templateHash );
 
         {
             //Copy shaders
@@ -149,7 +152,7 @@ namespace Ogre
             LogManager::getSingleton().logMessage(
                         "WARNING: The cached Hlms is for type " +
                         StringConverter::toString( mCache.type ) +
-                        "but it is being applied to Hlms type: " +
+                        " but it is being applied to Hlms type: " +
                         StringConverter::toString( hlms->getType() ) +
                         ". HlmsDiskCache won't be applied." );
             return;
@@ -162,6 +165,18 @@ namespace Ogre
                         "INFO: The cached Hlms is for shader profile in '" + mShaderProfile +
                         "' but it does not match the current one '" + hlms->getShaderProfile() +
                         "'. This increases loading times." );
+        }
+
+        {
+            uint64 currentHash[2];
+            hlms->getTemplateChecksum( currentHash );
+            if( mCache.templateHash[0] != currentHash[0] ||
+                mCache.templateHash[1] != currentHash[1] )
+            {
+                mTemplatesOutOfDate = true;
+                LogManager::getSingleton().logMessage(
+                            "INFO: The cached Hlms is out of date. The templates have changed." );
+            }
         }
 
         hlms->clearShaderCache();
@@ -430,7 +445,10 @@ namespace Ogre
 
         const uint16 version = read<uint16>( dataStream );
         if( version != c_hlmsDiskCacheVersion )
+        {
             LogManager::getSingleton().logMessage( "HlmsDiskCache: Version mismatch. Not loading." );
+            return;
+        }
 
         read( dataStream, mCache.templateHash );
         read( dataStream, mCache.type );

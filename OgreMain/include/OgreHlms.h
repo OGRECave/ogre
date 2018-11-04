@@ -332,6 +332,8 @@ namespace Ogre
         virtual void clearShaderCache(void);
 
         void processPieces( Archive *archive, const StringVector &pieceFiles );
+        void hashPieceFiles( Archive *archive, const StringVector &pieceFiles,
+                             FastArray<uint8> &fileContents ) const;
 
         void dumpProperties( std::ofstream &outFile );
 
@@ -423,6 +425,8 @@ namespace Ogre
         void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
         HlmsManager* getHlmsManager(void) const             { return mHlmsManager; }
         const String& getShaderProfile(void) const          { return mShaderProfile; }
+
+        void getTemplateChecksum( uint64 outHash[2] ) const;
 
         /** Sets the quality of the Hlms. This function is most relevant for mobile and
             almost or completely ignored by Desktop.
