@@ -299,6 +299,7 @@ namespace Ogre
         Real output = 0;
         // For simplicity, factor input down to {0,1)
         input = std::fmod(input, Real(1));
+        if(input < 0) input += 1;
 
         // Calculate output in -1..1 range
         switch (mWaveType)
