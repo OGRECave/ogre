@@ -249,6 +249,17 @@ namespace Ogre
     {
         dataStream->write( &value, sizeof(value) );
     }
+    //-----------------------------------------------------------------------------------
+    void HlmsDiskCache::save( DataStreamPtr &dataStream, const IdString &hashedString )
+    {
+        write( dataStream, hashedString.mHash );
+#if OGRE_DEBUG_STR_SIZE > 0
+        const size_t strLength = strnlen( hashedString.mDebugString, OGRE_DEBUG_STR_SIZE );
+        write<uint16>( dataStream, static_cast<uint16>( strLength ) );
+        dataStream->write( hashedString.mDebugString, strLength );
+#endif
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsDiskCache::save( DataStreamPtr &dataStream, const String &string )
     {
         write<uint32>( dataStream, static_cast<uint32>( string.size() ) );
@@ -264,7 +275,7 @@ namespace Ogre
 
         while( itor != end )
         {
-            write( dataStream, itor->keyName.mHash );
+            save( dataStream, itor->keyName );
             write( dataStream, itor->value );
             ++itor;
         }
@@ -285,7 +296,7 @@ namespace Ogre
 
             while( itor != end )
             {
-                write( dataStream, itor->first.mHash );
+                save( dataStream, itor->first );
                 save( dataStream, itor->second );
                 ++itor;
             }
@@ -297,6 +308,11 @@ namespace Ogre
         LogManager::getSingleton().logMessage( "Saving HlmsDiskCache to " + dataStream->getName() );
 
         write<uint16>( dataStream, c_hlmsDiskCacheVersion );
+#if OGRE_DEBUG_STR_SIZE > 0
+        write<uint16>( dataStream, OGRE_DEBUG_STR_SIZE );
+#else
+        write<uint16>( dataStream, 0 );
+#endif
         write( dataStream, mCache.templateHash );
         write( dataStream, mCache.type );
         save( dataStream, mShaderProfile );
@@ -391,6 +407,28 @@ namespace Ogre
         dataStream->read( &value, sizeof(value) );
         return value;
     }
+    //-----------------------------------------------------------------------------------
+    void HlmsDiskCache::load( DataStreamPtr &dataStream, IdString &hashedString )
+    {
+        read( dataStream, hashedString.mHash );
+#if OGRE_DEBUG_STR_SIZE > 0
+        if( mDebugStrSize > 0 )
+        {
+            const uint16 strLength = read<uint16>( dataStream );
+            const uint16 bytesToRead = std::min<uint16>( strLength, OGRE_DEBUG_STR_SIZE - 1u );
+            dataStream->read( hashedString.mDebugString, bytesToRead );
+            hashedString.mDebugString[bytesToRead] = '\0'; //Force the string to be null-terminated
+            dataStream->skip( strLength - bytesToRead );
+        }
+#else
+        if( mDebugStrSize > 0 )
+        {
+            const uint16 strLength = read<uint16>( dataStream );
+            dataStream->skip( strLength );
+        }
+#endif
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsDiskCache::load( DataStreamPtr &dataStream, String &string )
     {
         const uint32 stringLength = read<uint32>( dataStream );
@@ -409,7 +447,7 @@ namespace Ogre
         {
             IdString keyName;
             int32 value;
-            read( dataStream, keyName.mHash );
+            load( dataStream, keyName );
             read( dataStream, value );
             properties.push_back( HlmsProperty( keyName, value ) );
         }
@@ -430,7 +468,7 @@ namespace Ogre
             {
                 IdString key;
                 String valueStr;
-                read( dataStream, key.mHash );
+                load( dataStream, key );
                 load( dataStream, valueStr );
                 renderableCache.pieces[i][key] = valueStr;
             }
@@ -449,6 +487,18 @@ namespace Ogre
             LogManager::getSingleton().logMessage( "HlmsDiskCache: Version mismatch. Not loading." );
             return;
         }
+
+        mDebugStrSize = read<uint16>( dataStream );
+#if OGRE_DEBUG_STR_SIZE > 0
+        if( OGRE_DEBUG_STR_SIZE != mDebugStrSize )
+        {
+            LogManager::getSingleton().logMessage(
+                        "HlmsDiskCache: This cache was built with a OGRE_DEBUG_STR_SIZE (IdString) of "
+                        + StringConverter::toString( mDebugStrSize ) +
+                        ". It cannot be used. Not loading." );
+            return;
+        }
+#endif
 
         read( dataStream, mCache.templateHash );
         read( dataStream, mCache.type );
