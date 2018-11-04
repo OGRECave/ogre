@@ -88,20 +88,27 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::loadFromSource(void)
     {
-        if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(String("D3D9_HLSL_") + mName) )
+        uint32 hash = FastHash(mSource.c_str(), mSource.length());
+        if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
         {
-            getMicrocodeFromCache();
+            getMicrocodeFromCache(hash);
         }
         else
         {
             compileMicrocode();
+
+
+            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+            {
+                addMicrocodeToCache(hash);
+            }
         }
     }
     //-----------------------------------------------------------------------
-    void D3D9HLSLProgram::getMicrocodeFromCache(void)
+    void D3D9HLSLProgram::getMicrocodeFromCache(uint32 id)
     {
         GpuProgramManager::Microcode cacheMicrocode = 
-            GpuProgramManager::getSingleton().getMicrocodeFromCache(String("D3D9_HLSL_") + mName);
+            GpuProgramManager::getSingleton().getMicrocodeFromCache(id);
         
         cacheMicrocode->seek(0);
 
@@ -308,19 +315,12 @@ namespace Ogre {
 
 
             SAFE_RELEASE(pConstTable);
-
-            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
-            {
-                addMicrocodeToCache();
-            }
         }
     }
     //-----------------------------------------------------------------------
-    void D3D9HLSLProgram::addMicrocodeToCache()
+    void D3D9HLSLProgram::addMicrocodeToCache(uint32 id)
     {
         // add to the microcode to the cache
-        String name = String("D3D9_HLSL_") + mName;
-
         size_t sizeOfBuffer = sizeof(size_t) + mMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
         
         // create microcode
@@ -360,7 +360,7 @@ namespace Ogre {
 
 
         // add to the microcode to the cache
-        GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
+        GpuProgramManager::getSingleton().addMicrocodeToCache(id, newMicrocode);
     }
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::createLowLevelImpl(void)

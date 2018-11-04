@@ -49,7 +49,7 @@ namespace Ogre {
 
         Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
-        static bool getMicrocodeFromCache(const String& name, GLuint programHandle);
+        static bool getMicrocodeFromCache(uint32 id, GLuint programHandle);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         virtual void notifyOnContextLost();
@@ -57,7 +57,7 @@ namespace Ogre {
         virtual void notifyOnContextReset();
 #endif
 
-        static void _writeToCache(const String& name, GLuint programHandle);
+        static void _writeToCache(uint32 id, GLuint programHandle);
 
         /// Constructor should only be used by GLSLESLinkProgramManager and GLSLESProgramPipelineManager
         GLSLESProgramCommon(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram);

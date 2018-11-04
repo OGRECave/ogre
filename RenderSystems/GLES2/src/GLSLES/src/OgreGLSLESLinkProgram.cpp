@@ -75,7 +75,15 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
 
-            if (!getMicrocodeFromCache(getCombinedName(), mGLProgramHandle))
+            uint32 hash = 0;
+            GpuProgram* progs[] = {mVertexShader, mFragmentProgram};
+            for(auto p : progs)
+            {
+                if(!p) continue;
+                hash = FastHash(p->getSource().c_str(), p->getSource().size(), hash);
+            }
+
+            if (!getMicrocodeFromCache(hash, mGLProgramHandle))
             {
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
                 // Check CmdParams for each shader type to see if we should optimize
@@ -126,6 +134,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLESLinkProgram::compileAndLink()
     {
+        uint32 hash = 0;
+        GpuProgram* progs[] = {mVertexShader, mFragmentProgram};
+        for(auto p : progs)
+        {
+            if(!p) continue;
+            hash = FastHash(p->getSource().c_str(), p->getSource().size(), hash);
+        }
+
         // attach Vertex Program
         getVertexProgram()->attachToProgramObject(mGLProgramHandle);
         setSkeletalAnimationIncluded(getVertexProgram()->isSkeletalAnimationIncluded());
@@ -157,7 +173,7 @@ namespace Ogre {
 
         if(mLinked)
         {
-            _writeToCache(getCombinedName(), mGLProgramHandle);
+            _writeToCache(hash, mGLProgramHandle);
         }
     }
 
