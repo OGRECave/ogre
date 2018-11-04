@@ -171,6 +171,8 @@ namespace Ogre
         mActiveBlocks[block->mBlockType].erase( itor );
 
         mFreeBlockIds[block->mBlockType].push_back( block->mId );
+
+        block->mId = std::numeric_limits<uint16>::max();
     }
     //-----------------------------------------------------------------------------------
     template <typename T, HlmsBasicBlock type, size_t maxLimit>
@@ -241,7 +243,7 @@ namespace Ogre
 
         if( !mMacroblocks[macroblock->mLifetimeId].mRefCount )
         {
-            mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[macroblock->mId] );
+            mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[macroblock->mLifetimeId] );
             destroyBasicBlock( &mMacroblocks[macroblock->mLifetimeId] );
         }
     }

@@ -92,7 +92,7 @@ namespace Ogre
         void load( DataStreamPtr &dataStream, Hlms::RenderableCache &renderableCache );
 
     public:
-        HlmsDiskCache();
+        HlmsDiskCache( HlmsManager *hlmsManager );
         ~HlmsDiskCache();
 
         void clearCache(void);

@@ -28,6 +28,8 @@
 
 #include "OgreFileSystemLayer.h"
 
+#include "OgreHlmsDiskCache.h"
+
 #include "OgreLogManager.h"
 
 #if OGRE_USE_SDL2
@@ -293,6 +295,8 @@ namespace Demo
     {
         BaseSystem::deinitialize();
 
+        saveHlmsDiskCache();
+
         if( mSceneManager )
             mSceneManager->removeRenderQueueListener( mOverlaySystem );
 
@@ -451,6 +455,76 @@ namespace Demo
                     archName, typeName, secName);
 #endif
     }
+
+    //-----------------------------------------------------------------------------------
+    void GraphicsSystem::loadHlmsDiskCache(void)
+    {
+        Ogre::HlmsManager *hlmsManager = mRoot->getHlmsManager();
+        Ogre::HlmsDiskCache diskCache( hlmsManager );
+
+        Ogre::ArchiveManager &archiveManager = Ogre::ArchiveManager::getSingleton();
+
+        Ogre::Archive *rwAccessFolderArchive = archiveManager.load( mWriteAccessFolder,
+                                                                    "FileSystem", true );
+
+        for( size_t i=Ogre::HLMS_LOW_LEVEL + 1u; i<Ogre::HLMS_MAX; ++i )
+        {
+            Ogre::Hlms *hlms = hlmsManager->getHlms( static_cast<Ogre::HlmsTypes>( i ) );
+            if( hlms )
+            {
+                Ogre::String filename = "hlmsDiskCache" + Ogre::StringConverter::toString( i ) + ".bin";
+
+                try
+                {
+                    Ogre::DataStreamPtr diskCacheFile = rwAccessFolderArchive->open( filename );
+                    diskCache.loadFrom( diskCacheFile );
+                    diskCache.applyTo( hlms );
+                }
+                catch( Ogre::FileNotFoundException& )
+                {
+                }
+                catch( Ogre::Exception& )
+                {
+                    Ogre::LogManager::getSingleton().logMessage(
+                                "Error loading cache from " + mWriteAccessFolder + "/" + filename + "!"
+                                " If you have issues, try deleting the file and restarting the app" );
+                }
+            }
+        }
+
+        archiveManager.unload( mWriteAccessFolder );
+    }
+    //-----------------------------------------------------------------------------------
+    void GraphicsSystem::saveHlmsDiskCache(void)
+    {
+        if( mRoot->getRenderSystem() )
+        {
+            Ogre::HlmsManager *hlmsManager = mRoot->getHlmsManager();
+            Ogre::HlmsDiskCache diskCache( hlmsManager );
+
+            Ogre::ArchiveManager &archiveManager = Ogre::ArchiveManager::getSingleton();
+
+            Ogre::Archive *rwAccessFolderArchive = archiveManager.load( mWriteAccessFolder,
+                                                                        "FileSystem", false );
+
+            for( size_t i=Ogre::HLMS_LOW_LEVEL + 1u; i<Ogre::HLMS_MAX; ++i )
+            {
+                Ogre::Hlms *hlms = hlmsManager->getHlms( static_cast<Ogre::HlmsTypes>( i ) );
+                if( hlms )
+                {
+                    diskCache.copyFrom( hlms );
+
+                    Ogre::DataStreamPtr diskCacheFile =
+                            rwAccessFolderArchive->create( "hlmsDiskCache" +
+                                                           Ogre::StringConverter::toString( i ) +
+                                                           ".bin" );
+                    diskCache.saveTo( diskCacheFile );
+                }
+            }
+
+            archiveManager.unload( mWriteAccessFolder );
+        }
+    }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::setupResources(void)
     {
@@ -578,6 +652,8 @@ namespace Demo
     void GraphicsSystem::loadResources(void)
     {
         registerHlms();
+
+        loadHlmsDiskCache();
 
         // Initialise, parse scripts etc
         Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups( true );

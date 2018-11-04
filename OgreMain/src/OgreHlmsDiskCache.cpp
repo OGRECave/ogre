@@ -40,9 +40,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    HlmsDiskCache::HlmsDiskCache() :
+    HlmsDiskCache::HlmsDiskCache( HlmsManager *hlmsManager ) :
         mTemplatesOutOfDate( false ),
-        mHlmsManager( 0 )
+        mHlmsManager( hlmsManager )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ namespace Ogre
                 const uint32 finalHash = (*itor)->hash;
 
                 const uint32 renderableIdx  = (finalHash >> HlmsBits::RenderableShift) &
-                                              (uint32)HlmsBits::RendarebleHlmsTypeMask;
+                                              (uint32)HlmsBits::RenderableMask;
                 const uint32 passIdx        = (finalHash >> HlmsBits::PassShift) &
                                               (uint32)HlmsBits::PassMask;
 //                const uint32 inputLayout    = (finalHash >> HlmsBits::InputLayoutShift) &
@@ -370,17 +370,13 @@ namespace Ogre
         properties.clear();
         properties.reserve( numEntries );
 
-        HlmsPropertyVec::const_iterator itor = properties.begin();
-        HlmsPropertyVec::const_iterator end  = properties.end();
-
-        while( itor != end )
+        for( size_t j=0; j<numEntries; ++j )
         {
             IdString keyName;
             int32 value;
             read( dataStream, keyName.mHash );
             read( dataStream, value );
             properties.push_back( HlmsProperty( keyName, value ) );
-            ++itor;
         }
     }
     //-----------------------------------------------------------------------------------
