@@ -29,6 +29,7 @@
 #include "OgreFileSystemLayer.h"
 
 #include "OgreHlmsDiskCache.h"
+#include "OgreGpuProgramManager.h"
 
 #include "OgreLogManager.h"
 
@@ -68,6 +69,8 @@ namespace Demo
         mThreadWeight( 0 ),
         mQuit( false ),
         mAlwaysAskForConfig( true ),
+        mUseHlmsDiskCache( true ),
+        mUseMicrocodeCache( true ),
         mBackgroundColour( backgroundColour )
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
@@ -279,7 +282,7 @@ namespace Demo
         BaseSystem::initialize();
 
 #if OGRE_PROFILING
-        Ogre::Profiler::getSingleton().setEnabled( true );
+        Ogre::Profiler::getSingleton().setEnabled( false );
     #if OGRE_PROFILING == OGRE_PROFILING_INTERNAL
         Ogre::Profiler::getSingleton().endProfile( "" );
     #endif
@@ -455,10 +458,12 @@ namespace Demo
                     archName, typeName, secName);
 #endif
     }
-
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::loadHlmsDiskCache(void)
     {
+        if( !mUseMicrocodeCache && !mUseHlmsDiskCache )
+            return;
+
         Ogre::HlmsManager *hlmsManager = mRoot->getHlmsManager();
         Ogre::HlmsDiskCache diskCache( hlmsManager );
 
@@ -467,27 +472,44 @@ namespace Demo
         Ogre::Archive *rwAccessFolderArchive = archiveManager.load( mWriteAccessFolder,
                                                                     "FileSystem", true );
 
-        for( size_t i=Ogre::HLMS_LOW_LEVEL + 1u; i<Ogre::HLMS_MAX; ++i )
+        if( mUseMicrocodeCache )
         {
-            Ogre::Hlms *hlms = hlmsManager->getHlms( static_cast<Ogre::HlmsTypes>( i ) );
-            if( hlms )
+            //Make sure the microcode cache is enabled.
+            Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache( true );
+            const Ogre::String filename = "microcodeCodeCache.cache";
+            if( rwAccessFolderArchive->exists( filename ) )
             {
-                Ogre::String filename = "hlmsDiskCache" + Ogre::StringConverter::toString( i ) + ".bin";
+                Ogre::DataStreamPtr shaderCacheFile = rwAccessFolderArchive->open( filename );
+                Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache( shaderCacheFile );
+            }
+        }
 
-                try
+        if( mUseHlmsDiskCache )
+        {
+            for( size_t i=Ogre::HLMS_LOW_LEVEL + 1u; i<Ogre::HLMS_MAX; ++i )
+            {
+                Ogre::Hlms *hlms = hlmsManager->getHlms( static_cast<Ogre::HlmsTypes>( i ) );
+                if( hlms )
                 {
-                    if( rwAccessFolderArchive->exists( filename ) )
+                    Ogre::String filename = "hlmsDiskCache" +
+                                            Ogre::StringConverter::toString( i ) + ".bin";
+
+                    try
                     {
-                        Ogre::DataStreamPtr diskCacheFile = rwAccessFolderArchive->open( filename );
-                        diskCache.loadFrom( diskCacheFile );
-                        diskCache.applyTo( hlms );
+                        if( rwAccessFolderArchive->exists( filename ) )
+                        {
+                            Ogre::DataStreamPtr diskCacheFile = rwAccessFolderArchive->open( filename );
+                            diskCache.loadFrom( diskCacheFile );
+                            diskCache.applyTo( hlms );
+                        }
                     }
-                }
-                catch( Ogre::Exception& )
-                {
-                    Ogre::LogManager::getSingleton().logMessage(
-                                "Error loading cache from " + mWriteAccessFolder + "/" + filename + "!"
-                                " If you have issues, try deleting the file and restarting the app" );
+                    catch( Ogre::Exception& )
+                    {
+                        Ogre::LogManager::getSingleton().logMessage(
+                                    "Error loading cache from " + mWriteAccessFolder + "/" +
+                                    filename + "! If you have issues, try deleting the file "
+                                    "and restarting the app" );
+                    }
                 }
             }
         }
@@ -497,7 +519,7 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::saveHlmsDiskCache(void)
     {
-        if( mRoot->getRenderSystem() )
+        if( mRoot->getRenderSystem() && (mUseMicrocodeCache || mUseHlmsDiskCache) )
         {
             Ogre::HlmsManager *hlmsManager = mRoot->getHlmsManager();
             Ogre::HlmsDiskCache diskCache( hlmsManager );
@@ -507,19 +529,29 @@ namespace Demo
             Ogre::Archive *rwAccessFolderArchive = archiveManager.load( mWriteAccessFolder,
                                                                         "FileSystem", false );
 
-            for( size_t i=Ogre::HLMS_LOW_LEVEL + 1u; i<Ogre::HLMS_MAX; ++i )
+            if( mUseHlmsDiskCache )
             {
-                Ogre::Hlms *hlms = hlmsManager->getHlms( static_cast<Ogre::HlmsTypes>( i ) );
-                if( hlms )
+                for( size_t i=Ogre::HLMS_LOW_LEVEL + 1u; i<Ogre::HLMS_MAX; ++i )
                 {
-                    diskCache.copyFrom( hlms );
+                    Ogre::Hlms *hlms = hlmsManager->getHlms( static_cast<Ogre::HlmsTypes>( i ) );
+                    if( hlms )
+                    {
+                        diskCache.copyFrom( hlms );
 
-                    Ogre::DataStreamPtr diskCacheFile =
-                            rwAccessFolderArchive->create( "hlmsDiskCache" +
-                                                           Ogre::StringConverter::toString( i ) +
-                                                           ".bin" );
-                    diskCache.saveTo( diskCacheFile );
+                        Ogre::DataStreamPtr diskCacheFile =
+                                rwAccessFolderArchive->create( "hlmsDiskCache" +
+                                                               Ogre::StringConverter::toString( i ) +
+                                                               ".bin" );
+                        diskCache.saveTo( diskCacheFile );
+                    }
                 }
+            }
+
+            if( Ogre::GpuProgramManager::getSingleton().isCacheDirty() && mUseMicrocodeCache )
+            {
+                const Ogre::String filename = "microcodeCodeCache.cache";
+                Ogre::DataStreamPtr shaderCacheFile = rwAccessFolderArchive->create( filename );
+                Ogre::GpuProgramManager::getSingleton().saveMicrocodeCache( shaderCacheFile );
             }
 
             archiveManager.unload( mWriteAccessFolder );

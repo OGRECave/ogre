@@ -67,6 +67,60 @@ namespace Ogre
 
         Decrease loading times further by also enabling the microcode cache.
         See http://wiki.ogre3d.org/Ogre+2.1+FAQ#Starting_my_app_takes_forever_particularly_Direct3D11_
+
+    @remarks
+        What's the difference between the Microcode cache and HlmsDiskCache?
+
+        A PSO has multiple stages since it's compiled in an Hlms:
+
+    @code
+        Hlms Shader Templates       These are the shader templates (e.g. PixelShader_ps.glsl)
+                 |
+                 v
+        Property & Piece info       These are the properties set by the Hlms to describe information
+                 |                  about the mesh, the material and the pass (e.g. does it have
+                 |                  normals? does it use normal mapping? Is this a shadow mapping pass?)
+                 |                  This info is used to run the Hlms parser on the templates.
+                 |                  HlmsDiskCache stores it in
+                 |                  HlmsDiskCache::Cache::sourceCode::mergedCache
+                 |                  This information is API & platform agnostic.
+                 |
+                 v
+         Preprocessed Shader        These are the templates processed by the Hlms. There is up to 1
+                 |                  for each shader stage. The produced output is valid shader code
+                 |                  and specific to each RenderSystem API (OpenGL, D3D11, Metal)
+                 |                  While parsing the templates is fast, it's not free; specially in
+                 |                  debug builds
+                 |                  HlmsDiskCache stores this in
+                 |                  HlmsDiskCache::Cache::sourceCode::sourceFile
+                 |
+                 v
+         Compiled Microcode         The is a binary blob produced by the shader compiler
+                 |                  (e.g fxc in D3D11). *This is cached by the Microcode cache*.
+                 |                  If the microcode cache is not active, the HlmsDiskCache will
+                 |                  rebuild it from scratch to move the performance hit (stalls) from
+                 |                  realtime into loading time.
+                 |
+                 V
+        Pipeline State Object       This is a huge amalgamation of all the information required to
+               (PSO)                draw a triangle on screen. See HlmsPso for what's in it.
+                                    The driver will internally merge the compiled microcode and PSO info
+                                    and translate it into an ISA (Instruction Set Architecture) which is
+                                    specific to the GPU & Driver the user currently has installed;
+                                    and store the ISA into the PSO.
+                                    Under Vulkan & D3D12 this ISA can be saved to disk.
+                                    However for the rest of the APIs, HlmsDiskCache saves all the info
+                                    required to rebuild the PSO/ISA from scratch again.
+                                    HlmsDiskCache stores this info in HlmsDiskCache::Cache::pso
+                                    Depending on the API and Driver, building the PSO can be very fast
+                                    or take significant time.
+
+                                    Note that due to a technical issue, this information is currently
+                                    being saved to disk but the PSO is not rebuilt (i.e. the information
+                                    is not used). Because of it, certain platforms may still experience
+                                    some stalls at runtime, due to the driver translating the Microcode
+                                    to the internal ISA.
+    @endcode
     */
     class _OgreExport HlmsDiskCache : public HlmsAlloc
     {

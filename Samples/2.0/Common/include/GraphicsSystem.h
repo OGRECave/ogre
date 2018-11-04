@@ -54,6 +54,8 @@ namespace Demo
 
         bool                mQuit;
         bool                mAlwaysAskForConfig;
+        bool                mUseHlmsDiskCache;
+        bool                mUseMicrocodeCache;
 
         Ogre::ColourValue   mBackgroundColour;
 
