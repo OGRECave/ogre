@@ -122,14 +122,6 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void D3D11Texture::loadImage( const Image &img )
-    {
-        // Use OGRE its own codecs
-        std::vector<const Image*> imagePtrs;
-        imagePtrs.push_back(&img);
-        _loadImages( imagePtrs );
-    }
-    //---------------------------------------------------------------------
     void D3D11Texture::loadImpl()
     {
         if (mUsage & TU_RENDERTARGET)
@@ -178,6 +170,8 @@ namespace Ogre
         size_t pos = mName.find_last_of(".");
         String ext = mName.substr(pos+1);
         String baseName = mName.substr(0, pos);
+        
+        ConstImagePtrList imagePtrs;
         if((getSourceFileType() != "dds") && (this->getTextureType() == TEX_TYPE_CUBE_MAP))
         {
             // Load from 6 separate files
@@ -188,7 +182,6 @@ namespace Ogre
             //  if ( pos != String::npos )
             //      ext = mName.substr(pos+1);
             std::vector<Image> images(6);
-            ConstImagePtrList imagePtrs;
 
             assert(loadedStreams->size()==6);
             for(size_t i = 0; i < 6; i++)
@@ -231,7 +224,9 @@ namespace Ogre
 #endif
             {
                 img.load(dstream, ext);
-                loadImage(img);
+                // Use OGRE its own codecs
+                imagePtrs.push_back(&img);
+                _loadImages( imagePtrs );
             }
         }
 

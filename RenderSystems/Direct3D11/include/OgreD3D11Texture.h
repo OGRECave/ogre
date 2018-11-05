@@ -57,8 +57,6 @@ namespace Ogre {
 
 		/// overridden from Texture
 		void copyToTexture(TexturePtr& target);
-		/// overridden from Texture
-		void loadImage(const Image &img);
 
 		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex.Get(); }
 		/// retrieves a pointer to the actual texture
