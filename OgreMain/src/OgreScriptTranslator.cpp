@@ -537,6 +537,34 @@ namespace Ogre{
         return true;
     }
 
+    static GpuProgramType getProgramType(int id)
+    {
+        switch(id)
+        {
+        default:
+            assert(false);
+            OGRE_FALLTHROUGH;
+        case ID_VERTEX_PROGRAM:
+        case ID_VERTEX_PROGRAM_REF:
+            return GPT_VERTEX_PROGRAM;
+        case ID_FRAGMENT_PROGRAM:
+        case ID_FRAGMENT_PROGRAM_REF:
+            return GPT_FRAGMENT_PROGRAM;
+        case ID_GEOMETRY_PROGRAM:
+        case ID_GEOMETRY_PROGRAM_REF:
+            return GPT_GEOMETRY_PROGRAM;
+        case ID_TESSELLATION_DOMAIN_PROGRAM:
+        case ID_TESSELLATION_DOMAIN_PROGRAM_REF:
+            return GPT_DOMAIN_PROGRAM;
+        case ID_TESSELLATION_HULL_PROGRAM:
+        case ID_TESSELLATION_HULL_PROGRAM_REF:
+            return GPT_HULL_PROGRAM;
+        case ID_COMPUTE_PROGRAM:
+        case ID_COMPUTE_PROGRAM_REF:
+            return GPT_COMPUTE_PROGRAM;
+        }
+    }
+
     void ScriptTranslator::processNode(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
         if(node->type != ANT_OBJECT)
@@ -2257,22 +2285,12 @@ namespace Ogre{
                 switch(child->id)
                 {
                 case ID_FRAGMENT_PROGRAM_REF:
-                    translateProgramRef(GPT_FRAGMENT_PROGRAM, compiler, child);
-                    break;
                 case ID_VERTEX_PROGRAM_REF:
-                    translateProgramRef(GPT_VERTEX_PROGRAM, compiler, child);
-                    break;
                 case ID_GEOMETRY_PROGRAM_REF:
-                    translateProgramRef(GPT_GEOMETRY_PROGRAM, compiler, child);
-                    break;
                 case ID_TESSELLATION_HULL_PROGRAM_REF:
-                    translateProgramRef(GPT_HULL_PROGRAM, compiler, child);
-                    break;
                 case ID_TESSELLATION_DOMAIN_PROGRAM_REF:
-                    translateProgramRef(GPT_DOMAIN_PROGRAM, compiler, child);
-                    break;
                 case ID_COMPUTE_PROGRAM_REF:
-                    translateProgramRef(GPT_COMPUTE_PROGRAM, compiler, child);
+                    translateProgramRef(getProgramType(child->id), compiler, child);
                     break;
                 case ID_SHADOW_CASTER_VERTEX_PROGRAM_REF:
                     translateShadowCasterVertexProgramRef(compiler, child);
@@ -2288,6 +2306,19 @@ namespace Ogre{
                     break;
                 default:
                     processNode(compiler, *i);
+                    break;
+                case ID_FRAGMENT_PROGRAM:
+                case ID_VERTEX_PROGRAM:
+                case ID_GEOMETRY_PROGRAM:
+                case ID_TESSELLATION_HULL_PROGRAM:
+                case ID_TESSELLATION_DOMAIN_PROGRAM:
+                case ID_COMPUTE_PROGRAM:
+                {
+                    // auto assign inline defined programs
+                    processNode(compiler, *i);
+                    GpuProgramType type = getProgramType(child->id);
+                    mPass->setGpuProgram(type, GpuProgramUsage::_getProgramByName(child->name, mPass->getResourceGroup(), type));
+                }
                 }
             }
         }
