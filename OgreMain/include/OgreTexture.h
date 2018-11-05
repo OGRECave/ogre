@@ -284,15 +284,15 @@ namespace Ogre {
         virtual void copyToTexture( TexturePtr& target );
 
         /** Loads the data from an image.
-        @note Important: only call this from outside the load() routine of a 
+        @attention only call this from outside the load() routine of a 
             Resource. Don't call it within (including ManualResourceLoader) - use
             _loadImages() instead. This method is designed to be external, 
             performs locking and checks the load status before loading.
         */
-        virtual void loadImage( const Image &img );
+        void loadImage( const Image &img );
             
         /** Loads the data from a raw stream.
-        @note Important: only call this from outside the load() routine of a 
+        @attention only call this from outside the load() routine of a 
             Resource. Don't call it within (including ManualResourceLoader) - use
             _loadImages() instead. This method is designed to be external, 
             performs locking and checks the load status before loading.
@@ -305,7 +305,7 @@ namespace Ogre {
             ushort uWidth, ushort uHeight, PixelFormat eFormat);
 
         /** Internal method to load the texture from a set of images. 
-        @note Do NOT call this method unless you are inside the load() routine
+        @attention Do NOT call this method unless you are inside the load() routine
             already, e.g. a ManualResourceLoader. It is not threadsafe and does
             not check or update resource loading status.
         */
