@@ -96,7 +96,7 @@ namespace Ogre
         const HlmsTextureManager::TextureMapType texMapTypes[NUM_TERRA_TEXTURE_TYPES] =
         {
             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
-            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
 #ifdef OGRE_TEXTURE_ATLAS
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
@@ -151,7 +151,7 @@ namespace Ogre
         const HlmsTextureManager::TextureMapType texMapTypes[NUM_TERRA_TEXTURE_TYPES] =
         {
             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
-            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
 #ifdef OGRE_TEXTURE_ATLAS
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
