@@ -141,7 +141,7 @@ namespace Ogre
             {
                 GLint linkStatus = 0;
 
-                uint32 hash = FastHash(program->getSource().c_str(), program->getSource().size());
+                uint32 hash = program->_getHash();
 
                 GLuint programHandle = program->getGLProgramHandle();
 
@@ -204,7 +204,7 @@ namespace Ogre
                     GLint binaryLength = 0;
 
                     OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
-                    printf("write %d\n", binaryLength);
+
                     // Create microcode.
                     GpuProgramManager::Microcode newMicrocode =
                         GpuProgramManager::getSingleton().createMicrocode((unsigned long)binaryLength + sizeof(GLenum));

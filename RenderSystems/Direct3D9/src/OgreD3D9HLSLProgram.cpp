@@ -88,7 +88,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::loadFromSource(void)
     {
-        uint32 hash = FastHash(mSource.c_str(), mSource.length());
+        uint32 hash = _getHash();
         if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
         {
             getMicrocodeFromCache(hash);

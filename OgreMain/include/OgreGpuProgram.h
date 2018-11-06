@@ -429,6 +429,9 @@ namespace Ogre {
     /// @copydoc Resource::calculateSize
     virtual size_t calculateSize(void) const;
 
+    /// internal method to get the microcode cache id
+    uint32 _getHash(uint32 seed = 0) const;
+
     protected:
     /// Virtual method which must be implemented by subclasses, load from mSource
     virtual void loadFromSource(void) = 0;

@@ -61,7 +61,7 @@ namespace Ogre
         // Compile and attach Vertex Program
         if(getVertexProgram())
         {
-            vhash = FastHash(mVertexShader->getSource().c_str(), mVertexShader->getSource().size());
+            vhash = mVertexShader->_getHash();
             if(getVertexProgram()->isLinked())
             {
                 mLinked |= VERTEX_PROGRAM_LINKED;
@@ -97,7 +97,7 @@ namespace Ogre
         // Compile and attach Fragment Program
         if(mFragmentProgram)
         {
-            fhash = FastHash(mFragmentProgram->getSource().c_str(), mFragmentProgram->getSource().size());
+            fhash = mFragmentProgram->_getHash();
             if(mFragmentProgram->isLinked())
             {
                 mLinked |= FRAGMENT_PROGRAM_LINKED;

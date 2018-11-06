@@ -83,6 +83,14 @@ namespace Ogre
         mLoadFromFile = false;
         mCompileError = false;
     }
+
+    uint32 GpuProgram::_getHash(uint32 seed) const
+    {
+        // include filename as same source can be used with different defines & entry points
+        uint32 hash = FastHash(mName.c_str(), mName.size(), seed);
+        return FastHash(mSource.c_str(), mSource.size(), hash);
+    }
+
     size_t GpuProgram::calculateSize(void) const
     {
         size_t memSize = 0;
