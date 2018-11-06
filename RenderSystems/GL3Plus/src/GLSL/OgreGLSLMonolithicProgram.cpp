@@ -90,11 +90,9 @@ namespace Ogre {
 
     void GLSLMonolithicProgram::compileAndLink()
     {
-        uint32 hash = 0;
         // attach Vertex Program
         if (mVertexShader)
         {
-            hash = FastHash(mVertexShader->getSource().c_str(), mVertexShader->getSource().size(), hash);
             getVertexShader()->attachToProgramObject(mGLProgramHandle);
             setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
         }
@@ -105,7 +103,6 @@ namespace Ogre {
         	if(!shader) continue;
 
             shader->attachToProgramObject(mGLProgramHandle);
-            hash = FastHash(shader->getSource().c_str(), shader->getSource().size(), hash);
         }
 
         bindFixedAttributes(mGLProgramHandle);
@@ -140,7 +137,7 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glGetProgramBinary(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
 
                 // add to the microcode to the cache
-                GpuProgramManager::getSingleton().addMicrocodeToCache(hash, newMicrocode);
+                GpuProgramManager::getSingleton().addMicrocodeToCache(getCombinedHash(), newMicrocode);
             }
         }
     }

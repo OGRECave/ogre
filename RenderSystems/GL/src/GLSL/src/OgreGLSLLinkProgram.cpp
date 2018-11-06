@@ -119,7 +119,7 @@ namespace Ogre {
             for(auto p : progs)
             {
                 if(!p) continue;
-                hash = FastHash(p->getSource().c_str(), p->getSource().size(), hash);
+                hash = p->_getHash(hash);
             }
 
             if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
@@ -471,8 +471,8 @@ namespace Ogre {
 
             size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
             const String& vpSource = mVertexShader->getSource();
-
-            hash = FastHash(vpSource.c_str(), vpSource.size(), hash);
+            
+            hash = mVertexShader->_getHash(hash);
             for (size_t i = 0; i < numAttribs; ++i)
             {
                 const CustomAttribute& a = msCustomAttributes[i];
@@ -508,7 +508,7 @@ namespace Ogre {
 
         if (mGeometryProgram)
         {
-            hash = FastHash(mGeometryProgram->getSource().c_str(), mGeometryProgram->getSource().size(), hash);
+            hash = mGeometryProgram->_getHash(hash);
             // attach Geometry Program
             mGeometryProgram->attachToProgramObject(mGLProgramHandle);
 
@@ -529,7 +529,7 @@ namespace Ogre {
 
         if (mFragmentProgram)
         {
-            hash = FastHash(mFragmentProgram->getSource().c_str(), mFragmentProgram->getSource().size(), hash);
+            hash = mFragmentProgram->_getHash(hash);
             // attach Fragment Program
             mFragmentProgram->attachToProgramObject(mGLProgramHandle);
         }

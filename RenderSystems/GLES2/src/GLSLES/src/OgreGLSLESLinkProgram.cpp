@@ -80,7 +80,7 @@ namespace Ogre {
             for(auto p : progs)
             {
                 if(!p) continue;
-                hash = FastHash(p->getSource().c_str(), p->getSource().size(), hash);
+                hash = p->_getHash(hash);
             }
 
             if (!getMicrocodeFromCache(hash, mGLProgramHandle))
@@ -139,7 +139,7 @@ namespace Ogre {
         for(auto p : progs)
         {
             if(!p) continue;
-            hash = FastHash(p->getSource().c_str(), p->getSource().size(), hash);
+            hash = p->_getHash(hash);
         }
 
         // attach Vertex Program

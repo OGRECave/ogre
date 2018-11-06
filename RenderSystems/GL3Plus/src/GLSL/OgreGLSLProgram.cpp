@@ -117,7 +117,7 @@ namespace Ogre {
         for (auto p : progs)
         {
             if(!p) continue;
-            hash = FastHash(p->getSource().c_str(), p->getSource().size(), hash);
+            hash = p->_getHash(hash);
         }
         return hash;
     }
@@ -136,8 +136,7 @@ namespace Ogre {
             programId = glslGpuProgram->getGLProgramHandle();
 
             // force re-link
-            uint32 hash = FastHash(glslGpuProgram->getSource().c_str(), glslGpuProgram->getSource().size());
-            GpuProgramManager::getSingleton().removeMicrocodeFromCache(hash);
+            GpuProgramManager::getSingleton().removeMicrocodeFromCache(glslGpuProgram->_getHash());
             glslGpuProgram->setLinked(false);
         }
         else

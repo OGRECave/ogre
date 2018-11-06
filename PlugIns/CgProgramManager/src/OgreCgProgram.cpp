@@ -172,8 +172,8 @@ namespace Ogre {
 	{
 		selectProfile();
 
-		uint32 hash = FastHash("CG", 2); // HLSL and Cg shaders are indentical
-		hash = FastHash(mProgramString.c_str(), mProgramString.size(), hash);
+        uint32 hash = FastHash("CG", 2); // HLSL and Cg shaders are indentical
+        hash = _getHash(hash);
 
 		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
 		{

@@ -167,7 +167,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
    void D3D9GpuProgram::loadFromSource( IDirect3DDevice9* d3d9Device )
     {
-        uint32 hash = FastHash(mSource.c_str(), mSource.size());
+        uint32 hash = _getHash();
         if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
         {
             getMicrocodeFromCache( d3d9Device, hash );
@@ -233,7 +233,7 @@ namespace Ogre {
             memcpy(newMicrocode->getPtr(), microcode->GetBufferPointer(), microcode->GetBufferSize());
 
             // add to the microcode to the cache
-            GpuProgramManager::getSingleton().addMicrocodeToCache(FastHash(mSource.c_str(), mSource.length()), newMicrocode);
+            GpuProgramManager::getSingleton().addMicrocodeToCache(_getHash(), newMicrocode);
         }
 
         loadFromMicrocode(d3d9Device, microcode);       
