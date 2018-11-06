@@ -128,12 +128,12 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* psMain   = psProgram->getEntryPointFunction();    
-    FunctionInvocation* curFuncInvocation = NULL;   
-
     
     // Create vertex shader colour invocations.
     ParameterPtr vsDiffuse;
     ParameterPtr vsSpecular;
+
+    auto vsStage = vsMain->getStage(FFP_VS_COLOUR);
     if (mVSInputDiffuse)
     {
         vsDiffuse = mVSInputDiffuse;
@@ -141,12 +141,12 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-        vsMain->addAtomAssign(vsDiffuse, ParameterFactory::createConstParam(Vector4(1.0)), FFP_VS_COLOUR);
+        vsStage.assign(Vector4(1.0), vsDiffuse);
     }
 
     if (mVSOutputDiffuse)
     {
-        vsMain->addAtomAssign(mVSOutputDiffuse, vsDiffuse, FFP_VS_COLOUR);
+        vsStage.assign(vsDiffuse, mVSOutputDiffuse);
     }
     
     if (mVSInputSpecular)
@@ -156,12 +156,12 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         vsSpecular = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-        vsMain->addAtomAssign(vsSpecular, ParameterFactory::createConstParam(Vector4::ZERO), FFP_VS_COLOUR);
+        vsStage.assign(Vector4::ZERO, vsSpecular);
     }
 
     if (mVSOutputSpecular)
     {
-        vsMain->addAtomAssign(mVSOutputSpecular, vsSpecular, FFP_VS_COLOUR);
+        vsStage.assign(vsSpecular, mVSOutputSpecular);
     }
     
     
@@ -169,7 +169,8 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     // Create fragment shader colour invocations.
     ParameterPtr psDiffuse;
     ParameterPtr psSpecular;
-    
+    auto psStage = psMain->getStage(FFP_PS_COLOUR_BEGIN);
+
     // Handle diffuse colour.
     if (mPSInputDiffuse.get() != NULL)
     {
@@ -178,7 +179,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         psDiffuse = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-        psMain->addAtomAssign(psDiffuse, ParameterFactory::createConstParam(Vector4(1.0)), FFP_PS_COLOUR_BEGIN);
+        psStage.assign(Vector4(1.0), psDiffuse);
     }
 
     // Handle specular colour.
@@ -189,30 +190,27 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         psSpecular = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-        psMain->addAtomAssign(psSpecular, ParameterFactory::createConstParam(Vector4::ZERO), FFP_PS_COLOUR_BEGIN);
+        psStage.assign(Vector4::ZERO, psSpecular);
     }
 
     // Assign diffuse colour.
     if (mPSOutputDiffuse)
     {   
-        psMain->addAtomAssign(mPSOutputDiffuse, psDiffuse, FFP_PS_COLOUR_BEGIN);
+        psStage.assign(psDiffuse, mPSOutputDiffuse);
     }
 
     // Assign specular colour.
     if (mPSOutputSpecular)
     {
-        psMain->addAtomAssign(mPSOutputSpecular, psSpecular, FFP_PS_COLOUR_BEGIN);
+        psStage.assign(psSpecular, mPSOutputSpecular);
     }
 
     // Add specular to out colour.
-    if (mPSOutputDiffuse.get() != NULL && psSpecular.get() != NULL)
+    if (mPSOutputDiffuse && psSpecular)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_PS_COLOUR_END);
-        curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
-        curFuncInvocation->pushOperand(psSpecular, Operand::OPS_IN, Operand::OPM_XYZ);
-        curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
-        psMain->addAtomInstance(curFuncInvocation);
-    }   
+        psMain->getStage(FFP_PS_COLOUR_END)
+            .callFunction(FFP_FUNC_ADD, In(mPSOutputDiffuse).xyz(), In(psSpecular).xyz(), Out(mPSOutputDiffuse).xyz());
+    }
 
     return true;
 }

@@ -167,13 +167,13 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
                                          int samplerIndex,
                                          const LayerBlendModeEx& blendMode,
                                          const int groupOrder, 
-                                         int targetChannels)
+                                         int mask)
 {
     //
     // Add the modifier invocation
     //
 
-    addPSModifierInvocation(psMain, samplerIndex, arg1, arg2, groupOrder, targetChannels);
+    addPSModifierInvocation(psMain, samplerIndex, arg1, arg2, groupOrder, mask);
 
     //
     // Add the blending function invocations
@@ -183,12 +183,12 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
     
     if ((LB_FFPBlend == mode) || (LB_Invalid == mode))
     {
-        FFPTexturing::addPSBlendInvocations(psMain, arg1, arg2, texel, samplerIndex, blendMode, groupOrder, targetChannels);
+        FFPTexturing::addPSBlendInvocations(psMain, arg1, arg2, texel, samplerIndex, blendMode, groupOrder, mask);
     }
     else 
     {
         //find the function name for the blend mode
-        String funcName;
+        const char* funcName = NULL;
         for(int i = 0 ; i < (int)LayeredBlending::LB_MaxBlendModes ; ++i)
         {
             if (_blendModes[i].type == mode)
@@ -199,13 +199,10 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
         }
 
         //add the function of the blend mode
-        if (funcName.empty() == false)
+        if (funcName)
         {
-            FunctionInvocation* curFuncInvocation = OGRE_NEW FunctionInvocation(funcName, groupOrder);
-            curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
-            curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
-            curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
-            psMain->addAtomInstance(curFuncInvocation); 
+            psMain->getStage(groupOrder)
+                .callFunction(funcName, In(arg1).mask(mask), In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
         }
     }
 }
@@ -216,14 +213,14 @@ void LayeredBlending::addPSModifierInvocation(Function* psMain,
                                          ParameterPtr arg1,
                                          ParameterPtr arg2,
                                          const int groupOrder, 
-                                         int targetChannels)
+                                         int mask)
 {
     SourceModifier modType;
     int customNum;
     if (getSourceModifier(samplerIndex, modType, customNum) == true)
     {
         ParameterPtr modifiedParam;
-        String funcName;
+        const char* funcName = NULL;
         switch (modType)
         {
         case SM_Source1Modulate: 
@@ -247,15 +244,12 @@ void LayeredBlending::addPSModifierInvocation(Function* psMain,
         }
 
         //add the function of the blend mode
-        if (funcName.empty() == false)
+        if (funcName)
         {
             ParameterPtr& controlParam = mTextureBlends[samplerIndex].modControlParam;
-
-            FunctionInvocation* curFuncInvocation = OGRE_NEW FunctionInvocation(funcName, groupOrder);
-            curFuncInvocation->pushOperand(modifiedParam, Operand::OPS_IN, targetChannels);
-            curFuncInvocation->pushOperand(controlParam, Operand::OPS_IN, targetChannels);
-            curFuncInvocation->pushOperand(modifiedParam, Operand::OPS_OUT, targetChannels);        
-            psMain->addAtomInstance(curFuncInvocation); 
+            psMain->getStage(groupOrder)
+                .callFunction(funcName, In(modifiedParam).mask(mask), In(controlParam).mask(mask),
+                              Out(modifiedParam).mask(mask));
         }
     }
 }

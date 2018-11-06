@@ -77,17 +77,10 @@ namespace Ogre {
 			Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 			Function* psMain = psProgram->getEntryPointFunction();
 
-			FunctionInvocation *curFuncInvocation;
+            psMain->getStage(FFP_PS_ALPHA_TEST)
+                .callFunction(FFP_FUNC_ALPHA_TEST, {In(mPSAlphaFunc), In(mPSAlphaRef), In(mPSOutDiffuse)});
 
-			//Fragment shader invocations
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ALPHA_TEST, FFP_PS_ALPHA_TEST);
-			curFuncInvocation->pushOperand(mPSAlphaFunc, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mPSAlphaRef, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
-
-			psMain->addAtomInstance(curFuncInvocation);	
-
-			return true;
+            return true;
 		}
 
 		int FFPAlphaTest::getExecutionOrder() const

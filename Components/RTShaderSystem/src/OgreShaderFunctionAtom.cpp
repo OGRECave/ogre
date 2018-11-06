@@ -32,6 +32,7 @@ namespace RTShader {
 //-----------------------------------------------------------------------------
 Operand::Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, ushort indirectionLevel) : mParameter(parameter), mSemantic(opSemantic), mMask(opMask), mIndirectionLevel(indirectionLevel)
 {
+    OgreAssert(mParameter, "NULL parameter is not a valid operand");
 }
 //-----------------------------------------------------------------------------
 Operand::Operand(const Operand& other) 
@@ -267,9 +268,14 @@ void FunctionInvocation::writeOperands(std::ostream& os, OperandVector::const_it
 //-----------------------------------------------------------------------
 void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, int indirectionLevel)
 {
-    OgreAssert(parameter, "NULL parameter not allowed");
     mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
 }
+
+void FunctionInvocation::setOperands(const OperandVector& ops)
+{
+    mOperands = ops;
+}
+
 
 //-----------------------------------------------------------------------
 bool FunctionInvocation::operator == ( const FunctionInvocation& rhs ) const
@@ -424,10 +430,9 @@ bool FunctionInvocation::FunctionInvocationCompare::operator ()(FunctionInvocati
 }
 
 String AssignmentAtom::Type = "AssignmentAtom";
-AssignmentAtom::AssignmentAtom(ParameterPtr lhs, ParameterPtr rhs, int groupOrder) {
+AssignmentAtom::AssignmentAtom(const Out& lhs, const In& rhs, int groupOrder) {
     // do this backwards for compatibility with FFP_FUNC_ASSIGN calls
-    pushOperand(rhs, Operand::OPS_IN);
-    pushOperand(lhs, Operand::OPS_OUT);
+    setOperands({rhs, lhs});
     mGroupExecutionOrder = groupOrder;
 }
 
@@ -444,11 +449,9 @@ void AssignmentAtom::writeSourceCode(std::ostream& os, const String& targetLangu
 }
 
 String SampleTextureAtom::Type = "SampleTextureAtom";
-SampleTextureAtom::SampleTextureAtom(ParameterPtr sampler, ParameterPtr texcoord, ParameterPtr lhs, int groupOrder)
+SampleTextureAtom::SampleTextureAtom(const In& sampler, const In& texcoord, const Out& lhs, int groupOrder)
 {
-    pushOperand(sampler, Operand::OPS_IN);
-    pushOperand(texcoord, Operand::OPS_IN);
-    pushOperand(lhs, Operand::OPS_OUT);
+    setOperands({sampler, texcoord, lhs});
     mGroupExecutionOrder = groupOrder;
 }
 

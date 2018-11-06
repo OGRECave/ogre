@@ -476,25 +476,16 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder)
 {
-    FunctionInvocation* curFuncInvocation = NULL;
+    auto stage = vsMain->getStage(groupOrder);
 
     // Transform normal in view space.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder);
-    curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mVSOutNormal, Operand::OPS_OUT); 
-    vsMain->addAtomInstance(curFuncInvocation);
+    stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
 
     // Transform view space position if need to.
-    if (mVSOutViewPos.get() != NULL)
+    if (mVSOutViewPos)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMPOSITION, groupOrder);
-        curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mVSOutViewPos, Operand::OPS_OUT);    
-        vsMain->addAtomInstance(curFuncInvocation);
+        stage.callFunction(SGX_FUNC_TRANSFORMPOSITION, mWorldViewMatrix, mVSInPosition, mVSOutViewPos);
     }
-    
 
     return true;
 }
@@ -503,52 +494,37 @@ bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder)
 //-----------------------------------------------------------------------
 bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder)
 {
-    FunctionInvocation* curFuncInvocation = NULL;   
+    auto stage = psMain->getStage(groupOrder);
 
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
         (mTrackVertexColourType & TVC_EMISSIVE) == 0)
     {
-        psMain->addAtomAssign(mPSTempDiffuseColour, mDerivedSceneColour, groupOrder);
+        stage.assign(mDerivedSceneColour, mPSTempDiffuseColour);
     }
     else
     {
         if (mTrackVertexColourType & TVC_AMBIENT)
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-            curFuncInvocation->pushOperand(mLightAmbientColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);            
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-            psMain->addAtomInstance(curFuncInvocation);
+            stage.callFunction(FFP_FUNC_MODULATE, mLightAmbientColour, mPSDiffuse, mPSTempDiffuseColour);
         }
         else
         {
-            curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
-            curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, Operand::OPM_XYZ);  
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
-            psMain->addAtomInstance(curFuncInvocation);
+            stage.assign(In(mDerivedAmbientLightColour).xyz(), Out(mPSTempDiffuseColour).xyz());
         }
 
         if (mTrackVertexColourType & TVC_EMISSIVE)
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder);
-            curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-            psMain->addAtomInstance(curFuncInvocation);
+            stage.callFunction(FFP_FUNC_ADD, mPSDiffuse, mPSTempDiffuseColour, mPSTempDiffuseColour);
         }
         else
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder);
-            curFuncInvocation->pushOperand(mSurfaceEmissiveColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-            psMain->addAtomInstance(curFuncInvocation);
+            stage.callFunction(FFP_FUNC_ADD, mSurfaceEmissiveColour, mPSTempDiffuseColour, mPSTempDiffuseColour);
         }       
     }
 
     if (mSpecularEnable)
     {
-        psMain->addAtomAssign(mPSTempSpecularColour, mPSSpecular, groupOrder);
+        stage.assign(mPSSpecular, mPSTempSpecularColour);
     }
     
     return true;
@@ -557,28 +533,23 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 //-----------------------------------------------------------------------
 bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder)
 {   
-    FunctionInvocation* curFuncInvocation = NULL;   
+    auto stage = psMain->getStage(groupOrder);
 
     // Merge diffuse colour with vertex colour if need to.
     if (mTrackVertexColourType & TVC_DIFFUSE)           
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-        curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);  
-        curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
-        curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);
-        psMain->addAtomInstance(curFuncInvocation);
+        stage.callFunction(FFP_FUNC_MODULATE, In(mPSDiffuse).xyz(), In(curLightParams->mDiffuseColour).xyz(),
+                           Out(curLightParams->mDiffuseColour).xyz());
     }
 
     // Merge specular colour with vertex colour if need to.
     if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
-    {                           
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-        curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);  
-        curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);
-        curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_OUT, Operand::OPM_XYZ);
-        psMain->addAtomInstance(curFuncInvocation);
+    {
+        stage.callFunction(FFP_FUNC_MODULATE, In(mPSDiffuse).xyz(), In(curLightParams->mSpecularColour).xyz(),
+                           Out(curLightParams->mSpecularColour).xyz());
     }
 
+    FunctionInvocation* curFuncInvocation = NULL;   
     switch (curLightParams->mType)
     {
 
@@ -685,12 +656,13 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 //-----------------------------------------------------------------------
 bool PerPixelLighting::addPSFinalAssignmentInvocation( Function* psMain, const int groupOrder)
 {
-    psMain->addAtomAssign(mPSDiffuse, mPSTempDiffuseColour, groupOrder);
-    psMain->addAtomAssign(mPSOutDiffuse, mPSDiffuse, groupOrder);
+    auto stage = psMain->getStage(groupOrder);
+    stage.assign(mPSTempDiffuseColour, mPSDiffuse);
+    stage.assign(mPSDiffuse, mPSOutDiffuse);
 
     if (mSpecularEnable)
     {
-        psMain->addAtomAssign(mPSSpecular, mPSTempSpecularColour, groupOrder);
+        stage.assign(mPSTempSpecularColour, mPSSpecular);
     }
 
     return true;

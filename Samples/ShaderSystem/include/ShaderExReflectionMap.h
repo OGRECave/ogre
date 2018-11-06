@@ -136,13 +136,13 @@ protected:
     /** 
     Internal method that adds related vertex shader functions invocations.
     */
-    bool            addVSInvocations                (Function* vsMain, const int groupOrder);
+    bool            addVSInvocations                (const FunctionStageRef& stage);
 
 
     /** 
     Internal method that adds related pixel shader functions invocations.
     */
-    bool            addPSInvocations                (Function* psMain, const int groupOrder);
+    bool            addPSInvocations                (const FunctionStageRef& stage);
 
 
 // Attributes.

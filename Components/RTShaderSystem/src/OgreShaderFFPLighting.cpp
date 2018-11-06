@@ -395,43 +395,31 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int groupOrder)
 {
-	FunctionInvocation* curFuncInvocation = NULL;	
+	auto stage = vsMain->getStage(groupOrder);
 
 	if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
 		(mTrackVertexColourType & TVC_EMISSIVE) == 0)
 	{
-		vsMain->addAtomAssign(mVSOutDiffuse, mDerivedSceneColour, groupOrder);
+		stage.assign(mDerivedSceneColour, mVSOutDiffuse);
 	}
 	else
 	{
 		if (mTrackVertexColourType & TVC_AMBIENT)
 		{
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-			curFuncInvocation->pushOperand(mLightAmbientColour, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN);			
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
-			vsMain->addAtomInstance(curFuncInvocation);
+            stage.callFunction(FFP_FUNC_MODULATE, mLightAmbientColour, mVSDiffuse, mVSOutDiffuse);
 		}
 		else
 		{
-		    vsMain->addAtomAssign(mVSOutDiffuse, mDerivedAmbientLightColour, groupOrder);
+		    stage.assign(mDerivedAmbientLightColour, mVSOutDiffuse);
 		}
 
 		if (mTrackVertexColourType & TVC_EMISSIVE)
 		{
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder);
-			curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
-			vsMain->addAtomInstance(curFuncInvocation);
+            stage.callFunction(FFP_FUNC_ADD, mVSDiffuse, mVSOutDiffuse, mVSOutDiffuse);
 		}
 		else
 		{
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder);
-			curFuncInvocation->pushOperand(mSurfaceEmissiveColour, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
-			vsMain->addAtomInstance(curFuncInvocation);
+            stage.callFunction(FFP_FUNC_ADD, mSurfaceEmissiveColour, mVSOutDiffuse, mVSOutDiffuse);
 		}		
 	}
 
@@ -440,141 +428,90 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 
 //-----------------------------------------------------------------------
 bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Function* vsMain, const int groupOrder)
-{	
-	FunctionInvocation* curFuncInvocation = NULL;	
+{
+    auto stage = vsMain->getStage(groupOrder);
 
-	// Merge diffuse colour with vertex colour if need to.
-	if (mTrackVertexColourType & TVC_DIFFUSE)			
-	{
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-		curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);	
-		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
-		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);
-		vsMain->addAtomInstance(curFuncInvocation);
-	}
+    // Merge diffuse colour with vertex colour if need to.
+    if (mTrackVertexColourType & TVC_DIFFUSE)
+    {
+        stage.callFunction(FFP_FUNC_MODULATE, In(mVSDiffuse).xyz(), In(curLightParams->mDiffuseColour).xyz(),
+                           Out(curLightParams->mDiffuseColour).xyz());
+    }
 
-	// Merge specular colour with vertex colour if need to.
-	if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
-	{							
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-		curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);	
-		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);
-		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_OUT, Operand::OPM_XYZ);
-		vsMain->addAtomInstance(curFuncInvocation);
-	}
+    // Merge specular colour with vertex colour if need to.
+    if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
+    {
+        stage.callFunction(FFP_FUNC_MODULATE, In(mVSDiffuse).xyz(), In(curLightParams->mSpecularColour).xyz(),
+                           Out(curLightParams->mSpecularColour).xyz());
+    }
 
-	switch (curLightParams->mType)
-	{
-		
-	case Light::LT_DIRECTIONAL:			
-		if (mSpecularEnable)
-		{				
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder);
-			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);			
-			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);			
-			curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);			
-			curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			vsMain->addAtomInstance(curFuncInvocation);
-		}
+    switch (curLightParams->mType)
+    {
+    case Light::LT_DIRECTIONAL:
+        if (mSpecularEnable)
+        {
+            stage.callFunction(FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR,
+                               {In(mWorldViewMatrix), In(mVSInPosition), In(mWorldViewITMatrix), In(mVSInNormal),
+                                In(curLightParams->mDirection).xyz(), In(curLightParams->mDiffuseColour).xyz(),
+                                In(curLightParams->mSpecularColour).xyz(), In(mSurfaceShininess),
+                                In(mVSOutDiffuse).xyz(), In(mVSOutSpecular).xyz(), Out(mVSOutDiffuse).xyz(),
+                                Out(mVSOutSpecular).xyz()});
+        }
 
-		else
-		{
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, groupOrder);
-			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);					
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			vsMain->addAtomInstance(curFuncInvocation);	
-		}				
-		break;
+        else
+        {
+            stage.callFunction(FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE,
+                               {In(mWorldViewITMatrix), In(mVSInNormal), In(curLightParams->mDirection).xyz(),
+                                In(curLightParams->mDiffuseColour).xyz(), In(mVSOutDiffuse).xyz(),
+                                Out(mVSOutDiffuse).xyz()});
+        }
+        break;
 
-	case Light::LT_POINT:	
-		if (mSpecularEnable)
-		{
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder);
-			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);			
-			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);			
-			curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			vsMain->addAtomInstance(curFuncInvocation);			
-		}
-		else
-		{
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_POINT_DIFFUSE, groupOrder);
-			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);			
-			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);					
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			vsMain->addAtomInstance(curFuncInvocation);	
-		}
+    case Light::LT_POINT:
+        if (mSpecularEnable)
+        {
+            stage.callFunction(FFP_FUNC_LIGHT_POINT_DIFFUSESPECULAR,
+                               {In(mWorldViewMatrix), In(mVSInPosition), In(mWorldViewITMatrix), In(mVSInNormal),
+                                In(curLightParams->mPosition).xyz(), In(curLightParams->mAttenuatParams),
+                                In(curLightParams->mDiffuseColour).xyz(), In(curLightParams->mSpecularColour).xyz(),
+                                In(mSurfaceShininess), In(mVSOutDiffuse).xyz(), In(mVSOutSpecular).xyz(),
+                                Out(mVSOutDiffuse).xyz(), Out(mVSOutSpecular).xyz()});
+        }
+        else
+        {
+            stage.callFunction(FFP_FUNC_LIGHT_POINT_DIFFUSE,
+                               {In(mWorldViewMatrix), In(mVSInPosition), In(mWorldViewITMatrix), In(mVSInNormal),
+                                In(curLightParams->mPosition).xyz(), In(curLightParams->mAttenuatParams),
+                                In(curLightParams->mDiffuseColour).xyz(), In(mVSOutDiffuse).xyz(),
+                                Out(mVSOutDiffuse).xyz()});
+        }
 				
-		break;
+        break;
 
-	case Light::LT_SPOTLIGHT:
-		if (mSpecularEnable)
-		{
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder);
-			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);			
-			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mSpotParams, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);			
-			curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			vsMain->addAtomInstance(curFuncInvocation);			
-		}
-		else
-		{
-			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_SPOT_DIFFUSE, groupOrder);
-			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);			
-			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-			curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mSpotParams, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);					
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);	
-			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);	
-			vsMain->addAtomInstance(curFuncInvocation);	
-		}
-		break;
-	}
+    case Light::LT_SPOTLIGHT:
+        if (mSpecularEnable)
+        {
+            stage.callFunction(FFP_FUNC_LIGHT_SPOT_DIFFUSESPECULAR,
+                               {In(mWorldViewMatrix), In(mVSInPosition), In(mWorldViewITMatrix), In(mVSInNormal),
+                                In(curLightParams->mPosition).xyz(), In(curLightParams->mDirection).xyz(),
+                                In(curLightParams->mAttenuatParams), In(curLightParams->mSpotParams),
+                                In(curLightParams->mDiffuseColour).xyz(), In(curLightParams->mSpecularColour).xyz(),
+                                In(mSurfaceShininess), In(mVSOutDiffuse).xyz(), In(mVSOutSpecular).xyz(),
+                                Out(mVSOutDiffuse).xyz(), Out(mVSOutSpecular).xyz()});
+        }
+        else
+        {
+            stage.callFunction(FFP_FUNC_LIGHT_SPOT_DIFFUSE,
+                               {In(mWorldViewMatrix), In(mVSInPosition), In(mWorldViewITMatrix), In(mVSInNormal),
+                                In(curLightParams->mPosition).xyz(), In(curLightParams->mDirection).xyz(),
+                                In(curLightParams->mAttenuatParams), In(curLightParams->mSpotParams),
+                                In(curLightParams->mDiffuseColour).xyz(), In(mVSOutDiffuse).xyz(),
+                                Out(mVSOutDiffuse).xyz()});
+        }
+        break;
+    }
 
-	return true;
+    return true;
 }
 
 

@@ -213,45 +213,32 @@ bool RTShaderSRSTexturedFog::addFunctionInvocations(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
-    FunctionInvocation* curFuncInvocation = NULL;   
 
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_POSITION_DEPTH, FFP_VS_FOG);
-    curFuncInvocation->pushOperand(mWorldMatrix, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mCameraPos, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(mVSOutPosView, Operand::OPS_OUT);    
-    curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);  
-    vsMain->addAtomInstance(curFuncInvocation);     
-    
-    curFuncInvocation = OGRE_NEW SampleTextureAtom(FFP_PS_FOG);
-    curFuncInvocation->pushOperand(mBackgroundTextureSampler, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mPSInPosView, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mFogColour, Operand::OPS_OUT);
-    psMain->addAtomInstance(curFuncInvocation);
+    vsMain->getStage(FFP_VS_FOG)
+        .callFunction(FFP_FUNC_PIXELFOG_POSITION_DEPTH,
+                      {In(mWorldMatrix), In(mCameraPos), In(mVSInPos), Out(mVSOutPosView), Out(mVSOutDepth)});
 
+    auto psStage = psMain->getStage(FFP_PS_FOG);
+    psStage.sampleTexture(mBackgroundTextureSampler, mPSInPosView, mFogColour);
 
+    const char* fogFunc = NULL;
     switch (mFogMode)
     {
     case FOG_LINEAR:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_LINEAR, FFP_PS_FOG);
+        fogFunc = FFP_FUNC_PIXELFOG_LINEAR;
         break;
     case FOG_EXP:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_EXP, FFP_PS_FOG);
+        fogFunc = FFP_FUNC_PIXELFOG_EXP;
         break;
     case FOG_EXP2:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_EXP2, FFP_PS_FOG);
+        fogFunc = FFP_FUNC_PIXELFOG_EXP2;
         break;
-       case FOG_NONE:
-       default:
-           break;
+    case FOG_NONE:
+       break;
     }
 
-    curFuncInvocation->pushOperand(mPSInDepth, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mFogParams, Operand::OPS_IN);    
-    curFuncInvocation->pushOperand(mFogColour, Operand::OPS_IN);        
-    curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);
-    psMain->addAtomInstance(curFuncInvocation); 
+    psStage.callFunction(fogFunc,
+                         {In(mPSInDepth), In(mFogParams), In(mFogColour), In(mPSOutDiffuse), Out(mPSOutDiffuse)});
     return true;
 }
 

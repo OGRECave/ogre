@@ -41,6 +41,44 @@ namespace RTShader {
 *  @{
 */
 
+/// represents a @ref FFPShaderStage, part of a Function
+class _OgreRTSSExport FunctionStageRef
+{
+    friend class Function;
+public:
+    /** call a library function
+     * @param name the function name
+     */
+    void callFunction(const char* name, const InOut& inout) const;
+
+    /// @overload
+    void callFunction(const char* name, const std::vector<Operand>& params) const;
+    /// @overload
+    void callFunction(const char* name, const In& arg, const Out& ret) const { callFunction(name, {arg, ret}); }
+    /// @overload
+    void callFunction(const char* name, const In& arg0, const In& arg1, const Out& ret) const
+    {
+        callFunction(name, {arg0, arg1, ret});
+    }
+
+    /// dst = texture(sampler, texcoord);
+    void sampleTexture(const In& sampler, const In& texcoord, const Out& dst) const
+    {
+        sampleTexture({sampler, texcoord, dst});
+    }
+    /// @overload
+    void sampleTexture(const std::vector<Operand>& params) const;
+
+    /// to = from;
+    void assign(const In& from, const Out& to) const { assign({from, to}); }
+    /// @overload
+    void assign(const std::vector<Operand>& params) const;
+private:
+    size_t mStage;
+    Function* mParent;
+    FunctionStageRef(size_t stage, Function* parent) : mStage(stage), mParent(parent) {}
+};
+
 /** A class that represents a shader based program function.
 */
 class _OgreRTSSExport Function : public RTShaderSystemAlloc
@@ -144,8 +182,14 @@ public:
     */
     void addAtomInstance(FunctionAtom* atomInstance);
 
-    /// shorthand for a simple assignment "a = b;"
-    void addAtomAssign(ParameterPtr lhs, ParameterPtr rhs, int groupOrder);
+    /// @deprecated use FunctionStageRef::assign instead
+    OGRE_DEPRECATED void addAtomAssign(ParameterPtr lhs, ParameterPtr rhs, int groupOrder);
+
+    /// get a @ref FFPShaderStage of this function
+    FunctionStageRef getStage(size_t s)
+    {
+        return FunctionStageRef(s, this);
+    }
 
     /** Delete a function atom instance from this function. 
     @param atomInstance The atom instance to OGRE_DELETE.

@@ -225,45 +225,35 @@ bool ShaderExReflectionMap::addFunctionInvocations(ProgramSet* programSet)
     
 
     // Add vertex shader invocations.
-    if (false == addVSInvocations(vsMain, FFP_VS_TEXTURING + 1))
+    if (false == addVSInvocations(vsMain->getStage(FFP_VS_TEXTURING + 1)))
         return false;
 
 
     // Add pixel shader invocations.
-    if (false == addPSInvocations(psMain, FFP_PS_TEXTURING + 1))
+    if (false == addPSInvocations(psMain->getStage(FFP_PS_TEXTURING + 1)))
         return false;
     
     return true;
 }
 
 //-----------------------------------------------------------------------
-bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupOrder )
+bool ShaderExReflectionMap::addVSInvocations( const FunctionStageRef& stage )
 {
-    FunctionInvocation* funcInvocation = NULL;
-
     // Output mask texture coordinates.
-    vsMain->addAtomAssign(mVSOutMaskTexcoord, mVSInMaskTexcoord, groupOrder);
+    stage.assign(mVSInMaskTexcoord, mVSOutMaskTexcoord);
+
 
     // Output reflection texture coordinates.
     if (mReflectionMapType == TEX_TYPE_2D)
     {
-        funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  groupOrder);
-        funcInvocation->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-        funcInvocation->pushOperand(mViewMatrix, Operand::OPS_IN);  
-        funcInvocation->pushOperand(mVSInputNormal, Operand::OPS_IN);   
-        funcInvocation->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_OUT);
-        vsMain->addAtomInstance(funcInvocation);
+        stage.callFunction(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,
+                           {In(mWorldITMatrix), In(mViewMatrix), In(mVSInputNormal), Out(mVSOutReflectionTexcoord)});
     }
     else
     {
-        funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT, groupOrder);
-        funcInvocation->pushOperand(mWorldMatrix, Operand::OPS_IN);
-        funcInvocation->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-        funcInvocation->pushOperand(mViewMatrix, Operand::OPS_IN);                  
-        funcInvocation->pushOperand(mVSInputNormal, Operand::OPS_IN);   
-        funcInvocation->pushOperand(mVSInputPos, Operand::OPS_IN);              
-        funcInvocation->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_OUT);
-        vsMain->addAtomInstance(funcInvocation);
+        stage.callFunction(
+            FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,
+            {In(mWorldMatrix), In(mWorldITMatrix), In(mViewMatrix), In(mVSInputNormal), In(mVSInputPos), Out(mVSOutReflectionTexcoord)});
     }
     
 
@@ -272,21 +262,12 @@ bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupO
 }
 
 //-----------------------------------------------------------------------
-bool ShaderExReflectionMap::addPSInvocations( Function* psMain, const int groupOrder )
+bool ShaderExReflectionMap::addPSInvocations( const FunctionStageRef& stage )
 {
-    FunctionInvocation* funcInvocation = NULL;
-
-    funcInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_APPLY_REFLECTION_MAP, groupOrder);
-    funcInvocation->pushOperand(mMaskMapSampler, Operand::OPS_IN);
-    funcInvocation->pushOperand(mPSInMaskTexcoord, Operand::OPS_IN);
-    funcInvocation->pushOperand(mReflectionMapSampler, Operand::OPS_IN);
-    funcInvocation->pushOperand(mPSInReflectionTexcoord, Operand::OPS_IN);  
-    funcInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
-    funcInvocation->pushOperand(mReflectionPower, Operand::OPS_IN);
-    funcInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
-    
-    psMain->addAtomInstance(funcInvocation);
-
+    stage.callFunction(SGX_FUNC_APPLY_REFLECTION_MAP,
+                       {In(mMaskMapSampler), In(mPSInMaskTexcoord), In(mReflectionMapSampler),
+                        In(mPSInReflectionTexcoord), In(mPSOutDiffuse).xyz(), In(mReflectionPower),
+                        Out(mPSOutDiffuse).xyz()});
     return true;
 }
 

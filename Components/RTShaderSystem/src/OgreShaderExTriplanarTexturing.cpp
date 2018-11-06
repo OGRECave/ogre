@@ -104,26 +104,19 @@ namespace RTShader {
     //-----------------------------------------------------------------------
 	bool TriplanarTexturing::addFunctionInvocations(ProgramSet* programSet)
 	{
-		Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
-		Function* psMain = psProgram->getEntryPointFunction();
-		Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-		Function* vsMain = vsProgram->getEntryPointFunction();
+        Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
+        Function* psMain = psProgram->getEntryPointFunction();
+        Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+        Function* vsMain = vsProgram->getEntryPointFunction();
 
-		vsMain->addAtomAssign(mVSOutNormal, mVSInNormal, FFP_VS_TEXTURING);
-		vsMain->addAtomAssign(mVSOutPosition, mVSInPosition, FFP_VS_TEXTURING);
+        auto vsStage = vsMain->getStage(FFP_PS_TEXTURING);
+        vsStage.assign(mVSInNormal, mVSOutNormal);
+        vsStage.assign(mVSInPosition, mVSOutPosition);
 
-        FunctionInvocation *curFuncInvocation;
-		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRIPLANAR_TEXTURING, FFP_PS_TEXTURING);
-		curFuncInvocation->pushOperand(mPSInDiffuse, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mPSInPosition, Operand::OPS_IN);
-
-        curFuncInvocation->pushOperand(mSamplerFromX, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mSamplerFromY, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mSamplerFromZ, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mPSTPParams, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);
-        psMain->addAtomInstance(curFuncInvocation); 
+        psMain->getStage(FFP_PS_TEXTURING)
+            .callFunction(SGX_FUNC_TRIPLANAR_TEXTURING,
+                          {In(mPSInDiffuse), In(mPSInNormal), In(mPSInPosition), In(mSamplerFromX),
+                           In(mSamplerFromY), In(mSamplerFromZ), In(mPSTPParams), Out(mPSOutDiffuse)});
 
         return true;
     }

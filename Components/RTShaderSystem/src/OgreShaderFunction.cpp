@@ -29,6 +29,33 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace RTShader {
+
+void FunctionStageRef::callFunction(const char* name, const InOut& inout) const
+{
+    callFunction(name, std::vector<Operand>{inout});
+}
+
+void FunctionStageRef::callFunction(const char* name, const std::vector<Operand>& params) const
+{
+    auto function = new FunctionInvocation(name, mStage);
+    function->setOperands(params);
+    mParent->addAtomInstance(function);
+}
+
+void FunctionStageRef::sampleTexture(const std::vector<Operand>& params) const
+{
+    auto function = new SampleTextureAtom(mStage);
+    function->setOperands(params);
+    mParent->addAtomInstance(function);
+}
+
+void FunctionStageRef::assign(const std::vector<Operand>& params) const
+{
+    auto function = new AssignmentAtom(mStage);
+    function->setOperands(params);
+    mParent->addAtomInstance(function);
+}
+
 //-----------------------------------------------------------------------------
 Function::Function(const String& name, const String& desc, const FunctionType functionType)
 {
