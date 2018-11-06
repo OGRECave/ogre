@@ -3748,7 +3748,7 @@ namespace Ogre{
         }
 
         std::vector<std::pair<PropertyAbstractNode*, String> > customParameters;
-        String source, profiles;
+        String source, profiles, target;
         AbstractNodePtr params;
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -3788,6 +3788,8 @@ namespace Ogre{
 
                     if(prop->name == "profiles")
                         profiles = value;
+                    else if(prop->name == "target")
+                        target = value;
                     else
                         customParameters.push_back(std::make_pair(prop, value));
                 }
@@ -3833,6 +3835,10 @@ namespace Ogre{
         // special case for Cg
         if(!profiles.empty())
             prog->setParameter("profiles", profiles);
+
+        // special case for HLSL
+        if(!target.empty())
+            prog->setParameter("target", target);
 
         // Set the custom parameters
         for(const auto& p : customParameters)
