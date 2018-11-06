@@ -112,6 +112,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     if(mGLSLVersion > 120)
     {
         // Redefine texture functions to maintain reusability
+        os << "#define texture1D texture" << std::endl;
         os << "#define texture2D texture" << std::endl;
         os << "#define texture3D texture" << std::endl;
         os << "#define textureCube texture" << std::endl;
