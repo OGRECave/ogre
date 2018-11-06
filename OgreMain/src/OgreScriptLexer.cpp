@@ -28,8 +28,19 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreScriptLexer.h"
 
-namespace Ogre{
-    ScriptTokenListPtr ScriptLexer::tokenize(const String &str, const String &source)
+namespace Ogre {
+    ScriptTokenListPtr ScriptLexer::tokenize(const String &str, const String& source)
+    {
+        String error;
+        ScriptTokenListPtr ret = _tokenize(str, source.c_str(), error);
+
+        if (!error.empty())
+            LogManager::getSingleton().logError("ScriptLexer - " + error);
+
+        return ret;
+    }
+
+    ScriptTokenListPtr ScriptLexer::_tokenize(const String &str, const char* source, String& error)
     {
         // State enums
         enum{ READY = 0, COMMENT, MULTICOMMENT, WORD, QUOTE, VAR, POSSIBLECOMMENT };
@@ -63,12 +74,14 @@ namespace Ogre{
                 }
                 else if(c == closebrace)
                 {
-                    if(braceLayer == 0)
-                        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                            Ogre::String("no matching open bracket '{' found for close bracket '}' at line ") + 
-                            Ogre::StringConverter::toString(line),
-                            "ScriptLexer::tokenize");
-                    
+                    if (braceLayer == 0)
+                    {
+                        error = StringUtil::format(
+                            "no matching open bracket '{' found for close bracket '}' at %s:%d", source,
+                            line);
+                        return tokens;
+                    }
+
                     braceLayer --;
                 }
             }
@@ -237,34 +250,28 @@ namespace Ogre{
         {
             if(state == QUOTE)
             {
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                    Ogre::String("no matching \" found for \" at line ") + 
-                    Ogre::StringConverter::toString(lastQuote),
-                    "ScriptLexer::tokenize");
+                error = StringUtil::format("no matching \" found for \" at %s:%d", source, lastQuote);
+                return tokens;
             }
         }
         
         // Check that all opened brackets have been closed
         if (braceLayer == 1)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                Ogre::String("no matching closing bracket '}' for open bracket '{' at line ") +
-                Ogre::StringConverter::toString(firstOpenBrace),
-                "ScriptLexer::tokenize");
+            error = StringUtil::format("no matching closing bracket '}' for open bracket '{' at %s:%d",
+                                       source, firstOpenBrace);
         }
         else if (braceLayer > 1)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                Ogre::String("too many open brackets '{' without matching closing bracket '}' (") + 
-                Ogre::StringConverter::toString(braceLayer) +
-                Ogre::String(")"),
-                "ScriptLexer::tokenize");
+            error = StringUtil::format(
+                "too many open brackets (%d) '{' without matching closing bracket '}' in %s", braceLayer,
+                source);
         }
        
         return tokens;
     }
 
-    void ScriptLexer::setToken(const Ogre::String &lexeme, Ogre::uint32 line, const String &source, Ogre::ScriptTokenList *tokens)
+    void ScriptLexer::setToken(const Ogre::String &lexeme, Ogre::uint32 line, const char* source, ScriptTokenList *tokens)
     {
         const char openBracket = '{', closeBracket = '}', colon = ':',
             quote = '\"', var = '$';
