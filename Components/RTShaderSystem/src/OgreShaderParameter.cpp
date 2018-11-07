@@ -364,7 +364,7 @@ void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
 {   
     if (paramsPtr.get() != NULL)
     {
-        const GpuConstantDefinition* def = paramsPtr->_findNamedConstantDefinition(mName);
+        const GpuConstantDefinition* def = paramsPtr->_findNamedConstantDefinition(mBindName.empty() ? mName : mBindName, true);
 
         if (def != NULL)
         {
