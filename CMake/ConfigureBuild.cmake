@@ -134,9 +134,9 @@ if(SDL2_FOUND OR EMSCRIPTEN)
 endif()
 
 # generate OgreBuildSettings.h
-configure_file(${OGRE_TEMPLATES_DIR}/OgreBuildSettings.h.in ${CMAKE_BINARY_DIR}/include/OgreBuildSettings.h @ONLY)
-configure_file(${OGRE_TEMPLATES_DIR}/OgreRTShaderConfig.h.in ${CMAKE_BINARY_DIR}/include/OgreRTShaderConfig.h @ONLY)
-configure_file(${OGRE_TEMPLATES_DIR}/OgreGLES2Config.h.in ${CMAKE_BINARY_DIR}/include/OgreGLES2Config.h @ONLY)
+configure_file(${OGRE_TEMPLATES_DIR}/OgreBuildSettings.h.in ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h @ONLY)
+configure_file(${OGRE_TEMPLATES_DIR}/OgreRTShaderConfig.h.in ${OGRE_BINARY_DIR}/include/OgreRTShaderConfig.h @ONLY)
+configure_file(${OGRE_TEMPLATES_DIR}/OgreGLES2Config.h.in ${OGRE_BINARY_DIR}/include/OgreGLES2Config.h @ONLY)
 
 set(OGRE_LIB_SUFFIX "")
 

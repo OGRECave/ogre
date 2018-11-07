@@ -62,7 +62,7 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
     if( NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/Media")
         # Get OS dependent path to use in `execute_process`
         file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/Media" link)
-        file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Samples/Media" target)
+        file(TO_NATIVE_PATH "${OGRE_SOURCE_DIR}/Samples/Media" target)
         execute_process( COMMAND cmd.exe /c mklink /J ${link} ${target})
     endif()
 
@@ -82,10 +82,10 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
         ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
         ${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
 
-        ${CMAKE_SOURCE_DIR}/Samples/Common/misc.winrt/Logo.png
-        ${CMAKE_SOURCE_DIR}/Samples/Common/misc.winrt/SmallLogo.png
-        ${CMAKE_SOURCE_DIR}/Samples/Common/misc.winrt/StoreLogo.png
-        ${CMAKE_SOURCE_DIR}/Samples/Common/misc.winrt/SplashScreen.png
+        ${OGRE_SOURCE_DIR}/Samples/Common/misc.winrt/Logo.png
+        ${OGRE_SOURCE_DIR}/Samples/Common/misc.winrt/SmallLogo.png
+        ${OGRE_SOURCE_DIR}/Samples/Common/misc.winrt/StoreLogo.png
+        ${OGRE_SOURCE_DIR}/Samples/Common/misc.winrt/SplashScreen.png
 
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
     )

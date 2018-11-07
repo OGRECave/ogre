@@ -16,8 +16,8 @@ PROJECT(OgreMain)
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES
-    ${CMAKE_BINARY_DIR}/include/OgreBuildSettings.h
-    ${CMAKE_BINARY_DIR}/include/OgreExports.h)
+    ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
+    ${OGRE_BINARY_DIR}/include/OgreExports.h)
 
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
@@ -182,7 +182,7 @@ generate_export_header(OgreMain
     EXPORT_MACRO_NAME _OgreExport
     NO_EXPORT_MACRO_NAME _OgrePrivate
     DEPRECATED_MACRO_NAME OGRE_DEPRECATED
-    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreExports.h)
+    EXPORT_FILE_NAME ${OGRE_BINARY_DIR}/include/OgreExports.h)
 
 target_include_directories(OgreMain PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" 

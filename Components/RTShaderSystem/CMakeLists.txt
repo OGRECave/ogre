@@ -13,8 +13,8 @@ PROJECT(OgreRTShaderSystem)
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES 
-    ${CMAKE_BINARY_DIR}/include/OgreRTShaderExports.h 
-    ${CMAKE_BINARY_DIR}/include/OgreRTShaderConfig.h)
+    ${OGRE_BINARY_DIR}/include/OgreRTShaderExports.h 
+    ${OGRE_BINARY_DIR}/include/OgreRTShaderConfig.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 get_native_precompiled_header(OgreRTShaderSystem)
@@ -31,7 +31,7 @@ add_native_precompiled_header(OgreRTShaderSystem "${CMAKE_CURRENT_SOURCE_DIR}/sr
 
 generate_export_header(OgreRTShaderSystem 
     EXPORT_MACRO_NAME _OgreRTSSExport
-    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreRTShaderExports.h)
+    EXPORT_FILE_NAME ${OGRE_BINARY_DIR}/include/OgreRTShaderExports.h)
 
 ogre_config_framework(OgreRTShaderSystem)
 ogre_config_component(OgreRTShaderSystem)

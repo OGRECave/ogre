@@ -8,7 +8,7 @@
 #-------------------------------------------------------------------
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreFreeImageCodecExports.h)
+list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreFreeImageCodecExports.h)
 set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp")
 
 add_definitions(-DFREEIMAGE_LIB)
@@ -28,5 +28,5 @@ ogre_config_framework(Codec_FreeImage)
 ogre_config_plugin(Codec_FreeImage)
 generate_export_header(Codec_FreeImage 
     EXPORT_MACRO_NAME _OgreFreeImageCodecExport
-    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreFreeImageCodecExports.h)
+    EXPORT_FILE_NAME ${OGRE_BINARY_DIR}/include/OgreFreeImageCodecExports.h)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/FreeImageCodec)
