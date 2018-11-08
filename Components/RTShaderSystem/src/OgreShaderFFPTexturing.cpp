@@ -603,7 +603,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         psMain->addAtomInstance(curFuncInvocation); 
         break;
     case LBX_BLEND_DIFFUSE_ALPHA:
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder);
+        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_W);
@@ -649,7 +649,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder);
         curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
-        curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
+        curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, targetChannels);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);        
         psMain->addAtomInstance(curFuncInvocation);     
         break;
