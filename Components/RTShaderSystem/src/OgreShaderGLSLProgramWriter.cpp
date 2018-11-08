@@ -234,7 +234,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
                         os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << param->getName() << ";" << std::endl;
 
                         // From now on we replace it automatic
-                        param->_rename(newVar);
+                        param->_rename(newVar, true);
                         mLocalRenames.insert(newVar);
                     }
                 }

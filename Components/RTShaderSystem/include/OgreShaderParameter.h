@@ -328,7 +328,12 @@ public:
     const String& getName() const { return mName; }
 
     /// internal function for aliasing to GLSL builtins e.g. gl_Position
-    void _rename(const String& newName) { mName = newName; }
+    void _rename(const String& newName, bool onlyLocal = false)
+    {
+        if(onlyLocal)
+            mBindName = mName;
+        mName = newName;
+    }
 
     /** Get the type of this parameter. */
     GpuConstantType getType() const { return mType; }
@@ -361,6 +366,10 @@ public:
 protected:
     // Name of this parameter.
     String mName;
+
+    // only used for local renaming
+    String mBindName;
+
     // Type of this parameter.
     GpuConstantType mType;
     // Semantic of this parameter.
