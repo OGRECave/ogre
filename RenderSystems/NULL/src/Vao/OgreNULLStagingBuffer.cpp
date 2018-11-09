@@ -99,8 +99,9 @@ namespace Ogre
                                                  size_t srcLength )
     {
         size_t freeRegionOffset = getFreeDownloadRegion( srcLength );
+		size_t errorCode = -1; // dodge comile error about signed/unsigned compare
 
-        if( freeRegionOffset == -1u )
+        if( freeRegionOffset == errorCode)
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                          "Cannot download the request amount of " +

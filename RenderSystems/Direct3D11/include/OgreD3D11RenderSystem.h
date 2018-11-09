@@ -85,8 +85,9 @@ namespace Ogre
         void refreshD3DSettings(void);
         void refreshFSAAOptions(void);
         void freeDevice(void);
-        bool isWindows8OrGreater();
-        
+#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+		bool isWindows8OrGreater();
+#endif
         v1::D3D11HardwareBufferManager* mHardwareBufferManager;
         D3D11GpuProgramManager* mGpuProgramManager;
         D3D11HLSLProgramFactory* mHLSLProgramFactory;

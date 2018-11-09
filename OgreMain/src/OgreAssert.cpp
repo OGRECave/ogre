@@ -57,7 +57,7 @@ Assert::FailBehavior DefaultHandler(const char* condition,
                                     const char* file,
                                     const int line)
 {
-#if _MSC_VER && _WIN32 && !defined( _CONSOLE )
+#if _MSC_VER && _WIN32 && !defined( _CONSOLE ) && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
     char fullmsg[1024];
     memset( fullmsg, 0, sizeof(fullmsg) );
 
