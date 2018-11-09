@@ -3170,7 +3170,6 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_beginFrame()
     {
-        mHardwareBufferManager->_updateDirtyInputLayouts();
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_endFrame()

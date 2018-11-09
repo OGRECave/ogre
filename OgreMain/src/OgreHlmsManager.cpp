@@ -54,41 +54,29 @@ namespace Ogre
         memset( mDeleteRegisteredOnExit, 0, sizeof( mDeleteRegisteredOnExit ) );
         memset( mBlocks, 0, sizeof( mBlocks ) );
 
+        mMacroblocks.reserve( OGRE_HLMS_MAX_LIFETIME_MACROBLOCKS );
+        mBlendblocks.reserve( OGRE_HLMS_MAX_LIFETIME_BLENDBLOCKS );
+
         mTextureManager = OGRE_NEW HlmsTextureManager();
 
         mActiveBlocks[BLOCK_MACRO].reserve( OGRE_HLMS_NUM_MACROBLOCKS );
         mFreeBlockIds[BLOCK_MACRO].reserve( OGRE_HLMS_NUM_MACROBLOCKS );
         for( uint8 i=0; i<OGRE_HLMS_NUM_MACROBLOCKS; ++i )
-        {
-            mMacroblocks[i].mId = i;
-            mBlocks[BLOCK_MACRO][i] = &mMacroblocks[i];
             mFreeBlockIds[BLOCK_MACRO].push_back( (OGRE_HLMS_NUM_MACROBLOCKS - 1) - i );
-        }
 
         mActiveBlocks[BLOCK_BLEND].reserve( OGRE_HLMS_NUM_BLENDBLOCKS );
         mFreeBlockIds[BLOCK_BLEND].reserve( OGRE_HLMS_NUM_BLENDBLOCKS );
         for( uint8 i=0; i<OGRE_HLMS_NUM_BLENDBLOCKS; ++i )
-        {
-            mBlendblocks[i].mId = i;
-            mBlocks[BLOCK_BLEND][i] = &mBlendblocks[i];
             mFreeBlockIds[BLOCK_BLEND].push_back( (OGRE_HLMS_NUM_BLENDBLOCKS - 1) - i );
-        }
 
         mActiveBlocks[BLOCK_SAMPLER].reserve( OGRE_HLMS_NUM_SAMPLERBLOCKS );
         mFreeBlockIds[BLOCK_SAMPLER].reserve( OGRE_HLMS_NUM_SAMPLERBLOCKS );
         for( uint8 i=0; i<OGRE_HLMS_NUM_SAMPLERBLOCKS; ++i )
         {
             mSamplerblocks[i].mId = i;
+            mSamplerblocks[i].mLifetimeId = i;
             mBlocks[BLOCK_SAMPLER][i] = &mSamplerblocks[i];
             mFreeBlockIds[BLOCK_SAMPLER].push_back( (OGRE_HLMS_NUM_SAMPLERBLOCKS - 1) - i );
-        }
-
-        mFreeInputLayouts.reserve( OGRE_HLMS_NUM_INPUT_LAYOUTS );
-        for( uint8 i=0; i<OGRE_HLMS_NUM_INPUT_LAYOUTS; ++i )
-        {
-            mInputLayouts[i].opType = OT_POINT_LIST;
-            mInputLayouts[i].refCount = 0;
-            mFreeInputLayouts.push_back( (OGRE_HLMS_NUM_INPUT_LAYOUTS - 1) - i );
         }
 
 #if !OGRE_NO_JSON
@@ -102,7 +90,6 @@ namespace Ogre
 #if !OGRE_NO_JSON
         ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
 #endif
-
         renderSystemDestroyAllBlocks();
 
         OGRE_DELETE mTextureManager;
@@ -150,7 +137,7 @@ namespace Ogre
         ++realBlock->mRefCount;
     }
     //-----------------------------------------------------------------------------------
-    uint16 HlmsManager::getFreeBasicBlock( uint8 type )
+    uint16 HlmsManager::getFreeBasicBlock( uint8 type, BasicBlock *basicBlock )
     {
         if( mFreeBlockIds[type].empty() )
         {
@@ -163,10 +150,12 @@ namespace Ogre
                          "HlmsManager::getFreeBasicBlock" );
         }
 
-        size_t idx = mFreeBlockIds[type].back();
+        const uint16 idx = mFreeBlockIds[type].back();
         mFreeBlockIds[type].pop_back();
 
         mActiveBlocks[type].push_back( idx );
+        if( basicBlock )
+            mBlocks[type][idx] = basicBlock;
 
         return idx;
     }
@@ -182,43 +171,54 @@ namespace Ogre
         mActiveBlocks[block->mBlockType].erase( itor );
 
         mFreeBlockIds[block->mBlockType].push_back( block->mId );
+
+        block->mId = std::numeric_limits<uint16>::max();
+    }
+    //-----------------------------------------------------------------------------------
+    template <typename T, HlmsBasicBlock type, size_t maxLimit>
+    T* HlmsManager::getBasicBlock( typename vector<T>::type &container, const T &baseParams )
+    {
+        assert( mRenderSystem && "A render system must be selected first!" );
+        assert( baseParams.mBlockType == type &&
+                "baseParams.mBlockType should always be BLOCK_MACRO or BLOCK_BLEND! "
+                "You can ignore this assert,  but it usually indicates memory corruption"
+                "(or you created the block without its default constructor)." );
+
+        typename vector<T>::type::iterator itor = std::find( container.begin(), container.end(),
+                                                             baseParams );
+
+        if( itor == container.end() )
+        {
+            OGRE_ASSERT_LOW( container.size() <= maxLimit &&
+                             "Exceeded the max number of blocks that can be created during "
+                             "the lifetime of an application!!!");
+            container.push_back( baseParams );
+            container.back().mRefCount   = 0;
+            container.back().mId         = std::numeric_limits<uint16>::max();
+            container.back().mLifetimeId = static_cast<uint16>( container.size() - 1u );
+            container.back().mBlockType  = type;
+            itor = container.end() - 1u;
+        }
+
+        if( !itor->mRefCount )
+        {
+            OGRE_ASSERT_LOW( itor->mId == std::numeric_limits<uint16>::max() );
+            const size_t idx = getFreeBasicBlock( type, &*itor );
+            itor->mId = static_cast<uint16>( idx );
+        }
+
+        return &(*itor);
     }
     //-----------------------------------------------------------------------------------
     const HlmsMacroblock* HlmsManager::getMacroblock( const HlmsMacroblock &baseParams )
     {
-        assert( mRenderSystem && "A render system must be selected first!" );
-        assert( baseParams.mBlockType == BLOCK_MACRO &&
-                "baseParams.mBlockType should always be BLOCK_MACRO! You can ignore this assert,"
-                " but it usually indicates memory corruption (or you created the block without "
-                "its default constructor)." );
+        HlmsMacroblock *retVal = getBasicBlock<HlmsMacroblock, BLOCK_MACRO,
+                OGRE_HLMS_MAX_LIFETIME_MACROBLOCKS>( mMacroblocks, baseParams );
 
-        BlockIdxVec::iterator itor = mActiveBlocks[BLOCK_MACRO].begin();
-        BlockIdxVec::iterator end  = mActiveBlocks[BLOCK_MACRO].end();
+        if( !retVal->mRefCount )
+            mRenderSystem->_hlmsMacroblockCreated( retVal );
 
-        while( itor != end && mMacroblocks[*itor] != baseParams )
-            ++itor;
-
-        HlmsMacroblock *retVal = 0;
-        if( itor != end )
-        {
-            //Already exists
-            retVal = &mMacroblocks[*itor];
-        }
-        else
-        {
-            size_t idx = getFreeBasicBlock( BLOCK_MACRO );
-
-            mMacroblocks[idx] = baseParams;
-            //Restore the values which has just been overwritten and we need properly set.
-            mMacroblocks[idx].mRefCount = 0;
-            mMacroblocks[idx].mId       = idx;
-            mMacroblocks[idx].mBlockType= BLOCK_MACRO;
-            mRenderSystem->_hlmsMacroblockCreated( &mMacroblocks[idx] );
-
-            retVal = &mMacroblocks[idx];
-        }
-
-        assert( retVal->mRefCount < 0xFFFF && "Reference count overflow!" );
+        OGRE_ASSERT_LOW( retVal->mRefCount < 0xFFFF && "Reference count overflow!" );
         ++retVal->mRefCount;
 
         return retVal;
@@ -226,71 +226,45 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsManager::destroyMacroblock( const HlmsMacroblock *macroblock )
     {
-        if( &mMacroblocks[macroblock->mId] != macroblock )
+        if( &mMacroblocks[macroblock->mLifetimeId] != macroblock )
         {
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
                          "The macroblock wasn't created with this manager!",
                          "HlmsManager::destroyMacroblock" );
         }
-
-        --mMacroblocks[macroblock->mId].mRefCount;
-
-        if( !mMacroblocks[macroblock->mId].mRefCount )
+        if( !mMacroblocks[macroblock->mLifetimeId].mRefCount )
         {
-            for( size_t i=0; i<HLMS_MAX; ++i )
-            {
-                if( mRegisteredHlms[i] )
-                    mRegisteredHlms[i]->_notifyMacroblockDestroyed( macroblock->mId );
-            }
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "This macroblock has already been destroyed!",
+                         "HlmsManager::destroyMacroblock" );
+        }
 
-            mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[macroblock->mId] );
-            destroyBasicBlock( &mMacroblocks[macroblock->mId] );
+        --mMacroblocks[macroblock->mLifetimeId].mRefCount;
+
+        if( !mMacroblocks[macroblock->mLifetimeId].mRefCount )
+        {
+            mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[macroblock->mLifetimeId] );
+            destroyBasicBlock( &mMacroblocks[macroblock->mLifetimeId] );
         }
     }
     //-----------------------------------------------------------------------------------
     const HlmsBlendblock* HlmsManager::getBlendblock( const HlmsBlendblock &baseParams )
     {
-        assert( mRenderSystem && "A render system must be selected first!" );
-        assert( baseParams.mBlockType == BLOCK_BLEND &&
-                "baseParams.mBlockType should always be BLOCK_BLEND! You can ignore this assert,"
-                " but it usually indicates memory corruption (or you created the block without "
-                "its default constructor)." );
+        HlmsBlendblock *retVal = getBasicBlock<HlmsBlendblock, BLOCK_BLEND,
+                OGRE_HLMS_MAX_LIFETIME_BLENDBLOCKS>( mBlendblocks, baseParams );
 
-        BlockIdxVec::iterator itor = mActiveBlocks[BLOCK_BLEND].begin();
-        BlockIdxVec::iterator end  = mActiveBlocks[BLOCK_BLEND].end();
-
-        while( itor != end && mBlendblocks[*itor] != baseParams )
-            ++itor;
-
-        HlmsBlendblock *retVal = 0;
-        if( itor != end )
+        if( !retVal->mRefCount )
         {
-            //Already exists
-            retVal = &mBlendblocks[*itor];
-        }
-        else
-        {
-            size_t idx = getFreeBasicBlock( BLOCK_BLEND );
-
-            mBlendblocks[idx] = baseParams;
-
-            //Restore the values which has just been overwritten and we need properly set.
-            mBlendblocks[idx].mRefCount = 0;
-            mBlendblocks[idx].mId       = idx;
-            mBlendblocks[idx].mBlockType= BLOCK_BLEND;
-
-            mBlendblocks[idx].mIsTransparent =
-                     !( baseParams.mDestBlendFactor == SBF_ZERO &&
-                        baseParams.mSourceBlendFactor != SBF_DEST_COLOUR &&
-                        baseParams.mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
-                        baseParams.mSourceBlendFactor != SBF_DEST_ALPHA &&
-                        baseParams.mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA );
-            mRenderSystem->_hlmsBlendblockCreated( &mBlendblocks[idx] );
-
-            retVal = &mBlendblocks[idx];
+            retVal->mIsTransparent =
+                    !( baseParams.mDestBlendFactor == SBF_ZERO &&
+                       baseParams.mSourceBlendFactor != SBF_DEST_COLOUR &&
+                       baseParams.mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
+                       baseParams.mSourceBlendFactor != SBF_DEST_ALPHA &&
+                       baseParams.mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA );
+            mRenderSystem->_hlmsBlendblockCreated( retVal );
         }
 
-        assert( retVal->mRefCount < 0xFFFF && "Reference count overflow!" );
+        OGRE_ASSERT_LOW( retVal->mRefCount < 0xFFFF && "Reference count overflow!" );
         ++retVal->mRefCount;
 
         return retVal;
@@ -298,25 +272,19 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsManager::destroyBlendblock( const HlmsBlendblock *blendblock )
     {
-        if( &mBlendblocks[blendblock->mId] != blendblock )
+        if( &mBlendblocks[blendblock->mLifetimeId] != blendblock )
         {
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
                          "The Blendblock wasn't created with this manager!",
                          "HlmsManager::destroyBlendblock" );
         }
 
-        --mBlendblocks[blendblock->mId].mRefCount;
+        --mBlendblocks[blendblock->mLifetimeId].mRefCount;
 
-        if( !mBlendblocks[blendblock->mId].mRefCount )
+        if( !mBlendblocks[blendblock->mLifetimeId].mRefCount )
         {
-            for( size_t i=0; i<HLMS_MAX; ++i )
-            {
-                if( mRegisteredHlms[i] )
-                    mRegisteredHlms[i]->_notifyBlendblockDestroyed( blendblock->mId );
-            }
-
-            mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[blendblock->mId] );
-            destroyBasicBlock( &mBlendblocks[blendblock->mId] );
+            mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[blendblock->mLifetimeId] );
+            destroyBasicBlock( &mBlendblocks[blendblock->mLifetimeId] );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -364,12 +332,13 @@ namespace Ogre
         }
         else
         {
-            size_t idx = getFreeBasicBlock( BLOCK_SAMPLER );
+            size_t idx = getFreeBasicBlock( BLOCK_SAMPLER, 0 );
 
             mSamplerblocks[idx] = baseParams;
             //Restore the values which has just been overwritten and we need properly set.
             mSamplerblocks[idx].mRefCount   = 0;
             mSamplerblocks[idx].mId         = idx;
+            mSamplerblocks[idx].mLifetimeId = idx;
             mSamplerblocks[idx].mBlockType  = BLOCK_SAMPLER;
             mRenderSystem->_hlmsSamplerblockCreated( &mSamplerblocks[idx] );
 
@@ -400,79 +369,33 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    uint8 HlmsManager::_addInputLayoutId( VertexElement2VecVec vertexElements, OperationType opType )
+    uint16 HlmsManager::_getInputLayoutId( const VertexElement2VecVec &vertexElements,
+                                           OperationType opType )
     {
-        InputLayoutsIdVec::const_iterator itor = mActiveInputLayouts.begin();
-        InputLayoutsIdVec::const_iterator end  = mActiveInputLayouts.end();
+        InputLayoutsVec::const_iterator itor = mInputLayouts.begin();
+        InputLayoutsVec::const_iterator end  = mInputLayouts.end();
 
         while( itor != end &&
-               (mInputLayouts[*itor].vertexElements != vertexElements ||
-                mInputLayouts[*itor].opType != opType) )
+               (itor->vertexElements != vertexElements /*|| itor->opType != opType*/) )
         {
             ++itor;
         }
 
-        uint8 retVal = 0;
-        if( itor != end )
+        if( itor == end )
         {
-            //Already exists
-            retVal = *itor;
-        }
-        else
-        {
-            if( mFreeInputLayouts.empty() )
-            {
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
-                             "Can't have more than 256 active input layouts! "
-                             "You have too many different vertex formats.",
-                             "HlmsManager::_addInputLayoutId" );
-            }
+            OGRE_ASSERT_LOW( mInputLayouts.size() < (1u << 10u) && "Too many input layouts!!!" );
 
-            retVal = mFreeInputLayouts.back();
-            mFreeInputLayouts.pop_back();
-
-            mActiveInputLayouts.push_back( retVal );
-
-            mInputLayouts[retVal].opType            = opType;
-            mInputLayouts[retVal].vertexElements    = vertexElements;
-            mInputLayouts[retVal].refCount          = 0;
+            mInputLayouts.push_back( InputLayouts() );
+//            mInputLayouts.back().opType         = opType;
+            mInputLayouts.back().vertexElements = vertexElements;
+            itor = mInputLayouts.end() - 1u;
         }
 
-        ++mInputLayouts[retVal].refCount;
+        //Store the idx in the first 10 bits, store the operation type in the last 6.
+        uint16 retVal = static_cast<uint16>( itor - mInputLayouts.begin() );
+        retVal |= opType << 10u;
 
         return retVal;
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsManager::_removeInputLayoutIdReference( uint8 layoutId )
-    {
-        --mInputLayouts[layoutId].refCount;
-
-        if( !mInputLayouts[layoutId].refCount )
-        {
-            for( int i=0; i<HLMS_MAX; ++i )
-            {
-                if( mRegisteredHlms[i] )
-                    mRegisteredHlms[i]->_notifyInputLayoutDestroyed( layoutId );
-            }
-
-            InputLayoutsIdVec::iterator itor = std::find( mActiveInputLayouts.begin(),
-                                                          mActiveInputLayouts.end(),
-                                                          layoutId );
-
-            assert( itor != mActiveInputLayouts.end() );
-            mActiveInputLayouts.erase( itor );
-
-            mFreeInputLayouts.push_back( layoutId );
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsManager::_notifyV1InputLayoutDestroyed( uint8 v1LayoutId )
-    {
-        for( int i=0; i<HLMS_MAX; ++i )
-        {
-            if( mRegisteredHlms[i] )
-                mRegisteredHlms[i]->_notifyV1InputLayoutDestroyed( v1LayoutId );
-        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsManager::_datablockAdded( HlmsDatablock *datablock )
@@ -612,12 +535,20 @@ namespace Ogre
             BlockIdxVec::const_iterator itor = mActiveBlocks[BLOCK_MACRO].begin();
             BlockIdxVec::const_iterator end  = mActiveBlocks[BLOCK_MACRO].end();
             while( itor != end )
-                mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[*itor++] );
+            {
+                HlmsMacroblock *block = static_cast<HlmsMacroblock*>( mBlocks[BLOCK_MACRO][*itor] );
+                mRenderSystem->_hlmsMacroblockDestroyed( block );
+                ++itor;
+            }
 
             itor = mActiveBlocks[BLOCK_BLEND].begin();
             end  = mActiveBlocks[BLOCK_BLEND].end();
             while( itor != end )
-                mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[*itor++] );
+            {
+                HlmsBlendblock *block = static_cast<HlmsBlendblock*>( mBlocks[BLOCK_BLEND][*itor] );
+                mRenderSystem->_hlmsBlendblockDestroyed( block );
+                ++itor;
+            }
 
             itor = mActiveBlocks[BLOCK_SAMPLER].begin();
             end  = mActiveBlocks[BLOCK_SAMPLER].end();
@@ -636,12 +567,21 @@ namespace Ogre
             BlockIdxVec::const_iterator itor = mActiveBlocks[BLOCK_MACRO].begin();
             BlockIdxVec::const_iterator end  = mActiveBlocks[BLOCK_MACRO].end();
             while( itor != end )
-                mRenderSystem->_hlmsMacroblockCreated( &mMacroblocks[*itor++] );
+            {
+                HlmsMacroblock *block = static_cast<HlmsMacroblock*>( mBlocks[BLOCK_MACRO][*itor] );
+                mRenderSystem->_hlmsMacroblockCreated( block );
+                ++itor;
+            }
 
             itor = mActiveBlocks[BLOCK_BLEND].begin();
             end  = mActiveBlocks[BLOCK_BLEND].end();
             while( itor != end )
-                mRenderSystem->_hlmsBlendblockCreated( &mBlendblocks[*itor++] );
+            {
+                HlmsBlendblock *block = static_cast<HlmsBlendblock*>( mBlocks[BLOCK_BLEND][*itor] );
+                mRenderSystem->_hlmsBlendblockCreated( block );
+                ++itor;
+            }
+
 
             itor = mActiveBlocks[BLOCK_SAMPLER].begin();
             end  = mActiveBlocks[BLOCK_SAMPLER].end();
@@ -739,7 +679,8 @@ namespace Ogre
     }
 #endif
     //-----------------------------------------------------------------------------------
-    const HlmsManager::BlockIdxVec& HlmsManager::_getActiveBlocksIndices( const HlmsBasicBlock &blockType ) const
+    const HlmsManager::BlockIdxVec& HlmsManager::_getActiveBlocksIndices(
+            const HlmsBasicBlock &blockType ) const
     {
         return mActiveBlocks[blockType];
     }

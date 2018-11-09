@@ -49,10 +49,39 @@ namespace Ogre
     *  @{
     */
 
-    /** HLMS stands for "High Level Material System". */
+    /** HLMS stands for "High Level Material System".
+
+        The Hlms has multiple caches:
+
+        mRenderableCache
+            This cache contains all the properties set to a Renderable class and can be evaluated
+            early, when a Renderable is assigned a datablock i.e. inside Renderable::setDatablock.
+            Contains properties such as whether the material has normal mapping, if the mesh
+            has UV sets, evaluates if the material requires tangents for normal mapping, etc.
+            The main function in charge of filling this cache is Hlms::calculateHashFor
+
+        mPassCache
+            This cache contains per-pass information, such as how many lights are in the scene,
+            whether this is a shadow mapping pass, etc.
+            The main function in charge of filling this cache is Hlms::preparePassHash
+
+        mShaderCodeCache
+            Contains a cache of unique shaders (from Hlms templates -> actual valid shader code)
+            based on the properties merged from mRenderableCache & mPassCache.
+            However it is possible that two shaders are exactly the same and thus be duplicated,
+            this can happen if two combinations of properties end up producing the exact same code.
+            The Microcode cache (GpuProgramManager::setSaveMicrocodesToCache) can help with that issue.
+
+        mShaderCache
+            Contains a cache of the PSOs. The difference between this and mShaderCodeCache is
+            that PSOs require additional information, such as HlmsMacroblock. HlmsBlendblock.
+            For more information of all that is required, see HlmsPso
+    */
     class _OgreExport Hlms : public HlmsAlloc
     {
     public:
+        friend class HlmsDiskCache;
+
         enum LightGatheringMode
         {
             LightGatherForward,
@@ -115,11 +144,30 @@ namespace Ogre
             }
         };
 
+        struct ShaderCodeCache
+        {
+            /// Contains merged properties (pass and renderable's)
+            RenderableCache mergedCache;
+            GpuProgramPtr   shaders[NumShaderTypes];
+
+            ShaderCodeCache( const PiecesMap *_pieces ) :
+                mergedCache( HlmsPropertyVec(), _pieces )
+            {
+            }
+
+            bool operator == ( const ShaderCodeCache &_r ) const
+            {
+                return this->mergedCache == _r.mergedCache;
+            }
+        };
+
         typedef vector<PassCache>::type PassCacheVec;
         typedef vector<RenderableCache>::type RenderableCacheVec;
+        typedef vector<ShaderCodeCache>::type ShaderCodeCacheVec;
 
         PassCacheVec        mPassCache;
         RenderableCacheVec  mRenderableCache;
+        ShaderCodeCacheVec  mShaderCodeCache;
         HlmsCacheVec        mShaderCache;
 
         HlmsPropertyVec mSetProperties;
@@ -191,6 +239,8 @@ namespace Ogre
 
         void setProperty( IdString key, int32 value );
         int32 getProperty( IdString key, int32 defaultVal=0 ) const;
+
+        void unsetProperty( IdString key );
 
         enum ExpressionType
         {
@@ -282,6 +332,8 @@ namespace Ogre
         virtual void clearShaderCache(void);
 
         void processPieces( Archive *archive, const StringVector &pieceFiles );
+        void hashPieceFiles( Archive *archive, const StringVector &pieceFiles,
+                             FastArray<uint8> &fileContents ) const;
 
         void dumpProperties( std::ofstream &outFile );
 
@@ -292,13 +344,30 @@ namespace Ogre
         */
         void applyStrongMacroblockRules( HlmsPso &pso );
 
+        HighLevelGpuProgramPtr compileShaderCode( const String &source,
+                                                  const String &debugFilenameOutput,
+                                                  uint32 finalHash, ShaderType shaderType );
+
+    public:
+        void _compileShaderFromPreprocessedSource( const RenderableCache &mergedCache,
+                                                   const String source[NumShaderTypes] );
+
+        /** Compiles input properties and adds it to the shader code cache
+        @param codeCache [in/out]
+            All variables must be filled except for ShaderCodeCache::shaders which is the output
+        */
+        void compileShaderCode( ShaderCodeCache &codeCache );
+
+        const ShaderCodeCacheVec& getShaderCodeCache(void) const    { return mShaderCodeCache; }
+
+    protected:
         /** Creates a shader based on input parameters. Caller is responsible for ensuring
             this shader hasn't already been created.
             Shader template files will be processed and then compiled.
         @param renderableHash
-            The hash calculated in from @calculateHashFor that lives in @Renderable
+            The hash calculated in from Hlms::calculateHashFor that lives in Renderable
         @param passCache
-            The return value of @preparePassHash
+            The return value of Hlms::preparePassHash
         @param finalHash
             A hash calculated on the pass' & renderable' hash. Must be unique. Caller is
             responsible for ensuring this hash stays unique.
@@ -355,6 +424,9 @@ namespace Ogre
         const String& getTypeNameStr(void) const            { return mTypeNameStr; }
         void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
         HlmsManager* getHlmsManager(void) const             { return mHlmsManager; }
+        const String& getShaderProfile(void) const          { return mShaderProfile; }
+
+        void getTemplateChecksum( uint64 outHash[2] ) const;
 
         /** Sets the quality of the Hlms. This function is most relevant for mobile and
             almost or completely ignored by Desktop.
@@ -595,8 +667,7 @@ namespace Ogre
             Structure containing all necessary shaders
         */
         const HlmsCache* getMaterial( HlmsCache const *lastReturnedValue, const HlmsCache &passCache,
-                                      const QueuedRenderable &queuedRenderable, uint8 inputLayout,
-                                      bool casterPass );
+                                      const QueuedRenderable &queuedRenderable, bool casterPass );
 
         /** Fills the constant buffers. Gets executed right before drawing the mesh.
         @param cache
@@ -679,25 +750,13 @@ namespace Ogre
                                                 { return getProperty( key, defaultVal ); }
 
         /// Utility helper, mostly useful to HlmsListener implementations.
+        static void setProperty( HlmsPropertyVec &properties, IdString key, int32 value );
+        /// Utility helper, mostly useful to HlmsListener implementations.
         static int32 getProperty( const HlmsPropertyVec &properties,
                                   IdString key, int32 defaultVal=0 );
 
         /// Internal use. @see HlmsManager::setShadowMappingUseBackFaces
         void _notifyShadowMappingBackFaceSetting(void);
-
-        /// When a macroblock is destroyed, the PSO is no longer valid. We need to destroy it.
-        /// Otherwise when we try to reuse a macroblock with the same internal ID but different
-        /// settings, the old (wrong) PSO will be used.
-        void _notifyMacroblockDestroyed( uint16 id );
-
-        /// @copydoc _notifyMacroblockDestroyed
-        void _notifyBlendblockDestroyed( uint16 id );
-
-        /// @copydoc _notifyMacroblockDestroyed
-        void _notifyInputLayoutDestroyed( uint16 id );
-
-        /// @copydoc _notifyMacroblockDestroyed
-        void _notifyV1InputLayoutDestroyed( uint16 id );
 
         void _clearShaderCache(void);
 
@@ -816,7 +875,7 @@ namespace Ogre
     {
         static const IdString Macroblock;
         static const IdString Blendblock;
-        static const IdString OperationTypeV1;
+        static const IdString InputLayoutId;
     };
 
     struct _OgreExport HlmsBasePieces
@@ -829,7 +888,6 @@ namespace Ogre
         static const int HlmsTypeBits;
         static const int RenderableBits;
         static const int PassBits;
-        static const int InputLayoutBits;
 
         static const int HlmsTypeShift;
         static const int RenderableShift;

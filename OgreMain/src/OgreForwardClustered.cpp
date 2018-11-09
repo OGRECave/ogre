@@ -605,7 +605,7 @@ namespace Ogre
                                 uint16 * RESTRICT_ALIAS cellElem = mGridBuffer + idx * mObjsPerCell +
                                                                    (numLightsInCell->lightCount[0] +
                                                                    c_reservedLightSlotsPerCell);
-                                *cellElem = static_cast<uint16_t>( i * c_ForwardPlusNumFloat4PerLight );
+                                *cellElem = static_cast<uint16>( i * c_ForwardPlusNumFloat4PerLight );
                                 ++numLightsInCell->lightCount[0];
                                 ++numLightsInCell->lightCount[lightType];
                             }

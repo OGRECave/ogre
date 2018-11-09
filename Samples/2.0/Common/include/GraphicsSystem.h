@@ -54,6 +54,8 @@ namespace Demo
 
         bool                mQuit;
         bool                mAlwaysAskForConfig;
+        bool                mUseHlmsDiskCache;
+        bool                mUseMicrocodeCache;
 
         Ogre::ColourValue   mBackgroundColour;
 
@@ -68,6 +70,8 @@ namespace Demo
 
         static void addResourceLocation( const Ogre::String &archName, const Ogre::String &typeName,
                                          const Ogre::String &secName );
+        void loadHlmsDiskCache(void);
+        void saveHlmsDiskCache(void);
         virtual void setupResources(void);
         virtual void registerHlms(void);
         /// Optional override method where you can perform resource group loading

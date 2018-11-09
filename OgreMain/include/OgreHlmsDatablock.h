@@ -53,7 +53,13 @@ namespace Ogre
     {
         void        *mRsData;       /// Render-System specific data
         uint16      mRefCount;
+        /// The mId is only valid while mRefCount > 0; which means mRsData
+        /// may contain valid data, else it's null.
         uint16      mId;
+        /// Except for HlmsSamplerblocks, mLifetimeId is valid throghout the entire life of
+        /// HlmsManager. This guarantees HlmsMacroblock & HlmsBlendblock pointers are always
+        /// valid, although they may be inactive (i.e. mId invalid, mRefCount = 0 and mRsData = 0)
+        uint16      mLifetimeId;
         uint8       mBlockType;     /// @see HlmsBasicBlock
 
         /// When zero, HlmsManager cannot override the block's values with
@@ -65,7 +71,7 @@ namespace Ogre
     };
 
     /** A macro block contains settings that will rarely change, and thus are common to many materials.
-        This is very analogous to D3D11_RASTERIZER_DESC. @See HlmsDatablock
+        This is very analogous to D3D11_RASTERIZER_DESC. See HlmsDatablock
         Up to 32 different blocks are allowed!
     */
     struct _OgreExport HlmsMacroblock : public BasicBlock
@@ -130,7 +136,7 @@ namespace Ogre
     };
 
     /** A blend block contains settings that rarely change, and thus are common to many materials.
-        The reasons this structure isn't joined with @HlmsMacroblock is that:
+        The reasons this structure isn't joined with HlmsMacroblock is that:
             * The D3D11 API makes this distinction (much higher API overhead if we
               change i.e. depth settings) due to D3D11_RASTERIZER_DESC.
             * This block contains information of whether the material is transparent.
@@ -182,6 +188,11 @@ namespace Ogre
         /// Shortcut to set the blend factors to common blending operations.
         /// Sets colour and alpha individually, turns mSeparateBlend on.
         void setBlendType( SceneBlendType colour, SceneBlendType alpha );
+
+        bool operator == ( const HlmsBlendblock &_r ) const
+        {
+            return !(*this != _r);
+        }
 
         bool operator != ( const HlmsBlendblock &_r ) const
         {

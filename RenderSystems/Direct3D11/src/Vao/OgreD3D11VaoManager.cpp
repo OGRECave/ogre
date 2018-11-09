@@ -1251,7 +1251,7 @@ namespace Ogre
     {
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         VertexElement2VecVec vertexElements = VertexArrayObject::getVertexDeclaration( vertexBuffers );
-        uint8 inputLayout = hlmsManager->_addInputLayoutId( vertexElements, opType );
+        uint16 inputLayout = hlmsManager->_getInputLayoutId( vertexElements, opType );
 
         {
             bool hasImmutableDelayedBuffer = false;

@@ -427,7 +427,7 @@ namespace v1 {
     //-----------------------------------------------------------------------------
     VertexDeclaration::VertexDeclaration( HardwareBufferManagerBase *creator ) :
         mCreator( creator ),
-        mInputLayoutId( std::numeric_limits<uint16>::max() ),
+        mBaseInputLayoutId( std::numeric_limits<uint16>::max() ),
         mInputLayoutDirty( false )
     {
         vertexLayoutDirty();
@@ -435,49 +435,25 @@ namespace v1 {
     //-----------------------------------------------------------------------------
     VertexDeclaration::~VertexDeclaration()
     {
-        if( mInputLayoutId != std::numeric_limits<uint16>::max() )
-            mCreator->_removeInputLayoutReference( static_cast<uint8>(mInputLayoutId) );
     }
     //-----------------------------------------------------------------------------
     void VertexDeclaration::vertexLayoutDirty(void)
     {
         if( !mInputLayoutDirty )
-        {
-            if( mInputLayoutId != std::numeric_limits<uint16>::max() )
-            {
-                mCreator->_removeInputLayoutReference( getInputLayoutId() );
-                mInputLayoutId = std::numeric_limits<uint16>::max();
-            }
-
-            mCreator->_addDirtyInputLayout( this );
             mInputLayoutDirty = true;
+    }
+    //-----------------------------------------------------------------------------
+    uint16 VertexDeclaration::_getInputLayoutId( HlmsManager *hlmsManager, OperationType opType )
+    {
+        if( mInputLayoutDirty )
+        {
+            VertexElement2VecVec vertexElements = convertToV2();
+            mBaseInputLayoutId = hlmsManager->_getInputLayoutId( vertexElements, opType ) &
+                                 ((1u << 10u) - 1u);
+            mInputLayoutDirty = false;
         }
-    }
-    //-----------------------------------------------------------------------------
-    void VertexDeclaration::_setInputLayoutId( uint8 layoutId )
-    {
-        assert( mInputLayoutId == std::numeric_limits<uint16>::max() && mInputLayoutDirty );
-        mInputLayoutId = layoutId;
-        mInputLayoutDirty = false;
-    }
-    //-----------------------------------------------------------------------------
-    uint16 VertexDeclaration::_getInputLayoutId(void) const
-    {
-        return mInputLayoutId;
-    }
-    //-----------------------------------------------------------------------------
-    bool VertexDeclaration::_isInputLayoutDirty(void) const
-    {
-        return mInputLayoutDirty;
-    }
-    //-----------------------------------------------------------------------------
-    uint8 VertexDeclaration::getInputLayoutId(void) const
-    {
-        assert( !mInputLayoutDirty &&
-                "Must call HardwareBufferManagerBase::_updateDirtyInputLayouts first "
-                "or VertexDeclaration was altered inside the RenderQueue" );
-        assert( mInputLayoutId <= std::numeric_limits<uint8>::max() );
-        return static_cast<uint8>( mInputLayoutId );
+
+        return mBaseInputLayoutId | (static_cast<uint16>( opType ) << 10u);
     }
     //-----------------------------------------------------------------------------
     const VertexDeclaration::VertexElementList& VertexDeclaration::getElements(void) const

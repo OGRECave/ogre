@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 #include "OgreSharedPtr.h"
 #include "OgreColourValue.h"
+#include "OgreHlmsPso.h"
 #include "Vao/OgreVertexBufferPacked.h"
 #include "OgreHeaderPrefix.h"
 
@@ -292,9 +293,10 @@ namespace v1 {
         HardwareBufferManagerBase *mCreator;
 
         VertexElementList mElementList;
-        /// @see VertexArrayObject::mInputLayoutId
-        /// It's 16 bits so we can treat the range outside as [0; 255] as invalid.
-        uint16 mInputLayoutId;
+        /// See VertexArrayObject::mInputLayoutId
+        /// This value does not contain the OperationType in the last 6 bits, thus it needs
+        /// to be added later
+        uint16 mBaseInputLayoutId;
         bool mInputLayoutDirty;
 
         void vertexLayoutDirty(void);
@@ -303,11 +305,17 @@ namespace v1 {
         VertexDeclaration( HardwareBufferManagerBase *creator );
         virtual ~VertexDeclaration();
 
-        void _setInputLayoutId( uint8 layoutId );
-        uint16 _getInputLayoutId(void) const;
-        bool _isInputLayoutDirty(void) const;
+        /** VertexDeclaration do not store OperationType, which is why we cache just the base 10 bits
 
-        uint8 getInputLayoutId(void) const;
+            This function is not const as it will modify mBaseInputLayoutId if the layout is dirty
+
+            @see    HlmsManager::_getInputLayoutId
+            @see    VertexDeclaration::mBaseInputLayoutId
+        @param hlmsManager
+        @param opType
+        @return
+        */
+        uint16 _getInputLayoutId( HlmsManager *hlmsManager, OperationType opType );
 
         /** Get the number of elements in the declaration. */
         size_t getElementCount(void) const { return mElementList.size(); }
