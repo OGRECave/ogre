@@ -32,11 +32,10 @@ namespace Ogre
 
     void LodCollapser::collapse( LodData* data, LodCollapseCost* cost, LodOutputProvider* output, int vertexCountLimit, Real collapseCostLimit )
     {
-        size_t vertexCount = data->mCollapseCostHeap.size();
-        for (; static_cast<size_t>(vertexCountLimit) < vertexCount; vertexCount--)
+        while (data->mCollapseCostHeap.size() > static_cast<size_t>(vertexCountLimit))
         {
             LodData::CollapseCostHeap::iterator nextVertex = data->mCollapseCostHeap.begin();
-            if (nextVertex != data->mCollapseCostHeap.end() && nextVertex->first < collapseCostLimit)
+            if (nextVertex->first < collapseCostLimit)
             {
                 mLastReducedVertex = nextVertex->second;
                 collapseVertex(data, cost, output, mLastReducedVertex);
