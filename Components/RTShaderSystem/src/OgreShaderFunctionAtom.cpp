@@ -444,9 +444,8 @@ void AssignmentAtom::writeSourceCode(std::ostream& os, const String& targetLangu
 }
 
 String SampleTextureAtom::Type = "SampleTextureAtom";
-SampleTextureAtom::SampleTextureAtom(ParameterPtr lhs, ParameterPtr sampler, ParameterPtr texcoord, int groupOrder)
+SampleTextureAtom::SampleTextureAtom(ParameterPtr sampler, ParameterPtr texcoord, ParameterPtr lhs, int groupOrder)
 {
-    // do this backwards for compatibility with FFP_FUNC_SAMPLE_TEXTURE calls
     pushOperand(sampler, Operand::OPS_IN);
     pushOperand(texcoord, Operand::OPS_IN);
     pushOperand(lhs, Operand::OPS_OUT);
