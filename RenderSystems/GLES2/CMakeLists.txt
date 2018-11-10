@@ -19,8 +19,8 @@ macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.
 
 file(GLOB HEADER_FILES "include/*.h")
 list(APPEND HEADER_FILES
-    ${OGRE_BINARY_DIR}/include/OgreGLES2Exports.h
-    ${OGRE_BINARY_DIR}/include/OgreGLES2Config.h)
+    ${PROJECT_BINARY_DIR}/include/OgreGLES2Exports.h
+    ${PROJECT_BINARY_DIR}/include/OgreGLES2Config.h)
 file(GLOB SOURCE_FILES "src/*.cpp")
 list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/glesw.c")
 
@@ -84,7 +84,7 @@ endif ()
 
 generate_export_header(RenderSystem_GLES2 
     EXPORT_MACRO_NAME _OgreGLES2Export
-    EXPORT_FILE_NAME ${OGRE_BINARY_DIR}/include/OgreGLES2Exports.h)
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreGLES2Exports.h)
 
 ogre_config_plugin(RenderSystem_GLES2)
 

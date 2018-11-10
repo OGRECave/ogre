@@ -47,18 +47,18 @@ if (OGRE_BUILD_SAMPLES)
   # Find all samples headers, and copy them to a single include folder
   # We do this instead of including every sample in the include_directories directive, 
   # because this creates a list that is too long for the MSVC command line sometimes.
-  file (GLOB SAMPLES_HEADERS ${OGRE_SOURCE_DIR}/Samples/*/include/*.h)
+  file (GLOB SAMPLES_HEADERS ${PROJECT_SOURCE_DIR}/Samples/*/include/*.h)
   foreach(SAMPLE_HEADER_FULLPATH ${SAMPLES_HEADERS})
 	  get_filename_component(SAMPLE_HEADER_NAME ${SAMPLE_HEADER_FULLPATH} NAME)
-	  configure_file(${SAMPLE_HEADER_FULLPATH} ${OGRE_BINARY_DIR}/Samples/include/${SAMPLE_HEADER_NAME} COPYONLY)
+	  configure_file(${SAMPLE_HEADER_FULLPATH} ${PROJECT_BINARY_DIR}/Samples/include/${SAMPLE_HEADER_NAME} COPYONLY)
   endforeach(SAMPLE_HEADER_FULLPATH)
-  include_directories(${OGRE_BINARY_DIR}/Samples/include)
+  include_directories(${PROJECT_BINARY_DIR}/Samples/include)
 
-  file(GLOB SAMPLES_SOURCES ${OGRE_SOURCE_DIR}/Samples/*/src/*.cpp)
+  file(GLOB SAMPLES_SOURCES ${PROJECT_SOURCE_DIR}/Samples/*/src/*.cpp)
 
   set(BLACKLIST AtomicCounters Browser TerrainTessellation PCZTestApp)
   foreach(FILTER_SAMPLE ${BLACKLIST})
-    file(GLOB BLACKLIST_CPP ${OGRE_SOURCE_DIR}/Samples/${FILTER_SAMPLE}/src/*.cpp)
+    file(GLOB BLACKLIST_CPP ${PROJECT_SOURCE_DIR}/Samples/${FILTER_SAMPLE}/src/*.cpp)
     list(REMOVE_ITEM SAMPLES_SOURCES ${BLACKLIST_CPP})
   endforeach()
 

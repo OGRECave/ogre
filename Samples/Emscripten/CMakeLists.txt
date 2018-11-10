@@ -9,7 +9,7 @@ if(TRUE)
     add_definitions(-s ASSERTIONS=2 -s DISABLE_EXCEPTION_CATCHING=0)
 endif()
 
-include_directories(${OGRE_SOURCE_DIR}/Samples/Character/include)
+include_directories(${PROJECT_SOURCE_DIR}/Samples/Character/include)
 add_executable(EmscriptenSample Main.cpp Context.cpp)
 target_link_libraries(EmscriptenSample OgreBites ${OGRE_LIBRARIES})
 

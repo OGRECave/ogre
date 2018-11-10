@@ -11,8 +11,6 @@
 # Paging optional component
 ############################################################
 
-project(OgreBites)
-
 if(ANDROID)
     include_directories(${ANDROID_NDK}/sources/android/native_app_glue)
 endif()
@@ -22,8 +20,8 @@ if(EMSCRIPTEN)
 endif()
 
 if (OGRE_STATIC)
-  include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D9/include ${DirectX9_INCLUDE_DIR})
-  include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
+  include_directories(${PROJECT_SOURCE_DIR}/RenderSystems/Direct3D9/include ${DirectX9_INCLUDE_DIR})
+  include_directories(${PROJECT_SOURCE_DIR}/RenderSystems/Direct3D11/include)
 
   # Link to all enabled plugins
   if (OGRE_BUILD_PLUGIN_OCTREE)
@@ -66,7 +64,7 @@ endif ()
 
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBitesPrerequisites.h)
+list(APPEND HEADER_FILES ${PROJECT_BINARY_DIR}/include/OgreBitesPrerequisites.h)
 set(SOURCES 
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreAdvancedRenderControls.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreApplicationContext.cpp"
@@ -130,7 +128,7 @@ endif()
 
 generate_export_header(OgreBites 
     EXPORT_MACRO_NAME _OgreBitesExport
-    EXPORT_FILE_NAME ${OGRE_BINARY_DIR}/include/OgreBitesPrerequisites.h)
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreBitesPrerequisites.h)
 
 # install 
 ogre_config_framework(OgreBites)

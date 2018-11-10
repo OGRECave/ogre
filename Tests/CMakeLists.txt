@@ -93,36 +93,36 @@ if (OGRE_BUILD_TESTS)
     if(APPLE AND NOT APPLE_IOS)
       set_property(TARGET Test_Ogre PROPERTY MACOSX_BUNDLE TRUE)
       set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
-      set(OGRE_TEST_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/Test_Ogre.app/Contents)
+      set(OGRE_TEST_CONTENTS_PATH ${PROJECT_BINARY_DIR}/bin/$(CONFIGURATION)/Test_Ogre.app/Contents)
       set_target_properties(Test_Ogre PROPERTIES
         LINK_FLAGS "-framework Carbon -framework Cocoa")
       add_custom_command(TARGET Test_Ogre POST_BUILD
         COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/CustomCapabilities
         COMMAND ditto
-        ${OGRE_SOURCE_DIR}/Tests/Media/CustomCapabilities/* ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/CustomCapabilities
+        ${PROJECT_SOURCE_DIR}/Tests/Media/CustomCapabilities/* ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/CustomCapabilities
         )
 
       add_custom_command(TARGET Test_Ogre POST_BUILD
         COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Resources
-        COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/plugins.cfg
+        COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/plugins.cfg
         ${OGRE_TEST_CONTENTS_PATH}/Resources/
-        COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/resources.cfg
+        COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/resources.cfg
         ${OGRE_TEST_CONTENTS_PATH}/Resources/
-        COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/samples.cfg
+        COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/samples.cfg
         ${OGRE_TEST_CONTENTS_PATH}/Resources/
-        COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg
+        COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/quakemap.cfg
         ${OGRE_TEST_CONTENTS_PATH}/Resources/
         COMMAND ditto
-        ${OGRE_SOURCE_DIR}/Samples/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
+        ${PROJECT_SOURCE_DIR}/Samples/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
         COMMAND ditto
-        ${OGRE_SOURCE_DIR}/Tests/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
+        ${PROJECT_SOURCE_DIR}/Tests/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
         COMMAND ditto
-        ${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TEST_CONTENTS_PATH}/Resources
+        ${PROJECT_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TEST_CONTENTS_PATH}/Resources
         )
 
       add_custom_command(TARGET Test_Ogre POST_BUILD
         COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Frameworks
-        COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework
+        COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework
         ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
         COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}
         ${OGRE_TEST_CONTENTS_PATH}/Frameworks/
@@ -152,7 +152,7 @@ if (OGRE_BUILD_TESTS)
   
       foreach(FWK ${FRAMEWORKS})
         add_custom_command(TARGET Test_Ogre POST_BUILD
-          COMMAND ARGS if [ -d ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ]\; then ln -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ${OGRE_TEST_CONTENTS_PATH}/Frameworks/${FWK}.framework\; fi
+          COMMAND ARGS if [ -d ${PROJECT_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ]\; then ln -s -f ${PROJECT_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ${OGRE_TEST_CONTENTS_PATH}/Frameworks/${FWK}.framework\; fi
         )
       endforeach()
     endif()

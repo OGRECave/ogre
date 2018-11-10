@@ -1,5 +1,3 @@
-project(OgrePython)
-
 find_package(SWIG 3.0.8)
 
 if(NOT PYTHONLIBS_FOUND OR NOT SWIG_FOUND)
@@ -9,7 +7,7 @@ if(NOT PYTHONLIBS_FOUND OR NOT SWIG_FOUND)
 endif()
 
 include_directories(${PYTHON_INCLUDE_PATH})
-include_directories("${OGRE_BINARY_DIR}/include" "${OGRE_SOURCE_DIR}/OgreMain/include")
+include_directories("${PROJECT_BINARY_DIR}/include" "${PROJECT_SOURCE_DIR}/OgreMain/include")
 include(${SWIG_USE_FILE})
 
 set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/)
@@ -25,7 +23,7 @@ macro(ogre_python_module target)
     set_target_properties(${SWIG_MODULE_${target}_REAL_NAME} PROPERTIES 
                         DEBUG_POSTFIX "")
     install(TARGETS ${SWIG_MODULE_${target}_REAL_NAME} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
-    install(FILES ${OGRE_BINARY_DIR}/Components/Python/${target}.py DESTINATION ${PYTHON_SITE_PACKAGES})
+    install(FILES ${PROJECT_BINARY_DIR}/Components/Python/${target}.py DESTINATION ${PYTHON_SITE_PACKAGES})
 endmacro()
 
 if(MSVC)

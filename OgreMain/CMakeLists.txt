@@ -11,13 +11,11 @@
 # OgreMain core library
 ############################################################
 
-PROJECT(OgreMain)
-
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES
-    ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
-    ${OGRE_BINARY_DIR}/include/OgreExports.h)
+    ${PROJECT_BINARY_DIR}/include/OgreBuildSettings.h
+    ${PROJECT_BINARY_DIR}/include/OgreExports.h)
 
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
@@ -182,11 +180,11 @@ generate_export_header(OgreMain
     EXPORT_MACRO_NAME _OgreExport
     NO_EXPORT_MACRO_NAME _OgrePrivate
     DEPRECATED_MACRO_NAME OGRE_DEPRECATED
-    EXPORT_FILE_NAME ${OGRE_BINARY_DIR}/include/OgreExports.h)
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreExports.h)
 
 target_include_directories(OgreMain PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" 
-  "$<BUILD_INTERFACE:${OGRE_BINARY_DIR}/include>"
+  "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>"
   $<INSTALL_INTERFACE:include/OGRE>)
 
 # In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
@@ -219,15 +217,15 @@ if (APPLE)
   
     if(OGRE_BUILD_LIBS_AS_FRAMEWORKS)
       add_custom_command(TARGET OgreMain POST_BUILD
-          COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
+          COMMAND mkdir ARGS -p ${PROJECT_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
           COMMAND ditto
-          ${OGRE_SOURCE_DIR}/OgreMain/include/Threading/*.h ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
-          COMMAND cd ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers
+          ${PROJECT_SOURCE_DIR}/OgreMain/include/Threading/*.h ${PROJECT_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/Threading
+          COMMAND cd ${PROJECT_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers
           )
 
       foreach(HEADER_PATH ${THREAD_HEADER_FILES})
           get_filename_component(HEADER_FILE ${HEADER_PATH} NAME)
-          set(FWK_HEADER_PATH ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/${HEADER_FILE})
+          set(FWK_HEADER_PATH ${PROJECT_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework/Headers/${HEADER_FILE})
           add_custom_command(TARGET OgreMain POST_BUILD
               COMMAND rm -f ${FWK_HEADER_PATH}
               )

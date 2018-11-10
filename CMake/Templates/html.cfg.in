@@ -45,14 +45,14 @@ PROJECT_BRIEF          = "Object-Oriented Graphics Rendering Engine"
 # exceed 55 pixels and the maximum width should not exceed 200 pixels.
 # Doxygen will copy the logo to the output directory.
 
-PROJECT_LOGO           = "${OGRE_SOURCE_DIR}/Docs/ogre-logo-wetfloor.gif"
+PROJECT_LOGO           = "${PROJECT_SOURCE_DIR}/Docs/ogre-logo-wetfloor.gif"
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
 # base path where the generated documentation will be put.
 # If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = "${OGRE_BINARY_DIR}/api/"
+OUTPUT_DIRECTORY       = "${PROJECT_BINARY_DIR}/api/"
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create
 # 4096 sub-directories (in 2 levels) under the output directory of each output
@@ -602,7 +602,7 @@ LAYOUT_FILE            =
 # feature you need bibtex and perl available in the search path. Do not use
 # file names with spaces, bibtex cannot handle them.
 
-CITE_BIB_FILES         = "${OGRE_SOURCE_DIR}/Docs/src/bibliography.bib"
+CITE_BIB_FILES         = "${PROJECT_SOURCE_DIR}/Docs/src/bibliography.bib"
 
 # The LATEX_BIB_STYLE tag can be used to specify the style to use for the
 # bibliography, e.g. plainnat, or ieeetr. The default style is "plain". See
@@ -659,7 +659,7 @@ WARN_FORMAT            = "$file:$line: $text"
 # and error messages should be written. If left blank the output is written
 # to stderr.
 
-WARN_LOGFILE           = "${OGRE_BINARY_DIR}/doxygen_warnings.log"
+WARN_LOGFILE           = "${PROJECT_BINARY_DIR}/doxygen_warnings.log"
 
 #---------------------------------------------------------------------------
 # configuration options related to the input files
@@ -736,7 +736,7 @@ EXCLUDE_SYMBOLS        =
 # directories that contain example code fragments that are included (see
 # the \include command).
 
-EXAMPLE_PATH           = "${OGRE_SOURCE_DIR}"
+EXAMPLE_PATH           = "${PROJECT_SOURCE_DIR}"
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
@@ -756,8 +756,8 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             = "${OGRE_SOURCE_DIR}/Docs/src/tutorials/" \
-                         "${OGRE_SOURCE_DIR}/Docs/src/images/"
+IMAGE_PATH             = "${PROJECT_SOURCE_DIR}/Docs/src/tutorials/" \
+                         "${PROJECT_SOURCE_DIR}/Docs/src/images/"
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -947,7 +947,7 @@ HTML_STYLESHEET        =
 # robust against future updates. Doxygen will copy the style sheet file to
 # the output directory.
 
-HTML_EXTRA_STYLESHEET  = "${OGRE_SOURCE_DIR}/Docs/ogre_style.css"
+HTML_EXTRA_STYLESHEET  = "${PROJECT_SOURCE_DIR}/Docs/ogre_style.css"
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1243,7 +1243,7 @@ TAGFILES               =
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create
 # a tag file that is based on the input files it reads.
 
-GENERATE_TAGFILE       = "${OGRE_BINARY_DIR}/api/Ogre.tag"
+GENERATE_TAGFILE       = "${PROJECT_BINARY_DIR}/api/Ogre.tag"
 
 # If the ALLEXTERNALS tag is set to YES all external classes will be listed
 # in the class index. If set to NO only the inherited external classes

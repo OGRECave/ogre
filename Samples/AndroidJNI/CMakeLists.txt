@@ -40,7 +40,7 @@ if(ANDROID AND OGRE_BUILD_COMPONENT_JAVA)
     
     # copy the SDK
     add_custom_command(TARGET OgreJNIDummy PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${OGRE_BINARY_DIR}/java" "${NDKOUT}")
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_BINARY_DIR}/java" "${NDKOUT}")
 
     # set(JNI_PATH "${NDKOUT}/jni")
     create_android_proj(OgreJNIDummy)

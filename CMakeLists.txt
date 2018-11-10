@@ -46,17 +46,17 @@ project(OGRE)
 
 # Include necessary submodules
 set(CMAKE_MODULE_PATH
-  "${OGRE_SOURCE_DIR}/CMake"
-  "${OGRE_SOURCE_DIR}/CMake/Utils"
-  "${OGRE_SOURCE_DIR}/CMake/Packages"
+  "${PROJECT_SOURCE_DIR}/CMake"
+  "${PROJECT_SOURCE_DIR}/CMake/Utils"
+  "${PROJECT_SOURCE_DIR}/CMake/Packages"
 )
 
 include(CMakeDependentOption)
 include(MacroLogFeature)
 include(OgreConfigTargets)
 include(PreprocessorUtils)
-set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/CMake/Templates")
-set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
+set(OGRE_TEMPLATES_DIR "${PROJECT_SOURCE_DIR}/CMake/Templates")
+set(OGRE_WORK_DIR ${PROJECT_BINARY_DIR})
 
 
 #####################################################################
@@ -71,10 +71,10 @@ endif ()
 
 # determine Ogre version numbers
 include(OgreGetVersion)
-ogre_get_version(${OGRE_SOURCE_DIR}/OgreMain/include/OgrePrerequisites.h)
+ogre_get_version(${PROJECT_SOURCE_DIR}/OgreMain/include/OgrePrerequisites.h)
 message(STATUS "Configuring OGRE ${OGRE_VERSION}")
 # Configure version file for use by scripts
-configure_file("${OGRE_TEMPLATES_DIR}/version.txt.in" "${OGRE_BINARY_DIR}/version.txt" @ONLY)
+configure_file("${OGRE_TEMPLATES_DIR}/version.txt.in" "${PROJECT_BINARY_DIR}/version.txt" @ONLY)
 
 # determine if we are compiling for a 32bit or 64bit system
 include(CheckTypeSize)
@@ -197,14 +197,14 @@ set(OGRE_Plugin_PCZSceneManager_LIBRARIES Plugin_PCZSceneManager)
 set(OGRE_Plugin_OctreeZone_LIBRARIES Plugin_OctreeZone)
 
 # Specify build paths
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/bin")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 if (WIN32 OR APPLE)
   if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     # We don't want to install in default system location, install is really for the SDK, so call it that
     set(CMAKE_INSTALL_PREFIX
-	  "${OGRE_BINARY_DIR}/sdk" CACHE PATH "OGRE install prefix" FORCE
+	  "${PROJECT_BINARY_DIR}/sdk" CACHE PATH "OGRE install prefix" FORCE
     )
   endif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif(WIN32 OR APPLE)
@@ -394,8 +394,8 @@ set(OGRE_LIB_DIRECTORY "lib${LIB_SUFFIX}" CACHE STRING "Install path for librari
 if (WIN32)
 	option(OGRE_INSTALL_VSPROPS "Install Visual Studio Property Page." FALSE)
 	if (OGRE_INSTALL_VSPROPS)
-		configure_file(${OGRE_TEMPLATES_DIR}/OGRE.props.in ${OGRE_BINARY_DIR}/OGRE.props)
-		install(FILES ${OGRE_BINARY_DIR}/OGRE.props DESTINATION "${CMAKE_INSTALL_PREFIX}")
+		configure_file(${OGRE_TEMPLATES_DIR}/OGRE.props.in ${PROJECT_BINARY_DIR}/OGRE.props)
+		install(FILES ${PROJECT_BINARY_DIR}/OGRE.props DESTINATION "${CMAKE_INSTALL_PREFIX}")
 	endif ()
 endif ()
 

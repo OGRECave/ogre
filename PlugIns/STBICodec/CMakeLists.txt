@@ -8,7 +8,7 @@
 #-------------------------------------------------------------------
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreSTBICodecExports.h)
+list(APPEND HEADER_FILES ${PROJECT_BINARY_DIR}/include/OgreSTBICodecExports.h)
 set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp")
 
 if(UNIX)
@@ -35,5 +35,5 @@ ogre_config_framework(Codec_STBI)
 ogre_config_plugin(Codec_STBI)
 generate_export_header(Codec_STBI 
     EXPORT_MACRO_NAME _OgreSTBICodecExport
-    EXPORT_FILE_NAME ${OGRE_BINARY_DIR}/include/OgreSTBICodecExports.h)
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreSTBICodecExports.h)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/STBICodec)

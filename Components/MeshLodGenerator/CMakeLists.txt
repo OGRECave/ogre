@@ -11,8 +11,6 @@
 # MeshLodGenerator optional component
 ############################################################
 
-PROJECT(OgreMeshLodGenerator)
-
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
@@ -31,7 +29,7 @@ target_include_directories(OgreMeshLodGenerator PUBLIC
   $<INSTALL_INTERFACE:include/OGRE/MeshLodGenerator>)
 
 # repeat for PCH
-include_directories("${OGRE_SOURCE_DIR}/OgreMain/include" "${OGRE_BINARY_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/OgreMain/include" "${PROJECT_BINARY_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/include")
 add_native_precompiled_header(OgreMeshLodGenerator "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreMeshLodPrecompiledHeaders.h")
 
 # install 
