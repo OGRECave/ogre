@@ -145,7 +145,11 @@ void FFP_Lerp(in float4 vIn0, in float4 vIn1, float4 T, out float4 vOut)
 {
 	vOut = lerp(vIn0, vIn1, T);
 }
-
+//-----------------------------------------------------------------------------
+void FFP_Lerp(in float3 vIn0, in float3 vIn1, float3 T, out float3 vOut)
+{
+	vOut = lerp(vIn0, vIn1, T);
+}
 //-----------------------------------------------------------------------------
 void FFP_DotProduct(in float vIn0, in float vIn1, out float vOut)
 {
