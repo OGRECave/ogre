@@ -3,6 +3,13 @@
 
 // CMake auto-generated configuration options
 
+// Define ogre version
+#define OGRE_VERSION_MAJOR @OGRE_VERSION_MAJOR@
+#define OGRE_VERSION_MINOR @OGRE_VERSION_MINOR@
+#define OGRE_VERSION_PATCH @OGRE_VERSION_PATCH@
+#define OGRE_VERSION_SUFFIX "@OGRE_VERSION_SUFFIX@"
+#define OGRE_VERSION_NAME "@OGRE_VERSION_NAME@"
+
 #cmakedefine OGRE_STATIC_LIB
 #cmakedefine01 OGRE_DEBUG_MODE
 

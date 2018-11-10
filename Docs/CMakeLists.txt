@@ -29,37 +29,37 @@ if(DOXYGEN_FOUND)
       )
     endif ()
 
-    file(GLOB TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/*.md)
-    file(GLOB BASIC_TUTORIALS ${OGRE_SOURCE_DIR}/Docs/src/tutorials/basictutorials/*.md)
+    file(GLOB TUTORIALS ${PROJECT_SOURCE_DIR}/Docs/src/tutorials/*.md)
+    file(GLOB BASIC_TUTORIALS ${PROJECT_SOURCE_DIR}/Docs/src/tutorials/basictutorials/*.md)
 
     set(CMAKE_DOXYGEN_INPUT_LIST
-        ${OGRE_SOURCE_DIR}/OgreMain/include
-        ${OGRE_SOURCE_DIR}/Components
-        ${OGRE_SOURCE_DIR}/PlugIns
-        ${OGRE_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md
-        ${OGRE_SOURCE_DIR}/RenderSystems
-        ${OGRE_SOURCE_DIR}/Docs/src/apimainpage.md
-        ${OGRE_SOURCE_DIR}/Docs/src/manual.md
-        ${OGRE_SOURCE_DIR}/Docs/src/OgreShadows.md
-        ${OGRE_SOURCE_DIR}/Docs/src/scripts.md
-        ${OGRE_SOURCE_DIR}/Docs/src/material-scripts.md
-        ${OGRE_SOURCE_DIR}/Docs/src/high-level-programs.md
-        ${OGRE_SOURCE_DIR}/Docs/src/particle-scripts.md
-        ${OGRE_SOURCE_DIR}/Docs/src/hardware-buffers.md
-        ${OGRE_SOURCE_DIR}/Docs/src/hlms.md
-        ${OGRE_SOURCE_DIR}/Docs/src/rtss.md
-        ${OGRE_SOURCE_DIR}/BuildingOgre.md
+        ${PROJECT_SOURCE_DIR}/OgreMain/include
+        ${PROJECT_SOURCE_DIR}/Components
+        ${PROJECT_SOURCE_DIR}/PlugIns
+        ${PROJECT_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md
+        ${PROJECT_SOURCE_DIR}/RenderSystems
+        ${PROJECT_SOURCE_DIR}/Docs/src/apimainpage.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/manual.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/OgreShadows.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/scripts.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/material-scripts.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/high-level-programs.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/particle-scripts.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/hardware-buffers.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/hlms.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/rtss.md
+        ${PROJECT_SOURCE_DIR}/BuildingOgre.md
         ${TUTORIALS}
         ${BASIC_TUTORIALS})
     string(REPLACE ";" " \\\n" CMAKE_DOXYGEN_INPUT_LIST "${CMAKE_DOXYGEN_INPUT_LIST}")
-    configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE_BINARY_DIR}/html.cfg)
+    configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${PROJECT_BINARY_DIR}/html.cfg)
     add_custom_target(OgreDoc COMMAND 
-        ${DOXYGEN_EXECUTABLE} ${OGRE_BINARY_DIR}/html.cfg
-        DEPENDS ${OGRE_BINARY_DIR}/html.cfg
-        WORKING_DIRECTORY ${OGRE_SOURCE_DIR}/Docs/src/
+        ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/html.cfg
+        DEPENDS ${PROJECT_BINARY_DIR}/html.cfg
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Docs/src/
         COMMENT "Building documentation" VERBATIM)
-    file(MAKE_DIRECTORY ${OGRE_BINARY_DIR}/api/)
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/api/)
     if (OGRE_INSTALL_DOCS)
-        install(DIRECTORY ${OGRE_BINARY_DIR}/api DESTINATION ${OGRE_DOCS_PATH})
+        install(DIRECTORY ${PROJECT_BINARY_DIR}/api DESTINATION ${OGRE_DOCS_PATH})
     endif()
 endif()

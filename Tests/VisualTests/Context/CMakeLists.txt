@@ -27,13 +27,13 @@ if(APPLE)
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${OGRE_SOURCE_DIR}/Samples/Common/include)
-include_directories(${OGRE_SOURCE_DIR}/Samples/Browser/include)
-include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/Common/include)
+include_directories(${PROJECT_SOURCE_DIR}/Samples/Common/include)
+include_directories(${PROJECT_SOURCE_DIR}/Samples/Browser/include)
+include_directories(${PROJECT_SOURCE_DIR}/Tests/VisualTests/Common/include)
 
 if (OGRE_STATIC)
-  include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/VTests/include)
-  include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
+  include_directories(${PROJECT_SOURCE_DIR}/Tests/VisualTests/VTests/include)
+  include_directories(${PROJECT_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
   
   # Fix for static build with MinGW
   if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
@@ -88,34 +88,34 @@ add_dependencies(TestContext VTests PlayPenTests)
 if (APPLE)
   if (APPLE_IOS)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE TRUE)
-	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
+	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ogre3d.\${PRODUCT_NAME:rfc1034identifier}")
     set_target_properties(TestContext PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
     set_target_properties(TestContext PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
 	set (OGRE_TESTCONTEXT_CONTENTS_PATH
-		${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/TestContext.app)
+		${PROJECT_BINARY_DIR}/bin/$(CONFIGURATION)/TestContext.app)
     add_custom_command(TARGET TestContext POST_BUILD
-      COMMAND ditto ${OGRE_SOURCE_DIR}/Samples/Common/misc/*.png ${OGRE_TESTCONTEXT_CONTENTS_PATH}/
-      COMMAND ditto ${OGRE_BINARY_DIR}/bin/*.cfg ${OGRE_TESTCONTEXT_CONTENTS_PATH}/
+      COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Common/misc/*.png ${OGRE_TESTCONTEXT_CONTENTS_PATH}/
+      COMMAND ditto ${PROJECT_BINARY_DIR}/bin/*.cfg ${OGRE_TESTCONTEXT_CONTENTS_PATH}/
     )
     add_custom_command(TARGET TestContext POST_BUILD
-      COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
-      COMMAND ditto ${OGRE_SOURCE_DIR}/Samples/Media ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Media
-      COMMAND ditto ${OGRE_SOURCE_DIR}/Tests/Media ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Media
+      COMMAND mkdir ARGS -p ${PROJECT_BINARY_DIR}/lib/$(CONFIGURATION)/
+      COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Media ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Media
+      COMMAND ditto ${PROJECT_SOURCE_DIR}/Tests/Media ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Media
     )
   else()
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE TRUE)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_ICON_FILE SampleBrowser_OSX.icns)
-	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
+	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ogre3d.\${PRODUCT_NAME:rfc1034identifier}")
     set_target_properties(TestContext PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
     set_target_properties(TestContext PROPERTIES
         LINK_FLAGS "-framework IOKit -framework Cocoa -framework Carbon -framework OpenGL -framework CoreVideo")
 	set (OGRE_TESTCONTEXT_CONTENTS_PATH
-		${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/TestContext.app/Contents)
+		${PROJECT_BINARY_DIR}/bin/$(CONFIGURATION)/TestContext.app/Contents)
 	add_custom_command(TARGET TestContext POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework
+		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 		COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
@@ -123,31 +123,31 @@ if (APPLE)
 	# now cfg files
 	add_custom_command(TARGET TestContext POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/plugins.cfg
+		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/plugins.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/resources.cfg
+		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/resources.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg
+		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/quakemap.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/tests.cfg
+		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/tests.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media
+		COMMAND ln ARGS -s -f ${PROJECT_SOURCE_DIR}/Samples/Media
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
         COMMAND ditto
-		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources
+		${PROJECT_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources
 		)
 
   	add_custom_command(TARGET TestContext POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/PlayPenTests.dylib 
+		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/PlayPenTests.dylib 
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/VTests.dylib 
+		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/VTests.dylib 
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Plugins/
 	)
 
 	foreach(FWK ${FRAMEWORKS})
 		add_custom_command(TARGET TestContext POST_BUILD
-		COMMAND ARGS if [ -d ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ]\; then ln -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/${FWK}.framework\; fi
+		COMMAND ARGS if [ -d ${PROJECT_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ]\; then ln -s -f ${PROJECT_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/${FWK}.framework ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/${FWK}.framework\; fi
 		)
 	endforeach()
 	endif()

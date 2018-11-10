@@ -33,13 +33,6 @@ THE SOFTWARE
 #include <memory>
 
 namespace Ogre {
-    // Define ogre version
-    #define OGRE_VERSION_MAJOR 1
-    #define OGRE_VERSION_MINOR 11
-    #define OGRE_VERSION_PATCH 4
-    #define OGRE_VERSION_SUFFIX ""
-    #define OGRE_VERSION_NAME "Rhagorthua"
-
     #define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
 
     // define the real number values to be used

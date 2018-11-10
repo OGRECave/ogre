@@ -10,14 +10,14 @@
 # Configure BSP SceneManager build
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-list(APPEND HEADER_FILES ${CMAKE_BINARY_DIR}/include/OgreBspPrerequisites.h)
+list(APPEND HEADER_FILES ${PROJECT_BINARY_DIR}/include/OgreBspPrerequisites.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_library(Plugin_BSPSceneManager ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(Plugin_BSPSceneManager OgreMain)
 generate_export_header(Plugin_BSPSceneManager 
     EXPORT_MACRO_NAME _OgreBspPluginExport
-    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgreBspPrerequisites.h)
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreBspPrerequisites.h)
 
 target_include_directories(Plugin_BSPSceneManager PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"

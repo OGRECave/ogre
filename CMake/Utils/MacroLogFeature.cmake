@@ -40,17 +40,17 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 IF (NOT _macroLogFeatureAlreadyIncluded)
-   SET(_file ${OGRE_BINARY_DIR}/MissingRequirements.txt)
+   SET(_file ${PROJECT_BINARY_DIR}/MissingRequirements.txt)
    IF (EXISTS ${_file})
       FILE(REMOVE ${_file})
    ENDIF (EXISTS ${_file})
 
-   SET(_file ${OGRE_BINARY_DIR}/EnabledFeatures.txt)
+   SET(_file ${PROJECT_BINARY_DIR}/EnabledFeatures.txt)
    IF (EXISTS ${_file})
       FILE(REMOVE ${_file})
    ENDIF (EXISTS ${_file})
 
-   SET(_file ${OGRE_BINARY_DIR}/DisabledFeatures.txt)
+   SET(_file ${PROJECT_BINARY_DIR}/DisabledFeatures.txt)
    IF (EXISTS ${_file})
       FILE(REMOVE ${_file})
   ENDIF (EXISTS ${_file})
@@ -66,12 +66,12 @@ MACRO(MACRO_LOG_FEATURE _var _package _description _url ) # _required _minvers _
    SET(_comments "${ARGV6}")
 
    IF (${_var})
-     SET(_LOGFILENAME ${OGRE_BINARY_DIR}/EnabledFeatures.txt)
+     SET(_LOGFILENAME ${PROJECT_BINARY_DIR}/EnabledFeatures.txt)
    ELSE (${_var})
      IF (${_required} MATCHES "[Tt][Rr][Uu][Ee]")
-       SET(_LOGFILENAME ${OGRE_BINARY_DIR}/MissingRequirements.txt)
+       SET(_LOGFILENAME ${PROJECT_BINARY_DIR}/MissingRequirements.txt)
      ELSE (${_required} MATCHES "[Tt][Rr][Uu][Ee]")
-       SET(_LOGFILENAME ${OGRE_BINARY_DIR}/DisabledFeatures.txt)
+       SET(_LOGFILENAME ${PROJECT_BINARY_DIR}/DisabledFeatures.txt)
      ENDIF (${_required} MATCHES "[Tt][Rr][Uu][Ee]")
    ENDIF (${_var})
 
@@ -94,7 +94,7 @@ ENDMACRO(MACRO_LOG_FEATURE)
 
 MACRO(MACRO_DISPLAY_FEATURE_LOG)
 
-   SET(_file ${OGRE_BINARY_DIR}/MissingRequirements.txt)
+   SET(_file ${PROJECT_BINARY_DIR}/MissingRequirements.txt)
    IF (EXISTS ${_file})
       FILE(READ ${_file} _requirements)
       MESSAGE(FATAL_ERROR "\n-----------------------------------------------------------------------------\n-- The following REQUIRED packages could NOT be located on your system.\n-- Please install them before continuing this software installation.\n-- If you are in Windows, try passing -DOGRE_DEPENDENCIES_DIR=<path to dependencies>\n-----------------------------------------------------------------------------\n${_requirements}-----------------------------------------------------------------------------")
@@ -105,7 +105,7 @@ MACRO(MACRO_DISPLAY_FEATURE_LOG)
    SET(_summary "\n")
 
    SET(_elist 0)
-   SET(_file ${OGRE_BINARY_DIR}/EnabledFeatures.txt)
+   SET(_file ${PROJECT_BINARY_DIR}/EnabledFeatures.txt)
    IF (EXISTS ${_file})
       SET(_elist 1)
       FILE(READ ${_file} _enabled)
@@ -114,7 +114,7 @@ MACRO(MACRO_DISPLAY_FEATURE_LOG)
    ENDIF (EXISTS ${_file})
 
    SET(_dlist 0)
-   SET(_file ${OGRE_BINARY_DIR}/DisabledFeatures.txt)
+   SET(_file ${PROJECT_BINARY_DIR}/DisabledFeatures.txt)
    IF (EXISTS ${_file})
       SET(_dlist 1)
       FILE(READ ${_file} _disabled)

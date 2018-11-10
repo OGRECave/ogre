@@ -11,12 +11,10 @@
 # Paging optional component
 ############################################################
 
-PROJECT(OgreProperty)
-
 # define header and source files for the library
 set (HEADER_FILES
 	include/OgreProperty.h
-	${CMAKE_BINARY_DIR}/include/OgrePropertyPrerequisites.h
+	${PROJECT_BINARY_DIR}/include/OgrePropertyPrerequisites.h
 )
 
 set (SOURCE_FILES
@@ -41,7 +39,7 @@ target_include_directories(OgreProperty PUBLIC
 
 generate_export_header(OgreProperty 
     EXPORT_MACRO_NAME _OgrePropertyExport
-    EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/OgrePropertyPrerequisites.h)
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgrePropertyPrerequisites.h)
 
 # install 
 ogre_config_framework(OgreProperty)
