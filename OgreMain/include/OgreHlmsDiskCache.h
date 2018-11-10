@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define _OgreHlmsDiskCache_H_
 
 #include "OgreHlms.h"
+#include "OgreHlmsDatablock.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
