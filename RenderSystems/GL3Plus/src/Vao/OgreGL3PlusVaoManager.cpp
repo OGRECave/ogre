@@ -597,7 +597,7 @@ namespace Ogre
             ushort maxTexSizeBytes = 2048 * PixelUtil::getNumElemBytes( pixelFormat );
             // We need another line of maxTexSizeBytes for uploading
             //to create a rectangle when calling glTexSubImage2D().
-            sizeBytes = sizeBytes = alignToNextMultiple( sizeBytes, maxTexSizeBytes );
+            sizeBytes = alignToNextMultiple( sizeBytes, maxTexSizeBytes );
         }
         
         if( bufferType >= BT_DYNAMIC_DEFAULT )
