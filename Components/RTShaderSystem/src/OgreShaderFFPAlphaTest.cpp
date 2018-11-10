@@ -47,7 +47,7 @@ namespace Ogre {
 			Program* psProgram  = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 			Function* psMain = psProgram->getEntryPointFunction();
 			  
-			mPSAlphaRef = psProgram->resolveAutoParameterReal(GpuProgramParameters::ACT_SURFACE_ALPHA_REJECTION_VALUE, 0);
+			mPSAlphaRef = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_ALPHA_REJECTION_VALUE);
 			mPSAlphaFunc = psProgram->resolveParameter(GCT_FLOAT1,-1, (uint16)GPV_GLOBAL, "gAlphaFunc");
 			
 			mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);

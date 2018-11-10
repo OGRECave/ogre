@@ -105,7 +105,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
     bool hasError = false;
 
     // Resolve world view matrix.
-    mWorldViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
+    mWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
     
     // Resolve vertex shader input position.
     mVSInPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);

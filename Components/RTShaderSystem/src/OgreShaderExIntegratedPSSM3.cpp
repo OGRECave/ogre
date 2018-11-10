@@ -195,7 +195,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "pssm_split_points");
 
     // Get derived scene colour.
-    mPSDerivedSceneColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR, 0);
+    mPSDerivedSceneColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
     
     ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
     int lightIndex = 0;

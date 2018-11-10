@@ -100,8 +100,8 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         mParamInWeights = vsMain->resolveInputParameter(Parameter::SPS_BLEND_WEIGHTS, 0, Parameter::SPC_BLEND_WEIGHTS, GCT_FLOAT4);
         //ACT_WORLD_DUALQUATERNION_ARRAY_2x4 is an array of float4s, so there are two indices for each bone (required by Cg)
         mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, GCT_FLOAT4, 0, mBoneCount * 2);
-        mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
-        mParamInViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEWPROJ_MATRIX, 0);
+        mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
+        mParamInViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEWPROJ_MATRIX);
         
         mParamTempWorldMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "worldMatrix", GCT_MATRIX_2X4);
         mParamBlendDQ = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "blendDQ", GCT_MATRIX_2X4);
@@ -118,7 +118,7 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
                 vsProgram->setUseColumnMajorMatrices(false);
             }
                 
-            mParamInScaleShearMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, 0, mBoneCount);
+            mParamInScaleShearMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, mBoneCount);
             mParamBlendS = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "blendS", GCT_MATRIX_3X4);
             mParamTempFloat3x3 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal3x3", GCT_MATRIX_3X3);
             mParamTempFloat3x4 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal3x4", GCT_MATRIX_3X4);
@@ -152,8 +152,8 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
     }
     else
     {
-        mParamInWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-        mParamInWorldViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
+        mParamInWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
+        mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
 
         //check if parameter retrival went well
         isValid &=

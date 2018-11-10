@@ -228,13 +228,13 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Get surface ambient colour if need to.
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
     {       
-        mDerivedAmbientLightColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR, 0);
+        mDerivedAmbientLightColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR);
         hasError |= !(mDerivedAmbientLightColour.get());
     }
     else
     {
-        mLightAmbientColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR, 0);
-        mSurfaceAmbientColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR, 0);
+        mLightAmbientColour = psProgram->resolveParameter(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
+        mSurfaceAmbientColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR);
     
         hasError |= !(mDerivedAmbientLightColour.get()) || !(mLightAmbientColour.get());
     }
@@ -242,14 +242,14 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Get surface diffuse colour if need to.
     if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
     {
-        mSurfaceDiffuseColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR, 0);
+        mSurfaceDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
         hasError |= !(mSurfaceDiffuseColour.get());
     }
 
     // Get surface specular colour if need to.
     if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
     {
-        mSurfaceSpecularColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR, 0);
+        mSurfaceSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
         hasError |= !(mSurfaceSpecularColour.get());
     }
 
@@ -257,15 +257,15 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Get surface emissive colour if need to.
     if ((mTrackVertexColourType & TVC_EMISSIVE) == 0)
     {
-        mSurfaceEmissiveColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR, 0);
+        mSurfaceEmissiveColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR);
         hasError |= !(mSurfaceEmissiveColour.get());
     }
 
     // Get derived scene colour.
-    mDerivedSceneColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR, 0);
+    mDerivedSceneColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
 
     // Get surface shininess.
-    mSurfaceShininess = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_SHININESS, 0);
+    mSurfaceShininess = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SHININESS);
 
     // Resolve input vertex shader normal.
     mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
@@ -353,11 +353,11 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
             mVSOutView->getType());
 
         // Resolve camera position world space.
-        mCamPosWorldSpace = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_CAMERA_POSITION, 0);
+        mCamPosWorldSpace = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
         mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
         mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
         // Resolve world matrix.                
-        mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
+        mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
 
         // Resolve inverse world rotation matrix.
         mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
@@ -457,7 +457,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             // Resolve world matrix.
             if (mWorldMatrix.get() == NULL)
             {               
-                mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
+                mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
             }
 
             // Resolve inverse world rotation matrix.
@@ -533,7 +533,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             // Resolve world matrix.
             if (mWorldMatrix.get() == NULL)
             {               
-                mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
+                mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
             }
             
             // Resolve inverse world rotation matrix.

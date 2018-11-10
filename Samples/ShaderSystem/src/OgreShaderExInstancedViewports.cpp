@@ -116,10 +116,10 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 
 
     // Resolve the current world & view matrices concatenated   
-    mWorldViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEW_MATRIX, 0);
+    mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
 
     // Resolve the current projection matrix
-    mProjectionMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_PROJECTION_MATRIX, 0);
+    mProjectionMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_PROJECTION_MATRIX);
     
     
 #define SPC_MONITOR_INDEX Parameter::SPC_TEXTURE_COORDINATE3

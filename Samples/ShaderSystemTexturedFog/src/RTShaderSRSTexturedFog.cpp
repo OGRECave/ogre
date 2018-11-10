@@ -119,12 +119,12 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
 
 
     // Resolve world view matrix.
-    mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
+    mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
     if (mWorldMatrix.get() == NULL)
         return false;
     
     // Resolve world view matrix.
-    mCameraPos = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_CAMERA_POSITION, 0);
+    mCameraPos = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
     if (mCameraPos.get() == NULL)
         return false;
     

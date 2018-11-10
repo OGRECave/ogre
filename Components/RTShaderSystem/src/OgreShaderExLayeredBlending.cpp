@@ -124,7 +124,7 @@ bool LayeredBlending::resolveParameters(ProgramSet* programSet)
                 (texBlend.sourceModifier != SM_None))
             {
                 
-                texBlend.modControlParam = psProgram->resolveAutoParameterInt(
+                texBlend.modControlParam = psProgram->resolveParameter(
                     GpuProgramParameters::ACT_CUSTOM, texBlend.customNum);
                 if (texBlend.modControlParam.get() == NULL)
                 {   

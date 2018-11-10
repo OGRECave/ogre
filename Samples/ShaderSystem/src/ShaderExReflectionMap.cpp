@@ -149,18 +149,18 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
 
 
     // Resolve world matrix.    
-    mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
+    mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
     if (mWorldMatrix.get() == NULL)
         return false;   
 
     // Resolve world inverse transpose matrix.  
-    mWorldITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, 0);
+    mWorldITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX);
     if (mWorldITMatrix.get() == NULL)
         return false;   
 
 
     // Resolve view matrix.
-    mViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEW_MATRIX, 0);
+    mViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEW_MATRIX);
     if (mViewMatrix.get() == NULL)
         return false;   
 

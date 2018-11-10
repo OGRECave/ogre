@@ -62,7 +62,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     Function* vsEntry = vsProgram->getEntryPointFunction();
     
     // Resolve World View Projection Matrix.
-    UniformParameterPtr wvpMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
+    UniformParameterPtr wvpMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
         
     // Resolve input position parameter.
     ParameterPtr positionIn = vsEntry->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4); 
@@ -86,7 +86,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     if(!mSetPointSize || ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl") // not supported with DX11
         return true;
 
-    UniformParameterPtr pointParams = vsProgram->resolveAutoParameterReal(GpuProgramParameters::ACT_POINT_PARAMS, 0);
+    UniformParameterPtr pointParams = vsProgram->resolveParameter(GpuProgramParameters::ACT_POINT_PARAMS);
     ParameterPtr pointSize = vsEntry->resolveOutputParameter(
         Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POINTSPRITE_SIZE, GCT_FLOAT1); // abuse of texture semantic
 
