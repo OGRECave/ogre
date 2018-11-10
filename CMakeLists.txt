@@ -42,7 +42,16 @@ if (APPLE AND NOT ANDROID)
   add_definitions(-D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=0)
 endif ()
 
-project(OGRE)
+project(OGRE VERSION 1.11.4)
+
+# extra version info
+set(OGRE_VERSION_SUFFIX "")
+set(OGRE_VERSION_NAME "Rhagorthua")
+
+# legacy defines
+set(OGRE_SOVERSION ${OGRE_VERSION})
+set(OGRE_VERSION_DASH_SEPARATED "${OGRE_VERSION_MAJOR}-${OGRE_VERSION_MINOR}-${OGRE_VERSION_PATCH}")
+
 
 # Include necessary submodules
 set(CMAKE_MODULE_PATH
@@ -54,7 +63,6 @@ set(CMAKE_MODULE_PATH
 include(CMakeDependentOption)
 include(MacroLogFeature)
 include(OgreConfigTargets)
-include(PreprocessorUtils)
 set(OGRE_TEMPLATES_DIR "${PROJECT_SOURCE_DIR}/CMake/Templates")
 set(OGRE_WORK_DIR ${PROJECT_BINARY_DIR})
 
@@ -70,8 +78,6 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 # determine Ogre version numbers
-include(OgreGetVersion)
-ogre_get_version(${PROJECT_SOURCE_DIR}/OgreMain/include/OgrePrerequisites.h)
 message(STATUS "Configuring OGRE ${OGRE_VERSION}")
 # Configure version file for use by scripts
 configure_file("${OGRE_TEMPLATES_DIR}/version.txt.in" "${PROJECT_BINARY_DIR}/version.txt" @ONLY)
