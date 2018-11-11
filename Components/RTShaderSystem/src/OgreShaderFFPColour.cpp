@@ -140,7 +140,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     }
     else
     {
-        vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
         vsStage.assign(Vector4(1.0), vsDiffuse);
     }
 
@@ -155,7 +155,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     }
     else
     {
-        vsSpecular = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        vsSpecular = vsMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         vsStage.assign(Vector4::ZERO, vsSpecular);
     }
 
@@ -178,7 +178,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     }
     else
     {
-        psDiffuse = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        psDiffuse = psMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
         psStage.assign(Vector4(1.0), psDiffuse);
     }
 
@@ -189,7 +189,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     }
     else
     {
-        psSpecular = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        psSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         psStage.assign(Vector4::ZERO, psSpecular);
     }
 

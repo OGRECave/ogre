@@ -134,7 +134,7 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
         return false;
 
         // Resolve fog colour.
-    mFogColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "FogColor", GCT_FLOAT4);
+    mFogColour = psMain->resolveLocalParameter("FogColor", GCT_FLOAT4);
     if (mFogColour.get() == NULL)
         return false;
         

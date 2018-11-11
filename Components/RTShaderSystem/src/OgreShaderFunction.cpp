@@ -30,6 +30,28 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
+static GpuConstantType typeFromContent(Parameter::Content content)
+{
+    switch (content)
+    {
+    case Parameter::SPC_COLOR_DIFFUSE:
+    case Parameter::SPC_COLOR_SPECULAR:
+    case Parameter::SPC_POSITION_PROJECTIVE_SPACE:
+    case Parameter::SPC_POSITION_WORLD_SPACE:
+    case Parameter::SPC_POSITION_OBJECT_SPACE:
+        return GCT_FLOAT4;
+    case Parameter::SPC_NORMAL_TANGENT_SPACE:
+    case Parameter::SPC_NORMAL_OBJECT_SPACE:
+    case Parameter::SPC_NORMAL_WORLD_SPACE:
+        return GCT_FLOAT3;
+    case Parameter::SPC_POINTSPRITE_SIZE:
+        return GCT_FLOAT1;
+    default:
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "cannot derive type from content");
+        break;
+    }
+}
+
 void FunctionStageRef::callFunction(const char* name, const InOut& inout) const
 {
     callFunction(name, std::vector<Operand>{inout});
@@ -325,6 +347,8 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
 {
     ParameterPtr param;
 
+    if(type == GCT_UNKNOWN) type = typeFromContent(content);
+
     param = getParameterByContent(mLocalParameters, content, type);
     if (param.get() != NULL)    
         return param;
@@ -467,6 +491,9 @@ ParameterPtr Function::getParameterBySemantic(const ShaderParameterList& paramet
 ParameterPtr Function::getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
 {
     ShaderParameterConstIterator it;
+
+    if(type == GCT_UNKNOWN)
+        type = typeFromContent(content);
 
     // Search only for known content.
     if (content != Parameter::SPC_UNKNOWN)  

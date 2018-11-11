@@ -175,7 +175,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     mPSDiffuse = psMain->getParameterBySemantic(psMain->getInputParameters(), Parameter::SPS_COLOR, 0);
     if (mPSDiffuse.get() == NULL)   
     {
-        mPSDiffuse = psMain->getParameterBySemantic(psMain->getLocalParameters(), Parameter::SPS_COLOR, 0);
+        mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
     
     // Resolve output diffuse parameter.
@@ -185,11 +185,11 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     mPSSpecualr = psMain->getParameterBySemantic(psMain->getInputParameters(), Parameter::SPS_COLOR, 1);
     if (mPSSpecualr.get() == NULL)  
     {
-        mPSSpecualr = psMain->getParameterBySemantic(psMain->getLocalParameters(), Parameter::SPS_COLOR, 1);
+        mPSSpecualr = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
     }
     
     // Resolve computed local shadow colour parameter.
-    mPSLocalShadowFactor = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lShadowFactor", GCT_FLOAT1);
+    mPSLocalShadowFactor = psMain->resolveLocalParameter("lShadowFactor", GCT_FLOAT1);
 
     // Resolve computed local shadow colour parameter.
     mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "pssm_split_points");

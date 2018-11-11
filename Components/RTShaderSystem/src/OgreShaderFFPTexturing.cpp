@@ -228,18 +228,17 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
     }
 
     const ShaderParameterList& inputParams = psMain->getInputParameters();
-    const ShaderParameterList& localParams = psMain->getLocalParameters();
 
     mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
     if (mPSDiffuse.get() == NULL)
     {
-        mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
 
     mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
     if (mPSSpecular.get() == NULL)
     {
-        mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        mPSSpecular = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
     }
 
     mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
@@ -351,11 +350,11 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     
             
     // Add texture sampling code.
-    ParameterPtr texel = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, c_ParamTexelEx + StringConverter::toString(textureUnitParams->mTextureSamplerIndex), GCT_FLOAT4);
+    ParameterPtr texel = psMain->resolveLocalParameter(c_ParamTexelEx + StringConverter::toString(textureUnitParams->mTextureSamplerIndex), GCT_FLOAT4);
     addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
     // Build colour argument for source1.
-    source1 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "source1", GCT_FLOAT4);
+    source1 = psMain->resolveLocalParameter("source1", GCT_FLOAT4);
         
     addPSArgumentInvocations(psMain, source1, texel, 
         textureUnitParams->mTextureSamplerIndex,
@@ -363,7 +362,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
         colourBlend.alphaArg1, false, groupOrder);
 
     // Build colour argument for source2.
-    source2 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "source2", GCT_FLOAT4);
+    source2 = psMain->resolveLocalParameter("source2", GCT_FLOAT4);
 
     addPSArgumentInvocations(psMain, source2, texel, 
         textureUnitParams->mTextureSamplerIndex,

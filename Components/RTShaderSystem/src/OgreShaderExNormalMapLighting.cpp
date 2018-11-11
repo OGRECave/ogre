@@ -276,7 +276,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         mVSInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
         
         // Resolve local vertex shader TNB matrix.
-        mVSTBNMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lMatTBN", GCT_MATRIX_3X3);
+        mVSTBNMatrix = vsMain->resolveLocalParameter("lMatTBN", GCT_MATRIX_3X3);
         
         hasError |= !(mVSTBNMatrix.get()) || !(mVSInTangent.get());
     }
@@ -300,37 +300,36 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Resolve pixel shader normal.
     if (mNormalMapSpace == NMS_OBJECT)
     {
-        mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT4);
+        mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT4);
         hasError |= !(mPSNormal.get());
     }
     else if (mNormalMapSpace == NMS_TANGENT)
     {
-        mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT4);
+        mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT4);
         hasError |= !(mPSNormal.get());
     }
     
 
     const ShaderParameterList& inputParams = psMain->getInputParameters();
-    const ShaderParameterList& localParams = psMain->getLocalParameters();
 
     mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
     if (mPSDiffuse.get() == NULL)
     {
-        mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
 
     mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-    mPSTempDiffuseColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapDiffuse", GCT_FLOAT4);
+    mPSTempDiffuseColour = psMain->resolveLocalParameter("lNormalMapDiffuse", GCT_FLOAT4);
 
     if (mSpecularEnable)
     {
         mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
         if (mPSSpecular.get() == NULL)
         {
-            mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+            mPSSpecular = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         }
 
-        mPSTempSpecularColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapSpecular", GCT_FLOAT4);
+        mPSTempSpecularColour = psMain->resolveLocalParameter("lNormalMapSpecular", GCT_FLOAT4);
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 
         if (mNormalMapSpace == NMS_TANGENT)
@@ -354,8 +353,8 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 
         // Resolve camera position world space.
         mCamPosWorldSpace = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
-        mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
-        mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+        mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
+        mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
         // Resolve world matrix.                
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
 
@@ -445,13 +444,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             // Resolve local dir.
             if (mVSLocalDir.get() == NULL)
             {
-                mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
+                mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
             }   
 
             // Resolve world position.
             if (mVSWorldPosition.get() == NULL)
             {
-                mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+                mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
             }   
 
             // Resolve world matrix.
@@ -521,13 +520,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             // Resolve local dir.
             if (mVSLocalDir.get() == NULL)
             {
-                mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
+                mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
             }   
 
             // Resolve world position.
             if (mVSWorldPosition.get() == NULL)
             {
-                mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+                mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
             }   
 
             // Resolve world matrix.

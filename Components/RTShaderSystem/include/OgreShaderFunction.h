@@ -122,42 +122,46 @@ public:
     */
     ParameterPtr resolveOutputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
+    /// @deprecated local parameters do not have index or sematic. use resolveLocalParameter(const String&, GpuConstantType)
+    ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
+
     /** Resolve local parameter of this function    
-    @param semantic The desired parameter semantic. 
-    @param index The index of the desired parameter.
     @param name The name of the parameter.
     @param type The type of the desired parameter.  
     Return parameter instance in case of that resolve operation succeeded.
     */
-    ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
+    ParameterPtr resolveLocalParameter(const String& name, GpuConstantType type)
+    {
+        return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, name, type);
+    }
 
-    /** Resolve local parameter of this function    
-    @param semantic The desired parameter semantic. 
-    @param index The index of the desired parameter.
+    /// @deprecated local parameters do not have index or sematic. use resolveLocalParameter(const String&, GpuConstantType)
+    ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
+
+    /** Resolve local parameter of this function
     @param content The content of the parameter.
-    @param type The type of the desired parameter.  
+    @param type The type of the desired parameter.
     Return parameter instance in case of that resolve operation succeeded.
     */
-    ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
-    
+    ParameterPtr resolveLocalParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
+    {
+        return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0,content, type);
+    }
 
-    /** 
-    Get parameter by a given name from the given parameter list.
-    @param parameterList The parameters list to look in.
-    @param name The name of the parameter to search in the list.
-    @remarks Return NULL if no matching parameter found.
-    */
-    static ParameterPtr getParameterByName(const ShaderParameterList& parameterList, const String& name);
-
-    /** 
-    Get parameter by a given semantic and index from the given parameter list.
-    @param parameterList The parameters list to look in.
-    @param semantic The semantic of the parameter to search in the list.
-    @param index The index of the parameter to search in the list.
-    @remarks Return NULL if no matching parameter found.
-    */
-    static ParameterPtr getParameterBySemantic(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
-
+    /**
+     * get local parameter by content
+     * @param content
+     * @return parameter or NULL if not found
+     */
+    ParameterPtr getLocalParameter(Parameter::Content content)
+    {
+        return getParameterByContent(mLocalParameters, content, GCT_UNKNOWN);
+    }
+    /// @overload
+    ParameterPtr getLocalParameter(const String& name)
+    {
+        return getParameterByName(mLocalParameters, name);
+    }
 
     /** 
     Get parameter by a given content and type from the given parameter list.

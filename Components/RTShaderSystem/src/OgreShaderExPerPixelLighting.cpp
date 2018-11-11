@@ -276,16 +276,15 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
         GCT_FLOAT3);
     
     const ShaderParameterList& inputParams = psMain->getInputParameters();
-    const ShaderParameterList& localParams = psMain->getLocalParameters();
 
     mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
     if (mPSDiffuse.get() == NULL)
     {
-        mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
 
     mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-    mPSTempDiffuseColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lPerPixelDiffuse", GCT_FLOAT4);
+    mPSTempDiffuseColour = psMain->resolveLocalParameter("lPerPixelDiffuse", GCT_FLOAT4);
 
     hasError |= !(mDerivedSceneColour.get()) || !(mSurfaceShininess.get()) || !(mVSInNormal.get()) || !(mVSOutNormal.get()) || !(mPSInNormal.get()) || !(
         mPSDiffuse.get()) || !(mPSOutDiffuse.get()) || !(mPSTempDiffuseColour.get());
@@ -295,10 +294,10 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
         mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
         if (mPSSpecular.get() == NULL)
         {
-            mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+            mPSSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         }
 
-        mPSTempSpecularColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lPerPixelSpecular", GCT_FLOAT4);
+        mPSTempSpecularColour = psMain->resolveLocalParameter("lPerPixelSpecular", GCT_FLOAT4);
 
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 

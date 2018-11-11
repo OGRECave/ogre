@@ -277,7 +277,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
 
     
     //Check if another SRS already defined a normal in world space to be used
-    mPSLocalNormal = psMain->getParameterByContent(psMain->getLocalParameters(), Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);
+    mPSLocalNormal = psMain->getLocalParameter(Parameter::SPC_NORMAL_WORLD_SPACE);
     if (mPSLocalNormal.get() == NULL)
     {
         //create parameters to fetch the normal from the vertex shader
@@ -301,16 +301,15 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
         if (mPSInNormal.get() == NULL)
             return false;
 
-        mPSLocalNormal = psMain->resolveLocalParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);
+        mPSLocalNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_WORLD_SPACE);
     }
     
     const ShaderParameterList& inputParams = psMain->getInputParameters();
-    const ShaderParameterList& localParams = psMain->getLocalParameters();
 
     mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
     if (mPSDiffuse.get() == NULL)
     {
-        mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
         if (mPSDiffuse.get() == NULL)
             return false;
     }
@@ -319,7 +318,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
     if (mPSOutDiffuse.get() == NULL)
         return false;
 
-    mPSTempDiffuseColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lPerPixelDiffuse", GCT_FLOAT4);
+    mPSTempDiffuseColour = psMain->resolveLocalParameter("lPerPixelDiffuse", GCT_FLOAT4);
     if (mPSTempDiffuseColour.get() == NULL)
         return false;
 
@@ -347,12 +346,12 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
         mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
         if (mPSSpecular.get() == NULL)
         {
-            mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+            mPSSpecular = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
             if (mPSSpecular.get() == NULL)
                 return false;
         }
 
-        mPSTempSpecularColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lPerPixelSpecular", GCT_FLOAT4);
+        mPSTempSpecularColour = psMain->resolveLocalParameter("lPerPixelSpecular", GCT_FLOAT4);
         if (mPSTempSpecularColour.get() == NULL)
             return false;
 

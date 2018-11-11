@@ -68,9 +68,9 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
     //mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
 
     //local param
-    mParamLocalBlendPosition = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "BlendedPosition", GCT_FLOAT3);
-    mParamLocalPositionWorld = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT4);
-    mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);
+    mParamLocalBlendPosition = vsMain->resolveLocalParameter("BlendedPosition", GCT_FLOAT3);
+    mParamLocalPositionWorld = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
+    mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPC_NORMAL_WORLD_SPACE);
     //mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);
     //mParamLocalBinormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_WORLD_SPACE, GCT_FLOAT3);
 
@@ -103,11 +103,11 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
         mParamInViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEWPROJ_MATRIX);
         
-        mParamTempWorldMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "worldMatrix", GCT_MATRIX_2X4);
-        mParamBlendDQ = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "blendDQ", GCT_MATRIX_2X4);
-        mParamInitialDQ = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "initialDQ", GCT_MATRIX_2X4);
-        mParamIndex1 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "index1", GCT_FLOAT1);
-        mParamIndex2 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "index2", GCT_FLOAT1);
+        mParamTempWorldMatrix = vsMain->resolveLocalParameter("worldMatrix", GCT_MATRIX_2X4);
+        mParamBlendDQ = vsMain->resolveLocalParameter("blendDQ", GCT_MATRIX_2X4);
+        mParamInitialDQ = vsMain->resolveLocalParameter("initialDQ", GCT_MATRIX_2X4);
+        mParamIndex1 = vsMain->resolveLocalParameter("index1", GCT_FLOAT1);
+        mParamIndex2 = vsMain->resolveLocalParameter("index2", GCT_FLOAT1);
                 
         if(mScalingShearingSupport)
         {
@@ -119,14 +119,14 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
             }
                 
             mParamInScaleShearMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, mBoneCount);
-            mParamBlendS = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "blendS", GCT_MATRIX_3X4);
-            mParamTempFloat3x3 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal3x3", GCT_MATRIX_3X3);
-            mParamTempFloat3x4 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal3x4", GCT_MATRIX_3X4);
+            mParamBlendS = vsMain->resolveLocalParameter("blendS", GCT_MATRIX_3X4);
+            mParamTempFloat3x3 = vsMain->resolveLocalParameter("TempVal3x3", GCT_MATRIX_3X3);
+            mParamTempFloat3x4 = vsMain->resolveLocalParameter("TempVal3x4", GCT_MATRIX_3X4);
         }
         
-        mParamTempFloat2x4 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal2x4", GCT_MATRIX_2X4);
-        mParamTempFloat4 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal4", GCT_FLOAT4);
-        mParamTempFloat3 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal3", GCT_FLOAT3);
+        mParamTempFloat2x4 = vsMain->resolveLocalParameter("TempVal2x4", GCT_MATRIX_2X4);
+        mParamTempFloat4 = vsMain->resolveLocalParameter("TempVal4", GCT_FLOAT4);
+        mParamTempFloat3 = vsMain->resolveLocalParameter("TempVal3", GCT_FLOAT3);
 
         //check if parameter retrival went well
         isValid &=
