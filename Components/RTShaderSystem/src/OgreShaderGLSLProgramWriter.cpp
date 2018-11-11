@@ -391,7 +391,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
     {       
         ParameterPtr pParam = *itParam;
         Parameter::Content paramContent = pParam->getContent();
-        String paramName = pParam->getName();
+        const String& paramName = pParam->getName();
 
         if (gpuType == GPT_FRAGMENT_PROGRAM)
         {
@@ -400,12 +400,6 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 pParam->_rename("gl_PointCoord");
                 continue;
             }
-
-            // In the vertex and fragment program the variable names must match.
-            // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
-            // Thats why we rename the params which are used in function atoms
-            paramName[0] = 'o';
-            pParam->_rename(paramName);
 
             // After GLSL 1.20 varying is deprecated
             if(mGLSLVersion <= 120 || (mGLSLVersion == 100 && mIsGLSLES))
@@ -513,9 +507,16 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
                     os << "out\t";
                 }
 
+                // In the vertex and fragment program the variable names must match.
+                // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
+                // Thats why we rename the params which are used in function atoms
+                String paramName = pParam->getName();
+                paramName[0] = 'i';
+                pParam->_rename(paramName);
+
                 os << mGpuConstTypeMap[pParam->getType()];
                 os << "\t";
-                os << pParam->getName();
+                os << paramName;
                 if (pParam->isArray() == true)
                 {
                     os << "[" << pParam->getSize() << "]";  
@@ -534,8 +535,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             }
             else
             {
-                os << "out vec4 fragColour;" << std::endl;
-                pParam->_rename("fragColour");
+                os << "out vec4\t" << pParam->getName() << ";" << std::endl;
             }
         }
     }
