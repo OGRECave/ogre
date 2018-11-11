@@ -371,8 +371,9 @@ namespace Ogre {
             if(newElement->isContainer())
                 pOverlay->add2D((OverlayContainer*)newElement);
             else
-                LogManager::getSingleton().logError("cannot add to overlay. Not a container. " +
-                                                    stream->getName() + StringConverter::toString(l));
+                LogManager::getSingleton().logError(
+                    StringUtil::format("Top level components must be containers, but '%s' is an element in %s:%d",
+                                       elemType.c_str(), stream->getName().c_str(), l));
         }
 
         while(!stream->eof())
