@@ -598,7 +598,20 @@ namespace Ogre
                             if( idxBlock == 0 )
                             {
                                 it = subString.begin() + strlen( blockNames[i] );
-                                ++nesting;
+                                if( i == 3 )
+                                {
+                                    //Do not increase 'nesting' for "@else"
+                                    if( !allowedElses.test( static_cast<size_t>( nesting ) ) )
+                                    {
+                                        syntaxError = true;
+                                        printf( "Unexpected @else while looking for @end\nNear: '%s'\n",
+                                                &(*subString.begin()) );
+                                    }
+                                }
+                                else
+                                {
+                                    ++nesting;
+                                }
                                 allowedElses.setValue( static_cast<size_t>( nesting ), i == 1u );
                                 break;
                             }
