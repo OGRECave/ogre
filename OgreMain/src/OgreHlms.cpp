@@ -559,7 +559,6 @@ namespace Ogre
                 {
                     --nesting;
                     it += sizeof( "end" ) - 1;
-                    isElse = false;
                     continue;
                 }
                 else
@@ -574,9 +573,21 @@ namespace Ogre
                             printf( "Unexpected @else while looking for @end\nNear: '%s'\n",
                                     &(*subString.begin()) );
                         }
-                        --nesting;
+                        if( nesting == 0 )
+                        {
+                            //Decrement nesting so that we're out and tell caller we went from
+                            //@property() through @else. Caller will later have to go from
+                            //@else to @end
+                            isElse = true;
+                            --nesting;
+                        }
+                        else
+                        {
+                            //Do not decrease 'nesting', as we now need to look for "@end" but
+                            //unset allowedElses, so that we do not allow two consecutive @else
+                            allowedElses.setValue( static_cast<size_t>( nesting ), 0u );
+                        }
                         it += sizeof( "else" ) - 1;
-                        isElse = true;
                         continue;
                     }
                     else
