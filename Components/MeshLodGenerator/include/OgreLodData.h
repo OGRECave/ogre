@@ -99,10 +99,10 @@ namespace Ogre
         struct Vertex
         {
             Vector3 position;
+            Vector3 normal;
             VEdges edges;
             VTriangles triangles;
 
-            Vector3 normal;
             Vertex* collapseTo;
             bool seam;
             CollapseCostHeap::iterator costHeapPosition; /// Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
