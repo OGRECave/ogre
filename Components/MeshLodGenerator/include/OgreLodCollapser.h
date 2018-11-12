@@ -74,7 +74,7 @@ protected:
     struct CollapsedEdge {
         unsigned int srcID;
         unsigned int dstID;
-        size_t submeshID;
+        unsigned short submeshID;
     };
     
     typedef std::vector<CollapsedEdge> CollapsedEdges;
