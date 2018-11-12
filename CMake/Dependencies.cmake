@@ -142,32 +142,35 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     execute_process(COMMAND ${CMAKE_COMMAND} 
         --build ${PROJECT_BINARY_DIR}/ZZIPlib-master ${BUILD_COMMAND_OPTS})
     
-    message(STATUS "Building freetype")
-    file(DOWNLOAD
-        https://download.savannah.gnu.org/releases/freetype/freetype-2.9.tar.gz
-        ${PROJECT_BINARY_DIR}/freetype-2.9.tar.gz)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf freetype-2.9.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-    # patch toolchain for iOS
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy
-        ${PROJECT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
-        freetype-2.9/builds/cmake/iOS.cmake
-		WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-        -DWITH_PNG=OFF
-        -DWITH_BZip2=OFF # tries to use it on iOS otherwise
-        # workaround for broken iOS toolchain in freetype
-        -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.9
-        ${CROSS}
-        -G ${CMAKE_GENERATOR}
-        -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-        ${PROJECT_BINARY_DIR}/freetype-2.9
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.9/objs)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/freetype-2.9/objs ${BUILD_COMMAND_OPTS})
+    find_package(Freetype)
+    if (NOT FREETYPE_FOUND)
+        message(STATUS "Building freetype")
+        file(DOWNLOAD
+            https://download.savannah.gnu.org/releases/freetype/freetype-2.9.tar.gz
+            ${PROJECT_BINARY_DIR}/freetype-2.9.tar.gz)
+        execute_process(COMMAND ${CMAKE_COMMAND}
+            -E tar xf freetype-2.9.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        # patch toolchain for iOS
+        execute_process(COMMAND ${CMAKE_COMMAND} -E copy
+            ${PROJECT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
+            freetype-2.9/builds/cmake/iOS.cmake
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        execute_process(COMMAND ${CMAKE_COMMAND}
+            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+            -DWITH_PNG=OFF
+            -DWITH_BZip2=OFF # tries to use it on iOS otherwise
+            # workaround for broken iOS toolchain in freetype
+            -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.9
+            ${CROSS}
+            -G ${CMAKE_GENERATOR}
+            -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
+            ${PROJECT_BINARY_DIR}/freetype-2.9
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.9/objs)
+        execute_process(COMMAND ${CMAKE_COMMAND}
+            --build ${PROJECT_BINARY_DIR}/freetype-2.9/objs ${BUILD_COMMAND_OPTS})
+    endif()
 
     if(MSVC OR MINGW) # other platforms dont need this
         message(STATUS "Building SDL2")
