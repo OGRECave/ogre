@@ -333,14 +333,15 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 //-----------------------------------------------------------------------------
 void ProgramManager::bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams)
 {
-    const UniformParameterList& progParams = pCpuProgram->getParameters();
-    UniformParameterConstIterator itParams = progParams.begin();
-    UniformParameterConstIterator itParamsEnd = progParams.end();
+    bool isHLSL = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
 
     // Bind each uniform parameter to its GPU parameter.
-    for (; itParams != itParamsEnd; ++itParams)
-    {           
-        (*itParams)->bind(passParams);                  
+    for (const auto& param : pCpuProgram->getParameters())
+    {        
+        // samplers cannot be bound on HLSL where they are registers
+        if(isHLSL && param->isSampler()) continue;
+
+        param->bind(passParams);                  
     }
 }
 
