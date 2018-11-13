@@ -111,6 +111,20 @@ public:
     */
     ParameterPtr resolveInputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
+    ParameterPtr resolveInputParameter(Parameter::Content content)
+    {
+        return resolveInputParameter(Parameter::SPS_UNKNOWN, 0, content, GCT_UNKNOWN);
+    }
+
+    /**
+     * get input parameter by content
+     * @param content
+     * @return parameter or NULL if not found
+     */
+    ParameterPtr getInputParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
+    {
+        return getParameterByContent(mInputParameters, content, type);
+    }
 
     /** Resolve output parameter of this function
     @param semantic The desired parameter semantic. 
@@ -121,6 +135,21 @@ public:
     @remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
     */
     ParameterPtr resolveOutputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
+
+    ParameterPtr resolveOutputParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
+    {
+        return resolveOutputParameter(Parameter::SPS_UNKNOWN, 0, content, type);
+    }
+
+    /**
+     * get output parameter by content
+     * @param content
+     * @return parameter or NULL if not found
+     */
+    ParameterPtr getOutputParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
+    {
+        return getParameterByContent(mOutputParameters, content, type);
+    }
 
     /// @deprecated local parameters do not have index or sematic. use resolveLocalParameter(const String&, GpuConstantType)
     ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);

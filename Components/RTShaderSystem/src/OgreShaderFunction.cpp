@@ -39,15 +39,50 @@ static GpuConstantType typeFromContent(Parameter::Content content)
     case Parameter::SPC_POSITION_PROJECTIVE_SPACE:
     case Parameter::SPC_POSITION_WORLD_SPACE:
     case Parameter::SPC_POSITION_OBJECT_SPACE:
+    case Parameter::SPC_BLEND_INDICES:
+    case Parameter::SPC_BLEND_WEIGHTS:
         return GCT_FLOAT4;
     case Parameter::SPC_NORMAL_TANGENT_SPACE:
     case Parameter::SPC_NORMAL_OBJECT_SPACE:
     case Parameter::SPC_NORMAL_WORLD_SPACE:
+    case Parameter::SPC_TANGENT_OBJECT_SPACE:
         return GCT_FLOAT3;
+    case Parameter::SPC_POINTSPRITE_COORDINATE:
+        return GCT_FLOAT2;
     case Parameter::SPC_POINTSPRITE_SIZE:
         return GCT_FLOAT1;
     default:
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "cannot derive type from content");
+        break;
+    }
+}
+
+static Parameter::Semantic semanticFromContent(Parameter::Content content)
+{
+    switch (content)
+    {
+    case Parameter::SPC_COLOR_DIFFUSE:
+    case Parameter::SPC_COLOR_SPECULAR:
+        return Parameter::SPS_COLOR;
+    case Parameter::SPC_NORMAL_WORLD_SPACE:
+    case Parameter::SPC_NORMAL_OBJECT_SPACE:
+    case Parameter::SPC_NORMAL_TANGENT_SPACE:
+        return Parameter::SPS_NORMAL;
+    case Parameter::SPC_POSITION_PROJECTIVE_SPACE:
+    case Parameter::SPC_POSITION_WORLD_SPACE:
+    case Parameter::SPC_POSITION_OBJECT_SPACE:
+        return Parameter::SPS_POSITION;
+    case Parameter::SPC_BLEND_INDICES:
+        return Parameter::SPS_BLEND_INDICES;
+    case Parameter::SPC_BLEND_WEIGHTS:
+        return Parameter::SPS_BLEND_WEIGHTS;
+    case Parameter::SPC_TANGENT_OBJECT_SPACE:
+        return Parameter::SPS_TANGENT;
+    case Parameter::SPC_POINTSPRITE_COORDINATE:
+    case Parameter::SPC_POINTSPRITE_SIZE:  // fall back to TEXCOORD semantic
+        return Parameter::SPS_TEXTURE_COORDINATES;
+    default:
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "cannot derive semantic from content");
         break;
     }
 }
@@ -118,12 +153,18 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
                                         const Parameter::Content content,
                                         GpuConstantType type)
 {
+    if(type == GCT_UNKNOWN)
+        type = typeFromContent(content);
+
     ParameterPtr param;
 
     // Check if desired parameter already defined.
     param = getParameterByContent(mInputParameters, content, type);
     if (param.get() != NULL)
         return param;
+
+    if(semantic == Parameter::SPS_UNKNOWN)
+        semantic = semanticFromContent(content);
 
     // Case we have to create new parameter.
     if (index == -1)
@@ -219,12 +260,18 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
                                             Parameter::Content content,                                         
                                             GpuConstantType type)
 {
+    if(type == GCT_UNKNOWN)
+        type = typeFromContent(content);
+
     ParameterPtr param;
 
     // Check if desired parameter already defined.
     param = getParameterByContent(mOutputParameters, content, type);
     if (param.get() != NULL)
         return param;
+
+    if(semantic == Parameter::SPS_UNKNOWN)
+        semantic = semanticFromContent(content);
 
     // Case we have to create new parameter.
     if (index == -1)

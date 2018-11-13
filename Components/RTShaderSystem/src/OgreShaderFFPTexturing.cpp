@@ -184,33 +184,31 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
         case TEXCALC_ENVIRONMENT_MAP_PLANAR:        
         case TEXCALC_ENVIRONMENT_MAP_NORMAL:
             // Resolve vertex normal.
-            mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-            mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+            mVSInputPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
+            mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
             hasError |= !(mVSInputNormal.get()) || !(mVSInputPos.get());
             break;  
 
         case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
 
             // Resolve vertex normal.
-            mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+            mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
             // Resolve vertex position.
-            mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+            mVSInputPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
             
             hasError |= !(mVSInputNormal.get()) || !(mVSInputPos.get());
             break;
 
         case TEXCALC_PROJECTIVE_TEXTURE:
             // Resolve vertex position.
-            mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+            mVSInputPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
             hasError |= !(mVSInputPos.get());
             break;
     }
 
     if(mIsPointSprite)
     {
-        textureUnitParams->mPSInputTexCoord =
-            psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 0,
-                                          Parameter::SPC_POINTSPRITE_COORDINATE, GCT_FLOAT2);
+        textureUnitParams->mPSInputTexCoord = psMain->resolveInputParameter(Parameter::SPC_POINTSPRITE_COORDINATE);
     }
     else
     {
@@ -227,21 +225,19 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
             textureUnitParams->mVSOutTextureCoordinateType);
     }
 
-    const ShaderParameterList& inputParams = psMain->getInputParameters();
-
-    mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
     if (mPSDiffuse.get() == NULL)
     {
         mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
 
-    mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+    mPSSpecular = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
     if (mPSSpecular.get() == NULL)
     {
         mPSSpecular = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
     }
 
-    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
     hasError |= (!textureUnitParams->mVSOutputTexCoord && !mIsPointSprite) ||
                 !textureUnitParams->mPSInputTexCoord || !mPSDiffuse || !mPSSpecular ||

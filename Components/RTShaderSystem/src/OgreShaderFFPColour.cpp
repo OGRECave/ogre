@@ -64,21 +64,21 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
     bool hasError = false;
 
     if (mResolveStageFlags & SF_VS_INPUT_DIFFUSE)
-        mVSInputDiffuse  = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mVSInputDiffuse  = vsMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
     
     if (mResolveStageFlags & SF_VS_INPUT_SPECULAR)
         mVSInputSpecular = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
     
     // Resolve VS color outputs if have inputs from vertex stream.
     if (mVSInputDiffuse.get() != NULL || mResolveStageFlags & SF_VS_OUTPUT_DIFFUSE)     
-        mVSOutputDiffuse = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);                               
+        mVSOutputDiffuse = vsMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
     if (mVSInputSpecular.get() != NULL || mResolveStageFlags & SF_VS_OUTPUT_SPECULAR)       
         mVSOutputSpecular = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);         
 
     // Resolve PS color inputs if have inputs from vertex shader.
     if (mVSOutputDiffuse.get() != NULL || mResolveStageFlags & SF_PS_INPUT_DIFFUSE)     
-        mPSInputDiffuse = psMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSInputDiffuse = psMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
     if (mVSOutputSpecular.get() != NULL || mResolveStageFlags & SF_PS_INPUT_SPECULAR)       
         mPSInputSpecular = psMain->resolveInputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
@@ -87,7 +87,7 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
     // Resolve PS output diffuse color.
     if (mResolveStageFlags & SF_PS_OUTPUT_DIFFUSE)
     {
-        mPSOutputDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSOutputDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
         hasError |= !(mPSOutputDiffuse.get());
     }
 

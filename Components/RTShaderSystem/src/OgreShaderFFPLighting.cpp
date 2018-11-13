@@ -248,17 +248,17 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	mSurfaceShininess = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SHININESS);
 	
 	// Resolve input vertex shader normal.
-    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
 	
 	if (mTrackVertexColourType != 0)
 	{
-		mVSDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+		mVSDiffuse = vsMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
 		hasError |= !(mVSDiffuse.get());
 	}
 	
 
 	// Resolve output vertex shader diffuse colour.
-	mVSOutDiffuse = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+	mVSOutDiffuse = vsMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 	
 	// Resolve per light parameters.
 	for (unsigned int i=0; i < mLightParamsList.size(); ++i)
@@ -273,7 +273,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 		case Light::LT_POINT:
 			mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
 			
-			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 			
 			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
 			
@@ -285,7 +285,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 		case Light::LT_SPOTLIGHT:
 			mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
 			
-			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 			
 			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
 			
@@ -334,7 +334,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			
 			if (mVSInPosition.get() == NULL)
 			{
-				mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+				mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 				hasError |= !(mVSInPosition.get());
 			}
 

@@ -169,8 +169,6 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 
     groupOrder = (FFP_PS_SAMPLING + FFP_PS_TEXTURING) / 2;
 
-    const ShaderParameterList& inpParams = psMain->getInputParameters();
-    
     ParameterPtr psAtlasTextureCoord = psMain->resolveLocalParameter("atlasCoord", GCT_FLOAT2);
 
     for(ushort j = 0 ; j <  TAS_MAX_TEXTURES; ++j)
@@ -178,7 +176,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
         if (mIsAtlasTextureUnits[j] == true)
         {
             //Find the texture coordinates texel and sampler from the original FFPTexturing
-            ParameterPtr texcoord = psMain->getParameterByContent(inpParams, (Parameter::Content)(Parameter::SPC_TEXTURE_COORDINATE0 + j), GCT_FLOAT2);
+            ParameterPtr texcoord = psMain->getInputParameter((Parameter::Content)(Parameter::SPC_TEXTURE_COORDINATE0 + j), GCT_FLOAT2);
             ParameterPtr texel = psMain->getLocalParameter(c_ParamTexel + StringConverter::toString(j));
             UniformParameterPtr sampler = psProgram->getParameterByType(GCT_SAMPLER2D, j);
                 

@@ -42,16 +42,16 @@ namespace RTShader {
 		Function* psMain = psProgram->getEntryPointFunction();
 
 		// Resolve pixel shader output diffuse color.
-		mPSInDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+		mPSInDiffuse = vsMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
 		// Resolve input vertex shader normal.
-		mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+		mVSInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
 
 		// Resolve output vertex shader normal.
 		mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
 
 		// Resolve pixel shader output diffuse color.
-		mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+		mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
 		// Resolve input pixel shader normal.
 		mPSInNormal = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES,
@@ -60,7 +60,7 @@ namespace RTShader {
 			GCT_FLOAT3);
 
 		// Resolve input vertex shader normal.
-		mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+		mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
 		mVSOutPosition = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 		mPSInPosition = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES,
@@ -80,7 +80,7 @@ namespace RTShader {
 		if (mSamplerFromZ.get() == NULL)
 			return false;
 
-        mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
         if (mPSOutDiffuse.get() == NULL)    
             return false;
     

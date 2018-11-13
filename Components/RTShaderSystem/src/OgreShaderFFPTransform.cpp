@@ -65,10 +65,10 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     UniformParameterPtr wvpMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
         
     // Resolve input position parameter.
-    ParameterPtr positionIn = vsEntry->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4); 
+    ParameterPtr positionIn = vsEntry->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     
     // Resolve output position parameter.
-    ParameterPtr positionOut = vsEntry->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);
+    ParameterPtr positionOut = vsEntry->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
 
     if (!wvpMatrix || !positionIn || !positionOut)
     {
@@ -87,8 +87,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
         return true;
 
     UniformParameterPtr pointParams = vsProgram->resolveParameter(GpuProgramParameters::ACT_POINT_PARAMS);
-    ParameterPtr pointSize = vsEntry->resolveOutputParameter(
-        Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POINTSPRITE_SIZE, GCT_FLOAT1); // abuse of texture semantic
+    ParameterPtr pointSize = vsEntry->resolveOutputParameter(Parameter::SPC_POINTSPRITE_SIZE);
 
     // using eye space depth only instead of the eye real distance
     // its faster to obtain, so lets call it close enough..

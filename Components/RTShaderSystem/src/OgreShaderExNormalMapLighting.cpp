@@ -268,12 +268,12 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     mSurfaceShininess = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SHININESS);
 
     // Resolve input vertex shader normal.
-    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
 
     // Resolve input vertex shader tangent.
     if (mNormalMapSpace == NMS_TANGENT)
     {
-        mVSInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
+        mVSInTangent = vsMain->resolveInputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
         
         // Resolve local vertex shader TNB matrix.
         mVSTBNMatrix = vsMain->resolveLocalParameter("lMatTBN", GCT_MATRIX_3X3);
@@ -308,29 +308,26 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT4);
         hasError |= !(mPSNormal.get());
     }
-    
 
-    const ShaderParameterList& inputParams = psMain->getInputParameters();
-
-    mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
     if (mPSDiffuse.get() == NULL)
     {
         mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
 
-    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
     mPSTempDiffuseColour = psMain->resolveLocalParameter("lNormalMapDiffuse", GCT_FLOAT4);
 
     if (mSpecularEnable)
     {
-        mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        mPSSpecular = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
         if (mPSSpecular.get() == NULL)
         {
             mPSSpecular = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         }
 
         mPSTempSpecularColour = psMain->resolveLocalParameter("lNormalMapSpecular", GCT_FLOAT4);
-        mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+        mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
         if (mNormalMapSpace == NMS_TANGENT)
         {

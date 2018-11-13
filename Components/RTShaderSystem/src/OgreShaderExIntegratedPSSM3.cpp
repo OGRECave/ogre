@@ -156,10 +156,10 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
     
     // Get input position parameter.
-    mVSInPos = vsMain->getParameterBySemantic(vsMain->getInputParameters(), Parameter::SPS_POSITION, 0);
+    mVSInPos = vsMain->getInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     
     // Get output position parameter.
-    mVSOutPos = vsMain->getParameterBySemantic(vsMain->getOutputParameters(), Parameter::SPS_POSITION, 0);
+    mVSOutPos = vsMain->getOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
     
     // Resolve vertex shader output depth.      
     mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
@@ -172,17 +172,17 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
         GCT_FLOAT1);
     
     // Get in/local diffuse parameter.
-    mPSDiffuse = psMain->getParameterBySemantic(psMain->getInputParameters(), Parameter::SPS_COLOR, 0);
+    mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
     if (mPSDiffuse.get() == NULL)   
     {
         mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
     
     // Resolve output diffuse parameter.
-    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
     
     // Get in/local specular parameter.
-    mPSSpecualr = psMain->getParameterBySemantic(psMain->getInputParameters(), Parameter::SPS_COLOR, 1);
+    mPSSpecualr = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
     if (mPSSpecualr.get() == NULL)  
     {
         mPSSpecualr = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);

@@ -50,7 +50,7 @@ namespace Ogre {
 			mPSAlphaRef = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_ALPHA_REJECTION_VALUE);
 			mPSAlphaFunc = psProgram->resolveParameter(GCT_FLOAT1,-1, (uint16)GPV_GLOBAL, "gAlphaFunc");
 			
-			mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+			mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 			
 			return true;
 		}

@@ -129,7 +129,7 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
         return false;
     
     // Resolve vertex shader input position.
-    mVSInPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+    mVSInPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     if (mVSInPos.get() == NULL)
         return false;
 
@@ -139,7 +139,7 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
         return false;
         
     // Resolve pixel shader output diffuse color.
-    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
     if (mPSOutDiffuse.get() == NULL)    
         return false;
     

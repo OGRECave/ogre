@@ -165,12 +165,12 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
         return false;   
 
     // Resolve vertex position.
-    mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+    mVSInputPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     if (mVSInputPos.get() == NULL)
         return false;       
 
     // Resolve vertex normal.
-    mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+    mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
     if (mVSInputNormal.get() == NULL)
         return false;       
 
@@ -191,7 +191,7 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
         return false;
 
     // Resolve ps output diffuse colour.
-    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
     if (mPSOutDiffuse.get() == NULL)
         return false;
 
