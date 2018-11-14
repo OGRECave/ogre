@@ -367,6 +367,9 @@ namespace Ogre
         static inline float saturate(float t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
         static inline double saturate(double t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
 
+        /// saturated cast of size_t to uint16
+        static inline uint16 uint16Cast(size_t t) { return t < UINT16_MAX ? uint16(t) : UINT16_MAX; }
+
         /** Simulate the shader function lerp which performers linear interpolation
 
            given 3 parameters v0, v1 and t the function returns the value of (1 - t)* v0 + t * v1.
