@@ -119,12 +119,12 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
     // Resolve vs input mask texture coordinates.
     // NOTE: We use the first texture coordinate hard coded here
     // You may want to parametrize this as well - just remember to add it to hash and copy methods. 
-    mVSInMaskTexcoord = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 0, Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
+    mVSInMaskTexcoord = vsMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
     if (mVSInMaskTexcoord.get() == 0)
         return false;
 
     // Resolve vs output mask texture coordinates.
-    mVSOutMaskTexcoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, mVSInMaskTexcoord->getContent(), GCT_FLOAT2);
+    mVSOutMaskTexcoord = vsMain->resolveOutputParameter(mVSInMaskTexcoord->getContent(), GCT_FLOAT2);
     if (mVSOutMaskTexcoord.get() == 0)
         return false;
 
@@ -132,9 +132,8 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
     mPSInMaskTexcoord = psMain->resolveInputParameter(mVSOutMaskTexcoord);
 
     // Resolve vs output reflection texture coordinates.
-    mVSOutReflectionTexcoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-        Parameter::SPC_UNKNOWN,
-        mReflectionMapType == TEX_TYPE_2D ? GCT_FLOAT2 : GCT_FLOAT3);
+    mVSOutReflectionTexcoord = vsMain->resolveOutputParameter(
+        Parameter::SPC_UNKNOWN, mReflectionMapType == TEX_TYPE_2D ? GCT_FLOAT2 : GCT_FLOAT3);
     if (mVSOutReflectionTexcoord.get() == 0)
         return false;
 

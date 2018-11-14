@@ -162,9 +162,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     mVSOutPos = vsMain->getOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
     
     // Resolve vertex shader output depth.      
-    mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-        Parameter::SPC_DEPTH_VIEW_SPACE,
-        GCT_FLOAT1);
+    mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPC_DEPTH_VIEW_SPACE);
     
     // Resolve input depth parameter.
     mPSInDepth = psMain->resolveInputParameter(mVSOutDepth);
@@ -200,16 +198,12 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
 
     while(it != mShadowTextureParamsList.end())
     {
-        it->mWorldViewProjMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "world_texture_view_proj");      
+        it->mWorldViewProjMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "world_texture_view_proj"); 
 
-        it->mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1,
-            Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex),
-            GCT_FLOAT4);        
-
+        it->mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex));        
         it->mPSInLightPosition = psMain->resolveInputParameter(it->mVSOutLightPosition);    
-
         it->mTextureSampler = psProgram->resolveParameter(GCT_SAMPLER2D, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");       
-
+        
         it->mInvTextureSize = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "inv_shadow_texture_size");       
 
         if (!(it->mInvTextureSize.get()) || !(it->mTextureSampler.get()) || !(it->mPSInLightPosition.get()) ||

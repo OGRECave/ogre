@@ -37,19 +37,64 @@ static GpuConstantType typeFromContent(Parameter::Content content)
     case Parameter::SPC_COLOR_DIFFUSE:
     case Parameter::SPC_COLOR_SPECULAR:
     case Parameter::SPC_POSITION_PROJECTIVE_SPACE:
-    case Parameter::SPC_POSITION_WORLD_SPACE:
     case Parameter::SPC_POSITION_OBJECT_SPACE:
     case Parameter::SPC_BLEND_INDICES:
     case Parameter::SPC_BLEND_WEIGHTS:
+    case Parameter::SPC_POSITION_LIGHT_SPACE0:
+    case Parameter::SPC_POSITION_LIGHT_SPACE1:
+    case Parameter::SPC_POSITION_LIGHT_SPACE2:
+    case Parameter::SPC_POSITION_LIGHT_SPACE3:
+    case Parameter::SPC_POSITION_LIGHT_SPACE4:
+    case Parameter::SPC_POSITION_LIGHT_SPACE5:
+    case Parameter::SPC_POSITION_LIGHT_SPACE6:
+    case Parameter::SPC_POSITION_LIGHT_SPACE7:
         return GCT_FLOAT4;
     case Parameter::SPC_NORMAL_TANGENT_SPACE:
     case Parameter::SPC_NORMAL_OBJECT_SPACE:
     case Parameter::SPC_NORMAL_WORLD_SPACE:
+    case Parameter::SPC_NORMAL_VIEW_SPACE:
     case Parameter::SPC_TANGENT_OBJECT_SPACE:
+    case Parameter::SPC_POSTOCAMERA_TANGENT_SPACE:
+    case Parameter::SPC_POSTOCAMERA_OBJECT_SPACE:
+    case Parameter::SPC_POSITION_VIEW_SPACE:
+    case Parameter::SPC_POSITION_WORLD_SPACE:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE1:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE2:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE3:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE4:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE5:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE6:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE7:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE0:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE1:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE2:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE3:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE4:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE5:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE6:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE7:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE0:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE1:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE2:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE3:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE4:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE5:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE6:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE7:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE0:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE1:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE2:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE3:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE4:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE5:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE6:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE7:
         return GCT_FLOAT3;
     case Parameter::SPC_POINTSPRITE_COORDINATE:
         return GCT_FLOAT2;
     case Parameter::SPC_POINTSPRITE_SIZE:
+    case Parameter::SPC_DEPTH_VIEW_SPACE:
         return GCT_FLOAT1;
     default:
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "cannot derive type from content");
@@ -57,20 +102,14 @@ static GpuConstantType typeFromContent(Parameter::Content content)
     }
 }
 
-static Parameter::Semantic semanticFromContent(Parameter::Content content)
+static Parameter::Semantic semanticFromContent(Parameter::Content content, bool isVSOut = false)
 {
     switch (content)
     {
     case Parameter::SPC_COLOR_DIFFUSE:
     case Parameter::SPC_COLOR_SPECULAR:
         return Parameter::SPS_COLOR;
-    case Parameter::SPC_NORMAL_WORLD_SPACE:
-    case Parameter::SPC_NORMAL_OBJECT_SPACE:
-    case Parameter::SPC_NORMAL_TANGENT_SPACE:
-        return Parameter::SPS_NORMAL;
     case Parameter::SPC_POSITION_PROJECTIVE_SPACE:
-    case Parameter::SPC_POSITION_WORLD_SPACE:
-    case Parameter::SPC_POSITION_OBJECT_SPACE:
         return Parameter::SPS_POSITION;
     case Parameter::SPC_BLEND_INDICES:
         return Parameter::SPS_BLEND_INDICES;
@@ -79,12 +118,29 @@ static Parameter::Semantic semanticFromContent(Parameter::Content content)
     case Parameter::SPC_TANGENT_OBJECT_SPACE:
         return Parameter::SPS_TANGENT;
     case Parameter::SPC_POINTSPRITE_COORDINATE:
-    case Parameter::SPC_POINTSPRITE_SIZE:  // fall back to TEXCOORD semantic
         return Parameter::SPS_TEXTURE_COORDINATES;
+    case Parameter::SPC_POSITION_OBJECT_SPACE:
+        if(!isVSOut) return Parameter::SPS_POSITION;
+        OGRE_FALLTHROUGH;
+    case Parameter::SPC_NORMAL_OBJECT_SPACE:
+        if(!isVSOut) return Parameter::SPS_NORMAL;
+        OGRE_FALLTHROUGH;
+    // the remaining types are VS output types only (or indeed texcoord)
+    // for out types we use the TEXCOORD[n] semantics for compatibility
+    // with Cg, HLSL SM2.0 where they are the only multivariate semantics
     default:
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "cannot derive semantic from content");
-        break;
+        return Parameter::SPS_TEXTURE_COORDINATES;
     }
+}
+
+/// fixed index for texcoords, next free semantic slot else
+static int indexFromContent(Parameter::Content content)
+{
+    int c = int(content);
+    if(c < Parameter::SPC_TEXTURE_COORDINATE0 || c > Parameter::SPC_TEXTURE_COORDINATE7)
+        return -1;
+
+    return c - Parameter::SPC_TEXTURE_COORDINATE0;
 }
 
 void FunctionStageRef::callFunction(const char* name, const InOut& inout) const
@@ -164,7 +220,10 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
         return param;
 
     if(semantic == Parameter::SPS_UNKNOWN)
+    {
         semantic = semanticFromContent(content);
+        index = indexFromContent(content); // create new parameter for this content
+    }
 
     // Case we have to create new parameter.
     if (index == -1)
@@ -271,7 +330,10 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
         return param;
 
     if(semantic == Parameter::SPS_UNKNOWN)
-        semantic = semanticFromContent(content);
+    {
+        semantic = semanticFromContent(content, true);
+        index = -1; // create new parameter for this content
+    }
 
     // Case we have to create new parameter.
     if (index == -1)

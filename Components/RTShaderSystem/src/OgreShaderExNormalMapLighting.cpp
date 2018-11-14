@@ -282,15 +282,13 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     }
     
     // Resolve input vertex shader texture coordinates.
-    mVSInTexcoord = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSTexCoordSetIndex, 
-        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex),
-        GCT_FLOAT2);
+    mVSInTexcoord = vsMain->resolveInputParameter(
+        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex), GCT_FLOAT2);
 
     // Resolve output vertex shader texture coordinates.
-    mVSOutTexcoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex),
-        GCT_FLOAT2);
-    
+    mVSOutTexcoord = vsMain->resolveOutputParameter(
+        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex), GCT_FLOAT2);
+
     // Resolve pixel input texture coordinates normal.
     mPSInTexcoord = psMain->resolveInputParameter(mVSOutTexcoord);
 
@@ -328,14 +326,12 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 
         if (mNormalMapSpace == NMS_TANGENT)
         {
-            mVSOutView = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-                Parameter::SPC_POSTOCAMERA_TANGENT_SPACE, GCT_FLOAT3);
+            mVSOutView = vsMain->resolveOutputParameter(Parameter::SPC_POSTOCAMERA_TANGENT_SPACE);
             hasError |= !(mVSOutView.get());
         }
         else if (mNormalMapSpace == NMS_OBJECT)
         {
-            mVSOutView = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-                Parameter::SPC_POSTOCAMERA_OBJECT_SPACE, GCT_FLOAT3);
+            mVSOutView = vsMain->resolveOutputParameter(Parameter::SPC_POSTOCAMERA_OBJECT_SPACE);
             hasError |= !(mVSOutView.get());
         }
         
@@ -345,7 +341,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         // Resolve camera position world space.
         mCamPosWorldSpace = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
         mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
-        mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+        mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
         // Resolve world matrix.                
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
 
@@ -388,15 +384,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 
             if (mNormalMapSpace == NMS_TANGENT)
             {
-                mLightParamsList[i].mVSOutDirection = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1,
-                    Parameter::Content(Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE0 + i),
-                    GCT_FLOAT3);
+                mLightParamsList[i].mVSOutDirection = vsMain->resolveOutputParameter(
+                    Parameter::Content(Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE0 + i));
             }
             else if (mNormalMapSpace == NMS_OBJECT)
             {
-                mLightParamsList[i].mVSOutDirection = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1,
-                    Parameter::Content(Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0 + i),
-                    GCT_FLOAT3);
+                mLightParamsList[i].mVSOutDirection = vsMain->resolveOutputParameter(
+                    Parameter::Content(Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0 + i));
             }
 
             mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
@@ -411,15 +405,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 
             if (mNormalMapSpace == NMS_TANGENT)
             {
-                mLightParamsList[i].mVSOutToLightDir = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-                    Parameter::Content(Parameter::SPC_POSTOLIGHT_TANGENT_SPACE0 + i),
-                    GCT_FLOAT3);
+                mLightParamsList[i].mVSOutToLightDir = vsMain->resolveOutputParameter(
+                    Parameter::Content(Parameter::SPC_POSTOLIGHT_TANGENT_SPACE0 + i));
             }
             else if (mNormalMapSpace == NMS_OBJECT)
             {
-                mLightParamsList[i].mVSOutToLightDir = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-                    Parameter::Content(Parameter::SPC_POSTOLIGHT_OBJECT_SPACE0 + i),
-                    GCT_FLOAT3);
+                mLightParamsList[i].mVSOutToLightDir = vsMain->resolveOutputParameter(
+                    Parameter::Content(Parameter::SPC_POSTOLIGHT_OBJECT_SPACE0 + i));
             }
             
             mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
@@ -435,7 +427,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             // Resolve world position.
             if (mVSWorldPosition.get() == NULL)
             {
-                mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+                mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
             }   
 
             // Resolve world matrix.
@@ -462,15 +454,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             
             if (mNormalMapSpace == NMS_TANGENT)
             {
-                mLightParamsList[i].mVSOutToLightDir = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-                    Parameter::Content(Parameter::SPC_POSTOLIGHT_TANGENT_SPACE0 + i),
-                    GCT_FLOAT3);
+                mLightParamsList[i].mVSOutToLightDir = vsMain->resolveOutputParameter(
+                    Parameter::Content(Parameter::SPC_POSTOLIGHT_TANGENT_SPACE0 + i));
             }
             else if (mNormalMapSpace == NMS_OBJECT)
             {
-                mLightParamsList[i].mVSOutToLightDir = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-                    Parameter::Content(Parameter::SPC_POSTOLIGHT_OBJECT_SPACE0 + i),
-                    GCT_FLOAT3);
+                mLightParamsList[i].mVSOutToLightDir = vsMain->resolveOutputParameter(
+                    Parameter::Content(Parameter::SPC_POSTOLIGHT_OBJECT_SPACE0 + i));
             }
             
             mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
@@ -479,15 +469,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 
             if (mNormalMapSpace == NMS_TANGENT)
             {
-                mLightParamsList[i].mVSOutDirection = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1,
-                    Parameter::Content(Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE0 + i),
-                    GCT_FLOAT3);
+                mLightParamsList[i].mVSOutDirection = vsMain->resolveOutputParameter(
+                    Parameter::Content(Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE0 + i));
             }
             else if (mNormalMapSpace == NMS_OBJECT)
             {
-                mLightParamsList[i].mVSOutDirection = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1,
-                    Parameter::Content(Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0 + i),
-                    GCT_FLOAT3);
+                mLightParamsList[i].mVSOutDirection = vsMain->resolveOutputParameter(
+                    Parameter::Content(Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0 + i));
             }
                         
             mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
@@ -505,7 +493,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             // Resolve world position.
             if (mVSWorldPosition.get() == NULL)
             {
-                mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+                mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
             }   
 
             // Resolve world matrix.

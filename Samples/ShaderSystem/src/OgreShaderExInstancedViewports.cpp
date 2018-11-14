@@ -101,7 +101,7 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 
 #define SPC_POSITION_PROJECTIVE_SPACE_AS_TEXCORD ((Parameter::Content)(Parameter::SPC_CUSTOM_CONTENT_BEGIN + 1))
 
-    mVSOutPositionProjectiveSpace = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, SPC_POSITION_PROJECTIVE_SPACE_AS_TEXCORD, GCT_FLOAT4);
+    mVSOutPositionProjectiveSpace = vsMain->resolveOutputParameter(SPC_POSITION_PROJECTIVE_SPACE_AS_TEXCORD, GCT_FLOAT4);
 
     // Resolve ps input position in projective space.
     mPSInPositionProjectiveSpace = psMain->resolveInputParameter(mVSOutPositionProjectiveSpace);
@@ -121,7 +121,7 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
     
 #define SPC_MONITOR_INDEX Parameter::SPC_TEXTURE_COORDINATE3
     // Resolve vertex shader  monitor index
-    mVSInMonitorIndex = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 3, SPC_MONITOR_INDEX, GCT_FLOAT4);
+    mVSInMonitorIndex = vsMain->resolveInputParameter(SPC_MONITOR_INDEX, GCT_FLOAT4);
 
 #define SPC_MATRIX_R0 Parameter::SPC_TEXTURE_COORDINATE4
 #define SPC_MATRIX_R1 Parameter::SPC_TEXTURE_COORDINATE5
@@ -129,18 +129,16 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 #define SPC_MATRIX_R3 Parameter::SPC_TEXTURE_COORDINATE7
 
     // Resolve vertex shader viewport offset matrix
-    mVSInViewportOffsetMatrixR0 = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 4, SPC_MATRIX_R0, GCT_FLOAT4);
-    mVSInViewportOffsetMatrixR1 = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 5, SPC_MATRIX_R1, GCT_FLOAT4);
-    mVSInViewportOffsetMatrixR2 = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 6, SPC_MATRIX_R2, GCT_FLOAT4);
-    mVSInViewportOffsetMatrixR3 = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 7, SPC_MATRIX_R3, GCT_FLOAT4);
+    mVSInViewportOffsetMatrixR0 = vsMain->resolveInputParameter(SPC_MATRIX_R0, GCT_FLOAT4);
+    mVSInViewportOffsetMatrixR1 = vsMain->resolveInputParameter(SPC_MATRIX_R1, GCT_FLOAT4);
+    mVSInViewportOffsetMatrixR2 = vsMain->resolveInputParameter(SPC_MATRIX_R2, GCT_FLOAT4);
+    mVSInViewportOffsetMatrixR3 = vsMain->resolveInputParameter(SPC_MATRIX_R3, GCT_FLOAT4);
 
 
     
-    // Resolve vertex shader output monitor index.  
-    mVSOutMonitorIndex = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-            SPC_MONITOR_INDEX,
-            GCT_FLOAT4);
-    
+    // Resolve vertex shader output monitor index.
+    mVSOutMonitorIndex = vsMain->resolveOutputParameter(SPC_MONITOR_INDEX, GCT_FLOAT4);
+
     // Resolve ps input monitor index.
     mPSInMonitorIndex = psMain->resolveInputParameter(mVSOutMonitorIndex);
 

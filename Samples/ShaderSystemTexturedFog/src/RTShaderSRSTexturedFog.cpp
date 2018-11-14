@@ -149,9 +149,7 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
         return false;
 
     // Resolve vertex shader output depth.      
-    mVSOutPosView = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-        Parameter::SPC_POSITION_VIEW_SPACE,
-        GCT_FLOAT3);
+    mVSOutPosView = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
     if (mVSOutPosView.get() == NULL)
         return false;
     
@@ -161,9 +159,7 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
         return false;       
     
     // Resolve vertex shader output depth.      
-    mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-        Parameter::SPC_DEPTH_VIEW_SPACE,
-        GCT_FLOAT1);
+    mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPC_DEPTH_VIEW_SPACE);
     if (mVSOutDepth.get() == NULL)
         return false;
     

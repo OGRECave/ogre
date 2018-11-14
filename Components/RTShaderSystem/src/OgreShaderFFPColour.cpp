@@ -67,21 +67,21 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
         mVSInputDiffuse  = vsMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
     
     if (mResolveStageFlags & SF_VS_INPUT_SPECULAR)
-        mVSInputSpecular = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        mVSInputSpecular = vsMain->resolveInputParameter(Parameter::SPC_COLOR_SPECULAR);
     
     // Resolve VS color outputs if have inputs from vertex stream.
     if (mVSInputDiffuse.get() != NULL || mResolveStageFlags & SF_VS_OUTPUT_DIFFUSE)     
         mVSOutputDiffuse = vsMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
     if (mVSInputSpecular.get() != NULL || mResolveStageFlags & SF_VS_OUTPUT_SPECULAR)       
-        mVSOutputSpecular = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);         
+        mVSOutputSpecular = vsMain->resolveOutputParameter(Parameter::SPC_COLOR_SPECULAR);         
 
     // Resolve PS color inputs if have inputs from vertex shader.
     if (mVSOutputDiffuse.get() != NULL || mResolveStageFlags & SF_PS_INPUT_DIFFUSE)     
         mPSInputDiffuse = psMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
     if (mVSOutputSpecular.get() != NULL || mResolveStageFlags & SF_PS_INPUT_SPECULAR)       
-        mPSInputSpecular = psMain->resolveInputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        mPSInputSpecular = psMain->resolveInputParameter(Parameter::SPC_COLOR_SPECULAR);
 
 
     // Resolve PS output diffuse color.
@@ -94,7 +94,7 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
     // Resolve PS output specular color.
     if (mResolveStageFlags & SF_PS_OUTPUT_SPECULAR)
     {
-        mPSOutputSpecular = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        mPSOutputSpecular = psMain->resolveOutputParameter(Parameter::SPC_COLOR_SPECULAR);
         hasError |= !(mPSOutputSpecular.get());
     }
     

@@ -102,19 +102,17 @@ public:
     /** Get the description of this function */
     const String& getDescription() const { return mDescription; }
 
-    /** Resolve input parameter of this function
-    @param semantic The desired parameter semantic.
-    @param index The index of the desired parameter.
-    @param content The content of the parameter.
-    @param type The type of the desired parameter.
-    Return parameter instance in case of that resolve operation succeeded.
-    @remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
-    */
+    /// @deprecated
     ParameterPtr resolveInputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
-    ParameterPtr resolveInputParameter(Parameter::Content content)
+    /** Resolve input parameter of this function
+    @param content The content of the parameter.
+    @param type The type of the desired parameter.
+    @return parameter instance in case of that resolve operation succeeded.
+    */
+    ParameterPtr resolveInputParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
     {
-        return resolveInputParameter(Parameter::SPS_UNKNOWN, 0, content, GCT_UNKNOWN);
+        return resolveInputParameter(Parameter::SPS_UNKNOWN, 0, content, type);
     }
 
     /// resolve input parameter from previous output
@@ -133,16 +131,14 @@ public:
         return _getParameterByContent(mInputParameters, content, type);
     }
 
-    /** Resolve output parameter of this function
-    @param semantic The desired parameter semantic. 
-    @param index The index of the desired parameter.
-    @param content The content of the parameter.
-    @param type The type of the desired parameter.
-    Return parameter instance in case of that resolve operation succeeded.
-    @remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
-    */
+    /// @deprecated
     ParameterPtr resolveOutputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
+    /** Resolve output parameter of this function
+    @param content The content of the parameter.
+    @param type The type of the desired parameter.
+    @return parameter instance in case of that resolve operation succeeded.
+    */
     ParameterPtr resolveOutputParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
     {
         return resolveOutputParameter(Parameter::SPS_UNKNOWN, 0, content, type);

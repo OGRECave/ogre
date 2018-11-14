@@ -173,10 +173,10 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
             if (textureUnitParams->mTextureMatrix.get() == NULL)
                 texCoordContent = Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet());
 
-            textureUnitParams->mVSInputTexCoord = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                textureUnitParams->mTextureUnitState->getTextureCoordSet(), 
-                Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet()),
-                textureUnitParams->mVSInTextureCoordinateType); 
+            textureUnitParams->mVSInputTexCoord = vsMain->resolveInputParameter(
+                Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 +
+                                   textureUnitParams->mTextureUnitState->getTextureCoordSet()),
+                textureUnitParams->mVSInTextureCoordinateType);
             hasError |= !(textureUnitParams->mVSInputTexCoord.get());
             break;
 
@@ -213,10 +213,8 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
     else
     {
         // Resolve vs output texture coordinates.
-        textureUnitParams->mVSOutputTexCoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES,
-            -1,
-            texCoordContent,
-            textureUnitParams->mVSOutTextureCoordinateType);
+        textureUnitParams->mVSOutputTexCoord =
+            vsMain->resolveOutputParameter(texCoordContent, textureUnitParams->mVSOutTextureCoordinateType);
 
         // Resolve ps input texture coordinates.
         textureUnitParams->mPSInputTexCoord = psMain->resolveInputParameter(textureUnitParams->mVSOutputTexCoord);

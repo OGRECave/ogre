@@ -48,7 +48,7 @@ namespace RTShader {
 		mVSInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
 
 		// Resolve output vertex shader normal.
-		mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
+		mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
 
 		// Resolve pixel shader output diffuse color.
 		mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);

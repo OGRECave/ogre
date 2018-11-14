@@ -328,7 +328,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 
 			if (mVSOutSpecular.get() == NULL)
 			{
-				mVSOutSpecular = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+				mVSOutSpecular = vsMain->resolveOutputParameter(Parameter::SPC_COLOR_SPECULAR);
 				hasError |= !(mVSOutSpecular.get());
 			}
 			

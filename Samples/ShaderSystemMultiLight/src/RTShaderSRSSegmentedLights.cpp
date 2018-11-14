@@ -288,7 +288,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
             return false;
 
         // Resolve output vertex shader normal.
-        mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);
+        mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_WORLD_SPACE);
         if (mVSOutNormal.get() == NULL)
             return false;
 
@@ -317,7 +317,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
     if (mPSTempDiffuseColour.get() == NULL)
         return false;
 
-    mVSOutWorldPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+    mVSOutWorldPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_WORLD_SPACE);
     if (mVSOutWorldPos.get() == NULL)
         return false;   
 

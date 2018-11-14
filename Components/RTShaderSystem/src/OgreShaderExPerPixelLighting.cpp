@@ -267,7 +267,7 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     mVSInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
 
     // Resolve output vertex shader normal.
-    mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
+    mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
 
     // Resolve input pixel shader normal.
     mPSInNormal = psMain->resolveInputParameter(mVSOutNormal);
@@ -296,7 +296,7 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
-        mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
+        mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
         mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
 
@@ -341,7 +341,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             
             if (mVSOutViewPos.get() == NULL)
             {
-                mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
+                mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
                 mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
             }   
@@ -363,7 +363,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 
             if (mVSOutViewPos.get() == NULL)
             {
-                mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
+                mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
                 mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
             }   

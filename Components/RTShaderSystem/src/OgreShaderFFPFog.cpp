@@ -123,9 +123,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
         mFogParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogParams");
         
         // Resolve vertex shader output depth.      
-        mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-            Parameter::SPC_DEPTH_VIEW_SPACE,
-            GCT_FLOAT1);
+        mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPC_DEPTH_VIEW_SPACE);
         
         // Resolve pixel shader input depth.
         mPSInDepth = psMain->resolveInputParameter(mVSOutDepth);
@@ -138,11 +136,9 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
         // Resolve fog params.      
         mFogParams = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogParams");
         
-        // Resolve vertex shader output fog factor.     
-        mVSOutFogFactor = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-            Parameter::SPC_UNKNOWN,
-            GCT_FLOAT1);
-        
+        // Resolve vertex shader output fog factor.
+        mVSOutFogFactor = vsMain->resolveOutputParameter(Parameter::SPC_UNKNOWN, GCT_FLOAT1);
+
         // Resolve pixel shader input fog factor.
         mPSInFogFactor = psMain->resolveInputParameter(mVSOutFogFactor);
 
