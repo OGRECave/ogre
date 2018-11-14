@@ -129,10 +129,7 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
         return false;
 
     // Resolve ps input mask texture coordinates.
-    mPSInMaskTexcoord = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        mVSOutMaskTexcoord->getIndex(), 
-        mVSOutMaskTexcoord->getContent(),
-        GCT_FLOAT2);
+    mPSInMaskTexcoord = psMain->resolveInputParameter(mVSOutMaskTexcoord);
 
     // Resolve vs output reflection texture coordinates.
     mVSOutReflectionTexcoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
@@ -142,10 +139,7 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
         return false;
 
     // Resolve ps input reflection texture coordinates.
-    mPSInReflectionTexcoord= psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        mVSOutReflectionTexcoord->getIndex(), 
-        mVSOutReflectionTexcoord->getContent(),
-        mVSOutReflectionTexcoord->getType());
+    mPSInReflectionTexcoord= psMain->resolveInputParameter(mVSOutReflectionTexcoord);
 
 
     // Resolve world matrix.    

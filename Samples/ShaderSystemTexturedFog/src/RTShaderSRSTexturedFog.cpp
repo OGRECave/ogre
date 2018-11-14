@@ -156,9 +156,7 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
         return false;
     
     // Resolve pixel shader input depth.
-    mPSInPosView = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutPosView->getIndex(), 
-        mVSOutPosView->getContent(),
-        GCT_FLOAT3);
+    mPSInPosView = psMain->resolveInputParameter(mVSOutPosView);
     if (mPSInPosView.get() == NULL)
         return false;       
     
@@ -170,9 +168,7 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
         return false;
     
     // Resolve pixel shader input depth.
-    mPSInDepth = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutDepth->getIndex(), 
-        mVSOutDepth->getContent(),
-        GCT_FLOAT1);
+    mPSInDepth = psMain->resolveInputParameter(mVSOutDepth);
     if (mPSInDepth.get() == NULL)
         return false;       
 

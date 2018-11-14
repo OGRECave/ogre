@@ -54,19 +54,13 @@ namespace RTShader {
 		mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
 		// Resolve input pixel shader normal.
-		mPSInNormal = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES,
-			mVSOutNormal->getIndex(),
-			mVSOutNormal->getContent(),
-			GCT_FLOAT3);
+		mPSInNormal = psMain->resolveInputParameter(mVSOutNormal);
 
 		// Resolve input vertex shader normal.
 		mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
 		mVSOutPosition = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-		mPSInPosition = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES,
-			mVSOutPosition->getIndex(),
-			mVSOutPosition->getContent(),
-			GCT_FLOAT4);
+		mPSInPosition = psMain->resolveInputParameter(mVSOutPosition);
 
 		mSamplerFromX = psProgram->resolveParameter(GCT_SAMPLER2D, mTextureSamplerIndexFromX, (uint16)GPV_GLOBAL, "tp_sampler_from_x");
 		if (mSamplerFromX.get() == NULL)

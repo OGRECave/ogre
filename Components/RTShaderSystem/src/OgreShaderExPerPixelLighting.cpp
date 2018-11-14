@@ -270,10 +270,7 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
 
     // Resolve input pixel shader normal.
-    mPSInNormal = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        mVSOutNormal->getIndex(), 
-        mVSOutNormal->getContent(),
-        GCT_FLOAT3);
+    mPSInNormal = psMain->resolveInputParameter(mVSOutNormal);
 
     mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
     if (mPSDiffuse.get() == NULL)
@@ -301,10 +298,7 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 
         mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
 
-        mPSInViewPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-            mVSOutViewPos->getIndex(), 
-            mVSOutViewPos->getContent(),
-            GCT_FLOAT3);
+        mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
 
         mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
         
@@ -349,10 +343,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             {
                 mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
 
-                mPSInViewPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                    mVSOutViewPos->getIndex(),
-                    mVSOutViewPos->getContent(),
-                    GCT_FLOAT3);
+                mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
             }   
             
             hasError |= !(mWorldViewMatrix.get()) || !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || 
@@ -374,10 +365,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             {
                 mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
 
-                mPSInViewPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                    mVSOutViewPos->getIndex(), 
-                    mVSOutViewPos->getContent(),
-                    GCT_FLOAT3);
+                mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
             }   
 
             hasError |= !(mWorldViewMatrix.get()) || !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || 

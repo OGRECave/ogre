@@ -104,10 +104,7 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
     mVSOutPositionProjectiveSpace = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, SPC_POSITION_PROJECTIVE_SPACE_AS_TEXCORD, GCT_FLOAT4);
 
     // Resolve ps input position in projective space.
-    mPSInPositionProjectiveSpace = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        mVSOutPositionProjectiveSpace->getIndex(), 
-        mVSOutPositionProjectiveSpace->getContent(),
-        GCT_FLOAT4);
+    mPSInPositionProjectiveSpace = psMain->resolveInputParameter(mVSOutPositionProjectiveSpace);
     // Resolve vertex shader uniform monitors count
     mVSInMonitorsCount = vsProgram->resolveParameter(GCT_FLOAT2, -1, (uint16)GPV_GLOBAL, "monitorsCount");
 
@@ -145,10 +142,7 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
             GCT_FLOAT4);
     
     // Resolve ps input monitor index.
-    mPSInMonitorIndex = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        mVSOutMonitorIndex->getIndex(), 
-        mVSOutMonitorIndex->getContent(),
-        GCT_FLOAT4);
+    mPSInMonitorIndex = psMain->resolveInputParameter(mVSOutMonitorIndex);
 
     if (!mVSInPosition.get() || !mWorldViewMatrix.get() || !mVSOriginalOutPositionProjectiveSpace.get() ||
         !mVSOutPositionProjectiveSpace.get() || !mPSInPositionProjectiveSpace.get() || !mVSInMonitorsCount.get() ||

@@ -167,9 +167,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
         GCT_FLOAT1);
     
     // Resolve input depth parameter.
-    mPSInDepth = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutDepth->getIndex(), 
-        mVSOutDepth->getContent(),
-        GCT_FLOAT1);
+    mPSInDepth = psMain->resolveInputParameter(mVSOutDepth);
     
     // Get in/local diffuse parameter.
     mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
@@ -208,10 +206,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
             Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex),
             GCT_FLOAT4);        
 
-        it->mPSInLightPosition = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-            it->mVSOutLightPosition->getIndex(),
-            it->mVSOutLightPosition->getContent(),
-            GCT_FLOAT4);    
+        it->mPSInLightPosition = psMain->resolveInputParameter(it->mVSOutLightPosition);    
 
         it->mTextureSampler = psProgram->resolveParameter(GCT_SAMPLER2D, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");       
 

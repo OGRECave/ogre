@@ -293,10 +293,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
             return false;
 
         // Resolve input pixel shader normal.
-        mPSInNormal = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-            mVSOutNormal->getIndex(), 
-            mVSOutNormal->getContent(),
-            GCT_FLOAT3);
+        mPSInNormal = psMain->resolveInputParameter(mVSOutNormal);
 
         if (mPSInNormal.get() == NULL)
             return false;
@@ -324,10 +321,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
     if (mVSOutWorldPos.get() == NULL)
         return false;   
 
-    mPSInWorldPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        mVSOutWorldPos->getIndex(), 
-        mVSOutWorldPos->getContent(),
-        GCT_FLOAT3);
+    mPSInWorldPos = psMain->resolveInputParameter(mVSOutWorldPos);
     if (mPSInWorldPos.get() == NULL)
         return false;
 

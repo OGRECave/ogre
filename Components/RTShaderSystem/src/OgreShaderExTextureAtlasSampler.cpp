@@ -108,8 +108,7 @@ bool TextureAtlasSampler::resolveParameters(ProgramSet* programSet)
             mVSTextureTable[i] = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "AtlasData", mAtlasTableDatas[i]->size());
             mVSOutTextureDatas[i] = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES,
                     -1, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-            mPSInpTextureDatas[i] = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                mVSOutTextureDatas[i]->getIndex(), Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+            mPSInpTextureDatas[i] = psMain->resolveInputParameter(mVSOutTextureDatas[i]);
             mPSTextureSizes[i] = psProgram->resolveParameter(GCT_FLOAT2,-1, (uint16)GPV_PER_OBJECT, "AtlasSize");
         }
     }

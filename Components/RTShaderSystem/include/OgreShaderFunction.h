@@ -117,6 +117,12 @@ public:
         return resolveInputParameter(Parameter::SPS_UNKNOWN, 0, content, GCT_UNKNOWN);
     }
 
+    /// resolve input parameter from previous output
+    ParameterPtr resolveInputParameter(const ParameterPtr& out)
+    {
+        return resolveInputParameter(out->getSemantic(), out->getIndex(), out->getContent(), out->getType());
+    }
+
     /**
      * get input parameter by content
      * @param content

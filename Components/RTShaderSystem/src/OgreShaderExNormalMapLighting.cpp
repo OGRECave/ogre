@@ -292,10 +292,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         GCT_FLOAT2);
     
     // Resolve pixel input texture coordinates normal.
-    mPSInTexcoord = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        mVSOutTexcoord->getIndex(), 
-        mVSOutTexcoord->getContent(),
-        mVSOutTexcoord->getType());
+    mPSInTexcoord = psMain->resolveInputParameter(mVSOutTexcoord);
 
     // Resolve pixel shader normal.
     if (mNormalMapSpace == NMS_OBJECT)
@@ -343,10 +340,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         }
         
 
-        mPSInView = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-            mVSOutView->getIndex(), 
-            mVSOutView->getContent(),
-            mVSOutView->getType());
+        mPSInView = psMain->resolveInputParameter(mVSOutView);
 
         // Resolve camera position world space.
         mCamPosWorldSpace = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
@@ -405,10 +399,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
                     GCT_FLOAT3);
             }
 
-            mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                mLightParamsList[i].mVSOutDirection->getIndex(), 
-                mLightParamsList[i].mVSOutDirection->getContent(), 
-                mLightParamsList[i].mVSOutDirection->getType());
+            mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
 
             hasError = !(mLightParamsList[i].mDirection.get()) || !(mLightParamsList[i].mVSOutDirection.get()) || !(mLightParamsList[i].mPSInDirection.get());
             break;
@@ -431,10 +422,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
                     GCT_FLOAT3);
             }
             
-            mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                mLightParamsList[i].mVSOutToLightDir->getIndex(), 
-                mLightParamsList[i].mVSOutToLightDir->getContent(), 
-                mLightParamsList[i].mVSOutToLightDir->getType());
+            mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
 
             mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
 
@@ -485,10 +473,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
                     GCT_FLOAT3);
             }
             
-            mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                mLightParamsList[i].mVSOutToLightDir->getIndex(), 
-                mLightParamsList[i].mVSOutToLightDir->getContent(), 
-                mLightParamsList[i].mVSOutToLightDir->getType());
+            mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
 
             mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_direction_obj_space");
 
@@ -505,10 +490,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
                     GCT_FLOAT3);
             }
                         
-            mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                mLightParamsList[i].mVSOutDirection->getIndex(), 
-                mLightParamsList[i].mVSOutDirection->getContent(), 
-                mLightParamsList[i].mVSOutDirection->getType());
+            mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
 
             mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
 

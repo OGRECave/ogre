@@ -219,10 +219,7 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
             textureUnitParams->mVSOutTextureCoordinateType);
 
         // Resolve ps input texture coordinates.
-        textureUnitParams->mPSInputTexCoord = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES,
-            textureUnitParams->mVSOutputTexCoord->getIndex(),
-            textureUnitParams->mVSOutputTexCoord->getContent(),
-            textureUnitParams->mVSOutTextureCoordinateType);
+        textureUnitParams->mPSInputTexCoord = psMain->resolveInputParameter(textureUnitParams->mVSOutputTexCoord);
     }
 
     mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);

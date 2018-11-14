@@ -128,9 +128,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
             GCT_FLOAT1);
         
         // Resolve pixel shader input depth.
-        mPSInDepth = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutDepth->getIndex(), 
-            mVSOutDepth->getContent(),
-            GCT_FLOAT1);
+        mPSInDepth = psMain->resolveInputParameter(mVSOutDepth);
         
         hasError |= !(mPSInDepth.get()) || !(mVSOutDepth.get()) || !(mFogParams.get());
     }
@@ -146,9 +144,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
             GCT_FLOAT1);
         
         // Resolve pixel shader input fog factor.
-        mPSInFogFactor = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutFogFactor->getIndex(), 
-            mVSOutFogFactor->getContent(),
-            GCT_FLOAT1);
+        mPSInFogFactor = psMain->resolveInputParameter(mVSOutFogFactor);
 
         hasError |= !(mPSInFogFactor.get()) || !(mVSOutFogFactor.get()) || !(mFogParams.get());
     }
