@@ -83,6 +83,7 @@ private:
 */
 class _OgreRTSSExport Function : public RTShaderSystemAlloc
 {
+    friend ProgramManager;
 // Interface.
 public:
     enum FunctionType
@@ -123,7 +124,7 @@ public:
      */
     ParameterPtr getInputParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
     {
-        return getParameterByContent(mInputParameters, content, type);
+        return _getParameterByContent(mInputParameters, content, type);
     }
 
     /** Resolve output parameter of this function
@@ -148,7 +149,7 @@ public:
      */
     ParameterPtr getOutputParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
     {
-        return getParameterByContent(mOutputParameters, content, type);
+        return _getParameterByContent(mOutputParameters, content, type);
     }
 
     /// @deprecated local parameters do not have index or sematic. use resolveLocalParameter(const String&, GpuConstantType)
@@ -184,22 +185,29 @@ public:
      */
     ParameterPtr getLocalParameter(Parameter::Content content)
     {
-        return getParameterByContent(mLocalParameters, content, GCT_UNKNOWN);
+        return _getParameterByContent(mLocalParameters, content, GCT_UNKNOWN);
     }
     /// @overload
     ParameterPtr getLocalParameter(const String& name)
     {
-        return getParameterByName(mLocalParameters, name);
+        return _getParameterByName(mLocalParameters, name);
     }
 
-    /** 
-    Get parameter by a given content and type from the given parameter list.
-    @param parameterList The parameters list to look in.
-    @param content The content of the parameter to search in the list.
-    @param type The type of the parameter to search in the list.
-    @remarks Return NULL if no matching parameter found.
-    */
-    ParameterPtr getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
+    /// @deprecated do not use
+    OGRE_DEPRECATED static ParameterPtr getParameterByName(const ShaderParameterList& parameterList, const String& name)
+    {
+        return _getParameterByName(parameterList, name);
+    }
+    /// @deprecated do not use
+    OGRE_DEPRECATED static ParameterPtr getParameterBySemantic(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index)
+    {
+        return _getParameterBySemantic(parameterList, semantic, index);
+    }
+    /// @deprecated use getInputParameter / getOutputParameter / getLocalParameter instead
+    OGRE_DEPRECATED static ParameterPtr getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
+    {
+        return _getParameterByContent(parameterList, content, type);
+    }
 
     /** Return a list of input parameters. */
     const ShaderParameterList& getInputParameters() const { return mInputParameters; }  
@@ -255,6 +263,11 @@ public:
 
 
 protected:
+
+    static ParameterPtr _getParameterByName(const ShaderParameterList& parameterList, const String& name);
+    static ParameterPtr _getParameterBySemantic(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
+    static ParameterPtr _getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
+
 
     /** Class constructor.
     @param name The name of this function.

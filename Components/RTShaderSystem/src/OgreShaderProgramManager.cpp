@@ -574,7 +574,7 @@ void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
             for (it=outParams.begin(); it != outParams.end(); ++it)
             {
                 ParameterPtr curOutParemter = *it;
-                ParameterPtr paramToAdd = Function::getParameterBySemantic(
+                ParameterPtr paramToAdd = Function::_getParameterBySemantic(
                     pixelOriginalInParams, 
                     curOutParemter->getSemantic(), 
                     curOutParemter->getIndex());

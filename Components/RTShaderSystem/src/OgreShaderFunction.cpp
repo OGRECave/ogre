@@ -159,7 +159,7 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
     ParameterPtr param;
 
     // Check if desired parameter already defined.
-    param = getParameterByContent(mInputParameters, content, type);
+    param = _getParameterByContent(mInputParameters, content, type);
     if (param.get() != NULL)
         return param;
 
@@ -185,7 +185,7 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
     else
     {
         // Check if desired parameter already defined.
-        param = getParameterBySemantic(mInputParameters, semantic, index);
+        param = _getParameterBySemantic(mInputParameters, semantic, index);
         if (param.get() != NULL && param->getContent() == content)
         {
             if (param->getType() == type)
@@ -266,7 +266,7 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
     ParameterPtr param;
 
     // Check if desired parameter already defined.
-    param = getParameterByContent(mOutputParameters, content, type);
+    param = _getParameterByContent(mOutputParameters, content, type);
     if (param.get() != NULL)
         return param;
 
@@ -292,7 +292,7 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
     else
     {
         // Check if desired parameter already defined.
-        param = getParameterBySemantic(mOutputParameters, semantic, index);
+        param = _getParameterBySemantic(mOutputParameters, semantic, index);
         if (param.get() != NULL && param->getContent() == content)
         {
             if (param->getType() == type)
@@ -364,7 +364,7 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
 {
     ParameterPtr param;
 
-    param = getParameterByName(mLocalParameters, name);
+    param = _getParameterByName(mLocalParameters, name);
     if (param.get() != NULL)
     {
         if (param->getType() == type &&
@@ -396,7 +396,7 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
 
     if(type == GCT_UNKNOWN) type = typeFromContent(content);
 
-    param = getParameterByContent(mLocalParameters, content, type);
+    param = _getParameterByContent(mLocalParameters, content, type);
     if (param.get() != NULL)    
         return param;
 
@@ -411,7 +411,7 @@ void Function::addInputParameter(ParameterPtr parameter)
 {
 
     // Check that parameter with the same semantic and index in input parameters list.
-    if (getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
+    if (_getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
             "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",             
@@ -425,7 +425,7 @@ void Function::addInputParameter(ParameterPtr parameter)
 void Function::addOutputParameter(ParameterPtr parameter)
 {
     // Check that parameter with the same semantic and index in output parameters list.
-    if (getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
+    if (_getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
             "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",             
@@ -463,7 +463,7 @@ void Function::addParameter(ShaderParameterList& parameterList, ParameterPtr par
                                         
 {
     // Check that parameter with the same name doest exist in input parameters list.
-    if (getParameterByName(mInputParameters, parameter->getName()).get() != NULL)
+    if (_getParameterByName(mInputParameters, parameter->getName()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
             "Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">",            
@@ -471,7 +471,7 @@ void Function::addParameter(ShaderParameterList& parameterList, ParameterPtr par
     }
 
     // Check that parameter with the same name doest exist in output parameters list.
-    if (getParameterByName(mOutputParameters, parameter->getName()).get() != NULL)
+    if (_getParameterByName(mOutputParameters, parameter->getName()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
             "Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">",            
@@ -500,7 +500,7 @@ void Function::deleteParameter(ShaderParameterList& parameterList, ParameterPtr 
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::getParameterByName( const ShaderParameterList& parameterList, const String& name )
+ParameterPtr Function::_getParameterByName( const ShaderParameterList& parameterList, const String& name )
 {
     ShaderParameterConstIterator it;
 
@@ -516,7 +516,7 @@ ParameterPtr Function::getParameterByName( const ShaderParameterList& parameterL
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::getParameterBySemantic(const ShaderParameterList& parameterList, 
+ParameterPtr Function::_getParameterBySemantic(const ShaderParameterList& parameterList,
                                                 const Parameter::Semantic semantic, 
                                                 int index)
 {
@@ -535,7 +535,7 @@ ParameterPtr Function::getParameterBySemantic(const ShaderParameterList& paramet
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
+ParameterPtr Function::_getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
 {
     ShaderParameterConstIterator it;
 
