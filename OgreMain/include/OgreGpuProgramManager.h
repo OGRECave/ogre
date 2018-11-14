@@ -231,7 +231,7 @@ namespace Ogre {
         /** Creates a microcode to be later added to the cache.
         @param size The size of the microcode in bytes
         */
-        Microcode createMicrocode( uint32 size ) const;
+        Microcode createMicrocode( size_t size ) const;
 
         /** Adds a microcode for a program to the microcode cache.
         @param id The id of the program

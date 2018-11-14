@@ -1582,7 +1582,7 @@ namespace Ogre {
         //  GL measures from the bottom, not the top
         size_t targetHeight = mActiveRenderTarget->getHeight();
         // Calculate the "lower-left" corner of the viewport
-        uint64 x = 0, y = 0, w = 0, h = 0;
+        int x = 0, y = 0, w = 0, h = 0;
 
         if (enabled)
         {

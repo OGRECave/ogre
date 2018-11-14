@@ -109,7 +109,7 @@ namespace Ogre {
             GL_STENCIL_INDEX8,
             GL_STENCIL_INDEX16
         };
-    static const size_t stencilBits[] =
+    static const uchar stencilBits[] =
         {
             0, 1, 4, 8, 16
         };
@@ -125,7 +125,7 @@ namespace Ogre {
             GL_DEPTH24_STENCIL8,    // Packed depth / stencil
             GL_DEPTH32F_STENCIL8
         };
-    static const size_t depthBits[] =
+    static const uchar depthBits[] =
         {
             0,16,24,32,32,24,32
         };
@@ -335,7 +335,7 @@ namespace Ogre {
                     << " depth/stencil support: ";
 
                 // For each depth/stencil formats
-                for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
+                for (uchar depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
                     if ((depthFormats[depth] != GL_DEPTH24_STENCIL8) && (depthFormats[depth] != GL_DEPTH32F_STENCIL8))
                     {
@@ -351,7 +351,7 @@ namespace Ogre {
                             }
                         }
 
-                        for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
+                        for (uchar stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
                         {
                             //                            StringStream l;
                             //                            l << "Trying " << PixelUtil::getFormatName((PixelFormat)x)

@@ -1635,7 +1635,7 @@ ShaderGenerator::SGTechnique::~SGTechnique()
         MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
     
         // Remove the destination technique from parent material.
-        for (unsigned int i=0; i < mat->getNumTechniques(); ++i)
+        for (ushort i=0; i < mat->getNumTechniques(); ++i)
         {
             if (mDstTechnique == mat->getTechnique(i))
             {

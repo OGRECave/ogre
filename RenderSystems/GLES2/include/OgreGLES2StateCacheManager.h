@@ -112,7 +112,7 @@ namespace Ogre
          @param unit The texture unit to activate.
          @return Whether or not the texture unit was successfully activated.
          */
-        bool activateGLTextureUnit(unsigned char unit);
+        bool activateGLTextureUnit(size_t unit);
 
         /// Set the blend equation for RGB and alpha separately.
         void setBlendEquation(GLenum eqRGB, GLenum eqA);
