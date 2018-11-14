@@ -203,6 +203,10 @@ namespace Ogre {
                               const MovableObject *pMovableObject );
 
         /** Add a renderable (Ogre v2.0, i.e. Items; they use VAOs) object to the queue.
+        @remarks
+            If sorting mode is set to DisableSort (RenderQueue::setSortRenderQueue) for the given
+            renderQueueId, then the order in which renderables are added determines the render order
+            (the first added get rendered first) within that renderQueueId.
         @param threadIdx
             The unique index of the thread from which this function is called from.
             Valid range is [0; SceneManager::mNumWorkerThreads)
