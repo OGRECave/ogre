@@ -58,11 +58,11 @@ protected:
 
     void tuneContainerSize(LodData* data);
     void initialize(LodData* data);
-    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, size_t submeshID, RenderOperation::OperationType renderOp);
+    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, ushort submeshID, RenderOperation::OperationType renderOp);
     void addVertexData(LodData* data, VertexData* vertexData, bool useSharedVertexLookup);
     template<typename IndexType>
     void addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd,
-                          VertexLookupList& lookup, size_t submeshID, RenderOperation::OperationType renderOp)
+                          VertexLookupList& lookup, ushort submeshID, RenderOperation::OperationType renderOp)
     {
         if(iEnd - iPos < 3 
         || (renderOp != RenderOperation::OT_TRIANGLE_LIST

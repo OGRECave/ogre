@@ -194,7 +194,7 @@ namespace Ogre
             vNormalBuf->unlock();
         }
     }
-    void LodInputProviderMesh::addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, size_t submeshID, RenderOperation::OperationType renderOp)
+    void LodInputProviderMesh::addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, ushort submeshID, RenderOperation::OperationType renderOp)
     {
         const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
         size_t isize = ibuf->getIndexSize();
