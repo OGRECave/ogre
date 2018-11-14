@@ -57,7 +57,7 @@ namespace Ogre
     , mCurrentPos(0)
     , mAvailIn(avail_in)
     , mTmp(0)
-    , mIsCompressedValid(true)
+    , mStreamType(ZLib)
     {
         init();
     }
@@ -70,7 +70,20 @@ namespace Ogre
     , mCurrentPos(0)
     , mAvailIn(avail_in)
     , mTmp(0)
-    , mIsCompressedValid(true)
+    , mStreamType(ZLib)
+    {
+        init();
+    }
+    //---------------------------------------------------------------------
+    DeflateStream::DeflateStream(const String& name, const DataStreamPtr& compressedStream, StreamType streamType, const String& tmpFileName, size_t avail_in)
+    : DataStream(name, compressedStream->getAccessMode())
+    , mCompressedStream(compressedStream)
+    , mTempFileName(tmpFileName)
+    , mZStream(0)
+    , mCurrentPos(0)
+    , mAvailIn(avail_in)
+    , mTmp(0)
+    , mStreamType(streamType)
     {
         init();
     }
@@ -104,14 +117,13 @@ namespace Ogre
             mZStream->next_in = mTmp;
             mZStream->avail_in = static_cast<uint>(mCompressedStream->read(mTmp, getAvailInForSinglePass()));
             
-            if (inflateInit(mZStream) != Z_OK)
+            int windowBits = (mStreamType == Deflate) ? -MAX_WBITS : (mStreamType == GZip) ? 16 + MAX_WBITS : MAX_WBITS;
+            if (inflateInit2(mZStream, windowBits) != Z_OK)
             {
-                mIsCompressedValid = false;
+                mStreamType = Invalid;
             }
-            else
-                mIsCompressedValid = true;
             
-            if (mIsCompressedValid)
+            if (mStreamType != Invalid)
             {
                 // in fact, inflateInit on some implementations doesn't try to read
                 // anything. We need to at least read something to test
@@ -120,7 +132,7 @@ namespace Ogre
                 mZStream->avail_out = 4;
                 mZStream->next_out = testOut;
                 if (inflate(mZStream, Z_SYNC_FLUSH) != Z_OK)
-                    mIsCompressedValid = false;
+                    mStreamType = Invalid;
                 // restore for reading
                 mZStream->avail_in = static_cast<uint>(savedIn);
                 mZStream->next_in = mTmp;
@@ -128,7 +140,7 @@ namespace Ogre
                 inflateReset(mZStream);
             }
 
-            if (!mIsCompressedValid)
+            if (mStreamType == Invalid)
             {
                 // Not compressed data!
                 // Fail gracefully, fall back on reading the underlying stream direct
@@ -191,7 +203,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     size_t DeflateStream::read(void* buf, size_t count)
     {
-        if (!mIsCompressedValid)
+        if (mStreamType == Invalid)
         {
             return mCompressedStream->read(buf, count);
         }
@@ -284,7 +296,8 @@ namespace Ogre
         char in[OGRE_DEFLATE_TMP_SIZE];
         char out[OGRE_DEFLATE_TMP_SIZE];
         
-        if (deflateInit(mZStream, Z_DEFAULT_COMPRESSION) != Z_OK)
+        int windowBits = (mStreamType == Deflate) ? -MAX_WBITS : (mStreamType == GZip) ? 16 + MAX_WBITS : MAX_WBITS;
+        if (deflateInit2(mZStream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, windowBits, 8, Z_DEFAULT_STRATEGY) != Z_OK)
         {
             destroy();
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
@@ -335,7 +348,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void DeflateStream::skip(long count)
     {
-        if (!mIsCompressedValid)
+        if (mStreamType == Invalid)
         {
             mCompressedStream->skip(count);
             return;
@@ -373,7 +386,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void DeflateStream::seek( size_t pos )
     {
-        if (!mIsCompressedValid)
+        if (mStreamType == Invalid)
         {
             mCompressedStream->seek(pos);
             return;
@@ -401,7 +414,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     size_t DeflateStream::tell(void) const
     {
-        if (!mIsCompressedValid)
+        if (mStreamType == Invalid)
         {
             return mCompressedStream->tell();
         }
@@ -422,7 +435,7 @@ namespace Ogre
             return mTmpWriteStream->eof();
         else 
         {
-            if (!mIsCompressedValid)
+            if (mStreamType == Invalid)
                 return mCompressedStream->eof();
             else
                 return mCompressedStream->eof() && mZStream->avail_in == 0;

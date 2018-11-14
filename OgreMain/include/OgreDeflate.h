@@ -56,6 +56,17 @@ namespace Ogre
     */
     class _OgreExport DeflateStream : public DataStream
     {
+    public:
+        /** Requested stream type. All are essentially the same deflate stream with varying wrapping.
+            ZLib is used by default.
+        */
+        enum StreamType
+        {
+            Invalid = -1, /// Unexpected stream type or uncompressed data
+            Deflate = 0,  /// no header, no checksum, rfc1951
+            ZLib = 1,     /// 2 byte header, 4 byte footer with adler32 checksum, rfc1950
+            GZip = 2,     /// 10 byte header, 8 byte footer with crc32 checksum and unpacked size, rfc1952
+        };
     protected:
         DataStreamPtr mCompressedStream;
         DataStreamPtr mTmpWriteStream;
@@ -71,7 +82,7 @@ namespace Ogre
         unsigned char *mTmp;
         
         /// Whether the underlying stream is valid compressed data
-        bool mIsCompressedValid;
+        StreamType mStreamType;
         
         void init();
         void destroy();
@@ -98,6 +109,17 @@ namespace Ogre
          */
         DeflateStream(const String& name, const DataStreamPtr& compressedStream, const String& tmpFileName="",
             size_t avail_in = 0);
+        /** Constructor for creating named stream wrapping another stream.
+         @param name The name to give this stream
+         @param compressedStream The stream that this stream will use when reading / 
+            writing compressed data. The access mode from this stream will be matched.
+         @param streamType The type of compressed stream
+         @param tmpFileName Path/Filename to be used for temporary storage of incoming data
+         @param avail_in Available data length to be uncompressed. With it we can uncompress
+            DataStream partly.
+         */
+        DeflateStream(const String& name, const DataStreamPtr& compressedStream, StreamType streamType, const String& tmpFileName="",
+            size_t avail_in = 0);
         
         ~DeflateStream();
         
@@ -107,7 +129,7 @@ namespace Ogre
             deflate algorithm, this method returns false and all read commands
             will actually be executed as passthroughs as a fallback. 
         */
-        bool isCompressedStreamValid() const { return mIsCompressedValid; }
+        bool isCompressedStreamValid() const { return mStreamType != Invalid; }
         
         /** @copydoc DataStream::read
          */
