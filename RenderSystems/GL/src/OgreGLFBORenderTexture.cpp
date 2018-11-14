@@ -107,7 +107,7 @@ static const GLenum stencilFormats[] =
     GL_STENCIL_INDEX8_EXT,
     GL_STENCIL_INDEX16_EXT
 };
-static const size_t stencilBits[] =
+static const uchar stencilBits[] =
 {
     0, 1, 4, 8, 16
 };
@@ -121,7 +121,7 @@ static const GLenum depthFormats[] =
     GL_DEPTH_COMPONENT32,
     GL_DEPTH24_STENCIL8_EXT // packed depth / stencil
 };
-static const size_t depthBits[] =
+static const uchar depthBits[] =
 {
     0,16,24,32,24
 };
@@ -334,13 +334,13 @@ static const size_t depthBits[] =
                     << " depth/stencil support: ";
 
                 // For each depth/stencil formats
-                for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
+                for (uchar depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
                     if (depthFormats[depth] != GL_DEPTH24_STENCIL8_EXT)
                     {
                         // General depth/stencil combination
 
-                        for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
+                        for (uchar stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
                         {
                             //StringStream l;
                             //l << "Trying " << PixelUtil::getFormatName((PixelFormat)x) 

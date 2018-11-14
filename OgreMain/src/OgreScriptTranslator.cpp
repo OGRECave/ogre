@@ -2021,7 +2021,7 @@ namespace Ogre{
                     break;
                 case ID_MAX_LIGHTS:
                     if(getValue(prop, compiler, uival))
-                        mPass->setMaxSimultaneousLights(uival);
+                        mPass->setMaxSimultaneousLights(Math::uint16Cast(uival));
                     break;
                 case ID_START_LIGHT:
                     if(getValue(prop, compiler, uival))
@@ -5068,7 +5068,7 @@ namespace Ogre{
                                         return;
                                     }
 
-                                    depthBufferId = StringConverter::parseInt(atom->value);
+                                    depthBufferId = Math::uint16Cast(StringConverter::parseInt(atom->value));
                                 }
                                 break;
                             default:

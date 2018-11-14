@@ -293,7 +293,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindTexture(target, texture));
     }
     
-    bool GLES2StateCacheManager::activateGLTextureUnit(uchar unit)
+    bool GLES2StateCacheManager::activateGLTextureUnit(size_t unit)
     {
 #ifdef OGRE_ENABLE_STATE_CACHE
         if (mActiveTextureUnit == unit)

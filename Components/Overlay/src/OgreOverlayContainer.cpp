@@ -82,7 +82,7 @@ namespace Ogre {
         mChildren.insert(ChildMap::value_type(name, elem));
         // tell child about parent & Z-order
         elem->_notifyParent(this, mOverlay);
-        elem->_notifyZOrder(mZOrder + 1);
+        elem->_notifyZOrder(Math::uint16Cast(mZOrder + 1));
         elem->_notifyWorldTransforms(mXForm);
         elem->_notifyViewport();
 

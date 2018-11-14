@@ -254,7 +254,7 @@ namespace Ogre {
         return mMicrocodeCache.find(id)->second;
     }
     //---------------------------------------------------------------------
-    GpuProgramManager::Microcode GpuProgramManager::createMicrocode( const uint32 size ) const
+    GpuProgramManager::Microcode GpuProgramManager::createMicrocode( size_t size ) const
     {   
         return Microcode(OGRE_NEW MemoryDataStream(size));  
     }

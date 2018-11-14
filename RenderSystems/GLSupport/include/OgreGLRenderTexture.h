@@ -120,8 +120,8 @@ namespace Ogre {
              */
             struct Mode
             {
-                size_t depth;     // Depth format (0=no depth)
-                size_t stencil;   // Stencil format (0=no stencil)
+                uchar depth;     // Depth format (0=no depth)
+                uchar stencil;   // Stencil format (0=no stencil)
             };
 
             std::vector<Mode> modes;
