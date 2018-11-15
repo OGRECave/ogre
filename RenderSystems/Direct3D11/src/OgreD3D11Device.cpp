@@ -98,7 +98,7 @@ namespace Ogre
 
 #if OGRE_D3D11_PROFILING
             hr = mImmediateContext->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), (LPVOID*)&mPerf);
-            if(!mPerf->GetStatus())
+            if( !SUCCEEDED(hr) || !mPerf->GetStatus() )
                 SAFE_RELEASE(mPerf);
 #endif
 
