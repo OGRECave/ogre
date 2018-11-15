@@ -458,12 +458,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MemoryDataStream::close(void)    
     {
+        mAccess = 0;
         if (mFreeOnClose && mData)
         {
             OGRE_FREE(mData, MEMCATEGORY_GENERAL);
             mData = 0;
         }
-
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
@@ -667,6 +667,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void FileStreamDataStream::close(void)
     {
+        mAccess = 0;
         if (mInStream)
         {
             // Unfortunately, there is no file-specific shared class hierarchy between fstream and ifstream (!!)
@@ -683,10 +684,11 @@ namespace Ogre {
                 // delete the stream too
                 OGRE_DELETE_T(mFStreamRO, basic_ifstream, MEMCATEGORY_GENERAL);
                 OGRE_DELETE_T(mFStream, basic_fstream, MEMCATEGORY_GENERAL);
-                mInStream = 0;
-                mFStreamRO = 0; 
-                mFStream = 0; 
             }
+
+            mInStream = 0;
+            mFStreamRO = 0; 
+            mFStream = 0; 
         }
     }
     //-----------------------------------------------------------------------
@@ -750,6 +752,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void FileHandleDataStream::close(void)
     {
+        mAccess = 0;
         if (mFileHandle != 0)
         {
             fclose(mFileHandle);

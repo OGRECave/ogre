@@ -502,6 +502,7 @@ namespace {
     //-----------------------------------------------------------------------
     void ZipDataStream::close(void)
     {
+        mAccess = 0;
         if (mZzipFile != 0)
         {
             zzip_file_close(mZzipFile);
