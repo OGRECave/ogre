@@ -47,6 +47,8 @@ namespace Ogre {
     ResourcePtr ResourceManager::createResource(const String& name, const String& group,
         bool isManual, ManualResourceLoader* loader, const NameValuePairList* params)
     {
+        OgreAssert(!name.empty(), "resource name must not be empty");
+
         // Call creation implementation
         ResourcePtr ret = ResourcePtr(
             createImpl(name, getNextHandle(), group, isManual, loader, params));
