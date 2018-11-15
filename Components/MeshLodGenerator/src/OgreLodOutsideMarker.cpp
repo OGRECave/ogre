@@ -585,13 +585,4 @@ void LodOutsideMarker::markVertices()
     }
 }
 
-void LodOutsideMarker::CHTriangle::computeNormal()
-{
-    Vector3 e1 = vertex[1]->position - vertex[0]->position;
-    Vector3 e2 = vertex[2]->position - vertex[1]->position;
-
-    normal = e1.crossProduct(e2);
-    normal.normalise();
-}
-
 }

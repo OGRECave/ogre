@@ -117,7 +117,11 @@ struct _OgreLodExport LodData {
         unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
         unsigned int vertexID[3]; /// Vertex ID in the buffer associated with the submeshID.
 
-        void computeNormal();
+        void computeNormal()
+        {
+            normal = Math::calculateBasicFaceNormal(vertex[0]->position, vertex[1]->position,
+                                                    vertex[2]->position);
+        }
         bool hasVertex(const Vertex* v) const;
         unsigned int getVertexID(const Vertex* v) const;
         bool isMalformed();
