@@ -287,6 +287,7 @@ namespace Ogre
     {
         // Close temp stream
         mTmpWriteStream->close();
+        mTmpWriteStream.setNull();
         
         // Copy & compress
         // We do this rather than compress directly because some code seeks
@@ -446,10 +447,10 @@ namespace Ogre
     void DeflateStream::close(void)
     {
         if (getAccessMode() & WRITE)
-        {
             compressFinal();
-        }
-        
+
+        mAccess = 0;
+
         // don't close underlying compressed stream in case used for something else
     }
     //---------------------------------------------------------------------
