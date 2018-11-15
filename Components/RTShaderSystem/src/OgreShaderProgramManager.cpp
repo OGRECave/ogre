@@ -338,10 +338,11 @@ void ProgramManager::bindUniformParameters(Program* pCpuProgram, const GpuProgra
 
     // Bind each uniform parameter to its GPU parameter.
     for (const auto& param : pCpuProgram->getParameters())
-    {        
-        if(samplersBound && param->isSampler()) continue;
+    {
+        if((samplersBound && param->isSampler()) || !param->isUsed()) continue;
 
-        param->bind(passParams);                  
+        param->bind(passParams);
+        param->setUsed(false); // reset for shader regen
     }
 }
 

@@ -362,6 +362,10 @@ public:
     /** Sets the number of elements in the parameter (for arrays). */
     void setSize(size_t size) { mSize = size; }
 
+    /// track whether this was used
+    void setUsed(bool used) { mUsed = used; }
+    bool isUsed() { return mUsed; }
+
 // Attributes.
 protected:
     // Name of this parameter.
@@ -381,6 +385,7 @@ protected:
     // Number of elements in the parameter (for arrays)
     size_t mSize;
     
+    bool mUsed;
 };
 
 typedef ShaderParameterList::iterator           ShaderParameterIterator;

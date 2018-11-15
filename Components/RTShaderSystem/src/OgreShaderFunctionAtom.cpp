@@ -33,6 +33,7 @@ namespace RTShader {
 Operand::Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, ushort indirectionLevel) : mParameter(parameter), mSemantic(opSemantic), mMask(opMask), mIndirectionLevel(indirectionLevel)
 {
     OgreAssert(mParameter, "NULL parameter is not a valid operand");
+    parameter->setUsed(true);
 }
 //-----------------------------------------------------------------------------
 Operand::Operand(const Operand& other) 
