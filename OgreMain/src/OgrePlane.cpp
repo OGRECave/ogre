@@ -114,10 +114,7 @@ namespace Ogre {
     void Plane::redefine(const Vector3& rkPoint0, const Vector3& rkPoint1,
         const Vector3& rkPoint2)
     {
-        Vector3 kEdge1 = rkPoint1 - rkPoint0;
-        Vector3 kEdge2 = rkPoint2 - rkPoint0;
-        normal = kEdge1.crossProduct(kEdge2);
-        normal.normalise();
+        normal = Math::calculateBasicFaceNormal(rkPoint0, rkPoint1, rkPoint2);
         d = -normal.dotProduct(rkPoint0);
     }
     //-----------------------------------------------------------------------

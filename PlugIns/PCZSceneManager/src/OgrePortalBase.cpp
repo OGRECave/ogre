@@ -167,7 +167,6 @@ void PortalBase::setCorners(const Vector3* corners)
 void PortalBase::calcDirectionAndRadius(void) const
 {
     Vector3 radiusVector;
-    Vector3 side1, side2;
 
     // for AAB building.
     Vector3 min(Math::POS_INFINITY, Math::POS_INFINITY, Math::POS_INFINITY);
@@ -177,11 +176,7 @@ void PortalBase::calcDirectionAndRadius(void) const
     {
     default:
     case PORTAL_TYPE_QUAD:
-        // first calculate local direction
-        side1 = mCorners[1] - mCorners[0];
-        side2 = mCorners[2] - mCorners[0];
-        mDirection = side1.crossProduct(side2);
-        mDirection.normalise();
+        mDirection = Math::calculateBasicFaceNormal(mCorners[0], mCorners[1], mCorners[2]);
         // calculate local cp
         mLocalCP = Vector3::ZERO;
         for (int i=0;i<4;i++)

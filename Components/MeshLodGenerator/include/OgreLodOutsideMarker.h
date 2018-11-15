@@ -67,7 +67,11 @@ private:
         bool removed; // Whether the triangle is excluded from hull.
         CHVertex* vertex[3];
         Vector3 normal;
-        void computeNormal();
+        void computeNormal()
+        {
+            normal = Math::calculateBasicFaceNormal(vertex[0]->position, vertex[1]->position,
+                                                    vertex[2]->position);
+        }
     };
 
     

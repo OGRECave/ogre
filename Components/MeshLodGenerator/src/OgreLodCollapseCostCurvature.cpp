@@ -59,11 +59,8 @@ namespace Ogre
                     pv1 = (triangle->vertex[1] == src) ? dst : triangle->vertex[1];
                     pv2 = (triangle->vertex[2] == src) ? dst : triangle->vertex[2];
 
-                    // Cross-product 2 edges
-                    Vector3 e1 = pv1->position - pv0->position;
-                    Vector3 e2 = pv2->position - pv1->position;
-
-                    Vector3 newNormal = e1.crossProduct(e2);
+                    Vector3 newNormal = Math::calculateBasicFaceNormalWithoutNormalize(
+                        pv0->position, pv1->position, pv2->position);
 
                     // Dot old and new face normal
                     // If < 0 then more than 90 degree difference
