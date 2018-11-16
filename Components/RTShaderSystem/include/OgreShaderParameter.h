@@ -70,7 +70,11 @@ public:
         SPS_TANGENT = 9
     };
 
-    // Shader parameter content.
+    /** Shader parameter content
+     * 
+     * used to resolve Parameters across different SubRenderState instances
+     * Think of it as Semantic extended to the actual parameter content.
+     */ 
     enum Content
     {
         /// Unknown content

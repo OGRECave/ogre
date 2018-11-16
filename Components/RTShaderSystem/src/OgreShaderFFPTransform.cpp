@@ -69,6 +69,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     
     // Resolve output position parameter.
     ParameterPtr positionOut = vsEntry->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
+    //! [param_resolve]
 
     if (!wvpMatrix || !positionIn || !positionOut)
     {
@@ -76,7 +77,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
                 "Not all parameters could be constructed for the sub-render state.",
                 "FFPTransform::createCpuSubPrograms" );
     }
-    //! [param_resolve]
+
     // Add dependency.
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
 
