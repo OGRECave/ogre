@@ -29,6 +29,146 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace RTShader {
+
+static GpuConstantType typeFromContent(Parameter::Content content)
+{
+    switch (content)
+    {
+    case Parameter::SPC_COLOR_DIFFUSE:
+    case Parameter::SPC_COLOR_SPECULAR:
+    case Parameter::SPC_POSITION_PROJECTIVE_SPACE:
+    case Parameter::SPC_POSITION_OBJECT_SPACE:
+    case Parameter::SPC_BLEND_INDICES:
+    case Parameter::SPC_BLEND_WEIGHTS:
+    case Parameter::SPC_POSITION_LIGHT_SPACE0:
+    case Parameter::SPC_POSITION_LIGHT_SPACE1:
+    case Parameter::SPC_POSITION_LIGHT_SPACE2:
+    case Parameter::SPC_POSITION_LIGHT_SPACE3:
+    case Parameter::SPC_POSITION_LIGHT_SPACE4:
+    case Parameter::SPC_POSITION_LIGHT_SPACE5:
+    case Parameter::SPC_POSITION_LIGHT_SPACE6:
+    case Parameter::SPC_POSITION_LIGHT_SPACE7:
+        return GCT_FLOAT4;
+    case Parameter::SPC_NORMAL_TANGENT_SPACE:
+    case Parameter::SPC_NORMAL_OBJECT_SPACE:
+    case Parameter::SPC_NORMAL_WORLD_SPACE:
+    case Parameter::SPC_NORMAL_VIEW_SPACE:
+    case Parameter::SPC_TANGENT_OBJECT_SPACE:
+    case Parameter::SPC_POSTOCAMERA_TANGENT_SPACE:
+    case Parameter::SPC_POSTOCAMERA_OBJECT_SPACE:
+    case Parameter::SPC_POSITION_VIEW_SPACE:
+    case Parameter::SPC_POSITION_WORLD_SPACE:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE1:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE2:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE3:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE4:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE5:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE6:
+    case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE7:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE0:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE1:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE2:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE3:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE4:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE5:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE6:
+    case Parameter::SPC_POSTOLIGHT_OBJECT_SPACE7:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE0:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE1:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE2:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE3:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE4:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE5:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE6:
+    case Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE7:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE0:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE1:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE2:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE3:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE4:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE5:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE6:
+    case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE7:
+        return GCT_FLOAT3;
+    case Parameter::SPC_POINTSPRITE_COORDINATE:
+        return GCT_FLOAT2;
+    case Parameter::SPC_POINTSPRITE_SIZE:
+    case Parameter::SPC_DEPTH_VIEW_SPACE:
+        return GCT_FLOAT1;
+    default:
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "cannot derive type from content");
+        break;
+    }
+}
+
+static Parameter::Semantic semanticFromContent(Parameter::Content content, bool isVSOut = false)
+{
+    switch (content)
+    {
+    case Parameter::SPC_COLOR_DIFFUSE:
+    case Parameter::SPC_COLOR_SPECULAR:
+        return Parameter::SPS_COLOR;
+    case Parameter::SPC_POSITION_PROJECTIVE_SPACE:
+        return Parameter::SPS_POSITION;
+    case Parameter::SPC_BLEND_INDICES:
+        return Parameter::SPS_BLEND_INDICES;
+    case Parameter::SPC_BLEND_WEIGHTS:
+        return Parameter::SPS_BLEND_WEIGHTS;
+    case Parameter::SPC_TANGENT_OBJECT_SPACE:
+        return Parameter::SPS_TANGENT;
+    case Parameter::SPC_POINTSPRITE_COORDINATE:
+        return Parameter::SPS_TEXTURE_COORDINATES;
+    case Parameter::SPC_POSITION_OBJECT_SPACE:
+        if(!isVSOut) return Parameter::SPS_POSITION;
+        OGRE_FALLTHROUGH;
+    case Parameter::SPC_NORMAL_OBJECT_SPACE:
+        if(!isVSOut) return Parameter::SPS_NORMAL;
+        OGRE_FALLTHROUGH;
+    // the remaining types are VS output types only (or indeed texcoord)
+    // for out types we use the TEXCOORD[n] semantics for compatibility
+    // with Cg, HLSL SM2.0 where they are the only multivariate semantics
+    default:
+        return Parameter::SPS_TEXTURE_COORDINATES;
+    }
+}
+
+/// fixed index for texcoords, next free semantic slot else
+static int indexFromContent(Parameter::Content content)
+{
+    int c = int(content);
+    if(c < Parameter::SPC_TEXTURE_COORDINATE0 || c > Parameter::SPC_TEXTURE_COORDINATE7)
+        return -1;
+
+    return c - Parameter::SPC_TEXTURE_COORDINATE0;
+}
+
+void FunctionStageRef::callFunction(const char* name, const InOut& inout) const
+{
+    callFunction(name, std::vector<Operand>{inout});
+}
+
+void FunctionStageRef::callFunction(const char* name, const std::vector<Operand>& params) const
+{
+    auto function = new FunctionInvocation(name, mStage);
+    function->setOperands(params);
+    mParent->addAtomInstance(function);
+}
+
+void FunctionStageRef::sampleTexture(const std::vector<Operand>& params) const
+{
+    auto function = new SampleTextureAtom(mStage);
+    function->setOperands(params);
+    mParent->addAtomInstance(function);
+}
+
+void FunctionStageRef::assign(const std::vector<Operand>& params) const
+{
+    auto function = new AssignmentAtom(mStage);
+    function->setOperands(params);
+    mParent->addAtomInstance(function);
+}
+
 //-----------------------------------------------------------------------------
 Function::Function(const String& name, const String& desc, const FunctionType functionType)
 {
@@ -69,12 +209,21 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
                                         const Parameter::Content content,
                                         GpuConstantType type)
 {
+    if(type == GCT_UNKNOWN)
+        type = typeFromContent(content);
+
     ParameterPtr param;
 
     // Check if desired parameter already defined.
-    param = getParameterByContent(mInputParameters, content, type);
+    param = _getParameterByContent(mInputParameters, content, type);
     if (param.get() != NULL)
         return param;
+
+    if(semantic == Parameter::SPS_UNKNOWN)
+    {
+        semantic = semanticFromContent(content);
+        index = indexFromContent(content); // create new parameter for this content
+    }
 
     // Case we have to create new parameter.
     if (index == -1)
@@ -95,7 +244,7 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
     else
     {
         // Check if desired parameter already defined.
-        param = getParameterBySemantic(mInputParameters, semantic, index);
+        param = _getParameterBySemantic(mInputParameters, semantic, index);
         if (param.get() != NULL && param->getContent() == content)
         {
             if (param->getType() == type)
@@ -170,12 +319,21 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
                                             Parameter::Content content,                                         
                                             GpuConstantType type)
 {
+    if(type == GCT_UNKNOWN)
+        type = typeFromContent(content);
+
     ParameterPtr param;
 
     // Check if desired parameter already defined.
-    param = getParameterByContent(mOutputParameters, content, type);
+    param = _getParameterByContent(mOutputParameters, content, type);
     if (param.get() != NULL)
         return param;
+
+    if(semantic == Parameter::SPS_UNKNOWN)
+    {
+        semantic = semanticFromContent(content, true);
+        index = -1; // create new parameter for this content
+    }
 
     // Case we have to create new parameter.
     if (index == -1)
@@ -196,7 +354,7 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
     else
     {
         // Check if desired parameter already defined.
-        param = getParameterBySemantic(mOutputParameters, semantic, index);
+        param = _getParameterBySemantic(mOutputParameters, semantic, index);
         if (param.get() != NULL && param->getContent() == content)
         {
             if (param->getType() == type)
@@ -268,7 +426,7 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
 {
     ParameterPtr param;
 
-    param = getParameterByName(mLocalParameters, name);
+    param = _getParameterByName(mLocalParameters, name);
     if (param.get() != NULL)
     {
         if (param->getType() == type &&
@@ -298,7 +456,9 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
 {
     ParameterPtr param;
 
-    param = getParameterByContent(mLocalParameters, content, type);
+    if(type == GCT_UNKNOWN) type = typeFromContent(content);
+
+    param = _getParameterByContent(mLocalParameters, content, type);
     if (param.get() != NULL)    
         return param;
 
@@ -313,7 +473,7 @@ void Function::addInputParameter(ParameterPtr parameter)
 {
 
     // Check that parameter with the same semantic and index in input parameters list.
-    if (getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
+    if (_getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
             "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",             
@@ -327,7 +487,7 @@ void Function::addInputParameter(ParameterPtr parameter)
 void Function::addOutputParameter(ParameterPtr parameter)
 {
     // Check that parameter with the same semantic and index in output parameters list.
-    if (getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
+    if (_getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
             "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",             
@@ -365,7 +525,7 @@ void Function::addParameter(ShaderParameterList& parameterList, ParameterPtr par
                                         
 {
     // Check that parameter with the same name doest exist in input parameters list.
-    if (getParameterByName(mInputParameters, parameter->getName()).get() != NULL)
+    if (_getParameterByName(mInputParameters, parameter->getName()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
             "Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">",            
@@ -373,7 +533,7 @@ void Function::addParameter(ShaderParameterList& parameterList, ParameterPtr par
     }
 
     // Check that parameter with the same name doest exist in output parameters list.
-    if (getParameterByName(mOutputParameters, parameter->getName()).get() != NULL)
+    if (_getParameterByName(mOutputParameters, parameter->getName()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
             "Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">",            
@@ -402,7 +562,7 @@ void Function::deleteParameter(ShaderParameterList& parameterList, ParameterPtr 
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::getParameterByName( const ShaderParameterList& parameterList, const String& name )
+ParameterPtr Function::_getParameterByName( const ShaderParameterList& parameterList, const String& name )
 {
     ShaderParameterConstIterator it;
 
@@ -418,7 +578,7 @@ ParameterPtr Function::getParameterByName( const ShaderParameterList& parameterL
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::getParameterBySemantic(const ShaderParameterList& parameterList, 
+ParameterPtr Function::_getParameterBySemantic(const ShaderParameterList& parameterList,
                                                 const Parameter::Semantic semantic, 
                                                 int index)
 {
@@ -437,9 +597,12 @@ ParameterPtr Function::getParameterBySemantic(const ShaderParameterList& paramet
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
+ParameterPtr Function::_getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
 {
     ShaderParameterConstIterator it;
+
+    if(type == GCT_UNKNOWN)
+        type = typeFromContent(content);
 
     // Search only for known content.
     if (content != Parameter::SPC_UNKNOWN)  

@@ -156,65 +156,54 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
     
     // Get input position parameter.
-    mVSInPos = vsMain->getParameterBySemantic(vsMain->getInputParameters(), Parameter::SPS_POSITION, 0);
+    mVSInPos = vsMain->getInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     
     // Get output position parameter.
-    mVSOutPos = vsMain->getParameterBySemantic(vsMain->getOutputParameters(), Parameter::SPS_POSITION, 0);
+    mVSOutPos = vsMain->getOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
     
     // Resolve vertex shader output depth.      
-    mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
-        Parameter::SPC_DEPTH_VIEW_SPACE,
-        GCT_FLOAT1);
+    mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPC_DEPTH_VIEW_SPACE);
     
     // Resolve input depth parameter.
-    mPSInDepth = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutDepth->getIndex(), 
-        mVSOutDepth->getContent(),
-        GCT_FLOAT1);
+    mPSInDepth = psMain->resolveInputParameter(mVSOutDepth);
     
     // Get in/local diffuse parameter.
-    mPSDiffuse = psMain->getParameterBySemantic(psMain->getInputParameters(), Parameter::SPS_COLOR, 0);
+    mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
     if (mPSDiffuse.get() == NULL)   
     {
-        mPSDiffuse = psMain->getParameterBySemantic(psMain->getLocalParameters(), Parameter::SPS_COLOR, 0);
+        mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
     
     // Resolve output diffuse parameter.
-    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
     
     // Get in/local specular parameter.
-    mPSSpecualr = psMain->getParameterBySemantic(psMain->getInputParameters(), Parameter::SPS_COLOR, 1);
+    mPSSpecualr = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
     if (mPSSpecualr.get() == NULL)  
     {
-        mPSSpecualr = psMain->getParameterBySemantic(psMain->getLocalParameters(), Parameter::SPS_COLOR, 1);
+        mPSSpecualr = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
     }
     
     // Resolve computed local shadow colour parameter.
-    mPSLocalShadowFactor = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lShadowFactor", GCT_FLOAT1);
+    mPSLocalShadowFactor = psMain->resolveLocalParameter("lShadowFactor", GCT_FLOAT1);
 
     // Resolve computed local shadow colour parameter.
     mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "pssm_split_points");
 
     // Get derived scene colour.
-    mPSDerivedSceneColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR, 0);
+    mPSDerivedSceneColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
     
     ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
     int lightIndex = 0;
 
     while(it != mShadowTextureParamsList.end())
     {
-        it->mWorldViewProjMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "world_texture_view_proj");      
+        it->mWorldViewProjMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "world_texture_view_proj"); 
 
-        it->mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1,
-            Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex),
-            GCT_FLOAT4);        
-
-        it->mPSInLightPosition = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-            it->mVSOutLightPosition->getIndex(),
-            it->mVSOutLightPosition->getContent(),
-            GCT_FLOAT4);    
-
+        it->mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex));        
+        it->mPSInLightPosition = psMain->resolveInputParameter(it->mVSOutLightPosition);    
         it->mTextureSampler = psProgram->resolveParameter(GCT_SAMPLER2D, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");       
-
+        
         it->mInvTextureSize = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "inv_shadow_texture_size");       
 
         if (!(it->mInvTextureSize.get()) || !(it->mTextureSampler.get()) || !(it->mPSInLightPosition.get()) ||
@@ -275,26 +264,17 @@ bool IntegratedPSSM3::addFunctionInvocations(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder)
 {
-    FunctionInvocation* curFuncInvocation;
+    auto stage = vsMain->getStage(groupOrder);
 
     // Output the vertex depth in camera space.
-    curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
-    curFuncInvocation->pushOperand(mVSOutPos, Operand::OPS_IN, Operand::OPM_Z); 
-    curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);  
-    vsMain->addAtomInstance(curFuncInvocation); 
-
+    stage.assign(In(mVSOutPos).z(), mVSOutDepth);
 
     // Compute world space position.    
     ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
 
     while(it != mShadowTextureParamsList.end())
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, groupOrder);
-        curFuncInvocation->pushOperand(it->mWorldViewProjMatrix, Operand::OPS_IN);  
-        curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(it->mVSOutLightPosition, Operand::OPS_OUT);  
-        vsMain->addAtomInstance(curFuncInvocation); 
-
+        stage.callFunction(FFP_FUNC_TRANSFORM, it->mWorldViewProjMatrix, mVSInPos, it->mVSOutLightPosition);
         ++it;
     }
 
@@ -305,48 +285,29 @@ bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder)
 bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
 {
     Function* psMain = psProgram->getEntryPointFunction();
-    FunctionInvocation* curFuncInvocation;
+    auto stage = psMain->getStage(groupOrder);
 
     ShadowTextureParams& splitParams0 = mShadowTextureParamsList[0];
     ShadowTextureParams& splitParams1 = mShadowTextureParamsList[1];
     ShadowTextureParams& splitParams2 = mShadowTextureParamsList[2];
 
     // Compute shadow factor.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_COMPUTE_SHADOW_COLOUR3, groupOrder);
-    curFuncInvocation->pushOperand(mPSInDepth, Operand::OPS_IN);    
-    curFuncInvocation->pushOperand(mPSSplitPoints, Operand::OPS_IN);        
-    curFuncInvocation->pushOperand(splitParams0.mPSInLightPosition, Operand::OPS_IN);   
-    curFuncInvocation->pushOperand(splitParams1.mPSInLightPosition, Operand::OPS_IN);   
-    curFuncInvocation->pushOperand(splitParams2.mPSInLightPosition, Operand::OPS_IN);   
-    curFuncInvocation->pushOperand(splitParams0.mTextureSampler, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(splitParams1.mTextureSampler, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(splitParams2.mTextureSampler, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(splitParams0.mInvTextureSize, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(splitParams1.mInvTextureSize, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(splitParams2.mInvTextureSize, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mPSLocalShadowFactor, Operand::OPS_OUT); 
-    psMain->addAtomInstance(curFuncInvocation); 
-    
+    stage.callFunction(SGX_FUNC_COMPUTE_SHADOW_COLOUR3,
+                       {In(mPSInDepth), In(mPSSplitPoints), In(splitParams0.mPSInLightPosition),
+                        In(splitParams1.mPSInLightPosition), In(splitParams2.mPSInLightPosition),
+                        In(splitParams0.mTextureSampler), In(splitParams1.mTextureSampler),
+                        In(splitParams2.mTextureSampler), In(splitParams0.mInvTextureSize),
+                        In(splitParams1.mInvTextureSize), In(splitParams2.mInvTextureSize), Out(mPSLocalShadowFactor)});
+
     // Apply shadow factor on diffuse colour.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_APPLYSHADOWFACTOR_DIFFUSE, groupOrder);
-    curFuncInvocation->pushOperand(mPSDerivedSceneColour, Operand::OPS_IN);     
-    curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);    
-    curFuncInvocation->pushOperand(mPSLocalShadowFactor, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_OUT);   
-    psMain->addAtomInstance(curFuncInvocation); 
+    stage.callFunction(SGX_FUNC_APPLYSHADOWFACTOR_DIFFUSE,
+                       {In(mPSDerivedSceneColour), In(mPSDiffuse), In(mPSLocalShadowFactor), Out(mPSDiffuse)});
 
     // Apply shadow factor on specular colour.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_MODULATE_SCALAR, groupOrder);
-    curFuncInvocation->pushOperand(mPSLocalShadowFactor, Operand::OPS_IN);      
-    curFuncInvocation->pushOperand(mPSSpecualr, Operand::OPS_IN);   
-    curFuncInvocation->pushOperand(mPSSpecualr, Operand::OPS_OUT);      
-    psMain->addAtomInstance(curFuncInvocation);
+    stage.callFunction(SGX_FUNC_MODULATE_SCALAR, mPSLocalShadowFactor, mPSSpecualr, mPSSpecualr);
 
     // Assign the local diffuse to output diffuse.
-    curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
-    curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);    
-    curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);    
-    psMain->addAtomInstance(curFuncInvocation);
+    stage.assign(mPSDiffuse, mPSOutDiffuse);
 
     return true;
 }

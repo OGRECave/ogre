@@ -64,37 +64,37 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
     bool hasError = false;
 
     if (mResolveStageFlags & SF_VS_INPUT_DIFFUSE)
-        mVSInputDiffuse  = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mVSInputDiffuse  = vsMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
     
     if (mResolveStageFlags & SF_VS_INPUT_SPECULAR)
-        mVSInputSpecular = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        mVSInputSpecular = vsMain->resolveInputParameter(Parameter::SPC_COLOR_SPECULAR);
     
     // Resolve VS color outputs if have inputs from vertex stream.
     if (mVSInputDiffuse.get() != NULL || mResolveStageFlags & SF_VS_OUTPUT_DIFFUSE)     
-        mVSOutputDiffuse = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);                               
+        mVSOutputDiffuse = vsMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
     if (mVSInputSpecular.get() != NULL || mResolveStageFlags & SF_VS_OUTPUT_SPECULAR)       
-        mVSOutputSpecular = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);         
+        mVSOutputSpecular = vsMain->resolveOutputParameter(Parameter::SPC_COLOR_SPECULAR);         
 
     // Resolve PS color inputs if have inputs from vertex shader.
     if (mVSOutputDiffuse.get() != NULL || mResolveStageFlags & SF_PS_INPUT_DIFFUSE)     
-        mPSInputDiffuse = psMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSInputDiffuse = psMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
     if (mVSOutputSpecular.get() != NULL || mResolveStageFlags & SF_PS_INPUT_SPECULAR)       
-        mPSInputSpecular = psMain->resolveInputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        mPSInputSpecular = psMain->resolveInputParameter(Parameter::SPC_COLOR_SPECULAR);
 
 
     // Resolve PS output diffuse color.
     if (mResolveStageFlags & SF_PS_OUTPUT_DIFFUSE)
     {
-        mPSOutputDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSOutputDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
         hasError |= !(mPSOutputDiffuse.get());
     }
 
     // Resolve PS output specular color.
     if (mResolveStageFlags & SF_PS_OUTPUT_SPECULAR)
     {
-        mPSOutputSpecular = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        mPSOutputSpecular = psMain->resolveOutputParameter(Parameter::SPC_COLOR_SPECULAR);
         hasError |= !(mPSOutputSpecular.get());
     }
     
@@ -128,25 +128,25 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* psMain   = psProgram->getEntryPointFunction();    
-    FunctionInvocation* curFuncInvocation = NULL;   
-
     
     // Create vertex shader colour invocations.
     ParameterPtr vsDiffuse;
     ParameterPtr vsSpecular;
+
+    auto vsStage = vsMain->getStage(FFP_VS_COLOUR);
     if (mVSInputDiffuse)
     {
         vsDiffuse = mVSInputDiffuse;
     }
     else
     {
-        vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-        vsMain->addAtomAssign(vsDiffuse, ParameterFactory::createConstParam(Vector4(1.0)), FFP_VS_COLOUR);
+        vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
+        vsStage.assign(Vector4(1.0), vsDiffuse);
     }
 
     if (mVSOutputDiffuse)
     {
-        vsMain->addAtomAssign(mVSOutputDiffuse, vsDiffuse, FFP_VS_COLOUR);
+        vsStage.assign(vsDiffuse, mVSOutputDiffuse);
     }
     
     if (mVSInputSpecular)
@@ -155,13 +155,13 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     }
     else
     {
-        vsSpecular = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-        vsMain->addAtomAssign(vsSpecular, ParameterFactory::createConstParam(Vector4::ZERO), FFP_VS_COLOUR);
+        vsSpecular = vsMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
+        vsStage.assign(Vector4::ZERO, vsSpecular);
     }
 
     if (mVSOutputSpecular)
     {
-        vsMain->addAtomAssign(mVSOutputSpecular, vsSpecular, FFP_VS_COLOUR);
+        vsStage.assign(vsSpecular, mVSOutputSpecular);
     }
     
     
@@ -169,7 +169,8 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     // Create fragment shader colour invocations.
     ParameterPtr psDiffuse;
     ParameterPtr psSpecular;
-    
+    auto psStage = psMain->getStage(FFP_PS_COLOUR_BEGIN);
+
     // Handle diffuse colour.
     if (mPSInputDiffuse.get() != NULL)
     {
@@ -177,8 +178,8 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     }
     else
     {
-        psDiffuse = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-        psMain->addAtomAssign(psDiffuse, ParameterFactory::createConstParam(Vector4(1.0)), FFP_PS_COLOUR_BEGIN);
+        psDiffuse = psMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
+        psStage.assign(Vector4(1.0), psDiffuse);
     }
 
     // Handle specular colour.
@@ -188,31 +189,28 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     }
     else
     {
-        psSpecular = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-        psMain->addAtomAssign(psSpecular, ParameterFactory::createConstParam(Vector4::ZERO), FFP_PS_COLOUR_BEGIN);
+        psSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
+        psStage.assign(Vector4::ZERO, psSpecular);
     }
 
     // Assign diffuse colour.
     if (mPSOutputDiffuse)
     {   
-        psMain->addAtomAssign(mPSOutputDiffuse, psDiffuse, FFP_PS_COLOUR_BEGIN);
+        psStage.assign(psDiffuse, mPSOutputDiffuse);
     }
 
     // Assign specular colour.
     if (mPSOutputSpecular)
     {
-        psMain->addAtomAssign(mPSOutputSpecular, psSpecular, FFP_PS_COLOUR_BEGIN);
+        psStage.assign(psSpecular, mPSOutputSpecular);
     }
 
     // Add specular to out colour.
-    if (mPSOutputDiffuse.get() != NULL && psSpecular.get() != NULL)
+    if (mPSOutputDiffuse && psSpecular)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_PS_COLOUR_END);
-        curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
-        curFuncInvocation->pushOperand(psSpecular, Operand::OPS_IN, Operand::OPM_XYZ);
-        curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
-        psMain->addAtomInstance(curFuncInvocation);
-    }   
+        psMain->getStage(FFP_PS_COLOUR_END)
+            .callFunction(FFP_FUNC_ADD, In(mPSOutputDiffuse).xyz(), In(psSpecular).xyz(), Out(mPSOutputDiffuse).xyz());
+    }
 
     return true;
 }

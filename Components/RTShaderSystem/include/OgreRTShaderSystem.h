@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreShaderProgramWriter.h"
 #include "OgreShaderGenerator.h"
 #include "OgreShaderRenderState.h"
+#include "OgreShaderFunction.h"
 #include "OgreShaderFFPTransform.h"
 #include "OgreShaderFFPColour.h"
 #include "OgreShaderFFPLighting.h"

@@ -93,8 +93,7 @@ bool TextureAtlasSampler::resolveParameters(ProgramSet* programSet)
     Parameter::Content indexContent = (Parameter::Content)((int)Parameter::SPC_TEXTURE_COORDINATE0 + mAtlasTexcoordPos);
     GpuConstantType indexType = GCT_FLOAT4;
 
-    mVSInpTextureTableIndex = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                mAtlasTexcoordPos, indexContent, indexType);
+    mVSInpTextureTableIndex = vsMain->resolveInputParameter(indexContent, indexType);
         
     
     //
@@ -106,10 +105,8 @@ bool TextureAtlasSampler::resolveParameters(ProgramSet* programSet)
         if (mIsAtlasTextureUnits[i] == true)
         {
             mVSTextureTable[i] = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "AtlasData", mAtlasTableDatas[i]->size());
-            mVSOutTextureDatas[i] = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES,
-                    -1, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-            mPSInpTextureDatas[i] = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                mVSOutTextureDatas[i]->getIndex(), Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+            mVSOutTextureDatas[i] = vsMain->resolveOutputParameter(Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+            mPSInpTextureDatas[i] = psMain->resolveInputParameter(mVSOutTextureDatas[i]);
             mPSTextureSizes[i] = psProgram->resolveParameter(GCT_FLOAT2,-1, (uint16)GPV_PER_OBJECT, "AtlasSize");
         }
     }
@@ -169,19 +166,15 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 
     groupOrder = (FFP_PS_SAMPLING + FFP_PS_TEXTURING) / 2;
 
-    const ShaderParameterList& inpParams = psMain->getInputParameters();
-    const ShaderParameterList& localParams = psMain->getLocalParameters();
-    
-    ParameterPtr psAtlasTextureCoord = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 
-        -1, "atlasCoord", GCT_FLOAT2);
+    ParameterPtr psAtlasTextureCoord = psMain->resolveLocalParameter("atlasCoord", GCT_FLOAT2);
 
     for(ushort j = 0 ; j <  TAS_MAX_TEXTURES; ++j)
     {
         if (mIsAtlasTextureUnits[j] == true)
         {
             //Find the texture coordinates texel and sampler from the original FFPTexturing
-            ParameterPtr texcoord = psMain->getParameterByContent(inpParams, (Parameter::Content)(Parameter::SPC_TEXTURE_COORDINATE0 + j), GCT_FLOAT2);
-            ParameterPtr texel = psMain->getParameterByName(localParams, c_ParamTexel + Ogre::StringConverter::toString(j));
+            ParameterPtr texcoord = psMain->getInputParameter((Parameter::Content)(Parameter::SPC_TEXTURE_COORDINATE0 + j), GCT_FLOAT2);
+            ParameterPtr texel = psMain->getLocalParameter(c_ParamTexel + StringConverter::toString(j));
             UniformParameterPtr sampler = psProgram->getParameterByType(GCT_SAMPLER2D, j);
                 
             const char* addressUFuncName = getAdressingFunctionName(mTextureAddressings[j].u);

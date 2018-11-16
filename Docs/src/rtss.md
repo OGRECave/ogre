@@ -19,9 +19,10 @@ These "effects" include Fixed Function transformation and lighting. At the core 
 
 Correctly ordering these functions, providing them with the right input values and interconnecting them is the main purpose of the RTSS.
 
-To this end the RTSS defines a set of stages; e.g Ogre::RTShader::FFP_TRANSFORM, Ogre::RTShader::FFP_TEXTURING. It then queries all registered SubRenderStates which in turn attach functions given a Ogre::Pass. The stages are conceptually very similar to render queue groups.
+To this end the RTSS defines a set of stages; e.g Ogre::RTShader::FFP_VS_TRANSFORM, Ogre::RTShader::FFP_PS_TEXTURING.
+It then queries each registered Ogre::RTShader::SubRenderState to attach its functions to these stages. Then it generates the entry function (e.g. `main()` for GLSL) by sequentially calling these functions.
 
-After the RTSS has queried the SubRenderStates it continues to fill the entry function (e.g. `main()` for GLSL) by generating the actual function invocations.
+You can think of stages as a way to group shader "effects" inside a Ogre::Pass - similarly how a Ogre::RenderQueueGroup groups [renderables](@ref Ogre::Renderable) for rendering.
 
 Basically it performs the following (simplified) transformation, given
 ```cpp
@@ -40,6 +41,9 @@ void main() {
 and `$FFP_VS_TRANSFORM = [FFP_FUNC_TRANSFORM]`, `$FFP_VS_TEXTURING = [FFP_FUNC_TRANSFORM_TEXCOORD]`, it generates
 
 ```cpp
+// FORWARD DECLARATIONS
+void FFP_Transform(in mat4, in vec4, out vec4);
+void FFP_TransformTexCoord(in mat4, in vec2, out vec2);
 // GLOBAL PARAMETERS
 uniform	mat4	worldviewproj_matrix;
 uniform	mat4	texture_matrix1;
@@ -53,10 +57,9 @@ void main() {
 }
 ```
 
-It will automatically use Ogre::GpuProgramParameters::AutoConstantType as needed to obtain the required inputs and route them in the respective functions.
-In the above example no local parameters were allocated, but the RTSS will do it as needed. (for instance if you try to write to "vertex" in GLSL)
+As you can see the RTSS also resolved the required parameters and routed them into the correct functions. See @ref creating-extensions for details about parameter resolution.
 
-Now that you know what the RTSS does, you are probably wondering how to change which functions are emitted per stage to, lets say, change the lighting from the FFP style per-vertex lighting to per-pixel lighting.
+Now that you know what the RTSS does, you are probably wondering how to change which functions are emitted per stage. Lets say, change the lighting from the FFP style per-vertex lighting to per-pixel lighting.
 
 The RTSS is flexible enough to "just" move the according calculations from the vertex shader to the pixel shader.
 
@@ -251,29 +254,29 @@ The result of this entire process is that each technique associated with the SGS
 ## Main components {#rtss__components}
 The following is an partial list of components within the RTSS. These components are listed as they have great importance in understanding controlling and later extending the RTSS system.
 
-### ShaderGenerator
+@par ShaderGenerator
 The ShaderGenerator is the main interface to the RTSS system. Through it you can request to generate and destroy the shaders, influence from what parts to create the shaders, and control general system settings such as the shading language and shader caching.
 
-### RenderState classes
+@par RenderState classes
 A render state describes the different components that a shader will be created from. These components are referred to as SubRenderStates. 
-
+@par
 RenderStates exist on 2 levels: scheme and pass. Scheme RenderStates describe the SubRenderStates that will be used when creating a shader for a given material scheme. Pass RenderState describe the SubRenderStates that will be used when creating a specific pass of a specific material. When a shader is generated for a given material the system combines the SubRenderStates from both RenderStates to create a shader specific for a material pass in a specific scheme.
 
-### SubRenderState classes
+@par SubRenderState classes
 Sub-render states (SRS) are components designed to generate the code of the RTSS shaders. Each SRS usually has a specific role to fill within the shader's construction. These components can be combined in different combinations to create shaders with different capabilities.
-
+@par
 There are 5 basic SRSs. These are used to recreate the functionality provided by the fixed pipeline and are added by default to every scheme RenderState:
 * Ogre::RTShader::FFPTransform - responsible for adding code to the vertex shader which computes the position of the vertex in projection space
 * Ogre::RTShader::FFPColour - responsible for adding code to the shaders that calculate the base diffuse and specular color of the object regardless of lights or textures. The color is calculated based on the ambient, diffuse, specular and emissive properties of the object and scene, color tracking and the specified hardware buffer color.
 * Ogre::RTShader::FFPLighting - responsible for adding code to the shaders that calculate the luminescence added to the object by light. Then add that value to the color calculated by the color SRS stage.
 * Ogre::RTShader::FFPTexturing - responsible for adding code that modulates the color of the pixels based on textures assigned to the material.
 * Ogre::RTShader::FFPFog - responsible for adding code that modulates the color of a pixel based on the scene or object fog parameters.
-
+@par
 There are many more sub render states that already exist in the Ogre system and new ones can be added. Some of the existing SRSs include capabilities such as: per-pixel lighting, texture atlas, advanced texture blend, bump mapping, efficient multiple lights (sample), textured fog (sample), etc...
 
-### SubRenderStateFactory
+@par SubRenderStateFactory
 As the name suggests, sub render state factories are factories that produce sub render states. Each factory generates a specific SRS. 
-
+@par
 These type of components are note worthy for 2 reason. The first and obvious one is that they allow the system to generate new SRSs for the materials it is asked to generate. The second reason is that they perform as script readers and writers allowing the system to create specific or specialized SRSs per material.
 
 ## Creating custom shader extensions {#creating-extensions}
@@ -294,32 +297,38 @@ Implementing the SubRenderState requires overriding the pure methods of the base
 * Ogre::RTShader::SubRenderState::createCpuSubPrograms - This is the heart of this interface. This method should update the CPU shader programs with the specific details of the overriding class.
 
 The SubRenderState supply default implementation for this method which break down this method into three stages:
-* Resolving parameters: this stage should grab all the needed parameters for this SubRrenderState. In case of the FFPTransform it should resolve the world view projection matrix and vertex shader input and output position parameters.
 
+@par Resolving parameters
+this stage should grab all the needed parameters for this SubRenderState. Typically there several SubRenderStates working on a common set of Parameters - either to cooperate or because they use the same inputs.
+Therefore parameters are not resolved by name (except for local variables), but rather by symbolic constants. These can either be of Ogre::GpuProgramParameters::AutoConstantType, which should already be familiar to you or of Ogre::RTShader::Parameter::Content.
+@par
+You can think of the latter as an extension of the Cg/ HLSL Semantics to the actual content of the parameter.
+@par
+In case of the Ogre::RTShader::FFPTransform wee nned the world view projection matrix and vertex shader input and output position parameters.
+@par
 @snippet Components/RTShaderSystem/src/OgreShaderFFPTransform.cpp param_resolve
 
-* Resolving dependencies: this stage should provide the name of the external shader library files that contains the actual shader code needed by this SubRenderState.
-In case of the FFPTexturing  it will add the common and texturing library for both vertex and pixel shader program.
-
+@par Resolving dependencies
+this stage should provide the name of the external shader library files that contains the actual shader code needed by this SubRenderState.
+In case of the Ogre::RTShader::FFPTexturing  it will add the common and texturing library for both vertex and pixel shader program.
+@par
 @snippet Components/RTShaderSystem/src/OgreShaderFFPTexturing.cpp deps_resolve
 
-* Adding function invocations: this stage creates the function calls within this SubRenderState requires. Each function call has two keys that are used by the system to sort it before generating the actual shader code as well as set of in/out parameters.
-A function invocation is added to either vertex shader program or fragment shader program.
-In case of the FFPFog it will add vertex depth calculation to the vertex shader program.
-
+@par Adding function invocations
+this stage creates the function calls within this SubRenderState requires. To add function invocations, you first need to obtain a Ogre::RTShader::FunctionStageRef for the respective stage.
+In case of the Ogre::RTShader::FFPFog it will add vertex depth calculation to the vertex shader program.
+@par
 @snippet Components/RTShaderSystem/src/OgreShaderFFPFog.cpp func_invoc
-
-Note: 
-* Each Ogre::RTShader::SubRenderState can add as many function invocations as it needs.
-* Each Ogre::RTShader::SubRenderState can different function invocations in different ordering. 
-* The ordering of the function invocation is crucial. Use the FFPVertexShaderStage and FFPFragmentShaderStage enumarations to place your invocations in the desired order.
+@par
+The arguments to the function are the ones you resolved in the first step and the function name must be available in one of the libraries you provided in the second step.
+You can add call as many functions as you need. The calls will appear in the same order in the generates shader source code.
+@note
+* The ordering of the function invocation is crucial. Use the Ogre::RTShader::FFPVertexShaderStage and Ogre::RTShader::FFPFragmentShaderStage enumarations to place your invocations in the desired global order.
 * Make sure the parameter semantic (in/out) in the SubRenderState code matches to your shader code implementation you supplied in the library file. GLSL will fail to link to libray functions if it won't be able to find a perfect function declaration match. 
 * Ogre::RTShader::SubRenderState::updateGpuProgramsParams - As the name suggest this method should be overridden only in case your SubRenderState should update some parameter it created before.
 * Ogre::RTShader::SubRenderState::preAddToRenderState(): this method called before adding this SubRenderState to a parent RenderState instances. It allows this SubRenderState to exclude itself from the list in case the source pass is not matching. I.E in case of SubRenderState that perform lighting calculations it can return false when the given source pass specifies that lighting calculations disabled for it.
-
 @snippet Components/RTShaderSystem/src/OgreShaderFFPLighting.cpp disable
-
-This method also let the SubRenderState to opportunity to modify the destination pass. I.E the NormalMapLighting instance adds the normal map texture unit in this context.
+This method also let the SubRenderState to opportunity to modify the destination pass. I.E the Ogre::RTShader::NormalMapLighting instance adds the normal map texture unit in this context.
 
 Implementing the Ogre::RTShader::SubRenderStateFactory is much simpler and involves implementing the following methods
 * Ogre::RTShader::SubRenderStateFactory::createInstanceImpl(): This method should return instance for the SubRenderState sub class.

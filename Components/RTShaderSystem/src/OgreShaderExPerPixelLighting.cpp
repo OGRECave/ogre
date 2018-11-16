@@ -218,19 +218,19 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
     bool hasError = false;
     // Resolve world view IT matrix.
-    mWorldViewITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX, 0);
+    mWorldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX);
     hasError |= !(mWorldViewITMatrix.get());    
     
     // Get surface ambient colour if need to.
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
     {       
-        mDerivedAmbientLightColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR, 0);
+        mDerivedAmbientLightColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR);
         hasError |= !(mDerivedAmbientLightColour.get());        
     }
     else
     {
-        mLightAmbientColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR, 0);
-        mSurfaceAmbientColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR, 0);
+        mLightAmbientColour = psProgram->resolveParameter(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
+        mSurfaceAmbientColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR);
         
         hasError |= !(mSurfaceAmbientColour.get()) || !(mLightAmbientColour.get()); 
     }
@@ -238,14 +238,14 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Get surface diffuse colour if need to.
     if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
     {
-        mSurfaceDiffuseColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR, 0);
+        mSurfaceDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
         hasError |= !(mSurfaceDiffuseColour.get()); 
     }
 
     // Get surface specular colour if need to.
     if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
     {
-        mSurfaceSpecularColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR, 0);
+        mSurfaceSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
         hasError |= !(mSurfaceSpecularColour.get());    
     }
 
@@ -253,63 +253,54 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Get surface emissive colour if need to.
     if ((mTrackVertexColourType & TVC_EMISSIVE) == 0)
     {
-        mSurfaceEmissiveColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR, 0);
+        mSurfaceEmissiveColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR);
         hasError |= !(mSurfaceEmissiveColour.get());    
     }
 
     // Get derived scene colour.
-    mDerivedSceneColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR, 0);
+    mDerivedSceneColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
 
     // Get surface shininess.
-    mSurfaceShininess = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_SHININESS, 0);
+    mSurfaceShininess = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SHININESS);
 
     // Resolve input vertex shader normal.
-    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+    mVSInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
 
     // Resolve output vertex shader normal.
-    mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
+    mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
 
     // Resolve input pixel shader normal.
-    mPSInNormal = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-        mVSOutNormal->getIndex(), 
-        mVSOutNormal->getContent(),
-        GCT_FLOAT3);
-    
-    const ShaderParameterList& inputParams = psMain->getInputParameters();
-    const ShaderParameterList& localParams = psMain->getLocalParameters();
+    mPSInNormal = psMain->resolveInputParameter(mVSOutNormal);
 
-    mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
     if (mPSDiffuse.get() == NULL)
     {
-        mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
 
-    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-    mPSTempDiffuseColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lPerPixelDiffuse", GCT_FLOAT4);
+    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
+    mPSTempDiffuseColour = psMain->resolveLocalParameter("lPerPixelDiffuse", GCT_FLOAT4);
 
     hasError |= !(mDerivedSceneColour.get()) || !(mSurfaceShininess.get()) || !(mVSInNormal.get()) || !(mVSOutNormal.get()) || !(mPSInNormal.get()) || !(
         mPSDiffuse.get()) || !(mPSOutDiffuse.get()) || !(mPSTempDiffuseColour.get());
     
     if (mSpecularEnable)
     {
-        mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+        mPSSpecular = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
         if (mPSSpecular.get() == NULL)
         {
-            mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+            mPSSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         }
 
-        mPSTempSpecularColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lPerPixelSpecular", GCT_FLOAT4);
+        mPSTempSpecularColour = psMain->resolveLocalParameter("lPerPixelSpecular", GCT_FLOAT4);
 
-        mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+        mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
-        mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
+        mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
-        mPSInViewPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-            mVSOutViewPos->getIndex(), 
-            mVSOutViewPos->getContent(),
-            GCT_FLOAT3);
+        mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
 
-        mWorldViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEW_MATRIX, 0);
+        mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
         
         hasError |= !(mPSSpecular.get()) || !(mPSTempSpecularColour.get()) || !(mVSInPosition.get()) || !(mVSOutViewPos.get()) || 
             !(mPSInViewPos.get()) || !(mWorldViewMatrix.get());
@@ -343,19 +334,16 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             break;
 
         case Light::LT_POINT:
-            mWorldViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEW_MATRIX, 0);
-            mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0,  Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+            mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
+            mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
             mLightParamsList[i].mPosition = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
             mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
             
             if (mVSOutViewPos.get() == NULL)
             {
-                mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
+                mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
-                mPSInViewPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                    mVSOutViewPos->getIndex(),
-                    mVSOutViewPos->getContent(),
-                    GCT_FLOAT3);
+                mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
             }   
             
             hasError |= !(mWorldViewMatrix.get()) || !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || 
@@ -364,9 +352,9 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             break;
 
         case Light::LT_SPOTLIGHT:
-            mWorldViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEW_MATRIX, 0);
+            mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
 
-            mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
+            mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
             mLightParamsList[i].mPosition = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
             mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_view_space");
             mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
@@ -375,12 +363,9 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 
             if (mVSOutViewPos.get() == NULL)
             {
-                mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
+                mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
-                mPSInViewPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-                    mVSOutViewPos->getIndex(), 
-                    mVSOutViewPos->getContent(),
-                    GCT_FLOAT3);
+                mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
             }   
 
             hasError |= !(mWorldViewMatrix.get()) || !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || 
@@ -476,25 +461,16 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder)
 {
-    FunctionInvocation* curFuncInvocation = NULL;
+    auto stage = vsMain->getStage(groupOrder);
 
     // Transform normal in view space.
-    curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder);
-    curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mVSOutNormal, Operand::OPS_OUT); 
-    vsMain->addAtomInstance(curFuncInvocation);
+    stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
 
     // Transform view space position if need to.
-    if (mVSOutViewPos.get() != NULL)
+    if (mVSOutViewPos)
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMPOSITION, groupOrder);
-        curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mVSOutViewPos, Operand::OPS_OUT);    
-        vsMain->addAtomInstance(curFuncInvocation);
+        stage.callFunction(SGX_FUNC_TRANSFORMPOSITION, mWorldViewMatrix, mVSInPosition, mVSOutViewPos);
     }
-    
 
     return true;
 }
@@ -503,52 +479,37 @@ bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder)
 //-----------------------------------------------------------------------
 bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder)
 {
-    FunctionInvocation* curFuncInvocation = NULL;   
+    auto stage = psMain->getStage(groupOrder);
 
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
         (mTrackVertexColourType & TVC_EMISSIVE) == 0)
     {
-        psMain->addAtomAssign(mPSTempDiffuseColour, mDerivedSceneColour, groupOrder);
+        stage.assign(mDerivedSceneColour, mPSTempDiffuseColour);
     }
     else
     {
         if (mTrackVertexColourType & TVC_AMBIENT)
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-            curFuncInvocation->pushOperand(mLightAmbientColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);            
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-            psMain->addAtomInstance(curFuncInvocation);
+            stage.callFunction(FFP_FUNC_MODULATE, mLightAmbientColour, mPSDiffuse, mPSTempDiffuseColour);
         }
         else
         {
-            curFuncInvocation = OGRE_NEW AssignmentAtom(groupOrder);
-            curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, Operand::OPM_XYZ);  
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
-            psMain->addAtomInstance(curFuncInvocation);
+            stage.assign(In(mDerivedAmbientLightColour).xyz(), Out(mPSTempDiffuseColour).xyz());
         }
 
         if (mTrackVertexColourType & TVC_EMISSIVE)
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder);
-            curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-            psMain->addAtomInstance(curFuncInvocation);
+            stage.callFunction(FFP_FUNC_ADD, mPSDiffuse, mPSTempDiffuseColour, mPSTempDiffuseColour);
         }
         else
         {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder);
-            curFuncInvocation->pushOperand(mSurfaceEmissiveColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT); 
-            psMain->addAtomInstance(curFuncInvocation);
+            stage.callFunction(FFP_FUNC_ADD, mSurfaceEmissiveColour, mPSTempDiffuseColour, mPSTempDiffuseColour);
         }       
     }
 
     if (mSpecularEnable)
     {
-        psMain->addAtomAssign(mPSTempSpecularColour, mPSSpecular, groupOrder);
+        stage.assign(mPSSpecular, mPSTempSpecularColour);
     }
     
     return true;
@@ -557,28 +518,23 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 //-----------------------------------------------------------------------
 bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder)
 {   
-    FunctionInvocation* curFuncInvocation = NULL;   
+    auto stage = psMain->getStage(groupOrder);
 
     // Merge diffuse colour with vertex colour if need to.
     if (mTrackVertexColourType & TVC_DIFFUSE)           
     {
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-        curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);  
-        curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
-        curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);
-        psMain->addAtomInstance(curFuncInvocation);
+        stage.callFunction(FFP_FUNC_MODULATE, In(mPSDiffuse).xyz(), In(curLightParams->mDiffuseColour).xyz(),
+                           Out(curLightParams->mDiffuseColour).xyz());
     }
 
     // Merge specular colour with vertex colour if need to.
     if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
-    {                           
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder);
-        curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);  
-        curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);
-        curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_OUT, Operand::OPM_XYZ);
-        psMain->addAtomInstance(curFuncInvocation);
+    {
+        stage.callFunction(FFP_FUNC_MODULATE, In(mPSDiffuse).xyz(), In(curLightParams->mSpecularColour).xyz(),
+                           Out(curLightParams->mSpecularColour).xyz());
     }
 
+    FunctionInvocation* curFuncInvocation = NULL;   
     switch (curLightParams->mType)
     {
 
@@ -685,12 +641,13 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 //-----------------------------------------------------------------------
 bool PerPixelLighting::addPSFinalAssignmentInvocation( Function* psMain, const int groupOrder)
 {
-    psMain->addAtomAssign(mPSDiffuse, mPSTempDiffuseColour, groupOrder);
-    psMain->addAtomAssign(mPSOutDiffuse, mPSDiffuse, groupOrder);
+    auto stage = psMain->getStage(groupOrder);
+    stage.assign(mPSTempDiffuseColour, mPSDiffuse);
+    stage.assign(mPSDiffuse, mPSOutDiffuse);
 
     if (mSpecularEnable)
     {
-        psMain->addAtomAssign(mPSSpecular, mPSTempSpecularColour, groupOrder);
+        stage.assign(mPSTempSpecularColour, mPSSpecular);
     }
 
     return true;

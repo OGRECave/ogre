@@ -1741,7 +1741,7 @@ namespace Ogre {
             it is changed. Note that because of the nature of the types, we know how big the
             parameter details will be so you don't need to set that like you do for manual constants.
             @param acType The type of automatic constant to set
-            @param extraInfo If the constant type needs more information (like a light index) put it here.
+            @param extraInfo If the constant type needs more information (like a light index or array size) put it here.
         */
         void setAutoConstant(size_t index, AutoConstantType acType, size_t extraInfo = 0);
         void setAutoConstantReal(size_t index, AutoConstantType acType, Real rData);

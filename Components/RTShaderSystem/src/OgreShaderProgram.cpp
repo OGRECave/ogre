@@ -101,6 +101,64 @@ void Program::removeParameter(UniformParameterPtr parameter)
 }
 
 //-----------------------------------------------------------------------------
+
+static bool isArray(GpuProgramParameters::AutoConstantType autoType)
+{
+    switch (autoType)
+    {
+    case GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4:
+    case GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY:
+    case GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4:
+    case GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4:
+    case GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_ATTENUATION_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_POSITION_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_DIRECTION_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_DIRECTION_OBJECT_SPACE_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_DISTANCE_OBJECT_SPACE_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_POWER_SCALE_ARRAY:
+    case GpuProgramParameters::ACT_SPOTLIGHT_PARAMS_ARRAY:
+    case GpuProgramParameters::ACT_DERIVED_LIGHT_DIFFUSE_COLOUR_ARRAY:
+    case GpuProgramParameters::ACT_DERIVED_LIGHT_SPECULAR_COLOUR_ARRAY:
+    case GpuProgramParameters::ACT_LIGHT_CASTS_SHADOWS_ARRAY:
+    case GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX_ARRAY:
+    case GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX_ARRAY:
+    case GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY:
+    case GpuProgramParameters::ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY:
+    case GpuProgramParameters::ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY:
+        return true;
+    default:
+        return false;
+    }
+}
+
+UniformParameterPtr Program::resolveParameter(GpuProgramParameters::AutoConstantType autoType, size_t data)
+{
+    UniformParameterPtr param;
+
+    // Check if parameter already exists.
+    param = getParameterByAutoType(autoType);
+    if (param)
+    {
+        return param;
+    }
+    
+    // Create new parameter
+    size_t size = 0;
+    if(isArray(autoType)) std::swap(size, data); // for array autotypes the extra parameter is the size
+
+    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
+    addParameter(param);
+
+    return param;
+}
+
 UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, 
                                                 Real data, size_t size)
 {

@@ -164,7 +164,7 @@ namespace RTShader {
     };
 
 //-----------------------------------------------------------------------
-Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), mIndex(0), mContent(SPC_UNKNOWN), mSize(0)
+Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), mIndex(0), mContent(SPC_UNKNOWN), mSize(0), mUsed(false)
 {
 }
 
@@ -172,7 +172,7 @@ Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), 
 Parameter::Parameter(GpuConstantType type, const String& name, 
             const Semantic& semantic, int index, 
             const Content& content, size_t size) :
-    mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size)
+    mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size), mUsed(false)
 {
 }
 
@@ -364,8 +364,7 @@ void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
 {   
     if (paramsPtr.get() != NULL)
     {
-        // do not throw on failure: many SRS resolve unneeded vars which get optimized away..
-        const GpuConstantDefinition* def = paramsPtr->_findNamedConstantDefinition(mBindName.empty() ? mName : mBindName, false);
+        const GpuConstantDefinition* def = paramsPtr->_findNamedConstantDefinition(mBindName.empty() ? mName : mBindName, true);
 
         if (def != NULL)
         {

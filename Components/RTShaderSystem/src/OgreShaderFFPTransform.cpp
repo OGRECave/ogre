@@ -62,13 +62,14 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     Function* vsEntry = vsProgram->getEntryPointFunction();
     
     // Resolve World View Projection Matrix.
-    UniformParameterPtr wvpMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
+    UniformParameterPtr wvpMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
         
     // Resolve input position parameter.
-    ParameterPtr positionIn = vsEntry->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4); 
+    ParameterPtr positionIn = vsEntry->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     
     // Resolve output position parameter.
-    ParameterPtr positionOut = vsEntry->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);
+    ParameterPtr positionOut = vsEntry->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
+    //! [param_resolve]
 
     if (!wvpMatrix || !positionIn || !positionOut)
     {
@@ -76,34 +77,22 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
                 "Not all parameters could be constructed for the sub-render state.",
                 "FFPTransform::createCpuSubPrograms" );
     }
-    //! [param_resolve]
+
     // Add dependency.
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
 
-    FunctionInvocation* transformFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM,  FFP_VS_TRANSFORM);
-
-    transformFunc->pushOperand(wvpMatrix, Operand::OPS_IN);
-    transformFunc->pushOperand(positionIn, Operand::OPS_IN);
-    transformFunc->pushOperand(positionOut, Operand::OPS_OUT);
-
-    vsEntry->addAtomInstance(transformFunc);
+    auto stage = vsEntry->getStage(FFP_VS_TRANSFORM);
+    stage.callFunction(FFP_FUNC_TRANSFORM, wvpMatrix, positionIn, positionOut);
 
     if(!mSetPointSize || ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl") // not supported with DX11
         return true;
 
-    UniformParameterPtr pointParams = vsProgram->resolveAutoParameterReal(GpuProgramParameters::ACT_POINT_PARAMS, 0);
-    ParameterPtr pointSize = vsEntry->resolveOutputParameter(
-        Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POINTSPRITE_SIZE, GCT_FLOAT1); // abuse of texture semantic
+    UniformParameterPtr pointParams = vsProgram->resolveParameter(GpuProgramParameters::ACT_POINT_PARAMS);
+    ParameterPtr pointSize = vsEntry->resolveOutputParameter(Parameter::SPC_POINTSPRITE_SIZE);
 
-    transformFunc = OGRE_NEW FunctionInvocation("FFP_DerivePointSize", FFP_VS_TRANSFORM);
-
-    transformFunc->pushOperand(pointParams, Operand::OPS_IN);
     // using eye space depth only instead of the eye real distance
     // its faster to obtain, so lets call it close enough..
-    transformFunc->pushOperand(positionOut, Operand::OPS_IN, Operand::OPM_W);
-    transformFunc->pushOperand(pointSize, Operand::OPS_OUT);
-
-    vsEntry->addAtomInstance(transformFunc);
+    stage.callFunction("FFP_DerivePointSize", pointParams, In(positionOut).w(), pointSize);
 
     return true;
 }
