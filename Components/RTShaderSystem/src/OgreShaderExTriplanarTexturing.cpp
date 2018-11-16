@@ -41,17 +41,14 @@ namespace RTShader {
 		Function* vsMain = vsProgram->getEntryPointFunction();
 		Function* psMain = psProgram->getEntryPointFunction();
 
-		// Resolve pixel shader output diffuse color.
-		mPSInDiffuse = vsMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
-
 		// Resolve input vertex shader normal.
 		mVSInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
 
 		// Resolve output vertex shader normal.
-		mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
+		mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
 
 		// Resolve pixel shader output diffuse color.
-		mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
+		mPSInDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
 		// Resolve input pixel shader normal.
 		mPSInNormal = psMain->resolveInputParameter(mVSOutNormal);
