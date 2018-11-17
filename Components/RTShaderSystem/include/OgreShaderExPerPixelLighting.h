@@ -29,7 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#include "OgreShaderSubRenderState.h"
+#include "OgreShaderFFPLighting.h"
 #include "OgreLight.h"
 #include "OgreCommon.h"
 
@@ -56,120 +56,25 @@ namespace RTShader {
 /** Per pixel Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */
-class _OgreRTSSExport PerPixelLighting : public SubRenderState
+class _OgreRTSSExport PerPixelLighting : public FFPLighting
 {
 
 // Interface.
 public:
-    /** Class default constructor */    
-    PerPixelLighting();
-
     /** 
     @see SubRenderState::getType.
     */
     virtual const String& getType() const;
 
     /** 
-    @see SubRenderState::getType.
-    */
-    virtual int getExecutionOrder() const;
-
-    /** 
     @see SubRenderState::updateGpuProgramsParams.
     */
     virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
-
-    /** 
-    @see SubRenderState::copyFrom.
-    */
-    virtual void copyFrom(const SubRenderState& rhs);
-
-
-    /** 
-    @see SubRenderState::preAddToRenderState.
-    */
-    virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
-
-
     
     static String Type;
 
-// Protected types:
-protected:
-    /// Per light parameters.
-    struct _OgreRTSSExport LightParams
-    {
-        /// Light type.
-        Light::LightTypes mType;
-        /// Light position.
-        UniformParameterPtr mPosition;
-        /// Light direction.
-        UniformParameterPtr mDirection;
-        /// Attenuation parameters.
-        UniformParameterPtr mAttenuatParams;
-        /// Spot light parameters.
-        UniformParameterPtr mSpotParams;
-        /// Diffuse colour.
-        UniformParameterPtr mDiffuseColour;
-        /// Specular colour.
-        UniformParameterPtr mSpecularColour;
-
-        // for normal mapping:
-
-        /// Vertex shader output vertex position to light position direction (texture space).
-        ParameterPtr mVSOutToLightDir;
-        /// Pixel shader input vertex position to light position direction (texture space).
-        ParameterPtr mPSInToLightDir;
-        /// Vertex shader output light direction (texture space).
-        ParameterPtr mVSOutDirection;
-        /// Pixel shader input light direction (texture space).
-        ParameterPtr mPSInDirection;
-    };
-
-    typedef std::vector<LightParams> LightParamsList;
-    typedef LightParamsList::iterator LightParamsIterator;
-    typedef LightParamsList::const_iterator LightParamsConstIterator;
-
 // Protected methods
 protected:
-
-    /** 
-    Set the track per vertex colour type. Ambient, Diffuse, Specular and Emissive lighting components source
-    can be the vertex colour component. To establish such a link one should provide the matching flags to this
-    sub render state.
-    */
-    void setTrackVertexColourType(TrackVertexColourType type) { mTrackVertexColourType = type; }
-
-    /** 
-    Return the current track per vertex type.
-    */
-    TrackVertexColourType getTrackVertexColourType() const { return mTrackVertexColourType; }
-
-
-    /** 
-    Set the light count per light type that this sub render state will generate.
-    @see ShaderGenerator::setLightCount.
-    */
-    void setLightCount(const int lightCount[3]);
-
-    /** 
-    Get the light count per light type that this sub render state will generate.
-    @see ShaderGenerator::getLightCount.
-    */
-    void getLightCount(int lightCount[3]) const;
-    /** 
-    Set the specular component state. If set to true this sub render state will compute a specular
-    lighting component in addition to the diffuse component.
-    @param enable Pass true to enable specular component computation.
-    */
-    void setSpecularEnable(bool enable) { mSpecularEnable = enable; }
-
-    /** 
-    Get the specular component state. 
-    */
-    bool getSpecularEnable() const { return mSpecularEnable; }
-
-
     /** 
     @see SubRenderState::resolveParameters.
     */
@@ -204,11 +109,6 @@ protected:
     bool addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder);
 
     /** 
-    Internal method that adds per light illumination component functions invocations.
-    */
-    bool addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder);
-
-    /** 
     Internal method that adds the final colour assignments.
     */
     bool addPSFinalAssignmentInvocation(Function* psMain, const int groupOrder);
@@ -216,58 +116,12 @@ protected:
 
 // Attributes.
 protected:  
-    // Track per vertex colour type.
-    TrackVertexColourType mTrackVertexColourType;
-    // Specular component enabled/disabled.
-    bool mSpecularEnable;
-    // Light list.
-    LightParamsList mLightParamsList;
-    // World view matrix parameter.
-    UniformParameterPtr mWorldViewMatrix;
-    // World view matrix inverse transpose parameter.
-    UniformParameterPtr mWorldViewITMatrix;
-    // Vertex shader input position parameter.
-    ParameterPtr mVSInPosition;
     // Vertex shader output view position (position in camera space) parameter.
     ParameterPtr mVSOutViewPos;
-    // Pixel shader input view position (position in camera space) parameter.
-    ParameterPtr mPSInViewPos;
-    // Vertex shader input normal.
-    ParameterPtr mVSInNormal;
     // Vertex shader output normal.
     ParameterPtr mVSOutNormal;
-    // Pixel shader input normal.
-    ParameterPtr mPSInNormal;
-    // Pixel shader temporary diffuse calculation parameter.
-    ParameterPtr mPSTempDiffuseColour;
-    // Pixel shader temporary specular calculation parameter.
-    ParameterPtr mPSTempSpecularColour;
-    // Pixel shader input/local diffuse parameter.  
-    ParameterPtr mPSDiffuse;
     // Pixel shader input/local specular parameter. 
     ParameterPtr mPSSpecular;
-    // Pixel shader output diffuse parameter.   
-    ParameterPtr mPSOutDiffuse;
-    // Pixel shader output specular parameter.  
-    ParameterPtr mPSOutSpecular;
-    // Derived scene colour parameter.
-    UniformParameterPtr mDerivedSceneColour;
-    // Ambient light colour parameter.
-    UniformParameterPtr mLightAmbientColour;
-    // Derived ambient light colour parameter.
-    UniformParameterPtr mDerivedAmbientLightColour;
-    // Surface ambient colour parameter.
-    UniformParameterPtr mSurfaceAmbientColour;
-    // Surface diffuse colour parameter.
-    UniformParameterPtr mSurfaceDiffuseColour;
-    // Surface specular colour parameter.
-    UniformParameterPtr mSurfaceSpecularColour;
-    // Surface emissive colour parameter.
-    UniformParameterPtr mSurfaceEmissiveColour;
-    // Surface shininess parameter.
-    UniformParameterPtr mSurfaceShininess;
-    // Shared blank light.
-    static Light msBlankLight;
 };
 
 

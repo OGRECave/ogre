@@ -34,18 +34,6 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String PerPixelLighting::Type = "SGX_PerPixelLighting";
-Light PerPixelLighting::msBlankLight;
-
-//-----------------------------------------------------------------------
-PerPixelLighting::PerPixelLighting()
-{
-    mTrackVertexColourType          = TVC_NONE; 
-    mSpecularEnable                 = false;
-
-    msBlankLight.setDiffuseColour(ColourValue::Black);
-    msBlankLight.setSpecularColour(ColourValue::Black);
-    msBlankLight.setAttenuation(0,1,0,0);
-}
 
 //-----------------------------------------------------------------------
 const String& PerPixelLighting::getType() const
@@ -53,12 +41,6 @@ const String& PerPixelLighting::getType() const
     return Type;
 }
 
-
-//-----------------------------------------------------------------------
-int PerPixelLighting::getExecutionOrder() const
-{
-    return FFP_LIGHTING;
-}
 
 //-----------------------------------------------------------------------
 void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
@@ -270,19 +252,18 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
 
     // Resolve input pixel shader normal.
-    mPSInNormal = psMain->resolveInputParameter(mVSOutNormal);
+    mViewNormal = psMain->resolveInputParameter(mVSOutNormal);
 
-    mPSDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
-    if (mPSDiffuse.get() == NULL)
+    mInDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
+    if (mInDiffuse.get() == NULL)
     {
-        mPSDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
+        mInDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
 
-    mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
-    mPSTempDiffuseColour = psMain->resolveLocalParameter("lPerPixelDiffuse", GCT_FLOAT4);
+    mOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
-    hasError |= !(mDerivedSceneColour.get()) || !(mSurfaceShininess.get()) || !(mVSInNormal.get()) || !(mVSOutNormal.get()) || !(mPSInNormal.get()) || !(
-        mPSDiffuse.get()) || !(mPSOutDiffuse.get()) || !(mPSTempDiffuseColour.get());
+    hasError |= !(mDerivedSceneColour.get()) || !(mSurfaceShininess.get()) || !(mVSInNormal.get()) || !(mVSOutNormal.get()) || !(mViewNormal.get()) || !(
+        mInDiffuse.get()) || !(mOutDiffuse.get());
     
     if (mSpecularEnable)
     {
@@ -292,18 +273,18 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
             mPSSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         }
 
-        mPSTempSpecularColour = psMain->resolveLocalParameter("lPerPixelSpecular", GCT_FLOAT4);
+        mOutSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
 
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
         mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
-        mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
+        mViewPos = psMain->resolveInputParameter(mVSOutViewPos);
 
         mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
-        
-        hasError |= !(mPSSpecular.get()) || !(mPSTempSpecularColour.get()) || !(mVSInPosition.get()) || !(mVSOutViewPos.get()) || 
-            !(mPSInViewPos.get()) || !(mWorldViewMatrix.get());
+
+        hasError |= !(mPSSpecular.get()) || !(mOutSpecular.get()) || !(mVSInPosition.get()) || !(mVSOutViewPos.get()) ||
+            !(mViewPos.get()) || !(mWorldViewMatrix.get());
     }
 
     if (hasError)
@@ -343,11 +324,11 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             {
                 mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
-                mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
+                mViewPos = psMain->resolveInputParameter(mVSOutViewPos);
             }   
             
             hasError |= !(mWorldViewMatrix.get()) || !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || 
-                !(mLightParamsList[i].mAttenuatParams.get()) || !(mVSOutViewPos.get()) || !(mPSInViewPos.get());
+                !(mLightParamsList[i].mAttenuatParams.get()) || !(mVSOutViewPos.get()) || !(mViewPos.get());
         
             break;
 
@@ -365,12 +346,12 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             {
                 mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
-                mPSInViewPos = psMain->resolveInputParameter(mVSOutViewPos);
+                mViewPos = psMain->resolveInputParameter(mVSOutViewPos);
             }   
 
             hasError |= !(mWorldViewMatrix.get()) || !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || 
                 !(mLightParamsList[i].mDirection.get()) || !(mLightParamsList[i].mAttenuatParams.get()) || 
-                !(mLightParamsList[i].mSpotParams.get()) || !(mVSOutViewPos.get()) || !(mPSInViewPos.get());
+                !(mLightParamsList[i].mSpotParams.get()) || !(mVSOutViewPos.get()) || !(mViewPos.get());
             
             break;
         }
@@ -446,7 +427,7 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
     // Add per light functions.
     for (unsigned int i=0; i < mLightParamsList.size(); ++i)
     {       
-        if (false == addPSIlluminationInvocation(&mLightParamsList[i], psMain, FFP_PS_COLOUR_BEGIN + 1))
+        if (false == addIlluminationInvocation(&mLightParamsList[i], psMain, FFP_PS_COLOUR_BEGIN + 1))
             return false;
     }
 
@@ -484,157 +465,34 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
         (mTrackVertexColourType & TVC_EMISSIVE) == 0)
     {
-        stage.assign(mDerivedSceneColour, mPSTempDiffuseColour);
+        stage.assign(mDerivedSceneColour, mOutDiffuse);
     }
     else
     {
         if (mTrackVertexColourType & TVC_AMBIENT)
         {
-            stage.callFunction(FFP_FUNC_MODULATE, mLightAmbientColour, mPSDiffuse, mPSTempDiffuseColour);
+            stage.callFunction(FFP_FUNC_MODULATE, mLightAmbientColour, mInDiffuse, mOutDiffuse);
         }
         else
         {
-            stage.assign(In(mDerivedAmbientLightColour).xyz(), Out(mPSTempDiffuseColour).xyz());
+            stage.assign(In(mDerivedAmbientLightColour).xyz(), Out(mOutDiffuse).xyz());
         }
 
         if (mTrackVertexColourType & TVC_EMISSIVE)
         {
-            stage.callFunction(FFP_FUNC_ADD, mPSDiffuse, mPSTempDiffuseColour, mPSTempDiffuseColour);
+            stage.callFunction(FFP_FUNC_ADD, mInDiffuse, mOutDiffuse, mOutDiffuse);
         }
         else
         {
-            stage.callFunction(FFP_FUNC_ADD, mSurfaceEmissiveColour, mPSTempDiffuseColour, mPSTempDiffuseColour);
+            stage.callFunction(FFP_FUNC_ADD, mSurfaceEmissiveColour, mOutDiffuse, mOutDiffuse);
         }       
     }
 
     if (mSpecularEnable)
     {
-        stage.assign(mPSSpecular, mPSTempSpecularColour);
+        stage.assign(mPSSpecular, mOutSpecular);
     }
     
-    return true;
-}
-
-//-----------------------------------------------------------------------
-bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder)
-{   
-    auto stage = psMain->getStage(groupOrder);
-
-    // Merge diffuse colour with vertex colour if need to.
-    if (mTrackVertexColourType & TVC_DIFFUSE)           
-    {
-        stage.callFunction(FFP_FUNC_MODULATE, In(mPSDiffuse).xyz(), In(curLightParams->mDiffuseColour).xyz(),
-                           Out(curLightParams->mDiffuseColour).xyz());
-    }
-
-    // Merge specular colour with vertex colour if need to.
-    if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
-    {
-        stage.callFunction(FFP_FUNC_MODULATE, In(mPSDiffuse).xyz(), In(curLightParams->mSpecularColour).xyz(),
-                           Out(curLightParams->mSpecularColour).xyz());
-    }
-
-    FunctionInvocation* curFuncInvocation = NULL;   
-    switch (curLightParams->mType)
-    {
-
-    case Light::LT_DIRECTIONAL:         
-        if (mSpecularEnable)
-        {               
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder);
-            curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);          
-            curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);          
-            curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);         
-            curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);    
-            curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
-            curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, Operand::OPM_XYZ);  
-            psMain->addAtomInstance(curFuncInvocation);
-        }
-
-        else
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, groupOrder);
-            curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);                  
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);    
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
-            psMain->addAtomInstance(curFuncInvocation); 
-        }   
-        break;
-
-    case Light::LT_POINT:   
-        if (mSpecularEnable)
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder);
-            curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);           
-            curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);  
-            curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);         
-            curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);    
-            curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
-            curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, Operand::OPM_XYZ);  
-            psMain->addAtomInstance(curFuncInvocation);     
-        }
-        else
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSE, groupOrder);
-            curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);           
-            curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);                  
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);    
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
-            psMain->addAtomInstance(curFuncInvocation); 
-        }
-
-        break;
-
-    case Light::LT_SPOTLIGHT:
-        if (mSpecularEnable)
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder);
-            curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mSpotParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);         
-            curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);    
-            curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
-            curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, Operand::OPM_XYZ);  
-            psMain->addAtomInstance(curFuncInvocation);         
-        }
-        else
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSE, groupOrder);
-            curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mSpotParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);                  
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);    
-            curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);   
-            psMain->addAtomInstance(curFuncInvocation); 
-        }
-        break;
-    }
-
     return true;
 }
 
@@ -642,134 +500,15 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 bool PerPixelLighting::addPSFinalAssignmentInvocation( Function* psMain, const int groupOrder)
 {
     auto stage = psMain->getStage(groupOrder);
-    stage.assign(mPSTempDiffuseColour, mPSDiffuse);
-    stage.assign(mPSDiffuse, mPSOutDiffuse);
+    stage.assign(mOutDiffuse, mInDiffuse);
 
     if (mSpecularEnable)
     {
-        stage.assign(mPSTempSpecularColour, mPSSpecular);
+        stage.assign(mOutSpecular, mPSSpecular);
     }
 
     return true;
 }
-
-
-//-----------------------------------------------------------------------
-void PerPixelLighting::copyFrom(const SubRenderState& rhs)
-{
-    const PerPixelLighting& rhsLighting = static_cast<const PerPixelLighting&>(rhs);
-
-    int lightCount[3];
-
-    rhsLighting.getLightCount(lightCount);
-    setLightCount(lightCount);
-}
-
-//-----------------------------------------------------------------------
-bool PerPixelLighting::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
-{
-    if (srcPass->getLightingEnabled() == false)
-        return false;
-
-    int lightCount[3];
-
-    renderState->getLightCount(lightCount);
-
-    setTrackVertexColourType(srcPass->getVertexColourTracking());           
-
-    if (srcPass->getShininess() > 0.0 &&
-        srcPass->getSpecular() != ColourValue::Black)
-    {
-        setSpecularEnable(true);
-    }
-    else
-    {
-        setSpecularEnable(false);   
-    }
-
-    // Case this pass should run once per light(s) -> override the light policy.
-    if (srcPass->getIteratePerLight())
-    {       
-
-        // This is the preferred case -> only one type of light is handled.
-        if (srcPass->getRunOnlyForOneLightType())
-        {
-            if (srcPass->getOnlyLightType() == Light::LT_POINT)
-            {
-                lightCount[0] = srcPass->getLightCountPerIteration();
-                lightCount[1] = 0;
-                lightCount[2] = 0;
-            }
-            else if (srcPass->getOnlyLightType() == Light::LT_DIRECTIONAL)
-            {
-                lightCount[0] = 0;
-                lightCount[1] = srcPass->getLightCountPerIteration();
-                lightCount[2] = 0;
-            }
-            else if (srcPass->getOnlyLightType() == Light::LT_SPOTLIGHT)
-            {
-                lightCount[0] = 0;
-                lightCount[1] = 0;
-                lightCount[2] = srcPass->getLightCountPerIteration();
-            }
-        }
-
-        // This is worse case -> all light types expected to be handled.
-        // Can not handle this request in efficient way - throw an exception.
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Using iterative lighting method with RT Shader System requires specifying explicit light type.",
-                "PerPixelLighting::preAddToRenderState");           
-        }
-    }
-
-    setLightCount(lightCount);
-
-    return true;
-}
-
-//-----------------------------------------------------------------------
-void PerPixelLighting::setLightCount(const int lightCount[3])
-{
-    for (int type=0; type < 3; ++type)
-    {
-        for (int i=0; i < lightCount[type]; ++i)
-        {
-            LightParams curParams;
-
-            if (type == 0)
-                curParams.mType = Light::LT_POINT;
-            else if (type == 1)
-                curParams.mType = Light::LT_DIRECTIONAL;
-            else if (type == 2)
-                curParams.mType = Light::LT_SPOTLIGHT;      
-
-            mLightParamsList.push_back(curParams);
-        }
-    }           
-}
-
-//-----------------------------------------------------------------------
-void PerPixelLighting::getLightCount(int lightCount[3]) const
-{
-    lightCount[0] = 0;
-    lightCount[1] = 0;
-    lightCount[2] = 0;
-
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
-    {
-        const LightParams curParams = mLightParamsList[i];
-
-        if (curParams.mType == Light::LT_POINT)
-            lightCount[0]++;
-        else if (curParams.mType == Light::LT_DIRECTIONAL)
-            lightCount[1]++;
-        else if (curParams.mType == Light::LT_SPOTLIGHT)
-            lightCount[2]++;
-    }
-}
-
 
 //-----------------------------------------------------------------------
 const String& PerPixelLightingFactory::getType() const

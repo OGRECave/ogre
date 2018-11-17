@@ -91,6 +91,7 @@ enum FFPShaderStage
 #define FFP_FUNC_TRANSFORM                          "FFP_Transform"
 
 // Fixed Function Library: Lighting functions
+/// @deprecated use SGX_LIB_PERPIXELLIGHTING
 #define FFP_LIB_LIGHTING                            "FFPLib_Lighting"
 #define FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE          "FFP_Light_Directional_Diffuse"
 #define FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR  "FFP_Light_Directional_DiffuseSpecular"

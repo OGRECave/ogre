@@ -118,6 +118,7 @@ public:
     /// resolve input parameter from previous output
     ParameterPtr resolveInputParameter(const ParameterPtr& out)
     {
+        OgreAssert(out, "parameter must not be NULL");
         return resolveInputParameter(out->getSemantic(), out->getIndex(), out->getContent(), out->getType());
     }
 
