@@ -697,29 +697,33 @@ namespace Ogre
         Display* xDisplay = mGLSupport->getXDisplay();
         XWindowAttributes windowAttrib;
 
+        Window parent, root, *children;
+        uint nChildren;
+
+        XQueryTree(xDisplay, mWindow, &root, &parent, &children, &nChildren);
+
+        if (children)
+            XFree(children);
+
+        XGetWindowAttributes(xDisplay, parent, &windowAttrib);
+
         if (mIsTopLevel && !mIsFullScreen)
         {
-            Window parent, root, *children;
-            uint nChildren;
-
-            XQueryTree(xDisplay, mWindow, &root, &parent, &children, &nChildren);
-
-            if (children)
-                XFree(children);
-
-            XGetWindowAttributes(xDisplay, parent, &windowAttrib);
-
             mLeft = windowAttrib.x;
             mTop  = windowAttrib.y;
         }
-
-        XGetWindowAttributes(xDisplay, mWindow, &windowAttrib);
 
         if (mWidth == (size_t)windowAttrib.width && mHeight == (size_t)windowAttrib.height)
             return;
 
         mWidth = windowAttrib.width;
         mHeight = windowAttrib.height;
+
+        if(!mIsTopLevel)
+        {
+            XResizeWindow(xDisplay, mWindow, mWidth, mHeight);
+            XFlush(xDisplay);
+        }
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
             (*it).second->_updateDimensions();

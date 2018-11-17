@@ -792,7 +792,6 @@ void ApplicationContext::pollEvents()
                     continue;
 
                 Ogre::RenderWindow* win = it->render;
-                win->resize(event.window.data1, event.window.data2);
                 win->windowMovedOrResized();
                 windowResized(win);
             }
