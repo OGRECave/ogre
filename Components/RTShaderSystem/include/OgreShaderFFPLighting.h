@@ -28,7 +28,7 @@ THE SOFTWARE.
 #define _ShaderFFPLighting_
 
 #include "OgreShaderPrerequisites.h"
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+#if defined(RTSHADER_SYSTEM_BUILD_CORE_SHADERS) || defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 #include "OgreShaderSubRenderState.h"
 #include "OgreLight.h"
 #include "OgreCommon.h"
@@ -105,6 +105,16 @@ protected:
         // Specular colour.
         UniformParameterPtr mSpecularColour;
 
+        // for normal mapping:
+
+        /// Vertex shader output vertex position to light position direction (texture space).
+        ParameterPtr mVSOutToLightDir;
+        /// Pixel shader input vertex position to light position direction (texture space).
+        ParameterPtr mPSInToLightDir;
+        /// Vertex shader output light direction (texture space).
+        ParameterPtr mVSOutDirection;
+        /// Pixel shader input light direction (texture space).
+        ParameterPtr mPSInDirection;
     };
 
     typedef std::vector<LightParams>               LightParamsList;
@@ -188,16 +198,20 @@ protected:
     UniformParameterPtr mWorldViewMatrix;
     // World view matrix inverse transpose parameter.
     UniformParameterPtr mWorldViewITMatrix;
+    // Transformed view normal
+    ParameterPtr mViewNormal;
+    // Transformed view position
+    ParameterPtr mViewPos;
     // Vertex shader input position parameter.
     ParameterPtr mVSInPosition;
     // Vertex shader input normal.
     ParameterPtr mVSInNormal;
     // Vertex shader diffuse.
-    ParameterPtr mVSDiffuse;
+    ParameterPtr mInDiffuse;
     // Vertex shader output diffuse colour parameter.
-    ParameterPtr mVSOutDiffuse;
+    ParameterPtr mOutDiffuse;
     // Vertex shader output specular colour parameter.
-    ParameterPtr mVSOutSpecular;
+    ParameterPtr mOutSpecular;
     // Derived scene colour parameter.
     UniformParameterPtr mDerivedSceneColour;
     // Ambient light colour parameter.

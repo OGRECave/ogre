@@ -30,6 +30,9 @@ THE SOFTWARE.
 // Program Desc: Per pixel lighting functions.
 // Program Type: Vertex/Pixel shader
 // Language: GLSL
+// Notes: Implements core functions for FFPLighting class.
+// based on lighting engine. 
+// See http://msdn.microsoft.com/en-us/library/bb147178.aspx
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
