@@ -33,17 +33,12 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String FFPLighting::Type = "FFP_Lighting";
-Light FFPLighting::msBlankLight;
 
 //-----------------------------------------------------------------------
 FFPLighting::FFPLighting()
 {
 	mTrackVertexColourType			= TVC_NONE;
 	mSpecularEnable					= false;
-
-	msBlankLight.setDiffuseColour(ColourValue::Black);
-	msBlankLight.setSpecularColour(ColourValue::Black);
-	msBlankLight.setAttenuation(0,1,0,0);
 }
 
 //-----------------------------------------------------------------------
@@ -81,61 +76,47 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			curSearchLightIndex = 0;
 		}
 
-		Light*		srcLight = NULL;
 		Vector4		vParameter;
 		ColourValue colour;
 
 		// Search a matching light from the current sorted lights of the given renderable.
-		for (unsigned int j = curSearchLightIndex; j < (pLightList ? pLightList->size() : 0); ++j)
+		size_t j;
+		for (j = curSearchLightIndex; j < (pLightList ? pLightList->size() : 0); ++j)
 		{
 			if (pLightList->at(j)->getType() == curLightType)
-			{				
-				srcLight = pLightList->at(j);
+			{
 				curSearchLightIndex = j + 1;
 				break;
 			}			
 		}
 
-		// No matching light found -> use a blank dummy light for parameter update.
-		if (srcLight == NULL)
-		{						
-			srcLight = &msBlankLight;
-		}
-					
-		
 		switch (curParams.mType)
 		{
 		case Light::LT_DIRECTIONAL:
 
 			// Update light direction.
-			vParameter = matView * srcLight->getAs4DVector(true);
+			vParameter = matView * source->getLightAs4DVector(j);
 			curParams.mDirection->setGpuParameter(vParameter);
 			break;
 
 		case Light::LT_POINT:
-
 			// Update light position.
-			vParameter = matView * srcLight->getAs4DVector(true);
+			vParameter = matView * source->getLightAs4DVector(j);
 			curParams.mPosition->setGpuParameter(vParameter);
-
 			// Update light attenuation parameters.
-			vParameter.x = srcLight->getAttenuationRange();
-			vParameter.y = srcLight->getAttenuationConstant();
-			vParameter.z = srcLight->getAttenuationLinear();
-			vParameter.w = srcLight->getAttenuationQuadric();
+			vParameter = source->getLightAttenuation(j);
 			curParams.mAttenuatParams->setGpuParameter(vParameter);
 			break;
 
 		case Light::LT_SPOTLIGHT:
 		{						
 			Vector3 vec3;
-			
 			// Update light position.
-			vParameter = matView * srcLight->getAs4DVector(true);
+			vParameter = matView * source->getLightAs4DVector(j);
 			curParams.mPosition->setGpuParameter(vParameter);
 			
 							
-			vec3 = source->getInverseTransposeViewMatrix().linear() * srcLight->getDerivedDirection();
+			vec3 = source->getInverseTransposeViewMatrix().linear() * source->getLightDirection(j);
 			vec3.normalise();
 
 			vParameter.x = -vec3.x;
@@ -145,20 +126,11 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			curParams.mDirection->setGpuParameter(vParameter);
 
 			// Update light attenuation parameters.
-			vParameter.x = srcLight->getAttenuationRange();
-			vParameter.y = srcLight->getAttenuationConstant();
-			vParameter.z = srcLight->getAttenuationLinear();
-			vParameter.w = srcLight->getAttenuationQuadric();
+			vParameter = source->getLightAttenuation(j);
 			curParams.mAttenuatParams->setGpuParameter(vParameter);
 
 			// Update spotlight parameters.
-			Real phi   = Math::Cos(srcLight->getSpotlightOuterAngle().valueRadians() * 0.5f);
-			Real theta = Math::Cos(srcLight->getSpotlightInnerAngle().valueRadians() * 0.5f);
-
-			vec3.x = theta;
-			vec3.y = phi;
-			vec3.z = srcLight->getSpotlightFalloff();
-			
+			vec3 = source->getSpotlightParams(j).xyz();
 			curParams.mSpotParams->setGpuParameter(vec3);
 		}
 			break;
@@ -168,12 +140,12 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 		// Update diffuse colour.
 		if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 		{
-			colour = srcLight->getDiffuseColour() * pass->getDiffuse() * srcLight->getPowerScale();
+			colour = pass->getDiffuse() * source->getLightDiffuseColourWithPower(j);
 			curParams.mDiffuseColour->setGpuParameter(colour);					
 		}
 		else
 		{					
-			colour = srcLight->getDiffuseColour() * srcLight->getPowerScale();
+			colour = source->getLightDiffuseColourWithPower(j);
 			curParams.mDiffuseColour->setGpuParameter(colour);	
 		}
 
@@ -183,12 +155,12 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			// Update diffuse colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 			{
-				colour = srcLight->getSpecularColour() * pass->getSpecular() * srcLight->getPowerScale();
+				colour = pass->getSpecular() * source->getLightSpecularColourWithPower(j);
 				curParams.mSpecularColour->setGpuParameter(colour);					
 			}
 			else
 			{					
-				colour = srcLight->getSpecularColour() * srcLight->getPowerScale();
+				colour = source->getLightSpecularColourWithPower(j);
 				curParams.mSpecularColour->setGpuParameter(colour);	
 			}
 		}																			
