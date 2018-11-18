@@ -2017,6 +2017,8 @@ void SceneManager::issueRenderWithLights(Renderable* rend, const Pass* pass,
     if (pLightListToUse && (pass->isProgrammable() || pass->getLightingEnabled()))
         useLights(*pLightListToUse, pass->getMaxSimultaneousLights(), fixedFunction);
 
+    fireRenderSingleObject(rend, pass, mAutoParamDataSource.get(), pLightListToUse, false);
+
     // optional light scissoring & clipping
     ClipResult scissored = CLIPPED_NONE;
     ClipResult clipped = CLIPPED_NONE;
@@ -2152,7 +2154,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             (manualLightList && (manualLightList->size() != 1 ||
                                  manualLightList->front()->getType() == pass->getOnlyLightType())))
         {
-            fireRenderSingleObject(rend, pass, mAutoParamDataSource.get(), manualLightList, false);
             issueRenderWithLights(rend, pass, manualLightList, passLightParams, lightScissoringClipping);
         }
 
@@ -2299,7 +2300,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             lightsLeft = 0;
         }
 
-        fireRenderSingleObject(rend, pass, mAutoParamDataSource.get(), pLightListToUse, false);
         // issue the render op
 
         // We might need to update the depth bias each iteration
