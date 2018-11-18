@@ -228,9 +228,6 @@ protected:
     UniformParameterPtr mSurfaceEmissiveColour;
     // Surface shininess parameter.
     UniformParameterPtr mSurfaceShininess;
-    // Shared blank light.
-    static Light msBlankLight;
-
 };
 
 

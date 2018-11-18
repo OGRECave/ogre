@@ -66,11 +66,6 @@ public:
     */
     virtual const String& getType() const;
 
-    /** 
-    @see SubRenderState::updateGpuProgramsParams.
-    */
-    virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
-    
     static String Type;
 
 // Protected methods
