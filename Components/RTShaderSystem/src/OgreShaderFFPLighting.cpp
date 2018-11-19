@@ -379,7 +379,8 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 	auto stage = vsMain->getStage(groupOrder);
 
     // Transform normal to view space
-    stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldViewITMatrix, mVSInNormal, mViewNormal);
+	if(!mLightParamsList.empty())
+	    stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldViewITMatrix, mVSInNormal, mViewNormal);
 
     if(mViewPos)
     {
