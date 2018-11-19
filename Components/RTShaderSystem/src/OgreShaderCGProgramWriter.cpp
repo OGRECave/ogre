@@ -158,12 +158,15 @@ void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* progra
     os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
 
+    const auto& rgm = ResourceGroupManager::getSingleton();
 
     for (unsigned int i=0; i < program->getDependencyCount(); ++i)
     {
-        const String& curDependency = program->getDependency(i);
+        String curDependency = program->getDependency(i) + "." + getTargetLanguage();
+        if (!rgm.resourceExists(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, curDependency))
+            curDependency = program->getDependency(i) + ".cg"; // fall back to cg extension
 
-        os << "#include " << '\"' << curDependency << "." << getTargetLanguage() << '\"' << std::endl;
+        os << "#include \"" << curDependency << '\"' << std::endl;
     }
 }
 
