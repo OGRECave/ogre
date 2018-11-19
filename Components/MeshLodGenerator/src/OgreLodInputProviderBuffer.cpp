@@ -111,8 +111,9 @@ namespace Ogre
         Vector3* pOut = vertexBuffer.vertexBuffer.get();
         Vector3* pEnd = pOut + vertexBuffer.vertexCount;
         for (; pOut < pEnd; pOut++) {
-            data->mVertexList.push_back({*pOut, *pNormalOut});
+            data->mVertexList.push_back(LodData::Vertex());
             LodData::Vertex* v = &data->mVertexList.back();
+            v->position = *pOut;
             std::pair<LodData::UniqueVertexSet::iterator, bool> ret;
             ret = data->mUniqueVertexSet.insert(v);
             if (!ret.second) {
@@ -136,6 +137,7 @@ namespace Ogre
 #endif
                 v->seam = false;
                 if(data->mUseVertexNormals){
+                    v->normal = *pNormalOut;
                     v->normal.normalise();
                     pNormalOut++;
                 }
