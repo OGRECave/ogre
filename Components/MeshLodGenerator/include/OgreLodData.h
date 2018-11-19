@@ -122,7 +122,11 @@ struct _OgreLodExport LodData {
             normal = Math::calculateBasicFaceNormal(vertex[0]->position, vertex[1]->position,
                                                     vertex[2]->position);
         }
-        bool hasVertex(const Vertex* v) const;
+        bool hasVertex(const Vertex* v) const
+        {
+            return (v == vertex[0] || v == vertex[1] || v == vertex[2]);
+        }
+
         unsigned int getVertexID(const Vertex* v) const;
         bool isMalformed();
     };

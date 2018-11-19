@@ -70,11 +70,6 @@ size_t LodData::VertexHash::operator() (const LodData::Vertex* v) const
     return (size_t)hash;
 }
 
-bool LodData::Triangle::hasVertex(const LodData::Vertex* v) const
-{
-    return (v == vertex[0] || v == vertex[1] || v == vertex[2]);
-}
-
 unsigned int LodData::Triangle::getVertexID(const LodData::Vertex* v) const
 {
     for (int i = 0; i < 3; i++) {
