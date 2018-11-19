@@ -301,6 +301,13 @@ namespace Ogre {
             std::sort(forwardDecl.begin(), forwardDecl.end(), FunctionInvocation::FunctionInvocationLessThan());
             forwardDecl.erase(std::unique(forwardDecl.begin(), forwardDecl.end(), FunctionInvocation::FunctionInvocationCompare()), forwardDecl.end());
 
+            // Write forward declarations as we did not sort by dependency
+            for (auto& decl : forwardDecl)
+            {
+                writeFunctionDeclaration(os, decl, false);
+                os << ";\n";
+            }
+
             for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
             {
                 const String& curDependency = program->getDependency(i);
