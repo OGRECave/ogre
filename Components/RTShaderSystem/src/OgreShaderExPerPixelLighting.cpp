@@ -307,7 +307,8 @@ bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder)
     auto stage = vsMain->getStage(groupOrder);
 
     // Transform normal in view space.
-    stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
+    if(!mLightParamsList.empty())
+        stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
 
     // Transform view space position if need to.
     if (mVSOutViewPos)
