@@ -191,13 +191,6 @@ void LinearSkinning::addPositionCalculations(Function* vsMain)
     }
     else
     {
-        //update from object to world space
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
-        curFuncInvocation->pushOperand(mParamInWorldMatrix, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);
-        vsMain->addAtomInstance(curFuncInvocation);
-
         //update from object to projective space
         curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamInWorldViewProjMatrix, Operand::OPS_IN);
