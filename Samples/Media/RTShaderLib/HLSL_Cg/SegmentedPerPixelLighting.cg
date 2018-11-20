@@ -172,7 +172,7 @@ void SL_Light_Segment_Debug(
 	int index = (int)indexes.x + (int)(indexes.y) * 9;
 	float4 indexBounds = tex2Dlod(dataTexture, float4(widthOffset,heightOffset,0,0));
 
-	float2 debugColors = vColorOut.xy * 0.5 + ((mod(floor(indexes.xy),2) == 0) ? 0.1 : 0.2);
+	float2 debugColors = vColorOut.xy * 0.5 + ((fmod(floor(indexes.xy),2) == 0) ? 0.1 : 0.2);
 	vColorOut.xy =  debugColors;
 	int toIndex = min(lightIndexLimit.y, indexBounds.x);
 	vColorOut.z = (toIndex - lightIndexLimit.x) / 32;	
