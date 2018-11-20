@@ -464,9 +464,22 @@ namespace Ogre {
 
         bool mInternalResourcesCreated;
 
+        /** Vector of images that were pulled from disk by
+            prepareLoad but have yet to be pushed into texture memory
+            by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
+        */
+        typedef std::vector<Image> LoadedImages;
+        LoadedImages mLoadedImages;
+
         /// Vector of pointers to subsurfaces
         typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
         SurfaceList mSurfaceList;
+
+        void readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT);
+
+        void prepareImpl();
+        void unprepareImpl();
+        void loadImpl();
 
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;

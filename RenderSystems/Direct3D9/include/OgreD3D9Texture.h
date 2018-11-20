@@ -74,23 +74,6 @@ namespace Ogre {
         bool mHwGammaWriteSupported;
         D3DMULTISAMPLE_TYPE mFSAAType;
         DWORD mFSAAQuality;
-        
-        // needed to store data between prepareImpl and loadImpl
-        typedef SharedPtr<std::vector<MemoryDataStreamPtr> > LoadedStreams;
-
-        /// internal method, load a cube texture
-        void _loadCubeTex(IDirect3DDevice9* d3d9Device, const LoadedStreams &loadedStreams);
-        /// internal method, load a normal texture
-        void _loadNormTex(IDirect3DDevice9* d3d9Device, const LoadedStreams &loadedStreams);
-        /// internal method, load a volume texture
-        void _loadVolumeTex(IDirect3DDevice9* d3d9Device, const LoadedStreams &loadedStreams);
-
-        /// internal method, prepare a cube texture
-        LoadedStreams _prepareCubeTex();
-        /// internal method, prepare a normal texture
-        LoadedStreams _prepareNormTex();
-        /// internal method, prepare a volume texture
-        LoadedStreams _prepareVolumeTex();
 
         /// internal method, create a blank normal 1D/2D texture        
         void _createNormTex(IDirect3DDevice9* d3d9Device);
@@ -137,15 +120,7 @@ namespace Ogre {
         void _createSurfaceList(IDirect3DDevice9* d3d9Device, TextureResources* textureResources);
 
         /// overridden from Resource
-        void loadImpl();         
-        /// Loads this texture into the specified device.
-        void loadImpl(IDirect3DDevice9* d3d9Device);
-        /// overridden from Resource
-        void prepareImpl();
-        /// overridden from Resource
-        void unprepareImpl();
-        /// overridden from Resource
-        void postLoadImpl();
+        void loadImpl();
 
         /// gets the texture resources attached to the given device.
         TextureResources* getTextureResources(IDirect3DDevice9* d3d9Device);
@@ -160,12 +135,6 @@ namespace Ogre {
         void freeTextureResources(IDirect3DDevice9* d3d9Device, TextureResources* textureResources);
 
         void determinePool();
-
-        /** Vector of pointers to streams that were pulled from disk by
-            prepareImpl  but have yet to be pushed into texture memory
-            by loadImpl.  Should be cleared on load and on unprepare.
-        */
-        LoadedStreams mLoadedStreams;
 
         friend class D3D9HardwarePixelBuffer;
     public:

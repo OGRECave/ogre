@@ -115,31 +115,14 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::loadImpl()
     {
+        Texture::loadImpl();
+
         if (mUsage & TU_RENDERTARGET)
         {
-            createInternalResources();
             return;
         }
 
-        // Make sure streams prepared.
-        if (!mLoadedStreams)
-        {
-            prepareImpl();
-        }
-
-        // Set reading positions of loaded streams to the beginning.
-        for (uint i = 0; i < mLoadedStreams->size(); ++i)
-        {
-            MemoryDataStreamPtr curDataStream = (*mLoadedStreams)[i];
-
-            curDataStream->seek(0);
-        }
-
-        // only copy is on the stack so well-behaved if exception thrown
-        LoadedStreams loadedStreams = mLoadedStreams;
-
-        this->_loadTex(loadedStreams);
-
+        _setSrcAttributes(mWidth, mHeight, mDepth, mFormat);
     }
     //---------------------------------------------------------------------
     void D3D11Texture::freeInternalResources(void)
@@ -154,68 +137,6 @@ namespace Ogre
         mp1DTex.Reset();
         mp2DTex.Reset();
         mp3DTex.Reset();
-    }
-    //---------------------------------------------------------------------
-    void D3D11Texture::_loadTex(LoadedStreams & loadedStreams)
-    {
-        size_t pos = mName.find_last_of(".");
-        String ext = mName.substr(pos+1);
-        String baseName = mName.substr(0, pos);
-        
-        ConstImagePtrList imagePtrs;
-        if(getTextureType() == TEX_TYPE_CUBE_MAP)
-        {
-            // Load from 6 separate files
-            // Use OGRE its own codecs
-            //  String baseName;
-            //  size_t pos = mName.find_last_of(".");
-            
-            //  if ( pos != String::npos )
-            //      ext = mName.substr(pos+1);
-            std::vector<Image> images(6);
-
-            assert(loadedStreams->size()==6);
-            for(size_t i = 0; i < 6; i++)
-            {
-                String fullName = baseName + CUBEMAP_SUFFIXES[i];
-                if (!ext.empty())
-                    fullName = fullName + "." + ext;
-
-                // find & load resource data intro stream to allow resource
-                // group changes if required
-                DataStreamPtr stream((*loadedStreams)[i]);
-
-                images[i].load(stream, ext);
-
-                uint32 imageMips = images[i].getNumMipmaps();
-
-                if(imageMips < mNumMipmaps) {
-                    mNumMipmaps = imageMips;
-                }
-
-
-                imagePtrs.push_back(&images[i]);
-            }
-
-            _loadImages( imagePtrs );
-
-        }
-        else
-        {
-            assert(loadedStreams->size()==1);
-
-            Image img;
-            DataStreamPtr dstream((*loadedStreams)[0]);
-
-            img.load(dstream, ext);
-
-            // Use OGRE its own codecs
-            imagePtrs.push_back(&img);
-            _loadImages( imagePtrs );
-        }
-
-        _setSrcAttributes(mWidth, mHeight, mDepth, mFormat);
-
     }
     //---------------------------------------------------------------------
     void D3D11Texture::createInternalResources(void)
@@ -610,120 +531,6 @@ namespace Ogre
                 if(depth > 1 && getTextureType() != TEX_TYPE_2D_ARRAY) depth /= 2;
             }
         }
-    }
-    //---------------------------------------------------------------------
-    void D3D11Texture::prepareImpl( void )
-    {
-        if (mUsage & TU_RENDERTARGET || isManuallyLoaded())
-        {
-            return;
-        }
-
-        LoadedStreams loadedStreams;
-
-        // prepare load based on tex.type
-        switch (getTextureType())
-        {
-        case TEX_TYPE_1D:
-        case TEX_TYPE_2D:
-        case TEX_TYPE_2D_ARRAY:
-            loadedStreams = _prepareNormTex();
-            break;
-        case TEX_TYPE_3D:
-            loadedStreams = _prepareVolumeTex();
-            break;
-        case TEX_TYPE_CUBE_MAP:
-            loadedStreams = _prepareCubeTex();
-            break;
-        default:
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Unknown texture type", "D3D11Texture::prepareImpl" );
-        }
-
-        mLoadedStreams = loadedStreams;     
-    }
-    //---------------------------------------------------------------------
-    D3D11Texture::LoadedStreams D3D11Texture::_prepareCubeTex()
-    {
-        assert(getTextureType() == TEX_TYPE_CUBE_MAP);
-
-        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (std::vector<MemoryDataStreamPtr>, MEMCATEGORY_GENERAL), SPFM_DELETE_T );
-        // DDS load?
-        if (getSourceFileType() == "dds")
-        {
-            // find & load resource data
-            DataStreamPtr dstream = 
-                ResourceGroupManager::getSingleton().openResource(
-                    mName, mGroup, this);
-            loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
-        }
-        else
-        {
-            // Load from 6 separate files
-            // Use OGRE its own codecs
-            String baseName, ext;
-            size_t pos = mName.find_last_of(".");
-            baseName = mName.substr(0, pos);
-            if ( pos != String::npos )
-                ext = mName.substr(pos+1);
-
-            for(size_t i = 0; i < 6; i++)
-            {
-                String fullName = baseName + CUBEMAP_SUFFIXES[i];
-                if (!ext.empty())
-                    fullName = fullName + "." + ext;
-
-                // find & load resource data intro stream to allow resource
-                // group changes if required
-                DataStreamPtr dstream = 
-                    ResourceGroupManager::getSingleton().openResource(
-                        fullName, mGroup, this);
-
-                loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
-            }
-        }
-
-        return loadedStreams;
-    }
-    //---------------------------------------------------------------------
-    D3D11Texture::LoadedStreams D3D11Texture::_prepareVolumeTex()
-    {
-        assert(getTextureType() == TEX_TYPE_3D);
-
-        // find & load resource data
-        DataStreamPtr dstream = 
-            ResourceGroupManager::getSingleton().openResource(
-                mName, mGroup, this);
-
-        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (std::vector<MemoryDataStreamPtr>, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
-        loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
-        return loadedStreams;
-    }
-    //---------------------------------------------------------------------
-    D3D11Texture::LoadedStreams D3D11Texture::_prepareNormTex()
-    {
-        assert(getTextureType() == TEX_TYPE_1D || getTextureType() == TEX_TYPE_2D || getTextureType() == TEX_TYPE_2D_ARRAY);
-
-        // find & load resource data
-        DataStreamPtr dstream = 
-            ResourceGroupManager::getSingleton().openResource(
-                mName, mGroup, this);
-
-        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (std::vector<MemoryDataStreamPtr>, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
-        loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
-        return loadedStreams;
-    }
-    //---------------------------------------------------------------------
-    void D3D11Texture::unprepareImpl( void )
-    {
-        if (mUsage & TU_RENDERTARGET || isManuallyLoaded())
-        {
-            return;
-        }   
-    }
-    //---------------------------------------------------------------------
-    void D3D11Texture::postLoadImpl()
-    {
-        mLoadedStreams.reset();   
     }
     //---------------------------------------------------------------------
     // D3D11RenderTexture
