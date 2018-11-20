@@ -34,15 +34,6 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreException.h"
 
-// TODO: load DDS using DDSTextureLoader from DirectXTK rather than D3DX11
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(_WIN32_WINNT_WIN8)
-#define USE_D3DX11_LIBRARY
-#endif
-
-#ifdef USE_D3DX11_LIBRARY
-#include <d3dx11.h>
-#endif
-
 namespace Ogre 
 {
     //---------------------------------------------------------------------
@@ -172,7 +163,7 @@ namespace Ogre
         String baseName = mName.substr(0, pos);
         
         ConstImagePtrList imagePtrs;
-        if((getSourceFileType() != "dds") && (this->getTextureType() == TEX_TYPE_CUBE_MAP))
+        if(getTextureType() == TEX_TYPE_CUBE_MAP)
         {
             // Load from 6 separate files
             // Use OGRE its own codecs
@@ -215,127 +206,17 @@ namespace Ogre
 
             Image img;
             DataStreamPtr dstream((*loadedStreams)[0]);
-#ifdef USE_D3DX11_LIBRARY       
-            if(ext=="dds")
-            {
-                _loadDDS(dstream);
-            }
-            else
-#endif
-            {
-                img.load(dstream, ext);
-                // Use OGRE its own codecs
-                imagePtrs.push_back(&img);
-                _loadImages( imagePtrs );
-            }
+
+            img.load(dstream, ext);
+
+            // Use OGRE its own codecs
+            imagePtrs.push_back(&img);
+            _loadImages( imagePtrs );
         }
 
         _setSrcAttributes(mWidth, mHeight, mDepth, mFormat);
 
     }
-    //---------------------------------------------------------------------
-#ifdef USE_D3DX11_LIBRARY       
-    void D3D11Texture::_loadDDS(DataStreamPtr &dstream)
-    {
-        HRESULT hr;
-
-        MemoryDataStreamPtr memoryptr=MemoryDataStreamPtr(new MemoryDataStream(dstream));
-
-        D3DX11_IMAGE_LOAD_INFO loadInfo;
-        loadInfo.Usage          = D3D11Mappings::_getUsage(_getTextureUsage());
-		loadInfo.CpuAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
-        if(mUsage & TU_DYNAMIC)
-        {
-            loadInfo.MipLevels = 1;
-        }
-
-        // TO DO: check cpu access flags and use loadInfo only when it is needed.
-        // this is the first try
-
-        // Load the Texture
-        if (loadInfo.CpuAccessFlags == D3D11_CPU_ACCESS_WRITE)
-        {
-            hr = D3DX11CreateTextureFromMemory( mDevice.get(), 
-                memoryptr->getPtr(),
-                memoryptr->size(),
-                &loadInfo,
-                NULL, 
-                mpTex.ReleaseAndGetAddressOf(),
-                NULL );
-        }
-        else
-        {
-            hr = D3DX11CreateTextureFromMemory( mDevice.get(), 
-                memoryptr->getPtr(),
-                memoryptr->size(),
-                NULL,
-                NULL, 
-                mpTex.ReleaseAndGetAddressOf(),
-                NULL );
-        }
-
-        if( FAILED( hr ) )
-        {
-            LogManager::getSingleton().logMessage("D3D11: " + mName + " Could not be loaded");
-            return;
-        }   
-
-        D3D11_RESOURCE_DIMENSION dimension;
-        mpTex->GetType(&dimension);
-
-        switch (dimension)
-        {
-        case D3D11_RESOURCE_DIMENSION_TEXTURE1D:
-            {
-                _queryInterface<ID3D11Resource, ID3D11Texture1D>(mpTex, &mp1DTex);
-
-                D3D11_TEXTURE1D_DESC desc;
-                mp1DTex->GetDesc(&desc);
-                
-                mFormat = D3D11Mappings::_getPF(desc.Format);
-                mTextureType = TEX_TYPE_1D;
-
-                _create1DResourceView();
-            }                   
-            break;
-        case D3D11_RESOURCE_DIMENSION_TEXTURE2D:
-            {
-                _queryInterface<ID3D11Resource, ID3D11Texture2D>(mpTex, &mp2DTex);
-
-                D3D11_TEXTURE2D_DESC desc;
-                mp2DTex->GetDesc(&desc);
-                
-                mFormat = D3D11Mappings::_getPF(desc.Format);
-                
-                if(desc.ArraySize % 6 == 0 && desc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE)
-                    mTextureType = TEX_TYPE_CUBE_MAP; //2darray cubemap
-                else if(desc.ArraySize > 1)
-                    mTextureType = TEX_TYPE_2D_ARRAY;
-                else
-                    mTextureType = TEX_TYPE_2D;
-				
-				//TODO: move this line to a proper place.
-				_setSrcAttributes(desc.Width, desc.Height, 1, mFormat);
-				
-                _create2DResourceView();
-            }
-            break;
-        case D3D11_RESOURCE_DIMENSION_TEXTURE3D:
-            {
-                _queryInterface<ID3D11Resource, ID3D11Texture3D>(mpTex, &mp3DTex);
-
-                D3D11_TEXTURE3D_DESC desc;
-                mp3DTex->GetDesc(&desc);
-
-                mFormat = D3D11Mappings::_getPF(desc.Format);
-                mTextureType = TEX_TYPE_3D;
-
-                _create3DResourceView();
-            }
-            break;
-        }
-    }
-#endif
     //---------------------------------------------------------------------
     void D3D11Texture::createInternalResources(void)
     {

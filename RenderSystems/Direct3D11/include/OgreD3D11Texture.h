@@ -35,12 +35,6 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreSharedPtr.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(_WIN32_WINNT_WIN8)
-    #ifndef USE_D3DX11_LIBRARY
-        #define USE_D3DX11_LIBRARY
-    #endif
-#endif
-
 namespace Ogre {
 	/** Specialisation of Texture for D3D11 */
     class _OgreD3D11Export D3D11Texture
@@ -89,9 +83,6 @@ namespace Ogre {
                     "D3D11Texture::_queryInterface" );
             }
         }
-#ifdef USE_D3DX11_LIBRARY       
-        void _loadDDS(DataStreamPtr &dstream);
-#endif
         void _create1DResourceView();
         void _create2DResourceView();
         void _create3DResourceView();
