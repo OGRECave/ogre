@@ -485,449 +485,106 @@ namespace Ogre
     {
         assert(getTextureType() == TEX_TYPE_CUBE_MAP);
 
-        // DDS load?
-        if (getSourceFileType() == "dds")
+        assert(loadedStreams->size()==6);
+
+        String  ext;
+        size_t pos = mName.find_last_of(".");
+        if ( pos != String::npos )
+            ext = mName.substr(pos+1);
+
+        std::vector<Image> images(6);
+        ConstImagePtrList imagePtrs;
+
+        for(size_t i = 0; i < 6; i++)
         {
-            // find & load resource data
-            assert(loadedStreams->size()==1);
+            DataStreamPtr stream((*loadedStreams)[i]);
+            images[i].load(stream, ext);
 
-            DWORD usage = 0;
-			UINT numMips;
-
-			if (mNumRequestedMipmaps == MIP_UNLIMITED)
-				numMips = D3DX_DEFAULT;
-			else if (mNumRequestedMipmaps == 0)
-				numMips = D3DX_FROM_FILE;
-			else
-				numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
-            
-            D3D9Device* device = D3D9RenderSystem::getDeviceManager()->getDeviceFromD3D9Device(d3d9Device);
-            const D3DCAPS9& rkCurCaps = device->getD3D9DeviceCaps();            
-
-            // check if mip map volume textures are supported   
-            if (!(rkCurCaps.TextureCaps & D3DPTEXTURECAPS_MIPCUBEMAP))
-            {
-                // no mip map support for this kind of textures :(
-                mNumMipmaps = 0;
-                numMips = 1;
-            }
-
-            // Check dynamic textures
-            if (mUsage & TU_DYNAMIC)
-            {
-                D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
-                if (_canUseDynamicTextures(d3d9Device, usage, D3DRTYPE_TEXTURE, d3dPF))
-                {
-                    usage |= D3DUSAGE_DYNAMIC;
-                    mDynamicTextures = true;
-                }
-                else
-                {
-                    mDynamicTextures = false;
-                }
-            }
-
-            // Determine D3D pool to use
-            D3DPOOL pool;
-            if (useDefaultPool())
-            {
-                pool = D3DPOOL_DEFAULT;
-            }
-            else
-            {
-                pool = D3DPOOL_MANAGED;
-            }
-                
-            TextureResources* textureResources;         
-        
-            // Get or create new texture resources structure.
-            textureResources = getTextureResources(d3d9Device);
-            if (textureResources != NULL)
-                freeTextureResources(d3d9Device, textureResources);
-            else
-                textureResources = allocateTextureResources(d3d9Device);
-
-            HRESULT hr;
-
-            hr = D3DXCreateCubeTextureFromFileInMemoryEx(
-                d3d9Device,
-                (*loadedStreams)[0]->getPtr(),
-                static_cast<UINT>((*loadedStreams)[0]->size()),
-                D3DX_DEFAULT, // dims (square)
-                numMips,
-                usage,
-                D3DFMT_UNKNOWN,
-                pool,
-                D3DX_DEFAULT,
-                D3DX_DEFAULT,
-                0,  // colour key
-                NULL, // src box
-                NULL, // palette
-                &textureResources->pCubeTex); 
-
-            if (FAILED(hr))
-            {
-                freeInternalResources();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't create cube texture: " + String(DXGetErrorDescription(hr)), 
-                    "D3D9Texture::_loadCubeTex" );
-            }
-
-            hr = textureResources->pCubeTex->QueryInterface(IID_IDirect3DBaseTexture9, (void **)&textureResources->pBaseTex);
-
-            if (FAILED(hr))
-            {
-                freeInternalResources();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get base texture: " + String(DXGetErrorDescription(hr)), 
-                    "D3D9Texture::_loadCubeTex" );
-            }
-
-            D3DSURFACE_DESC texDesc;
-            textureResources->pCubeTex->GetLevelDesc(0, &texDesc);
-            mD3DPool = texDesc.Pool;
-            // set src and dest attributes to the same, we can't know
-            _setSrcAttributes(texDesc.Width, texDesc.Height, 1, D3D9Mappings::_getPF(texDesc.Format));
-            _setFinalAttributes(d3d9Device, textureResources, 
-                texDesc.Width, texDesc.Height, 1,  D3D9Mappings::_getPF(texDesc.Format));
-
-            if( mHwGamma )
-            {
-                mHwGammaReadSupported = _canUseHardwareGammaCorrection( d3d9Device, texDesc.Usage,
-                                                                        D3DRTYPE_CUBETEXTURE,
-                                                                        texDesc.Format, false);
-            }
-
-            mInternalResourcesCreated = true;
+            imagePtrs.push_back(&images[i]);
         }
-        else
-        {
-            assert(loadedStreams->size()==6);
 
-            String  ext;
-            size_t pos = mName.find_last_of(".");
-            if ( pos != String::npos )
-                ext = mName.substr(pos+1);
-
-            std::vector<Image> images(6);
-            ConstImagePtrList imagePtrs;
-
-            for(size_t i = 0; i < 6; i++)
-            {
-                DataStreamPtr stream((*loadedStreams)[i]);
-                images[i].load(stream, ext);
-
-                imagePtrs.push_back(&images[i]);
-            }
-
-            _loadImages( imagePtrs );
-        }
+        _loadImages( imagePtrs );
     }
     /****************************************************************************************/
     void D3D9Texture::_loadVolumeTex(IDirect3DDevice9* d3d9Device, const D3D9Texture::LoadedStreams &loadedStreams)
     {
         assert(getTextureType() == TEX_TYPE_3D);
-        // DDS load?
-        if (getSourceFileType() == "dds")
+
+        Image img;
+
+        assert(loadedStreams->size()==1);
+
+        size_t pos = mName.find_last_of(".");
+        String ext;
+        if ( pos != String::npos )
+            ext = mName.substr(pos+1);
+
+        DataStreamPtr stream((*loadedStreams)[0]);
+        img.load(stream, ext);
+
+        if (img.getHeight() == 0)
         {
-            // find & load resource data
-            assert(loadedStreams->size()==1);
-    
-            DWORD usage = 0;
-            UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ?
-                D3DX_DEFAULT : mNumRequestedMipmaps + 1;
-                        
-            D3D9Device* device = D3D9RenderSystem::getDeviceManager()->getDeviceFromD3D9Device(d3d9Device);
-            const D3DCAPS9& rkCurCaps = device->getD3D9DeviceCaps();            
-
-            // check if mip map volume textures are supported
-            if (!(rkCurCaps.TextureCaps & D3DPTEXTURECAPS_MIPVOLUMEMAP))
-            {
-                // no mip map support for this kind of textures :(
-                mNumMipmaps = 0;
-                numMips = 1;
-            }
-
-            // Check dynamic textures
-            if (mUsage & TU_DYNAMIC)
-            {
-                D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
-                if (_canUseDynamicTextures(d3d9Device, usage, D3DRTYPE_TEXTURE, d3dPF))
-                {
-                    usage |= D3DUSAGE_DYNAMIC;
-                    mDynamicTextures = true;
-                }
-                else
-                {
-                    mDynamicTextures = false;
-                }
-            }
-            
-            // Determine D3D pool to use
-            D3DPOOL pool;
-            if (useDefaultPool())
-            {
-                pool = D3DPOOL_DEFAULT;
-            }
-            else
-            {
-                pool = D3DPOOL_MANAGED;
-            }
-            
-            TextureResources* textureResources;         
-            
-            // Get or create new texture resources structure.
-            textureResources = getTextureResources(d3d9Device);
-            if (textureResources != NULL)
-                freeTextureResources(d3d9Device, textureResources);
-            else
-                textureResources = allocateTextureResources(d3d9Device);
-
-            HRESULT hr;
-
-            hr = D3DXCreateVolumeTextureFromFileInMemoryEx(
-                d3d9Device,
-                (*loadedStreams)[0]->getPtr(),
-                static_cast<UINT>((*loadedStreams)[0]->size()),
-                D3DX_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, // dims
-                numMips,
-                usage,
-                D3DFMT_UNKNOWN,
-                pool,
-                D3DX_DEFAULT,
-                D3DX_DEFAULT,
-                0,  // colour key
-                NULL, // src box
-                NULL, // palette
-                &textureResources->pVolumeTex); 
-    
-            if (FAILED(hr))
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Unable to load volume texture from " + getName() + ": " + String(DXGetErrorDescription(hr)),
-                    "D3D9Texture::_loadVolumeTex");
-            }
-    
-            hr = textureResources->pVolumeTex->QueryInterface(IID_IDirect3DBaseTexture9, (void **)&textureResources->pBaseTex);
-    
-            if (FAILED(hr))
-            {
-                freeInternalResources();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get base texture: " + String(DXGetErrorDescription(hr)), 
-                    "D3D9Texture::_loadVolumeTex" );
-            }
-    
-            D3DVOLUME_DESC texDesc;
-            hr = textureResources->pVolumeTex->GetLevelDesc(0, &texDesc);
-            mD3DPool = texDesc.Pool;
-            // set src and dest attributes to the same, we can't know
-            _setSrcAttributes(texDesc.Width, texDesc.Height, texDesc.Depth, D3D9Mappings::_getPF(texDesc.Format));
-            _setFinalAttributes(d3d9Device, textureResources, 
-                texDesc.Width, texDesc.Height, texDesc.Depth, D3D9Mappings::_getPF(texDesc.Format));
-
-            if( mHwGamma )
-            {
-                mHwGammaReadSupported = _canUseHardwareGammaCorrection( d3d9Device, texDesc.Usage,
-                                                                        D3DRTYPE_VOLUMETEXTURE,
-                                                                        texDesc.Format, false);
-            }
-
-            mInternalResourcesCreated = true;
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "Image height == 0 in " + getName(),
+                "D3D9Texture::_loadVolumeTex");
         }
-        else
+
+        if (img.getWidth() == 0)
         {
-            Image img;
-
-            assert(loadedStreams->size()==1);
-
-            size_t pos = mName.find_last_of(".");
-            String ext;
-            if ( pos != String::npos )
-                ext = mName.substr(pos+1);
-    
-            DataStreamPtr stream((*loadedStreams)[0]);
-            img.load(stream, ext);
-
-            if (img.getHeight() == 0)
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Image height == 0 in " + getName(),
-                    "D3D9Texture::_loadVolumeTex");
-            }
-
-            if (img.getWidth() == 0)
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Image width == 0 in " + getName(),
-                    "D3D9Texture::_loadVolumeTex");
-            }
-
-            if (img.getDepth() == 0)
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Image depth == 0 in " + getName(),
-                    "D3D9Texture::_loadVolumeTex");
-            }
-            // Call internal _loadImages, not loadImage since that's external and 
-            // will determine load status etc again
-            ConstImagePtrList imagePtrs;
-            imagePtrs.push_back(&img);
-            _loadImages( imagePtrs );
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "Image width == 0 in " + getName(),
+                "D3D9Texture::_loadVolumeTex");
         }
+
+        if (img.getDepth() == 0)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "Image depth == 0 in " + getName(),
+                "D3D9Texture::_loadVolumeTex");
+        }
+        // Call internal _loadImages, not loadImage since that's external and
+        // will determine load status etc again
+        ConstImagePtrList imagePtrs;
+        imagePtrs.push_back(&img);
+        _loadImages( imagePtrs );
     }
     /****************************************************************************************/
     void D3D9Texture::_loadNormTex(IDirect3DDevice9* d3d9Device, const D3D9Texture::LoadedStreams &loadedStreams)
     {
         assert(getTextureType() == TEX_TYPE_1D || getTextureType() == TEX_TYPE_2D);
-        // DDS load?
-        if (getSourceFileType() == "dds")
+
+        Image img;
+        // find & load resource data intro stream to allow resource
+        // group changes if required
+        assert(loadedStreams->size()==1);
+
+        size_t pos = mName.find_last_of(".");
+        String ext;
+        if ( pos != String::npos )
+            ext = mName.substr(pos+1);
+
+        DataStreamPtr stream((*loadedStreams)[0]);
+        img.load(stream, ext);
+
+        if (img.getHeight() == 0)
         {
-            // Use D3DX
-            assert(loadedStreams->size()==1);
-    
-            DWORD usage = 0;
-            UINT numMips;
-
-            if (mNumRequestedMipmaps == MIP_UNLIMITED)
-                numMips = D3DX_DEFAULT;
-            else if (mNumRequestedMipmaps == 0)         
-                numMips = D3DX_FROM_FILE;
-            else
-                numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
-                
-            D3D9Device* device = D3D9RenderSystem::getDeviceManager()->getDeviceFromD3D9Device(d3d9Device);
-            const D3DCAPS9& rkCurCaps = device->getD3D9DeviceCaps();            
-
-
-            // check if mip map volume textures are supported
-            if (!(rkCurCaps.TextureCaps & D3DPTEXTURECAPS_MIPMAP))
-            {
-                // no mip map support for this kind of textures :(
-                mNumMipmaps = 0;
-                numMips = 1;
-            }
-
-            // Check dynamic textures
-            if (mUsage & TU_DYNAMIC)
-            {
-                D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
-                if (_canUseDynamicTextures(d3d9Device, usage, D3DRTYPE_VOLUMETEXTURE, d3dPF))
-                {
-                    usage |= D3DUSAGE_DYNAMIC;
-                    mDynamicTextures = true;
-                }
-                else
-                {
-                    mDynamicTextures = false;
-                }
-            }
-
-            // Determine D3D pool to use
-            D3DPOOL pool;
-            if (useDefaultPool())
-            {
-                pool = D3DPOOL_DEFAULT;
-            }
-            else
-            {
-                pool = D3DPOOL_MANAGED;
-            }
-                        
-            TextureResources* textureResources;         
-            
-            // Get or create new texture resources structure.
-            textureResources = getTextureResources(d3d9Device);
-            if (textureResources != NULL)
-                freeTextureResources(d3d9Device, textureResources);
-            else
-                textureResources = allocateTextureResources(d3d9Device);
-
-            HRESULT hr;
-
-            UINT autoWidthHeight = Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_NON_POWER_OF_2_TEXTURES) ? 
-                D3DX_DEFAULT_NONPOW2 : D3DX_DEFAULT;
-
-            hr = D3DXCreateTextureFromFileInMemoryEx(
-                d3d9Device,
-                (*loadedStreams)[0]->getPtr(),
-                static_cast<UINT>((*loadedStreams)[0]->size()),
-                autoWidthHeight, autoWidthHeight, // dims
-                numMips,
-                usage,
-                D3DFMT_UNKNOWN,
-                pool,
-                D3DX_DEFAULT,
-                D3DX_DEFAULT,
-                0,  // colour key
-                NULL, // src box
-                NULL, // palette
-                &textureResources->pNormTex); 
-    
-            if (FAILED(hr))
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Unable to load texture from " + getName() + " :" + String(DXGetErrorDescription(hr)),
-                    "D3D9Texture::_loadNormTex");
-            }
-    
-            hr = textureResources->pNormTex->QueryInterface(IID_IDirect3DBaseTexture9, (void **)&textureResources->pBaseTex);
-    
-            if (FAILED(hr))
-            {
-                freeInternalResources();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get base texture: " + String(DXGetErrorDescription(hr)), 
-                    "D3D9Texture::_loadNormTex" );
-            }
-    
-            D3DSURFACE_DESC texDesc;
-            textureResources->pNormTex->GetLevelDesc(0, &texDesc);
-            mD3DPool = texDesc.Pool;
-            // set src and dest attributes to the same, we can't know
-            _setSrcAttributes(texDesc.Width, texDesc.Height, 1, D3D9Mappings::_getPF(texDesc.Format));
-            _setFinalAttributes(d3d9Device, textureResources, 
-                texDesc.Width, texDesc.Height, 1, D3D9Mappings::_getPF(texDesc.Format));
-
-            if( mHwGamma )
-            {
-                mHwGammaReadSupported = _canUseHardwareGammaCorrection( d3d9Device, texDesc.Usage,
-                                                                        D3DRTYPE_TEXTURE,
-                                                                        texDesc.Format, false);
-            }
-            mInternalResourcesCreated = true;
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "Image height == 0 in " + getName(),
+                "D3D9Texture::_loadNormTex");
         }
-        else
+
+        if (img.getWidth() == 0)
         {
-            Image img;
-            // find & load resource data intro stream to allow resource
-            // group changes if required
-            assert(loadedStreams->size()==1);
-    
-            size_t pos = mName.find_last_of(".");
-            String ext; 
-            if ( pos != String::npos )
-                ext = mName.substr(pos+1);
-
-            DataStreamPtr stream((*loadedStreams)[0]);
-            img.load(stream, ext);
-
-            if (img.getHeight() == 0)
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Image height == 0 in " + getName(),
-                    "D3D9Texture::_loadNormTex");
-            }
-
-            if (img.getWidth() == 0)
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Image width == 0 in " + getName(),
-                    "D3D9Texture::_loadNormTex");
-            }
-
-            // Call internal _loadImages, not loadImage since that's external and 
-            // will determine load status etc again
-            ConstImagePtrList imagePtrs;
-            imagePtrs.push_back(&img);
-            _loadImages( imagePtrs );
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "Image width == 0 in " + getName(),
+                "D3D9Texture::_loadNormTex");
         }
+
+        // Call internal _loadImages, not loadImage since that's external and
+        // will determine load status etc again
+        ConstImagePtrList imagePtrs;
+        imagePtrs.push_back(&img);
+        _loadImages( imagePtrs );
 
     }
 
