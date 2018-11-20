@@ -69,7 +69,6 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 
     //local param
     mParamLocalBlendPosition = vsMain->resolveLocalParameter("BlendedPosition", GCT_FLOAT3);
-    mParamLocalPositionWorld = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT4);
     mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPC_NORMAL_WORLD_SPACE);
     //mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);
     //mParamLocalBinormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_WORLD_SPACE, GCT_FLOAT3);
@@ -83,7 +82,6 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         (mParamInNormal.get() != NULL) &&
         //(mParamInBiNormal.get() != NULL) &&
         //(mParamInTangent.get() != NULL) &&
-        (mParamLocalPositionWorld.get() != NULL) &&
         (mParamLocalNormalWorld.get() != NULL) &&
         //(mParamLocalTangentWorld.get() != NULL) &&
         //(mParamLocalBinormalWorld.get() != NULL) &&
@@ -258,9 +256,6 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
     }
     else
     {
-        //update from object to world space
-        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldMatrix, mParamInPosition, mParamLocalPositionWorld);
-
         //update from object to projective space
         stage.callFunction(FFP_FUNC_TRANSFORM, mParamInWorldViewProjMatrix, mParamInPosition, mParamOutPositionProj);
     }
