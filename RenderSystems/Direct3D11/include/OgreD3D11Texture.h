@@ -67,9 +67,6 @@ namespace Ogre {
 		TextureUsage _getTextureUsage() { return static_cast<TextureUsage>(mUsage); }
 
     protected:
-        // needed to store data between prepareImpl and loadImpl
-        typedef SharedPtr<std::vector<MemoryDataStreamPtr> > LoadedStreams;
-
         template<typename fromtype, typename totype>
         void _queryInterface(const ComPtr<fromtype>& from, ComPtr<totype> *to)
         {
@@ -86,9 +83,6 @@ namespace Ogre {
         void _create1DResourceView();
         void _create2DResourceView();
         void _create3DResourceView();
-
-        /// internal method, load a normal texture
-        void _loadTex(LoadedStreams & loadedStreams);
 
         /// internal method, create a blank normal 1D Dtexture
         void _create1DTex();
@@ -117,23 +111,8 @@ namespace Ogre {
         void notifyDeviceLost(D3D11Device* device);
         void notifyDeviceRestored(D3D11Device* device);
 
-        /// @copydoc Resource::prepareImpl
-        void prepareImpl(void);
-        /// @copydoc Resource::unprepareImpl
-        void unprepareImpl(void);
         /// overridden from Resource
         void loadImpl();
-        /// overridden from Resource
-        void postLoadImpl();
-
-        /** Vector of pointers to streams that were pulled from disk by
-            prepareImpl  but have yet to be pushed into texture memory
-            by loadImpl.  Should be cleared on load and on unprepare.
-        */
-        LoadedStreams mLoadedStreams;
-        LoadedStreams _prepareNormTex();
-        LoadedStreams _prepareVolumeTex();
-        LoadedStreams _prepareCubeTex();
 
     protected:
         D3D11Device&	mDevice;
