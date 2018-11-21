@@ -465,6 +465,7 @@ namespace Ogre
         {
             uint32 numEntries = read<uint32>( dataStream );
             //renderableCache.pieces[i].reserve( numEntries );
+            renderableCache.pieces[i].clear();
 
             for( size_t j=0; j<numEntries; ++j )
             {
