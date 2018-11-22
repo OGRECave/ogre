@@ -48,6 +48,7 @@ if(DOXYGEN_FOUND)
         ${PROJECT_SOURCE_DIR}/Docs/src/hardware-buffers.md
         ${PROJECT_SOURCE_DIR}/Docs/src/hlms.md
         ${PROJECT_SOURCE_DIR}/Docs/src/rtss.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/resourcemanagement.md
         ${PROJECT_SOURCE_DIR}/BuildingOgre.md
         ${TUTORIALS}
         ${BASIC_TUTORIALS})
