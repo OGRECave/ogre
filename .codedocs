@@ -685,6 +685,7 @@ INPUT                  = OgreMain/include \
                             Docs/src/hardware-buffers.md \
                             Docs/src/hlms.md \
                             Docs/src/rtss.md \
+                            Docs/src/resourcemanagement.md \
                             BuildingOgre.md \
                             Docs/src/tutorials/deferred.md \
                             Docs/src/tutorials/external_texture.md \
