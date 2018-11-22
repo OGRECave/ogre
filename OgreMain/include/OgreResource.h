@@ -48,31 +48,22 @@ namespace Ogre {
     /** \addtogroup Resources
     *  @{
     */
-    /** Abstract class representing a loadable resource (e.g. textures, sounds etc)
-        @remarks
-            Resources are data objects that must be loaded and managed throughout
-            an application. A resource might be a mesh, a texture, or any other
-            piece of data - the key thing is that they must be identified by 
-            a name which is unique, must be loaded only once,
-            must be managed efficiently in terms of retrieval, and they may
-            also be unloadable to free memory up when they have not been used for
-            a while and the memory budget is under stress.
-        @par
-            All Resource instances must be a member of a resource group; see
-            ResourceGroupManager for full details.
-        @par
-            Subclasses must implement:
-            <ol>
-            <li>A constructor, overriding the same parameters as the constructor
-                defined by this class. Subclasses are not allowed to define
-                constructors with other parameters; other settings must be
-                settable through accessor methods before loading.</li>
-            <li>The loadImpl() and unloadImpl() methods - mSize must be set 
-                after loadImpl()</li>
-            <li>StringInterface ParamCommand and ParamDictionary setups
-                in order to allow setting of core parameters (prior to load)
-                through a generic interface.</li>
-            </ol>
+    /** Abstract class representing a loadable resource
+
+        @see @ref Resource-Management
+
+        Subclasses must implement:
+        <ol>
+        <li>A constructor, overriding the same parameters as the constructor
+            defined by this class. Subclasses are not allowed to define
+            constructors with other parameters; other settings must be
+            settable through accessor methods before loading.</li>
+        <li>The loadImpl() and unloadImpl() methods - mSize must be set 
+            after loadImpl()</li>
+        <li>StringInterface ParamCommand and ParamDictionary setups
+            in order to allow setting of core parameters (prior to load)
+            through a generic interface.</li>
+        </ol>
     */
     class _OgreExport Resource : public StringInterface, public ResourceAlloc
     {

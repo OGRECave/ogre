@@ -3,6 +3,7 @@ Manual {#manual}
 
 - @subpage Introduction
 - @subpage The-Core-Objects
+- @subpage Resource-Management
 - @subpage Scripts
 - @subpage High-level-Programs
 - @subpage Runtime-Shader-Generation

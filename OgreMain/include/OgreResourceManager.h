@@ -94,26 +94,7 @@ namespace Ogre {
     *  @{
     */
     /** Defines a generic resource handler.
-    @remarks
-        A resource manager is responsible for managing a pool of
-        resources of a particular type. It must index them, look
-        them up, load and destroy them. It may also need to stay within
-        a defined memory budget, and temporarily unload some resources
-        if it needs to to stay within this budget.
-    @par
-        Resource managers use a priority system to determine what can
-        be unloaded, and a Least Recently Used (LRU) policy within
-        resources of the same priority.
-    @par
-        Resources can be loaded using the generalised load interface,
-        and they can be unloaded and removed. In addition, each 
-        subclass of ResourceManager will likely define custom 'load' methods
-        which take explicit parameters depending on the kind of resource
-        being created.
-    @note
-        Resources can be loaded and unloaded through the Resource class, 
-        but they can only be removed (and thus eventually destroyed) using
-        their parent ResourceManager.
+    @see @ref Resource-Management
     @note
         If OGRE_THREAD_SUPPORT is 1, this class is thread-safe.
     */
@@ -410,7 +391,7 @@ namespace Ogre {
             to identify scripts intended for this manager.
         @return
             A list of file patterns, in the order they should be searched in.
-        @see isScriptingSupported, parseScript
+        @see parseScript
         */
         const StringVector& getScriptPatterns(void) const { return mScriptPatterns; }
 
