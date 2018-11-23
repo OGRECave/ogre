@@ -46,11 +46,11 @@ THE SOFTWARE.
 #endif
 
 #if OGRE_RESOURCEMANAGER_STRICT == 0
-#   define OGRE_RESOURCE_GROUP_INIT = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME
+#   define OGRE_RESOURCE_GROUP_INIT = RGN_AUTODETECT
 #elif OGRE_RESOURCEMANAGER_STRICT == 1
 #   define OGRE_RESOURCE_GROUP_INIT
 #else
-#   define OGRE_RESOURCE_GROUP_INIT = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
+#   define OGRE_RESOURCE_GROUP_INIT = RGN_DEFAULT
 #endif
 
 namespace Ogre {
@@ -61,6 +61,14 @@ namespace Ogre {
     /** \addtogroup Resources
     *  @{
     */
+
+    /// Default resource group name
+    _OgreExport extern const char* const RGN_DEFAULT;
+    /// Internal resource group name (should be used by OGRE internal only)
+    _OgreExport extern const char* const RGN_INTERNAL;
+    /// Special resource group name which causes resource group to be automatically determined based on searching for the resource in all groups.
+    _OgreExport extern const char* const RGN_AUTODETECT;
+
     /** This class defines an interface which is called back during
         resource group loading to indicate the progress of the load. 
 
