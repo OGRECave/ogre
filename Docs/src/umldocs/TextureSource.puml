@@ -9,7 +9,7 @@ class ExternalTextureSourceManager {
 + setCurrentPlugin()
 }
 ExternalTextureSource -up-o ExternalTextureSourceManager
-class MaterialSerializer {
+class ScriptTranslator {
     * Set "video" plugin active
     * Parse & Set parameters
     * Create Texture
@@ -24,7 +24,7 @@ object Plugins.cfg {
 }
 Plugins.cfg -- Plugin_ffmpegVideoSystem
 Plugin_ffmpegVideoSystem -down-> ExternalTextureSourceManager
-MaterialSerializer -down-> ExternalTextureSourceManager
+ScriptTranslator -down-> ExternalTextureSourceManager
 
 object "Sample Material Script" as material {
 pass
@@ -34,7 +34,7 @@ pass
 \tsound_mode on
 &#125;
 }
-material -- MaterialSerializer
+material -- ScriptTranslator
 
 @enduml 
 
