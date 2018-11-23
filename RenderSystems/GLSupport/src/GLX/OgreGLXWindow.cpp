@@ -709,8 +709,11 @@ namespace Ogre
 
         if (mIsTopLevel && !mIsFullScreen)
         {
+            // offset from window decorations
             mLeft = windowAttrib.x;
             mTop  = windowAttrib.y;
+            // w/ h of the actual renderwindow
+            XGetWindowAttributes(xDisplay, mWindow, &windowAttrib);
         }
 
         if (mWidth == (size_t)windowAttrib.width && mHeight == (size_t)windowAttrib.height)
