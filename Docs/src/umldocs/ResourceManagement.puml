@@ -1,0 +1,39 @@
+@startuml
+hide footbox
+
+Application -> ResourceGroupManager: createResourceGroup(group)
+loop resources.cfg
+Application -> ResourceGroupManager: addResourceLocation(loc, type, group)
+ResourceGroupManager -> ResourceGroupManager: addToIndex(file)
+end
+Application -> ResourceGroupManager: initialiseResourceGroup(group)
+
+ResourceGroupManager -> ResourceManager: parseScript(file)
+activate ResourceGroupManager
+loop Examples.material
+activate ResourceManager
+ResourceManager -> ResourceManager: create(name, group)
+ResourceManager -> Resource: << new >>
+deactivate ResourceManager
+end
+deactivate ResourceGroupManager
+
+Application -> ResourceManager: create(name, group)
+activate ResourceManager
+ResourceManager -> Resource: << new >>
+ResourceManager --> Application: ResourcePtr
+deactivate ResourceManager
+Application -> ResourceGroupManager: loadResourceGroup(group)
+loop group
+ResourceGroupManager -> Resource: load
+end
+
+Application -> ResourceGroupManager: clearResourceGroup(group)
+activate ResourceGroupManager
+loop group
+ResourceGroupManager -> ResourceManager: remove(name)
+ResourceManager -> Resource: << delete >>
+end
+deactivate ResourceGroupManager
+@enduml 
+

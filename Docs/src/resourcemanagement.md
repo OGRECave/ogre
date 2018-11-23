@@ -10,6 +10,8 @@ Resources are data objects that must be loaded and managed throughout an applica
 
 # Resource Life-cycle {#Resource-Life-cycle}
 
+![](images/ResourceManagement.svg)
+
 A Ogre::ResourceManager is responsible for managing a pool of resources of a particular type. It must index them, look them up, load and destroy them. It may also need to stay within a defined memory budget, and temporarily unload some resources if it needs to to stay within this budget. 
 
 Resource managers use a priority system to determine what can be unloaded, and a Least Recently Used (LRU) policy within resources of the same priority. 
@@ -40,14 +42,24 @@ You can create additional groups so that you can control the life of your resour
 
 Once you have defined a resource group, resources which will be loaded as part of it are defined in one of 2 ways:
 
-1. By @ref Resource-Declaration
+1. Through the use of @ref Scripts; some Ogre::ResourceManager subtypes have
+script formats (e.g. .material, .overlay) which can be used to declare resources
 2. By calling Ogre::ResourceManager::createResource to create a resource manually.
 This resource will go on the list for it's group and will be loaded
 and unloaded with that group
 
+After creating a resource group, adding some resource locations, and perhaps [pre-declaring](@ref Resource-Declaration) some resources, but before you need to use the resources in the group, you must call  Ogre::ResourceGroupManager::initialiseResourceGroup to initialise the group. By calling this, you are triggering the following processes:
+
+- @ref Scripts for all resource types which support scripting are parsed from the resource locations, and resources within them are created (but not loaded yet).
+- Creates all the resources which have just pre-declared using declareResource (again, these are not loaded yet)
+
+So what this essentially does is create a bunch of unloaded Ogre::Resource objects in the respective ResourceManagers based on scripts, and resources you've pre-declared. That means that code looking for these resources will find them, but they won't be taking up much memory yet, until they are either used, or they are loaded in bulk using Ogre::ResourceGroupManager::loadResourceGroup. Loading the resource group in bulk is entirely optional, but has the advantage of coming with progress reporting as resources are loaded. 
+
+Failure to call Ogre::ResourceGroupManager::initialiseResourceGroup means that Ogre::ResourceGroupManager::loadResourceGroup will do nothing, and any resources you define in scripts will not be found. Similarly, once you have called this method you won't be able to pick up any new scripts or pre-declared resources, unless you call Ogre::ResourceGroupManager::clearResourceGroup, set up declared resources, and call this method again.
+
 @note Resource groups by default are treated as self-contained - i.e. they cannot reference resources from other groups. To circumvent this specify `inGlobalPool=true` at Ogre::ResourceGroupManager::createResourceGroup for all groups that should be able to cross-reference resources.
 
-# Declaration {#Resource-Declaration}
+## Resource-Declaration {#Resource-Declaration}
 
 Declaring the resources you intend to use in advance is optional, however it is a very useful feature.
 By declaring resources before you attempt to use them, you can 
@@ -56,22 +68,9 @@ by their group. Declaring them also allows them to be enumerated,
 which means events can be raised to indicate the loading progress
 (Ogre::ResourceGroupListener). 
 
-To declare a resource there are two options
-1. Manually through Ogre::ResourceGroupManager::declareResource this is useful for scripted
+To declare a resource use Ogre::ResourceGroupManager::declareResource. This is useful for scripted
 declarations since it is entirely generalised, and does not create Resource instances right away.
-2. Through the use of @ref Scripts; some Ogre::ResourceManager subtypes have
-script formats (e.g. .material, .overlay) which can be used to declare resources
-
-After creating a resource group, adding some resource locations, and perhaps pre-declaring some resources using declareResource, but before you need to use the resources in the group, you must call  Ogre::ResourceGroupManager::initialiseResourceGroup to initialise the group. By calling this, you are triggering the following processes:
-
-- Scripts for all resource types which support scripting are parsed from the resource locations, and resources within them are created (but not loaded yet).
-- Creates all the resources which have just pre-declared using declareResource (again, these are not loaded yet)
-
-So what this essentially does is create a bunch of unloaded Ogre::Resource objects in the respective ResourceManagers based on scripts, and resources you've pre-declared. That means that code looking for these resources will find them, but they won't be taking up much memory yet, until they are either used, or they are loaded in bulk using Ogre::ResourceGroupManager::loadResourceGroup. Loading the resource group in bulk is entirely optional, but has the advantage of coming with progress reporting as resources are loaded. 
-
-Failure to call Ogre::ResourceGroupManager::initialiseResourceGroup means that Ogre::ResourceGroupManager::loadResourceGroup will do nothing, and any resources you define in scripts will not be found. Similarly, once you have called this method you won't be able to pick up any new scripts or pre-declared resources, unless you call Ogre::ResourceGroupManager::clearResourceGroup, set up declared resources, and call this method again. 
-
-In summary there are the following declaration stages:
+This adds the following conceptual stages before a Resource is created as Unloaded:
 
 @par Undefined
 Nobody knows about this resource yet. It might be
