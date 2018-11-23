@@ -1,15 +1,14 @@
 language: cpp
 sudo: required
-dist: trusty
+dist: xenial
 branches:
   only:
     - master
 addons:
   apt:
     sources:
-    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse"
-    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ trusty-backports universe"
-    - sourceline: "ppa:nschloe/swig-backports"
+    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ xenial multiverse"
+    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ xenial-backports universe"
     packages:
     - cmake
     - libxaw7-dev
@@ -30,7 +29,7 @@ before_script:
     # we start compilation afterwards anyway, so no need to sleep
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start ; fi
     - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew update && brew install freetype libzzip sdl2 ; fi
-osx_image: xcode10
+osx_image: xcode10.1
 env:
     - TEST=TRUE
     - GL3ES=TRUE # build GL3Plus and GLES2 Rendersystems
@@ -68,7 +67,7 @@ script:
     # run visual tests
     - if [ $TEST ]; then cd build/bin && ./TestContext -rs "OpenGL Rendering Subsystem" ; fi
     # verify that the python modules are loadable
-    - if [ $TEST ]; then cd ../lib && python3 -c "import _Ogre; import _OgreRTShader" ; fi
+    - if [ $TEST ]; then cd ../lib && python -c "import _Ogre; import _OgreRTShader" ; fi
 os:
     - linux
     - osx
