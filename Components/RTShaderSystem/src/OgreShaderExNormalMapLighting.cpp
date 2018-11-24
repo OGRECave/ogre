@@ -352,6 +352,10 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
 
+    // at most 8 lights are supported
+    if(mLightParamsList.size() > 8)
+        mLightParamsList.resize(8);
+
     bool hasError = false;
     // Resolve per light parameters.
     for (unsigned int i=0; i < mLightParamsList.size(); ++i)
