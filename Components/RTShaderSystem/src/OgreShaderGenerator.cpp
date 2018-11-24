@@ -743,40 +743,6 @@ bool ShaderGenerator::createShaderBasedTechnique(const Material& srcMat,
                                                  const String& dstTechniqueSchemeName,
                                                  bool overProgrammable)
 {
-    OGRE_LOCK_AUTO_MUTEX;
-
-    // Update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
-    const String& materialName = srcMat.getName();
-    const String& trueGroupName = srcMat.getGroup();
-        
-    SGMaterialIterator itMatEntry = findMaterialEntryIt(materialName, trueGroupName);
-    
-    // Check if technique already created.
-    if (itMatEntry != mMaterialEntriesMap.end())
-    {
-        const SGTechniqueList& techniqueEntires = itMatEntry->second->getTechniqueList();
-        SGTechniqueConstIterator itTechEntry = techniqueEntires.begin();
-
-        for (; itTechEntry != techniqueEntires.end(); ++itTechEntry)
-        {
-            // Case the requested mapping already exists.
-            if ((*itTechEntry)->getSourceTechnique()->getSchemeName() == srcTechniqueSchemeName &&
-                (*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName)
-            {
-                return true;
-            }
-
-
-            // Case a shader based technique with the same scheme name already defined based 
-            // on different source technique. 
-            // This state might lead to conflicts during shader generation - we prevent it by returning false here.
-            else if ((*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName)
-            {
-                return false;
-            }           
-        }
-    }
-
     // No technique created -> check if one can be created from the given source technique scheme.  
     Technique* srcTechnique = findSourceTechnique(srcMat, srcTechniqueSchemeName, overProgrammable);
 
@@ -786,8 +752,47 @@ bool ShaderGenerator::createShaderBasedTechnique(const Material& srcMat,
         return false;
     }
 
+    return createShaderBasedTechnique(srcTechnique, dstTechniqueSchemeName, overProgrammable);
+}
+bool ShaderGenerator::createShaderBasedTechnique(const Technique* srcTechnique, const String& dstTechniqueSchemeName,
+                                                 bool overProgrammable)
+{
+    OGRE_LOCK_AUTO_MUTEX;
 
-    // Create shader based technique from the given source technique.   
+    // Update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
+    Material* srcMat = srcTechnique->getParent();
+    const String& materialName = srcMat->getName();
+    const String& trueGroupName = srcMat->getGroup();
+
+    SGMaterialIterator itMatEntry = findMaterialEntryIt(materialName, trueGroupName);
+
+    // Check if technique already created.
+    if (itMatEntry != mMaterialEntriesMap.end())
+    {
+        const SGTechniqueList& techniqueEntires = itMatEntry->second->getTechniqueList();
+        SGTechniqueConstIterator itTechEntry = techniqueEntires.begin();
+
+        for (; itTechEntry != techniqueEntires.end(); ++itTechEntry)
+        {
+            // Case the requested mapping already exists.
+            if ((*itTechEntry)->getSourceTechnique()->getSchemeName() == srcTechnique->getSchemeName() &&
+                (*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName)
+            {
+                return true;
+            }
+
+
+            // Case a shader based technique with the same scheme name already defined based
+            // on different source technique.
+            // This state might lead to conflicts during shader generation - we prevent it by returning false here.
+            else if ((*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName)
+            {
+                return false;
+            }
+        }
+    }
+
+    // Create shader based technique from the given source technique.
     SGMaterial* matEntry = NULL;
 
     if (itMatEntry == mMaterialEntriesMap.end())
@@ -814,14 +819,22 @@ bool ShaderGenerator::createShaderBasedTechnique(const Material& srcMat,
     // Add to scheme.
     SGScheme* schemeEntry = createOrRetrieveScheme(dstTechniqueSchemeName).first;
     schemeEntry->addTechniqueEntry(techEntry);
-        
+
     return true;
 }
+
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName, 
                                                  const String& groupName, 
                                                  const String& srcTechniqueSchemeName, 
                                                  const String& dstTechniqueSchemeName)
+{
+    auto mat = MaterialManager::getSingleton().getByName(materialName, groupName);
+    Technique* srcTechnique = findSourceTechnique(*mat, srcTechniqueSchemeName, mCreateShaderOverProgrammablePass);
+    return removeShaderBasedTechnique(srcTechnique, dstTechniqueSchemeName);
+}
+
+bool ShaderGenerator::removeShaderBasedTechnique(const Technique* srcTech, const String& dstTechniqueSchemeName)
 {
     OGRE_LOCK_AUTO_MUTEX;
 
@@ -829,15 +842,14 @@ bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName,
     SGSchemeIterator itScheme = mSchemeEntriesMap.find(dstTechniqueSchemeName);
     SGScheme* schemeEntry = NULL;
 
-    if (itScheme == mSchemeEntriesMap.end())    
+    if (itScheme == mSchemeEntriesMap.end())
         return false;
-    
-    schemeEntry = itScheme->second;
-    
 
+    schemeEntry = itScheme->second;
 
     // Find the material entry.
-    SGMaterialIterator itMatEntry = findMaterialEntryIt(materialName,groupName);
+    Material* srcMat = srcTech->getParent();
+    SGMaterialIterator itMatEntry = findMaterialEntryIt(srcMat->getName(), srcMat->getGroup());
 
     // Case material not found.
     if (itMatEntry == mMaterialEntriesMap.end())
@@ -850,29 +862,29 @@ bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName,
 
     // Remove destination technique entry from material techniques list.
     for (; itTechEntry != matTechniqueEntires.end(); ++itTechEntry)
-    {       
-        if ((*itTechEntry)->getSourceTechnique()->getSchemeName() == srcTechniqueSchemeName &&
+    {
+        if ((*itTechEntry)->getSourceTechnique()->getSchemeName() == srcTech->getSchemeName() &&
             (*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName)
         {
             dstTechnique = *itTechEntry;
             matTechniqueEntires.erase(itTechEntry);
-            break;          
-        }       
+            break;
+        }
     }
 
     // Technique not found.
-    if (dstTechnique == NULL)   
-        return false;   
+    if (dstTechnique == NULL)
+        return false;
 
     schemeEntry->removeTechniqueEntry(dstTechnique);
 
     SGTechniqueMapIterator itTechMap = mTechniqueEntriesMap.find(dstTechnique);
 
-    if (itTechMap != mTechniqueEntriesMap.end())    
-        mTechniqueEntriesMap.erase(itTechMap);              
-    
+    if (itTechMap != mTechniqueEntriesMap.end())
+        mTechniqueEntriesMap.erase(itTechMap);
+
     OGRE_DELETE dstTechnique;
-        
+
     return true;
 }
 
@@ -896,8 +908,8 @@ bool ShaderGenerator::removeAllShaderBasedTechniques(const String& materialName,
     {   
         SGTechniqueIterator itTechEntry = matTechniqueEntires.begin();
 
-        removeShaderBasedTechnique(materialName, itMatEntry->first.second, (*itTechEntry)->getSourceTechnique()->getSchemeName(), 
-            (*itTechEntry)->getDestinationTechniqueSchemeName());       
+        removeShaderBasedTechnique((*itTechEntry)->getSourceTechnique(),
+                                   (*itTechEntry)->getDestinationTechniqueSchemeName());
     }
 
     OGRE_DELETE itMatEntry->second;
@@ -1555,7 +1567,7 @@ SubRenderState* ShaderGenerator::SGPass::getCustomFFPSubState(int subStateOrder,
 }
 
 //-----------------------------------------------------------------------------
-ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, Technique* srcTechnique,
+ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, const Technique* srcTechnique,
                                           const String& dstTechniqueSchemeName,
                                           bool overProgrammable)
     : mParent(parent), mSrcTechnique(srcTechnique), mDstTechnique(NULL), mBuildDstTechnique(true),

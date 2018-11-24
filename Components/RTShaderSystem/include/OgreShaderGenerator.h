@@ -273,16 +273,20 @@ public:
     */
     bool createShaderBasedTechnique(const Material& srcMat, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
+    /// @overload
+    bool createShaderBasedTechnique(const Technique* srcTech, const String& dstTechniqueSchemeName, bool overProgrammable = false);
+
     /**
      Remove shader based technique from a given technique.
      Return true upon success. Failure may occur if the given source technique was not previously
      registered successfully using the createShaderBasedTechnique method.
-     @param materialName The source material name.
-     @param groupName The source group name.
-     @param srcTechniqueSchemeName The source technique scheme name.
+     @param srcTech The source technique.
      @param dstTechniqueSchemeName The destination shader based technique scheme name.
      */
-    bool removeShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
+    bool removeShaderBasedTechnique(const Technique* srcTech, const String& dstTechniqueSchemeName);
+
+    /// @deprecated
+    OGRE_DEPRECATED bool removeShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
 
     /** 
     Remove all shader based techniques of the given material. 
@@ -528,7 +532,7 @@ protected:
     class _OgreRTSSExport SGTechnique : public RTShaderSystemAlloc
     {
     public:
-        SGTechnique(SGMaterial* parent, Technique* srcTechnique,
+        SGTechnique(SGMaterial* parent, const Technique* srcTechnique,
                     const String& dstTechniqueSchemeName, bool overProgrammable);
         ~SGTechnique();
         
@@ -536,7 +540,7 @@ protected:
         const SGMaterial* getParent() const { return mParent; }
         
         /** Get the source technique. */
-        Technique* getSourceTechnique() { return mSrcTechnique; }
+        const Technique* getSourceTechnique() { return mSrcTechnique; }
 
         /** Get the destination technique. */
         Technique* getDestinationTechnique() { return mDstTechnique; }
@@ -598,7 +602,7 @@ protected:
         // Parent material.     
         SGMaterial* mParent;
         // Source technique.
-        Technique* mSrcTechnique;
+        const Technique* mSrcTechnique;
         // Destination technique.
         Technique* mDstTechnique;
 		// All passes entries, both normal and illumination.
