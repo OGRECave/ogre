@@ -39,7 +39,7 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
-    rtShaderGen.createShaderBasedTechnique(*originalMaterial, originalTechnique->getSchemeName(), "NoGBuffer");
+    rtShaderGen.createShaderBasedTechnique(originalTechnique, "NoGBuffer");
 #else
     Technique* noGBufferTech = originalMaterial->createTechnique();
     noGBufferTech->removeAllPasses();
