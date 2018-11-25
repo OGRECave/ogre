@@ -249,11 +249,11 @@ namespace Ogre {
     {
     public:
         OGRE_AUTO_MUTEX; // public to allow external locking
-        /// Default resource group name
+        /// same as @ref RGN_DEFAULT
         static const String DEFAULT_RESOURCE_GROUP_NAME;
-        /// Internal resource group name (should be used by OGRE internal only)
+        /// same as @ref RGN_INTERNAL
         static const String INTERNAL_RESOURCE_GROUP_NAME;
-        /// Special resource group name which causes resource group to be automatically determined based on searching for the resource in all groups.
+        /// same as @ref RGN_AUTODETECT
         static const String AUTODETECT_RESOURCE_GROUP_NAME;
         /// The number of reference counts held per resource by the resource system
         static const long RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS;
