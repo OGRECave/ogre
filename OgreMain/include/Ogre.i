@@ -126,6 +126,8 @@ JNIEnv* OgreJNIGetEnv() {
 %enddef
 
 #ifdef SWIGJAVA
+// use proper (1.5+) enums
+%include "enums.swg"
 // conflicts with SWIG method
 %ignore *::getType;
 #endif
