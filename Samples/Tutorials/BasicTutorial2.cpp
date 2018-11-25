@@ -120,8 +120,7 @@ void TutorialApplication::setup()
 
     //! [planedefine]
     MeshManager::getSingleton().createPlane(
-            "ground",
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            "ground", RGN_DEFAULT,
             plane,
             1500, 1500, 20, 20,
             true,

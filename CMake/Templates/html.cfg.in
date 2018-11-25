@@ -1203,7 +1203,7 @@ PREDEFINED             = OGRE_MEMORY_ALLOCATOR=1 \
                          OGRE_PLATFORM=10 \
                          OGRE_DEPRECATED= \
                          MANAGED_RESOURCE= \
-                         OGRE_RESOURCE_GROUP_INIT==ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME \
+                         OGRE_RESOURCE_GROUP_INIT==RGN_DEFAULT \
                          protected=private
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then

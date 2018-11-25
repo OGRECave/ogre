@@ -37,7 +37,7 @@ We start by creating a Mesh object. As this is a manual Mesh, we have to set the
 ```cpp
 using namespace Ogre;
 
-        MeshPtr mesh = MeshManager::getSingleton().createManual(yourMeshName, "General");
+        MeshPtr mesh = MeshManager::getSingleton().createManual(yourMeshName, RGN_DEFAULT);
         mesh->_setBounds(AxisAlignedBox({-100,-100,0}, {100,100,0});
 ```
 
