@@ -93,10 +93,7 @@ public class MainActivity extends Activity {
         cameraNode.attachObject(camera);
         cameraNode.setPosition(0f, 0f, 15f);
 
-        final MaterialPtr material = MaterialManager.getSingleton().create(
-                "PlaneMat",
-                ResourceGroupManager.getDEFAULT_RESOURCE_GROUP_NAME()
-        );
+        final MaterialPtr material = MaterialManager.getSingleton().create("PlaneMat", Ogre.getRGN_DEFAULT());
 
         final Pass pass = material.getTechniques().get(0).getPass(0);
         pass.setDepthCheckEnabled(false);
@@ -104,8 +101,7 @@ public class MainActivity extends Activity {
         pass.setLightingEnabled(false);
 
         final TexturePtr texturePtr = TextureManager.getSingleton().createManual(
-                "SomeTexture",
-                "General",
+                "SomeTexture", Ogre.getRGN_DEFAULT(),
                 TextureType.TEX_TYPE_EXTERNAL_OES,
                 1080,
                 1920,
@@ -125,7 +121,7 @@ public class MainActivity extends Activity {
         // 90 deg rotate:
         rect.setUVs(new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, 0), new Vector2(1, 0));
         rect.setMaterial(material);
-        rect.setRenderQueueGroup((short) OgreJNI.RENDER_QUEUE_BACKGROUND_get());
+        rect.setRenderQueueGroup((short)RenderQueueGroupID.RENDER_QUEUE_BACKGROUND.swigValue());
         rect.setBoundingBox(bb);
 
         final SceneNode rectNode = scnMgr.getRootSceneNode().createChildSceneNode();
