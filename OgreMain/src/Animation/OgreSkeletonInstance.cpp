@@ -339,8 +339,8 @@ namespace Ogre
 
         if( itor != end && itor->boneChild == bone )
         {
+            itor->sceneNodeParent->_detachBone( this, itor->boneChild );
             efficientVectorRemove( mCustomParentSceneNodes, itor );
-            nodeParent->_detachBone( this, itor->boneChild );
         }
 
         if( nodeParent )
