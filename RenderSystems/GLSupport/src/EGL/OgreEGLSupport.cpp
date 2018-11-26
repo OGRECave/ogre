@@ -143,23 +143,32 @@ namespace Ogre {
 
     ::EGLConfig EGLSupport::getGLConfigFromContext(::EGLContext context)
     {
-        ::EGLConfig glConfig = 0;
+        ::EGLConfig glConfig;
+        EGLint id = 0;
+        ::EGLConfig *configs;
+        EGLint numConfigs;
 
-        if (eglQueryContext(mGLDisplay, context, EGL_CONFIG_ID, (EGLint *) &glConfig) == EGL_FALSE)
+        if (eglQueryContext(mGLDisplay, context, EGL_CONFIG_ID, &id) == EGL_FALSE)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to get config from context");
             return 0;
         }
         EGL_CHECK_ERROR
+        configs = getConfigs(&numConfigs);
+        glConfig = configs[id];
+        free(configs);
         return glConfig;
     }
 
     ::EGLConfig EGLSupport::getGLConfigFromDrawable(::EGLSurface drawable,
                                                     unsigned int *w, unsigned int *h)
     {
-        ::EGLConfig glConfig = 0;
+        ::EGLConfig glConfig;
+        EGLint id = 0;
+        ::EGLConfig *configs;
+        EGLint numConfigs;
 
-        if (eglQuerySurface(mGLDisplay, drawable, EGL_CONFIG_ID, (EGLint *) &glConfig) == EGL_FALSE)
+        if (eglQuerySurface(mGLDisplay, drawable, EGL_CONFIG_ID, &id) == EGL_FALSE)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to get config from drawable");
             return 0;
@@ -169,6 +178,9 @@ namespace Ogre {
         EGL_CHECK_ERROR
         eglQuerySurface(mGLDisplay, drawable, EGL_HEIGHT, (EGLint *) h);
         EGL_CHECK_ERROR
+        configs = getConfigs(&numConfigs);
+        glConfig = configs[id];
+        free(configs);
         return glConfig;
     }
 
