@@ -262,6 +262,9 @@ namespace Ogre {
         else
         {
             mLinked = true;
+
+            mVertexArrayObject = new GL3PlusOldVertexArrayObject();
+            mVertexArrayObject->bind();
         }
     }
 
