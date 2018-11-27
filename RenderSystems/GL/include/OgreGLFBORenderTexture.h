@@ -55,6 +55,9 @@ namespace Ogre {
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
         virtual void detachDepthBuffer();
         virtual void _detachDepthBuffer();
+
+        GLContext* getContext() const { return mFB.getContext(); }
+        GLFrameBufferObjectCommon* getFBO() { return &mFB; }
     protected:
         GLFrameBufferObject mFB;
     };

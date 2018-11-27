@@ -37,6 +37,40 @@ namespace Ogre {
 
     template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = NULL;
 
+    void GLFrameBufferObjectCommon::bindSurface(size_t attachment, const GLSurfaceDesc &target)
+    {
+        assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
+        mColour[attachment] = target;
+        // Re-initialise
+        if(mColour[0].buffer)
+            initialise();
+    }
+
+    void GLFrameBufferObjectCommon::unbindSurface(size_t attachment)
+    {
+        assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
+        mColour[attachment].buffer = 0;
+        // Re-initialise if buffer 0 still bound
+        if(mColour[0].buffer)
+            initialise();
+    }
+
+    uint32 GLFrameBufferObjectCommon::getWidth() const
+    {
+        assert(mColour[0].buffer);
+        return mColour[0].buffer->getWidth();
+    }
+    uint32 GLFrameBufferObjectCommon::getHeight() const
+    {
+        assert(mColour[0].buffer);
+        return mColour[0].buffer->getHeight();
+    }
+    PixelFormat GLFrameBufferObjectCommon::getFormat() const
+    {
+        assert(mColour[0].buffer);
+        return mColour[0].buffer->getFormat();
+    }
+
     GLRTTManager* GLRTTManager::getSingletonPtr(void)
     {
         return msSingleton;

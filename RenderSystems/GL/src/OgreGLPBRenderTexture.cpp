@@ -61,16 +61,22 @@ namespace Ogre {
         else if (name == GLRenderTexture::CustomAttributeString_GLCONTEXT )
         {
             // Get PBuffer for our internal format
-            *static_cast<GLContext**>(pData) = mManager->getContextFor(mPBFormat, mWidth, mHeight);
+            *static_cast<GLContext**>(pData) = getContext();
         }
     }
+
+    GLContext* GLPBRenderTexture::getContext() const
+    {
+        return mManager->getContextFor(mPBFormat, mWidth, mHeight);
+    }
+
 //-----------------------------------------------------------------------------  
     GLPBRTTManager::GLPBRTTManager(GLNativeSupport *support, RenderTarget *mainwindow):
         mSupport(support),
         mMainWindow(mainwindow),
         mMainContext(0)
     {
-        mMainWindow->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
+        mMainContext = dynamic_cast<GLRenderTarget*>(mMainWindow)->getContext();
     }  
     GLPBRTTManager::~GLPBRTTManager()
     {

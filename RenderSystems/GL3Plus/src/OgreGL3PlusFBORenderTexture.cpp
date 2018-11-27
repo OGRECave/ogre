@@ -59,7 +59,7 @@ namespace Ogre {
         }
         else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
         {
-            *static_cast<GLContext**>(pData) = mFB.getContext();
+            *static_cast<GLContext**>(pData) = getContext();
         }
         else if (name == "GL_FBOID")
         {
@@ -476,9 +476,7 @@ namespace Ogre {
     void GL3PlusFBOManager::bind(RenderTarget *target)
     {
         // Check if the render target is in the rendertarget->FBO map
-        GL3PlusFrameBufferObject *fbo = 0;
-        target->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
-        if(fbo)
+        if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
             fbo->bind(true);
         else
             // Old style context (window/pbuffer) or copying render texture

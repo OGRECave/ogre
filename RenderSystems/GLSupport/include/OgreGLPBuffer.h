@@ -30,24 +30,19 @@ THE SOFTWARE.
 #define __GLPBUFFER_H__
 
 #include "OgreGLSupportPrerequisites.h"
+#include "OgreGLRenderTarget.h"
 
 namespace Ogre {
-    class GLContext;
-
     /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
         convience, but the component format is configurable.
     */
-    class _OgreGLExport GLPBuffer
+    class _OgreGLExport GLPBuffer : public GLRenderTarget
     {
     public:
         GLPBuffer(PixelComponentType format, uint32 width, uint32 height)
             : mFormat(format), mWidth(width), mHeight(height) {}
         virtual ~GLPBuffer() {}
-        
-        /** Get the GL context that needs to be active to render to this PBuffer.
-        */
-        virtual GLContext *getContext() = 0;
-        
+
         PixelComponentType getFormat() { return mFormat; }
         uint32 getWidth() { return mWidth; }
         uint32 getHeight() { return mHeight; }

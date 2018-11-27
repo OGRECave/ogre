@@ -825,4 +825,6 @@ namespace Ogre
             mIsFullScreen = fullscreen;
         }
     }
+
+    GLContext* GLXWindow::getContext() const { return mContext; }
 }

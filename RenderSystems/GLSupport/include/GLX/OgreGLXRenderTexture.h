@@ -42,7 +42,7 @@ namespace Ogre
         GLXPBuffer(GLXGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
         ~GLXPBuffer();
         
-        virtual GLContext *getContext();
+        GLContext *getContext() const;
 
     protected:
         GLXContext*   mContext;

@@ -31,9 +31,10 @@ THE SOFTWARE.
 
 #include "OgreWin32Prerequisites.h"
 #include "OgreRenderWindow.h"
+#include "OgreGLRenderTarget.h"
 
 namespace Ogre {
-    class _OgreGLExport Win32Window : public RenderWindow
+    class _OgreGLExport Win32Window : public RenderWindow, public GLRenderTarget
     {
     public:
         Win32Window(Win32GLSupport &glsupport);
@@ -75,6 +76,8 @@ namespace Ogre {
 
         void adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
             unsigned int* winWidth, unsigned int* winHeight);
+
+        GLContext* getContext() const;
 
     protected:
         

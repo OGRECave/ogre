@@ -675,8 +675,7 @@ namespace Ogre {
         {
             // Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
             // Only Copy does, but Copy means only one depth buffer...
-            GL3PlusContext *windowContext = 0;
-            win->getCustomAttribute( GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
+            GL3PlusContext *windowContext = dynamic_cast<GLRenderTarget*>(win)->getContext();
             GL3PlusDepthBuffer *depthBuffer = new GL3PlusDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
                                                                       windowContext, 0, 0,
                                                                       win->getWidth(), win->getHeight(),
@@ -698,10 +697,8 @@ namespace Ogre {
         // Only FBOs support different depth buffers, so everything
         // else creates dummy (empty) containers
         // retVal = mRTTManager->_createDepthBufferFor( renderTarget );
-        GL3PlusFrameBufferObject *fbo = 0;
-        renderTarget->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
 
-        if ( fbo )
+        if ( auto fbo = dynamic_cast<GLRenderTarget*>(renderTarget)->getFBO() )
         {
             // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast.
             // Find best depth & stencil format suited for the RT's format.
@@ -751,8 +748,7 @@ namespace Ogre {
         RenderTarget* pWin = detachRenderTarget(name);
         OgreAssert(pWin, "unknown RenderWindow name");
 
-        GL3PlusContext *windowContext = 0;
-        pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
+        GL3PlusContext *windowContext = dynamic_cast<GLRenderTarget*>(pWin)->getContext();
 
         // 1 Window <-> 1 Context, should be always true.
         assert( windowContext );
@@ -1785,12 +1781,9 @@ namespace Ogre {
 
         for(RenderTargetMap::iterator it = mRenderTargets.begin(); it!=mRenderTargets.end(); ++it)
         {
-            RenderTarget* target = it->second;
-            if(target)
+            if(auto target = dynamic_cast<GLRenderTarget*>(it->second))
             {
-                GL3PlusFrameBufferObject *fbo = 0;
-                target->getCustomAttribute("FBO", &fbo);
-                if(fbo)
+                if(auto fbo = target->getFBO())
                     fbo->notifyContextDestroyed(context);
             }
         }
@@ -1904,8 +1897,7 @@ namespace Ogre {
     void GL3PlusRenderSystem::initialiseContext(RenderWindow* primary)
     {
         // Set main and current context
-        mMainContext = 0;
-        primary->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
+        mMainContext = dynamic_cast<GLRenderTarget*>(primary)->getContext();
         mCurrentContext = mMainContext;
 
         // Set primary context as active
@@ -1939,8 +1931,7 @@ namespace Ogre {
         if (target)
         {
             // Switch context if different from current one
-            GL3PlusContext *newContext = 0;
-            target->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &newContext);
+            GL3PlusContext *newContext = dynamic_cast<GLRenderTarget*>(target)->getContext();
             if (newContext && mCurrentContext != newContext)
             {
                 _switchContext(newContext);

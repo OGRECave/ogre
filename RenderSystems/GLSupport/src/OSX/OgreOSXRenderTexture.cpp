@@ -58,7 +58,7 @@ namespace Ogre
         destroyPBuffer();
     }
 
-    GLContext* OSXPBuffer::getContext()
+    GLContext* OSXPBuffer::getContext() const
     {
         LogManager::getSingleton().logMessage( "OSXPBuffer::getContext()" );
         return mContext;

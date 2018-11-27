@@ -33,9 +33,10 @@ THE SOFTWARE.
 #include "OgreRenderWindow.h"
 #include "OgreEGLSupport.h"
 #include "OgreEGLContext.h"
+#include "OgreGLRenderTarget.h"
 
 namespace Ogre {
-    class _OgrePrivate EGLWindow : public RenderWindow
+    class _OgrePrivate EGLWindow : public RenderWindow, public GLRenderTarget
     {
     private:
         protected:
@@ -71,6 +72,7 @@ namespace Ogre {
             virtual void resize(unsigned int width, unsigned int height) = 0;
             virtual void windowMovedOrResized() = 0;
 
+            GLContext* getContext() const { return mContext; }
     public:
             EGLWindow(EGLSupport* glsupport);
             virtual ~EGLWindow();

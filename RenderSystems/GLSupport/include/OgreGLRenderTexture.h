@@ -32,6 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreRenderTexture.h"
 #include "OgreSingleton.h"
+#include "OgreGLRenderTarget.h"
 
 namespace Ogre {
     class GLHardwarePixelBufferCommon;
@@ -48,9 +49,61 @@ namespace Ogre {
         GLSurfaceDesc() : buffer(0), zoffset(0), numSamples(0) {}
     };
 
+    /// Frame Buffer Object abstraction
+    class _OgreGLExport GLFrameBufferObjectCommon
+    {
+    public:
+        GLFrameBufferObjectCommon() : mContext(NULL), mFB(0), mMultisampleFB(0), mNumSamples(0) {}
+
+        /** Bind FrameBufferObject. Attempt to bind on incompatible GL context will cause FBO destruction and optional recreation.
+        */
+        virtual bool bind(bool recreateIfNeeded) = 0;
+
+        /** Bind a surface to a certain attachment point.
+            attachment: 0..OGRE_MAX_MULTIPLE_RENDER_TARGETS-1
+        */
+        void bindSurface(size_t attachment, const GLSurfaceDesc &target);
+        /** Unbind attachment
+        */
+        void unbindSurface(size_t attachment);
+
+        /// Accessors
+        int32 getFSAA() const { return mNumSamples; }
+        uint32 getWidth() const;
+        uint32 getHeight() const;
+        PixelFormat getFormat() const;
+
+        GLContext* getContext() const { return mContext; }
+        /// Get the GL id for the FBO
+        uint32 getGLFBOID() const { return mFB; }
+        /// Get the GL id for the multisample FBO
+        uint32 getGLMultisampleFBOID() const { return mMultisampleFB; }
+
+        const GLSurfaceDesc &getSurface(size_t attachment) const { return mColour[attachment]; }
+
+        void notifyContextDestroyed(GLContext* context) { if(mContext == context) { mContext = 0; mFB = 0; mMultisampleFB = 0; } }
+    protected:
+        // Arbitrary number of texture surfaces
+        GLSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        /// Context that was used to create FBO. It could already be destroyed, so do not dereference this field blindly
+        GLContext* mContext;
+        uint32 mFB;
+        uint32 mMultisampleFB;
+        int32 mNumSamples;
+
+        /** Initialise object (find suitable depth and stencil format).
+            Must be called every time the bindings change.
+            It fails with an exception (ERR_INVALIDPARAMS) if:
+            - Attachment point 0 has no binding
+            - Not all bound surfaces have the same size
+            - Not all bound surfaces have the same internal format
+        */
+        virtual void initialise() = 0;
+    };
+
     /** Base class for GL Render Textures
      */
-    class _OgreGLExport GLRenderTexture : public RenderTexture
+    class _OgreGLExport GLRenderTexture : public RenderTexture, public GLRenderTarget
     {
     public:
         GLRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);

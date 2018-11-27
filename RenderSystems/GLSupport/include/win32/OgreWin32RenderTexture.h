@@ -40,7 +40,7 @@ namespace Ogre {
         Win32PBuffer(PixelComponentType format, size_t width, size_t height);
         ~Win32PBuffer();
         
-        virtual GLContext *getContext() { return mContext; }
+        GLContext *getContext() const { return mContext; }
     protected:
         void createPBuffer();
         void destroyPBuffer();

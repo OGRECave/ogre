@@ -504,9 +504,7 @@ namespace Ogre {
     void GLES2FBOManager::bind(RenderTarget *target)
     {
         // Check if the render target is in the rendertarget->FBO map
-        GLES2FrameBufferObject *fbo = 0;
-        target->getCustomAttribute("FBO", &fbo);
-        if(fbo)
+        if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
             fbo->bind(true);
             // Old style context (window/pbuffer) or copying render texture
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS

@@ -491,10 +491,8 @@ static const uchar depthBits[] =
     void GLFBOManager::bind(RenderTarget *target)
     {
         /// Check if the render target is in the rendertarget->FBO map
-        GLFrameBufferObject *fbo = 0;
-        target->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
-        if(fbo)
-            fbo->bind();
+        if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
+            fbo->bind(true);
         else
             // Old style context (window/pbuffer) or copying render texture
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);

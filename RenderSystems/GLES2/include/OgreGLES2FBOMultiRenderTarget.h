@@ -37,13 +37,15 @@ namespace Ogre {
 
     /** MultiRenderTarget for GL ES 2.x.
     */
-    class _OgreGLES2Export GLES2FBOMultiRenderTarget : public MultiRenderTarget
+    class _OgreGLES2Export GLES2FBOMultiRenderTarget : public MultiRenderTarget, public GLRenderTarget
     {
     public:
         GLES2FBOMultiRenderTarget(GLES2FBOManager *manager, const String &name);
         ~GLES2FBOMultiRenderTarget();
 
         virtual void getCustomAttribute( const String& name, void *pData );
+        GLContext* getContext() const { return fbo.getContext(); }
+        GLFrameBufferObjectCommon* getFBO() { return &fbo; }
 
         bool requiresTextureFlipping() const { return true; }
 

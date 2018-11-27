@@ -1013,8 +1013,7 @@ namespace Ogre {
         {
             //Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
             //Only Copy does, but Copy means only one depth buffer...
-            GLContext *windowContext = 0;
-            win->getCustomAttribute( GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
+            GLContext *windowContext = dynamic_cast<GLRenderTarget*>(win)->getContext();;
 
             GLDepthBuffer *depthBuffer = new GLDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
                                                             windowContext, 0, 0,
@@ -1036,10 +1035,7 @@ namespace Ogre {
         //Only FBO & pbuffer support different depth buffers, so everything
         //else creates dummy (empty) containers
         //retVal = mRTTManager->_createDepthBufferFor( renderTarget );
-        GLFrameBufferObject *fbo = 0;
-        renderTarget->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
-
-        if( fbo )
+        if( auto fbo = dynamic_cast<GLRenderTarget*>(renderTarget)->getFBO() )
         {
             //Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
             //Find best depth & stencil format suited for the RT's format
@@ -1079,8 +1075,7 @@ namespace Ogre {
     void GLRenderSystem::initialiseContext(RenderWindow* primary)
     {
         // Set main and current context
-        mMainContext = 0;
-        primary->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
+        mMainContext = dynamic_cast<GLRenderTarget*>(primary)->getContext();
         mCurrentContext = mMainContext;
 
         // Set primary context as active
@@ -1123,9 +1118,8 @@ namespace Ogre {
         RenderTarget* pWin = detachRenderTarget(name);
         OgreAssert(pWin, "unknown RenderWindow name");
 
-        GLContext *windowContext = 0;
-        pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
-
+        GLContext *windowContext = dynamic_cast<GLRenderTarget*>(pWin)->getContext();
+    
         //1 Window <-> 1 Context, should be always true
         assert( windowContext );
 
@@ -3189,8 +3183,7 @@ namespace Ogre {
         if (target)
         {
             // Switch context if different from current one
-            GLContext *newContext = 0;
-            target->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &newContext);
+            GLContext *newContext = dynamic_cast<GLRenderTarget*>(target)->getContext();
             if(newContext && mCurrentContext != newContext)
             {
                 _switchContext(newContext);

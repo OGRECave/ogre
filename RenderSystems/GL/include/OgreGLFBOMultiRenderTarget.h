@@ -34,13 +34,15 @@ THE SOFTWARE.
 namespace Ogre {
     /** MultiRenderTarget for GL. Requires the FBO extension.
     */
-    class _OgreGLExport GLFBOMultiRenderTarget : public MultiRenderTarget
+    class _OgreGLExport GLFBOMultiRenderTarget : public MultiRenderTarget, public GLRenderTarget
     {
     public:
         GLFBOMultiRenderTarget(GLFBOManager *manager, const String &name);
         ~GLFBOMultiRenderTarget();
 
         virtual void getCustomAttribute( const String& name, void *pData );
+        GLContext* getContext() const { return fbo.getContext(); }
+        GLFrameBufferObjectCommon* getFBO() { return &fbo; }
 
         bool requiresTextureFlipping() const { return true; }
 
