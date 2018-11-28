@@ -334,6 +334,7 @@ NativeWindowPair ApplicationContext::createWindow(const Ogre::String& name, Ogre
     miscParams["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
 
     mWindows[0].render = Ogre::Root::getSingleton().createRenderWindow(name, 0, 0, false, &miscParams);
+    ret = mWindows[0];
 #else
     Ogre::ConfigOptionMap ropts = mRoot->getRenderSystem()->getConfigOptions();
 
