@@ -228,8 +228,26 @@ namespace Ogre {
         void resetStatistics(void);
 
         /** Retrieve a platform or API-specific piece of information
-            This is a nasty way of satisfying any API's need to see platform-specific details.
-            It horrid, but D3D needs this kind of info. At least it's abstracted.
+
+            This method of retrieving information should only be used if you know what you're doing.
+
+            | Name        | Description                        |
+            |-------------|------------------------------------|
+            | WINDOW      | The native window handle. (X11 Window XID/ HWND / NSWindow*) |
+            | HWND        | deprecated (same as WINDOW) |
+            | GL_FBOID | the id of the OpenGL framebuffer object |
+            | GL_MULTISAMPLEFBOID | the id of the OpenGL framebuffer object used for multisampling |
+            | GLFBO | id of the screen OpenGL framebuffer object on iOS |
+            | GLCONTEXT   | deprecated, do not use |
+            | FBO | deprecated, do not use |
+            | TARGET | deprecated, do not use |
+            | XDISPLAY     | The X Display connection behind that context. |
+            | DISPLAYNAME | The X Server name for the connected display. |
+            | ATOM        | The X Atom used in client delete events. |
+            | VIEW | Cocoa NSView* |
+            | NSOPENGLCONTEXT | Cocoa NSOpenGLContext* |
+            | NSOPENGLPIXELFORMAT | Cocoa NSOpenGLPixelFormat* |
+            
             @param name The name of the attribute.
             @param pData Pointer to memory of the right kind of structure to receive the info.
         */

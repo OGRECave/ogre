@@ -35,23 +35,13 @@ namespace Ogre {
     
     /** Frame Buffer Object abstraction.
     */
-    class _OgreGLExport GLFrameBufferObject
+    class _OgreGLExport GLFrameBufferObject : public GLFrameBufferObjectCommon
     {
     public:
         GLFrameBufferObject(GLFBOManager *manager, uint fsaa);
         ~GLFrameBufferObject();
 
-        /** Bind a surface to a certain attachment point.
-            attachment: 0..OGRE_MAX_MULTIPLE_RENDER_TARGETS-1
-        */
-        void bindSurface(size_t attachment, const GLSurfaceDesc &target);
-        /** Unbind attachment
-        */
-        void unbindSurface(size_t attachment);
-        
-        /** Bind FrameBufferObject
-        */
-        void bind();
+        bool bind(bool recreateIfNeeded);
 
         /** Swap buffers - only useful when using multisample buffers.
         */
@@ -65,40 +55,13 @@ namespace Ogre {
         void attachDepthBuffer( DepthBuffer *depthBuffer );
         void detachDepthBuffer();
         
-        /// Get the GL id for the FBO
-        GLuint getGLFBOID() const { return mFB; }
-        /// Get the GL id for the multisample FBO
-        GLuint getGLMultisampleFBOID() const { return mMultisampleFB; }
-        
-        /// Accessors
-        uint32 getWidth();
-        uint32 getHeight();
-        PixelFormat getFormat();
-        GLsizei getFSAA();
-        
         GLFBOManager *getManager() { return mManager; }
-        GLContext* getContext() { return mContext; }
-        const GLSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
     private:
         GLFBOManager *mManager;
-        GLContext* mContext;
-        GLsizei mNumSamples;
-        GLuint mFB;
-        GLuint mMultisampleFB;
         GLSurfaceDesc mMultisampleColourBuffer;
         GLSurfaceDesc mDepth;
         GLSurfaceDesc mStencil;
-        // Arbitrary number of texture surfaces
-        GLSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 
-
-        /** Initialise object (find suitable depth and stencil format).
-            Must be called every time the bindings change.
-            It fails with an exception (ERR_INVALIDPARAMS) if:
-            - Attachment point 0 has no binding
-            - Not all bound surfaces have the same size
-            - Not all bound surfaces have the same internal format
-        */
         void initialise();
     };
 

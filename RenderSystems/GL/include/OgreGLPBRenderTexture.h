@@ -43,6 +43,8 @@ namespace Ogre {
         virtual ~GLPBRenderTexture();
         
         virtual void getCustomAttribute(const String& name, void* pData);
+
+        GLContext* getContext() const;
     protected:
         GLPBRTTManager *mManager;
         PixelComponentType mPBFormat;

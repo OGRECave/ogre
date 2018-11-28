@@ -936,4 +936,6 @@ namespace Ogre {
             }
         }
     }
+
+    GLContext* Win32Window::getContext() const { return mContext; }
 }

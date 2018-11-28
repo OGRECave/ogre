@@ -41,7 +41,7 @@ namespace Ogre
         OSXPBuffer(PixelComponentType format, uint32 width, uint32 height );
         ~OSXPBuffer();
         
-        virtual GLContext *getContext();
+        GLContext *getContext() const;
 
     protected:
         void createPBuffer();

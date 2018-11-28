@@ -37,13 +37,15 @@ namespace Ogre {
 
     /** MultiRenderTarget for OpenGL
     */
-    class _OgreGL3PlusExport GL3PlusFBOMultiRenderTarget : public MultiRenderTarget
+    class _OgreGL3PlusExport GL3PlusFBOMultiRenderTarget : public MultiRenderTarget, public GLRenderTarget
     {
     public:
         GL3PlusFBOMultiRenderTarget(GL3PlusFBOManager *manager, const String &name);
         ~GL3PlusFBOMultiRenderTarget();
 
         virtual void getCustomAttribute( const String& name, void *pData );
+        GLContext* getContext() const { return fbo.getContext(); }
+        GLFrameBufferObjectCommon* getFBO() { return &fbo; }
 
         bool requiresTextureFlipping() const { return true; }
 

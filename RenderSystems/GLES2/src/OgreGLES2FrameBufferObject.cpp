@@ -39,7 +39,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
-        mManager(manager), mContext(NULL), mNumSamples(fsaa)
+        mManager(manager)
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         GLint oldfb = 0;
@@ -130,25 +130,6 @@ namespace Ogre {
         bindSurface(0, target);
     }
 #endif
-    
-    
-    void GLES2FrameBufferObject::bindSurface(size_t attachment, const GLSurfaceDesc &target)
-    {
-        assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-        mColour[attachment] = target;
-        // Re-initialise
-        if(mColour[0].buffer)
-            initialise();
-    }
-    
-    void GLES2FrameBufferObject::unbindSurface(size_t attachment)
-    {
-        assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-        mColour[attachment].buffer = 0;
-        // Re-initialise if buffer 0 still bound
-        if(mColour[0].buffer)
-            initialise();
-    }
     
     void GLES2FrameBufferObject::initialise()
     {
@@ -414,26 +395,6 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
             OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0 ));
         }
-    }
-
-    uint32 GLES2FrameBufferObject::getWidth()
-    {
-        assert(mColour[0].buffer);
-        return mColour[0].buffer->getWidth();
-    }
-    uint32 GLES2FrameBufferObject::getHeight()
-    {
-        assert(mColour[0].buffer);
-        return mColour[0].buffer->getHeight();
-    }
-    PixelFormat GLES2FrameBufferObject::getFormat()
-    {
-        assert(mColour[0].buffer);
-        return mColour[0].buffer->getFormat();
-    }
-    GLsizei GLES2FrameBufferObject::getFSAA()
-    {
-        return mNumSamples;
     }
 //-----------------------------------------------------------------------------
 }

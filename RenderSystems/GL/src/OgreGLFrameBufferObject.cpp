@@ -40,7 +40,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------
     GLFrameBufferObject::GLFrameBufferObject(GLFBOManager *manager, uint fsaa):
-        mManager(manager), mNumSamples(fsaa)
+        mManager(manager)
     {
         GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
         mContext = rs->_getCurrentContext();
@@ -86,24 +86,6 @@ namespace Ogre {
         if (mMultisampleFB)
             glDeleteFramebuffersEXT(1, &mMultisampleFB);
 
-    }
-    void GLFrameBufferObject::bindSurface(size_t attachment, const GLSurfaceDesc &target)
-    {
-        assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-        mColour[attachment] = target;
-        // Re-initialise
-        if(mColour[0].buffer)
-            initialise();
-    }
-    void GLFrameBufferObject::unbindSurface(size_t attachment)
-    {
-        assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-        mColour[attachment].buffer = 0;
-        // Re-initialise if buffer 0 still bound
-        if(mColour[0].buffer)
-        {
-            initialise();
-        }
     }
     void GLFrameBufferObject::initialise()
     {
@@ -253,11 +235,12 @@ namespace Ogre {
         }
         
     }
-    void GLFrameBufferObject::bind()
+    bool GLFrameBufferObject::bind(bool recreateIfNeeded)
     {
         // Bind it to FBO
         const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+        return mContext != 0;
     }
 
     void GLFrameBufferObject::swapBuffers()
@@ -314,25 +297,4 @@ namespace Ogre {
         glFramebufferRenderbufferEXT( GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT,
                                       GL_RENDERBUFFER_EXT, 0 );
     }
-
-    uint32 GLFrameBufferObject::getWidth()
-    {
-        assert(mColour[0].buffer);
-        return mColour[0].buffer->getWidth();
-    }
-    uint32 GLFrameBufferObject::getHeight()
-    {
-        assert(mColour[0].buffer);
-        return mColour[0].buffer->getHeight();
-    }
-    PixelFormat GLFrameBufferObject::getFormat()
-    {
-        assert(mColour[0].buffer);
-        return mColour[0].buffer->getFormat();
-    }
-    GLsizei GLFrameBufferObject::getFSAA()
-    {
-        return mNumSamples;
-    }
-//-----------------------------------------------------------------------------
 }

@@ -43,8 +43,7 @@ namespace Ogre {
     void GLES2FBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
     {
         /// Check if the render target is in the rendertarget->FBO map
-        GLES2FrameBufferObject *fbobj = 0;
-        target->getCustomAttribute("FBO", &fbobj);
+        auto *fbobj = dynamic_cast<GLRenderTarget*>(target)->getFBO();
         assert(fbobj);
         fbo.bindSurface(attachment, fbobj->getSurface(0));
 

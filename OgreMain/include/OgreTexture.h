@@ -402,6 +402,11 @@ namespace Ogre {
         
         /** Retrieve a platform or API-specific piece of information from this texture.
             This method of retrieving information should only be used if you know what you're doing.
+
+            | Name        | Description                  |
+            |-------------|------------------------------|
+            | GLID        | The OpenGL texture object id |
+
             @param name The name of the attribute to retrieve.
             @param pData Pointer to memory matching the type of data you want to retrieve.
         */

@@ -38,22 +38,12 @@ namespace Ogre {
 
     /** Frame Buffer Object abstraction.
     */
-    class _OgreGL3PlusExport GL3PlusFrameBufferObject
+    class _OgreGL3PlusExport GL3PlusFrameBufferObject : public GLFrameBufferObjectCommon
     {
     public:
         GL3PlusFrameBufferObject(GL3PlusFBOManager *manager, uint fsaa);
         ~GL3PlusFrameBufferObject();
 
-        /** Bind a surface to a certain attachment point.
-            attachment: 0..OGRE_MAX_MULTIPLE_RENDER_TARGETS-1
-        */
-        void bindSurface(size_t attachment, const GLSurfaceDesc &target);
-        /** Unbind attachment
-        */
-        void unbindSurface(size_t attachment);
-        
-        /** Bind FrameBufferObject. Attempt to bind on incompatible GL context will cause FBO destruction and optional recreation.
-        */
         bool bind(bool recreateIfNeeded);
 
         /** Swap buffers - only useful when using multisample buffers.
@@ -68,43 +58,13 @@ namespace Ogre {
         void attachDepthBuffer( DepthBuffer *depthBuffer );
         void detachDepthBuffer();
 
-        /// Get the GL id for the FBO
-        GLuint getGLFBOID() const { return mFB; }
-        /// Get the GL id for the multisample FBO
-        GLuint getGLMultisampleFBOID() const { return mMultisampleFB; }
-        
-        /// Accessors
-        uint32 getWidth();
-        uint32 getHeight();
-        PixelFormat getFormat();
-        GLsizei getFSAA();
-        
         GL3PlusFBOManager *getManager() { return mManager; }
-        GLContext* getContext() { return mContext; }
-        const GLSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
-
-        void notifyContextDestroyed(GLContext* context) { if(mContext == context) { mContext = 0; mFB = 0; mMultisampleFB = 0; } }
-
     private:
         GL3PlusFBOManager *mManager;
-        GLContext* mContext; /// Context that was used to create FBO. It could already be destroyed, so do not dereference this field blindly
-        GLsizei mNumSamples;
-        GLuint mFB;
-        GLuint mMultisampleFB;
         GLSurfaceDesc mMultisampleColourBuffer;
         GLSurfaceDesc mDepth;
         GLSurfaceDesc mStencil;
-        // Arbitrary number of texture surfaces
-        GLSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 
-
-        /** Initialise object (find suitable depth and stencil format).
-            Must be called every time the bindings change.
-            It fails with an exception (ERR_INVALIDPARAMS) if:
-            - Attachment point 0 has no binding
-            - Not all bound surfaces have the same size
-            - Not all bound surfaces have the same internal format
-        */
         void initialise();
     };
 
