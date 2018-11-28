@@ -183,6 +183,11 @@ namespace Ogre {
             {
                 preserveContextOpt = true;
             }
+                      
+            if ((opt = miscParams->find("externalGLControl")) != end)
+            {
+                mIsExternalGLControl = StringConverter::parseBool(opt->second);
+            }
         }
         
         initNativeCreatedWindow(miscParams);
