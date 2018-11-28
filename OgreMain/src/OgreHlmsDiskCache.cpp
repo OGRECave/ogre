@@ -208,6 +208,8 @@ namespace Ogre
         }
 
         {
+            hlms->mRenderableCache.reserve( hlms->mRenderableCache.size() + mCache.pso.size() );
+
             PsoVec::const_iterator itor = mCache.pso.begin();
             PsoVec::const_iterator end  = mCache.pso.end();
 
