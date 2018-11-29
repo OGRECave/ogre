@@ -59,8 +59,6 @@ namespace Ogre {
     private:
         GLFBOManager *mManager;
         GLSurfaceDesc mMultisampleColourBuffer;
-        GLSurfaceDesc mDepth;
-        GLSurfaceDesc mStencil;
 
         void initialise();
     };

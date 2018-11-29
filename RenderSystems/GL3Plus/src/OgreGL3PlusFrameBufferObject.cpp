@@ -38,11 +38,8 @@ namespace Ogre {
 
 
     GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager *manager, uint fsaa):
-        mManager(manager)
+        GLFrameBufferObjectCommon(fsaa), mManager(manager)
     {
-        GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
-        mContext = rs->_getCurrentContext();
-
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
@@ -61,14 +58,6 @@ namespace Ogre {
         else
         {
             mMultisampleFB = 0;
-        }
-
-        // Initialise state
-        mDepth.buffer=0;
-        mStencil.buffer=0;
-        for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
-        {
-            mColour[x].buffer=0;
         }
     }
     

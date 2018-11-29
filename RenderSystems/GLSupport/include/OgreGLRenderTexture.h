@@ -53,7 +53,8 @@ namespace Ogre {
     class _OgreGLExport GLFrameBufferObjectCommon
     {
     public:
-        GLFrameBufferObjectCommon() : mContext(NULL), mFB(0), mMultisampleFB(0), mNumSamples(0) {}
+        GLFrameBufferObjectCommon(int32 fsaa);
+        virtual ~GLFrameBufferObjectCommon() {}
 
         /** Bind FrameBufferObject. Attempt to bind on incompatible GL context will cause FBO destruction and optional recreation.
         */
@@ -83,6 +84,8 @@ namespace Ogre {
 
         void notifyContextDestroyed(GLContext* context) { if(mContext == context) { mContext = 0; mFB = 0; mMultisampleFB = 0; } }
     protected:
+        GLSurfaceDesc mDepth;
+        GLSurfaceDesc mStencil;
         // Arbitrary number of texture surfaces
         GLSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         /// Context that was used to create FBO. It could already be destroyed, so do not dereference this field blindly
