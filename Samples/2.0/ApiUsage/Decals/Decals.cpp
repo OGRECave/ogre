@@ -141,6 +141,8 @@ namespace Demo
         {
             registerHlms();
 
+            loadHlmsDiskCache();
+
             reserveDecalTextures();
 
             // Initialise, parse scripts etc
