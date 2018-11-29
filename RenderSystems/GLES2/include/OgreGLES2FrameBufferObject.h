@@ -71,8 +71,6 @@ namespace Ogre {
     private:
         GLES2FBOManager *mManager;
         GLSurfaceDesc mMultisampleColourBuffer;
-        GLSurfaceDesc mDepth;
-        GLSurfaceDesc mStencil;
 
         void initialise();
     };

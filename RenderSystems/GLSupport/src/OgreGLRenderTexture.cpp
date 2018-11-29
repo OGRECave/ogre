@@ -28,6 +28,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreGLRenderTexture.h"
 #include "OgreGLHardwarePixelBufferCommon.h"
+#include "OgreGLRenderSystemCommon.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 
@@ -36,6 +38,22 @@ namespace Ogre {
     const String GLRenderTexture::CustomAttributeString_GLCONTEXT = "GLCONTEXT";
 
     template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = NULL;
+
+    GLFrameBufferObjectCommon::GLFrameBufferObjectCommon(int32 fsaa)
+        : mFB(0), mMultisampleFB(0), mNumSamples(fsaa)
+    {
+        auto* rs = static_cast<GLRenderSystemCommon*>(
+            Root::getSingleton().getRenderSystem());
+        mContext = rs->_getCurrentContext();
+
+        // Initialise state
+        mDepth.buffer = 0;
+        mStencil.buffer = 0;
+        for(size_t x = 0; x < OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+        {
+            mColour[x].buffer=0;
+        }
+    }
 
     void GLFrameBufferObjectCommon::bindSurface(size_t attachment, const GLSurfaceDesc &target)
     {

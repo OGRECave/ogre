@@ -39,7 +39,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
-        mManager(manager)
+        GLFrameBufferObjectCommon(fsaa), mManager(manager)
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         GLint oldfb = 0;
@@ -81,14 +81,6 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
 #endif
-
-        // Initialise state
-        mDepth.buffer = 0;
-        mStencil.buffer = 0;
-        for(size_t x = 0; x < OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
-        {
-            mColour[x].buffer=0;
-        }
     }
     
     GLES2FrameBufferObject::~GLES2FrameBufferObject()
