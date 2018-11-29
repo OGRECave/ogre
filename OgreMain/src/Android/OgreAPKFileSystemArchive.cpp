@@ -87,8 +87,10 @@ namespace {
 	APKFileSystemArchive::~APKFileSystemArchive()
 	{
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
-		iter->second.clear(); 
-		mFiles.erase( iter );  	
+		if (iter != mFiles.end()) {
+			iter->second.clear();
+			mFiles.erase( iter );
+		}
 		unload();
 	}
 
