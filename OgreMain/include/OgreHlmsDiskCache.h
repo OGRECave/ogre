@@ -70,6 +70,9 @@ namespace Ogre
         See http://wiki.ogre3d.org/Ogre+2.1+FAQ#Starting_my_app_takes_forever_particularly_Direct3D11_
 
     @remarks
+        IMPORTANT: If you're using the microcode cache, it should be loaded BEFORE the disk cache.
+        And setSaveMicrocodesToCache should be called BEFORE loading the disk cache.
+
         What's the difference between the Microcode cache and HlmsDiskCache?
 
         A PSO has multiple stages since it's compiled in an Hlms:
