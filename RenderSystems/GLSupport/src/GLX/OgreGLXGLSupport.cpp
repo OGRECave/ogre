@@ -311,40 +311,29 @@ namespace Ogre
 
         GLXFBConfig fbConfig = 0;
 
-        XVisualInfo visualInfo;
+        int minAttribs[] = {
+            GLX_DRAWABLE_TYPE,  GLX_WINDOW_BIT,
+            GLX_RENDER_TYPE,        GLX_RGBA_BIT,
+            GLX_RED_SIZE,      1,
+            GLX_BLUE_SIZE,    1,
+            GLX_GREEN_SIZE,  1,
+            None
+        };
+        int nConfigs = 0;
 
-        visualInfo.screen = DefaultScreen(mGLDisplay);
-        visualInfo.depth = DefaultDepth(mGLDisplay, DefaultScreen(mGLDisplay));
-        visualInfo.visualid = visualid;
+        GLXFBConfig *fbConfigs = chooseFBConfig(minAttribs, &nConfigs);
 
-        fbConfig = glXGetFBConfigFromVisualSGIX(mGLDisplay, &visualInfo);
-
-        if (! fbConfig)
+        for (int i = 0; i < nConfigs && ! fbConfig; i++)
         {
-            int minAttribs[] = {
-                GLX_DRAWABLE_TYPE,  GLX_WINDOW_BIT,
-                GLX_RENDER_TYPE,        GLX_RGBA_BIT,
-                GLX_RED_SIZE,      1,
-                GLX_BLUE_SIZE,    1,
-                GLX_GREEN_SIZE,  1,
-                None
-            };
-            int nConfigs = 0;
+            XVisualInfo *vInfo = getVisualFromFBConfig(fbConfigs[i]);
 
-            GLXFBConfig *fbConfigs = chooseFBConfig(minAttribs, &nConfigs);
+            if (vInfo ->visualid == visualid)
+                fbConfig = fbConfigs[i];
 
-            for (int i = 0; i < nConfigs && ! fbConfig; i++)
-            {
-                XVisualInfo *vInfo = getVisualFromFBConfig(fbConfigs[i]);
-
-                if (vInfo ->visualid == visualid)
-                    fbConfig = fbConfigs[i];
-
-                XFree(vInfo );
-            }
-
-            XFree(fbConfigs);
+            XFree(vInfo );
         }
+
+        XFree(fbConfigs);
 
         return fbConfig;
     }
