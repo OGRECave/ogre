@@ -306,6 +306,9 @@ namespace Ogre
 
     GLXFBConfig GLXGLSupport::getFBConfigFromVisualID(VisualID visualid)
     {
+        PFNGLXGETFBCONFIGFROMVISUALSGIXPROC glXGetFBConfigFromVisualSGIX = 
+            (PFNGLXGETFBCONFIGFROMVISUALSGIXPROC)getProcAddress("glXGetFBConfigFromVisualSGIX");
+
         GLXFBConfig fbConfig = 0;
 
         XVisualInfo visualInfo;
