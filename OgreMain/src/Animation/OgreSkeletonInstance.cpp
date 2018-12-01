@@ -355,6 +355,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    bool SkeletonInstance::hasBone( IdString boneName ) const
+    {
+        return mDefinition->mBoneIndexByName.find( boneName ) != mDefinition->mBoneIndexByName.end();
+    }      
+    //-----------------------------------------------------------------------------------
     Bone* SkeletonInstance::getBone( IdString boneName )
     {
         SkeletonDef::BoneNameMap::const_iterator itor = mDefinition->mBoneIndexByName.find( boneName );

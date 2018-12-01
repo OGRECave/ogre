@@ -154,6 +154,7 @@ namespace Ogre
             return mBones[index]._getFullTransform();
         }
 
+        bool hasBone( IdString name ) const;
         /// Gets the bone with given name. Throws if not found.
         Bone* getBone( IdString boneName );
 
