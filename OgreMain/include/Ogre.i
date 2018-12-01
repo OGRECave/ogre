@@ -144,6 +144,15 @@ JNIEnv* OgreJNIGetEnv() {
 
 /* these are ordered by dependancy */
 %include "OgreBuildSettings.h"
+
+#ifdef SWIGPYTHON
+    #define XSTR(x) #x
+    #define STR(x) XSTR(x)
+    #define __version__ STR(OGRE_VERSION_MAJOR) "." STR(OGRE_VERSION_MINOR) "." STR(OGRE_VERSION_PATCH)
+    #undef STR
+    #undef XSTR
+#endif
+
 %include "OgrePrerequisites.h"
 %include "OgrePlatform.h"
 %include "OgreConfig.h"
