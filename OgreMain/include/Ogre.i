@@ -160,6 +160,9 @@ JNIEnv* OgreJNIGetEnv() {
 %import "OgreMemoryAllocatorConfig.h"
 %include "OgreCommon.h"
 %template(NameValuePairList) std::map<Ogre::String, Ogre::String>;
+ADD_REPR(TRect)
+%template(Rect) Ogre::TRect<long>;
+%template(FloatRect) Ogre::TRect<float>;
 %ignore Ogre::findCommandLineOpts; // not needed in python
 
 // Basic Data Types
