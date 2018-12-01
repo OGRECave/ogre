@@ -18,7 +18,7 @@ branches:
     - stable
 artifacts:
   - path: build/sdk
-    name: ogre-sdk-1.11.4-vc15-x64
+    name: ogre-sdk-master-vc15-x64
 deploy:
 - provider: BinTray
   username: paroj
@@ -29,7 +29,7 @@ deploy:
   package: ogre-sdk-vc15-x64
   publish: true
   override: true
-  version: 1.11.4
+  version: master
   on:
     branch: master
     APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
