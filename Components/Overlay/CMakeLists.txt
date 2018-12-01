@@ -13,7 +13,9 @@
 
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-list(APPEND HEADER_FILES ${PROJECT_BINARY_DIR}/include/OgreOverlayPrerequisites.h)
+list(APPEND HEADER_FILES 
+  ${PROJECT_BINARY_DIR}/include/OgreOverlayPrerequisites.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/OgreOverlay.i)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 # setup target
