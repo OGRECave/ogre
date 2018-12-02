@@ -485,6 +485,7 @@ SHARED_PTR(Mesh);
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&, FrameBuffer); // deprecated
+%feature("flatnested") Ogre::RenderTarget::FrameStats;
 %include "OgreRenderTarget.h"
 #ifdef __ANDROID__
     %ignore Ogre::RenderWindow::_notifySurfaceCreated(void*);
