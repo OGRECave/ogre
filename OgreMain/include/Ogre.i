@@ -14,6 +14,7 @@
 #include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgreScriptCompiler.h"
 #include "OgreConfigDialog.h"
+#include "OgreFileSystemLayer.h"
 %}
 
 %include std_shared_ptr.i
@@ -185,6 +186,7 @@ ADD_REPR(Radian)
 %include "OgreStringVector.h"
 %template(StringVector) std::vector<Ogre::String>;  // actual vector<T>
 %template(StringVectorPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
+%include "OgreFileSystemLayer.h"
 // Linear Algebra
 %ignore Ogre::Vector<2, Ogre::Real>::Vector(float, float, float);
 %ignore Ogre::Vector<2, Ogre::Real>::Vector(float, float, float, float);
