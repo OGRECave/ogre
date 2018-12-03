@@ -144,6 +144,15 @@ JNIEnv* OgreJNIGetEnv() {
 
 /* these are ordered by dependancy */
 %include "OgreBuildSettings.h"
+
+#ifdef SWIGPYTHON
+    #define XSTR(x) #x
+    #define STR(x) XSTR(x)
+    #define __version__ STR(OGRE_VERSION_MAJOR) "." STR(OGRE_VERSION_MINOR) "." STR(OGRE_VERSION_PATCH)
+    #undef STR
+    #undef XSTR
+#endif
+
 %include "OgrePrerequisites.h"
 %include "OgrePlatform.h"
 %include "OgreConfig.h"
@@ -151,6 +160,9 @@ JNIEnv* OgreJNIGetEnv() {
 %import "OgreMemoryAllocatorConfig.h"
 %include "OgreCommon.h"
 %template(NameValuePairList) std::map<Ogre::String, Ogre::String>;
+ADD_REPR(TRect)
+%template(Rect) Ogre::TRect<long>;
+%template(FloatRect) Ogre::TRect<float>;
 %ignore Ogre::findCommandLineOpts; // not needed in python
 
 // Basic Data Types
@@ -473,6 +485,7 @@ SHARED_PTR(Mesh);
     %include "OgreTechnique.h"
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
 %ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&, FrameBuffer); // deprecated
+%feature("flatnested") Ogre::RenderTarget::FrameStats;
 %include "OgreRenderTarget.h"
 #ifdef __ANDROID__
     %ignore Ogre::RenderWindow::_notifySurfaceCreated(void*);

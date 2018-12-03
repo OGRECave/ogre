@@ -64,7 +64,9 @@ endif ()
 
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-list(APPEND HEADER_FILES ${PROJECT_BINARY_DIR}/include/OgreBitesPrerequisites.h)
+list(APPEND HEADER_FILES
+  ${PROJECT_BINARY_DIR}/include/OgreBitesPrerequisites.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/OgreBites.i)
 set(SOURCES 
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreAdvancedRenderControls.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreApplicationContext.cpp"

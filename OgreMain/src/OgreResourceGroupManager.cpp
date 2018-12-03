@@ -42,13 +42,8 @@ namespace Ogre {
     }
 
     const char* const RGN_DEFAULT = "General";
-#if OGRE_RESOURCEMANAGER_STRICT
     const char* const RGN_INTERNAL = "OgreInternal";
     const char* const RGN_AUTODETECT = "OgreAutodetect";
-#else
-    const char* const RGN_INTERNAL = "Internal";
-    const char* const RGN_AUTODETECT = "Autodetect";
-#endif
 
     const String ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME = RGN_DEFAULT;
     const String ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME = RGN_INTERNAL;
