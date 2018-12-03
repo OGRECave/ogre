@@ -276,6 +276,11 @@ namespace OgreBites
                      Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
 
         /**
+         * get the FileSystemLayer instace pointing to an application specific directory
+         */
+        Ogre::FileSystemLayer& getFSLayer() { return *mFSLayer; }
+
+        /**
          * the directory where the media files were installed
          *
          * same as OGRE_MEDIA_DIR in CMake
