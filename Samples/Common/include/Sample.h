@@ -154,6 +154,8 @@ namespace OgreBites
         virtual void _shutdown()
 
         {
+            Ogre::ControllerManager::getSingleton().clearControllers();
+
             if (mContentSetup)
                 cleanupContent();
             if (mSceneMgr)

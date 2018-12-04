@@ -80,17 +80,6 @@ protected:
         delete mSystem;
     }
     
-    bool frameRenderingQueued(const FrameEvent& evt)
-    {
-        if( SdkSample::frameRenderingQueued(evt) == false )
-            return false;
-        SharedData::getSingleton().iLastFrameTime = evt.timeSinceLastFrame;
-        
-        if (SharedData::getSingleton().mMLAnimState)
-            SharedData::getSingleton().mMLAnimState->addTime(evt.timeSinceLastFrame);
-        return true;
-    }
-    
     void setupControls()
     {
         mTrayMgr->showCursor();
@@ -473,8 +462,11 @@ protected:
             }
         }
         // Create a new animation state to track this
-        SharedData::getSingleton().mMLAnimState = mSceneMgr->createAnimationState("LightSwarmTrack");
-        SharedData::getSingleton().mMLAnimState->setEnabled(true);
+        auto animState = mSceneMgr->createAnimationState("LightSwarmTrack");
+        animState->setEnabled(true);
+
+        auto& controllerMgr = ControllerManager::getSingleton();
+        controllerMgr.createFrameTimePassthroughController(AnimationStateControllerValue::create(animState, true));
         
         /*Light* spotLight = mSceneMgr->createLight("Spotlight1");
          spotLight->setType(Light::LT_SPOTLIGHT);

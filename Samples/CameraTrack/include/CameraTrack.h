@@ -19,12 +19,6 @@ public:
         mInfo["Category"] = "Unsorted";
     }
 
-    bool frameRenderingQueued(const FrameEvent& evt)
-    {
-        mAnimState->addTime(evt.timeSinceLastFrame);   // increment animation time
-        return SdkSample::frameRenderingQueued(evt);
-    }
-
 protected:
 
     void setupContent()
@@ -61,11 +55,12 @@ protected:
         track->createNodeKeyFrame(10)->setTranslate(Vector3(200, 0, 0));
 
         // create a new animation state to track this
-        mAnimState = mSceneMgr->createAnimationState("CameraTrack");
-        mAnimState->setEnabled(true);
-    }
+        auto animState = mSceneMgr->createAnimationState("CameraTrack");
+        animState->setEnabled(true);
 
-    AnimationState* mAnimState;
+        auto& controllerMgr = ControllerManager::getSingleton();
+        controllerMgr.createFrameTimePassthroughController(AnimationStateControllerValue::create(animState, true));
+    }
 };
 
 #endif
