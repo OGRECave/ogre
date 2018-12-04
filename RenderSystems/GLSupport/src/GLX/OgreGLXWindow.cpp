@@ -673,18 +673,17 @@ namespace Ogre
 
         if(width != 0 && height != 0)
         {
-            if (!mIsExternal)
+            if (!mIsTopLevel)
             {
                 XResizeWindow(mGLSupport->getXDisplay(), mWindow, width, height);
+                XFlush(mGLSupport->getXDisplay());
             }
-            else
-            {
-                mWidth = width;
-                mHeight = height;
 
-                for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-                    (*it).second->_updateDimensions();
-            }
+            mWidth = width;
+            mHeight = height;
+
+            for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
+                (*it).second->_updateDimensions();
         }
     }
 
