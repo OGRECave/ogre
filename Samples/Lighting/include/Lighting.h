@@ -16,8 +16,6 @@ class _OgreSampleClassExport Sample_Lighting : public SdkSample, public RenderOb
 public:
 
     Sample_Lighting() :
-        mGreenLightAnimState(NULL),
-        mYellowLightAnimState(NULL),
         mLight1BBFlare(NULL),
         mLight1BBQueryArea(NULL),
         mLight1BBQueryVisible(NULL),
@@ -43,10 +41,6 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
-        // Move the lights along their paths
-        mGreenLightAnimState->addTime(evt.timeSinceLastFrame);
-        mYellowLightAnimState->addTime(evt.timeSinceLastFrame);
-
         // Modulate the light flare according to performed occlusion queries
         if (mUseOcclusionQuery)
         {
@@ -176,9 +170,11 @@ protected:
         track->createNodeKeyFrame(12)->setTranslate(Vector3(-50, -30, 0));
         track->createNodeKeyFrame(14)->setTranslate(Vector3(50, 30, 0));
 
+        auto& controllerMgr = ControllerManager::getSingleton();
         // Create an animation state from the animation and enable it
-        mYellowLightAnimState = mSceneMgr->createAnimationState("Path1");
-        mYellowLightAnimState->setEnabled(true);
+        auto animState = mSceneMgr->createAnimationState("Path1");
+        animState->setEnabled(true);
+        controllerMgr.createFrameTimePassthroughController(AnimationStateControllerValue::create(animState, true));
 
         // Set initial settings for the ribbon mTrail and add the light node
         mTrail->setInitialColour(0, 1.0, 0.8, 0);
@@ -236,8 +232,9 @@ protected:
         track->createNodeKeyFrame(10)->setTranslate(Vector3(-50, 100, 0));
 
         // Create an animation state from the animation and enable it
-        mGreenLightAnimState = mSceneMgr->createAnimationState("Path2");
-        mGreenLightAnimState->setEnabled(true);
+        animState = mSceneMgr->createAnimationState("Path2");
+        animState->setEnabled(true);
+        controllerMgr.createFrameTimePassthroughController(AnimationStateControllerValue::create(animState, true));
 
         // Set initial settings for the ribbon mTrail and add the light node
         mTrail->setInitialColour(1, 0.0, 1.0, 0.4);
@@ -334,9 +331,6 @@ protected:
         if (mLight2QueryVisible != NULL)
             renderSystem->destroyHardwareOcclusionQuery(mLight2QueryVisible);
     }
-
-    AnimationState* mGreenLightAnimState;
-    AnimationState* mYellowLightAnimState;
 
     RibbonTrail* mTrail;
 

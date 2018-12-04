@@ -15,6 +15,7 @@
 #include "OgreScriptCompiler.h"
 #include "OgreConfigDialog.h"
 #include "OgreFileSystemLayer.h"
+#include "OgrePredefinedControllers.h"
 %}
 
 %include std_shared_ptr.i
@@ -307,7 +308,11 @@ SHARED_PTR(StringInterface);
             %include "OgreHighLevelGpuProgram.h"
 %include "OgreScriptCompiler.h"
 %include "OgreTextureUnitState.h"
+%template(ControllerReal) Ogre::Controller<Ogre::Real>;
+%template(ControllerValueRealPtr) Ogre::SharedPtr<Ogre::ControllerValue<Ogre::Real> >;
+%template(ControllerFunctionPtr) Ogre::SharedPtr<Ogre::ControllerFunction<Ogre::Real> >;
 %include "OgreControllerManager.h"
+%include "OgrePredefinedControllers.h"
 SHARED_PTR(Compositor);
 %include "OgreCompositor.h"
 %ignore Ogre::CompositionTechnique::getNumTextureDefinitions;

@@ -25,7 +25,7 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
  public:
 
  Sample_FacialAnimation():
-    mSpeakAnimState(0), mManualAnimState(0), mManualKeyFrame(0), mPlayAnimation(false)
+    mSpeakAnimState(0), mManualAnimState(0), mManualKeyFrame(0), mPlayAnimation(0)
     {
         mInfo["Title"] = "Facial Animation";
         mInfo["Description"] = "A demonstration of the facial animation feature, using pose animation.";
@@ -33,13 +33,6 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
         mInfo["Category"] = "Animation";
         mInfo["Help"] = "Use the checkbox to enable/disable manual animation. "
             "When manual animation is enabled, use the sliders to adjust each pose's influence.";
-    }
-
-    bool frameRenderingQueued(const FrameEvent& evt)
-    {
-        if (mPlayAnimation) mSpeakAnimState->addTime(evt.timeSinceLastFrame);
-        // std::cout << "Time since last frame: " << evt.timeSinceLastFrame << std::endl;
-        return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
     }
 
  protected:
@@ -78,7 +71,10 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
         mCameraMan->setYawPitchDist(Radian(0), Radian(0), 130);
         mTrayMgr->showCursor();
 
-        mPlayAnimation = true;   // by default, the speaking animation is enabled
+        // by default, the speaking animation is enabled
+        auto& controllerMgr = ControllerManager::getSingleton();
+        mPlayAnimation = controllerMgr.createFrameTimePassthroughController(
+            AnimationStateControllerValue::create(mSpeakAnimState, true));
 
         setupControls();
     }
@@ -115,31 +111,31 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
         mSpeakAnimState = 0;
         mManualAnimState = 0;
         mManualKeyFrame = 0;
-        mPlayAnimation = false;
         mHeadMesh->unload();
     }
 
     void checkBoxToggled(OgreBites::CheckBox * box)
     {
-        mPlayAnimation = !box->isChecked();
+        bool play = !box->isChecked();
+        mPlayAnimation->setEnabled(play);
 
         // toggle animation states
-        mSpeakAnimState->setEnabled(mPlayAnimation);
-        mManualAnimState->setEnabled(!mPlayAnimation);
+        mSpeakAnimState->setEnabled(play);
+        mManualAnimState->setEnabled(!play);
 
         // toggle expression controls
         for (unsigned int i = 0; i < mExpressions.size(); i++)
         {
-            mTrayMgr->moveWidgetToTray(mExpressions[i], mPlayAnimation ? TL_NONE : TL_TOPLEFT);
-            if (mPlayAnimation) mExpressions[i]->hide();
+            mTrayMgr->moveWidgetToTray(mExpressions[i], play ? TL_NONE : TL_TOPLEFT);
+            if (play) mExpressions[i]->hide();
             else mExpressions[i]->show();
         }
 
         // toggle mouth shape controls
         for (unsigned int i = 0; i < mMouthShapes.size(); i++)
         {
-            mTrayMgr->moveWidgetToTray(mMouthShapes[i], mPlayAnimation ? TL_NONE : TL_TOPRIGHT);
-            if (mPlayAnimation) mMouthShapes[i]->hide();
+            mTrayMgr->moveWidgetToTray(mMouthShapes[i], play ? TL_NONE : TL_TOPRIGHT);
+            if (play) mMouthShapes[i]->hide();
             else mMouthShapes[i]->show();
         }
     }
@@ -156,7 +152,7 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
     AnimationState* mSpeakAnimState;
     AnimationState* mManualAnimState;
     VertexPoseKeyFrame* mManualKeyFrame;
-    bool mPlayAnimation;
+    Controller<Real>* mPlayAnimation;
     WidgetList mExpressions;
     WidgetList mMouthShapes;
 };

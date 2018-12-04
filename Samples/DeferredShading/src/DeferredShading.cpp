@@ -45,8 +45,8 @@ namespace Ogre
 }
 
 SharedData::SharedData()
-    : iLastFrameTime(0), iRoot(0), iCamera(0), iWindow(0), iSystem(0), iActivate(false),
-      iGlobalActivate(false), mMLAnimState(0), iMainLight(0)
+    : iRoot(0), iCamera(0), iWindow(0), iSystem(0), iActivate(false),
+      iGlobalActivate(false), iMainLight(0)
 {
 }
 
