@@ -106,7 +106,7 @@ namespace Ogre
         {
             mCurrentFrame = fmod( mCurrentFrame, maxFrame );
             if( mCurrentFrame < 0 )
-                mCurrentFrame = maxFrame - mCurrentFrame;
+                mCurrentFrame = maxFrame + mCurrentFrame;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ namespace Ogre
         {
             mCurrentFrame = fmod( mCurrentFrame, maxFrame );
             if( mCurrentFrame < 0 )
-                mCurrentFrame = maxFrame - mCurrentFrame;
+                mCurrentFrame = maxFrame + mCurrentFrame;
         }
     }
     //-----------------------------------------------------------------------------------
