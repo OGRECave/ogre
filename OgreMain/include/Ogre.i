@@ -367,6 +367,19 @@ SHARED_PTR(UnifiedHighLevelGpuProgram);
 %ignore Ogre::AnimationStateSet::getAnimationStateIterator;
 %ignore Ogre::AnimationStateSet::getEnabledAnimationStateIterator;
 %include "OgreAnimationState.h"
+
+#ifdef SWIGPYTHON
+%{
+    // this is a workaround for the following map with swig 3.0.12
+    namespace swig {
+    template<> struct traits<Ogre::AnimationState> {
+        typedef pointer_category category;
+        static const char* type_name() { return "Ogre::AnimationState"; }
+    };
+    }
+%}
+#endif
+%template(AnimationStateMap) std::map<Ogre::String, Ogre::AnimationState*>;
 %include "OgreAnimation.h"
 SHARED_PTR(Skeleton);
 // deprecated
