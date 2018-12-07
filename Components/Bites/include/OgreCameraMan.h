@@ -142,9 +142,18 @@ namespace OgreBites
         */
         bool mouseReleased(const MouseButtonEvent& evt);
 
+        /**
+         * fix the yaw axis to be Vector3::UNIT_Y of the parent node (tabletop mode)
+         * 
+         * otherwise the yaw axis can change freely
+         */
+        void setFixedYaw(bool fixed)
+        {
+            mYawSpace = fixed ? Ogre::Node::TS_PARENT : Ogre::Node::TS_LOCAL;
+        }
     protected:
         Ogre::Real getDistToTarget();
-
+        Ogre::Node::TransformSpace mYawSpace;
         Ogre::SceneNode* mCamera;
         CameraStyle mStyle;
         Ogre::SceneNode* mTarget;
