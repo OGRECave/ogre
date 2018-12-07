@@ -57,15 +57,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ParticleSystemManager::~ParticleSystemManager()
     {
+        removeAllTemplates(true); // Destroy all templates
         OGRE_LOCK_AUTO_MUTEX;
-
-        // Destroy all templates
-        ParticleTemplateMap::iterator t;
-        for (t = mSystemTemplates.begin(); t != mSystemTemplates.end(); ++t)
-        {
-            OGRE_DELETE t->second;
-        }
-        mSystemTemplates.clear();
         ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
         // delete billboard factory
         if (mBillboardRendererFactory)

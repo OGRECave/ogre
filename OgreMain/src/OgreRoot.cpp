@@ -260,7 +260,6 @@ namespace Ogre {
         Pass::processPendingPassUpdates(); // make sure passes are cleaned
 
         mAutoWindow = 0;
-        mFirstTimePostWindowInit = false;
 
         StringInterface::cleanupDictionary();
 
@@ -498,7 +497,8 @@ namespace Ogre {
 
         mActiveRenderer = system;
         // Tell scene managers
-        SceneManagerEnumerator::getSingleton().setRenderSystem(system);
+        if(mSceneManagerEnum)
+            mSceneManagerEnum->setRenderSystem(system);
 
         if(RenderSystem::Listener* ls = RenderSystem::getSharedListener())
             ls->eventOccurred("RenderSystemChanged");
@@ -913,7 +913,11 @@ namespace Ogre {
         if(mSceneManagerEnum)
             mSceneManagerEnum->shutdownAll();
         if(mFirstTimePostWindowInit)
+        {
             shutdownPlugins();
+            mParticleManager->removeAllTemplates(true);
+            mFirstTimePostWindowInit = false;
+        }
         mSceneManagerEnum.reset();
         mShadowTextureManager.reset();
 
