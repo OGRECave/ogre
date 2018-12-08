@@ -95,16 +95,12 @@ void ApplicationContext::initApp()
 
 void ApplicationContext::closeApp()
 {
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    if (mRoot)
-    {
-        mRoot->saveConfig();
-    }
-#endif
-
     shutdown();
     if (mRoot)
     {
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+        mRoot->saveConfig();
+#endif
         OGRE_DELETE mRoot;
         mRoot = NULL;
     }
