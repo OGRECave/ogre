@@ -31,5 +31,5 @@ deploy:
   override: true
   version: 1.11.4
   on:
-    branch: master
+    branch: deploy
     APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
