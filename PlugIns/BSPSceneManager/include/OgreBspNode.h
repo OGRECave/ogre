@@ -153,7 +153,7 @@ namespace Ogre {
 
         struct Brush
         {
-            std::list<Plane> planes;
+            std::vector<Plane> planes;
             SceneQuery::WorldFragment fragment; /// For query reporting
         };
         typedef std::vector<Brush*> NodeBrushList; /// Main brush memory held on level

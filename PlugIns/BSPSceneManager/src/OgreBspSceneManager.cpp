@@ -687,7 +687,7 @@ namespace Ogre {
 
                     for (bi = brushes.begin(); bi != biend; ++bi)
                     {
-                        std::list<Plane>::const_iterator planeit, planeitend;
+                        std::vector<Plane>::const_iterator planeit, planeitend;
                         planeitend = (*bi)->planes.end();
                         bool brushIntersect = true; // Assume intersecting for now
 
