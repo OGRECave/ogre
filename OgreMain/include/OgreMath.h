@@ -669,12 +669,8 @@ namespace Ogre
         static std::pair<bool, Real> intersects(
             const Ray& ray, const std::vector<Plane>& planeList, 
             bool normalIsOutside);
-        /** Ray / convex plane list intersection test. 
-        @param ray The ray to test with
-        @param planeList List of planes which form a convex volume
-        @param normalIsOutside Does the normal point outside the volume
-        */
-        static std::pair<bool, Real> intersects(
+        /// @deprecated migrate to @ref PlaneList
+        OGRE_DEPRECATED static std::pair<bool, Real> intersects(
             const Ray& ray, const std::list<Plane>& planeList, 
             bool normalIsOutside);
 
