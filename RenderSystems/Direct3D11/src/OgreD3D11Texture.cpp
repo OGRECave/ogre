@@ -407,11 +407,11 @@ namespace Ogre
         desc.MipLevels      = numMips;
         desc.Format         = mD3DFormat;
 		desc.Usage			= D3D11Mappings::_getUsage(_getTextureUsage());
-        desc.BindFlags      = D3D11_BIND_SHADER_RESOURCE;
+        desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(mD3DFormat, _getTextureUsage());
 
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-        if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
-           desc.BindFlags       |= D3D11_BIND_RENDER_TARGET;
+        if (rsys->_getFeatureLevel() < D3D_FEATURE_LEVEL_10_0)
+           desc.BindFlags      &= ~D3D11_BIND_RENDER_TARGET;
 
 		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
         desc.MiscFlags      = 0;
