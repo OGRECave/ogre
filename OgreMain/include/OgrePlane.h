@@ -266,6 +266,11 @@ namespace Ogre {
         return ret;
     }
 
+    inline bool Math::intersects(const Plane& plane, const AxisAlignedBox& box)
+    {
+        return plane.getSide(box) == Plane::BOTH_SIDE;
+    }
+
     typedef std::vector<Plane> PlaneList;
     /** @} */
     /** @} */

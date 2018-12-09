@@ -353,7 +353,15 @@ namespace Ogre
 
         static inline Real Pow (Real fBase, Real fExponent) { return std::pow(fBase,fExponent); }
 
-        static Real Sign (Real fValue);
+        static Real Sign(Real fValue)
+        {
+            if (fValue > 0.0)
+                return 1.0;
+            if (fValue < 0.0)
+                return -1.0;
+            return 0.0;
+        }
+
         static inline Radian Sign ( const Radian& rValue )
         {
             return Radian(Sign(rValue.valueRadians()));

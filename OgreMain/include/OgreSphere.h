@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreVector3.h"
+#include "OgrePlane.h"
 
 namespace Ogre {
 
@@ -89,7 +90,7 @@ namespace Ogre {
         /** Returns whether or not this sphere intersects a plane. */
         bool intersects(const Plane& plane) const
         {
-            return Math::intersects(*this, plane);
+            return Math::Abs(plane.getDistance(getCenter())) <= getRadius();
         }
         /** Returns whether or not this sphere intersects a point. */
         bool intersects(const Vector3& v) const
@@ -122,9 +123,12 @@ namespace Ogre {
             mCenter = mCenter + diff * t;
             mRadius = 0.5f * (length + mRadius + oth.getRadius());
         }
-        
-
     };
+
+    inline bool Math::intersects(const Sphere& sphere, const Plane& plane)
+    {
+        return sphere.intersects(plane);
+    }
     /** @} */
     /** @} */
 
