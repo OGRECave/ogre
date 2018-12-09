@@ -1286,33 +1286,31 @@ namespace Ogre
         Vector3 v1 (endXTS, startYTS, getHeightAtPoint(endX, startY));
         Vector3 v2 (endXTS, endYTS, getHeightAtPoint(endX, endY));
         Vector3 v3 (startXTS, endYTS, getHeightAtPoint(startX, endY));
-        // define this plane in terrain space
-        Plane plane;
+        // define a plane in terrain space
+        // do not normalise as the normalization factor cancels out in the final
+        // equation anyway
+        Vector4 plane;
         if (startY % 2)
         {
             // odd row
             bool secondTri = ((1.0 - yParam) > xParam);
             if (secondTri)
-                plane.redefine(v0, v1, v3);
+                plane = Math::calculateFaceNormalWithoutNormalize(v0, v1, v3);
             else
-                plane.redefine(v1, v2, v3);
+                plane = Math::calculateFaceNormalWithoutNormalize(v1, v2, v3);
         }
         else
         {
             // even row
             bool secondTri = (yParam > xParam);
             if (secondTri)
-                plane.redefine(v0, v2, v3);
+                plane = Math::calculateFaceNormalWithoutNormalize(v0, v2, v3);
             else
-                plane.redefine(v0, v1, v2);
+                plane = Math::calculateFaceNormalWithoutNormalize(v0, v1, v2);
         }
 
         // Solve plane equation for z
-        return (-plane.normal.x * x 
-                -plane.normal.y * y
-                - plane.d) / plane.normal.z;
-
-
+        return (-plane.x * x - plane.y * y - plane.w) / plane.z;
     }
     //---------------------------------------------------------------------
     float Terrain::getHeightAtWorldPosition(Real x, Real y, Real z) const
