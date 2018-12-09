@@ -137,18 +137,6 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    Real Math::Sign (Real fValue)
-    {
-        if ( fValue > 0.0 )
-            return 1.0;
-
-        if ( fValue < 0.0 )
-            return -1.0;
-
-        return 0.0;
-    }
-
-    //-----------------------------------------------------------------------
     Real Math::UnitRandom ()
     {
         if (mRandProvider)
@@ -794,18 +782,6 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    bool Math::intersects(const Plane& plane, const AxisAlignedBox& box)
-    {
-        return (plane.getSide(box) == Plane::BOTH_SIDE);
-    }
-    //-----------------------------------------------------------------------
-    bool Math::intersects(const Sphere& sphere, const Plane& plane)
-    {
-        return (
-            Math::Abs(plane.getDistance(sphere.getCenter()))
-            <= sphere.getRadius() );
-    }
-    //-----------------------------------------------------------------------
     Vector3 Math::calculateTangentSpaceVector(
         const Vector3& position1, const Vector3& position2, const Vector3& position3,
         Real u1, Real v1, Real u2, Real v2, Real u3, Real v3)
@@ -850,33 +826,6 @@ namespace Ogre
             -2 * p.normal.x * p.normal.x + 1,   -2 * p.normal.x * p.normal.y,       -2 * p.normal.x * p.normal.z,       -2 * p.normal.x * p.d, 
             -2 * p.normal.y * p.normal.x,       -2 * p.normal.y * p.normal.y + 1,   -2 * p.normal.y * p.normal.z,       -2 * p.normal.y * p.d, 
             -2 * p.normal.z * p.normal.x,       -2 * p.normal.z * p.normal.y,       -2 * p.normal.z * p.normal.z + 1,   -2 * p.normal.z * p.d);
-    }
-    //-----------------------------------------------------------------------
-    Vector4 Math::calculateFaceNormal(const Vector3& v1, const Vector3& v2, const Vector3& v3)
-    {
-        Vector3 normal = calculateBasicFaceNormal(v1, v2, v3);
-        // Now set up the w (distance of tri from origin
-        return Vector4(normal.x, normal.y, normal.z, -(normal.dotProduct(v1)));
-    }
-    //-----------------------------------------------------------------------
-    Vector3 Math::calculateBasicFaceNormal(const Vector3& v1, const Vector3& v2, const Vector3& v3)
-    {
-        Vector3 normal = (v2 - v1).crossProduct(v3 - v1);
-        normal.normalise();
-        return normal;
-    }
-    //-----------------------------------------------------------------------
-    Vector4 Math::calculateFaceNormalWithoutNormalize(const Vector3& v1, const Vector3& v2, const Vector3& v3)
-    {
-        Vector3 normal = calculateBasicFaceNormalWithoutNormalize(v1, v2, v3);
-        // Now set up the w (distance of tri from origin)
-        return Vector4(normal.x, normal.y, normal.z, -(normal.dotProduct(v1)));
-    }
-    //-----------------------------------------------------------------------
-    Vector3 Math::calculateBasicFaceNormalWithoutNormalize(const Vector3& v1, const Vector3& v2, const Vector3& v3)
-    {
-        Vector3 normal = (v2 - v1).crossProduct(v3 - v1);
-        return normal;
     }
     //-----------------------------------------------------------------------
     Real Math::gaussianDistribution(Real x, Real offset, Real scale)
