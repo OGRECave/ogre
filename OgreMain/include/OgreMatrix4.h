@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 #include "OgreMatrix3.h"
 #include "OgreVector4.h"
-#include "OgrePlane.h"
+
 namespace Ogre
 {
     /** \addtogroup Core
@@ -551,20 +551,6 @@ namespace Ogre
             v.x*mat[0][2] + v.y*mat[1][2] + v.z*mat[2][2] + v.w*mat[3][2],
             v.x*mat[0][3] + v.y*mat[1][3] + v.z*mat[2][3] + v.w*mat[3][3]
             );
-    }
-
-    inline Plane operator * (const Matrix4& mat, const Plane& p)
-    {
-        Plane ret;
-        Matrix4 invTrans = mat.inverse().transpose();
-        Vector4 v4( p.normal.x, p.normal.y, p.normal.z, p.d );
-        v4 = invTrans * v4;
-        ret.normal.x = v4.x;
-        ret.normal.y = v4.y;
-        ret.normal.z = v4.z;
-        ret.d = v4.w / ret.normal.normalise();
-
-        return ret;
     }
     /** @} */
     /** @} */

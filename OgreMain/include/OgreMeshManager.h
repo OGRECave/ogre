@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 #include "OgrePatchSurface.h"
 #include "OgreHeaderPrefix.h"
+#include "OgrePlane.h"
 
 namespace Ogre {
 
