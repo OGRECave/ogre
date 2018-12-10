@@ -262,10 +262,10 @@ namespace Ogre
                         }
                     }
                 }
-            }
             
-            // Cache the last bytes read
-            mReadCache.cacheData((char*)buf + cachereads, newReadUncompressed);
+                // Cache the last bytes read not from cache
+                mReadCache.cacheData((char*)buf + cachereads, newReadUncompressed);
+            }
             
             mCurrentPos += newReadUncompressed + cachereads;
             
@@ -405,6 +405,7 @@ namespace Ogre
                 mCompressedStream->seek(0);
                 mZStream->avail_in = static_cast<uint>(mCompressedStream->read(mTmp, getAvailInForSinglePass()));
                 inflateReset(mZStream);
+                mReadCache.clear();
             }
             else 
             {
