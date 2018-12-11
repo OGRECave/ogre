@@ -284,7 +284,13 @@ namespace Ogre
 
             preLoadImpl();
 
-            loadImpl();
+            // FIXME
+            // loadImpl();
+            // loadImpl calls this again via getBuffer causing a stackoverflow
+            // prefer an empty texture to crashing for now
+            // to fix this we should probably use the notify mechanism instead of
+            // recrating the texture in getBuffer..
+            createInternalResourcesImpl(d3d9Device);
 
             postLoadImpl();         
         }       
