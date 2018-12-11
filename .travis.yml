@@ -68,6 +68,8 @@ script:
     - if [ $TEST ]; then cd build/bin && ./TestContext -rs "OpenGL Rendering Subsystem" ; fi
     # verify that the python modules are loadable
     - if [ $TEST ]; then cd ../lib && python -c "import _Ogre; import _OgreRTShader" ; fi
+    # whitespace sanity
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then git diff --check ${TRAVIS_COMMIT_RANGE/.../..} ; fi
 os:
     - linux
     - osx
