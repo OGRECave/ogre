@@ -170,6 +170,14 @@ Ogre::Real CameraMan::getDistToTarget()
     return offset.length();
 }
 
+void CameraMan::setPivotOffset(const Ogre::Vector3& pivot)
+{
+    Ogre::Real dist = getDistToTarget();
+    mOffset = pivot;
+    mCamera->setPosition(mTarget->_getDerivedPosition() + mOffset);
+    mCamera->translate(Ogre::Vector3(0, 0, dist), Ogre::Node::TS_LOCAL);
+}
+
 bool CameraMan::mouseMoved(const MouseMotionEvent &evt)
 {
     if (mStyle == CS_ORBIT)
