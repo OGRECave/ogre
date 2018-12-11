@@ -316,7 +316,7 @@ namespace Ogre {
         void unbindGpuProgram(GpuProgramType gptype);
 
         void bindGpuProgramParameters(GpuProgramType gptype, 
-                                      GpuProgramParametersSharedPtr params, uint16 variabilityMask);
+                                      const GpuProgramParametersPtr& params, uint16 variabilityMask);
         /** See
             RenderSystem
         */

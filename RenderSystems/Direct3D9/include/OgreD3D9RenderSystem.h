@@ -334,7 +334,7 @@ namespace Ogre
         void unbindGpuProgram(GpuProgramType gptype);
 
         void bindGpuProgramParameters(GpuProgramType gptype, 
-            GpuProgramParametersSharedPtr params, uint16 variabilityMask);
+            const GpuProgramParametersPtr& params, uint16 variabilityMask);
         void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 
         void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);

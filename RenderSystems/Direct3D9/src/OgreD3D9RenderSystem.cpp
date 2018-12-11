@@ -3707,7 +3707,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, 
-        GpuProgramParametersSharedPtr params, uint16 variability)
+        const GpuProgramParametersPtr& params, uint16 variability)
     {
         // special case pass iteration
         if (variability == (uint16)GPV_PASS_ITERATION_NUMBER)

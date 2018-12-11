@@ -90,7 +90,7 @@ namespace Ogre {
         /// Unbind the shader in OpenGL.
         void unbind(void);
         /// Execute the param binding functions for this shader.
-        void bindParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        void bindParameters(const GpuProgramParametersPtr& params, uint16 mask);
         /// Execute the pass iteration param binding functions for this shader.
         void bindPassIterationParameters(GpuProgramParametersSharedPtr params);
         /// Execute the shared param binding functions for this shader.
