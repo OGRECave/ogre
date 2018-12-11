@@ -72,48 +72,82 @@ namespace Ogre {
             return getPoint(t);
         }
 
-        /** Tests whether this ray intersects the given plane. 
-        @return A pair structure where the first element indicates whether
-            an intersection occurs, and if true, the second element will
-            indicate the distance along the ray at which it intersects. 
-            This can be converted to a point in space by calling getPoint().
-        */
-        std::pair<bool, Real> intersects(const Plane& p) const
+        /** Tests whether this ray intersects the given plane. */
+        RayTestResult intersects(const Plane& p) const
         {
-            return Math::intersects(*this, p);
+            Real denom = p.normal.dotProduct(mDirection);
+            if (Math::Abs(denom) < std::numeric_limits<Real>::epsilon())
+            {
+                // Parallel
+                return RayTestResult(false, (Real)0);
+            }
+            else
+            {
+                Real nom = p.normal.dotProduct(mOrigin) + p.d;
+                Real t = -(nom / denom);
+                return RayTestResult(t >= 0, (Real)t);
+            }
         }
-        /** Tests whether this ray intersects the given plane bounded volume. 
-        @return A pair structure where the first element indicates whether
-        an intersection occurs, and if true, the second element will
-        indicate the distance along the ray at which it intersects. 
-        This can be converted to a point in space by calling getPoint().
-        */
-        std::pair<bool, Real> intersects(const PlaneBoundedVolume& p) const
+        /** Tests whether this ray intersects the given plane bounded volume. */
+        RayTestResult intersects(const PlaneBoundedVolume& p) const
         {
             return Math::intersects(*this, p.planes, p.outside == Plane::POSITIVE_SIDE);
         }
-        /** Tests whether this ray intersects the given sphere. 
-        @return A pair structure where the first element indicates whether
-            an intersection occurs, and if true, the second element will
-            indicate the distance along the ray at which it intersects. 
-            This can be converted to a point in space by calling getPoint().
-        */
-        std::pair<bool, Real> intersects(const Sphere& s) const
+        /** Tests whether this ray intersects the given sphere. */
+        RayTestResult intersects(const Sphere& s, bool discardInside = true) const
         {
-            return Math::intersects(*this, s);
+            // Adjust ray origin relative to sphere center
+            Vector3 rayorig = mOrigin - s.getCenter();
+            Real radius = s.getRadius();
+
+            // Check origin inside first
+            if (rayorig.squaredLength() <= radius*radius && discardInside)
+            {
+                return RayTestResult(true, (Real)0);
+            }
+
+            // Mmm, quadratics
+            // Build coeffs which can be used with std quadratic solver
+            // ie t = (-b +/- sqrt(b*b + 4ac)) / 2a
+            Real a = mDirection.dotProduct(mDirection);
+            Real b = 2 * rayorig.dotProduct(mDirection);
+            Real c = rayorig.dotProduct(rayorig) - radius*radius;
+
+            // Calc determinant
+            Real d = (b*b) - (4 * a * c);
+            if (d < 0)
+            {
+                // No intersection
+                return RayTestResult(false, (Real)0);
+            }
+            else
+            {
+                // BTW, if d=0 there is one intersection, if d > 0 there are 2
+                // But we only want the closest one, so that's ok, just use the
+                // '-' version of the solver
+                Real t = ( -b - Math::Sqrt(d) ) / (2 * a);
+                if (t < 0)
+                    t = ( -b + Math::Sqrt(d) ) / (2 * a);
+                return RayTestResult(true, t);
+            }
         }
-        /** Tests whether this ray intersects the given box. 
-        @return A pair structure where the first element indicates whether
-            an intersection occurs, and if true, the second element will
-            indicate the distance along the ray at which it intersects. 
-            This can be converted to a point in space by calling getPoint().
-        */
-        std::pair<bool, Real> intersects(const AxisAlignedBox& box) const
+        /** Tests whether this ray intersects the given box. */
+        RayTestResult intersects(const AxisAlignedBox& box) const
         {
             return Math::intersects(*this, box);
         }
 
     };
+
+    inline RayTestResult Math::intersects(const Ray& ray, const Plane& plane)
+    {
+        return ray.intersects(plane);
+    }
+
+    inline RayTestResult Math::intersects(const Ray& ray, const Sphere& sphere, bool discardInside)
+    {
+        return ray.intersects(sphere, discardInside);
+    }
     /** @} */
     /** @} */
 
