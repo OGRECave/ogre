@@ -293,24 +293,6 @@ namespace Ogre
         return true;
     }
     //-----------------------------------------------------------------------
-    std::pair<bool, Real> Math::intersects(const Ray& ray, const Plane& plane)
-    {
-
-        Real denom = plane.normal.dotProduct(ray.getDirection());
-        if (Math::Abs(denom) < std::numeric_limits<Real>::epsilon())
-        {
-            // Parallel
-            return std::pair<bool, Real>(false, (Real)0);
-        }
-        else
-        {
-            Real nom = plane.normal.dotProduct(ray.getOrigin()) + plane.d;
-            Real t = -(nom/denom);
-            return std::pair<bool, Real>(t >= 0, (Real)t);
-        }
-        
-    }
-    //-----------------------------------------------------------------------
     std::pair<bool, Real> Math::intersects(const Ray& ray, 
         const std::list<Plane>& planes, bool normalIsOutside)
     {
@@ -404,48 +386,6 @@ namespace Ogre
             }
         }
         return ret;
-    }
-    //-----------------------------------------------------------------------
-    std::pair<bool, Real> Math::intersects(const Ray& ray, const Sphere& sphere, 
-        bool discardInside)
-    {
-        const Vector3& raydir = ray.getDirection();
-        // Adjust ray origin relative to sphere center
-        const Vector3& rayorig = ray.getOrigin() - sphere.getCenter();
-        Real radius = sphere.getRadius();
-
-        // Check origin inside first
-        if (rayorig.squaredLength() <= radius*radius && discardInside)
-        {
-            return std::pair<bool, Real>(true, (Real)0);
-        }
-
-        // Mmm, quadratics
-        // Build coeffs which can be used with std quadratic solver
-        // ie t = (-b +/- sqrt(b*b + 4ac)) / 2a
-        Real a = raydir.dotProduct(raydir);
-        Real b = 2 * rayorig.dotProduct(raydir);
-        Real c = rayorig.dotProduct(rayorig) - radius*radius;
-
-        // Calc determinant
-        Real d = (b*b) - (4 * a * c);
-        if (d < 0)
-        {
-            // No intersection
-            return std::pair<bool, Real>(false, (Real)0);
-        }
-        else
-        {
-            // BTW, if d=0 there is one intersection, if d > 0 there are 2
-            // But we only want the closest one, so that's ok, just use the 
-            // '-' version of the solver
-            Real t = ( -b - Math::Sqrt(d) ) / (2 * a);
-            if (t < 0)
-                t = ( -b + Math::Sqrt(d) ) / (2 * a);
-            return std::pair<bool, Real>(true, (Real)t);
-        }
-
-
     }
     //-----------------------------------------------------------------------
     std::pair<bool, Real> Math::intersects(const Ray& ray, const AxisAlignedBox& box)

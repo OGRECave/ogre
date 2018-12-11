@@ -39,6 +39,16 @@ namespace Ogre
     /** \addtogroup Math
     *  @{
     */
+
+    /** A pair structure where the first element indicates whether
+        an intersection occurs
+
+        if true, the second element will
+        indicate the distance along the ray at which it intersects.
+        This can be converted to a point in space by calling Ray::getPoint().
+     */
+    typedef std::pair<bool, Real> RayTestResult;
+
     /** Wrapper class which indicates a given angle value is in Radians.
     @remarks
         Radian values are interchangeable with Degree values, and conversions
@@ -568,15 +578,12 @@ namespace Ogre
         */
         static bool pointInTri3D(const Vector3& p, const Vector3& a, 
             const Vector3& b, const Vector3& c, const Vector3& normal);
-        /** Ray / plane intersection, returns boolean result and distance. */
-        static std::pair<bool, Real> intersects(const Ray& ray, const Plane& plane);
-
-        /** Ray / sphere intersection, returns boolean result and distance. */
-        static std::pair<bool, Real> intersects(const Ray& ray, const Sphere& sphere, 
-            bool discardInside = true);
-        
-        /** Ray / box intersection, returns boolean result and distance. */
-        static std::pair<bool, Real> intersects(const Ray& ray, const AxisAlignedBox& box);
+        /** Ray / plane intersection */
+        static inline RayTestResult intersects(const Ray& ray, const Plane& plane);
+        /** Ray / sphere intersection */
+        static RayTestResult intersects(const Ray& ray, const Sphere& sphere, bool discardInside = true);
+        /** Ray / box intersection */
+        static RayTestResult intersects(const Ray& ray, const AxisAlignedBox& box);
 
         /** Ray / box intersection, returns boolean result and two intersection distance.
         @param ray
@@ -620,14 +627,8 @@ namespace Ogre
             Intersect with "positive side" of the triangle
         @param negativeSide
             Intersect with "negative side" of the triangle
-        @return
-            If the ray is intersects the triangle, a pair of <b>true</b> and the
-            distance between intersection point and ray origin returned.
-        @par
-            If the ray isn't intersects the triangle, a pair of <b>false</b> and
-            <b>0</b> returned.
         */
-        static std::pair<bool, Real> intersects(const Ray& ray, const Vector3& a,
+        static RayTestResult intersects(const Ray& ray, const Vector3& a,
             const Vector3& b, const Vector3& c, const Vector3& normal,
             bool positiveSide = true, bool negativeSide = true);
 
@@ -644,14 +645,8 @@ namespace Ogre
             Intersect with "positive side" of the triangle
         @param negativeSide
             Intersect with "negative side" of the triangle
-        @return
-            If the ray is intersects the triangle, a pair of <b>true</b> and the
-            distance between intersection point and ray origin returned.
-        @par
-            If the ray isn't intersects the triangle, a pair of <b>false</b> and
-            <b>0</b> returned.
         */
-        static std::pair<bool, Real> intersects(const Ray& ray, const Vector3& a,
+        static RayTestResult intersects(const Ray& ray, const Vector3& a,
             const Vector3& b, const Vector3& c,
             bool positiveSide = true, bool negativeSide = true);
 
@@ -666,13 +661,10 @@ namespace Ogre
         @param planeList List of planes which form a convex volume
         @param normalIsOutside Does the normal point outside the volume
         */
-        static std::pair<bool, Real> intersects(
-            const Ray& ray, const std::vector<Plane>& planeList, 
-            bool normalIsOutside);
+        static RayTestResult intersects(const Ray& ray, const std::vector<Plane>& planeList, bool normalIsOutside);
         /// @deprecated migrate to @ref PlaneList
-        OGRE_DEPRECATED static std::pair<bool, Real> intersects(
-            const Ray& ray, const std::list<Plane>& planeList, 
-            bool normalIsOutside);
+        OGRE_DEPRECATED static RayTestResult intersects(const Ray& ray, const std::list<Plane>& planeList,
+                                                             bool normalIsOutside);
 
         /** Sphere / plane intersection test. 
         @remarks NB just do a plane.getDistance(sphere.getCenter()) for more detail!
