@@ -271,6 +271,8 @@ ADD_REPR(ColourValue)
 %include "OgreBlendMode.h"
 %include "OgreRay.h"
 %include "OgreSceneQuery.h"
+%template(RaySceneQueryResult) std::vector<Ogre::RaySceneQueryResultEntry>;
+
 %include "OgreNameGenerator.h"
 %include "OgreController.h"
 %include "OgreRenderSystemCapabilities.h"

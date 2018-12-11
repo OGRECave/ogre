@@ -151,6 +151,8 @@ namespace OgreBites
         {
             mYawSpace = fixed ? Ogre::Node::TS_PARENT : Ogre::Node::TS_LOCAL;
         }
+
+        void setPivotOffset(const Ogre::Vector3& offset);
     protected:
         Ogre::Real getDistToTarget();
         Ogre::Node::TransformSpace mYawSpace;

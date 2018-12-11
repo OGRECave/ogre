@@ -62,6 +62,7 @@ struct MouseButtonEvent {
     int type;
     int x, y;
     unsigned char button;
+    unsigned char clicks;
 };
 struct MouseWheelEvent {
     int type;
