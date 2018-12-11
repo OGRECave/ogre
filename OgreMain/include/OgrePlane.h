@@ -77,6 +77,8 @@ namespace Ogre {
         }
         /** Construct a plane using the 4 constants directly **/
         Plane(Real a, Real b, Real c, Real _d) : normal(a, b, c), d(_d) {}
+        /// @overload
+        explicit Plane(const Vector4& v) : normal(v.xyz()), d(v.w) {}
         Plane(const Vector3& rkNormal, const Vector3& rkPoint)
         {
             redefine(rkNormal, rkPoint);
