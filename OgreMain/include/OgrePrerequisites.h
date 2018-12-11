@@ -281,7 +281,8 @@ namespace Ogre {
     typedef SharedPtr<GpuNamedConstants> GpuNamedConstantsPtr;
     typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
     typedef SharedPtr<GpuSharedParameters> GpuSharedParametersPtr;
-    typedef SharedPtr<GpuProgramParameters> GpuProgramParametersSharedPtr;
+    typedef SharedPtr<GpuProgramParameters> GpuProgramParametersPtr;
+    typedef GpuProgramParametersPtr GpuProgramParametersSharedPtr; //!< @deprecated
     typedef SharedPtr<HardwareCounterBuffer> HardwareCounterBufferSharedPtr;
     typedef SharedPtr<HardwareIndexBuffer> HardwareIndexBufferSharedPtr;
     typedef SharedPtr<HardwarePixelBuffer> HardwarePixelBufferSharedPtr;

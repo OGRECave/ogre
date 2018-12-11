@@ -322,7 +322,7 @@ namespace Ogre
 
         void unbindGpuProgram(GpuProgramType gptype);
 
-        void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask);
+        void bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask);
 
         void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 

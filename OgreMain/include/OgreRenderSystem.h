@@ -972,7 +972,7 @@ namespace Ogre
         @param variabilityMask A mask of GpuParamVariability identifying which params need binding
         */
         virtual void bindGpuProgramParameters(GpuProgramType gptype, 
-            GpuProgramParametersSharedPtr params, uint16 variabilityMask) = 0;
+            const GpuProgramParametersPtr& params, uint16 variabilityMask) = 0;
 
         /** Only binds Gpu program parameters used for passes that have more than one iteration rendering
         */

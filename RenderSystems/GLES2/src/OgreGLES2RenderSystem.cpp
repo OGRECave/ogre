@@ -1989,7 +1989,7 @@ namespace Ogre {
         RenderSystem::unbindGpuProgram(gptype);
     }
 
-    void GLES2RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
+    void GLES2RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask)
     {
         // Just copy
         params->_copySharedParams();

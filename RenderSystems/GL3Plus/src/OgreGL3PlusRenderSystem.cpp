@@ -2156,7 +2156,7 @@ namespace Ogre {
         RenderSystem::unbindGpuProgram(gptype);
     }
 
-    void GL3PlusRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
+    void GL3PlusRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask)
     {
         if (mask & (uint16)GPV_GLOBAL)
         {

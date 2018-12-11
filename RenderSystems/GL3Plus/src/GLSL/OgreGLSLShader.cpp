@@ -432,7 +432,7 @@ namespace Ogre {
     }
 
 
-    void GLSLShader::bindParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    void GLSLShader::bindParameters(const GpuProgramParametersPtr& params, uint16 mask)
     {
         // Link can throw exceptions, ignore them at this point.
         try

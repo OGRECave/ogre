@@ -2833,7 +2833,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void GLRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
+    void GLRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask)
     {
         if (mask & (uint16)GPV_GLOBAL)
         {
