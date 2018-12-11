@@ -825,6 +825,7 @@ namespace Ogre {
     void TextureUnitState::setBlank(void)
     {
         mFramePtrs.clear();
+        mFramePtrs.push_back(TexturePtr()); // insert nullptr to show warning tex
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTextureTransform(const Matrix4& xform)
