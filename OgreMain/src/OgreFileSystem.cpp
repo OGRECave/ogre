@@ -505,6 +505,9 @@ namespace {
     //-----------------------------------------------------------------------
     bool FileSystemArchive::exists(const String& filename) const
     {
+        if (filename.empty())
+            return false;
+
         String full_path = concatenate_path(mName, filename);
 
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE

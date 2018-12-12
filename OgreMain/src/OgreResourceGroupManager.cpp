@@ -1632,6 +1632,7 @@ namespace Ogre {
     std::pair<Archive*, ResourceGroupManager::ResourceGroup*>
     ResourceGroupManager::resourceExistsInAnyGroupImpl(const String& filename) const
     {
+        OgreAssert(!filename.empty(), "resourceName is empty string");
             OGRE_LOCK_AUTO_MUTEX;
 
             // Iterate over resource groups and find
