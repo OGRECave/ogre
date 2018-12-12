@@ -199,7 +199,6 @@ namespace Ogre
     DeflateStream::~DeflateStream()
     {
         close();
-        destroy();
     }
     //---------------------------------------------------------------------
     size_t DeflateStream::read(void* buf, size_t count)
@@ -449,6 +448,8 @@ namespace Ogre
     {
         if (getAccessMode() & WRITE)
             compressFinal();
+
+        destroy();
 
         mAccess = 0;
 
