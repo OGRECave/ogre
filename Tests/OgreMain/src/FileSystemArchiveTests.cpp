@@ -70,6 +70,11 @@ TEST_F(FileSystemArchiveTests,ListNonRecursive)
     EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
 
 }
+
+TEST_F(FileSystemArchiveTests,Exists)
+{
+    EXPECT_FALSE(mArch->exists(""));
+}
 //--------------------------------------------------------------------------
 TEST_F(FileSystemArchiveTests,ListRecursive)
 {
