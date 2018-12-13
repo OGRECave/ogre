@@ -228,8 +228,8 @@ namespace Ogre {
             mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
             mPos = mData;
             mEnd = mData + sourceStream.read(mData, mSize);
-            mFreeOnClose = freeOnClose;
         }
+        mFreeOnClose = freeOnClose;
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
@@ -254,8 +254,8 @@ namespace Ogre {
             mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
             mPos = mData;
             mEnd = mData + sourceStream->read(mData, mSize);
-            mFreeOnClose = freeOnClose;
         }
+        mFreeOnClose = freeOnClose;
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
@@ -280,8 +280,8 @@ namespace Ogre {
             mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
             mPos = mData;
             mEnd = mData + sourceStream.read(mData, mSize);
-            mFreeOnClose = freeOnClose;
         }
+        mFreeOnClose = freeOnClose;
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
@@ -306,8 +306,8 @@ namespace Ogre {
             mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
             mPos = mData;
             mEnd = mData + sourceStream->read(mData, mSize);
-            mFreeOnClose = freeOnClose;
         }
+        mFreeOnClose = freeOnClose;
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
@@ -315,10 +315,10 @@ namespace Ogre {
         : DataStream(static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         mSize = inSize;
-        mFreeOnClose = freeOnClose;
         mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
         mEnd = mData + mSize;
+        mFreeOnClose = freeOnClose;
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
@@ -327,10 +327,10 @@ namespace Ogre {
         : DataStream(name, static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         mSize = inSize;
-        mFreeOnClose = freeOnClose;
         mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
         mEnd = mData + mSize;
+        mFreeOnClose = freeOnClose;
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
