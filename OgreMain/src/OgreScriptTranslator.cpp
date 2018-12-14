@@ -1098,8 +1098,11 @@ namespace Ogre{
         else
         {
             if(!mMaterial)
+            {
                 compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
                                    "failed to find or create material \"" + obj->name + "\"");
+                return;
+            }
         }
 
         mMaterial->removeAllTechniques();
@@ -2456,6 +2459,7 @@ namespace Ogre{
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                            (*i0)->getValue() + " not supported as first argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
+                        return;
                     }
                     mode.v = mode.u;
                     mode.w = mode.u;

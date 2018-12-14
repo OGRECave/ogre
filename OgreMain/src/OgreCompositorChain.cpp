@@ -548,10 +548,13 @@ void CompositorChain::_notifyViewport(Viewport* vp)
         if (vp != NULL) 
             vp->addListener(this);
         
-        if (vp->getTarget() != mViewport->getTarget())
+        if (!vp || !mViewport || vp->getTarget() != mViewport->getTarget())
         {
-            mViewport->getTarget()->removeListener(this);
-            vp->getTarget()->addListener(this);
+            if(mViewport)
+                mViewport->getTarget()->removeListener(this);
+
+            if(vp)
+                vp->getTarget()->addListener(this);
         }
         mOurListener.notifyViewport(vp);
         mViewport = vp;

@@ -515,7 +515,9 @@ namespace Ogre {
             unsigned short* p16Idx = 0;
             unsigned int* p32Idx = 0;
 
-            if (iData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
+            bool isIT32 = iData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT;
+
+            if (isIT32)
             {
                 p32Idx = static_cast<unsigned int*>(
                     iData->indexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
@@ -528,7 +530,7 @@ namespace Ogre {
 
             for (j = 0; j < iData->indexCount;  )
             {
-                if (iData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
+                if (isIT32)
                 {
                     if (mGeometryList[i].opType == RenderOperation::OT_TRIANGLE_LIST
                         || j == 0)
