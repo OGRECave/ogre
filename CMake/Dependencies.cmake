@@ -125,22 +125,24 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
     message(STATUS "Building ZZIPlib")
     file(DOWNLOAD
-        https://github.com/paroj/ZZIPlib/archive/master.tar.gz
-        ${PROJECT_BINARY_DIR}/ZZIPlib-master.tar.gz)
+        https://github.com/gdraheim/zziplib/archive/develop.zip
+        ${PROJECT_BINARY_DIR}/zziplib-develop.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf ZZIPlib-master.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        -E tar xf zziplib-develop.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     execute_process(COMMAND ${CMAKE_COMMAND}
         -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DZLIB_ROOT=${OGREDEPS_PATH}
+        -DZZIPMMAPPED=OFF -DZZIPCOMPAT=OFF -DZZIPLIBTOOL=OFF -DZZIPFSEEKO=OFF -DZZIPWRAP=OFF -DZZIPSDL=OFF -DZZIPBINS=OFF -DZZIPTEST=OFF -DZZIPDOCS=OFF -DBASH=sh
+        -DBUILD_STATIC_LIBS=TRUE
         -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
         -G ${CMAKE_GENERATOR}
         -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
         ${CROSS}
-        ${PROJECT_BINARY_DIR}/ZZIPlib-master
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/ZZIPlib-master)
+        ${PROJECT_BINARY_DIR}/zziplib-develop
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zziplib-develop)
     execute_process(COMMAND ${CMAKE_COMMAND} 
-        --build ${PROJECT_BINARY_DIR}/ZZIPlib-master ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/zziplib-develop ${BUILD_COMMAND_OPTS})
     
     find_package(Freetype)
     if (NOT FREETYPE_FOUND)
