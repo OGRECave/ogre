@@ -42,7 +42,7 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.content.res.AssetManager;
 
-public class MainActivity extends Activity implements SensorEventListener {
+public class BasicSample extends Activity implements SensorEventListener {
 	protected Handler handler = null;
 	protected SurfaceView surfaceView = null;
 	protected Surface lastSurface = null;

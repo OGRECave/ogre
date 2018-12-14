@@ -53,7 +53,8 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     #    - NDKOUT              The directory for the Ndk project to be written to
     #    - HAS_CODE            Set this variable to "false" if no java code will be present 
     #                          (google android:hasCode for more info)
-    #    - MAIN_ACTIVITY       Name of the main java activity ex "android.app.MainActivity" 
+    #    - MAIN_ACTIVITY       Name of the main java activity ex "android.app.MainActivity"
+    #    - EXTRA_ACTIVITIES    Name of additional java activities
     ##################################################################
 
     if(APPLE OR WIN32)
@@ -82,6 +83,22 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     file(MAKE_DIRECTORY "${NDKOUT}/res")
     file(MAKE_DIRECTORY "${NDKOUT}/src")
 
+    foreach(ACTIVITY_NAME ${MAIN_ACTIVITY} ${EXTRA_ACTIVITIES})
+        string(FIND ${ACTIVITY_NAME} "." DOT REVERSE)
+        math(EXPR DOT "${DOT} + 1")
+        string(SUBSTRING ${ACTIVITY_NAME} ${DOT} -1 LABEL)
+        set(ANDROID_ACTIVITIES "${ANDROID_ACTIVITIES}
+        <activity android:name=\"${ACTIVITY_NAME}\"
+        android:label=\"${LABEL}\"
+        android:configChanges=\"orientation${SCREEN_SIZE}|keyboardHidden\"
+        android:theme=\"@android:style/Theme.Black.NoTitleBar.Fullscreen\">
+            <meta-data android:name=\"android.app.lib_name\" android:value=\"${ANDROID_MOD_NAME}\" />
+            <intent-filter>
+                <action android:name=\"android.intent.action.MAIN\" />
+                <category android:name=\"android.intent.category.LAUNCHER\" />
+            </intent-filter>
+        </activity>")
+    endforeach()
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
     file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
     

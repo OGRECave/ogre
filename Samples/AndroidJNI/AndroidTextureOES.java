@@ -11,7 +11,7 @@ import android.view.SurfaceView;
 
 import org.ogre.*;
 
-public class MainActivity extends Activity {
+public class AndroidTextureOES extends Activity {
 
     static {
         System.loadLibrary("OgreJNI");

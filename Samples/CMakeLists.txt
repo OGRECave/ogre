@@ -5,10 +5,6 @@ if(OGRE_BUILD_ANDROID_JNI_SAMPLE)
   add_subdirectory(AndroidJNI)
 endif()
 
-if(OGRE_BUILD_ANDROID_TEXTURE_OES_SAMPLE)
-  add_subdirectory(AndroidTextureOES)
-endif()
-
 if (OGRE_BUILD_SAMPLES)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 

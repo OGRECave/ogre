@@ -24,19 +24,22 @@ if(ANDROID AND OGRE_BUILD_COMPONENT_JAVA)
     # Set this variable to false if no java code will be present (google android:hasCode for more info)
     SET(HAS_CODE "true")
     
-    SET(MAIN_ACTIVITY "org.ogre.example.MainActivity")
+    SET(MAIN_ACTIVITY "org.ogre.example.BasicSample")
+    SET(EXTRA_ACTIVITIES "org.ogre.example.AndroidTextureOES")
+    SET(ANDROID_ADDITIONAL_PERMISSION "<uses-permission android:name=\"android.permission.CAMERA\" />")
     SET(HEADERS "")
     SET(SAMPLE_LDLIBS "")
     
     # Copy and create resource files
-	# file(COPY "${JNI_PATH}/OgreActivityJNI.java" DESTINATION "${NDKOUT}/src/org/ogre/android")
-	file(COPY "${JNI_PATH}/MainActivity.java" DESTINATION "${NDKOUT}/src/org/ogre/example")
+    file(COPY "${JNI_PATH}/BasicSample.java" DESTINATION "${NDKOUT}/src/org/ogre/example")
+    file(COPY "${JNI_PATH}/AndroidTextureOES.java" DESTINATION "${NDKOUT}/src/org/ogre/example")
     
     copy_assets_to_android_proj()
         
     # Create CMake target
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp "int x = 23;")
     ADD_LIBRARY(OgreJNIDummy SHARED ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp)
+    add_dependencies(OgreJNIDummy OgreJNI)
     
     # copy the SDK
     add_custom_command(TARGET OgreJNIDummy PRE_BUILD

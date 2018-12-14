@@ -9,17 +9,7 @@
     <uses-sdk android:minSdkVersion="@ANDROID_NATIVE_API_LEVEL@" />
  
     <application android:label="@ANDROID_MOD_NAME@" android:icon="@drawable/ic_launcher" android:hasCode="@HAS_CODE@">
-        <activity android:name="@MAIN_ACTIVITY@" 
-                  android:label="@ANDROID_MOD_NAME@"
-                  android:configChanges="orientation@SCREEN_SIZE@|keyboardHidden"
-		  android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
-		  <!-- Tell NativeActivity the name of or .so -->
-          <meta-data android:name="android.app.lib_name" android:value="@ANDROID_MOD_NAME@" />
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity> 
+        @ANDROID_ACTIVITIES@
     </application>
 
 </manifest>
