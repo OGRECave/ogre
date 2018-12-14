@@ -541,6 +541,7 @@ namespace Ogre
                 {
                     if(mVertexDataRecord->gpuVertexData == NULL) 
                         createGpuVertexData();
+                    assert(mVertexDataRecord->gpuVertexData);
                     targetVertexData = mVertexDataRecord->gpuVertexData;
                 }
 

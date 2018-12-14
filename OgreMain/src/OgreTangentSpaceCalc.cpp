@@ -257,7 +257,9 @@ namespace Ogre
             uint32 *p32 = 0;
 
             HardwareIndexBufferSharedPtr ibuf = i_in->indexBuffer;
-            if (ibuf->getType() == HardwareIndexBuffer::IT_32BIT)
+
+            bool isIT32 = ibuf->getType() == HardwareIndexBuffer::IT_32BIT;
+            if (isIT32)
             {
                 p32 = static_cast<uint32*>(
                     ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
@@ -282,9 +284,9 @@ namespace Ogre
                 // Read 1 or 3 indexes depending on type
                 if (f == 0 || opType == RenderOperation::OT_TRIANGLE_LIST)
                 {
-                    vertInd[0] = p32? *p32++ : *p16++;
-                    vertInd[1] = p32? *p32++ : *p16++;
-                    vertInd[2] = p32? *p32++ : *p16++;
+                    vertInd[0] = isIT32? *p32++ : *p16++;
+                    vertInd[1] = isIT32? *p32++ : *p16++;
+                    vertInd[2] = isIT32? *p32++ : *p16++;
                 }
                 else if (opType == RenderOperation::OT_TRIANGLE_FAN)
                 {
@@ -292,7 +294,7 @@ namespace Ogre
                     // Element 2 becomes element 1
                     vertInd[1] = vertInd[2];
                     // read new into element 2
-                    vertInd[2] = p32? *p32++ : *p16++;
+                    vertInd[2] = isIT32? *p32++ : *p16++;
                 }
                 else if (opType == RenderOperation::OT_TRIANGLE_STRIP)
                 {
@@ -306,7 +308,7 @@ namespace Ogre
                     }
                     vertInd[0] = vertInd[1];
                     vertInd[1] = vertInd[2];            
-                    vertInd[2] = p32? *p32++ : *p16++;
+                    vertInd[2] = isIT32? *p32++ : *p16++;
                 }
 
                 // deal with strip inversion of winding

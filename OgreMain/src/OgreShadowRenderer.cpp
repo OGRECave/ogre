@@ -1833,11 +1833,8 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
         {
             return retPass = pass->getParent()->getShadowReceiverMaterial()->getBestTechnique()->getPass(0);
         }
-        else
-        {
-            retPass = mShadowTextureCustomReceiverPass ?
-                mShadowTextureCustomReceiverPass : mShadowReceiverPass;
-        }
+
+        retPass = mShadowTextureCustomReceiverPass ? mShadowTextureCustomReceiverPass : mShadowReceiverPass;
 
         // Does incoming pass have a custom shadow receiver program?
         if (!pass->getShadowReceiverVertexProgramName().empty())
@@ -1856,7 +1853,7 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
         }
         else
         {
-            if (retPass == mShadowTextureCustomReceiverPass)
+            if (mShadowTextureCustomReceiverPass && retPass == mShadowTextureCustomReceiverPass)
             {
                 // reset vp?
                 if (mShadowTextureCustomReceiverPass->getVertexProgramName() !=
