@@ -9,7 +9,7 @@ build_script:
  - cmake --build build --config Release --target INSTALL
 test_script:
  - set PATH=%PATH%;build\gtest\lib
- - build\bin\release\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
+ - IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" build\bin\release\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
 cache:
 - ogredeps -> CMake/Dependencies.cmake
 branches:
