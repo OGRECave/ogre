@@ -232,15 +232,19 @@ namespace Ogre
         GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
         GLuint progID = 0;
         GLUniformCache* uniformCache=0;
-        if(fromProgType == GPT_VERTEX_PROGRAM)
+        if(fromProgType == GPT_VERTEX_PROGRAM && getVertexProgram())
         {
             progID = getVertexProgram()->getGLProgramHandle();
             uniformCache = getVertexProgram()->getUniformCache();
         }
-        else if(fromProgType == GPT_FRAGMENT_PROGRAM)
+        else if(fromProgType == GPT_FRAGMENT_PROGRAM && mFragmentProgram)
         {
             progID = mFragmentProgram->getGLProgramHandle();
             uniformCache = mFragmentProgram->getUniformCache();
+        }
+        else
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "invalid program type");
         }
 
         for (;currentUniform != endUniform; ++currentUniform)

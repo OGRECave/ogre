@@ -295,35 +295,39 @@ namespace Ogre
 
         GLuint progID = 0;
         GLUniformCache * uniformCache=0;
-        if (fromProgType == GPT_VERTEX_PROGRAM)
+        if (fromProgType == GPT_VERTEX_PROGRAM && getVertexShader())
         {
             progID = getVertexShader()->getGLProgramHandle();
             uniformCache = getVertexShader()->getUniformCache();
         }
-        else if (fromProgType == GPT_FRAGMENT_PROGRAM)
+        else if (fromProgType == GPT_FRAGMENT_PROGRAM && mFragmentShader)
         {
             progID = mFragmentShader->getGLProgramHandle();
             uniformCache = mFragmentShader->getUniformCache();
         }
-        else if (fromProgType == GPT_GEOMETRY_PROGRAM)
+        else if (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader)
         {
             progID = mGeometryShader->getGLProgramHandle();
             uniformCache = mGeometryShader->getUniformCache();
         }
-        else if (fromProgType == GPT_HULL_PROGRAM)
+        else if (fromProgType == GPT_HULL_PROGRAM && mHullShader)
         {
             progID = mHullShader->getGLProgramHandle();
             uniformCache = mHullShader->getUniformCache();
         }
-        else if (fromProgType == GPT_DOMAIN_PROGRAM)
+        else if (fromProgType == GPT_DOMAIN_PROGRAM && mDomainShader)
         {
             progID = mDomainShader->getGLProgramHandle();
             uniformCache = mDomainShader->getUniformCache();
         }
-        else if (fromProgType == GPT_COMPUTE_PROGRAM)
+        else if (fromProgType == GPT_COMPUTE_PROGRAM && mComputeShader)
         {
             progID = mComputeShader->getGLProgramHandle();
             uniformCache = mComputeShader->getUniformCache();
+        }
+        else
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "invalid program type");
         }
 
         // Iterate through uniform reference list and update uniform values
