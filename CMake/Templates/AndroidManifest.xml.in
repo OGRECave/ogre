@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="@PKG_NAME@"
     android:versionCode="1"
-    android:versionName="@OGRE_VERSION@" 
+    android:versionName="@OGRE_VERSION@"
 	android:installLocation="auto">
 
     @ANDROID_ADDITIONAL_PERMISSION@
     <uses-sdk android:minSdkVersion="@ANDROID_NATIVE_API_LEVEL@" />
- 
+
     <application android:label="@ANDROID_MOD_NAME@" android:icon="@drawable/ic_launcher" android:hasCode="@HAS_CODE@">
         @ANDROID_ACTIVITIES@
     </application>
