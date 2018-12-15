@@ -1431,8 +1431,7 @@ namespace Ogre {
 
         if (enabled)
         {
-            GLTexturePtr tex = static_pointer_cast<GLTexture>(
-                texPtr ? texPtr : mTextureManager->_getWarningTexture());
+            GLTexturePtr tex = static_pointer_cast<GLTexture>(texPtr);
 
             // note used
             tex->touch();
