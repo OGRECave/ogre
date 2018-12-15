@@ -818,8 +818,7 @@ namespace Ogre {
 
         if (enabled)
         {
-            GLES2TexturePtr tex = static_pointer_cast<GLES2Texture>(
-                texPtr ? texPtr : mTextureManager->_getWarningTexture());
+            GLES2TexturePtr tex = static_pointer_cast<GLES2Texture>(texPtr);
 
             mCurTexMipCount = 0;
 

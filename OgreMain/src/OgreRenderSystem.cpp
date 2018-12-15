@@ -311,7 +311,9 @@ namespace Ogre {
     {
         // This method is only ever called to set a texture unit to valid details
         // The method _disableTextureUnit is called to turn a unit off
-        const TexturePtr& tex = tl._getTexturePtr();
+        TexturePtr tex = tl._getTexturePtr();
+        if(!tex || tl.isTextureLoadFailing())
+            tex = mTextureManager->_getWarningTexture();
 
         // Vertex texture binding (D3D9 only)
         if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
@@ -336,7 +338,7 @@ namespace Ogre {
         {
             // Shared vertex / fragment textures or no vertex texture support
             // Bind texture (may be blank)
-            _setTexture(texUnit, true, tl.isTextureLoadFailing() ? sNullTexPtr : tex);
+            _setTexture(texUnit, true, tex);
         }
 
         // Set texture coordinate set
