@@ -361,7 +361,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     String source = sourceCodeStringStream.str();
 
     // Generate program name.
-    String programName = generateHash(source);
+    String programName = generateHash(source, shaderProgram->getPreprocessorDefines());
 
     if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
     {
@@ -417,7 +417,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     }
 
     pGpuProgram->setSource(source);
-
+    pGpuProgram->setPreprocessorDefines(shaderProgram->getPreprocessorDefines());
     pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
 
     if (language == "hlsl")
@@ -466,11 +466,12 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 
 
 //-----------------------------------------------------------------------------
-String ProgramManager::generateHash(const String& programString)
+String ProgramManager::generateHash(const String& programString, const String& defines)
 {
     //Different programs must have unique hash values.
     uint32_t hash[4];
-    MurmurHash3_128(programString.c_str(), programString.size(), 0, hash);
+    uint32_t seed = FastHash(defines.c_str(), defines.size());
+    MurmurHash3_128(programString.c_str(), programString.size(), seed, hash);
 
     //Generate the string
     return StringUtil::format("%08x%08x%08x%08x", hash[0], hash[1], hash[2], hash[3]);
