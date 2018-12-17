@@ -192,6 +192,10 @@ public:
     */
     bool getUseColumnMajorMatrices() const { return mColumnMajorMatrices; }
 
+    void addPreprocessorDefines(const String& defines);
+
+    const String& getPreprocessorDefines() const { return mPreprocessorDefines; }
+
 // Protected methods.
 protected:
 
@@ -214,8 +218,6 @@ protected:
         
     /** Remove parameter from this program. */
     void removeParameter(UniformParameterPtr parameter);
-
-
 // Attributes.
 protected:
     // Program type. (Vertex, Fragment, Geometry).
@@ -228,6 +230,8 @@ protected:
     Function* mEntryPointFunction;
     // Program dependencies.
     StringVector mDependencies;
+    /// preprocessor definitions
+    String mPreprocessorDefines;
     // Skeletal animation calculation
     bool mSkeletalAnimation;
     // Whether to pass matrices as column-major.

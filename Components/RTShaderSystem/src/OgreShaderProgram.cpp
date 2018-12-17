@@ -398,6 +398,12 @@ void Program::addDependency(const String& libFileName)
     mDependencies.push_back(libFileName);
 }
 
+void Program::addPreprocessorDefines(const String& defines)
+{
+    mPreprocessorDefines +=
+        mPreprocessorDefines.empty() ? defines : ("," + defines);
+}
+
 //-----------------------------------------------------------------------------
 size_t Program::getDependencyCount() const
 {

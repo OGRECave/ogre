@@ -111,6 +111,12 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
                 subShaderName += "_FS";
             }                   
 
+            const String& defs = program->getPreprocessorDefines();
+            if (!defs.empty())
+            {
+                subShaderName += std::to_string(FastHash(defs.c_str(), defs.size()));
+            }
+
             // Check if the library shader already compiled
             if (!HighLevelGpuProgramManager::getSingleton().resourceExists(subShaderName, group))
             {
@@ -140,6 +146,7 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
                 }
 
                 pSubGpuProgram->setSource(versionLine + sourceCode);
+                pSubGpuProgram->setPreprocessorDefines(program->getPreprocessorDefines());
                 pSubGpuProgram->load();
 
                 // If we have compile errors than stop processing

@@ -148,10 +148,11 @@ protected:
         
     /** 
     Generates a unique hash from a string
-    @param programString string to generate a hash value for
+    @param programString source code to generate a hash value for
+    @param defines defines for the final source code
     @return A string representing a 128 bit hash value of the original string
     */
-    static String generateHash(const String& programString);
+    static String generateHash(const String& programString, const String& defines);
 
     /** Create GPU program based on the give CPU program.
     @param shaderProgram The CPU program instance.

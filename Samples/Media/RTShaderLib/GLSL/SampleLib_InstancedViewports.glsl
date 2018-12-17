@@ -88,7 +88,8 @@ void SGX_InstancedViewportsDiscardOutOfBounds(
     float maxM = max(boxedXY.x,boxedXY.y);
     if (maxM >= 0.5)
     {
-        //FIXME discard is not allowed in GLSL vertex shaders!
-        // discard;
+#ifdef FRAGMENT_PROG
+        discard;
+#endif
     }
 }
