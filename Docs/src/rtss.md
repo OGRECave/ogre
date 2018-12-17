@@ -96,11 +96,13 @@ Here are the attributes you can use in a `rtshader_system` section of a .materia
 Force a specific lighting model.
 
 @par
-Format1: `lighting_stage <ffp|per_pixel>`
+Format1: `lighting_stage <ffp|per_pixel> [normalised]`
 @par
 Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [samplerName]`
 @par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
+
+@param normalised @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
 
 @see Ogre::RTShader::NormalMapLighting::NormalMapSpace
 @see @ref Samplers

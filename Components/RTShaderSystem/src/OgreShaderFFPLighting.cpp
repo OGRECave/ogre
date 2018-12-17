@@ -39,6 +39,7 @@ FFPLighting::FFPLighting()
 {
 	mTrackVertexColourType			= TVC_NONE;
 	mSpecularEnable					= false;
+	mNormalisedEnable               = false;
 }
 
 //-----------------------------------------------------------------------
@@ -345,6 +346,9 @@ bool FFPLighting::resolveDependencies(ProgramSet* programSet)
 	vsProgram->addDependency(FFP_LIB_COMMON);
 	vsProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
+	if(mNormalisedEnable)
+	    vsProgram->addPreprocessorDefines("NORMALISED");
+
 	return true;
 }
 
@@ -507,6 +511,8 @@ void FFPLighting::copyFrom(const SubRenderState& rhs)
 
 	rhsLighting.getLightCount(lightCount);
 	setLightCount(lightCount);
+
+	mNormalisedEnable = rhsLighting.mNormalisedEnable;
 }
 
 //-----------------------------------------------------------------------
@@ -626,26 +632,36 @@ const String& FFPLightingFactory::getType() const
 SubRenderState*	FFPLightingFactory::createInstance(ScriptCompiler* compiler, 
 												PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
-	if (prop->name == "lighting_stage")
-	{
-		if(prop->values.size() == 1)
-		{
-			String modelType;
+    if (prop->name != "lighting_stage" || prop->values.empty())
+        return NULL;
 
-			if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
-			{
-				compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-				return NULL;
-			}
+    auto it = prop->values.begin();
+    String val;
 
-			if (modelType == "ffp")
-			{
-				return createOrRetrieveInstance(translator);
-			}
-		}		
-	}
+    if(!SGScriptTranslator::getString(*it, &val))
+    {
+        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+        return NULL;
+    }
 
-	return NULL;
+    SubRenderState* ret = NULL;
+    if (val == "ffp")
+    {
+        ret = createOrRetrieveInstance(translator);
+    }
+
+    if(ret && prop->values.size() >= 2)
+    {
+        if(!SGScriptTranslator::getString(*it, &val))
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            return NULL;
+        }
+
+        static_cast<FFPLighting*>(ret)->setNormaliseEnabled(val == "normalised");
+    }
+
+    return ret;
 }
 
 //-----------------------------------------------------------------------

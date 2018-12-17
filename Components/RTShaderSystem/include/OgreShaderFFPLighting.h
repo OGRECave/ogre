@@ -82,6 +82,11 @@ public:
     */
     virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
+    /** normalise the blinn-phong reflection model to make it energy conserving
+     *
+     * see [this for details](http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/)
+     */
+    void setNormaliseEnabled(bool enable) { mNormalisedEnable = enable; }
 
     static String Type;
 
@@ -192,6 +197,7 @@ protected:
     TrackVertexColourType mTrackVertexColourType;
     // Specular component enabled/disabled.
     bool mSpecularEnable;
+    bool mNormalisedEnable;
     // Light list.
     LightParamsList mLightParamsList;
     // World view matrix parameter.
