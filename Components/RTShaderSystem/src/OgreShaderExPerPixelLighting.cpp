@@ -266,6 +266,9 @@ bool PerPixelLighting::resolveDependencies(ProgramSet* programSet)
     psProgram->addDependency(FFP_LIB_COMMON);
     psProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
+    if(mNormalisedEnable)
+        psProgram->addPreprocessorDefines("NORMALISED");
+
     return true;
 }
 
@@ -383,26 +386,36 @@ const String& PerPixelLightingFactory::getType() const
 SubRenderState* PerPixelLightingFactory::createInstance(ScriptCompiler* compiler, 
                                                         PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
-    if (prop->name == "lighting_stage")
+    if (prop->name != "lighting_stage" || prop->values.empty())
+        return NULL;
+
+    auto it = prop->values.begin();
+    String val;
+
+    if(!SGScriptTranslator::getString(*it, &val))
     {
-        if(prop->values.size() == 1)
-        {
-            String modelType;
-            
-            if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
-            {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                return NULL;
-            }
-            
-            if (modelType == "per_pixel")
-            {
-                return createOrRetrieveInstance(translator);
-            }
-        }       
+        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+        return NULL;
     }
 
-    return NULL;
+    SubRenderState* ret = NULL;
+    if (val == "per_pixel")
+    {
+        ret = createOrRetrieveInstance(translator);
+    }
+
+    if(ret && prop->values.size() >= 2)
+    {
+        if(!SGScriptTranslator::getString(*it, &val))
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            return NULL;
+        }
+
+        static_cast<PerPixelLighting*>(ret)->setNormaliseEnabled(val == "normalised");
+    }
+
+    return ret;
 }
 
 //-----------------------------------------------------------------------
