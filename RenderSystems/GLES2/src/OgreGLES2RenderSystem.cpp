@@ -158,6 +158,9 @@ namespace Ogre {
         : mStateCacheManager(0),
           mGpuProgramManager(0),
           mGLSLESProgramFactory(0),
+#if !OGRE_NO_GLES2_CG_SUPPORT
+          mGLSLESCgProgramFactory(0),
+#endif
           mHardwareBufferManager(0),
           mRTTManager(0),
           mCurTexMipCount(0)

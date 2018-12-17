@@ -69,6 +69,7 @@ if (OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
+  target_include_directories(RenderSystem_GLES2 PUBLIC ${HLSL2GLSL_INCLUDE_DIRS})
   target_link_libraries(RenderSystem_GLES2 ${HLSL2GLSL_LIBRARIES})
 endif ()
 
