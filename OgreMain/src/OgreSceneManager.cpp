@@ -104,6 +104,7 @@ mName(name),
 mRenderQueue( 0 ),
 mForwardPlusSystem( 0 ),
 mForwardPlusImpl( 0 ),
+mBuildLegacyLightList( false ),
 mDecalsDiffuseTex( TexturePtr() ),
 mDecalsNormalsTex( TexturePtr() ),
 mDecalsEmissiveTex( TexturePtr() ),
@@ -996,6 +997,11 @@ void SceneManager::_setForwardPlusEnabledInPass( bool bEnable )
         mForwardPlusImpl = mForwardPlusSystem;
     else
         mForwardPlusImpl = 0;
+}
+//-----------------------------------------------------------------------
+void SceneManager::setBuildLegacyLightList(bool bEnable)
+{
+    mBuildLegacyLightList = bEnable;
 }
 //-----------------------------------------------------------------------
 void SceneManager::_setPrePassMode( PrePassMode mode, const TextureVec *prepassTextures,
@@ -2553,7 +2559,7 @@ void SceneManager::buildLightList()
         accumStartLightIdx += totalObjsInThread;
     }
 
-    if( accumStartLightIdx == mGlobalLightList.lights.size() )
+    if( accumStartLightIdx == mGlobalLightList.lights.size() && !mBuildLegacyLightList)
     {
         //All of the lights were directional. We're done. Avoid the sync point with worker threads.
         return;
@@ -2615,19 +2621,16 @@ void SceneManager::buildLightList()
         dstOffset += numCollectedLights;
     }
 
-    //Now fire the threads again, to build the per-MovableObject lists
-
-    if( mForwardPlusSystem )
-        return; //Don't do this on non-forward passes.
-    return;
-
-    mRequestType = BUILD_LIGHT_LIST02;
+    if(mBuildLegacyLightList) {
+        //Now fire the threads again, to build the per-MovableObject lists
+        mRequestType = BUILD_LIGHT_LIST02;
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-    _updateWorkerThread( NULL );
+        _updateWorkerThread( NULL );
 #else
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+        mWorkerThreadsBarrier->sync(); //Fire threads
+        mWorkerThreadsBarrier->sync(); //Wait them to complete
 #endif
+    }
 }
 //-----------------------------------------------------------------------
 void SceneManager::buildLightListThread01( const BuildLightListRequest &buildLightListRequest,

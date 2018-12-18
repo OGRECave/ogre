@@ -489,6 +489,7 @@ namespace Ogre {
 
         ForwardPlusBase *mForwardPlusSystem;
         ForwardPlusBase *mForwardPlusImpl;
+        bool mBuildLegacyLightList;
 
         TexturePtr mDecalsDiffuseTex;
         TexturePtr mDecalsNormalsTex;
@@ -1338,6 +1339,14 @@ namespace Ogre {
         void setForwardClustered( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
                                   uint32 lightsPerCell, uint32 decalsPerCell, float minDistance,
                                   float maxDistance );
+
+        /** Enables or disables the legace 1.9 way of building light lists which can be 
+            used by HlmsLowLevel materials.
+            This light list can be turned on regardless of any Forward* mode but it 
+            consumes a lot of performance and is only used by HlmsLowLevel materials 
+            that need ligting.
+        */
+        void setBuildLegacyLightList(bool bEnable);
 
         ForwardPlusBase* getForwardPlus(void)                       { return mForwardPlusSystem; }
         ForwardPlusBase* _getActivePassForwardPlus(void)            { return mForwardPlusImpl; }

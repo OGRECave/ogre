@@ -283,6 +283,7 @@ namespace Ogre
         mAutoParamDataSource->setCurrentRenderable( renderable );
         mAutoParamDataSource->setWorldMatrices( mTempXform, numMatrices );
         mAutoParamDataSource->setCurrentPass( pass );
+        mAutoParamDataSource->setCurrentLightList(&renderable->getLights());
 
         if( pass->getFogOverride() )
         {
