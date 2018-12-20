@@ -369,6 +369,11 @@ namespace Ogre
             mSrcHeight = mHeight;
         }
 
+        if(mUsage & TU_AUTOMIPMAP && D3D9RenderSystem::isDirectX9Ex())
+        {
+            mUsage |= TU_DYNAMIC;
+        }
+
         // load based on tex.type
         switch (getTextureType())
         {
