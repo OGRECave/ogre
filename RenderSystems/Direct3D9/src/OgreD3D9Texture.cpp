@@ -1206,7 +1206,7 @@ namespace Ogre
     }
     #undef GETLEVEL
     /****************************************************************************************/
-    HardwarePixelBufferSharedPtr D3D9Texture::getBuffer(size_t face, size_t mipmap)
+    const HardwarePixelBufferSharedPtr& D3D9Texture::getBuffer(size_t face, size_t mipmap)
     {
         IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getActiveD3D9Device();
         TextureResources* textureResources = getTextureResources(d3d9Device);

@@ -147,9 +147,7 @@ namespace Ogre {
         /// overridden from Texture
         void copyToTexture( TexturePtr& target );
 
-
-        /// @copydoc Texture::getBuffer
-        HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
+        const HardwarePixelBufferSharedPtr& getBuffer(size_t face, size_t mipmap);
         
         /// retrieves a pointer to the actual texture
         IDirect3DBaseTexture9 *getTexture();        

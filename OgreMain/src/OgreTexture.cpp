@@ -416,7 +416,7 @@ namespace Ogre {
         return BLANKSTRING;
 
     }
-    HardwarePixelBufferSharedPtr Texture::getBuffer(size_t face, size_t mipmap)
+    const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap)
     {
         if (face >= getNumFaces())
         {
