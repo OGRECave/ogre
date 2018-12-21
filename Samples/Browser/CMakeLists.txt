@@ -68,19 +68,13 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
 
     # Copy other resources
     file(COPY
-	${SDL2_BINARY}
+	    ${SDL2_BINARY}
 
-        ${PROJECT_BINARY_DIR}/inst/bin/debug/resources_d.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/debug/plugins_d.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/debug/quakemap_d.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/debug/samples_d.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/debug/tests_d.cfg
-
-        ${PROJECT_BINARY_DIR}/inst/bin/release/resources.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/release/plugins.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/release/quakemap.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/release/samples.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/release/tests.cfg
+        ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg
+        ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg
+        ${PROJECT_BINARY_DIR}/inst/bin/quakemap.cfg
+        ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg
+        ${PROJECT_BINARY_DIR}/inst/bin/tests.cfg
 
         ${PROJECT_SOURCE_DIR}/Samples/Common/misc.winrt/Logo.png
         ${PROJECT_SOURCE_DIR}/Samples/Common/misc.winrt/SmallLogo.png
@@ -99,15 +93,6 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
         ${CMAKE_CURRENT_BINARY_DIR}/SmallLogo.png
         ${CMAKE_CURRENT_BINARY_DIR}/StoreLogo.png
         ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.png
-    )
-    set(DEBUG_CONTENT_FILES ${DEBUG_CONTENT_FILES}
-        ${CMAKE_CURRENT_BINARY_DIR}/resources_d.cfg
-        ${CMAKE_CURRENT_BINARY_DIR}/plugins_d.cfg
-        ${CMAKE_CURRENT_BINARY_DIR}/quakemap_d.cfg
-        ${CMAKE_CURRENT_BINARY_DIR}/samples_d.cfg
-        ${CMAKE_CURRENT_BINARY_DIR}/tests_d.cfg
-    )
-    set(RELEASE_CONTENT_FILES ${RELEASE_CONTENT_FILES}
         ${CMAKE_CURRENT_BINARY_DIR}/resources.cfg
         ${CMAKE_CURRENT_BINARY_DIR}/plugins.cfg
         ${CMAKE_CURRENT_BINARY_DIR}/quakemap.cfg
@@ -115,10 +100,8 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
         ${CMAKE_CURRENT_BINARY_DIR}/tests.cfg
     )
     set_property(SOURCE ${CONTENT_FILES} PROPERTY VS_DEPLOYMENT_CONTENT 1)
-    set_property(SOURCE ${DEBUG_CONTENT_FILES} PROPERTY VS_DEPLOYMENT_CONTENT $<CONFIG:Debug>)
-    set_property(SOURCE ${RELEASE_CONTENT_FILES} PROPERTY VS_DEPLOYMENT_CONTENT $<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>)
 
-    set(RESOURCE_FILES ${CONTENT_FILES} ${DEBUG_CONTENT_FILES} ${RELEASE_CONTENT_FILES})
+    set(RESOURCE_FILES ${CONTENT_FILES})
     source_group("Resource Files" FILES ${RESOURCE_FILES})
 
 endif()

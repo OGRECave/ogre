@@ -203,8 +203,8 @@ namespace Ogre {
 #endif
 
 // Win32 compilers use _DEBUG for specifying debug builds.
-// for MinGW, we set DEBUG
-#   if defined(_DEBUG) || defined(DEBUG)
+// for MinGW, we use NDEBUG
+#   if defined(_DEBUG) || (defined(__MINGW32__) && !defined(NDEBUG))
 #       define OGRE_DEBUG_MODE 1
 #   else
 #       define OGRE_DEBUG_MODE 0

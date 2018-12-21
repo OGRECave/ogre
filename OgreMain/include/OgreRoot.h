@@ -154,10 +154,8 @@ namespace Ogre
             plugins.
             @param
                 pluginsfile The file that contains plugins information.
-                Defaults to "plugins.cfg" in release and to "plugins_d.cfg"
-                in debug build.
         */
-        void loadPlugins(const String& pluginsfile = "plugins" OGRE_BUILD_SUFFIX ".cfg");
+        void loadPlugins(const String& pluginsfile = "plugins.cfg");
         /** Initialise all loaded plugins - allows plugins to perform actions
             once the renderer is initialised.
         */
@@ -208,14 +206,13 @@ namespace Ogre
 
         /** Constructor
         @param pluginFileName The file that contains plugins information.
-            Defaults to "plugins.cfg" in release build and to "plugins_d.cfg"
-            in debug build. May be left blank to ignore.
+            May be left blank to ignore.
         @param configFileName The file that contains the configuration to be loaded.
             Defaults to "ogre.cfg", may be left blank to load nothing.
         @param logFileName The logfile to create, defaults to Ogre.log, may be 
             left blank if you've already set up LogManager & Log yourself
         */
-        Root(const String& pluginFileName = "plugins" OGRE_BUILD_SUFFIX ".cfg", 
+        Root(const String& pluginFileName = "plugins.cfg",
             const String& configFileName = "ogre.cfg", 
             const String& logFileName = "Ogre.log");
         ~Root();

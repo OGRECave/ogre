@@ -69,19 +69,9 @@ namespace Ogre
 
          @param filename The config file name (without path)
          @return The full path to the config file
-
-         @note on windows the "_d" suffix is appended to the basename in debug mode.
-         E.g. "resource.cfg" becomes "resources_d.cfg"
          */
         Ogre::String getConfigFilePath(Ogre::String filename) const
         {
-            #if OGRE_DEBUG_MODE && OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-                // add OGRE_BUILD_SUFFIX (default: "_d") to config file names
-                Ogre::String::size_type pos = filename.rfind('.');
-                if (pos != Ogre::String::npos)
-                    filename = filename.substr(0, pos) + OGRE_BUILD_SUFFIX + filename.substr(pos);
-            #endif
-
             // look for the requested file in several locations:
             
             // 1. in the writable path (so user can provide custom files)
