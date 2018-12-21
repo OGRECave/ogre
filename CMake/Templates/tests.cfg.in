@@ -1,4 +1,4 @@
 TestFolder=@OGRE_SAMPLES_DIR_REL@
 [VTests]
-TestPlugin=PlayPenTests@OGRE_BUILD_SUFFIX@
-TestPlugin=VTests@OGRE_BUILD_SUFFIX@
+TestPlugin=PlayPenTests
+TestPlugin=VTests

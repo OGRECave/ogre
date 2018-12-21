@@ -214,7 +214,7 @@ void ApplicationContext::createRoot()
 
     if (!Ogre::FileSystemLayer::fileExists(pluginsPath))
     {
-        pluginsPath = Ogre::FileSystemLayer::resolveBundlePath(OGRE_CONFIG_DIR "/plugins" OGRE_BUILD_SUFFIX ".cfg");
+        pluginsPath = Ogre::FileSystemLayer::resolveBundlePath(OGRE_CONFIG_DIR "/plugins.cfg");
     }
 #   endif
 

@@ -1,3 +1,3 @@
 SampleFolder=@OGRE_SAMPLES_DIR_REL@
-SamplePlugin=DefaultSamples@OGRE_BUILD_SUFFIX@
-@OGRE_COMMENT_PLAYPENTESTS@SamplePlugin=PlayPenTests@OGRE_BUILD_SUFFIX@
+SamplePlugin=DefaultSamples
+@OGRE_COMMENT_PLAYPENTESTS@SamplePlugin=PlayPenTests
