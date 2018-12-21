@@ -93,10 +93,10 @@ void SGX_Light_Directional_DiffuseSpecular(
 	if (nDotL > 0.0)
 	{
 		vOutDiffuse  += vDiffuseColour * nDotL;		
-		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower);
 #ifdef NORMALISED
-		vOutSpecular *= (fSpecularPower + 8.0)/(8.0 * M_PI);
+		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
+		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower);
 	}
 	vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
 	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
@@ -161,10 +161,10 @@ void SGX_Light_Point_DiffuseSpecular(
 		float fAtten	   = 1.0 / (vAttParams.y + vAttParams.z*fLightD + vAttParams.w*fLightD*fLightD);					
 		
 		vOutDiffuse  += vDiffuseColour * nDotL * fAtten;
-		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower) * fAtten;
 #ifdef NORMALISED
-		vOutSpecular *= (fSpecularPower + 8.0)/(8.0 * M_PI);
+		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
+		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower) * fAtten;
 	}
 	vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
 	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
@@ -239,10 +239,10 @@ void SGX_Light_Spot_DiffuseSpecular(
 		float fSpotT	= pow(fSpotE, vSpotParams.z);	
 						
 		vOutDiffuse  += vDiffuseColour * nDotL * fAtten * fSpotT;
-		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower) * fAtten * fSpotT;
 #ifdef NORMALISED
-		vOutSpecular *= (fSpecularPower + 8.0)/(8.0 * M_PI);
+		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
+		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower) * fAtten * fSpotT;
 	}
 	vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
 	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
