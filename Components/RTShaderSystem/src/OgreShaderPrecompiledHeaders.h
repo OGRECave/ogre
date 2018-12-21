@@ -71,6 +71,7 @@ THE SOFTWARE.
 
 #include "OgreShaderExPerPixelLighting.h"
 #include "OgreShaderExNormalMapLighting.h"
+#include "OgreShaderCookTorranceLighting.h"
 #include "OgreShaderExIntegratedPSSM3.h"
 #include "OgreShaderExLayeredBlending.h"
 #include "OgreShaderExHardwareSkinningTechnique.h"

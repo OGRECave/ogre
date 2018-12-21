@@ -7,6 +7,7 @@
 
 #define varying in
 #define texture2D texture
+#define textureCube texture
 #define textureCubeLod textureLod
 #define gl_FragColor FragColor
 
@@ -16,6 +17,9 @@ precision highp int;
 precision highp float;
 precision highp samplerCube;
 #endif
+
+#define USE_TEX_LOD
+#include "SGXLib_CookTorrance.glsl"
 
 #define ROUGHNESS_BIAS 0.005
 
@@ -111,55 +115,6 @@ uniform vec2 in_scale_d2;
 	uniform sampler2D in_map_d2_f0;
 	uniform float in_blendfactor1_d2_f0;
 @end
-
-
-// ---------------------------------
-// Pysicaly base shading functins
-// ---------------------------------
-
-// geometricShadowing / (4 * NoL * NoV)
-float visibilityTermGgx(float NoV, float NoL, float a2)
-{
-	float G_V = NoV + sqrt( (NoV - NoV * a2) * NoV + a2 );
-	float G_L = NoL + sqrt( (NoL - NoL * a2) * NoL + a2 );
-	return 1.0 / (G_V * G_L);
-}
-vec3 microfacetBRDF_GGX( float NoV, float NoL, float NoH, float VoH, vec3 halfVec, vec3 tangent, vec3 binormal, vec3 alpha, vec3 alpha2 , vec3 f0)
-{
-	float denom, D;
-	if(length(tangent) > 0.5)
-	{
-		// Anisotropic GGX Distribution
-		float ToH = dot( tangent, halfVec);
-		float BoH = dot( binormal, halfVec);
-		denom = (ToH * ToH) / alpha2.x + (BoH * BoH) / alpha2.y + NoH * NoH;
-		D = 1.0 / (alpha.x * alpha.y * denom * denom);
-	}
-	else
-	{
-		// if the tangent is 0 use the
-		// isotropic GGX Distribution
-		denom = NoH * NoH * (alpha2.z - 1.0) + 1.0;
-		D = alpha2.z / (denom * denom);
-	}
-
-	// F
-	vec3 F = f0 + (1.0 - f0) * pow( 1.0 - VoH, 5.0 );
-
-	// Vis
-	float vis = visibilityTermGgx(NoV, NoL, alpha2.z);
-
-	return D * F * vis;
-}
-
-vec3 diffuseBRDF_Disney(float NoV, float NoL, float NoH, float VoH, float roughness, vec3 f0)
-{
-	float Fd90 = 0.5 + 2.0 * roughness * VoH * VoH;
-	vec3 invF0 = vec3(1.0, 1.0, 1.0) - f0;
-	float dim = min(invF0.r, min(invF0.g, invF0.b));
-	float result = ((1.0 + (Fd90 - 1.0) * pow(1.0 - NoL, 5.0 )) * (1.0 + (Fd90 - 1.0) * pow(1.0 - NoV, 5.0 ))) * dim;
-	return vec3(result, result, result);
-}
 
 // ----------------------------------------------------------------------------------
 // Blend functions
@@ -299,10 +254,7 @@ void main()
 		float NoH = clamp( dot( normal_es, halfWay_es ), 0.00001, 1.0 );
 		float VoH = clamp( dot( viewDir_es, halfWay_es ), 0.00001, 1.0 );
 		
-		vec3 fs = microfacetBRDF_GGX(NoV, NoL, NoH, VoH, halfWay_es, tangent_es, binormal_es, alpha, alpha2, f0);
-		vec3 fd = diffuseBRDF_Disney(NoV, NoL, NoH, VoH, roughnessBiased.z, f0);
-		
-		finalColour += (fd * albedoColor.xyz + fs) * lightColors[@n].xyz * NoL;
+		finalColour += getPointShade(albedoColor.xyz, alpha.z, f0, vec3(1.0), NoL, NoV, NoH, VoH) * lightColors[@n].xyz;
 	}
 	@end
 	
@@ -330,11 +282,8 @@ void main()
 			float NoL = clamp( dot( normal_es, lightDir_es), 0.0, 1.0 );
 			float NoH = clamp( dot( normal_es, halfWay_es ), 0.00001, 1.0 );
 			float VoH = clamp( dot( viewDir_es, halfWay_es ), 0.00001, 1.0 );
-		
-			vec3 fs = microfacetBRDF_GGX(NoV, NoL, NoH, VoH, halfWay_es, tangent_es, binormal_es, alpha, alpha2, f0);
-			vec3 fd = diffuseBRDF_Disney(NoV, NoL, NoH, VoH, roughnessBiased.z, f0);
 
-			finalColour += (fd * albedoColor.xyz + fs) * lightColors[@n].xyz * NoL * atten;
+			finalColour += getPointShade(albedoColor.xyz, alpha.z, f0, vec3(1.0), NoL, NoV, NoH, VoH) * lightColors[@n].xyz * atten;
 		}
 	}
 	@end
@@ -364,10 +313,7 @@ void main()
 				float NoH = clamp( dot( normal_es, halfWay_es ), 0.00001, 1.0 );
 				float VoH = clamp( dot( viewDir_es, halfWay_es ), 0.00001, 1.0 );
 			
-				vec3 fs = microfacetBRDF_GGX(NoV, NoL, NoH, VoH, halfWay_es, tangent_es, binormal_es, alpha, alpha2, f0);
-				vec3 fd = diffuseBRDF_Disney(NoV, NoL, NoH, VoH, roughnessBiased.z, f0);
-			
-				finalColour += (fd * albedoColor.xyz + fs) * lightColors[@n].xyz * NoL * atten * spotEffect;
+				finalColour += getPointShade(albedoColor.xyz, alpha.z, f0, vec3(1.0), NoL, NoV, NoH, VoH) * lightColors[@n].xyz * atten * spotEffect;
 			}
 		}
 	}
@@ -401,10 +347,10 @@ void main()
 		float NoH = 1.0;
 		float VoH = NoV;
 
-		vec3 fs = (f0 + (1.0 - f0) * pow( 1.0 - NoV, 5.0 ));
-        vec3 fd = diffuseBRDF_Disney(NoV, NoL, NoH, VoH, rBiased, f0);
+		vec3 fs = specularReflection(f0, vec3(1.0), VoH);
+        vec3 fd = diffuse(albedoColor.xyz);
 
-		finalColour += (fd * albedoColor.xyz * cubeColorGlobal + fs * cubeColor) * NoL * in_map_environment_intensity;
+		finalColour += (fd * cubeColorGlobal + fs * cubeColor) * NoL * in_map_environment_intensity;
 	}
 	@end
 

@@ -63,6 +63,7 @@
 #   include "ShaderSystem.h"
 #   include "ShaderSystemTexturedFog.h"
 #   include "ShaderSystemMultiLight.h"
+#   include "ShaderSystemPBR.h"
 #endif
 #include "Shadows.h"
 #include "SkeletalAnimation.h"
@@ -128,6 +129,7 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_ShaderSystem);
     addSample(new Sample_ShaderSystemTexturedFog);
     addSample(new Sample_ShaderSystemMultiLight);
+    addSample(new Sample_ShaderSystemPBR);
 #endif
     addSample(new Sample_BSP);
     addSample(new Sample_CelShading);

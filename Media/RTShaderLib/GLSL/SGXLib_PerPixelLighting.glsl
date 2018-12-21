@@ -35,8 +35,21 @@ THE SOFTWARE.
 // See http://msdn.microsoft.com/en-us/library/bb147178.aspx
 //-----------------------------------------------------------------------------
 
+#include "SGXLib_CookTorrance.glsl"
+
 #define M_PI 3.141592654
 
+void cookTorrance(vec3 baseColor, float metallic, float perceptualRoughness, float VdotH, float NdotL, float NdotV, float NdotH, out vec3 diffuseContrib)
+{
+    float alphaRoughness;
+    vec3 specularColor;
+    vec3 specularEnvironmentR90;
+    getMetallicRoughSpecularParams(baseColor, metallic, perceptualRoughness, alphaRoughness, specularColor, specularEnvironmentR90);
+    vec3 diffuseColor = baseColor - specularColor;
+
+    // Calculation of analytical lighting contribution
+    diffuseContrib = getPointShade(diffuseColor, alphaRoughness, specularColor, specularEnvironmentR90, NdotL, NdotV, NdotH, VdotH)*M_PI;
+}
 //-----------------------------------------------------------------------------
 void SGX_FetchNormal(in sampler2D s,
 				   in vec2 uv,
@@ -67,6 +80,10 @@ void SGX_Light_Directional_DiffuseSpecular(
 					in vec3 vDiffuseColour, 
 					in vec3 vSpecularColour, 
 					in float fSpecularPower,
+#ifdef COOK_TORRANCE
+					in vec3 vSurfaceDiffuse, 
+					in float metallic, 
+#endif
 					inout vec3 vOutDiffuse,
 					inout vec3 vOutSpecular)
 {
@@ -78,11 +95,24 @@ void SGX_Light_Directional_DiffuseSpecular(
 	
 	if (nDotL > 0.0)
 	{
+#ifdef COOK_TORRANCE
+		float roughness = fSpecularPower;
+
+        float nDotV = abs(dot(vNormal, vView)) + 1e-5;
+        float vDotH = clamp(dot(vView, vHalfWay), 0.0, 1.0);
+
+		vec3 lightContrib;
+		cookTorrance(vSurfaceDiffuse, metallic, roughness, vDotH, nDotL, nDotV, nDotH, lightContrib);
+
+        // already contains diffuse + specular
+		vOutDiffuse  += lightContrib * vDiffuseColour * nDotL;		
+#else
 		vOutDiffuse  += vDiffuseColour * nDotL;		
 #ifdef NORMALISED
 		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
 		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower);
+#endif
         vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
 	    vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
 	}
@@ -120,6 +150,10 @@ void SGX_Light_Point_DiffuseSpecular(
 				    in vec3 vDiffuseColour, 
 				    in vec3 vSpecularColour, 
 					in float fSpecularPower,
+#ifdef COOK_TORRANCE
+					in vec3 vSurfaceDiffuse, 
+					in float metallic,
+#endif
 					inout vec3 vOutDiffuse,
 					inout vec3 vOutSpecular)
 {
@@ -127,19 +161,31 @@ void SGX_Light_Point_DiffuseSpecular(
 	vLightView		   = normalize(vLightView);	
 	vec3 vNormalView = normalize(vNormal);
 	float nDotL        = dot(vNormalView, vLightView);	
-		
+
 	if (nDotL > 0.0 && fLightD <= vAttParams.x)
 	{					
 		vec3 vView       = normalize(vViewDir);
 		vec3 vHalfWay    = normalize(vView + vLightView);		
 		float nDotH        = dot(vNormalView, vHalfWay);
 		float fAtten	   = 1.0 / (vAttParams.y + vAttParams.z*fLightD + vAttParams.w*fLightD*fLightD);					
-		
+
+#ifdef COOK_TORRANCE
+		float roughness = fSpecularPower;
+
+        float nDotV = abs(dot(vNormal, vView)) + 1e-5;
+        float vDotH = clamp(dot(vView, vHalfWay), 0.0, 1.0);
+
+		vec3 lightContrib;
+		cookTorrance(vSurfaceDiffuse, metallic, roughness, vDotH, nDotL, nDotV, nDotH, lightContrib);
+
+		vOutDiffuse  += lightContrib * vDiffuseColour * nDotL * fAtten;
+#else
 		vOutDiffuse  += vDiffuseColour * nDotL * fAtten;
 #ifdef NORMALISED
 		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
 		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower) * fAtten;
+#endif
 
         vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
         vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
@@ -184,6 +230,10 @@ void SGX_Light_Spot_DiffuseSpecular(
 				    in vec3 vDiffuseColour, 
 				    in vec3 vSpecularColour, 
 					in float fSpecularPower,
+#ifdef COOK_TORRANCE
+					in vec3 vSurfaceDiffuse, 
+					in float metallic,
+#endif
 					inout vec3 vOutDiffuse,
 					inout vec3 vOutSpecular)
 {
@@ -202,12 +252,24 @@ void SGX_Light_Spot_DiffuseSpecular(
 		float rho		= dot(vNegLightDirView, vLightView);						
 		float fSpotE	= clamp((rho - vSpotParams.y) / (vSpotParams.x - vSpotParams.y), 0.0, 1.0);
 		float fSpotT	= pow(fSpotE, vSpotParams.z);	
-						
+
+#ifdef COOK_TORRANCE
+		float roughness = fSpecularPower;
+
+        float nDotV = abs(dot(vNormal, vView)) + 1e-5;
+        float vDotH = clamp(dot(vView, vHalfWay), 0.0, 1.0);
+
+		vec3 lightContrib;
+		cookTorrance(vSurfaceDiffuse, metallic, roughness, vDotH, nDotL, nDotV, nDotH, lightContrib);
+
+		vOutDiffuse  += lightContrib * vDiffuseColour * nDotL * fAtten * fSpotT;
+#else
 		vOutDiffuse  += vDiffuseColour * nDotL * fAtten * fSpotT;
 #ifdef NORMALISED
 		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
 		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower) * fAtten * fSpotT;
+#endif
         vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
         vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
 	}

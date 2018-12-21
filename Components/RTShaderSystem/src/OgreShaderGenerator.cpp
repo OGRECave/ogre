@@ -279,6 +279,10 @@ void ShaderGenerator::createBuiltinSRSFactories()
         curFactory = OGRE_NEW HardwareSkinningFactory;  
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
+
+        curFactory = OGRE_NEW CookTorranceLightingFactory;
+        addSubRenderStateFactory(curFactory);
+        mBuiltinSRSFactories.push_back(curFactory);
     }
 
     curFactory = OGRE_NEW TextureAtlasSamplerFactory;

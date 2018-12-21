@@ -8,6 +8,7 @@
 #include "OgreAdvancedRenderControls.h"
 #include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
+#include "OgreShaderCookTorranceLighting.h"
 
 #include "OgreTrays.h"
 
@@ -180,7 +181,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
         // Add per pixel lighting sub render state to the global scheme render state.
         // It will override the default FFP lighting sub render state.
         if (useFFPLighting) {
-            auto perPixelLightModel = mShaderGenerator->createSubRenderState<Ogre::RTShader::FFPLighting>();
+            auto perPixelLightModel = mShaderGenerator->createSubRenderState<Ogre::RTShader::CookTorranceLighting>();
 
             schemRenderState->addTemplateSubRenderState(perPixelLightModel);
         }
@@ -190,7 +191,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
         else {
             for (auto srs : schemRenderState->getTemplateSubRenderStateList()) {
                 // This is the per pixel sub render state -> remove it.
-                if (dynamic_cast<Ogre::RTShader::FFPLighting*>(srs)) {
+                if (dynamic_cast<Ogre::RTShader::CookTorranceLighting*>(srs)) {
                     schemRenderState->removeTemplateSubRenderState(srs);
                     break;
                 }
