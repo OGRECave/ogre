@@ -32,6 +32,7 @@ THE SOFTWARE.
 // Language: CG
 //-----------------------------------------------------------------------------
 #define M_PI 3.141592654
+
 //-----------------------------------------------------------------------------
 void SGX_TransformNormal(in float4x4 m, 
 				   in float3 v, 
@@ -88,10 +89,10 @@ void SGX_Light_Directional_DiffuseSpecular(
 	if (nDotL > 0)
 	{
 		vOutDiffuse  += vDiffuseColour * nDotL;		
-		vOutSpecular += vSpecularColour * pow(saturate(nDotH), fSpecularPower);
 #ifdef NORMALISED
-		vOutSpecular *= (fSpecularPower + 8.0)/(8.0 * M_PI);
+		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
+		vOutSpecular += vSpecularColour * pow(saturate(nDotH), fSpecularPower);
 	}
 	vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
 	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
@@ -156,10 +157,10 @@ void SGX_Light_Point_DiffuseSpecular(
 		float fAtten	   = 1 / (vAttParams.y + vAttParams.z*fLightD + vAttParams.w*fLightD*fLightD);					
 		
 		vOutDiffuse  += vDiffuseColour * nDotL * fAtten;
-		vOutSpecular += vSpecularColour * pow(saturate(nDotH), fSpecularPower) * fAtten;
 #ifdef NORMALISED
-		vOutSpecular *= (fSpecularPower + 8.0)/(8.0 * M_PI);
+		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
+		vOutSpecular += vSpecularColour * pow(saturate(nDotH), fSpecularPower) * fAtten;
 	}		
 	vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
 	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
@@ -234,10 +235,10 @@ void SGX_Light_Spot_DiffuseSpecular(
 		float fSpotT	= pow(fSpotE, vSpotParams.z);	
 						
 		vOutDiffuse  += vDiffuseColour * nDotL * fAtten * fSpotT;
-		vOutSpecular += vSpecularColour * pow(saturate(nDotH), fSpecularPower) * fAtten * fSpotT;
 #ifdef NORMALISED
-		vOutSpecular *= (fSpecularPower + 8.0)/(8.0 * M_PI);
+		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
+		vOutSpecular += vSpecularColour * pow(saturate(nDotH), fSpecularPower) * fAtten * fSpotT;
 	}		
 	vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
 	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
