@@ -372,7 +372,7 @@ namespace Ogre {
                             if (formatSupported)
                             {
                                 // Add mode to allowed modes
-                                str << "D" << depthBits[depth] << "S" << stencilBits[stencil] << " ";
+                                str << StringUtil::format("D%dS%d ", depthBits[depth], stencilBits[stencil]);
                                 FormatProperties::Mode mode = {depth, stencil};
                                 mProps[x].modes.push_back(mode);
                             }
@@ -393,7 +393,7 @@ namespace Ogre {
                         if (formatSupported)
                         {
                             // Add mode to allowed modes
-                            str << "Packed-D" << depthBits[depth] << "S" << 8 << " ";
+                            str << "Packed-D" << int(depthBits[depth]) << "S8 ";
                             FormatProperties::Mode mode = {depth, 0}; // stencil unused
                             mProps[x].modes.push_back(mode);
                         }
