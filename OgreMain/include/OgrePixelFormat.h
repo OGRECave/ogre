@@ -79,27 +79,8 @@ namespace Ogre {
         PF_A8B8G8R8,
         /// 32-bit pixel format, 8 bits for blue, green, red and alpha.
         PF_B8G8R8A8,
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        /// 3 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue
-        PF_BYTE_RGB = PF_R8G8B8,
-        /// 3 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red
-        PF_BYTE_BGR = PF_B8G8R8,
-        /// 4 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red and one byte for alpha
-        PF_BYTE_BGRA = PF_B8G8R8A8,
-        /// 4 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue, and one byte for alpha
-        PF_BYTE_RGBA = PF_R8G8B8A8,
-#else
-        /// 3 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue
-        PF_BYTE_RGB = PF_B8G8R8,
-        /// 3 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red
-        PF_BYTE_BGR = PF_R8G8B8,
-        /// 4 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red and one byte for alpha
-        PF_BYTE_BGRA = PF_A8R8G8B8,
-        /// 4 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue, and one byte for alpha
-        PF_BYTE_RGBA = PF_A8B8G8R8,
-#endif        
         /// 32-bit pixel format, 2 bits for alpha, 10 bits for red, green and blue.
-        PF_A2R10G10B10 = PF_B8G8R8A8 + 1, // ensure steady continuing enumeration
+        PF_A2R10G10B10,
         /// 32-bit pixel format, 10 bits for blue, green and red, 2 bits for alpha.
         PF_A2B10G10R10,
         /// DDS (DirectDraw Surface) DXT1 format
@@ -288,7 +269,27 @@ namespace Ogre {
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 12x12)
         PF_ASTC_RGBA_12X12_LDR,
         /// Number of pixel formats currently defined
-        PF_COUNT
+        PF_COUNT,
+        // endianess aware aliases
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+        /// @copydoc PF_R8G8B8
+        PF_BYTE_RGB = PF_R8G8B8,
+        /// @copydoc PF_B8G8R8
+        PF_BYTE_BGR = PF_B8G8R8,
+        /// @copydoc PF_B8G8R8A8
+        PF_BYTE_BGRA = PF_B8G8R8A8,
+        /// @copydoc PF_R8G8B8A8
+        PF_BYTE_RGBA = PF_R8G8B8A8,
+#else
+        /// @copydoc PF_B8G8R8
+        PF_BYTE_RGB = PF_B8G8R8,
+        /// @copydoc PF_R8G8B8
+        PF_BYTE_BGR = PF_R8G8B8,
+        /// @copydoc PF_A8R8G8B8
+        PF_BYTE_BGRA = PF_A8R8G8B8,
+        /// @copydoc PF_A8B8G8R8
+        PF_BYTE_RGBA = PF_A8B8G8R8,
+#endif
     };
     typedef std::vector<PixelFormat> PixelFormatList;
 
