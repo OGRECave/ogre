@@ -77,7 +77,7 @@ namespace Ogre
         if( mMatrixTexture )
             TextureManager::getSingleton().remove( mMatrixTexture );
 
-        OGRE_FREE(mTempTransformsArray3x4, MEMCATEGORY_GENERAL);
+        delete[] mTempTransformsArray3x4;
     }
 
     //-----------------------------------------------------------------------
@@ -248,7 +248,7 @@ namespace Ogre
 
         if(mUseBoneDualQuaternions && !mTempTransformsArray3x4)
         {
-            mTempTransformsArray3x4 = OGRE_ALLOC_T(float, mMatricesPerInstance * 3 * 4, MEMCATEGORY_GENERAL);
+            mTempTransformsArray3x4 = new Matrix3x4f[mMatricesPerInstance];
         }
         
         mNumWorldMatrices = uniqueAnimations * mMatricesPerInstance;
@@ -295,23 +295,14 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    size_t BaseInstanceBatchVTF::convert3x4MatricesToDualQuaternions(float* matrices, size_t numOfMatrices, float* outDualQuaternions)
+    size_t BaseInstanceBatchVTF::convert3x4MatricesToDualQuaternions(Matrix3x4f* matrices, size_t numOfMatrices, float* outDualQuaternions)
     {
         DualQuaternion dQuat;
-        Affine3 matrix;
         size_t floatsWritten = 0;
 
         for (size_t m = 0; m < numOfMatrices; ++m)
         {
-            for(int i = 0; i < 3; ++i)
-            {
-                for(int b = 0; b < 4; ++b)
-                {
-                    matrix[i][b] = *matrices++;
-                }
-            }
-            
-            dQuat.fromTransformationMatrix(matrix);
+            dQuat.fromTransformationMatrix(Affine3(matrices[m][0]));
             
             //Copy the 2x4 matrix
             for(int i = 0; i < 8; ++i)
@@ -336,7 +327,7 @@ namespace Ogre
         InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
         InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-        float* transforms;
+        Matrix3x4f* transforms;
 
         //If using dual quaternion skinning, write the transforms to a temporary buffer,
         //then convert to dual quaternions, then later write to the pixel buffer
@@ -347,7 +338,7 @@ namespace Ogre
         }
         else
         {
-            transforms = pDest;
+            transforms = (Matrix3x4f*)pDest;
         }
 
         
@@ -356,7 +347,7 @@ namespace Ogre
             size_t floatsWritten = (*itor)->getTransforms3x4( transforms );
 
             if( mManager->getCameraRelativeRendering() )
-                makeMatrixCameraRelative3x4( transforms, floatsWritten );
+                makeMatrixCameraRelative3x4( transforms, floatsWritten / 12 );
 
             if(mUseBoneDualQuaternions)
             {
@@ -365,7 +356,7 @@ namespace Ogre
             }
             else
             {
-                transforms += floatsWritten;
+                transforms += floatsWritten / 12;
             }
             
             ++itor;

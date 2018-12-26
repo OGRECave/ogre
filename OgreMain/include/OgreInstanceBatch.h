@@ -91,6 +91,7 @@ namespace Ogre
         typedef std::vector<InstancedEntity*>  InstancedEntityVec;
         typedef std::vector<Vector4>           CustomParamsVec;
     protected:
+        typedef TransformBase<3, float>        Matrix3x4f;
         RenderOperation     mRenderOperation;
         size_t              mInstancesPerBatch;
 
@@ -154,7 +155,7 @@ namespace Ogre
             takes number of floats in the array, not number of matrices. Assumes mCachedCamera
             contains the camera which is about to be rendered to.
         */
-        void makeMatrixCameraRelative3x4( float *mat3x4, size_t numFloats );
+        void makeMatrixCameraRelative3x4( Matrix3x4f *mat3x4, size_t count );
 
         /// Returns false on errors that would prevent building this batch from the given submesh
         virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );

@@ -224,19 +224,13 @@ namespace Ogre
         mUnusedEntities.clear();
     }
     //-----------------------------------------------------------------------
-    void InstanceBatch::makeMatrixCameraRelative3x4( float *mat3x4, size_t numFloats )
+    void InstanceBatch::makeMatrixCameraRelative3x4( Matrix3x4f *mat3x4, size_t count )
     {
         const Vector3 &cameraRelativePosition = mCurrentCamera->getDerivedPosition();
 
-        for( size_t i=0; i<numFloats >> 2; i += 3 )
+        for( size_t i=0; i<count; i++ )
         {
-            const Vector3 worldTrans( mat3x4[(i+0) * 4 + 3], mat3x4[(i+1) * 4 + 3],
-                                        mat3x4[(i+2) * 4 + 3] );
-            const Vector3 newPos( worldTrans - cameraRelativePosition );
-
-            mat3x4[(i+0) * 4 + 3] = (float)newPos.x;
-            mat3x4[(i+1) * 4 + 3] = (float)newPos.y;
-            mat3x4[(i+2) * 4 + 3] = (float)newPos.z;
+            mat3x4[i].setTrans(mat3x4[i].getTrans() - cameraRelativePosition);
         }
     }
     //-----------------------------------------------------------------------
