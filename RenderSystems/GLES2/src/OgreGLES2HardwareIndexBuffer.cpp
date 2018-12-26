@@ -116,11 +116,9 @@ namespace Ogre {
     {
         if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
         {
-            const void *srcData = mShadowBuffer->lock(mLockStart, mLockSize, HBL_READ_ONLY);
+            HardwareBufferLockGuard shadowLock(mShadowBuffer.get(), mLockStart, mLockSize, HBL_READ_ONLY);
+            mBuffer.writeData(mLockStart, mLockSize, shadowLock.pData, false);
 
-            mBuffer.writeData(mLockStart, mLockSize, srcData, false);
-
-            mShadowBuffer->unlock();
             mShadowUpdated = false;
         }
     }

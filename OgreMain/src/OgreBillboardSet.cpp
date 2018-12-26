@@ -816,10 +816,8 @@ namespace Ogre {
                 2-----3
             */
 
-            ushort* pIdx = static_cast<ushort*>(
-                mIndexData->indexBuffer->lock(0,
-                  mIndexData->indexBuffer->getSizeInBytes(),
-                  HardwareBuffer::HBL_DISCARD) );
+            HardwareBufferLockGuard indexLock(mIndexData->indexBuffer, HardwareBuffer::HBL_DISCARD);
+            ushort* pIdx = static_cast<ushort*>(indexLock.pData);
 
             for(
                 size_t idx, idxOff, bboard = 0;
@@ -838,8 +836,6 @@ namespace Ogre {
                 pIdx[idx+5] = static_cast<unsigned short>(idxOff + 3);
 
             }
-
-            mIndexData->indexBuffer->unlock();
         }
         mBuffersCreated = true;
     }

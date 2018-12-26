@@ -143,7 +143,8 @@ namespace Ogre
         const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );
         
         HardwareVertexBufferSharedPtr buff = baseVertexData->vertexBufferBinding->getBuffer(ve->getSource());
-        char const *baseBuffer = static_cast<char const*>(buff->lock( HardwareBuffer::HBL_READ_ONLY ));
+        HardwareBufferLockGuard baseVertexLock(buff, HardwareBuffer::HBL_READ_ONLY);
+        char const *baseBuffer = static_cast<char const*>(baseVertexLock.pData);
 
         for( size_t i=0; i<baseVertexData->vertexCount; ++i )
         {
@@ -160,8 +161,6 @@ namespace Ogre
 
             baseBuffer += baseVertexData->vertexDeclaration->getVertexSize(ve->getSource());
         }
-
-        buff->unlock();
     }
 
     //-----------------------------------------------------------------------
@@ -171,7 +170,8 @@ namespace Ogre
         const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );
         
         HardwareVertexBufferSharedPtr buff = baseVertexData->vertexBufferBinding->getBuffer(ve->getSource());
-        char const *baseBuffer = static_cast<char const*>(buff->lock( HardwareBuffer::HBL_READ_ONLY ));
+        HardwareBufferLockGuard baseVertexLock(buff, HardwareBuffer::HBL_READ_ONLY);
+        char const *baseBuffer = static_cast<char const*>(baseVertexLock.pData);
 
         for( size_t i=0; i<baseVertexData->vertexCount * mWeightCount; i += mWeightCount)
         {
@@ -194,8 +194,6 @@ namespace Ogre
 
             baseBuffer += baseVertexData->vertexDeclaration->getVertexSize(ve->getSource());
         }
-
-        buff->unlock();
     }
     
     //-----------------------------------------------------------------------
@@ -319,7 +317,7 @@ namespace Ogre
     void BaseInstanceBatchVTF::updateVertexTexture(void)
     {
         //Now lock the texture and copy the 4x3 matrices!
-        mMatrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
+        HardwareBufferLockGuard matTexLock(mMatrixTexture->getBuffer(), HardwareBuffer::HBL_DISCARD);
         const PixelBox &pixelBox = mMatrixTexture->getBuffer()->getCurrentLock();
 
         float *pDest = reinterpret_cast<float*>(pixelBox.data);
@@ -361,8 +359,6 @@ namespace Ogre
             
             ++itor;
         }
-        
-        mMatrixTexture->getBuffer()->unlock();
     }
     /** update the lookup numbers for entities with shared transforms */
     void BaseInstanceBatchVTF::updateSharedLookupIndexes()
@@ -527,8 +523,10 @@ namespace Ogre
             HardwareVertexBufferSharedPtr baseVertexBuffer =
                 baseVertexData->vertexBufferBinding->getBuffer(i);
 
-            char* thisBuf = static_cast<char*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-            char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
+            HardwareBufferLockGuard thisLock(vertexBuffer, HardwareBuffer::HBL_DISCARD);
+            HardwareBufferLockGuard baseLock(baseVertexBuffer, HardwareBuffer::HBL_READ_ONLY);
+            char* thisBuf = static_cast<char*>(thisLock.pData);
+            char* baseBuf = static_cast<char*>(baseLock.pData);
 
             //Copy and repeat
             for( size_t j=0; j<mInstancesPerBatch; ++j )
@@ -537,9 +535,6 @@ namespace Ogre
                     baseVertexData->vertexDeclaration->getVertexSize(i);
                 memcpy( thisBuf + j * sizeOfBuffer, baseBuf, sizeOfBuffer );
             }
-
-            baseVertexBuffer->unlock();
-            vertexBuffer->unlock();
         }
 
         createVertexTexture( baseSubMesh );
@@ -562,29 +557,24 @@ namespace Ogre
         if( mRenderOperation.vertexData->vertexCount > 65535 )
             indexType = HardwareIndexBuffer::IT_32BIT;
         thisIndexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
-            indexType, thisIndexData->indexCount,
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+            indexType, thisIndexData->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 
-        void *buf           = thisIndexData->indexBuffer->lock( HardwareBuffer::HBL_DISCARD );
-        void const *baseBuf = baseIndexData->indexBuffer->lock( HardwareBuffer::HBL_READ_ONLY );
-
-        uint16 *thisBuf16 = static_cast<uint16*>(buf);
-        uint32 *thisBuf32 = static_cast<uint32*>(buf);
+        HardwareBufferLockGuard thisLock(thisIndexData->indexBuffer, HardwareBuffer::HBL_DISCARD);
+        HardwareBufferLockGuard baseLock(baseIndexData->indexBuffer, HardwareBuffer::HBL_READ_ONLY);
+        uint16 *thisBuf16 = static_cast<uint16*>(thisLock.pData);
+        uint32 *thisBuf32 = static_cast<uint32*>(thisLock.pData);
+        bool baseIndex16bit = baseIndexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT;
 
         for( size_t i=0; i<mInstancesPerBatch; ++i )
         {
             const size_t vertexOffset = i * mRenderOperation.vertexData->vertexCount / mInstancesPerBatch;
 
-            uint16 const *initBuf16 = static_cast<uint16 const *>(baseBuf);
-            uint32 const *initBuf32 = static_cast<uint32 const *>(baseBuf);
+            const uint16 *initBuf16 = static_cast<const uint16 *>(baseLock.pData);
+            const uint32 *initBuf32 = static_cast<const uint32 *>(baseLock.pData);
 
             for( size_t j=0; j<baseIndexData->indexCount; ++j )
             {
-                uint32 originalVal;
-                if( baseSubMesh->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT )
-                    originalVal = *initBuf16++;
-                else
-                    originalVal = *initBuf32++;
+                uint32 originalVal = baseIndex16bit ? *initBuf16++ : *initBuf32++;
 
                 if( indexType == HardwareIndexBuffer::IT_16BIT )
                     *thisBuf16++ = static_cast<uint16>(originalVal + vertexOffset);
@@ -592,9 +582,6 @@ namespace Ogre
                     *thisBuf32++ = static_cast<uint32>(originalVal + vertexOffset);
             }
         }
-
-        baseIndexData->indexBuffer->unlock();
-        thisIndexData->indexBuffer->unlock();
     }
     //-----------------------------------------------------------------------
     void InstanceBatchVTF::createVertexSemantics( 
@@ -641,7 +628,8 @@ namespace Ogre
             HardwareBuffer::HBU_STATIC_WRITE_ONLY );
         thisVertexData->vertexBufferBinding->setBinding( newSource, vertexBuffer );
 
-        float *thisFloat = static_cast<float*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+        HardwareBufferLockGuard vertexLock(vertexBuffer, HardwareBuffer::HBL_DISCARD);
+        float *thisFloat = static_cast<float*>(vertexLock.pData);
         
         //Copy and repeat
         for( size_t i=0; i<mInstancesPerBatch; ++i )
@@ -694,9 +682,6 @@ namespace Ogre
                 }
             }
         }
-
-        vertexBuffer->unlock();
-
     }
     //-----------------------------------------------------------------------
     size_t InstanceBatchVTF::calculateMaxNumInstances( 

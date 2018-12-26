@@ -251,8 +251,8 @@ namespace Ogre {
 
         HardwareVertexBufferSharedPtr vbuf =
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
-        float* pPos = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        float* pPos = static_cast<float*>(vbufLock.pData);
 
         // Use the furthest away depth value, since materials should have depth-check off
         // This initialised the depth buffer for any 3D objects in front
@@ -272,8 +272,6 @@ namespace Ogre {
         *pPos++ = right;
         *pPos++ = bottom;
         *pPos++ = zValue;
-
-        vbuf->unlock();
     }
     //---------------------------------------------------------------------
     void PanelOverlayElement::updateTextureGeometry(void)
@@ -329,8 +327,8 @@ namespace Ogre {
             {
                 HardwareVertexBufferSharedPtr vbuf =
                     mRenderOp.vertexData->vertexBufferBinding->getBuffer(TEXCOORD_BINDING);
-                float* pVBStart = static_cast<float*>(
-                    vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+                HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+                float* pVBStart = static_cast<float*>(vbufLock.pData);
 
                 size_t uvSize = VertexElement::getTypeSize(VET_FLOAT2) / sizeof(float);
                 size_t vertexSize = decl->getVertexSize(TEXCOORD_BINDING) / sizeof(float);
@@ -366,7 +364,6 @@ namespace Ogre {
                     pTex[0] = upperX;
                     pTex[1] = upperY;
                 }
-                vbuf->unlock();
             }
         }
     }

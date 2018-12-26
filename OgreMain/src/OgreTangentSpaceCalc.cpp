@@ -125,7 +125,8 @@ namespace Ogre
                 newBuf->copyData(*(srcbuf.get()), 0, 0, srcbuf->getNumVertices() * srcbuf->getVertexSize(), true);
 
                 // Split vertices, read / write from new buffer
-                char* pBase = static_cast<char*>(newBuf->lock(HardwareBuffer::HBL_NORMAL));
+                HardwareBufferLockGuard newBufLock(newBuf, HardwareBuffer::HBL_NORMAL);
+                char* pBase = static_cast<char*>(newBufLock.pData);
                 for (VertexSplits::iterator spliti = vertexSplits.begin(); 
                     spliti != vertexSplits.end(); ++spliti)
                 {
@@ -133,8 +134,6 @@ namespace Ogre
                     char* pDstBase = pBase + spliti->second * newBuf->getVertexSize();
                     memcpy(pDstBase, pSrcBase, newBuf->getVertexSize());
                 }
-                newBuf->unlock();
-
             }
 
             // Update vertex data
@@ -162,8 +161,10 @@ namespace Ogre
                             HardwareIndexBuffer::IT_32BIT, indexCount,
                             srcbuf->getUsage(), srcbuf->hasShadowBuffer());
 
-                        uint16* pSrcBase = static_cast<uint16*>(srcbuf->lock(HardwareBuffer::HBL_NORMAL));
-                        uint32* pBase = static_cast<uint32*>(newBuf->lock(HardwareBuffer::HBL_NORMAL));
+                        HardwareBufferLockGuard srcBufLock(srcbuf, HardwareBuffer::HBL_NORMAL);
+                        HardwareBufferLockGuard newBufLock(newBuf, HardwareBuffer::HBL_NORMAL);
+                        uint16* pSrcBase = static_cast<uint16*>(srcBufLock.pData);
+                        uint32* pBase = static_cast<uint32*>(newBufLock.pData);
 
                         size_t j = 0;
                         while (j < indexCount)
@@ -171,9 +172,6 @@ namespace Ogre
                             *pBase++ = *pSrcBase++;
                             ++j;
                         }
-
-                        srcbuf->unlock();
-                        newBuf->unlock();
 
                         // assign new index buffer.
                         idata->indexBuffer = newBuf;
@@ -192,17 +190,15 @@ namespace Ogre
             IndexData* idata = mIDataList[i];
             // Now do index data
             // no new buffer required, same size but some triangles remapped
+            HardwareBufferLockGuard indexLock(idata->indexBuffer, HardwareBuffer::HBL_NORMAL);
             if (idata->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
             {
-                uint32* p32 = static_cast<uint32*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
-                remapIndexes(p32, i, res);
+                remapIndexes(static_cast<uint32*>(indexLock.pData), i, res);
             }
             else
             {
-                uint16* p16 = static_cast<uint16*>(idata->indexBuffer->lock(HardwareBuffer::HBL_NORMAL));
-                remapIndexes(p16, i, res);
+                remapIndexes(static_cast<uint16*>(indexLock.pData), i, res);
             }
-            idata->indexBuffer->unlock();
         }
 
     }
@@ -253,26 +249,12 @@ namespace Ogre
             RenderOperation::OperationType opType = mOpTypes[i];
 
             // Read data from buffers
-            uint16 *p16 = 0;
-            uint32 *p32 = 0;
-
             HardwareIndexBufferSharedPtr ibuf = i_in->indexBuffer;
-
+            HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_READ_ONLY);
+            uint16 *p16 = static_cast<uint16*>(ibufLock.pData) + i_in->indexStart;
+            uint32 *p32 = static_cast<uint32*>(ibufLock.pData) + i_in->indexStart;
             bool isIT32 = ibuf->getType() == HardwareIndexBuffer::IT_32BIT;
-            if (isIT32)
-            {
-                p32 = static_cast<uint32*>(
-                    ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-                // offset by index start
-                p32 += i_in->indexStart;
-            }
-            else
-            {
-                p16 = static_cast<uint16*>(
-                    ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-                // offset by index start
-                p16 += i_in->indexStart;
-            }
+
             // current triangle
             size_t vertInd[3] = { 0, 0, 0 };
             // loop through all faces to calculate the tangents and normals
@@ -339,9 +321,6 @@ namespace Ogre
                 addFaceTangentSpaceToVertices(i, f, localVertInd, faceTsU, faceTsV, faceNorm, result);
 
             }
-
-
-            ibuf->unlock();
         }
 
     }

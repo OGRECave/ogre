@@ -180,9 +180,10 @@ namespace Ogre
         size_t retVal = 0;
 
         //Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
-        const ushort bufferIdx = ushort(mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1);
-        float *pDest = static_cast<float*>(mRenderOperation.vertexData->vertexBufferBinding->
-                                            getBuffer(bufferIdx)->lock( HardwareBuffer::HBL_DISCARD ));
+        VertexBufferBinding* binding = mRenderOperation.vertexData->vertexBufferBinding; 
+        const ushort bufferIdx = ushort(binding->getBufferCount()-1);
+        HardwareBufferLockGuard vertexLock(binding->getBuffer(bufferIdx), HardwareBuffer::HBL_DISCARD);
+        float *pDest = static_cast<float*>(vertexLock.pData);
 
         InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
         InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
@@ -218,8 +219,6 @@ namespace Ogre
 
             customParamIdx += numCustomParams;
         }
-
-        mRenderOperation.vertexData->vertexBufferBinding->getBuffer(bufferIdx)->unlock();
 
         return retVal;
     }

@@ -281,8 +281,8 @@ namespace Ogre
         //bool firstTri = true;
         HardwareIndexBufferSharedPtr ibuf = sm->indexData->indexBuffer;
         // Lock the whole buffer
-        unsigned short* pIndexes = static_cast<unsigned short*>(
-            ibuf->lock(HardwareBuffer::HBL_DISCARD) );
+        HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_DISCARD);
+        unsigned short* pIndexes = static_cast<unsigned short*>(ibufLock.pData);
 
         while (iterations--)
         {
@@ -330,9 +330,6 @@ namespace Ogre
             vInc = -vInc;
 
         }
-        // Unlock
-        ibuf->unlock();
-
     }
 
     //-----------------------------------------------------------------------
@@ -497,8 +494,8 @@ namespace Ogre
 
         // Generate vertex data
         // Lock the whole buffer
-        float* pReal = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        float* pReal = static_cast<float*>(vbufLock.pData);
         Real xSpace = params.width / params.xsegments;
         Real ySpace = params.height / params.ysegments;
         Real halfWidth = params.width / 2;
@@ -563,7 +560,7 @@ namespace Ogre
         } // y
 
         // Unlock
-        vbuf->unlock();
+        vbufLock.unlock();
         // Generate face list
         pSub->useSharedVertices = true;
         tesselate2DMesh(pSub, params.xsegments + 1, params.ysegments + 1, false, 
@@ -641,8 +638,8 @@ namespace Ogre
         xform = xlate * rot;
 
         // Generate vertex data
-        float* pFloat = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD)); 
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        float* pFloat = static_cast<float*>(vbufLock.pData);
         Real xSpace = params.width / params.xsegments;
         Real ySpace = params.height / params.ysegments;
         Real halfWidth = params.width / 2;
@@ -717,7 +714,7 @@ namespace Ogre
 
             } // x
         } // y
-        vbuf->unlock();
+        vbufLock.unlock();
 
         // Generate face list
         tesselate2DMesh(pSub, params.xsegments + 1, params.ysegments + 1, 
@@ -823,8 +820,8 @@ namespace Ogre
         camPos = sphereRadius - CAM_DIST;
 
         // Lock the whole buffer
-        float* pFloat = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        float* pFloat = static_cast<float*>(vbufLock.pData);
         Real xSpace = params.width / params.xsegments;
         Real ySpace = params.height / params.ysegments;
         Real halfWidth = params.width / 2;
@@ -901,7 +898,7 @@ namespace Ogre
         } // y
 
         // Unlock
-        vbuf->unlock();
+        vbufLock.unlock();
         // Generate face list
         pSub->useSharedVertices = true;
         tesselate2DMesh(pSub, params.xsegments + 1, params.ySegmentsToKeep + 1, false, 

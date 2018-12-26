@@ -717,14 +717,13 @@ namespace Ogre {
                 }
                 else //(HardwareIndexBuffer::IT_16BIT == indexType)
                 {
-                    uint16* pIdx = static_cast<uint16*>(rop->indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+                    HardwareBufferLockGuard indexLock(rop->indexData->indexBuffer, HardwareBuffer::HBL_DISCARD);
+                    uint16* pIdx = static_cast<uint16*>(indexLock.pData);
                     uint32* pSrc = mTempIndexBuffer;
                     for (size_t i = 0; i < rop->indexData->indexCount; i++)
                     {
                         *pIdx++ = static_cast<uint16>(*pSrc++);
                     }
-                    rop->indexData->indexBuffer->unlock();
-
                 }
             }
 

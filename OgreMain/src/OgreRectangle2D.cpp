@@ -85,7 +85,8 @@ namespace Ogre {
 
         bind->setBinding(NORMAL_BINDING, vbuf);
 
-        float *pNorm = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        float *pNorm = static_cast<float*>(vbufLock.pData);
         *pNorm++ = 0.0f;
         *pNorm++ = 0.0f;
         *pNorm++ = 1.0f;
@@ -102,7 +103,7 @@ namespace Ogre {
         *pNorm++ = 0.0f;
         *pNorm++ = 1.0f;
 
-        vbuf->unlock();
+        vbufLock.unlock();
 
         if (includeTextureCoords)
         {
@@ -136,7 +137,8 @@ namespace Ogre {
     {
         HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
-        float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        float* pFloat = static_cast<float*>(vbufLock.pData);
 
         *pFloat++ = left;
         *pFloat++ = top;
@@ -153,8 +155,6 @@ namespace Ogre {
         *pFloat++ = right;
         *pFloat++ = bottom;
         *pFloat++ = -1;
-
-        vbuf->unlock();
 
         if(updateAABB)
         {
@@ -168,7 +168,8 @@ namespace Ogre {
     {
         HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(NORMAL_BINDING);
-        float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        float* pFloat = static_cast<float*>(vbufLock.pData);
 
         *pFloat++ = topLeft.x;
         *pFloat++ = topLeft.y;
@@ -185,8 +186,6 @@ namespace Ogre {
         *pFloat++ = bottomRight.x;
         *pFloat++ = bottomRight.y;
         *pFloat++ = bottomRight.z;
-
-        vbuf->unlock();
     }
 
     void Rectangle2D::setUVs( const Ogre::Vector2 &topLeft, const Ogre::Vector2 &bottomLeft,
@@ -197,7 +196,8 @@ namespace Ogre {
 
         HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(TEXCOORD_BINDING);
-        float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        float* pFloat = static_cast<float*>(vbufLock.pData);
 
         *pFloat++ = topLeft.x;
         *pFloat++ = topLeft.y;
@@ -210,8 +210,6 @@ namespace Ogre {
 
         *pFloat++ = bottomRight.x;
         *pFloat++ = bottomRight.y;
-
-        vbuf->unlock();
     }
 
     void Rectangle2D::setDefaultUVs()

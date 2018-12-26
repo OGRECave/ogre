@@ -217,23 +217,21 @@ namespace Ogre {
     {
         if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
         {
-            const void *srcData = mShadowBuffer->lock(
-                mLockStart, mLockSize, HBL_READ_ONLY);
+            HardwareBufferLockGuard shadowLock(mShadowBuffer.get(), mLockStart, mLockSize, HBL_READ_ONLY);
 
             static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
 
             // Update whole buffer if possible, otherwise normal
             if (mLockStart == 0 && mLockSize == mSizeInBytes)
             {
-                glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, srcData,
+                glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, shadowLock.pData,
                     GLHardwareBufferManager::getGLUsage(mUsage));
             }
             else
             {
-                glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, mLockStart, mLockSize, srcData);
+                glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, mLockStart, mLockSize, shadowLock.pData);
             }
 
-            mShadowBuffer->unlock();
             mShadowUpdated = false;
         }
     }
