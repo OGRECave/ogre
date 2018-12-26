@@ -1,11 +1,8 @@
-/*
- * OgreApplicationContext.cpp
- *
- *  Created on: 18.05.2016
- *      Author: pavel
- */
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
 
-#include "OgreApplicationContext.h"
+#include "OgreApplicationContextBase.h"
 
 #include "OgreRoot.h"
 #include "OgreGpuProgramManager.h"
@@ -17,30 +14,15 @@
 #include "OgreBitesConfigDialog.h"
 #include "OgreWindowEventUtilities.h"
 
-#include "OgreConfigPaths.h"
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "OgreArchiveManager.h"
-#include "OgreFileSystem.h"
-#include "OgreZip.h"
-#endif
 
-#if OGRE_BITES_HAVE_SDL
-#include <SDL.h>
-#include <SDL_video.h>
-#include <SDL_syswm.h>
-
-#include "SDLInputMapping.h"
-#endif
+#include "OgreConfigPaths.h"
 
 namespace OgreBites {
 
 static const char* SHADER_CACHE_FILENAME = "cache.bin";
 
-ApplicationContext::ApplicationContext(const Ogre::String& appName, bool)
-#if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
-    : mTaskScheduler(tbb::task_scheduler_init::deferred)
-    #endif
+ApplicationContextBase::ApplicationContextBase(const Ogre::String& appName)
 {
     mAppName = appName;
     mFSLayer = new Ogre::FileSystemLayer(mAppName);
@@ -48,40 +30,20 @@ ApplicationContext::ApplicationContext(const Ogre::String& appName, bool)
     mOverlaySystem = NULL;
     mFirstRun = true;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    mAAssetMgr = NULL;
-    mAConfig = NULL;
-#endif
-
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     mMaterialMgrListener = NULL;
     mShaderGenerator = NULL;
 #endif
 }
 
-ApplicationContext::~ApplicationContext()
+ApplicationContextBase::~ApplicationContextBase()
 {
     delete mFSLayer;
 }
 
-void ApplicationContext::initApp()
+void ApplicationContextBase::initApp()
 {
     createRoot();
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    if (!oneTimeConfig()) return;
-
-    if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
-
-    setup();
-
-    mRoot->saveConfig();
-
-    Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
-
-    // Clear event times
-    Ogre::Root::getSingleton().clearEventTimes();
-#else
-
     if (!oneTimeConfig()) return;
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
@@ -90,10 +52,18 @@ void ApplicationContext::initApp()
 #endif
 
     setup();
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    mRoot->saveConfig();
+
+    Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
+
+    // Clear event times
+    Ogre::Root::getSingleton().clearEventTimes();
 #endif
 }
 
-void ApplicationContext::closeApp()
+void ApplicationContextBase::closeApp()
 {
     shutdown();
     if (mRoot)
@@ -108,14 +78,9 @@ void ApplicationContext::closeApp()
 #ifdef OGRE_STATIC_LIB
     mStaticPluginLoader.unload();
 #endif
-
-#if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
-    if (mTaskScheduler.is_active())
-        mTaskScheduler.terminate();
-#endif
 }
 
-bool ApplicationContext::initialiseRTShaderSystem()
+bool ApplicationContextBase::initialiseRTShaderSystem()
 {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     if (Ogre::RTShader::ShaderGenerator::initialize())
@@ -141,7 +106,7 @@ bool ApplicationContext::initialiseRTShaderSystem()
 #endif
 }
 
-void ApplicationContext::setRTSSWriteShadersToDisk(bool write)
+void ApplicationContextBase::setRTSSWriteShadersToDisk(bool write)
 {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     if(!write) {
@@ -160,7 +125,7 @@ void ApplicationContext::setRTSSWriteShadersToDisk(bool write)
 #endif
 }
 
-void ApplicationContext::destroyRTShaderSystem()
+void ApplicationContextBase::destroyRTShaderSystem()
 {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     //mShaderGenerator->removeAllShaderBasedTechniques();
@@ -186,7 +151,7 @@ void ApplicationContext::destroyRTShaderSystem()
 #endif
 }
 
-void ApplicationContext::setup()
+void ApplicationContextBase::setup()
 {
     mRoot->initialise(false);
     createWindow(mAppName);
@@ -199,12 +164,8 @@ void ApplicationContext::setup()
     mRoot->addFrameListener(this);
 }
 
-void ApplicationContext::createRoot()
+void ApplicationContextBase::createRoot()
 {
-#if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
-    mTaskScheduler.initialize(OGRE_THREAD_HARDWARE_CONCURRENCY);
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     mRoot = OGRE_NEW Ogre::Root("");
 #else
@@ -228,7 +189,7 @@ void ApplicationContext::createRoot()
     mOverlaySystem = OGRE_NEW Ogre::OverlaySystem();
 }
 
-bool ApplicationContext::oneTimeConfig()
+bool ApplicationContextBase::oneTimeConfig()
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
@@ -240,7 +201,7 @@ bool ApplicationContext::oneTimeConfig()
     return true;
 }
 
-void ApplicationContext::createDummyScene()
+void ApplicationContextBase::createDummyScene()
 {
     mWindows[0].render->removeAllViewports();
     Ogre::SceneManager* sm = mRoot->createSceneManager("DefaultSceneManager", "DummyScene");
@@ -254,14 +215,14 @@ void ApplicationContext::createDummyScene()
     {
         OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
                     "Shader Generator Initialization failed - Core shader libs path not found",
-                    "ApplicationContext::createDummyScene");
+                    "ApplicationContextBase::createDummyScene");
     }
 
     mShaderGenerator->addSceneManager(sm);
 #endif // OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 }
 
-void ApplicationContext::destroyDummyScene()
+void ApplicationContextBase::destroyDummyScene()
 {
     if(!mRoot->hasSceneManager("DummyScene"))
         return;
@@ -275,7 +236,7 @@ void ApplicationContext::destroyDummyScene()
     mRoot->destroySceneManager(dummyScene);
 }
 
-void ApplicationContext::enableShaderCache() const
+void ApplicationContextBase::enableShaderCache() const
 {
     Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
 
@@ -292,26 +253,18 @@ void ApplicationContext::enableShaderCache() const
     Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
 }
 
-void ApplicationContext::addInputListener(NativeWindowType* win, InputListener* lis)
+void ApplicationContextBase::addInputListener(NativeWindowType* win, InputListener* lis)
 {
-    uint32_t id = 0;
-#if OGRE_BITES_HAVE_SDL
-    id = SDL_GetWindowID(win);
-#endif
-    mInputListeners.insert(std::make_pair(id, lis));
+    mInputListeners.insert(std::make_pair(0, lis));
 }
 
 
-void ApplicationContext::removeInputListener(NativeWindowType* win, InputListener* lis)
+void ApplicationContextBase::removeInputListener(NativeWindowType* win, InputListener* lis)
 {
-    uint32_t id = 0;
-#if OGRE_BITES_HAVE_SDL
-    id = SDL_GetWindowID(win);
-#endif
-    mInputListeners.erase(std::make_pair(id, lis));
+    mInputListeners.erase(std::make_pair(0, lis));
 }
 
-bool ApplicationContext::frameRenderingQueued(const Ogre::FrameEvent& evt)
+bool ApplicationContextBase::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
     for(InputListenerList::iterator it = mInputListeners.begin();
             it != mInputListeners.end(); ++it) {
@@ -321,22 +274,13 @@ bool ApplicationContext::frameRenderingQueued(const Ogre::FrameEvent& evt)
     return true;
 }
 
-NativeWindowPair ApplicationContext::createWindow(const Ogre::String& name, Ogre::uint32 w, Ogre::uint32 h, Ogre::NameValuePairList miscParams)
+void ApplicationContextBase::parseWindowOptions(uint32_t& w, uint32_t& h, Ogre::NameValuePairList& miscParams)
 {
-    NativeWindowPair ret = {NULL, NULL};
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mWindows[0].native));
-    miscParams["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAConfig));
-    miscParams["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
-
-    mWindows[0].render = Ogre::Root::getSingleton().createRenderWindow(name, 0, 0, false, &miscParams);
-    ret = mWindows[0];
-#else
-    Ogre::ConfigOptionMap ropts = mRoot->getRenderSystem()->getConfigOptions();
+    const auto& ropts = mRoot->getRenderSystem()->getConfigOptions();
 
     if(w == 0 && h == 0)
     {
-        std::istringstream mode(ropts["Video Mode"].currentValue);
+        std::istringstream mode(ropts.at("Video Mode").currentValue);
         Ogre::String token;
         mode >> w; // width
         mode >> token; // 'x' as seperator between width and height
@@ -345,140 +289,32 @@ NativeWindowPair ApplicationContext::createWindow(const Ogre::String& name, Ogre
 
     if(miscParams.empty())
     {
-        miscParams["FSAA"] = ropts["FSAA"].currentValue;
-        miscParams["vsync"] = ropts["VSync"].currentValue;
-        miscParams["gamma"] = ropts["sRGB Gamma Conversion"].currentValue;
+        miscParams["FSAA"] = ropts.at("FSAA").currentValue;
+        miscParams["vsync"] = ropts.at("VSync").currentValue;
+        miscParams["gamma"] = ropts.at("sRGB Gamma Conversion").currentValue;
     }
 
-    if(!mWindows.empty()) {
+    if(!mWindows.empty())
+    {
         // additional windows should reuse the context
         miscParams["currentGLContext"] = "true";
     }
+}
 
+NativeWindowPair ApplicationContextBase::createWindow(const Ogre::String& name, Ogre::uint32 w, Ogre::uint32 h, Ogre::NameValuePairList miscParams)
+{
+    NativeWindowPair ret = {NULL, NULL};
+    parseWindowOptions(w, h, miscParams);
 
-
-#if OGRE_BITES_HAVE_SDL
-    if(!SDL_WasInit(SDL_INIT_VIDEO)) {
-        SDL_InitSubSystem(SDL_INIT_VIDEO);
-    }
-
-    Uint32 flags = SDL_WINDOW_RESIZABLE;
-
-    if(ropts["Full Screen"].currentValue == "Yes"){
-       flags = SDL_WINDOW_FULLSCREEN;
-    } else {
-       flags = SDL_WINDOW_RESIZABLE;
-    }
-
-    ret.native = SDL_CreateWindow(name.c_str(),
-                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flags);
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-    SDL_GL_CreateContext(ret.native);
-    miscParams["currentGLContext"] = "true";
-#else
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
-    SDL_GetWindowWMInfo(ret.native, &wmInfo);
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-    miscParams["parentWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.x11.window));
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    assert(wmInfo.subsystem == SDL_SYSWM_COCOA);
-    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.cocoa.window));
-#endif
-#endif
     ret.render = mRoot->createRenderWindow(name, w, h, false, &miscParams);
     mWindows.push_back(ret);
-#endif
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && !OGRE_BITES_HAVE_SDL
     WindowEventUtilities::_addRenderWindow(ret.render);
-#endif
 
     return ret;
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-void ApplicationContext::initAppForAndroid(AAssetManager* assetMgr, ANativeWindow* window)
-{
-    mAConfig = AConfiguration_new();
-    AConfiguration_fromAssetManager(mAConfig, assetMgr);
-    mAAssetMgr = assetMgr;
-
-    mWindows.resize(1);
-    mWindows[0].native = window;
-
-    initApp();
-}
-
-Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName)
-{
-    Ogre::Archive* apk = Ogre::ArchiveManager::getSingleton().load("", "APKFileSystem", true);
-    return apk->open(fileName);
-}
-
-void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
-    Event evt = {0};
-
-    static TouchFingerEvent lastTouch = {0};
-
-    if(wheel) {
-        evt.type = MOUSEWHEEL;
-        evt.wheel.y = wheel;
-        _fireInputEvent(evt, 0);
-        lastTouch.fingerId = -1; // prevent move-jump after pinch is over
-        return;
-    }
-
-    if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
-        int32_t action = AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event);
-
-        switch (action) {
-        case AMOTION_EVENT_ACTION_DOWN:
-            evt.type = FINGERDOWN;
-            break;
-        case AMOTION_EVENT_ACTION_UP:
-            evt.type = FINGERUP;
-            break;
-        case AMOTION_EVENT_ACTION_MOVE:
-            evt.type = FINGERMOTION;
-            break;
-        default:
-            return;
-        }
-
-        Ogre::RenderWindow* win = getRenderWindow();
-
-        evt.tfinger.fingerId = AMotionEvent_getPointerId(event, 0);
-        evt.tfinger.x = AMotionEvent_getRawX(event, 0) / win->getWidth();
-        evt.tfinger.y = AMotionEvent_getRawY(event, 0) / win->getHeight();
-
-        if(evt.type == FINGERMOTION) {
-            if(evt.tfinger.fingerId != lastTouch.fingerId)
-                return; // wrong finger
-
-            evt.tfinger.dx = evt.tfinger.x - lastTouch.x;
-            evt.tfinger.dy = evt.tfinger.y - lastTouch.y;
-        }
-
-        lastTouch = evt.tfinger;
-    } else {
-        if(AKeyEvent_getKeyCode(event) != AKEYCODE_BACK)
-            return;
-
-        evt.type = AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN ? KEYDOWN : KEYUP;
-        evt.key.keysym.sym = SDLK_ESCAPE;
-    }
-
-    _fireInputEvent(evt, 0);
-}
-#endif
-
-void ApplicationContext::_fireInputEvent(const Event& event, uint32_t windowID) const
+void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t windowID) const
 {
     for(InputListenerList::iterator it = mInputListeners.begin();
             it != mInputListeners.end(); ++it)
@@ -522,28 +358,16 @@ void ApplicationContext::_fireInputEvent(const Event& event, uint32_t windowID) 
     }
 }
 
-void ApplicationContext::setWindowGrab(NativeWindowType* win, bool _grab)
-{
-#if OGRE_BITES_HAVE_SDL
-    SDL_bool grab = SDL_bool(_grab);
-
-    SDL_SetWindowGrab(win, grab);
-    SDL_SetRelativeMouseMode(grab);
-#endif
-}
-
-Ogre::String ApplicationContext::getDefaultMediaDir()
+Ogre::String ApplicationContextBase::getDefaultMediaDir()
 {
     return Ogre::FileSystemLayer::resolveBundlePath(OGRE_MEDIA_DIR);
 }
 
-void ApplicationContext::locateResources()
+void ApplicationContextBase::locateResources()
 {
     // load resource paths from config file
     Ogre::ConfigFile cf;
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAAssetMgr) );
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAAssetMgr) );
     Ogre::Archive* apk = Ogre::ArchiveManager::getSingleton().load("", "APKFileSystem", true);
     cf.load(apk->open(mFSLayer->getConfigFilePath("resources.cfg")));
 #else
@@ -668,12 +492,12 @@ void ApplicationContext::locateResources()
 #endif /* OGRE_BUILD_COMPONENT_RTSHADERSYSTEM */
 }
 
-void ApplicationContext::loadResources()
+void ApplicationContextBase::loadResources()
 {
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
-void ApplicationContext::reconfigure(const Ogre::String &renderer, Ogre::NameValuePairList &options)
+void ApplicationContextBase::reconfigure(const Ogre::String &renderer, Ogre::NameValuePairList &options)
 {
     mNextRenderer = renderer;
     Ogre::RenderSystem* rs = mRoot->getRenderSystemByName(renderer);
@@ -706,7 +530,7 @@ void ApplicationContext::reconfigure(const Ogre::String &renderer, Ogre::NameVal
     mRoot->queueEndRendering();   // break from render loop
 }
 
-void ApplicationContext::shutdown()
+void ApplicationContextBase::shutdown()
 {
     const auto& gpuMgr = Ogre::GpuProgramManager::getSingleton();
     if (gpuMgr.getSaveMicrocodesToCache() && gpuMgr.isCacheDirty())
@@ -743,81 +567,13 @@ void ApplicationContext::shutdown()
         OGRE_DELETE mOverlaySystem;
     }
 
-#if OGRE_BITES_HAVE_SDL
-    for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
-    {
-        if(it->native)
-            SDL_DestroyWindow(it->native);
-    }
-    if(!mWindows.empty()) {
-        SDL_QuitSubSystem(SDL_INIT_VIDEO);
-    }
-#endif
-
-    mWindows.clear();
     mInputListeners.clear();
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    AConfiguration_delete(mAConfig);
-#endif
 }
 
-void ApplicationContext::pollEvents()
+void ApplicationContextBase::pollEvents()
 {
-#if OGRE_BITES_HAVE_SDL
-    if(mWindows.empty())
-    {
-        // SDL events not initialized
-        return;
-    }
-
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        switch (event.type)
-        {
-        case SDL_QUIT:
-            mRoot->queueEndRendering();
-            break;
-        case SDL_WINDOWEVENT:
-            if(event.window.event != SDL_WINDOWEVENT_RESIZED)
-                continue;
-
-            for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
-            {
-                if(event.window.windowID != SDL_GetWindowID(it->native))
-                    continue;
-
-                Ogre::RenderWindow* win = it->render;
-                win->windowMovedOrResized();
-                windowResized(win);
-            }
-            break;
-        default:
-            _fireInputEvent(convert(event), event.window.windowID);
-            break;
-        }
-    }
-
-#   if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    // hacky workaround for black window on OSX
-    for(const auto& win : mWindows)
-    {
-        SDL_SetWindowSize(win.native, win.render->getWidth(), win.render->getHeight());
-        win.render->windowMovedOrResized();
-    }
-#   endif
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
-    {
-        Ogre::RenderWindow* win = it->render;
-        win->windowMovedOrResized();
-        windowResized(win);
-    }
-#else
     // just avoid "window not responding"
     WindowEventUtilities::messagePump();
-#endif
 }
 
 }

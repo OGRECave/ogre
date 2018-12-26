@@ -3,6 +3,7 @@
 /* Includes the header in the wrapper code */
 #include "Ogre.h"
 #include "OgreBuildSettings.h"
+#include "OgreApplicationContextBase.h"
 #include "OgreApplicationContext.h"
 #include "OgreSGTechniqueResolverListener.h"
 #include "OgreCameraMan.h"
@@ -32,9 +33,9 @@
 JNIEnv* OgreJNIGetEnv();
 %}
 
-%ignore OgreBites::ApplicationContext::initApp;
-%ignore OgreBites::ApplicationContext::initAppForAndroid(AAssetManager*, ANativeWindow*);
-%extend OgreBites::ApplicationContext {
+%ignore OgreBites::ApplicationContextAndroid::initApp;
+%ignore OgreBites::ApplicationContextAndroid::initAppForAndroid(AAssetManager*, ANativeWindow*);
+%extend OgreBites::ApplicationContextAndroid {
     void initAppForAndroid(jobject assetManager, jobject surface) {
         OgreAssert(assetManager, "assetManager is NULL");
         OgreAssert(surface, "surface is NULL");
@@ -44,8 +45,12 @@ JNIEnv* OgreJNIGetEnv();
         $self->initAppForAndroid(assetMgr, nativeWnd);
     }
 }
+%rename(ApplicationContext) ApplicationContextAndroid;
+#else
+%rename(ApplicationContext) ApplicationContextSDL; // keep the pre 1.12 name
 #endif
 
+%include "OgreApplicationContextBase.h"
 %include "OgreApplicationContext.h"
 %include "OgreCameraMan.h"
 // deprecated
