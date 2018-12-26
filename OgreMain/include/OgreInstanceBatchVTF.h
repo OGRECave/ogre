@@ -92,7 +92,7 @@ namespace Ogre
         size_t                  mRowLength;
         size_t                  mWeightCount;
         //Temporary array used to store 3x4 matrices before they are converted to dual quaternions
-        float*                  mTempTransformsArray3x4;
+        Matrix3x4f*             mTempTransformsArray3x4;
 
         // The state of the usage of bone matrix lookup
         bool mUseBoneMatrixLookup;
@@ -129,7 +129,7 @@ namespace Ogre
         virtual void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
                                     const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec &hwBoneWgt) = 0;
 
-        size_t convert3x4MatricesToDualQuaternions(float* matrices, size_t numOfMatrices, float* outDualQuaternions);
+        size_t convert3x4MatricesToDualQuaternions(Matrix3x4f* matrices, size_t numOfMatrices, float* outDualQuaternions);
                                     
         /** Keeps filling the VTF with world matrix data */
         void updateVertexTexture(void);

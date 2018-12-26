@@ -196,10 +196,10 @@ namespace Ogre
             //No need to use null matrices at all!
             if( (*itor)->findVisible( currentCamera ) )
             {
-                const size_t floatsWritten = (*itor)->getTransforms3x4( pDest );
+                const size_t floatsWritten = (*itor)->getTransforms3x4( (Matrix3x4f*)pDest );
 
                 if( mManager->getCameraRelativeRendering() )
-                    makeMatrixCameraRelative3x4( pDest, floatsWritten );
+                    makeMatrixCameraRelative3x4( (Matrix3x4f*)pDest, floatsWritten / 12 );
 
                 pDest += floatsWritten;
 

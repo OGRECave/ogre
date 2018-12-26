@@ -84,6 +84,7 @@ namespace Ogre
         friend class InstanceBatchHW_VTF;
         friend class BaseInstanceBatchVTF;
     protected:
+        typedef TransformBase<3, float>        Matrix3x4f;
         uint16 mInstanceId; //Note it may change after defragmenting!
         bool mInUse;
         InstanceBatch *mBatchOwner;
@@ -131,7 +132,7 @@ namespace Ogre
         /// Returns number of matrices written to transform, assumes transform has enough space
         size_t getTransforms( Matrix4 *xform ) const;
         /// Returns number of 32-bit values written
-        size_t getTransforms3x4( float *xform ) const;
+        size_t getTransforms3x4( Matrix3x4f *xform ) const;
 
         /// Returns true if this InstancedObject is visible to the current camera
         bool findVisible( Camera *camera ) const;

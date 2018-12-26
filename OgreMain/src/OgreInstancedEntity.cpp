@@ -190,7 +190,7 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------
-    size_t InstancedEntity::getTransforms3x4( float *xform ) const
+    size_t InstancedEntity::getTransforms3x4( Matrix3x4f *xform ) const
     {
         size_t retVal;
         //When not attached, returns zero matrix to avoid rendering this one, not identity
@@ -200,32 +200,18 @@ namespace Ogre
             {
                 const Affine3& mat = mBatchOwner->useBoneWorldMatrices() ?
                     _getParentNodeFullTransform() : Affine3::IDENTITY;
-                for( int i=0; i<3; ++i )
-                {
-                    Real const *row = mat[i];
-                    for( int j=0; j<4; ++j )
-                        *xform++ = static_cast<float>( *row++ );
-                }
 
+                *xform = Matrix3x4f(mat[0]);
                 retVal = 12;
             }
             else
             {
                 Affine3* matrices = mBatchOwner->useBoneWorldMatrices() ? mBoneWorldMatrices : mBoneMatrices;
-
                 const Mesh::IndexMap *indexMap = mBatchOwner->_getIndexToBoneMap();
-                Mesh::IndexMap::const_iterator itor = indexMap->begin();
-                Mesh::IndexMap::const_iterator end  = indexMap->end();
                 
-                while( itor != end )
+                for(auto i : *indexMap)
                 {
-                    const Affine3 &mat = matrices[*itor++];
-                    for( int i=0; i<3; ++i )
-                    {
-                        Real const *row = mat[i];
-                        for( int j=0; j<4; ++j )
-                            *xform++ = static_cast<float>( *row++ );
-                    }
+                    *xform++ = Matrix3x4f(matrices[i][0]);
                 }
 
                 retVal = indexMap->size() * 4 * 3;
@@ -238,7 +224,7 @@ namespace Ogre
             else
                 retVal = 12;
             
-            std::fill_n( xform, retVal, 0.0f );
+            std::fill_n( xform, retVal/12, Matrix3x4f(Affine3::ZERO[0]) );
         }
 
         return retVal;

@@ -430,11 +430,11 @@ namespace Ogre
         size_t instanceCount = mInstancedEntities.size();
         size_t updatedInstances = 0;
 
-        float* transforms = NULL;
+        Matrix3x4f* transforms = NULL;
         //If using dual quaternions, write 3x4 matrices to a temporary buffer, then convert to dual quaternions
         if(mUseBoneDualQuaternions)
         {
-            transforms = mTempTransformsArray3x4;
+            transforms = (Matrix3x4f*)mTempTransformsArray3x4;
         }
         
         for(size_t i = 0 ; i < instanceCount ; ++i)
@@ -457,7 +457,7 @@ namespace Ogre
 
                 if(!mUseBoneDualQuaternions)
                 {
-                    transforms = pDest;
+                    transforms = (Matrix3x4f*)pDest;
                 }
                 
                 if( mMeshReference->hasSkeleton() )
@@ -466,7 +466,7 @@ namespace Ogre
                 size_t floatsWritten = entity->getTransforms3x4( transforms );
 
                 if( !useMatrixLookup && mManager->getCameraRelativeRendering() )
-                    makeMatrixCameraRelative3x4( transforms, floatsWritten );
+                    makeMatrixCameraRelative3x4( transforms, floatsWritten / 12 );
 
                 if(mUseBoneDualQuaternions)
                 {
