@@ -82,8 +82,8 @@ namespace Ogre {
 
     };
 
-    /** Locking helper. */    
-    typedef HardwareBufferLockGuard HardwareVertexBufferLockGuard; // deprecated, use HardwareBufferLockGuard directly
+    /// @deprecated use HardwareBufferLockGuard directly
+    OGRE_DEPRECATED typedef HardwareBufferLockGuard HardwareVertexBufferLockGuard;
 
     /// Vertex element semantics, used to identify the meaning of vertex buffer contents
     enum VertexElementSemantic {
