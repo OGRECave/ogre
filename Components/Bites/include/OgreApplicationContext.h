@@ -30,22 +30,8 @@
 
 #include "OgreBitesPrerequisites.h"
 #include "OgreBuildSettings.h"
-#include "OgreLogManager.h"
-#include "OgrePlugin.h"
-#include "OgreFileSystemLayer.h"
-#include "OgreFrameListener.h"
-#include "OgreStaticPluginLoader.h"
+#include "OgreApplicationContextBase.h"
 
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-#include "OgreSGTechniqueResolverListener.h"
-#endif // INCLUDE_RTSHADER_SYSTEM
-
-// forward declarations
-extern "C" struct SDL_Window;
-
-namespace Ogre {
-    class OverlaySystem;
-}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android/configuration.h>
@@ -56,269 +42,62 @@ namespace Ogre {
 
 #include "OgreInput.h"
 
-/** \addtogroup Optional Optional Components
+/** \addtogroup Optional
 *  @{
 */
-/** \defgroup Bites Bites
-* reusable utilities for rapid prototyping
+/** \addtogroup Bites
 *  @{
 */
 namespace OgreBites
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    typedef ANativeWindow NativeWindowType;
-#else
-    typedef SDL_Window NativeWindowType;
-#endif
 
-    /**
-     * link between a renderwindow and a platform specific window
-     */
-    struct NativeWindowPair
-    {
-        Ogre::RenderWindow* render;
-        NativeWindowType* native;
-    };
-
-    /** 
-    Base class responsible for setting up a common context for applications.
-    Subclass to implement specific event callbacks.
-    */
-    class _OgreBitesExport ApplicationContext : public Ogre::FrameListener
+#if OGRE_BITES_HAVE_SDL
+    class _OgreBitesExport ApplicationContextSDL : public ApplicationContextBase
     {
     public:
-        explicit ApplicationContext(const Ogre::String& appName = OGRE_VERSION_NAME, bool unused = true);
+        explicit ApplicationContextSDL(const Ogre::String& appName = OGRE_VERSION_NAME);
 
-        virtual ~ApplicationContext();
+        using ApplicationContextBase::setWindowGrab;
+        using ApplicationContextBase::addInputListener;
+        using ApplicationContextBase::removeInputListener;
 
-        /**
-         * get the main RenderWindow
-         * owns the context on OpenGL
-         */
-        Ogre::RenderWindow* getRenderWindow() const
-        {
-            return mWindows.empty() ? NULL : mWindows[0].render;
-        }
+        void setWindowGrab(NativeWindowType* win, bool grab);
+        void shutdown();
+        void pollEvents();
+        void addInputListener(NativeWindowType* win, InputListener* lis);
+        void removeInputListener(NativeWindowType* win, InputListener* lis);
+        virtual NativeWindowPair
+        createWindow(const Ogre::String& name, uint32_t w = 0, uint32_t h = 0,
+                     Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
+    };
 
-        Ogre::Root* getRoot() const {
-            return mRoot;
-        }
+    typedef ApplicationContextSDL ApplicationContext;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    class _OgreBitesExport ApplicationContextAndroid : public ApplicationContextBase
+    {
+    public:
+        explicit ApplicationContextAndroid(const Ogre::String& appName = OGRE_VERSION_NAME);
 
-        Ogre::OverlaySystem* getOverlaySystem() const {
-            return mOverlaySystem;
-        }
-
-        /**
-        This function initializes the render system and resources.
-        */
-        void initApp();
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         void initAppForAndroid(AAssetManager* assetMgr, ANativeWindow* window);
-
         void _fireInputEventAndroid(AInputEvent* event, int wheel = 0);
-#endif
 
-        /**
-        This function closes down the application - saves the configuration then
-        shutdowns.
-        */
-        void closeApp();
-
-        // callback interface copied from various listeners to be used by ApplicationContext
-        virtual bool frameStarted(const Ogre::FrameEvent& evt) {
-            pollEvents();
-            return true;
-        }
-        virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-        virtual bool frameEnded(const Ogre::FrameEvent& evt) { return true; }
-        virtual void windowMoved(Ogre::RenderWindow* rw) {}
-        virtual void windowResized(Ogre::RenderWindow* rw) {}
-        virtual bool windowClosing(Ogre::RenderWindow* rw) { return true; }
-        virtual void windowClosed(Ogre::RenderWindow* rw) {}
-        virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
-
-        /**
-         * inspect the event and call one of the corresponding functions on the registered InputListener
-         * @param event Input Event
-         * @param windowID only call listeners of this window
-         */
-        void _fireInputEvent(const Event& event, uint32_t windowID) const;
-
-        /**
-          Initialize the RT Shader system.
-          */
-        bool initialiseRTShaderSystem();
-
-        /**
-         * make the RTSS write out the generated shaders for caching and debugging
-         *
-         * by default all shaders are generated to system memory.
-         * Must be called before loadResources
-         * @param write
-         */
-        void setRTSSWriteShadersToDisk(bool write);
-
-        /**
-        Destroy the RT Shader system.
-          */
-        void destroyRTShaderSystem();
-
-        /**
-         Sets up the context after configuration.
-         */
-        virtual void setup();
-
-        /**
-        Creates the OGRE root.
-        */
-        virtual void createRoot();
-
-        /**
-        Configures the startup settings for OGRE. I use the config dialog here,
-        but you can also restore from a config file. Note that this only happens
-        when you start the context, and not when you reset it.
-        */
-        virtual bool oneTimeConfig();
-
-        /**
-        When input is grabbed the mouse is confined to the window.
-        */
-        void setWindowGrab(NativeWindowType* win, bool grab = true);
-
-        /// @overload
-        void setWindowGrab(bool grab = true) {
-            OgreAssert(!mWindows.empty(), "create a window first");
-            setWindowGrab(mWindows[0].native, grab);
-        }
-
-        /**
-        Finds context-wide resource groups. I load paths from a config file here,
-        but you can choose your resource locations however you want.
-        */
         virtual void locateResources();
-
-        /**
-        Loads context-wide resource groups. I chose here to simply initialise all
-        groups, but you can fully load specific ones if you wish.
-        */
-        virtual void loadResources();
-
-        /**
-        Reconfigures the context. Attempts to preserve the current sample state.
-        */
-        virtual void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options);
-
-
-        /**
-        Cleans up and shuts down the context.
-        */
         virtual void shutdown();
-
-        /**
-        process all window events since last call
-        */
         void pollEvents();
 
-        /**
-        Creates dummy scene to allow rendering GUI in viewport.
-          */
-        void createDummyScene();
-
-        /**
-        Destroys dummy scene.
-          */
-        void destroyDummyScene();
-
-        /**
-         * enables the caching of compiled shaders to file
-         *
-         * also loads any existing cache
-         */
-        void enableShaderCache() const;
-
-        /** attach input listener
-         *
-         * @param lis the listener
-         * @param win the window to receive the events for.
-         */
-        void addInputListener(NativeWindowType* win, InputListener* lis);
-
-        /// @overload
-        void addInputListener(InputListener* lis) {
-            OgreAssert(!mWindows.empty(), "create a window first");
-            addInputListener(mWindows[0].native, lis);
-        }
-
-        /** detatch input listener
-         *
-         * @param lis the listener
-         * @param win the window to receive the events for.
-         */
-        void removeInputListener(NativeWindowType* win, InputListener* lis);
-
-        /// @overload
-        void removeInputListener(InputListener* lis) {
-            OgreAssert(!mWindows.empty(), "called after all windows were deleted");
-            removeInputListener(mWindows[0].native, lis);
-        }
-
-        /**
-         * Create a new render window
-         *
-         * You must use SDL and not an auto-created window as SDL does not get the events
-         * otherwise.
-         *
-         * By default the values from ogre.cfg are used for w, h and miscParams.
-         */
         virtual NativeWindowPair
         createWindow(const Ogre::String& name, uint32_t w = 0, uint32_t h = 0,
                      Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
 
-        /**
-         * get the FileSystemLayer instace pointing to an application specific directory
-         */
-        Ogre::FileSystemLayer& getFSLayer() { return *mFSLayer; }
-
-        /**
-         * the directory where the media files were installed
-         *
-         * same as OGRE_MEDIA_DIR in CMake
-         */
-        static Ogre::String getDefaultMediaDir();
     protected:
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        OGRE_DEPRECATED Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);
         AAssetManager* mAAssetMgr;
         AConfiguration* mAConfig;
-#endif
-
-#if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
-        tbb::task_scheduler_init mTaskScheduler;
-#endif
-
-        Ogre::OverlaySystem* mOverlaySystem;  // Overlay system
-
-        Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
-        Ogre::Root* mRoot;              // OGRE root
-        StaticPluginLoader mStaticPluginLoader;
-        bool mFirstRun;
-        Ogre::String mNextRenderer;     // name of renderer used for next run
-        Ogre::String mAppName;
-        Ogre::NameValuePairList mLastSampleState;     // state of last sample
-
-        typedef std::vector<NativeWindowPair> WindowList;
-        WindowList mWindows; // all windows
-
-        typedef std::set<std::pair<uint32_t, InputListener*> > InputListenerList;
-        InputListenerList mInputListeners;
-
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-        Ogre::RTShader::ShaderGenerator*       mShaderGenerator; // The Shader generator instance.
-        SGTechniqueResolverListener*       mMaterialMgrListener; // Shader generator material manager listener.
-        Ogre::String                           mRTShaderLibPath;
-#endif // INCLUDE_RTSHADER_SYSTEM
     };
+
+    typedef ApplicationContextAndroid ApplicationContext;
+#else
+    typedef ApplicationContextBase ApplicationContext;
+#endif
 }
 /** @} */
 /** @} */
