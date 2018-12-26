@@ -1141,7 +1141,7 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------------
-    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const TransformBase* pMatrix, size_t numEntries)
+    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const TransformBaseReal* pMatrix, size_t numEntries)
     {
         // remember, raw content access uses raw float count rather than float4
         if (mTransposeMatrices)

@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreMatrix3.h"
-#include "OgreVector4.h"
+#include "OgreVector.h"
 
 namespace Ogre
 {
@@ -77,23 +77,98 @@ namespace Ogre
                 [ m[3][0]  m[3][1]  m[3][2]  m[3][3] ]   {1}
             </pre>
     */
-    class _OgreExport TransformBase
+    template<int rows, typename T> class TransformBase
     {
     protected:
         /// The matrix entries, indexed by [row][col].
-        Real m[4][4];
+        T m[rows][4];
         // do not reduce storage for affine for compatibility with SSE, shader mat4 types
     public:
-        Real* operator[](size_t iRow)
+        /// Do <b>NOT</b> initialize for efficiency.
+        TransformBase() {}
+
+        template<typename U>
+        explicit TransformBase(const U* ptr) {
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < 4; j++)
+                    m[i][j] = T(ptr[i*4 + j]);
+        }
+
+        template<typename U>
+        explicit TransformBase(const TransformBase<rows, U>& o) : TransformBase(o.m[0]) {}
+
+        T* operator[](size_t iRow)
         {
-            assert(iRow < 4);
+            assert(iRow < rows);
             return m[iRow];
         }
 
-        const Real* operator[](size_t iRow) const
+        const T* operator[](size_t iRow) const
         {
-            assert(iRow < 4);
+            assert(iRow < rows);
             return m[iRow];
+        }
+
+        /// Sets the translation transformation part of the matrix.
+        void setTrans( const Vector<3, T>& v )
+        {
+            assert(rows > 2);
+            m[0][3] = v.x;
+            m[1][3] = v.y;
+            m[2][3] = v.z;
+        }
+        /// Extracts the translation transformation part of the matrix.
+        Vector<3, T> getTrans() const
+        {
+            assert(rows > 2);
+            return Vector<3, T>(m[0][3], m[1][3], m[2][3]);
+        }
+        /// Sets the scale part of the matrix.
+        void setScale( const Vector<3, T>& v )
+        {
+            assert(rows > 2);
+            m[0][0] = v.x;
+            m[1][1] = v.y;
+            m[2][2] = v.z;
+        }
+
+        /** Function for writing to a stream.
+         */
+        inline friend std::ostream& operator<<(std::ostream& o, const TransformBase& mat)
+        {
+            o << "Matrix" << rows << "x4(";
+            for (size_t i = 0; i < rows; ++i)
+            {
+                for (size_t j = 0; j < 4; ++j)
+                {
+                    o << mat[i][j];
+                    if(j != 3)
+                        o << ", ";
+                }
+
+                if(i != (rows - 1))
+                    o << "; ";
+            }
+            o << ")";
+            return o;
+        }
+    };
+
+    struct _OgreExport TransformBaseReal : public TransformBase<4, Real>
+    {
+        /** Builds a translation matrix
+        */
+        void makeTrans( const Vector3& v )
+        {
+            makeTrans(v.x, v.y, v.z);
+        }
+
+        void makeTrans( Real tx, Real ty, Real tz )
+        {
+            m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = tx;
+            m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = ty;
+            m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = tz;
+            m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
         }
 
         /** Assignment from 3x3 matrix.
@@ -116,40 +191,6 @@ namespace Ogre
 
         OGRE_DEPRECATED void extract3x3Matrix(Matrix3& m3x3) const { m3x3 = linear(); }
         OGRE_DEPRECATED Quaternion extractQuaternion() const { return Quaternion(linear()); }
-        /// Sets the translation transformation part of the matrix.
-        void setTrans( const Vector3& v )
-        {
-            m[0][3] = v.x;
-            m[1][3] = v.y;
-            m[2][3] = v.z;
-        }
-        /// Extracts the translation transformation part of the matrix.
-        Vector3 getTrans() const
-        {
-          return Vector3(m[0][3], m[1][3], m[2][3]);
-        }
-        /// Sets the scale part of the matrix.
-        void setScale( const Vector3& v )
-        {
-            m[0][0] = v.x;
-            m[1][1] = v.y;
-            m[2][2] = v.z;
-        }
-
-        /** Builds a translation matrix
-        */
-        void makeTrans( const Vector3& v )
-        {
-            makeTrans(v.x, v.y, v.z);
-        }
-
-        void makeTrans( Real tx, Real ty, Real tz )
-        {
-            m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = tx;
-            m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = ty;
-            m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = tz;
-            m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
-        }
 
         Real determinant() const;
 
@@ -169,30 +210,10 @@ namespace Ogre
             performing -translation, -rotate, 1/scale in that order.
         */
         void makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
-
-        /** Function for writing to a stream.
-         */
-        inline friend std::ostream& operator<<(std::ostream& o, const TransformBase& mat)
-        {
-            o << "Matrix4(";
-            for (size_t i = 0; i < 4; ++i)
-            {
-                for (size_t j = 0; j < 4; ++j)
-                {
-                    o << mat[i][j];
-                    if(j != 3)
-                        o << ", ";
-                }
-
-                if(i != 3)
-                    o << "; ";
-            }
-            o << ")";
-            return o;
-        }
     };
+
     /// Transform specialization for projective - encapsulating a 4x4 Matrix
-    class _OgreExport Matrix4 : public TransformBase
+    class _OgreExport Matrix4 : public TransformBaseReal
     {
     public:
         /// Do <b>NOT</b> initialize the matrix for efficiency.
@@ -288,7 +309,7 @@ namespace Ogre
     };
 
     /// Transform specialization for 3D Affine - encapsulating a 3x4 Matrix
-    class _OgreExport Affine3 : public TransformBase
+    class _OgreExport Affine3 : public TransformBaseReal
     {
     public:
         /// Do <b>NOT</b> initialize the matrix for efficiency.
@@ -298,6 +319,12 @@ namespace Ogre
         Affine3(const Vector3& position, const Quaternion& orientation, const Vector3& scale = Vector3::UNIT_SCALE)
         {
             makeTransform(position, scale, orientation);
+        }
+
+        explicit Affine3(const Real* arr)
+        {
+            memcpy(m, arr, 12 * sizeof(Real));
+            m[3][0] = 0, m[3][1] = 0, m[3][2] = 0, m[3][3] = 1;
         }
 
         Affine3(
@@ -348,7 +375,7 @@ namespace Ogre
         /// every Affine3 transform is also a _const_ Matrix4
         operator const Matrix4&() const { return reinterpret_cast<const Matrix4&>(*this); }
 
-        using TransformBase::getTrans;
+        using TransformBaseReal::getTrans;
 
         /** Gets a translation matrix.
         */
@@ -387,7 +414,7 @@ namespace Ogre
         static const Affine3 IDENTITY;
     };
 
-    inline Matrix4 TransformBase::transpose() const
+    inline Matrix4 TransformBaseReal::transpose() const
     {
         return Matrix4(m[0][0], m[1][0], m[2][0], m[3][0],
                        m[0][1], m[1][1], m[2][1], m[3][1],

@@ -60,7 +60,7 @@ namespace Ogre
 
     //-----------------------------------------------------------------------
     static Real
-        MINOR(const TransformBase& m, const size_t r0, const size_t r1, const size_t r2,
+        MINOR(const TransformBaseReal& m, const size_t r0, const size_t r1, const size_t r2,
                                 const size_t c0, const size_t c1, const size_t c2)
     {
         return m[r0][c0] * (m[r1][c1] * m[r2][c2] - m[r2][c1] * m[r1][c2]) -
@@ -91,7 +91,7 @@ namespace Ogre
             MINOR(*this, 0, 1, 2, 0, 1, 2));
     }
     //-----------------------------------------------------------------------
-    Real TransformBase::determinant() const
+    Real TransformBaseReal::determinant() const
     {
         return m[0][0] * MINOR(*this, 1, 2, 3, 1, 2, 3) -
             m[0][1] * MINOR(*this, 1, 2, 3, 0, 2, 3) +
@@ -202,7 +202,7 @@ namespace Ogre
             r20, r21, r22, r23);
     }
     //-----------------------------------------------------------------------
-    void TransformBase::makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
+    void TransformBaseReal::makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
     {
         // Ordering:
         //    1. Scale
@@ -221,7 +221,7 @@ namespace Ogre
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
     }
     //-----------------------------------------------------------------------
-    void TransformBase::makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
+    void TransformBaseReal::makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
     {
         // Invert the parameters
         Vector3 invTranslate = -position;
