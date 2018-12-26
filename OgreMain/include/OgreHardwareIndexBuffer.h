@@ -75,7 +75,7 @@ namespace Ogre {
     };
     
     /** Locking helper. */    
-    typedef HardwareBufferLockGuard<HardwareIndexBufferSharedPtr> HardwareIndexBufferLockGuard;
+    typedef HardwareBufferLockGuard HardwareIndexBufferLockGuard; // deprecated, use HardwareBufferLockGuard directly
 
     /** @} */
     /** @} */

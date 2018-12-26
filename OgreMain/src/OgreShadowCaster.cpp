@@ -257,9 +257,10 @@ namespace Ogre {
         }
 
         // Lock index buffer for writing, just enough length as we need
-        unsigned short* pIdx = static_cast<unsigned short*>(
-            indexBuffer->lock(sizeof(unsigned short) * indexBufferUsedSize, sizeof(unsigned short) * preCountIndexes,
-            indexBufferUsedSize == 0 ? HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NO_OVERWRITE));
+        HardwareBufferLockGuard indexLock(indexBuffer,
+            sizeof(unsigned short) * indexBufferUsedSize, sizeof(unsigned short) * preCountIndexes,
+            indexBufferUsedSize == 0 ? HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NO_OVERWRITE);
+        unsigned short* pIdx = static_cast<unsigned short*>(indexLock.pData);
         size_t numIndices = indexBufferUsedSize;
         
         // Iterate over the groups and form renderables for each based on their
@@ -439,9 +440,6 @@ namespace Ogre {
 
         }
 
-        // Unlock index buffer
-        indexBuffer->unlock();
-
         // In debug mode, check we didn't overrun the index buffer
         assert(numIndices == indexBufferUsedSize + preCountIndexes);
         assert(numIndices <= indexBuffer->getNumIndexes() &&
@@ -462,8 +460,8 @@ namespace Ogre {
         // Lock the entire buffer for writing, even though we'll only be
         // updating the latter because you can't have 2 locks on the same
         // buffer
-        float* pSrc = static_cast<float*>(
-            vertexBuffer->lock(HardwareBuffer::HBL_NORMAL));
+        HardwareBufferLockGuard vertexLock(vertexBuffer, HardwareBuffer::HBL_NORMAL);
+        float* pSrc = static_cast<float*>(vertexLock.pData);
 
         // TODO: We should add extra (ununsed) vertices ensure source and
         // destination buffer have same alignment for slight performance gain.
@@ -472,9 +470,6 @@ namespace Ogre {
         OptimisedUtil::getImplementation()->extrudeVertices(
             light, extrudeDist,
             pSrc, pDest, originalVertexCount);
-
-        vertexBuffer->unlock();
-
     }
     // ------------------------------------------------------------------------
     void ShadowCaster::extrudeBounds(AxisAlignedBox& box, const Vector4& light, Real extrudeDist) const

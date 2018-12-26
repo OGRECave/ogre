@@ -1284,8 +1284,8 @@ namespace Ogre {
             {
                 HardwareVertexBufferSharedPtr buf = 
                     destData->vertexBufferBinding->getBuffer(normElem->getSource());
-                char* pBase = static_cast<char*>(buf->lock(HardwareBuffer::HBL_NORMAL));
-                pBase += destData->vertexStart * buf->getVertexSize();
+                HardwareBufferLockGuard vertexLock(buf, HardwareBuffer::HBL_NORMAL);
+                char* pBase = static_cast<char*>(vertexLock.pData) + destData->vertexStart * buf->getVertexSize();
                 
                 for (size_t v = 0; v < destData->vertexCount; ++v)
                 {
@@ -1297,7 +1297,6 @@ namespace Ogre {
                     
                     pBase += buf->getVertexSize();
                 }
-                buf->unlock();
             }
         }
     }
@@ -1315,10 +1314,10 @@ namespace Ogre {
                 srcData->vertexBufferBinding->getBuffer(srcNormElem->getSource());
             HardwareVertexBufferSharedPtr dstbuf = 
                 destData->vertexBufferBinding->getBuffer(destNormElem->getSource());
-            char* pSrcBase = static_cast<char*>(srcbuf->lock(HardwareBuffer::HBL_READ_ONLY));
-            char* pDstBase = static_cast<char*>(dstbuf->lock(HardwareBuffer::HBL_NORMAL));
-            pSrcBase += srcData->vertexStart * srcbuf->getVertexSize();
-            pDstBase += destData->vertexStart * dstbuf->getVertexSize();
+            HardwareBufferLockGuard srcLock(srcbuf, HardwareBuffer::HBL_READ_ONLY);
+            HardwareBufferLockGuard dstLock(dstbuf, HardwareBuffer::HBL_NORMAL);
+            char* pSrcBase = static_cast<char*>(srcLock.pData) + srcData->vertexStart * srcbuf->getVertexSize();
+            char* pDstBase = static_cast<char*>(dstLock.pData) + destData->vertexStart * dstbuf->getVertexSize();
             
             // The goal here is to detect the length of the vertices, and to apply
             // the base mesh vertex normal at one minus that length; this deals with 
@@ -1351,8 +1350,6 @@ namespace Ogre {
                 pDstBase += dstbuf->getVertexSize();
                 pSrcBase += dstbuf->getVertexSize();
             }
-            srcbuf->unlock();
-            dstbuf->unlock();
         }
     }
     //-----------------------------------------------------------------------
@@ -2050,11 +2047,10 @@ namespace Ogre {
                     if (!extrude)
                     {
                         // Lock, we'll be locking the (suppressed hardware update) shadow buffer
-                        float* pSrc = static_cast<float*>(
-                            esrPositionBuffer->lock(HardwareBuffer::HBL_NORMAL));
+                        HardwareBufferLockGuard posLock(esrPositionBuffer, HardwareBuffer::HBL_NORMAL);
+                        float* pSrc = static_cast<float*>(posLock.pData);
                         float* pDest = pSrc + (egi->vertexData->vertexCount * 3);
                         memcpy(pDest, pSrc, sizeof(float) * 3 * egi->vertexData->vertexCount);
-                        esrPositionBuffer->unlock();
                     }
                     if (egi->vertexData == mMesh->sharedVertexData)
                     {
