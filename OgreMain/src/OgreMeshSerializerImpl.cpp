@@ -257,18 +257,17 @@ namespace Ogre {
         {
             // unsigned short* faceVertexIndices ((indexCount)
             HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
-            void* pIdx = ibuf->lock(HardwareBuffer::HBL_READ_ONLY);
+            HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_READ_ONLY);
             if (idx32bit)
             {
-                unsigned int* pIdx32 = static_cast<unsigned int*>(pIdx);
+                unsigned int* pIdx32 = static_cast<unsigned int*>(ibufLock.pData);
                 writeInts(pIdx32, s->indexData->indexCount);
             }
             else
             {
-                unsigned short* pIdx16 = static_cast<unsigned short*>(pIdx);
+                unsigned short* pIdx16 = static_cast<unsigned short*>(ibufLock.pData);
                 writeShorts(pIdx16, s->indexData->indexCount);
             }
-            ibuf->unlock();
         }
 
         pushInnerChunk(mStream);
@@ -465,14 +464,14 @@ namespace Ogre {
             // Data
             size = MSTREAM_OVERHEAD_SIZE + vbufSizeInBytes;
             writeChunkHeader(M_GEOMETRY_VERTEX_BUFFER_DATA, size);
-            void* pBuf = vbuf->lock(HardwareBuffer::HBL_READ_ONLY);
+            HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_READ_ONLY);
 
             if (mFlipEndian)
             {
                 // endian conversion
                 // Copy data
                 unsigned char* tempData = OGRE_ALLOC_T(unsigned char, vbufSizeInBytes, MEMCATEGORY_GEOMETRY);
-                memcpy(tempData, pBuf, vbufSizeInBytes);
+                memcpy(tempData, vbufLock.pData, vbufSizeInBytes);
                 flipToLittleEndian(
                     tempData,
                     vertexData->vertexCount,
@@ -483,9 +482,8 @@ namespace Ogre {
             }
             else
             {
-                writeData(pBuf, vbuf->getVertexSize(), vertexData->vertexCount);
+                writeData(vbufLock.pData, vbuf->getVertexSize(), vertexData->vertexCount);
             }
-            vbuf->unlock();
         }
                 popInnerChunk(mStream);
             }
@@ -814,16 +812,15 @@ namespace Ogre {
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
             pMesh->mVertexBufferShadowBuffer);
-        void* pBuf = vbuf->lock(HardwareBuffer::HBL_DISCARD);
-        stream->read(pBuf, dest->vertexCount * vertexSize);
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        stream->read(vbufLock.pData, dest->vertexCount * vertexSize);
 
         // endian conversion for OSX
         flipFromLittleEndian(
-            pBuf,
+            vbufLock.pData,
             dest->vertexCount,
             vertexSize,
             dest->vertexDeclaration->findElementsBySource(bindIndex));
-        vbuf->unlock();
 
         // Set binding
         dest->vertexBufferBinding->setBinding(bindIndex, vbuf);
@@ -1010,12 +1007,8 @@ namespace Ogre {
                         sm->indexData->indexCount,
                         pMesh->mIndexBufferUsage,
                         pMesh->mIndexBufferShadowBuffer);
-                // unsigned int* faceVertexIndices
-                unsigned int* pIdx = static_cast<unsigned int*>(
-                    ibuf->lock(HardwareBuffer::HBL_DISCARD)
-                    );
-                readInts(stream, pIdx, sm->indexData->indexCount);
-                ibuf->unlock();
+                HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_DISCARD);
+                readInts(stream, static_cast<unsigned int*>(ibufLock.pData), sm->indexData->indexCount);
 
             }
             else // 16-bit
@@ -1025,12 +1018,8 @@ namespace Ogre {
                         sm->indexData->indexCount,
                         pMesh->mIndexBufferUsage,
                         pMesh->mIndexBufferShadowBuffer);
-                // unsigned short* faceVertexIndices
-                unsigned short* pIdx = static_cast<unsigned short*>(
-                    ibuf->lock(HardwareBuffer::HBL_DISCARD)
-                    );
-                readShorts(stream, pIdx, sm->indexData->indexCount);
-                ibuf->unlock();
+                HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_DISCARD);
+                readShorts(stream, static_cast<unsigned short*>(ibufLock.pData), sm->indexData->indexCount);
             }
         }
         sm->indexData->indexBuffer = ibuf;
@@ -1276,17 +1265,13 @@ namespace Ogre {
             {
                 if (is32BitIndices)
                 {
-                    unsigned int* pIdx = static_cast<unsigned int*>(
-                        ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-                    writeInts(pIdx, bufIndexCount);
-                    ibuf->unlock();
+                    HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_READ_ONLY);
+                    writeInts(static_cast<unsigned int*>(ibufLock.pData), bufIndexCount);
                 }
                 else
                 {
-                    unsigned short* pIdx = static_cast<unsigned short*>(
-                        ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-                    writeShorts(pIdx, bufIndexCount);
-                    ibuf->unlock();
+                    HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_READ_ONLY);
+                    writeShorts(static_cast<unsigned short*>(ibufLock.pData), bufIndexCount);
                 }
             }
         }
@@ -1589,19 +1574,16 @@ namespace Ogre {
                 indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
                     idx32Bit ? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT,
                     buffIndexCount, pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
-                void* pIdx = static_cast<unsigned int*>(indexData->indexBuffer->lock(
-                    0, indexData->indexBuffer->getSizeInBytes(), HardwareBuffer::HBL_DISCARD));
+                HardwareBufferLockGuard ibufLock(indexData->indexBuffer, HardwareBuffer::HBL_DISCARD);
 
-                // unsigned short*/int* faceIndexes;  ((v1, v2, v3) * numFaces)
                 if (idx32Bit)
                 {
-                    readInts(stream, (uint32*)pIdx, buffIndexCount);
+                    readInts(stream, (uint32*)ibufLock.pData, buffIndexCount);
                 }
                 else
                 {
-                    readShorts(stream, (uint16*)pIdx, buffIndexCount);
+                    readShorts(stream, (uint16*)ibufLock.pData, buffIndexCount);
                 }
-                indexData->indexBuffer->unlock();
             }
         }
     }
@@ -2371,10 +2353,8 @@ namespace Ogre {
         bool includeNormals = kf->getVertexBuffer()->getVertexSize() > (sizeof(float) * 3);
         writeBools(&includeNormals, 1);
         // float x,y,z          // repeat by number of vertices in original geometry
-        float* pSrc = static_cast<float*>(
-            kf->getVertexBuffer()->lock(HardwareBuffer::HBL_READ_ONLY));
-        writeFloats(pSrc, vertexCount * (includeNormals ? 6 : 3));
-        kf->getVertexBuffer()->unlock();
+        HardwareBufferLockGuard vbufLock(kf->getVertexBuffer(), HardwareBuffer::HBL_READ_ONLY);
+        writeFloats(static_cast<float*>(vbufLock.pData), vertexCount * (includeNormals ? 6 : 3));
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writePoseKeyframe(const VertexPoseKeyFrame* kf)
@@ -2664,10 +2644,8 @@ namespace Ogre {
                 vertexSize, vertexCount,
                 HardwareBuffer::HBU_STATIC, true);
         // float x,y,z          // repeat by number of vertices in original geometry
-        float* pDst = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD));
-        readFloats(stream, pDst, vertexCount * (includesNormals ? 6 : 3));
-        vbuf->unlock();
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        readFloats(stream, static_cast<float*>(vbufLock.pData), vertexCount * (includesNormals ? 6 : 3));
         kf->setVertexBuffer(vbuf);
 
     }
@@ -2915,19 +2893,16 @@ namespace Ogre {
 
             if (idxCount > 0)
             {
+                HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_READ_ONLY);
                 if (idx32)
                 {
-                    unsigned int* pIdx = static_cast<unsigned int*>(
-                        ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+                    unsigned int* pIdx = static_cast<unsigned int*>(ibufLock.pData);
                     writeInts(pIdx + indexData->indexStart, indexData->indexCount);
-                    ibuf->unlock();
                 }
                 else
                 {
-                    unsigned short* pIdx = static_cast<unsigned short*>(
-                        ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+                    unsigned short* pIdx = static_cast<unsigned short*>(ibufLock.pData);
                     writeShorts(pIdx + indexData->indexStart, indexData->indexCount);
-                    ibuf->unlock();
                 }
             }
         }
@@ -2959,19 +2934,16 @@ namespace Ogre {
         bool is32BitIndices = (ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
         writeBools(&is32BitIndices, 1);
 
+        HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_READ_ONLY);
         if (is32BitIndices)
         {
-            unsigned int* pIdx = static_cast<unsigned int*>(
-                ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+            unsigned int* pIdx = static_cast<unsigned int*>(ibufLock.pData);
             writeInts(pIdx + indexData->indexStart, indexCount);
-            ibuf->unlock();
         }
         else
         {
-            unsigned short* pIdx = static_cast<unsigned short*>(
-                ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+            unsigned short* pIdx = static_cast<unsigned short*>(ibufLock.pData);
             writeShorts(pIdx + indexData->indexStart, indexCount);
-            ibuf->unlock();
         }
     }
     //---------------------------------------------------------------------
@@ -3022,28 +2994,16 @@ namespace Ogre {
                     indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
                         HardwareIndexBuffer::IT_32BIT, indexData->indexCount,
                         pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
-                    unsigned int* pIdx = static_cast<unsigned int*>(
-                        indexData->indexBuffer->lock(
-                        0,
-                        indexData->indexBuffer->getSizeInBytes(),
-                        HardwareBuffer::HBL_DISCARD));
-
-                    readInts(stream, pIdx, indexData->indexCount);
-                    indexData->indexBuffer->unlock();
-
+                    HardwareBufferLockGuard ibufLock(indexData->indexBuffer, HardwareBuffer::HBL_DISCARD);
+                    readInts(stream, static_cast<unsigned int*>(ibufLock.pData), indexData->indexCount);
                 }
                 else
                 {
                     indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
                         HardwareIndexBuffer::IT_16BIT, indexData->indexCount,
                         pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
-                    unsigned short* pIdx = static_cast<unsigned short*>(
-                        indexData->indexBuffer->lock(
-                        0,
-                        indexData->indexBuffer->getSizeInBytes(),
-                        HardwareBuffer::HBL_DISCARD));
-                    readShorts(stream, pIdx, indexData->indexCount);
-                    indexData->indexBuffer->unlock();
+                    HardwareBufferLockGuard ibufLock(indexData->indexBuffer, HardwareBuffer::HBL_DISCARD);
+                    readShorts(stream, static_cast<unsigned short*>(ibufLock.pData), indexData->indexCount);
                 }
             }
         }
@@ -3232,10 +3192,8 @@ namespace Ogre {
         float timePos = kf->getTime();
         writeFloats(&timePos, 1);
         // float x,y,z          // repeat by number of vertices in original geometry
-        float* pSrc = static_cast<float*>(
-            kf->getVertexBuffer()->lock(HardwareBuffer::HBL_READ_ONLY));
-        writeFloats(pSrc, vertexCount * 3);
-        kf->getVertexBuffer()->unlock();
+        HardwareBufferLockGuard vbufLock(kf->getVertexBuffer(), HardwareBuffer::HBL_READ_ONLY);
+        writeFloats(static_cast<float*>(vbufLock.pData), vertexCount * 3);
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl_v1_41::readMorphKeyFrame(DataStreamPtr& stream, Mesh* pMesh, VertexAnimationTrack* track)
@@ -3253,10 +3211,8 @@ namespace Ogre {
                 VertexElement::getTypeSize(VET_FLOAT3), vertexCount,
                 HardwareBuffer::HBU_STATIC, true);
         // float x,y,z          // repeat by number of vertices in original geometry
-        float* pDst = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD));
-        readFloats(stream, pDst, vertexCount * 3);
-        vbuf->unlock();
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        readFloats(stream, static_cast<float*>(vbufLock.pData), vertexCount * 3);
         kf->setVertexBuffer(vbuf);
     }
     //---------------------------------------------------------------------
@@ -4111,7 +4067,6 @@ namespace Ogre {
     void MeshSerializerImpl_v1_2::readGeometryPositions(unsigned short bindIdx,
         DataStreamPtr& stream, Mesh* pMesh, VertexData* dest)
     {
-        float *pFloat = 0;
         HardwareVertexBufferSharedPtr vbuf;
         // float* pVertices (x, y, z order x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_FLOAT3, VES_POSITION);
@@ -4120,17 +4075,14 @@ namespace Ogre {
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
             pMesh->mVertexBufferShadowBuffer);
-        pFloat = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD));
-        readFloats(stream, pFloat, dest->vertexCount * 3);
-        vbuf->unlock();
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        readFloats(stream, static_cast<float*>(vbufLock.pData), dest->vertexCount * 3);
         dest->vertexBufferBinding->setBinding(bindIdx, vbuf);
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl_v1_2::readGeometryNormals(unsigned short bindIdx,
         DataStreamPtr& stream, Mesh* pMesh, VertexData* dest)
     {
-        float *pFloat = 0;
         HardwareVertexBufferSharedPtr vbuf;
         // float* pNormals (x, y, z order x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_FLOAT3, VES_NORMAL);
@@ -4139,17 +4091,14 @@ namespace Ogre {
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
             pMesh->mVertexBufferShadowBuffer);
-        pFloat = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD));
-        readFloats(stream, pFloat, dest->vertexCount * 3);
-        vbuf->unlock();
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        readFloats(stream, static_cast<float*>(vbufLock.pData), dest->vertexCount * 3);
         dest->vertexBufferBinding->setBinding(bindIdx, vbuf);
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl_v1_2::readGeometryColours(unsigned short bindIdx,
         DataStreamPtr& stream, Mesh* pMesh, VertexData* dest)
     {
-        RGBA* pRGBA = 0;
         HardwareVertexBufferSharedPtr vbuf;
         // unsigned long* pColours (RGBA 8888 format x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_COLOUR, VES_DIFFUSE);
@@ -4158,17 +4107,14 @@ namespace Ogre {
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
             pMesh->mVertexBufferShadowBuffer);
-        pRGBA = static_cast<RGBA*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD));
-        readInts(stream, pRGBA, dest->vertexCount);
-        vbuf->unlock();
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        readInts(stream, static_cast<RGBA*>(vbufLock.pData), dest->vertexCount);
         dest->vertexBufferBinding->setBinding(bindIdx, vbuf);
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl_v1_2::readGeometryTexCoords(unsigned short bindIdx,
         DataStreamPtr& stream, Mesh* pMesh, VertexData* dest, unsigned short texCoordSet)
     {
-        float *pFloat = 0;
         HardwareVertexBufferSharedPtr vbuf;
         // unsigned short dimensions    (1 for 1D, 2 for 2D, 3 for 3D)
         unsigned short dim;
@@ -4185,10 +4131,8 @@ namespace Ogre {
             dest->vertexCount,
             pMesh->mVertexBufferUsage,
             pMesh->mVertexBufferShadowBuffer);
-        pFloat = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD));
-        readFloats(stream, pFloat, dest->vertexCount * dim);
-        vbuf->unlock();
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        readFloats(stream, static_cast<float*>(vbufLock.pData), dest->vertexCount * dim);
         dest->vertexBufferBinding->setBinding(bindIdx, vbuf);
     }
     //---------------------------------------------------------------------
@@ -4224,8 +4168,8 @@ namespace Ogre {
             dest->vertexCount,
             pMesh->getVertexBufferUsage(),
             pMesh->isVertexBufferShadowed());
-        pFloat = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD));
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        pFloat = static_cast<float*>(vbufLock.pData);
         readFloats(stream, pFloat, dest->vertexCount * dim);
 
         // Adjust individual v values to (1 - v)
@@ -4239,7 +4183,6 @@ namespace Ogre {
             }
 
         }
-        vbuf->unlock();
         dest->vertexBufferBinding->setBinding(bindIdx, vbuf);
     }
     //---------------------------------------------------------------------

@@ -187,8 +187,8 @@ namespace Ogre {
         // Get position / texcoord buffer
         const HardwareVertexBufferSharedPtr& vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(POS_TEX_BINDING);
-        pVert = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        pVert = static_cast<float*>(vbufLock.pData);
 
         float largestWidth = 0;
         float left = _getDerivedLeft() * 2.0f - 1.0f;
@@ -345,8 +345,6 @@ namespace Ogre {
 
             }
         }
-        // Unlock vertex buffer
-        vbuf->unlock();
 
         if (mMetricsMode == GMM_PIXELS)
         {
@@ -554,8 +552,8 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(COLOUR_BINDING);
 
-        RGBA* pDest = static_cast<RGBA*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
+        RGBA* pDest = static_cast<RGBA*>(vbufLock.pData);
 
         for (size_t i = 0; i < mAllocSize; ++i)
         {
@@ -568,8 +566,6 @@ namespace Ogre {
             *pDest++ = bottomColour;
             *pDest++ = bottomColour;
         }
-        vbuf->unlock();
-
     }
     //-----------------------------------------------------------------------
     void TextAreaOverlayElement::setMetricsMode(GuiMetricsMode gmm)

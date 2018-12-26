@@ -229,20 +229,14 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf = 
             vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
         // lock the buffer for reading
-        unsigned char* pBaseVertex = static_cast<unsigned char*>(
-            vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        HardwareBufferLockGuard vertexLock(vbuf, HardwareBuffer::HBL_READ_ONLY);
+        unsigned char* pBaseVertex = static_cast<unsigned char*>(vertexLock.pData);
 
         // Get the indexes ready for reading
         bool idx32bit = (indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
-        size_t indexSize = idx32bit ? sizeof(uint32) : sizeof(uint16);
-        union {
-            void* pIndex;
-            unsigned short* p16Idx;
-            unsigned int* p32Idx;
-        };
-        pIndex = indexData->indexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
-        pIndex = static_cast<void*>(
-            static_cast<char*>(pIndex) + indexData->indexStart * indexSize);
+        HardwareBufferLockGuard indexLock(indexData->indexBuffer, HardwareBuffer::HBL_READ_ONLY);
+        unsigned short* p16Idx = static_cast<unsigned short*>(indexLock.pData) + indexData->indexStart;
+        unsigned int* p32Idx = static_cast<unsigned int*>(indexLock.pData) + indexData->indexStart;
 
         // Iterate over all the groups of 3 indexes
         unsigned int index[3];
@@ -344,9 +338,6 @@ namespace Ogre {
         // Update triCount for the edge group. Note that we are assume
         // geometries sorted by vertex set.
         eg.triCount = triangleIndex - eg.triStart;
-
-        indexData->indexBuffer->unlock();
-        vbuf->unlock();
     }
     //---------------------------------------------------------------------
     void EdgeListBuilder::connectOrCreateEdge(size_t vertexSet, size_t triangleIndex, 
@@ -436,23 +427,17 @@ namespace Ogre {
         // Triangle face normals should be 1:1 with triangles
         assert(triangleFaceNormals.size() == triangles.size());
 
-        // Lock buffer for reading
-        float* pVert = static_cast<float*>(
-            positionBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
-
         // Calculate triangles which are using this vertex set
         const EdgeData::EdgeGroup& eg = edgeGroups[vertexSet];
         if (eg.triCount != 0) 
         {
+            HardwareBufferLockGuard positionsLock(positionBuffer, HardwareBuffer::HBL_READ_ONLY);
             OptimisedUtil::getImplementation()->calculateFaceNormals(
-                pVert,
+                static_cast<float*>(positionsLock.pData),
                 &triangles[eg.triStart],
                 &triangleFaceNormals[eg.triStart],
                 eg.triCount);
         }
-
-        // unlock the buffer
-        positionBuffer->unlock();
     }
     //---------------------------------------------------------------------
     EdgeData* EdgeData::clone()
@@ -486,8 +471,8 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr vbuf = 
                 vData->vertexBufferBinding->getBuffer(posElem->getSource());
             // lock the buffer for reading
-            unsigned char* pBaseVertex = static_cast<unsigned char*>(
-                vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+            HardwareBufferLockGuard vertexLock(vbuf, HardwareBuffer::HBL_READ_ONLY);
+            unsigned char* pBaseVertex = static_cast<unsigned char*>(vertexLock.pData);
             float* pFloat;
             for (j = 0; j < vData->vertexCount; ++j)
             {
@@ -498,7 +483,6 @@ namespace Ogre {
                     ", " + StringConverter::toString(pFloat[2]) + ")");
                 pBaseVertex += vbuf->getVertexSize();
             }
-            vbuf->unlock();
         }
 
         // Log original index data
@@ -512,21 +496,10 @@ namespace Ogre {
             "vertex set " + StringConverter::toString(mGeometryList[i].vertexSet) + " - " + 
             "operationType " + StringConverter::toString(mGeometryList[i].opType));
             // Get the indexes ready for reading
-            unsigned short* p16Idx = 0;
-            unsigned int* p32Idx = 0;
-
+            HardwareBufferLockGuard indexLock(iData->indexBuffer, HardwareBuffer::HBL_READ_ONLY);
+            unsigned short* p16Idx = static_cast<unsigned short*>(indexLock.pData);
+            unsigned int* p32Idx = static_cast<unsigned int*>(indexLock.pData);
             bool isIT32 = iData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT;
-
-            if (isIT32)
-            {
-                p32Idx = static_cast<unsigned int*>(
-                    iData->indexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
-            }
-            else
-            {
-                p16Idx = static_cast<unsigned short*>(
-                    iData->indexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
-            }
 
             for (j = 0; j < iData->indexCount;  )
             {
@@ -572,12 +545,7 @@ namespace Ogre {
                         j++;
                     }
                 }
-
-
             }
-
-            iData->indexBuffer->unlock();
-
 
             // Log common vertex list
             l->logMessage(".");
