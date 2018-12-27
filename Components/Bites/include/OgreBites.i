@@ -21,7 +21,7 @@
 #define _OgreBitesExport
 
 %include "OgreSGTechniqueResolverListener.h"
-%feature("director") OgreBites::ApplicationContext;
+%feature("director") OgreBites::ApplicationContextBase;
 %feature("director") OgreBites::InputListener;
 %include "OgreInput.h"
 
@@ -45,8 +45,10 @@ JNIEnv* OgreJNIGetEnv();
         $self->initAppForAndroid(assetMgr, nativeWnd);
     }
 }
+%feature("director") OgreBites::ApplicationContextAndroid;
 %rename(ApplicationContext) ApplicationContextAndroid;
 #else
+%feature("director") OgreBites::ApplicationContextSDL;
 %rename(ApplicationContext) ApplicationContextSDL; // keep the pre 1.12 name
 #endif
 
