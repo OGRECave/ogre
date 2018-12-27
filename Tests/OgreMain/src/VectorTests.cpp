@@ -109,7 +109,7 @@ TEST(VectorTests,PerpendicularVector)
     EXPECT_EQ((v3 + v1).dotProduct((v3 + v1).perpendicular()), (Real)0);
 }
 //--------------------------------------------------------------------------
-TEST(VectorTest, Matrix4ArrayLoading)
+TEST(VectorTests, Matrix4ArrayLoading)
 {
     Real arr0[16] = { 1, 0, 0, 0,
                       0, 1, 0, 0,
@@ -151,3 +151,20 @@ TEST(VectorTest, Matrix4ArrayLoading)
     EXPECT_EQ(15, mat1[3][3]);
 }
 //--------------------------------------------------------------------------
+TEST(VectorTests, Matrix3SVD)
+{
+    Matrix3 U, V, mat;
+    Vector3 w;
+
+    // bidiagonal matrix
+    Matrix3 ref(3, 1, 0,
+                0, 2, 0,
+                0, 0, 1);
+
+    ref.SingularValueDecomposition(U, w, V);
+    mat.SingularValueComposition(U, w, V);
+
+    for(int i = 0; i < 3; i++)
+        for(int j = 0; j < 3; j++)
+            EXPECT_NEAR(ref[i][j], mat[i][j], Matrix3::EPSILON);
+}
