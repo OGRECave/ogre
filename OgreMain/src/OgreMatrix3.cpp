@@ -535,9 +535,9 @@ namespace Ogre
                 if ( bTest2 )
                 {
                     // 2x2 closed form factorization
-                    fTmp = (kA[0][0]*kA[0][0] + kA[1][1]*kA[1][1] -
+                    fTmp = (kA[0][0]*kA[0][0] - kA[1][1]*kA[1][1] +
                         kA[0][1]*kA[0][1])/(kA[0][1]*kA[1][1]);
-                    fTan0 = 0.5f*(-fTmp+Math::Sqrt(fTmp*fTmp + 4.0f));
+                    fTan0 = 0.5f*(fTmp+Math::Sqrt(fTmp*fTmp + 4.0f));
                     fCos0 = Math::InvSqrt(1.0f+fTan0*fTan0);
                     fSin0 = fTan0*fCos0;
 
