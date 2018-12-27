@@ -248,6 +248,7 @@ ADD_REPR(Matrix3)
 %ignore Ogre::Matrix4::concatenate; // deprecated
 %include "OgreMatrix4.h"
 ADD_REPR(Matrix4)
+ADD_REPR(Affine3)
 %include "OgreQuaternion.h"
 ADD_REPR(Quaternion)
 %include "OgreSimpleSpline.h"
