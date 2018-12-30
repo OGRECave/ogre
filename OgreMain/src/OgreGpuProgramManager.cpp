@@ -162,14 +162,15 @@ namespace Ogre {
     //---------------------------------------------------------------------------
     ResourcePtr GpuProgramManager::getResourceByName(const String& name, const String& group, bool preferHighLevelPrograms)
     {
-        ResourcePtr ret;
-        if (preferHighLevelPrograms)
-        {
-            ret = HighLevelGpuProgramManager::getSingleton().getResourceByName(name, group);
-            if (ret)
-                return ret;
-        }
-        return ResourceManager::getResourceByName(name, group);
+        if (!preferHighLevelPrograms)
+            return ResourceManager::getResourceByName(name, group);
+        return getResourceByName(name, group);
+    }
+    ResourcePtr GpuProgramManager::getResourceByName(const String& name, const String& group)
+    {
+        // prefer HighLevel Programs
+        ResourcePtr ret = HighLevelGpuProgramManager::getSingleton().getResourceByName(name, group);
+        return ret ? ret : ResourceManager::getResourceByName(name, group);
     }
     //-----------------------------------------------------------------------------
     GpuProgramParametersSharedPtr GpuProgramManager::createParameters(void)

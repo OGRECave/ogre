@@ -126,7 +126,7 @@ namespace Ogre {
         ResourceCreateOrRetrieveResult createOrRetrieve(
             const String &name, const String& group, bool isManual,
             ManualResourceLoader* loader, const NameValuePairList* createParams,
-            TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
+            TextureType texType, int numMipmaps = MIP_DEFAULT,
             Real gamma = 1.0f, bool isAlpha = false,
             PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
 
