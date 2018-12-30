@@ -100,7 +100,7 @@ namespace Ogre {
             const String& group,
             bool isManual, ManualResourceLoader* loader,
             const NameValuePairList* createParams,
-            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage vertexBufferUsage,
             HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
             bool vertexBufferShadowed = false, bool indexBufferShadowed = false);
 

@@ -50,7 +50,6 @@ namespace Ogre {
         // silence warnings
         using ResourceManager::createImpl;
         using ResourceManager::load;
-        using ResourceManager::getResourceByName;
     public:
 
         typedef std::set<String> SyntaxCodes;
@@ -174,7 +173,10 @@ namespace Ogre {
         @param preferHighLevelPrograms If set to true (the default), high level programs will be
             returned in preference to low-level programs.
         */
-        ResourcePtr getResourceByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT, bool preferHighLevelPrograms = true);
+        ResourcePtr getResourceByName(const String& name, const String& group, bool preferHighLevelPrograms);
+
+        /// @overload
+        ResourcePtr getResourceByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT);
 
         /** Create a new set of shared parameters, which can be used across many 
             GpuProgramParameters objects of different structures.
