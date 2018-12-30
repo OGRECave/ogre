@@ -52,8 +52,8 @@ namespace Ogre {
         mBufferManager(0),
         mVertexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
         mIndexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
-        mVertexBufferShadowBuffer(true),
-        mIndexBufferShadowBuffer(true),
+        mVertexBufferShadowBuffer(false),
+        mIndexBufferShadowBuffer(false),
         mPreparedForShadowVolumes(false),
         mEdgeListsBuilt(false),
         mAutoBuildEdgeLists(true), // will be set to false by serializers of 1.30 and above
