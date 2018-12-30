@@ -28,7 +28,7 @@ endmacro()
 
 if(MSVC)
 	# TODO: Set MSVC flags
-	add_definitions(-DMS_NO_COREDLL)
+	add_definitions(/wd4101 /wd4102 /bigobj)
 else()
 	add_definitions(-Wno-cast-qual -Wno-shadow -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-but-set-variable -Wno-missing-declarations)
 endif()

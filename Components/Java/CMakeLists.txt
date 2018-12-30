@@ -21,8 +21,7 @@ include_directories("${PROJECT_BINARY_DIR}/include" "${PROJECT_SOURCE_DIR}/OgreM
 include(${SWIG_USE_FILE})
 
 if(MSVC)
-	# TODO: Set MSVC flags
-	add_definitions(-DMS_NO_COREDLL)
+	add_definitions(/bigobj)
 else()
 	add_definitions(-Wno-strict-aliasing -Wno-cast-qual -Wno-shadow -Wno-missing-declarations)
 endif()
