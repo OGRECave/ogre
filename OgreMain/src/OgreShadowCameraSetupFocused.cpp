@@ -46,14 +46,17 @@ namespace Ogre
         0, -1,  0,  0,      // z
         0,  0,  0,  1); // w
 
-    FocusedShadowCameraSetup::FocusedShadowCameraSetup(void)
+    FocusedShadowCameraSetup::FocusedShadowCameraSetup(bool useAggressiveRegion)
         : mTempFrustum(OGRE_NEW Frustum())
         , mLightFrustumCamera(OGRE_NEW Camera("TEMP LIGHT INTERSECT CAM", NULL))
         , mLightFrustumCameraCalculated(false)
-        , mUseAggressiveRegion(true)
+        , mUseAggressiveRegion(useAggressiveRegion)
     {
         mTempFrustum->setProjectionType(PT_PERSPECTIVE);
     }
+
+    FocusedShadowCameraSetup::~FocusedShadowCameraSetup() {}
+
     //-----------------------------------------------------------------------
     void FocusedShadowCameraSetup::calculateShadowMappingMatrix(const SceneManager& sm,
         const Camera& cam, const Light& light, Affine3 *out_view, Matrix4 *out_proj,

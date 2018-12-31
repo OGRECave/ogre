@@ -68,7 +68,7 @@ mShadowTextureFadeStart(0.7),
 mShadowTextureFadeEnd(0.9)
 {
     // set up default shadow camera setup
-    mDefaultShadowCameraSetup.reset(new DefaultShadowCameraSetup());
+    mDefaultShadowCameraSetup = DefaultShadowCameraSetup::create();
 
     // init shadow texture count per type.
     mShadowTextureCountPerType[Light::LT_POINT] = 1;
