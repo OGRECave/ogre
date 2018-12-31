@@ -2818,7 +2818,7 @@ namespace Ogre {
 
         /** Sets the proportional distance which a texture shadow which is generated from a
             directional light will be offset into the camera view to make best use of texture space.
-        @remarks
+
             When generating a shadow texture from a directional light, an approximation is used
             since it is not possible to render the entire scene to one texture. 
             The texture is projected onto an area centred on the camera, and is
