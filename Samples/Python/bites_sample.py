@@ -5,7 +5,7 @@ import OgreBites
 
 class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
     def __init__(self):
-        OgreBites.ApplicationContext.__init__(self, "PySample", False)
+        OgreBites.ApplicationContext.__init__(self, "PySample")
         OgreBites.InputListener.__init__(self)
 
     def keyPressed(self, evt):
