@@ -69,9 +69,15 @@ namespace Ogre
         mutable size_t mCurrentIteration;
 
     public:
-        /// Constructor, defaults to 3 splits
+        /// @deprecated use create()
         PSSMShadowCameraSetup();
         virtual ~PSSMShadowCameraSetup();
+
+        /// Constructor, defaults to 3 splits
+        static ShadowCameraSetupPtr create()
+        {
+            return std::make_shared<PSSMShadowCameraSetup>();
+        }
 
         /** Calculate a new splitting scheme.
         @param splitCount The number of splits to use

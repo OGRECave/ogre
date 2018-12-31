@@ -62,20 +62,24 @@ namespace Ogre {
     class _OgreExport PlaneOptimalShadowCameraSetup : public ShadowCameraSetup
     {
     private:
-        MovablePlane* mPlane;   ///< pointer to plane of interest
+        const MovablePlane* mPlane;   ///< pointer to plane of interest
     private:
-        PlaneOptimalShadowCameraSetup() {}  ///< Default constructor is private
-
         /// helper function computing projection matrix given constraints
         Matrix4 computeConstrainedProjection( const Vector4& pinhole, 
                                               const std::vector<Vector4>& fpoint, 
                                               const std::vector<Vector2>& constraint) const;
 
     public:
-        /// Constructor -- requires a plane of interest
-        PlaneOptimalShadowCameraSetup(MovablePlane *plane);
-        /// Destructor
+        /// @deprecated use create()
+        PlaneOptimalShadowCameraSetup(const MovablePlane *plane);
+
         virtual ~PlaneOptimalShadowCameraSetup();
+
+        /// Constructor -- requires a plane of interest
+        static ShadowCameraSetupPtr create(const MovablePlane *plane)
+        {
+            return std::make_shared<PlaneOptimalShadowCameraSetup>(plane);
+        }
 
         /// Returns shadow camera configured to get 1-1 homography between screen and shadow map when restricted to plane
         virtual void getShadowCamera (const SceneManager *sm, const Camera *cam, 

@@ -84,10 +84,13 @@ namespace Ogre {
     class _OgreExport DefaultShadowCameraSetup : public ShadowCameraSetup
     {
     public:
-        /// Default constructor
         DefaultShadowCameraSetup();
-        /// Destructor
         virtual ~DefaultShadowCameraSetup();
+
+        static ShadowCameraSetupPtr create()
+        {
+            return std::make_shared<DefaultShadowCameraSetup>();
+        }
 
         /// Default shadow camera setup
         virtual void getShadowCamera (const SceneManager *sm, const Camera *cam, 

@@ -35,12 +35,12 @@ namespace Ogre
 {
 
 
-    LiSPSMShadowCameraSetup::LiSPSMShadowCameraSetup(void)
-        : mOptAdjustFactor(0.1f)
-        , mUseSimpleNOpt(true)
+    LiSPSMShadowCameraSetup::LiSPSMShadowCameraSetup(Real n, bool useSimpleNOpt, Degree angle)
+        : mOptAdjustFactor(n)
+        , mUseSimpleNOpt(useSimpleNOpt)
         , mOptAdjustFactorTweak(1.0)
-        , mCosCamLightDirThreshold(0.9)
     {
+        setCameraLightDirectionThreshold(angle);
     }
     //-----------------------------------------------------------------------
     LiSPSMShadowCameraSetup::~LiSPSMShadowCameraSetup(void)

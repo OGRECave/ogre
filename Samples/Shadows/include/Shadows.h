@@ -135,9 +135,6 @@ protected:
     ShadowCameraSetupPtr mCurrentShadowCameraSetup;
     /// Plane that defines plane-optimal shadow mapping basis
     MovablePlane* mPlane;
-    // transient pointer to LiSPSM setup if present
-    LiSPSMShadowCameraSetup* mLiSPSMSetup;
-
 public:
     Sample_Shadows()
         : mLightNode(0)
@@ -578,23 +575,17 @@ protected:
             switch(proj)
             {
             case UNIFORM:
-                mCurrentShadowCameraSetup = 
-                    ShadowCameraSetupPtr(new DefaultShadowCameraSetup());
+                mCurrentShadowCameraSetup = DefaultShadowCameraSetup::create();
                 break;
             case UNIFORM_FOCUSED:
-                mCurrentShadowCameraSetup = 
-                    ShadowCameraSetupPtr(new FocusedShadowCameraSetup());
+                mCurrentShadowCameraSetup = FocusedShadowCameraSetup::create();
                 break;
             case LISPSM:
-                {
-                    mLiSPSMSetup = new LiSPSMShadowCameraSetup();
-                    //mLiSPSMSetup->setUseAggressiveFocusRegion(false);
-                    mCurrentShadowCameraSetup = ShadowCameraSetupPtr(mLiSPSMSetup);
-                }
+                //mLiSPSMSetup->setUseAggressiveFocusRegion(false);
+                mCurrentShadowCameraSetup = LiSPSMShadowCameraSetup::create();
                 break;
             case PLANE_OPTIMAL:
-                mCurrentShadowCameraSetup = 
-                    ShadowCameraSetupPtr(new PlaneOptimalShadowCameraSetup(mPlane));
+                mCurrentShadowCameraSetup = PlaneOptimalShadowCameraSetup::create(mPlane);
                 break;
 
             };

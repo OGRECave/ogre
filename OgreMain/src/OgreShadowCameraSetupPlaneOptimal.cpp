@@ -283,7 +283,7 @@ namespace Ogre
     // --------------------------------------------------------------------
 
     /// Construct object to consider a specified plane of interest
-    PlaneOptimalShadowCameraSetup::PlaneOptimalShadowCameraSetup(MovablePlane* plane)
+    PlaneOptimalShadowCameraSetup::PlaneOptimalShadowCameraSetup(const MovablePlane* plane)
     {
         mPlane = plane;
     }

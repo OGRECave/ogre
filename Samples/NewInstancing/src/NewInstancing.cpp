@@ -123,10 +123,9 @@ void Sample_NewInstancing::setupContent()
     }
 
     //LiSPSMShadowCameraSetup *shadowCameraSetup = new LiSPSMShadowCameraSetup();
-    FocusedShadowCameraSetup *shadowCameraSetup = new FocusedShadowCameraSetup();
     //PlaneOptimalShadowCameraSetup *shadowCameraSetup = new PlaneOptimalShadowCameraSetup();
 
-    mSceneMgr->setShadowCameraSetup( ShadowCameraSetupPtr(shadowCameraSetup) );
+    mSceneMgr->setShadowCameraSetup( FocusedShadowCameraSetup::create() );
 
     mEntities.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
     mSceneNodes.reserve( NUM_INST_ROW * NUM_INST_COLUMN );

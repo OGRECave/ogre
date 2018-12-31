@@ -180,17 +180,20 @@ namespace Ogre
             Real top, Real near, Real far) const;
 
     public:
-        /** Default constructor.
-        @remarks
-        Nothing done here.
-        */
-        LiSPSMShadowCameraSetup(void);
+        /// @deprecated use create()
+        LiSPSMShadowCameraSetup(Real n = 0.1f, bool useSimpleNOpt = true, Degree angle = Radian(0.451));
 
-        /** Default destructor.
-        @remarks
-        Nothing done here.
-        */
-        virtual ~LiSPSMShadowCameraSetup(void);
+        virtual ~LiSPSMShadowCameraSetup();
+
+        /**
+         * @param n The adjustment factor
+         * @param useSimpleNOpt
+         * @param angle camera Light Direction Threshold
+         */
+        static ShadowCameraSetupPtr create(Real n = 0.1f, bool useSimpleNOpt = true, Degree angle = Radian(0.451))
+        {
+            return std::make_shared<LiSPSMShadowCameraSetup>();
+        }
 
         /** Returns a LiSPSM shadow camera.
         @remarks
