@@ -372,60 +372,10 @@ namespace Ogre {
 
         if (!mCustomProjMatrix)
         {
-
-            // The code below will dealing with general projection 
-            // parameters, similar glFrustum and glOrtho.
-            // Doesn't optimise manually except division operator, so the 
-            // code more self-explaining.
-
-            Real inv_w = 1 / (right - left);
-            Real inv_h = 1 / (top - bottom);
-            Real inv_d = 1 / (mFarDist - mNearDist);
-
             // Recalc if frustum params changed
             if (mProjType == PT_PERSPECTIVE)
             {
-                // Calc matrix elements
-                Real A = 2 * mNearDist * inv_w;
-                Real B = 2 * mNearDist * inv_h;
-                Real C = (right + left) * inv_w;
-                Real D = (top + bottom) * inv_h;
-                Real q, qn;
-                if (mFarDist == 0)
-                {
-                    // Infinite far plane
-                    q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
-                    qn = mNearDist * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
-                }
-                else
-                {
-                    q = - (mFarDist + mNearDist) * inv_d;
-                    qn = -2 * (mFarDist * mNearDist) * inv_d;
-                }
-
-                // NB: This creates 'uniform' perspective projection matrix,
-                // which depth range [-1,1], right-handed rules
-                //
-                // [ A   0   C   0  ]
-                // [ 0   B   D   0  ]
-                // [ 0   0   q   qn ]
-                // [ 0   0   -1  0  ]
-                //
-                // A = 2 * near / (right - left)
-                // B = 2 * near / (top - bottom)
-                // C = (right + left) / (right - left)
-                // D = (top + bottom) / (top - bottom)
-                // q = - (far + near) / (far - near)
-                // qn = - 2 * (far * near) / (far - near)
-
-                mProjMatrix = Matrix4::ZERO;
-                mProjMatrix[0][0] = A;
-                mProjMatrix[0][2] = C;
-                mProjMatrix[1][1] = B;
-                mProjMatrix[1][2] = D;
-                mProjMatrix[2][2] = q;
-                mProjMatrix[2][3] = qn;
-                mProjMatrix[3][2] = -1;
+                mProjMatrix = Math::makePerspectiveMatrix(left, right, bottom, top, mNearDist, mFarDist);
 
                 if (mObliqueDepthProjection)
                 {
@@ -469,6 +419,15 @@ namespace Ogre {
             } // perspective
             else if (mProjType == PT_ORTHOGRAPHIC)
             {
+                // The code below will dealing with general projection
+                // parameters, similar glOrtho.
+                // Doesn't optimise manually except division operator, so the
+                // code more self-explaining.
+
+                Real inv_w = 1 / (right - left);
+                Real inv_h = 1 / (top - bottom);
+                Real inv_d = 1 / (mFarDist - mNearDist);
+
                 Real A = 2 * inv_w;
                 Real B = 2 * inv_h;
                 Real C = - (right + left) * inv_w;

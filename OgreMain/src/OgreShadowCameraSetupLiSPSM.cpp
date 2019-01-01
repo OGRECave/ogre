@@ -91,7 +91,7 @@ namespace Ogre
 
         // set up the LiSPSM perspective transformation
         // build up frustum to map P onto the unit cube with (-1/-1/-1) and (+1/+1/+1)
-        Matrix4 P = buildFrustumProjection(-1, 1, -1, 1, n_opt + d, n_opt);
+        Matrix4 P = Math::makePerspectiveMatrix(-1, 1, -1, 1, n_opt + d, n_opt);
 
         return P * lightSpaceTranslation;
     }
@@ -195,26 +195,6 @@ namespace Ogre
                 return Vector3(0.0, 0.0, 0.0);
             }
         }
-    }
-    //-----------------------------------------------------------------------
-    Matrix4 LiSPSMShadowCameraSetup::buildFrustumProjection(Real left, Real right, 
-        Real bottom, Real top, Real nearf, Real farf) const
-    {
-        // Changed to nearf because windows defines near and far as a macros
-        Real m00 = 2 * nearf / (right - left),
-            m02 = (right + left) / (right - left),
-            m11 = 2 * nearf / (top - bottom),
-            m12 = (top + bottom) / (top - bottom),
-            m22 = -(farf + nearf) / (farf - nearf),
-            m23 = -2 * farf * nearf / (farf - nearf),
-            m32 = -1;
-
-        Matrix4 m(m00, 0.0, m02, 0.0,
-            0.0, m11, m12, 0.0,
-            0.0, 0.0, m22, m23,
-            0.0, 0.0, m32, 0.0);
-
-        return m;
     }
     //-----------------------------------------------------------------------
     void LiSPSMShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 

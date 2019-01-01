@@ -707,8 +707,34 @@ namespace Ogre
             return std::max(std::min(val, maxval), minval);
         }
 
+        /** This creates a view matrix
+
+            [ Lx  Uy  Dz  Tx  ]
+            [ Lx  Uy  Dz  Ty  ]
+            [ Lx  Uy  Dz  Tz  ]
+            [ 0   0   0   1   ]
+
+            Where T = -(Transposed(Rot) * Pos)
+         */
         static Affine3 makeViewMatrix(const Vector3& position, const Quaternion& orientation,
             const Affine3* reflectMatrix = 0);
+
+        /** This creates 'uniform' perspective projection matrix,
+            which depth range [-1,1], right-handed rules
+
+           [ A   0   C   0  ]
+           [ 0   B   D   0  ]
+           [ 0   0   q   qn ]
+           [ 0   0   -1  0  ]
+
+           A = 2 * near / (right - left)
+           B = 2 * near / (top - bottom)
+           C = (right + left) / (right - left)
+           D = (top + bottom) / (top - bottom)
+           q = - (far + near) / (far - near)
+           qn = - 2 * (far * near) / (far - near)
+         */
+        static Matrix4 makePerspectiveMatrix(Real left, Real right, Real bottom, Real top, Real zNear, Real zFar);
 
         /** Get the radius of the origin-centered bounding sphere from the bounding box. */
         static Real boundingRadiusFromAABB(const AxisAlignedBox& aabb);
