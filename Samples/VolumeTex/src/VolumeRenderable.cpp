@@ -62,18 +62,14 @@ void VolumeRenderable::_notifyCurrentCamera( Camera* cam )
 
     Vector3 yVec = zVec.crossProduct( xVec );
     yVec.normalise();
-    
-    Quaternion oriQuat;
-    oriQuat.FromAxes( xVec, yVec, zVec );
-    
-    oriQuat.ToRotationMatrix(mFakeOrientation);
+
+    mFakeOrientation.FromAxes( xVec, yVec, zVec );
     
     Matrix3 tempMat;
-    Quaternion q = getParentNode()->_getDerivedOrientation().UnitInverse() * oriQuat ;
-    q.ToRotationMatrix(tempMat);
+    getParentNode()->_getDerivedOrientation().UnitInverse().ToRotationMatrix(tempMat);
     
     Matrix4 rotMat = Matrix4::IDENTITY;
-    rotMat = tempMat;
+    rotMat = tempMat * mFakeOrientation;
     rotMat.setTrans(Vector3(0.5f, 0.5f, 0.5f));
 
     Technique* tech = mMaterial->getBestTechnique();

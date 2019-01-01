@@ -164,21 +164,8 @@ namespace Ogre {
     void Quaternion::FromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis)
     {
         Matrix3 kRot;
-
-        kRot[0][0] = xaxis.x;
-        kRot[1][0] = xaxis.y;
-        kRot[2][0] = xaxis.z;
-
-        kRot[0][1] = yaxis.x;
-        kRot[1][1] = yaxis.y;
-        kRot[2][1] = yaxis.z;
-
-        kRot[0][2] = zaxis.x;
-        kRot[1][2] = zaxis.y;
-        kRot[2][2] = zaxis.z;
-
+        kRot.FromAxes(xaxis, yaxis, zaxis);
         FromRotationMatrix(kRot);
-
     }
     //-----------------------------------------------------------------------
     void Quaternion::ToAxes (Vector3* akAxis) const
