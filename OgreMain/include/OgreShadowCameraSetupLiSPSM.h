@@ -170,15 +170,6 @@ namespace Ogre
         */
         Vector3 calculateZ0_ls(const Matrix4& lightSpace, const Vector3& e, Real bodyB_zMax_ls, 
             const Camera& cam) const;
-
-        /** Builds a frustum matrix.
-        @remarks
-        Builds a standard frustum matrix out of the distance info of the six frustum 
-        clipping planes.
-        */
-        Matrix4 buildFrustumProjection(Real left, Real right, Real bottom, 
-            Real top, Real near, Real far) const;
-
     public:
         /// @deprecated use create()
         LiSPSMShadowCameraSetup(Real n = 0.1f, bool useSimpleNOpt = true, Degree angle = Radian(0.451));

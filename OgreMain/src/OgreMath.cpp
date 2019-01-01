@@ -782,17 +782,6 @@ namespace Ogre
     Affine3 Math::makeViewMatrix(const Vector3& position, const Quaternion& orientation,
         const Affine3* reflectMatrix)
     {
-        Affine3 viewMatrix;
-
-        // View matrix is:
-        //
-        //  [ Lx  Uy  Dz  Tx  ]
-        //  [ Lx  Uy  Dz  Ty  ]
-        //  [ Lx  Uy  Dz  Tz  ]
-        //  [ 0   0   0   1   ]
-        //
-        // Where T = -(Transposed(Rot) * Pos)
-
         // This is most efficiently done using 3x3 Matrices
         Matrix3 rot;
         orientation.ToRotationMatrix(rot);
@@ -802,7 +791,7 @@ namespace Ogre
         Vector3 trans = -rotT * position;
 
         // Make final matrix
-        viewMatrix = Affine3::IDENTITY;
+        Affine3 viewMatrix = Affine3::IDENTITY;
         viewMatrix = rotT; // fills upper 3x3
         viewMatrix[0][3] = trans.x;
         viewMatrix[1][3] = trans.y;
@@ -816,6 +805,48 @@ namespace Ogre
 
         return viewMatrix;
 
+    }
+
+    Matrix4 Math::makePerspectiveMatrix(Real left, Real right, Real bottom, Real top, Real zNear, Real zFar)
+    {
+        // The code below will dealing with general projection
+        // parameters, similar glFrustum.
+        // Doesn't optimise manually except division operator, so the
+        // code more self-explaining.
+
+        Real inv_w = 1 / (right - left);
+        Real inv_h = 1 / (top - bottom);
+        Real inv_d = 1 / (zFar - zNear);
+
+        // Calc matrix elements
+        Real A = 2 * zNear * inv_w;
+        Real B = 2 * zNear * inv_h;
+        Real C = (right + left) * inv_w;
+        Real D = (top + bottom) * inv_h;
+        Real q, qn;
+
+        if (zFar == 0)
+        {
+            // Infinite far plane
+            q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
+            qn = zNear * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
+        }
+        else
+        {
+            q = - (zFar + zNear) * inv_d;
+            qn = -2 * (zFar * zNear) * inv_d;
+        }
+
+        Matrix4 ret = Matrix4::ZERO;
+        ret[0][0] = A;
+        ret[0][2] = C;
+        ret[1][1] = B;
+        ret[1][2] = D;
+        ret[2][2] = q;
+        ret[2][3] = qn;
+        ret[3][2] = -1;
+
+        return ret;
     }
     //---------------------------------------------------------------------
     Real Math::boundingRadiusFromAABB(const AxisAlignedBox& aabb)
