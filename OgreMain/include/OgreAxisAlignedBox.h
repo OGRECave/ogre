@@ -90,54 +90,28 @@ namespace Ogre {
         };
         typedef std::array<Vector3, 8> Corners;
 
-        inline AxisAlignedBox() : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE)
+        AxisAlignedBox()
         {
             // Default to a null box 
             setMinimum( -0.5, -0.5, -0.5 );
             setMaximum( 0.5, 0.5, 0.5 );
             mExtent = EXTENT_NULL;
         }
-        inline AxisAlignedBox(Extent e) : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE)
+        AxisAlignedBox(Extent e)
         {
             setMinimum( -0.5, -0.5, -0.5 );
             setMaximum( 0.5, 0.5, 0.5 );
             mExtent = e;
         }
 
-        inline AxisAlignedBox(const AxisAlignedBox & rkBox) : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE)
-
-        {
-            if (rkBox.isNull())
-                setNull();
-            else if (rkBox.isInfinite())
-                setInfinite();
-            else
-                setExtents( rkBox.mMinimum, rkBox.mMaximum );
-        }
-
-        inline AxisAlignedBox( const Vector3& min, const Vector3& max ) : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE)
+        AxisAlignedBox( const Vector3& min, const Vector3& max )
         {
             setExtents( min, max );
         }
 
-        inline AxisAlignedBox(
-            Real mx, Real my, Real mz,
-            Real Mx, Real My, Real Mz ) : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE)
+        AxisAlignedBox(Real mx, Real my, Real mz, Real Mx, Real My, Real Mz)
         {
             setExtents( mx, my, mz, Mx, My, Mz );
-        }
-
-        AxisAlignedBox& operator=(const AxisAlignedBox& rhs)
-        {
-            // Specifically override to avoid copying mCorners
-            if (rhs.isNull())
-                setNull();
-            else if (rhs.isInfinite())
-                setInfinite();
-            else
-                setExtents(rhs.mMinimum, rhs.mMaximum);
-
-            return *this;
         }
 
         /** Gets the minimum corner of the box.
