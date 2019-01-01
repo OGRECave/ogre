@@ -865,9 +865,10 @@ namespace Ogre {
     void TextureUnitState::recalcTextureMatrix() const
     {
         // Assumption: 2D texture coords
-        Matrix4 xform;
+        // that would make this Affine2(Matrix3), but we lack such a class
+        // Matrix3 is horribly unoptimized ATM
+        Affine3 xform = Affine3::IDENTITY;
 
-        xform = Matrix4::IDENTITY;
         if (mUScale != 1 || mVScale != 1)
         {
             // Offset to center of texture
@@ -880,17 +881,12 @@ namespace Ogre {
 
         if (mUMod || mVMod)
         {
-            Matrix4 xlate = Matrix4::IDENTITY;
-
-            xlate[0][3] = mUMod;
-            xlate[1][3] = mVMod;
-
-            xform = xlate * xform;
+            xform = Affine3::getTrans(mUMod, mVMod, 0) * xform;
         }
 
         if (mRotate != Radian(0))
         {
-            Matrix4 rot = Matrix4::IDENTITY;
+            Affine3 rot = Affine3::IDENTITY;
             Radian theta ( mRotate );
             Real cosTheta = Math::Cos(theta);
             Real sinTheta = Math::Sin(theta);
