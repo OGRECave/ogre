@@ -108,19 +108,19 @@ namespace Ogre
              left.normalise();
              up = dir.crossProduct(left);
              up.normalise();
-             // Derive quaternion from axes
-             Quaternion q;
-             q.FromAxes(left, up, dir);
+             // Derive rotation from axes
+             Matrix3 rot;
+             rot.FromAxes(left, up, dir);
 
              //convert world space camera position into light space
-             Vector3 lightSpacePos = q.Inverse() * pos;
+             Vector3 lightSpacePos = rot.transpose() * pos;
              
              //snap to nearest texel
              lightSpacePos.x -= std::fmod(lightSpacePos.x, worldTexelSize);
              lightSpacePos.y -= std::fmod(lightSpacePos.y, worldTexelSize);
 
              //convert back to world space
-             pos = q * lightSpacePos;
+             pos = rot * lightSpacePos;
             
         }
         // Spotlight
