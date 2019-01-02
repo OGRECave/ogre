@@ -1394,12 +1394,6 @@ namespace Ogre {
             }
         }
 
-        // Launch compute shader job(s).
-        if (mCurrentComputeShader)
-        {
-            _dispatchCompute(Vector3i(mCurrentComputeShader->getComputeGroupDimensions()));
-        }
-
         int operationType = op.operationType;
         // Use adjacency if there is a geometry program and it requested adjacency info
         if(mGeometryProgramBound && mCurrentGeometryShader && mCurrentGeometryShader->isAdjacencyInfoRequired())
