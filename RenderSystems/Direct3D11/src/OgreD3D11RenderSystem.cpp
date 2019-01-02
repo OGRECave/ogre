@@ -2617,13 +2617,7 @@ namespace Ogre
         D3D11_PRIMITIVE_TOPOLOGY primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
         DWORD primCount = 0;
 
-        // Handle computing
-        if(mBoundComputeProgram)
-        {
-            _dispatchCompute(Vector3i(mBoundComputeProgram->getComputeGroupDimensions()));
-            return;
-        }
-        else if(mBoundTessellationHullProgram && mBoundTessellationDomainProgram)
+        if(mBoundTessellationHullProgram && mBoundTessellationDomainProgram)
         {
             // useful primitives for tessellation
             switch( op.operationType )
