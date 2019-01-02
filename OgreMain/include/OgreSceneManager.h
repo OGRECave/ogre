@@ -624,8 +624,8 @@ namespace Ogre {
             HardwareIndexBufferSharedPtr mShadowIndexBuffer;
             size_t mShadowIndexBufferSize;
             size_t mShadowIndexBufferUsedSize;
-            GpuProgramParametersSharedPtr mInfiniteExtrusionParams;
-            GpuProgramParametersSharedPtr mFiniteExtrusionParams;
+            static GpuProgramParametersSharedPtr msInfiniteExtrusionParams;
+            static GpuProgramParametersSharedPtr msFiniteExtrusionParams;
 
             Pass* mShadowTextureCustomCasterPass;
             Pass* mShadowTextureCustomReceiverPass;
