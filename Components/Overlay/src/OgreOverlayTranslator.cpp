@@ -135,7 +135,7 @@ void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
 {
     ObjectAbstractNode* obj = static_cast<ObjectAbstractNode*>(node.get());
 
-    bool isATemplate = obj->cls != "overlay";
+    bool isATemplate = obj->cls != "overlay" && !obj->parent; // only top level elements are templates
 
     String name;
     // legacy compat
@@ -178,8 +178,12 @@ void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
     if(obj->parent && obj->parent->context.has_value())
     {
         Overlay** overlay = any_cast<Overlay*>(&obj->parent->context);
-        if(overlay && newElement->isContainer())
-            (*overlay)->add2D((OverlayContainer*)newElement);
+        if(overlay)
+            if(newElement->isContainer())
+                (*overlay)->add2D((OverlayContainer*)newElement);
+            else
+                compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
+                                   "Top level components must be containers, but '" + type + "' is an element");
         else
             any_cast<OverlayContainer*>(obj->parent->context)->addChild(newElement);
     }
@@ -242,14 +246,13 @@ void OverlayTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
         {
             PropertyAbstractNode* prop = static_cast<PropertyAbstractNode*>(c.get());
 
-            if (prop->name != "zorder")
+            uint32 zorder;
+            if (prop->name != "zorder" || prop->values.empty() || !getUInt(prop->values.front(), &zorder))
             {
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, prop->name);
                 continue;
             }
-            uint32 zorder;
-            getUInt(c, &zorder);
-            overlay->setZOrder((ushort)zorder);
+            overlay->setZOrder(Math::uint16Cast(zorder));
         }
         else if(c->type == ANT_OBJECT)
             processNode(compiler, c);
