@@ -877,8 +877,6 @@ overlay MyOverlays/ANewOverlay
 
 The above example defines a single overlay called ’MyOverlays/ANewOverlay’, with 2 panels in it, one nested under the other. It uses relative metrics (the default if no metrics\_mode option is found).
 
-@note Overlays do not yet use the generic Ogre::ScriptCompiler so, @ref Advanced-Script-Inheritance and @ref Script-Variables are not available.
-
 The overlay itself only has a single property ’zorder’ which determines how ’high’ it is in the stack of overlays if more than one is displayed at the same time. Overlays with higher zorder values are displayed on top.
 
 # Adding elements to the overlay {#Adding-elements-to-the-overlay}
