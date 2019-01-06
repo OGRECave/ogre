@@ -113,19 +113,6 @@ namespace Ogre {
         void switchMode (void);
 
         /**
-         * Loads an icon from an Ogre resource into the X Server. This currently only
-         * works for 24 and 32 bit displays. The image must be findable by the Ogre
-         * resource system, and of format PF_A8R8G8B8.
-         *
-         * @param display       X display
-         * @param name     Name of image to load
-         * @param pix           Receiver for the output pixmap
-         * @param mask     Receiver for the output mask (alpha bitmap)
-         * @returns               true on success
-         */
-        bool loadIcon(const String &name, Pixmap *pix, Pixmap *mask);
-
-        /**
          * Get the GLXFBConfig used to create a ::GLXContext
          *
          * @param drawable   GLXContext

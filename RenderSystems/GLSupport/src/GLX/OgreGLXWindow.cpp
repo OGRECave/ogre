@@ -421,17 +421,6 @@ namespace Ogre
                     wmHints->initial_state = NormalState;
                     wmHints->input = True;
                     wmHints->flags = StateHint | InputHint;
-
-                    int depth = DisplayPlanes(xDisplay, DefaultScreen(xDisplay));
-
-                    // Check if we can give it an icon
-                    if(depth == 24 || depth == 32)
-                    {
-                        if(mGLSupport->loadIcon("GLX_icon.png", &wmHints->icon_pixmap, &wmHints->icon_mask))
-                        {
-                            wmHints->flags |= IconPixmapHint | IconMaskHint;
-                        }
-                    }
                 }
 
                 // Is this really necessary ? Which broken WM might need it?
