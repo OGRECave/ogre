@@ -1,4 +1,4 @@
- %module(directors="1") Ogre
+ %module(package="Ogre", directors="1") Ogre
  %{
  /* Includes the header in the wrapper code */
 #include "Ogre.h"

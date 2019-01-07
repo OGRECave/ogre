@@ -1,19 +1,19 @@
 import Ogre
-import OgreBites
-import OgreRTShader
-import OgreNumpy
+import Ogre.Bites
+import Ogre.RTShader
+import Ogre.Numpy
 
 import numpy as np
 from matplotlib import pyplot
 
 def main():
-    app = OgreBites.ApplicationContext("PySample")
+    app = Ogre.Bites.ApplicationContext("PySample")
     app.initApp()
     
     root = app.getRoot()
     scn_mgr = root.createSceneManager()
     
-    shadergen = OgreRTShader.ShaderGenerator.getSingleton()
+    shadergen = Ogre.RTShader.ShaderGenerator.getSingleton()
     shadergen.addSceneManager(scn_mgr);
     
     ## [numpy_image]
@@ -22,7 +22,7 @@ def main():
     ## [numpy_image]
     
     ## [np_to_ogre]
-    mem = OgreNumpy.AsDataStream(arr)
+    mem = Ogre.Numpy.AsDataStream(arr)
     ogre_img = Ogre.Image()
     ogre_img.loadDynamicImage(mem.getPtr(), 256, 256, Ogre.PF_BYTE_RGB)
     
@@ -38,7 +38,7 @@ def main():
     rect = Ogre.Rectangle2D(True)
     rect.setCorners(-0.5, 0.5, 0.5, -0.5) # in normalized screen space
     rect.setMaterial(mat)
-    rect.setBoundingBox(Ogre.AxisAlignedBox(Ogre.AxisAlignedBox.BOX_INFINITE))
+    rect.setBoundingBox(Ogre.AxisAlignedBox.BOX_INFINITE)
 
     scn_mgr.getRootSceneNode().createChildSceneNode().attachObject(rect)
     ## [apply_to_rect]
@@ -61,7 +61,7 @@ def main():
     ## [allocate_with_ogre]
     
     ## [zero_copy_view]
-    pyplot.imsave("screenshot.png", OgreNumpy.view(pb))
+    pyplot.imsave("screenshot.png", Ogre.Numpy.view(pb))
     ## [zero_copy_view]
 
 if __name__ == "__main__":

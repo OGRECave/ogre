@@ -1,4 +1,4 @@
-%module(directors="1") OgreBites
+%module(package="Ogre", directors="1") Bites
 %{
 /* Includes the header in the wrapper code */
 #include "Ogre.h"

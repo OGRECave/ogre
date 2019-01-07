@@ -1,4 +1,8 @@
+#ifdef SWIGPYTHON
+%module(package="Ogre") Overlay
+#else
 %module OgreOverlay
+#endif
 %{
 /* Includes the header in the wrapper code */
 #include "Ogre.h"

@@ -1,15 +1,13 @@
 import Ogre
-import OgreRTShader
-import OgreOverlay
-import OgreBites
+from Ogre import RTShader, Overlay, Bites
 
-class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
+class SampleApp(Bites.ApplicationContext, Bites.InputListener):
     def __init__(self):
-        OgreBites.ApplicationContext.__init__(self, "PySample")
-        OgreBites.InputListener.__init__(self)
+        Bites.ApplicationContext.__init__(self, "PySample")
+        Bites.InputListener.__init__(self)
 
     def keyPressed(self, evt):
-        if evt.keysym.sym == OgreBites.SDLK_ESCAPE:
+        if evt.keysym.sym == Bites.SDLK_ESCAPE:
             self.getRoot().queueEndRendering()
 
         return True
@@ -20,12 +18,12 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
         # load essential resources for trays/ loading bar
         Ogre.ResourceGroupManager.getSingleton().initialiseResourceGroup("Essential")
         self.createDummyScene()
-        self.trays = OgreBites.TrayManager("Interface", self.getRenderWindow())
+        self.trays = Bites.TrayManager("Interface", self.getRenderWindow())
         self.addInputListener(self.trays)
 
         # show loading progress
         self.trays.showLoadingBar(1, 0)
-        ret = OgreBites.ApplicationContext.loadResources(self)
+        ret = Bites.ApplicationContext.loadResources(self)
 
         # clean up
         self.trays.hideLoadingBar()
@@ -33,23 +31,23 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
         return ret
 
     def setup(self):
-        OgreBites.ApplicationContext.setup(self)
+        Bites.ApplicationContext.setup(self)
         self.addInputListener(self)
 
         root = self.getRoot()
         scn_mgr = root.createSceneManager()
 
-        shadergen = OgreRTShader.ShaderGenerator.getSingleton()
+        shadergen = RTShader.ShaderGenerator.getSingleton()
         shadergen.addSceneManager(scn_mgr)  # must be done before we do anything with the scene
 
         # overlay/ trays
         scn_mgr.addRenderQueueListener(self.getOverlaySystem())
-        self.trays.showFrameStats(OgreBites.TL_TOPRIGHT)
+        self.trays.showFrameStats(Bites.TL_TOPRIGHT)
         self.trays.refreshCursor()
 
         # enable per pixel lighting
-        rs = shadergen.getRenderState(OgreRTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME)
-        rs.addTemplateSubRenderState(shadergen.createSubRenderState(OgreRTShader.cvar.PerPixelLighting_Type))
+        rs = shadergen.getRenderState(RTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME)
+        rs.addTemplateSubRenderState(shadergen.createSubRenderState(RTShader.cvar.PerPixelLighting_Type))
 
         scn_mgr.setAmbientLight(Ogre.ColourValue(.1, .1, .1))
 
@@ -64,13 +62,13 @@ class SampleApp(OgreBites.ApplicationContext, OgreBites.InputListener):
         camnode = scn_mgr.getRootSceneNode().createChildSceneNode()
         camnode.attachObject(cam)
 
-        self.camman = OgreBites.CameraMan(camnode)
-        self.camman.setStyle(OgreBites.CS_ORBIT)
+        self.camman = Bites.CameraMan(camnode)
+        self.camman.setStyle(Bites.CS_ORBIT)
         self.camman.setYawPitchDist(Ogre.Radian(0), Ogre.Radian(0.3), 15)
         self.addInputListener(self.camman)
 
         # must keep a reference to ctrls so it does not get deleted
-        self.ctrls = OgreBites.AdvancedRenderControls(self.trays, cam)
+        self.ctrls = Bites.AdvancedRenderControls(self.trays, cam)
         self.addInputListener(self.ctrls)
 
         vp = self.getRenderWindow().addViewport(cam)
