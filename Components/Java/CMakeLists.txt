@@ -68,6 +68,7 @@ if(OGRE_BUILD_COMPONENT_BITES)
 	list(APPEND SWIG_INPUT_MODULES ../Bites/include/OgreBites.i)
 endif()
 
+set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_module(OgreJNI java ${SWIG_INPUT_MODULES})
 swig_link_libraries(OgreJNI OgreBites OgreOverlay OgreRTShaderSystem OgreMain ${JNI_LIBRARIES})
 

@@ -42,6 +42,7 @@ if(OGRE_BUILD_COMPONENT_BITES)
 	list(APPEND SWIG_INPUT_MODULES ../Bites/include/OgreBites.i)
 endif()
 
+set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_module(libOgre csharp ${SWIG_INPUT_MODULES})
 SWIG_LINK_LIBRARIES(libOgre OgreBites OgreOverlay OgreRTShaderSystem OgreMain)
 install(TARGETS ${SWIG_MODULE_libOgre_REAL_NAME} LIBRARY DESTINATION lib/)
