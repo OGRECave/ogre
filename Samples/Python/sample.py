@@ -1,5 +1,5 @@
 import Ogre
-import OgreRTShader
+import Ogre.RTShader
 
 class SGResolver(Ogre.MaterialManager_Listener):
     def __init__(self, shadergen):
@@ -7,7 +7,7 @@ class SGResolver(Ogre.MaterialManager_Listener):
         self.shadergen = shadergen
 
     def handleSchemeNotFound(self, idx, name, mat, lod_idx, rend):
-        if name != OgreRTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME:
+        if name != Ogre.RTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME:
             return None
 
         def_name = Ogre.cvar.MaterialManager_DEFAULT_SCHEME_NAME
@@ -44,16 +44,16 @@ def main():
 
     win = root.initialise(True)
 
-    OgreRTShader.ShaderGenerator.initialize()
-    shadergen = OgreRTShader.ShaderGenerator.getSingleton()
+    Ogre.RTShader.ShaderGenerator.initialize()
+    shadergen = Ogre.RTShader.ShaderGenerator.getSingleton()
 
     sgres = SGResolver(shadergen)
     Ogre.MaterialManager.getSingleton().addListener(sgres)
 
     rgm.initialiseAllResourceGroups()
 
-    rs = shadergen.getRenderState(OgreRTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME)
-    rs.addTemplateSubRenderState(shadergen.createSubRenderState(OgreRTShader.cvar.PerPixelLighting_Type));
+    rs = shadergen.getRenderState(Ogre.RTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME)
+    rs.addTemplateSubRenderState(shadergen.createSubRenderState(Ogre.RTShader.cvar.PerPixelLighting_Type));
 
     scn_mgr = root.createSceneManager()
     shadergen.addSceneManager(scn_mgr)

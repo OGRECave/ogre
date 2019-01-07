@@ -10,7 +10,7 @@ include_directories(${PYTHON_INCLUDE_PATH})
 include_directories("${PROJECT_BINARY_DIR}/include" "${PROJECT_SOURCE_DIR}/OgreMain/include")
 include(${SWIG_USE_FILE})
 
-set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/)
+set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/Ogre/)
 
 set(CMAKE_SWIG_FLAGS -w401,314 -builtin)
 
@@ -39,26 +39,26 @@ swig_add_module(Ogre python ../../OgreMain/include/Ogre.i)
 swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
 ogre_python_module(Ogre)
 
-# always install OgreNumpy
-install(FILES OgreNumpy.py DESTINATION ${PYTHON_SITE_PACKAGES})
+# always install pure python modules
+install(FILES __init__.py Numpy.py DESTINATION ${PYTHON_SITE_PACKAGES})
 
 if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     set_source_files_properties(../RTShaderSystem/include/OgreRTShader.i PROPERTIES CPLUSPLUS ON)
-    swig_add_module(OgreRTShader python ../RTShaderSystem/include/OgreRTShader.i)
-    swig_link_libraries(OgreRTShader OgreMain OgreRTShaderSystem ${PYTHON_LIBRARIES})
-    ogre_python_module(OgreRTShader)
+    swig_add_module(RTShader python ../RTShaderSystem/include/OgreRTShader.i)
+    swig_link_libraries(RTShader OgreRTShaderSystem ${PYTHON_LIBRARIES})
+    ogre_python_module(RTShader)
 endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY)
     set_source_files_properties(../Overlay/include/OgreOverlay.i PROPERTIES CPLUSPLUS ON)
-    swig_add_module(OgreOverlay python ../Overlay/include/OgreOverlay.i)
-    swig_link_libraries(OgreOverlay OgreMain OgreOverlay ${PYTHON_LIBRARIES})
-    ogre_python_module(OgreOverlay)
+    swig_add_module(Overlay python ../Overlay/include/OgreOverlay.i)
+    swig_link_libraries(Overlay OgreOverlay ${PYTHON_LIBRARIES})
+    ogre_python_module(Overlay)
 endif()
 
 if(OGRE_BUILD_COMPONENT_BITES)    
     set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
-    swig_add_module(OgreBites python ../Bites/include/OgreBites.i)
-    swig_link_libraries(OgreBites OgreMain OgreBites ${PYTHON_LIBRARIES})
-    ogre_python_module(OgreBites)
+    swig_add_module(Bites python ../Bites/include/OgreBites.i)
+    swig_link_libraries(Bites OgreMain OgreBites ${PYTHON_LIBRARIES})
+    ogre_python_module(Bites)
 endif()

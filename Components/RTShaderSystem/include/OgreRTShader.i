@@ -1,4 +1,4 @@
-%module OgreRTShader
+%module(package="Ogre") RTShader
 %{
 /* Includes the header in the wrapper code */
 #include "Ogre.h"
