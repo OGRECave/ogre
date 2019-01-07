@@ -52,7 +52,8 @@ namespace Ogre {
           mMaxStencilSize(0),
           mMSAA(0),
           mCSAA(0),
-          mPreserveContext(false)
+          mPreserveContext(false),
+          mScale(1.0f)
     {
     }
 
@@ -76,6 +77,20 @@ namespace Ogre {
 
     void AndroidEGLWindow::resize(uint width, uint height)
     {
+      EGLint format;
+      eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
+      EGL_CHECK_ERROR
+      
+      if (mScale != 1.0f)
+      {
+        int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
+        int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
+        ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
+      }
+      else
+      {
+        ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+      }
     }
 
     void AndroidEGLWindow::windowMovedOrResized()
@@ -188,6 +203,11 @@ namespace Ogre {
             {
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
             }
+            
+            if ((opt = miscParams->find("bufferScale")) != end)
+            {
+              mScale = Ogre::StringConverter::parseReal(opt->second);
+            }
         }
         
         initNativeCreatedWindow(miscParams);
@@ -267,6 +287,22 @@ namespace Ogre {
         if (mPreserveContext)
         {
             mEglDisplay = mGLSupport->getGLDisplay();
+
+            EGLint format;
+            eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
+            EGL_CHECK_ERROR
+
+            if (mScale != 1.0f)
+            {
+                int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
+                int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
+                ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
+            }
+            else
+            {
+                ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+            }
+
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
             mContext->_updateInternalResources(mEglDisplay, mEglConfig, mEglSurface);
         }
@@ -352,7 +388,16 @@ namespace Ogre {
             eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
             EGL_CHECK_ERROR
 
+            if (mScale != 1.0f)
+            {
+                int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
+                int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
+                ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
+            }
+            else
+            {
                 ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+            }
 
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
 
