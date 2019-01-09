@@ -80,7 +80,7 @@ namespace Ogre {
       EGLint format;
       eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
       EGL_CHECK_ERROR
-      
+
       if (mScale != 1.0f)
       {
         int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
@@ -150,13 +150,12 @@ namespace Ogre {
                 mEglSurface = eglGetCurrentSurface(EGL_DRAW);
                 mEglDisplay = eglGetCurrentDisplay();
             }
-            
-            
+
             if((opt = miscParams->find("externalWindowHandle")) != end)
             {
                 mWindow = (ANativeWindow*)(Ogre::StringConverter::parseSizeT(opt->second));
             }
-            
+
             if((opt = miscParams->find("androidConfig")) != end)
             {
                 config = (AConfiguration*)(Ogre::StringConverter::parseSizeT(opt->second));
@@ -166,12 +165,12 @@ namespace Ogre {
             {
                 mMaxBufferSize = Ogre::StringConverter::parseInt(opt->second);
             }
-            
+
             if((opt = miscParams->find("maxDepthBufferSize")) != end)
             {
                 mMaxDepthSize = Ogre::StringConverter::parseInt(opt->second);
             }
-            
+
             if((opt = miscParams->find("maxStencilBufferSize")) != end)
             {
                 mMaxStencilSize = Ogre::StringConverter::parseInt(opt->second);
@@ -187,7 +186,7 @@ namespace Ogre {
             {
                 mMSAA = Ogre::StringConverter::parseInt(opt->second);
             }
-            
+
             if((opt = miscParams->find("CSAA")) != end)
             {
                 mCSAA = Ogre::StringConverter::parseInt(opt->second);
@@ -198,25 +197,25 @@ namespace Ogre {
             {
                 preserveContextOpt = true;
             }
-                      
+
             if ((opt = miscParams->find("externalGLControl")) != end)
             {
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
             }
-            
-            if ((opt = miscParams->find("bufferScale")) != end)
+
+            if ((opt = miscParams->find("contentScalingFactor")) != end)
             {
-              mScale = Ogre::StringConverter::parseReal(opt->second);
+              mScale = 1.0f / Ogre::StringConverter::parseReal(opt->second);
             }
         }
-        
+
         initNativeCreatedWindow(miscParams);
-        
+
         if (mEglSurface)
         {
             mEglConfig = mGLSupport->getGLConfigFromDrawable (mEglSurface, &width, &height);
         }
-        
+
         if (!mEglConfig && eglContext)
         {
             mEglConfig = mGLSupport->getGLConfigFromContext(eglContext);
@@ -229,9 +228,9 @@ namespace Ogre {
                             "EGLWindow::create");
             }
         }
-        
+
         mIsExternal = (mEglSurface != 0);
-        
+
         if (!mEglConfig)
         {
             _notifySurfaceCreated(mWindow, config);
@@ -240,7 +239,7 @@ namespace Ogre {
         
         mContext = createEGLContext();
         mContext->setCurrent();
-               
+
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
         EGL_CHECK_ERROR
