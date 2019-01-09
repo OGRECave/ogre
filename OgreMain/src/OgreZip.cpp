@@ -43,8 +43,6 @@ namespace {
     protected:
         /// Handle to root zip file
         ZZIP_DIR* mZzipDir;
-        /// Handle any errors from zzip
-        void checkZzipError(int zzipError, const String& operation) const;
         /// File list (since zziplib seems to only allow scanning of dir tree once)
         FileInfoList mFileList;
         /// A pointer to file io alternative implementation
@@ -120,43 +118,45 @@ namespace {
     };
 
     /// Utility method to format out zzip errors
-    String getZzipErrorDescription(zzip_error_t zzipError)
+    static String getErrorDescription(zzip_error_t zzipError, const String& file)
     {
-        String errorMsg;
+        const char* errorMsg = "";
         switch (zzipError)
         {
         case ZZIP_NO_ERROR:
             break;
         case ZZIP_OUTOFMEM:
-            errorMsg = "Out of memory.";
+            errorMsg = "Out of memory";
             break;            
         case ZZIP_DIR_OPEN:
+            errorMsg = "Unable to open zip file";
+            break;
         case ZZIP_DIR_STAT: 
         case ZZIP_DIR_SEEK:
         case ZZIP_DIR_READ:
-            errorMsg = "Unable to read zip file.";
+            errorMsg = "Unable to read zip file";
             break;            
         case ZZIP_UNSUPP_COMPR:
-            errorMsg = "Unsupported compression format.";
+            errorMsg = "Unsupported compression format";
             break;            
         case ZZIP_CORRUPTED:
-            errorMsg = "Corrupted archive.";
+            errorMsg = "Corrupted archive";
             break;
         case ZZIP_DIR_TOO_SHORT:
-            errorMsg = "Zip file is too short.";
+            errorMsg = "Zip file is too short";
             break;
         case ZZIP_DIR_EDH_MISSING:
-            errorMsg = "Zip-file's central directory record missing. Is this a 7z file?";
+            errorMsg = "Zip-file's central directory record missing. Is this a 7z file";
             break;
         case ZZIP_ENOENT:
-            errorMsg = "File not in archive.";
+            errorMsg = "File not in archive";
             break;
         default:
-            errorMsg = "Unknown error.";
+            errorMsg = "Unknown error";
             break;            
         };
 
-        return errorMsg;
+        return StringUtil::format("%s '%s'", errorMsg, file.c_str());
     }
 
     /// A static pointer to file io alternative implementation for the embedded files
@@ -180,7 +180,8 @@ namespace {
         {
             zzip_error_t zzipError;
             mZzipDir = zzip_dir_open_ext_io(mName.c_str(), &zzipError, 0, mPluginIo);
-            checkZzipError(zzipError, "opening archive");
+            if (zzipError)
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, getErrorDescription(zzipError, mName));
 
             // Cache names
             ZZIP_DIRENT zzipEntry;
@@ -261,11 +262,7 @@ namespace {
 
         if (!zzipFile)
         {
-            int zerr = zzip_error(mZzipDir);
-            String zzDesc = getZzipErrorDescription((zzip_error_t)zerr);
-
-            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-                    mName+ " Cannot open file: " + lookUpFileName + " - "+zzDesc, "ZipArchive::open");
+            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, getErrorDescription((zzip_error_t)zzip_error(mZzipDir), mName));
         }
 
         // Get uncompressed size too
@@ -404,20 +401,6 @@ namespace {
         }
 
     }
-    //-----------------------------------------------------------------------
-    void ZipArchive::checkZzipError(int zzipError, const String& operation) const
-    {
-        if (zzipError != ZZIP_NO_ERROR)
-        {
-            String errorMsg = getZzipErrorDescription(static_cast<zzip_error_t>(zzipError));
-
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                mName + " - error whilst " + operation + ": " + errorMsg,
-                "ZipArchive::checkZzipError");
-        }
-    }
-    //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     ZipDataStream::ZipDataStream(const String& name, ZZIP_FILE* zzipFile, size_t uncompressedSize)
         :DataStream(name), mZzipFile(zzipFile)
