@@ -52,6 +52,7 @@ namespace Ogre {
         int mMSAA;
         int mCSAA;
         bool mPreserveContext;
+        float mScale;
         
     protected:
         virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
