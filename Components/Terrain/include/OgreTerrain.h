@@ -1655,8 +1655,6 @@ namespace Ogre
         */
         void getPointAlign(long x, long y, float height, Alignment align, Vector3* outpos) const;
         void calculateCurrentLod(Viewport* vp);
-        /// Test a single quad of the terrain for ray intersection.
-        std::pair<bool, Vector3> checkQuadIntersection(int x, int y, const Ray& ray); //const;
 
         /// Delete blend maps for all layers >= lowIndex
         void deleteBlendMaps(uint8 lowIndex);
@@ -1861,6 +1859,9 @@ namespace Ogre
         int getHighestLodPrepared() const { return (mLodManager) ? mLodManager->getHighestLodPrepared() : -1; };
         int getHighestLodLoaded() const { return (mLodManager) ? mLodManager->getHighestLodLoaded() : -1; };
         int getTargetLodLevel() const { return (mLodManager) ? mLodManager->getTargetLodLevel() : -1; };
+    private:
+        /// Test a single quad of the terrain for ray intersection.
+        OGRE_FORCE_INLINE std::pair<bool, Vector3> checkQuadIntersection(int x, int y, const Ray& ray) const;
     };
 
 
