@@ -2480,7 +2480,7 @@ namespace Ogre
         return result;
     }
     //---------------------------------------------------------------------
-    std::pair<bool, Vector3> Terrain::checkQuadIntersection(int x, int z, const Ray& ray)
+    std::pair<bool, Vector3> Terrain::checkQuadIntersection(int x, int z, const Ray& ray) const
     {
         // build the two planes belonging to the quad's triangles
         Vector3 v1 ((Real)x, *getHeightData(x,z), (Real)z);
