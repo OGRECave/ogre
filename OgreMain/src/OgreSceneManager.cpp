@@ -745,6 +745,7 @@ SceneNode* SceneManager::createSceneNode(void)
 {
     SceneNode* sn = createSceneNodeImpl();
     mSceneNodes.push_back(sn);
+    sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
@@ -761,6 +762,7 @@ SceneNode* SceneManager::createSceneNode(const String& name)
 
     SceneNode* sn = createSceneNodeImpl(name);
     mSceneNodes.push_back(sn);
+    sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
@@ -818,6 +820,7 @@ void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
     }
     OGRE_DELETE *i;
     std::swap(*i, mSceneNodes.back());
+    (*i)->mGlobalIndex = i - mSceneNodes.begin();
     mSceneNodes.pop_back();
 }
 //---------------------------------------------------------------------
@@ -826,7 +829,12 @@ void SceneManager::destroySceneNode(SceneNode* sn)
     if(!sn)
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneNode.", "SceneManager::destroySceneNode");
 
-    _destroySceneNode(std::find(mSceneNodes.begin(), mSceneNodes.end(), sn));
+    auto pos = sn->mGlobalIndex < mSceneNodes.size() &&
+                       sn == *(mSceneNodes.begin() + sn->mGlobalIndex)
+                   ? mSceneNodes.begin() + sn->mGlobalIndex
+                   : mSceneNodes.end();
+
+    _destroySceneNode(pos);
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode(void)
