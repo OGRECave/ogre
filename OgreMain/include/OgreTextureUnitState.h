@@ -1180,7 +1180,7 @@ protected:
         // Complex members (those that can't be copied using memcpy) are at the end to 
         // allow for fast copying of the basic members.
         //
-        mutable std::vector<TexturePtr> mFramePtrs;
+        mutable std::vector<TexturePtr> mFramePtrs; // must at least contain a single nullptr
         SamplerPtr mSampler;
         String mName;               ///< Optional name for the TUS.
         String mTextureNameAlias;   ///< Optional alias for texture frames.

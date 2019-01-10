@@ -132,6 +132,7 @@ namespace Ogre {
         , mTexModMatrix(Matrix4::IDENTITY)
         , mBindingType(BT_FRAGMENT)
         , mContentType(CONTENT_NAMED)
+        , mFramePtrs(1)
         , mSampler(TextureManager::getSingletonPtr() ? TextureManager::getSingleton().getDefaultSampler() : DUMMY_SAMPLER)
         , mParent(parent)
         , mAnimController(0)
@@ -243,7 +244,7 @@ namespace Ogre {
     const String& TextureUnitState::getTextureName(void) const
     {
         // Return name of current frame
-        if (mCurrentFrame < mFramePtrs.size())
+        if (mCurrentFrame < mFramePtrs.size() && mFramePtrs[mCurrentFrame])
             return mFramePtrs[mCurrentFrame]->getName();
         else
             return BLANKSTRING;
@@ -387,7 +388,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     TextureType TextureUnitState::getTextureType(void) const
     {
-        return mFramePtrs.empty() ? TEX_TYPE_2D : mFramePtrs[0]->getTextureType();
+        return !mFramePtrs[0] ? TEX_TYPE_2D : mFramePtrs[0]->getTextureType();
     }
 
     //-----------------------------------------------------------------------
@@ -580,17 +581,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::setDesiredFormat(PixelFormat desiredFormat)
     {
+        OgreAssert(mFramePtrs[0], "frame must not be blank");
         for(auto& frame : mFramePtrs)
             frame->setFormat(desiredFormat);
     }
     //-----------------------------------------------------------------------
     PixelFormat TextureUnitState::getDesiredFormat(void) const
     {
-        return mFramePtrs.empty() ? PF_UNKNOWN : mFramePtrs[0]->getDesiredFormat();
+        return !mFramePtrs[0] ? PF_UNKNOWN : mFramePtrs[0]->getDesiredFormat();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setNumMipmaps(int numMipmaps)
     {
+        OgreAssert(mFramePtrs[0], "frame must not be blank");
         for (auto& frame : mFramePtrs)
             frame->setNumMipmaps(numMipmaps == MIP_DEFAULT
                                      ? TextureManager::getSingleton().getDefaultNumMipmaps()
@@ -599,38 +602,41 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     int TextureUnitState::getNumMipmaps(void) const
     {
-        return mFramePtrs.empty() ? int(MIP_DEFAULT) : mFramePtrs[0]->getNumMipmaps();
+        return !mFramePtrs[0] ? int(MIP_DEFAULT) : mFramePtrs[0]->getNumMipmaps();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setIsAlpha(bool isAlpha)
     {
+        OgreAssert(mFramePtrs[0], "frame must not be blank");
         for(auto& frame : mFramePtrs)
             frame->setTreatLuminanceAsAlpha(isAlpha);
     }
     //-----------------------------------------------------------------------
     bool TextureUnitState::getIsAlpha(void) const
     {
-        return !mFramePtrs.empty() && mFramePtrs[0]->getTreatLuminanceAsAlpha();
+        return mFramePtrs[0] && mFramePtrs[0]->getTreatLuminanceAsAlpha();
     }
     float TextureUnitState::getGamma() const
     {
-        return mFramePtrs.empty() ? 1.0f : mFramePtrs[0]->getGamma();
+        return !mFramePtrs[0] ? 1.0f : mFramePtrs[0]->getGamma();
     }
     void TextureUnitState::setGamma(float gamma)
     {
+        OgreAssert(mFramePtrs[0], "frame must not be blank");
         for(auto& frame : mFramePtrs)
             frame->setGamma(gamma);
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setHardwareGammaEnabled(bool g)
     {
+        OgreAssert(mFramePtrs[0], "frame must not be blank");
         for(auto& frame : mFramePtrs)
             frame->setHardwareGammaEnabled(g);
     }
     //-----------------------------------------------------------------------
     bool TextureUnitState::isHardwareGammaEnabled() const
     {
-        return !mFramePtrs.empty() && mFramePtrs[0]->isHardwareGammaEnabled();
+        return mFramePtrs[0] && mFramePtrs[0]->isHardwareGammaEnabled();
     }
     //-----------------------------------------------------------------------
     unsigned int TextureUnitState::getTextureCoordSet(void) const
@@ -762,10 +768,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool TextureUnitState::isBlank(void) const
     {
-        if (mFramePtrs.empty())
-            return true;
-        else
-            return !mFramePtrs[0]|| mTextureLoadFailed;
+        return !mFramePtrs[0] || mTextureLoadFailed;
     }
 
     //-----------------------------------------------------------------------
@@ -1086,10 +1089,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::_setTexturePtr(const TexturePtr& texptr, size_t frame)
     {
-        // generated textures (compositors & shadows) are only created at this point
-        if(mFramePtrs.empty() && mContentType != CONTENT_NAMED)
-            mFramePtrs.resize(1);
-
         assert(frame < mFramePtrs.size());
         mFramePtrs[frame] = texptr;
     }
