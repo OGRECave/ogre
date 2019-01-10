@@ -1367,18 +1367,17 @@ namespace Ogre {
         SceneNode* getRootSceneNode(void);
 
         /** Retrieves a named SceneNode from the scene graph.
-        @remarks
-            If you chose to name a SceneNode as you created it, or if you
-            happened to make a note of the generated name, you can look it
+
+            If you chose to name a SceneNode as you created it, you can look it
             up wherever it is in the scene graph using this method.
-            @note Throws an exception if the named instance does not exist
+            @param name
+            @param throwExceptionIfNotFound Throws an exception if the named instance does not exist
         */
-        SceneNode* getSceneNode(const String& name) const;
+        SceneNode* getSceneNode(const String& name, bool throwExceptionIfNotFound = true) const;
 
         /** Returns whether a scene node with the given name exists.
         */
-        bool hasSceneNode(const String& name) const;
-
+        bool hasSceneNode(const String& name) const { return getSceneNode(name, false) != NULL; }
 
         /** Create an Entity (instance of a discrete mesh).
             @param

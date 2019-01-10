@@ -841,28 +841,19 @@ SceneNode* SceneManager::getRootSceneNode(void)
     return mSceneRoot.get();
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::getSceneNode(const String& name) const
+SceneNode* SceneManager::getSceneNode(const String& name, bool throwExceptionIfNotFound) const
 {
     SceneNodeList::const_iterator i;
     OgreAssert(!name.empty(), "name must not be empty");
     SceneNodeNameExists pred = {name};
     i = std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred);
 
-    if (i == mSceneNodes.end())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.",
-            "SceneManager::getSceneNode");
-    }
+    if (i != mSceneNodes.end())
+        return *i;
 
-    return *i;
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasSceneNode(const String& name) const
-{
-    OgreAssert(!name.empty(), "name must not be empty");
-    SceneNodeNameExists pred = {name};
-    return std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred) != mSceneNodes.end();
+    if (throwExceptionIfNotFound)
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.");
+    return NULL;
 }
 
 //-----------------------------------------------------------------------
