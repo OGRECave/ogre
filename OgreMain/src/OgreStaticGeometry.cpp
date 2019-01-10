@@ -503,13 +503,10 @@ namespace Ogre {
             }
         }
         // Iterate through all the child-nodes
-        SceneNode::ConstChildNodeIterator nodei = node->getChildIterator();
-
-        while (nodei.hasMoreElements())
+        for (auto c : node->getChildren())
         {
-            const SceneNode* subNode = static_cast<const SceneNode*>(nodei.getNext());
             // Add this subnode and its children...
-            addSceneNode( subNode );
+            addSceneNode( static_cast<const SceneNode*>(c) );
         }
     }
     //--------------------------------------------------------------------------
