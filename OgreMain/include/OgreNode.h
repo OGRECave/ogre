@@ -477,21 +477,11 @@ namespace Ogre {
         */
         Node* getChild(const String& name) const;
 
-        /** Retrieves an iterator for efficiently looping through all children of this node.
-        @remarks
-            Using this is faster than repeatedly calling getChild if you want to go through
-            all (or most of) the children of this node.
-            Note that the returned iterator is only valid whilst no children are added or
-            removed from this node. Thus you should not store this returned iterator for
-            later use, nor should you add / remove children whilst iterating through it;
-            store up changes for later. Note that calling methods on returned items in 
-            the iterator IS allowed and does not invalidate the iterator.
-        @deprecated use getChildren()
-        */
-        ChildNodeIterator getChildIterator(void);
+        /// @deprecated use getChildren()
+        OGRE_DEPRECATED ChildNodeIterator getChildIterator(void);
 
-        /// @overload
-        ConstChildNodeIterator getChildIterator(void) const;
+        /// @deprecated use getChildren()
+        OGRE_DEPRECATED ConstChildNodeIterator getChildIterator(void) const;
 
         /// List of sub-nodes of this Node
         const ChildNodeMap& getChildren() const { return mChildren; }
