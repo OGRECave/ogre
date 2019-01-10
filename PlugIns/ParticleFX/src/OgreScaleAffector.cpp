@@ -80,6 +80,10 @@ namespace Ogre {
                 NewWide = p->getOwnWidth()  + ds;
                 NewHigh = p->getOwnHeight() + ds;
             }
+            if (NewWide < 0)
+                NewWide = 0;
+            if (NewHigh < 0)
+                NewHigh = 0;
             p->setDimensions( NewWide, NewHigh ); 
         }
 
