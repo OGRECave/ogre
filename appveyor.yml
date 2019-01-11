@@ -2,16 +2,46 @@ platform: x64
 configuration: Release
 image: 
  - Visual Studio 2017
- - Visual Studio 2013
+#  - Visual Studio 2013
+
+# Do we want to have a Matrix? 32-bit and 64-bit?
+environment: 
+  matrix:
+    - PYTHON_VERSION: 3.7
+      MINICONDA: C:\Miniconda3
+      RESTORE_MINICONDA: C:\Miniconda37
+      PYTHON_ARCH: "32"
+      ARTIFACT: "ogre-sdk-master-vc15-x64"
+    - PYTHON_VERSION: 3.7
+      MINICONDA: C:\Miniconda3-x64
+      RESTORE_MINICONDA: C:\Miniconda37-x64
+      PYTHON_ARCH: "64"
+
+init:
+  - "ECHO %PYTHON_VERSION% %MINICONDA%"
+
+install:
+ - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+ - "python --version"
+ - conda update -q conda
+ - conda info -a
+ - conda create -q -n env_ogre python=%PYTHON_VERSION% numpy freetype freeimage swig 
+ - activate env_ogre
 
 build_script:
  - cmake -P ci-build.cmake
  - cmake --build build --config Release --target INSTALL
+
 test_script:
  - set PATH=%PATH%;build\gtest\lib
  - IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" build\bin\release\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
+
+after_test:
+ - pip wheel Components/Python 
+
 cache:
 - ogredeps -> CMake/Dependencies.cmake
+
 branches:
   only:
     - master
@@ -19,17 +49,20 @@ branches:
 artifacts:
   - path: build/sdk
     name: ogre-sdk-master-vc15-x64
-deploy:
-- provider: BinTray
-  username: paroj
-  api_key:
-    secure: 4nFEwKApbHUf7UajsDt6Z7QOl3zzgEz6YbWGSGx5AiPxozWEQHEyGc6c9xE7utWE
-  subject: ogrecave
-  repo: ogre
-  package: ogre-sdk-vc15-x64
-  publish: true
-  override: true
-  version: master
-  on:
-    branch: master
-    APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
+  - path: dist\*.whl
+    
+# TODO: add wheels to build
+# deploy:
+# - provider: BinTray
+#   username: paroj
+#   api_key:
+#     secure: 4nFEwKApbHUf7UajsDt6Z7QOl3zzgEz6YbWGSGx5AiPxozWEQHEyGc6c9xE7utWE
+#   subject: ogrecave
+#   repo: ogre
+#   package: ogre-sdk-vc15-x64
+#   publish: true
+#   override: true
+#   version: master
+#   on:
+#     branch: master
+#     APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
