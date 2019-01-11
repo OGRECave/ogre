@@ -456,11 +456,11 @@ SHARED_PTR(Material);
 %rename(MaterialManager_Listener) Ogre::MaterialManager::Listener;
 %include "OgreMaterialManager.h"
 %include "OgreRenderable.h"
+%include "OgreShadowCaster.h"
+%include "OgreMovableObject.h"
     %include "OgreBillboardChain.h"
         %include "OgreRibbonTrail.h"
     %include "OgreBillboardSet.h"
-%include "OgreShadowCaster.h"
-%include "OgreMovableObject.h"
     %include "OgreMovablePlane.h"
     %ignore Ogre::Light::setPosition;
     %ignore Ogre::Light::getPosition;
