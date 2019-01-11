@@ -10,6 +10,8 @@ cmake-build-*/
 /embuild/
 /eminstall/
 /mingw/
+build32
+build64
 
 # Meta data of macOS's Finder.app
 .DS_Store
@@ -18,3 +20,9 @@ cmake-build-*/
 
 # Ignore vim files
 *.swp
+
+# Python build files
+Components/Python/build
+Components/Python/dist
+Components/Python/ogre.egg-info
+
