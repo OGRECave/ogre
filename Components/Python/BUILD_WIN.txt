@@ -1,0 +1,208 @@
+Python for Ogre on Windows
+==========================
+
+Ogre builds Python bindings with SWIG. SWIG isn't available on PyPi, but it is 
+available via `conda`, and `conda` can also install other dependencies such 
+as FreeType for us. Download Miniconda at:
+
+    https://conda.io/miniconda.html
+
+You will also need Microsoft Visual C++ 2017 (for Python 3.7, eariler versions 
+of Python require earlier versions of MSVC), and CMake (https://cmake.org/) 
+installed.
+
+Once you have run the required installers, open an Anaconda command prompt 
+and create a new `conda` environment to host `ogre`:
+
+    conda create -n env_ogre python=3.7
+    activate env_ogre
+    conda install swig freetype freeimage
+
+Optional: Ogre has hooks to convert NumPy arrays to C++ objects in Ogre, so 
+you will likely want it installed as well.
+
+    conda install numpy
+
+Optional: If you want Qt5 bindings, recommend PySide2 installed via `pip`, as 
+it is the QtCorp officially supported wheel:
+
+    pip install pyside2
+
+As the Python bindings have to be built against your particular Python 
+interpreter, the pre-built Ogre SDK does not include said Python bindings. 
+Some changes to the SWIG interface were recently made (2018-Dec-30) in 
+1.16.dev (9f92606) that require a recent clone:
+
+    git clone https://github.com/OGRECave/ogre.git
+    cd ogre
+
+Here we assume you already have all of the C++ dependencies installed. If not,
+you will find out what is missing in `cmake`. Now we run `cmake-gui` from 
+the Ogre base directory to configure and generation our MSVC solution.
+
+    cmake-gui
+
+Note: The default Ogre solution is win32. Presumably you will want to change
+the project generator in `cmake-gui` to `Visual Studio 15 2018 Win64` to
+target to 'x64' if you are working with a 64-bit Python interpreter. If you 
+want to support both memory address spaces you will need two separate Python 
+environments and most likely two separate Ogre build directories. 
+
+Optional: `conda` can be forced to make a 32-bit interpreter environment by setting 
+
+    set CONDA_FORCE_32BIT=1
+
+If you bother with both versions, I suggest making subdirectories `build32` 
+and `build64` as the binary build path. Hit the `Configure` button, select your 
+desired version of MSVC, and verify that the checkbox for 
+`OGRE_BUILD_COMPONENT_PYTHON` is checked. 
+
+IMPORTANT: at present (2018-Dec-30), you will also have to turn off
+`OGRE_BUILD_COMPONENT_CSHARP` bindings in the configuration step, as they are 
+broken.
+
+`Configure` again, then `Generate` and finally `Open Project` in MSVC2017. 
+Then you can build the entire solution, which takes about five minutes.
+
+Co-locating the Components
+--------------------------
+
+From the base `ogre` directory, you will need to copy all files into some 
+shared folder.  Following general Python package conventions, make a 
+directory `ogre` somewhere accessible and then a subdirectory `ogre` 
+which will hold the actual source files. 
+
+Copy into `Components/Python/ogre`:
+
+- `.pyd` files are in `buildXX/lib/release`
+- `.py` files are in `buildXX/Components/Python`
+- `OgreNumpy.py` is in `Components/Python`
+- All files from `buildXX/bin` should be co-located
+
+Then in the `Components/Python/ogre` folder add an `__init__.py`:
+
+    from .__version__ import __version__
+
+    # SWIG tries to import the .pyd files from the global namespace, e.g.
+    #
+    #   _Ogre = importlib.import_module('_Ogre')
+    #
+    # So path manipulation is the best work-around without changing how the 
+    # upstream Ogre builds things.
+    import os, sys, inspect
+    current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    sys.path.insert(0, current_dir)
+
+    from . import Ogre
+    from . import OgreBites
+    from . import OgreOverlay
+    from . import OgreRTShader
+    from . import OgreNumpy
+
+and in the base `Components/Python` folder add a `setup.py`:
+
+    import setuptools
+    import time, os.path as path, platform
+    from setuptools import setup, find_packages, Extension
+    import numpy as np
+    import glob
+
+    major_ver = 1
+    minor_ver = 11
+    nano_ver = 5
+    branch = ''
+
+    version = "%d.%d.%d%s" % (major_ver, minor_ver, nano_ver, branch)
+
+    ##### Get info from associated text files #####
+    # Write version.py
+    with open( "ogre/__version__.py", 'w' ) as fh:
+        fh.write( "__version__ = '" + version + "'\n" )
+
+    # Get the long description from the README file
+    try:
+        with open(path.join('.', 'README.rst'), encoding='utf-8') as f:
+            readmerst = f.read()
+    except: # No long description
+        readmerst = ""
+        pass
+
+    with open('requirements.txt') as f:
+        requirements = f.read().splitlines()
+
+    def setup_module():
+        metadata = dict(
+                        name = "ogre",
+                        version = version,
+                        description='Ogre for Python',
+                        long_description = readmerst,
+                        author='Pavel Rojtberg',
+                        author_email='',
+                        maintainer='Robert A. McLeod',
+                        maintainer_email='robbmcleod@gmail.com',
+                        url='',
+                        license='MIT',
+                        packages=find_packages(),
+                        install_requires=requirements,
+                        setup_requires=requirements,
+                        entry_points={
+                            # "gui_scripts" suppresses stdout, which we generally do not want
+                            "console_scripts": [],
+                            "gui_scripts": []
+                            },
+                        # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
+                        extras_require={
+                            },
+                        ext_modules = [
+                            ],
+                        package_data={
+                            '': ['*.pyd', '*.dll', '*.exe', '*.cfg', '*.dat'],
+                            },
+                        classifiers=[
+                                # How mature is this project? Common values are
+                                #   3 - Alpha
+                                #   4 - Beta
+                                #   5 - Production/Stable
+                                'Development Status :: 5 - Production',
+                        
+                                # Pick your license as you wish (should match "license" above)
+                                'License :: MIT',
+                        
+                                # Specify the Python versions you support here. In particular, ensure
+                                # that you indicate whether you support Python 2, Python 3 or both.
+                                'Programming Language :: Python :: 3',
+                                'Programming Language :: Python :: 3.7',
+                                
+                                # OS
+                                'Operating System :: Microsoft :: Windows',
+                                'Operating System :: Microsoft :: Linux'
+                            ],
+                        keywords=[''],
+                        #zip_safe=False, # DLLs cannot be zipped
+        )
+
+        setup(**metadata)
+
+
+    if __name__ == '__main__':
+        t0 = time.time()
+        setup_module()
+        t1 = time.time()
+        print( "Completed: build/install time (s): %.3f" % (t1-t0) )
+
+and `requirements.txt`:
+
+    # swig -- SWIG is actually only available via manual download or conda
+    numpy
+
+then you can install Ogre into any active Anaconda Python environment 
+(with the appropriate prereqs) as:
+
+    pip install .
+
+or build wheels, etc. Note to use this Python package, import as:
+
+    from ogre import Ogre, OgreRTShader # etc.
+
+
+
