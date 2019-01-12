@@ -1,5 +1,5 @@
 set(GENERATOR)
-set(OTHER -DCMAKE_CXX_FLAGS=-Werror)
+# set(OTHER -DCMAKE_CXX_FLAGS=-Werror)
 set(CROSS)
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -85,13 +85,19 @@ if(DEFINED ENV{ANDROID})
     endif()
 endif()
 
+if (WIN32)
+    set(SWIG_PATH $ENV{SWIG_DIR}/swig)
+else ()
+    set(SWIG_PATH /usr/bin/swig3.0)
+endif ()
+
 file(MAKE_DIRECTORY build)
 execute_process(COMMAND ${CMAKE_COMMAND}
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DOGRE_BUILD_TESTS=ON
     -DOGRE_RESOURCEMANAGER_STRICT=2
     -DOGRE_BUILD_DEPENDENCIES=${BUILD_DEPS}
-    -DSWIG_EXECUTABLE=/usr/bin/swig3.0
+    -DSWIG_EXECUTABLE=${SWIG_PATH}
     ${RENDERSYSTEMS}
     ${OTHER}
     ${GENERATOR}
