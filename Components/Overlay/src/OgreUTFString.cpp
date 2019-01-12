@@ -25,10 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreStableHeaders.h"
 #include "OgreUTFString.h"
-
-#if OGRE_UNICODE_SUPPORT
 
 namespace Ogre {
 
@@ -2023,5 +2020,3 @@ namespace Ogre {
     }
 
 }
-
-#endif
