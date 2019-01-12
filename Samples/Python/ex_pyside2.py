@@ -20,7 +20,7 @@ class OgreWidget(qw.QOpenGLWidget):
         
         # Ensure we are using the basic OpenGL renderer
         for renderer in self._root.getAvailableRenderers():
-            if renderer.getName() == 'OpenGL Rendering Subsystem':
+            if 'OpenGL' in renderer.getName():
                 break
         else:
             raise ValueError('OpenGL Rendering System not available to Ogre')
