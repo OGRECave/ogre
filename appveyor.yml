@@ -18,7 +18,7 @@ install:
  - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
  - "set SWIG_DIR=%CONDA_PREFIX\\Lib\\bin"
  - "python --version"
- - conda update -q conda
+ - conda update -y -q conda
  - conda info -a
  - conda create -y -q -n env_ogre python=%PYTHON_VERSION% numpy freetype swig 
  - activate env_ogre
