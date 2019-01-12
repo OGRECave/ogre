@@ -38,6 +38,7 @@ TEST(QuaternionTests,Norm)
 
 TEST(QuaternionTests,FromVectors)
 {
+    // VectorBase<3, Real>::getRotationTo tests
     Vector3 list[][2] =
     {
         // Generate identity quaternions
@@ -56,48 +57,27 @@ TEST(QuaternionTests,FromVectors)
         { Vector3(10000, 10000, 0), Vector3(10000, 10000, 1) },
     };
 
-    Quaternion quat;
-    Vector3 from, to;
-
-    from = list[0][0];
-    to = list[0][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
-
-    from = list[1][0];
-    to = list[1][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
-
-    from = list[2][0];
-    to = list[2][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
-
-    from = list[3][0];
-    to = list[3][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
-
-    from = list[4][0];
-    to = list[4][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
-
-    from = list[5][0];
-    to = list[5][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
-
-    from = list[6][0];
-    to = list[6][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
-
-    from = list[7][0];
-    to = list[7][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
-
-    from = list[8][0];
-    to = list[8][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
-
-    from = list[9][0];
-    to = list[9][1];
-    EXPECT_TRUE(to.normalisedCopy().positionEquals(from.getRotationTo(to) * from.normalisedCopy()));
+    for (size_t index = 0; index < sizeof(list) / sizeof(Vector3[2]); ++index)
+    {
+        Vector3 from = list[index][0];
+        Vector3 to = list[index][1];
+        Vector3 result = from.getRotationTo(to) * from;
+        EXPECT_TRUE(to.normalisedCopy().positionEquals(result.normalisedCopy())) << " index is " << index << std::endl;
+        EXPECT_NEAR(from.length(), result.length(), 1e-6) << " index is " << index << std::endl;
+    }
+    Vector3 list2[][2] =
+    {
+        // Edge cases, return IDENTITY, because there is no correct rotation
+        { Vector3(0, 0, 0), Vector3(1, 0, 0) },
+        { Vector3(1, 0, 0), Vector3(0, 0, 0) },
+    };
+    for (size_t index = 0; index < sizeof(list2) / sizeof(Vector3[2]); ++index)
+    {
+        Vector3 from = list2[index][0];
+        Vector3 to = list2[index][1];
+        Quaternion quat = from.getRotationTo(to);
+        EXPECT_EQ(quat, Quaternion::IDENTITY) << " index is " << index << std::endl;
+    }
 }
 
 TEST(QuaternionTests,Exp)
