@@ -47,13 +47,8 @@ namespace Ogre {
     *  @{
     */
 
-#if OGRE_UNICODE_SUPPORT
     typedef UTFString DisplayString;
-#   define OGRE_DEREF_DISPLAYSTRING_ITERATOR(it) it.getCharacter()
-#else
-    typedef String DisplayString;
-#   define OGRE_DEREF_DISPLAYSTRING_ITERATOR(it) *it
-#endif
+
     /** Enum describing how the position / size of an element is to be recorded. 
     */
     enum GuiMetricsMode

@@ -210,41 +210,7 @@ namespace Ogre {
 #       define OGRE_DEBUG_MODE 0
 #   endif
 
-// Disable unicode support on MingW for GCC 3, poorly supported in stdlibc++
-// STLPORT fixes this though so allow if found
-// MinGW C++ Toolkit supports unicode and sets the define __MINGW32_TOOLBOX_UNICODE__ in _mingw.h
-// GCC 4 is also fine
-#if defined(__MINGW32__)
-# if OGRE_COMP_VER < 400
-#  if !defined(_STLPORT_VERSION)
-#   include<_mingw.h>
-#   if defined(__MINGW32_TOOLBOX_UNICODE__) || OGRE_COMP_VER > 345
-#    define OGRE_UNICODE_SUPPORT 1
-#   else
-#    define OGRE_UNICODE_SUPPORT 0
-#   endif
-#  else
-#   define OGRE_UNICODE_SUPPORT 1
-#  endif
-# else
-#  define OGRE_UNICODE_SUPPORT 1
-# endif
-#else
-#  define OGRE_UNICODE_SUPPORT 1
-#endif
-
 #endif // OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-
-//----------------------------------------------------------------------------
-// Linux/Apple/iOS/Android/NaCl/Emscripten Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
-    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-
-// Always enable unicode support for the moment
-// Perhaps disable in old versions of gcc if necessary
-#define OGRE_UNICODE_SUPPORT 1
-
-#endif
 
 //----------------------------------------------------------------------------
 // Android Settings

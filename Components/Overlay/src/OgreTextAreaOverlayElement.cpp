@@ -211,7 +211,7 @@ namespace Ogre {
                 Real len = 0.0f;
                 for( DisplayString::iterator j = i; j != iend; j++ )
                 {
-                    Font::CodePoint character = OGRE_DEREF_DISPLAYSTRING_ITERATOR(j);
+                    Font::CodePoint character = j.getCharacter();
                     if (character == UNICODE_CR
                         || character == UNICODE_NEL
                         || character == UNICODE_LF) 
@@ -236,7 +236,7 @@ namespace Ogre {
                 newLine = false;
             }
 
-            Font::CodePoint character = OGRE_DEREF_DISPLAYSTRING_ITERATOR(i);
+            Font::CodePoint character = i.getCharacter();
             if (character == UNICODE_CR
                 || character == UNICODE_NEL
                 || character == UNICODE_LF)
@@ -252,7 +252,7 @@ namespace Ogre {
                 {
                     DisplayString::iterator peeki = i;
                     peeki++;
-                    if (peeki != iend && OGRE_DEREF_DISPLAYSTRING_ITERATOR(peeki) == UNICODE_LF)
+                    if (peeki != iend && peeki.getCharacter() == UNICODE_LF)
                     {
                         i = peeki; // skip both as one newline
                         // Also reduce tri count
