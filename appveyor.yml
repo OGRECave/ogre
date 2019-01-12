@@ -4,14 +4,8 @@ image:
  - Visual Studio 2017
 #  - Visual Studio 2013
 
-# Do we want to have a Matrix? 32-bit and 64-bit?
 environment: 
   matrix:
-    - PYTHON_VERSION: 3.7
-      MINICONDA: C:\Miniconda3
-      RESTORE_MINICONDA: C:\Miniconda37
-      PYTHON_ARCH: "32"
-      ARTIFACT: "ogre-sdk-master-vc15-x64"
     - PYTHON_VERSION: 3.7
       MINICONDA: C:\Miniconda3-x64
       RESTORE_MINICONDA: C:\Miniconda37-x64
@@ -22,10 +16,11 @@ init:
 
 install:
  - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+ - "set SWIG_DIR=%CONDA_PREFIX\\Lib\\bin"
  - "python --version"
  - conda update -q conda
  - conda info -a
- - conda create -q -n env_ogre python=%PYTHON_VERSION% numpy freetype freeimage swig 
+ - conda create -y -q -n env_ogre python=%PYTHON_VERSION% numpy freetype swig 
  - activate env_ogre
 
 build_script:
