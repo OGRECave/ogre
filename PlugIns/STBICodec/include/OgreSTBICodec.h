@@ -74,6 +74,7 @@ namespace Ogre {
 
     class STBIPlugin : public Plugin
     {
+    public:
         const String& getName() const;
         void install() { STBIImageCodec::startup(); }
         void uninstall() { STBIImageCodec::shutdown(); }
