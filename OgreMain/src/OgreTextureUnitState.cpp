@@ -462,45 +462,21 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void TextureUnitState::setAnimatedTextureName( const String& name, unsigned int numFrames, Real duration)
+    void TextureUnitState::setAnimatedTextureName( const String& name, size_t numFrames, Real duration)
     {
-        setContentType(CONTENT_NAMED);
-        mTextureLoadFailed = false;
+        String baseName, ext;
+        StringUtil::splitBaseFilename(name, baseName, ext);
 
-        String ext;
-        String baseName;
-
-        size_t pos = name.find_last_of('.');
-        baseName = name.substr(0, pos);
-        ext = name.substr(pos);
-
-        // resize pointers, but don't populate until needed
-        mFramePtrs.resize(numFrames);
-        mAnimDuration = duration;
-        mCurrentFrame = 0;
-        mCubic = false;
-
-        for (unsigned int i = 0; i < mFramePtrs.size(); ++i)
+        std::vector<String> names(numFrames);
+        for (uint32 i = 0; i < names.size(); ++i)
         {
-            StringStream str;
-            str << baseName << "_" << i << ext;
-            mFramePtrs[i] = retrieveTexture(str.str());
+            names[i] = StringUtil::format("%s_%u.%s", baseName.c_str(), i, ext.c_str());
         }
 
-        // Load immediately if Material loaded
-        if (isLoaded())
-        {
-            _load();
-        }
-        // Tell parent to recalculate hash
-        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-        {
-            mParent->_dirtyHash();
-        }
-
+        setAnimatedTextureName(names, duration);
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setAnimatedTextureName(const String* const names, unsigned int numFrames, Real duration)
+    void TextureUnitState::setAnimatedTextureName(const String* const names, size_t numFrames, Real duration)
     {
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;

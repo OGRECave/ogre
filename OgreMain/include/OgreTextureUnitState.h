@@ -446,11 +446,18 @@ namespace Ogre {
             The length of time it takes to display the whole animation sequence, in seconds.
             If 0, no automatic transition occurs.
         */
-        void setAnimatedTextureName( const String& name, unsigned int numFrames, Real duration = 0 );
+        void setAnimatedTextureName( const String& name, size_t numFrames, Real duration = 0 );
 
         /// @overload
         /// @param names Pointer to array of names of the textures to use, in frame order.
-        void setAnimatedTextureName( const String* const names, unsigned int numFrames, Real duration = 0 );
+        /// @deprecated use setAnimatedTextureName( const std::vector<String>&, Real )
+        void setAnimatedTextureName( const String* const names, size_t numFrames, Real duration = 0 );
+
+        /// @overload
+        void setAnimatedTextureName( const std::vector<String>& names, Real duration = 0 )
+        {
+            setAnimatedTextureName(names.data(), names.size(), duration);
+        }
 
         /** Returns the width and height of the texture in the given frame.
         */
