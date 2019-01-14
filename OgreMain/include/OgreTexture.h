@@ -442,6 +442,13 @@ namespace Ogre {
                                     format ? *format : PF_UNKNOWN);
         }
 
+        /** Set image names to be loaded as layers (3d & texture array) or cubemap faces
+         */
+        void setLayerNames(const std::vector<String>& names)
+        {
+            mLayerNames = names;
+        }
+
     protected:
         uint32 mHeight;
         uint32 mWidth;
@@ -468,6 +475,9 @@ namespace Ogre {
         bool mTreatLuminanceAsAlpha;
 
         bool mInternalResourcesCreated;
+
+        /// vector of images that should be loaded (cubemap/ texture array)
+        std::vector<String> mLayerNames;
 
         /** Vector of images that were pulled from disk by
             prepareLoad but have yet to be pushed into texture memory
