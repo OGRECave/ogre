@@ -715,6 +715,7 @@ void SceneManager::clearScene(void)
         OGRE_DELETE *i;
     }
     mSceneNodes.clear();
+    mNamedNodes.clear();
     mAutoTrackingSceneNodes.clear();
 
 
@@ -762,23 +763,16 @@ SceneNode* SceneManager::createSceneNode(const String& name)
 
     SceneNode* sn = createSceneNodeImpl(name);
     mSceneNodes.push_back(sn);
+    mNamedNodes[name] = sn;
     sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
-struct SceneNodeNameExists {
-    const String& name;
-    bool operator()(const SceneNode* sn) {
-        return sn->getName() == name;
-    }
-};
 void SceneManager::destroySceneNode(const String& name)
 {
-    SceneNodeList::iterator i;
     OgreAssert(!name.empty(), "name must not be empty");
-    SceneNodeNameExists pred = {name};
-    i = std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred);
-    _destroySceneNode(i);
+    auto i = mNamedNodes.find(name);
+    destroySceneNode(i != mNamedNodes.end() ? i->second : NULL);
 }
 
 void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
@@ -818,6 +812,8 @@ void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
     {
         parentNode->removeChild(*i);
     }
+    if(!(*i)->getName().empty())
+        mNamedNodes.erase((*i)->getName());
     OGRE_DELETE *i;
     std::swap(*i, mSceneNodes.back());
     (*i)->mGlobalIndex = i - mSceneNodes.begin();
@@ -851,13 +847,11 @@ SceneNode* SceneManager::getRootSceneNode(void)
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getSceneNode(const String& name, bool throwExceptionIfNotFound) const
 {
-    SceneNodeList::const_iterator i;
     OgreAssert(!name.empty(), "name must not be empty");
-    SceneNodeNameExists pred = {name};
-    i = std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred);
+    auto i = mNamedNodes.find(name);
 
-    if (i != mSceneNodes.end())
-        return *i;
+    if (i != mNamedNodes.end())
+        return i->second;
 
     if (throwExceptionIfNotFound)
         OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.");

@@ -417,6 +417,9 @@ namespace Ogre {
         */
         SceneNodeList mSceneNodes;
 
+        /// additional map to speed up lookup by name
+        std::map<String, SceneNode*> mNamedNodes;
+
         /// Camera in progress
         Camera* mCameraInProgress;
         /// Current Viewport
