@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreControllerManager.h"
 #include "OgreTextureManager.h"
+#include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
     // allow operation without hardware support
@@ -503,6 +504,38 @@ namespace Ogre {
             mParent->_dirtyHash();
         }
     }
+    void TextureUnitState::setLayerArrayNames(TextureType type, const std::vector<String>& names)
+    {
+        OgreAssert(!names.empty(), "array layers empty");
+
+        const char* typeName;
+        switch(type)
+        {
+        case TEX_TYPE_CUBE_MAP:
+            typeName = "Cube";
+            break;
+        case TEX_TYPE_2D_ARRAY:
+            typeName = "Array";
+            break;
+        case TEX_TYPE_3D:
+            typeName = "Volume";
+            break;
+        default:
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "arrays not possible for this texture type");
+            return;
+        }
+
+        // use hash to auto-name the texture
+        uint32 hash = 0;
+        for(const String& name : names)
+            hash = FastHash(name.data(), name.size(), hash);
+
+        auto tex = retrieveTexture(StringUtil::format("%sTex_%x", typeName, hash));
+        tex->setTextureType(type);
+        tex->setLayerNames(names);
+        setTexture(tex);
+    }
+
     //-----------------------------------------------------------------------
     std::pair< size_t, size_t > TextureUnitState::getTextureDimensions( unsigned int frame ) const
     {
