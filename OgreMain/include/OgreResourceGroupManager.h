@@ -414,7 +414,8 @@ namespace Ogre {
         DataStreamPtr openResourceImpl(const String& resourceName,
             const String& groupName,
             bool searchGroupsIfNotFound,
-            Resource* resourceBeingLoaded) const;
+            Resource* resourceBeingLoaded,
+            bool throwOnFailure = true) const;
 
         /// Stored current group - optimisation for when bulk loading a group
         ResourceGroup* mCurrentGroup;
@@ -655,14 +656,17 @@ namespace Ogre {
             locations are searched. 
         @param resourceBeingLoaded Optional pointer to the resource being 
             loaded, which you should supply if you want
+        @param throwOnFailure throw an exception. Returns nullptr otherwise
         @return Shared pointer to data stream containing the data, will be
             destroyed automatically when no longer referenced
         */
         DataStreamPtr openResource(const String& resourceName,
                                    const String& groupName = DEFAULT_RESOURCE_GROUP_NAME,
-                                   Resource* resourceBeingLoaded = NULL) const
+                                   Resource* resourceBeingLoaded = NULL,
+                                   bool throwOnFailure = true) const
         {
-            return openResourceImpl(resourceName, groupName, false, resourceBeingLoaded);
+            return openResourceImpl(resourceName, groupName, false,
+                                    resourceBeingLoaded, throwOnFailure);
         }
 
         /** 

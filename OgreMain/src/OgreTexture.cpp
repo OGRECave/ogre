@@ -384,24 +384,13 @@ namespace Ogre {
         }
 
         // No extension
-        DataStreamPtr dstream;
-        try
-        {
-            dstream = ResourceGroupManager::getSingleton().openResource(mName, mGroup);
-        }
-        catch (FileNotFoundException&)
-        {
-        }
+        auto dstream = ResourceGroupManager::getSingleton().openResource(
+            mName, mGroup, NULL, false);
+
         if (!dstream && getTextureType() == TEX_TYPE_CUBE_MAP)
         {
             // try again with one of the faces (non-dds)
-            try
-            {
-                dstream = ResourceGroupManager::getSingleton().openResource(mName + "_rt", mGroup);
-            }
-            catch (FileNotFoundException&)
-            {
-            }
+            dstream = ResourceGroupManager::getSingleton().openResource(mName + "_rt", mGroup, NULL, false);
         }
 
         return dstream ? Image::getFileExtFromMagic(dstream) : BLANKSTRING;
