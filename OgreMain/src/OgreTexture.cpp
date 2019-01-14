@@ -183,7 +183,7 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     void Texture::_loadImages( const ConstImagePtrList& images )
     {
-        if(images.size() < 1)
+        if(images.empty())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot load empty vector of images",
              "Texture::loadImages");
         
@@ -245,7 +245,7 @@ namespace Ogre {
         if (TextureManager::getSingleton().getVerbose()) {
             // Say what we're doing
             Log::Stream str = LogManager::getSingleton().stream();
-            str << "Texture: " << mName << ": Loading " << faces << " faces"
+            str << "Texture '" << mName << "': Loading " << faces << " faces"
                 << "(" << PixelUtil::getFormatName(images[0]->getFormat()) << ","
                 << images[0]->getWidth() << "x" << images[0]->getHeight() << "x"
                 << images[0]->getDepth() << ")";
@@ -378,42 +378,33 @@ namespace Ogre {
         String::size_type pos = mName.find_last_of('.');
         if (pos != String::npos && pos < (mName.length() - 1))
         {
-            String ext = mName.substr(pos+1);
+            String ext = mName.substr(pos + 1);
             StringUtil::toLowerCase(ext);
             return ext;
         }
-        else
+
+        // No extension
+        DataStreamPtr dstream;
+        try
         {
-            // No extension
-            DataStreamPtr dstream;
+            dstream = ResourceGroupManager::getSingleton().openResource(mName, mGroup);
+        }
+        catch (FileNotFoundException&)
+        {
+        }
+        if (!dstream && getTextureType() == TEX_TYPE_CUBE_MAP)
+        {
+            // try again with one of the faces (non-dds)
             try
             {
-                dstream = ResourceGroupManager::getSingleton().openResource(
-                        mName, mGroup);
+                dstream = ResourceGroupManager::getSingleton().openResource(mName + "_rt", mGroup);
             }
             catch (FileNotFoundException&)
             {
             }
-            if (!dstream && getTextureType() == TEX_TYPE_CUBE_MAP)
-            {
-                // try again with one of the faces (non-dds)
-                try
-                {
-                    dstream = ResourceGroupManager::getSingleton().openResource(
-                        mName + "_rt", mGroup);
-                }
-                catch (FileNotFoundException&)
-                {
-                }
-            }
-
-            if (dstream)
-            {
-                return Image::getFileExtFromMagic(dstream);
-            }
         }
 
-        return BLANKSTRING;
+        return dstream ? Image::getFileExtFromMagic(dstream) : BLANKSTRING;
 
     }
     const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap)
@@ -480,10 +471,10 @@ namespace Ogre {
 
     void Texture::readImage(LoadedImages& imgs, const String& name, const String& ext, bool haveNPOT)
     {
+        DataStreamPtr dstream = ResourceGroupManager::getSingleton().openResource(name, mGroup, this);
+
         imgs.push_back(Image());
         Image& img = imgs.back();
-
-        DataStreamPtr dstream = ResourceGroupManager::getSingleton().openResource(name, mGroup, this);
         img.load(dstream, ext);
 
         if( haveNPOT )
@@ -525,18 +516,6 @@ namespace Ogre {
             // If this is a volumetric texture set the texture type flag accordingly.
             if (loadedImages[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                 mTextureType = TEX_TYPE_3D;
-
-            // If compressed and 0 custom mipmap, disable auto mip generation and
-            // disable software mipmap creation.
-            // Not supported by GLES.
-            if (PixelUtil::isCompressed(loadedImages[0].getFormat()) &&
-                !renderCaps->hasCapability(RSC_AUTOMIPMAP_COMPRESSED) &&
-                loadedImages[0].getNumMipmaps() == 0)
-            {
-                mNumMipmaps = mNumRequestedMipmaps = 0;
-                // Disable flag for auto mip generation
-                mUsage &= ~TU_AUTOMIPMAP;
-            }
         }
         else if (mTextureType == TEX_TYPE_CUBE_MAP)
         {
@@ -562,6 +541,17 @@ namespace Ogre {
         else
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Unknown texture type");
+        }
+
+        // If compressed and 0 custom mipmap, disable auto mip generation and
+        // disable software mipmap creation.
+        // Not supported by GLES.
+        if (PixelUtil::isCompressed(loadedImages[0].getFormat()) &&
+            !renderCaps->hasCapability(RSC_AUTOMIPMAP_COMPRESSED) && loadedImages[0].getNumMipmaps() == 0)
+        {
+            mNumMipmaps = mNumRequestedMipmaps = 0;
+            // Disable flag for auto mip generation
+            mUsage &= ~TU_AUTOMIPMAP;
         }
 
         // avoid copying Image data
