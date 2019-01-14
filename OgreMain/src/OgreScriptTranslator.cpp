@@ -2797,8 +2797,7 @@ namespace Ogre{
                             AbstractNodeList::const_iterator in = getNodeAt(prop->values, static_cast<int>(prop->values.size()) - 1);
                             if(getReal(*in, &duration))
                             {
-                                String *names = OGRE_NEW_ARRAY_T(String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
-                                int n = 0;
+                                std::vector<String> names;
 
                                 AbstractNodeList::iterator j = prop->values.begin();
                                 while(j != in)
@@ -2811,11 +2810,11 @@ namespace Ogre{
                                         {
                                             ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, name);
                                             compiler->_fireEvent(&evt, 0);
-                                            names[n++] = evt.mName;
+                                            names.push_back(evt.mName);
                                         }
                                         else
                                         {
-                                            names[n++] = name;
+                                            names.push_back(name);
                                         }
                                     }
                                     else
@@ -2824,9 +2823,7 @@ namespace Ogre{
                                     ++j;
                                 }
 
-                                mUnit->setAnimatedTextureName(names, n, duration);
-
-                                OGRE_DELETE_ARRAY_T(names, String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
+                                mUnit->setAnimatedTextureName(names, duration);
                             }
                             else
                             {
