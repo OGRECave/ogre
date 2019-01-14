@@ -1066,13 +1066,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     DataStreamPtr Root::openFileStream(const String& filename, const String& groupName)
     {
-        try
-        {
-            return ResourceGroupManager::getSingleton().openResource(filename, groupName);
-        }
-        catch (FileNotFoundException&)
-        {
-        }
+        auto ret = ResourceGroupManager::getSingleton().openResource(filename, groupName, NULL, false);
+        if(ret)
+            return ret;
 
         // try direct
         std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);
