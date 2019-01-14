@@ -192,6 +192,9 @@ namespace Ogre {
         mSrcHeight = mHeight = images[0]->getHeight();
         mSrcDepth = mDepth = images[0]->getDepth();
 
+        if(!mLayerNames.empty() && mTextureType != TEX_TYPE_CUBE_MAP)
+            mDepth = mLayerNames.size();
+
         // Get source image format and adjust if required
         mSrcFormat = images[0]->getFormat();
         if (mTreatLuminanceAsAlpha && mSrcFormat == PF_L8)
@@ -279,13 +282,22 @@ namespace Ogre {
         // imageMips == 0 if the image has no custom mipmaps, otherwise contains the number of custom mips
         for(size_t mip = 0; mip <= std::min(mNumMipmaps, imageMips); ++mip)
         {
-            for(size_t i = 0; i < faces; ++i)
+            for(size_t i = 0; i < images.size(); ++i)
             {
                 PixelBox src;
+                Box dst(0, 0, 0, mWidth, mHeight, mDepth);
+                size_t face = (mDepth == 1) ? i : 0; // depth = 1, then cubemap face else 3d/ array layer
+
                 if(multiImage)
                 {
                     // Load from multiple images
                     src = images[i]->getPixelBox(0, mip);
+                    // set dst layer
+                    if(mDepth > 1)
+                    {
+                        dst.front = i;
+                        dst.back = i + 1;
+                    }
                 }
                 else
                 {
@@ -310,13 +322,13 @@ namespace Ogre {
     
                     // Destination: entire texture. blitFromMemory does the scaling to
                     // a power of two for us when needed
-                    getBuffer(i, mip)->blitFromMemory(corrected);
+                    getBuffer(face, mip)->blitFromMemory(corrected, dst);
                 }
                 else 
                 {
                     // Destination: entire texture. blitFromMemory does the scaling to
                     // a power of two for us when needed
-                    getBuffer(i, mip)->blitFromMemory(src);
+                    getBuffer(face, mip)->blitFromMemory(src, dst);
                 }
                 
             }
@@ -492,44 +504,41 @@ namespace Ogre {
 
         LoadedImages loadedImages;
 
-        if (mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D ||
-            mTextureType == TEX_TYPE_2D_RECT || mTextureType == TEX_TYPE_2D_ARRAY ||
-            mTextureType == TEX_TYPE_3D)
+        try
         {
-            readImage(loadedImages, mName, ext, haveNPOT);
-
-            // If this is a volumetric texture set the texture type flag accordingly.
-            // If this is a cube map, set the texture type flag accordingly.
-            if (loadedImages[0].hasFlag(IF_CUBEMAP))
-                mTextureType = TEX_TYPE_CUBE_MAP;
-            // If this is a volumetric texture set the texture type flag accordingly.
-            if (loadedImages[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
-                mTextureType = TEX_TYPE_3D;
-        }
-        else if (mTextureType == TEX_TYPE_CUBE_MAP)
-        {
-            if (getSourceFileType() == "dds")
+            if(mLayerNames.empty())
             {
-                // XX HACK there should be a better way to specify whether
-                // all faces are in the same file or not
                 readImage(loadedImages, mName, ext, haveNPOT);
+
+                // If this is a volumetric texture set the texture type flag accordingly.
+                // If this is a cube map, set the texture type flag accordingly.
+                if (loadedImages[0].hasFlag(IF_CUBEMAP))
+                    mTextureType = TEX_TYPE_CUBE_MAP;
+                // If this is a volumetric texture set the texture type flag accordingly.
+                if (loadedImages[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    mTextureType = TEX_TYPE_3D;
+            }
+        }
+        catch(const FileNotFoundException&)
+        {
+            if(mTextureType == TEX_TYPE_CUBE_MAP)
+            {
+                mLayerNames.resize(6);
+                for (size_t i = 0; i < 6; i++)
+                    mLayerNames[i] = StringUtil::format("%s%s.%s", baseName.c_str(), CUBEMAP_SUFFIXES[i], ext.c_str());
+            }
+            else if (mTextureType == TEX_TYPE_2D_ARRAY)
+            { // ignore
             }
             else
-            {
-                for (size_t i = 0; i < 6; i++)
-                {
-                    String fullName = baseName + CUBEMAP_SUFFIXES[i];
-                    if (!ext.empty())
-                        fullName = fullName + "." + ext;
-                    // find & load resource data intro stream to allow resource
-                    // group changes if required
-                    readImage(loadedImages, fullName, ext, haveNPOT);
-                }
-            }
+                throw; // rethrow
         }
-        else
+
+        // read sub-images
+        for(const String& name : mLayerNames)
         {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Unknown texture type");
+            StringUtil::splitBaseFilename(name, baseName, ext);
+            readImage(loadedImages, name, ext, haveNPOT);
         }
 
         // If compressed and 0 custom mipmap, disable auto mip generation and

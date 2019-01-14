@@ -459,6 +459,9 @@ namespace Ogre {
             setAnimatedTextureName(names.data(), names.size(), duration);
         }
 
+        /// Sets this texture layer to use an array of texture maps
+        void setLayerArrayNames(TextureType type, const std::vector<String>& names);
+
         /** Returns the width and height of the texture in the given frame.
         */
         std::pair< size_t, size_t > getTextureDimensions( unsigned int frame = 0 ) const;
