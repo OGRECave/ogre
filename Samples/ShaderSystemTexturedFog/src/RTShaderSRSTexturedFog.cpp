@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgrePass.h"
 #include "OgreShaderGenerator.h"
+#include "OgreTextureManager.h"
 
 #define FFP_FUNC_PIXELFOG_POSITION_DEPTH                        "FFP_PixelFog_PositionDepth"
 
@@ -290,8 +291,10 @@ bool RTShaderSRSTexturedFog::preAddToRenderState(const RenderState* renderState,
     // Override scene fog since it will happen in shader.
     dstPass->setFog(true, FOG_NONE, ColourValue::White, newFogDensity, newFogStart, newFogEnd); 
 
-    TextureUnitState* tus = dstPass->createTextureUnitState(mFactory->getBackgroundTextureName());
-    tus->setCubicTextureName(mFactory->getBackgroundTextureName(), true);
+    TextureUnitState* tus = dstPass->createTextureUnitState();
+    auto tex = TextureManager::getSingleton().load(
+        mFactory->getBackgroundTextureName(), RGN_DEFAULT, TEX_TYPE_CUBE_MAP);
+    tus->setTexture(tex);
     mBackgroundSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
     return true;
