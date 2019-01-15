@@ -183,7 +183,7 @@ namespace Ogre {
         {
             return Quaternion(s * w, s * x, s * y, s * z);
         }
-        _OgreExport friend Quaternion operator*(Real s, const Quaternion& q)
+        friend Quaternion operator*(Real s, const Quaternion& q)
         {
             return q * s;
         }
