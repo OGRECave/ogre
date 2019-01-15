@@ -2851,10 +2851,8 @@ namespace Ogre{
 
                             mUnit->setCubicTextureName(evt.mName, atom1->id == ID_COMBINED_UVW);
 
-                            if(mUnit->is3D())
-                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
-                                                   prop->line,
-                                                   "'cubic_texture .. combinedUVW'. Use 'texture .. cubic' instead.");
+                            compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                                   "'cubic_texture ..'. Use 'texture .. cubic' instead.");
                         }
                         else
                         {
