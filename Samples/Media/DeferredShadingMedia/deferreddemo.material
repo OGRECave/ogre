@@ -10,7 +10,7 @@ material DeferredDemo/SkyBox
 			lighting off
 			texture_unit
 			{
-				cubic_texture evening.jpg separateUV
+				texture evening.jpg cubic
 				tex_address_mode clamp
 			}
 		}

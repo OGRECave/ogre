@@ -63,7 +63,7 @@ material Examples/TrippySkyBox
 
 			texture_unit
 			{
-				cubic_texture nm.png separateUV
+				texture nm.png cubic
 				tex_address_mode clamp
 			}
 		}
@@ -81,7 +81,7 @@ material Examples/SpaceSkyBox
 
 			texture_unit
 			{
-				cubic_texture stevecube.jpg separateUV
+				texture stevecube.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -171,7 +171,7 @@ material Examples/CloudyNoonSkyBox
 
 			texture_unit
 			{
-				cubic_texture cloudy_noon.jpg separateUV
+				texture cloudy_noon.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -189,7 +189,7 @@ material Examples/StormySkyBox
 
 			texture_unit
 			{
-				cubic_texture stormy.jpg separateUV
+				texture stormy.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -207,7 +207,7 @@ material Examples/EarlyMorningSkyBox
 
 			texture_unit
 			{
-				cubic_texture early_morning.jpg separateUV
+				texture early_morning.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -244,6 +244,7 @@ material Examples/MorningSkyBox
 
 			texture_unit
 			{
+				// deprecated, but HDR shaders not yet updated
 				cubic_texture morning.jpg separateUV
 				tex_address_mode clamp
 			}
@@ -334,7 +335,7 @@ material Examples/EveningSkyBox
 
 			texture_unit
 			{
-				cubic_texture evening.jpg separateUV
+				texture evening.jpg cubic
 				tex_address_mode clamp
 			}
 		}
