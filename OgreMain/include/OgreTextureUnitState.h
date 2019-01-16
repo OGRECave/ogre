@@ -566,15 +566,11 @@ namespace Ogre {
         /** Get the type of content this TextureUnitState references. */
         ContentType getContentType(void) const;
 
-        /** Returns true if this texture unit is either a series of 6 2D textures, each
-            in it's own frame, or is a full 3D cube map. You can tell which by checking
-            getTextureType.            
-        */
-        bool isCubic(void) const;
+        /// @deprecated use getTextureType()
+        OGRE_DEPRECATED bool isCubic(void) const;
 
-        /** Returns true if this texture layer uses a composite 3D cubic texture.
-        */
-        bool is3D(void) const;
+        /// @deprecated use getTextureType()
+        OGRE_DEPRECATED bool is3D(void) const;
 
         /** Returns the type of this texture.
         */
