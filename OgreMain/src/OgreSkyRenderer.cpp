@@ -181,10 +181,9 @@ void SceneManager::SkyRenderer::setSkyBox(
             m = MaterialManager::getSingleton().getDefaultSettings();
         }
 
-        bool t3d = false;
         Pass* pass = m->getBestTechnique()->getPass(0);
-        if (pass->getNumTextureUnitStates() > 0 && pass->getTextureUnitState(0)->is3D())
-            t3d = true;
+        bool t3d =
+            pass->getNumTextureUnitStates() > 0 && pass->getTextureUnitState(0)->getTextureType() == TEX_TYPE_CUBE_MAP;
 
         mSkyBoxRenderQueue = renderQueue;
 

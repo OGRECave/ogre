@@ -145,7 +145,7 @@ namespace Ogre {
                     // Any Cube textures? NB we make the assumption that any
                     // card capable of running fragment programs can support
                     // cubic textures, which has to be true, surely?
-                    if (tex->is3D() && !caps->hasCapability(RSC_CUBEMAPPING))
+                    if ((tex->getTextureType() == TEX_TYPE_CUBE_MAP) && !caps->hasCapability(RSC_CUBEMAPPING))
                     {
                         // Fail
                         compileErrors << "Pass " << passNum <<
