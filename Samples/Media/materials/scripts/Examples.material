@@ -99,7 +99,7 @@ material Examples/SceneSkyBox1
 
 			texture_unit
 			{
-				cubic_texture cubemap_fr.jpg cubemap_bk.jpg cubemap_lf.jpg cubemap_rt.jpg cubemap_up.jpg cubemap_dn.jpg separateUV
+				texture cubemap.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -135,7 +135,7 @@ material Examples/SceneSkyBox2
 
 			texture_unit
 			{
-				cubic_texture cubescene_fr.jpg cubescene_bk.jpg cubescene_lf.jpg cubescene_rt.jpg cubescene_up.jpg cubescene_dn.jpg separateUV
+				texture cubescene.jpg cubic
 				tex_address_mode clamp
 			}
 		}
