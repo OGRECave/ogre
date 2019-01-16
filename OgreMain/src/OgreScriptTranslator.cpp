@@ -2875,13 +2875,14 @@ namespace Ogre{
                                 *atom2 = (AtomAbstractNode*)(*i2).get(), *atom3 = (AtomAbstractNode*)(*i3).get(),
                                 *atom4 = (AtomAbstractNode*)(*i4).get(), *atom5 = (AtomAbstractNode*)(*i5).get(),
                                 *atom6 = (AtomAbstractNode*)(*i6).get();
-                            String names[6];
-                            names[0] = atom0->value;
-                            names[1] = atom1->value;
-                            names[2] = atom2->value;
-                            names[3] = atom3->value;
-                            names[4] = atom4->value;
-                            names[5] = atom5->value;
+                            std::vector<String> names(6);
+                            // backward compatible order
+                            names[4] = atom0->value;
+                            names[5] = atom1->value;
+                            names[1] = atom2->value;
+                            names[0] = atom3->value;
+                            names[2] = atom4->value;
+                            names[3] = atom5->value;
 
                             if(compiler->getListener())
                             {
@@ -2894,7 +2895,17 @@ namespace Ogre{
                                 }
                             }
 
-                            mUnit->setCubicTextureName(names, atom6->id == ID_COMBINED_UVW);
+                            if(atom6->id != ID_COMBINED_UVW)
+                            {
+                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                                   "separateUV. Use combinedUVW.");
+                                String oldnames[6] = {names[4], names[5], names[1], names[0], names[2], names[3]};
+                                mUnit->setCubicTextureName(oldnames, false);
+                            }
+                            else
+                            {
+                                mUnit->setLayerArrayNames(TEX_TYPE_CUBE_MAP, names);
+                            }
                         }
 
                     }

@@ -273,13 +273,6 @@ namespace Ogre {
 
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
-
-        if (texPtr->getTextureType() == TEX_TYPE_CUBE_MAP)
-        {
-            // delegate to cubic texture implementation
-            setCubicTexture(&texPtr, true);
-            return;
-        }
         
         if (texPtr->getTextureType() == TEX_TYPE_EXTERNAL_OES || texPtr->getTextureType() == TEX_TYPE_2D_RECT)
         {
@@ -290,7 +283,7 @@ namespace Ogre {
         mFramePtrs[0] = texPtr;
 
         mCurrentFrame = 0;
-        mCubic = false;
+        mCubic = texPtr->getTextureType() == TEX_TYPE_CUBE_MAP;
 
         // Load immediately ?
         if (isLoaded())
@@ -329,7 +322,7 @@ namespace Ogre {
     {
         if (forUVW)
         {
-            setCubicTextureName(&name, forUVW);
+            setTextureName(name, TEX_TYPE_CUBE_MAP);
         }
         else
         {
@@ -351,20 +344,26 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::setCubicTextureName(const String* const names, bool forUVW)
     {
-        mFramePtrs.resize(forUVW ? 1 : 6);
+        if(forUVW)
+            return setTextureName(*names, TEX_TYPE_CUBE_MAP);
+
+        mFramePtrs.resize(6);
         for (unsigned int i = 0; i < mFramePtrs.size(); ++i)
         {
             mFramePtrs[i] = retrieveTexture(names[i]);
-            mFramePtrs[i]->setTextureType(forUVW ? TEX_TYPE_CUBE_MAP : TEX_TYPE_2D);
+            mFramePtrs[i]->setTextureType(TEX_TYPE_2D);
         }
-        setCubicTexture(&mFramePtrs[0], forUVW);
+        setCubicTexture(&mFramePtrs[0], false);
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setCubicTexture( const TexturePtr* const texPtrs, bool forUVW )
     {
+        if(forUVW)
+            return setTexture(*texPtrs);
+
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
-        mFramePtrs.resize(forUVW ? 1 : 6);
+        mFramePtrs.resize(6);
         mAnimDuration = 0;
         mCurrentFrame = 0;
         mCubic = true;
