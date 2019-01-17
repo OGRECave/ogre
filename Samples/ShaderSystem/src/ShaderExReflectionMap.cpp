@@ -94,15 +94,7 @@ bool ShaderExReflectionMap::preAddToRenderState(const RenderState* renderState, 
     // Create the reflection texture unit.
     textureUnit = dstPass->createTextureUnitState();
 
-    if (mReflectionMapType == TEX_TYPE_2D)
-    {
-        textureUnit->setTextureName(mReflectionMapTextureName); 
-    }
-    else
-    {
-        textureUnit->setCubicTextureName(mReflectionMapTextureName, true);  
-    }
-        
+    textureUnit->setTextureName(mReflectionMapTextureName, mReflectionMapType);
     mReflectionMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
     return true;
