@@ -318,64 +318,6 @@ namespace Ogre {
         return mContentType;
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setCubicTextureName( const String& name, bool forUVW)
-    {
-        if (forUVW)
-        {
-            setTextureName(name, TEX_TYPE_CUBE_MAP);
-        }
-        else
-        {
-            String ext;
-            String baseName;
-            StringUtil::splitBaseFilename(name, baseName, ext);
-            ext = "."+ext;
-
-            String fullNames[6];
-            static const char* suffixes[6] = {"_fr", "_bk", "_lf", "_rt", "_up", "_dn"};
-            for (int i = 0; i < 6; ++i)
-            {
-                fullNames[i] = baseName + suffixes[i] + ext;
-            }
-
-            setCubicTextureName(fullNames, forUVW);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setCubicTextureName(const String* const names, bool forUVW)
-    {
-        if(forUVW)
-            return setTextureName(*names, TEX_TYPE_CUBE_MAP);
-
-        mFramePtrs.resize(6);
-        for (unsigned int i = 0; i < mFramePtrs.size(); ++i)
-        {
-            mFramePtrs[i] = retrieveTexture(names[i]);
-            mFramePtrs[i]->setTextureType(TEX_TYPE_2D);
-        }
-        setCubicTexture(&mFramePtrs[0], false);
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setCubicTexture( const TexturePtr* const texPtrs, bool forUVW )
-    {
-        if(forUVW)
-            return setTexture(*texPtrs);
-
-        setContentType(CONTENT_NAMED);
-        mTextureLoadFailed = false;
-        mFramePtrs.resize(6);
-        mAnimDuration = 0;
-        mCurrentFrame = 0;
-        mCubic = true;
-
-        for (unsigned int i = 0; i < mFramePtrs.size(); ++i)
-        {
-            mFramePtrs[i] = texPtrs[i];
-        }
-        // Tell parent we need recompiling, will cause reload too
-        mParent->_notifyNeedsRecompile();
-    }
-    //-----------------------------------------------------------------------
     bool TextureUnitState::isCubic(void) const
     {
         return mCubic;
@@ -1340,20 +1282,12 @@ namespace Ogre {
                     // currently assumes animated frames are sequentially numbered
                     // cubic, 1d, 2d, and 3d textures are determined from current TUS state
                     
-                    // if cubic or 3D
-                    if (mCubic)
-                    {
-                        setCubicTextureName(aliasEntry->second, getTextureType() == TEX_TYPE_CUBE_MAP);
-                    }
+                    // if more than one frame then assume animated frames
+                    if (mFramePtrs.size() > 1)
+                        setAnimatedTextureName(aliasEntry->second,
+                            static_cast<unsigned int>(mFramePtrs.size()), mAnimDuration);
                     else
-                    {
-                        // if more than one frame then assume animated frames
-                        if (mFramePtrs.size() > 1)
-                            setAnimatedTextureName(aliasEntry->second, 
-                                static_cast<unsigned int>(mFramePtrs.size()), mAnimDuration);
-                        else
-                            setTextureName(aliasEntry->second, getTextureType());
-                    }
+                        setTextureName(aliasEntry->second, getTextureType());
                 }
                 
             }

@@ -214,25 +214,6 @@ material Examples/EarlyMorningSkyBox
 	}
 }
 
-fragment_program Examples/MorningSkyBoxHDRfpGLSLES glsles
-{
-	source hdrFp.glsles
-	profiles glsles
-}
-
-fragment_program Examples/MorningSkyBoxHDRfpCg cg
-{
-	source hdr.cg
-	entry_point morningskybox_fp
-	profiles ps_2_0 arbfp1
-}
-
-fragment_program Examples/MorningSkyBoxHDRfp unified
-{
-	delegate Examples/MorningSkyBoxHDRfpGLSLES
-	delegate Examples/MorningSkyBoxHDRfpCg
-}
-
 material Examples/MorningSkyBox
 {
 	technique
@@ -244,8 +225,7 @@ material Examples/MorningSkyBox
 
 			texture_unit
 			{
-				// deprecated, but HDR shaders not yet updated
-				cubic_texture morning.jpg separateUV
+				texture morning.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -261,18 +241,12 @@ material Examples/MorningSkyBox
 			lighting off
 			depth_write off
 
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-				param_named ambient float4 1 1 1 1
-			}
-			fragment_program_ref Examples/MorningSkyBoxHDRfp
-			{
-			}
-
 			texture_unit
 			{
-				cubic_texture morning.jpg separateUV
+				texture morning.jpg cubic
 				tex_address_mode clamp
+				// blow out the light a bit
+				colour_op_ex modulate src_texture src_manual 1.7 1.7 1.7
 			}
 		}
 	}
