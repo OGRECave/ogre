@@ -2844,12 +2844,12 @@ namespace Ogre{
                             i1 = getNodeAt(prop->values, 1);
                         if((*i0)->type == ANT_ATOM && (*i1)->type == ANT_ATOM)
                         {
-                            AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
+                            AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get();
 
                             ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, atom0->value);
                             compiler->_fireEvent(&evt, 0);
 
-                            mUnit->setCubicTextureName(evt.mName, atom1->id == ID_COMBINED_UVW);
+                            mUnit->setTextureName(evt.mName, TEX_TYPE_CUBE_MAP);
 
                             compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
                                                    "'cubic_texture ..'. Use 'texture .. cubic' instead.");
@@ -2898,14 +2898,9 @@ namespace Ogre{
                             if(atom6->id != ID_COMBINED_UVW)
                             {
                                 compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
-                                                   "separateUV. Use combinedUVW.");
-                                String oldnames[6] = {names[4], names[5], names[1], names[0], names[2], names[3]};
-                                mUnit->setCubicTextureName(oldnames, false);
+                                                   "separateUV is no longer supported.");
                             }
-                            else
-                            {
-                                mUnit->setLayerArrayNames(TEX_TYPE_CUBE_MAP, names);
-                            }
+                            mUnit->setLayerArrayNames(TEX_TYPE_CUBE_MAP, names);
                         }
 
                     }

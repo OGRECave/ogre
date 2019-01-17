@@ -368,17 +368,27 @@ namespace Ogre {
         /**
         @deprecated use setTextureName()
         */
-        void setCubicTextureName( const String& name, bool forUVW = false );
+        OGRE_DEPRECATED void setCubicTextureName( const String& name, bool forUVW = false )
+        {
+            setTextureName(name, TEX_TYPE_CUBE_MAP);
+        }
 
         /**
         @deprecated use setLayerArrayNames()
          */
-        void setCubicTextureName( const String* const names, bool forUVW = false );
+        OGRE_DEPRECATED void setCubicTextureName( const String* const names, bool forUVW = false )
+        {
+            setLayerArrayNames(TEX_TYPE_CUBE_MAP,
+                               std::vector<String>(names, names + 6));
+        }
 
         /**
         @deprecated use setTexture()
         */
-        void setCubicTexture( const TexturePtr* const texPtrs, bool forUVW = false );
+        OGRE_DEPRECATED void setCubicTexture( const TexturePtr* const texPtrs, bool forUVW = false )
+        {
+            setTexture(*texPtrs);
+        }
 
         /** Sets the names of the texture images for an animated texture.
 
