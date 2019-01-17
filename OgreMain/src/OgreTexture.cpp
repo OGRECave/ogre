@@ -282,11 +282,13 @@ namespace Ogre {
         // imageMips == 0 if the image has no custom mipmaps, otherwise contains the number of custom mips
         for(size_t mip = 0; mip <= std::min(mNumMipmaps, imageMips); ++mip)
         {
-            for(size_t i = 0; i < images.size(); ++i)
+            for(size_t i = 0; i < std::max(faces, images.size()); ++i)
             {
                 PixelBox src;
-                Box dst(0, 0, 0, mWidth, mHeight, mDepth);
                 size_t face = (mDepth == 1) ? i : 0; // depth = 1, then cubemap face else 3d/ array layer
+
+                auto buffer = getBuffer(face, mip);
+                Box dst(0, 0, 0, buffer->getWidth(), buffer->getHeight(), buffer->getDepth());
 
                 if(multiImage)
                 {
@@ -322,13 +324,13 @@ namespace Ogre {
     
                     // Destination: entire texture. blitFromMemory does the scaling to
                     // a power of two for us when needed
-                    getBuffer(face, mip)->blitFromMemory(corrected, dst);
+                    buffer->blitFromMemory(corrected, dst);
                 }
                 else 
                 {
                     // Destination: entire texture. blitFromMemory does the scaling to
                     // a power of two for us when needed
-                    getBuffer(face, mip)->blitFromMemory(src, dst);
+                    buffer->blitFromMemory(src, dst);
                 }
                 
             }
