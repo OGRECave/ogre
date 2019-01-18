@@ -2150,18 +2150,18 @@ namespace Ogre
                     getPointAlign(i, j + step, ALIGN_X_Y, &v2);
                     getPointAlign(i + step, j + step, ALIGN_X_Y, &v3);
 
-                    Plane t1, t2;
+                    Vector4 t1, t2;
                     bool backwardTri = false;
                     // Odd or even in terms of target level
                     if ((j / step) % 2 == 0)
                     {
-                        t1.redefine(v0, v1, v3);
-                        t2.redefine(v0, v3, v2);
+                        t1 = Math::calculateFaceNormalWithoutNormalize(v0, v1, v3);
+                        t2 = Math::calculateFaceNormalWithoutNormalize(v0, v3, v2);
                     }
                     else
                     {
-                        t1.redefine(v1, v3, v2);
-                        t2.redefine(v0, v1, v2);
+                        t1 = Math::calculateFaceNormalWithoutNormalize(v1, v3, v2);
+                        t2 = Math::calculateFaceNormalWithoutNormalize(v0, v1, v2);
                         backwardTri = true;
                     }
 
@@ -2195,17 +2195,17 @@ namespace Ogre
                             {
                                 // Solve for x/z
                                 interp_h = 
-                                    (-t1.normal.x * actualPos.x
-                                    - t1.normal.y * actualPos.y
-                                    - t1.d) / t1.normal.z;
+                                    (-t1.x * actualPos.x
+                                    - t1.y * actualPos.y
+                                    - t1.w) / t1.z;
                             }
                             else
                             {
                                 // Second tri
                                 interp_h = 
-                                    (-t2.normal.x * actualPos.x
-                                    - t2.normal.y * actualPos.y
-                                    - t2.d) / t2.normal.z;
+                                    (-t2.x * actualPos.x
+                                    - t2.y * actualPos.y
+                                    - t2.w) / t2.z;
                             }
 
                             Real actual_h = actualPos.z;
@@ -3356,7 +3356,6 @@ namespace Ogre
         //  | / | \ |
         //  5---6---7
 
-        Plane plane;
         for (long y = widenedRect.top; y < widenedRect.bottom; ++y)
         {
             for (long x = widenedRect.left; x < widenedRect.right; ++x)
@@ -3378,8 +3377,7 @@ namespace Ogre
 
                 for (int i = 0; i < 8; ++i)
                 {
-                    plane.redefine(centrePoint, adjacentPoints[i], adjacentPoints[(i+1)%8]);
-                    cumulativeNormal += plane.normal;
+                    cumulativeNormal += Math::calculateBasicFaceNormal(centrePoint, adjacentPoints[i], adjacentPoints[(i+1)%8]);
                 }
 
                 // normalise & store normal
