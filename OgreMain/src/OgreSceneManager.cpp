@@ -1020,42 +1020,37 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         // Set fixed-function fragment settings
     }
 
+    // fog params can either be from scene or from material
+    const auto& newFogColour = pass->getFogOverride() ? pass->getFogColour() : mFogColour;
+    FogMode newFogMode;
+    Real newFogStart, newFogEnd, newFogDensity;
+    if (pass->getFogOverride())
+    {
+        // fog params from material
+        newFogMode = pass->getFogMode();
+        newFogStart = pass->getFogStart();
+        newFogEnd = pass->getFogEnd();
+        newFogDensity = pass->getFogDensity();
+    }
+    else
+    {
+        // fog params from scene
+        newFogMode = mFogMode;
+        newFogStart = mFogStart;
+        newFogEnd = mFogEnd;
+        newFogDensity = mFogDensity;
+    }
+
     if (passFogParams)
     {
-        // New fog params can either be from scene or from material
-        FogMode newFogMode;
-        ColourValue newFogColour;
-        Real newFogStart, newFogEnd, newFogDensity;
-        if (pass->getFogOverride())
-        {
-            // New fog params from material
-            newFogMode = pass->getFogMode();
-            newFogColour = pass->getFogColour();
-            newFogStart = pass->getFogStart();
-            newFogEnd = pass->getFogEnd();
-            newFogDensity = pass->getFogDensity();
-        }
-        else
-        {
-            // New fog params from scene
-            newFogMode = mFogMode;
-            newFogColour = mFogColour;
-            newFogStart = mFogStart;
-            newFogEnd = mFogEnd;
-            newFogDensity = mFogDensity;
-        }
-
-        /* In D3D, it applies to shaders prior
-        to version vs_3_0 and ps_3_0. And in OGL, it applies to "ARB_fog_XXX" in
-        fragment program, and in other ways, them maybe access by gpu program via
-        "state.fog.XXX".
-        */
         mDestRenderSystem->_setFog(newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
     }
-    // Tell params about ORIGINAL fog
-    // Need to be able to override fixed function fog, but still have
-    // original fog parameters available to a shader than chooses to use
-    mAutoParamDataSource->setFog(mFogMode, mFogColour, mFogDensity, mFogStart, mFogEnd);
+    else
+    {
+        // In D3D9, it applies to shaders prior to version vs_3_0 and ps_3_0.
+        mDestRenderSystem->_setFog(FOG_NONE);
+    }
+    mAutoParamDataSource->setFog(newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
 
     // The rest of the settings are the same no matter whether we use programs or not
 
