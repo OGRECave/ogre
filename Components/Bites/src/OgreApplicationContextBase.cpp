@@ -274,39 +274,29 @@ bool ApplicationContextBase::frameRenderingQueued(const Ogre::FrameEvent& evt)
     return true;
 }
 
-void ApplicationContextBase::parseWindowOptions(uint32_t& w, uint32_t& h, Ogre::NameValuePairList& miscParams)
+NativeWindowPair ApplicationContextBase::createWindow(const Ogre::String& name, Ogre::uint32 w, Ogre::uint32 h, Ogre::NameValuePairList miscParams)
 {
-    const auto& ropts = mRoot->getRenderSystem()->getConfigOptions();
-
-    if(w == 0 && h == 0)
-    {
-        std::istringstream mode(ropts.at("Video Mode").currentValue);
-        Ogre::String token;
-        mode >> w; // width
-        mode >> token; // 'x' as seperator between width and height
-        mode >> h; // height
-    }
-
-    if(miscParams.empty())
-    {
-        miscParams["FSAA"] = ropts.at("FSAA").currentValue;
-        miscParams["vsync"] = ropts.at("VSync").currentValue;
-        miscParams["gamma"] = ropts.at("sRGB Gamma Conversion").currentValue;
-    }
+    NativeWindowPair ret = {NULL, NULL};
 
     if(!mWindows.empty())
     {
         // additional windows should reuse the context
         miscParams["currentGLContext"] = "true";
     }
-}
 
-NativeWindowPair ApplicationContextBase::createWindow(const Ogre::String& name, Ogre::uint32 w, Ogre::uint32 h, Ogre::NameValuePairList miscParams)
-{
-    NativeWindowPair ret = {NULL, NULL};
-    parseWindowOptions(w, h, miscParams);
+    auto p = mRoot->getRenderSystem()->getRenderWindowDescription();
+    miscParams.insert(p.miscParams.begin(), p.miscParams.end());
+    p.miscParams = miscParams;
+    p.name = name;
 
-    ret.render = mRoot->createRenderWindow(name, w, h, false, &miscParams);
+    if(w > 0 && h > 0)
+    {
+        p.width = w;
+        p.height= h;
+    }
+
+    ret.render = mRoot->createRenderWindow(p);
+
     mWindows.push_back(ret);
 
     WindowEventUtilities::_addRenderWindow(ret.render);

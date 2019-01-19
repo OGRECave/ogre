@@ -55,7 +55,6 @@ namespace Ogre {
 
         void initConfigOptions();
         void refreshConfig();
-        NameValuePairList parseOptions(uint& w, uint& h, bool& fullscreen);
     public:
         struct VideoMode {
             uint32 width;
@@ -118,7 +117,7 @@ namespace Ogre {
         void reinitialise(void)
         {
             this->shutdown();
-            this->_initialise(true);
+            this->_initialise();
         }
 
         void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool)

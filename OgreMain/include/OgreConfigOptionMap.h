@@ -46,13 +46,13 @@ namespace Ogre {
             Used for RenderSystem::getConfigOptions. If immutable is true, this
             option must be disabled for modifying.
     */
-    typedef struct _ConfigOption
+    struct ConfigOption
     {
         String name;
         String currentValue;
         StringVector possibleValues;
         bool immutable;
-    } ConfigOption;
+    };
 
     typedef std::map< String, ConfigOption > ConfigOptionMap;
     /** @} */

@@ -254,8 +254,6 @@ namespace OgreBites
             removeInputListener(mWindows[0].native, lis);
         }
 
-        void parseWindowOptions(uint32_t& w, uint32_t& h, Ogre::NameValuePairList& miscParams);
-
         /**
          * Create a new render window
          *

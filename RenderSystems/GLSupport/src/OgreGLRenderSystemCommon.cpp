@@ -160,63 +160,6 @@ namespace Ogre {
     }
 
     //-------------------------------------------------------------------------------------------------//
-    NameValuePairList GLRenderSystemCommon::parseOptions(uint& w, uint& h, bool& fullscreen)
-    {
-        ConfigOptionMap::iterator opt;
-        ConfigOptionMap::iterator end = mOptions.end();
-        NameValuePairList miscParams;
-
-        opt = mOptions.find("Full Screen");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find full screen options!", "parseOptions");
-        fullscreen = opt->second.currentValue == "Yes";
-
-        opt = mOptions.find("Video Mode");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find video mode options!", "parseOptions");
-        String val = opt->second.currentValue;
-        String::size_type pos = val.find('x');
-        if (pos == String::npos)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid Video Mode provided", "parseOptions");
-
-        w = StringConverter::parseUnsignedInt(val.substr(0, pos));
-        h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
-
-        if((opt = mOptions.find("Display Frequency")) != end)
-            miscParams["displayFrequency"] = opt->second.currentValue;
-
-        if((opt = mOptions.find("FSAA")) != end)
-            miscParams["FSAA"] = opt->second.currentValue;
-
-        if((opt = mOptions.find("VSync")) != end)
-            miscParams["vsync"] = opt->second.currentValue;
-
-        if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
-            miscParams["gamma"] = opt->second.currentValue;
-
-        // backend specific options. Presence determined by getConfigOptions
-        if((opt = mOptions.find("Colour Depth")) != end)
-            miscParams["colourDepth"] = opt->second.currentValue;
-
-        if((opt = mOptions.find("VSync Interval")) != end)
-            miscParams["vsyncInterval"] = opt->second.currentValue;
-
-        if((opt = mOptions.find("hidden")) != end)
-            miscParams[ "hidden" ] = opt->second.currentValue;
-
-        if((opt = mOptions.find("Content Scaling Factor")) != end)
-            miscParams["contentScalingFactor"] = opt->second.currentValue;
-
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-        opt = mOptions.find("Stereo Mode");
-        if (opt == mOptions.end())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "parseOptions");
-        miscParams["stereoMode"] = opt->second.currentValue;
-#endif
-
-        return miscParams;
-    }
-
     void GLRenderSystemCommon::setConfigOption(const String &name, const String &value)
     {
         ConfigOptionMap::iterator option = mOptions.find(name);
