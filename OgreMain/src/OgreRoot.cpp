@@ -593,13 +593,13 @@ namespace Ogre {
 
 
         PlatformInformation::log(LogManager::getSingleton().getDefaultLog());
-        mAutoWindow =  mActiveRenderer->_initialise(autoCreateWindow, windowTitle);
+        mActiveRenderer->_initialise();
 
-
-        if (autoCreateWindow && !mFirstTimePostWindowInit)
+        if (autoCreateWindow)
         {
-            oneTimePostWindowInit();
-            mAutoWindow->_setPrimary();
+            auto desc = mActiveRenderer->getRenderWindowDescription();
+            desc.name = windowTitle;
+            mAutoWindow = createRenderWindow(desc);
         }
 
         // Initialise timer

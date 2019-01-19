@@ -219,24 +219,14 @@ namespace Ogre {
         return strName;
     }
 
-    RenderWindow* GLRenderSystem::_initialise(bool autoCreateWindow, const String& windowTitle)
+    void GLRenderSystem::_initialise()
     {
+        RenderSystem::_initialise();
+
         mGLSupport->start();
 
         // Create the texture manager
         mTextureManager = new GLTextureManager(this);
-
-        RenderWindow* autoWindow = NULL;
-        if(autoCreateWindow) {
-            uint w, h;
-            bool fullscreen;
-            NameValuePairList misc = parseOptions(w, h, fullscreen);
-            autoWindow = _createRenderWindow(windowTitle, w, h, fullscreen, &misc);
-        }
-
-        RenderSystem::_initialise(autoCreateWindow, windowTitle);
-
-        return autoWindow;
     }
 
     RenderSystemCapabilities* GLRenderSystem::createRenderSystemCapabilities() const
@@ -781,7 +771,7 @@ namespace Ogre {
 
         /// Do this after extension function pointers are initialised as the extension
         /// is used to probe further capabilities.
-        ConfigOptionMap::iterator cfi = getConfigOptions().find("RTT Preferred Mode");
+        auto cfi = getConfigOptions().find("RTT Preferred Mode");
         // RTT Mode: 0 use whatever available, 1 use PBuffers, 2 force use copying
         int rttMode = 0;
         if (cfi != getConfigOptions().end())

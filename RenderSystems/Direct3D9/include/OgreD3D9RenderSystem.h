@@ -199,7 +199,7 @@ namespace Ogre
 
         // Overridden RenderSystem functions
         String validateConfigOptions();
-        RenderWindow* _initialise( bool autoCreateWindow, const String& windowTitle = "OGRE Render Window"  );
+        void _initialise() override;
         /// @copydoc RenderSystem::_createRenderWindow
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0);

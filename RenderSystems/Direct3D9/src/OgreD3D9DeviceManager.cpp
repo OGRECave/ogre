@@ -349,8 +349,8 @@ namespace Ogre
         
 
         // Do we want to preserve the FPU mode? Might be useful for scientific apps
-        ConfigOptionMap& options = renderSystem->getConfigOptions();
-        ConfigOptionMap::iterator opti = options.find("Floating-point mode");
+        auto options = renderSystem->getConfigOptions();
+        auto opti = options.find("Floating-point mode");
         if (opti != options.end() && opti->second.currentValue == "Consistent")
             extraFlags |= D3DCREATE_FPU_PRESERVE;
 
