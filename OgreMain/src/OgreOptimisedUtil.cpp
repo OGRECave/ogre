@@ -48,29 +48,6 @@ namespace Ogre {
 
 #ifdef __DO_PROFILE__
     //---------------------------------------------------------------------
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-    typedef unsigned __int64 uint64;
-#pragma warning(push)
-#pragma warning(disable: 4035)  // no return value
-    static OGRE_FORCE_INLINE uint64 getCpuTimestamp(void)
-    {
-        __asm rdtsc
-        // Return values in edx:eax, No return statement requirement here for VC.
-    }
-#pragma warning(pop)
-
-#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG)
-    typedef unsigned long long uint64;
-    static OGRE_FORCE_INLINE uint64 getCpuTimestamp(void)
-    {
-        uint64 result;
-        __asm__ __volatile__ ( "rdtsc" : "=A" (result) );
-        return result;
-    }
-
-#endif  // OGRE_COMPILER
-
-    //---------------------------------------------------------------------
     class OptimisedUtilProfiler : public OptimisedUtil
     {
     protected:
@@ -105,12 +82,12 @@ namespace Ogre {
 
             void begin(void)
             {
-                mStartTick = getCpuTimestamp();
+                mStartTick = clock();
             }
 
             void end(void)
             {
-                uint64 ticks = getCpuTimestamp() - mStartTick;
+                uint64 ticks = clock() - mStartTick;
                 mTotalTicks += ticks;
                 ++mCount;
                 mAvgTicks = mTotalTicks / mCount;
@@ -148,7 +125,7 @@ namespace Ogre {
             const float *srcPosPtr, float *destPosPtr,
             const float *srcNormPtr, float *destNormPtr,
             const float *blendWeightPtr, const unsigned char* blendIndexPtr,
-            const Matrix4* const* blendMatrices,
+            const Affine3* const* blendMatrices,
             size_t srcPosStride, size_t destPosStride,
             size_t srcNormStride, size_t destNormStride,
             size_t blendWeightStride, size_t blendIndexStride,
@@ -209,9 +186,9 @@ namespace Ogre {
         }
 
         virtual void concatenateAffineMatrices(
-            const Matrix4& baseMatrix,
-            const Matrix4* srcMatrices,
-            Matrix4* dstMatrices,
+            const Affine3& baseMatrix,
+            const Affine3* srcMatrices,
+            Affine3* dstMatrices,
             size_t numMatrices)
         {
             static ProfileItems results;
