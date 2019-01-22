@@ -65,15 +65,37 @@ THE SOFTWARE.
 // NOTE: Should be sync with __OGRE_HAVE_SSE macro.
 //
 
-#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86
-
-// GCC version 4.0 upwards should be reliable for official SSE now,
-// so no longer define SSE macros ourselves
-// We don't support gcc 3.x anymore anyway, although that had SSE it was a bit flaky?
+#if __OGRE_HAVE_SSE
 #include <xmmintrin.h>
+#elif __OGRE_HAVE_NEON
+#include "SSE2NEON.h"
 
+// some conversions custom to OGRE
+#define _mm_cmpnle_ps _mm_cmpgt_ps
 
-#endif // OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86
+// self written
+OGRE_FORCE_INLINE __m128 _mm_loadh_pi( __m128 a , __m64 const * p )
+{
+	return vcombine_f32(vget_low_f32(a), vld1_f32((float32_t const *)p));
+}
+// self written
+OGRE_FORCE_INLINE void _mm_storeh_pi( __m64 * p , __m128 a )
+{
+	vst1_f32((float32_t *)p, vget_high_f32((float32x4_t)a));
+}
+
+OGRE_FORCE_INLINE __m128 _mm_mul_ss(__m128 a, __m128 b)
+{
+    a[0] *= b[0];
+    return a;
+}
+
+OGRE_FORCE_INLINE __m128 _mm_sub_ss(__m128 a, __m128 b)
+{
+    a[0] -= b[0];
+    return a;
+}
+#endif
 
 
 
@@ -90,7 +112,7 @@ namespace Ogre {
     *  @{
     */
 
-#if __OGRE_HAVE_SSE
+#if __OGRE_HAVE_SSE || __OGRE_HAVE_NEON
 
 #define __MM_RSQRT_PS(x)    _mm_rsqrt_ps(x)
 
