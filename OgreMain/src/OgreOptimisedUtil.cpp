@@ -151,6 +151,8 @@ namespace Ogre {
                 numVertices);
             profile.end();
 
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
             // You can put break point here while running test application, to
             // watch profile results.
             ++index;    // So we can put break point here even if in release build
@@ -180,6 +182,9 @@ namespace Ogre {
                 morphNormals);
             profile.end();
 
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
+
             // You can put break point here while running test application, to
             // watch profile results.
             ++index;    // So we can put break point here even if in release build
@@ -204,6 +209,9 @@ namespace Ogre {
                 dstMatrices,
                 numMatrices);
             profile.end();
+
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
 
             // You can put break point here while running test application, to
             // watch profile results.
@@ -240,6 +248,9 @@ namespace Ogre {
             //      SSE         223559                  399495
             //
 
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
+
             // You can put break point here while running test application, to
             // watch profile results.
             ++index;    // So we can put break point here even if in release build
@@ -274,6 +285,9 @@ namespace Ogre {
             //      General     171875                  86998
             //      SSE          47934                  63995
             //
+
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
 
             // You can put break point here while running test application, to
             // watch profile results.
@@ -313,6 +327,9 @@ namespace Ogre {
             //      Point Light, General        224209              155483
             //      Point Light, SSE             56817              106663
             //
+
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
 
             // You can put break point here while running test application, to
             // watch profile results.
