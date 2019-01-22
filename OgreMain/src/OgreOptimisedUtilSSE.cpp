@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreOptimisedUtil.h"
 
 
-#if __OGRE_HAVE_SSE
+#if __OGRE_HAVE_SSE || __OGRE_HAVE_NEON
 
 // Should keep this includes at latest to avoid potential "xmmintrin.h" included by
 // other header file on some platform for some reason.
@@ -1044,7 +1044,7 @@ namespace Ogre {
         // run out of usable CPU registers, or L1/L2 cache related problem, causing
         // slight performance loss than general version.
         //
-
+#if __OGRE_HAVE_NEON == 0
         if (PlatformInformation::getCpuIdentifier().find("AuthenticAMD") != String::npos)
         {
             // How can I check it's an Athlon XP but not Althon 64?
@@ -1057,6 +1057,7 @@ namespace Ogre {
                 mPreferGeneralVersionForSharedBuffers = true;
             }
         }
+#endif
     }
     //---------------------------------------------------------------------
     void OptimisedUtilSSE::softwareVertexSkinning(
