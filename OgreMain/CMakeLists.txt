@@ -72,7 +72,6 @@ if(NOT WIN32)
     list(APPEND PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp")
 endif()
 
-include_directories("${ZZip_INCLUDE_DIRS}")
 # Configure threading files
 file(GLOB THREAD_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h")
 include_directories("include/Threading" "src/")
@@ -155,6 +154,7 @@ if (OGRE_CONFIG_ENABLE_ASTC)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_ZIP)
+  include_directories("${ZZip_INCLUDE_DIRS}")
   list(APPEND HEADER_FILES include/OgreZip.h)
   list(APPEND SOURCE_FILES src/OgreZip.cpp)
 
