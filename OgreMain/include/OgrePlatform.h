@@ -138,9 +138,6 @@ namespace Ogre {
 #   define __OGRE_WINRT_STORE     (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && WINAPI_FAMILY == WINAPI_FAMILY_APP)        // WindowsStore 8.0 and 8.1
 #   define __OGRE_WINRT_PHONE     (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)  // WindowsPhone 8.0 and 8.1
 #   define __OGRE_WINRT_PHONE_80  (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP && _WIN32_WINNT <= _WIN32_WINNT_WIN8) // Windows Phone 8.0 often need special handling, while 8.1 is OK
-#   if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8 // i.e. this is modern SDK and we compile for OS with guaranteed support for DirectXMath
-#       define __OGRE_HAVE_DIRECTXMATH 1
-#   endif
 #   ifndef _CRT_SECURE_NO_WARNINGS
 #       define _CRT_SECURE_NO_WARNINGS
 #   endif
@@ -218,10 +215,6 @@ namespace Ogre {
 #   ifndef CLOCKS_PER_SEC
 #       define CLOCKS_PER_SEC  1000
 #   endif
-#endif
-
-#ifndef __OGRE_HAVE_DIRECTXMATH
-#   define __OGRE_HAVE_DIRECTXMATH 0
 #endif
 
 //----------------------------------------------------------------------------
