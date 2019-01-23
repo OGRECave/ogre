@@ -38,9 +38,6 @@ namespace Ogre {
 #if __OGRE_HAVE_SSE || __OGRE_HAVE_NEON
     extern OptimisedUtil* _getOptimisedUtilSSE(void);
 #endif
-#if __OGRE_HAVE_DIRECTXMATH
-    extern OptimisedUtil* _getOptimisedUtilDirectXMath(void);
-#endif
 
 #ifdef __DO_PROFILE__
     //---------------------------------------------------------------------
@@ -385,11 +382,7 @@ namespace Ogre {
         else
 #endif  // __OGRE_HAVE_SSE
         {
-#if __OGRE_HAVE_DIRECTXMATH
-            return _getOptimisedUtilDirectXMath();
-#else // __OGRE_HAVE_DIRECTXMATH
-             return _getOptimisedUtilGeneral();
-#endif
+            return _getOptimisedUtilGeneral();
         }
 
 #endif  // __DO_PROFILE__
