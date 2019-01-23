@@ -92,21 +92,8 @@ namespace Ogre {
 
 #if __OGRE_HAVE_SSE
 
-/** Macro __MM_RSQRT_PS calculate square root, which should be used for
-    normalise normals only. It might be use NewtonRaphson reciprocal square
-    root for high precision, or use SSE rsqrt instruction directly, based
-    on profile to pick up perfect one.
-@note:
-    Prefer to never use NewtonRaphson reciprocal square root at all, since
-    speed test indicate performance loss 10% for unrolled version, and loss
-    %25 for general version (P4 3.0G HT). A slight loss in precision not
-    that important in case of normalise normals.
-*/
-#if 1
 #define __MM_RSQRT_PS(x)    _mm_rsqrt_ps(x)
-#else
-#define __MM_RSQRT_PS(x)    __mm_rsqrt_nr_ps(x) // Implemented below
-#endif
+
 
 /** Performing the transpose of a 4x4 matrix of single precision floating
     point values.
@@ -275,18 +262,6 @@ namespace Ogre {
     static OGRE_FORCE_INLINE bool _isAlignedForSSE(const void *p)
     {
         return (((size_t)p) & 15) == 0;
-    }
-
-    /** Calculate NewtonRaphson Reciprocal Square Root with formula:
-            0.5 * rsqrt(x) * (3 - x * rsqrt(x)^2)
-    */
-    static OGRE_FORCE_INLINE __m128 __mm_rsqrt_nr_ps(const __m128& x)
-    {
-        static const __m128 v0pt5 = { 0.5f, 0.5f, 0.5f, 0.5f };
-        static const __m128 v3pt0 = { 3.0f, 3.0f, 3.0f, 3.0f };
-        __m128 t = _mm_rsqrt_ps(x);
-        return _mm_mul_ps(_mm_mul_ps(v0pt5, t),
-            _mm_sub_ps(v3pt0, _mm_mul_ps(_mm_mul_ps(x, t), t)));
     }
 
 // Macro to check the stack aligned for SSE
