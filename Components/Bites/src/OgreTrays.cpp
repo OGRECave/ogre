@@ -917,6 +917,10 @@ void Slider::_cursorMoved(const Ogre::Vector2 &cursorPos, float wheelDelta)
 
         mHandle->setLeft(Ogre::Math::Clamp<int>((int)newLeft, 0, (int)rightBoundary));
         setValue(getSnappedValue(newLeft / rightBoundary));
+
+        // sync mHandle's mPixelLeft with mLeft
+        // if multiple "mouseMoved" happened during one frame, mLeft could be incorrect otherwise
+        mHandle->_update();
     }
 }
 
