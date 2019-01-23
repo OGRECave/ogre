@@ -13,7 +13,7 @@ set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp")
 
 add_definitions(-DFREEIMAGE_LIB)
 add_library(Codec_FreeImage ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCES})
-target_link_libraries(Codec_FreeImage PUBLIC OgreMain "${FreeImage_LIBRARIES}")
+target_link_libraries(Codec_FreeImage PUBLIC OgreMain ${FreeImage_LIBRARIES})
 target_include_directories(Codec_FreeImage PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/Plugins/FreeImageCodec>
