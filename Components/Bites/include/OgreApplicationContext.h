@@ -55,7 +55,7 @@ namespace OgreBites
     class _OgreBitesExport ApplicationContextSDL : public ApplicationContextBase
     {
     public:
-        explicit ApplicationContextSDL(const Ogre::String& appName = OGRE_VERSION_NAME);
+        explicit ApplicationContextSDL(const Ogre::String& appName = "Ogre3D");
 
         using ApplicationContextBase::setWindowGrab;
         using ApplicationContextBase::addInputListener;
@@ -76,7 +76,7 @@ namespace OgreBites
     class _OgreBitesExport ApplicationContextAndroid : public ApplicationContextBase
     {
     public:
-        explicit ApplicationContextAndroid(const Ogre::String& appName = OGRE_VERSION_NAME);
+        explicit ApplicationContextAndroid(const Ogre::String& appName = "Ogre3D");
 
         void initAppForAndroid(AAssetManager* assetMgr, ANativeWindow* window);
         void _fireInputEventAndroid(AInputEvent* event, int wheel = 0);

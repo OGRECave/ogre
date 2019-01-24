@@ -84,7 +84,7 @@ namespace OgreBites
     class _OgreBitesExport ApplicationContextBase : public Ogre::FrameListener
     {
     public:
-        explicit ApplicationContextBase(const Ogre::String& appName = OGRE_VERSION_NAME);
+        explicit ApplicationContextBase(const Ogre::String& appName = "Ogre3D");
 
         virtual ~ApplicationContextBase();
 
