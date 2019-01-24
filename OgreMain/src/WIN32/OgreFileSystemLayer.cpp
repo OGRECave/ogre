@@ -139,22 +139,12 @@ namespace Ogre
 
         if(!mHomePath.empty())
         {
-            // create Ogre subdir
-            mHomePath += "\\Ogre\\";
+            mHomePath += '\\' + subdir + '\\';
+            // create release subdir
             if (!createDirectory(mHomePath))
             {
                 // couldn't create directory, fall back to current working dir
                 mHomePath.clear();
-            }
-            else
-            {
-                mHomePath += subdir + '\\';
-                // create release subdir
-                if (!createDirectory(mHomePath))
-                {
-                    // couldn't create directory, fall back to current working dir
-                    mHomePath.clear();
-                }
             }
         }
     }
