@@ -53,7 +53,7 @@ void GLSLProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_FLOAT2] = "vec2";
     mGpuConstTypeMap[GCT_FLOAT3] = "vec3";
     mGpuConstTypeMap[GCT_FLOAT4] = "vec4";
-    mGpuConstTypeMap[GCT_SAMPLER1D] = mIsGLSLES ? "sampler2D" : "sampler1D";
+    mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler1D";
     mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
     mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "sampler2DArray";
     mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
