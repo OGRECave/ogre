@@ -822,6 +822,11 @@ namespace Ogre {
 
             mStateCacheManager->bindGLTexture(mTextureTypes[stage], tex->getGLID());
         }
+        else
+        {
+            // Bind zero texture
+            mStateCacheManager->bindGLTexture(GL_TEXTURE_2D, 0);
+        }
     }
 
     void GLES2RenderSystem::_setSampler(size_t unit, Sampler& sampler)
