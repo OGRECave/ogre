@@ -296,7 +296,6 @@ namespace OgreBites
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*       mShaderGenerator; // The Shader generator instance.
         SGTechniqueResolverListener*       mMaterialMgrListener; // Shader generator material manager listener.
-        Ogre::String                           mRTShaderLibPath;
 #endif // INCLUDE_RTSHADER_SYSTEM
     };
 }

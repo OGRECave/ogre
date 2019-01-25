@@ -883,7 +883,7 @@ namespace OgreBites
             createDummyScene();
 
             mTrayMgr->showLoadingBar(1, 0);
-            Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("General");
+            Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
             mTrayMgr->hideLoadingBar();
         }
 
