@@ -10,7 +10,7 @@
 
 namespace OgreBites {
     Ogre::ConfigDialog* getNativeConfigDialog() {
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(__MINGW32__)) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         static ConfigDialog dialog;
         return &dialog;
 #else
