@@ -819,5 +819,5 @@ void SGX_src_mod_inv_modulate(in vec3 iColor, in vec3 controlVal, out vec3 oColo
 }
 void SGX_src_mod_inv_modulate(in float iColor, in float controlVal, out float oColor)
 {
-	oColor = mix(iColor, 1, controlVal);
+	oColor = mix(iColor, 1.0, controlVal);
 }
