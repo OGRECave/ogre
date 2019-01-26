@@ -114,6 +114,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
         // Redefine texture functions to maintain reusability
         os << "#define texture1D texture" << std::endl;
         os << "#define texture2D texture" << std::endl;
+        os << "#define shadow2DProj textureProj" << std::endl;
         os << "#define texture3D texture" << std::endl;
         os << "#define textureCube texture" << std::endl;
         os << "#define texture2DLod textureLod" << std::endl;

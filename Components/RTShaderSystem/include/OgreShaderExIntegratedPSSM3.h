@@ -185,6 +185,7 @@ protected:
     // Derived scene colour (ambient term).
     UniformParameterPtr mPSDerivedSceneColour;
 
+    bool mUseTextureCompare;
 };
 
 
