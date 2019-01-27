@@ -502,9 +502,9 @@ endif ()
 # Install documentation
 add_subdirectory(Docs)
 
-# Install media files
+# Install sample media files
 if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
-  add_subdirectory(Samples/Media)
+  install(DIRECTORY Samples/Media/ DESTINATION ${OGRE_MEDIA_PATH})
 endif ()
 
 # Install CMake modules

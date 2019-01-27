@@ -145,3 +145,6 @@ ogre_config_component(OgreBites)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Bites
 )
+install(FILES "${PROJECT_SOURCE_DIR}/Media/packs/SdkTrays.zip"
+  DESTINATION "${OGRE_MEDIA_PATH}/packs/"
+)
