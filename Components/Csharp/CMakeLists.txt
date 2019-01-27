@@ -10,7 +10,7 @@ include_directories("${PROJECT_BINARY_DIR}/include" "${PROJECT_SOURCE_DIR}/OgreM
 include(${SWIG_USE_FILE})
 
 if(MSVC)
-	add_definitions(/bigobj)
+	add_definitions(/bigobj /wd4700)
 else()
 	add_definitions(-Wno-strict-aliasing -Wno-cast-qual -Wno-shadow -Wno-missing-declarations -Wno-unused-but-set-variable)
 endif()
