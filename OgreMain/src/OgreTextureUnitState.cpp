@@ -584,7 +584,7 @@ namespace Ogre {
                 "TextureUnitState::getFrameTextureName");
         }
 
-        return mFramePtrs[frameNumber]->getName();
+        return mFramePtrs[0] ? mFramePtrs[frameNumber]->getName() : BLANKSTRING;
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setDesiredFormat(PixelFormat desiredFormat)
