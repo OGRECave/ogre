@@ -1,9 +1,10 @@
 platform: x64
 configuration: Release
-image: 
+image:
  - Visual Studio 2017
  - Visual Studio 2013
-
+install:
+ - cmd: choco install swig -y & exit 0
 build_script:
  - cmake -P ci-build.cmake
  - cmake --build build --config Release --target INSTALL

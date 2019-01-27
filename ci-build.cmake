@@ -4,6 +4,7 @@ set(CROSS)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(BUILD_DEPS FALSE)
+set(SWIG_EXECUTABLE /usr/bin/swig3.0)
 
 set(RENDERSYSTEMS
     # tests only run with the legacy GL rendersystem as MESA is too old on buildbot
@@ -55,6 +56,7 @@ if(DEFINED ENV{APPVEYOR})
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
 
     set(BUILD_DEPS TRUE)
+    set(SWIG_EXECUTABLE "C:\\ProgramData\\chocolatey\\bin\\swig.exe")
 endif()
 
 if(DEFINED ENV{ANDROID})
@@ -91,7 +93,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
     -DOGRE_BUILD_TESTS=ON
     -DOGRE_RESOURCEMANAGER_STRICT=2
     -DOGRE_BUILD_DEPENDENCIES=${BUILD_DEPS}
-    -DSWIG_EXECUTABLE=/usr/bin/swig3.0
+    -DSWIG_EXECUTABLE=${SWIG_EXECUTABLE}
     ${RENDERSYSTEMS}
     ${OTHER}
     ${GENERATOR}
