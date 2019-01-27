@@ -1,5 +1,5 @@
 #version 120
-varying vec2 uv;
+varying vec2 oUv0;
 
 uniform sampler2D sMRT1;
 uniform sampler2D sMRT2;
@@ -18,9 +18,9 @@ void main()
     const int m = 8;
     const int n = 4;
     const int numSamples = m * n;
-    vec2 interleaveOffset = uv * cViewportSize.xy / interleaved;
-    vec3 fragmentPosition = texture2D(sMRT2, uv).xyz; // the current fragment in view space
-    vec3 fragmentNormal = texture2D(sMRT1, uv).xyz; // the fragment normal
+    vec2 interleaveOffset = oUv0 * cViewportSize.xy / interleaved;
+    vec3 fragmentPosition = texture2D(sMRT2, oUv0).xyz; // the current fragment in view space
+    vec3 fragmentNormal = texture2D(sMRT1, oUv0).xyz; // the fragment normal
     float rUV = 0; // radius of influence in screen space
     float r = 0; // radius of influence in world space
 
@@ -64,7 +64,7 @@ void main()
 
         vec3 sampleVector = reflect(randomVector, reflector) * sampleLength;
 
-        vec2 sampleTC = uv + sampleVector.xy * rUV;
+        vec2 sampleTC = oUv0 + sampleVector.xy * rUV;
 
         vec3 samplePosition = texture2D(sMRT2, sampleTC).xyz;
 

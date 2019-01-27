@@ -1,5 +1,5 @@
 #version 120
-varying vec2 uv;
+varying vec2 oUv0;
 
 uniform sampler2D sMRT1;
 uniform sampler2D sMRT2;
@@ -17,10 +17,10 @@ void main()
     const float pi = 3.1415926535897932384626433832795028841971693993751;
 
     const float numSteps = 7; // number of samples/steps along a direction
-    const float numDirections = 4; // number of sampling directions in uv space
+    const float numDirections = 4; // number of sampling directions in oUv0 space
     
-    vec3 p = texture2D(sMRT2, uv).xyz; // the current fragment in view space
-    vec3 pointNormal = texture2D(sMRT1, uv).xyz; // the fragment normal
+    vec3 p = texture2D(sMRT2, oUv0).xyz; // the current fragment in view space
+    vec3 pointNormal = texture2D(sMRT1, oUv0).xyz; // the fragment normal
 
     float Ruv = 0; // radius of influence in screen space
     float R = 0; // radius of influence in world space
@@ -55,7 +55,7 @@ void main()
     // we don't want to sample to the perimeter of R since those samples would be 
     // omitted by the distance attenuation (W(R) = 0 by definition)
     // Therefore we add a extra step and don't use the last sample.
-    vec3 randomValues = texture2D(sRand, (uv * cViewportSize.xy) / 4).xyz; //4px tiles
+    vec3 randomValues = texture2D(sRand, (oUv0 * cViewportSize.xy) / 4).xyz; //4px tiles
 	mat2 rotationMatrix = mat2( (randomValues.x - 0.5) * 2, -(randomValues.y - 0.5) * 2,
 								(randomValues.y - 0.5) * 2,  (randomValues.x - 0.5) * 2);
 
@@ -70,7 +70,7 @@ void main()
 
         for (int j = 1; j <= numSteps; j++) // sample along a direction, needs to start at one, for the sake of the next line
         {
-            vec2 sampleUV = uv + ((jitter + j) * sampleDirection); // jitter the step a little bit
+            vec2 sampleUV = oUv0 + ((jitter + j) * sampleDirection); // jitter the step a little bit
             
             vec3 sample = texture2D(sMRT2, sampleUV).xyz; // the sample in view space
             vec3 sampleVector = (sample - p);

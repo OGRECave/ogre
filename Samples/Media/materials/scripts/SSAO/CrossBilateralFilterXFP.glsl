@@ -3,7 +3,7 @@
 // note: encode the viewspace z component in the accessibility texture to reduce
 // the texture fetch count
 #version 120
-varying vec2 uv;
+varying vec2 oUv0;
 
 uniform sampler2D sAccessibility;
 uniform sampler2D sMRT2;
@@ -15,7 +15,7 @@ void main()
     const int kernelWidth = 13;
     float sigma = (kernelWidth - 1) / 6; // make the kernel span 6 sigma
     
-    float fragmentDepth = texture2D(sMRT2, uv).z;
+    float fragmentDepth = texture2D(sMRT2, oUv0).z;
 
     float weights = 0;
     float blurred = 0;
@@ -23,11 +23,11 @@ void main()
     for (float i = -(kernelWidth - 1) / 2; i < (kernelWidth - 1) / 2; i++)
     {
         float geometricWeight = exp(-pow(i, 2) / (2 * pow(sigma, 2)));
-        float sampleDepth = texture2D(sMRT2, vec2(uv.x - i * stepX, uv.y)).z;
+        float sampleDepth = texture2D(sMRT2, vec2(oUv0.x - i * stepX, oUv0.y)).z;
         float photometricWeight = 1 / pow((1 + abs(fragmentDepth - sampleDepth)), cPhotometricExponent);
 
         weights += (geometricWeight * photometricWeight);
-        blurred += texture2D(sAccessibility, vec2(uv.x - i * stepX, uv.y)).r * geometricWeight * photometricWeight;
+        blurred += texture2D(sAccessibility, vec2(oUv0.x - i * stepX, oUv0.y)).r * geometricWeight * photometricWeight;
     }
 
     blurred /= weights;
