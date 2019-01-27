@@ -95,7 +95,7 @@ namespace Ogre {
         };
 
         /** Inner class for displaying debug renderable for Node. */
-        class DebugRenderable : public Renderable, public NodeAlloc
+        class _OgreExport DebugRenderable : public Renderable, public NodeAlloc
         {
         protected:
             Node* mParent;
