@@ -7,7 +7,7 @@
 // where x marks the fragment position and the o marks a sampling point
 #version 120
 
-varying vec2 uv;
+varying vec2 oUv0;
 
 uniform sampler2D sOcclusion;
 uniform vec4 screenSize;
@@ -19,7 +19,7 @@ void main()
     for (int x = -2; x < 2; x++)
     for (int y = -2; y < 2; y++)
     {
-        color += texture2D(sOcclusion, vec2(uv.x + x * screenSize.z, uv.y + y * screenSize.w)).x;
+        color += texture2D(sOcclusion, vec2(oUv0.x + x * screenSize.z, oUv0.y + y * screenSize.w)).x;
     }
     color /= 16;
         

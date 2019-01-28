@@ -1,5 +1,5 @@
 #version 120
-varying vec2 uv;
+varying vec2 oUv0;
 
 uniform sampler2D sNormal;
 uniform sampler2D sPosition;
@@ -15,8 +15,8 @@ uniform vec4 cViewportSize;
 void main()
 {
     // get the view space position and normal of the fragment
-    vec3 fragmentPosition = texture2D(sPosition, uv).xyz;
-    vec3 fragmentNormal = texture2D(sNormal, uv).xyz;
+    vec3 fragmentPosition = texture2D(sPosition, oUv0).xyz;
+    vec3 fragmentNormal = texture2D(sNormal, oUv0).xyz;
 	
 	float totalGI = 0.0f;
 	
@@ -28,7 +28,7 @@ void main()
         {
             vec2 sampleOffset = diagonalStart + vec2(j, -j);
 
-            vec2 sampleUV = uv + (sampleOffset * cViewportSize.zw * cKernelSize);
+            vec2 sampleUV = oUv0 + (sampleOffset * cViewportSize.zw * cKernelSize);
             vec3 samplePos = texture2D(sPosition, sampleUV).xyz;
 
             vec3 toCenter = samplePos - fragmentPosition;

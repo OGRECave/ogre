@@ -3,7 +3,7 @@ uniform sampler2D rt1;
 uniform sampler2D rt2;
 uniform sampler2D rt3;
 
-varying vec2 uv;
+varying vec2 oUv0;
 
 void main(void)
 {

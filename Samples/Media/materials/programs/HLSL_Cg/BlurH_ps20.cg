@@ -3,15 +3,7 @@
 // Horizontal Gaussian-Blur pass
 //-------------------------------
 
-Texture2D Blur0;          // Color texture for mesh
-
-SamplerState g_samLinear
-{
-    Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = Wrap;
-    AddressV = Wrap;
-};
-
+sampler Blur0: register(s0);
 // Simple blur filter
 
 //We use the Normal-gauss distribution formula
@@ -48,12 +40,12 @@ static const float2 pos[11] =
  5, 0,
 };
 
-float4 main(float4 Pos: SV_POSITION, float2 texCoord: TEXCOORD0) : SV_Target
+float4 main(float4 Pos: POSITION, float2 texCoord: TEXCOORD0) : COLOR
 {
    float4 sum = 0;
    for (int i = 0; i < 11; i++)
    {
-      sum += Blur0.Sample(g_samLinear, texCoord + pos[i]*0.01) * samples[i];
+      sum += tex2D(Blur0, texCoord + pos[i]*0.01) * samples[i];
    }
    return sum;
 }
