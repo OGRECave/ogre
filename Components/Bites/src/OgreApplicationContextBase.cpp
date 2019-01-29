@@ -354,6 +354,7 @@ Ogre::String ApplicationContextBase::getDefaultMediaDir()
 
 void ApplicationContextBase::locateResources()
 {
+    auto& rgm = Ogre::ResourceGroupManager::getSingleton();
     // load resource paths from config file
     Ogre::ConfigFile cf;
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -367,9 +368,7 @@ void ApplicationContextBase::locateResources()
     }
     else
     {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-            getDefaultMediaDir(), "FileSystem",
-            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        rgm.addResourceLocation(getDefaultMediaDir(), "FileSystem", Ogre::RGN_DEFAULT);
     }
 
 #endif
@@ -388,12 +387,23 @@ void ApplicationContextBase::locateResources()
             type = i->first;
             arch = Ogre::FileSystemLayer::resolveBundlePath(i->second);
 
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
+            rgm.addResourceLocation(arch, type, sec);
         }
     }
 
+    if(rgm.getResourceLocationList(Ogre::RGN_INTERNAL).empty())
+    {
+        const auto& mediaDir = getDefaultMediaDir();
+        // add default locations
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        rgm.addResourceLocation(mediaDir + "/materials", "FileSystem", Ogre::RGN_INTERNAL);
+        rgm.addResourceLocation(mediaDir + "/RTShaderLib/GLSL", "FileSystem", Ogre::RGN_INTERNAL);
+        rgm.addResourceLocation(mediaDir + "/RTShaderLib/HLSL_Cg", "FileSystem", Ogre::RGN_INTERNAL);
+#endif
+    }
+
     sec = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-    const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(sec);
+    const Ogre::ResourceGroupManager::LocationList genLocs = rgm.getResourceLocationList(sec);
 
     OgreAssert(!genLocs.empty(), ("Resource Group '"+sec+"' must contain at least one entry").c_str());
 
@@ -425,35 +435,35 @@ void ApplicationContextBase::locateResources()
     // Add locations for supported shader languages
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
     {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSLES", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/GLSLES", type, sec);
     }
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
     {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL120", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/GLSL120", type, sec);
 
         if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
         {
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL150", type, sec);
+            rgm.addResourceLocation(arch + "/materials/programs/GLSL150", type, sec);
         }
         else
         {
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
+            rgm.addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
         }
 
         if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl400"))
         {
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL400", type, sec);
+            rgm.addResourceLocation(arch + "/materials/programs/GLSL400", type, sec);
         }
     }
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
     {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/HLSL", type, sec);
     }
 
     if(hasCgPlugin)
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/Cg", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/Cg", type, sec);
     if (use_HLSL_Cg_shared)
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL_Cg", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/HLSL_Cg", type, sec);
 }
 
 void ApplicationContextBase::loadResources()
