@@ -79,7 +79,10 @@ if(${Java_FOUND})
 	add_custom_command(TARGET ${SWIG_MODULE_OgreJNI_REAL_NAME} POST_BUILD
     	COMMAND "${Java_JAVAC_EXECUTABLE}" -d ${CLASS_OUTPUT_PATH} "${PROJECT_BINARY_DIR}/java/src/org/ogre/*.java"
 		COMMAND "${Java_JAR_EXECUTABLE}" cf ${JAR_NAME} -C ${CLASS_OUTPUT_PATH} .
-	)
+    )
+
+    install(FILES ${JAR_NAME} DESTINATION share/java/)
+    ogre_install_target(${SWIG_MODULE_OgreJNI_REAL_NAME} "" FALSE)
 endif()
 
 if(ANDROID)
