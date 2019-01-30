@@ -271,7 +271,7 @@ namespace Ogre {
             mWorldMatrixArray = mWorldMatrix;
             mCurrentRenderable->getWorldTransforms(reinterpret_cast<Matrix4*>(mWorldMatrix));
             mWorldMatrixCount = mCurrentRenderable->getNumWorldTransforms();
-            if (mCameraRelativeRendering)
+            if (mCameraRelativeRendering && !mCurrentRenderable->getUseIdentityView())
             {
                 for (size_t i = 0; i < mWorldMatrixCount; ++i)
                 {
