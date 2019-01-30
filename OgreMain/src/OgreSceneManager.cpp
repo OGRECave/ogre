@@ -815,8 +815,11 @@ void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
     if(!(*i)->getName().empty())
         mNamedNodes.erase((*i)->getName());
     OGRE_DELETE *i;
-    std::swap(*i, mSceneNodes.back());
-    (*i)->mGlobalIndex = i - mSceneNodes.begin();
+    if (std::next(i) != mSceneNodes.end())
+    {
+       std::swap(*i, mSceneNodes.back());
+       (*i)->mGlobalIndex = i - mSceneNodes.begin();
+    }
     mSceneNodes.pop_back();
 }
 //---------------------------------------------------------------------
