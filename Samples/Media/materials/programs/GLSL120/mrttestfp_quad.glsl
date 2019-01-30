@@ -9,7 +9,7 @@ void main(void)
 {
     
     //gl_FragColor = texture2D(rt0, uv);
-    gl_FragColor = texture2D(rt1, uv);
+    gl_FragColor = texture2D(rt1, oUv0);
     //gl_FragColor = texture2D(rt2, uv);
     //gl_FragColor = texture2D(rt3, uv);
 	
