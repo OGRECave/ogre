@@ -57,10 +57,6 @@ namespace OgreBites
     public:
         explicit ApplicationContextSDL(const Ogre::String& appName = "Ogre3D");
 
-        using ApplicationContextBase::setWindowGrab;
-        using ApplicationContextBase::addInputListener;
-        using ApplicationContextBase::removeInputListener;
-
         void setWindowGrab(NativeWindowType* win, bool grab);
         void shutdown();
         void pollEvents();
@@ -69,6 +65,10 @@ namespace OgreBites
         virtual NativeWindowPair
         createWindow(const Ogre::String& name, uint32_t w = 0, uint32_t h = 0,
                      Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
+
+        using ApplicationContextBase::setWindowGrab;
+        using ApplicationContextBase::addInputListener;
+        using ApplicationContextBase::removeInputListener;
     };
 
     typedef ApplicationContextSDL ApplicationContext;
