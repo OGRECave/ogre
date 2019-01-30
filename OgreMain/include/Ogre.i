@@ -238,9 +238,24 @@ ADD_REPR(Radian)
 %ignore Ogre::Vector<4, Ogre::Real>::Vector(float, float, float);
 %include "OgreVector.h"
 ADD_REPR(Vector)
-%template(Vector2) Ogre::Vector<2, Ogre::Real>;
-%template(Vector3) Ogre::Vector<3, Ogre::Real>; 
-%template(Vector4) Ogre::Vector<4, Ogre::Real>;  
+
+%define TPL_VECTOR(N)
+%ignore Ogre::VectorBase<N, Ogre::Real>::VectorBase;
+%ignore Ogre::VectorBase<N, Ogre::Real>::ZERO;
+%ignore Ogre::VectorBase<N, Ogre::Real>::UNIT_SCALE;
+%ignore Ogre::VectorBase<N, Ogre::Real>::UNIT_X;
+%ignore Ogre::VectorBase<N, Ogre::Real>::UNIT_Y;
+%ignore Ogre::VectorBase<N, Ogre::Real>::UNIT_Z;
+%ignore Ogre::VectorBase<N, Ogre::Real>::NEGATIVE_UNIT_X;
+%ignore Ogre::VectorBase<N, Ogre::Real>::NEGATIVE_UNIT_Y;
+%ignore Ogre::VectorBase<N, Ogre::Real>::NEGATIVE_UNIT_Z;
+%template(VectorBase ## N) Ogre::VectorBase<N, Ogre::Real>;
+%template(Vector ## N) Ogre::Vector<N, Ogre::Real>;
+%enddef
+
+TPL_VECTOR(2)
+TPL_VECTOR(3)
+TPL_VECTOR(4)
 %include "OgreMatrix3.h"
 ADD_REPR(Matrix3)
 %ignore Ogre::TransformBase::extract3x3Matrix; // deprecated
