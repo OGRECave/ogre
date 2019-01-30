@@ -337,7 +337,7 @@ material SupportHLSLandGLSLwithoutUnified
         {
             vertex_program_ref myVertexProgramHLSL
             {
-                param_named_auto worldViewProj world_view_proj_matrix
+                param_named_auto worldViewProj worldviewproj_matrix
                 param_named_auto lightColour light_diffuse_colour 0
                 param_named_auto lightSpecular light_specular_colour 0
                 param_named_auto lightAtten light_attenuation 0
@@ -354,7 +354,7 @@ material SupportHLSLandGLSLwithoutUnified
         {
             vertex_program_ref myVertexProgramHLSL
             {
-                param_named_auto worldViewProj world_view_proj_matrix
+                param_named_auto worldViewProj worldviewproj_matrix
                 param_named_auto lightColour light_diffuse_colour 0
                 param_named_auto lightSpecular light_specular_colour 0
                 param_named_auto lightAtten light_attenuation 0
@@ -414,7 +414,7 @@ material SupportHLSLandGLSLwithUnified
         {
             vertex_program_ref myVertexProgram
             {
-                param_named_auto worldViewProj world_view_proj_matrix
+                param_named_auto worldViewProj worldviewproj_matrix
                 param_named_auto lightColour light_diffuse_colour 0
                 param_named_auto lightSpecular light_specular_colour 0
                 param_named_auto lightAtten light_attenuation 0
