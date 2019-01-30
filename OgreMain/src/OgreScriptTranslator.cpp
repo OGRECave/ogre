@@ -1200,14 +1200,10 @@ namespace Ogre{
                         mMaterial->setTransparencyCastsShadows(bval);
                     break;
                 case ID_SET_TEXTURE_ALIAS:
-                    if(prop->values.empty())
+                    if(prop->values.size() != 2)
                     {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 3)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "set_texture_alias only supports 2 arguments");
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                            "set_texture_alias must have 2 string arguments");
                     }
                     else
                     {
@@ -1215,9 +1211,6 @@ namespace Ogre{
                         String name, value;
                         if(getString(*i0, &name) && getString(*i1, &value))
                             mTextureAliases.insert(std::make_pair(name, value));
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "set_texture_alias must have 2 string argument");
                     }
                     break;
                 default:
