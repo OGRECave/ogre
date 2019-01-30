@@ -1127,7 +1127,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
             if (mShadowDebugPass->hasFragmentProgram())
             {
                 mShadowDebugPass->getFragmentProgramParameters()->setNamedConstant(
-                    "colour", zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
+                    "shadowColor", zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
             }
             mSceneManager->_setPass(mShadowDebugPass);
             renderShadowVolumeObjects(iShadowRenderables, mShadowDebugPass, &lightList, flags,
@@ -1569,10 +1569,7 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
         mShadowModulativePass->setFragmentProgram("Ogre/ShadowBlendFP");
 
         mShadowModulativePass->getFragmentProgramParameters()->setNamedConstant("shadowColor", mShadowColour);
-        mShadowModulativePass->getVertexProgramParameters()->setNamedAutoConstant("worldViewProj", Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-        mShadowModulativePass->getVertexProgramParameters()->setAutoConstant(0, Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-
-
+        matModStencil->load();
     }
     else
     {

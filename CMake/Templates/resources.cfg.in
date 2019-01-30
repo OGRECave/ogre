@@ -1,5 +1,6 @@
 # Ogre Core Resources
 [OgreInternal]
+FileSystem=@OGRE_CORE_MEDIA_DIR@/ShadowVolume
 FileSystem=@OGRE_CORE_MEDIA_DIR@/RTShaderLib/materials
 FileSystem=@OGRE_CORE_MEDIA_DIR@/RTShaderLib/GLSL
 FileSystem=@OGRE_CORE_MEDIA_DIR@/RTShaderLib/HLSL_Cg

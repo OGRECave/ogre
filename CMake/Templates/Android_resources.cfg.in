@@ -1,5 +1,6 @@
 # Ogre Core Resources
 [OgreInternal]
+APKFileSystem=/ShadowVolume
 APKFileSystem=/RTShaderLib/materials
 APKFileSystem=/RTShaderLib/GLSL
 APKFileSystem=/Terrain
