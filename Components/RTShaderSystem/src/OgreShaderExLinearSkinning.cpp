@@ -78,19 +78,6 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
     //output param
     mParamOutPositionProj = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
 
-    //check if parameter retrival went well
-    bool isValid =
-        (mParamInPosition.get() != NULL) &&
-        (mParamInNormal.get() != NULL) &&
-        //(mParamInBiNormal.get() != NULL) &&
-        //(mParamInTangent.get() != NULL) &&
-        (mParamLocalPositionWorld.get() != NULL) &&
-        (mParamLocalNormalWorld.get() != NULL) &&
-        //(mParamLocalTangentWorld.get() != NULL) &&
-        //(mParamLocalBinormalWorld.get() != NULL) &&
-        (mParamOutPositionProj.get() != NULL);
-
-
     if (mDoBoneCalculations == true)
     {
         if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
@@ -112,28 +99,13 @@ bool LinearSkinning::resolveParameters(ProgramSet* programSet)
 
         mParamTempFloat4 = vsMain->resolveLocalParameter("TempVal4", GCT_FLOAT4);
         mParamTempFloat3 = vsMain->resolveLocalParameter("TempVal3", GCT_FLOAT3);
-
-        //check if parameter retrival went well
-        isValid &=
-            (mParamInIndices.get() != NULL) &&
-            (mParamInWeights.get() != NULL) &&
-            (mParamInWorldMatrices.get() != NULL) &&
-            (mParamInViewProjMatrix.get() != NULL) &&
-            (mParamInInvWorldMatrix.get() != NULL) &&
-            (mParamTempFloat4.get() != NULL) &&
-            (mParamTempFloat3.get() != NULL);
     }
     else
     {
         mParamInWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
         mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-
-        //check if parameter retrival went well
-        isValid &=
-            (mParamInWorldMatrix.get() != NULL) &&
-            (mParamInWorldViewProjMatrix.get() != NULL);
     }
-    return isValid;
+    return true;
 }
 
 //-----------------------------------------------------------------------

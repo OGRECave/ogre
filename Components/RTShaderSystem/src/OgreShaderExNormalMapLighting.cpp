@@ -196,7 +196,6 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 //-----------------------------------------------------------------------
 bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 {
-    bool hasError = false;
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
@@ -209,28 +208,23 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
     {       
         mDerivedAmbientLightColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR);
-        hasError |= !(mDerivedAmbientLightColour.get());
     }
     else
     {
         mLightAmbientColour = psProgram->resolveParameter(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
         mSurfaceAmbientColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR);
-    
-        hasError |= !(mDerivedAmbientLightColour.get()) || !(mLightAmbientColour.get());
     }
 
     // Get surface diffuse colour if need to.
     if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
     {
         mSurfaceDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
-        hasError |= !(mSurfaceDiffuseColour.get());
     }
 
     // Get surface specular colour if need to.
     if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
     {
         mSurfaceSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
-        hasError |= !(mSurfaceSpecularColour.get());
     }
 
 
@@ -238,7 +232,6 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     if ((mTrackVertexColourType & TVC_EMISSIVE) == 0)
     {
         mSurfaceEmissiveColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR);
-        hasError |= !(mSurfaceEmissiveColour.get());
     }
 
     // Get derived scene colour.
@@ -257,8 +250,6 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         
         // Resolve local vertex shader TNB matrix.
         mVSTBNMatrix = vsMain->resolveLocalParameter("lMatTBN", GCT_MATRIX_3X3);
-        
-        hasError |= !(mVSTBNMatrix.get()) || !(mVSInTangent.get());
     }
     
     // Resolve input vertex shader texture coordinates.
@@ -276,12 +267,10 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     if (mNormalMapSpace == NMS_OBJECT)
     {
         mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT4);
-        hasError |= !(mPSNormal.get());
     }
     else if (mNormalMapSpace == NMS_TANGENT)
     {
         mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT4);
-        hasError |= !(mPSNormal.get());
     }
 
     mInDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
@@ -289,6 +278,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     {
         mInDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
+    OgreAssert(mInDiffuse, "mInDiffuse is NULL");
 
     mOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
@@ -300,20 +290,19 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
             mPSSpecular = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         }
 
+        OgreAssert(mPSSpecular, "mPSSpecular is NULL");
+
         mOutSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
         if (mNormalMapSpace == NMS_TANGENT)
         {
             mVSOutView = vsMain->resolveOutputParameter(Parameter::SPC_POSTOCAMERA_TANGENT_SPACE);
-            hasError |= !(mVSOutView.get());
         }
         else if (mNormalMapSpace == NMS_OBJECT)
         {
             mVSOutView = vsMain->resolveOutputParameter(Parameter::SPC_POSTOCAMERA_OBJECT_SPACE);
-            hasError |= !(mVSOutView.get());
         }
-        
 
         mPSInView = psMain->resolveInputParameter(mVSOutView);
 
@@ -326,21 +315,8 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 
         // Resolve inverse world rotation matrix.
         mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
-
-        hasError |= !(mPSSpecular.get()) || !(mOutSpecular.get()) || !(mVSInPosition.get()) || !(mPSInView.get()) || !(mCamPosWorldSpace.get()) ||
-            !(mVSLocalDir.get()) || !(mVSWorldPosition.get()) || !(mWorldMatrix.get()) || !(mWorldInvRotMatrix.get());
     }
 
-    hasError |= !(mPSNormalMapSampler.get()) || !(mDerivedSceneColour.get()) || !(mSurfaceShininess.get()) || !(mVSInNormal.get()) || 
-        !(mVSInTexcoord.get()) || !(mVSOutTexcoord.get()) || !(mPSInTexcoord.get()) || !(mInDiffuse.get()) || !(mOutDiffuse.get()) ||
-        !(mOutDiffuse.get());
-
-    if (hasError)
-    {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "NormalMapLighting::resolveGlobalParameters" );
-    }
     return true;
 }
 
@@ -356,7 +332,6 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
     if(mLightParamsList.size() > 8)
         mLightParamsList.resize(8);
 
-    bool hasError = false;
     // Resolve per light parameters.
     for (unsigned int i=0; i < mLightParamsList.size(); ++i)
     {       
@@ -377,8 +352,6 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             }
 
             mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
-
-            hasError = !(mLightParamsList[i].mDirection.get()) || !(mLightParamsList[i].mVSOutDirection.get()) || !(mLightParamsList[i].mPSInDirection.get());
             break;
 
         case Light::LT_POINT:       
@@ -423,12 +396,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             if (mWorldInvRotMatrix.get() == NULL)
             {               
                 mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
-            }       
-
-            hasError |= !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || !(mLightParamsList[i].mVSOutToLightDir.get()) ||
-                 !(mLightParamsList[i].mPSInToLightDir.get()) || !(mLightParamsList[i].mAttenuatParams.get()) || !(mVSLocalDir.get()) ||
-                 !(mVSWorldPosition.get()) || !(mWorldMatrix.get()) || !(mWorldInvRotMatrix.get());
-            
+            }
             break;
 
         case Light::LT_SPOTLIGHT:       
@@ -490,12 +458,6 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             {               
                 mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
             }
-                  
-            hasError |= !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || !(mLightParamsList[i].mVSOutToLightDir.get()) || 
-                !(mLightParamsList[i].mPSInToLightDir.get()) || !(mLightParamsList[i].mDirection.get()) || !(mLightParamsList[i].mVSOutDirection.get()) || 
-                !(mLightParamsList[i].mPSInDirection.get()) || !(mLightParamsList[i].mAttenuatParams.get()) || !(mLightParamsList[i].mSpotParams.get()) ||
-                !(mVSLocalDir.get()) || !(mVSWorldPosition.get()) || !(mWorldMatrix.get()) || !(mWorldInvRotMatrix.get());
-                        
             break;
         }
 
@@ -508,8 +470,6 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
         {
             mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_diffuse");
         }       
-
-        hasError |= !(mLightParamsList[i].mDiffuseColour.get());
             
         if (mSpecularEnable)
         {
@@ -522,18 +482,10 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             {
                 mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_specular");
             }   
-            hasError |= !(mLightParamsList[i].mSpecularColour.get());
         }   
 
     }
 
-    
-    if (hasError)
-    {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "NormalMapLighting::resolvePerLightParameters" );
-    }
     return true;
 }
 

@@ -173,7 +173,6 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 {
 	Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
 	Function* vsMain = vsProgram->getEntryPointFunction();
-	bool hasError = false;
 
 	// Resolve world view IT matrix.
 	mWorldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX);
@@ -183,28 +182,23 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
 	{		
 		mDerivedAmbientLightColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR);
-		hasError |= !(mDerivedAmbientLightColour.get());
 	}
 	else
 	{
 		mLightAmbientColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
 		mSurfaceAmbientColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR);
-		
-		hasError |= !(mLightAmbientColour.get()) || !(mSurfaceAmbientColour.get());
 	}
 
 	// Get surface diffuse colour if need to.
 	if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 	{
 		mSurfaceDiffuseColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
-		hasError |= !(mSurfaceDiffuseColour.get());
 	}
 
 	// Get surface specular colour if need to.
 	if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 	{
 		mSurfaceSpecularColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
-		hasError |= !(mSurfaceSpecularColour.get());
 	}
 		 
 	
@@ -212,7 +206,6 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	if ((mTrackVertexColourType & TVC_EMISSIVE) == 0)
 	{
 		mSurfaceEmissiveColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR);
-		hasError |= !(mSurfaceEmissiveColour.get());
 	}
 
 	// Get derived scene colour.
@@ -227,7 +220,6 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	if (mTrackVertexColourType != 0)
 	{
 		mInDiffuse = vsMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
-		hasError |= !(mInDiffuse.get());
 	}
 	
 
@@ -242,7 +234,6 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 		{
 		case Light::LT_DIRECTIONAL:
 			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
-			hasError |= !(mLightParamsList[i].mDirection.get());
 			break;
 		
 		case Light::LT_POINT:
@@ -250,8 +241,6 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			
 			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
 			mLightParamsList[i].mAttenuatParams = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
-			
-			hasError |= !(mLightParamsList[i].mPosition.get()) || !(mLightParamsList[i].mAttenuatParams.get());
 			break;
 		
 		case Light::LT_SPOTLIGHT:
@@ -264,9 +253,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			mLightParamsList[i].mAttenuatParams = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
 			
 			mLightParamsList[i].mSpotParams = vsProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "spotlight_params");
-			
-			hasError |=  !(mLightParamsList[i].mPosition.get()) ||
-				!(mLightParamsList[i].mDirection.get()) || !(mLightParamsList[i].mAttenuatParams.get()) || !(mLightParamsList[i].mSpotParams.get());
+
 			break;
 		}
 
@@ -274,12 +261,10 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 		if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 		{
 			mLightParamsList[i].mDiffuseColour = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL | (uint16)GPV_LIGHTS, "derived_light_diffuse");
-			hasError |= !(mLightParamsList[i].mDiffuseColour.get());
 		}
 		else
 		{
 			mLightParamsList[i].mDiffuseColour = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_diffuse");
-			hasError |= !(mLightParamsList[i].mDiffuseColour.get());
 		}		
 
 		if (mSpecularEnable)
@@ -288,30 +273,25 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 			{
 				mLightParamsList[i].mSpecularColour = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL | (uint16)GPV_LIGHTS, "derived_light_specular");
-				hasError |= !(mLightParamsList[i].mSpecularColour.get());
 			}
 			else
 			{
 				mLightParamsList[i].mSpecularColour = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_specular");
-				hasError |= !(mLightParamsList[i].mSpecularColour.get());
 			}
 
 			if (mOutSpecular.get() == NULL)
 			{
 				mOutSpecular = vsMain->resolveOutputParameter(Parameter::SPC_COLOR_SPECULAR);
-				hasError |= !(mOutSpecular.get());
 			}
 			
 			if (mVSInPosition.get() == NULL)
 			{
 				mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-				hasError |= !(mVSInPosition.get());
 			}
 
 			if (mWorldViewMatrix.get() == NULL)
 			{
 				mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
-				hasError |= !(mWorldViewMatrix.get());
 			}
 		}		
 	}
@@ -321,18 +301,6 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
         mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
         mViewPos = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_VIEW_SPACE);
-        hasError |= !(mWorldViewMatrix.get()) || !(mVSInPosition.get()) || !(mViewPos.get());
-	}
-
-	hasError |= !(mWorldViewITMatrix.get()) || !(mDerivedSceneColour.get()) || !(mSurfaceShininess.get()) || 
-		!(mVSInNormal.get()) || !(mOutDiffuse.get());
-	
-	
-	if (hasError)
-	{
-		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-				"Not all parameters could be constructed for the sub-render state.",
-				"PerPixelLighting::resolveGlobalParameters" );
 	}
 
 	return true;

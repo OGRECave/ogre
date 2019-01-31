@@ -142,18 +142,6 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
     // Resolve ps input monitor index.
     mPSInMonitorIndex = psMain->resolveInputParameter(mVSOutMonitorIndex);
 
-    if (!mVSInPosition.get() || !mWorldViewMatrix.get() || !mVSOriginalOutPositionProjectiveSpace.get() ||
-        !mVSOutPositionProjectiveSpace.get() || !mPSInPositionProjectiveSpace.get() || !mVSInMonitorsCount.get() ||
-        !mPSInMonitorsCount.get() || !mVSInMonitorIndex.get() || !mProjectionMatrix.get() || !mVSInViewportOffsetMatrixR0.get() ||
-        !mVSInViewportOffsetMatrixR1.get() || !mVSInViewportOffsetMatrixR2.get() || !mVSInViewportOffsetMatrixR3.get() ||
-        !mVSOutMonitorIndex.get() || !mPSInMonitorIndex.get())
-    {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                    "Not all parameters could be constructed for the sub-render state.",
-                    "ShaderExInstancedViewports::resolveParameters" );
-    }
-            
-    
     return true;
 }
 
