@@ -258,8 +258,6 @@ namespace Ogre {
         mParticleManager.reset(); // may use plugins
         unloadPlugins();
 
-        Pass::processPendingPassUpdates(); // make sure passes are cleaned
-
         mAutoWindow = 0;
 
         StringInterface::cleanupDictionary();
