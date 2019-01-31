@@ -170,6 +170,7 @@ namespace Ogre {
         const Matrix4& getInverseTransposeWorldViewMatrix(void) const;
         const Vector4& getCameraPosition(void) const;
         const Vector4& getCameraPositionObjectSpace(void) const;
+        const Vector4  getCameraRelativePosition(void) const;
         const Vector4& getLodCameraPosition(void) const;
         const Vector4& getLodCameraPositionObjectSpace(void) const;
         bool hasLightList() const { return mCurrentLightList != 0; }
