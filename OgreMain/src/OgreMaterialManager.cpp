@@ -65,6 +65,9 @@ namespace Ogre {
     MaterialManager::~MaterialManager()
     {
         mDefaultSettings.reset();
+
+        Pass::processPendingPassUpdates(); // make sure pass graveyard is cleaned
+
         // Resources cleared by superclass
         // Unregister with resource group manager
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
