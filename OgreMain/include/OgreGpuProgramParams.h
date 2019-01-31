@@ -975,6 +975,8 @@ namespace Ogre {
             ACT_CAMERA_POSITION,
             /// The current camera's position in object space
             ACT_CAMERA_POSITION_OBJECT_SPACE,
+            /// The current camera's position in world space even when camera relative rendering is enabled.
+            ACT_CAMERA_POSITION_WORLD_SPACE,
             /** The view/projection matrix of the assigned texture projection frustum
 
              Applicable to vertex programs which have been specified as the ’shadow receiver’ vertex
