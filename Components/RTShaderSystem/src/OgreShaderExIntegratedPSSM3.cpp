@@ -206,7 +206,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
                 it->mTextureSamplerIndex);
         }
 
-        if (!(it->mInvTextureSize.get()) || !(it->mTextureSampler.get()) || !(it->mPSInLightPosition.get()) ||
+        if (!(it->mInvTextureSize.get() || mUseTextureCompare) || !(it->mTextureSampler.get()) || !(it->mPSInLightPosition.get()) ||
             !(it->mVSOutLightPosition.get()) || !(it->mWorldViewProjMatrix.get()))
         {
             OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
