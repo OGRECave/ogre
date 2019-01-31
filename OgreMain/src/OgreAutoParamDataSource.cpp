@@ -463,6 +463,11 @@ namespace Ogre {
         return mCameraPositionObjectSpace;
     }
     //-----------------------------------------------------------------------------
+    const Vector4 AutoParamDataSource::getCameraRelativePosition (void) const
+    {
+        return Ogre::Vector4 (mCameraRelativePosition.x, mCameraRelativePosition.y, mCameraRelativePosition.z, 1);
+    }
+    //-----------------------------------------------------------------------------
     const Vector4& AutoParamDataSource::getLodCameraPosition(void) const
     {
         if(mLodCameraPositionDirty)
