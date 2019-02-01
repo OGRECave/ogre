@@ -66,9 +66,9 @@ namespace Ogre
 
 
         mProfiles.push_back(OGRE_NEW SM2Profile(this, "SM2", "Profile for rendering on Shader Model 2 capable cards"));
-        // TODO - check hardware capabilities & use fallbacks if required (more profiles needed)
-        setActiveProfile("SM2");
 
+        // TODO - check hardware capabilities & use fallbacks if required (more profiles needed)
+        setActiveProfile(mProfiles.back());
     }
     //---------------------------------------------------------------------
     TerrainMaterialGeneratorA::~TerrainMaterialGeneratorA()
@@ -90,29 +90,16 @@ namespace Ogre
         , mPSSM(0)
         , mDepthShadows(false)
         , mLowLodShadows(false)
-        , mSM3Available(false)
-        , mSM4Available(false)
     {
         HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
-        if (hmgr.isLanguageSupported("hlsl"))
+
+        if (hmgr.isLanguageSupported("glsl") || hmgr.isLanguageSupported("glsles"))
         {
-            mShaderLanguage = "hlsl";
+            mShaderGen = OGRE_NEW ShaderHelperGLSL();
         }
-        else if (hmgr.isLanguageSupported("glsl"))
+        else if (hmgr.isLanguageSupported("cg") || hmgr.isLanguageSupported("hlsl"))
         {
-            mShaderLanguage = "glsl";
-        }
-        else if (hmgr.isLanguageSupported("glsles"))
-        {
-            mShaderLanguage = "glsles";
-        }
-        else if (hmgr.isLanguageSupported("cg"))
-        {
-            mShaderLanguage = "cg";
-        }
-        else
-        {
-            // todo
+            mShaderGen = OGRE_NEW ShaderHelperCg();
         }
     }
     //---------------------------------------------------------------------
@@ -131,11 +118,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool TerrainMaterialGeneratorA::SM2Profile::isVertexCompressionSupported() const
     {
-        // FIXME: Not supporting compression on GLSL at the moment
-        if ((mShaderLanguage == "glsl") || (mShaderLanguage == "glsles"))
-            return false;
-        else
-            return true;
+        return mShaderGen && mShaderGen->isVertexCompressionSupported();
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::setLayerNormalMappingEnabled(bool enabled)
@@ -263,9 +246,6 @@ namespace Ogre
         if (!mat)
         {
             MaterialManager& matMgr = MaterialManager::getSingleton();
-
-            // it's important that the names are deterministic for a given terrain, so
-            // use the terrain pointer as an ID
             const String& matName = terrain->getMaterialName();
             mat = matMgr.getByName(matName);
             if (!mat)
@@ -341,23 +321,6 @@ namespace Ogre
 
         // Only supporting one pass
         Pass* pass = tech->createPass();
-
-        HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
-        if (!mShaderGen)
-        {
-            if (hmgr.isLanguageSupported("glsl") || hmgr.isLanguageSupported("glsles"))
-            {
-                mShaderGen = OGRE_NEW ShaderHelperGLSL();
-            }
-            else if (hmgr.isLanguageSupported("cg") || hmgr.isLanguageSupported("hlsl"))
-            {
-                mShaderGen = OGRE_NEW ShaderHelperCg();
-            }
-            
-            // check SM3 features
-            mSM3Available = GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0");
-            mSM4Available = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
-        }
 
         HighLevelGpuProgramPtr vprog = mShaderGen->generateVertexProgram(this, terrain, tt);
         HighLevelGpuProgramPtr fprog = mShaderGen->generateFragmentProgram(this, terrain, tt);
@@ -615,7 +578,7 @@ namespace Ogre
         }
 
         // Explicitly bind samplers for GLSL
-        if ((prof->_getShaderLanguage() == "glsl") || (prof->_getShaderLanguage() == "glsles"))
+        if (mIsGLSL)
         {
             int numSamplers = 0;
             if (tt == LOW_LOD)

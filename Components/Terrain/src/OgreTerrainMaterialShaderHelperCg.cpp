@@ -30,10 +30,15 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreShadowCameraSetupPSSM.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre
 {
     //---------------------------------------------------------------------
+    ShaderHelperCg::ShaderHelperCg() : ShaderHelper(false)
+    {
+        mSM4Available = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
+    }
     //---------------------------------------------------------------------
     HighLevelGpuProgramPtr
     ShaderHelperCg::createVertexProgram(
@@ -118,7 +123,7 @@ namespace Ogre
         bool compression = terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP;
         if (compression)
         {
-            const char* idx2 = prof->_isSM4Available() ? "int2" : "float2";
+            const char* idx2 = mSM4Available ? "int2" : "float2";
             outStream << 
                 idx2 << " posIndex : POSITION,\n"
                 "float height  : TEXCOORD0,\n";

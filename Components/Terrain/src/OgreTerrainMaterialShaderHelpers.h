@@ -40,8 +40,9 @@ namespace Ogre
     class ShaderHelper : public TerrainAlloc
     {
     public:
-        ShaderHelper() : mShadowSamplerStartHi(0), mShadowSamplerStartLo(0) {}
+        ShaderHelper(bool glsl) : mShadowSamplerStartHi(0), mShadowSamplerStartLo(0), mIsGLSL(glsl) {}
         virtual ~ShaderHelper() {}
+        bool isVertexCompressionSupported() { return !mIsGLSL; }
         virtual HighLevelGpuProgramPtr generateVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         virtual HighLevelGpuProgramPtr generateFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         virtual void updateParams(const SM2Profile* prof, const MaterialPtr& mat, const Terrain* terrain, bool compositeMap);
@@ -66,12 +67,15 @@ namespace Ogre
 
         size_t mShadowSamplerStartHi;
         size_t mShadowSamplerStartLo;
+        bool mIsGLSL;
     };
 
     /// Utility class to help with generating shaders for Cg / HLSL.
-    class ShaderHelperCg : public ShaderHelper
+    struct ShaderHelperCg : public ShaderHelper
     {
+        ShaderHelperCg();
     protected:
+        bool mSM4Available;
         HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         void generateVpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
@@ -88,9 +92,11 @@ namespace Ogre
     };
 
     /// Utility class to help with generating shaders for GLSL.
-    class ShaderHelperGLSL : public ShaderHelper
+    struct ShaderHelperGLSL : public ShaderHelper
     {
+        ShaderHelperGLSL();
     protected:
+        bool mIsGLES;
         HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         void generateVpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);

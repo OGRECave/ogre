@@ -35,6 +35,10 @@ THE SOFTWARE.
 namespace Ogre
 {
     //---------------------------------------------------------------------
+    ShaderHelperGLSL::ShaderHelperGLSL() : ShaderHelper(true)
+    {
+        mIsGLES = HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles");
+    }
     //---------------------------------------------------------------------
     HighLevelGpuProgramPtr
     ShaderHelperGLSL::createVertexProgram(
@@ -86,12 +90,11 @@ namespace Ogre
     void ShaderHelperGLSL::generateVpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
-        bool isGLES = HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles");
-        int version = isGLES ? 100 : 120;
+        int version = mIsGLES ? 100 : 120;
 
         outStream << "#version "<< version << "\n";
 
-        if(isGLES) {
+        if(mIsGLES) {
             outStream << "precision highp int;\n";
             outStream << "precision highp float;\n";
         }
@@ -244,13 +247,12 @@ namespace Ogre
     void ShaderHelperGLSL::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
-        bool isGLES = HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles");
-        int version = isGLES ? 100 : 120;
+        int version = mIsGLES ? 100 : 120;
 
         // Main header
         outStream << "#version " << version << "\n";
 
-        if(isGLES) {
+        if(mIsGLES) {
             outStream << "precision highp int;\n";
             outStream << "precision highp float;\n";
         }
