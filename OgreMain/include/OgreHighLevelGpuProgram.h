@@ -73,13 +73,8 @@ namespace Ogre {
         /// Preprocessor options
         String mPreprocessorDefines;
 
-    public:
-
-        // Allow compiling shaders directly so apps can implement background asset streaming.
+        /// Internal load high-level portion if not loaded
         virtual void loadHighLevel(void);
-
-    protected:
-
         /// Internal unload high-level portion if loaded
         virtual void unloadHighLevel(void);
         /** Internal load implementation, loads just the high-level portion, enough to 
