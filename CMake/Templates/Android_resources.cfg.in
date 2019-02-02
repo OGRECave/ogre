@@ -2,6 +2,7 @@
 [OgreInternal]
 APKFileSystem=/RTShaderLib/materials
 APKFileSystem=/RTShaderLib/GLSL
+APKFileSystem=/Terrain
 
 # Resources required by the sample browser and most samples.
 [Essential]

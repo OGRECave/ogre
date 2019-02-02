@@ -38,6 +38,9 @@ namespace Ogre
     ShaderHelperGLSL::ShaderHelperGLSL() : ShaderHelper(true)
     {
         mIsGLES = HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles");
+        mHelperStr = ResourceGroupManager::getSingleton()
+                         .openResource("TerrainHelpers.glsl", RGN_INTERNAL)
+                         ->getAsString();
     }
     //---------------------------------------------------------------------
     HighLevelGpuProgramPtr
@@ -258,18 +261,7 @@ namespace Ogre
         }
 
         // helpers
-        outStream <<
-            "vec4 expand(vec4 v)\n"
-            "{\n"
-            "    return v * 2.0 - 1.0;\n"
-            "}\n\n"
-            // From http://substance.io/zauner/porting-vvvv-hlsl-shaders-to-vvvvjs
-            "vec4 lit(float NdotL, float NdotH, float m) {\n"
-            "    float ambient = 1.0;\n"
-            "    float diffuse = max(0.0, NdotL);\n"
-            "    float specular = step(0.0, NdotL) * max(NdotH, 0.0);\n"
-            "    return vec4(ambient, diffuse, specular, 1.0);\n"
-            "}\n\n";
+        outStream << mHelperStr;
 
         if (prof->isShadowingEnabled(tt, terrain))
             generateFpDynamicShadowsHelpers(prof, terrain, tt, outStream);
@@ -620,54 +612,6 @@ namespace Ogre
     void ShaderHelperGLSL::generateFpDynamicShadowsHelpers(const SM2Profile* prof, const Terrain* terrain,
                                                                                                   TechniqueType tt, StringStream& outStream)
     {
-        // TODO make filtering configurable
-        outStream <<
-            "// Simple PCF \n"
-            "// Number of samples in one dimension (square for total samples) \n"
-            "#define NUM_SHADOW_SAMPLES_1D 2.0 \n"
-            "#define SHADOW_FILTER_SCALE 1.0 \n"
-
-            "#define SHADOW_SAMPLES NUM_SHADOW_SAMPLES_1D*NUM_SHADOW_SAMPLES_1D \n"
-
-            "vec4 offsetSample(vec4 uv, vec2 offset, float invMapSize) \n"
-            "{ \n"
-            "    return vec4(uv.xy + offset * invMapSize * uv.w, uv.z, uv.w); \n"
-            "} \n";
-
-        if (prof->getReceiveDynamicShadowsDepth())
-        {
-            outStream <<
-                "float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize) \n"
-                "{ \n"
-                "    // 4-sample PCF \n"
-
-                "    float shadow = 0.0; \n"
-                "    float offset = (NUM_SHADOW_SAMPLES_1D/2.0 - 0.5) * SHADOW_FILTER_SCALE; \n"
-                "    for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE) \n"
-                "        for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE) \n"
-                "        { \n"
-                "            vec4 newUV = offsetSample(uv, vec2(x, y), invShadowMapSize);\n"
-                "            // manually project and assign derivatives \n"
-                "            // to avoid gradient issues inside loops \n"
-                "            float depth = texture2DProj(shadowMap, newUV.xyw).x; \n"
-                // was: "    float depth = texture2DProjGradARB(shadowMap, newUV.xyw, vec2(1.0), vec2(1.0)).x; \n"
-                "            if (depth >= 1.0 || depth >= uv.z)\n"
-                "                shadow += 1.0;\n"
-                "        } \n"
-
-                "    shadow /= SHADOW_SAMPLES; \n"
-                "    return shadow; \n"
-                "} \n";
-        }
-        else
-        {
-            outStream <<
-                "float calcSimpleShadow(sampler2D shadowMap, vec4 shadowMapPos) \n"
-                "{ \n"
-                "    return texture2DProj(shadowMap, shadowMapPos).x; \n"
-                "} \n";
-        }
-
         if (prof->getReceiveDynamicShadowsPSSM())
         {
             uint numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();

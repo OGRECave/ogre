@@ -68,6 +68,7 @@ namespace Ogre
         size_t mShadowSamplerStartHi;
         size_t mShadowSamplerStartLo;
         bool mIsGLSL;
+        String mHelperStr;
     };
 
     /// Utility class to help with generating shaders for Cg / HLSL.
