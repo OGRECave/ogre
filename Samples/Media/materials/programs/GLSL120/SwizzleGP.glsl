@@ -1,4 +1,13 @@
+#ifdef USE_LAYOUT
+#version 150
+out vec4 colour;
+layout(triangles) in;
+layout(line_strip, max_vertices = 6) out;
+#else
 #version 120
+varying out vec4 colour;
+#endif
+
 #extension GL_EXT_geometry_shader4 : enable
 
 uniform vec4 origColour;
@@ -21,7 +30,7 @@ void main(void)
     int i;
     for (i = 0; i < gl_VerticesIn; i++) {
         gl_Position = gl_PositionIn[i];
-        gl_FrontColor = origColour;
+        colour = origColour;
         EmitVertex();
     }
     EndPrimitive();
@@ -30,7 +39,7 @@ void main(void)
     for (i = 0; i < gl_VerticesIn; i++){
         gl_Position = gl_PositionIn[i];
         gl_Position.xy = gl_Position.yx;
-        gl_FrontColor = cloneColour;
+        colour = cloneColour;
         EmitVertex();
     }
     EndPrimitive();
