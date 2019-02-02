@@ -102,48 +102,6 @@ namespace Ogre {
         /** Gets whether matrix packed in column-major order. */
         bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
 
-        /** Returns the operation type that this geometry program expects to
-            receive as input
-        */
-        RenderOperation::OperationType getInputOperationType(void) const
-        { return mInputOperationType; }
-        /** Returns the operation type that this geometry program will emit
-        */
-        RenderOperation::OperationType getOutputOperationType(void) const
-        { return mOutputOperationType; }
-        /** Returns the maximum number of vertices that this geometry program can
-            output in a single run
-        */
-        int getMaxOutputVertices(void) const { return mMaxOutputVertices; }
-
-        /** Sets the operation type that this geometry program expects to receive
-        */
-        void setInputOperationType(RenderOperation::OperationType operationType)
-        { mInputOperationType = operationType; }
-        /** Set the operation type that this geometry program will emit
-        */
-        void setOutputOperationType(RenderOperation::OperationType operationType)
-        {
-            switch (operationType)
-            {
-            case RenderOperation::OT_POINT_LIST:
-            case RenderOperation::OT_LINE_STRIP:
-            case RenderOperation::OT_TRIANGLE_STRIP:
-                break;
-            default:
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Geometry shader output operation type can only be point list,"
-                            "line strip or triangle strip");
-            }
-
-            mOutputOperationType = operationType;
-        }
-        /** Set the maximum number of vertices that a single run of this geometry program
-            can emit.
-        */
-        void setMaxOutputVertices(int maxOutputVertices)
-        { mMaxOutputVertices = maxOutputVertices; }
-
         /** Return the shader link status.
             Only used for separable programs.
         */
@@ -167,34 +125,10 @@ namespace Ogre {
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
-        /// Command object for setting the input operation type (geometry shader only)
-        class CmdInputOperationType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for setting the output operation type (geometry shader only)
-        class CmdOutputOperationType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for setting the maximum output vertices (geometry shader only)
-        class CmdMaxOutputVertices : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
     protected:
         static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdAttach msCmdAttach;
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
-        static CmdInputOperationType msInputOperationTypeCmd;
-        static CmdOutputOperationType msOutputOperationTypeCmd;
-        static CmdMaxOutputVertices msMaxOutputVerticesCmd;
 
         String getResourceLogName() const;
 
@@ -208,12 +142,6 @@ namespace Ogre {
         /// Populate the passed parameters with name->index map
         void populateParameterNames(GpuProgramParametersSharedPtr params);
 
-        /// The input operation type for this (geometry) program
-        RenderOperation::OperationType mInputOperationType;
-        /// The output operation type for this (geometry) program
-        RenderOperation::OperationType mOutputOperationType;
-        /// The maximum amount of vertices that this (geometry) program can output
-        int mMaxOutputVertices;
         /// Attached Shader names
         String mAttachedShaderNames;
         /// Container of attached programs
