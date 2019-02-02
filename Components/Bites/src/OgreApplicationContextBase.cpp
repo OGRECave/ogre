@@ -435,21 +435,18 @@ void ApplicationContextBase::locateResources()
     // Add locations for supported shader languages
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
     {
+        rgm.addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
         rgm.addResourceLocation(arch + "/materials/programs/GLSLES", type, sec);
     }
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
     {
+        rgm.addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
         rgm.addResourceLocation(arch + "/materials/programs/GLSL120", type, sec);
 
         if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
         {
             rgm.addResourceLocation(arch + "/materials/programs/GLSL150", type, sec);
         }
-        else
-        {
-            rgm.addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
-        }
-
         if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl400"))
         {
             rgm.addResourceLocation(arch + "/materials/programs/GLSL400", type, sec);

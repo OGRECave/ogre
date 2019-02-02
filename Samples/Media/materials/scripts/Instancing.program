@@ -55,7 +55,7 @@ fragment_program Ogre/Instancing_glsles_ps glsles
 
 fragment_program Ogre/Instancing/shadow_caster_glsles_ps glsles
 {
-    source DepthShadowmapCasterFp.glsles
+    source DepthShadowmapCasterFp.glsl
 
 	preprocessor_defines LINEAR_RANGE=1
 }

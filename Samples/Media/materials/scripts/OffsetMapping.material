@@ -47,8 +47,7 @@ fragment_program Examples/OffsetMappingPS/Asm asm
 // Bump map with parallax fragment program 
 fragment_program Examples/OffsetMappingPS/GLSLES glsles
 { 
-    source OffsetMapping_specular.glsles
-    profiles glsles
+    source OffsetMapping_specular.glsl
 	default_params
 	{
         // Parallax Height scale and bias 
@@ -59,15 +58,13 @@ fragment_program Examples/OffsetMappingPS/GLSLES glsles
 // Bump map with Parallax offset vertex program, support for this is required 
 vertex_program Examples/OffsetMappingVP/GLSLES glsles
 { 
-    source OffsetMappingVp.glsles
-    profiles glsles
+    source OffsetMappingVp.glsl
 } 
 
 // Bump map with parallax fragment program 
 fragment_program Examples/OffsetMappingFP/GLSLES glsles
 { 
-    source OffsetMappingFp.glsles
-    profiles glsles
+    source OffsetMappingFp.glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -365,7 +362,7 @@ vertex_program Examples/OffsetMappingIntegratedShadowsVPglsl glsl
 
 vertex_program Examples/OffsetMappingIntegratedShadowsVPglsles glsles
 { 
-   source OffsetMappingShadowsVp.glsles
+   source OffsetMappingShadowsVp.glsl
 } 
 
 // Single-pass offset mapping with shadows
@@ -389,7 +386,7 @@ fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl
 }
 fragment_program Examples/OffsetMappingIntegratedShadowsFPglsles glsles
 {
-	source OffsetMappingShadowsFp.glsles
+	source OffsetMappingShadowsFp.glsl
 	default_params
 	{
 		// assign samplers as required by GLSL ES
