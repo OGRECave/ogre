@@ -123,7 +123,21 @@ namespace Ogre {
         /** Set the operation type that this geometry program will emit
         */
         void setOutputOperationType(RenderOperation::OperationType operationType)
-        { mOutputOperationType = operationType; }
+        {
+            switch (operationType)
+            {
+            case RenderOperation::OT_POINT_LIST:
+            case RenderOperation::OT_LINE_STRIP:
+            case RenderOperation::OT_TRIANGLE_STRIP:
+                break;
+            default:
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "Geometry shader output operation type can only be point list,"
+                            "line strip or triangle strip");
+            }
+
+            mOutputOperationType = operationType;
+        }
         /** Set the maximum number of vertices that a single run of this geometry program
             can emit.
         */
