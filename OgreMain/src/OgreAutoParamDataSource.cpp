@@ -463,21 +463,9 @@ namespace Ogre {
         return mCameraPositionObjectSpace;
     }
     //-----------------------------------------------------------------------------
-    const Vector4& AutoParamDataSource::getCameraPositionWorldSpace(void) const
+    const Vector4 AutoParamDataSource::getCameraRelativePosition (void) const
     {
-        if (mCameraPositionDirty)
-        {
-            Vector3 vec3 = mCurrentCamera->getDerivedPosition();
-            // We don't include the offset for camera relative rendering.
-            // This is intended for use when camera relative rendering is enabled
-            //   and the true world position is needed by a shader.
-            mCameraPosition[0] = vec3[0];
-            mCameraPosition[1] = vec3[1];
-            mCameraPosition[2] = vec3[2];
-            mCameraPosition[3] = 1.0;
-            mCameraPositionDirty = false;
-        }
-        return mCameraPosition;
+        return Ogre::Vector4 (mCameraRelativePosition.x, mCameraRelativePosition.y, mCameraRelativePosition.z, 1);
     }
     //-----------------------------------------------------------------------------
     const Vector4& AutoParamDataSource::getLodCameraPosition(void) const
