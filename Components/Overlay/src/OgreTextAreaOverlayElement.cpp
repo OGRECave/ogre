@@ -165,8 +165,7 @@ namespace Ogre {
             return;
 
         VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;
-        bind->unsetBinding(POS_TEX_BINDING);
-        bind->unsetBinding(COLOUR_BINDING);
+        bind->unsetAllBindings();
     }
     //---------------------------------------------------------------------
 
