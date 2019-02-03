@@ -350,7 +350,6 @@ SHARED_PTR(StringInterface);
     SHARED_PTR(ParticleAffector);
     %include "OgreParticleAffector.h"
         %include "OgreParticleAffectorFactory.h"
-    %include "OgreParticleEmitterCommands.h"
 //    SHARED_PTR(ParticleEmitter);
     %include "OgreParticleEmitter.h"
         %include "OgreParticleEmitterFactory.h"
