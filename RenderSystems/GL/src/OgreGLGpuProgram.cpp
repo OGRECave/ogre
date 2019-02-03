@@ -184,12 +184,8 @@ void GLArbGpuProgram::loadFromSource(void)
     {
         GLint errPos;
         glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errPos);
-        String errPosStr = StringConverter::toString(errPos);
         const char* errStr = (const char*)glGetString(GL_PROGRAM_ERROR_STRING_ARB);
-        // XXX New exception code?
-        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-            "Cannot load GL vertex program " + mName + 
-            ".  Line " + errPosStr + ":\n" + errStr, mName);
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "'" + mName + "' " + errStr);
     }
     glBindProgramARB(getProgramType(), 0);
 }
