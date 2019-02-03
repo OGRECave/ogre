@@ -60,37 +60,31 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
-    bool hasError = false;
+
     // Resolve world view IT matrix.
     mWorldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX);
-    hasError |= !(mWorldViewITMatrix.get());    
-    
+
     // Get surface ambient colour if need to.
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
     {       
         mDerivedAmbientLightColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR);
-        hasError |= !(mDerivedAmbientLightColour.get());        
     }
     else
     {
         mLightAmbientColour = psProgram->resolveParameter(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
         mSurfaceAmbientColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR);
-        
-        hasError |= !(mSurfaceAmbientColour.get()) || !(mLightAmbientColour.get()); 
     }
 
     // Get surface diffuse colour if need to.
     if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
     {
         mSurfaceDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
-        hasError |= !(mSurfaceDiffuseColour.get()); 
     }
 
     // Get surface specular colour if need to.
     if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
     {
         mSurfaceSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
-        hasError |= !(mSurfaceSpecularColour.get());    
     }
 
 
@@ -98,7 +92,6 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     if ((mTrackVertexColourType & TVC_EMISSIVE) == 0)
     {
         mSurfaceEmissiveColour = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR);
-        hasError |= !(mSurfaceEmissiveColour.get());    
     }
 
     // Get derived scene colour.
@@ -122,11 +115,10 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
         mInDiffuse = psMain->getLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
     }
 
+    OgreAssert(mInDiffuse, "mInDiffuse is NULL");
+
     mOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
-    hasError |= !(mDerivedSceneColour.get()) || !(mSurfaceShininess.get()) || !(mVSInNormal.get()) || !(mVSOutNormal.get()) || !(mViewNormal.get()) || !(
-        mInDiffuse.get()) || !(mOutDiffuse.get());
-    
     if (mSpecularEnable)
     {
         mPSSpecular = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
@@ -144,17 +136,8 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
         mViewPos = psMain->resolveInputParameter(mVSOutViewPos);
 
         mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
-
-        hasError |= !(mPSSpecular.get()) || !(mOutSpecular.get()) || !(mVSInPosition.get()) || !(mVSOutViewPos.get()) ||
-            !(mViewPos.get()) || !(mWorldViewMatrix.get());
     }
 
-    if (hasError)
-    {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "PerPixelLighting::resolveGlobalParameters" );
-    }
     return true;
 }
 
@@ -165,7 +148,6 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
-    bool hasError = false;
 
     // Resolve per light parameters.
     for (unsigned int i=0; i < mLightParamsList.size(); ++i)
@@ -187,11 +169,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
                 mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
                 mViewPos = psMain->resolveInputParameter(mVSOutViewPos);
-            }   
-            
-            hasError |= !(mWorldViewMatrix.get()) || !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || 
-                !(mLightParamsList[i].mAttenuatParams.get()) || !(mVSOutViewPos.get()) || !(mViewPos.get());
-        
+            }
             break;
 
         case Light::LT_SPOTLIGHT:
@@ -209,12 +187,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
                 mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
                 mViewPos = psMain->resolveInputParameter(mVSOutViewPos);
-            }   
-
-            hasError |= !(mWorldViewMatrix.get()) || !(mVSInPosition.get()) || !(mLightParamsList[i].mPosition.get()) || 
-                !(mLightParamsList[i].mDirection.get()) || !(mLightParamsList[i].mAttenuatParams.get()) || 
-                !(mLightParamsList[i].mSpotParams.get()) || !(mVSOutViewPos.get()) || !(mViewPos.get());
-            
+            }
             break;
         }
 
@@ -228,8 +201,6 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_diffuse");
         }   
 
-        hasError |= !(mLightParamsList[i].mDiffuseColour.get());
-
         if (mSpecularEnable)
         {
             // Resolve specular colour.
@@ -241,16 +212,9 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             {
                 mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_specular");
             }   
-            hasError |= !(mLightParamsList[i].mSpecularColour.get());
         }       
     }
-        
-    if (hasError)
-    {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "PerPixelLighting::resolvePerLightParameters" );
-    }
+
     return true;
 }
 

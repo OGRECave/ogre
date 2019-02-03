@@ -75,18 +75,6 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 
     //output param
     mParamOutPositionProj = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
-    
-    //check if parameter retrival went well
-    bool isValid =
-        (mParamInPosition.get() != NULL) &&
-        (mParamInNormal.get() != NULL) &&
-        //(mParamInBiNormal.get() != NULL) &&
-        //(mParamInTangent.get() != NULL) &&
-        (mParamLocalNormalWorld.get() != NULL) &&
-        //(mParamLocalTangentWorld.get() != NULL) &&
-        //(mParamLocalBinormalWorld.get() != NULL) &&
-        (mParamOutPositionProj.get() != NULL);
-
 
     if (mDoBoneCalculations == true)
     {
@@ -125,40 +113,13 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         mParamTempFloat2x4 = vsMain->resolveLocalParameter("TempVal2x4", GCT_MATRIX_2X4);
         mParamTempFloat4 = vsMain->resolveLocalParameter("TempVal4", GCT_FLOAT4);
         mParamTempFloat3 = vsMain->resolveLocalParameter("TempVal3", GCT_FLOAT3);
-
-        //check if parameter retrival went well
-        isValid &=
-            (mParamInIndices.get() != NULL) &&
-            (mParamInWeights.get() != NULL) &&
-            (mParamInWorldMatrices.get() != NULL) &&
-            (mParamInViewProjMatrix.get() != NULL) &&
-            (mParamInInvWorldMatrix.get() != NULL) &&
-            (mParamBlendDQ.get() != NULL) &&
-            (mParamInitialDQ.get() != NULL) &&
-            (mParamIndex1.get() != NULL) &&
-            (mParamIndex2.get() != NULL) &&
-                        
-            (!mScalingShearingSupport || (mScalingShearingSupport &&
-            (mParamInScaleShearMatrices.get() != NULL &&
-            mParamBlendS.get() != NULL &&
-            mParamTempFloat3x3.get() != NULL &&
-            mParamTempFloat3x4.get() != NULL))) &&
-
-            (mParamTempFloat2x4.get() != NULL) &&
-            (mParamTempFloat4.get() != NULL) &&
-            (mParamTempFloat3.get() != NULL);
     }
     else
     {
         mParamInWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
         mParamInWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-
-        //check if parameter retrival went well
-        isValid &=
-            (mParamInWorldMatrix.get() != NULL) &&
-            (mParamInWorldViewProjMatrix.get() != NULL);
     }
-    return isValid;
+    return true;
 }
 
 //-----------------------------------------------------------------------

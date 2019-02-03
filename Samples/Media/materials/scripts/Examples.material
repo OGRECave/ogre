@@ -2021,8 +2021,7 @@ fragment_program Examples/ShowUV_pHLSL hlsl
 
 fragment_program Examples/ShowUV_pGLSLES glsles
 {
-	source ShowUV.glsles
-	profiles glsles
+	source ShowUV.glsl
 }
 
 fragment_program Examples/ShowUV_pGLSL glsl
@@ -2061,8 +2060,7 @@ fragment_program Examples/ShowUVdir3D_pHLSL hlsl
 
 fragment_program Examples/ShowUVdir3D_pGLSLES glsles
 {
-	source ShowUVdir3D.glsles
-	profiles glsles
+	source ShowUVdir3D.glsl
 }
 
 fragment_program Examples/ShowUVdir3D_pGLSL glsl
@@ -2103,8 +2101,7 @@ vertex_program Examples/ShowTangents_vCg_sm4 cg
 
 vertex_program Examples/ShowTangents_vGLSLES glsles
 {
-	source ShowTangents.glsles
-	profiles glsles
+	source ShowTangents.glsl
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -2152,8 +2149,7 @@ vertex_program Examples/ShowNormals_vCg_sm4 cg
 
 vertex_program Examples/ShowNormals_vGLSLES glsles
 {
-	source ShowNormals.glsles
-	profiles glsles
+	source ShowNormals.glsl
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix

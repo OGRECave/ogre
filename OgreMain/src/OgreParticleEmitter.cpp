@@ -29,33 +29,34 @@ THE SOFTWARE.
 
 #include "OgreParticleEmitter.h"
 #include "OgreParticleEmitterFactory.h"
+#include "OgreParticleEmitterCommands.h"
 
 namespace Ogre
 {
-    // Define static members
-    EmitterCommands::CmdAngle ParticleEmitter::msAngleCmd;
-    EmitterCommands::CmdColour ParticleEmitter::msColourCmd;
-    EmitterCommands::CmdColourRangeStart ParticleEmitter::msColourRangeStartCmd;
-    EmitterCommands::CmdColourRangeEnd ParticleEmitter::msColourRangeEndCmd;
-    EmitterCommands::CmdDirection ParticleEmitter::msDirectionCmd;
-    EmitterCommands::CmdUp ParticleEmitter::msUpCmd;
-    EmitterCommands::CmdDirPositionRef ParticleEmitter::msDirPositionRefCmd;
-    EmitterCommands::CmdEmissionRate ParticleEmitter::msEmissionRateCmd;
-    EmitterCommands::CmdMaxTTL ParticleEmitter::msMaxTTLCmd;
-    EmitterCommands::CmdMaxVelocity ParticleEmitter::msMaxVelocityCmd;
-    EmitterCommands::CmdMinTTL ParticleEmitter::msMinTTLCmd;
-    EmitterCommands::CmdMinVelocity ParticleEmitter::msMinVelocityCmd;
-    EmitterCommands::CmdPosition ParticleEmitter::msPositionCmd;
-    EmitterCommands::CmdTTL ParticleEmitter::msTTLCmd;
-    EmitterCommands::CmdVelocity ParticleEmitter::msVelocityCmd;
-    EmitterCommands::CmdDuration ParticleEmitter::msDurationCmd;
-    EmitterCommands::CmdMinDuration ParticleEmitter::msMinDurationCmd;
-    EmitterCommands::CmdMaxDuration ParticleEmitter::msMaxDurationCmd;
-    EmitterCommands::CmdRepeatDelay ParticleEmitter::msRepeatDelayCmd;
-    EmitterCommands::CmdMinRepeatDelay ParticleEmitter::msMinRepeatDelayCmd;
-    EmitterCommands::CmdMaxRepeatDelay ParticleEmitter::msMaxRepeatDelayCmd;
-    EmitterCommands::CmdName ParticleEmitter::msNameCmd;
-    EmitterCommands::CmdEmittedEmitter ParticleEmitter::msEmittedEmitterCmd;
+    // Command object for setting / getting parameters
+    static EmitterCommands::CmdAngle msAngleCmd;
+    static EmitterCommands::CmdColour msColourCmd;
+    static EmitterCommands::CmdColourRangeStart msColourRangeStartCmd;
+    static EmitterCommands::CmdColourRangeEnd msColourRangeEndCmd;
+    static EmitterCommands::CmdDirection msDirectionCmd;
+    static EmitterCommands::CmdUp msUpCmd;
+    static EmitterCommands::CmdDirPositionRef msDirPositionRefCmd;
+    static EmitterCommands::CmdEmissionRate msEmissionRateCmd;
+    static EmitterCommands::CmdMaxTTL msMaxTTLCmd;
+    static EmitterCommands::CmdMaxVelocity msMaxVelocityCmd;
+    static EmitterCommands::CmdMinTTL msMinTTLCmd;
+    static EmitterCommands::CmdMinVelocity msMinVelocityCmd;
+    static EmitterCommands::CmdPosition msPositionCmd;
+    static EmitterCommands::CmdTTL msTTLCmd;
+    static EmitterCommands::CmdVelocity msVelocityCmd;
+    static EmitterCommands::CmdDuration msDurationCmd;
+    static EmitterCommands::CmdMinDuration msMinDurationCmd;
+    static EmitterCommands::CmdMaxDuration msMaxDurationCmd;
+    static EmitterCommands::CmdRepeatDelay msRepeatDelayCmd;
+    static EmitterCommands::CmdMinRepeatDelay msMinRepeatDelayCmd;
+    static EmitterCommands::CmdMaxRepeatDelay msMaxRepeatDelayCmd;
+    static EmitterCommands::CmdName msNameCmd;
+    static EmitterCommands::CmdEmittedEmitter msEmittedEmitterCmd;
 
 
     //-----------------------------------------------------------------------

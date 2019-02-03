@@ -1,0 +1,88 @@
+// Directional light extrude - FINITE
+void shadowVolumeExtrudeDirLightFinite_vp (
+    float4 position         : POSITION,
+    float  wcoord           : TEXCOORD0,
+
+    out float4 oPosition    : POSITION,
+
+    uniform float4x4 worldviewproj_matrix,
+    uniform float4   light_position_object_space, // homogeneous, object space
+    uniform float    shadow_extrusion_distance // how far to extrude
+    )
+{
+    // extrusion in object space
+    // vertex unmodified if w==1, extruded if w==0
+    float3 extrusionDir = - light_position_object_space.xyz;
+    extrusionDir = normalize(extrusionDir);
+
+    float4 newpos = float4(position.xyz +
+        ((1 - wcoord.x) * shadow_extrusion_distance * extrusionDir), 1);
+
+    oPosition = mul(worldviewproj_matrix, newpos);
+
+}
+
+// Directional light extrude
+void shadowVolumeExtrudeDirLight_vp (
+    float4 position         : POSITION,
+    float  wcoord           : TEXCOORD0,
+
+    out float4 oPosition    : POSITION,
+
+    uniform float4x4 worldviewproj_matrix,
+    uniform float4   light_position_object_space // homogenous, object space
+    )
+{
+    // extrusion in object space
+    // vertex unmodified if w==1, extruded if w==0
+    float4 newpos =
+        (wcoord.xxxx * (position + light_position_object_space)) - light_position_object_space;
+
+    oPosition = mul(worldviewproj_matrix, newpos);
+
+}
+
+// Point light shadow volume extrude - FINITE
+void shadowVolumeExtrudePointLightFinite_vp (
+    float4 position         : POSITION,
+    float  wcoord           : TEXCOORD0,
+
+    out float4 oPosition    : POSITION,
+
+    uniform float4x4 worldviewproj_matrix,
+    uniform float4   light_position_object_space, // homogeneous, object space
+    uniform float    shadow_extrusion_distance // how far to extrude
+    )
+{
+    // extrusion in object space
+    // vertex unmodified if w==1, extruded if w==0
+    float3 extrusionDir = position.xyz - light_position_object_space.xyz;
+    extrusionDir = normalize(extrusionDir);
+
+    float4 newpos = float4(position.xyz +
+        ((1 - wcoord.x) * shadow_extrusion_distance * extrusionDir), 1);
+
+    oPosition = mul(worldviewproj_matrix, newpos);
+
+}
+
+// Point light shadow volume extrude
+void shadowVolumeExtrudePointLight_vp (
+    float4 position         : POSITION,
+    float  wcoord           : TEXCOORD0,
+
+    out float4 oPosition    : POSITION,
+
+    uniform float4x4 worldviewproj_matrix,
+    uniform float4   light_position_object_space // homogeneous, object space
+    )
+{
+    // extrusion in object space
+    // vertex unmodified if w==1, extruded if w==0
+    float4 newpos =
+        (wcoord.xxxx * light_position_object_space) +
+        float4(position.xyz - light_position_object_space.xyz, 0);
+
+    oPosition = mul(worldviewproj_matrix, newpos);
+
+}

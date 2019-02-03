@@ -1,5 +1,3 @@
-#version 120
-
 uniform mat4 worldViewProj;
 uniform vec4 texelOffsets;
 

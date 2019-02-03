@@ -62,7 +62,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES glsles
 {
-    source AmbientOneTexture.glsles
+    source AmbientOneTexture.glsl
 
     default_params
     {
@@ -73,7 +73,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES glsles
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSLES glsles
 {
-    source AmbientOneTextureWithUV.glsles
+    source AmbientOneTextureWithUV.glsl
 
     default_params
     {
@@ -197,7 +197,7 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4ForAmbientOneTextu
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpGLSLES glsles
 {
-    source PassthroughFP.glsles
+    source PassthroughFP.glsl
 }
 
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpGLSL glsl

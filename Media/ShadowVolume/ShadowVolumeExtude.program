@@ -1,0 +1,134 @@
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
+
+vertex_program Ogre/ShadowBlendVP_hlsl hlsl
+{
+    source ShadowBlend.cg
+    target vs_2_0
+    entry_point ShadowBlend_vs
+}
+vertex_program Ogre/ShadowBlendVP_glsl glsl
+{
+    source ShadowBlend.vert
+}
+vertex_program Ogre/ShadowBlendVP_glsles glsles
+{
+    source ShadowBlend.vert
+}
+vertex_program Ogre/ShadowBlendVP unified
+{
+    delegate Ogre/ShadowBlendVP_glsl
+    delegate Ogre/ShadowBlendVP_glsles
+    delegate Ogre/ShadowBlendVP_hlsl
+
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
+
+fragment_program Ogre/ShadowBlendFP_hlsl hlsl
+{
+    source ShadowBlend.cg
+    target ps_2_0
+    entry_point ShadowBlend_ps
+}
+fragment_program Ogre/ShadowBlendFP_glsles glsles
+{
+    source ShadowBlend.frag
+}
+fragment_program Ogre/ShadowBlendFP_glsl glsl
+{
+    source ShadowBlend.frag
+}
+fragment_program Ogre/ShadowBlendFP unified
+{
+    delegate Ogre/ShadowBlendFP_glsl
+    delegate Ogre/ShadowBlendFP_glsles
+    delegate Ogre/ShadowBlendFP_hlsl
+}
+
+vertex_program Ogre/ShadowExtrudePointLight_hlsl hlsl
+{
+    source ShadowVolumeExtrude.cg
+    target vs_2_0
+    entry_point shadowVolumeExtrudePointLight_vp
+}
+vertex_program Ogre/ShadowExtrudePointLight_glsl glsl
+{
+    source ShadowExtrudePointLight.vert
+}
+vertex_program Ogre/ShadowExtrudePointLight_glsles glsles
+{
+    source ShadowExtrudePointLight.vert
+}
+vertex_program Ogre/ShadowExtrudePointLight unified
+{
+    delegate Ogre/ShadowExtrudePointLight_glsl
+    delegate Ogre/ShadowExtrudePointLight_glsles
+    delegate Ogre/ShadowExtrudePointLight_hlsl
+}
+
+vertex_program Ogre/ShadowExtrudeDirLight_hlsl hlsl
+{
+    source ShadowVolumeExtrude.cg
+    target vs_2_0
+    entry_point shadowVolumeExtrudeDirLight_vp
+}
+vertex_program Ogre/ShadowExtrudeDirLight_glsl glsl
+{
+    source ShadowExtrudeDirLight.vert
+}
+vertex_program Ogre/ShadowExtrudeDirLight_glsles glsles
+{
+    source ShadowExtrudeDirLight.vert
+}
+vertex_program Ogre/ShadowExtrudeDirLight unified
+{
+    delegate Ogre/ShadowExtrudeDirLight_glsl
+    delegate Ogre/ShadowExtrudeDirLight_glsles
+    delegate Ogre/ShadowExtrudeDirLight_hlsl
+}
+
+vertex_program Ogre/ShadowExtrudePointLightFinite_hlsl hlsl
+{
+    source ShadowVolumeExtrude.cg
+    target vs_2_0
+    entry_point shadowVolumeExtrudePointLightFinite_vp
+}
+vertex_program Ogre/ShadowExtrudePointLightFinite_glsl glsl
+{
+    source ShadowExtrudePointLightFinite.vert
+}
+vertex_program Ogre/ShadowExtrudePointLightFinite_glsles glsles
+{
+    source ShadowExtrudePointLightFinite.vert
+}
+vertex_program Ogre/ShadowExtrudePointLightFinite unified
+{
+    delegate Ogre/ShadowExtrudePointLightFinite_glsl
+    delegate Ogre/ShadowExtrudePointLightFinite_glsles
+    delegate Ogre/ShadowExtrudePointLightFinite_hlsl
+}
+
+vertex_program Ogre/ShadowExtrudeDirLightFinite_hlsl hlsl
+{
+    source ShadowVolumeExtrude.cg
+    target vs_2_0
+    entry_point shadowVolumeExtrudeDirLightFinite_vp
+}
+vertex_program Ogre/ShadowExtrudeDirLightFinite_glsl glsl
+{
+    source ShadowExtrudeDirLightFinite.vert
+}
+vertex_program Ogre/ShadowExtrudeDirLightFinite_glsles glsles
+{
+    source ShadowExtrudeDirLightFinite.vert
+}
+vertex_program Ogre/ShadowExtrudeDirLightFinite unified
+{
+    delegate Ogre/ShadowExtrudeDirLightFinite_glsl
+    delegate Ogre/ShadowExtrudeDirLightFinite_glsles
+    delegate Ogre/ShadowExtrudeDirLightFinite_hlsl
+}

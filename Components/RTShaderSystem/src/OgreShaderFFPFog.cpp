@@ -102,7 +102,6 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
-    bool hasError = false;
 
     // Resolve world view matrix.
     mWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
@@ -127,8 +126,6 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
         
         // Resolve pixel shader input depth.
         mPSInDepth = psMain->resolveInputParameter(mVSOutDepth);
-        
-        hasError |= !(mPSInDepth.get()) || !(mVSOutDepth.get()) || !(mFogParams.get());
     }
     // Per vertex fog.
     else
@@ -141,18 +138,8 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 
         // Resolve pixel shader input fog factor.
         mPSInFogFactor = psMain->resolveInputParameter(mVSOutFogFactor);
-
-        hasError |= !(mPSInFogFactor.get()) || !(mVSOutFogFactor.get()) || !(mFogParams.get());
     }
 
-    hasError |= !(mWorldViewProjMatrix.get()) || !(mVSInPos.get()) || !(mFogColour.get()) || !(mPSOutDiffuse.get());
-        
-    if (hasError)
-    {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "FFPFog::resolveParameters" );
-    }
     return true;
 }
 

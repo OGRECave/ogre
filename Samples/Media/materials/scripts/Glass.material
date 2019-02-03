@@ -7,7 +7,7 @@ fragment_program Ogre/Compositor/GlassFP_cg cg
 
 fragment_program Ogre/Compositor/GlassFP_glsles glsles
 {
-	source GlassFP.glsles
+	source GlassFP.glsl
 	default_params
 	{
 		param_named RT int 0

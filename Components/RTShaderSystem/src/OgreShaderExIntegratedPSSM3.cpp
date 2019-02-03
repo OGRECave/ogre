@@ -206,24 +206,13 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
                 it->mTextureSamplerIndex);
         }
 
-        if (!(it->mInvTextureSize.get() || mUseTextureCompare) || !(it->mTextureSampler.get()) || !(it->mPSInLightPosition.get()) ||
-            !(it->mVSOutLightPosition.get()) || !(it->mWorldViewProjMatrix.get()))
-        {
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "IntegratedPSSM3::resolveParameters" );
-        }
-
         ++lightIndex;
         ++it;
     }
 
-    if (!(mVSInPos.get()) || !(mVSOutPos.get()) || !(mVSOutDepth.get()) || !(mPSInDepth.get()) || !(mPSDiffuse.get()) || !(mPSOutDiffuse.get()) || 
-        !(mPSSpecualr.get()) || !(mPSLocalShadowFactor.get()) || !(mPSSplitPoints.get()) || !(mPSDerivedSceneColour.get()))
+    if (!(mVSInPos.get()) || !(mVSOutPos.get()) || !(mPSDiffuse.get()) || !(mPSSpecualr.get()))
     {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "IntegratedPSSM3::resolveParameters" );
+        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Not all parameters could be constructed for the sub-render state.");
     }
 
     return true;
