@@ -67,11 +67,14 @@ namespace Ogre {
         for (auto name : programNames)
         {
             auto vp = HighLevelGpuProgramManager::getSingleton().getByName(name, RGN_INTERNAL);
+            OgreAssert(vp, (String(name) + " not found. Verify that you referenced the 'ShadowVolume' "
+                                   "folder in your resources.cfg").c_str());
             vp->load();
             mPrograms.push_back(vp);
         }
 
         frgProgram = HighLevelGpuProgramManager::getSingleton().getByName("Ogre/ShadowBlendFP", RGN_INTERNAL);
+        OgreAssert(frgProgram, "Ogre/ShadowBlendFP not found.");
         frgProgram->load();
     }
     //---------------------------------------------------------------------
