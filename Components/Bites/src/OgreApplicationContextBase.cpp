@@ -395,8 +395,12 @@ void ApplicationContextBase::locateResources()
     {
         const auto& mediaDir = getDefaultMediaDir();
         // add default locations
+        rgm.addResourceLocation(mediaDir + "/ShadowVolume", "FileSystem", Ogre::RGN_INTERNAL);
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+        rgm.addResourceLocation(mediaDir + "/Terrain", "FileSystem", Ogre::RGN_INTERNAL);
+#endif
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-        rgm.addResourceLocation(mediaDir + "/materials", "FileSystem", Ogre::RGN_INTERNAL);
+        rgm.addResourceLocation(mediaDir + "/RTShaderLib/materials", "FileSystem", Ogre::RGN_INTERNAL);
         rgm.addResourceLocation(mediaDir + "/RTShaderLib/GLSL", "FileSystem", Ogre::RGN_INTERNAL);
         rgm.addResourceLocation(mediaDir + "/RTShaderLib/HLSL_Cg", "FileSystem", Ogre::RGN_INTERNAL);
 #endif
