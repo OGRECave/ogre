@@ -776,25 +776,11 @@ namespace Ogre {
         }
         MeshPtr m = MeshManager::getSingleton().createManual(meshName, groupName);
 
-        for (SectionList::iterator i = mSectionList.begin(); i != mSectionList.end(); ++i)
+        for (auto sec : mSectionList)
         {
-            ManualObjectSection* sec = *i;
-            RenderOperation* rop = sec->getRenderOperation();
             SubMesh* sm = m->createSubMesh();
-            sm->useSharedVertices = false;
-            sm->operationType = rop->operationType;
+            sec->convertToSubMesh(sm);
             sm->setMaterialName(sec->getMaterialName(), groupName);
-            // Copy vertex data; replicate buffers too
-            sm->vertexData = rop->vertexData->clone(true);
-            // Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
-
-            // check if index data is present
-            if (rop->indexData)
-            {
-                // Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
-                OGRE_DELETE sm->indexData;
-                sm->indexData = rop->indexData->clone(true);
-            }
         }
         // update bounds
         m->_setBounds(mAABB);
@@ -1094,6 +1080,23 @@ namespace Ogre {
         return mParent->queryLights();
     }
     //-----------------------------------------------------------------------------
+    void ManualObject::ManualObjectSection::convertToSubMesh(SubMesh* sm) const
+    {
+        sm->useSharedVertices = false;
+        sm->operationType = mRenderOperation.operationType;
+        // Copy vertex data; replicate buffers too
+        sm->vertexData = mRenderOperation.vertexData->clone(true);
+
+        // Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
+
+        // check if index data is present
+        if (mRenderOperation.indexData)
+        {
+            // Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
+            OGRE_DELETE sm->indexData;
+            sm->indexData = mRenderOperation.indexData->clone(true);
+        }
+    }
     //--------------------------------------------------------------------------
     ManualObject::ManualObjectSectionShadowRenderable::ManualObjectSectionShadowRenderable(
         ManualObject* parent, HardwareIndexBufferSharedPtr* indexBuffer,

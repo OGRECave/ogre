@@ -441,7 +441,8 @@ namespace Ogre
             /** @copydoc Renderable::getLights */
             const LightList &getLights(void) const;
 
-
+            /// convert this section to a SubMesh
+            void convertToSubMesh(SubMesh* sm) const;
                     
         };
         /** Nested class to allow shadows. */
