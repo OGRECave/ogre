@@ -64,6 +64,9 @@ namespace Ogre {
 
         /// Creates a sphere with a diameter of 100 units as a submesh of the given mesh
         static void createSphere(Mesh* mesh);
+
+        /// unit length coordinate axes
+        static void createAxes(Mesh* mesh);
     };
     /** @} */
     /** @} */

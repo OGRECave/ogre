@@ -50,7 +50,12 @@ namespace Ogre {
             createSphere(mesh);
             return true;
         }
-    
+        else if(resourceName == "Prefab_Axes" || resourceName == "Ogre/Debug/AxesMesh")
+        {
+            createAxes(mesh);
+            return true;
+        }
+
         return false;
     }
     //---------------------------------------------------------------------
@@ -368,4 +373,75 @@ namespace Ogre {
         mesh->_setBoundingSphereRadius(SPHERE_RADIUS);
     }
     //---------------------------------------------------------------------
+    void PrefabFactory::createAxes(Mesh* mesh)
+    {
+        ManualObject mo("");
+        mo.begin("BaseWhite");
+        /* 3 axes, each made up of 2 of these (base plane = XY)
+         *   .------------|\
+         *   '------------|/
+         */
+        mo.estimateVertexCount(7 * 2 * 3);
+        mo.estimateIndexCount(3 * 2 * 3);
+        Quaternion quat[6];
+        ColourValue col[3];
+
+        // x-axis
+        quat[0] = Quaternion::IDENTITY;
+        quat[1].FromAxes(Vector3::UNIT_X, Vector3::NEGATIVE_UNIT_Z, Vector3::UNIT_Y);
+        col[0] = ColourValue::Red;
+        col[0].a = 0.8;
+        // y-axis
+        quat[2].FromAxes(Vector3::UNIT_Y, Vector3::NEGATIVE_UNIT_X, Vector3::UNIT_Z);
+        quat[3].FromAxes(Vector3::UNIT_Y, Vector3::UNIT_Z, Vector3::UNIT_X);
+        col[1] = ColourValue::Green;
+        col[1].a = 0.8;
+        // z-axis
+        quat[4].FromAxes(Vector3::UNIT_Z, Vector3::UNIT_Y, Vector3::NEGATIVE_UNIT_X);
+        quat[5].FromAxes(Vector3::UNIT_Z, Vector3::UNIT_X, Vector3::UNIT_Y);
+        col[2] = ColourValue::Blue;
+        col[2].a = 0.8;
+
+        Vector3 basepos[7] =
+        {
+            // stalk
+            Vector3(0, 0.05, 0),
+            Vector3(0, -0.05, 0),
+            Vector3(0.7, -0.05, 0),
+            Vector3(0.7, 0.05, 0),
+            // head
+            Vector3(0.7, -0.15, 0),
+            Vector3(1, 0, 0),
+            Vector3(0.7, 0.15, 0)
+        };
+
+
+        // vertices
+        // 6 arrows
+        for (size_t i = 0; i < 6; ++i)
+        {
+            // 7 points
+            for (size_t p = 0; p < 7; ++p)
+            {
+                Vector3 pos = quat[i] * basepos[p];
+                mo.position(pos);
+                mo.colour(col[i / 2]);
+            }
+        }
+
+        // indices
+        // 6 arrows
+        for (uint32 i = 0; i < 6; ++i)
+        {
+            uint32 base = i * 7;
+            mo.triangle(base + 0, base + 1, base + 2);
+            mo.triangle(base + 0, base + 2, base + 3);
+            mo.triangle(base + 4, base + 5, base + 6);
+        }
+
+        auto sm = mesh->createSubMesh();
+        mo.end()->convertToSubMesh(sm);
+        mesh->_setBounds(mo.getBoundingBox());
+        mesh->_setBoundingSphereRadius(mo.getBoundingRadius());
+    }
 }
