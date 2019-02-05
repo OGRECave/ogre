@@ -335,40 +335,14 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MeshManager::createPrefabPlane(void)
     {
-        MeshPtr msh = create(
-            "Prefab_Plane", 
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
-            true, // manually loaded
-            this);
+        MeshPtr msh = create("Prefab_Plane", RGN_INTERNAL, true, this);
         // Planes can never be manifold
         msh->setAutoBuildEdgeLists(false);
-        // to preserve previous behaviour, load immediately
-        msh->load();
     }
     //-----------------------------------------------------------------------
-    void MeshManager::createPrefabCube(void)
-    {
-        MeshPtr msh = create(
-            "Prefab_Cube", 
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
-            true, // manually loaded
-            this);
-
-        // to preserve previous behaviour, load immediately
-        msh->load();
-    }
+    void MeshManager::createPrefabCube(void) { create("Prefab_Cube", RGN_INTERNAL, true, this); }
     //-------------------------------------------------------------------------
-    void MeshManager::createPrefabSphere(void)
-    {
-        MeshPtr msh = create(
-            "Prefab_Sphere", 
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
-            true, // manually loaded
-            this);
-
-        // to preserve previous behaviour, load immediately
-        msh->load();
-    }
+    void MeshManager::createPrefabSphere(void) { create("Prefab_Sphere", RGN_INTERNAL, true, this); }
     //-------------------------------------------------------------------------
     void MeshManager::setListener(Ogre::MeshSerializerListener *listener)
     {
