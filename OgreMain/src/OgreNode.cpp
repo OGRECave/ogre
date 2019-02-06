@@ -844,9 +844,8 @@ namespace Ogre {
 
         String meshName = "Ogre/Debug/AxesMesh";
         mMeshPtr = MeshManager::getSingleton().getByName(meshName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-        if (!mMeshPtr)
+        if (!mMeshPtr->isLoaded())
         {
-            mMeshPtr = MeshManager::getSingleton().createManual(meshName, RGN_INTERNAL, MeshManager::getSingletonPtr());
             mMeshPtr->load();
             mMeshPtr->getSubMeshes()[0]->setMaterialName(matName, RGN_INTERNAL);
         }

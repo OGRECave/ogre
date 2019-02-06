@@ -69,9 +69,11 @@ namespace Ogre
     void MeshManager::_initialise(void)
     {
         // Create prefab objects
-        createPrefabPlane();
-        createPrefabCube();
-        createPrefabSphere();
+        createManual("Ogre/Debug/AxesMesh", RGN_INTERNAL, &mPrefabLoader);
+        createManual("Prefab_Sphere", RGN_INTERNAL, &mPrefabLoader);
+        createManual("Prefab_Cube", RGN_INTERNAL, &mPrefabLoader);
+        // Planes can never be manifold
+        createManual("Prefab_Plane", RGN_INTERNAL, &mPrefabLoader)->setAutoBuildEdgeLists(false);
     }
     //-----------------------------------------------------------------------
     MeshManager::ResourceCreateOrRetrieveResult MeshManager::createOrRetrieve(
@@ -140,7 +142,7 @@ namespace Ogre
         bool vertexShadowBuffer, bool indexShadowBuffer)
     {
         // Create manual mesh which calls back self to load
-        MeshPtr pMesh = createManual(name, groupName, this);
+        MeshPtr pMesh = createManual(name, groupName, &mPrefabLoader);
         // Planes can never be manifold
         pMesh->setAutoBuildEdgeLists(false);
         // store parameters
@@ -160,7 +162,7 @@ namespace Ogre
         params.indexBufferUsage = indexBufferUsage;
         params.vertexShadowBuffer = vertexShadowBuffer;
         params.indexShadowBuffer = indexShadowBuffer;
-        mMeshBuildParams[pMesh.get()] = params;
+        mPrefabLoader.mMeshBuildParams[pMesh.get()] = params;
 
         // to preserve previous behaviour, load immediately
         pMesh->load();
@@ -176,7 +178,7 @@ namespace Ogre
             bool vertexShadowBuffer, bool indexShadowBuffer)
     {
         // Create manual mesh which calls back self to load
-        MeshPtr pMesh = createManual(name, groupName, this);
+        MeshPtr pMesh = createManual(name, groupName, &mPrefabLoader);
         // Planes can never be manifold
         pMesh->setAutoBuildEdgeLists(false);
         // store parameters
@@ -197,7 +199,7 @@ namespace Ogre
         params.indexBufferUsage = indexBufferUsage;
         params.vertexShadowBuffer = vertexShadowBuffer;
         params.indexShadowBuffer = indexShadowBuffer;
-        mMeshBuildParams[pMesh.get()] = params;
+        mPrefabLoader.mMeshBuildParams[pMesh.get()] = params;
 
         // to preserve previous behaviour, load immediately
         pMesh->load();
@@ -219,7 +221,7 @@ namespace Ogre
         int ySegmentsToKeep)
     {
         // Create manual mesh which calls back self to load
-        MeshPtr pMesh = createManual(name, groupName, this);
+        MeshPtr pMesh = createManual(name, groupName, &mPrefabLoader);
         // Planes can never be manifold
         pMesh->setAutoBuildEdgeLists(false);
         // store parameters
@@ -242,7 +244,7 @@ namespace Ogre
         params.vertexShadowBuffer = vertexShadowBuffer;
         params.indexShadowBuffer = indexShadowBuffer;
         params.ySegmentsToKeep = ySegmentsToKeep;
-        mMeshBuildParams[pMesh.get()] = params;
+        mPrefabLoader.mMeshBuildParams[pMesh.get()] = params;
 
         // to preserve previous behaviour, load immediately
         pMesh->load();
@@ -251,7 +253,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    void MeshManager::tesselate2DMesh(SubMesh* sm, unsigned short meshWidth, unsigned short meshHeight, 
+    void MeshManager::PrefabLoader::tesselate2DMesh(SubMesh* sm, unsigned short meshWidth, unsigned short meshHeight,
         bool doubleSided, HardwareBuffer::Usage indexBufferUsage, bool indexShadowBuffer)
     {
         // The mesh is built, just make a list of indexes to spit out the triangles
@@ -331,18 +333,6 @@ namespace Ogre
 
         }
     }
-
-    //-----------------------------------------------------------------------
-    void MeshManager::createPrefabPlane(void)
-    {
-        MeshPtr msh = create("Prefab_Plane", RGN_INTERNAL, true, this);
-        // Planes can never be manifold
-        msh->setAutoBuildEdgeLists(false);
-    }
-    //-----------------------------------------------------------------------
-    void MeshManager::createPrefabCube(void) { create("Prefab_Cube", RGN_INTERNAL, true, this); }
-    //-------------------------------------------------------------------------
-    void MeshManager::createPrefabSphere(void) { create("Prefab_Sphere", RGN_INTERNAL, true, this); }
     //-------------------------------------------------------------------------
     void MeshManager::setListener(Ogre::MeshSerializerListener *listener)
     {
@@ -354,7 +344,7 @@ namespace Ogre
         return mListener;
     }
     //-----------------------------------------------------------------------
-    void MeshManager::loadResource(Resource* res)
+    void MeshManager::PrefabLoader::loadResource(Resource* res)
     {
         Mesh* msh = static_cast<Mesh*>(res);
 
@@ -394,7 +384,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    void MeshManager::loadManualPlane(Mesh* pMesh, MeshBuildParams& params)
+    void MeshManager::PrefabLoader::loadManualPlane(Mesh* pMesh, MeshBuildParams& params)
     {
         if ((params.xsegments + 1) * (params.ysegments + 1) > 65536)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -544,7 +534,7 @@ namespace Ogre
         pMesh->_setBoundingSphereRadius(Math::Sqrt(maxSquaredLength));
     }
     //-----------------------------------------------------------------------
-    void MeshManager::loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params)
+    void MeshManager::PrefabLoader::loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params)
     {
         if ((params.xsegments + 1) * (params.ysegments + 1) > 65536)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -699,7 +689,7 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void MeshManager::loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params)
+    void MeshManager::PrefabLoader::loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params)
     {
         if (params.ySegmentsToKeep == -1) params.ySegmentsToKeep = params.ysegments;
 
@@ -882,7 +872,7 @@ namespace Ogre
         pMesh->_setBoundingSphereRadius(Math::Sqrt(maxSquaredLength));
     }
     //-----------------------------------------------------------------------
-    PatchMeshPtr MeshManager::createBezierPatch(const String& name, const String& groupName, 
+    PatchMeshPtr MeshManager::createBezierPatch(const String& name, const String& groupName,
             void* controlPointBuffer, VertexDeclaration *declaration, 
             size_t width, size_t height,
             size_t uMaxSubdivisionLevel, size_t vMaxSubdivisionLevel,
