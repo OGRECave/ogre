@@ -86,22 +86,30 @@ namespace Ogre {
 
     void EmscriptenEGLWindow::resize(uint width, uint height)
     {
-        mWidth = width;
-        mHeight = height;
-        
+        if(!mActive) return;
 
-        EMSCRIPTEN_RESULT result = emscripten_set_canvas_element_size(mCanvasSelector.c_str(), width, height);
-        
-        if(result < 0)
+        if(width != uint(-1) && height != uint(-1) && width && height)
         {
-           OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-             "Unexpected failure at emscripten_set_canvas_element_size with selector=" + mCanvasSelector,
-             "EmscriptenEGLWindow::resize");
+            EMSCRIPTEN_RESULT result = emscripten_set_canvas_element_size(
+                mCanvasSelector.c_str(), width, height);
+            if (result < 0)
+            {
+                OGRE_EXCEPT(
+                    Exception::ERR_RENDERINGAPI_ERROR,
+                    "Unexpected failure at emscripten_set_canvas_element_size "
+                    "with selector=" +
+                        mCanvasSelector);
+            }
+        }
+        else
+        {
+            emscripten_get_canvas_element_size(mCanvasSelector.c_str(), (int*)&width, (int*)&height);
         }
         
-        
+        mWidth = width;
+        mHeight = height;
         LogManager::getSingleton().logMessage("EmscriptenEGLWindow::resize "+mCanvasSelector+" w:" + Ogre::StringConverter::toString(mWidth) + " h:" + Ogre::StringConverter::toString(mHeight));
-        
+
         // Notify viewports of resize
         ViewportList::iterator it = mViewportList.begin();
         while( it != mViewportList.end() )
@@ -110,17 +118,7 @@ namespace Ogre {
 
     void EmscriptenEGLWindow::windowMovedOrResized()
     {
-        if(!mActive) return;
-
-        int w, h;
-        emscripten_get_canvas_element_size(mCanvasSelector.c_str(), &w, &h);
-        mWidth = w;
-        mHeight = h;
-
-        // Notify viewports of resize
-        ViewportList::iterator it = mViewportList.begin();
-        while( it != mViewportList.end() )
-            (*it++).second->_updateDimensions();
+        resize(-1, -1);
     }
     
     void EmscriptenEGLWindow::switchFullScreen(bool fullscreen)

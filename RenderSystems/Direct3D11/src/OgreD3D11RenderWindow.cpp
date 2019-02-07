@@ -997,28 +997,21 @@ namespace Ogre
     //---------------------------------------------------------------------
 	void D3D11RenderWindowHwnd::resize(unsigned int width, unsigned int height)
 	{
-
-		if (!mIsExternal)
-		{
-			if (mHWnd && !mIsFullScreen)
-			{
-				unsigned int winWidth, winHeight;
-				adjustWindow(width, height, &winWidth, &winHeight);
-				SetWindowPos(mHWnd, 0, 0, 0, winWidth, winHeight,
-					SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
-			}
-		}
-		else
-			updateWindowRect();
-	}
-    //---------------------------------------------------------------------
-    void D3D11RenderWindowHwnd::windowMovedOrResized()
-    {
         if (!mHWnd || IsIconic(mHWnd) || !mpSwapChain)
             return;
 
-		updateWindowRect();		
-		
+		if (!mIsExternal && !mIsFullScreen && width != uint(-1) && height != uint(-1) && width && height)
+		{
+            unsigned int winWidth, winHeight;
+            adjustWindow(width, height, &winWidth, &winHeight);
+            SetWindowPos(mHWnd, 0, 0, 0, winWidth, winHeight,
+                SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+
+            return;
+		}
+
+        updateWindowRect();
+
         RECT rc;
         // top and left represent outer window position
         GetWindowRect(mHWnd, &rc);
@@ -1026,8 +1019,8 @@ namespace Ogre
         mLeft = rc.left;
         // width and height represent drawable area only
         GetClientRect(mHWnd, &rc);
-        unsigned int width = rc.right - rc.left;
-        unsigned int height = rc.bottom - rc.top;
+        width = rc.right - rc.left;
+        height = rc.bottom - rc.top;
 
         if (width == 0) 
             width = 1;
@@ -1038,6 +1031,11 @@ namespace Ogre
             return;
 
         _resizeSwapChainBuffers(width, height);
+	}
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowHwnd::windowMovedOrResized()
+    {
+        resize(-1, -1);
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::getCustomAttribute( const String& name, void* pData )

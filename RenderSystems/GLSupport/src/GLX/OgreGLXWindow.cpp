@@ -654,63 +654,49 @@ namespace Ogre
     //-------------------------------------------------------------------------------------------------//
     void GLXWindow::resize(uint width, uint height)
     {
-        if (mClosed)
+        if (mClosed || !mWindow)
+            return;
+
+        Display* xDisplay = mGLSupport->getXDisplay();
+
+        if(width == uint(-1) || height == uint(-1))
+        {
+            // query from X11
+            XWindowAttributes windowAttrib;
+
+            Window parent, root, *children;
+            uint nChildren;
+
+            XQueryTree(xDisplay, mWindow, &root, &parent, &children, &nChildren);
+
+            if (children)
+                XFree(children);
+
+            XGetWindowAttributes(xDisplay, parent, &windowAttrib);
+
+            if (mIsTopLevel && !mIsFullScreen)
+            {
+                // offset from window decorations
+                mLeft = windowAttrib.x;
+                mTop  = windowAttrib.y;
+                // w/ h of the actual renderwindow
+                XGetWindowAttributes(xDisplay, mWindow, &windowAttrib);
+            }
+
+            width = windowAttrib.width;
+            height = windowAttrib.height;
+        }
+
+        if(width == 0 || height == 0)
             return;
 
         if(mWidth == width && mHeight == height)
             return;
 
-        if(width != 0 && height != 0)
-        {
-            if (!mIsTopLevel)
-            {
-                XResizeWindow(mGLSupport->getXDisplay(), mWindow, width, height);
-                XFlush(mGLSupport->getXDisplay());
-            }
+        mWidth = width;
+        mHeight = height;
 
-            mWidth = width;
-            mHeight = height;
-
-            for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-                (*it).second->_updateDimensions();
-        }
-    }
-
-    //-------------------------------------------------------------------------------------------------//
-    void GLXWindow::windowMovedOrResized()
-    {
-        if (mClosed || !mWindow)
-            return;
-
-        Display* xDisplay = mGLSupport->getXDisplay();
-        XWindowAttributes windowAttrib;
-
-        Window parent, root, *children;
-        uint nChildren;
-
-        XQueryTree(xDisplay, mWindow, &root, &parent, &children, &nChildren);
-
-        if (children)
-            XFree(children);
-
-        XGetWindowAttributes(xDisplay, parent, &windowAttrib);
-
-        if (mIsTopLevel && !mIsFullScreen)
-        {
-            // offset from window decorations
-            mLeft = windowAttrib.x;
-            mTop  = windowAttrib.y;
-            // w/ h of the actual renderwindow
-            XGetWindowAttributes(xDisplay, mWindow, &windowAttrib);
-        }
-
-        if (mWidth == (size_t)windowAttrib.width && mHeight == (size_t)windowAttrib.height)
-            return;
-
-        mWidth = windowAttrib.width;
-        mHeight = windowAttrib.height;
-
-        if(!mIsTopLevel)
+        if (!mIsTopLevel)
         {
             XResizeWindow(xDisplay, mWindow, mWidth, mHeight);
             XFlush(xDisplay);
@@ -718,6 +704,12 @@ namespace Ogre
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
             (*it).second->_updateDimensions();
+    }
+
+    //-------------------------------------------------------------------------------------------------//
+    void GLXWindow::windowMovedOrResized()
+    {
+        resize(-1, -1);
     }
 
     //-------------------------------------------------------------------------------------------------//

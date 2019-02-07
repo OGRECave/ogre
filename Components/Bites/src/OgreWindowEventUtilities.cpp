@@ -292,12 +292,11 @@ static void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
         break;
     }
     case ConfigureNotify:
-    {    
-        // This could be slightly more efficient if windowMovedOrResized took arguments:
+    {
         unsigned int oldWidth, oldHeight, oldDepth;
         int oldLeft, oldTop;
         win->getMetrics(oldWidth, oldHeight, oldDepth, oldLeft, oldTop);
-        win->windowMovedOrResized();
+        win->resize(event.xconfigurerequest.width, event.xconfigurerequest.height);
 
         unsigned int newWidth, newHeight, newDepth;
         int newLeft, newTop;

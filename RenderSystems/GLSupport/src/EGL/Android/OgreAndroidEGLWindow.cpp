@@ -77,40 +77,45 @@ namespace Ogre {
 
     void AndroidEGLWindow::resize(uint width, uint height)
     {
-      EGLint format;
-      eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
-      EGL_CHECK_ERROR
+        if (!mActive)
+            return;
 
-      if (mScale != 1.0f)
-      {
-        int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
-        int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
-        ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
-      }
-      else
-      {
-        ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
-      }
+        // When using GPU rendering for Android UI the os creates a context in the main thread
+        // Now we have 2 choices create OGRE in its own thread or set our context current before doing
+        // anything else. I put this code here because this function called before any rendering is done.
+        // Because the events for screen rotation / resizing did not worked on all devices it is the best
+        // way to query the correct dimensions.
+        if (width == uint(-1) || height == uint(-1))
+        {
+            width = ANativeWindow_getWidth(mWindow);
+            height = ANativeWindow_getHeight(mWindow);
+        }
+
+        mWidth = width * mScale;
+        mHeight = height * mScale;
+
+        // Notify viewports of resize
+        ViewportList::iterator it = mViewportList.begin();
+        while (it != mViewportList.end())
+            (*it++).second->_updateDimensions();
+
+        EGLint format;
+        eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
+        EGL_CHECK_ERROR
+
+        if (mScale != 1.0f)
+        {
+            ANativeWindow_setBuffersGeometry(mWindow, mWidth, mHeight, format);
+        }
+        else
+        {
+            ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+        }
     }
 
     void AndroidEGLWindow::windowMovedOrResized()
     {
-        if(mActive)
-        {		
-            // When using GPU rendering for Android UI the os creates a context in the main thread
-            // Now we have 2 choices create OGRE in its own thread or set our context current before doing
-            // anything else. I put this code here because this function called before any rendering is done.
-            // Because the events for screen rotation / resizing did not worked on all devices it is the best way
-            // to query the correct dimensions.
-            mContext->setCurrent(); 
-            eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
-            eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
-            
-            // Notify viewports of resize
-            ViewportList::iterator it = mViewportList.begin();
-            while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();
-        }
+        resize(-1, -1);
     }
     
     void AndroidEGLWindow::switchFullScreen(bool fullscreen)

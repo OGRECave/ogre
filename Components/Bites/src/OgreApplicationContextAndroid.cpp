@@ -116,8 +116,14 @@ void ApplicationContextAndroid::pollEvents()
     for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
     {
         Ogre::RenderWindow* win = it->render;
-        win->windowMovedOrResized();
-        windowResized(win);
+        int w = ANativeWindow_getWidth(it->native);
+        int h = ANativeWindow_getHeight(it->native);
+
+        if(w != win->getWidth() || h != win->getHeight())
+        {
+            win->resize(w, h);
+            windowResized(win);
+        }
     }
 }
 
