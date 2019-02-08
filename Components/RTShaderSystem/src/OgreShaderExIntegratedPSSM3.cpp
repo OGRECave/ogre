@@ -39,7 +39,8 @@ String IntegratedPSSM3::Type = "SGX_IntegratedPSSM3";
 //-----------------------------------------------------------------------
 IntegratedPSSM3::IntegratedPSSM3()
 {   
-    mUseTextureCompare = ShaderGenerator::getSingleton().getTargetLanguage() != "glsles";
+    // currently only works with PF_FLOAT32_R on Nvidia. should use PF_DEPTH, but got artifacts
+    mUseTextureCompare = false;
 }
 
 //-----------------------------------------------------------------------
