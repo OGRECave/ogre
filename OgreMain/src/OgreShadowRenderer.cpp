@@ -673,7 +673,8 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
             RenderTexture *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
 
             //Set appropriate depth buffer
-            shadowRTT->setDepthBufferPool( mSceneManager->mShadowTextureConfigList[__i].depthBufferPoolId );
+            if(!PixelUtil::isDepth(shadowRTT->suggestPixelFormat()))
+                shadowRTT->setDepthBufferPool( mSceneManager->mShadowTextureConfigList[__i].depthBufferPoolId );
 
             // Create camera for this texture, but note that we have to rebind
             // in prepareShadowTextures to coexist with multiple SMs
