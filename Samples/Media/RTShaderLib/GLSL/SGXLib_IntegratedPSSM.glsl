@@ -84,40 +84,24 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 							in vec4 invShadowMapSize2,																			
 							out float oShadowFactor)
 {
+	float shadowFactor0;
+	float shadowFactor1;
+	float shadowFactor2;
+														
+	shadowFactor0 = _SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0.xy);																								
+	shadowFactor1 = _SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy);												
+	shadowFactor2 = _SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy);							
+		
 	if (fDepth  <= vSplitPoints.x)
 	{									
-		oShadowFactor = _SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0.xy);
+		oShadowFactor = shadowFactor0;				
 	}
 	else if (fDepth <= vSplitPoints.y)
 	{									
-		oShadowFactor = _SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy);
+		oShadowFactor = shadowFactor1;		
 	}
 	else
 	{										
-		oShadowFactor = _SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy);
-	}
-}
-
-void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
-							in vec4 vSplitPoints,
-							in vec4 lightPosition0,
-							in vec4 lightPosition1,
-							in vec4 lightPosition2,
-							in sampler2DShadow shadowMap0,
-							in sampler2DShadow shadowMap1,
-							in sampler2DShadow shadowMap2,
-							out float oShadowFactor)
-{
-	if (fDepth  <= vSplitPoints.x)
-	{
-		oShadowFactor = shadow2DProj(shadowMap0, lightPosition0).r;
-	}
-	else if (fDepth <= vSplitPoints.y)
-	{
-		oShadowFactor = shadow2DProj(shadowMap1, lightPosition1).r;
-	}
-	else
-	{
-		oShadowFactor = shadow2DProj(shadowMap2, lightPosition2).r;
+		oShadowFactor = shadowFactor2;				
 	}
 }

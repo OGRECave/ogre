@@ -140,7 +140,6 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
                     // Redefine texture functions to maintain reusability
                     versionLine += "#define texture1D texture\n";
                     versionLine += "#define texture2D texture\n";
-                    versionLine += "#define shadow2DProj textureProj\n";
                     versionLine += "#define texture3D texture\n";
                     versionLine += "#define textureCube texture\n";
                     versionLine += "#define texture2DLod textureLod\n";
