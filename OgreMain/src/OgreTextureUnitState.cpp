@@ -277,6 +277,7 @@ namespace Ogre {
         if (texPtr->getTextureType() == TEX_TYPE_EXTERNAL_OES || texPtr->getTextureType() == TEX_TYPE_2D_RECT)
         {
             setTextureAddressingMode( TAM_CLAMP );
+            setTextureFiltering(FT_MIP, FO_NONE);
         }
 
         mFramePtrs.resize(1);
