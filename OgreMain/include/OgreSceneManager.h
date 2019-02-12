@@ -138,20 +138,23 @@ namespace Ogre {
     class _OgreExport SceneManager : public SceneMgtAlloc
     {
     public:
-        /// Query type mask which will be used for world geometry @see SceneQuery
-        static uint32 WORLD_GEOMETRY_TYPE_MASK;
-        /// Query type mask which will be used for entities @see SceneQuery
-        static uint32 ENTITY_TYPE_MASK;
-        /// Query type mask which will be used for effects like billboardsets / particle systems @see SceneQuery
-        static uint32 FX_TYPE_MASK;
-        /// Query type mask which will be used for StaticGeometry  @see SceneQuery
-        static uint32 STATICGEOMETRY_TYPE_MASK;
-        /// Query type mask which will be used for lights  @see SceneQuery
-        static uint32 LIGHT_TYPE_MASK;
-        /// Query type mask which will be used for frusta and cameras @see SceneQuery
-        static uint32 FRUSTUM_TYPE_MASK;
-        /// User type mask limit
-        static uint32 USER_TYPE_MASK_LIMIT;
+        enum QueryTypeMask : uint32
+        {
+            /// Query type mask which will be used for world geometry @see SceneQuery
+            WORLD_GEOMETRY_TYPE_MASK = 0x80000000,
+            /// Query type mask which will be used for entities @see SceneQuery
+            ENTITY_TYPE_MASK = 0x40000000,
+            /// Query type mask which will be used for effects like billboardsets / particle systems @see SceneQuery
+            FX_TYPE_MASK = 0x20000000,
+            /// Query type mask which will be used for StaticGeometry  @see SceneQuery
+            STATICGEOMETRY_TYPE_MASK = 0x10000000,
+            /// Query type mask which will be used for lights  @see SceneQuery
+            LIGHT_TYPE_MASK = 0x08000000,
+            /// Query type mask which will be used for frusta and cameras @see SceneQuery
+            FRUSTUM_TYPE_MASK = 0x04000000,
+            /// User type mask limit
+            USER_TYPE_MASK_LIMIT = FRUSTUM_TYPE_MASK
+        };
         /** Comparator for material map, for sorting materials into render order (e.g. transparent last).
         */
         struct materialLess

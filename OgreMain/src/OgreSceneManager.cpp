@@ -52,15 +52,6 @@ THE SOFTWARE.
 #include <cstdio>
 
 namespace Ogre {
-
-//-----------------------------------------------------------------------
-uint32 SceneManager::WORLD_GEOMETRY_TYPE_MASK   = 0x80000000;
-uint32 SceneManager::ENTITY_TYPE_MASK           = 0x40000000;
-uint32 SceneManager::FX_TYPE_MASK               = 0x20000000;
-uint32 SceneManager::STATICGEOMETRY_TYPE_MASK   = 0x10000000;
-uint32 SceneManager::LIGHT_TYPE_MASK            = 0x08000000;
-uint32 SceneManager::FRUSTUM_TYPE_MASK          = 0x04000000;
-uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_MASK;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
 mName(name),
