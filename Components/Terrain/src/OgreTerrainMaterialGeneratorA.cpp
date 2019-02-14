@@ -365,7 +365,8 @@ namespace Ogre
                 // diffuse / specular
                 pass->createTextureUnitState(terrain->getLayerTextureName(i, 0));
                 // normal / height
-                pass->createTextureUnitState(terrain->getLayerTextureName(i, 1));
+                if(mLayerNormalMappingEnabled)
+                    pass->createTextureUnitState(terrain->getLayerTextureName(i, 1));
             }
 
         }
@@ -611,7 +612,8 @@ namespace Ogre
                 for (uint i = 0; i < numLayers; ++i)
                 {
                     params->setNamedConstant("difftex" + StringConverter::toString(i), (int)numSamplers++);
-                    params->setNamedConstant("normtex" + StringConverter::toString(i), (int)numSamplers++);
+                    if(prof->isLayerNormalMappingEnabled())
+                        params->setNamedConstant("normtex" + StringConverter::toString(i), (int)numSamplers++);
                 }
 
                 uint numShadowTextures = 1;
