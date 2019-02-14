@@ -2814,10 +2814,7 @@ namespace Ogre
             
             if (target)
             {
-                uint numberOfViews;
-                target->getCustomAttribute( "numberOfViews", &numberOfViews );
-
-                mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), static_cast<UINT>(numberOfViews), NULL);
+                mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), 1, NULL);
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
