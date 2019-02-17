@@ -694,7 +694,7 @@ namespace Ogre {
         void setTextureBorderColour(const ColourValue& colour) { _getLocalSampler()->setBorderColour(colour); }
         /// @copydoc Sampler::getBorderColour
         const ColourValue& getTextureBorderColour() const { return mSampler->getBorderColour(); }
-        /// @copydoc Sampler::setFiltering
+        /// @copydoc Sampler::setFiltering(TextureFilterOptions)
         void setTextureFiltering(TextureFilterOptions filterType)
         {
             _getLocalSampler()->setFiltering(filterType);
@@ -704,7 +704,7 @@ namespace Ogre {
         {
             _getLocalSampler()->setFiltering(ftype, opts);
         }
-        /// @copydoc Sampler::setFiltering
+        /// @copydoc Sampler::setFiltering(FilterOptions, FilterOptions, FilterOptions)
         void setTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter)
         {
             _getLocalSampler()->setFiltering(minFilter, magFilter, mipFilter);

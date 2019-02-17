@@ -1430,24 +1430,24 @@ Default: filtering linear linear point
 
 Each parameter can be one of Ogre::FilterOptions without the `FO_` prefix. E.g. `FO_LINEAR` becomes `linear`.
 
-@copydetails Ogre::TextureUnitState::setTextureFiltering(FilterOptions,FilterOptions,FilterOptions)
+@copydetails Ogre::Sampler::setFiltering(FilterOptions,FilterOptions,FilterOptions)
 
 <a name="max_005fanisotropy"></a><a name="max_005fanisotropy-1"></a>
 
 ## max\_anisotropy
 
-@copybrief Ogre::TextureUnitState::setTextureAnisotropy
+@copybrief Ogre::Sampler::setAnisotropy
 
 @par
 Format: max\_anisotropy &lt;maxAniso&gt;<br> Default: max\_anisotropy 1
 
-@copydetails Ogre::TextureUnitState::setTextureAnisotropy
+@copydetails Ogre::Sampler::setAnisotropy
 
 <a name="mipmap_005fbias"></a><a name="mipmap_005fbias-1"></a>
 
 ## mipmap\_bias
 
-@copydetails Ogre::TextureUnitState::setTextureMipmapBias
+@copydetails Ogre::Sampler::setMipmapBias
 
 @par
 Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0
