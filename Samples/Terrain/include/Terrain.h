@@ -252,6 +252,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             }
         }
 
+        //! [loading_label]
         if (mTerrainGroup->isDerivedDataUpdateInProgress())
         {
             mTrayMgr->moveWidgetToTray(mInfoLabel, TL_TOP, 0);
@@ -275,6 +276,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 mTerrainsImported = false;
             }
         }
+        //! [loading_label]
 
         return SdkSample::frameRenderingQueued(evt);  // don't forget the parent updates!
     }
@@ -413,7 +415,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     SelectMenu* mEditMenu;
     SelectMenu* mShadowsMenu;
     CheckBox* mFlyBox;
-    OgreBites::Label* mInfoLabel;
+    //! [infolabel]
+    OgreBites::Label* mInfoLabel = nullptr;
+    //! [infolabel]
     bool mTerrainsImported;
     ShadowCameraSetupPtr mPSSMSetup;
 
@@ -433,66 +437,66 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         if (flat)
         {
             mTerrainGroup->defineTerrain(x, y, 0.0f);
+            return;
+        }
+
+        //! [define]
+        String filename = mTerrainGroup->generateFilename(x, y);
+        if (ResourceGroupManager::getSingleton().resourceExists(mTerrainGroup->getResourceGroup(), filename))
+        {
+            mTerrainGroup->defineTerrain(x, y);
         }
         else
         {
-            String filename = mTerrainGroup->generateFilename(x, y);
-            if (ResourceGroupManager::getSingleton().resourceExists(mTerrainGroup->getResourceGroup(), filename))
-            {
-                mTerrainGroup->defineTerrain(x, y);
-            }
-            else
-            {
-                Image img;
-                getTerrainImage(x % 2 != 0, y % 2 != 0, img);
-                mTerrainGroup->defineTerrain(x, y, &img);
-                mTerrainsImported = true;
-            }
+            Image img;
+            getTerrainImage(x % 2 != 0, y % 2 != 0, img);
+            mTerrainGroup->defineTerrain(x, y, &img);
+            mTerrainsImported = true;
         }
+        //! [define]
     }
 
     void getTerrainImage(bool flipX, bool flipY, Image& img)
     {
-        img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        //! [heightmap]
+        img.load("terrain.png", mTerrainGroup->getResourceGroup());
         if (flipX)
             img.flipAroundY();
         if (flipY)
             img.flipAroundX();
+        //! [heightmap]
     }
 
     void initBlendMaps(Terrain* terrain)
     {
+        //! [blendmap]
+        using namespace Ogre;
         TerrainLayerBlendMap* blendMap0 = terrain->getLayerBlendMap(1);
         TerrainLayerBlendMap* blendMap1 = terrain->getLayerBlendMap(2);
-        Real minHeight0 = 70;
-        Real fadeDist0 = 40;
-        Real minHeight1 = 70;
-        Real fadeDist1 = 15;
+        float minHeight0 = 20;
+        float fadeDist0 = 15;
+        float minHeight1 = 70;
+        float fadeDist1 = 15;
+        float* pBlend0 = blendMap0->getBlendPointer();
         float* pBlend1 = blendMap1->getBlendPointer();
-        for (Ogre::uint16 y = 0; y < terrain->getLayerBlendMapSize(); ++y)
+        for (uint16 y = 0; y < terrain->getLayerBlendMapSize(); ++y)
         {
-            for (Ogre::uint16 x = 0; x < terrain->getLayerBlendMapSize(); ++x)
+            for (uint16 x = 0; x < terrain->getLayerBlendMapSize(); ++x)
             {
                 Real tx, ty;
 
                 blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
-                Real height = terrain->getHeightAtTerrainPosition(tx, ty);
-                Real val = (height - minHeight0) / fadeDist0;
-                Math::Clamp(val, (Real)0, (Real)1);
+                float height = terrain->getHeightAtTerrainPosition(tx, ty);
 
-                val = (height - minHeight1) / fadeDist1;
-                val = Math::Clamp(val, (Real)0, (Real)1);
-                *pBlend1++ = val;
-
-
+                *pBlend0++ = Math::saturate((height - minHeight0) / fadeDist0);
+                *pBlend1++ = Math::saturate((height - minHeight1) / fadeDist1);
             }
         }
         blendMap0->dirty();
         blendMap1->dirty();
-        //blendMap0->loadImage("blendmap1.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         blendMap0->update();
         blendMap1->update();
-
+        //! [blendmap]
         // set up a colour map
         /*
           if (!terrain->getGlobalColourMapEnabled())
@@ -507,10 +511,11 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
     void configureTerrainDefaults(Light* l)
     {
-        // Configure global
+        //! [configure_lod]
         mTerrainGlobals->setMaxPixelError(8);
-        // testing composite map
         mTerrainGlobals->setCompositeMapDistance(3000);
+        //! [configure_lod]
+
         //mTerrainGlobals->setUseRayBoxDistanceCalculation(true);
         //mTerrainGlobals->getDefaultMaterialGenerator()->setDebugLevel(1);
         //mTerrainGlobals->setLightMapSize(256);
@@ -524,30 +529,35 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             matProfile->setLightmapEnabled(false);
         }
 
-        // Important to set these so that the terrain knows what to use for derived (non-realtime) data
+        //! [composite_lighting]
+        // Important to set these so that the terrain knows what to use for baked (non-realtime) data
         mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
         mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
-        //mTerrainGlobals->setCompositeMapAmbient(ColourValue::Red);
         mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
+        //! [composite_lighting]
+        //mTerrainGlobals->setCompositeMapAmbient(ColourValue::Red);
 
         // Configure default import settings for if we use imported image
-        Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
+        //! [import_settings]
+        Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
         defaultimp.terrainSize = TERRAIN_SIZE;
         defaultimp.worldSize = TERRAIN_WORLD_SIZE;
         defaultimp.inputScale = 600;
         defaultimp.minBatchSize = 33;
         defaultimp.maxBatchSize = 65;
-        // textures
+        //! [import_settings]
+        //! [textures]
         defaultimp.layerList.resize(3);
         defaultimp.layerList[0].worldSize = 100;
-        defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
-        defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
-        defaultimp.layerList[1].worldSize = 30;
-        defaultimp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
-        defaultimp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
+        defaultimp.layerList[0].textureNames.push_back("grass_green-01_diffusespecular.dds");
+        defaultimp.layerList[0].textureNames.push_back("grass_green-01_normalheight.dds");
+        defaultimp.layerList[1].worldSize = 100;
+        defaultimp.layerList[1].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+        defaultimp.layerList[1].textureNames.push_back("dirt_grayrocky_normalheight.dds");
         defaultimp.layerList[2].worldSize = 200;
         defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
         defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+        //! [textures]
     }
 
     void addTextureShadowDebugOverlay(TrayLocation loc, size_t num)
@@ -675,15 +685,19 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     {
         SdkSample::setupView();
 
+        //! [camera_setup]
         mCameraNode->setPosition(mTerrainPos + Vector3(1683, 50, 2116));
         mCameraNode->lookAt(Vector3(1963, 50, 1660), Node::TS_PARENT);
         mCamera->setNearClipDistance(0.1);
         mCamera->setFarClipDistance(50000);
+        //! [camera_setup]
 
+        //! [camera_inf]
         if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE))
         {
             mCamera->setFarClipDistance(0);   // enable infinite far clip distance if we can
         }
+        //! [camera_inf]
     }
 
     void setupControls()
@@ -695,7 +709,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTrayMgr->showFrameStats(TL_TOPRIGHT);
         mTrayMgr->toggleAdvancedFrameStats();
 
+        //! [infolabel_create]
         mInfoLabel = mTrayMgr->createLabel(TL_TOP, "TInfo", "", 350);
+        //! [infolabel_create]
 
         mEditMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "EditMode", "Edit Mode", 370, 250, 3);
         mEditMenu->addItem("None");
@@ -720,10 +736,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
     void setupContent()
     {
-        bool blankTerrain = false;
-        //blankTerrain = true;
-
-        mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
+        //! [global_opts]
+        mTerrainGlobals = new Ogre::TerrainGlobalOptions();
+        //! [global_opts]
 
         // Bugfix for D3D11 Render System because of pixel format incompatibility when using
         // vertex compression
@@ -748,20 +763,23 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         LogManager::getSingleton().setLogDetail(LL_BOREME);
 
+        //! [light]
         Vector3 lightdir(0.55, -0.3, 0.75);
         lightdir.normalise();
 
-        Light* l = mSceneMgr->createLight("tstLight");
+        Ogre::Light* l = mSceneMgr->createLight("tstLight");
         l->setType(Light::LT_DIRECTIONAL);
         l->setDirection(lightdir);
         l->setDiffuseColour(ColourValue::White);
         l->setSpecularColour(ColourValue(0.4, 0.4, 0.4));
-
+        //! [light]
         mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
-        mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
+        //! [terrain_create]
+        mTerrainGroup = new Ogre::TerrainGroup(mSceneMgr, Ogre::Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
         mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
         mTerrainGroup->setOrigin(mTerrainPos);
+        //! [terrain_create]
         
         configureTerrainDefaults(l);
 #ifdef PAGING
@@ -777,13 +795,16 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                                            TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y,
                                            TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
 #else
+        //! [define_loop]
         for (long x = TERRAIN_PAGE_MIN_X; x <= TERRAIN_PAGE_MAX_X; ++x)
             for (long y = TERRAIN_PAGE_MIN_Y; y <= TERRAIN_PAGE_MAX_Y; ++y)
-                defineTerrain(x, y, blankTerrain);
+                defineTerrain(x, y);
         // sync load since we want everything in place when we start
         mTerrainGroup->loadAllTerrains(true);
+        //! [define_loop]
 #endif
 
+        //! [init_blend]
         if (mTerrainsImported)
         {
             TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
@@ -795,6 +816,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         }
 
         mTerrainGroup->freeTemporaryResources();
+        //! [init_blend]
 
         // create a few entities on the terrain
         Entity* e = mSceneMgr->createEntity("tudorhouse.mesh");
