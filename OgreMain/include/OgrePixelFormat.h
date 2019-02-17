@@ -631,6 +631,7 @@ namespace Ogre {
             @param  srcFormat   Pixel format of source region
             @param  dst         Pointer to destination region
             @param  dstFormat   Pixel format of destination region
+            @param  count       The number of pixels to convert
          */
         static void bulkPixelConversion(void *src, PixelFormat srcFormat, void *dst, PixelFormat dstFormat, unsigned int count);
 

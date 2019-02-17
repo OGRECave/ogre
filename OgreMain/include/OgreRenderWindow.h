@@ -91,6 +91,7 @@ namespace Ogre
         virtual float getViewPointToPixelScale() { return 1.0f; }
 
         /** Creates & displays the new window.
+            @param name the internal window name. Not necessarily the title.
             @param
                 widthPt The width of the window in view points.
             @param

@@ -213,6 +213,7 @@ namespace Ogre {
         /** Standard constructor.
         @param creator Pointer to the ResourceManager that is creating this resource
         @param name The unique name of the resource
+        @param handle Handle to the resource
         @param group The name of the resource group to which this resource belongs
         @param isManual Is this resource manually loaded? If so, you should really
             populate the loader parameter in order that the load process
