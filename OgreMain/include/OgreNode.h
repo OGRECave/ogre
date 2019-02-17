@@ -448,6 +448,7 @@ namespace Ogre {
         @remarks
             This creates a child node with a given name, which allows you to look the node up from 
             the parent which holds this collection of nodes.
+        @param name Name of the Node to create
         @param translate
             Initial translation offset of child relative to parent
         @param rotate
@@ -629,7 +630,8 @@ namespace Ogre {
             parent, tell it anyway
         */
         virtual void needUpdate(bool forceParentUpdate = false);
-        /** Called by children to notify their parent that they need an update. 
+        /** Called by children to notify their parent that they need an update.
+        @param child The child Node to be updated
         @param forceParentUpdate Even if the node thinks it has already told it's
             parent, tell it anyway
         */
