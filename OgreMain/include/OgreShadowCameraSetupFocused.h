@@ -282,7 +282,7 @@ namespace Ogre {
             incorrectly. By default the more aggressive approach is used since it
             leads to significantly better results in most cases, but if you experience
             clipping issues, you can use the less aggressive version.
-        @param aggressive
+        @param useAggressiveRegion
             True to use the more aggressive approach, false otherwise.
          */
         static ShadowCameraSetupPtr create(bool useAggressiveRegion = true)
