@@ -315,7 +315,7 @@ namespace Ogre
         /// Do <b>NOT</b> initialize the matrix for efficiency.
         Affine3() {}
 
-        /// @copydoc TransformBase::makeTransform
+        /// @copydoc TransformBaseReal::makeTransform
         Affine3(const Vector3& position, const Quaternion& orientation, const Vector3& scale = Vector3::UNIT_SCALE)
         {
             makeTransform(position, scale, orientation);
