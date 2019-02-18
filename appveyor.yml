@@ -3,8 +3,29 @@ configuration: Release
 image:
  - Visual Studio 2017
  - Visual Studio 2013
+
+environment: 
+  APPVEYOR_RDP_PASSWORD: ogre_python
+  matrix:
+    - PYTHON_VERSION: 3.7
+      MINICONDA: C:\Miniconda3-x64
+      RESTORE_MINICONDA: C:\Miniconda37-x64
+      PYTHON_ARCH: "64"
+
+init:
+  - "ECHO %PYTHON_VERSION% %MINICONDA%"
+
 install:
  - cmd: choco install swig -y & exit 0
+ - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+ - "set SWIG_DIR=%CONDA_PREFIX\\Lib\\bin"
+ - "python --version"
+ - conda update -y -q conda
+ - conda info -a
+ - conda create -y -q -n env_ogre python=%PYTHON_VERSION% numpy freetype swig
+ - activate env_ogre
+ - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 build_script:
  - cmake -P ci-build.cmake
  - cmake --build build --config Release --target INSTALL
