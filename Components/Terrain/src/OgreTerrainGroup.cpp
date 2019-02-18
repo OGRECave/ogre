@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreStreamSerialiser.h"
 #include "OgreLogManager.h"
 #include "OgreTerrainAutoUpdateLod.h"
+#include "OgreTerrainMaterialGeneratorA.h"
 #include <cmath>
 #include <iomanip>
 
@@ -294,6 +295,72 @@ namespace Ogre
         }
 
     }
+
+    void TerrainGroup::loadLegacyTerrain(const String& cfgFilename, long x, long y, bool synchronous)
+    {
+        ConfigFile cfg;
+        cfg.loadFromResourceSystem(cfgFilename, mResourceGroup);
+        loadLegacyTerrain(cfg, x, y, synchronous);
+    }
+
+    void TerrainGroup::loadLegacyTerrain(const ConfigFile& cfg, long x, long y, bool synchronous)
+    {
+        OgreAssert(cfg.getSetting("PageSource") == "Heightmap", "only heightmap PageSource supported");
+        OgreAssert(cfg.getSetting("PageWorldZ") == cfg.getSetting("PageWorldX"), "terrain must be square");
+
+        mTerrainWorldSize = StringConverter::parseReal(cfg.getSetting("PageWorldX"));
+        mTerrainSize = StringConverter::parseInt(cfg.getSetting("PageSize"));
+
+        mAlignment = Terrain::ALIGN_X_Z;
+        mOrigin = Vector3(mTerrainWorldSize / 2, 0, mTerrainWorldSize / 2);
+
+        mDefaultImportData.inputScale = StringConverter::parseReal(cfg.getSetting("MaxHeight"));
+        mDefaultImportData.maxBatchSize = StringConverter::parseInt(cfg.getSetting("TileSize"));
+        mDefaultImportData.minBatchSize = (mDefaultImportData.maxBatchSize - 1)/2 + 1;
+
+        // copy data that would have normally happened on construction
+        mDefaultImportData.terrainAlign = mAlignment;
+        mDefaultImportData.terrainSize = mTerrainSize;
+        mDefaultImportData.worldSize = mTerrainWorldSize;
+
+        const String& worldTexName = cfg.getSetting("WorldTexture");
+        if (!worldTexName.empty())
+        {
+            const String& detailTexName = cfg.getSetting("DetailTexture");
+            OgreAssert(!detailTexName.empty(), "DetailTexture must be given");
+            Real detailTile = StringConverter::parseReal(cfg.getSetting("DetailTile"), 1);
+            mDefaultImportData.layerList.resize(1);
+            mDefaultImportData.layerList[0].worldSize =
+                (mTerrainWorldSize / mTerrainSize) * (mDefaultImportData.maxBatchSize / detailTile);
+            mDefaultImportData.layerList[0].textureNames.push_back(detailTexName);
+        }
+
+        // Load terrain from heightmap
+        Image img;
+        img.load(cfg.getSetting("Heightmap.image"), mResourceGroup);
+        defineTerrain(x, y, &img);
+
+        auto profile = dynamic_cast<TerrainMaterialGeneratorA::SM2Profile*>(
+            TerrainGlobalOptions::getSingleton().getDefaultMaterialGenerator()->getActiveProfile());
+
+        if(profile)
+        {
+            profile->setLayerSpecularMappingEnabled(false);
+            profile->setLayerNormalMappingEnabled(false);
+            profile->setLightmapEnabled(false); // baked into diffusemap
+        }
+
+        TerrainSlot* slot = getTerrainSlot(x, y, false);
+        loadTerrainImpl(slot, synchronous);
+
+        if (!worldTexName.empty())
+        {
+            img.load(worldTexName, mResourceGroup);
+            slot->instance->setGlobalColourMapEnabled(true, img.getWidth());
+            slot->instance->getGlobalColourMap()->loadImage(img);
+        }
+    }
+
     //---------------------------------------------------------------------
     void TerrainGroup::loadTerrainImpl(TerrainSlot* slot, bool synchronous)
     {
