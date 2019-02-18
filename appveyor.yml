@@ -5,7 +5,7 @@ image:
  - Visual Studio 2013
 
 environment: 
-  APPVEYOR_RDP_PASSWORD: ogre_python
+  APPVEYOR_RDP_PASSWORD: Ogre_Python#487
   matrix:
     - PYTHON_VERSION: 3.7
       MINICONDA: C:\Miniconda3-x64
