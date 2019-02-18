@@ -57,4 +57,6 @@ ogre_config_component(OgreTerrain)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Terrain
 )
-
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/Media/Terrain"
+  DESTINATION "${OGRE_MEDIA_PATH}/"
+)

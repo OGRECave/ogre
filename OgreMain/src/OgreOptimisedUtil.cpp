@@ -35,41 +35,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     // External functions
     extern OptimisedUtil* _getOptimisedUtilGeneral(void);
-#if __OGRE_HAVE_SSE
+#if __OGRE_HAVE_SSE || __OGRE_HAVE_NEON
     extern OptimisedUtil* _getOptimisedUtilSSE(void);
-//#elif __OGRE_HAVE_NEON
-//    extern OptimisedUtil* _getOptimisedUtilNEON(void);
-//#elif __OGRE_HAVE_VFP
-//    extern OptimisedUtil* _getOptimisedUtilVFP(void);
-#endif
-#if __OGRE_HAVE_DIRECTXMATH
-    extern OptimisedUtil* _getOptimisedUtilDirectXMath(void);
 #endif
 
 #ifdef __DO_PROFILE__
-    //---------------------------------------------------------------------
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-    typedef unsigned __int64 uint64;
-#pragma warning(push)
-#pragma warning(disable: 4035)  // no return value
-    static OGRE_FORCE_INLINE uint64 getCpuTimestamp(void)
-    {
-        __asm rdtsc
-        // Return values in edx:eax, No return statement requirement here for VC.
-    }
-#pragma warning(pop)
-
-#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG)
-    typedef unsigned long long uint64;
-    static OGRE_FORCE_INLINE uint64 getCpuTimestamp(void)
-    {
-        uint64 result;
-        __asm__ __volatile__ ( "rdtsc" : "=A" (result) );
-        return result;
-    }
-
-#endif  // OGRE_COMPILER
-
     //---------------------------------------------------------------------
     class OptimisedUtilProfiler : public OptimisedUtil
     {
@@ -78,12 +48,8 @@ namespace Ogre {
         enum
         {
             IMPL_DEFAULT,
-#if __OGRE_HAVE_SSE
+#if __OGRE_HAVE_SSE || __OGRE_HAVE_NEON
             IMPL_SSE,
-//#elif __OGRE_HAVE_NEON
-//            IMPL_NEON,
-//#elif __OGRE_HAVE_VFP
-//            IMPL_VFP,
 #endif
             IMPL_COUNT
         };
@@ -105,12 +71,12 @@ namespace Ogre {
 
             void begin(void)
             {
-                mStartTick = getCpuTimestamp();
+                mStartTick = clock();
             }
 
             void end(void)
             {
-                uint64 ticks = getCpuTimestamp() - mStartTick;
+                uint64 ticks = clock() - mStartTick;
                 mTotalTicks += ticks;
                 ++mCount;
                 mAvgTicks = mTotalTicks / mCount;
@@ -126,21 +92,11 @@ namespace Ogre {
         OptimisedUtilProfiler(void)
         {
             mOptimisedUtils.push_back(_getOptimisedUtilGeneral());
-#if __OGRE_HAVE_SSE
-            if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_SSE)
+#if __OGRE_HAVE_SSE || __OGRE_HAVE_NEON
+            //if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_SSE)
             {
                 mOptimisedUtils.push_back(_getOptimisedUtilSSE());
             }
-//#elif __OGRE_HAVE_VFP
-//            if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_VFP)
-//            {
-//                mOptimisedUtils.push_back(_getOptimisedUtilVFP());
-//            }
-//#elif __OGRE_HAVE_NEON
-//            if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_NEON)
-//            {
-//                mOptimisedUtils.push_back(_getOptimisedUtilNEON());
-//            }
 #endif
         }
 
@@ -148,7 +104,7 @@ namespace Ogre {
             const float *srcPosPtr, float *destPosPtr,
             const float *srcNormPtr, float *destNormPtr,
             const float *blendWeightPtr, const unsigned char* blendIndexPtr,
-            const Matrix4* const* blendMatrices,
+            const Affine3* const* blendMatrices,
             size_t srcPosStride, size_t destPosStride,
             size_t srcNormStride, size_t destNormStride,
             size_t blendWeightStride, size_t blendIndexStride,
@@ -174,6 +130,8 @@ namespace Ogre {
                 numVertices);
             profile.end();
 
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
             // You can put break point here while running test application, to
             // watch profile results.
             ++index;    // So we can put break point here even if in release build
@@ -203,15 +161,18 @@ namespace Ogre {
                 morphNormals);
             profile.end();
 
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
+
             // You can put break point here while running test application, to
             // watch profile results.
             ++index;    // So we can put break point here even if in release build
         }
 
         virtual void concatenateAffineMatrices(
-            const Matrix4& baseMatrix,
-            const Matrix4* srcMatrices,
-            Matrix4* dstMatrices,
+            const Affine3& baseMatrix,
+            const Affine3* srcMatrices,
+            Affine3* dstMatrices,
             size_t numMatrices)
         {
             static ProfileItems results;
@@ -227,6 +188,9 @@ namespace Ogre {
                 dstMatrices,
                 numMatrices);
             profile.end();
+
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
 
             // You can put break point here while running test application, to
             // watch profile results.
@@ -263,6 +227,9 @@ namespace Ogre {
             //      SSE         223559                  399495
             //
 
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
+
             // You can put break point here while running test application, to
             // watch profile results.
             ++index;    // So we can put break point here even if in release build
@@ -297,6 +264,9 @@ namespace Ogre {
             //      General     171875                  86998
             //      SSE          47934                  63995
             //
+
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
 
             // You can put break point here while running test application, to
             // watch profile results.
@@ -336,6 +306,9 @@ namespace Ogre {
             //      Point Light, General        224209              155483
             //      Point Light, SSE             56817              106663
             //
+
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "OptimisedUtilProfiler: %s - impl %zu = %u avg ticks\n", __FUNCTION__, index, profile.mAvgTicks));
 
             // You can put break point here while running test application, to
             // watch profile results.
@@ -401,25 +374,15 @@ namespace Ogre {
             return _getOptimisedUtilSSE();
         }
         else
-//#elif __OGRE_HAVE_VFP
-//        if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_VFP)
-//        {
-//            return _getOptimisedUtilVFP();
-//        }
-//        else
-//#elif __OGRE_HAVE_NEON
-//        if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_NEON)
-//        {
-//            return _getOptimisedUtilNEON();
-//        }
-//        else
+#elif __OGRE_HAVE_NEON
+        if (PlatformInformation::getCpuFeatures() & PlatformInformation::CPU_FEATURE_NEON)
+        {
+            return _getOptimisedUtilSSE();
+        }
+        else
 #endif  // __OGRE_HAVE_SSE
         {
-#if __OGRE_HAVE_DIRECTXMATH
-            return _getOptimisedUtilDirectXMath();
-#else // __OGRE_HAVE_DIRECTXMATH
-             return _getOptimisedUtilGeneral();
-#endif
+            return _getOptimisedUtilGeneral();
         }
 
 #endif  // __DO_PROFILE__

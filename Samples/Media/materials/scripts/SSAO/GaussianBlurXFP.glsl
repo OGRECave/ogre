@@ -1,5 +1,5 @@
 #version 120
-varying vec2 uv;
+varying vec2 oUv0;
 
 uniform sampler2D mrt1;
 
@@ -18,9 +18,9 @@ void main()
     {
         float geometricWeight = exp(-pow(i, 2) / (2 * pow(sigma, 2)));
         weights += geometricWeight;
-        blurredDepth += texture2D(mrt1, vec2(uv.x - i * stepX * cKernelWidthBias, uv.y)).w * geometricWeight;
+        blurredDepth += texture2D(mrt1, vec2(oUv0.x - i * stepX * cKernelWidthBias, oUv0.y)).w * geometricWeight;
     }
 
     blurredDepth /= weights;
-    gl_FragColor = vec4(texture2D(mrt1, uv).xyz, blurredDepth);
+    gl_FragColor = vec4(texture2D(mrt1, oUv0).xyz, blurredDepth);
 }

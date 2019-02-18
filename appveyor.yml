@@ -1,28 +1,10 @@
 platform: x64
 configuration: Release
-image: 
+image:
  - Visual Studio 2017
-#  - Visual Studio 2013
-
-environment: 
-  matrix:
-    - PYTHON_VERSION: 3.7
-      MINICONDA: C:\Miniconda3-x64
-      RESTORE_MINICONDA: C:\Miniconda37-x64
-      PYTHON_ARCH: "64"
-
-init:
-  - "ECHO %PYTHON_VERSION% %MINICONDA%"
-
+ - Visual Studio 2013
 install:
- - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
- - "set SWIG_DIR=%CONDA_PREFIX\\Lib\\bin"
- - "python --version"
- - conda update -y -q conda
- - conda info -a
- - conda create -y -q -n env_ogre python=%PYTHON_VERSION% numpy freetype swig 
- - activate env_ogre
-
+ - cmd: choco install swig -y & exit 0
 build_script:
  - cmake -P ci-build.cmake
  - cmake --build build --config Release --target INSTALL

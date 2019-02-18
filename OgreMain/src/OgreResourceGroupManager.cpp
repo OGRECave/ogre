@@ -651,7 +651,8 @@ namespace Ogre {
     DataStreamPtr ResourceGroupManager::openResourceImpl(const String& resourceName,
                                                      const String& groupName,
                                                      bool searchGroupsIfNotFound,
-                                                     Resource* resourceBeingLoaded) const
+                                                     Resource* resourceBeingLoaded,
+                                                     bool throwOnFailure) const
     {
         OgreAssert(!resourceName.empty(), "resourceName is empty string");
         if(mLoadingListener)
@@ -665,6 +666,9 @@ namespace Ogre {
         ResourceGroup* grp = getResourceGroup(groupName);
         if (!grp)
         {
+            if(!throwOnFailure)
+                return DataStreamPtr();
+
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
                 "Cannot locate a resource group called '" + groupName + 
                 "' for resource '" + resourceName + "'" , 
@@ -693,6 +697,9 @@ namespace Ogre {
                 mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, stream);
             return stream;
         }
+
+        if(!throwOnFailure)
+            return DataStreamPtr();
 
         OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "Cannot locate resource " + 
             resourceName + " in resource group " + groupName + ".", 

@@ -1,0 +1,15 @@
+void ShadowBlend_vs
+(
+in float4 inPos : POSITION,
+out float4 pos : POSITION,
+uniform float4x4 worldViewProj
+)
+{
+   pos = mul(worldViewProj, inPos);
+}
+
+uniform float4 shadowColor;
+float4 ShadowBlend_ps() : COLOR
+{
+   return shadowColor;
+}

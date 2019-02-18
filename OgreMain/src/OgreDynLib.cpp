@@ -39,7 +39,14 @@ THE SOFTWARE.
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#include "OgreUTFString.h"
+static std::wstring stringToWstring(const std::string& s)
+{
+	int len = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.length(), NULL, 0);
+	std::wstring ws(L"", len);
+	wchar_t* pWSBuf = const_cast<wchar_t*>(ws.c_str());
+	MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, pWSBuf, len);
+	return ws;
+}
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS

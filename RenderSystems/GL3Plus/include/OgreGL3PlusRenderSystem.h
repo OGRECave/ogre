@@ -147,7 +147,7 @@ namespace Ogre {
 
         const String& getName(void) const;
 
-        RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
+        void _initialise() override;
 
         virtual RenderSystemCapabilities* createRenderSystemCapabilities() const;
 

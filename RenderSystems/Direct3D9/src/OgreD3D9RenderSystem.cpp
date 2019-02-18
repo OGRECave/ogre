@@ -625,9 +625,10 @@ namespace Ogre
         return BLANKSTRING;
     }
     //---------------------------------------------------------------------
-    RenderWindow* D3D9RenderSystem::_initialise( bool autoCreateWindow, const String& windowTitle )
+    void D3D9RenderSystem::_initialise()
     {
-        RenderWindow* autoWindow = NULL;
+        // call superclass method
+        RenderSystem::_initialise();
         LogManager::getSingleton().logMessage( "D3D9 : Subsystem Initialising" );
 
         // Init using current settings
@@ -666,101 +667,16 @@ namespace Ogre
         // Create & register HLSL factory       
         mHLSLProgramFactory = OGRE_NEW D3D9HLSLProgramFactory();
         
-        if( autoCreateWindow )
-        {
-            bool fullScreen;
-            opt = mOptions.find( "Full Screen" );
-            if( opt == mOptions.end() )
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find full screen option!", "D3D9RenderSystem::initialise" );
-            fullScreen = opt->second.currentValue == "Yes";
-
-            D3D9VideoMode* videoMode = NULL;
-            unsigned int width, height;
-            String temp;
-
-            opt = mOptions.find( "Video Mode" );
-            if( opt == mOptions.end() )
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find Video Mode option!", "D3D9RenderSystem::initialise" );
-
-            // The string we are manipulating looks like this :width x height @ colourDepth
-            // Pull out the colour depth by getting what comes after the @ and a space
-            String colourDepth = opt->second.currentValue.substr(opt->second.currentValue.rfind('@')+1);
-            // Now we know that the width starts a 0, so if we can find the end we can parse that out
-            String::size_type widthEnd = opt->second.currentValue.find(' ');
-            // we know that the height starts 3 characters after the width and goes until the next space
-            String::size_type heightEnd = opt->second.currentValue.find(' ', widthEnd+3);
-            // Now we can parse out the values
-            width = StringConverter::parseInt(opt->second.currentValue.substr(0, widthEnd));
-            height = StringConverter::parseInt(opt->second.currentValue.substr(widthEnd+3, heightEnd));
-
-            for( unsigned j=0; j < mActiveD3DDriver->getVideoModeList()->count(); j++ )
-            {
-                temp = mActiveD3DDriver->getVideoModeList()->item(j)->getDescription();
-
-                // In full screen we only want to allow supported resolutions, so temp and opt->second.currentValue need to 
-                // match exactly, but in windowed mode we can allow for arbitrary window sized, so we only need
-                // to match the colour values
-                if(fullScreen && (temp == opt->second.currentValue) ||
-                    !fullScreen && (temp.substr(temp.rfind('@')+1) == colourDepth))
-                {
-                    videoMode = mActiveD3DDriver->getVideoModeList()->item(j);
-                    break;
-                }
-            }
-
-            if( !videoMode )
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find requested video mode.", "D3D9RenderSystem::initialise" );
-
-            // sRGB window option
-            bool hwGamma = false;
-            opt = mOptions.find( "sRGB Gamma Conversion" );
-            if( opt == mOptions.end() )
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find sRGB option!", "D3D9RenderSystem::initialise" );
-            hwGamma = opt->second.currentValue == "Yes";
-
-            NameValuePairList miscParams;
-            miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
-            miscParams["FSAA"] = StringConverter::toString(mFSAASamples);
-            miscParams["FSAAHint"] = mFSAAHint;
-			miscParams["vsync"] = StringConverter::toString(mVSync);
-			miscParams["vsyncInterval"] = StringConverter::toString(mVSyncInterval);
-
-            miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
-            miscParams["gamma"] = StringConverter::toString(hwGamma);
-            miscParams["monitorIndex"] = StringConverter::toString(static_cast<int>(mActiveD3DDriver->getAdapterNumber()));
-			miscParams["Backbuffer Count"] = StringConverter::toString(mBackBufferCount);
-			
-            opt = mOptions.find("VSync");
-            if (opt == mOptions.end())
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync options!", "D3D9RenderSystem::initialise");
-            bool vsync = (opt->second.currentValue == "Yes");
-            miscParams["vsync"] = StringConverter::toString(vsync);
-
-            opt = mOptions.find("VSync Interval");
-            if (opt == mOptions.end())
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync Interval options!", "D3D9RenderSystem::initialise");
-            miscParams["vsyncInterval"] = opt->second.currentValue;
-
-            autoWindow = _createRenderWindow( windowTitle, width, height, 
-                fullScreen, &miscParams );
-        }
-
         LogManager::getSingleton().logMessage("***************************************");
         LogManager::getSingleton().logMessage("*** D3D9 : Subsystem Initialised OK ***");
         LogManager::getSingleton().logMessage("***************************************");
-
-        // call superclass method
-        RenderSystem::_initialise( autoCreateWindow );
-
-
-        return autoWindow;
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::reinitialise()
     {
         LogManager::getSingleton().logMessage( "D3D9 : Reinitialising" );
         this->shutdown();
-        this->_initialise( true );
+        this->_initialise();
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::shutdown()

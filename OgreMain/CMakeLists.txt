@@ -62,6 +62,10 @@ elseif(ANDROID)
   include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
 
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Android/*.cpp")
+  # Remove optional platform source files
+  list(REMOVE_ITEM PLATFORM_SOURCE_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Android/OgreAPKZipArchive.cpp"
+  )
 elseif (UNIX)
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/GLX/*.cpp")
 
@@ -72,7 +76,6 @@ if(NOT WIN32)
     list(APPEND PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp")
 endif()
 
-include_directories("${ZZip_INCLUDE_DIRS}")
 # Configure threading files
 file(GLOB THREAD_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h")
 include_directories("include/Threading" "src/")
@@ -155,11 +158,13 @@ if (OGRE_CONFIG_ENABLE_ASTC)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_ZIP)
+  include_directories("${ZZip_INCLUDE_DIRS}")
   list(APPEND HEADER_FILES include/OgreZip.h)
   list(APPEND SOURCE_FILES src/OgreZip.cpp)
 
   if(ANDROID)
     ADD_DEFINITIONS(-DZZIP_OMIT_CONFIG_H)
+    list(APPEND PLATFORM_SOURCE_FILES src/Android/OgreAPKZipArchive.cpp)
   endif()
 
   list(APPEND LIBRARIES "${ZZip_LIBRARIES}")

@@ -34,22 +34,24 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreOverlayContainer.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreOverlayElementCommands.h"
 
 namespace Ogre {
 
 
     //---------------------------------------------------------------------
     // Define static members
-    OverlayElementCommands::CmdLeft OverlayElement::msLeftCmd;
-    OverlayElementCommands::CmdTop OverlayElement::msTopCmd;
-    OverlayElementCommands::CmdWidth OverlayElement::msWidthCmd;
-    OverlayElementCommands::CmdHeight OverlayElement::msHeightCmd;
-    OverlayElementCommands::CmdMaterial OverlayElement::msMaterialCmd;
-    OverlayElementCommands::CmdCaption OverlayElement::msCaptionCmd;
-    OverlayElementCommands::CmdMetricsMode OverlayElement::msMetricsModeCmd;
-    OverlayElementCommands::CmdHorizontalAlign OverlayElement::msHorizontalAlignCmd;
-    OverlayElementCommands::CmdVerticalAlign OverlayElement::msVerticalAlignCmd;
-    OverlayElementCommands::CmdVisible OverlayElement::msVisibleCmd;
+    // Command object for setting / getting parameters
+    static OverlayElementCommands::CmdLeft msLeftCmd;
+    static OverlayElementCommands::CmdTop msTopCmd;
+    static OverlayElementCommands::CmdWidth msWidthCmd;
+    static OverlayElementCommands::CmdHeight msHeightCmd;
+    static OverlayElementCommands::CmdMaterial msMaterialCmd;
+    static OverlayElementCommands::CmdCaption msCaptionCmd;
+    static OverlayElementCommands::CmdMetricsMode msMetricsModeCmd;
+    static OverlayElementCommands::CmdHorizontalAlign msHorizontalAlignCmd;
+    static OverlayElementCommands::CmdVerticalAlign msVerticalAlignCmd;
+    static OverlayElementCommands::CmdVisible msVisibleCmd;
 
     const String& OverlayElement::DEFAULT_RESOURCE_GROUP = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
     //---------------------------------------------------------------------

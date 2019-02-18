@@ -178,11 +178,16 @@ namespace Ogre {
         }
         Quaternion operator+ (const Quaternion& rkQ) const;
         Quaternion operator- (const Quaternion& rkQ) const;
-        Quaternion operator* (const Quaternion& rkQ) const;
-        Quaternion operator* (Real fScalar) const;
-        _OgreExport friend Quaternion operator* (Real fScalar,
-            const Quaternion& rkQ);
-        Quaternion operator- () const;
+        Quaternion operator*(const Quaternion& rkQ) const;
+        Quaternion operator*(Real s) const
+        {
+            return Quaternion(s * w, s * x, s * y, s * z);
+        }
+        friend Quaternion operator*(Real s, const Quaternion& q)
+        {
+            return q * s;
+        }
+        Quaternion operator-() const { return Quaternion(-w, -x, -y, -z); }
         inline bool operator== (const Quaternion& rhs) const
         {
             return (rhs.x == x) && (rhs.y == y) &&
@@ -194,11 +199,19 @@ namespace Ogre {
         }
         // functions of a quaternion
         /// Returns the dot product of the quaternion
-        Real Dot (const Quaternion& rkQ) const;
+        Real Dot(const Quaternion& rkQ) const
+        {
+            return w * rkQ.w + x * rkQ.x + y * rkQ.y + z * rkQ.z;
+        }
         /// Returns the normal length of this quaternion.
-        Real Norm () const;
+        Real Norm() const { return Math::Sqrt(w * w + x * x + y * y + z * z); }
         /// Normalises this quaternion, and returns the previous length
-        Real normalise(void); 
+        Real normalise(void)
+        {
+            Real len = Norm();
+            *this = 1.0f / len * *this;
+            return len;
+        }
         Quaternion Inverse () const;  /// Apply to non-zero quaternion
         Quaternion UnitInverse () const;  /// Apply to unit-length quaternion
         Quaternion Exp () const;
@@ -245,7 +258,13 @@ namespace Ogre {
         @remark Both equals() and orientationEquals() measure the exact same thing.
                 One measures the difference by angle, the other by a different, non-linear metric.
         */
-        bool equals(const Quaternion& rhs, const Radian& tolerance) const;
+        bool equals(const Quaternion& rhs, const Radian& tolerance) const
+        {
+            Real d = Dot(rhs);
+            Radian angle = Math::ACos(2.0f * d*d - 1.0f);
+
+            return Math::Abs(angle.valueRadians()) <= tolerance.valueRadians();
+        }
         
         /** Compare two quaternions which are assumed to be used as orientations.
         @remark Both equals() and orientationEquals() measure the exact same thing.

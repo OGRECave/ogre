@@ -28,7 +28,11 @@ geometry_program Ogre/GPTest/Swizzle/GP_GLSL_120 glsl
 {
 	source SwizzleGP.glsl
         syntax glsl
+        input_operation_type triangle_list
+        output_operation_type line_strip
+        max_output_vertices 6
 }
+
 
 fragment_program Ogre/GPTest/Swizzle/FP_GLSL_120 glsl
 {
@@ -36,31 +40,16 @@ fragment_program Ogre/GPTest/Swizzle/FP_GLSL_120 glsl
         syntax glsl
 }
 
-
-// GLSL 150
-vertex_program Ogre/GPTest/Swizzle/VP_GLSL_150 glsl
-{
-	source PassthroughVP.glsl
-        syntax glsl150
-}
-
 geometry_program Ogre/GPTest/Swizzle/GP_GLSL_150 glsl
 {
 	source SwizzleGP.glsl
         syntax glsl150
+        preprocessor_defines USE_LAYOUT
 }
-
-fragment_program Ogre/GPTest/Swizzle/FP_GLSL_150 glsl
-{
-	source PassthroughFP.glsl
-        syntax glsl150
-}
-
 
 // unified
 vertex_program Ogre/GPTest/Swizzle/VP unified
 {
-	delegate Ogre/GPTest/Swizzle/VP_GLSL_150
 	delegate Ogre/GPTest/Swizzle/VP_GLSL_120
 	
 	default_params
@@ -71,8 +60,8 @@ vertex_program Ogre/GPTest/Swizzle/VP unified
 
 geometry_program Ogre/GPTest/Swizzle/GP unified
 {
-	delegate Ogre/GPTest/Swizzle/GP_GLSL_150
 	delegate Ogre/GPTest/Swizzle/GP_GLSL_120
+	delegate Ogre/GPTest/Swizzle/GP_GLSL_150
 
         default_params
 	{
@@ -83,14 +72,13 @@ geometry_program Ogre/GPTest/Swizzle/GP unified
 
 fragment_program Ogre/GPTest/Swizzle/FP unified
 {
-	delegate Ogre/GPTest/Swizzle/FP_GLSL_150
 	delegate Ogre/GPTest/Swizzle/FP_GLSL_120
 }
 
 
 material Ogre/GPTest/Swizzle
 {
-	technique glsl
+	technique
 	{
 		pass
 		{
@@ -110,33 +98,4 @@ material Ogre/GPTest/Swizzle
                         }
 		}
 	}
-
-        //FIXME Appears broken.
-        // technique CG
-        // {
-        //         pass
-        //         {
-        //                 geometry_program Ogre/GPTest/Swizzle/GP_CG cg
-        //                 {
-        //                         source SwizzleGP.cg
-        //                         entry_point gs_swizzle
-        //                         profiles gp4gp gpu_gp
-        //                 }
-        //         }
-        // }
-
-
-        //TODO Replace with HLSL.
-        // technique asm
-        // {
-        //         pass
-        //         {
-        //                 geometry_program Ogre/GPTest/Swizzle/GP_ASM asm
-        //                 {
-        //                         source Swizzle.gp
-        //                         syntax nvgp4
-        //                 }
-        //         }
-
-        // }
 }

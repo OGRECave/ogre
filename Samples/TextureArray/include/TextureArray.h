@@ -25,7 +25,7 @@ protected:
     StringVector getRequiredPlugins()
     {
         StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
             names.push_back("Cg Program Manager");
         return names;
     }
@@ -41,7 +41,7 @@ protected:
 
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") && 
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150") &&
+            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("gp4fp"))
         {
@@ -81,34 +81,12 @@ protected:
         texNames.push_back("sinbad_clothes.tga");
         texNames.push_back("stevecube_bk.jpg");
 
-        // create the 2d texture array (the depth is the size of the array - number of textures)
-        TexturePtr tex = TextureManager::getSingleton().createManual("TextureArrayTex", 
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-            TEX_TYPE_2D_ARRAY, 
-            512, 512, (Ogre::uint)texNames.size(),
-            0, 
-            PF_X8R8G8B8 );
-
-
-        // add all the textures to a 2d texture array
-        for (uint32 i = 0; i < static_cast<uint32>(texNames.size()); i++)
-        {
-            Image terrainTex;
-            terrainTex.load(texNames[i], ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-            HardwarePixelBufferSharedPtr pixelBufferBuf = tex->getBuffer(0);
-            const PixelBox&  currImage = pixelBufferBuf->lock(Box(0,0,i,terrainTex.getHeight(), terrainTex.getHeight(), i+1), HardwareBuffer::HBL_DISCARD);
-            PixelUtil::bulkPixelConversion(terrainTex.getPixelBox(), currImage);
-            pixelBufferBuf->unlock();
-        }
-
         // create material and set the texture unit to our texture
-        MaterialManager& matMgr = MaterialManager::getSingleton();
-        MaterialPtr texArrayMat = static_pointer_cast<Material>(matMgr.createOrRetrieve("Examples/TextureArray", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first);
+        MaterialPtr texArrayMat = MaterialManager::getSingleton().getByName("Examples/TextureArray", RGN_DEFAULT);
         texArrayMat->compile();
         Pass * pass = texArrayMat->getBestTechnique()->getPass(0);
         pass->setLightingEnabled(false);
-        TextureUnitState* pState = pass->createTextureUnitState();
-        pState->setTextureName(tex->getName(), TEX_TYPE_2D_ARRAY);
+        pass->createTextureUnitState()->setLayerArrayNames(TEX_TYPE_2D_ARRAY, texNames);
 
         // create a plane with float3 tex coord - the third value will be the texture index in our case
         ManualObject* textureArrayObject = mSceneMgr->createManualObject("TextureAtlasObject");
@@ -138,11 +116,6 @@ protected:
         SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         node->setPosition(-quadSize / 2, -quadSize / 2, 0);
         node->attachObject(textureArrayObject);
-    }
-    
-    void cleanupContent()
-    {
-        TextureManager::getSingleton().remove("TextureArrayTex", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 };
 

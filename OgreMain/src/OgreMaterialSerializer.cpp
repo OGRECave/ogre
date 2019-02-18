@@ -871,7 +871,7 @@ namespace Ogre
 
             //texture name
             if (pTex->getNumFrames() == 1 && !pTex->getTextureName().empty() &&
-                (!pTex->isCubic() || pTex->getTextureType() == TEX_TYPE_CUBE_MAP))
+                (pTex->getTextureType() == TEX_TYPE_CUBE_MAP))
             {
                 writeAttribute(4, "texture");
                 writeValue(quoteWord(pTex->getTextureName()));
@@ -911,22 +911,12 @@ namespace Ogre
             }
 
             //anim. texture
-            if (pTex->getNumFrames() > 1 && !pTex->isCubic())
+            if (pTex->getNumFrames() > 1)
             {
                 writeAttribute(4, "anim_texture");
                 for (unsigned int n = 0; n < pTex->getNumFrames(); n++)
                     writeValue(quoteWord(pTex->getFrameTextureName(n)));
                 writeValue(StringConverter::toString(pTex->getAnimationDuration()));
-            }
-
-            //cubic texture separateUV
-            if (pTex->isCubic() && pTex->getTextureType() != TEX_TYPE_CUBE_MAP)
-            {
-                writeAttribute(4, "cubic_texture");
-                for (unsigned int n = 0; n < pTex->getNumFrames(); n++)
-                    writeValue(quoteWord(pTex->getFrameTextureName(n)));
-
-                writeValue("separateUV");
             }
 
             //anisotropy level

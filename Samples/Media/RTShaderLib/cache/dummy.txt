@@ -1,1 +1,0 @@
-This is a dummy file used to create this directory in the mercurial source control.

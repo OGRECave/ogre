@@ -62,8 +62,7 @@ namespace Ogre {
             control over pre-processed data (such as
             collision boxes, LOD reductions etc). 
     */
-    class _OgreExport MeshManager: public ResourceManager, public Singleton<MeshManager>, 
-        public ManualResourceLoader
+    class _OgreExport MeshManager: public ResourceManager, public Singleton<MeshManager>
     {
     public:
         MeshManager();
@@ -403,25 +402,12 @@ namespace Ogre {
         */
         MeshSerializerListener *getListener();
 
-        /** @see ManualResourceLoader::loadResource */
-        void loadResource(Resource* res);
-
     protected:
+
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader, 
             const NameValuePairList* createParams);
-        
-        /** Utility method for tessellating 2D meshes.
-        */
-        void tesselate2DMesh(SubMesh* pSub, unsigned short meshWidth, unsigned short meshHeight, 
-            bool doubleSided = false, 
-            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
-            bool indexSysMem = false);
-
-        void createPrefabPlane(void);
-        void createPrefabCube(void);
-        void createPrefabSphere(void);
     
         /** Enum identifying the types of manual mesh built by this manager */
         enum MeshBuildType
@@ -452,16 +438,28 @@ namespace Ogre {
             bool indexShadowBuffer;
             int ySegmentsToKeep;
         };
-        /** Map from resource pointer to parameter set */
-        typedef std::map<Resource*, MeshBuildParams> MeshBuildParamsMap;
-        MeshBuildParamsMap mMeshBuildParams;
 
-        /** Utility method for manual loading a plane */
-        void loadManualPlane(Mesh* pMesh, MeshBuildParams& params);
-        /** Utility method for manual loading a curved plane */
-        void loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params);
-        /** Utility method for manual loading a curved illusion plane */
-        void loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params);
+        struct PrefabLoader : public ManualResourceLoader
+        {
+            /** Map from resource pointer to parameter set */
+            typedef std::map<Resource*, MeshBuildParams> MeshBuildParamsMap;
+            MeshBuildParamsMap mMeshBuildParams;
+
+            /** Utility method for tessellating 2D meshes.
+            */
+            static void tesselate2DMesh(SubMesh* pSub, unsigned short meshWidth, unsigned short meshHeight,
+                bool doubleSided = false,
+                HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+                bool indexSysMem = false);
+            /** Utility method for manual loading a plane */
+            static void loadManualPlane(Mesh* pMesh, MeshBuildParams& params);
+            /** Utility method for manual loading a curved plane */
+            static void loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params);
+            /** Utility method for manual loading a curved illusion plane */
+            static void loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params);
+
+            void loadResource(Resource* res);
+        } mPrefabLoader;
 
         // element type for blend weights in vertex buffer (VET_UBYTE4, VET_USHORT1, or VET_FLOAT1)
         VertexElementType mBlendWeightsBaseElementType;

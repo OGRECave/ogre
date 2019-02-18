@@ -84,7 +84,7 @@ namespace OgreBites
     class _OgreBitesExport ApplicationContextBase : public Ogre::FrameListener
     {
     public:
-        explicit ApplicationContextBase(const Ogre::String& appName = OGRE_VERSION_NAME);
+        explicit ApplicationContextBase(const Ogre::String& appName = "Ogre3D");
 
         virtual ~ApplicationContextBase();
 
@@ -254,8 +254,6 @@ namespace OgreBites
             removeInputListener(mWindows[0].native, lis);
         }
 
-        void parseWindowOptions(uint32_t& w, uint32_t& h, Ogre::NameValuePairList& miscParams);
-
         /**
          * Create a new render window
          *
@@ -298,7 +296,6 @@ namespace OgreBites
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*       mShaderGenerator; // The Shader generator instance.
         SGTechniqueResolverListener*       mMaterialMgrListener; // Shader generator material manager listener.
-        Ogre::String                           mRTShaderLibPath;
 #endif // INCLUDE_RTSHADER_SYSTEM
     };
 }

@@ -697,7 +697,8 @@ INPUT                  = OgreMain/include \
                             Docs/src/tutorials/tutorials.md \
                             Docs/src/tutorials/volume.md \
                             Docs/src/tutorials/basictutorials/basictutorial1.md \
-                            Docs/src/tutorials/basictutorials/basictutorial2.md
+                            Docs/src/tutorials/basictutorials/basictutorial2.md \
+                            Docs/src/tutorials/basictutorials/basictutorial3.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

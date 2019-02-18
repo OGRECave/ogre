@@ -88,6 +88,7 @@ namespace Ogre {
         /** Adds an offset to a vertex and a new normal for this pose. 
         @param index The vertex index
         @param offset The position offset for this pose
+        @param normal The new vertex normal
         */
         void addVertex(size_t index, const Vector3& offset, const Vector3& normal);
 

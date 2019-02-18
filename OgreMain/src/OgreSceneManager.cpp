@@ -52,15 +52,6 @@ THE SOFTWARE.
 #include <cstdio>
 
 namespace Ogre {
-
-//-----------------------------------------------------------------------
-uint32 SceneManager::WORLD_GEOMETRY_TYPE_MASK   = 0x80000000;
-uint32 SceneManager::ENTITY_TYPE_MASK           = 0x40000000;
-uint32 SceneManager::FX_TYPE_MASK               = 0x20000000;
-uint32 SceneManager::STATICGEOMETRY_TYPE_MASK   = 0x10000000;
-uint32 SceneManager::LIGHT_TYPE_MASK            = 0x08000000;
-uint32 SceneManager::FRUSTUM_TYPE_MASK          = 0x04000000;
-uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_MASK;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
 mName(name),
@@ -715,6 +706,7 @@ void SceneManager::clearScene(void)
         OGRE_DELETE *i;
     }
     mSceneNodes.clear();
+    mNamedNodes.clear();
     mAutoTrackingSceneNodes.clear();
 
 
@@ -745,6 +737,7 @@ SceneNode* SceneManager::createSceneNode(void)
 {
     SceneNode* sn = createSceneNodeImpl();
     mSceneNodes.push_back(sn);
+    sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
@@ -761,22 +754,16 @@ SceneNode* SceneManager::createSceneNode(const String& name)
 
     SceneNode* sn = createSceneNodeImpl(name);
     mSceneNodes.push_back(sn);
+    mNamedNodes[name] = sn;
+    sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
-struct SceneNodeNameExists {
-    const String& name;
-    bool operator()(const SceneNode* sn) {
-        return sn->getName() == name;
-    }
-};
 void SceneManager::destroySceneNode(const String& name)
 {
-    SceneNodeList::iterator i;
     OgreAssert(!name.empty(), "name must not be empty");
-    SceneNodeNameExists pred = {name};
-    i = std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred);
-    _destroySceneNode(i);
+    auto i = mNamedNodes.find(name);
+    destroySceneNode(i != mNamedNodes.end() ? i->second : NULL);
 }
 
 void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
@@ -816,8 +803,14 @@ void SceneManager::_destroySceneNode(SceneNodeList::iterator i)
     {
         parentNode->removeChild(*i);
     }
+    if(!(*i)->getName().empty())
+        mNamedNodes.erase((*i)->getName());
     OGRE_DELETE *i;
-    std::swap(*i, mSceneNodes.back());
+    if (std::next(i) != mSceneNodes.end())
+    {
+       std::swap(*i, mSceneNodes.back());
+       (*i)->mGlobalIndex = i - mSceneNodes.begin();
+    }
     mSceneNodes.pop_back();
 }
 //---------------------------------------------------------------------
@@ -826,7 +819,12 @@ void SceneManager::destroySceneNode(SceneNode* sn)
     if(!sn)
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null SceneNode.", "SceneManager::destroySceneNode");
 
-    _destroySceneNode(std::find(mSceneNodes.begin(), mSceneNodes.end(), sn));
+    auto pos = sn->mGlobalIndex < mSceneNodes.size() &&
+                       sn == *(mSceneNodes.begin() + sn->mGlobalIndex)
+                   ? mSceneNodes.begin() + sn->mGlobalIndex
+                   : mSceneNodes.end();
+
+    _destroySceneNode(pos);
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::getRootSceneNode(void)
@@ -841,28 +839,17 @@ SceneNode* SceneManager::getRootSceneNode(void)
     return mSceneRoot.get();
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::getSceneNode(const String& name) const
-{
-    SceneNodeList::const_iterator i;
-    OgreAssert(!name.empty(), "name must not be empty");
-    SceneNodeNameExists pred = {name};
-    i = std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred);
-
-    if (i == mSceneNodes.end())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.",
-            "SceneManager::getSceneNode");
-    }
-
-    return *i;
-
-}
-//-----------------------------------------------------------------------
-bool SceneManager::hasSceneNode(const String& name) const
+SceneNode* SceneManager::getSceneNode(const String& name, bool throwExceptionIfNotFound) const
 {
     OgreAssert(!name.empty(), "name must not be empty");
-    SceneNodeNameExists pred = {name};
-    return std::find_if(mSceneNodes.begin(), mSceneNodes.end(), pred) != mSceneNodes.end();
+    auto i = mNamedNodes.find(name);
+
+    if (i != mNamedNodes.end())
+        return i->second;
+
+    if (throwExceptionIfNotFound)
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + name + "' not found.");
+    return NULL;
 }
 
 //-----------------------------------------------------------------------
@@ -1027,42 +1014,37 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         // Set fixed-function fragment settings
     }
 
+    // fog params can either be from scene or from material
+    const auto& newFogColour = pass->getFogOverride() ? pass->getFogColour() : mFogColour;
+    FogMode newFogMode;
+    Real newFogStart, newFogEnd, newFogDensity;
+    if (pass->getFogOverride())
+    {
+        // fog params from material
+        newFogMode = pass->getFogMode();
+        newFogStart = pass->getFogStart();
+        newFogEnd = pass->getFogEnd();
+        newFogDensity = pass->getFogDensity();
+    }
+    else
+    {
+        // fog params from scene
+        newFogMode = mFogMode;
+        newFogStart = mFogStart;
+        newFogEnd = mFogEnd;
+        newFogDensity = mFogDensity;
+    }
+
     if (passFogParams)
     {
-        // New fog params can either be from scene or from material
-        FogMode newFogMode;
-        ColourValue newFogColour;
-        Real newFogStart, newFogEnd, newFogDensity;
-        if (pass->getFogOverride())
-        {
-            // New fog params from material
-            newFogMode = pass->getFogMode();
-            newFogColour = pass->getFogColour();
-            newFogStart = pass->getFogStart();
-            newFogEnd = pass->getFogEnd();
-            newFogDensity = pass->getFogDensity();
-        }
-        else
-        {
-            // New fog params from scene
-            newFogMode = mFogMode;
-            newFogColour = mFogColour;
-            newFogStart = mFogStart;
-            newFogEnd = mFogEnd;
-            newFogDensity = mFogDensity;
-        }
-
-        /* In D3D, it applies to shaders prior
-        to version vs_3_0 and ps_3_0. And in OGL, it applies to "ARB_fog_XXX" in
-        fragment program, and in other ways, them maybe access by gpu program via
-        "state.fog.XXX".
-        */
         mDestRenderSystem->_setFog(newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
     }
-    // Tell params about ORIGINAL fog
-    // Need to be able to override fixed function fog, but still have
-    // original fog parameters available to a shader than chooses to use
-    mAutoParamDataSource->setFog(mFogMode, mFogColour, mFogDensity, mFogStart, mFogEnd);
+    else
+    {
+        // In D3D9, it applies to shaders prior to version vs_3_0 and ps_3_0.
+        mDestRenderSystem->_setFog(FOG_NONE);
+    }
+    mAutoParamDataSource->setFog(newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
 
     // The rest of the settings are the same no matter whether we use programs or not
 

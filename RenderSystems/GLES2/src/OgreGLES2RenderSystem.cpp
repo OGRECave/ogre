@@ -223,23 +223,13 @@ namespace Ogre {
         return strName;
     }
 
-    RenderWindow* GLES2RenderSystem::_initialise(bool autoCreateWindow,
-                                                 const String& windowTitle)
+    void GLES2RenderSystem::_initialise()
     {
-        mGLSupport->start();
+        RenderSystem::_initialise();
 
+        mGLSupport->start();
         // Create the texture manager
         mTextureManager = OGRE_NEW GLES2TextureManager(this);
-
-        RenderWindow* autoWindow = NULL;
-        if(autoCreateWindow) {
-            uint w, h;
-            bool fullscreen;
-            NameValuePairList misc = parseOptions(w, h, fullscreen);
-            autoWindow = _createRenderWindow(windowTitle, w, h, fullscreen, &misc);
-        }
-        RenderSystem::_initialise(autoCreateWindow, windowTitle);
-        return autoWindow;
     }
 
     RenderSystemCapabilities* GLES2RenderSystem::createRenderSystemCapabilities() const
@@ -831,6 +821,11 @@ namespace Ogre {
             mCurTexMipCount = tex->getNumMipmaps();
 
             mStateCacheManager->bindGLTexture(mTextureTypes[stage], tex->getGLID());
+        }
+        else
+        {
+            // Bind zero texture
+            mStateCacheManager->bindGLTexture(GL_TEXTURE_2D, 0);
         }
     }
 

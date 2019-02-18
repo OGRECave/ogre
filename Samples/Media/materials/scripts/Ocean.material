@@ -183,7 +183,7 @@ fragment_program GLSL/Ocean2FS glsl
 
 vertex_program GLSLES/Ocean2VS glsles
 {
-	source Ocean2GLSLES.vert
+	source Ocean2GLSL.vert
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -192,7 +192,7 @@ vertex_program GLSLES/Ocean2VS glsles
 
 fragment_program GLSLES/Ocean2FS glsles
 {
-   	source Ocean2GLSLES.frag
+    source Ocean2GLSL.frag
    	default_params
    	{
    		param_named NormalMap int 0
@@ -278,7 +278,7 @@ material SkyBox
 
 			texture_unit
 			{
-				cubic_texture morning.jpg separateUV
+				texture morning.jpg cubic
 				tex_address_mode clamp
 			}
 		}

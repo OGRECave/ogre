@@ -355,7 +355,7 @@ namespace OgreBites
             {
                 bool reset = false;
 
-                Ogre::ConfigOptionMap& options =
+                auto options =
                     mRoot->getRenderSystemByName(mRendererMenu->getSelectedItem())->getConfigOptions();
 
                 Ogre::NameValuePairList newOptions;
@@ -470,7 +470,7 @@ namespace OgreBites
                     mTrayMgr->destroyWidget(mRendererMenu->getTrayLocation(), 3);
                 }
 
-                Ogre::ConfigOptionMap& options = mRoot->getRenderSystemByName(menu->getSelectedItem())->getConfigOptions();
+                auto options = mRoot->getRenderSystemByName(menu->getSelectedItem())->getConfigOptions();
 
                 unsigned int i = 0;
 
@@ -515,9 +515,9 @@ namespace OgreBites
         virtual bool keyPressed(const KeyboardEvent& evt)
         {
             if (mTrayMgr->isDialogVisible()) return true;  // ignore keypresses when dialog is showing
-			
-			Keycode key = evt.keysym.sym;
-			
+
+            Keycode key = evt.keysym.sym;
+
             if (key == SDLK_ESCAPE)
             {
 #if __OGRE_WINRT_PHONE
@@ -580,8 +580,8 @@ namespace OgreBites
             {
                 // Make sure we use the window size as originally requested, NOT the
                 // current window size (which may have altered to fit desktop)
-                const Ogre::ConfigOptionMap::iterator opti =
-                    mRoot->getRenderSystem()->getConfigOptions().find("Video Mode");
+                auto opti = mRoot->getRenderSystem()->getConfigOptions().find(
+                    "Video Mode");
                 Ogre::StringVector vmopts = Ogre::StringUtil::split(opti->second.currentValue, " x");
                 unsigned int w = Ogre::StringConverter::parseUnsignedInt(vmopts[0]);
                 unsigned int h = Ogre::StringConverter::parseUnsignedInt(vmopts[1]);
@@ -651,7 +651,7 @@ namespace OgreBites
           | for thumbnail clicks, just because we can.
           -----------------------------------------------------------------------------*/
         virtual bool mousePressed(const MouseButtonEvent& evt)
-		{
+        {
             // FIXME: does SDL handle orientation for us already?
             //OIS::PointerState state = evt.state;
             //transformInputState(state);
@@ -883,7 +883,7 @@ namespace OgreBites
             createDummyScene();
 
             mTrayMgr->showLoadingBar(1, 0);
-            Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("General");
+            Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
             mTrayMgr->hideLoadingBar();
         }
 

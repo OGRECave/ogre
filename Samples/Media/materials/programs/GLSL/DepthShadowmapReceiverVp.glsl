@@ -1,5 +1,3 @@
-#version 120
-
 uniform mat4 world;
 uniform mat4 worldIT;
 uniform mat4 worldViewProj;

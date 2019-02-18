@@ -825,6 +825,10 @@ namespace Ogre
         // the final version"
         Real a = Math::Sqrt(((const Vector3*)this)->squaredLength() * dest.squaredLength());
         Real b = a + dest.dotProduct(*this);
+
+        if (Math::RealEqual(b, 2 * a) || a == 0)
+            return Quaternion::IDENTITY;
+
         Vector3 axis;
 
         if (b < (Real)1e-06 * a)

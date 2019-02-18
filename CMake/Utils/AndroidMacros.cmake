@@ -27,14 +27,13 @@ macro(copy_assets_to_android_proj)
     configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
     configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/assets/samples.cfg" @ONLY)
     
-    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/RTShaderLib" DESTINATION "${NDKOUT}/assets")
-    
+    file(COPY "${PROJECT_SOURCE_DIR}/Media" DESTINATION "${NDKOUT}/assets")
+
     file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/models" DESTINATION "${NDKOUT}/assets")
     file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/particle" DESTINATION "${NDKOUT}/assets")
     file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/thumbnails" DESTINATION "${NDKOUT}/assets")
     file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/packs" DESTINATION "${NDKOUT}/assets")
     file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/materials" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/HLMS" DESTINATION "${NDKOUT}/assets")
     file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/PBR" DESTINATION "${NDKOUT}/assets")
     file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/DeferredShadingMedia" DESTINATION "${NDKOUT}/assets")
 

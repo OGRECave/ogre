@@ -1,5 +1,3 @@
-#version 120
-
 uniform float inverseShadowmapSize;
 uniform float fixedDepthBias;
 uniform float gradientClamp;
@@ -61,10 +59,10 @@ void main()
 	
 	final *= 0.2;
 
-	gl_FragColor = vec4(vertexColour.xyz * final, 1);
+	gl_FragColor = vec4(vertexColour.xyz * final, 1.0);
 	
 #else
-	gl_FragColor = (finalCenterDepth > shadowUV.z) ? vertexColour : vec4(0,0,0,1);
+	gl_FragColor = (finalCenterDepth > shadowUV.z) ? vertexColour : vec4(0.0, 0.0, 0.0, 1.0);
 #endif
 }
 

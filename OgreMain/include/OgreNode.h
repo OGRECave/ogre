@@ -95,7 +95,7 @@ namespace Ogre {
         };
 
         /** Inner class for displaying debug renderable for Node. */
-        class DebugRenderable : public Renderable, public NodeAlloc
+        class _OgreExport DebugRenderable : public Renderable, public NodeAlloc
         {
         protected:
             Node* mParent;
@@ -448,6 +448,7 @@ namespace Ogre {
         @remarks
             This creates a child node with a given name, which allows you to look the node up from 
             the parent which holds this collection of nodes.
+        @param name Name of the Node to create
         @param translate
             Initial translation offset of child relative to parent
         @param rotate
@@ -477,21 +478,11 @@ namespace Ogre {
         */
         Node* getChild(const String& name) const;
 
-        /** Retrieves an iterator for efficiently looping through all children of this node.
-        @remarks
-            Using this is faster than repeatedly calling getChild if you want to go through
-            all (or most of) the children of this node.
-            Note that the returned iterator is only valid whilst no children are added or
-            removed from this node. Thus you should not store this returned iterator for
-            later use, nor should you add / remove children whilst iterating through it;
-            store up changes for later. Note that calling methods on returned items in 
-            the iterator IS allowed and does not invalidate the iterator.
-        @deprecated use getChildren()
-        */
-        ChildNodeIterator getChildIterator(void);
+        /// @deprecated use getChildren()
+        OGRE_DEPRECATED ChildNodeIterator getChildIterator(void);
 
-        /// @overload
-        ConstChildNodeIterator getChildIterator(void) const;
+        /// @deprecated use getChildren()
+        OGRE_DEPRECATED ConstChildNodeIterator getChildIterator(void) const;
 
         /// List of sub-nodes of this Node
         const ChildNodeMap& getChildren() const { return mChildren; }
@@ -639,7 +630,8 @@ namespace Ogre {
             parent, tell it anyway
         */
         virtual void needUpdate(bool forceParentUpdate = false);
-        /** Called by children to notify their parent that they need an update. 
+        /** Called by children to notify their parent that they need an update.
+        @param child The child Node to be updated
         @param forceParentUpdate Even if the node thinks it has already told it's
             parent, tell it anyway
         */

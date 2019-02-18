@@ -1,5 +1,5 @@
 #version 120
-varying vec2 uv;
+varying vec2 oUv0;
 
 uniform sampler2D sMRT1; // fragment normals
 uniform sampler2D sMRT2; // view space position, remember that we are looking down the negative Z axis!!!
@@ -18,10 +18,10 @@ void main()
     const int n = 4;
     const int numSamples = m * n;    
 
-    vec2 interleaveOffset = uv * cViewportSize.xy / interleaved;
+    vec2 interleaveOffset = oUv0 * cViewportSize.xy / interleaved;
     
-    vec3 fragmentPosition = texture2D(sMRT2, uv).xyz; // the current fragment in view space
-    vec3 fragmentNormal = texture2D(sMRT1, uv).xyz * vec3(1, -1, 1); // the fragment normal
+    vec3 fragmentPosition = texture2D(sMRT2, oUv0).xyz; // the current fragment in view space
+    vec3 fragmentNormal = texture2D(sMRT1, oUv0).xyz * vec3(1, -1, 1); // the fragment normal
 
     float rUV = 0; // radius of influence in screen space
     float r = 0; // radius of influence in world space
@@ -47,7 +47,7 @@ void main()
     float rUV2 = rUV /2;
     
     vec3 center = fragmentPosition + fragmentNormal * (r2);
-    vec2 centerUV = uv + (fragmentNormal * (rUV2)).xy;
+    vec2 centerUV = oUv0 + (fragmentNormal * (rUV2)).xy;
 
     float F = 0; // unoccluded Volume
     float V = 0; // occluded Volume

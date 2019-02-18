@@ -53,7 +53,7 @@ fragment_program Bloom2_ps20_glsl glsl
 //------------------------
 vertex_program Blur_vs_glsles glsles
 {
-	source Blur_vs.glsles
+	source Blur_vs.glsl
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -61,19 +61,19 @@ vertex_program Blur_vs_glsles glsles
 }
 fragment_program BlurV_ps20_glsles glsles
 {
-	source BlurV_ps20.glsles
+	source BlurV_ps20.glsl
 }
 fragment_program BlurH_ps20_glsles glsles
 {
-	source BlurH_ps20.glsles
+	source BlurH_ps20.glsl
 }
 fragment_program BrightBloom2_ps20_glsles glsles
 {
-	source BrightBloom2_ps20.glsles
+	source BrightBloom2_ps20.glsl
 }
 fragment_program Bloom2_ps20_glsles glsles
 {
-	source Bloom2_ps20.glsles
+	source Bloom2_ps20.glsl
 	default_params
 	{
 		param_named RT int 0
@@ -87,21 +87,21 @@ fragment_program Bloom2_ps20_glsles glsles
 //DirectX 9.0 HLSL Vertex Shader vs_1_1
 vertex_program Blur_vs11_hlsl hlsl
 {
-	source Blur_vs11.hlsl
-	target vs_1_1
+	source Blur_vs11.cg
+	target vs_1_1 vs_2_0
 	entry_point main
 }
 
 //DirectX 9.0 HLSL Pixel Shader ps_2_0
 fragment_program BlurV_ps20_hlsl hlsl
 {
-	source BlurV_ps20.hlsl
+	source BlurV_ps20.cg
 	target ps_2_0
 	entry_point main
 }
 fragment_program BlurH_ps20_hlsl hlsl
 {
-	source BlurH_ps20.hlsl
+	source BlurH_ps20.cg
 	target ps_2_0
 	entry_point main
 }
@@ -109,7 +109,7 @@ fragment_program BlurH_ps20_hlsl hlsl
 //DirectX 9.0 HLSL Pixel Shader ps_2_0
 fragment_program Bloom2_ps20_hlsl hlsl
 {
-	source Bloom2_ps20.hlsl
+	source Bloom2_ps20.cg
 	target ps_2_0
 	entry_point main
 }
@@ -117,49 +117,8 @@ fragment_program Bloom2_ps20_hlsl hlsl
 //DirectX 9.0 HLSL Pixel Shader ps_2_0
 fragment_program BrightBloom2_ps20_hlsl hlsl
 {
-	source BrightBloom2_ps20.hlsl
+	source BrightBloom2_ps20.cg
 	target ps_2_0
-	entry_point main
-}
-
-//------------------------
-//DirectX 11 HLSL Definitions
-//------------------------	
-//DirectX 11 HLSL Vertex Shader vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
-vertex_program Blur_vs40_hlsl hlsl
-{
-	source Blur_vs40.hlsl
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
-	entry_point main
-}
-
-//DirectX 11 HLSL Pixel Shader ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-fragment_program BlurV_ps40_hlsl hlsl
-{
-	source BlurV_ps40.hlsl
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-	entry_point main
-}
-fragment_program BlurH_ps40_hlsl hlsl
-{
-	source BlurH_ps40.hlsl
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-	entry_point main
-}
-
-//DirectX 11 HLSL Pixel Shader ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-fragment_program Bloom2_ps40_hlsl hlsl
-{
-	source Bloom2_ps40.hlsl
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-	entry_point main
-}
-
-//DirectX 11 HLSL Pixel Shader ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-fragment_program BrightBloom2_ps40_hlsl hlsl
-{
-	source BrightBloom2_ps40.hlsl
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point main
 }
 
@@ -210,7 +169,6 @@ fragment_program BrightBloom2_ps20_cg cg
 vertex_program Blur_vs unified
 {
 	delegate Blur_vs11_hlsl
-	delegate Blur_vs40_hlsl
 	delegate Blur_vs_glsl
 	delegate Blur_vs_glsles
 	delegate Blur_vs11_cg
@@ -219,7 +177,6 @@ vertex_program Blur_vs unified
 fragment_program Bloom2_ps unified
 {
 	delegate Bloom2_ps20_hlsl
-	delegate Bloom2_ps40_hlsl
 	delegate Bloom2_ps20_glsl
 	delegate Bloom2_ps20_glsles
 	delegate Bloom2_ps20_cg
@@ -227,7 +184,6 @@ fragment_program Bloom2_ps unified
 fragment_program BlurV_ps unified
 {
 	delegate BlurV_ps20_hlsl
-	delegate BlurV_ps40_hlsl
 	delegate BlurV_ps20_glsl
 	delegate BlurV_ps20_glsles
 	delegate BlurV_ps20_cg
@@ -235,7 +191,6 @@ fragment_program BlurV_ps unified
 fragment_program BlurH_ps unified
 {
 	delegate BlurH_ps20_hlsl
-	delegate BlurH_ps40_hlsl
 	delegate BlurH_ps20_glsl
 	delegate BlurH_ps20_glsles
 	delegate BlurH_ps20_cg
@@ -243,7 +198,6 @@ fragment_program BlurH_ps unified
 fragment_program BrightBloom2_ps unified
 {
 	delegate BrightBloom2_ps20_hlsl
-	delegate BrightBloom2_ps40_hlsl
 	delegate BrightBloom2_ps20_glsl
 	delegate BrightBloom2_ps20_glsles
 	delegate BrightBloom2_ps20_cg

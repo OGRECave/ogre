@@ -56,6 +56,7 @@ namespace Ogre {
     */
     class _OgreExport SceneNode : public Node
     {
+        friend class SceneManager;
     public:
         typedef std::vector<MovableObject*> ObjectMap;
         typedef VectorIterator<ObjectMap> ObjectIterator;
@@ -96,6 +97,13 @@ namespace Ogre {
         Vector3 mAutoTrackLocalDirection;
         /// Fixed axis to yaw around
         Vector3 mYawFixedAxis;
+
+        /** Index in the vector holding this node reference. Used for O(1) removals.
+
+            It is the parent (or our creator) the one that sets this value, not ourselves. Do NOT modify
+            it manually.
+        */
+        size_t mGlobalIndex;
 
         /// Whether to yaw around a fixed axis.
         bool mYawFixed : 1;

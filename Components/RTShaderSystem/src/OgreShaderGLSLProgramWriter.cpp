@@ -53,7 +53,7 @@ void GLSLProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_FLOAT2] = "vec2";
     mGpuConstTypeMap[GCT_FLOAT3] = "vec3";
     mGpuConstTypeMap[GCT_FLOAT4] = "vec4";
-    mGpuConstTypeMap[GCT_SAMPLER1D] = mIsGLSLES ? "sampler2D" : "sampler1D";
+    mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler1D";
     mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
     mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "sampler2DArray";
     mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
@@ -114,6 +114,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
         // Redefine texture functions to maintain reusability
         os << "#define texture1D texture" << std::endl;
         os << "#define texture2D texture" << std::endl;
+        os << "#define shadow2DProj textureProj" << std::endl;
         os << "#define texture3D texture" << std::endl;
         os << "#define textureCube texture" << std::endl;
         os << "#define texture2DLod textureLod" << std::endl;

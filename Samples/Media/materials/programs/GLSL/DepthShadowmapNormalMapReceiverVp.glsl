@@ -1,5 +1,3 @@
-#version 120
-
 uniform mat4 world;
 uniform mat4 worldViewProj;
 uniform mat4 texViewProj;
@@ -31,8 +29,10 @@ void main()
 	// already normalised) 
 	vec3 binormal = cross(normal, tangent); 
 
-	// Form a rotation matrix out of the vectors 
-	mat3 rotation = mat3(tangent, binormal, normal); 
+	// Form a rotation matrix out of the vectors, column major for glsl es
+	mat3 rotation = mat3(vec3(tangent[0], binormal[0], normal[0]),
+						vec3(tangent[1], binormal[1], normal[1]),
+						vec3(tangent[2], binormal[2], normal[2]));
     
 	// Transform the light vector according to this matrix 
 	tangentLightDir = normalize(rotation * lightDir); 

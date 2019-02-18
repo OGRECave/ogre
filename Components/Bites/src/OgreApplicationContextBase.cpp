@@ -87,23 +87,16 @@ bool ApplicationContextBase::initialiseRTShaderSystem()
     {
         mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-        // Core shader libs not found -> shader generating will fail.
-        if (mRTShaderLibPath.empty())
-            return false;
-#endif
-
         // Create and register the material manager listener if it doesn't exist yet.
         if (!mMaterialMgrListener) {
             mMaterialMgrListener = new SGTechniqueResolverListener(mShaderGenerator);
             Ogre::MaterialManager::getSingleton().addListener(mMaterialMgrListener);
         }
-    }
 
-    return true;
-#else
-    return false;
+        return true;
+    }
 #endif
+    return false;
 }
 
 void ApplicationContextBase::setRTSSWriteShadersToDisk(bool write)
@@ -116,12 +109,18 @@ void ApplicationContextBase::setRTSSWriteShadersToDisk(bool write)
 
     // Set shader cache path.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    mShaderGenerator->setShaderCachePath(mFSLayer->getWritablePath(""));
+    auto subdir = "";
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    mShaderGenerator->setShaderCachePath(mFSLayer->getWritablePath("org.ogre3d.RTShaderCache/"));
+    auto subdir = "org.ogre3d.RTShaderCache/";
 #else
-    mShaderGenerator->setShaderCachePath(mRTShaderLibPath+"/cache/");
+    auto subdir = "RTShaderCache";
 #endif
+    auto path = mFSLayer->getWritablePath(subdir);
+    if (!Ogre::FileSystemLayer::fileExists(path))
+    {
+        Ogre::FileSystemLayer::createDirectory(path);
+    }
+    mShaderGenerator->setShaderCachePath(path);
 #endif
 }
 
@@ -274,39 +273,29 @@ bool ApplicationContextBase::frameRenderingQueued(const Ogre::FrameEvent& evt)
     return true;
 }
 
-void ApplicationContextBase::parseWindowOptions(uint32_t& w, uint32_t& h, Ogre::NameValuePairList& miscParams)
+NativeWindowPair ApplicationContextBase::createWindow(const Ogre::String& name, Ogre::uint32 w, Ogre::uint32 h, Ogre::NameValuePairList miscParams)
 {
-    const auto& ropts = mRoot->getRenderSystem()->getConfigOptions();
-
-    if(w == 0 && h == 0)
-    {
-        std::istringstream mode(ropts.at("Video Mode").currentValue);
-        Ogre::String token;
-        mode >> w; // width
-        mode >> token; // 'x' as seperator between width and height
-        mode >> h; // height
-    }
-
-    if(miscParams.empty())
-    {
-        miscParams["FSAA"] = ropts.at("FSAA").currentValue;
-        miscParams["vsync"] = ropts.at("VSync").currentValue;
-        miscParams["gamma"] = ropts.at("sRGB Gamma Conversion").currentValue;
-    }
+    NativeWindowPair ret = {NULL, NULL};
 
     if(!mWindows.empty())
     {
         // additional windows should reuse the context
         miscParams["currentGLContext"] = "true";
     }
-}
 
-NativeWindowPair ApplicationContextBase::createWindow(const Ogre::String& name, Ogre::uint32 w, Ogre::uint32 h, Ogre::NameValuePairList miscParams)
-{
-    NativeWindowPair ret = {NULL, NULL};
-    parseWindowOptions(w, h, miscParams);
+    auto p = mRoot->getRenderSystem()->getRenderWindowDescription();
+    miscParams.insert(p.miscParams.begin(), p.miscParams.end());
+    p.miscParams = miscParams;
+    p.name = name;
 
-    ret.render = mRoot->createRenderWindow(name, w, h, false, &miscParams);
+    if(w > 0 && h > 0)
+    {
+        p.width = w;
+        p.height= h;
+    }
+
+    ret.render = mRoot->createRenderWindow(p);
+
     mWindows.push_back(ret);
 
     WindowEventUtilities::_addRenderWindow(ret.render);
@@ -365,6 +354,7 @@ Ogre::String ApplicationContextBase::getDefaultMediaDir()
 
 void ApplicationContextBase::locateResources()
 {
+    auto& rgm = Ogre::ResourceGroupManager::getSingleton();
     // load resource paths from config file
     Ogre::ConfigFile cf;
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -378,9 +368,7 @@ void ApplicationContextBase::locateResources()
     }
     else
     {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-            getDefaultMediaDir(), "FileSystem",
-            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        rgm.addResourceLocation(getDefaultMediaDir(), "FileSystem", Ogre::RGN_DEFAULT);
     }
 
 #endif
@@ -399,12 +387,27 @@ void ApplicationContextBase::locateResources()
             type = i->first;
             arch = Ogre::FileSystemLayer::resolveBundlePath(i->second);
 
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
+            rgm.addResourceLocation(arch, type, sec);
         }
     }
 
+    if(rgm.getResourceLocationList(Ogre::RGN_INTERNAL).empty())
+    {
+        const auto& mediaDir = getDefaultMediaDir();
+        // add default locations
+        rgm.addResourceLocation(mediaDir + "/ShadowVolume", "FileSystem", Ogre::RGN_INTERNAL);
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+        rgm.addResourceLocation(mediaDir + "/Terrain", "FileSystem", Ogre::RGN_INTERNAL);
+#endif
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        rgm.addResourceLocation(mediaDir + "/RTShaderLib/materials", "FileSystem", Ogre::RGN_INTERNAL);
+        rgm.addResourceLocation(mediaDir + "/RTShaderLib/GLSL", "FileSystem", Ogre::RGN_INTERNAL);
+        rgm.addResourceLocation(mediaDir + "/RTShaderLib/HLSL_Cg", "FileSystem", Ogre::RGN_INTERNAL);
+#endif
+    }
+
     sec = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-    const Ogre::ResourceGroupManager::LocationList genLocs = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(sec);
+    const Ogre::ResourceGroupManager::LocationList genLocs = rgm.getResourceLocationList(sec);
 
     OgreAssert(!genLocs.empty(), ("Resource Group '"+sec+"' must contain at least one entry").c_str());
 
@@ -436,60 +439,32 @@ void ApplicationContextBase::locateResources()
     // Add locations for supported shader languages
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
     {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSLES", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/GLSLES", type, sec);
     }
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
     {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL120", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/GLSL120", type, sec);
 
         if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
         {
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL150", type, sec);
+            rgm.addResourceLocation(arch + "/materials/programs/GLSL150", type, sec);
         }
-        else
-        {
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
-        }
-
         if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl400"))
         {
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/GLSL400", type, sec);
+            rgm.addResourceLocation(arch + "/materials/programs/GLSL400", type, sec);
         }
     }
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
     {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/HLSL", type, sec);
     }
 
     if(hasCgPlugin)
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/Cg", type, sec);
+        rgm.addResourceLocation(arch + "/materials/programs/Cg", type, sec);
     if (use_HLSL_Cg_shared)
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL_Cg", type, sec);
-
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-    mRTShaderLibPath = arch + "/RTShaderLib";
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/materials", type, sec);
-
-    if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
-    {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/GLSL", type, sec);
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/GLSLES", type, sec);
-    }
-    else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
-    {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/GLSL", type, sec);
-    }
-    else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
-    {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/HLSL", type, sec);
-    }
-
-    if(hasCgPlugin)
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/Cg", type, sec);
-    if (use_HLSL_Cg_shared)
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(mRTShaderLibPath + "/HLSL_Cg", type, sec);
-
-#endif /* OGRE_BUILD_COMPONENT_RTSHADERSYSTEM */
+        rgm.addResourceLocation(arch + "/materials/programs/HLSL_Cg", type, sec);
 }
 
 void ApplicationContextBase::loadResources()

@@ -137,7 +137,7 @@ namespace Ogre
         operation.
         @par
         These are passed as strings for portability, but
-        grouped into a structure (_ConfigOption) which includes
+        grouped into a structure (ConfigOption) which includes
         both options and current value.
         @par
         Note that the settings returned from this call are
@@ -151,7 +151,7 @@ namespace Ogre
         A 'map' of options, i.e. a list of options which is also
         indexed by option name.
         */
-        ConfigOptionMap& getConfigOptions() { return mOptions; }
+        const ConfigOptionMap& getConfigOptions() const { return mOptions; }
 
         /** Sets an option for this API
         @remarks
@@ -174,6 +174,10 @@ namespace Ogre
         */
         virtual void setConfigOption(const String &name, const String &value) = 0;
 
+        /** get a RenderWindowDescription from the current ConfigOptionMap
+         */
+        RenderWindowDescription getRenderWindowDescription() const;
+
         /** Create an object for performing hardware occlusion queries. 
         */
         virtual HardwareOcclusionQuery* createHardwareOcclusionQuery(void) = 0;
@@ -189,20 +193,11 @@ namespace Ogre
         virtual String validateConfigOptions(void) = 0;
 
         /** Start up the renderer using the settings selected (Or the defaults if none have been selected).
-        @remarks
+
         Called by Root::setRenderSystem. Shouldn't really be called
         directly, although  this can be done if the app wants to.
-        @param
-        autoCreateWindow If true, creates a render window
-        automatically, based on settings chosen so far. This saves
-        an extra call to _createRenderWindow
-        for the main render window.
-        @param
-        windowTitle Sets the app window title
-        @return
-        A pointer to the automatically created window, if requested, otherwise null.
         */
-        virtual RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
+        virtual void _initialise();
 
         /**
         Returns whether under the current render system buffers marked as TU_STATIC can be locked for update

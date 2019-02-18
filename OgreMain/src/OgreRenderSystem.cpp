@@ -94,6 +94,79 @@ namespace Ogre {
         // Current capabilities managed externally
         mCurrentCapabilities = 0;
     }
+
+    RenderWindowDescription RenderSystem::getRenderWindowDescription() const
+    {
+        RenderWindowDescription ret;
+        auto& miscParams = ret.miscParams;
+
+        auto end = mOptions.end();
+
+        auto opt = mOptions.find("Full Screen");
+        if (opt == end)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find 'Full Screen' option");
+
+        ret.useFullScreen = StringConverter::parseBool(opt->second.currentValue);
+
+        opt = mOptions.find("Video Mode");
+        if (opt == end)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find 'Video Mode' option");
+
+        StringStream mode(opt->second.currentValue);
+        String token;
+
+        mode >> ret.width;
+        mode >> token; // 'x' as seperator between width and height
+        mode >> ret.height;
+
+        // backend specific options. Presence determined by getConfigOptions
+        mode >> token; // '@' as seperator between bpp on D3D
+        if(!mode.eof())
+        {
+            uint32 bpp;
+            mode >> bpp;
+            miscParams.emplace("colourDepth", std::to_string(bpp));
+        }
+
+        if((opt = mOptions.find("FSAA")) != end)
+        {
+            StringStream fsaaMode(opt->second.currentValue);
+            uint32_t fsaa;
+            fsaaMode >> fsaa;
+            miscParams.emplace("FSAA", std::to_string(fsaa));
+
+            // D3D specific
+            String hint;
+            fsaaMode >> hint;
+            if(!fsaaMode.eof())
+                miscParams.emplace("FSAAHint", hint);
+        }
+
+        if((opt = mOptions.find("VSync")) != end)
+            miscParams.emplace("vsync", opt->second.currentValue);
+
+        if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
+            miscParams.emplace("gamma", opt->second.currentValue);
+
+        if((opt = mOptions.find("Colour Depth")) != end)
+            miscParams.emplace("colourDepth", opt->second.currentValue);
+
+        if((opt = mOptions.find("VSync Interval")) != end)
+            miscParams.emplace("vsyncInterval", opt->second.currentValue);
+
+        if((opt = mOptions.find("Display Frequency")) != end)
+            miscParams.emplace("displayFrequency", opt->second.currentValue);
+
+        if((opt = mOptions.find("Content Scaling Factor")) != end)
+            miscParams["contentScalingFactor"] = opt->second.currentValue;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        if((opt = mOptions.find("Stereo Mode")) != end)
+            miscParams["stereoMode"] = opt->second.currentValue;
+#endif
+        return ret;
+    }
+
     //-----------------------------------------------------------------------
     void RenderSystem::_initRenderTargets(void)
     {
@@ -135,7 +208,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    RenderWindow* RenderSystem::_initialise(bool autoCreateWindow, const String& windowTitle)
+    void RenderSystem::_initialise()
     {
         // Have I been registered by call to Root::setRenderSystem?
         /** Don't do this anymore, just allow via Root
@@ -156,8 +229,6 @@ namespace Ogre {
         mTessellationHullProgramBound = false;
         mTessellationDomainProgramBound = false;
         mComputeProgramBound = false;
-
-        return 0;
     }
 
     //---------------------------------------------------------------------------------------------

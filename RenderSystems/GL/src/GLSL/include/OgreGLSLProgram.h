@@ -72,6 +72,49 @@ namespace Ogre {
 
         /// compile source into shader object
         bool compile( bool checkErrors = true);
+
+        /** Returns the operation type that this geometry program expects to
+            receive as input
+        */
+        RenderOperation::OperationType getInputOperationType(void) const
+        { return mInputOperationType; }
+        /** Returns the operation type that this geometry program will emit
+        */
+        RenderOperation::OperationType getOutputOperationType(void) const
+        { return mOutputOperationType; }
+        /** Returns the maximum number of vertices that this geometry program can
+            output in a single run
+        */
+        int getMaxOutputVertices(void) const { return mMaxOutputVertices; }
+
+        /** Sets the operation type that this geometry program expects to receive
+        */
+        void setInputOperationType(RenderOperation::OperationType operationType)
+        { mInputOperationType = operationType; }
+        /** Set the operation type that this geometry program will emit
+        */
+        void setOutputOperationType(RenderOperation::OperationType operationType)
+        {
+            switch (operationType)
+            {
+            case RenderOperation::OT_POINT_LIST:
+            case RenderOperation::OT_LINE_STRIP:
+            case RenderOperation::OT_TRIANGLE_STRIP:
+                break;
+            default:
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "Geometry shader output operation type can only be point list,"
+                            "line strip or triangle strip");
+            }
+
+            mOutputOperationType = operationType;
+        }
+        /** Set the maximum number of vertices that a single run of this geometry program
+            can emit.
+        */
+        void setMaxOutputVertices(int maxOutputVertices)
+        { mMaxOutputVertices = maxOutputVertices; }
+
     protected:
         /** Internal method for creating a dummy low-level program for this
         high-level program. GLSL does not give access to the low level implementation of the
@@ -86,6 +129,11 @@ namespace Ogre {
         void populateParameterNames(GpuProgramParametersSharedPtr params);
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() const;
+
+        // legacy GL_EXT_geometry_shader4 functionality
+        RenderOperation::OperationType mInputOperationType;
+        RenderOperation::OperationType mOutputOperationType;
+        int mMaxOutputVertices;
 
     private:
         /// GL handle for shader object

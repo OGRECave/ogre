@@ -170,14 +170,12 @@ vertex_program Examples/BumpMapVPCg cg
 
 vertex_program Examples/BumpMapVPGLSLES glsles
 {
-	source Example_BumpMappingVp.glsles
-	profiles glsles
+	source Example_BumpMappingVp.glsl
 }
 
 vertex_program Examples/BumpMapVPGLSL glsl
 {
 	source Example_BumpMappingVp.glsl
-	syntax glsl
 }
 
 vertex_program Examples/BumpMapVP unified
@@ -199,7 +197,7 @@ vertex_program Examples/BumpMapVPTangentParityCg cg
 // Bump map vertex program, with tangent parity support for this is required
 vertex_program Examples/BumpMapVPTangentParityGLSLES glsles
 {
-	source BumpMapVPTangentParity.glsles
+	source BumpMapVPTangentParity.glsl
 }
 
 vertex_program Examples/BumpMapVPTangentParityGLSL glsl
@@ -225,8 +223,7 @@ fragment_program Examples/BumpMapFPCg cg
 
 fragment_program Examples/BumpMapFPGLSLES glsles
 {
-	source Example_BumpMappingFp.glsles
-	profiles glsles
+	source Example_BumpMappingFp.glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -237,7 +234,6 @@ fragment_program Examples/BumpMapFPGLSLES glsles
 fragment_program Examples/BumpMapFPGLSL glsl
 {
 	source Example_BumpMappingFp.glsl
-	syntax glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -263,14 +259,12 @@ vertex_program Examples/BumpMapVPShadowRcvCg cg
 // Bump map vertex program shadow receiver
 vertex_program Examples/BumpMapVPShadowRcvGLSLES glsles
 {
-	source Example_BumpMappingShadowRcvVp.glsles
-	profiles glsles
+	source Example_BumpMappingShadowRcvVp.glsl
 }
 
 vertex_program Examples/BumpMapVPShadowRcvGLSL glsl
 {
 	source Example_BumpMappingShadowRcvVp.glsl
-	syntax glsl
 }
 
 vertex_program Examples/BumpMapVPShadowRcv unified
@@ -289,10 +283,9 @@ fragment_program Examples/BumpMapFPShadowRcvCg cg
 }
 
 // Bump map fragment program shadow receiver, support for this is optional
-fragment_program Examples/BumpMapFPShadowRcvGLSLES glsles
+fragment_program Examples/BumpMapFPShadowRcvGLSLES glsl
 {
-	source Example_BumpMappingShadowRcvFp.glsles
-	profiles glsles
+	source Example_BumpMappingShadowRcvFp.glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -304,7 +297,6 @@ fragment_program Examples/BumpMapFPShadowRcvGLSLES glsles
 fragment_program Examples/BumpMapFPShadowRcvGLSL glsl
 {
 	source Example_BumpMappingShadowRcvFp.glsl
-	syntax glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -331,14 +323,12 @@ vertex_program Examples/BumpMapVPSpecularCg cg
 // Bump map with specular vertex program, support for this is required
 vertex_program Examples/BumpMapVPSpecularGLSLES glsles
 {
-	source Example_BumpMappingSpecularVp.glsles
-	profiles glsles
+	source Example_BumpMappingSpecularVp.glsl
 }
 
 vertex_program Examples/BumpMapVPSpecularGLSL glsl
 {
 	source Example_BumpMappingSpecularVp.glsl
-	syntax glsl
 }
 
 vertex_program Examples/BumpMapVPSpecular unified
@@ -359,8 +349,7 @@ fragment_program Examples/BumpMapFPSpecularCg cg
 // Bump map fragment program, support for this is optional
 fragment_program Examples/BumpMapFPSpecularGLSLES glsles
 {
-	source Example_BumpMappingSpecularFp.glsles
-	profiles glsles
+	source Example_BumpMappingSpecularFp.glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -371,7 +360,6 @@ fragment_program Examples/BumpMapFPSpecularGLSLES glsles
 fragment_program Examples/BumpMapFPSpecularGLSL glsl
 {
 	source Example_BumpMappingSpecularFp.glsl
-	syntax glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -584,13 +572,11 @@ vertex_program Examples/FresnelRefractReflectVPCg cg
 }
 vertex_program Examples/FresnelRefractReflectVPGLSLES glsles
 {
-	source Example_FresnelVp.glsles
-	profiles glsles
+	source Example_FresnelVp.glsl
 }
 vertex_program Examples/FresnelRefractReflectVPGLSL glsl
 {
 	source Example_FresnelVp.glsl
-	syntax glsl
 }
 
 vertex_program Examples/FresnelRefractReflectVP unified
@@ -610,8 +596,7 @@ fragment_program Examples/FresnelRefractReflectFPCg cg
 
 fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
 {
-	source Example_FresnelFp.glsles
-	profiles glsles
+	source Example_FresnelFp.glsl
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -624,7 +609,6 @@ fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
 fragment_program Examples/FresnelRefractReflectFPGLSL glsl
 {
 	source Example_FresnelFp.glsl
-	syntax glsl
 	default_params
 	{
 		// assign samplers as required by GLSL

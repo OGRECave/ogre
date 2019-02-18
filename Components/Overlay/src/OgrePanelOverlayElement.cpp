@@ -131,12 +131,14 @@ namespace Ogre {
             return;
 
         VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;
-        bind->unsetBinding(POSITION_BINDING);
+        if (bind->isBufferBound(POSITION_BINDING))
+            bind->unsetBinding(POSITION_BINDING);
 
         // Remove all texcoord element declarations
         if(mNumTexCoordsInBuffer > 0)
         {
-            bind->unsetBinding(TEXCOORD_BINDING);
+            if (bind->isBufferBound (TEXCOORD_BINDING))
+                bind->unsetBinding(TEXCOORD_BINDING);
 
             VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;
             for(size_t i = mNumTexCoordsInBuffer; i > 0; --i)

@@ -558,15 +558,10 @@ namespace Ogre
 
         if(!nodes && ResourceGroupManager::getSingletonPtr())
         {
-            DataStreamPtr stream;
-            try
-            {
-                stream = ResourceGroupManager::getSingleton().openResource(name, mGroup);
-            }
-            catch (FileNotFoundException&)
-            {
+            auto stream = ResourceGroupManager::getSingleton().openResource(name, mGroup, NULL, false);
+
+            if (!stream)
                 return retval;
-            }
 
             nodes = ScriptParser::parse(ScriptLexer::tokenize(stream->getAsString(), name));
         }

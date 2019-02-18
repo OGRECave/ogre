@@ -669,7 +669,7 @@ Format: polygon\_mode\_overrideable &lt;override&gt;
 
 ## fog\_override
 
-Tells the pass whether it should override the scene fog settings, and enforce it’s own. Very useful for things that you don’t want to be affected by fog when the rest of the scene is fogged, or vice versa. Note that this only affects fixed-function fog - the original scene fog parameters are still sent to shaders which use the fog\_params parameter binding (this allows you to turn off fixed function fog and calculate it in the shader instead; if you want to disable shader fog you can do that through shader parameters anyway). 
+Tells the pass whether it should override the scene fog settings, and enforce it’s own. Very useful for things that you don’t want to be affected by fog when the rest of the scene is fogged, or vice versa.
 @par
 Format: fog\_override &lt;override?&gt; \[&lt;type&gt; &lt;colour&gt; &lt;density&gt; &lt;start&gt; &lt;end&gt;\]
 @par
@@ -1039,9 +1039,12 @@ Sets the images used in a cubic texture, i.e. one made up of 6 individual images
 @par
 Format1 (short): cubic\_texture &lt;base\_name&gt; &lt;combinedUVW|separateUV&gt;
 
+@deprecated use the format '`texture <basename> cubic`' instead
+
 The base\_name in this format is something like ’skybox.jpg’, and the system will expect you to provide skybox\_fr.jpg, skybox\_bk.jpg, skybox\_up.jpg, skybox\_dn.jpg, skybox\_lf.jpg, and skybox\_rt.jpg for the individual faces.
+
 @par
-Format2 (long): cubic\_texture &lt;front&gt; &lt;back&gt; &lt;left&gt; &lt;right&gt; &lt;up&gt; &lt;down&gt; separateUV
+Format2 (long): cubic\_texture &lt;front&gt; &lt;back&gt; &lt;left&gt; &lt;right&gt; &lt;up&gt; &lt;down&gt; &lt;combinedUVW|separateUV&gt;
 
 In this case each face is specified explicitly, incase you don’t want to conform to the image naming standards above. You can only use this for the separateUV version since the combinedUVW version requires a single texture name to be assigned to the combined 3D texture (see below).
 
@@ -1050,20 +1053,16 @@ In both cases the final parameter means the following:
 <dl compact="compact">
 <dt>separateUV</dt> <dd>
 
-The 6 textures are kept separate but are all referenced by this single texture layer. One texture at a time is active (they are actually stored as 6 frames), and they are addressed using standard 2D UV coordinates.
+@deprecated Use real cubic textures due to hardware support
 
-@note This type is only useful with skyboxes where only one face is rendered at a time. For everything else real cubic textures are better due to hardware support.
+The 6 textures are kept separate but are all referenced by this single texture layer. One texture at a time is active (they are actually stored as 6 frames), and they are addressed using standard 2D UV coordinates.
 </dd>
 <dt>combinedUVW</dt> <dd>
 
 The 6 textures are combined into a single ’cubic’ texture map which is then addressed using 3D texture coordinates.
 
-@deprecated use the format `texture <basename> cubic` instead
-
 </dd>
 </dl> <br>
-@par
-Default: none
 
 <a name="binding_005ftype"></a><a name="binding_005ftype-1"></a>
 
@@ -1431,24 +1430,24 @@ Default: filtering linear linear point
 
 Each parameter can be one of Ogre::FilterOptions without the `FO_` prefix. E.g. `FO_LINEAR` becomes `linear`.
 
-@copydetails Ogre::TextureUnitState::setTextureFiltering(FilterOptions,FilterOptions,FilterOptions)
+@copydetails Ogre::Sampler::setFiltering(FilterOptions,FilterOptions,FilterOptions)
 
 <a name="max_005fanisotropy"></a><a name="max_005fanisotropy-1"></a>
 
 ## max\_anisotropy
 
-@copybrief Ogre::TextureUnitState::setTextureAnisotropy
+@copybrief Ogre::Sampler::setAnisotropy
 
 @par
 Format: max\_anisotropy &lt;maxAniso&gt;<br> Default: max\_anisotropy 1
 
-@copydetails Ogre::TextureUnitState::setTextureAnisotropy
+@copydetails Ogre::Sampler::setAnisotropy
 
 <a name="mipmap_005fbias"></a><a name="mipmap_005fbias-1"></a>
 
 ## mipmap\_bias
 
-@copydetails Ogre::TextureUnitState::setTextureMipmapBias
+@copydetails Ogre::Sampler::setMipmapBias
 
 @par
 Format: mipmap\_bias &lt;value&gt;<br> Default: mipmap\_bias 0

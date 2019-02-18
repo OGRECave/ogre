@@ -400,7 +400,7 @@ namespace Ogre
 		}
 		else if (s.textureType == TEX_TYPE_CUBE_MAP)
 		{
-			s.textureUnitState->setCubicTexture(&s.tex, true);
+			s.textureUnitState->setTexture(s.tex);
 			if (mFragmentDatablock.getLanguage() != "hlsl")
 			{
 				s.textureUnitState->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);

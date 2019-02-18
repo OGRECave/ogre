@@ -4,7 +4,8 @@
 Ogre uses CMake as its build system. It is recommended that you use it in your project as well.  
 Then all you need is to add the following lines to your project
 @snippet Samples/Tutorials/CMakeLists.txt discover_ogre
-These settings include all available components and third party libraries OGRE depends on (e.g. boost) - nothing more to do.
+These settings already include any third party libraries the Components depends on (e.g. SDL) - nothing more to do.
+Alternatively use `${OGRE_LIBRARIES}` to link against all available OGRE components.
 
 If you installed OGRE in a non-standard path, you will have to set `OGRE_DIR` to the location of `OGREConfig.cmake` so `find_package` can figure out the rest.
 
@@ -53,3 +54,8 @@ For instance to render into an existing Qt Window.
 @see Ogre::Root::renderOneFrame
 @see Ogre::RenderSystem::_createRenderWindow
 @see Ogre::RenderSystem::preExtraThreadsStarted
+
+# Running your App
+
+On Linux you will typically install OGRE into `/usr/local/` which is automatically searched by the linker, so nothing more to do.
+On Windows however, you will have to either add the `sdk/bin` folder to `PATH` or copy your executable into `sdk/bin`.

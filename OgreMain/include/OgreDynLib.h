@@ -42,7 +42,7 @@ typedef struct HINSTANCE__* hInstance;
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #    define DYNLIB_HANDLE hInstance
-#    define DYNLIB_LOAD( a ) LoadPackagedLibrary( UTFString(a).asWStr_c_str(), 0 )
+#    define DYNLIB_LOAD( a ) LoadPackagedLibrary( stringToWstring(a).c_str(), 0 )
 #    define DYNLIB_GETSYM( a, b ) GetProcAddress( a, b )
 #    define DYNLIB_UNLOAD( a ) !FreeLibrary( a )
 

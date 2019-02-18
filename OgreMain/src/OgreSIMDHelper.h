@@ -65,15 +65,37 @@ THE SOFTWARE.
 // NOTE: Should be sync with __OGRE_HAVE_SSE macro.
 //
 
-#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86
-
-// GCC version 4.0 upwards should be reliable for official SSE now,
-// so no longer define SSE macros ourselves
-// We don't support gcc 3.x anymore anyway, although that had SSE it was a bit flaky?
+#if __OGRE_HAVE_SSE
 #include <xmmintrin.h>
+#elif __OGRE_HAVE_NEON
+#include "SSE2NEON.h"
 
+// some conversions custom to OGRE
+#define _mm_cmpnle_ps _mm_cmpgt_ps
 
-#endif // OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86
+// self written
+OGRE_FORCE_INLINE __m128 _mm_loadh_pi( __m128 a , __m64 const * p )
+{
+	return vcombine_f32(vget_low_f32(a), vld1_f32((float32_t const *)p));
+}
+// self written
+OGRE_FORCE_INLINE void _mm_storeh_pi( __m64 * p , __m128 a )
+{
+	vst1_f32((float32_t *)p, vget_high_f32((float32x4_t)a));
+}
+
+OGRE_FORCE_INLINE __m128 _mm_mul_ss(__m128 a, __m128 b)
+{
+    a[0] *= b[0];
+    return a;
+}
+
+OGRE_FORCE_INLINE __m128 _mm_sub_ss(__m128 a, __m128 b)
+{
+    a[0] -= b[0];
+    return a;
+}
+#endif
 
 
 
@@ -90,23 +112,10 @@ namespace Ogre {
     *  @{
     */
 
-#if __OGRE_HAVE_SSE
+#if __OGRE_HAVE_SSE || __OGRE_HAVE_NEON
 
-/** Macro __MM_RSQRT_PS calculate square root, which should be used for
-    normalise normals only. It might be use NewtonRaphson reciprocal square
-    root for high precision, or use SSE rsqrt instruction directly, based
-    on profile to pick up perfect one.
-@note:
-    Prefer to never use NewtonRaphson reciprocal square root at all, since
-    speed test indicate performance loss 10% for unrolled version, and loss
-    %25 for general version (P4 3.0G HT). A slight loss in precision not
-    that important in case of normalise normals.
-*/
-#if 1
 #define __MM_RSQRT_PS(x)    _mm_rsqrt_ps(x)
-#else
-#define __MM_RSQRT_PS(x)    __mm_rsqrt_nr_ps(x) // Implemented below
-#endif
+
 
 /** Performing the transpose of a 4x4 matrix of single precision floating
     point values.
@@ -275,18 +284,6 @@ namespace Ogre {
     static OGRE_FORCE_INLINE bool _isAlignedForSSE(const void *p)
     {
         return (((size_t)p) & 15) == 0;
-    }
-
-    /** Calculate NewtonRaphson Reciprocal Square Root with formula:
-            0.5 * rsqrt(x) * (3 - x * rsqrt(x)^2)
-    */
-    static OGRE_FORCE_INLINE __m128 __mm_rsqrt_nr_ps(const __m128& x)
-    {
-        static const __m128 v0pt5 = { 0.5f, 0.5f, 0.5f, 0.5f };
-        static const __m128 v3pt0 = { 3.0f, 3.0f, 3.0f, 3.0f };
-        __m128 t = _mm_rsqrt_ps(x);
-        return _mm_mul_ps(_mm_mul_ps(v0pt5, t),
-            _mm_sub_ps(v3pt0, _mm_mul_ps(_mm_mul_ps(x, t), t)));
     }
 
 // Macro to check the stack aligned for SSE

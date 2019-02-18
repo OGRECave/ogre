@@ -37,11 +37,11 @@ namespace Ogre {
         : Node(name)
         , mCreator(creator)
         , mAutoTrackTarget(0)
+        , mGlobalIndex(-1)
         , mYawFixed(false)
         , mIsInSceneGraph(false)
         , mShowBoundingBox(false)
         , mHideBoundingBox(false)
-
     {
         needUpdate();
     }

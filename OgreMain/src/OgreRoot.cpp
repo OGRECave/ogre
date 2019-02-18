@@ -145,9 +145,10 @@ namespace Ogre {
         // never process responses in main thread for longer than 10ms by default
         defaultQ->setResponseProcessingTimeLimit(10);
         // match threads to hardware
-        unsigned threadCount = OGRE_THREAD_HARDWARE_CONCURRENCY;
-        if (!threadCount)
-            threadCount = 1;
+        int threadCount = OGRE_THREAD_HARDWARE_CONCURRENCY;
+        // but clamp it at 2 by default - we dont scale much beyond that currently
+        // yet it helps on android where it needlessly burns CPU
+        threadCount = Math::Clamp(threadCount, 1, 2);
         defaultQ->setWorkerThreadCount(threadCount);
 
         // only allow workers to access rendersystem if threadsupport is 1
@@ -256,8 +257,6 @@ namespace Ogre {
 		mCompositorManager.reset(); // needs rendersystem
         mParticleManager.reset(); // may use plugins
         unloadPlugins();
-
-        Pass::processPendingPassUpdates(); // make sure passes are cleaned
 
         mAutoWindow = 0;
 
@@ -593,13 +592,13 @@ namespace Ogre {
 
 
         PlatformInformation::log(LogManager::getSingleton().getDefaultLog());
-        mAutoWindow =  mActiveRenderer->_initialise(autoCreateWindow, windowTitle);
+        mActiveRenderer->_initialise();
 
-
-        if (autoCreateWindow && !mFirstTimePostWindowInit)
+        if (autoCreateWindow)
         {
-            oneTimePostWindowInit();
-            mAutoWindow->_setPrimary();
+            auto desc = mActiveRenderer->getRenderWindowDescription();
+            desc.name = windowTitle;
+            mAutoWindow = createRenderWindow(desc);
         }
 
         // Initialise timer
@@ -1066,13 +1065,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     DataStreamPtr Root::openFileStream(const String& filename, const String& groupName)
     {
-        try
-        {
-            return ResourceGroupManager::getSingleton().openResource(filename, groupName);
-        }
-        catch (FileNotFoundException&)
-        {
-        }
+        auto ret = ResourceGroupManager::getSingleton().openResource(filename, groupName, NULL, false);
+        if(ret)
+            return ret;
 
         // try direct
         std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);

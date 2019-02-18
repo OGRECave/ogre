@@ -111,6 +111,9 @@ if(UNIX)
   if (EMSCRIPTEN)
       set(OGRE_WARNING_FLAGS "${OGRE_WARNING_FLAGS} -Wno-warn-absolute-paths")
   endif ()
+  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(OGRE_WARNING_FLAGS "${OGRE_WARNING_FLAGS} -Wno-inconsistent-missing-override")
+  endif()
   set(CMAKE_CXX_FLAGS "${OGRE_WARNING_FLAGS} ${CMAKE_CXX_FLAGS}")
 endif ()
 if (MSVC)
@@ -499,9 +502,10 @@ endif ()
 # Install documentation
 add_subdirectory(Docs)
 
-# Install media files
+# Install sample media files
+install(DIRECTORY Media/ShadowVolume DESTINATION "${OGRE_MEDIA_PATH}/")
 if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
-  add_subdirectory(Samples/Media)
+  install(DIRECTORY Samples/Media/ DESTINATION ${OGRE_MEDIA_PATH})
 endif ()
 
 # Install CMake modules

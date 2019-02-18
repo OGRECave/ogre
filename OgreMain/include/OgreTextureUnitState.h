@@ -365,67 +365,30 @@ namespace Ogre {
         */
         void setTexture( const TexturePtr& texPtr);
 
-        /** Sets this texture layer to use a combination of 6 texture maps, each one relating to a face of a cube.
-
-            Cubic textures are made up of 6 separate texture images. Each one of these is an orthogonal view of the
-            world with a FOV of 90 degrees and an aspect ratio of 1:1. You can generate these from 3D Studio by
-            rendering a scene to a reflection map of a transparent cube and saving the output files.
-
-            Cubic maps can be used either for skyboxes (complete wrap-around skies, like space) or as environment
-            maps to simulate reflections. The system deals with these 2 scenarios in different ways:
-            <ol>
-            <li>
-            <p>
-            for cubic environment maps, the 6 textures are combined into a single 'cubic' texture map which
-            is then addressed using 3D texture coordinates. This is required because you don't know what
-            face of the box you're going to need to address when you render an object, and typically you
-            need to reflect more than one face on the one object, so all 6 textures are needed to be
-            'active' at once. Cubic environment maps are enabled by calling this method with the forUVW
-            parameter set to true, and then calling setEnvironmentMap(true).
-            </p>
-            <p>
-            Note that not all cards support cubic environment mapping.
-            </p>
-            </li>
-            <li>
-            <p>
-            for skyboxes, the 6 textures are kept separate and used independently for each face of the skybox.
-            This is done because not all cards support 3D cubic maps and skyboxes do not need to use 3D
-            texture coordinates so it is simpler to render each face of the box with 2D coordinates, changing
-            texture between faces.
-            </p>
-            <p>
-            Skyboxes are created by calling SceneManager::setSkyBox.
-            </p>
-            </li>
-            </ol>
-        @param name
-            The basic name of the texture e.g. brickwall.jpg, stonefloor.png. There must be 6 versions
-            of this texture with the suffixes _fr, _bk, _up, _dn, _lf, and _rt (before the extension) which
-            make up the 6 sides of the box. The textures must all be the same size and be powers of 2 in width & height.
-            If you can't make your texture names conform to this, use the alternative method of the same name which takes
-            an array of texture names instead.
-        @param forUVW
-            Set to @c true if you want a single 3D texture addressable with 3D texture coordinates rather than
-            6 separate textures. Useful for cubic environment mapping.
+        /**
+        @deprecated use setTextureName()
         */
-        void setCubicTextureName( const String& name, bool forUVW = false );
+        OGRE_DEPRECATED void setCubicTextureName( const String& name, bool forUVW = false )
+        {
+            setTextureName(name, TEX_TYPE_CUBE_MAP);
+        }
 
-        /** @overload
-            @param names
-            The 6 names of the textures which make up the 6 sides of the box. The textures must all
-            be the same size and be powers of 2 in width & height.
-            Must be an Ogre::String array with a length of 6 unless forUVW is set to @c true.
+        /**
+        @deprecated use setLayerArrayNames()
          */
-        void setCubicTextureName( const String* const names, bool forUVW = false );
+        OGRE_DEPRECATED void setCubicTextureName( const String* const names, bool forUVW = false )
+        {
+            setLayerArrayNames(TEX_TYPE_CUBE_MAP,
+                               std::vector<String>(names, names + 6));
+        }
 
-        /** @copydoc setCubicTextureName
-        @param texPtrs
-            The 6 pointers to the textures which make up the 6 sides of the box. The textures must all 
-            be the same size and be powers of 2 in width & height.
-            Must be an Ogre::TexturePtr array with a length of 6 unless forUVW is set to @c true.
+        /**
+        @deprecated use setTexture()
         */
-        void setCubicTexture( const TexturePtr* const texPtrs, bool forUVW = false );
+        OGRE_DEPRECATED void setCubicTexture( const TexturePtr* const texPtrs, bool forUVW = false )
+        {
+            setTexture(*texPtrs);
+        }
 
         /** Sets the names of the texture images for an animated texture.
 
@@ -446,11 +409,21 @@ namespace Ogre {
             The length of time it takes to display the whole animation sequence, in seconds.
             If 0, no automatic transition occurs.
         */
-        void setAnimatedTextureName( const String& name, unsigned int numFrames, Real duration = 0 );
+        void setAnimatedTextureName( const String& name, size_t numFrames, Real duration = 0 );
 
         /// @overload
         /// @param names Pointer to array of names of the textures to use, in frame order.
-        void setAnimatedTextureName( const String* const names, unsigned int numFrames, Real duration = 0 );
+        /// @deprecated use setAnimatedTextureName( const std::vector<String>&, Real )
+        void setAnimatedTextureName( const String* const names, size_t numFrames, Real duration = 0 );
+
+        /// @overload
+        void setAnimatedTextureName( const std::vector<String>& names, Real duration = 0 )
+        {
+            setAnimatedTextureName(names.data(), names.size(), duration);
+        }
+
+        /// Sets this texture layer to use an array of texture maps
+        void setLayerArrayNames(TextureType type, const std::vector<String>& names);
 
         /** Returns the width and height of the texture in the given frame.
         */
@@ -559,15 +532,11 @@ namespace Ogre {
         /** Get the type of content this TextureUnitState references. */
         ContentType getContentType(void) const;
 
-        /** Returns true if this texture unit is either a series of 6 2D textures, each
-            in it's own frame, or is a full 3D cube map. You can tell which by checking
-            getTextureType.            
-        */
-        bool isCubic(void) const;
+        /// @deprecated use getTextureType()
+        OGRE_DEPRECATED bool isCubic(void) const;
 
-        /** Returns true if this texture layer uses a composite 3D cubic texture.
-        */
-        bool is3D(void) const;
+        /// @deprecated use getTextureType()
+        OGRE_DEPRECATED bool is3D(void) const;
 
         /** Returns the type of this texture.
         */
@@ -725,7 +694,7 @@ namespace Ogre {
         void setTextureBorderColour(const ColourValue& colour) { _getLocalSampler()->setBorderColour(colour); }
         /// @copydoc Sampler::getBorderColour
         const ColourValue& getTextureBorderColour() const { return mSampler->getBorderColour(); }
-        /// @copydoc Sampler::setFiltering
+        /// @copydoc Sampler::setFiltering(TextureFilterOptions)
         void setTextureFiltering(TextureFilterOptions filterType)
         {
             _getLocalSampler()->setFiltering(filterType);
@@ -735,7 +704,7 @@ namespace Ogre {
         {
             _getLocalSampler()->setFiltering(ftype, opts);
         }
-        /// @copydoc Sampler::setFiltering
+        /// @copydoc Sampler::setFiltering(FilterOptions, FilterOptions, FilterOptions)
         void setTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter)
         {
             _getLocalSampler()->setFiltering(minFilter, magFilter, mipFilter);
@@ -1180,7 +1149,7 @@ protected:
         // Complex members (those that can't be copied using memcpy) are at the end to 
         // allow for fast copying of the basic members.
         //
-        mutable std::vector<TexturePtr> mFramePtrs;
+        mutable std::vector<TexturePtr> mFramePtrs; // must at least contain a single nullptr
         SamplerPtr mSampler;
         String mName;               ///< Optional name for the TUS.
         String mTextureNameAlias;   ///< Optional alias for texture frames.

@@ -43,9 +43,6 @@ namespace Ogre {
     GLSLShaderCommon::CmdPreprocessorDefines GLSLShaderCommon::msCmdPreprocessorDefines;
     GLSLShaderCommon::CmdAttach GLSLShaderCommon::msCmdAttach;
     GLSLShaderCommon::CmdColumnMajorMatrices GLSLShaderCommon::msCmdColumnMajorMatrices;
-    GLSLShaderCommon::CmdInputOperationType GLSLShaderCommon::msInputOperationTypeCmd;
-    GLSLShaderCommon::CmdOutputOperationType GLSLShaderCommon::msOutputOperationTypeCmd;
-    GLSLShaderCommon::CmdMaxOutputVertices GLSLShaderCommon::msMaxOutputVerticesCmd;
 
     String GLSLShaderCommon::getResourceLogName() const
     {
@@ -157,9 +154,6 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
-        , mInputOperationType(RenderOperation::OT_TRIANGLE_LIST)
-        , mOutputOperationType(RenderOperation::OT_TRIANGLE_LIST)
-        , mMaxOutputVertices(3)
         , mColumnMajorMatrices(true)
         , mLinked(0)
         , mShaderID(++mShaderCount) // Increase shader counter and use as ID
@@ -217,89 +211,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    static RenderOperation::OperationType parseOperationType(const String& val)
-    {
-        if (val == "point_list")
-        {
-            return RenderOperation::OT_POINT_LIST;
-        }
-        else if (val == "line_list")
-        {
-            return RenderOperation::OT_LINE_LIST;
-        }
-        else if (val == "line_list_adj")
-        {
-            return RenderOperation::OT_LINE_LIST_ADJ;
-        }
-        else if (val == "line_strip")
-        {
-            return RenderOperation::OT_LINE_STRIP;
-        }
-        else if (val == "line_strip_adj")
-        {
-            return RenderOperation::OT_LINE_STRIP_ADJ;
-        }
-        else if (val == "triangle_strip")
-        {
-            return RenderOperation::OT_TRIANGLE_STRIP;
-        }
-        else if (val == "triangle_strip_adj")
-        {
-            return RenderOperation::OT_TRIANGLE_STRIP_ADJ;
-        }
-        else if (val == "triangle_fan")
-        {
-            return RenderOperation::OT_TRIANGLE_FAN;
-        }
-        else if (val == "triangle_list_adj")
-        {
-            return RenderOperation::OT_TRIANGLE_LIST_ADJ;
-        }
-        else 
-        {
-            //Triangle list is the default fallback. Keep it this way?
-            return RenderOperation::OT_TRIANGLE_LIST;
-        }
-    }
-    //-----------------------------------------------------------------------
-    static const char* operationTypeToString(RenderOperation::OperationType val)
-    {
-        switch (val)
-        {
-        case RenderOperation::OT_POINT_LIST:
-            return "point_list";
-            break;
-        case RenderOperation::OT_LINE_LIST:
-            return "line_list";
-            break;
-        case RenderOperation::OT_LINE_LIST_ADJ:
-            return "line_list_adj";
-            break;
-        case RenderOperation::OT_LINE_STRIP:
-            return "line_strip";
-            break;
-        case RenderOperation::OT_LINE_STRIP_ADJ:
-            return "line_strip_adj";
-            break;
-        case RenderOperation::OT_TRIANGLE_STRIP:
-            return "triangle_strip";
-            break;
-        case RenderOperation::OT_TRIANGLE_STRIP_ADJ:
-            return "triangle_strip_adj";
-            break;
-        case RenderOperation::OT_TRIANGLE_FAN:
-            return "triangle_fan";
-            break;
-        case RenderOperation::OT_TRIANGLE_LIST_ADJ:
-            return "triangle_list_adj";
-            break;
-        case RenderOperation::OT_TRIANGLE_LIST:
-        default:
-            return "triangle_list";
-            break;
-        }
-    }
-    //-----------------------------------------------------------------------
     String GLSLShaderCommon::CmdColumnMajorMatrices::doGet(const void *target) const
     {
         return StringConverter::toString(static_cast<const GLSLShaderCommon*>(target)->getColumnMajorMatrices());
@@ -307,38 +218,5 @@ namespace Ogre {
     void GLSLShaderCommon::CmdColumnMajorMatrices::doSet(void *target, const String& val)
     {
         static_cast<GLSLShaderCommon*>(target)->setColumnMajorMatrices(StringConverter::parseBool(val));
-    }
-    //-----------------------------------------------------------------------
-    String GLSLShaderCommon::CmdInputOperationType::doGet(const void* target) const
-    {
-        const GLSLShaderCommon* t = static_cast<const GLSLShaderCommon*>(target);
-        return operationTypeToString(t->getInputOperationType());
-    }
-    void GLSLShaderCommon::CmdInputOperationType::doSet(void* target, const String& val)
-    {
-        GLSLShaderCommon* t = static_cast<GLSLShaderCommon*>(target);
-        t->setInputOperationType(parseOperationType(val));
-    }
-    //-----------------------------------------------------------------------
-    String GLSLShaderCommon::CmdOutputOperationType::doGet(const void* target) const
-    {
-        const GLSLShaderCommon* t = static_cast<const GLSLShaderCommon*>(target);
-        return operationTypeToString(t->getOutputOperationType());
-    }
-    void GLSLShaderCommon::CmdOutputOperationType::doSet(void* target, const String& val)
-    {
-        GLSLShaderCommon* t = static_cast<GLSLShaderCommon*>(target);
-        t->setOutputOperationType(parseOperationType(val));
-    }
-    //-----------------------------------------------------------------------
-    String GLSLShaderCommon::CmdMaxOutputVertices::doGet(const void* target) const
-    {
-        const GLSLShaderCommon* t = static_cast<const GLSLShaderCommon*>(target);
-        return StringConverter::toString(t->getMaxOutputVertices());
-    }
-    void GLSLShaderCommon::CmdMaxOutputVertices::doSet(void* target, const String& val)
-    {
-        GLSLShaderCommon* t = static_cast<GLSLShaderCommon*>(target);
-        t->setMaxOutputVertices(StringConverter::parseInt(val));
     }
 }

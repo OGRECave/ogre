@@ -61,7 +61,6 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* psMain   = psProgram->getEntryPointFunction();    
-    bool hasError = false;
 
     if (mResolveStageFlags & SF_VS_INPUT_DIFFUSE)
         mVSInputDiffuse  = vsMain->resolveInputParameter(Parameter::SPC_COLOR_DIFFUSE);
@@ -88,23 +87,14 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
     if (mResolveStageFlags & SF_PS_OUTPUT_DIFFUSE)
     {
         mPSOutputDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
-        hasError |= !(mPSOutputDiffuse.get());
     }
 
     // Resolve PS output specular color.
     if (mResolveStageFlags & SF_PS_OUTPUT_SPECULAR)
     {
         mPSOutputSpecular = psMain->resolveOutputParameter(Parameter::SPC_COLOR_SPECULAR);
-        hasError |= !(mPSOutputSpecular.get());
     }
-    
-    
-    if (hasError)
-    {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "FFPColour::resolveParameters" );
-    }
+
     return true;
 }
 

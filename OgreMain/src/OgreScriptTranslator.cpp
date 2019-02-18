@@ -1200,14 +1200,10 @@ namespace Ogre{
                         mMaterial->setTransparencyCastsShadows(bval);
                     break;
                 case ID_SET_TEXTURE_ALIAS:
-                    if(prop->values.empty())
+                    if(prop->values.size() != 2)
                     {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 3)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "set_texture_alias only supports 2 arguments");
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                            "set_texture_alias must have 2 string arguments");
                     }
                     else
                     {
@@ -1215,9 +1211,6 @@ namespace Ogre{
                         String name, value;
                         if(getString(*i0, &name) && getString(*i1, &value))
                             mTextureAliases.insert(std::make_pair(name, value));
-                        else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "set_texture_alias must have 2 string argument");
                     }
                     break;
                 default:
@@ -2797,8 +2790,7 @@ namespace Ogre{
                             AbstractNodeList::const_iterator in = getNodeAt(prop->values, static_cast<int>(prop->values.size()) - 1);
                             if(getReal(*in, &duration))
                             {
-                                String *names = OGRE_NEW_ARRAY_T(String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
-                                int n = 0;
+                                std::vector<String> names;
 
                                 AbstractNodeList::iterator j = prop->values.begin();
                                 while(j != in)
@@ -2811,11 +2803,11 @@ namespace Ogre{
                                         {
                                             ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, name);
                                             compiler->_fireEvent(&evt, 0);
-                                            names[n++] = evt.mName;
+                                            names.push_back(evt.mName);
                                         }
                                         else
                                         {
-                                            names[n++] = name;
+                                            names.push_back(name);
                                         }
                                     }
                                     else
@@ -2824,9 +2816,7 @@ namespace Ogre{
                                     ++j;
                                 }
 
-                                mUnit->setAnimatedTextureName(names, n, duration);
-
-                                OGRE_DELETE_ARRAY_T(names, String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
+                                mUnit->setAnimatedTextureName(names, duration);
                             }
                             else
                             {
@@ -2847,17 +2837,15 @@ namespace Ogre{
                             i1 = getNodeAt(prop->values, 1);
                         if((*i0)->type == ANT_ATOM && (*i1)->type == ANT_ATOM)
                         {
-                            AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
+                            AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get();
 
                             ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, atom0->value);
                             compiler->_fireEvent(&evt, 0);
 
-                            mUnit->setCubicTextureName(evt.mName, atom1->id == ID_COMBINED_UVW);
+                            mUnit->setTextureName(evt.mName, TEX_TYPE_CUBE_MAP);
 
-                            if(mUnit->is3D())
-                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
-                                                   prop->line,
-                                                   "'cubic_texture .. combinedUVW'. Use 'texture .. cubic' instead.");
+                            compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                                   "'cubic_texture ..'. Use 'texture .. cubic' instead.");
                         }
                         else
                         {
@@ -2880,13 +2868,14 @@ namespace Ogre{
                                 *atom2 = (AtomAbstractNode*)(*i2).get(), *atom3 = (AtomAbstractNode*)(*i3).get(),
                                 *atom4 = (AtomAbstractNode*)(*i4).get(), *atom5 = (AtomAbstractNode*)(*i5).get(),
                                 *atom6 = (AtomAbstractNode*)(*i6).get();
-                            String names[6];
-                            names[0] = atom0->value;
-                            names[1] = atom1->value;
-                            names[2] = atom2->value;
-                            names[3] = atom3->value;
-                            names[4] = atom4->value;
-                            names[5] = atom5->value;
+                            std::vector<String> names(6);
+                            // backward compatible order
+                            names[4] = atom0->value;
+                            names[5] = atom1->value;
+                            names[1] = atom2->value;
+                            names[0] = atom3->value;
+                            names[2] = atom4->value;
+                            names[3] = atom5->value;
 
                             if(compiler->getListener())
                             {
@@ -2899,7 +2888,12 @@ namespace Ogre{
                                 }
                             }
 
-                            mUnit->setCubicTextureName(names, atom6->id == ID_COMBINED_UVW);
+                            if(atom6->id != ID_COMBINED_UVW)
+                            {
+                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                                   "separateUV is no longer supported.");
+                            }
+                            mUnit->setLayerArrayNames(TEX_TYPE_CUBE_MAP, names);
                         }
 
                     }

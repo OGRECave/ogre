@@ -38,3 +38,6 @@ ogre_config_component(OgreRTShaderSystem)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/RTShaderSystem
 )
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/Media/RTShaderLib"
+  DESTINATION "${OGRE_MEDIA_PATH}/"
+)

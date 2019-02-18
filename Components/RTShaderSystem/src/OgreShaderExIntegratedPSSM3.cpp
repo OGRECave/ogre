@@ -39,7 +39,8 @@ String IntegratedPSSM3::Type = "SGX_IntegratedPSSM3";
 //-----------------------------------------------------------------------
 IntegratedPSSM3::IntegratedPSSM3()
 {   
-    
+    // currently only works with PF_FLOAT32_R on Nvidia. should use PF_DEPTH, but got artifacts
+    mUseTextureCompare = false;
 }
 
 //-----------------------------------------------------------------------
@@ -60,18 +61,6 @@ void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, Pass* pass,
                                              const AutoParamDataSource* source, 
                                              const LightList* pLightList)
 {
-    ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
-    size_t shadowIndex = 0;
-
-    while(it != mShadowTextureParamsList.end())
-    {                       
-        it->mWorldViewProjMatrix->setGpuParameter(source->getTextureWorldViewProjMatrix(shadowIndex));              
-        it->mInvTextureSize->setGpuParameter(source->getInverseTextureSize(it->mTextureSamplerIndex));
-        
-        ++it;
-        ++shadowIndex;
-    }
-
     Vector4 vSplitPoints;
 
     vSplitPoints.x = mShadowTextureParamsList[0].mMaxRange;
@@ -88,6 +77,7 @@ void IntegratedPSSM3::copyFrom(const SubRenderState& rhs)
 {
     const IntegratedPSSM3& rhsPssm= static_cast<const IntegratedPSSM3&>(rhs);
 
+    mUseTextureCompare = rhsPssm.mUseTextureCompare;
     mShadowTextureParamsList.resize(rhsPssm.mShadowTextureParamsList.size());
 
     ShadowTextureParamsConstIterator itSrc = rhsPssm.mShadowTextureParamsList.begin();
@@ -118,6 +108,11 @@ bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
         curShadowTexture->setContentType(TextureUnitState::CONTENT_SHADOW);
         curShadowTexture->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
         curShadowTexture->setTextureBorderColour(ColourValue::White);
+        if(mUseTextureCompare)
+        {
+            curShadowTexture->setTextureCompareEnabled(true);
+            curShadowTexture->setTextureCompareFunction(CMPF_LESS_EQUAL);
+        }
         it->mTextureSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
         ++it;
     }
@@ -198,32 +193,27 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
 
     while(it != mShadowTextureParamsList.end())
     {
-        it->mWorldViewProjMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "world_texture_view_proj"); 
+        it->mWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX, lightIndex);
 
         it->mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex));        
-        it->mPSInLightPosition = psMain->resolveInputParameter(it->mVSOutLightPosition);    
-        it->mTextureSampler = psProgram->resolveParameter(GCT_SAMPLER2D, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");       
-        
-        it->mInvTextureSize = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "inv_shadow_texture_size");       
+        it->mPSInLightPosition = psMain->resolveInputParameter(it->mVSOutLightPosition);
+        auto stype = mUseTextureCompare ? GCT_SAMPLER2DSHADOW : GCT_SAMPLER2D;
+        it->mTextureSampler = psProgram->resolveParameter(stype, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");
 
-        if (!(it->mInvTextureSize.get()) || !(it->mTextureSampler.get()) || !(it->mPSInLightPosition.get()) ||
-            !(it->mVSOutLightPosition.get()) || !(it->mWorldViewProjMatrix.get()))
+        if (!mUseTextureCompare)
         {
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "IntegratedPSSM3::resolveParameters" );
+            it->mInvTextureSize = psProgram->resolveParameter(
+                GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE,
+                it->mTextureSamplerIndex);
         }
 
         ++lightIndex;
         ++it;
     }
 
-    if (!(mVSInPos.get()) || !(mVSOutPos.get()) || !(mVSOutDepth.get()) || !(mPSInDepth.get()) || !(mPSDiffuse.get()) || !(mPSOutDiffuse.get()) || 
-        !(mPSSpecualr.get()) || !(mPSLocalShadowFactor.get()) || !(mPSSplitPoints.get()) || !(mPSDerivedSceneColour.get()))
+    if (!(mVSInPos.get()) || !(mVSOutPos.get()) || !(mPSDiffuse.get()) || !(mPSSpecualr.get()))
     {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Not all parameters could be constructed for the sub-render state.",
-                "IntegratedPSSM3::resolveParameters" );
+        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Not all parameters could be constructed for the sub-render state.");
     }
 
     return true;
@@ -292,12 +282,30 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
     ShadowTextureParams& splitParams2 = mShadowTextureParamsList[2];
 
     // Compute shadow factor.
-    stage.callFunction(SGX_FUNC_COMPUTE_SHADOW_COLOUR3,
-                       {In(mPSInDepth), In(mPSSplitPoints), In(splitParams0.mPSInLightPosition),
-                        In(splitParams1.mPSInLightPosition), In(splitParams2.mPSInLightPosition),
-                        In(splitParams0.mTextureSampler), In(splitParams1.mTextureSampler),
-                        In(splitParams2.mTextureSampler), In(splitParams0.mInvTextureSize),
-                        In(splitParams1.mInvTextureSize), In(splitParams2.mInvTextureSize), Out(mPSLocalShadowFactor)});
+    if (mUseTextureCompare)
+    {
+        stage.callFunction(
+            SGX_FUNC_COMPUTE_SHADOW_COLOUR3,
+            {In(mPSInDepth), In(mPSSplitPoints),
+             In(splitParams0.mPSInLightPosition),
+             In(splitParams1.mPSInLightPosition),
+             In(splitParams2.mPSInLightPosition),
+             In(splitParams0.mTextureSampler), In(splitParams1.mTextureSampler),
+             In(splitParams2.mTextureSampler), Out(mPSLocalShadowFactor)});
+    }
+    else
+    {
+        stage.callFunction(
+            SGX_FUNC_COMPUTE_SHADOW_COLOUR3,
+            {In(mPSInDepth), In(mPSSplitPoints),
+             In(splitParams0.mPSInLightPosition),
+             In(splitParams1.mPSInLightPosition),
+             In(splitParams2.mPSInLightPosition),
+             In(splitParams0.mTextureSampler), In(splitParams1.mTextureSampler),
+             In(splitParams2.mTextureSampler), In(splitParams0.mInvTextureSize),
+             In(splitParams1.mInvTextureSize), In(splitParams2.mInvTextureSize),
+             Out(mPSLocalShadowFactor)});
+    }
 
     // Apply shadow factor on diffuse colour.
     stage.callFunction(SGX_FUNC_APPLYSHADOWFACTOR_DIFFUSE,

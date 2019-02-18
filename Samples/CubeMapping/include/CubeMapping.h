@@ -113,7 +113,7 @@ protected:
             ->getTechnique(0)
             ->getPass(0)
             ->getTextureUnitState(0)
-            ->setCubicTexture(&tex, true);
+            ->setTexture(tex);
 
         // assign our camera to all 6 render targets of the texture (1 for each direction)
         for (unsigned int i = 0; i < 6; i++)

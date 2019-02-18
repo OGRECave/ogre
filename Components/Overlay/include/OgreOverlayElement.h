@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 #include "OgreUTFString.h"
 #include "OgreStringInterface.h"
-#include "OgreOverlayElementCommands.h"
 #include "OgreColourValue.h"
 
 namespace Ogre {
@@ -47,13 +46,8 @@ namespace Ogre {
     *  @{
     */
 
-#if OGRE_UNICODE_SUPPORT
     typedef UTFString DisplayString;
-#   define OGRE_DEREF_DISPLAYSTRING_ITERATOR(it) it.getCharacter()
-#else
-    typedef String DisplayString;
-#   define OGRE_DEREF_DISPLAYSTRING_ITERATOR(it) *it
-#endif
+
     /** Enum describing how the position / size of an element is to be recorded. 
     */
     enum GuiMetricsMode
@@ -111,19 +105,6 @@ namespace Ogre {
     public:
         static const String& DEFAULT_RESOURCE_GROUP;
     protected:
-        // Command object for setting / getting parameters
-        static OverlayElementCommands::CmdLeft msLeftCmd;
-        static OverlayElementCommands::CmdTop msTopCmd;
-        static OverlayElementCommands::CmdWidth msWidthCmd;
-        static OverlayElementCommands::CmdHeight msHeightCmd;
-        static OverlayElementCommands::CmdMaterial msMaterialCmd;
-        static OverlayElementCommands::CmdCaption msCaptionCmd;
-        static OverlayElementCommands::CmdMetricsMode msMetricsModeCmd;
-        static OverlayElementCommands::CmdHorizontalAlign msHorizontalAlignCmd;
-        static OverlayElementCommands::CmdVerticalAlign msVerticalAlignCmd;
-        static OverlayElementCommands::CmdVisible msVisibleCmd;
-
-
         String mName;
         bool mVisible;
         bool mCloneable;

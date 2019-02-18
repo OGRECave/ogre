@@ -271,7 +271,7 @@ namespace Ogre {
             mWorldMatrixArray = mWorldMatrix;
             mCurrentRenderable->getWorldTransforms(reinterpret_cast<Matrix4*>(mWorldMatrix));
             mWorldMatrixCount = mCurrentRenderable->getNumWorldTransforms();
-            if (mCameraRelativeRendering)
+            if (mCameraRelativeRendering && !mCurrentRenderable->getUseIdentityView())
             {
                 for (size_t i = 0; i < mWorldMatrixCount; ++i)
                 {
@@ -461,6 +461,11 @@ namespace Ogre {
             mCameraPositionObjectSpaceDirty = false;
         }
         return mCameraPositionObjectSpace;
+    }
+    //-----------------------------------------------------------------------------
+    const Vector4 AutoParamDataSource::getCameraRelativePosition (void) const
+    {
+        return Ogre::Vector4 (mCameraRelativePosition.x, mCameraRelativePosition.y, mCameraRelativePosition.z, 1);
     }
     //-----------------------------------------------------------------------------
     const Vector4& AutoParamDataSource::getLodCameraPosition(void) const

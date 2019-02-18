@@ -63,7 +63,7 @@ material Examples/TrippySkyBox
 
 			texture_unit
 			{
-				cubic_texture nm.png separateUV
+				texture nm.png cubic
 				tex_address_mode clamp
 			}
 		}
@@ -81,7 +81,7 @@ material Examples/SpaceSkyBox
 
 			texture_unit
 			{
-				cubic_texture stevecube.jpg separateUV
+				texture stevecube.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -99,7 +99,7 @@ material Examples/SceneSkyBox1
 
 			texture_unit
 			{
-				cubic_texture cubemap_fr.jpg cubemap_bk.jpg cubemap_lf.jpg cubemap_rt.jpg cubemap_up.jpg cubemap_dn.jpg separateUV
+				texture cubemap.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -135,7 +135,7 @@ material Examples/SceneSkyBox2
 
 			texture_unit
 			{
-				cubic_texture cubescene_fr.jpg cubescene_bk.jpg cubescene_lf.jpg cubescene_rt.jpg cubescene_up.jpg cubescene_dn.jpg separateUV
+				texture cubescene.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -171,7 +171,7 @@ material Examples/CloudyNoonSkyBox
 
 			texture_unit
 			{
-				cubic_texture cloudy_noon.jpg separateUV
+				texture cloudy_noon.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -189,7 +189,7 @@ material Examples/StormySkyBox
 
 			texture_unit
 			{
-				cubic_texture stormy.jpg separateUV
+				texture stormy.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -207,30 +207,11 @@ material Examples/EarlyMorningSkyBox
 
 			texture_unit
 			{
-				cubic_texture early_morning.jpg separateUV
+				texture early_morning.jpg cubic
 				tex_address_mode clamp
 			}
 		}
 	}
-}
-
-fragment_program Examples/MorningSkyBoxHDRfpGLSLES glsles
-{
-	source hdrFp.glsles
-	profiles glsles
-}
-
-fragment_program Examples/MorningSkyBoxHDRfpCg cg
-{
-	source hdr.cg
-	entry_point morningskybox_fp
-	profiles ps_2_0 arbfp1
-}
-
-fragment_program Examples/MorningSkyBoxHDRfp unified
-{
-	delegate Examples/MorningSkyBoxHDRfpGLSLES
-	delegate Examples/MorningSkyBoxHDRfpCg
 }
 
 material Examples/MorningSkyBox
@@ -244,7 +225,7 @@ material Examples/MorningSkyBox
 
 			texture_unit
 			{
-				cubic_texture morning.jpg separateUV
+				texture morning.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -260,18 +241,12 @@ material Examples/MorningSkyBox
 			lighting off
 			depth_write off
 
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-				param_named ambient float4 1 1 1 1
-			}
-			fragment_program_ref Examples/MorningSkyBoxHDRfp
-			{
-			}
-
 			texture_unit
 			{
-				cubic_texture morning.jpg separateUV
+				texture morning.jpg cubic
 				tex_address_mode clamp
+				// blow out the light a bit
+				colour_op_ex modulate src_texture src_manual 1.7 1.7 1.7
 			}
 		}
 	}
@@ -334,7 +309,7 @@ material Examples/EveningSkyBox
 
 			texture_unit
 			{
-				cubic_texture evening.jpg separateUV
+				texture evening.jpg cubic
 				tex_address_mode clamp
 			}
 		}
@@ -2046,8 +2021,7 @@ fragment_program Examples/ShowUV_pHLSL hlsl
 
 fragment_program Examples/ShowUV_pGLSLES glsles
 {
-	source ShowUV.glsles
-	profiles glsles
+	source ShowUV.glsl
 }
 
 fragment_program Examples/ShowUV_pGLSL glsl
@@ -2086,8 +2060,7 @@ fragment_program Examples/ShowUVdir3D_pHLSL hlsl
 
 fragment_program Examples/ShowUVdir3D_pGLSLES glsles
 {
-	source ShowUVdir3D.glsles
-	profiles glsles
+	source ShowUVdir3D.glsl
 }
 
 fragment_program Examples/ShowUVdir3D_pGLSL glsl
@@ -2128,8 +2101,7 @@ vertex_program Examples/ShowTangents_vCg_sm4 cg
 
 vertex_program Examples/ShowTangents_vGLSLES glsles
 {
-	source ShowTangents.glsles
-	profiles glsles
+	source ShowTangents.glsl
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -2177,8 +2149,7 @@ vertex_program Examples/ShowNormals_vCg_sm4 cg
 
 vertex_program Examples/ShowNormals_vGLSLES glsles
 {
-	source ShowNormals.glsles
-	profiles glsles
+	source ShowNormals.glsl
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix

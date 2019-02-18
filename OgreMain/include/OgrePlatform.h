@@ -138,9 +138,6 @@ namespace Ogre {
 #   define __OGRE_WINRT_STORE     (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && WINAPI_FAMILY == WINAPI_FAMILY_APP)        // WindowsStore 8.0 and 8.1
 #   define __OGRE_WINRT_PHONE     (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)  // WindowsPhone 8.0 and 8.1
 #   define __OGRE_WINRT_PHONE_80  (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP && _WIN32_WINNT <= _WIN32_WINNT_WIN8) // Windows Phone 8.0 often need special handling, while 8.1 is OK
-#   if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8 // i.e. this is modern SDK and we compile for OS with guaranteed support for DirectXMath
-#       define __OGRE_HAVE_DIRECTXMATH 1
-#   endif
 #   ifndef _CRT_SECURE_NO_WARNINGS
 #       define _CRT_SECURE_NO_WARNINGS
 #   endif
@@ -210,41 +207,7 @@ namespace Ogre {
 #       define OGRE_DEBUG_MODE 0
 #   endif
 
-// Disable unicode support on MingW for GCC 3, poorly supported in stdlibc++
-// STLPORT fixes this though so allow if found
-// MinGW C++ Toolkit supports unicode and sets the define __MINGW32_TOOLBOX_UNICODE__ in _mingw.h
-// GCC 4 is also fine
-#if defined(__MINGW32__)
-# if OGRE_COMP_VER < 400
-#  if !defined(_STLPORT_VERSION)
-#   include<_mingw.h>
-#   if defined(__MINGW32_TOOLBOX_UNICODE__) || OGRE_COMP_VER > 345
-#    define OGRE_UNICODE_SUPPORT 1
-#   else
-#    define OGRE_UNICODE_SUPPORT 0
-#   endif
-#  else
-#   define OGRE_UNICODE_SUPPORT 1
-#  endif
-# else
-#  define OGRE_UNICODE_SUPPORT 1
-# endif
-#else
-#  define OGRE_UNICODE_SUPPORT 1
-#endif
-
 #endif // OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-
-//----------------------------------------------------------------------------
-// Linux/Apple/iOS/Android/NaCl/Emscripten Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
-    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-
-// Always enable unicode support for the moment
-// Perhaps disable in old versions of gcc if necessary
-#define OGRE_UNICODE_SUPPORT 1
-
-#endif
 
 //----------------------------------------------------------------------------
 // Android Settings
@@ -252,10 +215,6 @@ namespace Ogre {
 #   ifndef CLOCKS_PER_SEC
 #       define CLOCKS_PER_SEC  1000
 #   endif
-#endif
-
-#ifndef __OGRE_HAVE_DIRECTXMATH
-#   define __OGRE_HAVE_DIRECTXMATH 0
 #endif
 
 //----------------------------------------------------------------------------

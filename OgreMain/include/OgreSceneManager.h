@@ -138,20 +138,23 @@ namespace Ogre {
     class _OgreExport SceneManager : public SceneMgtAlloc
     {
     public:
-        /// Query type mask which will be used for world geometry @see SceneQuery
-        static uint32 WORLD_GEOMETRY_TYPE_MASK;
-        /// Query type mask which will be used for entities @see SceneQuery
-        static uint32 ENTITY_TYPE_MASK;
-        /// Query type mask which will be used for effects like billboardsets / particle systems @see SceneQuery
-        static uint32 FX_TYPE_MASK;
-        /// Query type mask which will be used for StaticGeometry  @see SceneQuery
-        static uint32 STATICGEOMETRY_TYPE_MASK;
-        /// Query type mask which will be used for lights  @see SceneQuery
-        static uint32 LIGHT_TYPE_MASK;
-        /// Query type mask which will be used for frusta and cameras @see SceneQuery
-        static uint32 FRUSTUM_TYPE_MASK;
-        /// User type mask limit
-        static uint32 USER_TYPE_MASK_LIMIT;
+        enum QueryTypeMask : uint32
+        {
+            /// Query type mask which will be used for world geometry @see SceneQuery
+            WORLD_GEOMETRY_TYPE_MASK = 0x80000000,
+            /// Query type mask which will be used for entities @see SceneQuery
+            ENTITY_TYPE_MASK = 0x40000000,
+            /// Query type mask which will be used for effects like billboardsets / particle systems @see SceneQuery
+            FX_TYPE_MASK = 0x20000000,
+            /// Query type mask which will be used for StaticGeometry  @see SceneQuery
+            STATICGEOMETRY_TYPE_MASK = 0x10000000,
+            /// Query type mask which will be used for lights  @see SceneQuery
+            LIGHT_TYPE_MASK = 0x08000000,
+            /// Query type mask which will be used for frusta and cameras @see SceneQuery
+            FRUSTUM_TYPE_MASK = 0x04000000,
+            /// User type mask limit
+            USER_TYPE_MASK_LIMIT = FRUSTUM_TYPE_MASK
+        };
         /** Comparator for material map, for sorting materials into render order (e.g. transparent last).
         */
         struct materialLess
@@ -416,6 +419,9 @@ namespace Ogre {
                 can look up nodes this way.
         */
         SceneNodeList mSceneNodes;
+
+        /// additional map to speed up lookup by name
+        std::map<String, SceneNode*> mNamedNodes;
 
         /// Camera in progress
         Camera* mCameraInProgress;
@@ -1367,18 +1373,17 @@ namespace Ogre {
         SceneNode* getRootSceneNode(void);
 
         /** Retrieves a named SceneNode from the scene graph.
-        @remarks
-            If you chose to name a SceneNode as you created it, or if you
-            happened to make a note of the generated name, you can look it
+
+            If you chose to name a SceneNode as you created it, you can look it
             up wherever it is in the scene graph using this method.
-            @note Throws an exception if the named instance does not exist
+            @param name
+            @param throwExceptionIfNotFound Throws an exception if the named instance does not exist
         */
-        SceneNode* getSceneNode(const String& name) const;
+        SceneNode* getSceneNode(const String& name, bool throwExceptionIfNotFound = true) const;
 
         /** Returns whether a scene node with the given name exists.
         */
-        bool hasSceneNode(const String& name) const;
-
+        bool hasSceneNode(const String& name) const { return getSceneNode(name, false) != NULL; }
 
         /** Create an Entity (instance of a discrete mesh).
             @param

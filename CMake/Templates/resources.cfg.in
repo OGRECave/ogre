@@ -1,7 +1,15 @@
+# Ogre Core Resources
+[OgreInternal]
+FileSystem=@OGRE_CORE_MEDIA_DIR@/ShadowVolume
+FileSystem=@OGRE_CORE_MEDIA_DIR@/RTShaderLib/materials
+FileSystem=@OGRE_CORE_MEDIA_DIR@/RTShaderLib/GLSL
+FileSystem=@OGRE_CORE_MEDIA_DIR@/RTShaderLib/HLSL_Cg
+FileSystem=@OGRE_CORE_MEDIA_DIR@/Terrain/
+
 # Resources required by the sample browser and most samples.
 [Essential]
-Zip=@OGRE_MEDIA_DIR_REL@/packs/SdkTrays.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/profiler.zip
+Zip=@OGRE_CORE_MEDIA_DIR@/packs/SdkTrays.zip
+Zip=@OGRE_CORE_MEDIA_DIR@/packs/profiler.zip
 FileSystem=@OGRE_MEDIA_DIR_REL@/thumbnails
 
 # Common sample resources needed by many of the samples.
@@ -37,7 +45,7 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/glTF2_IBL
 Zip=@OGRE_MEDIA_DIR_REL@/packs/DamagedHelmet.zip
 
-FileSystem=@OGRE_MEDIA_DIR_REL@/HLMS
+FileSystem=@OGRE_CORE_MEDIA_DIR@/HLMS
 
 # Materials for visual tests
 [Tests]
