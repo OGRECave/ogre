@@ -290,7 +290,7 @@ macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from 
 #######################################################################
 
 # Find sdl2
-if(NOT ANDROID)
+if(NOT ANDROID AND NOT EMSCRIPTEN)
   # find script does not work in cross compilation environment
   find_package(SDL2)
   macro_log_feature(SDL2_FOUND "SDL2" "Simple DirectMedia Library needed for input handling in samples" "https://www.libsdl.org/" FALSE "" "")
