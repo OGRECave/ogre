@@ -847,7 +847,7 @@ namespace Ogre {
         if (!mMeshPtr->isLoaded())
         {
             mMeshPtr->load();
-            mMeshPtr->getSubMeshes()[0]->setMaterialName(matName, RGN_INTERNAL);
+            mMeshPtr->getSubMeshes()[0]->setMaterial(mMat);
         }
 
     }
