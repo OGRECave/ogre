@@ -139,9 +139,11 @@ namespace Ogre {
         void setMaterialName(const String& matName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
         const String& getMaterialName(void) const;
 
-        /** Returns true if a material has been assigned to the submesh, otherwise returns false.
-        */
-        bool isMatInitialised(void) const;
+        void setMaterial(const MaterialPtr& mat) { mMaterial = mat; }
+        const MaterialPtr& getMaterial() const { return mMaterial; }
+
+        /// @deprecated use getMaterial() instead
+        OGRE_DEPRECATED bool isMatInitialised(void) const { return bool(mMaterial); }
 
         /** Returns a RenderOperation structure required to render this mesh.
             @param 
@@ -263,11 +265,8 @@ namespace Ogre {
 
     protected:
 
-        /// Name of the material this SubMesh uses.
-        String mMaterialName;
-
-        /// Is there a material yet?
-        bool mMatInitialised;
+        /// the material this SubMesh uses.
+        MaterialPtr mMaterial;
 
         /// paired list of texture aliases and texture names
         AliasTextureNamePairList mTextureAliases;

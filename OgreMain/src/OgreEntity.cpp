@@ -1478,8 +1478,8 @@ namespace Ogre {
         {
             SubMesh* subMesh = mesh->getSubMesh(i);
             SubEntity* subEnt = OGRE_NEW SubEntity(this, subMesh);
-            if (subMesh->isMatInitialised())
-                subEnt->setMaterialName(subMesh->getMaterialName(), mesh->getGroup());
+            if (subMesh->getMaterial())
+                subEnt->setMaterial(subMesh->getMaterial());
             sublist->push_back(subEnt);
         }
     }

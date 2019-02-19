@@ -380,7 +380,7 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
         SubMesh* bSubmesh = b->getSubMesh(i);
 
         EXPECT_TRUE(aSubmesh->getMaterialName() == bSubmesh->getMaterialName());
-        EXPECT_TRUE(aSubmesh->isMatInitialised() == bSubmesh->isMatInitialised());
+        EXPECT_EQ(bool(aSubmesh->getMaterial()), bool(bSubmesh->getMaterial()));
         EXPECT_TRUE(aSubmesh->useSharedVertices == bSubmesh->useSharedVertices);
         EXPECT_TRUE(aSubmesh->getVertexAnimationIncludesNormals() == bSubmesh->getVertexAnimationIncludesNormals());
         EXPECT_TRUE(aSubmesh->getVertexAnimationType() == bSubmesh->getVertexAnimationType());
