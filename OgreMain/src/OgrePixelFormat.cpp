@@ -724,7 +724,7 @@ namespace Ogre {
         // Check for compressed formats, we don't support decompression, compression or recoding
         if(PixelUtil::isCompressed(src.format) || PixelUtil::isCompressed(dst.format))
         {
-            if(src.format == dst.format && src.left == 0 && src.top == 0 && dst.left == 0 && dst.top == 0)
+            if(src.format == dst.format && src.isConsecutive() && dst.isConsecutive())
             {
                 // we can copy with slice granularity, useful for Tex2DArray handling
                 size_t bytesPerSlice = getMemorySize(src.getWidth(), src.getHeight(), 1, src.format);
