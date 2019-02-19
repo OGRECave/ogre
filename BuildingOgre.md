@@ -117,11 +117,13 @@ Installing
 Once the build is complete, you can optionally have the build system
 copy the built libraries and headers to a clean location. We recommend
 you do this step as it will make it easier to use Ogre in your projects.
-In Visual Studio, just select and build the target *INSTALL*. For Makefile based generators, type:
+In Visual Studio, just select and build the target *INSTALL*. When using the command line with MSVC, type:
 
+    cmake --build . --config release --target INSTALL
+
+For Makefile based generators, type:
 
     make install  # (or sudo make install, if root privileges are required)
-
 
 On Linux Ogre will be installed to `/usr/local` by default. On Windows this will create the folder `sdk` inside your build directory and copy all the
 required libraries there. You can change the install location by changing the variable `CMAKE_INSTALL_PREFIX` in CMake.
