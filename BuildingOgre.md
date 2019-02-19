@@ -219,16 +219,19 @@ To manually generate the APK and install it on your device, run
 
     ant debug install
 
-Building for HTML5 (Emscripten)
+Building for WebAssembly (using Emscripten)
 -----------------------------------------
-Install the Emscripten SDK and make sure that the environment variables are correctly set.
+Install the Emscripten SDK (see full documentation on [www.emscripten.org](https://emscripten.org/docs/getting_started/downloads.html)), and make sure
+that the environment variables are correctly set (eg. run source <emsdk_path>/emsdk_env.sh before attempting to build)
 
 Run cmake in cross compile mode using emscripten as following:
 
-    cmake -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake .
+    mkdir build-wasm
+    emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
+    emmake make
 
-in cmake GUI change `CMAKE_AR` to `emcc`. Then run `make`.
+NB: to simplify the process, 'emcmake' and 'emmake' wrappers are used. These tools are provided by Emscripten to correctly setup the cross compilation environment
 
-this will not build the full SampleBrowser, but just a minimal Sample. The resulting `EmscriptenSample.html` will be placed in `${CMAKE_BINARY_DIR}/bin/`.
+This will not build the full SampleBrowser, but just a minimal Sample. The resulting `EmscriptenSample.html` will be placed in `${CMAKE_BINARY_DIR}/bin/`.
 
 To prevent any cross-origin issues, start a local webserver as `python3 -m http.server 8000` and visit `localhost:8000`.

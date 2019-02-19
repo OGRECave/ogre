@@ -6,7 +6,7 @@ set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. -s BINARYEN_TRAP_MODE
 add_definitions(-s USE_SDL=2)
 
 if(TRUE)
-    add_definitions(-s ASSERTIONS=2 -s DISABLE_EXCEPTION_CATCHING=0)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0")
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/Samples/Character/include)
@@ -20,11 +20,15 @@ file(COPY
 file(COPY
     "${CMAKE_SOURCE_DIR}/Samples/Media/materials/textures/ribbonband.png"
     "${CMAKE_SOURCE_DIR}/Samples/Media/materials/textures/rockwall.tga"
-    "${CMAKE_SOURCE_DIR}/Samples/Media/packs/SdkTrays.zip" 
+    "${CMAKE_SOURCE_DIR}/Media/packs/SdkTrays.zip"
     "${CMAKE_SOURCE_DIR}/Samples/Media/packs/Sinbad.zip"
     DESTINATION ${MEDIA_DIR})
 
-file(COPY 
-    "${CMAKE_SOURCE_DIR}/Samples/Media/RTShaderLib/GLSL"
-    "${CMAKE_SOURCE_DIR}/Samples/Media/RTShaderLib/GLSLES"
+file(COPY
+    "${CMAKE_SOURCE_DIR}/Media/RTShaderLib/GLSL"
+    "${CMAKE_SOURCE_DIR}/Media/RTShaderLib/materials"
     DESTINATION "${MEDIA_DIR}/RTShaderLib/")
+
+file(COPY
+    "${CMAKE_SOURCE_DIR}/Media/ShadowVolume"
+    DESTINATION "${MEDIA_DIR}/")
