@@ -176,19 +176,12 @@ namespace Ogre {
             break;
         };
 
-        size_t offset = 0;
-
         if(mUsage == HBU_STATIC || mUsage & HBU_DYNAMIC)
         {
             if(mUsage == HBU_STATIC || options == HBL_READ_ONLY || options == HBL_NORMAL || options == HBL_WRITE_ONLY)
                 _mapstagingbuffer(flags, rval);
             else
                 _map(mParentTexture->getTextureResource(), flags, rval);
-
-            // calculate the offset in bytes
-			offset = PixelUtil::getMemorySize(rval.left, rval.front, 1, rval.format);
-            // add the offset, so the right memory will be changed
-            //rval.data = static_cast<int*>(rval.data) + offset;
         }
         else
         {
@@ -198,9 +191,6 @@ namespace Ogre {
         // save without offset
         mCurrentLock = rval;
         mCurrentLockOptions = options;
-
-        // add the offset, so the right memory will be changed
-		rval.data = (uchar*)((int*)rval.data + offset);	// TODO: why offsetInBytes is added to (int*) pointer ???
 
         return rval;
     }
