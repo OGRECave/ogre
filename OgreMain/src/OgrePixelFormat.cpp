@@ -42,30 +42,36 @@ namespace Ogre {
     }
     PixelBox PixelBox::getSubVolume(const Box &def, bool resetOrigin /* = true */) const
     {
-        if(PixelUtil::isCompressed(format))
-        {
-            if(def.left == left && def.top == top && def.right == right &&
-			   def.bottom == bottom)
-            {
-                // Entire buffer is being queried
-                return *this;
-            }
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot return subvolume of compressed PixelBuffer", "PixelBox::getSubVolume");
-        }
         if(!contains(def))
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Bounds out of range", "PixelBox::getSubVolume");
+
+        if(PixelUtil::isCompressed(format) && (def.left != left || def.top != top || def.right != right || def.bottom != bottom))
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot return subvolume of compressed PixelBuffer with less than slice granularity", "PixelBox::getSubVolume");
 
         // Calculate new pixelbox and optionally reset origin.
         PixelBox rval(def, format, data);
         rval.rowPitch = rowPitch;
         rval.slicePitch = slicePitch;
+
         if(resetOrigin)
         {
-            rval.data = rval.getTopLeftFrontPixelPtr();
-            rval.right -= rval.left;
-            rval.bottom -= rval.top;
-            rval.back -= rval.front;
-            rval.front = rval.top = rval.left = 0;
+            if(PixelUtil::isCompressed(format))
+            {
+                if(rval.front > 0)
+                {
+                    rval.data = (uint8*)rval.data + rval.front * PixelUtil::getMemorySize(getWidth(), getHeight(), 1, format);
+                    rval.back -= rval.front;
+                    rval.front = 0;
+                }
+            }
+            else
+            {
+                rval.data = rval.getTopLeftFrontPixelPtr();
+                rval.right -= rval.left;
+                rval.bottom -= rval.top;
+                rval.back -= rval.front;
+                rval.front = rval.top = rval.left = 0;
+            }
         }
 
         return rval;
@@ -712,7 +718,8 @@ namespace Ogre {
     void PixelUtil::bulkPixelConversion(const PixelBox &src, const PixelBox &dst)
     {
         assert(src.getWidth() == dst.getWidth() &&
-               src.getHeight() == dst.getHeight());
+               src.getHeight() == dst.getHeight() &&
+               src.getDepth() == dst.getDepth());
 
         // Check for compressed formats, we don't support decompression, compression or recoding
         if(PixelUtil::isCompressed(src.format) || PixelUtil::isCompressed(dst.format))
