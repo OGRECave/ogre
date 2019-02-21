@@ -30,9 +30,10 @@ THE SOFTWARE.
 #include "OgreD3D11VideoMode.h"
 #include "OgreD3D11Device.h"
 #include "OgreString.h"
+#include "OgreStringConverter.h"
 
-#ifdef __MINGW32__
-#define DXGI_ADAPTER_FLAG_SOFTWARE 0
+#ifndef DXGI_ADAPTER_FLAG_SOFTWARE
+#define DXGI_ADAPTER_FLAG_SOFTWARE 2 // unavailable in June 2010 SDK
 #endif
 
 namespace Ogre
@@ -41,22 +42,14 @@ namespace Ogre
     D3D11Driver::D3D11Driver() 
     {
         ZeroMemory( &mAdapterIdentifier, sizeof(mAdapterIdentifier) );
+        mSameNameAdapterIndex = 0;
     }
     //---------------------------------------------------------------------
-    D3D11Driver::D3D11Driver( const D3D11Driver &ob ) 
+    D3D11Driver::D3D11Driver(IDXGIAdapterN* pDXGIAdapter, const DXGI_ADAPTER_DESC1& desc, unsigned sameNameIndex)
     {
-        mDXGIAdapter = ob.mDXGIAdapter;
-        mAdapterIdentifier = ob.mAdapterIdentifier;
-        mVideoModeList = ob.mVideoModeList;
-    }
-    //---------------------------------------------------------------------
-    D3D11Driver::D3D11Driver(IDXGIAdapterN* pDXGIAdapter)
-    {
-        ZeroMemory(&mAdapterIdentifier, sizeof(mAdapterIdentifier));
-
         mDXGIAdapter = pDXGIAdapter;
-        if(mDXGIAdapter)
-            mDXGIAdapter->GetDesc1(&mAdapterIdentifier);
+        mAdapterIdentifier = desc;
+        mSameNameAdapterIndex = sameNameIndex;
     }
     //---------------------------------------------------------------------
     D3D11Driver::~D3D11Driver()
@@ -70,8 +63,11 @@ namespace Ogre
         str[sizeof(str) - 1] = '\0';
         String driverDescription=str;
         StringUtil::trim(driverDescription);
-        if(mAdapterIdentifier.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
-            driverDescription += " (software)";
+        if(mAdapterIdentifier.VendorId == 0x1414 && mAdapterIdentifier.DeviceId == 0x8c && (mAdapterIdentifier.Flags & DXGI_ADAPTER_FLAG_SOFTWARE))
+            driverDescription += " (software)"; // It`s software only variation of "Microsoft Basic Render Driver", always present since Win8
+        else if(mSameNameAdapterIndex != 0)
+            driverDescription += " (" + Ogre::StringConverter::toString(mSameNameAdapterIndex + 1) + ")";
+
         return driverDescription;
     }
     //---------------------------------------------------------------------
