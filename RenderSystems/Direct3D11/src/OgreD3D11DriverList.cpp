@@ -52,6 +52,7 @@ namespace Ogre
     void D3D11DriverList::refresh()
     {
         clear();
+        std::map<std::wstring, unsigned> sameNameCounter;
 
         LogManager::getSingleton().logMessage( "D3D11: Driver Detection Starts" );
 
@@ -81,7 +82,18 @@ namespace Ogre
                     "D3D11DriverList::refresh");
             }
 
-            SharedPtr<D3D11Driver> driver(OGRE_NEW_T(D3D11Driver, MEMCATEGORY_GENERAL)(pDXGIAdapter.Get()), SPFM_DELETE_T);
+            DXGI_ADAPTER_DESC1 desc1 = {0};
+            hr = pDXGIAdapter->GetDesc1(&desc1);
+            if( FAILED(hr) )
+            {
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Failed to get adapter description",
+                    "D3D11DriverList::refresh");
+            }
+
+            unsigned sameNameIndex = sameNameCounter[std::wstring(desc1.Description)]++;
+
+            SharedPtr<D3D11Driver> driver(OGRE_NEW_T(D3D11Driver, MEMCATEGORY_GENERAL)(pDXGIAdapter.Get(), desc1, sameNameIndex), SPFM_DELETE_T);
 
             LogManager::getSingleton().logMessage("D3D11: \"" + driver->DriverDescription() + "\"");
 

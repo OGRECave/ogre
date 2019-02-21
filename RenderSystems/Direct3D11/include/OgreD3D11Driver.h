@@ -42,13 +42,13 @@ namespace Ogre
     private:
         ComPtr<IDXGIAdapterN> mDXGIAdapter;
         DXGI_ADAPTER_DESC1 mAdapterIdentifier;
+        unsigned mSameNameAdapterIndex;
         SharedPtr<D3D11VideoModeList> mVideoModeList;
 
     public:
         // Constructors
         D3D11Driver();      // Default
-        D3D11Driver( const D3D11Driver &ob );   // Copy
-        D3D11Driver( IDXGIAdapterN* pDXGIAdapter );
+        D3D11Driver( IDXGIAdapterN* pDXGIAdapter, const DXGI_ADAPTER_DESC1& desc, unsigned sameNameIndex);
         ~D3D11Driver();
 
         // Information accessors
