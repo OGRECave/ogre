@@ -979,6 +979,18 @@ void resolveColourAmbiguities(Mesh* mesh)
 
 
 }
+
+struct MaterialCreator : public MeshSerializerListener
+{
+    void processMaterialName(Mesh *mesh, String *name)
+    {
+        // create material because we do not load any .material files
+        MaterialManager::getSingleton().create(*name, mesh->getGroup());
+    }
+
+    void processSkeletonName(Mesh *mesh, String *name) {}
+    void processMeshCompleted(Mesh *mesh) {}
+};
 }
 
 int main(int numargs, char** args)
@@ -1000,6 +1012,8 @@ int main(int numargs, char** args)
         matMgr->initialise();
         skelMgr = new SkeletonManager();
         meshSerializer = new MeshSerializer();
+        MaterialCreator matCreator;
+        meshSerializer->setListener(&matCreator);
         skeletonSerializer = new SkeletonSerializer();
         bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
         meshMgr = new MeshManager();
