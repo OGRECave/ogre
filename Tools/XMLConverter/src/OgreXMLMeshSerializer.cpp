@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreKeyFrame.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreLodStrategy.h"
+#include "OgreMaterialManager.h"
 #include <cstddef>
 
 namespace Ogre {
@@ -722,7 +723,10 @@ namespace Ogre {
 
             const char* mat = smElem->Attribute("material");
             if (mat)
-                sm->setMaterialName(mat);
+            {
+                // we do not load any materials - so create a dummy here to just store the name
+                sm->setMaterial(MaterialManager::getSingleton().create(mat, RGN_DEFAULT));
+            }
 
             // Read operation type
             bool readFaces = true;
