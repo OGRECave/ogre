@@ -132,17 +132,9 @@ namespace Ogre {
         */
         void clearBestTechniqueList(void);
 
-        /** Overridden from Resource.
-        */
-        void prepareImpl(void);
-
-        /** Overridden from Resource.
-        */
-        void unprepareImpl(void);
-
-        /** Overridden from Resource.
-        */
-        void loadImpl(void);
+        void prepareImpl(void) override;
+        void unprepareImpl(void) override;
+        void loadImpl(void) override;
 
         /** Unloads the material, frees resources etc.
         @see

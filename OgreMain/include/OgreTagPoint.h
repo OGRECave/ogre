@@ -95,13 +95,12 @@ namespace Ogre  {
         /** Gets the transform of this node just for the skeleton (not entity) */
         const Affine3& _getFullLocalTransform(void) const;
 
-        /** @copydoc Node::needUpdate */
-        void needUpdate(bool forceParentUpdate = false);
 
+        void needUpdate(bool forceParentUpdate = false) override;
         /** Overridden from Node in order to include parent Entity transform. */
-        void updateFromParentImpl(void) const;
-        /** @copydoc Renderable::getLights */
-        const LightList& getLights(void) const;
+        void updateFromParentImpl(void) const override;
+        /// @deprecated do not use
+        OGRE_DEPRECATED const LightList& getLights(void) const;
 
 
 

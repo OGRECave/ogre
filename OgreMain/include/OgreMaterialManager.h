@@ -128,10 +128,9 @@ namespace Ogre {
         /// Default settings
         MaterialPtr mDefaultSettings;
 
-        /// Overridden from ResourceManager
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader,
-            const NameValuePairList* params);
+            const NameValuePairList* params) override;
 
         /// Scheme name -> index. Never shrinks! Should be pretty static anyway
         typedef std::map<String, unsigned short> SchemeMap;

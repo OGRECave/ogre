@@ -390,8 +390,7 @@ namespace Ogre
         void _updateRenderQueue(RenderQueue* queue);
         /** Implement this method to enable stencil shadows */
         EdgeData* getEdgeList(void);
-        /** Overridden member from ShadowCaster. */
-        bool hasEdgeList(void);
+        bool hasEdgeList(void) override;
         /** Implement this method to enable stencil shadows. */
         ShadowRenderableListIterator getShadowVolumeRenderableIterator(
             ShadowTechnique shadowTechnique, const Light* light, 
@@ -460,12 +459,10 @@ namespace Ogre
                 HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
                 bool createSeparateLightCap, bool isLightCap = false);
             ~ManualObjectSectionShadowRenderable();
-            /// Overridden from ShadowRenderable
-            void getWorldTransforms(Matrix4* xform) const;
+            void getWorldTransforms(Matrix4* xform) const override;
             HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
             HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-            /// Overridden from ShadowRenderable
-            virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
+            virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) override;
 
             
 

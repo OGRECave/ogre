@@ -511,10 +511,8 @@ namespace Ogre {
             HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
             bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);
         
-        /** Overridden member from ShadowCaster. */
-        const AxisAlignedBox& getLightCapBounds(void) const;
-        /** Overridden member from ShadowCaster. */
-        const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const;
+        const AxisAlignedBox& getLightCapBounds(void) const override;
+        const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const override;
         /** Sets whether or not this object will cast shadows.
         @remarks
         This setting simply allows you to turn on/off shadows for a given object.

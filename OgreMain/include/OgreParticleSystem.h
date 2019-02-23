@@ -364,35 +364,11 @@ namespace Ogre {
         */
         virtual const String& getMaterialName(void) const;
 
-        /** Overridden from MovableObject
-            @see
-                MovableObject
-        */
-        virtual void _notifyCurrentCamera(Camera* cam);
-
-        /** Overridden from MovableObject
-        @see
-        MovableObject
-        */
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
-
-        /** Overridden from MovableObject
-            @see
-                MovableObject
-        */
-        virtual const AxisAlignedBox& getBoundingBox(void) const { return mAABB; }
-
-        /** Overridden from MovableObject
-            @see
-                MovableObject
-        */
-        virtual Real getBoundingRadius(void) const { return mBoundingRadius; }
-
-        /** Overridden from MovableObject
-            @see
-                MovableObject
-        */
-        virtual void _updateRenderQueue(RenderQueue* queue);
+        virtual void _notifyCurrentCamera(Camera* cam) override;
+        void _notifyAttached(Node* parent, bool isTagPoint = false) override;
+        virtual const AxisAlignedBox& getBoundingBox(void) const override { return mAABB; }
+        virtual Real getBoundingRadius(void) const override { return mBoundingRadius; }
+        virtual void _updateRenderQueue(RenderQueue* queue) override;
 
         /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
@@ -484,8 +460,7 @@ namespace Ogre {
         */
         static Real getDefaultNonVisibleUpdateTimeout(void) { return msDefaultNonvisibleTimeout; }
 
-        /** Overridden from MovableObject */
-        const String& getMovableType(void) const;
+        const String& getMovableType(void) const override;
 
         /** Internal callback used by Particles to notify their parent that they have been resized.
         */

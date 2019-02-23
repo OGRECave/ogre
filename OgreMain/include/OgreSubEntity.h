@@ -195,17 +195,10 @@ namespace Ogre {
         /** Accessor to get parent Entity */
         Entity* getParent(void) const { return mParentEntity; }
 
-        /** Overridden - see Renderable.
-        */
-        const MaterialPtr& getMaterial(void) const;
 
-        /** Overridden - see Renderable.
-        */
-        Technique* getTechnique(void) const;
-
-        /** Overridden - see Renderable.
-        */
-        void getRenderOperation(RenderOperation& op);
+        const MaterialPtr& getMaterial(void) const override;
+        Technique* getTechnique(void) const override;
+        void getRenderOperation(RenderOperation& op) override;
 
         /** Tells this SubEntity to draw a subset of the SubMesh by adjusting the index buffer extents.
          * Default value is zero so that the entire index buffer is used when drawing.
@@ -232,18 +225,11 @@ namespace Ogre {
         */
         void resetIndexDataStartEndIndex();
 
-        /** Overridden - see Renderable.
-        */
-        void getWorldTransforms(Matrix4* xform) const;
-        /** Overridden - see Renderable.
-        */
-        unsigned short getNumWorldTransforms(void) const;
-        /** Overridden, see Renderable */
-        Real getSquaredViewDepth(const Camera* cam) const;
-        /** @copydoc Renderable::getLights */
-        const LightList& getLights(void) const;
-        /** @copydoc Renderable::getCastsShadows */
-        bool getCastsShadows(void) const;
+        void getWorldTransforms(Matrix4* xform) const override;
+        unsigned short getNumWorldTransforms(void) const override;
+        Real getSquaredViewDepth(const Camera* cam) const override;
+        const LightList& getLights(void) const override;
+        bool getCastsShadows(void) const override;
         /** Advanced method to get the temporarily blended vertex information
         for entities which are software skinned. 
         @remarks
@@ -295,7 +281,7 @@ namespace Ogre {
         /** Overridden from Renderable to provide some custom behaviour. */
         void _updateCustomGpuParameter(
             const GpuProgramParameters::AutoConstantEntry& constantEntry,
-            GpuProgramParameters* params) const;
+            GpuProgramParameters* params) const override;
 
         /** Invalidate the camera distance cache */
         void _invalidateCameraCache ()

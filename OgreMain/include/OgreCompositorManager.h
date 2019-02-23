@@ -63,10 +63,9 @@ namespace Ogre {
         CompositorManager();
         virtual ~CompositorManager();
 
-        /// Overridden from ResourceManager
         Resource* createImpl(const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader,
-            const NameValuePairList* params);
+            const NameValuePairList* params) override;
 
         /** Initialises the Compositor manager, which also triggers it to
             parse all available .compositor scripts. */

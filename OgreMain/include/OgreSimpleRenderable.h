@@ -89,15 +89,11 @@ namespace Ogre {
         virtual const AxisAlignedBox& getBoundingBox(void) const;
 
         virtual void _updateRenderQueue(RenderQueue* queue);
-        /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
 
-        /** Overridden from MovableObject */
-        virtual const String& getMovableType(void) const;
-
-        /** @copydoc Renderable::getLights */
-        const LightList& getLights(void) const;
+        void visitRenderables(Renderable::Visitor* visitor,
+            bool debugRenderables = false) override;
+        virtual const String& getMovableType(void) const override;
+        const LightList& getLights(void) const override;
 
     };
     /** @} */

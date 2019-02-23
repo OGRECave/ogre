@@ -408,11 +408,8 @@ namespace Ogre {
             rotation inherited from a node attachment. */
         Vector3 getRealRight(void) const;
 
-        /** Overridden from Frustum/Renderable */
-        void getWorldTransforms(Matrix4* mat) const;
-
-        /** Overridden from MovableObject */
-        const String& getMovableType(void) const;
+        void getWorldTransforms(Matrix4* mat) const override;
+        const String& getMovableType(void) const override;
 
         /** Enables / disables automatic tracking of a SceneNode.
         @remarks
@@ -539,8 +536,7 @@ namespace Ogre {
         /// Gets the window clip planes, only applicable if isWindowSet == true
         const std::vector<Plane>& getWindowPlanes(void) const;
 
-        /** Overridden from MovableObject */
-        Real getBoundingRadius(void) const;
+        Real getBoundingRadius(void) const override;
         /** Get the auto tracking target for this camera, if any. */
         SceneNode* getAutoTrackTarget(void) const { return mAutoTrackTarget; }
         /** Get the auto tracking offset for this camera, if it is auto tracking. */
