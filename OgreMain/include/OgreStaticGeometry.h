@@ -325,12 +325,10 @@ namespace Ogre {
                     HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
                     bool createSeparateLightCap, bool isLightCap = false);
                 ~LODShadowRenderable();
-                /// Overridden from ShadowRenderable
-                void getWorldTransforms(Matrix4* xform) const;
+                void getWorldTransforms(Matrix4* xform) const override;
                 HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
                 HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-                /// Overridden from ShadowRenderable
-                virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
+                virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) override;
 
             };
             /// Pointer to parent region
@@ -464,15 +462,11 @@ namespace Ogre {
                 ShadowTechnique shadowTechnique, const Light* light, 
                 HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
                 bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
-            /// Overridden from MovableObject
-            EdgeData* getEdgeList(void);
-            /** Overridden member from ShadowCaster. */
-            bool hasEdgeList(void);
+            EdgeData* getEdgeList(void) override;
+            bool hasEdgeList(void) override;
 
-            /** @copydoc MovableObject::_releaseManualHardwareResources */
-            void _releaseManualHardwareResources();
-            /** @copydoc MovableObject::_restoreManualHardwareResources */
-            void _restoreManualHardwareResources();
+            void _releaseManualHardwareResources() override;
+            void _restoreManualHardwareResources() override;
 
             /// Dump contents for diagnostics
             void dump(std::ofstream& of) const;

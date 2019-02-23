@@ -472,41 +472,21 @@ namespace Ogre
         */
         virtual bool isVisible(const Vector3& vert, FrustumPlane* culledBy = 0) const;
 
-        /// Overridden from MovableObject::getTypeFlags
-        uint32 getTypeFlags(void) const;
-
-        /** Overridden from MovableObject */
-        const AxisAlignedBox& getBoundingBox(void) const;
-
-        /** Overridden from MovableObject */
-        Real getBoundingRadius(void) const;
-
-        /** Overridden from MovableObject */
-        void _updateRenderQueue(RenderQueue* queue);
-
-        /** Overridden from MovableObject */
-        const String& getMovableType(void) const;
-
-        /** Overridden from MovableObject */
-        void _notifyCurrentCamera(Camera* cam);
+        uint32 getTypeFlags(void) const override;
+        const AxisAlignedBox& getBoundingBox(void) const override;
+        Real getBoundingRadius(void) const override;
+        void _updateRenderQueue(RenderQueue* queue) override;
+        const String& getMovableType(void) const override;
+        void _notifyCurrentCamera(Camera* cam) override;
 
         /// material to use for debug display
         void setMaterial(const MaterialPtr& mat);
 
-        /** Overridden from Renderable */
-        const MaterialPtr& getMaterial(void) const;
-
-        /** Overridden from Renderable */
-        void getRenderOperation(RenderOperation& op);
-
-        /** Overridden from Renderable */
-        void getWorldTransforms(Matrix4* xform) const;
-
-        /** Overridden from Renderable */
-        Real getSquaredViewDepth(const Camera* cam) const;
-
-        /** Overridden from Renderable */
-        const LightList& getLights(void) const;
+        const MaterialPtr& getMaterial(void) const override;
+        void getRenderOperation(RenderOperation& op) override;
+        void getWorldTransforms(Matrix4* xform) const override;
+        Real getSquaredViewDepth(const Camera* cam) const override;
+        const LightList& getLights(void) const override;
 
         /** Gets the world space corners of the frustum.
         @remarks
