@@ -70,6 +70,16 @@ namespace Ogre {
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
 
+        bool getPassTransformStates(void) const {
+            return true;
+        }
+        bool getPassSurfaceAndLightStates(void) const {
+            return true;
+        }
+        bool getPassFogStates(void) const {
+            return true;
+        }
+
         /// compile source into shader object
         bool compile( bool checkErrors = true);
 

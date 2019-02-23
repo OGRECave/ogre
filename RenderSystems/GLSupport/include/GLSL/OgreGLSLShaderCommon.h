@@ -84,16 +84,6 @@ namespace Ogre {
         String getAttachedShaderNames() const { return mAttachedShaderNames; }
 
         /// Overridden
-        bool getPassTransformStates(void) const {
-            return true;
-        }
-        bool getPassSurfaceAndLightStates(void) const {
-            return true;
-        }
-        bool getPassFogStates(void) const {
-            return true;
-        }
-
         /** Attach another GLSL Shader to this one. */
         void attachChildShader(const String& name);
 
