@@ -81,8 +81,8 @@ namespace Ogre {
     class _OgreExport StringUtil
     {
     public:
-        OGRE_DEPRECATED static const String& BLANK; /// @deprecated use Ogre::BLANKSTRING instead
-        OGRE_DEPRECATED typedef StringStream StrStreamType; /// @deprecated use Ogre::StringStream instead
+        OGRE_DEPRECATED static const String& BLANK; //!< @deprecated use Ogre::BLANKSTRING instead
+        OGRE_DEPRECATED typedef StringStream StrStreamType; //!< @deprecated use Ogre::StringStream instead
 
         /** Removes any whitespace characters, be it standard space or
             TABs and so on.
