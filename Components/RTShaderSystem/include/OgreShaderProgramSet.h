@@ -60,18 +60,6 @@ public:
     /** Get the shader GPU program. */
     const GpuProgramPtr& getGpuProgram(GpuProgramType type) const;
 
-    /// @deprecated
-    OGRE_DEPRECATED Program* getCpuVertexProgram() { return getCpuProgram(GPT_VERTEX_PROGRAM); }
-
-    /// @deprecated
-    OGRE_DEPRECATED Program* getCpuFragmentProgram() { return getCpuProgram(GPT_FRAGMENT_PROGRAM); }
-
-    /// @deprecated
-    OGRE_DEPRECATED GpuProgramPtr getGpuVertexProgram() { return getGpuProgram(GPT_VERTEX_PROGRAM); }
-
-    /// @deprecated
-    OGRE_DEPRECATED GpuProgramPtr getGpuFragmentProgram() { return getGpuProgram(GPT_FRAGMENT_PROGRAM); }
-
     // Protected methods.
 protected:
     void setCpuProgram(Program* program, GpuProgramType type);

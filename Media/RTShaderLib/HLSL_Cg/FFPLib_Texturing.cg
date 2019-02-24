@@ -122,45 +122,12 @@ void FFP_GenerateTexCoord_Projection(in float4x4 mWorld,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_SampleTexture(in sampler1D s, 
-				   in float f,
-				   out float4 t)
-{
-	t = tex1D(s, f);
-}
-
-//-----------------------------------------------------------------------------
-void FFP_SampleTexture(in sampler2D s, 
-				   in float2 f,
-				   out float4 t)
-{
-	t = tex2D(s, f);
-}
-
-//-----------------------------------------------------------------------------
 void FFP_SampleTextureProj(in sampler2D s, 
 				   in float3 f,
 				   out float4 t)
 {
 	t = tex2D(s, f.xy/f.z);
 }
-
-//-----------------------------------------------------------------------------
-void FFP_SampleTexture(in sampler3D s, 
-				   in float3 f,
-				   out float4 t)
-{
-	t = tex3D(s, f);
-}
-
-//-----------------------------------------------------------------------------
-void FFP_SampleTexture(in samplerCUBE s, 
-				   in float3 f,
-				   out float4 t)
-{
-	t = texCUBE(s, f);
-}
-
 
 //-----------------------------------------------------------------------------
 void FFP_ModulateX2(in float vIn0, in float vIn1, out float vOut)

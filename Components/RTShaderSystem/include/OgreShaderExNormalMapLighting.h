@@ -135,21 +135,11 @@ public:
     void setNormalMapFiltering(const FilterOptions minFilter, const FilterOptions magFilter, const FilterOptions mipFilter) 
     { mNormalMapSampler->setFiltering(minFilter, magFilter, mipFilter); }
 
-    /// @deprecated use getNormalMapSampler
-    OGRE_DEPRECATED void getNormalMapFiltering(FilterOptions& minFilter, FilterOptions& magFilter, FilterOptions& mipFilter) const
-    { minFilter = mNormalMapSampler->getFiltering(FT_MIN); magFilter = mNormalMapSampler->getFiltering(FT_MAG) ; mipFilter = mNormalMapSampler->getFiltering(FT_MIP); }
-
     /// @deprecated use setNormalMapSampler
     void setNormalMapAnisotropy(unsigned int anisotropy) { mNormalMapSampler->setAnisotropy(anisotropy); }
 
-    /// @deprecated use getNormalMapSampler
-    OGRE_DEPRECATED unsigned int getNormalMapAnisotropy() const { return mNormalMapSampler->getAnisotropy(); }
-
     /// @deprecated use setNormalMapSampler
     void setNormalMapMipBias(Real mipBias) { mNormalMapSampler->setMipmapBias(mipBias); }
-
-    /// @deprecated use getNormalMapSampler
-    OGRE_DEPRECATED Real getNormalMapMipBias() const { return mNormalMapSampler->getMipmapBias(); }
 
     /// return the normal map sampler
     const SamplerPtr& getNormalMapSampler() const { return mNormalMapSampler; }

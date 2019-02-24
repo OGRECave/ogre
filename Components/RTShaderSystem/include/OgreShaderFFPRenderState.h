@@ -90,16 +90,6 @@ enum FFPShaderStage
 #define FFP_LIB_TRANSFORM                           "FFPLib_Transform"
 #define FFP_FUNC_TRANSFORM                          "FFP_Transform"
 
-// Fixed Function Library: Lighting functions
-/// @deprecated use SGX_LIB_PERPIXELLIGHTING
-#define FFP_LIB_LIGHTING                            "FFPLib_Lighting"
-#define FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE          "FFP_Light_Directional_Diffuse"
-#define FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR  "FFP_Light_Directional_DiffuseSpecular"
-#define FFP_FUNC_LIGHT_POINT_DIFFUSE                "FFP_Light_Point_Diffuse"
-#define FFP_FUNC_LIGHT_POINT_DIFFUSESPECULAR        "FFP_Light_Point_DiffuseSpecular"
-#define FFP_FUNC_LIGHT_SPOT_DIFFUSE                 "FFP_Light_Spot_Diffuse"
-#define FFP_FUNC_LIGHT_SPOT_DIFFUSESPECULAR         "FFP_Light_Spot_DiffuseSpecular"
-
 // Fixed Function Library: Texturing functions
 #define FFP_LIB_TEXTURING                           "FFPLib_Texturing"
 #define FFP_FUNC_TRANSFORM_TEXCOORD                 "FFP_TransformTexCoord"
@@ -107,9 +97,6 @@ enum FFPShaderStage
 #define FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE       "FFP_GenerateTexCoord_EnvMap_Sphere"
 #define FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT      "FFP_GenerateTexCoord_EnvMap_Reflect"
 #define FFP_FUNC_GENERATE_TEXCOORD_PROJECTION       "FFP_GenerateTexCoord_Projection"
-
-/// @deprecated use SampleTextureAtom
-#define FFP_FUNC_SAMPLE_TEXTURE                     "FFP_SampleTexture"
 
 #define FFP_FUNC_SAMPLE_TEXTURE_PROJ                "FFP_SampleTextureProj"
 #define FFP_FUNC_MODULATEX2                         "FFP_ModulateX2"
