@@ -433,15 +433,6 @@ namespace Ogre {
         virtual void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE,
                                         int mipmapLevel = 0, int textureArrayIndex = 0,
                                         PixelFormat format = PF_UNKNOWN) {}
-        /// @deprecated
-        OGRE_DEPRECATED void createShaderAccessPoint(uint bindPoint, TextureAccess access,
-                                                     int mipmapLevel, int textureArrayIndex,
-                                                     PixelFormat* format)
-        {
-            createShaderAccessPoint(bindPoint, access, mipmapLevel, textureArrayIndex,
-                                    format ? *format : PF_UNKNOWN);
-        }
-
         /** Set image names to be loaded as layers (3d & texture array) or cubemap faces
          */
         void setLayerNames(const std::vector<String>& names)
