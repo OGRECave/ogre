@@ -255,12 +255,6 @@ namespace Ogre
         */
         virtual void setLightingEnabled(bool enabled) {}
 
-        /// @deprecated use RSC_WBUFFER
-        OGRE_DEPRECATED void setWBufferEnabled(bool enabled);
-
-        /// @deprecated use RSC_WBUFFER
-        OGRE_DEPRECATED bool getWBufferEnabled(void) const;
-
         /** Creates a new rendering window.
         @remarks
         This method creates a new rendering window as specified
@@ -428,7 +422,6 @@ namespace Ogre
         virtual void _setTextureUnitSettings(size_t texUnit, TextureUnitState& tl);
         /// set the sampler settings for the given texture unit
         virtual void _setSampler(size_t texUnit, Sampler& s) = 0;
-        OGRE_DEPRECATED virtual void _setBindingType(TextureUnitState::BindingType bindigType) {}
         /** Turns off a texture unit. */
         virtual void _disableTextureUnit(size_t texUnit);
         /** Disables all texture units from the given unit upwards */
@@ -574,12 +567,6 @@ namespace Ogre
             _setSeparateSceneBlending(state.sourceFactor, state.destFactor, state.sourceFactorAlpha,
                                       state.destFactorAlpha, state.operation, state.alphaOperation);
             _setColourBufferWriteEnabled(state.writeR, state.writeG, state.writeB, state.writeA);
-        }
-
-        /// @deprecated use setColourBlendState
-        OGRE_DEPRECATED void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD)
-        {
-            _setSeparateSceneBlending(sourceFactor, destFactor, sourceFactor, destFactor, op, op);
         }
 
         /// @deprecated use setColourBlendState
@@ -761,19 +748,6 @@ namespace Ogre
         virtual void _convertProjectionMatrix(const Matrix4& matrix,
             Matrix4& dest, bool forGpuProgram = false) = 0;
 
-        /// @deprecated use Frustum::getProjectionMatrixRS
-        OGRE_DEPRECATED virtual void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane,
-            Matrix4& dest, bool forGpuProgram = false) = 0;
-        /// @deprecated use Frustum::getProjectionMatrixRS
-        OGRE_DEPRECATED virtual void _makeProjectionMatrix(Real left, Real right, Real bottom, Real top,
-            Real nearPlane, Real farPlane, Matrix4& dest, bool forGpuProgram = false) = 0;
-        /// @deprecated use Frustum::getProjectionMatrixRS
-        OGRE_DEPRECATED virtual void _makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane,
-            Matrix4& dest, bool forGpuProgram = false) = 0;
-        /// @deprecated use Frustum::getProjectionMatrixRS
-        OGRE_DEPRECATED virtual void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
-            bool forGpuProgram) = 0;
-
         /** Sets how to rasterise triangles, as points, wireframe or solid polys. */
         virtual void _setPolygonMode(PolygonMode level) = 0;
 
@@ -917,12 +891,6 @@ namespace Ogre
         @deprecated only needed for fixed function APIs
         */
         virtual void setClipPlanes(const PlaneList& clipPlanes);
-
-        /// @deprecated use setClipPlanes
-        OGRE_DEPRECATED void addClipPlane (const Plane &p);
-
-        /// @deprecated use setClipPlanes
-        OGRE_DEPRECATED void resetClipPlanes();
 
         /** Utility method for initialising all render targets attached to this rendering system. */
         void _initRenderTargets(void);

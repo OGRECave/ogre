@@ -634,16 +634,6 @@ namespace Ogre {
                                                        "for RT: " + renderTarget->getName());
         }
     }
-    bool RenderSystem::getWBufferEnabled(void) const
-    {
-        return mCurrentCapabilities->hasCapability(RSC_WBUFFER);
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::setWBufferEnabled(bool enabled)
-    {
-        enabled ? mCurrentCapabilities->setCapability(RSC_WBUFFER)
-                : mCurrentCapabilities->unsetCapability(RSC_WBUFFER);
-    }
     //-----------------------------------------------------------------------
     void RenderSystem::shutdown(void)
     {
@@ -767,26 +757,11 @@ namespace Ogre {
         return mInvertVertexWinding;
     }
     //---------------------------------------------------------------------
-    void RenderSystem::addClipPlane (const Plane &p)
-    {
-        mClipPlanes.push_back(p);
-        mClipPlanesDirty = true;
-    }
-    //---------------------------------------------------------------------
     void RenderSystem::setClipPlanes(const PlaneList& clipPlanes)
     {
         if (clipPlanes != mClipPlanes)
         {
             mClipPlanes = clipPlanes;
-            mClipPlanesDirty = true;
-        }
-    }
-    //---------------------------------------------------------------------
-    void RenderSystem::resetClipPlanes()
-    {
-        if (!mClipPlanes.empty())
-        {
-            mClipPlanes.clear();
             mClipPlanesDirty = true;
         }
     }
