@@ -167,18 +167,12 @@ namespace Ogre {
 		/** Check if a compositor logic exists
 		*/
 		bool hasCompositorLogic(const String& name);
-
-		/// @deprecated use hasCompositorLogic
-		OGRE_DEPRECATED bool getHasCompositorLogic(const String& name) { return hasCompositorLogic(name); }
 		
         /** Register a custom composition pass.
         */
         void registerCustomCompositionPass(const String& name, CustomCompositionPass* customPass);
 
         void unregisterCustomCompositionPass(const String& name);
-
-        /// @deprecated use unregisterCustomCompositionPass
-		OGRE_DEPRECATED void unRegisterCustomCompositionPass(const String& name) { unregisterCustomCompositionPass(name); }
 
         /** Get a custom composition pass by its name 
         */
@@ -187,9 +181,6 @@ namespace Ogre {
 		/** Check if a compositor pass exists
 		*/
         bool hasCustomCompositionPass(const String& name);
-		
-        /// @deprecated use hasCustomCompositionPass
-        OGRE_DEPRECATED bool getHasCompositionPass(const String& name) { return hasCustomCompositionPass(name); }
 
         /**
         Relocates a compositor chain from one viewport to another

@@ -319,35 +319,6 @@ namespace Ogre {
         return PF_UNKNOWN;
     }
     //-----------------------------------------------------------------------
-    String PixelUtil::getBNFExpressionOfPixelFormats(bool accessibleOnly)
-    {
-        // Collect format names sorted by length, it's required by BNF compiler
-        // that similar tokens need longer ones comes first.
-        typedef std::multimap<String::size_type, String> FormatNameMap;
-        FormatNameMap formatNames;
-        for (size_t i = 0; i < PF_COUNT; ++i)
-        {
-            PixelFormat pf = static_cast<PixelFormat>(i);
-            if (!accessibleOnly || isAccessible(pf))
-            {
-                String formatName = getFormatName(pf);
-                formatNames.insert(std::make_pair(formatName.length(), formatName));
-            }
-        }
-
-        // Populate the BNF expression in reverse order
-        String result;
-        // Note: Stupid M$ VC7.1 can't dealing operator!= with FormatNameMap::const_reverse_iterator.
-        for (FormatNameMap::reverse_iterator j = formatNames.rbegin(); j != formatNames.rend(); ++j)
-        {
-            if (!result.empty())
-                result += " | ";
-            result += "'" + j->second + "'";
-        }
-
-        return result;
-    }
-    //-----------------------------------------------------------------------
     PixelFormat PixelUtil::getFormatForBitDepths(PixelFormat fmt, ushort integerBits, ushort floatBits)
     {
         switch (integerBits)

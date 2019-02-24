@@ -559,9 +559,6 @@ namespace Ogre {
         */
         static PixelFormat getFormatFromName(const String& name, bool accessibleOnly = false, bool caseSensitive = false);
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED static String getBNFExpressionOfPixelFormats(bool accessibleOnly = false);
-
         /** Returns the similar format but acoording with given bit depths.
             @param fmt      The original foamt.
             @param integerBits Preferred bit depth (pixel bits) for integer pixel format.

@@ -33,9 +33,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre
 {
-
-    GpuLogicalBufferStructPtr GpuProgramParameters::mBoolLogicalToPhysical;
-
     //---------------------------------------------------------------------
     GpuProgramParameters::AutoConstantDefinition GpuProgramParameters::AutoConstantDictionary[] = {
         AutoConstantDefinition(ACT_WORLD_MATRIX,                  "world_matrix",                16, ET_REAL, ACDT_NONE),
@@ -1548,11 +1545,6 @@ namespace Ogre
         return getConstantLogicalIndexUse(mIntLogicalToPhysical, mIntConstants, logicalIndex,
                                           requestedSize, variability);
     }
-    //---------------------------------------------------------------------()
-    GpuLogicalIndexUse* GpuProgramParameters::_getUnsignedIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability)
-    {
-        return _getIntConstantLogicalIndexUse(logicalIndex, requestedSize, variability);
-    }
     //-----------------------------------------------------------------------------
     size_t GpuProgramParameters::_getFloatConstantPhysicalIndex(
         size_t logicalIndex, size_t requestedSize, uint16 variability)
@@ -1573,12 +1565,6 @@ namespace Ogre
     {
         GpuLogicalIndexUse* indexUse = _getIntConstantLogicalIndexUse(logicalIndex, requestedSize, variability);
         return indexUse ? indexUse->physicalIndex : 0;
-    }
-    //-----------------------------------------------------------------------------
-    size_t GpuProgramParameters::_getUnsignedIntConstantPhysicalIndex(
-        size_t logicalIndex, size_t requestedSize, uint16 variability)
-    {
-        return _getIntConstantPhysicalIndex(logicalIndex, requestedSize, variability);
     }
     //-----------------------------------------------------------------------------
     static size_t getLogicalIndexForPhysicalIndex(const GpuLogicalBufferStructPtr& logicalToPhysical,
@@ -1603,15 +1589,6 @@ namespace Ogre
     size_t GpuProgramParameters::getIntLogicalIndexForPhysicalIndex(size_t physicalIndex)
     {
         return getLogicalIndexForPhysicalIndex(mIntLogicalToPhysical, physicalIndex);
-    }
-    size_t GpuProgramParameters::getUnsignedIntLogicalIndexForPhysicalIndex(size_t physicalIndex)
-    {
-        return getIntLogicalIndexForPhysicalIndex(physicalIndex);
-    }
-    //-----------------------------------------------------------------------------
-    size_t GpuProgramParameters::getBoolLogicalIndexForPhysicalIndex(size_t physicalIndex)
-    {
-        return std::numeric_limits<size_t>::max();
     }
     //-----------------------------------------------------------------------------
     GpuConstantDefinitionIterator GpuProgramParameters::getConstantDefinitionIterator(void) const
@@ -1832,11 +1809,6 @@ namespace Ogre
     {
         mAutoConstants.clear();
         mCombinedVariability = GPV_GLOBAL;
-    }
-    //-----------------------------------------------------------------------------
-    GpuProgramParameters::AutoConstantIterator GpuProgramParameters::getAutoConstantIterator(void) const
-    {
-        return AutoConstantIterator(mAutoConstants.begin(), mAutoConstants.end());
     }
     //-----------------------------------------------------------------------------
     void GpuProgramParameters::setAutoConstantReal(size_t index, AutoConstantType acType, Real rData)

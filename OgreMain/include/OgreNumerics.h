@@ -40,10 +40,6 @@ namespace Ogre {
     /** \addtogroup Math
     *  @{
     */
-    /** Real type for numeric solvers */
-    OGRE_DEPRECATED typedef double PreciseReal;
-
-
     /** Provides numeric solvers for Ogre
         @remarks
             Handles linear algebra numerics.
