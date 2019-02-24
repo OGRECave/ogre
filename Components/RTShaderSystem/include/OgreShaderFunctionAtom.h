@@ -55,10 +55,7 @@ public:
 
     /** Get the group execution order of this function atom. */
     int getGroupExecutionOrder() const;
-    
-    /** Get an internal execution order within a group of this function atom. */
-    OGRE_DEPRECATED int getInternalExecutionOrder() const { return -1; }
-    
+
     /** Abstract method that writes a source code to the given output stream in the target shader language. */
     virtual void writeSourceCode(std::ostream& os, const String& targetLanguage) const = 0;
     

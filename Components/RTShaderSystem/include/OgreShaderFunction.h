@@ -226,9 +226,6 @@ public:
     */
     void addAtomInstance(FunctionAtom* atomInstance);
 
-    /// @deprecated use FunctionStageRef::assign instead
-    OGRE_DEPRECATED void addAtomAssign(ParameterPtr lhs, ParameterPtr rhs, int groupOrder);
-
     /// get a @ref FFPShaderStage of this function
     FunctionStageRef getStage(size_t s)
     {

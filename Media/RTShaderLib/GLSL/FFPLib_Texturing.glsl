@@ -150,59 +150,12 @@ void FFP_GenerateTexCoord_Projection(in mat4 mWorld,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_SampleTexture(in sampler2D s,
-                   in float f,
-                   out vec4 t)
-{
-    t = texture2D(s, vec2(f, 0));
-}
-//-----------------------------------------------------------------------------
-void FFP_SampleTexture(in sampler1D s, 
-				   in float f,
-				   out vec4 t)
-{
-	t = texture1D(s, f);
-}
-
-//-----------------------------------------------------------------------------
-void FFP_SampleTexture(in sampler2D s, 
-				   in vec2 f,
-				   out vec4 t)
-{
-	t = texture2D (s, f);
-}
-//-----------------------------------------------------------------------------
-void FFP_SampleTexture(in sampler2D s, 
-				   in vec4 f,
-				   out vec4 t)
-{
-	t = texture2D (s, vec2(f.xy));
-}
-
-//-----------------------------------------------------------------------------
 void FFP_SampleTextureProj(in sampler2D s, 
 				   in vec3 f,
 				   out vec4 t)
 {
 	t = texture2D(s, f.xy/f.z);
 }
-
-//-----------------------------------------------------------------------------
-void FFP_SampleTexture(in sampler3D s, 
-				   in vec3 f,
-				   out vec4 t)
-{
-	t = texture3D(s, f);
-}
-
-//-----------------------------------------------------------------------------
-void FFP_SampleTexture(in samplerCube s, 
-				   in vec3 f,
-				   out vec4 t)
-{
-	t = textureCube(s, f);
-}
-
 
 //-----------------------------------------------------------------------------
 void FFP_ModulateX2(in float vIn0, in float vIn1, out float vOut)
