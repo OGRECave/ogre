@@ -594,13 +594,6 @@ namespace Ogre {
         PlatformInformation::log(LogManager::getSingleton().getDefaultLog());
         mActiveRenderer->_initialise();
 
-        if (autoCreateWindow)
-        {
-            auto desc = mActiveRenderer->getRenderWindowDescription();
-            desc.name = windowTitle;
-            mAutoWindow = createRenderWindow(desc);
-        }
-
         // Initialise timer
         mTimer->reset();
 
@@ -608,6 +601,13 @@ namespace Ogre {
         ConvexBody::_initialisePool();
 
         mIsInitialised = true;
+
+        if (autoCreateWindow)
+        {
+            auto desc = mActiveRenderer->getRenderWindowDescription();
+            desc.name = windowTitle;
+            mAutoWindow = createRenderWindow(desc);
+        }
 
         return mAutoWindow;
 
