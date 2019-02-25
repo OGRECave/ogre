@@ -240,6 +240,43 @@ namespace Ogre
             return mFixedFunctionParams;
         }
 
+        /// @deprecated migrate to getFixedFunctionParams ASAP. this is very slow now.
+        OGRE_DEPRECATED void _setProjectionMatrix(const Matrix4& m)
+        {
+            if (!mFixedFunctionParams) return;
+            mFixedFunctionParams->setConstant(8, m);
+            applyFixedFunctionParams(mFixedFunctionParams, GPV_GLOBAL);
+        }
+
+        /// @deprecated migrate to getFixedFunctionParams ASAP. this is very slow now.
+        OGRE_DEPRECATED void _setViewMatrix(const Matrix4& m)
+        {
+            if (!mFixedFunctionParams) return;
+            mFixedFunctionParams->setConstant(4, m);
+            applyFixedFunctionParams(mFixedFunctionParams, GPV_GLOBAL);
+        }
+
+        /// @deprecated migrate to getFixedFunctionParams ASAP. this is very slow now.
+        OGRE_DEPRECATED void _setWorldMatrix(const Matrix4& m)
+        {
+            if (!mFixedFunctionParams) return;
+            mFixedFunctionParams->setConstant(0, m);
+            applyFixedFunctionParams(mFixedFunctionParams, GPV_PER_OBJECT);
+        }
+
+        /// @deprecated migrate to getFixedFunctionParams ASAP. this is very slow now.
+        OGRE_DEPRECATED void _setFog(FogMode f)
+        {
+            if (mFixedFunctionParams)
+                getFixedFunctionParams(TVC_NONE, f);
+        }
+
+        /// @deprecated use setColourBlendState
+        OGRE_DEPRECATED void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD)
+        {
+            _setSeparateSceneBlending(sourceFactor, destFactor, sourceFactor, destFactor, op, op);
+        }
+
         virtual void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 variabilityMask) {}
 
         /** Sets the type of light shading required (default = Gouraud).
