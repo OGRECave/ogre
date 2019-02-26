@@ -233,16 +233,16 @@ namespace Ogre {
                 switch(ac.paramType)
                 {
                 case GpuProgramParameters::ACT_WORLD_MATRIX:
-                    _setWorldMatrix((const Matrix4&)ptr);
+                    setWorldMatrix((const Matrix4&)ptr);
                     break;
                 case GpuProgramParameters::ACT_VIEW_MATRIX:
                     // force light update
                     updateLightPos = true;
                     mask |= GPV_LIGHTS;
-                    _setViewMatrix((const Matrix4&)ptr);
+                    setViewMatrix((const Matrix4&)ptr);
                     break;
                 case GpuProgramParameters::ACT_PROJECTION_MATRIX:
-                    _setProjectionMatrix((const Matrix4&)ptr);
+                    setProjectionMatrix((const Matrix4&)ptr);
                     break;
                 case GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR:
                     mStateCacheManager->setMaterialAmbient(ptr[0], ptr[1], ptr[2], ptr[3]);
@@ -1321,7 +1321,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setWorldMatrix( const Matrix4 &m )
+    void GLRenderSystem::setWorldMatrix( const Matrix4 &m )
     {
         mWorldMatrix = m;
         glMatrixMode(GL_MODELVIEW);
@@ -1329,7 +1329,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setViewMatrix( const Matrix4 &m )
+    void GLRenderSystem::setViewMatrix( const Matrix4 &m )
     {
         mViewMatrix = m;
         glMatrixMode(GL_MODELVIEW);
@@ -1340,7 +1340,7 @@ namespace Ogre {
             mClipPlanesDirty = true;
     }
     //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setProjectionMatrix(const Matrix4 &m)
+    void GLRenderSystem::setProjectionMatrix(const Matrix4 &m)
     {
         glMatrixMode(GL_PROJECTION);
         glLoadMatrixf(m.transpose()[0]);

@@ -188,7 +188,10 @@ namespace Ogre
 #endif
 
     protected:
-        void setClipPlanesImpl(const PlaneList& clipPlanes);        
+        void setClipPlanesImpl(const PlaneList& clipPlanes);
+        void setWorldMatrix( const Matrix4 &m );
+        void setViewMatrix( const Matrix4 &m );
+        void setProjectionMatrix( const Matrix4 &m );
     public:
         // constructor
         D3D9RenderSystem( HINSTANCE hInstance );
@@ -277,9 +280,6 @@ namespace Ogre
 
         // Low-level overridden members, mainly for internal use
         void _useLights(unsigned short limit);
-        void _setWorldMatrix( const Matrix4 &m );
-        void _setViewMatrix( const Matrix4 &m );
-        void _setProjectionMatrix( const Matrix4 &m );
         void _setSurfaceTracking( TrackVertexColourType tracking );
         void _setPointSpritesEnabled(bool enabled);
         void _setPointParameters(bool attenuationEnabled, Real minSize, Real maxSize);
