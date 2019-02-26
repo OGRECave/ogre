@@ -102,11 +102,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box)
     {
-        assert(mLockBox.getDepth() == 1 || mParentTexture->getTextureType() == TEX_TYPE_3D);
+        assert(mLockedBox.getDepth() == 1 || mParentTexture->getTextureType() == TEX_TYPE_3D);
 
         D3D11_MAPPED_SUBRESOURCE pMappedResource = { 0 };
 
-        HRESULT hr = mDevice.GetImmediateContext()->Map(res, getSubresourceIndex(mLockBox.front), flags, 0, &pMappedResource);
+        HRESULT hr = mDevice.GetImmediateContext()->Map(res, getSubresourceIndex(mLockedBox.front), flags, 0, &pMappedResource);
         if(FAILED(hr) || mDevice.isError())
         {
             String errorDescription; errorDescription
@@ -125,12 +125,12 @@ namespace Ogre {
 
         if(flags == D3D11_MAP_READ_WRITE || flags == D3D11_MAP_READ || flags == D3D11_MAP_WRITE)  
         {
-            if(mLockBox.getHeight() == mParentTexture->getHeight() && mLockBox.getWidth() == mParentTexture->getWidth())
+            if(mLockedBox.getHeight() == mParentTexture->getHeight() && mLockedBox.getWidth() == mParentTexture->getWidth())
                 mDevice.GetImmediateContext()->CopyResource(mStagingBuffer.Get(), mParentTexture->getTextureResource());
             else
             {
-                D3D11_BOX box = getSubresourceBox(mLockBox);
-                UINT subresource = getSubresourceIndex(mLockBox.front);
+                D3D11_BOX box = getSubresourceBox(mLockedBox);
+                UINT subresource = getSubresourceIndex(mLockedBox.front);
                 mDevice.GetImmediateContext()->CopySubresourceRegion(mStagingBuffer.Get(), subresource, box.left, box.top, box.front, mParentTexture->getTextureResource(), subresource, &box);
             }
         }
@@ -147,7 +147,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "DirectX does not allow locking of or directly writing to RenderTargets. Use blitFromMemory if you need the contents.",
             "D3D11HardwarePixelBuffer::lockImpl");  
 
-        mLockBox = lockBox;
+        mLockedBox = lockBox;
 
         // Set extents and format
         // Note that we do not carry over the left/top/front here, since the returned
@@ -197,7 +197,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void D3D11HardwarePixelBuffer::_unmap(ID3D11Resource *res)
     {
-        mDevice.GetImmediateContext()->Unmap(res, getSubresourceIndex(mLockBox.front));
+        mDevice.GetImmediateContext()->Unmap(res, getSubresourceIndex(mLockedBox.front));
         if (mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription();
@@ -209,8 +209,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_unmapstaticbuffer()
     {
-        D3D11_BOX box = getSubresourceBox(mLockBox);
-        UINT subresource = getSubresourceIndex(mLockBox.front);
+        D3D11_BOX box = getSubresourceBox(mLockedBox);
+        UINT subresource = getSubresourceIndex(mLockedBox.front);
         UINT srcRowPitch = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mCurrentLock.format);
         UINT srcDepthPitch = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mCurrentLock.format); // H * rowPitch is invalid for compressed formats
 
@@ -232,12 +232,12 @@ namespace Ogre {
 
         if(copyback)
         {
-            if(mLockBox.getHeight() == mParentTexture->getHeight() && mLockBox.getWidth() == mParentTexture->getWidth())
+            if(mLockedBox.getHeight() == mParentTexture->getHeight() && mLockedBox.getWidth() == mParentTexture->getWidth())
                 mDevice.GetImmediateContext()->CopyResource(mParentTexture->getTextureResource(), mStagingBuffer.Get());
             else
             {
-                D3D11_BOX box = getSubresourceBox(mLockBox);
-                UINT subresource = getSubresourceIndex(mLockBox.front);
+                D3D11_BOX box = getSubresourceBox(mLockedBox);
+                UINT subresource = getSubresourceIndex(mLockedBox.front);
                 mDevice.GetImmediateContext()->CopySubresourceRegion(mParentTexture->getTextureResource(), subresource, box.left, box.top, box.front, mStagingBuffer.Get(), subresource, &box);
             }
         }
