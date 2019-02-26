@@ -105,8 +105,9 @@ namespace Ogre {
         assert(mLockedBox.getDepth() == 1 || mParentTexture->getTextureType() == TEX_TYPE_3D);
 
         D3D11_MAPPED_SUBRESOURCE pMappedResource = { 0 };
+        UINT subresource = (res == mStagingBuffer.Get()) ? 0 : getSubresourceIndex(mLockedBox.front);
 
-        HRESULT hr = mDevice.GetImmediateContext()->Map(res, getSubresourceIndex(mLockedBox.front), flags, 0, &pMappedResource);
+        HRESULT hr = mDevice.GetImmediateContext()->Map(res, subresource, flags, 0, &pMappedResource);
         if(FAILED(hr) || mDevice.isError())
         {
             String errorDescription; errorDescription
@@ -125,14 +126,11 @@ namespace Ogre {
 
         if(flags == D3D11_MAP_READ_WRITE || flags == D3D11_MAP_READ || flags == D3D11_MAP_WRITE)  
         {
-            if(mLockedBox.getHeight() == mParentTexture->getHeight() && mLockedBox.getWidth() == mParentTexture->getWidth())
-                mDevice.GetImmediateContext()->CopyResource(mStagingBuffer.Get(), mParentTexture->getTextureResource());
-            else
-            {
-                D3D11_BOX box = getSubresourceBox(mLockedBox);
-                UINT subresource = getSubresourceIndex(mLockedBox.front);
-                mDevice.GetImmediateContext()->CopySubresourceRegion(mStagingBuffer.Get(), subresource, box.left, box.top, box.front, mParentTexture->getTextureResource(), subresource, &box);
-            }
+            D3D11_BOX boxDx11 = getSubresourceBox(mLockedBox); // both src and dest
+            UINT subresource = getSubresourceIndex(mLockedBox.front);
+            mDevice.GetImmediateContext()->CopySubresourceRegion(
+                mStagingBuffer.Get(), 0, boxDx11.left, boxDx11.top, boxDx11.front,
+                mParentTexture->getTextureResource(), subresource, &boxDx11);
         }
         else if(flags == D3D11_MAP_WRITE_DISCARD)
             flags = D3D11_MAP_WRITE; // stagingbuffer doesn't support discarding
@@ -197,7 +195,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void D3D11HardwarePixelBuffer::_unmap(ID3D11Resource *res)
     {
-        mDevice.GetImmediateContext()->Unmap(res, getSubresourceIndex(mLockedBox.front));
+        UINT subresource = (res == mStagingBuffer.Get()) ? 0 : getSubresourceIndex(mLockedBox.front);
+        mDevice.GetImmediateContext()->Unmap(res, subresource);
+
         if (mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription();
@@ -209,12 +209,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_unmapstaticbuffer()
     {
-        D3D11_BOX box = getSubresourceBox(mLockedBox);
+        D3D11_BOX dstBoxDx11 = getSubresourceBox(mLockedBox);
         UINT subresource = getSubresourceIndex(mLockedBox.front);
-        UINT srcRowPitch = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mCurrentLock.format);
-        UINT srcDepthPitch = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mCurrentLock.format); // H * rowPitch is invalid for compressed formats
+        UINT srcRowPitch = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mFormat);
+        UINT srcDepthPitch = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mFormat); // H * rowPitch is invalid for compressed formats
 
-        mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->getTextureResource(), subresource, &box, mDataForStaticUsageLock.data(), srcRowPitch, srcDepthPitch);
+        mDevice.GetImmediateContext()->UpdateSubresource(
+                    mParentTexture->getTextureResource(), subresource, &dstBoxDx11,
+                    mDataForStaticUsageLock.data(), srcRowPitch, srcDepthPitch);
         if (mDevice.isError())
         {
             String errorDescription; errorDescription
@@ -232,14 +234,14 @@ namespace Ogre {
 
         if(copyback)
         {
-            if(mLockedBox.getHeight() == mParentTexture->getHeight() && mLockedBox.getWidth() == mParentTexture->getWidth())
-                mDevice.GetImmediateContext()->CopyResource(mParentTexture->getTextureResource(), mStagingBuffer.Get());
-            else
-            {
-                D3D11_BOX box = getSubresourceBox(mLockedBox);
-                UINT subresource = getSubresourceIndex(mLockedBox.front);
-                mDevice.GetImmediateContext()->CopySubresourceRegion(mParentTexture->getTextureResource(), subresource, box.left, box.top, box.front, mStagingBuffer.Get(), subresource, &box);
-            }
+            D3D11_BOX boxDx11 = getSubresourceBox(mLockedBox); // both src and dest
+            UINT subresource = getSubresourceIndex(mLockedBox.front);
+
+            mDevice.GetImmediateContext()->CopySubresourceRegion(
+                mParentTexture->getTextureResource(), subresource, boxDx11.left, boxDx11.top, boxDx11.front,
+                mStagingBuffer.Get(), 0, &boxDx11);
+
+            mStagingBuffer.Reset();
         }
     }
     //-----------------------------------------------------------------------------  
@@ -416,7 +418,7 @@ namespace Ogre {
             desc.SampleDesc.Count = 1;
             desc.SampleDesc.Quality = 0;
 
-            hr = mDevice->CreateTexture2D(&desc, 0, textureNoMSAA.ReleaseAndGetAddressOf());
+            hr = mDevice->CreateTexture2D(&desc, NULL, textureNoMSAA.ReleaseAndGetAddressOf());
             mDevice.throwIfFailed(hr, "Error creating texture without MSAA", "D3D11HardwarePixelBuffer::blitToMemory");
 
             mDevice.GetImmediateContext()->ResolveSubresource(textureNoMSAA.Get(), srcSubresource, texture, srcSubresource, desc.Format);
@@ -531,6 +533,8 @@ namespace Ogre {
                 D3D11_TEXTURE1D_DESC desc;
                 tex->GetTex1D()->GetDesc(&desc);
 
+                desc.Width     = mWidth;
+                desc.MipLevels = 0;
                 desc.BindFlags = 0;
                 desc.MiscFlags = 0;
                 desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
@@ -546,6 +550,9 @@ namespace Ogre {
                 D3D11_TEXTURE2D_DESC desc;
                 tex->GetTex2D()->GetDesc(&desc);
 
+                desc.Width     = mWidth;
+                desc.Height    = mHeight;
+                desc.MipLevels = 0;
                 desc.BindFlags = 0;
                 desc.MiscFlags = 0;
                 desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
@@ -559,6 +566,10 @@ namespace Ogre {
                 D3D11_TEXTURE3D_DESC desc;
                 tex->GetTex3D()->GetDesc(&desc);
 
+                desc.Width     = mWidth;
+                desc.Height    = mHeight;
+                desc.Depth     = mDepth;
+                desc.MipLevels = 0;
                 desc.BindFlags = 0;
                 desc.MiscFlags = 0;
                 desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
