@@ -670,6 +670,23 @@ namespace Ogre {
 
         mPrioritisedRenderTargets.clear();
     }
+
+    void RenderSystem::_setProjectionMatrix(Matrix4 m)
+    {
+        if (!mFixedFunctionParams) return;
+
+        if (mActiveRenderTarget->requiresTextureFlipping())
+        {
+            // Invert transformed y
+            m[1][0] = -m[1][0];
+            m[1][1] = -m[1][1];
+            m[1][2] = -m[1][2];
+            m[1][3] = -m[1][3];
+        }
+
+        mFixedFunctionParams->setConstant(8, m);
+        applyFixedFunctionParams(mFixedFunctionParams, GPV_GLOBAL);
+    }
     //-----------------------------------------------------------------------
     void RenderSystem::_beginGeometryCount(void)
     {

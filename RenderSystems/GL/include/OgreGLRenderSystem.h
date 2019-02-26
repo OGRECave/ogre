@@ -209,11 +209,11 @@ namespace Ogre {
 
         void _useLights(unsigned short limit);
 
-        void _setWorldMatrix(const Matrix4 &m);
+        void setWorldMatrix(const Matrix4 &m);
 
-        void _setViewMatrix(const Matrix4 &m);
+        void setViewMatrix(const Matrix4 &m);
 
-        void _setProjectionMatrix(const Matrix4 &m);
+        void setProjectionMatrix(const Matrix4 &m);
 
         void _setSurfaceTracking(TrackVertexColourType tracking);
 

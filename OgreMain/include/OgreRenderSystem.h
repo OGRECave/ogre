@@ -241,12 +241,7 @@ namespace Ogre
         }
 
         /// @deprecated migrate to getFixedFunctionParams ASAP. this is very slow now.
-        OGRE_DEPRECATED void _setProjectionMatrix(const Matrix4& m)
-        {
-            if (!mFixedFunctionParams) return;
-            mFixedFunctionParams->setConstant(8, m);
-            applyFixedFunctionParams(mFixedFunctionParams, GPV_GLOBAL);
-        }
+        OGRE_DEPRECATED void _setProjectionMatrix(Matrix4 m);
 
         /// @deprecated migrate to getFixedFunctionParams ASAP. this is very slow now.
         OGRE_DEPRECATED void _setViewMatrix(const Matrix4& m)

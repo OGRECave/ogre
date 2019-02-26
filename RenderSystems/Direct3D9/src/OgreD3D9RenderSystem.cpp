@@ -166,13 +166,13 @@ namespace Ogre
                 switch(ac.paramType)
                 {
                 case GpuProgramParameters::ACT_WORLD_MATRIX:
-                    _setWorldMatrix((const Matrix4&)ptr);
+                    setWorldMatrix((const Matrix4&)ptr);
                     break;
                 case GpuProgramParameters::ACT_VIEW_MATRIX:
-                    _setViewMatrix((const Matrix4&)ptr);
+                    setViewMatrix((const Matrix4&)ptr);
                     break;
                 case GpuProgramParameters::ACT_PROJECTION_MATRIX:
-                    _setProjectionMatrix((const Matrix4&)ptr);
+                    setProjectionMatrix((const Matrix4&)ptr);
                     break;
                 case GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR:
                     material.Ambient = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3]);
@@ -1738,7 +1738,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setViewMatrix( const Matrix4 &m )
+    void D3D9RenderSystem::setViewMatrix( const Matrix4 &m )
     {
         // save latest view matrix
         mViewMatrix = m;
@@ -1751,14 +1751,14 @@ namespace Ogre
 
         HRESULT hr;
         if( FAILED( hr = getActiveD3D9Device()->SetTransform( D3DTS_VIEW, &mDxViewMat ) ) )
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot set D3D9 view matrix", "D3D9RenderSystem::_setViewMatrix" );
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot set D3D9 view matrix");
 
         // also mark clip planes dirty
         if (!mClipPlanes.empty())
             mClipPlanesDirty = true;
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setProjectionMatrix( const Matrix4 &m )
+    void D3D9RenderSystem::setProjectionMatrix( const Matrix4 &m )
     {
         // save latest matrix
         mDxProjMat = D3D9Mappings::makeD3DXMatrix( m );
@@ -1769,18 +1769,9 @@ namespace Ogre
         mDxProjMat._33 = -mDxProjMat._33;
         mDxProjMat._34 = -mDxProjMat._34;
 
-        if( mActiveRenderTarget->requiresTextureFlipping() )
-        {
-            // Invert transformed y
-            mDxProjMat._12 = - mDxProjMat._12;
-            mDxProjMat._22 = - mDxProjMat._22;
-            mDxProjMat._32 = - mDxProjMat._32;
-            mDxProjMat._42 = - mDxProjMat._42;
-        }
-
         HRESULT hr;
         if( FAILED( hr = getActiveD3D9Device()->SetTransform( D3DTS_PROJECTION, &mDxProjMat ) ) )
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot set D3D9 projection matrix", "D3D9RenderSystem::_setProjectionMatrix" );
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot set D3D9 projection matrix");
 
         // also mark clip planes dirty
         if (!mClipPlanes.empty())
@@ -1788,14 +1779,14 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setWorldMatrix( const Matrix4 &m )
+    void D3D9RenderSystem::setWorldMatrix( const Matrix4 &m )
     {
         // save latest matrix
         mDxWorldMat = D3D9Mappings::makeD3DXMatrix( m );
 
         HRESULT hr;
         if( FAILED( hr = getActiveD3D9Device()->SetTransform( D3DTS_WORLD, &mDxWorldMat ) ) )
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot set D3D9 world matrix", "D3D9RenderSystem::_setWorldMatrix" );
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot set D3D9 world matrix");
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_setSurfaceTracking( TrackVertexColourType tracking )
