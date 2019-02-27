@@ -387,8 +387,7 @@ void Sample_ShaderSystem::setupContent()
         RTShader::RenderState* pMainRenderState =
             RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
         pMainRenderState->addTemplateSubRenderState(
-            Ogre::RTShader::ShaderGenerator::getSingleton().createSubRenderState(
-            Ogre::RTShader::TextureAtlasSampler::Type));
+            mShaderGenerator->createSubRenderState<RTShader::TextureAtlasSampler>());
 
         // Create texture atlas object and node
         ManualObject* atlasObject = createTextureAtlasObject();
@@ -624,9 +623,7 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
         // Create the fog sub render state if need to.
         if (fogSubRenderState == NULL)
         {           
-            SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(FFPFog::Type);
-            
-            fogSubRenderState = static_cast<FFPFog*>(subRenderState);
+            fogSubRenderState = mShaderGenerator->createSubRenderState<FFPFog>();
             schemRenderState->addTemplateSubRenderState(fogSubRenderState);
         }
             
@@ -716,7 +713,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
             if (mCurLightingModel == SSLM_PerVertexLighting)
             {
-                RTShader::SubRenderState* perPerVertexLightModel = mShaderGenerator->createSubRenderState(RTShader::FFPLighting::Type);
+                RTShader::SubRenderState* perPerVertexLightModel = mShaderGenerator->createSubRenderState<RTShader::FFPLighting>();
 
                 renderState->addTemplateSubRenderState(perPerVertexLightModel); 
             }
@@ -725,7 +722,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
             else if (mCurLightingModel == SSLM_PerPixelLighting)
             {
-                RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
+                RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState<RTShader::PerPixelLighting>();
                 
                 renderState->addTemplateSubRenderState(perPixelLightModel);             
             }
@@ -734,8 +731,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // Apply normal map only on main entity.
                 if (entity->getName() == MAIN_ENTITY_NAME)
                 {
-                    RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
-                    RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
+                    RTShader::NormalMapLighting* normalMapSubRS = mShaderGenerator->createSubRenderState<RTShader::NormalMapLighting>();
                     
                     normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_TANGENT);
                     normalMapSubRS->setNormalMapTextureName("Panels_Normal_Tangent.png");   
@@ -746,7 +742,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // It is secondary entity -> use simple per pixel lighting.
                 else
                 {
-                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
+                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState<RTShader::PerPixelLighting>();
                     renderState->addTemplateSubRenderState(perPixelLightModel);
                 }               
             }
@@ -755,8 +751,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // Apply normal map only on main entity.
                 if (entity->getName() == MAIN_ENTITY_NAME)
                 {
-                    RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
-                    RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
+                    RTShader::NormalMapLighting* normalMapSubRS = mShaderGenerator->createSubRenderState<RTShader::NormalMapLighting>();
                 
                     normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_OBJECT);
                     normalMapSubRS->setNormalMapTextureName("Panels_Normal_Obj.png");   
@@ -767,7 +762,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
                 // It is secondary entity -> use simple per pixel lighting.
                 else
                 {
-                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
+                    RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState<RTShader::PerPixelLighting>();
                     renderState->addTemplateSubRenderState(perPixelLightModel);
                 }               
             }
@@ -1106,17 +1101,8 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
         mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(pssmSetup));
 
     
-        Ogre::RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(Ogre::RTShader::IntegratedPSSM3::Type); 
-        Ogre::RTShader::IntegratedPSSM3* pssm3SubRenderState = static_cast<Ogre::RTShader::IntegratedPSSM3*>(subRenderState);
-        const PSSMShadowCameraSetup::SplitPointList& srcSplitPoints = pssmSetup->getSplitPoints();
-        Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
-
-        for (unsigned int i=0; i < srcSplitPoints.size(); ++i)
-        {
-            dstSplitPoints.push_back(srcSplitPoints[i]);
-        }
-
-        pssm3SubRenderState->setSplitPoints(dstSplitPoints);
+        auto subRenderState = mShaderGenerator->createSubRenderState<RTShader::IntegratedPSSM3>();
+        subRenderState->setSplitPoints(pssmSetup->getSplitPoints());
         schemRenderState->addTemplateSubRenderState(subRenderState);        
     }
 #endif
@@ -1554,7 +1540,7 @@ void Sample_ShaderSystem::createInstancedViewports()
     }
 
     Ogre::Vector2 monitorCount(2.0, 2.0);
-    mInstancedViewportsSubRenderState = mShaderGenerator->createSubRenderState(Ogre::RTShader::ShaderExInstancedViewports::Type);
+    mInstancedViewportsSubRenderState = mShaderGenerator->createSubRenderState<RTShader::ShaderExInstancedViewports>();
     Ogre::RTShader::ShaderExInstancedViewports* shaderExInstancedViewports 
         = static_cast<Ogre::RTShader::ShaderExInstancedViewports*>(mInstancedViewportsSubRenderState);
     shaderExInstancedViewports->setMonitorsCount(monitorCount);

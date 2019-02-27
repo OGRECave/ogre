@@ -183,8 +183,8 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
         // Add per pixel lighting sub render state to the global scheme render state.
         // It will override the default FFP lighting sub render state.
         if (usePerPixelLighting) {
-            Ogre::RTShader::SubRenderState* perPixelLightModel =
-                mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
+            Ogre::RTShader::PerPixelLighting* perPixelLightModel =
+                mShaderGenerator->createSubRenderState<Ogre::RTShader::PerPixelLighting>();
 
             schemRenderState->addTemplateSubRenderState(perPixelLightModel);
         }

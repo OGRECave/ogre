@@ -115,9 +115,8 @@ protected:
 
         mSRSTextureFogFactory = new RTShaderSRSTexturedFogFactory;
         mGen->addSubRenderStateFactory(mSRSTextureFogFactory);
-        pMainRenderState->addTemplateSubRenderState(
-            mGen->createSubRenderState(RTShaderSRSTexturedFog::Type));  
-        
+        pMainRenderState->addTemplateSubRenderState(mGen->createSubRenderState<RTShaderSRSTexturedFog>());
+
         mSRSTextureFogFactory->setBackgroundTextureName("early_morning.jpg");
 
         
