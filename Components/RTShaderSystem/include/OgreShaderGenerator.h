@@ -235,7 +235,13 @@ public:
     */
     SubRenderState* createSubRenderState(const String& type);
 
-    
+    /// @overload
+    template<typename T>
+    T* createSubRenderState()
+    {
+        return static_cast<T*>(createSubRenderState(T::Type));
+    }
+
     /** 
     Destroy an instance of sub render state. 
     @param subRenderState The instance to destroy.
