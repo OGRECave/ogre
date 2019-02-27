@@ -169,9 +169,8 @@ protected:
         mSRSSegLightFactory = new RTShaderSRSSegmentedLightsFactory;
         mGen->addSubRenderStateFactory(mSRSSegLightFactory);
         pMainRenderState->addTemplateSubRenderState(
-            mGen->createSubRenderState(RTShaderSRSSegmentedLights::Type));  
-                    
-        
+            mGen->createSubRenderState<RTShaderSRSSegmentedLights>());
+
         mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
         // Make this viewport work with shader generator scheme.
