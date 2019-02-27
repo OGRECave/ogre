@@ -528,7 +528,7 @@ void ApplicationContextBase::shutdown()
     destroyRTShaderSystem();
 #endif
 
-    for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
+    for(auto it = mWindows.rbegin(); it != mWindows.rend(); ++it)
     {
 #if !OGRE_BITES_HAVE_SDL
         // remove window event listener before destroying it
