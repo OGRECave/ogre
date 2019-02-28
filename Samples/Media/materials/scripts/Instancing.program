@@ -74,10 +74,9 @@ fragment_program Ogre/Instancing_cg_ps cg
 
 fragment_program Ogre/Instancing/shadow_caster_cg_ps cg
 {
-	source depthshadowobject.cg
+	source pssm.cg
 	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_3_0 ps_2_x fp40
-	entry_point main_fp
-	compile_arguments -DSHADOWCASTER=1 -DDEPTH_SHADOWCASTER=1 -DDEPTH_SHADOWRECEIVER=0
+	entry_point shadow_caster_ps
 
 	default_params
 	{

@@ -15,7 +15,7 @@ float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize)
         {
             vec2 newUV = uv.xy + vec2(x, y) * invShadowMapSize;
             float depth = texture2D(shadowMap, newUV).x;
-            if (depth >= 1.0 || depth >= uv.z) // depth = 1.0 at border
+            if (depth >= 1.0 || depth >= uv.z) // depth = 1.0 at PSSM end
                 shadow += 1.0;
         }
     shadow /= SHADOW_SAMPLES;

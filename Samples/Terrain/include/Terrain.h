@@ -569,31 +569,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         }
     }
 
-    MaterialPtr buildDepthShadowMaterial(const String& textureName)
-    {
-        String matName = "DepthShadows/" + textureName;
-
-        MaterialPtr ret = MaterialManager::getSingleton().getByName(matName);
-        if (!ret)
-        {
-            MaterialPtr baseMat = MaterialManager::getSingleton().getByName("Ogre/shadow/depth/integrated/pssm");
-            ret = baseMat->clone(matName);
-            Pass* p = ret->getTechnique(0)->getPass(0);
-            p->getTextureUnitState("diffuse")->setTextureName(textureName);
-
-            Vector4 splitPoints;
-            const PSSMShadowCameraSetup::SplitPointList& splitPointList =
-                static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints();
-            for (int i = 0; i < 3; ++i)
-            {
-                splitPoints[i] = splitPointList[i];
-            }
-            p->getFragmentProgramParameters()->setNamedConstant("pssmSplitPoints", splitPoints);
-        }
-
-        return ret;
-    }
-
     void changeShadows()
     {
         configureShadows(mShadowMode != SHADOWS_NONE, mShadowMode == SHADOWS_DEPTH);
@@ -610,10 +585,16 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         matProfile->setReceiveDynamicShadowsLowLod(false);
 #endif
 
-        // Default materials
-        for (EntityList::iterator i = mHouseList.begin(); i != mHouseList.end(); ++i)
+        RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+        for (auto srs : schemRenderState->getTemplateSubRenderStateList())
         {
-            (*i)->setMaterialName("Examples/TudorHouse");
+            // This is the pssm3 sub render state -> remove it.
+            if (dynamic_cast<RTShader::IntegratedPSSM3*>(srs))
+            {
+                schemRenderState->removeTemplateSubRenderState(srs);
+                break;
+            }
         }
 
         if (enabled)
@@ -629,7 +610,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             {
                 // shadow camera setup
                 PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
-                pssmSetup->setSplitPadding(mCamera->getNearClipDistance());
+                pssmSetup->setSplitPadding(mCamera->getNearClipDistance()*2);
                 pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
                 pssmSetup->setOptimalAdjustFactor(0, 2);
                 pssmSetup->setOptimalAdjustFactor(1, 1);
@@ -648,11 +629,11 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                 mSceneMgr->setShadowTextureSelfShadow(true);
                 mSceneMgr->setShadowCasterRenderBackFaces(true);
 
-                MaterialPtr houseMat = buildDepthShadowMaterial("fw12b.jpg");
-                for (EntityList::iterator i = mHouseList.begin(); i != mHouseList.end(); ++i)
-                {
-                    (*i)->setMaterial(houseMat);
-                }
+                auto subRenderState = mShaderGenerator->createSubRenderState<RTShader::IntegratedPSSM3>();
+                subRenderState->setSplitPoints(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints());
+                schemRenderState->addTemplateSubRenderState(subRenderState);
+
+                mSceneMgr->setShadowTextureCasterMaterial(MaterialManager::getSingleton().getByName("PSSM/shadow_caster"));
             }
             else
             {
@@ -675,7 +656,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
         }
 
-
+        mShaderGenerator->invalidateScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
     }
 
     /*-----------------------------------------------------------------------------
@@ -684,11 +665,13 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     void setupView()
     {
         SdkSample::setupView();
+        // Make this viewport work with shader generator scheme.
+        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
         //! [camera_setup]
         mCameraNode->setPosition(mTerrainPos + Vector3(1683, 50, 2116));
         mCameraNode->lookAt(Vector3(1963, 50, 1660), Node::TS_PARENT);
-        mCamera->setNearClipDistance(0.1);
+        mCamera->setNearClipDistance(40); // tight near plane important for shadows
         mCamera->setFarClipDistance(50000);
         //! [camera_setup]
 
