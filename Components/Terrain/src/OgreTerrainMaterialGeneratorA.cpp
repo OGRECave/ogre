@@ -518,11 +518,6 @@ namespace Ogre
             {
                 params->setNamedAutoConstant("texViewProjMatrix" + StringConverter::toString(i), 
                     GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX, i);
-                if (prof->getReceiveDynamicShadowsDepth())
-                {
-                    params->setNamedAutoConstant("depthRange" + StringConverter::toString(i), 
-                        GpuProgramParameters::ACT_SHADOW_SCENE_DEPTH_RANGE, i);
-                }
             }
         }
 
