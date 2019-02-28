@@ -72,18 +72,30 @@ namespace Ogre
         std::vector<D3D11DeviceResource*>::iterator it = std::find(mResources.begin(), mResources.end(), deviceResource);
         assert(it != mResources.end());
         mResources.erase(it);
+
+        std::vector<D3D11DeviceResource*>::iterator itCopy = std::find(mResourcesCopy.begin(), mResourcesCopy.end(), deviceResource);
+        if(itCopy != mResourcesCopy.end())
+            *itCopy = NULL;
     }
 
     void D3D11DeviceResourceManager::notifyDeviceLost(D3D11Device* device)
     {
-        for(std::vector<D3D11DeviceResource*>::iterator it = mResources.begin(), it_end = mResources.end(); it != it_end; ++it)
-            (*it)->notifyDeviceLost(device);
+        assert(mResourcesCopy.empty()); // reentrancy is not expected nor supported
+        mResourcesCopy = mResources;
+        for(std::vector<D3D11DeviceResource*>::iterator it = mResourcesCopy.begin(), it_end = mResourcesCopy.end(); it != it_end; ++it)
+            if(D3D11DeviceResource* deviceResource = *it)
+                deviceResource->notifyDeviceLost(device);
+        mResourcesCopy.clear();
     }
 
     void D3D11DeviceResourceManager::notifyDeviceRestored(D3D11Device* device)
     {
-        for(std::vector<D3D11DeviceResource*>::iterator it = mResources.begin(), it_end = mResources.end(); it != it_end; ++it)
-            (*it)->notifyDeviceRestored(device);
+        assert(mResourcesCopy.empty()); // reentrancy is not expected nor supported
+        mResourcesCopy = mResources;
+        for(std::vector<D3D11DeviceResource*>::iterator it = mResourcesCopy.begin(), it_end = mResourcesCopy.end(); it != it_end; ++it)
+            if(D3D11DeviceResource* deviceResource = *it)
+                deviceResource->notifyDeviceRestored(device);
+        mResourcesCopy.clear();
     }
 
 }
