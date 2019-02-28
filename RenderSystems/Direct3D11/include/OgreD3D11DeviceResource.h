@@ -74,7 +74,7 @@ namespace Ogre {
         ~D3D11DeviceResourceManager(); // protected and non-virtual
 
     private:
-        std::vector<D3D11DeviceResource*> mResources;
+        std::vector<D3D11DeviceResource*> mResources, mResourcesCopy;
     };
 
 }
