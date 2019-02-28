@@ -1032,18 +1032,12 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
         mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-        const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
-        Ogre::RTShader::SubRenderStateListConstIterator it = subRenderStateList.begin();
-        Ogre::RTShader::SubRenderStateListConstIterator itEnd = subRenderStateList.end();
-
-        for (; it != itEnd; ++it)
+        for (auto srs : schemRenderState->getTemplateSubRenderStateList())
         {
-            Ogre::RTShader::SubRenderState* curSubRenderState = *it;
-
             // This is the pssm3 sub render state -> remove it.
-            if (curSubRenderState->getType() == Ogre::RTShader::IntegratedPSSM3::Type)
+            if (dynamic_cast<RTShader::IntegratedPSSM3*>(srs))
             {
-                schemRenderState->removeTemplateSubRenderState(*it);
+                schemRenderState->removeTemplateSubRenderState(srs);
                 break;
             }
         }
