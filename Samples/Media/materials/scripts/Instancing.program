@@ -8,7 +8,7 @@
 //--------------------------------------------------------------
 fragment_program Ogre/Shadow/Utils_glsl glsl
 {
-	source shadows.glsl
+	source TerrainHelpers.glsl
 }
 
 fragment_program Ogre/Instancing_glsl_ps glsl
@@ -27,19 +27,12 @@ fragment_program Ogre/Instancing_glsl_ps glsl
 
 fragment_program Ogre/Instancing/shadow_caster_glsl_ps glsl
 {
-    source DepthShadowmapCasterFp.glsl
-
-	preprocessor_defines LINEAR_RANGE=1
+    source pssmCasterFp.glsl
 }
 
 //--------------------------------------------------------------
 // GLSL ES Programs
 //--------------------------------------------------------------
-fragment_program Ogre/Shadow/Utils_glsles glsles
-{
-	source shadows.glsles
-}
-
 fragment_program Ogre/Instancing_glsles_ps glsles
 {
 	source Instancing.frag
@@ -55,9 +48,7 @@ fragment_program Ogre/Instancing_glsles_ps glsles
 
 fragment_program Ogre/Instancing/shadow_caster_glsles_ps glsles
 {
-    source DepthShadowmapCasterFp.glsl
-
-	preprocessor_defines LINEAR_RANGE=1
+    source pssmCasterFp.glsl
 }
 
 //--------------------------------------------------------------

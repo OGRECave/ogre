@@ -5,7 +5,7 @@
 
 #include "InstancingVertexInterpolators.cg"
 
-#include "shadows.cg"
+#include "TerrainHelpers.cg"
 
 //---------------------------------------------
 //Main Pixel Shader

@@ -65,7 +65,6 @@ vertex_program Ogre/Instancing/Misc_vs unified
 	{
 		param_named_auto	viewProjMatrix				viewproj_matrix
 		param_named_auto	worldMatrix					world_matrix
-		param_named_auto	depthRange					shadow_scene_depth_range 0
 		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
 	}
 }

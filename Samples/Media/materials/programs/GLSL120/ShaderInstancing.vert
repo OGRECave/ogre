@@ -102,8 +102,7 @@ vec3 worldNorm;
 	gl_Position			= viewProjMatrix * worldPos;
 
 #if DEPTH_SHADOWCASTER
-	depth.x				= (gl_Position.z - depthRange.x) * depthRange.w;
-	depth.y				= depthRange.w;
+	depth				= gl_Position.zw;
 #else
 	_uv0		= uv0.xy;
 	oNormal		= worldNorm;
@@ -111,7 +110,6 @@ vec3 worldNorm;
 
 	#if DEPTH_SHADOWRECEIVER
 		oLightSpacePos		= texViewProjMatrix * worldPos;
-		oLightSpacePos.z	= (oLightSpacePos.z - depthRange.x) * depthRange.w;
 	#endif
 #endif
 }

@@ -273,7 +273,6 @@ vertex_program Ogre/Instancing/ShaderBased_vs unified
 		param_named_auto	viewProjMatrix				viewproj_matrix
 		param_named_auto	worldMatrix3x4Array			world_matrix_array_3x4
 		
-		param_named_auto	depthRange					shadow_scene_depth_range 0
 		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
 	}
 }
@@ -289,7 +288,6 @@ vertex_program Ogre/Instancing/shadow_caster_vs unified
 	{
 		param_named_auto	viewProjMatrix				viewproj_matrix
 		param_named_auto	worldMatrix3x4Array			world_matrix_array_3x4
-		param_named_auto	depthRange					scene_depth_range
 	}
 }
 
@@ -304,7 +302,6 @@ vertex_program Ogre/Instancing/ShaderBased_dq_vs unified
 	{
 		param_named_auto	viewProjMatrix				viewproj_matrix
 		param_named_auto 	worldDualQuaternion2x4Array 		world_dualquaternion_array_2x4
-		param_named_auto	depthRange				shadow_scene_depth_range 0
 		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
 	}
 }
@@ -320,7 +317,6 @@ vertex_program Ogre/Instancing/shadow_caster_dq_vs unified
 	{
 		param_named_auto	viewProjMatrix				viewproj_matrix
 		param_named_auto 	worldDualQuaternion2x4Array 		world_dualquaternion_array_2x4
-		param_named_auto	depthRange				shadow_scene_depth_range 0
 	}
 }
 
@@ -335,7 +331,6 @@ vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_vs unified
 	{
 		param_named_auto	viewProjMatrix				viewproj_matrix
 		param_named_auto 	worldDualQuaternion2x4Array 		world_dualquaternion_array_2x4
-		param_named_auto	depthRange				shadow_scene_depth_range 0
 		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
 	}
 }
@@ -351,7 +346,6 @@ vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_vs unified
 	{
 		param_named_auto	viewProjMatrix				viewproj_matrix
 		param_named_auto 	worldDualQuaternion2x4Array 		world_dualquaternion_array_2x4
-		param_named_auto	depthRange				shadow_scene_depth_range 0
 
 	}
 }
