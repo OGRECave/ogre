@@ -1,0 +1,29 @@
+void shadow_caster_vs(
+	float4 position			: POSITION,
+
+	out float4 oPosition	: POSITION,
+	out float2 oDepth		: TEXCOORD0,
+
+	uniform float4x4 worldViewProjMatrix)
+{
+	// this is the view space position
+	oPosition = mul(worldViewProjMatrix, position);
+
+	// depth info for the fragment.
+	oDepth.x = oPosition.z;
+	oDepth.y = oPosition.w;
+
+	// clamp z to zero. seem to do the trick. :-/
+	//oPosition.z = max(oPosition.z, 0);
+}
+
+void shadow_caster_ps(
+	float2 depth		: TEXCOORD0,
+
+	out float4 oColour	: COLOR,
+
+	uniform float4 pssmSplitPoints)
+{
+	float finalDepth = depth.x / depth.y;
+	oColour = float4(finalDepth, finalDepth, finalDepth, 1);
+}

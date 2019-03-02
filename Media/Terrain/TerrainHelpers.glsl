@@ -10,6 +10,7 @@ float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize)
     float shadow = 0.0;
     float offset = (NUM_SHADOW_SAMPLES_1D/2.0 - 0.5) * SHADOW_FILTER_SCALE;
     uv /= uv.w;
+    uv.z = uv.z * 0.5 + 0.5; // convert -1..1 to 0..1
     for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE)
         for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE)
         {
