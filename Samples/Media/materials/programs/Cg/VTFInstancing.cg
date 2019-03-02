@@ -86,8 +86,7 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	output.Position		= mul( viewProjMatrix, worldPos );
 
 #ifdef DEPTH_SHADOWCASTER
-	output.ps.unused	= float3( 0 );
-	output.ps.depth		= (output.Position.z - depthRange.x + SHADOW_BIAS) * depthRange.w;
+	output.ps.unused	= float3( output.Position.zw, 0 );
 #else
 	output.ps.uv0		= input.uv0;
 
@@ -98,8 +97,6 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	#ifdef DEPTH_SHADOWRECEIVER
 		// Calculate the position of vertex in light space to do shadows
 		output.ps.lightSpacePos = mul( texViewProjMatrix, worldPos );
-		// make linear
-		output.ps.lightSpacePos.z = (output.ps.lightSpacePos.z - depthRange.x) * depthRange.w;
 	#endif
 #endif
 

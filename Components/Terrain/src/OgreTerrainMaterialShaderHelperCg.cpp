@@ -748,11 +748,6 @@ namespace Ogre
             outStream <<
                 ", out float4 oLightSpacePos" << i << " : TEXCOORD" << texCoord++ << " \n" <<
                 ", uniform float4x4 texViewProjMatrix" << i << " \n";
-            if (prof->getReceiveDynamicShadowsDepth())
-            {
-                outStream <<
-                    ", uniform float4 depthRange" << i << " // x = min, y = max, z = range, w = 1/range \n";
-            }
         }
 
         return texCoord;
@@ -773,13 +768,6 @@ namespace Ogre
         {
             outStream <<
                 "   oLightSpacePos" << i << " = mul(texViewProjMatrix" << i << ", worldPos); \n";
-            if (prof->getReceiveDynamicShadowsDepth())
-            {
-                // make linear
-                outStream <<
-                    "oLightSpacePos" << i << ".z = (oLightSpacePos" << i << ".z - depthRange" << i << ".x) * depthRange" << i << ".w;\n";
-
-            }
         }
 
 
