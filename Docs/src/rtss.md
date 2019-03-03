@@ -147,9 +147,9 @@ Valid values are [0; 0.57] not bigger to avoid division by zero
 <a name="integrated_pssm4"></a>
 
 ### integrated_pssm4
-Integrated PSSM shadow receiver with 3 splits. Custom split points.
+Integrated PSSM shadow receiver with 2 splits. Custom split points.
 @par
-Format: `integrated_pssm4 <sp0> <sp1> <sp2> <sp3>`
+Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar>`
 
 <a name="layered_blend"></a>
 
