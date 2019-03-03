@@ -3841,7 +3841,7 @@ namespace Ogre{
         // Set the custom parameters
         for(const auto& p : customParameters)
         {
-            if(prog->isSupported() && !prog->setParameter(p.first->name, p.second))
+            if(!prog->setParameter(p.first->name, p.second))
             {
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, p.first->file, p.first->line, p.first->name);
             }
