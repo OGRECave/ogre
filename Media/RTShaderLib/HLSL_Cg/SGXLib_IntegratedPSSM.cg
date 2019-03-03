@@ -53,19 +53,19 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 	}
 }
 
-float _SGX_ShadowPCF4(sampler2D shadowMap, float4 shadowMapPos, float2 offset)
+void SGX_ShadowPCF4(sampler2D shadowMap, float4 shadowMapPos, float2 offset, out float c)
 {
     shadowMapPos = shadowMapPos / shadowMapPos.w;
     float2 uv = shadowMapPos.xy;
     float3 o = float3(offset, -offset.x) * 0.3f;
 
     // Note: We using 2x2 PCF. Good enough and is a lot faster.
-    float c =   (shadowMapPos.z <= tex2D(shadowMap, uv.xy - o.xy).r) ? 1 : 0; // top left
-    c +=        (shadowMapPos.z <= tex2D(shadowMap, uv.xy + o.xy).r) ? 1 : 0; // bottom right
-    c +=        (shadowMapPos.z <= tex2D(shadowMap, uv.xy + o.zy).r) ? 1 : 0; // bottom left
-    c +=        (shadowMapPos.z <= tex2D(shadowMap, uv.xy - o.zy).r) ? 1 : 0; // top right
+    c =  (shadowMapPos.z <= tex2D(shadowMap, uv.xy - o.xy).r) ? 1 : 0; // top left
+    c += (shadowMapPos.z <= tex2D(shadowMap, uv.xy + o.xy).r) ? 1 : 0; // bottom right
+    c += (shadowMapPos.z <= tex2D(shadowMap, uv.xy + o.zy).r) ? 1 : 0; // bottom left
+    c += (shadowMapPos.z <= tex2D(shadowMap, uv.xy - o.zy).r) ? 1 : 0; // top right
 
-    return c / 4;
+    c /= 4;
 }
 
 //-----------------------------------------------------------------------------
@@ -84,14 +84,14 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 {
     if (fDepth  <= vSplitPoints.x)
     {
-        oShadowFactor = _SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0.xy);
+        SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0.xy, oShadowFactor);
     }
     else if (fDepth <= vSplitPoints.y)
     {
-        oShadowFactor = _SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy);
+        SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy, oShadowFactor);
     }
     else
     {
-        oShadowFactor = _SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy);
+        SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy, oShadowFactor);
     }
 }
