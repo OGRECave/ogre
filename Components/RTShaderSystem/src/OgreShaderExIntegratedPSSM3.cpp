@@ -41,6 +41,7 @@ IntegratedPSSM3::IntegratedPSSM3()
 {   
     // currently only works with PF_FLOAT32_R on Nvidia. should use PF_DEPTH, but got artifacts
     mUseTextureCompare = false;
+    mShadowTextureParamsList.resize(1); // normal single texture depth shadowmapping
 }
 
 //-----------------------------------------------------------------------
@@ -273,35 +274,43 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
 {
     Function* psMain = psProgram->getEntryPointFunction();
     auto stage = psMain->getStage(groupOrder);
-
     ShadowTextureParams& splitParams0 = mShadowTextureParamsList[0];
-    ShadowTextureParams& splitParams1 = mShadowTextureParamsList[1];
-    ShadowTextureParams& splitParams2 = mShadowTextureParamsList[2];
-
-    // Compute shadow factor.
-    if (mUseTextureCompare)
+    if(mShadowTextureParamsList.size() != 3)
     {
-        stage.callFunction(
-            SGX_FUNC_COMPUTE_SHADOW_COLOUR3,
-            {In(mPSInDepth), In(mPSSplitPoints),
-             In(splitParams0.mPSInLightPosition),
-             In(splitParams1.mPSInLightPosition),
-             In(splitParams2.mPSInLightPosition),
-             In(splitParams0.mTextureSampler), In(splitParams1.mTextureSampler),
-             In(splitParams2.mTextureSampler), Out(mPSLocalShadowFactor)});
+        stage.callFunction("SGX_ShadowPCF4",
+                           {In(splitParams0.mTextureSampler), In(splitParams0.mPSInLightPosition),
+                            In(splitParams0.mInvTextureSize).xy(), Out(mPSLocalShadowFactor)});
     }
     else
     {
-        stage.callFunction(
-            SGX_FUNC_COMPUTE_SHADOW_COLOUR3,
-            {In(mPSInDepth), In(mPSSplitPoints),
-             In(splitParams0.mPSInLightPosition),
-             In(splitParams1.mPSInLightPosition),
-             In(splitParams2.mPSInLightPosition),
-             In(splitParams0.mTextureSampler), In(splitParams1.mTextureSampler),
-             In(splitParams2.mTextureSampler), In(splitParams0.mInvTextureSize),
-             In(splitParams1.mInvTextureSize), In(splitParams2.mInvTextureSize),
-             Out(mPSLocalShadowFactor)});
+        ShadowTextureParams& splitParams1 = mShadowTextureParamsList[1];
+        ShadowTextureParams& splitParams2 = mShadowTextureParamsList[2];
+
+        // Compute shadow factor.
+        if (mUseTextureCompare)
+        {
+            stage.callFunction(
+                SGX_FUNC_COMPUTE_SHADOW_COLOUR3,
+                {In(mPSInDepth), In(mPSSplitPoints),
+                 In(splitParams0.mPSInLightPosition),
+                 In(splitParams1.mPSInLightPosition),
+                 In(splitParams2.mPSInLightPosition),
+                 In(splitParams0.mTextureSampler), In(splitParams1.mTextureSampler),
+                 In(splitParams2.mTextureSampler), Out(mPSLocalShadowFactor)});
+        }
+        else
+        {
+            stage.callFunction(
+                SGX_FUNC_COMPUTE_SHADOW_COLOUR3,
+                {In(mPSInDepth), In(mPSSplitPoints),
+                 In(splitParams0.mPSInLightPosition),
+                 In(splitParams1.mPSInLightPosition),
+                 In(splitParams2.mPSInLightPosition),
+                 In(splitParams0.mTextureSampler), In(splitParams1.mTextureSampler),
+                 In(splitParams2.mTextureSampler), In(splitParams0.mInvTextureSize),
+                 In(splitParams1.mInvTextureSize), In(splitParams2.mInvTextureSize),
+                 Out(mPSLocalShadowFactor)});
+        }
     }
 
     // Apply shadow factor on diffuse colour.
