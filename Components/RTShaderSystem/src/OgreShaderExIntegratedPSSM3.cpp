@@ -127,18 +127,15 @@ void IntegratedPSSM3::setSplitPoints(const SplitPointList& newSplitPoints)
 {
     if (newSplitPoints.size() != 4)
     {
-        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
-            "IntegratedPSSM3 sub render state supports only 4 split points",
-            "IntegratedPSSM3::setSplitPoints");
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                    "IntegratedPSSM3 sub render state requires 4 split points");
     }
 
     mShadowTextureParamsList.resize(newSplitPoints.size() - 1);
 
-    for (unsigned int i=1; i < newSplitPoints.size(); ++i)
+    for (size_t i = 1; i < newSplitPoints.size(); ++i)
     {
-        ShadowTextureParams& curParams = mShadowTextureParamsList[i-1];
-
-        curParams.mMaxRange             = newSplitPoints[i];        
+        mShadowTextureParamsList[i - 1].mMaxRange = newSplitPoints[i];
     }
 }
 
