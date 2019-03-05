@@ -2742,8 +2742,11 @@ namespace Ogre {
         void setShadowTextureConfig(size_t shadowIndex,
             const ShadowTextureConfig& config);
 
-        /** Get an iterator over the current shadow texture settings. */
-        ConstShadowTextureConfigIterator getShadowTextureConfigIterator() const;
+        /** Get the current shadow texture settings. */
+        const ShadowTextureConfigList& getShadowTextureConfigList() const { return mShadowTextureConfigList; }
+
+        /// @deprecated use getShadowTextureConfigList
+        OGRE_DEPRECATED ConstShadowTextureConfigIterator getShadowTextureConfigIterator() const;
 
         /** Set the pixel format of the textures used for texture-based shadows.
         @remarks
@@ -2773,8 +2776,8 @@ namespace Ogre {
             make this more flexible, but be aware of the texture memory it will use.
         */
         void setShadowTextureCount(size_t count);
-        /// Get the number of the textures allocated for texture based shadows
-        size_t getShadowTextureCount(void) const {return mShadowTextureConfigList.size(); }
+        /// @deprecated use getShadowTextureConfigList
+        OGRE_DEPRECATED size_t getShadowTextureCount(void) const {return mShadowTextureConfigList.size(); }
 
         /** Set the number of shadow textures a light type uses.
         @remarks
