@@ -71,6 +71,12 @@ void SGX_ShadowPCF4(in sampler2D shadowMap, in vec4 shadowMapPos, in vec2 offset
 	c /= 4.0;
 }
 
+void SGX_ShadowPCF4(in sampler2DShadow shadowMap, in vec4 shadowMapPos, out float c)
+{
+    shadowMapPos.z = shadowMapPos.z * 0.5 + 0.5 * shadowMapPos.w; // convert -1..1 to 0..1
+    c = shadow2DProj(shadowMap, shadowMapPos).r;
+}
+
 //-----------------------------------------------------------------------------
 void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 							in vec4 vSplitPoints,	
@@ -111,14 +117,14 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 {
 	if (fDepth  <= vSplitPoints.x)
 	{
-		oShadowFactor = shadow2DProj(shadowMap0, lightPosition0).r;
+        SGX_ShadowPCF4(shadowMap0, lightPosition0, oShadowFactor);
 	}
 	else if (fDepth <= vSplitPoints.y)
 	{
-		oShadowFactor = shadow2DProj(shadowMap1, lightPosition1).r;
+        SGX_ShadowPCF4(shadowMap1, lightPosition1, oShadowFactor);
 	}
 	else
 	{
-		oShadowFactor = shadow2DProj(shadowMap2, lightPosition2).r;
+        SGX_ShadowPCF4(shadowMap2, lightPosition2, oShadowFactor);
 	}
 }
