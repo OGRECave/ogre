@@ -101,6 +101,15 @@ bool Sample_NewInstancing::keyPressed(const KeyboardEvent& evt)
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::setupContent()
 {
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+    // Make this viewport work with shader generator scheme.
+    mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
+    RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    auto subRenderState = rtShaderGen.createSubRenderState<RTShader::IntegratedPSSM3>();
+    schemRenderState->addTemplateSubRenderState(subRenderState);
+#endif
+
     //Initialize the techniques and current mesh variables
     mInstancingTechnique    = 0;
     mCurrentMesh            = 0;
@@ -138,7 +147,7 @@ void Sample_NewInstancing::setupContent()
 
     // create a ground entity from our mesh and attach it to the origin
     Entity* ground = mSceneMgr->createEntity("Ground", "ground");
-    ground->setMaterialName("Examples/Instancing/Misc/Grass");
+    ground->setMaterialName("Examples/GrassFloor");
     ground->setCastShadows(false);
     mSceneMgr->getRootSceneNode()->attachObject(ground);
 
