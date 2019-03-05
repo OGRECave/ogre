@@ -37,7 +37,6 @@ THE SOFTWARE.
 #define __OGRE_ANY_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreException.h"
 #include <typeinfo>
 #include "OgreHeaderPrefix.h"
 
@@ -403,12 +402,7 @@ namespace Ogre
         const ValueType * result = any_cast<ValueType>(&operand);
         if(!result)
         {
-            StringStream str;
-            str << "Bad cast from type '" << operand.type().name() << "' "
-                << "to '" << typeid(ValueType).name() << "'";
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                str.str(), 
-                "Ogre::any_cast");
+            throw std::bad_cast();
         }
         return *result;
     }
