@@ -672,47 +672,8 @@ void FFPTexturing::setTextureUnitCount(size_t count)
 //-----------------------------------------------------------------------
 void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textureUnitState)
 {
-    if (index >= mTextureUnitParamsList.size())
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFPTexturing unit index out of bounds !!!",
-            "FFPTexturing::setTextureUnit");
-    }
-
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_VERTEX)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support vertex texture fetch !!!",
-            "FFPTexturing::setTextureUnit");
-    }
-    
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_GEOMETRY)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support geometry texture fetch !!!",
-            "FFPTexturing::setTextureUnit");
-    }
-
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_COMPUTE)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support comput texture fetch !!!",
-            "FFPTexturing::setTextureUnit");
-    }
-
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELLATION_DOMAIN)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support domain texture fetch !!!",
-            "FFPTexturing::setTextureUnit");
-    }
-
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELLATION_HULL)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support hull texture fetch !!!",
-            "FFPTexturing::setTextureUnit");
-    }
+    OgreAssert(index < mTextureUnitParamsList.size(), "FFPTexturing unit index out of bounds");
+    OgreAssert(textureUnitState->getBindingType() == TextureUnitState::BT_FRAGMENT, "only fragment shaders supported");
 
     TextureUnitParams& curParams = mTextureUnitParamsList[index];
 
