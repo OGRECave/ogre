@@ -38,8 +38,7 @@ String IntegratedPSSM3::Type = "SGX_IntegratedPSSM3";
 
 //-----------------------------------------------------------------------
 IntegratedPSSM3::IntegratedPSSM3()
-{   
-    // currently only works with PF_FLOAT32_R on Nvidia. should use PF_DEPTH, but got artifacts
+{
     mUseTextureCompare = false;
     mShadowTextureParamsList.resize(1); // normal single texture depth shadowmapping
 }
@@ -99,6 +98,12 @@ bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
     if (srcPass->getLightingEnabled() == false ||
         srcPass->getParent()->getParent()->getReceiveShadows() == false)
         return false;
+
+    PixelFormat shadowTexFormat = PF_UNKNOWN;
+    const auto& configs = ShaderGenerator::getSingleton().getActiveSceneManager()->getShadowTextureConfigList();
+    if (!configs.empty())
+        shadowTexFormat = configs[0].format; // assume first texture is representative
+    mUseTextureCompare = PixelUtil::isDepth(shadowTexFormat);
 
     ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
 
@@ -277,9 +282,18 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
     ShadowTextureParams& splitParams0 = mShadowTextureParamsList[0];
     if(mShadowTextureParamsList.size() != 3)
     {
-        stage.callFunction("SGX_ShadowPCF4",
-                           {In(splitParams0.mTextureSampler), In(splitParams0.mPSInLightPosition),
-                            In(splitParams0.mInvTextureSize).xy(), Out(mPSLocalShadowFactor)});
+        if (mUseTextureCompare)
+        {
+            stage.callFunction("SGX_ShadowPCF4",
+                               {In(splitParams0.mTextureSampler), In(splitParams0.mPSInLightPosition),
+                                Out(mPSLocalShadowFactor)});
+        }
+        else
+        {
+            stage.callFunction("SGX_ShadowPCF4",
+                               {In(splitParams0.mTextureSampler), In(splitParams0.mPSInLightPosition),
+                                In(splitParams0.mInvTextureSize).xy(), Out(mPSLocalShadowFactor)});
+        }
     }
     else
     {
