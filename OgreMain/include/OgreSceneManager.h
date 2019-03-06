@@ -3529,10 +3529,8 @@ namespace Ogre {
     /// Bitmask containing scene types
     typedef uint16 SceneTypeMask;
 
-    /** Classification of a scene to allow a decision of what type of
-    SceenManager to provide back to the application.
-    */
-    enum SceneType
+    /// @deprecated do not use
+    enum OGRE_DEPRECATED SceneType
     {
         ST_GENERIC = 1,
         ST_EXTERIOR_CLOSE = 2,
