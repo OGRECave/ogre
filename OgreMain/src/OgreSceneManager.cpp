@@ -79,10 +79,7 @@ mShowBoundingBoxes(false),
 mActiveCompositorChain(0),
 mLateMaterialResolving(false),
 mIlluminationStage(IRS_NONE),
-mShadowTextureConfigDirty(true),
-mShadowCasterRenderBackFaces(true),
 mLightClippingInfoMapFrameNumber(999),
-mShadowTextureSelfShadow(false),
 mVisibilityMask(0xFFFFFFFF),
 mFindVisibleObjects(true),
 mSuppressRenderStateChanges(false),
@@ -1154,7 +1151,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 
     // Culling mode
     if (isShadowTechniqueTextureBased() && mIlluminationStage == IRS_RENDER_TO_TEXTURE &&
-        mShadowCasterRenderBackFaces && pass->getCullingMode() == CULL_CLOCKWISE)
+        mShadowRenderer.mShadowCasterRenderBackFaces && pass->getCullingMode() == CULL_CLOCKWISE)
     {
         // render back faces into shadow caster, can help with depth comparison
         mPassCullingMode = CULL_ANTICLOCKWISE;
@@ -1846,7 +1843,7 @@ bool SceneManager::validateRenderableForRendering(const Pass* pass, const Render
         isShadowTechniqueTextureBased())
     {
         if (mIlluminationStage == IRS_RENDER_RECEIVER_PASS && 
-            rend->getCastsShadows() && !mShadowTextureSelfShadow)
+            rend->getCastsShadows() && !mShadowRenderer.mShadowTextureSelfShadow)
         {
             return false;
         }
@@ -2867,7 +2864,7 @@ void SceneManager::updateRenderQueueSplitOptions(void)
     }
     else // texture based
     {
-        getRenderQueue()->setShadowCastersCannotBeReceivers(!mShadowTextureSelfShadow);
+        getRenderQueue()->setShadowCastersCannotBeReceivers(!mShadowRenderer.mShadowTextureSelfShadow);
     }
 
     if (isShadowTechniqueAdditive() && !isShadowTechniqueIntegrated()
@@ -2905,7 +2902,7 @@ void SceneManager::updateRenderQueueGroupSplitOptions(RenderQueueGroup* group,
     }
     else if (isShadowTechniqueTextureBased()) 
     {
-        group->setShadowCastersCannotBeReceivers(!mShadowTextureSelfShadow);
+        group->setShadowCastersCannotBeReceivers(!mShadowRenderer.mShadowTextureSelfShadow);
     }
 
     if (!suppressShadows && mCurrentViewport->getShadowsEnabled() &&
@@ -3478,137 +3475,16 @@ void SceneManager::setShadowIndexBufferSize(size_t size)
     mShadowRenderer.setShadowIndexBufferSize(size);
 }
 //---------------------------------------------------------------------
-void SceneManager::setShadowTextureConfig(size_t shadowIndex, unsigned short width, 
-    unsigned short height, PixelFormat format, unsigned short fsaa, uint16 depthBufferPoolId )
-{
-    ShadowTextureConfig conf;
-    conf.width = width;
-    conf.height = height;
-    conf.format = format;
-    conf.fsaa = fsaa;
-    conf.depthBufferPoolId = depthBufferPoolId;
-
-    setShadowTextureConfig(shadowIndex, conf);
-
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureConfig(size_t shadowIndex, 
-    const ShadowTextureConfig& config)
-{
-    if (shadowIndex >= mShadowTextureConfigList.size())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-            "shadowIndex out of bounds",
-            "SceneManager::setShadowTextureConfig");
-    }
-    mShadowTextureConfigList[shadowIndex] = config;
-
-    mShadowTextureConfigDirty = true;
-}
-//---------------------------------------------------------------------
 ConstShadowTextureConfigIterator SceneManager::getShadowTextureConfigIterator() const
 {
     return ConstShadowTextureConfigIterator(
-        mShadowTextureConfigList.begin(), mShadowTextureConfigList.end());
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureSize(unsigned short size)
-{
-    // default all current
-    for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-        i != mShadowTextureConfigList.end(); ++i)
-    {
-        if (i->width != size || i->height != size)
-        {
-            i->width = i->height = size;
-            mShadowTextureConfigDirty = true;
-        }
-    }
-
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureCount(size_t count)
-{
-    // Change size, any new items will need defaults
-    if (count != mShadowTextureConfigList.size())
-    {
-        // if no entries yet, use the defaults
-        if (mShadowTextureConfigList.empty())
-        {
-            mShadowTextureConfigList.resize(count);
-        }
-        else 
-        {
-            // create new instances with the same settings as the last item in the list
-            mShadowTextureConfigList.resize(count, *mShadowTextureConfigList.rbegin());
-        }
-        mShadowTextureConfigDirty = true;
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTexturePixelFormat(PixelFormat fmt)
-{
-    for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-        i != mShadowTextureConfigList.end(); ++i)
-    {
-        if (i->format != fmt)
-        {
-            i->format = fmt;
-            mShadowTextureConfigDirty = true;
-        }
-    }
-}
-void SceneManager::setShadowTextureFSAA(unsigned short fsaa)
-{
-    for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-                i != mShadowTextureConfigList.end(); ++i)
-    {
-        if (i->fsaa != fsaa)
-        {
-            i->fsaa = fsaa;
-            mShadowTextureConfigDirty = true;
-        }
-    }
-}
-//---------------------------------------------------------------------
-void SceneManager::setShadowTextureSettings(unsigned short size, 
-    unsigned short count, PixelFormat fmt, unsigned short fsaa, uint16 depthBufferPoolId)
-{
-    setShadowTextureCount(count);
-    for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
-        i != mShadowTextureConfigList.end(); ++i)
-    {
-        if (i->width != size || i->height != size || i->format != fmt || i->fsaa != fsaa)
-        {
-            i->width = i->height = size;
-            i->format = fmt;
-            i->fsaa = fsaa;
-            i->depthBufferPoolId = depthBufferPoolId;
-            mShadowTextureConfigDirty = true;
-        }
-    }
-}
-//---------------------------------------------------------------------
-const TexturePtr& SceneManager::getShadowTexture(size_t shadowIndex)
-{
-    if (shadowIndex >= mShadowTextureConfigList.size())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-            "shadowIndex out of bounds",
-            "SceneManager::getShadowTexture");
-    }
-    mShadowRenderer.ensureShadowTexturesCreated();
-
-    return mShadowRenderer.mShadowTextures[shadowIndex];
-
+        mShadowRenderer.mShadowTextureConfigList.begin(), mShadowRenderer.mShadowTextureConfigList.end());
 
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureSelfShadow(bool selfShadow) 
 { 
-    mShadowTextureSelfShadow = selfShadow;
+    mShadowRenderer.mShadowTextureSelfShadow = selfShadow;
     if (isShadowTechniqueTextureBased())
         getRenderQueue()->setShadowCastersCannotBeReceivers(!selfShadow);
 }

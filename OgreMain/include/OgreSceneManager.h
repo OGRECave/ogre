@@ -668,6 +668,11 @@ namespace Ogre {
             Real mShadowTextureOffset; /// Proportion of texture offset in view direction e.g. 0.4
             Real mShadowTextureFadeStart; /// As a proportion e.g. 0.6
             Real mShadowTextureFadeEnd; /// As a proportion e.g. 0.9
+            bool mShadowTextureSelfShadow;
+            bool mShadowTextureConfigDirty;
+            bool mShadowCasterRenderBackFaces;
+
+            ShadowTextureConfigList mShadowTextureConfigList;
 
             /// Array defining shadow count per light type.
             size_t mShadowTextureCountPerType[3];
@@ -756,6 +761,17 @@ namespace Ogre {
             size_t getShadowTexIndex(size_t lightIndex);
 
             void setShadowIndexBufferSize(size_t size);
+
+            const TexturePtr& getShadowTexture(size_t shadowIndex);
+            void setShadowTextureSettings(uint16 size, uint16 count, PixelFormat fmt, uint16 fsaa,
+                                          uint16 depthBufferPoolId);
+            void setShadowTextureSize(unsigned short size);
+            void setShadowTextureCount(size_t count);
+            void setShadowTexturePixelFormat(PixelFormat fmt);
+            void setShadowTextureFSAA(unsigned short fsaa);
+            void setShadowTextureConfig(size_t shadowIndex, const ShadowTextureConfig& config);
+            void setShadowTextureConfig(size_t shadowIndex, uint16 width, uint16 height, PixelFormat format,
+                                        uint16 fsaa, uint16 depthBufferPoolId);
         } mShadowRenderer;
 
         /** Internal method to validate whether a Pass should be allowed to render.
@@ -876,9 +892,6 @@ namespace Ogre {
         bool mLateMaterialResolving;
 
         IlluminationRenderStage mIlluminationStage;
-        ShadowTextureConfigList mShadowTextureConfigList;
-        bool mShadowTextureConfigDirty;
-        bool mShadowCasterRenderBackFaces;
 
         /// Struct for caching light clipping information for re-use in a frame
         struct LightClippingInfo
@@ -960,7 +973,6 @@ namespace Ogre {
         ShadowCasterList mShadowCasterList;
         std::unique_ptr<SphereSceneQuery> mShadowCasterSphereQuery;
         std::unique_ptr<AxisAlignedBoxSceneQuery> mShadowCasterAABBQuery;
-        bool mShadowTextureSelfShadow;
 
         /// Visibility mask used to show / hide objects
         uint32 mVisibilityMask;
@@ -2721,7 +2733,7 @@ namespace Ogre {
         @note This is the simple form, see setShadowTextureConfig for the more 
             complex form.
         */
-        void setShadowTextureSize(unsigned short size);
+        void setShadowTextureSize(unsigned short size) { mShadowRenderer.setShadowTextureSize(size); }
 
         /** Set the detailed configuration for a shadow texture.
         @param shadowIndex The index of the texture to configure, must be < the
@@ -2732,18 +2744,23 @@ namespace Ogre {
         @param fsaa The level of multisampling to use. Ignored if the device does not support it.
         @param depthBufferPoolId The pool # it should query the depth buffers from
         */
-        void setShadowTextureConfig(size_t shadowIndex, unsigned short width,
-            unsigned short height, PixelFormat format, unsigned short fsaa = 0, uint16 depthBufferPoolId=1);
+        void setShadowTextureConfig(size_t shadowIndex, uint16 width, uint16 height, PixelFormat format,
+                                    uint16 fsaa = 0, uint16 depthBufferPoolId = 1)
+        {
+            mShadowRenderer.setShadowTextureConfig(shadowIndex, width, height, format, fsaa, depthBufferPoolId);
+        }
         /** Set the detailed configuration for a shadow texture.
         @param shadowIndex The index of the texture to configure, must be < the
             number of shadow textures setting
         @param config Configuration structure
         */
-        void setShadowTextureConfig(size_t shadowIndex,
-            const ShadowTextureConfig& config);
+        void setShadowTextureConfig(size_t shadowIndex, const ShadowTextureConfig& config)
+        {
+            mShadowRenderer.setShadowTextureConfig(shadowIndex, config);
+        }
 
         /** Get the current shadow texture settings. */
-        const ShadowTextureConfigList& getShadowTextureConfigList() const { return mShadowTextureConfigList; }
+        const ShadowTextureConfigList& getShadowTextureConfigList() const { return mShadowRenderer.mShadowTextureConfigList; }
 
         /// @deprecated use getShadowTextureConfigList
         OGRE_DEPRECATED ConstShadowTextureConfigIterator getShadowTextureConfigIterator() const;
@@ -2759,14 +2776,17 @@ namespace Ogre {
         @note This is the simple form, see setShadowTextureConfig for the more 
             complex form.
         */
-        void setShadowTexturePixelFormat(PixelFormat fmt);
+        void setShadowTexturePixelFormat(PixelFormat fmt)
+        {
+            mShadowRenderer.setShadowTexturePixelFormat(fmt);
+        }
         /** Set the level of multisample AA of the textures used for texture-based shadows.
         @remarks
             By default, the level of multisample AA is zero.
         @note This is the simple form, see setShadowTextureConfig for the more 
             complex form.
         */
-        void setShadowTextureFSAA(unsigned short fsaa);
+        void setShadowTextureFSAA(unsigned short fsaa) { mShadowRenderer.setShadowTextureFSAA(fsaa); }
 
         /** Set the number of textures allocated for texture-based shadows.
         @remarks
@@ -2775,9 +2795,10 @@ namespace Ogre {
             shadows at the same time. You can increase this number in order to 
             make this more flexible, but be aware of the texture memory it will use.
         */
-        void setShadowTextureCount(size_t count);
+        void setShadowTextureCount(size_t count) { mShadowRenderer.setShadowTextureCount(count); }
+
         /// @deprecated use getShadowTextureConfigList
-        OGRE_DEPRECATED size_t getShadowTextureCount(void) const {return mShadowTextureConfigList.size(); }
+        OGRE_DEPRECATED size_t getShadowTextureCount(void) const {return mShadowRenderer.mShadowTextureConfigList.size(); }
 
         /** Set the number of shadow textures a light type uses.
         @remarks
@@ -2801,8 +2822,11 @@ namespace Ogre {
         @note This is the simple form, see setShadowTextureConfig for the more 
             complex form.
         */
-        void setShadowTextureSettings(unsigned short size, unsigned short count,
-            PixelFormat fmt = PF_X8R8G8B8, unsigned short fsaa = 0, uint16 depthBufferPoolId=1);
+        void setShadowTextureSettings(uint16 size, uint16 count, PixelFormat fmt = PF_X8R8G8B8,
+                                      uint16 fsaa = 0, uint16 depthBufferPoolId = 1)
+        {
+            mShadowRenderer.setShadowTextureSettings(size, count, fmt, fsaa, depthBufferPoolId);
+        }
 
         /** Get a reference to the shadow texture currently in use at the given index.
         @note
@@ -2810,7 +2834,10 @@ namespace Ogre {
             be correct, so be sure not to hold the returned reference over 
             texture shadow configuration changes.
         */
-        const TexturePtr& getShadowTexture(size_t shadowIndex);
+        const TexturePtr& getShadowTexture(size_t shadowIndex)
+        {
+            return mShadowRenderer.getShadowTexture(shadowIndex);
+        }
 
         /** Sets the proportional distance which a texture shadow which is generated from a
             directional light will be offset into the camera view to make best use of texture space.
@@ -2866,7 +2893,7 @@ namespace Ogre {
 
         /// Gets whether or not texture shadows attempt to self-shadow.
         bool getShadowTextureSelfShadow(void) const
-        { return mShadowTextureSelfShadow; }
+        { return mShadowRenderer.mShadowTextureSelfShadow; }
         /** Sets the default material to use for rendering shadow casters.
         @remarks
             By default shadow casters are rendered into the shadow texture using
@@ -2924,12 +2951,12 @@ namespace Ogre {
             if you have objects with holes you may want to turn this option off.
             The default is to enable this option.
         */
-        void setShadowCasterRenderBackFaces(bool bf) { mShadowCasterRenderBackFaces = bf; }
+        void setShadowCasterRenderBackFaces(bool bf) { mShadowRenderer.mShadowCasterRenderBackFaces = bf; }
 
         /** Gets whether or not shadow casters should be rendered into shadow
             textures using their back faces rather than their front faces. 
         */
-        bool getShadowCasterRenderBackFaces() const { return mShadowCasterRenderBackFaces; }
+        bool getShadowCasterRenderBackFaces() const { return mShadowRenderer.mShadowCasterRenderBackFaces; }
 
         /** Set the shadow camera setup to use for all lights which don't have
             their own shadow camera setup.

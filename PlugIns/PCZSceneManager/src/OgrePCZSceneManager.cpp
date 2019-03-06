@@ -1077,7 +1077,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void PCZSceneManager::ensureShadowTexturesCreated()
     {
-        bool shadowTextureConfigDirty = mShadowTextureConfigDirty;
+        bool shadowTextureConfigDirty = mShadowRenderer.mShadowTextureConfigDirty;
         mShadowRenderer.ensureShadowTexturesCreated();
         if (!shadowTextureConfigDirty) return;
 
