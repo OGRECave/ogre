@@ -384,10 +384,10 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
         // the first few lights unchanged from the frustum list, matching the
         // texture shadows that were generated
         // Thus we only allow object-relative sorting on the remainder of the list
-        if (destList.size() > getShadowTextureCount())
+        if (destList.size() > getShadowTextureConfigList().size())
         {
             LightList::iterator start = destList.begin();
-            std::advance(start, getShadowTextureCount());
+            std::advance(start, getShadowTextureConfigList().size());
             std::stable_sort(start, destList.end(), lightLess());
         }
     }
