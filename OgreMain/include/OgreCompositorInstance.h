@@ -362,6 +362,9 @@ namespace Ogre {
         */
         void freeResources(bool forResizeOnly, bool clearReserveTextures);
 
+        CompositionTechnique::TextureDefinition*
+        resolveTexReference(const CompositionTechnique::TextureDefinition* texDef);
+
         /** Get RenderTarget for a named local texture.
         */
         RenderTarget *getTargetForTex(const String &name);
