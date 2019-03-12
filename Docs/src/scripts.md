@@ -304,7 +304,7 @@ Techniques can have the following nested elements:
 
 -   [texture](#compositor_005ftexture)
 -   [texture\_ref](#compositor_005ftexture_005fref)
--   [material_scheme](#compositor_005fscheme)
+-   [scheme](#compositor_005fscheme)
 -   [compositor\_logic](#compositor_005flogic)
 -   [target](#Compositor-Target-Passes)
 -   [target\_output](#Compositor-Target-Passes)
@@ -390,10 +390,10 @@ Example : texture\_ref GBuffer GBufferCompositor mrt\_output
 
 ## scheme
 
-This gives a compositor technique a scheme name, allowing you to manually switch between different techniques for this compositor when instantiated on a viewport by calling CompositorInstance::setScheme.
+This gives a compositor technique a scheme name, allowing you to manually switch between different techniques for this compositor when instantiated on a viewport by calling Ogre::CompositorInstance::setScheme.
 
 @par
-Format: material\_scheme &lt;Name&gt; 
+Format: scheme &lt;Name&gt;
 
 <a name="compositor_005flogic"></a><a name="compositor_005flogic-1"></a>
 
@@ -404,7 +404,7 @@ This connects between a compositor and code that it requires in order to functio
 @par
 Format: compositor\_logic &lt;Name&gt;
 
-Registration of compositor logics is done by name through CompositorManager::registerCompositorLogic.
+Registration of compositor logics is done by name through Ogre::CompositorManager::registerCompositorLogic.
 
 # Target Passes {#Compositor-Target-Passes}
 
@@ -468,7 +468,7 @@ Default: only\_initial off
 
 ## visibility\_mask
 
-Sets the visibility mask for any render\_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to Viewport::setVisibilityMask.
+Sets the visibility mask for any render\_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to Ogre::Viewport::setVisibilityMask.
 @par
 Format: visibility\_mask &lt;mask&gt;
 @par
@@ -602,7 +602,7 @@ Example: input 0 rt0
 
 ## identifier
 
-Associates a numeric identifier with the pass. This is useful for registering a listener with the compositor (CompositorInstance::addListener), and being able to identify which pass it is that’s being processed when you get events regarding it. Numbers between 0 and 2^32 are allowed. 
+Associates a numeric identifier with the pass. This is useful for registering a listener with Ogre::CompositorInstance::addListener, and being able to identify which pass it is that’s being processed when you get events regarding it. Numbers between 0 and 2^32 are allowed.
 
 @par
 Format: identifier &lt;number&gt; 
@@ -613,7 +613,7 @@ Example: identifier 99945 Default: identifier 0
 
 ## first\_render\_queue
 
-For passes of type ’render\_scene’, this sets the first render queue id that is included in the render. Defaults to the value of RENDER\_QUEUE\_SKIES\_EARLY. 
+For passes of type ’render\_scene’, this sets the first render queue id that is included in the render. Defaults to the value of Ogre::RENDER_QUEUE_BACKGROUND.
 @par
 Format: first\_render\_queue &lt;id&gt; 
 @par
@@ -623,7 +623,7 @@ Default: first\_render\_queue 0
 
 ## last\_render\_queue
 
-For passes of type ’render\_scene’, this sets the last render queue id that is included in the render. Defaults to the value of RENDER\_QUEUE\_SKIES\_LATE. 
+For passes of type ’render\_scene’, this sets the last render queue id that is included in the render. Defaults to the value of Ogre::RENDER_QUEUE_SKIES_LATE.
 @par
 Format: last\_render\_queue &lt;id&gt; 
 @par
