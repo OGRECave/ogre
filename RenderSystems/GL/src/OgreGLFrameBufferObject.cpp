@@ -100,7 +100,9 @@ namespace Ogre {
         uint32 width = mColour[0].buffer->getWidth();
         uint32 height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
-        ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
+
+        auto rsc = Root::getSingleton().getRenderSystem()->getCapabilities();
+        ushort maxSupportedMRTs = rsc->getNumMultiRenderTargets();
 
         // Bind simple buffer to add colour attachments
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
@@ -122,7 +124,7 @@ namespace Ogre {
                     ss << ".";
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GLFrameBufferObject::initialise");
                 }
-                if(mColour[x].buffer->getGLFormat() != format)
+                if (!rsc->hasCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS) && mColour[x].buffer->getGLFormat() != format)
                 {
                     StringStream ss;
                     ss << "Attachment " << x << " has incompatible format.";
