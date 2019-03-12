@@ -3509,7 +3509,25 @@ void SceneManager::destroyShadowTextures(void)
 }
 void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
-    mShadowRenderer.prepareShadowTextures(cam, vp, lightList);
+        // Set the illumination stage, prevents recursive calls
+    IlluminationRenderStage savedStage = mIlluminationStage;
+    mIlluminationStage = IRS_RENDER_TO_TEXTURE;
+
+    if (lightList == 0)
+        lightList = &mLightsAffectingFrustum;
+
+    try
+    {
+        mShadowRenderer.prepareShadowTextures(cam, vp, lightList);
+    }
+    catch (Exception&)
+    {
+        // we must reset the illumination stage if an exception occurs
+        mIlluminationStage = savedStage;
+        throw;
+    }
+
+    mIlluminationStage = savedStage;
 }
 //---------------------------------------------------------------------
 SceneManager::RenderContext* SceneManager::_pauseRendering()
