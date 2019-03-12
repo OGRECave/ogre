@@ -61,8 +61,6 @@ namespace Ogre {
         /// Map between device to texture resources.
         DeviceToTextureResourcesMap mMapDeviceToTextureResources;
 
-        /// cube texture individual face names
-        String                          mCubeFaceNames[6];  
         /// The memory pool being used
         D3DPOOL                         mD3DPool;
         // Dynamic textures?
@@ -110,11 +108,7 @@ namespace Ogre {
         bool _canAutoGenMipmaps(IDirect3DDevice9* d3d9Device, DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat);
         /// internal method, return true if the device/texture combination can use hardware gamma
         bool _canUseHardwareGammaCorrection(IDirect3DDevice9* d3d9Device, DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat, bool forwriting);
-        
-        /// internal method, the cube map face name for the spec. face index
-        String _getCubeFaceName(unsigned char face) const
-        { assert(face < 6); return mCubeFaceNames[face]; }
-        
+
         /// internal method, create D3D9HardwarePixelBuffers for every face and
         /// mipmap level. This method must be called after the D3D texture object was created
         void _createSurfaceList(IDirect3DDevice9* d3d9Device, TextureResources* textureResources);
