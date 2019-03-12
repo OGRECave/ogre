@@ -579,7 +579,6 @@ SHARED_PTR(Mesh);
 %ignore Ogre::CompositorChain::getCompositor;
 %ignore Ogre::CompositorChain::getCompositors;
 %include "OgreCompositorChain.h"
-%include "OgreShadowTextureManager.h"
 %include "OgreRenderQueueSortingGrouping.h"
 %include "OgreRenderQueueInvocation.h"
 %ignore Ogre::SceneManager::getCameraIterator; // deprecated

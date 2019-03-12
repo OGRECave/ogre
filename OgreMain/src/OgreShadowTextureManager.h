@@ -34,7 +34,6 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
 #include "OgrePixelFormat.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -44,27 +43,6 @@ namespace Ogre
     /** \addtogroup Scene
     *  @{
     */
-    typedef std::vector<TexturePtr> ShadowTextureList;
-
-    /** Structure containing the configuration for one shadow texture. */
-    struct ShadowTextureConfig
-    {
-        unsigned int width;
-        unsigned int height;
-        PixelFormat format;
-        unsigned int fsaa;
-        uint16      depthBufferPoolId;
-
-        ShadowTextureConfig()
-            : width(512), height(512), format(PF_X8R8G8B8), fsaa(0), depthBufferPoolId(1) {}
-    };
-
-    typedef std::vector<ShadowTextureConfig> ShadowTextureConfigList;
-    typedef ConstVectorIterator<ShadowTextureConfigList> ConstShadowTextureConfigIterator;
-
-    _OgreExport bool operator== ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
-    _OgreExport bool operator!= ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
-
 
     /** Class to manage the available shadow textures which may be shared between
         many SceneManager instances if formats agree.
@@ -76,7 +54,7 @@ namespace Ogre
         not be consistent - if it is, it is good to centrally manage the textures
         so that creation and destruction responsibility is clear.
     */
-    class _OgreExport ShadowTextureManager : public Singleton<ShadowTextureManager>, public ShadowDataAlloc
+    class ShadowTextureManager : public Singleton<ShadowTextureManager>, public ShadowDataAlloc
     {
     protected:
         ShadowTextureList mTextureList;
@@ -120,8 +98,6 @@ namespace Ogre
     /** @} */
     /** @} */
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif
 

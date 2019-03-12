@@ -45,6 +45,7 @@ namespace Ogre
     */
 
     class AndroidLogListener;
+    class ShadowTextureManager;
 
     typedef std::vector<RenderSystem*> RenderSystemList;
     
