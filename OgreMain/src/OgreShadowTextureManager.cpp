@@ -28,7 +28,6 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -------------------------------------------------------------------------*/
 #include "OgreStableHeaders.h"
-#include "OgreShadowTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre

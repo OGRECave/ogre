@@ -81,6 +81,7 @@ THE SOFTWARE.
 #include "OgreResourceGroupManager.h"
 #include "OgreResource.h"
 #include "OgreRoot.h"
+#include "OgreShadowTextureManager.h"
 #include "OgreSceneManager.h"
 #include "OgreSceneNode.h"
 #include "OgreScriptCompiler.h"

@@ -222,7 +222,6 @@ namespace Ogre {
     class ShadowCameraSetup;
     class ShadowCaster;
     class ShadowRenderable;
-    class ShadowTextureManager;
     class SimpleRenderable;
     class SimpleSpline;
     class Skeleton;

@@ -43,7 +43,6 @@ Torus Knot Software Ltd.
 #include "OgreRenderQueue.h"
 #include "OgreRenderQueueSortingGrouping.h"
 #include "OgreResourceGroupManager.h"
-#include "OgreShadowTextureManager.h"
 #include "OgreInstanceManager.h"
 #include "OgreManualObject.h"
 #include "OgreRenderSystem.h"
@@ -58,6 +57,26 @@ namespace Ogre {
     /** \addtogroup Scene
     *  @{
     */
+
+    typedef std::vector<TexturePtr> ShadowTextureList;
+
+    /** Structure containing the configuration for one shadow texture. */
+    struct ShadowTextureConfig
+    {
+        unsigned int width;
+        unsigned int height;
+        PixelFormat format;
+        unsigned int fsaa;
+        uint16      depthBufferPoolId;
+
+        ShadowTextureConfig() : width(512), height(512), format(PF_X8R8G8B8), fsaa(0), depthBufferPoolId(1) {}
+    };
+
+    typedef std::vector<ShadowTextureConfig> ShadowTextureConfigList;
+    typedef ConstVectorIterator<ShadowTextureConfigList> ConstShadowTextureConfigIterator;
+
+    _OgreExport bool operator== ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
+    _OgreExport bool operator!= ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
 
     /** Structure for holding a position & orientation pair. */
     struct ViewPoint
