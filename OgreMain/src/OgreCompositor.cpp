@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreRenderTarget.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreCompositorInstance.h"
 
 namespace Ogre {
 
@@ -196,11 +197,6 @@ CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName
 
 }
 //-----------------------------------------------------------------------
-static String getMRTTexLocalName(const String& baseName, size_t attachment)
-{
-    return baseName + "/" + StringConverter::toString(attachment);
-}
-//-----------------------------------------------------------------------
 void Compositor::createGlobalTextures()
 {
     static size_t dummyCounter = 0;
@@ -275,7 +271,7 @@ void Compositor::createGlobalTextures()
                     mrt->bindSurface(atch, rt);
 
                     // Also add to local textures so we can look up
-                    String mrtLocalName = getMRTTexLocalName(def->name, atch);
+                    String mrtLocalName = CompositorInstance::getMRTTexLocalName(def->name, atch);
                     mGlobalTextures[mrtLocalName] = tex;
                     
                 }
@@ -378,7 +374,7 @@ TexturePtr Compositor::getTextureInstance(const String& name, size_t mrtIndex)
         return i->second;
     }
     //Try MRT
-    String mrtName = getMRTTexLocalName(name, mrtIndex);
+    String mrtName = CompositorInstance::getMRTTexLocalName(name, mrtIndex);
     i = mGlobalTextures.find(mrtName);
     if(i != mGlobalTextures.end())
     {

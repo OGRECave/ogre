@@ -394,6 +394,7 @@ namespace Ogre {
         void notifyCameraChanged(Camera* camera);
 
         friend class CompositorChain;
+        friend class Compositor;
     };
     /** @} */
     /** @} */

@@ -686,8 +686,8 @@ void CompositorInstance::createResources(bool forResizeOnly)
             
         } else {
             /// Determine width and height
-            size_t width = def->width;
-            size_t height = def->height;
+            uint32 width = def->width;
+            uint32 height = def->height;
             uint fsaa = 0;
             String fsaaHint;
             bool hwGamma = false;
