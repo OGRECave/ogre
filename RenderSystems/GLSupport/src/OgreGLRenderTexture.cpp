@@ -102,14 +102,6 @@ namespace Ogre {
     // need to implement in cpp due to how Ogre::Singleton works
     GLRTTManager::~GLRTTManager() {}
 
-    MultiRenderTarget* GLRTTManager::createMultiRenderTarget(const String & name)
-    {
-        // TODO: Check rendersystem capabilities before throwing the exception
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "MultiRenderTarget is not supported",
-                    "GLRTTManager::createMultiRenderTarget");
-    }
-
     PixelFormat GLRTTManager::getSupportedAlternative(PixelFormat format)
     {
         if (checkFormat(format))

@@ -496,10 +496,6 @@ namespace Ogre {
         GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
     }
-    MultiRenderTarget *GLES2FBOManager::createMultiRenderTarget(const String & name)
-    {
-        return new GLES2FBOMultiRenderTarget(this, name);
-    }
 
     void GLES2FBOManager::bind(RenderTarget *target)
     {

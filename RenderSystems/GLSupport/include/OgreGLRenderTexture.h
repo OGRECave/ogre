@@ -153,10 +153,6 @@ namespace Ogre {
             *stencilFormat = 0;
         }
 
-        /** Create a multi render target
-         */
-        virtual MultiRenderTarget* createMultiRenderTarget(const String & name);
-
         /** Get the closest supported alternative format. If format is supported, returns format.
          */
         PixelFormat getSupportedAlternative(PixelFormat format);
