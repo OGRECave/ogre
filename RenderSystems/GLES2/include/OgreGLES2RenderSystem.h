@@ -44,7 +44,7 @@ namespace Ogre {
     * Implementation of GL ES 2.x as a rendering system.
     *  @{
     */
-    class GLRTTManager;
+    class GLES2FBOManager;
     class GLES2GpuProgramManager;
     class GLSLESProgramCommon;
     class GLSLESProgramFactory;
@@ -89,7 +89,7 @@ namespace Ogre {
                 to pbuffers, which depend on the GL support used and are generally 
                 unwieldy and slow. However, FBO support for stencil buffers is poor.
               */
-            GLRTTManager *mRTTManager;
+            GLES2FBOManager *mRTTManager;
 
             /// Check if the GL system has already been initialised
             bool mGLInitialised;

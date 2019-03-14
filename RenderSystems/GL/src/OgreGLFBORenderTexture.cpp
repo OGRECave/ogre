@@ -483,10 +483,6 @@ static const uchar depthBits[] =
         GLFBORenderTexture *retval = new GLFBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
     }
-    MultiRenderTarget *GLFBOManager::createMultiRenderTarget(const String & name)
-    {
-        return new GLFBOMultiRenderTarget(this, name);
-    }
     //---------------------------------------------------------------------
     void GLFBOManager::bind(RenderTarget *target)
     {

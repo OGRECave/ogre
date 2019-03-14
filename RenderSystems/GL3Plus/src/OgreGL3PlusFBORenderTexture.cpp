@@ -468,10 +468,6 @@ namespace Ogre {
         GL3PlusFBORenderTexture *retval = new GL3PlusFBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
     }
-    MultiRenderTarget *GL3PlusFBOManager::createMultiRenderTarget(const String & name)
-    {
-        return new GL3PlusFBOMultiRenderTarget(this, name);
-    }
 
     void GL3PlusFBOManager::bind(RenderTarget *target)
     {

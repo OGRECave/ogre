@@ -101,7 +101,7 @@ namespace Ogre {
             to pbuffers, which depend on the GL support used and are generally
             unwieldy and slow. However, FBO support for stencil buffers is poor.
         */
-        GLRTTManager *mRTTManager;
+        GL3PlusFBOManager *mRTTManager;
 
         /** These variables are used for caching RenderSystem state.
             They are cached because OpenGL state changes can be quite expensive,

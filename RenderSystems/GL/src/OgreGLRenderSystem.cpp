@@ -59,6 +59,7 @@ THE SOFTWARE.
 #include "OgreGLPixelFormat.h"
 
 #include "OgreGLSLProgramCommon.h"
+#include "OgreGLFBOMultiRenderTarget.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 extern "C" void glFlushRenderAPPLE();
@@ -1214,7 +1215,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MultiRenderTarget * GLRenderSystem::createMultiRenderTarget(const String & name)
     {
-        MultiRenderTarget *retval = mRTTManager->createMultiRenderTarget(name);
+        auto fboMgr = dynamic_cast<GLFBOManager*>(mRTTManager);
+        if (!fboMgr)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "MultiRenderTarget is not supported");
+
+        MultiRenderTarget *retval = new GLFBOMultiRenderTarget(fboMgr, name);
         attachRenderTarget( *retval );
         return retval;
     }
