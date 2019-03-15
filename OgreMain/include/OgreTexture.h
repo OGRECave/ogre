@@ -59,16 +59,24 @@ namespace Ogre {
         TU_DYNAMIC_WRITE_ONLY = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
         /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE
         TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-        /// Mipmaps will be automatically generated for this texture. The exact algorithm used is not
-        /// defined, but you can assume it to be a 2x2 box filter.
-        TU_AUTOMIPMAP = 16,
+        /// Mipmaps will be automatically generated for this texture
+        TU_AUTOMIPMAP = 0x10,
         /** This texture will be a render target, i.e. used as a target for render to texture
-            setting this flag will ignore all other texture usages except TU_AUTOMIPMAP and TU_NOTSHADERRESOURCE */
-        TU_RENDERTARGET = 32,
-        /// Hint, that could be combined with TU_RENDERTARGET to remove possible limitations on some hardware
-        TU_NOTSHADERRESOURCE = 64,
+            setting this flag will ignore all other texture usages except TU_AUTOMIPMAP, TU_UAV, TU_NOT_SRV */
+        TU_RENDERTARGET = 0x20,
+        /// Texture would not be used as Shader Resource View, i.e. as regular texture.
+        /// That flag could be combined with TU_RENDERTARGET or TU_UAV to remove possible limitations on some hardware
+        TU_NOT_SRV = 0x40,
+        /// Texture can be bound as an Unordered Access View
+        /// (imageStore/imageRead/glBindImageTexture in GL jargon)
+        TU_UAV = 0x80,
+        /// Texture can be used as an UAV, but not as a regular texture.
+        TU_UAV_NOT_SRV = TU_UAV | TU_NOT_SRV,
         /// Default to automatic mipmap generation static textures
-        TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY
+        TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY,
+
+        // deprecated
+        TU_NOTSHADERRESOURCE = TU_NOT_SRV
     };
 
     /** Enum identifying the texture access privilege
