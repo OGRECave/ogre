@@ -78,16 +78,6 @@ namespace Ogre
         return mHeight;
     }
     //-----------------------------------------------------------------------
-    uint32 DepthBuffer::getFsaa() const
-    {
-        return mFsaa;
-    }
-    //-----------------------------------------------------------------------
-    const String& DepthBuffer::getFsaaHint() const
-    {
-        return mFsaaHint;
-    }
-    //-----------------------------------------------------------------------
     bool DepthBuffer::isManual() const
     {
         return mManual;
@@ -97,7 +87,7 @@ namespace Ogre
     {
         if( this->getWidth() >= renderTarget->getWidth() &&
             this->getHeight() >= renderTarget->getHeight() &&
-            this->getFsaa() == renderTarget->getFSAA() )
+            this->getFSAA() == renderTarget->getFSAA() )
         {
             return true;
         }
