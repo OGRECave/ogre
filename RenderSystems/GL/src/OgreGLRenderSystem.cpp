@@ -1141,9 +1141,6 @@ namespace Ogre {
     {
         GLDepthBuffer *retVal = 0;
 
-        //Only FBO & pbuffer support different depth buffers, so everything
-        //else creates dummy (empty) containers
-        //retVal = mRTTManager->_createDepthBufferFor( renderTarget );
         if( auto fbo = dynamic_cast<GLRenderTarget*>(renderTarget)->getFBO() )
         {
             //Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
@@ -1170,6 +1167,13 @@ namespace Ogre {
             //No "custom-quality" multisample for now in GL
             retVal = new GLDepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
                                         fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), false );
+        }
+        else
+        {
+            // Only FBO support different depth buffers, so everything
+            // else creates dummy (empty) containers
+            retVal = new GLDepthBuffer(0, this, mCurrentContext, NULL, NULL, renderTarget->getWidth(),
+                                       renderTarget->getHeight(), renderTarget->getFSAA(), false);
         }
 
         return retVal;
