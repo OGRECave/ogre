@@ -52,7 +52,7 @@ namespace Ogre
     public:
         GLES2DepthBuffer( uint16 poolId, GLES2RenderSystem *renderSystem, GLContext *creatorContext,
                         GLES2RenderBuffer *depth, GLES2RenderBuffer *stencil,
-                        uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
+                        uint32 width, uint32 height, uint32 fsaa,
                         bool isManual );
         ~GLES2DepthBuffer();
 
@@ -64,7 +64,6 @@ namespace Ogre
         GLES2RenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
 
     protected:
-        uint32                      mMultiSampleQuality;
         GLContext                   *mCreatorContext;
         GLES2RenderBuffer           *mDepthBuffer;
         GLES2RenderBuffer           *mStencilBuffer;

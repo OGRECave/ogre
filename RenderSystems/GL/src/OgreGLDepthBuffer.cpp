@@ -34,10 +34,9 @@ namespace Ogre
 {
     GLDepthBuffer::GLDepthBuffer( uint16 poolId, GLRenderSystem *renderSystem, GLContext *creatorContext,
                                     GLRenderBuffer *depth, GLRenderBuffer *stencil,
-                                    uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
+                                    uint32 width, uint32 height, uint32 fsaa,
                                     bool manual ) :
                 DepthBuffer( poolId, 0, width, height, fsaa, "", manual ),
-                mMultiSampleQuality( multiSampleQuality ),
                 mCreatorContext( creatorContext ),
                 mDepthBuffer( depth ),
                 mStencilBuffer( stencil ),

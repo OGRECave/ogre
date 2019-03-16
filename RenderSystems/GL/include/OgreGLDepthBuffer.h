@@ -49,7 +49,7 @@ namespace Ogre
     public:
         GLDepthBuffer( uint16 poolId, GLRenderSystem *renderSystem, GLContext *creatorContext,
                         GLRenderBuffer *depth, GLRenderBuffer *stencil,
-                        uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
+                        uint32 width, uint32 height, uint32 fsaa,
                         bool isManual );
         ~GLDepthBuffer();
 
@@ -61,7 +61,6 @@ namespace Ogre
         GLRenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
 
     protected:
-        uint32                      mMultiSampleQuality;
         GLContext                   *mCreatorContext;
         GLRenderBuffer              *mDepthBuffer;
         GLRenderBuffer              *mStencilBuffer;
