@@ -269,7 +269,7 @@ namespace Ogre {
                 return false;
             }
         };
-        typedef std::map<TextureDef, TextureList*, TextureDefLess> TexturesByDef;
+        typedef std::map<TextureDef, TextureList, TextureDefLess> TexturesByDef;
         TexturesByDef mTexturesByDef;
 
         typedef std::pair<String, String> StringPair;
