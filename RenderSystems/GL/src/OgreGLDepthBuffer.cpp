@@ -98,11 +98,11 @@ namespace Ogre
 
         if( !fbo )
         {
-            GLContext *windowContext = dynamic_cast<GLRenderTarget*>(renderTarget)->getContext();;
+            GLContext *windowContext = dynamic_cast<GLRenderTarget*>(renderTarget)->getContext();
 
             //Non-FBO targets and FBO depth surfaces don't play along, only dummies which match the same
             //context
-            if( !mDepthBuffer && !mStencilBuffer && mCreatorContext == windowContext )
+            if( !mDepthBuffer && !mStencilBuffer && (!windowContext || mCreatorContext == windowContext) )
                 retVal = true;
         }
         else
