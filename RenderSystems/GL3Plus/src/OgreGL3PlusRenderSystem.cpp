@@ -685,10 +685,6 @@ namespace Ogre {
     {
         GL3PlusDepthBuffer *retVal = 0;
 
-        // Only FBOs support different depth buffers, so everything
-        // else creates dummy (empty) containers
-        // retVal = mRTTManager->_createDepthBufferFor( renderTarget );
-
         if ( auto fbo = dynamic_cast<GLRenderTarget*>(renderTarget)->getFBO() )
         {
             // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast.
@@ -1912,15 +1908,11 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setRenderTarget(RenderTarget *target)
     {
-        // Unbind frame buffer object
-        if (mActiveRenderTarget)
-            mRTTManager->unbind(mActiveRenderTarget);
-
         mActiveRenderTarget = target;
-        if (target)
+        if (auto gltarget = dynamic_cast<GLRenderTarget*>(target))
         {
             // Switch context if different from current one
-            GL3PlusContext *newContext = dynamic_cast<GLRenderTarget*>(target)->getContext();
+            GL3PlusContext *newContext = gltarget->getContext();
             if (newContext && mCurrentContext != newContext)
             {
                 _switchContext(newContext);
@@ -1937,8 +1929,13 @@ namespace Ogre {
                 setDepthBufferFor( target );
             }
 
-            // Bind frame buffer object
-            mRTTManager->bind(target);
+            /* Bind a certain render target if it is a FBO. If it is not a FBO, bind the
+               main frame buffer.
+            */
+            if(auto fbo = gltarget->getFBO())
+                fbo->bind(true);
+            else
+                _getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
 
             // Enable / disable sRGB states
             if (target->isHardwareGammaEnabled())

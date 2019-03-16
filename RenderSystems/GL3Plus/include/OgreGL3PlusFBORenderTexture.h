@@ -68,15 +68,6 @@ namespace Ogre {
         GL3PlusFBOManager(GL3PlusRenderSystem* renderSystem);
         ~GL3PlusFBOManager();
 
-        /** Bind a certain render target if it is a FBO. If it is not a FBO, bind the
-            main frame buffer.
-        */
-        void bind(RenderTarget *target);
-
-        /** Unbind a certain render target. No-op for FBOs.
-         */
-        void unbind(RenderTarget *target) {};
-
         /** Get best depth and stencil supported for given internalFormat
          */
         void getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat);
