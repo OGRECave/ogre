@@ -99,8 +99,10 @@ namespace Ogre
         virtual uint16 getBitDepth() const;
         virtual uint32 getWidth() const;
         virtual uint32 getHeight() const;
-        virtual uint32 getFsaa() const;
-        virtual const String& getFsaaHint() const;
+        uint32 getFSAA() const { return mFsaa; }
+        const String& getFSAAHint() const { return mFsaaHint; }
+        OGRE_DEPRECATED uint32 getFsaa() const { return getFSAA(); }
+        OGRE_DEPRECATED const String& getFsaaHint() const { return getFSAAHint(); }
 
         /** Manual DepthBuffers are cleared in RenderSystem's destructor. Non-manual ones are released
             with it's render target (aka, a backbuffer or similar) */
