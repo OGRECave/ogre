@@ -80,11 +80,7 @@ namespace Ogre {
             main frame buffer.
         */
         void bind(RenderTarget *target);
-        
-        /** Unbind a certain render target. No-op for FBOs.
-        */
-        void unbind(RenderTarget *target) {};
-        
+
         /** Get best depth and stencil supported for given internalFormat
         */
         void getBestDepthStencil(PixelFormat internalFormat, uint32 *depthFormat, uint32 *stencilFormat);

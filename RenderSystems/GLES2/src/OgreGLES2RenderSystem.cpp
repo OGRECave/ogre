@@ -708,9 +708,6 @@ namespace Ogre {
     {
         GLES2DepthBuffer *retVal = 0;
 
-        // Only FBO & pbuffer support different depth buffers, so everything
-        // else creates dummy (empty) containers
-        // retVal = mRTTManager->_createDepthBufferFor( renderTarget );
         if( auto fbo = dynamic_cast<GLRenderTarget*>(renderTarget)->getFBO() )
         {
             // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
@@ -1832,10 +1829,6 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setRenderTarget(RenderTarget *target)
     {
-        // Unbind frame buffer object
-        if(mActiveRenderTarget && mRTTManager)
-            mRTTManager->unbind(mActiveRenderTarget);
-
         mActiveRenderTarget = target;
         if (target && mRTTManager)
         {

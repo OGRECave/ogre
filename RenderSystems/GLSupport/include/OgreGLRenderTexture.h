@@ -138,14 +138,16 @@ namespace Ogre {
         bool checkFormat(PixelFormat format) { return mProps[format].valid; }
 
         /** Bind a certain render target.
+            @note only needed for FBO RTTs
          */
-        virtual void bind(RenderTarget *target) = 0;
+        virtual void bind(RenderTarget *target) {}
 
         /** Unbind a certain render target. This is called before binding another RenderTarget, and
             before the context is switched. It can be used to do a copy, or just be a noop if direct
             binding is used.
+            @note only needed for Copying or PBuffer RTTs
         */
-        virtual void unbind(RenderTarget *target) = 0;
+        virtual void unbind(RenderTarget *target) {}
 
         virtual void getBestDepthStencil(PixelFormat internalFormat, uint32 *depthFormat, uint32 *stencilFormat)
         {
