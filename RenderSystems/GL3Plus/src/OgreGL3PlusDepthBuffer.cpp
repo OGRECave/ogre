@@ -35,10 +35,9 @@ namespace Ogre
     GL3PlusDepthBuffer::GL3PlusDepthBuffer(
         uint16 poolId, GL3PlusRenderSystem *renderSystem, GL3PlusContext *creatorContext,
         GL3PlusRenderBuffer *depth, GL3PlusRenderBuffer *stencil,
-        uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
+        uint32 width, uint32 height, uint32 fsaa,
         bool manual ) :
         DepthBuffer( poolId, 0, width, height, fsaa, "", manual ),
-        mMultiSampleQuality( multiSampleQuality ),
         mCreatorContext( creatorContext ),
         mDepthBuffer( depth ),
         mStencilBuffer( stencil ),
