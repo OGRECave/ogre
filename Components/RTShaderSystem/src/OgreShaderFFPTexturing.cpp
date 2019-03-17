@@ -441,7 +441,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
                                           int samplerIndex,
                                           const LayerBlendModeEx& blendMode,
                                           const int groupOrder, 
-                                          int mask)
+                                          Operand::OpMask mask)
 {
     auto stage = psMain->getStage(groupOrder);
     switch(blendMode.operation)

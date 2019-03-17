@@ -30,7 +30,7 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 //-----------------------------------------------------------------------------
-Operand::Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, ushort indirectionLevel) : mParameter(parameter), mSemantic(opSemantic), mMask(opMask), mIndirectionLevel(indirectionLevel)
+Operand::Operand(ParameterPtr parameter, OpSemantic opSemantic, OpMask opMask, ushort indirectionLevel) : mParameter(parameter), mSemantic(opSemantic), mMask(opMask), mIndirectionLevel(indirectionLevel)
 {
     OgreAssert(mParameter, "NULL parameter is not a valid operand");
     parameter->setUsed(true);
@@ -82,7 +82,7 @@ String Operand::getMaskAsString(int mask)
 {
     String retVal = "";
 
-    if (mask & ~OPM_ALL) 
+    if (mask != OPM_ALL)
     {
         if (mask & OPM_X)
         {
@@ -163,7 +163,7 @@ GpuConstantType Operand::getGpuConstantType(int mask)
 String Operand::toString() const
 {
     String retVal = mParameter->toString();
-    if ((mMask & OPM_ALL) || ((mMask & OPM_X) && (mMask & OPM_Y) && (mMask & OPM_Z) && (mMask & OPM_W)))
+    if (mMask == OPM_ALL)
     {
         return retVal;
     }
@@ -267,7 +267,7 @@ void FunctionInvocation::writeOperands(std::ostream& os, OperandVector::const_it
 }
 
 //-----------------------------------------------------------------------
-void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, int indirectionLevel)
+void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, Operand::OpMask opMask, int indirectionLevel)
 {
     mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
 }

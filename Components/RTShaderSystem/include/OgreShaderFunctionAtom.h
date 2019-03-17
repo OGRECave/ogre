@@ -86,13 +86,13 @@ public:
     };
 
     // Used field mask
-    enum OpMask
+    enum OpMask : uchar
     {
-        OPM_ALL     = 0x0001,
-        OPM_X       = 0x0002,
-        OPM_Y       = 0x0004,
-        OPM_Z       = 0x0008,
-        OPM_W       = 0x0010,
+        OPM_NONE    = 0,
+        OPM_X       = 0x0001,
+        OPM_Y       = 0x0002,
+        OPM_Z       = 0x0004,
+        OPM_W       = 0x0008,
         OPM_XY      = OPM_X | OPM_Y,
         OPM_XZ      = OPM_X | OPM_Z,
         OPM_XW      = OPM_X | OPM_W,
@@ -103,7 +103,8 @@ public:
         OPM_XYW     = OPM_X | OPM_Y | OPM_W,
         OPM_XZW     = OPM_X | OPM_Z | OPM_W,
         OPM_YZW     = OPM_Y | OPM_Z | OPM_W,
-        OPM_XYZW    = OPM_X | OPM_Y | OPM_Z | OPM_W
+        OPM_XYZW    = OPM_X | OPM_Y | OPM_Z | OPM_W,
+        OPM_ALL     = OPM_XYZW
     };
 
     /** Class constructor 
@@ -112,7 +113,7 @@ public:
     @param opMask The field mask of the parameter.
     @param indirectionLevel
     */
-    Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL, ushort indirectionLevel = 0);
+    Operand(ParameterPtr parameter, OpSemantic opSemantic, OpMask opMask = OPM_ALL, ushort indirectionLevel = 0);
 
     /** Copy constructor */
     Operand(const Operand& rhs);
@@ -129,10 +130,10 @@ public:
     const ParameterPtr& getParameter()  const { return mParameter; }
 
     /** Returns true if not all fields used. (usage is described through semantic)*/
-    bool hasFreeFields()    const { return ((mMask & ~OPM_ALL) && ((mMask & ~OPM_X) || (mMask & ~OPM_Y) || (mMask & ~OPM_Z) || (mMask & ~OPM_W))); }
+    bool hasFreeFields()    const { return mMask != OPM_ALL; }
     
     /** Returns the mask bitfield. */
-    int getMask()   const { return mMask; }
+    OpMask getMask()   const { return mMask; }
 
     Operand& x() { return mask(OPM_X); }
     Operand& y() { return mask(OPM_Y); }
@@ -141,7 +142,7 @@ public:
     Operand& xy() { return mask(OPM_XY); }
     Operand& xyz() { return mask(OPM_XYZ); }
 
-    Operand& mask(int opMask)
+    Operand& mask(OpMask opMask)
     {
         mMask = opMask;
         return *this;
@@ -178,7 +179,7 @@ protected:
     /// Tells if the parameter is of type input,output or both
     OpSemantic mSemantic;
     /// Which part of the parameter should be passed (x,y,z,w)
-    int mMask;
+    OpMask mMask;
     /// The level of indirection. @see getIndirectionLevel
     ushort mIndirectionLevel;
 };
@@ -253,7 +254,7 @@ public:
     @param opMask The field mask of the parameter.
     @param indirectionLevel The level of nesting inside brackets
     */
-    void pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL, int indirectionLevel = 0);
+    void pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, Operand::OpMask opMask = Operand::OPM_ALL, int indirectionLevel = 0);
 
     void setOperands(const OperandVector& ops);
 

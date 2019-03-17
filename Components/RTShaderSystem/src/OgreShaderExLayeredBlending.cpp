@@ -167,7 +167,7 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
                                          int samplerIndex,
                                          const LayerBlendModeEx& blendMode,
                                          const int groupOrder, 
-                                         int mask)
+                                         Operand::OpMask mask)
 {
     //
     // Add the modifier invocation
@@ -213,7 +213,7 @@ void LayeredBlending::addPSModifierInvocation(Function* psMain,
                                          ParameterPtr arg1,
                                          ParameterPtr arg2,
                                          const int groupOrder, 
-                                         int mask)
+                                         Operand::OpMask mask)
 {
     SourceModifier modType;
     int customNum;

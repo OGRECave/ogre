@@ -193,7 +193,7 @@ protected:
 
     virtual void addPSBlendInvocations(Function* psMain, ParameterPtr arg1, ParameterPtr arg2,
                 ParameterPtr texel,int samplerIndex, const LayerBlendModeEx& blendMode,
-                const int groupOrder, int targetChannels);
+                const int groupOrder, Operand::OpMask targetChannels);
     
     /** 
     Determines the texture coordinates calculation method of the given texture unit state.
