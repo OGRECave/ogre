@@ -91,7 +91,7 @@ protected:
         void clear();
         
         /** Add source parameter to this merged */
-        void addSourceParameter(ParameterPtr srcParam, int mask);
+        void addSourceParameter(ParameterPtr srcParam, Operand::OpMask mask);
 
         /** Return the source parameter count. */
         size_t getSourceParameterCount() const { return mSrcParameterCount; }
@@ -100,10 +100,10 @@ protected:
         ParameterPtr getSourceParameter(unsigned int index) { return mSrcParameter[index]; }
 
         /** Return source parameter mask by index. */
-        int getSourceParameterMask(unsigned int index) const { return mSrcParameterMask[index]; }
+        Operand::OpMask getSourceParameterMask(unsigned int index) const { return mSrcParameterMask[index]; }
 
         /** Return destination parameter mask by index. */
-        int getDestinationParameterMask(unsigned int index) const { return mDstParameterMask[index]; }
+        Operand::OpMask getDestinationParameterMask(unsigned int index) const { return mDstParameterMask[index]; }
 
         /** Return the number of used floats. */ 
         int getUsedFloatCount();
@@ -123,9 +123,9 @@ protected:
         // Source parameters - 4 source at max 1,1,1,1 -> 4.
         ParameterPtr mSrcParameter[4];
         // Source parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
-        int mSrcParameterMask[4];
+        Operand::OpMask mSrcParameterMask[4];
         // Destination parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
-        int mDstParameterMask[4];
+        Operand::OpMask mDstParameterMask[4];
         // The actual source parameters count.
         size_t mSrcParameterCount;
         // The number of used floats.
@@ -141,13 +141,13 @@ protected:
         // The count of each source type. I.E (1 FLOAT1, 0 FLOAT2, 1 FLOAT3, 0 FLOAT4).
         size_t srcParameterTypeCount[4];
         // Source parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
-        int srcParameterMask[4];
+        Operand::OpMask srcParameterMask[4];
 
         MergeCombination(
-            int float1Count, int float1Mask,
-            int float2Count, int float2Mask,
-            int float3Count, int float3Mask,
-            int float4Count, int float4Mask)
+            int float1Count, Operand::OpMask float1Mask,
+            int float2Count, Operand::OpMask float2Mask,
+            int float3Count, Operand::OpMask float3Mask,
+            int float4Count, Operand::OpMask float4Mask)
         {
             srcParameterTypeCount[0] = float1Count;
             srcParameterTypeCount[1] = float2Count;
@@ -245,10 +245,10 @@ protected:
     static int getParameterFloatCount(GpuConstantType type);        
 
     /** Return the parameter mask of by the given parameter type (I.E: X|Y for FLOAT2 etc..) */
-    static int getParameterMaskByType(GpuConstantType type);
+    static Operand::OpMask getParameterMaskByType(GpuConstantType type);
     
     /** Return the parameter mask of by the float count type (I.E: X|Y for 2 etc..) */
-    static int getParameterMaskByFloatCount(int floatCount);
+    static Operand::OpMask getParameterMaskByFloatCount(int floatCount);
     
     /** Bind the auto parameters for a given CPU and GPU program set. */
     void bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pGpuProgram);

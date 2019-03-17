@@ -543,7 +543,7 @@ void ProgramProcessor::mergeParametersReminders(ShaderParameterList paramsTable[
                             srcComponentsMask = getParameterMaskByFloatCount(freeFloatCount) << splitCount;                         
 
                             // Add the partial source parameter to merged parameter.
-                            curMergeParam.addSourceParameter(srcParameter, srcComponentsMask & srcParameterComponents);
+                            curMergeParam.addSourceParameter(srcParameter, Operand::OpMask(srcComponentsMask & srcParameterComponents));
                         }
                         splitCount++;
 
@@ -753,7 +753,7 @@ void ProgramProcessor::replaceParametersReferences(MergeParameterList& mergedPar
                         }
 
                         // Replace the original source operand with a new operand the reference the new merged parameter.                       
-                        *srcOperandPtr = Operand(dstParameter, srcOperandPtr->getSemantic(), dstOpMask);
+                        *srcOperandPtr = Operand(dstParameter, srcOperandPtr->getSemantic(), Operand::OpMask(dstOpMask));
                     }
                 }
             }   
@@ -784,7 +784,7 @@ void ProgramProcessor::replaceSplitParametersReferences(LocalParameterMap& local
             for (unsigned int op=0; op < srcParamRefs.size(); ++op)
             {
                 Operand*  srcOperandPtr = srcParamRefs[op];
-                int       dstOpMask;
+                Operand::OpMask dstOpMask;
 
                 if (srcOperandPtr->getMask() == Operand::OPM_ALL)
                 {                   
@@ -823,43 +823,31 @@ int ProgramProcessor::getParameterFloatCount(GpuConstantType type)
 }
 
 //-----------------------------------------------------------------------------
-int ProgramProcessor::getParameterMaskByType(GpuConstantType type)
+Operand::OpMask ProgramProcessor::getParameterMaskByType(GpuConstantType type)
 {
-    int paramMask = 0;
-
     switch (type)
     {
-    case GCT_FLOAT1: paramMask = Operand::OPM_X; break;
-    case GCT_FLOAT2: paramMask = Operand::OPM_XY; break;
-    case GCT_FLOAT3: paramMask = Operand::OPM_XYZ; break;
-    case GCT_FLOAT4: paramMask = Operand::OPM_XYZW; break;
+    case GCT_FLOAT1: return Operand::OPM_X;
+    case GCT_FLOAT2: return Operand::OPM_XY;
+    case GCT_FLOAT3: return Operand::OPM_XYZ;
+    case GCT_FLOAT4: return Operand::OPM_XYZW;
     default:
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "Invalid parameter float type.",
-            "ProgramProcessor::getParameterMaskByType");
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid parameter type.");
     }
-
-    return paramMask;
 }
 
 //-----------------------------------------------------------------------------
-int ProgramProcessor::getParameterMaskByFloatCount(int floatCount)
+Operand::OpMask ProgramProcessor::getParameterMaskByFloatCount(int floatCount)
 {
-    int paramMask = 0;
-
     switch (floatCount)
     {
-    case 1: paramMask = Operand::OPM_X; break;
-    case 2: paramMask = Operand::OPM_XY; break;
-    case 3: paramMask = Operand::OPM_XYZ; break;
-    case 4: paramMask = Operand::OPM_XYZW; break;
+    case 1: return Operand::OPM_X;
+    case 2: return Operand::OPM_XY;
+    case 3: return Operand::OPM_XYZ;
+    case 4: return Operand::OPM_XYZW;
     default:
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "Invalid parameter float type.",
-            "ProgramProcessor::getParameterMaskByFloatCount");
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid parameter float type");
     }
-
-    return paramMask;
 }
 
 
@@ -910,7 +898,7 @@ ProgramProcessor::MergeParameter::MergeParameter()
 }
 
 //-----------------------------------------------------------------------------
-void ProgramProcessor::MergeParameter::addSourceParameter(ParameterPtr srcParam, int mask)
+void ProgramProcessor::MergeParameter::addSourceParameter(ParameterPtr srcParam, Operand::OpMask mask)
 {
     // Case source count exceeded maximum
     if (mSrcParameterCount >= 4)
@@ -933,7 +921,7 @@ void ProgramProcessor::MergeParameter::addSourceParameter(ParameterPtr srcParam,
     {       
         int srcParamFloatCount = Operand::getFloatCount(mask);
 
-        mDstParameterMask[mSrcParameterCount] = getParameterMaskByFloatCount(srcParamFloatCount) << mUsedFloatCount;            
+        mDstParameterMask[mSrcParameterCount] = Operand::OpMask(getParameterMaskByFloatCount(srcParamFloatCount) << mUsedFloatCount);
         mUsedFloatCount += srcParamFloatCount;
     }
     
@@ -1008,8 +996,8 @@ void ProgramProcessor::MergeParameter::clear()
     for (unsigned int i=0; i < 4; ++i)
     {
         mSrcParameter[i].reset();
-        mSrcParameterMask[i] = 0;
-        mDstParameterMask[i] = 0;
+        mSrcParameterMask[i] = Operand::OPM_NONE;
+        mDstParameterMask[i] = Operand::OPM_NONE;
     }   
     mSrcParameterCount = 0;
     mUsedFloatCount = 0;
