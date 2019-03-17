@@ -29,45 +29,17 @@ THE SOFTWARE.
 #define __GL3PlusDepthBuffer_H__
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "OgreDepthBuffer.h"
-
+#include "OgreGLDepthBufferCommon.h"
 
 namespace Ogre 
 {
-    class GL3PlusRenderBuffer;
-    class GL3PlusRenderSystem;
-    /**
-        @copydoc DepthBuffer
-
-        OpenGL supports 3 different methods: FBO, pbuffer & Copy.
-        Each one has it's own limitations. Non-FBO methods are solved using "dummy" DepthBuffers.
-        That is, a DepthBuffer pointer is attached to the RenderTarget (for the sake of consistency)
-        but it doesn't actually contain a Depth surface/renderbuffer (mDepthBuffer & mStencilBuffer are
-        null pointers all the time) Those dummy DepthBuffers are identified thanks to their GL context.
-        Note that FBOs don't allow sharing with the main window's depth buffer. Therefore even
-        when FBO is enabled, a dummy DepthBuffer is still used to manage the windows.
-    */
-    class _OgreGL3PlusExport GL3PlusDepthBuffer : public DepthBuffer
+    class _OgreGL3PlusExport GL3PlusDepthBuffer : public GLDepthBufferCommon
     {
     public:
         GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem, GLContext *creatorContext,
                         GL3PlusRenderBuffer *depth, GL3PlusRenderBuffer *stencil,
                         uint32 width, uint32 height, uint32 fsaa,
                         bool manual );
-        ~GL3PlusDepthBuffer();
-
-        /// @copydoc DepthBuffer::isCompatible
-        virtual bool isCompatible( RenderTarget *renderTarget ) const;
-
-        GL3PlusContext* getGLContext() const { return mCreatorContext; }
-        GL3PlusRenderBuffer* getDepthBuffer() const  { return mDepthBuffer; }
-        GL3PlusRenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
-
-    protected:
-        GL3PlusContext              *mCreatorContext;
-        GL3PlusRenderBuffer         *mDepthBuffer;
-        GL3PlusRenderBuffer         *mStencilBuffer;
-        GL3PlusRenderSystem         *mRenderSystem;
     };
 }
 #endif

@@ -35,12 +35,8 @@ namespace Ogre
     GLDepthBuffer::GLDepthBuffer( uint16 poolId, GLRenderSystem *renderSystem, GLContext *creatorContext,
                                     GLRenderBuffer *depth, GLRenderBuffer *stencil,
                                     uint32 width, uint32 height, uint32 fsaa,
-                                    bool manual ) :
-                DepthBuffer( poolId, 0, width, height, fsaa, "", manual ),
-                mCreatorContext( creatorContext ),
-                mDepthBuffer( depth ),
-                mStencilBuffer( stencil ),
-                mRenderSystem( renderSystem )
+                                    bool manual )
+    : GLDepthBufferCommon( poolId, renderSystem, creatorContext, depth, stencil, width, height, fsaa,  manual)
     {
         if( mDepthBuffer )
         {
@@ -58,82 +54,5 @@ namespace Ogre
                 break;
             }
         }
-    }
-
-    GLDepthBuffer::~GLDepthBuffer()
-    {
-        if( mStencilBuffer && mStencilBuffer != mDepthBuffer )
-        {
-            delete mStencilBuffer;
-            mStencilBuffer = 0;
-        }
-
-        if( mDepthBuffer )
-        {
-            delete mDepthBuffer;
-            mDepthBuffer = 0;
-        }
-    }
-    //---------------------------------------------------------------------
-    bool GLDepthBuffer::isCompatible( RenderTarget *renderTarget ) const
-    {
-        bool retVal = false;
-
-        //Check standard stuff first.
-        if( mRenderSystem->getCapabilities()->hasCapability( RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL ) )
-        {
-            if( !DepthBuffer::isCompatible( renderTarget ) )
-                return false;
-        }
-        else
-        {
-            if( this->getWidth() != renderTarget->getWidth() ||
-                this->getHeight() != renderTarget->getHeight() ||
-                this->getFSAA() != renderTarget->getFSAA() )
-                    return false;
-        }
-
-        //Now check this is the appropriate format
-        auto fbo = dynamic_cast<GLRenderTarget*>(renderTarget)->getFBO();
-
-        if( !fbo )
-        {
-            GLContext *windowContext = dynamic_cast<GLRenderTarget*>(renderTarget)->getContext();
-
-            //Non-FBO targets and FBO depth surfaces don't play along, only dummies which match the same
-            //context
-            if( !mDepthBuffer && !mStencilBuffer && (!windowContext || mCreatorContext == windowContext) )
-                retVal = true;
-        }
-        else
-        {
-            //Check this isn't a dummy non-FBO depth buffer with an FBO target, don't mix them.
-            //If you don't want depth buffer, use a Null Depth Buffer, not a dummy one.
-            if( mDepthBuffer || mStencilBuffer )
-            {
-                PixelFormat internalFormat = fbo->getFormat();
-                GLenum depthFormat, stencilFormat;
-                mRenderSystem->_getDepthStencilFormatFor( internalFormat, &depthFormat, &stencilFormat );
-
-                bool bSameDepth = false;
-
-                if( mDepthBuffer )
-                    bSameDepth |= mDepthBuffer->getGLFormat() == depthFormat;
-
-                bool bSameStencil = false;
-
-                if( !mStencilBuffer || mStencilBuffer == mDepthBuffer )
-                   bSameStencil = stencilFormat == GL_NONE;
-                else
-                {
-                    if( mStencilBuffer )
-                        bSameStencil = stencilFormat == mStencilBuffer->getGLFormat();
-                }
-
-                retVal = PixelUtil::isDepth(internalFormat) ? bSameDepth : (bSameDepth && bSameStencil);
-            }
-        }
-
-        return retVal;
     }
 }

@@ -96,13 +96,6 @@ namespace Ogre {
         GLSLShaderFactory* mGLSLShaderFactory;
         HardwareBufferManager* mHardwareBufferManager;
 
-        /** Manager object for creating render textures.
-            Direct render to texture via FBO is preferable
-            to pbuffers, which depend on the GL support used and are generally
-            unwieldy and slow. However, FBO support for stencil buffers is poor.
-        */
-        GL3PlusFBOManager *mRTTManager;
-
         /** These variables are used for caching RenderSystem state.
             They are cached because OpenGL state changes can be quite expensive,
             which is especially important on mobile or embedded systems.
@@ -165,10 +158,6 @@ namespace Ogre {
 
         /// @copydoc RenderSystem::_createDepthBufferFor
         DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
-
-        /// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
-        void _getDepthStencilFormatFor( PixelFormat internalColourFormat, GLenum *depthFormat,
-                                        GLenum *stencilFormat );
 
         /// @copydoc RenderSystem::createMultiRenderTarget
         virtual MultiRenderTarget * createMultiRenderTarget(const String & name);

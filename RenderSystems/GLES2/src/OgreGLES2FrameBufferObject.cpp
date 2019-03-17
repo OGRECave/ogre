@@ -355,8 +355,8 @@ namespace Ogre {
 
         if( glDepthBuffer )
         {
-            GLES2RenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
-            GLES2RenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
+            auto *depthBuf   = glDepthBuffer->getDepthBuffer();
+            auto *stencilBuf = glDepthBuffer->getStencilBuffer();
 
             //Attach depth buffer, if it has one.
             if( depthBuf )

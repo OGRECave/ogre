@@ -161,7 +161,6 @@ namespace Ogre {
         mGpuProgramManager(0),
         mGLSLProgramFactory(0),
         mStateCacheManager(0),
-        mRTTManager(0),
         mActiveTextureUnit(0),
         mMaxBuiltInTextureAttribIndex(0)
     {
@@ -201,7 +200,7 @@ namespace Ogre {
         mCurrentVertexProgram = 0;
         mCurrentGeometryProgram = 0;
         mCurrentFragmentProgram = 0;
-
+        mRTTManager = NULL;
     }
 
     GLRenderSystem::~GLRenderSystem()
@@ -1177,12 +1176,6 @@ namespace Ogre {
         }
 
         return retVal;
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::_getDepthStencilFormatFor( PixelFormat internalColourFormat, GLenum *depthFormat,
-                                                    GLenum *stencilFormat )
-    {
-        mRTTManager->getBestDepthStencil( internalColourFormat, depthFormat, stencilFormat );
     }
 
     void GLRenderSystem::initialiseContext(RenderWindow* primary)
