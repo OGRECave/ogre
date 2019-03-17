@@ -29,42 +29,17 @@ THE SOFTWARE.
 #define __GLDepthBuffer_H__
 
 #include "OgreGLPrerequisites.h"
-#include "OgreDepthBuffer.h"
+#include "OgreGLDepthBufferCommon.h"
 
 namespace Ogre 
 {
-    /**
-        @copydoc DepthBuffer
-
-        OpenGL supports 3 different methods: FBO, pbuffer & Copy.
-        Each one has it's own limitations. Non-FBO methods are solved using "dummy" DepthBuffers.
-        That is, a DepthBuffer pointer is attached to the RenderTarget (for the sake of consistency)
-        but it doesn't actually contain a Depth surface/renderbuffer (mDepthBuffer & mStencilBuffer are
-        null pointers all the time) Those dummy DepthBuffers are identified thanks to their GL context.
-        Note that FBOs don't allow sharing with the main window's depth buffer. Therefore even
-        when FBO is enabled, a dummy DepthBuffer is still used to manage the windows.
-    */
-    class GLDepthBuffer : public DepthBuffer
+    class GLDepthBuffer : public GLDepthBufferCommon
     {
     public:
         GLDepthBuffer( uint16 poolId, GLRenderSystem *renderSystem, GLContext *creatorContext,
                         GLRenderBuffer *depth, GLRenderBuffer *stencil,
                         uint32 width, uint32 height, uint32 fsaa,
                         bool isManual );
-        ~GLDepthBuffer();
-
-        /// @copydoc DepthBuffer::isCompatible
-        virtual bool isCompatible( RenderTarget *renderTarget ) const;
-
-        GLContext* getGLContext() const { return mCreatorContext; }
-        GLRenderBuffer* getDepthBuffer() const  { return mDepthBuffer; }
-        GLRenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
-
-    protected:
-        GLContext                   *mCreatorContext;
-        GLRenderBuffer              *mDepthBuffer;
-        GLRenderBuffer              *mStencilBuffer;
-        GLRenderSystem              *mRenderSystem;
     };
 }
 #endif

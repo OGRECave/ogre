@@ -163,7 +163,6 @@ namespace Ogre {
           mGLSLESCgProgramFactory(0),
 #endif
           mHardwareBufferManager(0),
-          mRTTManager(0),
           mCurTexMipCount(0)
     {
         size_t i;
@@ -200,6 +199,7 @@ namespace Ogre {
         mPolygonMode = GL_FILL;
         mCurrentVertexProgram = 0;
         mCurrentFragmentProgram = 0;
+        mRTTManager = NULL;
     }
 
     GLES2RenderSystem::~GLES2RenderSystem()
@@ -738,16 +738,11 @@ namespace Ogre {
 
         return retVal;
     }
-    //---------------------------------------------------------------------
-    void GLES2RenderSystem::_getDepthStencilFormatFor( PixelFormat internalColourFormat, GLenum *depthFormat,
-                                                      GLenum *stencilFormat )
-    {
-        mRTTManager->getBestDepthStencil( internalColourFormat, depthFormat, stencilFormat );
-    }
 
     MultiRenderTarget* GLES2RenderSystem::createMultiRenderTarget(const String & name)
     {
-        MultiRenderTarget *retval = new GLES2FBOMultiRenderTarget(mRTTManager, name);
+        MultiRenderTarget* retval =
+            new GLES2FBOMultiRenderTarget(static_cast<GLES2FBOManager*>(mRTTManager), name);
         attachRenderTarget(*retval);
         return retval;
     }

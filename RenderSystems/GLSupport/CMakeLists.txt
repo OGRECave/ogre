@@ -98,6 +98,7 @@ add_library(OgreGLSupport STATIC
     ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES} 
     src/OgreGLRenderSystemCommon.cpp 
     src/OgreGLTextureCommon.cpp
+    src/OgreGLDepthBufferCommon.cpp
     src/OgreGLRenderTexture.cpp
     src/OgreGLHardwarePixelBufferCommon.cpp
     src/OgreGLUniformCache.cpp

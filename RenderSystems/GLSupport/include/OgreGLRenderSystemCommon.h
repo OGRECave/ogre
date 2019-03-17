@@ -36,6 +36,7 @@ namespace Ogre {
     class GLContext;
     class GLSLProgramCommon;
     class GLNativeSupport;
+    class GLRTTManager;
 
     class _OgreGLExport GLRenderSystemCommon : public RenderSystem
     {
@@ -52,6 +53,13 @@ namespace Ogre {
         // This contains the complete list of supported extensions
         std::set<String> mExtensionList;
         String mVendor;
+
+        /** Manager object for creating render textures.
+            Direct render to texture via FBO is preferable
+            to pbuffers, which depend on the GL support used and are generally
+            unwieldy and slow. However, FBO support for stencil buffers is poor.
+        */
+        GLRTTManager *mRTTManager;
 
         void initConfigOptions();
         void refreshConfig();
@@ -125,6 +133,10 @@ namespace Ogre {
             // no conversion request for OpenGL
             dest = matrix;
         }
+
+        /// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
+        void _getDepthStencilFormatFor(PixelFormat internalColourFormat, uint32* depthFormat,
+                                       uint32* stencilFormat);
 
         /** Create VAO on current context */
         virtual uint32 _createVao() { return 0; }

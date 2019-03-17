@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreGLContext.h"
 #include "OgreFrustum.h"
 #include "OgreGLNativeSupport.h"
+#include "OgreGLRenderTexture.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #include "OgreEGLWindow.h"
@@ -206,5 +207,11 @@ namespace Ogre {
             }
 
         }
+    }
+
+    void GLRenderSystemCommon::_getDepthStencilFormatFor(PixelFormat internalColourFormat,
+                                                         uint32* depthFormat, uint32* stencilFormat)
+    {
+        mRTTManager->getBestDepthStencil( internalColourFormat, depthFormat, stencilFormat );
     }
 }

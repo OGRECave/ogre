@@ -136,7 +136,6 @@ namespace Ogre {
           mShaderManager(0),
           mGLSLShaderFactory(0),
           mHardwareBufferManager(0),
-          mRTTManager(0),
           mActiveTextureUnit(0)
     {
         size_t i;
@@ -170,6 +169,7 @@ namespace Ogre {
         mCurrentDomainShader = 0;
         mCurrentComputeShader = 0;
         mLargestSupportedAnisotropy = 1;
+        mRTTManager = NULL;
     }
 
     GL3PlusRenderSystem::~GL3PlusRenderSystem()
@@ -716,15 +716,10 @@ namespace Ogre {
         return retVal;
     }
 
-    void GL3PlusRenderSystem::_getDepthStencilFormatFor( PixelFormat internalColourFormat, GLenum *depthFormat,
-                                                         GLenum *stencilFormat )
-    {
-        mRTTManager->getBestDepthStencil( internalColourFormat, depthFormat, stencilFormat );
-    }
-
     MultiRenderTarget* GL3PlusRenderSystem::createMultiRenderTarget(const String & name)
     {
-        MultiRenderTarget *retval = new GL3PlusFBOMultiRenderTarget(mRTTManager, name);
+        MultiRenderTarget* retval =
+            new GL3PlusFBOMultiRenderTarget(static_cast<GL3PlusFBOManager*>(mRTTManager), name);
         attachRenderTarget(*retval);
         return retval;
     }
