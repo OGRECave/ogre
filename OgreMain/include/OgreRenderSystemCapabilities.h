@@ -87,8 +87,8 @@ namespace Ogre
         RSC_WIDE_LINES              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 4),
         /// Supports hardware stencil buffer
         RSC_HWSTENCIL               = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 5),
-        /// @deprecated use RenderSystemCapabilities::getVertexTextureUnitsShared
-        RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 6),
+        /// Supports atomic counter buffers
+        RSC_ATOMIC_COUNTERS         = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 6),
         /// Supports compressed textures in the ASTC format
         RSC_TEXTURE_COMPRESSION_ASTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 7),
         /// Supports 32bit hardware index buffers
@@ -186,8 +186,6 @@ namespace Ogre
         RSC_COMPUTE_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 23),
         /// Supports asynchronous hardware occlusion queries
         RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 24),
-        /// Supports asynchronous hardware occlusion queries
-        RSC_ATOMIC_COUNTERS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 25),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
