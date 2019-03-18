@@ -302,7 +302,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllFalseCapabilities)
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap_compressed false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tanisotropy false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 false") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tcubemapping false") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwstencil false") != lines.end());
 
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_program false") != lines.end());
@@ -358,7 +357,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     caps.setCapability(RSC_AUTOMIPMAP_COMPRESSED);
     caps.setCapability(RSC_ANISOTROPY);
     caps.setCapability(RSC_DOT3);
-    caps.setCapability(RSC_CUBEMAPPING);
     caps.setCapability(RSC_HWSTENCIL);
 
     caps.setCapability(RSC_VERTEX_PROGRAM);
@@ -423,7 +421,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tautomipmap_compressed true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tanisotropy true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 true") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tcubemapping true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwstencil true") != lines.end());
 
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_program true") != lines.end());
@@ -477,7 +474,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     caps.setVertexTextureUnitsShared(true);
 
     caps.setCapability(RSC_DOT3);
-    caps.setCapability(RSC_CUBEMAPPING);
     caps.setCapability(RSC_HWSTENCIL);
     caps.setCapability(RSC_FRAGMENT_PROGRAM);
     caps.setCapability(RSC_SCISSOR_TEST);
@@ -554,7 +550,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
 
     EXPECT_EQ(caps.hasCapability(RSC_ANISOTROPY), caps2.hasCapability(RSC_ANISOTROPY));
     EXPECT_EQ(caps.hasCapability(RSC_DOT3), caps2.hasCapability(RSC_DOT3));
-    EXPECT_EQ(caps.hasCapability(RSC_CUBEMAPPING), caps2.hasCapability(RSC_CUBEMAPPING));
     EXPECT_EQ(caps.hasCapability(RSC_HWSTENCIL), caps2.hasCapability(RSC_HWSTENCIL));
 
     EXPECT_EQ(caps.hasCapability(RSC_VERTEX_PROGRAM), caps2.hasCapability(RSC_VERTEX_PROGRAM));

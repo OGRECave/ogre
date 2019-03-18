@@ -70,9 +70,6 @@ namespace Ogre {
             " * Anisotropic texture filtering: "
             + StringConverter::toString(hasCapability(RSC_ANISOTROPY), true));
         pLog->logMessage(
-            " * Cube mapping: "
-            + StringConverter::toString(hasCapability(RSC_CUBEMAPPING), true));
-        pLog->logMessage(
             " * Hardware stencil buffer: "
             + StringConverter::toString(hasCapability(RSC_HWSTENCIL), true));
         if (hasCapability(RSC_HWSTENCIL))

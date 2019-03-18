@@ -63,7 +63,6 @@ static void checkCaps(const Ogre::RenderSystemCapabilities* caps)
 
     EXPECT_EQ(caps->hasCapability(RSC_ANISOTROPY), true);
     EXPECT_EQ(caps->hasCapability(RSC_DOT3), true);
-    EXPECT_EQ(caps->hasCapability(RSC_CUBEMAPPING), true);
     EXPECT_EQ(caps->hasCapability(RSC_HWSTENCIL), true);
 
     EXPECT_EQ(caps->hasCapability(RSC_VERTEX_PROGRAM), true);

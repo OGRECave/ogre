@@ -142,18 +142,6 @@ namespace Ogre {
                 for(it = currPass->getTextureUnitStates().begin(); it != currPass->getTextureUnitStates().end(); ++it)
                 {
                     TextureUnitState* tex = *it;
-                    // Any Cube textures? NB we make the assumption that any
-                    // card capable of running fragment programs can support
-                    // cubic textures, which has to be true, surely?
-                    if ((tex->getTextureType() == TEX_TYPE_CUBE_MAP) && !caps->hasCapability(RSC_CUBEMAPPING))
-                    {
-                        // Fail
-                        compileErrors << "Pass " << passNum <<
-                            " Tex " << texUnit <<
-                            ": Cube maps not supported by current environment."
-                            << std::endl;
-                        return false;
-                    }
                     // Any 3D textures? NB we make the assumption that any
                     // card capable of running fragment programs can support
                     // 3D textures, which has to be true, surely?

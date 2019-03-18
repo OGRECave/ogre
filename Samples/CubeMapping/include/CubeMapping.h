@@ -19,15 +19,6 @@ public:
         mInfo["Category"] = "Unsorted";
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
-    {
-        if (!caps->hasCapability(RSC_CUBEMAPPING))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support cube mapping, "
-                "so you cannot run this sample. Sorry!", "CubeMappingSample::testCapabilities");
-        }
-    }
-
     bool frameRenderingQueued(const FrameEvent& evt)
     {
         mPivot->yaw(Radian(evt.timeSinceLastFrame));      // spin the fishy around the cube mapped one

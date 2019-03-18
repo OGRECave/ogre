@@ -231,9 +231,6 @@ namespace Ogre {
         // DOT3 support is standard
         rsc->setCapability(RSC_DOT3);
 
-        // Cube map
-        rsc->setCapability(RSC_CUBEMAPPING);
-
         // Point sprites
         rsc->setCapability(RSC_POINT_SPRITES);
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
