@@ -963,7 +963,6 @@ namespace Ogre
         rsc->setNumVertexAttributes(14); // see D3DDECLUSAGE
         rsc->setCapability(RSC_ANISOTROPY);
         rsc->setCapability(RSC_DOT3);
-        rsc->setCapability(RSC_CUBEMAPPING);        
         rsc->setCapability(RSC_SCISSOR_TEST);       
         rsc->setCapability(RSC_TWO_SIDED_STENCIL);      
         rsc->setCapability(RSC_STENCIL_WRAP);
@@ -1034,6 +1033,8 @@ namespace Ogre
                 rsc->setNumTextureUnits(static_cast<ushort>(rkCurCaps.MaxSimultaneousTextures));
             }
 
+            bool has_level_9_1 = true;
+
             // Check for Anisotropy.
             if (rkCurCaps.MaxAnisotropy <= 1)
                 rsc->unsetCapability(RSC_ANISOTROPY);
@@ -1046,10 +1047,12 @@ namespace Ogre
             if ((rkCurCaps.RasterCaps & D3DPRASTERCAPS_SCISSORTEST) == 0)
                 rsc->unsetCapability(RSC_SCISSOR_TEST);
 
+            if ((rkCurCaps.RasterCaps & (D3DPRASTERCAPS_DEPTHBIAS | D3DPRASTERCAPS_SLOPESCALEDEPTHBIAS)) == 0)
+                has_level_9_1 = false;
 
             // Two-sided stencil
             if ((rkCurCaps.StencilCaps & D3DSTENCILCAPS_TWOSIDED) == 0)
-                rsc->unsetCapability(RSC_TWO_SIDED_STENCIL);
+                has_level_9_1 = false;
 
             // stencil wrap
             if ((rkCurCaps.StencilCaps & D3DSTENCILCAPS_INCR) == 0 ||
@@ -1070,7 +1073,7 @@ namespace Ogre
 
             // Check cube map support.
             if ((rkCurCaps.TextureCaps & D3DPTEXTURECAPS_CUBEMAP) == 0)
-                rsc->unsetCapability(RSC_CUBEMAPPING);
+                has_level_9_1 = false;
             
             // 3D textures?
             if ((rkCurCaps.TextureCaps & D3DPTEXTURECAPS_VOLUMEMAP) == 0)           
@@ -1126,7 +1129,12 @@ namespace Ogre
             // Advanced blend operations? min max subtract rev 
             if((rkCurCaps.PrimitiveMiscCaps & D3DPMISCCAPS_BLENDOP) == 0)
                 rsc->unsetCapability(RSC_ADVANCED_BLEND_OPERATIONS);
-        }               
+
+            // see https://technet.microsoft.com/en-us/evalcenter/jj841213(v=vs.90)
+            if (!has_level_9_1)
+                LogManager::getSingleton().logError(
+                    "D3D9 feature level 9.1 required, but at least one Capability is not supported");
+        }
 
         // We always support compression, D3DX will decompress if device does not support
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
@@ -2541,30 +2549,21 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
+        // Negate bias since D3D is backward
+        // D3D also expresses the constant bias as an absolute value, rather than
+        // relative to minimum depth unit, so scale to fit
+        constantBias = -constantBias / 250000.0f;
+        HRESULT hr = __SetRenderState(D3DRS_DEPTHBIAS, FLOAT2DWORD(constantBias));
+        if (FAILED(hr))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting constant depth bias",
+            "D3D9RenderSystem::_setDepthBias");
 
-        if ((mDeviceManager->getActiveDevice()->getD3D9DeviceCaps().RasterCaps & D3DPRASTERCAPS_DEPTHBIAS) != 0)
-        {
-            // Negate bias since D3D is backward
-            // D3D also expresses the constant bias as an absolute value, rather than 
-            // relative to minimum depth unit, so scale to fit
-            constantBias = -constantBias / 250000.0f;
-            HRESULT hr = __SetRenderState(D3DRS_DEPTHBIAS, FLOAT2DWORD(constantBias));
-            if (FAILED(hr))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting constant depth bias", 
-                "D3D9RenderSystem::_setDepthBias");
-        }
-
-        if ((mDeviceManager->getActiveDevice()->getD3D9DeviceCaps().RasterCaps & D3DPRASTERCAPS_SLOPESCALEDEPTHBIAS) != 0)
-        {
-            // Negate bias since D3D is backward
-            slopeScaleBias = -slopeScaleBias;
-            HRESULT hr = __SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, FLOAT2DWORD(slopeScaleBias));
-            if (FAILED(hr))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting slope scale depth bias", 
-                "D3D9RenderSystem::_setDepthBias");
-        }
-
-
+        // Negate bias since D3D is backward
+        slopeScaleBias = -slopeScaleBias;
+        hr = __SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, FLOAT2DWORD(slopeScaleBias));
+        if (FAILED(hr))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting slope scale depth bias",
+            "D3D9RenderSystem::_setDepthBias");
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, 

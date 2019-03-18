@@ -83,8 +83,8 @@ namespace Ogre
         /// Supports fixed-function DOT3 texture blend
         /// @deprecated All targetted APIs by Ogre support this feature
         RSC_DOT3                    = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 3),
-        /// Supports cube mapping
-        RSC_CUBEMAPPING             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 4),
+        /// Supports linewidth != 1.0
+        RSC_WIDE_LINES              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 4),
         /// Supports hardware stencil buffer
         RSC_HWSTENCIL               = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 5),
         /// @deprecated use RenderSystemCapabilities::getVertexTextureUnitsShared
@@ -188,8 +188,6 @@ namespace Ogre
         RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 24),
         /// Supports asynchronous hardware occlusion queries
         RSC_ATOMIC_COUNTERS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 25),
-        /// Supports linewidth != 1.0
-        RSC_WIDE_LINES = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

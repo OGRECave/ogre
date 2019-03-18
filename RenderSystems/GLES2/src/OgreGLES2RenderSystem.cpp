@@ -355,9 +355,6 @@ namespace Ogre {
             rsc->setNumMultiRenderTargets(1);
         }
 
-        // Cube map
-        rsc->setCapability(RSC_CUBEMAPPING);
-
         // Stencil wrapping
         rsc->setCapability(RSC_STENCIL_WRAP);
 

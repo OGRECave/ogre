@@ -852,7 +852,6 @@ namespace Ogre
         // Cube map
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
         {
-            rsc->setCapability(RSC_CUBEMAPPING);
             rsc->setCapability(RSC_READ_BACK_AS_TEXTURE);
         }
 
