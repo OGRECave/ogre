@@ -202,7 +202,6 @@ namespace Ogre
             CE_DUPLICATEOVERRIDE,
             CE_UNEXPECTEDTOKEN,
             CE_OBJECTBASENOTFOUND,
-            CE_UNSUPPORTEDBYRENDERSYSTEM, //!< @deprecated do not use
             CE_REFERENCETOANONEXISTINGOBJECT,
             CE_DEPRECATEDSYMBOL
         };
