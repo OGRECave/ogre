@@ -1137,18 +1137,6 @@ namespace Ogre
                 case TextureUnitState::BT_VERTEX:
                     writeValue("vertex");
                     break;
-                case TextureUnitState::BT_GEOMETRY:
-                    writeValue("geometry");
-                    break;
-                case TextureUnitState::BT_TESSELLATION_DOMAIN:
-                    writeValue("tessellation_domain");
-                    break;
-                case TextureUnitState::BT_TESSELLATION_HULL:
-                    writeValue("tessellation_hull");
-                    break;
-                case TextureUnitState::BT_COMPUTE:
-                    writeValue("compute");
-                    break;
                 };
         
             }

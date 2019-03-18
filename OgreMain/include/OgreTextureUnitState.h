@@ -482,15 +482,7 @@ namespace Ogre {
             /** Vertex processing unit - indicates this unit will be used for 
                 a vertex texture fetch.
             */
-            BT_VERTEX = 1,          
-            /// Geometry processing unit        
-            BT_GEOMETRY = 2,
-            /// Tessellation control processing unit
-            BT_TESSELLATION_HULL = 3,
-            /// Tessellation evaluation processing unit
-            BT_TESSELLATION_DOMAIN = 4,
-            /// Compute processing unit
-            BT_COMPUTE = 5
+            BT_VERTEX = 1
         };
         /** Enum identifying the type of content this texture unit contains.
         */

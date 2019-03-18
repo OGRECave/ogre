@@ -400,19 +400,6 @@ namespace Ogre{
         case ID_FRAGMENT:
             result = TextureUnitState::BT_FRAGMENT;
             break;
-        // TODO values below are useless
-        case ID_GEOMETRY:
-            result = TextureUnitState::BT_GEOMETRY;
-            break;
-        case ID_TESSELLATION_HULL:
-            result = TextureUnitState::BT_TESSELLATION_HULL;
-            break;
-        case ID_TESSELLATION_DOMAIN:
-            result = TextureUnitState::BT_TESSELLATION_DOMAIN;
-            break;
-        case ID_COMPUTE:
-            result = TextureUnitState::BT_COMPUTE;
-            break;
         default:
             return false;
         }
