@@ -54,7 +54,7 @@ namespace Ogre {
 
 		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex.Get(); }
 		/// retrieves a pointer to the actual texture
-		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView.Get(); }
+		ID3D11ShaderResourceView *getSrvView() { assert(mpShaderResourceView); return mpShaderResourceView.Get(); }
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }
 
 		ID3D11Texture1D * GetTex1D() { return mp1DTex.Get(); };

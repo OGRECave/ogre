@@ -465,7 +465,7 @@ namespace Ogre {
     {
         if(mParentTexture->HasAutoMipMapGenerationEnabled())
         {
-            ID3D11ShaderResourceView *pShaderResourceView = mParentTexture->getTexture();
+            ID3D11ShaderResourceView *pShaderResourceView = mParentTexture->getSrvView();
             ID3D11DeviceContextN * context =  mDevice.GetImmediateContext();
             context->GenerateMips(pShaderResourceView);
             if (mDevice.isError())
