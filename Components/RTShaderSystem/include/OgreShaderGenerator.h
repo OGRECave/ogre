@@ -49,6 +49,11 @@ namespace RTShader {
 *  @{
 */
 
+class SGRenderObjectListener;
+class SGSceneManagerListener;
+class SGScriptTranslatorManager;
+class SGResourceGroupListener;
+
 /** Shader generator system main interface. This singleton based class
 enables automatic generation of shader code based on existing material techniques.
 */
@@ -737,117 +742,6 @@ protected:
 
 // Protected types.
 protected:
-    
-    /** Shader generator RenderObjectListener sub class. */
-    class _OgreRTSSExport SGRenderObjectListener : public RenderObjectListener, public RTShaderSystemAlloc
-    {
-    public:
-        SGRenderObjectListener(ShaderGenerator* owner)
-        {
-            mOwner = owner;
-        }
-
-        /** 
-        Listener overridden function notify the shader generator when rendering single object.
-        */
-        virtual void notifyRenderSingleObject(Renderable* rend, const Pass* pass,  
-            const AutoParamDataSource* source, 
-            const LightList* pLightList, bool suppressRenderStateChanges)
-        {
-            mOwner->notifyRenderSingleObject(rend, pass, source, pLightList, suppressRenderStateChanges);
-        }
-
-    protected:
-        ShaderGenerator* mOwner;
-    };
-
-    /** Shader generator scene manager sub class. */
-    class _OgreRTSSExport SGSceneManagerListener : public SceneManager::Listener, public RTShaderSystemAlloc
-    {
-    public:
-        SGSceneManagerListener(ShaderGenerator* owner)
-        {
-            mOwner = owner;
-        }
-
-        /** 
-        Listener overridden function notify the shader generator when finding visible objects process started.
-        */
-        virtual void preFindVisibleObjects(SceneManager* source, 
-            SceneManager::IlluminationRenderStage irs, Viewport* v)
-        {
-            mOwner->preFindVisibleObjects(source, irs, v);
-        }
-
-        virtual void postFindVisibleObjects(SceneManager* source, 
-            SceneManager::IlluminationRenderStage irs, Viewport* v)
-        {
-
-        }
-
-        virtual void shadowTexturesUpdated(size_t numberOfShadowTextures) 
-        {
-
-        }
-
-        virtual void shadowTextureCasterPreViewProj(Light* light, 
-            Camera* camera, size_t iteration) 
-        {
-
-        }
-
-        virtual void shadowTextureReceiverPreViewProj(Light* light, 
-            Frustum* frustum)
-        {
-
-        }
-
-    protected:
-        // The shader generator instance.
-        ShaderGenerator* mOwner;
-    };
-
-    /** Shader generator ScriptTranslatorManager sub class. */
-    class _OgreRTSSExport SGScriptTranslatorManager : public ScriptTranslatorManager
-    {
-    public:
-        SGScriptTranslatorManager(ShaderGenerator* owner)
-        {
-            mOwner = owner;
-        }
-        
-        /// Returns a manager for the given object abstract node, or null if it is not supported
-        virtual ScriptTranslator *getTranslator(const AbstractNodePtr& node)
-        {
-            return mOwner->getTranslator(node);
-        }
-
-    protected:
-        // The shader generator instance.
-        ShaderGenerator* mOwner;
-    };
-
-    class _OgreRTSSExport SGResourceGroupListener : public ResourceGroupListener
-    {
-    public:
-        SGResourceGroupListener(ShaderGenerator* owner)
-        {
-            mOwner = owner;
-        }
-
-        /// sync our internal list if material gets dropped
-        virtual void resourceRemove(const ResourcePtr& resource)
-        {
-            if(!dynamic_cast<Material*>(resource.get()))
-                return;
-            mOwner->removeAllShaderBasedTechniques(resource->getName(), resource->getGroup());
-        }
-
-    protected:
-        // The shader generator instance.
-        ShaderGenerator* mOwner;
-    };
-
     //-----------------------------------------------------------------------------
     typedef std::map<String, SubRenderStateFactory*>       SubRenderStateFactoryMap;
     typedef SubRenderStateFactoryMap::iterator              SubRenderStateFactoryIterator;
@@ -858,6 +752,8 @@ protected:
     typedef SceneManagerMap::iterator                       SceneManagerIterator;
     typedef SceneManagerMap::const_iterator                 SceneManagerConstIterator;
 
+    friend class SGRenderObjectListener;
+    friend class SGSceneManagerListener;
 protected:
     /** Class default constructor */
     ShaderGenerator();

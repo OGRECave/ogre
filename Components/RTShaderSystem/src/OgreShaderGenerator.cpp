@@ -34,6 +34,80 @@ RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::msSingleton = 0
 
 namespace RTShader {
 
+/** Shader generator RenderObjectListener sub class. */
+class SGRenderObjectListener : public RenderObjectListener, public RTShaderSystemAlloc
+{
+public:
+    SGRenderObjectListener(ShaderGenerator* owner) { mOwner = owner; }
+
+    /**
+    Listener overridden function notify the shader generator when rendering single object.
+    */
+    virtual void notifyRenderSingleObject(Renderable* rend, const Pass* pass,
+                                          const AutoParamDataSource* source, const LightList* pLightList,
+                                          bool suppressRenderStateChanges)
+    {
+        mOwner->notifyRenderSingleObject(rend, pass, source, pLightList, suppressRenderStateChanges);
+    }
+
+protected:
+    ShaderGenerator* mOwner;
+};
+
+/** Shader generator scene manager sub class. */
+class SGSceneManagerListener : public SceneManager::Listener, public RTShaderSystemAlloc
+{
+public:
+    SGSceneManagerListener(ShaderGenerator* owner) { mOwner = owner; }
+
+    /**
+    Listener overridden function notify the shader generator when finding visible objects process started.
+    */
+    virtual void preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs,
+                                       Viewport* v)
+    {
+        mOwner->preFindVisibleObjects(source, irs, v);
+    }
+protected:
+    // The shader generator instance.
+    ShaderGenerator* mOwner;
+};
+
+/** Shader generator ScriptTranslatorManager sub class. */
+class SGScriptTranslatorManager : public ScriptTranslatorManager
+{
+public:
+    SGScriptTranslatorManager(ShaderGenerator* owner) { mOwner = owner; }
+
+    /// Returns a manager for the given object abstract node, or null if it is not supported
+    virtual ScriptTranslator* getTranslator(const AbstractNodePtr& node)
+    {
+        return mOwner->getTranslator(node);
+    }
+
+protected:
+    // The shader generator instance.
+    ShaderGenerator* mOwner;
+};
+
+class SGResourceGroupListener : public ResourceGroupListener
+{
+public:
+    SGResourceGroupListener(ShaderGenerator* owner) { mOwner = owner; }
+
+    /// sync our internal list if material gets dropped
+    virtual void resourceRemove(const ResourcePtr& resource)
+    {
+        if (!dynamic_cast<Material*>(resource.get()))
+            return;
+        mOwner->removeAllShaderBasedTechniques(resource->getName(), resource->getGroup());
+    }
+
+protected:
+    // The shader generator instance.
+    ShaderGenerator* mOwner;
+};
+
 String ShaderGenerator::DEFAULT_SCHEME_NAME     = "ShaderGeneratorDefaultScheme";
 String ShaderGenerator::SGPass::UserKey         = "SGPass";
 String ShaderGenerator::SGTechnique::UserKey    = "SGTechnique";
