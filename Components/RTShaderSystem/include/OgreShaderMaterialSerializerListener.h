@@ -84,7 +84,6 @@ protected:
 protected:
     /** Will be create and destroyed via ShaderGenerator interface. */ 
     SGMaterialSerializerListener();
-    ~SGMaterialSerializerListener();
 
     /** Internal method that creates list of SGPass instances composing the given material. */
     void createSGPassList(Material* mat, SGPassList& passList);

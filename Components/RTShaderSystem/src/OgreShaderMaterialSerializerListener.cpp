@@ -36,13 +36,6 @@ SGMaterialSerializerListener::SGMaterialSerializerListener()
 }
 
 //-----------------------------------------------------------------------------
-SGMaterialSerializerListener::~SGMaterialSerializerListener()
-{
-
-
-}
-
-//-----------------------------------------------------------------------------
 void SGMaterialSerializerListener::materialEventRaised(MaterialSerializer* ser, 
                                                         MaterialSerializer::SerializeEvent event, 
                                                         bool& skip, const Material* mat)

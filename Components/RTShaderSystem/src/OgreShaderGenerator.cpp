@@ -53,9 +53,8 @@ ShaderGenerator& ShaderGenerator::getSingleton()
 
 //-----------------------------------------------------------------------------
 ShaderGenerator::ShaderGenerator() :
-    mActiveSceneMgr(NULL), mRenderObjectListener(NULL), mSceneManagerListener(NULL), mScriptTranslatorManager(NULL),
-    mMaterialSerializerListener(NULL), mShaderLanguage(""), mProgramManager(NULL), mProgramWriterManager(NULL),
-    mFSLayer(0), mFFPRenderStateBuilder(NULL),mActiveViewportValid(false), mVSOutputCompactPolicy(VSOCP_LOW),
+    mActiveSceneMgr(NULL), mShaderLanguage(""),
+    mFSLayer(0), mActiveViewportValid(false), mVSOutputCompactPolicy(VSOCP_LOW),
     mCreateShaderOverProgrammablePass(false), mIsFinalizing(false)
 {
     mLightCount[0]              = 0;
@@ -123,14 +122,14 @@ bool ShaderGenerator::_initialize()
     OGRE_LOCK_AUTO_MUTEX;
 
     // Allocate program writer manager.
-    mProgramWriterManager = OGRE_NEW ProgramWriterManager;
+    mProgramWriterManager.reset(new ProgramWriterManager);
 
     // Allocate program manager.
-    mProgramManager         = OGRE_NEW ProgramManager;
+    mProgramManager.reset(new ProgramManager);
 
     // Allocate and initialize FFP render state builder.
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-    mFFPRenderStateBuilder  = OGRE_NEW FFPRenderStateBuilder;
+    mFFPRenderStateBuilder.reset(new FFPRenderStateBuilder);
     if (false == mFFPRenderStateBuilder->initialize())
         return false;
 #endif
@@ -139,15 +138,15 @@ bool ShaderGenerator::_initialize()
     createSubRenderStateExFactories();
 
     // Allocate script translator manager.
-    mScriptTranslatorManager = OGRE_NEW SGScriptTranslatorManager(this);
-    ScriptCompilerManager::getSingleton().addTranslatorManager(mScriptTranslatorManager);
+    mScriptTranslatorManager.reset(new SGScriptTranslatorManager(this));
+    ScriptCompilerManager::getSingleton().addTranslatorManager(mScriptTranslatorManager.get());
     ID_RT_SHADER_SYSTEM = ScriptCompilerManager::getSingleton().registerCustomWordId("rtshader_system");
 
     // Create the default scheme.
     createScheme(DEFAULT_SCHEME_NAME);
 	
-	mResourceGroupListener = new SGResourceGroupListener(this);
-	ResourceGroupManager::getSingleton().addResourceGroupListener(mResourceGroupListener);
+	mResourceGroupListener.reset(new SGResourceGroupListener(this));
+	ResourceGroupManager::getSingleton().addResourceGroupListener(mResourceGroupListener.get());
 
     return true;
 }
@@ -244,48 +243,29 @@ void ShaderGenerator::_destroy()
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     // Delete FFP Emulator.
-    if (mFFPRenderStateBuilder != NULL)
+    if (mFFPRenderStateBuilder)
     {
         mFFPRenderStateBuilder->destroy();
-        OGRE_DELETE mFFPRenderStateBuilder;
-        mFFPRenderStateBuilder = NULL;
+        mFFPRenderStateBuilder.reset();
     }
 #endif
 
-    // Delete Program manager.
-    if (mProgramManager != NULL)
-    {
-        OGRE_DELETE mProgramManager;
-        mProgramManager = NULL;
-    }
-
-    // Delete Program writer manager.
-    if(mProgramWriterManager != NULL)
-    {
-        OGRE_DELETE mProgramWriterManager;
-        mProgramWriterManager = NULL;
-    }
+    mProgramManager.reset();
+    mProgramWriterManager.reset();
 
     // Delete script translator manager.
-    if (mScriptTranslatorManager != NULL)
+    if (mScriptTranslatorManager)
     {
-        ScriptCompilerManager::getSingleton().removeTranslatorManager(mScriptTranslatorManager);
-        OGRE_DELETE mScriptTranslatorManager;
-        mScriptTranslatorManager = NULL;
+        ScriptCompilerManager::getSingleton().removeTranslatorManager(mScriptTranslatorManager.get());
+        mScriptTranslatorManager.reset();
     }
 
-    // Delete material Serializer listener.
-    if (mMaterialSerializerListener != NULL)
-    {
-        OGRE_DELETE mMaterialSerializerListener;
-        mMaterialSerializerListener = NULL;
-    }
+    mMaterialSerializerListener.reset();
 
-    ResourceGroupManager::getSingleton().removeResourceGroupListener(mResourceGroupListener);
-    if (mResourceGroupListener != NULL)
+    if (mResourceGroupListener)
     {
-        OGRE_DELETE mResourceGroupListener;
-        mResourceGroupListener = NULL;
+        ResourceGroupManager::getSingleton().removeResourceGroupListener(mResourceGroupListener.get());
+        mResourceGroupListener.reset();
     }
 
     // Remove all scene managers.   
@@ -296,19 +276,8 @@ void ShaderGenerator::_destroy()
         removeSceneManager(itSceneMgr->second);
     }
 
-    // Delete render object listener.
-    if (mRenderObjectListener != NULL)
-    {
-        OGRE_DELETE mRenderObjectListener;
-        mRenderObjectListener = NULL;
-    }
-
-    // Delete scene manager listener.
-    if (mSceneManagerListener != NULL)
-    {
-        OGRE_DELETE mSceneManagerListener;
-        mSceneManagerListener = NULL;
-    }       
+    mRenderObjectListener.reset();
+    mSceneManagerListener.reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -320,8 +289,8 @@ void ShaderGenerator::destroySubRenderStateExFactories()
 
     for (it = mSubRenderStateExFactories.begin(); it != mSubRenderStateExFactories.end(); ++it)
     {
-        removeSubRenderStateFactory(it->second);        
-        OGRE_DELETE it->second;     
+        removeSubRenderStateFactory(it->second);
+        OGRE_DELETE it->second;
     }
     mSubRenderStateExFactories.clear();
 }
@@ -565,15 +534,15 @@ void ShaderGenerator::addSceneManager(SceneManager* sceneMgr)
     if (itFind != mSceneManagerMap.end())
         return;
 
-    if (mRenderObjectListener == NULL)
-        mRenderObjectListener = OGRE_NEW SGRenderObjectListener(this);
+    if (!mRenderObjectListener)
+        mRenderObjectListener.reset(new SGRenderObjectListener(this));
     
-    sceneMgr->addRenderObjectListener(mRenderObjectListener);
+    sceneMgr->addRenderObjectListener(mRenderObjectListener.get());
 
-    if (mSceneManagerListener == NULL)
-        mSceneManagerListener = OGRE_NEW SGSceneManagerListener(this);
+    if (!mSceneManagerListener)
+        mSceneManagerListener.reset(new SGSceneManagerListener(this));
     
-    sceneMgr->addListener(mSceneManagerListener);
+    sceneMgr->addListener(mSceneManagerListener.get());
 
     mSceneManagerMap[sceneMgr->getName()] = sceneMgr;
 
@@ -590,8 +559,8 @@ void ShaderGenerator::removeSceneManager(SceneManager* sceneMgr)
     
     if (itFind != mSceneManagerMap.end())
     {
-        itFind->second->removeRenderObjectListener(mRenderObjectListener);      
-        itFind->second->removeListener(mSceneManagerListener);  
+        itFind->second->removeRenderObjectListener(mRenderObjectListener.get());
+        itFind->second->removeListener(mSceneManagerListener.get());
 
         mSceneManagerMap.erase(itFind);
 
@@ -1166,10 +1135,10 @@ bool ShaderGenerator::validateMaterialIlluminationPasses(const String& schemeNam
 //-----------------------------------------------------------------------------
 SGMaterialSerializerListener* ShaderGenerator::getMaterialSerializerListener()
 {
-    if (mMaterialSerializerListener == NULL)
-        mMaterialSerializerListener = OGRE_NEW SGMaterialSerializerListener;
+    if (!mMaterialSerializerListener)
+        mMaterialSerializerListener.reset(new SGMaterialSerializerListener);
 
-    return mMaterialSerializerListener;
+    return mMaterialSerializerListener.get();
 }
 
 //-----------------------------------------------------------------------------
@@ -1445,11 +1414,6 @@ ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPas
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::~SGPass()
 {
-    if (mTargetRenderState != NULL)
-    {
-        OGRE_DELETE mTargetRenderState;
-        mTargetRenderState = NULL;
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1460,7 +1424,7 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     const RenderState* renderStateGlobal = ShaderGenerator::getSingleton().getRenderState(schemeName);
     
 
-    mTargetRenderState = OGRE_NEW TargetRenderState;
+    mTargetRenderState.reset(new TargetRenderState);
 
     // Set light properties.
     int lightCount[3] = {0};    
@@ -1482,7 +1446,7 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
             
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     // Build the FFP state. 
-    FFPRenderStateBuilder::getSingleton().buildRenderState(this, mTargetRenderState);
+    FFPRenderStateBuilder::getSingleton().buildRenderState(this, mTargetRenderState.get());
 #endif
 
 
@@ -1503,14 +1467,14 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
 void ShaderGenerator::SGPass::acquirePrograms()
 {
     if(!mTargetRenderState) return;
-    ProgramManager::getSingleton().acquirePrograms(mDstPass, mTargetRenderState);
+    ProgramManager::getSingleton().acquirePrograms(mDstPass, mTargetRenderState.get());
 }
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::releasePrograms()
 {
     if(!mTargetRenderState) return;
-    ProgramManager::getSingleton().releasePrograms(mDstPass, mTargetRenderState);   
+    ProgramManager::getSingleton().releasePrograms(mDstPass, mTargetRenderState.get());
 }
 
 //-----------------------------------------------------------------------------
@@ -1824,27 +1788,22 @@ bool ShaderGenerator::SGTechnique::hasRenderState(unsigned short passIndex)
 
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGScheme::SGScheme(const String& schemeName) :
-    mName(schemeName), mOutOfDate(true), mRenderState(NULL), mFogMode(FOG_NONE)
+    mName(schemeName), mOutOfDate(true), mFogMode(FOG_NONE)
 {
 }
 
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGScheme::~SGScheme()
 {
-    if (mRenderState != NULL)
-    {
-        OGRE_DELETE mRenderState;
-        mRenderState = NULL;
-    }
 }
 
 //-----------------------------------------------------------------------------
 RenderState* ShaderGenerator::SGScheme::getRenderState()
 {
-    if (mRenderState == NULL)
-        mRenderState = OGRE_NEW RenderState;
+    if (!mRenderState)
+        mRenderState.reset(new RenderState);
 
-    return mRenderState;
+    return mRenderState.get();
 }
 
 //-----------------------------------------------------------------------------
