@@ -530,7 +530,7 @@ protected:
         // Custom render state.
         RenderState* mCustomRenderState;
         // The compiled render state.
-        TargetRenderState* mTargetRenderState;
+        std::unique_ptr<TargetRenderState> mTargetRenderState;
     };
 
     
@@ -729,7 +729,7 @@ protected:
         // Tells if this scheme is out of date.
         bool mOutOfDate;
         // The global render state of this scheme.
-        RenderState* mRenderState;
+        std::unique_ptr<RenderState> mRenderState;
         // Current fog mode.
         FogMode mFogMode;
     };
@@ -947,15 +947,15 @@ protected:
     // A map of all scene managers this generator is bound to.
     SceneManagerMap mSceneManagerMap;
     // Render object listener.
-    SGRenderObjectListener* mRenderObjectListener;
+    std::unique_ptr<SGRenderObjectListener> mRenderObjectListener;
     // Scene manager listener.
-    SGSceneManagerListener* mSceneManagerListener;
+    std::unique_ptr<SGSceneManagerListener> mSceneManagerListener;
     // Script translator manager.
-    SGScriptTranslatorManager* mScriptTranslatorManager;
+    std::unique_ptr<SGScriptTranslatorManager> mScriptTranslatorManager;
     // Custom material Serializer listener - allows exporting material that contains shader generated techniques.
-    SGMaterialSerializerListener* mMaterialSerializerListener;
+    std::unique_ptr<SGMaterialSerializerListener> mMaterialSerializerListener;
     // get notified if materials get dropped
-    SGResourceGroupListener* mResourceGroupListener;
+    std::unique_ptr<SGResourceGroupListener> mResourceGroupListener;
     // The core translator of the RT Shader System.
     SGScriptTranslator mCoreScriptTranslator;
     // The target shader language (currently only cg supported).
@@ -971,13 +971,13 @@ protected:
     // Path for caching the generated shaders.
     String mShaderCachePath;
     // Shader program manager.
-    ProgramManager* mProgramManager;
+    std::unique_ptr<ProgramManager> mProgramManager;
     // Shader program writer manager.
-    ProgramWriterManager* mProgramWriterManager;
+    std::unique_ptr<ProgramWriterManager> mProgramWriterManager;
     // File system layer manager.
     FileSystemLayer* mFSLayer;
     // Fixed Function Render state builder.
-    FFPRenderStateBuilder* mFFPRenderStateBuilder;
+    std::unique_ptr<FFPRenderStateBuilder> mFFPRenderStateBuilder;
     // Material entries map.
     SGMaterialMap mMaterialEntriesMap;
     // Scheme entries map.
