@@ -100,7 +100,7 @@ namespace Ogre
     class D3D11DriverList;
     class D3D11VideoMode;
     class D3D11VideoModeList;
-    class D3D11GpuProgramManager;
+    class GpuProgramManager;
     class D3D11HardwareBufferManager;
     class D3D11HardwareIndexBuffer;
     class D3D11HLSLProgramFactory;

@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareBufferManager.h"
 #include "OgreGLES2HardwareIndexBuffer.h"
 #include "OgreGLES2HardwareVertexBuffer.h"
-#include "OgreGLES2GpuProgramManager.h"
+#include "OgreGpuProgramManager.h"
 #include "OgreGLUtil.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2HardwareOcclusionQuery.h"
@@ -526,7 +526,9 @@ namespace Ogre {
         if(caps->getNumVertexAttributes() < 16)
             GLSLProgramCommon::useTightAttributeLayout();
 
-        mGpuProgramManager = OGRE_NEW GLES2GpuProgramManager();
+        mGpuProgramManager = new GpuProgramManager();
+        ResourceGroupManager::getSingleton()._registerResourceManager(mGpuProgramManager->getResourceType(),
+                                                                      mGpuProgramManager);
 
         mGLSLESProgramFactory = OGRE_NEW GLSLESProgramFactory();
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLESProgramFactory);
@@ -577,8 +579,12 @@ namespace Ogre {
         }
 #endif
         // Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
-        OGRE_DELETE mGpuProgramManager;
-        mGpuProgramManager = 0;
+        if(mGpuProgramManager)
+        {
+            ResourceGroupManager::getSingleton()._unregisterResourceManager(mGpuProgramManager->getResourceType());
+            OGRE_DELETE mGpuProgramManager;
+            mGpuProgramManager = 0;
+        }
 
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;

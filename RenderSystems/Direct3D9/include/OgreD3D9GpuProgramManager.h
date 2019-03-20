@@ -36,10 +36,6 @@ namespace Ogre {
     class _OgreD3D9Export D3D9GpuProgramManager : public GpuProgramManager
     {
     protected:
-        /// @copydoc ResourceManager::createImpl
-        Resource* createImpl(const String& name, ResourceHandle handle, 
-            const String& group, bool isManual, ManualResourceLoader* loader,
-            const NameValuePairList* createParams);
         /// Specialised create method with specific parameters
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader,

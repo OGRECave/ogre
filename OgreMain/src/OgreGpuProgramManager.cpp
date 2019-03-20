@@ -33,6 +33,63 @@ THE SOFTWARE.
 namespace Ogre {
     static uint32 CACHE_CHUNK_ID = StreamSerialiser::makeIdentifier("OGPC"); // Ogre Gpu Program cache
 
+    /// default implementation for RenderSystems without assembly shader support
+    class UnsupportedGpuProgram : public GpuProgram
+    {
+    public:
+        UnsupportedGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader)
+            : GpuProgram(creator, name, handle, group, isManual, loader) { }
+
+        bool isSupported() const { return false; }
+        void throwException()
+        {
+            String message = "assembly shaders are unsupported. Shader name:" + mName + "\n";
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message);
+        }
+
+    protected:
+        void loadImpl(void)         { throwException(); }
+        void loadFromSource(void)   { throwException(); }
+        void unloadImpl(void)       { }
+    };
+
+    Resource* GpuProgramManager::createImpl(const String& name, ResourceHandle handle, const String& group,
+                                            bool isManual, ManualResourceLoader* loader,
+                                            const NameValuePairList* params)
+    {
+        NameValuePairList::const_iterator paramSyntax, paramType;
+
+        if (!params || (paramSyntax = params->find("syntax")) == params->end() ||
+            (paramType = params->find("type")) == params->end())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "You must supply 'syntax' and 'type' parameters");
+        }
+
+        GpuProgramType gpt;
+        if (paramType->second == "vertex_program")
+        {
+            gpt = GPT_VERTEX_PROGRAM;
+        }
+        else if (paramType->second == "geometry_program")
+        {
+            gpt = GPT_GEOMETRY_PROGRAM;
+        }
+        else
+        {
+            gpt = GPT_FRAGMENT_PROGRAM;
+        }
+
+        return createImpl(name, handle, group, isManual, loader, gpt, paramSyntax->second);
+    }
+
+    Resource* GpuProgramManager::createImpl(const String& name, ResourceHandle handle, const String& group,
+                                            bool isManual, ManualResourceLoader* loader,
+                                            GpuProgramType gptype, const String& syntaxCode)
+    {
+        return new UnsupportedGpuProgram(this, name, handle, group, isManual, loader);
+    }
+
     //-----------------------------------------------------------------------
     template<> GpuProgramManager* Singleton<GpuProgramManager>::msSingleton = 0;
     GpuProgramManager* GpuProgramManager::getSingletonPtr(void)
