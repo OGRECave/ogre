@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreShaderSubRenderState.h"
+#include "OgreShaderProgramSet.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -125,12 +126,6 @@ private:
     friend class FFPRenderStateBuilder;
 };
 
-
-typedef std::vector<RenderState*>              RenderStateList;
-typedef RenderStateList::iterator               RenderStateIterator;
-typedef RenderStateList::const_iterator         RenderStateConstIterator;
-
-
 /** This is the target render state. This class will hold the actual generated CPU/GPU programs.
 It will be initially build from the FFP state of a given Pass by the FFP builder and then will be linked
 with the custom pass render state and the global scheme render state. See ShaderGenerator::SGPass::buildTargetRenderState().
@@ -143,9 +138,6 @@ public:
     
     /** Class default constructor. */
     TargetRenderState();
-
-    /** Class destructor */
-    virtual ~TargetRenderState();
 
     /** Link this target render state with the given render state.
     Only sub render states with execution order that don't exist in this render state will be added.    
@@ -177,12 +169,12 @@ protected:
     */
     ProgramSet* createProgramSet();
 
-    /* Destroy the program set of this render state. */
-    void destroyProgramSet();
+    /** Destroy the program set of this render state. */
+    void destroyProgramSet() { mProgramSet.reset(); }
 
     /** Return the program set of this render state.
     */
-    ProgramSet* getProgramSet() { return mProgramSet; }
+    ProgramSet* getProgramSet() { return mProgramSet.get(); }
 
     /** Add sub render state to this render state.
     @param subRenderState The sub render state to add.
@@ -200,7 +192,7 @@ protected:
     // Tells if the list of the sub render states is sorted.
     bool mSubRenderStateSortValid;
     // The program set of this RenderState.
-    ProgramSet* mProgramSet;
+    std::unique_ptr<ProgramSet> mProgramSet;
     
 
 private:

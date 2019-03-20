@@ -119,17 +119,9 @@ void RenderState::removeTemplateSubRenderState(SubRenderState* subRenderState)
 
 //-----------------------------------------------------------------------
 TargetRenderState::TargetRenderState()
-{   
-    mProgramSet              = NULL;
-    mSubRenderStateSortValid = false;   
-}
-
-//-----------------------------------------------------------------------
-TargetRenderState::~TargetRenderState()
 {
-    destroyProgramSet();
+    mSubRenderStateSortValid = false;
 }
-
 
 //-----------------------------------------------------------------------
 void TargetRenderState::addSubRenderStateInstance(SubRenderState* subRenderState)
@@ -190,20 +182,9 @@ bool TargetRenderState::createCpuPrograms()
 //-----------------------------------------------------------------------
 ProgramSet* TargetRenderState::createProgramSet()
 {
-    destroyProgramSet();
+    mProgramSet.reset(new ProgramSet);
 
-    mProgramSet = OGRE_NEW ProgramSet;
-
-    return mProgramSet;
-}
-//-----------------------------------------------------------------------
-void TargetRenderState::destroyProgramSet()
-{
-    if (mProgramSet != NULL)
-    {
-        OGRE_DELETE mProgramSet;
-        mProgramSet = NULL;
-    }
+    return mProgramSet.get();
 }
 
 //-----------------------------------------------------------------------
