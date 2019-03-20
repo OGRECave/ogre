@@ -48,7 +48,6 @@ namespace Ogre {
     class _OgreExport GpuProgramManager : public ResourceManager, public Singleton<GpuProgramManager>
     {
         // silence warnings
-        using ResourceManager::createImpl;
         using ResourceManager::load;
     public:
 
@@ -66,10 +65,15 @@ namespace Ogre {
             
         static String addRenderSystemToName( const String &  name );
 
+        /// Generic create method
+        Resource* createImpl(const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader,
+            const NameValuePairList* createParams);
+
         /// Specialised create method with specific parameters
         virtual Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader,
-            GpuProgramType gptype, const String& syntaxCode) = 0;
+            GpuProgramType gptype, const String& syntaxCode);
     public:
         GpuProgramManager();
         virtual ~GpuProgramManager();

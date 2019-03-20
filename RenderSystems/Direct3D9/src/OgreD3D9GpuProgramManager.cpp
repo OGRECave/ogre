@@ -50,31 +50,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Resource* D3D9GpuProgramManager::createImpl(const String& name, ResourceHandle handle, 
         const String& group, bool isManual, ManualResourceLoader* loader,
-        const NameValuePairList* params)
-    {
-        NameValuePairList::const_iterator paramIt;
-
-        if (!params || (paramIt = params->find("type")) == params->end())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "You must supply a 'type' parameter",
-                "D3D9GpuProgramManager::createImpl");
-        }
-
-        if (paramIt->second == "vertex_program")
-        {
-            return OGRE_NEW D3D9GpuVertexProgram(this, name, handle, group, 
-                isManual, loader);
-        }
-        else
-        {
-            return OGRE_NEW D3D9GpuFragmentProgram(this, name, handle, group, 
-                isManual, loader);
-        }
-    }
-    //-----------------------------------------------------------------------------
-    Resource* D3D9GpuProgramManager::createImpl(const String& name, ResourceHandle handle, 
-        const String& group, bool isManual, ManualResourceLoader* loader,
         GpuProgramType gptype, const String& syntaxCode)
     {
         if (gptype == GPT_VERTEX_PROGRAM)

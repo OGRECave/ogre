@@ -91,7 +91,7 @@ namespace Ogre
         DWORD _getCurrentAnisotropy(size_t unit);
         
         D3D11HardwareBufferManager* mHardwareBufferManager;
-        D3D11GpuProgramManager* mGpuProgramManager;
+        GpuProgramManager* mGpuProgramManager;
         D3D11HLSLProgramFactory* mHLSLProgramFactory;
 
         size_t mLastVertexSourceCount;

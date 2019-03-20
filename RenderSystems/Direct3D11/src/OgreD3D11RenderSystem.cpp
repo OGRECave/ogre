@@ -42,7 +42,7 @@ THE SOFTWARE.
 #include "OgreD3D11HardwareIndexBuffer.h"
 #include "OgreD3D11HardwareVertexBuffer.h"
 #include "OgreD3D11VertexDeclaration.h"
-#include "OgreD3D11GpuProgramManager.h"
+#include "OgreGpuProgramManager.h"
 #include "OgreD3D11HLSLProgramFactory.h"
 
 #include "OgreD3D11HardwareOcclusionQuery.h"
@@ -698,8 +698,12 @@ namespace Ogre
         LogManager::getSingleton().logMessage("D3D11: Shutting down cleanly.");
         SAFE_DELETE( mTextureManager );
         SAFE_DELETE( mHardwareBufferManager );
-        SAFE_DELETE( mGpuProgramManager );
 
+        if(mGpuProgramManager)
+        {
+            ResourceGroupManager::getSingleton()._unregisterResourceManager(mGpuProgramManager->getResourceType());
+            SAFE_DELETE( mGpuProgramManager );
+        }
     }
     //---------------------------------------------------------------------
 	RenderWindow* D3D11RenderSystem::_createRenderWindow(const String &name,
@@ -790,7 +794,9 @@ namespace Ogre
 			mHardwareBufferManager = new D3D11HardwareBufferManager(mDevice);
 
 			// Create the GPU program manager
-			mGpuProgramManager = new D3D11GpuProgramManager();
+	        mGpuProgramManager = new GpuProgramManager();
+	        ResourceGroupManager::getSingleton()._registerResourceManager(mGpuProgramManager->getResourceType(),
+	                                                                      mGpuProgramManager);
 			// create & register HLSL factory
 			if (mHLSLProgramFactory == NULL)
 				mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);

@@ -45,7 +45,7 @@ namespace Ogre {
     *  @{
     */
     class GLES2FBOManager;
-    class GLES2GpuProgramManager;
+    class GpuProgramManager;
     class GLSLESProgramCommon;
     class GLSLESProgramFactory;
     class GLES2StateCacheManager;
@@ -77,7 +77,7 @@ namespace Ogre {
             /// List of background thread contexts
             GLContextList mBackgroundContextList;
 
-            GLES2GpuProgramManager *mGpuProgramManager;
+            GpuProgramManager *mGpuProgramManager;
             GLSLESProgramFactory* mGLSLESProgramFactory;
 #if !OGRE_NO_GLES2_CG_SUPPORT
             GLSLESCgProgramFactory* mGLSLESCgProgramFactory;
