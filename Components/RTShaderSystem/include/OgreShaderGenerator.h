@@ -619,6 +619,7 @@ protected:
 		// All passes entries, both normal and illumination.
         SGPassList mPassEntries;
         // The custom render states of all passes.
+        typedef std::vector<RenderState*> RenderStateList;
         RenderStateList mCustomRenderStates;
         // Flag that tells if destination technique should be build.        
         bool mBuildDstTechnique;
