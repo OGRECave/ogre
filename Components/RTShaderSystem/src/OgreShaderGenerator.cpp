@@ -155,9 +155,8 @@ ShaderGenerator::ShaderGenerator() :
     }
     else
     {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-            "ShaderGenerator creation error: None of the profiles is supported.", 
-            "ShaderGenerator::ShaderGenerator" );
+        mShaderLanguage = "null"; // falling back to HLSL, for unit tests mainly
+        LogManager::getSingleton().logWarning("ShaderGenerator: No supported language found. Falling back to 'null'");
     }
 
     setShaderProfiles(GPT_VERTEX_PROGRAM, "gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_4_0_level_9_3 "
@@ -1345,11 +1344,9 @@ size_t ShaderGenerator::getShaderCount(GpuProgramType type) const
 void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 {
     // Make sure that the shader language is supported.
-    if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(shaderLanguage) == false)
+    if (!mProgramWriterManager->isLanguageSupported(shaderLanguage))
     {
-        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-            "The language " + shaderLanguage + " is not supported !!",
-            "ShaderGenerator::setShaderLanguage");
+        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "'" + shaderLanguage + "' is not supported");
     }
 
     // Case target language changed -> flush the shaders cache.

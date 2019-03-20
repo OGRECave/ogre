@@ -36,7 +36,8 @@ namespace Ogre {
         GLSLESProgramWriter::GLSLESProgramWriter()
         {
             mIsGLSLES = true;
-            mGLSLVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+            auto* rs = Root::getSingleton().getRenderSystem();
+            mGLSLVersion = rs ? rs->getNativeShadingLanguageVersion() : 100;
             initializeStringMaps();
             mFunctionCacheMap.clear();
         }

@@ -214,7 +214,7 @@ namespace Ogre {
         RenderSystem* rs = Root::getSingleton().getRenderSystem();
 
         // Get the supported syntax from RenderSystemCapabilities 
-        return rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
+        return rs && rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
     }
     //---------------------------------------------------------------------------
     ResourcePtr GpuProgramManager::getResourceByName(const String& name, const String& group, bool preferHighLevelPrograms)

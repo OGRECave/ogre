@@ -35,7 +35,8 @@ String GLSLProgramWriter::TargetLanguage = "glsl";
 //-----------------------------------------------------------------------
 GLSLProgramWriter::GLSLProgramWriter() : mIsGLSLES(false)
 {
-    mGLSLVersion = Ogre::Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+    auto* rs = Root::getSingleton().getRenderSystem();
+    mGLSLVersion = rs ? rs->getNativeShadingLanguageVersion() : 120;
     initializeStringMaps();
 }
 
@@ -549,8 +550,8 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
     if(gpuType == GPT_VERTEX_PROGRAM && !mIsGLSLES) // TODO: also use for GLSLES?
     {
         // Special case where gl_Position needs to be redeclared
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_GLSL_SSO_REDECLARE) &&
-           mGLSLVersion >= 150)
+        if (mGLSLVersion >= 150 && Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
+                                       RSC_GLSL_SSO_REDECLARE))
         {
             os << "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n" << std::endl;
         }
