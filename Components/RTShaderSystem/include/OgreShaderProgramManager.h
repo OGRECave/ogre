@@ -191,8 +191,6 @@ protected:
     void synchronizePixelnToBeVertexOut(ProgramSet* programSet);
 
 protected:
-    // CPU programs list.                   
-    ProgramList mCpuProgramsList;
     // Map between target language and shader program writer.                   
     ProgramWriterMap mProgramWritersMap;
     // Map between target language and shader program processor.    

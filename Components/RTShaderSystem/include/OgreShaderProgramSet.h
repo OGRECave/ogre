@@ -62,15 +62,15 @@ public:
 
     // Protected methods.
 protected:
-    void setCpuProgram(Program* program, GpuProgramType type);
-    void setGpuProgram(const GpuProgramPtr& program, GpuProgramType type);
+    void setCpuProgram(std::unique_ptr<Program>&& program);
+    void setGpuProgram(const GpuProgramPtr& program);
 
     // Attributes.
 protected:
     // Vertex shader CPU program.
-    Program* mVSCpuProgram;
+    std::unique_ptr<Program> mVSCpuProgram;
     // Fragment shader CPU program.
-    Program* mPSCpuProgram;
+    std::unique_ptr<Program> mPSCpuProgram;
     // Vertex shader GPU program.
     GpuProgramPtr mVSGpuProgram;
     // Fragment shader CPU program.

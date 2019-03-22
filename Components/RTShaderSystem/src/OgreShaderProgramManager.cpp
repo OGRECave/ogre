@@ -196,29 +196,6 @@ void ProgramManager::destroyProgramWriters()
 }
 
 //-----------------------------------------------------------------------------
-Program* ProgramManager::createCpuProgram(GpuProgramType type)
-{
-    Program* shaderProgram = OGRE_NEW Program(type);
-
-    mCpuProgramsList.insert(shaderProgram);
-
-    return shaderProgram;
-}
-
-
-//-----------------------------------------------------------------------------
-void ProgramManager::destroyCpuProgram(Program* shaderProgram)
-{
-    ProgramListIterator it    = mCpuProgramsList.find(shaderProgram);
-    
-    if (it != mCpuProgramsList.end())
-    {           
-        OGRE_DELETE *it;            
-        mCpuProgramsList.erase(it); 
-    }           
-}
-
-//-----------------------------------------------------------------------------
 void ProgramManager::createGpuPrograms(ProgramSet* programSet)
 {
     // Before we start we need to make sure that the pixel shader input
@@ -273,7 +250,7 @@ void ProgramManager::createGpuPrograms(ProgramSet* programSet)
                                            ShaderGenerator::getSingleton().getShaderCachePath());
 
         OgreAssert(gpuProgram, "gpu program could not be created");
-        programSet->setGpuProgram(gpuProgram, type);
+        programSet->setGpuProgram(gpuProgram);
     }
 
     //update flags
