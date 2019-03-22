@@ -203,8 +203,6 @@ bool ShaderGenerator::_initialize()
     // Allocate and initialize FFP render state builder.
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     mFFPRenderStateBuilder.reset(new FFPRenderStateBuilder);
-    if (false == mFFPRenderStateBuilder->initialize())
-        return false;
 #endif
 
     // Create extensions factories.
@@ -315,12 +313,7 @@ void ShaderGenerator::_destroy()
     destroySubRenderStateExFactories();
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-    // Delete FFP Emulator.
-    if (mFFPRenderStateBuilder)
-    {
-        mFFPRenderStateBuilder->destroy();
-        mFFPRenderStateBuilder.reset();
-    }
+    mFFPRenderStateBuilder.reset();
 #endif
 
     mProgramManager.reset();
