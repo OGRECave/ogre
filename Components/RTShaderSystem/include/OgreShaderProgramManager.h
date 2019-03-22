@@ -190,13 +190,6 @@ protected:
     /** Fix the input of the pixel shader to be the same as the output of the vertex shader */
     void synchronizePixelnToBeVertexOut(ProgramSet* programSet);
 
-    /** Bind the uniform parameters of a given CPU and GPU program set. */
-    void bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams);
-
-
-protected:
-    
-
 protected:
     // CPU programs list.                   
     ProgramList mCpuProgramsList;

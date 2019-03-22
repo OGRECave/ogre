@@ -167,6 +167,8 @@ public:
 
 // Protected methods
 protected:
+    /** Bind the uniform parameters of a given CPU and GPU program set. */
+    static void bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams);
 
     /** Sort the sub render states composing this render state. */
     void sortSubRenderStates();

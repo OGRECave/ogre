@@ -144,19 +144,34 @@ void TargetRenderState::removeSubRenderStateInstance(SubRenderState* subRenderSt
     }
 }
 
+//-----------------------------------------------------------------------------
+void TargetRenderState::bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams)
+{
+    // samplers are bound via registers in HLSL & Cg
+    bool samplersBound = ShaderGenerator::getSingleton().getTargetLanguage()[0] != 'g';
+
+    // Bind each uniform parameter to its GPU parameter.
+    for (const auto& param : pCpuProgram->getParameters())
+    {
+        if((samplersBound && param->isSampler()) || !param->isUsed()) continue;
+
+        param->bind(passParams);
+        param->setUsed(false); // reset for shader regen
+    }
+}
+
 void TargetRenderState::acquirePrograms(Pass* pass)
 {
     createCpuPrograms();
 
-    ProgramManager& mgr = ProgramManager::getSingleton();
-    mgr.createGpuPrograms(mProgramSet.get());
+    ProgramManager::getSingleton().createGpuPrograms(mProgramSet.get());
 
     for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
     {
         // Bind the created GPU programs to the target pass.
         pass->setGpuProgram(type, mProgramSet->getGpuProgram(type));
         // Bind uniform parameters to pass parameters.
-        mgr.bindUniformParameters(mProgramSet->getCpuProgram(type), pass->getGpuProgramParameters(type));
+        bindUniformParameters(mProgramSet->getCpuProgram(type), pass->getGpuProgramParameters(type));
     }
 }
 
