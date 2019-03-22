@@ -28,20 +28,36 @@ THE SOFTWARE.
 #include "Ogre.h"
 #include "RootWithoutRenderSystemFixture.h"
 #include "OgreShaderGenerator.h"
+#include "OgreShaderProgramManager.h"
+
+#include "OgreShaderFFPTransform.h"
+#include "OgreShaderFFPColour.h"
 
 using namespace Ogre;
 
-typedef RootWithoutRenderSystemFixture RTShaderSystem;
+struct RTShaderSystem : public RootWithoutRenderSystemFixture
+{
+    std::unique_ptr<GpuProgramManager> gpuProgMgr;
+
+    void SetUp()
+    {
+        RootWithoutRenderSystemFixture::SetUp();
+        gpuProgMgr.reset(new GpuProgramManager());
+
+        RTShader::ShaderGenerator::initialize();
+        RTShader::ShaderGenerator::getSingleton().setTargetLanguage("glsl");
+    }
+    void TearDown()
+    {
+        RTShader::ShaderGenerator::destroy();
+        gpuProgMgr.reset();
+        RootWithoutRenderSystemFixture::TearDown();
+    }
+};
 
 TEST_F(RTShaderSystem, createShaderBasedTechnique)
 {
-    std::unique_ptr<GpuProgramManager> gpuProgMgr(new GpuProgramManager());
-
-    using namespace RTShader;
-    EXPECT_TRUE(ShaderGenerator::initialize());
-
-    auto& shaderGen = ShaderGenerator::getSingleton();
-    shaderGen.setTargetLanguage("glsl");
+    auto& shaderGen = RTShader::ShaderGenerator::getSingleton();
     auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
 
     EXPECT_TRUE(shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
@@ -57,6 +73,22 @@ TEST_F(RTShaderSystem, createShaderBasedTechnique)
     EXPECT_TRUE(newTech->getPasses()[0]->hasGpuProgram(GPT_FRAGMENT_PROGRAM));
 
     EXPECT_TRUE(shaderGen.removeShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+}
 
-    ShaderGenerator::destroy();
+TEST_F(RTShaderSystem, TargetRenderState)
+{
+    auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
+    auto pass = mat->getTechniques()[0]->getPasses()[0];
+
+    using namespace RTShader;
+    auto& shaderGen = ShaderGenerator::getSingleton();
+
+    TargetRenderState targetRenderState;
+    targetRenderState.addSubRenderStateInstance(shaderGen.createSubRenderState<FFPTransform>());
+    targetRenderState.addSubRenderStateInstance(shaderGen.createSubRenderState<FFPColour>());
+
+    targetRenderState.acquirePrograms(pass);
+
+    EXPECT_TRUE(pass->hasGpuProgram(GPT_VERTEX_PROGRAM));
+    EXPECT_TRUE(pass->hasGpuProgram(GPT_FRAGMENT_PROGRAM));
 }

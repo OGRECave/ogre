@@ -154,6 +154,16 @@ public:
     @param pLightList The light list used for the current rendering operation.
     */
     void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+
+    /** Add sub render state to this render state.
+    @param subRenderState The sub render state to add.
+    */
+    void addSubRenderStateInstance(SubRenderState* subRenderState);
+
+    /** Remove sub render state from this render state.
+    @param subRenderState The sub render state to remove.
+    */
+    void removeSubRenderStateInstance(SubRenderState* subRenderState);
     
     /** Acquire CPU/GPU programs set associated with the given render state and bind them to the pass.
     @param pass The pass to bind the programs to.
@@ -184,17 +194,6 @@ protected:
     /** Return the program set of this render state.
     */
     ProgramSet* getProgramSet() { return mProgramSet.get(); }
-
-    /** Add sub render state to this render state.
-    @param subRenderState The sub render state to add.
-    */
-    void addSubRenderStateInstance(SubRenderState* subRenderState);
-
-    /** Remove sub render state from this render state.
-    @param subRenderState The sub render state to remove.
-    */
-    void removeSubRenderStateInstance(SubRenderState* subRenderState);
-
     
 // Attributes.
 protected:
