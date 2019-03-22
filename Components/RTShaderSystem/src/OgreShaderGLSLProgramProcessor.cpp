@@ -137,13 +137,7 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
                 String versionLine = "#version " + StringConverter::toString(GLSLVersion) + "\n";
 
                 if(GLSLVersion > 130) {
-                    // Redefine texture functions to maintain reusability
-                    versionLine += "#define texture1D texture\n";
-                    versionLine += "#define texture2D texture\n";
-                    versionLine += "#define shadow2DProj textureProj\n";
-                    versionLine += "#define texture3D texture\n";
-                    versionLine += "#define textureCube texture\n";
-                    versionLine += "#define texture2DLod textureLod\n";
+                    versionLine += GLSLProgramWriter::getGL3CompatDefines();
                 }
 
                 pSubGpuProgram->setSource(versionLine + sourceCode);
