@@ -1538,14 +1538,14 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
 void ShaderGenerator::SGPass::acquirePrograms()
 {
     if(!mTargetRenderState) return;
-    ProgramManager::getSingleton().acquirePrograms(mDstPass, mTargetRenderState.get());
+    mTargetRenderState->acquirePrograms(mDstPass);
 }
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::releasePrograms()
 {
     if(!mTargetRenderState) return;
-    ProgramManager::getSingleton().releasePrograms(mDstPass, mTargetRenderState.get());
+    mTargetRenderState->releasePrograms(mDstPass);
 }
 
 //-----------------------------------------------------------------------------

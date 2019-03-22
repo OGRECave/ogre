@@ -144,8 +144,38 @@ void TargetRenderState::removeSubRenderStateInstance(SubRenderState* subRenderSt
     }
 }
 
+void TargetRenderState::acquirePrograms(Pass* pass)
+{
+    createCpuPrograms();
+
+    ProgramManager& mgr = ProgramManager::getSingleton();
+    mgr.createGpuPrograms(mProgramSet.get());
+
+    for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
+    {
+        // Bind the created GPU programs to the target pass.
+        pass->setGpuProgram(type, mProgramSet->getGpuProgram(type));
+        // Bind uniform parameters to pass parameters.
+        mgr.bindUniformParameters(mProgramSet->getCpuProgram(type), pass->getGpuProgramParameters(type));
+    }
+}
+
+
+void TargetRenderState::releasePrograms(Pass* pass)
+{
+    if(!mProgramSet)
+        return;
+
+    pass->setGpuProgram(GPT_VERTEX_PROGRAM, GpuProgramPtr());
+    pass->setGpuProgram(GPT_FRAGMENT_PROGRAM, GpuProgramPtr());
+
+    ProgramManager::getSingleton().releasePrograms(mProgramSet.get());
+
+    mProgramSet.reset();
+}
+
 //-----------------------------------------------------------------------
-bool TargetRenderState::createCpuPrograms()
+void TargetRenderState::createCpuPrograms()
 {
     sortSubRenderStates();
 
@@ -169,14 +199,12 @@ bool TargetRenderState::createCpuPrograms()
     {
         SubRenderState* srcSubRenderState = *it;
 
-        if (false == srcSubRenderState->createCpuSubPrograms(programSet))
+        if (!srcSubRenderState->createCpuSubPrograms(programSet))
         {
-            LogManager::getSingleton().stream() << "RTShader::TargetRenderState : Could not generate sub render program of type: " << srcSubRenderState->getType();
-            return false;
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Could not generate sub render program of type: " + srcSubRenderState->getType());
         }
     }
-
-    return true;
 }
 
 //-----------------------------------------------------------------------

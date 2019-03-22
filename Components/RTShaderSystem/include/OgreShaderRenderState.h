@@ -155,6 +155,16 @@ public:
     */
     void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
     
+    /** Acquire CPU/GPU programs set associated with the given render state and bind them to the pass.
+    @param pass The pass to bind the programs to.
+    */
+    void acquirePrograms(Pass* pass);
+
+    /** Release CPU/GPU programs set associated with the given render state and pass.
+    @param pass The pass to release the programs from.
+    */
+    void releasePrograms(Pass* pass);
+
 // Protected methods
 protected:
 
@@ -163,14 +173,11 @@ protected:
     
     /** Create CPU programs that represent this render state.   
     */
-    bool createCpuPrograms();
+    void createCpuPrograms();
 
     /** Create the program set of this render state.
     */
     ProgramSet* createProgramSet();
-
-    /** Destroy the program set of this render state. */
-    void destroyProgramSet() { mProgramSet.reset(); }
 
     /** Return the program set of this render state.
     */

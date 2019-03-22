@@ -78,17 +78,10 @@ public:
     /// @copydoc Singleton::getSingleton()
     static ProgramManager* getSingletonPtr();
 
-    /** Acquire CPU/GPU programs set associated with the given render state and bind them to the pass.
-    @param pass The pass to bind the programs to.
-    @param renderState The render state that describes the program that need to be generated.
+    /** Release CPU/GPU programs set associated with the given ProgramSet
+    @param renderState The ProgramSet holds the programs.
     */
-    void acquirePrograms(Pass* pass, TargetRenderState* renderState);
-
-    /** Release CPU/GPU programs set associated with the given render state and pass.
-    @param pass The pass to release the programs from.
-    @param renderState The render state holds the programs.
-    */
-    void releasePrograms(Pass* pass, TargetRenderState* renderState);
+    void releasePrograms(const ProgramSet* programSet);
 
     /** Flush the local GPU programs cache.
     */
@@ -144,7 +137,7 @@ protected:
     /** Create GPU programs for the given program set based on the CPU programs it contains.
     @param programSet The program set container.
     */
-    bool createGpuPrograms(ProgramSet* programSet);
+    void createGpuPrograms(ProgramSet* programSet);
         
     /** 
     Generates a unique hash from a string
