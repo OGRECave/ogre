@@ -858,17 +858,6 @@ bool ShaderGenerator::createShaderBasedTechnique(const Technique* srcTechnique, 
     return true;
 }
 
-//-----------------------------------------------------------------------------
-bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName, 
-                                                 const String& groupName, 
-                                                 const String& srcTechniqueSchemeName, 
-                                                 const String& dstTechniqueSchemeName)
-{
-    auto mat = MaterialManager::getSingleton().getByName(materialName, groupName);
-    Technique* srcTechnique = findSourceTechnique(*mat, srcTechniqueSchemeName, mCreateShaderOverProgrammablePass);
-    return removeShaderBasedTechnique(srcTechnique, dstTechniqueSchemeName);
-}
-
 bool ShaderGenerator::removeShaderBasedTechnique(const Technique* srcTech, const String& dstTechniqueSchemeName)
 {
     OGRE_LOCK_AUTO_MUTEX;

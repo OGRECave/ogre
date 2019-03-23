@@ -196,22 +196,6 @@ public:
         return _getParameterByName(mLocalParameters, name);
     }
 
-    /// @deprecated do not use
-    OGRE_DEPRECATED static ParameterPtr getParameterByName(const ShaderParameterList& parameterList, const String& name)
-    {
-        return _getParameterByName(parameterList, name);
-    }
-    /// @deprecated do not use
-    OGRE_DEPRECATED static ParameterPtr getParameterBySemantic(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index)
-    {
-        return _getParameterBySemantic(parameterList, semantic, index);
-    }
-    /// @deprecated use getInputParameter / getOutputParameter / getLocalParameter instead
-    OGRE_DEPRECATED static ParameterPtr getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
-    {
-        return _getParameterByContent(parameterList, content, type);
-    }
-
     /** Return a list of input parameters. */
     const ShaderParameterList& getInputParameters() const { return mInputParameters; }  
 

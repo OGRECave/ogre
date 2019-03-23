@@ -296,9 +296,6 @@ public:
      */
     bool removeShaderBasedTechnique(const Technique* srcTech, const String& dstTechniqueSchemeName);
 
-    /// @deprecated
-    OGRE_DEPRECATED bool removeShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
-
     /** 
     Remove all shader based techniques of the given material. 
     Return true upon success.
