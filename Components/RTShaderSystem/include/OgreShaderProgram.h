@@ -70,9 +70,6 @@ public:
     */
     UniformParameterPtr resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, Real data, size_t size = 0);
 
-    /// @deprecated use resolveParameter(GpuProgramParameters::AutoConstantType, size_t)
-    OGRE_DEPRECATED UniformParameterPtr resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, size_t data, size_t size = 0);
-    
     /** Resolve uniform auto constant parameter with associated int data of this program.
     @param autoType The auto type of the desired parameter.
     @param type The desired data type of the auto parameter.
