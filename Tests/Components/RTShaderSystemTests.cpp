@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "RootWithoutRenderSystemFixture.h"
 #include "OgreShaderGenerator.h"
 #include "OgreShaderProgramManager.h"
+#include "OgreShaderMaterialSerializerListener.h"
 
 #include "OgreShaderFFPTransform.h"
 #include "OgreShaderFFPColour.h"
@@ -73,6 +74,24 @@ TEST_F(RTShaderSystem, createShaderBasedTechnique)
     EXPECT_TRUE(newTech->getPasses()[0]->hasGpuProgram(GPT_FRAGMENT_PROGRAM));
 
     EXPECT_TRUE(shaderGen.removeShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+}
+
+TEST_F(RTShaderSystem, MaterialSerializer)
+{
+    auto& shaderGen = RTShader::ShaderGenerator::getSingleton();
+    auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
+
+    shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme");
+
+    auto rstate = shaderGen.getRenderState("MyScheme", "TestMat", RGN_DEFAULT, 0);
+    rstate->addTemplateSubRenderState(shaderGen.createSubRenderState<RTShader::FFPColour>());
+
+    shaderGen.validateMaterial("MyScheme", mat->getName(), mat->getGroup());
+
+    MaterialSerializer ser;
+    ser.addListener(shaderGen.getMaterialSerializerListener());
+    ser.queueForExport(mat);
+    EXPECT_TRUE(ser.getQueuedAsString().find("colour_stage") != String::npos);
 }
 
 TEST_F(RTShaderSystem, TargetRenderState)
