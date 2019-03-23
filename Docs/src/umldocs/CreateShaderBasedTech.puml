@@ -3,30 +3,11 @@ hide footbox
 
 Application -> ShaderGenerator: createShaderBasedTechnique
 activate ShaderGenerator
-ShaderGenerator -> ShaderGenerator: isPureFFPTechnique
-ShaderGenerator --> Application: return false
-ShaderGenerator -> SGTechnique: createTechnique
-activate SGTechnique
-
-SGTechnique -> SGPass: createPass
-activate SGPass
-SGPass --> SGTechnique: new Pass
-deactivate SGPass
-deactivate SGTechnique
-
-ShaderGenerator -> SGScheme: createScheme
-activate SGScheme
-SGScheme --> ShaderGenerator: new Scheme
-deactivate SGScheme
-
-ShaderGenerator -> SGMaterial: createMaterial
-activate SGMaterial
-SGMaterial --> ShaderGenerator: new Material
-deactivate SGMaterial
-
+ShaderGenerator -> SGMaterial: << new >>
+ShaderGenerator -> SGTechnique: << new >>
 ShaderGenerator -> SGMaterial: addTechnique(tech)
-ShaderGenerator -> SGScheme: addTechnique(tech)
 
-ShaderGenerator --> Application: return true
+ShaderGenerator -> SGScheme: << new >>
+ShaderGenerator -> SGScheme: addTechniqueEntry(tech)
 deactivate ShaderGenerator
 @enduml
