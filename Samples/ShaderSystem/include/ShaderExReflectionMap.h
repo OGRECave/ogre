@@ -76,7 +76,7 @@ public:
     /** 
     @see SubRenderState::updateGpuProgramsParams.
     */
-    virtual void            updateGpuProgramsParams (Renderable* rend, Pass* pass,  const AutoParamDataSource* source,  const LightList* pLightList);
+    virtual void            updateGpuProgramsParams (Renderable* rend, const Pass* pass,  const AutoParamDataSource* source,  const LightList* pLightList);
 
     /** Sets the reflection map type. */
     void                    setReflectionMapType    (TextureType type);

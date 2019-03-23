@@ -93,7 +93,7 @@ namespace Ogre {
 			return srcPass->getAlphaRejectFunction() != CMPF_ALWAYS_PASS;
 		}
 
-		void FFPAlphaTest::updateGpuProgramsParams( Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList )
+		void FFPAlphaTest::updateGpuProgramsParams( Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList )
 		{
 			mPSAlphaFunc->setGpuParameter((float)pass->getAlphaRejectFunction());
 		}

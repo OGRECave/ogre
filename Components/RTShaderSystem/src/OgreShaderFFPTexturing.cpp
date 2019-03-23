@@ -630,7 +630,7 @@ bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* src
 }
 
 //-----------------------------------------------------------------------
-void FFPTexturing::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
+void FFPTexturing::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
                                               const LightList* pLightList)
 {
     for (unsigned int i=0; i < mTextureUnitParamsList.size(); ++i)

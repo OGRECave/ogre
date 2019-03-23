@@ -243,7 +243,7 @@ void TextureAtlasSampler::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-void TextureAtlasSampler::updateGpuProgramsParams(Renderable* rend, Pass* pass,  const AutoParamDataSource* source, const LightList* pLightList)
+void TextureAtlasSampler::updateGpuProgramsParams(Renderable* rend, const Pass* pass,  const AutoParamDataSource* source, const LightList* pLightList)
 {
     if (mIsTableDataUpdated == false)
     {

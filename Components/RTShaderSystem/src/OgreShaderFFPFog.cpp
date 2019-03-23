@@ -56,7 +56,7 @@ int FFPFog::getExecutionOrder() const
     return FFP_FOG;
 }
 //-----------------------------------------------------------------------
-void FFPFog::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
+void FFPFog::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
                                      const LightList* pLightList)
 {   
     if (mFogMode == FOG_NONE)

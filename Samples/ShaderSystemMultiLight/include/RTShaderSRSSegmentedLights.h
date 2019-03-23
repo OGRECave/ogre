@@ -58,7 +58,7 @@ public:
     /** 
     @see SubRenderState::updateGpuProgramsParams.
     */
-    virtual void updateGpuProgramsParams(Ogre::Renderable* rend, Ogre::Pass* pass, const Ogre::AutoParamDataSource* source, const Ogre::LightList* pLightList);
+    virtual void updateGpuProgramsParams(Ogre::Renderable* rend, const Ogre::Pass* pass, const Ogre::AutoParamDataSource* source, const Ogre::LightList* pLightList);
 
     /** 
     @see SubRenderState::copyFrom.
