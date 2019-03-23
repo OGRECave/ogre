@@ -29,6 +29,7 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
+const char* TargetRenderState::UserKey = "TargetRenderState";
 
 //-----------------------------------------------------------------------
 RenderState::RenderState()
@@ -173,6 +174,8 @@ void TargetRenderState::acquirePrograms(Pass* pass)
         // Bind uniform parameters to pass parameters.
         bindUniformParameters(mProgramSet->getCpuProgram(type), pass->getGpuProgramParameters(type));
     }
+
+    pass->getUserObjectBindings().setUserAny(UserKey, Any(this));
 }
 
 
@@ -187,6 +190,8 @@ void TargetRenderState::releasePrograms(Pass* pass)
     ProgramManager::getSingleton().releasePrograms(mProgramSet.get());
 
     mProgramSet.reset();
+
+    pass->getUserObjectBindings().eraseUserAny(UserKey);
 }
 
 //-----------------------------------------------------------------------

@@ -489,10 +489,6 @@ protected:
         /** Release the CPU/GPU programs of this pass. */
         void releasePrograms();
 
-
-        /** Called when a single object is about to be rendered. */
-        void notifyRenderSingleObject(Renderable* rend, const AutoParamDataSource* source, const LightList* pLightList, bool suppressRenderStateChanges);
-
         /** Get source pass. */
         Pass* getSrcPass() { return mSrcPass; }
 
@@ -513,10 +509,6 @@ protected:
 
         /** Set the custom render state of this pass. */
         void setCustomRenderState(RenderState* customRenderState) { mCustomRenderState = customRenderState; }
-
-        /// Key name for associating with a Pass instance.
-        static String UserKey;
-    
     protected:
         SubRenderState* getCustomFFPSubState(int subStateOrder, const RenderState* renderState);
 
@@ -589,6 +581,8 @@ protected:
 
         /// whether shaders are created for passes with shaders
         bool overProgrammablePass() { return mOverProgrammable; }
+
+        const SGPassList& getPassList() const  { return mPassEntries; }
 
         // Key name for associating with a Technique instance.
         static String UserKey;
@@ -833,6 +827,9 @@ protected:
 
     /** Used to check if finalizing */
     bool getIsFinalizing() const;
+
+    /** Internal method that creates list of SGPass instances composing the given material. */
+    SGPassList createSGPassList(Material* mat) const;
 protected:  
     // Auto mutex.
     OGRE_AUTO_MUTEX;

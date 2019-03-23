@@ -44,7 +44,7 @@ void SGMaterialSerializerListener::materialEventRaised(MaterialSerializer* ser,
     {
         MaterialPtr matPtr = MaterialManager::getSingleton().getByName(mat->getName());
         mSourceMaterial = matPtr.get();
-        createSGPassList(mSourceMaterial, mSGPassList);
+        mSGPassList = ShaderGenerator::getSingleton().createSGPassList(mSourceMaterial);
     }
 
     if (event == MaterialSerializer::MSE_POST_WRITE)
@@ -108,28 +108,6 @@ void SGMaterialSerializerListener::textureUnitStateEventRaised(MaterialSerialize
     }   
 }
 
-//-----------------------------------------------------------------------------
-void SGMaterialSerializerListener::createSGPassList(Material* mat, SGPassList& passList)
-{
-    for (unsigned short techniqueIndex = 0; techniqueIndex < mat->getNumTechniques(); ++techniqueIndex)
-    {
-        Technique* curTechnique = mat->getTechnique(techniqueIndex);
-
-        for (unsigned short passIndex = 0; passIndex < curTechnique->getNumPasses(); ++passIndex)
-        {
-            Pass* curPass = curTechnique->getPass(passIndex);       
-            const Any& passUserData = curPass->getUserObjectBindings().getUserAny(ShaderGenerator::SGPass::UserKey);
-
-            // Case this pass created by the shader generator.
-            if (passUserData.has_value())
-            {
-                ShaderGenerator::SGPass* passEntry = any_cast<ShaderGenerator::SGPass*>(passUserData);
-
-                passList.push_back(passEntry);
-            }                               
-        }
-    }
-}
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass* SGMaterialSerializerListener::getShaderGeneratedPass(const Pass* srcPass)
 {

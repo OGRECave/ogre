@@ -175,6 +175,8 @@ public:
     */
     void releasePrograms(Pass* pass);
 
+    /// Key name for associating with a Pass instance.
+    static const char* UserKey;
 // Protected methods
 protected:
     /** Bind the uniform parameters of a given CPU and GPU program set. */

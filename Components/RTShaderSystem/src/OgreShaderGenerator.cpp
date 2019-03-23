@@ -109,7 +109,6 @@ protected:
 };
 
 String ShaderGenerator::DEFAULT_SCHEME_NAME     = "ShaderGeneratorDefaultScheme";
-String ShaderGenerator::SGPass::UserKey         = "SGPass";
 String ShaderGenerator::SGTechnique::UserKey    = "SGTechnique";
 
 //-----------------------------------------------------------------------
@@ -991,7 +990,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
         Pass* pSrcPass = pSrcTech->getNumPasses() > 0 ? pSrcTech->getPass(0) : NULL;
         if (pSrcPass)
         {
-            const Any& passUserData = pSrcPass->getUserObjectBindings().getUserAny(SGPass::UserKey);
+            const Any& passUserData = pSrcPass->getUserObjectBindings().getUserAny(TargetRenderState::UserKey);
             if (passUserData.has_value())
             {
                 schemesToRemove.insert(pSrcTech->_getSchemeIndex());
@@ -1081,17 +1080,15 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 {
     if (mActiveViewportValid)
     {
-        const Any& passUserData = pass->getUserObjectBindings().getUserAny(SGPass::UserKey);
+        const Any& passUserData = pass->getUserObjectBindings().getUserAny(TargetRenderState::UserKey);
 
-        if (!passUserData.has_value())
+        if (!passUserData.has_value() || suppressRenderStateChanges)
             return; 
 
         OGRE_LOCK_AUTO_MUTEX;
 
-        SGPass* passEntry = any_cast<SGPass*>(passUserData);
-
-        passEntry->notifyRenderSingleObject(rend, source, pLightList, suppressRenderStateChanges);
-                        
+        auto renderState = any_cast<TargetRenderState*>(passUserData);
+        renderState->updateGpuProgramsParams(rend, pass, source, pLightList);        
     }   
 }
 
@@ -1453,6 +1450,28 @@ bool ShaderGenerator::getIsFinalizing() const
 }
 
 //-----------------------------------------------------------------------------
+ShaderGenerator::SGPassList ShaderGenerator::createSGPassList(Material* mat) const
+{
+    SGPassList passList;
+
+    SGMaterialConstIterator itMatEntry = findMaterialEntryIt(mat->getName(), mat->getGroup());
+
+    // Check if material is managed.
+    if (itMatEntry == mMaterialEntriesMap.end())
+        return passList;
+
+    for (auto sgtech : itMatEntry->second->getTechniqueList())
+    {
+        for(auto sgpass : sgtech->getPassList())
+        {
+            passList.push_back(sgpass);
+        }
+    }
+
+    return passList;
+}
+
+//-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass, IlluminationStage stage)
 {
     mParent             = parent;
@@ -1461,7 +1480,6 @@ ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPas
 	mStage				= stage;
     mCustomRenderState  = NULL;
     mTargetRenderState  = NULL;
-    mDstPass->getUserObjectBindings().setUserAny(SGPass::UserKey, Any(this));
 }
 
 //-----------------------------------------------------------------------------
@@ -1530,13 +1548,6 @@ void ShaderGenerator::SGPass::releasePrograms()
     mTargetRenderState->releasePrograms(mDstPass);
 }
 
-//-----------------------------------------------------------------------------
-void ShaderGenerator::SGPass::notifyRenderSingleObject(Renderable* rend,  const AutoParamDataSource* source, 
-                                              const LightList* pLightList, bool suppressRenderStateChanges)
-{
-    if (mTargetRenderState != NULL && suppressRenderStateChanges == false)
-        mTargetRenderState->updateGpuProgramsParams(rend, mDstPass, source, pLightList);
-}
 //-----------------------------------------------------------------------------
 SubRenderState* ShaderGenerator::SGPass::getCustomFFPSubState(int subStateOrder)
 {
@@ -1624,12 +1635,17 @@ void ShaderGenerator::SGTechnique::createIlluminationSGPasses()
 
 		SGPass* passEntry = OGRE_NEW SGPass(this, p->pass, p->pass, p->stage);
 
-		const Any& origPassUserData = p->originalPass->getUserObjectBindings().getUserAny(SGPass::UserKey);
+		const Any& origPassUserData = p->originalPass->getUserObjectBindings().getUserAny(TargetRenderState::UserKey);
 		if(origPassUserData.has_value())
 		{
-
-			SGPass* origPassEntry = any_cast<SGPass*>(origPassUserData);
-			passEntry->setCustomRenderState(origPassEntry->getCustomRenderState());
+            for(auto sgp : mPassEntries)
+            {
+                if(sgp->getDstPass() == p->originalPass)
+                {
+                    passEntry->setCustomRenderState(sgp->getCustomRenderState());
+                    break;
+                }
+            }
 		}
 
 		mPassEntries.push_back(passEntry);
