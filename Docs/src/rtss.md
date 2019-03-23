@@ -6,10 +6,10 @@
 * Runtime shader generation synchronized with scene state. Each time scene settings change, a new set of shaders is generated.
 * Full Fixed Function Pipeline (FFP) emulation. This feature is most useful combined with render system that doesn't provide any FFP functionality (OpenGL ES 2.0, D3D11 etc).
 * Shader language independent interface: the logic representation of the shader programs is completely independent from the target shader language. You can generate code for different shader languages from the same program.
-* Pluggable interface allows extending the target shader languages set. 
-* Pluggable interface allows adding new shader based effects to the system in a seamless way. Each effect code will be automatically combined with the rest of the shader code.
-* Smart program management: each shader program is created only once and may be used by multiple passes.
-* Automatic vertex shader compacting mechanism: no more compacting variables by hand. In case the amount of used vertex shader output registers exceeds the maximum allowed (12 to 32, depending on [D3DPSHADERCAPS2_0.NumTemps](http://msdn.microsoft.com/en-us/library/bb172918%28v=VS.85%29.aspx)), a compacting algorithm packs the vertex shader outputs and adds unpack code in the fragment shader side.
+* Pluggable interface for different shader languages.
+* Pluggable interface for shader based functions in a seamless way. Each function will be automatically combined with the rest of the shader code.
+* Smart program caching: each shader program is created only once and may be used by multiple passes.
+* Automatic vertex shader output register compacting: no more compacting variables by hand. In case the amount of used vertex shader outputs exceeds the maximum allowed (12 to 32, depending on [D3DPSHADERCAPS2_0.NumTemps](http://msdn.microsoft.com/en-us/library/bb172918%28v=VS.85%29.aspx)), a compacting algorithm packs the vertex shader outputs and adds unpack code in the fragment shader side.
 * Material script support, for both export and import.
 
 # System overview {#rtss_overview}
@@ -63,21 +63,13 @@ Now that you know what the RTSS does, you are probably wondering how to change w
 
 The RTSS is flexible enough to "just" move the according calculations from the vertex shader to the pixel shader.
 
-## Customising the RTSS using the API {#rtss_custom_api}
-
-The first option is to globally enforce per-pixel lighting, you can do the following
-
-@snippet Components/Bites/src/OgreAdvancedRenderControls.cpp rtss_per_pixel
-
-any non FFP SRS will automatically override the default SRS for the same stage. Ogre::RTShader::FFP_LIGHTING in this case.
-
 ## Customizing the RTSS using Material Scripts {#rtss_custom_mat}
 
-Alternatively you can enable per-pixel lighting for one material only, by adding a `rtshader_system` section to the pass as following
+You can explicitly enable per-pixel lighting for one material only, by adding a `rtshader_system` section to the pass as following
 
 @snippet Media/RTShaderLib/materials/RTShaderSystem.material rtss_per_pixel
 
-for more examples see `Media/RTShaderLib/materials/RTShaderSystem.material`.
+To globally enable per-pixel lighting [see below](@ref rtss_custom_api). For more examples see `Media/RTShaderLib/materials/RTShaderSystem.material`.
 
 Here are the attributes you can use in a `rtshader_system` section of a .material script:
 
@@ -181,12 +173,19 @@ Example: `source_modifier src1_inverse_modulate custom 2`
 @param operation one of `src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate`
 @param parameterNum number of the custom shader parameter that controls the operation
 
+## Customising the RTSS using the API {#rtss_custom_api}
+
+Alternatively you can globally enforce per-pixel lighting, as
+
+@snippet Components/Bites/src/OgreAdvancedRenderControls.cpp rtss_per_pixel
+
+any non FFP SRS will automatically override the default SRS for the same stage. Ogre::RTShader::FFP_LIGHTING in this case.
+
 # The RTSS in Depth {#rtss_indepth}
 
-When the user asks the system to generate shaders for a given technique it has to provide the system a name for the target technique scheme. The system in turn, then creates a new technique based on the source technique but with a different scheme name. 
-__Note:__ In order to avoid clashes the source technique must NOT contain any shaders otherwise this step will fail.
+When the user asks the system to generate shaders for a given technique he has to provide a name for the target technique scheme. The system then creates a new technique based on the source technique but with a different scheme name.
 
-The idea behind this concept is to use Ogre's built in mechanism of material schemes, so all the user has to do in order to use the new technique is to change the material scheme of his viewport(s).
+The idea behind this concept is to use Ogre's built in mechanism of material schemes, so all the user has to do in order to use the new technique is to call Ogre::Viewport::setMaterialScheme.
 
 Before each viewport update, the system performs a validation step of all associated shader based techniques it created. This step includes automatic synchronization with the scene lights and fog states. When the system detects that a scheme is out of date it generates the appropriate shaders for each technique new.
 
@@ -196,6 +195,38 @@ The following steps are executed in order to generate shaders for a given techni
 * Each render state is translated into a set of logic shader programs (currently only pixel and vertex shader).
 The logic programs are then sent to specific shader language writers that produce source code for the respective shader language. The source code is used to create the GPU programs that are applied to the destination pass.
 Before rendering of an object that uses generated shaders the system allows each sub render state to update the GPU constants associated with it.
+
+## Main components {#rtss__components}
+The following is an partial list of components within the RTSS. These components are listed as they have great importance in understanding controlling and later extending the RTSS system.
+
+@par ShaderGenerator
+The ShaderGenerator is the main interface to the RTSS system. Through it you can request to generate and destroy the shaders, influence from what parts to create the shaders, and control general system settings such as the shading language and shader caching.
+
+@par RenderState classes
+The RenderState is the core component of the system. It aggregates the stages that the final shader will be created from. These stages are referred to as SubRenderStates. It is possible to bypass the rest of the RTSS and use RenderStates directly to manually generate shaders for arbitrary passes.
+@par
+RenderStates exist on two levels:
+1. SGScheme RenderStates describe the SubRenderStates that will be used when creating a shader for a given material scheme.
+2. SGPass <em>Target</em>RenderState describe the SubRenderStates that will be used when creating a specific pass of a specific material.
+@par
+When a shader is generated for a given material the system combines the SubRenderStates from both RenderStates to create a shader specific for a material pass in a specific scheme.
+
+@par SubRenderState classes
+Sub-render states (SRS) are components designed to generate the code of the RTSS shaders. Each SRS usually has a specific role to fill within the shader's construction. These components can be combined in different combinations to create shaders with different capabilities.
+@par
+There are 5 basic SRSs. These are used to recreate the functionality provided by the fixed pipeline and are added by default to every scheme RenderState:
+* Ogre::RTShader::FFPTransform - responsible for adding code to the vertex shader which computes the position of the vertex in projection space
+* Ogre::RTShader::FFPColour - responsible for adding code to the shaders that calculate the base diffuse and specular color of the object regardless of lights or textures. The color is calculated based on the ambient, diffuse, specular and emissive properties of the object and scene, color tracking and the specified hardware buffer color.
+* Ogre::RTShader::FFPLighting - responsible for adding code to the shaders that calculate the luminescence added to the object by light. Then add that value to the color calculated by the color SRS stage.
+* Ogre::RTShader::FFPTexturing - responsible for adding code that modulates the color of the pixels based on textures assigned to the material.
+* Ogre::RTShader::FFPFog - responsible for adding code that modulates the color of a pixel based on the scene or object fog parameters.
+@par
+There are many more sub render states that already exist in the Ogre system and new ones can be added. Some of the existing SRSs include capabilities such as: per-pixel lighting, texture atlas, advanced texture blend, bump mapping, efficient multiple lights (sample), textured fog (sample), etc...
+
+@par SubRenderStateFactory
+As the name suggests, sub render state factories are factories that produce sub render states. Each factory generates a specific SRS.
+@par
+These type of components are note worthy for 2 reason. The first and obvious one is that they allow the system to generate new SRSs for the materials it is asked to generate. The second reason is that they perform as script readers and writers allowing the system to create specific or specialized SRSs per material.
 
 ## Initializing the system
 
@@ -227,12 +258,12 @@ if (Ogre::RTShader::ShaderGenerator::initialize())
 }
 ```
 
-## Creating shader based technique
+## Creating shader based technique {#rtssTech}
 This step will associate the given technique with a destination shader generated based technique. Calling the `Ogre::RTShader::ShaderGenerator::createShaderBasedTechnique()` will cause the system to generate internal data structures associated with the source technique and will add new technique to the source material. This new technique will have the scheme name that was passed as an argument to this method and all its passes will contain shaders that the system will generate and update during the application runtime.
 
-To use the generated technique set the change material scheme of your viewport(s) to the same scheme name you passed as argument to this method.
+![](CreateShaderBasedTech.svg)
 
-Note that you can automate the shader generation process for all materials. First set the viewport scheme to the destination scheme of the RTSS shaders. Second register to the `Ogre::MaterialManager::Listener` and implement the `handleSchemeNotFound()` function. If the function requests a scheme for the RTSS, generate it based on functions parameters.
+To use the generated technique set the change material scheme of your viewport(s) to the same scheme name you passed as argument to this method.
 
 ```cpp
 // Create shader based technique from the default technique of the given material.
@@ -241,45 +272,20 @@ mShaderGenerator->createShaderBasedTechnique("Examples/BeachStones", Ogre::Mater
 // Apply the shader generated based techniques.
 mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 ```
-![](CreateShaderBasedTech.svg)
 
-## Runtime shader generation
+@note you can automate the shader generation process for all materials. First set the viewport scheme to the destination scheme of the RTSS shaders. Second register to the `Ogre::MaterialManager::Listener` implementing `handleSchemeNotFound()` - e.g. OgreBites::SGTechniqueResolverListener
+
+## Runtime shader generation {#rtssGenerate}
 During the application runtime the ShaderGenerator instance receives notifications on per frame basis from its target SceneManager.
 At this point it checks the material scheme in use. In case the current scheme has representations in the manager, it executes its validate method.
 The SGScheme validation includes synchronization with scene light and fog settings. In case it is out of date it will rebuild all shader generated techniques.
-The first step is to loop over every SGTechnique associated with this SGScheme and build its RenderStates - one for each pass. Each RenderState has its own hash code and it is cached at the ShaderGenerator. The same RenderState can be shared by multiple SGPasses.
-The second step is to loop again on every SGTechnique and acquire a program set for each SGPass. The actual acquiring process is done by the ProgramManager that generates CPU program representation, send them to a matching ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
+1. The first step is to loop over every SGTechnique associated with this SGScheme and build its RenderStates - one for each pass.
+2. The second step is to loop again on every SGTechnique and acquire a program set for each SGPass.
+
+The actual acquiring process is done by the TargetRenderState that generates CPU program representation, send them to a matching ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
 The result of this entire process is that each technique associated with the SGScheme has vertex and pixel shaders applied to all its passes. These shaders are synchronized with scene lights and fog settings.
 
 ![](RuntimeShaderGeneration.svg)
-
-## Main components {#rtss__components}
-The following is an partial list of components within the RTSS. These components are listed as they have great importance in understanding controlling and later extending the RTSS system.
-
-@par ShaderGenerator
-The ShaderGenerator is the main interface to the RTSS system. Through it you can request to generate and destroy the shaders, influence from what parts to create the shaders, and control general system settings such as the shading language and shader caching.
-
-@par RenderState classes
-A render state describes the different components that a shader will be created from. These components are referred to as SubRenderStates. 
-@par
-RenderStates exist on 2 levels: scheme and pass. Scheme RenderStates describe the SubRenderStates that will be used when creating a shader for a given material scheme. Pass RenderState describe the SubRenderStates that will be used when creating a specific pass of a specific material. When a shader is generated for a given material the system combines the SubRenderStates from both RenderStates to create a shader specific for a material pass in a specific scheme.
-
-@par SubRenderState classes
-Sub-render states (SRS) are components designed to generate the code of the RTSS shaders. Each SRS usually has a specific role to fill within the shader's construction. These components can be combined in different combinations to create shaders with different capabilities.
-@par
-There are 5 basic SRSs. These are used to recreate the functionality provided by the fixed pipeline and are added by default to every scheme RenderState:
-* Ogre::RTShader::FFPTransform - responsible for adding code to the vertex shader which computes the position of the vertex in projection space
-* Ogre::RTShader::FFPColour - responsible for adding code to the shaders that calculate the base diffuse and specular color of the object regardless of lights or textures. The color is calculated based on the ambient, diffuse, specular and emissive properties of the object and scene, color tracking and the specified hardware buffer color.
-* Ogre::RTShader::FFPLighting - responsible for adding code to the shaders that calculate the luminescence added to the object by light. Then add that value to the color calculated by the color SRS stage.
-* Ogre::RTShader::FFPTexturing - responsible for adding code that modulates the color of the pixels based on textures assigned to the material.
-* Ogre::RTShader::FFPFog - responsible for adding code that modulates the color of a pixel based on the scene or object fog parameters.
-@par
-There are many more sub render states that already exist in the Ogre system and new ones can be added. Some of the existing SRSs include capabilities such as: per-pixel lighting, texture atlas, advanced texture blend, bump mapping, efficient multiple lights (sample), textured fog (sample), etc...
-
-@par SubRenderStateFactory
-As the name suggests, sub render state factories are factories that produce sub render states. Each factory generates a specific SRS. 
-@par
-These type of components are note worthy for 2 reason. The first and obvious one is that they allow the system to generate new SRSs for the materials it is asked to generate. The second reason is that they perform as script readers and writers allowing the system to create specific or specialized SRSs per material.
 
 ## Creating custom shader extensions {#creating-extensions}
 Although the system implements some common shader based effects such as per pixel lighting, normal map, etc., you may find it useful to write your own shader extensions.

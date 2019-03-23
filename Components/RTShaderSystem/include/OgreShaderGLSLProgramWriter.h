@@ -74,6 +74,7 @@ public:
 
     static String TargetLanguage;
 
+    static const char* getGL3CompatDefines();
 
     // Protected methods.
 protected:

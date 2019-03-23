@@ -97,6 +97,9 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
         String attachedShaders = pGpuProgram->getParameter("attach");
         String subShaderDef = "";
 
+        auto* rs = Root::getSingleton().getRenderSystem();
+        int GLSLVersion = rs ? rs->getNativeShadingLanguageVersion() : 100;
+
         for (unsigned int i=0; i < program->getDependencyCount(); ++i)
         {
             // Here we append _VS and _FS to the library shaders (so max each lib shader
@@ -133,17 +136,10 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
                 String sourceCode = stream->getAsString();
 
                 // Prepend the current GLSL version
-                int GLSLVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
                 String versionLine = "#version " + StringConverter::toString(GLSLVersion) + "\n";
 
                 if(GLSLVersion > 130) {
-                    // Redefine texture functions to maintain reusability
-                    versionLine += "#define texture1D texture\n";
-                    versionLine += "#define texture2D texture\n";
-                    versionLine += "#define shadow2DProj textureProj\n";
-                    versionLine += "#define texture3D texture\n";
-                    versionLine += "#define textureCube texture\n";
-                    versionLine += "#define texture2DLod textureLod\n";
+                    versionLine += GLSLProgramWriter::getGL3CompatDefines();
                 }
 
                 pSubGpuProgram->setSource(versionLine + sourceCode);

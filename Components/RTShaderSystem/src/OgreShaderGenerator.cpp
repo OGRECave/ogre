@@ -155,9 +155,8 @@ ShaderGenerator::ShaderGenerator() :
     }
     else
     {
-        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-            "ShaderGenerator creation error: None of the profiles is supported.", 
-            "ShaderGenerator::ShaderGenerator" );
+        mShaderLanguage = "null"; // falling back to HLSL, for unit tests mainly
+        LogManager::getSingleton().logWarning("ShaderGenerator: No supported language found. Falling back to 'null'");
     }
 
     setShaderProfiles(GPT_VERTEX_PROGRAM, "gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_4_0_level_9_3 "
@@ -204,8 +203,6 @@ bool ShaderGenerator::_initialize()
     // Allocate and initialize FFP render state builder.
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     mFFPRenderStateBuilder.reset(new FFPRenderStateBuilder);
-    if (false == mFFPRenderStateBuilder->initialize())
-        return false;
 #endif
 
     // Create extensions factories.
@@ -316,12 +313,7 @@ void ShaderGenerator::_destroy()
     destroySubRenderStateExFactories();
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-    // Delete FFP Emulator.
-    if (mFFPRenderStateBuilder)
-    {
-        mFFPRenderStateBuilder->destroy();
-        mFFPRenderStateBuilder.reset();
-    }
+    mFFPRenderStateBuilder.reset();
 #endif
 
     mProgramManager.reset();
@@ -1345,11 +1337,9 @@ size_t ShaderGenerator::getShaderCount(GpuProgramType type) const
 void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 {
     // Make sure that the shader language is supported.
-    if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(shaderLanguage) == false)
+    if (!mProgramWriterManager->isLanguageSupported(shaderLanguage))
     {
-        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-            "The language " + shaderLanguage + " is not supported !!",
-            "ShaderGenerator::setShaderLanguage");
+        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "'" + shaderLanguage + "' is not supported");
     }
 
     // Case target language changed -> flush the shaders cache.
@@ -1541,14 +1531,14 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
 void ShaderGenerator::SGPass::acquirePrograms()
 {
     if(!mTargetRenderState) return;
-    ProgramManager::getSingleton().acquirePrograms(mDstPass, mTargetRenderState.get());
+    mTargetRenderState->acquirePrograms(mDstPass);
 }
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::releasePrograms()
 {
     if(!mTargetRenderState) return;
-    ProgramManager::getSingleton().releasePrograms(mDstPass, mTargetRenderState.get());
+    mTargetRenderState->releasePrograms(mDstPass);
 }
 
 //-----------------------------------------------------------------------------
@@ -1680,6 +1670,13 @@ ShaderGenerator::SGTechnique::~SGTechnique()
     const String& materialName = mParent->getMaterialName();
     const String& groupName = mParent->getGroupName();
 
+    // Release CPU/GPU programs that associated with this technique passes.
+    // Needs the parent technique to still exist
+    for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
+    {
+        (*itPass)->releasePrograms();
+    }
+
     if (MaterialManager::getSingleton().resourceExists(materialName, groupName))
     {
         MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
@@ -1704,12 +1701,6 @@ ShaderGenerator::SGTechnique::~SGTechnique()
                 break;
             }       
         }
-    }
-
-    // Release CPU/GPU programs that associated with this technique passes.
-    for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
-    {
-        (*itPass)->releasePrograms();
     }
     
     // Destroy the passes.

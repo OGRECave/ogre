@@ -74,18 +74,6 @@ public:
     /// @copydoc Singleton::getSingleton()
     static FFPRenderStateBuilder* getSingletonPtr();
 
-
-    /** 
-    Initialize the FFP builder instance.
-    Return true upon success.
-    */
-    bool initialize();
-
-    /** 
-    Destroy the FFP builder instance.
-    */
-    void destroy();
-
     /** 
     Build render state from the given pass that emulates the fixed function pipeline behaviour. 
     @param sgPass The shader generator pass representation. Contains both source and destination pass.
@@ -102,13 +90,23 @@ protected:
 
 // Protected methods.
 protected:
+    /**
+    Initialize the FFP builder instance.
+    Return true upon success.
+    */
+    bool initialize();
 
     /** 
+    Destroy the FFP builder instance.
+    */
+    void destroy();
+
+    /**
     Internal method that builds FFP sub render state.
     */
-    void buildFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType, 
+    void buildFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType,
                                                  ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
-    
+
     /** 
     Internal method that resolves the colour stage flags.
     */

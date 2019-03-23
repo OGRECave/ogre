@@ -196,6 +196,8 @@ public:
 
     const String& getPreprocessorDefines() const { return mPreprocessorDefines; }
 
+    /** Class destructor */
+    ~Program();
 // Protected methods.
 protected:
 
@@ -203,9 +205,6 @@ protected:
     @param type The type of this program.
     */
     Program(GpuProgramType type);
-
-    /** Class destructor */
-    ~Program();
 
     /** Destroy all parameters of this program. */
     void destroyParameters();
@@ -237,7 +236,7 @@ protected:
     // Whether to pass matrices as column-major.
     bool mColumnMajorMatrices;
 private:
-    friend class ProgramManager;
+    friend class TargetRenderState;
 };
 
 /** @} */

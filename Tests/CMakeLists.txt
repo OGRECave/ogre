@@ -67,6 +67,11 @@ if (OGRE_BUILD_TESTS)
     if (OGRE_BUILD_COMPONENT_OVERLAY)
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay)
     endif ()
+
+    if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+      set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreRTShaderSystem)
+      list(APPEND SOURCE_FILES Components/RTShaderSystemTests.cpp)
+    endif ()
     
     if(TEST_GLSUPPORT)
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreGLSupport)

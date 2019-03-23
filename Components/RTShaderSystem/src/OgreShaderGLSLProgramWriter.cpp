@@ -35,7 +35,8 @@ String GLSLProgramWriter::TargetLanguage = "glsl";
 //-----------------------------------------------------------------------
 GLSLProgramWriter::GLSLProgramWriter() : mIsGLSLES(false)
 {
-    mGLSLVersion = Ogre::Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+    auto* rs = Root::getSingleton().getRenderSystem();
+    mGLSLVersion = rs ? rs->getNativeShadingLanguageVersion() : 120;
     initializeStringMaps();
 }
 
@@ -104,6 +105,17 @@ void GLSLProgramWriter::initializeStringMaps()
 }
 
 //-----------------------------------------------------------------------
+const char* GLSLProgramWriter::getGL3CompatDefines()
+{
+    // Redefine texture functions to maintain reusability
+    return "#define texture1D texture\n"
+           "#define texture2D texture\n"
+           "#define shadow2DProj textureProj\n"
+           "#define texture3D texture\n"
+           "#define textureCube texture\n"
+           "#define texture2DLod textureLod\n";
+}
+
 void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
     // Write the current version (this force the driver to more fulfill the glsl standard)
@@ -111,13 +123,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 
     if(mGLSLVersion > 120)
     {
-        // Redefine texture functions to maintain reusability
-        os << "#define texture1D texture" << std::endl;
-        os << "#define texture2D texture" << std::endl;
-        os << "#define shadow2DProj textureProj" << std::endl;
-        os << "#define texture3D texture" << std::endl;
-        os << "#define textureCube texture" << std::endl;
-        os << "#define texture2DLod textureLod" << std::endl;
+        os << getGL3CompatDefines();
     }
 
     // Generate source code header.
@@ -544,8 +550,8 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
     if(gpuType == GPT_VERTEX_PROGRAM && !mIsGLSLES) // TODO: also use for GLSLES?
     {
         // Special case where gl_Position needs to be redeclared
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_GLSL_SSO_REDECLARE) &&
-           mGLSLVersion >= 150)
+        if (mGLSLVersion >= 150 && Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
+                                       RSC_GLSL_SSO_REDECLARE))
         {
             os << "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\nfloat gl_ClipDistance[];\n};\n" << std::endl;
         }

@@ -144,39 +144,80 @@ void TargetRenderState::removeSubRenderStateInstance(SubRenderState* subRenderSt
     }
 }
 
+//-----------------------------------------------------------------------------
+void TargetRenderState::bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams)
+{
+    // samplers are bound via registers in HLSL & Cg
+    bool samplersBound = ShaderGenerator::getSingleton().getTargetLanguage()[0] != 'g';
+
+    // Bind each uniform parameter to its GPU parameter.
+    for (const auto& param : pCpuProgram->getParameters())
+    {
+        if((samplersBound && param->isSampler()) || !param->isUsed()) continue;
+
+        param->bind(passParams);
+        param->setUsed(false); // reset for shader regen
+    }
+}
+
+void TargetRenderState::acquirePrograms(Pass* pass)
+{
+    createCpuPrograms();
+
+    ProgramManager::getSingleton().createGpuPrograms(mProgramSet.get());
+
+    for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
+    {
+        // Bind the created GPU programs to the target pass.
+        pass->setGpuProgram(type, mProgramSet->getGpuProgram(type));
+        // Bind uniform parameters to pass parameters.
+        bindUniformParameters(mProgramSet->getCpuProgram(type), pass->getGpuProgramParameters(type));
+    }
+}
+
+
+void TargetRenderState::releasePrograms(Pass* pass)
+{
+    if(!mProgramSet)
+        return;
+
+    pass->setGpuProgram(GPT_VERTEX_PROGRAM, GpuProgramPtr());
+    pass->setGpuProgram(GPT_FRAGMENT_PROGRAM, GpuProgramPtr());
+
+    ProgramManager::getSingleton().releasePrograms(mProgramSet.get());
+
+    mProgramSet.reset();
+}
+
 //-----------------------------------------------------------------------
-bool TargetRenderState::createCpuPrograms()
+void TargetRenderState::createCpuPrograms()
 {
     sortSubRenderStates();
 
     ProgramSet* programSet = createProgramSet();
-    Program* vsProgram = ProgramManager::getSingleton().createCpuProgram(GPT_VERTEX_PROGRAM);
-    Program* psProgram = ProgramManager::getSingleton().createCpuProgram(GPT_FRAGMENT_PROGRAM);
-    RTShader::Function* vsMainFunc = NULL;
-    RTShader::Function* psMainFunc = NULL;
-
-    programSet->setCpuProgram(vsProgram, GPT_VERTEX_PROGRAM);
-    programSet->setCpuProgram(psProgram, GPT_FRAGMENT_PROGRAM);
+    std::unique_ptr<Program> vsProgram(new Program(GPT_VERTEX_PROGRAM));
+    std::unique_ptr<Program> psProgram(new Program(GPT_FRAGMENT_PROGRAM));
 
     // Create entry point functions.
-    vsMainFunc = vsProgram->createFunction("main", "Vertex Program Entry point", Function::FFT_VS_MAIN);
+    auto vsMainFunc = vsProgram->createFunction("main", "Vertex Program Entry point", Function::FFT_VS_MAIN);
     vsProgram->setEntryPointFunction(vsMainFunc);
 
-    psMainFunc = psProgram->createFunction("main", "Pixel Program Entry point", Function::FFT_PS_MAIN);
+    auto psMainFunc = psProgram->createFunction("main", "Pixel Program Entry point", Function::FFT_PS_MAIN);
     psProgram->setEntryPointFunction(psMainFunc);
+
+    programSet->setCpuProgram(std::move(vsProgram));
+    programSet->setCpuProgram(std::move(psProgram));
 
     for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
     {
         SubRenderState* srcSubRenderState = *it;
 
-        if (false == srcSubRenderState->createCpuSubPrograms(programSet))
+        if (!srcSubRenderState->createCpuSubPrograms(programSet))
         {
-            LogManager::getSingleton().stream() << "RTShader::TargetRenderState : Could not generate sub render program of type: " << srcSubRenderState->getType();
-            return false;
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Could not generate sub render program of type: " + srcSubRenderState->getType());
         }
     }
-
-    return true;
 }
 
 //-----------------------------------------------------------------------

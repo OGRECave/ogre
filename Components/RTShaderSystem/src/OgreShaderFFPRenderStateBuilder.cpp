@@ -52,15 +52,13 @@ FFPRenderStateBuilder& FFPRenderStateBuilder::getSingleton()
 //-----------------------------------------------------------------------------
 FFPRenderStateBuilder::FFPRenderStateBuilder()
 {
-    
-
+    initialize();
 }
 
 //-----------------------------------------------------------------------------
 FFPRenderStateBuilder::~FFPRenderStateBuilder()
 {
-    
-
+    destroy();
 }
 
 //-----------------------------------------------------------------------------
@@ -115,7 +113,7 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Ta
     renderState->reset();
 
     // Build transformation sub state.
-    buildFFPSubRenderState(FFP_TRANSFORM, FFPTransform::Type, sgPass, renderState); 
+    buildFFPSubRenderState(FFP_TRANSFORM, FFPTransform::Type, sgPass, renderState);
 
     // Build colour sub state.
     buildFFPSubRenderState(FFP_COLOUR, FFPColour::Type, sgPass, renderState);
@@ -124,7 +122,7 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Ta
     buildFFPSubRenderState(FFP_LIGHTING, FFPLighting::Type, sgPass, renderState);
 
     // Build texturing sub state.
-    buildFFPSubRenderState(FFP_TEXTURING, FFPTexturing::Type, sgPass, renderState); 
+    buildFFPSubRenderState(FFP_TEXTURING, FFPTexturing::Type, sgPass, renderState);
     
     // Build fog sub state.
     buildFFPSubRenderState(FFP_FOG, FFPFog::Type, sgPass, renderState);
@@ -145,9 +143,9 @@ void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, cons
 
     subRenderState = sgPass->getCustomFFPSubState(subRenderStateOrder);
 
-    if (subRenderState == NULL) 
+    if (subRenderState == NULL)
     {
-        subRenderState = ShaderGenerator::getSingleton().createSubRenderState(subRenderStateType);      
+        subRenderState = ShaderGenerator::getSingleton().createSubRenderState(subRenderStateType);
     }
 
     if (subRenderState->preAddToRenderState(renderState, sgPass->getSrcPass(), sgPass->getDstPass()))
@@ -155,8 +153,8 @@ void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, cons
         renderState->addSubRenderStateInstance(subRenderState);
     }
     else
-    {       
-        ShaderGenerator::getSingleton().destroySubRenderState(subRenderState);              
+    {
+        ShaderGenerator::getSingleton().destroySubRenderState(subRenderState);
     }
 }
 

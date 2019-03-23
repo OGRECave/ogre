@@ -1,29 +1,27 @@
 @startuml
 hide footbox
 
-SceneManager -> ShaderGenerator: preFindVisObjects
 ShaderGenerator -> SGScheme: validate
 activate SGScheme
-SGScheme -> SGScheme: syncWithSceneLights
-SGScheme -> SGScheme: syncWithSceneFog
+SGScheme -> SGScheme: syncWithScene
 SGScheme -> SGTechniqe: buildRenderState
-deactivate SGScheme
 SGTechniqe -> SGPass: buildRenderState
 activate SGPass
-SGPass -> FFPBuilder: buildFFPRenderState
-SGPass -> SGPass: appendCustomRenderState
-SGPass --> ShaderGenerator: cacheFinalRenderState
+SGPass -> TargetRenderState: << new >>
+loop globalRenderState
+SGPass -> TargetRenderState: addSubRenderState
+end
 deactivate SGPass
-ShaderGenerator -> SGPass: return RenderState
 SGScheme -> SGTechniqe: acquirePrograms
+deactivate SGScheme
 SGTechniqe -> SGPass: acquirePrograms
-SGPass -> ProgramManager: acquirePrograms
+SGPass -> TargetRenderState: acquirePrograms(dst)
+activate TargetRenderState
+TargetRenderState -> TargetRenderState: createCpuPrograms
+TargetRenderState -> ProgramManager: createGpuPrograms
 activate ProgramManager
-ProgramManager -> ProgramManager: createCpuPrograms
-ProgramManager -> ProgramWriter: writeShaderSourceCode
-activate ProgramWriter
-ProgramWriter --> ProgramManager: return sourceCode
-deactivate ProgramWriter
-ProgramManager -> ProgramManager: createGpuPrograms
-
+ProgramManager -> ProgramManager: hash(source)
+ProgramManager --> TargetRenderState: GpuProgramPtr
+deactivate ProgramManager
+TargetRenderState -> TargetRenderState : bindUniformParameters
 @enduml

@@ -364,7 +364,8 @@ void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
 {   
     if (paramsPtr.get() != NULL)
     {
-        const GpuConstantDefinition* def = paramsPtr->_findNamedConstantDefinition(mBindName.empty() ? mName : mBindName, true);
+        // do not throw on failure: some RS optimize unused uniforms away. Also unit tests run without any RS
+        const GpuConstantDefinition* def = paramsPtr->_findNamedConstantDefinition(mBindName.empty() ? mName : mBindName, false);
 
         if (def != NULL)
         {

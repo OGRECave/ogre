@@ -31,39 +31,21 @@ namespace Ogre {
 namespace RTShader {
 
 //-----------------------------------------------------------------------------
-ProgramSet::ProgramSet() : mVSCpuProgram(0), mPSCpuProgram(0)
-{   
-}
+ProgramSet::ProgramSet() {}
 
 //-----------------------------------------------------------------------------
-ProgramSet::~ProgramSet()
-{
-    if (mVSCpuProgram != NULL)
-    {
-        ProgramManager::getSingleton().destroyCpuProgram(mVSCpuProgram);
-        mVSCpuProgram = NULL;
-    }
-
-    if (mPSCpuProgram != NULL)
-    {
-        ProgramManager::getSingleton().destroyCpuProgram(mPSCpuProgram);
-        mPSCpuProgram = NULL;
-    }
-                
-    mVSGpuProgram.reset();                    
-    mPSGpuProgram.reset();    
-}
+ProgramSet::~ProgramSet() {}
 
 //-----------------------------------------------------------------------------
-void ProgramSet::setCpuProgram(Program* program, GpuProgramType type)
+void ProgramSet::setCpuProgram(std::unique_ptr<Program>&& program)
 {
-    switch(type)
+    switch(program->getType())
     {
     case GPT_VERTEX_PROGRAM:
-        mVSCpuProgram = program;
+        mVSCpuProgram = std::move(program);
         break;
     case GPT_FRAGMENT_PROGRAM:
-        mPSCpuProgram = program;
+        mPSCpuProgram = std::move(program);
         break;
     default:
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
@@ -77,17 +59,17 @@ Program* ProgramSet::getCpuProgram(GpuProgramType type) const
     switch(type)
     {
     case GPT_VERTEX_PROGRAM:
-        return mVSCpuProgram;
+        return mVSCpuProgram.get();
     case GPT_FRAGMENT_PROGRAM:
-        return mPSCpuProgram;
+        return mPSCpuProgram.get();
     default:
         return NULL;
     }
 }
 //-----------------------------------------------------------------------------
-void ProgramSet::setGpuProgram(const GpuProgramPtr& program, GpuProgramType type)
+void ProgramSet::setGpuProgram(const GpuProgramPtr& program)
 {
-    switch(type)
+    switch(program->getType())
     {
     case GPT_VERTEX_PROGRAM:
         mVSGpuProgram = program;
