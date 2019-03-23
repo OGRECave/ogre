@@ -1670,6 +1670,13 @@ ShaderGenerator::SGTechnique::~SGTechnique()
     const String& materialName = mParent->getMaterialName();
     const String& groupName = mParent->getGroupName();
 
+    // Release CPU/GPU programs that associated with this technique passes.
+    // Needs the parent technique to still exist
+    for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
+    {
+        (*itPass)->releasePrograms();
+    }
+
     if (MaterialManager::getSingleton().resourceExists(materialName, groupName))
     {
         MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
@@ -1694,12 +1701,6 @@ ShaderGenerator::SGTechnique::~SGTechnique()
                 break;
             }       
         }
-    }
-
-    // Release CPU/GPU programs that associated with this technique passes.
-    for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
-    {
-        (*itPass)->releasePrograms();
     }
     
     // Destroy the passes.
