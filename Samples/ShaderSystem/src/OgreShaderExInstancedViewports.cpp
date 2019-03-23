@@ -231,7 +231,7 @@ bool ShaderExInstancedViewports::addPSInvocations( Function* psMain, const int g
     return true;
 }
 //-----------------------------------------------------------------------
-void ShaderExInstancedViewports::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList)
+void ShaderExInstancedViewports::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList)
 {
     if (mMonitorsCountChanged)
     {

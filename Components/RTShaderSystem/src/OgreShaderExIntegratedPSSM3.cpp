@@ -57,7 +57,7 @@ int IntegratedPSSM3::getExecutionOrder() const
 }
 
 //-----------------------------------------------------------------------
-void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, Pass* pass, 
+void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, const Pass* pass,
                                              const AutoParamDataSource* source, 
                                              const LightList* pLightList)
 {

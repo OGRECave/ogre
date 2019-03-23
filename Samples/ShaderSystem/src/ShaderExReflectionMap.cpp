@@ -276,7 +276,7 @@ void ShaderExReflectionMap::setReflectionPower(const Real reflectionPower)
 }
 
 //-----------------------------------------------------------------------
-void ShaderExReflectionMap::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList)
+void ShaderExReflectionMap::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList)
 {
     if (mReflectionPowerChanged)
     {

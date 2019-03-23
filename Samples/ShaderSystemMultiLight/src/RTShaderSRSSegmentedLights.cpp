@@ -54,7 +54,7 @@ int RTShaderSRSSegmentedLights::getExecutionOrder() const
 }
 
 //-----------------------------------------------------------------------
-void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
+void RTShaderSRSSegmentedLights::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
     const LightList* pLightList)
 {
     if ((mLightParamsList.empty()) && (!mUseSegmentedLightTexture))

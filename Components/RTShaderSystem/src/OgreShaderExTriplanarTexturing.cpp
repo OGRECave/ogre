@@ -175,7 +175,7 @@ namespace RTShader {
     }
 
     //-----------------------------------------------------------------------
-    void TriplanarTexturing::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
+    void TriplanarTexturing::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
                                          const LightList* pLightList)
     {
         mPSTPParams->setGpuParameter(mParameters);

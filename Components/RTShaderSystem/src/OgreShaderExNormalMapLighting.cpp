@@ -52,7 +52,7 @@ const String& NormalMapLighting::getType() const
 }
 
 //-----------------------------------------------------------------------
-void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
+void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
     const LightList* pLightList)
 {       
     if (mLightParamsList.empty())

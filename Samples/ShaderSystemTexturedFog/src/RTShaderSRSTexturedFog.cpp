@@ -64,7 +64,7 @@ int RTShaderSRSTexturedFog::getExecutionOrder() const
     return FFP_FOG;
 }
 //-----------------------------------------------------------------------
-void RTShaderSRSTexturedFog::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
+void RTShaderSRSTexturedFog::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
                                      const LightList* pLightList)
 {   
     if (mFogMode == FOG_NONE)

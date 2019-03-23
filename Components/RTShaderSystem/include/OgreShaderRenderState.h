@@ -153,7 +153,7 @@ public:
     @param source The auto parameter auto source instance.
     @param pLightList The light list used for the current rendering operation.
     */
-    void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+    void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 
     /** Add sub render state to this render state.
     @param subRenderState The sub render state to add.

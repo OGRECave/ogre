@@ -229,7 +229,7 @@ ProgramSet* TargetRenderState::createProgramSet()
 }
 
 //-----------------------------------------------------------------------
-void TargetRenderState::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
+void TargetRenderState::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
                                                 const LightList* pLightList)
 {
     for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)

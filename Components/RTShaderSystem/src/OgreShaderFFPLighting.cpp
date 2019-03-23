@@ -56,7 +56,7 @@ int	FFPLighting::getExecutionOrder() const
 }
 
 //-----------------------------------------------------------------------
-void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
+void FFPLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
 										  const LightList* pLightList)
 {		
 	if (mLightParamsList.empty())
