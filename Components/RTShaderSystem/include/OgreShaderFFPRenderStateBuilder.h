@@ -112,7 +112,8 @@ protected:
     */
     void resolveColourStageFlags(ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
 
-
+    /** Get custom FPP sub state of this pass. */
+    static SubRenderState* getCustomFFPSubState(ShaderGenerator::SGPass* sgPass, int subStateOrder);
 // Attributes.
 protected:
     // All factories needed by the FFP.

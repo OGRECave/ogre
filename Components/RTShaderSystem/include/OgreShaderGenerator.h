@@ -501,17 +501,13 @@ protected:
 		/** Get illumination state. */
 		bool isIlluminationPass() { return mStage != IS_UNKNOWN; }
 
-        /** Get custom FPP sub state of this pass. */
-        SubRenderState* getCustomFFPSubState(int subStateOrder);
-
         /** Get custom render state of this pass. */
         RenderState* getCustomRenderState() { return mCustomRenderState; }
 
         /** Set the custom render state of this pass. */
         void setCustomRenderState(RenderState* customRenderState) { mCustomRenderState = customRenderState; }
-    protected:
-        SubRenderState* getCustomFFPSubState(int subStateOrder, const RenderState* renderState);
 
+        const SGTechnique* getParent() const { return mParent; }
     protected:
         // Parent technique.
         SGTechnique* mParent;

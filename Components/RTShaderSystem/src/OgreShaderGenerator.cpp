@@ -1538,53 +1538,6 @@ void ShaderGenerator::SGPass::releasePrograms()
     if(!mTargetRenderState) return;
     mTargetRenderState->releasePrograms(mDstPass);
 }
-
-//-----------------------------------------------------------------------------
-SubRenderState* ShaderGenerator::SGPass::getCustomFFPSubState(int subStateOrder)
-{
-    SubRenderState* customSubState = NULL;
-
-    // Try to override with custom render state of this pass.
-    customSubState = getCustomFFPSubState(subStateOrder, mCustomRenderState);
-    
-    // Case no custom sub state of this pass found, try to override with global scheme state.
-    if (customSubState == NULL)
-    {
-        const String& schemeName = mParent->getDestinationTechniqueSchemeName();
-        const RenderState* renderStateGlobal = ShaderGenerator::getSingleton().getRenderState(schemeName);
-
-        customSubState = getCustomFFPSubState(subStateOrder, renderStateGlobal);
-    }
-
-    return customSubState;
-}
-
-//-----------------------------------------------------------------------------
-SubRenderState* ShaderGenerator::SGPass::getCustomFFPSubState(int subStateOrder, const RenderState* renderState)
-{
-    if (renderState != NULL)
-    {
-        const SubRenderStateList& subRenderStateList = renderState->getTemplateSubRenderStateList();
-
-        for (SubRenderStateListConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
-        {
-            SubRenderState* curSubRenderState = *it;
-
-            if (curSubRenderState->getExecutionOrder() == subStateOrder)
-            {   
-                SubRenderState* clone;
-
-                clone = ShaderGenerator::getSingleton().createSubRenderState(curSubRenderState->getType());
-                *clone = *curSubRenderState;
-
-                return clone;           
-            }
-        }
-    }
-    
-    return NULL;
-}
-
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, const Technique* srcTechnique,
                                           const String& dstTechniqueSchemeName,
