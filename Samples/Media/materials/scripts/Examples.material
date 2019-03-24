@@ -234,12 +234,16 @@ material Examples/MorningSkyBox
 	// HDR technique (fake)
 	technique
 	{
-		scheme HDR
+		// this causes the current FFP technique to be picked
+		// over the RTSS generated one
+		// scheme HDR
 
 		pass
 		{
 			lighting off
 			depth_write off
+
+			rtshader_system HDR {} // connect and set the scheme for the RTSS
 
 			texture_unit
 			{

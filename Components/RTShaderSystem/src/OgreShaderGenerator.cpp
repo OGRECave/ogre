@@ -503,16 +503,7 @@ SubRenderState* ShaderGenerator::createSubRenderState(ScriptCompiler* compiler,
 //-----------------------------------------------------------------------------
 void ShaderGenerator::createScheme(const String& schemeName)
 {
-    OGRE_LOCK_AUTO_MUTEX;
-
-    SGSchemeIterator itFind = mSchemeEntriesMap.find(schemeName);
-    SGScheme* schemeEntry   = NULL;
-
-    if (itFind == mSchemeEntriesMap.end())
-    {
-        schemeEntry = OGRE_NEW SGScheme(schemeName);
-        mSchemeEntriesMap[schemeName] = schemeEntry;
-    }
+    createOrRetrieveScheme(schemeName);
 }
 
 //-----------------------------------------------------------------------------
@@ -1759,6 +1750,7 @@ void ShaderGenerator::SGTechnique::buildTargetRenderState()
     mDstTechnique->getUserObjectBindings().setUserAny(SGTechnique::UserKey, Any(this));
     *mDstTechnique  = *mSrcTechnique;
     mDstTechnique->setSchemeName(mDstTechniqueSchemeName);
+    printf("%s -> %s\n", mSrcTechnique->getParent()->getName().c_str(), mDstTechniqueSchemeName.c_str());
     createSGPasses();
 
 
