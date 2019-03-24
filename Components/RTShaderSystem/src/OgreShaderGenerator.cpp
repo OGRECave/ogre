@@ -1176,7 +1176,7 @@ bool ShaderGenerator::validateMaterialIlluminationPasses(const String& schemeNam
 }
 
 //-----------------------------------------------------------------------------
-SGMaterialSerializerListener* ShaderGenerator::getMaterialSerializerListener()
+MaterialSerializer::Listener* ShaderGenerator::getMaterialSerializerListener()
 {
     if (!mMaterialSerializerListener)
         mMaterialSerializerListener.reset(new SGMaterialSerializerListener);

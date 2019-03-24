@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreShaderRenderState.h"
 #include "OgreScriptTranslator.h"
 #include "OgreShaderScriptTranslator.h"
+#include "OgreMaterialSerializer.h"
 
 
 namespace Ogre {
@@ -389,7 +390,7 @@ public:
     3. Add the return instance of serializer listener to the MaterialSerializer.
     4. Call one of the export methods of MaterialSerializer.
     */
-    SGMaterialSerializerListener* getMaterialSerializerListener();
+    MaterialSerializer::Listener* getMaterialSerializerListener();
 
     /** Return the current number of generated shaders. */
     size_t getShaderCount(GpuProgramType type) const;
