@@ -136,12 +136,47 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Ta
 
 
 //-----------------------------------------------------------------------------
+static SubRenderState* getSubStateByOrder(int subStateOrder, const RenderState* renderState)
+{
+    for (auto curSubRenderState : renderState->getTemplateSubRenderStateList())
+    {
+        if (curSubRenderState->getExecutionOrder() == subStateOrder)
+        {
+            SubRenderState* clone;
+
+            clone = ShaderGenerator::getSingleton().createSubRenderState(curSubRenderState->getType());
+            *clone = *curSubRenderState;
+
+            return clone;
+        }
+    }
+
+    return NULL;
+}
+SubRenderState* FFPRenderStateBuilder::getCustomFFPSubState(ShaderGenerator::SGPass* sgPass, int subStateOrder)
+{
+    SubRenderState* customSubState = NULL;
+
+    // Try to override with custom render state of this pass.
+    if(auto customRenderState = sgPass->getCustomRenderState())
+        customSubState = getSubStateByOrder(subStateOrder, customRenderState);
+
+    // Case no custom sub state of this pass found, try to override with global scheme state.
+    if (customSubState == NULL)
+    {
+        const String& schemeName = sgPass->getParent()->getDestinationTechniqueSchemeName();
+        const RenderState* renderStateGlobal = ShaderGenerator::getSingleton().getRenderState(schemeName);
+
+        customSubState = getSubStateByOrder(subStateOrder, renderStateGlobal);
+    }
+
+    return customSubState;
+}
+//-----------------------------------------------------------------------------
 void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType,
                                                 ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState)
 {
-    SubRenderState* subRenderState;
-
-    subRenderState = sgPass->getCustomFFPSubState(subRenderStateOrder);
+    SubRenderState* subRenderState = getCustomFFPSubState(sgPass, subRenderStateOrder);
 
     if (subRenderState == NULL)
     {
