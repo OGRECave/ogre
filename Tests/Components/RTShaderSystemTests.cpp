@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "RootWithoutRenderSystemFixture.h"
 #include "OgreShaderGenerator.h"
 #include "OgreShaderProgramManager.h"
-#include "OgreShaderMaterialSerializerListener.h"
 
 #include "OgreShaderFFPTransform.h"
 #include "OgreShaderFFPColour.h"

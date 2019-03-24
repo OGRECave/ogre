@@ -25,7 +25,7 @@ target_include_directories(OgreRTShaderSystem PUBLIC
   $<INSTALL_INTERFACE:include/OGRE/RTShaderSystem>)
 
 # repeat for PCH
-include_directories("${PROJECT_SOURCE_DIR}/OgreMain/include" "${PROJECT_BINARY_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/OgreMain/include" "${PROJECT_BINARY_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/src")
 add_native_precompiled_header(OgreRTShaderSystem "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreShaderPrecompiledHeaders.h")
 
 generate_export_header(OgreRTShaderSystem 

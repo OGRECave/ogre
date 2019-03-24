@@ -33,4 +33,3 @@
 %include "OgreShaderExIntegratedPSSM3.h"
 %include "OgreShaderExLayeredBlending.h"
 %include "OgreShaderExHardwareSkinning.h"
-%include "OgreShaderMaterialSerializerListener.h"
