@@ -10,7 +10,7 @@ SGTechniqueResolverListener::SGTechniqueResolverListener(Ogre::RTShader::ShaderG
 }
 
 Ogre::Technique *SGTechniqueResolverListener::handleSchemeNotFound(unsigned short schemeIndex, const Ogre::String &schemeName, Ogre::Material *originalMaterial, unsigned short lodIndex, const Ogre::Renderable *rend) {
-    if (schemeName != Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+    if (!mShaderGenerator->hasRenderState(schemeName))
     {
         return NULL;
     }
@@ -48,7 +48,7 @@ Ogre::Technique *SGTechniqueResolverListener::handleSchemeNotFound(unsigned shor
 
 bool SGTechniqueResolverListener::afterIlluminationPassesCreated(Ogre::Technique *tech)
 {
-    if(tech->getSchemeName() == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+    if(mShaderGenerator->hasRenderState(tech->getSchemeName()))
     {
         Ogre::Material* mat = tech->getParent();
         mShaderGenerator->validateMaterialIlluminationPasses(tech->getSchemeName(),
@@ -60,7 +60,7 @@ bool SGTechniqueResolverListener::afterIlluminationPassesCreated(Ogre::Technique
 
 bool SGTechniqueResolverListener::beforeIlluminationPassesCleared(Ogre::Technique *tech)
 {
-    if(tech->getSchemeName() == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+    if(mShaderGenerator->hasRenderState(tech->getSchemeName()))
     {
         Ogre::Material* mat = tech->getParent();
         mShaderGenerator->invalidateMaterialIlluminationPasses(tech->getSchemeName(),

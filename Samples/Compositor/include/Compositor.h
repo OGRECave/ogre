@@ -116,6 +116,10 @@ void Sample_Compositor::setupContent(void)
     compMgr.registerCompositorLogic("HDR", mCompositorLogics["HDR"]);
     compMgr.registerCompositorLogic("HeatVision", mCompositorLogics["HeatVision"]);
 
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+    mShaderGenerator->createScheme("HDR"); // make sure HDR viewport is handled
+#endif
+
     createTextures();
     /// Create a couple of hard coded postfilter effects as an example of how to do it
     /// but the preferred method is to use compositor scripts.
