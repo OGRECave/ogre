@@ -411,16 +411,18 @@ namespace Ogre {
 
         void lock(HardwareBuffer* p, HardwareBuffer::LockOptions options)
         {
+            assert(p);
             unlock();
             pBuf = p;
-            pData = pBuf ? pBuf->lock(options) : 0;
+            pData = pBuf->lock(options);
         }
         
         void lock(HardwareBuffer* p, size_t offset, size_t length, HardwareBuffer::LockOptions options)
         {
+            assert(p);
             unlock();
             pBuf = p;
-            pData = pBuf ? pBuf->lock(offset, length, options) : 0;
+            pData = pBuf->lock(offset, length, options);
         }
         
         template <typename T>
