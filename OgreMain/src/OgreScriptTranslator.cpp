@@ -1066,6 +1066,10 @@ namespace Ogre{
             }
 
         }
+        else
+        {
+            return false;
+        }
 
         return true;
     }
