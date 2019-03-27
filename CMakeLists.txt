@@ -37,7 +37,15 @@ if (APPLE AND NOT ANDROID)
   set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
   set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
   set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-  
+
+  if(POLICY CMP0068)
+    cmake_policy(SET CMP0068 NEW)  # CMake 3.9+: `RPATH` settings on macOS do not affect `install_name`.
+  endif()
+
+  if (NOT CMAKE_OSX_ARCHITECTURES)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "") # target the common case
+  endif()
+
   # otherwise apple defines a macro named check that conflicts with boost
   add_definitions(-D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=0)
 endif ()
@@ -271,22 +279,6 @@ elseif (APPLE AND NOT APPLE_IOS)
     string(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
   else()
     set(CMAKE_OSX_SYSROOT macosx)
-  endif()
-
-  if (NOT CMAKE_OSX_ARCHITECTURES)
-    if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-      if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
-        set(CMAKE_OSX_ARCHITECTURES "${ARCHS_STANDARD_64_BIT}")
-      else()
-        set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)")
-      endif()
-    else()
-      if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
-        set(CMAKE_OSX_ARCHITECTURES "${ARCHS_STANDARD_32_64_BIT}")
-      else()
-        set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_64_BIT)")
-      endif()
-    endif()
   endif()
 
   # Make sure that the OpenGL render system is selected for non-iOS Apple builds
