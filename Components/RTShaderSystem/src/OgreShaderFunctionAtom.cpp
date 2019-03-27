@@ -296,6 +296,15 @@ bool FunctionInvocation::operator < ( const FunctionInvocation& rhs ) const
     return FunctionInvocationLessThan()(*this, rhs);
 }
 
+static uchar getSwizzledSize(const Operand& op)
+{
+    auto gct = op.getParameter()->getType();
+    if (op.getMask() == Operand::OPM_ALL)
+        return GpuConstantDefinition::getElementSize(gct, false);
+
+    return Operand::getFloatCount(op.getMask());
+}
+
 bool FunctionInvocation::FunctionInvocationLessThan::operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const
 {
     // Check the function names first
@@ -341,25 +350,8 @@ bool FunctionInvocation::FunctionInvocationLessThan::operator ()(FunctionInvocat
         if (itLHSOps->getSemantic() > itRHSOps->getSemantic())
             return false;
 
-        GpuConstantType leftType    = itLHSOps->getParameter()->getType();
-        GpuConstantType rightType   = itRHSOps->getParameter()->getType();
-        
-        // If a swizzle mask is being applied to the parameter, generate the GpuConstantType to
-        // perform the parameter type comparison the way that the compiler will see it.
-        if ((itLHSOps->getFloatCount(itLHSOps->getMask()) > 0) ||
-           (itRHSOps->getFloatCount(itRHSOps->getMask()) > 0))
-        {
-            if (itLHSOps->getFloatCount(itLHSOps->getMask()) > 0)
-            {
-                leftType = (GpuConstantType)((itLHSOps->getParameter()->getType() - itLHSOps->getParameter()->getType()) +
-                                             itLHSOps->getFloatCount(itLHSOps->getMask()));
-            }
-            if (itRHSOps->getFloatCount(itRHSOps->getMask()) > 0)
-            {
-                rightType = (GpuConstantType)((itRHSOps->getParameter()->getType() - itRHSOps->getParameter()->getType()) +
-                                             itRHSOps->getFloatCount(itRHSOps->getMask()));
-            }
-        }
+        uchar leftType    = getSwizzledSize(*itLHSOps);
+        uchar rightType   = getSwizzledSize(*itRHSOps);
 
         if (leftType < rightType)
             return true;
@@ -393,36 +385,7 @@ bool FunctionInvocation::FunctionInvocationCompare::operator ()(FunctionInvocati
         if (itLHSOps->getSemantic() != itRHSOps->getSemantic())
             return false;
 
-        GpuConstantType leftType    = itLHSOps->getParameter()->getType();
-        GpuConstantType rightType   = itRHSOps->getParameter()->getType();
-        
-        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
-        {
-            if (leftType == GCT_SAMPLER1D)
-                leftType = GCT_SAMPLER2D;
-
-            if (rightType == GCT_SAMPLER1D)
-                rightType = GCT_SAMPLER2D;
-        }
-
-        // If a swizzle mask is being applied to the parameter, generate the GpuConstantType to
-        // perform the parameter type comparison the way that the compiler will see it.
-        if ((itLHSOps->getFloatCount(itLHSOps->getMask()) > 0) ||
-           (itRHSOps->getFloatCount(itRHSOps->getMask()) > 0))
-        {
-            if (itLHSOps->getFloatCount(itLHSOps->getMask()) > 0)
-            {
-                leftType = (GpuConstantType)((itLHSOps->getParameter()->getType() - itLHSOps->getParameter()->getType()) +
-                                             itLHSOps->getFloatCount(itLHSOps->getMask()));
-            }
-            if (itRHSOps->getFloatCount(itRHSOps->getMask()) > 0)
-            {
-                rightType = (GpuConstantType)((itRHSOps->getParameter()->getType() - itRHSOps->getParameter()->getType()) +
-                                             itRHSOps->getFloatCount(itRHSOps->getMask()));
-            }
-        }
-
-        if (leftType != rightType)
+        if (getSwizzledSize(*itLHSOps) != getSwizzledSize(*itRHSOps))
             return false;
     }
 

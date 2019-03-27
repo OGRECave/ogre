@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreShaderFFPTransform.h"
 #include "OgreShaderFFPColour.h"
 
+#include "OgreShaderFunctionAtom.h"
+
 using namespace Ogre;
 
 struct RTShaderSystem : public RootWithoutRenderSystemFixture
@@ -109,4 +111,23 @@ TEST_F(RTShaderSystem, TargetRenderState)
 
     EXPECT_TRUE(pass->hasGpuProgram(GPT_VERTEX_PROGRAM));
     EXPECT_TRUE(pass->hasGpuProgram(GPT_FRAGMENT_PROGRAM));
+}
+
+TEST_F(RTShaderSystem, FunctionInvocationOrder)
+{
+    using namespace RTShader;
+
+    FunctionInvocation a("name", 0);
+    FunctionInvocation b("name", 0);
+    FunctionInvocation c("name", 0);
+
+    a.pushOperand(ParameterFactory::createConstParam(Vector3()), Operand::OPS_IN);
+    b.pushOperand(ParameterFactory::createConstParam(Vector3()), Operand::OPS_IN, Operand::OPM_XY);
+    c.pushOperand(ParameterFactory::createConstParam(Vector3()), Operand::OPS_IN, Operand::OPM_XYZ);
+
+    EXPECT_FALSE(b == a);
+    EXPECT_TRUE(b < a);
+
+    EXPECT_TRUE(c == a);
+    EXPECT_FALSE(c < a);
 }
