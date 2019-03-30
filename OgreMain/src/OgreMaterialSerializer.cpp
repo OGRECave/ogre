@@ -863,15 +863,14 @@ namespace Ogre
             fireTextureUnitStateEvent(MSE_WRITE_BEGIN, skipWriting, pTex);
 
             // texture_alias
-            if (!pTex->getTextureNameAlias().empty())
+            if (!pTex->getTextureNameAlias().empty() && pTex->getTextureNameAlias() != pTex->getName())
             {
                 writeAttribute(4, "texture_alias");
                 writeValue(quoteWord(pTex->getTextureNameAlias()));
             }
 
             //texture name
-            if (pTex->getNumFrames() == 1 && !pTex->getTextureName().empty() &&
-                (pTex->getTextureType() == TEX_TYPE_CUBE_MAP))
+            if (pTex->getNumFrames() == 1 && !pTex->getTextureName().empty())
             {
                 writeAttribute(4, "texture");
                 writeValue(quoteWord(pTex->getTextureName()));
@@ -894,7 +893,7 @@ namespace Ogre
                     break;
                 };
 
-                if (pTex->getNumMipmaps() != MIP_DEFAULT)
+                if (uint32(pTex->getNumMipmaps()) != TextureManager::getSingleton().getDefaultNumMipmaps())
                 {
                     writeValue(StringConverter::toString(pTex->getNumMipmaps()));
                 }
