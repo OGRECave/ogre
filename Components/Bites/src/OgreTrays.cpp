@@ -1974,7 +1974,12 @@ void TrayManager::frameRendered(const Ogre::FrameEvent &evt)
 void TrayManager::windowUpdate()
 {
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-    mWindow->update();
+    unsigned long currentTime = mTimer->getMilliseconds();
+    if (currentTime - mLastStatUpdateTime > 250)
+    {
+        mLastStatUpdateTime = currentTime;
+        mWindow->update();
+    }
 #endif
 }
 
