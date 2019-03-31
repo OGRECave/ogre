@@ -45,31 +45,31 @@ void Timer::reset()
 }
 
 //--------------------------------------------------------------------------------//
-unsigned long Timer::getMilliseconds()
+uint64_t Timer::getMilliseconds()
 {
     auto now = steady_clock::now();
     return duration_cast<milliseconds>(now - start).count();
 }
 
 //--------------------------------------------------------------------------------//
-unsigned long Timer::getMicroseconds()
+uint64_t Timer::getMicroseconds()
 {
     auto now = steady_clock::now();
     return duration_cast<microseconds>(now - start).count();
 }
 
 //-- Common Across All Timers ----------------------------------------------------//
-unsigned long Timer::getMillisecondsCPU()
+uint64_t Timer::getMillisecondsCPU()
 {
     clock_t newClock = clock();
-    return (unsigned long)((float)(newClock-zeroClock) / ((float)CLOCKS_PER_SEC/1000.0)) ;
+    return (uint64_t)((float)(newClock-zeroClock) / ((float)CLOCKS_PER_SEC/1000.0)) ;
 }
 
 //-- Common Across All Timers ----------------------------------------------------//
-unsigned long Timer::getMicrosecondsCPU()
+uint64_t Timer::getMicrosecondsCPU()
 {
     clock_t newClock = clock();
-    return (unsigned long)((float)(newClock-zeroClock) / ((float)CLOCKS_PER_SEC/1000000.0)) ;
+    return (uint64_t)((float)(newClock-zeroClock) / ((float)CLOCKS_PER_SEC/1000000.0)) ;
 }
 
 }
