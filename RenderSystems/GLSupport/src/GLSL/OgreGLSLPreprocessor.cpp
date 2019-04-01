@@ -1218,7 +1218,7 @@ namespace Ogre {
     Done:
 
 #define IS_DIRECTIVE(s)                                                 \
-        (dirlen == strlen(s) && (strncmp (directive, s, strlen(s)) == 0))
+        (dirlen == strlen(s) && (strncmp (directive, s, dirlen) == 0))
 
         bool outputEnabled = ((EnableOutput & (EnableOutput + 1)) == 0);
         bool rc;
