@@ -167,9 +167,6 @@ namespace Ogre {
         void resetCompileError(void);
         size_t getSize(void) const;
         void touch(void);
-
-        /// Scan the file for \#include and replace with source from the OGRE resources
-        static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
     };
     /** @} */
     /** @} */

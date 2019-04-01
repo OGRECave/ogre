@@ -82,8 +82,6 @@ namespace Ogre {
 
         // check if syntax is supported
         bool isSyntaxSupported();
-        /// scan the file for #include and replace with source from the OGRE resources
-        String resolveCgIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName);
         // deletes the key word ": register(xx)" that hlsl2glsl doesn't know to handle
         String deleteRegisterFromCg(const String& inSource);
     };
