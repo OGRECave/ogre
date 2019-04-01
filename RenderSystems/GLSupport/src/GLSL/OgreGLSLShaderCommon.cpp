@@ -117,6 +117,9 @@ namespace Ogre {
             }
         }
 
+		// deal with includes
+		mSource = _resolveIncludes(mSource, this, mFilename);
+
         size_t out_size = 0;
         const char *src = mSource.c_str ();
         size_t src_len = mSource.size ();

@@ -22,33 +22,9 @@ uniform float	lightGloss;
 uniform float invShadowMapSize;
 uniform lowp sampler2D shadowMap;
 
-//declare external function
-
-// Simple PCF 
-// Number of samples in one dimension (square for total samples)
-#define NUM_SHADOW_SAMPLES_1D 2.0
-#define SHADOW_FILTER_SCALE 1.0
-
-#define SHADOW_SAMPLES NUM_SHADOW_SAMPLES_1D*NUM_SHADOW_SAMPLES_1D
-
-float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize)
-{
-    // 4-sample PCF
-    float shadow = 0.0;
-    float offset = (NUM_SHADOW_SAMPLES_1D/2.0 - 0.5) * SHADOW_FILTER_SCALE;
-    uv /= uv.w;
-    uv.z = uv.z * 0.5 + 0.5; // convert -1..1 to 0..1
-    for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE)
-        for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE)
-        {
-            vec2 newUV = uv.xy + vec2(x, y) * invShadowMapSize;
-            float depth = texture(shadowMap, newUV).x;
-            if (depth >= 1.0 || depth >= uv.z) // depth = 1.0 at PSSM end
-                shadow += 1.0;
-        }
-    shadow /= SHADOW_SAMPLES;
-    return shadow;
-}
+#define texture2D texture
+#define texture2DProj textureProj
+#include "TerrainHelpers.glsl"
 #endif
 
 in vec2 _uv0;
