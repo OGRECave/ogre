@@ -130,6 +130,9 @@ namespace Ogre {
         void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
         /** Gets the preprocessor defines used to compile the program. */
         const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
+
+        /// Scan the source for \#include and replace with contents from OGRE resources
+        static String _resolveIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
     };
     /** @} */
     /** @} */
