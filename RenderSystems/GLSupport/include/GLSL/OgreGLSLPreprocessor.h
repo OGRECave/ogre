@@ -506,35 +506,6 @@ namespace Ogre {
          *     string only if the returned address is not inside the source text.
          */
         char *Parse (const char *iSource, size_t iLength, size_t &oLength);
-
-        /**
-         * An error handler function type.
-         * The default implementation just drops a note to stderr and
-         * then the parser ends, returning NULL.
-         * @param iData
-         *     User-specific pointer from the corresponding CPreprocessor object.
-         * @param iLine
-         *     The line at which the error happened.
-         * @param iError
-         *     The error string.
-         * @param iToken
-         *     If not NULL contains the erroneous token
-         * @param iTokenLen
-         *     The length of iToken. iToken is never zero-terminated!
-         */
-        typedef void (*ErrorHandlerFunc) (
-            void *iData, int iLine, const char *iError,
-            const char *iToken, size_t iTokenLen);
-
-        /**
-         * A pointer to the preprocessor's error handler.
-         * You can assign the address of your own function to this variable
-         * and implement your own error handling (e.g. throwing an exception etc).
-         */
-        static ErrorHandlerFunc ErrorHandler;
-
-        /// User-specific storage, passed to Error()
-        void *ErrorData;
     };
 
 } // namespace Ogre
