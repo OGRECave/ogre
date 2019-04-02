@@ -211,6 +211,10 @@ namespace Ogre
 
         size_t startMarker = 0;
         size_t i = inSource.find("#include");
+
+        bool supportsFilename = StringUtil::endsWith(fileName, "cg");
+        String lineFilename = supportsFilename ? StringUtil::format(" \"%s\"", fileName.c_str()) : " 0";
+
         while (i != String::npos)
         {
             size_t includePos = i;
@@ -293,15 +297,16 @@ namespace Ogre
                 lineCount++;
             }
 
-            String lineFilename = StringUtil::endsWith(fileName, "cg") ? StringUtil::format("\"%s\"", fileName.c_str()) : "";
+            // use include filename if supported (cg) - else use include line as id (glsl)
+            String incLineFilename = supportsFilename ? StringUtil::format(" \"%s\"", filename.c_str()) : StringUtil::format(" %zu", lineCount);
 
             // Add #line to the start of the included file to correct the line count)
-            outSource.append("#line 1 " + lineFilename + "\n");
+            outSource.append("#line 1 " + incLineFilename + "\n");
 
             outSource.append(resource->getAsString());
 
             // Add #line to the end of the included file to correct the line count
-            outSource.append("\n#line " + Ogre::StringConverter::toString(lineCount) + lineFilename + "\n");
+            outSource.append("\n#line " + std::to_string(lineCount) + lineFilename + "\n");
 
             startMarker = newLineAfter;
 
