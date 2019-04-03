@@ -1,5 +1,6 @@
 #include "OgreStaticPluginLoader.h"
 #include "OgreBuildSettings.h"
+#include "OgreComponents.h"
 #include "OgreRoot.h"
 #include "OgrePlugin.h"
 

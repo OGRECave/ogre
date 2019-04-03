@@ -26,6 +26,8 @@
  -----------------------------------------------------------------------------
  */
 #include "DefaultSamplesPlugin.h"
+
+#include "OgreComponents.h"
 #include "BezierPatch.h"
 #include "BSP.h"
 #include "CameraTrack.h"

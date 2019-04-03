@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreDepthBuffer.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreHardwareOcclusionQuery.h"
+#include "OgreComponents.h"
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #include "OgreRTShaderConfig.h"
