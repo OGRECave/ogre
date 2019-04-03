@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreInput.h"
 #include "OgreRoot.h"
 #include "OgreCamera.h"
+#include "OgreComponents.h"
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #include "OgreRTShaderSystem.h"
