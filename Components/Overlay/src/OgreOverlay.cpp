@@ -138,7 +138,6 @@ namespace Ogre {
         Matrix4 xform;
         _getWorldTransforms(&xform);
         cont->_notifyWorldTransforms(xform);
-        cont->_notifyViewport();
     }
     //---------------------------------------------------------------------
     void Overlay::remove2D(OverlayContainer* cont)
