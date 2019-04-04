@@ -84,8 +84,6 @@ namespace Ogre {
         elem->_notifyParent(this, mOverlay);
         elem->_notifyZOrder(Math::uint16Cast(mZOrder + 1));
         elem->_notifyWorldTransforms(mXForm);
-        elem->_notifyViewport();
-
     }
     //---------------------------------------------------------------------
     void OverlayContainer::addChildImpl(OverlayContainer* cont)
