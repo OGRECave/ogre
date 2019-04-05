@@ -26,9 +26,6 @@ THE SOFTWARE
 #ifndef __OgreThreadDefinesSTD_H__
 #define __OgreThreadDefinesSTD_H__
 
-#define OGRE_TOKEN_PASTE(x, y) x ## y
-#define OGRE_TOKEN_PASTE_EXTRA(x, y) OGRE_TOKEN_PASTE(x, y)
-
 // Thread objects and related functions
 #define OGRE_THREAD_TYPE std::thread
 #define OGRE_THREAD_CREATE(name, worker) std::thread* name = OGRE_NEW_T(std::thread, MEMCATEGORY_GENERAL)(worker)
@@ -38,13 +35,13 @@ THE SOFTWARE
 #define OGRE_THREAD_WORKER_INHERIT
 
 #define OGRE_WQ_MUTEX(name) mutable std::recursive_mutex name
-#define OGRE_WQ_LOCK_MUTEX(name) std::unique_lock<std::recursive_mutex> OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
+#define OGRE_WQ_LOCK_MUTEX(name) std::unique_lock<std::recursive_mutex> OGRE_TOKEN_PASTE(ogrenameLock, __LINE__) (name)
 #define OGRE_WQ_LOCK_MUTEX_NAMED(mutexName, lockName) std::unique_lock<std::recursive_mutex> lockName(mutexName)
 
 // Read-write mutex
 #define OGRE_WQ_RW_MUTEX(name) mutable std::recursive_mutex name
-#define OGRE_WQ_LOCK_RW_MUTEX_READ(name) std::unique_lock<std::recursive_mutex> OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
-#define OGRE_WQ_LOCK_RW_MUTEX_WRITE(name) std::unique_lock<std::recursive_mutex> OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
+#define OGRE_WQ_LOCK_RW_MUTEX_READ(name) std::unique_lock<std::recursive_mutex> OGRE_TOKEN_PASTE(ogrenameLock, __LINE__) (name)
+#define OGRE_WQ_LOCK_RW_MUTEX_WRITE(name) std::unique_lock<std::recursive_mutex> OGRE_TOKEN_PASTE(ogrenameLock, __LINE__) (name)
 
 #define OGRE_WQ_THREAD_SYNCHRONISER(sync) std::condition_variable_any sync
 #define OGRE_THREAD_WAIT(sync, mutex, lock) sync.wait(lock)

@@ -26,21 +26,18 @@ THE SOFTWARE
 #ifndef __OgreThreadDefinesTBB_H__
 #define __OgreThreadDefinesTBB_H__
 
-#define OGRE_TOKEN_PASTE(x, y) x ## y
-#define OGRE_TOKEN_PASTE_EXTRA(x, y) OGRE_TOKEN_PASTE(x, y)
-
 #define OGRE_THREAD_HARDWARE_CONCURRENCY tbb::task_scheduler_init::default_num_threads()
 #define OGRE_THREAD_CURRENT_ID tbb::this_tbb_thread::get_id()
 #define OGRE_THREAD_WORKER_INHERIT
 
 #define OGRE_WQ_MUTEX(name) mutable tbb::recursive_mutex name
-#define OGRE_WQ_LOCK_MUTEX(name) tbb::recursive_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
+#define OGRE_WQ_LOCK_MUTEX(name) tbb::recursive_mutex::scoped_lock OGRE_TOKEN_PASTE(ogrenameLock, __LINE__) (name)
 #define OGRE_WQ_LOCK_MUTEX_NAMED(mutexName, lockName) tbb::recursive_mutex::scoped_lock lockName(mutexName)
 
 // Read-write mutex
 #define OGRE_WQ_RW_MUTEX(name) mutable tbb::queuing_rw_mutex name
-#define OGRE_WQ_LOCK_RW_MUTEX_READ(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, false)
-#define OGRE_WQ_LOCK_RW_MUTEX_WRITE(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, true)
+#define OGRE_WQ_LOCK_RW_MUTEX_READ(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE(ogrenameLock, __LINE__) (name, false)
+#define OGRE_WQ_LOCK_RW_MUTEX_WRITE(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE(ogrenameLock, __LINE__) (name, true)
 
 #if OGRE_THREAD_SUPPORT != 3
 #define OGRE_AUTO_MUTEX mutable tbb::recursive_mutex OGRE_AUTO_MUTEX_NAME

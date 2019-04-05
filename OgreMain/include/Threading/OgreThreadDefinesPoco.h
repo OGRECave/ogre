@@ -26,9 +26,6 @@ THE SOFTWARE
 #ifndef __OgreThreadDefinesPoco_H__
 #define __OgreThreadDefinesPoco_H__
 
-#define OGRE_TOKEN_PASTE(x, y) x ## y
-#define OGRE_TOKEN_PASTE_EXTRA(x, y) OGRE_TOKEN_PASTE(x, y)
-
 // Thread objects and related functions
 #define OGRE_THREAD_TYPE Poco::Thread
 #define OGRE_THREAD_CREATE(name, worker) Poco::Thread* name = OGRE_NEW_T(Poco::Thread, MEMCATEGORY_GENERAL)(); name->start(worker)
@@ -38,13 +35,13 @@ THE SOFTWARE
 #define OGRE_THREAD_WORKER_INHERIT : public Poco::Runnable
 
 #define OGRE_WQ_MUTEX(name) mutable Poco::Mutex name
-#define OGRE_WQ_LOCK_MUTEX(name) Poco::Mutex::ScopedLock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
+#define OGRE_WQ_LOCK_MUTEX(name) Poco::Mutex::ScopedLock OGRE_TOKEN_PASTE(ogrenameLock, __LINE__) (name)
 #define OGRE_WQ_LOCK_MUTEX_NAMED(mutexName, lockName) Poco::Mutex::ScopedLock lockName(mutexName)
 
 // Read-write mutex
 #define OGRE_WQ_RW_MUTEX(name) mutable Poco::RWLock name
-#define OGRE_WQ_LOCK_RW_MUTEX_READ(name) Poco::RWLock::ScopedLock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, false)
-#define OGRE_WQ_LOCK_RW_MUTEX_WRITE(name) Poco::RWLock::ScopedLock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, true)
+#define OGRE_WQ_LOCK_RW_MUTEX_READ(name) Poco::RWLock::ScopedLock OGRE_TOKEN_PASTE(ogrenameLock, __LINE__) (name, false)
+#define OGRE_WQ_LOCK_RW_MUTEX_WRITE(name) Poco::RWLock::ScopedLock OGRE_TOKEN_PASTE(ogrenameLock, __LINE__) (name, true)
 
 #define OGRE_WQ_THREAD_SYNCHRONISER(sync) Poco::Condition sync
 #define OGRE_THREAD_WAIT(sync, mutex, lock) sync.wait(mutex)
