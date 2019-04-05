@@ -15,6 +15,7 @@
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES
     ${PROJECT_BINARY_DIR}/include/OgreBuildSettings.h
+    ${PROJECT_BINARY_DIR}/include/OgreComponents.h
     ${PROJECT_BINARY_DIR}/include/OgreExports.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/Ogre.i)
 
