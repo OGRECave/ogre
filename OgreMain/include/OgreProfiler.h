@@ -90,33 +90,6 @@ namespace Ogre {
         OGREPROF_RENDERING = 0x20000000
     };
 
-    /** An individual profile that will be processed by the Profiler
-        @remarks
-            Use the macro OgreProfile(name) instead of instantiating this profile directly
-        @remarks
-            We use this Profile to allow scoping rules to signify the beginning and end of
-            the profile. Use the Profiler singleton (through the macro OgreProfileBegin(name)
-            and OgreProfileEnd(name)) directly if you want a profile to last
-            outside of a scope (i.e. the main game loop).
-        @author Amit Mathew (amitmathew (at) yahoo (dot) com)
-    */
-    class _OgreExport Profile : 
-        public ProfilerAlloc 
-    {
-
-        public:
-            Profile(const String& profileName, uint32 groupID = (uint32)OGREPROF_USER_DEFAULT);
-            ~Profile();
-
-        protected:
-
-            /// The name of this profile
-            String mName;
-            /// The group ID
-            uint32 mGroupID;
-            
-    };
-
     /** Represents the total timing information of a profile
         since profiles can be called more than once each frame
     */
@@ -486,6 +459,34 @@ namespace Ogre {
 
 
     }; // end class
+
+    /** An individual profile that will be processed by the Profiler
+        @remarks
+            Use the macro OgreProfile(name) instead of instantiating this profile directly
+        @remarks
+            We use this Profile to allow scoping rules to signify the beginning and end of
+            the profile. Use the Profiler singleton (through the macro OgreProfileBegin(name)
+            and OgreProfileEnd(name)) directly if you want a profile to last
+            outside of a scope (i.e. the main game loop).
+        @author Amit Mathew (amitmathew (at) yahoo (dot) com)
+    */
+    class Profile : public ProfilerAlloc
+    {
+
+    public:
+        Profile(const String& profileName, uint32 groupID = (uint32)OGREPROF_USER_DEFAULT)
+            : mName(profileName), mGroupID(groupID)
+        {
+            Profiler::getSingleton().beginProfile(profileName, groupID);
+        }
+        ~Profile() { Profiler::getSingleton().endProfile(mName, mGroupID); }
+
+    protected:
+        /// The name of this profile
+        String mName;
+        /// The group ID
+        uint32 mGroupID;
+    };
     /** @} */
     /** @} */
 
