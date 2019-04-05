@@ -54,20 +54,6 @@ namespace Ogre {
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
-    //-----------------------------------------------------------------------
-    Profile::Profile(const String& profileName, uint32 groupID) 
-        : mName(profileName)
-        , mGroupID(groupID)
-    {
-        Ogre::Profiler::getSingleton().beginProfile(profileName, groupID);
-    }
-    //-----------------------------------------------------------------------
-    Profile::~Profile()
-    {
-        Ogre::Profiler::getSingleton().endProfile(mName, mGroupID);
-    }
-    //-----------------------------------------------------------------------
-
 
     //-----------------------------------------------------------------------
     // PROFILER DEFINITIONS
