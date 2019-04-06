@@ -1,6 +1,6 @@
 # Using the Profiler {#profiler}
 
-@note If you are using the Ogre SDK and you want to use the Profiler, it is advisable to switch to the source code version of Ogre, because the SDK is shipped with `OGRE_PROFILING=OFF`, so Profiling is disabled by default.
+@note If you are using the Ogre SDK and you want to use the Profiler, it is advisable to switch to the source code version of Ogre, because the SDK is shipped with `OGRE_PROFILING=OFF`, so instrumentation is disabled by default.
 
 First you want to initialize the Profiler like this:
 ```cpp
@@ -100,7 +100,7 @@ To maximize the accuracy of a profile, it is best to remove the child profiles o
 Some tests I've conducted show that the profiling code will max out unexpectedly, so take the maximum frame time value with a grain of salt (See the *Known Issues* section). I think this only happens when a profile is first created, so you can possibly get around this issue by calling the reset() function after the first frame.
 
 # Release Version Considerations
-For the release version of your app, you should set `OGRE_PROFILING=OFF` in CMake. If the build you are using has been compiled with the `OGRE_PROFILING=OFF` and you still want to use the profiler without recompiling your SDK, a quick workaround is to instantiate a dummy profiler like this:
+For the release version of your app, you should set `OGRE_PROFILING=OFF` in CMake. If the build you are using has been compiled with the `OGRE_PROFILING=OFF` and you still want to use instrumentation, you can instantiate a dummy profiler like this:
 
 ```cpp
 // Create dummy profile to set singleton pointer
@@ -114,7 +114,7 @@ Ogre::Profiler::getSingleton().setEnabled(true);
 The profiler will now work but the 3 OgreProfile macro will not work. You will have to manually use the beginProfile() and endProfile() method. You can also instantiate scope-limited Profile objects or simply define your own macros somewhere in your code.
 
 ```cpp
-#define MyOgreProfile( a ) Ogre::Profile _OgreProfileInstance( (a) )
-#define MyOgreProfileBegin( a ) Ogre::Profiler::getSingleton().beginProfile( (a) )
-#define MyOgreProfileEnd( a ) Ogre::Profiler::getSingleton().endProfile( (a) )
+#define MyScopedProfile( a ) Ogre::Profile _OgreProfileInstance( (a) )
+#define MyProfileBegin( a ) Ogre::Profiler::getSingleton().beginProfile( (a) )
+#define MyProfileEnd( a ) Ogre::Profiler::getSingleton().endProfile( (a) )
 ```
