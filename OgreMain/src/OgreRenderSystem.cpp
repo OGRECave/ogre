@@ -257,6 +257,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::_swapAllRenderTargetBuffers()
     {
+        OgreProfile("_swapAllRenderTargetBuffers");
         // Update all in order of priority
         // This ensures render-to-texture targets get updated before render windows
         RenderTargetPriorityMap::iterator itarg, itargend;
