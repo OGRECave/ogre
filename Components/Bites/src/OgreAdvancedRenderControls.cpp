@@ -145,15 +145,12 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
     {
         mCamera->getViewport()->getTarget()->writeContentsToTimestampedFile("screenshot", ".png");
     }
-#if OGRE_PROFILING
     // Toggle visibility of profiler window
     else if (key == 'p')
     {
-        Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
-        if (prof)
+        if (auto prof = Ogre::Profiler::getSingletonPtr())
             prof->setEnabled(!prof->getEnabled());
     }
-#endif // OGRE_PROFILING
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     // Toggle schemes.
     else if (key == SDLK_F2) {

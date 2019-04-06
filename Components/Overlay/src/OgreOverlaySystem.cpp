@@ -48,14 +48,11 @@ namespace Ogre {
         mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::TextAreaOverlayElementFactory());
 
         mFontManager = OGRE_NEW FontManager();
-#if OGRE_PROFILING
-        mProfileListener = new Ogre::OverlayProfileSessionListener();
-        Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
-        if (prof)
+        if (auto prof = Profiler::getSingletonPtr())
         {
+            mProfileListener = new Ogre::OverlayProfileSessionListener();
             prof->addListener(mProfileListener);
         }
-#endif
     }
     //---------------------------------------------------------------------
     OverlaySystem::~OverlaySystem()
@@ -63,14 +60,12 @@ namespace Ogre {
         if(RenderSystem::getSharedListener() == this)
             RenderSystem::setSharedListener(0);
 
-#if OGRE_PROFILING
-        Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
-        if (prof)
+        if (auto prof = Profiler::getSingletonPtr())
         {
             prof->removeListener(mProfileListener);
+            delete mProfileListener;
         }
-        delete mProfileListener;
-#endif
+
         OGRE_DELETE mOverlayManager;
         OGRE_DELETE mFontManager;
     }

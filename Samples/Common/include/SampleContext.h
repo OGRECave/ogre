@@ -64,11 +64,9 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void runSample(Sample* s)
         {
-#if OGRE_PROFILING
             Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
             if (prof)
                 prof->setEnabled(false);
-#endif
 
             if (mCurrentSample)
             {
@@ -119,10 +117,9 @@ namespace OgreBites
 
                 s->_setup(mWindow, mFSLayer, mOverlaySystem);   // start new sample
             }
-#if OGRE_PROFILING
+
             if (prof)
                 prof->setEnabled(true);
-#endif
 
             mCurrentSample = s;
         }

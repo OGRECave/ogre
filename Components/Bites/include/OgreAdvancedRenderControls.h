@@ -46,7 +46,7 @@ class ParamsPanel;
 /**
    - F:        Toggle frame rate stats on/off
    - G:        Toggle advanced frame stats on/off
-   - P         Toggle profiler window on/ off (if compiled with OGRE_PROFILING)
+   - P         Toggle profiler window on/ off
    - R:        Render mode
                - Wireframe
                - Points
