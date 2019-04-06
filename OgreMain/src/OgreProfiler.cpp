@@ -41,6 +41,11 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 
 #include "OgreTimer.h"
 
+#ifdef USE_REMOTERY
+#include "Remotery.h"
+static Remotery* rmt;
+#endif
+
 namespace Ogre {
     //-----------------------------------------------------------------------
     // PROFILE DEFINITIONS
@@ -75,6 +80,16 @@ namespace Ogre {
         , mResetExtents(false)
     {
         mRoot.hierarchicalLvl = 0 - 1;
+
+#ifdef USE_REMOTERY
+        rmt_Settings()->reuse_open_port = true;
+        if(auto error = rmt_CreateGlobalInstance(&rmt))
+        {
+            LogManager::getSingleton().logError("Could not launch Remotery - RMT_ERROR " + std::to_string(error));
+            return;
+        }
+        rmt_SetCurrentThreadName("Ogre Main");
+#endif
     }
     //-----------------------------------------------------------------------
     ProfileInstance::ProfileInstance(void)
@@ -109,6 +124,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Profiler::~Profiler()
     {
+#ifdef USE_REMOTERY
+        rmt_DestroyGlobalInstance(rmt);
+#else
         if (!mRoot.children.empty()) 
         {
             // log the results of our profiling before we quit
@@ -117,6 +135,7 @@ namespace Ogre {
 
         // clear all our lists
         mDisabledProfiles.clear();
+#endif
     }
     //-----------------------------------------------------------------------
     void Profiler::setTimer(Timer* t)
@@ -178,25 +197,27 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Profiler::beginProfile(const String& profileName, uint32 groupID) 
     {
-        // regardless of whether or not we are enabled, we need the application's root profile (ie the first profile started each frame)
-        // we need this so bogus profiles don't show up when users enable profiling mid frame
-        // so we check
-
         // if the profiler is enabled
-        if (!mEnabled) 
+        if (!mEnabled)
             return;
 
         // mask groups
         if ((groupID & mProfileMask) == 0)
             return;
 
-        // we only process this profile if isn't disabled
-        if (mDisabledProfiles.find(profileName) != mDisabledProfiles.end()) 
-            return;
-
         // empty string is reserved for the root
         // not really fatal anymore, however one shouldn't name one's profile as an empty string anyway.
         assert ((profileName != "") && ("Profile name can't be an empty string"));
+#ifdef USE_REMOTERY
+        rmt_BeginCPUSampleDynamic(profileName.c_str(), RMTSF_Aggregate);
+#else
+        // we only process this profile if isn't disabled
+        if (mDisabledProfiles.find(profileName) != mDisabledProfiles.end())
+            return;
+
+        // regardless of whether or not we are enabled, we need the application's root profile (ie the first profile started each frame)
+        // we need this so bogus profiles don't show up when users enable profiling mid frame
+        // so we check
 
         // this would be an internal error.
         assert (mCurrent);
@@ -233,10 +254,21 @@ namespace Ogre {
         // we do this at the very end of the function to get the most
         // accurate timing results
         mCurrent->currTime = mTimer->getMicroseconds();
+#endif
     }
     //-----------------------------------------------------------------------
     void Profiler::endProfile(const String& profileName, uint32 groupID) 
     {
+#ifdef USE_REMOTERY
+        if (!mEnabled)
+            return;
+
+        // mask groups
+        if ((groupID & mProfileMask) == 0)
+            return;
+
+        rmt_EndCPUSample();
+#else
         if(!mEnabled) 
         {
             // if the profiler received a request to be enabled or disabled
@@ -335,6 +367,7 @@ namespace Ogre {
             // we display everything to the screen
             displayResults();
         }
+#endif
     }
     //-----------------------------------------------------------------------
     void Profiler::beginGPUEvent(const String& event)

@@ -172,6 +172,11 @@ if (OGRE_CONFIG_ENABLE_ZIP)
   list(APPEND LIBRARIES ZLIB::ZLIB)
 endif ()
 
+if(OGRE_PROFILING_REMOTERY_PATH)
+  list(APPEND SOURCE_FILES ${OGRE_PROFILING_REMOTERY_PATH}/Remotery.c)
+  set_source_files_properties(src/OgreProfiler.cpp PROPERTIES COMPILE_DEFINITIONS USE_REMOTERY)
+endif()
+
 set (TARGET_LINK_FLAGS "")
 
 # setup OgreMain target
@@ -192,7 +197,8 @@ generate_export_header(OgreMain
 target_include_directories(OgreMain PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" 
   "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>"
-  $<INSTALL_INTERFACE:include/OGRE>)
+  $<INSTALL_INTERFACE:include/OGRE>
+  PRIVATE "${OGRE_PROFILING_REMOTERY_PATH}")
 
 # In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
 if(WIN32 AND MSVC10 AND CMAKE_CL_64)
