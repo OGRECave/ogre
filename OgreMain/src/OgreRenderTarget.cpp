@@ -564,7 +564,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderTarget::update(bool swap)
     {
-        OgreProfileBeginGPUEvent("RenderTarget: " + getName());
+        OgreProfileBeginGPUEvent(getName());
         // call implementation
         updateImpl();
 
@@ -574,7 +574,7 @@ namespace Ogre {
             // Swap buffers
             swapBuffers();
         }
-        OgreProfileEndGPUEvent("RenderTarget: " + getName());
+        OgreProfileEndGPUEvent(getName());
     }
     
 

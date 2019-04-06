@@ -1,6 +1,8 @@
 # Using the Profiler {#profiler}
 
-@note If you are using the Ogre SDK and you want to use the Profiler, it is advisable to switch to the source code version of Ogre, because the SDK is shipped with `OGRE_PROFILING=OFF`, so Profiling is disabled by default.
+@note If you are using the Ogre SDK and you want to use the Profiler, it is advisable to switch to the source code version of Ogre, because the SDK is shipped with `OGRE_PROFILING=OFF`, so instrumentation is disabled by default.
+
+@tableofcontents
 
 First you want to initialize the Profiler like this:
 ```cpp
@@ -32,10 +34,13 @@ Make sure the names match exactly, otherwise the profiler will fail an assert. N
 ```
 If you want a profile to last outside of its scope, use OgreProfileBegin(<name>) and OgreProfileEnd(<name>) like you did when creating the main loop profile.
 
-# Reading the Display
+# Reading the Display {#profRead}
+
+![](profiler.jpg)
+
 On the left side are the profile names with a number in parentheses next to it. This number is the number of times this profile was called during this frame. If this number is 0, that means that the profile was called before, but is not being called currently. The bars on the left represent the frame time statistics. You can see indicators above which show that a profile can take anywhere from 0% to 100% of the frame time. The big yellow bars show the current frame percentage that the profile is taking. The green line shows the minimum frame time, the red line is the maximum frame time, and the blue line is the average frame time. Big discrepancies between the average and maximum can possibly be the sign of a performance bottleneck (however it could be the profiler acting strangely, see the ''Known Issues'' section). These results will be printed to the log when the application ends or you can manually do it by calling logResults().
 
-# Features
+# Features {#profFeatures}
 ## Disabling the Profiler
 You can disable the profiler by calling:
 ```cpp
@@ -92,15 +97,24 @@ You can change how frequently the display is updated to suit your tastes like th
 ```
 Basically the tradeoff is between how accurate the display is and the amount of flicker. The default is that the display is updated every 10 frames.
 
-# Performance and Accuracy
+# Performance and Accuracy {#profAccuracy}
 I've tried to minimize the performance hit from using the profiler. However, like anything else, it still takes some time to perform the necessary calculations. There are some steps you can take to increase the accuracy of the results. Firstly, although the profiler supports multiple calls of a profile during each frame, doing this more than a few times can cause the profiler to take significantly longer than the actual code you are trying to profile. Therefore it is recommended that you move the profile up one level (such as outside of a for loop) so that it is called fewer times.
 
 To maximize the accuracy of a profile, it is best to remove the child profiles of the profile you are analysing. Child profiles increases the frame time of the parent due to the overhead of using the profiler.
 
 Some tests I've conducted show that the profiling code will max out unexpectedly, so take the maximum frame time value with a grain of salt (See the *Known Issues* section). I think this only happens when a profile is first created, so you can possibly get around this issue by calling the reset() function after the first frame.
 
-# Release Version Considerations
-For the release version of your app, you should set `OGRE_PROFILING=OFF` in CMake. If the build you are using has been compiled with the `OGRE_PROFILING=OFF` and you still want to use the profiler without recompiling your SDK, a quick workaround is to instantiate a dummy profiler like this:
+# Remotery Backend {#profRemotery}
+
+If you need some more overview or want to profile a remote device, the profiler optionally supports using [Remotery](https://github.com/Celtoys/Remotery).
+
+To enable the Remotery backend set `OGRE_PROFILING_REMOTERY_PATH` in CMake to point to the `Remotery/lib` directory (containing `Remotery.c`).
+Remotery will be compiled into OgreMain and can be accessed as usual.
+
+Note that no features besides Ogre::Profiler::setEnabled are available when using Remotery.
+
+# Release Version Considerations {#profRelmode}
+For the release version of your app, you should set `OGRE_PROFILING=OFF` in CMake. If the build you are using has been compiled with the `OGRE_PROFILING=OFF` and you still want to use instrumentation, you can instantiate a dummy profiler like this:
 
 ```cpp
 // Create dummy profile to set singleton pointer
@@ -114,7 +128,7 @@ Ogre::Profiler::getSingleton().setEnabled(true);
 The profiler will now work but the 3 OgreProfile macro will not work. You will have to manually use the beginProfile() and endProfile() method. You can also instantiate scope-limited Profile objects or simply define your own macros somewhere in your code.
 
 ```cpp
-#define MyOgreProfile( a ) Ogre::Profile _OgreProfileInstance( (a) )
-#define MyOgreProfileBegin( a ) Ogre::Profiler::getSingleton().beginProfile( (a) )
-#define MyOgreProfileEnd( a ) Ogre::Profiler::getSingleton().endProfile( (a) )
+#define MyScopedProfile( a ) Ogre::Profile _OgreProfileInstance( (a) )
+#define MyProfileBegin( a ) Ogre::Profiler::getSingleton().beginProfile( (a) )
+#define MyProfileEnd( a ) Ogre::Profiler::getSingleton().endProfile( (a) )
 ```

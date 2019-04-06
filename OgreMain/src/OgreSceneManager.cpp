@@ -1238,7 +1238,8 @@ void SceneManager::prepareRenderQueue(void)
 //-----------------------------------------------------------------------
 void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverlays)
 {
-    OgreProfileGroup("_renderScene", OGREPROF_GENERAL);
+    assert(camera);
+    OgreProfileGroup(camera->getName(), OGREPROF_GENERAL);
 
     Root::getSingleton()._pushCurrentSceneManager(this);
     mActiveQueuedRenderableVisitor->targetSceneMgr = this;
@@ -1996,7 +1997,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                                       bool lightScissoringClipping, bool doLightIteration,
                                       const LightList* manualLightList)
 {
-    OgreProfileBeginGPUEvent("Material: " + pass->getParent()->getParent()->getName());
+    OgreProfileBeginGPUEvent(pass->getParent()->getParent()->getName());
 
     // Tell auto params object about the renderable change
     mAutoParamDataSource->setCurrentRenderable(rend);
@@ -2011,7 +2012,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         _issueRenderOp(rend, NULL);
         // Reset view / projection changes if any
         resetViewProjMode();
-        OgreProfileEndGPUEvent("Material: " + pass->getParent()->getParent()->getName());
+        OgreProfileEndGPUEvent(pass->getParent()->getParent()->getName());
         return;
     }
 
@@ -2092,7 +2093,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
         // Reset view / projection changes if any
         resetViewProjMode();
-        OgreProfileEndGPUEvent("Material: " + pass->getParent()->getParent()->getName());
+        OgreProfileEndGPUEvent(pass->getParent()->getParent()->getName());
         return;
     }
 
@@ -2268,7 +2269,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     
     // Reset view / projection changes if any
     resetViewProjMode();
-    OgreProfileEndGPUEvent("Material: " + pass->getParent()->getParent()->getName());
+    OgreProfileEndGPUEvent(pass->getParent()->getParent()->getName());
 }
 //-----------------------------------------------------------------------
 void SceneManager::setAmbientLight(const ColourValue& colour)

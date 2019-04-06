@@ -201,15 +201,6 @@ namespace Ogre {
     class _OgreExport ProfileSessionListener
     {
     public:
-        enum DisplayMode
-        {
-            /// Display % frame usage on the overlay
-            DISPLAY_PERCENTAGE,
-            /// Display milliseconds on the overlay
-            DISPLAY_MILLISECONDS
-        };
-
-        ProfileSessionListener() : mDisplayMode(DISPLAY_MILLISECONDS) {}
         virtual ~ProfileSessionListener() {}
 
         /// Create the internal resources
@@ -226,16 +217,6 @@ namespace Ogre {
         
         /// Here we get the real profiling information which we can use 
         virtual void displayResults(const ProfileInstance& instance, ulong maxTotalFrameTime) {};
-
-        /// Set the display mode for the overlay. 
-        void setDisplayMode(DisplayMode d) { mDisplayMode = d; }
-    
-        /// Get the display mode for the overlay. 
-        DisplayMode getDisplayMode() const { return mDisplayMode; }
-    
-    protected:
-        /// How to display the overlay
-        DisplayMode mDisplayMode;
     };
 
     /** The profiler allows you to measure the performance of your code

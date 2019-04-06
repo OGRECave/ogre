@@ -49,6 +49,7 @@ namespace Ogre
         , mBarLineWidth(2)
         , mBarSpacing(3)
         , mMaxDisplayProfiles(50)
+        , mDisplayMode(DISPLAY_MILLISECONDS)
     {
     }
     //-----------------------------------------------------------------------

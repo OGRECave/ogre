@@ -395,7 +395,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Camera::_renderScene(Viewport *vp, bool includeOverlays)
     {
-        OgreProfileBeginGPUEvent("Camera: " + getName());
+        OgreProfileBeginGPUEvent(getName());
 
         //update the pixel display ratio
         if (mProjType == Ogre::PT_PERSPECTIVE)
@@ -425,7 +425,7 @@ namespace Ogre {
         {
             (*i)->cameraPostRenderScene(this);
         }
-        OgreProfileEndGPUEvent("Camera: " + getName());
+        OgreProfileEndGPUEvent(getName());
     }
     //---------------------------------------------------------------------
     void Camera::addListener(Listener* l)
