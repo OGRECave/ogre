@@ -263,24 +263,15 @@ namespace Ogre {
 
             if(&mRoot == mCurrent && mLast)
             {   // profiler was enabled this frame, but the first subsequent beginProfile was NOT the beinging of a new frame as we had hoped.
-                // we have a bogus ProfileInstance in our hierarchy, we will need to remove it, then update the overlays so as not to confuse ze user
+                // we have bogus ProfileInstance in our hierarchy, we will need to remove it, then update the overlays so as not to confuse ze user
 
-                // we could use mRoot.children.find() instead of this, except we'd be compairing strings instead of a pointer.
-                // the string way could be faster, but i don't believe it would.
-                ProfileChildren::iterator it = mRoot.children.begin(), endit = mRoot.children.end();
-                for(;it != endit; ++it)
+                for(auto& e : mRoot.children)
                 {
-                    if(mLast == it->second)
-                    {
-                        mRoot.children.erase(it);
-                        break;
-                    }
+                    OGRE_DELETE e.second;
                 }
+                mRoot.children.clear();
 
-                // with mLast == NULL we won't reach this code, in case this isn't the end of the top level profile
-                ProfileInstance* last = mLast;
                 mLast = NULL;
-                OGRE_DELETE last;
 
                 processFrameStats();
                 displayResults();
