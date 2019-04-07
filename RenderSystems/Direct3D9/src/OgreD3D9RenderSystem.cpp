@@ -161,7 +161,7 @@ namespace Ogre
             // Only update needed slots
             if (ac.variability & mask)
             {
-                HRESULT hr;
+                HRESULT hr = S_OK;
                 const float* ptr = params->getFloatPointer(ac.physicalIndex);
                 switch(ac.paramType)
                 {
