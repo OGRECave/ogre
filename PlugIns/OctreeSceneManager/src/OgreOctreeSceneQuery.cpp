@@ -98,10 +98,8 @@ void OctreeIntersectionSceneQuery::execute(IntersectionSceneQueryListener* liste
                         if (m->getMovableType() == "Entity")
                         {
                             Entity* e2 = static_cast<Entity*>(m);
-                            Entity::ChildObjectListIterator childIt = e2->getAttachedObjectIterator();
-                            while(childIt.hasMoreElements())
+                            for(auto c : e2->getAttachedObjects())
                             {
-                                MovableObject* c = childIt.getNext();
                                 if (c->getQueryFlags() & mQueryMask && 
                                     e->getWorldBoundingBox().intersects( c->getWorldBoundingBox() ))
                                 {
@@ -151,10 +149,8 @@ void OctreeAxisAlignedBoxSceneQuery::execute(SceneQueryListener* listener)
                 if (m->getMovableType() == "Entity")
                 {
                     Entity* e = static_cast<Entity*>(m);
-                    Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-                    while(childIt.hasMoreElements())
+                    for (auto c : e->getAttachedObjects())
                     {
-                        MovableObject* c = childIt.getNext();
                         if (c->getQueryFlags() & mQueryMask)
                         {
                             listener->queryResult(c);
@@ -202,10 +198,8 @@ void OctreeRaySceneQuery::execute(RaySceneQueryListener* listener)
                     if (m->getMovableType() == "Entity")
                     {
                         Entity* e = static_cast<Entity*>(m);
-                        Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-                        while(childIt.hasMoreElements())
+                        for(auto c : e->getAttachedObjects())
                         {
-                            MovableObject* c = childIt.getNext();
                             if (c->getQueryFlags() & mQueryMask)
                             {
                                 result = mRay.intersects(c->getWorldBoundingBox());
@@ -257,10 +251,8 @@ void OctreeSphereSceneQuery::execute(SceneQueryListener* listener)
                 if (m->getMovableType() == "Entity")
                 {
                     Entity* e = static_cast<Entity*>(m);
-                    Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-                    while(childIt.hasMoreElements())
+                    for(auto c : e->getAttachedObjects())
                     {
-                        MovableObject* c = childIt.getNext();
                         if (c->getQueryFlags() & mQueryMask &&
                             mSphere.intersects( c->getWorldBoundingBox()))
                         {
@@ -317,10 +309,8 @@ void OctreePlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listene
                     if (m->getMovableType() == "Entity")
                     {
                         Entity* e = static_cast<Entity*>(m);
-                        Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-                        while(childIt.hasMoreElements())
+                        for(auto c : e->getAttachedObjects())
                         {
-                            MovableObject* c = childIt.getNext();
                             if (c->getQueryFlags() & mQueryMask &&
                                 (*pi).intersects( c->getWorldBoundingBox()))
                             {
