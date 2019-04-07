@@ -308,7 +308,7 @@ namespace Ogre {
 
     public:
         /// Contains the child objects (attached to bones) indexed by name.
-        typedef std::map<String, MovableObject*> ChildObjectList;
+        typedef std::vector<MovableObject*> ChildObjectList;
     protected:
         ChildObjectList mChildObjectList;
 
@@ -600,9 +600,11 @@ namespace Ogre {
         /// Detach all MovableObjects previously attached using attachObjectToBone
         void detachAllObjectsFromBone(void);
 
-        typedef MapIterator<ChildObjectList> ChildObjectListIterator;
+        typedef VectorIterator<ChildObjectList> ChildObjectListIterator;
+        /// @deprecated use getAttachedObjects()
+        OGRE_DEPRECATED ChildObjectListIterator getAttachedObjectIterator(void);
         /** Gets an iterator to the list of objects attached to bones on this entity. */
-        ChildObjectListIterator getAttachedObjectIterator(void);
+        const ChildObjectList& getAttachedObjects() const { return mChildObjectList; }
         /** @copydoc MovableObject::getBoundingRadius */
         Real getBoundingRadius(void) const;
 

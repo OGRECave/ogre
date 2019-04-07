@@ -451,11 +451,9 @@ namespace Ogre {
 
         }
         // Notify any child objects
-        ChildObjectList::iterator child_itr = mChildObjectList.begin();
-        ChildObjectList::iterator child_itr_end = mChildObjectList.end();
-        for( ; child_itr != child_itr_end; ++child_itr)
+        for(auto child : mChildObjectList)
         {
-            (*child_itr).second->_notifyCurrentCamera(cam);
+            child->_notifyCurrentCamera(cam);
         }
     }
     //-----------------------------------------------------------------------
@@ -562,12 +560,10 @@ namespace Ogre {
         AxisAlignedBox full_aa_box;
         full_aa_box.setNull();
 
-        ChildObjectList::const_iterator child_itr = mChildObjectList.begin();
-        ChildObjectList::const_iterator child_itr_end = mChildObjectList.end();
-        for( ; child_itr != child_itr_end; ++child_itr)
+        for(auto child : mChildObjectList)
         {
-            aa_box = child_itr->second->getBoundingBox();
-            TagPoint* tp = static_cast<TagPoint*>(child_itr->second->getParentNode());
+            aa_box = child->getBoundingBox();
+            TagPoint* tp = static_cast<TagPoint*>(child->getParentNode());
             // Use transform local to skeleton since world xform comes later
             aa_box.transform(tp->_getFullLocalTransform());
 
@@ -582,11 +578,9 @@ namespace Ogre {
         if (derive)
         {
             // derive child bounding boxes
-            ChildObjectList::const_iterator child_itr = mChildObjectList.begin();
-            ChildObjectList::const_iterator child_itr_end = mChildObjectList.end();
-            for( ; child_itr != child_itr_end; ++child_itr)
+            for(auto child : mChildObjectList)
             {
-                child_itr->second->getWorldBoundingBox(true);
+                child->getWorldBoundingBox(true);
             }
         }
         return MovableObject::getWorldBoundingBox(derive);
@@ -597,11 +591,9 @@ namespace Ogre {
         if (derive)
         {
             // derive child bounding boxes
-            ChildObjectList::const_iterator child_itr = mChildObjectList.begin();
-            ChildObjectList::const_iterator child_itr_end = mChildObjectList.end();
-            for( ; child_itr != child_itr_end; ++child_itr)
+            for(auto child : mChildObjectList)
             {
-                child_itr->second->getWorldBoundingSphere(true);
+                child->getWorldBoundingSphere(true);
             }
         }
         return MovableObject::getWorldBoundingSphere(derive);
@@ -701,11 +693,8 @@ namespace Ogre {
             displayEntity->updateAnimation();
 
             //--- pass this point,  we are sure that the transformation matrix of each bone and tagPoint have been updated
-            ChildObjectList::iterator child_itr = mChildObjectList.begin();
-            ChildObjectList::iterator child_itr_end = mChildObjectList.end();
-            for( ; child_itr != child_itr_end; ++child_itr)
+            for(auto child : mChildObjectList)
             {
-                MovableObject* child = child_itr->second;
                 bool visible = child->isVisible();
                 if (visible && (displayEntity != this))
                 {
@@ -967,11 +956,9 @@ namespace Ogre {
             mLastParentXform = _getParentNodeFullTransform();
 
             //--- Update the child object's transforms
-            ChildObjectList::iterator child_itr = mChildObjectList.begin();
-            ChildObjectList::iterator child_itr_end = mChildObjectList.end();
-            for( ; child_itr != child_itr_end; ++child_itr)
+            for(auto child : mChildObjectList)
             {
-                (*child_itr).second->getParentNode()->_update(true, true);
+                child->getParentNode()->_update(true, true);
             }
 
             // Also calculate bone world matrices, since are used as replacement world matrices,
@@ -1496,9 +1483,19 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
+
+    struct MovableObjectNameExists {
+        const String& name;
+        bool operator()(const MovableObject* mo) {
+            return mo->getName() == name;
+        }
+    };
+
     TagPoint* Entity::attachObjectToBone(const String &boneName, MovableObject *pMovable, const Quaternion &offsetOrientation, const Vector3 &offsetPosition)
     {
-        if (mChildObjectList.find(pMovable->getName()) != mChildObjectList.end())
+        MovableObjectNameExists pred = {pMovable->getName()};
+        auto it = std::find_if(mChildObjectList.begin(), mChildObjectList.end(), pred);
+        if (it != mChildObjectList.end())
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
                 "An object with the name " + pMovable->getName() + " already attached",
@@ -1538,30 +1535,33 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::attachObjectImpl(MovableObject *pObject, TagPoint *pAttachingPoint)
     {
-        assert(mChildObjectList.find(pObject->getName()) == mChildObjectList.end());
-        mChildObjectList[pObject->getName()] = pObject;
+        assert(std::find_if(mChildObjectList.begin(), mChildObjectList.end(),
+                            MovableObjectNameExists{pObject->getName()}) == mChildObjectList.end());
+
+        mChildObjectList.push_back(pObject);
         pObject->_notifyAttached(pAttachingPoint, true);
     }
 
     //-----------------------------------------------------------------------
     MovableObject* Entity::detachObjectFromBone(const String &name)
     {
-        ChildObjectList::iterator i = mChildObjectList.find(name);
+        MovableObjectNameExists pred = {name};
+        auto it = std::find_if(mChildObjectList.begin(), mChildObjectList.end(), pred);
 
-        if (i == mChildObjectList.end())
+        if (it == mChildObjectList.end())
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No child object entry found named " + name,
                 "Entity::detachObjectFromBone");
         }
-        MovableObject *obj = i->second;
-        detachObjectImpl(obj);
-        mChildObjectList.erase(i);
+        detachObjectImpl(*it);
+        std::swap(*it, mChildObjectList.back());
+        mChildObjectList.pop_back();
 
         // Trigger update of bounding box if necessary
         if (mParentNode)
             mParentNode->needUpdate();
 
-        return obj;
+        return *it;
     }
     //-----------------------------------------------------------------------
     void Entity::detachObjectFromBone(MovableObject* obj)
@@ -1570,10 +1570,11 @@ namespace Ogre {
         iend = mChildObjectList.end();
         for (i = mChildObjectList.begin(); i != iend; ++i)
         {
-            if (i->second == obj)
+            if (*i == obj)
             {
                 detachObjectImpl(obj);
-                mChildObjectList.erase(i);
+                std::swap(*i, mChildObjectList.back());
+                mChildObjectList.pop_back();
 
                 // Trigger update of bounding box if necessary
                 if (mParentNode)
@@ -1604,11 +1605,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Entity::detachAllObjectsImpl(void)
     {
-        ChildObjectList::const_iterator i, iend;
-        iend = mChildObjectList.end();
-        for (i = mChildObjectList.begin(); i != iend; ++i)
+        for (auto child : mChildObjectList)
         {
-            detachObjectImpl(i->second);
+            detachObjectImpl(child);
         }
         mChildObjectList.clear();
     }

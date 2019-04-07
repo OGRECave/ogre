@@ -96,10 +96,8 @@ namespace Ogre
                             if (m->getMovableType() == "Entity")
                             {
                                 Entity* e2 = static_cast<Entity*>(m);
-                                Entity::ChildObjectListIterator childIt = e2->getAttachedObjectIterator();
-                                while(childIt.hasMoreElements())
+                                for (auto c : e2->getAttachedObjects())
                                 {
-                                    MovableObject* c = childIt.getNext();
                                     if (c->getQueryFlags() & mQueryMask && 
                                         e->getWorldBoundingBox().intersects( c->getWorldBoundingBox() ))
                                     {
@@ -151,10 +149,8 @@ namespace Ogre
                     if (m->getMovableType() == "Entity")
                     {
                         Entity* e = static_cast<Entity*>(m);
-                        Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-                        while(childIt.hasMoreElements())
+                        for (auto c : e->getAttachedObjects())
                         {
-                            MovableObject* c = childIt.getNext();
                             if (c->getQueryFlags() & mQueryMask)
                             {
                                 listener->queryResult(c);
@@ -205,10 +201,8 @@ namespace Ogre
                         if (m->getMovableType() == "Entity")
                         {
                             Entity* e = static_cast<Entity*>(m);
-                            Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-                            while(childIt.hasMoreElements())
+                            for (auto c : e->getAttachedObjects())
                             {
-                                MovableObject* c = childIt.getNext();
                                 if (c->getQueryFlags() & mQueryMask)
                                 {
                                     result = mRay.intersects(c->getWorldBoundingBox());
@@ -263,10 +257,8 @@ namespace Ogre
                     if (m->getMovableType() == "Entity")
                     {
                         Entity* e = static_cast<Entity*>(m);
-                        Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-                        while(childIt.hasMoreElements())
+                        for (auto c : e->getAttachedObjects())
                         {
-                            MovableObject* c = childIt.getNext();
                             if (c->getQueryFlags() & mQueryMask &&
                                 mSphere.intersects( c->getWorldBoundingBox()))
                             {
@@ -326,10 +318,8 @@ namespace Ogre
                         if (m->getMovableType() == "Entity")
                         {
                             Entity* e = static_cast<Entity*>(m);
-                            Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-                            while(childIt.hasMoreElements())
+                            for (auto c : e->getAttachedObjects())
                             {
-                                MovableObject* c = childIt.getNext();
                                 if (c->getQueryFlags() & mQueryMask &&
                                     (*pi).intersects( c->getWorldBoundingBox()))
                                 {
