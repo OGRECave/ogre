@@ -17,6 +17,7 @@ same license as the rest of the engine.
 #include "OgreMaterialManager.h"
 #include "OgreTechnique.h"
 #include "OgreRTShaderSystem.h"
+#include "OgreComponents.h"
 
 using namespace Ogre;
 
