@@ -97,11 +97,6 @@ namespace Ogre {
         mParentEntity->reevaluateVertexProcessing();
     }
     //-----------------------------------------------------------------------
-    const MaterialPtr& SubEntity::getMaterial(void) const
-    {
-        return mMaterialPtr;
-    }
-    //-----------------------------------------------------------------------
     Technique* SubEntity::getTechnique(void) const
     {
         return mMaterialPtr->getBestTechnique(mMaterialLodIndex, this);
@@ -276,11 +271,6 @@ namespace Ogre {
         mVisible = visible;
     }
     //-----------------------------------------------------------------------
-    bool SubEntity::isVisible(void) const
-    {
-        return mVisible;
-    }
-    //-----------------------------------------------------------------------
     void SubEntity::prepareTempBlendBuffers(void)
     {
         if (mSubMesh->useSharedVertices)
@@ -443,26 +433,6 @@ namespace Ogre {
         setRenderQueueGroup(queueID);
         mRenderQueuePrioritySet = true;
         mRenderQueuePriority = priority;
-    }
-    //-----------------------------------------------------------------------
-    uint8 SubEntity::getRenderQueueGroup(void) const
-    {
-        return mRenderQueueID;
-    }
-    //-----------------------------------------------------------------------
-    ushort SubEntity::getRenderQueuePriority(void) const
-    {
-        return mRenderQueuePriority;
-    }
-    //-----------------------------------------------------------------------
-    bool SubEntity::isRenderQueueGroupSet(void) const
-    {
-        return mRenderQueueIDSet;
-    }
-    //-----------------------------------------------------------------------
-    bool SubEntity::isRenderQueuePrioritySet(void) const
-    {
-        return mRenderQueuePrioritySet;
     }
     //-----------------------------------------------------------------------
 }
