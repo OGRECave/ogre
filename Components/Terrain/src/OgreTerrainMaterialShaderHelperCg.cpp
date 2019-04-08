@@ -38,9 +38,6 @@ namespace Ogre
     ShaderHelperCg::ShaderHelperCg() : ShaderHelper(false)
     {
         mSM4Available = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
-        mHelperStr = ResourceGroupManager::getSingleton()
-                         .openResource("TerrainHelpers.cg", RGN_INTERNAL)
-                         ->getAsString();
     }
     //---------------------------------------------------------------------
     HighLevelGpuProgramPtr
@@ -284,7 +281,7 @@ namespace Ogre
     {
 
         // Main header
-        outStream << mHelperStr;
+        outStream << "#include <TerrainHelpers.cg>\n";
 
         if (prof->isShadowingEnabled(tt, terrain))
             generateFpDynamicShadowsHelpers(prof, terrain, tt, outStream);
