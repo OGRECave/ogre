@@ -73,8 +73,10 @@ void SGX_ShadowPCF4(in sampler2D shadowMap, in vec4 shadowMapPos, in vec2 offset
 
 void SGX_ShadowPCF4(in sampler2DShadow shadowMap, in vec4 shadowMapPos, out float c)
 {
+#ifndef GL_ES
     shadowMapPos.z = shadowMapPos.z * 0.5 + 0.5 * shadowMapPos.w; // convert -1..1 to 0..1
     c = shadow2DProj(shadowMap, shadowMapPos).r;
+#endif
 }
 
 //-----------------------------------------------------------------------------
