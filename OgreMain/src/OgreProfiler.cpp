@@ -197,6 +197,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Profiler::beginProfile(const String& profileName, uint32 groupID) 
     {
+#ifdef USE_REMOTERY
+        // mask groups
+        if ((groupID & mProfileMask) == 0)
+            return;
+
+        rmt_BeginCPUSampleDynamic(profileName.c_str(), RMTSF_Aggregate);
+#else
         // if the profiler is enabled
         if (!mEnabled)
             return;
@@ -208,9 +215,7 @@ namespace Ogre {
         // empty string is reserved for the root
         // not really fatal anymore, however one shouldn't name one's profile as an empty string anyway.
         assert ((profileName != "") && ("Profile name can't be an empty string"));
-#ifdef USE_REMOTERY
-        rmt_BeginCPUSampleDynamic(profileName.c_str(), RMTSF_Aggregate);
-#else
+
         // we only process this profile if isn't disabled
         if (mDisabledProfiles.find(profileName) != mDisabledProfiles.end())
             return;
@@ -260,9 +265,6 @@ namespace Ogre {
     void Profiler::endProfile(const String& profileName, uint32 groupID) 
     {
 #ifdef USE_REMOTERY
-        if (!mEnabled)
-            return;
-
         // mask groups
         if ((groupID & mProfileMask) == 0)
             return;
