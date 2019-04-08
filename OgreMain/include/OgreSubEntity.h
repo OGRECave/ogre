@@ -146,7 +146,7 @@ namespace Ogre {
         void setVisible(bool visible);
 
         /** Returns whether or not this SubEntity is supposed to be visible. */
-        bool isVisible(void) const;
+        bool isVisible(void) const { return mVisible; }
 
         /** Sets the render queue group this SubEntity will be rendered through.
         @remarks
@@ -177,16 +177,16 @@ namespace Ogre {
         void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        uint8 getRenderQueueGroup(void) const;
+        uint8 getRenderQueueGroup(void) const { return mRenderQueueID; }
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        ushort getRenderQueuePriority(void) const;
+        ushort getRenderQueuePriority(void) const { return mRenderQueuePriority; }
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        bool isRenderQueueGroupSet(void) const;
+        bool isRenderQueueGroupSet(void) const { return mRenderQueueIDSet; }
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        bool isRenderQueuePrioritySet(void) const;
+        bool isRenderQueuePrioritySet(void) const { return mRenderQueuePrioritySet; }
 
         /** Accessor method to read mesh data.
         */
@@ -196,7 +196,7 @@ namespace Ogre {
         Entity* getParent(void) const { return mParentEntity; }
 
 
-        const MaterialPtr& getMaterial(void) const override;
+        const MaterialPtr& getMaterial(void) const override { return mMaterialPtr; }
         Technique* getTechnique(void) const override;
         void getRenderOperation(RenderOperation& op) override;
 
