@@ -133,7 +133,8 @@ namespace Ogre {
             HardwareBufferManager::getSingleton().createVertexBuffer(
                 decl->getVertexSize(POSITION_BINDING), 
                 mRenderOp2.vertexData->vertexCount,
-                HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+                true);//Workaround, using shadow buffer to avoid stall due to buffer mapping
         // bind position
         VertexBufferBinding* binding = mRenderOp2.vertexData->vertexBufferBinding;
         binding->setBinding(POSITION_BINDING, vbuf);
@@ -142,7 +143,8 @@ namespace Ogre {
         vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
                 decl->getVertexSize(TEXCOORD_BINDING), 
                 mRenderOp2.vertexData->vertexCount,
-                HardwareBuffer::HBU_STATIC_WRITE_ONLY, true);
+                HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+                true);//Workaround, using shadow buffer to avoid stall due to buffer mapping
         // bind texcoord
         binding->setBinding(TEXCOORD_BINDING, vbuf);
 
