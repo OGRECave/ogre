@@ -142,7 +142,7 @@ namespace Ogre {
                 createVertexBuffer(
                     decl->getVertexSize(POS_TEX_BINDING), 
                     allocatedVertexCount,
-                    HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, 
+                    HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
                     true);//Workaround, using shadow buffer to avoid stall due to buffer mapping
         bind->setBinding(POS_TEX_BINDING, vbuf);
 
@@ -151,7 +151,7 @@ namespace Ogre {
                 createVertexBuffer(
                     decl->getVertexSize(COLOUR_BINDING), 
                     allocatedVertexCount,
-                    HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, 
+                    HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
                     true);//Workaround, using shadow buffer to avoid stall due to buffer mapping
         bind->setBinding(COLOUR_BINDING, vbuf);
 
