@@ -89,6 +89,7 @@ namespace Ogre {
             access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
         // FIXME: Big stall here
+        // NOTE: Stall happens, when using modern drivers, with multi threading enabled driver
         void* pBuffer;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(mTarget, offset, length, access));
 
