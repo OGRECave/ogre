@@ -252,11 +252,11 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Resolve pixel shader normal.
     if (mNormalMapSpace == NMS_OBJECT)
     {
-        mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT4);
+        mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
     }
     else if (mNormalMapSpace == NMS_TANGENT)
     {
-        mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT4);
+        mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT3);
     }
 
     mInDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
