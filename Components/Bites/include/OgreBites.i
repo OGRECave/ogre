@@ -3,6 +3,7 @@
 /* Includes the header in the wrapper code */
 #include "Ogre.h"
 #include "OgreBuildSettings.h"
+#include "OgreComponents.h"
 #include "OgreApplicationContextBase.h"
 #include "OgreApplicationContext.h"
 #include "OgreSGTechniqueResolverListener.h"
@@ -52,6 +53,7 @@ JNIEnv* OgreJNIGetEnv();
 %rename(ApplicationContext) ApplicationContextSDL; // keep the pre 1.12 name
 #endif
 
+%include "OgreComponents.h"
 %include "OgreApplicationContextBase.h"
 %include "OgreApplicationContext.h"
 %include "OgreCameraMan.h"
