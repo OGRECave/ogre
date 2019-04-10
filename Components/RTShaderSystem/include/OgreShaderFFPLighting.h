@@ -224,12 +224,6 @@ protected:
     UniformParameterPtr mLightAmbientColour;
     // Derived ambient light colour parameter.
     UniformParameterPtr mDerivedAmbientLightColour;
-    // Surface ambient colour parameter.
-    UniformParameterPtr mSurfaceAmbientColour;
-    // Surface diffuse colour parameter.
-    UniformParameterPtr mSurfaceDiffuseColour;
-    // Surface specular colour parameter.
-    UniformParameterPtr mSurfaceSpecularColour;
     // Surface emissive colour parameter.
     UniformParameterPtr mSurfaceEmissiveColour;
     // Surface shininess parameter.

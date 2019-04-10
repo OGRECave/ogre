@@ -186,21 +186,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	else
 	{
 		mLightAmbientColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
-		mSurfaceAmbientColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR);
 	}
-
-	// Get surface diffuse colour if need to.
-	if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
-	{
-		mSurfaceDiffuseColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
-	}
-
-	// Get surface specular colour if need to.
-	if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
-	{
-		mSurfaceSpecularColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
-	}
-		 
 	
 	// Get surface emissive colour if need to.
 	if ((mTrackVertexColourType & TVC_EMISSIVE) == 0)
