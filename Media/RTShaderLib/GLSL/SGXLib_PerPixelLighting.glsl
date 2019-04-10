@@ -42,15 +42,7 @@ void SGX_TransformNormal(in mat4 m,
 				   in vec3 v, 
 				   out vec3 vOut)
 {
-	vOut = (m * vec4(v, 1.0)).xyz;
-}
-
-//-----------------------------------------------------------------------------
-void SGX_TransformPosition(in mat4 mWorldView, 
-				   in vec4 vPos, 
-				   out vec3 vOut)
-{
-	vOut = (mWorldView * vPos).xyz;
+	vOut = mat3(m) * v;
 }
 
 //-----------------------------------------------------------------------------

@@ -211,6 +211,7 @@ bool PerPixelLighting::resolveDependencies(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     vsProgram->addDependency(FFP_LIB_COMMON);
+    vsProgram->addDependency(FFP_LIB_TRANSFORM);
     vsProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
     psProgram->addDependency(FFP_LIB_COMMON);
@@ -266,7 +267,7 @@ bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder)
     // Transform view space position if need to.
     if (mVSOutViewPos)
     {
-        stage.callFunction(SGX_FUNC_TRANSFORMPOSITION, mWorldViewMatrix, mVSInPosition, mVSOutViewPos);
+        stage.callFunction(FFP_FUNC_TRANSFORM, mWorldViewMatrix, mVSInPosition, mVSOutViewPos);
     }
 
     return true;

@@ -300,7 +300,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
 
         // Resolve inverse world rotation matrix.
-        mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
+        mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_3X3, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
     }
 
     return true;
@@ -381,7 +381,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             // Resolve inverse world rotation matrix.
             if (mWorldInvRotMatrix.get() == NULL)
             {               
-                mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
+                mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_3X3, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
             }
             break;
 
@@ -442,7 +442,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             // Resolve inverse world rotation matrix.
             if (mWorldInvRotMatrix.get() == NULL)
             {               
-                mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
+                mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_3X3, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
             }
             break;
         }
@@ -481,6 +481,7 @@ bool NormalMapLighting::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
+    vsProgram->addDependency(FFP_LIB_TRANSFORM);
     vsProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency(FFP_LIB_TEXTURING);
 
@@ -547,7 +548,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder)
     // Compute world space position.
     if (mVSWorldPosition.get() != NULL)
     {
-        stage.callFunction(SGX_FUNC_TRANSFORMPOSITION, mWorldMatrix, mVSInPosition, mVSWorldPosition);
+        stage.callFunction(FFP_FUNC_TRANSFORM, mWorldMatrix, mVSInPosition, mVSWorldPosition);
     }
     
 
@@ -560,12 +561,12 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder)
                            mVSLocalDir);
 
         // Transform to object space.
-        stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
+        stage.callFunction(FFP_FUNC_TRANSFORM, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
 
         // Transform to tangent space.
         if (mNormalMapSpace == NMS_TANGENT)
         {
-            stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mVSTBNMatrix, mVSLocalDir, mVSOutView);
+            stage.callFunction(FFP_FUNC_TRANSFORM, mVSTBNMatrix, mVSLocalDir, mVSOutView);
         }
 
         // Output object space.
@@ -598,7 +599,7 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
         // Transform to texture space.
         if (mNormalMapSpace == NMS_TANGENT)
         {
-            stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mVSTBNMatrix, In(curLightParams->mDirection).xyz(),
+            stage.callFunction(FFP_FUNC_TRANSFORM, mVSTBNMatrix, In(curLightParams->mDirection).xyz(),
                                curLightParams->mVSOutDirection);
         }
         // Output object space.
@@ -617,12 +618,12 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
                            mVSLocalDir);
 
         // Transform to object space.
-        stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
+        stage.callFunction(FFP_FUNC_TRANSFORM, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
 
         // Transform to tangent space.      
         if (mNormalMapSpace == NMS_TANGENT)
         {
-            stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mVSTBNMatrix, mVSLocalDir,
+            stage.callFunction(FFP_FUNC_TRANSFORM, mVSTBNMatrix, mVSLocalDir,
                                curLightParams->mVSOutToLightDir);
         }
 

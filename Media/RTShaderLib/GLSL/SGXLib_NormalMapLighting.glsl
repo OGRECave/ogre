@@ -53,30 +53,6 @@ void SGX_ConstructTBNMatrix(in vec3 vNormal,
 }
 
 //-----------------------------------------------------------------------------
-void SGX_TransformNormal(in mat3 m, 
-				   in vec3 v, 
-				   out vec3 vOut)
-{
-	vOut = (m * v) ;
-}
-
-//-----------------------------------------------------------------------------
-void SGX_TransformNormal(in mat4 m, 
-				   in vec3 v, 
-				   out vec3 vOut)
-{
-	vOut = (m * vec4(v, 1.0)).xyz ;
-}
-
-//-----------------------------------------------------------------------------
-void SGX_TransformPosition(in mat4 m, 
-				   in vec4 v, 
-				   out vec3 vOut)
-{
-	vOut = (m * v).xyz;
-}
-
-//-----------------------------------------------------------------------------
 void SGX_FetchNormal(in sampler2D s, 
 				   in vec2 uv, 
 				   out vec3 vOut)

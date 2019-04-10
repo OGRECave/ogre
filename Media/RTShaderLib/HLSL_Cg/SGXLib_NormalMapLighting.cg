@@ -43,30 +43,6 @@ void SGX_ConstructTBNMatrix(in float3 vNormal,
 }
 
 //-----------------------------------------------------------------------------
-void SGX_TransformNormal(in float3x3 m, 
-				   in float3 v, 
-				   out float3 vOut)
-{
-	vOut = mul(m, v);
-}
-
-//-----------------------------------------------------------------------------
-void SGX_TransformNormal(in float4x4 m, 
-				   in float3 v, 
-				   out float3 vOut)
-{
-	vOut = mul((float3x3)m, v);
-}
-
-//-----------------------------------------------------------------------------
-void SGX_TransformPosition(in float4x4 m, 
-				   in float4 v, 
-				   out float3 vOut)
-{
-	vOut = mul(m, v).xyz;
-}
-
-//-----------------------------------------------------------------------------
 void SGX_FetchNormal(in sampler2D s, 
 				   in float2 uv, 
 				   out float3 vOut)
