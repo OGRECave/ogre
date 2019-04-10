@@ -53,14 +53,13 @@ void SGX_TransformPosition(in float4x4 mWorldView,
 void SGX_Light_Directional_Diffuse(
 				   in float3 vNormal,
 				   in float3 vNegLightDirView,
-				   in float3 vDiffuseColour, 
-				   in float3 vBaseColour, 
-				   out float3 vOut)
+				   in float3 vDiffuseColour,
+				   inout float3 vOut)
 {
 	float3 vNormalView = normalize(vNormal);
 	float nDotL = dot(vNormalView, vNegLightDirView);
 	
-	vOut = vBaseColour + vDiffuseColour * saturate(nDotL);
+	vOut += vDiffuseColour * saturate(nDotL);
 	vOut = clamp(vOut, 0.0, 1.0);
 }
 
@@ -71,15 +70,10 @@ void SGX_Light_Directional_DiffuseSpecular(
 					in float3 vNegLightDirView,
 					in float3 vDiffuseColour, 
 					in float3 vSpecularColour, 
-					in float fSpecularPower, 
-					in float3 vBaseDiffuseColour,
-					in float3 vBaseSpecularColour,					
-					out float3 vOutDiffuse,
-					out float3 vOutSpecular)
+					in float fSpecularPower,
+					inout float3 vOutDiffuse,
+					inout float3 vOutSpecular)
 {
-	vOutDiffuse  = vBaseDiffuseColour;
-	vOutSpecular = vBaseSpecularColour;
-	
 	float3 vNormalView = normalize(vNormal);		
 	float nDotL		   = dot(vNormalView, vNegLightDirView);			
 	float3 vView       = -normalize(vViewPos);
@@ -93,9 +87,9 @@ void SGX_Light_Directional_DiffuseSpecular(
 		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
 		vOutSpecular += vSpecularColour * pow(saturate(nDotH), fSpecularPower);
+        vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
+        vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
 	}
-	vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
-	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -105,11 +99,8 @@ void SGX_Light_Point_Diffuse(
 				    in float3 vLightPosView,
 				    in float4 vAttParams,
 				    in float3 vDiffuseColour, 
-				    in float3 vBaseColour, 
-				    out float3 vOut)
+				    inout float3 vOut)
 {
-	vOut = vBaseColour;		
-	
 	float3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
 	float3 vNormalView = normalize(vNormal);
@@ -120,8 +111,8 @@ void SGX_Light_Point_Diffuse(
 		float fAtten	   = 1 / (vAttParams.y + vAttParams.z*fLightD + vAttParams.w*fLightD*fLightD);
 			
 		vOut += vDiffuseColour * nDotL * fAtten;
+        vOut = clamp(vOut, 0.0, 1.0);
 	}
-	vOut = clamp(vOut, 0.0, 1.0);	
 }
 
 
@@ -134,15 +125,10 @@ void SGX_Light_Point_DiffuseSpecular(
 				    in float4 vAttParams,
 				    in float3 vDiffuseColour, 
 				    in float3 vSpecularColour, 
-					in float fSpecularPower, 
-				    in float3 vBaseDiffuseColour,
-					in float3 vBaseSpecularColour,					
-					out float3 vOutDiffuse,
-					out float3 vOutSpecular)
+					in float fSpecularPower,
+					inout float3 vOutDiffuse,
+					inout float3 vOutSpecular)
 {
-	vOutDiffuse  = vBaseDiffuseColour;
-	vOutSpecular = vBaseSpecularColour;
-
 	float3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
 	vLightView		   = normalize(vLightView);	
@@ -161,9 +147,9 @@ void SGX_Light_Point_DiffuseSpecular(
 		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
 		vOutSpecular += vSpecularColour * pow(saturate(nDotH), fSpecularPower) * fAtten;
-	}		
-	vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
-	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
+        vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
+	    vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -175,11 +161,8 @@ void SGX_Light_Spot_Diffuse(
 				    in float4 vAttParams,
 				    in float3 vSpotParams,
 				    in float3 vDiffuseColour, 
-				    in float3 vBaseColour, 
-				    out float3 vOut)
+				    inout float3 vOut)
 {
-	vOut = vBaseColour;		
-	
 	float3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
 	vLightView		   = normalize(vLightView);
@@ -194,8 +177,8 @@ void SGX_Light_Spot_Diffuse(
 		float fSpotT	= pow(fSpotE, vSpotParams.z);	
 						
 		vOut += vDiffuseColour * nDotL * fAtten * fSpotT;
+        vOut = clamp(vOut, 0.0, 1.0);
 	}
-	vOut = clamp(vOut, 0.0, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -208,15 +191,10 @@ void SGX_Light_Spot_DiffuseSpecular(
 				    in float3 vSpotParams,
 				    in float3 vDiffuseColour, 
 				    in float3 vSpecularColour, 
-					in float fSpecularPower, 
-				    in float3 vBaseDiffuseColour,
-					in float3 vBaseSpecularColour,					
-					out float3 vOutDiffuse,
-					out float3 vOutSpecular)
+					in float fSpecularPower,
+					inout float3 vOutDiffuse,
+					inout float3 vOutSpecular)
 {
-	vOutDiffuse  = vBaseDiffuseColour;		
-	vOutSpecular = vBaseSpecularColour;
-	
 	float3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
 	vLightView		   = normalize(vLightView);
@@ -239,7 +217,7 @@ void SGX_Light_Spot_DiffuseSpecular(
 		vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
 		vOutSpecular += vSpecularColour * pow(saturate(nDotH), fSpecularPower) * fAtten * fSpotT;
-	}		
-	vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
-	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
+        vOutDiffuse = clamp(vOutDiffuse, 0.0, 1.0);
+	    vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
+	}
 }

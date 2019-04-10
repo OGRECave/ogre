@@ -397,16 +397,14 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
             stage.callFunction(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR,
                                {In(mViewNormal), In(mViewPos), In(curLightParams->mDirection).xyz(),
                                 In(curLightParams->mDiffuseColour).xyz(), In(curLightParams->mSpecularColour).xyz(),
-                                In(mSurfaceShininess), In(mOutDiffuse).xyz(), In(mOutSpecular).xyz(),
-                                Out(mOutDiffuse).xyz(), Out(mOutSpecular).xyz()});
+                                In(mSurfaceShininess), InOut(mOutDiffuse).xyz(), InOut(mOutSpecular).xyz()});
         }
 
         else
         {
             stage.callFunction(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE,
                                {In(mViewNormal), In(curLightParams->mDirection).xyz(),
-                                In(curLightParams->mDiffuseColour).xyz(), In(mOutDiffuse).xyz(),
-                                Out(mOutDiffuse).xyz()});
+                                In(curLightParams->mDiffuseColour).xyz(), InOut(mOutDiffuse).xyz()});
         }
         break;
 
@@ -417,15 +415,14 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
                                {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
                                 In(curLightParams->mAttenuatParams), In(curLightParams->mDiffuseColour).xyz(),
                                 In(curLightParams->mSpecularColour).xyz(), In(mSurfaceShininess),
-                                In(mOutDiffuse).xyz(), In(mOutSpecular).xyz(), Out(mOutDiffuse).xyz(),
-                                Out(mOutSpecular).xyz()});
+                                InOut(mOutDiffuse).xyz(), InOut(mOutSpecular).xyz()});
         }
         else
         {
             stage.callFunction(SGX_FUNC_LIGHT_POINT_DIFFUSE,
                                {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
                                 In(curLightParams->mAttenuatParams), In(curLightParams->mDiffuseColour).xyz(),
-                                In(mOutDiffuse).xyz(), Out(mOutDiffuse).xyz()});
+                                InOut(mOutDiffuse).xyz()});
         }
 				
         break;
@@ -438,8 +435,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
                                 In(curLightParams->mDirection).xyz(), In(curLightParams->mAttenuatParams),
                                 In(curLightParams->mSpotParams), In(curLightParams->mDiffuseColour).xyz(),
                                 In(curLightParams->mSpecularColour).xyz(), In(mSurfaceShininess),
-                                In(mOutDiffuse).xyz(), In(mOutSpecular).xyz(), Out(mOutDiffuse).xyz(),
-                                Out(mOutSpecular).xyz()});
+                                InOut(mOutDiffuse).xyz(), InOut(mOutSpecular).xyz()});
         }
         else
         {
@@ -447,7 +443,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
                                {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
                                 In(curLightParams->mDirection).xyz(), In(curLightParams->mAttenuatParams),
                                 In(curLightParams->mSpotParams), In(curLightParams->mDiffuseColour).xyz(),
-                                In(mOutDiffuse).xyz(), Out(mOutDiffuse).xyz()});
+                                InOut(mOutDiffuse).xyz()});
         }
         break;
     }
