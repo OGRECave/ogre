@@ -231,7 +231,7 @@ namespace Ogre
             m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
         }
         
-        inline Matrix4 (const Real* arr)
+        explicit Matrix4 (const Real* arr)
         {
             memcpy(m,arr,16*sizeof(Real));
         }
@@ -239,7 +239,7 @@ namespace Ogre
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling 3x3 matrix.
          */
 
-        inline Matrix4(const Matrix3& m3x3)
+        explicit Matrix4(const Matrix3& m3x3)
         {
           operator=(IDENTITY);
           operator=(m3x3);
@@ -248,7 +248,7 @@ namespace Ogre
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling Quaternion.
          */
         
-        inline Matrix4(const Quaternion& rot)
+        explicit Matrix4(const Quaternion& rot)
         {
           Matrix3 m3x3;
           rot.ToRotationMatrix(m3x3);
