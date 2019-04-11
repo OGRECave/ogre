@@ -62,7 +62,7 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
 
     // Resolve world view IT matrix.
-    mWorldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX);
+    mWorldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
 
     // Get surface ambient colour if need to.
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
@@ -262,7 +262,7 @@ bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder)
 
     // Transform normal in view space.
     if(!mLightParamsList.empty())
-        stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
+        stage.callFunction(FFP_FUNC_TRANSFORM, mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
 
     // Transform view space position if need to.
     if (mVSOutViewPos)

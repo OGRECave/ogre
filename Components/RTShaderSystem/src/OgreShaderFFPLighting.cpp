@@ -175,7 +175,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	Function* vsMain = vsProgram->getEntryPointFunction();
 
 	// Resolve world view IT matrix.
-	mWorldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX);
+	mWorldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
 	mViewNormal = vsMain->resolveLocalParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
 	
 	// Get surface ambient colour if need to.
@@ -334,7 +334,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 
     // Transform normal to view space
 	if(!mLightParamsList.empty())
-	    stage.callFunction(SGX_FUNC_TRANSFORMNORMAL, mWorldViewITMatrix, mVSInNormal, mViewNormal);
+	    stage.callFunction(FFP_FUNC_TRANSFORM, mWorldViewITMatrix, mVSInNormal, mViewNormal);
 
     if(mViewPos)
     {

@@ -38,14 +38,6 @@ THE SOFTWARE.
 #define M_PI 3.141592654
 
 //-----------------------------------------------------------------------------
-void SGX_TransformNormal(in mat4 m, 
-				   in vec3 v, 
-				   out vec3 vOut)
-{
-	vOut = mat3(m) * v;
-}
-
-//-----------------------------------------------------------------------------
 void SGX_Light_Directional_Diffuse(
 				   in vec3 vNormal,
 				   in vec3 vNegLightDirView,
