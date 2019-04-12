@@ -43,7 +43,7 @@ namespace RTShader {
 *  @{
 */
 
-#define SGX_LIB_NORMALMAPLIGHTING                   "SGXLib_NormalMapLighting"
+#define SGX_LIB_NORMALMAP                           "SGXLib_NormalMap"
 #define SGX_FUNC_CONSTRUCT_TBNMATRIX                "SGX_ConstructTBNMatrix"
 #define SGX_FUNC_FETCHNORMAL                        "SGX_FetchNormal"
 
@@ -176,11 +176,6 @@ protected:
     bool addVSIlluminationInvocation(LightParams* curLightParams, Function* vsMain, const int groupOrder);
 
     /** 
-    Internal method that perform normal fetch invocation.
-    */
-    bool addPSNormalFetchInvocation(Function* psMain, const int groupOrder);
-
-    /** 
     Internal method that adds per light illumination component functions invocations.
     */
     bool addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder);
@@ -207,8 +202,6 @@ protected:
     ParameterPtr mVSWorldPosition;
     // Vertex shader output view vector (position in camera space) parameter.
     ParameterPtr mVSOutView;
-    // Pixel shader input view position (position in camera space) parameter.
-    ParameterPtr mPSInView;
     // Vertex shader input tangent.
     ParameterPtr mVSInTangent;
     // Vertex shader local TNB matrix.
@@ -217,8 +210,6 @@ protected:
     ParameterPtr mVSLocalDir;
     // Normal map texture sampler parameter.
     UniformParameterPtr mPSNormalMapSampler;
-    // Pixel shader normal parameter.
-    ParameterPtr mPSNormal;
     // Vertex shader input texture coordinates.
     ParameterPtr mVSInTexcoord;
     // Vertex shader output texture coordinates.

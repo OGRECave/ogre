@@ -166,13 +166,13 @@ namespace Ogre
                 switch(ac.paramType)
                 {
                 case GpuProgramParameters::ACT_WORLD_MATRIX:
-                    setWorldMatrix((const Matrix4&)ptr);
+                    setWorldMatrix(Matrix4(ptr));
                     break;
                 case GpuProgramParameters::ACT_VIEW_MATRIX:
-                    setViewMatrix((const Matrix4&)ptr);
+                    setViewMatrix(Matrix4(ptr));
                     break;
                 case GpuProgramParameters::ACT_PROJECTION_MATRIX:
-                    setProjectionMatrix((const Matrix4&)ptr);
+                    setProjectionMatrix(Matrix4(ptr));
                     break;
                 case GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR:
                     material.Ambient = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3]);

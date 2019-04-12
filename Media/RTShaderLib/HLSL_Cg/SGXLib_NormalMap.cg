@@ -26,60 +26,32 @@ THE SOFTWARE.
 */
 
 //-----------------------------------------------------------------------------
-// Program Name: FFPLib_Transform
-// Program Desc: Transform functions of the FFP.
-// Program Type: Vertex shader
+// Program Name: SGXLib_NormalMapLighting
+// Program Desc: Normal map lighting functions.
+// Program Type: Vertex/Pixel shader
 // Language: CG
-// Notes: Implements core functions for FFPTransform class.
-// based on transform engine. 
-// See http://msdn.microsoft.com/en-us/library/bb206269.aspx
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-void FFP_Transform(in float3x3 m, 
-				   in float3 v, 
-				   out float3 vOut)
+void SGX_ConstructTBNMatrix(in float3 vNormal,
+				   in float3 vTangent,
+				   out float3x3 vOut)
 {
-	vOut = mul(m, v);
-}
-//-----------------------------------------------------------------------------
-void FFP_Transform(in float4x4 m, 
-				   in float4 v, 
-				   out float4 vOut)
-{
-	vOut = mul(m, v);
-}
-//-----------------------------------------------------------------------------
-void FFP_Transform(in float4x4 m,
-				   in float4 v,
-				   out float3 vOut)
-{
-	vOut = mul(m, v).xyz;
-}
-//-----------------------------------------------------------------------------
-#ifndef OPENGL_ES_2
+	float3 vBinormal = cross(vTangent, vNormal);
 
-//-----------------------------------------------------------------------------
-void FFP_Transform(in float3x4 m, 
-				   in float4 v, 
-				   out float3 vOut)
-{
-	vOut = mul(m, v);
+	vOut = float3x3(vTangent, vBinormal, vNormal);
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Transform(in float3x4 m, 
-				   in float3 v, 
-				   out float3 vOut)
+void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
+						in float2 texCoord,
+						in float3 eyeVec,
+						in float2 scaleBias,
+						out float2 newTexCoord)
 {
-	vOut = mul((float3x3)m, v);
-}
-//-----------------------------------------------------------------------------
-#endif 
-//-----------------------------------------------------------------------------
-void FFP_Transform(in float4x4 m, 
-				   in float3 v, 
-				   out float3 vOut)
-{
-	vOut = mul((float3x3)m, v);
+	eyeVec = normalize(eyeVec);
+	float height = tex2D(normalHeightMap, texCoord).a;
+	float displacement = (height * scaleBias.x) + scaleBias.y;
+	float3 scaledEyeDir = eyeVec * displacement;
+	newTexCoord = (scaledEyeDir  + float3(texCoord, 1.0)).xy;
 }

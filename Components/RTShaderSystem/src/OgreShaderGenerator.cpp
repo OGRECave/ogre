@@ -205,7 +205,7 @@ bool ShaderGenerator::_initialize()
 #endif
 
     // Create extensions factories.
-    createSubRenderStateExFactories();
+    createBuiltinSRSFactories();
 
     // Allocate script translator manager.
     mScriptTranslatorManager.reset(new SGScriptTranslatorManager(this));
@@ -224,13 +224,36 @@ bool ShaderGenerator::_initialize()
 
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::createSubRenderStateExFactories()
+void ShaderGenerator::createBuiltinSRSFactories()
 {
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     OGRE_LOCK_AUTO_MUTEX;
-
     SubRenderStateFactory* curFactory;
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+    curFactory = OGRE_NEW FFPTransformFactory;
+    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
+    mBuiltinSRSFactories.push_back(curFactory);
 
+    curFactory = OGRE_NEW FFPColourFactory;
+    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
+    mBuiltinSRSFactories.push_back(curFactory);
+
+    curFactory = OGRE_NEW FFPLightingFactory;
+    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
+    mBuiltinSRSFactories.push_back(curFactory);
+
+    curFactory = OGRE_NEW FFPTexturingFactory;
+    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
+    mBuiltinSRSFactories.push_back(curFactory);
+
+    curFactory = OGRE_NEW FFPFogFactory;
+    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
+    mBuiltinSRSFactories.push_back(curFactory);
+
+    curFactory = OGRE_NEW FFPAlphaTestFactory;
+    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
+    mBuiltinSRSFactories.push_back(curFactory);
+#endif
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     // check if we are running an old shader level in d3d11
     bool d3d11AndLowProfile = ( (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1") ||
         GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
@@ -239,32 +262,32 @@ void ShaderGenerator::createSubRenderStateExFactories()
     {
         curFactory = OGRE_NEW PerPixelLightingFactory;  
         addSubRenderStateFactory(curFactory);
-        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+        mBuiltinSRSFactories.push_back(curFactory);
 
         curFactory = OGRE_NEW NormalMapLightingFactory; 
         addSubRenderStateFactory(curFactory);
-        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+        mBuiltinSRSFactories.push_back(curFactory);
 
         curFactory = OGRE_NEW IntegratedPSSM3Factory;   
         addSubRenderStateFactory(curFactory);
-        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+        mBuiltinSRSFactories.push_back(curFactory);
 
         curFactory = OGRE_NEW LayeredBlendingFactory;   
         addSubRenderStateFactory(curFactory);
-        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+        mBuiltinSRSFactories.push_back(curFactory);
 
         curFactory = OGRE_NEW HardwareSkinningFactory;  
         addSubRenderStateFactory(curFactory);
-        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+        mBuiltinSRSFactories.push_back(curFactory);
     }
 
     curFactory = OGRE_NEW TextureAtlasSamplerFactory;
     addSubRenderStateFactory(curFactory);
-    mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+    mBuiltinSRSFactories.push_back(curFactory);
     
     curFactory = OGRE_NEW TriplanarTexturingFactory;
     addSubRenderStateFactory(curFactory);
-    mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+    mBuiltinSRSFactories.push_back(curFactory);
 #endif
 }
 
@@ -309,7 +332,7 @@ void ShaderGenerator::_destroy()
     mSchemeEntriesMap.clear();
 
     // Destroy extensions factories.
-    destroySubRenderStateExFactories();
+    destroyBuiltinSRSFactories();
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     mFFPRenderStateBuilder.reset();
@@ -346,18 +369,16 @@ void ShaderGenerator::_destroy()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::destroySubRenderStateExFactories()
+void ShaderGenerator::destroyBuiltinSRSFactories()
 {
     OGRE_LOCK_AUTO_MUTEX;
 
-    SubRenderStateFactoryIterator it;
-
-    for (it = mSubRenderStateExFactories.begin(); it != mSubRenderStateExFactories.end(); ++it)
+    for (auto f : mBuiltinSRSFactories)
     {
-        removeSubRenderStateFactory(it->second);
-        OGRE_DELETE it->second;
+        removeSubRenderStateFactory(f);
+        delete f;
     }
-    mSubRenderStateExFactories.clear();
+    mBuiltinSRSFactories.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -1508,7 +1529,7 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
             
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     // Build the FFP state. 
-    FFPRenderStateBuilder::getSingleton().buildRenderState(this, mTargetRenderState.get());
+    FFPRenderStateBuilder::buildRenderState(this, mTargetRenderState.get());
 #endif
 
 

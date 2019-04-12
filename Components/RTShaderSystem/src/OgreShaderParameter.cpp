@@ -252,6 +252,8 @@ static GpuConstantType getGCType(const GpuProgramParameters::AutoConstantDefinit
         return GCT_FLOAT4;
     case 8:
         return GCT_MATRIX_2X4;
+    case 9:
+        return GCT_MATRIX_3X3;
     case 12:
         return GCT_MATRIX_3X4;
     case 16:
@@ -371,6 +373,7 @@ void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
         {
             mParamsPtr = paramsPtr.get();
             mPhysicalIndex = def->physicalIndex;
+            mElementSize = def->elementSize;
         }
     }
 }

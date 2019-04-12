@@ -763,10 +763,10 @@ protected:
     void preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v);
 
     /** Create sub render state core extensions factories */
-    void createSubRenderStateExFactories();
+    void createBuiltinSRSFactories();
 
     /** Destroy sub render state core extensions factories */
-    void destroySubRenderStateExFactories();
+    void destroyBuiltinSRSFactories();
 
     /** Create an instance of the SubRenderState based on script properties using the
     current sub render state factories.
@@ -875,7 +875,7 @@ protected:
     // Sub render state registered factories.
     SubRenderStateFactoryMap mSubRenderStateFactories;
     // Sub render state core extension factories.
-    SubRenderStateFactoryMap mSubRenderStateExFactories;
+    std::vector<SubRenderStateFactory*> mBuiltinSRSFactories;
     // True if active view port use a valid SGScheme.
     bool mActiveViewportValid;
     // Light count per light type.

@@ -63,6 +63,7 @@ namespace Ogre
         AutoConstantDefinition(ACT_INVERSE_WORLDVIEW_MATRIX,      "inverse_worldview_matrix",    16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_TRANSPOSE_WORLDVIEW_MATRIX,         "transpose_worldview_matrix",        16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX, "inverse_transpose_worldview_matrix", 16, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_NORMAL_MATRIX,                  "normal_matrix",     9, ET_REAL, ACDT_NONE),
 
         AutoConstantDefinition(ACT_WORLDVIEWPROJ_MATRIX,          "worldviewproj_matrix",        16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_INVERSE_WORLDVIEWPROJ_MATRIX,       "inverse_worldviewproj_matrix",      16, ET_REAL, ACDT_NONE),
@@ -1139,6 +1140,22 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------------
+    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Matrix3& m, size_t elementCount)
+    {
+
+        // remember, raw content access uses raw float count rather than float4
+        if (mTransposeMatrices)
+        {
+            Matrix3 t = m.transpose();
+            _writeRawConstants(physicalIndex, t[0], elementCount > 9 ? 9 : elementCount);
+        }
+        else
+        {
+            _writeRawConstants(physicalIndex, m[0], elementCount > 9 ? 9 : elementCount);
+        }
+
+    }
+    //-----------------------------------------------------------------------------
     void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const TransformBaseReal* pMatrix, size_t numEntries)
     {
         // remember, raw content access uses raw float count rather than float4
@@ -1288,6 +1305,7 @@ namespace Ogre
         case ACT_INVERSE_WORLDVIEW_MATRIX:
         case ACT_TRANSPOSE_WORLDVIEW_MATRIX:
         case ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX:
+        case ACT_NORMAL_MATRIX:
         case ACT_WORLDVIEWPROJ_MATRIX:
         case ACT_INVERSE_WORLDVIEWPROJ_MATRIX:
         case ACT_TRANSPOSE_WORLDVIEWPROJ_MATRIX:
@@ -2246,6 +2264,13 @@ namespace Ogre
                 case ACT_TRANSPOSE_WORLDVIEW_MATRIX:
                     _writeRawConstant(i->physicalIndex, source->getTransposeWorldViewMatrix(),i->elementCount);
                     break;
+                case ACT_NORMAL_MATRIX:
+                    if(i->elementCount == 9) // check if shader supports packed data
+                    {
+                        _writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewMatrix().linear(),i->elementCount);
+                        break;
+                    }
+                    OGRE_FALLTHROUGH; // fallthrough to padded 4x4 matrix
                 case ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX:
                     _writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewMatrix(),i->elementCount);
                     break;

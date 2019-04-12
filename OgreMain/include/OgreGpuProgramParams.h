@@ -766,7 +766,10 @@ namespace Ogre {
             ACT_TRANSPOSE_WORLDVIEW_MATRIX,
             /// The current world & view matrices concatenated, then inverted & transposed
             ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX,
-            // view matrices.
+            /** Provides inverse transpose of the upper 3x3 of the worldview matrix.
+                Equivalent to "gl_NormalMatrix".
+            */
+            ACT_NORMAL_MATRIX,
 
             /// The current world, view & projection matrices concatenated
             ACT_WORLDVIEWPROJ_MATRIX,
@@ -1600,6 +1603,8 @@ namespace Ogre {
             @param elementCount actual element count used with shader
         */
         void _writeRawConstant(size_t physicalIndex, const Matrix4& m, size_t elementCount);
+        /// @overload
+        void _writeRawConstant(size_t physicalIndex, const Matrix3& m, size_t elementCount);
         /** Write a list of Matrix4 parameters to the program.
             @note You can use these methods if you have already derived the physical
             constant buffer location, for a slight speed improvement over using

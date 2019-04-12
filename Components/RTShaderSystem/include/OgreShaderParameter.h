@@ -532,6 +532,20 @@ public:
         }
     }
 
+    void setGpuParameter(const Matrix3& val)
+    {
+        if (mParamsPtr == NULL) return;
+
+        if(mElementSize == 9) // check if tight packing is supported
+        {
+            mParamsPtr->_writeRawConstant(mPhysicalIndex, val, 9);
+        }
+        else
+        {
+            mParamsPtr->_writeRawConstant(mPhysicalIndex, Matrix4(val), mElementSize);
+        }
+    }
+
     /** Update the GPU parameter with the given value. */   
     void setGpuParameter(const Matrix4& val)  
     { 
@@ -587,6 +601,8 @@ protected:
     GpuProgramParameters* mParamsPtr;
     // The physical index of this parameter in the GPU program.
     size_t mPhysicalIndex;
+    // The size of this parameter in the GPU program
+    size_t mElementSize;
 };
 
 typedef std::vector<UniformParameterPtr>       UniformParameterList;

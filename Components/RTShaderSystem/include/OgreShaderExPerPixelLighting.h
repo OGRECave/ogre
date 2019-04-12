@@ -44,8 +44,6 @@ namespace RTShader {
 */
 
 #define SGX_LIB_PERPIXELLIGHTING                    "SGXLib_PerPixelLighting"
-#define SGX_FUNC_TRANSFORMNORMAL                    "SGX_TransformNormal"
-#define SGX_FUNC_TRANSFORMPOSITION                  "SGX_TransformPosition"
 #define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE          "SGX_Light_Directional_Diffuse"
 #define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR  "SGX_Light_Directional_DiffuseSpecular"
 #define SGX_FUNC_LIGHT_POINT_DIFFUSE                "SGX_Light_Point_Diffuse"
@@ -101,7 +99,7 @@ protected:
     /** 
     Internal method that adds global illumination component functions invocations.
     */
-    bool addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder);
+    bool addPSGlobalIlluminationInvocation(const FunctionStageRef& stage);
 
     /** 
     Internal method that adds the final colour assignments.
