@@ -29,82 +29,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-//-----------------------------------------------------------------------
-template<> 
-RTShader::FFPRenderStateBuilder* Singleton<RTShader::FFPRenderStateBuilder>::msSingleton = 0;
-
 namespace RTShader {
-
-
-//-----------------------------------------------------------------------
-FFPRenderStateBuilder* FFPRenderStateBuilder::getSingletonPtr()
-{
-    return msSingleton;
-}
-
-//-----------------------------------------------------------------------
-FFPRenderStateBuilder& FFPRenderStateBuilder::getSingleton()
-{
-    assert( msSingleton );  
-    return ( *msSingleton );
-}
-
-//-----------------------------------------------------------------------------
-FFPRenderStateBuilder::FFPRenderStateBuilder()
-{
-    initialize();
-}
-
-//-----------------------------------------------------------------------------
-FFPRenderStateBuilder::~FFPRenderStateBuilder()
-{
-    destroy();
-}
-
-//-----------------------------------------------------------------------------
-bool FFPRenderStateBuilder::initialize()
-{
-    SubRenderStateFactory* curFactory;
-
-    curFactory = OGRE_NEW FFPTransformFactory;  
-    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-    mFFPSubRenderStateFactoryList.push_back(curFactory);
-
-    curFactory = OGRE_NEW FFPColourFactory; 
-    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-    mFFPSubRenderStateFactoryList.push_back(curFactory);
-
-    curFactory = OGRE_NEW FFPLightingFactory;
-    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-    mFFPSubRenderStateFactoryList.push_back(curFactory);
-
-    curFactory = OGRE_NEW FFPTexturingFactory;
-    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-    mFFPSubRenderStateFactoryList.push_back(curFactory);
-
-    curFactory = OGRE_NEW FFPFogFactory;    
-    ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-    mFFPSubRenderStateFactoryList.push_back(curFactory);
-
-	curFactory = OGRE_NEW FFPAlphaTestFactory;	
-	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
-	mFFPSubRenderStateFactoryList.push_back(curFactory);
-	
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-void FFPRenderStateBuilder::destroy()
-{
-    SubRenderStateFactoryIterator it;
-
-    for (it = mFFPSubRenderStateFactoryList.begin(); it != mFFPSubRenderStateFactoryList.end(); ++it)
-    {
-        ShaderGenerator::getSingleton().removeSubRenderStateFactory(*it);       
-        OGRE_DELETE *it;        
-    }
-    mFFPSubRenderStateFactoryList.clear();
-}
 
 
 //-----------------------------------------------------------------------------
@@ -119,8 +44,11 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Ta
     buildFFPSubRenderState(FFP_COLOUR, FFPColour::Type, sgPass, renderState);
 
     // Build lighting sub state.
+#ifndef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     buildFFPSubRenderState(FFP_LIGHTING, FFPLighting::Type, sgPass, renderState);
-
+#else
+    buildFFPSubRenderState(FFP_LIGHTING, PerPixelLighting::Type, sgPass, renderState);
+#endif
     // Build texturing sub state.
     buildFFPSubRenderState(FFP_TEXTURING, FFPTexturing::Type, sgPass, renderState);
     

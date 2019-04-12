@@ -51,7 +51,7 @@ AdvancedRenderControls::AdvancedRenderControls(TrayManager* trayMgr, Ogre::Camer
         mDetailsPanel->setParamValue(11, "On");
     }
 
-    mDetailsPanel->setParamValue(12, "Vertex");
+    mDetailsPanel->setParamValue(12, "Pixel");
     mDetailsPanel->setParamValue(13, "Low");
     mDetailsPanel->setParamValue(14, "0");
     mDetailsPanel->setParamValue(15, "0");
@@ -170,7 +170,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
 #   ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     // Toggles per pixel per light model.
     else if (key == SDLK_F3) {
-        static bool usePerPixelLighting = true;
+        static bool useFFPLighting = true;
 
         //![rtss_per_pixel]
         // Grab the scheme render state.
@@ -179,9 +179,8 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
 
         // Add per pixel lighting sub render state to the global scheme render state.
         // It will override the default FFP lighting sub render state.
-        if (usePerPixelLighting) {
-            Ogre::RTShader::PerPixelLighting* perPixelLightModel =
-                mShaderGenerator->createSubRenderState<Ogre::RTShader::PerPixelLighting>();
+        if (useFFPLighting) {
+            auto perPixelLightModel = mShaderGenerator->createSubRenderState<Ogre::RTShader::FFPLighting>();
 
             schemRenderState->addTemplateSubRenderState(perPixelLightModel);
         }
@@ -191,7 +190,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
         else {
             for (auto srs : schemRenderState->getTemplateSubRenderStateList()) {
                 // This is the per pixel sub render state -> remove it.
-                if (dynamic_cast<Ogre::RTShader::PerPixelLighting*>(srs)) {
+                if (dynamic_cast<Ogre::RTShader::FFPLighting*>(srs)) {
                     schemRenderState->removeTemplateSubRenderState(srs);
                     break;
                 }
@@ -203,11 +202,11 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
         mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
         // Update UI.
-        if (usePerPixelLighting)
+        if (!useFFPLighting)
             mDetailsPanel->setParamValue(12, "Pixel");
         else
             mDetailsPanel->setParamValue(12, "Vertex");
-        usePerPixelLighting = !usePerPixelLighting;
+        useFFPLighting = !useFFPLighting;
     }
 #   endif
     // Switch vertex shader outputs compaction policy.
