@@ -99,7 +99,7 @@ protected:
     /** 
     Internal method that adds global illumination component functions invocations.
     */
-    bool addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder);
+    bool addPSGlobalIlluminationInvocation(const FunctionStageRef& stage);
 
     /** 
     Internal method that adds the final colour assignments.

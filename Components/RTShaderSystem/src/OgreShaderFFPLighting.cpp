@@ -220,6 +220,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 		{
 		case Light::LT_DIRECTIONAL:
 			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
+			mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
 			break;
 		
 		case Light::LT_POINT:
@@ -235,6 +236,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
 			
 			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_view_space");
+			mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
 			
 			mLightParamsList[i].mAttenuatParams = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
 			
@@ -287,6 +289,15 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
         mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
         mViewPos = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_VIEW_SPACE);
+        mToLight = vsMain->resolveLocalParameter(Parameter::SPC_LIGHTDIRECTION_VIEW_SPACE0);
+        mToView = vsMain->resolveLocalParameter(Parameter::SPC_POSTOCAMERA_VIEW_SPACE);
+
+        for (auto& l : mLightParamsList)
+        {
+            if(l.mType != Light::LT_POINT && l.mType != Light::LT_SPOTLIGHT)
+                continue;
+            l.mToLight = mToLight;
+        }
 	}
 
 	return true;
@@ -312,15 +323,19 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
 {
 	Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);	
 	Function* vsMain = vsProgram->getEntryPointFunction();	
+    auto stage = vsMain->getStage(FFP_VS_LIGHTING);
 
 	// Add the global illumination functions.
-	if (false == addGlobalIlluminationInvocation(vsMain, FFP_VS_LIGHTING))
+	if (false == addGlobalIlluminationInvocation(stage))
 		return false;
 
-	// Add per light functions.
+    if (mToView)
+        stage.callFunction(FFP_FUNC_MODULATE, ParameterFactory::createConstParam(Vector3(-1)), mViewPos, mToView);
+
+    // Add per light functions.
 	for (unsigned int i=0; i < mLightParamsList.size(); ++i)
 	{		
-		if (false == addIlluminationInvocation(&mLightParamsList[i], vsMain, FFP_VS_LIGHTING))
+		if (false == addIlluminationInvocation(&mLightParamsList[i], stage))
 			return false;
 	}
 
@@ -328,10 +343,8 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
 }
 
 //-----------------------------------------------------------------------
-bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int groupOrder)
+bool FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
 {
-	auto stage = vsMain->getStage(groupOrder);
-
     // Transform normal to view space
 	if(!mLightParamsList.empty())
 	    stage.callFunction(FFP_FUNC_TRANSFORM, mWorldViewITMatrix, mVSInNormal, mViewNormal);
@@ -372,10 +385,8 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 }
 
 //-----------------------------------------------------------------------
-bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Function* vsMain, const int groupOrder)
+bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, const FunctionStageRef& stage)
 {
-    auto stage = vsMain->getStage(groupOrder);
-
     // Merge diffuse colour with vertex colour if need to.
     if (mTrackVertexColourType & TVC_DIFFUSE)
     {
@@ -396,7 +407,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
         if (mSpecularEnable)
         {
             stage.callFunction(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR,
-                               {In(mViewNormal), In(mViewPos), In(curLightParams->mDirection).xyz(),
+                               {In(mViewNormal), In(mToView), In(curLightParams->mPSInDirection).xyz(),
                                 In(curLightParams->mDiffuseColour).xyz(), In(curLightParams->mSpecularColour).xyz(),
                                 In(mSurfaceShininess), InOut(mOutDiffuse).xyz(), InOut(mOutSpecular).xyz()});
         }
@@ -404,16 +415,18 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
         else
         {
             stage.callFunction(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE,
-                               {In(mViewNormal), In(curLightParams->mDirection).xyz(),
+                               {In(mViewNormal), In(curLightParams->mPSInDirection).xyz(),
                                 In(curLightParams->mDiffuseColour).xyz(), InOut(mOutDiffuse).xyz()});
         }
         break;
 
     case Light::LT_POINT:
+        if(mToLight)
+            stage.callFunction(FFP_FUNC_SUBTRACT, In(curLightParams->mPosition).xyz(), mViewPos, mToLight);
         if (mSpecularEnable)
         {
             stage.callFunction(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR,
-                               {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
+                               {In(mViewNormal), In(mToView), In(curLightParams->mToLight),
                                 In(curLightParams->mAttenuatParams), In(curLightParams->mDiffuseColour).xyz(),
                                 In(curLightParams->mSpecularColour).xyz(), In(mSurfaceShininess),
                                 InOut(mOutDiffuse).xyz(), InOut(mOutSpecular).xyz()});
@@ -421,19 +434,20 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
         else
         {
             stage.callFunction(SGX_FUNC_LIGHT_POINT_DIFFUSE,
-                               {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
-                                In(curLightParams->mAttenuatParams), In(curLightParams->mDiffuseColour).xyz(),
-                                InOut(mOutDiffuse).xyz()});
+                               {In(mViewNormal), In(curLightParams->mToLight), In(curLightParams->mAttenuatParams),
+                                In(curLightParams->mDiffuseColour).xyz(), InOut(mOutDiffuse).xyz()});
         }
 				
         break;
 
     case Light::LT_SPOTLIGHT:
+        if(mToLight)
+            stage.callFunction(FFP_FUNC_SUBTRACT, In(curLightParams->mPosition).xyz(), mViewPos, mToLight);
         if (mSpecularEnable)
         {
             stage.callFunction(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR,
-                               {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
-                                In(curLightParams->mDirection).xyz(), In(curLightParams->mAttenuatParams),
+                               {In(mViewNormal), In(mToView), In(curLightParams->mToLight),
+                                In(curLightParams->mPSInDirection).xyz(), In(curLightParams->mAttenuatParams),
                                 In(curLightParams->mSpotParams), In(curLightParams->mDiffuseColour).xyz(),
                                 In(curLightParams->mSpecularColour).xyz(), In(mSurfaceShininess),
                                 InOut(mOutDiffuse).xyz(), InOut(mOutSpecular).xyz()});
@@ -441,10 +455,9 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
         else
         {
             stage.callFunction(SGX_FUNC_LIGHT_SPOT_DIFFUSE,
-                               {In(mViewNormal), In(mViewPos), In(curLightParams->mPosition).xyz(),
-                                In(curLightParams->mDirection).xyz(), In(curLightParams->mAttenuatParams),
-                                In(curLightParams->mSpotParams), In(curLightParams->mDiffuseColour).xyz(),
-                                InOut(mOutDiffuse).xyz()});
+                               {In(mViewNormal), In(curLightParams->mToLight), In(curLightParams->mPSInDirection).xyz(),
+                                In(curLightParams->mAttenuatParams), In(curLightParams->mSpotParams),
+                                In(curLightParams->mDiffuseColour).xyz(), InOut(mOutDiffuse).xyz()});
         }
         break;
     }

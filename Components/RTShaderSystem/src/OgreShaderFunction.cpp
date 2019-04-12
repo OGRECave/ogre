@@ -56,6 +56,7 @@ static GpuConstantType typeFromContent(Parameter::Content content)
     case Parameter::SPC_TANGENT_OBJECT_SPACE:
     case Parameter::SPC_POSTOCAMERA_TANGENT_SPACE:
     case Parameter::SPC_POSTOCAMERA_OBJECT_SPACE:
+    case Parameter::SPC_POSTOCAMERA_VIEW_SPACE:
     case Parameter::SPC_POSITION_VIEW_SPACE:
     case Parameter::SPC_POSITION_WORLD_SPACE:
     case Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0:
@@ -90,6 +91,7 @@ static GpuConstantType typeFromContent(Parameter::Content content)
     case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE5:
     case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE6:
     case Parameter::SPC_POSTOLIGHT_TANGENT_SPACE7:
+    case Parameter::SPC_LIGHTDIRECTION_VIEW_SPACE0:
         return GCT_FLOAT3;
     case Parameter::SPC_POINTSPRITE_COORDINATE:
         return GCT_FLOAT2;

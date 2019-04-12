@@ -252,11 +252,11 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Resolve pixel shader normal.
     if (mNormalMapSpace == NMS_OBJECT)
     {
-        mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+        mViewNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
     }
     else if (mNormalMapSpace == NMS_TANGENT)
     {
-        mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT3);
+        mViewNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT3);
     }
 
     mInDiffuse = psMain->getInputParameter(Parameter::SPC_COLOR_DIFFUSE);
@@ -290,7 +290,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
             mVSOutView = vsMain->resolveOutputParameter(Parameter::SPC_POSTOCAMERA_OBJECT_SPACE);
         }
 
-        mPSInView = psMain->resolveInputParameter(mVSOutView);
+        mToView = psMain->resolveInputParameter(mVSOutView);
 
         // Resolve camera position world space.
         mCamPosWorldSpace = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
@@ -356,7 +356,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
                     Parameter::Content(Parameter::SPC_POSTOLIGHT_OBJECT_SPACE0 + i));
             }
             
-            mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
+            mLightParamsList[i].mToLight = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
 
             mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
 
@@ -400,7 +400,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
                     Parameter::Content(Parameter::SPC_POSTOLIGHT_OBJECT_SPACE0 + i));
             }
             
-            mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
+            mLightParamsList[i].mToLight = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
 
             mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_direction_obj_space");
 
@@ -486,10 +486,10 @@ bool NormalMapLighting::resolveDependencies(ProgramSet* programSet)
     psProgram->addDependency(FFP_LIB_TEXTURING);
 
     vsProgram->addDependency(FFP_LIB_COMMON);
-    vsProgram->addDependency(SGX_LIB_NORMALMAPLIGHTING);
+    vsProgram->addDependency(SGX_LIB_NORMALMAP);
 
     psProgram->addDependency(FFP_LIB_COMMON);
-    psProgram->addDependency(SGX_LIB_NORMALMAPLIGHTING);
+    psProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
     return true;
 }
@@ -506,20 +506,20 @@ bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
     if (false == addVSInvocation(vsMain, FFP_VS_LIGHTING))
         return false;
 
-    // Add the normal fetch function invocation.
-    if (false == addPSNormalFetchInvocation(psMain, FFP_PS_COLOUR_BEGIN + 1))
-        return false;
+    auto stage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
 
+    // Add the normal fetch function invocation.
+    stage.callFunction(SGX_FUNC_FETCHNORMAL, mPSNormalMapSampler, mPSInTexcoord, mViewNormal);
     
     // Add the global illumination functions.
-    if (false == addPSGlobalIlluminationInvocation(psMain, FFP_PS_COLOUR_BEGIN + 1))
+    if (false == addPSGlobalIlluminationInvocation(stage))
         return false;
 
 
     // Add per light functions.
     for (unsigned int i=0; i < mLightParamsList.size(); ++i)
     {       
-        if (false == addPSIlluminationInvocation(&mLightParamsList[i], psMain, FFP_PS_COLOUR_BEGIN + 1))
+        if (false == addIlluminationInvocation(&mLightParamsList[i], stage))
             return false;
     }
 
@@ -557,8 +557,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder)
         mVSOutView.get() != NULL)
     {   
         // View vector in world space.
-        stage.callFunction(FFP_FUNC_SUBTRACT, In(mCamPosWorldSpace).xyz(), In(mVSWorldPosition).xyz(),
-                           mVSLocalDir);
+        stage.callFunction(FFP_FUNC_SUBTRACT, In(mCamPosWorldSpace).xyz(), In(mVSWorldPosition).xyz(), mVSLocalDir);
 
         // Transform to object space.
         stage.callFunction(FFP_FUNC_TRANSFORM, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
@@ -634,136 +633,6 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
         }
     }
 
-
-    return true;
-}
-
-//-----------------------------------------------------------------------
-bool NormalMapLighting::addPSNormalFetchInvocation(Function* psMain, const int groupOrder)
-{
-    psMain->getStage(groupOrder)
-        .callFunction(SGX_FUNC_FETCHNORMAL, mPSNormalMapSampler, mPSInTexcoord, mPSNormal);
-
-    return true;
-}
-
-//-----------------------------------------------------------------------
-bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder)
-{
-    auto stage = psMain->getStage(groupOrder);
-
-    // Merge diffuse colour with vertex colour if need to.
-    if (mTrackVertexColourType & TVC_DIFFUSE)           
-    {
-        stage.callFunction(FFP_FUNC_MODULATE, In(mInDiffuse).xyz(), In(curLightParams->mDiffuseColour).xyz(),
-                           Out(curLightParams->mDiffuseColour).xyz());
-    }
-
-    // Merge specular colour with vertex colour if need to.
-    if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
-    {
-        stage.callFunction(FFP_FUNC_MODULATE, In(mInDiffuse).xyz(), In(curLightParams->mSpecularColour).xyz(),
-                           Out(curLightParams->mSpecularColour).xyz());
-    }
-
-    FunctionInvocation* curFuncInvocation = NULL;
-    switch (curLightParams->mType)
-    {
-
-    case Light::LT_DIRECTIONAL:         
-        if (mSpecularEnable)
-        {               
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder);
-            curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSInView, Operand::OPS_IN);         
-            curFuncInvocation->pushOperand(curLightParams->mPSInDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);          
-            curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);         
-            curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutSpecular, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutSpecular, Operand::OPS_OUT, Operand::OPM_XYZ);
-            psMain->addAtomInstance(curFuncInvocation);
-        }
-
-        else
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, groupOrder);
-            curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mPSInDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);                  
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
-            psMain->addAtomInstance(curFuncInvocation); 
-        }   
-        break;
-
-    case Light::LT_POINT:   
-        if (mSpecularEnable)
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder);
-            curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);         
-            curFuncInvocation->pushOperand(mPSInView, Operand::OPS_IN); 
-            curFuncInvocation->pushOperand(curLightParams->mPSInToLightDir, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);         
-            curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutSpecular, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutSpecular, Operand::OPS_OUT, Operand::OPM_XYZ);
-            psMain->addAtomInstance(curFuncInvocation);     
-        }
-        else
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSE, groupOrder);
-            curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);                     
-            curFuncInvocation->pushOperand(curLightParams->mPSInToLightDir, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);                  
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
-            psMain->addAtomInstance(curFuncInvocation); 
-        }
-
-        break;
-
-    case Light::LT_SPOTLIGHT:
-        if (mSpecularEnable)
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder);
-            curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mPSInView, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mPSInToLightDir, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mPSInDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mSpotParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);         
-            curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutSpecular, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutSpecular, Operand::OPS_OUT, Operand::OPM_XYZ);
-            psMain->addAtomInstance(curFuncInvocation);         
-        }
-        else
-        {
-            curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSE, groupOrder);
-            curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mPSInToLightDir, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mPSInDirection, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mSpotParams, Operand::OPS_IN);
-            curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);                  
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
-            curFuncInvocation->pushOperand(mOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
-            psMain->addAtomInstance(curFuncInvocation); 
-        }
-        break;
-    }
 
     return true;
 }
