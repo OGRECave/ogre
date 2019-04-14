@@ -32,8 +32,9 @@ namespace RTShader {
 //-----------------------------------------------------------------------------
 Operand::Operand(ParameterPtr parameter, OpSemantic opSemantic, OpMask opMask, ushort indirectionLevel) : mParameter(parameter), mSemantic(opSemantic), mMask(opMask), mIndirectionLevel(indirectionLevel)
 {
-    OgreAssert(mParameter, "NULL parameter is not a valid operand");
-    parameter->setUsed(true);
+    // delay null check until FunctionInvocation
+    if(parameter)
+        parameter->setUsed(true);
 }
 //-----------------------------------------------------------------------------
 Operand::Operand(const Operand& other) 
@@ -267,13 +268,22 @@ void FunctionInvocation::writeOperands(std::ostream& os, OperandVector::const_it
 }
 
 //-----------------------------------------------------------------------
+static String parameterNullMsg(const String& type, const String& name, size_t pos)
+{
+    return StringUtil::format("%s: %s parameter #%zu is NULL", type.c_str(), name.c_str(), pos);
+}
+
 void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, Operand::OpMask opMask, int indirectionLevel)
 {
+    OgreAssert(parameter, parameterNullMsg(getFunctionAtomType(), mFunctionName, mOperands.size()).c_str());
     mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
 }
 
 void FunctionInvocation::setOperands(const OperandVector& ops)
 {
+    for (size_t i = 0; i < ops.size(); i++)
+        OgreAssert(ops[i].getParameter(), parameterNullMsg(getFunctionAtomType(), mFunctionName, i).c_str());
+
     mOperands = ops;
 }
 
