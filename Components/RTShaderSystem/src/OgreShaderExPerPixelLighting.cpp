@@ -145,7 +145,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
         case Light::LT_DIRECTIONAL:
             mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_view_space");
             mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
-            needViewPos = mSpecularEnable;
+            needViewPos = mSpecularEnable || needViewPos;
             break;
 
         case Light::LT_POINT:
