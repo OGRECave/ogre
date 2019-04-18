@@ -2,7 +2,6 @@ struct VS_INPUT
 {
 	float4 Position	:	SV_POSITION;
 	float3 Normal	:	NORMAL;
-	float3 Tangent	:	TANGENT;
 #ifdef BONE_TWO_WEIGHTS
 	float4 weights		: 	BLENDWEIGHT;
 #endif
