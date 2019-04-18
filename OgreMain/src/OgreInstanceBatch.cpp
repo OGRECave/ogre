@@ -159,6 +159,7 @@ namespace Ogre
         if (mParentNode) {
             mParentNode->needUpdate();
         }
+	mBoundsUpdated  = true;
         mBoundsDirty    = false;
     }
 
