@@ -93,10 +93,11 @@ namespace Ogre {
                     }
                 }
 
-                if(!found)
+                if (!found)
                 {
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D11 vertex declaration" , 
-                                                "D3D11VertexDeclaration::getILayoutByShader");
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                                StringUtil::format("No VertexElement for semantic %s in shader %s found",
+                                                   inputDesc.SemanticName, boundVertexProgram->getName().c_str()));
                 }
 
                 D3D11_INPUT_ELEMENT_DESC elem = {};
