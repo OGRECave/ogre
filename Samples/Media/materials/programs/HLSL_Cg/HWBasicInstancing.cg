@@ -10,7 +10,6 @@ struct VS_INPUT
 {
 	float4 Position	:	POSITION;
 	float3 Normal	:	NORMAL;
-	float3 Tangent	:	TANGENT;
 	float2 uv0		:	TEXCOORD0;
 
 	float4 mat14	:	TEXCOORD1;
@@ -48,7 +47,7 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	output.Position		= mul( viewProjMatrix, worldPos );
 
 #ifdef DEPTH_SHADOWCASTER
-	output.ps.unused	= float3( 0 );
+	output.ps.unused	= float3( 0, 0, 0 );
 	output.ps.depth		= (output.Position.z - depthRange.x + SHADOW_BIAS) * depthRange.w;
 #else
 	output.ps.uv0		= input.uv0;

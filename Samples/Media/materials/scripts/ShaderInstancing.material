@@ -123,9 +123,9 @@ vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_glsles_vs glsles
 //--------------------------------------------------------------
 vertex_program Ogre/Instancing/ShaderBased_hlsl_vs hlsl
 {
-	source ShaderInstancing.hlsl
+	source ShaderInstancing.cg
 	entry_point main_vs
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_3_0
 
 	preprocessor_defines DEPTH_SHADOWRECEIVER
 
@@ -134,9 +134,9 @@ vertex_program Ogre/Instancing/ShaderBased_hlsl_vs hlsl
 
 vertex_program Ogre/Instancing/shadow_caster_hlsl_vs hlsl
 {
-	source ShaderInstancing.hlsl
+	source ShaderInstancing.cg
 	entry_point main_vs
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_3_0
 	
 	preprocessor_defines DEPTH_SHADOWCASTER
 
@@ -145,9 +145,9 @@ vertex_program Ogre/Instancing/shadow_caster_hlsl_vs hlsl
 
 vertex_program Ogre/Instancing/ShaderBased_dq_hlsl_vs hlsl
 {
-	source ShaderInstancing.hlsl
+	source ShaderInstancing.cg
 	entry_point main_vs
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_3_0
 
 	preprocessor_defines DEPTH_SHADOWRECEIVER,ST_DUAL_QUATERNION
 
@@ -156,9 +156,9 @@ vertex_program Ogre/Instancing/ShaderBased_dq_hlsl_vs hlsl
 
 vertex_program Ogre/Instancing/shadow_caster_dq_hlsl_vs hlsl
 {
-	source ShaderInstancing.hlsl
+	source ShaderInstancing.cg
 	entry_point main_vs
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_3_0
 	
 	preprocessor_defines DEPTH_SHADOWCASTER,ST_DUAL_QUATERNION
 
@@ -167,9 +167,9 @@ vertex_program Ogre/Instancing/shadow_caster_dq_hlsl_vs hlsl
 
 vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_hlsl_vs hlsl
 {
-	source ShaderInstancing.hlsl
+	source ShaderInstancing.cg
 	entry_point main_vs
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_3_0
 
 	preprocessor_defines DEPTH_SHADOWRECEIVER,ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS
 
@@ -178,9 +178,9 @@ vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_hlsl_vs hlsl
 
 vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_hlsl_vs hlsl
 {
-	source ShaderInstancing.hlsl
+	source ShaderInstancing.cg
 	entry_point main_vs
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_3_0
 	
 	preprocessor_defines DEPTH_SHADOWCASTER,ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS
 
