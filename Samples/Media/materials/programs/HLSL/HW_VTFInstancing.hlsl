@@ -10,7 +10,6 @@ struct VS_INPUT
 {
 	float4 Position	:	POSITION;
 	float3 Normal	:	NORMAL;
-	float3 Tangent	:	TANGENT;
 #ifdef BONE_TWO_WEIGHTS
 	float4 weights		: 	BLENDWEIGHT;
 #endif
@@ -44,7 +43,7 @@ struct PS_INPUT
 
 struct VS_OUTPUT
 {
-	float4 Position	:	SV_POSITION;
+	float4 Position	:	POSITION;
 	PS_INPUT	ps;
 };
 
@@ -52,7 +51,7 @@ struct VS_OUTPUT
 #define LOD 0
 
 #ifdef ST_DUAL_QUATERNION
-#include "DualQuaternion_Common.hlsl"
+#include "DualQuaternionSkinning_Shadow.cg"
 #endif
 
 SamplerState MySampler;
@@ -100,7 +99,7 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	//Normalize the resultant dual quaternion
 	blendDQ /= length(blendDQ[0]);
 #endif
-	worldPos = float4(calculateBlendPosition(input.Position.xyz, blendDQ), 1.0);
+	worldPos = float4(calculateBlendPosition(input.Position, blendDQ), 1.0);
 	worldNorm = calculateBlendNormal(input.Normal, blendDQ);
 #else
 	float3x4 worldMatrix;

@@ -25,18 +25,18 @@ vertex_program Ogre/Instancing/HWBasic/shadow_caster_glsl_vs glsl
 //--------------------------------------------------------------
 vertex_program Ogre/Instancing/HWBasic_hlsl_vs hlsl
 {
-	source HWBasicInstancing.hlsl
+	source HWBasicInstancing.cg
 	entry_point main_vs
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_3_0
 	
 	preprocessor_defines DEPTH_SHADOWRECEIVER
 }
 
 vertex_program Ogre/Instancing/HWBasic/shadow_caster_hlsl_vs hlsl
 {
-	source HWBasicInstancing.hlsl
+	source HWBasicInstancing.cg
 	entry_point main_vs
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_3_0
 	
 	preprocessor_defines DEPTH_SHADOWCASTER
 }

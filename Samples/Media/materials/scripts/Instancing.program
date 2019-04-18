@@ -89,10 +89,9 @@ fragment_program Ogre/Instancing_hlsl_ps hlsl
 
 fragment_program Ogre/Instancing/shadow_caster_hlsl_ps hlsl
 {
-	source depthshadowobject.hlsl
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-	entry_point caster_fp
-	preprocessor_defines SHADOWCASTER=1;DEPTH_SHADOWCASTER=1;DEPTH_SHADOWRECEIVER=0
+	source pssm.cg
+	target ps_3_0
+	entry_point shadow_caster_ps
 
 	default_params
 	{
