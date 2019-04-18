@@ -1,4 +1,4 @@
-#include "DualQuaternion_Common.hlsl"
+#include "DualQuaternionSkinning_Shadow.cg"
 
 
 struct v2p
