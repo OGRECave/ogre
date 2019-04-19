@@ -6,6 +6,34 @@ One way to support both HLSL and GLSL is to include separate techniques in the m
 
 @tableofcontents
 
+
+# Preprocessor definitions {#Preprocessor-definitions}
+
+Both GLSL and HLSL support using preprocessor definitions in your code - some are defined by the implementation, but you can also define your own, say in order to use the same source code for a few different variants of the same technique. In order to use this feature, include preprocessor conditions in your code, of the kind \#ifdef SYMBOL, \#if SYMBOL==2 etc. Then in your program definition, use the ’preprocessor\_defines’ option, following it with a string of definitions. Definitions are separated by ’;’ or ’,’ and may optionally have a ’=’ operator within them to specify a definition value. Those without an ’=’ will implicitly have a definition of 1. For example:
+
+```cpp
+// in your shader
+
+#ifdef CLEVERTECHNIQUE
+    // some clever stuff here
+#else
+    // normal technique
+#endif
+
+#if NUM_THINGS==2
+    // Some specific code
+#else
+    // something else
+#endif
+
+// in  your program definition
+preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
+```
+
+This way you can use the same source code but still include small variations, each one defined as a different Ogre program name but based on the same source code.
+
+@note on GLSL %Ogre pre-processes the source itself instead on relying on the driver implementation which is often buggy. This relaxes using \#ifdef directives compared to the standard - e.g. you can \#ifdef \#version. However this means that defines specified in GLSL extensions are not present.
+
 # Cg programs {#Cg}
 
 In order to define Cg programs, you have to have to load Plugin\_CgProgramManager.so/.dll at startup, either through plugins.cfg or through your own plugin loading code. They are very easy to define:
@@ -45,11 +73,7 @@ Note that if you use the float3x4 / matrix3x4 type in your shader, bound to an O
 **Advanced options**<br>
 
 <dl compact="compact">
-<dt>preprocessor\_defines &lt;defines&gt;</dt> <dd>
-
-This allows you to define symbols which can be used inside the HLSL shader code to alter the behaviour (through \#ifdef or \#if clauses). Definitions are separated by ’;’ or ’,’ and may optionally have a ’=’ operator within them to specify a definition value. Those without an ’=’ will implicitly have a definition of 1.
-
-</dd> <dt>column\_major\_matrices &lt;true|false&gt;</dt> <dd>
+<dt>column\_major\_matrices &lt;true|false&gt;</dt> <dd>
 
 The default for this option is ’true’ so that OGRE passes matrices auto-bound matrices in a form where mul(m,v) works. Setting this option to false does 2 things - it transpose auto-bound 4x4 matrices and also sets the /Zpr (row-major) option on the shader compilation. This means you can still use mul(m,v), but the matrix layout is row-major instead. This is only useful if you need to use bone matrices (float3x4) in a shader since it saves a float4 constant for every bone involved.
 
@@ -231,31 +255,6 @@ Binds Ogre::VES\_BLEND\_INDICES, declare as ’attribute vec4 blendIndices;’.
 Binds Ogre::VES\_BLEND\_WEIGHTS, declare as ’attribute vec4 blendWeights;’.
 
 </dd> </dl>
-
-## Preprocessor definitions {#Preprocessor-definitions}
-
-GLSL supports using preprocessor definitions in your code - some are defined by the implementation, but you can also define your own, say in order to use the same source code for a few different variants of the same technique. In order to use this feature, include preprocessor conditions in your GLSL code, of the kind \#ifdef SYMBOL, \#if SYMBOL==2 etc. Then in your program definition, use the ’preprocessor\_defines’ option, following it with a string if definitions. Definitions are separated by ’;’ or ’,’ and may optionally have a ’=’ operator within them to specify a definition value. Those without an ’=’ will implicitly have a definition of 1. For example:
-
-```cpp
-// in your GLSL
-
-#ifdef CLEVERTECHNIQUE
-    // some clever stuff here
-#else
-    // normal technique
-#endif
-
-#if NUM_THINGS==2
-    // Some specific code
-#else
-    // something else
-#endif
-
-// in  your program definition
-preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
-```
-
-This way you can use the same source code but still include small variations, each one defined as a different Ogre program name but based on the same source code.
 
 ## GLSL Geometry shader specification {#GLSL-Geometry-shader-specification}
 
