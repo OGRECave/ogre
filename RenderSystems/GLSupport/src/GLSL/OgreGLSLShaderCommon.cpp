@@ -62,59 +62,10 @@ namespace Ogre {
         if(getLanguage() == "glsles")
             cpp.Define("GL_ES", 5, 1);
 
-        // Pass all user-defined macros to preprocessor
-        if (!mPreprocessorDefines.empty ())
+        String defines = mPreprocessorDefines;
+        for(const auto& def : parseDefines(defines))
         {
-            String::size_type pos = 0;
-            while (pos != String::npos)
-            {
-                // Find delims
-                String::size_type endPos = mPreprocessorDefines.find_first_of(";,=", pos);
-                if (endPos != String::npos)
-                {
-                    String::size_type macro_name_start = pos;
-                    size_t macro_name_len = endPos - pos;
-                    pos = endPos;
-
-                    // Check definition part
-                    if (mPreprocessorDefines[pos] == '=')
-                    {
-                        // set up a definition, skip delim
-                        ++pos;
-                        String::size_type macro_val_start = pos;
-                        size_t macro_val_len;
-
-                        endPos = mPreprocessorDefines.find_first_of(";,", pos);
-                        if (endPos == String::npos)
-                        {
-                            macro_val_len = mPreprocessorDefines.size () - pos;
-                            pos = endPos;
-                        }
-                        else
-                        {
-                            macro_val_len = endPos - pos;
-                            pos = endPos+1;
-                        }
-                        cpp.Define (
-                            mPreprocessorDefines.c_str () + macro_name_start, macro_name_len,
-                            mPreprocessorDefines.c_str () + macro_val_start, macro_val_len);
-                    }
-                    else
-                    {
-                        // No definition part, define as "1"
-                        ++pos;
-                        cpp.Define (
-                            mPreprocessorDefines.c_str () + macro_name_start, macro_name_len, 1);
-                    }
-                }
-                else
-                {
-                    if(pos < mPreprocessorDefines.size())
-                        cpp.Define (mPreprocessorDefines.c_str () + pos, mPreprocessorDefines.size() - pos, 1);
-
-                    pos = endPos;
-                }
-            }
+            cpp.Define(def.first, strlen(def.first), def.second, strlen(def.second));
         }
 
 		// deal with includes

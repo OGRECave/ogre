@@ -73,6 +73,9 @@ namespace Ogre {
         /// Preprocessor options
         String mPreprocessorDefines;
 
+        /// in-situ parsing of defines
+        static std::vector<std::pair<const char*, const char*>> parseDefines(String& defines);
+
         /// Internal load high-level portion if not loaded
         virtual void loadHighLevel(void);
         /// Internal unload high-level portion if loaded

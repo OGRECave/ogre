@@ -110,6 +110,65 @@ namespace Ogre
         return memSize;
     }
 
+    std::vector<std::pair<const char*, const char*>> HighLevelGpuProgram::parseDefines(String& defines)
+    {
+        std::vector<std::pair<const char*, const char*>> ret;
+        if (defines.empty())
+            return ret;
+
+        String::size_type pos = 0;
+        while (pos != String::npos)
+        {
+            // Find delims
+            String::size_type endPos = defines.find_first_of(";,=", pos);
+            if (endPos != String::npos)
+            {
+                String::size_type macro_name_start = pos;
+                pos = endPos;
+
+                // Check definition part
+                if (defines[pos] == '=')
+                {
+                    // Setup null character for macro name
+                    defines[pos] = '\0';
+                    // set up a definition, skip delim
+                    ++pos;
+                    String::size_type macro_val_start = pos;
+
+                    endPos = defines.find_first_of(";,", pos);
+                    if (endPos == String::npos)
+                    {
+                        pos = endPos;
+                    }
+                    else
+                    {
+                        defines[endPos] = '\0';
+                        pos = endPos+1;
+                    }
+
+                    ret.push_back({&defines[macro_name_start], &defines[macro_val_start]});
+                }
+                else
+                {
+                    // Setup null character for macro name
+                    defines[pos] = '\0';
+                    // No definition part, define as "1"
+                    ++pos;
+                    ret.push_back({&defines[macro_name_start], "1"});
+                }
+            }
+            else
+            {
+                if(pos < defines.size())
+                    ret.push_back({&defines[pos], "1"});
+
+                pos = endPos;
+            }
+        }
+
+        return ret;
+    }
+
     //---------------------------------------------------------------------------
     void HighLevelGpuProgram::loadHighLevel(void)
     {
