@@ -91,7 +91,7 @@ OpenGL GLSL has a similar language syntax to HLSL but is tied to the OpenGL API.
 ```cpp
 vertex_program myGLSLVertexProgram glsl
 {
-    source myGLSLVertexProgram.txt
+    source myGLSLVertexProgram.vert
 }
 ```
 
@@ -99,26 +99,28 @@ In GLSL, no entry point needs to be defined since it is always `main()` and ther
 
 GLSL supports the use of modular shaders. This means you can write GLSL external functions that can be used in multiple shaders.
 
+@note shader attachment is not supported by OpenGL ES. However OGRE allows you to use the \#include directive in GLSL shaders, which is independent of the backend.
+
 ```cpp
 vertex_program myExternalGLSLFunction1 glsl
 {
-    source myExternalGLSLfunction1.txt
+    source myExternalGLSLfunction1.vert
 }
 
 vertex_program myExternalGLSLFunction2 glsl
 {
-    source myExternalGLSLfunction2.txt
+    source myExternalGLSLfunction2.vert
 }
 
 vertex_program myGLSLVertexProgram1 glsl
 {
-    source myGLSLfunction.txt
+    source myGLSLfunction.vert
     attach myExternalGLSLFunction1 myExternalGLSLFunction2
 }
 
 vertex_program myGLSLVertexProgram2 glsl
 {
-    source myGLSLfunction.txt
+    source myGLSLfunction.vert
     attach myExternalGLSLFunction1
 }
 ```
@@ -203,19 +205,9 @@ material exampleGLSLmatrixUniforms
 }
 ```
 
-## Accessing OpenGL states in GLSL {#Accessing-OpenGL-states-in-GLSL}
-
-GLSL can access most of the GL states directly so you do not need to pass these states through [param\_named\_auto](#param_005fnamed_005fauto) in the material script. This includes lights, material state, and all the matrices used in the openGL state i.e. model view matrix, worldview projection matrix etc. 
-
-@note this is only possible with OpenGL legacy profiles i.e. **not** with GL3+.
-
 ## Binding vertex attributes {#Binding-vertex-attributes}
 
-GLSL natively supports automatic binding of the most common incoming per-vertex attributes (e.g. `gl_Vertex`, `gl_Normal`, `gl_MultiTexCoord0` etc). However, there are some which are not automatically bound, which must be declared in the shader using the `attribute &lt;type&gt; &lt;name&gt;` syntax, and the vertex data bound to it by Ogre. 
-
-@note again this is only possible with OpenGL legacy profiles i.e. **not** with GL3+.
-
-In addition to the built in attributes described in section 7.3 of the GLSL manual, Ogre supports a number of automatically bound custom vertex attributes. There are some drivers that do not behave correctly when mixing built-in vertex attributes like `gl_Normal` and custom vertex attributes, so for maximum compatibility you should use all custom attributes
+Vertex attributes must be declared in the shader using the `attribute &lt;type&gt; &lt;name&gt;` syntax, and the vertex data bound to it by Ogre.
 
 <dl compact="compact">
 <dt>vertex</dt> <dd>
@@ -256,27 +248,31 @@ Binds Ogre::VES\_BLEND\_WEIGHTS, declare as ’attribute vec4 blendWeights;’.
 
 </dd> </dl>
 
-## GLSL Geometry shader specification {#GLSL-Geometry-shader-specification}
+## Compatibility profile GLSL features {#Legacy-GLSL-features}
 
-GLSL allows the same shader to run on different types of geometry primitives. In order to properly link the shaders together, you have to specify which primitives it will receive as input, which primitives it will emit and how many vertices a single run of the shader can generate. The GLSL geometry\_program definition requires three additional parameters :
+The following features are only available when using the legacy OpenGL profile. Notably they are not available with GL3+ or GLES2.
 
-<dl compact="compact">
-<dt>input\_operation\_type</dt> <dd>
+### Accessing OpenGL state
+GLSL can access most of the GL states directly so you do not need to pass these states through [param\_named\_auto](#param_005fnamed_005fauto) in the material script. This includes lights, material state, and all the matrices used in the openGL state i.e. model view matrix, worldview projection matrix etc.
 
+### Access to built-in attributes
+GLSL natively supports automatic binding of the most common incoming per-vertex attributes (e.g. `gl_Vertex`, `gl_Normal`, `gl_MultiTexCoord0` etc)
+as described in section 7.3 of the GLSL manual.
+There are some drivers that do not behave correctly when mixing built-in vertex attributes like `gl_Normal` and custom vertex attributes, so for maximum compatibility you should use all custom attributes
+
+### Geometry shader specification
+GLSL allows the same shader to run on different types of geometry primitives. In order to properly link the shaders together, you have to specify which primitives it will receive as input, which primitives it will emit and how many vertices a single run of the shader can generate. The GLSL geometry\_program definition requires three additional parameters
+
+@param input\_operation\_type
 The operation type of the geometry that the shader will receive. Can be ’point\_list’, ’line\_list’, ’line\_strip’, ’triangle\_list’, ’triangle\_strip’ or ’triangle\_fan’.
 
-</dd> <dt>output\_operation\_type</dt> <dd>
-
+@param output\_operation\_type
 The operation type of the geometry that the shader will emit. Can be ’point\_list’, ’line\_strip’ or ’triangle\_strip’.
 
-</dd> <dt>max\_output\_vertices</dt> <dd>
-
+@param max\_output\_vertices
 The maximum number of vertices that the shader can emit. There is an upper limit for this value, it is exposed in the render system capabilities.
 
-</dd> </dl>
-
-For example:
-
+@par Example
 ```cpp
 geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
 {
@@ -286,6 +282,8 @@ geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
     max_output_vertices 6
 }
 ```
+
+With GL3+ these values are specified using the `layout` modifier.
 
 # Unified High-level Programs {#Unified-High_002dlevel-Programs}
 
