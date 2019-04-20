@@ -582,6 +582,16 @@ public:
         }
     }
 
+    /// light index or array size
+    void updateExtraInfo(size_t data)
+    {
+        if (!mParamsPtr)
+            return;
+
+        mParamsPtr->_setRawAutoConstant(mPhysicalIndex, mAutoConstantType, data, mVariability,
+                                        mElementSize);
+    }
+
 protected:
     // Is it auto constant real based parameter.
     bool mIsAutoConstantReal;
