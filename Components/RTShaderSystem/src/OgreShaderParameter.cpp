@@ -374,6 +374,7 @@ void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
             mParamsPtr = paramsPtr.get();
             mPhysicalIndex = def->physicalIndex;
             mElementSize = def->elementSize;
+            mVariability = def->variability;
         }
     }
 }

@@ -60,19 +60,9 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pa
 
     Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 
     unsigned int curSearchLightIndex = 0;
-    const Affine3& matWorld = source->getWorldMatrix();
-    Matrix3 matWorldInvRotation;
-    Vector3 vRow0(matWorld[0][0], matWorld[0][1], matWorld[0][2]); 
-    Vector3 vRow1(matWorld[1][0], matWorld[1][1], matWorld[1][2]); 
-    Vector3 vRow2(matWorld[2][0], matWorld[2][1], matWorld[2][2]); 
 
-    vRow0.normalise();
-    vRow1.normalise();
-    vRow2.normalise();
-
-    matWorldInvRotation.SetColumn(0, vRow0);
-    matWorldInvRotation.SetColumn(1, vRow1);
-    matWorldInvRotation.SetColumn(2, vRow2);
+    // We need the inverse of the inverse transpose
+    Matrix3 matWorldInvRotation = source->getTransposeWorldMatrix().linear();
 
     // Update inverse rotation parameter.
     if (mWorldInvRotMatrix.get() != NULL)   
@@ -88,9 +78,6 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pa
             curLightType = curParams.mType;
             curSearchLightIndex = 0;
         }
-
-        Vector4     vParameter;
-        ColourValue colour;
 
         // Search a matching light from the current sorted lights of the given renderable.
         size_t j;
@@ -111,25 +98,14 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pa
 
                 // Update light direction. (Object space).
                 vec3 = matWorldInvRotation * source->getLightDirection(j);
-                vec3.normalise();
-
-                vParameter.x = -vec3.x;
-                vParameter.y = -vec3.y;
-                vParameter.z = -vec3.z;
-                vParameter.w = 0.0;
-                curParams.mDirection->setGpuParameter(vParameter);
+                curParams.mDirection->setGpuParameter(Vector4(-vec3.normalisedCopy(), 0.0f));
             }
             break;
 
         case Light::LT_POINT:
-
-            // Update light position. (World space).                
-            vParameter = source->getLightAs4DVector(j);
-            curParams.mPosition->setGpuParameter(vParameter);
-
-            // Update light attenuation parameters.
-            vParameter = source->getLightAttenuation(j);
-            curParams.mAttenuatParams->setGpuParameter(vParameter);
+            // update light index. data will be set by scene manager
+            curParams.mPosition->updateExtraInfo(j);
+            curParams.mAttenuatParams->updateExtraInfo(j);
             break;
 
         case Light::LT_SPOTLIGHT:
@@ -137,58 +113,25 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, const Pass* pa
                 Vector3 vec3;               
                                             
                 // Update light position. (World space).                
-                vParameter = source->getLightAs4DVector(j);
-                curParams.mPosition->setGpuParameter(vParameter);
+                curParams.mPosition->updateExtraInfo(j);
+                curParams.mAttenuatParams->updateExtraInfo(j);
+                curParams.mSpotParams->updateExtraInfo(j);
 
-                            
                 // Update light direction. (Object space).
                 vec3 = matWorldInvRotation * source->getLightDirection(j);
-                vec3.normalise();
-            
-                vParameter.x = -vec3.x;
-                vParameter.y = -vec3.y;
-                vParameter.z = -vec3.z;
-                vParameter.w = 0.0;
-                curParams.mDirection->setGpuParameter(vParameter);                          
-                
-                // Update light attenuation parameters.
-                vParameter = source->getLightAttenuation(j);
-                curParams.mAttenuatParams->setGpuParameter(vParameter);
-
-                // Update spotlight parameters.
-                vec3 = source->getSpotlightParams(j).xyz();
-                curParams.mSpotParams->setGpuParameter(vec3);
+                curParams.mDirection->setGpuParameter(Vector4(-vec3.normalisedCopy(), 0.0f));
             }
             break;
         }
 
 
         // Update diffuse colour.
-        if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
-        {
-            colour = pass->getDiffuse() * source->getLightDiffuseColourWithPower(j);
-            curParams.mDiffuseColour->setGpuParameter(colour);                  
-        }
-        else
-        {                   
-            colour = source->getLightDiffuseColourWithPower(j);
-            curParams.mDiffuseColour->setGpuParameter(colour);  
-        }
+        curParams.mDiffuseColour->updateExtraInfo(j);
 
         // Update specular colour if need to.
         if (mSpecularEnable)
         {
-            // Update diffuse colour.
-            if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
-            {
-                colour = pass->getSpecular() * source->getLightSpecularColourWithPower(j);
-                curParams.mSpecularColour->setGpuParameter(colour);                 
-            }
-            else
-            {                   
-                colour = source->getLightSpecularColourWithPower(j);
-                curParams.mSpecularColour->setGpuParameter(colour); 
-            }
+            curParams.mSpecularColour->updateExtraInfo(j);
         }                                                                           
     }
 }
@@ -343,7 +286,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
         case Light::LT_POINT:       
             mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
-            mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_position_world_space");
+            mLightParamsList[i].mPosition = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION, i);
 
             if (mNormalMapSpace == NMS_TANGENT)
             {
@@ -358,7 +301,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             
             mLightParamsList[i].mToLight = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
 
-            mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
+            mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
 
             // Resolve local dir.
             if (mVSLocalDir.get() == NULL)
@@ -387,7 +330,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 
         case Light::LT_SPOTLIGHT:       
             mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-            mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_position_world_space");
+            mLightParamsList[i].mPosition = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION, i);
             
             if (mNormalMapSpace == NMS_TANGENT)
             {
@@ -417,9 +360,8 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
                         
             mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(mLightParamsList[i].mVSOutDirection);
 
-            mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
-
-            mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "spotlight_params");
+            mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
+            mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GpuProgramParameters::ACT_SPOTLIGHT_PARAMS, i);
             
             // Resolve local dir.
             if (mVSLocalDir.get() == NULL)
@@ -450,11 +392,11 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
         // Resolve diffuse colour.
         if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
         {
-            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "derived_light_diffuse");
+            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_LIGHT_DIFFUSE_COLOUR, i);
         }
         else
         {
-            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_diffuse");
+            mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED, i);
         }       
             
         if (mSpecularEnable)
@@ -462,11 +404,11 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
             // Resolve specular colour.
             if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
             {
-                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "derived_light_specular");
+                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_LIGHT_SPECULAR_COLOUR, i);
             }
             else
             {
-                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_specular");
+                mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED, i);
             }   
         }   
 
