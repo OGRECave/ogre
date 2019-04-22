@@ -301,8 +301,7 @@ namespace Ogre {
         rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
         // Check for non-power-of-2 texture support
-        if (hasMinGLVersion(3, 1) || checkExtension("GL_ARB_texture_rectangle") || checkExtension("GL_ARB_texture_non_power_of_two"))
-            rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
+        rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 
         // Check for atomic counter support
         if (hasMinGLVersion(4, 2) || checkExtension("GL_ARB_shader_atomic_counters"))
@@ -380,21 +379,19 @@ namespace Ogre {
         rsc->setFragmentProgramConstantIntCount((Ogre::ushort)constantCount);
 
         // Geometry Program Properties
-        if (hasMinGLVersion(3, 2) || checkExtension("ARB_geometry_shader4")) {
-            rsc->setCapability(RSC_GEOMETRY_PROGRAM);
+        rsc->setCapability(RSC_GEOMETRY_PROGRAM);
 
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
-            rsc->setGeometryProgramConstantFloatCount(constantCount);
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
+        rsc->setGeometryProgramConstantFloatCount(constantCount);
 
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &constantCount));
-            rsc->setGeometryProgramNumOutputVertices(constantCount);
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &constantCount));
+        rsc->setGeometryProgramNumOutputVertices(constantCount);
 
-            //FIXME Is this correct?
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
-            rsc->setGeometryProgramConstantFloatCount(constantCount);
-            rsc->setGeometryProgramConstantBoolCount(constantCount);
-            rsc->setGeometryProgramConstantIntCount(constantCount);
-        }
+        //FIXME Is this correct?
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
+        rsc->setGeometryProgramConstantFloatCount(constantCount);
+        rsc->setGeometryProgramConstantBoolCount(constantCount);
+        rsc->setGeometryProgramConstantIntCount(constantCount);
 
         // Tessellation Program Properties
         if (hasMinGLVersion(4, 0) || checkExtension("GL_ARB_tessellation_shader"))
@@ -444,10 +441,7 @@ namespace Ogre {
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
 
-        if (hasMinGLVersion(3, 3) || checkExtension("GL_ARB_instanced_arrays"))
-        {
-            rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
-        }
+        rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
 
         // Check for Float textures
         rsc->setCapability(RSC_TEXTURE_FLOAT);
@@ -797,58 +791,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setSampler(size_t unit, Sampler& sampler)
     {
-        if(hasMinGLVersion(3, 3))
-        {
-            static_cast<GL3PlusSampler&>(sampler).bind(unit);
-            return;
-        }
-
-        if (!mStateCacheManager->activateGLTextureUnit(unit))
-            return;
-
-        GLenum target = mTextureTypes[unit];
-
-        const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
-        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_S,
-                                             GL3PlusSampler::getTextureAddressingMode(uvw.u));
-        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_T,
-                                             GL3PlusSampler::getTextureAddressingMode(uvw.v));
-        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_WRAP_R,
-                                             GL3PlusSampler::getTextureAddressingMode(uvw.w));
-
-        if (uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER)
-            OGRE_CHECK_GL_ERROR(glTexParameterfv( target, GL_TEXTURE_BORDER_COLOR, sampler.getBorderColour().ptr()));
-        OGRE_CHECK_GL_ERROR(glTexParameterf(target, GL_TEXTURE_LOD_BIAS, sampler.getMipmapBias()));
-
-        if (mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
-            mStateCacheManager->setTexParameteri(
-                target, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-                std::min<uint>(mLargestSupportedAnisotropy, sampler.getAnisotropy()));
-
-        mStateCacheManager->setTexParameteri(target, GL_TEXTURE_COMPARE_MODE,
-                                             sampler.getCompareEnabled() ? GL_COMPARE_REF_TO_TEXTURE
-                                                                         : GL_NONE);
-        if (sampler.getCompareEnabled())
-            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_COMPARE_FUNC,
-                                                 convertCompareFunction(sampler.getCompareFunction()));
-
-        // Combine with existing mip filter
-        mStateCacheManager->setTexParameteri(
-            target, GL_TEXTURE_MIN_FILTER,
-            GL3PlusSampler::getCombinedMinMipFilter(sampler.getFiltering(FT_MIN),
-                                                    sampler.getFiltering(FT_MIP)));
-
-        switch (sampler.getFiltering(FT_MAG))
-        {
-        case FO_ANISOTROPIC: // GL treats linear and aniso the same
-        case FO_LINEAR:
-            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            break;
-        case FO_POINT:
-        case FO_NONE:
-            mStateCacheManager->setTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            break;
-        }
+        static_cast<GL3PlusSampler&>(sampler).bind(unit);
     }
 
     void GL3PlusRenderSystem::_setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw)
@@ -1839,17 +1782,10 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy));
         }
 
-        if (hasMinGLVersion(3, 2) || checkExtension("GL_ARB_seamless_cube_map"))
-        {
-            // Enable seamless cube maps
-            OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
-        }
-
-        if (hasMinGLVersion(3, 2) || checkExtension("GL_ARB_provoking_vertex"))
-        {
-            // Set provoking vertex convention
-            OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
-        }
+        // Enable seamless cube maps
+        OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
+        // Set provoking vertex convention
+        OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
 
         if (getCapabilities()->hasCapability(RSC_DEBUG))
         {
@@ -1889,13 +1825,13 @@ namespace Ogre {
 
         // Initialise GL3W
         if (gl3wInit2(get_proc)) { // gl3wInit() fails if GL3.0 is not supported
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "OpenGL 3.0 is not supported",
-                        "GL3PlusRenderSystem::initialiseContext");
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "OpenGL 3.0 is not supported");
         }
 
         // Setup GL3PlusSupport
         initialiseExtensions();
+
+        OgreAssert(hasMinGLVersion(3, 3), "OpenGL 3.3 is not supported");
 
         mStateCacheManager = mCurrentContext->createOrRetrieveStateCacheManager<GL3PlusStateCacheManager>();
 

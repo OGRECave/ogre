@@ -98,8 +98,7 @@ namespace Ogre {
 
     GL3PlusSampler::GL3PlusSampler(GL3PlusRenderSystem* rs) : mSamplerId(0)
     {
-        if(rs->hasMinGLVersion(3, 3))
-            glGenSamplers(1, &mSamplerId);
+        glGenSamplers(1, &mSamplerId);
     }
     GL3PlusSampler::~GL3PlusSampler()
     {
