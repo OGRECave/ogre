@@ -138,7 +138,7 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	
-        if (PixelUtil::isLuminance(mFormat) && (mRenderSystem->hasMinGLVersion(3, 3) || mRenderSystem->checkExtension("GL_ARB_texture_swizzle")))
+        if (PixelUtil::isLuminance(mFormat))
         {
             if (PixelUtil::getComponentCount(mFormat) == 2)
             {
