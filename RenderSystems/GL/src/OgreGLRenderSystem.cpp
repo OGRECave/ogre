@@ -1731,26 +1731,6 @@ namespace Ogre {
                          getTextureAddressingMode(uvw.w));
     }
     //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
-    {
-        GLfloat border[4] = { colour.r, colour.g, colour.b, colour.a };
-        if (mStateCacheManager->activateGLTextureUnit(stage))
-        {
-            glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, border);
-        }
-    }
-    //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setTextureMipmapBias(size_t stage, float bias)
-    {
-        if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
-        {
-            if (mStateCacheManager->activateGLTextureUnit(stage))
-            {
-                glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
-            }
-        }
-    }
-    //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTextureMatrix(size_t stage, const Matrix4& xform)
     {
         if (stage >= mFixedFunctionTextureUnits)
@@ -2274,42 +2254,6 @@ namespace Ogre {
                 getCombinedMinMipFilter(mMinFilter, mMipFilter));
             break;
         }
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
-    {
-        if (!mStateCacheManager->activateGLTextureUnit(unit) || !GLEW_VERSION_2_0)
-            return;
-
-        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
-                                            GL_TEXTURE_COMPARE_FUNC,
-                                            convertCompareFunction(function));
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
-    {
-        // actually ARB_shadow would be enough..
-        if (!mStateCacheManager->activateGLTextureUnit(unit) || !GLEW_VERSION_2_0)
-            return;
-
-        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
-                                            GL_TEXTURE_COMPARE_MODE,
-                                            compare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
-    }
-    //---------------------------------------------------------------------
-    void GLRenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
-    {
-        if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
-            return;
-
-        if (!mStateCacheManager->activateGLTextureUnit(unit))
-            return;
-
-        Real largest_supported_anisotropy = mCurrentCapabilities->getMaxSupportedAnisotropy();
-        if (maxAnisotropy > largest_supported_anisotropy)
-            maxAnisotropy = largest_supported_anisotropy ?
-                static_cast<uint>(largest_supported_anisotropy) : 1;
-        glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm)

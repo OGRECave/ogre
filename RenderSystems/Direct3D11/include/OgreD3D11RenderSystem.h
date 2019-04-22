@@ -281,8 +281,6 @@ namespace Ogre
         void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
         void _setSampler(size_t unit, Sampler& sampler);
         void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
-        void _setTextureBorderColour(size_t stage, const ColourValue& colour);
-        void _setTextureMipmapBias(size_t unit, float bias);
         void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
             SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD);
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
@@ -300,9 +298,6 @@ namespace Ogre
 		void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool forGpuProgram = false);
         void _setPolygonMode(PolygonMode level);
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
-        void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
-        void _setTextureUnitCompareEnabled(size_t unit, bool compare);
-        void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
         void setVertexDeclaration(VertexDeclaration* decl);
         void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
         void setVertexBufferBinding(VertexBufferBinding* binding);

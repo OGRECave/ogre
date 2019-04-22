@@ -225,10 +225,6 @@ namespace Ogre {
 
         void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
 
-        void _setTextureBorderColour(size_t stage, const ColourValue& colour);
-
-        void _setTextureMipmapBias(size_t unit, float bias);
-
         void _setTextureMatrix(size_t stage, const Matrix4& xform);
 
         void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
@@ -276,12 +272,6 @@ namespace Ogre {
             bool readBackAsTexture = false);
 
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
-
-        void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
-
-        void _setTextureUnitCompareEnabled(size_t unit, bool compare);
-
-        void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
 
         void _render(const RenderOperation& op);
 

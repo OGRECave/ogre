@@ -1355,22 +1355,6 @@ namespace Ogre {
         }
     }
 
-    void GLES2RenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
-    {
-        if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
-            return;
-
-        if (!mStateCacheManager->activateGLTextureUnit(unit))
-            return;
-
-        if (maxAnisotropy > mCurrentCapabilities->getMaxSupportedAnisotropy())
-            maxAnisotropy = mCurrentCapabilities->getMaxSupportedAnisotropy() ? 
-            static_cast<uint>(mCurrentCapabilities->getMaxSupportedAnisotropy()) : 1;
-
-        mStateCacheManager->setTexParameterf(mTextureTypes[unit],
-                                              GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)maxAnisotropy);
-    }
-
     void GLES2RenderSystem::_render(const RenderOperation& op)
     {
         // Call super class
@@ -2140,26 +2124,6 @@ namespace Ogre {
         return GLES2RenderSystem::mResourceManager;
     }
 #endif
-
-    void GLES2RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
-    {
-        if (!mStateCacheManager->activateGLTextureUnit(unit) || !hasMinGLVersion(3, 0))
-            return;
-
-        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
-                                            GL_TEXTURE_COMPARE_FUNC,
-                                            convertCompareFunction(function));
-    }
-
-    void GLES2RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
-    {
-        if (!mStateCacheManager->activateGLTextureUnit(unit) || !hasMinGLVersion(3, 0))
-            return;
-
-        mStateCacheManager->setTexParameteri(mTextureTypes[unit],
-                                            GL_TEXTURE_COMPARE_MODE,
-                                            compare ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
-    }
 
     void GLES2RenderSystem::bindVertexElementToGpu(
         const VertexElement& elem, const HardwareVertexBufferSharedPtr& vertexBuffer,

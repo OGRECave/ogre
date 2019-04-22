@@ -2035,20 +2035,6 @@ namespace Ogre
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set texture auto tex.coord. generation mode", "D3D9RenderSystem::_setTextureCoordCalculation" );
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
-    {
-        if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
-        {
-            // ugh - have to pass float data through DWORD with no conversion
-            HRESULT hr = __SetSamplerState(getSamplerId(unit), D3DSAMP_MIPMAPLODBIAS, 
-                *(DWORD*)&bias);
-            if(FAILED(hr))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set texture mipmap bias", 
-                "D3D9RenderSystem::_setTextureMipmapBias" );
-
-        }
-    }
-    //---------------------------------------------------------------------
     void D3D9RenderSystem::_setTextureMatrix( size_t stage, const Matrix4& xForm )
     {
         HRESULT hr;
@@ -2264,14 +2250,6 @@ namespace Ogre
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set texture addressing mode for V", "D3D9RenderSystem::_setTextureAddressingMode" );
         if( FAILED( hr = __SetSamplerState( getSamplerId(stage), D3DSAMP_ADDRESSW, D3D9Mappings::get(uvw.w, mDeviceManager->getActiveDevice()->getD3D9DeviceCaps()) ) ) )
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set texture addressing mode for W", "D3D9RenderSystem::_setTextureAddressingMode" );
-    }
-    //-----------------------------------------------------------------------------
-    void D3D9RenderSystem::_setTextureBorderColour(size_t stage,
-        const ColourValue& colour)
-    {
-        HRESULT hr;
-        if( FAILED( hr = __SetSamplerState( getSamplerId(stage), D3DSAMP_BORDERCOLOR, colour.getAsARGB()) ) )
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set texture border colour", "D3D9RenderSystem::_setTextureBorderColour" );
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_setTextureBlendMode( size_t stage, const LayerBlendModeEx& bm )
@@ -2746,30 +2724,11 @@ namespace Ogre
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set texture filter ", "D3D9RenderSystem::_setTextureUnitFiltering");
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
-    {
-        //no effect in directX9 rendersystem
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
-    {
-        //no effect in directX9 rendersystem
-    }
-    //---------------------------------------------------------------------
     DWORD D3D9RenderSystem::_getCurrentAnisotropy(size_t unit)
     {
         DWORD oldVal;
         getActiveD3D9Device()->GetSamplerState(static_cast<DWORD>(unit), D3DSAMP_MAXANISOTROPY, &oldVal);
         return oldVal;
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
-    {
-        if (static_cast<DWORD>(maxAnisotropy) > mDeviceManager->getActiveDevice()->getD3D9DeviceCaps().MaxAnisotropy)
-            maxAnisotropy = mDeviceManager->getActiveDevice()->getD3D9DeviceCaps().MaxAnisotropy;
-
-        if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-            __SetSamplerState( getSamplerId(unit), D3DSAMP_MAXANISOTROPY, maxAnisotropy );
     }
     //---------------------------------------------------------------------
     HRESULT D3D9RenderSystem::__SetRenderState(D3DRENDERSTATETYPE state, DWORD value)

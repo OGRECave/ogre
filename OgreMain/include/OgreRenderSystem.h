@@ -537,54 +537,15 @@ namespace Ogre
         */
         virtual void _setTextureBlendMode(size_t unit, const LayerBlendModeEx& bm) {}
 
-        /** Sets a single filter for a given texture unit.
-        @param unit The texture unit to set the filtering options for
-        @param ftype The filter type
-        @param filter The filter to be used
-        */
+        /// @deprecated use _setSampler
         virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
 
-        /** @overload
-        @param unit The texture unit to set the filtering options for
-        @param minFilter The filter used when a texture is reduced in size
-        @param magFilter The filter used when a texture is magnified
-        @param mipFilter The filter used between mipmap levels, FO_NONE disables mipmapping
-        */
-        virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
+        /// @deprecated use _setSampler
+        OGRE_DEPRECATED virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
             FilterOptions magFilter, FilterOptions mipFilter);
 
-        /** Sets whether the compare func is enabled or not for this texture unit 
-        @param unit The texture unit to set the filtering options for
-        @param compare The state (enabled/disabled)
-        */
-        virtual void _setTextureUnitCompareEnabled(size_t unit, bool compare) = 0;
-
-
-        /** Sets the compare function to use for a given texture unit
-        @param unit The texture unit to set the filtering options for
-        @param function The comparison function
-        */
-        virtual void _setTextureUnitCompareFunction(size_t unit, CompareFunction function) = 0;
-
-
-        /** Sets the maximal anisotropy for the specified texture unit.*/
-        virtual void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy) = 0;
-
-        /** Sets the texture addressing mode for a texture unit.*/
-        virtual void _setTextureAddressingMode(size_t unit, const Sampler::UVWAddressingMode& uvw) = 0;
-
-        /** Sets the texture border colour for a texture unit.*/
-        virtual void _setTextureBorderColour(size_t unit, const ColourValue& colour) = 0;
-
-        /** Sets the mipmap bias value for a given texture unit.
-        @remarks
-        This allows you to adjust the mipmap calculation up or down for a
-        given texture unit. Negative values force a larger mipmap to be used, 
-        positive values force a smaller mipmap to be used. Units are in numbers
-        of levels, so +1 forces the mipmaps to one smaller level.
-        @note Only does something if render system has capability RSC_MIPMAP_LOD_BIAS.
-        */
-        virtual void _setTextureMipmapBias(size_t unit, float bias) = 0;
+        /// @deprecated use _setSampler
+        OGRE_DEPRECATED virtual void _setTextureAddressingMode(size_t unit, const Sampler::UVWAddressingMode& uvw) = 0;
 
         /** Sets the texture coordinate transformation matrix for a texture unit.
         @param unit Texture unit to affect
