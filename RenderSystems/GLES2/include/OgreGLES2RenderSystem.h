@@ -157,10 +157,6 @@ namespace Ogre {
 
             void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
 
-            void _setTextureBorderColour(size_t stage, const ColourValue& colour) { };   // Not supported
-
-            void _setTextureMipmapBias(size_t unit, float bias) { };   // Not supported
-
             void _setLineWidth(float width);
 
             void _setViewport(Viewport *vp);
@@ -195,16 +191,10 @@ namespace Ogre {
                     bool twoSidedOperation = false,
                     bool readBackAsTexture = false);
 
-            void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
-
-            void _setTextureUnitCompareEnabled(size_t unit, bool compare);          
-
             virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
                 FilterOptions magFilter, FilterOptions mipFilter);              
 
             void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
-
-            void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
 
             virtual bool hasAnisotropicMipMapFilter() const { return false; }   
 
