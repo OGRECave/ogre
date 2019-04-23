@@ -1120,10 +1120,6 @@ namespace Ogre
         */
         virtual void markProfileEvent( const String &event ) = 0;
 
-        /** Determines if the system has anisotropic mip map filter support
-        */
-        virtual bool hasAnisotropicMipMapFilter() const = 0;
-
         /** Gets a custom (maybe platform-specific) attribute.
         @remarks This is a nasty way of satisfying any API's need to see platform-specific details.
         @param name The name of the attribute.

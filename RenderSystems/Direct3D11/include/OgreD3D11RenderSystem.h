@@ -338,9 +338,6 @@ namespace Ogre
         /// @copydoc RenderSystem::getDisplayMonitorCount
         unsigned int getDisplayMonitorCount() const {return 1;} //todo
 
-        /// @copydoc RenderSystem::hasAnisotropicMipMapFilter
-        virtual bool hasAnisotropicMipMapFilter() const { return true; }  
-
         D3D11Device &_getDevice() { return mDevice; }
         
         
