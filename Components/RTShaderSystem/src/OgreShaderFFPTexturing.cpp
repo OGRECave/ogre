@@ -318,20 +318,12 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
     // Build colour argument for source1.
-    source1 = psMain->resolveLocalParameter("source1", GCT_FLOAT4);
-        
-    addPSArgumentInvocations(psMain, source1, texel, 
-        textureUnitParams->mTextureSamplerIndex,
-        colourBlend.source1, colourBlend.colourArg1, 
-        colourBlend.alphaArg1, false, groupOrder);
+    source1 = getPSArgument(texel, textureUnitParams->mTextureSamplerIndex, colourBlend.source1,
+                            colourBlend.colourArg1, colourBlend.alphaArg1, false);
 
     // Build colour argument for source2.
-    source2 = psMain->resolveLocalParameter("source2", GCT_FLOAT4);
-
-    addPSArgumentInvocations(psMain, source2, texel, 
-        textureUnitParams->mTextureSamplerIndex,
-        colourBlend.source2, colourBlend.colourArg2, 
-        colourBlend.alphaArg2, false, groupOrder);
+    source2 = getPSArgument(texel, textureUnitParams->mTextureSamplerIndex, colourBlend.source2,
+                            colourBlend.colourArg2, colourBlend.alphaArg2, false);
 
     bool needDifferentAlphaBlend = false;
     if (alphaBlend.operation != colourBlend.operation ||
@@ -353,16 +345,12 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     if (needDifferentAlphaBlend)
     {
         // Build alpha argument for source1.
-        addPSArgumentInvocations(psMain, source1, texel,
-            textureUnitParams->mTextureSamplerIndex, 
-            alphaBlend.source1, alphaBlend.colourArg1, 
-            alphaBlend.alphaArg1, true, groupOrder);
+        source1 = getPSArgument(texel, textureUnitParams->mTextureSamplerIndex, alphaBlend.source1,
+                                alphaBlend.colourArg1, alphaBlend.alphaArg1, true);
 
         // Build alpha argument for source2.
-        addPSArgumentInvocations(psMain, source2, texel, 
-            textureUnitParams->mTextureSamplerIndex,
-            alphaBlend.source2, alphaBlend.colourArg2, 
-            alphaBlend.alphaArg2, true, groupOrder);
+        source2 = getPSArgument(texel, textureUnitParams->mTextureSamplerIndex, alphaBlend.source2,
+                                alphaBlend.colourArg2, alphaBlend.alphaArg2, true);
 
         // Build alpha blend
         addPSBlendInvocations(psMain, source1, source2, texel,
@@ -392,45 +380,31 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
 }
 
 //-----------------------------------------------------------------------
-void FFPTexturing::addPSArgumentInvocations(Function* psMain, 
-                                             ParameterPtr arg,
-                                             ParameterPtr texel,
-                                             int samplerIndex,
-                                             LayerBlendSource blendSrc,
-                                             const ColourValue& colourValue,
-                                             Real alphaValue,
-                                             bool isAlphaArgument,
-                                             const int groupOrder)
+ParameterPtr FFPTexturing::getPSArgument(ParameterPtr texel, int samplerIndex, LayerBlendSource blendSrc,
+                                         const ColourValue& colourValue, Real alphaValue,
+                                         bool isAlphaArgument) const
 {
-    ParameterPtr src;
     switch(blendSrc)
     {
     case LBS_CURRENT:
-        src = samplerIndex == 0 ? mPSDiffuse : mPSOutDiffuse;
-        break;
+        return samplerIndex == 0 ? mPSDiffuse : mPSOutDiffuse;
     case LBS_TEXTURE:
-        src = texel;
-        break;
+        return texel;
     case LBS_DIFFUSE:
-        src = mPSDiffuse;
-        break;
+        return mPSDiffuse;
     case LBS_SPECULAR:
-        src = mPSSpecular;
-        break;
+        return mPSSpecular;
     case LBS_MANUAL:
         if (isAlphaArgument)
         {
-            src = ParameterFactory::createConstParam(Vector4(alphaValue));
+            return ParameterFactory::createConstParam(Vector4(alphaValue));
         }
-        else
-        {
-            src = ParameterFactory::createConstParam(Vector4((Real)colourValue.r, (Real)colourValue.g,
-                                                             (Real)colourValue.b, (Real)colourValue.a));
-        }
-        break;
+
+        return ParameterFactory::createConstParam(Vector4((Real)colourValue.r, (Real)colourValue.g,
+                                                         (Real)colourValue.b, (Real)colourValue.a));
     }
 
-    psMain->getStage(groupOrder).assign(src, arg);
+    return ParameterPtr();
 }
 
 //-----------------------------------------------------------------------
