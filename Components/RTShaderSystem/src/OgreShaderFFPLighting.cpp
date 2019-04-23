@@ -283,24 +283,22 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
     auto stage = vsMain->getStage(FFP_VS_LIGHTING);
 
 	// Add the global illumination functions.
-	if (false == addGlobalIlluminationInvocation(stage))
-		return false;
+	addGlobalIlluminationInvocation(stage);
 
     if (mToView)
         stage.callFunction(FFP_FUNC_MODULATE, ParameterFactory::createConstParam(Vector3(-1)), mViewPos, mToView);
 
     // Add per light functions.
-	for (unsigned int i=0; i < mLightParamsList.size(); ++i)
-	{		
-		if (false == addIlluminationInvocation(&mLightParamsList[i], stage))
-			return false;
-	}
+    for (const auto& lp : mLightParamsList)
+    {
+        addIlluminationInvocation(&lp, stage);
+    }
 
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------
-bool FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
+void FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
 {
     // Transform normal to view space
 	if(!mLightParamsList.empty())
@@ -337,12 +335,10 @@ bool FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
             stage.callFunction(FFP_FUNC_ADD, mSurfaceEmissiveColour, mOutDiffuse, mOutDiffuse);
 		}		
 	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------
-bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, const FunctionStageRef& stage)
+void FFPLighting::addIlluminationInvocation(const LightParams* curLightParams, const FunctionStageRef& stage)
 {
     // Merge diffuse colour with vertex colour if need to.
     if (mTrackVertexColourType & TVC_DIFFUSE)
@@ -418,8 +414,6 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, const F
         }
         break;
     }
-
-    return true;
 }
 
 

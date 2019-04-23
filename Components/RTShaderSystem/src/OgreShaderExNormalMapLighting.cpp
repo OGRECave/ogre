@@ -445,8 +445,7 @@ bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();  
 
     // Add the global illumination functions.
-    if (false == addVSInvocation(vsMain, FFP_VS_LIGHTING))
-        return false;
+    addVSInvocation(vsMain->getStage(FFP_VS_LIGHTING));
 
     auto stage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
 
@@ -454,30 +453,23 @@ bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
     stage.callFunction(SGX_FUNC_FETCHNORMAL, mPSNormalMapSampler, mPSInTexcoord, mViewNormal);
     
     // Add the global illumination functions.
-    if (false == addPSGlobalIlluminationInvocation(stage))
-        return false;
-
+    addPSGlobalIlluminationInvocation(stage);
 
     // Add per light functions.
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
-    {       
-        if (false == addIlluminationInvocation(&mLightParamsList[i], stage))
-            return false;
+    for (const auto& lp : mLightParamsList)
+    {
+        addIlluminationInvocation(&lp, stage);
     }
 
     // Assign back temporary variables to the ps diffuse and specular components.
-    if (false == addPSFinalAssignmentInvocation(psMain, FFP_PS_COLOUR_BEGIN + 1))
-        return false;
-
+    addPSFinalAssignmentInvocation(stage);
 
     return true;
 }
 
 //-----------------------------------------------------------------------
-bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder)
+void NormalMapLighting::addVSInvocation(const FunctionStageRef& stage)
 {
-    auto stage = vsMain->getStage(groupOrder);
-
     // Construct TNB matrix.
     if (mNormalMapSpace == NMS_TANGENT)
     {
@@ -518,21 +510,15 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder)
     }
 
     // Add per light functions.
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
-    {       
-        if (false == addVSIlluminationInvocation(&mLightParamsList[i], vsMain, groupOrder))
-            return false;
+    for (const auto& lp : mLightParamsList)
+    {
+        addVSIlluminationInvocation(&lp, stage);
     }
-
-
-    return true;
 }
 
 //-----------------------------------------------------------------------
-bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams, Function* vsMain, const int groupOrder)
+void NormalMapLighting::addVSIlluminationInvocation(const LightParams* curLightParams, const FunctionStageRef& stage)
 {
-    auto stage = vsMain->getStage(groupOrder);
-
     // Compute light direction in texture space.
     if (curLightParams->mDirection.get() != NULL &&
         curLightParams->mVSOutDirection.get() != NULL)
@@ -574,9 +560,6 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
             stage.assign(mVSLocalDir, curLightParams->mVSOutToLightDir);
         }
     }
-
-
-    return true;
 }
 
 //-----------------------------------------------------------------------

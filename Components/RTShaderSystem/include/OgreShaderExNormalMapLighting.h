@@ -168,17 +168,12 @@ protected:
     /** 
     Internal method that adds related vertex shader functions invocations.
     */
-    bool addVSInvocation(Function* vsMain, const int groupOrder);
+    void addVSInvocation(const FunctionStageRef& stage);
 
     /** 
     Internal method that adds per light illumination component functions invocations.
     */
-    bool addVSIlluminationInvocation(LightParams* curLightParams, Function* vsMain, const int groupOrder);
-
-    /** 
-    Internal method that adds per light illumination component functions invocations.
-    */
-    bool addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder);
+    void addVSIlluminationInvocation(const LightParams* curLightParams, const FunctionStageRef& stage);
 
 // Attributes.
 protected:  
