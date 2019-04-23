@@ -72,7 +72,7 @@ namespace Ogre {
             setFiltering(FO_LINEAR, FO_LINEAR, FO_LINEAR);
             break;
         case TFO_ANISOTROPIC:
-            setFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, Root::getSingleton().getRenderSystem()->hasAnisotropicMipMapFilter() ? FO_ANISOTROPIC : FO_LINEAR);
+            setFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, FO_LINEAR);
             break;
         }
     }
