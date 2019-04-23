@@ -132,6 +132,8 @@ endif()
 if(SDL2_FOUND)
   target_include_directories(OgreBites PRIVATE ${SDL2_INCLUDE_DIR})
   target_link_libraries(OgreBites PRIVATE ${SDL2_LIBRARY})
+elseif(NOT EMSCRIPTEN)
+  message(WARNING "SDL2 not found - no input handling and reduced window creation capabilites")
 endif()
 
 generate_export_header(OgreBites 
