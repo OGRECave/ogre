@@ -241,38 +241,30 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();  
 
     // Add the global illumination functions.
-    if (false == addVSInvocation(vsMain, FFP_VS_LIGHTING))
-        return false;
+    addVSInvocation(vsMain->getStage(FFP_VS_LIGHTING));
 
     auto stage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
-
     // Add the global illumination functions.
-    if (false == addPSGlobalIlluminationInvocation(stage))
-        return false;
+    addPSGlobalIlluminationInvocation(stage);
 
     if (mToView)
         stage.callFunction(FFP_FUNC_MODULATE, ParameterFactory::createConstParam(Vector3(-1)), mViewPos, mToView);
 
     // Add per light functions.
-    for (unsigned int i=0; i < mLightParamsList.size(); ++i)
-    {       
-        if (false == addIlluminationInvocation(&mLightParamsList[i], stage))
-            return false;
+    for (const auto& lp : mLightParamsList)
+    {
+        addIlluminationInvocation(&lp, stage);
     }
 
     // Assign back temporary variables to the ps diffuse and specular components.
-    if (false == addPSFinalAssignmentInvocation(psMain, FFP_PS_COLOUR_BEGIN + 1))
-        return false;
-
+    addPSFinalAssignmentInvocation(stage);
 
     return true;
 }
 
 //-----------------------------------------------------------------------
-bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder)
+void PerPixelLighting::addVSInvocation(const FunctionStageRef& stage)
 {
-    auto stage = vsMain->getStage(groupOrder);
-
     // Transform normal in view space.
     if(!mLightParamsList.empty())
         stage.callFunction(FFP_FUNC_TRANSFORM, mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
@@ -282,13 +274,11 @@ bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder)
     {
         stage.callFunction(FFP_FUNC_TRANSFORM, mWorldViewMatrix, mVSInPosition, mVSOutViewPos);
     }
-
-    return true;
 }
 
 
 //-----------------------------------------------------------------------
-bool PerPixelLighting::addPSGlobalIlluminationInvocation(const FunctionStageRef& stage)
+void PerPixelLighting::addPSGlobalIlluminationInvocation(const FunctionStageRef& stage)
 {
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
         (mTrackVertexColourType & TVC_EMISSIVE) == 0)
@@ -320,22 +310,17 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(const FunctionStageRef&
     {
         stage.assign(mPSSpecular, mOutSpecular);
     }
-    
-    return true;
 }
 
 //-----------------------------------------------------------------------
-bool PerPixelLighting::addPSFinalAssignmentInvocation( Function* psMain, const int groupOrder)
+void PerPixelLighting::addPSFinalAssignmentInvocation(const FunctionStageRef& stage)
 {
-    auto stage = psMain->getStage(groupOrder);
     stage.assign(mOutDiffuse, mInDiffuse);
 
     if (mSpecularEnable)
     {
         stage.assign(mOutSpecular, mPSSpecular);
     }
-
-    return true;
 }
 
 //-----------------------------------------------------------------------

@@ -183,12 +183,12 @@ protected:
     /** 
     Internal method that adds global illumination component functions invocations.
     */
-    bool addGlobalIlluminationInvocation(const FunctionStageRef& stage);
+    void addGlobalIlluminationInvocation(const FunctionStageRef& stage);
             
     /** 
     Internal method that adds per light illumination component functions invocations.
     */
-    bool addIlluminationInvocation(LightParams* curLightParams, const FunctionStageRef& stage);
+    void addIlluminationInvocation(const LightParams* curLightParams, const FunctionStageRef& stage);
 
 
 // Attributes.

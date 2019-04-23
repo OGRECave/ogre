@@ -93,18 +93,18 @@ protected:
     /** 
     Internal method that adds related vertex shader functions invocations.
     */
-    bool addVSInvocation(Function* vsMain, const int groupOrder);
+    void addVSInvocation(const FunctionStageRef& stage);
 
     
     /** 
     Internal method that adds global illumination component functions invocations.
     */
-    bool addPSGlobalIlluminationInvocation(const FunctionStageRef& stage);
+    void addPSGlobalIlluminationInvocation(const FunctionStageRef& stage);
 
     /** 
     Internal method that adds the final colour assignments.
     */
-    bool addPSFinalAssignmentInvocation(Function* psMain, const int groupOrder);
+    void addPSFinalAssignmentInvocation(const FunctionStageRef& stage);
 
 
 // Attributes.
