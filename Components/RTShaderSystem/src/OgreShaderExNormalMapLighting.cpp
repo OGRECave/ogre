@@ -567,10 +567,7 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 {
     const NormalMapLighting& rhsLighting = static_cast<const NormalMapLighting&>(rhs);
 
-    int lightCount[3];
-
-    rhsLighting.getLightCount(lightCount);
-    setLightCount(lightCount);
+    setLightCount(rhsLighting.getLightCount());
 
     mTrackVertexColourType = rhsLighting.mTrackVertexColourType;
     mSpecularEnable = rhsLighting.mSpecularEnable;

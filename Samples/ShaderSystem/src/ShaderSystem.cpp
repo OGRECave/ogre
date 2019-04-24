@@ -990,7 +990,7 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
 
         RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
         
-        int lightCount[3] = {0};
+        Vector3i lightCount(0, 0, 0);
 
         // Update point light count.
         if (mSceneMgr->getLight(POINT_LIGHT_NAME)->isVisible())

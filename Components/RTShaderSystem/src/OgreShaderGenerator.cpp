@@ -1510,18 +1510,18 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     mTargetRenderState.reset(new TargetRenderState);
 
     // Set light properties.
-    int lightCount[3] = {0};    
+    Vector3i lightCount(0, 0, 0);
 
     // Use light count definitions of the custom render state if exists.
     if (mCustomRenderState != NULL && mCustomRenderState->getLightCountAutoUpdate() == false)
     {
-        mCustomRenderState->getLightCount(lightCount);
+        lightCount = mCustomRenderState->getLightCount();
     }
 
     // Use light count definitions of the global render state if exists.
     else if (renderStateGlobal != NULL)
     {
-        renderStateGlobal->getLightCount(lightCount);
+        lightCount = renderStateGlobal->getLightCount();
     }
     
     
@@ -1945,20 +1945,16 @@ void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
     {
         const LightList& lightList =  sceneManager->_getLightsAffectingFrustum();
         
-        int sceneLightCount[3] = {0};
-        int currLightCount[3] = {0};
-
+        Vector3i sceneLightCount(0, 0, 0);
         for (unsigned int i=0; i < lightList.size(); ++i)
         {
             sceneLightCount[lightList[i]->getType()]++;
         }
         
-        mRenderState->getLightCount(currLightCount);        
+        auto currLightCount = mRenderState->getLightCount();
 
         // Case light state has been changed -> invalidate this scheme.
-        if (currLightCount[0] != sceneLightCount[0] ||
-            currLightCount[1] != sceneLightCount[1] ||
-            currLightCount[2] != sceneLightCount[2])
+        if (currLightCount != sceneLightCount)
         {       
             curRenderState->setLightCount(sceneLightCount);
             invalidate();
