@@ -821,10 +821,7 @@ bool RTShaderSRSSegmentedLights::preAddToRenderState(const RenderState* renderSt
         setSpecularEnable(false);   
     }
 
-    
-    int lightCount[3];
-    renderState->getLightCount(lightCount);
-    setLightCount(lightCount);
+    setLightCount(renderState->getLightCount().ptr());
 
     if (mUseSegmentedLightTexture)
     {

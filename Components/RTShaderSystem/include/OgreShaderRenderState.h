@@ -83,17 +83,16 @@ public:
     lightCount[1] defines the directional light count.
     lightCount[2] defines the spot light count.
     */
-    void setLightCount(const int lightCount[3]);
+    void setLightCount(const Vector3i& lightCount);
 
     /** 
     Get the light count per light type.
-    @param 
-    lightCount The light count per type.
+
     lightCount[0] defines the point light count.
     lightCount[1] defines the directional light count.
     lightCount[2] defines the spot light count.
     */
-    void getLightCount(int lightCount[3]) const;
+    const Vector3i& getLightCount() const;
 
     /** 
     Set the light count auto update state.
@@ -117,7 +116,7 @@ protected:
     // The sub render states list.  
     SubRenderStateList mSubRenderStateList;
     // The light count per light type definition.
-    int mLightCount[3];
+    Vector3i mLightCount;
     // True if light count was explicitly set.
     bool mLightCountAutoUpdate;
 

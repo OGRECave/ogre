@@ -422,11 +422,7 @@ void FFPLighting::copyFrom(const SubRenderState& rhs)
 {
 	const FFPLighting& rhsLighting = static_cast<const FFPLighting&>(rhs);
 
-	int lightCount[3];
-
-	rhsLighting.getLightCount(lightCount);
-	setLightCount(lightCount);
-
+	setLightCount(rhsLighting.getLightCount());
 	mNormalisedEnable = rhsLighting.mNormalisedEnable;
 }
 
@@ -438,9 +434,7 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 		return false;
 	//! [disable]
 
-	int lightCount[3];
-
-	renderState->getLightCount(lightCount);
+	auto lightCount = renderState->getLightCount();
 	
 	setTrackVertexColourType(srcPass->getVertexColourTracking());			
 
@@ -497,7 +491,7 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 }
 
 //-----------------------------------------------------------------------
-void FFPLighting::setLightCount(const int lightCount[3])
+void FFPLighting::setLightCount(const Vector3i& lightCount)
 {
 	for (int type=0; type < 3; ++type)
 	{
@@ -518,11 +512,9 @@ void FFPLighting::setLightCount(const int lightCount[3])
 }
 
 //-----------------------------------------------------------------------
-void FFPLighting::getLightCount(int lightCount[3]) const
+Vector3i FFPLighting::getLightCount() const
 {
-	lightCount[0] = 0;
-	lightCount[1] = 0;
-	lightCount[2] = 0;
+	Vector3i lightCount(0, 0, 0);
 
 	for (unsigned int i=0; i < mLightParamsList.size(); ++i)
 	{
@@ -535,6 +527,8 @@ void FFPLighting::getLightCount(int lightCount[3]) const
 		else if (curParams.mType == Light::LT_SPOTLIGHT)
 			lightCount[2]++;
 	}
+
+	return lightCount;
 }
 
 //-----------------------------------------------------------------------

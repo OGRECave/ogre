@@ -57,19 +57,15 @@ void RenderState::reset()
 }
 
 //-----------------------------------------------------------------------
-void RenderState::setLightCount(const int lightCount[3])
+void RenderState::setLightCount(const Vector3i& lightCount)
 {
-    mLightCount[0] = lightCount[0];
-    mLightCount[1] = lightCount[1];
-    mLightCount[2] = lightCount[2];
+    mLightCount = lightCount;
 }
 
 //-----------------------------------------------------------------------
-void RenderState::getLightCount(int lightCount[3]) const
+const Vector3i& RenderState::getLightCount() const
 {
-    lightCount[0] = mLightCount[0];
-    lightCount[1] = mLightCount[1];
-    lightCount[2] = mLightCount[2];
+    return mLightCount;
 }
 
 //-----------------------------------------------------------------------
