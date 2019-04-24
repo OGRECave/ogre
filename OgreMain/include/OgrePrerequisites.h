@@ -254,6 +254,7 @@ namespace Ogre {
     typedef Vector<3, Real> Vector3;
     typedef Vector<3, int> Vector3i;
     typedef Vector<4, Real> Vector4;
+    typedef Vector<4, float> Vector4f;
     class Viewport;
     class VertexAnimationTrack;
     class VertexBufferBinding;

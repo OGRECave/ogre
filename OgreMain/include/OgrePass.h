@@ -208,11 +208,10 @@ namespace Ogre {
         /// line width
         float mLineWidth;
         /// Point size, applies when not using per-vertex point size
-        Real mPointSize;
         Real mPointMinSize;
         Real mPointMaxSize;
-        /// Constant, linear, quadratic coeffs
-        Real mPointAttenuationCoeffs[3];
+        /// Size, Constant, linear, quadratic coeffs
+        Vector4f mPointAttenution;
         // TU Content type lookups
         typedef std::vector<unsigned short> ContentTypeLookup;
         mutable ContentTypeLookup mShadowContentTypeLookup;
@@ -406,7 +405,7 @@ namespace Ogre {
             This property determines what point size is used to render a point
             list.
         */
-        Real getPointSize(void) const;
+        float getPointSize(void) const { return mPointAttenution[0]; }
 
         /** Sets the point size of this pass.
 
@@ -422,7 +421,7 @@ namespace Ogre {
             get very large on screen, since they may get clamped on some cards. Upper sizes can range
             from 64 to 256 pixels.
         */
-        void setPointSize(Real ps);
+        void setPointSize(float ps) { mPointAttenution[0] = ps; }
 
         /** Sets whether points will be rendered as textured quads or plain dots
 
@@ -464,11 +463,14 @@ namespace Ogre {
         bool isPointAttenuationEnabled(void) const;
 
         /** Returns the constant coefficient of point attenuation. */
-        Real getPointAttenuationConstant(void) const;
+        float getPointAttenuationConstant(void) const { return mPointAttenution[1]; }
         /** Returns the linear coefficient of point attenuation. */
-        Real getPointAttenuationLinear(void) const;
+        float getPointAttenuationLinear(void) const { return mPointAttenution[2]; }
         /** Returns the quadratic coefficient of point attenuation. */
-        Real getPointAttenuationQuadratic(void) const;
+        float getPointAttenuationQuadratic(void) const { return mPointAttenution[3]; }
+
+        /// get all point attenuation params as (size, constant, linear, quadratic)
+        const Vector4f& getPointAttenuation() const { return mPointAttenution; }
 
         /** Set the minimum point size, when point attenuation is in use. */
         void setPointMinSize(Real min);
