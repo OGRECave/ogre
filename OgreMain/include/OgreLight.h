@@ -161,23 +161,29 @@ namespace Ogre {
         @param quadratic
             The quadratic factor in the attenuation formula: adds a curvature to the attenuation formula.
         */
-        void setAttenuation(Real range, Real constant, Real linear, Real quadratic);
+        void setAttenuation(float range, float constant, float linear, float quadratic)
+        {
+            mAttenuation = {range, constant, linear, quadratic};
+        }
 
         /** Returns the absolute upper range of the light.
         */
-        Real getAttenuationRange(void) const;
+        float getAttenuationRange(void) const { return mAttenuation[0]; }
 
         /** Returns the constant factor in the attenuation formula.
         */
-        Real getAttenuationConstant(void) const;
+        float getAttenuationConstant(void) const { return mAttenuation[1]; }
 
         /** Returns the linear factor in the attenuation formula.
         */
-        Real getAttenuationLinear(void) const;
+        float getAttenuationLinear(void) const { return mAttenuation[2]; }
 
         /** Returns the quadric factor in the attenuation formula.
         */
-        Real getAttenuationQuadric(void) const;
+        float getAttenuationQuadric(void) const { return mAttenuation[3]; }
+
+        /// get all attenuation params as (range, constant, linear, quadratic)
+        const Vector4f& getAttenuation() const { return mAttenuation; }
 
         /** Sets the position of the light.
         @remarks
@@ -535,10 +541,8 @@ namespace Ogre {
         Radian mSpotInner;
         Real mSpotFalloff;
         Real mSpotNearClip;
-        Real mRange;
-        Real mAttenuationConst;
-        Real mAttenuationLinear;
-        Real mAttenuationQuad;
+        // range, const, linear, quad coeffs
+        Vector4f mAttenuation;
         Real mPowerScale;
         size_t mIndexInFrame;
         bool mOwnShadowFarDist;

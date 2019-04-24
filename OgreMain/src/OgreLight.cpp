@@ -40,10 +40,7 @@ namespace Ogre {
           mSpotInner(Degree(30.0f)),
           mSpotFalloff(1.0f),
           mSpotNearClip(0.0f),
-          mRange(100000),
-          mAttenuationConst(1.0f),
-          mAttenuationLinear(0.0f),
-          mAttenuationQuad(0.0f),
+          mAttenuation(100000.f, 1.f, 0.f, 0.f),
           mPowerScale(1.0f),
           mIndexInFrame(0),
           mOwnShadowFarDist(false),
@@ -73,10 +70,7 @@ namespace Ogre {
         mSpotInner(Degree(30.0f)),
         mSpotFalloff(1.0f),
         mSpotNearClip(0.0f),
-        mRange(100000),
-        mAttenuationConst(1.0f),
-        mAttenuationLinear(0.0f),
-        mAttenuationQuad(0.0f),
+        mAttenuation(100000.f, 1.f, 0.f, 0.f),
         mPowerScale(1.0f),
         mIndexInFrame(0),
         mOwnShadowFarDist(false),
@@ -216,35 +210,6 @@ namespace Ogre {
     const ColourValue& Light::getSpecularColour(void) const
     {
         return mSpecular;
-    }
-    //-----------------------------------------------------------------------
-    void Light::setAttenuation(Real range, Real constant,
-                        Real linear, Real quadratic)
-    {
-        mRange = range;
-        mAttenuationConst = constant;
-        mAttenuationLinear = linear;
-        mAttenuationQuad = quadratic;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationRange(void) const
-    {
-        return mRange;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationConstant(void) const
-    {
-        return mAttenuationConst;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationLinear(void) const
-    {
-        return mAttenuationLinear;
-    }
-    //-----------------------------------------------------------------------
-    Real Light::getAttenuationQuadric(void) const
-    {
-        return mAttenuationQuad;
     }
     //-----------------------------------------------------------------------
     void Light::setPowerScale(Real power)
@@ -799,7 +764,7 @@ namespace Ogre {
             if (mLightType == LT_DIRECTIONAL)
                 return 0;
             else
-                return mRange;
+                return mAttenuation[0];
         }
     }
     //-----------------------------------------------------------------------
@@ -840,7 +805,7 @@ namespace Ogre {
         if (mLightType != LT_DIRECTIONAL)
         {
             //Check that the sphere is within the sphere of the light
-            isIntersect = container.intersects(Sphere(mDerivedPosition, mRange));
+            isIntersect = container.intersects(Sphere(mDerivedPosition, mAttenuation[0]));
             //If this is a spotlight, check that the sphere is within the cone of the spot light
             if ((isIntersect) && (mLightType == LT_SPOTLIGHT))
             {
@@ -871,21 +836,22 @@ namespace Ogre {
         //Check the 2 simple / obvious situations. Light is directional or light source is inside the container
         if ((mLightType != LT_DIRECTIONAL) && (container.intersects(mDerivedPosition) == false))
         {
+            float range = mAttenuation[0];
             //Check that the container is within the sphere of the light
-            isIntersect = Math::intersects(Sphere(mDerivedPosition, mRange),container);
+            isIntersect = Math::intersects(Sphere(mDerivedPosition, range),container);
             //If this is a spotlight, do a more specific check
             if ((isIntersect) && (mLightType == LT_SPOTLIGHT) && (mSpotOuter.valueRadians() <= Math::PI))
             {
                 //Create a rough bounding box around the light and check if
                 Quaternion localToWorld = Vector3::NEGATIVE_UNIT_Z.getRotationTo(mDerivedDirection);
 
-                Real boxOffset = Math::Sin(mSpotOuter * 0.5) * mRange;
+                Real boxOffset = Math::Sin(mSpotOuter * 0.5) * range;
                 AxisAlignedBox lightBoxBound;
                 lightBoxBound.merge(Vector3::ZERO);
-                lightBoxBound.merge(localToWorld * Vector3(boxOffset, boxOffset, -mRange));
-                lightBoxBound.merge(localToWorld * Vector3(-boxOffset, boxOffset, -mRange));
-                lightBoxBound.merge(localToWorld * Vector3(-boxOffset, -boxOffset, -mRange));
-                lightBoxBound.merge(localToWorld * Vector3(boxOffset, -boxOffset, -mRange));
+                lightBoxBound.merge(localToWorld * Vector3(boxOffset, boxOffset, -range));
+                lightBoxBound.merge(localToWorld * Vector3(-boxOffset, boxOffset, -range));
+                lightBoxBound.merge(localToWorld * Vector3(-boxOffset, -boxOffset, -range));
+                lightBoxBound.merge(localToWorld * Vector3(boxOffset, -boxOffset, -range));
                 lightBoxBound.setMaximum(lightBoxBound.getMaximum() + mDerivedPosition);
                 lightBoxBound.setMinimum(lightBoxBound.getMinimum() + mDerivedPosition);
                 isIntersect = lightBoxBound.intersects(container);

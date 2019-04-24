@@ -166,14 +166,11 @@ namespace Ogre {
         , mFogDensity(0.001)
         , mPassIterationCount(1)
         , mLineWidth(1.0f)
-        , mPointSize(1.0f)
         , mPointMinSize(0.0f)
         , mPointMaxSize(0.0f)
+        , mPointAttenution(1.0f, 1.0f, 0.0f, 0.0f)
         , mIlluminationStage(IS_UNKNOWN)
     {
-        mPointAttenuationCoeffs[0] = 1.0f;
-        mPointAttenuationCoeffs[1] = mPointAttenuationCoeffs[2] = 0.0f;
-
         // init the hash inline
         _recalculateHash();
    }
@@ -240,12 +237,11 @@ namespace Ogre {
         mPolygonModeOverrideable = oth.mPolygonModeOverrideable;
         mPassIterationCount = oth.mPassIterationCount;
         mLineWidth = oth.mLineWidth;
-        mPointSize = oth.mPointSize;
+        mPointAttenution = oth.mPointAttenution;
         mPointMinSize = oth.mPointMinSize;
         mPointMaxSize = oth.mPointMaxSize;
         mPointSpritesEnabled = oth.mPointSpritesEnabled;
         mPointAttenuationEnabled = oth.mPointAttenuationEnabled;
-        memcpy(mPointAttenuationCoeffs, oth.mPointAttenuationCoeffs, sizeof(Real)*3);
         mShadowContentTypeLookup = oth.mShadowContentTypeLookup;
         mContentTypeLookupBuilt = oth.mContentTypeLookupBuilt;
         mLightScissoring = oth.mLightScissoring;
@@ -339,11 +335,6 @@ namespace Ogre {
         mName = name;
     }
     //-----------------------------------------------------------------------
-    void Pass::setPointSize(Real ps)
-    {
-        mPointSize = ps;
-    }
-    //-----------------------------------------------------------------------
     void Pass::setPointSpritesEnabled(bool enabled)
     {
         mPointSpritesEnabled = enabled;
@@ -358,29 +349,14 @@ namespace Ogre {
         Real constant, Real linear, Real quadratic)
     {
         mPointAttenuationEnabled = enabled;
-        mPointAttenuationCoeffs[0] = enabled ? constant : 1.0f;
-        mPointAttenuationCoeffs[1] = enabled ? linear : 0.0f;
-        mPointAttenuationCoeffs[2] = enabled ? quadratic : 0.0f;
+        mPointAttenution[0] = enabled ? constant : 1.0f;
+        mPointAttenution[1] = enabled ? linear : 0.0f;
+        mPointAttenution[2] = enabled ? quadratic : 0.0f;
     }
     //-----------------------------------------------------------------------
     bool Pass::isPointAttenuationEnabled(void) const
     {
         return mPointAttenuationEnabled;
-    }
-    //-----------------------------------------------------------------------
-    Real Pass::getPointAttenuationConstant(void) const
-    {
-        return mPointAttenuationCoeffs[0];
-    }
-    //-----------------------------------------------------------------------
-    Real Pass::getPointAttenuationLinear(void) const
-    {
-        return mPointAttenuationCoeffs[1];
-    }
-    //-----------------------------------------------------------------------
-    Real Pass::getPointAttenuationQuadratic(void) const
-    {
-        return mPointAttenuationCoeffs[2];
     }
     //-----------------------------------------------------------------------
     void Pass::setPointMinSize(Real min)
@@ -463,11 +439,6 @@ namespace Ogre {
     void Pass::setVertexColourTracking(TrackVertexColourType tracking)
     {
         mTracking = tracking;
-    }
-    //-----------------------------------------------------------------------
-    Real Pass::getPointSize(void) const
-    {
-        return mPointSize;
     }
     //-----------------------------------------------------------------------
     const ColourValue& Pass::getAmbient(void) const

@@ -1041,10 +1041,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
     if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
         mDestRenderSystem->_setPointSpritesEnabled(pass->getPointSpritesEnabled());
 
-    mAutoParamDataSource->setPointParameters(
-        pass->getPointSize(), pass->isPointAttenuationEnabled(),
-        pass->getPointAttenuationConstant(), pass->getPointAttenuationLinear(),
-        pass->getPointAttenuationQuadratic());
+    mAutoParamDataSource->setPointParameters(pass->isPointAttenuationEnabled(), pass->getPointAttenuation());
 
     // Texture unit settings
     size_t unit = 0;

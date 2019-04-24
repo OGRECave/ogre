@@ -212,14 +212,10 @@ namespace Ogre {
         return getLight(index).getPowerScale();
     }
     //-----------------------------------------------------------------------------
-    Vector4 AutoParamDataSource::getLightAttenuation(size_t index) const
+    const Vector4f& AutoParamDataSource::getLightAttenuation(size_t index) const
     {
         // range, const, linear, quad
-        const Light& l = getLight(index);
-        return Vector4(l.getAttenuationRange(),
-                       l.getAttenuationConstant(),
-                       l.getAttenuationLinear(),
-                       l.getAttenuationQuadric());
+        return getLight(index).getAttenuation();
     }
     //-----------------------------------------------------------------------------
     Vector4 AutoParamDataSource::getSpotlightParams(size_t index) const
@@ -633,15 +629,11 @@ namespace Ogre {
         return mFogParams;
     }
 
-    void AutoParamDataSource::setPointParameters(Real size, bool attenuation, Real constant,
-                                                 Real linear, Real quadratic)
+    void AutoParamDataSource::setPointParameters(bool attenuation, const Vector4f& params)
     {
-        mPointParams.x = size;
+        mPointParams = params;
         if(attenuation)
-            mPointParams.x *= getViewportHeight();
-        mPointParams.y = constant;
-        mPointParams.z = linear;
-        mPointParams.w = quadratic;
+            mPointParams[0] *= getViewportHeight();
     }
 
     const Vector4& AutoParamDataSource::getPointParams() const
