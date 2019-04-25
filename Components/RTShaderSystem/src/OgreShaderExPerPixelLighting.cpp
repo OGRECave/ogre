@@ -107,12 +107,6 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 
     if (mSpecularEnable)
     {
-        mPSSpecular = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
-        if (mPSSpecular.get() == NULL)
-        {
-            mPSSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
-        }
-
         mOutSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
 
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
@@ -256,8 +250,8 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
         addIlluminationInvocation(&lp, stage);
     }
 
-    // Assign back temporary variables to the ps diffuse and specular components.
-    addPSFinalAssignmentInvocation(stage);
+    // Assign back temporary variables
+    stage.assign(mOutDiffuse, mInDiffuse);
 
     return true;
 }
@@ -304,22 +298,6 @@ void PerPixelLighting::addPSGlobalIlluminationInvocation(const FunctionStageRef&
         {
             stage.callFunction(FFP_FUNC_ADD, mSurfaceEmissiveColour, mOutDiffuse, mOutDiffuse);
         }       
-    }
-
-    if (mSpecularEnable)
-    {
-        stage.assign(mPSSpecular, mOutSpecular);
-    }
-}
-
-//-----------------------------------------------------------------------
-void PerPixelLighting::addPSFinalAssignmentInvocation(const FunctionStageRef& stage)
-{
-    stage.assign(mOutDiffuse, mInDiffuse);
-
-    if (mSpecularEnable)
-    {
-        stage.assign(mOutSpecular, mPSSpecular);
     }
 }
 
