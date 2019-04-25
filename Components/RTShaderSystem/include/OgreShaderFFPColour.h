@@ -52,13 +52,10 @@ public:
     enum StageFlags
     {
         SF_VS_INPUT_DIFFUSE     = 1 << 1,
-        SF_VS_INPUT_SPECULAR    = 1 << 2,
-        SF_VS_OUTPUT_DIFFUSE    = 1 << 3,
-        SF_VS_OUTPUT_SPECULAR   = 1 << 4,
-        SF_PS_INPUT_DIFFUSE     = 1 << 5,
-        SF_PS_INPUT_SPECULAR    = 1 << 6,
-        SF_PS_OUTPUT_DIFFUSE    = 1 << 7,
-        SF_PS_OUTPUT_SPECULAR   = 1 << 8
+        SF_VS_OUTPUT_DIFFUSE    = 1 << 2,
+        SF_VS_OUTPUT_SPECULAR   = 1 << 3,
+        SF_PS_INPUT_DIFFUSE     = 1 << 4,
+        SF_PS_INPUT_SPECULAR    = 1 << 5
     };
 
 // Interface.
@@ -88,27 +85,27 @@ public:
     */
     virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
-    /** 
+    /**
     Set the resolve stage flags that this sub render state will produce.
     I.E - If one want to specify that the vertex shader program needs to get a diffuse component
-    and the pixel shader should output diffuse component he should pass SF_VS_INPUT_DIFFUSE | SF_PS_OUTPUT_DIFFUSE.
+    and the pixel shader should output diffuse component he should pass SF_VS_INPUT_DIFFUSE.
     @param flags The stage flag to set.
     */
     void setResolveStageFlags(unsigned int flags) { mResolveStageFlags = flags; }
 
-    /** 
-    Get the current resolve stage flags.        
+    /**
+    Get the current resolve stage flags.
     */
     unsigned int getResolveStageFlags() const            { return mResolveStageFlags; }
 
-    /** 
-    Add the given mask to resolve stage flags that this sub render state will produce.  
+    /**
+    Add the given mask to resolve stage flags that this sub render state will produce.
     @param mask The mask to add to current flag set.
     */
     void addResolveStageMask(unsigned int mask)  { mResolveStageFlags |= mask; }
 
-    /** 
-    Remove the given mask from the resolve stage flags that this sub render state will produce. 
+    /**
+    Remove the given mask from the resolve stage flags that this sub render state will produce.
     @param mask The mask to remove from current flag set.
     */
     void removeResolveStageMask(unsigned int mask)  { mResolveStageFlags &= ~mask; }
@@ -125,8 +122,6 @@ protected:
 protected:
     // Vertex shader input diffuse component.
     ParameterPtr mVSInputDiffuse;
-    // Vertex shader input specular component.
-    ParameterPtr mVSInputSpecular;
     // Vertex shader output diffuse component.
     ParameterPtr mVSOutputDiffuse;
     // Vertex shader input specular component.
@@ -137,8 +132,6 @@ protected:
     ParameterPtr mPSInputSpecular;
     // Pixel shader output diffuse component.
     ParameterPtr mPSOutputDiffuse;
-    // Pixel shader input specular component.
-    ParameterPtr mPSOutputSpecular;
     // Stage flags that defines resolve parameters definitions.
     unsigned int mResolveStageFlags;
 };
