@@ -213,14 +213,6 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 
     if (mSpecularEnable)
     {
-        mPSSpecular = psMain->getInputParameter(Parameter::SPC_COLOR_SPECULAR);
-        if (mPSSpecular.get() == NULL)
-        {
-            mPSSpecular = psMain->getLocalParameter(Parameter::SPC_COLOR_SPECULAR);
-        }
-
-        OgreAssert(mPSSpecular, "mPSSpecular is NULL");
-
         mOutSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
@@ -461,8 +453,8 @@ bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
         addIlluminationInvocation(&lp, stage);
     }
 
-    // Assign back temporary variables to the ps diffuse and specular components.
-    addPSFinalAssignmentInvocation(stage);
+    // Assign back temporary variables
+    stage.assign(mOutDiffuse, mInDiffuse);
 
     return true;
 }

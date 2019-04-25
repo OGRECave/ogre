@@ -101,20 +101,12 @@ protected:
     */
     void addPSGlobalIlluminationInvocation(const FunctionStageRef& stage);
 
-    /** 
-    Internal method that adds the final colour assignments.
-    */
-    void addPSFinalAssignmentInvocation(const FunctionStageRef& stage);
-
-
 // Attributes.
 protected:  
     // Vertex shader output view position (position in camera space) parameter.
     ParameterPtr mVSOutViewPos;
     // Vertex shader output normal.
     ParameterPtr mVSOutNormal;
-    // Pixel shader input/local specular parameter. 
-    ParameterPtr mPSSpecular;
 };
 
 
