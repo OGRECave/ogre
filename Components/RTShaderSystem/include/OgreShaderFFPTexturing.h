@@ -187,8 +187,8 @@ protected:
     virtual void addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
         const ParameterPtr& texel, int groupOrder);
 
-    ParameterPtr getPSArgument(ParameterPtr texel, int samplerIndex, LayerBlendSource blendSrc,
-                               const ColourValue& colourValue, Real alphaValue, bool isAlphaArgument) const;
+    ParameterPtr getPSArgument(ParameterPtr texel, LayerBlendSource blendSrc, const ColourValue& colourValue,
+                               Real alphaValue, bool isAlphaArgument) const;
 
     virtual void addPSBlendInvocations(Function* psMain, ParameterPtr arg1, ParameterPtr arg2,
                 ParameterPtr texel,int samplerIndex, const LayerBlendModeEx& blendMode,

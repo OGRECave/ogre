@@ -318,12 +318,10 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
     // Build colour argument for source1.
-    source1 = getPSArgument(texel, textureUnitParams->mTextureSamplerIndex, colourBlend.source1,
-                            colourBlend.colourArg1, colourBlend.alphaArg1, false);
+    source1 = getPSArgument(texel, colourBlend.source1, colourBlend.colourArg1, colourBlend.alphaArg1, false);
 
     // Build colour argument for source2.
-    source2 = getPSArgument(texel, textureUnitParams->mTextureSamplerIndex, colourBlend.source2,
-                            colourBlend.colourArg2, colourBlend.alphaArg2, false);
+    source2 = getPSArgument(texel, colourBlend.source2, colourBlend.colourArg2, colourBlend.alphaArg2, false);
 
     bool needDifferentAlphaBlend = false;
     if (alphaBlend.operation != colourBlend.operation ||
@@ -345,12 +343,10 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
     if (needDifferentAlphaBlend)
     {
         // Build alpha argument for source1.
-        source1 = getPSArgument(texel, textureUnitParams->mTextureSamplerIndex, alphaBlend.source1,
-                                alphaBlend.colourArg1, alphaBlend.alphaArg1, true);
+        source1 = getPSArgument(texel, alphaBlend.source1, alphaBlend.colourArg1, alphaBlend.alphaArg1, true);
 
         // Build alpha argument for source2.
-        source2 = getPSArgument(texel, textureUnitParams->mTextureSamplerIndex, alphaBlend.source2,
-                                alphaBlend.colourArg2, alphaBlend.alphaArg2, true);
+        source2 = getPSArgument(texel, alphaBlend.source2, alphaBlend.colourArg2, alphaBlend.alphaArg2, true);
 
         // Build alpha blend
         addPSBlendInvocations(psMain, source1, source2, texel,
@@ -380,14 +376,13 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr FFPTexturing::getPSArgument(ParameterPtr texel, int samplerIndex, LayerBlendSource blendSrc,
-                                         const ColourValue& colourValue, Real alphaValue,
-                                         bool isAlphaArgument) const
+ParameterPtr FFPTexturing::getPSArgument(ParameterPtr texel, LayerBlendSource blendSrc, const ColourValue& colourValue,
+                                         Real alphaValue, bool isAlphaArgument) const
 {
     switch(blendSrc)
     {
     case LBS_CURRENT:
-        return samplerIndex == 0 ? mPSDiffuse : mPSOutDiffuse;
+        return mPSOutDiffuse;
     case LBS_TEXTURE:
         return texel;
     case LBS_DIFFUSE:
@@ -461,7 +456,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         break;
     case LBX_BLEND_CURRENT_ALPHA:
         stage.callFunction(FFP_FUNC_LERP, {In(arg2).mask(mask), In(arg1).mask(mask),
-                                           In(samplerIndex == 0 ? mPSDiffuse : mPSOutDiffuse).w(),
+                                           In(mPSOutDiffuse).w(),
                                            Out(mPSOutDiffuse).mask(mask)});
         break;
     case LBX_BLEND_MANUAL:
