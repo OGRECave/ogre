@@ -186,10 +186,10 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
             stage.assign(In(mParamInIndices).mask(indexToMask(i)), mParamIndex1);
             
             //Multiply the index by 2
-            stage.callFunction(FFP_FUNC_MODULATE, mParamIndex1, 2, mParamIndex1);
+            stage.mul(mParamIndex1, 2, mParamIndex1);
             
             //Add 1 to the index and assign as the second row's index
-            stage.callFunction(FFP_FUNC_ADD, mParamIndex1, 1, mParamIndex2);
+            stage.add(mParamIndex1, 1, mParamIndex2);
             
             //Build the dual quaternion matrix
             stage.callFunction(SGX_FUNC_BUILD_DUAL_QUATERNION_MATRIX,
@@ -291,8 +291,7 @@ void DualQuaternionSkinning::addIndexedPositionWeight(Function* vsMain, int inde
     else
     {
         //add the local param as the value of the world param
-        stage.callFunction(FFP_FUNC_ADD, pPositionTempParameter, pPositionRelatedOutputParam,
-                           pPositionRelatedOutputParam);
+        stage.add(pPositionTempParameter, pPositionRelatedOutputParam, pPositionRelatedOutputParam);
     }
 }
 

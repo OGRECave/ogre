@@ -73,6 +73,22 @@ public:
     void assign(const In& from, const Out& to) const { assign({from, to}); }
     /// @overload
     void assign(const std::vector<Operand>& params) const;
+
+    /// dst = arg0 * arg1;
+    void mul(const In& arg0, const In& arg1, const Out& dst) const { binaryOp('*', {arg0, arg1, dst}); }
+
+    /// dst = arg0 / arg1;
+    void div(const In& arg0, const In& arg1, const Out& dst) const { binaryOp('/', {arg0, arg1, dst}); }
+
+    /// dst = arg0 - arg1;
+    void sub(const In& arg0, const In& arg1, const Out& dst) const { binaryOp('-', {arg0, arg1, dst}); }
+
+    /// dst = arg0 + arg1;
+    void add(const In& arg0, const In& arg1, const Out& dst) const { binaryOp('+', {arg0, arg1, dst}); }
+
+    /// dst = arg0 OP arg1;
+    void binaryOp(char op, const std::vector<Operand>& params) const;
+
 private:
     size_t mStage;
     Function* mParent;

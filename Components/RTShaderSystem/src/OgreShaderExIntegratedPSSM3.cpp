@@ -225,12 +225,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool IntegratedPSSM3::resolveDependencies(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
-
-    vsProgram->addDependency(FFP_LIB_COMMON);
-    
-    psProgram->addDependency(FFP_LIB_COMMON);
     psProgram->addDependency(SGX_LIB_INTEGRATEDPSSM);
 
     return true;

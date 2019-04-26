@@ -311,6 +311,16 @@ public:
     void writeSourceCode(std::ostream& os, const String& targetLanguage) const;
 };
 
+/// shorthand for "dst = a OP b;"
+class _OgreRTSSExport BinaryOpAtom : public FunctionAtom
+{
+    char mOp;
+public:
+    explicit BinaryOpAtom(char op, int groupOrder) : mOp(op) { mGroupExecutionOrder = groupOrder; }
+    BinaryOpAtom(char op, const In& a, const In& b, const Out& dst, int groupOrder);
+    void writeSourceCode(std::ostream& os, const String& targetLanguage) const;
+};
+
 typedef std::vector<FunctionAtom*>                 FunctionAtomInstanceList;
 typedef FunctionAtomInstanceList::iterator          FunctionAtomInstanceIterator;
 typedef FunctionAtomInstanceList::const_iterator    FunctionAtomInstanceConstIterator;

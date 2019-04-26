@@ -265,7 +265,6 @@ bool FFPLighting::resolveDependencies(ProgramSet* programSet)
 {
 	Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
 
-	vsProgram->addDependency(FFP_LIB_COMMON);
 	vsProgram->addDependency(FFP_LIB_TRANSFORM);
 	vsProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
@@ -286,7 +285,7 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
 	addGlobalIlluminationInvocation(stage);
 
     if (mToView)
-        stage.callFunction(FFP_FUNC_MODULATE, ParameterFactory::createConstParam(Vector3(-1)), mViewPos, mToView);
+        stage.mul(Vector3(-1), mViewPos, mToView);
 
     // Add per light functions.
     for (const auto& lp : mLightParamsList)
@@ -319,7 +318,7 @@ void FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
 	{
 		if (mTrackVertexColourType & TVC_AMBIENT)
 		{
-            stage.callFunction(FFP_FUNC_MODULATE, mLightAmbientColour, mInDiffuse, mOutDiffuse);
+            stage.mul(mLightAmbientColour, mInDiffuse, mOutDiffuse);
 		}
 		else
 		{
@@ -328,11 +327,11 @@ void FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
 
 		if (mTrackVertexColourType & TVC_EMISSIVE)
 		{
-            stage.callFunction(FFP_FUNC_ADD, mInDiffuse, mOutDiffuse, mOutDiffuse);
+            stage.add(mInDiffuse, mOutDiffuse, mOutDiffuse);
 		}
 		else
 		{
-            stage.callFunction(FFP_FUNC_ADD, mSurfaceEmissiveColour, mOutDiffuse, mOutDiffuse);
+            stage.add(mSurfaceEmissiveColour, mOutDiffuse, mOutDiffuse);
 		}		
 	}
 }
@@ -343,15 +342,15 @@ void FFPLighting::addIlluminationInvocation(const LightParams* curLightParams, c
     // Merge diffuse colour with vertex colour if need to.
     if (mTrackVertexColourType & TVC_DIFFUSE)
     {
-        stage.callFunction(FFP_FUNC_MODULATE, In(mInDiffuse).xyz(), In(curLightParams->mDiffuseColour).xyz(),
-                           Out(curLightParams->mDiffuseColour).xyz());
+        stage.mul(In(mInDiffuse).xyz(), In(curLightParams->mDiffuseColour).xyz(),
+                  Out(curLightParams->mDiffuseColour).xyz());
     }
 
     // Merge specular colour with vertex colour if need to.
     if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
     {
-        stage.callFunction(FFP_FUNC_MODULATE, In(mInDiffuse).xyz(), In(curLightParams->mSpecularColour).xyz(),
-                           Out(curLightParams->mSpecularColour).xyz());
+        stage.mul(In(mInDiffuse).xyz(), In(curLightParams->mSpecularColour).xyz(),
+                  Out(curLightParams->mSpecularColour).xyz());
     }
 
     switch (curLightParams->mType)
@@ -375,7 +374,7 @@ void FFPLighting::addIlluminationInvocation(const LightParams* curLightParams, c
 
     case Light::LT_POINT:
         if(mToLight)
-            stage.callFunction(FFP_FUNC_SUBTRACT, In(curLightParams->mPosition).xyz(), mViewPos, mToLight);
+            stage.sub(In(curLightParams->mPosition).xyz(), mViewPos, mToLight);
         if (mSpecularEnable)
         {
             stage.callFunction(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR,
@@ -395,7 +394,7 @@ void FFPLighting::addIlluminationInvocation(const LightParams* curLightParams, c
 
     case Light::LT_SPOTLIGHT:
         if(mToLight)
-            stage.callFunction(FFP_FUNC_SUBTRACT, In(curLightParams->mPosition).xyz(), mViewPos, mToLight);
+            stage.sub(In(curLightParams->mPosition).xyz(), mViewPos, mToLight);
         if (mSpecularEnable)
         {
             stage.callFunction(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR,

@@ -229,7 +229,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
     vsMain->addAtomInstance(curFuncInvocation);
 
     //multiply temporary param with  weight
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM);
+    curFuncInvocation = OGRE_NEW BinaryOpAtom('*', FFP_VS_TRANSFORM);
     curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mParamInWeights, Operand::OPS_IN, indexMask);
     curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT);
@@ -247,7 +247,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
     else
     {
         //add the local param as the value of the world param
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM);
+        curFuncInvocation = OGRE_NEW BinaryOpAtom('+', FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);
@@ -276,7 +276,7 @@ void LinearSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
     vsMain->addAtomInstance(curFuncInvocation);
 
     //multiply temporary param with weight
-    curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM);
+    curFuncInvocation = OGRE_NEW BinaryOpAtom('*', FFP_VS_TRANSFORM);
     curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mParamInWeights, Operand::OPS_IN, indexMask);
     curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_OUT);
@@ -294,7 +294,7 @@ void LinearSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
     else
     {
         //add the local param as the value of the world normal
-        curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM);
+        curFuncInvocation = OGRE_NEW BinaryOpAtom('+', FFP_VS_TRANSFORM);
         curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_IN);
         curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);

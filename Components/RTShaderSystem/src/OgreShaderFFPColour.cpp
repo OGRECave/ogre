@@ -90,12 +90,6 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool FFPColour::resolveDependencies(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
-    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
-
-    vsProgram->addDependency(FFP_LIB_COMMON);
-    psProgram->addDependency(FFP_LIB_COMMON);
-
     return true;
 }
 
@@ -169,7 +163,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 
     // Add specular to out colour.
     psMain->getStage(FFP_PS_COLOUR_END)
-        .callFunction(FFP_FUNC_ADD, In(mPSOutputDiffuse).xyz(), In(psSpecular).xyz(), Out(mPSOutputDiffuse).xyz());
+        .add(In(mPSOutputDiffuse).xyz(), In(psSpecular).xyz(), Out(mPSOutputDiffuse).xyz());
 
     return true;
 }
