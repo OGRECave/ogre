@@ -528,7 +528,7 @@ bool RTShaderSRSSegmentedLights::addVSInvocation(Function* vsMain, const int gro
 //-----------------------------------------------------------------------
 bool RTShaderSRSSegmentedLights::addPSGlobalIlluminationInvocationBegin(Function* psMain, const int groupOrder)
 {
-    FunctionInvocation* curFuncInvocation = NULL;   
+    FunctionAtom* curFuncInvocation = NULL;
 
     if (mPSInNormal.get())
     {
@@ -765,7 +765,7 @@ bool RTShaderSRSSegmentedLights::addPSSegmentedTextureLightInvocation(Function* 
 //-----------------------------------------------------------------------
 bool RTShaderSRSSegmentedLights::addPSFinalAssignmentInvocation( Function* psMain, const int groupOrder)
 {
-    FunctionInvocation* curFuncInvocation;
+    FunctionAtom* curFuncInvocation;
 
     curFuncInvocation = OGRE_NEW AssignmentAtom(FFP_PS_COLOUR_BEGIN + 1);
     curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);  

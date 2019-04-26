@@ -186,20 +186,20 @@ int FunctionAtom::getGroupExecutionOrder() const
     return mGroupExecutionOrder;
 }
 
-String FunctionInvocation::Type = "FunctionInvocation";
-
 //-----------------------------------------------------------------------
 FunctionInvocation::FunctionInvocation(const String& functionName, int groupOrder,
                                        const String& returnType)
-    : mFunctionName(functionName), mReturnType(returnType)
+    : mReturnType(returnType)
 {
+    mFunctionName = functionName;
     mGroupExecutionOrder = groupOrder;
 }
 
 //-----------------------------------------------------------------------------
 FunctionInvocation::FunctionInvocation(const FunctionInvocation& other) :
-    mFunctionName(other.mFunctionName), mReturnType(other.mReturnType)
+    mReturnType(other.mReturnType)
 {
+    mFunctionName = other.mFunctionName;
     mGroupExecutionOrder = other.mGroupExecutionOrder;
     
     for ( OperandVector::const_iterator it = other.mOperands.begin(); it != other.mOperands.end(); ++it)
@@ -216,7 +216,27 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
     os << ");";
 }
 
-void FunctionInvocation::writeOperands(std::ostream& os, OperandVector::const_iterator begin,
+//-----------------------------------------------------------------------
+static String parameterNullMsg(const String& name, size_t pos)
+{
+    return StringUtil::format("%s: parameter #%zu is NULL", name.c_str(), pos);
+}
+
+void FunctionAtom::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, Operand::OpMask opMask, int indirectionLevel)
+{
+    OgreAssert(parameter, parameterNullMsg(mFunctionName, mOperands.size()).c_str());
+    mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
+}
+
+void FunctionAtom::setOperands(const OperandVector& ops)
+{
+    for (size_t i = 0; i < ops.size(); i++)
+        OgreAssert(ops[i].getParameter(), parameterNullMsg(mFunctionName, i).c_str());
+
+    mOperands = ops;
+}
+
+void FunctionAtom::writeOperands(std::ostream& os, OperandVector::const_iterator begin,
                                        OperandVector::const_iterator end) const
 {
     // Write parameters.
@@ -266,27 +286,6 @@ void FunctionInvocation::writeOperands(std::ostream& os, OperandVector::const_it
         }
     }
 }
-
-//-----------------------------------------------------------------------
-static String parameterNullMsg(const String& type, const String& name, size_t pos)
-{
-    return StringUtil::format("%s: %s parameter #%zu is NULL", type.c_str(), name.c_str(), pos);
-}
-
-void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, Operand::OpMask opMask, int indirectionLevel)
-{
-    OgreAssert(parameter, parameterNullMsg(getFunctionAtomType(), mFunctionName, mOperands.size()).c_str());
-    mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
-}
-
-void FunctionInvocation::setOperands(const OperandVector& ops)
-{
-    for (size_t i = 0; i < ops.size(); i++)
-        OgreAssert(ops[i].getParameter(), parameterNullMsg(getFunctionAtomType(), mFunctionName, i).c_str());
-
-    mOperands = ops;
-}
-
 
 //-----------------------------------------------------------------------
 bool FunctionInvocation::operator == ( const FunctionInvocation& rhs ) const
@@ -403,11 +402,11 @@ bool FunctionInvocation::FunctionInvocationCompare::operator ()(FunctionInvocati
     return true;
 }
 
-String AssignmentAtom::Type = "AssignmentAtom";
 AssignmentAtom::AssignmentAtom(const Out& lhs, const In& rhs, int groupOrder) {
     // do this backwards for compatibility with FFP_FUNC_ASSIGN calls
     setOperands({rhs, lhs});
     mGroupExecutionOrder = groupOrder;
+    mFunctionName = "assign";
 }
 
 void AssignmentAtom::writeSourceCode(std::ostream& os, const String& targetLanguage) const
@@ -422,11 +421,11 @@ void AssignmentAtom::writeSourceCode(std::ostream& os, const String& targetLangu
     os << ";";
 }
 
-String SampleTextureAtom::Type = "SampleTextureAtom";
 SampleTextureAtom::SampleTextureAtom(const In& sampler, const In& texcoord, const Out& lhs, int groupOrder)
 {
     setOperands({sampler, texcoord, lhs});
     mGroupExecutionOrder = groupOrder;
+    mFunctionName = "sampleTexture";
 }
 
 void SampleTextureAtom::writeSourceCode(std::ostream& os, const String& targetLanguage) const

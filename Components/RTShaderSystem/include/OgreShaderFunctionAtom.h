@@ -42,33 +42,6 @@ namespace RTShader {
 *  @{
 */
 
-/** A class that represents an atomic code section of shader based program function.
-*/
-class _OgreRTSSExport FunctionAtom : public RTShaderSystemAlloc
-{
-// Interface.
-public:
-    /** Class default constructor. */
-    FunctionAtom();
-
-    /** Class default destructor. */
-    virtual ~FunctionAtom() {}
-
-    /** Get the group execution order of this function atom. */
-    int getGroupExecutionOrder() const;
-
-    /** Abstract method that writes a source code to the given output stream in the target shader language. */
-    virtual void writeSourceCode(std::ostream& os, const String& targetLanguage) const = 0;
-    
-    /** Return the type of this atom instance implementation. */
-    virtual const String& getFunctionAtomType() = 0;
-
-// Attributes.
-protected:
-    // The owner group execution order. 
-    int mGroupExecutionOrder;
-};
-
 /** A class that represents a function operand (its the combination of a parameter the in/out semantic and the used fields)
 */
 class _OgreRTSSExport Operand : public RTShaderSystemAlloc
@@ -218,14 +191,55 @@ struct _OgreRTSSExport At : Operand
     At(ParameterPtr p) : Operand(p, OPS_IN, OPM_ALL, 1) {}
 };
 
+/** A class that represents an atomic code section of shader based program function.
+*/
+class _OgreRTSSExport FunctionAtom : public RTShaderSystemAlloc
+{
+// Interface.
+public:
+    typedef std::vector<Operand> OperandVector;
+
+    /** Class default destructor. */
+    virtual ~FunctionAtom() {}
+
+    /** Get the group execution order of this function atom. */
+    int getGroupExecutionOrder() const;
+
+    /** Get a list of parameters this function invocation will use in the function call as arguments. */
+    OperandVector& getOperandList() { return mOperands; }
+
+    /** Push a new operand (on the end) to the function.
+    @param parameter A function parameter.
+    @param opSemantic The in/out semantic of the parameter.
+    @param opMask The field mask of the parameter.
+    @param indirectionLevel The level of nesting inside brackets
+    */
+    void pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, Operand::OpMask opMask = Operand::OPM_ALL, int indirectionLevel = 0);
+
+    void setOperands(const OperandVector& ops);
+
+    /** Abstract method that writes a source code to the given output stream in the target shader language. */
+    virtual void writeSourceCode(std::ostream& os, const String& targetLanguage) const = 0;
+
+// Attributes.
+protected:
+    /** Class default constructor. */
+    FunctionAtom();
+
+    void writeOperands(std::ostream& os, OperandVector::const_iterator begin, OperandVector::const_iterator end) const;
+
+    // The owner group execution order.
+    int mGroupExecutionOrder;
+    OperandVector mOperands;
+    String mFunctionName;
+};
+
 /** A class that represents function invocation code from shader based program function.
 */
 class _OgreRTSSExport FunctionInvocation : public FunctionAtom
 {
     // Interface.
-public: 
-    typedef std::vector<Operand> OperandVector;
-
+public:
     /** Class constructor 
     @param functionName The name of the function to invoke.
     @param groupOrder The group order of this invocation.
@@ -240,24 +254,6 @@ public:
     @see FunctionAtom::writeSourceCode
     */
     virtual void writeSourceCode(std::ostream& os, const String& targetLanguage) const;
-
-    /** 
-    @see FunctionAtom::getFunctionAtomType
-    */
-    virtual const String& getFunctionAtomType() { return Type; }
-
-    /** Get a list of parameters this function invocation will use in the function call as arguments. */
-    OperandVector& getOperandList() { return mOperands; }
-    
-    /** Push a new operand (on the end) to the function. 
-    @param parameter A function parameter.
-    @param opSemantic The in/out semantic of the parameter.
-    @param opMask The field mask of the parameter.
-    @param indirectionLevel The level of nesting inside brackets
-    */
-    void pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, Operand::OpMask opMask = Operand::OPM_ALL, int indirectionLevel = 0);
-
-    void setOperands(const OperandVector& ops);
 
     /** Return the function name */
     const String& getFunctionName() const { return mFunctionName; }
@@ -290,44 +286,29 @@ public:
         bool operator()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
     };
 
-    /// The type of this class.
-    static String Type;
-
-    // Attributes.
 protected:
     FunctionInvocation() {}
 
-    void writeOperands(std::ostream& os, OperandVector::const_iterator begin,
-                       OperandVector::const_iterator end) const;
-
-    String mFunctionName;
     String mReturnType;
-    OperandVector mOperands;    
 };
 
 /// shorthand for "lhs = rhs;" insted of using FFP_Assign(rhs, lhs)
-class _OgreRTSSExport AssignmentAtom : public FunctionInvocation
+class _OgreRTSSExport AssignmentAtom : public FunctionAtom
 {
 public:
     explicit AssignmentAtom(int groupOrder) { mGroupExecutionOrder = groupOrder; }
     /// @note the argument order is reversed comered to all other function invocations
     AssignmentAtom(const Out& lhs, const In& rhs, int groupOrder);
     void writeSourceCode(std::ostream& os, const String& targetLanguage) const;
-    const String& getFunctionAtomType() { return Type; }
-
-    static String Type;
 };
 
 /// shorthand for "dst = texture(sampler, uv);" instead of using FFP_SampleTexture
-class _OgreRTSSExport SampleTextureAtom : public FunctionInvocation
+class _OgreRTSSExport SampleTextureAtom : public FunctionAtom
 {
 public:
     explicit SampleTextureAtom(int groupOrder) { mGroupExecutionOrder = groupOrder; }
     SampleTextureAtom(const In& sampler, const In& texcoord, const Out& dst, int groupOrder);
     void writeSourceCode(std::ostream& os, const String& targetLanguage) const;
-    const String& getFunctionAtomType() { return Type; }
-
-    static String Type;
 };
 
 typedef std::vector<FunctionAtom*>                 FunctionAtomInstanceList;

@@ -282,7 +282,7 @@ namespace Ogre {
             for ( ; itAtom != itAtomEnd; ++itAtom)
             {   
                 // Skip non function invocation atoms.
-                if ((*itAtom)->getFunctionAtomType() != FunctionInvocation::Type)
+                if (!dynamic_cast<const FunctionInvocation*>(*itAtom))
                     continue;
 
                 FunctionInvocation pFuncInvoc = *(static_cast<FunctionInvocation *>(*itAtom));

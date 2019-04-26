@@ -132,7 +132,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
     Function* vsMain   = vsProgram->getEntryPointFunction();    
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* psMain   = psProgram->getEntryPointFunction();    
-    FunctionInvocation* curFuncInvocation = NULL;   
+    FunctionAtom* curFuncInvocation = NULL;
 
     //
     // Calculate the position and size of the texture in the atlas in the vertex shader
