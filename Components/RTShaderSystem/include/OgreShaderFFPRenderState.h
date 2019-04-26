@@ -79,9 +79,6 @@ enum FFPShaderStage
 
 // Fixed Function Library: Common functions
 #define FFP_LIB_COMMON                              "FFPLib_Common"
-#define FFP_FUNC_MODULATE                           "FFP_Modulate"
-#define FFP_FUNC_ADD                                "FFP_Add"
-#define FFP_FUNC_SUBTRACT                           "FFP_Subtract"
 #define FFP_FUNC_LERP                               "FFP_Lerp"
 #define FFP_FUNC_DOTPRODUCT                         "FFP_DotProduct"
 #define FFP_FUNC_NORMALIZE                          "FFP_Normalize"

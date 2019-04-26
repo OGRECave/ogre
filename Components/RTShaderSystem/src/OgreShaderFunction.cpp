@@ -171,6 +171,13 @@ void FunctionStageRef::assign(const std::vector<Operand>& params) const
     mParent->addAtomInstance(function);
 }
 
+void FunctionStageRef::binaryOp(char op, const std::vector<Operand>& params) const
+{
+    auto function = new BinaryOpAtom(op, mStage);
+    function->setOperands(params);
+    mParent->addAtomInstance(function);
+}
+
 //-----------------------------------------------------------------------------
 Function::Function(const String& name, const String& desc, const FunctionType functionType)
 {

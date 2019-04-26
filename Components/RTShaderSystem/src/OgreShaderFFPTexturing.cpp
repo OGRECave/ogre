@@ -427,8 +427,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
         stage.assign(In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_MODULATE:
-        stage.callFunction(FFP_FUNC_MODULATE, In(arg1).mask(mask), In(arg2).mask(mask),
-                           Out(mPSOutDiffuse).mask(mask));
+        stage.mul(In(arg1).mask(mask), In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_MODULATE_X2:
         stage.callFunction(FFP_FUNC_MODULATEX2, In(arg1).mask(mask), In(arg2).mask(mask),
@@ -439,8 +438,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
                            Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_ADD:
-        stage.callFunction(FFP_FUNC_ADD, In(arg1).mask(mask), In(arg2).mask(mask),
-                           Out(mPSOutDiffuse).mask(mask));
+        stage.add(In(arg1).mask(mask), In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_ADD_SIGNED:
         stage.callFunction(FFP_FUNC_ADDSIGNED, In(arg1).mask(mask), In(arg2).mask(mask),
@@ -451,8 +449,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
                            Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_SUBTRACT:
-        stage.callFunction(FFP_FUNC_SUBTRACT, In(arg1).mask(mask), In(arg2).mask(mask),
-                           Out(mPSOutDiffuse).mask(mask));
+        stage.sub(In(arg1).mask(mask), In(arg2).mask(mask), Out(mPSOutDiffuse).mask(mask));
         break;
     case LBX_BLEND_DIFFUSE_ALPHA:
         stage.callFunction(FFP_FUNC_LERP, {In(arg2).mask(mask), In(arg1).mask(mask), In(mPSDiffuse).w(),

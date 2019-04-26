@@ -4,19 +4,6 @@
 // Program Type: Vertex/Pixel shader
 // Language: CG
 //-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-void SGX_CopyDepth(in float4 clipSpacePos,
-				 out float oDepth)
-{
-	oDepth = clipSpacePos.z;
-}
-
-//-----------------------------------------------------------------------------
-void SGX_ModulateScalar(in float vIn0, in float4 vIn1, out float4 vOut)
-{
-	vOut = vIn0 * vIn1;
-}
 	
 //-----------------------------------------------------------------------------
 void SGX_ApplyShadowFactor_Diffuse(in float4 ambient, 

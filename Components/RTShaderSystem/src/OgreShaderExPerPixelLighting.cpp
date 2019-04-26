@@ -213,11 +213,9 @@ bool PerPixelLighting::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
-    vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
     vsProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
-    psProgram->addDependency(FFP_LIB_COMMON);
     psProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
     if(mNormalisedEnable)
@@ -242,7 +240,7 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
     addPSGlobalIlluminationInvocation(stage);
 
     if (mToView)
-        stage.callFunction(FFP_FUNC_MODULATE, ParameterFactory::createConstParam(Vector3(-1)), mViewPos, mToView);
+        stage.mul(Vector3(-1), mViewPos, mToView);
 
     // Add per light functions.
     for (const auto& lp : mLightParamsList)
@@ -283,7 +281,7 @@ void PerPixelLighting::addPSGlobalIlluminationInvocation(const FunctionStageRef&
     {
         if (mTrackVertexColourType & TVC_AMBIENT)
         {
-            stage.callFunction(FFP_FUNC_MODULATE, mLightAmbientColour, mInDiffuse, mOutDiffuse);
+            stage.mul(mLightAmbientColour, mInDiffuse, mOutDiffuse);
         }
         else
         {
@@ -292,11 +290,11 @@ void PerPixelLighting::addPSGlobalIlluminationInvocation(const FunctionStageRef&
 
         if (mTrackVertexColourType & TVC_EMISSIVE)
         {
-            stage.callFunction(FFP_FUNC_ADD, mInDiffuse, mOutDiffuse, mOutDiffuse);
+            stage.add(mInDiffuse, mOutDiffuse, mOutDiffuse);
         }
         else
         {
-            stage.callFunction(FFP_FUNC_ADD, mSurfaceEmissiveColour, mOutDiffuse, mOutDiffuse);
+            stage.add(mSurfaceEmissiveColour, mOutDiffuse, mOutDiffuse);
         }       
     }
 }

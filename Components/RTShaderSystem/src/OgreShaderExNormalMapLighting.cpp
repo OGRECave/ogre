@@ -417,12 +417,9 @@ bool NormalMapLighting::resolveDependencies(ProgramSet* programSet)
 
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
     vsProgram->addDependency(FFP_LIB_TEXTURING);
-    psProgram->addDependency(FFP_LIB_TEXTURING);
-
-    vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(SGX_LIB_NORMALMAP);
 
-    psProgram->addDependency(FFP_LIB_COMMON);
+    psProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
 
     return true;
@@ -483,7 +480,7 @@ void NormalMapLighting::addVSInvocation(const FunctionStageRef& stage)
         mVSOutView.get() != NULL)
     {   
         // View vector in world space.
-        stage.callFunction(FFP_FUNC_SUBTRACT, In(mCamPosWorldSpace).xyz(), In(mVSWorldPosition).xyz(), mVSLocalDir);
+        stage.sub(In(mCamPosWorldSpace).xyz(), In(mVSWorldPosition).xyz(), mVSLocalDir);
 
         // Transform to object space.
         stage.callFunction(FFP_FUNC_TRANSFORM, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
@@ -533,8 +530,7 @@ void NormalMapLighting::addVSIlluminationInvocation(const LightParams* curLightP
         curLightParams->mVSOutToLightDir.get() != NULL)
     {
         // Compute light vector.
-        stage.callFunction(FFP_FUNC_SUBTRACT, In(curLightParams->mPosition).xyz(), mVSWorldPosition,
-                           mVSLocalDir);
+        stage.sub(In(curLightParams->mPosition).xyz(), mVSWorldPosition, mVSLocalDir);
 
         // Transform to object space.
         stage.callFunction(FFP_FUNC_TRANSFORM, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);

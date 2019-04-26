@@ -466,5 +466,33 @@ void SampleTextureAtom::writeSourceCode(std::ostream& os, const String& targetLa
     os << ");";
 }
 
+BinaryOpAtom::BinaryOpAtom(char op, const In& a, const In& b, const Out& dst, int groupOrder) {
+    // do this backwards for compatibility with FFP_FUNC_ASSIGN calls
+    setOperands({a, b, dst});
+    mGroupExecutionOrder = groupOrder;
+    mOp = op;
+    mFunctionName = op;
+}
+
+void BinaryOpAtom::writeSourceCode(std::ostream& os, const String& targetLanguage) const
+{
+    // find the output operand
+    OperandVector::const_iterator outOp = mOperands.begin();
+    while(outOp->getSemantic() != Operand::OPS_OUT)
+        outOp++;
+
+    // find the second operand
+    OperandVector::const_iterator secondOp = ++(mOperands.begin());
+    while(outOp->getIndirectionLevel() != 0)
+        secondOp++;
+
+    writeOperands(os, outOp, mOperands.end());
+    os << "\t=\t";
+    writeOperands(os, mOperands.begin(), secondOp);
+    os << mOp;
+    writeOperands(os, secondOp, outOp);
+    os << ";";
+}
+
 }
 }
