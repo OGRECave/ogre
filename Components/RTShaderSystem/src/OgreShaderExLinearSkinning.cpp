@@ -212,7 +212,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
 {
     Operand::OpMask indexMask = indexToMask(index);
 
-    FunctionInvocation* curFuncInvocation;
+    FunctionAtom* curFuncInvocation;
 
     //multiply position with world matrix and put into temporary param
     curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM);
@@ -263,7 +263,7 @@ void LinearSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
                                 int index)
 {
 
-    FunctionInvocation* curFuncInvocation;
+    FunctionAtom* curFuncInvocation;
 
     Operand::OpMask indexMask = indexToMask(index);
 

@@ -186,7 +186,7 @@ bool ShaderExInstancedViewports::addFunctionInvocations(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool ShaderExInstancedViewports::addVSInvocations( Function* vsMain, const int groupOrder )
 {
-    FunctionInvocation* funcInvocation = NULL;
+    FunctionAtom* funcInvocation = NULL;
     
     funcInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_INSTANCED_VIEWPORTS_TRANSFORM, groupOrder);
     funcInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
