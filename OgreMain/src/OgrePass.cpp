@@ -345,13 +345,12 @@ namespace Ogre {
         return mPointSpritesEnabled;
     }
     //-----------------------------------------------------------------------
-    void Pass::setPointAttenuation(bool enabled,
-        Real constant, Real linear, Real quadratic)
+    void Pass::setPointAttenuation(bool enabled, float constant, float linear, float quadratic)
     {
         mPointAttenuationEnabled = enabled;
-        mPointAttenution[0] = enabled ? constant : 1.0f;
-        mPointAttenution[1] = enabled ? linear : 0.0f;
-        mPointAttenution[2] = enabled ? quadratic : 0.0f;
+        mPointAttenution[1] = enabled ? constant : 1.0f;
+        mPointAttenution[2] = enabled ? linear : 0.0f;
+        mPointAttenution[3] = enabled ? quadratic : 0.0f;
     }
     //-----------------------------------------------------------------------
     bool Pass::isPointAttenuationEnabled(void) const

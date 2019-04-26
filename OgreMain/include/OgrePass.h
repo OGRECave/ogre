@@ -456,8 +456,7 @@ namespace Ogre {
         @param constant, linear, quadratic Parameters to the attenuation
             function defined above
         */
-        void setPointAttenuation(bool enabled,
-            Real constant = 0.0f, Real linear = 1.0f, Real quadratic = 0.0f);
+        void setPointAttenuation(bool enabled, float constant = 0.0f, float linear = 1.0f, float quadratic = 0.0f);
 
         /** Returns whether points are attenuated with distance. */
         bool isPointAttenuationEnabled(void) const;
