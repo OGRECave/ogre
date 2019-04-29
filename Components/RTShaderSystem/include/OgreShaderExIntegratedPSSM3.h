@@ -46,7 +46,6 @@ namespace RTShader {
 #define SGX_LIB_INTEGRATEDPSSM                      "SGXLib_IntegratedPSSM"
 #define SGX_FUNC_COMPUTE_SHADOW_COLOUR3             "SGX_ComputeShadowFactor_PSSM3"
 #define SGX_FUNC_APPLYSHADOWFACTOR_DIFFUSE          "SGX_ApplyShadowFactor_Diffuse"
-#define SGX_FUNC_MODULATE_SCALAR                    "SGX_ModulateScalar"
 
 /** Integrated PSSM shadow receiver with 3 splits sub render state implementation.
 Derives from SubRenderState class.

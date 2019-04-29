@@ -32,19 +32,6 @@ THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-void SGX_CopyDepth(in vec4 clipSpacePos,
-			 out float oDepth)
-{
-	oDepth = clipSpacePos.z;
-}
-
-//-----------------------------------------------------------------------------
-void SGX_ModulateScalar(in float vIn0, in vec4 vIn1, out vec4 vOut)
-{
-	vOut = vIn0 * vIn1;
-}
-	
-//-----------------------------------------------------------------------------
 void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient, 
 					  in vec4 lightSum, 
 					  in float fShadowFactor, 

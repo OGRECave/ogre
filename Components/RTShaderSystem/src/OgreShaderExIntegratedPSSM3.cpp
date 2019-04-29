@@ -327,7 +327,7 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
                        {In(mPSDerivedSceneColour), In(mPSDiffuse), In(mPSLocalShadowFactor), Out(mPSDiffuse)});
 
     // Apply shadow factor on specular colour.
-    stage.callFunction(SGX_FUNC_MODULATE_SCALAR, mPSLocalShadowFactor, mPSSpecualr, mPSSpecualr);
+    stage.mul(mPSLocalShadowFactor, mPSSpecualr, mPSSpecualr);
 
     // Assign the local diffuse to output diffuse.
     stage.assign(mPSDiffuse, mPSOutDiffuse);
