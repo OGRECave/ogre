@@ -46,7 +46,7 @@ namespace RTShader {
 /** Per pixel Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */
-class _OgreRTSSExport CookTorranceLighting : public FFPLighting
+class _OgreRTSSExport CookTorranceLighting : public NormalMapLighting
 {
 
 // Interface.
@@ -70,9 +70,6 @@ protected:
     /** Resolve global lighting parameters */
     virtual bool resolveGlobalParameters(ProgramSet* programSet);
 
-    /** Resolve per light parameters */
-    virtual bool resolvePerLightParameters(ProgramSet* programSet);
-
     /**
     @see SubRenderState::resolveDependencies.
     */
@@ -85,35 +82,9 @@ protected:
 
     void addPSIlluminationInvocation(const LightParams* curLightParams, const FunctionStageRef& stage);
 
-    /**
-    Internal method that adds related vertex shader functions invocations.
-    */
-    void addVSInvocation(const FunctionStageRef& stage);
-
-
-    /**
-    Internal method that adds global illumination component functions invocations.
-    */
-    void addPSGlobalIlluminationInvocation(const FunctionStageRef& stage);
-
-    /**
-    Internal method that adds the final colour assignments.
-    */
-    void addPSFinalAssignmentInvocation(const FunctionStageRef& stage);
-
-
 // Attributes.
 protected:
-    // Vertex shader output view position (position in camera space) parameter.
-    ParameterPtr mVSOutViewPos;
-    // Vertex shader output normal.
-    ParameterPtr mVSOutNormal;
-    // Pixel shader input/local specular parameter.
-    ParameterPtr mPSSpecular;
-
-    ParameterPtr mSurfaceDiffuseColour;
-
-    // Surface shininess parameter.
+    UniformParameterPtr mSurfaceDiffuseColour;
     UniformParameterPtr mSurfaceRoughness;
     UniformParameterPtr mSurfaceMetallness;
 };

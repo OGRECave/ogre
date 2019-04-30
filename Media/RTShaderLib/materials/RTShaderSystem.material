@@ -152,7 +152,7 @@ material RTSS/Athene/NormalMapping_SinglePass : RTSS/NormalMapping_SinglePass
 			// Override the normal map.
  			rtshader_system
  			{	 	 						
- 				lighting_stage normal_map atheneNormalMap.png tangent_space 0 RTSS/NormalMapSampler
+ 				lighting_stage cook_torrance atheneNormalMap.png tangent_space 0 RTSS/NormalMapSampler
  			}
 		}				
 	}
