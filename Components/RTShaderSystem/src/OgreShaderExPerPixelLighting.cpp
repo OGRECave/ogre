@@ -143,8 +143,6 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             break;
 
         case Light::LT_POINT:
-            mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
-            mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
             mLightParamsList[i].mPosition = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, i);
             mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
             
@@ -152,9 +150,6 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
             break;
 
         case Light::LT_SPOTLIGHT:
-            mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
-
-            mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
             mLightParamsList[i].mPosition = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, i);
             mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_view_space");
             mLightParamsList[i].mPSInDirection = mLightParamsList[i].mDirection;
@@ -191,7 +186,10 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 
     if (needViewPos)
     {
+        mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
+        mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
         mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
+
         mViewPos = psMain->resolveInputParameter(mVSOutViewPos);
         mToLight = psMain->resolveLocalParameter(Parameter::SPC_LIGHTDIRECTION_VIEW_SPACE0);
         mToView = psMain->resolveLocalParameter(Parameter::SPC_POSTOCAMERA_VIEW_SPACE);

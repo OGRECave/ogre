@@ -228,16 +228,6 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			{
 				mOutSpecular = vsMain->resolveOutputParameter(Parameter::SPC_COLOR_SPECULAR);
 			}
-			
-			if (mVSInPosition.get() == NULL)
-			{
-				mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-			}
-
-			if (mWorldViewMatrix.get() == NULL)
-			{
-				mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
-			}
 		}		
 	}
 
