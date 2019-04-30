@@ -195,8 +195,6 @@ protected:
     UniformParameterPtr mCamPosWorldSpace;
     // Vertex shader world position parameter.
     ParameterPtr mVSWorldPosition;
-    // Vertex shader output view vector (position in camera space) parameter.
-    ParameterPtr mVSOutView;
     // Vertex shader input tangent.
     ParameterPtr mVSInTangent;
     // Vertex shader local TNB matrix.
