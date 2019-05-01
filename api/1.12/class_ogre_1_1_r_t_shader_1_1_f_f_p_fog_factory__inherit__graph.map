@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::FFPFogFactory" name="Ogre::RTShader::FFPFogFactory">
+<area shape="rect" id="node1" title="A factory that enables creation of FFPFog instances." alt="" coords="5,169,232,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state_factory.html" title="Abstract factory interface for creating SubRenderState implementation instances." alt="" coords="18,80,219,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="36,5,201,32"/>
+</map>

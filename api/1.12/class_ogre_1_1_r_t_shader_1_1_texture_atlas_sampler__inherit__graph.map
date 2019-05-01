@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::TextureAtlasSampler" name="Ogre::RTShader::TextureAtlasSampler">
+<area shape="rect" id="node1" title="Implements texture atlas sampling." alt="" coords="5,169,217,211"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state.html" title="This class is the base interface of sub part from a shader based rendering pipeline." alt="" coords="11,80,212,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="29,5,194,32"/>
+</map>

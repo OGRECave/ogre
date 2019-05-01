@@ -1,0 +1,10 @@
+<map id="Ogre::GLTextureCommon" name="Ogre::GLTextureCommon">
+<area shape="rect" id="node1" title=" " alt="" coords="174,229,358,256"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_g_l3_plus_texture.html" title=" " alt="" coords="5,304,167,331"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l_e_s2_texture.html" title=" " alt="" coords="191,304,341,331"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l_texture.html" title=" " alt="" coords="366,304,491,331"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_texture.html" title="Abstract class representing a Texture resource." alt="" coords="211,155,321,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource." alt="" coords="205,80,327,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="107,5,265,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="289,5,403,32"/>
+</map>

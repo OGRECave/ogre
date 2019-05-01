@@ -1,0 +1,13 @@
+<map id="Ogre::InstanceBatch" name="Ogre::InstanceBatch">
+<area shape="rect" id="node1" title="InstanceBatch forms part of the new Instancing system This is an abstract class that must be derived ..." alt="" coords="358,155,511,181"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_base_instance_batch_v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) This implementation..." alt="" coords="112,229,323,256"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_instance_batch_h_w.html" title="This is technique requires true instancing hardware support." alt="" coords="347,229,523,256"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_instance_batch_shader.html" title="This is the same technique the old &quot;InstancedGeometry&quot; implementation used (with improvements)." alt="" coords="547,229,746,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="282,80,417,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="441,80,599,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="259,5,413,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="437,5,603,32"/>
+<area shape="rect" id="node6" title=" " alt="" coords="627,5,738,32"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_instance_batch_h_w___v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and hardware instan..." alt="" coords="5,304,213,331"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_instance_batch_v_t_f.html" title=" " alt="" coords="237,304,416,331"/>
+</map>

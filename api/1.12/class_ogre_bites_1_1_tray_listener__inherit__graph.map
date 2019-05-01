@@ -1,0 +1,4 @@
+<map id="OgreBites::TrayListener" name="OgreBites::TrayListener">
+<area shape="rect" id="node1" title="Listener class for responding to tray events." alt="" coords="7,5,182,32"/>
+<area shape="rect" id="node2" href="$class_ogre_bites_1_1_tray_manager.html" title="Main class to manage a cursor, backdrop, trays and widgets." alt="" coords="5,80,184,107"/>
+</map>

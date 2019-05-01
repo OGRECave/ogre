@@ -1,0 +1,5 @@
+<map id="Ogre::NodeAnimationTrack" name="Ogre::NodeAnimationTrack">
+<area shape="rect" id="node1" title="Specialised AnimationTrack for dealing with node transforms." alt="" coords="5,155,203,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_animation_track.html" title="A &#39;track&#39; in an animation sequence, i.e." alt="" coords="23,80,185,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="43,5,165,32"/>
+</map>

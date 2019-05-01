@@ -1,0 +1,14 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,183,100,209"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_codec.html" title="Abstract class that defines a &#39;codec&#39;." alt="" coords="187,157,289,184"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_codec_1_1_codec_data.html" title=" " alt="" coords="148,208,328,235"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_image_codec.html" title="Codec specialized in images." alt="" coords="416,157,559,184"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_a_s_t_c_codec.html" title="Codec specialized in loading ASTC (ARM Adaptive Scalable Texture Compression) images." alt="" coords="665,5,799,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d_d_s_codec.html" title="Codec specialized in loading DDS (Direct Draw Surface) images." alt="" coords="667,56,797,83"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_e_t_c_codec.html" title="Codec specialized in loading ETC (Ericsson Texture Compression) images." alt="" coords="669,107,795,133"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_e_x_r_codec.html" title=" " alt="" coords="669,157,795,184"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_free_image_codec.html" title=" " alt="" coords="647,208,817,235"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_p_v_r_t_c_codec.html" title="Codec specialized in loading PVRTC (PowerVR) images." alt="" coords="661,259,803,285"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_s_t_b_i_image_codec.html" title=" " alt="" coords="647,309,817,336"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_image_codec_1_1_image_data.html" title="Codec return class for images." alt="" coords="376,208,599,235"/>
+</map>

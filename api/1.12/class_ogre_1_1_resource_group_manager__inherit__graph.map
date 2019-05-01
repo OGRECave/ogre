@@ -1,0 +1,5 @@
+<map id="Ogre::ResourceGroupManager" name="Ogre::ResourceGroupManager">
+<area shape="rect" id="node1" title="This singleton class manages the list of resource groups, and notifying the various resource managers..." alt="" coords="85,95,302,121"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="5,5,203,47"/>
+<area shape="rect" id="node3" title=" " alt="" coords="227,13,341,39"/>
+</map>

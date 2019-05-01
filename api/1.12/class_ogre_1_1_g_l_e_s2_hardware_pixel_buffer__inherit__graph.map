@@ -1,0 +1,9 @@
+<map id="Ogre::GLES2HardwarePixelBuffer" name="Ogre::GLES2HardwarePixelBuffer">
+<area shape="rect" id="node1" title=" " alt="" coords="107,319,305,360"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_g_l_e_s2_render_buffer.html" title="Renderbuffer surface." alt="" coords="5,408,193,435"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l_e_s2_texture_buffer.html" title="Texture surface." alt="" coords="217,408,408,435"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_g_l_hardware_pixel_buffer_common.html" title=" " alt="" coords="99,229,313,271"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hardware_pixel_buffer.html" title="Specialisation of HardwareBuffer for a pixel buffer." alt="" coords="108,155,304,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers." alt="" coords="124,80,288,107"/>
+<area shape="rect" id="node5" title=" " alt="" coords="159,5,253,32"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Ogre::TextAreaOverlayElementFactory" name="Ogre::TextAreaOverlayElementFactory">
+<area shape="rect" id="node1" title="Factory for creating TextAreaOverlayElement instances." alt="" coords="5,155,228,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_overlay_element_factory.html" title="Defines the interface which all components wishing to supply OverlayElement subclasses must implement..." alt="" coords="9,80,224,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="64,5,169,32"/>
+</map>

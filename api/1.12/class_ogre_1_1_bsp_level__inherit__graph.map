@@ -1,0 +1,7 @@
+<map id="Ogre::BspLevel" name="Ogre::BspLevel">
+<area shape="rect" id="node1" title="Holds all the data associated with a Binary Space Parition (BSP) based indoor level." alt="" coords="180,155,300,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource." alt="" coords="103,80,225,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="187,5,301,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="249,80,383,107"/>
+</map>

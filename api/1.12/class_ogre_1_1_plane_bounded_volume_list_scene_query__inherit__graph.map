@@ -1,0 +1,10 @@
+<map id="Ogre::PlaneBoundedVolumeListSceneQuery" name="Ogre::PlaneBoundedVolumeListSceneQuery">
+<area shape="rect" id="node1" title="Specialises the SceneQuery class for querying within a plane&#45;bounded volume." alt="" coords="643,39,847,80"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_default_plane_bounded_volume_list_scene_query.html" title="Default implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="895,39,1097,80"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_region_scene_query.html" title="Abstract class defining a query which returns single results from a region." alt="" coords="411,46,595,73"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene." alt="" coords="198,21,337,47"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,21,124,47"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_scene_query_listener.html" title="This optional class allows you to receive per&#45;result callbacks from SceneQuery executions instead of ..." alt="" coords="172,71,363,98"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_octree_plane_bounded_volume_list_scene_query.html" title="Octree implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="1162,5,1359,47"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_p_c_z_plane_bounded_volume_list_scene_query.html" title="PCZ implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="1145,71,1376,112"/>
+</map>

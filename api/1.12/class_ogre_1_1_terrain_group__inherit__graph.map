@@ -1,0 +1,6 @@
+<map id="Ogre::TerrainGroup" name="Ogre::TerrainGroup">
+<area shape="rect" id="node1" title="Helper class to assist you in managing multiple terrain instances that are connected to each other." alt="" coords="261,95,405,121"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_work_queue_1_1_request_handler.html" title="Interface definition for a handler of requests." alt="" coords="5,5,204,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_work_queue_1_1_response_handler.html" title="Interface definition for a handler of responses." alt="" coords="229,5,437,47"/>
+<area shape="rect" id="node4" title=" " alt="" coords="461,13,559,39"/>
+</map>

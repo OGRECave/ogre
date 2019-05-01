@@ -1,0 +1,5 @@
+<map id="Ogre::PointEmitterFactory" name="Ogre::PointEmitterFactory">
+<area shape="rect" id="node1" title="Factory class for particle emitter of type &quot;Point&quot;." alt="" coords="13,155,204,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_particle_emitter_factory.html" title="Abstract class defining the interface to be implemented by creators of ParticleEmitter subclasses." alt="" coords="5,80,212,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="73,5,144,32"/>
+</map>

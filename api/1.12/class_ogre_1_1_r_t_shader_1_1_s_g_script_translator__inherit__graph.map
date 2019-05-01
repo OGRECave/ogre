@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::SGScriptTranslator" name="Ogre::RTShader::SGScriptTranslator">
+<area shape="rect" id="node1" title="This class responsible for translating core features of the RT Shader System for Ogre material script..." alt="" coords="5,155,192,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_script_translator.html" title="This class translates script AST (abstract syntax tree) into Ogre resources." alt="" coords="17,80,180,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="21,5,177,32"/>
+</map>

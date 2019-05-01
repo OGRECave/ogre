@@ -1,0 +1,4 @@
+<map id="Ogre::DirectionRandomiserAffector::CmdScope" name="Ogre::DirectionRandomiserAffector::CmdScope">
+<area shape="rect" id="node1" title="Command object for scope (see ParamCommand)." alt="" coords="5,80,204,121"/>
+<area shape="rect" id="node2" title="Abstract class which is command object which gets/sets parameters." alt="" coords="19,5,190,32"/>
+</map>

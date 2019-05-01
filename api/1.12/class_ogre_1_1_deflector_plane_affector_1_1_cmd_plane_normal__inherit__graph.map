@@ -1,0 +1,4 @@
+<map id="Ogre::DeflectorPlaneAffector::CmdPlaneNormal" name="Ogre::DeflectorPlaneAffector::CmdPlaneNormal">
+<area shape="rect" id="node1" title="Command object for plane normal (see ParamCommand)." alt="" coords="5,80,213,121"/>
+<area shape="rect" id="node2" title="Abstract class which is command object which gets/sets parameters." alt="" coords="24,5,195,32"/>
+</map>

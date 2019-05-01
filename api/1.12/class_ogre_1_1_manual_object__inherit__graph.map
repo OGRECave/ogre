@@ -1,0 +1,7 @@
+<map id="Ogre::ManualObject" name="Ogre::ManualObject">
+<area shape="rect" id="node1" title="Class providing a much simplified interface to generating manual objects with custom geometry." alt="" coords="191,155,342,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="187,80,346,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="5,5,160,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="184,5,349,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="374,5,485,32"/>
+</map>

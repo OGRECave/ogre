@@ -1,0 +1,5 @@
+<map id="Ogre::PagedWorldSection" name="Ogre::PagedWorldSection">
+<area shape="rect" id="node1" title="Represents a section of the PagedWorld which uses a given PageStrategy, and which is made up of a gen..." alt="" coords="27,80,214,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_terrain_paged_world_section.html" title="A world section which includes paged terrain." alt="" coords="5,155,236,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="77,5,164,32"/>
+</map>

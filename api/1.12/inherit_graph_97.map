@@ -1,0 +1,15 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,233,92,260"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_exception.html" title="When thrown, provides information about an error that has occurred inside the engine." alt="" coords="140,233,265,260"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_file_not_found_exception.html" title=" " alt="" coords="331,5,540,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_internal_error_exception.html" title=" " alt="" coords="332,56,539,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_invalid_call_exception.html" title=" " alt="" coords="338,107,533,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_invalid_parameters_exception.html" title=" " alt="" coords="313,157,557,184"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_invalid_state_exception.html" title=" " alt="" coords="334,208,537,235"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_i_o_exception.html" title=" " alt="" coords="366,259,505,285"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_item_identity_exception.html" title=" " alt="" coords="333,309,538,336"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_rendering_a_p_i_exception.html" title=" " alt="" coords="329,360,541,387"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_runtime_assertion_exception.html" title=" " alt="" coords="315,411,556,437"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_unimplemented_exception.html" title="Template struct which creates a distinct type for each exception code." alt="" coords="320,461,551,488"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_d3_d11_rendering_a_p_i_exception.html" title=" " alt="" coords="605,360,861,387"/>
+</map>

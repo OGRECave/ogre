@@ -1,0 +1,4 @@
+<map id="Ogre::ParticleSystem::CmdIterationInterval" name="Ogre::ParticleSystem::CmdIterationInterval">
+<area shape="rect" id="node1" title="Command object for iteration interval(see ParamCommand)." alt="" coords="8,80,173,121"/>
+<area shape="rect" id="node2" title="Abstract class which is command object which gets/sets parameters." alt="" coords="5,5,176,32"/>
+</map>

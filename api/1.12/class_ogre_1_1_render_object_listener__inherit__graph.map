@@ -1,0 +1,4 @@
+<map id="Ogre::RenderObjectListener" name="Ogre::RenderObjectListener">
+<area shape="rect" id="node1" title="Abstract interface which classes must implement if they wish to receive events from the scene manager..." alt="" coords="5,5,207,32"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hlms_manager.html" title=" " alt="" coords="30,80,182,107"/>
+</map>

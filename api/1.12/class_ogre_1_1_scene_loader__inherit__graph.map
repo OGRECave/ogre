@@ -1,0 +1,5 @@
+<map id="Ogre::SceneLoader" name="Ogre::SceneLoader">
+<area shape="rect" id="node1" title="Abstract class for loading scenes from a file (DataStream)." alt="" coords="113,5,257,32"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_bsp_scene_loader.html" title="Manages the locating and loading of BSP&#45;based indoor levels." alt="" coords="5,80,173,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_dot_scene_loader.html" title=" " alt="" coords="198,80,365,107"/>
+</map>

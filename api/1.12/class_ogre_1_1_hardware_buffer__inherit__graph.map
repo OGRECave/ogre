@@ -1,0 +1,34 @@
+<map id="Ogre::HardwareBuffer" name="Ogre::HardwareBuffer">
+<area shape="rect" id="node1" title="Abstract class defining common features of hardware buffers." alt="" coords="148,259,312,285"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_d3_d11_hardware_buffer.html" title="Base implementation of a D3D11 buffer, dealing with all the common aspects." alt="" coords="368,5,576,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d9_hardware_buffer.html" title="Specialisation of HardwareVertexBuffer for D3D9." alt="" coords="372,56,572,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_default_hardware_buffer.html" title="Specialisation of HardwareBuffer for emulation." alt="" coords="366,107,578,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_g_l3_plus_hardware_buffer.html" title=" " alt="" coords="364,157,580,184"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l_e_s2_hardware_buffer.html" title=" " alt="" coords="369,208,575,235"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l_hardware_vertex_buffer.html" title="Specialisation of HardwareVertexBuffer for OpenGL." alt="" coords="360,259,584,285"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_hardware_index_buffer.html" title="Specialisation of HardwareBuffer for vertex index buffers, still abstract." alt="" coords="372,309,572,336"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_hardware_pixel_buffer.html" title="Specialisation of HardwareBuffer for a pixel buffer." alt="" coords="374,360,570,387"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1_hardware_uniform_buffer.html" title="Specialisation of HardwareBuffer for a uniform buffer." alt="" coords="363,411,581,437"/>
+<area shape="rect" id="node30" href="$class_ogre_1_1_hardware_vertex_buffer.html" title="Specialisation of HardwareBuffer for a vertex buffer." alt="" coords="369,461,575,488"/>
+<area shape="rect" id="node32" href="$class_ogre_1_1_metal_hardware_buffer_common.html" title="Common buffer operations for most v1 buffer interfaces used in Metal This implementation treats: Igno..." alt="" coords="371,513,573,554"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,259,100,285"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_default_hardware_index_buffer.html" title=" " alt="" coords="644,111,852,153"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_d3_d11_hardware_pixel_buffer.html" title=" " alt="" coords="648,177,848,218"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_d3_d9_hardware_pixel_buffer.html" title=" " alt="" coords="632,243,864,269"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_g_l_hardware_pixel_buffer_common.html" title=" " alt="" coords="641,294,855,335"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_metal_depth_pixel_buffer.html" title=" " alt="" coords="643,360,853,387"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_metal_hardware_pixel_buffer.html" title=" " alt="" coords="651,411,845,453"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1_tiny_hardware_pixel_buffer.html" title=" " alt="" coords="637,477,859,504"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_g_l3_plus_hardware_pixel_buffer.html" title=" " alt="" coords="915,205,1123,246"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_g_l_e_s2_hardware_pixel_buffer.html" title=" " alt="" coords="920,294,1117,335"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_g_l_hardware_pixel_buffer.html" title=" " alt="" coords="912,364,1125,391"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_g_l3_plus_render_buffer.html" title="Renderbuffer surface." alt="" coords="1175,161,1373,188"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_g_l3_plus_texture_buffer.html" title="Texture surface." alt="" coords="1173,212,1375,239"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_g_l_e_s2_render_buffer.html" title="Renderbuffer surface." alt="" coords="1180,263,1368,289"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_g_l_e_s2_texture_buffer.html" title="Texture surface." alt="" coords="1179,313,1369,340"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_g_l_render_buffer.html" title="Renderbuffer surface." alt="" coords="1192,364,1356,391"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_g_l_texture_buffer.html" title="Texture surface." alt="" coords="1191,415,1357,441"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1_metal_texture_buffer.html" title="Texture surface." alt="" coords="925,419,1112,445"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1_default_hardware_uniform_buffer.html" title="Specialisation of HardwareUniformBuffer for emulation." alt="" coords="635,529,861,570"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1_default_hardware_vertex_buffer.html" title=" " alt="" coords="641,594,855,635"/>
+</map>

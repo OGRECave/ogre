@@ -1,0 +1,10 @@
+<map id="Ogre::D3D9GpuProgram" name="Ogre::D3D9GpuProgram">
+<area shape="rect" id="node1" title="Direct3D implementation of a few things common to low&#45;level vertex &amp; fragment programs." alt="" coords="163,229,341,256"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_d3_d9_gpu_fragment_program.html" title="Direct3D implementation of low&#45;level fragment programs." alt="" coords="5,304,245,331"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_d3_d9_gpu_vertex_program.html" title="Direct3D implementation of low&#45;level vertex programs." alt="" coords="269,304,491,331"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_gpu_program.html" title="Defines a program which runs on the GPU such as a vertex or fragment program." alt="" coords="94,155,237,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource." alt="" coords="105,80,226,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="7,5,164,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="188,5,303,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d9_resource.html" title="Represents a Direct3D rendering resource." alt="" coords="261,155,419,181"/>
+</map>

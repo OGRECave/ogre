@@ -1,0 +1,14 @@
+<map id="Ogre::ParticleAffectorFactory" name="Ogre::ParticleAffectorFactory">
+<area shape="rect" id="node1" title="Abstract class defining the interface to be implemented by creators of ParticleAffector subclasses." alt="" coords="124,307,333,334"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_colour_fader_affector_factory.html" title="Factory class for ColourFaderAffector." alt="" coords="396,5,587,47"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_colour_fader_affector_factory2.html" title="Factory class for ColourFaderAffector." alt="" coords="396,71,587,112"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_colour_image_affector_factory.html" title="Factory class for ColourImageAffector." alt="" coords="394,136,589,177"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_colour_interpolator_affector_factory.html" title="Factory class for ColourInterpolatorAffector." alt="" coords="402,201,581,243"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_deflector_plane_affector_factory.html" title="Factory class for DeflectorPlaneAffector." alt="" coords="387,267,595,308"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_direction_randomiser_affector_factory.html" title="Factory class for DirectionRandomiserAffector." alt="" coords="392,332,591,373"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_linear_force_affector_factory.html" title="Factory class for LinearForceAffector." alt="" coords="398,397,585,439"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_rotation_affector_factory.html" title="Factory class for RotationAffector." alt="" coords="384,463,599,490"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_scale_affector_factory.html" title="Factory class for ScaleAffector." alt="" coords="394,514,589,541"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_texture_animator_affector_factory.html" title="Factory class for TextureAnimatorAffector." alt="" coords="381,565,601,607"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,307,76,334"/>
+</map>

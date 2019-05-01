@@ -1,0 +1,6 @@
+<map id="Ogre::DefaultHardwareVertexBuffer" name="Ogre::DefaultHardwareVertexBuffer">
+<area shape="rect" id="node1" title=" " alt="" coords="5,229,220,271"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_vertex_buffer.html" title="Specialisation of HardwareBuffer for a vertex buffer." alt="" coords="9,155,216,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers." alt="" coords="31,80,195,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="65,5,160,32"/>
+</map>

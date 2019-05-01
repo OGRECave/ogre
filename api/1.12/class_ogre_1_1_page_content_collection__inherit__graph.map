@@ -1,0 +1,5 @@
+<map id="Ogre::PageContentCollection" name="Ogre::PageContentCollection">
+<area shape="rect" id="node1" title="Definition of the interface for a collection of PageContent instances." alt="" coords="28,80,237,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_simple_page_content_collection.html" title="Specialisation of PageContentCollection which just provides a simple list of PageContent instances." alt="" coords="5,155,260,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="89,5,176,32"/>
+</map>

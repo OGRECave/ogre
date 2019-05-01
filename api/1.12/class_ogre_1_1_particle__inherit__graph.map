@@ -1,0 +1,12 @@
+<map id="Ogre::Particle" name="Ogre::Particle">
+<area shape="rect" id="node1" title="Class representing a single particle instance." alt="" coords="367,80,477,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_particle_emitter.html" title="Abstract class defining the interface to be implemented by particle emitters." alt="" coords="343,155,501,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="387,5,457,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_area_emitter.html" title="Particle emitter which emits particles randomly from points inside an area (box, sphere,..." alt="" coords="270,229,409,256"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_point_emitter.html" title="This emitter emits particles from a single point, which is it’s position." alt="" coords="433,229,576,256"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_box_emitter.html" title="This emitter emits particles from a random location within a 3&#45;dimensional box." alt="" coords="5,304,140,331"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_cylinder_emitter.html" title="This emitter emits particles in a random direction from within a cylinder area, where the cylinder is..." alt="" coords="165,304,327,331"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_ellipsoid_emitter.html" title="Particle emitter which emits particles randomly from points inside an ellipsoid." alt="" coords="352,304,516,331"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_ring_emitter.html" title="Particle emitter which emits particles randomly from points inside a ring (e.g." alt="" coords="541,304,679,331"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_hollow_ellipsoid_emitter.html" title="Particle emitter which emits particles randomly from points inside a hollow ellipsoid." alt="" coords="329,379,539,405"/>
+</map>

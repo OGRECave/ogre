@@ -1,0 +1,4 @@
+<map id="Ogre::AreaEmitter::CmdHeight" name="Ogre::AreaEmitter::CmdHeight">
+<area shape="rect" id="node1" title="Command object for area emitter size (see ParamCommand)." alt="" coords="17,80,164,121"/>
+<area shape="rect" id="node2" title="Abstract class which is command object which gets/sets parameters." alt="" coords="5,5,176,32"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::ColourFaderAffector::CmdGreenAdjust" name="Ogre::ColourFaderAffector::CmdGreenAdjust">
+<area shape="rect" id="node1" title="Command object for green adjust (see ParamCommand)." alt="" coords="5,80,196,121"/>
+<area shape="rect" id="node2" title="Abstract class which is command object which gets/sets parameters." alt="" coords="15,5,186,32"/>
+</map>

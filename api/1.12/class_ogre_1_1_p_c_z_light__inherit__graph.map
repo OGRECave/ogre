@@ -1,0 +1,8 @@
+<map id="Ogre::PCZLight" name="Ogre::PCZLight">
+<area shape="rect" id="node1" title="Specialized version of Ogre::Light which caches which zones the light affects." alt="" coords="207,229,326,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_light.html" title="Representation of a dynamic light source in the scene." alt="" coords="220,155,313,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="187,80,346,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="5,5,160,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="184,5,349,32"/>
+<area shape="rect" id="node6" title=" " alt="" coords="374,5,485,32"/>
+</map>

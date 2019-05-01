@@ -1,0 +1,8 @@
+<map id="Ogre::SceneNode" name="Ogre::SceneNode">
+<area shape="rect" id="node1" title="Class representing a node in the scene graph." alt="" coords="191,155,325,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_bsp_scene_node.html" title="Specialisation of SceneNode for the BspSceneManager." alt="" coords="5,229,164,256"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_octree_node.html" title="Specialized SceneNode that is customized for working within an Octree." alt="" coords="189,229,327,256"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_p_c_z_scene_node.html" title="The PCZSceneNode is an extension used to store zone information and provide additional functionality ..." alt="" coords="351,229,511,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_node.html" title="Class representing a general&#45;purpose node an articulated scene graph." alt="" coords="211,80,305,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="214,5,302,32"/>
+</map>

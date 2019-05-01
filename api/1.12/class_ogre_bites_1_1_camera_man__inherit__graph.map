@@ -1,0 +1,4 @@
+<map id="OgreBites::CameraMan" name="OgreBites::CameraMan">
+<area shape="rect" id="node1" title="Utility class for controlling the camera in samples." alt="" coords="8,80,181,107"/>
+<area shape="rect" id="node2" href="$struct_ogre_bites_1_1_input_listener.html" title="the return values of the callbacks are ignored by ApplicationContext however they can be used to cont..." alt="" coords="5,5,184,32"/>
+</map>

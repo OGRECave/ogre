@@ -1,0 +1,4 @@
+<map id="OgreBites::ProgressBar" name="OgreBites::ProgressBar">
+<area shape="rect" id="node1" title="Basic progress bar widget." alt="" coords="5,80,177,107"/>
+<area shape="rect" id="node2" href="$class_ogre_bites_1_1_widget.html" title="Abstract base class for all widgets." alt="" coords="21,5,161,32"/>
+</map>

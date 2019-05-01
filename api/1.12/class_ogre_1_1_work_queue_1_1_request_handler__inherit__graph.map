@@ -1,0 +1,11 @@
+<map id="Ogre::WorkQueue::RequestHandler" name="Ogre::WorkQueue::RequestHandler">
+<area shape="rect" id="node1" title="Interface definition for a handler of requests." alt="" coords="5,191,204,233"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_lod_work_queue_worker.html" title="Processes requests." alt="" coords="264,5,471,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_page.html" title="Page class." alt="" coords="321,56,414,83"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_resource_background_queue.html" title="This class is used to perform Resource operations in a background thread." alt="" coords="268,107,467,149"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_terrain.html" title="The main containing class for a chunk of terrain." alt="" coords="315,173,420,200"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_terrain_group.html" title="Helper class to assist you in managing multiple terrain instances that are connected to each other." alt="" coords="295,224,439,251"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_terrain_lod_manager.html" title="Terrain LOD data manager." alt="" coords="275,275,460,301"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_terrain_paged_world_section.html" title="A world section which includes paged terrain." alt="" coords="252,325,483,352"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_volume_1_1_chunk_handler.html" title="Handles the WorkQueue management of the chunks." alt="" coords="262,376,473,403"/>
+</map>

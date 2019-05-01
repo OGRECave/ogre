@@ -1,0 +1,5 @@
+<map id="Ogre::MetalHardwareBufferCommon" name="Ogre::MetalHardwareBufferCommon">
+<area shape="rect" id="node1" title="Common buffer operations for most v1 buffer interfaces used in Metal This implementation treats: Igno..." alt="" coords="5,155,207,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers." alt="" coords="24,80,188,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="59,5,153,32"/>
+</map>

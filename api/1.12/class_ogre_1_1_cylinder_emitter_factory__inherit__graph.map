@@ -1,0 +1,5 @@
+<map id="Ogre::CylinderEmitterFactory" name="Ogre::CylinderEmitterFactory">
+<area shape="rect" id="node1" title="Factory class for particle emitter of type &quot;Cylinder&quot;." alt="" coords="5,155,216,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_particle_emitter_factory.html" title="Abstract class defining the interface to be implemented by creators of ParticleEmitter subclasses." alt="" coords="7,80,214,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="75,5,146,32"/>
+</map>

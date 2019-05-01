@@ -1,0 +1,11 @@
+<map id="Ogre::MultiRenderTarget" name="Ogre::MultiRenderTarget">
+<area shape="rect" id="node1" title="This class represents a render target that renders to multiple RenderTextures at once." alt="" coords="371,148,551,175"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d11_multi_render_target.html" title=" " alt="" coords="599,5,823,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d9_multi_render_target.html" title=" " alt="" coords="603,56,819,83"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_g_l3_plus_f_b_o_multi_render_target.html" title="MultiRenderTarget for OpenGL." alt="" coords="601,107,820,149"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l_e_s2_f_b_o_multi_render_target.html" title="MultiRenderTarget for GL ES 2.x." alt="" coords="607,173,815,214"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l_f_b_o_multi_render_target.html" title="MultiRenderTarget for GL." alt="" coords="599,239,823,265"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_metal_multi_render_target.html" title=" " alt="" coords="602,289,819,316"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation." alt="" coords="176,148,323,175"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,148,128,175"/>
+</map>

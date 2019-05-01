@@ -1,0 +1,9 @@
+<map id="Ogre::OverlayContainer" name="Ogre::OverlayContainer">
+<area shape="rect" id="node1" title="A 2D element which contains other OverlayElement instances." alt="" coords="167,155,342,181"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_panel_overlay_element.html" title="OverlayElement representing a flat, single&#45;material (or transparent) panel which can contain other el..." alt="" coords="153,229,356,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_overlay_element.html" title="Abstract definition of a 2D element to be displayed in an Overlay." alt="" coords="171,80,338,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="187,5,322,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="346,5,451,32"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_border_panel_overlay_element.html" title="A specialisation of the PanelOverlayElement to provide a panel with a border." alt="" coords="159,304,350,345"/>
+</map>

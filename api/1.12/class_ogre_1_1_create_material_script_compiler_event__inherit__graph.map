@@ -1,0 +1,4 @@
+<map id="Ogre::CreateMaterialScriptCompilerEvent" name="Ogre::CreateMaterialScriptCompilerEvent">
+<area shape="rect" id="node1" title=" " alt="" coords="5,80,200,121"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_script_compiler_event.html" title="This struct is a base class for events which can be thrown by the compilers and caught by subscribers..." alt="" coords="5,5,200,32"/>
+</map>
