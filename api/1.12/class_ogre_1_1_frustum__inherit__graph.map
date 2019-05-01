@@ -1,0 +1,11 @@
+<map id="Ogre::Frustum" name="Ogre::Frustum">
+<area shape="rect" id="node1" title="A frustum represents a pyramid, capped at the near and far end which is used to represent either a vi..." alt="" coords="295,155,409,181"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_camera.html" title="A viewpoint from which the scene will be rendered." alt="" coords="296,229,408,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="187,80,346,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="5,5,160,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="184,5,349,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="374,5,485,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="370,80,505,107"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_octree_camera.html" title="Specialized viewpoint from which an Octree can be rendered." alt="" coords="189,304,344,331"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_p_c_z_camera.html" title="Specialized viewpoint from which an PCZone Scene can be rendered." alt="" coords="368,304,507,331"/>
+</map>

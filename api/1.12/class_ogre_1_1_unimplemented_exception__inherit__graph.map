@@ -1,0 +1,5 @@
+<map id="Ogre::UnimplementedException" name="Ogre::UnimplementedException">
+<area shape="rect" id="node1" title="Template struct which creates a distinct type for each exception code." alt="" coords="5,155,236,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_exception.html" title="When thrown, provides information about an error that has occurred inside the engine." alt="" coords="58,80,183,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="63,5,178,32"/>
+</map>

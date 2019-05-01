@@ -1,0 +1,5 @@
+<map id="Ogre::TerrainAutoUpdateLod" name="Ogre::TerrainAutoUpdateLod">
+<area shape="rect" id="node1" title="Terrain automatic LOD loading." alt="" coords="5,80,211,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_terrain_auto_update_lod_by_distance.html" title="Class implementing TerrainAutoUpdateLod interface." alt="" coords="5,155,211,196"/>
+<area shape="rect" id="node2" title=" " alt="" coords="59,5,157,32"/>
+</map>

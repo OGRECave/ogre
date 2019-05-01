@@ -1,0 +1,8 @@
+<map id="Ogre::RTShader::ProgramWriter" name="Ogre::RTShader::ProgramWriter">
+<area shape="rect" id="node1" title="Base class interface for shader program writers." alt="" coords="125,80,352,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_r_t_shader_1_1_c_g_program_writer.html" title="CG target language writer implementation." alt="" coords="19,155,224,196"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_r_t_shader_1_1_g_l_s_l_program_writer.html" title="GLSL target language writer implementation." alt="" coords="252,155,471,196"/>
+<area shape="rect" id="node2" title=" " alt="" coords="156,5,321,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_r_t_shader_1_1_h_l_s_l_program_writer.html" title="HLSL target language writer implementation." alt="" coords="5,244,224,285"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_r_t_shader_1_1_g_l_s_l_e_s_program_writer.html" title="GLSL ES target language writer implementation." alt="" coords="248,244,483,285"/>
+</map>

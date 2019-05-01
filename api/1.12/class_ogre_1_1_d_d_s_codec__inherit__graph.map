@@ -1,0 +1,6 @@
+<map id="Ogre::DDSCodec" name="Ogre::DDSCodec">
+<area shape="rect" id="node1" title="Codec specialized in loading DDS (Direct Draw Surface) images." alt="" coords="12,229,141,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_image_codec.html" title="Codec specialized in images." alt="" coords="5,155,148,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_codec.html" title="Abstract class that defines a &#39;codec&#39;." alt="" coords="26,80,127,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="29,5,124,32"/>
+</map>

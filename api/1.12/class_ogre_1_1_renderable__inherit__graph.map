@@ -1,0 +1,34 @@
+<map id="Ogre::Renderable" name="Ogre::Renderable">
+<area shape="rect" id="node1" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="5,347,140,373"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_billboard_chain.html" title="Allows the rendering of a chain of connected billboards." alt="" coords="219,5,375,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_billboard_set.html" title="A collection of billboards (faces which are always facing the given direction) with the same (default..." alt="" coords="227,56,367,83"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_border_renderable.html" title="Class for rendering the border of a BorderPanelOverlayElement." alt="" coords="208,107,387,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_bsp_level.html" title="Holds all the data associated with a Binary Space Parition (BSP) based indoor level." alt="" coords="237,157,357,184"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_frustum.html" title="A frustum represents a pyramid, capped at the near and far end which is used to represent either a vi..." alt="" coords="240,208,355,235"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_instance_batch.html" title="InstanceBatch forms part of the new Instancing system This is an abstract class that must be derived ..." alt="" coords="221,259,374,285"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_manual_object_1_1_manual_object_section.html" title="Built, renderable section of geometry." alt="" coords="213,310,381,351"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_node_1_1_debug_renderable.html" title="Inner class for displaying debug renderable for Node." alt="" coords="188,376,407,403"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_overlay_element.html" title="Abstract definition of a 2D element to be displayed in an Overlay." alt="" coords="214,427,381,453"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_shadow_renderable.html" title="Class which represents the renderable aspects of a set of shadow volume faces." alt="" coords="204,477,391,504"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1_simple_renderable.html" title="Simple implementation of MovableObject and Renderable for single&#45;part custom objects." alt="" coords="207,528,387,555"/>
+<area shape="rect" id="node30" href="$class_ogre_1_1_static_geometry_1_1_geometry_bucket.html" title="A GeometryBucket is a the lowest level bucket where geometry with the same vertex &amp; index format is s..." alt="" coords="216,579,379,621"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1_sub_entity.html" title="Utility class which defines the sub&#45;parts of an Entity." alt="" coords="236,645,359,672"/>
+<area shape="rect" id="node32" href="$class_ogre_1_1_terrain_quad_tree_node.html" title="A node in a quad tree used to store a patch of terrain." alt="" coords="197,696,397,723"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_ribbon_trail.html" title="Subclass of BillboardChain which automatically leaves a trail behind one or more Node instances." alt="" coords="499,5,633,32"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_camera.html" title="A viewpoint from which the scene will be rendered." alt="" coords="510,157,622,184"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_octree_camera.html" title="Specialized viewpoint from which an Octree can be rendered." alt="" coords="752,107,907,133"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_p_c_z_camera.html" title="Specialized viewpoint from which an PCZone Scene can be rendered." alt="" coords="760,157,899,184"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_base_instance_batch_v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) This implementation..." alt="" coords="461,208,671,235"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_instance_batch_h_w.html" title="This is technique requires true instancing hardware support." alt="" coords="478,259,654,285"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_instance_batch_shader.html" title="This is the same technique the old &quot;InstancedGeometry&quot; implementation used (with improvements)." alt="" coords="467,309,665,336"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_instance_batch_h_w___v_t_f.html" title="Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and hardware instan..." alt="" coords="725,208,933,235"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_instance_batch_v_t_f.html" title=" " alt="" coords="740,259,919,285"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_overlay_container.html" title="A 2D element which contains other OverlayElement instances." alt="" coords="479,360,653,387"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_text_area_overlay_element.html" title="This class implements an overlay element which contains simple unformatted text." alt="" coords="455,411,677,437"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_panel_overlay_element.html" title="OverlayElement representing a flat, single&#45;material (or transparent) panel which can contain other el..." alt="" coords="728,360,931,387"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_border_panel_overlay_element.html" title="A specialisation of the PanelOverlayElement to provide a panel with a border." alt="" coords="981,353,1172,394"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_manual_object_1_1_manual_object_section_shadow_renderable.html" title="Nested class to allow shadows." alt="" coords="457,461,675,517"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1_rectangle2_d.html" title="Allows the rendering of a simple 2D rectangle This class renders a simple 2D rectangle; this rectangl..." alt="" coords="494,541,638,568"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1_volume_1_1_chunk.html" title="A single volume chunk mesh." alt="" coords="486,592,646,619"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1_wire_bounding_box.html" title="Allows the rendering of a wireframe bounding box." alt="" coords="477,643,655,669"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_ogre_1_1_scene_loader.html" title="Abstract class for loading scenes from a file (DataStream)." alt="" coords="5,31,149,57"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_bsp_scene_loader.html" title="Manages the locating and loading of BSP&#45;based indoor levels." alt="" coords="197,5,365,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_dot_scene_loader.html" title=" " alt="" coords="198,56,365,83"/>
+</map>

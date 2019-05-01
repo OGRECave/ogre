@@ -1,0 +1,5 @@
+<map id="Ogre::BorderRenderable" name="Ogre::BorderRenderable">
+<area shape="rect" id="node1" title="Class for rendering the border of a BorderPanelOverlayElement." alt="" coords="55,80,234,107"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="5,5,140,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="164,5,269,32"/>
+</map>

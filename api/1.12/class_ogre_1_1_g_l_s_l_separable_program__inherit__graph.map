@@ -1,0 +1,5 @@
+<map id="Ogre::GLSLSeparableProgram" name="Ogre::GLSLSeparableProgram">
+<area shape="rect" id="node1" title="Specialisation of GLSLProgram to provide support for separable programs via the OpenGL program pipeli..." alt="" coords="5,155,219,181"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_g_l_s_l_program.html" title="C++ encapsulation of GLSL program object." alt="" coords="38,80,186,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_g_l_s_l_program_common.html" title=" " alt="" coords="9,5,215,32"/>
+</map>

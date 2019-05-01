@@ -1,0 +1,7 @@
+<map id="Ogre::PSSMShadowCameraSetup" name="Ogre::PSSMShadowCameraSetup">
+<area shape="rect" id="node1" title="Parallel Split Shadow Map (PSSM) shadow camera setup." alt="" coords="5,333,241,360"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_li_s_p_s_m_shadow_camera_setup.html" title="Implements the Light Space Perspective Shadow Mapping Algorithm." alt="" coords="18,244,229,285"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_focused_shadow_camera_setup.html" title="Implements the uniform shadow mapping algorithm in focused mode." alt="" coords="15,155,231,196"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_shadow_camera_setup.html" title="This class allows you to plug in new ways to define the camera setup when rendering and projecting sh..." alt="" coords="23,80,223,107"/>
+<area shape="rect" id="node5" title=" " alt="" coords="55,5,191,32"/>
+</map>

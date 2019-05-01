@@ -1,0 +1,5 @@
+<map id="Ogre::GLHardwareOcclusionQuery" name="Ogre::GLHardwareOcclusionQuery">
+<area shape="rect" id="node1" title="This is a class that is the base class of the query class for hardware occlusion." alt="" coords="17,155,221,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_occlusion_query.html" title="This is a abstract class that that provides the interface for the query class for hardware occlusion." alt="" coords="5,80,232,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="57,5,180,32"/>
+</map>

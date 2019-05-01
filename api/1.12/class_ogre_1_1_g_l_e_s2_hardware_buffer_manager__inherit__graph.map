@@ -1,0 +1,7 @@
+<map id="Ogre::GLES2HardwareBufferManager" name="Ogre::GLES2HardwareBufferManager">
+<area shape="rect" id="node1" title="Implementation of HardwareBufferManager for OpenGL ES." alt="" coords="155,244,360,285"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_buffer_manager.html" title="Singleton wrapper for hardware buffer manager." alt="" coords="147,169,368,196"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hardware_buffer_manager_base.html" title="Base definition of a hardware buffer manager." alt="" coords="5,87,259,114"/>
+<area shape="rect" id="node4" title=" " alt="" coords="85,5,179,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="283,80,483,121"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="OgreBites::ApplicationContextQt" name="OgreBites::ApplicationContextQt">
+<area shape="rect" id="node1" title="Specialization for connecting with Qt." alt="" coords="19,155,253,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,80,107"/>
+<area shape="rect" id="node3" href="$class_ogre_bites_1_1_application_context_base.html" title="Base class responsible for setting up a common context for applications." alt="" coords="104,80,355,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_frame_listener.html" title="A interface class defining a listener which can be used to receive notifications of frame events." alt="" coords="152,5,307,32"/>
+</map>

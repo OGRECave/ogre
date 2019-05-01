@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,132,148,159"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_queued_renderable_collection.html" title="Lowest level collection of renderables." alt="" coords="196,5,447,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_render_priority_group.html" title="Collection of renderables by priority." alt="" coords="225,56,418,83"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_render_queue.html" title="Class to manage the scene object rendering queue." alt="" coords="247,107,396,133"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_render_queue_group.html" title="A grouping level underneath RenderQueue which groups renderables to be issued at coarsely the same ti..." alt="" coords="227,157,415,184"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_render_queue_invocation.html" title="Class representing the invocation of queue groups in a RenderQueue." alt="" coords="213,208,430,235"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_render_queue_invocation_sequence.html" title="Class to hold a linear sequence of RenderQueueInvocation objects." alt="" coords="213,259,430,301"/>
+</map>

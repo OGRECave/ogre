@@ -1,0 +1,5 @@
+<map id="Ogre::LodWorkQueueWorker" name="Ogre::LodWorkQueueWorker">
+<area shape="rect" id="node1" title="Processes requests." alt="" coords="112,95,319,121"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_work_queue_1_1_request_handler.html" title="Interface definition for a handler of requests." alt="" coords="5,5,204,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="229,5,423,47"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="Ogre::HlmsManager" name="Ogre::HlmsManager">
+<area shape="rect" id="node1" title=" " alt="" coords="138,95,290,121"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,13,89,39"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_render_object_listener.html" title="Abstract interface which classes must implement if they wish to receive events from the scene manager..." alt="" coords="113,13,315,39"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_scene_manager_1_1_listener.html" title="Class that allows listening in on the various stages of SceneManager processing, so that custom behav..." alt="" coords="339,5,497,47"/>
+</map>

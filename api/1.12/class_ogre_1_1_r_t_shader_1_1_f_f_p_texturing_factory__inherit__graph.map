@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::FFPTexturingFactory" name="Ogre::RTShader::FFPTexturingFactory">
+<area shape="rect" id="node1" title="A factory that enables creation of FFPTexturing instances." alt="" coords="5,169,220,211"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state_factory.html" title="Abstract factory interface for creating SubRenderState implementation instances." alt="" coords="12,80,213,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="30,5,195,32"/>
+</map>

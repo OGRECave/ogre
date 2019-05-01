@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,56,120,83"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_material_serializer.html" title="Class for serializing Materials to a .material script." alt="" coords="168,31,344,57"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_serializer.html" title="Generic class for serialising data to / from binary stream&#45;based files." alt="" coords="195,81,317,108"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_gpu_named_constants_serializer.html" title="Simple class for loading / saving GpuNamedConstants." alt="" coords="392,5,652,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_lod_config_serializer.html" title=" " alt="" coords="429,56,615,83"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_mesh_serializer.html" title="Class for serialising mesh data to/from an OGRE .mesh file." alt="" coords="443,107,601,133"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_skeleton_serializer.html" title="Class for serialising skeleton data to/from an OGRE .skeleton file." alt="" coords="433,157,611,184"/>
+</map>

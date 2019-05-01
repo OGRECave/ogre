@@ -1,0 +1,4 @@
+<map id="Ogre::CgProgram::CmdArgs" name="Ogre::CgProgram::CmdArgs">
+<area shape="rect" id="node1" title="Command object for setting compilation arguments." alt="" coords="5,80,205,107"/>
+<area shape="rect" id="node2" title="Abstract class which is command object which gets/sets parameters." alt="" coords="20,5,191,32"/>
+</map>

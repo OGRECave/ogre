@@ -1,0 +1,4 @@
+<map id="Ogre::MaterialSerializer::Listener" name="Ogre::MaterialSerializer::Listener">
+<area shape="rect" id="node1" title="Class that allows listening in on the various stages of material serialization process." alt="" coords="19,5,195,47"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_s_g_material_serializer_listener.html" title="This class responsible for translating core features of the RT Shader System for Ogre material script..." alt="" coords="5,95,208,136"/>
+</map>

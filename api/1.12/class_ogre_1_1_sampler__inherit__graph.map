@@ -1,0 +1,6 @@
+<map id="Ogre::Sampler" name="Ogre::Sampler">
+<area shape="rect" id="node1" title="Class which determines how a TextureUnitState accesses data from a Texture." alt="" coords="214,5,329,32"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_d3_d11_sampler.html" title=" " alt="" coords="5,80,164,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_g_l3_plus_sampler.html" title=" " alt="" coords="188,80,355,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_metal_sampler.html" title=" " alt="" coords="379,80,531,107"/>
+</map>

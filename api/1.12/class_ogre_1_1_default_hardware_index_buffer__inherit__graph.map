@@ -1,0 +1,6 @@
+<map id="Ogre::DefaultHardwareIndexBuffer" name="Ogre::DefaultHardwareIndexBuffer">
+<area shape="rect" id="node1" title=" " alt="" coords="5,229,213,271"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_index_buffer.html" title="Specialisation of HardwareBuffer for vertex index buffers, still abstract." alt="" coords="9,155,209,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_hardware_buffer.html" title="Abstract class defining common features of hardware buffers." alt="" coords="27,80,191,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="62,5,157,32"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Ogre::InstanceBatchShader" name="Ogre::InstanceBatchShader">
+<area shape="rect" id="node1" title="This is the same technique the old &quot;InstancedGeometry&quot; implementation used (with improvements)." alt="" coords="82,229,281,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_instance_batch.html" title="InstanceBatch forms part of the new Instancing system This is an abstract class that must be derived ..." alt="" coords="105,155,258,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_renderable.html" title="Abstract class defining the interface all renderable objects must implement." alt="" coords="29,80,163,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="187,80,346,107"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="5,5,160,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="184,5,349,32"/>
+<area shape="rect" id="node7" title=" " alt="" coords="374,5,485,32"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::RotationAffector::CmdRotationSpeedRangeEnd" name="Ogre::RotationAffector::CmdRotationSpeedRangeEnd">
+<area shape="rect" id="node1" title="Command object for particle emitter &#45; see ParamCommand." alt="" coords="5,80,225,121"/>
+<area shape="rect" id="node2" title="Abstract class which is command object which gets/sets parameters." alt="" coords="30,5,201,32"/>
+</map>

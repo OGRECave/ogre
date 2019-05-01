@@ -1,0 +1,4 @@
+<map id="Ogre::OverlayElementCommands::CmdHeight" name="Ogre::OverlayElementCommands::CmdHeight">
+<area shape="rect" id="node1" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="5,80,245,121"/>
+<area shape="rect" id="node2" title="Abstract class which is command object which gets/sets parameters." alt="" coords="40,5,211,32"/>
+</map>

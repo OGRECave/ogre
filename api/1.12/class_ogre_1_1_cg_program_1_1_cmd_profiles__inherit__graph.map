@@ -1,0 +1,4 @@
+<map id="Ogre::CgProgram::CmdProfiles" name="Ogre::CgProgram::CmdProfiles">
+<area shape="rect" id="node1" title="Command object for setting profiles." alt="" coords="5,80,225,107"/>
+<area shape="rect" id="node2" title="Abstract class which is command object which gets/sets parameters." alt="" coords="30,5,201,32"/>
+</map>

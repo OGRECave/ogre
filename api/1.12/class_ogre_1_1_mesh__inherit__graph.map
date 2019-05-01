@@ -1,0 +1,8 @@
+<map id="Ogre::Mesh" name="Ogre::Mesh">
+<area shape="rect" id="node1" title="Resource holding data about 3D mesh." alt="" coords="205,155,301,181"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_patch_mesh.html" title="Patch specialisation of Mesh." alt="" coords="187,229,319,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource." alt="" coords="103,80,225,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="187,5,301,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_animation_container.html" title="An animation container interface, which allows generic access to sibling animations." alt="" coords="249,80,439,107"/>
+</map>

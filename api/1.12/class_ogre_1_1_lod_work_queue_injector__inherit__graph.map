@@ -1,0 +1,5 @@
+<map id="Ogre::LodWorkQueueInjector" name="Ogre::LodWorkQueueInjector">
+<area shape="rect" id="node1" title="Injects the output of a request to the mesh in a thread safe way." alt="" coords="117,95,326,121"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_work_queue_1_1_response_handler.html" title="Interface definition for a handler of responses." alt="" coords="5,5,213,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="237,5,432,47"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="Ogre::FrameTimeControllerValue" name="Ogre::FrameTimeControllerValue">
+<area shape="rect" id="node1" title="Predefined controller value for getting the latest frame time." alt="" coords="78,169,277,211"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_controller_value.html" title=" " alt="" coords="5,80,168,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="27,5,146,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_frame_listener.html" title="A interface class defining a listener which can be used to receive notifications of frame events." alt="" coords="192,87,347,114"/>
+</map>

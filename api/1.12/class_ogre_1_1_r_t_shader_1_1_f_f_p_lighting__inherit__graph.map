@@ -1,0 +1,7 @@
+<map id="Ogre::RTShader::FFPLighting" name="Ogre::RTShader::FFPLighting">
+<area shape="rect" id="node1" title="Lighting sub render state implementation of the Fixed Function Pipeline." alt="" coords="5,169,212,196"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_r_t_shader_1_1_per_pixel_lighting.html" title="Per pixel Lighting extension sub render state implementation." alt="" coords="17,244,201,285"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state.html" title="This class is the base interface of sub part from a shader based rendering pipeline." alt="" coords="8,80,209,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="26,5,191,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_r_t_shader_1_1_normal_map_lighting.html" title="Normal Map Lighting extension sub render state implementation." alt="" coords="5,333,212,375"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::GBuffer" name="Ogre::RTShader::GBuffer">
+<area shape="rect" id="node1" title="Transform sub render state implementation of writing to GBuffers." alt="" coords="15,169,197,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state.html" title="This class is the base interface of sub part from a shader based rendering pipeline." alt="" coords="5,80,207,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="23,5,189,32"/>
+</map>

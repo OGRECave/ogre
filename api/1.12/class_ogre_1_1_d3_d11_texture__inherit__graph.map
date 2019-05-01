@@ -1,0 +1,8 @@
+<map id="Ogre::D3D11Texture" name="Ogre::D3D11Texture">
+<area shape="rect" id="node1" title="Specialisation of Texture for D3D11." alt="" coords="179,229,333,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_texture.html" title="Abstract class representing a Texture resource." alt="" coords="109,155,219,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource." alt="" coords="103,80,225,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="187,5,301,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d11_device_resource.html" title="Represents a Direct3D rendering resource." alt="" coords="243,155,453,181"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="Ogre::Skeleton" name="Ogre::Skeleton">
+<area shape="rect" id="node1" title="A collection of Bone objects used to animate a skinned mesh." alt="" coords="195,155,312,181"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_skeleton_instance.html" title="A SkeletonInstance is a single instance of a Skeleton used by a world object." alt="" coords="167,229,339,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_resource.html" title="Abstract class representing a loadable resource." alt="" coords="103,80,225,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_string_interface.html" title="Class defining the common interface which classes can use to present a reflection&#45;style,..." alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="187,5,301,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_animation_container.html" title="An animation container interface, which allows generic access to sibling animations." alt="" coords="249,80,439,107"/>
+</map>

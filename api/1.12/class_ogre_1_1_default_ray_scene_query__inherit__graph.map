@@ -1,0 +1,10 @@
+<map id="Ogre::DefaultRaySceneQuery" name="Ogre::DefaultRaySceneQuery">
+<area shape="rect" id="node1" title="Default implementation of RaySceneQuery." alt="" coords="215,229,427,256"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_bsp_ray_scene_query.html" title="BSP specialisation of RaySceneQuery." alt="" coords="5,304,193,331"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_octree_ray_scene_query.html" title="Octree implementation of RaySceneQuery." alt="" coords="217,304,424,331"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_p_c_z_ray_scene_query.html" title="PCZ implementation of RaySceneQuery." alt="" coords="448,304,639,331"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_ray_scene_query.html" title="Specialises the SceneQuery class for querying along a ray." alt="" coords="239,155,403,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene." alt="" coords="151,80,290,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="161,5,280,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_ray_scene_query_listener.html" title="Alternative listener class for dealing with RaySceneQuery." alt="" coords="314,80,530,107"/>
+</map>

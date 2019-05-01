@@ -1,0 +1,8 @@
+<map id="Ogre::GL3PlusTextureManager" name="Ogre::GL3PlusTextureManager">
+<area shape="rect" id="node1" title="GL3Plus&#45;specific implementation of a TextureManager." alt="" coords="146,244,365,271"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_texture_manager.html" title="Class for loading &amp; managing textures." alt="" coords="172,169,339,196"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_resource_manager.html" title="Defines a generic resource handler." alt="" coords="63,87,242,114"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_script_loader.html" title="Abstract class defining the interface used by classes which wish to perform script loading to define ..." alt="" coords="5,5,148,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="173,5,287,32"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_singleton.html" title=" " alt="" coords="267,80,452,121"/>
+</map>

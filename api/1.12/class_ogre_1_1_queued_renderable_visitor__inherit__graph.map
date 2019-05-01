@@ -1,0 +1,4 @@
+<map id="Ogre::QueuedRenderableVisitor" name="Ogre::QueuedRenderableVisitor">
+<area shape="rect" id="node1" title="Visitor interface for items in a QueuedRenderableCollection." alt="" coords="5,5,232,32"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_scene_manager_1_1_scene_mgr_queued_renderable_visitor.html" title="Inner helper class to implement the visitor pattern for rendering objects in a queue." alt="" coords="9,80,228,136"/>
+</map>

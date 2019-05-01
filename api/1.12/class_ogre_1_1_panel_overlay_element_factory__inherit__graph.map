@@ -1,0 +1,5 @@
+<map id="Ogre::PanelOverlayElementFactory" name="Ogre::PanelOverlayElementFactory">
+<area shape="rect" id="node1" title="Factory for creating PanelOverlayElement instances." alt="" coords="11,155,214,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_overlay_element_factory.html" title="Defines the interface which all components wishing to supply OverlayElement subclasses must implement..." alt="" coords="5,80,220,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="60,5,165,32"/>
+</map>

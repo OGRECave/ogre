@@ -1,0 +1,13 @@
+<map id="OgreBites::Widget" name="OgreBites::Widget">
+<area shape="rect" id="node1" title="Abstract base class for all widgets." alt="" coords="5,233,145,260"/>
+<area shape="rect" id="node2" href="$class_ogre_bites_1_1_button.html" title="Basic button class." alt="" coords="214,5,351,32"/>
+<area shape="rect" id="node3" href="$class_ogre_bites_1_1_check_box.html" title="Basic check box widget." alt="" coords="203,56,362,83"/>
+<area shape="rect" id="node4" href="$class_ogre_bites_1_1_decor_widget.html" title="Custom, decorative widget created from a template." alt="" coords="193,107,372,133"/>
+<area shape="rect" id="node5" href="$class_ogre_bites_1_1_label.html" title="Basic label widget." alt="" coords="218,157,347,184"/>
+<area shape="rect" id="node6" href="$class_ogre_bites_1_1_params_panel.html" title="Basic parameters panel widget." alt="" coords="193,208,372,235"/>
+<area shape="rect" id="node7" href="$class_ogre_bites_1_1_progress_bar.html" title="Basic progress bar widget." alt="" coords="197,259,369,285"/>
+<area shape="rect" id="node8" href="$class_ogre_bites_1_1_select_menu.html" title="Basic selection menu widget." alt="" coords="197,309,368,336"/>
+<area shape="rect" id="node9" href="$class_ogre_bites_1_1_separator.html" title="Basic separator widget." alt="" coords="204,360,361,387"/>
+<area shape="rect" id="node10" href="$class_ogre_bites_1_1_slider.html" title="Basic slider widget." alt="" coords="217,411,348,437"/>
+<area shape="rect" id="node11" href="$class_ogre_bites_1_1_text_box.html" title="Scrollable text box widget." alt="" coords="209,461,356,488"/>
+</map>

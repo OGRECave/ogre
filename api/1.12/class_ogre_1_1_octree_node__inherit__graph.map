@@ -1,0 +1,6 @@
+<map id="Ogre::OctreeNode" name="Ogre::OctreeNode">
+<area shape="rect" id="node1" title="Specialized SceneNode that is customized for working within an Octree." alt="" coords="5,229,144,256"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_scene_node.html" title="Class representing a node in the scene graph." alt="" coords="7,155,142,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_node.html" title="Class representing a general&#45;purpose node an articulated scene graph." alt="" coords="27,80,122,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="31,5,119,32"/>
+</map>

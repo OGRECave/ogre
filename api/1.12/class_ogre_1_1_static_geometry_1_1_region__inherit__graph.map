@@ -1,0 +1,7 @@
+<map id="Ogre::StaticGeometry::Region" name="Ogre::StaticGeometry::Region">
+<area shape="rect" id="node1" title="The details of a topological region which is the highest level of partitioning for this class." alt="" coords="185,155,348,196"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_movable_object.html" title="Abstract class defining a movable object in a scene." alt="" coords="187,80,346,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_shadow_caster.html" title="This class defines the interface that must be implemented by shadow casters." alt="" coords="5,5,160,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_animable_object.html" title="Defines an interface to classes which have one or more AnimableValue instances to expose." alt="" coords="184,5,349,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="374,5,485,32"/>
+</map>

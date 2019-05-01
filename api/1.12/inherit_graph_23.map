@@ -1,0 +1,117 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title="Abstract class which is command object which gets/sets parameters." alt="" coords="5,3678,176,3705"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_area_emitter_1_1_cmd_depth.html" title="Command object for area emitter size (see ParamCommand)." alt="" coords="282,5,429,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_area_emitter_1_1_cmd_height.html" title="Command object for area emitter size (see ParamCommand)." alt="" coords="282,71,429,112"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_area_emitter_1_1_cmd_width.html" title="Command object for area emitter size (see ParamCommand)." alt="" coords="282,136,429,177"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_billboard_particle_renderer_1_1_cmd_accurate_facing.html" title="Command object for accurate facing(see ParamCommand)." alt="" coords="242,201,469,243"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_billboard_particle_renderer_1_1_cmd_billboard_origin.html" title="Command object for billboard origin (see ParamCommand)." alt="" coords="242,267,469,308"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_billboard_particle_renderer_1_1_cmd_billboard_rotation_type.html" title="Command object for billboard rotation type (see ParamCommand)." alt="" coords="242,332,469,373"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_billboard_particle_renderer_1_1_cmd_billboard_type.html" title="Command object for billboard type (see ParamCommand)." alt="" coords="242,397,469,439"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_billboard_particle_renderer_1_1_cmd_common_direction.html" title="Command object for common direction (see ParamCommand)." alt="" coords="242,463,469,504"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_billboard_particle_renderer_1_1_cmd_common_up_vector.html" title="Command object for common up&#45;vector (see ParamCommand)." alt="" coords="242,528,469,569"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_billboard_particle_renderer_1_1_cmd_point_rendering.html" title="Command object for point rendering (see ParamCommand)." alt="" coords="242,593,469,635"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_bottom_left_u_v.html" title="Command object for specifying texture coordinates for the border (see ParamCommand)." alt="" coords="231,659,480,700"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_bottom_right_u_v.html" title="Command object for specifying texture coordinates for the border (see ParamCommand)." alt="" coords="226,724,485,765"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_bottom_u_v.html" title="Command object for specifying texture coordinates for the border (see ParamCommand)." alt="" coords="243,789,467,831"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_left_u_v.html" title="Command object for specifying texture coordinates for the border (see ParamCommand)." alt="" coords="255,855,456,896"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_material.html" title="Command object for specifying the Material for the border (see ParamCommand)." alt="" coords="250,920,461,961"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_right_u_v.html" title="Command object for specifying texture coordinates for the border (see ParamCommand)." alt="" coords="250,985,461,1027"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_size.html" title="Command object for specifying border sizes (see ParamCommand)." alt="" coords="260,1051,451,1092"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_top_left_u_v.html" title="Command object for specifying texture coordinates for the border (see ParamCommand)." alt="" coords="244,1116,467,1157"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_top_right_u_v.html" title="Command object for specifying texture coordinates for the border (see ParamCommand)." alt="" coords="239,1181,471,1223"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_border_panel_overlay_element_1_1_cmd_border_top_u_v.html" title="Command object for specifying texture coordinates for the border (see ParamCommand)." alt="" coords="256,1247,455,1288"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_cg_program_1_1_cmd_args.html" title="Command object for setting compilation arguments." alt="" coords="255,1313,455,1339"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_cg_program_1_1_cmd_entry_point.html" title="Command object for setting entry point." alt="" coords="253,1364,458,1405"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_cg_program_1_1_cmd_profiles.html" title="Command object for setting profiles." alt="" coords="245,1430,465,1457"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_colour_fader_affector2_1_1_cmd_alpha_adjust1.html" title="Command object for alpha adjust (see ParamCommand)." alt="" coords="256,1481,455,1523"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1_colour_fader_affector2_1_1_cmd_alpha_adjust2.html" title="Command object for alpha adjust (see ParamCommand)." alt="" coords="256,1547,455,1588"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1_colour_fader_affector2_1_1_cmd_blue_adjust1.html" title="Command object for blue adjust (see ParamCommand)." alt="" coords="256,1612,455,1653"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1_colour_fader_affector2_1_1_cmd_blue_adjust2.html" title="Command object for blue adjust (see ParamCommand)." alt="" coords="256,1677,455,1719"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1_colour_fader_affector2_1_1_cmd_green_adjust1.html" title="Command object for green adjust (see ParamCommand)." alt="" coords="256,1743,455,1784"/>
+<area shape="rect" id="node30" href="$class_ogre_1_1_colour_fader_affector2_1_1_cmd_green_adjust2.html" title="Command object for green adjust (see ParamCommand)." alt="" coords="256,1808,455,1849"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1_colour_fader_affector2_1_1_cmd_red_adjust1.html" title="Command object for red adjust (see ParamCommand)." alt="" coords="256,1873,455,1915"/>
+<area shape="rect" id="node32" href="$class_ogre_1_1_colour_fader_affector2_1_1_cmd_red_adjust2.html" title="Command object for red adjust (see ParamCommand)." alt="" coords="256,1939,455,1980"/>
+<area shape="rect" id="node33" href="$class_ogre_1_1_colour_fader_affector2_1_1_cmd_state_change.html" title="Command object for alpha adjust (see ParamCommand)." alt="" coords="256,2004,455,2045"/>
+<area shape="rect" id="node34" href="$class_ogre_1_1_colour_fader_affector_1_1_cmd_alpha_adjust.html" title="Command object for alpha adjust (see ParamCommand)." alt="" coords="260,2069,451,2111"/>
+<area shape="rect" id="node35" href="$class_ogre_1_1_colour_fader_affector_1_1_cmd_blue_adjust.html" title="Command object for blue adjust (see ParamCommand)." alt="" coords="260,2135,451,2176"/>
+<area shape="rect" id="node36" href="$class_ogre_1_1_colour_fader_affector_1_1_cmd_green_adjust.html" title="Command object for green adjust (see ParamCommand)." alt="" coords="260,2200,451,2241"/>
+<area shape="rect" id="node37" href="$class_ogre_1_1_colour_fader_affector_1_1_cmd_red_adjust.html" title="Command object for red adjust (see ParamCommand)." alt="" coords="260,2265,451,2307"/>
+<area shape="rect" id="node38" href="$class_ogre_1_1_colour_image_affector_1_1_cmd_image_adjust.html" title="Command object for red adjust (see ParamCommand)." alt="" coords="258,2331,453,2372"/>
+<area shape="rect" id="node39" href="$class_ogre_1_1_colour_interpolator_affector_1_1_cmd_colour_adjust.html" title="Command object for red adjust (see ParamCommand)." alt="" coords="258,2396,453,2437"/>
+<area shape="rect" id="node40" href="$class_ogre_1_1_colour_interpolator_affector_1_1_cmd_time_adjust.html" title="Command object for red adjust (see ParamCommand)." alt="" coords="263,2461,447,2503"/>
+<area shape="rect" id="node41" href="$class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_column_major_matrices.html" title="Command object for setting matrix packing in column&#45;major order." alt="" coords="254,2527,457,2568"/>
+<area shape="rect" id="node42" href="$class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_enable_backwards_compatibility.html" title="Command object for setting backwards compatibility." alt="" coords="224,2592,487,2633"/>
+<area shape="rect" id="node43" href="$class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_entry_point.html" title="Command object for setting entry point." alt="" coords="259,2657,451,2699"/>
+<area shape="rect" id="node44" href="$class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_target.html" title="Command object for setting target assembler." alt="" coords="259,2723,451,2764"/>
+<area shape="rect" id="node45" href="$class_ogre_1_1_d3_d9_gpu_program_1_1_cmd_column_major_matrices.html" title="Command object for setting matrix packing in column&#45;major order." alt="" coords="254,2788,457,2829"/>
+<area shape="rect" id="node46" href="$class_ogre_1_1_d3_d9_gpu_program_1_1_cmd_external_microcode.html" title="Command object for getting/setting external micro code (void*)" alt="" coords="265,2853,446,2895"/>
+<area shape="rect" id="node47" href="$class_ogre_1_1_d3_d9_h_l_s_l_program_1_1_cmd_assembler_code.html" title="Command object for getting/setting assembler code." alt="" coords="263,2919,447,2960"/>
+<area shape="rect" id="node48" href="$class_ogre_1_1_d3_d9_h_l_s_l_program_1_1_cmd_backwards_compatibility.html" title="Command object for enabling backwards compatibility." alt="" coords="246,2984,465,3025"/>
+<area shape="rect" id="node49" href="$class_ogre_1_1_d3_d9_h_l_s_l_program_1_1_cmd_column_major_matrices.html" title="Command object for setting matrix packing in column&#45;major order." alt="" coords="254,3049,457,3091"/>
+<area shape="rect" id="node50" href="$class_ogre_1_1_d3_d9_h_l_s_l_program_1_1_cmd_entry_point.html" title="Command object for setting entry point." alt="" coords="263,3115,447,3156"/>
+<area shape="rect" id="node51" href="$class_ogre_1_1_d3_d9_h_l_s_l_program_1_1_cmd_microcode.html" title="Command object for getting/setting micro code." alt="" coords="263,3180,447,3221"/>
+<area shape="rect" id="node52" href="$class_ogre_1_1_d3_d9_h_l_s_l_program_1_1_cmd_optimisation.html" title="Command object for setting optimisation level." alt="" coords="263,3245,447,3287"/>
+<area shape="rect" id="node53" href="$class_ogre_1_1_d3_d9_h_l_s_l_program_1_1_cmd_target.html" title="Command object for setting target assembler." alt="" coords="263,3311,447,3352"/>
+<area shape="rect" id="node54" href="$class_ogre_1_1_deflector_plane_affector_1_1_cmd_bounce.html" title="Command object for bounce (see ParamCommand)." alt="" coords="251,3376,459,3417"/>
+<area shape="rect" id="node55" href="$class_ogre_1_1_deflector_plane_affector_1_1_cmd_plane_normal.html" title="Command object for plane normal (see ParamCommand)." alt="" coords="251,3441,459,3483"/>
+<area shape="rect" id="node56" href="$class_ogre_1_1_deflector_plane_affector_1_1_cmd_plane_point.html" title="Command object for plane point (see ParamCommand)." alt="" coords="251,3507,459,3548"/>
+<area shape="rect" id="node57" href="$class_ogre_1_1_direction_randomiser_affector_1_1_cmd_keep_velocity.html" title="Command object for keep_velocity (see ParamCommand)." alt="" coords="256,3572,455,3613"/>
+<area shape="rect" id="node58" href="$class_ogre_1_1_direction_randomiser_affector_1_1_cmd_randomness.html" title="Command object for randomness (see ParamCommand)." alt="" coords="256,3637,455,3679"/>
+<area shape="rect" id="node59" href="$class_ogre_1_1_direction_randomiser_affector_1_1_cmd_scope.html" title="Command object for scope (see ParamCommand)." alt="" coords="256,3703,455,3744"/>
+<area shape="rect" id="node60" href="$class_ogre_1_1_external_texture_source_1_1_cmd_f_p_s.html" title=" " alt="" coords="252,3768,459,3809"/>
+<area shape="rect" id="node61" href="$class_ogre_1_1_external_texture_source_1_1_cmd_input_file_name.html" title=" " alt="" coords="252,3833,459,3875"/>
+<area shape="rect" id="node62" href="$class_ogre_1_1_external_texture_source_1_1_cmd_play_mode.html" title=" " alt="" coords="252,3899,459,3940"/>
+<area shape="rect" id="node63" href="$class_ogre_1_1_external_texture_source_1_1_cmd_tec_pass_state.html" title=" " alt="" coords="252,3964,459,4005"/>
+<area shape="rect" id="node64" href="$class_ogre_1_1_g_l_s_l_e_s_cg_program_1_1_cmd_entry_point.html" title="Command object for setting entry point." alt="" coords="265,4029,446,4071"/>
+<area shape="rect" id="node65" href="$class_ogre_1_1_g_l_s_l_e_s_cg_program_1_1_cmd_profiles.html" title="Command object for setting profiles." alt="" coords="265,4095,446,4136"/>
+<area shape="rect" id="node66" href="$class_ogre_1_1_g_l_s_l_e_s_program_1_1_cmd_optimisation.html" title="Command object for running the GLSL optimiser." alt="" coords="273,4160,437,4201"/>
+<area shape="rect" id="node67" href="$class_ogre_1_1_g_l_s_l_shader_common_1_1_cmd_attach.html" title="Command object for attaching another GLSL Program." alt="" coords="257,4225,454,4267"/>
+<area shape="rect" id="node68" href="$class_ogre_1_1_g_l_s_l_shader_common_1_1_cmd_column_major_matrices.html" title="Command object for setting matrix packing in column&#45;major order." alt="" coords="254,4291,457,4332"/>
+<area shape="rect" id="node69" href="$class_ogre_1_1_hollow_ellipsoid_emitter_1_1_cmd_inner_x.html" title="Command object for inner size (see ParamCommand)." alt="" coords="251,4356,460,4397"/>
+<area shape="rect" id="node70" href="$class_ogre_1_1_hollow_ellipsoid_emitter_1_1_cmd_inner_y.html" title="Command object for inner size (see ParamCommand)." alt="" coords="251,4421,460,4463"/>
+<area shape="rect" id="node71" href="$class_ogre_1_1_hollow_ellipsoid_emitter_1_1_cmd_inner_z.html" title="Command object for inner size (see ParamCommand)." alt="" coords="251,4487,460,4528"/>
+<area shape="rect" id="node72" href="$class_ogre_1_1_linear_force_affector_1_1_cmd_force_app.html" title="Command object for force application (see ParamCommand)." alt="" coords="262,4552,449,4593"/>
+<area shape="rect" id="node73" href="$class_ogre_1_1_linear_force_affector_1_1_cmd_force_vector.html" title="Command object for force vector (see ParamCommand)." alt="" coords="262,4617,449,4659"/>
+<area shape="rect" id="node74" href="$class_ogre_1_1_metal_program_1_1_cmd_entry_point.html" title="Command object for setting entry point." alt="" coords="279,4683,432,4724"/>
+<area shape="rect" id="node75" href="$class_ogre_1_1_metal_program_1_1_cmd_shader_reflection_pair_hint.html" title="Command object for setting vertex shader pair." alt="" coords="244,4748,467,4789"/>
+<area shape="rect" id="node76" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_caption.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,4813,475,4855"/>
+<area shape="rect" id="node77" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_height.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,4879,475,4920"/>
+<area shape="rect" id="node78" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_horizontal_align.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,4944,475,4985"/>
+<area shape="rect" id="node79" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_left.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,5009,475,5051"/>
+<area shape="rect" id="node80" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_material.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,5075,475,5116"/>
+<area shape="rect" id="node81" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_metrics_mode.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,5140,475,5181"/>
+<area shape="rect" id="node82" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_top.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,5205,475,5247"/>
+<area shape="rect" id="node83" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_vertical_align.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,5271,475,5312"/>
+<area shape="rect" id="node84" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_visible.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,5336,475,5377"/>
+<area shape="rect" id="node85" href="$class_ogre_1_1_overlay_element_commands_1_1_cmd_width.html" title="Command object for OverlayElement &#45; see ParamCommand." alt="" coords="235,5401,475,5443"/>
+<area shape="rect" id="node86" href="$class_ogre_1_1_panel_overlay_element_1_1_cmd_tiling.html" title="Command object for specifying tiling (see ParamCommand)." alt="" coords="254,5467,457,5508"/>
+<area shape="rect" id="node87" href="$class_ogre_1_1_panel_overlay_element_1_1_cmd_transparent.html" title="Command object for specifying transparency (see ParamCommand)." alt="" coords="254,5532,457,5573"/>
+<area shape="rect" id="node88" href="$class_ogre_1_1_panel_overlay_element_1_1_cmd_u_v_coords.html" title="Command object for specifying UV coordinates (see ParamCommand)." alt="" coords="254,5597,457,5639"/>
+<area shape="rect" id="node89" href="$class_ogre_1_1_particle_system_1_1_cmd_cull.html" title="Command object for cull_each (see ParamCommand)." alt="" coords="276,5663,435,5704"/>
+<area shape="rect" id="node90" href="$class_ogre_1_1_particle_system_1_1_cmd_emitted_emitter_quota.html" title="Command object for emittedEmitterQuota (see ParamCommand)." alt="" coords="256,5728,455,5769"/>
+<area shape="rect" id="node91" href="$class_ogre_1_1_particle_system_1_1_cmd_height.html" title="Command object for particle_height (see ParamCommand)." alt="" coords="276,5793,435,5835"/>
+<area shape="rect" id="node92" href="$class_ogre_1_1_particle_system_1_1_cmd_iteration_interval.html" title="Command object for iteration interval(see ParamCommand)." alt="" coords="273,5859,438,5900"/>
+<area shape="rect" id="node93" href="$class_ogre_1_1_particle_system_1_1_cmd_local_space.html" title="Command object for local space (see ParamCommand)." alt="" coords="276,5924,435,5965"/>
+<area shape="rect" id="node94" href="$class_ogre_1_1_particle_system_1_1_cmd_material.html" title="Command object for material (see ParamCommand)." alt="" coords="276,5989,435,6031"/>
+<area shape="rect" id="node95" href="$class_ogre_1_1_particle_system_1_1_cmd_nonvisible_timeout.html" title="Command object for nonvisible timeout (see ParamCommand)." alt="" coords="264,6055,447,6096"/>
+<area shape="rect" id="node96" href="$class_ogre_1_1_particle_system_1_1_cmd_quota.html" title="Command object for quota (see ParamCommand)." alt="" coords="276,6120,435,6161"/>
+<area shape="rect" id="node97" href="$class_ogre_1_1_particle_system_1_1_cmd_renderer.html" title="Command object for renderer (see ParamCommand)." alt="" coords="276,6185,435,6227"/>
+<area shape="rect" id="node98" href="$class_ogre_1_1_particle_system_1_1_cmd_sorted.html" title="Command object for sorting (see ParamCommand)." alt="" coords="276,6251,435,6292"/>
+<area shape="rect" id="node99" href="$class_ogre_1_1_particle_system_1_1_cmd_width.html" title="Command object for particle_width (see ParamCommand)." alt="" coords="276,6316,435,6357"/>
+<area shape="rect" id="node100" href="$class_ogre_1_1_ring_emitter_1_1_cmd_inner_x.html" title="Command object for inner size (see ParamCommand)." alt="" coords="282,6381,429,6423"/>
+<area shape="rect" id="node101" href="$class_ogre_1_1_ring_emitter_1_1_cmd_inner_y.html" title="Command object for inner size (see ParamCommand)." alt="" coords="282,6447,429,6488"/>
+<area shape="rect" id="node102" href="$class_ogre_1_1_rotation_affector_1_1_cmd_rotation_range_end.html" title="Command object for particle emitter &#45; see ParamCommand." alt="" coords="265,6512,445,6553"/>
+<area shape="rect" id="node103" href="$class_ogre_1_1_rotation_affector_1_1_cmd_rotation_range_start.html" title="Command object for particle emitter &#45; see ParamCommand." alt="" coords="262,6577,449,6619"/>
+<area shape="rect" id="node104" href="$class_ogre_1_1_rotation_affector_1_1_cmd_rotation_speed_range_end.html" title="Command object for particle emitter &#45; see ParamCommand." alt="" coords="245,6643,465,6684"/>
+<area shape="rect" id="node105" href="$class_ogre_1_1_rotation_affector_1_1_cmd_rotation_speed_range_start.html" title="Command object for particle emitter &#45; see ParamCommand." alt="" coords="242,6708,469,6749"/>
+<area shape="rect" id="node106" href="$class_ogre_1_1_scale_affector_1_1_cmd_scale_adjust.html" title="Command object for scale adjust (see ParamCommand)." alt="" coords="282,6773,429,6815"/>
+<area shape="rect" id="node107" href="$class_ogre_1_1_text_area_overlay_element_1_1_cmd_alignment.html" title="Command object for setting the alignment." alt="" coords="244,6839,467,6880"/>
+<area shape="rect" id="node108" href="$class_ogre_1_1_text_area_overlay_element_1_1_cmd_caption.html" title="Command object for setting the caption." alt="" coords="244,6904,467,6945"/>
+<area shape="rect" id="node109" href="$class_ogre_1_1_text_area_overlay_element_1_1_cmd_char_height.html" title="Command object for setting the char height." alt="" coords="244,6969,467,7011"/>
+<area shape="rect" id="node110" href="$class_ogre_1_1_text_area_overlay_element_1_1_cmd_colour.html" title="Command object for setting the constant colour." alt="" coords="244,7035,467,7076"/>
+<area shape="rect" id="node111" href="$class_ogre_1_1_text_area_overlay_element_1_1_cmd_colour_bottom.html" title="Command object for setting the bottom colour." alt="" coords="244,7100,467,7141"/>
+<area shape="rect" id="node112" href="$class_ogre_1_1_text_area_overlay_element_1_1_cmd_colour_top.html" title="Command object for setting the top colour." alt="" coords="244,7165,467,7207"/>
+<area shape="rect" id="node113" href="$class_ogre_1_1_text_area_overlay_element_1_1_cmd_font_name.html" title="Command object for setting the caption." alt="" coords="244,7231,467,7272"/>
+<area shape="rect" id="node114" href="$class_ogre_1_1_text_area_overlay_element_1_1_cmd_space_width.html" title="Command object for setting the width of a space." alt="" coords="244,7296,467,7337"/>
+<area shape="rect" id="node115" href="$class_ogre_1_1_unified_high_level_gpu_program_1_1_cmd_delegate.html" title="Command object for setting delegate (can set more than once)" alt="" coords="256,7361,455,7403"/>
+</map>

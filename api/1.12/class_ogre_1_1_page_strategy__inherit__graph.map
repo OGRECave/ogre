@@ -1,0 +1,6 @@
+<map id="Ogre::PageStrategy" name="Ogre::PageStrategy">
+<area shape="rect" id="node1" title="Defines the interface to a strategy class which is responsible for deciding when Page instances are r..." alt="" coords="136,80,284,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_grid2_d_page_strategy.html" title="Page strategy which loads new pages based on a regular 2D grid." alt="" coords="5,155,199,181"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_grid3_d_page_strategy.html" title="Page strategy which loads new pages based on a regular 3D grid." alt="" coords="223,155,416,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="167,5,253,32"/>
+</map>

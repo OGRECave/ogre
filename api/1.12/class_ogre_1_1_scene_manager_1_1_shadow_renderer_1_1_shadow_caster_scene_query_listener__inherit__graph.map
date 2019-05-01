@@ -1,0 +1,5 @@
+<map id="Ogre::SceneManager::ShadowRenderer::ShadowCasterSceneQueryListener" name="Ogre::SceneManager::ShadowRenderer::ShadowCasterSceneQueryListener">
+<area shape="rect" id="node1" title="Inner class to use as callback for shadow caster scene query." alt="" coords="69,80,311,136"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_scene_query_listener.html" title="This optional class allows you to receive per&#45;result callbacks from SceneQuery executions instead of ..." alt="" coords="5,5,196,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="220,5,339,32"/>
+</map>

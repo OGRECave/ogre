@@ -1,0 +1,27 @@
+<map id="Ogre::SceneQuery" name="Ogre::SceneQuery">
+<area shape="rect" id="node1" title="A class for performing queries on a scene." alt="" coords="172,253,311,279"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_intersection_scene_query.html" title="Separate SceneQuery class to query for pairs of objects which are possibly intersecting one another." alt="" coords="359,173,575,199"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_ray_scene_query.html" title="Specialises the SceneQuery class for querying along a ray." alt="" coords="385,253,549,279"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_region_scene_query.html" title="Abstract class defining a query which returns single results from a region." alt="" coords="375,394,559,421"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,253,124,279"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_default_intersection_scene_query.html" title="Default implementation of IntersectionSceneQuery." alt="" coords="635,104,822,145"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_bsp_intersection_scene_query.html" title="BSP specialisation of IntersectionSceneQuery." alt="" coords="885,5,1087,47"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_octree_intersection_scene_query.html" title="Octree implementation of IntersectionSceneQuery." alt="" coords="895,71,1077,112"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_p_c_z_intersection_scene_query.html" title="PCZ implementation of IntersectionSceneQuery." alt="" coords="885,136,1087,177"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_default_ray_scene_query.html" title="Default implementation of RaySceneQuery." alt="" coords="623,253,835,279"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_bsp_ray_scene_query.html" title="BSP specialisation of RaySceneQuery." alt="" coords="892,202,1080,229"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_octree_ray_scene_query.html" title="Octree implementation of RaySceneQuery." alt="" coords="883,253,1089,279"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_p_c_z_ray_scene_query.html" title="PCZ implementation of RaySceneQuery." alt="" coords="891,303,1081,330"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_axis_aligned_box_scene_query.html" title="Specialises the SceneQuery class for querying within an axis aligned box." alt="" coords="627,355,830,396"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_plane_bounded_volume_list_scene_query.html" title="Specialises the SceneQuery class for querying within a plane&#45;bounded volume." alt="" coords="627,420,831,461"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_sphere_scene_query.html" title="Specialises the SceneQuery class for querying within a sphere." alt="" coords="637,518,821,545"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_default_axis_aligned_box_scene_query.html" title="Default implementation of AxisAlignedBoxSceneQuery." alt="" coords="893,355,1079,396"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_octree_axis_aligned_box_scene_query.html" title="Octree implementation of AxisAlignedBoxSceneQuery." alt="" coords="1149,289,1356,331"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_p_c_z_axis_aligned_box_scene_query.html" title="PCZ implementation of AxisAlignedBoxSceneQuery." alt="" coords="1139,355,1367,396"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_default_plane_bounded_volume_list_scene_query.html" title="Default implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="885,420,1087,461"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_octree_plane_bounded_volume_list_scene_query.html" title="Octree implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="1154,420,1351,461"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_p_c_z_plane_bounded_volume_list_scene_query.html" title="PCZ implementation of PlaneBoundedVolumeListSceneQuery." alt="" coords="1137,485,1368,527"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_default_sphere_scene_query.html" title="Default implementation of SphereSceneQuery." alt="" coords="889,544,1083,585"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_octree_sphere_scene_query.html" title="Octree implementation of SphereSceneQuery." alt="" coords="1139,551,1366,578"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_p_c_z_sphere_scene_query.html" title="PCZ implementation of SphereSceneQuery." alt="" coords="1147,602,1358,629"/>
+</map>
