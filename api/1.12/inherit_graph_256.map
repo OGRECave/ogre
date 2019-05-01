@@ -1,0 +1,41 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; T \&gt;" alt="" coords="187,5,335,32"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Abstract\lNodeList \&gt;" alt="" coords="172,57,349,98"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Animable\lValue \&gt;" alt="" coords="169,122,352,163"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; BspLevel \&gt;" alt="" coords="163,188,358,215"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Controller\lFunction\&lt; Real \&gt; \&gt;" alt="" coords="169,239,353,281"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Controller\lValue\&lt; Real \&gt; \&gt;" alt="" coords="169,305,353,346"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; DataStream \&gt;" alt="" coords="155,371,366,397"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Font \&gt;" alt="" coords="177,421,344,448"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; GpuLogical\lBufferStruct \&gt;" alt="" coords="164,473,357,514"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; GpuNamed\lConstants \&gt;" alt="" coords="163,538,358,579"/>
+<area shape="rect" id="node12" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; GpuProgram \&gt;" alt="" coords="154,604,367,631"/>
+<area shape="rect" id="node13" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; GpuProgram\lParameters \&gt;" alt="" coords="160,655,361,697"/>
+<area shape="rect" id="node14" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; GpuShared\lParameters \&gt;" alt="" coords="164,721,357,762"/>
+<area shape="rect" id="node15" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Hardware\lIndexBuffer \&gt;" alt="" coords="169,786,353,827"/>
+<area shape="rect" id="node16" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Hardware\lUniformBuffer \&gt;" alt="" coords="169,851,353,893"/>
+<area shape="rect" id="node17" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Hardware\lVertexBuffer \&gt;" alt="" coords="169,917,353,958"/>
+<area shape="rect" id="node18" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; HighLevel\lGpuProgram \&gt;" alt="" coords="167,982,354,1023"/>
+<area shape="rect" id="node19" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Material \&gt;" alt="" coords="167,1048,354,1075"/>
+<area shape="rect" id="node20" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; MemoryData\lStream \&gt;" alt="" coords="159,1099,362,1141"/>
+<area shape="rect" id="node21" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Mesh \&gt;" alt="" coords="175,1165,347,1192"/>
+<area shape="rect" id="node22" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::ControllerFunction\l\&lt; Real \&gt; \&gt;" alt="" coords="183,1216,339,1272"/>
+<area shape="rect" id="node23" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::ControllerFunction\l\&lt; T \&gt; \&gt;" alt="" coords="183,1296,339,1352"/>
+<area shape="rect" id="node24" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::ControllerValue\&lt; Real \&gt; \&gt;" alt="" coords="169,1377,352,1418"/>
+<area shape="rect" id="node25" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::ControllerValue\&lt; T \&gt; \&gt;" alt="" coords="179,1442,342,1483"/>
+<area shape="rect" id="node26" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::D3D11VideoModeList \&gt;" alt="" coords="176,1507,345,1549"/>
+<area shape="rect" id="node27" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::GLStateCacheManagerCommon \&gt;" alt="" coords="145,1573,376,1614"/>
+<area shape="rect" id="node28" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::RTShader::DualQuaternionSkinning \&gt;" alt="" coords="136,1638,385,1679"/>
+<area shape="rect" id="node29" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::RTShader::HardwareSkinning\lTechnique \&gt;" alt="" coords="159,1704,362,1760"/>
+<area shape="rect" id="node30" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::RTShader::LinearSkinning \&gt;" alt="" coords="163,1785,358,1826"/>
+<area shape="rect" id="node31" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Ogre\l::Vector \&gt;" alt="" coords="183,1850,339,1891"/>
+<area shape="rect" id="node32" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; RenderSystem\lData \&gt;" alt="" coords="153,1915,368,1957"/>
+<area shape="rect" id="node33" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Resource \&gt;" alt="" coords="163,1981,359,2008"/>
+<area shape="rect" id="node34" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; ShadowCamera\lSetup \&gt;" alt="" coords="150,2033,371,2074"/>
+<area shape="rect" id="node35" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Skeleton \&gt;" alt="" coords="165,2099,356,2125"/>
+<area shape="rect" id="node36" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; SubRender\lStateAccessor \&gt;" alt="" coords="164,2150,357,2191"/>
+<area shape="rect" id="node37" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Terrain\lMaterialGenerator \&gt;" alt="" coords="177,2215,345,2257"/>
+<area shape="rect" id="node38" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Texture \&gt;" alt="" coords="169,2281,353,2308"/>
+<area shape="rect" id="node39" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; Texture\lAtlasTable \&gt;" alt="" coords="175,2333,347,2374"/>
+<area shape="rect" id="node40" href="$class_ogre_1_1_shared_ptr.html" title="Ogre::SharedPtr\&lt; unsigned\l char \&gt;" alt="" coords="171,2398,351,2439"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="Ogre::RenderTexture" name="Ogre::RenderTexture">
+<area shape="rect" id="node4" href="$class_ogre_1_1_d3_d11_render_texture.html" title="RenderTexture implementation for D3D11. " alt="" coords="547,5,732,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d9_render_texture.html" title="RenderTexture implementation for D3D9. " alt="" coords="550,56,729,83"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_g_l_render_texture.html" title="Base class for GL Render Textures. " alt="" coords="559,107,720,133"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_render_target.html" title="A &#39;canvas&#39; which can receive the results of a rendering operation. " alt="" coords="169,56,307,83"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="RenderSysAlloc" alt="" coords="5,56,121,83"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_g_l3_plus_f_b_o_render_texture.html" title="RenderTexture for GL FBO. " alt="" coords="780,5,1001,32"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l_copying_render_texture.html" title="Ogre::GLCopyingRenderTexture" alt="" coords="786,56,995,83"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_g_l_e_s2_f_b_o_render_texture.html" title="RenderTexture for GL ES 2 FBO. " alt="" coords="784,107,997,133"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_g_l_f_b_o_render_texture.html" title="RenderTexture for GL FBO. " alt="" coords="797,157,985,184"/>
+<area shape="rect" id="node11" href="$class_ogre_1_1_g_l_p_b_render_texture.html" title="Ogre::GLPBRenderTexture" alt="" coords="801,208,980,235"/>
+</map>

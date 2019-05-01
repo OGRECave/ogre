@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::TextureAtlasSamplerFactory" name="Ogre::RTShader::TextureAtlasSamplerFactory">
+<area shape="rect" id="node2" href="$class_ogre_1_1_r_t_shader_1_1_sub_render_state_factory.html" title="Abstract factory interface for creating SubRenderState implementation instances. " alt="" coords="208,5,399,47"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="RTShaderSystemAlloc" alt="" coords="5,13,160,39"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Texture\lAtlasSamplerFactory \&gt;" alt="" coords="219,71,387,112"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="Ogre::HardwareBufferManager" name="Ogre::HardwareBufferManager">
+<area shape="rect" id="node5" href="$class_ogre_1_1_d3_d11_hardware_buffer_manager.html" title="Implementation of HardwareBufferManager for D3D11. " alt="" coords="677,5,867,47"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_d3_d9_hardware_buffer_manager.html" title="Implementation of HardwareBufferManager for D3D9. " alt="" coords="681,71,863,112"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_default_hardware_buffer_manager.html" title="DefaultHardwareBufferManager as a Singleton. " alt="" coords="677,136,867,177"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_g_l3_plus_hardware_buffer_manager.html" title="Implementation of HardwareBufferManager for OpenGL. " alt="" coords="673,201,871,243"/>
+<area shape="rect" id="node9" href="$class_ogre_1_1_g_l_e_s2_hardware_buffer_manager.html" title="Implementation of HardwareBufferManager for OpenGL ES. " alt="" coords="677,267,867,308"/>
+<area shape="rect" id="node10" href="$class_ogre_1_1_g_l_hardware_buffer_manager.html" title="Implementation of HardwareBufferManager for OpenGL. " alt="" coords="664,333,880,359"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_hardware_buffer_manager_base.html" title="Base definition of a hardware buffer manager. " alt="" coords="140,147,369,174"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="BufferAlloc" alt="" coords="5,147,92,174"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_singleton.html" title="Ogre::Singleton\&lt; Hardware\lBufferManager \&gt;" alt="" coords="165,199,345,240"/>
+</map>

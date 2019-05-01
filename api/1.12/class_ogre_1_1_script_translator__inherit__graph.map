@@ -1,0 +1,7 @@
+<map id="Ogre::ScriptTranslator" name="Ogre::ScriptTranslator">
+<area shape="rect" id="node3" href="$struct_ogre_1_1_element_translator.html" title="[font_translator] " alt="" coords="402,5,566,32"/>
+<area shape="rect" id="node4" href="$struct_ogre_1_1_font_translator.html" title="[font_translator] " alt="" coords="413,56,555,83"/>
+<area shape="rect" id="node5" href="$struct_ogre_1_1_overlay_translator.html" title="Ogre::OverlayTranslator" alt="" coords="403,107,565,133"/>
+<area shape="rect" id="node6" href="$class_ogre_1_1_r_t_shader_1_1_s_g_script_translator.html" title="This class responsible for translating core features of the RT Shader System for Ogre material script..." alt="" coords="395,158,573,199"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="ScriptTranslatorAlloc" alt="" coords="5,81,148,108"/>
+</map>

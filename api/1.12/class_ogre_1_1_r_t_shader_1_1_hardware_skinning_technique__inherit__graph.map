@@ -1,0 +1,5 @@
+<map id="Ogre::RTShader::HardwareSkinningTechnique" name="Ogre::RTShader::HardwareSkinningTechnique">
+<area shape="rect" id="node3" href="$class_ogre_1_1_r_t_shader_1_1_dual_quaternion_skinning.html" title="Implement a sub render state which performs dual quaternion hardware skinning. " alt="" coords="5,169,220,211"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_r_t_shader_1_1_linear_skinning.html" title="Implement a sub render state which performs hardware skinning. " alt="" coords="245,177,455,203"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_allocated_object.html" title="RTShaderSystemAlloc" alt="" coords="154,5,309,32"/>
+</map>

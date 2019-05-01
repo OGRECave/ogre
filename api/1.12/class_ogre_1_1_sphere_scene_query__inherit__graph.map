@@ -1,0 +1,9 @@
+<map id="Ogre::SphereSceneQuery" name="Ogre::SphereSceneQuery">
+<area shape="rect" id="node6" href="$class_ogre_1_1_default_sphere_scene_query.html" title="Default implementation of SphereSceneQuery. " alt="" coords="135,304,313,345"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_region_scene_query.html" title="Abstract class defining a query which returns single results from a region. " alt="" coords="139,155,309,181"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_scene_query.html" title="A class for performing queries on a scene. " alt="" coords="71,80,201,107"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="SceneMgtAlloc" alt="" coords="81,5,191,32"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_scene_query_listener.html" title="This optional class allows you to receive per&#45;result callbacks from SceneQuery executions instead of ..." alt="" coords="225,80,401,107"/>
+<area shape="rect" id="node7" href="$class_ogre_1_1_octree_sphere_scene_query.html" title="Octree implementation of SphereSceneQuery. " alt="" coords="5,393,216,420"/>
+<area shape="rect" id="node8" href="$class_ogre_1_1_p_c_z_sphere_scene_query.html" title="PCZ implementation of SphereSceneQuery. " alt="" coords="239,393,438,420"/>
+</map>

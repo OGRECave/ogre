@@ -1,0 +1,5 @@
+<map id="Ogre::BillboardParticleRendererFactory" name="Ogre::BillboardParticleRendererFactory">
+<area shape="rect" id="node2" href="$class_ogre_1_1_particle_system_renderer_factory.html" title="Abstract class definition of a factory object for ParticleSystemRenderer. " alt="" coords="68,95,268,136"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_factory_obj.html" title="Ogre::FactoryObj\&lt; Particle\lSystemRenderer \&gt;" alt="" coords="5,5,184,47"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_allocated_object.html" title="FXAlloc" alt="" coords="209,13,277,39"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Ogre::ElementTranslator" name="Ogre::ElementTranslator">
+<area shape="rect" id="node2" href="$class_ogre_1_1_script_translator.html" title="This class translates script AST (abstract syntax tree) into Ogre resources. " alt="" coords="12,80,163,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="ScriptTranslatorAlloc" alt="" coords="16,5,159,32"/>
+</map>

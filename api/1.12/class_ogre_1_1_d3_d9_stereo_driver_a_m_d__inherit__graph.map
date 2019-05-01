@@ -1,0 +1,6 @@
+<map id="Ogre::D3D9StereoDriverAMD" name="Ogre::D3D9StereoDriverAMD">
+<area shape="rect" id="node2" href="$class_ogre_1_1_d3_d9_stereo_driver_impl.html" title="Virtual interface of the stereo driver. " alt="" coords="5,87,196,114"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_allocated_object.html" title="ResourceAlloc" alt="" coords="47,5,154,32"/>
+<area shape="rect" id="node4" href="$class_ogre_1_1_render_system_1_1_listener.html" title="Defines a listener on the custom events that this render system can raise. " alt="" coords="220,80,365,121"/>
+<area shape="rect" id="node5" href="$class_ogre_1_1_render_target_listener.html" title="A interface class defining a listener which can be used to receive notifications of RenderTarget even..." alt="" coords="389,87,572,114"/>
+</map>
