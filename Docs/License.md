@@ -11,6 +11,8 @@
 
 In practice this means that whenever you distribute your application, whether as binary or as source code, you must include somewhere in your distribution the text <a href="../LICENSE">in this file</a>. This might be in the printed documentation, as a file on delivered media, or even on the credits / acknowledgements of the runtime application itself; any of those would satisfy the requirement.
 
+The [OGRE Logo](ogre-logo.png) is licenced [CC-BY](https://creativecommons.org/licenses/by/2.0/) [Pierre Fontaine](http://codrer.com/).
+
 # Licenses for 3rd-party libraries used in OGRE
 
 Several 3rd-party libraries are used in OGRE for various purposes, and the licensing details of each are given here.
