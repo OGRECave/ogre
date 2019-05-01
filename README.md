@@ -2,7 +2,7 @@
 [![Join the chat at https://gitter.im/OGRECave/ogre](https://badges.gitter.im/OGRECave/ogre.svg)](https://gitter.im/OGRECave/ogre?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Patreon](https://img.shields.io/badge/patreon-donate-blue.svg)](https://www.patreon.com/ogre1)
 
-![](Docs/ogre-logo-wetfloor.gif)
+![](Other/ogre_header.png)
 
 ## Summary
 **OGRE** (Object-Oriented Graphics Rendering Engine) is a
@@ -19,7 +19,7 @@ classes.
 | MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
 
 ## Index Of Contents
-* [What's New?](Docs/1.11-Notes.md)  
+* [What's New?](Docs/1.12-Notes.md)  
 A summary of the new and altered features in this release.
 * [Features](http://www.ogre3d.org/about/features)  
 A summary of OGRE's main features.
