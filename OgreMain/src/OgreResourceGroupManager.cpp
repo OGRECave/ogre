@@ -1828,14 +1828,14 @@ namespace Ogre {
     void ResourceGroupManager::ResourceGroup::addToIndex(const String& filename, Archive* arch)
     {
         // internal, assumes mutex lock has already been obtained
-        this->resourceIndexCaseSensitive[filename] = arch;
+        this->resourceIndexCaseSensitive.emplace(filename, arch);
 
 #if !OGRE_RESOURCEMANAGER_STRICT
         if (!arch->isCaseSensitive())
         {
             String lcase = filename;
             StringUtil::toLowerCase(lcase);
-            this->resourceIndexCaseInsensitive[lcase] = arch;
+            this->resourceIndexCaseInsensitive.emplace(lcase, arch);
         }
 #endif
     }
