@@ -154,6 +154,7 @@ namespace Ogre
     {
         D3DMATERIAL9 material;
         D3DLIGHT9 d3dLight;
+        ZeroMemory(&d3dLight, sizeof(D3DLIGHT9));
 
         // Autoconstant index is not a physical index
         for (const auto& ac : params->getAutoConstants())
