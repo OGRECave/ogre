@@ -1755,9 +1755,7 @@ namespace Ogre {
         if (it == mSchemeHardwareAnim.end())
         {
             //evaluate the animation hardware value
-            it = mSchemeHardwareAnim.insert(
-                SchemeHardwareAnimMap::value_type(schemeIndex,
-                    calcVertexProcessing())).first;
+            it = mSchemeHardwareAnim.emplace(schemeIndex, calcVertexProcessing()).first;
         }
         return it->second;
     }

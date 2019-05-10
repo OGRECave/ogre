@@ -250,15 +250,12 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
             (uint)w, (uint)h, 0, f, TU_RENDERTARGET, 0,
             srgb, aa, aaHint);
-        defMap.insert(TextureDefMap::value_type(def, newTex));
+        defMap.emplace(def, newTex);
         return newTex;
     }
 
-    TexturesByDef::iterator i = mTexturesByDef.find(def);
-    if (i == mTexturesByDef.end())
-    {
-        i = mTexturesByDef.insert(TexturesByDef::value_type(def, TextureList())).first;
-    }
+    TexturesByDef::iterator i = mTexturesByDef.emplace(def, TextureList()).first;
+
     CompositorInstance* previous = inst->getChain()->getPreviousInstance(inst);
     CompositorInstance* next = inst->getChain()->getNextInstance(inst);
 

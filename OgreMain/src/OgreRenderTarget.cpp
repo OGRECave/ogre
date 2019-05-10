@@ -241,7 +241,7 @@ namespace Ogre {
         // Order based on Z-order
         Viewport* vp = OGRE_NEW Viewport(cam, this, left, top, width, height, ZOrder);
 
-        mViewportList.insert(ViewportList::value_type(ZOrder, vp));
+        mViewportList.emplace(ZOrder, vp);
 
         fireViewportAdded(vp);
 

@@ -168,7 +168,7 @@ namespace Ogre {
                         LogManager::getSingleton().logMessage("Could not parse type of GLSL Uniform: '"
                                                               + line + "' in file " + filename);
                     }
-                    defs.map.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+                    defs.map.emplace(paramName, def);
 
                     // Generate array accessors
                     defs.generateConstantDefinitionArrayEntries(paramName, def);

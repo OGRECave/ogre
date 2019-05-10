@@ -522,7 +522,7 @@ namespace Ogre {
                     pPriorityGrp->addOrganisationMode((QueuedRenderableCollection::OrganisationMode)mOrganisationMode);
                 }
 
-                mPriorityGroups.insert(PriorityMap::value_type(priority, pPriorityGrp));
+                mPriorityGroups.emplace(priority, pPriorityGrp);
             }
             else
             {
@@ -696,7 +696,7 @@ namespace Ogre {
                         pDstPriorityGrp->addOrganisationMode((QueuedRenderableCollection::OrganisationMode)mOrganisationMode);
                     }
 
-                    mPriorityGroups.insert(PriorityMap::value_type(priority, pDstPriorityGrp));
+                    mPriorityGroups.emplace(priority, pDstPriorityGrp);
                 }
                 else
                 {

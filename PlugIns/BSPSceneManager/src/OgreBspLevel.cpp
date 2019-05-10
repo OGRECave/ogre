@@ -949,9 +949,7 @@ namespace Ogre {
         {
             // Add to movable->node map
             // Insert all the time, will get current if already there
-            std::pair<MovableToNodeMap::iterator, bool> p = 
-                mMovableToNodeMap.insert(
-                MovableToNodeMap::value_type(mov, std::list<BspNode*>()));
+            std::pair<MovableToNodeMap::iterator, bool> p = mMovableToNodeMap.emplace(mov, std::list<BspNode*>());
 
             p.first->second.push_back(node);
 

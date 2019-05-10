@@ -344,9 +344,7 @@ namespace Ogre {
                 mFaceGroupSet.insert(realIndex);
                 // Try to insert, will find existing if already there
                 std::pair<MaterialFaceGroupMap::iterator, bool> matgrpi;
-                matgrpi = mMatFaceGroupMap.insert(
-                    MaterialFaceGroupMap::value_type(pMat.get(), std::vector<StaticFaceGroup*>())
-                    );
+                matgrpi = mMatFaceGroupMap.emplace(pMat.get(), std::vector<StaticFaceGroup*>());
                 // Whatever happened, matgrpi.first is map iterator
                 // Need to get second part of that to get vector
                 matgrpi.first->second.push_back(faceGroup);

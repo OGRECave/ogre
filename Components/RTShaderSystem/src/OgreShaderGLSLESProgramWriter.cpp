@@ -527,7 +527,7 @@ namespace Ogre {
                                     functionBody.erase(pos, 1);
                                     pos = functionBody.rfind('}');
                                     functionBody.erase(pos, 1);
-                                    mFunctionCacheMap.insert(FunctionMap::value_type(*functionInvoc, functionBody));
+                                    mFunctionCacheMap.emplace(*functionInvoc, functionBody);
                                 }
                                 functionBody += "\n";
                                 line = stream->getLine();

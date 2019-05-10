@@ -197,7 +197,7 @@ Camera* SceneManager::createCamera(const String& name)
     }
 
     Camera *c = OGRE_NEW Camera(name, this);
-    mCameras.insert(CameraList::value_type(name, c));
+    mCameras.emplace(name, c);
 
     // create visible bounds aab map entry
     mCamVisibleObjectsMap[c] = VisibleObjectsBoundsInfo();
@@ -3200,12 +3200,7 @@ const RealRect& SceneManager::getLightScissorRect(Light* l, const Camera* cam)
     checkCachedLightClippingInfo();
 
     // Re-use calculations if possible
-    LightClippingInfoMap::iterator ci = mLightClippingInfoMap.find(l);
-    if (ci == mLightClippingInfoMap.end())
-    {
-        // create new entry
-        ci = mLightClippingInfoMap.insert(LightClippingInfoMap::value_type(l, LightClippingInfo())).first;
-    }
+    LightClippingInfoMap::iterator ci = mLightClippingInfoMap.emplace(l, LightClippingInfo()).first;
     if (!ci->second.scissorValid)
     {
 
@@ -3316,12 +3311,8 @@ const PlaneList& SceneManager::getLightClippingPlanes(Light* l)
     checkCachedLightClippingInfo();
 
     // Try to re-use clipping info if already calculated
-    LightClippingInfoMap::iterator ci = mLightClippingInfoMap.find(l);
-    if (ci == mLightClippingInfoMap.end())
-    {
-        // create new entry
-        ci = mLightClippingInfoMap.insert(LightClippingInfoMap::value_type(l, LightClippingInfo())).first;
-    }
+    LightClippingInfoMap::iterator ci = mLightClippingInfoMap.emplace(l, LightClippingInfo()).first;
+
     if (!ci->second.clipPlanesValid)
     {
         buildLightClip(l, ci->second.clipPlanes);

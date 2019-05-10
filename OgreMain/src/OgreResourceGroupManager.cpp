@@ -95,8 +95,7 @@ namespace Ogre {
         grp->worldGeometrySceneManager = 0;
 
         OGRE_LOCK_AUTO_MUTEX;
-        mResourceGroupMap.insert(
-            ResourceGroupMap::value_type(name, grp));
+        mResourceGroupMap.emplace(name, grp);
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::initialiseResourceGroup(const String& name)
@@ -909,8 +908,7 @@ namespace Ogre {
     {
             OGRE_LOCK_AUTO_MUTEX;
 
-        mScriptLoaderOrderMap.insert(
-            ScriptLoaderOrderMap::value_type(su->getLoadingOrder(), su));
+        mScriptLoaderOrderMap.emplace(su->getLoadingOrder(), su);
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::_unregisterScriptLoader(ScriptLoader* su)

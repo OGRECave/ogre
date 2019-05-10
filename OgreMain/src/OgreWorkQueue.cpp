@@ -129,9 +129,7 @@ namespace Ogre {
     {
             OGRE_WQ_LOCK_RW_MUTEX_WRITE(mRequestHandlerMutex);
 
-        RequestHandlerListByChannel::iterator i = mRequestHandlers.find(channel);
-        if (i == mRequestHandlers.end())
-            i = mRequestHandlers.insert(RequestHandlerListByChannel::value_type(channel, RequestHandlerList())).first;
+        RequestHandlerListByChannel::iterator i = mRequestHandlers.emplace(channel, RequestHandlerList()).first;
 
         RequestHandlerList& handlers = i->second;
         bool duplicate = false;
@@ -174,9 +172,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::addResponseHandler(uint16 channel, ResponseHandler* rh)
     {
-        ResponseHandlerListByChannel::iterator i = mResponseHandlers.find(channel);
-        if (i == mResponseHandlers.end())
-            i = mResponseHandlers.insert(ResponseHandlerListByChannel::value_type(channel, ResponseHandlerList())).first;
+        ResponseHandlerListByChannel::iterator i = mResponseHandlers.emplace(channel, ResponseHandlerList()).first;
 
         ResponseHandlerList& handlers = i->second;
         if (std::find(handlers.begin(), handlers.end(), rh) == handlers.end())

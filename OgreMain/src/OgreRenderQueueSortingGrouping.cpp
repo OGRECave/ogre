@@ -351,20 +351,12 @@ namespace Ogre {
 
         if (mOrganisationMode & OM_PASS_GROUP)
         {
-            PassGroupRenderableMap::iterator i = mGrouped.find(pass);
-            if (i == mGrouped.end())
-            {
-                std::pair<PassGroupRenderableMap::iterator, bool> retPair;
-                // Create new pass entry, build a new list
-                // Note that this pass and list are never destroyed until the 
-                // engine shuts down, or a pass is destroyed or has it's hash
-                // recalculated, although the lists will be cleared
-                retPair = mGrouped.insert(
-                    PassGroupRenderableMap::value_type(pass, RenderableList()));
-                assert(retPair.second && 
-                    "Error inserting new pass entry into PassGroupRenderableMap");
-                i = retPair.first;
-            }
+            // Optionally create new pass entry, build a new list
+            // Note that this pass and list are never destroyed until the
+            // engine shuts down, or a pass is destroyed or has it's hash
+            // recalculated, although the lists will be cleared
+            PassGroupRenderableMap::iterator i = mGrouped.emplace(pass, RenderableList()).first;
+
             // Insert renderable
             i->second.push_back(rend);
             
@@ -455,20 +447,11 @@ namespace Ogre {
         PassGroupRenderableMap::const_iterator srcGroup;
         for( srcGroup = rhs.mGrouped.begin(); srcGroup != rhs.mGrouped.end(); ++srcGroup )
         {
-            PassGroupRenderableMap::iterator dstGroup = mGrouped.find( srcGroup->first );
-            if (dstGroup == mGrouped.end())
-            {
-                std::pair<PassGroupRenderableMap::iterator, bool> retPair;
-                // Create new pass entry, build a new list
-                // Note that this pass and list are never destroyed until the 
-                // engine shuts down, or a pass is destroyed or has it's hash
-                // recalculated, although the lists will be cleared
-                retPair = mGrouped.insert(
-                    PassGroupRenderableMap::value_type(srcGroup->first, RenderableList()));
-                assert(retPair.second && 
-                    "Error inserting new pass entry into PassGroupRenderableMap");
-                dstGroup = retPair.first;
-            }
+            // Optionally create new pass entry, build a new list
+            // Note that this pass and list are never destroyed until the
+            // engine shuts down, or a pass is destroyed or has it's hash
+            // recalculated, although the lists will be cleared
+            PassGroupRenderableMap::iterator dstGroup = mGrouped.emplace(srcGroup->first, RenderableList()).first;
 
             // Insert renderable
             dstGroup->second.insert( dstGroup->second.end(), srcGroup->second.begin(), srcGroup->second.end() );

@@ -385,9 +385,8 @@ namespace Ogre {
     {
         assert( target.getPriority() < OGRE_NUM_RENDERTARGET_GROUPS );
 
-        mRenderTargets.insert( RenderTargetMap::value_type( target.getName(), &target ) );
-        mPrioritisedRenderTargets.insert(
-            RenderTargetPriorityMap::value_type(target.getPriority(), &target ));
+        mRenderTargets.emplace(target.getName(), &target);
+        mPrioritisedRenderTargets.emplace(target.getPriority(), &target);
     }
 
     //---------------------------------------------------------------------------------------------
