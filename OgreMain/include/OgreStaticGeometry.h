@@ -563,7 +563,7 @@ namespace Ogre {
             for (size_t i = 0; i < numIndexes; ++i)
             {
                 // use insert since duplicates are silently discarded
-                remap.insert(IndexRemap::value_type(*pBuffer++, remap.size()));
+                remap.emplace(*pBuffer++, remap.size());
                 // this will have mapped oldindex -> new index IF oldindex
                 // wasn't already there
             }

@@ -376,8 +376,7 @@ namespace Ogre
             LoadRequest req;
             req.slot = slot;
             req.origin = this;
-            std::pair<TerrainPrepareRequestMap::iterator, bool> ret =
-                mTerrainPrepareRequests.insert(TerrainPrepareRequestMap::value_type(slot, 0));
+            std::pair<TerrainPrepareRequestMap::iterator, bool> ret = mTerrainPrepareRequests.emplace(slot, 0);
             assert(ret.second == true);
             WorkQueue::RequestID id =
                 Root::getSingleton().getWorkQueue()->addRequest(

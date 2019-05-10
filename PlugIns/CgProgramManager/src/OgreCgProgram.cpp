@@ -273,7 +273,7 @@ namespace Ogre {
 			// get def
 			cacheMicrocode->read( &def, sizeof(GpuConstantDefinition));
 
-			mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+			mParametersMap.emplace(paramName, def);
 		}
 
 		if (mDelegate)
@@ -904,23 +904,21 @@ namespace Ogre {
 			const String & paramName = iter->first;
 			GpuConstantDefinition def = iter->second;
 
-			mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(iter->first, iter->second));
+			mConstantDefs->map.emplace(iter->first, iter->second);
 
 			// Record logical / physical mapping
 			if (def.isFloat())
 			{
 							OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
-				mFloatLogicalToPhysical->map.insert(
-					GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
-						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+				mFloatLogicalToPhysical->map.emplace(def.logicalIndex,
+						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
 				mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 			}
 			else
 			{
 							OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
-				mIntLogicalToPhysical->map.insert(
-					GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
-						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+				mIntLogicalToPhysical->map.emplace(def.logicalIndex,
+						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
 				mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 			}
 
@@ -1027,7 +1025,7 @@ namespace Ogre {
 					def.logicalIndex = logicalIndex;
 					if( mParametersMap.find(paramName) == mParametersMap.end())
 					{
-						mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+						mParametersMap.emplace(paramName, def);
 						mParametersMapSizeAsBuffer += sizeof(size_t);
 						mParametersMapSizeAsBuffer += paramName.size();
 						mParametersMapSizeAsBuffer += sizeof(GpuConstantDefinition);
@@ -1037,17 +1035,15 @@ namespace Ogre {
 					if (def.isFloat())
 					{
 											OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
-						mFloatLogicalToPhysical->map.insert(
-							GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
-								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+						mFloatLogicalToPhysical->map.emplace(def.logicalIndex,
+								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
 						mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 					}
 					else
 					{
 											OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
-						mIntLogicalToPhysical->map.insert(
-							GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
-								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+						mIntLogicalToPhysical->map.emplace(def.logicalIndex,
+								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
 						mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 					}
 

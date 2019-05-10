@@ -1209,9 +1209,8 @@ namespace Ogre {
             {
                 def.physicalIndex = currentBuffer->bufferSize;
                 OGRE_LOCK_MUTEX(currentBuffer->mutex);
-                currentBuffer->map.insert(
-                    GpuLogicalIndexUseMap::value_type(paramIndex,
-                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+                currentBuffer->map.emplace(
+                    paramIndex, GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
                 currentBuffer->bufferSize += def.arraySize * def.elementSize;
                 *currentBufferSize = currentBuffer->bufferSize;
             }
@@ -1222,7 +1221,7 @@ namespace Ogre {
                             "D3D11HLSLProgram::getConstantBuffer");
             }
 
-            mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(def.Name, def));
+            mConstantDefs->map.emplace(def.Name, def);
 
             // Now deal with arrays
             mConstantDefs->generateConstantDefinitionArrayEntries(def.Name, def);

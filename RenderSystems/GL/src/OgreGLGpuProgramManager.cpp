@@ -50,7 +50,7 @@ GLGpuProgramManager::~GLGpuProgramManager()
 
 bool GLGpuProgramManager::registerProgramFactory(const String& syntaxCode, CreateGpuProgramCallback createFn)
 {
-    return mProgramMap.insert(ProgramMap::value_type(syntaxCode, createFn)).second;
+    return mProgramMap.emplace(syntaxCode, createFn).second;
 }
 
 bool GLGpuProgramManager::unregisterProgramFactory(const String& syntaxCode)

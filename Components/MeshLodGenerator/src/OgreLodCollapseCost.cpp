@@ -71,7 +71,7 @@ namespace Ogre
         computeVertexCollapseCost(data, vertex, collapseCost, collapseTo);
 
         vertex->collapseTo = collapseTo;
-        vertex->costHeapPosition = data->mCollapseCostHeap.insert(LodData::CollapseCostHeap::value_type(collapseCost, vertex));
+        vertex->costHeapPosition = data->mCollapseCostHeap.emplace(collapseCost, vertex);
     }
 
     void LodCollapseCost::updateVertexCollapseCost( LodData* data, LodData::Vertex* vertex )
@@ -85,7 +85,7 @@ namespace Ogre
             data->mCollapseCostHeap.erase(vertex->costHeapPosition);
             if (collapseCost != LodData::UNINITIALIZED_COLLAPSE_COST) {
                 vertex->collapseTo = collapseTo;
-                vertex->costHeapPosition = data->mCollapseCostHeap.insert(LodData::CollapseCostHeap::value_type(collapseCost, vertex));
+                vertex->costHeapPosition = data->mCollapseCostHeap.emplace(collapseCost, vertex);
             } else {
 #if OGRE_DEBUG_MODE
                 vertex->collapseTo = NULL;

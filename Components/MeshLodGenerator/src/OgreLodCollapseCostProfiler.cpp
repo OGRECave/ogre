@@ -88,7 +88,7 @@ namespace Ogre
             e.dst = *dst;
             e.cost = it->cost;
             OgreAssert(e.cost >= 0 && e.cost != LodData::UNINITIALIZED_COLLAPSE_COST, "Invalid collapse cost");
-            mProfileLookup.insert(ProfileLookup::value_type(*src, e));
+            mProfileLookup.emplace(*src, e);
         }
     }
 

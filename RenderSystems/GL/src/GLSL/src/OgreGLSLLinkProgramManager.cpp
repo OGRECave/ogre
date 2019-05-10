@@ -56,34 +56,34 @@ namespace Ogre {
         mActiveGeometryGpuProgram(NULL), mActiveFragmentGpuProgram(NULL), mActiveLinkProgram(NULL)
     {
         // Fill in the relationship between type names and enums
-        mTypeEnumMap.insert(StringToEnumMap::value_type("float", GL_FLOAT));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("vec2", GL_FLOAT_VEC2));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("vec3", GL_FLOAT_VEC3));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("vec4", GL_FLOAT_VEC4));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("sampler1D", GL_SAMPLER_1D));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2D", GL_SAMPLER_2D));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("sampler3D", GL_SAMPLER_3D));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DArray", GL_SAMPLER_2D_ARRAY_EXT));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("samplerCube", GL_SAMPLER_CUBE));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("sampler1DShadow", GL_SAMPLER_1D_SHADOW));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DShadow", GL_SAMPLER_2D_SHADOW));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("int", GL_INT));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("ivec2", GL_INT_VEC2));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("ivec3", GL_INT_VEC3));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("ivec4", GL_INT_VEC4));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat2", GL_FLOAT_MAT2));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat3", GL_FLOAT_MAT3));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat4", GL_FLOAT_MAT4));
+        mTypeEnumMap.emplace("float", GL_FLOAT);
+        mTypeEnumMap.emplace("vec2", GL_FLOAT_VEC2);
+        mTypeEnumMap.emplace("vec3", GL_FLOAT_VEC3);
+        mTypeEnumMap.emplace("vec4", GL_FLOAT_VEC4);
+        mTypeEnumMap.emplace("sampler1D", GL_SAMPLER_1D);
+        mTypeEnumMap.emplace("sampler2D", GL_SAMPLER_2D);
+        mTypeEnumMap.emplace("sampler3D", GL_SAMPLER_3D);
+        mTypeEnumMap.emplace("sampler2DArray", GL_SAMPLER_2D_ARRAY_EXT);
+        mTypeEnumMap.emplace("samplerCube", GL_SAMPLER_CUBE);
+        mTypeEnumMap.emplace("sampler1DShadow", GL_SAMPLER_1D_SHADOW);
+        mTypeEnumMap.emplace("sampler2DShadow", GL_SAMPLER_2D_SHADOW);
+        mTypeEnumMap.emplace("int", GL_INT);
+        mTypeEnumMap.emplace("ivec2", GL_INT_VEC2);
+        mTypeEnumMap.emplace("ivec3", GL_INT_VEC3);
+        mTypeEnumMap.emplace("ivec4", GL_INT_VEC4);
+        mTypeEnumMap.emplace("mat2", GL_FLOAT_MAT2);
+        mTypeEnumMap.emplace("mat3", GL_FLOAT_MAT3);
+        mTypeEnumMap.emplace("mat4", GL_FLOAT_MAT4);
         // GL 2.1
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat2x2", GL_FLOAT_MAT2));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat3x3", GL_FLOAT_MAT3));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat4x4", GL_FLOAT_MAT4));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat2x3", GL_FLOAT_MAT2x3));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat3x2", GL_FLOAT_MAT3x2));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat3x4", GL_FLOAT_MAT3x4));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat4x3", GL_FLOAT_MAT4x3));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat2x4", GL_FLOAT_MAT2x4));
-        mTypeEnumMap.insert(StringToEnumMap::value_type("mat4x2", GL_FLOAT_MAT4x2));
+        mTypeEnumMap.emplace("mat2x2", GL_FLOAT_MAT2);
+        mTypeEnumMap.emplace("mat3x3", GL_FLOAT_MAT3);
+        mTypeEnumMap.emplace("mat4x4", GL_FLOAT_MAT4);
+        mTypeEnumMap.emplace("mat2x3", GL_FLOAT_MAT2x3);
+        mTypeEnumMap.emplace("mat3x2", GL_FLOAT_MAT3x2);
+        mTypeEnumMap.emplace("mat3x4", GL_FLOAT_MAT3x4);
+        mTypeEnumMap.emplace("mat4x3", GL_FLOAT_MAT4x3);
+        mTypeEnumMap.emplace("mat2x4", GL_FLOAT_MAT2x4);
+        mTypeEnumMap.emplace("mat4x2", GL_FLOAT_MAT4x2);
 
     }
 

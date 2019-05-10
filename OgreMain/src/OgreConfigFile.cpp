@@ -124,7 +124,7 @@ namespace Ogre {
                             StringUtil::trim(optVal);
                             StringUtil::trim(optName);
                         }
-                        currentSettings->insert(SettingsMultiMap::value_type(optName, optVal));
+                        currentSettings->emplace(optName, optVal);
                     }
                 }
             }

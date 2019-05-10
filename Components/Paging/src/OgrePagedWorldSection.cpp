@@ -205,8 +205,7 @@ namespace Ogre
         {
             Page* page = OGRE_NEW Page(pageID, this);
             // try to insert
-            std::pair<PageMap::iterator, bool> ret = mPages.insert(
-                PageMap::value_type(page->getID(), page));
+            std::pair<PageMap::iterator, bool> ret = mPages.emplace(page->getID(), page);
 
             if (!ret.second)
             {

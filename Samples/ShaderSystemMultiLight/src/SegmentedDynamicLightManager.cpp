@@ -151,8 +151,7 @@ void SegmentedDynamicLightManager::regenerateActiveLightList(const LightList& i_
             (pLight->getAttenuationRange() > 0))
         {
                 
-            MapLightData::iterator it = mActiveLights.insert(
-                MapLightData::value_type(pLight,LightData())).first;
+            MapLightData::iterator it = mActiveLights.emplace(pLight,LightData()).first;
             LightData& lightData = it->second;
                 
             calculateLightBounds(pLight, lightData);

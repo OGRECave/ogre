@@ -537,8 +537,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Mesh::addBoneAssignment(const VertexBoneAssignment& vertBoneAssign)
     {
-        mBoneAssignments.insert(
-            VertexBoneAssignmentList::value_type(vertBoneAssign.vertexIndex, vertBoneAssign));
+        mBoneAssignments.emplace(vertBoneAssign.vertexIndex, vertBoneAssign);
         mBoneAssignmentsOutOfDate = true;
     }
     //-----------------------------------------------------------------------
@@ -655,8 +654,7 @@ namespace Ogre {
                 for (i = range.first; i != range.second; ++i)
                 {
                     // insert value weight->iterator
-                    weightToAssignmentMap.insert(
-                        WeightIteratorMap::value_type(i->second.weight, i));
+                    weightToAssignmentMap.emplace(i->second.weight, i);
                 }
                 // Reverse iterate over weight map, remove lowest n
                 unsigned short numToRemove = currBones - OGRE_MAX_BLEND_WEIGHTS;

@@ -250,11 +250,11 @@ namespace Ogre
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, def.variability));
                 if (def.isFloat())
                 {
-                    mFloatLogicalToPhysical->map.insert(val);
+                    mFloatLogicalToPhysical->map.emplace(val);
                 }
                 else
                 {
-                    mIntLogicalToPhysical->map.insert(val);
+                    mIntLogicalToPhysical->map.emplace(val);
                 }
             }
         }

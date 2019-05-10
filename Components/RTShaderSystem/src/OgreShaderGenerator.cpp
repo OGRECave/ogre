@@ -572,7 +572,7 @@ ShaderGenerator::SchemeCreateOrRetrieveResult ShaderGenerator::createOrRetrieveS
     if (itScheme == mSchemeEntriesMap.end())
     {
         schemeEntry = OGRE_NEW SGScheme(schemeName);
-        mSchemeEntriesMap.insert(SGSchemeMap::value_type(schemeName, schemeEntry));
+        mSchemeEntriesMap.emplace(schemeName, schemeEntry);
         wasCreated = true;
     }
     else
@@ -844,8 +844,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const Technique* srcTechnique, 
     if (itMatEntry == mMaterialEntriesMap.end())
     {
         matEntry = OGRE_NEW SGMaterial(materialName, trueGroupName);
-        mMaterialEntriesMap.insert(SGMaterialMap::value_type(
-            MatGroupPair(materialName, trueGroupName), matEntry));
+        mMaterialEntriesMap.emplace(MatGroupPair(materialName, trueGroupName), matEntry);
     }
     else
     {

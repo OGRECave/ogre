@@ -360,9 +360,8 @@ namespace Ogre {
         else
         {
             // Not found, create new edge
-            mEdgeMap.insert(EdgeMap::value_type(
-                std::pair<size_t, size_t>(sharedVertIndex0, sharedVertIndex1),
-                std::pair<size_t, size_t>(vertexSet, mEdgeData->edgeGroups[vertexSet].edges.size())));
+            mEdgeMap.emplace(std::pair<size_t, size_t>(sharedVertIndex0, sharedVertIndex1),
+                             std::pair<size_t, size_t>(vertexSet, mEdgeData->edgeGroups[vertexSet].edges.size()));
             EdgeData::Edge e;
             e.degenerate = true; // initialise as degenerate
 
@@ -383,8 +382,7 @@ namespace Ogre {
         // Because the algorithm doesn't care about manifold or not, we just identifying
         // the common vertex by EXACT same position.
         // Hint: We can use quantize method for welding almost same position vertex fastest.
-        std::pair<CommonVertexMap::iterator, bool> inserted =
-            mCommonVertexMap.insert(CommonVertexMap::value_type(vec, mVertices.size()));
+        std::pair<CommonVertexMap::iterator, bool> inserted = mCommonVertexMap.emplace(vec, mVertices.size());
         if (!inserted.second)
         {
             // Already existing, return old one

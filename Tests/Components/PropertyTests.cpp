@@ -51,9 +51,8 @@ TEST(Property, StringProp) {
     Foo foo;
     PropertySet props;
 
-    PropertyDefMap::iterator defi = propertyDefs.insert(PropertyDefMap::value_type("name", 
-            PropertyDef("name", 
-            "The name of the object.", PROP_STRING))).first;
+    PropertyDefMap::iterator defi =
+        propertyDefs.emplace("name", PropertyDef("name", "The name of the object.", PROP_STRING)).first;
 
     props.addProperty(
         OGRE_NEW Property<String>(&(defi->second),

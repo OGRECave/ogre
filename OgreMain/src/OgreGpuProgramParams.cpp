@@ -210,7 +210,7 @@ namespace Ogre
         for (size_t i = 0; i < maxArrayIndex; i++)
         {
             arrayName = paramName + "[" + StringConverter::toString(i) + "]";
-            map.insert(GpuConstantDefinitionMap::value_type(arrayName, arrayDef));
+            map.emplace(arrayName, arrayDef);
             // increment location
             arrayDef.physicalIndex += arrayDef.elementSize;
         }
@@ -1466,10 +1466,9 @@ namespace Ogre
                 for (size_t logicalNum = 0; logicalNum < count; ++logicalNum)
                 {
                     GpuLogicalIndexUseMap::iterator it =
-                            logicalToPhysical->map.insert(
-                            GpuLogicalIndexUseMap::value_type(
+                            logicalToPhysical->map.emplace(
                                 logicalIndex + logicalNum,
-                                GpuLogicalIndexUse(currPhys, requestedSize, variability))).first;
+                                GpuLogicalIndexUse(currPhys, requestedSize, variability)).first;
                     currPhys += 4;
 
                     if (logicalNum == 0)

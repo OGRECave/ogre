@@ -352,7 +352,7 @@ Camera * OctreeSceneManager::createCamera( const String &name )
     }
 
     Camera * c = OGRE_NEW OctreeCamera( name, this );
-    mCameras.insert( CameraList::value_type( name, c ) );
+    mCameras.emplace(name, c);
 
     // create visible bounds aab map entry
     mCamVisibleObjectsMap[c] = VisibleObjectsBoundsInfo();

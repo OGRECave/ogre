@@ -73,9 +73,9 @@ THE SOFTWARE.
     PropertyDefMap::iterator defi = propertyDefs.find("name");
     if (defi == propertyDefs.end())
     {
-        defi = propertyDefs.insert(PropertyDefMap::value_type("name", 
+        defi = propertyDefs.emplace("name",
             PropertyDef("name", 
-                "The name of the object.", PROP_STRING))).first;
+                "The name of the object.", PROP_STRING)).first;
     }
     // This has established the property definition, and its description.
     // Now, we need to 'wire' a property instance for this object instance

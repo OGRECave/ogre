@@ -322,7 +322,7 @@ namespace Ogre {
         OverlayElement* newElem = createOverlayElementFromFactory(typeName, instanceName);
 
         // Register
-        elementMap.insert(ElementMap::value_type(instanceName, newElem));
+        elementMap.emplace(instanceName, newElem);
 
         return newElem;
 
