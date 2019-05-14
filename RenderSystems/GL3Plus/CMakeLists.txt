@@ -18,8 +18,6 @@ file(GLOB GLSL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/src/*.cpp")
 
 add_definitions(${OGRE_VISIBILITY_FLAGS})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include)
-
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGL3PlusStateCacheManager.cpp
     PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)
@@ -28,7 +26,9 @@ add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_HEADERS
 target_link_libraries(RenderSystem_GL3Plus OgreMain OgreGLSupport ${OPENGL_gl_LIBRARY} ${CMAKE_DL_LIBS})
 target_include_directories(RenderSystem_GL3Plus PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GL3Plus>)
+    $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GL3Plus>
+    PRIVATE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include>")
 
 if (APPLE)
     set_target_properties(RenderSystem_GL3Plus PROPERTIES
