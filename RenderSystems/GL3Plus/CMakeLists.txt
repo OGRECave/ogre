@@ -44,4 +44,4 @@ ogre_config_plugin(RenderSystem_GL3Plus)
 
 install(FILES ${HEADER_FILES} ${GLSUPPORT_HEADERS} DESTINATION include/OGRE/RenderSystems/GL3Plus)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GL DESTINATION include/OGRE/RenderSystems/GL3Plus)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/ DESTINATION include/OGRE/RenderSystems/GL3Plus)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL DESTINATION include/OGRE/RenderSystems/GL3Plus)
