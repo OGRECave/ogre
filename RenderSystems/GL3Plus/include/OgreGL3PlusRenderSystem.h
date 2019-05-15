@@ -32,7 +32,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusPrerequisites.h"
 
 #include "OgreMaterialManager.h"
-#include "OgreGLSLShader.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreGL3PlusStateCacheManager.h"
