@@ -183,7 +183,7 @@ namespace Ogre  {
 
     GLenum GL3PlusPixelUtil::getGLOriginFormat(PixelFormat pf)
     {
-        OgreAssertDbg(sizeof(_pixelFormats)/sizeof(GLPixelFormatDescription) == PF_COUNT, "Did you add a new format?");
+        static_assert(sizeof(_pixelFormats)/sizeof(GLPixelFormatDescription) == PF_COUNT, "Did you add a new format?");
         return _pixelFormats[pf].format;
     }
 
