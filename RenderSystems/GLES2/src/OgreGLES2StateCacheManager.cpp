@@ -243,7 +243,7 @@ namespace Ogre {
         // Get a local copy of the parameter map and search for this parameter
         TexParameterfMap &myMap = (*it).second.mTexParameterfMap;
         auto ret = myMap.emplace(pname, param);
-        TexParameteriMap::iterator i = ret.first;
+        TexParameterfMap::iterator i = ret.first;
 
         // Update the cached value if needed
         if((*i).second != param || ret.second)
