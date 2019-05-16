@@ -351,7 +351,8 @@ namespace Ogre {
                             features |= PlatformInformation::CPU_FEATURE_INVARIANT_TSC;
                     }
                 }
-                else if (memcmp(&result._ebx, "AuthenticAMD", 12) == 0)
+                else if (memcmp(&result._ebx, "AuthenticAMD", 12) == 0 ||
+                         memcmp(&result._ebx, "HygonGenuine", 12) == 0)
                 {
                     features |= PlatformInformation::CPU_FEATURE_PRO;
 

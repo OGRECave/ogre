@@ -1045,7 +1045,8 @@ namespace Ogre {
         // slight performance loss than general version.
         //
 #if __OGRE_HAVE_NEON == 0
-        if (PlatformInformation::getCpuIdentifier().find("AuthenticAMD") != String::npos)
+        if (PlatformInformation::getCpuIdentifier().find("AuthenticAMD") != String::npos ||
+            PlatformInformation::getCpuIdentifier().find("HygonGenuine") != String::npos)
         {
             // How can I check it's an Athlon XP but not Althon 64?
             // Ok, just test whether supports SSE2/SSE3 or not, if not,
