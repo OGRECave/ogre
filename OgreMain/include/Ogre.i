@@ -24,6 +24,7 @@
 %include std_map.i
 #ifdef SWIGPYTHON
 %include std_multimap.i
+%include std_list.i
 #endif
 %include std_vector.i
 %include exception.i
@@ -362,6 +363,10 @@ SHARED_PTR(StringInterface);
             SHARED_PTR(HighLevelGpuProgram);
             %include "OgreHighLevelGpuProgram.h"
 %include "OgreScriptCompiler.h"
+%ignore Ogre::TextureUnitState::setCubicTexture;
+%ignore Ogre::TextureUnitState::setCubicTextureName;
+%ignore Ogre::TextureUnitState::isCubic;
+%ignore Ogre::TextureUnitState::is3D;
 %include "OgreTextureUnitState.h"
 %template(ControllerReal) Ogre::Controller<Ogre::Real>;
 %template(ControllerValueRealPtr) Ogre::SharedPtr<Ogre::ControllerValue<Ogre::Real> >;
@@ -382,6 +387,9 @@ SHARED_PTR(Compositor);
 %include "OgreCompositionTargetPass.h"
 %include "OgreResourceBackgroundQueue.h"
 SHARED_PTR(HardwareVertexBuffer);
+#ifdef SWIGPYTHON
+%template(VertexElementList) std::list<Ogre::VertexElement>;
+#endif
 %include "OgreHardwareVertexBuffer.h"
 SHARED_PTR(HardwareIndexBuffer);
 %include "OgreHardwareIndexBuffer.h"
