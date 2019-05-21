@@ -464,13 +464,13 @@ namespace Ogre {
     };
 
     /** Interface describing a manual resource loader.
-    @remarks
+
         Resources are usually loaded from files; however in some cases you
         want to be able to set the data up manually instead. This provides
         some problems, such as how to reload a Resource if it becomes
         unloaded for some reason, either because of memory constraints, or
         because a device fails and some or all of the data is lost.
-    @par
+
         This interface should be implemented by all classes which wish to
         provide manual data to a resource. They provide a pointer to themselves
         when defining the resource (via the appropriate ResourceManager), 
@@ -490,17 +490,18 @@ namespace Ogre {
         ManualResourceLoader() {}
         virtual ~ManualResourceLoader() {}
 
-        /** Called when a resource wishes to load.  Note that this could get
+        /** Called when a resource wishes to prepare instead of Resource::prepareImpl
+         * @note this could get
          * called in a background thread even in just a semithreaded ogre
-         * (OGRE_THREAD_SUPPORT==2).  Thus, you must not access the rendersystem from
-         * this callback.  Do that stuff in loadResource.
-        @param resource The resource which wishes to load
+         * (OGRE_THREAD_SUPPORT==2).  Thus, you must not access the RenderSystem from
+         * this callback.  Do that stuff in #loadResource.
+        @param resource The resource which wishes to prepare
         */
         virtual void prepareResource(Resource* resource)
                 { (void)resource; }
 
-        /** Called when a resource wishes to prepare.
-        @param resource The resource which wishes to prepare
+        /** Called when a resource wishes to load instead of Resource::loadImpl
+        @param resource The resource which wishes to load
         */
         virtual void loadResource(Resource* resource) = 0;
     };
