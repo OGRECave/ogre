@@ -159,6 +159,11 @@ namespace Ogre
         return i->second;
     }
     //---------------------------------------------------------------------
+    void Font::_setMaterial(const MaterialPtr &mat)
+    {
+        mMaterial = mat;
+    }
+    //---------------------------------------------------------------------
     void Font::loadImpl()
     {
         // Create a new material

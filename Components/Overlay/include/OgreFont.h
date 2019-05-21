@@ -411,6 +411,13 @@ namespace Ogre
             when the Texture that this font creates needs to (re)load.
         */
         void loadResource(Resource* resource);
+
+        /** Manually set the material used for this font.
+        @remarks
+            This should only be used when the font is being loaded from a
+            ManualResourceLoader.
+        */
+        void _setMaterial(const MaterialPtr& mat);
     };
 
     typedef SharedPtr<Font> FontPtr;
