@@ -6,7 +6,6 @@
 	android:installLocation="auto">
 
     @ANDROID_ADDITIONAL_PERMISSION@
-    <uses-sdk android:minSdkVersion="@ANDROID_NATIVE_API_LEVEL@" />
 
     <application android:label="@ANDROID_MOD_NAME@" android:icon="@drawable/ic_launcher" android:hasCode="@HAS_CODE@">
         @ANDROID_ACTIVITIES@
