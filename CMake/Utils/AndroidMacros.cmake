@@ -24,23 +24,23 @@ macro(add_ndk_native_app_glue_library)
 endmacro(add_ndk_native_app_glue_library)
 
 macro(copy_assets_to_android_proj)
-    configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
-    configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/assets/samples.cfg" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/app/src/main/assets/resources.cfg" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/app/src/main/assets/samples.cfg" @ONLY)
     
-    file(COPY "${PROJECT_SOURCE_DIR}/Media/" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${PROJECT_SOURCE_DIR}/Media/" DESTINATION "${NDKOUT}/app/src/main/assets")
 
-    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/models" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/particle" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/thumbnails" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/packs" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/materials" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/PBR" DESTINATION "${NDKOUT}/assets")
-    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/DeferredShadingMedia" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/models" DESTINATION "${NDKOUT}/app/src/main/assets")
+    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/particle" DESTINATION "${NDKOUT}/app/src/main/assets")
+    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/thumbnails" DESTINATION "${NDKOUT}/app/src/main/assets")
+    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/packs" DESTINATION "${NDKOUT}/app/src/main/assets")
+    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/materials" DESTINATION "${NDKOUT}/app/src/main/assets")
+    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/PBR" DESTINATION "${NDKOUT}/app/src/main/assets")
+    file(COPY "${PROJECT_SOURCE_DIR}/Samples/Media/DeferredShadingMedia" DESTINATION "${NDKOUT}/app/src/main/assets")
 
-    file(COPY "${PROJECT_SOURCE_DIR}/SDK/Android/drawable-hdpi" DESTINATION "${NDKOUT}/res")
-    file(COPY "${PROJECT_SOURCE_DIR}/SDK/Android/drawable-ldpi" DESTINATION "${NDKOUT}/res")
-    file(COPY "${PROJECT_SOURCE_DIR}/SDK/Android/drawable-mdpi" DESTINATION "${NDKOUT}/res")
-    file(COPY "${PROJECT_SOURCE_DIR}/SDK/Android/drawable-xhdpi" DESTINATION "${NDKOUT}/res")
+    file(COPY "${PROJECT_SOURCE_DIR}/SDK/Android/drawable-hdpi" DESTINATION "${NDKOUT}/app/src/main/res")
+    file(COPY "${PROJECT_SOURCE_DIR}/SDK/Android/drawable-ldpi" DESTINATION "${NDKOUT}/app/src/main/res")
+    file(COPY "${PROJECT_SOURCE_DIR}/SDK/Android/drawable-mdpi" DESTINATION "${NDKOUT}/app/src/main/res")
+    file(COPY "${PROJECT_SOURCE_DIR}/SDK/Android/drawable-xhdpi" DESTINATION "${NDKOUT}/app/src/main/res")
 endmacro()
 
 macro(create_android_proj ANDROID_PROJECT_TARGET)
@@ -56,31 +56,11 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     #    - EXTRA_ACTIVITIES    Name of additional java activities
     ##################################################################
 
-    if(APPLE OR WIN32)
-        SET(ANDROID_EXECUTABLE "android")
-    else()
-        if(EXISTS $ENV{ANDROID_SDK})
-            SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
-        else()
-            SET(ANDROID_EXECUTABLE "/opt/android-sdk/tools/android")
-        endif()
-    endif()
-
-    SET(ANT_EXECUTABLE "ant")
-
-    if(${ANDROID_NATIVE_API_LEVEL} LESS 14)
-        MATH(EXPR ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}+1")
-    else()
-        SET(ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}")
-        SET(SCREEN_SIZE "|screenSize")
-    endif()
-
+    SET(ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}")
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
 
-    file(MAKE_DIRECTORY "${NDKOUT}")
-    file(MAKE_DIRECTORY "${NDKOUT}/assets")
-    file(MAKE_DIRECTORY "${NDKOUT}/res")
-    file(MAKE_DIRECTORY "${NDKOUT}/src")
+    file(MAKE_DIRECTORY "${NDKOUT}/app/src/main/assets")
+    file(MAKE_DIRECTORY "${NDKOUT}/app/src/main/res")
 
     foreach(ACTIVITY_NAME ${MAIN_ACTIVITY} ${EXTRA_ACTIVITIES})
         string(FIND ${ACTIVITY_NAME} "." DOT REVERSE)
@@ -89,7 +69,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
         set(ANDROID_ACTIVITIES "${ANDROID_ACTIVITIES}
         <activity android:name=\"${ACTIVITY_NAME}\"
         android:label=\"${LABEL}\"
-        android:configChanges=\"orientation${SCREEN_SIZE}|keyboardHidden\"
+        android:configChanges=\"orientation|screenSize|keyboardHidden\"
         android:theme=\"@android:style/Theme.Black.NoTitleBar.Fullscreen\">
             <meta-data android:name=\"android.app.lib_name\" android:value=\"${ANDROID_MOD_NAME}\" />
             <intent-filter>
@@ -98,24 +78,8 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
             </intent-filter>
         </activity>")
     endforeach()
-    configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
-    file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
-    
-    if(EXISTS ${ANDROID_EXECUTABLE})
-        add_custom_command(
-            TARGET ${ANDROID_PROJECT_TARGET}
-            POST_BUILD
-            COMMAND ${ANDROID_EXECUTABLE} update project  --target 1 --path "${NDKOUT}"
-            WORKING_DIRECTORY ${NDKOUT}
-        )
-
-        add_custom_command(
-            TARGET ${ANDROID_PROJECT_TARGET}
-            POST_BUILD
-            COMMAND ${ANT_EXECUTABLE} debug
-            WORKING_DIRECTORY ${NDKOUT}
-        )
-    else()
-        message(WARNING "Android executable not found. Not building ${ANDROID_PROJECT_TARGET} APK. Do you have the Android SDK installed?")
-    endif()
+    configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/app/src/main/AndroidManifest.xml" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/app.gradle.in" "${NDKOUT}/app/build.gradle" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/project.gradle" "${NDKOUT}/build.gradle" @ONLY)
+    file(WRITE "${NDKOUT}/settings.gradle" "include ':app'")
 endmacro(create_android_proj)

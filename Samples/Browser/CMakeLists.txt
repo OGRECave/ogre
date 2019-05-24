@@ -311,9 +311,8 @@ if (ANDROID)
 
     copy_assets_to_android_proj()
 
-    file(MAKE_DIRECTORY "${NDKOUT}/libs")
-    file(MAKE_DIRECTORY "${NDKOUT}/libs/${ANDROID_NDK_ABI_NAME}")
-    set_target_properties(SampleBrowser PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${NDKOUT}/libs/${ANDROID_NDK_ABI_NAME}")
+    file(MAKE_DIRECTORY "${NDKOUT}/app/src/main/jniLibs/${ANDROID_NDK_ABI_NAME}")
+    set_target_properties(SampleBrowser PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${NDKOUT}/app/src/main/jniLibs/${ANDROID_NDK_ABI_NAME}")
     set_target_properties(SampleBrowser PROPERTIES OUTPUT_NAME "OgreSampleBrowser")
 
     create_android_proj(SampleBrowser)
