@@ -74,3 +74,14 @@ os:
     - linux
     - osx
 cache: apt
+before_deploy:
+    - if [ $ANDROID ]; then cd build/OgreJNI && zip -qr ogre-sdk-android-arm64-v8a.zip * ; fi
+deploy:
+  - provider: bintray
+    key:
+      secure: "kTzm4IUxRX3gBMCS/8hV1PKNqsb6tJHGjroteXQZL2kH8WPFQqjse08ecj/aLbCDTVYTyOfIj+af+CuJTwVOfxdIrZdwUj+ARmJMWrqCV8MYDSuzLEtIqZfInxqMBG3WKJIjj+NDkLQzYcgptOdyuZKQ/fNvZvLAvy6xFQqEfXIiYOl/RPZQw0nHP94ltZ/XrsX81hLk+EB+GFrxkHqvd7jRYjwl0Rd4PPbsriOf2BtZbUZhQqQ4dG8F/ETVFh4PyemFp2OFEKzHfN2cFDJOeQgYhxLU6BRAwQilC+35kzWuEEPfsErfKk2Cda1/by73VS7no1A9AiHQdteE4udzBpGJ+LSxlXLpF20wDC074/VrM7xGPY74BKwLBi53PZZxgTmuvoZvrDCbKZ0S5pclhR+uUidjMndkevvQG7Va+i5qIViVIkFOc5BWP0zErt/oKqQOGC6xlEjhBRNA2ZORTiwXv+ndAPltdq1a56c9vqfwXN7gTm/TXl/XAUu23tSJj3fHITZ0akyayjvpVv3B20mDaZQXOy6OXkUBcy69sUfv09/tDdbuI8XoGQJLsax/uWiYdZP03/5UwsT6SISCNfjsahGY9A+R/ORQ9RpgUcnbnQdIQ5Qc8WONKriBR2N2/DeYDXdDfynWUgN9fuk5NOzEolk3ZHkzTDGq9kjqM94="
+    user: paroj
+    skip_cleanup: true
+    file: $TRAVIS_BUILD_DIR/Other/bintray.json
+    on:
+      condition: $ANDROID
