@@ -31,8 +31,8 @@ if(ANDROID AND OGRE_BUILD_COMPONENT_JAVA)
     SET(SAMPLE_LDLIBS "")
     
     # Copy and create resource files
-    file(COPY "${JNI_PATH}/BasicSample.java" DESTINATION "${NDKOUT}/app/src/main/org/ogre/example")
-    file(COPY "${JNI_PATH}/AndroidTextureOES.java" DESTINATION "${NDKOUT}/app/src/main/org/ogre/example")
+    file(COPY "${JNI_PATH}/BasicSample.java" DESTINATION "${NDKOUT}/app/src/main/java/org/ogre/example")
+    file(COPY "${JNI_PATH}/AndroidTextureOES.java" DESTINATION "${NDKOUT}/app/src/main/java/org/ogre/example")
     
     copy_assets_to_android_proj()
         
