@@ -1041,7 +1041,7 @@ namespace Ogre {
             Custom scene managers are encouraged to override this method to add optimisations, 
             and to add their own custom shadow casters (perhaps for world geometry)
         */
-        const ShadowCasterList& findShadowCastersForLight(const Light* light,
+        virtual const ShadowCasterList& findShadowCastersForLight(const Light* light,
             const Camera* camera);
         /** Render a group in the ordinary way */
         void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
@@ -1168,11 +1168,11 @@ namespace Ogre {
         /** Retrieves a pointer to the named camera.
         @note Throws an exception if the named instance does not exist
         */
-        Camera* getCamera(const String& name) const;
+        virtual Camera* getCamera(const String& name) const;
 
         /** Returns whether a camera with the given name exists.
         */
-        bool hasCamera(const String& name) const;
+        virtual bool hasCamera(const String& name) const;
 
         /** Removes a camera from the scene.
             @remarks
@@ -1286,7 +1286,7 @@ namespace Ogre {
             which is populated when rendering the scene. So by default the list of lights 
             is only available during scene rendering.
         */
-        const LightList& _getLightsAffectingFrustum(void) const;
+        virtual const LightList& _getLightsAffectingFrustum(void) const;
 
         /** Populate a light list with an ordered set of the lights which are closest
         to the position specified.
@@ -1310,7 +1310,8 @@ namespace Ogre {
             this method before population.
         @param lightMask The mask with which to include / exclude lights
         */
-        void _populateLightList(const Vector3& position, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
+        virtual void _populateLightList(const Vector3& position, Real radius,
+            LightList& destList, uint32 lightMask = 0xFFFFFFFF);
 
         /** Populates a light list with an ordered set of the lights which are closest
         to the position of the SceneNode given.
@@ -1496,79 +1497,79 @@ namespace Ogre {
         @param
             name The name to be given to the object (must be unique).
         */
-        ManualObject* createManualObject(const String& name);
+        virtual ManualObject* createManualObject(const String& name);
         /** Create a ManualObject, an object which you populate with geometry
         manually through a GL immediate-mode style interface, generating the name.
         */
-        ManualObject* createManualObject();
+        virtual ManualObject* createManualObject();
         /** Retrieves a pointer to the named ManualObject. 
         @note Throws an exception if the named instance does not exist
         */
-        ManualObject* getManualObject(const String& name) const;
+        virtual ManualObject* getManualObject(const String& name) const;
         /** Returns whether a manual object with the given name exists.
         */
-        bool hasManualObject(const String& name) const;
+        virtual bool hasManualObject(const String& name) const;
 
         /** Removes & destroys a ManualObject from the SceneManager.
         */
-        void destroyManualObject(ManualObject* obj);
+        virtual void destroyManualObject(ManualObject* obj);
         /// @overload
-        void destroyManualObject(const String& name);
+        virtual void destroyManualObject(const String& name);
         /** Removes & destroys all ManualObjects from the SceneManager.
         */
-        void destroyAllManualObjects(void);
+        virtual void destroyAllManualObjects(void);
         /** Create a BillboardChain, an object which you can use to render
             a linked chain of billboards.
         @param
             name The name to be given to the object (must be unique).
         */
-        BillboardChain* createBillboardChain(const String& name);
+        virtual BillboardChain* createBillboardChain(const String& name);
         /** Create a BillboardChain, an object which you can use to render
         a linked chain of billboards, with a generated name.
         */
-        BillboardChain* createBillboardChain();
+        virtual BillboardChain* createBillboardChain();
         /** Retrieves a pointer to the named BillboardChain. 
         @note Throws an exception if the named instance does not exist
         */
-        BillboardChain* getBillboardChain(const String& name) const;
+        virtual BillboardChain* getBillboardChain(const String& name) const;
         /** Returns whether a billboard chain with the given name exists.
         */
-        bool hasBillboardChain(const String& name) const;
+        virtual bool hasBillboardChain(const String& name) const;
 
         /** Removes & destroys a BillboardChain from the SceneManager.
         */
-        void destroyBillboardChain(BillboardChain* obj);
+        virtual void destroyBillboardChain(BillboardChain* obj);
         /// @overload
-        void destroyBillboardChain(const String& name);
+        virtual void destroyBillboardChain(const String& name);
         /** Removes & destroys all BillboardChains from the SceneManager.
         */
-        void destroyAllBillboardChains(void);
+        virtual void destroyAllBillboardChains(void);
         /** Create a RibbonTrail, an object which you can use to render
             a linked chain of billboards which follows one or more nodes.
         @param
             name The name to be given to the object (must be unique).
         */
-        RibbonTrail* createRibbonTrail(const String& name);
+        virtual RibbonTrail* createRibbonTrail(const String& name);
         /** Create a RibbonTrail, an object which you can use to render
         a linked chain of billboards which follows one or more nodes, generating the name.
         */
-        RibbonTrail* createRibbonTrail();
+        virtual RibbonTrail* createRibbonTrail();
         /** Retrieves a pointer to the named RibbonTrail. 
         @note Throws an exception if the named instance does not exist
         */
-        RibbonTrail* getRibbonTrail(const String& name) const;
+        virtual RibbonTrail* getRibbonTrail(const String& name) const;
         /** Returns whether a ribbon trail with the given name exists.
         */
-        bool hasRibbonTrail(const String& name) const;
+        virtual bool hasRibbonTrail(const String& name) const;
 
         /** Removes & destroys a RibbonTrail from the SceneManager.
         */
-        void destroyRibbonTrail(RibbonTrail* obj);
+        virtual void destroyRibbonTrail(RibbonTrail* obj);
         /// @overload
-        void destroyRibbonTrail(const String& name);
+        virtual void destroyRibbonTrail(const String& name);
         /** Removes & destroys all RibbonTrails from the SceneManager.
         */
-        void destroyAllRibbonTrails(void);
+        virtual void destroyAllRibbonTrails(void);
 
         /** Creates a particle system based on a template.
         @remarks
@@ -1590,7 +1591,7 @@ namespace Ogre {
         @param 
             templateName The name of the template to base the new instance on.
         */
-        ParticleSystem* createParticleSystem(const String& name,
+        virtual ParticleSystem* createParticleSystem(const String& name,
             const String& templateName);
         /** Create a blank particle system.
         @remarks
@@ -1611,7 +1612,7 @@ namespace Ogre {
         @param
             resourceGroup The resource group which will be used to load dependent resources
         */
-        ParticleSystem* createParticleSystem(const String& name,
+        virtual ParticleSystem* createParticleSystem(const String& name,
             size_t quota = 500, 
             const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
@@ -1632,25 +1633,25 @@ namespace Ogre {
         @param
             resourceGroup The resource group which will be used to load dependent resources
         */
-        ParticleSystem* createParticleSystem(size_t quota = 500,
+        virtual ParticleSystem* createParticleSystem(size_t quota = 500,
             const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         /** Retrieves a pointer to the named ParticleSystem. 
         @note Throws an exception if the named instance does not exist
         */
-        ParticleSystem* getParticleSystem(const String& name) const;
+        virtual ParticleSystem* getParticleSystem(const String& name) const;
         /** Returns whether a particle system with the given name exists.
         */
-        bool hasParticleSystem(const String& name) const;
+        virtual bool hasParticleSystem(const String& name) const;
 
         /** Removes & destroys a ParticleSystem from the SceneManager.
         */
-        void destroyParticleSystem(ParticleSystem* obj);
+        virtual void destroyParticleSystem(ParticleSystem* obj);
         /** Removes & destroys a ParticleSystem from the SceneManager.
         */
-        void destroyParticleSystem(const String& name);
+        virtual void destroyParticleSystem(const String& name);
         /** Removes & destroys all ParticleSystems from the SceneManager.
         */
-        void destroyAllParticleSystems(void);
+        virtual void destroyAllParticleSystems(void);
 
         /** Empties the entire scene, inluding all SceneNodes, Entities, Lights, 
             BillboardSets etc. Cameras are not deleted at this stage since
@@ -2222,21 +2223,21 @@ namespace Ogre {
             @see
                 BillboardSet
         */
-        BillboardSet* createBillboardSet(unsigned int poolSize = 20);
+        virtual BillboardSet* createBillboardSet(unsigned int poolSize = 20);
 
         /** @overload
             @param
                 name The name to give to this billboard set. Must be unique.
         */
-        BillboardSet* createBillboardSet(const String& name, unsigned int poolSize = 20);
+        virtual BillboardSet* createBillboardSet(const String& name, unsigned int poolSize = 20);
 
         /** Retrieves a pointer to the named BillboardSet.
         @note Throws an exception if the named instance does not exist
         */
-        BillboardSet* getBillboardSet(const String& name) const;
+        virtual BillboardSet* getBillboardSet(const String& name) const;
         /** Returns whether a billboardset with the given name exists.
         */
-        bool hasBillboardSet(const String& name) const;
+        virtual bool hasBillboardSet(const String& name) const;
 
         /** Removes & destroys an BillboardSet from the SceneManager.
             @warning
@@ -2244,10 +2245,10 @@ namespace Ogre {
                 to a SceneNode. It may be safer to wait to clear the whole
                 scene. If you are unsure, use clearScene.
         */
-        void destroyBillboardSet(BillboardSet* set);
+        virtual void destroyBillboardSet(BillboardSet* set);
 
         /// @overload
-        void destroyBillboardSet(const String& name);
+        virtual void destroyBillboardSet(const String& name);
 
         /** Removes & destroys all BillboardSets.
         @warning
@@ -2258,7 +2259,7 @@ namespace Ogre {
         @see
         SceneManager::clearScene
         */
-        void destroyAllBillboardSets(void);
+        virtual void destroyAllBillboardSets(void);
 
         /** Tells the SceneManager whether it should render the SceneNodes which 
             make up the scene as well as the objects in the scene.
@@ -3201,39 +3202,39 @@ namespace Ogre {
         @param params Optional name/value pair list to give extra parameters to
             the created object.
         */
-        MovableObject* createMovableObject(const String& name,
+        virtual MovableObject* createMovableObject(const String& name,
             const String& typeName, const NameValuePairList* params = 0);
         /// @overload
-        MovableObject* createMovableObject(const String& typeName, const NameValuePairList* params = 0);
+        virtual MovableObject* createMovableObject(const String& typeName, const NameValuePairList* params = 0);
         /** Destroys a MovableObject with the name specified, of the type specified.
         @remarks
             The MovableObject will automatically detach itself from any nodes
             on destruction.
         */
-        void destroyMovableObject(const String& name, const String& typeName);
+        virtual void destroyMovableObject(const String& name, const String& typeName);
         /** Destroys a MovableObject.
         @remarks
             The MovableObject will automatically detach itself from any nodes
             on destruction.
         */
-        void destroyMovableObject(MovableObject* m);
+        virtual void destroyMovableObject(MovableObject* m);
         /** Destroy all MovableObjects of a given type. */
-        void destroyAllMovableObjectsByType(const String& typeName);
+        virtual void destroyAllMovableObjectsByType(const String& typeName);
         /** Destroy all MovableObjects. */
-        void destroyAllMovableObjects(void);
+        virtual void destroyAllMovableObjects(void);
         /** Get a reference to a previously created MovableObject. 
         @note Throws an exception if the named instance does not exist
         */
-        MovableObject* getMovableObject(const String& name, const String& typeName) const;
+        virtual MovableObject* getMovableObject(const String& name, const String& typeName) const;
         /** Returns whether a movable object instance with the given name exists. */
-        bool hasMovableObject(const String& name, const String& typeName) const;
+        virtual bool hasMovableObject(const String& name, const String& typeName) const;
         typedef MapIterator<MovableObjectMap> MovableObjectIterator;
         /** Get an iterator over all MovableObect instances of a given type. 
         @note
             The iterator returned from this method is not thread safe, do not use this
             if you are creating or deleting objects of this type in another thread.
         */
-        MovableObjectIterator getMovableObjectIterator(const String& typeName);
+        virtual MovableObjectIterator getMovableObjectIterator(const String& typeName);
         /** Inject a MovableObject instance created externally.
         @remarks
             This method 'injects' a MovableObject instance created externally into
@@ -3245,23 +3246,23 @@ namespace Ogre {
             It is important that the MovableObject has a unique name for the type,
             and that its getMovableType() method returns a proper type name.
         */
-        void injectMovableObject(MovableObject* m);
+        virtual void injectMovableObject(MovableObject* m);
         /** Extract a previously injected MovableObject.
         @remarks
             Essentially this does the same as destroyMovableObject, but only
             removes the instance from the internal lists, it does not attempt
             to destroy it.
         */
-        void extractMovableObject(const String& name, const String& typeName);
+        virtual void extractMovableObject(const String& name, const String& typeName);
         /// @overload
-        void extractMovableObject(MovableObject* m);
+        virtual void extractMovableObject(MovableObject* m);
         /** Extract all injected MovableObjects of a given type.
         @remarks
             Essentially this does the same as destroyAllMovableObjectsByType, 
             but only removes the instances from the internal lists, it does not 
             attempt to destroy them.
         */
-        void extractAllMovableObjectsByType(const String& typeName);
+        virtual void extractAllMovableObjectsByType(const String& typeName);
 
         /** Sets a mask which is bitwise 'and'ed with objects own visibility masks
             to determine if the object is visible.
