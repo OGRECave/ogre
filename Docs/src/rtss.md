@@ -1,16 +1,121 @@
 # RTSS: Run Time Shader System {#rtss}
 
+The Run Time Shader System or RTSS for short is the %Ogre way of managing Shaders and their variations. Initially it was created as a drop-in-replacement to the Fixed-Function Pipeline (FFP) for RenderSystems that lacked it (e.g D3D11, GLES2).
+However, since then it grew to a general way to express shader functionality in @ref Material-Scripts without having to manually write shaders.
+
+For fixed function function properties, the RTSS will read the standard `pass` and `texture_unit` definitions, so no changes are required. To enable features that go beyond the possibilities of the FFP, you have to define an additional `rtshader_system` block with the respective properties.
+
+For instance, the FFP only allows per-vertex lighting. To request per-pixel lighting, you would add the following block to a pass:
+
+@snippet Media/RTShaderLib/materials/RTShaderSystem.material rtss_per_pixel
+
+To modify the default lighting stage [see below](@ref rtss_custom_api). For more examples see `Media/RTShaderLib/materials/RTShaderSystem.material`.
+
 @tableofcontents
 
-# Core features of the system {#core-feats}
-* Runtime shader generation synchronized with scene state. Each time scene settings change, a new set of shaders is generated.
-* Full Fixed Function Pipeline (FFP) emulation. This feature is most useful combined with render system that doesn't provide any FFP functionality (OpenGL ES 2.0, D3D11 etc).
-* Shader language independent interface: the logic representation of the shader programs is completely independent from the target shader language. You can generate code for different shader languages from the same program.
-* Pluggable interface for different shader languages.
-* Pluggable interface for shader based functions in a seamless way. Each function will be automatically combined with the rest of the shader code.
-* Smart program caching: each shader program is created only once and may be used by multiple passes.
-* Automatic vertex shader output register compacting: no more compacting variables by hand. In case the amount of used vertex shader outputs exceeds the maximum allowed (12 to 32, depending on [D3DPSHADERCAPS2_0.NumTemps](http://msdn.microsoft.com/en-us/library/bb172918%28v=VS.85%29.aspx)), a compacting algorithm packs the vertex shader outputs and adds unpack code in the fragment shader side.
-* Material script support, for both export and import.
+# RTSS properties in Material Scripts {#rtss_custom_mat}
+
+Here are the attributes you can use in a `rtshader_system` block of a .material script:
+
+- [lighting_stage](#lighting_stage)
+- [fog_stage](#fog_stage)
+- [light_count](#light_count)
+- [triplanarTexturing](#triplanarTexturing)
+- [integrated_pssm4](#integrated_pssm4)
+- [layered_blend](#layered_blend)
+- [source_modifier](#source_modifier)
+
+<a name="lighting_stage"></a>
+
+## lighting_stage
+
+Force a specific lighting model.
+
+@par
+Format1: `lighting_stage <ffp|per_pixel> [normalised]`
+@par
+Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [samplerName]`
+@par
+Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
+
+@param normalised @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
+
+@see Ogre::RTShader::NormalMapLighting::NormalMapSpace
+@see @ref Samplers
+
+<a name="fog_stage"></a>
+
+## fog_stage
+
+Force a specific fog calculation
+
+@par
+Format: `fog_stage ffp <per_vertex|per_pixel>`
+@par
+Example: `fog_stage ffp per_pixel`
+
+<a name="light_count"></a>
+
+## light_count
+
+Override dynamic light count. Allows to customize which lights the RTSS will consider.
+@par
+Format: `light_count <pointLights> <directionalLights> <spotLights>`
+
+<a name="triplanarTexturing"></a>
+
+## triplanarTexturing
+
+Force [triplanar texturing](https://www.volume-gfx.com/volume-rendering/triplanar-texturing/)
+@par
+Format: `triplanarTexturing <textureScale> <plateauSize> <transitionSpeed> <textureFromX> <textureFromY> <textureFromZ>`
+@par
+Example: `triplanarTexturing 0.05 0.2 4.0 BumpyMetal.jpg egyptrockyfull.jpg MtlPlat2.jpg`
+
+@param textureScale texture coordinates are multiplied by this.
+@param plateauSize plateau on which small components of the normal have no influence. 
+@param transitionSpeed transitions speed between the three textures
+Valid values are [0; 0.57] not bigger to avoid division by zero
+@param textureFromX Texture for the x-direction planar mapping
+@param textureFromY Texture for the y-direction planar mapping
+@param textureFromZ Texture for the z-direction planar mapping
+
+<a name="integrated_pssm4"></a>
+
+## integrated_pssm4
+Integrated PSSM shadow receiver with 2 splits. Custom split points.
+@par
+Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar>`
+
+<a name="layered_blend"></a>
+
+## layered_blend
+
+Apply photoshop-like blend effects to texture layers
+@par
+Format: `layered_blend <effect>`
+@par
+Example: layered_blend luminosity
+
+@note only applicable inside a texture_unit section
+
+@param effect one of `default, normal, lighten, darken, multiply, average, add, subtract, difference, negation, exclusion, screen, overlay, hard_light, soft_light, color_dodge, color_burn, linear_dodge, linear_burn, linear_light, vivid_light, pin_light, hard_mix, reflect, glow, phoenix, saturation, color, luminosity`
+
+
+<a name="source_modifier"></a>
+
+## source_modifier
+
+Apply custom modulate effect to texture layer
+@par
+Format: `source_modifier <operation> custom <parameterNum>`
+@par
+Example: `source_modifier src1_inverse_modulate custom 2`
+
+@note only applicable inside a texture_unit section
+
+@param operation one of `src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate`
+@param parameterNum number of the custom shader parameter that controls the operation
 
 # System overview {#rtss_overview}
 
@@ -63,123 +168,15 @@ Now that you know what the RTSS does, you are probably wondering how to change w
 
 The RTSS is flexible enough to "just" move the according calculations from the vertex shader to the pixel shader.
 
-## Customizing the RTSS using Material Scripts {#rtss_custom_mat}
-
-You can explicitly enable per-pixel lighting for one material only, by adding a `rtshader_system` section to the pass as following
-
-@snippet Media/RTShaderLib/materials/RTShaderSystem.material rtss_per_pixel
-
-To globally enable per-pixel lighting [see below](@ref rtss_custom_api). For more examples see `Media/RTShaderLib/materials/RTShaderSystem.material`.
-
-Here are the attributes you can use in a `rtshader_system` section of a .material script:
-
-- [lighting_stage](#lighting_stage)
-- [fog_stage](#fog_stage)
-- [light_count](#light_count)
-- [triplanarTexturing](#triplanarTexturing)
-- [integrated_pssm4](#integrated_pssm4)
-- [layered_blend](#layered_blend)
-- [source_modifier](#source_modifier)
-
-<a name="lighting_stage"></a>
-
-### lighting_stage
-
-Force a specific lighting model.
-
-@par
-Format1: `lighting_stage <ffp|per_pixel> [normalised]`
-@par
-Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [samplerName]`
-@par
-Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
-
-@param normalised @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
-
-@see Ogre::RTShader::NormalMapLighting::NormalMapSpace
-@see @ref Samplers
-
-<a name="fog_stage"></a>
-
-### fog_stage
-
-Force a specific fog calculation
-
-@par
-Format: `fog_stage ffp <per_vertex|per_pixel>`
-@par
-Example: `fog_stage ffp per_pixel`
-
-<a name="light_count"></a>
-
-### light_count
-
-Override dynamic light count. Allows to customize which lights the RTSS will consider.
-@par
-Format: `light_count <pointLights> <directionalLights> <spotLights>`
-
-<a name="triplanarTexturing"></a>
-
-### triplanarTexturing
-
-Force [triplanar texturing](https://www.volume-gfx.com/volume-rendering/triplanar-texturing/)
-@par
-Format: `triplanarTexturing <textureScale> <plateauSize> <transitionSpeed> <textureFromX> <textureFromY> <textureFromZ>`
-@par
-Example: `triplanarTexturing 0.05 0.2 4.0 BumpyMetal.jpg egyptrockyfull.jpg MtlPlat2.jpg`
-
-@param textureScale texture coordinates are multiplied by this.
-@param plateauSize plateau on which small components of the normal have no influence. 
-@param transitionSpeed transitions speed between the three textures
-Valid values are [0; 0.57] not bigger to avoid division by zero
-@param textureFromX Texture for the x-direction planar mapping
-@param textureFromY Texture for the y-direction planar mapping
-@param textureFromZ Texture for the z-direction planar mapping
-
-<a name="integrated_pssm4"></a>
-
-### integrated_pssm4
-Integrated PSSM shadow receiver with 2 splits. Custom split points.
-@par
-Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar>`
-
-<a name="layered_blend"></a>
-
-### layered_blend
-
-Apply photoshop-like blend effects to texture layers
-@par
-Format: `layered_blend <effect>`
-@par
-Example: layered_blend luminosity
-
-@note only applicable inside a texture_unit section
-
-@param effect one of `default, normal, lighten, darken, multiply, average, add, subtract, difference, negation, exclusion, screen, overlay, hard_light, soft_light, color_dodge, color_burn, linear_dodge, linear_burn, linear_light, vivid_light, pin_light, hard_mix, reflect, glow, phoenix, saturation, color, luminosity`
-
-
-<a name="source_modifier"></a>
-
-### source_modifier
-
-Apply custom modulate effect to texture layer
-@par
-Format: `source_modifier <operation> custom <parameterNum>`
-@par
-Example: `source_modifier src1_inverse_modulate custom 2`
-
-@note only applicable inside a texture_unit section
-
-@param operation one of `src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate`
-@param parameterNum number of the custom shader parameter that controls the operation
-
-## Customising the RTSS using the API {#rtss_custom_api}
-
-Alternatively you can globally enforce per-pixel lighting, as
-
-@snippet Components/Bites/src/OgreAdvancedRenderControls.cpp rtss_per_pixel
-
-any non FFP SRS will automatically override the default SRS for the same stage. Ogre::RTShader::FFP_LIGHTING in this case.
+## Core features of the system {#core-feats}
+* Runtime shader generation synchronized with scene state. Each time scene settings change, a new set of shaders is generated.
+* Full Fixed Function Pipeline (FFP) emulation. This feature is most useful combined with render system that doesn't provide any FFP functionality (OpenGL ES 2.0, D3D11 etc).
+* Shader language independent interface: the logic representation of the shader programs is completely independent from the target shader language. You can generate code for different shader languages from the same program.
+* Pluggable interface for different shader languages.
+* Pluggable interface for shader based functions in a seamless way. Each function will be automatically combined with the rest of the shader code.
+* Smart program caching: each shader program is created only once and may be used by multiple passes.
+* Automatic vertex shader output register compacting: no more compacting variables by hand. In case the amount of used vertex shader outputs exceeds the maximum allowed (12 to 32, depending on [D3DPSHADERCAPS2_0.NumTemps](http://msdn.microsoft.com/en-us/library/bb172918%28v=VS.85%29.aspx)), a compacting algorithm packs the vertex shader outputs and adds unpack code in the fragment shader side.
+* Material script support, for both export and import.
 
 # The RTSS in Depth {#rtss_indepth}
 
@@ -257,6 +254,17 @@ if (Ogre::RTShader::ShaderGenerator::initialize())
 	return true;
 }
 ```
+
+## Customizing the default RenderState {#rtss_custom_api}
+
+Lets say, you wanted to globally change the default per-pixel lighting mode of the RTSS back to the FFP style per-vertex lighting.
+For this you have to grab the global RenderState associated with the active material scheme,  as
+
+@snippet Components/Bites/src/OgreAdvancedRenderControls.cpp rtss_per_pixel
+
+Next, you have to create the FFPLighting SRS that should be used for shader generation and *add* to the set.
+
+@note adding a SRS will automatically override the default SRS for the same stage. In the example we override the Ogre::RTShader::FFP_LIGHTING stage.
 
 ## Creating shader based technique {#rtssTech}
 This step will associate the given technique with a destination shader generated based technique. Calling the `Ogre::RTShader::ShaderGenerator::createShaderBasedTechnique()` will cause the system to generate internal data structures associated with the source technique and will add new technique to the source material. This new technique will have the scheme name that was passed as an argument to this method and all its passes will contain shaders that the system will generate and update during the application runtime.
