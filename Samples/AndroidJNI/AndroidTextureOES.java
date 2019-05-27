@@ -1,6 +1,12 @@
 package org.ogre.example;
 
 import android.content.pm.ActivityInfo;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+
 import android.graphics.SurfaceTexture;
 import android.app.Activity;
 import android.os.Bundle;
@@ -149,6 +155,12 @@ public class AndroidTextureOES extends Activity {
                 if (!sceneCreated) {
                     ogre.initAppForAndroid(getAssets(), lastSurface);
                     initializeScene();
+
+                    if (ContextCompat.checkSelfPermission(AndroidTextureOES.this, Manifest.permission.CAMERA)
+                            == PackageManager.PERMISSION_DENIED)
+                    {
+                        ActivityCompat.requestPermissions(AndroidTextureOES.this, new String[] {Manifest.permission.CAMERA}, 100);
+                    }
 
                     final android.hardware.Camera camera = android.hardware.Camera.open();
                     try {
