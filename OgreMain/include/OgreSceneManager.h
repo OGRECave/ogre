@@ -940,11 +940,15 @@ namespace Ogre {
         };
 
 
-        /** Internal method for locating a list of lights which could be affecting the frustum. 
+        /** Internal method for locating a list of lights which could be affecting the frustum.
         @remarks
             Custom scene managers are encouraged to override this method to make use of their
             scene partitioning scheme to more efficiently locate lights, and to eliminate lights
-            which may be occluded by word geometry.
+            which may be occluded by world geometry.
+            If the list of lights is different to the list returned by
+            SceneManager::_getLightsAffectingFrustum before this method was called, then this
+            method should update that cached list and call SceneManager::_notifyLightsDirty to
+            mark that the internal light cache has changed.
         */
         virtual void findLightsAffectingFrustum(const Camera* camera);
         /// Internal method for setting up materials for shadows
@@ -1035,11 +1039,8 @@ namespace Ogre {
 
         std::unique_ptr<ShadowCasterSceneQueryListener> mShadowCasterQueryListener;
 
-        /** Internal method for locating a list of shadow casters which 
-            could be affecting the frustum for a given light. 
-        @remarks
-            Custom scene managers are encouraged to override this method to add optimisations, 
-            and to add their own custom shadow casters (perhaps for world geometry)
+        /** Internal method for locating a list of shadow casters which
+            could be affecting the frustum for a given light.
         */
         const ShadowCasterList& findShadowCastersForLight(const Light* light,
             const Camera* camera);
@@ -1254,37 +1255,28 @@ namespace Ogre {
         */
         virtual void destroyAllLights(void);
 
-        /** Advance method to increase the lights dirty counter due lights changed.
+        /** Advanced method to increase the lights dirty counter due to lights having changed.
         @remarks
-            Scene manager tracking lights that affecting the frustum, if changes
-            detected (the changes includes light list itself and the light's position
-            and attenuation range), then increase the lights dirty counter.
+            The SceneManager tracks the list of lights affecting the current frustum, and if
+            changes are detected (including changes to the light list itself or to a light's
+            position or attenuation range) then it increases the lights dirty counter.
         @par
-            For some reason, you can call this method to force whole scene objects
-            re-populate their light list. But near in mind, call to this method
-            will harm performance, so should avoid if possible.
+            You could call this method to force all the objects in the scene to re-populate
+            their light list, but doing so may harm performance so should be avoided if possible.
         */
         void _notifyLightsDirty(void);
 
-        /** Advance method to gets the lights dirty counter.
+        /** Advanced method to gets the lights dirty counter.
         @remarks
-            Scene manager tracking lights that affecting the frustum, if changes
-            detected (the changes includes light list itself and the light's position
-            and attenuation range), then increase the lights dirty counter.
-        @par
-            When implementing customise lights finding algorithm relied on either
-            SceneManager::_getLightsAffectingFrustum or SceneManager::_populateLightList,
-            might check this value for sure that the light list are really need to
-            re-populate, otherwise, returns cached light list (if exists) for better
-            performance.
+            The SceneManager tracks the list of lights affecting the current frustum, and if
+            changes are detected (including changes to the light list itself or to a light's
+            position or attenuation range) then it increases the lights dirty counter.
         */
         ulong _getLightsDirtyCounter(void) const { return mLightsDirtyCounter; }
 
         /** Get the list of lights which could be affecting the frustum.
         @remarks
-            Note that default implementation of this method returns a cached light list,
-            which is populated when rendering the scene. So by default the list of lights 
-            is only available during scene rendering.
+            This returns a cached light list which is populated when rendering the scene.
         */
         const LightList& _getLightsAffectingFrustum(void) const;
 
@@ -1292,21 +1284,16 @@ namespace Ogre {
         to the position specified.
         @remarks
             Note that since directional lights have no position, they are always considered
-            closer than any point lights and as such will always take precedence. 
+            closer than any point lights and as such will always take precedence.
+            The returned lights are those in the cached list of lights (i.e. those
+            returned by SceneManager::_getLightsAffectingFrustum) sorted by distance.
         @par
-            Subclasses of the default SceneManager may wish to take into account other issues
-            such as possible visibility of the light if that information is included in their
-            data structures. This basic scenemanager simply orders by distance, eliminating 
-            those lights which are out of range or could not be affecting the frustum (i.e.
-            only the lights returned by SceneManager::_getLightsAffectingFrustum are take into
-            account).
-        @par
-            The number of items in the list max exceed the maximum number of lights supported
+            The number of items in the list may exceed the maximum number of lights supported
             by the renderer, but the extraneous ones will never be used. In fact the limit will
             be imposed by Pass::getMaxSimultaneousLights.
         @param position The position at which to evaluate the list of lights
         @param radius The bounding radius to test
-        @param destList List to be populated with ordered set of lights; will be cleared by 
+        @param destList List to be populated with ordered set of lights; will be cleared by
             this method before population.
         @param lightMask The mask with which to include / exclude lights
         */
@@ -1316,27 +1303,19 @@ namespace Ogre {
         to the position of the SceneNode given.
         @remarks
             Note that since directional lights have no position, they are always considered
-            closer than any point lights and as such will always take precedence. 
+            closer than any point lights and as such will always take precedence.
             This overloaded version will take the SceneNode's position and use the second method
             to populate the list.
         @par
-            Subclasses of the default SceneManager may wish to take into account other issues
-            such as possible visibility of the light if that information is included in their
-            data structures. This basic scenemanager simply orders by distance, eliminating 
-            those lights which are out of range or could not be affecting the frustum (i.e.
-            only the lights returned by SceneManager::_getLightsAffectingFrustum are take into
-            account). 
-        @par   
-            Also note that subclasses of the SceneNode might be used here to provide cached
-            scene related data, accelerating the list population (for example light lists for
-            SceneNodes could be cached inside subclassed SceneNode objects).
+            The returned lights are those in the cached list of lights (i.e. those
+            returned by SceneManager::_getLightsAffectingFrustum) sorted by distance.
         @par
             The number of items in the list may exceed the maximum number of lights supported
             by the renderer, but the extraneous ones will never be used. In fact the limit will
             be imposed by Pass::getMaxSimultaneousLights.
         @param sn The SceneNode for which to evaluate the list of lights
         @param radius The bounding radius to test
-        @param destList List to be populated with ordered set of lights; will be cleared by 
+        @param destList List to be populated with ordered set of lights; will be cleared by
             this method before population.
         @param lightMask The mask with which to include / exclude lights
         */
