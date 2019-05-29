@@ -115,7 +115,7 @@ namespace Ogre
 
             // set up scene
             mCompositeMapPlane = mCompositeMapSM->createManualObject();
-            mCompositeMapPlane->begin(mat->getName());
+            mCompositeMapPlane->begin(mat);
             mCompositeMapPlane->position(-halfCamDist, halfCamDist, 0);
             mCompositeMapPlane->textureCoord(0 - hOffset, 0 - vOffset);
             mCompositeMapPlane->position(-halfCamDist, -halfCamDist, 0);
@@ -131,7 +131,7 @@ namespace Ogre
         }
 
         // update
-        mCompositeMapPlane->setMaterialName(0, mat->getName());
+        mCompositeMapPlane->setMaterial(0, mat);
         TerrainGlobalOptions& globalopts = TerrainGlobalOptions::getSingleton();
         mLightNode->setDirection(globalopts.getLightMapDirection());
         mCompositeMapLight->setDiffuseColour(globalopts.getCompositeMapDiffuse());
@@ -148,9 +148,9 @@ namespace Ogre
         if (!mCompositeMapRTT)
         {
             mCompositeMapRTT = TextureManager::getSingleton().createManual(
-                mCompositeMapSM->getName() + "/compRTT", 
-                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, static_cast<uint>(size), static_cast<uint>(size), 0, PF_BYTE_RGBA,
-                TU_RENDERTARGET).get();
+                mCompositeMapSM->getName() + "/compRTT", mat->getGroup(),
+                TEX_TYPE_2D, static_cast<uint>(size), static_cast<uint>(size), 0,
+                PF_BYTE_RGBA, TU_RENDERTARGET).get();
             RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
             // don't render all the time, only on demand
             rtt->setAutoUpdated(false);
