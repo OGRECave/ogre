@@ -591,7 +591,7 @@ FORCE_INLINE __m128 _mm_movehl_ps(__m128 a, __m128 b)
 {
 	float32x2_t a32 = vget_high_f32(vreinterpretq_f32_m128(a));
 	float32x2_t b32 = vget_high_f32(vreinterpretq_f32_m128(b));
-	return vreinterpretq_m128_f32(vcombine_f32(a32, b32));
+	return vreinterpretq_m128_f32(vcombine_f32(b32, a32));
 }
 
 FORCE_INLINE __m128 _mm_shuffle_ps_1001(__m128 a, __m128 b)
@@ -725,7 +725,7 @@ FORCE_INLINE __m128 _mm_shuffle_ps_default(__m128 a, __m128 b, __constrange(0,25
 		case _MM_SHUFFLE(0, 0, 2, 2): ret = _mm_shuffle_ps_0022((a), (b)); break; \
 		case _MM_SHUFFLE(2, 2, 0, 0): ret = _mm_shuffle_ps_2200((a), (b)); break; \
 		case _MM_SHUFFLE(3, 2, 0, 2): ret = _mm_shuffle_ps_3202((a), (b)); break; \
-        case _MM_SHUFFLE(3, 2, 3, 2): ret = _mm_movehl_ps      ((a), (b)); break; \
+        case _MM_SHUFFLE(3, 2, 3, 2): ret = _mm_movehl_ps      ((b), (a)); break; \
 		case _MM_SHUFFLE(1, 1, 3, 3): ret = _mm_shuffle_ps_1133((a), (b)); break; \
 		case _MM_SHUFFLE(2, 0, 1, 0): ret = _mm_shuffle_ps_2010((a), (b)); break; \
 		case _MM_SHUFFLE(2, 0, 0, 1): ret = _mm_shuffle_ps_2001((a), (b)); break; \

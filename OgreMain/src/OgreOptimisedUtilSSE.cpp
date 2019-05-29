@@ -1060,7 +1060,6 @@ namespace Ogre {
 #endif
     }
     //---------------------------------------------------------------------
-    extern OptimisedUtil* _getOptimisedUtilGeneral();
     void OptimisedUtilSSE::softwareVertexSkinning(
         const float *pSrcPos, float *pDestPos,
         const float *pSrcNorm, float *pDestNorm,
@@ -1072,20 +1071,6 @@ namespace Ogre {
         size_t numWeightsPerVertex,
         size_t numVertices)
     {
-#if __OGRE_HAVE_NEON
-        // optimized impl results in corrupted vertices. see #1193
-        _getOptimisedUtilGeneral()->softwareVertexSkinning(
-                pSrcPos, pDestPos,
-                pSrcNorm, pDestNorm,
-                pBlendWeight, pBlendIndex,
-                blendMatrices,
-                srcPosStride, destPosStride,
-                srcNormStride, destNormStride,
-                blendWeightStride, blendIndexStride,
-                numWeightsPerVertex,
-                numVertices);
-        return;
-#endif
 
         __OGRE_CHECK_STACK_ALIGNED_FOR_SSE();
 
