@@ -152,7 +152,12 @@ namespace Ogre {
             @note
                 Must be set before calling any 'load' method.
         */
-        void setNumMipmaps(uint32 num) {mNumRequestedMipmaps = mNumMipmaps = num;}
+        void setNumMipmaps(uint32 num)
+        {
+            mNumRequestedMipmaps = mNumMipmaps = num;
+            if (!num)
+                mUsage &= ~TU_AUTOMIPMAP;
+        }
 
         /** Are mipmaps hardware generated?
         @remarks
