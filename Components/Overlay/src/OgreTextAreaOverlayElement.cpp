@@ -378,7 +378,8 @@ namespace Ogre {
         if (!mFont)
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find font " + font,
                 "TextAreaOverlayElement::setFontName" );
-        
+        mMaterial.reset();
+
         mGeomPositionsOutOfDate = true;
         mGeomUVsOutOfDate = true;
     }
