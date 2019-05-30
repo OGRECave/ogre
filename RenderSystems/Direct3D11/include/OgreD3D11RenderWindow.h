@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreD3D11DeviceResource.h"
 #include "OgreD3D11Mappings.h"
+#include "OgreD3D11RenderTarget.h"
 #include "OgreRenderWindow.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT 
@@ -47,7 +48,7 @@ THE SOFTWARE.
 namespace Ogre 
 {
     class _OgreD3D11Export D3D11RenderWindowBase
-        : public RenderWindow
+        : public RenderWindow, public D3D11RenderTarget
         , protected D3D11DeviceResource
     {
     public:
@@ -63,6 +64,10 @@ namespace Ogre
 
         bool isClosed() const                                   { return mClosed; }
         bool isHidden() const                                   { return mHidden; }
+
+        virtual uint getNumberOfViews() const;
+        virtual ID3D11Texture2D* getSurface(uint index = 0) const;
+        virtual ID3D11RenderTargetView* getRenderTargetView(uint index = 0) const;
 
         void getCustomAttribute( const String& name, void* pData );
         /** Overridden - see RenderTarget. */

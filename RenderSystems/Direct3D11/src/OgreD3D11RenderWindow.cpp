@@ -273,6 +273,19 @@ namespace Ogre
                 "D3D11RenderWindowBase::_queryDxgiDevice");
         }
     }
+
+    uint D3D11RenderWindowBase::getNumberOfViews() const { return 1; }
+
+    ID3D11Texture2D* D3D11RenderWindowBase::getSurface(uint index) const
+    {
+        return index == 0 ? mpBackBuffer.Get() : NULL;
+    }
+
+    ID3D11RenderTargetView* D3D11RenderWindowBase::getRenderTargetView(uint index) const
+    {
+        return index == 0 ? mRenderTargetView.Get() : NULL;
+    }
+
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::getCustomAttribute( const String& name, void* pData )
     {
