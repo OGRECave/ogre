@@ -107,6 +107,21 @@ namespace Ogre
 
         MultiRenderTarget::update();
     }
+
+    uint D3D11MultiRenderTarget::getNumberOfViews() const { return mNumberOfViews; }
+
+    ID3D11Texture2D* D3D11MultiRenderTarget::getSurface(uint index) const
+    {
+        D3D11RenderTarget* renderTarget = dynamic_cast<D3D11RenderTarget*>(mRenderTargets[index]);
+        return renderTarget ? renderTarget->getSurface() : NULL;
+    }
+
+    ID3D11RenderTargetView* D3D11MultiRenderTarget::getRenderTargetView(uint index) const
+    {
+        D3D11RenderTarget* renderTarget = dynamic_cast<D3D11RenderTarget*>(mRenderTargets[index]);
+        return renderTarget ? renderTarget->getRenderTargetView() : NULL;
+    }
+
     //---------------------------------------------------------------------
     void D3D11MultiRenderTarget::getCustomAttribute(const String& name, void *pData)
     {
