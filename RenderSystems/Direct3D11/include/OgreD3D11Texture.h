@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11DeviceResource.h"
+#include "OgreD3D11RenderTarget.h"
 #include "OgreTexture.h"
 #include "OgreRenderTexture.h"
 #include "OgreSharedPtr.h"
@@ -133,7 +134,7 @@ namespace Ogre {
 
     /// RenderTexture implementation for D3D11
     class _OgreD3D11Export D3D11RenderTexture
-        : public RenderTexture
+        : public RenderTexture, public D3D11RenderTarget
         , protected D3D11DeviceResource
     {
         D3D11Device & mDevice;
@@ -143,6 +144,10 @@ namespace Ogre {
         virtual ~D3D11RenderTexture();
 
         void rebind(D3D11HardwarePixelBuffer *buffer);
+
+        virtual uint getNumberOfViews() const;
+        virtual ID3D11Texture2D* getSurface(uint index = 0) const;
+        virtual ID3D11RenderTargetView* getRenderTargetView(uint index = 0) const;
 
         virtual void getCustomAttribute( const String& name, void *pData );
 

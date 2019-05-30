@@ -596,6 +596,20 @@ namespace Ogre
                 "D3D11RenderTexture::rebind" );
         }
     }
+
+    uint D3D11RenderTexture::getNumberOfViews() const { return 1; }
+
+    ID3D11Texture2D* D3D11RenderTexture::getSurface(uint index) const
+    {
+        return index == 0 ? static_cast<D3D11HardwarePixelBuffer*>(mBuffer)->getParentTexture()->GetTex2D()
+                          : NULL;
+    }
+
+    ID3D11RenderTargetView* D3D11RenderTexture::getRenderTargetView(uint index) const
+    {
+        return index == 0 ? mRenderTargetView.Get() : NULL;
+    }
+
     //---------------------------------------------------------------------
     void D3D11RenderTexture::getCustomAttribute( const String& name, void *pData )
     {
