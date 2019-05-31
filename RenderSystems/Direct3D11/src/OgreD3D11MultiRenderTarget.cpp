@@ -41,7 +41,6 @@ namespace Ogre
         /// Clear targets
         for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
         {
-            targets[x] = 0;
             mRenderTargetViews[x] = 0;
             mRenderTargets[x] = 0;
         }
@@ -76,7 +75,6 @@ namespace Ogre
             }
         }
 
-        targets[attachment] = buffer;
         mRenderTargets[attachment] = target;
 
         ID3D11RenderTargetView** v;
@@ -92,7 +90,6 @@ namespace Ogre
     void D3D11MultiRenderTarget::unbindSurfaceImpl(size_t attachment)
     {
         assert(attachment<OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-        targets[attachment] = 0;
         mRenderTargetViews[attachment] = 0;
 
         if(mNumberOfViews > 0)

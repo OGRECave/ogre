@@ -48,7 +48,6 @@ namespace Ogre {
 
         bool requiresTextureFlipping() const { return false; }
     private:
-        D3D11HardwarePixelBuffer *targets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         ID3D11RenderTargetView* mRenderTargetViews[OGRE_MAX_MULTIPLE_RENDER_TARGETS];   // Store views to accelerate bind
         uint mNumberOfViews;                                                            // Store number of views to accelerate bind
 
