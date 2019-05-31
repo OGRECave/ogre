@@ -149,8 +149,6 @@ namespace Ogre {
         virtual ID3D11Texture2D* getSurface(uint index = 0) const;
         virtual ID3D11RenderTargetView* getRenderTargetView(uint index = 0) const;
 
-        virtual void getCustomAttribute( const String& name, void *pData );
-
         bool requiresTextureFlipping() const { return false; }
 
     protected:
