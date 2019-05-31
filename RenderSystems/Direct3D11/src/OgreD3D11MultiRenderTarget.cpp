@@ -61,13 +61,13 @@ namespace Ogre
 
         /// Find first non-null target
         int y;
-        for(y=0; y<OGRE_MAX_MULTIPLE_RENDER_TARGETS && !targets[y]; ++y) ;
+        for(y=0; y<OGRE_MAX_MULTIPLE_RENDER_TARGETS && !mRenderTargets[y]; ++y) ;
 
         if(y!=OGRE_MAX_MULTIPLE_RENDER_TARGETS)
         {
             /// If there is another target bound, compare sizes
-            if(targets[y]->getWidth() != buffer->getWidth() ||
-                targets[y]->getHeight() != buffer->getHeight())
+            if(mRenderTargets[y]->getWidth() != target->getWidth() ||
+                mRenderTargets[y]->getHeight() != target->getHeight())
             {
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
                     "MultiRenderTarget surfaces are not of same size", 
@@ -152,10 +152,10 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11MultiRenderTarget::checkAndUpdate()
     {
-        if(targets[0])
+        if(mRenderTargets[0])
         {
-            mWidth = static_cast<unsigned int>(targets[0]->getWidth());
-            mHeight = static_cast<unsigned int>(targets[0]->getHeight());
+            mWidth = static_cast<unsigned int>(mRenderTargets[0]->getWidth());
+            mHeight = static_cast<unsigned int>(mRenderTargets[0]->getHeight());
         }
         else
         {
