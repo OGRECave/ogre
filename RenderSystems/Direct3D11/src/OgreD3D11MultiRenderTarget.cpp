@@ -122,34 +122,6 @@ namespace Ogre
         return renderTarget ? renderTarget->getRenderTargetView() : NULL;
     }
 
-    //---------------------------------------------------------------------
-    void D3D11MultiRenderTarget::getCustomAttribute(const String& name, void *pData)
-    {
-        if(name == "DDBACKBUFFER")
-        {
-            ID3D11Texture2D** pSurf = (ID3D11Texture2D**)pData;
-            for(unsigned i = 0; i < OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i)
-                pSurf[i] = targets[i] ? targets[i]->getParentTexture()->GetTex2D() : NULL;
-        }
-        else if(name == "ID3D11RenderTargetView")
-        {
-            ID3D11RenderTargetView** pRTView = (ID3D11RenderTargetView**)pData;
-            memset(pRTView, 0, OGRE_MAX_MULTIPLE_RENDER_TARGETS * sizeof(ID3D11RenderTargetView*));
-            for(unsigned i = 0; i < OGRE_MAX_MULTIPLE_RENDER_TARGETS && mRenderTargets[i]; ++i)
-                mRenderTargets[i]->getCustomAttribute("ID3D11RenderTargetView", &pRTView[i]);
-        }
-        else if( name == "numberOfViews" )
-        {
-            *(unsigned*)pData = mNumberOfViews;
-        }
-        else if(name == "isTexture")
-        {
-            *(bool*)pData = false;
-        }
-        else
-            MultiRenderTarget::getCustomAttribute(name, pData);
-    }
-    //---------------------------------------------------------------------
     void D3D11MultiRenderTarget::checkAndUpdate()
     {
         if(mRenderTargets[0])
