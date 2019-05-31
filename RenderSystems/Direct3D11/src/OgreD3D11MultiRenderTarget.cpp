@@ -53,10 +53,8 @@ namespace Ogre
     void D3D11MultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
     {
         assert(attachment<OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-        /// Get buffer and surface to bind to
-        D3D11HardwarePixelBuffer *buffer = 0;
-        target->getCustomAttribute("BUFFER", &buffer);
-        assert(buffer);
+
+        D3D11RenderTarget* d3d11RenderTarget = dynamic_cast<D3D11RenderTarget*>(target);
 
         /// Find first non-null target
         int y;
@@ -76,10 +74,8 @@ namespace Ogre
         }
 
         mRenderTargets[attachment] = target;
-
-        ID3D11RenderTargetView** v;
-        target->getCustomAttribute( "ID3D11RenderTargetView", &v );
-        mRenderTargetViews[attachment] = *v;
+        mRenderTargetViews[attachment] =
+            d3d11RenderTarget ? d3d11RenderTarget->getRenderTargetView() : NULL;
 
         if(mNumberOfViews < OGRE_MAX_MULTIPLE_RENDER_TARGETS)
             mNumberOfViews++;
