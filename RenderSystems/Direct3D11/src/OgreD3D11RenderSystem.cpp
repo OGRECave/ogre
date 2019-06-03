@@ -52,6 +52,7 @@ THE SOFTWARE.
 
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
+#include "OgreD3D11RenderTarget.h"
 #include "OgreException.h"
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
@@ -1198,11 +1199,22 @@ namespace Ogre
     //-----------------------------------------------------------------------
     DepthBuffer* D3D11RenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
     {
-        //Get surface data (mainly to get MSAA data)
-        D3D11HardwarePixelBuffer *pBuffer;
-        renderTarget->getCustomAttribute( "BUFFER", &pBuffer );
+        // Get surface data (mainly to get MSAA data)
+        D3D11RenderTarget* d3d11RenderTarget = dynamic_cast<D3D11RenderTarget*>(renderTarget);
+        ID3D11Texture2D* d3d11Texture = NULL;
+        if (d3d11RenderTarget)
+        {
+            d3d11Texture = d3d11RenderTarget->getSurface();
+        }
+
+        if (!d3d11Texture)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Invalid render target",
+                        "D3D11RenderSystem::_createDepthBufferFor");
+        }
+
         D3D11_TEXTURE2D_DESC BBDesc;
-        static_cast<ID3D11Texture2D*>(pBuffer->getParentTexture()->getTextureResource())->GetDesc( &BBDesc );
+        d3d11Texture->GetDesc(&BBDesc);
 
         // Create depth stencil texture
         ComPtr<ID3D11Texture2D> pDepthStencil;
@@ -1795,17 +1807,24 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setRenderTargetViews()
     {
-        RenderTarget *target = mActiveRenderTarget;
+        RenderTarget* target = mActiveRenderTarget;
+        D3D11RenderTarget* d3d11RenderTarget = dynamic_cast<D3D11RenderTarget*>(target);
 
-        if (target)
+        if (target && d3d11RenderTarget)
         {
-            ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+            ID3D11RenderTargetView* pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
             memset(pRTView, 0, sizeof(pRTView));
 
-            target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+            uint numberOfViews = d3d11RenderTarget->getNumberOfViews();
 
-            uint numberOfViews;
-            target->getCustomAttribute( "numberOfViews", &numberOfViews );
+            for (uint i = 0; i < OGRE_MAX_MULTIPLE_RENDER_TARGETS; i++)
+            {
+                pRTView[i] = d3d11RenderTarget->getRenderTargetView(i);
+                if (!pRTView[i])
+                {
+                    break;
+                }
+            }
 
             //Retrieve depth buffer
             D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
@@ -2626,19 +2645,26 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName, unsigned int StartSlot)
     {
-        RenderTarget *target = mActiveRenderTarget;
+        RenderTarget* target = mActiveRenderTarget;
+        D3D11RenderTarget* d3d11RenderTarget = dynamic_cast<D3D11RenderTarget*>(target);
         switch (passNr)
         {
         case 1:
-            if (target)
+            if (target && d3d11RenderTarget)
             {
-                ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+                ID3D11RenderTargetView* pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
                 memset(pRTView, 0, sizeof(pRTView));
 
-                target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+                uint numberOfViews = d3d11RenderTarget->getNumberOfViews();
 
-                uint numberOfViews;
-                target->getCustomAttribute( "numberOfViews", &numberOfViews );
+                for (uint i = 0; i < OGRE_MAX_MULTIPLE_RENDER_TARGETS; i++)
+                {
+                    pRTView[i] = d3d11RenderTarget->getRenderTargetView(i);
+                    if (!pRTView[i])
+                    {
+                        break;
+                    }
+                }
 
                 //Retrieve depth buffer
                 D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
@@ -2660,32 +2686,33 @@ namespace Ogre
                 mDevice.GetImmediateContext()->ClearDepthStencilView(depthBuffer->getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
                 float ClearColor[4];
-                //D3D11Mappings::get(colour, ClearColor);
+                // D3D11Mappings::get(colour, ClearColor);
                 // Clear all views
-                mActiveRenderTarget->getCustomAttribute( "numberOfViews", &numberOfViews );
-                if( numberOfViews == 1 )
-                    mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[0], ClearColor );
-                else
+                for (uint i = 0; i < numberOfViews; ++i)
                 {
-                    for( uint i = 0; i < numberOfViews; ++i )
-                        mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[i], ClearColor );
+                    mDevice.GetImmediateContext()->ClearRenderTargetView(pRTView[i], ClearColor);
                 }
-
             }
             break;
         case 2:
-            if (target)
+            if (target && d3d11RenderTarget)
             {
                 //
                 // We need to remove the the DST from the Render Targets if we want to use it as a texture :
                 //
-                ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+                ID3D11RenderTargetView* pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
                 memset(pRTView, 0, sizeof(pRTView));
 
-                target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+                uint numberOfViews = d3d11RenderTarget->getNumberOfViews();
 
-                uint numberOfViews;
-                target->getCustomAttribute( "numberOfViews", &numberOfViews );
+                for (uint i = 0; i < OGRE_MAX_MULTIPLE_RENDER_TARGETS; i++)
+                {
+                    pRTView[i] = d3d11RenderTarget->getRenderTargetView(i);
+                    if (!pRTView[i])
+                    {
+                        break;
+                    }
+                }
 
                 //Retrieve depth buffer
                 D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
@@ -3177,27 +3204,31 @@ namespace Ogre
     void D3D11RenderSystem::clearFrameBuffer(unsigned int buffers, 
         const ColourValue& colour, Real depth, unsigned short stencil)
     {
-        if (mActiveRenderTarget)
+        D3D11RenderTarget* d3d11RenderTarget = dynamic_cast<D3D11RenderTarget*>(mActiveRenderTarget);
+        if (mActiveRenderTarget && d3d11RenderTarget)
         {
-            ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+            ID3D11RenderTargetView* pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
             memset(pRTView, 0, sizeof(pRTView));
 
-            mActiveRenderTarget->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
-            
+            for (uint i = 0; i < OGRE_MAX_MULTIPLE_RENDER_TARGETS; i++)
+            {
+                pRTView[i] = d3d11RenderTarget->getRenderTargetView(i);
+                if (!pRTView[i])
+                {
+                    break;
+                }
+            }
+
             if (buffers & FBT_COLOUR)
             {
                 float ClearColor[4];
                 D3D11Mappings::get(colour, ClearColor);
 
                 // Clear all views
-                uint numberOfViews;
-                mActiveRenderTarget->getCustomAttribute( "numberOfViews", &numberOfViews );
-                if( numberOfViews == 1 )
-                    mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[0], ClearColor );
-                else
+                uint numberOfViews = d3d11RenderTarget->getNumberOfViews();
+                for (uint i = 0; i < numberOfViews; ++i)
                 {
-                    for( uint i = 0; i < numberOfViews; ++i )
-                        mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[i], ClearColor );
+                    mDevice.GetImmediateContext()->ClearRenderTargetView(pRTView[i], ClearColor);
                 }
 
             }
