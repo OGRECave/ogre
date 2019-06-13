@@ -561,7 +561,7 @@ namespace Ogre {
         case FILTER_BILINEAR:
             switch (src.format) 
             {
-            case PF_L8: case PF_A8: case PF_BYTE_LA:
+            case PF_L8: case PF_R8: case PF_A8: case PF_BYTE_LA:
             case PF_R8G8B8: case PF_B8G8R8:
             case PF_R8G8B8A8: case PF_B8G8R8A8:
             case PF_A8B8G8R8: case PF_A8R8G8B8:
