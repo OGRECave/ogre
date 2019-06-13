@@ -192,6 +192,13 @@ TEST_F(PixelFormatTests,BulkConversion)
     testCase(PF_R8G8B8A8,PF_A8B8G8R8);
     testCase(PF_R8G8B8A8,PF_B8G8R8A8);
 
+    testCase(PF_A8B8G8R8, PF_R8);
+    testCase(PF_R8, PF_A8B8G8R8);
+    testCase(PF_A8R8G8B8, PF_R8);
+    testCase(PF_R8, PF_A8R8G8B8);
+    testCase(PF_B8G8R8A8, PF_R8);
+    testCase(PF_R8, PF_B8G8R8A8);
+
     testCase(PF_A8B8G8R8, PF_L8);
     testCase(PF_L8, PF_A8B8G8R8);
     testCase(PF_A8R8G8B8, PF_L8);

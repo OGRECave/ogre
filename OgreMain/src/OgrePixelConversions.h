@@ -201,6 +201,54 @@ struct R8G8B8A8toB8G8R8A8: public PixelConverter <Ogre::uint32, Ogre::uint32, FM
     }
 };
 
+struct A8B8G8R8toR8: public PixelConverter <Ogre::uint32, Ogre::uint8, FMTCONVERTERID(Ogre::PF_A8B8G8R8, Ogre::PF_R8)>
+{
+    inline static DstType pixelConvert(SrcType inp)
+    {
+        return (Ogre::uint8)(inp&0x000000FF);
+    }
+};
+
+struct R8toA8B8G8R8: public PixelConverter <Ogre::uint8, Ogre::uint32, FMTCONVERTERID(Ogre::PF_R8, Ogre::PF_A8B8G8R8)>
+{
+    inline static DstType pixelConvert(SrcType inp)
+    {
+        return 0xFF000000|((unsigned int)inp);
+    }
+};
+
+struct A8R8G8B8toR8: public PixelConverter <Ogre::uint32, Ogre::uint8, FMTCONVERTERID(Ogre::PF_A8R8G8B8, Ogre::PF_R8)>
+{
+    inline static DstType pixelConvert(SrcType inp)
+    {
+        return (Ogre::uint8)((inp&0x00FF0000)>>16);
+    }
+};
+
+struct R8toA8R8G8B8: public PixelConverter <Ogre::uint8, Ogre::uint32, FMTCONVERTERID(Ogre::PF_R8, Ogre::PF_A8R8G8B8)>
+{
+    inline static DstType pixelConvert(SrcType inp)
+    {
+        return 0xFF000000|(((unsigned int)inp)<<16);
+    }
+};
+
+struct B8G8R8A8toR8: public PixelConverter <Ogre::uint32, Ogre::uint8, FMTCONVERTERID(Ogre::PF_B8G8R8A8, Ogre::PF_R8)>
+{
+    inline static DstType pixelConvert(SrcType inp)
+    {
+        return (Ogre::uint8)((inp&0x0000FF00)>>8);
+    }
+};
+
+struct R8toB8G8R8A8: public PixelConverter <Ogre::uint8, Ogre::uint32, FMTCONVERTERID(Ogre::PF_R8, Ogre::PF_B8G8R8A8)>
+{
+    inline static DstType pixelConvert(SrcType inp)
+    {
+        return 0x000000FF|(((unsigned int)inp)<<8);
+    }
+};
+
 struct A8B8G8R8toL8: public PixelConverter <Ogre::uint32, Ogre::uint8, FMTCONVERTERID(Ogre::PF_A8B8G8R8, Ogre::PF_L8)>
 {
     inline static DstType pixelConvert(SrcType inp)
@@ -398,6 +446,12 @@ inline int doOptimizedConversion(const Ogre::PixelBox &src, const Ogre::PixelBox
         CASECONVERTER(R8G8B8A8toA8R8G8B8);
         CASECONVERTER(R8G8B8A8toA8B8G8R8);
         CASECONVERTER(R8G8B8A8toB8G8R8A8);
+        CASECONVERTER(A8B8G8R8toR8);
+        CASECONVERTER(R8toA8B8G8R8);
+        CASECONVERTER(A8R8G8B8toR8);
+        CASECONVERTER(R8toA8R8G8B8);
+        CASECONVERTER(B8G8R8A8toR8);
+        CASECONVERTER(R8toB8G8R8A8);
         CASECONVERTER(A8B8G8R8toL8);
         CASECONVERTER(L8toA8B8G8R8);
         CASECONVERTER(A8R8G8B8toL8);
