@@ -65,6 +65,7 @@ class RenderState;
 class Parameter;
 class UniformParameter;
 class Function;
+class FunctionStageRef;
 class FFPRenderStateBuilder;
 class ShaderGenerator;
 class SGMaterialSerializerListener;
