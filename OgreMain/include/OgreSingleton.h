@@ -55,35 +55,49 @@ namespace Ogre {
     */
 
 // End SJS additions
-    /** Template class for creating single-instance global classes.
-    */
-    template <typename T> class Singleton
+/** Template class for creating single-instance global classes.
+ *
+ * This implementation @cite bilas2000automatic slightly derives from the textbook pattern, by requiring
+ * manual instantiation, instead of implicitly doing it in #getSingleton. This is useful for classes that
+ * want to do some involved initialization, which should be done at a well defined time-point or need some
+ * additional parmeters in their constructor.
+ *
+ * It also allows you to manage the singleton lifetime through RAII.
+ *
+ * @note Be aware that #getSingleton will fail before the global instance is created. (check via
+ * #getSingletonPtr)
+ */
+template <typename T> class Singleton
+{
+private:
+    /** @brief Explicit private copy constructor. This is a forbidden operation.*/
+    Singleton(const Singleton<T>&);
+
+    /** @brief Private operator= . This is a forbidden operation. */
+    Singleton& operator=(const Singleton<T>&);
+
+protected:
+    static T* msSingleton;
+
+public:
+    Singleton(void)
     {
-    private:
-        /** @brief Explicit private copy constructor. This is a forbidden operation.*/
-        Singleton(const Singleton<T> &);
-
-        /** @brief Private operator= . This is a forbidden operation. */
-        Singleton& operator=(const Singleton<T> &);
-    
-    protected:
-
-        static T* msSingleton;
-
-    public:
-        Singleton( void )
-        {
-            OgreAssert( !msSingleton, "There can be only one singleton" );
-            msSingleton = static_cast< T* >( this );
-        }
-        ~Singleton( void )
-            {  assert( msSingleton );  msSingleton = 0;  }
-        /// Get the singleton instance
-        static T& getSingleton( void )
-        {   assert( msSingleton );  return ( *msSingleton ); }
-        /// @copydoc getSingleton
-        static T* getSingletonPtr( void )
-        { return msSingleton; }
+        OgreAssert(!msSingleton, "There can be only one singleton");
+        msSingleton = static_cast<T*>(this);
+    }
+    ~Singleton(void)
+    {
+        assert(msSingleton);
+        msSingleton = 0;
+    }
+    /// Get the singleton instance
+    static T& getSingleton(void)
+    {
+        assert(msSingleton);
+        return (*msSingleton);
+    }
+    /// @copydoc getSingleton
+    static T* getSingletonPtr(void) { return msSingleton; }
     };
     /** @} */
     /** @} */
