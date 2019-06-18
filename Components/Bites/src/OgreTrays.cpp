@@ -2014,8 +2014,7 @@ void TrayManager::buttonHit(Button *button)
 
 bool TrayManager::mousePressed(const MouseButtonEvent &evt)
 {
-    // Only process mouse buttons when stuff is visible.
-    if (!mCursorLayer->isVisible() || evt.button != BUTTON_LEFT) return false;
+    if (evt.button != BUTTON_LEFT) return false;
 
     Ogre::Vector2 cursorPos(mCursor->getLeft(), mCursor->getTop());
 
@@ -2088,8 +2087,7 @@ bool TrayManager::mousePressed(const MouseButtonEvent &evt)
 
 bool TrayManager::mouseReleased(const MouseButtonEvent &evt)
 {
-    // Only process mouse buttons when stuff is visible.
-    if (!mCursorLayer->isVisible() || evt.button != BUTTON_LEFT) return false;
+    if (evt.button != BUTTON_LEFT) return false;
 
     Ogre::Vector2 cursorPos(mCursor->getLeft(), mCursor->getTop());
 
@@ -2136,8 +2134,6 @@ bool TrayManager::mouseMoved(const MouseMotionEvent &evt)
 {
     // always keep track of the mouse pos for refreshCursor()
     mCursorPos = Ogre::Vector2(evt.x, evt.y);
-
-    if (!mCursorLayer->isVisible()) return false;   // don't process if cursor layer is invisible
 
     float wheelDelta = 0;//evt.state.Z.rel;
     mCursor->setPosition(mCursorPos.x, mCursorPos.y);
