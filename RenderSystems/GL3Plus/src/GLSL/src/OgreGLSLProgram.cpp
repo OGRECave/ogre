@@ -48,6 +48,9 @@ namespace Ogre {
         , mFragmentShader(fragmentShader)
         , mComputeShader(computeShader)
     {
+        // compute shader presence means no other shaders are allowed
+        if(mComputeShader)
+            mVertexShader = mHullShader = mDomainShader = mGeometryShader = mFragmentShader = NULL;
     }
 
     Ogre::String GLSLProgram::getCombinedName()
