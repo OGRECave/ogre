@@ -823,6 +823,7 @@ namespace OgreBites
             mWindow = getRenderWindow();
             addInputListener(this);
             if(mGrabInput) setWindowGrab();
+            else mTrayMgr->hideCursor();
 #ifdef OGRE_STATIC_LIB
             mPluginNameMap["DefaultSamples"] = new DefaultSamplesPlugin();
 #   ifdef SAMPLES_INCLUDE_PLAYPEN
