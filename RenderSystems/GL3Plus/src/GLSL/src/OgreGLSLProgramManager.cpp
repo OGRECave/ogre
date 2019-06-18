@@ -237,7 +237,8 @@ namespace Ogre {
         }
         if (mActiveComputeShader)
         {
-            activeKey = HashCombine(activeKey, mActiveComputeShader->getShaderID());
+            // overwrite as compute shaders are not part of the pipeline
+            activeKey = HashCombine(0, mActiveComputeShader->getShaderID());
         }
 
         // Only return a link program object if a program exists.
