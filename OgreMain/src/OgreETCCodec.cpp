@@ -68,7 +68,7 @@ namespace Ogre {
         uint8  iHeightMSB;
         uint8  iHeightLSB;
     } PKMHeader;
-    
+
     typedef struct {
         uint8     identifier[12];
         uint32    endianness;
@@ -127,7 +127,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     ETCCodec::ETCCodec(const String &type):
         mType(type)
-    { 
+    {
     }
     //---------------------------------------------------------------------
     DataStreamPtr ETCCodec::encode(const MemoryDataStreamPtr& input,
@@ -159,37 +159,37 @@ namespace Ogre {
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                     "This is not a valid ETC file!", "ETCCodec::decode");
     }
-    //---------------------------------------------------------------------    
-    String ETCCodec::getType() const 
+    //---------------------------------------------------------------------
+    String ETCCodec::getType() const
     {
         return mType;
     }
-    //---------------------------------------------------------------------    
+    //---------------------------------------------------------------------
     void ETCCodec::flipEndian(void * pData, size_t size, size_t count)
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		Bitwise::bswapChunks(pData, size, count);
+        Bitwise::bswapChunks(pData, size, count);
 #endif
     }
-    //---------------------------------------------------------------------    
+    //---------------------------------------------------------------------
     void ETCCodec::flipEndian(void * pData, size_t size)
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
         Bitwise::bswapBuffer(pData, size);
 #endif
     }
-    //---------------------------------------------------------------------    
+    //---------------------------------------------------------------------
     String ETCCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const
     {
         if (maxbytes >= sizeof(uint32))
         {
             uint32 fileType;
             memcpy(&fileType, magicNumberPtr, sizeof(uint32));
-			flipEndian(&fileType, sizeof(uint32));
+            flipEndian(&fileType, sizeof(uint32));
 
             if (PKM_MAGIC == fileType)
                 return String("pkm");
-        
+
             if (KTX_MAGIC == fileType)
                 return String("ktx");
         }
@@ -267,7 +267,7 @@ namespace Ogre {
         void *destPtr = output->getPtr();
         stream->read(destPtr, imgData->size);
         destPtr = static_cast<void*>(static_cast<uchar*>(destPtr));
-        
+
         DecodeResult ret;
         ret.first = output;
         ret.second = CodecDataPtr(imgData);
@@ -286,7 +286,7 @@ namespace Ogre {
             return false;
 
         if (header.endianness == KTX_ENDIAN_REF_REV)
-			flipEndian(&header.glType, sizeof(uint32));
+            flipEndian(&header.glType, sizeof(uint32));
 
         ImageData *imgData = OGRE_NEW ImageData();
         imgData->depth = 1;
@@ -335,18 +335,18 @@ namespace Ogre {
         case 0x8c03: // COMPRESSED_RGBA_PVRTC_2BPPV1_IMG
             imgData->format = PF_PVRTC_RGBA2;
             break;
-        default:        
+        default:
             imgData->format = PF_ETC1_RGB8;
             break;
         }
-        
+
         imgData->flags = 0;
         if (header.glType == 0 || header.glFormat == 0)
             imgData->flags |= IF_COMPRESSED;
 
-		size_t numFaces = header.numberOfFaces;
-		if (numFaces > 1)
-			imgData->flags |= IF_CUBEMAP;
+        size_t numFaces = header.numberOfFaces;
+        if (numFaces > 1)
+            imgData->flags |= IF_CUBEMAP;
         // Calculate total size from number of mipmaps, faces and size
         imgData->size = Image::calculateSize(imgData->num_mipmaps, numFaces,
                                              imgData->width, imgData->height, imgData->depth, imgData->format);
@@ -374,7 +374,7 @@ namespace Ogre {
 
         result.first = output;
         result.second = CodecDataPtr(imgData);
-        
+
         return true;
     }
 }
