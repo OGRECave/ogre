@@ -278,7 +278,7 @@ namespace Ogre {
     bool ETCCodec::decodeKTX(const DataStreamPtr& stream, DecodeResult& result) const
     {
         KTXHeader header;
-        // Read the ETC1 header
+        // Read the KTX header
         stream->read(&header, sizeof(KTXHeader));
 
         const uint8 KTXFileIdentifier[12] = { 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A };
@@ -334,6 +334,48 @@ namespace Ogre {
             break;
         case 0x8c03: // COMPRESSED_RGBA_PVRTC_2BPPV1_IMG
             imgData->format = PF_PVRTC_RGBA2;
+            break;
+        case 0x93B0: // COMPRESSED_RGBA_ASTC_4x4_KHR
+            imgData->format = PF_ASTC_RGBA_4X4_LDR;
+            break;
+        case 0x93B1: // COMPRESSED_RGBA_ASTC_5x4_KHR
+            imgData->format = PF_ASTC_RGBA_5X4_LDR;
+            break;
+        case 0x93B2: // COMPRESSED_RGBA_ASTC_5x5_KHR
+            imgData->format = PF_ASTC_RGBA_5X5_LDR;
+            break;
+        case 0x93B3: // COMPRESSED_RGBA_ASTC_6x5_KHR
+            imgData->format = PF_ASTC_RGBA_6X5_LDR;
+            break;
+        case 0x93B4: // COMPRESSED_RGBA_ASTC_6x6_KHR
+            imgData->format = PF_ASTC_RGBA_6X6_LDR;
+            break;
+        case 0x93B5: // COMPRESSED_RGBA_ASTC_8x5_KHR
+            imgData->format = PF_ASTC_RGBA_8X5_LDR;
+            break;
+        case 0x93B6: // COMPRESSED_RGBA_ASTC_8x6_KHR
+            imgData->format = PF_ASTC_RGBA_8X6_LDR;
+            break;
+        case 0x93B7: // COMPRESSED_RGBA_ASTC_8x8_KHR
+            imgData->format = PF_ASTC_RGBA_8X8_LDR;
+            break;
+        case 0x93B8: // COMPRESSED_RGBA_ASTC_10x5_KHR
+            imgData->format = PF_ASTC_RGBA_10X5_LDR;
+            break;
+        case 0x93B9: // COMPRESSED_RGBA_ASTC_10x6_KHR
+            imgData->format = PF_ASTC_RGBA_10X6_LDR;
+            break;
+        case 0x93BA: // COMPRESSED_RGBA_ASTC_10x8_KHR
+            imgData->format = PF_ASTC_RGBA_10X8_LDR;
+            break;
+        case 0x93BB: // COMPRESSED_RGBA_ASTC_10x10_KHR
+            imgData->format = PF_ASTC_RGBA_10X10_LDR;
+            break;
+        case 0x93BC: // COMPRESSED_RGBA_ASTC_12x10_KHR
+            imgData->format = PF_ASTC_RGBA_12X10_LDR;
+            break;
+        case 0x93BD: // COMPRESSED_RGBA_ASTC_12x12_KHR
+            imgData->format = PF_ASTC_RGBA_12X12_LDR;
             break;
         default:
             imgData->format = PF_ETC1_RGB8;
