@@ -157,7 +157,7 @@ namespace Ogre {
                 case PF_ASTC_RGBA_4X4_LDR:
                     return astc_slice_size(width, height, 4, 4) * depth;
                 case PF_ASTC_RGBA_5X4_LDR:
-                    return astc_slice_size(width, height, 5, 5) * depth;
+                    return astc_slice_size(width, height, 5, 4) * depth;
                 case PF_ASTC_RGBA_5X5_LDR:
                     return astc_slice_size(width, height, 5, 5) * depth;
                 case PF_ASTC_RGBA_6X5_LDR:
