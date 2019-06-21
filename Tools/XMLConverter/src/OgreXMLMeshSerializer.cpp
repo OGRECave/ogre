@@ -59,18 +59,18 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("XMLMeshSerializer reading mesh data from " + filename + "...");
         mMesh = pMesh;
         mColourElementType = colourElementType;
-        mXMLDoc = new TiXmlDocument(filename);
-        mXMLDoc->LoadFile();
+        pugi::xml_document mXMLDoc;
+        mXMLDoc.load_file(filename.c_str());
 
-        TiXmlElement* elem;
+        pugi::xml_node elem;
 
-        TiXmlElement* rootElem = mXMLDoc->RootElement();
+        pugi::xml_node rootElem = mXMLDoc.document_element();
 
         // shared geometry
-        elem = rootElem->FirstChildElement("sharedgeometry");
+        elem = rootElem.child("sharedgeometry");
         if (elem)
         {
-            const char *claimedVertexCount_ = elem->Attribute("vertexcount");
+            const char *claimedVertexCount_ = elem.attribute("vertexcount").as_string(NULL);
             if(!claimedVertexCount_ || StringConverter::parseInt(claimedVertexCount_) > 0)
             {
                 mMesh->sharedVertexData = new VertexData();
@@ -79,46 +79,44 @@ namespace Ogre {
         }
 
         // submeshes
-        elem = rootElem->FirstChildElement("submeshes");
+        elem = rootElem.child("submeshes");
         if (elem)
             readSubMeshes(elem);
 
         // skeleton link
-        elem = rootElem->FirstChildElement("skeletonlink");
+        elem = rootElem.child("skeletonlink");
         if (elem)
             readSkeletonLink(elem);
 
         // bone assignments
-        elem = rootElem->FirstChildElement("boneassignments");
+        elem = rootElem.child("boneassignments");
         if (elem)
             readBoneAssignments(elem);
 
         //Lod
-        elem = rootElem->FirstChildElement("levelofdetail");
+        elem = rootElem.child("levelofdetail");
         if (elem)
             readLodInfo(elem);
 
         // submesh names
-        elem = rootElem->FirstChildElement("submeshnames");
+        elem = rootElem.child("submeshnames");
         if (elem)
             readSubMeshNames(elem, mMesh);
 
         // submesh extremes
-        elem = rootElem->FirstChildElement("extremes");
+        elem = rootElem.child("extremes");
         if (elem)
             readExtremes(elem, mMesh);
 
         // poses
-        elem = rootElem->FirstChildElement("poses");
+        elem = rootElem.child("poses");
         if (elem)
             readPoses(elem, mMesh);
 
         // animations
-        elem = rootElem->FirstChildElement("animations");
+        elem = rootElem.child("animations");
         if (elem)
             readAnimations(elem, mMesh);
-
-        delete mXMLDoc;
 
         LogManager::getSingleton().logMessage("XMLMeshSerializer import successful.");
         
@@ -130,19 +128,19 @@ namespace Ogre {
         
         mMesh = const_cast<Mesh*>(pMesh);
 
-        mXMLDoc = new TiXmlDocument();
-        mXMLDoc->InsertEndChild(TiXmlElement("mesh"));
+        pugi::xml_document mXMLDoc;
+        pugi::xml_node rootNode = mXMLDoc.append_child("mesh");
 
         LogManager::getSingleton().logMessage("Populating DOM...");
 
             
            
         // Write to DOM
-        writeMesh(pMesh);
+        writeMesh(pMesh, rootNode);
         LogManager::getSingleton().logMessage("DOM populated, writing XML file..");
 
         // Write out to a file
-        if(! mXMLDoc->SaveFile(filename) )
+        if(! mXMLDoc.save_file(filename.c_str()) )
         {
             LogManager::getSingleton().logMessage("XMLMeshSerializer failed writing the XML file.", LML_CRITICAL);
         }
@@ -150,27 +148,19 @@ namespace Ogre {
         {
             LogManager::getSingleton().logMessage("XMLMeshSerializer export successful.");
         }
-
-    
-        delete mXMLDoc;
-
-
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeMesh(const Mesh* pMesh)
+    void XMLMeshSerializer::writeMesh(const Mesh* pMesh, pugi::xml_node& rootNode)
     {
-        TiXmlElement* rootNode = mXMLDoc->RootElement();
         // Write geometry
         if (pMesh->sharedVertexData)
         {
-            TiXmlElement* geomNode = 
-                rootNode->InsertEndChild(TiXmlElement("sharedgeometry"))->ToElement();
+            pugi::xml_node geomNode = rootNode.append_child("sharedgeometry");
             writeGeometry(geomNode, pMesh->sharedVertexData);
         }
 
         // Write Submeshes
-        TiXmlElement* subMeshesNode = 
-            rootNode->InsertEndChild(TiXmlElement("submeshes"))->ToElement();
+        pugi::xml_node subMeshesNode = rootNode.append_child("submeshes");
         for (size_t i = 0; i < pMesh->getNumSubMeshes(); ++i)
         {
             LogManager::getSingleton().logMessage("Writing submesh...");
@@ -191,8 +181,7 @@ namespace Ogre {
             if (bi.hasMoreElements())
             {
                 LogManager::getSingleton().logMessage("Exporting shared geometry bone assignments...");
-                TiXmlElement* boneAssignNode = 
-                    rootNode->InsertEndChild(TiXmlElement("boneassignments"))->ToElement();
+                pugi::xml_node boneAssignNode = rootNode.append_child("boneassignments");
 
                 while (bi.hasMoreElements())
                 {
@@ -219,56 +208,55 @@ namespace Ogre {
         writeExtremes(rootNode, pMesh);
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeSubMesh(TiXmlElement* mSubMeshesNode, const SubMesh* s)
+    void XMLMeshSerializer::writeSubMesh(pugi::xml_node& mSubMeshesNode, const SubMesh* s)
     {
-        TiXmlElement* subMeshNode = 
-            mSubMeshesNode->InsertEndChild(TiXmlElement("submesh"))->ToElement();
+        pugi::xml_node subMeshNode = mSubMeshesNode.append_child("submesh");
 
         size_t numFaces;
 
         // Material name
-        subMeshNode->SetAttribute("material", s->getMaterialName());
+        subMeshNode.append_attribute("material") = s->getMaterialName().c_str();
         // bool useSharedVertices
-        subMeshNode->SetAttribute("usesharedvertices", 
-            StringConverter::toString(s->useSharedVertices) );
+        subMeshNode.append_attribute("usesharedvertices") =
+            StringConverter::toString(s->useSharedVertices).c_str();
         // bool use32BitIndexes
         bool use32BitIndexes = (s->indexData->indexBuffer && 
             s->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
-        subMeshNode->SetAttribute("use32bitindexes", 
-            StringConverter::toString( use32BitIndexes ));
+        subMeshNode.append_attribute("use32bitindexes") =
+            StringConverter::toString( use32BitIndexes ).c_str();
 
         // Operation type
         switch(s->operationType)
         {
         case RenderOperation::OT_LINE_LIST:
-            subMeshNode->SetAttribute("operationtype", "line_list");
+            subMeshNode.append_attribute("operationtype") = "line_list";
             break;
         case RenderOperation::OT_LINE_STRIP:
-            subMeshNode->SetAttribute("operationtype", "line_strip");
+            subMeshNode.append_attribute("operationtype") = "line_strip";
             break;
         case RenderOperation::OT_POINT_LIST:
-            subMeshNode->SetAttribute("operationtype", "point_list");
+            subMeshNode.append_attribute("operationtype") = "point_list";
             break;
         case RenderOperation::OT_TRIANGLE_FAN:
-            subMeshNode->SetAttribute("operationtype", "triangle_fan");
+            subMeshNode.append_attribute("operationtype") = "triangle_fan";
             break;
         case RenderOperation::OT_TRIANGLE_LIST:
-            subMeshNode->SetAttribute("operationtype", "triangle_list");
+            subMeshNode.append_attribute("operationtype") = "triangle_list";
             break;
         case RenderOperation::OT_TRIANGLE_STRIP:
-            subMeshNode->SetAttribute("operationtype", "triangle_strip");
+            subMeshNode.append_attribute("operationtype") = "triangle_strip";
             break;
         case RenderOperation::OT_TRIANGLE_LIST_ADJ:
-            subMeshNode->SetAttribute("operationtype", "triangle_list_adj");
+            subMeshNode.append_attribute("operationtype") = "triangle_list_adj";
             break;
         case RenderOperation::OT_TRIANGLE_STRIP_ADJ:
-            subMeshNode->SetAttribute("operationtype", "triangle_strip_adj");
+            subMeshNode.append_attribute("operationtype") = "triangle_strip_adj";
             break;
         case RenderOperation::OT_LINE_LIST_ADJ:
-            subMeshNode->SetAttribute("operationtype", "line_list_adj");
+            subMeshNode.append_attribute("operationtype") = "line_list_adj";
             break;
         case RenderOperation::OT_LINE_STRIP_ADJ:
-            subMeshNode->SetAttribute("operationtype", "line_strip_adj");
+            subMeshNode.append_attribute("operationtype") = "line_strip_adj";
             break;
         default:
             OgreAssert(false, "Patch control point operations not supported");
@@ -278,8 +266,8 @@ namespace Ogre {
         if (s->indexData->indexCount > 0)
         {
             // Faces
-            TiXmlElement* facesNode = 
-                subMeshNode->InsertEndChild(TiXmlElement("faces"))->ToElement();
+            pugi::xml_node facesNode =
+                subMeshNode.append_child("faces");
             switch(s->operationType)
             {
             case RenderOperation::OT_TRIANGLE_LIST:
@@ -300,8 +288,7 @@ namespace Ogre {
             default:
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported render operation type");
             }
-            facesNode->SetAttribute("count", 
-                StringConverter::toString(numFaces));
+            facesNode.append_attribute("count") = StringConverter::toString(numFaces).c_str();
             // Write each face in turn
             size_t i;
             unsigned int* pInt = 0;
@@ -319,34 +306,33 @@ namespace Ogre {
             }
             for (i = 0; i < numFaces; ++i)
             {
-                TiXmlElement* faceNode = 
-                    facesNode->InsertEndChild(TiXmlElement("face"))->ToElement();
+                pugi::xml_node faceNode = facesNode.append_child("face");
                 if (use32BitIndexes)
                 {
-                    faceNode->SetAttribute("v1", StringConverter::toString(*pInt++));
+                    faceNode.append_attribute("v1") = StringConverter::toString(*pInt++).c_str();
                     if(s->operationType == RenderOperation::OT_LINE_LIST)
                     {
-                        faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
+                        faceNode.append_attribute("v2") = StringConverter::toString(*pInt++).c_str();
                     }
                     /// Only need all 3 vertex indices if trilist or first face
                     else if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
                     {
-                        faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
-                        faceNode->SetAttribute("v3", StringConverter::toString(*pInt++));
+                        faceNode.append_attribute("v2") = StringConverter::toString(*pInt++).c_str();
+                        faceNode.append_attribute("v3") = StringConverter::toString(*pInt++).c_str();
                     }
                 }
                 else
                 {
-                    faceNode->SetAttribute("v1", StringConverter::toString(*pShort++));
+                    faceNode.append_attribute("v1") = StringConverter::toString(*pShort++).c_str();
                     if(s->operationType == RenderOperation::OT_LINE_LIST)
                     {
-                        faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
+                        faceNode.append_attribute("v2") = StringConverter::toString(*pShort++).c_str();
                     }
                     /// Only need all 3 vertex indices if trilist or first face
                     else if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
                     {
-                        faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
-                        faceNode->SetAttribute("v3", StringConverter::toString(*pShort++));
+                        faceNode.append_attribute("v2") = StringConverter::toString(*pShort++).c_str();
+                        faceNode.append_attribute("v3") = StringConverter::toString(*pShort++).c_str();
                     }
                 }
             }
@@ -356,8 +342,7 @@ namespace Ogre {
         // M_GEOMETRY chunk (Optional: present only if useSharedVertices = false)
         if (!s->useSharedVertices)
         {
-            TiXmlElement* geomNode = 
-                subMeshNode->InsertEndChild(TiXmlElement("geometry"))->ToElement();
+            pugi::xml_node geomNode = subMeshNode.append_child("geometry");
             writeGeometry(geomNode, s->vertexData);
         }
 
@@ -370,8 +355,7 @@ namespace Ogre {
             SubMesh::BoneAssignmentIterator bi = const_cast<SubMesh*>(s)->getBoneAssignmentIterator();
             LogManager::getSingleton().logMessage("Exporting dedicated geometry bone assignments...");
 
-            TiXmlElement* boneAssignNode = 
-                subMeshNode->InsertEndChild(TiXmlElement("boneassignments"))->ToElement();
+            pugi::xml_node boneAssignNode = subMeshNode.append_child("boneassignments");
             while (bi.hasMoreElements())
             {
                 const VertexBoneAssignment& assign = bi.getNext();
@@ -382,14 +366,14 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeGeometry(TiXmlElement* mParentNode, const VertexData* vertexData)
+    void XMLMeshSerializer::writeGeometry(pugi::xml_node& mParentNode, const VertexData* vertexData)
     {
         // Write a vertex buffer per element
 
-        TiXmlElement *vbNode, *vertexNode, *dataNode;
+        pugi::xml_node vbNode, vertexNode, dataNode;
 
         // Set num verts on parent
-        mParentNode->SetAttribute("vertexcount", StringConverter::toString(vertexData->vertexCount));
+        mParentNode.append_attribute("vertexcount") = StringConverter::toString(vertexData->vertexCount).c_str();
 
         VertexDeclaration* decl = vertexData->vertexDeclaration;
         VertexBufferBinding* bind = vertexData->vertexBufferBinding;
@@ -399,7 +383,7 @@ namespace Ogre {
         // Iterate over buffers
         for(b = bind->getBindings().begin(); b != bend; ++b)
         {
-            vbNode = mParentNode->InsertEndChild(TiXmlElement("vertexbuffer"))->ToElement();
+            vbNode = mParentNode.append_child("vertexbuffer");
             const HardwareVertexBufferSharedPtr vbuf = b->second;
             unsigned short bufferIdx = b->first;
             // Get all the elements that relate to this buffer          
@@ -425,26 +409,26 @@ namespace Ogre {
                 switch(elem.getSemantic())
                 {
                 case VES_POSITION:
-                    vbNode->SetAttribute("positions","true");
+                    vbNode.append_attribute("positions") = "true";
                     break;
                 case VES_NORMAL:
-                    vbNode->SetAttribute("normals","true");
+                    vbNode.append_attribute("normals") = "true";
                     break;
                 case VES_TANGENT:
-                    vbNode->SetAttribute("tangents","true");
+                    vbNode.append_attribute("tangents") = "true";
                     if (elem.getType() == VET_FLOAT4)
                     {
-                        vbNode->SetAttribute("tangent_dimensions", "4");
+                        vbNode.append_attribute("tangent_dimensions") = "4";
                     }
                     break;
                 case VES_BINORMAL:
-                    vbNode->SetAttribute("binormals","true");
+                    vbNode.append_attribute("binormals") = "true";
                     break;
                 case VES_DIFFUSE:
-                    vbNode->SetAttribute("colours_diffuse","true");
+                    vbNode.append_attribute("colours_diffuse") = "true";
                     break;
                 case VES_SPECULAR:
-                    vbNode->SetAttribute("colours_specular","true");
+                    vbNode.append_attribute("colours_specular") = "true";
                     break;
                 case VES_TEXTURE_COORDINATES:
                     {
@@ -487,8 +471,8 @@ namespace Ogre {
                             OgreAssert(false, "Unsupported VET");
                             break;
                         }
-                        vbNode->SetAttribute(
-                            "texture_coord_dimensions_" + StringConverter::toString(numTextureCoords), type);
+                        vbNode.append_attribute(
+                            ("texture_coord_dimensions_" + StringConverter::toString(numTextureCoords)).c_str()) = type;
                         ++numTextureCoords;
                     } 
                     break;
@@ -499,15 +483,14 @@ namespace Ogre {
             }
             if (numTextureCoords > 0)
             {
-                vbNode->SetAttribute("texture_coords", 
-                    StringConverter::toString(numTextureCoords));
+                vbNode.append_attribute("texture_coords") =
+                    StringConverter::toString(numTextureCoords).c_str();
             }
 
             // For each vertex
             for (size_t v = 0; v < vertexData->vertexCount; ++v)
             {
-                vertexNode = 
-                    vbNode->InsertEndChild(TiXmlElement("vertex"))->ToElement();
+                vertexNode = vbNode.append_child("vertex");
                 // Iterate over the elements
                 for (i = elems.begin(); i != iend; ++i)
                 {
@@ -516,44 +499,39 @@ namespace Ogre {
                     {
                     case VES_POSITION:
                         elem.baseVertexPointerToElement(pVert, &pFloat);
-                        dataNode = 
-                            vertexNode->InsertEndChild(TiXmlElement("position"))->ToElement();
-                        dataNode->SetAttribute("x", StringConverter::toString(pFloat[0]));
-                        dataNode->SetAttribute("y", StringConverter::toString(pFloat[1]));
-                        dataNode->SetAttribute("z", StringConverter::toString(pFloat[2]));
+                        dataNode = vertexNode.append_child("position");
+                        dataNode.append_attribute("x") = StringConverter::toString(pFloat[0]).c_str();
+                        dataNode.append_attribute("y") = StringConverter::toString(pFloat[1]).c_str();
+                        dataNode.append_attribute("z") = StringConverter::toString(pFloat[2]).c_str();
                         break;
                     case VES_NORMAL:
                         elem.baseVertexPointerToElement(pVert, &pFloat);
-                        dataNode = 
-                            vertexNode->InsertEndChild(TiXmlElement("normal"))->ToElement();
-                        dataNode->SetAttribute("x", StringConverter::toString(pFloat[0]));
-                        dataNode->SetAttribute("y", StringConverter::toString(pFloat[1]));
-                        dataNode->SetAttribute("z", StringConverter::toString(pFloat[2]));
+                        dataNode = vertexNode.append_child("normal");
+                        dataNode.append_attribute("x") = StringConverter::toString(pFloat[0]).c_str();
+                        dataNode.append_attribute("y") = StringConverter::toString(pFloat[1]).c_str();
+                        dataNode.append_attribute("z") = StringConverter::toString(pFloat[2]).c_str();
                         break;
                     case VES_TANGENT:
                         elem.baseVertexPointerToElement(pVert, &pFloat);
-                        dataNode = 
-                            vertexNode->InsertEndChild(TiXmlElement("tangent"))->ToElement();
-                        dataNode->SetAttribute("x", StringConverter::toString(pFloat[0]));
-                        dataNode->SetAttribute("y", StringConverter::toString(pFloat[1]));
-                        dataNode->SetAttribute("z", StringConverter::toString(pFloat[2]));
+                        dataNode = vertexNode.append_child("tangent");
+                        dataNode.append_attribute("x") = StringConverter::toString(pFloat[0]).c_str();
+                        dataNode.append_attribute("y") = StringConverter::toString(pFloat[1]).c_str();
+                        dataNode.append_attribute("z") = StringConverter::toString(pFloat[2]).c_str();
                         if (elem.getType() == VET_FLOAT4)
                         {
-                            dataNode->SetAttribute("w", StringConverter::toString(pFloat[3]));
+                            dataNode.append_attribute("w") = StringConverter::toString(pFloat[3]).c_str();
                         }
                         break;
                     case VES_BINORMAL:
                         elem.baseVertexPointerToElement(pVert, &pFloat);
-                        dataNode = 
-                            vertexNode->InsertEndChild(TiXmlElement("binormal"))->ToElement();
-                        dataNode->SetAttribute("x", StringConverter::toString(pFloat[0]));
-                        dataNode->SetAttribute("y", StringConverter::toString(pFloat[1]));
-                        dataNode->SetAttribute("z", StringConverter::toString(pFloat[2]));
+                        dataNode = vertexNode.append_child("binormal");
+                        dataNode.append_attribute("x") = StringConverter::toString(pFloat[0]).c_str();
+                        dataNode.append_attribute("y") = StringConverter::toString(pFloat[1]).c_str();
+                        dataNode.append_attribute("z") = StringConverter::toString(pFloat[2]).c_str();
                         break;
                     case VES_DIFFUSE:
                         elem.baseVertexPointerToElement(pVert, &pColour);
-                        dataNode = 
-                            vertexNode->InsertEndChild(TiXmlElement("colour_diffuse"))->ToElement();
+                        dataNode = vertexNode.append_child("colour_diffuse");
                         {
                             ARGB rc = *pColour++;
                             ColourValue cv;
@@ -561,13 +539,12 @@ namespace Ogre {
                             cv.g = (rc & 0xFF) / 255.0f;        rc >>= 8;
                             cv.r = (rc & 0xFF) / 255.0f;        rc >>= 8;
                             cv.a = (rc & 0xFF) / 255.0f;
-                            dataNode->SetAttribute("value", StringConverter::toString(cv));
+                            dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
                     case VES_SPECULAR:
                         elem.baseVertexPointerToElement(pVert, &pColour);
-                        dataNode = 
-                            vertexNode->InsertEndChild(TiXmlElement("colour_specular"))->ToElement();
+                        dataNode = vertexNode.append_child("colour_specular");
                         {
                             ARGB rc = *pColour++;
                             ColourValue cv;
@@ -575,58 +552,57 @@ namespace Ogre {
                             cv.g = (rc & 0xFF) / 255.0f;        rc >>= 8;
                             cv.r = (rc & 0xFF) / 255.0f;        rc >>= 8;
                             cv.a = (rc & 0xFF) / 255.0f;
-                            dataNode->SetAttribute("value", StringConverter::toString(cv));
+                            dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
                     case VES_TEXTURE_COORDINATES:
-                        dataNode = 
-                            vertexNode->InsertEndChild(TiXmlElement("texcoord"))->ToElement();
+                        dataNode = vertexNode.append_child("texcoord");
 
                         switch(elem.getType())
                         {
                         case VET_FLOAT1:
                             elem.baseVertexPointerToElement(pVert, &pFloat);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pFloat++));
+                            dataNode.append_attribute("u") = StringConverter::toString(*pFloat++).c_str();
                             break;
                         case VET_FLOAT2:
                             elem.baseVertexPointerToElement(pVert, &pFloat);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pFloat++));
-                            dataNode->SetAttribute("v", StringConverter::toString(*pFloat++));
+                            dataNode.append_attribute("u") = StringConverter::toString(*pFloat++).c_str();
+                            dataNode.append_attribute("v") = StringConverter::toString(*pFloat++).c_str();
                             break;
                         case VET_FLOAT3:
                             elem.baseVertexPointerToElement(pVert, &pFloat);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pFloat++));
-                            dataNode->SetAttribute("v", StringConverter::toString(*pFloat++));
-                            dataNode->SetAttribute("w", StringConverter::toString(*pFloat++));
+                            dataNode.append_attribute("u") = StringConverter::toString(*pFloat++).c_str();
+                            dataNode.append_attribute("v") = StringConverter::toString(*pFloat++).c_str();
+                            dataNode.append_attribute("w") = StringConverter::toString(*pFloat++).c_str();
                             break;
                         case VET_FLOAT4:
                             elem.baseVertexPointerToElement(pVert, &pFloat);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pFloat++));
-                            dataNode->SetAttribute("v", StringConverter::toString(*pFloat++));
-                            dataNode->SetAttribute("w", StringConverter::toString(*pFloat++));
-                            dataNode->SetAttribute("x", StringConverter::toString(*pFloat++));
+                            dataNode.append_attribute("u") = StringConverter::toString(*pFloat++).c_str();
+                            dataNode.append_attribute("v") = StringConverter::toString(*pFloat++).c_str();
+                            dataNode.append_attribute("w") = StringConverter::toString(*pFloat++).c_str();
+                            dataNode.append_attribute("x") = StringConverter::toString(*pFloat++).c_str();
                             break;
                         case VET_SHORT1:
                             elem.baseVertexPointerToElement(pVert, &pShort);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pShort++ / 65535.0f));
+                            dataNode.append_attribute("u") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             break;
                         case VET_SHORT2:
                             elem.baseVertexPointerToElement(pVert, &pShort);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pShort++ / 65535.0f));
-                            dataNode->SetAttribute("v", StringConverter::toString(*pShort++ / 65535.0f));
+                            dataNode.append_attribute("u") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
+                            dataNode.append_attribute("v") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             break;
                         case VET_SHORT3:
                             elem.baseVertexPointerToElement(pVert, &pShort);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pShort++ / 65535.0f));
-                            dataNode->SetAttribute("v", StringConverter::toString(*pShort++ / 65535.0f));
-                            dataNode->SetAttribute("w", StringConverter::toString(*pShort++ / 65535.0f));
+                            dataNode.append_attribute("u") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
+                            dataNode.append_attribute("v") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
+                            dataNode.append_attribute("w") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             break;
                         case VET_SHORT4:
                             elem.baseVertexPointerToElement(pVert, &pShort);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pShort++ / 65535.0f));
-                            dataNode->SetAttribute("v", StringConverter::toString(*pShort++ / 65535.0f));
-                            dataNode->SetAttribute("w", StringConverter::toString(*pShort++ / 65535.0f));
-                            dataNode->SetAttribute("x", StringConverter::toString(*pShort++ / 65535.0f));
+                            dataNode.append_attribute("u") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
+                            dataNode.append_attribute("v") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
+                            dataNode.append_attribute("w") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
+                            dataNode.append_attribute("x") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             break;
                         case VET_COLOUR: case VET_COLOUR_ARGB: case VET_COLOUR_ABGR:
                             elem.baseVertexPointerToElement(pVert, &pColour);
@@ -637,15 +613,15 @@ namespace Ogre {
                                 cv.g = (rc & 0xFF) / 255.0f;        rc >>= 8;
                                 cv.r = (rc & 0xFF) / 255.0f;        rc >>= 8;
                                 cv.a = (rc & 0xFF) / 255.0f;
-                                dataNode->SetAttribute("u", StringConverter::toString(cv));
+                                dataNode.append_attribute("u") = StringConverter::toString(cv).c_str();
                             }
                             break;
                         case VET_UBYTE4:
                             elem.baseVertexPointerToElement(pVert, &pChar);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pChar++ / 255.0f));
-                            dataNode->SetAttribute("v", StringConverter::toString(*pChar++ / 255.0f));
-                            dataNode->SetAttribute("w", StringConverter::toString(*pChar++ / 255.0f));
-                            dataNode->SetAttribute("x", StringConverter::toString(*pChar++ / 255.0f));
+                            dataNode.append_attribute("u") =  StringConverter::toString(*pChar++ / 255.0f).c_str();
+                            dataNode.append_attribute("v") =  StringConverter::toString(*pChar++ / 255.0f).c_str();
+                            dataNode.append_attribute("w") =  StringConverter::toString(*pChar++ / 255.0f).c_str();
+                            dataNode.append_attribute("x") =  StringConverter::toString(*pChar++ / 255.0f).c_str();
                             break;
                         default:
                             OgreAssert(false, "Unsupported VET");
@@ -664,64 +640,58 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeSkeletonLink(TiXmlElement* mMeshNode, const String& skelName)
+    void XMLMeshSerializer::writeSkeletonLink(pugi::xml_node& mMeshNode, const String& skelName)
     {
 
-        TiXmlElement* skelNode = 
-            mMeshNode->InsertEndChild(TiXmlElement("skeletonlink"))->ToElement();
-        skelNode->SetAttribute("name", skelName);
+        pugi::xml_node skelNode = mMeshNode.append_child("skeletonlink");
+        skelNode.append_attribute("name") = skelName.c_str();
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeBoneAssignment(TiXmlElement* mBoneAssignNode, const VertexBoneAssignment* assign)
+    void XMLMeshSerializer::writeBoneAssignment(pugi::xml_node& mBoneAssignNode, const VertexBoneAssignment* assign)
     {
-        TiXmlElement* assignNode = 
-            mBoneAssignNode->InsertEndChild(
-            TiXmlElement("vertexboneassignment"))->ToElement();
+        pugi::xml_node assignNode = mBoneAssignNode.append_child("vertexboneassignment");
 
-        assignNode->SetAttribute("vertexindex", 
-            StringConverter::toString(assign->vertexIndex));
-        assignNode->SetAttribute("boneindex", 
-            StringConverter::toString(assign->boneIndex));
-        assignNode->SetAttribute("weight",
-            StringConverter::toString(assign->weight));
+        assignNode.append_attribute("vertexindex") =
+            StringConverter::toString(assign->vertexIndex).c_str();
+        assignNode.append_attribute("boneindex") =
+            StringConverter::toString(assign->boneIndex).c_str();
+        assignNode.append_attribute("weight" ) =
+            StringConverter::toString(assign->weight).c_str();
 
 
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeTextureAliases(TiXmlElement* mSubmeshesNode, const SubMesh* subMesh)
+    void XMLMeshSerializer::writeTextureAliases(pugi::xml_node& mSubmeshesNode, const SubMesh* subMesh)
     {
         if (!subMesh->hasTextureAliases())
             return; // do nothing
 
-        TiXmlElement* textureAliasesNode = 
-            mSubmeshesNode->InsertEndChild(TiXmlElement("textures"))->ToElement();
+        pugi::xml_node textureAliasesNode = mSubmeshesNode.append_child("textures");
 
         // use ogre map iterator
         SubMesh::AliasTextureIterator aliasIterator = subMesh->getAliasTextureIterator();
 
         while (aliasIterator.hasMoreElements())
         {
-            TiXmlElement* aliasTextureNode = 
-                textureAliasesNode->InsertEndChild(TiXmlElement("texture"))->ToElement();
+            pugi::xml_node aliasTextureNode = textureAliasesNode.append_child("texture");
             // iterator key is alias and value is texture name
-            aliasTextureNode->SetAttribute("alias", aliasIterator.peekNextKey());
-            aliasTextureNode->SetAttribute("name", aliasIterator.peekNextValue());
+            aliasTextureNode.append_attribute("alias") = aliasIterator.peekNextKey().c_str();
+            aliasTextureNode.append_attribute("name") = aliasIterator.peekNextValue().c_str();
             aliasIterator.moveNext();
         }
 
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readSubMeshes(TiXmlElement* mSubmeshesNode)
+    void XMLMeshSerializer::readSubMeshes(pugi::xml_node& mSubmeshesNode)
     {
         LogManager::getSingleton().logMessage("Reading submeshes...");
         assert(mMesh->getNumSubMeshes() == 0);
-        for (TiXmlElement* smElem = mSubmeshesNode->FirstChildElement();
-            smElem != 0; smElem = smElem->NextSiblingElement())
+        for (pugi::xml_node& smElem : mSubmeshesNode.children())
         {
             // All children should be submeshes 
             SubMesh* sm = mMesh->createSubMesh();
 
-            const char* mat = smElem->Attribute("material");
+            const char* mat = smElem.attribute("material").as_string(NULL);
             if (mat && mat[0] != '\0')
             {
                 // we do not load any materials - so create a dummy here to just store the name
@@ -730,7 +700,7 @@ namespace Ogre {
 
             // Read operation type
             bool readFaces = true;
-            const char* optype = smElem->Attribute("operationtype");
+            const char* optype = smElem.attribute("operationtype").as_string(NULL);
             if (optype)
             {
                 if (!strcmp(optype, "triangle_list"))
@@ -780,10 +750,10 @@ namespace Ogre {
                 }
             }
 
-            const char* tmp = smElem->Attribute("usesharedvertices");
+            const char* tmp = smElem.attribute("usesharedvertices").as_string(NULL);
             if (tmp)
                 sm->useSharedVertices = StringConverter::parseBool(tmp);
-            tmp = smElem->Attribute("use32bitindexes");
+            tmp = smElem.attribute("use32bitindexes").as_string(NULL);
             bool use32BitIndexes = false;
             if (tmp)
                 use32BitIndexes = StringConverter::parseBool(tmp);
@@ -791,13 +761,13 @@ namespace Ogre {
             // Faces
             if (readFaces)
             {
-                TiXmlElement* faces = smElem->FirstChildElement("faces");
+                pugi::xml_node faces = smElem.child("faces");
                 int actualCount = 0;
-                for (TiXmlElement *faceElem = faces->FirstChildElement(); faceElem != 0; faceElem = faceElem->NextSiblingElement())
+                for (pugi::xml_node faceElem : faces.children())
                 {
                         actualCount++;
                 }
-                const char *claimedCount_ = faces->Attribute("count");
+                const char *claimedCount_ = faces.attribute("count").as_string(NULL);
                 if (claimedCount_ && StringConverter::parseInt(claimedCount_)!=actualCount)
                 {
                     LogManager::getSingleton().stream(LML_WARNING)
@@ -851,37 +821,36 @@ namespace Ogre {
                         pShort = static_cast<unsigned short*>(
                             ibuf->lock(HardwareBuffer::HBL_DISCARD));
                     }
-                    TiXmlElement* faceElem;
+
                     bool firstTri = true;
-                    for (faceElem = faces->FirstChildElement();
-                        faceElem != 0; faceElem = faceElem->NextSiblingElement())
+                    for (auto faceElem : faces.children())
                     {
                         if (use32BitIndexes)
                         {
-                            *pInt++ = StringConverter::parseInt(faceElem->Attribute("v1"));
+                            *pInt++ = StringConverter::parseInt(faceElem.attribute("v1").value());
                             if(sm->operationType == RenderOperation::OT_LINE_LIST)
                             {
-                                *pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
+                                *pInt++ = StringConverter::parseInt(faceElem.attribute("v2").value());
                             }
                             // only need all 3 vertices if it's a trilist or first tri
                             else if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
                             {
-                                *pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
-                                *pInt++ = StringConverter::parseInt(faceElem->Attribute("v3"));
+                                *pInt++ = StringConverter::parseInt(faceElem.attribute("v2").value());
+                                *pInt++ = StringConverter::parseInt(faceElem.attribute("v3").value());
                             }
                         }
                         else
                         {
-                            *pShort++ = StringConverter::parseInt(faceElem->Attribute("v1"));
+                            *pShort++ = StringConverter::parseInt(faceElem.attribute("v1").value());
                             if(sm->operationType == RenderOperation::OT_LINE_LIST)
                             {
-                                *pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
+                                *pShort++ = StringConverter::parseInt(faceElem.attribute("v2").value());
                             }
                             // only need all 3 vertices if it's a trilist or first tri
                             else if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
                             {
-                                *pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
-                                *pShort++ = StringConverter::parseInt(faceElem->Attribute("v3"));
+                                *pShort++ = StringConverter::parseInt(faceElem.attribute("v2").value());
+                                *pShort++ = StringConverter::parseInt(faceElem.attribute("v3").value());
                             }
                         }
                         firstTri = false;
@@ -893,7 +862,7 @@ namespace Ogre {
             // Geometry
             if (!sm->useSharedVertices)
             {
-                TiXmlElement* geomNode = smElem->FirstChildElement("geometry");
+                pugi::xml_node geomNode = smElem.child("geometry");
                 if (geomNode)
                 {
                     sm->vertexData = new VertexData();
@@ -902,12 +871,12 @@ namespace Ogre {
             }
 
             // texture aliases
-            TiXmlElement* textureAliasesNode = smElem->FirstChildElement("textures");
+            pugi::xml_node textureAliasesNode = smElem.child("textures");
             if(textureAliasesNode)
                 readTextureAliases(textureAliasesNode, sm);
 
             // Bone assignments
-            TiXmlElement* boneAssigns = smElem->FirstChildElement("boneassignments");
+            pugi::xml_node boneAssigns = smElem.child("boneassignments");
             if(boneAssigns)
                 readBoneAssignments(boneAssigns, sm);
 
@@ -915,7 +884,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("Submeshes done.");
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readGeometry(TiXmlElement* mGeometryNode, VertexData* vertexData)
+    void XMLMeshSerializer::readGeometry(pugi::xml_node& mGeometryNode, VertexData* vertexData)
     {
         LogManager::getSingleton().logMessage("Reading geometry...");
         unsigned char *pVert;
@@ -924,7 +893,7 @@ namespace Ogre {
         uint8 *pChar;
         ARGB *pCol;
 
-        const char *claimedVertexCount_ = mGeometryNode->Attribute("vertexcount");
+        const char *claimedVertexCount_ = mGeometryNode.attribute("vertexcount").as_string(NULL);
         ptrdiff_t claimedVertexCount = 0;
         if (claimedVertexCount_)
         {
@@ -946,32 +915,31 @@ namespace Ogre {
         bool first = true;
 
         // Iterate over all children (vertexbuffer entries) 
-        for (TiXmlElement* vbElem = mGeometryNode->FirstChildElement();
-            vbElem != 0; vbElem = vbElem->NextSiblingElement())
+        for (pugi::xml_node& vbElem : mGeometryNode.children())
         {
             size_t offset = 0;
             // Skip non-vertexbuffer elems
-            if (stricmp(vbElem->Value(), "vertexbuffer")) continue;
+            if (stricmp(vbElem.name(), "vertexbuffer")) continue;
            
-            const char* attrib = vbElem->Attribute("positions");
+            const char* attrib = vbElem.attribute("positions").as_string(NULL);
             if (attrib && StringConverter::parseBool(attrib))
             {
                 // Add element
                 decl->addElement(bufCount, offset, VET_FLOAT3, VES_POSITION);
                 offset += VertexElement::getTypeSize(VET_FLOAT3);
             }
-            attrib = vbElem->Attribute("normals");
+            attrib = vbElem.attribute("normals").as_string(NULL);
             if (attrib && StringConverter::parseBool(attrib))
             {
                 // Add element
                 decl->addElement(bufCount, offset, VET_FLOAT3, VES_NORMAL);
                 offset += VertexElement::getTypeSize(VET_FLOAT3);
             }
-            attrib = vbElem->Attribute("tangents");
+            attrib = vbElem.attribute("tangents").as_string(NULL);
             if (attrib && StringConverter::parseBool(attrib))
             {
                 VertexElementType tangentType = VET_FLOAT3;
-                attrib = vbElem->Attribute("tangent_dimensions");
+                attrib = vbElem.attribute("tangent_dimensions").value();
                 if (attrib)
                 {
                     unsigned int dims = StringConverter::parseUnsignedInt(attrib);
@@ -983,38 +951,38 @@ namespace Ogre {
                 decl->addElement(bufCount, offset, tangentType, VES_TANGENT);
                 offset += VertexElement::getTypeSize(tangentType);
             }
-            attrib = vbElem->Attribute("binormals");
+            attrib = vbElem.attribute("binormals").as_string(NULL);
             if (attrib && StringConverter::parseBool(attrib))
             {
                 // Add element
                 decl->addElement(bufCount, offset, VET_FLOAT3, VES_BINORMAL);
                 offset += VertexElement::getTypeSize(VET_FLOAT3);
             }
-            attrib = vbElem->Attribute("colours_diffuse");
+            attrib = vbElem.attribute("colours_diffuse").as_string(NULL);
             if (attrib && StringConverter::parseBool(attrib))
             {
                 // Add element
                 decl->addElement(bufCount, offset, mColourElementType, VES_DIFFUSE);
                 offset += VertexElement::getTypeSize(mColourElementType);
             }
-            attrib = vbElem->Attribute("colours_specular");
+            attrib = vbElem.attribute("colours_specular").as_string(NULL);
             if (attrib && StringConverter::parseBool(attrib))
             {
                 // Add element
                 decl->addElement(bufCount, offset, mColourElementType, VES_SPECULAR);
                 offset += VertexElement::getTypeSize(mColourElementType);
             }
-            attrib = vbElem->Attribute("texture_coords");
+            attrib = vbElem.attribute("texture_coords").as_string(NULL);
             if (attrib && StringConverter::parseInt(attrib))
             {
-                unsigned short numTexCoords = StringConverter::parseInt(vbElem->Attribute("texture_coords"));
+                unsigned short numTexCoords = StringConverter::parseInt(vbElem.attribute("texture_coords").value());
                 for (unsigned short tx = 0; tx < numTexCoords; ++tx)
                 {
                     // NB set is local to this buffer, but will be translated into a 
                     // global set number across all vertex buffers
                     StringStream str;
                     str << "texture_coord_dimensions_" << tx;
-                    attrib = vbElem->Attribute(str.str().c_str());
+                    attrib = vbElem.attribute(str.str().c_str()).as_string(NULL);
                     VertexElementType vtype = VET_FLOAT2; // Default
                     if (attrib)
                     {
@@ -1052,8 +1020,9 @@ namespace Ogre {
                             vtype = VET_COLOUR_ABGR;
                         else 
                         {
-                            std::cerr << "ERROR: Did not recognise texture_coord_dimensions value of \""<<attrib<<"\"" << std::endl;
-                            std::cerr << "Falling back to default of VET_FLOAT2" << std::endl;
+                            auto err = LogManager::getSingleton().stream(LML_CRITICAL);
+                            err << "Did not recognise texture_coord_dimensions value of \""<<attrib<<"\"\n";
+                            err << "Falling back to default of VET_FLOAT2\n";
                         }
                     }
                     // Add element
@@ -1065,7 +1034,7 @@ namespace Ogre {
 
             // calculate how many vertexes there actually are
             int actualVertexCount = 0;
-            for (TiXmlElement * vertexElem = vbElem->FirstChildElement(); vertexElem != 0; vertexElem = vertexElem->NextSiblingElement())
+            for (pugi::xml_node& vertexElem : vbElem.children())
             {
                     actualVertexCount++;
             }
@@ -1090,13 +1059,12 @@ namespace Ogre {
             // Get the element list for this buffer alone
             VertexDeclaration::VertexElementList elems = decl->findElementsBySource(bufCount);
             // Now the buffer is set up, parse all the vertices
-            for (TiXmlElement* vertexElem = vbElem->FirstChildElement();
-            vertexElem != 0; vertexElem = vertexElem->NextSiblingElement())
+            for (pugi::xml_node& vertexElem : vbElem.children())
             {
                 // Now parse the elements, ensure they are all matched
                 VertexDeclaration::VertexElementList::const_iterator ielem, ielemend;
-                TiXmlElement* xmlElem;
-                TiXmlElement* texCoordElem = 0;
+                pugi::xml_node xmlElem;
+                pugi::xml_node texCoordElem;
                 ielemend = elems.end();
                 for (ielem = elems.begin(); ielem != ielemend; ++ielem)
                 {
@@ -1105,7 +1073,7 @@ namespace Ogre {
                     switch(elem.getSemantic())
                     {
                     case VES_POSITION:
-                        xmlElem = vertexElem->FirstChildElement("position");
+                        xmlElem = vertexElem.child("position");
                         if (!xmlElem)
                         {
                             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Missing <position> element.",
@@ -1113,19 +1081,13 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pFloat);
 
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("x"));
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("y"));
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("z"));
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("x").value());
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("y").value());
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("z").value());
 
-                        pos.x = StringConverter::parseReal(
-                            xmlElem->Attribute("x"));
-                        pos.y = StringConverter::parseReal(
-                            xmlElem->Attribute("y"));
-                        pos.z = StringConverter::parseReal(
-                            xmlElem->Attribute("z"));
+                        pos.x = StringConverter::parseReal(xmlElem.attribute("x").value());
+                        pos.y = StringConverter::parseReal(xmlElem.attribute("y").value());
+                        pos.z = StringConverter::parseReal(xmlElem.attribute("z").value());
                         
                         if (first)
                         {
@@ -1141,7 +1103,7 @@ namespace Ogre {
                         }
                         break;
                     case VES_NORMAL:
-                        xmlElem = vertexElem->FirstChildElement("normal");
+                        xmlElem = vertexElem.child("normal");
                         if (!xmlElem)
                         {
                             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Missing <normal> element.",
@@ -1149,15 +1111,12 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pFloat);
 
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("x"));
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("y"));
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("z"));
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("x").value());
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("y").value());
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("z").value());
                         break;
                     case VES_TANGENT:
-                        xmlElem = vertexElem->FirstChildElement("tangent");
+                        xmlElem = vertexElem.child("tangent");
                         if (!xmlElem)
                         {
                             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Missing <tangent> element.",
@@ -1165,20 +1124,16 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pFloat);
 
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("x"));
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("y"));
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("z"));
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("x").value());
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("y").value());
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("z").value());
                         if (elem.getType() == VET_FLOAT4)
                         {
-                            *pFloat++ = StringConverter::parseReal(
-                                xmlElem->Attribute("w"));
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("w").value());
                         }
                         break;
                     case VES_BINORMAL:
-                        xmlElem = vertexElem->FirstChildElement("binormal");
+                        xmlElem = vertexElem.child("binormal");
                         if (!xmlElem)
                         {
                             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Missing <binormal> element.",
@@ -1186,15 +1141,12 @@ namespace Ogre {
                         }
                         elem.baseVertexPointerToElement(pVert, &pFloat);
 
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("x"));
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("y"));
-                        *pFloat++ = StringConverter::parseReal(
-                            xmlElem->Attribute("z"));
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("x").value());
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("y").value());
+                        *pFloat++ = StringConverter::parseReal(xmlElem.attribute("z").value());
                         break;
                     case VES_DIFFUSE:
-                        xmlElem = vertexElem->FirstChildElement("colour_diffuse");
+                        xmlElem = vertexElem.child("colour_diffuse");
                         if (!xmlElem)
                         {
                             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Missing <colour_diffuse> element.",
@@ -1203,13 +1155,12 @@ namespace Ogre {
                         elem.baseVertexPointerToElement(pVert, &pCol);
                         {
                             ColourValue cv;
-                            cv = StringConverter::parseColourValue(
-                                xmlElem->Attribute("value"));
+                            cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
                             *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
                         }
                         break;
                     case VES_SPECULAR:
-                        xmlElem = vertexElem->FirstChildElement("colour_specular");
+                        xmlElem = vertexElem.child("colour_specular");
                         if (!xmlElem)
                         {
                             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Missing <colour_specular> element.",
@@ -1218,8 +1169,7 @@ namespace Ogre {
                         elem.baseVertexPointerToElement(pVert, &pCol);
                         {
                             ColourValue cv;
-                            cv = StringConverter::parseColourValue(
-                                xmlElem->Attribute("value"));
+                            cv = StringConverter::parseColourValue(xmlElem.attribute("value").value());
                             *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
                         }
                         break;
@@ -1227,12 +1177,12 @@ namespace Ogre {
                         if (!texCoordElem)
                         {
                             // Get first texcoord
-                            xmlElem = vertexElem->FirstChildElement("texcoord");
+                            xmlElem = vertexElem.child("texcoord");
                         }
                         else
                         {
                             // Get next texcoord
-                            xmlElem = texCoordElem->NextSiblingElement("texcoord");
+                            xmlElem = texCoordElem.next_sibling("texcoord");
                         }
                         if (!xmlElem)
                         {
@@ -1242,7 +1192,7 @@ namespace Ogre {
                         // Record the latest texture coord entry
                         texCoordElem = xmlElem;
 
-                        if (!xmlElem->Attribute("u"))
+                        if (!xmlElem.attribute("u"))
                             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'u' attribute not found.", "XMLMeshSerializer::readGeometry");
                         
                         // depending on type, pack appropriately, can process colour channels separately which is a bonus
@@ -1250,99 +1200,99 @@ namespace Ogre {
                         {
                         case VET_FLOAT1:
                             elem.baseVertexPointerToElement(pVert, &pFloat);
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("u"));
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("u").value());
                             break;
 
                         case VET_FLOAT2:
-                            if (!xmlElem->Attribute("v"))
+                            if (!xmlElem.attribute("v"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'v' attribute not found.", "XMLMeshSerializer::readGeometry");
                             elem.baseVertexPointerToElement(pVert, &pFloat);
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("u"));
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("v"));
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("u").value());
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("v").value());
                             break;
 
                         case VET_FLOAT3:
-                            if (!xmlElem->Attribute("v"))
+                            if (!xmlElem.attribute("v"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'v' attribute not found.", "XMLMeshSerializer::readGeometry");
-                            if (!xmlElem->Attribute("w"))
+                            if (!xmlElem.attribute("w"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'w' attribute not found.", "XMLMeshSerializer::readGeometry");
                             elem.baseVertexPointerToElement(pVert, &pFloat);
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("u"));
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("v"));
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("w"));
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("u").value());
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("v").value());
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("w").value());
                             break;
 
                         case VET_FLOAT4:
-                            if (!xmlElem->Attribute("v"))
+                            if (!xmlElem.attribute("v"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'v' attribute not found.", "XMLMeshSerializer::readGeometry");
-                            if (!xmlElem->Attribute("w"))
+                            if (!xmlElem.attribute("w"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'w' attribute not found.", "XMLMeshSerializer::readGeometry");
-                            if (!xmlElem->Attribute("x"))
+                            if (!xmlElem.attribute("x"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'x' attribute not found.", "XMLMeshSerializer::readGeometry");
                             elem.baseVertexPointerToElement(pVert, &pFloat);
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("u"));
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("v"));
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("w"));
-                            *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("x"));
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("u").value());
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("v").value());
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("w").value());
+                            *pFloat++ = StringConverter::parseReal(xmlElem.attribute("x").value());
                             break;
 
                         case VET_SHORT1:
                             elem.baseVertexPointerToElement(pVert, &pShort);
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("u")));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("u").value()));
                             break;
 
                         case VET_SHORT2:
-                            if (!xmlElem->Attribute("v"))
+                            if (!xmlElem.attribute("v"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'v' attribute not found.", "XMLMeshSerializer::readGeometry");
                             elem.baseVertexPointerToElement(pVert, &pShort);
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("u")));
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("v")));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("u").value()));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("v").value()));
                             break;
 
                         case VET_SHORT3:
-                            if (!xmlElem->Attribute("v"))
+                            if (!xmlElem.attribute("v"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'v' attribute not found.", "XMLMeshSerializer::readGeometry");
-                            if (!xmlElem->Attribute("w"))
+                            if (!xmlElem.attribute("w"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'w' attribute not found.", "XMLMeshSerializer::readGeometry");
                             elem.baseVertexPointerToElement(pVert, &pShort);
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("u")));
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("v")));
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("w")));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("u").value()));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("v").value()));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("w").value()));
                             break;
 
                         case VET_SHORT4:
-                            if (!xmlElem->Attribute("v"))
+                            if (!xmlElem.attribute("v"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'v' attribute not found.", "XMLMeshSerializer::readGeometry");
-                            if (!xmlElem->Attribute("w"))
+                            if (!xmlElem.attribute("w"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'w' attribute not found.", "XMLMeshSerializer::readGeometry");
-                            if (!xmlElem->Attribute("x"))
+                            if (!xmlElem.attribute("x"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'x' attribute not found.", "XMLMeshSerializer::readGeometry");
                             elem.baseVertexPointerToElement(pVert, &pShort);
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("u")));
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("v")));
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("w")));
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("x")));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("u").value()));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("v").value()));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("w").value()));
+                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem.attribute("x").value()));
                             break;
 
                         case VET_UBYTE4:
-                            if (!xmlElem->Attribute("v"))
+                            if (!xmlElem.attribute("v"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'v' attribute not found.", "XMLMeshSerializer::readGeometry");
-                            if (!xmlElem->Attribute("w"))
+                            if (!xmlElem.attribute("w"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'w' attribute not found.", "XMLMeshSerializer::readGeometry");
-                            if (!xmlElem->Attribute("x"))
+                            if (!xmlElem.attribute("x"))
                                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Texcoord 'x' attribute not found.", "XMLMeshSerializer::readGeometry");
                             elem.baseVertexPointerToElement(pVert, &pChar);
                             // round off instead of just truncating -- avoids magnifying rounding errors
-                            *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem->Attribute("u")));
-                            *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem->Attribute("v")));
-                            *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem->Attribute("w")));
-                            *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem->Attribute("x")));
+                            *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem.attribute("u").value()));
+                            *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem.attribute("v").value()));
+                            *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem.attribute("w").value()));
+                            *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem.attribute("x").value()));
                             break;
 
                         case VET_COLOUR: 
                             {
                                 elem.baseVertexPointerToElement(pVert, &pCol);
-                                ColourValue cv = StringConverter::parseColourValue(xmlElem->Attribute("u"));
+                                ColourValue cv = StringConverter::parseColourValue(xmlElem.attribute("u").value());
                                 *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
                             }
                             break;
@@ -1351,7 +1301,7 @@ namespace Ogre {
                         case VET_COLOUR_ABGR: 
                             {
                                 elem.baseVertexPointerToElement(pVert, &pCol);
-                                ColourValue cv = StringConverter::parseColourValue(xmlElem->Attribute("u"));
+                                ColourValue cv = StringConverter::parseColourValue(xmlElem.attribute("u").value());
                                 *pCol++ = VertexElement::convertColourValue(cv, elem.getType());
                             }
                             break;
@@ -1393,26 +1343,22 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("Geometry done...");
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readSkeletonLink(TiXmlElement* mSkelNode)
+    void XMLMeshSerializer::readSkeletonLink(pugi::xml_node& mSkelNode)
     {
-        mMesh->setSkeletonName(mSkelNode->Attribute("name"));
+        mMesh->setSkeletonName(mSkelNode.attribute("name").value());
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readBoneAssignments(TiXmlElement* mBoneAssignmentsNode)
+    void XMLMeshSerializer::readBoneAssignments(pugi::xml_node& mBoneAssignmentsNode)
     {
         LogManager::getSingleton().logMessage("Reading bone assignments...");
 
         // Iterate over all children (vertexboneassignment entries)
-        for (TiXmlElement* elem = mBoneAssignmentsNode->FirstChildElement();
-        elem != 0; elem = elem->NextSiblingElement())
+        for (pugi::xml_node& elem : mBoneAssignmentsNode.children())
         {
             VertexBoneAssignment vba;
-            vba.vertexIndex = StringConverter::parseInt(
-                elem->Attribute("vertexindex"));
-            vba.boneIndex = StringConverter::parseInt(
-                elem->Attribute("boneindex"));
-            vba.weight= StringConverter::parseReal(
-                elem->Attribute("weight"));
+            vba.vertexIndex = StringConverter::parseInt(elem.attribute("vertexindex").value());
+            vba.boneIndex = StringConverter::parseInt(elem.attribute("boneindex").value());
+            vba.weight = StringConverter::parseReal(elem.attribute("weight").value());
 
             mMesh->addBoneAssignment(vba);
         }
@@ -1420,19 +1366,18 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("Bone assignments done.");
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readTextureAliases(TiXmlElement* mTextureAliasesNode, SubMesh* subMesh)
+    void XMLMeshSerializer::readTextureAliases(pugi::xml_node& mTextureAliasesNode, SubMesh* subMesh)
     {
         LogManager::getSingleton().logMessage("Reading sub mesh texture aliases...");
 
         // Iterate over all children (texture entries)
-        for (TiXmlElement* elem = mTextureAliasesNode->FirstChildElement();
-             elem != 0; elem = elem->NextSiblingElement())
+        for (pugi::xml_node& elem : mTextureAliasesNode.children())
         {
             // pass alias and texture name to submesh
             // read attribute "alias"
-            String alias = elem->Attribute("alias");
+            String alias = elem.attribute("alias").value();
             // read attribute "name"
-            String name = elem->Attribute("name");
+            String name = elem.attribute("name").value();
 
             subMesh->addTextureAlias(alias, name);
         }
@@ -1440,16 +1385,15 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("Texture aliases done.");
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readSubMeshNames(TiXmlElement* mMeshNamesNode, Mesh *sm)
+    void XMLMeshSerializer::readSubMeshNames(pugi::xml_node& mMeshNamesNode, Mesh *sm)
     {
         LogManager::getSingleton().logMessage("Reading mesh names...");
 
         // Iterate over all children (vertexboneassignment entries)
-        for (TiXmlElement* elem = mMeshNamesNode->FirstChildElement();
-            elem != 0; elem = elem->NextSiblingElement())
+        for (pugi::xml_node& elem : mMeshNamesNode.children())
         {
-            String meshName = elem->Attribute("name");
-            int index = StringConverter::parseInt(elem->Attribute("index"));
+            String meshName = elem.attribute("name").value();
+            int index = StringConverter::parseInt(elem.attribute("index").value());
 
             sm->nameSubMesh(meshName, index);
         }
@@ -1457,37 +1401,32 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("Mesh names done.");
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readBoneAssignments(TiXmlElement* mBoneAssignmentsNode, SubMesh* sm)
+    void XMLMeshSerializer::readBoneAssignments(pugi::xml_node& mBoneAssignmentsNode, SubMesh* sm)
     {
         LogManager::getSingleton().logMessage("Reading bone assignments...");
         // Iterate over all children (vertexboneassignment entries)
-        for (TiXmlElement* elem = mBoneAssignmentsNode->FirstChildElement();
-        elem != 0; elem = elem->NextSiblingElement())
+        for (pugi::xml_node& elem : mBoneAssignmentsNode.children())
         {
             VertexBoneAssignment vba;
-            vba.vertexIndex = StringConverter::parseInt(
-                elem->Attribute("vertexindex"));
-            vba.boneIndex = StringConverter::parseInt(
-                elem->Attribute("boneindex"));
-            vba.weight= StringConverter::parseReal(
-                elem->Attribute("weight"));
+            vba.vertexIndex = StringConverter::parseInt(elem.attribute("vertexindex").value());
+            vba.boneIndex = StringConverter::parseInt(elem.attribute("boneindex").value());
+            vba.weight = StringConverter::parseReal(elem.attribute("weight").value());
 
             sm->addBoneAssignment(vba);
         }
         LogManager::getSingleton().logMessage("Bone assignments done.");
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeLodInfo(TiXmlElement* mMeshNode, const Mesh* pMesh)
+    void XMLMeshSerializer::writeLodInfo(pugi::xml_node& mMeshNode, const Mesh* pMesh)
     {
-        TiXmlElement* lodNode = 
-            mMeshNode->InsertEndChild(TiXmlElement("levelofdetail"))->ToElement();
+        pugi::xml_node lodNode = mMeshNode.append_child("levelofdetail");
 
         const LodStrategy *strategy = pMesh->getLodStrategy();
         unsigned short numLvls = pMesh->getNumLodLevels();
         bool manual = pMesh->hasManualLodLevel();
-        lodNode->SetAttribute("strategy", strategy->getName());
-        lodNode->SetAttribute("numlevels", StringConverter::toString(numLvls));
-        lodNode->SetAttribute("manual", StringConverter::toString(manual));
+        lodNode.append_attribute("strategy") = strategy->getName().c_str();
+        lodNode.append_attribute("numlevels") = StringConverter::toString(numLvls).c_str();
+        lodNode.append_attribute("manual") = StringConverter::toString(manual).c_str();
 
         // Iterate from level 1, not 0 (full detail)
         for (unsigned short i = 1; i < numLvls; ++i)
@@ -1505,61 +1444,56 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeSubMeshNames(TiXmlElement* mMeshNode, const Mesh* m)
+    void XMLMeshSerializer::writeSubMeshNames(pugi::xml_node& mMeshNode, const Mesh* m)
     {
         const Mesh::SubMeshNameMap& nameMap = m->getSubMeshNameMap();
         if (nameMap.empty())
             return; // do nothing
 
-        TiXmlElement* namesNode = 
-            mMeshNode->InsertEndChild(TiXmlElement("submeshnames"))->ToElement();
+        pugi::xml_node namesNode = mMeshNode.append_child("submeshnames");
         Mesh::SubMeshNameMap::const_iterator i, iend;
         iend = nameMap.end();
         for (i = nameMap.begin(); i != iend; ++i)
         {
-            TiXmlElement* subNameNode = 
-                namesNode->InsertEndChild(TiXmlElement("submeshname"))->ToElement();
+            pugi::xml_node subNameNode = namesNode.append_child("submeshname");
 
-            subNameNode->SetAttribute("name", i->first);
-            subNameNode->SetAttribute("index", 
-                StringConverter::toString(i->second));
+            subNameNode.append_attribute("name") = i->first.c_str();
+            subNameNode.append_attribute("index") =
+                StringConverter::toString(i->second).c_str();
         }
 
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeLodUsageManual(TiXmlElement* usageNode, 
+    void XMLMeshSerializer::writeLodUsageManual(pugi::xml_node& usageNode,
         unsigned short levelNum, const MeshLodUsage& usage)
     {
-        TiXmlElement* manualNode = 
-            usageNode->InsertEndChild(TiXmlElement("lodmanual"))->ToElement();
+        pugi::xml_node manualNode = usageNode.append_child("lodmanual");
 
-        manualNode->SetAttribute("value", 
-            StringConverter::toString(usage.userValue));
-        manualNode->SetAttribute("meshname", usage.manualName);
+        manualNode.append_attribute("value") =
+            StringConverter::toString(usage.userValue).c_str();
+        manualNode.append_attribute("meshname") = usage.manualName.c_str();
 
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeLodUsageGenerated(TiXmlElement* usageNode, 
+    void XMLMeshSerializer::writeLodUsageGenerated(pugi::xml_node& usageNode,
         unsigned short levelNum,  const MeshLodUsage& usage, 
         const Mesh* pMesh)
     {
-        TiXmlElement* generatedNode = 
-            usageNode->InsertEndChild(TiXmlElement("lodgenerated"))->ToElement();
-        generatedNode->SetAttribute("value", 
-            StringConverter::toString(usage.userValue));
+        pugi::xml_node generatedNode = usageNode.append_child("lodgenerated");
+        generatedNode.append_attribute("value") =
+            StringConverter::toString(usage.userValue).c_str();
 
         // Iterate over submeshes at this level
         size_t numsubs = pMesh->getNumSubMeshes();
 
         for (size_t subi = 0; subi < numsubs; ++subi)
         {
-            TiXmlElement* subNode = 
-                generatedNode->InsertEndChild(TiXmlElement("lodfacelist"))->ToElement();
+            pugi::xml_node subNode = generatedNode.append_child("lodfacelist");
             SubMesh* sub = pMesh->getSubMesh(subi);
-            subNode->SetAttribute("submeshindex", StringConverter::toString(subi));
+            subNode.append_attribute("submeshindex") = StringConverter::toString(subi).c_str();
             // NB level - 1 because SubMeshes don't store the first index in geometry
             IndexData* facedata = sub->mLodFaceList[levelNum - 1];
-            subNode->SetAttribute("numfaces", StringConverter::toString(facedata->indexCount / 3));
+            subNode.append_attribute("numfaces") =  StringConverter::toString(facedata->indexCount / 3).c_str();
 
             if (facedata->indexCount > 0)
             {
@@ -1585,19 +1519,19 @@ namespace Ogre {
                 
                 for (size_t f = 0; f < facedata->indexCount; f += 3)
                 {
-                    TiXmlElement* faceNode = 
-                        subNode->InsertEndChild(TiXmlElement("face"))->ToElement();
+                    pugi::xml_node faceNode =
+                        subNode.append_child("face");
                     if (use32BitIndexes)
                     {
-                        faceNode->SetAttribute("v1", StringConverter::toString(*pInt++));
-                        faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
-                        faceNode->SetAttribute("v3", StringConverter::toString(*pInt++));
+                        faceNode.append_attribute("v1") = StringConverter::toString(*pInt++).c_str();
+                        faceNode.append_attribute("v2") = StringConverter::toString(*pInt++).c_str();
+                        faceNode.append_attribute("v3") = StringConverter::toString(*pInt++).c_str();
                     }
                     else
                     {
-                        faceNode->SetAttribute("v1", StringConverter::toString(*pShort++));
-                        faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
-                        faceNode->SetAttribute("v3", StringConverter::toString(*pShort++));
+                        faceNode.append_attribute("v1") = StringConverter::toString(*pShort++).c_str();
+                        faceNode.append_attribute("v2") = StringConverter::toString(*pShort++).c_str();
+                        faceNode.append_attribute("v3") = StringConverter::toString(*pShort++).c_str();
                     }
 
                 }
@@ -1609,9 +1543,9 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::writeExtremes(TiXmlElement* mMeshNode, const Mesh* m)
+    void XMLMeshSerializer::writeExtremes(pugi::xml_node& mMeshNode, const Mesh* m)
     {
-        TiXmlElement* extremesNode = NULL;
+        pugi::xml_node extremesNode;
         size_t submeshCount = m->getNumSubMeshes();
         for (size_t idx = 0; idx < submeshCount; ++idx)
         {
@@ -1620,31 +1554,29 @@ namespace Ogre {
                 continue; // do nothing
 
             if (!extremesNode)
-                extremesNode = mMeshNode->InsertEndChild(TiXmlElement("extremes"))->ToElement();
+                extremesNode = mMeshNode.append_child("extremes");
 
-            TiXmlElement* submeshNode =
-                extremesNode->InsertEndChild(TiXmlElement("submesh_extremes"))->ToElement();
+            pugi::xml_node submeshNode = extremesNode.append_child("submesh_extremes");
 
-            submeshNode->SetAttribute("index",  StringConverter::toString(idx));
+            submeshNode.append_attribute("index") =   StringConverter::toString(idx).c_str();
 
             for (std::vector<Vector3>::const_iterator v = sm->extremityPoints.begin ();
                  v != sm->extremityPoints.end (); ++v)
             {
-                TiXmlElement* vert = submeshNode->InsertEndChild(
-                    TiXmlElement("position"))->ToElement();
-                vert->SetAttribute("x", StringConverter::toString(v->x));
-                vert->SetAttribute("y", StringConverter::toString(v->y));
-                vert->SetAttribute("z", StringConverter::toString(v->z));
+                pugi::xml_node vert = submeshNode.append_child("position");
+                vert.append_attribute("x") = StringConverter::toString(v->x).c_str();
+                vert.append_attribute("y") = StringConverter::toString(v->y).c_str();
+                vert.append_attribute("z") = StringConverter::toString(v->z).c_str();
             }
         }
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readLodInfo(TiXmlElement*  lodNode)
+    void XMLMeshSerializer::readLodInfo(pugi::xml_node&  lodNode)
     {
         
         LogManager::getSingleton().logMessage("Parsing LOD information...");
 
-        const char* val = lodNode->Attribute("strategy");
+        const char* val = lodNode.attribute("strategy").as_string(NULL);
         // This attribute is optional to maintain backwards compatibility
         if (val)
         {
@@ -1653,11 +1585,11 @@ namespace Ogre {
             mMesh->setLodStrategy(strategy);
         }
 
-        val = lodNode->Attribute("numlevels");
+        val = lodNode.attribute("numlevels").value();
         unsigned short numLevels = static_cast<unsigned short>(
             StringConverter::parseUnsignedInt(val));
 
-        val = lodNode->Attribute("manual");
+        val = lodNode.attribute("manual").value();
         StringConverter::parseBool(val);
 
         // Set up the basic structures
@@ -1665,18 +1597,16 @@ namespace Ogre {
 
         // Parse the detail, start from 1 (the first sub-level of detail)
         unsigned short i = 1;
-        TiXmlElement* usageElem = lodNode->FirstChildElement();
-        while (usageElem)
+        for (auto usageElem : lodNode.children())
         {
-            if (usageElem->ValueStr() == "lodmanual")
+            if (usageElem.name() == String("lodmanual"))
             {
                 readLodUsageManual(usageElem, i);
             }
-            else if (usageElem->ValueStr() == "lodgenerated")
+            else if (usageElem.name() == String("lodgenerated"))
             {
                 readLodUsageGenerated(usageElem, i);
             }
-            usageElem = usageElem->NextSiblingElement();
             ++i;
         }
         
@@ -1684,15 +1614,15 @@ namespace Ogre {
         
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readLodUsageManual(TiXmlElement* manualNode, unsigned short index)
+    void XMLMeshSerializer::readLodUsageManual(pugi::xml_node& manualNode, unsigned short index)
     {
         MeshLodUsage usage;
-        const char* val = manualNode->Attribute("value");
+        const char* val = manualNode.attribute("value").as_string(NULL);
 
         // If value attribute not found check for old name
         if (!val)
         {
-            val = manualNode->Attribute("fromdepthsquared");
+            val = manualNode.attribute("fromdepthsquared").as_string(NULL);
             if (val)
                 LogManager::getSingleton().logWarning("'fromdepthsquared' attribute has been renamed to 'value'.");
             // user values are non-squared
@@ -1703,7 +1633,7 @@ namespace Ogre {
             usage.userValue = StringConverter::parseReal(val);
         }
         usage.value = mMesh->getLodStrategy()->transformUserValue(usage.userValue);
-        usage.manualName = manualNode->Attribute("meshname");
+        usage.manualName = manualNode.attribute("meshname").value();
         usage.edgeData = NULL;
 
         // Generate for mixed
@@ -1717,15 +1647,15 @@ namespace Ogre {
         mMesh->_setLodUsage(index, usage);
     }
     //---------------------------------------------------------------------
-    void XMLMeshSerializer::readLodUsageGenerated(TiXmlElement* genNode, unsigned short index)
+    void XMLMeshSerializer::readLodUsageGenerated(pugi::xml_node& genNode, unsigned short index)
     {
         MeshLodUsage usage;
-        const char* val = genNode->Attribute("value");
+        const char* val = genNode.attribute("value").as_string(NULL);
 
         // If value attribute not found check for old name
         if (!val)
         {
-            val = genNode->Attribute("fromdepthsquared");
+            val = genNode.attribute("fromdepthsquared").value();
             if (val)
                 LogManager::getSingleton().logWarning("'fromdepthsquared' attribute has been renamed to 'value'.");
             // user values are non-squared
@@ -1743,13 +1673,13 @@ namespace Ogre {
         mMesh->_setLodUsage(index, usage);
 
         // Read submesh face lists
-        TiXmlElement* faceListElem = genNode->FirstChildElement("lodfacelist");
+
         HardwareIndexBufferSharedPtr ibuf;
-        while (faceListElem)
+        for (pugi::xml_node faceListElem : genNode.children("lodfacelist"))
         {
-            val = faceListElem->Attribute("submeshindex");
+            val = faceListElem.attribute("submeshindex").value();
             unsigned short subidx = StringConverter::parseUnsignedInt(val);
-            val = faceListElem->Attribute("numfaces");
+            val = faceListElem.attribute("numfaces").value();
             unsigned short numFaces = StringConverter::parseUnsignedInt(val);
             if (numFaces)
             {
@@ -1775,25 +1705,25 @@ namespace Ogre {
                     pShort = static_cast<unsigned short*>(
                         ibuf->lock(HardwareBuffer::HBL_DISCARD));
                 }
-                TiXmlElement* faceElem = faceListElem->FirstChildElement("face");
-                for (unsigned int face = 0; face < numFaces; ++face, faceElem = faceElem->NextSiblingElement())
+                pugi::xml_node faceElem = faceListElem.child("face");
+                for (unsigned int face = 0; face < numFaces; ++face, faceElem = faceElem.next_sibling())
                 {
                     if (use32bitindexes)
                     {
-                        val = faceElem->Attribute("v1");
+                        val = faceElem.attribute("v1").value();
                         *pInt++ = StringConverter::parseUnsignedInt(val);
-                        val = faceElem->Attribute("v2");
+                        val = faceElem.attribute("v2").value();
                         *pInt++ = StringConverter::parseUnsignedInt(val);
-                        val = faceElem->Attribute("v3");
+                        val = faceElem.attribute("v3").value();
                         *pInt++ = StringConverter::parseUnsignedInt(val);
                     }
                     else
                     {
-                        val = faceElem->Attribute("v1");
+                        val = faceElem.attribute("v1").value();
                         *pShort++ = StringConverter::parseUnsignedInt(val);
-                        val = faceElem->Attribute("v2");
+                        val = faceElem.attribute("v2").value();
                         *pShort++ = StringConverter::parseUnsignedInt(val);
-                        val = faceElem->Attribute("v3");
+                        val = faceElem.attribute("v3").value();
                         *pShort++ = StringConverter::parseUnsignedInt(val);
                     }
 
@@ -1806,31 +1736,27 @@ namespace Ogre {
             facedata->indexStart = 0;
             facedata->indexBuffer = ibuf;
             mMesh->_setSubMeshLodFaceList(subidx, index, facedata);
-
-            faceListElem = faceListElem->NextSiblingElement();
         }
         
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::readExtremes(TiXmlElement* extremesNode, Mesh *m)
+    void XMLMeshSerializer::readExtremes(pugi::xml_node& extremesNode, Mesh *m)
     {
         LogManager::getSingleton().logMessage("Reading extremes...");
 
         // Iterate over all children (submesh_extreme list)
-        for (TiXmlElement* elem = extremesNode->FirstChildElement();
-             elem != 0; elem = elem->NextSiblingElement())
+        for (pugi::xml_node& elem : extremesNode.children())
         {
-            int index = StringConverter::parseInt(elem->Attribute("index"));
+            int index = StringConverter::parseInt(elem.attribute("index").value());
 
             SubMesh *sm = m->getSubMesh(index);
             sm->extremityPoints.clear ();
-            for (TiXmlElement* vert = elem->FirstChildElement();
-                 vert != 0; vert = vert->NextSiblingElement())
+            for (pugi::xml_node& vert : elem.children())
             {
                 Vector3 v;
-                v.x = StringConverter::parseReal(vert->Attribute("x"));
-                v.y = StringConverter::parseReal(vert->Attribute("y"));
-                v.z = StringConverter::parseReal(vert->Attribute("z"));
+                v.x = StringConverter::parseReal(vert.attribute("x").value());
+                v.y = StringConverter::parseReal(vert.attribute("y").value());
+                v.z = StringConverter::parseReal(vert.attribute("z").value());
                 sm->extremityPoints.push_back (v);
             }
         }
@@ -1838,13 +1764,13 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("Extremes done.");
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::readPoses(TiXmlElement* posesNode, Mesh *m)
+    void XMLMeshSerializer::readPoses(pugi::xml_node& posesNode, Mesh *m)
     {
-        TiXmlElement* poseNode = posesNode->FirstChildElement("pose");
 
-        while (poseNode)
+
+        for (pugi::xml_node poseNode : posesNode.children("pose"))
         {
-            const char* target = poseNode->Attribute("target");
+            const char* target = poseNode.attribute("target").as_string(NULL);
             if (!target)
             {
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
@@ -1859,7 +1785,7 @@ namespace Ogre {
             else
             {
                 // submesh, get index
-                const char* val = poseNode->Attribute("index");
+                const char* val = poseNode.attribute("index").as_string(NULL);
                 if (!val)
                 {
                     OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
@@ -1873,29 +1799,27 @@ namespace Ogre {
             }
 
             String name;
-            const char* val = poseNode->Attribute("name");
+            const char* val = poseNode.attribute("name").as_string(NULL);
             if (val)
                 name = val;
             Pose* pose = m->createPose(targetID, name);
 
-            TiXmlElement* poseOffsetNode = poseNode->FirstChildElement("poseoffset");
-            while (poseOffsetNode)
+            for (pugi::xml_node poseOffsetNode : poseNode.children("poseoffset"))
             {
-                uint index = StringConverter::parseUnsignedInt(
-                    poseOffsetNode->Attribute("index"));
+                uint index = StringConverter::parseUnsignedInt(poseOffsetNode.attribute("index").value());
                 Vector3 offset;
-                offset.x = StringConverter::parseReal(poseOffsetNode->Attribute("x"));
-                offset.y = StringConverter::parseReal(poseOffsetNode->Attribute("y"));
-                offset.z = StringConverter::parseReal(poseOffsetNode->Attribute("z"));
+                offset.x = StringConverter::parseReal(poseOffsetNode.attribute("x").value());
+                offset.y = StringConverter::parseReal(poseOffsetNode.attribute("y").value());
+                offset.z = StringConverter::parseReal(poseOffsetNode.attribute("z").value());
 
-                if (poseOffsetNode->Attribute("nx") && 
-                    poseOffsetNode->Attribute("ny") &&
-                    poseOffsetNode->Attribute("nz"))
+                if (poseOffsetNode.attribute("nx").value() &&
+                    poseOffsetNode.attribute("ny").value() &&
+                    poseOffsetNode.attribute("nz").value())
                 {
                     Vector3 normal;
-                    normal.x = StringConverter::parseReal(poseOffsetNode->Attribute("nx"));
-                    normal.y = StringConverter::parseReal(poseOffsetNode->Attribute("ny"));
-                    normal.z = StringConverter::parseReal(poseOffsetNode->Attribute("nz"));
+                    normal.x = StringConverter::parseReal(poseOffsetNode.attribute("nx").value());
+                    normal.y = StringConverter::parseReal(poseOffsetNode.attribute("ny").value());
+                    normal.z = StringConverter::parseReal(poseOffsetNode.attribute("nz").value());
                     pose->addVertex(index, offset, normal);
                     
                 }
@@ -1903,56 +1827,45 @@ namespace Ogre {
                 {
                     pose->addVertex(index, offset);
                 }
-
-                poseOffsetNode = poseOffsetNode->NextSiblingElement();
-
             }
-
-            poseNode = poseNode->NextSiblingElement();
-
         }
 
 
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::readAnimations(TiXmlElement* mAnimationsNode, Mesh *pMesh)
+    void XMLMeshSerializer::readAnimations(pugi::xml_node& mAnimationsNode, Mesh *pMesh)
     {
-        TiXmlElement* animElem = mAnimationsNode->FirstChildElement("animation");
-        while (animElem)
+        for (pugi::xml_node animElem : mAnimationsNode.children("animation"))
         {
-            String name = animElem->Attribute("name");
-            const char* charLen = animElem->Attribute("length");
+            String name = animElem.attribute("name").value();
+            const char* charLen = animElem.attribute("length").as_string(NULL);
             Real len = StringConverter::parseReal(charLen);
 
             Animation* anim = pMesh->createAnimation(name, len);
 
-            TiXmlElement* baseInfoNode = animElem->FirstChildElement("baseinfo");
+            pugi::xml_node baseInfoNode = animElem.child("baseinfo");
             if (baseInfoNode)
             {
-                String baseName = baseInfoNode->Attribute("baseanimationname");
-                Real baseTime = StringConverter::parseReal(baseInfoNode->Attribute("basekeyframetime"));
+                String baseName = baseInfoNode.attribute("baseanimationname").value();
+                Real baseTime = StringConverter::parseReal(baseInfoNode.attribute("basekeyframetime").value());
                 anim->setUseBaseKeyFrame(true, baseTime, baseName);
             }
             
-            TiXmlElement* tracksNode = animElem->FirstChildElement("tracks");
+            pugi::xml_node tracksNode = animElem.child("tracks");
             if (tracksNode)
             {
                 readTracks(tracksNode, pMesh, anim);
             }
-
-            animElem = animElem->NextSiblingElement();
-
         }
 
 
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::readTracks(TiXmlElement* tracksNode, Mesh *m, Animation* anim)
+    void XMLMeshSerializer::readTracks(pugi::xml_node& tracksNode, Mesh *m, Animation* anim)
     {
-        TiXmlElement* trackNode = tracksNode->FirstChildElement("track");
-        while (trackNode)
+        for (pugi::xml_node trackNode : tracksNode.children("track"))
         {
-            String target = trackNode->Attribute("target");
+            String target = trackNode.attribute("target").value();
             unsigned short targetID;
             VertexData* vertexData = 0;
             if(target == "mesh")
@@ -1963,7 +1876,7 @@ namespace Ogre {
             else
             {
                 // submesh, get index
-                const char* val = trackNode->Attribute("index");
+                const char* val = trackNode.attribute("index").as_string(NULL);
                 if (!val)
                 {
                     OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
@@ -1988,7 +1901,7 @@ namespace Ogre {
 
             // Get type
             VertexAnimationType animType = VAT_NONE;
-            String strAnimType = trackNode->Attribute("type");
+            String strAnimType = trackNode.attribute("type").value();
             if (strAnimType == "morph")
             {
                 animType = VAT_MORPH;
@@ -2008,7 +1921,7 @@ namespace Ogre {
             VertexAnimationTrack* track = 
                 anim->createVertexTrack(targetID, vertexData, animType);
 
-            TiXmlElement* keyframesNode = trackNode->FirstChildElement("keyframes");
+            pugi::xml_node keyframesNode = trackNode.child("keyframes");
             if (keyframesNode)
             {
                 if (track->getAnimationType() == VAT_MORPH)
@@ -2020,18 +1933,15 @@ namespace Ogre {
                     readPoseKeyFrames(keyframesNode, track);
                 }
             }
-
-            trackNode = trackNode->NextSiblingElement();
         }
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::readMorphKeyFrames(TiXmlElement* keyframesNode, 
+    void XMLMeshSerializer::readMorphKeyFrames(pugi::xml_node& keyframesNode,
         VertexAnimationTrack* track, size_t vertexCount)
     {
-        TiXmlElement* keyNode = keyframesNode->FirstChildElement("keyframe");
-        while (keyNode)
+        for (pugi::xml_node keyNode : keyframesNode.children("keyframe"))
         {
-            const char* val = keyNode->Attribute("time");
+            const char* val = keyNode.attribute("time").as_string(NULL);
             if (!val)
             {
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
@@ -2042,7 +1952,7 @@ namespace Ogre {
 
             VertexMorphKeyFrame* kf = track->createVertexMorphKeyFrame(time);
             
-            bool includesNormals = keyNode->FirstChildElement("normal") != 0;
+            bool includesNormals = keyNode.child("normal");
 
             size_t vertexSize = sizeof(float) * (includesNormals ? 6 : 3);
             // create a vertex buffer
@@ -2055,8 +1965,8 @@ namespace Ogre {
                 vbuf->lock(HardwareBuffer::HBL_DISCARD));
 
 
-            TiXmlElement* posNode = keyNode->FirstChildElement("position");
-            TiXmlElement* normNode = keyNode->FirstChildElement("normal");
+            pugi::xml_node posNode = keyNode.child("position");
+            pugi::xml_node normNode = keyNode.child("normal");
             for (size_t v = 0; v < vertexCount; ++v)
             {
                 if (!posNode)
@@ -2067,12 +1977,9 @@ namespace Ogre {
 
                 }
 
-                *pFloat++ = StringConverter::parseReal(
-                    posNode->Attribute("x"));
-                *pFloat++ = StringConverter::parseReal(
-                    posNode->Attribute("y"));
-                *pFloat++ = StringConverter::parseReal(
-                    posNode->Attribute("z"));
+                *pFloat++ = StringConverter::parseReal(posNode.attribute("x").value());
+                *pFloat++ = StringConverter::parseReal(posNode.attribute("y").value());
+                *pFloat++ = StringConverter::parseReal(posNode.attribute("z").value());
                     
                 if (includesNormals)
                 {
@@ -2084,36 +1991,29 @@ namespace Ogre {
 
                     }
                     
-                    *pFloat++ = StringConverter::parseReal(
-                        normNode->Attribute("x"));
-                    *pFloat++ = StringConverter::parseReal(
-                        normNode->Attribute("y"));
-                    *pFloat++ = StringConverter::parseReal(
-                        normNode->Attribute("z"));
-                    normNode = normNode->NextSiblingElement("normal");
+                    *pFloat++ = StringConverter::parseReal(normNode.attribute("x").value());
+                    *pFloat++ = StringConverter::parseReal(normNode.attribute("y").value());
+                    *pFloat++ = StringConverter::parseReal(normNode.attribute("z").value());
+                    normNode = normNode.next_sibling("normal");
                 }
 
 
-                posNode = posNode->NextSiblingElement("position");
+                posNode = posNode.next_sibling("position");
             }
 
             vbuf->unlock();
 
             kf->setVertexBuffer(vbuf);
-                
-
-            keyNode = keyNode->NextSiblingElement();
         }
 
 
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::readPoseKeyFrames(TiXmlElement* keyframesNode, VertexAnimationTrack* track)
+    void XMLMeshSerializer::readPoseKeyFrames(pugi::xml_node& keyframesNode, VertexAnimationTrack* track)
     {
-        TiXmlElement* keyNode = keyframesNode->FirstChildElement("keyframe");
-        while (keyNode)
+        for (pugi::xml_node keyNode : keyframesNode.children("keyframe"))
         {
-            const char* val = keyNode->Attribute("time");
+            const char* val = keyNode.attribute("time").as_string(NULL);
             if (!val)
             {
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
@@ -2125,10 +2025,9 @@ namespace Ogre {
             VertexPoseKeyFrame* kf = track->createVertexPoseKeyFrame(time);
 
             // Read all pose references
-            TiXmlElement* poseRefNode = keyNode->FirstChildElement("poseref");
-            while (poseRefNode)
+            for (pugi::xml_node poseRefNode : keyNode.children("poseref"))
             {
-                const char* attr = poseRefNode->Attribute("poseindex");
+                const char* attr = poseRefNode.attribute("poseindex").as_string(NULL);
                 if (!attr)
                 {
                     OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
@@ -2137,50 +2036,44 @@ namespace Ogre {
                 }
                 unsigned short poseIndex = StringConverter::parseUnsignedInt(attr);
                 Real influence = 1.0f;
-                attr = poseRefNode->Attribute("influence");
+                attr = poseRefNode.attribute("influence").as_string(NULL);
                 if (attr)
                 {
                     influence = StringConverter::parseReal(attr);
                 }
 
                 kf->addPoseReference(poseIndex, influence);
-
-                poseRefNode = poseRefNode->NextSiblingElement();
             }
-
-            keyNode = keyNode->NextSiblingElement();
         }
 
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::writePoses(TiXmlElement* meshNode, const Mesh* m)
+    void XMLMeshSerializer::writePoses(pugi::xml_node& meshNode, const Mesh* m)
     {
         if (m->getPoseList().empty())
             return;
 
-        TiXmlElement* posesNode = 
-            meshNode->InsertEndChild(TiXmlElement("poses"))->ToElement();
+        pugi::xml_node posesNode = meshNode.append_child("poses");
 
         PoseList::const_iterator it;
         for( it = m->getPoseList().begin(); it != m->getPoseList().end(); ++it)
         {
             const Pose* pose = *it;
-            TiXmlElement* poseNode = 
-                posesNode->InsertEndChild(TiXmlElement("pose"))->ToElement();
+            pugi::xml_node poseNode = posesNode.append_child("pose");
             unsigned short target = pose->getTarget();
             if (target == 0)
             {
                 // Main mesh
-                poseNode->SetAttribute("target", "mesh");
+                poseNode.append_attribute("target") = "mesh";
             }
             else
             {
                 // Submesh - rebase index
-                poseNode->SetAttribute("target", "submesh");
-                poseNode->SetAttribute("index", 
-                    StringConverter::toString(target - 1));
+                poseNode.append_attribute("target") = "submesh";
+                poseNode.append_attribute("index") =
+                    StringConverter::toString(target - 1).c_str();
             }
-            poseNode->SetAttribute("name", pose->getName());
+            poseNode.append_attribute("name") = pose->getName().c_str();
             
             bool includesNormals = !pose->getNormals().empty();
 
@@ -2188,23 +2081,22 @@ namespace Ogre {
             Pose::ConstNormalsIterator nit = pose->getNormalsIterator();
             while (vit.hasMoreElements())
             {
-                TiXmlElement* poseOffsetElement = poseNode->InsertEndChild(
-                    TiXmlElement("poseoffset"))->ToElement();
+                pugi::xml_node poseOffsetElement = poseNode.append_child("poseoffset");
 
-                poseOffsetElement->SetAttribute("index", 
-                    StringConverter::toString(vit.peekNextKey()));
+                poseOffsetElement.append_attribute("index") =
+                    StringConverter::toString(vit.peekNextKey()).c_str();
 
                 Vector3 offset = vit.getNext();
-                poseOffsetElement->SetAttribute("x", StringConverter::toString(offset.x));
-                poseOffsetElement->SetAttribute("y", StringConverter::toString(offset.y));
-                poseOffsetElement->SetAttribute("z", StringConverter::toString(offset.z));
+                poseOffsetElement.append_attribute("x") = StringConverter::toString(offset.x).c_str();
+                poseOffsetElement.append_attribute("y") = StringConverter::toString(offset.y).c_str();
+                poseOffsetElement.append_attribute("z") = StringConverter::toString(offset.z).c_str();
                 
                 if (includesNormals)
                 {
                     Vector3 normal = nit.getNext();
-                    poseOffsetElement->SetAttribute("nx", StringConverter::toString(normal.x));
-                    poseOffsetElement->SetAttribute("ny", StringConverter::toString(normal.y));
-                    poseOffsetElement->SetAttribute("nz", StringConverter::toString(normal.z));
+                    poseOffsetElement.append_attribute("nx") = StringConverter::toString(normal.x).c_str();
+                    poseOffsetElement.append_attribute("ny") = StringConverter::toString(normal.y).c_str();
+                    poseOffsetElement.append_attribute("nz") = StringConverter::toString(normal.z).c_str();
                 }
                 
                 
@@ -2216,63 +2108,60 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::writeAnimations(TiXmlElement* meshNode, const Mesh* m)
+    void XMLMeshSerializer::writeAnimations(pugi::xml_node& meshNode, const Mesh* m)
     {
         // Skip if no animation
         if (!m->hasVertexAnimation())
             return;
 
-        TiXmlElement* animationsNode = 
-            meshNode->InsertEndChild(TiXmlElement("animations"))->ToElement();
+        pugi::xml_node animationsNode = meshNode.append_child("animations");
 
         for (unsigned short a = 0; a < m->getNumAnimations(); ++a)
         {
             Animation* anim = m->getAnimation(a);
 
-            TiXmlElement* animNode = 
-                animationsNode->InsertEndChild(TiXmlElement("animation"))->ToElement();
-            animNode->SetAttribute("name", anim->getName());
-            animNode->SetAttribute("length", 
-                StringConverter::toString(anim->getLength()));
+            pugi::xml_node animNode =
+                animationsNode.append_child("animation");
+            animNode.append_attribute("name") = anim->getName().c_str();
+            animNode.append_attribute("length") =
+                StringConverter::toString(anim->getLength()).c_str();
 
             // Optional base keyframe information
             if (anim->getUseBaseKeyFrame())
             {
-                TiXmlElement* baseInfoNode = 
-                animNode->InsertEndChild(TiXmlElement("baseinfo"))->ToElement();
-                baseInfoNode->SetAttribute("baseanimationname", anim->getBaseKeyFrameAnimationName());
-                baseInfoNode->SetAttribute("basekeyframetime", StringConverter::toString(anim->getBaseKeyFrameTime()));
+                pugi::xml_node baseInfoNode =
+                animNode.append_child("baseinfo");
+                baseInfoNode.append_attribute("baseanimationname") = anim->getBaseKeyFrameAnimationName().c_str();
+                baseInfoNode.append_attribute("basekeyframetime") = StringConverter::toString(anim->getBaseKeyFrameTime()).c_str();
             }
             
-            TiXmlElement* tracksNode = 
-                animNode->InsertEndChild(TiXmlElement("tracks"))->ToElement();
+            pugi::xml_node tracksNode = animNode.append_child("tracks");
             Animation::VertexTrackIterator iter = anim->getVertexTrackIterator();
             while(iter.hasMoreElements())
             {
                 const VertexAnimationTrack* track = iter.getNext();
-                TiXmlElement* trackNode = 
-                    tracksNode->InsertEndChild(TiXmlElement("track"))->ToElement();
+                pugi::xml_node trackNode = tracksNode.append_child("track");
 
                 unsigned short targetID = track->getHandle();
                 if (targetID == 0)
                 {
-                    trackNode->SetAttribute("target", "mesh");
+                    trackNode.append_attribute("target") = "mesh";
                 }
                 else
                 {
-                    trackNode->SetAttribute("target", "submesh");
-                    trackNode->SetAttribute("index", 
-                        StringConverter::toString(targetID-1));
+                    trackNode.append_attribute("target") = "submesh";
+                    trackNode.append_attribute("index") =
+                        StringConverter::toString(targetID-1).c_str();
                 }
 
                 if (track->getAnimationType() == VAT_MORPH)
                 {
-                    trackNode->SetAttribute("type", "morph");
+                    trackNode.append_attribute("type") = "morph";
                     writeMorphKeyFrames(trackNode, track);
                 }
                 else
                 {
-                    trackNode->SetAttribute("type", "pose");
+                    trackNode.append_attribute("type") = "pose";
                     writePoseKeyFrames(trackNode, track);
                 }
 
@@ -2283,20 +2172,18 @@ namespace Ogre {
         
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::writeMorphKeyFrames(TiXmlElement* trackNode, const VertexAnimationTrack* track)
+    void XMLMeshSerializer::writeMorphKeyFrames(pugi::xml_node& trackNode, const VertexAnimationTrack* track)
     {
-        TiXmlElement* keyframesNode = 
-            trackNode->InsertEndChild(TiXmlElement("keyframes"))->ToElement();
+        pugi::xml_node keyframesNode = trackNode.append_child("keyframes");
 
         size_t vertexCount = track->getAssociatedVertexData()->vertexCount;
 
         for (unsigned short k = 0; k < track->getNumKeyFrames(); ++k)
         {
             VertexMorphKeyFrame* kf = track->getVertexMorphKeyFrame(k);
-            TiXmlElement* keyNode = 
-                keyframesNode->InsertEndChild(TiXmlElement("keyframe"))->ToElement();
-            keyNode->SetAttribute("time", 
-                StringConverter::toString(kf->getTime()));
+            pugi::xml_node keyNode = keyframesNode.append_child("keyframe");
+            keyNode.append_attribute("time") =
+                StringConverter::toString(kf->getTime()).c_str();
 
             HardwareVertexBufferSharedPtr vbuf = kf->getVertexBuffer();
             
@@ -2307,50 +2194,45 @@ namespace Ogre {
 
             for (size_t v = 0; v < vertexCount; ++v)
             {
-                TiXmlElement* posNode = 
-                    keyNode->InsertEndChild(TiXmlElement("position"))->ToElement();
-                posNode->SetAttribute("x", StringConverter::toString(*pFloat++));
-                posNode->SetAttribute("y", StringConverter::toString(*pFloat++));
-                posNode->SetAttribute("z", StringConverter::toString(*pFloat++));
+                pugi::xml_node posNode = keyNode.append_child("position");
+                posNode.append_attribute("x") = StringConverter::toString(*pFloat++).c_str();
+                posNode.append_attribute("y") = StringConverter::toString(*pFloat++).c_str();
+                posNode.append_attribute("z") = StringConverter::toString(*pFloat++).c_str();
                 
                 if (includesNormals)
                 {
-                    TiXmlElement* normNode = 
-                        keyNode->InsertEndChild(TiXmlElement("normal"))->ToElement();
-                    normNode->SetAttribute("x", StringConverter::toString(*pFloat++));
-                    normNode->SetAttribute("y", StringConverter::toString(*pFloat++));
-                    normNode->SetAttribute("z", StringConverter::toString(*pFloat++));
+                    pugi::xml_node normNode = keyNode.append_child("normal");
+                    normNode.append_attribute("x") = StringConverter::toString(*pFloat++).c_str();
+                    normNode.append_attribute("y") = StringConverter::toString(*pFloat++).c_str();
+                    normNode.append_attribute("z") = StringConverter::toString(*pFloat++).c_str();
                 }
             }
 
         }
     }
     //-----------------------------------------------------------------------------
-    void XMLMeshSerializer::writePoseKeyFrames(TiXmlElement* trackNode, const VertexAnimationTrack* track)
+    void XMLMeshSerializer::writePoseKeyFrames(pugi::xml_node& trackNode, const VertexAnimationTrack* track)
     {
-        TiXmlElement* keyframesNode = 
-            trackNode->InsertEndChild(TiXmlElement("keyframes"))->ToElement();
+        pugi::xml_node keyframesNode = trackNode.append_child("keyframes");
 
         for (unsigned short k = 0; k < track->getNumKeyFrames(); ++k)
         {
             VertexPoseKeyFrame* kf = track->getVertexPoseKeyFrame(k);
-            TiXmlElement* keyNode = 
-                keyframesNode->InsertEndChild(TiXmlElement("keyframe"))->ToElement();
-            keyNode->SetAttribute("time", 
-                StringConverter::toString(kf->getTime()));
+            pugi::xml_node keyNode = keyframesNode.append_child("keyframe");
+            keyNode.append_attribute("time") =
+                StringConverter::toString(kf->getTime()).c_str();
 
             VertexPoseKeyFrame::PoseRefList::const_iterator poseIt =
                 kf->getPoseReferences().begin();
             for (;poseIt != kf->getPoseReferences().end(); ++poseIt)
             {
                 const VertexPoseKeyFrame::PoseRef& poseRef = *poseIt;
-                TiXmlElement* poseRefNode = 
-                    keyNode->InsertEndChild(TiXmlElement("poseref"))->ToElement();
+                pugi::xml_node poseRefNode = keyNode.append_child("poseref");
 
-                poseRefNode->SetAttribute("poseindex", 
-                    StringConverter::toString(poseRef.poseIndex));
-                poseRefNode->SetAttribute("influence", 
-                    StringConverter::toString(poseRef.influence));
+                poseRefNode.append_attribute("poseindex") =
+                    StringConverter::toString(poseRef.poseIndex).c_str();
+                poseRefNode.append_attribute("influence") =
+                    StringConverter::toString(poseRef.influence).c_str();
 
             }
 
