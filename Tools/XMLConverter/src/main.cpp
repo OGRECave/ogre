@@ -387,18 +387,17 @@ void XMLToBinary(XmlOptions opts)
 {
     // Read root element and decide from there what type
     String response;
-    TiXmlDocument* doc = new TiXmlDocument(opts.source);
+    pugi::xml_document doc;
+
     // Some double-parsing here but never mind
-    if (!doc->LoadFile())
+    if (!doc.load_file(opts.source.c_str()))
     {
         cout << "Unable to open file " << opts.source << " - fatal error." << endl;
-        delete doc;
         exit (1);
     }
-    TiXmlElement* root = doc->RootElement();
-    if (!stricmp(root->Value(), "mesh"))
+    pugi::xml_node root = doc.document_element();
+    if (!stricmp(root.name(), "mesh"))
     {
-        delete doc;
         MeshPtr newMesh = MeshManager::getSingleton().createManual("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         VertexElementType colourElementType;
@@ -476,9 +475,8 @@ void XMLToBinary(XmlOptions opts)
         MeshManager::getSingleton().remove("conversion",
                                            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
-    else if (!stricmp(root->Value(), "skeleton"))
+    else if (!stricmp(root.name(), "skeleton"))
     {
-        delete doc;
         SkeletonPtr newSkel = SkeletonManager::getSingleton().create("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         xmlSkeletonSerializer->importSkeleton(opts.source, newSkel.get());
@@ -492,11 +490,6 @@ void XMLToBinary(XmlOptions opts)
         SkeletonManager::getSingleton().remove("conversion",
                                                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
-    else
-    {
-        delete doc;
-    }
-
 }
 
 void skeletonToXML(XmlOptions opts)

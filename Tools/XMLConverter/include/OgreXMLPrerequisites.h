@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 // Include tinyxml headers
-#include "tinyxml.h"
+#include <pugixml.hpp>
 
 
 #endif
