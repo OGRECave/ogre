@@ -722,7 +722,7 @@ namespace Ogre {
             SubMesh* sm = mMesh->createSubMesh();
 
             const char* mat = smElem->Attribute("material");
-            if (mat)
+            if (mat && mat[0] != '\0')
             {
                 // we do not load any materials - so create a dummy here to just store the name
                 sm->setMaterial(MaterialManager::getSingleton().create(mat, RGN_DEFAULT));
