@@ -523,6 +523,18 @@ void skeletonToXML(XmlOptions opts)
     SkeletonManager::getSingleton().remove("conversion",
                                            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
+
+struct MaterialCreator : public MeshSerializerListener
+{
+    void processMaterialName(Mesh *mesh, String *name)
+    {
+        // create material because we do not load any .material files
+        MaterialManager::getSingleton().create(*name, mesh->getGroup());
+    }
+
+    void processSkeletonName(Mesh *mesh, String *name) {}
+    void processMeshCompleted(Mesh *mesh) {}
+};
 }
 
 int main(int numargs, char** args)
@@ -557,6 +569,8 @@ int main(int numargs, char** args)
         matMgr->initialise();
         skelMgr = new SkeletonManager();
         meshSerializer = new MeshSerializer();
+        MaterialCreator matCreator;
+        meshSerializer->setListener(&matCreator);
         xmlMeshSerializer = new XMLMeshSerializer();
         skeletonSerializer = new SkeletonSerializer();
         xmlSkeletonSerializer = new XMLSkeletonSerializer();
