@@ -553,6 +553,8 @@ SHARED_PTR(Mesh);
 %include "OgrePatchSurface.h"
     SHARED_PTR(PatchMesh);
     %include "OgrePatchMesh.h"
+%feature("director") Ogre::MeshSerializerListener;
+%include "OgreMeshSerializer.h"
 %include "OgreMeshManager.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
 %ignore Ogre::Pass::hasSeparateSceneBlending;
