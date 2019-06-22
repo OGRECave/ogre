@@ -70,8 +70,7 @@ namespace Ogre {
         elem = rootElem.child("sharedgeometry");
         if (elem)
         {
-            const char *claimedVertexCount_ = elem.attribute("vertexcount").as_string(NULL);
-            if(!claimedVertexCount_ || StringConverter::parseInt(claimedVertexCount_) > 0)
+            if(StringConverter::parseInt(elem.attribute("vertexcount").value()) > 0)
             {
                 mMesh->sharedVertexData = new VertexData();
                 readGeometry(elem, mMesh->sharedVertexData);
@@ -750,25 +749,16 @@ namespace Ogre {
                 }
             }
 
-            const char* tmp = smElem.attribute("usesharedvertices").as_string(NULL);
-            if (tmp)
-                sm->useSharedVertices = StringConverter::parseBool(tmp);
-            tmp = smElem.attribute("use32bitindexes").as_string(NULL);
-            bool use32BitIndexes = false;
-            if (tmp)
-                use32BitIndexes = StringConverter::parseBool(tmp);
+            sm->useSharedVertices = StringConverter::parseBool(smElem.attribute("usesharedvertices").value());
+            bool use32BitIndexes = StringConverter::parseBool(smElem.attribute("use32bitindexes").value());
             
             // Faces
             if (readFaces)
             {
                 pugi::xml_node faces = smElem.child("faces");
-                int actualCount = 0;
-                for (pugi::xml_node faceElem : faces.children())
-                {
-                        actualCount++;
-                }
-                const char *claimedCount_ = faces.attribute("count").as_string(NULL);
-                if (claimedCount_ && StringConverter::parseInt(claimedCount_)!=actualCount)
+                int actualCount = std::distance(faces.begin(), faces.end());
+                const char *claimedCount_ = faces.attribute("count").value();
+                if (StringConverter::parseInt(claimedCount_)!=actualCount)
                 {
                     LogManager::getSingleton().stream(LML_WARNING)
                         << "WARNING: face count (" << actualCount << ") " <<
@@ -893,15 +883,11 @@ namespace Ogre {
         uint8 *pChar;
         ARGB *pCol;
 
-        const char *claimedVertexCount_ = mGeometryNode.attribute("vertexcount").as_string(NULL);
-        ptrdiff_t claimedVertexCount = 0;
-        if (claimedVertexCount_)
-        {
-                claimedVertexCount =
-                        StringConverter::parseInt(claimedVertexCount_);
-        }
+        ptrdiff_t claimedVertexCount =
+            StringConverter::parseInt(mGeometryNode.attribute("vertexcount").value());
+
         // Skip empty 
-        if (claimedVertexCount_ && claimedVertexCount <= 0) return;
+        if (claimedVertexCount <= 0) return;
         
 
         VertexDeclaration* decl = vertexData->vertexDeclaration;
@@ -915,65 +901,51 @@ namespace Ogre {
         bool first = true;
 
         // Iterate over all children (vertexbuffer entries) 
-        for (pugi::xml_node& vbElem : mGeometryNode.children())
+        for (pugi::xml_node& vbElem : mGeometryNode.children("vertexbuffer"))
         {
             size_t offset = 0;
-            // Skip non-vertexbuffer elems
-            if (stricmp(vbElem.name(), "vertexbuffer")) continue;
-           
-            const char* attrib = vbElem.attribute("positions").as_string(NULL);
-            if (attrib && StringConverter::parseBool(attrib))
+            if (StringConverter::parseBool(vbElem.attribute("positions").value()))
             {
                 // Add element
                 decl->addElement(bufCount, offset, VET_FLOAT3, VES_POSITION);
                 offset += VertexElement::getTypeSize(VET_FLOAT3);
             }
-            attrib = vbElem.attribute("normals").as_string(NULL);
-            if (attrib && StringConverter::parseBool(attrib))
+            if (StringConverter::parseBool(vbElem.attribute("normals").value()))
             {
                 // Add element
                 decl->addElement(bufCount, offset, VET_FLOAT3, VES_NORMAL);
                 offset += VertexElement::getTypeSize(VET_FLOAT3);
             }
-            attrib = vbElem.attribute("tangents").as_string(NULL);
-            if (attrib && StringConverter::parseBool(attrib))
+            if (StringConverter::parseBool(vbElem.attribute("tangents").value()))
             {
                 VertexElementType tangentType = VET_FLOAT3;
-                attrib = vbElem.attribute("tangent_dimensions").value();
-                if (attrib)
-                {
-                    unsigned int dims = StringConverter::parseUnsignedInt(attrib);
-                    if (dims == 4)
-                        tangentType = VET_FLOAT4;
-                }
+                unsigned int dims = StringConverter::parseUnsignedInt(vbElem.attribute("tangent_dimensions").value());
+                if (dims == 4)
+                    tangentType = VET_FLOAT4;
 
                 // Add element
                 decl->addElement(bufCount, offset, tangentType, VES_TANGENT);
                 offset += VertexElement::getTypeSize(tangentType);
             }
-            attrib = vbElem.attribute("binormals").as_string(NULL);
-            if (attrib && StringConverter::parseBool(attrib))
+            if (StringConverter::parseBool(vbElem.attribute("binormals").value()))
             {
                 // Add element
                 decl->addElement(bufCount, offset, VET_FLOAT3, VES_BINORMAL);
                 offset += VertexElement::getTypeSize(VET_FLOAT3);
             }
-            attrib = vbElem.attribute("colours_diffuse").as_string(NULL);
-            if (attrib && StringConverter::parseBool(attrib))
+            if (StringConverter::parseBool(vbElem.attribute("colours_diffuse").value()))
             {
                 // Add element
                 decl->addElement(bufCount, offset, mColourElementType, VES_DIFFUSE);
                 offset += VertexElement::getTypeSize(mColourElementType);
             }
-            attrib = vbElem.attribute("colours_specular").as_string(NULL);
-            if (attrib && StringConverter::parseBool(attrib))
+            if (StringConverter::parseBool(vbElem.attribute("colours_specular").value()))
             {
                 // Add element
                 decl->addElement(bufCount, offset, mColourElementType, VES_SPECULAR);
                 offset += VertexElement::getTypeSize(mColourElementType);
             }
-            attrib = vbElem.attribute("texture_coords").as_string(NULL);
-            if (attrib && StringConverter::parseInt(attrib))
+            if (StringConverter::parseInt(vbElem.attribute("texture_coords").value()))
             {
                 unsigned short numTexCoords = StringConverter::parseInt(vbElem.attribute("texture_coords").value());
                 for (unsigned short tx = 0; tx < numTexCoords; ++tx)
@@ -982,7 +954,7 @@ namespace Ogre {
                     // global set number across all vertex buffers
                     StringStream str;
                     str << "texture_coord_dimensions_" << tx;
-                    attrib = vbElem.attribute(str.str().c_str()).as_string(NULL);
+                    auto attrib = vbElem.attribute(str.str().c_str()).as_string(NULL);
                     VertexElementType vtype = VET_FLOAT2; // Default
                     if (attrib)
                     {
@@ -1033,16 +1005,12 @@ namespace Ogre {
             } 
 
             // calculate how many vertexes there actually are
-            int actualVertexCount = 0;
-            for (pugi::xml_node& vertexElem : vbElem.children())
-            {
-                    actualVertexCount++;
-            }
-            if (claimedVertexCount_ && actualVertexCount!=claimedVertexCount)
+            int actualVertexCount = std::distance(vbElem.begin(), vbElem.end());
+            if (actualVertexCount!=claimedVertexCount)
             {
                 LogManager::getSingleton().stream(LML_WARNING)
                     << "WARNING: vertex count (" << actualVertexCount 
-                    << ") is not as claimed (" << claimedVertexCount_ << ")";
+                    << ") is not as claimed (" << claimedVertexCount << ")";
             }
 
             vertexData->vertexCount = actualVertexCount;
@@ -1838,8 +1806,7 @@ namespace Ogre {
         for (pugi::xml_node animElem : mAnimationsNode.children("animation"))
         {
             String name = animElem.attribute("name").value();
-            const char* charLen = animElem.attribute("length").as_string(NULL);
-            Real len = StringConverter::parseReal(charLen);
+            Real len = StringConverter::parseReal(animElem.attribute("length").value());
 
             Animation* anim = pMesh->createAnimation(name, len);
 
