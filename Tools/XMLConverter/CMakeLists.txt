@@ -22,7 +22,7 @@ set(SOURCE_FILES
 )
 
 # allow override by cmake
-find_package(pugixml)
+find_package(pugixml QUIET)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
