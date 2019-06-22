@@ -18,7 +18,6 @@ addons:
     - libxrandr-dev
     - libfreetype6-dev
     - libxt-dev
-    - libboost-all-dev
     - libgles2-mesa-dev
     - mesa-common-dev
     - libgl1-mesa-dev
@@ -26,9 +25,10 @@ addons:
     - python3-dev
     - python3-lxml     # for validate script
     - nvidia-cg-dev
+    - libpugixml-dev
     - swig3.0
 before_script:
-    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew update && brew install freetype libzzip sdl2 ; fi
+    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew update && brew install freetype libzzip sdl2 pugixml ; fi
 osx_image: xcode10.1
 env:
     - TEST=TRUE

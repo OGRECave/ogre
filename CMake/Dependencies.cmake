@@ -102,6 +102,14 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
     set(BUILD_COMMAND_OPTS --target install --config ${CMAKE_BUILD_TYPE})
 
+    set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+      -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+      -G ${CMAKE_GENERATOR}
+      -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
+      -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+      ${CROSS})
+
     if(MSVC OR EMSCRIPTEN OR MINGW) # other platforms ship zlib
         message(STATUS "Building zlib")
         file(DOWNLOAD 
@@ -110,14 +118,8 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             EXPECTED_MD5 1c9f62f0778697a09d36121ead88e08e)
         execute_process(COMMAND ${CMAKE_COMMAND} 
             -E tar xf zlib-1.2.11.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-            -G ${CMAKE_GENERATOR}
-            -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-            -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-            ${CROSS}
             ${PROJECT_BINARY_DIR}/zlib-1.2.11
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zlib-1.2.11)
         execute_process(COMMAND ${CMAKE_COMMAND} 
@@ -130,22 +132,28 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         ${PROJECT_BINARY_DIR}/zziplib-develop.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
         -E tar xf zziplib-develop.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DZLIB_ROOT=${OGREDEPS_PATH}
         -DZZIPMMAPPED=OFF -DZZIPCOMPAT=OFF -DZZIPLIBTOOL=OFF -DZZIPFSEEKO=OFF -DZZIPWRAP=OFF -DZZIPSDL=OFF -DZZIPBINS=OFF -DZZIPTEST=OFF -DZZIPDOCS=OFF -DBASH=sh
         -DBUILD_STATIC_LIBS=TRUE
         -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-        -G ${CMAKE_GENERATOR}
-        -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-        -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-        ${CROSS}
         ${PROJECT_BINARY_DIR}/zziplib-develop
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zziplib-develop)
     execute_process(COMMAND ${CMAKE_COMMAND} 
         --build ${PROJECT_BINARY_DIR}/zziplib-develop ${BUILD_COMMAND_OPTS})
-    
+
+    message(STATUS "Building pugixml")
+    file(DOWNLOAD
+        https://github.com/zeux/pugixml/releases/download/v1.9/pugixml-1.9.tar.gz
+        ${PROJECT_BINARY_DIR}/pugixml-1.9.tar.gz)
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        -E tar xf pugixml-1.9.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    execute_process(COMMAND ${BUILD_COMMAND_COMMON}
+        ${PROJECT_BINARY_DIR}/pugixml-1.9
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/pugixml-1.9)
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        --build ${PROJECT_BINARY_DIR}/pugixml-1.9 ${BUILD_COMMAND_OPTS})
+
     find_package(Freetype)
     if (NOT FREETYPE_FOUND)
         message(STATUS "Building freetype")
@@ -159,18 +167,12 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             ${PROJECT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
             freetype-2.9/builds/cmake/iOS.cmake
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
             -DWITH_PNG=OFF
             -DWITH_BZip2=OFF # tries to use it on iOS otherwise
             # workaround for broken iOS toolchain in freetype
             -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.9
-            ${CROSS}
-            -G ${CMAKE_GENERATOR}
-            -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-            -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
             ${PROJECT_BINARY_DIR}/freetype-2.9
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.9/objs)
         execute_process(COMMAND ${CMAKE_COMMAND}
@@ -186,14 +188,8 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             -E tar xf SDL2-2.0.8.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         execute_process(COMMAND ${CMAKE_COMMAND}
             -E make_directory ${PROJECT_BINARY_DIR}/SDL2-build)
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DSDL_STATIC=FALSE
-            -G ${CMAKE_GENERATOR}
-            -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-            -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-            ${CROSS}
             ${PROJECT_BINARY_DIR}/SDL2-2.0.8
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${CMAKE_COMMAND}
