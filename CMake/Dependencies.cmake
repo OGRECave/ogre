@@ -82,6 +82,22 @@ if(CMAKE_CROSSCOMPILING)
     endif()
 endif()
 
+set(OGREDEPS_SHARED TRUE)
+if(OGRE_STATIC OR MSVC)
+    # freetype does not like shared build on MSVC and it generally eases distribution there
+    set(OGREDEPS_SHARED FALSE)
+endif()
+
+set(BUILD_COMMAND_OPTS --target install --config ${CMAKE_BUILD_TYPE})
+
+set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
+  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+  -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+  -G ${CMAKE_GENERATOR}
+  -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
+  -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+  ${CROSS})
+
 # Set hardcoded path guesses for various platforms
 if (UNIX AND NOT EMSCRIPTEN)
   set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/local)
@@ -94,22 +110,6 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OGRE_DEP_SEARCH_PATH})
 set(CMAKE_FRAMEWORK_PATH ${CMAKE_FRAMEWORK_PATH} ${OGRE_DEP_SEARCH_PATH})
 
 if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
-    set(OGREDEPS_SHARED TRUE)
-    if(OGRE_STATIC OR MSVC)
-        # freetype does not like shared build on MSVC and it generally eases distribution there
-        set(OGREDEPS_SHARED FALSE)
-    endif()
-
-    set(BUILD_COMMAND_OPTS --target install --config ${CMAKE_BUILD_TYPE})
-
-    set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
-      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-      -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
-      -G ${CMAKE_GENERATOR}
-      -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-      -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-      ${CROSS})
-
     if(MSVC OR EMSCRIPTEN OR MINGW) # other platforms ship zlib
         message(STATUS "Building zlib")
         file(DOWNLOAD 
