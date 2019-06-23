@@ -10,34 +10,29 @@
 # Configure Tests build
 if (OGRE_BUILD_TESTS)
 
+  find_package(GTest)
+  if(NOT ${GTest_FOUND})
+    message(STATUS "Building gtest")
+    file(DOWNLOAD
+        https://github.com/google/googletest/archive/v1.8.x.tar.gz
+        ${PROJECT_BINARY_DIR}/v1.8.x.tar.gz)
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        -E tar xf v1.8.x.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    execute_process(COMMAND ${BUILD_COMMAND_COMMON}
+        ${PROJECT_BINARY_DIR}/googletest-1.8.x
+        -Dgtest_force_shared_crt=TRUE
+        -DBUILD_GMOCK=FALSE
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-1.8.x)
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        --build ${PROJECT_BINARY_DIR}/googletest-1.8.x ${BUILD_COMMAND_OPTS})
+    
+    find_package(GTest CONFIG REQUIRED)
+    set(GTEST_LIBRARIES GTest::gtest)
+  endif()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
-    if(APPLE AND NOT APPLE_IOS)
-        set(CROSS ${CROSS} -DCMAKE_CXX_FLAGS=-stdlib=libc++)
-    endif()
-    
-    if(MSVC)
-        set(CROSS ${CROSS} -DCMAKE_CXX_FLAGS=-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-    endif()
-
-    set(GTEST_INSTALL_DIR ${CMAKE_BINARY_DIR}/gtest)
-    include(ExternalProject)
-    ExternalProject_Add(googletest
-        URL https://github.com/google/googletest/archive/release-1.8.0.tar.gz
-        SOURCE_DIR ${GTEST_INSTALL_DIR}
-        CMAKE_ARGS
-            -DCMAKE_INSTALL_PREFIX=${GTEST_INSTALL_DIR}
-            -DBUILD_SHARED_LIBS=FALSE
-            -DBUILD_GMOCK=FALSE
-            -DBUILD_GTEST=TRUE
-            -Dgtest_force_shared_crt=TRUE
-            -G ${CMAKE_GENERATOR}
-            -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
-            ${CROSS})
-
     # unit tests are go!
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include ${GTEST_INSTALL_DIR}/include)
-    link_directories(${GTEST_INSTALL_DIR}/lib)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include)
     
     file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include/*.h")
     file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/src/*.cpp"
@@ -87,9 +82,8 @@ if (OGRE_BUILD_TESTS)
       add_definitions(-Wno-undef)
     endif()
     add_executable(Test_Ogre ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
-    add_dependencies(Test_Ogre googletest)
     ogre_install_target(Test_Ogre "" FALSE)
-    target_link_libraries(Test_Ogre OgreBites Codec_STBI ${OGRE_LIBRARIES} gtest)
+    target_link_libraries(Test_Ogre OgreBites Codec_STBI ${OGRE_LIBRARIES} ${GTEST_LIBRARIES})
     
     if(ANDROID)
         set_target_properties(Test_Ogre PROPERTIES LINK_FLAGS -pie)
