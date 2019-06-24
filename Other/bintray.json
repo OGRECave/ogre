@@ -7,7 +7,7 @@
         "licenses": ["MIT"]
     },
     "version": {
-        "name": "master1",
+        "name": "1.12.1",
         "gpgSign": false
     },
     "files": [
