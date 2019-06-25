@@ -53,7 +53,8 @@ then build it according to its documentation.
 ### Recommended dependencies:
 
 * zlib: http://www.zlib.net
-* zziplib: https://github.com/paroj/ZZIPlib
+* zziplib: https://github.com/gdraheim/zziplib
+* pugixml: https://github.com/zeux/pugixml
 * SDL: https://www.libsdl.org/
 
 ### Optional dependencies:
@@ -62,6 +63,7 @@ then build it according to its documentation.
 * FreeImage: http://freeimage.sourceforge.net
 * Doxygen: http://doxygen.org
 * Cg: http://developer.nvidia.com/object/cg_toolkit.html
+* Remotery: https://github.com/Celtoys/Remotery
 * Boost: http://www.boost.org (+)
 * POCO: http://pocoproject.org (+)
 * TBB: http://www.threadingbuildingblocks.org (+)
@@ -83,9 +85,17 @@ Check the [CMake documentation](https://cmake.org/cmake/help/latest/manual/cmake
 
 Click *Finish*. CMake will now gather some information about your
 build environment and try to locate the dependencies. It will then show
-a list of build options. You can adjust the settings to your liking; for
-example unchecking any of the `OGRE_BUILD_XXX` options will disable that
-particular component from being built. Once you are satisfied, hit
+a list of build options. You can adjust the settings to your liking;
+- unchecking any of the `OGRE_BUILD_XXX` options will disable that
+particular component/ plugin from being built
+- `OGRE_CONFIG_XXX` on the other hand allows you to configure Core features e.g. threading or zip file support.
+- `OGRE_CONFIG_NODE_INHERIT_TRANSFORM` enables shearing and non-uniform scaling for Ogre::SceneNode. This requires slightly more storage and computation time.
+- `OGRE_PROFILING` add profiling instrumentation the ogre library.
+- `OGRE_PROFILING_REMOTERY_PATH` if set, Remotery is used for profiling instead of the Ogre internal profiler.
+- `OGRE_ASSERT_MODE` allows you to to disable all runtime assertion exceptions or turn them into calls to `std::abort`.
+- `OGRE_RESOURCEMANGER_STRICT` allows you to turn on resource lookup related quirks for pre ogre 1.10 compatibility.
+
+Once you are satisfied, hit
 *Configure* again and then click on *Generate*. CMake will then create
 the build system for you.
 
