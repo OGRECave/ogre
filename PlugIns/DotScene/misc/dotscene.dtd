@@ -1,0 +1,276 @@
+<!ELEMENT scene (nodes?, externals?, environment?, terrain?, userData?, light?, camera?)>
+<!ATTLIST scene
+    formatVersion    CDATA    #FIXED "1.1"
+    id                ID        #IMPLIED
+    sceneManager    CDATA    #IMPLIED
+    minOgreVersion    CDATA    #IMPLIED
+    author            CDATA    #IMPLIED
+>
+
+<!ELEMENT terrainGroup (terrain*)>
+<!ATTLIST terrainGroup
+    size CDATA #REQUIRED
+    worldSize CDATA #REQUIRED
+>
+
+<!ELEMENT terrain EMPTY>
+<!ATTLIST terrain
+    x CDATA #REQUIRED
+    y CDATA #REQUIRED
+    dataFile CDATA #REQUIRED
+>
+
+<!ELEMENT nodes (node*, position?, rotation?, scale?)>
+
+<!ELEMENT node (position?, rotation?, scale?, lookTarget?, trackTarget?, userData?, node*, entity*, light*, camera*, particleSystem*, billboardSet*, plane*)>
+<!ATTLIST node
+    name        CDATA    #IMPLIED
+    id            ID        #IMPLIED
+    isTarget    (true | false) "true"
+>
+
+<!ELEMENT particleSystem (userData?)>
+<!ATTLIST particleSystem
+    name    CDATA    #IMPLIED
+    id        ID        #IMPLIED
+    template    CDATA    #REQUIRED
+>
+
+<!ELEMENT light (colourDiffuse?, colourSpecular?, lightRange?, lightAttenuation?, userData?)>
+<!ATTLIST light
+    name            CDATA    #IMPLIED
+    id                ID        #IMPLIED
+    type            (point | directional | spot ) "point"
+    visible            (true | false) "true"
+    castShadows        (true | false) "true"
+    powerScale		CDATA	"1.0"
+>
+
+<!ELEMENT camera (clipping?, userData?)>
+<!ATTLIST camera
+    name            CDATA    #IMPLIED
+    id                ID        #IMPLIED
+    fov                CDATA    #IMPLIED
+    aspectRatio        CDATA    #IMPLIED
+    projectionType    (perspective | orthographic)    "perspective"
+>
+
+<!ELEMENT trackTarget (localDirection?, offset?)>
+<!ATTLIST trackTarget
+    nodeName    CDATA    #REQUIRED
+>
+
+<!ELEMENT lookTarget (position?, localDirection?)>
+<!ATTLIST lookTarget
+    nodeName    CDATA    #IMPLIED
+    relativeTo    (local | parent | world) "parent"
+>
+
+<!ELEMENT lightAttenuation EMPTY>
+<!ATTLIST lightAttenuation
+    range        CDATA    #IMPLIED
+    constant    CDATA    #IMPLIED
+    linear        CDATA    #IMPLIED
+    quadratic    CDATA    #IMPLIED
+>
+
+<!ELEMENT lightRange EMPTY>
+<!ATTLIST lightRange
+    inner    CDATA    #REQUIRED
+    outer    CDATA    #REQUIRED
+    falloff CDATA    #REQUIRED
+>
+
+<!ELEMENT entity (userData?)>
+<!ATTLIST entity
+    name            CDATA    #IMPLIED
+    id                ID        #IMPLIED
+    meshFile        CDATA    #REQUIRED
+    material        CDATA    #IMPLIED
+    static            (true | false) "false"
+    castShadows        (true | false) "true"
+>
+
+<!ELEMENT environment (fog?, skyBox?, skyDome?, skyPlane?, colourAmbient?, colourBackground?)>
+
+<!ELEMENT clipping EMPTY>
+<!ATTLIST clipping
+    near    CDATA #REQUIRED
+    far        CDATA #REQUIRED
+>
+
+<!ELEMENT fog (colourDiffuse?)>
+<!ATTLIST fog
+    expDensity    CDATA        "0.001"
+    linearStart CDATA        "0.0"
+    linearEnd    CDATA        "1.0"
+    mode        (none | exp | exp2 | linear) "none"
+>
+
+<!ELEMENT skyBox (rotation?)>
+<!ATTLIST skyBox
+    material    CDATA #REQUIRED
+    distance    CDATA     "5000"
+    drawFirst    (true | false)    "true"
+>
+
+<!ELEMENT skyDome (rotation?)>
+<!ATTLIST skyDome
+    material    CDATA #REQUIRED
+    curvature    CDATA     "10"
+    tiling        CDATA     "8"
+    distance    CDATA     "4000"
+    drawFirst    (true | false) "true"
+>
+
+<!ELEMENT skyPlane EMPTY>
+<!ATTLIST skyPlane
+    material    CDATA    #REQUIRED
+    planeX        CDATA        "0"
+    planeY        CDATA        "-1"
+    planeZ        CDATA        "0"
+    planeD        CDATA        "5000"
+    scale        CDATA        "1000"
+    bow            CDATA        "0"
+    tiling        CDATA        "10"
+    drawFirst    (true | false)        "true"
+>
+
+<!ELEMENT billboardSet (billboard*)>
+<!ATTLIST billboardSet
+    name        CDATA    #REQUIRED
+    material    CDATA    #REQUIRED
+    id            ID        #IMPLIED
+    width        CDATA        "10"
+    height        CDATA        "10"
+    type        (orientedCommon | orientedSelf | point) "point"
+    origin        (bottomLeft | bottomCenter | bottomRight | left | center | right | topLeft | topCenter | topRight) "center"
+>
+
+<!ELEMENT billboard (position?, rotation?, colourDiffuse?)>
+<!ATTLIST billboard
+    id ID #IMPLIED
+    width CDATA #IMPLIED
+    height CDATA #IMPLIED
+>
+
+<!ELEMENT plane (normal, upVector?)>
+<!ATTLIST plane
+    name            CDATA    #REQUIRED
+    id                ID        #IMPLIED
+    distance        CDATA    #REQUIRED
+    width            CDATA    #REQUIRED
+    height            CDATA    #REQUIRED
+    xSegments        CDATA        "1"
+    ySegments        CDATA        "1"
+    numTexCoordSets    CDATA        "1"
+    uTile            CDATA        "1"
+    vTile            CDATA        "1"
+    material        CDATA    #IMPLIED
+    normals            (true | false)        "true"
+>
+
+<!ELEMENT externals (item*)>
+
+<!ELEMENT item (file)>
+<!ATTLIST item
+    type CDATA #REQUIRED
+>
+
+<!ELEMENT file EMPTY>
+<!ATTLIST file
+    name CDATA #REQUIRED
+>
+
+<!ELEMENT position EMPTY>
+<!ATTLIST position
+    x CDATA #REQUIRED
+    y CDATA #REQUIRED
+    z CDATA #REQUIRED
+>
+
+<!ELEMENT rotation EMPTY>
+<!ATTLIST rotation
+    qx        CDATA #IMPLIED
+    qy        CDATA #IMPLIED
+    qz        CDATA #IMPLIED
+    qw        CDATA #IMPLIED
+    axisX    CDATA #IMPLIED
+    axisY    CDATA #IMPLIED
+    axisZ    CDATA #IMPLIED
+    angle    CDATA #IMPLIED
+    angleX    CDATA #IMPLIED
+    angleY    CDATA #IMPLIED
+    angleZ    CDATA #IMPLIED
+>
+
+<!ELEMENT normal EMPTY>
+<!ATTLIST normal
+    x CDATA #REQUIRED
+    y CDATA #REQUIRED
+    z CDATA #REQUIRED
+>
+
+<!ELEMENT upVector EMPTY>
+<!ATTLIST upVector
+    x CDATA #REQUIRED
+    y CDATA #REQUIRED
+    z CDATA #REQUIRED
+>
+
+<!ELEMENT offset EMPTY>
+<!ATTLIST offset
+    x CDATA #REQUIRED
+    y CDATA #REQUIRED
+    z CDATA #REQUIRED
+>
+
+<!ELEMENT localDirection EMPTY>
+<!ATTLIST localDirection
+    x CDATA #REQUIRED
+    y CDATA #REQUIRED
+    z CDATA #REQUIRED
+>
+
+<!ELEMENT scale EMPTY>
+<!ATTLIST scale
+    x CDATA #REQUIRED
+    y CDATA #REQUIRED
+    z CDATA #REQUIRED
+>
+
+<!ELEMENT colourDiffuse EMPTY>
+<!ATTLIST colourDiffuse
+    r CDATA #REQUIRED
+    g CDATA #REQUIRED
+    b CDATA #REQUIRED
+>
+
+<!ELEMENT colourSpecular EMPTY>
+<!ATTLIST colourSpecular
+    r CDATA #REQUIRED
+    g CDATA #REQUIRED
+    b CDATA #REQUIRED
+>
+
+<!ELEMENT colourAmbient EMPTY>
+<!ATTLIST colourAmbient
+    r CDATA #REQUIRED
+    g CDATA #REQUIRED
+    b CDATA #REQUIRED
+>
+
+<!ELEMENT colourBackground EMPTY>
+<!ATTLIST colourBackground
+    r CDATA #REQUIRED
+    g CDATA #REQUIRED
+    b CDATA #REQUIRED
+>
+
+<!ELEMENT userData (property+)>
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+    name CDATA #REQUIRED
+    type ( bool | float | int | str ) "str"
+    data CDATA #REQUIRED
+>
