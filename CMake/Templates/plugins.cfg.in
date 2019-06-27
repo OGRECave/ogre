@@ -18,3 +18,4 @@ PluginFolder=@OGRE_PLUGIN_DIR_REL@
 @OGRE_COMMENT_PLUGIN_PCZ@ Plugin=Plugin_PCZSceneManager
 @OGRE_COMMENT_PLUGIN_PCZ@ Plugin=Plugin_OctreeZone
 @OGRE_COMMENT_PLUGIN_OCTREE@ Plugin=Plugin_OctreeSceneManager
+@OGRE_COMMENT_PLUGIN_DOT_SCENE@ Plugin=Plugin_DotScene

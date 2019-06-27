@@ -47,3 +47,7 @@ if (OGRE_BUILD_PLUGIN_PCZ)
   add_subdirectory(PCZSceneManager)
   add_subdirectory(OctreeZone)
 endif (OGRE_BUILD_PLUGIN_PCZ)
+
+if (OGRE_BUILD_PLUGIN_DOT_SCENE)
+  add_subdirectory(DotScene)
+endif ()
