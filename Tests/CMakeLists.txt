@@ -10,8 +10,7 @@
 # Configure Tests build
 if (OGRE_BUILD_TESTS)
 
-  find_package(GTest)
-  if(NOT ${GTest_FOUND})
+  if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-1.8.x)
     message(STATUS "Building gtest")
     file(DOWNLOAD
         https://github.com/google/googletest/archive/v1.8.x.tar.gz
@@ -25,10 +24,8 @@ if (OGRE_BUILD_TESTS)
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-1.8.x)
     execute_process(COMMAND ${CMAKE_COMMAND}
         --build ${PROJECT_BINARY_DIR}/googletest-1.8.x ${BUILD_COMMAND_OPTS})
-    
-    find_package(GTest CONFIG REQUIRED)
-    set(GTEST_LIBRARIES GTest::gtest)
   endif()
+  find_package(GTest REQUIRED CONFIG)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
     # unit tests are go!
@@ -83,7 +80,7 @@ if (OGRE_BUILD_TESTS)
     endif()
     add_executable(Test_Ogre ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
     ogre_install_target(Test_Ogre "" FALSE)
-    target_link_libraries(Test_Ogre OgreBites Codec_STBI ${OGRE_LIBRARIES} ${GTEST_LIBRARIES})
+    target_link_libraries(Test_Ogre OgreBites Codec_STBI ${OGRE_LIBRARIES} GTest::gtest)
     
     if(ANDROID)
         set_target_properties(Test_Ogre PROPERTIES LINK_FLAGS -pie)
