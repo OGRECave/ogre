@@ -285,7 +285,7 @@ Sets the ambient colour reflectance properties of this pass.
 Format: ambient (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
 
 @copydetails Ogre::Pass::setAmbient
-@note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+@shaderparam
 
 @par
 Example: ambient 0.0 0.8 0.0
@@ -301,7 +301,7 @@ Sets the diffuse colour reflectance properties of this pass.
 Format: diffuse (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vertexcolour)<br> NB valid colour values are between 0.0 and 1.0.
 
 @copydetails Ogre::Pass::setDiffuse
-@note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+@shaderparam
 
 @par
 Example: diffuse 1.0 0.5 0.5
@@ -322,7 +322,7 @@ It is also possible to make the specular reflectance track the vertex colour as 
 the mesh instead of the colour values.
 
 @copydetails Ogre::Pass::setShininess
-@note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+@shaderparam
 
 @par
 Example: specular 1.0 1.0 1.0 12.5
@@ -341,7 +341,7 @@ Format: emissive (&lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]| vert
 
 Unlike the name suggests, this object doesn’t act as a light source for other objects in the scene (if you want it to, you have to create a light which is centered on the object).
 @copydetails Ogre::Pass::setSelfIllumination
-@note When using shader programs, you have to explicitely forward this property in the @ref Program-Parameter-Specification
+@shaderparam
 
 @par
 Example: emissive 1.0 0.0 0.0
@@ -509,6 +509,9 @@ Format: alpha\_rejection &lt;function&gt; &lt;value&gt;
 Example: alpha\_rejection greater\_equal 128
 
 The function parameter can be any of the options listed in the material depth\_function attribute. The value parameter can theoretically be any value between 0 and 255, but is best limited to 0 or 128 for hardware compatibility.
+
+@ffp_rtss_only
+
 @par
 Default: alpha\_rejection always\_pass
 
@@ -868,6 +871,8 @@ material Fur
 @par
 Format: point\_size &lt;size&gt; Default: point\_size 1.0
 
+@ffp_rtss_only
+
 <a name="point_005fsprites"></a><a name="point_005fsprites-1"></a>
 
 ## point\_sprites
@@ -888,6 +893,7 @@ Format: point\_size\_attenuation &lt;enabled&gt; \[constant linear quadratic\] D
 
 @copydetails Ogre::Pass::setPointAttenuation
 
+@ffp_rtss_only
 
 <a name="point_005fsize_005fmin"></a><a name="point_005fsize_005fmin-1"></a>
 
@@ -1119,7 +1125,7 @@ Default: content\_type named
 @par
 Format: tex\_coord\_set &lt;set\_num&gt;
 
-@note Only has an effect with the fixed-function pipeline or the @ref rtss
+@ffp_rtss_only
 
 @par
 Example: tex\_coord\_set 2
@@ -1130,7 +1136,7 @@ Default: tex\_coord\_set 0
 
 ## colour\_op
 
-@note Only has an effect with the fixed-function pipeline or the @ref rtss
+@ffp_rtss_only
 
 Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer).
 @par
@@ -1145,7 +1151,7 @@ Default: colour\_op modulate
 
 ## colour\_op\_ex
 
-@note Only has an effect with the fixed-function pipeline or the @ref rtss
+@ffp_rtss_only
 @par
 Format: colour\_op\_ex &lt;op&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manualBlend&gt;\] \[&lt;arg1&gt;\] \[&lt;arg2&gt;\]
 @par
@@ -1174,7 +1180,7 @@ Example: colour\_op\_multipass\_fallback one one\_minus\_dest\_alpha
 
 ## alpha\_op\_ex
 
-@note Only has an effect with the fixed-function pipeline or the @ref rtss
+@ffp_rtss_only
 
 @par
 Format: alpha\_op\_ex &lt;op&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manualBlend&gt;\] \[&lt;arg1&gt;\] \[&lt;arg2&gt;\]
@@ -1185,7 +1191,7 @@ Format: alpha\_op\_ex &lt;op&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manualBle
 
 ## env\_map
 
-Turns on/off texture coordinate effect that makes this layer an environment map. @note Only has an effect with the fixed-function pipeline or the @ref rtss
+Turns on/off texture coordinate effect that makes this layer an environment map. @ffp_rtss_only
 @par
 Format: env\_map &lt;off|spherical|planar|cubic\_reflection|cubic\_normal&gt;
 
@@ -1222,7 +1228,7 @@ Format: scroll &lt;u&gt; &lt;v&gt;
 
 @copydetails Ogre::TextureUnitState::setTextureScroll
 
-@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+@shaderparam
 
 <a name="scroll_005fanim"></a><a name="scroll_005fanim-1"></a>
 
@@ -1234,7 +1240,7 @@ Format: scroll\_anim &lt;uSpeed&gt; &lt;vSpeed&gt;<br>
 
 @copydetails Ogre::TextureUnitState::setScrollAnimation 
 
-@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+@shaderparam
 <a name="rotate"></a><a name="rotate-1"></a>
 
 ## rotate
@@ -1246,7 +1252,7 @@ Format: rotate &lt;angle&gt;
 
 @copydetails Ogre::TextureUnitState::setTextureRotate
 
-@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+@shaderparam
 
 <a name="rotate_005fanim"></a><a name="rotate_005fanim-1"></a>
 
@@ -1259,7 +1265,7 @@ Format: rotate\_anim &lt;speed&gt;
 
 @copydetails Ogre::TextureUnitState::setRotateAnimation 
 
-@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+@shaderparam
 
 <a name="scale"></a><a name="scale-1"></a>
 
@@ -1273,7 +1279,7 @@ Format: scale &lt;uScale&gt; &lt;vScale&gt;
 @copydetails Ogre::TextureUnitState::setTextureScale
 
 
- @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+@shaderparam
 
 <a name="wave_005fxform"></a><a name="wave_005fxform-1"></a>
 
@@ -1314,7 +1320,7 @@ Animate the v scale value
 
 waveType is one of Ogre::WaveformType without the `WFT_` prefix. E.g. `WFT_SQUARE` becomes `square`.
 
-@note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+@shaderparam
 
 <a name="transform"></a><a name="transform-1"></a>
 
@@ -1326,7 +1332,7 @@ Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m3
 
 The indexes of the 4x4 matrix value above are expressed as m&lt;row&gt;&lt;col&gt;.
 
- @note if you’re using a vertex program this will have no effect unless you use the texture\_matrix auto-param.
+@shaderparam
 
 <a name="sampler_ref"></a>
 ## sampler_ref
