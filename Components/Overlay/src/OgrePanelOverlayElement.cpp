@@ -301,11 +301,9 @@ namespace Ogre {
                 size_t offset = VertexElement::getTypeSize(VET_FLOAT2) * mNumTexCoordsInBuffer;
                 for (size_t i = mNumTexCoordsInBuffer; i < numLayers; ++i)
                 {
-                    decl->addElement(TEXCOORD_BINDING,
-                        offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 
-                        static_cast<unsigned short>(i));
-                    offset += VertexElement::getTypeSize(VET_FLOAT2);
-
+                    offset += decl->addElement(TEXCOORD_BINDING, offset, VET_FLOAT2,
+                                               VES_TEXTURE_COORDINATES, ushort(i))
+                                  .getSize();
                 }
             }
 

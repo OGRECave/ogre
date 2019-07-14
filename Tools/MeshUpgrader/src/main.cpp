@@ -443,15 +443,10 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                         offset = 0;
                         currentBuffer = i->getSource();
                     }
-                    newDecl->addElement(
-                        currentBuffer,
-                        offset,
-                        i->getType(),
-                        i->getSemantic(),
-                        i->getIndex());
-
-                    offset += VertexElement::getTypeSize(i->getType());
-                    
+                    offset += newDecl
+                                  ->addElement(currentBuffer, offset, i->getType(), i->getSemantic(),
+                                               i->getIndex())
+                                  .getSize();
                 }
                 // Usages don't matter here since we're onlly exporting
                 BufferUsageList bufferUsages;

@@ -773,10 +773,8 @@ namespace Ogre {
         VertexBufferBinding* binding = mVertexData->vertexBufferBinding;
 
         size_t offset = 0;
-        decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
-        decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE);
-        offset += VertexElement::getTypeSize(VET_COLOUR);
+        offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
+        offset += decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE).getSize();
         // Texture coords irrelevant when enabled point rendering (generated
         // in point sprite mode, and unused in standard point mode)
         if (!mPointRendering)

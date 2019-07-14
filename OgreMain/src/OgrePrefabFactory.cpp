@@ -90,12 +90,9 @@ namespace Ogre {
 
         //! [vertex_decl]
         size_t offset = 0;
-        decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
-        decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
-        decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
-        offset += VertexElement::getTypeSize(VET_FLOAT2);
+        offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
+        offset += decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL).getSize();
+        offset += decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0).getSize();
         //! [vertex_decl]
 
         //! [vertex_buffer]
@@ -228,12 +225,9 @@ namespace Ogre {
         VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
 
         size_t offset = 0;
-        decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
-        decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
-        decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
-        offset += VertexElement::getTypeSize(VET_FLOAT2);
+        offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
+        offset += decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL).getSize();
+        offset += decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0).getSize();
 
         HardwareVertexBufferSharedPtr vbuf = 
             HardwareBufferManager::getSingleton().createVertexBuffer(
@@ -299,14 +293,9 @@ namespace Ogre {
         // define the vertex format
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
         size_t currOffset = 0;
-        // positions
-        vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_POSITION);
-        currOffset += VertexElement::getTypeSize(VET_FLOAT3);
-        // normals
-        vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_NORMAL);
-        currOffset += VertexElement::getTypeSize(VET_FLOAT3);
-        // two dimensional texture coordinates
-        vertexDecl->addElement(0, currOffset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
+        currOffset += vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_POSITION).getSize();
+        currOffset += vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_NORMAL).getSize();
+        currOffset += vertexDecl->addElement(0, currOffset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0).getSize();
 
         // allocate the vertex buffer
         vertexData->vertexCount = (NUM_RINGS + 1) * (NUM_SEGMENTS+1);
