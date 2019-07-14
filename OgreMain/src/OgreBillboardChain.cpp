@@ -120,13 +120,11 @@ namespace Ogre {
 
             size_t offset = 0;
             // Add a description for the buffer of the positions of the vertices
-            decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-            offset += VertexElement::getTypeSize(VET_FLOAT3);
+            offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
 
             if (mUseVertexColour)
             {
-                decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE);
-                offset += VertexElement::getTypeSize(VET_COLOUR);
+                offset += decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE).getSize();
             }
 
             if (mUseTexCoords)

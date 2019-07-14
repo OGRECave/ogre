@@ -223,14 +223,10 @@ namespace Ogre {
         /// Create vertex declaration
         VertexDeclaration* decl = mVertexData->vertexDeclaration;
         size_t offset = 0;
-        decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
-        decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
-        decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE);
-        offset += VertexElement::getTypeSize(VET_COLOUR);
-        decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
-        offset += VertexElement::getTypeSize(VET_FLOAT2);
+        offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
+        offset += decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL).getSize();
+        offset += decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE).getSize();
+        offset += decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0).getSize();
         decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 1);
 
         // Build initial patches - we need to know how big the vertex buffer needs to be

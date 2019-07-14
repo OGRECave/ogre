@@ -86,8 +86,7 @@ namespace Volume {
         size_t offset = 0;
 
         // Add vertex-positions to the buffer
-        decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
+        offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
     
         // Add vertex-normals to the buffer
         decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL);

@@ -481,8 +481,7 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
     VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
     size_t offset = 0;
     // 1st buffer
-    decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-    offset += VertexElement::getTypeSize(VET_FLOAT3);
+    offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
 
     /// Allocate vertex buffer of the requested number of vertices (vertexCount) 
     /// and bytes per vertex (offset)

@@ -159,12 +159,9 @@ void VolumeRenderable::initialise()
     VertexBufferBinding* bind = vdata->vertexBufferBinding;
 
     size_t offset = 0;
-    decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-    offset += VertexElement::getTypeSize(VET_FLOAT3);
-    decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL);
-    offset += VertexElement::getTypeSize(VET_FLOAT3);
-    decl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES);
-    offset += VertexElement::getTypeSize(VET_FLOAT3);
+    offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
+    offset += decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL).getSize();
+    offset += decl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES).getSize();
 
     HardwareVertexBufferSharedPtr vbuf = 
     HardwareBufferManager::getSingleton().createVertexBuffer(

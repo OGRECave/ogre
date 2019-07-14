@@ -251,9 +251,8 @@ namespace Ogre {
         if (mFirstVertex && !mCurrentUpdating)
         {
             // defining declaration
-            mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
-                ->addElement(0, mDeclSize, VET_FLOAT3, VES_POSITION);
-            mDeclSize += VertexElement::getTypeSize(VET_FLOAT3);
+            mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
+                ->addElement(0, mDeclSize, VET_FLOAT3, VES_POSITION).getSize();
         }
 
         mTempVertex.position.x = x;
@@ -286,9 +285,8 @@ namespace Ogre {
         if (mFirstVertex && !mCurrentUpdating)
         {
             // defining declaration
-            mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
-                ->addElement(0, mDeclSize, VET_FLOAT3, VES_NORMAL);
-            mDeclSize += VertexElement::getTypeSize(VET_FLOAT3);
+            mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
+                ->addElement(0, mDeclSize, VET_FLOAT3, VES_NORMAL).getSize();
         }
         mTempVertex.normal.x = x;
         mTempVertex.normal.y = y;
@@ -312,9 +310,8 @@ namespace Ogre {
         if (mFirstVertex && !mCurrentUpdating)
         {
             // defining declaration
-            mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
-                ->addElement(0, mDeclSize, VET_FLOAT3, VES_TANGENT);
-            mDeclSize += VertexElement::getTypeSize(VET_FLOAT3);
+            mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
+                ->addElement(0, mDeclSize, VET_FLOAT3, VES_TANGENT).getSize();
         }
         mTempVertex.tangent.x = x;
         mTempVertex.tangent.y = y;
@@ -333,9 +330,8 @@ namespace Ogre {
         if (mFirstVertex && !mCurrentUpdating)
         {
             // defining declaration
-            mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
-                ->addElement(0, mDeclSize, VET_FLOAT1, VES_TEXTURE_COORDINATES, mTexCoordIndex);
-            mDeclSize += VertexElement::getTypeSize(VET_FLOAT1);
+            mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
+                ->addElement(0, mDeclSize, VET_FLOAT1, VES_TEXTURE_COORDINATES, mTexCoordIndex).getSize();
         }
         mTempVertex.texCoordDims[mTexCoordIndex] = 1;
         mTempVertex.texCoord[mTexCoordIndex].x = u;
@@ -355,9 +351,8 @@ namespace Ogre {
         if (mFirstVertex && !mCurrentUpdating)
         {
             // defining declaration
-            mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
-                ->addElement(0, mDeclSize, VET_FLOAT2, VES_TEXTURE_COORDINATES, mTexCoordIndex);
-            mDeclSize += VertexElement::getTypeSize(VET_FLOAT2);
+            mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
+                ->addElement(0, mDeclSize, VET_FLOAT2, VES_TEXTURE_COORDINATES, mTexCoordIndex).getSize();
         }
         mTempVertex.texCoordDims[mTexCoordIndex] = 2;
         mTempVertex.texCoord[mTexCoordIndex].x = u;
@@ -377,9 +372,8 @@ namespace Ogre {
         if (mFirstVertex && !mCurrentUpdating)
         {
             // defining declaration
-            mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
-                ->addElement(0, mDeclSize, VET_FLOAT3, VES_TEXTURE_COORDINATES, mTexCoordIndex);
-            mDeclSize += VertexElement::getTypeSize(VET_FLOAT3);
+            mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
+                ->addElement(0, mDeclSize, VET_FLOAT3, VES_TEXTURE_COORDINATES, mTexCoordIndex).getSize();
         }
         mTempVertex.texCoordDims[mTexCoordIndex] = 3;
         mTempVertex.texCoord[mTexCoordIndex].x = u;
@@ -400,9 +394,8 @@ namespace Ogre {
         if (mFirstVertex && !mCurrentUpdating)
         {
             // defining declaration
-            mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
-                ->addElement(0, mDeclSize, VET_FLOAT4, VES_TEXTURE_COORDINATES, mTexCoordIndex);
-            mDeclSize += VertexElement::getTypeSize(VET_FLOAT4);
+            mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
+                ->addElement(0, mDeclSize, VET_FLOAT4, VES_TEXTURE_COORDINATES, mTexCoordIndex).getSize();
         }
         mTempVertex.texCoordDims[mTexCoordIndex] = 4;
         mTempVertex.texCoord[mTexCoordIndex].x = x;
@@ -444,9 +437,8 @@ namespace Ogre {
         if (mFirstVertex && !mCurrentUpdating)
         {
             // defining declaration
-            mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
-                ->addElement(0, mDeclSize, VET_COLOUR, VES_DIFFUSE);
-            mDeclSize += VertexElement::getTypeSize(VET_COLOUR);
+            mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
+                ->addElement(0, mDeclSize, VET_COLOUR, VES_DIFFUSE).getSize();
         }
         mTempVertex.colour.r = r;
         mTempVertex.colour.g = g;

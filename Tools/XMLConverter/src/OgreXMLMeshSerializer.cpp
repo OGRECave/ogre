@@ -906,15 +906,11 @@ namespace Ogre {
             size_t offset = 0;
             if (StringConverter::parseBool(vbElem.attribute("positions").value()))
             {
-                // Add element
-                decl->addElement(bufCount, offset, VET_FLOAT3, VES_POSITION);
-                offset += VertexElement::getTypeSize(VET_FLOAT3);
+                offset += decl->addElement(bufCount, offset, VET_FLOAT3, VES_POSITION).getSize();
             }
             if (StringConverter::parseBool(vbElem.attribute("normals").value()))
             {
-                // Add element
-                decl->addElement(bufCount, offset, VET_FLOAT3, VES_NORMAL);
-                offset += VertexElement::getTypeSize(VET_FLOAT3);
+                offset += decl->addElement(bufCount, offset, VET_FLOAT3, VES_NORMAL).getSize();
             }
             if (StringConverter::parseBool(vbElem.attribute("tangents").value()))
             {
@@ -923,27 +919,20 @@ namespace Ogre {
                 if (dims == 4)
                     tangentType = VET_FLOAT4;
 
-                // Add element
-                decl->addElement(bufCount, offset, tangentType, VES_TANGENT);
-                offset += VertexElement::getTypeSize(tangentType);
+                offset += decl->addElement(bufCount, offset, tangentType, VES_TANGENT).getSize();
             }
             if (StringConverter::parseBool(vbElem.attribute("binormals").value()))
             {
-                // Add element
-                decl->addElement(bufCount, offset, VET_FLOAT3, VES_BINORMAL);
-                offset += VertexElement::getTypeSize(VET_FLOAT3);
+                offset += decl->addElement(bufCount, offset, VET_FLOAT3, VES_BINORMAL).getSize();
             }
             if (StringConverter::parseBool(vbElem.attribute("colours_diffuse").value()))
             {
-                // Add element
-                decl->addElement(bufCount, offset, mColourElementType, VES_DIFFUSE);
-                offset += VertexElement::getTypeSize(mColourElementType);
+                offset += decl->addElement(bufCount, offset, mColourElementType, VES_DIFFUSE).getSize();
             }
             if (StringConverter::parseBool(vbElem.attribute("colours_specular").value()))
             {
                 // Add element
-                decl->addElement(bufCount, offset, mColourElementType, VES_SPECULAR);
-                offset += VertexElement::getTypeSize(mColourElementType);
+                offset += decl->addElement(bufCount, offset, mColourElementType, VES_SPECULAR).getSize();
             }
             if (StringConverter::parseInt(vbElem.attribute("texture_coords").value()))
             {
@@ -997,10 +986,8 @@ namespace Ogre {
                             err << "Falling back to default of VET_FLOAT2\n";
                         }
                     }
-                    // Add element
-                    decl->addElement(bufCount, offset, vtype, 
-                        VES_TEXTURE_COORDINATES, totalTexCoords++);
-                    offset += VertexElement::getTypeSize(vtype);
+                    offset += decl->addElement(bufCount, offset, vtype,
+                        VES_TEXTURE_COORDINATES, totalTexCoords++).getSize();
                 }
             } 
 

@@ -399,20 +399,17 @@ namespace Ogre
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
         size_t currOffset = 0;
         // We always need positions
-        vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_POSITION);
-        currOffset += VertexElement::getTypeSize(VET_FLOAT3);
+        currOffset += vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_POSITION).getSize();
         // Optional normals
         if(params.normals)
         {
-            vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_NORMAL);
-            currOffset += VertexElement::getTypeSize(VET_FLOAT3);
+            currOffset += vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_NORMAL).getSize();
         }
 
         for (unsigned short i = 0; i < params.numTexCoordSets; ++i)
         {
             // Assumes 2D texture coords
-            vertexDecl->addElement(0, currOffset, VET_FLOAT2, VES_TEXTURE_COORDINATES, i);
-            currOffset += VertexElement::getTypeSize(VET_FLOAT2);
+            currOffset += vertexDecl->addElement(0, currOffset, VET_FLOAT2, VES_TEXTURE_COORDINATES, i).getSize();
         }
 
         vertexData->vertexCount = (params.xsegments + 1) * (params.ysegments + 1);
@@ -550,18 +547,15 @@ namespace Ogre
         pMesh->sharedVertexData->vertexCount = (params.xsegments + 1) * (params.ysegments + 1);
 
         size_t offset = 0;
-        decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
+        offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
         if (params.normals)
         {
-            decl->addElement(0, 0, VET_FLOAT3, VES_NORMAL);
-            offset += VertexElement::getTypeSize(VET_FLOAT3);
+            offset += decl->addElement(0, 0, VET_FLOAT3, VES_NORMAL).getSize();
         }
 
         for (unsigned short i = 0; i < params.numTexCoordSets; ++i)
         {
-            decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, i);
-            offset += VertexElement::getTypeSize(VET_FLOAT2);
+            offset += decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, i).getSize();
         }
 
 
@@ -707,20 +701,17 @@ namespace Ogre
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
         size_t currOffset = 0;
         // We always need positions
-        vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_POSITION);
-        currOffset += VertexElement::getTypeSize(VET_FLOAT3);
+        currOffset += vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_POSITION).getSize();
         // Optional normals
         if(params.normals)
         {
-            vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_NORMAL);
-            currOffset += VertexElement::getTypeSize(VET_FLOAT3);
+            currOffset += vertexDecl->addElement(0, currOffset, VET_FLOAT3, VES_NORMAL).getSize();
         }
 
         for (unsigned short i = 0; i < params.numTexCoordSets; ++i)
         {
             // Assumes 2D texture coords
-            vertexDecl->addElement(0, currOffset, VET_FLOAT2, VES_TEXTURE_COORDINATES, i);
-            currOffset += VertexElement::getTypeSize(VET_FLOAT2);
+            currOffset += vertexDecl->addElement(0, currOffset, VET_FLOAT2, VES_TEXTURE_COORDINATES, i).getSize();
         }
 
         vertexData->vertexCount = (params.xsegments + 1) * (params.ySegmentsToKeep + 1);
