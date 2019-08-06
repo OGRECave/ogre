@@ -94,7 +94,7 @@ if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
     PROPERTIES COMPILE_DEFINITIONS OGRE_ENABLE_STATE_CACHE)
 endif()
 
-add_library(OgreGLSupport STATIC 
+add_library(OgreGLSupport SHARED
     ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES} 
     src/OgreGLRenderSystemCommon.cpp 
     src/OgreGLTextureCommon.cpp
