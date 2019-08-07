@@ -49,10 +49,7 @@ namespace Ogre {
     void SkeletonSerializer::exportSkeleton(const Skeleton* pSkeleton, 
         const String& filename, SkeletonVersion ver, Endian endianMode)
     {
-        std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-        f->open(filename.c_str(), std::ios::binary | std::ios::out);
-        DataStreamPtr stream(OGRE_NEW FileStreamDataStream(f));
-
+        DataStreamPtr stream = _openFileStream(filename, std::ios::binary | std::ios::out);
         exportSkeleton(pSkeleton, stream, ver, endianMode);
 
         stream->close();

@@ -1047,16 +1047,7 @@ namespace Ogre {
         if (!stream)
         {
             // save direct in filesystem
-            std::fstream* fs = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL);
-            fs->open(filename.c_str(), std::ios::out | std::ios::binary);
-            if (!*fs)
-            {
-                OGRE_DELETE_T(fs, basic_fstream, MEMCATEGORY_GENERAL);
-                OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
-                            "Can't open " + filename + " for writing");
-            }
-
-            stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, fs));
+            stream = _openFileStream(filename, std::ios::out | std::ios::binary);
         }
 
         return stream;
@@ -1069,15 +1060,7 @@ namespace Ogre {
         if(ret)
             return ret;
 
-        // try direct
-        std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);
-        ifs->open(filename.c_str(), std::ios::in | std::ios::binary);
-        if(!*ifs)
-        {
-            OGRE_DELETE_T(ifs, basic_ifstream, MEMCATEGORY_GENERAL);
-            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!");
-        }
-        return DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, ifs));
+        return _openFileStream(filename, std::ios::in | std::ios::binary);
     }
     //-----------------------------------------------------------------------
     void Root::convertColourValue(const ColourValue& colour, uint32* pDest)
