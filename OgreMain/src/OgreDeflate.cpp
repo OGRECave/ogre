@@ -176,9 +176,7 @@ namespace Ogre
 #endif
             }
 
-            std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-            f->open(mTempFileName.c_str(), std::ios::binary | std::ios::out);
-            mTmpWriteStream = DataStreamPtr(OGRE_NEW FileStreamDataStream(f));
+            mTmpWriteStream = _openFileStream(mTempFileName, std::ios::binary | std::ios::out);
             
         }
 

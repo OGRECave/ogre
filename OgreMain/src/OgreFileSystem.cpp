@@ -165,7 +165,7 @@ namespace {
     }
 	//-----------------------------------------------------------------------
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-	std::wstring to_wpath(const String& text, unsigned codepage = CP_UTF8)
+	static std::wstring to_wpath(const String& text, unsigned codepage = CP_UTF8)
 	{
 		const int utf16Length = ::MultiByteToWideChar(codepage, 0, text.c_str(), (int)text.size(), NULL, 0);
 		if(utf16Length > 0)
@@ -177,7 +177,7 @@ namespace {
 		}
 		return L"";
 	}
-	String from_wpath(const std::wstring& text, unsigned codepage = CP_UTF8)
+	static String from_wpath(const std::wstring& text, unsigned codepage = CP_UTF8)
 	{
 		const int length = ::WideCharToMultiByte(codepage, 0, text.c_str(), (int)text.size(), NULL, 0, NULL, NULL);
 		if(length > 0)
@@ -328,8 +328,21 @@ namespace {
     //-----------------------------------------------------------------------
     DataStreamPtr FileSystemArchive::open(const String& filename, bool readOnly) const
     {
-        String full_path = concatenate_path(mName, filename);
+        if (!readOnly && isReadOnly())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot open a file in read-write mode in a read-only archive");
+        }
 
+        // Always open in binary mode
+        // Also, always include reading
+        std::ios::openmode mode = std::ios::in | std::ios::binary;
+
+        if(!readOnly) mode |= std::ios::out;
+
+        return _openFileStream(concatenate_path(mName, filename), mode, filename);
+    }
+    DataStreamPtr _openFileStream(const String& full_path, std::ios::openmode mode, const String& name)
+    {
         // Use filesystem to determine size 
         // (quicker than streaming to the end and back)
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
@@ -339,26 +352,14 @@ namespace {
         struct stat tagStat;
         int ret = stat(full_path.c_str(), &tagStat);
 #endif
-        assert(ret == 0 && "Problem getting file size" );
-        (void)ret;  // Silence warning
+        size_t st_size = ret == 0 ? tagStat.st_size : 0;
 
-        // Always open in binary mode
-        // Also, always include reading
-        std::ios::openmode mode = std::ios::in | std::ios::binary;
         std::istream* baseStream = 0;
         std::ifstream* roStream = 0;
         std::fstream* rwStream = 0;
 
-        if (!readOnly && isReadOnly())
+        if (mode & std::ios::out)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Cannot open a file in read-write mode in a read-only archive",
-                        "FileSystemArchive::open");
-        }
-
-        if (!readOnly)
-        {
-            mode |= std::ios::out;
             rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
 			rwStream->open(to_wpath(full_path).c_str(), mode);
@@ -384,24 +385,22 @@ namespace {
         {
             OGRE_DELETE_T(roStream, basic_ifstream, MEMCATEGORY_GENERAL);
             OGRE_DELETE_T(rwStream, basic_fstream, MEMCATEGORY_GENERAL);
-            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-                "Cannot open file: " + filename,
-                "FileSystemArchive::open");
+            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "Cannot open file: " + full_path);
         }
 
         /// Construct return stream, tell it to delete on destroy
         FileStreamDataStream* stream = 0;
+        const String& streamname = name.empty() ? full_path : name;
         if (rwStream)
         {
-            // use the writeable stream 
-            stream = OGRE_NEW FileStreamDataStream(filename,
-                rwStream, (size_t)tagStat.st_size, true);
+            // use the writeable stream
+            stream = OGRE_NEW FileStreamDataStream(streamname, rwStream, st_size);
         }
         else
         {
+            OgreAssertDbg(ret == 0, "Problem getting file size");
             // read-only stream
-            stream = OGRE_NEW FileStreamDataStream(filename,
-                roStream, (size_t)tagStat.st_size, true);
+            stream = OGRE_NEW FileStreamDataStream(streamname, roStream, st_size);
         }
         return DataStreamPtr(stream);
     }
@@ -410,9 +409,7 @@ namespace {
     {
         if (isReadOnly())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Cannot create a file in a read-only archive", 
-                "FileSystemArchive::remove");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot create a file in a read-only archive");
         }
 
         String full_path = concatenate_path(mName, filename);
@@ -431,9 +428,7 @@ namespace {
         if (rwStream->fail())
         {
             OGRE_DELETE_T(rwStream, basic_fstream, MEMCATEGORY_GENERAL);
-            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-                "Cannot open file: " + filename,
-                "FileSystemArchive::create");
+            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "Cannot open file: " + filename);
         }
 
         /// Construct return stream, tell it to delete on destroy
@@ -447,9 +442,7 @@ namespace {
     {
         if (isReadOnly())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Cannot remove a file from a read-only archive", 
-                "FileSystemArchive::remove");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot remove a file from a read-only archive");
         }
         String full_path = concatenate_path(mName, filename);
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE

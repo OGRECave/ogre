@@ -45,6 +45,9 @@ namespace Ogre {
     *  @{
     */
 
+    /// internal method to open a FileStreamDataStream
+    DataStreamPtr _openFileStream(const String& path, std::ios::openmode mode, const String& name = "");
+
     /** Specialisation of the ArchiveFactory to allow reading of files from
         filesystem folders / directories.
     */
