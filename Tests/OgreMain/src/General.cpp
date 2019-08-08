@@ -52,6 +52,19 @@ using std::minstd_rand;
 
 using namespace Ogre;
 
+typedef RootWithoutRenderSystemFixture CameraTests;
+TEST_F(CameraTests,customProjectionMatrix)
+{
+    Camera cam("", NULL);
+    std::vector<Vector3> corners(cam.getWorldSpaceCorners(), cam.getWorldSpaceCorners() + 8);
+    RealRect extents = cam.getFrustumExtents();
+    cam.setCustomProjectionMatrix(true, cam.getProjectionMatrix());
+    for(int j = 0; j < 8; j++)
+        EXPECT_EQ(corners[j], cam.getWorldSpaceCorners()[j]);
+
+    EXPECT_EQ(extents, cam.getFrustumExtents());
+}
+
 TEST(Root,shutdown)
 {
 #ifdef OGRE_STATIC_LIB
