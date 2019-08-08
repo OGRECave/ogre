@@ -670,7 +670,10 @@ namespace Ogre {
               return ret;
 
           }
-
+          bool operator==(const TRect& rhs) const
+          {
+              return left == rhs.left && right == rhs.right && top == rhs.top && bottom == rhs.bottom;
+          }
         };
         template<typename T>
         std::ostream& operator<<(std::ostream& o, const TRect<T>& r)
