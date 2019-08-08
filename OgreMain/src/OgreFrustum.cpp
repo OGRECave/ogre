@@ -314,13 +314,16 @@ namespace Ogre {
         {
             // Convert clipspace corners to camera space
             Matrix4 invProj = mProjMatrix.inverse();
-            Vector3 topLeft(-0.5f, 0.5f, 0.0f);
-            Vector3 bottomRight(0.5f, -0.5f, 0.0f);
+            Vector4 topLeft(-1.0f, 1.0f, -1.0f, 1.0f);
+            Vector4 bottomRight(1.0f, -1.0f, -1.0f, 1.0f);
 
             topLeft = invProj * topLeft;
             bottomRight = invProj * bottomRight;
 
-            return RealRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+            topLeft /= topLeft.w;
+            bottomRight /= bottomRight.w;
+
+            mExtents = RealRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
         }
         else
         {
@@ -352,9 +355,9 @@ namespace Ogre {
 
                 mExtents = RealRect(-half_w, +half_h, +half_w, -half_h);
             }
-
-            return mExtents;
         }
+
+        return mExtents;
     }
     //-----------------------------------------------------------------------
     void Frustum::updateFrustumImpl(void) const
