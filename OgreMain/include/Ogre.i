@@ -141,6 +141,7 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore Ogre::TextureUsage;
 %ignore Ogre::GpuConstantType;
 %ignore Ogre::Capabilities;
+%typemap(csbase) Ogre::SceneManager::QueryTypeMask "uint";
 %csmethodmodifiers *::ToString "public override";
 // wrong "override" because of multiple inheritance
 %csmethodmodifiers *::getMaterial "public";
@@ -171,6 +172,7 @@ JNIEnv* OgreJNIGetEnv() {
 %csmethodmodifiers *::viewportDestroyed "public";
 %csmethodmodifiers *::viewportDimensionsChanged "public";
 %csmethodmodifiers *::viewportCameraChanged "public";
+%csmethodmodifiers Ogre::BillboardChain::preRender "public";
 #endif
 
 // connect operator[] to __getitem__
