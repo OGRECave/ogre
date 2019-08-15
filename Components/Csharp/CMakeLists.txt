@@ -45,4 +45,10 @@ endif()
 set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_module(libOgre csharp ${SWIG_INPUT_MODULES})
 SWIG_LINK_LIBRARIES(libOgre OgreBites OgreOverlay OgreRTShaderSystem OgreMain)
-install(TARGETS ${SWIG_MODULE_libOgre_REAL_NAME} LIBRARY DESTINATION lib/)
+
+set(CLI_DEST lib/cli/ogre-sharp-${OGRE_VERSION})
+install(TARGETS ${SWIG_MODULE_libOgre_REAL_NAME} LIBRARY DESTINATION ${CLI_DEST}/)
+
+# install source files until we figure out how to compile the dll cross-platform
+install(DIRECTORY ${CMAKE_SWIG_OUTDIR} DESTINATION ${CLI_DEST}
+		FILES_MATCHING PATTERN "*.cs")
