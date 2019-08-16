@@ -52,6 +52,7 @@
 #endif
 #include "Isosurf.h"
 #include "Lighting.h"
+#include "LightShafts.h"
 #include "MeshLod.h"
 #include "NewInstancing.h"
 #include "OceanDemo.h"
@@ -108,6 +109,7 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_VolumeTex);
     addSample(new Sample_Shadows);
     addSample(new Sample_Lighting);
+    addSample(new Sample_LightShafts);
     addSample(new Sample_MeshLod);
     addSample(new Sample_ParticleFX);
     addSample(new Sample_ParticleGS);
