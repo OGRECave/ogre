@@ -6,7 +6,7 @@ var class_ogre_1_1_forward_clustered =
       [ "MethodForwardClustered", "class_ogre_1_1_forward_clustered.html#aa439cebd12e355190a361d06fe9486e2a98c8d76dea9b04102dc00bb463bdc3e9", null ],
       [ "NumForwardPlusMethods", "class_ogre_1_1_forward_clustered.html#aa439cebd12e355190a361d06fe9486e2ac25e587dc8bc6baf59e29a70a7dc243c", null ]
     ] ],
-    [ "ForwardClustered", "class_ogre_1_1_forward_clustered.html#a6bed3fb6491c5668d2e01bbbe3f6fc11", null ],
+    [ "ForwardClustered", "class_ogre_1_1_forward_clustered.html#a6854776a6a76791bdf1c6d6ef5fa376d", null ],
     [ "~ForwardClustered", "class_ogre_1_1_forward_clustered.html#a97c76ee27ea0a2b9a75f67675fc0dbb7", null ],
     [ "_changeRenderSystem", "class_ogre_1_1_forward_clustered.html#ab52365a0ec1349d2b84e529189cee7fc", null ],
     [ "collectLights", "class_ogre_1_1_forward_clustered.html#a586414288417e5b7406bba549ddbad6c", null ],
@@ -15,6 +15,8 @@ var class_ogre_1_1_forward_clustered =
     [ "getConstBufferSize", "class_ogre_1_1_forward_clustered.html#a8388744ab73e9918854266ea0b5906a1", null ],
     [ "getDebugFrustum", "class_ogre_1_1_forward_clustered.html#abf710f2b03eef70db5cb66ed92d8ab1e", null ],
     [ "getDebugMode", "class_ogre_1_1_forward_clustered.html#aa169a9da93f7be67ef0315e0db6200de", null ],
+    [ "getDecalsEnabled", "class_ogre_1_1_forward_clustered.html#aea2eb4c0d7b39ec1711a6d4ad60c7ea0", null ],
+    [ "getDecalsPerCell", "class_ogre_1_1_forward_clustered.html#a91d8babf19f0223abbaa2c489d70b8b4", null ],
     [ "getEnableVpls", "class_ogre_1_1_forward_clustered.html#a5c5170c5fea7c435f6576f6a0e15efcc", null ],
     [ "getFadeAttenuationRange", "class_ogre_1_1_forward_clustered.html#a1f5209d8ebcfb60601bbf8805ee86cba", null ],
     [ "getFineLightMaskGranularity", "class_ogre_1_1_forward_clustered.html#ae6d7d1e32fe5521ef19bf74dc98aa68d", null ],
@@ -28,6 +30,7 @@ var class_ogre_1_1_forward_clustered =
     [ "getMinDistance", "class_ogre_1_1_forward_clustered.html#ad4a34cb081cf47b99daf2a4945b402e7", null ],
     [ "getNumSlices", "class_ogre_1_1_forward_clustered.html#ac5a1b5ff3dc7782c12a3e8fc23dfab4e", null ],
     [ "getWidth", "class_ogre_1_1_forward_clustered.html#ad41d9bd61adc358dea117deedc7251b3", null ],
+    [ "isCacheDirty", "class_ogre_1_1_forward_clustered.html#af9ae3b8c220a4ec4235609363f70f732", null ],
     [ "operator delete", "class_ogre_1_1_forward_clustered.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_forward_clustered.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_forward_clustered.html#acb46d4b0a597156d9ba5abc39d127792", null ],
@@ -44,5 +47,7 @@ var class_ogre_1_1_forward_clustered =
     [ "setFadeAttenuationRange", "class_ogre_1_1_forward_clustered.html#a5afca86cefefcd3a5d5da282fd734325", null ],
     [ "setFineLightMaskGranularity", "class_ogre_1_1_forward_clustered.html#aab10c992600476f4227e8205bb383293", null ],
     [ "setFreezeDebugFrustum", "class_ogre_1_1_forward_clustered.html#a9e327e8b2c00343fc28aca6877e16a9d", null ],
-    [ "setHlmsPassProperties", "class_ogre_1_1_forward_clustered.html#af004b69ad0a17995e113bba576241ac5", null ]
+    [ "setHlmsPassProperties", "class_ogre_1_1_forward_clustered.html#af004b69ad0a17995e113bba576241ac5", null ],
+    [ "MaxDecalRq", "class_ogre_1_1_forward_clustered.html#acb5feca7f057c2bdb232280d194ad4dd", null ],
+    [ "MinDecalRq", "class_ogre_1_1_forward_clustered.html#aa833d186cda639884547b760b8aafb44", null ]
 ];

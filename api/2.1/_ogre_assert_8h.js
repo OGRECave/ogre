@@ -13,7 +13,7 @@ var _ogre_assert_8h =
       [ "Halt", "_ogre_assert_8h.html#ae7407cfb5a2a4b74bec50d13c1a41eccad17452815fd57a330cf2cdc8d71e7ce1", null ],
       [ "Continue", "_ogre_assert_8h.html#ae7407cfb5a2a4b74bec50d13c1a41ecca1c29415f35271faacfcf6edf917af1d0", null ]
     ] ],
-    [ "GetHandler", "_ogre_assert_8h.html#aed87d0a7a534c5f8544ea46b8fcb5997", null ],
-    [ "ReportFailure", "_ogre_assert_8h.html#aed3893231668b788e13760b54583356f", null ],
-    [ "SetHandler", "_ogre_assert_8h.html#a2ed002dc2d3d583c2ecdb733bcf89667", null ]
+    [ "GetHandler", "_ogre_assert_8h.html#a2195bd8dfaf496724ac8cfb7c269dcd6", null ],
+    [ "ReportFailure", "_ogre_assert_8h.html#a99558f55885f66769bf2a0906b97d7b6", null ],
+    [ "SetHandler", "_ogre_assert_8h.html#a9964d1f0bdbc6d19ad1b686ca4b3b357", null ]
 ];

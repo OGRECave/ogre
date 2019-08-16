@@ -57,6 +57,7 @@ var class_ogre_1_1_vector3 =
     [ "squaredDistance", "class_ogre_1_1_vector3.html#af4e1e3e7df9fbba46c60a22eacfddef2", null ],
     [ "squaredLength", "class_ogre_1_1_vector3.html#a2f82726a193902e24c8b0b02f7e918da", null ],
     [ "swap", "class_ogre_1_1_vector3.html#a2de7638f0d38e460e1b65c8953f0c45f", null ],
+    [ "xy", "class_ogre_1_1_vector3.html#acdfb27b5a990112e3f731a2be8a54aec", null ],
     [ "operator*", "class_ogre_1_1_vector3.html#a92d7a0e4025b82401c2baa1e43c86ab1", null ],
     [ "operator+", "class_ogre_1_1_vector3.html#a09fc339aca944e8b0bb21d02215a092e", null ],
     [ "operator+", "class_ogre_1_1_vector3.html#aa5a711e980d3f906f83bf4740b573aaf", null ],

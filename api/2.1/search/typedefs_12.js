@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['safebooltype',['SafeBoolType',['../class_ogre_1_1_com_ptr.html#a1cb5413c581370dfaf0dde6313d7ef40',1,'Ogre::ComPtr']]],
   ['scenectlalignedobject',['SceneCtlAlignedObject',['../namespace_ogre.html#a027016b98f8ec0ef84e35edb51942add',1,'Ogre']]],
   ['scenectlalignpolicy',['SceneCtlAlignPolicy',['../namespace_ogre.html#a026fea7ffd1e2b282ec0465279d61317',1,'Ogre']]],
   ['scenectlallocatedobject',['SceneCtlAllocatedObject',['../namespace_ogre.html#aa225e5e6dcbf1073a8990eafdae4fb1c',1,'Ogre']]],
@@ -52,6 +53,7 @@ var searchData=
   ['skeletondefptr',['SkeletonDefPtr',['../namespace_ogre.html#a2e4542b93098e5f39cef152c941047e7',1,'Ogre']]],
   ['skeletonptr',['SkeletonPtr',['../namespace_ogre_1_1v1.html#a2348646dd6dc0d382222eb16955ece6e',1,'Ogre::v1']]],
   ['skeletontrackvec',['SkeletonTrackVec',['../namespace_ogre.html#ad863a4b95621bb7e8ae56852fe221677',1,'Ogre']]],
+  ['sourcecodevec',['SourceCodeVec',['../class_ogre_1_1_hlms_disk_cache.html#afba4875fb3b00ceffe4781474f8a87b0',1,'Ogre::HlmsDiskCache']]],
   ['sourcedataarray',['SourceDataArray',['../class_ogre_1_1_sub_mesh.html#ab4fa9187dd2a96ec0f90ebfe4a90d10c',1,'Ogre::SubMesh']]],
   ['splitpointlist',['SplitPointList',['../class_ogre_1_1_p_s_s_m_shadow_camera_setup.html#aad0d2ebd7081a0916ba725a109f7219a',1,'Ogre::PSSMShadowCameraSetup::SplitPointList()'],['../class_ogre_1_1_r_t_shader_1_1_integrated_p_s_s_m3.html#a92f8ec8b38ba0335c10cf6d27594fb0c',1,'Ogre::RTShader::IntegratedPSSM3::SplitPointList()']]],
   ['stagingbufferalloc',['StagingBufferAlloc',['../namespace_ogre.html#a2d5ee471d7f7183f16cea85d6eb35bbd',1,'Ogre']]],

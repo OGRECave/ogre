@@ -11,9 +11,9 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="struct_ogre_1_1_volume_1_1_dual_cell.html" target="_top" xlink:title="To store the generated dual cells in a vector. ">
+<g id="a_node1"><a xlink:href="struct_ogre_1_1vector.html" target="_top" xlink:title="Ogre::vector\&lt; Threshold \&gt;">
 <polygon fill="none" stroke="#000000" points="0,-.5 0,-19.5 131,-19.5 131,-.5 0,-.5"/>
-<text text-anchor="middle" x="65.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">Ogre::Volume::DualCell</text>
+<text text-anchor="middle" x="65.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">Ogre::vector&lt; Threshold &gt;</text>
 </a>
 </g>
 </g>

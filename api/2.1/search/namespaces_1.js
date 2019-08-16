@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rapidjson',['rapidjson',['../namespacerapidjson.html',1,'']]]
+  ['profilesampleflags',['ProfileSampleFlags',['../namespace_profile_sample_flags.html',1,'']]]
 ];

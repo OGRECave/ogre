@@ -21,5 +21,6 @@ var functions_eval =
     [ "t", "functions_eval_t.html", null ],
     [ "u", "functions_eval_u.html", null ],
     [ "v", "functions_eval_v.html", null ],
-    [ "w", "functions_eval_w.html", null ]
+    [ "w", "functions_eval_w.html", null ],
+    [ "z", "functions_eval_z.html", null ]
 ];

@@ -1,7 +1,7 @@
 var searchData=
 [
   ['samplemask',['sampleMask',['../struct_ogre_1_1_hlms_pso.html#ac604b5d0efc71adb1c8b9d50e7c9c3d5',1,'Ogre::HlmsPso']]],
-  ['samplerblock',['samplerblock',['../struct_ogre_1_1_packed_texture.html#a1c919d60b8fb5864b270b3468b54f8b0',1,'Ogre::PackedTexture::samplerblock()'],['../struct_ogre_1_1_cb_texture.html#a460c0bec2d7ba8669964ee6719b009a1',1,'Ogre::CbTexture::samplerBlock()'],['../struct_ogre_1_1_pbs_baked_texture.html#a916c63407a8d1f8deabc8eeda0e57787',1,'Ogre::PbsBakedTexture::samplerBlock()'],['../struct_ogre_1_1_unlit_baked_texture.html#a94c32d9915fea0bb1629b7ed5c19ab30',1,'Ogre::UnlitBakedTexture::samplerBlock()']]],
+  ['samplerblock',['samplerBlock',['../struct_ogre_1_1_cb_texture.html#a460c0bec2d7ba8669964ee6719b009a1',1,'Ogre::CbTexture::samplerBlock()'],['../struct_ogre_1_1_pbs_baked_texture.html#a916c63407a8d1f8deabc8eeda0e57787',1,'Ogre::PbsBakedTexture::samplerBlock()'],['../struct_ogre_1_1_unlit_baked_texture.html#a94c32d9915fea0bb1629b7ed5c19ab30',1,'Ogre::UnlitBakedTexture::samplerBlock()'],['../struct_ogre_1_1_packed_texture.html#a1c919d60b8fb5864b270b3468b54f8b0',1,'Ogre::PackedTexture::samplerblock()']]],
   ['samplerblocks',['samplerblocks',['../struct_ogre_1_1_hlms_json_1_1_named_blocks.html#a843b28445fdd9b3027a554fb44ef0eae',1,'Ogre::HlmsJson::NamedBlocks']]],
   ['samplers',['samplers',['../struct_ogre_1_1_terrain_layer_declaration.html#a3beefe92183cb240f5810553909f7bde',1,'Ogre::TerrainLayerDeclaration']]],
   ['save_5funder',['save_under',['../struct_x_set_window_attributes.html#adaa32df4d46b933e56ad7930613e2f7a',1,'XSetWindowAttributes']]],
@@ -87,6 +87,8 @@ var searchData=
   ['source2',['source2',['../class_ogre_1_1_layer_blend_mode_ex.html#a94eeae80ba84e9aa5271d317d48f2688',1,'Ogre::LayerBlendModeEx']]],
   ['sourceblend',['sourceBlend',['../struct_ogre_1_1_g_l3_plus_hlms_pso.html#a10f6070ae94bf9f6858f7e468ef7ac1e',1,'Ogre::GL3PlusHlmsPso']]],
   ['sourceblendalpha',['sourceBlendAlpha',['../struct_ogre_1_1_g_l3_plus_hlms_pso.html#ae28bc951d72671c58dc6e58cad4204e7',1,'Ogre::GL3PlusHlmsPso']]],
+  ['sourcecode',['sourceCode',['../struct_ogre_1_1_hlms_disk_cache_1_1_cache.html#a7e78623bd0a3cf950c534aae99fac7d4',1,'Ogre::HlmsDiskCache::Cache']]],
+  ['sourcefile',['sourceFile',['../struct_ogre_1_1_hlms_disk_cache_1_1_source_code.html#a31d614eae75d705a2e4c81b1dc9aa7fd',1,'Ogre::HlmsDiskCache::SourceCode']]],
   ['sourcemodifier',['sourceModifier',['../struct_ogre_1_1_r_t_shader_1_1_layered_blending_1_1_texture_blend.html#a8d8716c8bb7b13cad01bd33f866bad14',1,'Ogre::RTShader::LayeredBlending::TextureBlend']]],
   ['specularmap',['SpecularMap',['../struct_ogre_1_1_pbs_property.html#aea29e066cf045002a4e6047a86c02179',1,'Ogre::PbsProperty::SpecularMap()'],['../struct_ogre_1_1_pbs_mobile_property.html#af85e38d2b9f17811ec5b9487a047244e',1,'Ogre::PbsMobileProperty::SpecularMap()']]],
   ['sphereradius',['sphereRadius',['../struct_ogre_1_1_instant_radiosity_1_1_area_of_interest.html#acd53cb3f6a58dbf08f1baa12bcb03033',1,'Ogre::InstantRadiosity::AreaOfInterest']]],
@@ -122,5 +124,5 @@ var searchData=
   ['supportsmorphanimation',['supportsMorphAnimation',['../struct_ogre_1_1_material_script_program_definition.html#a7d0607b541edd5abfc19a1e933eed431',1,'Ogre::MaterialScriptProgramDefinition']]],
   ['supportsposeanimation',['supportsPoseAnimation',['../struct_ogre_1_1_material_script_program_definition.html#aceffe25ef1a661814764abcff14693a3',1,'Ogre::MaterialScriptProgramDefinition']]],
   ['supportsskeletalanimation',['supportsSkeletalAnimation',['../struct_ogre_1_1_material_script_program_definition.html#ae1581e882fed968d73656a5a389679ca',1,'Ogre::MaterialScriptProgramDefinition']]],
-  ['syntax',['syntax',['../struct_ogre_1_1_material_script_program_definition.html#a8392666564161eed2e77efed86ead9fd',1,'Ogre::MaterialScriptProgramDefinition::syntax()'],['../struct_ogre_1_1_hlms_base_prop.html#a2cd566a2316cec4b2e0e9aab58993dca',1,'Ogre::HlmsBaseProp::Syntax()']]]
+  ['syntax',['Syntax',['../struct_ogre_1_1_hlms_base_prop.html#a2cd566a2316cec4b2e0e9aab58993dca',1,'Ogre::HlmsBaseProp::Syntax()'],['../struct_ogre_1_1_material_script_program_definition.html#a8392666564161eed2e77efed86ead9fd',1,'Ogre::MaterialScriptProgramDefinition::syntax()']]]
 ];

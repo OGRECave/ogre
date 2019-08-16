@@ -7,6 +7,7 @@ var searchData=
   ['namegenerator',['NameGenerator',['../class_ogre_1_1_name_generator.html',1,'Ogre']]],
   ['namepair',['NamePair',['../struct_ogre_1_1_hlms_texture_manager_1_1_texture_array_1_1_name_pair.html',1,'Ogre::HlmsTextureManager::TextureArray']]],
   ['nearestresampler',['NearestResampler',['../struct_ogre_1_1_nearest_resampler.html',1,'Ogre']]],
+  ['noaddrefrelease',['NoAddRefRelease',['../class_ogre_1_1_no_add_ref_release.html',1,'Ogre']]],
   ['node',['Node',['../class_ogre_1_1_node.html',1,'Ogre']]],
   ['nodeanimationtrack',['NodeAnimationTrack',['../class_ogre_1_1v1_1_1_node_animation_track.html',1,'Ogre::v1']]],
   ['nodearraymemorymanager',['NodeArrayMemoryManager',['../class_ogre_1_1_node_array_memory_manager.html',1,'Ogre']]],

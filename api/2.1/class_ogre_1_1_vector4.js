@@ -35,6 +35,8 @@ var class_ogre_1_1_vector4 =
     [ "ptr", "class_ogre_1_1_vector4.html#ae8a0fc61bcae1449c843b3c5430cef1f", null ],
     [ "ptr", "class_ogre_1_1_vector4.html#a75aebd511dc9b550314917b9709dc637", null ],
     [ "swap", "class_ogre_1_1_vector4.html#aa1980e262c207bcd24ca89f2db9bd061", null ],
+    [ "xy", "class_ogre_1_1_vector4.html#ad6dc84f0ca8204d16b0232c7609c243c", null ],
+    [ "xyz", "class_ogre_1_1_vector4.html#a299d194697fd0ab74fec1961beed0715", null ],
     [ "operator*", "class_ogre_1_1_vector4.html#ab1ae444cc19c4468260df273cfe7bc37", null ],
     [ "operator+", "class_ogre_1_1_vector4.html#a28efcff06858b5011bbc4250230539f0", null ],
     [ "operator+", "class_ogre_1_1_vector4.html#a4ec63fee2f096c1e845076797d1e140a", null ],

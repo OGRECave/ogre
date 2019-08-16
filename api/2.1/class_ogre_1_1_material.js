@@ -3,6 +3,13 @@ var class_ogre_1_1_material =
     [ "LodValueArray", "class_ogre_1_1_material.html#a7726f446442e5df77f29e2fd91af1633", null ],
     [ "LodValueIterator", "class_ogre_1_1_material.html#aefc64a391f751ffb3cb5153c3d81bc1b", null ],
     [ "TechniqueIterator", "class_ogre_1_1_material.html#a4969168248bff6aea70eafcf75497689", null ],
+    [ "LoadingFlags", "class_ogre_1_1_material.html#a1aa750a4b994f2b1066220936cdfdb94", [
+      [ "LF_DEFAULT", "class_ogre_1_1_material.html#a1aa750a4b994f2b1066220936cdfdb94ab49695ac949df3a7d2e2f9a03267097c", null ],
+      [ "LF_INCLUDE_NON_RELOADABLE", "class_ogre_1_1_material.html#a1aa750a4b994f2b1066220936cdfdb94a6ee542226e1cf18df28ab88426be6809", null ],
+      [ "LF_ONLY_UNREFERENCED", "class_ogre_1_1_material.html#a1aa750a4b994f2b1066220936cdfdb94a70589e0b87b09b0a4fd98ce490dc9782", null ],
+      [ "LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE", "class_ogre_1_1_material.html#a1aa750a4b994f2b1066220936cdfdb94ae5f2eca654bd810da4c774570a5b4b77", null ],
+      [ "LF_PRESERVE_STATE", "class_ogre_1_1_material.html#a1aa750a4b994f2b1066220936cdfdb94ad83abf165de5cfa1a4c8e0cd5471ad2c", null ]
+    ] ],
     [ "LoadingState", "class_ogre_1_1_material.html#a07e619aa09d3bc6789a6667cb4fc572c", [
       [ "LOADSTATE_UNLOADED", "class_ogre_1_1_material.html#a07e619aa09d3bc6789a6667cb4fc572ca28d463296cacdfc115dbc3fb02d00e94", null ],
       [ "LOADSTATE_LOADING", "class_ogre_1_1_material.html#a07e619aa09d3bc6789a6667cb4fc572caf138fc9087e0dc755bff08a83720cbb5", null ],
@@ -78,7 +85,7 @@ var class_ogre_1_1_material =
     [ "operator new[]", "class_ogre_1_1_material.html#afa2943846ba6a2b5824a12857139cf5e", null ],
     [ "operator=", "class_ogre_1_1_material.html#ada9d917b97ae23bbd61ab8a811dd14cf", null ],
     [ "prepare", "class_ogre_1_1_material.html#a350b287fa3e83a389221274f68760008", null ],
-    [ "reload", "class_ogre_1_1_material.html#ab7a0b8de3a7e4d20fcfd84da41ac450e", null ],
+    [ "reload", "class_ogre_1_1_material.html#a5016aec1762b026997ddd346775879ef", null ],
     [ "removeAllTechniques", "class_ogre_1_1_material.html#a1158a82d9399448666ea415d5f9a10a9", null ],
     [ "removeListener", "class_ogre_1_1_material.html#a3c49142f739ba8fb56d6e7b3db235fb7", null ],
     [ "removeTechnique", "class_ogre_1_1_material.html#a8a81c60f958b0f3615c8690583c10d52", null ],

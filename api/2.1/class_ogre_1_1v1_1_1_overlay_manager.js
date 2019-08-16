@@ -8,6 +8,8 @@ var class_ogre_1_1v1_1_1_overlay_manager =
     [ "OverlayManager", "class_ogre_1_1v1_1_1_overlay_manager.html#a4e257c787c247ef4b7415ced7fe627b7", null ],
     [ "~OverlayManager", "class_ogre_1_1v1_1_1_overlay_manager.html#a634faf0ec35d7a8692b8c27b706bd131", null ],
     [ "_queueOverlaysForRendering", "class_ogre_1_1v1_1_1_overlay_manager.html#ae6bb083804f02761ad4e02733a063113", null ],
+    [ "_releaseManualHardwareResources", "class_ogre_1_1v1_1_1_overlay_manager.html#a0e5c76045cacf1eda8b4ffd0065bfe7a", null ],
+    [ "_restoreManualHardwareResources", "class_ogre_1_1v1_1_1_overlay_manager.html#a540910e6e92d6f6aaaf91819572b3759", null ],
     [ "addOverlayElementFactory", "class_ogre_1_1v1_1_1_overlay_manager.html#a4702070f1292431a0a21c198345202af", null ],
     [ "cloneOverlayElementFromTemplate", "class_ogre_1_1v1_1_1_overlay_manager.html#a733ce292142f93eb0b7ef5ae0b27f651", null ],
     [ "create", "class_ogre_1_1v1_1_1_overlay_manager.html#a2e182642ff4eabbd10cf06d12b1aab3c", null ],

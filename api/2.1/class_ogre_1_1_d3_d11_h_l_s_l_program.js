@@ -5,6 +5,13 @@ var class_ogre_1_1_d3_d11_h_l_s_l_program =
     [ "CmdEntryPoint", "class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_entry_point.html", "class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_entry_point" ],
     [ "CmdPreprocessorDefines", "class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_preprocessor_defines.html", "class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_preprocessor_defines" ],
     [ "CmdTarget", "class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_target.html", "class_ogre_1_1_d3_d11_h_l_s_l_program_1_1_cmd_target" ],
+    [ "LoadingFlags", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a1aa750a4b994f2b1066220936cdfdb94", [
+      [ "LF_DEFAULT", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a1aa750a4b994f2b1066220936cdfdb94ab49695ac949df3a7d2e2f9a03267097c", null ],
+      [ "LF_INCLUDE_NON_RELOADABLE", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a1aa750a4b994f2b1066220936cdfdb94a6ee542226e1cf18df28ab88426be6809", null ],
+      [ "LF_ONLY_UNREFERENCED", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a1aa750a4b994f2b1066220936cdfdb94a70589e0b87b09b0a4fd98ce490dc9782", null ],
+      [ "LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a1aa750a4b994f2b1066220936cdfdb94ae5f2eca654bd810da4c774570a5b4b77", null ],
+      [ "LF_PRESERVE_STATE", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a1aa750a4b994f2b1066220936cdfdb94ad83abf165de5cfa1a4c8e0cd5471ad2c", null ]
+    ] ],
     [ "LoadingState", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a07e619aa09d3bc6789a6667cb4fc572c", [
       [ "LOADSTATE_UNLOADED", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a07e619aa09d3bc6789a6667cb4fc572ca28d463296cacdfc115dbc3fb02d00e94", null ],
       [ "LOADSTATE_LOADING", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a07e619aa09d3bc6789a6667cb4fc572caf138fc9087e0dc755bff08a83720cbb5", null ],
@@ -111,7 +118,7 @@ var class_ogre_1_1_d3_d11_h_l_s_l_program =
     [ "operator new[]", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#afa2943846ba6a2b5824a12857139cf5e", null ],
     [ "prepare", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a350b287fa3e83a389221274f68760008", null ],
     [ "reinterpretGSForStreamOut", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a585368f2e75a4e78b36a4048a9300563", null ],
-    [ "reload", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#ab7a0b8de3a7e4d20fcfd84da41ac450e", null ],
+    [ "reload", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a5016aec1762b026997ddd346775879ef", null ],
     [ "removeListener", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a3c49142f739ba8fb56d6e7b3db235fb7", null ],
     [ "resetCompileError", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a2443ed18b880eb939123bb8daf9165c7", null ],
     [ "setAdjacencyInfoRequired", "class_ogre_1_1_d3_d11_h_l_s_l_program.html#a39b43157d6b40626101e5de8f9c77bf5", null ],

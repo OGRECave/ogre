@@ -15,6 +15,7 @@ var searchData=
   ['emissivemap',['EmissiveMap',['../struct_ogre_1_1_pbs_property.html#aa0b9c855539fd6f083759303448e88ed',1,'Ogre::PbsProperty']]],
   ['enablealphablend',['enableAlphaBlend',['../struct_ogre_1_1_g_l3_plus_hlms_pso.html#a6c239dd27a887c733128edb24fb5f8cb',1,'Ogre::GL3PlusHlmsPso']]],
   ['enabled',['enabled',['../struct_ogre_1_1_stencil_params.html#a8fb09fe7bb68a01e3a7cfaa841572c3c',1,'Ogre::StencilParams']]],
+  ['enabledecals',['EnableDecals',['../struct_ogre_1_1_hlms_base_prop.html#a44c68b1348efc7a02e5d4c4678e85dcb',1,'Ogre::HlmsBaseProp']]],
   ['enableprimitiverestart',['enablePrimitiveRestart',['../struct_ogre_1_1_hlms_pso.html#a98b85399cb50916cad81513ddc0c3c0e',1,'Ogre::HlmsPso']]],
   ['enablevpls',['EnableVpls',['../struct_ogre_1_1_hlms_base_prop.html#aec485191b959843f9bda48c39808f7d8',1,'Ogre::HlmsBaseProp']]],
   ['entity',['entity',['../struct_ogre_1_1_entity_mesh_lod_changed_event.html#aee9b9e65d091afd53df6a5b79e52c7dc',1,'Ogre::EntityMeshLodChangedEvent']]],

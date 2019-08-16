@@ -1,12 +1,13 @@
 var struct_ogre_1_1_d3_d11_vertex_array_object =
 [
     [ "ReadRequestsArray", "struct_ogre_1_1_d3_d11_vertex_array_object.html#a3475853f055b59cf9e231a4ee26e95c1", null ],
-    [ "D3D11VertexArrayObject", "struct_ogre_1_1_d3_d11_vertex_array_object.html#a83950982f3466dd4c62d191d5d54ae1f", null ],
+    [ "D3D11VertexArrayObject", "struct_ogre_1_1_d3_d11_vertex_array_object.html#adb4133433f419e4c54325f660bd1b8ba", null ],
     [ "_updateImmutableResource", "struct_ogre_1_1_d3_d11_vertex_array_object.html#a23f28bc689512c1c8599cdc4f70ba016", null ],
     [ "clone", "struct_ogre_1_1_d3_d11_vertex_array_object.html#a504ed47a14f33f48ff3f808567774c5c", null ],
     [ "findBySemantic", "struct_ogre_1_1_d3_d11_vertex_array_object.html#aedb8aeacdb894bae73b3ce3f609f29be", null ],
+    [ "getBaseVertexBuffer", "struct_ogre_1_1_d3_d11_vertex_array_object.html#a9b062da47a94004258a6085535c1466f", null ],
     [ "getIndexBuffer", "struct_ogre_1_1_d3_d11_vertex_array_object.html#ab583af81783365aa86ae439e11989711", null ],
-    [ "getInputLayoutId", "struct_ogre_1_1_d3_d11_vertex_array_object.html#ae06d7de8180a4b1e0f451ffbd35f9ef7", null ],
+    [ "getInputLayoutId", "struct_ogre_1_1_d3_d11_vertex_array_object.html#a5fb7a959f0bb9a63ccc123f2ce34d080", null ],
     [ "getOperationType", "struct_ogre_1_1_d3_d11_vertex_array_object.html#aeedbc5dadc06e31d8adc2e2784055e1b", null ],
     [ "getPrimitiveCount", "struct_ogre_1_1_d3_d11_vertex_array_object.html#a950c578cc2fff07b81ed6aa76fb2f59e", null ],
     [ "getPrimitiveStart", "struct_ogre_1_1_d3_d11_vertex_array_object.html#a1789fd786735a1e97652b0e971d5f720", null ],

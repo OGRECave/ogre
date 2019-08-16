@@ -20,6 +20,7 @@ var searchData=
   ['lightingshader',['lightingShader',['../_ogre_g_l_e_s2_internal_shaders_8h.html#a445e5538560d021dbddf48e92c4c7347',1,'OgreGLES2InternalShaders.h']]],
   ['lights',['lights',['../struct_ogre_1_1_light_list_info.html#a29f8b2d7075f792fe24454a5a37b09d0',1,'Ogre::LightListInfo']]],
   ['lightsareaapprox',['LightsAreaApprox',['../struct_ogre_1_1_hlms_base_prop.html#aadab57242035ec68cef4db1aa1db601f',1,'Ogre::HlmsBaseProp']]],
+  ['lightsarealtc',['LightsAreaLtc',['../struct_ogre_1_1_hlms_base_prop.html#afc34b6b99ecc65879f88059d2aa1c4e0',1,'Ogre::HlmsBaseProp']]],
   ['lightsareatexcolour',['LightsAreaTexColour',['../struct_ogre_1_1_hlms_base_prop.html#a331c39fb20c11a18fe8677aad9abca78',1,'Ogre::HlmsBaseProp']]],
   ['lightsareatexmask',['LightsAreaTexMask',['../struct_ogre_1_1_hlms_base_prop.html#a91ce66216630c5c9c4ec80a169b0abcf',1,'Ogre::HlmsBaseProp']]],
   ['lightsattenuation',['LightsAttenuation',['../struct_ogre_1_1_hlms_base_prop.html#a30a8aaf4edf7c988a87ebc7d620f1288',1,'Ogre::HlmsBaseProp']]],

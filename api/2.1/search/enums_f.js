@@ -28,5 +28,6 @@ var searchData=
   ['statflags',['StatFlags',['../class_ogre_1_1_render_target.html#a15f59cd1b4a2b2e65fcee349d78ae490',1,'Ogre::RenderTarget']]],
   ['stenciloperation',['StencilOperation',['../group___general.html#gae8bb1cb809660de802d1d592ba4adb61',1,'Ogre']]],
   ['stereomodetype',['StereoModeType',['../group___general.html#ga5ddaf464fe84b110f720b21a9a94b0cf',1,'Ogre']]],
+  ['streamtype',['StreamType',['../class_ogre_1_1_deflate_stream.html#aa0d681e30262c74b6c1f2ecacc85908c',1,'Ogre::DeflateStream']]],
   ['strongmacroblockbits',['StrongMacroblockBits',['../struct_ogre_1_1_hlms_pass_pso.html#af263ff6f0b338cd6c9e1bfa968a7214b',1,'Ogre::HlmsPassPso']]]
 ];

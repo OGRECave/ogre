@@ -6,6 +6,13 @@ var class_ogre_1_1v1_1_1_skeleton =
     [ "ConstBoneIterator", "class_ogre_1_1v1_1_1_skeleton.html#af39ab762efce530e4a8783ba622082b9", null ],
     [ "LinkedSkeletonAnimSourceIterator", "class_ogre_1_1v1_1_1_skeleton.html#ae38d5ae67a12f752ed2e54501a977c82", null ],
     [ "LinkedSkeletonAnimSourceList", "class_ogre_1_1v1_1_1_skeleton.html#a5130ea4fe3c4941b1efa0e3688d10ed9", null ],
+    [ "LoadingFlags", "class_ogre_1_1v1_1_1_skeleton.html#a1aa750a4b994f2b1066220936cdfdb94", [
+      [ "LF_DEFAULT", "class_ogre_1_1v1_1_1_skeleton.html#a1aa750a4b994f2b1066220936cdfdb94ab49695ac949df3a7d2e2f9a03267097c", null ],
+      [ "LF_INCLUDE_NON_RELOADABLE", "class_ogre_1_1v1_1_1_skeleton.html#a1aa750a4b994f2b1066220936cdfdb94a6ee542226e1cf18df28ab88426be6809", null ],
+      [ "LF_ONLY_UNREFERENCED", "class_ogre_1_1v1_1_1_skeleton.html#a1aa750a4b994f2b1066220936cdfdb94a70589e0b87b09b0a4fd98ce490dc9782", null ],
+      [ "LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE", "class_ogre_1_1v1_1_1_skeleton.html#a1aa750a4b994f2b1066220936cdfdb94ae5f2eca654bd810da4c774570a5b4b77", null ],
+      [ "LF_PRESERVE_STATE", "class_ogre_1_1v1_1_1_skeleton.html#a1aa750a4b994f2b1066220936cdfdb94ad83abf165de5cfa1a4c8e0cd5471ad2c", null ]
+    ] ],
     [ "LoadingState", "class_ogre_1_1v1_1_1_skeleton.html#a07e619aa09d3bc6789a6667cb4fc572c", [
       [ "LOADSTATE_UNLOADED", "class_ogre_1_1v1_1_1_skeleton.html#a07e619aa09d3bc6789a6667cb4fc572ca28d463296cacdfc115dbc3fb02d00e94", null ],
       [ "LOADSTATE_LOADING", "class_ogre_1_1v1_1_1_skeleton.html#a07e619aa09d3bc6789a6667cb4fc572caf138fc9087e0dc755bff08a83720cbb5", null ],
@@ -90,7 +97,7 @@ var class_ogre_1_1v1_1_1_skeleton =
     [ "operator new[]", "class_ogre_1_1v1_1_1_skeleton.html#afa2943846ba6a2b5824a12857139cf5e", null ],
     [ "optimiseAllAnimations", "class_ogre_1_1v1_1_1_skeleton.html#a19adb2321f3f7905037c3e1137ae4037", null ],
     [ "prepare", "class_ogre_1_1v1_1_1_skeleton.html#a350b287fa3e83a389221274f68760008", null ],
-    [ "reload", "class_ogre_1_1v1_1_1_skeleton.html#ab7a0b8de3a7e4d20fcfd84da41ac450e", null ],
+    [ "reload", "class_ogre_1_1v1_1_1_skeleton.html#a5016aec1762b026997ddd346775879ef", null ],
     [ "removeAllLinkedSkeletonAnimationSources", "class_ogre_1_1v1_1_1_skeleton.html#a1cffd95ca120104dd201d00513bd0198", null ],
     [ "removeAnimation", "class_ogre_1_1v1_1_1_skeleton.html#ada8adc32b06aa10998a96912e7e936ed", null ],
     [ "removeListener", "class_ogre_1_1v1_1_1_skeleton.html#a3c49142f739ba8fb56d6e7b3db235fb7", null ],

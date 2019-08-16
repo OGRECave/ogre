@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$class_ogre_1_1_colour_value.html" title="Class representing colour. " alt="" coords="5,5,145,32"/>
+<area shape="rect" id="node1" href="$class_ogre_1_1cbitset_n.html" title="Ogre::cbitsetN\&lt; _N,\l uint32, 5u, 0x1Fu \&gt;" alt="" coords="5,5,145,47"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1cbitset32.html" title="This is similar to std::bitset, except waaay less bloat. " alt="" coords="193,13,345,39"/>
 </map>

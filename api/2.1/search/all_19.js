@@ -8,6 +8,7 @@ var searchData=
   ['ziparchive',['ZipArchive',['../class_ogre_1_1_zip_archive.html',1,'Ogre::ZipArchive'],['../class_ogre_1_1_zip_archive.html#a96c1ff6075b2ed4e222831c60b269656',1,'Ogre::ZipArchive::ZipArchive()']]],
   ['ziparchivefactory',['ZipArchiveFactory',['../class_ogre_1_1_zip_archive_factory.html',1,'Ogre']]],
   ['zipdatastream',['ZipDataStream',['../class_ogre_1_1_zip_data_stream.html',1,'Ogre::ZipDataStream'],['../class_ogre_1_1_zip_data_stream.html#a469d266bf656ebc0bbc63f006a001844',1,'Ogre::ZipDataStream::ZipDataStream(ZZIP_FILE *zzipFile, size_t uncompressedSize)'],['../class_ogre_1_1_zip_data_stream.html#aa59e9bbc5a05c5560191e721cace8f09',1,'Ogre::ZipDataStream::ZipDataStream(const String &amp;name, ZZIP_FILE *zzipFile, size_t uncompressedSize)']]],
+  ['zlib',['ZLib',['../class_ogre_1_1_deflate_stream.html#aa0d681e30262c74b6c1f2ecacc85908caab547cd040a3b61b6df82af4cf202692',1,'Ogre::DeflateStream']]],
   ['zoffset',['zoffset',['../struct_ogre_1_1_g_l3_plus_surface_desc.html#a7c03c0b6eefc5f5c02a86cfe6baa55c7',1,'Ogre::GL3PlusSurfaceDesc::zoffset()'],['../struct_ogre_1_1_g_l_e_s2_surface_desc.html#ac973faa7257ff00e5fee1870324d69db',1,'Ogre::GLES2SurfaceDesc::zoffset()']]],
   ['zzip_5fdir',['ZZIP_DIR',['../_ogre_zip_8h.html#a8cee87e0d5584ff66b56196eec9758c4',1,'OgreZip.h']]],
   ['zzip_5ffile',['ZZIP_FILE',['../_ogre_zip_8h.html#a83aee2653632d452e58ac776fde409ea',1,'OgreZip.h']]],

@@ -10,7 +10,7 @@ var class_ogre_1_1_na_cl_g_l_support =
     [ "getDisplayName", "class_ogre_1_1_na_cl_g_l_support.html#a84ac52c0ca260c4c19729532a62392d2", null ],
     [ "getGLVendor", "class_ogre_1_1_na_cl_g_l_support.html#a6c7a06f4962c6a5c0660204fb47c687c", null ],
     [ "getGLVersion", "class_ogre_1_1_na_cl_g_l_support.html#aeb520c6f045a33348eec5c7dd4a6224e", null ],
-    [ "getProcAddress", "class_ogre_1_1_na_cl_g_l_support.html#af594f4227709664fa9272ed15b3f3f3f", null ],
+    [ "getProcAddress", "class_ogre_1_1_na_cl_g_l_support.html#ab3440e44fa100d77ff92ac312d097563", null ],
     [ "getShaderCachePath", "class_ogre_1_1_na_cl_g_l_support.html#a568f90fab6eccb6bf8ef6d565a647bd5", null ],
     [ "getShaderLibraryPath", "class_ogre_1_1_na_cl_g_l_support.html#a1418f5341531e2499a0ff11fdc208769", null ],
     [ "getStateCacheManager", "class_ogre_1_1_na_cl_g_l_support.html#a2b2b8f4b97973698e0a6ebc75e87b5f0", null ],

@@ -51,5 +51,7 @@ var searchData=
   ['xvisualinfo',['XVisualInfo',['../struct_x_visual_info.html',1,'']]],
   ['xwindowattributes',['XWindowAttributes',['../struct_x_window_attributes.html',1,'']]],
   ['xwmhints',['XWMHints',['../struct_x_w_m_hints.html',1,'']]],
-  ['xyhalfsize',['xyHalfSize',['../struct_ogre_1_1_array_actor_plane.html#a97985b96875c32fa0d8e519ef2e7f417',1,'Ogre::ArrayActorPlane']]]
+  ['xy',['xy',['../class_ogre_1_1_vector3.html#acdfb27b5a990112e3f731a2be8a54aec',1,'Ogre::Vector3::xy()'],['../class_ogre_1_1_vector4.html#ad6dc84f0ca8204d16b0232c7609c243c',1,'Ogre::Vector4::xy()']]],
+  ['xyhalfsize',['xyHalfSize',['../struct_ogre_1_1_array_actor_plane.html#a97985b96875c32fa0d8e519ef2e7f417',1,'Ogre::ArrayActorPlane']]],
+  ['xyz',['xyz',['../class_ogre_1_1_vector4.html#a299d194697fd0ab74fec1961beed0715',1,'Ogre::Vector4']]]
 ];

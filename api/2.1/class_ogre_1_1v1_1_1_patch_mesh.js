@@ -10,6 +10,13 @@ var class_ogre_1_1v1_1_1_patch_mesh =
     [ "SubMeshList", "class_ogre_1_1v1_1_1_patch_mesh.html#a60a552ffe97ad7ec2eda607ad0289ecc", null ],
     [ "SubMeshNameMap", "class_ogre_1_1v1_1_1_patch_mesh.html#a3bc0ae51586e40dce1a40910f7651f6b", null ],
     [ "VertexBoneAssignmentList", "class_ogre_1_1v1_1_1_patch_mesh.html#a503032ea48d780f676efde54c31f248f", null ],
+    [ "LoadingFlags", "class_ogre_1_1v1_1_1_patch_mesh.html#a1aa750a4b994f2b1066220936cdfdb94", [
+      [ "LF_DEFAULT", "class_ogre_1_1v1_1_1_patch_mesh.html#a1aa750a4b994f2b1066220936cdfdb94ab49695ac949df3a7d2e2f9a03267097c", null ],
+      [ "LF_INCLUDE_NON_RELOADABLE", "class_ogre_1_1v1_1_1_patch_mesh.html#a1aa750a4b994f2b1066220936cdfdb94a6ee542226e1cf18df28ab88426be6809", null ],
+      [ "LF_ONLY_UNREFERENCED", "class_ogre_1_1v1_1_1_patch_mesh.html#a1aa750a4b994f2b1066220936cdfdb94a70589e0b87b09b0a4fd98ce490dc9782", null ],
+      [ "LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE", "class_ogre_1_1v1_1_1_patch_mesh.html#a1aa750a4b994f2b1066220936cdfdb94ae5f2eca654bd810da4c774570a5b4b77", null ],
+      [ "LF_PRESERVE_STATE", "class_ogre_1_1v1_1_1_patch_mesh.html#a1aa750a4b994f2b1066220936cdfdb94ad83abf165de5cfa1a4c8e0cd5471ad2c", null ]
+    ] ],
     [ "LoadingState", "class_ogre_1_1v1_1_1_patch_mesh.html#a07e619aa09d3bc6789a6667cb4fc572c", [
       [ "LOADSTATE_UNLOADED", "class_ogre_1_1v1_1_1_patch_mesh.html#a07e619aa09d3bc6789a6667cb4fc572ca28d463296cacdfc115dbc3fb02d00e94", null ],
       [ "LOADSTATE_LOADING", "class_ogre_1_1v1_1_1_patch_mesh.html#a07e619aa09d3bc6789a6667cb4fc572caf138fc9087e0dc755bff08a83720cbb5", null ],
@@ -79,6 +86,7 @@ var class_ogre_1_1v1_1_1_patch_mesh =
     [ "getEdgeList", "class_ogre_1_1v1_1_1_patch_mesh.html#aa0053698c497e61384a938618caa9529", null ],
     [ "getGroup", "class_ogre_1_1v1_1_1_patch_mesh.html#a382919945c07a6a13136889ad3fbf578", null ],
     [ "getHandle", "class_ogre_1_1v1_1_1_patch_mesh.html#a2298551707debaf774d577e643ee856a", null ],
+    [ "getHardwareBufferManager", "class_ogre_1_1v1_1_1_patch_mesh.html#a55221a7d8dac04b8efbd6b07c77cae41", null ],
     [ "getIndexBufferUsage", "class_ogre_1_1v1_1_1_patch_mesh.html#acdf31ade7816b993211b9a4ce72a56c2", null ],
     [ "getLoadingState", "class_ogre_1_1v1_1_1_patch_mesh.html#a1e90ade99935ef70ec5b199243bf995b", null ],
     [ "getLodIndex", "class_ogre_1_1v1_1_1_patch_mesh.html#afe9fec3370d8303c9bac766621c3ba86", null ],
@@ -146,7 +154,7 @@ var class_ogre_1_1v1_1_1_patch_mesh =
     [ "prepareForShadowMapping", "class_ogre_1_1v1_1_1_patch_mesh.html#a2cec8d873758fd22b9d7e377a3e5dce5", null ],
     [ "prepareForShadowVolume", "class_ogre_1_1v1_1_1_patch_mesh.html#a5aa76b1122de9edd98e599f2898e4bac", null ],
     [ "prepareMatricesForVertexBlend", "class_ogre_1_1v1_1_1_patch_mesh.html#ad61b3c1ba0f6027e21228f4e14885740", null ],
-    [ "reload", "class_ogre_1_1v1_1_1_patch_mesh.html#ab7a0b8de3a7e4d20fcfd84da41ac450e", null ],
+    [ "reload", "class_ogre_1_1v1_1_1_patch_mesh.html#a323c2a05ebcfb72efdb2bed0e438e338", null ],
     [ "removeAllAnimations", "class_ogre_1_1v1_1_1_patch_mesh.html#a64c676349811d1b9f486a7a838acb69e", null ],
     [ "removeAllPoses", "class_ogre_1_1v1_1_1_patch_mesh.html#a6592fdc758cb7a783e0eaf3b5673cfe0", null ],
     [ "removeAnimation", "class_ogre_1_1v1_1_1_patch_mesh.html#aec7fd7f25b152282855894f34ef4964a", null ],
@@ -156,6 +164,7 @@ var class_ogre_1_1v1_1_1_patch_mesh =
     [ "removePose", "class_ogre_1_1v1_1_1_patch_mesh.html#a01c5de9c100d5509efaa64840bc224dc", null ],
     [ "setAutoBuildEdgeLists", "class_ogre_1_1v1_1_1_patch_mesh.html#a3704c9124ac56ed06c1b9d076231d931", null ],
     [ "setBackgroundLoaded", "class_ogre_1_1v1_1_1_patch_mesh.html#ae0a0007de944eb3c2f933a372a752b35", null ],
+    [ "setHardwareBufferManager", "class_ogre_1_1v1_1_1_patch_mesh.html#a914f165047d5a4433261cc1d734c3dbd", null ],
     [ "setIndexBufferPolicy", "class_ogre_1_1v1_1_1_patch_mesh.html#ab8eb4467c24bc16c9b37df117699e387", null ],
     [ "setLodStrategyName", "class_ogre_1_1v1_1_1_patch_mesh.html#a130e96583beda27a42a0a4cec454c01c", null ],
     [ "setManuallyLoaded", "class_ogre_1_1v1_1_1_patch_mesh.html#a82174dc4f4a0645332483ced7904c2f6", null ],

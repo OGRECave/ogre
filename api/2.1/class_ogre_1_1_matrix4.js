@@ -43,6 +43,7 @@ var class_ogre_1_1_matrix4 =
     [ "swap", "class_ogre_1_1_matrix4.html#a83b9aa92783c4679fc09307e74e92736", null ],
     [ "transformAffine", "class_ogre_1_1_matrix4.html#aef2423834bcfd70912cc70b7cb7c5adb", null ],
     [ "transformAffine", "class_ogre_1_1_matrix4.html#a0dba3d71ef91778d553155436a93df32", null ],
+    [ "transformDirectionAffine", "class_ogre_1_1_matrix4.html#a0e7c6ab3a7420bf705b52e5aa546b710", null ],
     [ "transpose", "class_ogre_1_1_matrix4.html#a8129ccfa5d07cdd8af4eb268edc1d42e", null ],
     [ "ArrayMatrix4", "class_ogre_1_1_matrix4.html#ae1cc0532fb62b25db5e3b496991c89f0", null ],
     [ "ArrayMatrixAf4x3", "class_ogre_1_1_matrix4.html#a646c095812980e545414b3f61deeea87", null ],

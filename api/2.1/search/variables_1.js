@@ -19,6 +19,7 @@ var searchData=
   ['alphablend',['AlphaBlend',['../struct_ogre_1_1_hlms_base_prop.html#a8bf55758ad2d7622abc44f449631bc9c',1,'Ogre::HlmsBaseProp']]],
   ['alphatest',['AlphaTest',['../struct_ogre_1_1_hlms_base_prop.html#a1cdd5b3e6b9e3aecf4e591f9fdd507a4',1,'Ogre::HlmsBaseProp']]],
   ['alphatestcmpfunc',['AlphaTestCmpFunc',['../struct_ogre_1_1_hlms_base_pieces.html#a818124924b91cc5cb1f5510fd76a43ce',1,'Ogre::HlmsBasePieces']]],
+  ['alphatestshadowcasteronly',['AlphaTestShadowCasterOnly',['../struct_ogre_1_1_hlms_base_prop.html#a0f7ba12f4dd9081fb481095598eca626',1,'Ogre::HlmsBaseProp']]],
   ['amask',['amask',['../struct_ogre_1_1_pixel_format_description.html#a1ffac3a6184e318a192b6ec16ac9fb7d',1,'Ogre::PixelFormatDescription']]],
   ['ambientfixed',['AmbientFixed',['../struct_ogre_1_1_pbs_property.html#a4866419a67e296cc413219b1825afa86',1,'Ogre::PbsProperty']]],
   ['ambienthemisphere',['AmbientHemisphere',['../struct_ogre_1_1_pbs_property.html#abf2d2d6c9980b59d920b2fa696a81d1b',1,'Ogre::PbsProperty']]],

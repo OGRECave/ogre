@@ -17,6 +17,7 @@ var _ogre_scene_format_base_8h =
       [ "BuildInstantRadiosity", "_ogre_scene_format_base_8h.html#af3190017d83d94455e645c506aa1681baceb12ece684abf5f97d151487dbc7e5a", null ],
       [ "LightsVpl", "_ogre_scene_format_base_8h.html#af3190017d83d94455e645c506aa1681ba4cd22db20c201c57c4f2390e0c7575a2", null ],
       [ "ParallaxCorrectedCubemap", "_ogre_scene_format_base_8h.html#af3190017d83d94455e645c506aa1681baea5db3022cecaccacfdd638ae3f25965", null ],
-      [ "AreaLightMasks", "_ogre_scene_format_base_8h.html#af3190017d83d94455e645c506aa1681ba4c9ac52c8b2f9be69cf70d5d8ed8d9dc", null ]
+      [ "AreaLightMasks", "_ogre_scene_format_base_8h.html#af3190017d83d94455e645c506aa1681ba4c9ac52c8b2f9be69cf70d5d8ed8d9dc", null ],
+      [ "Decals", "_ogre_scene_format_base_8h.html#af3190017d83d94455e645c506aa1681baeabc33f6a8d43624c7b608196f026f76", null ]
     ] ]
 ];

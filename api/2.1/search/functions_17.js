@@ -34,5 +34,7 @@ var searchData=
   ['xsetwmproperties',['XSetWMProperties',['../_ogre_x11_e_g_l_support_8h.html#a46c6f72b9036514969671b47377251cb',1,'OgreX11EGLSupport.h']]],
   ['xsetwmprotocols',['XSetWMProtocols',['../_ogre_x11_e_g_l_support_8h.html#ad15f704cba03100c7c79f536927aa6c3',1,'OgreX11EGLSupport.h']]],
   ['xstringlisttotextproperty',['XStringListToTextProperty',['../_ogre_x11_e_g_l_support_8h.html#a13f1bb8c8d66fd74b2d6a425d76b6716',1,'OgreX11EGLSupport.h']]],
-  ['xvisualidfromvisual',['XVisualIDFromVisual',['../_ogre_x11_e_g_l_support_8h.html#a5c320d2dfe131dc7e450142e83ee149b',1,'OgreX11EGLSupport.h']]]
+  ['xvisualidfromvisual',['XVisualIDFromVisual',['../_ogre_x11_e_g_l_support_8h.html#a5c320d2dfe131dc7e450142e83ee149b',1,'OgreX11EGLSupport.h']]],
+  ['xy',['xy',['../class_ogre_1_1_vector3.html#acdfb27b5a990112e3f731a2be8a54aec',1,'Ogre::Vector3::xy()'],['../class_ogre_1_1_vector4.html#ad6dc84f0ca8204d16b0232c7609c243c',1,'Ogre::Vector4::xy()']]],
+  ['xyz',['xyz',['../class_ogre_1_1_vector4.html#a299d194697fd0ab74fec1961beed0715',1,'Ogre::Vector4']]]
 ];

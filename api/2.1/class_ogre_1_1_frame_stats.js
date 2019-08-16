@@ -1,7 +1,7 @@
 var class_ogre_1_1_frame_stats =
 [
     [ "FrameStats", "group___general.html#gabfc5ae8f8bccf034ef247e1b4a72ab97", null ],
-    [ "addSample", "group___general.html#ga91bb18d5e11da62d1ad0f521ba2472aa", null ],
+    [ "addSample", "group___general.html#gaa6a88b9aef803fda1435c756cbf976a8", null ],
     [ "getAvgFps", "group___general.html#ga9d0dbea6a114b80a0e025d076164aab3", null ],
     [ "getAvgTime", "group___general.html#ga98257e179b644d78acff20ec0b1b8ec9", null ],
     [ "getBestTime", "group___general.html#ga44e146f9ba3fb02e462d57f321a94eba", null ],
@@ -18,5 +18,5 @@ var class_ogre_1_1_frame_stats =
     [ "operator new", "class_ogre_1_1_frame_stats.html#ab78a921e54419be677839cdf15d1f0b8", null ],
     [ "operator new[]", "class_ogre_1_1_frame_stats.html#a4be37baef81876985aa1071ad5acc6dd", null ],
     [ "operator new[]", "class_ogre_1_1_frame_stats.html#afa2943846ba6a2b5824a12857139cf5e", null ],
-    [ "reset", "group___general.html#gac594ddf64ec78a1ec7fbd5ec2105ac5d", null ]
+    [ "reset", "group___general.html#ga91166fe4ac997f5e98d7118cac7cddb9", null ]
 ];

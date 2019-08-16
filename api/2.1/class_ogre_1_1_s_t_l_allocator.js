@@ -10,7 +10,7 @@ var class_ogre_1_1_s_t_l_allocator =
     [ "size_type", "class_ogre_1_1_s_t_l_allocator.html#aabd94312eb1a0e3f84339e5d810c273f", null ],
     [ "value_type", "class_ogre_1_1_s_t_l_allocator.html#af5221070699c31f29ff62f889ffd9b32", null ],
     [ "STLAllocator", "class_ogre_1_1_s_t_l_allocator.html#a9c25559c7ed0e526a0195d4d44efce10", null ],
-    [ "~STLAllocator", "class_ogre_1_1_s_t_l_allocator.html#ab4be8634d905e1c62cfbaeca27389188", null ],
+    [ "~STLAllocator", "class_ogre_1_1_s_t_l_allocator.html#aa471292f11b97fad72f31c25048b7c33", null ],
     [ "STLAllocator", "class_ogre_1_1_s_t_l_allocator.html#af85d3e2726cef7ec1f1d24f2ed3b0675", null ],
     [ "STLAllocator", "class_ogre_1_1_s_t_l_allocator.html#a3d97ea3f530a55614990908f19ccd533", null ],
     [ "STLAllocator", "class_ogre_1_1_s_t_l_allocator.html#ac80a6c2569f5812937287072c04d23ea", null ],

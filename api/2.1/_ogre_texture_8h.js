@@ -21,10 +21,12 @@ var _ogre_texture_8h =
       [ "TU_DYNAMIC_WRITE_ONLY_DISCARDABLE", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67a79920182637c94fabcf834950096483f", null ],
       [ "TU_AUTOMIPMAP", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67a7c14cc95a59af42a63eb33fc9de05d27", null ],
       [ "TU_RENDERTARGET", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67ae1661d9846a9b4e83c2e4cd99fc6ad9d", null ],
+      [ "TU_NOT_SRV", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67aeaa879e353bc503f741a0a0671b35c15", null ],
       [ "TU_UAV", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67a85ca4e5cb922c3a2381ed5eed01c0cf1", null ],
-      [ "TU_NOT_TEXTURE", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67a034335ff9ba602df40a556bcf5b1c854", null ],
-      [ "TU_UAV_NOT_TEXTURE", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67ab3038b7ea346f9982eeb85d53435e4a3", null ],
+      [ "TU_UAV_NOT_SRV", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67a705be8b4d48b62f98e1cd5d70c2a16a8", null ],
       [ "TU_AUTOMIPMAP_AUTO", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67a7033ce699556661d7d2055ea29f19356", null ],
-      [ "TU_DEFAULT", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67acaa45fe77d1becf4c5bd353bc2aa764b", null ]
+      [ "TU_DEFAULT", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67acaa45fe77d1becf4c5bd353bc2aa764b", null ],
+      [ "TU_NOT_TEXTURE", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67a034335ff9ba602df40a556bcf5b1c854", null ],
+      [ "TU_UAV_NOT_TEXTURE", "_ogre_texture_8h.html#ggaf140ec886884a864abc74a7556f8bf67ab3038b7ea346f9982eeb85d53435e4a3", null ]
     ] ]
 ];

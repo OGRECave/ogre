@@ -18,6 +18,7 @@ var searchData=
   ['rendareblehlmstypemask',['RendarebleHlmsTypeMask',['../struct_ogre_1_1_hlms_bits.html#aa95210cbd33619cba7e5b8b22fb291f5',1,'Ogre::HlmsBits']]],
   ['renderable',['renderable',['../struct_ogre_1_1_cb_low_level_material.html#ac4e234229befb3dec94304c13e74e6a5',1,'Ogre::CbLowLevelMaterial::renderable()'],['../struct_ogre_1_1_queued_renderable.html#ad63644d36969a4f90efc8b88ec394518',1,'Ogre::QueuedRenderable::renderable()'],['../struct_ogre_1_1_planar_reflections_1_1_tracked_renderable.html#a9523732d7c8f78aad197574563f22ba6',1,'Ogre::PlanarReflections::TrackedRenderable::renderable()']]],
   ['renderablebits',['RenderableBits',['../struct_ogre_1_1_hlms_bits.html#a7c4a502448a66c6373a8763b49a12980',1,'Ogre::HlmsBits']]],
+  ['renderablecache',['renderableCache',['../struct_ogre_1_1_hlms_disk_cache_1_1_pso.html#ab474d42949e1800fb64e0b3ab378de75',1,'Ogre::HlmsDiskCache::Pso']]],
   ['renderablecenter',['renderableCenter',['../struct_ogre_1_1_planar_reflections_1_1_tracked_renderable.html#a557d8b10d227e322a55e19c534d0dbf9',1,'Ogre::PlanarReflections::TrackedRenderable']]],
   ['renderablemask',['RenderableMask',['../struct_ogre_1_1_hlms_bits.html#a5b7ab7ed064fbf0e52998523a386168c',1,'Ogre::HlmsBits']]],
   ['renderableshift',['RenderableShift',['../struct_ogre_1_1_hlms_bits.html#a384f5dec64f797a0e381a52be85bf930',1,'Ogre::HlmsBits']]],

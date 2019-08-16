@@ -9,6 +9,7 @@ var struct_ogre_1_1_hlms_samplerblock =
     [ "mBorderColour", "struct_ogre_1_1_hlms_samplerblock.html#a40b3d816aee861a42b0dfe3aa9866667", null ],
     [ "mCompareFunction", "struct_ogre_1_1_hlms_samplerblock.html#a626bdfc5ade2a5330f91e26f93ff334b", null ],
     [ "mId", "struct_ogre_1_1_hlms_samplerblock.html#a46bd9a389676bce8a4c7f1ac1dc294bd", null ],
+    [ "mLifetimeId", "struct_ogre_1_1_hlms_samplerblock.html#a8dbf13c2d554ba4945031e0f309e82a4", null ],
     [ "mMagFilter", "struct_ogre_1_1_hlms_samplerblock.html#af6490e4df1f868370696578d7ce315c1", null ],
     [ "mMaxAnisotropy", "struct_ogre_1_1_hlms_samplerblock.html#a3bcc29a23b6b0ab3df78b03e9ac6b1e0", null ],
     [ "mMaxLod", "struct_ogre_1_1_hlms_samplerblock.html#aa99714532431f7a2e17398cfadb5d0a5", null ],

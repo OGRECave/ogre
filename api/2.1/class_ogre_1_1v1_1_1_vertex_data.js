@@ -12,7 +12,7 @@ var class_ogre_1_1v1_1_1_vertex_data =
     [ "clone", "class_ogre_1_1v1_1_1_vertex_data.html#a3329ebb97edaf21abffb60e19dee9130", null ],
     [ "closeGapsInBindings", "class_ogre_1_1v1_1_1_vertex_data.html#a7519655dfc05e3a76a314fa27ec22752", null ],
     [ "convertPackedColour", "class_ogre_1_1v1_1_1_vertex_data.html#a110b3fbc4f040549509c29456745dde2", null ],
-    [ "lockMultipleElements", "class_ogre_1_1v1_1_1_vertex_data.html#a49db7af259aa51de7a0fe8bc42c9ec8a", null ],
+    [ "lockMultipleElements", "class_ogre_1_1v1_1_1_vertex_data.html#a09fe53aac92cc199d95e32d9216ce429", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_vertex_data.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_vertex_data.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_vertex_data.html#acb46d4b0a597156d9ba5abc39d127792", null ],

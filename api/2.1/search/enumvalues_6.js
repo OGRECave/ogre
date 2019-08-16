@@ -95,5 +95,6 @@ var searchData=
   ['gpv_5fper_5fobject',['GPV_PER_OBJECT',['../group___materials.html#gga167c785d87088b52526f1f079024fcdaa39d4c360141a21c7dd916c7837b357af',1,'Ogre']]],
   ['gva_5fbottom',['GVA_BOTTOM',['../group___overlays.html#gga9e3894529c45039606127f43c750382dac17101e3c70054f17d2d90f5f21cbb03',1,'Ogre::v1']]],
   ['gva_5fcenter',['GVA_CENTER',['../group___overlays.html#gga9e3894529c45039606127f43c750382da7350663734264399184470166677247c',1,'Ogre::v1']]],
-  ['gva_5ftop',['GVA_TOP',['../group___overlays.html#gga9e3894529c45039606127f43c750382da129954c420771057ddcd5657fcaf2068',1,'Ogre::v1']]]
+  ['gva_5ftop',['GVA_TOP',['../group___overlays.html#gga9e3894529c45039606127f43c750382da129954c420771057ddcd5657fcaf2068',1,'Ogre::v1']]],
+  ['gzip',['GZip',['../class_ogre_1_1_deflate_stream.html#aa0d681e30262c74b6c1f2ecacc85908ca6d7007604fcbeb05fd8f27baac7eed9b',1,'Ogre::DeflateStream']]]
 ];

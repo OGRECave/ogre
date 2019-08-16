@@ -49,6 +49,7 @@ var searchData=
   ['shadowmap_5fplaneoptimal',['SHADOWMAP_PLANEOPTIMAL',['../group___effects.html#ggab1bb9aa322106f045a06196ba0d7c2a7a2a0c6e35ea3d12de16bd73de29abd923',1,'Ogre']]],
   ['shadowmap_5fpssm',['SHADOWMAP_PSSM',['../group___effects.html#ggab1bb9aa322106f045a06196ba0d7c2a7ab05ad05bfc2c20d9b22fb2c0aed411ec',1,'Ogre']]],
   ['shadowmap_5funiform',['SHADOWMAP_UNIFORM',['../group___effects.html#ggab1bb9aa322106f045a06196ba0d7c2a7ab067ffa4c1b52d57b450d0eaccf07c1a',1,'Ogre']]],
+  ['shadowupperdistance',['ShadowUpperDistance',['../class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735ad5518d8f510487649adddc818324009e',1,'Ogre::ObjectDataArrayMemoryManager']]],
   ['show_5fboundingbox',['SHOW_BOUNDINGBOX',['../group___scene.html#gga2967aa471d9b4bbba11ba6b6f4fc90d7a8bc207bbcf78bd642d321a11692d535c',1,'Ogre::v1::InstanceManager']]],
   ['skeleton_5fanimation',['SKELETON_ANIMATION',['../group___animation.html#gga5b37bdf2f67384dbd81643164545f7bdaa559ee7367718e8c9ffdfd1af83c9ca8',1,'Ogre']]],
   ['skeleton_5fanimation_5fbaseinfo',['SKELETON_ANIMATION_BASEINFO',['../group___animation.html#gga5b37bdf2f67384dbd81643164545f7bdaedacebfaa34fe1ed9b95efb6210e13e1',1,'Ogre']]],

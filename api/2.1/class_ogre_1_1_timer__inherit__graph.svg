@@ -11,14 +11,14 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<polygon fill="#bfbfbf" stroke="#000000" points="4.0812,-.5 4.0812,-19.5 78.0812,-19.5 78.0812,-.5 4.0812,-.5"/>
+<polygon fill="#bfbfbf" stroke="#000000" points="7.0812,-.5 7.0812,-19.5 75.0812,-19.5 75.0812,-.5 7.0812,-.5"/>
 <text text-anchor="middle" x="41.0812" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">Ogre::Timer</text>
 </g>
 <!-- Node1 -->
 <g id="node2" class="node">
 <title>Node1</title>
 <g id="a_node2"><a xlink:href="class_ogre_1_1_allocated_object.html" target="_top" xlink:title="Superclass for all objects that wish to use custom memory allocators when their new / delete operator...">
-<polygon fill="none" stroke="#000000" points="6.5812,-56.5 6.5812,-75.5 75.5812,-75.5 75.5812,-56.5 6.5812,-56.5"/>
+<polygon fill="none" stroke="#000000" points="9.5812,-56.5 9.5812,-75.5 72.5812,-75.5 72.5812,-56.5 9.5812,-56.5"/>
 <text text-anchor="middle" x="41.0812" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">TimerAlloc</text>
 </a>
 </g>

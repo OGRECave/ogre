@@ -36,6 +36,7 @@ var class_ogre_1_1_compositor_pass_quad_def =
     [ "mExecutionMask", "class_ogre_1_1_compositor_pass_quad_def.html#a4ba939216db7e92e0a0ba4cebe62af5b", null ],
     [ "mExposedTextures", "class_ogre_1_1_compositor_pass_quad_def.html#aa9377ca6479c21df519128eb6142b169", null ],
     [ "mFrustumCorners", "class_ogre_1_1_compositor_pass_quad_def.html#a9031fd84b590ef668d82128b1d77a407", null ],
+    [ "mFsaaTextureName", "class_ogre_1_1_compositor_pass_quad_def.html#acb7b82ccf803a40c753f49a9f2019214", null ],
     [ "mIdentifier", "class_ogre_1_1_compositor_pass_quad_def.html#ab32b226a745dfd996d7b94a7197044eb", null ],
     [ "mIncludeOverlays", "class_ogre_1_1_compositor_pass_quad_def.html#aacdeaffb7cacec5f264de2be66410c67", null ],
     [ "mIsResolve", "class_ogre_1_1_compositor_pass_quad_def.html#a4173b782c03799cf44692660019775bc", null ],

@@ -2,6 +2,13 @@ var class_ogre_1_1_mesh =
 [
     [ "LodValueArray", "class_ogre_1_1_mesh.html#a755ff206ec856db92062df2669a0b6d1", null ],
     [ "SubMeshVec", "class_ogre_1_1_mesh.html#aedc2da9047ca813ce16f657e7f0b3a2a", null ],
+    [ "LoadingFlags", "class_ogre_1_1_mesh.html#a1aa750a4b994f2b1066220936cdfdb94", [
+      [ "LF_DEFAULT", "class_ogre_1_1_mesh.html#a1aa750a4b994f2b1066220936cdfdb94ab49695ac949df3a7d2e2f9a03267097c", null ],
+      [ "LF_INCLUDE_NON_RELOADABLE", "class_ogre_1_1_mesh.html#a1aa750a4b994f2b1066220936cdfdb94a6ee542226e1cf18df28ab88426be6809", null ],
+      [ "LF_ONLY_UNREFERENCED", "class_ogre_1_1_mesh.html#a1aa750a4b994f2b1066220936cdfdb94a70589e0b87b09b0a4fd98ce490dc9782", null ],
+      [ "LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE", "class_ogre_1_1_mesh.html#a1aa750a4b994f2b1066220936cdfdb94ae5f2eca654bd810da4c774570a5b4b77", null ],
+      [ "LF_PRESERVE_STATE", "class_ogre_1_1_mesh.html#a1aa750a4b994f2b1066220936cdfdb94ad83abf165de5cfa1a4c8e0cd5471ad2c", null ]
+    ] ],
     [ "LoadingState", "class_ogre_1_1_mesh.html#a07e619aa09d3bc6789a6667cb4fc572c", [
       [ "LOADSTATE_UNLOADED", "class_ogre_1_1_mesh.html#a07e619aa09d3bc6789a6667cb4fc572ca28d463296cacdfc115dbc3fb02d00e94", null ],
       [ "LOADSTATE_LOADING", "class_ogre_1_1_mesh.html#a07e619aa09d3bc6789a6667cb4fc572caf138fc9087e0dc755bff08a83720cbb5", null ],
@@ -66,7 +73,7 @@ var class_ogre_1_1_mesh =
     [ "hasIndependentShadowMappingVaos", "class_ogre_1_1_mesh.html#ad67474aef6d20e2dcceeaaf0d2f6cc24", null ],
     [ "hasSkeleton", "class_ogre_1_1_mesh.html#abda741ea76979cf0e4d43eced5dece25", null ],
     [ "hasValidShadowMappingVaos", "class_ogre_1_1_mesh.html#abb6cb9b0e87d09a674cdc82e197c2dd4", null ],
-    [ "importV1", "class_ogre_1_1_mesh.html#a0a5f88956c17ef23f649c1875d9980e9", null ],
+    [ "importV1", "class_ogre_1_1_mesh.html#add0faad76685a41c804c485a4d9b42c4", null ],
     [ "isBackgroundLoaded", "class_ogre_1_1_mesh.html#a60ce96525ac730a0f7b466ed287beef3", null ],
     [ "isIndexBufferShadowed", "class_ogre_1_1_mesh.html#af37305346744be4480479e764036116f", null ],
     [ "isLoaded", "class_ogre_1_1_mesh.html#a74138c0203835513613af73cdb08890d", null ],
@@ -89,7 +96,7 @@ var class_ogre_1_1_mesh =
     [ "operator new[]", "class_ogre_1_1_mesh.html#afa2943846ba6a2b5824a12857139cf5e", null ],
     [ "prepare", "class_ogre_1_1_mesh.html#a350b287fa3e83a389221274f68760008", null ],
     [ "prepareForShadowMapping", "class_ogre_1_1_mesh.html#af92113ada1cba0d20b60b66a9ad07b3e", null ],
-    [ "reload", "class_ogre_1_1_mesh.html#ab7a0b8de3a7e4d20fcfd84da41ac450e", null ],
+    [ "reload", "class_ogre_1_1_mesh.html#a5016aec1762b026997ddd346775879ef", null ],
     [ "removeListener", "class_ogre_1_1_mesh.html#a3c49142f739ba8fb56d6e7b3db235fb7", null ],
     [ "removeLodLevels", "class_ogre_1_1_mesh.html#a02d5ed61b0b9c6bc5d3426a5fa99ac90", null ],
     [ "setBackgroundLoaded", "class_ogre_1_1_mesh.html#ae0a0007de944eb3c2f933a372a752b35", null ],

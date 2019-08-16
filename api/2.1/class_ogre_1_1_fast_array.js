@@ -15,6 +15,7 @@ var class_ogre_1_1_fast_array =
     [ "begin", "class_ogre_1_1_fast_array.html#a385891aa594bfb3c94ee5972222b92f8", null ],
     [ "capacity", "class_ogre_1_1_fast_array.html#a98b377565a481828315004368e471d11", null ],
     [ "clear", "class_ogre_1_1_fast_array.html#aa70b29c206f1c7f0df3ef96b8df38be9", null ],
+    [ "destroy", "class_ogre_1_1_fast_array.html#aeb2466cbd69a8c1f9dbf0d0d2dfce9ad", null ],
     [ "empty", "class_ogre_1_1_fast_array.html#a3a66212ba03e78e56d89e8b747f1dc33", null ],
     [ "end", "class_ogre_1_1_fast_array.html#abe80fd500f80a208899e9c481e269572", null ],
     [ "end", "class_ogre_1_1_fast_array.html#a4b21bcb50a7b45c7d9feb75d17c2d9d3", null ],
@@ -32,6 +33,7 @@ var class_ogre_1_1_fast_array =
     [ "push_back", "class_ogre_1_1_fast_array.html#a37b3b705fdf6f055087f8940c4381131", null ],
     [ "reserve", "class_ogre_1_1_fast_array.html#a0dc58ffb287d4dd0905e88e70c287a12", null ],
     [ "resize", "class_ogre_1_1_fast_array.html#ac2544ce7917912b5bdd14feb52eda6ac", null ],
+    [ "resizePOD", "class_ogre_1_1_fast_array.html#a71203d4c240959b2b703692fce6216fc", null ],
     [ "size", "class_ogre_1_1_fast_array.html#a0cafeba67ad72862d895af30887015d2", null ],
     [ "swap", "class_ogre_1_1_fast_array.html#ad3804ff969f9abc0309fd86ed717de2b", null ]
 ];

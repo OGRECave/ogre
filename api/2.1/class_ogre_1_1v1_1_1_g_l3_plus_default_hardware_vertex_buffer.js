@@ -7,10 +7,6 @@ var class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer =
       [ "HBL_NO_OVERWRITE", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#ac0c56e93ce6f29bf39fb48c3d5dc64cfae160717b1f864d2d91aa2ba24ac38771", null ],
       [ "HBL_WRITE_ONLY", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#ac0c56e93ce6f29bf39fb48c3d5dc64cfaacdcbae3ae1ce82b2f4411df53a545cb", null ]
     ] ],
-    [ "UploadOptions", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a02bbce9e6a96f46e75c133a1e658ed04", [
-      [ "HBU_DEFAULT", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a02bbce9e6a96f46e75c133a1e658ed04a1943ff0a33b2f3baa2129a72539d7ff2", null ],
-      [ "HBU_ON_DEMAND", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a02bbce9e6a96f46e75c133a1e658ed04ad5193dd15cb26c43db2886a902666ef6", null ]
-    ] ],
     [ "Usage", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a87632db14ce9c10e113f1966c6a97c6d", [
       [ "HBU_STATIC", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a87632db14ce9c10e113f1966c6a97c6da0c8055304cee698c19e3080e34202430", null ],
       [ "HBU_DYNAMIC", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a87632db14ce9c10e113f1966c6a97c6da1de64eadc98dfb60e9dcdf7fe6287c09", null ],
@@ -38,8 +34,8 @@ var class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer =
     [ "hasShadowBuffer", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#ae1e1ae8b6ec0a783e89e7c83e6aee49d", null ],
     [ "isLocked", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#ac9cbd2da85d59fe5ef6d5fa348052cd8", null ],
     [ "isSystemMemory", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#ac6d97282de4e5937ff00cf2ff14860a8", null ],
-    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#ad93cbe82badbc6a3fedb7262a249ada3", null ],
-    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a6ccb4406af2ed6dc8f491a0d621a60e4", null ],
+    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a465fcf12454222842b5417c3840ac0e8", null ],
+    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a6778f242b88650651a2a7bd7e4c97201", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_g_l3_plus_default_hardware_vertex_buffer.html#acb46d4b0a597156d9ba5abc39d127792", null ],

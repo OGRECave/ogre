@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['d3d11gpuprogramptr',['D3D11GpuProgramPtr',['../namespace_ogre.html#a8abcb4c4f5cb1ff257febecabee70b7d',1,'Ogre']]],
   ['d3d11hlslprogramptr',['D3D11HLSLProgramPtr',['../namespace_ogre.html#a4fdfbb7af58cbdd237866fe276917b0e',1,'Ogre']]],
   ['d3d11textureptr',['D3D11TexturePtr',['../namespace_ogre.html#a57d00154758020454d2cc4619d127a6b',1,'Ogre']]],
   ['d3d9gpuprogramptr',['D3D9GpuProgramPtr',['../namespace_ogre.html#af9e827385d9ac1435afae63e5c65f7d6',1,'Ogre']]],

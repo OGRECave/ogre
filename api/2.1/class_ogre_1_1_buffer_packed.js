@@ -35,6 +35,7 @@ var class_ogre_1_1_buffer_packed =
     [ "upload", "class_ogre_1_1_buffer_packed.html#a0c6fb3d387685e50e2b5069164b95e6b", null ],
     [ "BufferInterface", "class_ogre_1_1_buffer_packed.html#af1c0e7921889be449c27d1002416b405", null ],
     [ "D3D11BufferInterface", "class_ogre_1_1_buffer_packed.html#ae0e57175c89ba8f13a13b2460f7eee23", null ],
+    [ "D3D11BufferInterfaceBase", "class_ogre_1_1_buffer_packed.html#a83bf87828ec4291e865953e420ab8caa", null ],
     [ "D3D11CompatBufferInterface", "class_ogre_1_1_buffer_packed.html#a52b6a6c5683238629666dc7e5517e4e5", null ],
     [ "GL3PlusBufferInterface", "class_ogre_1_1_buffer_packed.html#a920a4b9b97deafbbebc7ca4ffbaa1b9e", null ],
     [ "MetalBufferInterface", "class_ogre_1_1_buffer_packed.html#a2f01c6f6a61515b8238ff46a66b32be1", null ],

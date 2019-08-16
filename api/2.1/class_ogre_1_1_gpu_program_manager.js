@@ -67,8 +67,9 @@ var class_ogre_1_1_gpu_program_manager =
     [ "operator new[]", "class_ogre_1_1_gpu_program_manager.html#afa2943846ba6a2b5824a12857139cf5e", null ],
     [ "parseScript", "class_ogre_1_1_gpu_program_manager.html#a8240f6bbf3449b1f2acdd476efbde821", null ],
     [ "prepare", "class_ogre_1_1_gpu_program_manager.html#ae26b6ecd722f3e24b52de8b4ac9bba0d", null ],
-    [ "reloadAll", "class_ogre_1_1_gpu_program_manager.html#a860f0bcac1a4d152878855f9a85a58d3", null ],
-    [ "reloadUnreferencedResources", "class_ogre_1_1_gpu_program_manager.html#a22dbc50ba8fac0d3222a31ef1ef82dcd", null ],
+    [ "reloadAll", "class_ogre_1_1_gpu_program_manager.html#aa9608544a7beb1b0e43835877ab62788", null ],
+    [ "reloadAll", "class_ogre_1_1_gpu_program_manager.html#a84e25cc5ad09ff7567d1fed7429433a3", null ],
+    [ "reloadUnreferencedResources", "class_ogre_1_1_gpu_program_manager.html#a4dda8323b265a00638dd29a4fa6510bc", null ],
     [ "remove", "class_ogre_1_1_gpu_program_manager.html#a3f92489910e40e3756606a35618d7b06", null ],
     [ "remove", "class_ogre_1_1_gpu_program_manager.html#abfb0022b18d022a7605f0d19a966f00f", null ],
     [ "remove", "class_ogre_1_1_gpu_program_manager.html#ac22655af03ecea85d863a1d1d561778c", null ],
@@ -83,7 +84,8 @@ var class_ogre_1_1_gpu_program_manager =
     [ "setVerbose", "class_ogre_1_1_gpu_program_manager.html#aa3ff9558e8fa8187f510472a58093b6f", null ],
     [ "unload", "class_ogre_1_1_gpu_program_manager.html#a2cf457c70ea86892b1bec52028c96237", null ],
     [ "unload", "class_ogre_1_1_gpu_program_manager.html#a94962d0929fdc88c25d35672ff2c1ff0", null ],
-    [ "unloadAll", "class_ogre_1_1_gpu_program_manager.html#acaba96b1b4816457b03028eed9895789", null ],
-    [ "unloadUnreferencedResources", "class_ogre_1_1_gpu_program_manager.html#a7b9ba584a17235f6eff9847b90ba895d", null ],
+    [ "unloadAll", "class_ogre_1_1_gpu_program_manager.html#a1fe343406d15d5367cfc4f86ba589b55", null ],
+    [ "unloadAll", "class_ogre_1_1_gpu_program_manager.html#a93b40c858020f2bbbcebcd4dc72a6321", null ],
+    [ "unloadUnreferencedResources", "class_ogre_1_1_gpu_program_manager.html#aeaa1410333b7bcea14b00c360112a528", null ],
     [ "OGRE_AUTO_MUTEX", "class_ogre_1_1_gpu_program_manager.html#abbb523a827bc6ea90d3b5ec80f0cf770", null ]
 ];

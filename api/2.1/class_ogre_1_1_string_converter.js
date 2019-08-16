@@ -4,7 +4,7 @@ var class_ogre_1_1_string_converter =
     [ "isNumber", "class_ogre_1_1_string_converter.html#a95d05930b54167f5353733ec36668f65", null ],
     [ "isUseLocale", "class_ogre_1_1_string_converter.html#a0356f16ae84fb3a715c7a5cd98fb5ff3", null ],
     [ "parseAngle", "class_ogre_1_1_string_converter.html#ae7053b6bd3df67328a898940036ab5b5", null ],
-    [ "parseBool", "class_ogre_1_1_string_converter.html#a8f1d0fab67ac94cb5466812aea13dae0", null ],
+    [ "parseBool", "class_ogre_1_1_string_converter.html#ad20124cf6bf3bb04c7a5ced0739b7d9d", null ],
     [ "parseColourBuffer", "class_ogre_1_1_string_converter.html#a49e815a4951a685b0434bcb561fa3a37", null ],
     [ "parseColourValue", "class_ogre_1_1_string_converter.html#a167f9319fa721f66e393d963de145c6c", null ],
     [ "parseInt", "class_ogre_1_1_string_converter.html#a77d05cbca629795de8b9496b31b0de33", null ],

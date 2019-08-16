@@ -225,6 +225,7 @@ var _ogre_script_compiler_8h =
     [ "ID_NO_GAMMA", "_ogre_script_compiler_8h.html#gga0b5cbeda8e74421290877666785271d3a954c223ebe14be9ae196829145d16ffb", null ],
     [ "ID_NO_FSAA", "_ogre_script_compiler_8h.html#gga0b5cbeda8e74421290877666785271d3a02452805e94dad9c3a043949be110679", null ],
     [ "ID_EXPLICIT_RESOLVE", "_ogre_script_compiler_8h.html#gga0b5cbeda8e74421290877666785271d3a513a675c5cc7e40dae07c905ea94b952", null ],
+    [ "ID_RESOLVE", "_ogre_script_compiler_8h.html#gga0b5cbeda8e74421290877666785271d3a6135a9f731519f4a63d34b666534539e", null ],
     [ "ID_DEPTH_POOL", "_ogre_script_compiler_8h.html#gga0b5cbeda8e74421290877666785271d3ae092acc2d893628fba9256f9a69b758e", null ],
     [ "ID_DEPTH_TEXTURE", "_ogre_script_compiler_8h.html#gga0b5cbeda8e74421290877666785271d3a31dcf867cfae9b814c1405154a3d44ad", null ],
     [ "ID_DEPTH_FORMAT", "_ogre_script_compiler_8h.html#gga0b5cbeda8e74421290877666785271d3a173b38a14d910679235b23a433896028", null ],

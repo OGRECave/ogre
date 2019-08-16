@@ -6,6 +6,7 @@ var searchData=
   ['objectmemorymanager',['ObjectMemoryManager',['../class_ogre_1_1_object_memory_manager.html',1,'Ogre']]],
   ['octreenode',['OctreeNode',['../class_ogre_1_1_volume_1_1_octree_node.html',1,'Ogre::Volume']]],
   ['octreenodesplitpolicy',['OctreeNodeSplitPolicy',['../class_ogre_1_1_volume_1_1_octree_node_split_policy.html',1,'Ogre::Volume']]],
+  ['offlineprofiler',['OfflineProfiler',['../class_ogre_1_1_offline_profiler.html',1,'Ogre']]],
   ['ogregl3plusview',['OgreGL3PlusView',['../interface_ogre_g_l3_plus_view.html',1,'']]],
   ['ogregl3pluswindow',['OgreGL3PlusWindow',['../interface_ogre_g_l3_plus_window.html',1,'']]],
   ['ogremetalview',['OgreMetalView',['../interface_ogre_metal_view.html',1,'']]],

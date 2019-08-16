@@ -10,6 +10,7 @@ var class_ogre_1_1_object_data_array_memory_manager =
       [ "WorldRadius", "class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735a890d3237f75a082e2a815e454c9c7565", null ],
       [ "DistanceToCamera", "class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735aec1f7f4ceacb00d6a5b3d6dd9306a2d4", null ],
       [ "UpperDistance", "class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735a5afc36549e882fb2e57afae6adab3626", null ],
+      [ "ShadowUpperDistance", "class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735ad5518d8f510487649adddc818324009e", null ],
       [ "VisibilityFlags", "class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735a19696973661462180391313e340b17b0", null ],
       [ "QueryFlags", "class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735a9742ee29a5b2a459053f95264f9045fd", null ],
       [ "LightMask", "class_ogre_1_1_object_data_array_memory_manager.html#a01818bd20c4b78825933f9b4e5c83735a413c495624baf53a2489abe5972519ee", null ],

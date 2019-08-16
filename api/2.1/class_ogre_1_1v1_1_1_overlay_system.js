@@ -2,6 +2,7 @@ var class_ogre_1_1v1_1_1_overlay_system =
 [
     [ "OverlaySystem", "group___overlays.html#gaa6b58aedc7ee95bb33f1b279dadbdc69", null ],
     [ "~OverlaySystem", "group___overlays.html#ga5531cbcd1c654fcea44a0f040856bbad", null ],
+    [ "eventOccurred", "group___overlays.html#gae84db7583f6210b52c43bf89980fddde", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_overlay_system.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_overlay_system.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_overlay_system.html#acb46d4b0a597156d9ba5abc39d127792", null ],

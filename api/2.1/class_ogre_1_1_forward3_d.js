@@ -13,6 +13,7 @@ var class_ogre_1_1_forward3_d =
     [ "fillConstBufferData", "class_ogre_1_1_forward3_d.html#abdfa817eda086c0ae48a74cd759990d1", null ],
     [ "getConstBufferSize", "class_ogre_1_1_forward3_d.html#a1fc1280f15af3debf598750be587306e", null ],
     [ "getDebugMode", "class_ogre_1_1_forward3_d.html#aa169a9da93f7be67ef0315e0db6200de", null ],
+    [ "getDecalsEnabled", "class_ogre_1_1_forward3_d.html#aea2eb4c0d7b39ec1711a6d4ad60c7ea0", null ],
     [ "getEnableVpls", "class_ogre_1_1_forward3_d.html#a5c5170c5fea7c435f6576f6a0e15efcc", null ],
     [ "getFadeAttenuationRange", "class_ogre_1_1_forward3_d.html#a1f5209d8ebcfb60601bbf8805ee86cba", null ],
     [ "getFineLightMaskGranularity", "class_ogre_1_1_forward3_d.html#ae6d7d1e32fe5521ef19bf74dc98aa68d", null ],
@@ -25,6 +26,7 @@ var class_ogre_1_1_forward3_d =
     [ "getMinDistance", "class_ogre_1_1_forward3_d.html#a58c313f0a0b273bc73c62df690f8adc6", null ],
     [ "getNumSlices", "class_ogre_1_1_forward3_d.html#a56e8917eb55ba5478674397fa7c4872b", null ],
     [ "getWidth", "class_ogre_1_1_forward3_d.html#ae650a39edea0cda6235cc486250daef6", null ],
+    [ "isCacheDirty", "class_ogre_1_1_forward3_d.html#af9ae3b8c220a4ec4235609363f70f732", null ],
     [ "operator delete", "class_ogre_1_1_forward3_d.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_forward3_d.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1_forward3_d.html#acb46d4b0a597156d9ba5abc39d127792", null ],
@@ -39,5 +41,7 @@ var class_ogre_1_1_forward3_d =
     [ "setEnableVpls", "class_ogre_1_1_forward3_d.html#ace096afb5e2f082995fecfa56b87bda0", null ],
     [ "setFadeAttenuationRange", "class_ogre_1_1_forward3_d.html#a5afca86cefefcd3a5d5da282fd734325", null ],
     [ "setFineLightMaskGranularity", "class_ogre_1_1_forward3_d.html#aab10c992600476f4227e8205bb383293", null ],
-    [ "setHlmsPassProperties", "class_ogre_1_1_forward3_d.html#adf85299fbdfd192b0845f612f6a4238a", null ]
+    [ "setHlmsPassProperties", "class_ogre_1_1_forward3_d.html#adf85299fbdfd192b0845f612f6a4238a", null ],
+    [ "MaxDecalRq", "class_ogre_1_1_forward3_d.html#acb5feca7f057c2bdb232280d194ad4dd", null ],
+    [ "MinDecalRq", "class_ogre_1_1_forward3_d.html#aa833d186cda639884547b760b8aafb44", null ]
 ];

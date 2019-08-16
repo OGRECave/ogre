@@ -9,6 +9,7 @@ var searchData=
   ['meshlodalloc',['MeshLodAlloc',['../namespace_ogre.html#a9fd71fd7bfbb195319bb4ae3ef81f1c7',1,'Ogre']]],
   ['meshlodusagelist',['MeshLodUsageList',['../class_ogre_1_1v1_1_1_mesh.html#af2253eb8fefd1dace58c6f0d52fedd39',1,'Ogre::v1::Mesh']]],
   ['meshptr',['MeshPtr',['../namespace_ogre.html#a5c4c0c56ea9f824c49e331f6fad33ddb',1,'Ogre::MeshPtr()'],['../namespace_ogre_1_1v1.html#a500ac3b30068793f1dda3f0627c5cf67',1,'Ogre::v1::MeshPtr()']]],
+  ['metadatacachemap',['MetadataCacheMap',['../class_ogre_1_1_hlms_texture_manager.html#aef4c233be78bd460a5c2153cb4a6812d',1,'Ogre::HlmsTextureManager']]],
   ['metadataiterator',['MetaDataIterator',['../class_ogre_1_1_scene_manager_enumerator.html#aba1ede3f8195a234c286f372ef181ce0',1,'Ogre::SceneManagerEnumerator']]],
   ['metadatalist',['MetaDataList',['../class_ogre_1_1_scene_manager_enumerator.html#a5fde27af1394a5e2229c624c556629c0',1,'Ogre::SceneManagerEnumerator']]],
   ['metaldiscardbuffervec',['MetalDiscardBufferVec',['../namespace_ogre.html#a060fedef99d92c80ac01f84784d71077',1,'Ogre']]],

@@ -1,3 +1,4 @@
 <map id="Ogre::D3D11CompatBufferInterface" name="Ogre::D3D11CompatBufferInterface">
-<area shape="rect" id="node2" href="$class_ogre_1_1_buffer_interface.html" title="Most (if not all) buffers, can be treated with the same code. " alt="" coords="53,5,212,32"/>
+<area shape="rect" id="node2" href="$class_ogre_1_1_d3_d11_buffer_interface_base.html" title="For D3D11, most (if not all) buffers, can be treated with the same code. " alt="" coords="13,80,228,107"/>
+<area shape="rect" id="node3" href="$class_ogre_1_1_buffer_interface.html" title="Most (if not all) buffers, can be treated with the same code. " alt="" coords="49,5,193,32"/>
 </map>

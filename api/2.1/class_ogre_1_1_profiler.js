@@ -5,7 +5,7 @@ var class_ogre_1_1_profiler =
     [ "addListener", "class_ogre_1_1_profiler.html#a01413a02e5af48736c96284ee973cfd2", null ],
     [ "beginGPUEvent", "class_ogre_1_1_profiler.html#a5800006ecf74193bb6683428542b60b5", null ],
     [ "beginGPUSample", "class_ogre_1_1_profiler.html#ac08272286cf01c6c24aacb91b6800be3", null ],
-    [ "beginProfile", "class_ogre_1_1_profiler.html#a9b3e71a70bdd2285cebcbd2764fad0e6", null ],
+    [ "beginProfile", "class_ogre_1_1_profiler.html#a1c4d43eaf4b909cd9970836709f50caa", null ],
     [ "disableProfile", "class_ogre_1_1_profiler.html#a144fc3944f41b1198a44590beda4ce3f", null ],
     [ "enableProfile", "class_ogre_1_1_profiler.html#a52e2f0d3530febbbf7199173d91ad4e2", null ],
     [ "endGPUEvent", "class_ogre_1_1_profiler.html#ace158cd7cd820a3176755ce3b84601c3", null ],

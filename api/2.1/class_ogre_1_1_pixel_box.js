@@ -12,7 +12,7 @@ var class_ogre_1_1_pixel_box =
     [ "getRowSkip", "class_ogre_1_1_pixel_box.html#a1c74e261d3283aa84efca68e8bc7c717", null ],
     [ "getSliceSkip", "class_ogre_1_1_pixel_box.html#a098dfd052183aeb4025794758ed59021", null ],
     [ "getSliceSkipAlwaysBytes", "class_ogre_1_1_pixel_box.html#a9a06f4ef4b6f641f8579a48e50e7ec6b", null ],
-    [ "getSubVolume", "class_ogre_1_1_pixel_box.html#a373b4379ff263edc109286a8f44961e7", null ],
+    [ "getSubVolume", "class_ogre_1_1_pixel_box.html#adcd4bcebf8ba9ac17b55f0aced8a8285", null ],
     [ "getTopLeftFrontPixelPtr", "class_ogre_1_1_pixel_box.html#ad17fa4952092880a29b4b7a1d92cab49", null ],
     [ "getWidth", "class_ogre_1_1_pixel_box.html#a5499449ff454ff98aaa697f8854376fc", null ],
     [ "isConsecutive", "class_ogre_1_1_pixel_box.html#ac24a3ceef06a3e9426d3832d1ba69c6f", null ],

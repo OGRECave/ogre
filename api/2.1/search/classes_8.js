@@ -39,6 +39,7 @@ var searchData=
   ['hlmscomputejob',['HlmsComputeJob',['../class_ogre_1_1_hlms_compute_job.html',1,'Ogre']]],
   ['hlmscomputepso',['HlmsComputePso',['../struct_ogre_1_1_hlms_compute_pso.html',1,'Ogre']]],
   ['hlmsdatablock',['HlmsDatablock',['../class_ogre_1_1_hlms_datablock.html',1,'Ogre']]],
+  ['hlmsdiskcache',['HlmsDiskCache',['../class_ogre_1_1_hlms_disk_cache.html',1,'Ogre']]],
   ['hlmsjson',['HlmsJson',['../class_ogre_1_1_hlms_json.html',1,'Ogre']]],
   ['hlmsjsoncompute',['HlmsJsonCompute',['../class_ogre_1_1_hlms_json_compute.html',1,'Ogre']]],
   ['hlmsjsonlistener',['HlmsJsonListener',['../class_ogre_1_1_hlms_json_listener.html',1,'Ogre']]],

@@ -7,10 +7,6 @@ var class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer =
       [ "HBL_NO_OVERWRITE", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#ac0c56e93ce6f29bf39fb48c3d5dc64cfae160717b1f864d2d91aa2ba24ac38771", null ],
       [ "HBL_WRITE_ONLY", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#ac0c56e93ce6f29bf39fb48c3d5dc64cfaacdcbae3ae1ce82b2f4411df53a545cb", null ]
     ] ],
-    [ "UploadOptions", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a02bbce9e6a96f46e75c133a1e658ed04", [
-      [ "HBU_DEFAULT", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a02bbce9e6a96f46e75c133a1e658ed04a1943ff0a33b2f3baa2129a72539d7ff2", null ],
-      [ "HBU_ON_DEMAND", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a02bbce9e6a96f46e75c133a1e658ed04ad5193dd15cb26c43db2886a902666ef6", null ]
-    ] ],
     [ "Usage", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a87632db14ce9c10e113f1966c6a97c6d", [
       [ "HBU_STATIC", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a87632db14ce9c10e113f1966c6a97c6da0c8055304cee698c19e3080e34202430", null ],
       [ "HBU_DYNAMIC", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a87632db14ce9c10e113f1966c6a97c6da1de64eadc98dfb60e9dcdf7fe6287c09", null ],
@@ -25,12 +21,12 @@ var class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer =
     [ "_clearSliceRTT", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#aecaaa1796dbfdce092f3f595fb5a88dd", null ],
     [ "_updateFromShadow", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a1a1a5e9fd1743fdd09d2b1cfa740bcd4", null ],
     [ "bindToFramebuffer", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a9b647f8b58af372c34478bc571811abe", null ],
-    [ "blit", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a77617798174f8196392d8cd522f7b1c6", null ],
+    [ "blit", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a1d41d5aed7bcd7500e4b89b41af33a41", null ],
     [ "blit", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a07805731df6ad3b13adfb036e0f52762", null ],
-    [ "blitFromMemory", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a985a363f852ded2f4e6cf81e3fa591ca", null ],
+    [ "blitFromMemory", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a0ccc7b82be49dd0817954ffde38c7ccd", null ],
     [ "blitFromMemory", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a2762fe6bafe2b4bf7e2149b6f2ea4f56", null ],
-    [ "blitFromTexture", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a1fbb4f696ce3a669014cc26489a1fe18", null ],
-    [ "blitToMemory", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a1a90c7a0e453b8fa823fcd85aad18443", null ],
+    [ "blitFromTexture", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a6dcdbd50f75cca420cb69c27942308d6", null ],
+    [ "blitToMemory", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#abb8f98e9696877a05119be77ea79a7e1", null ],
     [ "blitToMemory", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a3e7adba95ce26023bc068e8103c5b20a", null ],
     [ "copyData", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a4c89e8f3e555b5baf18bcae16d5fb8dd", null ],
     [ "copyData", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a5caebd4b5db7696029eb412351d7767f", null ],
@@ -51,11 +47,9 @@ var class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer =
     [ "hasShadowBuffer", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#ae1e1ae8b6ec0a783e89e7c83e6aee49d", null ],
     [ "isLocked", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#ac9cbd2da85d59fe5ef6d5fa348052cd8", null ],
     [ "isSystemMemory", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#ac6d97282de4e5937ff00cf2ff14860a8", null ],
-    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a6ccb4406af2ed6dc8f491a0d621a60e4", null ],
-    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a0da17750cf53f7adc664dfdc872e0f38", null ],
-    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a7e1ab04290f44c195b6f322fb2391204", null ],
-    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a654417873844e8d07ea89fc551e44be3", null ],
-    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a6ccb4406af2ed6dc8f491a0d621a60e4", null ],
+    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#ab0fe5b0518f4551d5d9487875e708079", null ],
+    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#aab364e99418969301c4ded6ca569ddc3", null ],
+    [ "lock", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a6778f242b88650651a2a7bd7e4c97201", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a1c727e879a260c37b00ce5505fe8e144", null ],
     [ "operator delete", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#acb46d4b0a597156d9ba5abc39d127792", null ],
@@ -69,6 +63,6 @@ var class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer =
     [ "readData", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#ab60da8e622506487a7d44200a1c704b6", null ],
     [ "suppressHardwareUpdate", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a4674ce75bfc84fa7e6ac03a059f0dbb5", null ],
     [ "unlock", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#ac20e63654b67a94b3836c52f9c81da99", null ],
-    [ "upload", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#aef48af10a86b82b7e3537bf0f6193615", null ],
+    [ "upload", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a3a7ed053a89bf6410ccfcb08db4365a9", null ],
     [ "writeData", "class_ogre_1_1v1_1_1_g_l3_plus_texture_buffer.html#a6ed986689e41c247108c1c4e8cca354a", null ]
 ];

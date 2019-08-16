@@ -23,6 +23,7 @@ var class_ogre_1_1_skeleton_instance =
     [ "getParentNode", "class_ogre_1_1_skeleton_instance.html#a9a2fa5d2e7432344fbc995a579a346e9", null ],
     [ "getTransforms", "class_ogre_1_1_skeleton_instance.html#a1433fa101b771575adc8f1f3d6a46e67", null ],
     [ "hasAnimation", "class_ogre_1_1_skeleton_instance.html#ab1d3bb727c5d13a4e4142b94a8166080", null ],
+    [ "hasBone", "class_ogre_1_1_skeleton_instance.html#a36ba3a7d2aa12945c8701c3f55f92d5a", null ],
     [ "isManualBone", "class_ogre_1_1_skeleton_instance.html#abe74fec94fca608ee153b557df4abcf4", null ],
     [ "operator delete", "class_ogre_1_1_skeleton_instance.html#a8357fe4fb4849772b94baa4bf47c7ded", null ],
     [ "operator delete", "class_ogre_1_1_skeleton_instance.html#a1c727e879a260c37b00ce5505fe8e144", null ],

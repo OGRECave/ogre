@@ -48,5 +48,6 @@ var searchData=
   ['propertyiterator',['PropertyIterator',['../class_ogre_1_1_property_set.html#a7f4ea40ca663fd32e4833801323033df',1,'Ogre::PropertySet']]],
   ['propertymap',['PropertyMap',['../class_ogre_1_1_property_set.html#a1db21116c18716df1bf043042e1e07c7',1,'Ogre::PropertySet']]],
   ['propertyvaluemap',['PropertyValueMap',['../group___property.html#gac473fdb476888c7a1a0a4a857948cc5c',1,'Ogre']]],
+  ['psovec',['PsoVec',['../class_ogre_1_1_hlms_disk_cache.html#af8fa1f4d66f6a50812c86914679178dc',1,'Ogre::HlmsDiskCache']]],
   ['ptrdiffvec',['PtrdiffVec',['../class_ogre_1_1_array_memory_manager.html#aac88868dab1629f0becfe78f25f27426',1,'Ogre::ArrayMemoryManager']]]
 ];

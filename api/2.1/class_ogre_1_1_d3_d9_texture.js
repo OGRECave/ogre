@@ -1,5 +1,12 @@
 var class_ogre_1_1_d3_d9_texture =
 [
+    [ "LoadingFlags", "class_ogre_1_1_d3_d9_texture.html#a1aa750a4b994f2b1066220936cdfdb94", [
+      [ "LF_DEFAULT", "class_ogre_1_1_d3_d9_texture.html#a1aa750a4b994f2b1066220936cdfdb94ab49695ac949df3a7d2e2f9a03267097c", null ],
+      [ "LF_INCLUDE_NON_RELOADABLE", "class_ogre_1_1_d3_d9_texture.html#a1aa750a4b994f2b1066220936cdfdb94a6ee542226e1cf18df28ab88426be6809", null ],
+      [ "LF_ONLY_UNREFERENCED", "class_ogre_1_1_d3_d9_texture.html#a1aa750a4b994f2b1066220936cdfdb94a70589e0b87b09b0a4fd98ce490dc9782", null ],
+      [ "LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE", "class_ogre_1_1_d3_d9_texture.html#a1aa750a4b994f2b1066220936cdfdb94ae5f2eca654bd810da4c774570a5b4b77", null ],
+      [ "LF_PRESERVE_STATE", "class_ogre_1_1_d3_d9_texture.html#a1aa750a4b994f2b1066220936cdfdb94ad83abf165de5cfa1a4c8e0cd5471ad2c", null ]
+    ] ],
     [ "LoadingState", "class_ogre_1_1_d3_d9_texture.html#a07e619aa09d3bc6789a6667cb4fc572c", [
       [ "LOADSTATE_UNLOADED", "class_ogre_1_1_d3_d9_texture.html#a07e619aa09d3bc6789a6667cb4fc572ca28d463296cacdfc115dbc3fb02d00e94", null ],
       [ "LOADSTATE_LOADING", "class_ogre_1_1_d3_d9_texture.html#a07e619aa09d3bc6789a6667cb4fc572caf138fc9087e0dc755bff08a83720cbb5", null ],
@@ -20,7 +27,7 @@ var class_ogre_1_1_d3_d9_texture =
     [ "addListener", "class_ogre_1_1_d3_d9_texture.html#a5513ffce404b14cff72846318b018d32", null ],
     [ "changeGroupOwnership", "class_ogre_1_1_d3_d9_texture.html#aa5d6f3f7e73b77b233fc62b11f270e4d", null ],
     [ "cleanupDictionary", "class_ogre_1_1_d3_d9_texture.html#a1bea65fa2b3c2ac5a9f3be59b46a80e8", null ],
-    [ "convertToImage", "class_ogre_1_1_d3_d9_texture.html#a0f6bfe88619c0872e6b9be0b011ac565", null ],
+    [ "convertToImage", "class_ogre_1_1_d3_d9_texture.html#a496e18b2a22246735fd08fd83798c4a2", null ],
     [ "copyParametersTo", "class_ogre_1_1_d3_d9_texture.html#a3c600369ab5d6957524125c93915019f", null ],
     [ "copyToTexture", "class_ogre_1_1_d3_d9_texture.html#a9877df680d0756fa081a3a558ac94b2a", null ],
     [ "escalateLoading", "class_ogre_1_1_d3_d9_texture.html#a367f6fe60bb211cb4c32e3825ca67e4c", null ],
@@ -90,7 +97,7 @@ var class_ogre_1_1_d3_d9_texture =
     [ "operator new[]", "class_ogre_1_1_d3_d9_texture.html#a4be37baef81876985aa1071ad5acc6dd", null ],
     [ "operator new[]", "class_ogre_1_1_d3_d9_texture.html#afa2943846ba6a2b5824a12857139cf5e", null ],
     [ "prepare", "class_ogre_1_1_d3_d9_texture.html#a350b287fa3e83a389221274f68760008", null ],
-    [ "reload", "class_ogre_1_1_d3_d9_texture.html#ab7a0b8de3a7e4d20fcfd84da41ac450e", null ],
+    [ "reload", "class_ogre_1_1_d3_d9_texture.html#a5016aec1762b026997ddd346775879ef", null ],
     [ "removeListener", "class_ogre_1_1_d3_d9_texture.html#a3c49142f739ba8fb56d6e7b3db235fb7", null ],
     [ "setBackgroundLoaded", "class_ogre_1_1_d3_d9_texture.html#ae0a0007de944eb3c2f933a372a752b35", null ],
     [ "setDepth", "class_ogre_1_1_d3_d9_texture.html#aec390502f63927ed9470ba423ea66f64", null ],

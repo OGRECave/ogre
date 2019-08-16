@@ -41,7 +41,6 @@ var class_ogre_1_1_compositor_node_def =
     [ "getPassNumber", "class_ogre_1_1_compositor_node_def.html#a6fa98a167d723f5296d48926980aa4f6", null ],
     [ "getStartEnabled", "class_ogre_1_1_compositor_node_def.html#aafceb902c282818a6c5aeffbc84fc1e8", null ],
     [ "getTargetPass", "class_ogre_1_1_compositor_node_def.html#a25399907b63825d292a0d6ac6eb47030", null ],
-    [ "getTextureSource", "class_ogre_1_1_compositor_node_def.html#a0b832d936fde223d0e19076097e95054", null ],
     [ "getTextureSource", "class_ogre_1_1_compositor_node_def.html#afb36d1872d6b36cd67575740cc115087", null ],
     [ "getTextureSource", "class_ogre_1_1_compositor_node_def.html#a0b832d936fde223d0e19076097e95054", null ],
     [ "mapOutputBufferChannel", "class_ogre_1_1_compositor_node_def.html#afc0e6772dfb0b5907acf048d128597fd", null ],

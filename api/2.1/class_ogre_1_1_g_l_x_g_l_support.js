@@ -17,7 +17,7 @@ var class_ogre_1_1_g_l_x_g_l_support =
     [ "getGLDisplay", "class_ogre_1_1_g_l_x_g_l_support.html#ae74ac94b8ad8ee8f8501727a9e466114", null ],
     [ "getGLVendor", "class_ogre_1_1_g_l_x_g_l_support.html#ac1f06da1f33ec693eaddb05627b18a65", null ],
     [ "getGLVersion", "class_ogre_1_1_g_l_x_g_l_support.html#a1502ce2a3d26462b90321ca00634e2fd", null ],
-    [ "getProcAddress", "class_ogre_1_1_g_l_x_g_l_support.html#a574ceb1c53ce76afb6c582efde82f60a", null ],
+    [ "getProcAddress", "class_ogre_1_1_g_l_x_g_l_support.html#a6c554d600ddcbf145e2e38e07e4c6385", null ],
     [ "getShaderCachePath", "class_ogre_1_1_g_l_x_g_l_support.html#a05611e652e80b1c5dd260ad829d8bc7d", null ],
     [ "getShaderLibraryPath", "class_ogre_1_1_g_l_x_g_l_support.html#a8c87e29883b18efc8da37afbe42b3852", null ],
     [ "getVisualFromFBConfig", "class_ogre_1_1_g_l_x_g_l_support.html#af525bf6a93d6cc976c0d5fc1527d2fab", null ],

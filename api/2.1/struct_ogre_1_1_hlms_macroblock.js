@@ -12,6 +12,7 @@ var struct_ogre_1_1_hlms_macroblock =
     [ "mDepthFunc", "struct_ogre_1_1_hlms_macroblock.html#abe268acf5606ed35b7af995a2b031843", null ],
     [ "mDepthWrite", "struct_ogre_1_1_hlms_macroblock.html#a38d3242e6c29312f16a8293b9f70efae", null ],
     [ "mId", "struct_ogre_1_1_hlms_macroblock.html#a46bd9a389676bce8a4c7f1ac1dc294bd", null ],
+    [ "mLifetimeId", "struct_ogre_1_1_hlms_macroblock.html#a8dbf13c2d554ba4945031e0f309e82a4", null ],
     [ "mPolygonMode", "struct_ogre_1_1_hlms_macroblock.html#ad51e417c152a4061cdd21b215502c5c0", null ],
     [ "mRefCount", "struct_ogre_1_1_hlms_macroblock.html#afea9606f074d5d04aba4be6b04b2a90f", null ],
     [ "mRsData", "struct_ogre_1_1_hlms_macroblock.html#a21bbcc9c98f74ec12230597d9a3e7e6d", null ],

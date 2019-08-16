@@ -11,9 +11,9 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="struct_ogre_1_1_profile_history.html" target="_top" xlink:title="Represents a history of each profile during the duration of the app. ">
+<g id="a_node1"><a xlink:href="class_ogre_1_1_name_generator.html" target="_top" xlink:title="Utility class to generate a sequentially numbered series of names. ">
 <polygon fill="none" stroke="#000000" points="0,-.5 0,-19.5 113,-19.5 113,-.5 0,-.5"/>
-<text text-anchor="middle" x="56.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">Ogre::ProfileHistory</text>
+<text text-anchor="middle" x="56.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">Ogre::NameGenerator</text>
 </a>
 </g>
 </g>

@@ -19,7 +19,5 @@ var class_ogre_1_1_cocoa_context =
     [ "operator new[]", "class_ogre_1_1_cocoa_context.html#afa2943846ba6a2b5824a12857139cf5e", null ],
     [ "releaseContext", "class_ogre_1_1_cocoa_context.html#a1adbc39dc51e3c5dd91795544c2fa352", null ],
     [ "setCurrent", "class_ogre_1_1_cocoa_context.html#ae3bde299681683c815b8fd1eec310c13", null ],
-    [ "setInitialized", "class_ogre_1_1_cocoa_context.html#a291525177116254970385db2fab2536d", null ],
-    [ "mBackingHeight", "class_ogre_1_1_cocoa_context.html#a49905f4529be3810ad4d0153c6298ef0", null ],
-    [ "mBackingWidth", "class_ogre_1_1_cocoa_context.html#a643a8a57749a9144bbb7420a18b9e344", null ]
+    [ "setInitialized", "class_ogre_1_1_cocoa_context.html#a291525177116254970385db2fab2536d", null ]
 ];

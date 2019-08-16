@@ -18,7 +18,7 @@ var struct_ogre_1_1_object_data =
     [ "mOwner", "struct_ogre_1_1_object_data.html#a63938f91d634dc8d21e5b767d33c63dd", null ],
     [ "mParents", "struct_ogre_1_1_object_data.html#a207b3a361bfd0d79d745e9b30cd9bf03", null ],
     [ "mQueryFlags", "struct_ogre_1_1_object_data.html#a80774ff883856184bd3f1ffe0306776c", null ],
-    [ "mUpperDistance", "struct_ogre_1_1_object_data.html#aa353351fdeed5a15d27ba471e8d66b37", null ],
+    [ "mUpperDistance", "struct_ogre_1_1_object_data.html#acbdcebd04eb5b48f9976c6c0757bdc08", null ],
     [ "mVisibilityFlags", "struct_ogre_1_1_object_data.html#a6d104ca43c34419f35a1e8495f8133ee", null ],
     [ "mWorldAabb", "struct_ogre_1_1_object_data.html#a0a22f7505805d72aecc7b76286e01aad", null ],
     [ "mWorldRadius", "struct_ogre_1_1_object_data.html#abec80ae2e06993a18dfc3824815d059f", null ]

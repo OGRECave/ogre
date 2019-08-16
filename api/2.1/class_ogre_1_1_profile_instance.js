@@ -27,7 +27,7 @@ var class_ogre_1_1_profile_instance =
     [ "accum", "class_ogre_1_1_profile_instance.html#af01c402b5996d7672e6a2bb5b078faab", null ],
     [ "children", "class_ogre_1_1_profile_instance.html#ad3f5b9c9b50015e40f9fea6ff5a68549", null ],
     [ "childrenMap", "class_ogre_1_1_profile_instance.html#aa53d0905541623e980f89185860ca066", null ],
-    [ "currTime", "class_ogre_1_1_profile_instance.html#ad19af15bb373d720d1b2caf30cf92ed6", null ],
+    [ "currTime", "class_ogre_1_1_profile_instance.html#a782130abc8d261f26fbe2f998be60022", null ],
     [ "frame", "class_ogre_1_1_profile_instance.html#a08c87da13e23c3899052faab7680da30", null ],
     [ "frameNumber", "class_ogre_1_1_profile_instance.html#a40b76f9c74bd13e1b07db0559af27dc5", null ],
     [ "hierarchicalLvl", "class_ogre_1_1_profile_instance.html#a7da2a13be546c6b1f6f0e9856e125429", null ],

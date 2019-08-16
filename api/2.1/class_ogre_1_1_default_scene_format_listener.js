@@ -1,6 +1,7 @@
 var class_ogre_1_1_default_scene_format_listener =
 [
     [ "DefaultSceneFormatListener", "class_ogre_1_1_default_scene_format_listener.html#a3f7ab493cf90b1db58b87c4d1e43d6ab", null ],
+    [ "exportDecal", "class_ogre_1_1_default_scene_format_listener.html#ae6db42ab9429dfe14beb1f5b83b4c85c", null ],
     [ "exportEntity", "class_ogre_1_1_default_scene_format_listener.html#a41c9cc88fa90d3073646c2814a45d07e", null ],
     [ "exportItem", "class_ogre_1_1_default_scene_format_listener.html#a7091dd9d227b3bc2256694c9f3458dbd", null ],
     [ "exportLight", "class_ogre_1_1_default_scene_format_listener.html#a26a4e68160fcc7c36bfcd938ca5c38a0", null ],
