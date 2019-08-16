@@ -1,0 +1,122 @@
+// ---------------------------------------------------------------------------------------
+// Light shafts shaders with shadows and noise support
+// Inpirated on the ATI paper https://developer.amd.com/wordpress/media/2012/10/Mitchell_LightShafts.pdf
+// Ogre3D implementation by Xavier Verguín González (xavyiy [at] gmail [dot] com)
+// ---------------------------------------------------------------------------------------
+
+// --------------------- Light shafts material ------------------------
+
+vertex_program LightShafts_VP cg
+{
+    source LightShafts.hlsl
+    entry_point main_vp
+    profiles vs_2_0 arbvp1
+
+    default_params
+    {
+        param_named_auto uWorld world_matrix
+        param_named_auto uWorldViewProj worldviewproj_matrix
+        param_named_auto uTexViewProj texture_viewproj_matrix 0
+    }
+}
+
+fragment_program LightShafts_FP cg
+{
+    source LightShafts.hlsl
+    entry_point main_fp
+    profiles ps_2_0 arbfp1
+}
+
+material LightShafts
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+
+            depth_write off
+            depth_check on
+
+            scene_blend add
+
+            vertex_program_ref LightShafts_VP
+            {
+            }
+
+            fragment_program_ref LightShafts_FP
+            {
+                param_named uAttenuation float 0.02
+                param_named_auto uLightPosition light_position 0
+                // Light camera/frustum (near+far) clip distance
+                param_named uLightFarClipDistance float 48
+                param_named_auto Time time
+            }
+
+            // Depth map
+            texture_unit
+            {
+                tex_address_mode clamp
+                content_type shadow
+            }
+
+            // Projector cookie
+            texture_unit
+            {
+                tex_address_mode clamp
+                texture Cookie0.png
+            }
+
+            // Noise texture
+            texture_unit
+            {
+                tex_address_mode wrap
+                texture Noise.png
+            }
+        }
+    }
+}
+
+// --------------------- Depth material ------------------------
+
+vertex_program LightShaftsDepth_VP cg
+{
+    source LightShafts.hlsl
+    entry_point main_vp_depth
+    profiles vs_2_0 arbvp1
+
+    default_params
+    {
+        param_named_auto uWorld world_matrix
+        param_named_auto uWorldViewProj worldviewproj_matrix
+    }
+}
+
+fragment_program LightShaftsDepth_FP cg
+{
+    source LightShafts.hlsl
+    entry_point main_fp_depth
+    profiles ps_2_0 arbfp1
+}
+
+material LightShaftsDepth
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+
+            vertex_program_ref LightShaftsDepth_VP
+            {
+            }
+
+            fragment_program_ref LightShaftsDepth_FP
+            {
+                param_named_auto uLightPosition light_position 0
+                // Light camera/frustum (near+far) clip distance
+                param_named uLightFarClipDistance float 48
+            }
+        }
+    }
+}
