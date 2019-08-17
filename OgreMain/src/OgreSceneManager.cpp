@@ -4027,6 +4027,12 @@ bool SceneManager::hasMovableObject(const String& name, const String& typeName) 
 }
 
 //---------------------------------------------------------------------
+const SceneManager::MovableObjectMap&
+SceneManager::getMovableObjects(const String& typeName)
+{
+    MovableObjectCollection* objectMap = getMovableObjectCollection(typeName);
+    return objectMap->map;
+}
 SceneManager::MovableObjectIterator 
 SceneManager::getMovableObjectIterator(const String& typeName)
 {
