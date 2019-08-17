@@ -400,6 +400,7 @@ namespace Ogre {
 
         typedef std::map<String, Camera* > CameraList;
         typedef std::map<String, Animation*> AnimationList;
+        typedef std::map<String, MovableObject*> MovableObjectMap;
     protected:
 
         /// Subclasses can override this to ensure their specialised SceneNode is used.
@@ -594,7 +595,6 @@ namespace Ogre {
         LightInfoList mTestLightInfos; // potentially new list
         ulong mLightsDirtyCounter;
 
-        typedef std::map<String, MovableObject*> MovableObjectMap;
         /// Simple structure to hold MovableObject map and a mutex to go with it.
         struct MovableObjectCollection
         {
@@ -3207,12 +3207,15 @@ namespace Ogre {
         /** Returns whether a movable object instance with the given name exists. */
         bool hasMovableObject(const String& name, const String& typeName) const;
         typedef MapIterator<MovableObjectMap> MovableObjectIterator;
-        /** Get an iterator over all MovableObect instances of a given type. 
+        /** Get all MovableObect instances of a given type.
         @note
             The iterator returned from this method is not thread safe, do not use this
             if you are creating or deleting objects of this type in another thread.
         */
-        MovableObjectIterator getMovableObjectIterator(const String& typeName);
+        const MovableObjectMap& getMovableObjects(const String& typeName);
+
+        /// @deprecated use getMovableObjects
+        OGRE_DEPRECATED MovableObjectIterator getMovableObjectIterator(const String& typeName);
         /** Inject a MovableObject instance created externally.
         @remarks
             This method 'injects' a MovableObject instance created externally into

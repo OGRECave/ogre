@@ -62,17 +62,13 @@ namespace Ogre
         MovableSet set;
 
         // Iterate over all movable types
-        Root::MovableObjectFactoryIterator factIt = 
-            Root::getSingleton().getMovableObjectFactoryIterator();
+        auto factIt = Root::getSingleton().getMovableObjectFactoryIterator();
         while(factIt.hasMoreElements())
         {
-            SceneManager::MovableObjectIterator it = 
-                mParentSceneMgr->getMovableObjectIterator(
-                factIt.getNext()->getType());
-            while( it.hasMoreElements() )
+            for (const auto& it : mParentSceneMgr->getMovableObjects(factIt.getNext()->getType()))
             {
 
-                MovableObject * e = it.getNext();
+                MovableObject * e = it.second;
                 PCZone * zone = ((PCZSceneNode*)(e->getParentSceneNode()))->getHomeZone();
                 PCZSceneNodeList list;
                 //find the nodes that intersect the AAB
