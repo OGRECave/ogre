@@ -43,10 +43,11 @@ namespace Ogre {
     void DefaultIntersectionSceneQuery::execute(IntersectionSceneQueryListener* listener)
     {
         // Iterate over all movable types
-        auto factIt = Root::getSingleton().getMovableObjectFactoryIterator();
-        while(factIt.hasMoreElements())
+        const auto& factories = Root::getSingleton().getMovableObjectFactories();
+        auto factIt = factories.begin();
+        while(factIt != factories.end())
         {
-            const auto& objsA = mParentSceneMgr->getMovableObjects(factIt.getNext()->getType());
+            const auto& objsA = mParentSceneMgr->getMovableObjects((factIt++)->first);
             auto objItA = objsA.begin();
             while (objItA != objsA.end())
             {
@@ -78,11 +79,11 @@ namespace Ogre {
                     }
                 }
                 // Check  against later groups
-                Root::MovableObjectFactoryIterator factItLater = factIt;
-                while (factItLater.hasMoreElements())
+                auto factItLater = factIt;
+                while (factItLater != factories.end())
                 {
                     for (const auto& objItC :
-                         mParentSceneMgr->getMovableObjects(factItLater.getNext()->getType()))
+                         mParentSceneMgr->getMovableObjects((factItLater++)->first))
                     {
                         MovableObject* c = objItC.second;
                         // skip entire section if type doesn't match
@@ -126,10 +127,9 @@ namespace Ogre {
     void DefaultAxisAlignedBoxSceneQuery::execute(SceneQueryListener* listener)
     {
         // Iterate over all movable types
-        auto factIt = Root::getSingleton().getMovableObjectFactoryIterator();
-        while(factIt.hasMoreElements())
+        for(const auto& factIt : Root::getSingleton().getMovableObjectFactories())
         {
-            for (const auto& objIt : mParentSceneMgr->getMovableObjects(factIt.getNext()->getType()))
+            for (const auto& objIt : mParentSceneMgr->getMovableObjects(factIt.first))
             {
                 MovableObject* a = objIt.second;
                 // skip whole group if type doesn't match
@@ -165,10 +165,9 @@ namespace Ogre {
         // required to fulfil the query
 
         // Iterate over all movable types
-        auto factIt = Root::getSingleton().getMovableObjectFactoryIterator();
-        while(factIt.hasMoreElements())
+        for(const auto& factIt : Root::getSingleton().getMovableObjectFactories())
         {
-            for (const auto& objIt : mParentSceneMgr->getMovableObjects(factIt.getNext()->getType()))
+            for (const auto& objIt : mParentSceneMgr->getMovableObjects(factIt.first))
             {
                 MovableObject* a = objIt.second;
                 // skip whole group if type doesn't match
@@ -206,10 +205,9 @@ namespace Ogre {
         Sphere testSphere;
 
         // Iterate over all movable types
-        auto factIt = Root::getSingleton().getMovableObjectFactoryIterator();
-        while(factIt.hasMoreElements())
+        for(const auto& factIt : Root::getSingleton().getMovableObjectFactories())
         {
-            for (const auto& objIt : mParentSceneMgr->getMovableObjects(factIt.getNext()->getType()))
+            for (const auto& objIt : mParentSceneMgr->getMovableObjects(factIt.first))
             {
                 MovableObject* a = objIt.second;
                 // skip whole group if type doesn't match
@@ -245,10 +243,9 @@ namespace Ogre {
     void DefaultPlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listener)
     {
         // Iterate over all movable types
-        auto factIt = Root::getSingleton().getMovableObjectFactoryIterator();
-        while(factIt.hasMoreElements())
+        for(const auto& factIt : Root::getSingleton().getMovableObjectFactories())
         {
-            for (const auto& objIt : mParentSceneMgr->getMovableObjects(factIt.getNext()->getType()))
+            for (const auto& objIt : mParentSceneMgr->getMovableObjects(factIt.first))
             {
                 MovableObject* a = objIt.second;
                 // skip whole group if type doesn't match

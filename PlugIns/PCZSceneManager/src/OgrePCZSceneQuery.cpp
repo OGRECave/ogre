@@ -62,10 +62,9 @@ namespace Ogre
         MovableSet set;
 
         // Iterate over all movable types
-        auto factIt = Root::getSingleton().getMovableObjectFactoryIterator();
-        while(factIt.hasMoreElements())
+        for(const auto& factIt : Root::getSingleton().getMovableObjectFactories())
         {
-            for (const auto& it : mParentSceneMgr->getMovableObjects(factIt.getNext()->getType()))
+            for (const auto& it : mParentSceneMgr->getMovableObjects(factIt.first))
             {
 
                 MovableObject * e = it.second;
@@ -107,7 +106,6 @@ namespace Ogre
                     }
                     ++nit;
                 }
-
             }
         }
     }
