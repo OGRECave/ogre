@@ -13,7 +13,7 @@ set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp")
 
 if(UNIX)
   set_source_files_properties(src/OgreSTBICodec.cpp PROPERTIES  
-    COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function -Wno-shadow -Wno-missing-declarations")
+    COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function -Wno-missing-declarations -Wno-type-limits")
 endif()
 
 add_library(Codec_STBI ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCES})
