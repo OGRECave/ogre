@@ -125,6 +125,9 @@ namespace Ogre {
          Default: Desktop vsync rate
 
         ***Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false Default: 0
+
+        ***Key: "currentGLContext" Description: use an externally created OpenGL context (must be current)
+         Values: true, false Default: false
         */
 
 		BOOL hasDepthBuffer = YES;
@@ -135,6 +138,7 @@ namespace Ogre {
 		int colourDepth = 32;
         int surfaceOrder = 1;
         int contextProfile = GLNativeSupport::CONTEXT_COMPATIBILITY;
+        bool currentGLContext = false;
         NSOpenGLContext *externalGLContext = nil;
         NSObject* externalWindowHandle = nil; // NSOpenGLView, NSView or NSWindow
         NameValuePairList::const_iterator opt;
@@ -190,6 +194,10 @@ namespace Ogre {
             opt = miscParams->find("contextProfile");
             if(opt != miscParams->end())
                 contextProfile = StringConverter::parseInt(opt->second);
+
+            opt = miscParams->find("currentGLContext");
+            if (opt != miscParams->end())
+                currentGLContext = StringConverter::parseBool(opt->second);
             
             opt = miscParams->find("externalGLContext");
             if(opt != miscParams->end())
@@ -233,6 +241,11 @@ namespace Ogre {
         {
             mGLContext = [externalGLContext retain];
             mGLPixelFormat = [externalGLContext.pixelFormat retain];
+        }
+        else if(currentGLContext)
+        {
+            mGLContext = [[NSOpenGLContext currentContext] retain];
+            mGLPixelFormat = [mGLContext.pixelFormat retain];
         }
         else
         {
