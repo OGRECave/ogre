@@ -39,7 +39,7 @@ endif()
 
 if(DEFINED ENV{APPVEYOR})
     set(CMAKE_BUILD_TYPE Release)
-    if("$ENV{APPVEYOR_BUILD_WORKER_IMAGE}" STREQUAL "Visual Studio 2019 Preview")
+    if("$ENV{APPVEYOR_BUILD_WORKER_IMAGE}" STREQUAL "Visual Studio 2019")
         set(GENERATOR -G "Visual Studio 16 2019")
     else()
         set(GENERATOR -G "Visual Studio 12")
