@@ -253,18 +253,18 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    DefaultHardwareBufferManagerBase::DefaultHardwareBufferManagerBase()
+    DefaultHardwareBufferManager::DefaultHardwareBufferManager()
     {
     }
     //-----------------------------------------------------------------------
-    DefaultHardwareBufferManagerBase::~DefaultHardwareBufferManagerBase()
+    DefaultHardwareBufferManager::~DefaultHardwareBufferManager()
     {
         destroyAllDeclarations();
         destroyAllBindings(); 
     }
     //-----------------------------------------------------------------------
     HardwareVertexBufferSharedPtr 
-        DefaultHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize, 
+        DefaultHardwareBufferManager::createVertexBuffer(size_t vertexSize, 
         size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
         DefaultHardwareVertexBuffer* vb = OGRE_NEW DefaultHardwareVertexBuffer(this, vertexSize, numVerts, usage);
@@ -272,7 +272,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     HardwareIndexBufferSharedPtr 
-        DefaultHardwareBufferManagerBase::createIndexBuffer(HardwareIndexBuffer::IndexType itype, 
+        DefaultHardwareBufferManager::createIndexBuffer(HardwareIndexBuffer::IndexType itype, 
         size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
         DefaultHardwareIndexBuffer* ib = OGRE_NEW DefaultHardwareIndexBuffer(itype, numIndexes, usage);
@@ -280,22 +280,22 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     RenderToVertexBufferSharedPtr
-        DefaultHardwareBufferManagerBase::createRenderToVertexBuffer()
+        DefaultHardwareBufferManager::createRenderToVertexBuffer()
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-            "Cannot create RenderToVertexBuffer in DefaultHardwareBufferManagerBase", 
-            "DefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
+            "Cannot create RenderToVertexBuffer in DefaultHardwareBufferManager", 
+            "DefaultHardwareBufferManager::createRenderToVertexBuffer");
     }
 
     HardwareUniformBufferSharedPtr 
-        DefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, 
+        DefaultHardwareBufferManager::createUniformBuffer(size_t sizeBytes, 
                                     HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
         DefaultHardwareUniformBuffer* ub = OGRE_NEW DefaultHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer);
         return HardwareUniformBufferSharedPtr(ub);
     }
     HardwareCounterBufferSharedPtr
-    DefaultHardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
+    DefaultHardwareBufferManager::createCounterBuffer(size_t sizeBytes,
                                                           HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
         DefaultHardwareCounterBuffer* ub = OGRE_NEW DefaultHardwareCounterBuffer(this, sizeBytes, usage, useShadowBuffer);

@@ -147,18 +147,18 @@ namespace Ogre {
         void unlock(void);
     };
 
-    /** Specialisation of HardwareBufferManagerBase to emulate hardware buffers.
+    /** Specialization of HardwareBufferManager to emulate hardware buffers.
     @remarks
-        You might want to instantiate this class if you want to utilise
-        classes like MeshSerializer without having initialised the 
+        You might want to instantiate this class if you want to utilize
+        classes like MeshSerializer without having initialized the 
         rendering system (which is required to create a 'real' hardware
         buffer manager).
     */
-    class _OgreExport DefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreExport DefaultHardwareBufferManager : public HardwareBufferManager
     {
     public:
-        DefaultHardwareBufferManagerBase();
-        ~DefaultHardwareBufferManagerBase();
+        DefaultHardwareBufferManager();
+        ~DefaultHardwareBufferManager();
         /// Creates a vertex buffer
         HardwareVertexBufferSharedPtr 
             createVertexBuffer(size_t vertexSize, size_t numVerts, 
@@ -177,45 +177,6 @@ namespace Ogre {
         HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                            HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                            bool useShadowBuffer = false, const String& name = "");
-    };
-
-    /// DefaultHardwareBufferManager as a Singleton
-    class _OgreExport DefaultHardwareBufferManager : public HardwareBufferManager
-    {
-        std::unique_ptr<HardwareBufferManagerBase> mImpl;
-    public:
-        DefaultHardwareBufferManager() : mImpl(new DefaultHardwareBufferManagerBase()) {}
-
-        HardwareVertexBufferSharedPtr
-            createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage,
-            bool useShadowBuffer = false)
-        {
-            return mImpl->createVertexBuffer(vertexSize, numVerts, usage, useShadowBuffer);
-        }
-
-        HardwareIndexBufferSharedPtr
-            createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes,
-            HardwareBuffer::Usage usage, bool useShadowBuffer = false)
-        {
-            return mImpl->createIndexBuffer(itype, numIndexes, usage, useShadowBuffer);
-        }
-
-        RenderToVertexBufferSharedPtr createRenderToVertexBuffer()
-        {
-            return mImpl->createRenderToVertexBuffer();
-        }
-
-        HardwareUniformBufferSharedPtr
-                createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "")
-        {
-            return mImpl->createUniformBuffer(sizeBytes, usage, useShadowBuffer, name);
-        }
-
-        HardwareCounterBufferSharedPtr
-        createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "")
-        {
-            return mImpl->createCounterBuffer(sizeBytes, usage, useShadowBuffer, name);
-        }
     };
 
     /** @} */
