@@ -185,6 +185,12 @@ namespace Ogre {
         std::unique_ptr<HardwareBufferManagerBase> mImpl;
     public:
         DefaultHardwareBufferManager() : mImpl(new DefaultHardwareBufferManagerBase()) {}
+        ~DefaultHardwareBufferManager()
+        {
+            // have to do this before mImpl is gone
+            destroyAllDeclarations();
+            destroyAllBindings();
+        }
 
         HardwareVertexBufferSharedPtr
             createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage,
