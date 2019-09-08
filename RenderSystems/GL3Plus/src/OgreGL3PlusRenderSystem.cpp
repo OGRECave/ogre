@@ -61,6 +61,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusStateCacheManager.h"
 #include "OgreGLSLProgramCommon.h"
 #include "OgreGL3PlusFBOMultiRenderTarget.h"
+#include "OgreSPIRVShaderFactory.h"
+
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 extern "C" void glFlushRenderAPPLE();
@@ -135,6 +137,7 @@ namespace Ogre {
           mStateCacheManager(0),
           mShaderManager(0),
           mGLSLShaderFactory(0),
+          mSPIRVShaderFactory(0),
           mHardwareBufferManager(0),
           mActiveTextureUnit(0)
     {
@@ -345,6 +348,8 @@ namespace Ogre {
         if (getNativeShadingLanguageVersion() >= 130 && !limitedOSXCoreProfile)
             rsc->addShaderProfile("glsl130");
 
+        if(checkExtension("GL_ARB_gl_spirv")) rsc->addShaderProfile("spirv");
+
         if (hasMinGLVersion(4, 1) || checkExtension("GL_ARB_separate_shader_objects")) {
             // this relaxes shader matching rules and requires slightly different GLSL declaration
             // however our usage pattern does not benefit from this and driver support is quite poor
@@ -489,6 +494,8 @@ namespace Ogre {
         // Create GLSL shader factory
         mGLSLShaderFactory = new GLSLShaderFactory(this);
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLShaderFactory);
+        mSPIRVShaderFactory = new SPIRVShaderFactory();
+        HighLevelGpuProgramManager::getSingleton().addFactory(mSPIRVShaderFactory);
 
         // Use VBO's by default
         mHardwareBufferManager = new GL3PlusHardwareBufferManager();
@@ -515,15 +522,21 @@ namespace Ogre {
     {
         RenderSystem::shutdown();
 
-        // Deleting the GLSL program factory
-        if (mGLSLShaderFactory)
+        // Remove from manager safely
+        if (auto progMgr = HighLevelGpuProgramManager::getSingletonPtr())
         {
-            // Remove from manager safely
-            if (HighLevelGpuProgramManager::getSingletonPtr())
-                HighLevelGpuProgramManager::getSingleton().removeFactory(mGLSLShaderFactory);
-            OGRE_DELETE mGLSLShaderFactory;
-            mGLSLShaderFactory = 0;
+            if(mGLSLShaderFactory)
+                progMgr->removeFactory(mGLSLShaderFactory);
+
+            if(mSPIRVShaderFactory)
+                progMgr->removeFactory(mSPIRVShaderFactory);
         }
+
+        OGRE_DELETE mGLSLShaderFactory;
+        mGLSLShaderFactory = 0;
+
+        OGRE_DELETE mSPIRVShaderFactory;
+        mSPIRVShaderFactory = 0;
 
         // Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
         if(mShaderManager)

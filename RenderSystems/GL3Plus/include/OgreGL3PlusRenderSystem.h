@@ -95,6 +95,7 @@ namespace Ogre {
 
         GpuProgramManager *mShaderManager;
         GLSLShaderFactory* mGLSLShaderFactory;
+        HighLevelGpuProgramFactory* mSPIRVShaderFactory;
         HardwareBufferManager* mHardwareBufferManager;
 
         /** These variables are used for caching RenderSystem state.

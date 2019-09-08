@@ -107,7 +107,7 @@ namespace Ogre {
         // /// @copydoc Resource::loadImpl
         // void loadImpl(void) {}
 
-    private:
+    protected:
         /// GL handle for shader object.
         GLuint mGLShaderHandle;
         /// GL handle for program object the shader is bound to.
