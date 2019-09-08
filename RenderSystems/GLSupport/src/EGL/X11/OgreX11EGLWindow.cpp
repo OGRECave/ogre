@@ -352,44 +352,44 @@ namespace Ogre {
     void X11EGLWindow::windowMovedOrResized()
     {
         if (mClosed || !mWindow)
-        {
             return;
-        }
 
         NativeDisplayType mNativeDisplay = mGLSupport->getNativeDisplay();
         XWindowAttributes windowAttrib;
 
+        Window parent, root, *children;
+        uint nChildren;
+
+        XQueryTree((Display*)mNativeDisplay, (Window)mWindow, &root, &parent, &children, &nChildren);
+
+        if (children)
+            XFree(children);
+
+        XGetWindowAttributes((Display*)mNativeDisplay, parent, &windowAttrib);
+
         if (mIsTopLevel && !mIsFullScreen)
         {
-            Window parent, root, *children;
-            uint nChildren;
-
-            XQueryTree((Display*)mNativeDisplay, (Window)mWindow, &root, &parent, &children, &nChildren);
-
-            if (children)
-            {
-                XFree(children);
-            }
-
-            XGetWindowAttributes((Display*)mNativeDisplay, parent, &windowAttrib);
+            // offset from window decorations
             mLeft = windowAttrib.x;
-            mTop = windowAttrib.y;
+            mTop  = windowAttrib.y;
+            // w/ h of the actual renderwindow
+            XGetWindowAttributes((Display*)mNativeDisplay, (Window)mWindow, &windowAttrib);
         }
-
-        XGetWindowAttributes((Display*)mNativeDisplay, (Window)mWindow, &windowAttrib);
 
         if (mWidth == uint32(windowAttrib.width) && mHeight == uint32(windowAttrib.height))
-        {
             return;
-        }
 
         mWidth = windowAttrib.width;
         mHeight = windowAttrib.height;
 
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
+        if(!mIsTopLevel)
         {
-            (*it).second->_updateDimensions();
+            XResizeWindow((Display*)mNativeDisplay, mWindow, mWidth, mHeight);
+            XFlush((Display*)mNativeDisplay);
         }
+
+        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
+            (*it).second->_updateDimensions();
     }
     void X11EGLWindow::switchFullScreen(bool fullscreen)
     { 
