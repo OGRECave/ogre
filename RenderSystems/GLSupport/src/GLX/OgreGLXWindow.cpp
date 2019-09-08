@@ -330,39 +330,35 @@ namespace Ogre
             fbConfig = mGLSupport->selectFBConfig(minAttribs, maxAttribs);
         }
 
-        if (fbConfig)
+        // This should never happen.
+        if(!fbConfig)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unexpected failure to determine a GLXFBConfig");
+
+
+        // Now check the actual fsaa and gamma value
+
+        GLint fsaa;
+        mGLSupport->getFBConfigAttrib(fbConfig, GLX_SAMPLES, &fsaa);
+        mFSAA = fsaa;
+
+        if (gamma)
         {
-            // Now check the actual fsaa and gamma value
-
-            GLint fsaa;
-            mGLSupport->getFBConfigAttrib(fbConfig, GLX_SAMPLES, &fsaa);            
-            mFSAA = fsaa;
-
-            if (gamma)
-            {
-                int val = 0;
-                gamma = mGLSupport->getFBConfigAttrib(fbConfig, GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, &val) == 0;
-                gamma = gamma && val; // can an supported extension return 0? lets rather be safe..
-            }
-            mHwGamma = gamma;
-
-            int bufferSize = 0;
-            for(int i = GLX_RED_SIZE; i < GLX_ALPHA_SIZE + 1; i++)
-            {
-                int val = 0;
-                mGLSupport->getFBConfigAttrib(fbConfig, i, &val);
-                bufferSize += val;
-            }
-
-            LogManager::getSingleton().stream()
-                << "Actual frame buffer FSAA: " << mFSAA << ", gamma: " << mHwGamma
-                << ", colourBufferSize: " << bufferSize;
+            int val = 0;
+            gamma = mGLSupport->getFBConfigAttrib(fbConfig, GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, &val) == 0;
+            gamma = gamma && val; // can an supported extension return 0? lets rather be safe..
         }
-        else
+        mHwGamma = gamma;
+
+        int bufferSize = 0;
+        for(int i = GLX_RED_SIZE; i < GLX_ALPHA_SIZE + 1; i++)
         {
-            // This should never happen.
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unexpected failure to determine a GLXFBConfig","GLXWindow::create");
+            int val = 0;
+            mGLSupport->getFBConfigAttrib(fbConfig, i, &val);
+            bufferSize += val;
         }
+
+        LogManager::getSingleton().logMessage(StringUtil::format(
+            "GLXWindow::create colourBufferSize=%d gamma=%d FSAA=%d", bufferSize, mHwGamma, fsaa));
 
         mIsTopLevel = (! mIsExternal && parentWindow == DefaultRootWindow(xDisplay));
 
