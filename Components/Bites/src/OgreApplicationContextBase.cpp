@@ -461,6 +461,11 @@ void ApplicationContextBase::locateResources()
         rgm.addResourceLocation(arch + "/materials/programs/HLSL", type, sec);
     }
 
+    if (Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("spirv"))
+    {
+        rgm.addResourceLocation(arch + "/materials/programs/SPIRV", type, sec);
+    }
+
     if(hasCgPlugin)
         rgm.addResourceLocation(arch + "/materials/programs/Cg", type, sec);
     if (use_HLSL_Cg_shared)
