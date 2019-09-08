@@ -40,6 +40,8 @@ THE SOFTWARE.
 #include <algorithm>
 #include <climits>
 
+#include <EGL/eglext.h>
+
 namespace Ogre {
     EGLWindow::EGLWindow(EGLSupport *glsupport)
         : mGLSupport(glsupport),
@@ -208,7 +210,11 @@ namespace Ogre {
     {
         ::EGLSurface surface;
 
-        surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, NULL);
+        int gamma_attribs[] = {EGL_GL_COLORSPACE_KHR, EGL_GL_COLORSPACE_SRGB_KHR, EGL_NONE};
+
+        mHwGamma = mHwGamma && mGLSupport->checkExtension("EGL_KHR_gl_colorspace");
+
+        surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, mHwGamma ? gamma_attribs : NULL);
         EGL_CHECK_ERROR
 
         if (surface == EGL_NO_SURFACE)

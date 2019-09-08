@@ -423,7 +423,6 @@ namespace Ogre {
     {
         String title = name;
         int samples = 0;
-        int gamma;
         short frequency = 0;
         bool vsync = false;
         ::EGLContext eglContext = 0;
@@ -477,7 +476,7 @@ namespace Ogre {
 
             if ((opt = miscParams->find("gamma")) != end)
             {
-                gamma = StringConverter::parseBool(opt->second);
+                mHwGamma = StringConverter::parseBool(opt->second);
             }
 
             if ((opt = miscParams->find("left")) != end)
@@ -550,7 +549,6 @@ namespace Ogre {
             };
 
             mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
-            mHwGamma = false;
         }
 
         if (!mIsTopLevel)
