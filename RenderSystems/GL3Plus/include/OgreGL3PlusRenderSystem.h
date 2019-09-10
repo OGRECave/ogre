@@ -36,6 +36,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreGL3PlusStateCacheManager.h"
 
+#include <array>
+
 namespace Ogre {
     /** \addtogroup RenderSystems RenderSystems
     *  @{
@@ -110,12 +112,7 @@ namespace Ogre {
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
 #endif
 
-        GLSLShader* mCurrentVertexShader;
-        GLSLShader* mCurrentFragmentShader;
-        GLSLShader* mCurrentGeometryShader;
-        GLSLShader* mCurrentHullShader;
-        GLSLShader* mCurrentDomainShader;
-        GLSLShader* mCurrentComputeShader;
+        std::array<GLSLShader*, GPT_COUNT> mCurrentShader;
 
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 

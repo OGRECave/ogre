@@ -72,8 +72,6 @@ namespace Ogre {
         GLuint getGLProgramHandle();
         void attachToProgramObject(const GLuint programObject);
         void detachFromProgramObject(const GLuint programObject);
-        /// Get OpenGL GLSL shader type from OGRE GPU program type.
-        static GLenum getGLShaderType(GpuProgramType programType);
 
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
@@ -83,18 +81,6 @@ namespace Ogre {
 
         /// Compile source into shader object
         bool compile( bool checkErrors = false);
-
-
-        /// Bind the shader in OpenGL.
-        void bind(void);
-        /// Unbind the shader in OpenGL.
-        void unbind(void);
-        /// Execute the param binding functions for this shader.
-        void bindParameters(const GpuProgramParametersPtr& params, uint16 mask);
-        /// Execute the pass iteration param binding functions for this shader.
-        void bindPassIterationParameters(GpuProgramParametersSharedPtr params);
-        /// Execute the shared param binding functions for this shader.
-        void bindSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;

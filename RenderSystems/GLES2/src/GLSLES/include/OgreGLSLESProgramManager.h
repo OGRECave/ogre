@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramCommon.h"
 #include "OgreGLSLESExtSupport.h"
 
+#include <array>
+
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
 #   include "glsl_optimizer.h"
 #endif
@@ -52,9 +54,8 @@ namespace Ogre {
     class _OgreGLES2Export GLSLESProgramManager : public GLSLProgramManagerCommon, public Singleton<GLSLESProgramManager>
     {
     protected:
-        /// Active shaders defining the program
-        GLSLESProgram* mActiveVertexGpuProgram;
-        GLSLESProgram* mActiveFragmentGpuProgram;
+        /// Active shader objects defining the active program object.
+        std::array<GLSLESProgram*, GPT_COUNT> mActiveShader;
 
         /// Active object defining the active rendering gpu state
         GLSLESProgramCommon* mActiveProgram;
@@ -78,9 +79,7 @@ namespace Ogre {
             The active program object will be cleared.
             Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
         */
-        void setActiveFragmentShader(GLSLESProgram* fragmentGpuProgram);
-        /// @copydoc setActiveFragmentShader
-        void setActiveVertexShader(GLSLESProgram* vertexGpuProgram);
+        void setActiveShader(GpuProgramType type, GLSLESProgram* fragmentGpuProgram);
 
         /**
             Get the program object that links the two active shader objects together

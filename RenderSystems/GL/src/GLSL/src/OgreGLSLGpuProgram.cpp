@@ -76,39 +76,14 @@ namespace Ogre {
     void GLSLGpuProgram::bindProgram(void)
     {
         // Tell the Link Program Manager what shader is to become active
-        switch (mType)
-        {
-        case GPT_VERTEX_PROGRAM:
-            GLSLLinkProgramManager::getSingleton().setActiveVertexShader( mGLSLProgram );
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            GLSLLinkProgramManager::getSingleton().setActiveFragmentShader( mGLSLProgram );
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            GLSLLinkProgramManager::getSingleton().setActiveGeometryShader( mGLSLProgram );
-            break;
-        default:
-                break;
-        }
+        GLSLLinkProgramManager::getSingleton().setActiveShader( mType, mGLSLProgram );
     }
 
     //-----------------------------------------------------------------------------
     void GLSLGpuProgram::unbindProgram(void)
     {
         // Tell the Link Program Manager what shader is to become inactive
-        if (mType == GPT_VERTEX_PROGRAM)
-        {
-            GLSLLinkProgramManager::getSingleton().setActiveVertexShader( NULL );
-        }
-        else if (mType == GPT_GEOMETRY_PROGRAM)
-        {
-            GLSLLinkProgramManager::getSingleton().setActiveGeometryShader( NULL );
-        }
-        else // its a fragment shader
-        {
-            GLSLLinkProgramManager::getSingleton().setActiveFragmentShader( NULL );
-        }
-
+        GLSLLinkProgramManager::getSingleton().setActiveShader( mType, NULL );
     }
 
     //-----------------------------------------------------------------------------
