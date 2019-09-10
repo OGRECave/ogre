@@ -34,6 +34,8 @@
 #include "OgreGLSLProgram.h"
 #include "OgreGLSLExtSupport.h"
 
+#include <array>
+
 namespace Ogre {
 
     /** Ogre assumes that there are separate vertex and fragment
@@ -54,12 +56,7 @@ namespace Ogre {
     {
     protected:
         /// Active shader objects defining the active program object.
-        GLSLShader* mActiveVertexShader;
-        GLSLShader* mActiveHullShader;
-        GLSLShader* mActiveDomainShader;
-        GLSLShader* mActiveGeometryShader;
-        GLSLShader* mActiveFragmentShader;
-        GLSLShader* mActiveComputeShader;
+        std::array<GLSLShader*, GPT_COUNT> mActiveShader;
 
         /// active objects defining the active rendering gpu state
         GLSLProgram* mActiveProgram;
@@ -98,20 +95,10 @@ namespace Ogre {
 
         /** Set the shader for the next rendering state.
             The active program object will be cleared.  Normally
-            called from the GLSLShader::bindProgram and
+            called from the GLRenderSystem::bindGpuProgram and
             unbindProgram methods
         */
-        void setActiveVertexShader(GLSLShader* vertexGpuProgram);
-        /// @copydoc setActiveVertexShader
-        void setActiveHullShader(GLSLShader* hullGpuProgram);
-        /// @copydoc setActiveVertexShader
-        void setActiveDomainShader(GLSLShader* domainGpuProgram);
-        /// @copydoc setActiveVertexShader
-        void setActiveGeometryShader(GLSLShader* geometryGpuProgram);
-        /// @copydoc setActiveVertexShader
-        void setActiveFragmentShader(GLSLShader* fragmentGpuProgram);
-        /// @copydoc setActiveVertexShader
-        void setActiveComputeShader(GLSLShader* computeGpuProgram);
+        void setActiveShader(GpuProgramType type, GLSLShader* shader);
 
         /** Populate a list of uniforms based on an OpenGL program object.
         */

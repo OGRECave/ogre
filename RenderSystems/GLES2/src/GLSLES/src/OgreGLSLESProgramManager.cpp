@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "../include/OgreGLSLESProgramManager.h"
+#include "OgreGLSLESProgramManager.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -58,9 +58,10 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLESProgramManager::GLSLESProgramManager(void) : mActiveVertexGpuProgram(NULL),
-        mActiveFragmentGpuProgram(NULL), mActiveProgram(NULL)
+    GLSLESProgramManager::GLSLESProgramManager(void) : mActiveProgram(NULL)
     {
+        mActiveShader.fill(NULL);
+
         // Fill in the relationship between type names and enums
         mTypeEnumMap.emplace("float", GL_FLOAT);
         mTypeEnumMap.emplace("vec2", GL_FLOAT_VEC2);
@@ -136,13 +137,10 @@ namespace Ogre {
         // No active link program so find one or make a new one
         // Is there an active key?
         uint32 activeKey = 0;
-        if (mActiveVertexGpuProgram)
+        for(auto shader : mActiveShader)
         {
-            activeKey = HashCombine(activeKey, mActiveVertexGpuProgram->getShaderID());
-        }
-        if (mActiveFragmentGpuProgram)
-        {
-            activeKey = HashCombine(activeKey, mActiveFragmentGpuProgram->getShaderID());
+            if(!shader) continue;
+            activeKey = HashCombine(activeKey, shader->getShaderID());
         }
 
         // Only return a link program object if a vertex or fragment program exist
@@ -157,12 +155,12 @@ namespace Ogre {
                         RSC_SEPARATE_SHADER_OBJECTS))
                 {
                     mActiveProgram =
-                        new GLSLESProgramPipeline(mActiveVertexGpuProgram, mActiveFragmentGpuProgram);
+                        new GLSLESProgramPipeline(mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_FRAGMENT_PROGRAM]);
                 }
                 else
                 {
                     mActiveProgram =
-                        new GLSLESLinkProgram(mActiveVertexGpuProgram, mActiveFragmentGpuProgram);
+                        new GLSLESLinkProgram(mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_FRAGMENT_PROGRAM]);
                 }
 
                 mPrograms[activeKey] = mActiveProgram;
@@ -181,22 +179,11 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLESProgramManager::setActiveFragmentShader(GLSLESProgram* fragmentGpuProgram)
+    void GLSLESProgramManager::setActiveShader(GpuProgramType type, GLSLESProgram* gpuProgram)
     {
-        if (fragmentGpuProgram != mActiveFragmentGpuProgram)
+        if (gpuProgram != mActiveShader[type])
         {
-            mActiveFragmentGpuProgram = fragmentGpuProgram;
-            // ActiveLinkProgram is no longer valid
-            mActiveProgram = NULL;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    void GLSLESProgramManager::setActiveVertexShader(GLSLESProgram* vertexGpuProgram)
-    {
-        if (vertexGpuProgram != mActiveVertexGpuProgram)
-        {
-            mActiveVertexGpuProgram = vertexGpuProgram;
+            mActiveShader[type] = gpuProgram;
             // ActiveLinkProgram is no longer valid
             mActiveProgram = NULL;
         }

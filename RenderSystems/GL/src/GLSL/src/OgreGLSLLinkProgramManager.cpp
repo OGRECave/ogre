@@ -52,9 +52,10 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLLinkProgramManager::GLSLLinkProgramManager(void) : mActiveVertexGpuProgram(NULL),
-        mActiveGeometryGpuProgram(NULL), mActiveFragmentGpuProgram(NULL), mActiveLinkProgram(NULL)
+    GLSLLinkProgramManager::GLSLLinkProgramManager(void) : mActiveLinkProgram(NULL)
     {
+        mActiveGpuProgram.fill(NULL);
+
         // Fill in the relationship between type names and enums
         mTypeEnumMap.emplace("float", GL_FLOAT);
         mTypeEnumMap.emplace("vec2", GL_FLOAT_VEC2);
@@ -100,18 +101,10 @@ namespace Ogre {
         // no active link program so find one or make a new one
         // is there an active key?
         uint32 activeKey = 0;
-
-        if (mActiveVertexGpuProgram)
+        for(auto shader : mActiveGpuProgram)
         {
-            activeKey = HashCombine(activeKey, mActiveVertexGpuProgram->getShaderID());
-        }
-        if (mActiveGeometryGpuProgram)
-        {
-            activeKey = HashCombine(activeKey, mActiveGeometryGpuProgram->getShaderID());
-        }
-        if (mActiveFragmentGpuProgram)
-        {
-            activeKey = HashCombine(activeKey, mActiveFragmentGpuProgram->getShaderID());
+            if(!shader) continue;
+            activeKey = HashCombine(activeKey, shader->getShaderID());
         }
 
         // only return a link program object if a vertex, geometry or fragment program exist
@@ -122,7 +115,9 @@ namespace Ogre {
             // program object not found for key so need to create it
             if (programFound == mPrograms.end())
             {
-                mActiveLinkProgram = new GLSLLinkProgram(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,mActiveFragmentGpuProgram);
+                mActiveLinkProgram = new GLSLLinkProgram(mActiveGpuProgram[GPT_VERTEX_PROGRAM],
+                                                         mActiveGpuProgram[GPT_GEOMETRY_PROGRAM],
+                                                         mActiveGpuProgram[GPT_FRAGMENT_PROGRAM]);
                 mPrograms[activeKey] = mActiveLinkProgram;
             }
             else
@@ -140,11 +135,11 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLLinkProgramManager::setActiveFragmentShader(GLSLProgram* fragmentGpuProgram)
+    void GLSLLinkProgramManager::setActiveShader(GpuProgramType type, GLSLProgram* gpuProgram)
     {
-        if (fragmentGpuProgram != mActiveFragmentGpuProgram)
+        if (gpuProgram != mActiveGpuProgram[type])
         {
-            mActiveFragmentGpuProgram = fragmentGpuProgram;
+            mActiveGpuProgram[type] = gpuProgram;
             // ActiveLinkProgram is no longer valid
             mActiveLinkProgram = NULL;
             // change back to fixed pipeline
@@ -152,30 +147,6 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
-    void GLSLLinkProgramManager::setActiveVertexShader(GLSLProgram* vertexGpuProgram)
-    {
-        if (vertexGpuProgram != mActiveVertexGpuProgram)
-        {
-            mActiveVertexGpuProgram = vertexGpuProgram;
-            // ActiveLinkProgram is no longer valid
-            mActiveLinkProgram = NULL;
-            // change back to fixed pipeline
-            glUseProgramObjectARB(0);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void GLSLLinkProgramManager::setActiveGeometryShader(GLSLProgram* geometryGpuProgram)
-    {
-        if (geometryGpuProgram != mActiveGeometryGpuProgram)
-        {
-            mActiveGeometryGpuProgram = geometryGpuProgram;
-            // ActiveLinkProgram is no longer valid
-            mActiveLinkProgram = NULL;
-            // change back to fixed pipeline
-            glUseProgramObjectARB(0);
-        }
-    }
     //---------------------------------------------------------------------
     void GLSLLinkProgramManager::convertGLUniformtoOgreType(GLenum gltype,
         GpuConstantDefinition& defToUpdate)

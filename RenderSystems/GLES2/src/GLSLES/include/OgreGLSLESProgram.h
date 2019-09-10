@@ -100,17 +100,6 @@ namespace Ogre {
         /// Since GLSL has no assembly, use this shader for binding.
         GpuProgram* _getBindingDelegate(void) { return this; }
 
-        /// Execute the binding functions for this program
-        void bindProgram(void);
-        /// Execute the unbinding functions for this program
-        void unbindProgram(void);
-        /// Execute the param binding functions for this program
-        void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
-        /// Execute the shared param binding functions for this program
-        void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
-        /// Execute the pass iteration param binding functions for this program
-        void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
-
         size_t calculateSize(void) const;
 
     protected:

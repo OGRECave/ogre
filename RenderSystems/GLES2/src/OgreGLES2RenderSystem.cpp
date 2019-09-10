@@ -1649,9 +1649,9 @@ namespace Ogre {
         // scene manager treat render system as ONE 'context' ONLY, and it
         // cached the GPU programs using state.
         if (mCurrentVertexProgram)
-            mCurrentVertexProgram->unbindProgram();
+            GLSLESProgramManager::getSingleton().setActiveShader(GPT_VERTEX_PROGRAM, NULL);
         if (mCurrentFragmentProgram)
-            mCurrentFragmentProgram->unbindProgram();
+            GLSLESProgramManager::getSingleton().setActiveShader(GPT_FRAGMENT_PROGRAM, NULL);
         
         // Disable textures
         _disableTextureUnitsFrom(0);
@@ -1681,9 +1681,9 @@ namespace Ogre {
 
         // Rebind GPU programs to new context
         if (mCurrentVertexProgram)
-            mCurrentVertexProgram->bindProgram();
+            GLSLESProgramManager::getSingleton().setActiveShader(GPT_VERTEX_PROGRAM, mCurrentVertexProgram);
         if (mCurrentFragmentProgram)
-            mCurrentFragmentProgram->bindProgram();
+            GLSLESProgramManager::getSingleton().setActiveShader(GPT_FRAGMENT_PROGRAM, mCurrentFragmentProgram);
         
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
@@ -1901,65 +1901,38 @@ namespace Ogre {
         }
         
         GLSLESProgram* glprg = static_cast<GLSLESProgram*>(prg);
-        
-        // Unbind previous gpu program first.
-        //
-        // Note:
-        //  1. Even if both previous and current are the same object, we can't
-        //     bypass re-bind completely since the object itself may be modified.
-        //     But we can bypass unbind based on the assumption that object
-        //     internally GL program type shouldn't be changed after it has
-        //     been created. The behavior of bind to a GL program type twice
-        //     should be same as unbind and rebind that GL program type, even
-        //     for different objects.
-        //  2. We also assumed that the program's type (vertex or fragment) should
-        //     not be changed during it's in using. If not, the following switch
-        //     statement will confuse GL state completely, and we can't fix it
-        //     here. To fix this case, we must coding the program implementation
-        //     itself, if type is changing (during load/unload, etc), and it's in use,
-        //     unbind and notify render system to correct for its state.
-        //
+
         switch (glprg->getType())
         {
             case GPT_VERTEX_PROGRAM:
-                if (mCurrentVertexProgram != glprg)
-                {
-                    if (mCurrentVertexProgram)
-                        mCurrentVertexProgram->unbindProgram();
-                    mCurrentVertexProgram = glprg;
-                }
+                mCurrentVertexProgram = glprg;
                 break;
                 
             case GPT_FRAGMENT_PROGRAM:
-                if (mCurrentFragmentProgram != glprg)
-                {
-                    if (mCurrentFragmentProgram)
-                        mCurrentFragmentProgram->unbindProgram();
-                    mCurrentFragmentProgram = glprg;
-                }
+                mCurrentFragmentProgram = glprg;
                 break;
             default:
                 break;
         }
         
         // Bind the program
-        glprg->bindProgram();
+        GLSLESProgramManager::getSingleton().setActiveShader(glprg->getType(), glprg);
 
         RenderSystem::bindGpuProgram(prg);
     }
 
     void GLES2RenderSystem::unbindGpuProgram(GpuProgramType gptype)
     {
+        GLSLESProgramManager::getSingleton().setActiveShader(gptype, NULL);
+
         if (gptype == GPT_VERTEX_PROGRAM && mCurrentVertexProgram)
         {
             mActiveVertexGpuProgramParameters.reset();
-            mCurrentVertexProgram->unbindProgram();
             mCurrentVertexProgram = 0;
         }
         else if (gptype == GPT_FRAGMENT_PROGRAM && mCurrentFragmentProgram)
         {
             mActiveFragmentGpuProgramParameters.reset();
-            mCurrentFragmentProgram->unbindProgram();
             mCurrentFragmentProgram = 0;
         }
         RenderSystem::unbindGpuProgram(gptype);
@@ -1969,29 +1942,24 @@ namespace Ogre {
     {
         // Just copy
         params->_copySharedParams();
-        switch (gptype)
+
+        // Link can throw exceptions, ignore them at this point
+        try
         {
-            case GPT_VERTEX_PROGRAM:
-                mActiveVertexGpuProgramParameters = params;
-                mCurrentVertexProgram->bindProgramSharedParameters(params, mask);
-                break;
-            case GPT_FRAGMENT_PROGRAM:
-                mActiveFragmentGpuProgramParameters = params;
-                mCurrentFragmentProgram->bindProgramSharedParameters(params, mask);
-                break;
-            default:
-                break;
+            GLSLESProgramCommon* program = GLSLESProgramManager::getSingleton().getActiveProgram();
+            // Pass on parameters from params to program object uniforms
+            program->updateUniformBlocks(params, mask, gptype);
+            program->updateUniforms(params, mask, gptype);
         }
+        catch (Exception& e) {}
 
         switch (gptype)
         {
             case GPT_VERTEX_PROGRAM:
                 mActiveVertexGpuProgramParameters = params;
-                mCurrentVertexProgram->bindProgramParameters(params, mask);
                 break;
             case GPT_FRAGMENT_PROGRAM:
                 mActiveFragmentGpuProgramParameters = params;
-                mCurrentFragmentProgram->bindProgramParameters(params, mask);
                 break;
             default:
                 break;
@@ -2000,13 +1968,16 @@ namespace Ogre {
 
     void GLES2RenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
     {
+        GLSLESProgramCommon* program = GLSLESProgramManager::getSingleton().getActiveProgram();
+
+        // Pass on parameters from params to program object uniforms
         switch (gptype)
         {
             case GPT_VERTEX_PROGRAM:
-                mCurrentVertexProgram->bindProgramPassIterationParameters(mActiveVertexGpuProgramParameters);
+                program->updatePassIterationUniforms(mActiveVertexGpuProgramParameters);
                 break;
             case GPT_FRAGMENT_PROGRAM:
-                mCurrentFragmentProgram->bindProgramPassIterationParameters(mActiveFragmentGpuProgramParameters);
+                program->updatePassIterationUniforms(mActiveFragmentGpuProgramParameters);
                 break;
             default:
                 break;

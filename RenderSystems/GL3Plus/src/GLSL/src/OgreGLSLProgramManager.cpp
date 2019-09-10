@@ -56,15 +56,11 @@ namespace Ogre {
     }
     
     GLSLProgramManager::GLSLProgramManager(GL3PlusRenderSystem* renderSystem) :
-        mActiveVertexShader(NULL),
-        mActiveHullShader(NULL),
-        mActiveDomainShader(NULL),
-        mActiveGeometryShader(NULL),
-        mActiveFragmentShader(NULL),
-        mActiveComputeShader(NULL),
         mActiveProgram(NULL),
         mRenderSystem(renderSystem)
     {
+        mActiveShader.fill(NULL);
+
         // Fill in the relationship between type names and enums
         mTypeEnumMap.emplace("float", GL_FLOAT);
         mTypeEnumMap.emplace("vec2", GL_FLOAT_VEC2);
@@ -215,30 +211,15 @@ namespace Ogre {
         // No active link program so find one or make a new one.
         // Is there an active key?
         uint32 activeKey = 0;
-        if (mActiveVertexShader)
+        for(auto shader : mActiveShader)
         {
-            activeKey = HashCombine(activeKey, mActiveVertexShader->getShaderID());
-        }
-        if (mActiveDomainShader)
-        {
-            activeKey = HashCombine(activeKey, mActiveDomainShader->getShaderID());
-        }
-        if (mActiveHullShader)
-        {
-            activeKey = HashCombine(activeKey, mActiveHullShader->getShaderID());
-        }
-        if (mActiveGeometryShader)
-        {
-            activeKey = HashCombine(activeKey, mActiveGeometryShader->getShaderID());
-        }
-        if (mActiveFragmentShader)
-        {
-            activeKey = HashCombine(activeKey, mActiveFragmentShader->getShaderID());
-        }
-        if (mActiveComputeShader)
-        {
+            if(!shader) continue;
+
             // overwrite as compute shaders are not part of the pipeline
-            activeKey = HashCombine(0, mActiveComputeShader->getShaderID());
+            if(shader->getType() == GPT_COMPUTE_PROGRAM)
+                activeKey = 0;
+
+            activeKey = HashCombine(activeKey, shader->getShaderID());
         }
 
         // Only return a link program object if a program exists.
@@ -252,14 +233,16 @@ namespace Ogre {
                 if (mRenderSystem->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
                 {
                     mActiveProgram = new GLSLSeparableProgram(
-                        mActiveVertexShader, mActiveHullShader, mActiveDomainShader,
-                        mActiveGeometryShader, mActiveFragmentShader, mActiveComputeShader);
+                        mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_HULL_PROGRAM],
+                        mActiveShader[GPT_DOMAIN_PROGRAM], mActiveShader[GPT_GEOMETRY_PROGRAM],
+                        mActiveShader[GPT_FRAGMENT_PROGRAM], mActiveShader[GPT_COMPUTE_PROGRAM]);
                 }
                 else
                 {
                     mActiveProgram = new GLSLMonolithicProgram(
-                        mActiveVertexShader, mActiveHullShader, mActiveDomainShader,
-                        mActiveGeometryShader, mActiveFragmentShader, mActiveComputeShader);
+                        mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_HULL_PROGRAM],
+                        mActiveShader[GPT_DOMAIN_PROGRAM], mActiveShader[GPT_GEOMETRY_PROGRAM],
+                        mActiveShader[GPT_FRAGMENT_PROGRAM], mActiveShader[GPT_COMPUTE_PROGRAM]);
                 }
 
                 mPrograms[activeKey] = mActiveProgram;
@@ -278,66 +261,11 @@ namespace Ogre {
         return mActiveProgram;
     }
 
-    void GLSLProgramManager::setActiveFragmentShader(GLSLShader* fragmentShader)
+    void GLSLProgramManager::setActiveShader(GpuProgramType type, GLSLShader* shader)
     {
-        if (fragmentShader != mActiveFragmentShader)
+        if (mActiveShader[type] != shader)
         {
-            mActiveFragmentShader = fragmentShader;
-            // ActiveMonolithicProgram is no longer valid
-            mActiveProgram = NULL;
-        }
-    }
-
-
-    void GLSLProgramManager::setActiveVertexShader(GLSLShader* vertexShader)
-    {
-        if (vertexShader != mActiveVertexShader)
-        {
-            mActiveVertexShader = vertexShader;
-            // ActiveMonolithicProgram is no longer valid
-            mActiveProgram = NULL;
-        }
-    }
-
-
-    void GLSLProgramManager::setActiveGeometryShader(GLSLShader* geometryShader)
-    {
-        if (geometryShader != mActiveGeometryShader)
-        {
-            mActiveGeometryShader = geometryShader;
-            // ActiveMonolithicProgram is no longer valid
-            mActiveProgram = NULL;
-        }
-    }
-
-
-    void GLSLProgramManager::setActiveHullShader(GLSLShader* hullShader)
-    {
-        if (hullShader != mActiveHullShader)
-        {
-            mActiveHullShader = hullShader;
-            // ActiveMonolithicProgram is no longer valid
-            mActiveProgram = NULL;
-        }
-    }
-
-
-    void GLSLProgramManager::setActiveDomainShader(GLSLShader* domainShader)
-    {
-        if (domainShader != mActiveDomainShader)
-        {
-            mActiveDomainShader = domainShader;
-            // ActiveMonolithicProgram is no longer valid
-            mActiveProgram = NULL;
-        }
-    }
-
-
-    void GLSLProgramManager::setActiveComputeShader(GLSLShader* computeShader)
-    {
-        if (computeShader != mActiveComputeShader)
-        {
-            mActiveComputeShader = computeShader;
+            mActiveShader[type] = shader;
             // ActiveMonolithicProgram is no longer valid
             mActiveProgram = NULL;
         }

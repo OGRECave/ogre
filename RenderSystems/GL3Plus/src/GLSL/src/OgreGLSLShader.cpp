@@ -40,6 +40,28 @@
 #include "OgreGLUniformCache.h"
 
 namespace Ogre {
+    /// Get OpenGL GLSL shader type from OGRE GPU program type.
+    static GLenum getGLShaderType(GpuProgramType programType)
+    {
+        switch (programType)
+        {
+        case GPT_VERTEX_PROGRAM:
+            return GL_VERTEX_SHADER;
+        case GPT_HULL_PROGRAM:
+            return GL_TESS_CONTROL_SHADER;
+        case GPT_DOMAIN_PROGRAM:
+            return GL_TESS_EVALUATION_SHADER;
+        case GPT_GEOMETRY_PROGRAM:
+            return GL_GEOMETRY_SHADER;
+        case GPT_FRAGMENT_PROGRAM:
+            return GL_FRAGMENT_SHADER;
+        case GPT_COMPUTE_PROGRAM:
+            return GL_COMPUTE_SHADER;
+        }
+
+        return 0;
+    }
+
     GLSLShader::GLSLShader(
         ResourceManager* creator,
         const String& name, ResourceHandle handle,
@@ -316,31 +338,7 @@ namespace Ogre {
 
     Ogre::GpuProgramParametersSharedPtr GLSLShader::createParameters(void)
     {
-        GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
-        return params;
-    }
-
-    GLenum GLSLShader::getGLShaderType(GpuProgramType programType)
-    {
-        //TODO Convert to map, or is speed different negligible?
-        switch (programType)
-        {
-        case GPT_VERTEX_PROGRAM:
-            return GL_VERTEX_SHADER;
-        case GPT_HULL_PROGRAM:
-            return GL_TESS_CONTROL_SHADER;
-        case GPT_DOMAIN_PROGRAM:
-            return GL_TESS_EVALUATION_SHADER;
-        case GPT_GEOMETRY_PROGRAM:
-            return GL_GEOMETRY_SHADER;
-        case GPT_FRAGMENT_PROGRAM:
-            return GL_FRAGMENT_SHADER;
-        case GPT_COMPUTE_PROGRAM:
-            return GL_COMPUTE_SHADER;
-        }
-
-        //TODO add warning or error
-        return 0;
+        return HighLevelGpuProgram::createParameters();
     }
 
     GLuint GLSLShader::getGLProgramHandle() {
@@ -357,108 +355,6 @@ namespace Ogre {
         }
         return mGLProgramHandle;
     }
-
-
-    void GLSLShader::bind(void)
-    {
-        // Tell the Program Manager what shader is to become active.
-        switch (mType)
-        {
-        case GPT_VERTEX_PROGRAM:
-            GLSLProgramManager::getSingleton().setActiveVertexShader(this);
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            GLSLProgramManager::getSingleton().setActiveFragmentShader(this);
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            GLSLProgramManager::getSingleton().setActiveGeometryShader(this);
-            break;
-        case GPT_HULL_PROGRAM:
-            GLSLProgramManager::getSingleton().setActiveHullShader(this);
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            GLSLProgramManager::getSingleton().setActiveDomainShader(this);
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            GLSLProgramManager::getSingleton().setActiveComputeShader(this);
-            break;
-        }
-    }
-
-    void GLSLShader::unbind(void)
-    {
-        // Tell the Link Program Manager what shader is to become inactive.
-        if (mType == GPT_VERTEX_PROGRAM)
-        {
-            GLSLProgramManager::getSingleton().setActiveVertexShader(NULL);
-        }
-        else if (mType == GPT_GEOMETRY_PROGRAM)
-        {
-            GLSLProgramManager::getSingleton().setActiveGeometryShader(NULL);
-        }
-        else if (mType == GPT_HULL_PROGRAM)
-        {
-            GLSLProgramManager::getSingleton().setActiveHullShader(NULL);
-        }
-        else if (mType == GPT_DOMAIN_PROGRAM)
-        {
-            GLSLProgramManager::getSingleton().setActiveDomainShader(NULL);
-        }
-        else if (mType == GPT_COMPUTE_PROGRAM)
-        {
-            GLSLProgramManager::getSingleton().setActiveComputeShader(NULL);
-        }
-        else // It's a fragment shader
-        {
-            GLSLProgramManager::getSingleton().setActiveFragmentShader(NULL);
-        }
-    }
-
-
-    void GLSLShader::bindParameters(const GpuProgramParametersPtr& params, uint16 mask)
-    {
-        // Link can throw exceptions, ignore them at this point.
-        try
-        {
-            // Activate the program pipeline object.
-            GLSLProgram* program = GLSLProgramManager::getSingleton().getActiveProgram();
-            // Pass on parameters from params to program object uniforms.
-            program->updateUniforms(params, mask, mType);
-            program->updateAtomicCounters(params, mask, mType);
-        }
-        catch (Exception&) {}
-    }
-
-
-    void GLSLShader::bindPassIterationParameters(GpuProgramParametersSharedPtr params)
-{
-        // Activate the link program object.
-        GLSLProgram* program = GLSLProgramManager::getSingleton().getActiveProgram();
-        // Pass on parameters from params to program object uniforms.
-        program->updatePassIterationUniforms(params);
-    }
-
-
-    void GLSLShader::bindSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask)
-    {
-        // Link can throw exceptions, ignore them at this point.
-        try
-        {
-            // Activate the program pipeline object.
-            GLSLProgram* program = GLSLProgramManager::getSingleton().getActiveProgram();
-            // Pass on parameters from params to program object uniforms.
-            program->updateUniformBlocks(params, mask, mType);
-            // program->updateShaderStorageBlock(params, mask, mType);
-
-        }
-        catch (InvalidParametersException& e)
-        {
-            LogManager::getSingleton().logError("binding shared parameters failed: " +
-                                                e.getDescription());
-        }
-        catch (Exception&) {}
-    }
-
 
     size_t GLSLShader::calculateSize(void) const
     {
