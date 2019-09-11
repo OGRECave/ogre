@@ -81,10 +81,6 @@ namespace Ogre {
         */
         void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
 
-        /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-        normally called by GLSLGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
-        */
-        void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
         /// Get the GL Handle for the program object
         GLhandleARB getGLHandle(void) const { return mGLProgramHandle; }
 

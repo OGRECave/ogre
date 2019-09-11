@@ -2007,22 +2007,22 @@ namespace Ogre {
         switch (gptype)
         {
         case GPT_VERTEX_PROGRAM:
-            program->updatePassIterationUniforms(mActiveVertexGpuProgramParameters);
+            program->updateUniforms(mActiveVertexGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
             break;
         case GPT_FRAGMENT_PROGRAM:
-            program->updatePassIterationUniforms(mActiveFragmentGpuProgramParameters);
+            program->updateUniforms(mActiveFragmentGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
             break;
         case GPT_GEOMETRY_PROGRAM:
-            program->updatePassIterationUniforms(mActiveGeometryGpuProgramParameters);
+            program->updateUniforms(mActiveGeometryGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
             break;
         case GPT_HULL_PROGRAM:
-            program->updatePassIterationUniforms(mActiveTessellationHullGpuProgramParameters);
+            program->updateUniforms(mActiveTessellationHullGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
             break;
         case GPT_DOMAIN_PROGRAM:
-            program->updatePassIterationUniforms(mActiveTessellationDomainGpuProgramParameters);
+            program->updateUniforms(mActiveTessellationDomainGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
             break;
         case GPT_COMPUTE_PROGRAM:
-            program->updatePassIterationUniforms(mActiveComputeGpuProgramParameters);
+            program->updateUniforms(mActiveComputeGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
             break;
         default:
             break;

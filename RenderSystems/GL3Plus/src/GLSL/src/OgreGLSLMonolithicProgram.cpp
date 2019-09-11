@@ -369,27 +369,4 @@ namespace Ogre {
         } // End for
     }
 
-    void GLSLMonolithicProgram::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
-    {
-        if (params->hasPassIterationNumber())
-        {
-            size_t index = params->getPassIterationNumberIndex();
-
-            GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
-            GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
-
-            // Need to find the uniform that matches the multi pass entry
-            for (;currentUniform != endUniform; ++currentUniform)
-            {
-                // Get the index in the parameter real list
-                if (index == currentUniform->mConstantDef->physicalIndex)
-                {
-                    OGRE_CHECK_GL_ERROR(glUniform1fv(currentUniform->mLocation, 1, params->getFloatPointer(index)));
-                    // There will only be one multipass entry
-                    return;
-                }
-            }
-        }
-    }
-
 } // namespace Ogre

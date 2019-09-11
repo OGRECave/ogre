@@ -393,39 +393,4 @@ namespace Ogre
             
         } // End for
     }
-    //-----------------------------------------------------------------------
-    void GLSLESProgramPipeline::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
-    {
-        if (params->hasPassIterationNumber())
-        {
-            size_t index = params->getPassIterationNumberIndex();
-            
-            GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
-            GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
-            
-            // Need to find the uniform that matches the multi pass entry
-            for (;currentUniform != endUniform; ++currentUniform)
-            {
-                // Get the index in the parameter real list
-                if (index == currentUniform->mConstantDef->physicalIndex)
-                {
-                    GLuint progID = 0;
-                    if (getVertexProgram() && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
-                    {
-                        progID = getVertexProgram()->getGLProgramHandle();
-                        OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
-                    }
-                    
-                    if (mFragmentProgram && currentUniform->mSourceProgType == GPT_FRAGMENT_PROGRAM)
-                    {
-                        progID = mFragmentProgram->getGLProgramHandle();
-                        OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
-                    }
-
-                    // There will only be one multipass entry
-                    return;
-                }
-            }
-        }
-    }
 }

@@ -64,10 +64,6 @@ namespace Ogre
          normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
          */
         virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-        /** Updates program pipeline object uniforms using data from pass iteration GpuProgramParameters.
-         normally called by GLSLESGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
-         */
-        virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
 
         /** Makes a program pipeline object active by making sure it is linked and then putting it in use.
          */
