@@ -99,12 +99,6 @@ namespace Ogre
         */
         void updateAtomicCounters(GpuProgramParametersSharedPtr params,
                                   uint16 mask, GpuProgramType fromProgType);
-        /** Updates program pipeline object uniforms using data from
-            pass iteration GpuProgramParameters.  Normally called by
-            GLSLShader::bindProgramPassIterationParameters() just
-            before multi pass rendering occurs.
-        */
-        void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
 
         /** Makes a program pipeline object active by making sure it
             is linked and then putting it in use.

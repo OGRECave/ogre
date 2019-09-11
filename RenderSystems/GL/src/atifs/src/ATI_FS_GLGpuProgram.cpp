@@ -89,19 +89,6 @@ void ATI_FS_GLGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr pa
 
 }
 
-
-void ATI_FS_GLGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
-{
-    if (params->hasPassIterationNumber())
-    {
-        size_t physicalIndex = params->getPassIterationNumberIndex();
-        size_t logicalIndex = params->getFloatLogicalIndexForPhysicalIndex(physicalIndex);
-        const float* pFloat = params->getFloatPointer(physicalIndex);
-        glSetFragmentShaderConstantATI( GL_CON_0_ATI + (GLuint)logicalIndex, pFloat);
-    }
-}
-
-
 void ATI_FS_GLGpuProgram::unloadImpl(void)
 {
     glDeleteFragmentShaderATI(mProgramID);

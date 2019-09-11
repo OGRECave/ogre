@@ -2795,13 +2795,13 @@ namespace Ogre {
         switch (gptype)
         {
         case GPT_VERTEX_PROGRAM:
-            mCurrentVertexProgram->bindProgramPassIterationParameters(mActiveVertexGpuProgramParameters);
+            mCurrentVertexProgram->bindProgramParameters(mActiveVertexGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
             break;
         case GPT_GEOMETRY_PROGRAM:
-            mCurrentGeometryProgram->bindProgramPassIterationParameters(mActiveGeometryGpuProgramParameters);
+            mCurrentGeometryProgram->bindProgramParameters(mActiveGeometryGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
             break;
         case GPT_FRAGMENT_PROGRAM:
-            mCurrentFragmentProgram->bindProgramPassIterationParameters(mActiveFragmentGpuProgramParameters);
+            mCurrentFragmentProgram->bindProgramParameters(mActiveFragmentGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
             break;
         case GPT_COMPUTE_PROGRAM:
         case GPT_DOMAIN_PROGRAM:

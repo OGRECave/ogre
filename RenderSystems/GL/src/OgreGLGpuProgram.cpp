@@ -152,20 +152,6 @@ void GLArbGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params
     }
 }
 
-void GLArbGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
-{
-    if (params->hasPassIterationNumber())
-    {
-        GLenum type = getProgramType();
-
-        size_t physicalIndex = params->getPassIterationNumberIndex();
-        size_t logicalIndex = params->getFloatLogicalIndexForPhysicalIndex(physicalIndex);
-        const float* pFloat = params->getFloatPointer(physicalIndex);
-        glProgramLocalParameter4fvARB(type, (GLuint)logicalIndex, pFloat);
-    }
-
-}
-
 void GLArbGpuProgram::unloadImpl(void)
 {
     glDeleteProgramsARB(1, &mProgramID);

@@ -98,11 +98,6 @@ public:
     */
     void updateUniformBlocks();
 
-    /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-        Normally called by GLSLShader::bindMultiPassParameters() just before multi pass rendering occurs.
-    */
-    virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
-
     /** Get the fixed attribute bindings normally used by GL for a semantic. */
     static int32 getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
 
