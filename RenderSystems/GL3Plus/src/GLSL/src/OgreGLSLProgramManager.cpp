@@ -500,7 +500,6 @@ namespace Ogre {
         const GpuConstantDefinitionMap* (&constantDefs)[6],
         GLUniformReferenceList& uniformList,
         GLAtomicCounterReferenceList& counterList,
-        GLUniformBufferList& uniformBufferList,
         SharedParamsBufferMap& sharedParamsBufferMap,
         // GLShaderStorageBufferList& shaderStorageBufferList,
         GLCounterBufferList& counterBufferList)

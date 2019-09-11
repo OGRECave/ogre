@@ -75,12 +75,7 @@ namespace Ogre {
             occurs.
         */
         void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-        /** Updates program object uniform blocks using data from
-            GpuProgramParameters.  normally called by
-            GLSLShader::bindParameters() just before rendering
-            occurs.
-        */
-        void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+
         /** Updates program object uniforms using data from pass
             iteration GpuProgramParameters.  normally called by
             GLSLShader::bindMultiPassParameters() just before multi

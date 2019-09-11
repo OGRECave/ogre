@@ -57,7 +57,6 @@ namespace Ogre {
 
     typedef std::vector<GLAtomicCounterReference> GLAtomicCounterReferenceList;
     typedef GLAtomicCounterReferenceList::iterator GLAtomicCounterReferenceIterator;
-    typedef std::map<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> SharedParamsBufferMap;
     typedef std::vector<HardwareCounterBufferSharedPtr> GLCounterBufferList;
     typedef GLCounterBufferList::iterator GLCounterBufferIterator;
 
@@ -99,8 +98,6 @@ namespace Ogre {
 
         /// Container of atomic counter uniform references that are active in the program object
         GLAtomicCounterReferenceList mGLAtomicCounterReferences;
-        /// Map of shared parameter blocks to uniform buffer references
-        SharedParamsBufferMap mSharedParamsBufferMap;
         /// Container of counter buffer references that are active in the program object
         GLCounterBufferList mGLCounterBufferReferences;
 

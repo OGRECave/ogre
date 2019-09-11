@@ -52,6 +52,7 @@ typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
 
 typedef std::vector<HardwareUniformBufferSharedPtr> GLUniformBufferList;
 typedef GLUniformBufferList::iterator GLUniformBufferIterator;
+typedef std::map<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> SharedParamsBufferMap;
 
 class GLSLProgramCommon
 {
@@ -93,9 +94,9 @@ public:
     virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
 
     /** Updates program object uniform blocks using data from GpuProgramParameters.
-        Normally called by GLSLShader::bindParameters() just before rendering occurs.
+        Normally called by GLRenderSystem::bindParameters() just before rendering occurs.
     */
-    virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
+    void updateUniformBlocks();
 
     /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
         Normally called by GLSLShader::bindMultiPassParameters() just before multi pass rendering occurs.
@@ -114,8 +115,8 @@ public:
 protected:
     /// Container of uniform references that are active in the program object
     GLUniformReferenceList mGLUniformReferences;
-    /// Container of uniform buffer references that are active in the program object
-    GLUniformBufferList mGLUniformBufferReferences;
+    /// Map of shared parameter blocks to uniform buffers
+    SharedParamsBufferMap mSharedParamsBufferMap;
 
     /// Linked vertex shader.
     GLSLShaderCommon* mVertexShader;

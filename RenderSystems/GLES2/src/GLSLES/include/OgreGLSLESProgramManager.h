@@ -118,7 +118,7 @@ namespace Ogre {
         static void extractUniforms(GLuint programObject,
             const GpuConstantDefinitionMap* vertexConstantDefs, 
             const GpuConstantDefinitionMap* fragmentConstantDefs,
-            GLUniformReferenceList& list, GLUniformBufferList& sharedList);
+            GLUniformReferenceList& list, SharedParamsBufferMap& sharedParamsBufferMap);
 
         static GLSLESProgramManager& getSingleton(void);
         static GLSLESProgramManager* getSingletonPtr(void);

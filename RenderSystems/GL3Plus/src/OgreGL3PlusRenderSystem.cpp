@@ -1986,7 +1986,7 @@ namespace Ogre {
             // for now, just copy
             params->_copySharedParams();
 
-            program->updateUniformBlocks(params, mask, gptype);
+            program->updateUniformBlocks();
             // program->updateShaderStorageBlock(params, mask, mType);
         }
 

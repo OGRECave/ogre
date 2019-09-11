@@ -269,9 +269,8 @@ namespace Ogre
             const GpuConstantDefinitionMap* params[6] = {NULL};
             params[i] = &(shaders[i]->getConstantDefinitions().map);
             GLSLProgramManager::getSingleton().extractUniformsFromProgram(
-                shaders[i]->getGLProgramHandle(), params, mGLUniformReferences,
-                mGLAtomicCounterReferences, mGLUniformBufferReferences, mSharedParamsBufferMap,
-                mGLCounterBufferReferences);
+                shaders[i]->getGLProgramHandle(), params, mGLUniformReferences, mGLAtomicCounterReferences,
+                mSharedParamsBufferMap, mGLCounterBufferReferences);
         }
 
         mUniformRefsBuilt = true;
@@ -594,84 +593,6 @@ namespace Ogre
         //     }
         // }
     }
-
-    void GLSLSeparableProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
-                                                   uint16 mask, GpuProgramType fromProgType)
-    {
-        //TODO Support uniform block arrays - need to figure how to do this via material.
-
-        // Iterate through the list of uniform blocks and update them as needed.
-        SharedParamsBufferMap::const_iterator currentPair = mSharedParamsBufferMap.begin();
-        SharedParamsBufferMap::const_iterator endPair = mSharedParamsBufferMap.end();
-
-        // const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-
-        // const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-        // GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
-
-        for (; currentPair != endPair; ++currentPair)
-        {
-            // force const call to get*Pointer
-            const GpuSharedParameters* paramsPtr = currentPair->first.get();
-
-            //FIXME Possible buffer does not exist if no associated uniform block.
-            HardwareUniformBuffer* hwGlBuffer = currentPair->second.get();
-
-            if (!paramsPtr->isDirty()) continue;
-
-            //FIXME does not check if current progrtype, or if shared param is active
-
-            GpuConstantDefinitionIterator parami = paramsPtr->getConstantDefinitionIterator();
-
-            for (int i = 0; parami.current() != parami.end(); parami.moveNext(), i++)
-            {
-                //String name = parami->;
-                //GpuConstantDefinition * param = GpuConstantConstantDefinition(name);
-
-                //const String* name = &parami.current()->first;
-                const GpuConstantDefinition* param = &parami.current()->second;
-
-                BaseConstantType baseType = GpuConstantDefinition::getBaseType(param->constType);
-
-                const void* dataPtr;
-
-                // NOTE: the naming is backward. this is the logical index
-                size_t index =  param->physicalIndex;
-
-                //TODO Maybe move to GpuSharedParams?  Otherwise create bool buffer.
-                switch (baseType)
-                {
-                case BCT_FLOAT:
-                    dataPtr = paramsPtr->getFloatPointer(index);
-                    break;
-                case BCT_INT:
-                    dataPtr = paramsPtr->getIntPointer(index);
-                    break;
-                case BCT_DOUBLE:
-                    dataPtr = paramsPtr->getDoublePointer(index);
-                    break;
-                case BCT_UINT:
-                case BCT_BOOL:
-                    dataPtr = paramsPtr->getUnsignedIntPointer(index);
-                    break;
-                case BCT_SAMPLER:
-                case BCT_SUBROUTINE:
-                    //TODO implement me!
-                default:
-                    //TODO error handling
-                    continue;
-                }
-
-                // in bytes
-                size_t length = param->arraySize * param->elementSize * 4;
-
-                // NOTE: the naming is backward. this is the physical offset in bytes
-                size_t offset = param->logicalIndex;
-                hwGlBuffer->writeData(offset, length, dataPtr);
-            }
-        }
-    }
-
 
     void GLSLSeparableProgram::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
     {

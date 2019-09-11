@@ -386,7 +386,7 @@ namespace Ogre {
     void GLSLESProgramManager::extractUniforms(GLuint programObject,
         const GpuConstantDefinitionMap* vertexConstantDefs, 
         const GpuConstantDefinitionMap* fragmentConstantDefs,
-        GLUniformReferenceList& list, GLUniformBufferList& sharedList)
+        GLUniformReferenceList& list, SharedParamsBufferMap& sharedParamsBufferMap)
     {
         // Scan through the active uniforms and add them to the reference list
         GLint uniformCount = 0;
@@ -456,7 +456,7 @@ namespace Ogre {
             delete[] uniformName;
         }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
+#if 0 // needs updating to GL3Plus code
         // Now deal with uniform blocks
 
         GLint blockCount = 0;

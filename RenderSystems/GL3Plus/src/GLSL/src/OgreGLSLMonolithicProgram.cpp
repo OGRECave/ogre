@@ -164,8 +164,8 @@ namespace Ogre {
 
         // Do we know how many shared params there are yet? Or if there are any blocks defined?
         GLSLProgramManager::getSingleton().extractUniformsFromProgram(
-            mGLProgramHandle, params, mGLUniformReferences, mGLAtomicCounterReferences,
-            mGLUniformBufferReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+            mGLProgramHandle, params, mGLUniformReferences, mGLAtomicCounterReferences, mSharedParamsBufferMap,
+            mGLCounterBufferReferences);
 
         mUniformRefsBuilt = true;
     }
@@ -368,35 +368,6 @@ namespace Ogre {
 
         } // End for
     }
-
-
-    void GLSLMonolithicProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
-                                                    uint16 mask, GpuProgramType fromProgType)
-    {
-        // Iterate through the list of uniform buffers and update them as needed
-        GLUniformBufferIterator currentBuffer = mGLUniformBufferReferences.begin();
-        GLUniformBufferIterator endBuffer = mGLUniformBufferReferences.end();
-
-        const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-
-        GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
-        for (it = sharedParams.begin(); it != end; ++it)
-        {
-            for (;currentBuffer != endBuffer; ++currentBuffer)
-            {
-                GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(currentBuffer->get());
-                GpuSharedParametersPtr paramsPtr = it->getSharedParams();
-
-                // Block name is stored in mSharedParams->mName of GpuSharedParamUsageList items
-                GLint UniformTransform;
-                OGRE_CHECK_GL_ERROR(UniformTransform = glGetUniformBlockIndex(mGLProgramHandle, it->getName().c_str()));
-                OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, UniformTransform, hwGlBuffer->getGLBufferBinding()));
-
-                hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
-            }
-        }
-    }
-
 
     void GLSLMonolithicProgram::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
     {
