@@ -3561,13 +3561,6 @@ namespace Ogre
     void D3D9RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, 
         const GpuProgramParametersPtr& params, uint16 variability)
     {
-        // special case pass iteration
-        if (variability == (uint16)GPV_PASS_ITERATION_NUMBER)
-        {
-            bindGpuProgramPassIterationParameters(gptype);
-            return;
-        }
-        
         if (variability & (uint16)GPV_GLOBAL)
         {
             // D3D9 doesn't support shared constant buffers, so use copy routine
@@ -3696,47 +3689,16 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9RenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
     {
-
-        HRESULT hr;
-        size_t physicalIndex = 0;
-        size_t logicalIndex = 0;
-        const float* pFloat;
-
-        switch(gptype)
+        switch (gptype)
         {
-        case GPT_VERTEX_PROGRAM:
-            if (mActiveVertexGpuProgramParameters->hasPassIterationNumber())
-            {
-                physicalIndex = mActiveVertexGpuProgramParameters->getPassIterationNumberIndex();
-                logicalIndex = mActiveVertexGpuProgramParameters->getFloatLogicalIndexForPhysicalIndex(physicalIndex);
-                pFloat = mActiveVertexGpuProgramParameters->getFloatPointer(physicalIndex);
-
-                if (FAILED(hr = getActiveD3D9Device()->SetVertexShaderConstantF(
-                    static_cast<UINT>(logicalIndex), pFloat, 1)))
-                {
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "Unable to upload vertex shader multi pass parameters", 
-                        "D3D9RenderSystem::bindGpuProgramMultiPassParameters");
-                }
-            }
-            break;
-
-        case GPT_FRAGMENT_PROGRAM:
-            if (mActiveFragmentGpuProgramParameters->hasPassIterationNumber())
-            {
-                physicalIndex = mActiveFragmentGpuProgramParameters->getPassIterationNumberIndex();
-                logicalIndex = mActiveFragmentGpuProgramParameters->getFloatLogicalIndexForPhysicalIndex(physicalIndex);
-                pFloat = mActiveFragmentGpuProgramParameters->getFloatPointer(physicalIndex);
-                if (FAILED(hr = getActiveD3D9Device()->SetPixelShaderConstantF(
-                    static_cast<UINT>(logicalIndex), pFloat, 1)))
-                {
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "Unable to upload pixel shader multi pass parameters", 
-                        "D3D9RenderSystem::bindGpuProgramMultiPassParameters");
-                }
-            }
-            break;
-
+            case GPT_VERTEX_PROGRAM:
+                bindGpuProgramParameters(gptype, mActiveVertexGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
+                break;
+            case GPT_FRAGMENT_PROGRAM:
+                bindGpuProgramParameters(gptype, mActiveFragmentGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
+                break;
+            default:
+                break;
         }
     }
     //---------------------------------------------------------------------
