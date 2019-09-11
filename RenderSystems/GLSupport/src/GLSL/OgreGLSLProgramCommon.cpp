@@ -239,4 +239,65 @@ int32 GLSLProgramCommon::getFixedAttributeIndex(VertexElementSemantic semantic, 
 
     return attributeIndex[semantic];
 }
+
+void GLSLProgramCommon::updateUniformBlocks()
+{
+    //TODO Maybe move to GpuSharedParams?
+    //TODO Support uniform block arrays - need to figure how to do this via material.
+
+    // const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
+
+    // Iterate through the list of uniform blocks and update them as needed.
+    for (const auto& currentPair : mSharedParamsBufferMap)
+    {
+        // force const call to get*Pointer
+        const GpuSharedParameters* paramsPtr = currentPair.first.get();
+
+        if (!paramsPtr->isDirty()) continue;
+
+        //FIXME Possible buffer does not exist if no associated uniform block.
+        HardwareUniformBuffer* hwGlBuffer = currentPair.second.get();
+
+        //FIXME does not check if current progrtype, or if shared param is active
+
+        for (const auto& parami : paramsPtr->getConstantDefinitions().map)
+        {
+            const GpuConstantDefinition& param = parami.second;
+
+            BaseConstantType baseType = GpuConstantDefinition::getBaseType(param.constType);
+
+            // NOTE: the naming is backward. this is the logical index
+            size_t index =  param.physicalIndex;
+
+            const void* dataPtr;
+            switch (baseType)
+            {
+            case BCT_FLOAT:
+                dataPtr = paramsPtr->getFloatPointer(index);
+                break;
+            case BCT_UINT:
+            case BCT_BOOL:
+            case BCT_INT:
+                dataPtr = paramsPtr->getIntPointer(index);
+                break;
+            case BCT_DOUBLE:
+                dataPtr = paramsPtr->getDoublePointer(index);
+                break;
+            case BCT_SAMPLER:
+            case BCT_SUBROUTINE:
+                //TODO implement me!
+            default:
+                //TODO error handling
+                continue;
+            }
+
+            // in bytes
+            size_t length = param.arraySize * param.elementSize * 4;
+
+            // NOTE: the naming is backward. this is the physical offset in bytes
+            size_t offset = param.logicalIndex;
+            hwGlBuffer->writeData(offset, length, dataPtr);
+        }
+    }
+}
 } /* namespace Ogre */

@@ -209,14 +209,14 @@ namespace Ogre
                 vertParams = &(getVertexProgram()->getConstantDefinitions().map);
                 GLSLESProgramManager::extractUniforms(getVertexProgram()->getGLProgramHandle(),
                                                       vertParams, NULL, mGLUniformReferences,
-                                                      mGLUniformBufferReferences);
+                                                      mSharedParamsBufferMap);
             }
             if (mFragmentProgram)
             {
                 fragParams = &(mFragmentProgram->getConstantDefinitions().map);
                 GLSLESProgramManager::extractUniforms(mFragmentProgram->getGLProgramHandle(), NULL,
                                                       fragParams, mGLUniformReferences,
-                                                      mGLUniformBufferReferences);
+                                                      mSharedParamsBufferMap);
             }
 
             mUniformRefsBuilt = true;
@@ -392,35 +392,6 @@ namespace Ogre
             } // fromProgType == currentUniform->mSourceProgType
             
         } // End for
-    }
-    //-----------------------------------------------------------------------
-    void GLSLESProgramPipeline::updateUniformBlocks(GpuProgramParametersSharedPtr params,
-                                                  uint16 mask, GpuProgramType fromProgType)
-    {
-#if OGRE_NO_GLES3_SUPPORT == 0
-        // Iterate through the list of uniform buffers and update them as needed
-        GLUniformBufferIterator currentBuffer = mGLUniformBufferReferences.begin();
-        GLUniformBufferIterator endBuffer = mGLUniformBufferReferences.end();
-
-        const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-
-        GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
-        for (it = sharedParams.begin(); it != end; ++it)
-        {
-            for (;currentBuffer != endBuffer; ++currentBuffer)
-            {
-                GLES2HardwareUniformBuffer* hwGlBuffer = static_cast<GLES2HardwareUniformBuffer*>(currentBuffer->get());
-                GpuSharedParametersPtr paramsPtr = it->getSharedParams();
-
-                // Block name is stored in mSharedParams->mName of GpuSharedParamUsageList items
-                GLint UniformTransform;
-                OGRE_CHECK_GL_ERROR(UniformTransform = glGetUniformBlockIndex(mGLProgramHandle, it->getName().c_str()));
-                OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, UniformTransform, hwGlBuffer->getGLBufferBinding()));
-
-                hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
-            }
-        }
-#endif
     }
     //-----------------------------------------------------------------------
     void GLSLESProgramPipeline::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)

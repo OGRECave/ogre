@@ -1948,7 +1948,7 @@ namespace Ogre {
         {
             GLSLESProgramCommon* program = GLSLESProgramManager::getSingleton().getActiveProgram();
             // Pass on parameters from params to program object uniforms
-            program->updateUniformBlocks(params, mask, gptype);
+            program->updateUniformBlocks();
             program->updateUniforms(params, mask, gptype);
         }
         catch (Exception& e) {}
