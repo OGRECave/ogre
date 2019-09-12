@@ -1940,19 +1940,6 @@ namespace Ogre {
 
     void GLES2RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask)
     {
-        // Just copy
-        params->_copySharedParams();
-
-        // Link can throw exceptions, ignore them at this point
-        try
-        {
-            GLSLESProgramCommon* program = GLSLESProgramManager::getSingleton().getActiveProgram();
-            // Pass on parameters from params to program object uniforms
-            program->updateUniformBlocks();
-            program->updateUniforms(params, mask, gptype);
-        }
-        catch (Exception& e) {}
-
         switch (gptype)
         {
             case GPT_VERTEX_PROGRAM:
@@ -1964,23 +1951,26 @@ namespace Ogre {
             default:
                 break;
         }
-    }
 
-    void GLES2RenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
-    {
-        GLSLESProgramCommon* program = GLSLESProgramManager::getSingleton().getActiveProgram();
+        GLSLESProgramCommon* program = NULL;
 
-        // Pass on parameters from params to program object uniforms
-        switch (gptype)
+        // Link can throw exceptions, ignore them at this point
+        try
         {
-            case GPT_VERTEX_PROGRAM:
-                program->updateUniforms(mActiveVertexGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
-                break;
-            case GPT_FRAGMENT_PROGRAM:
-                program->updateUniforms(mActiveFragmentGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
-                break;
-            default:
-                break;
+            program = GLSLESProgramManager::getSingleton().getActiveProgram();
+            // Pass on parameters from params to program object uniforms
+            program->updateUniforms(params, mask, gptype);
+        }
+        catch (Exception& e)
+        {
+            return;
+        }
+
+        if (mask & (uint16)GPV_GLOBAL)
+        {
+            // Just copy
+            params->_copySharedParams();
+            program->updateUniformBlocks();
         }
     }
 

@@ -333,7 +333,8 @@ ADD_REPR(ColourValue)
 %include "OgreNameGenerator.h"
 %include "OgreController.h"
 %include "OgreRenderSystemCapabilities.h"
-%ignore Ogre::GpuProgramParameters::getAutoConstantIterator; // deprecated
+%ignore Ogre::GpuProgramParameters::hasPassIterationNumber; // deprecated
+%ignore Ogre::GpuProgramParameters::getPassIterationNumberIndex; // deprecated
 %include "OgreGpuProgramParams.h"
 %include "OgreImage.h"
 %include "OgreBillboard.h"
@@ -468,6 +469,7 @@ SHARED_PTR(Material);
 %template(Techniques) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
 %ignore Ogre::RenderSystem::_setBindingType;
+%ignore Ogre::RenderSystem::bindGpuProgramPassIterationParameters;
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 #ifdef SWIGJAVA

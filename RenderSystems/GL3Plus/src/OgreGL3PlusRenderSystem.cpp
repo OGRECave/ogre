@@ -1999,36 +1999,6 @@ namespace Ogre {
         // static_cast<GL3PlusTextureManager*>(mTextureManager)->bindImages();
     }
 
-    void GL3PlusRenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
-    {
-        GLSLProgram* program = GLSLProgramManager::getSingleton().getActiveProgram();
-
-        // Pass on parameters from params to program object uniforms.
-        switch (gptype)
-        {
-        case GPT_VERTEX_PROGRAM:
-            program->updateUniforms(mActiveVertexGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            program->updateUniforms(mActiveFragmentGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            program->updateUniforms(mActiveGeometryGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
-            break;
-        case GPT_HULL_PROGRAM:
-            program->updateUniforms(mActiveTessellationHullGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            program->updateUniforms(mActiveTessellationDomainGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            program->updateUniforms(mActiveComputeGpuProgramParameters, GPV_PASS_ITERATION_NUMBER, gptype);
-            break;
-        default:
-            break;
-        }
-    }
-
     void GL3PlusRenderSystem::registerThread()
     {
         OGRE_LOCK_MUTEX(mThreadInitMutex);
