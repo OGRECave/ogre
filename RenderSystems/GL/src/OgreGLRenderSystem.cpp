@@ -2790,26 +2790,6 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void GLRenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
-    {
-        switch (gptype)
-        {
-        case GPT_VERTEX_PROGRAM:
-            mCurrentVertexProgram->bindProgramParameters(mActiveVertexGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mCurrentGeometryProgram->bindProgramParameters(mActiveGeometryGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mCurrentFragmentProgram->bindProgramParameters(mActiveFragmentGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
-            break;
-        case GPT_COMPUTE_PROGRAM:
-        case GPT_DOMAIN_PROGRAM:
-        case GPT_HULL_PROGRAM:
-            break;
-        }
-    }
-    //---------------------------------------------------------------------
     void GLRenderSystem::setClipPlanesImpl(const PlaneList& clipPlanes)
     {
         // A note on GL user clipping:

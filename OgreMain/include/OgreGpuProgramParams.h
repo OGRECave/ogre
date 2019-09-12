@@ -2013,11 +2013,11 @@ namespace Ogre {
         /** increments the multipass number entry by 1 if it exists
          */
         void incPassIterationNumber(void);
-        /** Does this parameters object have a pass iteration number constant? */
-        bool hasPassIterationNumber() const
+        /// @deprecated query by GPV_PASS_ITERATION_NUMBER instead
+        OGRE_DEPRECATED bool hasPassIterationNumber() const
         { return mActivePassIterationIndex != (std::numeric_limits<size_t>::max)(); }
-        /** Get the physical buffer index of the pass iteration number constant */
-        size_t getPassIterationNumberIndex() const
+        /// @deprecated query by GPV_PASS_ITERATION_NUMBER instead
+        OGRE_DEPRECATED size_t getPassIterationNumberIndex() const
         { return mActivePassIterationIndex; }
 
 

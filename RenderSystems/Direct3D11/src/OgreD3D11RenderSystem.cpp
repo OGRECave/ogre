@@ -3061,33 +3061,6 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
-    {
-
-        switch(gptype)
-        {
-        case GPT_VERTEX_PROGRAM:
-            bindGpuProgramParameters(gptype, mActiveVertexGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
-            break;
-
-        case GPT_FRAGMENT_PROGRAM:
-            bindGpuProgramParameters(gptype, mActiveFragmentGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            bindGpuProgramParameters(gptype, mActiveGeometryGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
-            break;
-        case GPT_HULL_PROGRAM:
-            bindGpuProgramParameters(gptype, mActiveTessellationHullGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            bindGpuProgramParameters(gptype, mActiveTessellationDomainGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            bindGpuProgramParameters(gptype, mActiveComputeGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
-            break;
-        }
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::setSubroutine(GpuProgramType gptype, unsigned int slotIndex, const String& subroutineName)
     {
         ID3D11ClassInstance* instance = 0;

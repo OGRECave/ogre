@@ -251,7 +251,6 @@ namespace Ogre {
             void bindGpuProgram(GpuProgram* prg);
             void unbindGpuProgram(GpuProgramType gptype);
             void bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask);
-            void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 
             /// @copydoc RenderSystem::_setSeparateSceneBlending
             void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );

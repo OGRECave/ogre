@@ -3687,21 +3687,6 @@ namespace Ogre
         };
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
-    {
-        switch (gptype)
-        {
-            case GPT_VERTEX_PROGRAM:
-                bindGpuProgramParameters(gptype, mActiveVertexGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
-                break;
-            case GPT_FRAGMENT_PROGRAM:
-                bindGpuProgramParameters(gptype, mActiveFragmentGpuProgramParameters, GPV_PASS_ITERATION_NUMBER);
-                break;
-            default:
-                break;
-        }
-    }
-    //---------------------------------------------------------------------
     void D3D9RenderSystem::setClipPlanesImpl(const PlaneList& clipPlanes)
     {
         size_t i;
