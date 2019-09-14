@@ -207,46 +207,31 @@ material exampleGLSLmatrixUniforms
 
 ## Binding vertex attributes {#Binding-vertex-attributes}
 
-Vertex attributes must be declared in the shader using the `attribute &lt;type&gt; &lt;name&gt;` syntax, and the vertex data bound to it by Ogre.
+Vertex attributes must be declared in the shader, for the vertex data bound to it by Ogre.
 
-<dl compact="compact">
-<dt>vertex</dt> <dd>
+```cpp
+// legacy GLSL syntax
+attribute vec4 vertex;
 
-Binds Ogre::VES\_POSITION, declare as ’attribute vec4 vertex;’.
+// modern GLSL syntax with explicit layout qualifier
+layout(location = 0) in vec4 vertex;
+```
 
-</dd> <dt>normal</dt> <dd>
+refer to the following table for the location indices and names to use:
 
-Binds Ogre::VES\_NORMAL, declare as ’attribute vec3 normal;’.
+| Semantic | Custom name | Binding location | Legacy OpenGL built-in |
+|----------|------|------------------|-----------------------|
+| Ogre::VES_POSITION | vertex | 0 | gl_Vertex |
+| Ogre::VES_BLEND_WEIGHTS | blendWeights | 1 | n/a |
+| Ogre::VES_NORMAL | normal | 2 | gl_Normal |
+| Ogre::VES_DIFFUSE | colour | 3 | gl_Color |
+| Ogre::VES_SPECULAR | secondary_colour | 4 | gl_SecondaryColor |
+| Ogre::VES_BLEND_INDICES | blendIndices | 7 | n/a |
+| Ogre::VES_TEXTURE_COORDINATES | uv0 - uv7 | 8-15 | gl_MultiTexCoord0 - gl_MultiTexCoord7 |
+| Ogre::VES_TANGENT | tangent | 14 | n/a |
+| Ogre::VES_BINORMAL | binormal | 15 | n/a |
 
-</dd> <dt>colour</dt> <dd>
-
-Binds Ogre::VES\_DIFFUSE, declare as ’attribute vec4 colour;’.
-
-</dd> <dt>secondary\_colour</dt> <dd>
-
-Binds Ogre::VES\_SPECULAR, declare as ’attribute vec4 secondary\_colour;’.
-
-</dd> <dt>uv0 - uv7</dt> <dd>
-
-Binds Ogre::VES\_TEXTURE\_COORDINATES, declare as ’attribute vec4 uv0;’. Note that uv6 and uv7 share attributes with tangent and binormal respectively so cannot both be present.
-
-</dd> <dt>tangent</dt> <dd>
-
-Binds Ogre::VES\_TANGENT, declare as ’attribute vec3 tangent;’.
-
-</dd> <dt>binormal</dt> <dd>
-
-Binds Ogre::VES\_BINORMAL, declare as ’attribute vec3 binormal;’.
-
-</dd> <dt>blendIndices</dt> <dd>
-
-Binds Ogre::VES\_BLEND\_INDICES, declare as ’attribute vec4 blendIndices;’.
-
-</dd> <dt>blendWeights</dt> <dd>
-
-Binds Ogre::VES\_BLEND\_WEIGHTS, declare as ’attribute vec4 blendWeights;’.
-
-</dd> </dl>
+@note uv6 and uv7 share attributes with tangent and binormal respectively so cannot both be present.
 
 ## Compatibility profile GLSL features {#Legacy-GLSL-features}
 
