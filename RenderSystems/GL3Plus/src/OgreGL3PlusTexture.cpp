@@ -122,16 +122,6 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0);
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
 
-        // Set some misc default parameters, these can of course be changed later.
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
-                                            GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
-                                            GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
-                                            GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
-                                            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
         // Set up texture swizzling.
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN);

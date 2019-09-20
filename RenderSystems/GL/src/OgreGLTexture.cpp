@@ -150,15 +150,6 @@ namespace Ogre {
             mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(),
                 GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
         
-        // Set some misc default parameters so NVidia won't complain, these can of course be changed later
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        if (GLEW_VERSION_1_2)
-        {
-            mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        }
-
         if ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps)
         {
             mRenderSystem->_getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
