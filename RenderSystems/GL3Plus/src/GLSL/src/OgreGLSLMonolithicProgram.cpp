@@ -65,7 +65,10 @@ namespace Ogre {
         {
             uint32 hash = getCombinedHash();
 
-            OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+            if(mGLProgramHandle == 0)
+            {
+                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+            }
 
             if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
                  GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
