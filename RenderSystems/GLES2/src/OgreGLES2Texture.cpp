@@ -128,19 +128,9 @@ namespace Ogre {
         if(mRenderSystem->hasMinGLVersion(3, 0) || mRenderSystem->checkExtension("GL_APPLE_texture_max_level"))
             mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, mNumRequestedMipmaps ? mNumMipmaps + 1 : 0);
 
-        // Set some misc default parameters, these can of course be changed later
         if(mTextureType == TEX_TYPE_EXTERNAL_OES && mNumRequestedMipmaps > 0) {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Mipmaps are not available for TEX_TYPE_EXTERNAL_OES", "GLES2Texture::_createGLTexResource");
         }
-
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, 
-                                                            GL_TEXTURE_MIN_FILTER, ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
-                                                            GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
-                                                            GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget,
-                                                            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         bool hasGLES30 = mRenderSystem->hasMinGLVersion(3, 0);
 
