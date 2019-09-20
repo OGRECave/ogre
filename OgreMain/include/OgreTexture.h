@@ -103,7 +103,7 @@ namespace Ogre {
         TEX_TYPE_CUBE_MAP = 4,
         /// 2D texture array
         TEX_TYPE_2D_ARRAY = 5,
-        /// 2D non-square texture, used in combination with 2D texture coordinates
+        /// @deprecated do not use. Not support by any of the current rendersystems.
         TEX_TYPE_2D_RECT = 6,
         /// GLES2 only OES texture type
         TEX_TYPE_EXTERNAL_OES = 7
