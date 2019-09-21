@@ -36,6 +36,12 @@ THE SOFTWARE.
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
 
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+#   define WIN32_LEAN_AND_MEAN
+#   include <windows.h>
+#   include <stringapiset.h>
+#endif
+
 namespace Ogre {
 namespace {
     class ZipArchive : public Archive
@@ -46,11 +52,11 @@ namespace {
         /// File list (since zziplib seems to only allow scanning of dir tree once)
         FileInfoList mFileList;
         /// A pointer to file io alternative implementation
-        zzip_plugin_io_handlers* mPluginIo;
+        const zzip_plugin_io_handlers* mPluginIo;
 
         OGRE_AUTO_MUTEX;
     public:
-        ZipArchive(const String& name, const String& archType, zzip_plugin_io_handlers* pluginIo = NULL);
+        ZipArchive(const String& name, const String& archType, const zzip_plugin_io_handlers* pluginIo);
         ~ZipArchive();
         /// @copydoc Archive::isCaseSensitive
         bool isCaseSensitive(void) const { return OGRE_RESOURCEMANAGER_STRICT != 0; }
@@ -159,11 +165,43 @@ namespace {
         return StringUtil::format("%s '%s'", errorMsg, file.c_str());
     }
 
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+    int wopen_wrapper(const char* filename, int oflag, ...)
+    {
+        int utf16Length = ::MultiByteToWideChar(CP_UTF8, 0, filename, (int)strlen(filename), NULL, 0);
+        if (utf16Length > 0)
+        {
+            std::wstring wt;
+            wt.resize(utf16Length);
+            if (0 != ::MultiByteToWideChar(CP_UTF8, 0, filename, (int)strlen(filename), &wt[0],
+                                           (int)wt.size()))
+                return _wopen(wt.c_str(), oflag);
+        }
+
+        return -1;
+    }
+#endif
+    const zzip_plugin_io_handlers* getDefaultIO()
+    {
+        static zzip_plugin_io_handlers defaultIO;
+        static bool isInit = false;
+
+        if (!isInit)
+        {
+            zzip_init_io(&defaultIO, 1);
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+            defaultIO.fd.open = wopen_wrapper;
+#endif
+            isInit = true;
+        }
+
+        return &defaultIO;
+    }
     /// A static pointer to file io alternative implementation for the embedded files
     zzip_plugin_io_handlers* gPluginIo = NULL;
 }
     //-----------------------------------------------------------------------
-    ZipArchive::ZipArchive(const String& name, const String& archType, zzip_plugin_io_handlers* pluginIo)
+    ZipArchive::ZipArchive(const String& name, const String& archType, const zzip_plugin_io_handlers* pluginIo)
         : Archive(name, archType), mZzipDir(0), mPluginIo(pluginIo)
     {
     }
@@ -502,7 +540,7 @@ namespace {
         if(!readOnly)
             return NULL;
 
-        return OGRE_NEW ZipArchive(name, getType());
+        return OGRE_NEW ZipArchive(name, getType(), getDefaultIO());
     }
     //-----------------------------------------------------------------------
     const String& ZipArchiveFactory::getType(void) const
