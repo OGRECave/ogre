@@ -2985,17 +2985,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLRenderSystem::_oneTimeContextInitialization()
     {
-        if (GLEW_VERSION_1_2)
-        {
-            // Set nicer lighting model -- d3d9 has this by default
-            glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
-            glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);        
-        }
-        if (GLEW_VERSION_1_4)
-        {
-            mStateCacheManager->setEnabled(GL_COLOR_SUM, true);
-            mStateCacheManager->setEnabled(GL_DITHER, false);
-        }
+        // Set nicer lighting model -- d3d9 has this by default
+        glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+        glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
+        mStateCacheManager->setEnabled(GL_COLOR_SUM, true);
+        mStateCacheManager->setEnabled(GL_DITHER, false);
 
         // Check for FSAA
         // Enable the extension if it was enabled by the GLSupport
