@@ -181,6 +181,7 @@ namespace {
         return -1;
     }
 #endif
+
     const zzip_plugin_io_handlers* getDefaultIO()
     {
         static zzip_plugin_io_handlers defaultIO;
@@ -197,8 +198,6 @@ namespace {
 
         return &defaultIO;
     }
-    /// A static pointer to file io alternative implementation for the embedded files
-    zzip_plugin_io_handlers* gPluginIo = NULL;
 }
     //-----------------------------------------------------------------------
     ZipArchive::ZipArchive(const String& name, const String& archType, const zzip_plugin_io_handlers* pluginIo)
@@ -532,7 +531,6 @@ namespace {
         mCache.clear();
     }
     //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
     //  ZipArchiveFactory
     //-----------------------------------------------------------------------
     Archive *ZipArchiveFactory::createInstance( const String& name, bool readOnly )
@@ -574,7 +572,6 @@ namespace {
     FileNameToIndexMap * EmbeddedZipArchiveFactory_mFileNameToIndexMap;
     /// A static list to store the embedded files data
     EmbbedFileDataList * EmbeddedZipArchiveFactory_mEmbbedFileDataList;
-    _zzip_plugin_io sEmbeddedZipArchiveFactory_PluginIo;
     #define EMBED_IO_BAD_FILE_HANDLE (-1)
     #define EMBED_IO_SUCCESS (0)
     //-----------------------------------------------------------------------
@@ -734,32 +731,25 @@ namespace {
         // the files in this case are read only - return an error  - nonzero value.
         return -1;
     }
+
+    /// A static pointer to file io alternative implementation for the embedded files
+    const zzip_plugin_io_handlers* getEmbeddedZipIO()
+    {
+        static zzip_plugin_io_handlers embeddedZipIO = {
+            {EmbeddedZipArchiveFactory_open, EmbeddedZipArchiveFactory_close,
+             EmbeddedZipArchiveFactory_read, EmbeddedZipArchiveFactory_seeks,
+             EmbeddedZipArchiveFactory_filesize, 1, 1, EmbeddedZipArchiveFactory_write}};
+        return &embeddedZipIO;
+    }
+
     } // namespace {
     //-----------------------------------------------------------------------
-    EmbeddedZipArchiveFactory::EmbeddedZipArchiveFactory()
-    {
-        // init static member
-        if (gPluginIo == NULL)
-        {
-            gPluginIo = &sEmbeddedZipArchiveFactory_PluginIo;
-            gPluginIo->fd.open = EmbeddedZipArchiveFactory_open;
-            gPluginIo->fd.close = EmbeddedZipArchiveFactory_close;
-            gPluginIo->fd.read = EmbeddedZipArchiveFactory_read;
-            gPluginIo->fd.seeks = EmbeddedZipArchiveFactory_seeks;
-            gPluginIo->fd.filesize = EmbeddedZipArchiveFactory_filesize;
-            gPluginIo->fd.write = EmbeddedZipArchiveFactory_write;
-            gPluginIo->fd.sys = 1;
-            gPluginIo->fd.type = 1;
-        }
-    }
-    //-----------------------------------------------------------------------
-    EmbeddedZipArchiveFactory::~EmbeddedZipArchiveFactory()
-    {
-    }
+    EmbeddedZipArchiveFactory::EmbeddedZipArchiveFactory() {}
+    EmbeddedZipArchiveFactory::~EmbeddedZipArchiveFactory() {}
     //-----------------------------------------------------------------------
     Archive *EmbeddedZipArchiveFactory::createInstance( const String& name, bool readOnly )
     {
-        ZipArchive * resZipArchive = OGRE_NEW ZipArchive(name, getType(), gPluginIo);
+        ZipArchive * resZipArchive = OGRE_NEW ZipArchive(name, getType(), getEmbeddedZipIO());
         return resZipArchive;
     }
     //-----------------------------------------------------------------------
