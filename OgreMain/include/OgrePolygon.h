@@ -69,8 +69,8 @@ namespace Ogre
 
     public:
         Polygon();
-        ~Polygon();
-        Polygon( const Polygon& cpy );
+        ~Polygon() = default;
+        Polygon( const Polygon& cpy ) = default;
 
         /** Inserts a vertex at a specific position.
         @note Vertices must be coplanar.

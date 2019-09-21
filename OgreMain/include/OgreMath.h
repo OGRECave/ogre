@@ -60,6 +60,7 @@ namespace Ogre
 
     public:
         explicit Radian ( Real r=0 ) : mRad(r) {}
+        constexpr Radian(const Radian&) = default;
         Radian ( const Degree& d );
         Radian& operator = ( const Real& f ) { mRad = f; return *this; }
         Radian& operator = ( const Radian& r ) { mRad = r.mRad; return *this; }
@@ -111,6 +112,7 @@ namespace Ogre
 
     public:
         explicit Degree ( Real d=0 ) : mDeg(d) {}
+        constexpr Degree(const Degree&) = default;
         Degree ( const Radian& r ) : mDeg(r.valueDegrees()) {}
         Degree& operator = ( const Real& f ) { mDeg = f; return *this; }
         Degree& operator = ( const Degree& d ) { mDeg = d.mDeg; return *this; }

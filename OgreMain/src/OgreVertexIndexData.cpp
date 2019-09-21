@@ -742,9 +742,7 @@ namespace Ogre {
 
         uint32 a, b, c;     
 
-        inline Triangle()
-        {
-        }
+        inline Triangle() = default;
 
         inline Triangle( uint32 ta, uint32 tb, uint32 tc ) 
             : a( ta ), b( tb ), c( tc )
@@ -756,10 +754,7 @@ namespace Ogre {
         {
         }
 
-        inline Triangle( const Triangle& t )
-            : a( t.a ), b( t.b ), c( t.c )
-        {
-        }
+        inline Triangle( const Triangle& t ) = default;
 
         inline bool sharesEdge(const Triangle& t) const
         {

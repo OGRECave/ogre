@@ -41,17 +41,6 @@ namespace Ogre
         mVertexList.reserve(6);
     }
     //-----------------------------------------------------------------------
-    Polygon::~Polygon()
-    {
-    }
-    //-----------------------------------------------------------------------
-    Polygon::Polygon( const Polygon& cpy )
-    {
-        mVertexList = cpy.mVertexList;
-        mNormal = cpy.mNormal;
-        mIsNormalSet = cpy.mIsNormalSet;
-    }
-    //-----------------------------------------------------------------------
     void Polygon::insertVertex(const Vector3& vdata, size_t vertex )
     {
         // TODO: optional: check planarity

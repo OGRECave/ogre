@@ -56,6 +56,9 @@ namespace Ogre {
     class _OgreExport Quaternion
     {
     public:
+
+        constexpr Quaternion(const Ogre::Quaternion&) = default;
+
         /// Default constructor, initializes to identity rotation (aka 0°)
         inline Quaternion ()
             : w(1), x(0), y(0), z(0)

@@ -58,12 +58,12 @@ namespace Ogre {
     {
     public:
         SharedPtr(std::nullptr_t) {}
-        SharedPtr() {}
+        SharedPtr() = default;
         template< class Y>
         explicit SharedPtr(Y* ptr) : shared_ptr<T>(ptr) {}
         template< class Y, class Deleter >
         SharedPtr( Y* ptr, Deleter d ) : shared_ptr<T>(ptr, d) {}
-        SharedPtr(const SharedPtr& r) : shared_ptr<T>(r) {}
+        SharedPtr(const SharedPtr& r) = default;
         template<class Y>
         SharedPtr(const SharedPtr<Y>& r) : shared_ptr<T>(r) {}
 
@@ -71,7 +71,6 @@ namespace Ogre {
         template<class Y>
         SharedPtr(const shared_ptr<Y>& r) : shared_ptr<T>(r) {}
         operator const shared_ptr<T>&() { return static_cast<shared_ptr<T>&>(*this); }
-
         // so swig recognizes it should forward the operators
         T* operator->() const { return shared_ptr<T>::operator->(); }
 

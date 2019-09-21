@@ -241,8 +241,8 @@ namespace Ogre {
     class _OgreOverlayExport _fwd_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
             friend class _const_fwd_iterator;
         public:
-            _fwd_iterator();
-            _fwd_iterator( const _fwd_iterator& i );
+            _fwd_iterator() = default;
+            _fwd_iterator( const _fwd_iterator& i ) = default;
 
             //! pre-increment
             _fwd_iterator& operator++();
@@ -286,8 +286,8 @@ namespace Ogre {
         //! const forward iterator for UTFString
     class _OgreOverlayExport _const_fwd_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
         public:
-            _const_fwd_iterator();
-            _const_fwd_iterator( const _const_fwd_iterator& i );
+            _const_fwd_iterator() = default;
+            _const_fwd_iterator( const _const_fwd_iterator& i ) = default;
             _const_fwd_iterator( const _fwd_iterator& i );
 
             //! pre-increment
@@ -348,8 +348,8 @@ namespace Ogre {
     class _OgreOverlayExport _rev_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
             friend class _const_rev_iterator;
         public:
-            _rev_iterator();
-            _rev_iterator( const _rev_iterator& i );
+            _rev_iterator() = default;
+            _rev_iterator( const _rev_iterator& i ) = default;
 
             //! pre-increment
             _rev_iterator& operator++();
@@ -381,8 +381,8 @@ namespace Ogre {
         //! const reverse iterator for UTFString
     class _OgreOverlayExport _const_rev_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
         public:
-            _const_rev_iterator();
-            _const_rev_iterator( const _const_rev_iterator& i );
+            _const_rev_iterator() = default;
+            _const_rev_iterator( const _const_rev_iterator& i ) = default;
             _const_rev_iterator( const _rev_iterator& i );
             //! pre-increment
             _const_rev_iterator& operator++();
