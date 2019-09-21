@@ -103,11 +103,6 @@ namespace Ogre {
     //* Creation / loading methods ********************************************
     void GLTexture::createInternalResourcesImpl(void)
     {
-        if (!GLEW_VERSION_1_2 && mTextureType == TEX_TYPE_3D)
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-                "3D Textures not supported before OpenGL 1.2", 
-                "GLTexture::createInternalResourcesImpl");
-
         if (!GLEW_VERSION_2_0 && mTextureType == TEX_TYPE_2D_ARRAY)
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
                 "2D texture arrays not supported before OpenGL 2.0", 
@@ -146,10 +141,9 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->bindGLTexture( getGLTextureTarget(), mTextureID );
         
         // This needs to be set otherwise the texture doesn't get rendered
-        if (GLEW_VERSION_1_2)
-            mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(),
-                GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
-        
+        mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL,
+                                                                 mNumMipmaps);
+
         if ((mUsage & TU_AUTOMIPMAP) && mNumRequestedMipmaps)
         {
             mRenderSystem->_getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );

@@ -329,8 +329,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Box &dest)
 
     // Restore defaults
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    if (GLEW_VERSION_1_2)
-        glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0);
+    glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 //-----------------------------------------------------------------------------  
@@ -458,11 +457,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, c
     // Important to disable all other texture units
     RenderSystem* rsys = Root::getSingleton().getRenderSystem();
     rsys->_disableTextureUnitsFrom(0);
-    if (GLEW_VERSION_1_2)
-    {
-        mRenderSystem->_getStateCacheManager()->activateGLTextureUnit(0);
-    }
-
+    mRenderSystem->_getStateCacheManager()->activateGLTextureUnit(0);
 
     /// Disable alpha, depth and scissor testing, disable blending, 
     /// disable culling, disble lighting, disable fog and reset foreground
