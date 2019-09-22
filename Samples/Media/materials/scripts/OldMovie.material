@@ -7,9 +7,9 @@ fragment_program Ogre/Compositor/OldMovie_Cg_FP cg
 
 fragment_program Ogre/Compositor/OldMovie_HLSL_FP hlsl
 {
-	source OldMovie.hlsl
+	source OldMovieFP.cg
 	entry_point OldMovie_ps
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	target ps_4_0
 }
 
 fragment_program Ogre/Compositor/OldMovie_GLSLES_FP glsles
