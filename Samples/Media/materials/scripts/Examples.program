@@ -19,26 +19,12 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCg cg
 
 }
 
-vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4 cg
-{
-    source Example_Basic_sm4.cg
-    entry_point ambientOneTexture_vp
-    profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto ambient ambient_light_colour
-    }
-
-}
-
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
 {
-    source Example_Basic4.hlsl
+    source Example_Basic.cg
     entry_point ambientOneTexture_vp
-    target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+    target vs_2_0
 
     default_params
     {
@@ -99,7 +85,6 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUV unified
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSLES
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
-    delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 }
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
@@ -108,7 +93,6 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
-    delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 }
 
 fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTextureCg cg
@@ -120,9 +104,9 @@ fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTextureCg cg
 
 fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTextureHLSL hlsl
 {
-    source Example_Basic4.hlsl
+    source Example_Basic.cg
     entry_point diffuseOneTexture_fp
-    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+    target ps_2_0
 }
 
 fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSLES glsles
@@ -233,7 +217,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterCg cg
 // Same as below, but for use when rendering texture shadows
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL hlsl
 {
-    source Example_Basic4.hlsl
+    source Example_Basic.cg
     entry_point hardwareSkinningTwoWeightsCaster_vp
     target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
     includes_skeletal_animation true
@@ -264,7 +248,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
 // Basic hardware skinning using two indexed weights per vertex
 vertex_program Ogre/HardwareSkinningTwoWeightsHLSL hlsl
 {
-    source Example_Basic4.hlsl
+    source Example_Basic.cg
     entry_point hardwareSkinningTwoWeights_vp
     target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
     includes_skeletal_animation true
@@ -349,7 +333,7 @@ vertex_program Ogre/HardwareMorphAnimationCg cg
 
 vertex_program Ogre/HardwareSkinningFourWeightsHLSL hlsl
 {
-   source Example_Basic4.hlsl
+   source Example_Basic.cg
    entry_point hardwareSkinningFourWeights_vp
    target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
    includes_skeletal_animation true
@@ -369,7 +353,7 @@ vertex_program Ogre/HardwareSkinningFourWeightsHLSL hlsl
 // Basic hardware morph animation (no normals)
 vertex_program Ogre/HardwareMorphAnimationHLSL hlsl
 {
-    source Example_Basic4.hlsl
+    source Example_Basic.cg
     entry_point hardwareMorphAnimation
     target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
@@ -440,7 +424,7 @@ vertex_program Ogre/HardwarePoseAnimationCg cg
 // Basic hardware pose animation supporting 2 active poses (no normals)
 vertex_program Ogre/HardwarePoseAnimationHLSL hlsl
 {
-    source Example_Basic4.hlsl
+    source Example_Basic.cg
     entry_point hardwarePoseAnimation
     target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
@@ -506,7 +490,7 @@ vertex_program Ogre/HardwareMorphAnimationWithNormalsCg cg
 // Basic hardware morph animation (with normals)
 vertex_program Ogre/HardwareMorphAnimationWithNormalsHLSL hlsl
 {
-    source Example_Basic4.hlsl
+    source Example_Basic.cg
     entry_point hardwareMorphAnimationWithNormals
     target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
@@ -561,7 +545,7 @@ vertex_program Ogre/HardwareMorphAnimationWithNormals unified
 // Basic hardware pose animation supporting 2 active poses (with normals)
 vertex_program Ogre/HardwarePoseAnimationWithNormalsHLSL hlsl
 {
-    source Example_Basic4.hlsl
+    source Example_Basic.cg
     entry_point hardwarePoseAnimationWithNormals
     target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 

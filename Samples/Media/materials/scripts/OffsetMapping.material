@@ -132,7 +132,7 @@ material Examples/OffsetMapping/Specular
       pass
       {
           illumination_stage ambient
-          vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
+          vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
           {
               param_named_auto worldViewProj worldviewproj_matrix
           }
