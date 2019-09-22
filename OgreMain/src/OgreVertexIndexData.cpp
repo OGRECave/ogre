@@ -761,6 +761,13 @@ namespace Ogre {
         {
         }
 
+        inline Triangle& operator=(const Triangle& rhs) {
+            a = rhs.a;
+            b = rhs.b;
+            c = rhs.c;
+            return *this;
+        }
+
         inline bool sharesEdge(const Triangle& t) const
         {
             return( (a == t.a && b == t.c) ||

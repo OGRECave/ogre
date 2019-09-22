@@ -129,6 +129,12 @@ namespace Ogre {
         _become( i );
     }
     //--------------------------------------------------------------------------
+    UTFString::_fwd_iterator& UTFString::_fwd_iterator::operator=(const _fwd_iterator& rhs)
+    {
+        _become(rhs);
+        return *this;
+    }
+    //--------------------------------------------------------------------------
     UTFString::_fwd_iterator& UTFString::_fwd_iterator::operator++()
     {
         _seekFwd( 1 );
@@ -245,6 +251,12 @@ namespace Ogre {
         _become( i );
     }
     //--------------------------------------------------------------------------
+    UTFString::_const_fwd_iterator& UTFString::_const_fwd_iterator::operator=(const _const_fwd_iterator& rhs)
+    {
+        _become(rhs);
+        return *this;
+    }
+    //--------------------------------------------------------------------------
     UTFString::_const_fwd_iterator& UTFString::_const_fwd_iterator::operator++()
     {
         _seekFwd( 1 );
@@ -351,6 +363,12 @@ namespace Ogre {
         _become( i );
     }
     //--------------------------------------------------------------------------
+    UTFString::_rev_iterator& UTFString::_rev_iterator::operator=(const _rev_iterator& rhs)
+    {
+        _become(rhs);
+        return *this;
+    }
+    //--------------------------------------------------------------------------
     UTFString::_rev_iterator& UTFString::_rev_iterator::operator++()
     {
         _seekRev( 1 );
@@ -443,6 +461,12 @@ namespace Ogre {
     UTFString::_const_rev_iterator::_const_rev_iterator( const _rev_iterator& i )
     {
         _become( i );
+    }
+    //--------------------------------------------------------------------------
+    UTFString::_const_rev_iterator& UTFString::_const_rev_iterator::operator=(const _const_rev_iterator& rhs)
+    {
+        _become(rhs);
+        return *this;
     }
     //--------------------------------------------------------------------------
     UTFString::_const_rev_iterator& UTFString::_const_rev_iterator::operator++()

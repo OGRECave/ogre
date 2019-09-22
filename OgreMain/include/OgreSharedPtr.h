@@ -71,7 +71,7 @@ namespace Ogre {
         template<class Y>
         SharedPtr(const shared_ptr<Y>& r) : shared_ptr<T>(r) {}
         operator const shared_ptr<T>&() { return static_cast<shared_ptr<T>&>(*this); }
-
+        SharedPtr<T>& operator=(const Ogre::SharedPtr<T>& rhs) {shared_ptr<T>::operator=(rhs); return *this;}
         // so swig recognizes it should forward the operators
         T* operator->() const { return shared_ptr<T>::operator->(); }
 

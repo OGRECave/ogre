@@ -133,6 +133,8 @@ namespace Ogre
         bool operator != (const Polygon& rhs) const
         { return !( *this == rhs ); }
 
+        Polygon& operator=(const Ogre::Polygon&) ;
+
         /** Prints out the polygon data.
         */
         _OgreExport friend std::ostream& operator<< ( std::ostream& strm, const Polygon& poly );
