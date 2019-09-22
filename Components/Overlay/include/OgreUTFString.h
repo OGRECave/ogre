@@ -244,6 +244,9 @@ namespace Ogre {
             _fwd_iterator();
             _fwd_iterator( const _fwd_iterator& i );
 
+            //! assign
+            _fwd_iterator& operator=(const _fwd_iterator&);
+
             //! pre-increment
             _fwd_iterator& operator++();
             //! post-increment
@@ -290,6 +293,8 @@ namespace Ogre {
             _const_fwd_iterator( const _const_fwd_iterator& i );
             _const_fwd_iterator( const _fwd_iterator& i );
 
+            //! assign
+            _const_fwd_iterator& operator=(const _const_fwd_iterator&);
             //! pre-increment
             _const_fwd_iterator& operator++();
             //! post-increment
@@ -351,6 +356,8 @@ namespace Ogre {
             _rev_iterator();
             _rev_iterator( const _rev_iterator& i );
 
+            //! assign
+            _rev_iterator& operator=(const _rev_iterator&);
             //! pre-increment
             _rev_iterator& operator++();
             //! post-increment
@@ -384,6 +391,8 @@ namespace Ogre {
             _const_rev_iterator();
             _const_rev_iterator( const _const_rev_iterator& i );
             _const_rev_iterator( const _rev_iterator& i );
+            //! assign
+            _const_rev_iterator& operator=(const _const_rev_iterator&);
             //! pre-increment
             _const_rev_iterator& operator++();
             //! post-increment

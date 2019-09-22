@@ -61,6 +61,10 @@ namespace Ogre {
             : w(1), x(0), y(0), z(0)
         {
         }
+        /// Copy constructor
+        inline Quaternion(const Ogre::Quaternion& rhs)
+            : w(rhs.w), x(rhs.x), y(rhs.y), z(rhs.z)
+        {}
         /// Construct from an explicit list of values
         inline Quaternion (
             Real fW,
