@@ -1,3 +1,7 @@
+#ifdef SHADER_MODEL_4
+#include "HLSL4Support.hlsl"
+#endif
+
 sampler2D RT : register(s0);
 sampler2D SplotchesTx : register(s1);
 sampler1D Texture2 : register(s2);

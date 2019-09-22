@@ -1,3 +1,6 @@
+#ifdef SHADER_MODEL_4
+#include "HLSL4Support.hlsl"
+#endif
 
 /* Cel shading vertex program for single-pass rendering
    In this program, we want to calculate the diffuse and specular

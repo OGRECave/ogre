@@ -26,9 +26,9 @@ fragment_program Ogre/CelShadingFPCg cg
 
 vertex_program Ogre/CelShadingVPhlsl hlsl
 {
-	source Example_CelShading.hlsl
+	source Example_CelShading.cg
 	entry_point main_vp
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_2_0
 
 	default_params
 	{
@@ -41,9 +41,9 @@ vertex_program Ogre/CelShadingVPhlsl hlsl
 
 fragment_program Ogre/CelShadingFPhlsl hlsl
 {
-	source Example_CelShading.hlsl
+	source Example_CelShading.cg
 	entry_point main_fp
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	target ps_4_0 ps_2_0
 }
 
 vertex_program Ogre/CelShadingVPGLSLES glsles
