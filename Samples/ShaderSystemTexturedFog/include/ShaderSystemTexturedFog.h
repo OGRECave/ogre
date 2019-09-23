@@ -91,7 +91,7 @@ protected:
         addHead(Vector3(-100,0,200));
 
         //We will set the sky box far away so it will render with the color of the background
-        mSceneMgr->setSkyBox(true,"BaseWhite",2000);
+        mSceneMgr->setSkyBox(true,"BaseWhiteNoLighting",2000);
     }
 
    void addHead(const Vector3& pos)
@@ -166,7 +166,7 @@ protected:
         }
         if (cbName == ACTIVATE_SKY_BUTTON)
         {
-            mSceneMgr->setSkyBox(!mSceneMgr->isSkyBoxEnabled(),"BaseWhite",2000);
+            mSceneMgr->setSkyBox(!mSceneMgr->isSkyBoxEnabled(),"BaseWhiteNoLighting",2000);
 
         }
     }
