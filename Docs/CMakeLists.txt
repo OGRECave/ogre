@@ -16,7 +16,7 @@
 if (WIN32 OR APPLE)
   set(OGRE_DOCS_PATH "Docs")
 elseif (UNIX)
-  set(OGRE_DOCS_PATH "share/OGRE/docs")
+  set(OGRE_DOCS_PATH "share/doc/OGRE")
 endif ()
 
 # Build and install API documentation if doxygen is available
