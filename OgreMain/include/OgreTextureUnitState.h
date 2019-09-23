@@ -358,7 +358,10 @@ namespace Ogre {
         /** Sets this texture layer to use a single texture, given the
             name of the texture to use on this layer.
         */
-        void setTextureName( const String& name, TextureType ttype = TEX_TYPE_2D);
+        void setTextureName( const String& name);
+
+        /// @overload
+        void setTextureName( const String& name, TextureType ttype);
 
         /** Sets this texture layer to use a single texture, given the
             pointer to the texture to use on this layer.

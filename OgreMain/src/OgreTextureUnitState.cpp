@@ -251,6 +251,12 @@ namespace Ogre {
             return BLANKSTRING;
     }
     //-----------------------------------------------------------------------
+    void TextureUnitState::setTextureName( const String& name)
+    {
+        if(TexturePtr tex = retrieveTexture(name))
+            setTexture(tex);
+    }
+
     void TextureUnitState::setTextureName( const String& name, TextureType texType)
     {
         TexturePtr tex = retrieveTexture(name);
