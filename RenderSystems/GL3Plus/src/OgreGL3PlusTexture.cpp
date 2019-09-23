@@ -123,28 +123,29 @@ namespace Ogre {
         mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, mNumMipmaps);
 
         // Set up texture swizzling.
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-        mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	
+        typedef std::array<GLint, 4> SwizzleMask;
+        SwizzleMask swizzleMask;
+
         if (PixelUtil::isLuminance(mFormat))
         {
             if (PixelUtil::getComponentCount(mFormat) == 2)
             {
-                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
-                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED);
-                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
-                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_GREEN);
+                swizzleMask = SwizzleMask{GL_RED, GL_RED, GL_RED, GL_GREEN};
             }
             else
             {
-                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
-                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_RED);
-                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
-                mRenderSystem->_getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE);
+                swizzleMask = SwizzleMask{GL_RED, GL_RED, GL_RED, GL_ONE};
             }
         }
+        else if(mFormat == PF_A8)
+        {
+            swizzleMask = SwizzleMask{GL_ZERO, GL_ZERO, GL_ZERO, GL_RED};
+        }
+        else
+        {
+            swizzleMask = SwizzleMask{GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
+        }
+        OGRE_CHECK_GL_ERROR(glTexParameteriv(texTarget, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask.data()));
 
         GLenum format = GL3PlusPixelUtil::getGLInternalFormat(mFormat, mHwGamma);
         GLenum datatype = GL3PlusPixelUtil::getGLOriginDataType(mFormat);
