@@ -172,7 +172,7 @@ void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* progra
 }
 
 //-----------------------------------------------------------------------
-void CGProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter)
+void CGProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
 {
     os << mGpuConstTypeMap[parameter->getType()];
     os << "\t"; 

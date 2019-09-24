@@ -1,6 +1,4 @@
-#ifdef SHADER_MODEL_4
-#include "HLSL4Support.hlsl"
-#endif
+#include "HLSL_SM4Support.hlsl"
 
 /* Cel shading vertex program for single-pass rendering
    In this program, we want to calculate the diffuse and specular
@@ -41,6 +39,10 @@ void main_vp(float4 position	: POSITION,
 	edge = max(dot(N, E), 0);
 }
 
+SAMPLER1D(diffuseRamp, 0);
+SAMPLER1D(specularRamp, 1);
+SAMPLER1D(edgeRamp, 2);
+
 void main_fp( float4 position	: POSITION,
        float diffuseIn 	: TEXCOORD0,
 			 float specularIn	: TEXCOORD1,
@@ -49,11 +51,7 @@ void main_fp( float4 position	: POSITION,
 			 out float4 colour	: COLOR,
 			 
 			 uniform float4 diffuse,
-			 uniform float4 specular,
-			 
-			 uniform sampler1D diffuseRamp,
-			 uniform sampler1D specularRamp,
-			 uniform sampler1D edgeRamp)
+			 uniform float4 specular)
 {
 	// Step functions from textures
 	diffuseIn = tex1D(diffuseRamp, diffuseIn).x;

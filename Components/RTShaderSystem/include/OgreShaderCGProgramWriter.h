@@ -82,10 +82,10 @@ protected:
     void initializeStringMaps();
 
     /** Write the program dependencies. */
-    void writeProgramDependencies(std::ostream& os, Program* program);
+    virtual void writeProgramDependencies(std::ostream& os, Program* program);
     
     /** Write a uniform parameter. */
-    void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
+    virtual void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
 
     /** Write a function parameter. */
     void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);

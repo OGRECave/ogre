@@ -46,13 +46,17 @@ namespace Ogre {
 */
 class _OgreRTSSExport HLSLProgramWriter : public CGProgramWriter
 {
-
+    bool mIsShaderModel4;
     // Interface.
 public:
 
     /** Class constructor. 
     */
     HLSLProgramWriter();
+
+    void writeProgramDependencies(std::ostream& os, Program* program);
+
+    void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
 
     /** Class destructor */
     virtual ~HLSLProgramWriter();
