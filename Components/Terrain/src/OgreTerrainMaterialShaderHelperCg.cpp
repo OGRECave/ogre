@@ -275,17 +275,68 @@ namespace Ogre
 
 
     }
+
     //---------------------------------------------------------------------
     void ShaderHelperCg::generateFpHeader(
         const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
 
         // Main header
+        if(mSM4Available)
+            outStream << "#include <HLSL_SM4Support.hlsl>\n";
         outStream << "#include <TerrainHelpers.cg>\n";
 
         if (prof->isShadowingEnabled(tt, terrain))
             generateFpDynamicShadowsHelpers(prof, terrain, tt, outStream);
 
+        // UV's premultiplied, packed as xy/zw
+        uint maxLayers = prof->getMaxLayers(terrain);
+        uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
+        uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+
+        uint currentSamplerIdx = 0;
+        if (tt == LOW_LOD)
+        {
+            // single composite map covers all the others below
+            outStream << StringUtil::format("SAMPLER2D(compositeMap, %d);\n", currentSamplerIdx++);
+        }
+        else
+        {
+            outStream << StringUtil::format("SAMPLER2D(globalNormal, %d);\n", currentSamplerIdx++);
+
+            if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
+            {
+                outStream << StringUtil::format("SAMPLER2D(globalColourMap, %d);\n", currentSamplerIdx++);
+            }
+            if (prof->isLightmapEnabled())
+            {
+                outStream << StringUtil::format("SAMPLER2D(lightMap, %d);\n", currentSamplerIdx++);
+            }
+            // Blend textures - sampler definitions
+            for (uint i = 0; i < numBlendTextures; ++i)
+            {
+                outStream << StringUtil::format("SAMPLER2D(blendTex%d, %d);\n", i, currentSamplerIdx++);
+            }
+
+            // Layer textures - sampler definitions & UV multipliers
+            for (uint i = 0; i < numLayers; ++i)
+            {
+                outStream << StringUtil::format("SAMPLER2D(difftex%d, %d);\n", i, currentSamplerIdx++);
+                outStream << StringUtil::format("SAMPLER2D(normtex%d, %d);\n", i, currentSamplerIdx++);
+            }
+        }
+
+        if (prof->isShadowingEnabled(tt, terrain))
+        {
+            uint numTextures = 1;
+            if (prof->getReceiveDynamicShadowsPSSM())
+                numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+            uint sampler = currentSamplerIdx;
+            for (uint i = 0; i < numTextures; ++i)
+            {
+                outStream << StringUtil::format("SAMPLER2D(shadowMap%d, %d);\n", i, sampler++);
+            }
+        }
 
         outStream << 
             "float4 main_fp(\n"
@@ -296,10 +347,7 @@ namespace Ogre
         outStream <<
             "float4 uvMisc : TEXCOORD" << texCoordSet++ << ",\n";
 
-        // UV's premultiplied, packed as xy/zw
-        uint maxLayers = prof->getMaxLayers(terrain);
-        uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
-        uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+
         uint numUVSets = numLayers / 2;
         if (numLayers % 2)
             ++numUVSets;
@@ -325,8 +373,6 @@ namespace Ogre
                 "float fogVal : COLOR,\n";
         }
 
-        uint currentSamplerIdx = 0;
-
         outStream <<
             // Only 1 light supported in this version
             // deferred shading profile / generator later, ok? :)
@@ -336,46 +382,7 @@ namespace Ogre
             "uniform float3 lightSpecularColour,\n"
             "uniform float3 eyePosObjSpace,\n"
             // pack scale, bias and specular
-            "uniform float4 scaleBiasSpecular,\n";
-
-        if (tt == LOW_LOD)
-        {
-            // single composite map covers all the others below
-            outStream << 
-                "uniform sampler2D compositeMap : register(s" << currentSamplerIdx++ << ")\n";
-        }
-        else
-        {
-            outStream << 
-                "uniform sampler2D globalNormal : register(s" << currentSamplerIdx++ << ")\n";
-
-
-            if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
-            {
-                outStream << ", uniform sampler2D globalColourMap : register(s" 
-                    << currentSamplerIdx++ << ")\n";
-            }
-            if (prof->isLightmapEnabled())
-            {
-                outStream << ", uniform sampler2D lightMap : register(s" 
-                    << currentSamplerIdx++ << ")\n";
-            }
-            // Blend textures - sampler definitions
-            for (uint i = 0; i < numBlendTextures; ++i)
-            {
-                outStream << ", uniform sampler2D blendTex" << i 
-                    << " : register(s" << currentSamplerIdx++ << ")\n";
-            }
-
-            // Layer textures - sampler definitions & UV multipliers
-            for (uint i = 0; i < numLayers; ++i)
-            {
-                outStream << ", uniform sampler2D difftex" << i 
-                    << " : register(s" << currentSamplerIdx++ << ")\n";
-                outStream << ", uniform sampler2D normtex" << i 
-                    << " : register(s" << currentSamplerIdx++ << ")\n";
-            }
-        }
+            "uniform float4 scaleBiasSpecular\n";
 
         if (prof->isShadowingEnabled(tt, terrain))
         {
@@ -796,8 +803,7 @@ namespace Ogre
         for (uint i = 0; i < numTextures; ++i)
         {
             outStream <<
-                ", float4 lightSpacePos" << i << " : TEXCOORD" << *texCoord << " \n" <<
-                ", uniform sampler2D shadowMap" << i << " : register(s" << *sampler << ") \n";
+                ", float4 lightSpacePos" << i << " : TEXCOORD" << *texCoord << " \n";
             *sampler = *sampler + 1;
             *texCoord = *texCoord + 1;
             if (prof->getReceiveDynamicShadowsDepth())
