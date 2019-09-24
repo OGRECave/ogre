@@ -37,10 +37,51 @@ String HLSLProgramWriter::TargetLanguage = "hlsl";
 HLSLProgramWriter::HLSLProgramWriter()
 {
     initializeStringMaps();
-    mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "Texture2DArray";
+
+    mIsShaderModel4 = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
+
+    if(mIsShaderModel4)
+    {
+        mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "Texture2DArray";
+    }
 }
 
-//-----------------------------------------------------------------------
+void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
+{
+    if(mIsShaderModel4 && program->getType() == GPT_FRAGMENT_PROGRAM)
+        os << "#include <HLSL_SM4Support.hlsl>" << std::endl;
+
+    CGProgramWriter::writeProgramDependencies(os, program);
+}
+
+void HLSLProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
+{
+    if(!mIsShaderModel4 || !parameter->isSampler())
+    {
+        CGProgramWriter::writeUniformParameter(os, parameter);
+        return;
+    }
+
+    switch(parameter->getType())
+    {
+    case GCT_SAMPLER1D:
+        os << "SAMPLER1D(";
+        break;
+    case GCT_SAMPLER2D:
+        os << "SAMPLER2D(";
+        break;
+    case GCT_SAMPLER3D:
+        os << "SAMPLER3D(";
+        break;
+    case GCT_SAMPLERCUBE:
+        os << "SAMPLERCUBE(";
+        break;
+    default:
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unsuppported sampler type");
+    }
+    os << parameter->getName() << ", " << parameter->getIndex() << ")";
+}
+
 HLSLProgramWriter::~HLSLProgramWriter()
 {
 

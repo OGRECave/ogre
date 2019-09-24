@@ -1,11 +1,9 @@
-#ifdef SHADER_MODEL_4
-#include "HLSL4Support.hlsl"
-#endif
+#include "HLSL_SM4Support.hlsl"
 
-sampler2D RT : register(s0);
-sampler2D SplotchesTx : register(s1);
-sampler1D Texture2 : register(s2);
-sampler1D SepiaTx : register(s3);
+SAMPLER2D(RT, 0);
+SAMPLER2D(SplotchesTx, 1);
+SAMPLER1D(Texture2, 2);
+SAMPLER1D(SepiaTx, 3);
 
 float2 calcSpriteAddr(float2 texCoord, float DirtFrequency1, float period)
 {
