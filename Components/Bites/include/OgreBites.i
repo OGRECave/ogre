@@ -12,6 +12,8 @@
 #include "OgreAdvancedRenderControls.h"
 #include "OgreUnifiedHighLevelGpuProgram.h"
 #include "OgrePredefinedControllers.h"
+
+#include "OgreImGuiInputListener.h"
 %}
 
 %include std_string.i
@@ -25,6 +27,10 @@
 %feature("director") OgreBites::ApplicationContextBase;
 %feature("director") OgreBites::InputListener;
 %include "OgreInput.h"
+
+#ifdef HAVE_IMGUI
+%include "OgreImGuiInputListener.h"
+#endif
 
 #ifdef __ANDROID__
 %{

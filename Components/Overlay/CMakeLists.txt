@@ -18,14 +18,47 @@ list(APPEND HEADER_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/include/OgreOverlay.i)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
+if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+  list(APPEND SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui_draw.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui_widgets.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui_demo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/misc/freetype/imgui_freetype.cpp)
+endif()
+
 # setup target
-add_library(OgreOverlay ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
+add_library(OgreOverlay ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreOverlay PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreOverlay PUBLIC OgreMain PRIVATE "${FREETYPE_LIBRARIES}" ZLIB::ZLIB)
 target_include_directories(OgreOverlay PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   $<INSTALL_INTERFACE:include/OGRE/Overlay>
   PRIVATE ${FREETYPE_INCLUDE_DIRS})
+
+if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+  target_include_directories(OgreOverlay PUBLIC
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/imgui>"
+    PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/misc/freetype>")
+
+  if(UNIX)
+    set_source_files_properties(src/imgui/misc/freetype/imgui_freetype.cpp PROPERTIES
+      COMPILE_FLAGS "-Wno-missing-declarations")
+
+    set_source_files_properties(src/imgui/imgui_widgets.cpp PROPERTIES
+      COMPILE_FLAGS "-Wno-cast-qual")
+  endif()
+
+  file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imconfig.h
+    "#pragma once
+    #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+    #include <OgreOverlayPrerequisites.h>
+    #define IMGUI_API _OgreOverlayExport")
+
+  list(APPEND HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imconfig.h)
+endif()
 
 generate_export_header(OgreOverlay 
     EXPORT_MACRO_NAME _OgreOverlayExport

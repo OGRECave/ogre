@@ -1,5 +1,5 @@
 #ifdef SWIGPYTHON
-%module(package="Ogre") Overlay
+%module(package="Ogre", directors="1") Overlay
 #else
 %module OgreOverlay
 #endif
@@ -19,6 +19,9 @@
 #include "OgreOverlayManager.h"
 #include "OgrePanelOverlayElement.h"
 #include "OgreTextAreaOverlayElement.h"
+
+#include "imgui.h"
+#include "OgreImGuiOverlay.h"
 %}
 
 %include std_string.i
@@ -50,3 +53,28 @@
 %ignore Ogre::TextAreaOverlayElement::getFontName;
 %shared_ptr(Ogre::TextAreaOverlayElement);
 %include "OgreTextAreaOverlayElement.h"
+
+#ifdef HAVE_IMGUI
+%include stdint.i
+%include typemaps.i
+
+%include "OgreImGuiOverlay.h"
+
+/// Imgui
+// ignore va list methods
+%ignore ImGui::TextV;
+%ignore ImGui::TextColoredV;
+%ignore ImGui::TextDisabledV;
+%ignore ImGui::TextWrappedV;
+%ignore ImGui::LabelTextV;
+%ignore ImGui::BulletTextV;
+%ignore ImGui::TreeNodeV;
+%ignore ImGui::TreeNodeExV;
+%ignore ImGui::SetTooltipV;
+%ignore ImGuiTextBuffer::appendfv;
+
+%apply bool* INOUT { bool* p_open };
+%apply float* INOUT { float* v };
+%apply int* INOUT { int* v };
+%include "imgui.h"
+#endif
