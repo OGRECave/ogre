@@ -19,6 +19,11 @@ if (APPLE AND NOT ANDROID)
     list(APPEND CMAKE_SWIG_FLAGS -D_LIBCPP_VERSION)
 endif()
 
+if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+    include_directories("${PROJECT_SOURCE_DIR}/Components/Overlay/src/imgui")
+    list(APPEND CMAKE_SWIG_FLAGS -DHAVE_IMGUI -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
+endif()
+
 macro(ogre_python_module target)
     set_target_properties(${SWIG_MODULE_${target}_REAL_NAME} PROPERTIES 
                         DEBUG_POSTFIX "")
