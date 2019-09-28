@@ -105,6 +105,8 @@ namespace Ogre {
         /// @copydoc ScriptLoader::getLoadingOrder
         Real getLoadingOrder(void) const;
 
+        void addOverlay(Overlay* overlay);
+
         /** Create a new Overlay. */
         Overlay* create(const String& name);
         /** Retrieve an Overlay by name 
