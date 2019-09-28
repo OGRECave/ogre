@@ -4283,12 +4283,12 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 //---------------------------------------------------------------------
 void SceneManager::_issueRenderOp(Renderable* rend, const Pass* pass)
 {
+    // Finalise GPU parameter bindings
+    if(pass)
+        updateGpuProgramParameters(pass);
+
     if(rend->preRender(this, mDestRenderSystem))
     {
-        // Finalise GPU parameter bindings
-        if(pass)
-            updateGpuProgramParameters(pass);
-        
         RenderOperation ro;
         ro.srcRenderable = rend;
 
