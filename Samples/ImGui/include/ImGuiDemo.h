@@ -18,6 +18,7 @@ public:
         mInfo["Title"] = "Dear ImGui integration";
         mInfo["Description"] = "Overlay ImGui interactions";
         mInfo["Category"] = "Unsorted";
+        mInfo["Thumbnail"] = "thumb_imgui.png";
     }
 
     bool frameStarted(const FrameEvent& e)
