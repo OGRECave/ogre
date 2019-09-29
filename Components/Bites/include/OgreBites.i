@@ -16,6 +16,7 @@
 #include "OgreImGuiInputListener.h"
 %}
 
+%include std_vector.i
 %include std_string.i
 %include exception.i 
 %include stdint.i
@@ -24,6 +25,7 @@
 #define _OgreBitesExport
 
 %include "OgreSGTechniqueResolverListener.h"
+%template(InputListenerList) std::vector<OgreBites::InputListener*>;
 %feature("director") OgreBites::ApplicationContextBase;
 %feature("director") OgreBites::InputListener;
 %include "OgreInput.h"
