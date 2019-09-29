@@ -9,6 +9,7 @@
 #define SAMPLES_COMMON_INCLUDE_INPUT_H_
 
 #include "OgreBitesPrerequisites.h"
+#include <vector>
 
 namespace Ogre {
     struct FrameEvent;
@@ -116,20 +117,124 @@ enum {
 
 /**
 the return values of the callbacks are ignored by ApplicationContext
-however they can be used to control event propagation in a hierarchy
+however they can be used to control event propagation in a hierarchy.
+The convention is to return true if the event was handled and false if it should be further propagated.
 */
 struct _OgreBitesExport InputListener {
     virtual ~InputListener() {}
     virtual void frameRendered(const Ogre::FrameEvent& evt) { }
-    virtual bool keyPressed(const KeyboardEvent& evt) { return true;}
-    virtual bool keyReleased(const KeyboardEvent& evt) { return true; }
-    virtual bool touchMoved(const TouchFingerEvent& evt) { return true; }
-    virtual bool touchPressed(const TouchFingerEvent& evt) { return true; }
-    virtual bool touchReleased(const TouchFingerEvent& evt) { return true; }
-    virtual bool mouseMoved(const MouseMotionEvent& evt) { return true; }
-    virtual bool mouseWheelRolled(const MouseWheelEvent& evt) { return true; }
-    virtual bool mousePressed(const MouseButtonEvent& evt) { return true; }
-    virtual bool mouseReleased(const MouseButtonEvent& evt) { return true; }
+    virtual bool keyPressed(const KeyboardEvent& evt) { return false;}
+    virtual bool keyReleased(const KeyboardEvent& evt) { return false; }
+    virtual bool touchMoved(const TouchFingerEvent& evt) { return false; }
+    virtual bool touchPressed(const TouchFingerEvent& evt) { return false; }
+    virtual bool touchReleased(const TouchFingerEvent& evt) { return false; }
+    virtual bool mouseMoved(const MouseMotionEvent& evt) { return false; }
+    virtual bool mouseWheelRolled(const MouseWheelEvent& evt) { return false; }
+    virtual bool mousePressed(const MouseButtonEvent& evt) { return false; }
+    virtual bool mouseReleased(const MouseButtonEvent& evt) { return false; }
+};
+
+/**
+ * Chain of multiple InputListeners that acts as a single InputListener
+ *
+ * input events are propagated front to back until a listener returns true
+ */
+class _OgreBitesExport InputListenerChain : public InputListener
+{
+protected:
+    std::vector<InputListener*> mListenerChain;
+
+public:
+    InputListenerChain() {}
+    InputListenerChain(std::vector<InputListener*> chain) : mListenerChain(chain) {}
+
+    InputListenerChain& operator=(InputListenerChain o)
+    {
+        mListenerChain = o.mListenerChain;
+        return *this;
+    }
+
+    bool keyPressed(const KeyboardEvent& evt)
+    {
+        for (auto listner : mListenerChain)
+        {
+            if (listner->keyPressed(evt))
+                return true;
+        }
+        return false;
+    }
+    bool keyReleased(const KeyboardEvent& evt)
+    {
+        for (auto listner : mListenerChain)
+        {
+            if (listner->keyReleased(evt))
+                return true;
+        }
+        return false;
+    }
+    bool touchMoved(const TouchFingerEvent& evt)
+    {
+        for (auto listner : mListenerChain)
+        {
+            if (listner->touchMoved(evt))
+                return true;
+        }
+        return false;
+    }
+    bool touchPressed(const TouchFingerEvent& evt)
+    {
+        for (auto listner : mListenerChain)
+        {
+            if (listner->touchPressed(evt))
+                return true;
+        }
+        return false;
+    }
+    bool touchReleased(const TouchFingerEvent& evt)
+    {
+        for (auto listner : mListenerChain)
+        {
+            if (listner->touchReleased(evt))
+                return true;
+        }
+        return false;
+    }
+    bool mouseMoved(const MouseMotionEvent& evt)
+    {
+        for (auto listner : mListenerChain)
+        {
+            if (listner->mouseMoved(evt))
+                return true;
+        }
+        return false;
+    }
+    bool mouseWheelRolled(const MouseWheelEvent& evt)
+    {
+        for (auto listner : mListenerChain)
+        {
+            if (listner->mouseWheelRolled(evt))
+                return true;
+        }
+        return false;
+    }
+    bool mousePressed(const MouseButtonEvent& evt)
+    {
+        for (auto listner : mListenerChain)
+        {
+            if (listner->mousePressed(evt))
+                return true;
+        }
+        return false;
+    }
+    bool mouseReleased(const MouseButtonEvent& evt)
+    {
+        for (auto listner : mListenerChain)
+        {
+            if (listner->mouseReleased(evt))
+                return true;
+        }
+        return false;
+    }
 };
 }
 /** @} */

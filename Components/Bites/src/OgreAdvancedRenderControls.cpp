@@ -234,7 +234,7 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
     }
 #endif // INCLUDE_RTSHADER_SYSTEM
 
-    return true;
+    return InputListener::keyPressed(evt);
 }
 
 void AdvancedRenderControls::frameRendered(const Ogre::FrameEvent& evt) {
