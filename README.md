@@ -13,7 +13,7 @@ using the underlying system libraries like Direct3D and OpenGL and
 provides an interface based on world objects and other intuitive
 classes.
 
-| Build | Status (github) |
+| Build | Status |
 |-------|-----------------|
 | Ubuntu, OSX, Android, iOS | [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre) |
 | MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
@@ -31,6 +31,24 @@ A high-level guide to the major parts of the engine and script reference.
 The full OGRE API documentation, as generated from the (heavily!) commented source.
 * [The OGRE Tutorials](https://ogrecave.github.io/ogre/api/latest/tutorials.html)  
 A gold mine of tutorials, tips and code snippets which will help you get up to speed with the engine.
+
+## Try it
+* [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/)
+* Ubuntu Snap package: `sudo snap install ogre`
+* [Android App on F-Droid](https://f-droid.org/packages/org.ogre.browser/)
+
+## Who is using it?
+
+**Open Source**
+- [Rigs of Rods - Soft Body Physics Simulator](https://rigsofrods.org/)
+- [Gazebo - Robot simulation](http://gazebosim.org/)
+- [ROS 3D visualization tool](http://wiki.ros.org/rviz)
+- [legged robotics RAISIM](https://github.com/leggedrobotics/raisimLib#examples)
+
+**Closed Source**
+- [Hob](http://store.steampowered.com/app/404680/Hob/)
+- [Torchlight II](http://store.steampowered.com/app/200710/Torchlight_II/)
+- [Battlezone 98 Redux](http://store.steampowered.com/app/301650/Battlezone_98_Redux/)
 
 ## Contributing
 We welcome all contributions to OGRE, be that new
