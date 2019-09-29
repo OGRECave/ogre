@@ -9,6 +9,8 @@ using namespace OgreBites;
 
 class _OgreSampleClassExport Sample_ImGui : public SdkSample
 {
+    std::unique_ptr<ImGuiInputListener> mImguiListener;
+    InputListenerChain mListenerChain;
 public:
     // Basic constructor
     Sample_ImGui()
@@ -27,12 +29,22 @@ public:
         return SdkSample::frameStarted(e);
     }
 
+    bool keyPressed(const KeyboardEvent& evt) { return mListenerChain.keyPressed(evt); }
+    bool keyReleased(const KeyboardEvent& evt) { return mListenerChain.keyReleased(evt); }
+    bool mouseMoved(const MouseMotionEvent& evt) { return mListenerChain.mouseMoved(evt); }
+    bool mouseWheelRolled(const MouseWheelEvent& evt) { return mListenerChain.mouseWheelRolled(evt); }
+    bool mousePressed(const MouseButtonEvent& evt) { return mListenerChain.mousePressed(evt); }
+    bool mouseReleased(const MouseButtonEvent& evt) { return mListenerChain.mouseReleased(evt); }
+
     void setupContent(void)
     {
         auto imguiOverlay = new ImGuiOverlay();
         imguiOverlay->setZOrder(300);
         imguiOverlay->show();
         OverlayManager::getSingleton().addOverlay(imguiOverlay); // now owned by overlaymgr
+
+        mImguiListener.reset(new ImGuiInputListener());
+        mListenerChain = InputListenerChain({mTrayMgr, mImguiListener.get(), mCameraMan});
 
         mTrayMgr->showCursor();
         mCameraMan->setStyle(OgreBites::CS_ORBIT);

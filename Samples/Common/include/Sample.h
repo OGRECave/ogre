@@ -43,11 +43,13 @@
 
 namespace OgreBites
 {
+
+
     /*=============================================================================
     | Base class responsible for everything specific to one sample.
     | Designed to be subclassed for each sample.
     =============================================================================*/
-    class Sample : public Ogre::GeneralAllocatedObject
+    class Sample : public InputListener, public Ogre::GeneralAllocatedObject
     {
     public:
         /*=============================================================================
@@ -211,15 +213,6 @@ namespace OgreBites
         virtual bool windowClosing(Ogre::RenderWindow* rw) { return true; }
         virtual void windowClosed(Ogre::RenderWindow* rw) {}
         virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
-        virtual bool keyPressed(const KeyboardEvent& evt) { return true; }
-        virtual bool keyReleased(const KeyboardEvent& evt) { return true; }
-        virtual bool touchMoved(const TouchFingerEvent& evt) { return true; }
-        virtual bool touchPressed(const TouchFingerEvent& evt) { return true; }
-        virtual bool touchReleased(const TouchFingerEvent& evt) { return true; }
-        virtual bool mouseMoved(const MouseMotionEvent& evt) { return true; }
-        virtual bool mouseWheelRolled(const MouseWheelEvent& evt) { return true; }
-        virtual bool mousePressed(const MouseButtonEvent& evt) { return true; }
-        virtual bool mouseReleased(const MouseButtonEvent& evt) { return true; }
     protected:
 
         /*-----------------------------------------------------------------------------
