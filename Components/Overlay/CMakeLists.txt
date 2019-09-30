@@ -25,6 +25,8 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
     ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui_widgets.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui_demo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/misc/freetype/imgui_freetype.cpp)
+else()
+    list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreImGuiOverlay.cpp")
 endif()
 
 # setup target
