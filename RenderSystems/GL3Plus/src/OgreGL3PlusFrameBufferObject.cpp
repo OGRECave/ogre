@@ -107,13 +107,13 @@ namespace Ogre {
         // Bind simple buffer to add colour attachments
         mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mFB );
 
-        bool isDepth = PixelUtil::isDepth(getFormat());
-
         // Bind all attachment points to frame buffer
         for(unsigned int x = 0; x < maxSupportedMRTs; ++x)
         {
             if(mColour[x].buffer)
             {
+                bool isDepth = PixelUtil::isDepth(mColour[x].buffer->getFormat());
+
                 if(mColour[x].buffer->getWidth() != width || mColour[x].buffer->getHeight() != height)
                 {
                     StringStream ss;
@@ -136,7 +136,7 @@ namespace Ogre {
         }
 
         // Now deal with depth / stencil
-        if (mMultisampleFB)
+        if (mMultisampleFB && !PixelUtil::isDepth(getFormat()))
         {
             // Bind multisample buffer
             mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mMultisampleFB );
@@ -165,9 +165,12 @@ namespace Ogre {
             // Fill attached colour buffers
             if(mColour[x].buffer)
             {
+                bool isDepth = PixelUtil::isDepth(mColour[x].buffer->getFormat());
+
                 bufs[x] = isDepth ? GL_DEPTH_ATTACHMENT : (GL_COLOR_ATTACHMENT0 + x);
                 // Keep highest used buffer + 1
-                n = x+1;
+                if(!isDepth)
+                    n = x+1;
             }
             else
             {
@@ -176,10 +179,9 @@ namespace Ogre {
         }
 
         // Drawbuffer extension supported, use it
-        if(!isDepth)
-            OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
+        OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
 
-        if (mMultisampleFB)
+        if (mMultisampleFB && !PixelUtil::isDepth(getFormat()))
         {
             // we need a read buffer because we'll be blitting to mFB
             OGRE_CHECK_GL_ERROR(glReadBuffer(bufs[0]));
