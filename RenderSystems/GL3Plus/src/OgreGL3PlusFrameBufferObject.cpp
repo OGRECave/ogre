@@ -180,17 +180,6 @@ namespace Ogre {
 
         // Drawbuffer extension supported, use it
         OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
-
-        if (mMultisampleFB && !PixelUtil::isDepth(getFormat()))
-        {
-            // we need a read buffer because we'll be blitting to mFB
-            OGRE_CHECK_GL_ERROR(glReadBuffer(bufs[0]));
-        }
-        else
-        {
-            // No read buffer, by default, if we want to read anyway we must not forget to set this.
-            OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
-        }
         
         // Check status
         GLuint status;

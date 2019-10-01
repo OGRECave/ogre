@@ -192,17 +192,6 @@ namespace Ogre {
                 // In this case, the capabilities will not show more than 1 simultaneaous render target.
                 glDrawBuffer(bufs[0]);
         }
-
-        if (mMultisampleFB)
-        {
-            // we need a read buffer because we'll be blitting to mFB
-            glReadBuffer(bufs[0]);
-        }
-        else
-        {
-            // No read buffer, by default, if we want to read anyway we must not forget to set this.
-            glReadBuffer(GL_NONE);
-        }
         
         // Check status
         GLuint status;
