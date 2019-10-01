@@ -182,7 +182,7 @@ namespace Ogre {
                 if (mMinBufferSize > mMaxBufferSize) mMinBufferSize = mMaxBufferSize;
             }
 
-            if((opt = miscParams->find("MSAA")) != end)
+            if((opt = miscParams->find("FSAA")) != end)
             {
                 mMSAA = Ogre::StringConverter::parseInt(opt->second);
             }
