@@ -81,22 +81,10 @@ namespace Ogre
             - Not all bound surfaces have the same internal format 
         */
 
-        virtual void bindSurface(size_t attachment, RenderTexture *target)
-        {
-            for (size_t i = mBoundSurfaces.size(); i <= attachment; ++i)
-            {
-                mBoundSurfaces.push_back(0);
-            }
-            mBoundSurfaces[attachment] = target;
-
-            bindSurfaceImpl(attachment, target);
-        }
-
-
+        virtual void bindSurface(size_t attachment, RenderTexture *target);
 
         /** Unbind attachment.
         */
-
         virtual void unbindSurface(size_t attachment)
         {
             if (attachment < mBoundSurfaces.size())
