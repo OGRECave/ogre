@@ -77,20 +77,8 @@ namespace Ogre {
 
     void AndroidEGLWindow::resize(uint width, uint height)
     {
-      EGLint format;
-      eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
-      EGL_CHECK_ERROR
-
-      if (mScale != 1.0f)
-      {
-        int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
-        int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
-        ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
-      }
-      else
-      {
-        ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
-      }
+        // cannot do this - query size instead
+        windowMovedOrResized();
     }
 
     void AndroidEGLWindow::windowMovedOrResized()
@@ -102,10 +90,24 @@ namespace Ogre {
             // anything else. I put this code here because this function called before any rendering is done.
             // Because the events for screen rotation / resizing did not worked on all devices it is the best way
             // to query the correct dimensions.
-            mContext->setCurrent(); 
-            eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
-            eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
-            
+            mContext->setCurrent();
+
+            int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
+            int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
+
+            if(mScale != 1.0f && (nwidth != int(mWidth) || nheight != int(mHeight)))
+            {
+                // update buffer geometry
+                EGLint format;
+                eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
+                EGL_CHECK_ERROR
+
+                ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
+            }
+
+            mWidth = nwidth;
+            mHeight = nheight;
+
             // Notify viewports of resize
             ViewportList::iterator it = mViewportList.begin();
             while( it != mViewportList.end() )
