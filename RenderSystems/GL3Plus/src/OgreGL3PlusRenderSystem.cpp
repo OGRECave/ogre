@@ -697,8 +697,7 @@ namespace Ogre {
             // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast.
             // Find best depth & stencil format suited for the RT's format.
             GLuint depthFormat, stencilFormat;
-            static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( fbo->getFormat(),
-                                                                               &depthFormat, &stencilFormat );
+            _getDepthStencilFormatFor(fbo->getFormat(), &depthFormat, &stencilFormat);
 
             GL3PlusRenderBuffer *depthBuffer = new GL3PlusRenderBuffer( depthFormat, fbo->getWidth(),
                                                                         fbo->getHeight(), fbo->getFSAA() );
@@ -1056,7 +1055,7 @@ namespace Ogre {
     {
         if (enabled)
         {
-            mStateCacheManager->setClearDepth(1.0f);
+            mStateCacheManager->setClearDepth(isReverseDepthBufferEnabled() ? 0.0f : 1.0f);
         }
         mStateCacheManager->setEnabled(GL_DEPTH_TEST, enabled);
     }
@@ -1072,7 +1071,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setDepthBufferFunction(CompareFunction func)
     {
-        mStateCacheManager->setDepthFunc(convertCompareFunction(func));
+        mStateCacheManager->setDepthFunc(convertCompareFunction(func, isReverseDepthBufferEnabled()));
     }
 
     void GL3PlusRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
@@ -1456,6 +1455,22 @@ namespace Ogre {
         // VAO #0 is not supported in Core profiles, and WOULD NOT be used by Ogre even in compatibility profiles
     }
 
+    void GL3PlusRenderSystem::_getDepthStencilFormatFor(PixelFormat internalColourFormat,
+                                                        uint32* depthFormat,
+                                                        uint32* stencilFormat)
+    {
+        if (isReverseDepthBufferEnabled())
+        {
+            *depthFormat = GL_DEPTH_COMPONENT32F;
+            *stencilFormat = GL_NONE;
+        }
+        else
+        {
+            static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil(
+                    internalColourFormat, depthFormat, stencilFormat);
+        }
+    }
+
     void GL3PlusRenderSystem::setScissorTest(bool enabled, size_t left,
                                              size_t top, size_t right,
                                              size_t bottom)
@@ -1538,6 +1553,12 @@ namespace Ogre {
             {
                 mStateCacheManager->setDepthMask( GL_TRUE );
             }
+
+            if (isReverseDepthBufferEnabled())
+            {
+                depth = 1.0f - 0.5f * (depth + 1.0f);
+            }
+
             mStateCacheManager->setClearDepth(depth);
         }
         if (buffers & FBT_STENCIL)
@@ -1759,6 +1780,12 @@ namespace Ogre {
             glEnable(0x8861); // GL_POINT_SPRITE
             glGetError();     // clear the error that it generates nevertheless..
         }
+
+        if (isReverseDepthBufferEnabled())
+        {
+            // We want depth to range from 0 to 1 to increase precision.
+            glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
+        }
     }
 
     void GL3PlusRenderSystem::initialiseContext(RenderWindow* primary)
@@ -1835,7 +1862,7 @@ namespace Ogre {
         }
     }
 
-    GLint GL3PlusRenderSystem::convertCompareFunction(CompareFunction func)
+    GLint GL3PlusRenderSystem::convertCompareFunction(CompareFunction func, bool isReverse)
     {
         switch(func)
         {
@@ -1844,18 +1871,18 @@ namespace Ogre {
         case CMPF_ALWAYS_PASS:
             return GL_ALWAYS;
         case CMPF_LESS:
-            return GL_LESS;
+            return isReverse ? GL_GREATER : GL_LESS;
         case CMPF_LESS_EQUAL:
-            return GL_LEQUAL;
+            return isReverse ? GL_GEQUAL : GL_LEQUAL;
         case CMPF_EQUAL:
             return GL_EQUAL;
         case CMPF_NOT_EQUAL:
             return GL_NOTEQUAL;
         case CMPF_GREATER_EQUAL:
-            return GL_GEQUAL;
+            return isReverse ? GL_LEQUAL : GL_GEQUAL;
         case CMPF_GREATER:
-            return GL_GREATER;
-        };
+            return isReverse ? GL_LESS :  GL_GREATER;
+        }
         // To keep compiler happy
         return GL_ALWAYS;
     }

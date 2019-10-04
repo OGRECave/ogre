@@ -807,7 +807,7 @@ namespace Ogre
 
     }
 
-    Matrix4 Math::makePerspectiveMatrix(Real left, Real right, Real bottom, Real top, Real zNear, Real zFar)
+    Matrix4 Math::makePerspectiveMatrix(Real left, Real right, Real bottom, Real top, Real zNear, Real zFar, bool isReverseDepth)
     {
         // The code below will dealing with general projection
         // parameters, similar glFrustum.
@@ -816,7 +816,16 @@ namespace Ogre
 
         Real inv_w = 1 / (right - left);
         Real inv_h = 1 / (top - bottom);
-        Real inv_d = 1 / (zFar - zNear);
+        Real inv_d;
+
+        if (isReverseDepth)
+        {
+            inv_d = 1 / (zNear - zFar);
+        }
+        else
+        {
+            inv_d = 1 / (zFar - zNear);
+        }
 
         // Calc matrix elements
         Real A = 2 * zNear * inv_w;

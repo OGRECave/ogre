@@ -213,6 +213,10 @@ namespace Ogre {
 
         void _render(const RenderOperation& op);
 
+        void _getDepthStencilFormatFor(PixelFormat internalColourFormat,
+                                       uint32* depthFormat,
+                                       uint32* stencilFormat);
+
         void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
 
         void clearFrameBuffer(unsigned int buffers,
@@ -260,7 +264,7 @@ namespace Ogre {
          */
         void _setRenderTarget(RenderTarget *target);
 
-        static GLint convertCompareFunction(CompareFunction func);
+        static GLint convertCompareFunction(CompareFunction func, bool isReverse = false);
         static GLint convertStencilOp(StencilOperation op, bool invert = false);
 
         void bindGpuProgram(GpuProgram* prg);
