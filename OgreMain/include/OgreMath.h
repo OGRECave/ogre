@@ -736,7 +736,7 @@ namespace Ogre
            q = - (far + near) / (far - near)
            qn = - 2 * (far * near) / (far - near)
          */
-        static Matrix4 makePerspectiveMatrix(Real left, Real right, Real bottom, Real top, Real zNear, Real zFar);
+        static Matrix4 makePerspectiveMatrix(Real left, Real right, Real bottom, Real top, Real zNear, Real zFar, bool isReverseDepth = false);
 
         /** Get the radius of the origin-centered bounding sphere from the bounding box. */
         static Real boundingRadiusFromAABB(const AxisAlignedBox& aabb);

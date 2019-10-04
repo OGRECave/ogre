@@ -128,15 +128,12 @@ namespace Ogre {
             this->_initialise();
         }
 
-        void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool)
-        {
-            // no conversion request for OpenGL
-            dest = matrix;
-        }
+        void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool);
 
         /// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
-        void _getDepthStencilFormatFor(PixelFormat internalColourFormat, uint32* depthFormat,
-                                       uint32* stencilFormat);
+        virtual void _getDepthStencilFormatFor(PixelFormat internalColourFormat,
+                                               uint32* depthFormat,
+                                               uint32* stencilFormat);
 
         /** Create VAO on current context */
         virtual uint32 _createVao() { return 0; }

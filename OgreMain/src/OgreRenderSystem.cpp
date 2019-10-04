@@ -60,6 +60,7 @@ namespace Ogre {
         , mFaceCount(0)
         , mVertexCount(0)
         , mInvertVertexWinding(false)
+        , mIsReverseDepthBufferEnabled(false)
         , mDisabledTexUnitsFrom(0)
         , mCurrentPassIterationCount(0)
         , mCurrentPassIterationNum(0)
@@ -634,6 +635,16 @@ namespace Ogre {
                 LogManager::getSingleton().logWarning( "Couldn't create a suited DepthBuffer"
                                                        "for RT: " + renderTarget->getName());
         }
+    }
+    //-----------------------------------------------------------------------
+    void RenderSystem::setReverseDepthBuffer(bool isReversed)
+    {
+        mIsReverseDepthBufferEnabled = isReversed;
+    }
+    //-----------------------------------------------------------------------
+    bool RenderSystem::isReverseDepthBufferEnabled() const
+    {
+        return mIsReverseDepthBufferEnabled;
     }
     //-----------------------------------------------------------------------
     void RenderSystem::shutdown(void)
