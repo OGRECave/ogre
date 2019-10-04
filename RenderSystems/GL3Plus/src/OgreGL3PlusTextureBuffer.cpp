@@ -223,6 +223,10 @@ namespace Ogre {
                     case GL_DEPTH_COMPONENT32:
                         type = GL_UNSIGNED_INT;
                         break;
+
+                    case GL_DEPTH_COMPONENT32F:
+                        type = GL_FLOAT;
+                        break;
                 }
             }
 

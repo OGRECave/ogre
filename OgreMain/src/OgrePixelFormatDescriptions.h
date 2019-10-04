@@ -1515,6 +1515,19 @@ namespace Ogre {
             /* Masks and shifts */
             0, 0, 0, 0, 0, 0, 0, 0
         },
+        //-----------------------------------------------------------------------
+        {"PF_DEPTH32F",
+            /* Bytes per element */
+            4,
+            /* Flags */
+            PFF_LUMINANCE | PFF_DEPTH | PFF_NATIVEENDIAN,
+            /* Component type and count */
+            PCT_FLOAT32, 1,
+            /* rbits, gbits, bbits, abits */
+            32, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0, 0, 0, 0, 0
+        },
     };
     /** @} */
     /** @} */

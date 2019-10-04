@@ -269,6 +269,8 @@ namespace Ogre {
         /// ASTC (ARM Adaptive Scalable Texture Compression RGBA, block size 12x12)
         PF_ASTC_RGBA_12X12_LDR,
         PF_DEPTH32,
+        /// Depth texture format with 32-bit floating point
+        PF_DEPTH32F,
         /// Number of pixel formats currently defined
         PF_COUNT,
         // endianess aware aliases
