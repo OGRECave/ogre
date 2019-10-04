@@ -265,6 +265,7 @@ namespace Ogre {
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_12x10_KHR},// PF_ASTC_RGBA_12X10_LDR
             {GL_NONE, GL_NONE, GL_COMPRESSED_RGBA_ASTC_12x12_KHR},// PF_ASTC_RGBA_12X12_LDR
             {GL_NONE, GL_NONE, GL_NONE}, // PF_DEPTH32
+            {GL_NONE, GL_NONE, GL_NONE}, // PF_DEPTH32F
     };
 
     void GLES2PixelUtil::useSizedFormats()
