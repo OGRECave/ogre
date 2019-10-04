@@ -852,6 +852,15 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual NativeWindowPair createWindow(const Ogre::String& name, uint32_t w, uint32_t h, Ogre::NameValuePairList miscParams)
         {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            // Make sure Trays are not tiny -  we cannot easily scale the UI, therefore just reduce resolution
+            float contentScaling = AConfiguration_getDensity(mAConfig)/float(ACONFIGURATION_DENSITY_HIGH);
+            if(contentScaling > 1.0)
+            {
+                miscParams["contentScalingFactor"] = std::to_string(contentScaling);
+                miscParams["FSAA"] = "2";
+            }
+#endif
             NativeWindowPair res = ApplicationContext::createWindow(name, w, h, miscParams);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
