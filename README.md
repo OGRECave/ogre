@@ -21,8 +21,6 @@ classes.
 ## Index Of Contents
 * [What's New?](Docs/1.12-Notes.md)  
 A summary of the new and altered features in this release.
-* [Features](http://www.ogre3d.org/about/features)  
-A summary of OGRE's main features.
 * [Building the core OGRE libraries](https://ogrecave.github.io/ogre/api/latest/building-ogre.html)  
 If you're using the full source release, this will help you build it. If you're using a precompiled SDK then most of the work has already been done for you, and you should use the sample projects to see how to compile your own code against OGRE.
 * [The OGRE Manual](https://ogrecave.github.io/ogre/api/latest/manual.html)  
@@ -36,6 +34,27 @@ A gold mine of tutorials, tips and code snippets which will help you get up to s
 * [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/)
 * Ubuntu Snap package: `sudo snap install ogre`
 * [Android App on F-Droid](https://f-droid.org/packages/org.ogre.browser/)
+
+## Features
+
+For an exhaustive list, see the [features page](http://www.ogre3d.org/about/features) and try our Sample Browser. For a quick overview see below
+
+| Integrated Bump Mapping | Integrated shadows |
+|----|----|
+| ![](Other/screenshots/bumpmap.jpg) | ![](Other/screenshots/shadows.jpg) |
+
+
+| HW & SW skeletal animation | Multi-layer Terrain |
+|----|----|
+| ![](Other/screenshots/skeletal.jpg) | ![](Other/screenshots/terrain.jpg) |
+
+| Automatic Rendertarget pipelining (Compositors) | Volume Rendering with CSG & Triplanar Texturing |
+|----|----|
+| ![](Other/screenshots/compositor.jpg) | ![](Other/screenshots/volume.jpg) |
+
+| [Dear ImGui](https://github.com/ocornut/imgui) | Particle Effects |
+|----|----|
+| ![](Other/screenshots/imgui.jpg) | ![](Other/screenshots/particle.jpg) |
 
 ## Who is using it?
 
