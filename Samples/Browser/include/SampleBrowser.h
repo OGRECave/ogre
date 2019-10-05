@@ -175,6 +175,22 @@ namespace OgreBites
             }
         }
 
+        /// catch any exceptions that might drop out of event handlers implemented by Samples
+        bool frameStarted(const Ogre::FrameEvent& evt)
+        {
+            try
+            {
+                return SampleContext::frameStarted(evt);
+            }
+            catch (Ogre::Exception& e)   // show error and fall back to menu
+            {
+                runSample(0);
+                mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
+            }
+
+            return true;
+        }
+
         /*-----------------------------------------------------------------------------
           | Extends frameRenderingQueued to update tray manager and carousel.
           -----------------------------------------------------------------------------*/
@@ -220,17 +236,7 @@ namespace OgreBites
 
             mTrayMgr->frameRendered(evt);
 
-            try
-            {
-                return SampleContext::frameRenderingQueued(evt);
-            }
-            catch (Ogre::Exception& e)   // show error and fall back to menu
-            {
-                runSample(0);
-                mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
-            }
-
-            return true;
+            return SampleContext::frameRenderingQueued(evt);
         }
 
         /*-----------------------------------------------------------------------------
@@ -598,17 +604,7 @@ namespace OgreBites
                     mWindow->setFSAA(newFSAA, mWindow->getFSAAHint());
             }
 
-            try
-            {
-                return SampleContext::keyPressed(evt);
-            }
-            catch (Ogre::Exception& e)   // show error and fall back to menu
-            {
-                runSample(0);
-                mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
-            }
-
-            return true;
+            return SampleContext::keyPressed(evt);
         }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -667,18 +663,7 @@ namespace OgreBites
 
             if (isCurrentSamplePaused()) return mTrayMgr->mousePressed(evt);
 
-            try
-            {
-                // return SampleContext::mousePressed(orientedEvt);
-                return SampleContext::mousePressed(evt);
-            }
-            catch (Ogre::Exception& e)   // show error and fall back to menu
-            {
-                runSample(0);
-                mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
-            }
-
-            return true;
+            return SampleContext::mousePressed(evt);
         }
 
         // convert and redirect
@@ -695,17 +680,7 @@ namespace OgreBites
          {
             if (isCurrentSamplePaused()) return mTrayMgr->mouseReleased(evt);
 
-            try
-            {
-                return SampleContext::mouseReleased(evt);
-            }
-            catch (Ogre::Exception& e)   // show error and fall back to menu
-            {
-                runSample(0);
-                mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
-            }
-
-            return true;
+            return SampleContext::mouseReleased(evt);
         }
 
         // convert and redirect
@@ -723,17 +698,7 @@ namespace OgreBites
         {
             if (isCurrentSamplePaused()) return mTrayMgr->mouseMoved(evt);
 
-            try
-            {
-                return SampleContext::mouseMoved(evt);
-            }
-            catch (Ogre::Exception& e)   // show error and fall back to menu
-            {
-                runSample(0);
-                mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
-            }
-
-            return true;
+            return SampleContext::mouseMoved(evt);
         }
 
         // convert and redirect
