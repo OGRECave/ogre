@@ -652,11 +652,6 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual bool mousePressed(const MouseButtonEvent& evt)
         {
-            // FIXME: does SDL handle orientation for us already?
-            //OIS::PointerState state = evt.state;
-            //transformInputState(state);
-            //OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
-
             if (mTitleLabel->getTrayLocation() != TL_NONE)
             {
                 for (unsigned int i = 0; i < mThumbs.size(); i++)
@@ -698,10 +693,6 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual bool mouseReleased(const MouseButtonEvent& evt)
          {
-            //OIS::PointerState state = evt.state;
-            //transformInputState(state);
-            //OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
-
             if ((!mCurrentSample || mSamplePaused) && mTrayMgr->mouseReleased(evt)) return true;
 
             try
@@ -730,10 +721,6 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual bool mouseMoved(const MouseMotionEvent& evt)
         {
-            //OIS::PointerState state = evt.state;
-            //transformInputState(state);
-            //OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
-
             if ((!mCurrentSample || mSamplePaused) && mTrayMgr->mouseMoved(evt)) return true;
 
             try

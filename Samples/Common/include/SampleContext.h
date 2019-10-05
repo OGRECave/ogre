@@ -282,80 +282,6 @@ namespace OgreBites
             return true;
         }
 
-        void transformInputState(TouchFingerEvent &state)
-        {
-#if 0
-            int w = mWindow->getViewport(0)->getActualWidth();
-            int h = mWindow->getViewport(0)->getActualHeight();
-            int absX = state.X.abs;
-            int absY = state.Y.abs;
-            int relX = state.X.rel;
-            int relY = state.Y.rel;
-
-            // as OIS work in windowing system units we need to convert them to pixels
-            float scale = mWindow->getViewPointToPixelScale();
-            if(scale != 1.0f)
-            {
-                absX = (int)(absX * scale);
-                absY = (int)(absY * scale);
-                relX = (int)(relX * scale);
-                relY = (int)(relY * scale);
-            }
-
-            // determine required orientation
-            Ogre::OrientationMode orientation = Ogre::OR_DEGREE_0;
-#    if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0)
-            orientation = mWindow->getViewport(0)->getOrientationMode();
-#    elif (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 1) && (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
-            UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
-            switch (interfaceOrientation)
-            {
-            case UIInterfaceOrientationPortrait:           break;
-            case UIInterfaceOrientationLandscapeLeft:      orientation = Ogre::OR_DEGREE_90;  break;
-            case UIInterfaceOrientationPortraitUpsideDown: orientation = Ogre::OR_DEGREE_180; break;
-            case UIInterfaceOrientationLandscapeRight:     orientation = Ogre::OR_DEGREE_270; break;
-            }
-#    endif
-
-            // apply changes
-            switch (orientation)
-            {
-            case Ogre::OR_DEGREE_0:
-                state.X.abs = absX;
-                state.Y.abs = absY;
-                state.X.rel = relX;
-                state.Y.rel = relY;
-                state.width = w;
-                state.height = h;
-                break;
-            case Ogre::OR_DEGREE_90:
-                state.X.abs = w - absY;
-                state.Y.abs = absX;
-                state.X.rel = -relY;
-                state.Y.rel = relX;
-                state.width = h;
-                state.height = w;
-                break;
-            case Ogre::OR_DEGREE_180:
-                state.X.abs = w - absX;
-                state.Y.abs = h - absY;
-                state.X.rel = -relX;
-                state.Y.rel = -relY;
-                state.width = w;
-                state.height = h;
-                break;
-            case Ogre::OR_DEGREE_270:
-                state.X.abs = absY;
-                state.Y.abs = h - absX;
-                state.X.rel = relY;
-                state.Y.rel = -relX;
-                state.width = h;
-                state.height = w;
-                break;
-            }
-#endif
-        }
-
         virtual bool touchMoved(const TouchFingerEvent& evt)
         {
             if (mCurrentSample && !mSamplePaused)
@@ -365,12 +291,6 @@ namespace OgreBites
 
         virtual bool mouseMoved(const MouseMotionEvent& evt)
         {
-            // Miniscule mouse movements are still considered hovering.
-            // if (evt.xrel > 100000 || evt.yrel > 100000)
-            // {
-            //     mTimeSinceMouseMoved = 0;
-            // }
-
             if (mCurrentSample && !mSamplePaused)
                 return mCurrentSample->mouseMoved(evt);
             return true;
@@ -404,15 +324,6 @@ namespace OgreBites
             return true;
         }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        //FIXME: Handle mouse wheel wheel events on mobile devices.
-        // virtual bool touchReleased(const SDL_TouchFingerEvent& evt)
-        // {
-        //     if (mCurrentSample && !mSamplePaused)
-        //         return mCurrentSample->touchReleased(evt);
-        //     return true;
-        // }
-#endif
         virtual bool mouseWheelRolled(const MouseWheelEvent& evt)
         {
             if (mCurrentSample && !mSamplePaused)
