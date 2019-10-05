@@ -665,7 +665,7 @@ namespace OgreBites
                 }
             }
 
-            if ((!mCurrentSample || mSamplePaused) && mTrayMgr->mousePressed(evt)) return true;
+            if (isCurrentSamplePaused()) return mTrayMgr->mousePressed(evt);
 
             try
             {
@@ -693,7 +693,7 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual bool mouseReleased(const MouseButtonEvent& evt)
          {
-            if ((!mCurrentSample || mSamplePaused) && mTrayMgr->mouseReleased(evt)) return true;
+            if (isCurrentSamplePaused()) return mTrayMgr->mouseReleased(evt);
 
             try
             {
@@ -721,7 +721,7 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual bool mouseMoved(const MouseMotionEvent& evt)
         {
-            if ((!mCurrentSample || mSamplePaused) && mTrayMgr->mouseMoved(evt)) return true;
+            if (isCurrentSamplePaused()) return mTrayMgr->mouseMoved(evt);
 
             try
             {
@@ -751,8 +751,8 @@ namespace OgreBites
          */
         virtual bool mouseWheelRolled(const MouseWheelEvent& evt)
         {
-            if (!(mCurrentSample && !mSamplePaused) && mTitleLabel->getTrayLocation() != TL_NONE
-                && mSampleMenu->getNumItems() != 0)
+            if (isCurrentSamplePaused() && mTitleLabel->getTrayLocation() != TL_NONE &&
+                mSampleMenu->getNumItems() != 0)
             {
                 int newIndex = mSampleMenu->getSelectionIndex() - evt.y / Ogre::Math::Abs(evt.y);
                 mSampleMenu->selectItem(Ogre::Math::Clamp<size_t>(newIndex, 0, mSampleMenu->getNumItems() - 1));
