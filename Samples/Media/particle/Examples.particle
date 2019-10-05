@@ -9,6 +9,7 @@ particle_system Examples/GreenyNimbus
     cull_each       false
     quota           5000
     billboard_type  point
+    point_rendering true
     
     // Area emitter.
     emitter Box
