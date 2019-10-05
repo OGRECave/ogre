@@ -45,7 +45,7 @@ public:
         OverlayManager::getSingleton().addOverlay(imguiOverlay); // now owned by overlaymgr
 
         mImguiListener.reset(new ImGuiInputListener());
-        mListenerChain = InputListenerChain({mTrayMgr, mImguiListener.get(), mCameraMan});
+        mListenerChain = InputListenerChain({mTrayMgr, mImguiListener.get(), mCameraMan, mControls});
 
         mTrayMgr->showCursor();
         mCameraMan->setStyle(OgreBites::CS_ORBIT);

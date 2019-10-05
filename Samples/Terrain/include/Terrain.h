@@ -272,7 +272,8 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             mInfoLabel->hide();
             if (mTerrainsImported)
             {
-                saveTerrains(true);
+                // FIXME does not end up in the correct resource group
+                // saveTerrains(true);
                 mTerrainsImported = false;
             }
         }
