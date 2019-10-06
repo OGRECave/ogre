@@ -78,6 +78,7 @@ namespace Ogre {
             and animations it uses to a .skeleton file.
         @param pSkeleton Weak reference to the Skeleton to export
         @param filename The destination filename
+        @param ver @copydoc SkeletonVersion
         @param endianMode The endian mode to write in
         */
         void exportSkeleton(const Skeleton* pSkeleton, const String& filename,
@@ -89,6 +90,7 @@ namespace Ogre {
             and animations it uses to a .skeleton file.
         @param pSkeleton Weak reference to the Skeleton to export
         @param stream The destination stream
+        @param ver @copydoc SkeletonVersion
         @param endianMode The endian mode to write in
         */
         void exportSkeleton(const Skeleton* pSkeleton, DataStreamPtr stream,

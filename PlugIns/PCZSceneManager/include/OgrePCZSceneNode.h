@@ -68,27 +68,10 @@ namespace Ogre
         void _update(bool updateChildren, bool parentHasChanged);
         void updateFromParentImpl() const;
 
-        /** Creates an unnamed new SceneNode as a child of this node.
-        @param
-            translate Initial translation offset of child relative to parent
-        @param
-            rotate Initial rotation relative to parent
-        */
-        virtual SceneNode* createChildSceneNode(
-            const Vector3& translate = Vector3::ZERO, 
-            const Quaternion& rotate = Quaternion::IDENTITY );
-
-        /** Creates a new named SceneNode as a child of this node.
-        @remarks
-            This creates a child node with a given name, which allows you to look the node up from 
-            the parent which holds this collection of nodes.
-            @param
-                translate Initial translation offset of child relative to parent
-            @param
-                rotate Initial rotation relative to parent
-        */
-        virtual SceneNode* createChildSceneNode(const String& name, const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
-
+        SceneNode* createChildSceneNode(const Vector3& translate = Vector3::ZERO,
+                                        const Quaternion& rotate = Quaternion::IDENTITY) override;
+        SceneNode* createChildSceneNode(const String& name, const Vector3& translate = Vector3::ZERO,
+                                        const Quaternion& rotate = Quaternion::IDENTITY) override;
 
         PCZone*     getHomeZone(void);
         void        setHomeZone(PCZone * zone);

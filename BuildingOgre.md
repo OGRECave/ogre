@@ -154,7 +154,7 @@ You can now import these projects in Android Studio or manually trigger the APK 
 Building for WebAssembly (using Emscripten)
 -----------------------------------------
 Install the Emscripten SDK (see full documentation on [www.emscripten.org](https://emscripten.org/docs/getting_started/downloads.html)), and make sure
-that the environment variables are correctly set (eg. run source <emsdk_path>/emsdk_env.sh before attempting to build)
+that the environment variables are correctly set (eg. run `source <emsdk_path>/emsdk_env.sh` before attempting to build)
 
 Run cmake in cross compile mode using emscripten as following:
 

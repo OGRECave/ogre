@@ -120,7 +120,7 @@ Example: `source_modifier src1_inverse_modulate custom 2`
 # System overview {#rtss_overview}
 
 The RTSS manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
-These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @ref FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, @ref FFP_FUNC_LIGHT_POINT_DIFFUSE.
+These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @ref SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, @ref SGX_FUNC_LIGHT_POINT_DIFFUSE.
 
 Correctly ordering these functions, providing them with the right input values and interconnecting them is the main purpose of the RTSS.
 

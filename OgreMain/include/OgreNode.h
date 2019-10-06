@@ -222,10 +222,7 @@ namespace Ogre {
         static QueuedUpdates msQueuedUpdates;
 
     public:
-        /** Constructor, should only be called by parent, not directly.
-        @remarks
-            Generates a name.
-        */
+        /// Constructor, should only be called by parent, not directly.
         Node();
         /** Constructor, should only be called by parent, not directly.
         @remarks

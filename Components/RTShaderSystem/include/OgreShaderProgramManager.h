@@ -79,7 +79,7 @@ public:
     static ProgramManager* getSingletonPtr();
 
     /** Release CPU/GPU programs set associated with the given ProgramSet
-    @param renderState The ProgramSet holds the programs.
+    @param programSet The ProgramSet holds the programs.
     */
     void releasePrograms(const ProgramSet* programSet);
 

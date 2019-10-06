@@ -2187,7 +2187,7 @@ namespace Ogre {
 
 
         /** Creates a new BillboardSet for use with this scene manager.
-            @remarks
+
                 This method creates a new BillboardSet which is registered with
                 the SceneManager. The SceneManager will destroy this object when
                 it shuts down or when the SceneManager::clearScene method is
@@ -2204,6 +2204,7 @@ namespace Ogre {
         BillboardSet* createBillboardSet(unsigned int poolSize = 20);
 
         /** @overload
+            @copydoc createBillboardSet(unsigned int)
             @param
                 name The name to give to this billboard set. Must be unique.
         */
