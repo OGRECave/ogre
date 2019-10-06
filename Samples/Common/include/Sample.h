@@ -100,15 +100,6 @@ namespace OgreBites
         virtual void testCapabilities(const Ogre::RenderSystemCapabilities* caps) {}
 
         /*-----------------------------------------------------------------------------
-        | If this sample requires a specific render system to run, this method
-        | will be used to return its name.
-        -----------------------------------------------------------------------------*/
-        virtual Ogre::String getRequiredRenderSystem()
-        {
-            return "";
-        }
-
-        /*-----------------------------------------------------------------------------
         | If this sample requires specific plugins to run, this method will be
         | used to return their names.
         -----------------------------------------------------------------------------*/

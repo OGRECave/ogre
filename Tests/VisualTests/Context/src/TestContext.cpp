@@ -268,11 +268,6 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
         OgreBites::SampleSet newSamples = sp->getSamples();
         for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
         {
-            // skip it if using wrong rendersystem
-            Ogre::String rs = (*j)->getRequiredRenderSystem();
-            if(!rs.empty() && rs != mRoot->getRenderSystem()->getName())
-                continue;
-
             // capability check
             try
             {
