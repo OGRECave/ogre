@@ -214,15 +214,14 @@ namespace Ogre {
         orientationModeChanged = (mLastViewportOrientationMode != vp->getOrientationMode());
 #endif
         // Flag for update pixel-based GUIElements if viewport has changed dimensions
-        if (mLastViewportWidth != vp->getActualWidth() || 
-            mLastViewportHeight != vp->getActualHeight() ||
-            orientationModeChanged)
+        if (mLastViewportWidth != int(vp->getActualWidth() / mPixelRatio) ||
+            mLastViewportHeight != int(vp->getActualHeight() / mPixelRatio) || orientationModeChanged)
         {
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             mLastViewportOrientationMode = vp->getOrientationMode();
 #endif
-            mLastViewportWidth = vp->getActualWidth();
-            mLastViewportHeight = vp->getActualHeight();
+            mLastViewportWidth = int(vp->getActualWidth() / mPixelRatio);
+            mLastViewportHeight = int(vp->getActualHeight() / mPixelRatio);
         }
 
         OverlayMap::iterator i, iend;
@@ -263,6 +262,16 @@ namespace Ogre {
                     "Getting ViewPort orientation mode is not supported");
 #endif
         return mLastViewportOrientationMode;
+    }
+    //---------------------------------------------------------------------
+    Real OverlayManager::getPixelRatio(void) const
+    {
+        return mPixelRatio;
+    }
+    //---------------------------------------------------------------------
+    void OverlayManager::setPixelRatio(Real ratio)
+    {
+        mPixelRatio = ratio;
     }
     //---------------------------------------------------------------------
     OverlayManager::ElementMap& OverlayManager::getElementMap(bool isATemplate)
