@@ -103,15 +103,6 @@ namespace OgreBites
                     }
                 }
 
-                // throw an exception if samples requires the use of another renderer
-                Ogre::String rrs = s->getRequiredRenderSystem();
-                if (!rrs.empty() && rrs != mRoot->getRenderSystem()->getName())
-                {
-                    Ogre::String desc = "Sample only runs with renderer: " + rrs;
-                    Ogre::String src = "SampleContext::runSample";
-                    OGRE_EXCEPT(Ogre::Exception::ERR_INVALID_STATE, desc, src);
-                }
-
                 // test system capabilities against sample requirements
                 s->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
 
