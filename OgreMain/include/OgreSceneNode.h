@@ -316,6 +316,7 @@ namespace Ogre {
         @remarks
             This creates a child node with a given name, which allows you to look the node up from 
             the parent which holds this collection of nodes.
+            @param name name of the node
             @param
                 translate Initial translation offset of child relative to parent
             @param

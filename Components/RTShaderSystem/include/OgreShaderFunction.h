@@ -48,6 +48,7 @@ class _OgreRTSSExport FunctionStageRef
 public:
     /** call a library function
      * @param name the function name
+     * @param inout function argument
      */
     void callFunction(const char* name, const InOut& inout) const;
 
@@ -141,6 +142,7 @@ public:
     /**
      * get input parameter by content
      * @param content
+     * @param type The type of the desired parameter.
      * @return parameter or NULL if not found
      */
     ParameterPtr getInputParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)
@@ -164,6 +166,7 @@ public:
     /**
      * get output parameter by content
      * @param content
+     * @param type The type of the desired parameter.
      * @return parameter or NULL if not found
      */
     ParameterPtr getOutputParameter(Parameter::Content content, GpuConstantType type = GCT_UNKNOWN)

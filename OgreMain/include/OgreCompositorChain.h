@@ -114,6 +114,7 @@ namespace Ogre {
             addCompositor in cases the filter is switched on and off a lot.
         @param position
             Position in filter chain of filter
+        @param state enabled flag
         */
         void setCompositorEnabled(size_t position, bool state);
 
