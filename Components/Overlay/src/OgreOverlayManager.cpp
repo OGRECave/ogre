@@ -53,7 +53,8 @@ namespace Ogre {
     OverlayManager::OverlayManager() 
       : mLastViewportWidth(0), 
         mLastViewportHeight(0), 
-        mLastViewportOrientationMode(OR_DEGREE_0)
+        mLastViewportOrientationMode(OR_DEGREE_0),
+        mPixelRatio(1)
     {
 
         // Scripting is supported by this manager
@@ -264,7 +265,7 @@ namespace Ogre {
         return mLastViewportOrientationMode;
     }
     //---------------------------------------------------------------------
-    Real OverlayManager::getPixelRatio(void) const
+    float OverlayManager::getPixelRatio(void) const
     {
         return mPixelRatio;
     }
