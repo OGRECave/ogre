@@ -435,26 +435,12 @@ namespace Ogre
         void setDepthBufferFor( RenderTarget *renderTarget );
 
         /**
-         Set reverse depth buffer enabled or disabled (default disabled).
-
-         @note You must call this function EARLY (before creating windows)!
-               You can't change this value after that.
+         Returns if reverse Z-buffer is enabled.
 
          If you have large scenes and need big far clip distance but still want
          to draw objects closer (for example cockpit of a plane) you can enable
          reverse depth buffer so that the depth buffer precision is greater further away.
          This enables the OGRE_REVERSED_Z preprocessor define for shaders.
-
-         @param isReversed If true reverse Z-buffer will be enabled (false by default).
-         @see isReverseDepthBufferEnabled
-         */
-        void setReverseDepthBuffer(bool isReversed);
-
-        /**
-         Returns if reverse Z-buffer is enabled.
-
-         Usually you should not need to call this function
-         (the RenderSystem will handle everything for you).
 
          @retval true If reverse Z-buffer is enabled.
          @retval false If reverse Z-buffer is disabled (default).

@@ -139,6 +139,8 @@ namespace Ogre {
 
         void _initialise() override;
 
+        void initConfigOptions();
+
         virtual RenderSystemCapabilities* createRenderSystemCapabilities() const;
 
         void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);

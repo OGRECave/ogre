@@ -637,11 +637,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::setReverseDepthBuffer(bool isReversed)
-    {
-        mIsReverseDepthBufferEnabled = isReversed;
-    }
-    //-----------------------------------------------------------------------
     bool RenderSystem::isReverseDepthBufferEnabled() const
     {
         return mIsReverseDepthBufferEnabled;

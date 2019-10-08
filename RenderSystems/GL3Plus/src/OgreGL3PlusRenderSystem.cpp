@@ -190,6 +190,19 @@ namespace Ogre {
         mGLSupport->start();
     }
 
+    void GL3PlusRenderSystem::initConfigOptions()
+    {
+        GLRenderSystemCommon::initConfigOptions();
+
+        ConfigOption opt;
+        opt.name = "Reversed Z-Buffer";
+        opt.possibleValues = {"No", "Yes"};
+        opt.currentValue = opt.possibleValues[0];
+        opt.immutable = false;
+
+        mOptions[opt.name] = opt;
+    }
+
     RenderSystemCapabilities* GL3PlusRenderSystem::createRenderSystemCapabilities() const
     {
         RenderSystemCapabilities* rsc = OGRE_NEW RenderSystemCapabilities();
@@ -650,6 +663,15 @@ namespace Ogre {
             const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
             StringVector tokens = StringUtil::split(shadingLangVersion, ". ");
             mNativeShadingLanguageVersion = (StringConverter::parseUnsignedInt(tokens[0]) * 100) + StringConverter::parseUnsignedInt(tokens[1]);
+
+            auto it = mOptions.find("Reversed Z-Buffer");
+            if (it != mOptions.end())
+            {
+                mIsReverseDepthBufferEnabled = StringConverter::parseBool(it->second.currentValue);
+                OgreAssert(!mIsReverseDepthBufferEnabled || hasMinGLVersion(4, 5) ||
+                               checkExtension("GL_ARB_clip_control"),
+                           "Reversed Z-Buffer not supported");
+            }
 
             // Initialise GL after the first window has been created
             // TODO: fire this from emulation options, and don't duplicate Real and Current capabilities
