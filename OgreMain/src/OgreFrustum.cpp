@@ -372,15 +372,13 @@ namespace Ogre {
         }
 
         Real left = rect.left, right = rect.right, top = rect.top, bottom = rect.bottom;
-        RenderSystem* renderSystem = Root::getSingleton().getRenderSystem();
-        const bool isReverseDepthBuffer = renderSystem ? renderSystem->isReverseDepthBufferEnabled() : false;
 
         if (!mCustomProjMatrix)
         {
             // Recalc if frustum params changed
             if (mProjType == PT_PERSPECTIVE)
             {
-                mProjMatrix = Math::makePerspectiveMatrix(left, right, bottom, top, mNearDist, mFarDist, isReverseDepthBuffer);
+                mProjMatrix = Math::makePerspectiveMatrix(left, right, bottom, top, mNearDist, mFarDist);
 
                 if (mObliqueDepthProjection)
                 {
@@ -408,7 +406,7 @@ namespace Ogre {
                     Vector4 qVec;
                     qVec.x = (Math::Sign(plane.normal.x) + mProjMatrix[0][2]) / mProjMatrix[0][0];
                     qVec.y = (Math::Sign(plane.normal.y) + mProjMatrix[1][2]) / mProjMatrix[1][1];
-                    qVec.z = (isReverseDepthBuffer ? 1 : -1);
+                    qVec.z = -1;
                     qVec.w = (1 + mProjMatrix[2][2]) / mProjMatrix[2][3];
 
                     // Calculate the scaled plane vector
@@ -418,7 +416,7 @@ namespace Ogre {
                     // Replace the third row of the projection matrix
                     mProjMatrix[2][0] = c.x;
                     mProjMatrix[2][1] = c.y;
-                    mProjMatrix[2][2] = c.z + (isReverseDepthBuffer ? -1 : 1);
+                    mProjMatrix[2][2] = c.z + 1;
                     mProjMatrix[2][3] = c.w; 
                 }
             } // perspective
@@ -480,6 +478,7 @@ namespace Ogre {
         // Deal with orientation mode
         mProjMatrix = mProjMatrix * Quaternion(Degree(mOrientationMode * 90.f), Vector3::UNIT_Z);
 #endif
+        RenderSystem* renderSystem = Root::getSingleton().getRenderSystem();
 
         if(renderSystem)
         {
