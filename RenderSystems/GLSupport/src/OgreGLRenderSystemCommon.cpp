@@ -211,16 +211,16 @@ namespace Ogre {
 
     void GLRenderSystemCommon::_convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool)
     {
-        // no conversion request for OpenGL
+        // no conversion required for OpenGL
         dest = matrix;
 
         if (mIsReverseDepthBufferEnabled)
         {
-            // Convert depth range from [+1,-1] to [1,0]
-            dest[2][0] = (dest[2][0] + dest[3][0]) * 0.5f;
-            dest[2][1] = (dest[2][1] + dest[3][1]) * 0.5f;
-            dest[2][2] = (dest[2][2] + dest[3][2]) * 0.5f;
-            dest[2][3] = (dest[2][3] + dest[3][3]) * 0.5f;
+            // Convert depth range from [-1,+1] to [1,0]
+            dest[2][0] = (dest[2][0] - dest[3][0]) * -0.5f;
+            dest[2][1] = (dest[2][1] - dest[3][1]) * -0.5f;
+            dest[2][2] = (dest[2][2] - dest[3][2]) * -0.5f;
+            dest[2][3] = (dest[2][3] - dest[3][3]) * -0.5f;
         }
     }
 
