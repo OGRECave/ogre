@@ -1098,7 +1098,6 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
-        //FIXME glPolygonOffset currently is buggy in GL3+ RS but not GL RS.
         bool enable = constantBias != 0 || slopeScaleBias != 0;
         mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_FILL, enable);
         mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_POINT, enable);
@@ -1106,6 +1105,12 @@ namespace Ogre {
 
         if (enable)
         {
+            if(isReverseDepthBufferEnabled())
+            {
+                slopeScaleBias *= -1;
+                constantBias *= -1;
+            }
+
             glPolygonOffset(-slopeScaleBias, -constantBias);
         }
     }
