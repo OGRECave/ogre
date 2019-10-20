@@ -497,14 +497,6 @@ namespace Ogre {
                 BP_DOWN = 5
             };
 
-            /* Internal utility method for creating the planes of a skybox.
-            */
-            MeshPtr createSkyboxPlane(
-                BoxPlane bp,
-                Real distance,
-                const Quaternion& orientation,
-                const String& groupName);
-
             /* Internal utility method for creating the planes of a skydome.
             */
             MeshPtr createSkydomePlane(
