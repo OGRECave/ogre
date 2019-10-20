@@ -255,10 +255,6 @@ void SceneManager::SkyRenderer::setSkyBox(
                 right = Vector3::UNIT_X * distance;
                 break;
             }
-            // Modify by orientation
-            middle = orientation * middle;
-            up = orientation * up;
-            right = orientation * right;
 
             // 3D cubic texture
             // Note UVs mirrored front/back
@@ -266,21 +262,20 @@ void SceneManager::SkyRenderer::setSkyBox(
             // since 3D coords will function correctly but it's really not worth
             // making the code more complicated for the sake of 16 verts
             // top left
-            Vector3 pos;
-            pos = middle + up - right;
-            mSkyBoxObj->position(pos);
+            Vector3 pos = middle + up - right;
+            mSkyBoxObj->position(orientation * pos);
             mSkyBoxObj->textureCoord(pos.normalisedCopy() * Vector3(1,1,-1));
             // bottom left
             pos = middle - up - right;
-            mSkyBoxObj->position(pos);
+            mSkyBoxObj->position(orientation * pos);
             mSkyBoxObj->textureCoord(pos.normalisedCopy() * Vector3(1,1,-1));
             // bottom right
             pos = middle - up + right;
-            mSkyBoxObj->position(pos);
+            mSkyBoxObj->position(orientation * pos);
             mSkyBoxObj->textureCoord(pos.normalisedCopy() * Vector3(1,1,-1));
             // top right
             pos = middle + up + right;
-            mSkyBoxObj->position(pos);
+            mSkyBoxObj->position(orientation * pos);
             mSkyBoxObj->textureCoord(pos.normalisedCopy() * Vector3(1,1,-1));
 
             uint16 base = i * 4;
