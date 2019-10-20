@@ -593,7 +593,7 @@ Associates a numeric identifier with a pass involving a material (like render_qu
 @par
 Format: identifier &lt;number&gt; 
 @par
-Example: identifier 99945 
+Example: identifier 99945
 @par
 Default: identifier 0
 
@@ -668,9 +668,11 @@ Here are the attributes you can use in a ’clear’ section of a .compositor sc
 
     Set the colour used to fill the colour buffer by this pass, if the colour buffer is being cleared
     @par
-    Format: colour\_value &lt;red&gt; &lt;green&gt; &lt;blue&gt; &lt;alpha&gt; 
+    Format: colour\_value (&lt;red&gt; &lt;green&gt; &lt;blue&gt; &lt;alpha&gt; | auto)
     @par
     Default: colour\_value 0 0 0 0
+
+    If set to `auto` the background colour of the viewport is used, to which the parent compositor is attached to.
 
     <a name="compositor_005fclear_005fdepth_005fvalue"></a><a name="depth_005fvalue"></a>
 

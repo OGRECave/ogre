@@ -1185,7 +1185,7 @@ namespace Ogre
         mIds["target_output"] = ID_TARGET_OUTPUT;
 
         mIds["input"] = ID_INPUT;
-        mIds["none"] = ID_NONE;
+        //mIds["none"] = ID_NONE; - already registered
         mIds["previous"] = ID_PREVIOUS;
         mIds["target_width"] = ID_TARGET_WIDTH;
         mIds["target_height"] = ID_TARGET_HEIGHT;
@@ -1249,6 +1249,7 @@ namespace Ogre
         mIds["sampler_ref"] = ID_SAMPLER_REF;
         mIds["thread_groups"] = ID_THREAD_GROUPS;
         mIds["render_custom"] = ID_RENDER_CUSTOM;
+        mIds["auto"] = ID_AUTO;
 
 		mLargestRegisteredWordId = ID_END_BUILTIN_IDS;
 	}

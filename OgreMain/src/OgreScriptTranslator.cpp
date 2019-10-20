@@ -5398,7 +5398,10 @@ namespace Ogre{
                             return;
                         }
                         ColourValue val;
-                        if(getColour(prop->values.begin(), prop->values.end(), &val))
+                        if (prop->values.front()->type == ANT_ATOM &&
+                            ((AtomAbstractNode*)prop->values.front().get())->id == ID_AUTO)
+                            mPass->setAutomaticColour(true);
+                        else if(getColour(prop->values.begin(), prop->values.end(), &val))
                             mPass->setClearColour(val);
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
