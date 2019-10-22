@@ -32,6 +32,7 @@
 #include "OgrePlatform.h"
 #include <string.h>
 #include <stdlib.h>
+#include <forward_list>
 
 namespace Ogre {
 
@@ -181,23 +182,20 @@ namespace Ogre {
             Token Value;
             /// Unparsed macro body (keeps the whole raw unparsed macro body)
             Token Body;
-            /// Next macro in chained list
-            Macro *Next;
             /// A pointer to function implementation (if macro is really a func)
             Token (*ExpandFunc) (CPreprocessor *iParent, int iNumArgs, Token *iArgs);
             /// true if macro expansion is in progress
             bool Expanding;
 
             Macro (const Token &iName) :
-            Name (iName), NumArgs (0), Args (NULL), Next (NULL),
+            Name (iName), NumArgs (0), Args (NULL),
                 ExpandFunc (NULL), Expanding (false)
             { }
 
-            ~Macro ()
-            { delete [] Args; delete Next; }
+            ~Macro() { delete[] Args; }
 
             /// Expand the macro value (will not work for functions)
-            Token Expand (int iNumArgs, Token *iArgs, Macro *iMacros);
+            Token Expand (int iNumArgs, Token *iArgs, std::forward_list<Macro*>& iMacros);
         };
 
         friend class CPreprocessor::Macro;
@@ -214,7 +212,7 @@ namespace Ogre {
         unsigned EnableOutput;
         unsigned EnableElif;
         /// The list of macros defined so far
-        Macro *MacroList;
+        std::forward_list<Macro*> MacroList;
 
         /**
          * Private constructor to re-parse a single token.
@@ -442,8 +440,7 @@ namespace Ogre {
 
     public:
         /// Create an empty preprocessor object
-        CPreprocessor () : MacroList (NULL)
-        { }
+        CPreprocessor() {}
 
         /// Destroy the preprocessor object
         virtual ~CPreprocessor ();
