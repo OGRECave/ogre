@@ -212,6 +212,7 @@ namespace Ogre {
         bool BOL;
         /// A stack of 32 booleans packed into one value :)
         unsigned EnableOutput;
+        unsigned EnableElif;
         /// The list of macros defined so far
         Macro *MacroList;
 

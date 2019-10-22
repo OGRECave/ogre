@@ -69,6 +69,10 @@ TEST(CPreprocessorTests, ElseIf)
                  "value is 1\n"
                  "#elif A == 0\n"
                  "value is 0\n"
+                 "#elif A == 2\n"
+                 "value is 2\n"
+                 "#else\n"
+                 "value is 3\n"
                  "#endif";
 
     size_t olen;

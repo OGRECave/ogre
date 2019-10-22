@@ -1013,9 +1013,12 @@ namespace Ogre {
             return false;
         }
 
+        EnableElif <<= 1;
         EnableOutput <<= 1;
         if (IsDefined (t))
             EnableOutput |= 1;
+        else
+            EnableElif |= 1;
 
         do
         {
@@ -1064,9 +1067,12 @@ namespace Ogre {
         if (!rc)
             return false;
 
+        EnableElif <<= 1;
         EnableOutput <<= 1;
         if (val)
             EnableOutput |= 1;
+        else
+            EnableElif |= 1;
 
         return true;
     }
@@ -1098,8 +1104,11 @@ namespace Ogre {
         if (!rc)
             return false;
 
-        if (val)
+        if (val && (EnableElif & 1))
+        {
             EnableOutput |= 1;
+            EnableElif &= ~1;
+        }
         else
             EnableOutput &= ~1;
 
@@ -1116,7 +1125,8 @@ namespace Ogre {
         }
 
         // Negate the result of last #if
-        EnableOutput ^= 1;
+        if (EnableElif & 1)
+            EnableOutput ^= 1;
 
         if (iBody.Length)
             Error (iLine, "Warning: Ignoring garbage after #else", &iBody);
@@ -1127,6 +1137,7 @@ namespace Ogre {
 
     bool CPreprocessor::HandleEndIf (Token &iBody, int iLine)
     {
+        EnableElif >>= 1;
         EnableOutput >>= 1;
         if (EnableOutput == 0)
         {
@@ -1296,6 +1307,7 @@ namespace Ogre {
         Line = 1;
         BOL = true;
         EnableOutput = 1;
+        EnableElif = 0;
 
         // Accumulate output into this token
         Token output (Token::TK_TEXT);
