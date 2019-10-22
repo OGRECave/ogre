@@ -515,7 +515,6 @@ namespace Ogre {
 
         // Use FBO's for RTT, PBuffers and Copy are no longer supported
         // Create FBO manager
-        LogManager::getSingleton().logMessage("GL3+: Using FBOs for rendering to textures");
         mRTTManager = new GL3PlusFBOManager(this);
         caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
@@ -655,11 +654,6 @@ namespace Ogre {
         {
             initialiseContext(win);
 
-            if (mDriverVersion.major < 3)
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Driver does not support at least OpenGL 3.0.",
-                            "GL3PlusRenderSystem::_createRenderWindow");
-
             const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
             StringVector tokens = StringUtil::split(shadingLangVersion, ". ");
             mNativeShadingLanguageVersion = (StringConverter::parseUnsignedInt(tokens[0]) * 100) + StringConverter::parseUnsignedInt(tokens[1]);
@@ -668,9 +662,12 @@ namespace Ogre {
             if (it != mOptions.end())
             {
                 mIsReverseDepthBufferEnabled = StringConverter::parseBool(it->second.currentValue);
-                OgreAssert(!mIsReverseDepthBufferEnabled || hasMinGLVersion(4, 5) ||
-                               checkExtension("GL_ARB_clip_control"),
-                           "Reversed Z-Buffer not supported");
+
+                if(mIsReverseDepthBufferEnabled && !hasMinGLVersion(4, 5) && !checkExtension("GL_ARB_clip_control"))
+                {
+                    mIsReverseDepthBufferEnabled = false;
+                    LogManager::getSingleton().logWarning("Reversed Z-Buffer was requested, but it is not supported. Disabling.");
+                }
             }
 
             // Initialise GL after the first window has been created
@@ -1770,7 +1767,6 @@ namespace Ogre {
         if (fsaa_active)
         {
             OGRE_CHECK_GL_ERROR(glEnable(GL_MULTISAMPLE));
-            LogManager::getSingleton().logMessage("Using FSAA.");
         }
 
         if (checkExtension("GL_EXT_texture_filter_anisotropic"))
