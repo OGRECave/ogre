@@ -65,7 +65,7 @@ if (OGRE_BUILD_TESTS)
       list(APPEND SOURCE_FILES Components/RTShaderSystemTests.cpp)
     endif ()
     
-    if(TEST_GLSUPPORT)
+    if(TARGET OgreGLSupport)
       set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreGLSupport)
       list(APPEND SOURCE_FILES RenderSystems/GLSupport/GLSLTests.cpp)
     endif()
