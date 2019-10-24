@@ -33,6 +33,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <forward_list>
+#include <vector>
 
 namespace Ogre {
 
@@ -174,28 +175,21 @@ namespace Ogre {
         public:
             /// Macro name
             Token Name;
-            /// Number of arguments
-            int NumArgs;
             /// The names of the arguments
-            Token *Args;
+            std::vector<Token> Args;
             /// The macro value
             Token Value;
             /// Unparsed macro body (keeps the whole raw unparsed macro body)
             Token Body;
             /// A pointer to function implementation (if macro is really a func)
-            Token (*ExpandFunc) (CPreprocessor *iParent, int iNumArgs, Token *iArgs);
+            Token (*ExpandFunc) (CPreprocessor *iParent, const std::vector<Token>& iArgs);
             /// true if macro expansion is in progress
             bool Expanding;
 
-            Macro (const Token &iName) :
-            Name (iName), NumArgs (0), Args (NULL),
-                ExpandFunc (NULL), Expanding (false)
-            { }
-
-            ~Macro() { delete[] Args; }
+            Macro(const Token& iName) : Name(iName), ExpandFunc(NULL), Expanding(false) {}
 
             /// Expand the macro value (will not work for functions)
-            Token Expand (int iNumArgs, Token *iArgs, std::forward_list<Macro*>& iMacros);
+            Token Expand (const std::vector<Token>& iArgs, std::forward_list<Macro*>& iMacros);
         };
 
         friend class CPreprocessor::Macro;
@@ -342,8 +336,6 @@ namespace Ogre {
 
         /**
          * Get all the arguments of a macro: '(' arg1 { ',' arg2 { ',' ... }} ')'
-         * @param oNumArgs
-         *     Number of parsed arguments is stored into this variable.
          * @param oArgs
          *     This is set to a pointer to an array of parsed arguments.
          * @param shouldAppendArg
@@ -352,7 +344,7 @@ namespace Ogre {
          *     If false, parameters are not expanded and no expressions are
          *     allowed; only a single keyword is expected per argument.
          */
-        Token GetArguments (int &oNumArgs, Token *&oArgs, bool iExpand, bool shouldAppendArg);
+        Token GetArguments (std::vector<Token>& oArgs, bool iExpand, bool shouldAppendArg);
 
         /**
          * Parse an expression, compute it and return the result.
@@ -409,14 +401,12 @@ namespace Ogre {
          * The implementation of the defined() preprocessor function
          * @param iParent
          *     The parent preprocessor object
-         * @param iNumArgs
-         *     Number of arguments
          * @param iArgs
          *     The arguments themselves
          * @return
          *     The return value encapsulated in a token
          */
-        static Token ExpandDefined (CPreprocessor *iParent, int iNumArgs, Token *iArgs);
+        static Token ExpandDefined (CPreprocessor *iParent, const std::vector<Token>& iArgs);
 
         /**
          * Parse the input string and return a token containing the whole output.
