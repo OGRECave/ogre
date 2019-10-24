@@ -61,6 +61,24 @@ TEST(CPreprocessorTests, MacroExpansion)
     free(out);
 }
 
+TEST(CPreprocessorTests, IfDef)
+{
+    CPreprocessor prep;
+    String src = "#define A\n"
+                 "#ifndef A\n"
+                 "undefined\n"
+                 "#else\n"
+                 "defined\n"
+                 "#endif";
+
+    size_t olen;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    String str(out, olen);
+    StringUtil::trim(str);
+    EXPECT_EQ(str, "defined");
+    free(out);
+}
+
 TEST(CPreprocessorTests, ElseIf)
 {
     CPreprocessor prep;
