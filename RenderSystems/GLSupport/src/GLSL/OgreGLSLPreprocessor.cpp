@@ -1120,7 +1120,7 @@ namespace Ogre {
         }
 
         // Negate the result of last #if
-        if (EnableElif & 1)
+        if ((EnableElif & 1) || (EnableOutput & 1))
             EnableOutput ^= 1;
 
         if (iBody.Length)
@@ -1222,7 +1222,10 @@ namespace Ogre {
         {
             rc = HandleIfDef (t, iLine);
             if (rc)
+            {
                 EnableOutput ^= 1;
+                EnableElif ^= 1;
+            }
         }
         else if (IS_DIRECTIVE ("if"))
             rc = HandleIf (t, iLine);
@@ -1282,6 +1285,7 @@ namespace Ogre {
 
             if ((*itpp)->Name == name)
             {
+                delete *itpp;
                 MacroList.erase_after(it);
                 return true;
             }
