@@ -61,6 +61,23 @@ TEST(CPreprocessorTests, MacroExpansion)
     free(out);
 }
 
+TEST(CPreprocessorTests, Passthrough)
+{
+    CPreprocessor prep;
+    prep.setPassthroughDefines({"GL_ARB"});
+    String src = "#ifdef GL_ARB_shader_texture_lod\n"
+                 "textureCubeLod\n"
+                 "#else\n"
+                 "textureCube\n"
+                 "#endif";
+
+    size_t olen;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    String str(out, olen);
+    EXPECT_EQ(src, str);
+    free(out);
+}
+
 TEST(CPreprocessorTests, IfDef)
 {
     CPreprocessor prep;

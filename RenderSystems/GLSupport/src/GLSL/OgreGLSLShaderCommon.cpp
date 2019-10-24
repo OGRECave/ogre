@@ -57,8 +57,8 @@ namespace Ogre {
         // Preprocess the GLSL shader in order to get a clean source
         CPreprocessor cpp;
 
+        cpp.setPassthroughDefines({"GL_ARB", "GL_EXT", "GL_OES", "__VERSION__"});
         // Define "predefined" macros.
-        // TODO: decide, should we define __VERSION__, and with what value.
         if(getLanguage() == "glsles")
             cpp.Define("GL_ES", 5, 1);
 
