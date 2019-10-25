@@ -188,8 +188,10 @@ namespace Ogre {
 
             Macro(const Token& iName) : Name(iName), ExpandFunc(NULL), Expanding(false) {}
 
+            // Macro(Macro&&) = default; // TODO unsupported by VS2013
+
             /// Expand the macro value (will not work for functions)
-            Token Expand (const std::vector<Token>& iArgs, std::forward_list<Macro*>& iMacros);
+            Token Expand (const std::vector<Token>& iArgs, std::forward_list<Macro>& iMacros);
         };
 
         friend class CPreprocessor::Macro;
@@ -206,7 +208,7 @@ namespace Ogre {
         unsigned EnableOutput;
         unsigned EnableElif;
         /// The list of macros defined so far
-        std::forward_list<Macro*> MacroList;
+        std::forward_list<Macro> MacroList;
 
         /**
          * Private constructor to re-parse a single token.
