@@ -194,7 +194,7 @@ namespace Ogre {
     }
 
     CPreprocessor::Token CPreprocessor::Macro::Expand(const std::vector<Token>& iArgs,
-                                                      std::forward_list<Macro*>& iMacros)
+                                                      std::forward_list<Macro>& iMacros)
     {
         Expanding = true;
 
@@ -244,10 +244,7 @@ namespace Ogre {
         BOL = true;
     }
 
-    CPreprocessor::~CPreprocessor ()
-    {
-        for(auto m : MacroList) delete m;
-    }
+    CPreprocessor::~CPreprocessor() {}
 
     CPreprocessor::Token CPreprocessor::GetToken (bool iExpand)
     {
@@ -384,9 +381,9 @@ namespace Ogre {
 
     CPreprocessor::Macro *CPreprocessor::IsDefined (const Token &iToken)
     {
-        for (Macro *cur : MacroList)
-            if (cur->Name == iToken)
-                return cur;
+        for (Macro& cur : MacroList)
+            if (cur.Name == iToken)
+                return &cur;
 
         return NULL;
     }
@@ -906,9 +903,9 @@ namespace Ogre {
             return false;
         }
 
-        Macro *m = new Macro (t);
-        m->Body = iBody;
-        t = cpp.GetArguments (m->Args, false, true);
+        Macro m(t);
+        m.Body = iBody;
+        t = cpp.GetArguments (m.Args, false, true);
         while (t.Type == Token::TK_WHITESPACE)
             t = cpp.GetToken (false);
 
@@ -921,7 +918,6 @@ namespace Ogre {
             break;
 
         case Token::TK_ERROR:
-            delete m;
             return false;
 
         default:
@@ -931,7 +927,7 @@ namespace Ogre {
             break;
         }
 
-        if( !m->Args.empty() )
+        if( !m.Args.empty() )
         {
             CPreprocessor cpp2;
 
@@ -939,7 +935,7 @@ namespace Ogre {
             //  #define mad( a__arg_, b__arg_, c__arg_ ) fma( a, b, c )
             //into:
             //  #define mad( a__arg_, b__arg_, c__arg_ ) fma( a__arg_, b__arg_, c__arg_ )
-            for (const Token& arg : m->Args)
+            for (const Token& arg : m.Args)
             {
                 cpp2.Define(arg.String, arg.Length - 6, arg.String, arg.Length);
             }
@@ -949,8 +945,8 @@ namespace Ogre {
             t = xt;
         }
 
-        m->Value = t;
-        MacroList.push_front(m);
+        m.Value = t;
+        MacroList.push_front(std::move(m));
         return true;
     }
 
@@ -1044,12 +1040,10 @@ namespace Ogre {
 
     bool CPreprocessor::GetValueDef(const Token &iToken, long &oValue, int iLine)
     {
-        Macro defined (Token (Token::TK_KEYWORD, "defined", 7));
-        defined.ExpandFunc = ExpandDefined;
-        defined.Args.resize(1);
-
         // Temporary add the defined() function to the macro list
-        MacroList.push_front(&defined);
+        MacroList.emplace_front(Token(Token::TK_KEYWORD, "defined", 7));
+        MacroList.front().ExpandFunc = ExpandDefined;
+        MacroList.front().Args.resize(1);
 
         bool rc = GetValue (iToken, oValue, iLine);
 
@@ -1237,18 +1231,16 @@ namespace Ogre {
     void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen,
                                 const char *iMacroValue, size_t iMacroValueLen)
     {
-        Macro *m = new Macro (Token (Token::TK_KEYWORD, iMacroName, iMacroNameLen));
-        m->Value = Token (Token::TK_TEXT, iMacroValue, iMacroValueLen);
-        MacroList.push_front(m);
+        MacroList.emplace_front(Token(Token::TK_KEYWORD, iMacroName, iMacroNameLen));
+        MacroList.front().Value = Token(Token::TK_TEXT, iMacroValue, iMacroValueLen);
     }
 
 
     void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen,
                                 long iMacroValue)
     {
-        Macro *m = new Macro (Token (Token::TK_KEYWORD, iMacroName, iMacroNameLen));
-        m->Value.SetValue (iMacroValue);
-        MacroList.push_front(m);
+        MacroList.emplace_front(Token(Token::TK_KEYWORD, iMacroName, iMacroNameLen));
+        MacroList.front().Value.SetValue(iMacroValue);
     }
 
 
@@ -1261,9 +1253,8 @@ namespace Ogre {
             auto itpp = std::next(it);
             if(itpp == MacroList.end()) break;
 
-            if ((*itpp)->Name == name)
+            if (itpp->Name == name)
             {
-                delete *itpp;
                 MacroList.erase_after(it);
                 return true;
             }
