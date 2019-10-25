@@ -54,6 +54,8 @@ namespace OgreBites
 #if OGRE_BITES_HAVE_SDL
     class _OgreBitesExport ApplicationContextSDL : public ApplicationContextBase
     {
+    protected:
+        void _destroyWindow(const NativeWindowPair& win);
     public:
         explicit ApplicationContextSDL(const Ogre::String& appName = "Ogre3D");
 
