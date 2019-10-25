@@ -983,7 +983,7 @@ namespace Ogre {
         return true;
     }
 
-    bool CPreprocessor::HandleIfDef (Token &iBody, int iLine)
+    bool CPreprocessor::HandleIf(bool val, int iLine)
     {
         if (EnableOutput & (1 << 31))
         {
@@ -991,6 +991,18 @@ namespace Ogre {
             return false;
         }
 
+        EnableElif <<= 1;
+        EnableOutput <<= 1;
+        if (val)
+            EnableOutput |= 1;
+        else
+            EnableElif |= 1;
+
+        return true;
+    }
+
+    bool CPreprocessor::HandleIfDef (Token &iBody, int iLine)
+    {
         CPreprocessor cpp (iBody, iLine);
 
         Token t = cpp.GetToken (false);
@@ -1001,12 +1013,8 @@ namespace Ogre {
             return false;
         }
 
-        EnableElif <<= 1;
-        EnableOutput <<= 1;
-        if (IsDefined (t))
-            EnableOutput |= 1;
-        else
-            EnableElif |= 1;
+        if (!HandleIf(IsDefined(t), iLine))
+            return false;
 
         do
         {
@@ -1034,8 +1042,7 @@ namespace Ogre {
         return Token (Token::TK_NUMBER, v, 1);
     }
 
-
-    bool CPreprocessor::HandleIf (Token &iBody, int iLine)
+    bool CPreprocessor::GetValueDef(const Token &iToken, long &oValue, int iLine)
     {
         Macro defined (Token (Token::TK_KEYWORD, "defined", 7));
         defined.ExpandFunc = ExpandDefined;
@@ -1044,25 +1051,19 @@ namespace Ogre {
         // Temporary add the defined() function to the macro list
         MacroList.push_front(&defined);
 
-        long val;
-        bool rc = GetValue (iBody, val, iLine);
+        bool rc = GetValue (iToken, oValue, iLine);
 
         // Restore the macro list
         MacroList.pop_front();
 
-        if (!rc)
-            return false;
-
-        EnableElif <<= 1;
-        EnableOutput <<= 1;
-        if (val)
-            EnableOutput |= 1;
-        else
-            EnableElif |= 1;
-
-        return true;
+        return rc;
     }
 
+    bool CPreprocessor::HandleIf (Token &iBody, int iLine)
+    {
+        long val;
+        return GetValueDef(iBody, val, iLine) && HandleIf(val, iLine);
+    }
 
     bool CPreprocessor::HandleElif (Token &iBody, int iLine)
     {
@@ -1072,20 +1073,8 @@ namespace Ogre {
             return false;
         }
 
-        Macro defined (Token (Token::TK_KEYWORD, "defined", 7));
-        defined.ExpandFunc = ExpandDefined;
-        defined.Args.resize(1);
-
-        // Temporary add the defined() function to the macro list
-        MacroList.push_front(&defined);
-
         long val;
-        bool rc = GetValue (iBody, val, iLine);
-
-        // Restore the macro list
-        MacroList.pop_front();
-
-        if (!rc)
+        if (!GetValueDef(iBody, val, iLine))
             return false;
 
         if (val && (EnableElif & 1))

@@ -281,6 +281,9 @@ namespace Ogre {
          */
         bool HandleIf (Token &iBody, int iLine);
 
+        /// @overload
+        bool HandleIf(bool val, int iLine);
+
         /**
          * Handle an #elif directive.
          * @param iBody
@@ -377,6 +380,10 @@ namespace Ogre {
          *     true if ok, false if not
          */
         bool GetValue (const Token &iToken, long &oValue, int iLine);
+
+        /// @overload
+        /// same as above, but considers the defined() function
+        bool GetValueDef(const Token &iToken, long &oValue, int iLine);
 
         /**
          * Expand the given macro, if it exists.
