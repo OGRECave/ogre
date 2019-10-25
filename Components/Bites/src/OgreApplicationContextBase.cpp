@@ -303,6 +303,29 @@ NativeWindowPair ApplicationContextBase::createWindow(const Ogre::String& name, 
     return ret;
 }
 
+void ApplicationContextBase::destroyWindow(const Ogre::String& name)
+{
+    for (auto it = mWindows.begin(); it != mWindows.end(); ++it)
+    {
+        if (it->render->getName() != name)
+            continue;
+        _destroyWindow(*it);
+        mWindows.erase(it);
+        return;
+    }
+
+    OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, "No window named '"+name+"'");
+}
+
+void ApplicationContextBase::_destroyWindow(const NativeWindowPair& win)
+{
+#if !OGRE_BITES_HAVE_SDL
+    // remove window event listener before destroying it
+    WindowEventUtilities::_removeRenderWindow(win.render);
+#endif
+    mRoot->destroyRenderTarget(win.render);
+}
+
 void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t windowID) const
 {
     for(InputListenerList::iterator it = mInputListeners.begin();
@@ -535,12 +558,9 @@ void ApplicationContextBase::shutdown()
 
     for(auto it = mWindows.rbegin(); it != mWindows.rend(); ++it)
     {
-#if !OGRE_BITES_HAVE_SDL
-        // remove window event listener before destroying it
-        WindowEventUtilities::_removeRenderWindow(it->render);
-#endif
-        mRoot->destroyRenderTarget(it->render);
+        _destroyWindow(*it);
     }
+    mWindows.clear();
 
     if (mOverlaySystem)
     {

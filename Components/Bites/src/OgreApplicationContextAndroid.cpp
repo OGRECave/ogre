@@ -107,7 +107,6 @@ void ApplicationContextAndroid::locateResources()
 void ApplicationContextAndroid::shutdown()
 {
     ApplicationContextBase::shutdown();
-    mWindows.clear();
     AConfiguration_delete(mAConfig);
 }
 

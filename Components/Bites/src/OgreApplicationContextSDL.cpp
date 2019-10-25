@@ -82,6 +82,13 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
     return ret;
 }
 
+void ApplicationContextSDL::_destroyWindow(const NativeWindowPair& win)
+{
+    ApplicationContextBase::_destroyWindow(win);
+    if(win.native)
+        SDL_DestroyWindow(win.native);
+}
+
 void ApplicationContextSDL::setWindowGrab(NativeWindowType* win, bool _grab)
 {
     SDL_bool grab = SDL_bool(_grab);
@@ -94,16 +101,9 @@ void ApplicationContextSDL::shutdown()
 {
     ApplicationContextBase::shutdown();
 
-    for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
-    {
-        if(it->native)
-            SDL_DestroyWindow(it->native);
-    }
-    if(!mWindows.empty()) {
+    if(SDL_WasInit(SDL_INIT_VIDEO)) {
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
     }
-
-    mWindows.clear();
 }
 
 void ApplicationContextSDL::pollEvents()

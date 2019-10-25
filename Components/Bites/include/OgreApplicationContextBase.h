@@ -267,6 +267,9 @@ namespace OgreBites
         createWindow(const Ogre::String& name, uint32_t w = 0, uint32_t h = 0,
                      Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
 
+        /// destroy and erase an NativeWindowPair by name
+        void destroyWindow(const Ogre::String& name);
+
         /**
          * get the FileSystemLayer instace pointing to an application specific directory
          */
@@ -279,6 +282,9 @@ namespace OgreBites
          */
         static Ogre::String getDefaultMediaDir();
     protected:
+        /// internal method to destroy both the render and the native window
+        virtual void _destroyWindow(const NativeWindowPair& win);
+
         Ogre::OverlaySystem* mOverlaySystem;  // Overlay system
 
         Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
