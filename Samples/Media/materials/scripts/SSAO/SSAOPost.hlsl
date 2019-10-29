@@ -76,6 +76,10 @@ float4 smartBoxFilter_fp
 //    oColor0 = float4(tex2D(sOcclusion, screenTC).www, 1);
 }
 
+struct noFilterIn
+{
+    float2 uv : TEXCOORD0;
+};
 
 // cross bilateral filter
 // gaussian blur with photometric weighting
