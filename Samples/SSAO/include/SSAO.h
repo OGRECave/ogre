@@ -176,9 +176,9 @@ public:
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
                         " programs, so you cannot run this sample. Sorry!", "Sample_SSAO::testCapabilities");
         }
-		if (StringUtil::startsWith(caps->getRenderSystemName(), "OpenGL ES"))
+        if (!StringUtil::startsWith(caps->getRenderSystemName(), "OpenGL 3+") && !StringUtil::startsWith (caps->getRenderSystemName (), "Direct3D11"))
         {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "This demo currently only supports OpenGL and DirectX9. Sorry!",
+            OGRE_EXCEPT (Exception::ERR_INVALID_STATE, "This demo currently only supports OpenGL 3+ and DirectX 11. Sorry!",
                 "Sample_SSAO:testCapabilities");
         }
     }
