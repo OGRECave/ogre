@@ -1,8 +1,8 @@
 fragment_program SSAO/ShowViewPos_fp_hlsl hlsl
 {
-    source ShowViewPos.hlsl
+    source ShowViewPos.cg
     entry_point ShowViewPos_fp
-    target ps_4_0
+    target ps_2_0
 }
 
 fragment_program SSAO/ShowViewPos_fp_cg cg

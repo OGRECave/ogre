@@ -20,6 +20,7 @@ void GBuffer_vp(
 }
 
 void GBuffer_fp(
+        float4 iPosition : POSITION,
         float3 iViewPos : TEXCOORD0,
         float3 iNormal  : TEXCOORD1,
 
