@@ -1,8 +1,8 @@
 fragment_program SSAO/ShowDepth_fp_hlsl hlsl
 {
-    source ShowDepth.hlsl
+    source ShowDepth.cg
     entry_point ShowDepth_fp
-    target ps_4_0
+    target ps_2_x
 }
 
 fragment_program SSAO/ShowDepth_fp_cg cg

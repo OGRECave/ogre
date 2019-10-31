@@ -1,5 +1,6 @@
 void ShowNormals_fp
 (
+    in float4 position : POSITION,
     in float2 iTexCoord : TEXCOORD0,
     
     out float4 oColor0: COLOR0,

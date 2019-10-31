@@ -1,29 +1,29 @@
 fragment_program SSAO/Post/BoxFilter_fp_hlsl hlsl
 {
-    source SSAOPost.hlsl
+    source SSAOPost.cg
     entry_point boxFilter_fp
-    target ps_4_0
+    target ps_3_0
 }
 
 fragment_program SSAO/Post/SmartBoxFilter_fp_hlsl hlsl
 {
-    source SSAOPost.hlsl
+    source SSAOPost.cg
     entry_point smartBoxFilter_fp
-    target ps_4_0
+    target ps_3_0
 }
 
 fragment_program SSAO/HorizonBased/CrossBilateralFilter/X_fp_hlsl hlsl
 {
-    source SSAOPost.hlsl
+    source SSAOPost.cg
     entry_point crossBilateralFilterX_fp
-    target ps_4_0
+    target ps_3_0
 }
 
 fragment_program SSAO/HorizonBased/CrossBilateralFilter/Y_fp_hlsl hlsl
 {
-    source SSAOPost.hlsl
+    source SSAOPost.cg
     entry_point crossBilateralFilterY_fp
-    target ps_4_0
+    target ps_3_0
 }
 
 fragment_program SSAO/Post/BoxFilter_fp_cg cg
@@ -70,8 +70,8 @@ fragment_program SSAO/Post/SmartBoxFilter_fp_glsl glsl
     	
 	default_params
 	{
-		param_named sMrt1 int 0
-		param_named sOcclusion int 1
+        param_named sOcclusion int 0
+		param_named sMrt1 int 1
 	}
 }
 
@@ -187,14 +187,14 @@ material SSAO/Post/SmartBoxFilter
 
             texture_unit
             {
-                content_type compositor SSAO/GBuffer mrt 0
+                content_type compositor SSAO/GBuffer occlusion
                 tex_address_mode clamp
                 filtering none
             }
 
             texture_unit
             {
-                content_type compositor SSAO/GBuffer occlusion
+                content_type compositor SSAO/GBuffer mrt 0
                 tex_address_mode clamp
                 filtering none
             }
