@@ -282,8 +282,7 @@ namespace Ogre
     {
 
         // Main header
-        if(mSM4Available)
-            outStream << "#include <HLSL_SM4Support.hlsl>\n";
+        outStream << "#include <HLSL_SM4Support.hlsl>\n";
         outStream << "#include <TerrainHelpers.cg>\n";
 
         if (prof->isShadowingEnabled(tt, terrain))
