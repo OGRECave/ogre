@@ -1,14 +1,18 @@
 // original sources found at Game Developer Magazine March 2008
 
+#include "HLSL_SM4Support.hlsl"
+
+SAMPLER2D(sNormal, 0); // xyz normal + depth [0, 1]
+SAMPLER2D(sPosition, 1); // view space position
+SAMPLER2D(sRandom, 1); // random texture sampler
+
 void CreaseShading_fp
 (
+    in float4 position : POSITION,
     in float2 uv : TEXCOORD0,
 
     out float4 oColor0 : COLOR0,
-    
-    uniform sampler sNormal : register(s0),    // xyz normal + depth [0, 1]
-    uniform sampler sPosition : register(s1),  // view space position
-    uniform sampler sRandom : register(s2),    // random texture sampler
+
     uniform const float cRange, // the three(four) artistic parameters
     uniform const float cBias,
     uniform const float cAverager,

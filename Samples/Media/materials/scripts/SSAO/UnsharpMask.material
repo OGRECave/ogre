@@ -1,22 +1,22 @@
 fragment_program SSAO/UnsharpMask_fp_hlsl hlsl
 {
-    source UnsharpMask.hlsl
+    source UnsharpMask.cg
     entry_point UnsharpMask_fp
-    target ps_4_0
+    target ps_2_0
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurX_fp_hlsl hlsl
 {
-    source UnsharpMask.hlsl
+    source UnsharpMask.cg
     entry_point GaussianBlurX_fp
-    target ps_4_0
+    target ps_2_0
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurY_fp_hlsl hlsl
 {
-    source UnsharpMask.hlsl
+    source UnsharpMask.cg
     entry_point GaussianBlurY_fp
-    target ps_4_0
+    target ps_2_0
 }
 
 fragment_program SSAO/UnsharpMask_fp_cg cg
