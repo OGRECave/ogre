@@ -2,7 +2,7 @@ fragment_program SSAO/ShowDepth_fp_hlsl hlsl
 {
     source ShowDepth.cg
     entry_point ShowDepth_fp
-    target ps_2_x
+    target ps_2_a
 }
 
 fragment_program SSAO/ShowDepth_fp_cg cg
