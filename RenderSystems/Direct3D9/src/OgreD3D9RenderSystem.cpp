@@ -1319,20 +1319,12 @@ namespace Ogre
             major = static_cast<ushort>((d3dDeviceCaps9.VertexShaderVersion & 0x0000FF00) >> 8);
             minor = static_cast<ushort>(d3dDeviceCaps9.VertexShaderVersion & 0x000000FF);
         }
-        
-        bool vs2x = false;
+
         bool vs2a = false;
 
         // Special case detection for vs_2_x/a support
         if (major >= 2)
         {
-            if ((minVSCaps.VS20Caps.Caps & D3DVS20CAPS_PREDICATION) &&
-                (minVSCaps.VS20Caps.DynamicFlowControlDepth > 0) &&
-                (minVSCaps.VS20Caps.NumTemps >= 12))
-            {
-                vs2x = true;
-            }
-
             if ((minVSCaps.VS20Caps.Caps & D3DVS20CAPS_PREDICATION) &&
                 (minVSCaps.VS20Caps.DynamicFlowControlDepth > 0) &&
                 (minVSCaps.VS20Caps.NumTemps >= 13))
@@ -1377,8 +1369,6 @@ namespace Ogre
         case 3:
             rsc->addShaderProfile("vs_3_0");
         case 2:
-            if (vs2x)
-                rsc->addShaderProfile("vs_2_x");
             if (vs2a)
                 rsc->addShaderProfile("vs_2_a");
 
@@ -1418,9 +1408,8 @@ namespace Ogre
         
         bool ps2a = false;
         bool ps2b = false;
-        bool ps2x = false;
 
-        // Special case detection for ps_2_x/a/b support
+        // Special case detection for ps_2_a/b support
         if (major >= 2)
         {
             if ((minPSCaps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT) &&
@@ -1437,12 +1426,6 @@ namespace Ogre
                 (minPSCaps.PS20Caps.NumTemps >= 22))
             {
                 ps2a = true;
-            }
-
-            // Does this enough?
-            if (ps2a || ps2b)
-            {
-                ps2x = true;
             }
         }
 
@@ -1480,13 +1463,8 @@ namespace Ogre
         switch(major)
         {
         case 3:
-            if (minor > 0)
-                rsc->addShaderProfile("ps_3_x");
-
             rsc->addShaderProfile("ps_3_0");
         case 2:
-            if (ps2x)
-                rsc->addShaderProfile("ps_2_x");
             if (ps2a)
                 rsc->addShaderProfile("ps_2_a");
             if (ps2b)
