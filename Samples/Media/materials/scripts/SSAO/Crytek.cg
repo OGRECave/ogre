@@ -1,5 +1,6 @@
 void Crytek_fp
 (
+    in float4 position : POSITION,
     in float2 fragmentTC : TEXCOORD0,
     
     out float4 oColor0 : COLOR0,

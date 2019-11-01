@@ -1,5 +1,6 @@
 void UnsharpMask_fp
 (
+    in float4 position : POSITION,
     in float2 iTexCoord : TEXCOORD0, 
     
     out float4 oColor0 : COLOR0,
@@ -22,6 +23,7 @@ void UnsharpMask_fp
 
 void GaussianBlurX_fp
 (
+    in float4 position : POSITION,
     in float2 uv : TEXCOORD0,
     
     out float4 oColor0 : COLOR0,
@@ -50,6 +52,7 @@ void GaussianBlurX_fp
 
 void GaussianBlurY_fp
 (
+    in float4 position : POSITION,
     in float2 uv : TEXCOORD0,
     
     out float4 oColor0 : COLOR0,
