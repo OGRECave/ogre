@@ -266,7 +266,7 @@ namespace Ogre {
          */
         void _setRenderTarget(RenderTarget *target);
 
-        static GLint convertCompareFunction(CompareFunction func, bool isReverse = false);
+        static GLint convertCompareFunction(CompareFunction func);
         static GLint convertStencilOp(StencilOperation op, bool invert = false);
 
         void bindGpuProgram(GpuProgram* prg);

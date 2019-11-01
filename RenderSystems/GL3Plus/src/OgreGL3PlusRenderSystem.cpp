@@ -1090,7 +1090,9 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setDepthBufferFunction(CompareFunction func)
     {
-        mStateCacheManager->setDepthFunc(convertCompareFunction(func, isReverseDepthBufferEnabled()));
+        if(isReverseDepthBufferEnabled())
+            func = reverseCompareFunction(func);
+        mStateCacheManager->setDepthFunc(convertCompareFunction(func));
     }
 
     void GL3PlusRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
@@ -1885,7 +1887,7 @@ namespace Ogre {
         }
     }
 
-    GLint GL3PlusRenderSystem::convertCompareFunction(CompareFunction func, bool isReverse)
+    GLint GL3PlusRenderSystem::convertCompareFunction(CompareFunction func)
     {
         switch(func)
         {
@@ -1894,17 +1896,17 @@ namespace Ogre {
         case CMPF_ALWAYS_PASS:
             return GL_ALWAYS;
         case CMPF_LESS:
-            return isReverse ? GL_GREATER : GL_LESS;
+            return GL_LESS;
         case CMPF_LESS_EQUAL:
-            return isReverse ? GL_GEQUAL : GL_LEQUAL;
+            return GL_LEQUAL;
         case CMPF_EQUAL:
             return GL_EQUAL;
         case CMPF_NOT_EQUAL:
             return GL_NOTEQUAL;
         case CMPF_GREATER_EQUAL:
-            return isReverse ? GL_LEQUAL : GL_GEQUAL;
+            return GL_GEQUAL;
         case CMPF_GREATER:
-            return isReverse ? GL_LESS :  GL_GREATER;
+            return GL_GREATER;
         }
         // To keep compiler happy
         return GL_ALWAYS;
