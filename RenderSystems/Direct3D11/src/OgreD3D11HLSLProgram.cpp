@@ -182,7 +182,12 @@ namespace Ogre {
         macro.Name = "SHADER_MODEL_4";
         defines.push_back(macro);
 
-        
+        if(Root::getSingleton().getRenderSystem()->isReverseDepthBufferEnabled())
+        {
+            macro.Name = "OGRE_REVERSED_Z";
+            defines.push_back(macro);
+        }
+
 		switch (this->mType)
 		{
 			case GPT_VERTEX_PROGRAM:

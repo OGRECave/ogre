@@ -443,6 +443,13 @@ namespace Ogre
 
 		mOptions[optBackBufferCount.name] = optBackBufferCount;
 
+        ConfigOption opt;
+        opt.name = "Reversed Z-Buffer";
+        opt.possibleValues = {"No", "Yes"};
+        opt.currentValue = opt.possibleValues[0];
+        opt.immutable = false;
+
+        mOptions[opt.name] = opt;
         
         refreshD3DSettings();
 
@@ -536,6 +543,9 @@ namespace Ogre
             mMaxRequestedFeatureLevel = D3D11Device::parseFeatureLevel(value, D3D_FEATURE_LEVEL_11_0);
 #endif
         }
+
+        if(name == "Reversed Z-Buffer")
+            mIsReverseDepthBufferEnabled = StringConverter::parseBool(value);
 
         if( name == "Allow NVPerfHUD" )
         {
@@ -1539,11 +1549,22 @@ namespace Ogre
     {
         dest = matrix;
 
-        // Convert depth range from [-1,+1] to [0,1]
-        dest[2][0] = (dest[2][0] + dest[3][0]) / 2;
-        dest[2][1] = (dest[2][1] + dest[3][1]) / 2;
-        dest[2][2] = (dest[2][2] + dest[3][2]) / 2;
-        dest[2][3] = (dest[2][3] + dest[3][3]) / 2;
+        if (mIsReverseDepthBufferEnabled)
+        {
+            // Convert depth range from [-1,+1] to [1,0]
+            dest[2][0] = (dest[2][0] - dest[3][0]) * -0.5f;
+            dest[2][1] = (dest[2][1] - dest[3][1]) * -0.5f;
+            dest[2][2] = (dest[2][2] - dest[3][2]) * -0.5f;
+            dest[2][3] = (dest[2][3] - dest[3][3]) * -0.5f;
+        }
+        else
+        {
+            // Convert depth range from [-1,+1] to [0,1]
+            dest[2][0] = (dest[2][0] + dest[3][0]) / 2;
+            dest[2][1] = (dest[2][1] + dest[3][1]) / 2;
+            dest[2][2] = (dest[2][2] + dest[3][2]) / 2;
+            dest[2][3] = (dest[2][3] + dest[3][3]) / 2;
+        }
 
         if (!forGpuProgram)
         {
@@ -1684,12 +1705,21 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setDepthBufferFunction( CompareFunction func )
     {
+        if(isReverseDepthBufferEnabled())
+            func = reverseCompareFunction(func);
+
         mDepthStencilDesc.DepthFunc = D3D11Mappings::get(func);
         mDepthStencilDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
+        if(isReverseDepthBufferEnabled())
+        {
+            slopeScaleBias *= -1;
+            constantBias *= -1;
+        }
+
 		const float nearFarFactor = 10.0; 
 		mRasterizerDesc.DepthBias = static_cast<int>(-constantBias * nearFarFactor);
 		mRasterizerDesc.SlopeScaledDepthBias = -slopeScaleBias;
@@ -3220,6 +3250,11 @@ namespace Ogre
                                                                                         getDepthBuffer());
                 if( depthBuffer )
                 {
+                    if (isReverseDepthBufferEnabled())
+                    {
+                        depth = 1.0f - 0.5f * (depth + 1.0f);
+                    }
+
                     mDevice.GetImmediateContext()->ClearDepthStencilView(
                                                         depthBuffer->getDepthStencilView(),
                                                         ClearFlags, depth, static_cast<UINT8>(stencil) );

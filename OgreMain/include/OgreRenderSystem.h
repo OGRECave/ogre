@@ -1269,6 +1269,7 @@ namespace Ogre
 
         void initFixedFunctionParams();
         void setFFPLightParams(size_t index, bool enabled);
+        static CompareFunction reverseCompareFunction(CompareFunction func);
     };
     /** @} */
     /** @} */
