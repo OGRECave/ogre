@@ -32,7 +32,7 @@ A gold mine of tutorials, tips and code snippets which will help you get up to s
 
 ## Try it
 * [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/)
-* Ubuntu Snap package: `sudo snap install ogre`
+* [Linux Snap Package](https://snapcraft.io/ogre)
 * [Android App on F-Droid](https://f-droid.org/packages/org.ogre.browser/)
 
 ## Features
