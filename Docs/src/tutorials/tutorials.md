@@ -13,6 +13,7 @@
 - In Depth
     - @subpage manual-mesh-creation
     - @subpage profiler
+    - @subpage reversed-depth
     - @subpage External-Texture-Sources
     - @subpage ShadowMappingOgre
     - @subpage deferred
