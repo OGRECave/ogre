@@ -1611,10 +1611,18 @@ namespace Ogre
         mTexStageDesc[unit].samplerDesc.MipLODBias = sampler.getMipmapBias();
 
         if (uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER)
-            D3D11Mappings::get(sampler.getBorderColour(), mTexStageDesc[unit].samplerDesc.BorderColor);
+        {
+            auto borderColour = (mIsReverseDepthBufferEnabled && sampler.getCompareEnabled())
+                                    ? ColourValue::White - sampler.getBorderColour()
+                                    : sampler.getBorderColour();
+            D3D11Mappings::get(borderColour, mTexStageDesc[unit].samplerDesc.BorderColor);
+        }
 
         mTexStageDesc[unit].samplerDesc.MaxAnisotropy = sampler.getAnisotropy();
-        mTexStageDesc[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(sampler.getCompareFunction());
+
+        auto cmpFunc = sampler.getCompareFunction();
+        if(mIsReverseDepthBufferEnabled) cmpFunc = reverseCompareFunction(cmpFunc);
+        mTexStageDesc[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(cmpFunc);
 
         FilterMinification[unit] = sampler.getFiltering(FT_MIN);
         FilterMagnification[unit] = sampler.getFiltering(FT_MAG);

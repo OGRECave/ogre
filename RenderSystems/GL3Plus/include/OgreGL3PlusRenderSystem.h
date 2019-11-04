@@ -56,6 +56,7 @@ namespace Ogre {
     */
     class _OgreGL3PlusExport GL3PlusRenderSystem : public GLRenderSystemCommon
     {
+        friend class GL3PlusSampler;
     private:
         /// Rendering loop control
         bool mStopRendering;
