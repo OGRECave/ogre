@@ -102,7 +102,7 @@ TEST(BitwiseTests,IntReadWrite)
 //--------------------------------------------------------------------------
 TEST(BitwiseTests,Half)
 {
-    for(float f : {1.f, -1.f, INFINITY, 65504.f})
+    for(float f : {1.f, -1.f, float(INFINITY), 65504.f})
     {
         uint16 g = Bitwise::floatToHalf(f);
         float h = Bitwise::halfToFloat(g);
