@@ -34,7 +34,7 @@ namespace Ogre
     const Real Matrix3::EPSILON = 1e-06;
     const Matrix3 Matrix3::ZERO(0,0,0,0,0,0,0,0,0);
     const Matrix3 Matrix3::IDENTITY(1,0,0,0,1,0,0,0,1);
-    const unsigned int Matrix3::msSvdMaxIterations = 32;
+    const unsigned int Matrix3::msSvdMaxIterations = 64;
 
     //-----------------------------------------------------------------------
     Vector3 Matrix3::GetColumn (size_t iCol) const
@@ -482,8 +482,17 @@ namespace Ogre
         Real const epsilon = std::numeric_limits<Real>::epsilon();
         Real const threshold = multiplier * epsilon * norm;
 
-        for (unsigned int i = 0; i < msSvdMaxIterations; i++)
+        for (unsigned int i = 0; ; i++)
         {
+            if(i == msSvdMaxIterations)
+            {
+                // ensure that we exit loop via branch that update kS
+                if(Math::Abs(kA[0][1]) <= Math::Abs(kA[1][2]))
+                    kA[0][1] = 0.;
+                else
+                    kA[1][2] = 0.;
+            }
+
             Real fTmp, fTmp0, fTmp1;
             Real fSin0, fCos0, fTan0;
             Real fSin1, fCos1, fTan1;
