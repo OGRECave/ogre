@@ -67,6 +67,7 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, const UniformPar
     case GCT_SAMPLER1D:
         os << "SAMPLER1D(";
         break;
+    case GCT_SAMPLER2DSHADOW:
     case GCT_SAMPLER2D:
         os << "SAMPLER2D(";
         break;

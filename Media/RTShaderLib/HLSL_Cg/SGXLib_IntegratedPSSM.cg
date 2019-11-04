@@ -55,6 +55,11 @@ void SGX_ShadowPCF4(sampler2D shadowMap, float4 shadowMapPos, float2 offset, out
     c /= 4;
 }
 
+void SGX_ShadowPCF4(sampler2D shadowMap, float4 shadowMapPos, out float c)
+{
+    c = tex2Dproj(shadowMap, shadowMapPos).r;
+}
+
 //-----------------------------------------------------------------------------
 void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
                             in float4 vSplitPoints,
