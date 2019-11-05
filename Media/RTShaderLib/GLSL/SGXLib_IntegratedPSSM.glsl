@@ -58,6 +58,9 @@ void SGX_ShadowPCF4(in sampler2D shadowMap, in vec4 shadowMapPos, in vec2 offset
 	c += (shadowMapPos.z <= texture2D(shadowMap, uv.xy - o.zy).r) ? 1.0 : 0.0; // top right
 		
 	c /= 4.0;
+#ifdef OGRE_REVERSED_Z
+    c = 1.0 - c;
+#endif
 }
 
 void SGX_ShadowPCF4(in sampler2DShadow shadowMap, in vec4 shadowMapPos, out float c)

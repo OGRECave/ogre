@@ -10,7 +10,9 @@ float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize)
     float shadow = 0.0;
     float offset = (NUM_SHADOW_SAMPLES_1D/2.0 - 0.5) * SHADOW_FILTER_SCALE;
     uv /= uv.w;
+#ifndef OGRE_REVERSED_Z
     uv.z = uv.z * 0.5 + 0.5; // convert -1..1 to 0..1
+#endif
     for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE)
         for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE)
         {
@@ -20,6 +22,9 @@ float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize)
                 shadow += 1.0;
         }
     shadow /= SHADOW_SAMPLES;
+#ifdef OGRE_REVERSED_Z
+    shadow = 1.0 - shadow;
+#endif
     return shadow;
 }
 
