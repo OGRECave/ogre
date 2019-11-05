@@ -18,6 +18,7 @@ void shadow_caster_vs(
 }
 
 void shadow_caster_ps(
+	float4 position	: POSITION,
 	float2 depth		: TEXCOORD0,
 
 	out float4 oColour	: COLOR,
