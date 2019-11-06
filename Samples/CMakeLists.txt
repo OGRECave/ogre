@@ -108,7 +108,7 @@ file(GLOB SAMPLE_COMMON_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/Common/include/*.h"
 install(FILES ${SAMPLE_COMMON_HEADERS}
 		DESTINATION include/OGRE)
 		
-if (MSVC)
+if (MSVC AND OGRE_BUILD_SAMPLES)
   find_package(Wix)
   if (Wix_FOUND)
     # Create WiX setup for demo build
