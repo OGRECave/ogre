@@ -19,6 +19,13 @@ if(EMSCRIPTEN)
     add_definitions(-s USE_SDL=2)
 endif()
 
+# Find X11
+if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
+  find_library(XAW_LIBRARY NAMES Xaw Xaw7 PATHS ${OGRE_DEP_SEARCH_PATH} ${DEP_LIB_SEARCH_DIR} ${X11_LIB_SEARCH_PATH})
+  macro_log_feature(XAW_LIBRARY "Xaw" "X11 Athena widget set" "http://www.x.org" TRUE "" "")
+  mark_as_advanced(XAW_LIBRARY)
+endif ()
+
 if (OGRE_STATIC)
   include_directories(${PROJECT_SOURCE_DIR}/RenderSystems/Direct3D9/include ${DirectX9_INCLUDE_DIR})
   include_directories(${PROJECT_SOURCE_DIR}/RenderSystems/Direct3D11/include)

@@ -224,9 +224,6 @@ macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.f
 if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
   find_package(X11)
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org" TRUE "" "")
-  find_library(XAW_LIBRARY NAMES Xaw Xaw7 PATHS ${OGRE_DEP_SEARCH_PATH} ${DEP_LIB_SEARCH_DIR} ${X11_LIB_SEARCH_PATH})
-  macro_log_feature(XAW_LIBRARY "Xaw" "X11 Athena widget set" "http://www.x.org" TRUE "" "")
-  mark_as_advanced(XAW_LIBRARY)
 endif ()
 
 
