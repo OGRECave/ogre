@@ -2045,7 +2045,7 @@ namespace Ogre
                     _writeRawConstant(i->physicalIndex, source->getInverseViewportHeight());
                     break;
                 case ACT_VIEWPORT_SIZE:
-                    _writeRawConstant(i->physicalIndex, Vector4(
+                    _writeRawConstant(i->physicalIndex, Vector4f(
                         source->getViewportWidth(),
                         source->getViewportHeight(),
                         source->getInverseViewportWidth(),
@@ -2054,7 +2054,7 @@ namespace Ogre
                 case ACT_TEXEL_OFFSETS:
                     {
                         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-                        _writeRawConstant(i->physicalIndex, Vector4(
+                        _writeRawConstant(i->physicalIndex, Vector4f(
                             rsys->getHorizontalTexelOffset(),
                             rsys->getVerticalTexelOffset(),
                             rsys->getHorizontalTexelOffset() * source->getInverseViewportWidth(),
@@ -2138,7 +2138,7 @@ namespace Ogre
                     vec3 = m3 * source->getLightDirection(i->data);
                     vec3.normalise();
                     // Set as 4D vector for compatibility
-                    _writeRawConstant(i->physicalIndex, Vector4(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
+                    _writeRawConstant(i->physicalIndex, Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
                     break;
                 case ACT_LIGHT_DISTANCE_OBJECT_SPACE:
                     vec3 = source->getInverseWorldMatrix() * source->getLightPosition(i->data);
@@ -2160,7 +2160,7 @@ namespace Ogre
                         vec3 = m3 * source->getLightDirection(l);
                         vec3.normalise();
                         _writeRawConstant(i->physicalIndex + l*i->elementCount,
-                                          Vector4(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
+                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
                     }
                     break;
 
@@ -2316,7 +2316,7 @@ namespace Ogre
                     vec3 = source->getLightDirection(i->data);
                     // Set as 4D vector for compatibility
                     // Use element count in case uniform slot is smaller
-                    _writeRawConstant(i->physicalIndex, Vector4(vec3.x, vec3.y, vec3.z, 1.0f), i->elementCount);
+                    _writeRawConstant(i->physicalIndex, Vector4f(vec3.x, vec3.y, vec3.z, 1.0f), i->elementCount);
                     break;
                 case ACT_LIGHT_POSITION_VIEW_SPACE:
                     _writeRawConstant(i->physicalIndex,
@@ -2328,7 +2328,7 @@ namespace Ogre
                     vec3 = m3 * source->getLightDirection(i->data);
                     vec3.normalise();
                     // Set as 4D vector for compatibility
-                    _writeRawConstant(i->physicalIndex, Vector4(vec3.x, vec3.y, vec3.z, 0.0f),i->elementCount);
+                    _writeRawConstant(i->physicalIndex, Vector4f(vec3.x, vec3.y, vec3.z, 0.0f),i->elementCount);
                     break;
                 case ACT_SHADOW_EXTRUSION_DISTANCE:
                     // extrusion is in object-space, so we have to rescale by the inverse
@@ -2408,7 +2408,7 @@ namespace Ogre
                         vec3 = source->getLightDirection(l);
                         // Set as 4D vector for compatibility
                         _writeRawConstant(i->physicalIndex + l*i->elementCount,
-                                          Vector4(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
+                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
                     }
                     break;
 
@@ -2428,7 +2428,7 @@ namespace Ogre
                         vec3.normalise();
                         // Set as 4D vector for compatibility
                         _writeRawConstant(i->physicalIndex + l*i->elementCount,
-                                          Vector4(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
+                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), i->elementCount);
                     }
                     break;
 
