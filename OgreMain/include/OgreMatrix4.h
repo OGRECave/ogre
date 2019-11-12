@@ -95,7 +95,7 @@ namespace Ogre
         }
 
         template<typename U>
-        explicit TransformBase(const TransformBase<rows, U>& o) : TransformBase(o.m[0]) {}
+        explicit TransformBase(const TransformBase<rows, U>& o) : TransformBase(o[0]) {}
 
         T* operator[](size_t iRow)
         {
@@ -113,9 +113,9 @@ namespace Ogre
         void setTrans( const Vector<3, T>& v )
         {
             assert(rows > 2);
-            m[0][3] = v.x;
-            m[1][3] = v.y;
-            m[2][3] = v.z;
+            m[0][3] = v[0];
+            m[1][3] = v[1];
+            m[2][3] = v[2];
         }
         /// Extracts the translation transformation part of the matrix.
         Vector<3, T> getTrans() const
@@ -127,9 +127,9 @@ namespace Ogre
         void setScale( const Vector<3, T>& v )
         {
             assert(rows > 2);
-            m[0][0] = v.x;
-            m[1][1] = v.y;
-            m[2][2] = v.z;
+            m[0][0] = v[0];
+            m[1][1] = v[1];
+            m[2][2] = v[2];
         }
 
         /** Function for writing to a stream.
