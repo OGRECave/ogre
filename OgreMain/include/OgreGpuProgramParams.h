@@ -1544,7 +1544,10 @@ namespace Ogre {
             @param count The number of floats to write; if for example
             the uniform constant 'slot' is smaller than a Vector4
         */
-        void _writeRawConstant(size_t physicalIndex, const Vector4& vec,
+        void _writeRawConstant(size_t physicalIndex, const Vector4f& vec,
+                               size_t count = 4);
+        /// @overload
+        void _writeRawConstant(size_t physicalIndex, const Vector<4, double>& vec,
                                size_t count = 4);
         /** Write a single floating-point parameter to the program.
             @note You can use these methods if you have already derived the physical
