@@ -70,6 +70,8 @@ extern "C" void glFlushRenderAPPLE();
 
 namespace Ogre {
 
+    typedef TransformBase<4, float> Matrix4f;
+
     // Callback function used when registering GLGpuPrograms
     static GpuProgram* createGLArbGpuProgram(ResourceManager* creator,
                                       const String& name, ResourceHandle handle,
@@ -311,7 +313,7 @@ namespace Ogre {
         // Save previous modelview
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
-        glLoadMatrixf(mViewMatrix.transpose()[0]);
+        glLoadMatrixf(Matrix4f(mViewMatrix.transpose())[0]);
 
         for (const auto& ac : params->getAutoConstants())
         {
@@ -1326,7 +1328,7 @@ namespace Ogre {
     {
         mWorldMatrix = m;
         glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf((mViewMatrix * mWorldMatrix).transpose()[0]);
+        glLoadMatrixf(Matrix4f((mViewMatrix * mWorldMatrix).transpose())[0]);
     }
 
     //-----------------------------------------------------------------------------
@@ -1334,7 +1336,7 @@ namespace Ogre {
     {
         mViewMatrix = m;
         glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf((mViewMatrix * mWorldMatrix).transpose()[0]);
+        glLoadMatrixf(Matrix4f((mViewMatrix * mWorldMatrix).transpose())[0]);
 
         // also mark clip planes dirty
         if (!mClipPlanes.empty())
@@ -1344,7 +1346,7 @@ namespace Ogre {
     void GLRenderSystem::setProjectionMatrix(const Matrix4 &m)
     {
         glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf(m.transpose()[0]);
+        glLoadMatrixf(Matrix4f(m.transpose())[0]);
         glMatrixMode(GL_MODELVIEW);
 
         // also mark clip planes dirty
@@ -1744,7 +1746,7 @@ namespace Ogre {
         glMatrixMode(GL_TEXTURE);
 
         // Load this matrix in
-        glLoadMatrixf(xform.transpose()[0]);
+        glLoadMatrixf(Matrix4f(xform.transpose())[0]);
 
         if (mUseAutoTextureMatrix)
         {
