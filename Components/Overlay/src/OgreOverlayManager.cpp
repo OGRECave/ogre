@@ -270,7 +270,7 @@ namespace Ogre {
         return mPixelRatio;
     }
     //---------------------------------------------------------------------
-    void OverlayManager::setPixelRatio(Real ratio)
+    void OverlayManager::setPixelRatio(float ratio)
     {
         mPixelRatio = ratio;
     }

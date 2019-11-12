@@ -128,7 +128,7 @@ void ImGuiOverlay::ImGUIRenderable::createFontTexture()
 void ImGuiOverlay::NewFrame(const FrameEvent& evt)
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.DeltaTime = std::max(
+    io.DeltaTime = std::max<float>(
         evt.timeSinceLastFrame,
         1e-4f); // see https://github.com/ocornut/imgui/commit/3c07ec6a6126fb6b98523a9685d1f0f78ca3c40c
 
