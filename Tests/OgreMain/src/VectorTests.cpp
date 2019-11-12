@@ -194,3 +194,22 @@ TEST(VectorTests, TransformBaseArrayLoading)
     EXPECT_EQ(10, mat1[2][2]);
     EXPECT_EQ(11, mat1[2][3]);
 }
+//--------------------------------------------------------------------------
+TEST(VectorTests, TypeCasts)
+{
+    int arr[16] = { 0 };
+
+    Affine3 affine(arr);
+    Matrix4 matrix(arr);
+
+    EXPECT_EQ(affine, Affine3::ZERO);
+    EXPECT_EQ(matrix, Matrix4::ZERO);
+
+    typedef TransformBase<4, int> Matrix4i; // something that is neither float nor double
+    Matrix4i imat;
+
+    Vector3i vec(1, 2, 3);
+    imat.setTrans(vec);
+
+    EXPECT_EQ(imat.getTrans(), vec);
+}
