@@ -218,13 +218,13 @@ namespace Ogre {
         return getLight(index).getAttenuation();
     }
     //-----------------------------------------------------------------------------
-    Vector4 AutoParamDataSource::getSpotlightParams(size_t index) const
+    Vector4f AutoParamDataSource::getSpotlightParams(size_t index) const
     {
         // inner, outer, fallof, isSpot
         const Light& l = getLight(index);
         if (l.getType() == Light::LT_SPOTLIGHT)
         {
-            return Vector4(Math::Cos(l.getSpotlightInnerAngle().valueRadians() * 0.5f),
+            return Vector4f(Math::Cos(l.getSpotlightInnerAngle().valueRadians() * 0.5f),
                            Math::Cos(l.getSpotlightOuterAngle().valueRadians() * 0.5f),
                            l.getSpotlightFalloff(),
                            1.0);
@@ -238,7 +238,7 @@ namespace Ogre {
             // since pow(anything, 0) == 1
             // However we also need to ensure we don't overflow because of the division
             // therefore set x = 1 and y = 0 so divisor doesn't change scale
-            return Vector4(1.0, 0.0, 0.0, 0.0); // since the main op is pow(.., vec4.z), this will result in 1.0
+            return Vector4f(1.0, 0.0, 0.0, 0.0); // since the main op is pow(.., vec4.z), this will result in 1.0
         }
     }
     //-----------------------------------------------------------------------------
@@ -535,9 +535,9 @@ namespace Ogre {
         return mCurrentPass;
     }
     //-----------------------------------------------------------------------------
-    Vector4 AutoParamDataSource::getTextureSize(size_t index) const
+    Vector4f AutoParamDataSource::getTextureSize(size_t index) const
     {
-        Vector4 size = Vector4(1,1,1,1);
+        Vector4f size = Vector4f(1,1,1,1);
 
         if (index < mCurrentPass->getNumTextureUnitStates())
         {
@@ -545,25 +545,25 @@ namespace Ogre {
                 static_cast<unsigned short>(index))->_getTexturePtr();
             if (tex)
             {
-                size.x = static_cast<Real>(tex->getWidth());
-                size.y = static_cast<Real>(tex->getHeight());
-                size.z = static_cast<Real>(tex->getDepth());
+                size[0] = static_cast<Real>(tex->getWidth());
+                size[1] = static_cast<Real>(tex->getHeight());
+                size[2] = static_cast<Real>(tex->getDepth());
             }
         }
 
         return size;
     }
     //-----------------------------------------------------------------------------
-    Vector4 AutoParamDataSource::getInverseTextureSize(size_t index) const
+    Vector4f AutoParamDataSource::getInverseTextureSize(size_t index) const
     {
-        Vector4 size = getTextureSize(index);
+        Vector4f size = getTextureSize(index);
         return 1 / size;
     }
     //-----------------------------------------------------------------------------
-    Vector4 AutoParamDataSource::getPackedTextureSize(size_t index) const
+    Vector4f AutoParamDataSource::getPackedTextureSize(size_t index) const
     {
-        Vector4 size = getTextureSize(index);
-        return Vector4(size.x, size.y, 1 / size.x, 1 / size.y);
+        Vector4f size = getTextureSize(index);
+        return Vector4f(size[0], size[1], 1 / size[0], 1 / size[1]);
     }
     //-----------------------------------------------------------------------------
     const ColourValue& AutoParamDataSource::getSurfaceAmbientColour(void) const
@@ -613,10 +613,10 @@ namespace Ogre {
     {
         (void)mode; // ignored
         mFogColour = colour;
-        mFogParams.x = expDensity;
-        mFogParams.y = linearStart;
-        mFogParams.z = linearEnd;
-        mFogParams.w = linearEnd != linearStart ? 1 / (linearEnd - linearStart) : 0;
+        mFogParams[0] = expDensity;
+        mFogParams[1] = linearStart;
+        mFogParams[2] = linearEnd;
+        mFogParams[3] = linearEnd != linearStart ? 1 / (linearEnd - linearStart) : 0;
     }
     //-----------------------------------------------------------------------------
     const ColourValue& AutoParamDataSource::getFogColour(void) const
@@ -624,7 +624,7 @@ namespace Ogre {
         return mFogColour;
     }
     //-----------------------------------------------------------------------------
-    const Vector4& AutoParamDataSource::getFogParams(void) const
+    const Vector4f& AutoParamDataSource::getFogParams(void) const
     {
         return mFogParams;
     }
@@ -636,7 +636,7 @@ namespace Ogre {
             mPointParams[0] *= getViewportHeight();
     }
 
-    const Vector4& AutoParamDataSource::getPointParams() const
+    const Vector4f& AutoParamDataSource::getPointParams() const
     {
         return mPointParams;
     }
@@ -923,10 +923,10 @@ namespace Ogre {
         return std::tan(this->getTime_0_X(x));
     }
     //-----------------------------------------------------------------------------
-    Vector4 AutoParamDataSource::getTime_0_X_packed(Real x) const
+    Vector4f AutoParamDataSource::getTime_0_X_packed(Real x) const
     {
-        Real t = this->getTime_0_X(x);
-        return Vector4(t, std::sin(t), std::cos(t), std::tan(t));
+        float t = this->getTime_0_X(x);
+        return Vector4f(t, std::sin(t), std::cos(t), std::tan(t));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getTime_0_1(Real x) const
@@ -949,10 +949,10 @@ namespace Ogre {
         return std::tan(this->getTime_0_1(x));
     }
     //-----------------------------------------------------------------------------
-    Vector4 AutoParamDataSource::getTime_0_1_packed(Real x) const
+    Vector4f AutoParamDataSource::getTime_0_1_packed(Real x) const
     {
-        Real t = this->getTime_0_1(x);
-        return Vector4(t, std::sin(t), std::cos(t), std::tan(t));
+        float t = this->getTime_0_1(x);
+        return Vector4f(t, std::sin(t), std::cos(t), std::tan(t));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getTime_0_2Pi(Real x) const
@@ -975,10 +975,10 @@ namespace Ogre {
         return std::tan(this->getTime_0_2Pi(x));
     }
     //-----------------------------------------------------------------------------
-    Vector4 AutoParamDataSource::getTime_0_2Pi_packed(Real x) const
+    Vector4f AutoParamDataSource::getTime_0_2Pi_packed(Real x) const
     {
-        Real t = this->getTime_0_2Pi(x);
-        return Vector4(t, std::sin(t), std::cos(t), std::tan(t));
+        float t = this->getTime_0_2Pi(x);
+        return Vector4f(t, std::sin(t), std::cos(t), std::tan(t));
     }
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getFrameTime(void) const
