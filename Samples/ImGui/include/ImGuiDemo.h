@@ -43,6 +43,14 @@ public:
         imguiOverlay->setZOrder(300);
         imguiOverlay->show();
         OverlayManager::getSingleton().addOverlay(imguiOverlay); // now owned by overlaymgr
+        
+        /*
+            NOTE:
+            Custom apps will ASSERT on ImGuiOverlay::NewFrame(e) and not display any UI if they 
+            have not registered the overlay system by calling mSceneMgr->addRenderQueueListener(mOverlaySystem).  
+            OgreBites::SampleBrowser does this on behalf of the ImGuiDemo but custom applications will need to 
+            call this themselves.  See ApplicationContextBase::createDummyScene().
+        */
 
         mImguiListener.reset(new ImGuiInputListener());
         mListenerChain = InputListenerChain({mTrayMgr, mImguiListener.get(), mCameraMan, mControls});
