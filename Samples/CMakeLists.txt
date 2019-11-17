@@ -14,7 +14,7 @@ if (OGRE_BUILD_SAMPLES)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_OVERLAY)
-  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreOverlay)
+    set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreOverlay)
   endif ()
   
   if (OGRE_BUILD_COMPONENT_TERRAIN)
@@ -63,6 +63,11 @@ if (OGRE_BUILD_SAMPLES)
               ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/DefaultSamplesPlugin.cpp
               ${SAMPLES_SOURCES} ${SAMPLES_HEADERS})
   target_link_libraries(DefaultSamples OgreMain ${SAMPLE_DEPENDENCIES} OgreBites)
+
+  if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+    target_compile_definitions(DefaultSamples PRIVATE -DHAVE_IMGUI)
+  endif()
+
   ogre_config_sample_lib(DefaultSamples)
 
   if (APPLE AND NOT APPLE_IOS)

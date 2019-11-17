@@ -50,7 +50,9 @@
 #ifdef OGRE_BUILD_COMPONENT_HLMS
 #   include "HLMS.h"
 #endif
+#ifdef HAVE_IMGUI
 #include "ImGuiDemo.h"
+#endif
 #include "Isosurf.h"
 #include "Lighting.h"
 #include "LightShafts.h"
@@ -99,7 +101,9 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_Grass);
     addSample(new Sample_DualQuaternion);
     addSample(new Sample_Isosurf);
+#ifdef HAVE_IMGUI
     addSample(new Sample_ImGui);
+#endif
     addSample(new Sample_NewInstancing);
     addSample(new Sample_TextureArray);
     addSample(new Sample_Tessellation);
