@@ -93,8 +93,9 @@ namespace Ogre
         size_t fsaaSamples = 0;
         String fsaaHint;
         bool enableDoubleClick = false;
-        int monitorIndex = -1;  //Default by detecting the adapter from left / top position
-        
+
+        D3D9RenderSystem* rsys = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
+        int monitorIndex = rsys->getAdapterNumber();  // default to whatever was set in "Rendering Device" config option
 
         if(miscParams)
         {
