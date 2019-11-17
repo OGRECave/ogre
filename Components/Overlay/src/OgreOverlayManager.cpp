@@ -204,6 +204,14 @@ namespace Ogre {
     }
     void OverlayManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
+        // skip scripts that were already loaded as we lack proper re-loading support
+        if(!stream->getName().empty() && !mLoadedScripts.emplace(stream->getName()).second)
+        {
+            LogManager::getSingleton().logWarning(
+                StringUtil::format("Skipping loading '%s' as it is already loaded", stream->getName().c_str()));
+            return;
+        }
+
         ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
     }
     //---------------------------------------------------------------------
