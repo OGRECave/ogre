@@ -3905,7 +3905,12 @@ namespace Ogre
     {   
         D3D9Device* activeDevice = msD3D9RenderSystem->mDeviceManager->getActiveDevice();
         return activeDevice ? activeDevice->getD3D9Device() : NULL;
-    }   
+    }
+
+    uint D3D9RenderSystem::getAdapterNumber()
+    {
+        return mActiveD3DDriver->getAdapterNumber();
+    }
 
     //---------------------------------------------------------------------
     // Formats to try, in decreasing order of preference
