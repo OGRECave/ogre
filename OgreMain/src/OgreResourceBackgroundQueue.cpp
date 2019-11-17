@@ -28,11 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreResourceBackgroundQueue.h"
 
-#if OGRE_THREAD_SUPPORT == 3 // resource system is not threadsafe
-#undef OGRE_THREAD_SUPPORT
-#define OGRE_THREAD_SUPPORT 0
-#endif
-
 namespace Ogre {
 
     // Note, no locks are required here anymore because all of the parallelisation
