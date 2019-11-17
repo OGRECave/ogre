@@ -43,7 +43,7 @@ public:
         imguiOverlay->setZOrder(300);
         imguiOverlay->show();
         OverlayManager::getSingleton().addOverlay(imguiOverlay); // now owned by overlaymgr
-        
+
         /*
             NOTE:
             Custom apps will ASSERT on ImGuiOverlay::NewFrame(e) and not display any UI if they
