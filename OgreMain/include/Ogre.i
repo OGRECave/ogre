@@ -248,6 +248,7 @@ ADD_REPR(TRect)
 %include "OgreMath.h"
 ADD_REPR(Degree)
 ADD_REPR(Radian)
+%template(RayTestResult) std::pair<bool, float>;
 %include "OgreStringVector.h"
 %template(StringVector) std::vector<Ogre::String>;  // actual vector<T>
 %template(StringVectorPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
@@ -648,6 +649,8 @@ SHARED_PTR(Mesh);
 %ignore Ogre::SceneManager::getMovableObjectIterator;
 %ignore Ogre::SceneManager::getShadowTextureCount;
 %ignore Ogre::SceneManager::getShadowTextureConfigIterator;
+%newobject Ogre::SceneManager::createRayQuery(const Ray&, uint32 mask);
+%newobject Ogre::SceneManager::createRayQuery(const Ray&);
 %include "OgreSceneManager.h"
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask);
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&);
