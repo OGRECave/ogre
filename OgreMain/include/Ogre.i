@@ -45,7 +45,6 @@ using namespace std;
 #define OGRE_MUTEX(arg)
 
 %feature("autodoc", "1");
-%feature("director") *Listener;
 %feature("director") *::Listener;
 // should be turned on globally if all renames are in place
 %feature("flatnested") Ogre::MaterialManager::Listener;
@@ -315,10 +314,15 @@ SHARED_PTR(FileHandleDataStream);
 %include "OgreSerializer.h"
 %include "OgreScriptLoader.h"
 // Listeners 
+%feature("director") Ogre::FrameListener;
 %include "OgreFrameListener.h"
+%feature("director") Ogre::LodListener;
 %include "OgreLodListener.h"
+%feature("director") Ogre::RenderObjectListener;
 %include "OgreRenderObjectListener.h"
+%feature("director") Ogre::RenderQueueListener;
 %include "OgreRenderQueueListener.h"
+%feature("director") Ogre::RenderTargetListener;
 %include "OgreRenderTargetListener.h"
 // More Data Types
 %include "OgreColourValue.h"
