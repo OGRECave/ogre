@@ -564,11 +564,11 @@ material Examples/GeneralTexProjection
 // Distortion effects
 //----------------------------
 
-vertex_program Examples/FresnelRefractReflectVPCg cg
+vertex_program Examples/FresnelRefractReflectVPCg hlsl
 {
 	source Example_Fresnel.cg
 	entry_point main_vp
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
+	target vs_2_0
 }
 vertex_program Examples/FresnelRefractReflectVPGLSLES glsles
 {
@@ -586,12 +586,12 @@ vertex_program Examples/FresnelRefractReflectVP unified
 	delegate Examples/FresnelRefractReflectVPCg
 }
 
-fragment_program Examples/FresnelRefractReflectFPCg cg
+fragment_program Examples/FresnelRefractReflectFPCg hlsl
 {
 	source Example_Fresnel.cg
 	entry_point main_fp
 	// sorry, ps_1_1 and fp20 can't do this
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
+	target ps_2_0
 }
 
 fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
