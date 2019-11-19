@@ -420,6 +420,9 @@ SHARED_PTR(HardwareUniformBuffer);
 %ignore Ogre::ResourceManager::load;
 #endif
 %include "OgreResourceManager.h"
+    // ambiguity as enums are just ints
+    %ignore Ogre::TextureManager::createManual(const String&, const String&,TextureType,uint,uint,int,PixelFormat,int);
+    %ignore Ogre::TextureManager::createManual(const String&, const String&,TextureType,uint,uint,int,PixelFormat);
     %include "OgreTextureManager.h"
     %include "OgreGpuProgramManager.h"
     %include "OgreHighLevelGpuProgramManager.h"
