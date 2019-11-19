@@ -156,6 +156,8 @@ namespace Ogre {
     {
         TexturePtr ret;
 
+        OgreAssert(width && height && depth, "total size of texture must not be zero");
+
         // Check for 3D texture support
         const RenderSystemCapabilities* caps =
             Root::getSingleton().getRenderSystem()->getCapabilities();
