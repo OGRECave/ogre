@@ -261,8 +261,8 @@ TPL_VECTOR(3)
 TPL_VECTOR(4)
 %include "OgreMatrix3.h"
 ADD_REPR(Matrix3)
-%ignore Ogre::TransformBase::extract3x3Matrix; // deprecated
-%ignore Ogre::TransformBase::extractQuaternion; // deprecated
+%ignore Ogre::TransformBaseReal::extract3x3Matrix; // deprecated
+%ignore Ogre::TransformBaseReal::extractQuaternion; // deprecated
 %ignore Ogre::Matrix4::concatenate; // deprecated
 %include "OgreMatrix4.h"
 ADD_REPR(Matrix4)
@@ -469,7 +469,14 @@ SHARED_PTR(Material);
 %template(Techniques) std::vector<Ogre::Technique*>;
 %include "OgreMaterial.h"
 %ignore Ogre::RenderSystem::_setBindingType;
-%ignore Ogre::RenderSystem::bindGpuProgramPassIterationParameters;
+%ignore Ogre::RenderSystem::_setBindingType;
+%ignore Ogre::RenderSystem::_setTextureUnitFiltering;
+%ignore Ogre::RenderSystem::_setTextureAddressingMode;
+%ignore Ogre::RenderSystem::_setSceneBlending;
+%ignore Ogre::RenderSystem::_setFog;
+%ignore Ogre::RenderSystem::_setWorldMatrix;
+%ignore Ogre::RenderSystem::_setViewMatrix;
+%ignore Ogre::RenderSystem::_setProjectionMatrix;
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 #ifdef SWIGJAVA
@@ -492,6 +499,7 @@ SHARED_PTR(Material);
     %ignore Ogre::Light::getPosition;
     %ignore Ogre::Light::getDirection;
     %include "OgreLight.h"
+    %ignore Ogre::Node::getChildIterator;
     %include "OgreNode.h"
         %include "OgreBone.h"
         %ignore Ogre::SceneNode::getAttachedObjectIterator;
@@ -530,6 +538,7 @@ SHARED_PTR(Material);
         ADD_REPR(Camera)
     %include "OgreManualObject.h"
     %template(SubEntityList) std::vector<Ogre::SubEntity*>;
+    %ignore Ogre::Entity::getAttachedObjectIterator;
     %include "OgreEntity.h"
     %include "OgreSubEntity.h"
     SHARED_PTR(ParticleSystem);
@@ -598,8 +607,9 @@ SHARED_PTR(Mesh);
 %ignore Ogre::SceneManager::getCameraIterator; // deprecated
 %ignore Ogre::SceneManager::getAnimationIterator;
 %ignore Ogre::SceneManager::getAnimationStateIterator;
-%ignore Ogre::SceneManager::setShadowTextureCasterMaterial(const String&);
-%ignore Ogre::SceneManager::setShadowTextureReceiverMaterial(const String&);
+%ignore Ogre::SceneManager::getMovableObjectIterator;
+%ignore Ogre::SceneManager::getShadowTextureCount;
+%ignore Ogre::SceneManager::getShadowTextureConfigIterator;
 %include "OgreSceneManager.h"
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask);
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&);
@@ -610,6 +620,7 @@ SHARED_PTR(Mesh);
 %ignore Ogre::Root::getSceneManagerIterator;
 %ignore Ogre::Root::createSceneManager(SceneTypeMask);
 %ignore Ogre::Root::createSceneManager(SceneTypeMask, const String&);
+%ignore Ogre::Root::getMovableObjectFactoryIterator;
 %include "OgreRoot.h"
 // dont wrap: platform specific
 // %include "OgreWindowEventUtilities.h"
