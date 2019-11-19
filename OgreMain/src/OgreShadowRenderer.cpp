@@ -401,21 +401,19 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
                 continue;
 
             // Store current shadow texture
-            mCurrentShadowTexture = si->get();
+            const auto& currentShadowTexture = *si;
             // Get camera for current shadow texture
-            Camera *cam = mCurrentShadowTexture->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
+            Camera *cam = currentShadowTexture->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
             // Hook up receiver texture
             Pass* targetPass = mShadowTextureCustomReceiverPass ?
                     mShadowTextureCustomReceiverPass : mShadowReceiverPass;
-            targetPass->getTextureUnitState(0)->setTextureName(
-                mCurrentShadowTexture->getName());
+            targetPass->getTextureUnitState(0)->setTexture(currentShadowTexture);
             // Hook up projection frustum if fixed-function, but also need to
             // disable it explicitly for program pipeline.
             TextureUnitState* texUnit = targetPass->getTextureUnitState(0);
             texUnit->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
             // clamp to border colour in case this is a custom material
-            texUnit->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
-            texUnit->setTextureBorderColour(ColourValue::White);
+            texUnit->setSampler(mBorderSampler);
 
             mSceneManager->mAutoParamDataSource->setTextureProjector(cam, 0);
             // if this light is a spotlight, we need to add the spot fader layer
@@ -530,21 +528,19 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
                 if (l->getCastShadows() && si != siend)
                 {
                     // Store current shadow texture
-                    mCurrentShadowTexture = si->get();
+                    const auto& currentShadowTexture = *si;
                     // Get camera for current shadow texture
-                    Camera *cam = mCurrentShadowTexture->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
+                    Camera *cam = currentShadowTexture->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
                     // Hook up receiver texture
                     Pass* targetPass = mShadowTextureCustomReceiverPass ?
                         mShadowTextureCustomReceiverPass : mShadowReceiverPass;
-                    targetPass->getTextureUnitState(0)->setTextureName(
-                        mCurrentShadowTexture->getName());
+                    targetPass->getTextureUnitState(0)->setTexture(currentShadowTexture);
                     // Hook up projection frustum if fixed-function, but also need to
                     // disable it explicitly for program pipeline.
                     TextureUnitState* texUnit = targetPass->getTextureUnitState(0);
                     texUnit->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
                     // clamp to border colour in case this is a custom material
-                    texUnit->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
-                    texUnit->setTextureBorderColour(ColourValue::White);
+                    texUnit->setSampler(mBorderSampler);
                     mSceneManager->mAutoParamDataSource->setTextureProjector(cam, 0);
                     // Remove any spot fader layer
                     if (targetPass->getNumTextureUnitStates() > 1 &&
@@ -650,6 +646,13 @@ void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
 //---------------------------------------------------------------------
 void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
 {
+    if(!mBorderSampler)
+    {
+        mBorderSampler = std::make_shared<Sampler>();
+        mBorderSampler->setAddressingMode(TAM_BORDER);
+        mBorderSampler->setBorderColour(ColourValue::White);
+    }
+
     if (mShadowTextureConfigDirty)
     {
         destroyShadowTextures();
@@ -715,8 +718,7 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
                 // set projective based on camera
                 texUnit->setProjectiveTexturing(!p->hasVertexProgram(), cam);
                 // clamp to border colour
-                texUnit->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
-                texUnit->setTextureBorderColour(ColourValue::White);
+                texUnit->setSampler(mBorderSampler);
                 mat->touch();
 
             }

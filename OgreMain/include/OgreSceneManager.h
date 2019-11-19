@@ -655,6 +655,8 @@ namespace Ogre {
             GpuProgramParametersSharedPtr mShadowTextureCustomReceiverVPParams;
             GpuProgramParametersSharedPtr mShadowTextureCustomReceiverFPParams;
 
+            SamplerPtr mBorderSampler;
+
             TexturePtr mNullShadowTexture;
             CameraList mShadowTextureCameras;
             LightList mShadowTextureCurrentCasterLightList;
@@ -666,7 +668,6 @@ namespace Ogre {
             std::unique_ptr<Rectangle2D> mFullScreenQuad;
 
             ShadowTextureList mShadowTextures;
-            Texture* mCurrentShadowTexture;
 
             bool mShadowAdditiveLightClip;
             bool mDebugShadows;
