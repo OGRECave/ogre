@@ -51,6 +51,7 @@ namespace Ogre
                 mMaterialLodIndex( 0 ),
                 mDirtyAnimation(true),
                 mTechnSupportsSkeletal( true ),
+                mCameraDistLastUpdateFrameNumber( std::numeric_limits<unsigned long>::max() ),
                 mCachedCamera( 0 ),
                 mTransformSharingDirty(true),
                 mRemoveOwnVertexData(false),
