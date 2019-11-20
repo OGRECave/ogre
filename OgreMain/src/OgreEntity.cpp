@@ -162,7 +162,8 @@ namespace Ogre {
         // Initialise the AnimationState, if Mesh has animation
         if (hasSkeleton())
         {
-            mFrameBonesLastUpdated = OGRE_NEW_T(unsigned long, MEMCATEGORY_ANIMATION)(std::numeric_limits<unsigned long>::max());
+            mFrameBonesLastUpdated = OGRE_ALLOC_T(unsigned long, 1, MEMCATEGORY_ANIMATION);
+            *mFrameBonesLastUpdated = std::numeric_limits<unsigned long>::max();
             mNumBoneMatrices = mSkeletonInstance->getNumBones();
             mBoneMatrices = static_cast<Affine3*>(OGRE_MALLOC_SIMD(sizeof(Affine3) * mNumBoneMatrices, MEMCATEGORY_ANIMATION));
         }
@@ -2375,7 +2376,8 @@ namespace Ogre {
             mSkeletonInstance->load();
             mAnimationState = OGRE_NEW AnimationStateSet();
             mMesh->_initAnimationState(mAnimationState);
-            mFrameBonesLastUpdated = OGRE_NEW_T(unsigned long, MEMCATEGORY_ANIMATION)(std::numeric_limits<unsigned long>::max());
+            mFrameBonesLastUpdated = OGRE_ALLOC_T(unsigned long, 1, MEMCATEGORY_ANIMATION);
+            *mFrameBonesLastUpdated = std::numeric_limits<unsigned long>::max();
             mNumBoneMatrices = mSkeletonInstance->getNumBones();
             mBoneMatrices = static_cast<Affine3*>(OGRE_MALLOC_SIMD(sizeof(Affine3) * mNumBoneMatrices, MEMCATEGORY_ANIMATION));
 
