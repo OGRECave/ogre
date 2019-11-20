@@ -27,31 +27,6 @@ licenses when distributing an application since most require you to
 include the license in your documentation. All the license texts are
 included in the Docs/licenses folder.
 
-### STB Image
-
-<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
-<tbody>
-
-<tr>
-    <td style="width: 20%;">Original Authors:</td>
-    <td>Sean Barrett<br />
-    </td>
-</tr>
-
-<tr>
-    <td>Website:</td>
-    <td>https://github.com/nothings/stb<br />
-    </td>
-</tr>
-
-<tr>
-    <td>Licensed Under:</td>
-    <td>public domain</td>
-</tr>
-
-</tbody>
-</table>
-
 ### Zlib
 
 <table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
@@ -159,6 +134,36 @@ Bites Component</td>
 </tbody>
 </table>
 
+### STB Image
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+
+<tr>
+    <td style="width: 20%;">Original Authors:</td>
+    <td>Sean Barrett<br />
+    </td>
+</tr>
+
+<tr>
+    <td>Website:</td>
+    <td>https://github.com/nothings/stb<br />
+    </td>
+</tr>
+
+<tr>
+    <td>Licensed Under:</td>
+    <td>public domain</td>
+</tr>
+
+<tr>
+<td>Needed By:</td>
+<td>Codec_STBI</td>
+</tr>
+
+</tbody>
+</table>
+
 ### OpenEXR
 
 <table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
@@ -181,12 +186,42 @@ Bites Component</td>
 
 <tr>
 <td>Needed By:</td>
-<td>Plugin_EXRCodec</td>
+<td>Codec_EXR</td>
 </tr>
 
 </tbody>
 </table>
-<br />
+
+### pugixml
+
+<table>
+<tbody>
+<tr>
+<td style="width: 20%;">
+Original Authors:</td>
+<td>
+Arseny Kapoulkine</td>
+</tr>
+<tr>
+<td>
+Website:</td>
+<td>
+ https://pugixml.org/</td>
+</tr>
+<tr>
+<td>
+Licensed Under:</td>
+<td>
+<a href="licenses/mit.txt">MIT License</a></td>
+</tr>
+
+<tr>
+<td>Needed By:</td>
+<td>OgreXMLConverter, Bites Component</td>
+</tr>
+
+</tbody>
+</table>
 
 ## Source code used in-place in OGRE
 
