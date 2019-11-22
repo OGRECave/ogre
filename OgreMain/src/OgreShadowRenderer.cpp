@@ -35,9 +35,6 @@ THE SOFTWARE.
 #include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreHighLevelGpuProgram.h"
 
-#include "OgreSpotShadowFadePng.h"
-
-
 namespace Ogre {
 
 GpuProgramParametersSharedPtr SceneManager::ShadowRenderer::msInfiniteExtrusionParams;
@@ -435,12 +432,10 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
 
                 // Add spot fader if not present already
                 if (targetPass->getNumTextureUnitStates() == 2 &&
-                    targetPass->getTextureUnitState(1)->getTextureName() ==
-                        "spot_shadow_fade.png")
+                    targetPass->getTextureUnitState(1)->getTextureName() == "spot_shadow_fade.dds")
                 {
                     // Just set
-                    TextureUnitState* t =
-                        targetPass->getTextureUnitState(1);
+                    TextureUnitState* t = targetPass->getTextureUnitState(1);
                     t->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
                 }
                 else
@@ -449,8 +444,7 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
                     while(targetPass->getNumTextureUnitStates() > 1)
                         targetPass->removeTextureUnitState(1);
 
-                    TextureUnitState* t =
-                        targetPass->createTextureUnitState("spot_shadow_fade.png");
+                    TextureUnitState* t = targetPass->createTextureUnitState("spot_shadow_fade.dds");
                     t->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
                     t->setColourOperation(LBO_ADD);
                     t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
@@ -558,8 +552,7 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
                     mSceneManager->mAutoParamDataSource->setTextureProjector(cam, 0);
                     // Remove any spot fader layer
                     if (targetPass->getNumTextureUnitStates() > 1 &&
-                        targetPass->getTextureUnitState(1)->getTextureName()
-                            == "spot_shadow_fade.png")
+                        targetPass->getTextureUnitState(1)->getTextureName() == "spot_shadow_fade.dds")
                     {
                         // remove spot fader layer (should only be there if
                         // we previously used modulative shadows)
@@ -1628,22 +1621,6 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
         {
             mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
         }
-    }
-
-    // Set up spot shadow fade texture (loaded from code data block)
-    TexturePtr spotShadowFadeTex = TextureManager::getSingleton().getByName(
-        "spot_shadow_fade.png", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-    if (!spotShadowFadeTex)
-    {
-        // Load the manual buffer into an image (don't destroy memory!
-        DataStreamPtr stream(
-            OGRE_NEW MemoryDataStream(SPOT_SHADOW_FADE_PNG, SPOT_SHADOW_FADE_PNG_SIZE, false));
-        Image img;
-        img.load(stream, "png");
-        spotShadowFadeTex =
-            TextureManager::getSingleton().loadImage(
-            "spot_shadow_fade.png", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-            img, TEX_TYPE_2D);
     }
 
     mShadowMaterialInitDone = true;
