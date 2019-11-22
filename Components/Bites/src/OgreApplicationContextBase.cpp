@@ -366,6 +366,9 @@ void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t window
         case FINGERMOTION:
             l.touchMoved(event.tfinger);
             break;
+        case TEXTINPUT:
+            l.textInput(event.text);
+            break;
         }
     }
 }
