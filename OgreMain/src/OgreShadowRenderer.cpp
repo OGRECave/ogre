@@ -407,6 +407,13 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
             // Hook up receiver texture
             Pass* targetPass = mShadowTextureCustomReceiverPass ?
                     mShadowTextureCustomReceiverPass : mShadowReceiverPass;
+
+            // account for the RTSS
+            if (auto betterTechnique = targetPass->getParent()->getParent()->getBestTechnique())
+            {
+                targetPass = betterTechnique->getPass(0);
+            }
+
             targetPass->getTextureUnitState(0)->setTexture(currentShadowTexture);
             // Hook up projection frustum if fixed-function, but also need to
             // disable it explicitly for program pipeline.
@@ -534,6 +541,13 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
                     // Hook up receiver texture
                     Pass* targetPass = mShadowTextureCustomReceiverPass ?
                         mShadowTextureCustomReceiverPass : mShadowReceiverPass;
+
+                    // account for the RTSS
+                    if (auto betterTechnique = targetPass->getParent()->getParent()->getBestTechnique())
+                    {
+                        targetPass = betterTechnique->getPass(0);
+                    }
+
                     targetPass->getTextureUnitState(0)->setTexture(currentShadowTexture);
                     // Hook up projection frustum if fixed-function, but also need to
                     // disable it explicitly for program pipeline.
@@ -1598,18 +1612,17 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
 
     if (!mShadowReceiverPass)
     {
-        MaterialPtr matShadRec = MaterialManager::getSingleton().getByName(
-            "Ogre/TextureShadowReceiver");
+        MaterialPtr matShadRec = MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver", RGN_INTERNAL);
         if (!matShadRec)
         {
-            matShadRec = MaterialManager::getSingleton().create(
-                "Ogre/TextureShadowReceiver",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+            matShadRec = MaterialManager::getSingleton().create("Ogre/TextureShadowReceiver", RGN_INTERNAL);
             mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
             // Don't set lighting and blending modes here, depends on additive / modulative
             TextureUnitState* t = mShadowReceiverPass->createTextureUnitState();
             t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
             t->setTextureFiltering(FT_MIP, FO_NONE); // we do not have mips. GLES2 is particularly picky here.
+            t->setProjectiveTexturing(true, NULL); // will be set later, but the RTSS needs to know about this
+            matShadRec->compile(); // tell the RTSS
         }
         else
         {
