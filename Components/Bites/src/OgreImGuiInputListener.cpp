@@ -96,43 +96,30 @@ bool ImGuiInputListener::mouseReleased(const MouseButtonEvent& arg)
     }
     return io.WantCaptureMouse;
 }
+bool ImGuiInputListener::keyEvent (const KeyboardEvent& arg)
+{
+    ImGuiIO& io = ImGui::GetIO ();
+    int key = kc2sc (arg.keysym.sym);
+    io.KeysDown[key] = (arg.type == OgreBites::KEYDOWN);
+    io.KeyShift = (arg.keysym.mod & KMOD_SHIFT) != 0;
+    io.KeyCtrl = (arg.keysym.mod & KMOD_CTRL) != 0;
+    io.KeyAlt = (arg.keysym.mod & KMOD_ALT) != 0;
+    io.KeySuper = (arg.keysym.mod & KMOD_GUI) != 0;
+    return io.WantCaptureKeyboard;
+}
 bool ImGuiInputListener::keyPressed(const KeyboardEvent& arg)
 {
-    ImGuiIO& io = ImGui::GetIO();
-
-    // ignore
-    if (arg.keysym.sym == SDLK_LSHIFT)
-        return io.WantCaptureKeyboard;
-
-    io.KeyCtrl = arg.keysym.mod & KMOD_CTRL;
-    io.KeyShift = arg.keysym.mod & SDLK_LSHIFT;
-
-    int key = kc2sc(arg.keysym.sym);
-
-    if (key > 0 && key < 512)
-    {
-        io.KeysDown[key] = true;
-
-        uint16_t sym = arg.keysym.sym;
-        if (io.KeyShift)
-            sym -= 32;
-        io.AddInputCharacter(sym);
-    }
-
-    return io.WantCaptureKeyboard;
+    return keyEvent (arg);
 }
 bool ImGuiInputListener::keyReleased(const KeyboardEvent& arg)
 {
-    int key = kc2sc(arg.keysym.sym);
-    if (key < 0 || key >= 512)
-        return true;
-
-    ImGuiIO& io = ImGui::GetIO();
-
-    io.KeyCtrl = arg.keysym.mod & KMOD_CTRL;
-    io.KeyShift = arg.keysym.mod & SDLK_LSHIFT;
-
-    io.KeysDown[key] = false;
-    return io.WantCaptureKeyboard;
+    return keyEvent (arg);
 }
+bool ImGuiInputListener::textInput (const TextInputEvent& evt)
+{
+    ImGuiIO& io = ImGui::GetIO ();
+    io.AddInputCharactersUTF8 (evt.chars);
+    return true;
+}
+
 } // namespace OgreBites

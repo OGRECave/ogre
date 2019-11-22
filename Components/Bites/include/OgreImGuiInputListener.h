@@ -19,6 +19,9 @@ namespace OgreBites
         bool mouseWheelRolled(const MouseWheelEvent& evt);
         bool mousePressed(const MouseButtonEvent& evt);
         bool mouseReleased(const MouseButtonEvent& evt);
+        bool textInput (const TextInputEvent& evt);
+    private:
+        bool keyEvent (const KeyboardEvent& arg);
     };
 }
 
