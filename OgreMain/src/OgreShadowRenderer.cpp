@@ -405,6 +405,46 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
             Pass* targetPass = mShadowTextureCustomReceiverPass ?
                     mShadowTextureCustomReceiverPass : mShadowReceiverPass;
 
+            // if this light is a spotlight, we need to add the spot fader layer
+            // BUT not if using a custom projection matrix, since then it will be
+            // inappropriately shaped most likely
+            if (l->getType() == Light::LT_SPOTLIGHT && !cam->isCustomProjectionMatrixEnabled())
+            {
+                // remove all TUs except 0 & 1
+                // (only an issue if additive shadows have been used)
+                while(targetPass->getNumTextureUnitStates() > 2)
+                    targetPass->removeTextureUnitState(2);
+
+                TextureUnitState* t = NULL;
+                // Add spot fader if not present already
+                if (targetPass->getNumTextureUnitStates() == 2 &&
+                    targetPass->getTextureUnitState(1)->getTextureName() == "spot_shadow_fade.dds")
+                {
+                    // Just set
+                    t = targetPass->getTextureUnitState(1);
+                }
+                else
+                {
+                    // Remove any non-conforming spot layers
+                    while(targetPass->getNumTextureUnitStates() > 1)
+                        targetPass->removeTextureUnitState(1);
+
+                    t = targetPass->createTextureUnitState("spot_shadow_fade.dds");
+                    t->setColourOperation(LBO_ADD);
+                    t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+                }
+
+                t->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
+                mSceneManager->mAutoParamDataSource->setTextureProjector(cam, 1);
+            }
+            else
+            {
+                // remove all TUs except 0 including spot
+                while(targetPass->getNumTextureUnitStates() > 1)
+                    targetPass->removeTextureUnitState(1);
+
+            }
+
             // account for the RTSS
             if (auto betterTechnique = targetPass->getParent()->getParent()->getBestTechnique())
             {
@@ -420,43 +460,7 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
             texUnit->setSampler(mBorderSampler);
 
             mSceneManager->mAutoParamDataSource->setTextureProjector(cam, 0);
-            // if this light is a spotlight, we need to add the spot fader layer
-            // BUT not if using a custom projection matrix, since then it will be
-            // inappropriately shaped most likely
-            if (l->getType() == Light::LT_SPOTLIGHT && !cam->isCustomProjectionMatrixEnabled())
-            {
-                // remove all TUs except 0 & 1
-                // (only an issue if additive shadows have been used)
-                while(targetPass->getNumTextureUnitStates() > 2)
-                    targetPass->removeTextureUnitState(2);
 
-                // Add spot fader if not present already
-                if (targetPass->getNumTextureUnitStates() == 2 &&
-                    targetPass->getTextureUnitState(1)->getTextureName() == "spot_shadow_fade.dds")
-                {
-                    // Just set
-                    TextureUnitState* t = targetPass->getTextureUnitState(1);
-                    t->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
-                }
-                else
-                {
-                    // Remove any non-conforming spot layers
-                    while(targetPass->getNumTextureUnitStates() > 1)
-                        targetPass->removeTextureUnitState(1);
-
-                    TextureUnitState* t = targetPass->createTextureUnitState("spot_shadow_fade.dds");
-                    t->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
-                    t->setColourOperation(LBO_ADD);
-                    t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
-                }
-            }
-            else
-            {
-                // remove all TUs except 0 including spot
-                while(targetPass->getNumTextureUnitStates() > 1)
-                    targetPass->removeTextureUnitState(1);
-
-            }
             // Set lighting / blending modes
             targetPass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO);
             targetPass->setLightingEnabled(false);
@@ -1615,7 +1619,6 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
             t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
             t->setTextureFiltering(FT_MIP, FO_NONE); // we do not have mips. GLES2 is particularly picky here.
             t->setProjectiveTexturing(true, NULL); // will be set later, but the RTSS needs to know about this
-            matShadRec->compile(); // tell the RTSS
         }
         else
         {
