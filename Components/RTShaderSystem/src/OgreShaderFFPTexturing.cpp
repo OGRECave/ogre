@@ -111,23 +111,9 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
         break;
 
     case TEXCALC_PROJECTIVE_TEXTURE:
-
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
-        textureUnitParams->mTextureViewProjImageMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_LIGHTS, "gTexViewProjImageMatrix");
-        
-        const TextureUnitState::EffectMap&      effectMap = textureUnitParams->mTextureUnitState->getEffects(); 
-        TextureUnitState::EffectMap::const_iterator effi;
-
-        for (effi = effectMap.begin(); effi != effectMap.end(); ++effi)
-        {
-            if (effi->second.type == TextureUnitState::ET_PROJECTIVE_TEXTURE)
-            {
-                textureUnitParams->mTextureProjector = effi->second.frustum;
-                break;
-            }
-        }
-
-        OgreAssert(textureUnitParams->mTextureProjector, "frustum is NULL");
+        textureUnitParams->mTextureViewProjImageMatrix = vsProgram->resolveParameter(
+            GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX, textureUnitParams->mTextureSamplerIndex);
         break;
     }
 
@@ -571,9 +557,9 @@ bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* src
 
     //count the number of texture units we need to process
     size_t validTexUnits = 0;
-    for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)
+    for (unsigned short i=0; i < dstPass->getNumTextureUnitStates(); ++i)
     {       
-        if (isProcessingNeeded(srcPass->getTextureUnitState(i)))
+        if (isProcessingNeeded(dstPass->getTextureUnitState(i)))
         {
             ++validTexUnits;
         }
@@ -582,9 +568,9 @@ bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* src
     setTextureUnitCount(validTexUnits);
 
     // Build texture stage sub states.
-    for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)
+    for (unsigned short i=0; i < dstPass->getNumTextureUnitStates(); ++i)
     {       
-        TextureUnitState* texUnitState = srcPass->getTextureUnitState(i);                               
+        TextureUnitState* texUnitState = dstPass->getTextureUnitState(i);
 
         if (isProcessingNeeded(texUnitState))
         {
@@ -596,28 +582,6 @@ bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* src
 }
 
 //-----------------------------------------------------------------------
-void FFPTexturing::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
-                                              const LightList* pLightList)
-{
-    for (unsigned int i=0; i < mTextureUnitParamsList.size(); ++i)
-    {
-        TextureUnitParams* curParams = &mTextureUnitParamsList[i];
-
-        if (curParams->mTextureProjector != NULL && curParams->mTextureViewProjImageMatrix.get() != NULL)
-        {                   
-            Matrix4 matTexViewProjImage;
-
-            matTexViewProjImage = 
-                Matrix4::CLIPSPACE2DTOIMAGESPACE * 
-                curParams->mTextureProjector->getProjectionMatrixWithRSDepth() * 
-                curParams->mTextureProjector->getViewMatrix();
-
-            curParams->mTextureViewProjImageMatrix->setGpuParameter(matTexViewProjImage);
-        }
-    }
-}
-
-//-----------------------------------------------------------------------
 void FFPTexturing::setTextureUnitCount(size_t count)
 {
     mTextureUnitParamsList.resize(count);
@@ -626,8 +590,7 @@ void FFPTexturing::setTextureUnitCount(size_t count)
     {
         TextureUnitParams& curParams = mTextureUnitParamsList[i];
 
-        curParams.mTextureUnitState             = NULL;         
-        curParams.mTextureProjector             = NULL;               
+        curParams.mTextureUnitState             = NULL;
         curParams.mTextureSamplerIndex          = 0;              
         curParams.mTextureSamplerType           = GCT_SAMPLER2D;        
         curParams.mVSInTextureCoordinateType    = GCT_FLOAT2;   
