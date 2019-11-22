@@ -36,6 +36,7 @@ public:
     bool mouseWheelRolled(const MouseWheelEvent& evt) { return mListenerChain.mouseWheelRolled(evt); }
     bool mousePressed(const MouseButtonEvent& evt) { return mListenerChain.mousePressed(evt); }
     bool mouseReleased(const MouseButtonEvent& evt) { return mListenerChain.mouseReleased(evt); }
+    bool textInput (const TextInputEvent& evt) { return mListenerChain.textInput (evt); }
 
     void setupContent(void)
     {

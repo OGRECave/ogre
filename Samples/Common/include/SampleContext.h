@@ -321,6 +321,13 @@ namespace OgreBites
             return true;
         }
 
+        virtual bool textInput (const TextInputEvent& evt)
+        {
+            if (!isCurrentSamplePaused ())
+                return mCurrentSample->textInput (evt);
+            return true;
+        }
+
         bool isFirstRun() { return mFirstRun; }
         void setFirstRun(bool flag) { mFirstRun = flag; }
         bool isLastRun() { return mLastRun; }

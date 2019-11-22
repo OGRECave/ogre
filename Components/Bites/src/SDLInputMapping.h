@@ -66,6 +66,10 @@ namespace {
             out.tfinger.dy = in.tfinger.dy;
             out.tfinger.fingerId = in.tfinger.fingerId;
             break;
+        case SDL_TEXTINPUT:
+            out.type = OgreBites::TEXTINPUT;
+            out.text.chars = in.text.text;
+            break;
         }
 
         return out;
