@@ -94,13 +94,13 @@ And finally we need to give our ground a material. For now, it will be easiest t
 Make sure you add the texture for the material and the Examples.material script to your resource loading path. In our case, the texture is called 'rockwall.tga'. You can find the name yourself by reading the entry in the material script.
 
 # Using Shadows in Ogre {#bt2UsingShadowsinOgre}
-Enabling shadows in Ogre is easy. The SceneManager class has a Ogre::SceneManager::setShadowTechnique method we can use. Then whenever we create an Entity, we call setCastShadows to choose which Entities will cast shadows. setShadowTechinique method takes several of different techniques. Refer to Ogre::ShadowTechnique for more details.
+Enabling shadows in Ogre is easy. The SceneManager class has a Ogre::SceneManager::setShadowTechnique method we can use. Then whenever we create an Entity, we call Ogre::Entity::setCastShadows to choose which ones will cast shadows. setShadowTechinique method takes several of different techniques. Refer to Ogre::ShadowTechnique for more details.
 
 Let's turn off the ambient light so we can see the full effect of our lights. Add the following changes:
 
 @snippet Samples/Tutorials/BasicTutorial2.cpp lightingsset
 
-Now the SceneManager will use modulative stencil shadows. Let's add some lights to see this in action.
+Now the SceneManager will use shadows. Let's add some lights to see this in action.
 
 # Lights {#bt2Lights}
 Ogre provides three types of lighting.
