@@ -502,11 +502,12 @@ The only required parameter is a name, which must be the name of an already defi
 
 # Shadows and Vertex Programs {#Shadows-and-Vertex-Programs}
 
-When using shadows (See [Shadows](@ref Shadows)), the use of vertex programs can add some additional complexities, because Ogre can only automatically deal with everything when using the fixed-function pipeline. If you use vertex programs, and you are also using shadows, you may need to make some adjustments. 
+When using @ref Shadows, the use of vertex programs can add some additional complexities, because %Ogre can only automatically deal with everything when using the fixed-function pipeline. If you use vertex programs, and you are also using shadows, you may need to make some adjustments.
 
-If you use **stencil shadows**, then any vertex programs which do vertex deformation can be a problem, because stencil shadows are calculated on the CPU, which does not have access to the modified vertices. If the vertex program is doing standard skeletal animation, this is ok (see section above) because Ogre knows how to replicate the effect in software, but any other vertex deformation cannot be replicated, and you will either have to accept that the shadow will not reflect this deformation, or you should turn off shadows for that object. 
+- If you use **stencil shadows**, then any vertex programs which do vertex deformation can be a problem, because stencil shadows are calculated on the CPU, which does not have access to the modified vertices. If the vertex program is doing standard skeletal animation, this is ok (see section above) because %Ogre knows how to replicate the effect in software, but any other vertex deformation cannot be replicated, and you will either have to accept that the shadow will not reflect this deformation, or you should turn off shadows for that object.
+- If you use **texture shadows**, then vertex deformation is acceptable; however, when rendering the object into the shadow texture (the shadow caster pass), the shadow has to be rendered in a solid colour (linked to the ambient colour). You must therefore provide an alternative vertex program, so %Ogre provides you with a way of specifying one to use when rendering the caster.
 
-If you use **texture shadows**, then vertex deformation is acceptable; however, when rendering the object into the shadow texture (the shadow caster pass), the shadow has to be rendered in a solid colour (linked to the ambient colour). You must therefore provide an alternative vertex program, so Ogre provides you with a way of specifying one to use when rendering the caster. Basically you link an alternative vertex program, using exactly the same syntax as the original vertex program link:
+Basically you link an alternative vertex program, using exactly the same syntax as the original vertex program link:
 
 ```cpp
 shadow_caster_vertex_program_ref myShadowCasterVertexProgram
