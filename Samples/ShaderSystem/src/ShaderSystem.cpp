@@ -222,15 +222,7 @@ void Sample_ShaderSystem::sliderMoved(Slider* slider)
 
 //-----------------------------------------------------------------------
 bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
-{   
-    if (mSceneMgr->hasLight(SPOT_LIGHT_NAME))
-    {
-        Light* light = mSceneMgr->getLight(SPOT_LIGHT_NAME);
-
-        light->setPosition(mCamera->getDerivedPosition() + mCamera->getDerivedUp() * 20.0);
-        light->setDirection(mCamera->getDerivedDirection());
-    }
-
+{
     if (mPointLightNode != NULL)
     {
         static Real sToatalTime = 0.0;
@@ -809,12 +801,12 @@ void Sample_ShaderSystem::createDirectionalLight()
     dir.y = -1.0;
     dir.z = 0.3;
     dir.normalise();
-    light->setDirection(dir);
     light->setDiffuseColour(0.65, 0.15, 0.15);
     light->setSpecularColour(0.5, 0.5, 0.5);
 
     // create pivot node
     mDirectionalLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    mDirectionalLightNode->setDirection(dir);
 
     // Create billboard set.
     mBbsFlare = mSceneMgr->createBillboardSet();
@@ -866,6 +858,9 @@ void Sample_ShaderSystem::createSpotLight()
     light->setDiffuseColour(0.15, 0.15, 0.65);
     light->setSpecularColour(0.5, 0.5, 0.5);    
     light->setAttenuation(1000.0, 1.0, 0.0005, 0.0);
+
+    auto ln = mCameraNode->createChildSceneNode(Vector3::UNIT_Y * 20);
+    ln->attachObject(light);
 }
 
 void Sample_ShaderSystem::addModelToScene(const String &  modelName)

@@ -282,12 +282,15 @@ protected:
         Light* l1 = mSceneMgr->createLight();
         l1->setType(Light::LT_DIRECTIONAL);
         l1->setDiffuseColour(0.5f, 0.45f, 0.1f);
-        l1->setDirection(1, -0.5, -0.2);
         l1->setShadowFarClipDistance(250);
         l1->setShadowFarDistance(75);
         //Turn this on to have the directional light cast shadows
         l1->setCastShadows(false);
         
+        auto ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        ln->setDirection(Vector3(1, -0.5, -0.2));
+        ln->attachObject(l1);
+
         mCameraNode->setPosition(25, 5, 0);
         mCameraNode->lookAt(Vector3::ZERO, Node::TS_PARENT);
         mCamera->setFarClipDistance(1000.0);

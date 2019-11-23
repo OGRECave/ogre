@@ -99,13 +99,13 @@ public:
             mLights[i].animState->addTime(evt.timeSinceLastFrame);
             if (mTwirlLights)
             {
-                mLights[i].light->setDirection(
+                mLights[i].dirnode->setDirection(
                     Quaternion(Degree(ControllerManager::getSingleton().getElapsedTime() * 150 + 360 * i / (float)mLights.size()), Vector3::UNIT_Y) *
-                    Vector3(0,-1,-1).normalisedCopy());
+                    Vector3(0,-1,-1).normalisedCopy(), Node::TS_WORLD);
             }
             else
             {
-                mLights[i].light->setDirection(Vector3::NEGATIVE_UNIT_Y);
+                mLights[i].dirnode->setDirection(Vector3::NEGATIVE_UNIT_Y, Node::TS_WORLD);
             }
         }
         
@@ -184,10 +184,13 @@ protected:
         // set the single directional light
         Light* light = mSceneMgr->createLight();
         light->setType(Light::LT_DIRECTIONAL);
-        light->setDirection(Vector3(-1,-1,0).normalisedCopy());
         light->setDiffuseColour(ColourValue(0.1, 0.1, 0.1));
         light->setCastShadows(false);
         
+        auto ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        ln->setDirection(Vector3(-1,-1,0).normalisedCopy());
+        ln->attachObject(light);
+
         for(unsigned int i = 0 ; i < cInitialLightCount ; ++i)
         {
             addSpotLight();
@@ -242,10 +245,11 @@ protected:
         state.light = mSceneMgr->createLight();
         state.light->setCastShadows(false);
         state.light->setType(mLights.size() % 10 ? Light::LT_SPOTLIGHT : Light::LT_POINT);
-        state.light->setDirection(Vector3::NEGATIVE_UNIT_Y);
         state.light->setAttenuation(200,0,0,0);
         state.light->setDiffuseColour(lightColor);
-        state.node->attachObject(state.light);
+        state.dirnode = state.node->createChildSceneNode();
+        state.dirnode->setDirection(Vector3::NEGATIVE_UNIT_Y, Node::TS_WORLD);
+        state.dirnode->attachObject(state.light);
 
         // Attach a flare with the same colour to the light node
         state.bbs = mSceneMgr->createBillboardSet(1);
@@ -328,6 +332,7 @@ private:
     struct LightState
     {
         SceneNode* node;
+        SceneNode* dirnode;
         Animation* anim;
         NodeAnimationTrack* track;
         AnimationState* animState;

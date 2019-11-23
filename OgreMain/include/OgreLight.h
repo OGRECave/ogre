@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreVector4.h"
 #include "OgreMovableObject.h"
 #include "OgrePlaneBoundedVolume.h"
+#include "OgreNode.h"
+#include "OgreCamera.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -48,17 +50,14 @@ namespace Ogre {
     /** Representation of a dynamic light source in the scene.
     @remarks
         Lights are added to the scene like any other object. They contain various
-        parameters like type, position, attenuation (how light intensity fades with
+        parameters like type, attenuation (how light intensity fades with
         distance), colour etc.
     @par
         The defaults when a light is created is pure white diffuse light, with no
         attenuation (does not decrease with distance) and a range of 1000 world units.
     @par
-        Lights are created by using the SceneManager::createLight method. They can subsequently be
-        added to a SceneNode if required to allow them to move relative to a node in the scene. A light attached
-        to a SceneNode is assumed to have a base position of (0,0,0) and a direction of (0,0,1) before modification
-        by the SceneNode's own orientation. If not attached to a SceneNode,
-        the light's position and direction is as set using setPosition and setDirection.
+        Lights are created by using the SceneManager::createLight method. They subsequently must be
+        added to a SceneNode to orient them in the scene and to allow moving them.
     @par
         Remember also that dynamic lights rely on modifying the colour of vertices based on the position of
         the light compared to an object's vertex normals. Dynamic lighting will only look good if the
@@ -185,6 +184,7 @@ namespace Ogre {
         /// get all attenuation params as (range, constant, linear, quadratic)
         const Vector4f& getAttenuation() const { return mAttenuation; }
 
+#ifdef OGRE_NODELESS_POSITIONING
         /** Sets the position of the light.
         @remarks
             Applicable to point lights and spotlights only.
@@ -196,7 +196,7 @@ namespace Ogre {
 
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::setPosition
-        void setPosition(const Vector3& vec);
+        OGRE_DEPRECATED void setPosition(const Vector3& vec);
 
         /** Returns the position of the light.
         @note
@@ -206,17 +206,23 @@ namespace Ogre {
         OGRE_DEPRECATED const Vector3& getPosition(void) const;
 
         /// @deprecated attach to SceneNode and use SceneNode::setDirection
-        void setDirection(Real x, Real y, Real z);
+        OGRE_DEPRECATED void setDirection(Real x, Real y, Real z);
 
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::setDirection
-        void setDirection(const Vector3& vec);
+        OGRE_DEPRECATED void setDirection(const Vector3& vec);
 
         /**
         @deprecated attach to SceneNode and use SceneNode::getLocalAxes
         */
         OGRE_DEPRECATED const Vector3& getDirection(void) const;
 
+        /** @copydoc MovableObject::_notifyAttached */
+        void _notifyAttached(Node* parent, bool isTagPoint = false);
+
+        /** @copydoc MovableObject::_notifyMoved */
+        void _notifyMoved(void);
+#endif
         /** Sets the range of a spotlight, i.e. the angle of the inner and outer cones
             and the rate of falloff between them.
         @param innerAngle
@@ -283,12 +289,6 @@ namespace Ogre {
         */
         Real getPowerScale(void) const;
 
-        /** @copydoc MovableObject::_notifyAttached */
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
-
-        /** @copydoc MovableObject::_notifyMoved */
-        void _notifyMoved(void);
-
         /** @copydoc MovableObject::getBoundingBox */
         const AxisAlignedBox& getBoundingBox(void) const;
 
@@ -301,10 +301,29 @@ namespace Ogre {
         /** Retrieves the position of the light including any transform from nodes it is attached to. 
         @param cameraRelativeIfSet If set to true, returns data in camera-relative units if that's been set up (render use)
         */
+#ifdef OGRE_NODELESS_POSITIONING
         const Vector3& getDerivedPosition(bool cameraRelativeIfSet = false) const;
+#else
+        Vector3 getDerivedPosition(bool cameraRelativeIfSet = false) const
+        {
+            assert(mParentNode && "Light must be attached to a SceneNode");
+            auto ret = mParentNode->_getDerivedPosition();
+            if (cameraRelativeIfSet && mCameraToBeRelativeTo)
+                ret -= mCameraToBeRelativeTo->getDerivedPosition();
+            return ret;
+        }
+#endif
 
         /** Retrieves the direction of the light including any transform from nodes it is attached to. */
+#ifdef OGRE_NODELESS_POSITIONING
         const Vector3& getDerivedDirection(void) const;
+#else
+        Vector3 getDerivedDirection(void) const
+        {
+            assert(mParentNode && "Light must be attached to a SceneNode");
+            return -mParentNode->_getDerivedOrientation().zAxis();
+        }
+#endif
 
         /** @copydoc MovableObject::setVisible
         @remarks
@@ -527,15 +546,23 @@ namespace Ogre {
         bool isInLightRange(const Ogre::AxisAlignedBox& container) const;
     
     protected:
+        LightTypes mLightType;
+#ifdef OGRE_NODELESS_POSITIONING
+        Vector3 mPosition;
+        Vector3 mDirection;
+        mutable Vector3 mDerivedPosition;
+        mutable Vector3 mDerivedDirection;
+        // Slightly hacky but unless we separate observed light render state from main Light...
+        mutable Vector3 mDerivedCamRelativePosition;
+        mutable bool mDerivedCamRelativeDirty;
+        /// Is the derived transform dirty?
+        mutable bool mDerivedTransformDirty;
+
         /// Internal method for synchronising with parent node (if any)
         virtual void update(void) const;
-
-        LightTypes mLightType;
-        Vector3 mPosition;
+#endif
         ColourValue mDiffuse;
         ColourValue mSpecular;
-
-        Vector3 mDirection;
 
         Radian mSpotOuter;
         Radian mSpotInner;
@@ -552,12 +579,6 @@ namespace Ogre {
         Real mShadowNearClipDist;
         Real mShadowFarClipDist;
 
-
-        mutable Vector3 mDerivedPosition;
-        mutable Vector3 mDerivedDirection;
-        // Slightly hacky but unless we separate observed light render state from main Light...
-        mutable Vector3 mDerivedCamRelativePosition;
-        mutable bool mDerivedCamRelativeDirty;
         Camera* mCameraToBeRelativeTo;
 
         /// Shared class-level name for Movable type.
@@ -565,8 +586,6 @@ namespace Ogre {
 
         mutable PlaneBoundedVolume mNearClipVolume;
         mutable PlaneBoundedVolumeList mFrustumClipVolumes;
-        /// Is the derived transform dirty?
-        mutable bool mDerivedTransformDirty;
 
         /// Pointer to a custom shadow camera setup.
         mutable ShadowCameraSetupPtr mCustomShadowCameraSetup;

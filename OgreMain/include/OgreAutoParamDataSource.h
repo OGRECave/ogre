@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 #include "OgreLight.h"
+#include "OgreSceneNode.h"
 
 namespace Ogre {
 
@@ -124,6 +125,7 @@ namespace Ogre {
         const VisibleObjectsBoundsInfo* mMainCamBoundsInfo;
         const Pass* mCurrentPass;
 
+        SceneNode mDummyNode;
         Light mBlankLight;
     public:
         AutoParamDataSource();
@@ -182,9 +184,9 @@ namespace Ogre {
         const ColourValue& getLightSpecularColour(size_t index) const;
         const ColourValue getLightDiffuseColourWithPower(size_t index) const;
         const ColourValue getLightSpecularColourWithPower(size_t index) const;
-        const Vector3& getLightPosition(size_t index) const;
+        Vector3 getLightPosition(size_t index) const;
         Vector4 getLightAs4DVector(size_t index) const;
-        const Vector3& getLightDirection(size_t index) const;
+        Vector3 getLightDirection(size_t index) const;
         Real getLightPowerScale(size_t index) const;
         const Vector4f& getLightAttenuation(size_t index) const;
         Vector4f getSpotlightParams(size_t index) const;
