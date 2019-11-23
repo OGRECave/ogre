@@ -573,14 +573,6 @@ You can implement pose animation (blending between multiple poses based on weigh
 
 Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See [Animation](#Animation)) then all techniques must be hardware accelerated for any to be.
 
-# Vertex texture fetching in vertex programs {#Vertex-texture-fetching-in-vertex-programs}
-
-If your vertex program makes use of [Vertex Texture Fetch](#Vertex-Texture-Fetch), you should declare that with the ’uses\_vertex\_texture\_fetch’ directive. This is enough to tell Ogre that your program uses this feature and that hardware support for it should be checked.
-
-```cpp
-   uses_vertex_texture_fetch true
-```
-
 # Vertex Texture Fetch {#Vertex-Texture-Fetch}
 
 More recent generations of video card allow you to perform a read from a texture in the vertex program rather than just the fragment program, as is traditional. This allows you to, for example, read the contents of a texture and displace vertices based on the intensity of the colour contained within.
@@ -589,15 +581,21 @@ More recent generations of video card allow you to perform a read from a texture
 
 ## Declaring the use of vertex texture fetching
 
-Since hardware support for vertex texture fetching is not ubiquitous, you should use the uses\_vertex\_texture\_fetch (See [Vertex texture fetching in vertex programs](#Vertex-texture-fetching-in-vertex-programs)) directive when declaring your vertex programs which use vertex textures, so that if it is not supported, technique fallback can be enabled. This is not strictly necessary for DirectX-targeted shaders, since vertex texture fetching is only supported in vs\_3\_0, which can be stated as a required syntax in your shader definition, but for OpenGL (GLSL), there are cards which support GLSL but not vertex textures, so you should be explicit about your need for them.
+If your vertex program makes use of Vertex Texture Fetch, you should declare that as
+
+```cpp
+   uses_vertex_texture_fetch true
+```
+
+Since hardware support for vertex texture fetching is not ubiquitous, you should use the directive when declaring your vertex programs which use vertex textures, so that if it is not supported, technique fallback can be enabled. This is not strictly necessary for DirectX-targeted shaders, since vertex texture fetching is only supported in vs\_3\_0, which can be stated as a required syntax in your shader definition, but for OpenGL (GLSL), there are cards which support GLSL but not vertex textures, so you should be explicit about your need for them.
 
 <a name="Render-system-texture-binding-differences"></a>
 
-## Render system texture binding differences
+## DirectX9 binding limitations
 
 Unfortunately the method for binding textures so that they are available to a vertex program is not well standardised. As at the time of writing, Shader Model 3.0 (SM3.0) hardware under DirectX9 include 4 separate sampler bindings for the purposes of vertex textures. OpenGL, on the other hand, is able to access vertex textures in GLSL (and in assembler through NV\_vertex\_program\_3, although this is less popular), but the textures are shared with the fragment pipeline. I expect DirectX to move to the GL model with the advent of DirectX10, since a unified shader architecture implies sharing of texture resources between the two stages. As it is right now though, we’re stuck with an inconsistent situation.
 
-To reflect this, you should use the [binding\_type](#binding_005ftype) attribute in a texture unit to indicate which unit you are targeting with your texture - ’fragment’ (the default) or ’vertex’. For render systems that don’t have separate bindings, this actually does nothing. But for those that do, it will ensure your texture gets bound to the right processing unit.
+To reflect this, you should use the `binding_type` attribute in a texture unit to indicate which unit you are targeting with your texture - ’fragment’ (the default) or ’vertex’. For render systems that don’t have separate bindings, this actually does nothing. But for those that do, it will ensure your texture gets bound to the right processing unit.
 
 Note that whilst DirectX9 has separate bindings for the vertex and fragment pipelines, binding a texture to the vertex processing unit still uses up a ’slot’ which is then not available for use in the fragment pipeline. I didn’t manage to find this documented anywhere, but the nVidia samples certainly avoid binding a texture to the same index on both vertex and fragment units, and when I tried to do it, the texture did not appear correctly in the fragment unit, whilst it did as soon as I moved it into the next unit.
 
