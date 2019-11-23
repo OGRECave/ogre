@@ -342,17 +342,19 @@ The OGRE release notes will notify you when this is necessary with a new release
 
 @page Shadows Shadows
 
-Shadows are clearly an important part of rendering a believable scene - they provide a more tangible feel to the objects in the scene, and aid the viewer in understanding the spatial relationship between objects. Unfortunately, shadows are also one of the most challenging aspects of 3D rendering, and they are still very much an active area of research. Whilst there are many techniques to render shadows, none is perfect and they all come with advantages and disadvantages. For this reason, Ogre provides multiple shadow implementations, with plenty of configuration settings, so you can choose which technique is most appropriate for your scene.
+Shadows are clearly an important part of rendering a believable scene - they provide a more tangible feel to the objects in the scene, and aid the viewer in understanding the spatial relationship between objects. Unfortunately, shadows are also one of the most challenging aspects of 3D rendering, and they are still very much an active area of research. Whilst there are many techniques to render shadows, none is perfect and they all come with advantages and disadvantages. For this reason, %Ogre provides multiple shadow implementations, with plenty of configuration settings, so you can choose which technique is most appropriate for your scene.
 
-Shadow implementations fall into basically 2 broad categories:
-1. @ref Stencil-Shadows
-2. @ref Texture_002dbased-Shadows.
+Shadow implementations fall into 2 basic categories:
+- @ref Stencil-Shadows
+- @ref Texture_002dbased-Shadows.
 
-This describes the method by which the shape of the shadow is generated. In addition, there is more than one way to render the shadow into the scene:
+This describes the method by which the shape of the shadow is generated.
+
+In addition, there is more than one way to render the shadow into the scene:
 - @ref Modulative-Shadows, which darkens the scene in areas of shadow, and
 - @ref Additive-Light-Masking, which by contrast builds up light contribution in areas which are not in shadow.
 
-You also have the option of @ref Integrated-Texture-Shadows which gives you complete control over texture shadow application, allowing for complex single-pass shadowing shaders. Ogre supports all these combinations.
+You also have the option of @ref Integrated-Texture-Shadows which gives you complete control over texture shadow application, allowing for complex single-pass shadowing shaders. %Ogre supports all these combinations.
 
 @tableofcontents
 
@@ -361,12 +363,12 @@ You also have the option of @ref Integrated-Texture-Shadows which gives you comp
 Shadows are disabled by default, here’s how you turn them on and configure them in the general sense:
 
 1.  Enable a shadow technique on the SceneManager as the **first** thing you doing your scene setup. It is important that this is done first because the shadow technique can alter the way meshes are loaded. Here’s an example:
-
-    `mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);`
-
+```cpp
+mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
+```
 2.  Create one or more lights. Note that not all light types are necessarily supported by all shadow techniques, you should check the sections about each technique to check. Note that if certain lights should not cast shadows, you can turn that off by calling setCastShadows(false) on the light, the default is true.
 3.  Disable shadow casting on objects which should not cast shadows. Call setCastShadows(false) on objects you don’t want to cast shadows, the default for all objects is to cast shadows.
-4.  Configure shadow far distance. You can limit the distance at which shadows are considered for performance reasons, by calling SceneManager::setShadowFarDistance.
+4.  Configure shadow far distance. You can limit the distance at which shadows are considered for performance reasons, by calling Ogre::SceneManager::setShadowFarDistance.
 5.  Turn off the receipt of shadows on materials that should not receive them. You can turn off the receipt of shadows (note, not the casting of shadows - that is done per-object) by calling Material::setReceiveShadows or using the receive\_shadows material attribute. This is useful for materials which should be considered self-illuminated for example. Note that transparent materials are typically excluded from receiving and casting shadows, although see the [transparency\_casts\_shadows](#transparency_005fcasts_005fshadows) option for exceptions.
 
 # Opting out of shadows {#Opting-out-of-shadows}
