@@ -70,12 +70,6 @@ namespace Ogre {
         Viewport which will translate these parametric co-ordinates into real screen
         co-ordinates. Obviously it is advisable that the viewport has the same
         aspect ratio as the camera to avoid distortion (unless you want it!).
-    @par
-        Note that a Camera can be attached to a SceneNode, using the method
-        SceneNode::attachObject. If this is done the Camera will combine it's own
-        position/orientation settings with it's parent SceneNode. 
-        This is useful for implementing more complex Camera / object
-        relationships i.e. having a camera attached to a world object.
     */
     class _OgreExport Camera : public Frustum
     {
@@ -105,24 +99,9 @@ namespace Ogre {
         /// Scene manager responsible for the scene
         SceneManager *mSceneMgr;
 
-        /// Camera orientation, quaternion style
-        Quaternion mOrientation;
-
-        /// Camera position - default (0,0,0)
-        Vector3 mPosition;
-
         /// Derived orientation/position of the camera, including reflection
         mutable Quaternion mDerivedOrientation;
         mutable Vector3 mDerivedPosition;
-
-        /// Real world orientation/position of the camera
-        mutable Quaternion mRealOrientation;
-        mutable Vector3 mRealPosition;
-
-        /// Whether to yaw around a fixed axis.
-        bool mYawFixed;
-        /// Fixed axis to yaw around
-        Vector3 mYawFixedAxis;
 
         /// Rendering type
         PolygonMode mSceneDetail;
@@ -136,11 +115,24 @@ namespace Ogre {
         /// Shared class-level name for Movable type
         static String msMovableType;
 
+#ifdef OGRE_NODELESS_POSITIONING
+        /// Real world orientation/position of the camera
+        mutable Quaternion mRealOrientation;
+        mutable Vector3 mRealPosition;
+
+        /// Whether to yaw around a fixed axis.
+        bool mYawFixed;
+        /// Fixed axis to yaw around
+        Vector3 mYawFixedAxis;
+        /// Camera orientation, quaternion style
+        Quaternion mOrientation;
+        /// Camera position - default (0,0,0)
+        Vector3 mPosition;
         /// SceneNode which this Camera will automatically track
         SceneNode* mAutoTrackTarget;
         /// Tracking offset for fine tuning
         Vector3 mAutoTrackOffset;
-
+#endif
         /// Scene LOD factor used to adjust overall LOD
         Real mSceneLodFactor;
         /// Inverted scene LOD factor, can be used by Renderables to adjust their LOD
@@ -228,6 +220,7 @@ namespace Ogre {
         */
         PolygonMode getPolygonMode(void) const;
 
+#ifdef OGRE_NODELESS_POSITIONING
         /** Sets the camera's position.
         @deprecated attach to SceneNode and use SceneNode::setPosition
         */
@@ -235,7 +228,7 @@ namespace Ogre {
 
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::setPosition
-        void setPosition(const Vector3& vec);
+        OGRE_DEPRECATED void setPosition(const Vector3& vec);
 
         /** Retrieves the camera's position.
         @deprecated attach to SceneNode and use SceneNode::getPosition
@@ -348,8 +341,39 @@ namespace Ogre {
         /** Sets the camera's orientation.
         @deprecated attach to SceneNode and use SceneNode::setOrientation
         */
-        void setOrientation(const Quaternion& q);
+        OGRE_DEPRECATED void setOrientation(const Quaternion& q);
 
+        /** Internal method used by OGRE to update auto-tracking cameras. */
+        void _autoTrack(void);
+
+        /** Get the auto tracking target for this camera, if any. */
+        OGRE_DEPRECATED SceneNode* getAutoTrackTarget(void) const { return mAutoTrackTarget; }
+        /** Get the auto tracking offset for this camera, if it is auto tracking. */
+        OGRE_DEPRECATED const Vector3& getAutoTrackOffset(void) const { return mAutoTrackOffset; }
+
+        /** Enables / disables automatic tracking of a SceneNode.
+        @remarks
+            If you enable auto-tracking, this Camera will automatically rotate to
+            look at the target SceneNode every frame, no matter how
+            it or SceneNode move. This is handy if you want a Camera to be focused on a
+            single object or group of objects. Note that by default the Camera looks at the
+            origin of the SceneNode, if you want to tweak this, e.g. if the object which is
+            attached to this target node is quite big and you want to point the camera at
+            a specific point on it, provide a vector in the 'offset' parameter and the
+            camera's target point will be adjusted.
+        @param enabled If true, the Camera will track the SceneNode supplied as the next
+            parameter (cannot be null). If false the camera will cease tracking and will
+            remain in it's current orientation.
+        @param target Pointer to the SceneNode which this Camera will track. Make sure you don't
+            delete this SceneNode before turning off tracking (e.g. SceneManager::clearScene will
+            delete it so be careful of this). Can be null if and only if the enabled param is false.
+        @param offset If supplied, the camera targets this point in local space of the target node
+            instead of the origin of the target node. Good for fine tuning the look at point.
+        @deprecated attach to SceneNode and use SceneNode::setAutoTracking
+        */
+        OGRE_DEPRECATED void setAutoTracking(bool enabled, SceneNode* const target = 0,
+            const Vector3& offset = Vector3::ZERO);
+#endif
         /** Tells the Camera to contact the SceneManager to render from it's viewpoint.
         @param vp The viewport to render to
         @param includeOverlays Whether or not any overlay objects should be included
@@ -410,30 +434,6 @@ namespace Ogre {
 
         void getWorldTransforms(Matrix4* mat) const override;
         const String& getMovableType(void) const override;
-
-        /** Enables / disables automatic tracking of a SceneNode.
-        @remarks
-            If you enable auto-tracking, this Camera will automatically rotate to
-            look at the target SceneNode every frame, no matter how 
-            it or SceneNode move. This is handy if you want a Camera to be focused on a
-            single object or group of objects. Note that by default the Camera looks at the 
-            origin of the SceneNode, if you want to tweak this, e.g. if the object which is
-            attached to this target node is quite big and you want to point the camera at
-            a specific point on it, provide a vector in the 'offset' parameter and the 
-            camera's target point will be adjusted.
-        @param enabled If true, the Camera will track the SceneNode supplied as the next 
-            parameter (cannot be null). If false the camera will cease tracking and will
-            remain in it's current orientation.
-        @param target Pointer to the SceneNode which this Camera will track. Make sure you don't
-            delete this SceneNode before turning off tracking (e.g. SceneManager::clearScene will
-            delete it so be careful of this). Can be null if and only if the enabled param is false.
-        @param offset If supplied, the camera targets this point in local space of the target node
-            instead of the origin of the target node. Good for fine tuning the look at point.
-        @deprecated attach to SceneNode and use SceneNode::setAutoTracking
-        */
-        OGRE_DEPRECATED void setAutoTracking(bool enabled, SceneNode* const target = 0,
-            const Vector3& offset = Vector3::ZERO);
-
 
         /** Sets the level-of-detail factor for this Camera.
         @remarks
@@ -514,11 +514,6 @@ namespace Ogre {
         /** Internal method for OGRE to use for LOD calculations. */
         Real _getLodBiasInverse(void) const;
 
-
-        /** Internal method used by OGRE to update auto-tracking cameras. */
-        void _autoTrack(void);
-
-
         /** Sets the viewing window inside of viewport.
         @remarks
             This method can be used to set a subset of the viewport as the rendering
@@ -537,10 +532,6 @@ namespace Ogre {
         const std::vector<Plane>& getWindowPlanes(void) const;
 
         Real getBoundingRadius(void) const override;
-        /** Get the auto tracking target for this camera, if any. */
-        SceneNode* getAutoTrackTarget(void) const { return mAutoTrackTarget; }
-        /** Get the auto tracking offset for this camera, if it is auto tracking. */
-        const Vector3& getAutoTrackOffset(void) const { return mAutoTrackOffset; }
         
         /** Get the last viewport which was attached to this camera. 
         @note This is not guaranteed to be the only viewport which is

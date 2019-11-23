@@ -376,8 +376,6 @@ namespace Ogre
         virtual void findLightsAffectingFrustum(const Camera* camera);
         /// Internal method for creating shadow textures (texture-based shadows)
         virtual void ensureShadowTexturesCreated();
-        /// Internal method for destroying shadow textures (texture-based shadows)
-        virtual void destroyShadowTextures(void);
         /// Internal method for firing the pre caster texture shadows event
         virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
     };
