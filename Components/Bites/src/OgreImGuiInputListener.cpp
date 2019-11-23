@@ -31,6 +31,36 @@ static int kc2sc(int kc)
 namespace OgreBites
 {
 
+static int keypad2kc(int sym, int mod)
+{
+    if (sym < SDLK_KP_1 || sym > SDLK_KP_PERIOD)
+        return sym;
+    bool numlock = (mod & KMOD_NUM) != 0;
+    if (numlock)
+        return sym;
+    if (sym == SDLK_KP_1)
+        sym = SDLK_END;
+    else if (sym == SDLK_KP_2)
+        sym = SDLK_DOWN;
+    else if (sym == SDLK_KP_3)
+        sym = SDLK_PAGEDOWN;
+    else if (sym == SDLK_KP_4)
+        sym = SDLK_LEFT;
+    else if (sym == SDLK_KP_6)
+        sym = SDLK_RIGHT;
+    else if (sym == SDLK_KP_7)
+        sym = SDLK_HOME;
+    else if (sym == SDLK_KP_8)
+        sym = SDLK_UP;
+    else if (sym == SDLK_KP_9)
+        sym = SDLK_PAGEUP;
+    else if (sym == SDLK_KP_0)
+        sym = SDLK_INSERT;
+    else if (sym == SDLK_KP_PERIOD)
+        sym = SDLK_DELETE;
+    return sym;
+}
+
 ImGuiInputListener::ImGuiInputListener()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -43,13 +73,15 @@ ImGuiInputListener::ImGuiInputListener()
     io.KeyMap[ImGuiKey_DownArrow] = kc2sc(SDLK_DOWN);
     io.KeyMap[ImGuiKey_PageUp] = kc2sc(SDLK_PAGEUP);
     io.KeyMap[ImGuiKey_PageDown] = kc2sc(SDLK_PAGEDOWN);
-    io.KeyMap[ImGuiKey_Home] = -1;
-    io.KeyMap[ImGuiKey_End] = -1;
-    io.KeyMap[ImGuiKey_Delete] = -1;
+    io.KeyMap[ImGuiKey_Home] = kc2sc(SDLK_HOME);
+    io.KeyMap[ImGuiKey_End] = kc2sc(SDLK_END);
+    io.KeyMap[ImGuiKey_Insert] = kc2sc(SDLK_INSERT);
+    io.KeyMap[ImGuiKey_Delete] = kc2sc(SDLK_DELETE);
     io.KeyMap[ImGuiKey_Backspace] = '\b';
-    io.KeyMap[ImGuiKey_Enter] = '\r';
+    io.KeyMap[ImGuiKey_Enter] = SDLK_RETURN;
     io.KeyMap[ImGuiKey_Escape] = '\033';
     io.KeyMap[ImGuiKey_Space] = ' ';
+    io.KeyMap[ImGuiKey_KeyPadEnter] = kc2sc(SDLK_KP_ENTER);
     io.KeyMap[ImGuiKey_A] = 'a';
     io.KeyMap[ImGuiKey_C] = 'c';
     io.KeyMap[ImGuiKey_V] = 'v';
@@ -99,7 +131,8 @@ bool ImGuiInputListener::mouseReleased(const MouseButtonEvent& arg)
 bool ImGuiInputListener::keyEvent (const KeyboardEvent& arg)
 {
     ImGuiIO& io = ImGui::GetIO ();
-    int key = kc2sc (arg.keysym.sym);
+    int sym = keypad2kc (arg.keysym.sym, arg.keysym.mod);
+    int key = kc2sc (sym);
     io.KeysDown[key] = (arg.type == OgreBites::KEYDOWN);
     io.KeyShift = (arg.keysym.mod & KMOD_SHIFT) != 0;
     io.KeyCtrl = (arg.keysym.mod & KMOD_CTRL) != 0;
