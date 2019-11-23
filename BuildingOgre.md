@@ -94,6 +94,7 @@ particular component/ plugin from being built
 - `OGRE_PROFILING_REMOTERY_PATH` if set, Remotery is used for profiling instead of the Ogre internal profiler.
 - `OGRE_ASSERT_MODE` allows you to to disable all runtime assertion exceptions or turn them into calls to `std::abort`.
 - `OGRE_RESOURCEMANGER_STRICT` allows you to turn on resource lookup related quirks for pre ogre 1.10 compatibility.
+- `OGRE_NODELESS_POSITIONING` allows to use Lights and Cameras without attaching them to nodes (only for legacy code).
 
 Once you are satisfied, hit
 *Configure* again and then click on *Generate*. CMake will then create
