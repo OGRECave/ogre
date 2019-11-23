@@ -108,7 +108,6 @@ mGpuParamsDirty((uint16)GPV_ALL)
 SceneManager::~SceneManager()
 {
     fireSceneManagerDestroyed();
-    mShadowRenderer.destroyShadowTextures();
     clearScene();
     destroyAllCameras();
 
@@ -687,6 +686,7 @@ void SceneManager::destroyAllParticleSystems(void)
 //-----------------------------------------------------------------------
 void SceneManager::clearScene(void)
 {
+    mShadowRenderer.destroyShadowTextures();
     destroyAllStaticGeometry();
     destroyAllInstanceManagers();
     destroyAllMovableObjects();
