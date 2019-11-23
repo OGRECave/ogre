@@ -557,20 +557,17 @@ bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* src
 
     //count the number of texture units we need to process
     size_t validTexUnits = 0;
-    for (unsigned short i=0; i < dstPass->getNumTextureUnitStates(); ++i)
-    {       
-        if (isProcessingNeeded(dstPass->getTextureUnitState(i)))
-        {
-            ++validTexUnits;
-        }
+    for (const auto tu : srcPass->getTextureUnitStates())
+    {
+        validTexUnits += int(isProcessingNeeded(tu));
     }
 
     setTextureUnitCount(validTexUnits);
 
     // Build texture stage sub states.
-    for (unsigned short i=0; i < dstPass->getNumTextureUnitStates(); ++i)
+    for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)
     {       
-        TextureUnitState* texUnitState = dstPass->getTextureUnitState(i);
+        TextureUnitState* texUnitState = srcPass->getTextureUnitState(i);
 
         if (isProcessingNeeded(texUnitState))
         {
