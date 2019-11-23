@@ -748,14 +748,14 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         LogManager::getSingleton().setLogDetail(LL_BOREME);
 
         //! [light]
-        Vector3 lightdir(0.55, -0.3, 0.75);
-        lightdir.normalise();
-
         Ogre::Light* l = mSceneMgr->createLight("tstLight");
-        l->setType(Light::LT_DIRECTIONAL);
-        l->setDirection(lightdir);
+        l->setType(Ogre::Light::LT_DIRECTIONAL);
         l->setDiffuseColour(ColourValue::White);
         l->setSpecularColour(ColourValue(0.4, 0.4, 0.4));
+
+        Ogre::SceneNode* ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        ln->setDirection(Vector3(0.55, -0.3, 0.75).normalisedCopy());
+        ln->attachObject(l);
         //! [light]
         mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 

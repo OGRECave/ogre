@@ -64,11 +64,13 @@ namespace Ogre {
          mCurrentViewport(0), 
          mCurrentSceneManager(0),
          mMainCamBoundsInfo(0),
-         mCurrentPass(0)
+         mCurrentPass(0),
+         mDummyNode(NULL)
     {
         mBlankLight.setDiffuseColour(ColourValue::Black);
         mBlankLight.setSpecularColour(ColourValue::Black);
         mBlankLight.setAttenuation(0,1,0,0);
+        mBlankLight._notifyAttached(&mDummyNode);
         for(size_t i = 0; i < OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i)
         {
             mTextureViewProjMatrixDirty[i] = true;
@@ -192,7 +194,7 @@ namespace Ogre {
         return scaled;
     }
     //-----------------------------------------------------------------------------
-    const Vector3& AutoParamDataSource::getLightPosition(size_t index) const
+    Vector3 AutoParamDataSource::getLightPosition(size_t index) const
     {
         return getLight(index).getDerivedPosition(true);
     }
@@ -202,7 +204,7 @@ namespace Ogre {
         return getLight(index).getAs4DVector(true);
     }
     //-----------------------------------------------------------------------------
-    const Vector3& AutoParamDataSource::getLightDirection(size_t index) const
+    Vector3 AutoParamDataSource::getLightDirection(size_t index) const
     {
         return getLight(index).getDerivedDirection();
     }

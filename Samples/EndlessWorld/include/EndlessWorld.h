@@ -405,14 +405,14 @@ protected:
 
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
-		Vector3 lightdir(0.55, -0.3, 0.75);
-		lightdir.normalise();
-
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
-		l->setDirection(lightdir);
 		l->setDiffuseColour(ColourValue::White);
 		l->setSpecularColour(ColourValue(0.4, 0.4, 0.4));
+
+	    auto ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	    ln->setDirection(Vector3(0.55, -0.3, 0.75).normalisedCopy());
+	    ln->attachObject(l);
 
 		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 

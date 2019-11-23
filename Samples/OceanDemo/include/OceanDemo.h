@@ -201,13 +201,12 @@ void Sample_Ocean::setupScene()
         mLightPivots[i]->rotate(mLightRotationAxes[i], Ogre::Angle(mLightRotationAngles[i]));
         // Create a light, use default parameters
         mLights[i] = mSceneMgr->createLight("Light" + Ogre::StringConverter::toString(i));
-        mLights[i]->setPosition(mLightPositions[i]);
         mLights[i]->setDiffuseColour(mDiffuseLightColours[i]);
         mLights[i]->setSpecularColour(mSpecularLightColours[i]);
         mLights[i]->setVisible(mLightState[i]);
         //mLights[i]->setAttenuation(400, 0.1 , 1 , 0);
         // Attach light
-        mLightPivots[i]->attachObject(mLights[i]);
+        mLightPivots[i]->createChildSceneNode(mLightPositions[i])->attachObject(mLights[i]);
         // Create billboard for light
         mLightFlareSets[i] = mSceneMgr->createBillboardSet("Flare" + Ogre::StringConverter::toString(i));
         mLightFlareSets[i]->setMaterialName("LightFlare");

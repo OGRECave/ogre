@@ -213,9 +213,10 @@ protected:
         mSunLight->setType(Light::LT_SPOTLIGHT);
 
         Vector3 pos(1500,1750,1300);
-        mSceneMgr->getRootSceneNode()->createChildSceneNode(pos)->attachObject(mSunLight);
+        auto ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
+        ln->attachObject(mSunLight);
+        ln->setDirection(-pos.normalisedCopy());
         mSunLight->setSpotlightRange(Degree(30), Degree(50));
-        mSunLight->setDirection(-pos.normalisedCopy());
         mSunLight->setDiffuseColour(0.35, 0.35, 0.38);
         mSunLight->setSpecularColour(0.9, 0.9, 1);
 

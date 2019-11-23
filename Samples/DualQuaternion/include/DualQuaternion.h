@@ -101,10 +101,9 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         Light* l = mSceneMgr->createLight();
         Vector3 pos(30, 70, 40);
         l->setType(Light::LT_POINT);
-        mSceneMgr->getRootSceneNode()
-            ->createChildSceneNode(pos)
-            ->attachObject(l);
-        l->setDirection(-pos.normalisedCopy());
+        auto ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
+        ln->attachObject(l);
+        ln->setDirection(-pos.normalisedCopy());
         l->setDiffuseColour(1, 1, 1);
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
 

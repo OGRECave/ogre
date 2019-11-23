@@ -62,7 +62,7 @@ protected:
 		lightNode->attachObject(light);
 		light->setPowerScale(1.0f);
 		light->setType(Ogre::Light::LT_DIRECTIONAL);
-		light->setDirection(Ogre::Vector3(-1, -1, -1).normalisedCopy());
+		lightNode->setDirection(Ogre::Vector3(-1, -1, -1).normalisedCopy());
 		mLightNodes[0] = lightNode;
 
 		mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3f, 0.5f, 0.7f));
@@ -75,7 +75,7 @@ protected:
 		light->setPowerScale(Ogre::Math::PI);
 		light->setType(Ogre::Light::LT_SPOTLIGHT);
 		lightNode->setPosition(-10.0f, 10.0f, 10.0f);
-		light->setDirection(Ogre::Vector3(1, -1, -1).normalisedCopy());
+		lightNode->setDirection(Ogre::Vector3(1, -1, -1).normalisedCopy());
 		mLightNodes[1] = lightNode;
 
 		light = mSceneMgr->createLight();
@@ -86,7 +86,7 @@ protected:
 		light->setPowerScale(Ogre::Math::PI);
 		light->setType(Ogre::Light::LT_SPOTLIGHT);
 		lightNode->setPosition(10.0f, 10.0f, -10.0f);
-		light->setDirection(Ogre::Vector3(-1, -1, 1).normalisedCopy());
+		lightNode->setDirection(Ogre::Vector3(-1, -1, 1).normalisedCopy());
 		mLightNodes[2] = lightNode;
 
 
