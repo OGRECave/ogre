@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreConvexBody.h"
 #include "OgreHeaderPrefix.h"
 #include "OgreAxisAlignedBox.h"
+#include "OgreSceneNode.h"
 
 namespace Ogre {
 
@@ -73,6 +74,7 @@ namespace Ogre {
 
         /** Temporary preallocated camera to set up a light frustum for clipping in FocusedShadowCameraSetup::calculateB.
         */
+        SceneNode mLightFrustumCameraNode;
         std::unique_ptr<Camera> mLightFrustumCamera;
         mutable bool mLightFrustumCameraCalculated;
 

@@ -13,6 +13,8 @@
 #include "OgreDataStream.h"
 #include "OgreBitesConfigDialog.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreSceneNode.h"
+#include "OgreCamera.h"
 
 #include "OgreArchiveManager.h"
 
@@ -206,6 +208,7 @@ void ApplicationContextBase::createDummyScene()
     Ogre::SceneManager* sm = mRoot->createSceneManager("DefaultSceneManager", "DummyScene");
     sm->addRenderQueueListener(mOverlaySystem);
     Ogre::Camera* cam = sm->createCamera("DummyCamera");
+    sm->getRootSceneNode()->attachObject(cam);
     mWindows[0].render->addViewport(cam);
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     // Initialize shader generator.

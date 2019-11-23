@@ -696,6 +696,7 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
             // in prepareShadowTextures to coexist with multiple SMs
             Camera* cam = mSceneManager->createCamera(camName);
             cam->setAspectRatio((Real)shadowTex->getWidth() / (Real)shadowTex->getHeight());
+            mSceneManager->getRootSceneNode()->createChildSceneNode(camName)->attachObject(cam);
             mShadowTextureCameras.push_back(cam);
 
             // Create a viewport, if not there already
@@ -776,12 +777,11 @@ void SceneManager::ShadowRenderer::destroyShadowTextures(void)
 
     }
 
-    CameraList::iterator ci, ciend;
-    ciend = mShadowTextureCameras.end();
-    for (ci = mShadowTextureCameras.begin(); ci != ciend; ++ci)
+    for (auto cam : mShadowTextureCameras)
     {
+        mSceneManager->getRootSceneNode()->removeAndDestroyChild(cam->getParentSceneNode());
         // Always destroy camera since they are local to this SM
-        mSceneManager->destroyCamera(*ci);
+        mSceneManager->destroyCamera(cam);
     }
     mShadowTextures.clear();
     mShadowTextureCameras.clear();
@@ -865,9 +865,9 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
             texCam->setLodCamera(cam);
             // set base
             if (light->getType() != Light::LT_POINT)
-                texCam->setDirection(light->getDerivedDirection());
+                texCam->getParentSceneNode()->setDirection(light->getDerivedDirection(), Node::TS_WORLD);
             if (light->getType() != Light::LT_DIRECTIONAL)
-                texCam->setPosition(light->getDerivedPosition());
+                texCam->getParentSceneNode()->setPosition(light->getDerivedPosition());
 
             // Use the material scheme of the main viewport
             // This is required to pick up the correct shadow_caster_material and similar properties.

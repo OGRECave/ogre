@@ -164,7 +164,7 @@ namespace Ogre
         }
 
         // Finally set position
-        texCam->setPosition(pos);
+        texCam->getParentSceneNode()->setPosition(pos);
 
         // Calculate orientation based on direction calculated above
         /*
@@ -197,7 +197,7 @@ namespace Ogre
         // Derive quaternion from axes
         Quaternion q;
         q.FromAxes(left, up, dir);
-        texCam->setOrientation(q);
+        texCam->getParentNode()->setOrientation(q);
     }
 
 
