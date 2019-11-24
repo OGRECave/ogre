@@ -364,10 +364,22 @@ namespace Ogre {
             mAutoTrackTarget = 0;
         }
     }
+    //-----------------------------------------------------------------------
+    const Vector3& Camera::getPositionForViewUpdate(void) const
+    {
+        // Note no update, because we're calling this from the update!
+        return mRealPosition;
+    }
+    //-----------------------------------------------------------------------
+    const Quaternion& Camera::getOrientationForViewUpdate(void) const
+    {
+        return mRealOrientation;
+    }
 #endif
     //-----------------------------------------------------------------------
     bool Camera::isViewOutOfDate(void) const
     {
+#ifdef OGRE_NODELESS_POSITIONING
         // Overridden from Frustum to use local orientation / position offsets
         // Attached to node?
         if (mParentNode != 0)
@@ -379,22 +391,18 @@ namespace Ogre {
                 // Ok, we're out of date with SceneNode we're attached to
                 mLastParentOrientation = mParentNode->_getDerivedOrientation();
                 mLastParentPosition = mParentNode->_getDerivedPosition();
-#ifdef OGRE_NODELESS_POSITIONING
                 mRealOrientation = mParentNode->convertLocalToWorldOrientation(mOrientation);
                 mRealPosition = mParentNode->convertLocalToWorldPosition(mPosition);
-#endif
                 mRecalcView = true;
                 mRecalcWindow = true;
             }
         }
-#ifdef OGRE_NODELESS_POSITIONING
         else
         {
             // Rely on own updates
             mRealOrientation = mOrientation;
             mRealPosition = mPosition;
         }
-#endif
 
         // Deriving reflection from linked plane?
         if (mReflect && mLinkedReflectPlane && 
@@ -406,6 +414,10 @@ namespace Ogre {
             mRecalcView = true;
             mRecalcWindow = true;
         }
+#else
+        if(Frustum::isViewOutOfDate())
+            mRecalcWindow = true;
+#endif
 
         // Deriving reflected orientation / position
         if (mRecalcView)
@@ -873,25 +885,6 @@ namespace Ogre {
         // just to keep things just outside
         return mNearDist * 1.5f;
 
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& Camera::getPositionForViewUpdate(void) const
-    {
-        // Note no update, because we're calling this from the update!
-#ifdef OGRE_NODELESS_POSITIONING
-        return mRealPosition;
-#else
-        return mLastParentPosition;
-#endif
-    }
-    //-----------------------------------------------------------------------
-    const Quaternion& Camera::getOrientationForViewUpdate(void) const
-    {
-#ifdef OGRE_NODELESS_POSITIONING
-        return mRealOrientation;
-#else
-        return mLastParentOrientation;
-#endif
     }
     //-----------------------------------------------------------------------
     bool Camera::getAutoAspectRatio(void) const
