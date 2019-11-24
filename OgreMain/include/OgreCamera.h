@@ -373,6 +373,11 @@ namespace Ogre {
         */
         OGRE_DEPRECATED void setAutoTracking(bool enabled, SceneNode* const target = 0,
             const Vector3& offset = Vector3::ZERO);
+
+        /** Get the derived position of this frustum. */
+        const Vector3& getPositionForViewUpdate(void) const;
+        /** Get the derived orientation of this frustum. */
+        const Quaternion& getOrientationForViewUpdate(void) const;
 #endif
         /** Tells the Camera to contact the SceneManager to render from it's viewpoint.
         @param vp The viewport to render to
@@ -622,11 +627,6 @@ namespace Ogre {
             reflection etc are preserved.
         */
         virtual void synchroniseBaseSettingsWith(const Camera* cam);
-
-        /** Get the derived position of this frustum. */
-        const Vector3& getPositionForViewUpdate(void) const;
-        /** Get the derived orientation of this frustum. */
-        const Quaternion& getOrientationForViewUpdate(void) const;
 
         /** @brief Sets whether to use min display size calculations.
             When active, objects that derive from MovableObject whose size on the screen is less then a MovableObject::mMinPixelSize will not
