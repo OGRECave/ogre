@@ -56,9 +56,7 @@ public:
         mLight = light;
         mBillboard = billboard;
         mMinColour = minColour;
-        mColourRange.r = maxColour.r - minColour.r;
-        mColourRange.g = maxColour.g - minColour.g;
-        mColourRange.b = maxColour.b - minColour.b;
+        mColourRange = maxColour - minColour;
         mMinSize = minSize;
         mSizeRange = maxSize - minSize;
         
@@ -73,19 +71,14 @@ public:
     {
         intensity = value;
 
-        ColourValue newColour;
-
         // Attenuate the brightness of the light
-        newColour.r = mMinColour.r + (mColourRange.r * intensity);
-        newColour.g = mMinColour.g + (mColourRange.g * intensity);
-        newColour.b = mMinColour.b + (mColourRange.b * intensity);
+        ColourValue newColour = mMinColour + (mColourRange * intensity);
 
         mLight->setDiffuseColour(newColour);
         mBillboard->setColour(newColour);
         // set billboard size
         Real newSize = mMinSize + (intensity * mSizeRange);
         mBillboard->setDimensions(newSize, newSize);
-
     }
 };
 
@@ -154,42 +147,6 @@ public:
     }
 
 protected:
-
-    // Override this to ensure FPU mode
-    //bool configure(void)
-    //{
-    //  // Show the configuration dialog and initialise the system
-    //  // You can skip this and use root.restoreConfig() to load configuration
-    //  // settings if you were sure there are valid ones saved in ogre.cfg
-    //  if(mRoot->showConfigDialog())
-    //  {
-    //      // Custom option - to use PlaneOptimalShadowCameraSetup we must have
-    //      // double-precision. Thus, set the D3D floating point mode if present, 
-    //      // no matter what was chosen
-    //      ConfigOptionMap& optMap = mRoot->getRenderSystem()->getConfigOptions();
-    //      ConfigOptionMap::iterator i = optMap.find("Floating-point mode");
-    //      if (i != optMap.end())
-    //      {
-    //          if (i->second.currentValue != "Consistent")
-    //          {
-    //              i->second.currentValue = "Consistent";
-    //              LogManager::getSingleton().logMessage("Demo_Shadows: overriding "
-    //                  "D3D floating point mode to 'Consistent' to ensure precision "
-    //                  "for plane-optimal camera setup option");
-
-    //          }
-    //      }
-
-    //      // If returned true, user clicked OK so initialise
-    //      // Here we choose to let the system create a default rendering window by passing 'true'
-    //      mWindow = mRoot->initialise(true);
-    //      return true;
-    //  }
-    //  else
-    //  {
-    //      return false;
-    //  }
-    //}
     
     // Just override the mandatory create scene method
     void setupContent(void)
@@ -307,26 +264,20 @@ protected:
         node->translate(0,-27, 0);
         node->yaw(Degree(90));
 
-        Entity* pEnt;
         // Columns
         for (int x = -2; x <= 2; ++x)
         {
             for (int z = -2; z <= 2; ++z)
             {
-                if (x != 0 || z != 0)
-                {
-                    StringStream str;
-                    str << "col" << x << "_" << z;
-                    node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-                    pEnt = mSceneMgr->createEntity( str.str(), "column.mesh" );
-                    pEnt->setMaterialName(BASIC_ROCKWALL_MATERIAL);
-                    pColumns.push_back(pEnt);
-                    node->attachObject( pEnt );
-                    node->translate(x*300,0, z*300);
+                if (x == 0 && z == 0)
+                    continue;
 
-                }
+                Entity* pEnt = mSceneMgr->createEntity("column.mesh" );
+                pEnt->setMaterialName(BASIC_ROCKWALL_MATERIAL);
+                pColumns.push_back(pEnt);
+                node = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x*300,0, z*300));
+                node->attachObject( pEnt );
             }
-
         }
 
 
@@ -376,16 +327,7 @@ protected:
     {
         mSceneMgr->setShadowTechnique(newTech);
 
-        // Below is for projection
-        //configureShadowCameras(mCurrentShadowTechnique, newTech);
-
         configureLights(newTech);
-
-        // Advanced modes - materials / compositors
-        //configureCompositors(mCurrentShadowTechnique, newTech);
-        //configureTextures(mCurrentShadowTechnique, newTech);
-        //configureShadowCasterReceiverMaterials(mCurrentShadowTechnique, newTech);
-
         updateGUI(newTech);
 
         mCurrentShadowTechnique = newTech;
@@ -396,46 +338,18 @@ protected:
         Vector3 dir;
         switch (newTech)
         {
-        case SHADOWTYPE_STENCIL_ADDITIVE:
-            // Fixed light, dim
-            mSunLight->setCastShadows(true);
-
-            // Point light, movable, reddish
-            mLight->setType(Light::LT_POINT);
-            mLight->setCastShadows(true);
-            mLight->setDiffuseColour(mMinLightColour);
-            mLight->setSpecularColour(1, 1, 1);
-            mLight->setAttenuation(8000,1,0.0005,0);
-
-            break;
         case SHADOWTYPE_STENCIL_MODULATIVE:
             // Multiple lights cause obvious silhouette edges in modulative mode
-            // So turn off shadows on the direct light
-            // Fixed light, dim
-            mSunLight->setCastShadows(false);
-
+            // mSunLight->setCastShadows(false); // turn off shadows on the direct light to fix it
+        case SHADOWTYPE_STENCIL_ADDITIVE:
             // Point light, movable, reddish
             mLight->setType(Light::LT_POINT);
-            mLight->setCastShadows(true);
-            mLight->setDiffuseColour(mMinLightColour);
-            mLight->setSpecularColour(1, 1, 1);
-            mLight->setAttenuation(8000,1,0.0005,0);
             break;
         case SHADOWTYPE_TEXTURE_MODULATIVE:
         case SHADOWTYPE_TEXTURE_ADDITIVE:
-            // Fixed light, dim
-            mSunLight->setCastShadows(true);
-
             // Change moving light to spotlight
-            // Point light, movable, reddish
             mLight->setType(Light::LT_SPOTLIGHT);
-            mLight->setCastShadows(true);
-            mLight->setDiffuseColour(mMinLightColour);
-            mLight->setSpecularColour(1, 1, 1);
-            mLight->setAttenuation(8000,1,0.0005,0);
             mLight->setSpotlightRange(Degree(80),Degree(90));
-
-
             break;
         default:
             break;
@@ -508,19 +422,24 @@ protected:
 
     void updateGUI(ShadowTechnique newTech)
     {
-        bool isTextureBased = (newTech & SHADOWDETAILTYPE_TEXTURE) != 0;
-
-        if (isTextureBased) 
+        if (newTech & SHADOWDETAILTYPE_TEXTURE)
         {
             mProjectionMenu->show();
             mTrayMgr->moveWidgetToTray(mProjectionMenu, TL_TOPLEFT);
-            mMaterialMenu->show();
-            mTrayMgr->moveWidgetToTray(mMaterialMenu, TL_TOPLEFT);
         }
         else 
         {
             mProjectionMenu->hide();
             mTrayMgr->removeWidgetFromTray(mProjectionMenu);
+        }
+
+        if((newTech & SHADOWTYPE_TEXTURE_ADDITIVE) == SHADOWTYPE_TEXTURE_ADDITIVE)
+        {
+            mMaterialMenu->show();
+            mTrayMgr->moveWidgetToTray(mMaterialMenu, TL_TOPLEFT);
+        }
+        else
+        {
             mMaterialMenu->hide();
             mTrayMgr->removeWidgetFromTray(mMaterialMenu);
         }
@@ -560,6 +479,7 @@ protected:
         }
         else
         {
+            mMaterialMenu->selectItem(0);
             newTech = static_cast<ShadowTechnique>(
                 (newTech & ~SHADOWDETAILTYPE_ADDITIVE) | SHADOWDETAILTYPE_MODULATIVE);
         }
@@ -594,7 +514,6 @@ protected:
 
             mSceneMgr->setShadowCameraSetup(mCurrentShadowCameraSetup);
 
-            //updateTipForCombo(cbo);
             if (mCustomRockwallVparams && mCustomRockwallFparams)
             {
                 // set
@@ -677,7 +596,7 @@ protected:
             switch(mat)
             {
             case MAT_STANDARD:
-                mSceneMgr->setShadowTexturePixelFormat(PF_X8R8G8B8);
+                mSceneMgr->setShadowTexturePixelFormat(PF_BYTE_RGBA);
                 mSceneMgr->setShadowTextureCasterMaterial(MaterialPtr());
                 mSceneMgr->setShadowTextureReceiverMaterial(MaterialPtr());
                 mSceneMgr->setShadowTextureSelfShadow(false);   
@@ -763,7 +682,6 @@ protected:
                 mClampSlider->hide();       
                 mTrayMgr->removeWidgetFromTray(mClampSlider);       
             }
-            //updateTipForCombo(cbo);
         }
     }
 };
