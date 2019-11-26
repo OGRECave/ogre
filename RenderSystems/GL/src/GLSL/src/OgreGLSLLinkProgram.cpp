@@ -359,6 +359,14 @@ namespace Ogre {
                         glUniformMatrix4fvARB(currentUniform->mLocation, glArraySize, 
                             transpose, params->getFloatPointer(def->physicalIndex));
                         break;
+                    case GCT_SAMPLER1D:
+                    case GCT_SAMPLER1DSHADOW:
+                    case GCT_SAMPLER2D:
+                    case GCT_SAMPLER2DSHADOW:
+                    case GCT_SAMPLER2DARRAY:
+                    case GCT_SAMPLER3D:
+                    case GCT_SAMPLERCUBE:
+                        // samplers handled like 1-element ints
                     case GCT_INT1:
                         glUniform1ivARB(currentUniform->mLocation, glArraySize, 
                             (GLint*)params->getIntPointer(def->physicalIndex));
@@ -373,17 +381,6 @@ namespace Ogre {
                         break;
                     case GCT_INT4:
                         glUniform4ivARB(currentUniform->mLocation, glArraySize, 
-                            (GLint*)params->getIntPointer(def->physicalIndex));
-                        break;
-                    case GCT_SAMPLER1D:
-                    case GCT_SAMPLER1DSHADOW:
-                    case GCT_SAMPLER2D:
-                    case GCT_SAMPLER2DSHADOW:
-                                        case GCT_SAMPLER2DARRAY:
-                    case GCT_SAMPLER3D:
-                    case GCT_SAMPLERCUBE:
-                        // samplers handled like 1-element ints
-                        glUniform1ivARB(currentUniform->mLocation, 1, 
                             (GLint*)params->getIntPointer(def->physicalIndex));
                         break;
                     case GCT_UNKNOWN:

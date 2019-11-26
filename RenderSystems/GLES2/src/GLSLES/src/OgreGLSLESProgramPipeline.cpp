@@ -317,6 +317,14 @@ namespace Ogre
                             OGRE_CHECK_GL_ERROR(glProgramUniformMatrix4fvEXT(progID, currentUniform->mLocation, glArraySize, 
                                                                              GL_FALSE, params->getFloatPointer(def->physicalIndex)));
                             break;
+                        case GCT_SAMPLER1D:
+                        case GCT_SAMPLER1DSHADOW:
+                        case GCT_SAMPLER2D:
+                        case GCT_SAMPLER2DSHADOW:
+                        case GCT_SAMPLER3D:
+                        case GCT_SAMPLERCUBE:
+                        case GCT_SAMPLER2DARRAY:
+                            // Samplers handled like 1-element ints
                         case GCT_INT1:
                             OGRE_CHECK_GL_ERROR(glProgramUniform1ivEXT(progID, currentUniform->mLocation, glArraySize, 
                                                                        params->getIntPointer(def->physicalIndex)));
@@ -331,17 +339,6 @@ namespace Ogre
                             break;
                         case GCT_INT4:
                             OGRE_CHECK_GL_ERROR(glProgramUniform4ivEXT(progID, currentUniform->mLocation, glArraySize, 
-                                                                       params->getIntPointer(def->physicalIndex)));
-                            break;
-                        case GCT_SAMPLER1D:
-                        case GCT_SAMPLER1DSHADOW:
-                        case GCT_SAMPLER2D:
-                        case GCT_SAMPLER2DSHADOW:
-                        case GCT_SAMPLER3D:
-                        case GCT_SAMPLERCUBE:
-                        case GCT_SAMPLER2DARRAY:
-                            // Samplers handled like 1-element ints
-                            OGRE_CHECK_GL_ERROR(glProgramUniform1ivEXT(progID, currentUniform->mLocation, 1,
                                                                        params->getIntPointer(def->physicalIndex)));
                             break;
                         case GCT_MATRIX_2X3:
