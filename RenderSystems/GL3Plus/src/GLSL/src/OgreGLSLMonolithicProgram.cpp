@@ -312,6 +312,15 @@ namespace Ogre {
                         OGRE_CHECK_GL_ERROR(glUniformMatrix4fv(currentUniform->mLocation, glArraySize,
                                                                transpose, params->getFloatPointer(def->physicalIndex)));
                         break;
+                    case GCT_SAMPLER1D:
+                    case GCT_SAMPLER1DSHADOW:
+                    case GCT_SAMPLER2D:
+                    case GCT_SAMPLER2DSHADOW:
+                    case GCT_SAMPLER2DARRAY:
+                    case GCT_SAMPLER3D:
+                    case GCT_SAMPLERCUBE:
+                    case GCT_SAMPLERRECT:
+                        // Samplers handled like 1-element ints
                     case GCT_INT1:
                         OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize,
                                                          (GLint*)params->getIntPointer(def->physicalIndex)));
@@ -347,19 +356,6 @@ namespace Ogre {
                     case GCT_BOOL4:
                         OGRE_CHECK_GL_ERROR(glUniform4uiv(currentUniform->mLocation, glArraySize,
                                                           (GLuint*)params->getUnsignedIntPointer(def->physicalIndex)));
-                        break;
-
-                    case GCT_SAMPLER1D:
-                    case GCT_SAMPLER1DSHADOW:
-                    case GCT_SAMPLER2D:
-                    case GCT_SAMPLER2DSHADOW:
-                    case GCT_SAMPLER2DARRAY:
-                    case GCT_SAMPLER3D:
-                    case GCT_SAMPLERCUBE:
-                    case GCT_SAMPLERRECT:
-                        // Samplers handled like 1-element ints
-                        OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, 1,
-                                                         (GLint*)params->getIntPointer(def->physicalIndex)));
                         break;
                     default:
                         break;
