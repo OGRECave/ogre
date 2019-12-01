@@ -142,8 +142,6 @@ namespace Ogre {
     */
     struct _OgreExport GpuConstantDefinition
     {
-        /// Data type
-        GpuConstantType constType;
         /// Physical start index in buffer (either float, double, int, or uint buffer)
         size_t physicalIndex;
         /// Logical index - used to communicate this constant to the rendersystem
@@ -153,6 +151,8 @@ namespace Ogre {
         size_t elementSize;
         /// Length of array
         size_t arraySize;
+        /// Data type
+        GpuConstantType constType;
         /// How this parameter varies (bitwise combination of GpuProgramVariability)
         mutable uint16 variability;
 
@@ -296,11 +296,11 @@ namespace Ogre {
         }
 
     GpuConstantDefinition()
-        : constType(GCT_UNKNOWN)
-            , physicalIndex((std::numeric_limits<size_t>::max)())
+        : physicalIndex((std::numeric_limits<size_t>::max)())
             , logicalIndex(0)
             , elementSize(0)
             , arraySize(1)
+            , constType(GCT_UNKNOWN)
             , variability(GPV_GLOBAL) {}
     };
     typedef std::map<String, GpuConstantDefinition> GpuConstantDefinitionMap;

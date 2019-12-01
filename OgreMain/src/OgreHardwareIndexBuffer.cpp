@@ -37,8 +37,8 @@ namespace Ogre {
         size_t numIndexes, HardwareBuffer::Usage usage, 
         bool useSystemMemory, bool useShadowBuffer) 
         : HardwareBuffer(usage, useSystemMemory, useShadowBuffer)
-        , mMgr(mgr)
         , mIndexType(idxType)
+        , mMgr(mgr)
         , mNumIndexes(numIndexes)
     {
         // Calculate the size of the indexes

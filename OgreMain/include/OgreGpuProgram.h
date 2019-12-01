@@ -135,32 +135,32 @@ namespace Ogre {
     static CmdManualNamedConstsFile msManNamedConstsFileCmd;
     static CmdAdjacency msAdjacencyCmd;
     static CmdComputeGroupDims msComputeGroupDimsCmd;
-    /// The type of the program
-    GpuProgramType mType;
     /// The name of the file to load source from (may be blank)
     String mFilename;
     /// The assembler source of the program (may be blank until file loaded)
     String mSource;
-    /// Whether we need to load source from file or not
-    bool mLoadFromFile;
     /// Syntax code e.g. arbvp1, vs_2_0 etc
     String mSyntaxCode;
+    /// The type of the program
+    GpuProgramType mType;
+    /// Whether we need to load source from file or not
+    bool mLoadFromFile;
     /// Does this (vertex) program include skeletal animation?
     bool mSkeletalAnimation;
     /// Does this (vertex) program include morph animation?
     bool mMorphAnimation;
-    /// Does this (vertex) program include pose animation (count of number of poses supported)
-    ushort mPoseAnimation;
     /// Does this (vertex) program require support for vertex texture fetch?
     bool mVertexTextureFetch;
     /// Does this (geometry) program require adjacency information?
     bool mNeedsAdjacencyInfo;
+    /// Did we encounter a compilation error?
+    bool mCompileError;
+    /// Does this (vertex) program include pose animation (count of number of poses supported)
+    ushort mPoseAnimation;
     /// The number of process groups dispatched by this (compute) program.
     Vector3 mComputeGroupDimensions;
     /// The default parameters for use with this object
     GpuProgramParametersSharedPtr mDefaultParams;
-    /// Did we encounter a compilation error?
-    bool mCompileError;
     /** Record of logical to physical buffer maps. Mandatory for low-level
         programs or high-level programs which set their params the same way.
         This is a shared pointer because if the program is recompiled and the parameters

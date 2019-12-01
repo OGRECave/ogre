@@ -54,10 +54,10 @@ namespace Ogre {
         mCustomProjMatrix(false),
         mFrustumExtentsManuallySet(false),
         mOrientationMode(OR_DEGREE_0),
-        mReflect(false), 
         mLinkedReflectPlane(0),
-        mObliqueDepthProjection(false), 
-        mLinkedObliqueProjPlane(0)
+        mLinkedObliqueProjPlane(0),
+        mReflect(false),
+        mObliqueDepthProjection(false)
     {
         // Initialise material
         mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);

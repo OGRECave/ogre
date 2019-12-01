@@ -91,12 +91,6 @@ namespace Ogre {
         SceneNode* mAutoTrackTarget;
         /// Pointer to a Wire Bounding Box for this Node
         std::unique_ptr<WireBoundingBox> mWireBoundingBox;
-        /// Tracking offset for fine tuning
-        Vector3 mAutoTrackOffset;
-        /// Local 'normal' direction vector
-        Vector3 mAutoTrackLocalDirection;
-        /// Fixed axis to yaw around
-        Vector3 mYawFixedAxis;
 
         /** Index in the vector holding this node reference. Used for O(1) removals.
 
@@ -104,6 +98,13 @@ namespace Ogre {
             it manually.
         */
         size_t mGlobalIndex;
+
+        /// Tracking offset for fine tuning
+        Vector3 mAutoTrackOffset;
+        /// Local 'normal' direction vector
+        Vector3 mAutoTrackLocalDirection;
+        /// Fixed axis to yaw around
+        Vector3 mYawFixedAxis;
 
         /// Whether to yaw around a fixed axis.
         bool mYawFixed : 1;

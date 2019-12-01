@@ -82,9 +82,9 @@ namespace Ogre {
         Vector3 mPosition;
         /// Normalised direction vector
         Vector3 mDirection;
-        BillboardSet* mParentSet;
         ColourValue mColour;
         Radian mRotation;
+        BillboardSet* mParentSet;
 
         /** Default constructor.
         */

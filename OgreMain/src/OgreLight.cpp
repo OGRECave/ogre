@@ -50,13 +50,12 @@ namespace Ogre {
           mAttenuation(100000.f, 1.f, 0.f, 0.f),
           mPowerScale(1.0f),
           mIndexInFrame(0),
-          mOwnShadowFarDist(false),
           mShadowFarDist(0),
           mShadowFarDistSquared(0),
           mShadowNearClipDist(-1),
           mShadowFarClipDist(-1),
           mCameraToBeRelativeTo(0),
-          mCustomShadowCameraSetup()
+          mOwnShadowFarDist(false)
     {
         //mMinPixelSize should always be zero for lights otherwise lights will disapear
         mMinPixelSize = 0;
@@ -81,13 +80,12 @@ namespace Ogre {
         mAttenuation(100000.f, 1.f, 0.f, 0.f),
         mPowerScale(1.0f),
         mIndexInFrame(0),
-        mOwnShadowFarDist(false),
         mShadowFarDist(0),
         mShadowFarDistSquared(0),
         mShadowNearClipDist(-1),
         mShadowFarClipDist(-1),
         mCameraToBeRelativeTo(0),
-        mCustomShadowCameraSetup()
+        mOwnShadowFarDist(false)
     {
         //mMinPixelSize should always be zero for lights otherwise lights will disapear
         mMinPixelSize = 0;
