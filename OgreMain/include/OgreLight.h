@@ -572,7 +572,6 @@ namespace Ogre {
         Vector4f mAttenuation;
         Real mPowerScale;
         size_t mIndexInFrame;
-        bool mOwnShadowFarDist;
         Real mShadowFarDist;
         Real mShadowFarDistSquared;
         
@@ -593,6 +592,8 @@ namespace Ogre {
         typedef std::map<uint16, Vector4> CustomParameterMap;
         /// Stores the custom parameters for the light.
         CustomParameterMap mCustomParameters;
+
+        bool mOwnShadowFarDist;
     };
 
     /** Factory object for creating Light instances. */

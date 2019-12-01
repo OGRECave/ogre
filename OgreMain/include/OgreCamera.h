@@ -96,6 +96,20 @@ namespace Ogre {
 
         };
     protected:
+        /// Is viewing window used.
+        bool mWindowSet;
+        /// Was viewing window changed.
+        mutable bool mRecalcWindow;
+
+        /** Whether aspect ratio will automatically be recalculated
+            when a viewport changes its size
+        */
+        bool mAutoAspectRatio;
+        /// Whether or not the rendering distance of objects should take effect for this camera
+        bool mUseRenderingDistance;
+        /// Whether or not the minimum display size of objects should take effect for this camera
+        bool mUseMinPixelSize;
+
         /// Scene manager responsible for the scene
         SceneManager *mSceneMgr;
 
@@ -144,33 +158,19 @@ namespace Ogre {
         Generalize camera class for the case, when viewing frustum doesn't cover all viewport.
         */
         Real mWLeft, mWTop, mWRight, mWBottom;
-        /// Is viewing window used.
-        bool mWindowSet;
         /// Windowed viewport clip planes 
         mutable std::vector<Plane> mWindowClipPlanes;
-        /// Was viewing window changed.
-        mutable bool mRecalcWindow;
         /// The last viewport to be added using this camera
         Viewport* mLastViewport;
-        /** Whether aspect ratio will automatically be recalculated 
-            when a viewport changes its size
-        */
-        bool mAutoAspectRatio;
         /// Custom culling frustum
         Frustum *mCullFrustum;
-        /// Whether or not the rendering distance of objects should take effect for this camera
-        bool mUseRenderingDistance;
         /// Camera to use for LOD calculation
         const Camera* mLodCamera;
-        
-        /// Whether or not the minimum display size of objects should take effect for this camera
-        bool mUseMinPixelSize;
         /// @see Camera::getPixelDisplayRatio
         Real mPixelDisplayRatio;
 
         typedef std::vector<Listener*> ListenerList;
         ListenerList mListeners;
-
 
         // Internal functions for calcs
         bool isViewOutOfDate(void) const;

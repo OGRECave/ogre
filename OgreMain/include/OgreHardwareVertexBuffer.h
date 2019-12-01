@@ -49,10 +49,10 @@ namespace Ogre {
     {
         protected:
 
+            bool mIsInstanceData;
             HardwareBufferManagerBase* mMgr;
             size_t mNumVertices;
             size_t mVertexSize;
-            bool mIsInstanceData;
             size_t mInstanceDataStepRate;           
             /// Checks if vertex instance data is supported by the render system
             virtual bool checkIfVertexInstanceDataIsSupported();
@@ -174,14 +174,14 @@ namespace Ogre {
     protected:
         /// The source vertex buffer, as bound to an index using VertexBufferBinding
         unsigned short mSource;
+        /// Index of the item, only applicable for some elements like texture coords
+        unsigned short mIndex;
         /// The offset in the buffer that this element starts at
         size_t mOffset;
         /// The type of element
         VertexElementType mType;
         /// The meaning of the element
         VertexElementSemantic mSemantic;
-        /// Index of the item, only applicable for some elements like texture coords
-        unsigned short mIndex;
     public:
         /// Constructor, should not be called directly, only needed because of list
         VertexElement() {}

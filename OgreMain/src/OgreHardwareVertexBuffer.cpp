@@ -35,11 +35,11 @@ namespace Ogre {
     HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,  
         size_t numVertices, HardwareBuffer::Usage usage, 
         bool useSystemMemory, bool useShadowBuffer) 
-        : HardwareBuffer(usage, useSystemMemory, useShadowBuffer), 
+        : HardwareBuffer(usage, useSystemMemory, useShadowBuffer),
+          mIsInstanceData(false),
           mMgr(mgr),
           mNumVertices(numVertices),
           mVertexSize(vertexSize),
-          mIsInstanceData(false),
           mInstanceDataStepRate(1)
     {
         // Calculate the size of the vertices
@@ -106,10 +106,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     // VertexElement
     //-----------------------------------------------------------------------------
-    VertexElement::VertexElement(unsigned short source, size_t offset, 
-        VertexElementType theType, VertexElementSemantic semantic, unsigned short index)
-        : mSource(source), mOffset(offset), mType(theType), 
-        mSemantic(semantic), mIndex(index)
+    VertexElement::VertexElement(unsigned short source, size_t offset, VertexElementType theType,
+                                 VertexElementSemantic semantic, unsigned short index)
+        : mSource(source), mIndex(index), mOffset(offset), mType(theType), mSemantic(semantic)
     {
     }
     //-----------------------------------------------------------------------------

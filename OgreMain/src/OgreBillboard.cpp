@@ -39,9 +39,9 @@ namespace Ogre {
         mTexcoordIndex(0),
         mPosition(Vector3::ZERO),
         mDirection(Vector3::ZERO),        
-        mParentSet(0),
         mColour(ColourValue::White),
-        mRotation(0)
+        mRotation(0),
+        mParentSet(0)
     {
     }
     //-----------------------------------------------------------------------
@@ -55,9 +55,9 @@ namespace Ogre {
         , mTexcoordIndex(0)
         , mPosition(position)
         , mDirection(Vector3::ZERO)
-        , mParentSet(owner)
         , mColour(colour)
         , mRotation(0)
+        , mParentSet(owner)
     {
     }
     //-----------------------------------------------------------------------

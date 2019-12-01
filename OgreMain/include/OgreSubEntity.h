@@ -92,10 +92,10 @@ namespace Ogre {
         uint8 mRenderQueueID;
         /// Flags whether the RenderQueue's default should be used.
         bool mRenderQueueIDSet;
-        /// The render queue priority to use when rendering this renderable
-        ushort mRenderQueuePriority;
         /// Flags whether the RenderQueue's default should be used.
         bool mRenderQueuePrioritySet;
+        /// The render queue priority to use when rendering this renderable
+        ushort mRenderQueuePriority;
 #if !OGRE_NO_MESHLOD
         /// The LOD number of the material to use, calculated by Entity::_notifyCurrentCamera
         unsigned short mMaterialLodIndex;
@@ -114,12 +114,12 @@ namespace Ogre {
         /// - separate since we need to s/w anim for shadows whilst still altering
         ///   the vertex data for hardware morphing (pos2 binding)
         std::unique_ptr<VertexData> mHardwareVertexAnimVertexData;
-        /// Have we applied any vertex animation to geometry?
-        bool mVertexAnimationAppliedThisFrame;
-        /// Number of hardware blended poses supported by material
-        ushort mHardwarePoseCount;
         /// Cached distance to last camera for getSquaredViewDepth
         mutable Real mCachedCameraDist;
+        /// Number of hardware blended poses supported by material
+        ushort mHardwarePoseCount;
+        /// Have we applied any vertex animation to geometry?
+        bool mVertexAnimationAppliedThisFrame;
         /// The camera for which the cached distance is valid
         mutable const Camera *mCachedCamera;
 

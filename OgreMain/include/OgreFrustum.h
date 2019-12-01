@@ -171,25 +171,26 @@ namespace Ogre
         MaterialPtr mMaterial;
         mutable Vector3 mWorldSpaceCorners[8];
 
-        /// Is this frustum to act as a reflection of itself?
-        bool mReflect;
         /// Derived reflection matrix
         mutable Affine3 mReflectMatrix;
         /// Fixed reflection plane
         mutable Plane mReflectPlane;
-        /// Pointer to a reflection plane (automatically updated)
-        const MovablePlane* mLinkedReflectPlane;
         /// Record of the last world-space reflection plane info used
         mutable Plane mLastLinkedReflectionPlane;
-        
-        /// Is this frustum using an oblique depth projection?
-        bool mObliqueDepthProjection;
         /// Fixed oblique projection plane
         mutable Plane mObliqueProjPlane;
+
+        /// Pointer to a reflection plane (automatically updated)
+        const MovablePlane* mLinkedReflectPlane;
         /// Pointer to oblique projection plane (automatically updated)
         const MovablePlane* mLinkedObliqueProjPlane;
         /// Record of the last world-space oblique depth projection plane info used
         mutable Plane mLastLinkedObliqueProjPlane;
+
+        /// Is this frustum to act as a reflection of itself?
+        bool mReflect;
+        /// Is this frustum using an oblique depth projection?
+        bool mObliqueDepthProjection;
 
     public:
 

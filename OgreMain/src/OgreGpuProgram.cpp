@@ -47,13 +47,11 @@ namespace Ogre
     GpuLogicalBufferStructPtr GpuProgram::mBoolLogicalToPhysical;
 
     //-----------------------------------------------------------------------------
-    GpuProgram::GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-        const String& group, bool isManual, ManualResourceLoader* loader) 
-        :Resource(creator, name, handle, group, isManual, loader),
-        mType(GPT_VERTEX_PROGRAM), mLoadFromFile(true), mSkeletalAnimation(false),
-        mMorphAnimation(false), mPoseAnimation(0),
-        mVertexTextureFetch(false), mNeedsAdjacencyInfo(false),
-        mCompileError(false), mLoadedManualNamedConstants(false)
+    GpuProgram::GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle, const String& group,
+                           bool isManual, ManualResourceLoader* loader)
+        : Resource(creator, name, handle, group, isManual, loader), mType(GPT_VERTEX_PROGRAM), mLoadFromFile(true),
+          mSkeletalAnimation(false), mMorphAnimation(false), mVertexTextureFetch(false), mNeedsAdjacencyInfo(false),
+          mCompileError(false), mPoseAnimation(0), mLoadedManualNamedConstants(false)
     {
         createParameterMappingStructures();
     }

@@ -66,10 +66,10 @@ namespace Ogre {
     protected:
         /// Whether the high-level program (and it's parameter defs) is loaded
         bool mHighLevelLoaded;
-        /// The underlying assembler program
-        GpuProgramPtr mAssemblerProgram;
         /// Have we built the name->index parameter map yet?
         mutable bool mConstantDefsBuilt;
+        /// The underlying assembler program
+        GpuProgramPtr mAssemblerProgram;
         /// Preprocessor options
         String mPreprocessorDefines;
 

@@ -175,9 +175,9 @@ namespace Ogre {
             bool mIsLocked;
             size_t mLockStart;
             size_t mLockSize;
+            std::unique_ptr<HardwareBuffer> mShadowBuffer;
             bool mSystemMemory;
             bool mUseShadowBuffer;
-            std::unique_ptr<HardwareBuffer> mShadowBuffer;
             bool mShadowUpdated;
             bool mSuppressHardwareUpdate;
             

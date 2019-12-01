@@ -36,6 +36,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Camera::Camera( const String& name, SceneManager* sm)
         : Frustum(name),
+        mWindowSet(false),
+        mAutoAspectRatio(false),
+        mUseRenderingDistance(true),
+        mUseMinPixelSize(false),
         mSceneMgr(sm),
         mSceneDetail(PM_SOLID),
 #ifdef OGRE_NODELESS_POSITIONING
@@ -46,13 +50,9 @@ namespace Ogre {
 #endif
         mSceneLodFactor(1.0f),
         mSceneLodFactorInv(1.0f),
-        mWindowSet(false),
         mLastViewport(0),
-        mAutoAspectRatio(false),
         mCullFrustum(0),
-        mUseRenderingDistance(true),
         mLodCamera(0),
-        mUseMinPixelSize(false),
         mPixelDisplayRatio(0)
     {
 
