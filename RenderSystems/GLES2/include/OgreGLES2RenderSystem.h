@@ -73,10 +73,6 @@ namespace Ogre {
             /// State cache manager which responsible to reduce redundant state changes
             GLES2StateCacheManager* mStateCacheManager;
 
-            typedef std::list<GLContext*> GLContextList;
-            /// List of background thread contexts
-            GLContextList mBackgroundContextList;
-
             GpuProgramManager *mGpuProgramManager;
             GLSLESProgramFactory* mGLSLESProgramFactory;
 #if !OGRE_NO_GLES2_CG_SUPPORT
@@ -204,11 +200,6 @@ namespace Ogre {
                 const ColourValue& colour = ColourValue::Black,
                 Real depth = 1.0f, unsigned short stencil = 0);
             HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
-            OGRE_MUTEX(mThreadInitMutex);
-            void registerThread();
-            void unregisterThread();
-            void preExtraThreadsStarted();
-            void postExtraThreadsStarted();
 
             // ----------------------------------
             // GLES2RenderSystem specific members
@@ -235,9 +226,6 @@ namespace Ogre {
             /** Switch GL context, dealing with involved internal cached states too
              */
             void _switchContext(GLContext *context);
-            /** One time initialization for the RenderState of a context. Things that
-             only need to be set once, like the LightingModel can be defined here.
-             */
             void _oneTimeContextInitialization();
             void initialiseContext(RenderWindow* primary);
             /**

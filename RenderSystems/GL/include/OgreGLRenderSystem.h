@@ -116,10 +116,6 @@ namespace Ogre {
         GLGpuProgram* mCurrentFragmentProgram;
         GLGpuProgram* mCurrentGeometryProgram;
 
-        typedef std::list<GLContext*> GLContextList;
-        /// List of background thread contexts
-        GLContextList mBackgroundContextList;
-
         // statecaches are per context
         GLStateCacheManager* mStateCacheManager;
 
@@ -287,18 +283,10 @@ namespace Ogre {
                               const ColourValue& colour = ColourValue::Black, 
                               Real depth = 1.0f, unsigned short stencil = 0);
         HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
-        OGRE_MUTEX(mThreadInitMutex);
-        void registerThread();
-        void unregisterThread();
-        void preExtraThreadsStarted();
-        void postExtraThreadsStarted();
 
         // ----------------------------------
         // GLRenderSystem specific members
         // ----------------------------------
-        /** One time initialization for the RenderState of a context. Things that
-            only need to be set once, like the LightingModel can be defined here.
-         */
         void _oneTimeContextInitialization();
         /** Switch GL context, dealing with involved internal cached states too
         */

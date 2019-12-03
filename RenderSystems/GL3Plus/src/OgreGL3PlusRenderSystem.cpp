@@ -568,13 +568,9 @@ namespace Ogre {
         mTextureManager = 0;
 
         // Delete extra threads contexts
-        for (GL3PlusContextList::iterator i = mBackgroundContextList.begin();
-             i != mBackgroundContextList.end(); ++i)
+        for (auto pCurContext : mBackgroundContextList)
         {
-            GL3PlusContext* pCurContext = *i;
-
             pCurContext->releaseContext();
-
             OGRE_DELETE pCurContext;
         }
         mBackgroundContextList.clear();
@@ -2061,55 +2057,6 @@ namespace Ogre {
         // FIXME This needs to be moved somewhere texture specific.
         // Update image bindings for image load/store
         // static_cast<GL3PlusTextureManager*>(mTextureManager)->bindImages();
-    }
-
-    void GL3PlusRenderSystem::registerThread()
-    {
-        OGRE_LOCK_MUTEX(mThreadInitMutex);
-        // This is only valid once we've created the main context
-        if (!mMainContext)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Cannot register a background thread before the main context "
-                        "has been created.",
-                        "GL3PlusRenderSystem::registerThread");
-        }
-
-        // Create a new context for this thread. Cloning from the main context
-        // will ensure that resources are shared with the main context
-        // We want a separate context so that we can safely create GL
-        // objects in parallel with the main thread
-        GL3PlusContext* newContext = mMainContext->clone();
-        mBackgroundContextList.push_back(newContext);
-
-        // Bind this new context to this thread.
-        newContext->setCurrent();
-
-        _oneTimeContextInitialization();
-        newContext->setInitialized();
-    }
-
-    void GL3PlusRenderSystem::unregisterThread()
-    {
-        // nothing to do here?
-        // Don't need to worry about active context, just make sure we delete
-        // on shutdown.
-    }
-
-    void GL3PlusRenderSystem::preExtraThreadsStarted()
-    {
-        OGRE_LOCK_MUTEX(mThreadInitMutex);
-        // free context, we'll need this to share lists
-        if (mCurrentContext)
-            mCurrentContext->endCurrent();
-    }
-
-    void GL3PlusRenderSystem::postExtraThreadsStarted()
-    {
-        OGRE_LOCK_MUTEX(mThreadInitMutex);
-        // reacquire context
-        if (mCurrentContext)
-            mCurrentContext->setCurrent();
     }
 
     unsigned int GL3PlusRenderSystem::getDisplayMonitorCount() const

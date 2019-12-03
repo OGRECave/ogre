@@ -229,4 +229,51 @@ namespace Ogre {
     {
         mRTTManager->getBestDepthStencil( internalColourFormat, depthFormat, stencilFormat );
     }
+
+    void GLRenderSystemCommon::registerThread()
+    {
+        OGRE_LOCK_MUTEX(mThreadInitMutex);
+        // This is only valid once we've created the main context
+        if (!mMainContext)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Cannot register a background thread before the main context has been created");
+        }
+
+        // Create a new context for this thread. Cloning from the main context
+        // will ensure that resources are shared with the main context
+        // We want a separate context so that we can safely create GL
+        // objects in parallel with the main thread
+        GLContext* newContext = mMainContext->clone();
+        mBackgroundContextList.push_back(newContext);
+
+        // Bind this new context to this thread.
+        newContext->setCurrent();
+
+        _oneTimeContextInitialization();
+        newContext->setInitialized();
+    }
+
+    void GLRenderSystemCommon::unregisterThread()
+    {
+        // nothing to do here?
+        // Don't need to worry about active context, just make sure we delete
+        // on shutdown.
+    }
+
+    void GLRenderSystemCommon::preExtraThreadsStarted()
+    {
+        OGRE_LOCK_MUTEX(mThreadInitMutex);
+        // free context, we'll need this to share lists
+        if (mCurrentContext)
+            mCurrentContext->endCurrent();
+    }
+
+    void GLRenderSystemCommon::postExtraThreadsStarted()
+    {
+        OGRE_LOCK_MUTEX(mThreadInitMutex);
+        // reacquire context
+        if (mCurrentContext)
+            mCurrentContext->setCurrent();
+    }
 }
