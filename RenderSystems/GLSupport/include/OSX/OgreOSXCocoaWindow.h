@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include <AppKit/NSWindow.h>
 #include <QuartzCore/CVDisplayLink.h>
 #include "OgreOSXCocoaView.h"
-#include "OgreGLRenderTarget.h"
+#include "OgreGLWindow.h"
 
 typedef NSUInteger NSWindowStyleMask; // NSWindowStyleMask was declared only since OSX 10.12 SDK
 
@@ -43,7 +43,7 @@ typedef NSUInteger NSWindowStyleMask; // NSWindowStyleMask was declared only sin
 @end
 
 namespace Ogre {
-    class _OgreGLExport CocoaWindow : public RenderWindow, public GLRenderTarget
+    class _OgreGLExport CocoaWindow : public GLWindow
     {
     private:
         NSWindow *mWindow;
@@ -52,15 +52,8 @@ namespace Ogre {
         NSOpenGLPixelFormat *mGLPixelFormat;
         CVDisplayLinkRef mDisplayLink;
         NSPoint mWindowOriginPt;
-        CocoaContext* mContext;
 
-        bool mActive;
-        bool mClosed;
-        bool mHidden;
-        bool mVSync;
         bool mHasResized;
-        bool mIsExternal;
-        bool mExternalGLControl;
         String mWindowTitle;
         bool mUseOgreGLView;
         float mContentScalingFactor;
@@ -86,26 +79,16 @@ namespace Ogre {
                 bool fullScreen, const NameValuePairList *miscParams);
         /** Overridden - see RenderWindow */
         void destroy(void);
-        /** Overridden - see RenderWindow */
-        bool isActive(void) const;
-        /** Overridden - see RenderWindow */
-        bool isClosed(void) const;
-        /** @copydoc see RenderWindow::isHidden */
-        bool isHidden(void) const { return mHidden; }
         /** @copydoc see RenderWindow::setHidden */
         void setHidden(bool hidden);
         /** @copydoc see RenderWindow::setVSyncEnabled */
         void setVSyncEnabled(bool vsync);
-        /** @copydoc see RenderWindow::isVSyncEnabled */
-        bool isVSyncEnabled() const;
         /** Overridden - see RenderWindow */
         void reposition(int leftPt, int topPt);
         /** Overridden - see RenderWindow */
         void resize(unsigned int widthPt, unsigned int heightPt);
         /** Overridden - see RenderWindow */
         void swapBuffers();
-        /** Overridden - see RenderTarget */
-        virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
         /** Overridden - see RenderWindow */
         virtual void setFullscreen(bool fullScreen, unsigned int widthPt, unsigned int heightPt);
         /** Overridden - see RenderWindow */
@@ -118,7 +101,6 @@ namespace Ogre {
         void createNewWindow(unsigned int width, unsigned int height, String title);
         void createWindowFromExternal(NSView *viewRef);
 
-        bool requiresTextureFlipping() const { return false; }      
         void getCustomAttribute( const String& name, void* pData );
     };
 }

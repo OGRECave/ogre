@@ -103,6 +103,7 @@ add_library(OgreGLSupport STATIC
     src/OgreGLHardwarePixelBufferCommon.cpp
     src/OgreGLUniformCache.cpp
     src/OgreGLVertexArrayObject.cpp
+    src/OgreGLWindow.cpp
 )
 target_link_libraries(OgreGLSupport PUBLIC OgreMain PRIVATE ${PLATFORM_LIBS})
 target_include_directories(OgreGLSupport PUBLIC 

@@ -262,7 +262,7 @@ namespace Ogre {
             mContext->setCurrent();
 
             static_cast<GLRenderSystemCommon*>(Root::getSingletonPtr()->getRenderSystem())->notifyOnContextLost();
-            mContext->_destroyInternalResources();
+            static_cast<EGLContext*>(mContext)->_destroyInternalResources();
         }
         
         eglDestroySurface(mEglDisplay, mEglSurface);
@@ -305,7 +305,7 @@ namespace Ogre {
             }
 
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
-            mContext->_updateInternalResources(mEglDisplay, mEglConfig, mEglSurface);
+            static_cast<EGLContext*>(mContext)->_updateInternalResources(mEglDisplay, mEglConfig, mEglSurface);
         }
         else
         {
@@ -417,7 +417,7 @@ namespace Ogre {
             
             if (!mPreserveContext)
             {
-                mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
+                static_cast<EGLContext*>(mContext)->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
 
                 static_cast<GLRenderSystemCommon*>(Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
             }

@@ -268,7 +268,7 @@ namespace Ogre {
         mContext->setCurrent();
         
         static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem())->notifyOnContextLost();
-        mContext->_destroyInternalResources();
+        static_cast<EGLContext*>(mContext)->_destroyInternalResources();
         
         eglDestroySurface(mEglDisplay, mEglSurface);
         EGL_CHECK_ERROR
@@ -375,7 +375,7 @@ namespace Ogre {
             mVisible = true;
             mClosed = false;
             
-            mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, nullptr);
+            static_cast<EGLContext*>(mContext)->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, nullptr);
             
             static_cast<GLRenderSystemCommon*>(Ogre::Root::getSingleton().getRenderSystem())->resetRenderer(this);
         }
