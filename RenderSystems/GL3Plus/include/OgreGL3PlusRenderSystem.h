@@ -87,10 +87,6 @@ namespace Ogre {
         /// Store last stencil mask state
         uint32 mStencilWriteMask;
 
-        typedef std::list<GL3PlusContext*> GL3PlusContextList;
-        /// List of background thread contexts
-        GL3PlusContextList mBackgroundContextList;
-
         // statecaches are per context
         GL3PlusStateCacheManager* mStateCacheManager;
 
@@ -226,11 +222,6 @@ namespace Ogre {
                               const ColourValue& colour = ColourValue::Black,
                               Real depth = 1.0f, unsigned short stencil = 0);
         HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
-        OGRE_MUTEX(mThreadInitMutex);
-        void registerThread();
-        void unregisterThread();
-        void preExtraThreadsStarted();
-        void postExtraThreadsStarted();
 
         // ----------------------------------
         // GL3PlusRenderSystem specific members
@@ -257,9 +248,6 @@ namespace Ogre {
         /** Switch GL context, dealing with involved internal cached states too
          */
         void _switchContext(GL3PlusContext *context);
-        /** One time initialization for the RenderState of a context. Things that
-            only need to be set once, like the LightingModel can be defined here.
-        */
         void _oneTimeContextInitialization();
         void initialiseContext(RenderWindow* primary);
         /**

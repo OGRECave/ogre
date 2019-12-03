@@ -63,6 +63,16 @@ namespace Ogre {
 
         void initConfigOptions();
         void refreshConfig();
+
+        typedef std::list<GLContext*> GLContextList;
+        /// List of background thread contexts
+        GLContextList mBackgroundContextList;
+        OGRE_MUTEX(mThreadInitMutex);
+
+        /** One time initialization for the RenderState of a context. Things that
+            only need to be set once, like the LightingModel can be defined here.
+        */
+        virtual void _oneTimeContextInitialization() = 0;
     public:
         struct VideoMode {
             uint32 width;
@@ -145,6 +155,11 @@ namespace Ogre {
         virtual void _destroyFbo(GLContext* context, uint32 fbo) {}
         /** Complete destruction of VAOs and FBOs deferred while creator context was not current */
         void _completeDeferredVaoFboDestruction();
+
+        void registerThread();
+        void unregisterThread();
+        void preExtraThreadsStarted();
+        void postExtraThreadsStarted();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         virtual void resetRenderer(RenderWindow* pRenderWnd) = 0;
