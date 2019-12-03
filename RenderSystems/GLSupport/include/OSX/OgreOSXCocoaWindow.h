@@ -60,6 +60,7 @@ namespace Ogre {
         bool mVSync;
         bool mHasResized;
         bool mIsExternal;
+        bool mExternalGLControl;
         String mWindowTitle;
         bool mUseOgreGLView;
         float mContentScalingFactor;

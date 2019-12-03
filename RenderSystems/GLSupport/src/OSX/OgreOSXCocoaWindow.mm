@@ -70,7 +70,7 @@ namespace Ogre {
 
 
     CocoaWindow::CocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOriginPt(NSZeroPoint),
-        mActive(false), mClosed(false), mHidden(false), mVSync(true), mHasResized(false), mIsExternal(false), mWindowTitle(""),
+        mActive(false), mClosed(false), mHidden(false), mVSync(true), mHasResized(false), mIsExternal(false), mExternalGLControl(false), mWindowTitle(""),
         mUseOgreGLView(true), mContentScalingFactor(1.0), mStyleMask(NSResizableWindowMask|NSTitledWindowMask)
     {
         // Set vsync by default to save battery and reduce tearing
@@ -198,6 +198,10 @@ namespace Ogre {
             opt = miscParams->find("currentGLContext");
             if (opt != miscParams->end())
                 currentGLContext = StringConverter::parseBool(opt->second);
+
+            opt = miscParams->find("externalGLControl");
+            if (opt != miscParams->end())
+                mExternalGLControl = StringConverter::parseBool(opt->second);
             
             opt = miscParams->find("externalGLContext");
             if(opt != miscParams->end())
@@ -247,7 +251,7 @@ namespace Ogre {
             mGLContext = [[NSOpenGLContext currentContext] retain];
             mGLPixelFormat = [mGLContext.pixelFormat retain];
         }
-        else
+        else if(!mExternalGLControl)
         {
             NSOpenGLPixelFormatAttribute attribs[30];
             int i = 0;
@@ -306,11 +310,14 @@ namespace Ogre {
             mGLContext = [[NSOpenGLContext alloc] initWithFormat:mGLPixelFormat shareContext:shareContext];
         }
 
-        // Set vsync
-        GLint swapInterval = (GLint)mVSync;
-        [mGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
-        GLint order = (GLint)surfaceOrder;
-        [mGLContext setValues:&order forParameter:NSOpenGLCPSurfaceOrder];
+        if(!mExternalGLControl)
+        {
+            // Set vsync
+            GLint swapInterval = (GLint)mVSync;
+            [mGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
+            GLint order = (GLint)surfaceOrder;
+            [mGLContext setValues:&order forParameter:NSOpenGLCPSurfaceOrder];
+        }
         
         // Make active
         setHidden(hidden);
@@ -624,14 +631,17 @@ namespace Ogre {
 
     void CocoaWindow::swapBuffers()
     {
-        CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
-        [mGLContext makeCurrentContext];
+        if(!mExternalGLControl)
+        {
+            CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
+            [mGLContext makeCurrentContext];
 
-        if([mGLContext view] != mView)
-            [mGLContext setView:mView];
+            if([mGLContext view] != mView)
+                [mGLContext setView:mView];
 
-        [mGLContext flushBuffer];
-        CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
+            [mGLContext flushBuffer];
+            CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
+        }
     }
 	
 	//-------------------------------------------------------------------------------------------------//
