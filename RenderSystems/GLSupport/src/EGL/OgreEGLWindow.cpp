@@ -36,32 +36,18 @@ THE SOFTWARE.
 #include "OgreEGLWindow.h"
 #include "OgreEGLContext.h"
 
-#include <iostream>
-#include <algorithm>
-#include <climits>
-
 #include <EGL/eglext.h>
 
 namespace Ogre {
     EGLWindow::EGLWindow(EGLSupport *glsupport)
-        : mGLSupport(glsupport),
-          mContext(0),
+        : GLWindow(), mGLSupport(glsupport),
           mWindow(0),
           mNativeDisplay(0),
           mEglDisplay(EGL_NO_DISPLAY),
           mEglConfig(0),
           mEglSurface(0)
     {
-        mIsTopLevel = false;
-        mIsFullScreen = false;
-        mIsExternal = false;
-        mIsExternalGLControl = false;
-        mClosed = false;
         mActive = true;//todo
-        mIsExternalGLControl = false;
-        mVisible = false;
-        mVSync = false;
-        mVSyncInterval = 1;
     }
 
     EGLWindow::~EGLWindow()
@@ -127,23 +113,6 @@ namespace Ogre {
         }
     }
 
-    bool EGLWindow::isClosed() const
-    {
-        return mClosed;
-    }
-
-    bool EGLWindow::isVisible() const
-    {
-        return mVisible;
-    }
-
-    void EGLWindow::setVisible(bool visible)
-    {
-        mVisible = visible;
-    }
-
-  
-
     void EGLWindow::swapBuffers()
     {
         if (mClosed || mIsExternalGLControl)
@@ -172,7 +141,7 @@ namespace Ogre {
         }
         else if (name == "GLCONTEXT")
         {
-            *static_cast<EGLContext**>(pData) = mContext;
+            *static_cast<GLContext**>(pData) = mContext;
             return;
         } 
         else if (name == "WINDOW")
@@ -186,24 +155,6 @@ namespace Ogre {
     {
         return mGLSupport->getContextProfile() == GLNativeSupport::CONTEXT_ES ? PF_BYTE_RGBA : PF_BYTE_RGB;
     }
-
-    void EGLWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
-    {
-        if(src.right > mWidth || src.bottom > mHeight || src.front != 0 || src.back != 1
-        || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight() || dst.getDepth() != 1)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "EGLWindow::copyContentsToMemory");
-        }
-
-        if (buffer == FB_AUTO)
-        {
-            buffer = mIsFullScreen? FB_FRONT : FB_BACK;
-        }
-
-        static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem())
-                ->_copyContentsToMemory(getViewport(0), src, dst, buffer);
-    }
-
 
     ::EGLSurface EGLWindow::createSurfaceFromWindow(::EGLDisplay display,
                                                     NativeWindowType win)
@@ -226,11 +177,6 @@ namespace Ogre {
                         "Fail to create EGLSurface based on NativeWindowType");
         }
         return surface;
-    }
-
-    bool EGLWindow::requiresTextureFlipping() const
-    {
-        return false;
     }
 
     void EGLWindow::setVSyncEnabled(bool vsync) {
@@ -258,11 +204,4 @@ namespace Ogre {
         eglMakeCurrent (dpy, oldDraw, oldRead, oldContext);
         EGL_CHECK_ERROR
     }
-
-    void EGLWindow::setVSyncInterval(unsigned int interval) {
-        mVSyncInterval = interval;
-        if (mVSync)
-            setVSyncEnabled(true);
-    }
-
 }
