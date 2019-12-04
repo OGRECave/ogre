@@ -980,6 +980,14 @@ namespace Ogre {
             mGLSLProgramFactory = 0;
         }
 
+        // Delete extra threads contexts
+        for (auto pCurContext : mBackgroundContextList)
+        {
+            pCurContext->releaseContext();
+            OGRE_DELETE pCurContext;
+        }
+        mBackgroundContextList.clear();
+
         // Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
         delete mGpuProgramManager;
         mGpuProgramManager = 0;
@@ -989,18 +997,6 @@ namespace Ogre {
 
         delete mRTTManager;
         mRTTManager = 0;
-
-        // Delete extra threads contexts
-        for (GLContextList::iterator i = mBackgroundContextList.begin();
-             i != mBackgroundContextList.end(); ++i)
-        {
-            GLContext* pCurContext = *i;
-
-            pCurContext->releaseContext();
-
-            delete pCurContext;
-        }
-        mBackgroundContextList.clear();
 
         mGLSupport->stop();
         mStopRendering = true;
