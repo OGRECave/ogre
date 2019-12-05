@@ -401,7 +401,7 @@ namespace Ogre {
             if you specify a name of "flame.jpg" with 3 frames, the image names must be "flame_0.jpg", "flame_1.jpg"
             and "flame_2.jpg".
 
-            You can change the active frame on a texture layer by calling the setCurrentFrame method.
+            You can change the active frame on a texture layer by calling the Ogre::TextureUnitState::setCurrentFrame method.
         @note
             If you can't make your texture images conform to the naming standard laid out here, you
             can call the alternative setAnimatedTextureName method which takes an array of names instead.
