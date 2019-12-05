@@ -1564,7 +1564,7 @@ This is the OpenGL standard assembler format for fragment programs. It’s rough
 
 </dd> <dt>fp20</dt> <dd>
 
-This is an nVidia-specific OpenGL fragment syntax which is a superset of ps 1.3. It allows you to use the ’nvparse’ format for basic fragment programs. It actually uses NV\_texture\_shader and NV\_register\_combiners to provide functionality equivalent to DirectX’s ps\_1\_1 under GL, but only for nVidia cards. However, since ATI cards adopted arbfp1 a little earlier than nVidia, it is mainly nVidia cards like the GeForce3 and GeForce4 that this will be useful for. You can find more information about nvparse at http://developer.nvidia.com/object/nvparse.html.
+This is an nVidia-specific OpenGL fragment syntax which is a superset of ps 1.3. It allows you to use the [nvparse format](https://www.nvidia.com/attach/6400) for basic fragment programs. It actually uses NV\_texture\_shader and NV\_register\_combiners to provide functionality equivalent to DirectX’s ps\_1\_1 under GL, but only for nVidia cards. However, since ATI cards adopted arbfp1 a little earlier than nVidia, it is mainly nVidia cards like the GeForce3 and GeForce4 that this will be useful for.
 
 </dd> <dt>fp30</dt> <dd>
 
@@ -1578,13 +1578,9 @@ Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 3.
 
 An nVidia-specific OpenGL geometry shader syntax. <br> Supported cards: nVidia GeForce FX8 series<br>
 
-</dd> <dt>glsles</dt> <dd>
-
-OpenGL Shading Language for Embedded Systems. It is a variant of GLSL, streamlined for low power devices. Supported cards: PowerVR SGX series
-
 </dd> </dl>
 
-You can get a definitive list of the syntaxes supported by the current card by calling GpuProgramManager::getSingleton().getSupportedSyntax().
+You can get a definitive list of the syntaxes supported by the current card by calling `Ogre::GpuProgramManager::getSupportedSyntax()`.
 
 # Specifying Named Constants for Assembler Shaders {#Specifying-Named-Constants-for-Assembler-Shaders}
 
@@ -1599,28 +1595,13 @@ vertex_program myVertexProgram asm
 }
 ```
 
-In this case myVertexProgram.constants has been created by calling highLevelGpuProgram-&gt;getNamedConstants().save("myVertexProgram.constants"); sometime earlier as preparation, from the original high-level program. Once you’ve used this directive, you can use named parameters here even though the assembler program itself has no knowledge of them.
+In this case myVertexProgram.constants has been created by calling `Ogre::GpuNamedConstants::save("myVertexProgram.constants");` sometime earlier as preparation, from the original high-level program. Once you’ve used this directive, you can use named parameters here even though the assembler program itself has no knowledge of them.
 
 # Default Program Parameters {#Default-Program-Parameters}
 
 While defining a vertex, geometry or fragment program, you can also specify the default parameters to be used for materials which use it, unless they specifically override them. You do this by including a nested ’default\_params’ section, like so:
 
-```cpp
-vertex_program Ogre/CelShadingVP cg
-{
-    source Example_CelShading.cg
-    entry_point main_vp
-    profiles vs_1_1 arbvp1
-
-    default_params
-    {
-        param_named_auto lightPosition light_position_object_space 0
-        param_named_auto eyePosition camera_position_object_space
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named shininess float 10 
-    }
-}
-```
+@snippet Samples/Media/materials/scripts/Examples-Advanced.material celshading_vp
 
 The syntax of the parameter definition is exactly the same as when you define parameters when using programs, See @ref Program-Parameter-Specification. Defining default parameters allows you to avoid rebinding common parameters repeatedly (clearly in the above example, all but ’shininess’ are unlikely to change between uses of the program) which makes your material declarations shorter.
 
