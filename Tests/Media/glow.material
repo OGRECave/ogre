@@ -1,77 +1,52 @@
 vertex_program glow_vs_glsl glsl
 {
-	source vs_glow.glsl	
-	
-	default_params
-	{
-        param_named_auto worldViewProjMatrix worldviewproj_matrix
-	}
+	source vs_glow.glsl
 }
-
-vertex_program glow_vs_glsl150 glsl
-{
-	source vs_glow150.glsl
-	syntax glsl150
-
-	default_params
-	{
-        param_named_auto worldViewProjMatrix worldviewproj_matrix
-	}
-}
-
 fragment_program glow_ps_glsl glsl
 {
 	source ps_glow.glsl
 }
 
-fragment_program glow_ps_glsl150 glsl
-{
-	source ps_glow150.glsl
-	syntax glsl150
-}
 vertex_program glow_vs_glsles glsles
 {
-	source vs_glow.glsles
-	default_params
-	{
-        param_named_auto worldViewProjMatrix worldviewproj_matrix
-	}
+	source vs_glow.glsl
 }
 
 fragment_program glow_ps_glsles glsles
 {
-	source ps_glow.glsles
+	source ps_glow.glsl
 }
 
-vertex_program glow_vs_cg cg
+vertex_program glow_vs_cg hlsl
 {
 	source vs_glow.cg
 	entry_point main
-	profiles vs_1_1 arbvp1
-	default_params
-	{
-        param_named_auto worldViewProjMatrix worldviewproj_matrix
-	}
+	target vs_2_0
 }
 
-fragment_program glow_ps_cg cg
+fragment_program glow_ps_cg hlsl
 {
 	source ps_glow.cg
 	entry_point main
-	profiles ps_2_0 arbfp1	
+	target ps_2_0
 }
 
 vertex_program glow_vs unified
 {
-	delegate glow_vs_glsl150
 	delegate glow_vs_glsl
 	delegate glow_vs_glsles
 	delegate glow_vs_cg
+
+    default_params
+	{
+        param_named_auto worldViewProjMatrix worldviewproj_matrix
+        param_named size_value float 1.1
+        param_named_auto time time_0_x 100
+	}
 }
 
 fragment_program glow_ps unified
 {
-	delegate glow_ps_glsl150
 	delegate glow_ps_glsl
 	delegate glow_ps_glsles
 	delegate glow_ps_cg
@@ -94,8 +69,6 @@ material glow
 			}
 			vertex_program_ref glow_vs
 			{
-				param_named size_value float 1.1
-				param_named_auto time time_0_x 100
 			}
 		}
 		
@@ -119,8 +92,6 @@ material alpha_glow
 			}
 			vertex_program_ref glow_vs
 			{
-				param_named size_value float 1.1
-				param_named_auto time time_0_x 100
 			}
 		}
 
@@ -160,8 +131,6 @@ material no_depth_check_glow
 			}
 			vertex_program_ref glow_vs
 			{
-				param_named size_value float 1.1
-				param_named_auto time time_0_x 100
 			}
 		}
 	}

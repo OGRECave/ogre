@@ -1,5 +1,3 @@
-#version 120
-
 uniform float size_value;
 uniform float time;
 uniform mat4 worldViewProjMatrix;
