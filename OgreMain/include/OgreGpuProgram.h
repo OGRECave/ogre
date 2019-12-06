@@ -196,7 +196,8 @@ namespace Ogre {
      */
     bool isRequiredCapabilitiesSupported(void) const;
 
-    /// @copydoc Resource::loadImpl
+    void prepareImpl();
+
     void loadImpl(void);
 
     /// Create the internal params logical & named mapping structures

@@ -335,12 +335,6 @@ namespace Ogre {
         return language;
     }
 
-
-    Ogre::GpuProgramParametersSharedPtr GLSLShader::createParameters(void)
-    {
-        return HighLevelGpuProgram::createParameters();
-    }
-
     GLuint GLSLShader::getGLProgramHandle() {
         //TODO This should be removed and the compile() function
         // should use glCreateShaderProgramv

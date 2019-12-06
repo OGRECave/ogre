@@ -80,10 +80,6 @@ namespace Ogre {
         virtual void loadHighLevel(void);
         /// Internal unload high-level portion if loaded
         virtual void unloadHighLevel(void);
-        /** Internal load implementation, loads just the high-level portion, enough to 
-            get parameters.
-        */
-        virtual void loadHighLevelImpl(void);
         /** Internal method for creating an appropriate low-level program from this
         high-level program, must be implemented by subclasses. */
         virtual void createLowLevelImpl(void) = 0;
