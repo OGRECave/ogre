@@ -1,5 +1,3 @@
-#version 120
-
 uniform float alpha_value;
 uniform float time;
 
