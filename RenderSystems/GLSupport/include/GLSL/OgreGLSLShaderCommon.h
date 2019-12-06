@@ -124,9 +124,9 @@ namespace Ogre {
 
         /** Internal load implementation, must be implemented by subclasses.
         */
-        void loadFromSource(void);
+        void loadFromSource() { compile(true); }
 
-        /// Overridden from HighLevelGpuProgram
+        void prepareImpl(void);
         void unloadImpl(void);
 
         /// Populate the passed parameters with name->index map

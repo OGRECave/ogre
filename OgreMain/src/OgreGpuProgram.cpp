@@ -112,17 +112,26 @@ namespace Ogre
         return memSize + paramsSize;
     }
     //-----------------------------------------------------------------------------
-    void GpuProgram::loadImpl(void)
+    void GpuProgram::prepareImpl()
     {
-        if (mLoadFromFile)
+        if (!mLoadFromFile)
+            return;
+
+        auto stream = ResourceGroupManager::getSingleton().openResource(mFilename, mGroup, this, false);
+
+        if(stream)
         {
-            // find & load source code
-            DataStreamPtr stream = 
-                ResourceGroupManager::getSingleton().openResource(
-                    mFilename, mGroup, this);
             mSource = stream->getAsString();
+            return;
         }
 
+        mCompileError = true;
+        LogManager::getSingleton().logError(StringUtil::format("Gpu Program '%s' not supported: '%s' not found in '%s'",
+                                                               mName.c_str(), mFilename.c_str(), mGroup.c_str()));
+    }
+
+    void GpuProgram::loadImpl(void)
+    {
         // Call polymorphic load
         try 
         {

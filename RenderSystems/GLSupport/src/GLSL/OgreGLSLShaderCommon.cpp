@@ -52,8 +52,10 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLSLShaderCommon::loadFromSource(void)
+    void GLSLShaderCommon::prepareImpl()
     {
+        HighLevelGpuProgram::prepareImpl(); // loads source
+
         // Preprocess the GLSL shader in order to get a clean source
         CPreprocessor cpp;
 
@@ -89,8 +91,6 @@ namespace Ogre {
         mSource = String (out, out_size);
         if (out < src || out > src + src_len)
             free (out);
-
-        compile(true);
     }
     //---------------------------------------------------------------------------
     void GLSLShaderCommon::unloadImpl()
@@ -164,6 +164,7 @@ namespace Ogre {
             // load the source and attach the child shader only if supported
             if (isSupported())
             {
+                childShader->prepare();
                 childShader->loadHighLevel();
                 // add to the container
                 mAttachedGLSLPrograms.push_back( childShader );

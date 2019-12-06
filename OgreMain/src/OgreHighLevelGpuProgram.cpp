@@ -86,6 +86,7 @@ namespace Ogre
         // Only populate named parameters if we can support this program
         if (this->isSupported())
         {
+            prepare(); // loads source
             loadHighLevel();
             // Errors during load may have prevented compile
             if (this->isSupported())
@@ -173,7 +174,7 @@ namespace Ogre
         {
             try 
             {
-                loadHighLevelImpl();
+                loadFromSource();
                 mHighLevelLoaded = true;
                 if (mDefaultParams)
                 {
@@ -219,23 +220,6 @@ namespace Ogre
 
             mHighLevelLoaded = false;
         }
-    }
-    //---------------------------------------------------------------------------
-    void HighLevelGpuProgram::loadHighLevelImpl(void)
-    {
-        if (mLoadFromFile)
-        {
-            // find & load source code
-            DataStreamPtr stream = 
-                ResourceGroupManager::getSingleton().openResource(
-                    mFilename, mGroup, this);
-
-            mSource = stream->getAsString();
-        }
-
-        loadFromSource();
-
-
     }
     //---------------------------------------------------------------------
     const GpuNamedConstants& HighLevelGpuProgram::getConstantDefinitions() const

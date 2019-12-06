@@ -62,7 +62,7 @@ namespace Ogre {
     void D3D11HLSLProgram::notifyDeviceRestored(D3D11Device* device)
     {
         if(mHighLevelLoaded)
-            loadHighLevelImpl();
+            loadFromSource();
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::createConstantBuffer(const UINT ByteWidth)

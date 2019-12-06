@@ -208,6 +208,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLESCgProgram::loadFromSource( void )
     {
+        GLSLESProgram::prepareImpl(); // loads + preprocesses source
 
         // check if syntax is supported
         if (!isSyntaxSupported()) 
@@ -219,15 +220,8 @@ namespace Ogre {
             return;
         }
 
-
-        // add a #define so we can control some cg code in shaders
-        mSource = "#define OPENGL_ES_2\n" + mSource;
-
-        // resolve includes
-        String sourceToUse = _resolveIncludes(mSource, this, mFilename);
-
         // delete ": register(xx)" that hlsl2glsl doesn't know to handle
-        sourceToUse = deleteRegisterFromCg(sourceToUse);
+        String sourceToUse = deleteRegisterFromCg(sourceToUse);
 
 
         // select the program type
