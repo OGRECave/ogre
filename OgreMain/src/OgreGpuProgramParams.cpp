@@ -246,11 +246,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     size_t GpuNamedConstants::calculateSize(void) const
     {
-        size_t memSize = 0;
-
-        // Buffer size refs
-        memSize += 3 * sizeof(size_t);
-
+        size_t memSize = sizeof(*this);
         // Tally up constant defs
         memSize += sizeof(GpuConstantDefinition) * map.size();
 
@@ -369,15 +365,12 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     size_t GpuSharedParameters::calculateSize(void) const
     {
-        size_t memSize = 0;
+        size_t memSize = sizeof(*this);
 
         memSize += sizeof(float) * mFloatConstants.size();
         memSize += sizeof(double) * mDoubleConstants.size();
         memSize += sizeof(int) * mIntConstants.size(); 
         memSize += mName.size() * sizeof(char);
-        memSize += sizeof(Any);
-        memSize += sizeof(size_t);
-        memSize += sizeof(unsigned long);
 
         return memSize;
     }
@@ -887,15 +880,11 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     size_t GpuProgramParameters::calculateSize(void) const
     {
-        size_t memSize = 0;
+        size_t memSize = sizeof(*this);
 
         memSize += sizeof(float) * mFloatConstants.size();
         memSize += sizeof(double) * mDoubleConstants.size();
         memSize += sizeof(int) * mIntConstants.size();
-        memSize += sizeof(Any);
-        memSize += sizeof(size_t);
-        memSize += sizeof(bool) * 2;
-        memSize += sizeof(uint16);
 
         for (AutoConstantList::const_iterator i = mAutoConstants.begin();
              i != mAutoConstants.end(); ++i)

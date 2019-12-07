@@ -91,14 +91,11 @@ namespace Ogre
 
     size_t GpuProgram::calculateSize(void) const
     {
-        size_t memSize = 0;
-        memSize += sizeof(bool) * 7;
+        size_t memSize = sizeof(*this);
         memSize += mManualNamedConstantsFile.size() * sizeof(char);
         memSize += mFilename.size() * sizeof(char);
         memSize += mSource.size() * sizeof(char);
         memSize += mSyntaxCode.size() * sizeof(char);
-        memSize += sizeof(GpuProgramType);
-        memSize += sizeof(ushort);
 
         size_t paramsSize = 0;
         if(mDefaultParams)

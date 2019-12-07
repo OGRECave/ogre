@@ -82,9 +82,6 @@ namespace Ogre {
         /// Compile source into shader object
         bool compile( bool checkErrors = false);
 
-        /// @copydoc Resource::calculateSize
-        size_t calculateSize(void) const;
-
         /// Since GLSL has no assembly, use this shader for binding.
         GpuProgram* _getBindingDelegate(void) { return this; }
 

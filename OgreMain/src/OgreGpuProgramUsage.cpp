@@ -140,10 +140,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     size_t GpuProgramUsage::calculateSize(void) const
     {
-        size_t memSize = 0;
-
-        memSize += sizeof(GpuProgramType);
-        memSize += sizeof(bool);
+        size_t memSize = sizeof(*this);
 
         // Tally up passes
         if(mProgram)

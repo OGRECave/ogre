@@ -51,9 +51,6 @@ namespace Ogre {
         /// Execute the param binding functions for this program
         virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
 
-        /// @copydoc Resource::calculateSize
-        virtual size_t calculateSize(void) const;
-
         /** Test whether attribute index for a given semantic is valid. 
         */
         virtual bool isAttributeValid(VertexElementSemantic semantic, uint index);

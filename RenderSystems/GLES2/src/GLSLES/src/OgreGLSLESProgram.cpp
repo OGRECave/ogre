@@ -373,17 +373,4 @@ namespace Ogre {
             }
         }
     }
-
-    //-----------------------------------------------------------------------------
-    size_t GLSLESProgram::calculateSize(void) const
-    {
-        size_t memSize = 0;
-
-        // Delegate Names
-        memSize += sizeof(GLuint);
-        memSize += sizeof(GLenum);
-        memSize += GpuProgram::calculateSize();
-
-        return memSize;
-    }
 }

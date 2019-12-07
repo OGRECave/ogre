@@ -355,17 +355,4 @@ namespace Ogre {
         }
         return mGLProgramHandle;
     }
-
-    size_t GLSLShader::calculateSize(void) const
-    {
-        size_t memSize = 0;
-
-        // Delegate names.
-        memSize += sizeof(GLuint);
-        memSize += sizeof(GLenum);
-        memSize += GpuProgram::calculateSize();
-
-        return memSize;
-    }
-
 }
