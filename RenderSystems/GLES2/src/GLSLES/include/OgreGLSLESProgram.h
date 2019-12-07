@@ -100,8 +100,6 @@ namespace Ogre {
         /// Since GLSL has no assembly, use this shader for binding.
         GpuProgram* _getBindingDelegate(void) { return this; }
 
-        size_t calculateSize(void) const;
-
     protected:
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         static CmdOptimisation msCmdOptimisation;

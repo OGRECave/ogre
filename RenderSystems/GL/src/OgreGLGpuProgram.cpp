@@ -87,19 +87,6 @@ bool GLGpuProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
     return false;
 }
 
-//-----------------------------------------------------------------------------
-size_t GLGpuProgram::calculateSize(void) const
-{
-    size_t memSize = 0;
-
-    // Delegate Names
-    memSize += sizeof(GLuint);
-    memSize += sizeof(GLenum);
-    memSize += GpuProgram::calculateSize();
-    
-    return memSize;
-}
-
 GLArbGpuProgram::GLArbGpuProgram(ResourceManager* creator, const String& name, 
     ResourceHandle handle, const String& group, bool isManual, 
     ManualResourceLoader* loader) 

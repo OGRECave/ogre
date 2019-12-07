@@ -1317,28 +1317,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     size_t TextureUnitState::calculateSize(void) const
     {
-        size_t memSize = 0;
-
-        memSize += sizeof(unsigned int) * 3;
-        memSize += sizeof(int);
-        memSize += sizeof(float);
-        memSize += sizeof(Real) * 5;
-        memSize += sizeof(bool) * 6;
-        memSize += sizeof(size_t);
-        memSize += sizeof(TextureType);
-        memSize += sizeof(PixelFormat);
-        memSize += sizeof(SamplerPtr);
-        memSize += sizeof(LayerBlendModeEx) * 2;
-        memSize += sizeof(SceneBlendFactor) * 2;
-        memSize += sizeof(Radian);
-        memSize += sizeof(Matrix4);
-        memSize += sizeof(BindingType);
-        memSize += sizeof(ContentType);
-        memSize += sizeof(String) * 4;
-
+        size_t memSize = sizeof(*this);
         memSize += mFramePtrs.size() * sizeof(TexturePtr);
         memSize += mEffects.size() * sizeof(TextureEffect);
-
         return memSize;
     }
 

@@ -100,12 +100,9 @@ namespace Ogre
     }
     size_t HighLevelGpuProgram::calculateSize(void) const
     {
-        size_t memSize = 0;
-        memSize += sizeof(bool);
+        size_t memSize = GpuProgram::calculateSize();
         if(mAssemblerProgram && (mAssemblerProgram.get() != this) )
             memSize += mAssemblerProgram->calculateSize();
-
-        memSize += GpuProgram::calculateSize();
 
         return memSize;
     }
