@@ -50,7 +50,7 @@ namespace Ogre
             // create low-level implementation
             createLowLevelImpl();
             // load constructed assembler program (if it exists)
-            if (mAssemblerProgram && mAssemblerProgram.get() != this)
+            if (mAssemblerProgram)
             {
                 mAssemblerProgram->load();
             }
@@ -60,7 +60,7 @@ namespace Ogre
     //---------------------------------------------------------------------------
     void HighLevelGpuProgram::unloadImpl()
     {   
-        if (mAssemblerProgram && mAssemblerProgram.get() != this)
+        if (mAssemblerProgram)
         {
             mAssemblerProgram->getCreator()->remove(mAssemblerProgram);
             mAssemblerProgram.reset();
@@ -102,7 +102,7 @@ namespace Ogre
     size_t HighLevelGpuProgram::calculateSize(void) const
     {
         size_t memSize = GpuProgram::calculateSize();
-        if(mAssemblerProgram && (mAssemblerProgram.get() != this) )
+        if(mAssemblerProgram)
             memSize += mAssemblerProgram->calculateSize();
 
         return memSize;
