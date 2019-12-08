@@ -1061,7 +1061,7 @@ namespace Ogre {
     {
         assert(mMaterial);
         mMaterialName = mMaterial->getName();
-        mMaterialName = mMaterial->getGroup();
+        mGroupName = mMaterial->getGroup();
 
         mRenderOperation.operationType = opType;
         mRenderOperation.useIndexes = false;
