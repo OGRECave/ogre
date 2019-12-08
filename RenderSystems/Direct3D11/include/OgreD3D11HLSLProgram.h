@@ -97,9 +97,8 @@ namespace Ogre {
         void notifyDeviceLost(D3D11Device* device);
         void notifyDeviceRestored(D3D11Device* device);
 
-        /** Internal method for creating an appropriate low-level program from this
-        high-level program, must be implemented by subclasses. */
-        void createLowLevelImpl(void);
+        /// noop
+        void createLowLevelImpl(void) {}
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
         /// Populate the passed parameters with name->index map, must be overridden
@@ -345,6 +344,9 @@ namespace Ogre {
         void CreateDomainShader();
         void CreateHullShader();
         void CreateComputeShader();
+
+        /// shortcut as we there is no low-level separation here
+        GpuProgram* _getBindingDelegate(void) { return this; }
 
         /** Internal load implementation, must be implemented by subclasses.
         */
