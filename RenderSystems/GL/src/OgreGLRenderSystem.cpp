@@ -2528,7 +2528,7 @@ namespace Ogre {
         GLint primType;
         int operationType = op.operationType;
         // Use adjacency if there is a geometry program and it requested adjacency info
-        if(mGeometryProgramBound && mCurrentGeometryProgram && mCurrentGeometryProgram->isAdjacencyInfoRequired())
+        if(mGeometryProgramBound && mCurrentGeometryProgram && dynamic_cast<GLGpuProgram*>(mCurrentGeometryProgram)->isAdjacencyInfoRequired())
             operationType |= RenderOperation::OT_DETAIL_ADJACENCY_BIT;
         switch (operationType)
         {
@@ -2674,7 +2674,7 @@ namespace Ogre {
                         "GLRenderSystem::bindGpuProgram");
         }
 
-        GLGpuProgram* glprg = static_cast<GLGpuProgram*>(prg);
+        GLGpuProgramBase* glprg = dynamic_cast<GLGpuProgramBase*>(prg);
 
         // Unbind previous gpu program first.
         //
@@ -2693,7 +2693,7 @@ namespace Ogre {
         //     itself, if type is changing (during load/unload, etc), and it's inuse,
         //     unbind and notify render system to correct for its state.
         //
-        switch (glprg->getType())
+        switch (prg->getType())
         {
         case GPT_VERTEX_PROGRAM:
             if (mCurrentVertexProgram != glprg)

@@ -253,15 +253,6 @@ namespace Ogre {
         return compiled == 1;
     }
 
-
-    void GLSLShader::createLowLevelImpl(void)
-    {
-        // mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLShader(this));
-        // // Shader params need to be forwarded to low level implementation
-        // mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
-        // mAssemblerProgram->setComputeGroupDimensions(getComputeGroupDimensions());
-    }
-
     void GLSLShader::unloadHighLevelImpl(void)
     {
         OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));

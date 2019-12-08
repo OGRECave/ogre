@@ -66,7 +66,7 @@ GLGpuProgram::~GLGpuProgram()
     unload(); 
 }
 
-bool GLGpuProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
+bool GLGpuProgramBase::isAttributeValid(VertexElementSemantic semantic, uint index)
 {
     // default implementation
     switch(semantic)

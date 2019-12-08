@@ -92,16 +92,6 @@ namespace Ogre {
         if (out < src || out > src + src_len)
             free (out);
     }
-    //---------------------------------------------------------------------------
-    void GLSLShaderCommon::unloadImpl()
-    {
-        // We didn't create mAssemblerProgram through a manager, so override this
-        // implementation so that we don't try to remove it from one. Since getCreator()
-        // is used, it might target a different matching handle!
-        mAssemblerProgram.reset();
-
-        unloadHighLevel();
-    }
 
     //-----------------------------------------------------------------------
     void GLSLShaderCommon::populateParameterNames(GpuProgramParametersSharedPtr params)

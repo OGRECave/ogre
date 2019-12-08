@@ -244,10 +244,6 @@ namespace Ogre {
     }
 #endif
     //-----------------------------------------------------------------------
-    void GLSLESProgram::createLowLevelImpl(void)
-    {
-    }
-    //-----------------------------------------------------------------------
     void GLSLESProgram::unloadHighLevelImpl(void)
     {
         if (isSupported())
