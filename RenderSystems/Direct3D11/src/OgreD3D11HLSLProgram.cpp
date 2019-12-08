@@ -220,8 +220,10 @@ namespace Ogre {
         defines.push_back(macro);
     }       
     //-----------------------------------------------------------------------
-    void D3D11HLSLProgram::loadFromSource(void)
+    void D3D11HLSLProgram::prepareImpl()
     {
+        HighLevelGpuProgram::prepareImpl();
+
         uint32 hash = getNameForMicrocodeCache();
         if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
         {
@@ -231,6 +233,12 @@ namespace Ogre {
         {
             compileMicrocode();
         }
+    }
+
+    void D3D11HLSLProgram::loadFromSource(void)
+    {
+        if(!mCompileError)
+            analizeMicrocode();
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::getMicrocodeFromCache(uint32 id)
@@ -399,9 +407,6 @@ namespace Ogre {
             mInterfaceSlots.resize(mInterfaceSlotsSize);
             cacheMicrocode->read(&mInterfaceSlots[0], mInterfaceSlotsSize * sizeof(UINT));
         }
-
-
-        analizeMicrocode();
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::compileMicrocode(void)
@@ -1016,9 +1021,6 @@ namespace Ogre {
                 GpuProgramManager::getSingleton().addMicrocodeToCache(getNameForMicrocodeCache(), newMicrocode);
             }
         }
-
-        analizeMicrocode();
-
 #endif // else defined(ENABLE_SHADERS_CACHE_LOAD) && (ENABLE_SHADERS_CACHE_LOAD == 1)
     }
     //-----------------------------------------------------------------------

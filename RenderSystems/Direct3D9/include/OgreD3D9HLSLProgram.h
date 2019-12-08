@@ -114,9 +114,8 @@ namespace Ogre {
         static CmdAssemblerCode msCmdAssemblerCode;
         static CmdBackwardsCompatibility msCmdBackwardsCompatibility;
 
-        /** Internal load implementation, must be implemented by subclasses.
-        */
-        void loadFromSource(void);
+        void prepareImpl();
+        void loadFromSource() {} // all done in prepare
         /** Internal method for creating an appropriate low-level program from this
         high-level program, must be implemented by subclasses. */
         void createLowLevelImpl(void);
