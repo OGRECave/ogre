@@ -164,7 +164,7 @@ namespace Ogre {
             // load the source and attach the child shader only if supported
             if (isSupported())
             {
-                childShader->prepare();
+                childShader->safePrepare();
                 childShader->loadHighLevel();
                 // add to the container
                 mAttachedGLSLPrograms.push_back( childShader );

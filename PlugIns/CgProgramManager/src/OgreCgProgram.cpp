@@ -746,7 +746,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void CgProgram::loadHighLevelSafe()
 	{
-	    prepare();
+	    safePrepare()
 		OGRE_LOCK_AUTO_MUTEX;
 		if (this->isSupported())
 			loadHighLevel();
