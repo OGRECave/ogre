@@ -117,17 +117,27 @@ namespace Ogre
         if (!mLoadFromFile)
             return;
 
-        auto stream = ResourceGroupManager::getSingleton().openResource(mFilename, mGroup, this, false);
+        mSource = ResourceGroupManager::getSingleton().openResource(mFilename, mGroup, this)->getAsString();
+    }
 
-        if(stream)
+    void GpuProgram::safePrepare()
+    {
+        try
         {
-            mSource = stream->getAsString();
-            return;
+            prepare();
         }
+        catch (const RuntimeAssertionException&)
+        {
+            throw;
+        }
+        catch (const Exception& e)
+        {
+            // will already have been logged
+            LogManager::getSingleton().stream(LML_CRITICAL)
+                << "Program '" << mName << "' is not supported: " << e.getDescription();
 
-        mCompileError = true;
-        LogManager::getSingleton().logError(StringUtil::format("Gpu Program '%s' not supported: '%s' not found in '%s'",
-                                                               mName.c_str(), mFilename.c_str(), mGroup.c_str()));
+            mCompileError = true;
+        }
     }
 
     void GpuProgram::loadImpl(void)

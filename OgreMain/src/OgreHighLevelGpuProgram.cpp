@@ -86,7 +86,7 @@ namespace Ogre
         // Only populate named parameters if we can support this program
         if (this->isSupported())
         {
-            prepare(); // loads source
+            safePrepare(); // loads source
             loadHighLevel();
             // Errors during load may have prevented compile
             if (this->isSupported())

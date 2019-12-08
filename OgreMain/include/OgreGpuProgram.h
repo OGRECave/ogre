@@ -196,6 +196,9 @@ namespace Ogre {
      */
     bool isRequiredCapabilitiesSupported(void) const;
 
+    // catches errors during prepare
+    void safePrepare();
+
     void prepareImpl();
 
     void loadImpl(void);
