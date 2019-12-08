@@ -37,7 +37,7 @@ Code Style Update    : Apr 5, 2007
 #ifndef SEGMENT_H
 #define SEGMENT_H
 
-#include "OgreVector3.h"
+#include "OgreVector.h"
 
 namespace Ogre
 {

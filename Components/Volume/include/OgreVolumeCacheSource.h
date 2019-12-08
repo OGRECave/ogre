@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __Ogre_Volume_CacheSource_H__
 #define __Ogre_Volume_CacheSource_H__
 
-#include "OgreVector4.h"
+#include "OgreVector.h"
 
 #include "OgreVolumeSource.h"
 #include "OgreVolumePrerequisites.h"

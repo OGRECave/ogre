@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __Ogre_Volume_CSGSource_H__
 
 #include "OgreVolumeSource.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreVolumePrerequisites.h"
 #include "OgreVolumeSimplexNoise.h"

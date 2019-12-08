@@ -30,8 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
-#include "OgreVector2.h"
-#include "OgreVector4.h"
+#include "OgreVector.h"
 #include "OgreColourValue.h"
 #include "OgreStringVector.h"
 #include "OgreException.h"

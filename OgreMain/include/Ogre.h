@@ -126,7 +126,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreTextureUnitState.h"
 #include "OgreTimer.h"
-#include "OgreVector2.h"
+#include "OgreVector.h"
 #include "OgreViewport.h"
 #include "OgreComponents.h"
 // .... more to come

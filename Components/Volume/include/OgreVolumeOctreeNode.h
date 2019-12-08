@@ -29,8 +29,7 @@ THE SOFTWARE.
 #define __Ogre_Volume_OctreeNode_H__
 
 #include "OgreVolumePrerequisites.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
+#include "OgreVector.h"
 
 namespace Ogre {
 

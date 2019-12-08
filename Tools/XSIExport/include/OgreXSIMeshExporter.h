@@ -29,8 +29,7 @@ THE SOFTWARE.
 #define __XSIMESHEXPORTER_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreVector2.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 #include "OgreColourValue.h"
 #include "OgreMesh.h"
 #include "OgreProgressiveMesh.h"
