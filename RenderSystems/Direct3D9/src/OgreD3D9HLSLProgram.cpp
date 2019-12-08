@@ -85,9 +85,10 @@ namespace Ogre {
     };
 
     //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    void D3D9HLSLProgram::loadFromSource(void)
+    void D3D9HLSLProgram::prepareImpl()
     {
+        HighLevelGpuProgram::prepareImpl();
+
         uint32 hash = _getHash();
         if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) )
         {
@@ -231,8 +232,7 @@ namespace Ogre {
                 errors->Release();
             }
 
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
-                "D3D9HLSLProgram::loadFromSource");
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message);
         }
         else
         {
@@ -245,9 +245,8 @@ namespace Ogre {
 
             if (FAILED(hr))
             {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Cannot retrieve constant descriptions from HLSL program.", 
-                    "D3D9HLSLProgram::buildParameterNameMap");
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                            "Cannot retrieve constant descriptions from HLSL program");
             }
             // Iterate over the constants
             for (unsigned int i = 0; i < desc.Constants; ++i)

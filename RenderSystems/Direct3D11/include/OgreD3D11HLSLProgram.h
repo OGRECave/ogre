@@ -350,6 +350,8 @@ namespace Ogre {
         */
         void loadFromSource(void);
 
+        void prepareImpl();
+
         void reinterpretGSForStreamOut(void);
         bool mReinterpretingGS;
         
