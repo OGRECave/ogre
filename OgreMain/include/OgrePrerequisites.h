@@ -61,7 +61,6 @@ namespace Ogre {
     /// @deprecated
     #define OGRE_HashMultiSet ::std::unordered_multiset
 
-
     /** In order to avoid finger-aches :)
     */
     typedef unsigned char uchar;
@@ -312,6 +311,9 @@ settings have been made.
 
 namespace Ogre
 {
+    /// @deprecated use std::atomic
+    template<class T> using AtomicScalar = std::atomic<T>;
+
     typedef std::string _StringBase;
     typedef std::basic_stringstream<char,std::char_traits<char>,std::allocator<char> > _StringStreamBase;
 

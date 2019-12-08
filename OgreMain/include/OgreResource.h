@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define _Resource_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreAtomicScalar.h"
 #include "OgreStringInterface.h"
 #include "OgreHeaderPrefix.h"
 #include "Threading/OgreThreadHeaders.h"
@@ -141,7 +140,7 @@ namespace Ogre {
         /// Numeric handle for more efficient look up than name
         ResourceHandle mHandle;
         /// Is the resource currently loaded?
-        AtomicScalar<LoadingState> mLoadingState;
+        std::atomic<LoadingState> mLoadingState;
         /// Is this resource going to be background loaded? Only applicable for multithreaded
         volatile bool mIsBackgroundLoaded;
         /// Is this file manually loaded?

@@ -505,8 +505,8 @@ namespace Ogre {
         ResourceMap mResources;
         ResourceWithGroupMap mResourcesWithGroup;
         size_t mMemoryBudget; /// In bytes
-        AtomicScalar<ResourceHandle> mNextHandle;
-        AtomicScalar<size_t> mMemoryUsage; /// In bytes
+        std::atomic<ResourceHandle> mNextHandle;
+        std::atomic<size_t> mMemoryUsage; /// In bytes
 
         bool mVerbose;
 
