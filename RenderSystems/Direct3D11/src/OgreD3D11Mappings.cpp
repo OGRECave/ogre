@@ -630,6 +630,8 @@ namespace Ogre
         }
         switch(ogrePF)
         {
+        case PF_R8G8B8:
+            return PF_X8R8G8B8;
         case PF_FLOAT16_RGB:
             return PF_FLOAT16_RGBA;
         case PF_FLOAT32_RGB:
