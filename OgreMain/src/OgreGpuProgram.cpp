@@ -163,16 +163,18 @@ namespace Ogre
 
             }
         }
-        catch (const Exception&)
+        catch (const RuntimeAssertionException&)
+        {
+            throw;
+        }
+        catch (const Exception& e)
         {
             // will already have been logged
-            LogManager::getSingleton().stream()
-                << "Gpu program " << mName << " encountered an error "
-                << "during loading and is thus not supported.";
+            LogManager::getSingleton().stream(LML_CRITICAL)
+                << "Program '" << mName << "' is not supported: " << e.getDescription();
 
             mCompileError = true;
         }
-
     }
     //-----------------------------------------------------------------------------
     bool GpuProgram::isRequiredCapabilitiesSupported(void) const

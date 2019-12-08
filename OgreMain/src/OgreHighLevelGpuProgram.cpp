@@ -172,40 +172,8 @@ namespace Ogre
     {
         if (!mHighLevelLoaded)
         {
-            try 
-            {
-                loadFromSource();
-                mHighLevelLoaded = true;
-                if (mDefaultParams)
-                {
-                    // Keep a reference to old ones to copy
-                    GpuProgramParametersSharedPtr savedParams = mDefaultParams;
-                    // reset params to stop them being referenced in the next create
-                    mDefaultParams.reset();
-
-                    // Create new params
-                    mDefaultParams = createParameters();
-
-                    // Copy old (matching) values across
-                    // Don't use copyConstantsFrom since program may be different
-                    mDefaultParams->copyMatchingNamedConstantsFrom(*savedParams.get());
-
-                }
-
-            }
-            catch (const RuntimeAssertionException&)
-            {
-                throw;
-            }
-            catch (const Exception& e)
-            {
-                // will already have been logged
-                LogManager::getSingleton().stream(LML_CRITICAL)
-                    << "High-level program '" << mName << "' is not supported: "
-                    << e.getDescription();
-
-                mCompileError = true;
-            }
+            GpuProgram::loadImpl();
+            mHighLevelLoaded = !mCompileError;
         }
     }
     //---------------------------------------------------------------------------
