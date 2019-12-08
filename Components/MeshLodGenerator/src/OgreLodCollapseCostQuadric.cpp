@@ -33,7 +33,7 @@
  */
 
 #include "OgreLodCollapseCostQuadric.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 
 namespace Ogre
 {

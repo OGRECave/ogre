@@ -28,7 +28,7 @@
 #include <android/native_window_jni.h>
 
 // adapt to OGRE
-#include "OgreVector2.h"
+#include "OgreVector.h"
 #include <android/log.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "Ogre", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "Ogre", __VA_ARGS__))

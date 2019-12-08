@@ -31,8 +31,7 @@ THE SOFTWARE.
 
 #include "OgrePagingPrerequisites.h"
 #include "OgrePageStrategy.h"
-#include "OgreVector2.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 
 namespace Ogre
 {

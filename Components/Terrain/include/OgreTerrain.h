@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgreCommon.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreSceneManager.h"
 #include "OgreTerrainMaterialGenerator.h"

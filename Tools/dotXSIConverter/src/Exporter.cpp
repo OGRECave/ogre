@@ -18,9 +18,6 @@
 #include "OgreMeshSerializer.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgrePrerequisites.h"
-#include "OgreVector2.h"
-#include "OgreVector3.h"
-#include "OgreVector3.h"
 #include "OgreColourValue.h"
 
 using namespace Ogre;

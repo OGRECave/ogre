@@ -48,7 +48,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringVector.h"
 #include "OgreSingleton.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 #include "OgreQuaternion.h"
 #include "OgreHardwareVertexBuffer.h"
 

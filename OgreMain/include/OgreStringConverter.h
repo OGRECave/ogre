@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreColourValue.h"
 #include "OgreMatrix4.h"
-#include "OgreVector2.h"
+#include "OgreVector.h"
 
 namespace Ogre {
 

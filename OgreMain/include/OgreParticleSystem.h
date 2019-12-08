@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreVector3.h"
+#include "OgreVector.h"
 #include "OgreParticleIterator.h"
 #include "OgreStringInterface.h"
 #include "OgreMovableObject.h"

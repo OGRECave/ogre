@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __Ogre_Simplex_Noise_H__
 #define __Ogre_Simplex_Noise_H__
 
-#include "OgreVector3.h"
+#include "OgreVector.h"
 
 #include "OgreVolumePrerequisites.h"
 

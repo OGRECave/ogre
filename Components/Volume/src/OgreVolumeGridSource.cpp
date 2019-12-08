@@ -25,7 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreVolumeGridSource.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 #include "OgreLogManager.h"
 #include "OgreRay.h"
 #include "OgreVolumeCSGSource.h"

@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgreParticleFXPrerequisites.h"
 #include "OgreParticleAffector.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 
 
 namespace Ogre {

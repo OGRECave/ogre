@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 #include "OgreResourceManager.h"
 #include "OgreSingleton.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 #include "OgreHardwareBuffer.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgrePatchSurface.h"

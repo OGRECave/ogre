@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "OgreMatrix4.h"
 #include "OgreMaterial.h"
 #include "OgrePlane.h"
-#include "OgreVector4.h"
+#include "OgreVector.h"
 #include "OgreException.h"
 #include "OgreUserObjectBindings.h"
 #include "OgreHeaderPrefix.h"

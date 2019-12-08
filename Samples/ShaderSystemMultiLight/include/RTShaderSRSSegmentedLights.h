@@ -29,7 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreShaderSubRenderState.h"
-#include "OgreVector4.h"
+#include "OgreVector.h"
 #include "OgreLight.h"
 #include "OgreCommon.h"
 

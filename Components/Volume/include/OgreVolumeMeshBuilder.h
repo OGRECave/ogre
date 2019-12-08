@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include <vector>
 #include "OgreManualObject.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreVolumePrerequisites.h"
 

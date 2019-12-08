@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreStreamSerialiser.h"
 #include "OgreFileSystem.h"
 #include "OgreException.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 
 
 using namespace Ogre;

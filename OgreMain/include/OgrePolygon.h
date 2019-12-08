@@ -30,7 +30,7 @@ THE SOFTWARE.
 #define __Polygon_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreVector3.h"
+#include "OgreVector.h"
 #include "OgreHeaderPrefix.h"
 
 
