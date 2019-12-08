@@ -35,31 +35,27 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    struct GLGpuProgramBase
+    {
+        virtual ~GLGpuProgramBase() {}
+        /// Execute the binding functions for this program
+        virtual void bindProgram(void) = 0;
+        /// Execute the binding functions for this program
+        virtual void unbindProgram(void) = 0;
+        /// Execute the param binding functions for this program
+        virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) = 0;
+        /// Test whether attribute index for a given semantic is valid
+        virtual bool isAttributeValid(VertexElementSemantic semantic, uint index);
+    };
+
     /** Generalised low-level GL program, can be applied to multiple types (eg ARB and NV) */
-    class _OgreGLExport GLGpuProgram : public GpuProgram
+    class _OgreGLExport GLGpuProgram : public GpuProgram, public GLGpuProgramBase
     {
     public:
         GLGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
         virtual ~GLGpuProgram();
-
-        /// Execute the binding functions for this program
-        virtual void bindProgram(void) {}
-        /// Execute the binding functions for this program
-        virtual void unbindProgram(void) {}
-
-        /// Execute the param binding functions for this program
-        virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
-
-        /** Test whether attribute index for a given semantic is valid. 
-        */
-        virtual bool isAttributeValid(VertexElementSemantic semantic, uint index);
-
     protected:
-        /** Overridden from GpuProgram, do nothing */
-        void loadFromSource(void) {}
-        /// @copydoc Resource::unloadImpl
-        void unloadImpl(void) {}
 
         GLuint mProgramID;
     };

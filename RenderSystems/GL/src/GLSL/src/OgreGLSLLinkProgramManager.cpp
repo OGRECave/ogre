@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreGLSLLinkProgramManager.h"
-#include "OgreGLSLGpuProgram.h"
 #include "OgreGLSLProgram.h"
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"

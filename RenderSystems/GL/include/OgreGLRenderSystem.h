@@ -112,9 +112,9 @@ namespace Ogre {
 
         unsigned short mCurrentLights;
 
-        GLGpuProgram* mCurrentVertexProgram;
-        GLGpuProgram* mCurrentFragmentProgram;
-        GLGpuProgram* mCurrentGeometryProgram;
+        GLGpuProgramBase* mCurrentVertexProgram;
+        GLGpuProgramBase* mCurrentFragmentProgram;
+        GLGpuProgramBase* mCurrentGeometryProgram;
 
         // statecaches are per context
         GLStateCacheManager* mStateCacheManager;

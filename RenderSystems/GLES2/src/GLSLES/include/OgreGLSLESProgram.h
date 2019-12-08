@@ -33,20 +33,6 @@ THE SOFTWARE.
 #include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
-    /** Specialisation of HighLevelGpuProgram to provide support for OpenGL 
-        Shader Language (GLSL ES) for OpenGL ES 2.0.
-    @remarks
-        GLSL ES has no target assembler or entry point specification like DirectX 9 HLSL.
-        Vertex and Fragment shaders only have one entry point called "main".  
-        When a shader is compiled, microcode is generated but can not be accessed by
-        the application.
-        GLSL ES also does not provide assembler low level output after compiling.  The GL ES Render
-        system assumes that the Gpu program is a GL Gpu program so GLSLESProgram will create a 
-        GLSLESGpuProgram that is subclassed from GLES2GpuProgram for the low level implementation.
-        The GLES2Program class will create a shader object and compile the source but will
-        not create a program object.  It's up to GLES2GpuProgram class to request a program object
-        to link the shader object to.
-    */
     class _OgreGLES2Export GLSLESProgram : public GLSLShaderCommon MANAGED_RESOURCE
     {
     public:
@@ -97,20 +83,11 @@ namespace Ogre {
         /// compile source into shader object
         bool compile( bool checkErrors = false);
 
-        /// Since GLSL has no assembly, use this shader for binding.
-        GpuProgram* _getBindingDelegate(void) { return this; }
-
     protected:
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         static CmdOptimisation msCmdOptimisation;
 #endif
 
-        /** Internal method for creating a dummy low-level program for this
-        high-level program. GLSL ES does not give access to the low level implementation of the
-        shader so this method creates an object sub-classed from GLES2GpuProgram just to be
-        compatible with GLES2RenderSystem.
-        */
-        void createLowLevelImpl(void);
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
 

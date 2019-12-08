@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 
 #include "OgreGLSLProgram.h"
-#include "OgreGLSLGpuProgram.h"
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLSLLinkProgramManager.h"
 #include "OgreGLSLPreprocessor.h"
@@ -240,14 +239,6 @@ namespace Ogre {
 
         return (compiled == 1);
     }
-
-    //-----------------------------------------------------------------------
-    void GLSLProgram::createLowLevelImpl(void)
-    {
-        mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLGpuProgram( this ));
-        // Shader params need to be forwarded to low level implementation
-        mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
-    }
     //-----------------------------------------------------------------------
     void GLSLProgram::unloadHighLevelImpl(void)
     {
@@ -385,6 +376,49 @@ namespace Ogre {
         static const String language = "glsl";
 
         return language;
+    }
+    //-----------------------------------------------------------------------------
+    void GLSLProgram::bindProgram(void)
+    {
+        // Tell the Link Program Manager what shader is to become active
+        GLSLLinkProgramManager::getSingleton().setActiveShader( mType, this );
+    }
+    //-----------------------------------------------------------------------------
+    void GLSLProgram::unbindProgram(void)
+    {
+        // Tell the Link Program Manager what shader is to become inactive
+        GLSLLinkProgramManager::getSingleton().setActiveShader( mType, NULL );
+    }
+
+    //-----------------------------------------------------------------------------
+    void GLSLProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    {
+        // link can throw exceptions, ignore them at this point
+        try
+        {
+            // activate the link program object
+            GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+            // pass on parameters from params to program object uniforms
+            linkProgram->updateUniforms(params, mask, mType);
+        }
+        catch (Exception&) {}
+
+    }
+    //-----------------------------------------------------------------------------
+    bool GLSLProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
+    {
+        // get link program - only call this in the context of bound program
+        GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
+
+        if (linkProgram->isAttributeValid(semantic, index))
+        {
+            return true;
+        }
+        else
+        {
+            // fall back to default implementation, allow default bindings
+            return GLGpuProgramBase::isAttributeValid(semantic, index);
+        }
     }
 }
 }
