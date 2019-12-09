@@ -42,12 +42,12 @@ namespace Ogre {
     *  @{
     */
     /** Specialisation of HighLevelGpuProgram which just delegates its implementation
-        to one other high level program, allowing a single program definition
+        to one other GpuProgram, allowing a single program definition
         to represent one supported program from a number of options
     @remarks
         Whilst you can use Technique to implement several ways to render an object
         depending on hardware support, if the only reason to need multiple paths is
-        because of the high-level shader language supported, this can be 
+        because of the shader language supported, this can be
         cumbersome. For example you might want to implement the same shader 
         in HLSL and GLSL for portability but apart from the implementation detail,
         the shaders do the same thing and take the same parameters. If the materials
@@ -81,7 +81,7 @@ namespace Ogre {
         /// Ordered list of potential delegates
         StringVector mDelegateNames;
         /// The chosen delegate
-        mutable HighLevelGpuProgramPtr mChosenDelegate;
+        mutable GpuProgramPtr mChosenDelegate;
 
         /// Choose the delegate to use
         void chooseDelegate() const;
@@ -109,7 +109,7 @@ namespace Ogre {
         void clearDelegatePrograms();
 
         /// Get the chosen delegate
-        const HighLevelGpuProgramPtr& _getDelegate() const;
+        const GpuProgramPtr& _getDelegate() const;
 
         /** @copydoc GpuProgram::getLanguage */
         const String& getLanguage(void) const;

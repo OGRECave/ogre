@@ -80,18 +80,16 @@ namespace Ogre
 
         mChosenDelegate.reset();
 
-        HighLevelGpuProgramPtr tmpDelegate;
-        tmpDelegate.reset();
+        GpuProgramPtr tmpDelegate;
         int tmpPriority = -1;
 
-        for (StringVector::const_iterator i = mDelegateNames.begin(); i != mDelegateNames.end(); ++i)
+        for (const String& dn : mDelegateNames)
         {
-            HighLevelGpuProgramPtr deleg = HighLevelGpuProgramManager::getSingleton().getByName(*i, mGroup);
+            GpuProgramPtr deleg = GpuProgramManager::getSingleton().getByName(dn, mGroup);
 
             //recheck with auto resource group
             if (!deleg)
-                deleg = HighLevelGpuProgramManager::getSingleton().getByName(
-                    *i, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+                deleg = GpuProgramManager::getSingleton().getByName(dn, RGN_AUTODETECT);
 
             // Silently ignore missing links
             if(!deleg || !deleg->isSupported())
@@ -99,9 +97,8 @@ namespace Ogre
 
             if (deleg->getType() != getType())
             {
-                LogManager::getSingleton().logError(
-                    "unified program '" + getName() +
-                    "' delegating to program with different type '" + *i + "'");
+                LogManager::getSingleton().logError("unified program '" + getName() +
+                                                    "' delegating to program with different type '" + dn + "'");
                 continue;
             }
 
@@ -117,7 +114,7 @@ namespace Ogre
         mChosenDelegate = tmpDelegate;
     }
     //-----------------------------------------------------------------------
-    const HighLevelGpuProgramPtr& UnifiedHighLevelGpuProgram::_getDelegate() const
+    const GpuProgramPtr& UnifiedHighLevelGpuProgram::_getDelegate() const
     {
         if (!mChosenDelegate)
         {
