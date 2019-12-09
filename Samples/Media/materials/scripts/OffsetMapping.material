@@ -1,35 +1,18 @@
 // Bump map with Parallax offset vertex program, support for this is required 
-vertex_program Examples/OffsetMappingVP/Cg cg 
+vertex_program Examples/OffsetMappingVP/HLSL hlsl
 { 
    source OffsetMapping.cg 
    entry_point main_vp 
-   profiles vs_1_1 arbvp1 
+   target vs_2_0
 } 
 
 // Bump map with parallax fragment program 
-fragment_program Examples/OffsetMappingFP/Cg cg
+fragment_program Examples/OffsetMappingFP/HLSL hlsl
 { 
    source OffsetMapping.cg
    entry_point main_fp
-   profiles ps_2_0 arbfp1
+   target ps_2_0
 } 
-
-// Bump map with Parallax offset vertex program, support for this is required 
-vertex_program Examples/OffsetMappingVPShaderModel4 cg 
-{ 
-   source OffsetMapping.cg 
-   entry_point main_vp 
-   profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 
-} 
-
-// Bump map with parallax fragment program 
-fragment_program Examples/OffsetMappingFPShaderModel4 cg
-{ 
-   source OffsetMapping.cg
-   entry_point main_fp
-   profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-} 
-
 
 // Bump map with parallax fragment program 
 fragment_program Examples/OffsetMappingPS/Asm asm 
@@ -106,14 +89,14 @@ vertex_program Examples/OffsetMappingVP unified
 {
 	delegate Examples/OffsetMappingVP/GLSL
 	delegate Examples/OffsetMappingVP/GLSLES
-	delegate Examples/OffsetMappingVP/Cg
+	delegate Examples/OffsetMappingVP/HLSL
 }
 
 fragment_program Examples/OffsetMappingFP unified
 {
 	delegate Examples/OffsetMappingFP/GLSL
 	delegate Examples/OffsetMappingFP/GLSLES
-	delegate Examples/OffsetMappingFP/Cg
+	delegate Examples/OffsetMappingFP/HLSL
 }
 
 fragment_program Examples/OffsetMappingPS unified
@@ -125,82 +108,12 @@ fragment_program Examples/OffsetMappingPS unified
 
 
 material Examples/OffsetMapping/Specular 
-{ 
-   technique ShaderModel4
+{
+   technique
    {
-      // ambient / depth
-      pass
-      {
-          illumination_stage ambient
-          vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
-          {
-              param_named_auto worldViewProj worldviewproj_matrix
-          }
-          fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFpCgSm4ForAmbientOneTexture
-          {
-          }
-      }
-
-      // do the lighting and bump mapping with parallax pass 
-      pass 
-      {
-         illumination_stage per_light
-         scene_blend add
-         depth_write off
-       
-         // Vertex program reference 
-         vertex_program_ref Examples/OffsetMappingVPShaderModel4
-         { 
-            param_named_auto lightPosition light_position_object_space 0 
-            param_named_auto eyePosition camera_position_object_space 
-            param_named_auto worldViewProj worldviewproj_matrix 
-         } 
-
-         // Fragment program 
-         fragment_program_ref Examples/OffsetMappingFPShaderModel4
-         { 
-            param_named_auto lightDiffuse light_diffuse_colour 0 
-            param_named_auto lightSpecular light_specular_colour 0 
-            // Parallax Height scale and bias 
-            param_named scaleBias float4 0.04 -0.02 1 0 
-         } 
-          
-         // Normal + height(alpha) map 
-         texture_unit 
-         { 
-            texture rockwall_NH.tga
-            tex_coord_set 0 
-         } 
-
-         // Base diffuse texture map 
-         texture_unit 
-         { 
-            texture rockwall.tga
-            tex_coord_set 1 
-         } 
-      } 
-   } 
-
-   technique GLES
-   {
-       // ambient / depth
-       pass
-       {
-           illumination_stage ambient
-           vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-           {
-           }
-           fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-           {
-           }		  
-       }
        // do the lighting and bump mapping with parallax pass 
        pass 
        {
-           illumination_stage per_light
-           scene_blend add
-           depth_write off
-       
            // Vertex program reference 
            vertex_program_ref Examples/OffsetMappingVP 
            { 
@@ -232,57 +145,6 @@ material Examples/OffsetMapping/Specular
               tex_coord_set 1 
            } 
        } 
-   } 
-
-   technique gl dx9
-   {
-   	  // ambient / depth
-          pass
-          {
-              illumination_stage ambient
-        	  vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-        	  {
-        	  }
-		  
-          }
-      // do the lighting and bump mapping with parallax pass 
-      pass 
-      {
-             illumination_stage per_light
-             scene_blend add
-        	 depth_write off
-       
-         // Vertex program reference 
-         vertex_program_ref Examples/OffsetMappingVP 
-         { 
-            param_named_auto lightPosition light_position_object_space 0 
-            param_named_auto eyePosition camera_position_object_space 
-            param_named_auto worldViewProj worldviewproj_matrix 
-         } 
-
-         // Fragment program 
-         fragment_program_ref Examples/OffsetMappingFP
-         { 
-            param_named_auto lightDiffuse light_diffuse_colour 0 
-            param_named_auto lightSpecular light_specular_colour 0 
-            // Parallax Height scale and bias 
-            param_named scaleBias float4 0.04 -0.02 1 0 
-         } 
-          
-         // Normal + height(alpha) map 
-         texture_unit 
-         { 
-            texture rockwall_NH.tga
-            tex_coord_set 0 
-         } 
-
-         // Base diffuse texture map 
-         texture_unit 
-         { 
-            texture rockwall.tga
-            tex_coord_set 1 
-         } 
-      } 
    } 
 
    // This is the preferred technique which uses both vertex and 
