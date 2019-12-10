@@ -57,13 +57,6 @@ namespace Ogre {
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
-        /// Command object for setting macro defines
-        class CmdPreprocessorDefines : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
         /// Command object for setting matrix packing in column-major order
         class CmdColumnMajorMatrices : public ParamCommand
         {
@@ -107,7 +100,6 @@ namespace Ogre {
 
         static CmdEntryPoint msCmdEntryPoint;
         static CmdTarget msCmdTarget;
-        static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
         static CmdOptimisation msCmdOptimisation;
         static CmdMicrocode msCmdMicrocode;

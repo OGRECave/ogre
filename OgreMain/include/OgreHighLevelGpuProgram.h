@@ -99,6 +99,8 @@ namespace Ogre {
         void loadImpl();
         /** @copydoc Resource::unloadImpl */
         void unloadImpl();
+
+        void setupBaseParamDictionary();
     public:
         /** Constructor, should be used only by factory classes. */
         HighLevelGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,

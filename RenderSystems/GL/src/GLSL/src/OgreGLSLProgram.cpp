@@ -299,9 +299,6 @@ namespace Ogre {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("preprocessor_defines", 
-                "Preprocessor defines use to compile the program.",
-                PT_STRING),&msCmdPreprocessorDefines);
             dict->addParameter(ParameterDef("attach", 
                 "name of another GLSL program needed by this program",
                 PT_STRING),&msCmdAttach);

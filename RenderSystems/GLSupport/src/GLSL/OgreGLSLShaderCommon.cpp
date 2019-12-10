@@ -40,7 +40,7 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     uint GLSLShaderCommon::mShaderCount = 0;
-    GLSLShaderCommon::CmdPreprocessorDefines GLSLShaderCommon::msCmdPreprocessorDefines;
+
     GLSLShaderCommon::CmdAttach GLSLShaderCommon::msCmdAttach;
     GLSLShaderCommon::CmdColumnMajorMatrices GLSLShaderCommon::msCmdColumnMajorMatrices;
 
@@ -127,16 +127,6 @@ namespace Ogre {
             static_cast<GLSLShaderCommon*>(target)->attachChildShader(vecShaderNames[i]);
         }
     }
-    //-----------------------------------------------------------------------
-    String GLSLShaderCommon::CmdPreprocessorDefines::doGet(const void *target) const
-    {
-        return static_cast<const GLSLShaderCommon*>(target)->getPreprocessorDefines();
-    }
-    void GLSLShaderCommon::CmdPreprocessorDefines::doSet(void *target, const String& val)
-    {
-        static_cast<GLSLShaderCommon*>(target)->setPreprocessorDefines(val);
-    }
-
     //-----------------------------------------------------------------------
     void GLSLShaderCommon::attachChildShader(const String& name)
     {

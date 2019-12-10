@@ -31,6 +31,30 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    /// Command object for setting macro defines
+    class CmdPreprocessorDefines : public ParamCommand
+    {
+    public:
+        //-----------------------------------------------------------------------
+        String doGet(const void* target) const
+        {
+            return static_cast<const HighLevelGpuProgram*>(target)->getPreprocessorDefines();
+        }
+        void doSet(void* target, const String& val)
+        {
+            static_cast<HighLevelGpuProgram*>(target)->setPreprocessorDefines(val);
+        }
+    };
+    static CmdPreprocessorDefines msCmdPreprocessorDefines;
+
+    void HighLevelGpuProgram::setupBaseParamDictionary()
+    {
+        GpuProgram::setupBaseParamDictionary();
+        ParamDictionary* dict = getParamDictionary();
+
+        dict->addParameter(ParameterDef("preprocessor_defines", "", PT_STRING), &msCmdPreprocessorDefines);
+    }
+
     //---------------------------------------------------------------------------
     HighLevelGpuProgram::HighLevelGpuProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle, const String& group, 

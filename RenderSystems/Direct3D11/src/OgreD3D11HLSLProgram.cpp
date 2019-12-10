@@ -49,7 +49,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     D3D11HLSLProgram::CmdEntryPoint D3D11HLSLProgram::msCmdEntryPoint;
     D3D11HLSLProgram::CmdTarget D3D11HLSLProgram::msCmdTarget;
-    D3D11HLSLProgram::CmdPreprocessorDefines D3D11HLSLProgram::msCmdPreprocessorDefines;
     D3D11HLSLProgram::CmdColumnMajorMatrices D3D11HLSLProgram::msCmdColumnMajorMatrices;
     D3D11HLSLProgram::CmdEnableBackwardsCompatibility D3D11HLSLProgram::msCmdEnableBackwardsCompatibility;
     //-----------------------------------------------------------------------
@@ -1464,9 +1463,6 @@ namespace Ogre {
             dict->addParameter(ParameterDef("target", 
                 "Name of the assembler target to compile down to.",
                 PT_STRING),&msCmdTarget);
-            dict->addParameter(ParameterDef("preprocessor_defines", 
-                "Preprocessor defines use to compile the program.",
-                PT_STRING),&msCmdPreprocessorDefines);
             dict->addParameter(ParameterDef("column_major_matrices", 
                 "Whether matrix packing in column-major order.",
                 PT_BOOL),&msCmdColumnMajorMatrices);
@@ -1592,15 +1588,6 @@ namespace Ogre {
     void D3D11HLSLProgram::CmdTarget::doSet(void *target, const String& val)
     {
         static_cast<D3D11HLSLProgram*>(target)->setTarget(val);
-    }
-    //-----------------------------------------------------------------------
-    String D3D11HLSLProgram::CmdPreprocessorDefines::doGet(const void *target) const
-    {
-        return static_cast<const D3D11HLSLProgram*>(target)->getPreprocessorDefines();
-    }
-    void D3D11HLSLProgram::CmdPreprocessorDefines::doSet(void *target, const String& val)
-    {
-        static_cast<D3D11HLSLProgram*>(target)->setPreprocessorDefines(val);
     }
     //-----------------------------------------------------------------------
     String D3D11HLSLProgram::CmdColumnMajorMatrices::doGet(const void *target) const

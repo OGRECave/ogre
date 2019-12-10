@@ -60,12 +60,8 @@ namespace Ogre {
         if (createParamDictionary("GLSLESProgram"))
         {
             setupBaseParamDictionary();
-            ParamDictionary* dict = getParamDictionary();
-
-            dict->addParameter(ParameterDef("preprocessor_defines", 
-                                            "Preprocessor defines use to compile the program.",
-                                            PT_STRING),&msCmdPreprocessorDefines);
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
+            ParamDictionary* dict = getParamDictionary();
             dict->addParameter(ParameterDef("use_optimiser", 
                                             "Should the GLSL optimiser be used. Default is false.",
                                             PT_BOOL),&msCmdOptimisation);
