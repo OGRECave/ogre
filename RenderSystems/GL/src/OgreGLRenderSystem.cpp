@@ -2528,7 +2528,7 @@ namespace Ogre {
         GLint primType;
         int operationType = op.operationType;
         // Use adjacency if there is a geometry program and it requested adjacency info
-        if(mGeometryProgramBound && mCurrentGeometryProgram && dynamic_cast<GLGpuProgram*>(mCurrentGeometryProgram)->isAdjacencyInfoRequired())
+        if(mGeometryProgramBound && mCurrentGeometryProgram && dynamic_cast<GpuProgram*>(mCurrentGeometryProgram)->isAdjacencyInfoRequired())
             operationType |= RenderOperation::OT_DETAIL_ADJACENCY_BIT;
         switch (operationType)
         {
