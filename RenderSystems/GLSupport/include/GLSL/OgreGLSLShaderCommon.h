@@ -106,21 +106,12 @@ namespace Ogre {
         /// Get the uniform cache for this shader
         GLUniformCache*    getUniformCache(){return &mUniformCache;}
 
-        /// Command object for setting macro defines
-        class CmdPreprocessorDefines : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-
         /// GLSL does not provide access to the low level code of the shader, so use this shader for binding as well
         GpuProgram* _getBindingDelegate(void) { return this; }
     protected:
         /// GLSL does not provide access to the low level implementation of the shader, so this method s a no-op
         void createLowLevelImpl() {}
 
-        static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdAttach msCmdAttach;
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
 

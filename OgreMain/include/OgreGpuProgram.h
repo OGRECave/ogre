@@ -190,7 +190,7 @@ namespace Ogre {
         @par
         The subclass must have called it's own createParamDictionary before calling this method.
     */
-    void setupBaseParamDictionary(void);
+    virtual void setupBaseParamDictionary(void);
 
     /** Internal method returns whether required capabilities for this program is supported.
      */
