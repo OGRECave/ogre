@@ -523,18 +523,20 @@ namespace Ogre
         {}  
     };
 
-    class _OgreExport CreateHighLevelGpuProgramScriptCompilerEvent : public ScriptCompilerEvent
+    class _OgreExport CreateHighLevelGpuProgramScriptCompilerEvent : public CreateGpuProgramScriptCompilerEvent
     {
     public:
-        String mFile, mName, mResourceGroup, mSource, mLanguage;
-        GpuProgramType mProgramType;
+        String mLanguage;
         static String eventType;
 
-        CreateHighLevelGpuProgramScriptCompilerEvent(const String &file, const String &name, const String &resourceGroup, const String &source, 
-            const String &language, GpuProgramType programType)
-            :ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup), mSource(source), 
-             mLanguage(language), mProgramType(programType)
-        {}  
+        CreateHighLevelGpuProgramScriptCompilerEvent(const String& file, const String& name,
+                                                     const String& resourceGroup, const String& source,
+                                                     const String& language, GpuProgramType programType)
+            : CreateGpuProgramScriptCompilerEvent(file, name, resourceGroup, source, language, programType),
+              mLanguage(language)
+        {
+            mType = eventType; // override
+        }
     };
 
     class _OgreExport CreateGpuSharedParametersScriptCompilerEvent : public ScriptCompilerEvent
