@@ -524,21 +524,7 @@ namespace Ogre
     };
 
     /// @deprecated use CreateGpuProgramScriptCompilerEvent
-    class OGRE_DEPRECATED _OgreExport CreateHighLevelGpuProgramScriptCompilerEvent : public CreateGpuProgramScriptCompilerEvent
-    {
-    public:
-        String mLanguage;
-        static String eventType;
-
-        CreateHighLevelGpuProgramScriptCompilerEvent(const String& file, const String& name,
-                                                     const String& resourceGroup, const String& source,
-                                                     const String& language, GpuProgramType programType)
-            : CreateGpuProgramScriptCompilerEvent(file, name, resourceGroup, source, language, programType),
-              mLanguage(language)
-        {
-            mType = eventType; // override
-        }
-    };
+    typedef OGRE_DEPRECATED CreateGpuProgramScriptCompilerEvent CreateHighLevelGpuProgramScriptCompilerEvent;
 
     class _OgreExport CreateGpuSharedParametersScriptCompilerEvent : public ScriptCompilerEvent
     {

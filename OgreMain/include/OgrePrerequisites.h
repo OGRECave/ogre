@@ -296,7 +296,7 @@ namespace Ogre {
     typedef SharedPtr<HardwareUniformBuffer> HardwareUniformBufferSharedPtr;
     typedef HardwareUniformBufferSharedPtr HardwareCounterBufferSharedPtr;
     typedef SharedPtr<HardwareVertexBuffer> HardwareVertexBufferSharedPtr;
-    typedef SharedPtr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
+    typedef GpuProgramPtr HighLevelGpuProgramPtr; //!< @deprecated
     typedef SharedPtr<Material> MaterialPtr;
     typedef SharedPtr<MemoryDataStream> MemoryDataStreamPtr;
     typedef SharedPtr<Mesh> MeshPtr;

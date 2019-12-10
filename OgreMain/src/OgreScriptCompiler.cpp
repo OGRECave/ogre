@@ -1688,8 +1688,6 @@ namespace Ogre
     //----------------------------------------------------------------------------
     String CreateGpuProgramScriptCompilerEvent::eventType = "createGpuProgram";
     //-------------------------------------------------------------------------
-    String CreateHighLevelGpuProgramScriptCompilerEvent::eventType = "createHighLevelGpuProgram";
-    //-------------------------------------------------------------------------
     String CreateGpuSharedParametersScriptCompilerEvent::eventType = "createGpuSharedParameters";
     //-------------------------------------------------------------------------
     String CreateParticleSystemScriptCompilerEvent::eventType = "createParticleSystem";
