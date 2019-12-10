@@ -50,10 +50,10 @@ namespace Ogre {
         virtual ~HighLevelGpuProgramFactory();
         /// Get the name of the language this factory creates programs for
         virtual const String& getLanguage(void) const = 0;
-        virtual HighLevelGpuProgram* create(ResourceManager* creator, 
+        virtual GpuProgram* create(ResourceManager* creator,
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader) = 0;
-        virtual void destroy(HighLevelGpuProgram* prog) = 0;
+        virtual void destroy(GpuProgram* prog) { delete prog; }
     };
 
     /** This ResourceManager manages high-level vertex and fragment programs. 

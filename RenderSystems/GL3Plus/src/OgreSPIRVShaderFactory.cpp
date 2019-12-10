@@ -112,11 +112,9 @@ const String& SPIRVShaderFactory::getLanguage(void) const
     return language;
 }
 
-HighLevelGpuProgram* SPIRVShaderFactory::create(ResourceManager* creator, const String& name, ResourceHandle handle,
+GpuProgram* SPIRVShaderFactory::create(ResourceManager* creator, const String& name, ResourceHandle handle,
                                                 const String& group, bool isManual, ManualResourceLoader* loader)
 {
     return OGRE_NEW SPIRVShader(creator, name, handle, group, isManual, loader);
 }
-
-void SPIRVShaderFactory::destroy(HighLevelGpuProgram* prog) { delete prog; }
 }

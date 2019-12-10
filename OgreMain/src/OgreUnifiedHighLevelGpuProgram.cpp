@@ -440,18 +440,11 @@ namespace Ogre
         return sLanguage;
     }
     //-----------------------------------------------------------------------
-    HighLevelGpuProgram* UnifiedHighLevelGpuProgramFactory::create(ResourceManager* creator, 
+    GpuProgram* UnifiedHighLevelGpuProgramFactory::create(ResourceManager* creator,
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
     {
         return OGRE_NEW UnifiedHighLevelGpuProgram(creator, name, handle, group, isManual, loader);
     }
-    //-----------------------------------------------------------------------
-    void UnifiedHighLevelGpuProgramFactory::destroy(HighLevelGpuProgram* prog)
-    {
-        OGRE_DELETE prog;
-    }
-    //-----------------------------------------------------------------------
-
 }
 

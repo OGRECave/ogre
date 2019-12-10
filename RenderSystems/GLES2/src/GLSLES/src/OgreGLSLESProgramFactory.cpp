@@ -58,15 +58,10 @@ namespace Ogre {
         return sLanguageName;
     }
     //-----------------------------------------------------------------------
-    HighLevelGpuProgram* GLSLESProgramFactory::create(ResourceManager* creator, 
+    GpuProgram* GLSLESProgramFactory::create(ResourceManager* creator,
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
     {
         return OGRE_NEW GLSLESProgram(creator, name, handle, group, isManual, loader);
-    }
-    //-----------------------------------------------------------------------
-    void GLSLESProgramFactory::destroy(HighLevelGpuProgram* prog)
-    {
-        OGRE_DELETE prog;
     }
 }

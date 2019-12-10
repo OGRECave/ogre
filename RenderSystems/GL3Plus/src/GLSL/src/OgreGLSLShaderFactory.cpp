@@ -64,19 +64,11 @@ namespace Ogre
     }
     
 
-    HighLevelGpuProgram* GLSLShaderFactory::create(
+    GpuProgram* GLSLShaderFactory::create(
         ResourceManager* creator,
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
     {
         return OGRE_NEW GLSLShader(creator, name, handle, group, isManual, loader);
     }
-    
-
-    void GLSLShaderFactory::destroy(HighLevelGpuProgram* prog)
-    {
-        OGRE_DELETE prog;
-    }
-    
-
 }
