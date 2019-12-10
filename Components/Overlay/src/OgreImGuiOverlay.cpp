@@ -258,6 +258,8 @@ ImGuiOverlay::ImGUIRenderable::ImGUIRenderable()
     // use identity projection and view matrices
     mUseIdentityProjection = true;
     mUseIdentityView = true;
+
+    mConvertToBGR = false;
 }
 //-----------------------------------------------------------------------------------
 void ImGuiOverlay::ImGUIRenderable::initialise(void)
@@ -286,6 +288,9 @@ void ImGuiOverlay::ImGUIRenderable::initialise(void)
     decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
     offset += VertexElement::getTypeSize(VET_FLOAT2);
     decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE);
+
+    if (Root::getSingleton().getRenderSystem()->getName().find("Direct3D9") != String::npos)
+        mConvertToBGR = true;
 }
 //-----------------------------------------------------------------------------------
 ImGuiOverlay::ImGUIRenderable::~ImGUIRenderable()
@@ -309,6 +314,16 @@ void ImGuiOverlay::ImGUIRenderable::updateVertexData(const ImVector<ImDrawVert>&
     {
         mRenderOp.indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, idxBuf.size(), HardwareBuffer::HBU_WRITE_ONLY);
+    }
+
+    if (mConvertToBGR)
+    {
+        // convert RGBA > BGRA
+        PixelBox src(1, vtxBuf.size(), 1, PF_A8B8G8R8, (char*)vtxBuf.Data + offsetof(ImDrawVert, col));
+        src.rowPitch = sizeof(ImDrawVert) / sizeof(ImU32);
+        PixelBox dst = src;
+        dst.format = PF_A8R8G8B8;
+        PixelUtil::bulkPixelConversion(src, dst);
     }
 
     // Copy all vertices
