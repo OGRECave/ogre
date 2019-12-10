@@ -58,7 +58,7 @@ namespace Ogre {
         at another program name. The first one which has a supported syntax 
         will be used.
     */
-    class _OgreExport UnifiedHighLevelGpuProgram : public HighLevelGpuProgram
+    class _OgreExport UnifiedHighLevelGpuProgram : public GpuProgram
     {
     private:
         static std::map<String,int> mLanguagePriorities;
@@ -91,6 +91,7 @@ namespace Ogre {
         void buildConstantDefinitions() const;
         void loadFromSource(void);
 
+        void unloadImpl() { resetCompileError(); }
     public:
         /** Constructor, should be used only by factory classes. */
         UnifiedHighLevelGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,

@@ -54,7 +54,7 @@ namespace Ogre
     UnifiedHighLevelGpuProgram::UnifiedHighLevelGpuProgram(
         ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        :HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
+        :GpuProgram(creator, name, handle, group, isManual, loader)
     {
         if (createParamDictionary("UnifiedHighLevelGpuProgram"))
         {
@@ -147,7 +147,7 @@ namespace Ogre
     {
         size_t memSize = 0;
 
-        memSize += HighLevelGpuProgram::calculateSize();
+        memSize += GpuProgram::calculateSize();
 
         // Delegate Names
         for (StringVector::const_iterator i = mDelegateNames.begin(); i != mDelegateNames.end(); ++i)
@@ -253,7 +253,7 @@ namespace Ogre
         if (_getDelegate())
             return _getDelegate()->getPassSurfaceAndLightStates();
         else
-            return HighLevelGpuProgram::getPassSurfaceAndLightStates();
+            return GpuProgram::getPassSurfaceAndLightStates();
     }
     //---------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::getPassFogStates(void) const
@@ -261,7 +261,7 @@ namespace Ogre
         if (_getDelegate())
             return _getDelegate()->getPassFogStates();
         else
-            return HighLevelGpuProgram::getPassFogStates();
+            return GpuProgram::getPassFogStates();
     }
     //---------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::getPassTransformStates(void) const
@@ -269,7 +269,7 @@ namespace Ogre
         if (_getDelegate())
             return _getDelegate()->getPassTransformStates();
         else
-            return HighLevelGpuProgram::getPassTransformStates();
+            return GpuProgram::getPassTransformStates();
 
     }
     //-----------------------------------------------------------------------

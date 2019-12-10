@@ -32,34 +32,19 @@ THE SOFTWARE.
 namespace Ogre {
 
     String sNullLang = "null";
-    class NullProgram : public HighLevelGpuProgram
+    class NullProgram : public GpuProgram
     {
     protected:
         /** Internal load implementation, must be implemented by subclasses.
         */
         void loadFromSource(void) {}
-        /** Internal method for creating an appropriate low-level program from this
-        high-level program, must be implemented by subclasses. */
-        void createLowLevelImpl(void) {}
-        /// Internal unload implementation, must be implemented by subclasses
-        void unloadHighLevelImpl(void) {}
-        /// Populate the passed parameters with name->index map, must be overridden
-        void populateParameterNames(GpuProgramParametersSharedPtr params)
-        {
-            // Skip the normal implementation
-            // Ensure we don't complain about missing parameter names
-            params->setIgnoreMissingParams(true);
+        void unloadImpl() {}
 
-        }
-        void buildConstantDefinitions() const
-        {
-            // do nothing
-        }
     public:
         NullProgram(ResourceManager* creator, 
             const String& name, ResourceHandle handle, const String& group, 
             bool isManual, ManualResourceLoader* loader)
-            : HighLevelGpuProgram(creator, name, handle, group, isManual, loader){}
+            : GpuProgram(creator, name, handle, group, isManual, loader){}
         ~NullProgram() {}
         /// Overridden from GpuProgram - never supported
         bool isSupported(void) const { return false; }

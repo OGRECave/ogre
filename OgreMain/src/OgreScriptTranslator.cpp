@@ -3642,13 +3642,9 @@ namespace Ogre{
         GpuProgram *prog = 0;
 
         bool isHighLevel = language != "asm";
-        CreateGpuProgramScriptCompilerEvent evt(obj->file, obj->name, compiler->getResourceGroup(), source, syntax,
-                                                gpt);
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        CreateHighLevelGpuProgramScriptCompilerEvent evtHL(obj->file, obj->name, compiler->getResourceGroup(), source,
-                                                         language, gpt);
-        OGRE_IGNORE_DEPRECATED_END
-        bool processed = compiler->_fireEvent(isHighLevel ? &evt : &evtHL, &prog);
+        CreateGpuProgramScriptCompilerEvent evt(obj->file, obj->name, compiler->getResourceGroup(), source,
+                                                isHighLevel ? language : syntax, gpt);
+        bool processed = compiler->_fireEvent(&evt, &prog);
         if(!processed)
         {
             if(isHighLevel)
