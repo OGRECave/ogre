@@ -14,30 +14,6 @@ fragment_program Examples/OffsetMappingFP/HLSL hlsl
    target ps_2_0
 } 
 
-// Bump map with parallax fragment program 
-fragment_program Examples/OffsetMappingPS/Asm asm 
-{ 
-   source OffsetMapping_specular.asm 
-   // sorry, only for ps_1_4 and above:) 
-   syntax ps_1_4 
-	default_params
-	{
-        // Parallax Height scale and bias 
-        param_indexed 2 float4 0.04 -0.02 1 0 
-	}
-} 
-
-// Bump map with parallax fragment program 
-fragment_program Examples/OffsetMappingPS/GLSLES glsles
-{ 
-    source OffsetMapping_specular.glsl
-	default_params
-	{
-        // Parallax Height scale and bias 
-        param_named scaleBias float4 0.04 -0.02 1 0 
-	}
-}
-
 // Bump map with Parallax offset vertex program, support for this is required 
 vertex_program Examples/OffsetMappingVP/GLSLES glsles
 { 
@@ -54,17 +30,6 @@ fragment_program Examples/OffsetMappingFP/GLSLES glsles
 		param_named normalHeightMap int 0
 		param_named diffuseMap int 1
 	}
-}
-
-// Bump map with parallax fragment program 
-fragment_program Examples/OffsetMappingPS/GLSL glsl
-{ 
-    source OffsetMapping_specular.glsl
-    default_params
-    {
-        // Parallax Height scale and bias 
-        param_named scaleBias float4 0.04 -0.02 1 0 
-    }           
 }
 
 // Bump map with Parallax offset vertex program, support for this is required 
@@ -99,21 +64,24 @@ fragment_program Examples/OffsetMappingFP unified
 	delegate Examples/OffsetMappingFP/HLSL
 }
 
-fragment_program Examples/OffsetMappingPS unified
-{
-	delegate Examples/OffsetMappingPS/GLSL
-	delegate Examples/OffsetMappingPS/GLSLES
-	delegate Examples/OffsetMappingPS/Asm
-}
-
-
 material Examples/OffsetMapping/Specular 
 {
    technique
    {
+       // ambient / depth
+       pass
+       {
+           illumination_stage ambient
+           diffuse 0 0 0
+           // might be needed for D3D) & GL: depth_bias -1 -1
+       }
        // do the lighting and bump mapping with parallax pass 
        pass 
        {
+           illumination_stage per_light
+           iteration once_per_light
+           scene_blend add
+
            // Vertex program reference 
            vertex_program_ref Examples/OffsetMappingVP 
            { 
@@ -135,73 +103,15 @@ material Examples/OffsetMapping/Specular
            texture_unit 
            { 
               texture rockwall_NH.tga
-              tex_coord_set 0 
            } 
 
            // Base diffuse texture map 
            texture_unit 
            { 
               texture rockwall.tga
-              tex_coord_set 1 
            } 
-       } 
-   } 
-
-   // This is the preferred technique which uses both vertex and 
-   // fragment programs, supports coloured lights 
-   // technique 
-   // { 
-   //    // do the lighting and bump mapping with parallax pass 
-   //    pass 
-   //    { 
-       
-   //       // Vertex program reference 
-   //       vertex_program_ref Examples/OffsetMappingVP 
-   //       { 
-   //          param_named_auto lightPosition light_position_object_space 0 
-   //          param_named_auto eyePosition camera_position_object_space 
-   //          param_named_auto worldViewProj worldviewproj_matrix 
-   //       }
-
-   //       // Fragment program 
-   //       fragment_program_ref Examples/OffsetMappingPS 
-   //       { 
-   //          param_indexed_auto 0 light_diffuse_colour 0 
-   //          param_indexed_auto 1 light_specular_colour 0 
-   //          // Parallax Height scale and bias 
-   //          //param_indexed 2 float4 0.04 -0.02 1 0 
-   //       } 
-          
-   //       // Normal + height(alpha) map 
-   //       texture_unit 
-   //       { 
-   //          texture rockwall_NH.tga
-   //          tex_coord_set 0 
-   //       } 
-
-   //       // Base diffuse texture map 
-   //       texture_unit 
-   //       { 
-   //          texture rockwall.tga
-   //          tex_coord_set 1 
-   //       } 
-   //    } 
-   // } 
-   
-   // Simple no-shader fallback
-   //FIXME why does GL and GL3+ fall back on this technique?
-   // technique 
-   // { 
-   //     pass 
-   //     { 
-   //         // Base diffuse texture map 
-   //         texture_unit 
-   //         { 
-   //             texture rockwall.tga
-   //         } 
-   //     }
-   // }
-
+       }
+   }
 }
 
 
