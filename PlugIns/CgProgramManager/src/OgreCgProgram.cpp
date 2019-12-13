@@ -65,7 +65,7 @@ namespace Ogre {
 					syntaxSupported = true;
 					useDelegate = true;
 				}
-			
+
 			}
 
 			if (syntaxSupported)
@@ -82,9 +82,9 @@ namespace Ogre {
 				}
 				mSelectedCgProfile = cgGetProfile(selectedProfileForFind.c_str());
 				// Check for errors
-				checkForCgError("CgProgram::selectProfile", 
+				checkForCgError("CgProgram::selectProfile",
 					"Unable to find CG profile enum for program " + mName + ": ", mCgContext);
-				
+
 				// do we need a delegate?
 				if (useDelegate && !mDelegate)
 				{
@@ -104,7 +104,7 @@ namespace Ogre {
 					HighLevelGpuProgramManager::getSingleton().remove(rs);
 					mDelegate.reset();
 				}
-				
+
 				break;
 			}
 		}
@@ -239,9 +239,9 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void CgProgram::getMicrocodeFromCache(uint32 id)
 	{
-		GpuProgramManager::Microcode cacheMicrocode = 
+		GpuProgramManager::Microcode cacheMicrocode =
 			GpuProgramManager::getSingleton().getMicrocodeFromCache(id);
-		
+
 		cacheMicrocode->seek(0);
 
 		// get size of string
@@ -255,21 +255,21 @@ namespace Ogre {
 		// get size of param map
 		size_t parametersMapSize = 0;
 		cacheMicrocode->read(&parametersMapSize, sizeof(size_t));
-				
+
 		// get params
 		for(size_t i = 0 ; i < parametersMapSize ; i++)
 		{
 			String paramName;
 			size_t stringSize = 0;
 			GpuConstantDefinition def;
-			
+
 			// get string size
 			cacheMicrocode->read(&stringSize, sizeof(size_t));
 
 			// get string
 			paramName.resize(stringSize);
 			cacheMicrocode->read(&paramName[0], stringSize);
-		
+
 			// get def
 			cacheMicrocode->read( &def, sizeof(GpuConstantDefinition));
 
@@ -303,7 +303,7 @@ namespace Ogre {
 	void CgProgram::compileMicrocode(void)
 	{
 		// Create Cg Program
-  
+
 		/// Program handle
 		CGprogram cgProgram;
 
@@ -318,14 +318,14 @@ namespace Ogre {
 		// deal with includes
 		String sourceToUse = _resolveIncludes(mSource, this, mFilename);
 
-		cgProgram = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(), 
+		cgProgram = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(),
 			mSelectedCgProfile, mEntryPoint.c_str(), const_cast<const char**>(mCgArguments));
 
 		// Test
 		//LogManager::getSingleton().logMessage(cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM));
 
 		// Check for errors
-		checkForCgError("CgProgram::compileMicrocode", 
+		checkForCgError("CgProgram::compileMicrocode",
 			"Unable to compile Cg program " + mName + ": ", mCgContext);
 
 		CGerror error = cgGetError();
@@ -357,8 +357,8 @@ namespace Ogre {
 
 			// Unload Cg Program - we don't need it anymore
 			cgDestroyProgram(cgProgram);
-			//checkForCgError("CgProgram::unloadImpl", 
-			//  "Error while unloading Cg program " + mName + ": ", 
+			//checkForCgError("CgProgram::unloadImpl",
+			//  "Error while unloading Cg program " + mName + ": ",
 			//  mCgContext);
 			cgProgram = 0;
 		}
@@ -376,7 +376,7 @@ namespace Ogre {
 													 mParametersMapSizeAsBuffer);
 
 		// create microcode
-		GpuProgramManager::Microcode newMicrocode = 
+		GpuProgramManager::Microcode newMicrocode =
 			GpuProgramManager::getSingleton().createMicrocode(sizeOfMicrocode);
 
 		newMicrocode->seek(0);
@@ -464,7 +464,7 @@ namespace Ogre {
 			{
 				// Create a high-level program, give it the same name as us
                 HighLevelGpuProgramManager::getSingleton().remove(mName, mGroup);
-				HighLevelGpuProgramPtr vp = 
+				HighLevelGpuProgramPtr vp =
 					HighLevelGpuProgramManager::getSingleton().createProgram(
 					mName, mGroup, "hlsl", mType);
 				vp->setSource(mProgramString);
@@ -478,12 +478,12 @@ namespace Ogre {
 			else
 			{
 				// Create a low-level program, give it the same name as us
-                mAssemblerProgram = 
+                mAssemblerProgram =
 					GpuProgramManager::getSingleton().createProgramFromString(
-					mName, 
+					mName,
 					mGroup,
 					mProgramString,
-					mType, 
+					mType,
 					mSelectedProfile);
 			}
 			// Shader params need to be forwarded to low level implementation
@@ -513,7 +513,7 @@ namespace Ogre {
 		// HLSL delegates need a target to compile to.
 		// Return value for GLSL delegates is ignored.
 		GpuProgramManager* gpuMgr = GpuProgramManager::getSingletonPtr();
-		
+
 		if (mSelectedCgProfile == CG_PROFILE_HLSLF)
 		{
 			static const String fpProfiles[] = {
@@ -540,7 +540,7 @@ namespace Ogre {
 #endif
 #if(CG_VERSION_NUM >= 2200)
 			"vs_4_0",
-#endif              
+#endif
 			"vs_3_0", "vs_2_x", "vs_2_0", "vs_1_4", "vs_1_3", "vs_1_2", "vs_1_1"};
 			static const size_t numVpProfiles = sizeof(vpProfiles)/sizeof(String);
 			// find the highest profile available
@@ -571,8 +571,8 @@ namespace Ogre {
 		};
 		std::vector<ReplacementMark> replacements;
 
-		HighLevelOutputFixer(const String& src, const GpuConstantDefinitionMap& params, 
-			const std::map<String,int>& samplers, bool isGLSL) 
+		HighLevelOutputFixer(const String& src, const GpuConstantDefinitionMap& params,
+			const std::map<String,int>& samplers, bool isGLSL)
 			: source(src), paramMap(params), samplerMap(samplers), glsl(isGLSL), start(0)
 		{
 			findNameMappings();
@@ -725,8 +725,8 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void CgProgram::fixHighLevelOutput(String& hlSource)
 	{
-		// Cg chooses to change parameter names when translating to another 
-		// high level language, possibly to avoid clashes with reserved keywords. 
+		// Cg chooses to change parameter names when translating to another
+		// high level language, possibly to avoid clashes with reserved keywords.
 		// We need to revert that, otherwise Ogre parameter mappings fail.
 		// Cg logs its renamings in the comments at the beginning of the
 		// processed source file. We can get them from there.
@@ -734,8 +734,8 @@ namespace Ogre {
 #if OGRE_DEBUG_MODE || 1
 		LogManager::getSingleton().stream() << "Cg high level output for " << getName() << ":\n" << hlSource;
 #endif
-		hlSource = HighLevelOutputFixer(hlSource, mParametersMap, mSamplerRegisterMap, 
-			mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || 
+		hlSource = HighLevelOutputFixer(hlSource, mParametersMap, mSamplerRegisterMap,
+			mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF ||
 			mSelectedCgProfile == CG_PROFILE_GLSLG).output;
 #if OGRE_DEBUG_MODE || 1
 		LogManager::getSingleton().stream() << "Cleaned high level output for " << getName() << ":\n" << hlSource;
@@ -746,7 +746,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void CgProgram::loadHighLevelSafe()
 	{
-	    safePrepare()
+	    safePrepare();
 		OGRE_LOCK_AUTO_MUTEX;
 		if (this->isSupported())
 			loadHighLevel();
@@ -894,7 +894,7 @@ namespace Ogre {
 
 		if ( mProgramString.empty() )
 			return;
-				
+
 		mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
 		mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
 
@@ -943,7 +943,7 @@ namespace Ogre {
 				paramType != CG_SAMPLER3D &&
 				paramType != CG_SAMPLERCUBE &&
 				paramType != CG_SAMPLERRECT &&
-				cgGetParameterDirection(parameter) != CG_OUT && 
+				cgGetParameterDirection(parameter) != CG_OUT &&
 				cgIsParameterReferenced(parameter))
 			{
 				int arraySize;
@@ -1049,7 +1049,7 @@ namespace Ogre {
 					}
 
 					break;
-				}                   
+				}
 			}
 
 			// now handle uniform samplers. This is needed to fix their register positions
@@ -1060,7 +1060,7 @@ namespace Ogre {
 				paramType == CG_SAMPLER3D ||
 				paramType == CG_SAMPLERCUBE ||
 				paramType == CG_SAMPLERRECT) &&
-				cgGetParameterDirection(parameter) != CG_OUT && 
+				cgGetParameterDirection(parameter) != CG_OUT &&
 				cgIsParameterReferenced(parameter))
 			{
 				String paramName = cgGetParameterName(parameter);
@@ -1115,10 +1115,10 @@ namespace Ogre {
 			parameter = cgGetNextParameter(parameter);
 		}
 
-		
+
 	}
 	//-----------------------------------------------------------------------
-	void CgProgram::mapTypeAndElementSize(CGtype cgType, bool isRegisterCombiner, 
+	void CgProgram::mapTypeAndElementSize(CGtype cgType, bool isRegisterCombiner,
 		GpuConstantDefinition& def) const
 	{
 		if (isRegisterCombiner)
@@ -1207,11 +1207,11 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	CgProgram::CgProgram(ResourceManager* creator, const String& name, 
-		ResourceHandle handle, const String& group, bool isManual, 
+	CgProgram::CgProgram(ResourceManager* creator, const String& name,
+		ResourceHandle handle, const String& group, bool isManual,
 		ManualResourceLoader* loader, CGcontext context)
-		: HighLevelGpuProgram(creator, name, handle, group, isManual, loader), 
-		mCgContext(context), 
+		: HighLevelGpuProgram(creator, name, handle, group, isManual, loader),
+		mCgContext(context),
 		mSelectedCgProfile(CG_PROFILE_UNKNOWN), mCgArguments(0), mParametersMapSizeAsBuffer(0)
 	{
 		if (createParamDictionary("CgProgram"))
@@ -1220,17 +1220,17 @@ namespace Ogre {
 
 			ParamDictionary* dict = getParamDictionary();
 
-			dict->addParameter(ParameterDef("entry_point", 
+			dict->addParameter(ParameterDef("entry_point",
 				"The entry point for the Cg program.",
 				PT_STRING),&msCmdEntryPoint);
-			dict->addParameter(ParameterDef("profiles", 
+			dict->addParameter(ParameterDef("profiles",
 				"Space-separated list of Cg profiles supported by this profile.",
 				PT_STRING),&msCmdProfiles);
-			dict->addParameter(ParameterDef("compile_arguments", 
+			dict->addParameter(ParameterDef("compile_arguments",
 				"A string of compilation arguments to pass to the Cg compiler.",
 				PT_STRING),&msCmdArgs);
 		}
-		
+
 	}
 	//-----------------------------------------------------------------------
 	CgProgram::~CgProgram()
