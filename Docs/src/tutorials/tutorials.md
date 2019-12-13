@@ -15,6 +15,7 @@
     - @subpage profiler
     - @subpage reversed-depth
     - @subpage External-Texture-Sources
+    - @subpage background-resource
     - @subpage ShadowMappingOgre
     - @subpage deferred
     - @subpage pczscenemanager
