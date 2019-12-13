@@ -50,6 +50,7 @@ if(DOXYGEN_FOUND)
         ${PROJECT_SOURCE_DIR}/Docs/src/rtss.md
         ${PROJECT_SOURCE_DIR}/Docs/src/resourcemanagement.md
         ${PROJECT_SOURCE_DIR}/Docs/src/reveresed-depth.md
+        ${PROJECT_SOURCE_DIR}/Docs/src/background-resource.md
         ${PROJECT_SOURCE_DIR}/BuildingOgre.md
         ${TUTORIALS}
         ${BASIC_TUTORIALS})

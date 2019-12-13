@@ -693,6 +693,8 @@ INPUT                  = OgreMain/include \
                             Docs/src/tutorials/manualmesh.md \
                             Docs/src/tutorials/numpy.md \
                             Docs/src/tutorials/profiler.md \
+                            Docs/src/background-resource.md \
+                            Docs/src/reversed-depth.md \
                             Docs/src/tutorials/setup.md \
                             Docs/src/tutorials/trays.md \
                             Docs/src/tutorials/tutorials.md \
