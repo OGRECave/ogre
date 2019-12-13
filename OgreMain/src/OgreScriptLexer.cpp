@@ -276,36 +276,36 @@ namespace Ogre {
         const char openBracket = '{', closeBracket = '}', colon = ':',
             quote = '\"', var = '$';
 
-        ScriptTokenPtr token(OGRE_NEW_T(ScriptToken, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
-        token->lexeme = lexeme;
-        token->line = line;
+        ScriptToken token;
+        token.lexeme = lexeme;
+        token.line = line;
         bool ignore = false;
 
         // Check the user token map first
         if(lexeme.size() == 1 && isNewline(lexeme[0]))
         {
-            token->type = TID_NEWLINE;
-            if(!tokens->empty() && tokens->back()->type == TID_NEWLINE)
+            token.type = TID_NEWLINE;
+            if(!tokens->empty() && tokens->back().type == TID_NEWLINE)
                 ignore = true;
         }
         else if(lexeme.size() == 1 && lexeme[0] == openBracket)
-            token->type = TID_LBRACKET;
+            token.type = TID_LBRACKET;
         else if(lexeme.size() == 1 && lexeme[0] == closeBracket)
-            token->type = TID_RBRACKET;
+            token.type = TID_RBRACKET;
         else if(lexeme.size() == 1 && lexeme[0] == colon)
-            token->type = TID_COLON;
+            token.type = TID_COLON;
         else if(lexeme.size() > 1 && lexeme[0] == var)
-            token->type = TID_VARIABLE;
+            token.type = TID_VARIABLE;
         else
         {
             // This is either a non-zero length phrase or quoted phrase
             if(lexeme.size() >= 2 && lexeme[0] == quote && lexeme[lexeme.size() - 1] == quote)
             {
-                token->type = TID_QUOTE;
+                token.type = TID_QUOTE;
             }
             else
             {
-                token->type = TID_WORD;
+                token.type = TID_WORD;
             }
         }
 
