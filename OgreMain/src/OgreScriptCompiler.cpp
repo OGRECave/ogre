@@ -491,23 +491,27 @@ namespace Ogre
                         processImports(*importedNodes);
                         processObjects(*importedNodes, *importedNodes);
                     }
+                    else
+                    {
+                        addError(CE_REFERENCETOANONEXISTINGOBJECT, import->file, import->line, import->source);
+                    }
+
                     if(importedNodes && !importedNodes->empty())
                         mImports.insert(std::make_pair(import->source, importedNodes));
                 }
 
+                ImportRequestMap::iterator iter = mImportRequests.lower_bound(import->source),
+                                           end = mImportRequests.upper_bound(import->source);
                 // Handle the target request now
                 // If it is a '*' import we remove all previous requests and just use the '*'
                 // Otherwise, ensure '*' isn't already registered and register our request
                 if(import->target == "*")
                 {
-                    mImportRequests.erase(mImportRequests.lower_bound(import->source),
-                        mImportRequests.upper_bound(import->source));
+                    mImportRequests.erase(iter, end);
                     mImportRequests.insert(std::make_pair(import->source, "*"));
                 }
                 else
                 {
-                    ImportRequestMap::iterator iter = mImportRequests.lower_bound(import->source),
-                        end = mImportRequests.upper_bound(import->source);
                     if(iter == end || iter->second != "*")
                     {
                         mImportRequests.insert(std::make_pair(import->source, import->target));
@@ -541,6 +545,9 @@ namespace Ogre
                         AbstractNodeList newNodes = locateTarget(*it->second, j->second);
                         if(!newNodes.empty())
                             mImportTable.insert(mImportTable.begin(), newNodes.begin(), newNodes.end());
+                        else
+                            // -1 for line as we lost that info here
+                            addError(CE_REFERENCETOANONEXISTINGOBJECT, nodes.front()->file, -1, j->second);
                     }
                 }
             }
