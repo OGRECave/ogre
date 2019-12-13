@@ -59,7 +59,7 @@ namespace Ogre {
     struct ScriptToken
     {
         /// This is the lexeme for this token
-        String lexeme, file;
+        String lexeme;
         /// This is the id associated with the lexeme, which comes from a lexeme-token id mapping
         uint32 type;
         /// This holds the line number of the input stream where the token was found.
@@ -76,7 +76,7 @@ namespace Ogre {
         static ScriptTokenListPtr tokenize(const String &str, const String &source);
     private: // Private utility operations
         static ScriptTokenListPtr _tokenize(const String &str, const char* source, String& error);
-        static void setToken(const String &lexeme, uint32 line, const char* source, ScriptTokenList *tokens);
+        static void setToken(const String &lexeme, uint32 line, ScriptTokenList *tokens);
         static bool isWhitespace(Ogre::String::value_type c);
         static bool isNewline(Ogre::String::value_type c);
     };
