@@ -73,7 +73,7 @@ namespace Ogre
                         temp->line = (*i)->line;
                         temp->type = (*i)->type == TID_WORD ? CNT_WORD : CNT_QUOTE;
                         if(temp->type == CNT_QUOTE)
-                            temp->token = (*i)->lexeme.substr(1, token->lexeme.size() - 2);
+                            temp->token = (*i)->lexeme.substr(1, (*i)->lexeme.size() - 2);
                         else
                             temp->token = (*i)->lexeme;
                         node->children.push_back(temp);
