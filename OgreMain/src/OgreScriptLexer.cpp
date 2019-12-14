@@ -277,7 +277,6 @@ namespace Ogre {
             quote = '\"', var = '$';
 
         ScriptToken token;
-        token.lexeme = lexeme;
         token.line = line;
         bool ignore = false;
 
@@ -294,15 +293,17 @@ namespace Ogre {
             token.type = TID_RBRACKET;
         else if(lexeme.size() == 1 && lexeme[0] == colon)
             token.type = TID_COLON;
-        else if(lexeme.size() > 1 && lexeme[0] == var)
-            token.type = TID_VARIABLE;
         else
         {
+            token.lexeme = lexeme;
+
             // This is either a non-zero length phrase or quoted phrase
             if(lexeme.size() >= 2 && lexeme[0] == quote && lexeme[lexeme.size() - 1] == quote)
             {
                 token.type = TID_QUOTE;
             }
+            else if(lexeme.size() > 1 && lexeme[0] == var)
+                token.type = TID_VARIABLE;
             else
             {
                 token.type = TID_WORD;
