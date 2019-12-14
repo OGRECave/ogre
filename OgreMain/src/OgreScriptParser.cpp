@@ -31,6 +31,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    static String unquoted(const String& str, bool trim = true)
+    {
+        return trim ? str.substr(1, str.size() - 2) : str;
+    }
+
     ConcreteNodeListPtr ScriptParser::parse(const ScriptTokenList &tokens, const String& file)
     {
         // MEMCATEGORY_GENERAL because SharedPtr can only free using that category
@@ -72,10 +77,7 @@ namespace Ogre
                         temp->file = file;
                         temp->line = i->line;
                         temp->type = i->type == TID_WORD ? CNT_WORD : CNT_QUOTE;
-                        if(temp->type == CNT_QUOTE)
-                            temp->token = i->lexeme.substr(1, i->lexeme.size() - 2);
-                        else
-                            temp->token = i->lexeme;
+                        temp->token = unquoted(i->lexeme, temp->type == CNT_QUOTE);
                         node->children.push_back(temp);
 
                         // The second-next token is the source
@@ -91,10 +93,7 @@ namespace Ogre
                         temp->file = file;
                         temp->line = i->line;
                         temp->type = i->type == TID_WORD ? CNT_WORD : CNT_QUOTE;
-                        if(temp->type == CNT_QUOTE)
-                            temp->token = i->lexeme.substr(1, i->lexeme.size() - 2);
-                        else
-                            temp->token = i->lexeme;
+                        temp->token = unquoted(i->lexeme, temp->type == CNT_QUOTE);
                         node->children.push_back(temp);
 
                         // Consume all the newlines
@@ -148,10 +147,7 @@ namespace Ogre
                         temp->file = file;
                         temp->line = i->line;
                         temp->type = i->type == TID_WORD ? CNT_WORD : CNT_QUOTE;
-                        if(temp->type == CNT_QUOTE)
-                            temp->token = i->lexeme.substr(1, i->lexeme.size() - 2);
-                        else
-                            temp->token = i->lexeme;
+                        temp->token = unquoted(i->lexeme, temp->type == CNT_QUOTE);
                         node->children.push_back(temp);
 
                         // Consume all the newlines
@@ -176,10 +172,7 @@ namespace Ogre
                         node->file = file;
                         node->line = token->line;
                         node->type = token->type == TID_WORD ? CNT_WORD : CNT_QUOTE;
-                        if(node->type == CNT_QUOTE)
-                            node->token = token->lexeme.substr(1, token->lexeme.size() - 2);
-                        else
-                            node->token = token->lexeme;
+                        node->token = unquoted(token->lexeme, node->type == CNT_QUOTE);
 
                         // Insert the node
                         if(parent)
@@ -390,7 +383,7 @@ namespace Ogre
                 else if(token->type == TID_QUOTE)
                 {
                     node = ConcreteNodePtr(OGRE_NEW ConcreteNode());
-                    node->token = token->lexeme.substr(1, token->lexeme.size() - 2);
+                    node->token = unquoted(token->lexeme);
                     node->file = file;
                     node->line = token->line;
                     node->type = CNT_QUOTE;
@@ -472,7 +465,7 @@ namespace Ogre
                 node->file = file;
                 node->line = token->line;
                 node->parent = 0;
-                node->token = token->lexeme.substr(1, token->lexeme.size() - 2);
+                node->token= unquoted(token->lexeme);
                 node->type = CNT_QUOTE;
                 break;
             default:
