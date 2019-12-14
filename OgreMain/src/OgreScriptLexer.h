@@ -66,16 +66,15 @@ namespace Ogre {
         uint32 line;
     };
     typedef std::vector<ScriptToken> ScriptTokenList;
-    typedef SharedPtr<ScriptTokenList> ScriptTokenListPtr;
 
     class _OgrePrivate ScriptLexer : public ScriptCompilerAlloc
     {
     public:
         /** Tokenizes the given input and returns the list of tokens found */
-        static ScriptTokenListPtr tokenize(const String &str, const String &source);
+        static ScriptTokenList tokenize(const String &str, const String &source);
     private: // Private utility operations
-        static ScriptTokenListPtr _tokenize(const String &str, const char* source, String& error);
-        static void setToken(const String &lexeme, uint32 line, ScriptTokenList *tokens);
+        static ScriptTokenList _tokenize(const String &str, const char* source, String& error);
+        static void setToken(const String &lexeme, uint32 line, ScriptTokenList& tokens);
         static bool isWhitespace(Ogre::String::value_type c);
         static bool isNewline(Ogre::String::value_type c);
     };
