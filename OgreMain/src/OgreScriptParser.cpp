@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    ConcreteNodeListPtr ScriptParser::parse(const ScriptTokenListPtr &tokens, const String& file)
+    ConcreteNodeListPtr ScriptParser::parse(const ScriptTokenList &tokens, const String& file)
     {
         // MEMCATEGORY_GENERAL because SharedPtr can only free using that category
         ConcreteNodeListPtr nodes(OGRE_NEW_T(ConcreteNodeList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
@@ -41,8 +41,8 @@ namespace Ogre
 
         ConcreteNode *parent = 0;
         ConcreteNodePtr node;
-        ScriptToken *token = 0;
-        ScriptTokenList::iterator i = tokens->begin(), end = tokens->end();
+        const ScriptToken *token = 0;
+        ScriptTokenList::const_iterator i = tokens.begin(), end = tokens.end();
         while(i != end)
         {
             token = &*i;
@@ -240,7 +240,7 @@ namespace Ogre
                 if(token->type == TID_NEWLINE)
                 {
                     // Look ahead to the next non-newline token and if it isn't an {, this was a property
-                    ScriptTokenList::iterator next = skipNewlines(i, end);
+                    ScriptTokenList::const_iterator next = skipNewlines(i, end);
                     if(next == end || next->type != TID_LBRACKET)
                     {
                         // Ended a property here
@@ -260,7 +260,7 @@ namespace Ogre
                     // The following token are the parent objects (base classes).
                     // Require at least one of them.
 
-                    ScriptTokenList::iterator j = i + 1;
+                    ScriptTokenList::const_iterator j = i + 1;
                     j = skipNewlines(j, end);
                     if(j == end || (j->type != TID_WORD && j->type != TID_QUOTE)) {
                         OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
@@ -438,14 +438,14 @@ namespace Ogre
         return nodes;
     }
 
-    ConcreteNodeListPtr ScriptParser::parseChunk(const ScriptTokenListPtr &tokens, const String& file)
+    ConcreteNodeListPtr ScriptParser::parseChunk(const ScriptTokenList &tokens, const String& file)
     {
         // MEMCATEGORY_GENERAL because SharedPtr can only free using that category
         ConcreteNodeListPtr nodes(OGRE_NEW_T(ConcreteNodeList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         ConcreteNodePtr node;
         const ScriptToken *token = 0;
-        for(ScriptTokenList::const_iterator i = tokens->begin(); i != tokens->end(); ++i)
+        for(ScriptTokenList::const_iterator i = tokens.begin(); i != tokens.end(); ++i)
         {
             token = &*i;
 
@@ -489,16 +489,16 @@ namespace Ogre
         return nodes;
     }
 
-    ScriptToken *ScriptParser::getToken(ScriptTokenList::iterator i, ScriptTokenList::iterator end, int offset)
+    const ScriptToken *ScriptParser::getToken(ScriptTokenList::const_iterator i, ScriptTokenList::const_iterator end, int offset)
     {
-        ScriptToken *token = 0;
-        ScriptTokenList::iterator iter = i + offset;
+        const ScriptToken *token = 0;
+        ScriptTokenList::const_iterator iter = i + offset;
         if(iter != end)
             token = &*i;
         return token;
     }
 
-    ScriptTokenList::iterator ScriptParser::skipNewlines(ScriptTokenList::iterator i, ScriptTokenList::iterator end)
+    ScriptTokenList::const_iterator ScriptParser::skipNewlines(ScriptTokenList::const_iterator i, ScriptTokenList::const_iterator end)
     {
         while(i != end && i->type == TID_NEWLINE)
             ++i;
