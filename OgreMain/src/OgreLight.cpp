@@ -526,7 +526,10 @@ namespace Ogre {
     {
         if (mLightType == LT_DIRECTIONAL)
         {
-            tempSquareDist = 0;
+            // make sure directional lights are always in front
+            // even of point lights at worldPos
+            // tempSquareDist is just a tag for sorting, and nobody will take the sqrt
+            tempSquareDist = -1;
         }
         else
         {
