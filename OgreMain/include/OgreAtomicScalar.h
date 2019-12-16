@@ -1,1 +1,1 @@
-#warning "This header is deprecated, migrate to Ogre.h"
+#pragma message( __FILE__ " is deprecated, migrate to Ogre.h")
