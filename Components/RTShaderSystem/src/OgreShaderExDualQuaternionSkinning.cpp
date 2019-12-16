@@ -84,30 +84,27 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         //mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
         mParamInIndices = vsMain->resolveInputParameter(Parameter::SPC_BLEND_INDICES);
         mParamInWeights = vsMain->resolveInputParameter(Parameter::SPC_BLEND_WEIGHTS);
-        //ACT_WORLD_DUALQUATERNION_ARRAY_2x4 is an array of float4s, so there are two indices for each bone (required by Cg)
-        mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, GCT_FLOAT4, 0, mBoneCount * 2);
+        mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, mBoneCount);
         mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
         mParamInViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEWPROJ_MATRIX);
         
         mParamTempWorldMatrix = vsMain->resolveLocalParameter("worldMatrix", GCT_MATRIX_2X4);
         mParamBlendDQ = vsMain->resolveLocalParameter("blendDQ", GCT_MATRIX_2X4);
         mParamInitialDQ = vsMain->resolveLocalParameter("initialDQ", GCT_MATRIX_2X4);
-        mParamIndex1 = vsMain->resolveLocalParameter("index1", GCT_FLOAT1);
-        mParamIndex2 = vsMain->resolveLocalParameter("index2", GCT_FLOAT1);
-                
+
+        if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
+        {
+            //set hlsl shader to use row-major matrices instead of column-major.
+            //it enables the use of auto-bound 3x4 matrices in generated hlsl shader.
+            vsProgram->setUseColumnMajorMatrices(false);
+        }
+
         if(mScalingShearingSupport)
         {
-            if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
-            {
-                //set hlsl shader to use row-major matrices instead of column-major.
-                //it enables the use of auto-bound 3x4 matrices in generated hlsl shader.
-                vsProgram->setUseColumnMajorMatrices(false);
-            }
-                
             mParamInScaleShearMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, mBoneCount);
-            mParamBlendS = vsMain->resolveLocalParameter("blendS", GCT_MATRIX_3X4);
+            mParamBlendS = vsMain->resolveLocalParameter("blendS", mParamInScaleShearMatrices->getType()); // will be transposed for GLSL
             mParamTempFloat3x3 = vsMain->resolveLocalParameter("TempVal3x3", GCT_MATRIX_3X3);
-            mParamTempFloat3x4 = vsMain->resolveLocalParameter("TempVal3x4", GCT_MATRIX_3X4);
+            mParamTempFloat3x4 = vsMain->resolveLocalParameter("TempVal3x4", mParamInScaleShearMatrices->getType()); // will be transposed for GLSL
         }
         
         mParamTempFloat2x4 = vsMain->resolveLocalParameter("TempVal2x4", GCT_MATRIX_2X4);
@@ -171,7 +168,7 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
             }
 
             //Transform the position based by the scaling and shearing matrix
-            stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendS, In(mParamInPosition).xyz(), mParamLocalBlendPosition);
+            stage.callFunction(FFP_FUNC_TRANSFORM, mParamBlendS, mParamInPosition, mParamLocalBlendPosition);
         }
         else
         {
@@ -182,19 +179,10 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
         //Set functions to calculate world position
         for(int i = 0 ; i < getWeightCount() ; ++i)
         {
-            //Set the index of the matrix
-            stage.assign(In(mParamInIndices).mask(indexToMask(i)), mParamIndex1);
-            
-            //Multiply the index by 2
-            stage.mul(mParamIndex1, 2, mParamIndex1);
-            
-            //Add 1 to the index and assign as the second row's index
-            stage.add(mParamIndex1, 1, mParamIndex2);
-            
-            //Build the dual quaternion matrix
-            stage.callFunction(SGX_FUNC_BUILD_DUAL_QUATERNION_MATRIX,
-                               {In(mParamInWorldMatrices), At(mParamIndex1), In(mParamInWorldMatrices),
-                                At(mParamIndex2), Out(mParamTempFloat2x4)});
+            // Build the dual quaternion matrix
+            stage.callFunction(
+                SGX_FUNC_BUILD_DUAL_QUATERNION_MATRIX,
+                {In(mParamInWorldMatrices), At(mParamInIndices).mask(indexToMask(i)), Out(mParamTempFloat2x4)});
 
             //Adjust the podalities of the dual quaternions
             if(mCorrectAntipodalityHandling)

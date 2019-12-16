@@ -1,6 +1,6 @@
 #version 120
 
-mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[48]);
+mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, mat4x2 dualQuaternions[24]);
 vec3 calculateBlendPosition(vec3 position, mat2x4 blendDQ);
 vec3 calculateBlendNormal(vec3 normal, mat2x4 blendDQ);
 
@@ -22,8 +22,8 @@ mat3 adjointTransposeMatrix(mat3 M)
 	return atM;
 }
 
-uniform vec4 worldDualQuaternion2x4Array[48];
-uniform vec4 scaleM[72];
+uniform mat4x2 worldDualQuaternion2x4Array[24];
+uniform mat4x3 scaleM[24];
 uniform mat4 viewProjectionMatrix;
 uniform vec4   lightPos[2];
 uniform vec4   lightDiffuseColour[2];
@@ -40,13 +40,11 @@ varying vec4 colour;
 void main()
 {	
 	//First phase - applies scaling and shearing:
-	int blendIndicesX = int(blendIndices.x) * 3;
-	int blendIndicesY = int(blendIndices.y) * 3;
+	int blendIndicesX = int(blendIndices.x);
+	int blendIndicesY = int(blendIndices.y);
 	
-	mat3x4 blendS = blendWeights.x*mat3x4(scaleM[blendIndicesX], 
-		scaleM[blendIndicesX + 1], scaleM[blendIndicesX + 2]);
-	
-	blendS += blendWeights.y*mat3x4(scaleM[blendIndicesY], scaleM[blendIndicesY + 1], scaleM[blendIndicesY + 2]);
+	mat3x4 blendS = blendWeights.x*transpose(scaleM[blendIndicesX]);
+	blendS += blendWeights.y*transpose(scaleM[blendIndicesY]);
 
 	vec3 pass1_position = vertex* blendS;
 

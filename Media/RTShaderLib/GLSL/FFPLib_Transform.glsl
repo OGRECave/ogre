@@ -61,11 +61,11 @@ void FFP_Transform(in mat4 m,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Transform(in mat3x4 m, 
-				   in vec3 v, 
+void FFP_Transform(in mat4x3 m,
+				   in vec4 v,
 				   out vec3 vOut)
 {
-	vOut = mat3(m) * v;
+	vOut = m * v;
 }
 
 //-----------------------------------------------------------------------------
