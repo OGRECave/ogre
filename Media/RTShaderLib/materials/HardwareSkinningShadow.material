@@ -11,10 +11,6 @@ fragment_program Ogre/RTShader/shadow_caster_ps_cg cg
 	profiles ps_2_0 fp40
 	// entry function
 	entry_point shadow_caster_ps
- 	default_params
-	{
-		
-	}
 }
 
 vertex_program Ogre/RTShader/shadow_caster_skinning_1weight_vs cg
@@ -83,23 +79,20 @@ vertex_program Ogre/RTShader/shadow_caster_skinning_4weight_vs cg
 fragment_program Ogre/RTShader/shadow_caster_ps_hlsl hlsl
 {
 	// source file
-	source HardwareSkinningShadow.hlsl
+	source HardwareSkinningShadow.cg
 	// will run on pixel shader 2.0+
-	target ps_4_0
+	target ps_2_0
 	// entry function
 	entry_point shadow_caster_ps
- 	default_params
-	{
-		
-	}
 }
 
 vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_hlsl hlsl
 {
-	source HardwareSkinningShadow.hlsl
+	source HardwareSkinningShadow.cg
 	//will run on 3 to accommodate the amount of registers
-	target vs_4_0
+	target vs_3_0
 	entry_point shadow_caster_skinning_2weight_vs
+    column_major_matrices false
 
 	default_params
 	{
