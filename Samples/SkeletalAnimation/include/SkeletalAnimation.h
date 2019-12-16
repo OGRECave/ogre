@@ -152,9 +152,10 @@ protected:
     {
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        // RTSS currently unable to generate shader for GLSLES and HLSL
-        if (mShaderGenerator->getTargetLanguage() != "glsles" &&
-                mShaderGenerator->getTargetLanguage() != "hlsl")
+        isD3D11 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+
+        // RTSS currently unable to generate shader for GLSLES and D3D11
+        if (mShaderGenerator->getTargetLanguage() != "glsles" && !isD3D11)
         {
             // Make this viewport work with shader generator scheme.
             mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -271,8 +272,7 @@ protected:
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
             //see above
-            if (mShaderGenerator->getTargetLanguage() != "glsles" &&
-                    mShaderGenerator->getTargetLanguage() != "hlsl")
+            if (mShaderGenerator->getTargetLanguage() != "glsles" && !isD3D11)
             {
                 //In case the system uses the RTSS, the following line will ensure
                 //that the entity is using hardware animation in RTSS as well.
@@ -386,8 +386,7 @@ protected:
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         //see above
-        if (mShaderGenerator->getTargetLanguage() != "glsles" &&
-                mShaderGenerator->getTargetLanguage() != "hlsl")
+        if (mShaderGenerator->getTargetLanguage() != "glsles" && !isD3D11)
         {
             Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
             renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
@@ -410,6 +409,7 @@ protected:
     Vector3 mSneakEndPos;
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+    bool isD3D11;
     RTShader::SubRenderState* mSrsHardwareSkinning;
 #endif
 };

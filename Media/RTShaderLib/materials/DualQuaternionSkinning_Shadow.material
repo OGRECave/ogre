@@ -11,6 +11,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs unified
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs unified
 {
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_cg
+    delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_hlsl
     delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_glsl
 }
 
@@ -71,26 +72,16 @@ fragment_program Ogre/RTShader/shadow_caster_dq_ps_cg cg
 	profiles ps_2_0 fp40
 	// entry function
 	entry_point shadow_caster_dq_ps
-
- 	default_params
-	{
-		
-	}
 }
 
 fragment_program Ogre/RTShader/shadow_caster_dq_ps_hlsl hlsl
 {
 	// source file
-	source DualQuaternionSkinning_Shadow.hlsl
+	source DualQuaternionSkinning_Shadow.cg
 	// will run on pixel shader 2.0+
-	target ps_4_0
+	target ps_2_0
 	// entry function
 	entry_point shadow_caster_dq_ps
-
- 	default_params
-	{
-		
-	}
 }
 
 vertex_program Ogre/RTShader/DualQuaternionHardwareSkinningTwoWeightsCommon glsl
@@ -145,6 +136,23 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_glsl glsl
 	source DualQuaternionSkinning_ShadowFourWeights.glsl
 	attach Ogre/RTShader/DualQuaternionHardwareSkinningTwoWeightsCommon
 	includes_skeletal_animation true
+
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_hlsl hlsl
+{
+	source DualQuaternionSkinning_Shadow.cg
+	//will run on 3 to accommodate the amount of registers
+	target vs_3_0
+	entry_point shadow_caster_dq_skinning_2weight_vs
+	includes_skeletal_animation true
+    column_major_matrices false
 
 	default_params
 	{
@@ -251,11 +259,12 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_cg cg
 
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_hlsl hlsl
 {
-	source DualQuaternionSkinning_Shadow.hlsl
+	source DualQuaternionSkinning_Shadow.cg
 	//will run on 3 to accommodate the amount of registers
-	target vs_4_0
+	target vs_3_0
 	entry_point shadow_caster_dq_skinning_2weight_twophase_vs
 	includes_skeletal_animation true
+    column_major_matrices false
 
 	default_params
 	{
