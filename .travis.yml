@@ -29,7 +29,7 @@ addons:
     - swig3.0
 before_script:
     - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew update && brew install freetype libzzip sdl2 pugixml ; fi
-osx_image: xcode9.4
+osx_image: xcode9.2
 env:
     - TEST=TRUE
     - GL3ES=TRUE # build GL3Plus and GLES2 Rendersystems
