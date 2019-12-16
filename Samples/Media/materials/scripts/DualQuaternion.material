@@ -10,19 +10,6 @@ material spine
 			{
 				texture circuit.dds
 			}
-			
-			vertex_program_ref Ogre/HardwareSkinningTwoWeights
-			{
-			
-			}
-	
-			// alternate shadow caster program
-			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
-			{
-				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-				param_named_auto viewProjectionMatrix viewproj_matrix
-				param_named_auto ambient ambient_light_colour
-			}
 		}
 	}
 }
@@ -38,14 +25,6 @@ material spineDualQuat
 			texture_unit
 			{
 				texture circuit.dds
-			}
-			
-			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhase
-			{
-			}
-
-			shadow_caster_vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster
-			{
 			}
 		}
 	}
