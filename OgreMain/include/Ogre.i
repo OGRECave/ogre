@@ -106,6 +106,18 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore ::operator<<;
 %feature("python:slot", "tp_repr", functype="reprfunc") *::__repr__;
 
+%ignore *::operator+;
+%rename(__add__) *::operator+;
+
+%ignore *::operator-;
+%rename(__sub__) *::operator-;
+
+%ignore *::operator*;
+%rename(__mul__) *::operator*;
+
+%ignore *::operator/;
+%rename(__div__) *::operator/;
+
 #ifdef SWIGJAVA
 #define REPRFUNC toString
 #elif defined(SWIGCSHARP)
