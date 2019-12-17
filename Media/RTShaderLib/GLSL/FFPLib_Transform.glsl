@@ -68,6 +68,13 @@ void FFP_Transform(in mat4x3 m,
 	vOut = m * v;
 }
 
+void FFP_Transform(in mat4x3 m,
+				   in vec3 v,
+				   out vec3 vOut)
+{
+	vOut = mat3(m) * v;
+}
+
 //-----------------------------------------------------------------------------
 void FFP_Transform(in mat4 m, 
 				   in vec3 v, 
