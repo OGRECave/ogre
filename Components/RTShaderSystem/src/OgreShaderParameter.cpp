@@ -174,6 +174,8 @@ Parameter::Parameter(GpuConstantType type, const String& name,
             const Content& content, size_t size) :
     mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size), mUsed(false)
 {
+    if (ShaderGenerator::getSingleton().getTargetLanguage()[0] == 'h' && mSemantic == SPS_BLEND_INDICES)
+        mType = GCT_UINT4;
 }
 
 //-----------------------------------------------------------------------

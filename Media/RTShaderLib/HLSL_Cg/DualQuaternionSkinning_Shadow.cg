@@ -1,4 +1,4 @@
-float2x4 blendTwoWeights(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+float2x4 blendTwoWeights(float4 blendWgt, uint4 blendIdx, float2x4 dualQuaternions[24])
 {
 	float2x4 blendDQ = blendWgt.x*dualQuaternions[blendIdx.x];
 	blendDQ += blendWgt.y*dualQuaternions[blendIdx.y];
@@ -6,7 +6,7 @@ float2x4 blendTwoWeights(float4 blendWgt, float4 blendIdx, float2x4 dualQuaterni
 	return blendDQ;
 }
 
-float2x4 blendTwoWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+float2x4 blendTwoWeightsAntipod(float4 blendWgt, uint4 blendIdx, float2x4 dualQuaternions[24])
 {
 	float2x4 dq0 = dualQuaternions[blendIdx.x];
 	float2x4 dq1 = dualQuaternions[blendIdx.y];
@@ -21,7 +21,7 @@ float2x4 blendTwoWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQ
 	return blendDQ;
 }
 
-float2x4 blendThreeWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+float2x4 blendThreeWeightsAntipod(float4 blendWgt, uint4 blendIdx, float2x4 dualQuaternions[24])
 {
 	float2x4 dq0 = dualQuaternions[blendIdx.x];
 	float2x4 dq1 = dualQuaternions[blendIdx.y];
@@ -39,7 +39,7 @@ float2x4 blendThreeWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dua
 	return blendDQ;
 }
 
-float2x4 blendFourWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+float2x4 blendFourWeightsAntipod(float4 blendWgt, uint4 blendIdx, float2x4 dualQuaternions[24])
 {
 	float2x4 dq0 = dualQuaternions[blendIdx.x];
 	float2x4 dq1 = dualQuaternions[blendIdx.y];
@@ -117,7 +117,7 @@ void shadow_caster_dq_ps(
 //Shadow caster pass
 void shadow_caster_dq_skinning_1weight_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+	uint4 blendIdx : BLENDINDICES,
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -143,7 +143,7 @@ void shadow_caster_dq_skinning_1weight_vs(
 
 void shadow_caster_dq_skinning_2weight_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+	uint4 blendIdx : BLENDINDICES,
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -169,7 +169,7 @@ void shadow_caster_dq_skinning_2weight_vs(
 
 void shadow_caster_dq_skinning_3weight_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+	uint4 blendIdx : BLENDINDICES,
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -195,7 +195,7 @@ void shadow_caster_dq_skinning_3weight_vs(
 
 void shadow_caster_dq_skinning_4weight_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+	uint4 blendIdx : BLENDINDICES,
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -223,7 +223,7 @@ void shadow_caster_dq_skinning_4weight_vs(
 //Two-phase skinning shadow caster pass
 void shadow_caster_dq_skinning_1weight_twophase_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+	uint4 blendIdx : BLENDINDICES,
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -257,7 +257,7 @@ void shadow_caster_dq_skinning_1weight_twophase_vs(
 //Two-phase skinning shadow caster pass
 void shadow_caster_dq_skinning_2weight_twophase_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+	uint4 blendIdx : BLENDINDICES,
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
