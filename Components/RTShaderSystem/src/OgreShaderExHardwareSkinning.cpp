@@ -297,7 +297,7 @@ SubRenderState* HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 
         if (hasError == true)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, "Expected the format: hardware_skinning <bone count> <weight count> [skinning type] [correct antipodality handling] [scaling/shearing support]");
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return NULL;
         }
         else
