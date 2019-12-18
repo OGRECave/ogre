@@ -22,6 +22,7 @@ Here are the attributes you can use in a `rtshader_system` block of a .material 
 - [light_count](#light_count)
 - [triplanarTexturing](#triplanarTexturing)
 - [integrated_pssm4](#integrated_pssm4)
+- [hardware_skinning](#hardware_skinning)
 - [layered_blend](#layered_blend)
 - [source_modifier](#source_modifier)
 
@@ -86,6 +87,19 @@ Valid values are [0; 0.57] not bigger to avoid division by zero
 Integrated PSSM shadow receiver with 2 splits. Custom split points.
 @par
 Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar>`
+
+<a name="hardware_skinning"></a>
+
+## hardware_skinning
+Include skinning calculations for Skeletal Animation in the shader to move computations to the GPU
+@par
+Format: `hardware_skinning <max_bone_count> <max_weight_count> [type antipodality_check scale_shear]`
+@par
+Example: `hardware_skinning 24 2 dual_quaternion true false`
+
+@param type either `dual_quaternion` or `linear`
+@param antipodality_check Accurate antipodality handling for rotations > 180°
+@param scale_shear add scaling and shearing support to dual quaternion computation
 
 <a name="layered_blend"></a>
 
