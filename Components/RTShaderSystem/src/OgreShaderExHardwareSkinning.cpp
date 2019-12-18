@@ -194,8 +194,11 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
         //update the receiver and caster materials
         if (!dstPass->getParent()->getShadowCasterMaterial())
         {
-            dstPass->getParent()->setShadowCasterMaterial(
-                mCreator->getCustomShadowCasterMaterial(mSkinningType, weightCount - 1));
+            auto casterMat = mCreator->getCustomShadowCasterMaterial(mSkinningType, weightCount - 1);
+
+            // if the caster material itsefl uses RTSS hardware skinning
+            if(casterMat.get() != dstPass->getParent()->getParent())
+                dstPass->getParent()->setShadowCasterMaterial(casterMat);
         }
 
         if (!dstPass->getParent()->getShadowReceiverMaterial())
@@ -289,6 +292,8 @@ SubRenderState* HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
                 skinType = ST_LINEAR;
             }
         }
+        else
+            hasError = true;
 
         if (hasError == true)
         {
