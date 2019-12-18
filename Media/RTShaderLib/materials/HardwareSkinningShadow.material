@@ -1,146 +1,4 @@
 ///////////////////////////////////////////////////////////////////////////
-/// Declare CG shaders for casters
-///////////////////////////////////////////////////////////////////////////
-
-// declare the fragment shader (CG for the language)
-fragment_program Ogre/RTShader/shadow_caster_ps_cg cg
-{
-	// source file
-	source HardwareSkinningShadow.cg
-	// will run on pixel shader 2.0+
-	profiles ps_2_0 fp40
-	// entry function
-	entry_point shadow_caster_ps
-}
-
-vertex_program Ogre/RTShader/shadow_caster_skinning_1weight_vs cg
-{
-	source HardwareSkinningShadow.cg
-	//will run on 3 to accommodate the amount of registers
-	profiles vs_3_0 vp40
-	entry_point shadow_caster_skinning_1weight_vs
-
-	default_params
-	{
-		param_named_auto viewProjectionMatrix viewproj_matrix	
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-	}
-}
-
-vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_cg cg
-{
-	source HardwareSkinningShadow.cg
-	//will run on 3 to accommodate the amount of registers
-	profiles vs_3_0 vp40
-	entry_point shadow_caster_skinning_2weight_vs
-
-	default_params
-	{
-		param_named_auto viewProjectionMatrix viewproj_matrix	
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-	}
-}
-
-vertex_program Ogre/RTShader/shadow_caster_skinning_3weight_vs cg
-{
-	source HardwareSkinningShadow.cg
-	//will run on 3 to accommodate the amount of registers
-	profiles vs_3_0 vp40
-	entry_point shadow_caster_skinning_3weight_vs
-
-	default_params
-	{
-		param_named_auto viewProjectionMatrix viewproj_matrix	
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-	}
-}
-
-
-vertex_program Ogre/RTShader/shadow_caster_skinning_4weight_vs cg
-{
-	source HardwareSkinningShadow.cg
-	//will run on 3 to accommodate the amount of registers
-	profiles vs_3_0 vp40
-	entry_point shadow_caster_skinning_4weight_vs
-
-	default_params
-	{
-		param_named_auto viewProjectionMatrix viewproj_matrix	
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-	}
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Declare HLSL shaders for casters
-///////////////////////////////////////////////////////////////////////////
-
-// declare the fragment shader (HLSL for the language)
-fragment_program Ogre/RTShader/shadow_caster_ps_hlsl hlsl
-{
-	// source file
-	source HardwareSkinningShadow.cg
-	// will run on pixel shader 2.0+
-	target ps_2_0
-	// entry function
-	entry_point shadow_caster_ps
-}
-
-vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_hlsl hlsl
-{
-	source HardwareSkinningShadow.cg
-	//will run on 3 to accommodate the amount of registers
-	target vs_3_0
-	entry_point shadow_caster_skinning_2weight_vs
-    column_major_matrices false
-
-	default_params
-	{
-		param_named_auto viewProjectionMatrix viewproj_matrix	
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////
-/// Declare GLSL shaders for casters
-///////////////////////////////////////////////////////////////////////////
-
-fragment_program Ogre/RTShader/shadow_caster_ps_glsl glsl
-{
-	source HardwareSkinningShadow_Fragment.glsl
-}
-
-vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_glsl glsl
-{
-	source HardwareSkinningShadow_TwoWeights.glsl
-	includes_skeletal_animation true
-
-	default_params
-	{
-		param_named_auto viewProjectionMatrix viewproj_matrix	
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-		param_named_auto ambient ambient_light_colour
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////
-/// Unified program declarations
-///////////////////////////////////////////////////////////////////////////
-fragment_program Ogre/RTShader/shadow_caster_ps unified
-{
-	delegate Ogre/RTShader/shadow_caster_ps_cg
-    delegate Ogre/RTShader/shadow_caster_ps_glsl
-	delegate Ogre/RTShader/shadow_caster_ps_hlsl
-}
-
-vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs unified
-{
-    delegate Ogre/RTShader/shadow_caster_skinning_2weight_vs_cg
-	delegate Ogre/RTShader/shadow_caster_skinning_2weight_vs_hlsl
-	delegate Ogre/RTShader/shadow_caster_skinning_2weight_vs_glsl
-}
-
-///////////////////////////////////////////////////////////////////////////
 /// Declare materials for casters and casters with hardware skinning
 ///////////////////////////////////////////////////////////////////////////
 
@@ -148,16 +6,13 @@ material Ogre/RTShader/shadow_caster_skinning_1weight
 {
 	technique
 	{
-		// all this will do is write depth and depth� to red and green
 		pass
 		{
-			vertex_program_ref Ogre/RTShader/shadow_caster_skinning_1weight_vs
-			{				
-			}
-
-			fragment_program_ref Ogre/RTShader/shadow_caster_ps
-			{				
-			}
+			diffuse 0 0 0
+            rtshader_system
+            {
+                hardware_skinning 24 1
+            }
 		}
 	}
 }
@@ -167,16 +22,13 @@ material Ogre/RTShader/shadow_caster_skinning_2weight
 {
 	technique
 	{
-		// all this will do is write depth and depth� to red and green
 		pass
 		{
-			vertex_program_ref Ogre/RTShader/shadow_caster_skinning_2weight_vs
-			{				
-			}
-
-			fragment_program_ref Ogre/RTShader/shadow_caster_ps
-			{				
-			}
+			diffuse 0 0 0
+            rtshader_system
+            {
+                hardware_skinning 24 2
+            }
 		}
 	}
 }
@@ -186,16 +38,13 @@ material Ogre/RTShader/shadow_caster_skinning_3weight
 {
 	technique
 	{
-		// all this will do is write depth and depth� to red and green
 		pass
 		{
-			vertex_program_ref Ogre/RTShader/shadow_caster_skinning_3weight_vs
-			{				
-			}
-
-			fragment_program_ref Ogre/RTShader/shadow_caster_ps
-			{				
-			}
+			diffuse 0 0 0
+            rtshader_system
+            {
+                hardware_skinning 24 3
+            }
 		}
 	}
 }
@@ -205,16 +54,13 @@ material Ogre/RTShader/shadow_caster_skinning_4weight
 {
 	technique
 	{
-		// all this will do is write depth and depth� to red and green
 		pass
 		{
-			vertex_program_ref Ogre/RTShader/shadow_caster_skinning_4weight_vs
-			{				
-			}
-
-			fragment_program_ref Ogre/RTShader/shadow_caster_ps
-			{				
-			}
+			diffuse 0 0 0
+            rtshader_system
+            {
+                hardware_skinning 24 4
+            }
 		}
 	}
 }
