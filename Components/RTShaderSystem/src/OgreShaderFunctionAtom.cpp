@@ -381,20 +381,28 @@ bool FunctionInvocation::FunctionInvocationCompare::operator ()(FunctionInvocati
     if (lhs.getReturnType() != rhs.getReturnType())
         return false;
 
-    // Check the number of operands
-    if (lhs.mOperands.size() != rhs.mOperands.size())
+    // filter indirect operands
+    std::vector<const Operand*> lhsOps;
+    std::vector<const Operand*> rhsOps;
+    for(const Operand& op : lhs.mOperands)
+        if(op.getIndirectionLevel() == 0) lhsOps.push_back(&op);
+    for(const Operand& op : rhs.mOperands)
+        if(op.getIndirectionLevel() == 0) rhsOps.push_back(&op);
+
+    // Check the number of direct operands
+    if (lhsOps.size() != rhsOps.size())
         return false;
 
     // Now that we've gotten past the two quick tests, iterate over operands
     // Check the semantic and type.  The operands must be in the same order as well.
-    OperandVector::const_iterator itLHSOps = lhs.mOperands.begin();
-    OperandVector::const_iterator itRHSOps = rhs.mOperands.begin();
-    for ( ; ((itLHSOps != lhs.mOperands.end()) && (itRHSOps != rhs.mOperands.end())); ++itLHSOps, ++itRHSOps)
+    auto itLHSOps = lhsOps.begin();
+    auto itRHSOps = rhsOps.begin();
+    for ( ; ((itLHSOps != lhsOps.end()) && (itRHSOps != rhsOps.end())); ++itLHSOps, ++itRHSOps)
     {
-        if (itLHSOps->getSemantic() != itRHSOps->getSemantic())
+        if ((*itLHSOps)->getSemantic() != (*itRHSOps)->getSemantic())
             return false;
 
-        if (getSwizzledSize(*itLHSOps) != getSwizzledSize(*itRHSOps))
+        if (getSwizzledSize(**itLHSOps) != getSwizzledSize(**itRHSOps))
             return false;
     }
 

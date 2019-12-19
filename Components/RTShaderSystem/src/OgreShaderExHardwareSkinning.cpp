@@ -186,6 +186,11 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
         (weightCount != 0) && (weightCount <= 4) &&
         ((mCreator == NULL) || (boneCount <= mCreator->getMaxCalculableBoneCount()));
 
+    // This requires GLES3.0
+    if (ShaderGenerator::getSingleton().getTargetLanguage() == "glsles" &&
+        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es"))
+        doBoneCalculations = false;
+
     mActiveTechnique->setDoBoneCalculations(doBoneCalculations);
     mActiveTechnique->setDoLightCalculations(srcPass->getLightingEnabled());
 
@@ -417,6 +422,11 @@ const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(cons
 void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, SkinningType skinningType, 
                                bool correctAntidpodalityHandling, bool shearScale)
 {
+    // This requires GLES3.0
+    if (ShaderGenerator::getSingleton().getTargetLanguage() == "glsles" &&
+        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es"))
+        return;
+
     if (pEntity != NULL) 
     {
         size_t lodLevels = pEntity->getNumManualLodLevels() + 1;
