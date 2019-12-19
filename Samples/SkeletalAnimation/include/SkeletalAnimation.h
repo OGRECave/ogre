@@ -152,26 +152,22 @@ protected:
     {
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        // RTSS currently unable to generate shader for GLSLES
-        if (mShaderGenerator->getTargetLanguage() != "glsles")
-        {
-            // Make this viewport work with shader generator scheme.
-            mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-            mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        // Make this viewport work with shader generator scheme.
+        mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-            //Add the hardware skinning to the shader generator default render state
-            mSrsHardwareSkinning = mShaderGenerator->createSubRenderState<RTShader::HardwareSkinning>();
-            Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-            renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
-            
-            Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight");
-            Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight");
-            Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_3weight");
-            Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight");
+        //Add the hardware skinning to the shader generator default render state
+        mSrsHardwareSkinning = mShaderGenerator->createSubRenderState<RTShader::HardwareSkinning>();
+        Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
 
-            Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
-                Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
-        }
+        Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight");
+        Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight");
+        Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_3weight");
+        Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight");
+
+        Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
+            Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
 #endif
         // set shadow properties
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
@@ -261,21 +257,9 @@ protected:
             sn->attachObject(ent);
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-            //see above
-            if (mShaderGenerator->getTargetLanguage() != "glsles")
-            {
-                //In case the system uses the RTSS, the following line will ensure
-                //that the entity is using hardware animation in RTSS as well.
-                RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent, Ogre::RTShader::ST_DUAL_QUATERNION, true, false);
-                
-                //The following line is needed only because the Jaiqua model material has shaders and
-                //as such is not automatically reflected in the RTSS system
-                RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
-                    *ent->getSubEntity(0)->getMaterial(),
-                    Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-                    Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                    true);
-            }
+            //In case the system uses the RTSS, the following line will ensure
+            //that the entity is using hardware animation in RTSS as well.
+            RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent, Ogre::RTShader::ST_DUAL_QUATERNION, true, false);
 #endif
         
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
@@ -375,12 +359,8 @@ protected:
         mSceneMgr->destroyEntity("Jaiqua");
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        //see above
-        if (mShaderGenerator->getTargetLanguage() != "glsles")
-        {
-            Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-            renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
-        }
+        Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
 #endif
     }
 
