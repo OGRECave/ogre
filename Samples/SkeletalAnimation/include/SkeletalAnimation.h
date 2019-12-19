@@ -257,14 +257,6 @@ protected:
 
             // create and attach a jaiqua entity
             ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
-
-#ifdef INCLUDE_RTSHADER_SYSTEM
-            if (mShaderGenerator->getTargetLanguage() == "glsles")
-            {
-                MaterialPtr mat = MaterialManager::getSingleton().getByName("jaiqua");
-                mat->getTechnique(0)->getPass(0)->setShadowCasterFragmentProgram("Ogre/BasicFragmentPrograms/PassthroughFpGLSLES");
-            }
-#endif
             ent->setMaterialName("jaiqua");
             sn->attachObject(ent);
 
