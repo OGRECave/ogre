@@ -9,6 +9,7 @@ material Ogre/RTShader/shadow_caster_skinning_1weight
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 1
@@ -25,6 +26,7 @@ material Ogre/RTShader/shadow_caster_skinning_2weight
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 2
@@ -41,6 +43,7 @@ material Ogre/RTShader/shadow_caster_skinning_3weight
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 3
@@ -57,6 +60,7 @@ material Ogre/RTShader/shadow_caster_skinning_4weight
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 4

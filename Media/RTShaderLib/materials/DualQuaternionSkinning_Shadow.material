@@ -9,6 +9,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_1weight
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 1 dual_quaternion true false
@@ -25,6 +26,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_2weight
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 2 dual_quaternion true false
@@ -41,6 +43,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_3weight
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 3 dual_quaternion true false
@@ -57,6 +60,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_4weight
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 4 dual_quaternion true false
@@ -72,6 +76,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 1 dual_quaternion true true
@@ -88,6 +93,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 2 dual_quaternion true true
@@ -104,6 +110,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 3 dual_quaternion true true
@@ -120,6 +127,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase
 		pass
 		{
 			diffuse 0 0 0
+			fog_override true none
             rtshader_system
             {
                 hardware_skinning 24 4 dual_quaternion true true
