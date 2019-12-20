@@ -69,7 +69,7 @@ void SGX_BlendWeight(in float blendWgt, in mat2x4 dualQuaternion, out mat2x4 vOu
 }
 
 //-----------------------------------------------------------------------------
-void SGX_BlendWeight(in float blendWgt, in mat4x3 scaleShearMatrix, out mat4x3 vOut)
+void SGX_BlendWeight(in float blendWgt, in mat3x4 scaleShearMatrix, out mat3x4 vOut)
 {
 	vOut = blendWgt*scaleShearMatrix;
 }
@@ -105,7 +105,7 @@ void SGX_NormalizeDualQuaternion(inout mat2x4 dq)
 }
 
 //-----------------------------------------------------------------------------
-void SGX_AdjointTransposeMatrix(in mat4x3 M, out mat3 vOut)
+void SGX_AdjointTransposeMatrix(in mat3x4 M, out mat3 vOut)
 {
 	mat3x3 atM;
 	atM[0][0] = M[2][2] * M[1][1] - M[1][2] * M[2][1];
@@ -127,9 +127,4 @@ void SGX_AdjointTransposeMatrix(in mat4x3 M, out mat3 vOut)
 void SGX_BuildDualQuaternionMatrix(in vec4 r1, in vec4 r2, out mat2x4 vOut)
 {
 	vOut = mat2x4(r1, r2);
-}
-
-void SGX_BuildDualQuaternionMatrix(in mat4x2 M, out mat2x4 vOut)
-{
-	vOut = transpose(M);
 }

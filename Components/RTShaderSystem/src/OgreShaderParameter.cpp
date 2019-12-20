@@ -317,32 +317,6 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     mSize                = size;
 }
 
-/* transpose non-square uniform matrices for correct row-major > column-major mapping
- * this is actually the opposite of what we need to do, but we want to keep
- * the wrong indexing inside the shader so mat[0] returns the same data in both GLSL and HLSL
- * although it will be the first row in HLSL and the first column in GLSL
- */
-static GpuConstantType convertForUniform(GpuConstantType in)
-{
-    switch(in)
-    {
-    case GCT_MATRIX_2X3:
-        return GCT_MATRIX_3X2;
-    case GCT_MATRIX_2X4:
-        return GCT_MATRIX_4X2;
-    case GCT_MATRIX_3X2:
-        return GCT_MATRIX_2X3;
-    case GCT_MATRIX_3X4:
-        return GCT_MATRIX_4X3;
-    case GCT_MATRIX_4X2:
-        return GCT_MATRIX_2X4;
-    case GCT_MATRIX_4X3:
-        return GCT_MATRIX_3X4;
-    default:
-        return in;
-    }
-}
-
 //-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size)
 {
@@ -353,10 +327,6 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     if (nAutoConstantData != 0)
         mName += StringConverter::toString(nAutoConstantData);
     mType               = getGCType(parameterDef);
-
-    if (ShaderGenerator::getSingleton().getTargetLanguage()[0] == 'g')
-        mType = convertForUniform(mType);
-
     mSemantic           = SPS_UNKNOWN;
     mIndex              = -1;
     mContent            = SPC_UNKNOWN;
@@ -380,10 +350,6 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     if (nAutoConstantData != 0)
         mName += StringConverter::toString(nAutoConstantData);
     mType               = type;
-
-    if (ShaderGenerator::getSingleton().getTargetLanguage()[0] == 'g')
-        mType = convertForUniform(mType);
-
     mSemantic           = SPS_UNKNOWN;
     mIndex              = -1;
     mContent            = SPC_UNKNOWN;

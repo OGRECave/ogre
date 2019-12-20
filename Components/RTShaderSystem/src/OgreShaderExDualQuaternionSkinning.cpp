@@ -101,9 +101,9 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         if(mScalingShearingSupport)
         {
             mParamInScaleShearMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, mBoneCount);
-            mParamBlendS = vsMain->resolveLocalParameter("blendS", mParamInScaleShearMatrices->getType()); // will be transposed for GLSL
+            mParamBlendS = vsMain->resolveLocalParameter("blendS", GCT_MATRIX_3X4);
             mParamTempFloat3x3 = vsMain->resolveLocalParameter("TempVal3x3", GCT_MATRIX_3X3);
-            mParamTempFloat3x4 = vsMain->resolveLocalParameter("TempVal3x4", mParamInScaleShearMatrices->getType()); // will be transposed for GLSL
+            mParamTempFloat3x4 = vsMain->resolveLocalParameter("TempVal3x4", GCT_MATRIX_3X4);
         }
         
         mParamTempFloat2x4 = vsMain->resolveLocalParameter("TempVal2x4", GCT_MATRIX_2X4);
@@ -180,8 +180,7 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
         for(int i = 0 ; i < getWeightCount() ; ++i)
         {
             // Build the dual quaternion matrix
-            stage.callFunction(
-                SGX_FUNC_BUILD_DUAL_QUATERNION_MATRIX,
+            stage.assign(
                 {In(mParamInWorldMatrices), At(mParamInIndices).mask(indexToMask(i)), Out(mParamTempFloat2x4)});
 
             //Adjust the podalities of the dual quaternions
@@ -267,8 +266,7 @@ void DualQuaternionSkinning::addIndexedPositionWeight(Function* vsMain, int inde
     auto stage = vsMain->getStage(FFP_VS_TRANSFORM);
 
     //multiply position with world matrix and put into temporary param
-    stage.callFunction(SGX_FUNC_BLEND_WEIGHT, In(mParamInWeights).mask(indexToMask(index)), pWorldMatrix,
-                       pPositionTempParameter);
+    stage.mul(In(mParamInWeights).mask(indexToMask(index)), pWorldMatrix, pPositionTempParameter);
 
     //check if on first iteration
     if (index == 0)
