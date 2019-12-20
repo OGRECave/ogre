@@ -205,6 +205,10 @@ material exampleGLSLmatrixUniforms
 }
 ```
 
+@note GLSL uses column-major storage by default, while %Ogre is using row-major storage. Furthermore, GLSL is using column-major addressing, while %Ogre and HLSL use row-major addressing.
+This means that `mat[0]` is the first column in GLSL, but the first row in HLSL and %Ogre. %Ogre takes care of transposing square matrices before uploading them with GLSL, so matrix-vector multiplication `M*v` just works and `mat[0]` will return the same data.
+However, with non-square matrices transposing would change their GLSL type from e.g. `mat2x4` (two columns, four rows) to `mat4x2` (two rows, four columns) and consequently what `mat[0]` would return. Therefore %Ogre just passes such matrices unchanged and you have to handle this case (notably in skinning) yourself by either transposing the matrix in the shader or column-wise access.
+
 ## Binding vertex attributes {#Binding-vertex-attributes}
 
 Vertex attributes must be declared in the shader, for the vertex data bound to it by Ogre.
