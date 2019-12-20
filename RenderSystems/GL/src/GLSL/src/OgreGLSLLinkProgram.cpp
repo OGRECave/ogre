@@ -312,21 +312,21 @@ namespace Ogre {
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix2x3fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_2X4:
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix2x4fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_3X2:
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix3x2fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_3X3:
@@ -337,21 +337,21 @@ namespace Ogre {
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix3x4fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_4X2:
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix4x2fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_4X3:
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix4x3fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_4X4:

@@ -61,18 +61,22 @@ void FFP_Transform(in mat4 m,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Transform(in mat4x3 m,
+void FFP_Transform(in mat3x4 m,
 				   in vec4 v,
 				   out vec3 vOut)
 {
-	vOut = m * v;
+/* transpose non-square uniform matrix for correct row-major > column-major mapping
+ * to keep the indexing inside the shader so mat[0] returns the same data in both GLSL and HLSL
+ * although it will be the first row in HLSL and the first column in GLSL
+ */
+	vOut = v * m;
 }
 
-void FFP_Transform(in mat4x3 m,
+void FFP_Transform(in mat3x4 m,
 				   in vec3 v,
 				   out vec3 vOut)
 {
-	vOut = mat3(m) * v;
+	vOut = v * mat3(m);
 }
 
 //-----------------------------------------------------------------------------
