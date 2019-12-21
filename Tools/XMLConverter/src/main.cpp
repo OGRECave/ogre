@@ -592,8 +592,7 @@ int main(int numargs, char** args)
     }
     catch(Exception& e)
     {
-        cerr << "FATAL ERROR: " << e.getDescription() << std::endl;
-        cerr << "ABORTING!" << std::endl;
+        LogManager::getSingleton().logError(e.getDescription());
         retCode = 1;
     }
 
