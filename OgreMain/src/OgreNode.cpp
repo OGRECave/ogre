@@ -390,17 +390,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Matrix3 Node::getLocalAxes(void) const
     {
-        Vector3 axisX = Vector3::UNIT_X;
-        Vector3 axisY = Vector3::UNIT_Y;
-        Vector3 axisZ = Vector3::UNIT_Z;
-
-        axisX = mOrientation * axisX;
-        axisY = mOrientation * axisY;
-        axisZ = mOrientation * axisZ;
-
-        return Matrix3(axisX.x, axisY.x, axisZ.x,
-                       axisX.y, axisY.y, axisZ.y,
-                       axisX.z, axisY.z, axisZ.z);
+        Matrix3 ret;
+        mOrientation.ToRotationMatrix(ret);
+        return ret;
     }
 
     //-----------------------------------------------------------------------
