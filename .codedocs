@@ -1233,6 +1233,7 @@ PREDEFINED             = OGRE_MEMORY_ALLOCATOR=1 \
                          RTSHADER_SYSTEM_BUILD_EXT_SHADERS \
                          OGRE_PLATFORM=10 \
                          OGRE_DEPRECATED= \
+                         OGRE_NODELESS_POSITIONING= \
                          MANAGED_RESOURCE= \
                          OGRE_RESOURCE_GROUP_INIT==RGN_DEFAULT \
                          protected=private

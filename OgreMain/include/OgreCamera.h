@@ -258,17 +258,17 @@ namespace Ogre {
         void setDirection(const Vector3& vec);
 
         /** Gets the camera's direction.
-        @deprecated attach to SceneNode and use SceneNode::getLocalAxes
+        @deprecated attach to SceneNode and use SceneNode::getOrientation().zAxis() * -1
         */
         OGRE_DEPRECATED Vector3 getDirection(void) const;
 
         /** Gets the camera's up vector.
-        @deprecated attach to SceneNode and use SceneNode::getLocalAxes
+        @deprecated attach to SceneNode and use SceneNode::getOrientation().yAxis()
         */
         OGRE_DEPRECATED Vector3 getUp(void) const;
 
         /** Gets the camera's right vector.
-        @deprecated attach to SceneNode and use SceneNode::getLocalAxes
+        @deprecated attach to SceneNode and use SceneNode::getOrientation().xAxis()
         */
         OGRE_DEPRECATED Vector3 getRight(void) const;
 
