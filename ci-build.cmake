@@ -62,6 +62,7 @@ if(DEFINED ENV{APPVEYOR})
 endif()
 
 if(DEFINED ENV{ANDROID})
+    set(CMAKE_BUILD_TYPE RelWithDebInfo)
     set(CROSS
         -DANDROID_PLATFORM=android-16
         -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r17
