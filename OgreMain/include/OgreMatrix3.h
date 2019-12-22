@@ -104,9 +104,24 @@ namespace Ogre
             return m[iRow];
         }
 
-        Vector3 GetColumn (size_t iCol) const;
-        void SetColumn(size_t iCol, const Vector3& vec);
-        void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
+        Vector3 GetColumn(size_t iCol) const
+        {
+            assert(iCol < 3);
+            return Vector3(m[0][iCol], m[1][iCol], m[2][iCol]);
+        }
+        void SetColumn(size_t iCol, const Vector3& vec)
+        {
+            assert(iCol < 3);
+            m[0][iCol] = vec.x;
+            m[1][iCol] = vec.y;
+            m[2][iCol] = vec.z;
+        }
+        void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
+        {
+            SetColumn(0, xAxis);
+            SetColumn(1, yAxis);
+            SetColumn(2, zAxis);
+        }
 
         /** Tests 2 matrices for equality.
          */
@@ -147,11 +162,18 @@ namespace Ogre
         Matrix3 Transpose () const;
         bool Inverse (Matrix3& rkInverse, Real fTolerance = 1e-06f) const;
         Matrix3 Inverse (Real fTolerance = 1e-06f) const;
-        Real Determinant () const;
+        Real Determinant() const { return determinant(); }
 
         Matrix3 transpose() const { return Transpose(); }
         Matrix3 inverse() const { return Inverse(); }
-        Real determinant() const { return Determinant(); }
+        Real determinant() const
+        {
+            Real fCofactor00 = m[1][1] * m[2][2] - m[1][2] * m[2][1];
+            Real fCofactor10 = m[1][2] * m[2][0] - m[1][0] * m[2][2];
+            Real fCofactor20 = m[1][0] * m[2][1] - m[1][1] * m[2][0];
+
+            return m[0][0] * fCofactor00 + m[0][1] * fCofactor10 + m[0][2] * fCofactor20;
+        }
 
         /** Determines if this matrix involves a negative scaling. */
         bool hasNegativeScale() const { return determinant() < 0; }
@@ -162,8 +184,37 @@ namespace Ogre
         void SingularValueComposition (const Matrix3& rkL,
             const Vector3& rkS, const Matrix3& rkR);
 
-        /// Gram-Schmidt orthonormalization (applied to columns of rotation matrix)
-        void Orthonormalize ();
+        /// Gram-Schmidt orthogonalisation (applied to columns of rotation matrix)
+        Matrix3 orthonormalised() const
+        {
+            // Algorithm uses Gram-Schmidt orthogonalisation.  If 'this' matrix is
+            // M = [m0|m1|m2], then orthonormal output matrix is Q = [q0|q1|q2],
+            //
+            //   q0 = m0/|m0|
+            //   q1 = (m1-(q0*m1)q0)/|m1-(q0*m1)q0|
+            //   q2 = (m2-(q0*m2)q0-(q1*m2)q1)/|m2-(q0*m2)q0-(q1*m2)q1|
+            //
+            // where |V| indicates length of vector V and A*B indicates dot
+            // product of vectors A and B.
+
+            Matrix3 Q;
+            // compute q0
+            Q.SetColumn(0, GetColumn(0) / GetColumn(0).length());
+
+            // compute q1
+            Real dot0 = Q.GetColumn(0).dotProduct(GetColumn(1));
+            Q.SetColumn(1, (GetColumn(1) - dot0 * Q.GetColumn(0)).normalisedCopy());
+
+            // compute q2
+            Real dot1 = Q.GetColumn(1).dotProduct(GetColumn(2));
+            dot0 = Q.GetColumn(0).dotProduct(GetColumn(2));
+            Q.SetColumn(2, (GetColumn(2) - dot0 * Q.GetColumn(0) + dot1 * Q.GetColumn(1)).normalisedCopy());
+
+            return Q;
+        }
+
+        /// @deprecated
+        OGRE_DEPRECATED void Orthonormalize() { *this = orthonormalised(); }
 
         /// Orthogonal Q, diagonal D, upper triangular U stored as (u01,u02,u12)
         void QDUDecomposition (Matrix3& rkQ, Vector3& rkD,
