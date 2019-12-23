@@ -303,10 +303,12 @@ namespace OgreBites
             else if (b->getName() == "Configure")   // enter configuration screen
             {
                 mTrayMgr->removeWidgetFromTray("StartStop");
-                mTrayMgr->removeWidgetFromTray("UnloadReload");
                 mTrayMgr->removeWidgetFromTray("Configure");
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+                mTrayMgr->removeWidgetFromTray("UnloadReload");
                 mTrayMgr->removeWidgetFromTray("Quit");
                 mTrayMgr->moveWidgetToTray("Apply", TL_RIGHT);
+#endif
                 mTrayMgr->moveWidgetToTray("Back", TL_RIGHT);
 
                 for (unsigned int i = 0; i < mThumbs.size(); i++)
@@ -351,9 +353,13 @@ namespace OgreBites
                 mTrayMgr->removeWidgetFromTray("ConfigSeparator");
 
                 mTrayMgr->moveWidgetToTray("StartStop", TL_RIGHT);
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
                 mTrayMgr->moveWidgetToTray("UnloadReload", TL_RIGHT);
+#endif
                 mTrayMgr->moveWidgetToTray("Configure", TL_RIGHT);
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
                 mTrayMgr->moveWidgetToTray("Quit", TL_RIGHT);
+#endif
 
                 windowResized(mWindow);
             }
@@ -726,16 +732,6 @@ namespace OgreBites
             return SampleContext::mouseWheelRolled(evt);
         }
 
-        
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        /** Extends touchCancelled to inject an event that a touch was cancelled.
-         */
-        virtual bool touchCancelled(const TouchFingerEvent& evt)
-        {
-            return true;
-        }
-#endif
-
         /*-----------------------------------------------------------------------------
           | Extends windowResized to best fit menus on screen. We basically move the
           | menu tray to the left for higher resolutions and move it to the center
@@ -1011,25 +1007,27 @@ namespace OgreBites
             mTrayMgr->createSeparator(TL_RIGHT, "LogoSep");
             mTrayMgr->createButton(TL_RIGHT, "StartStop", "Start Sample", 120);
 
-#       if      OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+#if (OGRE_PLATFORM != OGRE_PLATFORM_WINRT) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
             mTrayMgr->createButton(TL_RIGHT, "UnloadReload", mLoadedSamples.empty() ? "Reload Samples" : "Unload Samples");
+#endif
+#if (OGRE_PLATFORM != OGRE_PLATFORM_WINRT)
             mTrayMgr->createButton(TL_RIGHT, "Configure", "Configure");
-#       endif // OGRE_PLATFORM_WINRT
+#endif
+#if (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
             mTrayMgr->createButton(TL_RIGHT, "Quit", "Quit");
+#endif
 
             // create sample viewing controls
-            mTitleLabel = mTrayMgr->createLabel(TL_LEFT, "SampleTitle", "");
+            float infoWidth = 250;
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            mDescBox = mTrayMgr->createTextBox(TL_LEFT, "SampleInfo", "Sample Info", 120, 100);
-            mCategoryMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "CategoryMenu", "Select Category", 120, 10);
-            mSampleMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "SampleMenu", "Select Sample", 120, 10);
-            mSampleSlider = mTrayMgr->createThickSlider(TL_LEFT, "SampleSlider", "Slide Samples", 120, 42, 0, 0, 0);
-#else
-            mDescBox = mTrayMgr->createTextBox(TL_LEFT, "SampleInfo", "Sample Info", 250, 208);
-            mCategoryMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "CategoryMenu", "Select Category", 250, 10);
-            mSampleMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "SampleMenu", "Select Sample", 250, 10);
-            mSampleSlider = mTrayMgr->createThickSlider(TL_LEFT, "SampleSlider", "Slide Samples", 250, 80, 0, 0, 0);
+            infoWidth *= 0.9;
 #endif
+            mTitleLabel = mTrayMgr->createLabel(TL_LEFT, "SampleTitle", "");
+            mDescBox = mTrayMgr->createTextBox(TL_LEFT, "SampleInfo", "Sample Info", infoWidth, 208);
+            mCategoryMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "CategoryMenu", "Select Category", infoWidth, 10);
+            mSampleMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "SampleMenu", "Select Sample", infoWidth, 10);
+            mSampleSlider = mTrayMgr->createThickSlider(TL_LEFT, "SampleSlider", "Slide Samples", infoWidth, 80, 0, 0, 0);
+
             /* Sliders do not notify their listeners on creation, so we manually call the callback here
                to format the slider value correctly. */
             sliderMoved(mSampleSlider);
@@ -1040,11 +1038,7 @@ namespace OgreBites
 
             // create configuration screen label and renderer menu
             mTrayMgr->createLabel(TL_NONE, "ConfigLabel", "Configuration");
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-            mRendererMenu = mTrayMgr->createLongSelectMenu(TL_NONE, "RendererMenu", "Render System", 216, 115, 10);
-#else
             mRendererMenu = mTrayMgr->createLongSelectMenu(TL_NONE, "RendererMenu", "Render System", 450, 240, 10);
-#endif
             mTrayMgr->createSeparator(TL_NONE, "ConfigSeparator");
 
             // populate render system names
