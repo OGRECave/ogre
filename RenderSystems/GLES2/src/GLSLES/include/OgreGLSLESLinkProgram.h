@@ -58,7 +58,7 @@ namespace Ogre {
         
     public:
         /// Constructor should only be used by GLSLESLinkProgramManager
-        GLSLESLinkProgram(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram);
+        explicit GLSLESLinkProgram(const GLShaderList& shaders);
         virtual ~GLSLESLinkProgram(void);
 
         /** Makes a program object active by making sure it is linked and then putting it in use.

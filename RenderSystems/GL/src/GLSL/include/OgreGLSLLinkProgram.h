@@ -66,7 +66,7 @@ namespace Ogre {
         void getMicrocodeFromCache(uint32 id);
     public:
         /// Constructor should only be used by GLSLLinkProgramManager
-        GLSLLinkProgram(GLSLProgram* vertexProgram, GLSLProgram* geometryProgram, GLSLProgram* fragmentProgram);
+        explicit GLSLLinkProgram(const GLShaderList& shaders);
         ~GLSLLinkProgram(void);
 
         /** Makes a program object active by making sure it is linked and then putting it in use.

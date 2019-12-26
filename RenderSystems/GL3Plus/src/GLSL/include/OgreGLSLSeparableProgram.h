@@ -74,12 +74,7 @@ namespace Ogre
     {
     public:
         /// Constructor should only be used by GLSLSeparableProgramManager.
-        GLSLSeparableProgram(GLSLShader* vertexShader,
-                             GLSLShader* hullShader,
-                             GLSLShader* domainShader,
-                             GLSLShader* geometryShader,
-                             GLSLShader* fragmentShader,
-                             GLSLShader* computeShader);
+        explicit GLSLSeparableProgram(const GLShaderList& shaders);
         ~GLSLSeparableProgram();
 
         /// GL Program Pipeline Handle

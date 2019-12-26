@@ -33,8 +33,6 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramCommon.h"
 #include "OgreGLSLESExtSupport.h"
 
-#include <array>
-
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
 #   include "glsl_optimizer.h"
 #endif
@@ -54,9 +52,6 @@ namespace Ogre {
     class _OgreGLES2Export GLSLESProgramManager : public GLSLProgramManagerCommon, public Singleton<GLSLESProgramManager>
     {
     protected:
-        /// Active shader objects defining the active program object.
-        std::array<GLSLESProgram*, GPT_COUNT> mActiveShader;
-
         /// Active object defining the active rendering gpu state
         GLSLESProgramCommon* mActiveProgram;
 

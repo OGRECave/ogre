@@ -37,9 +37,9 @@
 namespace Ogre {
     
     //-----------------------------------------------------------------------
-    GLSLESProgramCommon::GLSLESProgramCommon(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram)
-    : GLSLProgramCommon(vertexProgram)
-    , mFragmentProgram(fragmentProgram)
+    GLSLESProgramCommon::GLSLESProgramCommon(const GLShaderList& shaders)
+    : GLSLProgramCommon(shaders[GPT_VERTEX_PROGRAM])
+    , mFragmentProgram(static_cast<GLSLESProgram*>(shaders[GPT_FRAGMENT_PROGRAM]))
     {
     }
 

@@ -56,12 +56,7 @@ namespace Ogre {
 
     public:
         /// Constructor should only be used by GLSLMonolithicProgramManager
-        GLSLMonolithicProgram(GLSLShader* vertexProgram,
-                              GLSLShader* hullProgram,
-                              GLSLShader* domainProgram,
-                              GLSLShader* geometryProgram,
-                              GLSLShader* fragmentProgram,
-                              GLSLShader* computeProgram);
+        explicit GLSLMonolithicProgram(const GLShaderList& shaders);
         ~GLSLMonolithicProgram(void);
 
         /** Makes a program object active by making sure it is linked

@@ -38,18 +38,8 @@
 
 namespace Ogre {
 
-    GLSLMonolithicProgram::GLSLMonolithicProgram(GLSLShader* vertexProgram,
-                                                 GLSLShader* hullProgram,
-                                                 GLSLShader* domainProgram,
-                                                 GLSLShader* geometryProgram,
-                                                 GLSLShader* fragmentProgram,
-                                                 GLSLShader* computeProgram)
-        : GLSLProgram(vertexProgram,
-                      hullProgram,
-                      domainProgram,
-                      geometryProgram,
-                      fragmentProgram,
-                      computeProgram)
+    GLSLMonolithicProgram::GLSLMonolithicProgram(const GLShaderList& shaders)
+        : GLSLProgram(shaders)
     {
     }
 

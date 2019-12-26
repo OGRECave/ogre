@@ -31,9 +31,9 @@
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreString.h"
 #include "OgreGpuProgramParams.h"
+#include "OgreGLSLProgramCommon.h"
 
 namespace Ogre {
-    class GLSLProgramCommon;
     class GLSLShaderCommon;
 
     /** Ogre assumes that there are separate programs to deal with but
@@ -70,6 +70,9 @@ namespace Ogre {
 
         /// container holding previously created program objects
         ProgramMap mPrograms;
+
+        /// Active shader objects defining the active program object.
+        GLShaderList mActiveShader;
     public:
         virtual ~GLSLProgramManagerCommon();
 

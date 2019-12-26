@@ -154,13 +154,11 @@ namespace Ogre {
                 if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
                         RSC_SEPARATE_SHADER_OBJECTS))
                 {
-                    mActiveProgram =
-                        new GLSLESProgramPipeline(mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_FRAGMENT_PROGRAM]);
+                    mActiveProgram = new GLSLESProgramPipeline(mActiveShader);
                 }
                 else
                 {
-                    mActiveProgram =
-                        new GLSLESLinkProgram(mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_FRAGMENT_PROGRAM]);
+                    mActiveProgram = new GLSLESLinkProgram(mActiveShader);
                 }
 
                 mPrograms[activeKey] = mActiveProgram;
