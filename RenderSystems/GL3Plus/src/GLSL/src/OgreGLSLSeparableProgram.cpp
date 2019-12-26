@@ -38,18 +38,8 @@
 
 namespace Ogre
 {
-    GLSLSeparableProgram::GLSLSeparableProgram(GLSLShader* vertexShader,
-                                               GLSLShader* hullShader,
-                                               GLSLShader* domainShader,
-                                               GLSLShader* geometryShader,
-                                               GLSLShader* fragmentShader,
-                                               GLSLShader* computeShader) :
-        GLSLProgram(vertexShader,
-                    hullShader,
-                    domainShader,
-                    geometryShader,
-                    fragmentShader,
-                    computeShader)
+    GLSLSeparableProgram::GLSLSeparableProgram(const GLShaderList& shaders) :
+        GLSLProgram(shaders)
     {
     }
 

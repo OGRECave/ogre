@@ -41,8 +41,8 @@
 
 namespace Ogre
 {
-    GLSLESProgramPipeline::GLSLESProgramPipeline(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram) :
-    GLSLESProgramCommon(vertexProgram, fragmentProgram) { }
+    GLSLESProgramPipeline::GLSLESProgramPipeline(const GLShaderList& shaders) :
+    GLSLESProgramCommon(shaders) { }
 
     GLSLESProgramPipeline::~GLSLESProgramPipeline()
     {

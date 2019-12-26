@@ -34,8 +34,6 @@
 #include "OgreGLSLProgram.h"
 #include "OgreGLSLExtSupport.h"
 
-#include <array>
-
 namespace Ogre {
 
     /** Ogre assumes that there are separate vertex and fragment
@@ -55,9 +53,6 @@ namespace Ogre {
     class _OgreGL3PlusExport GLSLProgramManager : public GLSLProgramManagerCommon, public Singleton<GLSLProgramManager>
     {
     protected:
-        /// Active shader objects defining the active program object.
-        std::array<GLSLShader*, GPT_COUNT> mActiveShader;
-
         /// active objects defining the active rendering gpu state
         GLSLProgram* mActiveProgram;
 

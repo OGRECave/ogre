@@ -35,18 +35,13 @@
 
 namespace Ogre {
 
-    GLSLProgram::GLSLProgram(GLSLShader* vertexShader,
-                             GLSLShader* hullShader,
-                             GLSLShader* domainShader,
-                             GLSLShader* geometryShader,
-                             GLSLShader* fragmentShader,
-                             GLSLShader* computeShader)
-        : GLSLProgramCommon(vertexShader)
-        , mHullShader(hullShader)
-        , mDomainShader(domainShader)
-        , mGeometryShader(geometryShader)
-        , mFragmentShader(fragmentShader)
-        , mComputeShader(computeShader)
+    GLSLProgram::GLSLProgram(const GLShaderList& shaders)
+        : GLSLProgramCommon(shaders[GPT_VERTEX_PROGRAM])
+        , mHullShader(static_cast<GLSLShader*>(shaders[GPT_HULL_PROGRAM]))
+        , mDomainShader(static_cast<GLSLShader*>(shaders[GPT_DOMAIN_PROGRAM]))
+        , mGeometryShader(static_cast<GLSLShader*>(shaders[GPT_GEOMETRY_PROGRAM]))
+        , mFragmentShader(static_cast<GLSLShader*>(shaders[GPT_FRAGMENT_PROGRAM]))
+        , mComputeShader(static_cast<GLSLShader*>(shaders[GPT_COMPUTE_PROGRAM]))
     {
         // compute shader presence means no other shaders are allowed
         if(mComputeShader)

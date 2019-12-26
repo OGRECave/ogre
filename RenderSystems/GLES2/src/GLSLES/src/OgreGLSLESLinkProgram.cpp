@@ -41,8 +41,8 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    GLSLESLinkProgram::GLSLESLinkProgram(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram)
-    : GLSLESProgramCommon(vertexProgram, fragmentProgram)
+    GLSLESLinkProgram::GLSLESLinkProgram(const GLShaderList& shaders)
+    : GLSLESProgramCommon(shaders)
     {
         if ((!getVertexProgram() || !mFragmentProgram))
         {

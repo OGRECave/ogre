@@ -60,7 +60,7 @@ namespace Ogre {
         static void _writeToCache(uint32 id, GLuint programHandle);
 
         /// Constructor should only be used by GLSLESLinkProgramManager and GLSLESProgramPipelineManager
-        GLSLESProgramCommon(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram);
+        GLSLESProgramCommon(const GLShaderList& shaders);
     public:
 
         void bindFixedAttributes(GLuint program);

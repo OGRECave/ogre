@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreGLSLShaderCommon.h"
 #include "OgreHardwareUniformBuffer.h"
 
+#include <array>
+
 namespace Ogre
 {
 /// Structure used to keep track of named uniforms in the linked program object
@@ -53,6 +55,8 @@ typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
 typedef std::vector<HardwareUniformBufferSharedPtr> GLUniformBufferList;
 typedef GLUniformBufferList::iterator GLUniformBufferIterator;
 typedef std::map<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> SharedParamsBufferMap;
+
+typedef  std::array<GLSLShaderCommon*, GPT_COUNT> GLShaderList;
 
 class GLSLProgramCommon
 {

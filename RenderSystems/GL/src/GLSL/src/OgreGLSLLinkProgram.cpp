@@ -76,10 +76,10 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLLinkProgram::GLSLLinkProgram(GLSLProgram* vertexProgram, GLSLProgram* geometryProgram, GLSLProgram* fragmentProgram)
-        : GLSLProgramCommon(vertexProgram)
-        , mGeometryProgram(geometryProgram)
-        , mFragmentProgram(fragmentProgram)
+    GLSLLinkProgram::GLSLLinkProgram(const GLShaderList& shaders)
+        : GLSLProgramCommon(shaders[GPT_VERTEX_PROGRAM])
+        , mGeometryProgram(static_cast<GLSLProgram*>(shaders[GPT_GEOMETRY_PROGRAM]))
+        , mFragmentProgram(static_cast<GLSLProgram*>(shaders[GPT_FRAGMENT_PROGRAM]))
     {
         // Initialise uniform cache
         mUniformCache = new GLUniformCache();

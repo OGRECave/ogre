@@ -53,7 +53,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLSLLinkProgramManager::GLSLLinkProgramManager(void) : mActiveLinkProgram(NULL)
     {
-        mActiveGpuProgram.fill(NULL);
+        mActiveShader.fill(NULL);
 
         // Fill in the relationship between type names and enums
         mTypeEnumMap.emplace("float", GL_FLOAT);
@@ -100,7 +100,7 @@ namespace Ogre {
         // no active link program so find one or make a new one
         // is there an active key?
         uint32 activeKey = 0;
-        for(auto shader : mActiveGpuProgram)
+        for(auto shader : mActiveShader)
         {
             if(!shader) continue;
             activeKey = HashCombine(activeKey, shader->getShaderID());
@@ -114,9 +114,7 @@ namespace Ogre {
             // program object not found for key so need to create it
             if (programFound == mPrograms.end())
             {
-                mActiveLinkProgram = new GLSLLinkProgram(mActiveGpuProgram[GPT_VERTEX_PROGRAM],
-                                                         mActiveGpuProgram[GPT_GEOMETRY_PROGRAM],
-                                                         mActiveGpuProgram[GPT_FRAGMENT_PROGRAM]);
+                mActiveLinkProgram = new GLSLLinkProgram(mActiveShader);
                 mPrograms[activeKey] = mActiveLinkProgram;
             }
             else
@@ -136,9 +134,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLLinkProgramManager::setActiveShader(GpuProgramType type, GLSLProgram* gpuProgram)
     {
-        if (gpuProgram != mActiveGpuProgram[type])
+        if (gpuProgram != mActiveShader[type])
         {
-            mActiveGpuProgram[type] = gpuProgram;
+            mActiveShader[type] = gpuProgram;
             // ActiveLinkProgram is no longer valid
             mActiveLinkProgram = NULL;
             // change back to fixed pipeline

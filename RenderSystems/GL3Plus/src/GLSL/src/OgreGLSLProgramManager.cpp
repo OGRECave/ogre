@@ -232,17 +232,11 @@ namespace Ogre {
             {
                 if (mRenderSystem->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
                 {
-                    mActiveProgram = new GLSLSeparableProgram(
-                        mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_HULL_PROGRAM],
-                        mActiveShader[GPT_DOMAIN_PROGRAM], mActiveShader[GPT_GEOMETRY_PROGRAM],
-                        mActiveShader[GPT_FRAGMENT_PROGRAM], mActiveShader[GPT_COMPUTE_PROGRAM]);
+                    mActiveProgram = new GLSLSeparableProgram(mActiveShader);
                 }
                 else
                 {
-                    mActiveProgram = new GLSLMonolithicProgram(
-                        mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_HULL_PROGRAM],
-                        mActiveShader[GPT_DOMAIN_PROGRAM], mActiveShader[GPT_GEOMETRY_PROGRAM],
-                        mActiveShader[GPT_FRAGMENT_PROGRAM], mActiveShader[GPT_COMPUTE_PROGRAM]);
+                    mActiveProgram = new GLSLMonolithicProgram(mActiveShader);
                 }
 
                 mPrograms[activeKey] = mActiveProgram;
