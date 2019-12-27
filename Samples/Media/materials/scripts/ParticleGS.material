@@ -259,13 +259,9 @@ material Ogre/ParticleGS/Display
 			
 			vertex_program_ref Ogre/ParticleGS/DisplayVSglsl
 			{
-				
-			}
-			
-			geometry_program_ref Ogre/ParticleGS/DisplayGSglsl
-			{
-			    param_named_auto inverseView inverse_view_matrix
-			    param_named_auto worldViewProj worldviewproj_matrix
+				param_named_auto worldView worldview_matrix
+				param_named_auto proj projection_matrix
+				param_named_auto height viewport_height
 			}
 			
 			fragment_program_ref Ogre/ParticleGS/DisplayPSglsl

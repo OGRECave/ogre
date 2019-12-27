@@ -18,7 +18,7 @@
 #define P_EMBER2LIFE 1.5
 #define P_EMBER3LIFE 2.0
 
-in vec3 position;
+in vec4 position;
 // timer
 in float uv0;
 // type
@@ -26,56 +26,56 @@ in float uv1;
 // velocity
 in vec3 uv2;
 
-out block {
-    vec3 pos;
-    vec4 colour;
-    float radius;
-} ColouredFirework;
+out vec4 colour;
 
-uniform mat4 worldViewProj;
+uniform mat4 worldView;
+uniform mat4 proj;
+uniform float height;
 
 //The vertex shader that prepares the fireworks for display
 void main()
 {
     float inTimer = uv0;
     float inType = uv1;
+
+    float radius = 1.5;
     
-    //
-    // Pass the point through
-    //
-    ColouredFirework.pos = position; // Multiply by world matrix?
-    ColouredFirework.radius = 1.5;
-    
+    gl_Position = worldView * position;
+
     //  
     // calculate the colour
     //
     if (inType == PT_LAUNCHER)
     {
         // red
-        ColouredFirework.colour = vec4(1, 0.1, 0.1, 1);
-        ColouredFirework.radius = 1.0;
+        colour = vec4(1, 0.1, 0.1, 1);
+        radius = 1.0;
     }
     else if (inType == PT_SHELL)
     {
         // cyan
-        ColouredFirework.colour = vec4(0.1, 1, 1, 1);
-        ColouredFirework.radius = 1.0;
+        colour = vec4(0.1, 1, 1, 1);
+        radius = 1.0;
     }
     else if (inType == PT_EMBER1)
     {
         // yellow
-        ColouredFirework.colour = vec4(1, 1, 0.1, 1);
-        ColouredFirework.colour *= (inTimer / P_EMBER1LIFE);
+        colour = vec4(1, 1, 0.1, 1);
+        colour *= (inTimer / P_EMBER1LIFE);
     }
     else if (inType == PT_EMBER2)
     {
         // fuschia
-        ColouredFirework.colour = vec4(1, 0.1, 1, 1);
+        colour = vec4(1, 0.1, 1, 1);
     }
     else if (inType == PT_EMBER3)
     {
         // red
-        ColouredFirework.colour = vec4(1, 0.1, 0.1, 1);
-        ColouredFirework.colour *= (inTimer / P_EMBER3LIFE);
+        colour = vec4(1, 0.1, 0.1, 1);
+        colour *= (inTimer / P_EMBER3LIFE);
     }
+
+    vec4 tmp = proj * vec4(radius*2, 0, gl_Position.z, 1);
+    gl_PointSize = tmp.x/tmp.w*height;
+    gl_Position = proj*gl_Position;
 }
