@@ -42,9 +42,7 @@ namespace Ogre {
                    const String& name, ResourceHandle handle,
                    const String& group, bool isManual, ManualResourceLoader* loader);
 		~GLSLShader();
-		
-        GLuint getGLShaderHandle() const { return mGLShaderHandle; }
-        GLuint getGLProgramHandle();
+
         void attachToProgramObject(const GLuint programObject);
         void detachFromProgramObject(const GLuint programObject);
 
@@ -65,12 +63,6 @@ namespace Ogre {
 
         // /// @copydoc Resource::loadImpl
         // void loadImpl(void) {}
-
-    protected:
-        /// GL handle for shader object.
-        GLuint mGLShaderHandle;
-        /// GL handle for program object the shader is bound to.
-        GLuint mGLProgramHandle;
     };
 }
 

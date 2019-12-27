@@ -103,6 +103,9 @@ namespace Ogre {
         /// Get the OGRE assigned shader ID.
         uint getShaderID(void) const { return mShaderID; }
 
+        /// If we are using program pipelines, the OpenGL program handle
+        uint getGLProgramHandle() const { return mGLProgramHandle; }
+
         /// Get the uniform cache for this shader
         GLUniformCache*    getUniformCache(){return &mUniformCache;}
 
@@ -142,6 +145,11 @@ namespace Ogre {
 
         /// OGRE assigned shader ID.
         uint mShaderID;
+
+        /// GL handle for shader object.
+        uint mGLShaderHandle;
+        /// GL handle for program object the shader is bound to.
+        uint mGLProgramHandle;
 
         /// Pointer to the uniform cache for this shader
         GLUniformCache    mUniformCache;

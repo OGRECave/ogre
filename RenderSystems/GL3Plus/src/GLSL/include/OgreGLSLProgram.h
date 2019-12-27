@@ -67,8 +67,6 @@ namespace Ogre {
     public:
         void bindFixedAttributes(GLuint program);
 
-        GLSLShader* getShader(GpuProgramType type) const { return static_cast<GLSLShader*>(mShaders[type]); }
-
         virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
                                           GpuProgramType fromProgType) = 0;
 

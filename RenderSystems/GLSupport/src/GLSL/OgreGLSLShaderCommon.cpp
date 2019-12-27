@@ -108,6 +108,8 @@ namespace Ogre {
         , mColumnMajorMatrices(true)
         , mLinked(0)
         , mShaderID(++mShaderCount) // Increase shader counter and use as ID
+        , mGLShaderHandle(0)
+        , mGLProgramHandle(0)
     {
     }
     //-----------------------------------------------------------------------
