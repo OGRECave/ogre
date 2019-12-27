@@ -43,7 +43,6 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader);
         ~GLSLProgram();
 
-        GLhandleARB getGLHandle() const { return mGLHandle; }
         void attachToProgramObject( const GLhandleARB programObject );
         void detachFromProgramObject( const GLhandleARB programObject );
 
@@ -122,10 +121,6 @@ namespace Ogre {
         RenderOperation::OperationType mInputOperationType;
         RenderOperation::OperationType mOutputOperationType;
         int mMaxOutputVertices;
-
-    private:
-        /// GL handle for shader object
-        GLhandleARB mGLHandle;
     };
     }
 }

@@ -63,9 +63,9 @@ namespace Ogre {
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             //TODO include tessellation stages
-            GLSLShader* glslGpuProgram = getShader(GPT_GEOMETRY_PROGRAM);
+            auto glslGpuProgram = mShaders[GPT_GEOMETRY_PROGRAM];
             if (!glslGpuProgram)
-                glslGpuProgram = getShader(GPT_VERTEX_PROGRAM);
+                glslGpuProgram = mShaders[GPT_VERTEX_PROGRAM];
 
             programId = glslGpuProgram->getGLProgramHandle();
 

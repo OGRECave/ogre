@@ -102,7 +102,7 @@ namespace Ogre
                     continue;
 
                 OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, ogre2gltype[s->getType()],
-                                                       static_cast<GLSLShader*>(s)->getGLProgramHandle()));
+                                                       s->getGLProgramHandle()));
             }
 
             // Validate pipeline
@@ -264,7 +264,7 @@ namespace Ogre
         bool transpose = !mShaders[fromProgType] || mShaders[fromProgType]->getColumnMajorMatrices();
 
         OgreAssert(mShaders[fromProgType], "invalid program type");
-        GLuint progID = getShader(fromProgType)->getGLProgramHandle();
+        GLuint progID = mShaders[fromProgType]->getGLProgramHandle();
         GLUniformCache* uniformCache = mShaders[fromProgType]->getUniformCache();
 
         // Iterate through uniform reference list and update uniform values

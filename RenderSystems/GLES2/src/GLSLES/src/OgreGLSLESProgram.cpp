@@ -50,8 +50,6 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : GLSLShaderCommon(creator, name, handle, group, isManual, loader)
-        , mGLShaderHandle(0)
-        , mGLProgramHandle(0)
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         , mIsOptimised(false)
         , mOptimiserEnabled(false)
@@ -106,24 +104,10 @@ namespace Ogre {
         }
     }
 #endif
-    GLuint GLSLESProgram::createGLProgramHandle() {
-        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            return 0;
-
-        if (mGLProgramHandle)
-            return mGLProgramHandle;
-
-        OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
-        {
-            glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
-        }
-
-        return mGLProgramHandle;
-    }
-
     bool GLSLESProgram::compile(bool checkErrors)
     {
+        const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
+
         // Only create a shader object if glsl es is supported
         if (isSupported())
         {
@@ -139,15 +123,20 @@ namespace Ogre {
             }
             OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
 
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
+            if(caps->hasCapability(RSC_DEBUG))
             {
                 glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
             }
 
-            createGLProgramHandle();
+            // also create program object
+            if (caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            {
+                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+                if (caps->hasCapability(RSC_DEBUG))
+                    OGRE_CHECK_GL_ERROR(
+                        glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str()));
+            }
         }
-
-        const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
 
         // Add preprocessor extras and main source
         if (!mSource.empty())

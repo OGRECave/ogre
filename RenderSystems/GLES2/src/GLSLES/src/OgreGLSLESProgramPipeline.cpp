@@ -66,14 +66,14 @@ namespace Ogre
             {
                 mLinked |= VERTEX_PROGRAM_LINKED;
             }
-            else if (getMicrocodeFromCache(vhash, getProgram(GPT_VERTEX_PROGRAM)->createGLProgramHandle()))
+            else if (getMicrocodeFromCache(vhash, mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle()))
             {
                 mShaders[GPT_VERTEX_PROGRAM]->setLinked(true);
                 mLinked |= VERTEX_PROGRAM_LINKED;
             }
             else
             {
-                GLuint programHandle = getProgram(GPT_VERTEX_PROGRAM)->getGLProgramHandle();
+                GLuint programHandle = mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle();
 
                 bindFixedAttributes( programHandle );
 
@@ -102,14 +102,14 @@ namespace Ogre
             {
                 mLinked |= FRAGMENT_PROGRAM_LINKED;
             }
-            else if (getMicrocodeFromCache(fhash, getProgram(GPT_FRAGMENT_PROGRAM)->createGLProgramHandle()))
+            else if (getMicrocodeFromCache(fhash, mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle()))
             {
                 mShaders[GPT_FRAGMENT_PROGRAM]->setLinked(true);
                 mLinked |= FRAGMENT_PROGRAM_LINKED;
             }
             else
             {
-                GLuint programHandle = getProgram(GPT_FRAGMENT_PROGRAM)->getGLProgramHandle();
+                GLuint programHandle = mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle();
                 OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
                 mShaders[GPT_FRAGMENT_PROGRAM]->attachToProgramObject(programHandle);
                 OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
@@ -129,13 +129,13 @@ namespace Ogre
         {
             if(mShaders[GPT_VERTEX_PROGRAM] && mShaders[GPT_VERTEX_PROGRAM]->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_VERTEX_SHADER_BIT_EXT, getProgram(GPT_VERTEX_PROGRAM)->getGLProgramHandle()));
-                _writeToCache(vhash, getProgram(GPT_VERTEX_PROGRAM)->getGLProgramHandle());
+                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_VERTEX_SHADER_BIT_EXT, mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle()));
+                _writeToCache(vhash, mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle());
             }
             if(mShaders[GPT_FRAGMENT_PROGRAM] && mShaders[GPT_FRAGMENT_PROGRAM]->isLinked())
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_FRAGMENT_SHADER_BIT_EXT, getProgram(GPT_FRAGMENT_PROGRAM)->getGLProgramHandle()));
-                _writeToCache(fhash, getProgram(GPT_FRAGMENT_PROGRAM)->getGLProgramHandle());
+                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_FRAGMENT_SHADER_BIT_EXT, mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle()));
+                _writeToCache(fhash, mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle());
             }
 
             // Validate pipeline
@@ -207,14 +207,14 @@ namespace Ogre
             if (mShaders[GPT_VERTEX_PROGRAM])
             {
                 vertParams = &(mShaders[GPT_VERTEX_PROGRAM]->getConstantDefinitions().map);
-                GLSLESProgramManager::extractUniforms(getProgram(GPT_VERTEX_PROGRAM)->getGLProgramHandle(),
+                GLSLESProgramManager::extractUniforms(mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle(),
                                                       vertParams, NULL, mGLUniformReferences,
                                                       mSharedParamsBufferMap);
             }
             if (mShaders[GPT_FRAGMENT_PROGRAM])
             {
                 fragParams = &(mShaders[GPT_FRAGMENT_PROGRAM]->getConstantDefinitions().map);
-                GLSLESProgramManager::extractUniforms(getProgram(GPT_FRAGMENT_PROGRAM)->getGLProgramHandle(), NULL,
+                GLSLESProgramManager::extractUniforms(mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle(), NULL,
                                                       fragParams, mGLUniformReferences,
                                                       mSharedParamsBufferMap);
             }
@@ -228,8 +228,8 @@ namespace Ogre
                                            uint16 mask, GpuProgramType fromProgType)
     {
         OgreAssert(mShaders[fromProgType], "invalid program type");
-        GLuint progID = getProgram(fromProgType)->getGLProgramHandle();
-        GLUniformCache* uniformCache = getProgram(fromProgType)->getUniformCache();
+        GLuint progID = mShaders[fromProgType]->getGLProgramHandle();
+        GLUniformCache* uniformCache = mShaders[fromProgType]->getUniformCache();
 
         // Iterate through uniform reference list and update uniform values
         GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();

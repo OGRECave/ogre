@@ -60,8 +60,6 @@ namespace Ogre {
     public:
 
         void bindFixedAttributes(GLuint program);
-
-        GLSLESProgram* getProgram(GpuProgramType type) const { return static_cast<GLSLESProgram*>(mShaders[type]); }
     };
 }
 

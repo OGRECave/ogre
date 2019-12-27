@@ -50,13 +50,8 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader);
         ~GLSLESProgram();
 
-        /// GL Shader Handle
-        GLuint getGLShaderHandle() const { return mGLShaderHandle; }
         void attachToProgramObject( const GLuint programObject );
         void detachFromProgramObject( const GLuint programObject );
-        GLuint getGLProgramHandle() const { return mGLProgramHandle; }
-
-        GLuint createGLProgramHandle();
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /// Sets if the GLSL optimiser is enabled.
@@ -106,9 +101,6 @@ namespace Ogre {
 #endif
         
     private:
-        /// GL handle for shader object
-        GLuint mGLShaderHandle;
-        GLuint mGLProgramHandle;
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /// Flag indicating if shader has been successfully optimised
         bool mIsOptimised;

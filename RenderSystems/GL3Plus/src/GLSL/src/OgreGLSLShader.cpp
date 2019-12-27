@@ -67,8 +67,6 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : GLSLShaderCommon(creator, name, handle, group, isManual, loader)
-        , mGLShaderHandle(0)
-        , mGLProgramHandle(0)
     {
         if (createParamDictionary("GLSLShader"))
         {
@@ -214,17 +212,10 @@ namespace Ogre {
         GLenum GLShaderType = getGLShaderType(mType);
         OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(GLShaderType));
 
-        //TODO GL 4.3 KHR_debug
+        auto caps = Root::getSingleton().getRenderSystem()->getCapabilities();
 
-        // if (getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-        //     glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
-
-        // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        // {
-        //     OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-        //     if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-        //         glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
-        // }
+        if (caps->hasCapability(RSC_DEBUG))
+            OGRE_CHECK_GL_ERROR(glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str()));
 
         submitSource();
 
@@ -233,6 +224,14 @@ namespace Ogre {
         // Check for compile errors
         int compiled = 0;
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
+
+        // also create program object
+        if (compiled && caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+            if (caps->hasCapability(RSC_DEBUG))
+                OGRE_CHECK_GL_ERROR(glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str()));
+        }
 
         if(!checkErrors)
             return compiled == 1;
@@ -253,7 +252,7 @@ namespace Ogre {
     {
         OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
 
-        if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) && mGLProgramHandle)
+        if (mGLProgramHandle)
         {
             OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
         }
@@ -320,20 +319,5 @@ namespace Ogre {
         static const String language = "glsl";
 
         return language;
-    }
-
-    GLuint GLSLShader::getGLProgramHandle() {
-        //TODO This should be removed and the compile() function
-        // should use glCreateShaderProgramv
-        // for separable programs which includes creating a program.
-        if (mGLProgramHandle == 0)
-        {
-            OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-            if (mGLProgramHandle == 0)
-            {
-                //TODO error handling
-            }
-        }
-        return mGLProgramHandle;
     }
 }
