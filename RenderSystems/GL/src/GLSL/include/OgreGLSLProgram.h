@@ -59,9 +59,6 @@ namespace Ogre {
             return true;
         }
 
-        /// compile source into shader object
-        bool compile( bool checkErrors = true);
-
         /** Returns the operation type that this geometry program expects to
             receive as input
         */
@@ -109,6 +106,7 @@ namespace Ogre {
         void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
         bool isAttributeValid(VertexElementSemantic semantic, uint index);
     protected:
+        void loadFromSource();
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
 

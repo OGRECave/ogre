@@ -187,7 +187,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------------
-    bool GLSLProgram::compile(bool checkErrors)
+    void GLSLProgram::loadFromSource()
     {
         // only create a shader object if glsl is supported
         if (isSupported())
@@ -225,9 +225,6 @@ namespace Ogre {
         int compiled = 0;
         glGetObjectParameterivARB(mGLShaderHandle, GL_OBJECT_COMPILE_STATUS_ARB, &compiled);
 
-        if(!checkErrors)
-            return compiled == 1;
-
         String compileInfo = getObjectInfo(mGLShaderHandle);
 
         if (!compiled)
@@ -236,8 +233,6 @@ namespace Ogre {
         // probably we have warnings
         if (!compileInfo.empty())
             LogManager::getSingleton().stream(LML_WARNING) << getResourceLogName() << " " << compileInfo;
-
-        return (compiled == 1);
     }
     //-----------------------------------------------------------------------
     void GLSLProgram::unloadHighLevelImpl(void)

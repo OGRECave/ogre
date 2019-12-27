@@ -95,7 +95,7 @@ namespace Ogre {
     void GLSLESProgram::notifyOnContextReset()
     {
         try {
-            compile(true);
+            loadFromSource();
         }
         catch(Exception& e)
         {
@@ -104,7 +104,7 @@ namespace Ogre {
         }
     }
 #endif
-    bool GLSLESProgram::compile(bool checkErrors)
+    void GLSLESProgram::loadFromSource()
     {
         const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
 
@@ -186,16 +186,6 @@ namespace Ogre {
         int compiled;
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
 
-        if(!checkErrors)
-            return compiled == 1;
-
-        if(!compiled && caps->getVendor() == GPU_QUALCOMM)
-        {
-            String message = GLSLES::getObjectInfo(mGLShaderHandle);
-            checkAndFixInvalidDefaultPrecisionError(message);
-            OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
-        }
-
         String compileInfo = GLSLES::getObjectInfo(mGLShaderHandle);
 
         if (!compiled)
@@ -204,8 +194,6 @@ namespace Ogre {
         // probably we have warnings
         if (!compileInfo.empty())
             LogManager::getSingleton().stream(LML_WARNING) << getResourceLogName() << " " << compileInfo;
-
-        return compiled == 1;
     }
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER   
@@ -300,58 +288,5 @@ namespace Ogre {
         GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
         params->setTransposeMatrices(true);
         return params;
-    }
-    //-----------------------------------------------------------------------
-    void GLSLESProgram::checkAndFixInvalidDefaultPrecisionError( String &message )
-    {
-        String precisionQualifierErrorString = ": 'Default Precision Qualifier' : invalid type Type for default precision qualifier can be only float or int";
-        std::vector< String > linesOfSource = StringUtil::split(mSource, "\n");
-        if( message.find(precisionQualifierErrorString) != String::npos )
-        {
-            LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling");
-
-            // remove relevant lines from source
-            std::vector< String > errors = StringUtil::split(message, "\n");
-
-            // going from the end so when we delete a line the numbers of the lines before will not change
-            for(int i = static_cast<int>(errors.size()) - 1 ; i != -1 ; i--)
-            {
-                String & curError = errors[i];
-                size_t foundPos = curError.find(precisionQualifierErrorString);
-                if(foundPos != String::npos)
-                {
-                    String lineNumber = curError.substr(0, foundPos);
-                    size_t posOfStartOfNumber = lineNumber.find_last_of(':');
-                    if (posOfStartOfNumber != String::npos)
-                    {
-                        lineNumber = lineNumber.substr(posOfStartOfNumber + 1, lineNumber.size() - (posOfStartOfNumber + 1));
-                        if (StringConverter::isNumber(lineNumber))
-                        {
-                            int iLineNumber = StringConverter::parseInt(lineNumber);
-                            linesOfSource.erase(linesOfSource.begin() + iLineNumber - 1);
-                        }
-                    }
-                }
-            }   
-            // rebuild source
-            StringStream newSource; 
-            for(size_t i = 0; i < linesOfSource.size()  ; i++)
-            {
-                newSource << linesOfSource[i] << "\n";
-            }
-            mSource = newSource.str();
-
-            const char *source = mSource.c_str();
-            OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
-
-            if (compile())
-            {
-                LogManager::getSingleton().logMessage("The removing of the lines fixed the invalid type Type for default precision qualifier error.");
-            }
-            else
-            {
-                LogManager::getSingleton().logMessage("The removing of the lines didn't help.");
-            }
-        }
     }
 }
