@@ -83,11 +83,6 @@ namespace Ogre {
         GLSLESProgramCommon* getActiveProgram(void);
 
         /**
-            Get the linker program by a gpu program
-        */
-        GLSLESProgramCommon* getByProgram(GLSLESProgram* gpuProgram);
-
-        /**
             Destroy and remove the linker program from the local cache
         */
         bool destroyLinkProgram(GLSLESProgramCommon* linkProgram);

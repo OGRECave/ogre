@@ -61,7 +61,7 @@ typedef  std::array<GLSLShaderCommon*, GPT_COUNT> GLShaderList;
 class GLSLProgramCommon
 {
 public:
-    GLSLProgramCommon(GLSLShaderCommon* vertexShader);
+    explicit GLSLProgramCommon(const GLShaderList& shaders);
     virtual ~GLSLProgramCommon() {}
 
     void extractLayoutQualifiers(void);
@@ -90,7 +90,7 @@ public:
     virtual void activate(void) = 0;
 
     /// query if the program is using the given shader
-    virtual bool isUsingShader(GLSLShaderCommon* shader) const = 0;
+    bool isUsingShader(GLSLShaderCommon* shader) const { return mShaders[shader->getType()] == shader; }
 
     /** Updates program object uniforms using data from GpuProgramParameters.
         Normally called by GLSLShader::bindParameters() just before rendering occurs.
@@ -117,8 +117,8 @@ protected:
     /// Map of shared parameter blocks to uniform buffers
     SharedParamsBufferMap mSharedParamsBufferMap;
 
-    /// Linked vertex shader.
-    GLSLShaderCommon* mVertexShader;
+    /// Linked shaders
+    GLShaderList mShaders;
 
     /// Flag to indicate that uniform references have already been built
     bool mUniformRefsBuilt;
@@ -138,6 +138,9 @@ protected:
 
     /// Compiles and links the vertex and fragment programs
     virtual void compileAndLink(void) = 0;
+
+    uint32 getCombinedHash();
+    String getCombinedName();
 
     static VertexElementSemantic getAttributeSemanticEnum(const String& type);
     static const char * getAttributeSemanticString(VertexElementSemantic semantic);

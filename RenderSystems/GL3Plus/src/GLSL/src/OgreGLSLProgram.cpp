@@ -36,59 +36,8 @@
 namespace Ogre {
 
     GLSLProgram::GLSLProgram(const GLShaderList& shaders)
-        : GLSLProgramCommon(shaders[GPT_VERTEX_PROGRAM])
-        , mHullShader(static_cast<GLSLShader*>(shaders[GPT_HULL_PROGRAM]))
-        , mDomainShader(static_cast<GLSLShader*>(shaders[GPT_DOMAIN_PROGRAM]))
-        , mGeometryShader(static_cast<GLSLShader*>(shaders[GPT_GEOMETRY_PROGRAM]))
-        , mFragmentShader(static_cast<GLSLShader*>(shaders[GPT_FRAGMENT_PROGRAM]))
-        , mComputeShader(static_cast<GLSLShader*>(shaders[GPT_COMPUTE_PROGRAM]))
+        : GLSLProgramCommon(shaders)
     {
-        // compute shader presence means no other shaders are allowed
-        if(mComputeShader)
-            mVertexShader = mHullShader = mDomainShader = mGeometryShader = mFragmentShader = NULL;
-    }
-
-    Ogre::String GLSLProgram::getCombinedName()
-    {
-        String name;
-        if (mVertexShader)
-        {
-            name += "Vertex Shader: ";
-            name += mVertexShader->getName();
-            name += "\n";
-        }
-        if (mHullShader)
-        {
-            name += "Tessellation Control Shader: ";
-            name += mHullShader->getName();
-            name += "\n";
-        }
-        if (mDomainShader)
-        {
-            name += "Tessellation Evaluation Shader: ";
-            name += mDomainShader->getName();
-            name += "\n";
-        }
-        if (mGeometryShader)
-        {
-            name += "Geometry Shader: ";
-            name += mGeometryShader->getName();
-            name += "\n";
-        }
-        if (mFragmentShader)
-        {
-            name += "Fragment Shader: ";
-            name += mFragmentShader->getName();
-            name += "\n";
-        }
-        if (mComputeShader)
-        {
-            name += "Compute Shader: ";
-            name += mComputeShader->getName();
-            name += "\n";
-        }
-
-        return name;
     }
 
     void GLSLProgram::bindFixedAttributes(GLuint program)
@@ -107,19 +56,6 @@ namespace Ogre {
         }
     }
 
-    uint32 GLSLProgram::getCombinedHash()
-    {
-        uint32 hash = 0;
-        GpuProgram* progs[] = {mVertexShader, mFragmentShader, mGeometryShader,
-                               mHullShader,   mDomainShader,   mComputeShader};
-        for (auto p : progs)
-        {
-            if(!p) continue;
-            hash = p->_getHash(hash);
-        }
-        return hash;
-    }
-
     void GLSLProgram::setTransformFeedbackVaryings(const std::vector<String>& nameStrings)
     {
         // Get program object ID.
@@ -127,9 +63,9 @@ namespace Ogre {
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             //TODO include tessellation stages
-            GLSLShader* glslGpuProgram = getGeometryShader();
+            GLSLShader* glslGpuProgram = getShader(GPT_GEOMETRY_PROGRAM);
             if (!glslGpuProgram)
-                glslGpuProgram = getVertexShader();
+                glslGpuProgram = getShader(GPT_VERTEX_PROGRAM);
 
             programId = glslGpuProgram->getGLProgramHandle();
 
