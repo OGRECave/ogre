@@ -75,14 +75,12 @@ namespace Ogre {
         /// Overridden from GpuProgram
         GpuProgramParametersSharedPtr createParameters(void);
 
-        /// compile source into shader object
-        bool compile( bool checkErrors = false);
-
     protected:
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         static CmdOptimisation msCmdOptimisation;
 #endif
 
+        void loadFromSource();
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
 

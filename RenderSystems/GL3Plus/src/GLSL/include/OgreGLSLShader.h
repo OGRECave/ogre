@@ -48,11 +48,8 @@ namespace Ogre {
 
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
-
-        /// Compile source into shader object
-        bool compile( bool checkErrors = false);
-
     protected:
+        void loadFromSource();
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
         /// Populate the passed parameters with name->index map, must be overridden

@@ -75,7 +75,6 @@ namespace Ogre {
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
 
-        virtual bool compile( bool checkErrors = false) = 0;
         virtual void attachToProgramObject(const uint programObject) = 0;
         virtual void detachFromProgramObject(const uint programObject) = 0;
 
@@ -119,10 +118,6 @@ namespace Ogre {
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
 
         String getResourceLogName() const;
-
-        /** Internal load implementation, must be implemented by subclasses.
-        */
-        void loadFromSource() { compile(true); }
 
         void prepareImpl(void);
 

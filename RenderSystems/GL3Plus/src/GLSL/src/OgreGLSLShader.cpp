@@ -206,7 +206,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
     }
 
-    bool GLSLShader::compile(bool checkErrors)
+    void GLSLShader::loadFromSource()
     {
         // Create shader object.
         GLenum GLShaderType = getGLShaderType(mType);
@@ -233,9 +233,6 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str()));
         }
 
-        if(!checkErrors)
-            return compiled == 1;
-
         String compileInfo = getObjectInfo(mGLShaderHandle);
 
         if (!compiled)
@@ -244,8 +241,6 @@ namespace Ogre {
         // probably we have warnings
         if (!compileInfo.empty())
             LogManager::getSingleton().stream(LML_WARNING) << getResourceLogName() << " " << compileInfo;
-
-        return compiled == 1;
     }
 
     void GLSLShader::unloadHighLevelImpl(void)
