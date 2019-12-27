@@ -83,19 +83,14 @@ namespace Ogre {
 
     void GLSLMonolithicProgram::compileAndLink()
     {
-        // attach Vertex Program
-        if (mVertexShader)
-        {
-            getVertexShader()->attachToProgramObject(mGLProgramHandle);
-            setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
-        }
-
-        // attach remaining Programs
-        for (auto shader : {mFragmentShader, mGeometryShader, mHullShader, mDomainShader, mComputeShader})
+        for (auto shader : mShaders)
         {
         	if(!shader) continue;
 
             shader->attachToProgramObject(mGLProgramHandle);
+
+            if(shader->getType() == GPT_VERTEX_PROGRAM)
+                setSkeletalAnimationIncluded(shader->isSkeletalAnimationIncluded());
         }
 
         bindFixedAttributes(mGLProgramHandle);
@@ -144,15 +139,14 @@ namespace Ogre {
         }
 
         // order must match GpuProgramType
-        GLSLShader* shaders[6] = {getVertexShader(), mFragmentShader, mGeometryShader, mDomainShader, mHullShader, mComputeShader};
         const GpuConstantDefinitionMap* params[6] = { NULL };
 
         for (int i = 0; i < 6; i++)
         {
-            if (!shaders[i])
+            if (!mShaders[i])
                 continue;
 
-            params[i] = &(shaders[i]->getConstantDefinitions().map);
+            params[i] = &(mShaders[i]->getConstantDefinitions().map);
         }
 
         // Do we know how many shared params there are yet? Or if there are any blocks defined?
@@ -172,16 +166,7 @@ namespace Ogre {
         GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 
         // determine if we need to transpose matrices when binding
-        bool transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!getVertexShader()->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentShader && (!mFragmentShader->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryShader && (!mGeometryShader->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_HULL_PROGRAM && mHullShader && (!mHullShader->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_DOMAIN_PROGRAM && mDomainShader && (!mDomainShader->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_COMPUTE_PROGRAM && mComputeShader && (!mComputeShader->getColumnMajorMatrices())))
-        {
-            transpose = GL_FALSE;
-        }
+        bool transpose = !mShaders[fromProgType] || mShaders[fromProgType]->getColumnMajorMatrices();
 
         for (;currentUniform != endUniform; ++currentUniform)
         {

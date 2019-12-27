@@ -44,10 +44,6 @@ namespace Ogre {
     class _OgreGLES2Export GLSLESProgramCommon : public GLSLProgramCommon MANAGED_RESOURCE
     {
     protected:
-        /// Linked fragment program
-        GLSLESProgram* mFragmentProgram;
-
-        Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
         static bool getMicrocodeFromCache(uint32 id, GLuint programHandle);
 
@@ -65,13 +61,7 @@ namespace Ogre {
 
         void bindFixedAttributes(GLuint program);
 
-        GLSLESProgram* getVertexProgram(void) const { return static_cast<GLSLESProgram*>(mVertexShader); }
-        GLSLESProgram* getFragmentProgram(void) const { return mFragmentProgram; }
-
-        bool isUsingShader(GLSLShaderCommon* shader) const
-        {
-            return mVertexShader == shader || (GLSLShaderCommon*)mFragmentProgram == shader;
-        }
+        GLSLESProgram* getProgram(GpuProgramType type) const { return static_cast<GLSLESProgram*>(mShaders[type]); }
     };
 }
 

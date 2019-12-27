@@ -188,22 +188,6 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLESProgramCommon* GLSLESProgramManager::getByProgram(GLSLESProgram* gpuProgram)
-    {
-        for (ProgramIterator currentProgram = mPrograms.begin();
-            currentProgram != mPrograms.end(); ++currentProgram)
-        {
-            GLSLESProgramCommon* prgm = static_cast<GLSLESProgramCommon*>(currentProgram->second);
-            if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
-            {
-                return prgm;
-            }
-        }
-
-        return NULL;
-    }
-
-    //-----------------------------------------------------------------------
     bool GLSLESProgramManager::destroyLinkProgram(GLSLESProgramCommon* linkProgram)
     {
         for (ProgramIterator currentProgram = mPrograms.begin();

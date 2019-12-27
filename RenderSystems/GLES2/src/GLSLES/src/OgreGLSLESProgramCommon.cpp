@@ -38,28 +38,8 @@ namespace Ogre {
     
     //-----------------------------------------------------------------------
     GLSLESProgramCommon::GLSLESProgramCommon(const GLShaderList& shaders)
-    : GLSLProgramCommon(shaders[GPT_VERTEX_PROGRAM])
-    , mFragmentProgram(static_cast<GLSLESProgram*>(shaders[GPT_FRAGMENT_PROGRAM]))
+    : GLSLProgramCommon(shaders)
     {
-    }
-
-    //-----------------------------------------------------------------------
-    Ogre::String GLSLESProgramCommon::getCombinedName()
-    {
-        String name;
-        if (getVertexProgram())
-        {
-            name += "Vertex Program:" ;
-            name += getVertexProgram()->getName();
-        }
-        if (mFragmentProgram)
-        {
-            name += " Fragment Program:" ;
-            name += mFragmentProgram->getName();
-        }
-        name += "\n";
-
-        return name;
     }
 
     void GLSLESProgramCommon::bindFixedAttributes(GLuint program)
@@ -143,8 +123,10 @@ namespace Ogre {
     {
         mLinked = false;
         mUniformRefsBuilt = false;
-        getVertexProgram()->getUniformCache()->clearCache();
-        mFragmentProgram->getUniformCache()->clearCache();
+        for(auto s : mShaders)
+        {
+            if(s) s->getUniformCache()->clearCache();
+        }
     }
 
     void GLSLESProgramCommon::notifyOnContextReset()

@@ -44,12 +44,6 @@ namespace Ogre {
     GLSLESLinkProgram::GLSLESLinkProgram(const GLShaderList& shaders)
     : GLSLESProgramCommon(shaders)
     {
-        if ((!getVertexProgram() || !mFragmentProgram))
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Attempted to create a shader program without both a vertex and fragment program.",
-                        "GLSLESLinkProgram::GLSLESLinkProgram");
-        }
     }
 
     //-----------------------------------------------------------------------
@@ -75,14 +69,7 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
 
-            uint32 hash = 0;
-            GpuProgram* progs[] = {mVertexShader, mFragmentProgram};
-            for(auto p : progs)
-            {
-                if(!p) continue;
-                hash = p->_getHash(hash);
-            }
-
+            uint32 hash = getCombinedHash();
             if (!getMicrocodeFromCache(hash, mGLProgramHandle))
             {
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
@@ -134,20 +121,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLESLinkProgram::compileAndLink()
     {
-        uint32 hash = 0;
-        GpuProgram* progs[] = {mVertexShader, mFragmentProgram};
-        for(auto p : progs)
-        {
-            if(!p) continue;
-            hash = p->_getHash(hash);
-        }
+        uint32 hash = getCombinedHash();
 
         // attach Vertex Program
-        getVertexProgram()->attachToProgramObject(mGLProgramHandle);
-        setSkeletalAnimationIncluded(getVertexProgram()->isSkeletalAnimationIncluded());
+        mShaders[GPT_VERTEX_PROGRAM]->attachToProgramObject(mGLProgramHandle);
+        setSkeletalAnimationIncluded(mShaders[GPT_VERTEX_PROGRAM]->isSkeletalAnimationIncluded());
         
         // attach Fragment Program
-        mFragmentProgram->attachToProgramObject(mGLProgramHandle);
+        mShaders[GPT_FRAGMENT_PROGRAM]->attachToProgramObject(mGLProgramHandle);
         
         bindFixedAttributes( mGLProgramHandle );
 
@@ -184,13 +165,13 @@ namespace Ogre {
         {
             const GpuConstantDefinitionMap* vertParams = 0;
             const GpuConstantDefinitionMap* fragParams = 0;
-            if (getVertexProgram())
+            if (mShaders[GPT_VERTEX_PROGRAM])
             {
-                vertParams = &(getVertexProgram()->getConstantDefinitions().map);
+                vertParams = &(mShaders[GPT_VERTEX_PROGRAM]->getConstantDefinitions().map);
             }
-            if (mFragmentProgram)
+            if (mShaders[GPT_FRAGMENT_PROGRAM])
             {
-                fragParams = &(mFragmentProgram->getConstantDefinitions().map);
+                fragParams = &(mShaders[GPT_FRAGMENT_PROGRAM]->getConstantDefinitions().map);
             }
 
             GLSLESProgramManager::extractUniforms(mGLProgramHandle, vertParams, fragParams,
@@ -223,7 +204,7 @@ namespace Ogre {
                     bool shouldUpdate = true;
 
                     // this is a monolitic program so we can use the cache of any attached shader
-                    GLUniformCache* uniformCache =  mVertexShader->getUniformCache();
+                    GLUniformCache* uniformCache =  mShaders[GPT_VERTEX_PROGRAM]->getUniformCache();
                     switch (def->constType)
                     {
                         case GCT_INT1:

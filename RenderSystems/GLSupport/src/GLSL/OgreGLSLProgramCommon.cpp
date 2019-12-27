@@ -23,13 +23,20 @@ VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(const String& 
     return VertexElementSemantic(0);
 }
 
-GLSLProgramCommon::GLSLProgramCommon(GLSLShaderCommon* vertexShader)
-    : mVertexShader(vertexShader),
+GLSLProgramCommon::GLSLProgramCommon(const GLShaderList& shaders)
+    : mShaders(shaders),
       mUniformRefsBuilt(false),
       mGLProgramHandle(0),
       mLinked(false),
       mSkeletalAnimation(false)
 {
+    // compute shader presence means no other shaders are allowed
+    if(shaders[GPT_COMPUTE_PROGRAM])
+    {
+        mShaders.fill(NULL);
+        mShaders[GPT_COMPUTE_PROGRAM] = shaders[GPT_COMPUTE_PROGRAM];
+    }
+
     // init mCustomAttributesIndexes
     for (size_t i = 0; i < VES_COUNT; i++)
     {
@@ -61,12 +68,12 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
     // Format is:
     //      layout(location = 0) attribute vec4 vertex;
 
-    if (!mVertexShader)
+    if (!mShaders[GPT_VERTEX_PROGRAM])
     {
         return;
     }
 
-    String shaderSource = mVertexShader->getSource();
+    String shaderSource = mShaders[GPT_VERTEX_PROGRAM]->getSource();
     String::size_type currPos = shaderSource.find("layout");
     while (currPos != String::npos)
     {
@@ -300,4 +307,32 @@ void GLSLProgramCommon::updateUniformBlocks()
         }
     }
 }
+
+String GLSLProgramCommon::getCombinedName()
+{
+    StringStream ss;
+
+    for(auto s : mShaders)
+    {
+        if (s)
+        {
+            ss << s->getName() << "\n";
+        }
+    }
+
+    return ss.str();
+}
+
+uint32 GLSLProgramCommon::getCombinedHash()
+{
+    uint32 hash = 0;
+
+    for (auto p : mShaders)
+    {
+        if(!p) continue;
+        hash = p->_getHash(hash);
+    }
+    return hash;
+}
+
 } /* namespace Ogre */

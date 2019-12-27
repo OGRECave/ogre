@@ -67,21 +67,7 @@ namespace Ogre {
     public:
         void bindFixedAttributes(GLuint program);
 
-        GLSLShader* getVertexShader() const { return static_cast<GLSLShader*>(mVertexShader); }
-        GLSLShader* getHullShader() const { return mHullShader; }
-        GLSLShader* getDomainShader() const { return mDomainShader; }
-        GLSLShader* getGeometryShader() const { return mGeometryShader; }
-        GLSLShader* getFragmentShader() const { return mFragmentShader; }
-        GLSLShader* getComputeShader() const { return mComputeShader; }
-
-        bool isUsingShader(GLSLShaderCommon* shader) const
-        {
-            return mVertexShader == shader || (GLSLShaderCommon*)mGeometryShader == shader ||
-                   (GLSLShaderCommon*)mFragmentShader == shader ||
-                   (GLSLShaderCommon*)mHullShader == shader ||
-                   (GLSLShaderCommon*)mDomainShader == shader ||
-                   (GLSLShaderCommon*)mComputeShader == shader;
-        }
+        GLSLShader* getShader(GpuProgramType type) const { return static_cast<GLSLShader*>(mShaders[type]); }
 
         virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
                                           GpuProgramType fromProgType) = 0;
@@ -96,20 +82,6 @@ namespace Ogre {
         /// Container of counter buffer references that are active in the program object
         GLCounterBufferList mGLCounterBufferReferences;
 
-        /// Linked hull (control) shader.
-        GLSLShader* mHullShader;
-        /// Linked domain (evaluation) shader.
-        GLSLShader* mDomainShader;
-        /// Linked geometry shader.
-        GLSLShader* mGeometryShader;
-        /// Linked fragment shader.
-        GLSLShader* mFragmentShader;
-        /// Linked compute shader.
-        GLSLShader* mComputeShader;
-
-        uint32 getCombinedHash();
-
-        Ogre::String getCombinedName(void);
         /// Get the the binary data of a program from the microcode cache
         void getMicrocodeFromCache(uint32 id);
     };
