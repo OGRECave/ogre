@@ -30,7 +30,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareCounterBuffer.h"
 #include "OgreGL3PlusHardwareIndexBuffer.h"
 #include "OgreGL3PlusHardwareUniformBuffer.h"
-#include "OgreGL3PlusHardwareShaderStorageBuffer.h"
 #include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreGL3PlusRenderToVertexBuffer.h"
 #include "OgreGL3PlusRenderSystem.h"
@@ -118,8 +117,8 @@ namespace Ogre {
 
     HardwareUniformBufferSharedPtr GL3PlusHardwareBufferManager::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
-        GL3PlusHardwareUniformBuffer* buf =
-            new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name);
+        HardwareUniformBuffer* buf =
+            new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, GL_UNIFORM_BUFFER);
         {
             OGRE_LOCK_MUTEX(mUniformBuffersMutex);
             mUniformBuffers.insert(buf);
@@ -129,8 +128,8 @@ namespace Ogre {
 
     HardwareUniformBufferSharedPtr GL3PlusHardwareBufferManager::createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
-        GL3PlusHardwareShaderStorageBuffer* buf =
-            new GL3PlusHardwareShaderStorageBuffer(this, sizeBytes, usage, useShadowBuffer, name);
+        HardwareUniformBuffer* buf =
+            new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, GL_SHADER_STORAGE_BUFFER);
         {
             OGRE_LOCK_MUTEX(mUniformBuffersMutex);
             mShaderStorageBuffers.insert(buf);

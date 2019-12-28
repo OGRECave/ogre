@@ -59,6 +59,8 @@ namespace Ogre {
                       bool discardWholeBuffer);
 
         GLuint getGLBufferId(void) const { return mBufferId; }
+
+        GLenum getTarget() const { return mTarget; }
     };
 }
 #endif // __GL3PlusHARDWAREBUFFER_H__
