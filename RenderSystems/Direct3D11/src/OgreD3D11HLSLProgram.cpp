@@ -1222,9 +1222,6 @@ namespace Ogre {
             }
 
             mConstantDefs->map.emplace(def.Name, def);
-
-            // Now deal with arrays
-            mConstantDefs->generateConstantDefinitionArrayEntries(def.Name, def);
         }
     }
     //-----------------------------------------------------------------------

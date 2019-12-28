@@ -320,30 +320,15 @@ namespace Ogre {
 
         GpuNamedConstants() : floatBufferSize(0), doubleBufferSize(0), intBufferSize(0) {}
 
-        /** Generate additional constant entries for arrays based on a base definition.
-            @remarks
-            Array uniforms will be added just with their base name with no array
-            suffix. This method will add named entries for array suffixes too
-            so individual array entries can be addressed. Note that we only
-            individually index array elements if the array size is up to 16
-            entries in size. Anything larger than that only gets a [0] entry
-            as well as the main entry, to save cluttering up the name map. After
-            all, you can address the larger arrays in a bulk fashion much more
-            easily anyway.
-        */
-        void generateConstantDefinitionArrayEntries(const String& paramName,
+        /// @deprecated obsolete
+        OGRE_DEPRECATED void generateConstantDefinitionArrayEntries(const String& paramName,
                                                     const GpuConstantDefinition& baseDef);
 
-        /// Indicates whether all array entries will be generated and added to the definitions map
-        static bool getGenerateAllConstantDefinitionArrayEntries();
+        /// @deprecated obsolete
+        OGRE_DEPRECATED static bool getGenerateAllConstantDefinitionArrayEntries();
 
-        /** Sets whether all array entries will be generated and added to the definitions map.
-            @remarks
-            Usually, array entries can only be individually indexed if they're up to 16 entries long,
-            to save memory - arrays larger than that can be set but only via the bulk setting
-            methods. This option allows you to choose to individually index every array entry.
-        */
-        static void setGenerateAllConstantDefinitionArrayEntries(bool generateAll);
+        /// @deprecated obsolete
+        OGRE_DEPRECATED static void setGenerateAllConstantDefinitionArrayEntries(bool generateAll);
 
         /** Saves constant definitions to a file, compatible with GpuProgram::setManualNamedConstantsFile.
             @see GpuProgram::setManualNamedConstantsFile
