@@ -902,7 +902,6 @@ namespace Ogre {
 		GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
 		for (; iter != iterE ; iter++)
 		{
-			const String & paramName = iter->first;
 			GpuConstantDefinition def = iter->second;
 
 			mConstantDefs->map.emplace(iter->first, iter->second);
@@ -922,9 +921,6 @@ namespace Ogre {
 						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
 				mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 			}
-
-			// Deal with array indexing
-			mConstantDefs->generateConstantDefinitionArrayEntries(paramName, def);
 		}
 	}
 	//---------------------------------------------------------------------

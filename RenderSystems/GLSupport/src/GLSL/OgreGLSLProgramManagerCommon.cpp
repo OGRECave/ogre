@@ -169,9 +169,6 @@ namespace Ogre {
                                                               + line + "' in file " + filename);
                     }
                     defs.map.emplace(paramName, def);
-
-                    // Generate array accessors
-                    defs.generateConstantDefinitionArrayEntries(paramName, def);
                 }
                 else
                 {
