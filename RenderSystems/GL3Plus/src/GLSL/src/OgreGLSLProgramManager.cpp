@@ -498,22 +498,21 @@ namespace Ogre {
         // GLShaderStorageBufferList& shaderStorageBufferList,
         GLCounterBufferList& counterBufferList)
     {
-        // Scan through the active uniforms and add them to the reference list.
-        GLint uniformCount = 0;
 #define uniformLength 200
         //              GLint uniformLength = 0;
         //        glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformLength);
 
-        char uniformName[uniformLength];
-        GLUniformReference newGLUniformReference;
+        char uniformName[uniformLength] = {0};
         GLAtomicCounterReference newGLAtomicCounterReference;
+        GLUniformReference newGLUniformReference;
+
 
         // Get the number of active uniforms, including atomic
         // counters and uniforms contained in uniform blocks.
+        GLint uniformCount = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount));
 
-        // Loop over each active uniform and add it to the reference
-        // container.
+        // Scan through the active uniforms and add them to the reference list.
         for (GLuint index = 0; index < (GLuint)uniformCount; index++)
         {
             GLint arraySize;
@@ -523,30 +522,30 @@ namespace Ogre {
 
             // Don't add built in uniforms, atomic counters, or uniform block parameters.
             OGRE_CHECK_GL_ERROR(newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName));
+
+            // User defined uniform found, add it to the reference list.
+            String paramName = String(uniformName);
+
+            // ATI drivers (Catalyst 7.2 and earlier) and
+            // older NVidia drivers will include all array
+            // elements as uniforms but we only want the root
+            // array name and location. Also note that ATI Catalyst
+            // 6.8 to 7.2 there is a bug with glUniform that does
+            // not allow you to update a uniform array past the
+            // first uniform array element ie you can't start
+            // updating an array starting at element 1, must
+            // always be element 0.
+
+            // If the uniform name ends with "]" then its an array element uniform
+            if (paramName.back() == ']')
+            {
+                // if not the first array element then skip it and continue to the next uniform
+                if (paramName.compare(paramName.size() - 3, 3, "[0]") != 0) continue;
+                paramName.resize(paramName.size() - 3);
+            }
+
             if (newGLUniformReference.mLocation >= 0)
             {
-                // User defined uniform found, add it to the reference list.
-                String paramName = String(uniformName);
-
-                // Current ATI drivers (Catalyst 7.2 and earlier) and
-                // older NVidia drivers will include all array
-                // elements as uniforms but we only want the root
-                // array name and location. Also note that ATI Catalyst
-                // 6.8 to 7.2 there is a bug with glUniform that does
-                // not allow you to update a uniform array past the
-                // first uniform array element ie you can't start
-                // updating an array starting at element 1, must
-                // always be element 0.
-
-                // If the uniform name has a "[" in it then its an array element uniform.
-                String::size_type arrayStart = paramName.find('[');
-                if (arrayStart != String::npos)
-                {
-                    // if not the first array element then skip it and continue to the next uniform
-                    if (paramName.compare(arrayStart, paramName.size() - 1, "[0]") != 0) continue;
-                    paramName = paramName.substr(0, arrayStart);
-                }
-
                 // Find out which params object this comes from
                 bool foundSource = findUniformDataSource(paramName, constantDefs, newGLUniformReference);
 
@@ -562,16 +561,13 @@ namespace Ogre {
                 // picked up in the 'parent' parameter can copied all at once
                 // anyway, individual indexes are only needed for lookup from
                 // user params
-            } // end if
-            // Handle atomic counters. Currently atomic counters
-            // cannot be in uniform blocks and are always unsigned
-            // integers.
+            }
             else if (glType == GL_UNSIGNED_INT_ATOMIC_COUNTER)
             {
-                String paramName = String(uniformName);
-
+                // Handle atomic counters. Currently atomic counters
+                // cannot be in uniform blocks and are always unsigned
+                // integers.
                 GLint binding, offset;
-                //GLuint indices [] = {index};
                 OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, 1, &index, GL_UNIFORM_ATOMIC_COUNTER_BUFFER_INDEX, &binding));
                 OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, 1, &index, GL_UNIFORM_OFFSET, &offset));
 
@@ -583,15 +579,6 @@ namespace Ogre {
                 //atomicCounterCount += arraySize;
                 // actually, this should not be necessary since
                 // parameters are processed one by one
-
-                // If the uniform name has a "[" in it then its an array element uniform.
-                String::size_type arrayStart = paramName.find('[');
-                if (arrayStart != String::npos)
-                {
-                    // if not the first array element then skip it and continue to the next uniform
-                    if (paramName.compare(arrayStart, paramName.size() - 1, "[0]") != 0) continue;
-                    paramName = paramName.substr(0, arrayStart);
-                }
 
                 printf("ATOMIC COUNTER FOUND: %s %d", paramName.c_str(), arraySize);
 
@@ -623,20 +610,13 @@ namespace Ogre {
         } // end for
 
 
-        //FIXME uniform buffers need to be created during material script parsing of shared params
-        // HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
-        // GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
-        // hwGlBuffer->setGLBufferBinding(blockBinding);
-        // GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
-        // uniformBufferList.push_back(uniformBuffer);
+        // FIXME uniform buffers need to be created during material script parsing of shared params
 
-        //FIXME Ogre materials need a new shared param that is associated with an entity.
+        // FIXME Ogre materials need a new shared param that is associated with an entity.
         // This could be impemented as a switch-like statement inside shared_params:
 
-        GLint blockCount = 0;
-
         // Now deal with uniform blocks
-
+        GLint blockCount = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount));
 
         for (int index = 0; index < blockCount; index++)
@@ -645,13 +625,10 @@ namespace Ogre {
 
             // Map uniform block to binding point of GL buffer of
             // shared param bearing the same name.
-
             GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
-            //TODO error handling for when buffer has no associated shared parameter?
-            //if (bufferi == mSharedParamGLBufferMap.end()) continue;
 
             GL3PlusHardwareUniformBuffer* hwGlBuffer;
-            SharedParamsBufferMap::const_iterator bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
+            auto bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
             if (bufferMapi != sharedParamsBufferMap.end())
             {
                 hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(bufferMapi->second.get());
@@ -662,19 +639,16 @@ namespace Ogre {
                 GLint blockSize;
                 OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
                 HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
-                // bufferMapi->second() = newUniformBuffer;
                 hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
-                GLint bufferBinding = sharedParamsBufferMap.size();
-                hwGlBuffer->setGLBufferBinding(bufferBinding);
-                std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newUniformBuffer);
-                sharedParamsBufferMap.insert(newPair);
+                hwGlBuffer->setGLBufferBinding(int(sharedParamsBufferMap.size()));
+
+                sharedParamsBufferMap.emplace(blockSharedParams, newUniformBuffer);
 
                 // Get active block parameter properties.
-                GpuConstantDefinitionIterator sharedParamDef = blockSharedParams->getConstantDefinitionIterator();
                 std::vector<const char*> sharedParamNames;
-                for (; sharedParamDef.current() != sharedParamDef.end(); sharedParamDef.moveNext())
+                for (const auto& it : blockSharedParams->getConstantDefinitions().map)
                 {
-                    sharedParamNames.push_back(sharedParamDef.current()->first.c_str());
+                    sharedParamNames.push_back(it.first.c_str());
                 }
 
                 std::vector<GLuint> uniformParamIndices(sharedParamNames.size());
@@ -689,27 +663,20 @@ namespace Ogre {
                 //GL_UNIFORM_MATRIX_STRIDE
 
                 GpuNamedConstants& consts = const_cast<GpuNamedConstants&>(blockSharedParams->getConstantDefinitions());
-                MapIterator<GpuConstantDefinitionMap> sharedParamDefMut(consts.map);
-                for (size_t i = 0; sharedParamDefMut.current() != sharedParamDefMut.end(); sharedParamDefMut.moveNext(), i++)
+                size_t i = 0;
+                for (auto& gcdef : consts.map)
                 {
                     // NOTE: the naming in GL3Plus is backward. logicalIndex is actually the physical index of the parameter
                     // while the physicalIndex is the logical array offset..
-                    sharedParamDefMut.current()->second.logicalIndex = uniformParamOffsets[i];
+                    gcdef.second.logicalIndex = uniformParamOffsets[i++];
                 }
             }
 
-            GLint bufferBinding = hwGlBuffer->getGLBufferBinding();
-
-            //OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding));
-
-            OGRE_CHECK_GL_ERROR(glUniformBlockBinding(programObject, index, bufferBinding));
+            OGRE_CHECK_GL_ERROR(glUniformBlockBinding(programObject, index, hwGlBuffer->getGLBufferBinding()));
         }
 
         // Now deal with shader storage blocks
-
-        //TODO Need easier, more robust feature checking.
-        // if (mRenderSystem->checkExtension("GL_ARB_program_interface_query") || gl3wIsSupported(4, 3))
-        if (mRenderSystem->hasMinGLVersion(4, 3))
+        if (mRenderSystem->hasMinGLVersion(4, 3) || mRenderSystem->checkExtension("GL_ARB_program_interface_query"))
         {
             OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(programObject, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &blockCount));
 
@@ -718,19 +685,12 @@ namespace Ogre {
 
             for (int index = 0; index < blockCount; index++)
             {
-                //OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(programObject, GL_SHADER_STORAGE_BLOCK, index, uniformName, ));
-                // OGRE_CHECK_GL_ERROR(glGetIntegeri_v(GL_SHADER_STORAGE_BUFFER_BINDING, index, uniformName));
                 OGRE_CHECK_GL_ERROR(glGetProgramResourceName(programObject, GL_SHADER_STORAGE_BLOCK, index, uniformLength, NULL, uniformName));
 
                 // Map uniform block to binding point of GL buffer of
                 // shared param bearing the same name.
 
                 GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
-                //TODO error handling for when buffer has no associated shared parameter?
-                //if (bufferi == mSharedParamGLBufferMap.end()) continue;
-
-                // No more shader storage blocks.
-                // if (uniformName == 0) break;
                 GL3PlusHardwareUniformBuffer* hwGlBuffer;
                 SharedParamsBufferMap::const_iterator bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
                 if (bufferMapi != sharedParamsBufferMap.end())
@@ -740,44 +700,34 @@ namespace Ogre {
                 else
                 {
                     // Create buffer and add entry to buffer map.
-                    // bufferMapi->second() = newUniformBuffer;
-
                     GLint blockSize;
                     // const GLenum properties [2] = {GL_BUFFER_DATA_SIZE, GL_BUFFER_BINDING};
                     GLenum properties[] = {GL_BUFFER_DATA_SIZE};
                     OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(programObject, GL_SHADER_STORAGE_BLOCK, index, 1, properties, 1, NULL, &blockSize));
-                    //blockSize = properties[0];
                     //TODO Implement shared param access param in materials (R, W, R+W)
-                    // HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
-                    HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
+
+                    auto newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager&>(HardwareBufferManager::getSingleton()).createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
                     hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newShaderStorageBuffer.get());
+                    hwGlBuffer->setGLBufferBinding(int(sharedParamsBufferMap.size()));
 
-                    //FIXME check parameters
-                    GLint bufferBinding = sharedParamsBufferMap.size();
-                    hwGlBuffer->setGLBufferBinding(bufferBinding);
-
-                    std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newShaderStorageBuffer);
-                    sharedParamsBufferMap.insert(newPair);
+                    sharedParamsBufferMap.emplace(blockSharedParams, newShaderStorageBuffer);
 
                     // Get active block parameter properties.
                     properties[0] = GL_OFFSET;
                     GpuNamedConstants& consts = const_cast<GpuNamedConstants&>(blockSharedParams->getConstantDefinitions());
-                    MapIterator<GpuConstantDefinitionMap> sharedParamDef(consts.map);
-                    for (size_t i = 0; sharedParamDef.current() != sharedParamDef.end(); sharedParamDef.moveNext(), i++) {
-                        GLuint varIndex = glGetProgramResourceIndex(programObject, GL_BUFFER_VARIABLE, sharedParamDef.current()->first.c_str());
+                    for (auto& gcdef : consts.map) {
+                        GLuint varIndex = glGetProgramResourceIndex(programObject, GL_BUFFER_VARIABLE, gcdef.first.c_str());
                         GLint offset;
                         glGetProgramResourceiv(programObject, GL_BUFFER_VARIABLE, varIndex, 1, properties, 1, NULL, &offset);
-                        sharedParamDef.current()->second.logicalIndex = offset;
+                        gcdef.second.logicalIndex = offset;
                     }
                 }
 
-                GLint bufferBinding = hwGlBuffer->getGLBufferBinding();
-
-                OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, bufferBinding));
+                OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, hwGlBuffer->getGLBufferBinding()));
             }
         }
-        // if (mRenderSystem->checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
-        if (mRenderSystem->hasMinGLVersion(4, 2))
+
+        if (mRenderSystem->hasMinGLVersion(4, 2) || mRenderSystem->checkExtension("GL_ARB_shader_atomic_counters"))
         {
             // Now deal with atomic counters buffers
             OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS, &blockCount));
