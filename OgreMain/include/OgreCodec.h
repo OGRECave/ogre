@@ -65,9 +65,8 @@ namespace Ogre {
         public:
             virtual ~CodecData() {}
 
-            /** Returns the type of the data.
-            */
-            virtual String dataType() const { return "CodecData"; }
+            /// @deprecated do not use
+            OGRE_DEPRECATED virtual String dataType() const { return "CodecData"; }
         };
         typedef SharedPtr<CodecData> CodecDataPtr;
 
@@ -146,9 +145,8 @@ namespace Ogre {
         */
         virtual String getType() const = 0;
 
-        /** Returns the type of the data that supported by this codec as a String
-        */
-        virtual String getDataType() const = 0;
+        /// @deprecated do not use
+        OGRE_DEPRECATED virtual String getDataType() const = 0;
 
         /** Returns whether a magic number header matches this codec.
         @param magicNumberPtr Pointer to a stream of bytes which should identify the file.
