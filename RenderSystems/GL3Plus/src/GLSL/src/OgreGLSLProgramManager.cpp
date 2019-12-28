@@ -731,11 +731,11 @@ namespace Ogre {
 
                 // No more shader storage blocks.
                 // if (uniformName == 0) break;
-                GL3PlusHardwareShaderStorageBuffer* hwGlBuffer;
+                GL3PlusHardwareUniformBuffer* hwGlBuffer;
                 SharedParamsBufferMap::const_iterator bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
                 if (bufferMapi != sharedParamsBufferMap.end())
                 {
-                    hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(bufferMapi->second.get());
+                    hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(bufferMapi->second.get());
                 }
                 else
                 {
@@ -750,7 +750,7 @@ namespace Ogre {
                     //TODO Implement shared param access param in materials (R, W, R+W)
                     // HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
                     HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
-                    hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(newShaderStorageBuffer.get());
+                    hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newShaderStorageBuffer.get());
 
                     //FIXME check parameters
                     GLint bufferBinding = sharedParamsBufferMap.size();

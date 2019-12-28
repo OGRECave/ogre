@@ -51,7 +51,7 @@ namespace Ogre {
 
     public:
         GL3PlusHardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t bufferSize, HardwareBuffer::Usage usage,
-                                     bool useShadowBuffer, const String& name);
+                                     bool useShadowBuffer, const String& name, GLenum target);
 
         /** See HardwareBuffer. */
         void readData(size_t offset, size_t length, void* pDest);
