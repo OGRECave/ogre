@@ -51,89 +51,31 @@ namespace Ogre
 
     void GLSLESProgramPipeline::compileAndLink()
     {
-        GLint linkStatus = 0;
-        
         OGRE_CHECK_GL_ERROR(glGenProgramPipelinesEXT(1, &mGLProgramHandle));
         //OGRE_CHECK_GL_ERROR(glBindProgramPipelineEXT(mGLProgramHandle));
 
-        uint32 vhash = 0, fhash = 0;
-
+        mLinked = true;
         // Compile and attach Vertex Program
         if(mShaders[GPT_VERTEX_PROGRAM])
         {
-            vhash = mShaders[GPT_VERTEX_PROGRAM]->_getHash();
-            if(mShaders[GPT_VERTEX_PROGRAM]->isLinked())
-            {
-                mLinked |= VERTEX_PROGRAM_LINKED;
-            }
-            else if (getMicrocodeFromCache(vhash, mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle()))
-            {
-                mShaders[GPT_VERTEX_PROGRAM]->setLinked(true);
-                mLinked |= VERTEX_PROGRAM_LINKED;
-            }
-            else
-            {
-                GLuint programHandle = mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle();
-
-                bindFixedAttributes( programHandle );
-
-                OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
-                mShaders[GPT_VERTEX_PROGRAM]->attachToProgramObject(programHandle);
-                OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
-                
-                if(linkStatus)
-                {
-                    mShaders[GPT_VERTEX_PROGRAM]->setLinked(linkStatus);
-                    mLinked |= VERTEX_PROGRAM_LINKED;
-                }
-
-                GLSLES::logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
-            }
+            mLinked = mLinked && mShaders[GPT_VERTEX_PROGRAM]->linkSeparable();
         }
         
         // Compile and attach Fragment Program
         if(mShaders[GPT_FRAGMENT_PROGRAM])
         {
-            fhash = mShaders[GPT_FRAGMENT_PROGRAM]->_getHash();
-            if(mShaders[GPT_FRAGMENT_PROGRAM]->isLinked())
-            {
-                mLinked |= FRAGMENT_PROGRAM_LINKED;
-            }
-            else if (getMicrocodeFromCache(fhash, mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle()))
-            {
-                mShaders[GPT_FRAGMENT_PROGRAM]->setLinked(true);
-                mLinked |= FRAGMENT_PROGRAM_LINKED;
-            }
-            else
-            {
-                GLuint programHandle = mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle();
-                OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
-                mShaders[GPT_FRAGMENT_PROGRAM]->attachToProgramObject(programHandle);
-                OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
-
-                if(linkStatus)
-                {
-                    mShaders[GPT_FRAGMENT_PROGRAM]->setLinked(linkStatus);
-                    mLinked |= FRAGMENT_PROGRAM_LINKED;
-                }
-
-                GLSLES::logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
-            }
+            mLinked = mLinked && mShaders[GPT_FRAGMENT_PROGRAM]->linkSeparable();
         }
         
         if(mLinked)
         {
-            if(mShaders[GPT_VERTEX_PROGRAM] && mShaders[GPT_VERTEX_PROGRAM]->isLinked())
+            if(mShaders[GPT_VERTEX_PROGRAM])
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_VERTEX_SHADER_BIT_EXT, mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle()));
-                _writeToCache(vhash, mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle());
             }
-            if(mShaders[GPT_FRAGMENT_PROGRAM] && mShaders[GPT_FRAGMENT_PROGRAM]->isLinked())
+            if(mShaders[GPT_FRAGMENT_PROGRAM])
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_FRAGMENT_SHADER_BIT_EXT, mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle()));
-                _writeToCache(fhash, mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle());
             }
 
             // Validate pipeline

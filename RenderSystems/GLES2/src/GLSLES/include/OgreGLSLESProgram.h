@@ -75,6 +75,8 @@ namespace Ogre {
         /// Overridden from GpuProgram
         GpuProgramParametersSharedPtr createParameters(void);
 
+        bool linkSeparable();
+
     protected:
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         static CmdOptimisation msCmdOptimisation;

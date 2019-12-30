@@ -104,6 +104,35 @@ namespace Ogre {
         }
     }
 #endif
+    bool GLSLESProgram::linkSeparable()
+    {
+        if(mLinked)
+            return true;
+
+        uint32 hash = _getHash();
+
+        if (GLSLESProgramCommon::getMicrocodeFromCache(hash, mGLProgramHandle))
+        {
+            mLinked = true;
+        }
+        else
+        {
+            if( mType == GPT_VERTEX_PROGRAM )
+                GLSLESProgramCommon::bindFixedAttributes( mGLProgramHandle );
+
+            OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(mGLProgramHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
+            attachToProgramObject(mGLProgramHandle);
+            OGRE_CHECK_GL_ERROR(glLinkProgram(mGLProgramHandle));
+            OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &mLinked));
+
+            GLSLES::logObjectInfo( mName + String("GLSL vertex program result : "), mGLProgramHandle );
+
+            GLSLESProgramCommon::_writeToCache(hash, mGLProgramHandle);
+        }
+
+        return mLinked;
+    }
+
     void GLSLESProgram::loadFromSource()
     {
         const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();

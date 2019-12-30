@@ -64,7 +64,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GLSLProgram : public GLSLProgramCommon
     {
     public:
-        void bindFixedAttributes(GLuint program);
+        static void bindFixedAttributes(GLuint program);
 
         virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
                                           GpuProgramType fromProgType) = 0;
