@@ -89,15 +89,11 @@ namespace Ogre {
         /** Gets whether matrix packed in column-major order. */
         bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
 
-        /** Return the shader link status.
-            Only used for separable programs.
-        */
-        int isLinked(void) { return mLinked; }
+        /// Only used for separable programs.
+        virtual bool linkSeparable() { return false; }
 
-        /** Set the shader link status.
-            Only used for separable programs.
-        */
-        void setLinked(int flag) { mLinked = flag; }
+        /// reset link status of separable program
+        void resetLinked() { mLinked = 0; }
 
         /// Get the OGRE assigned shader ID.
         uint getShaderID(void) const { return mShaderID; }

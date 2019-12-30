@@ -30,8 +30,8 @@
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 #include "OgreStringConverter.h"
+#include "OgreGpuProgramManager.h"
 
-#include "OgreGLSLShader.h"
 #include "OgreGLSLShader.h"
 
 #include "OgreGLSLPreprocessor.h"
@@ -204,6 +204,83 @@ namespace Ogre {
         // Submit shader source.
         const char *source = mSource.c_str();
         OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
+    }
+
+    bool GLSLShader::linkSeparable()
+    {
+        if(mLinked)
+            return true;
+
+        OGRE_CHECK_GL_ERROR(glProgramParameteri(mGLProgramHandle, GL_PROGRAM_SEPARABLE, GL_TRUE));
+        OGRE_CHECK_GL_ERROR(glProgramParameteri(mGLProgramHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
+
+        uint32 hash = _getHash();
+
+        // Use precompiled program if possible.
+        bool microcodeAvailableInCache = GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash);
+        if (microcodeAvailableInCache)
+        {
+            GpuProgramManager::Microcode cacheMicrocode =
+                GpuProgramManager::getSingleton().getMicrocodeFromCache(hash);
+            cacheMicrocode->seek(0);
+
+            GLenum binaryFormat = 0;
+            cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
+
+            GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
+
+            OGRE_CHECK_GL_ERROR(glProgramBinary(mGLProgramHandle,
+                                                binaryFormat,
+                                                cacheMicrocode->getPtr() + sizeof(GLenum),
+                                                binaryLength));
+
+            OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &mLinked));
+            if (!mLinked)
+                logObjectInfo("Could not use cached binary " + mName, mGLProgramHandle);
+        }
+
+        // Compilation needed if precompiled program is
+        // unavailable or failed to link.
+        if (!mLinked)
+        {
+            if( mType == GPT_VERTEX_PROGRAM )
+                GLSLProgram::bindFixedAttributes( mGLProgramHandle );
+
+            attachToProgramObject(mGLProgramHandle);
+            OGRE_CHECK_GL_ERROR(glLinkProgram(mGLProgramHandle));
+            OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &mLinked));
+
+            // Binary cache needs an update.
+            microcodeAvailableInCache = false;
+        }
+
+        if(!mLinked)
+        {
+            logObjectInfo( mName + String(" - GLSL program result : "), mGLProgramHandle );
+            return false;
+        }
+
+        // Add the microcode to the cache.
+        if (!microcodeAvailableInCache && GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
+        {
+            // Get buffer size.
+            GLint binaryLength = 0;
+
+            OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
+
+            // Create microcode.
+            GpuProgramManager::Microcode newMicrocode = GpuProgramManager::getSingleton().createMicrocode(
+                (unsigned long)binaryLength + sizeof(GLenum));
+
+            // Get binary.
+            OGRE_CHECK_GL_ERROR(glGetProgramBinary(mGLProgramHandle, binaryLength, NULL,
+                                                   (GLenum*)newMicrocode->getPtr(),
+                                                   newMicrocode->getPtr() + sizeof(GLenum)));
+
+            GpuProgramManager::getSingleton().addMicrocodeToCache(hash, newMicrocode);
+        }
+
+        return true;
     }
 
     void GLSLShader::loadFromSource()

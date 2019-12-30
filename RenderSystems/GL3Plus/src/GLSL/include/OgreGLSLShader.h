@@ -46,6 +46,8 @@ namespace Ogre {
         void attachToProgramObject(const GLuint programObject);
         void detachFromProgramObject(const GLuint programObject);
 
+        bool linkSeparable();
+
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
     protected:

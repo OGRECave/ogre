@@ -71,7 +71,7 @@ namespace Ogre {
 
             // force re-link
             GpuProgramManager::getSingleton().removeMicrocodeFromCache(glslGpuProgram->_getHash());
-            glslGpuProgram->setLinked(false);
+            glslGpuProgram->resetLinked();
         }
         else
         {
