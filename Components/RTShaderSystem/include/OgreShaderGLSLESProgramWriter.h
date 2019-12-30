@@ -91,8 +91,11 @@ protected:
     /** Create a FunctionInvocation object from a string taken out of a shader library. */
     FunctionInvocation  *createInvocationFromString (const String & input);
 
+    void writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func,
+                                  bool writeParamName = true);
+
     /** Write the program dependencies. */
-    void                writeProgramDependencies    (std::ostream& os, Program* program);
+    void                copyProgramDependencies    (std::ostream& os, Program* program);
 
     String processOperand(Operand op, GpuProgramType gpuType);
     

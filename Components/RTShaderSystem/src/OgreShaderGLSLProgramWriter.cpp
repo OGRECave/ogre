@@ -126,13 +126,9 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
         os << getGL3CompatDefines();
     }
 
-    // Generate source code header.
-    writeProgramTitle(os, program);
-    os<< std::endl;
-
-    // Write forward declarations
-    writeForwardDeclarations(os, program);
-    os<< std::endl;
+    // Generate dependencies.
+    writeProgramDependencies(os, program);
+    os << std::endl;
 
     writeMainSourceCode(os, program);
 }
@@ -265,127 +261,17 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func,
-                                                 bool writeParamName)
-{
-    os << func.getReturnType() << " " << func.getFunctionName() << "(";
-
-    FunctionInvocation::OperandVector::iterator itOperand    = func.getOperandList().begin();
-    FunctionInvocation::OperandVector::iterator itOperandEnd = func.getOperandList().end();
-    for (; itOperand != itOperandEnd;)
-    {
-      const ParameterPtr& param = itOperand->getParameter();
-      Operand::OpSemantic opSemantic = itOperand->getSemantic();
-      int opMask = itOperand->getMask();
-      GpuConstantType gpuType = GCT_UNKNOWN;
-
-      switch(opSemantic)
-      {
-      case Operand::OPS_IN:
-          os << "in ";
-          break;
-
-      case Operand::OPS_OUT:
-          os << "out ";
-          break;
-
-      case Operand::OPS_INOUT:
-          os << "inout ";
-          break;
-
-      default:
-          break;
-      }
-
-      // Swizzle masks are only defined for types like vec2, vec3, vec4.
-      if (opMask == Operand::OPM_ALL)
-      {
-          gpuType = param->getType();
-      }
-      else
-      {
-          // Now we have to convert the mask to operator
-          gpuType = Operand::getGpuConstantType(opMask);
-      }
-
-      // We need a valid type otherwise glsl compilation will not work
-      if (gpuType == GCT_UNKNOWN)
-      {
-          OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
-              "Can not convert Operand::OpMask to GpuConstantType",
-              "GLSLProgramWriter::writeFunctionDeclaration" );
-      }
-
-      // Write the operand type.
-      os << mGpuConstTypeMap[gpuType];
-
-      if(writeParamName)
-          os << " " << param->getName();
-
-      ++itOperand;
-      //move over all operators with indirection
-      while ((itOperand != itOperandEnd) && (itOperand->getIndirectionLevel() != 0))
-      {
-          ++itOperand;
-      }
-
-      // Prepare for the next operand
-      if (itOperand != itOperandEnd)
-      {
-          os << ", ";
-      }
-    }
-    os << ")";
-}
-
-//-----------------------------------------------------------------------
-void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* program)
+void GLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
 {
     os << "//-----------------------------------------------------------------------------" << std::endl;
-    os << "//                         FORWARD DECLARATIONS" << std::endl;
+    os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
 
-    StringVector forwardDecl; // holds all generated function declarations 
-    const ShaderFunctionList& functionList = program->getFunctions();
-    ShaderFunctionConstIterator itFunction;
-
-    // Iterate over all functions in the current program (in our case this is always the main() function)
-    for ( itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
+    for (unsigned int i=0; i < program->getDependencyCount(); ++i)
     {
-        Function* curFunction = *itFunction;
-        const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-        FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
-        FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
-
-        // Now iterate over all function atoms
-        for ( ; itAtom != itAtomEnd; ++itAtom)
-        {   
-            // Skip non function invocation atoms.
-            if (!dynamic_cast<const FunctionInvocation*>(*itAtom))
-                continue;
-
-            FunctionInvocation* pFuncInvoc = static_cast<FunctionInvocation*>(*itAtom);
-
-            StringStream funcDecl;
-            writeFunctionDeclaration(funcDecl, *pFuncInvoc, false);
-
-            // Push the generated declaration into the vector
-            // duplicate declarations will be removed later.
-            forwardDecl.push_back(funcDecl.str());
-        }
-    }
-
-    // Now remove duplicate declaration, first we have to sort the vector.
-    std::sort(forwardDecl.begin(), forwardDecl.end());
-    StringVector::iterator endIt = std::unique(forwardDecl.begin(), forwardDecl.end()); 
-
-    // Finally write all function declarations to the shader file
-    for (StringVector::iterator it = forwardDecl.begin(); it != endIt; ++it)
-    {
-        os << *it << ";\n";
+        os << "#include \"" << program->getDependency(i) << ".glsl\"" << std::endl;
     }
 }
-
 //-----------------------------------------------------------------------
 void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
 {
