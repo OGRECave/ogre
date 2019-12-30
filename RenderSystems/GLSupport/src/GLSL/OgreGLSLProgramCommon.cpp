@@ -27,8 +27,7 @@ GLSLProgramCommon::GLSLProgramCommon(const GLShaderList& shaders)
     : mShaders(shaders),
       mUniformRefsBuilt(false),
       mGLProgramHandle(0),
-      mLinked(false),
-      mSkeletalAnimation(false)
+      mLinked(false)
 {
     // compute shader presence means no other shaders are allowed
     if(shaders[GPT_COMPUTE_PROGRAM])

@@ -175,9 +175,6 @@ namespace Ogre
                 if(!mLinked)
                 	logObjectInfo( getCombinedName() + String("GLSL program result : "), programHandle );
 
-                if (program->getType() == GPT_VERTEX_PROGRAM)
-                    setSkeletalAnimationIncluded(program->isSkeletalAnimationIncluded());
-
                 // Add the microcode to the cache.
                 if (!microcodeAvailableInCache && mLinked &&
                     GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )

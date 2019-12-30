@@ -392,7 +392,6 @@ namespace Ogre {
         {
             // attach Vertex Program
             mShaders[GPT_VERTEX_PROGRAM]->attachToProgramObject(mGLProgramHandle);
-            setSkeletalAnimationIncluded(mShaders[GPT_VERTEX_PROGRAM]->isSkeletalAnimationIncluded());
 
             // Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
 
