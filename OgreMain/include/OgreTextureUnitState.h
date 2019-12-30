@@ -56,6 +56,7 @@ namespace Ogre {
             TextureAddressingMode u, v, w;
         };
 
+        /// must be created through TextureManager
         Sampler();
         virtual ~Sampler();
 
