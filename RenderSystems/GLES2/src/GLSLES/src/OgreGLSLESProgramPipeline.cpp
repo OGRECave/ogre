@@ -89,8 +89,6 @@ namespace Ogre
                 }
 
                 GLSLES::logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
-
-                setSkeletalAnimationIncluded(mShaders[GPT_VERTEX_PROGRAM]->isSkeletalAnimationIncluded());
             }
         }
         

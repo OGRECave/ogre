@@ -125,8 +125,6 @@ namespace Ogre {
 
         // attach Vertex Program
         mShaders[GPT_VERTEX_PROGRAM]->attachToProgramObject(mGLProgramHandle);
-        setSkeletalAnimationIncluded(mShaders[GPT_VERTEX_PROGRAM]->isSkeletalAnimationIncluded());
-        
         // attach Fragment Program
         mShaders[GPT_FRAGMENT_PROGRAM]->attachToProgramObject(mGLProgramHandle);
         

@@ -66,22 +66,6 @@ public:
 
     void extractLayoutQualifiers(void);
 
-    /** Sets whether the linked program includes the required instructions
-        to perform skeletal animation.
-        @remarks
-        If this is set to true, OGRE will not blend the geometry according to
-        skeletal animation, it will expect the vertex program to do it.
-    */
-    void setSkeletalAnimationIncluded(bool included) { mSkeletalAnimation = included; }
-
-    /** Returns whether the linked program includes the required instructions
-        to perform skeletal animation.
-        @remarks
-         If this returns true, OGRE will not blend the geometry according to
-         skeletal animation, it will expect the vertex program to do it.
-                                                                         */
-    bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
-
     /// Get the GL Handle for the program object
     uint getGLProgramHandle(void) const { return mGLProgramHandle; }
 
@@ -126,8 +110,6 @@ protected:
     uint mGLProgramHandle;
     /// Flag indicating that the program or pipeline object has been successfully linked
     int mLinked;
-    /// Flag indicating skeletal animation is being performed
-    bool mSkeletalAnimation;
     /// A value to define the case we didn't look for the attributes since the contractor
     static const int NULL_CUSTOM_ATTRIBUTES_INDEX = -2;
     /// A value to define the attribute has not been found (this is also the result when glGetAttribLocation fails)

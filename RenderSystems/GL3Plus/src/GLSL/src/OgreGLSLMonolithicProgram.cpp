@@ -88,9 +88,6 @@ namespace Ogre {
         	if(!shader) continue;
 
             shader->attachToProgramObject(mGLProgramHandle);
-
-            if(shader->getType() == GPT_VERTEX_PROGRAM)
-                setSkeletalAnimationIncluded(shader->isSkeletalAnimationIncluded());
         }
 
         bindFixedAttributes(mGLProgramHandle);
