@@ -75,9 +75,6 @@ private:
     /** Bind texture samplers. */
     void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
 
-    /** Compiles sub shaders (only if the not exists) and attach them to the main gpu program. */
-    void bindSubShaders(Program* program, GpuProgramPtr pGpuProgram);
-
     static String TargetLanguage;
 
     // The list of created library shaders.
