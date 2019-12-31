@@ -66,6 +66,12 @@ namespace Ogre {
     public:
         static void bindFixedAttributes(GLuint program);
 
+        /// Get the the binary data of a program from the microcode cache
+        static bool getMicrocodeFromCache(uint32 id, GLuint programHandle);
+
+        /// add the microcode to the cache
+        static void writeMicrocodeToCache(uint32 id, GLuint programHandle);
+
         virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
                                           GpuProgramType fromProgType) = 0;
 
@@ -78,9 +84,6 @@ namespace Ogre {
         GLAtomicCounterReferenceList mGLAtomicCounterReferences;
         /// Container of counter buffer references that are active in the program object
         GLCounterBufferList mGLCounterBufferReferences;
-
-        /// Get the the binary data of a program from the microcode cache
-        void getMicrocodeFromCache(uint32 id);
     };
 
 

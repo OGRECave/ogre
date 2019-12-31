@@ -113,8 +113,14 @@ namespace Ogre {
 #endif
     }
 
-    void GLSLProgram::getMicrocodeFromCache(uint32 id)
+    bool GLSLProgram::getMicrocodeFromCache(uint32 id, GLuint programHandle)
     {
+        if (!GpuProgramManager::canGetCompiledShaderBuffer())
+            return false;
+
+        if (!GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(id))
+            return false;
+
         GpuProgramManager::Microcode cacheMicrocode =
             GpuProgramManager::getSingleton().getMicrocodeFromCache(id);
 
@@ -128,25 +134,40 @@ namespace Ogre {
         GLint binaryLength = static_cast<GLint>(cacheMicrocode->size() - sizeof(GLenum));
 
         // Load binary.
-        OGRE_CHECK_GL_ERROR(glProgramBinary(mGLProgramHandle,
+        OGRE_CHECK_GL_ERROR(glProgramBinary(programHandle,
                                             binaryFormat,
                                             cacheMicrocode->getCurrentPtr(),
                                             binaryLength));
 
         GLint success = 0;
-        OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success));
+        OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &success));
 
-        if(success)
-        {
-            mLinked = true;
+        if(!success)
+            logObjectInfo("could not load from cache", programHandle);
+
+        return success;
+    }
+
+    void GLSLProgram::writeMicrocodeToCache(uint32 id, GLuint programHandle)
+    {
+        if (!GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
             return;
-        }
 
-        logObjectInfo("could not load from cache "+getCombinedName(), mGLProgramHandle);
-        // Something must have changed since the program binaries
-        // were cached away. Fallback to source shader loading path,
-        // and then retrieve and cache new program binaries once again.
-        compileAndLink();
+        // get buffer size
+        GLint binaryLength = 0;
+        OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
+
+        // create microcode
+        GpuProgramManager::Microcode newMicrocode =
+            GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
+
+        // get binary
+        OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL,
+                                               (GLenum*)newMicrocode->getPtr(),
+                                               newMicrocode->getPtr() + sizeof(GLenum)));
+
+        // add to the microcode to the cache
+        GpuProgramManager::getSingleton().addMicrocodeToCache(id, newMicrocode);
     }
 
 } // namespace Ogre
