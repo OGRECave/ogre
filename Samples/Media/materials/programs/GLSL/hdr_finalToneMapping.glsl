@@ -4,8 +4,7 @@ uniform sampler2D inLum;
 
 varying vec2 oUv0;
 
-// declare external function
-vec4 toneMap(in vec4 inColour, in float lum);
+#include "hdr_tonemap_util.glsl"
 
 void main(void)
 {
