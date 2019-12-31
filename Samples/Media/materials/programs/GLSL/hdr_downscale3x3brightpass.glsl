@@ -5,8 +5,7 @@ uniform vec2 texelSize;
 varying vec2 oUv0;
 const vec4 BRIGHT_LIMITER = vec4(0.6, 0.6, 0.6, 0.0);
 
-// declare external function
-vec4 toneMap(in vec4 inColour, in float lum);
+#include "hdr_tonemap_util.glsl"
 
 void main(void)
 {
