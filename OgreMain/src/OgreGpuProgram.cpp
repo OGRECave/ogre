@@ -146,22 +146,6 @@ namespace Ogre
         try 
         {
             loadFromSource();
-
-            if (mDefaultParams)
-            {
-                // Keep a reference to old ones to copy
-                GpuProgramParametersSharedPtr savedParams = mDefaultParams;
-                // reset params to stop them being referenced in the next create
-                mDefaultParams.reset();
-
-                // Create new params
-                mDefaultParams = createParameters();
-
-                // Copy old (matching) values across
-                // Don't use copyConstantsFrom since program may be different
-                mDefaultParams->copyMatchingNamedConstantsFrom(*savedParams.get());
-
-            }
         }
         catch (const RuntimeAssertionException&)
         {
@@ -176,6 +160,24 @@ namespace Ogre
             mCompileError = true;
         }
     }
+    void GpuProgram::postLoadImpl()
+    {
+        if (!mDefaultParams)
+            return;
+
+        // Keep a reference to old ones to copy
+        GpuProgramParametersSharedPtr savedParams = mDefaultParams;
+        // reset params to stop them being referenced in the next create
+        mDefaultParams.reset();
+
+        // Create new params
+        mDefaultParams = createParameters();
+
+        // Copy old (matching) values across
+        // Don't use copyConstantsFrom since program may be different
+        mDefaultParams->copyMatchingNamedConstantsFrom(*savedParams.get());
+    }
+
     //-----------------------------------------------------------------------------
     bool GpuProgram::isRequiredCapabilitiesSupported(void) const
     {

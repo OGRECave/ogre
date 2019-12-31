@@ -203,6 +203,8 @@ namespace Ogre {
 
     void loadImpl(void);
 
+    void postLoadImpl();
+
     /// Create the internal params logical & named mapping structures
     void createParameterMappingStructures(bool recreateIfExists = true) const;
     /// Create the internal params logical mapping structures
