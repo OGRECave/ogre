@@ -51,13 +51,8 @@ namespace Ogre {
     class GLSLProgramManagerCommon
     {
     protected:
-        typedef std::map<String, uint32> StringToEnumMap;
+        typedef std::map<String, GpuConstantType> StringToEnumMap;
         StringToEnumMap mTypeEnumMap;
-
-        /**  Convert GL uniform size and type to OGRE constant types
-             and associate uniform definitions together. */
-        virtual void convertGLUniformtoOgreType(uint32 gltype,
-                                        GpuConstantDefinition& defToUpdate) = 0;
 
         /** Parse an individual uniform from a GLSL source file and
             store it in a GpuNamedConstant. */
@@ -74,6 +69,7 @@ namespace Ogre {
         /// Active shader objects defining the active program object.
         GLShaderList mActiveShader;
     public:
+        GLSLProgramManagerCommon();
         virtual ~GLSLProgramManagerCommon();
 
         /** Populate a list of uniforms based on GLSL source and store

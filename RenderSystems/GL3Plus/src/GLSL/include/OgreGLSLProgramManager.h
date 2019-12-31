@@ -58,10 +58,6 @@ namespace Ogre {
 
         GL3PlusRenderSystem* mRenderSystem;
 
-        /**  Convert GL uniform size and type to OGRE constant types
-             and associate uniform definitions together. */
-        void convertGLUniformtoOgreType(GLenum gltype,
-                                        GpuConstantDefinition& defToUpdate);
         /** Find the data source definition for a given uniform name
             and reference. Return true if found and pair the reference
             with its data source. */
