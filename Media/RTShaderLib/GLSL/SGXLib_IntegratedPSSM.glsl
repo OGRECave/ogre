@@ -69,7 +69,7 @@ void SGX_ShadowPCF4(in sampler2DShadow shadowMap, in vec4 shadowMapPos, out floa
 #ifndef OGRE_REVERSED_Z
     shadowMapPos.z = shadowMapPos.z * 0.5 + 0.5 * shadowMapPos.w; // convert -1..1 to 0..1
 #endif
-    c = shadow2DProj(shadowMap, shadowMapPos).r;
+    c = vec4(shadow2DProj(shadowMap, shadowMapPos)).r; // avoid scalar swizzle with textureProj
 #endif
 }
 
