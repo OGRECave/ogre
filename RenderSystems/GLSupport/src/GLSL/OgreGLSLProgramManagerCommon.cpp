@@ -205,9 +205,8 @@ namespace Ogre {
         }
     }
 
-    void GLSLProgramManagerCommon::parseGLSLUniform(
-        String line, GpuNamedConstants& defs,
-        const String& filename, const GpuSharedParametersPtr& sharedParams)
+    void GLSLProgramManagerCommon::parseGLSLUniform(String line, GpuNamedConstants& defs,
+                                                    const String& filename)
     {
         GpuConstantDefinition def;
         String paramName = "";
@@ -286,43 +285,30 @@ namespace Ogre {
                     break;
                 }
 
-                // Special handling for shared parameters
-                if(!sharedParams)
+                // Complete def and add
+                // increment physical buffer location
+                def.logicalIndex = 0; // not valid in GLSL
+                if (def.isFloat())
                 {
-                    // Complete def and add
-                    // increment physical buffer location
-                    def.logicalIndex = 0; // not valid in GLSL
-                    if (def.isFloat())
-                    {
-                        def.physicalIndex = defs.floatBufferSize;
-                        defs.floatBufferSize += def.arraySize * def.elementSize;
-                    }
-                    else if (def.isDouble())
-                    {
-                        def.physicalIndex = defs.doubleBufferSize;
-                        defs.doubleBufferSize += def.arraySize * def.elementSize;
-                    }
-                    else if (def.isInt() || def.isSampler() || def.isUnsignedInt() || def.isBool())
-                    {
-                        def.physicalIndex = defs.intBufferSize;
-                        defs.intBufferSize += def.arraySize * def.elementSize;
-                    }
-                    else
-                    {
-                        LogManager::getSingleton().logMessage("Could not parse type of GLSL Uniform: '"
-                                                              + line + "' in file " + filename);
-                    }
-                    defs.map.emplace(paramName, def);
+                    def.physicalIndex = defs.floatBufferSize;
+                    defs.floatBufferSize += def.arraySize * def.elementSize;
+                }
+                else if (def.isDouble())
+                {
+                    def.physicalIndex = defs.doubleBufferSize;
+                    defs.doubleBufferSize += def.arraySize * def.elementSize;
+                }
+                else if (def.isInt() || def.isSampler() || def.isUnsignedInt() || def.isBool())
+                {
+                    def.physicalIndex = defs.intBufferSize;
+                    defs.intBufferSize += def.arraySize * def.elementSize;
                 }
                 else
                 {
-                    const GpuConstantDefinitionMap& map = sharedParams->getConstantDefinitions().map;
-
-                    if(map.find(paramName) == map.end()) {
-                        // This constant doesn't exist so we'll create a new one
-                        sharedParams->addConstantDefinition(paramName, def.constType);
-                    }
+                    LogManager::getSingleton().logMessage("Could not parse type of GLSL Uniform: '"
+                                                          + line + "' in file " + filename);
                 }
+                defs.map.emplace(paramName, def);
             }
         }
     }
@@ -360,7 +346,6 @@ namespace Ogre {
             {
                 String::size_type endPos;
                 String typeString;
-                GpuSharedParametersPtr blockSharedParams;
 
                 // Check for a type. If there is one, then the semicolon is missing
                 // otherwise treat as if it is a uniform block
@@ -417,7 +402,7 @@ namespace Ogre {
                         break;
                     }
 
-                    parseGLSLUniform(src.substr(currPos, endPos - currPos), defs, filename, blockSharedParams);
+                    parseGLSLUniform(src.substr(currPos, endPos - currPos), defs, filename);
                 }
                 line = src.substr(currPos, endPos - currPos);
             } // not commented or a larger symbol
