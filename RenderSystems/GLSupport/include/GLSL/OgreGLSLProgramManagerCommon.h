@@ -56,9 +56,7 @@ namespace Ogre {
 
         /** Parse an individual uniform from a GLSL source file and
             store it in a GpuNamedConstant. */
-        void parseGLSLUniform(
-            String line, GpuNamedConstants& defs,
-            const String& filename, const GpuSharedParametersPtr& sharedParams);
+        void parseGLSLUniform(String line, GpuNamedConstants& defs, const String& filename);
 
         typedef std::map<uint32, GLSLProgramCommon*> ProgramMap;
         typedef ProgramMap::iterator ProgramIterator;
