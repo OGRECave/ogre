@@ -92,14 +92,6 @@ namespace Ogre {
         if (out < src || out > src + src_len)
             free (out);
     }
-
-    //-----------------------------------------------------------------------
-    void GLSLShaderCommon::populateParameterNames(GpuProgramParametersSharedPtr params)
-    {
-        getConstantDefinitions();
-        params->_setNamedConstants(mConstantDefs);
-        // Don't set logical / physical maps here, as we can't access parameters by logical index in GLHL.
-    }
     //-----------------------------------------------------------------------
     GLSLShaderCommon::GLSLShaderCommon(ResourceManager* creator, 
         const String& name, ResourceHandle handle,

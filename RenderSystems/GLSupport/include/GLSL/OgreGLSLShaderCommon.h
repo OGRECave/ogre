@@ -117,9 +117,6 @@ namespace Ogre {
 
         void prepareImpl(void);
 
-        /// Populate the passed parameters with name->index map
-        void populateParameterNames(GpuProgramParametersSharedPtr params);
-
         /// Attached Shader names
         String mAttachedShaderNames;
         /// Container of attached programs

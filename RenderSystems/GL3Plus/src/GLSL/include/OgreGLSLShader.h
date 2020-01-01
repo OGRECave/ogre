@@ -58,10 +58,11 @@ namespace Ogre {
         void buildConstantDefinitions() const;
         /// Add boiler plate code and preprocessor extras, then
         /// submit shader source to OpenGL.
-        void submitSource();
+        virtual void compileSource();
 
-        // /// @copydoc Resource::loadImpl
-        // void loadImpl(void) {}
+
+        void extractUniforms() const;
+        void extractBufferBlocks(GLenum type) const;
     };
 }
 
