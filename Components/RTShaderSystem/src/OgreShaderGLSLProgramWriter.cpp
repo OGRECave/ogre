@@ -316,8 +316,8 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             // according there content.
             pParam->_rename(mContentToPerVertexAttributes[paramContent]);
 
-            // After GLSL 1.40 attribute is deprecated
-            if (mGLSLVersion >= 140 || (mGLSLVersion > 100 && mIsGLSLES))
+            // After GLSL 1.20 attribute is deprecated
+            if (mGLSLVersion > 120 || (mGLSLVersion > 100 && mIsGLSLES))
             {
                 os << "in\t";
             }
@@ -420,9 +420,9 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
         else if(gpuType == GPT_FRAGMENT_PROGRAM &&
                 pParam->getSemantic() == Parameter::SPS_COLOR)
         {                   
-            // GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 130)
+            // GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 120)
             // Always add gl_FragColor as an output.  The name is for compatibility.
-            if(mGLSLVersion <= 130 || (mIsGLSLES && mGLSLVersion == 100))
+            if(mGLSLVersion <= 120 || (mIsGLSLES && mGLSLVersion == 100))
             {
                 pParam->_rename("gl_FragColor");
             }
