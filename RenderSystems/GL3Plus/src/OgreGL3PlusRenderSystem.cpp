@@ -167,6 +167,7 @@ namespace Ogre {
         mCurrentShader.fill(NULL);
         mLargestSupportedAnisotropy = 1;
         mRTTManager = NULL;
+        mSeparateShaderObjectsEnabled = false;
     }
 
     GL3PlusRenderSystem::~GL3PlusRenderSystem()
@@ -195,6 +196,13 @@ namespace Ogre {
 
         ConfigOption opt;
         opt.name = "Reversed Z-Buffer";
+        opt.possibleValues = {"No", "Yes"};
+        opt.currentValue = opt.possibleValues[0];
+        opt.immutable = false;
+
+        mOptions[opt.name] = opt;
+
+        opt.name = "Separate Shader Objects";
         opt.possibleValues = {"No", "Yes"};
         opt.currentValue = opt.possibleValues[0];
         opt.immutable = false;
@@ -360,15 +368,16 @@ namespace Ogre {
         if (getNativeShadingLanguageVersion() >= 130 && !limitedOSXCoreProfile)
             rsc->addShaderProfile("glsl130");
 
-        if(checkExtension("GL_ARB_gl_spirv")) rsc->addShaderProfile("spirv");
-
-        if (hasMinGLVersion(4, 1) || checkExtension("GL_ARB_separate_shader_objects")) {
-            // this relaxes shader matching rules and requires slightly different GLSL declaration
-            // however our usage pattern does not benefit from this and driver support is quite poor
-            // so disable it for now (see below)
-            /*rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
-            rsc->setCapability(RSC_GLSL_SSO_REDECLARE);*/
+        if (mSeparateShaderObjectsEnabled &&
+            (hasMinGLVersion(4, 3) ||
+             (checkExtension("GL_ARB_separate_shader_objects") && checkExtension("GL_ARB_program_interface_query"))))
+        {
+            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
+            rsc->setCapability(RSC_GLSL_SSO_REDECLARE);
         }
+
+        if (checkExtension("GL_ARB_gl_spirv") && rsc->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            rsc->addShaderProfile("spirv");
 
         // Mesa 11.2 does not behave according to spec and throws a "gl_Position redefined"
         if(rsc->getDeviceName().find("Mesa") != String::npos) {
@@ -664,6 +673,12 @@ namespace Ogre {
                     mIsReverseDepthBufferEnabled = false;
                     LogManager::getSingleton().logWarning("Reversed Z-Buffer was requested, but it is not supported. Disabling.");
                 }
+            }
+
+            it = mOptions.find("Separate Shader Objects");
+            if (it != mOptions.end())
+            {
+                mSeparateShaderObjectsEnabled = StringConverter::parseBool(it->second.currentValue);
             }
 
             // Initialise GL after the first window has been created

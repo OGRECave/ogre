@@ -103,8 +103,6 @@ namespace Ogre
 
         /// Compiles and links the separate programs.
         void compileAndLink(void);
-        /// Build uniform references from active named uniforms.
-        void buildGLUniformReferences(void);
 
         void getMicrocodeFromCache(void);
         void getIndividualProgramMicrocodeFromCache(GLSLShader* program);

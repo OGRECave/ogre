@@ -33,27 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-static GLenum getGLShaderType(GpuProgramType programType)
-{
-    switch (programType)
-    {
-    case GPT_VERTEX_PROGRAM:
-        return GL_VERTEX_SHADER;
-    case GPT_HULL_PROGRAM:
-        return GL_TESS_CONTROL_SHADER;
-    case GPT_DOMAIN_PROGRAM:
-        return GL_TESS_EVALUATION_SHADER;
-    case GPT_GEOMETRY_PROGRAM:
-        return GL_GEOMETRY_SHADER;
-    case GPT_FRAGMENT_PROGRAM:
-        return GL_FRAGMENT_SHADER;
-    case GPT_COMPUTE_PROGRAM:
-        return GL_COMPUTE_SHADER;
-    }
-
-    return 0;
-}
-
 SPIRVShader::SPIRVShader(ResourceManager* creator, const String& name, ResourceHandle handle, const String& group,
                          bool isManual, ManualResourceLoader* loader)
     : GLSLShader(creator, name, handle, group, isManual, loader)
@@ -77,23 +56,10 @@ const String& SPIRVShader::getLanguage(void) const
     return language;
 }
 
-void SPIRVShader::loadFromSource(void)
+void SPIRVShader::compileSource(void)
 {
-    OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(getGLShaderType(mType)));
-
     OGRE_CHECK_GL_ERROR(glShaderBinary(1, &mGLShaderHandle, GL_SHADER_BINARY_FORMAT_SPIR_V, mSource.data(), mSource.size()));
-
     OGRE_CHECK_GL_ERROR(glSpecializeShader(mGLShaderHandle, "main", 0, NULL, NULL));
-
-    // Check for compile errors
-    int compiled = 0;
-    OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
-
-    if (compiled) return;
-
-    String compileInfo = getObjectInfo(mGLShaderHandle);
-
-    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, compileInfo);
 }
 
 SPIRVShaderFactory::SPIRVShaderFactory()
