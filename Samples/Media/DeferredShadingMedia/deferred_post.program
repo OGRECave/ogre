@@ -87,7 +87,6 @@ fragment_program DeferredShading/post/ShowNormal_ps_pGLSL glsl
 	syntax glsl150
 	default_params
 	{
-        param_named Tex0 int 0
         param_named Tex1 int 1
     }
 }

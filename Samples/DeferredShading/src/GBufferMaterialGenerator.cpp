@@ -369,13 +369,13 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         {
             ss << " vec3 texNormal = (" << textureFunc << "(sNormalMap, oUv0).rgb-0.5)*2.0;" << std::endl;
             ss << " mat3 normalRotation = mat3(oTangent, oBiNormal, oNormal);" << std::endl;
-            ss << outData << "[1].rgb = normalize(texNormal * normalRotation);" << std::endl;
+            ss << outData << "[1].rgb = normalize(normalRotation * texNormal);" << std::endl;
         }
         else
         {
             ss << outData << "[1].rgb = normalize(oNormal);" << std::endl;
         }
-        ss << outData << "[1].rgb = normalize(oNormal);" << std::endl;
+
 #ifdef WRITE_LINEAR_DEPTH
         ss << outData << "[1].a = length(oViewPos) / cFarDistance;" << std::endl;
 #else

@@ -1027,7 +1027,6 @@ vertex_program Examples/GrassWaverVpGLSL glsl
     default_params
     {
         param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto camObjPos camera_position_object_space
         param_named_auto ambient ambient_light_colour
         param_named_auto objSpaceLight light_position_object_space 0
         param_named_auto lightColour light_diffuse_colour 0
