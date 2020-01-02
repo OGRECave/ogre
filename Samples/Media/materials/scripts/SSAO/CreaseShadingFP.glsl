@@ -3,7 +3,6 @@ varying vec2 oUv0;
 
 uniform sampler2D sNormal;
 uniform sampler2D sPosition;
-uniform sampler2D sRandom;
 	
 uniform float cRange; // the three(four) artistic parameters
 uniform float cBias;

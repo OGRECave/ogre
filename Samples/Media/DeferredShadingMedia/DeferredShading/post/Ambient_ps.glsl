@@ -53,7 +53,7 @@ void main()
         discard;
 
 	// Calculate ambient colour of fragment
-	oColour = vec4(ambientColor * vec4(a1.rgb,0));
+	oColour = vec4(ambientColor * vec4(a0.rgb,0));
 
 	// Calculate depth of fragment;
 	vec3 viewPos = normalize(oRay) * farClipDistance * a1.w;

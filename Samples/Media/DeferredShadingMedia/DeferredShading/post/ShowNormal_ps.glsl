@@ -25,7 +25,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #version 150
 
-uniform sampler2D Tex0;
 uniform sampler2D Tex1;
 
 in vec2 oUv0;

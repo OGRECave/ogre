@@ -20,7 +20,6 @@ fragment_program SSAO/CreaseShading_fp_glsl glsl
 	{
 		param_named sNormal int 0
 		param_named sPosition int 1
-		param_named sRandom int 2
 	}
 }
 
