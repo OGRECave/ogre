@@ -412,6 +412,22 @@ namespace Ogre {
     void HardwareBufferManagerBase::_notifyCounterBufferDestroyed(HardwareCounterBuffer* buf)
     {
     }
+    RenderToVertexBufferSharedPtr HardwareBufferManagerBase::createRenderToVertexBuffer()
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "not supported by RenderSystem");
+    }
+    HardwareUniformBufferSharedPtr
+    HardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
+                                                   bool useShadowBuffer, const String& name)
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "not supported by RenderSystem");
+    }
+    HardwareUniformBufferSharedPtr
+    HardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
+                                                   bool useShadowBuffer, const String& name)
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "not supported by RenderSystem");
+    }
     //-----------------------------------------------------------------------
     HardwareVertexBufferSharedPtr 
     HardwareBufferManagerBase::makeBufferCopy(

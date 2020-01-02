@@ -187,12 +187,5 @@ namespace Ogre {
         }
         return HardwareUniformBufferSharedPtr(buf);
     }
-    //---------------------------------------------------------------------
-    Ogre::HardwareCounterBufferSharedPtr GLES2HardwareBufferManager::createCounterBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name )
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "GLES2 does not support atomic counter buffers",
-                    "GLES2HardwareBufferManager::createCounterBuffer");
-    }
 
 }
