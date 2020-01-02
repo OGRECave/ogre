@@ -17,8 +17,7 @@ uniform float	lightGloss;
 uniform float invShadowMapSize;
 uniform sampler2D shadowMap;
 
-//declare external function
-float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize);
+#include "TerrainHelpers.glsl"
 #endif
 
 varying vec2 _uv0;
