@@ -62,10 +62,6 @@ namespace Ogre {
         HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
                                     HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
                                     bool useShadowBuffer = false, const String& name = "");
-        /// @copydoc HardwareBufferManager::createCounterBuffer
-        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
-                                                           HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                                                           bool useShadowBuffer = false, const String& name = "");
     };
 
     typedef D3D11HardwareBufferManager D3D11HardwareBufferManagerBase;
