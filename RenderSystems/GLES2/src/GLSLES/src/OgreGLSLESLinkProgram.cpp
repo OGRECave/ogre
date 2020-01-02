@@ -173,7 +173,7 @@ namespace Ogre {
             }
 
             GLSLESProgramManager::extractUniforms(mGLProgramHandle, vertParams, fragParams,
-                                                  mGLUniformReferences, mSharedParamsBufferMap);
+                                                  mGLUniformReferences);
 
             mUniformRefsBuilt = true;
         }

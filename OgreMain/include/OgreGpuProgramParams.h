@@ -442,6 +442,8 @@ namespace Ogre {
 
         /// Optional data the rendersystem might want to store.
         mutable Any mRenderSystemData;
+        /// Optional rendersystem backed storage
+        HardwareBufferPtr mHardwareBuffer;
 
         /// Not used when copying data, but might be useful to RS using shared buffers.
         size_t mFrameLastUpdated;
@@ -509,10 +511,8 @@ namespace Ogre {
         /// Get the frame in which this shared parameter set was last updated
         size_t getFrameLastUpdated() const { return mFrameLastUpdated; }
 
-        /** Gets an iterator over the named GpuConstantDefinition instances as defined
-            by the user.
-        */
-        GpuConstantDefinitionIterator getConstantDefinitionIterator(void) const;
+        /// @deprecated use getConstantDefinitions()
+        OGRE_DEPRECATED GpuConstantDefinitionIterator getConstantDefinitionIterator(void) const;
 
         /** Get a specific GpuConstantDefinition for a named parameter.
          */
@@ -568,11 +568,18 @@ namespace Ogre {
         const DoubleConstantList& getDoubleConstantList() const { return mDoubleConstants; }
         /// Get a reference to the list of int constants
         const IntConstantList& getIntConstantList() const { return mIntConstants; }
+        /// @deprecated use _setHardwareBuffer
+        OGRE_DEPRECATED void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
+        /// @deprecated use _getHardwareBuffer
+        OGRE_DEPRECATED const Any& _getRenderSystemData() const { return mRenderSystemData; }
         /** Internal method that the RenderSystem might use to store optional data. */
-        void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
+        void _setHardwareBuffer(const HardwareBufferPtr& data) { mHardwareBuffer = data; }
         /** Internal method that the RenderSystem might use to store optional data. */
-        const Any& _getRenderSystemData() const { return mRenderSystemData; }
-
+        const HardwareBufferPtr& _getHardwareBuffer() const { return mHardwareBuffer; }
+        /// upload parameter data to GPU memory. Must have a HardwareBuffer
+        void _upload() const;
+        /// download data from GPU memory. Must have a writable HardwareBuffer
+        void download();
     };
 
     class GpuProgramParameters;
@@ -617,7 +624,7 @@ namespace Ogre {
             which case the values should not be copied out of the shared area
             into the individual parameter set, but bound separately.
         */
-        void _copySharedParamsToTargetParams();
+        void _copySharedParamsToTargetParams() const;
 
         /// Get the name of the shared parameter set
         const String& getName() const { return mSharedParams->getName(); }
@@ -625,10 +632,10 @@ namespace Ogre {
         GpuSharedParametersPtr getSharedParams() const { return mSharedParams; }
         GpuProgramParameters* getTargetParams() const { return mParams; }
 
-        /** Internal method that the RenderSystem might use to store optional data. */
-        void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
-        /** Internal method that the RenderSystem might use to store optional data. */
-        const Any& _getRenderSystemData() const { return mRenderSystemData; }
+        /// @deprecated use GpuSharedParameters::_setHardwareBuffer
+        OGRE_DEPRECATED void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
+        /// @deprecated use GpuSharedParameters::_getHardwareBuffer
+        OGRE_DEPRECATED const Any& _getRenderSystemData() const { return mRenderSystemData; }
 
 
     };
@@ -2044,6 +2051,12 @@ namespace Ogre {
             into the individual parameter set, but bound separately.
         */
         void _copySharedParams();
+
+        /** Update the HardwareBuffer based backing of referenced shared parameters
+         *
+         * falls back to _copySharedParams() if a shared parameter is not hardware backed
+         */
+        void _updateSharedParams();
 
         size_t calculateSize(void) const;
 

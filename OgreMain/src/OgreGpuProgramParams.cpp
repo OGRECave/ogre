@@ -475,6 +475,84 @@ namespace Ogre
         }
 
     }
+
+    void GpuSharedParameters::_upload() const
+    {
+        OgreAssert(mHardwareBuffer, "not backed by a HardwareBuffer");
+
+        if (!mDirty)
+            return;
+
+        size_t offset = 0;
+        for (const auto& parami : getConstantDefinitions().map)
+        {
+            const GpuConstantDefinition& param = parami.second;
+
+            const void* dataPtr;
+            switch (GpuConstantDefinition::getBaseType(param.constType))
+            {
+            case BCT_FLOAT:
+                dataPtr = getFloatPointer(param.physicalIndex);
+                break;
+            case BCT_UINT:
+            case BCT_BOOL:
+            case BCT_INT:
+                dataPtr = getIntPointer(param.physicalIndex);
+                break;
+            case BCT_DOUBLE:
+                dataPtr = getDoublePointer(param.physicalIndex);
+                break;
+            case BCT_SAMPLER:
+            case BCT_SUBROUTINE:
+                //TODO implement me!
+            default:
+                //TODO error handling
+                continue;
+            }
+
+            // in bytes
+            size_t length = param.arraySize * param.elementSize * 4;
+            mHardwareBuffer->writeData(offset, length, dataPtr);
+            offset += length;
+        }
+    }
+    void GpuSharedParameters::download()
+    {
+        OgreAssert(mHardwareBuffer, "not backed by a HardwareBuffer");
+
+        size_t offset = 0;
+        for (const auto& parami : getConstantDefinitions().map)
+        {
+            const GpuConstantDefinition& param = parami.second;
+
+            void* dataPtr;
+            switch (GpuConstantDefinition::getBaseType(param.constType))
+            {
+            case BCT_FLOAT:
+                dataPtr = getFloatPointer(param.physicalIndex);
+                break;
+            case BCT_UINT:
+            case BCT_BOOL:
+            case BCT_INT:
+                dataPtr = getIntPointer(param.physicalIndex);
+                break;
+            case BCT_DOUBLE:
+                dataPtr = getDoublePointer(param.physicalIndex);
+                break;
+            case BCT_SAMPLER:
+            case BCT_SUBROUTINE:
+                //TODO implement me!
+            default:
+                //TODO error handling
+                continue;
+            }
+
+            // in bytes
+            size_t length = param.arraySize * param.elementSize * 4;
+            mHardwareBuffer->readData(offset, length, dataPtr);
+            offset += length;
+        }
+    }
     //---------------------------------------------------------------------
     void GpuSharedParameters::removeAllConstantDefinitions()
     {
@@ -667,19 +745,17 @@ namespace Ogre
         mCopyDataVersion = mSharedParams->getVersion();
     }
     //---------------------------------------------------------------------
-    void GpuSharedParametersUsage::_copySharedParamsToTargetParams()
+    void GpuSharedParametersUsage::_copySharedParamsToTargetParams() const
     {
         // check copy data version
         if (mCopyDataVersion != mSharedParams->getVersion())
-            initCopyData();
+            const_cast<GpuSharedParametersUsage*>(this)->initCopyData();
 
         // force const call to get*Pointer
         const GpuSharedParameters* sharedParams = mSharedParams.get();
 
-        for (CopyDataList::iterator i = mCopyDataList.begin(); i != mCopyDataList.end(); ++i)
+        for (const CopyDataEntry& e : mCopyDataList)
         {
-            CopyDataEntry& e = *i;
-
             if (e.dstDefinition->isFloat())
             {
                 const float* pSrc = sharedParams->getFloatPointer(e.srcDefinition->physicalIndex);
@@ -3064,15 +3140,25 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GpuProgramParameters::_copySharedParams()
     {
-        for (GpuSharedParamUsageList::iterator i = mSharedParamSets.begin();
-             i != mSharedParamSets.end(); ++i )
+        for (auto& usage : mSharedParamSets)
         {
-            i->_copySharedParamsToTargetParams();
+            usage._copySharedParamsToTargetParams();
         }
-
     }
 
+    void GpuProgramParameters::_updateSharedParams()
+    {
+        for (auto& usage : mSharedParamSets)
+        {
+            const GpuSharedParametersPtr& sharedParams = usage.getSharedParams();
+            if(sharedParams->_getHardwareBuffer())
+            {
+                sharedParams->_upload();
+                sharedParams->_markClean();
+                continue;
+            }
 
-
-
+            usage._copySharedParamsToTargetParams();
+        }
+    }
 }

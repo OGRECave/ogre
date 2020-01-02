@@ -128,7 +128,7 @@ namespace Ogre
             params[i] = &(mShaders[i]->getConstantDefinitions().map);
             GLSLProgramManager::getSingleton().extractUniformsFromProgram(
                 static_cast<GLSLShader*>(mShaders[i])->getGLProgramHandle(), params, mGLUniformReferences,
-                mGLAtomicCounterReferences, mSharedParamsBufferMap, mGLCounterBufferReferences);
+                mGLAtomicCounterReferences, mGLCounterBufferReferences);
         }
 
         mUniformRefsBuilt = true;
