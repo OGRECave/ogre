@@ -27,7 +27,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreGL3PlusHardwareBufferManager.h"
-#include "OgreGL3PlusHardwareCounterBuffer.h"
 #include "OgreGL3PlusHardwareIndexBuffer.h"
 #include "OgreGL3PlusHardwareUniformBuffer.h"
 #include "OgreGL3PlusHardwareVertexBuffer.h"
@@ -139,8 +138,9 @@ namespace Ogre {
 
     HardwareCounterBufferSharedPtr GL3PlusHardwareBufferManager::createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
-        GL3PlusHardwareCounterBuffer* buf =
-            new GL3PlusHardwareCounterBuffer(this, name);
+        HardwareUniformBuffer* buf =
+                new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, GL_ATOMIC_COUNTER_BUFFER);
+
         {
             OGRE_LOCK_MUTEX(mCounterBuffersMutex);
             mCounterBuffers.insert(buf);

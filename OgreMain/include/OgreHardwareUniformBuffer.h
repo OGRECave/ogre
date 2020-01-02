@@ -61,6 +61,8 @@ namespace Ogre {
             const String& getName() const { return mName; }
 
     };
+
+    typedef HardwareUniformBuffer HardwareCounterBuffer;
 }
 
 #include "OgreHeaderSuffix.h"

@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreHardwareCounterBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreHardwareUniformBuffer.h"
 #include "OgreHardwareVertexBuffer.h"
@@ -115,32 +114,6 @@ namespace Ogre {
         /** See HardwareBuffer. */
         void writeData(size_t offset, size_t length, const void* pSource,
                 bool discardWholeBuffer = false);
-        /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
-        /** Override HardwareBuffer to turn off all shadowing. */
-        void unlock(void);
-    };
-
-    /// Specialisation of HardwareCounterBuffer for emulation
-    class _OgreExport DefaultHardwareCounterBuffer : public HardwareCounterBuffer
-    {
-    protected:
-        unsigned char* mData;
-        /** See HardwareBuffer. */
-        void* lockImpl(size_t offset, size_t length, LockOptions options);
-        /** See HardwareBuffer. */
-        void unlockImpl(void);
-        /**  */
-        //bool updateStructure(const Any& renderSystemInfo);
-
-    public:
-        DefaultHardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer = false, const String& name = "");
-        ~DefaultHardwareCounterBuffer();
-        /** See HardwareBuffer. */
-        void readData(size_t offset, size_t length, void* pDest);
-        /** See HardwareBuffer. */
-        void writeData(size_t offset, size_t length, const void* pSource,
-                       bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
         void* lock(size_t offset, size_t length, LockOptions options);
         /** Override HardwareBuffer to turn off all shadowing. */
