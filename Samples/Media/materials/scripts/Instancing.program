@@ -6,15 +6,9 @@
 //--------------------------------------------------------------
 // GLSL Programs
 //--------------------------------------------------------------
-fragment_program Ogre/Shadow/Utils_glsl glsl
-{
-	source TerrainHelpers.glsl
-}
-
 fragment_program Ogre/Instancing_glsl_ps glsl
 {
 	source Instancing.frag
-	attach Ogre/Shadow/Utils_glsl
 
 	preprocessor_defines DEPTH_SHADOWRECEIVER=1
 

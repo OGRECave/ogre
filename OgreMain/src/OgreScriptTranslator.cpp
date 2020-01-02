@@ -3571,6 +3571,10 @@ namespace Ogre{
                                 ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, ((AtomAbstractNode*)(*it).get())->value);
                                 compiler->_fireEvent(&evt, 0);
                                 value += evt.mName;
+
+                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
+                                                   prop->line,
+                                                   "attach. Use the #include directive instead");
                             }
                             else
                             {
