@@ -142,6 +142,9 @@ namespace Ogre
 
     void GpuProgram::loadImpl(void)
     {
+        if(mCompileError)
+            return;
+
         // Call polymorphic load
         try 
         {
@@ -162,7 +165,7 @@ namespace Ogre
     }
     void GpuProgram::postLoadImpl()
     {
-        if (!mDefaultParams)
+        if (!mDefaultParams || mCompileError)
             return;
 
         // Keep a reference to old ones to copy
