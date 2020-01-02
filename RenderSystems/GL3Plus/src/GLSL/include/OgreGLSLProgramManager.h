@@ -98,8 +98,6 @@ namespace Ogre {
             const GpuConstantDefinitionMap* (&constantDefs)[6],
             GLUniformReferenceList& uniformList,
             GLAtomicCounterReferenceList& counterList,
-            SharedParamsBufferMap& sharedParamsBufferMap,
-            //GLShaderStorageBufferList& shaderStorageBufferList,
             GLCounterBufferList& counterBufferList);
 
         GL3PlusStateCacheManager* getStateCacheManager();

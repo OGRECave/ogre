@@ -227,9 +227,9 @@ namespace Ogre {
 
     //---------------------------------------------------------------------
     void GLSLESProgramManager::extractUniforms(GLuint programObject,
-        const GpuConstantDefinitionMap* vertexConstantDefs, 
-        const GpuConstantDefinitionMap* fragmentConstantDefs,
-        GLUniformReferenceList& list, SharedParamsBufferMap& sharedParamsBufferMap)
+                                               const GpuConstantDefinitionMap* vertexConstantDefs,
+                                               const GpuConstantDefinitionMap* fragmentConstantDefs,
+                                               GLUniformReferenceList& list)
     {
         // Scan through the active uniforms and add them to the reference list
         GLint uniformCount = 0;

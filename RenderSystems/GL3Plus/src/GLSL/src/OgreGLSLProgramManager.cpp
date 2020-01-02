@@ -182,8 +182,6 @@ namespace Ogre {
         const GpuConstantDefinitionMap* (&constantDefs)[6],
         GLUniformReferenceList& uniformList,
         GLAtomicCounterReferenceList& counterList,
-        SharedParamsBufferMap& sharedParamsBufferMap,
-        // GLShaderStorageBufferList& shaderStorageBufferList,
         GLCounterBufferList& counterBufferList)
     {
 #define uniformLength 200
@@ -304,6 +302,7 @@ namespace Ogre {
         // This could be impemented as a switch-like statement inside shared_params:
 
         // Now deal with uniform blocks
+        auto& hbm = static_cast<GL3PlusHardwareBufferManager&>(HardwareBufferManager::getSingleton());
         GLint blockCount = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount));
 
@@ -315,52 +314,23 @@ namespace Ogre {
             // shared param bearing the same name.
             GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
 
-            GL3PlusHardwareUniformBuffer* hwGlBuffer;
-            auto bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
-            if (bufferMapi != sharedParamsBufferMap.end())
-            {
-                hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(bufferMapi->second.get());
-            }
-            else
+            HardwareBufferPtr hwGlBuffer = blockSharedParams->_getHardwareBuffer();
+            if (!hwGlBuffer)
             {
                 // Create buffer and add entry to buffer map.
                 GLint blockSize;
                 OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
-                HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
-                hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
-                hwGlBuffer->setGLBufferBinding(int(sharedParamsBufferMap.size()));
 
-                sharedParamsBufferMap.emplace(blockSharedParams, newUniformBuffer);
+                auto binding = hbm.getUniformBufferCount();
+                hwGlBuffer = hbm.createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
+                static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->setGLBufferBinding(int(binding));
 
-                // Get active block parameter properties.
-                std::vector<const char*> sharedParamNames;
-                for (const auto& it : blockSharedParams->getConstantDefinitions().map)
-                {
-                    sharedParamNames.push_back(it.first.c_str());
-                }
-
-                std::vector<GLuint> uniformParamIndices(sharedParamNames.size());
-                std::vector<GLint> uniformParamOffsets(sharedParamNames.size());
-
-                OGRE_CHECK_GL_ERROR(glGetUniformIndices(programObject, sharedParamNames.size(), &sharedParamNames[0], &uniformParamIndices[0]));
-                //FIXME debug this (see stdout)
-                OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, uniformParamIndices.size(), &uniformParamIndices[0], GL_UNIFORM_OFFSET, &uniformParamOffsets[0]));
-                //TODO handle uniform arrays
-                //GL_UNIFORM_ARRAY_STRIDE
-                //TODO handle matrices
-                //GL_UNIFORM_MATRIX_STRIDE
-
-                GpuNamedConstants& consts = const_cast<GpuNamedConstants&>(blockSharedParams->getConstantDefinitions());
-                size_t i = 0;
-                for (auto& gcdef : consts.map)
-                {
-                    // NOTE: the naming in GL3Plus is backward. logicalIndex is actually the physical index of the parameter
-                    // while the physicalIndex is the logical array offset..
-                    gcdef.second.logicalIndex = uniformParamOffsets[i++];
-                }
+                blockSharedParams->_setHardwareBuffer(hwGlBuffer);
             }
 
-            OGRE_CHECK_GL_ERROR(glUniformBlockBinding(programObject, index, hwGlBuffer->getGLBufferBinding()));
+            OGRE_CHECK_GL_ERROR(glUniformBlockBinding(
+                programObject, index,
+                static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->getGLBufferBinding()));
         }
 
         // Now deal with shader storage blocks
@@ -379,13 +349,9 @@ namespace Ogre {
                 // shared param bearing the same name.
 
                 GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
-                GL3PlusHardwareUniformBuffer* hwGlBuffer;
-                SharedParamsBufferMap::const_iterator bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
-                if (bufferMapi != sharedParamsBufferMap.end())
-                {
-                    hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(bufferMapi->second.get());
-                }
-                else
+
+                HardwareBufferPtr hwGlBuffer = blockSharedParams->_getHardwareBuffer();
+                if (!hwGlBuffer)
                 {
                     // Create buffer and add entry to buffer map.
                     GLint blockSize;
@@ -394,24 +360,16 @@ namespace Ogre {
                     OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(programObject, GL_SHADER_STORAGE_BLOCK, index, 1, properties, 1, NULL, &blockSize));
                     //TODO Implement shared param access param in materials (R, W, R+W)
 
-                    auto newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager&>(HardwareBufferManager::getSingleton()).createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
-                    hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newShaderStorageBuffer.get());
-                    hwGlBuffer->setGLBufferBinding(int(sharedParamsBufferMap.size()));
+                    auto binding = hbm.getShaderStorageBufferCount();
+                    hwGlBuffer = hbm.createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
+                    static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->setGLBufferBinding(binding);
 
-                    sharedParamsBufferMap.emplace(blockSharedParams, newShaderStorageBuffer);
-
-                    // Get active block parameter properties.
-                    properties[0] = GL_OFFSET;
-                    GpuNamedConstants& consts = const_cast<GpuNamedConstants&>(blockSharedParams->getConstantDefinitions());
-                    for (auto& gcdef : consts.map) {
-                        GLuint varIndex = glGetProgramResourceIndex(programObject, GL_BUFFER_VARIABLE, gcdef.first.c_str());
-                        GLint offset;
-                        glGetProgramResourceiv(programObject, GL_BUFFER_VARIABLE, varIndex, 1, properties, 1, NULL, &offset);
-                        gcdef.second.logicalIndex = offset;
-                    }
+                    blockSharedParams->_setHardwareBuffer(hwGlBuffer);
                 }
 
-                OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, hwGlBuffer->getGLBufferBinding()));
+                OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(
+                    programObject, index,
+                    static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->getGLBufferBinding()));
             }
         }
 

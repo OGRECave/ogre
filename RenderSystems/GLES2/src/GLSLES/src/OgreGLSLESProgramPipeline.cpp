@@ -148,15 +148,13 @@ namespace Ogre
             {
                 vertParams = &(mShaders[GPT_VERTEX_PROGRAM]->getConstantDefinitions().map);
                 GLSLESProgramManager::extractUniforms(mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle(),
-                                                      vertParams, NULL, mGLUniformReferences,
-                                                      mSharedParamsBufferMap);
+                                                      vertParams, NULL, mGLUniformReferences);
             }
             if (mShaders[GPT_FRAGMENT_PROGRAM])
             {
                 fragParams = &(mShaders[GPT_FRAGMENT_PROGRAM]->getConstantDefinitions().map);
                 GLSLESProgramManager::extractUniforms(mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle(), NULL,
-                                                      fragParams, mGLUniformReferences,
-                                                      mSharedParamsBufferMap);
+                                                      fragParams, mGLUniformReferences);
             }
 
             mUniformRefsBuilt = true;
