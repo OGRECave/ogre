@@ -450,7 +450,7 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str()));
 
             // do not attempt to link attach only shaders
-            if(mSource.find("void main") != String::npos)
+            if(mSyntaxCode == "spirv" || (mSource.find("void main") != String::npos))
                 compiled = linkSeparable();
         }
 
