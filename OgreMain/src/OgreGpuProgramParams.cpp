@@ -529,15 +529,15 @@ namespace Ogre
             switch (GpuConstantDefinition::getBaseType(param.constType))
             {
             case BCT_FLOAT:
-                dataPtr = getFloatPointer(param.physicalIndex);
+                dataPtr = &mFloatConstants[param.physicalIndex];
                 break;
             case BCT_UINT:
             case BCT_BOOL:
             case BCT_INT:
-                dataPtr = getIntPointer(param.physicalIndex);
+                dataPtr = &mIntConstants[param.physicalIndex];
                 break;
             case BCT_DOUBLE:
-                dataPtr = getDoublePointer(param.physicalIndex);
+                dataPtr = &mDoubleConstants[param.physicalIndex];
                 break;
             case BCT_SAMPLER:
             case BCT_SUBROUTINE:
@@ -1678,8 +1678,7 @@ namespace Ogre
     {
         if (!mNamedConstants)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "This params object is not based on a program with named parameters.",
-                        "GpuProgramParameters::getConstantDefinitionIterator");
+                        "Named constants have not been initialised, perhaps a compile error");
 
         return GpuConstantDefinitionIterator(mNamedConstants->map.begin(),
                                              mNamedConstants->map.end());
@@ -1690,8 +1689,7 @@ namespace Ogre
     {
         if (!mNamedConstants)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "This params object is not based on a program with named parameters.",
-                        "GpuProgramParameters::getConstantDefinitionIterator");
+                        "Named constants have not been initialised, perhaps a compile error");
 
         return *mNamedConstants;
     }
@@ -1700,7 +1698,7 @@ namespace Ogre
     {
         if (!mNamedConstants)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "This params object is not based on a program with named parameters.",
+                        "Named constants have not been initialised, perhaps a compile error",
                         "GpuProgramParameters::getConstantDefinitionIterator");
 
 
@@ -1719,8 +1717,7 @@ namespace Ogre
         {
             if (throwExceptionIfNotFound)
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Named constants have not been initialised, perhaps a compile error.",
-                            "GpuProgramParameters::_findNamedConstantDefinition");
+                            "Named constants have not been initialised, perhaps a compile error");
             return 0;
         }
 
