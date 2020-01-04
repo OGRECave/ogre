@@ -1,4 +1,8 @@
+#ifdef GL_ES
+#version 300 es
+#else
 #version 150
+#endif
 
 uniform mat4 ptMat;
 uniform float far;
@@ -34,8 +38,8 @@ void main()
     #define NUM_BASE_SAMPLES 6
 
     // random normal lookup from a texture and expand to [-1..1]
-    vec3 randN = textureLod(randMap, oUv0 * 24, 0).xyz * 2.0 - 1.0;
-    vec4 geom = textureLod(geomMap, oUv0, 0);
+    vec3 randN = textureLod(randMap, oUv0 * 24.0, 0.0).xyz * 2.0 - 1.0;
+    vec4 geom = textureLod(geomMap, oUv0, 0.0);
     float depth = geom.w;
 
     // IN.ray will be distorted slightly due to interpolation
@@ -47,7 +51,7 @@ void main()
     vec3 viewNorm = geom.xyz;
 
     // Accumulated occlusion factor
-    float occ = 0;
+    float occ = 0.0;
     for (int i = 0; i < NUM_BASE_SAMPLES; ++i)
     {
         // Reflected direction to move in for the sphere
@@ -58,16 +62,16 @@ void main()
 
         // Move new view-space position back into texture space
         #define RADIUS 0.2125
-        vec4 nuv = ptMat * vec4(viewPos.xyz + randomDir * RADIUS, 1);
+        vec4 nuv = ptMat * vec4(viewPos.xyz + randomDir * RADIUS, 1.0);
         nuv.xy /= nuv.w;
 
         // Compute occlusion based on the (scaled) Z difference
         float zd = clamp(far * (depth - textureLod(geomMap, nuv.xy, nuv.w).w), 0.0, 1.0);
         // This is a sample occlusion function, you can always play with
         // other ones, like 1.0 / (1.0 + zd * zd) and stuff
-        occ += clamp(pow(1.0 - zd, 11) + zd, 0.0, 1.0);
+        occ += clamp(pow(1.0 - zd, 11.0) + zd, 0.0, 1.0);
     }
-    occ /= NUM_BASE_SAMPLES;
+    occ /= float(NUM_BASE_SAMPLES);
 
-    fragColour = vec4(occ, occ, occ, 1);
+    fragColour = vec4(occ, occ, occ, 1.0);
 }

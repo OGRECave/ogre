@@ -39,7 +39,7 @@ vertex_program ssao_vs_pGLSL glsl
 }
 vertex_program ssao_vs_pGLSLES glsles
 {
-    source ssao_vs.glsles
+    source ssao_vs.glsl
     syntax glsles
     default_params
     {
@@ -86,7 +86,7 @@ fragment_program ssao_ps_pGLSL glsl
 }
 fragment_program ssao_ps_pGLSLES glsles
 {
-    source ssao_ps.glsles
+    source ssao_ps.glsl
     // will run on anything with GLSL 1.50 and up
     syntax glsles
 	default_params
@@ -135,7 +135,7 @@ fragment_program ssaoBlurX_ps_pGLSL glsl
 }
 fragment_program ssaoBlurX_ps_pGLSLES glsles
 {
-    source ssao_blurx_ps.glsles
+    source ssao_blurx_ps.glsl
     syntax glsles
     default_params
     {
@@ -185,7 +185,7 @@ fragment_program ssaoBlurY_ps_pGLSL glsl
 }
 fragment_program ssaoBlurY_ps_pGLSLES glsles
 {
-    source ssao_blury_ps.glsles
+    source ssao_blury_ps.glsl
     syntax glsles
     default_params
     {

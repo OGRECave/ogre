@@ -23,8 +23,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	Post shader: Multipass, ambient (base) pass
 */
-
+#ifdef GL_ES
+#version 300 es
+#else
 #version 150
+#endif
 
 in vec2 oUv0;
 in vec3 oRay;

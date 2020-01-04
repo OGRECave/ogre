@@ -23,7 +23,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	Post shader: Generic fullscreen quad
 */
+#ifdef GL_ES
+#version 300 es
+#else
 #version 150
+#endif
 
 in vec4 vertex;
 

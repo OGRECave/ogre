@@ -241,13 +241,8 @@ public:
         /// Create shader
         if (mMasterSource.empty())
         {
-            DataStreamPtr ptrMasterSource;
-            if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
-                ptrMasterSource = ResourceGroupManager::getSingleton().openResource("LightMaterial_ps.glsles",
-                                                                                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-            else
-                ptrMasterSource = ResourceGroupManager::getSingleton().openResource("LightMaterial_ps.glsl",
-                                                                                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            DataStreamPtr ptrMasterSource =
+                ResourceGroupManager::getSingleton().openResource("LightMaterial_ps.glsl", RGN_DEFAULT);
 
             OgreAssert(ptrMasterSource, "could not find 'LightMaterial_ps'");
             mMasterSource = ptrMasterSource->getAsString();
