@@ -33,14 +33,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
 //DirectX needs this to compensate for jitter
-ps_2_x float2 fixUV(float2 texCoord, float2 texSize)
-{
-	return texCoord - (float2(0.5,0.5)/texSize);
-}
-
 float2 fixUV(float2 texCoord, float2 texSize)
 {
-	return texCoord;
+	return texCoord - (float2(0.5,0.5)/texSize);
 }
 
 
@@ -74,7 +69,7 @@ void checkShadow(
 //////////////////////////////////////////////////////////////////////////////	
 	
 float4 main(
-
+    float4 oPos: POSITION,
 #if LIGHT_TYPE == LIGHT_DIRECTIONAL
 	float2 texCoord : TEXCOORD0, 
 	float3 ray : TEXCOORD1,

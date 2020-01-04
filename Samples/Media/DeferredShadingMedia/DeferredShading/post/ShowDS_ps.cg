@@ -24,6 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	Post shader: Debug, show depth and specularity channel
 */
 float4 main(
+    float4 oPos: POSITION,
 	float2 texCoord: TEXCOORD0, 
 	float2 projCoord: TEXCOORD1,
 

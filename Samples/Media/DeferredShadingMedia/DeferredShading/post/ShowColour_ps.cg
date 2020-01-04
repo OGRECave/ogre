@@ -26,6 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 float4 main(
+    float4 oPos: POSITION,
 	float2 texCoord: TEXCOORD0, 
 	float2 projCoord: TEXCOORD1,
 

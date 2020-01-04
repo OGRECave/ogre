@@ -23,12 +23,16 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	Post shader: Debug, show normal channel
 */
-float4 main(
-	float2 texCoord: TEXCOORD0, 
-	float2 projCoord: TEXCOORD1,
 
-	uniform sampler Tex0: register(s0),
-	uniform sampler Tex1: register(s1)	
+#include "HLSL_SM4Support.hlsl"
+
+SAMPLER2D(Tex0, 0);
+SAMPLER2D(Tex1, 1);
+
+float4 main(
+    float4 oPos: POSITION,
+	float2 texCoord: TEXCOORD0, 
+	float2 projCoord: TEXCOORD1
 	) : COLOR 
 {
 	float4 a0 = tex2D(Tex0, texCoord); // Attribute 0: Diffuse color+shininess
