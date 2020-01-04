@@ -249,14 +249,12 @@ material modulate
 
             texture_unit
             {
-                texture white.bmp
-                filtering bilinear
+                filtering none
             }
 
             texture_unit
             {
-                texture white.bmp
-                filtering bilinear
+                filtering none
             }
         }
     }

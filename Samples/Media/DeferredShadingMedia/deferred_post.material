@@ -140,7 +140,6 @@ material DeferredShading/Post/SimpleQuad
 			
             texture_unit
             {
-                texture white.bmp
                 filtering none
             }
 		}
