@@ -1,4 +1,8 @@
+#ifdef GL_ES
+#version 300 es
+#else
 #version 150
+#endif
 
 uniform mat4 worldViewProj;
 uniform vec3 farCorner;

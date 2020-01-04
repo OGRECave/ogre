@@ -1,8 +1,6 @@
-#version 150
-
-in vec4 vertex;
+attribute vec4 vertex;
     
-out vec3 oViewPos;
+varying vec3 oViewPos;
    
 uniform mat4 cWorldViewProj;
 uniform mat4 cWorldView;
