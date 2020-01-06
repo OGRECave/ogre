@@ -41,21 +41,15 @@ uniform mat4 texViewProjMatrix;
 //---------------------------------------------
 void main(void)
 {
-	mat4 worldMatrix;
-	worldMatrix[0] = uv1;
-	worldMatrix[1] = uv2;
-	worldMatrix[2] = uv3;
-	worldMatrix[3] = vec4( 0, 0, 0, 1 );
-
-	vec4 worldPos		= vertex * worldMatrix;
+	mat3x4 worldMatrix(uv1, uv2, uv3);
+	vec4 worldPos		= vec4(vertex * worldMatrix, 1);
 	vec3 worldNorm		= normal * mat3(worldMatrix);
 
 	//Transform the position
 	gl_Position			= viewProjMatrix * worldPos;
 	
 #if DEPTH_SHADOWCASTER
-	depth.x				= (gl_Position.z - depthRange.x) * depthRange.w;
-	depth.y				= depthRange.w;
+	depth				= gl_Position.zw;
 #else
 	_uv0		= uv0.xy;
 	oNormal		= worldNorm;
@@ -63,7 +57,6 @@ void main(void)
 
 	#if DEPTH_SHADOWRECEIVER
 		oLightSpacePos		= texViewProjMatrix * worldPos;
-		oLightSpacePos.z	= (oLightSpacePos.z - depthRange.x) * depthRange.w;
 	#endif
 #endif
 }
