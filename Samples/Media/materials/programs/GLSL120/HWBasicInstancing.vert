@@ -41,7 +41,7 @@ uniform mat4 texViewProjMatrix;
 //---------------------------------------------
 void main(void)
 {
-	mat3x4 worldMatrix(uv1, uv2, uv3);
+	mat3x4 worldMatrix = mat3x4(uv1, uv2, uv3);
 	vec4 worldPos		= vec4(vertex * worldMatrix, 1);
 	vec3 worldNorm		= normal * mat3(worldMatrix);
 
