@@ -148,7 +148,7 @@ abstract material Examples/Instancing/HWBasic
 
 			texture_unit Diffuse
 			{
-				texture_alias		DiffuseMap
+				texture		$DiffuseMap
 				tex_address_mode	clamp
 			}
 
@@ -164,10 +164,10 @@ abstract material Examples/Instancing/HWBasic
 
 material Examples/Instancing/HWBasic/Robot : Examples/Instancing/HWBasic
 {
-	set_texture_alias	DiffuseMap	r2skin.jpg
+	set	$DiffuseMap	r2skin.jpg
 }
 
 material Examples/Instancing/HWBasic/spine : Examples/Instancing/HWBasic
 {
-	set_texture_alias	DiffuseMap	circuit.dds
+	set	$DiffuseMap	circuit.dds
 }

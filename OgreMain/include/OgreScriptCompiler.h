@@ -458,7 +458,7 @@ namespace Ogre
         static ScriptCompilerManager* getSingletonPtr(void);
     };
 
-    // Standard event types
+    /// @deprecated do not use
     class _OgreExport PreApplyTextureAliasesScriptCompilerEvent : public ScriptCompilerEvent
     {
     public:
@@ -523,6 +523,7 @@ namespace Ogre
         {}  
     };
 
+    /// @deprecated use CreateGpuProgramScriptCompilerEvent
     class _OgreExport CreateHighLevelGpuProgramScriptCompilerEvent : public CreateGpuProgramScriptCompilerEvent
     {
     public:

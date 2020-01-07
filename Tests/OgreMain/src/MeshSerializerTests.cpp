@@ -384,7 +384,6 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
         EXPECT_TRUE(aSubmesh->useSharedVertices == bSubmesh->useSharedVertices);
         EXPECT_TRUE(aSubmesh->getVertexAnimationIncludesNormals() == bSubmesh->getVertexAnimationIncludesNormals());
         EXPECT_TRUE(aSubmesh->getVertexAnimationType() == bSubmesh->getVertexAnimationType());
-        EXPECT_TRUE(aSubmesh->getTextureAliasCount() == bSubmesh->getTextureAliasCount());
         EXPECT_TRUE(isContainerClone(aSubmesh->blendIndexToBoneIndexMap, bSubmesh->blendIndexToBoneIndexMap));
         // TODO: Compare getBoneAssignments and getTextureAliases
         for (int n = 0; n < numLods; n++) {

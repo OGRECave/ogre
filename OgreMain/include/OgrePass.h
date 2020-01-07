@@ -1554,17 +1554,7 @@ namespace Ogre {
          */
         size_t getPassIterationCount(void) const { return mPassIterationCount; }
 
-        /** Applies texture names to Texture Unit State with matching texture name aliases.
-            All Texture Unit States within the pass are checked.
-            If matching texture aliases are found then true is returned.
-
-            @param
-            aliasList is a map container of texture alias, texture name pairs
-            @param
-            apply set true to apply the texture aliases else just test to see if texture alias matches are found.
-            @return
-            True if matching texture aliases were found in the pass.
-        */
+        /// @deprecated do not use
         bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
 
         /** Sets whether or not this pass will be clipped by a scissor rectangle

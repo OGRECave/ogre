@@ -646,17 +646,7 @@ namespace Ogre {
             Resource::touch();
         }
         
-        /** Applies texture names to Texture Unit State with matching texture name aliases.
-            All techniques, passes, and Texture Unit States within the material are checked.
-            If matching texture aliases are found then true is returned.
-
-        @param
-            aliasList is a map container of texture alias, texture name pairs
-        @param
-            apply set true to apply the texture aliases else just test to see if texture alias matches are found.
-        @return
-            True if matching texture aliases were found in the material.
-        */
+        /// @deprecated do not use
         bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
 
         /** Gets the compilation status of the material.

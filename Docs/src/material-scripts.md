@@ -1656,7 +1656,9 @@ material BumpMap2 : BumpMap1
 
 # Texture Aliases {#Texture-Aliases}
 
-Texture aliases are useful for when only the textures used in texture units need to be specified for a cloned material. In the source material i.e. the original material to be cloned, each texture unit can be given a texture alias name. The cloned material in the script can then specify what textures should be used for each texture alias. Note that texture aliases are a more specific version of [Script Variables](#Script-Variables) which can be used to easily set other values.
+@deprecated texture aliases are a restricted version of @ref Script-Variables, which you should instead.
+
+Texture aliases are useful for when only the textures used in texture units need to be specified for a cloned material. In the source material i.e. the original material to be cloned, each texture unit can be given a texture alias name. The cloned material in the script can then specify what textures should be used for each texture alias.
 
 Using texture aliases within texture units:
 @par
@@ -1794,7 +1796,7 @@ material fxTest : TSNormalSpecMapping
 
 The textures in both techniques in the child material will automatically get replaced with the new ones we want to use.
 
-The same process can be done in code as long you set up the texture alias names so then there is no need to traverse technique/pass/TUS to change a texture. You just call myMaterialPtr-&gt;applyTextureAliases(myAliasTextureNameList) which will update all textures in all texture units that match the alias names in the map container reference you passed as a parameter.
+The same process can be done in code as long you set up the texture alias names so then there is no need to traverse technique/pass/TUS to change a texture. You just call @ref Ogre::Material::applyTextureAliases which will update all textures in all texture units that match the alias names in the map container reference you passed as a parameter.
 
 You don’t have to supply all the textures in the copied material.<br>
 
