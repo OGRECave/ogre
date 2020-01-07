@@ -17,6 +17,7 @@ To modify the default lighting stage [see below](@ref rtss_custom_api). For more
 
 Here are the attributes you can use in a `rtshader_system` block of a .material script:
 
+- [transform_stage](#transform_stage)
 - [lighting_stage](#lighting_stage)
 - [fog_stage](#fog_stage)
 - [light_count](#light_count)
@@ -25,6 +26,21 @@ Here are the attributes you can use in a `rtshader_system` block of a .material 
 - [hardware_skinning](#hardware_skinning)
 - [layered_blend](#layered_blend)
 - [source_modifier](#source_modifier)
+
+<a name="transform_stage"></a>
+
+## transform_stage
+
+Force a specific transform calculation
+@par
+Format: `transform_stage <type> [attrIndex]`
+@par
+Example: `transform_stage instanced 1`
+
+@param type either `ffp` or `instanced`
+@param coordinateIndex the start texcoord attribute index to read the instanced world matrix from
+
+@note `instanced` is supposed to be used with Ogre::InstanceManager::HWInstancingBasic
 
 <a name="lighting_stage"></a>
 

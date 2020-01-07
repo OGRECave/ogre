@@ -51,6 +51,7 @@ int FFPTransform::getExecutionOrder() const
 bool FFPTransform::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
     mSetPointSize = srcPass->getPointSize() != 1.0f || srcPass->isPointAttenuationEnabled();
+    mDoLightCalculations = srcPass->getLightingEnabled();
     return true;
 }
 
@@ -63,7 +64,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     
     // Resolve World View Projection Matrix.
     UniformParameterPtr wvpMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-        
+
     // Resolve input position parameter.
     ParameterPtr positionIn = vsEntry->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     
@@ -74,10 +75,32 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
     // Add dependency.
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
 
+    bool isHLSL = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
+
     auto stage = vsEntry->getStage(FFP_VS_TRANSFORM);
+    if(mInstanced)
+    {
+        if (isHLSL)
+        {
+            // set hlsl shader to use row-major matrices instead of column-major.
+            // it enables the use of auto-bound 3x4 matrices in generated hlsl shader.
+            vsProgram->setUseColumnMajorMatrices(false);
+        }
+
+        auto wMatrix = vsEntry->resolveInputParameter(mTexCoordIndex, GCT_MATRIX_3X4);
+        stage.callFunction(FFP_FUNC_TRANSFORM, wMatrix, positionIn, Out(positionIn).xyz());
+
+        if(mDoLightCalculations)
+        {
+            auto vsInNormal = vsEntry->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
+            stage.callFunction(FFP_FUNC_TRANSFORM, wMatrix, vsInNormal, vsInNormal);
+        }
+        // we can end here because the world matrix will be identity with instanced rendering
+        // so the code below will work as indended
+    }
     stage.callFunction(FFP_FUNC_TRANSFORM, wvpMatrix, positionIn, positionOut);
 
-    if(!mSetPointSize || ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl") // not supported with DX11
+    if(!mSetPointSize || isHLSL) // not supported with DX11
         return true;
 
     UniformParameterPtr pointParams = vsProgram->resolveParameter(GpuProgramParameters::ACT_POINT_PARAMS);
@@ -96,6 +119,8 @@ void FFPTransform::copyFrom(const SubRenderState& rhs)
 {
     const FFPTransform& rhsTransform = static_cast<const FFPTransform&>(rhs);
     mSetPointSize = rhsTransform.mSetPointSize;
+    mInstanced = rhsTransform.mInstanced;
+    mTexCoordIndex = rhsTransform.mTexCoordIndex;
 }
 
 //-----------------------------------------------------------------------
@@ -110,21 +135,33 @@ SubRenderState* FFPTransformFactory::createInstance(ScriptCompiler* compiler,
 {
     if (prop->name == "transform_stage")
     {
-        if(prop->values.size() == 1)
+        if(prop->values.size() > 0)
         {
+            bool hasError = false;
             String modelType;
+            int texCoordSlot = 1;
 
-            if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
+            auto it = prop->values.begin();
+
+            if(!SGScriptTranslator::getString(*it, &modelType))
+            {
+                hasError = true;
+            }
+
+            if(++it != prop->values.end() && !SGScriptTranslator::getInt(*++it, &texCoordSlot))
+                hasError = true;
+
+            if(hasError)
             {
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                 return NULL;
             }
 
-            if (modelType == "ffp")
-            {
-                return createOrRetrieveInstance(translator);
-            }
-        }       
+            auto ret = static_cast<FFPTransform*>(createOrRetrieveInstance(translator));
+            ret->setInstancingParams(modelType == "instanced", texCoordSlot);
+
+            return ret;
+        }
     }
 
     return NULL;
