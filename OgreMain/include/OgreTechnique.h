@@ -597,17 +597,7 @@ namespace Ogre {
         /// Gets the name of the technique
         const String& getName(void) const { return mName; }
 
-        /** Applies texture names to Texture Unit State with matching texture name aliases.
-            All passes, and Texture Unit States within the technique are checked.
-            If matching texture aliases are found then true is returned.
-
-        @param
-            aliasList is a map container of texture alias, texture name pairs
-        @param
-            apply set true to apply the texture aliases else just test to see if texture alias matches are found.
-        @return
-            True if matching texture aliases were found in the Technique.
-        */
+        /// @deprecated do not use
         bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
 
 

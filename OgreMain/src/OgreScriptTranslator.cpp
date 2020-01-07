@@ -1198,6 +1198,9 @@ namespace Ogre{
                     }
                     else
                     {
+                        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                                            "set_texture_alias. Use 'set $variable value'");
+
                         AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
                         String name, value;
                         if(getString(*i0, &name) && getString(*i1, &value))
@@ -2652,6 +2655,8 @@ namespace Ogre{
                     }
                     break;
                 case ID_TEXTURE_ALIAS:
+                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
+                        "texture_alias. Use 'texture $variable'");
                     if(getValue(prop, compiler, sval))
                         mUnit->setTextureNameAlias(sval);
                     break;

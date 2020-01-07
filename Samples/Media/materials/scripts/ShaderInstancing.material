@@ -417,7 +417,7 @@ abstract material Examples/Instancing/ShaderBased
 
 			texture_unit Diffuse
 			{
-				texture_alias		DiffuseMap
+				texture		$DiffuseMap
 			}
 
 			texture_unit shadow0
@@ -432,7 +432,7 @@ abstract material Examples/Instancing/ShaderBased
 
 material Examples/Instancing/ShaderBased/Robot : Examples/Instancing/ShaderBased
 {
-	set_texture_alias	DiffuseMap	r2skin.jpg
+	set	$DiffuseMap	r2skin.jpg
 }
 
 abstract material Examples/Instancing/ShaderBased_dq
@@ -454,7 +454,7 @@ abstract material Examples/Instancing/ShaderBased_dq
 
 			texture_unit Diffuse
 			{
-				texture_alias		DiffuseMap
+				texture		$DiffuseMap
 			}
 
 			texture_unit shadow0
@@ -469,7 +469,7 @@ abstract material Examples/Instancing/ShaderBased_dq
 
 material Examples/Instancing/ShaderBased/Robot_dq : Examples/Instancing/ShaderBased_dq
 {
-	set_texture_alias	DiffuseMap	r2skin.jpg
+	set	$DiffuseMap	r2skin.jpg
 }
 
 abstract material Examples/Instancing/ShaderBased_dq_two_weights
@@ -492,7 +492,7 @@ abstract material Examples/Instancing/ShaderBased_dq_two_weights
 
 			texture_unit Diffuse
 			{
-				texture_alias		DiffuseMap
+				texture		$DiffuseMap
 				tex_address_mode	clamp
 			}
 
@@ -508,5 +508,5 @@ abstract material Examples/Instancing/ShaderBased_dq_two_weights
 
 material Examples/Instancing/ShaderBased/spine_dq_two_weights : Examples/Instancing/ShaderBased_dq_two_weights
 {
-	set_texture_alias	DiffuseMap	circuit.dds
+	set	$DiffuseMap	circuit.dds
 }
