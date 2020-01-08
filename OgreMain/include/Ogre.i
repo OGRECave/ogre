@@ -87,6 +87,18 @@ JNIEnv* OgreJNIGetEnv() {
 }
 #endif
 
+#ifdef SWIGCSHARP
+  %apply void *VOID_INT_PTR {void *}
+
+  %typemap(csvarout) void * %{
+    get {
+	  global::System.IntPtr cPtr = $imcall;
+	  if (OgrePINVOKE.SWIGPendingException.Pending) throw OgrePINVOKE.SWIGPendingException.Retrieve();
+	  return cPtr;
+	}
+  %}
+#endif
+
 // convert c++ exceptions to language native exceptions
 %exception {
     try {
@@ -497,7 +509,7 @@ SHARED_PTR(Material);
 %include "OgreMaterialManager.h"
 %include "OgreRenderable.h"
 %include "OgreShadowCaster.h"
-//#ifdef SWIGCSHARP
+#ifdef SWIGCSHARP
 %typemap(cscode) Ogre::MovableObject %{
   public bool tryCastEntity(out Entity entity)
   {
@@ -505,14 +517,14 @@ SHARED_PTR(Material);
   	if (this.getMovableType() != "Entity")
 	  return false;
 
-    global::System.IntPtr cPtr = OgrePINVOKE.SWIG_CastMovableObjectToEntity(MovableObject.getCPtr(this));
+    global::System.IntPtr cPtr = OgrePINVOKE.SWIG_CastMovableObjectToEntity(MovableObject.getCPtr(this).Handle);
     entity = (cPtr == global::System.IntPtr.Zero) ? null : new Entity(cPtr, false);
     if (OgrePINVOKE.SWIGPendingException.Pending) throw OgrePINVOKE.SWIGPendingException.Retrieve();
 
 	return entity != null;
   }
 %}
-//#endif
+#endif
 %include "OgreMovableObject.h"
     %include "OgreBillboardChain.h"
         %include "OgreRibbonTrail.h"
