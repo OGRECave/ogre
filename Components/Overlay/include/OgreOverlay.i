@@ -35,23 +35,23 @@
 #endif
 
 %include "OgreOverlayPrerequisites.h"
-%shared_ptr(Ogre::Font);
+SHARED_PTR(Font);
 %include "OgreFont.h"
 %include "OgreFontManager.h"
 %ignore Ogre::Overlay::get2DElementsIterator;
 %include "OgreOverlay.h"
-%shared_ptr(Ogre::OverlayElement);
+SHARED_PTR(OverlayElement);
 %include "OgreOverlayElement.h"
 %include "OgreOverlayElementFactory.h"
-%shared_ptr(Ogre::OverlayContainer);
+SHARED_PTR(OverlayContainer);
 %include "OgreOverlayContainer.h"
 %include "OgreOverlayManager.h"
-%shared_ptr(Ogre::OverlaySystem);
+SHARED_PTR(OverlaySystem);
 %include "OgreOverlaySystem.h"
-%shared_ptr(Ogre::PanelOverlayElement);
+SHARED_PTR(PanelOverlayElement);
 %include "OgrePanelOverlayElement.h"
 %ignore Ogre::TextAreaOverlayElement::getFontName;
-%shared_ptr(Ogre::TextAreaOverlayElement);
+SHARED_PTR(TextAreaOverlayElement);
 %include "OgreTextAreaOverlayElement.h"
 
 #ifdef HAVE_IMGUI
