@@ -131,10 +131,7 @@ void Sample_NewInstancing::setupContent()
         mSceneMgr->setShadowTextureConfig( 0, 512, 512, PF_FLOAT32_R );
     }
 
-    //LiSPSMShadowCameraSetup *shadowCameraSetup = new LiSPSMShadowCameraSetup();
-    //PlaneOptimalShadowCameraSetup *shadowCameraSetup = new PlaneOptimalShadowCameraSetup();
-
-    mSceneMgr->setShadowCameraSetup( FocusedShadowCameraSetup::create() );
+    mSceneMgr->setShadowCameraSetup( LiSPSMShadowCameraSetup::create() );
 
     mEntities.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
     mSceneNodes.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
@@ -169,28 +166,14 @@ void Sample_NewInstancing::setupLighting()
 {
     mSceneMgr->setAmbientLight( ColourValue( 0.40f, 0.40f, 0.40f ) );
 
-    ColourValue lightColour( 1, 0.5, 0.3 );
-
-    //Create main (point) light
+    //Create main light
     Light* light = mSceneMgr->createLight();
-    light->setDiffuseColour(lightColour);
-    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3( 0.0f, 25.0f, 0.0f ))->attachObject(light);
+    light->setType( Light::LT_DIRECTIONAL );
+    light->setDiffuseColour(1, 0.5, 0.3);
+    auto n = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    n->attachObject(light);
+    n->setDirection(0, -1, -1);
     light->setSpecularColour( 0.6, 0.82, 1.0 );
-    light->setAttenuation( 3500, 0.085, 0.00008, 0.00006 );
-    light->setCastShadows( false );
-
-    //Create a dummy spot light for shadows
-    light = mSceneMgr->createLight();
-    light->setType( Light::LT_SPOTLIGHT );
-    light->setDiffuseColour( ColourValue( 0.15f, 0.35f, 0.44f ) );
-    SceneNode* ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3( 250.0f, 200.0f, 250.0f ));
-    ln->attachObject(light);
-    ln->setDirection(-Vector3::UNIT_SCALE );
-    light->setSpecularColour( 0.2, 0.12, 0.11 );
-    light->setAttenuation( 3500, 0.005, 0.00002, 0.00001 );
-    light->setSpotlightRange( Degree(80), Degree(90) );
-    light->setCastShadows( true );
-    light->setLightMask( 0x00000000 );
 }
 
 //------------------------------------------------------------------------------
