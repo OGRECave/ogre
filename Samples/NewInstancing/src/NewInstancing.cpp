@@ -16,32 +16,32 @@ static const char *c_instancingTechniques[] =
 
 static const char *c_materialsTechniques[] =
 {
-    "Examples/Instancing/ShaderBased/Robot",
+    "Examples/Instancing/RTSS/Robot",
     "Examples/Instancing/VTF/Robot",
     "Examples/Instancing/HWBasic/Robot",
     "Examples/Instancing/VTF/HW/Robot",
     "Examples/Instancing/VTF/HW/LUT/Robot",
-    "Examples/Instancing/ShaderBased/Robot"
+    "Examples/Instancing/RTSS/Robot"
 };
 
 static const char *c_materialsTechniques_dq[] =
 {
-    "Examples/Instancing/ShaderBased/Robot_dq",
+    "Examples/Instancing/RTSS/Robot_dq",
     "Examples/Instancing/VTF/Robot_dq",
     "Examples/Instancing/HWBasic/Robot",
     "Examples/Instancing/VTF/HW/Robot_dq",
     "Examples/Instancing/VTF/HW/LUT/Robot_dq",
-    "Examples/Instancing/ShaderBased/Robot_dq"
+    "Examples/Instancing/RTSS/Robot_dq"
 };
 
 static const char *c_materialsTechniques_dq_two_weights[] =
 {
-    "Examples/Instancing/ShaderBased/spine_dq_two_weights",
+    "Examples/Instancing/RTSS/spine_dq_two_weights",
     "Examples/Instancing/VTF/spine_dq_two_weights",
     "Examples/Instancing/HWBasic/spine",
     "Examples/Instancing/VTF/HW/spine_dq_two_weights",
     "Examples/Instancing/VTF/HW/LUT/spine_dq_two_weights",
-    "Examples/Instancing/ShaderBased/spine_dq_two_weights"
+    "Examples/Instancing/RTSS/spine_dq_two_weights"
 };
 
 static const char *c_meshNames[] =
@@ -106,8 +106,22 @@ void Sample_NewInstancing::setupContent()
     mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
     RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
     RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-    auto subRenderState = rtShaderGen.createSubRenderState<RTShader::IntegratedPSSM3>();
+    RTShader::SubRenderState* subRenderState = rtShaderGen.createSubRenderState<RTShader::IntegratedPSSM3>();
     schemRenderState->addTemplateSubRenderState(subRenderState);
+
+    //Add the hardware skinning to the shader generator default render state
+    subRenderState = mShaderGenerator->createSubRenderState<RTShader::HardwareSkinning>();
+    schemRenderState->addTemplateSubRenderState(subRenderState);
+
+    // increase max bone count for higher efficiency
+    RTShader::HardwareSkinningFactory::getSingleton().setMaxCalculableBoneCount(80);
+
+    // re-generate shaders to include new SRSs
+    rtShaderGen.invalidateScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    rtShaderGen.validateScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+    // update scheme for FFP supporting rendersystems
+    MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());
 #endif
 
     //Initialize the techniques and current mesh variables
