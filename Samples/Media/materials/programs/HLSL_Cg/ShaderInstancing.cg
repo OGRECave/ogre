@@ -11,8 +11,7 @@ struct VS_INPUT
 	float4 Position	:	POSITION;
 	float3 Normal	:	NORMAL;
 	float2 uv0	:	TEXCOORD0;
-
-	float4 BlendIdx	:	BLENDINDICES;
+	uint4 BlendIdx	:	BLENDINDICES;
 	float4 BlendWgt	:	BLENDWEIGHT;
 };
 
@@ -31,18 +30,11 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 #else
 				   uniform float3x4 worldMatrix3x4Array[80]
 #endif
-#if defined( DEPTH_SHADOWCASTER ) || defined( DEPTH_SHADOWRECEIVER )
-				,  uniform float4 depthRange
-#endif
-#ifdef DEPTH_SHADOWRECEIVER
-				,  uniform float4x4 texViewProjMatrix
-#endif
 				   )
 {
 	VS_OUTPUT output;
 
 	float4 worldPos	 = 0;
-	float3 worldNorm = 0;
 
 	int idx = int(input.BlendIdx[0]);
 #ifdef ST_DUAL_QUATERNION
@@ -61,38 +53,15 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	blendDQ /= length(blendDQ[0]);
 #endif
 	worldPos = float4(calculateBlendPosition(input.Position, blendDQ), 1.0);
-	worldNorm = calculateBlendNormal(input.Normal, blendDQ);
 #else
 	worldPos  = float4( mul( worldMatrix3x4Array[idx], input.Position ).xyz, 1.0f );
-	worldNorm = mul( (float3x3)(worldMatrix3x4Array[idx]), input.Normal );
 #endif
-
-	/*int i;
-	for( i=0; i<4; i++ )
-	{
-		int idx = int(input.BlendIdx[0]);
-		worldPos += float4( mul( worldMatrix3x4Array[idx], input.Position ).xyz, 1.0f ) * input.BlendWgt[i];
-		worldNorm += mul( (float3x3)(worldMatrix3x4Array[idx]), input.Normal ) * input.BlendWgt[i];
-	}*/
 
 	//Transform the position
 	output.Position		= mul( viewProjMatrix, worldPos );
-	
-#ifdef DEPTH_SHADOWCASTER
+
 	output.ps.unused	= float3( output.Position.zw, 0 );
 	output.ps.depth		= output.Position.z;
-#else
-	output.ps.uv0		= input.uv0;
-	
-	//Pass Normal and position for Blinn Phong lighting
-	output.ps.Normal	= normalize(worldNorm);
-	output.ps.vPos		= worldPos.xyz;
-
-	#ifdef DEPTH_SHADOWRECEIVER
-		// Calculate the position of vertex in light space to do shadows
-		output.ps.lightSpacePos = mul( texViewProjMatrix, worldPos );
-	#endif
-#endif
 
 	return output;
 }
