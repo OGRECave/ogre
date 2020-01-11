@@ -201,6 +201,10 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
 
         //Update from object to projective space
         stage.callFunction(FFP_FUNC_TRANSFORM, mParamInViewProjMatrix, mParamTempFloat4, mParamOutPositionProj);
+
+        //update back the original position relative to the object
+        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamTempFloat4,
+                           mParamInPosition);
     }
     else
     {
