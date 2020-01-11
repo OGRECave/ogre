@@ -1908,6 +1908,15 @@ material jaiqua
 				texture blue_jaiqua.jpg
 				tex_address_mode clamp
 			}
+
+			rtshader_system
+			{
+				// In case the system uses the RTSS, the following line will ensure
+				// that hardware animation is used.
+				// Alternatively, you can derive this information programatically via
+				// HardwareSkinningFactory::prepareEntityForSkinning
+				hardware_skinning 38 2 dual_quaternion true false
+			}
 		}
 	}
 
