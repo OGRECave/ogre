@@ -101,6 +101,8 @@ Example: `hardware_skinning 24 2 dual_quaternion true false`
 @param antipodality_check Accurate antipodality handling for rotations > 180°
 @param scale_shear add scaling and shearing support to dual quaternion computation
 
+@note You can also use Ogre::RTShader::HardwareSkinningFactory::prepareEntityForSkinning to derive this information automatically.
+
 <a name="layered_blend"></a>
 
 ## layered_blend

@@ -255,12 +255,6 @@ protected:
             ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
             ent->setMaterialName("jaiqua");
             sn->attachObject(ent);
-
-#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-            //In case the system uses the RTSS, the following line will ensure
-            //that the entity is using hardware animation in RTSS as well.
-            RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent, Ogre::RTShader::ST_DUAL_QUATERNION, true, false);
-#endif
         
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
