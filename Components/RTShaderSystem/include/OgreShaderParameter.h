@@ -678,7 +678,9 @@ public:
 
     static ParameterPtr createInTexcoord(GpuConstantType type, int index, Parameter::Content content);
     static ParameterPtr createOutTexcoord(GpuConstantType type, int index, Parameter::Content content);
+    /// @deprecated use createInTexcoord
     static ParameterPtr createInTexcoord1(int index, Parameter::Content content);
+    /// @deprecated use createOutTexcoord
     static ParameterPtr createOutTexcoord1(int index, Parameter::Content content);
     static ParameterPtr createInTexcoord2(int index, Parameter::Content content);
     static ParameterPtr createOutTexcoord2(int index, Parameter::Content content);

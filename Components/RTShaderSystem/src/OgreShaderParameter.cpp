@@ -487,24 +487,9 @@ ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index,
     switch (type)
     {
     case GCT_FLOAT1:
-        return createInTexcoord1(index, content);
-        
     case GCT_FLOAT2:
-        return createInTexcoord2(index, content);
-        
     case GCT_FLOAT3:
-        return createInTexcoord3(index, content);
-        
     case GCT_FLOAT4:
-        return createInTexcoord4(index, content);       
-    default:
-    case GCT_SAMPLER1D:
-    case GCT_SAMPLER2D:
-    case GCT_SAMPLER2DARRAY:
-    case GCT_SAMPLER3D:
-    case GCT_SAMPLERCUBE:
-    case GCT_SAMPLER1DSHADOW:
-    case GCT_SAMPLER2DSHADOW:
     case GCT_MATRIX_2X2:
     case GCT_MATRIX_2X3:
     case GCT_MATRIX_2X4:
@@ -522,6 +507,16 @@ ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index,
     case GCT_UINT2:
     case GCT_UINT3:
     case GCT_UINT4:
+        return std::make_shared<Parameter>(type, StringUtil::format("iTexcoord_%d", index),
+                                           Parameter::SPS_TEXTURE_COORDINATES, index, content);
+    default:
+    case GCT_SAMPLER1D:
+    case GCT_SAMPLER2D:
+    case GCT_SAMPLER2DARRAY:
+    case GCT_SAMPLER3D:
+    case GCT_SAMPLERCUBE:
+    case GCT_SAMPLER1DSHADOW:
+    case GCT_SAMPLER2DSHADOW:
     case GCT_UNKNOWN:
         break;
     }
@@ -535,17 +530,11 @@ ParameterPtr ParameterFactory::createOutTexcoord(GpuConstantType type, int index
     switch (type)
     {
     case GCT_FLOAT1:
-        return createOutTexcoord1(index, content);
-
     case GCT_FLOAT2:
-        return createOutTexcoord2(index, content);
-
     case GCT_FLOAT3:
-        return createOutTexcoord3(index, content);
-
     case GCT_FLOAT4:
-        return createOutTexcoord4(index, content);      
-    
+        return std::make_shared<Parameter>(type, StringUtil::format("oTexcoord_%d", index),
+                                           Parameter::SPS_TEXTURE_COORDINATES, index, content);
     default:
     case GCT_SAMPLER1D:
     case GCT_SAMPLER2D:

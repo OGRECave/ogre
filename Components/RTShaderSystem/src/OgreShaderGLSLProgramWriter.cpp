@@ -326,15 +326,16 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 os << "attribute\t";
             }
 
-            // all uv texcoords passed by ogre are vec4
-            if (paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE1 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE2 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE3 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE4 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE5 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE6 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE7 )
+            // all uv texcoords passed by ogre are at least vec4
+            if ((paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE1 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE2 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE3 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE4 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE5 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE6 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE7) &&
+                (pParam->getType() < GCT_FLOAT4))
             {
                 os << "vec4";
             }
