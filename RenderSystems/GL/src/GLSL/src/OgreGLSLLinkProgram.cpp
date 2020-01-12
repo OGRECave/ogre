@@ -180,6 +180,14 @@ namespace Ogre {
             if (attrib != -1)
             {
                 mValidAttributes.insert(a.attrib);
+
+                if(a.semantic != VES_TEXTURE_COORDINATES) continue;
+
+                // also enable next 4 attributes to allow matrix types in texcoord semantic
+                // might cause problems with mixing builtin and custom names,
+                // but then again you should not
+                for(int j = 0; j < 4; j++)
+                    mValidAttributes.insert(msCustomAttributes[i + j].attrib);
             }
         }
     }
