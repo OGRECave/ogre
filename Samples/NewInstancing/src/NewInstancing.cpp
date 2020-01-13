@@ -1,6 +1,8 @@
 #include "SamplePlugin.h"
 #include "NewInstancing.h"
 
+#include <random>
+
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -193,7 +195,6 @@ void Sample_NewInstancing::setupLighting()
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::switchInstancingTechnique()
 {
-    randGenerator.randomize();
     //mInstancingTechnique = (mInstancingTechnique+1) % (NUM_TECHNIQUES+1);
     mInstancingTechnique = mTechniqueMenu->getSelectionIndex();
 
@@ -316,6 +317,7 @@ void Sample_NewInstancing::switchSkinningTechnique(int index)
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::createEntities()
 {
+    std::mt19937 rng;
     for( int i=0; i<NUM_INST_ROW * NUM_INST_COLUMN; ++i )
     {
         //Create the non-instanced entity. Use the same shader as shader-based because:
@@ -330,14 +332,15 @@ void Sample_NewInstancing::createEntities()
         if (mAnimations.insert( anim ).second)
         {
             anim->setEnabled( true );
-            anim->addTime( randGenerator.nextFloat() * 10 ); //Random start offset
+            anim->addTime( float(rng())/rng.max() * 10 ); //Random start offset
         }
     }
 }
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::createInstancedEntities()
 {
-
+    std::mt19937 rng;
+    std::mt19937 orng; // separate oriention rng for consistency with other techniques
     for( int i=0; i<NUM_INST_ROW; ++i )
     {
         for( int j=0; j<NUM_INST_COLUMN; ++j )
@@ -352,14 +355,14 @@ void Sample_NewInstancing::createInstancedEntities()
                 //Get the animation
                 AnimationState *anim = ent->getAnimationState( "Walk" );
                 anim->setEnabled( true );
-                anim->addTime( randGenerator.nextFloat() * 10); //Random start offset
+                anim->addTime( float(rng())/rng.max() * 10); //Random start offset
                 mAnimations.insert( anim );
             }
 
             if ((mInstancingTechnique < NUM_TECHNIQUES) && (!mUseSceneNodes->isChecked()))
             {
                 mMovedInstances.push_back( ent );
-                ent->setOrientation(Quaternion(Radian(randGenerator.nextFloat() * 10 * 3.14159265359f), Vector3::UNIT_Y));
+                ent->setOrientation(Quaternion(Radian(float(orng())/orng.max() * 10 * Math::PI), Vector3::UNIT_Y));
                 ent->setPosition( Ogre::Vector3(mEntities[0]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
                     mEntities[0]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f)) );
             }
@@ -373,6 +376,7 @@ void Sample_NewInstancing::createSceneNodes()
     //they behave like regular Entities on this.
     SceneNode *rootNode = mSceneMgr->getRootSceneNode();
 
+    std::mt19937 rng;
     for( int i=0; i<NUM_INST_ROW; ++i )
     {
         for( int j=0; j<NUM_INST_COLUMN; ++j )
@@ -382,7 +386,7 @@ void Sample_NewInstancing::createSceneNodes()
             {
                 SceneNode *sceneNode = rootNode->createChildSceneNode();
                 sceneNode->attachObject( mEntities[idx] );
-                sceneNode->yaw( Radian( randGenerator.nextFloat() * 10 * 3.14159265359f )); //Random orientation
+                sceneNode->yaw( Radian( float(rng())/rng.max() * 10 * Math::PI )); //Random orientation
                 sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
                     mEntities[idx]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f) );
                 mSceneNodes.push_back( sceneNode );
