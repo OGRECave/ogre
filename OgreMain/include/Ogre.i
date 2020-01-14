@@ -514,12 +514,9 @@ SHARED_PTR(Material);
   public bool tryCastEntity(out Entity entity)
   {
 	entity = null;
-  	if (this.getMovableType() != "Entity")
-	  return false;
 
     global::System.IntPtr cPtr = OgrePINVOKE.SWIG_CastMovableObjectToEntity(MovableObject.getCPtr(this).Handle);
     entity = (cPtr == global::System.IntPtr.Zero) ? null : new Entity(cPtr, false);
-    if (OgrePINVOKE.SWIGPendingException.Pending) throw OgrePINVOKE.SWIGPendingException.Retrieve();
 
 	return entity != null;
   }
@@ -583,17 +580,9 @@ SHARED_PTR(Material);
           Ogre::Entity *result = 0 ;
 
           arg1 = (Ogre::MovableObject *)jarg1;
-          {
-            try {
-              result = (Ogre::Entity *)arg1;
-            }
 
-            catch (const std::exception& e) {
-              {
-                SWIG_CSharpException(SWIG_RuntimeError, e.what()); return 0;
-              };
-            }
-          }
+          result = dynamic_cast<Ogre::Entity *>(arg1);
+
           jresult = (void *)result;
           return jresult;
 		}
