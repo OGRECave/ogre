@@ -509,12 +509,12 @@ SHARED_PTR(Material);
 %include "OgreMaterialManager.h"
 %include "OgreRenderable.h"
 %include "OgreShadowCaster.h"
-%extend Ogre::MovableObject %{
+%extend Ogre::MovableObject {
   Entity* castEntity()
   {
     return dynamic_cast<Entity*>(this);	
   }
-%}
+}
 %include "OgreMovableObject.h"
     %include "OgreBillboardChain.h"
         %include "OgreRibbonTrail.h"
