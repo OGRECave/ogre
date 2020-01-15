@@ -512,7 +512,7 @@ SHARED_PTR(Material);
 %extend Ogre::MovableObject {
   Entity* castEntity()
   {
-    return dynamic_cast<Entity*>(this);	
+    return dynamic_cast<Ogre::Entity*>($self);
   }
 }
 %include "OgreMovableObject.h"
