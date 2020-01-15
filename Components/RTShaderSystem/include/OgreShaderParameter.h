@@ -662,7 +662,7 @@ class _OgreRTSSExport ParameterFactory
     // Interface.
 public:
 
-    static ParameterPtr createInPosition(int index);    
+    static ParameterPtr createInPosition(int index, Parameter::Content content = Parameter::SPC_POSITION_OBJECT_SPACE);
     static ParameterPtr createOutPosition(int index);
 
     static ParameterPtr createInNormal(int index);

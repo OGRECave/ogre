@@ -293,6 +293,11 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 pParam->_rename("gl_PointCoord");
                 continue;
             }
+            else if(paramContent == Parameter::SPC_POSITION_PROJECTIVE_SPACE)
+            {
+                pParam->_rename("gl_FragCoord");
+                continue;
+            }
 
             // After GLSL 1.20 varying is deprecated
             if(mGLSLVersion <= 120 || (mGLSLVersion == 100 && mIsGLSLES))

@@ -382,11 +382,11 @@ void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInPosition(int index)
+ParameterPtr ParameterFactory::createInPosition(int index, Parameter::Content content)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iPos_" + StringConverter::toString(index), 
-        Parameter::SPS_POSITION, index, 
-        Parameter::SPC_POSITION_OBJECT_SPACE));
+    return std::make_shared<Parameter>(GCT_FLOAT4, "iPos_" + StringConverter::toString(index),
+                                       Parameter::SPS_POSITION, index,
+                                       content);
 }
 
 //-----------------------------------------------------------------------

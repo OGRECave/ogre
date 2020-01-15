@@ -276,7 +276,7 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
     {
     case Parameter::SPS_POSITION:   
         assert(type == GCT_FLOAT4);
-        param = ParameterFactory::createInPosition(index);
+        param = ParameterFactory::createInPosition(index, content);
         break;
             
     case Parameter::SPS_BLEND_WEIGHTS:          
