@@ -87,6 +87,18 @@ JNIEnv* OgreJNIGetEnv() {
 }
 #endif
 
+#ifdef SWIGCSHARP
+  %apply void *VOID_INT_PTR {void *}
+
+  %typemap(csvarout) void * %{
+    get {
+	  global::System.IntPtr cPtr = $imcall;
+	  if (OgrePINVOKE.SWIGPendingException.Pending) throw OgrePINVOKE.SWIGPendingException.Retrieve();
+	  return cPtr;
+	}
+  %}
+#endif
+
 // convert c++ exceptions to language native exceptions
 %exception {
     try {
@@ -510,6 +522,12 @@ SHARED_PTR(Material);
 %include "OgreMaterialManager.h"
 %include "OgreRenderable.h"
 %include "OgreShadowCaster.h"
+%extend Ogre::MovableObject {
+  Entity* castEntity()
+  {
+    return dynamic_cast<Ogre::Entity*>($self);
+  }
+}
 %include "OgreMovableObject.h"
     %include "OgreBillboardChain.h"
         %include "OgreRibbonTrail.h"
