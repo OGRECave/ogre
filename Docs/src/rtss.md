@@ -49,13 +49,17 @@ Example: `transform_stage instanced 1`
 Force a specific lighting model.
 
 @par
-Format1: `lighting_stage <ffp|per_pixel> [normalised]`
+Format: `lighting_stage <ffp|per_pixel|normal_map|gbuffer> [normalised]`
 @par
 Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [samplerName]`
 @par
+Format3: `lighting_stage gbuffer <target_layout> [target_layout]`
+@par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
-@param normalised @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
+@param normalised with @c ffp or @c per_pixel @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
+@param texturename normal map to use with @c normal_map
+@param target_layout with @c gbuffer, this specifies the data to be written into one ore two MRT targets. Possible values are @c depth, @c depth_normal and @c diffuse_specular
 
 @see Ogre::RTShader::NormalMapLighting::NormalMapSpace
 @see @ref Samplers
