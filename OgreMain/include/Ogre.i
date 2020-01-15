@@ -509,19 +509,12 @@ SHARED_PTR(Material);
 %include "OgreMaterialManager.h"
 %include "OgreRenderable.h"
 %include "OgreShadowCaster.h"
-#ifdef SWIGCSHARP
-%typemap(cscode) Ogre::MovableObject %{
-  public bool tryCastEntity(out Entity entity)
+%extend Ogre::MovableObject %{
+  Entity* castEntity()
   {
-	entity = null;
-
-    global::System.IntPtr cPtr = OgrePINVOKE.SWIG_CastMovableObjectToEntity(MovableObject.getCPtr(this).Handle);
-    entity = (cPtr == global::System.IntPtr.Zero) ? null : new Entity(cPtr, false);
-
-	return entity != null;
+    return dynamic_cast<Entity*>(this);	
   }
 %}
-#endif
 %include "OgreMovableObject.h"
     %include "OgreBillboardChain.h"
         %include "OgreRibbonTrail.h"
@@ -572,21 +565,6 @@ SHARED_PTR(Material);
     %template(SubEntityList) std::vector<Ogre::SubEntity*>;
     %ignore Ogre::Entity::getAttachedObjectIterator;
     %include "OgreEntity.h"
-	%inline %{
-		static void* SWIG_CastMovableObjectToEntity(void * jarg1)
-		{
-          void * jresult ;
-          Ogre::MovableObject *arg1 = (Ogre::MovableObject *) 0 ;
-          Ogre::Entity *result = 0 ;
-
-          arg1 = (Ogre::MovableObject *)jarg1;
-
-          result = dynamic_cast<Ogre::Entity *>(arg1);
-
-          jresult = (void *)result;
-          return jresult;
-		}
-	%}
     %include "OgreSubEntity.h"
     SHARED_PTR(ParticleSystem);
     %include "OgreParticleSystem.h"
