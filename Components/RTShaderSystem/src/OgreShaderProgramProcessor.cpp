@@ -298,8 +298,8 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
         const MergeCombination& curCombination = mParamMergeCombinations[i];
 
         // Case all parameters have been merged.
-        if (paramsTable[0].size() + paramsTable[1].size() + 
-            paramsTable[2].size() + paramsTable[3].empty())     
+        if (paramsTable[0].empty() && paramsTable[1].empty() &&
+            paramsTable[2].empty() && paramsTable[3].empty())
             return;     
 
         MergeParameter curMergeParam;
@@ -684,24 +684,11 @@ void ProgramProcessor::rebuildFunctionInvocations(const FunctionAtomInstanceList
 //-----------------------------------------------------------------------------
 void ProgramProcessor::buildParameterReferenceMap(const FunctionAtomInstanceList& funcAtomList, ParameterOperandMap& paramsRefMap)
 {
-    
-    FunctionAtomInstanceConstIterator it    = funcAtomList.begin();
-    FunctionAtomInstanceConstIterator itEnd = funcAtomList.end();
-
-    for (; it != itEnd; ++it)
+    for (const auto& func : funcAtomList)
     {
-        // Deal only with function invocations.
-        FunctionInvocation* curFuncInvocation = dynamic_cast<FunctionInvocation*>(*it);
-        if (curFuncInvocation)
+        for (Operand& curOperand : func->getOperandList())
         {
-            FunctionInvocation::OperandVector& funcOperands = curFuncInvocation->getOperandList();
-
-            for (unsigned int op=0; op < funcOperands.size(); ++op)
-            {
-                Operand& curOperand = funcOperands[op];
-
-                paramsRefMap[curOperand.getParameter().get()].push_back(&curOperand);
-            }
+            paramsRefMap[curOperand.getParameter().get()].push_back(&curOperand);
         }
     }
 }
