@@ -129,6 +129,10 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
                     addSubRenderState(subRenderState, dstTechniqueSchemeName, material->getName(), 
                         material->getGroup(), pass->getIndex());
                 }
+                else
+                {
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, prop->name);
+                }
             }
             else
             {
@@ -206,6 +210,10 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
                     if (subRenderState)
                     {
                         addSubRenderState(subRenderState, dstTechniqueSchemeName, material->getName(), material->getGroup(), pass->getIndex());
+                    }
+                    else
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, prop->name);
                     }
                 }               
             }
