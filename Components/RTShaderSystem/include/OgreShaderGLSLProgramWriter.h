@@ -37,7 +37,6 @@ namespace RTShader {
 
     class Function;
     class Program;
-    class FunctionInvocation;
 
 /** \addtogroup Optional
 *  @{

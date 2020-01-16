@@ -197,21 +197,13 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             os << ";" << std::endl;                     
         }
         os << std::endl;            
-        
-        const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-        FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
-        FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
 
-        for (; itAtom != itAtomEnd; ++itAtom)
-        {       
-            FunctionInvocation*  pFuncInvoc = (FunctionInvocation*)*itAtom;
-            FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
-            FunctionInvocation::OperandVector::iterator itOperandEnd = pFuncInvoc->getOperandList().end();
-
-            for (; itOperand != itOperandEnd; ++itOperand)
+        for (const auto& pFuncInvoc : curFunction->getAtomInstances())
+        {
+            for (auto& operand : pFuncInvoc->getOperandList())
             {
-                const ParameterPtr& param = itOperand->getParameter();
-                Operand::OpSemantic opSemantic = itOperand->getSemantic();
+                const ParameterPtr& param = operand.getParameter();
+                Operand::OpSemantic opSemantic = operand.getSemantic();
 
                 bool isInputParam =
                     std::find(inParams.begin(), inParams.end(), param) != inParams.end();
@@ -247,7 +239,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
                 if (gpuType == GPT_VERTEX_PROGRAM && isInputParam &&
                     param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
                 {
-                    itOperand->setMaskToParamType();
+                    operand.setMaskToParamType();
                 }
             }
 
