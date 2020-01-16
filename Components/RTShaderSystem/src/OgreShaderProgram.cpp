@@ -34,9 +34,12 @@ namespace RTShader {
 Program::Program(GpuProgramType type)
 {
     mType               = type;
-    mEntryPointFunction = NULL;
+    // all programs must have an entry point, nobody cares about FFT
+    mEntryPointFunction = new Function("main", "", Function::FFT_VS_MAIN);
     mSkeletalAnimation  = false;
     mColumnMajorMatrices = true;
+
+    mFunctions.push_back(mEntryPointFunction);
 }
 
 //-----------------------------------------------------------------------------
