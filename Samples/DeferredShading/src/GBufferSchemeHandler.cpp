@@ -34,13 +34,16 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
     Technique* originalTechnique = originalMaterial->getBestTechnique(lodIndex, rend);
     matMgr.setActiveScheme(curSchemeName);
 
+#ifndef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     Technique* gBufferTech = originalMaterial->createTechnique();
     gBufferTech->removeAllPasses();
-    gBufferTech->setSchemeName(schemeName);
+    gBufferTech->setSchemeName(schemeName)
+#endif
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
     rtShaderGen.createShaderBasedTechnique(originalTechnique, "NoGBuffer");
+    rtShaderGen.createShaderBasedTechnique(originalTechnique, "GBuffer");
 #else
     Technique* noGBufferTech = originalMaterial->createTechnique();
     noGBufferTech->removeAllPasses();
@@ -64,7 +67,20 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
             continue;
         }
 
-        Pass* newPass = gBufferTech->createPass();
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        rtShaderGen.validateMaterial("GBuffer", originalMaterial->getName(), originalMaterial->getGroup());
+        // Grab the generated technique.
+        for(Technique* curTech : originalMaterial->getTechniques())
+        {
+            if (curTech->getSchemeName() == schemeName)
+            {
+                return curTech;
+            }
+        }
+        break;
+#endif
+
+        Pass* newPass = 0;//gBufferTech->createPass();
         MaterialGenerator::Perm perm = getPermutation(props);
 
         const Ogre::MaterialPtr& templateMat = mMaterialGenerator.getMaterial(perm);
@@ -74,7 +90,7 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
         fillPass(newPass, originalPass, props);    
     }
     
-    return gBufferTech;
+    return NULL;// gBufferTech;
 }
 //! [schemenotfound]
 
