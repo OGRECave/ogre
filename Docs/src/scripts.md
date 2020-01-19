@@ -554,6 +554,7 @@ Here are the attributes you can use in a ’pass’ section of a .compositor scr
 -   [last\_render\_queue](#last_005frender_005fqueue)
 -   [thread_groups](#thread_groups)
 -   [material\_scheme](#compositor_005fpass_005fmaterial_005fscheme)
+-   [quad_normals](#quad_normals)
 
 <a name="material"></a><a name="material-1"></a>
 
@@ -621,7 +622,7 @@ Default: last\_render\_queue 95
 
 ## thread_groups
 
-Passes of type `compute` operate on an absract "compute space". This space is typically diveded into threads and thread groups (work groups). The size of a thread group is defined inside the compute shader itself. This defines how many groups should be launched.
+Passes of type `compute` operate on an abstract "compute space". This space is typically divided into threads and thread groups (work groups). The size of a thread group is defined inside the compute shader itself. This defines how many groups should be launched.
 
 @par
 Example: if you want to process a 256x256px image and have a thread group size of 16x16x1, you want to specify `16 16 1` here as well.
@@ -636,6 +637,17 @@ Format: thread_groups &lt;groups_x&gt; &lt;groups_y&gt; &lt;groups_z&gt;
 If set, indicates the material scheme to use for this pass only. Useful for performing special-case rendering effects. This will overwrite any scheme set in the parent @ref Compositor-Target-Passes.
 @par
 Format: material\_scheme &lt;scheme name&gt; 
+@par
+Default: None
+
+<a name="quad_normals"></a>
+
+## quad_normals
+
+Pass the camera Frustum far corner vectors in the quad normals for passes of type `quad`. This is particularly useful for efficiently reconstructing position using only the depth and the corners.
+
+@par
+Format: quad_normals &lt;camera_far_corners_world_space|camera_far_corners_view_space&gt;
 @par
 Default: None
 
