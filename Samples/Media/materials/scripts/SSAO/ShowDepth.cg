@@ -5,10 +5,10 @@ void ShowDepth_fp
     
     out float4 oColor0 : COLOR0,
 
-    uniform sampler mrt1: register(s0),
-    uniform sampler tex : register(s1)
+    uniform sampler mrt1: register(s0)
 )
 {
     float depth = tex2D(mrt1, iTexCoord).w;
-    oColor0 = float4(tex2D(tex, float2(depth*20, 0)).rgb, 1);
+    depth = pow(depth, 0.3);
+    oColor0 = float4(depth, depth, depth, 1);
 }

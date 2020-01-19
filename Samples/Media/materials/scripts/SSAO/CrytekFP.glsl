@@ -6,7 +6,6 @@ uniform sampler2D sRotSampler4x4;
 uniform vec4 cViewportSize; // auto param width/height/inv. width/inv. height
 uniform float cFov; // vertical field of view in radians
 uniform float farClipDistance;
-uniform float nearClipDistance;
 uniform float cSampleInScreenspace; // whether to sample in screen or world space
 uniform float cSampleLengthScreenSpace; // The sample length in screen space [0, 1]
 uniform float cSampleLengthWorldSpace; // the sample length in world space in units
@@ -19,11 +18,8 @@ void main()
 {
     const int nSampleNum = 32; // number of samples
 
-    // compute the distance between the clipping planes to convert [0, 1] depth to world space units
-    float clipDepth = farClipDistance - nearClipDistance;
-
     // get the depth of the current pixel and convert into world space unit [0, inf]
-    float fragmentWorldDepth = texture2D(sSceneDepthSampler, oUv0).w * clipDepth;
+    float fragmentWorldDepth = texture2D(sSceneDepthSampler, oUv0).w * farClipDistance;
 
     // get rotation vector, rotation is tiled every 4 screen pixels
     vec2 rotationTC = oUv0 * cViewportSize.xy / 4.0;
@@ -65,7 +61,7 @@ void main()
             vec2 sampleTC = oUv0 + rotatedOffset.xy * rUV;
                 
             // read scene depth at sampling point and convert into world space units (m or whatever)
-            float sampleWorldDepth = texture2D(sSceneDepthSampler, sampleTC).w * clipDepth;
+            float sampleWorldDepth = texture2D(sSceneDepthSampler, sampleTC).w * farClipDistance;
             
             // check if depths of both pixels are close enough and sampling point should affect our center pixel
             float fRangeIsInvalid = clamp((fragmentWorldDepth - sampleWorldDepth) / r, 0.0, 1.0);

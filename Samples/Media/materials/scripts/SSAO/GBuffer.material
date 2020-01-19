@@ -4,16 +4,9 @@ material SSAO/GBuffer
     {
         pass
         {	 
-            vertex_program_ref SSAO/GBuffer_vp
+            rtshader_system GBuffer
             {
-                param_named_auto cWorldViewProj worldviewproj_matrix
-                param_named_auto cWorldView worldview_matrix
-            }
-
-            fragment_program_ref SSAO/GBuffer_fp
-            {
-                param_named_auto cNearClipDistance near_clip_distance
-                param_named_auto cFarClipDistance far_clip_distance
+                lighting_stage gbuffer normal_viewdepth viewpos
             }
         }
     }

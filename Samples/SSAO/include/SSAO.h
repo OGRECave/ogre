@@ -65,6 +65,7 @@ public:
     SSAOGBufferSchemeHandler()
     {
         mGBufRefMat = Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
+        RTShader::ShaderGenerator::getSingleton().validateMaterial("SSAO/GBuffer", "GBuffer");
     }
 
     virtual ~SSAOGBufferSchemeHandler()
@@ -80,7 +81,7 @@ public:
             Technique* gBufferTech = originalMaterial->createTechnique();
             gBufferTech->setSchemeName(schemeName);
             Ogre::Pass* gbufPass = gBufferTech->createPass();
-            *gbufPass = *mGBufRefMat->getTechnique(0)->getPass(0);
+            *gbufPass = *mGBufRefMat->getTechnique(1)->getPass(0);
             return gBufferTech;
     }
 private:
