@@ -489,13 +489,15 @@ namespace Ogre
         Real getSquaredViewDepth(const Camera* cam) const override;
         const LightList& getLights(void) const override;
 
+        typedef Vector3 Corners[8];
+
         /** Gets the world space corners of the frustum.
         @remarks
             The corners are ordered as follows: top-right near, 
             top-left near, bottom-left near, bottom-right near, 
             top-right far, top-left far, bottom-left far, bottom-right far.
         */
-        virtual const Vector3* getWorldSpaceCorners(void) const;
+        virtual const Corners& getWorldSpaceCorners(void) const;
 
         /** Sets the type of projection to use (orthographic or perspective). Default is perspective.
         */

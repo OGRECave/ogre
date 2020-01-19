@@ -943,7 +943,7 @@ namespace Ogre {
         mRecalcWorldSpaceCorners = true;
     }
     // -------------------------------------------------------------------
-    const Vector3* Frustum::getWorldSpaceCorners(void) const
+    const Frustum::Corners& Frustum::getWorldSpaceCorners(void) const
     {
         updateWorldSpaceCorners();
 
