@@ -43,7 +43,6 @@ material SSAO/Crytek
             {
                 param_named_auto cViewportSize viewport_size
                 param_named_auto farClipDistance far_clip_distance
-                param_named_auto nearClipDistance near_clip_distance
                 param_named_auto cFov fov
 				
 				param_named cSampleInScreenspace float 0
