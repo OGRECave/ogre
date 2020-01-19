@@ -933,7 +933,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    const Vector3* Camera::getWorldSpaceCorners(void) const
+    const Frustum::Corners& Camera::getWorldSpaceCorners(void) const
     {
         if (mCullFrustum)
         {

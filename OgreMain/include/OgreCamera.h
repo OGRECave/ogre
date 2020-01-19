@@ -588,7 +588,7 @@ namespace Ogre {
         /// @copydoc Frustum::isVisible(const Vector3&, FrustumPlane*) const
         bool isVisible(const Vector3& vert, FrustumPlane* culledBy = 0) const;
         /// @copydoc Frustum::getWorldSpaceCorners
-        const Vector3* getWorldSpaceCorners(void) const;
+        const Corners& getWorldSpaceCorners(void) const;
         /// @copydoc Frustum::getFrustumPlane
         const Plane& getFrustumPlane( unsigned short plane ) const;
         /// @copydoc Frustum::projectSphere
