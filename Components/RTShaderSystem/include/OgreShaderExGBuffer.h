@@ -54,7 +54,9 @@ public:
     enum TargetLayout
     {
         TL_DEPTH,
-        TL_DEPTH_NORMAL,
+        TL_NORMAL,
+        TL_VIEWPOS,
+        TL_NORMAL_VIEWDEPTH,
         TL_DIFFUSE_SPECULAR,
     };
     typedef std::vector<TargetLayout> TargetBuffers;
@@ -86,9 +88,10 @@ public:
     static String Type;
 
 private:
-    void addDepthInvocations(ProgramSet* programSet, const ParameterPtr& out) const;
-    void addNormalInvocations(ProgramSet* programSet, const ParameterPtr& out) const ;
-    void addDiffuseSpecularInvocations(ProgramSet* programSet, const ParameterPtr& out) const;
+    static void addViewPosInvocations(ProgramSet* programSet, const ParameterPtr& out, bool depthOnly);
+    static void addDepthInvocations(ProgramSet* programSet, const ParameterPtr& out);
+    static void addNormalInvocations(ProgramSet* programSet, const ParameterPtr& out) ;
+    static void addDiffuseSpecularInvocations(ProgramSet* programSet, const ParameterPtr& out);
 
     TargetBuffers mOutBuffers;
 };

@@ -97,4 +97,9 @@ void FFP_Normalize(inout float3 vIn)
 	vIn /= length(vIn);
 }
 
+void FFP_Length(in float3 vIn, out float vOut)
+{
+	vOut = length(vIn);
+}
+
 
