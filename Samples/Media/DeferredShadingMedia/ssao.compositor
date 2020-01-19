@@ -31,6 +31,8 @@ compositor DeferredShading/SSAO
                 // our SSAO listener number
                 identifier 42
 
+                quad_normals camera_far_corners_view_space
+
                 material ssao
                 // pass in the "geometry map"
                 input 0 geom 1
