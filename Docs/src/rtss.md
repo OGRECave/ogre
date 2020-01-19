@@ -59,7 +59,7 @@ Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 Sa
 
 @param normalised with @c ffp or @c per_pixel @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
 @param texturename normal map to use with @c normal_map
-@param target_layout with @c gbuffer, this specifies the data to be written into one ore two MRT targets. Possible values are @c depth, @c depth_normal and @c diffuse_specular
+@param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
 
 @see Ogre::RTShader::NormalMapLighting::NormalMapSpace
 @see @ref Samplers

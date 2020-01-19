@@ -45,7 +45,7 @@ int GBuffer::getExecutionOrder() const { return FFP_LIGHTING; }
 
 bool GBuffer::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-    srcPass->setLightingEnabled(false); // disable receiving shadows
+    srcPass->getParent()->getParent()->setReceiveShadows(false);
     return true;
 }
 
@@ -61,11 +61,17 @@ bool GBuffer::createCpuSubPrograms(ProgramSet* programSet)
 
         switch(mOutBuffers[i])
         {
-        case TL_DEPTH_NORMAL:
-            addNormalInvocations(programSet, out);
-            OGRE_FALLTHROUGH;
         case TL_DEPTH:
             addDepthInvocations(programSet, out);
+            break;
+        case TL_NORMAL_VIEWDEPTH:
+            addViewPosInvocations(programSet, out, true);
+            OGRE_FALLTHROUGH;
+        case TL_NORMAL:
+            addNormalInvocations(programSet, out);
+            break;
+        case TL_VIEWPOS:
+            addViewPosInvocations(programSet, out, false);
             break;
         case TL_DIFFUSE_SPECULAR:
             addDiffuseSpecularInvocations(programSet, out);
@@ -78,7 +84,37 @@ bool GBuffer::createCpuSubPrograms(ProgramSet* programSet)
     return true;
 }
 
-void GBuffer::addDepthInvocations(ProgramSet* programSet, const ParameterPtr& out) const
+void GBuffer::addViewPosInvocations(ProgramSet* programSet, const ParameterPtr& out, bool depthOnly)
+{
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
+    Function* vsMain = vsProgram->getMain();
+    Function* psMain = psProgram->getMain();
+
+    // vertex shader
+    auto vstage = vsMain->getStage(FFP_VS_POST_PROCESS);
+    auto vsInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
+    auto vsOutPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
+    auto worldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
+    vstage.callFunction(FFP_FUNC_TRANSFORM, worldViewMatrix, vsInPosition, vsOutPos);
+
+    // fragment shader
+    auto fstage = psMain->getStage(FFP_PS_COLOUR_END);
+    auto viewPos = psMain->resolveInputParameter(vsOutPos);
+
+    if(depthOnly)
+    {
+        auto far = psProgram->resolveParameter(GpuProgramParameters::ACT_FAR_CLIP_DISTANCE);
+        fstage.callFunction("FFP_Length", viewPos, Out(out).w());
+        fstage.div(In(out).w(), far, Out(out).w());
+        return;
+    }
+
+    fstage.assign(viewPos, Out(out).xyz());
+    fstage.assign(0, Out(out).w());
+}
+
+void GBuffer::addDepthInvocations(ProgramSet* programSet, const ParameterPtr& out)
 {
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
@@ -111,7 +147,7 @@ void GBuffer::addDepthInvocations(ProgramSet* programSet, const ParameterPtr& ou
     }
 }
 
-void GBuffer::addNormalInvocations(ProgramSet* programSet, const ParameterPtr& out) const
+void GBuffer::addNormalInvocations(ProgramSet* programSet, const ParameterPtr& out)
 {
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Function* vsMain = vsProgram->getMain();
@@ -123,13 +159,14 @@ void GBuffer::addNormalInvocations(ProgramSet* programSet, const ParameterPtr& o
     auto vsOutNormal = vsMain->resolveOutputParameter(Parameter::SPC_NORMAL_VIEW_SPACE);
     auto worldViewITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_NORMAL_MATRIX);
     vstage.callFunction(FFP_FUNC_TRANSFORM, worldViewITMatrix, vsInNormal, vsOutNormal);
+    vstage.callFunction(FFP_FUNC_NORMALIZE, vsOutNormal);
 
     // pass through
     auto fstage = psMain->getStage(FFP_PS_COLOUR_END);
-    fstage.assign(psMain->resolveInputParameter(vsOutNormal), Out(out).mask(Operand::OPM_YZW));
+    fstage.assign(psMain->resolveInputParameter(vsOutNormal), Out(out).xyz());
 }
 
-void GBuffer::addDiffuseSpecularInvocations(ProgramSet* programSet, const ParameterPtr& out) const
+void GBuffer::addDiffuseSpecularInvocations(ProgramSet* programSet, const ParameterPtr& out)
 {
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* psMain = psProgram->getMain();
@@ -157,8 +194,12 @@ static GBuffer::TargetLayout translate(const String& val)
 {
     if(val == "depth")
         return GBuffer::TL_DEPTH;
-    if(val == "depth_normal")
-        return GBuffer::TL_DEPTH_NORMAL;
+    if(val == "normal")
+        return GBuffer::TL_NORMAL;
+    if(val == "viewpos")
+        return GBuffer::TL_VIEWPOS;
+    if(val == "normal_viewdepth")
+        return GBuffer::TL_NORMAL_VIEWDEPTH;
     return GBuffer::TL_DIFFUSE_SPECULAR;
 }
 
