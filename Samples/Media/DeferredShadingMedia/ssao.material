@@ -163,6 +163,7 @@ material ssao
 
             fragment_program_ref ssao_ps
             {
+                param_named_auto far far_clip_distance
             }
 
             texture_unit geomMap
