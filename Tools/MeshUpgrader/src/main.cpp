@@ -980,7 +980,7 @@ struct MaterialCreator : public MeshSerializerListener
     void processMaterialName(Mesh *mesh, String *name)
     {
         // create material because we do not load any .material files
-        MaterialManager::getSingleton().create(*name, mesh->getGroup());
+        MaterialManager::getSingleton().createOrRetrieve(*name, mesh->getGroup());
     }
 
     void processSkeletonName(Mesh *mesh, String *name) {}
