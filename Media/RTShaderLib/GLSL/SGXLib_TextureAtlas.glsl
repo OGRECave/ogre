@@ -4,7 +4,6 @@
 // Program Type: Vertex/Pixel shader
 // Language: GLSL
 //-----------------------------------------------------------------------------
-#extension GL_ARB_shader_texture_lod : require
 
 float mipmapLevel(in vec2 coords, in vec2 texSize)
 {
