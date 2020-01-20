@@ -140,6 +140,79 @@ namespace Ogre {
 
             return invoc;
         }
+        //-----------------------------------------------------------------------
+        void GLSLESProgramWriter::writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func,
+                                                         bool writeParamName)
+        {
+            os << func.getReturnType() << " " << func.getFunctionName() << "(";
+
+            FunctionInvocation::OperandVector::iterator itOperand    = func.getOperandList().begin();
+            FunctionInvocation::OperandVector::iterator itOperandEnd = func.getOperandList().end();
+            for (; itOperand != itOperandEnd;)
+            {
+              const ParameterPtr& param = itOperand->getParameter();
+              Operand::OpSemantic opSemantic = itOperand->getSemantic();
+              int opMask = itOperand->getMask();
+              GpuConstantType gpuType = GCT_UNKNOWN;
+
+              switch(opSemantic)
+              {
+              case Operand::OPS_IN:
+                  os << "in ";
+                  break;
+
+              case Operand::OPS_OUT:
+                  os << "out ";
+                  break;
+
+              case Operand::OPS_INOUT:
+                  os << "inout ";
+                  break;
+
+              default:
+                  break;
+              }
+
+              // Swizzle masks are only defined for types like vec2, vec3, vec4.
+              if (opMask == Operand::OPM_ALL)
+              {
+                  gpuType = param->getType();
+              }
+              else
+              {
+                  // Now we have to convert the mask to operator
+                  gpuType = Operand::getGpuConstantType(opMask);
+              }
+
+              // We need a valid type otherwise glsl compilation will not work
+              if (gpuType == GCT_UNKNOWN)
+              {
+                  OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+                      "Can not convert Operand::OpMask to GpuConstantType",
+                      "GLSLProgramWriter::writeFunctionDeclaration" );
+              }
+
+              // Write the operand type.
+              os << mGpuConstTypeMap[gpuType];
+
+              if(writeParamName)
+                  os << " " << param->getName();
+
+              ++itOperand;
+              //move over all operators with indirection
+              while ((itOperand != itOperandEnd) && (itOperand->getIndirectionLevel() != 0))
+              {
+                  ++itOperand;
+              }
+
+              // Prepare for the next operand
+              if (itOperand != itOperandEnd)
+              {
+                  os << ", ";
+              }
+            }
+            os << ")";
+        }
         
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::discoverFunctionDependencies(const FunctionInvocation &invoc, FunctionVector &depVector)
@@ -241,7 +314,7 @@ namespace Ogre {
             os<< std::endl;
 
             // Embed dependencies.
-            writeProgramDependencies(os, program);
+            copyProgramDependencies(os, program);
             os << std::endl;
             writeMainSourceCode(os, program);
         }
@@ -256,7 +329,7 @@ namespace Ogre {
         // 4. When we reach the last closing brace, write the function and its signature to the output stream
         // 5. Go back to step 1 until we have found all the functions
         //
-        void GLSLESProgramWriter::writeProgramDependencies(
+        void GLSLESProgramWriter::copyProgramDependencies(
             std::ostream& os, 
             Program* program)
         {

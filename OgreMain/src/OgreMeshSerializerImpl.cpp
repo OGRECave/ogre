@@ -1044,6 +1044,7 @@ namespace Ogre {
         if (!stream->eof())
         {
             streamID = readChunk(stream);
+            bool seenTexAlias = false;
             while(!stream->eof() &&
                 (streamID == M_SUBMESH_BONE_ASSIGNMENT ||
                  streamID == M_SUBMESH_OPERATION ||
@@ -1058,6 +1059,7 @@ namespace Ogre {
                     readSubMeshBoneAssignment(stream, pMesh, sm);
                     break;
                 case M_SUBMESH_TEXTURE_ALIAS:
+                    seenTexAlias = true;
                     readSubMeshTextureAlias(stream, pMesh, sm);
                     break;
                 }
@@ -1068,6 +1070,11 @@ namespace Ogre {
                 }
 
             }
+
+            if (seenTexAlias)
+                LogManager::getSingleton().logWarning("texture aliases for SubMeshes are deprecated - " +
+                                                      stream->getName());
+
             if (!stream->eof())
             {
                 // Backpedal back to start of stream

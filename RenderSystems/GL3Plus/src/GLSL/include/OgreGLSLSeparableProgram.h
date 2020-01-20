@@ -74,16 +74,8 @@ namespace Ogre
     {
     public:
         /// Constructor should only be used by GLSLSeparableProgramManager.
-        GLSLSeparableProgram(GLSLShader* vertexShader,
-                             GLSLShader* hullShader,
-                             GLSLShader* domainShader,
-                             GLSLShader* geometryShader,
-                             GLSLShader* fragmentShader,
-                             GLSLShader* computeShader);
+        explicit GLSLSeparableProgram(const GLShaderList& shaders);
         ~GLSLSeparableProgram();
-
-        /// GL Program Pipeline Handle
-        GLuint getGLProgramPipelineHandle() const { return mGLProgramPipelineHandle; }
 
         /** Updates program pipeline object uniforms using named and
             indexed parameter data from GpuProgramParameters.
@@ -111,9 +103,6 @@ namespace Ogre
 
         /// Compiles and links the separate programs.
         void compileAndLink(void);
-        void loadIndividualProgram(GLSLShader *program);
-        /// Build uniform references from active named uniforms.
-        void buildGLUniformReferences(void);
 
         void getMicrocodeFromCache(void);
         void getIndividualProgramMicrocodeFromCache(GLSLShader* program);

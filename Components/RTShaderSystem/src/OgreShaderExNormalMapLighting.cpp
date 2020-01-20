@@ -144,8 +144,9 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
     
-    // Resolve normal map texture sampler parameter.        
-    mPSNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
+    // Resolve normal map texture sampler parameter.
+    if(!mLightParamsList.empty())
+        mPSNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
 
     // Get surface ambient colour if need to.
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
@@ -357,8 +358,9 @@ bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
 
     auto stage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
 
-    // Add the normal fetch function invocation.
-    stage.callFunction(SGX_FUNC_FETCHNORMAL, mPSNormalMapSampler, mPSInTexcoord, mViewNormal);
+    // Add the normal fetch function invocation
+    if(!mLightParamsList.empty())
+        stage.callFunction(SGX_FUNC_FETCHNORMAL, mPSNormalMapSampler, mPSInTexcoord, mViewNormal);
     
     // Add the global illumination functions.
     addPSGlobalIlluminationInvocation(stage);

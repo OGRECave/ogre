@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreHardwareCounterBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreHardwareUniformBuffer.h"
 #include "OgreHardwareVertexBuffer.h"
@@ -121,32 +120,6 @@ namespace Ogre {
         void unlock(void);
     };
 
-    /// Specialisation of HardwareCounterBuffer for emulation
-    class _OgreExport DefaultHardwareCounterBuffer : public HardwareCounterBuffer
-    {
-    protected:
-        unsigned char* mData;
-        /** See HardwareBuffer. */
-        void* lockImpl(size_t offset, size_t length, LockOptions options);
-        /** See HardwareBuffer. */
-        void unlockImpl(void);
-        /**  */
-        //bool updateStructure(const Any& renderSystemInfo);
-
-    public:
-        DefaultHardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer = false, const String& name = "");
-        ~DefaultHardwareCounterBuffer();
-        /** See HardwareBuffer. */
-        void readData(size_t offset, size_t length, void* pDest);
-        /** See HardwareBuffer. */
-        void writeData(size_t offset, size_t length, const void* pSource,
-                       bool discardWholeBuffer = false);
-        /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
-        /** Override HardwareBuffer to turn off all shadowing. */
-        void unlock(void);
-    };
-
     /** Specialisation of HardwareBufferManagerBase to emulate hardware buffers.
     @remarks
         You might want to instantiate this class if you want to utilise
@@ -167,8 +140,6 @@ namespace Ogre {
         HardwareIndexBufferSharedPtr 
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
                 HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-        /// Create a hardware vertex buffer
-        RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
         /// Create a hardware uniform buffer
         HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
                                     HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 

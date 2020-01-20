@@ -50,8 +50,6 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : GLSLShaderCommon(creator, name, handle, group, isManual, loader)
-        , mGLShaderHandle(0)
-        , mGLProgramHandle(0)
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         , mIsOptimised(false)
         , mOptimiserEnabled(false)
@@ -97,7 +95,7 @@ namespace Ogre {
     void GLSLESProgram::notifyOnContextReset()
     {
         try {
-            compile(true);
+            loadFromSource();
         }
         catch(Exception& e)
         {
@@ -106,24 +104,39 @@ namespace Ogre {
         }
     }
 #endif
-    GLuint GLSLESProgram::createGLProgramHandle() {
-        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            return 0;
+    bool GLSLESProgram::linkSeparable()
+    {
+        if(mLinked)
+            return true;
 
-        if (mGLProgramHandle)
-            return mGLProgramHandle;
+        uint32 hash = _getHash();
 
-        OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
+        if (GLSLESProgramCommon::getMicrocodeFromCache(hash, mGLProgramHandle))
         {
-            glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
+            mLinked = true;
+        }
+        else
+        {
+            if( mType == GPT_VERTEX_PROGRAM )
+                GLSLESProgramCommon::bindFixedAttributes( mGLProgramHandle );
+
+            OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(mGLProgramHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
+            attachToProgramObject(mGLProgramHandle);
+            OGRE_CHECK_GL_ERROR(glLinkProgram(mGLProgramHandle));
+            OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &mLinked));
+
+            GLSLES::logObjectInfo( mName + String("GLSL vertex program result : "), mGLProgramHandle );
+
+            GLSLESProgramCommon::_writeToCache(hash, mGLProgramHandle);
         }
 
-        return mGLProgramHandle;
+        return mLinked;
     }
 
-    bool GLSLESProgram::compile(bool checkErrors)
+    void GLSLESProgram::loadFromSource()
     {
+        const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
+
         // Only create a shader object if glsl es is supported
         if (isSupported())
         {
@@ -139,15 +152,20 @@ namespace Ogre {
             }
             OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
 
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
+            if(caps->hasCapability(RSC_DEBUG))
             {
                 glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
             }
 
-            createGLProgramHandle();
+            // also create program object
+            if (caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            {
+                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+                if (caps->hasCapability(RSC_DEBUG))
+                    OGRE_CHECK_GL_ERROR(
+                        glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str()));
+            }
         }
-
-        const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
 
         // Add preprocessor extras and main source
         if (!mSource.empty())
@@ -197,16 +215,6 @@ namespace Ogre {
         int compiled;
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
 
-        if(!checkErrors)
-            return compiled == 1;
-
-        if(!compiled && caps->getVendor() == GPU_QUALCOMM)
-        {
-            String message = GLSLES::getObjectInfo(mGLShaderHandle);
-            checkAndFixInvalidDefaultPrecisionError(message);
-            OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &compiled));
-        }
-
         String compileInfo = GLSLES::getObjectInfo(mGLShaderHandle);
 
         if (!compiled)
@@ -215,8 +223,6 @@ namespace Ogre {
         // probably we have warnings
         if (!compileInfo.empty())
             LogManager::getSingleton().stream(LML_WARNING) << getResourceLogName() << " " << compileInfo;
-
-        return compiled == 1;
     }
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER   
@@ -269,6 +275,8 @@ namespace Ogre {
 
         // Therefore instead, parse the source code manually and extract the uniforms
         createParameterMappingStructures(true);
+        mFloatLogicalToPhysical.reset();
+        mIntLogicalToPhysical.reset();
         GLSLESProgramManager::getSingleton().extractUniformsFromGLSL(mSource, *mConstantDefs, mName);
     }
 
@@ -311,58 +319,5 @@ namespace Ogre {
         GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
         params->setTransposeMatrices(true);
         return params;
-    }
-    //-----------------------------------------------------------------------
-    void GLSLESProgram::checkAndFixInvalidDefaultPrecisionError( String &message )
-    {
-        String precisionQualifierErrorString = ": 'Default Precision Qualifier' : invalid type Type for default precision qualifier can be only float or int";
-        std::vector< String > linesOfSource = StringUtil::split(mSource, "\n");
-        if( message.find(precisionQualifierErrorString) != String::npos )
-        {
-            LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling");
-
-            // remove relevant lines from source
-            std::vector< String > errors = StringUtil::split(message, "\n");
-
-            // going from the end so when we delete a line the numbers of the lines before will not change
-            for(int i = static_cast<int>(errors.size()) - 1 ; i != -1 ; i--)
-            {
-                String & curError = errors[i];
-                size_t foundPos = curError.find(precisionQualifierErrorString);
-                if(foundPos != String::npos)
-                {
-                    String lineNumber = curError.substr(0, foundPos);
-                    size_t posOfStartOfNumber = lineNumber.find_last_of(':');
-                    if (posOfStartOfNumber != String::npos)
-                    {
-                        lineNumber = lineNumber.substr(posOfStartOfNumber + 1, lineNumber.size() - (posOfStartOfNumber + 1));
-                        if (StringConverter::isNumber(lineNumber))
-                        {
-                            int iLineNumber = StringConverter::parseInt(lineNumber);
-                            linesOfSource.erase(linesOfSource.begin() + iLineNumber - 1);
-                        }
-                    }
-                }
-            }   
-            // rebuild source
-            StringStream newSource; 
-            for(size_t i = 0; i < linesOfSource.size()  ; i++)
-            {
-                newSource << linesOfSource[i] << "\n";
-            }
-            mSource = newSource.str();
-
-            const char *source = mSource.c_str();
-            OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
-
-            if (compile())
-            {
-                LogManager::getSingleton().logMessage("The removing of the lines fixed the invalid type Type for default precision qualifier error.");
-            }
-            else
-            {
-                LogManager::getSingleton().logMessage("The removing of the lines didn't help.");
-            }
-        }
     }
 }

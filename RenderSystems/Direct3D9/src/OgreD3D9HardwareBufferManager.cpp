@@ -135,31 +135,6 @@ namespace Ogre {
             
     }
     //-----------------------------------------------------------------------
-    RenderToVertexBufferSharedPtr 
-        D3D9HardwareBufferManager::createRenderToVertexBuffer()
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-            "Direct3D9 does not support render to vertex buffer objects", 
-            "D3D9HardwareBufferManager::createRenderToVertexBuffer");
-    }
-    //---------------------------------------------------------------------
-    HardwareUniformBufferSharedPtr 
-        D3D9HardwareBufferManager::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "Uniform buffer not supported in Direct3D 9 RenderSystem.",
-                "D3D9HardwareBufferManager::createUniformBuffer");
-    }
-    //-----------------------------------------------------------------------
-    HardwareCounterBufferSharedPtr
-    D3D9HardwareBufferManager::createCounterBuffer(size_t sizeBytes,
-                                                          HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "D3D9 does not support atomic counter buffers",
-                    "D3D9HardwareBufferManager::createCounterBuffer");
-    }
-    //-----------------------------------------------------------------------
     VertexDeclaration* D3D9HardwareBufferManager::createVertexDeclarationImpl(void)
     {
         return OGRE_NEW D3D9VertexDeclaration();

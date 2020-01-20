@@ -79,6 +79,7 @@ THE SOFTWARE.
 #include "OgreShaderExDualQuaternionSkinning.h"
 #include "OgreShaderExTextureAtlasSampler.h"
 #include "OgreShaderExTriplanarTexturing.h"
+#include "OgreShaderExGBuffer.h"
 
 #include "OgreShaderCGProgramProcessor.h"
 #include "OgreShaderHLSLProgramProcessor.h"

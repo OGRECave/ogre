@@ -3,7 +3,6 @@
 
 #include "SdkSample.h"
 #include "OgreInstancedEntity.h"
-#include "MersenneTwister.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -98,8 +97,6 @@ protected:
     OgreBites::Button                   *mDefragmentBatches;
     CheckBox                        *mDefragmentOptimumCull;
     Slider                          *mInstancesSlider;
-
-    MersenneTwister randGenerator;
 };
 
 #endif

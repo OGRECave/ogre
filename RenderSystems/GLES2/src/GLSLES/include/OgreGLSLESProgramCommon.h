@@ -44,34 +44,18 @@ namespace Ogre {
     class _OgreGLES2Export GLSLESProgramCommon : public GLSLProgramCommon MANAGED_RESOURCE
     {
     protected:
-        /// Linked fragment program
-        GLSLESProgram* mFragmentProgram;
-
-        Ogre::String getCombinedName(void);
-        /// Get the the binary data of a program from the microcode cache
-        static bool getMicrocodeFromCache(uint32 id, GLuint programHandle);
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         virtual void notifyOnContextLost();
 
         virtual void notifyOnContextReset();
 #endif
-
-        static void _writeToCache(uint32 id, GLuint programHandle);
-
         /// Constructor should only be used by GLSLESLinkProgramManager and GLSLESProgramPipelineManager
-        GLSLESProgramCommon(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram);
+        GLSLESProgramCommon(const GLShaderList& shaders);
     public:
-
-        void bindFixedAttributes(GLuint program);
-
-        GLSLESProgram* getVertexProgram(void) const { return static_cast<GLSLESProgram*>(mVertexShader); }
-        GLSLESProgram* getFragmentProgram(void) const { return mFragmentProgram; }
-
-        bool isUsingShader(GLSLShaderCommon* shader) const
-        {
-            return mVertexShader == shader || (GLSLShaderCommon*)mFragmentProgram == shader;
-        }
+        /// Get the the binary data of a program from the microcode cache
+        static bool getMicrocodeFromCache(uint32 id, GLuint programHandle);
+        static void _writeToCache(uint32 id, GLuint programHandle);
+        static void bindFixedAttributes(GLuint program);
     };
 }
 

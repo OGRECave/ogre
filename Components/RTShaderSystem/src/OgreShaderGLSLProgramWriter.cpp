@@ -126,13 +126,9 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
         os << getGL3CompatDefines();
     }
 
-    // Generate source code header.
-    writeProgramTitle(os, program);
-    os<< std::endl;
-
-    // Write forward declarations
-    writeForwardDeclarations(os, program);
-    os<< std::endl;
+    // Generate dependencies.
+    writeProgramDependencies(os, program);
+    os << std::endl;
 
     writeMainSourceCode(os, program);
 }
@@ -201,21 +197,13 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             os << ";" << std::endl;                     
         }
         os << std::endl;            
-        
-        const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-        FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
-        FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
 
-        for (; itAtom != itAtomEnd; ++itAtom)
-        {       
-            FunctionInvocation*  pFuncInvoc = (FunctionInvocation*)*itAtom;
-            FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
-            FunctionInvocation::OperandVector::iterator itOperandEnd = pFuncInvoc->getOperandList().end();
-
-            for (; itOperand != itOperandEnd; ++itOperand)
+        for (const auto& pFuncInvoc : curFunction->getAtomInstances())
+        {
+            for (auto& operand : pFuncInvoc->getOperandList())
             {
-                const ParameterPtr& param = itOperand->getParameter();
-                Operand::OpSemantic opSemantic = itOperand->getSemantic();
+                const ParameterPtr& param = operand.getParameter();
+                Operand::OpSemantic opSemantic = operand.getSemantic();
 
                 bool isInputParam =
                     std::find(inParams.begin(), inParams.end(), param) != inParams.end();
@@ -251,7 +239,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
                 if (gpuType == GPT_VERTEX_PROGRAM && isInputParam &&
                     param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
                 {
-                    itOperand->setMaskToParamType();
+                    operand.setMaskToParamType();
                 }
             }
 
@@ -265,127 +253,17 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func,
-                                                 bool writeParamName)
-{
-    os << func.getReturnType() << " " << func.getFunctionName() << "(";
-
-    FunctionInvocation::OperandVector::iterator itOperand    = func.getOperandList().begin();
-    FunctionInvocation::OperandVector::iterator itOperandEnd = func.getOperandList().end();
-    for (; itOperand != itOperandEnd;)
-    {
-      const ParameterPtr& param = itOperand->getParameter();
-      Operand::OpSemantic opSemantic = itOperand->getSemantic();
-      int opMask = itOperand->getMask();
-      GpuConstantType gpuType = GCT_UNKNOWN;
-
-      switch(opSemantic)
-      {
-      case Operand::OPS_IN:
-          os << "in ";
-          break;
-
-      case Operand::OPS_OUT:
-          os << "out ";
-          break;
-
-      case Operand::OPS_INOUT:
-          os << "inout ";
-          break;
-
-      default:
-          break;
-      }
-
-      // Swizzle masks are only defined for types like vec2, vec3, vec4.
-      if (opMask == Operand::OPM_ALL)
-      {
-          gpuType = param->getType();
-      }
-      else
-      {
-          // Now we have to convert the mask to operator
-          gpuType = Operand::getGpuConstantType(opMask);
-      }
-
-      // We need a valid type otherwise glsl compilation will not work
-      if (gpuType == GCT_UNKNOWN)
-      {
-          OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
-              "Can not convert Operand::OpMask to GpuConstantType",
-              "GLSLProgramWriter::writeFunctionDeclaration" );
-      }
-
-      // Write the operand type.
-      os << mGpuConstTypeMap[gpuType];
-
-      if(writeParamName)
-          os << " " << param->getName();
-
-      ++itOperand;
-      //move over all operators with indirection
-      while ((itOperand != itOperandEnd) && (itOperand->getIndirectionLevel() != 0))
-      {
-          ++itOperand;
-      }
-
-      // Prepare for the next operand
-      if (itOperand != itOperandEnd)
-      {
-          os << ", ";
-      }
-    }
-    os << ")";
-}
-
-//-----------------------------------------------------------------------
-void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* program)
+void GLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
 {
     os << "//-----------------------------------------------------------------------------" << std::endl;
-    os << "//                         FORWARD DECLARATIONS" << std::endl;
+    os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
 
-    StringVector forwardDecl; // holds all generated function declarations 
-    const ShaderFunctionList& functionList = program->getFunctions();
-    ShaderFunctionConstIterator itFunction;
-
-    // Iterate over all functions in the current program (in our case this is always the main() function)
-    for ( itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
+    for (unsigned int i=0; i < program->getDependencyCount(); ++i)
     {
-        Function* curFunction = *itFunction;
-        const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-        FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
-        FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
-
-        // Now iterate over all function atoms
-        for ( ; itAtom != itAtomEnd; ++itAtom)
-        {   
-            // Skip non function invocation atoms.
-            if (!dynamic_cast<const FunctionInvocation*>(*itAtom))
-                continue;
-
-            FunctionInvocation* pFuncInvoc = static_cast<FunctionInvocation*>(*itAtom);
-
-            StringStream funcDecl;
-            writeFunctionDeclaration(funcDecl, *pFuncInvoc, false);
-
-            // Push the generated declaration into the vector
-            // duplicate declarations will be removed later.
-            forwardDecl.push_back(funcDecl.str());
-        }
-    }
-
-    // Now remove duplicate declaration, first we have to sort the vector.
-    std::sort(forwardDecl.begin(), forwardDecl.end());
-    StringVector::iterator endIt = std::unique(forwardDecl.begin(), forwardDecl.end()); 
-
-    // Finally write all function declarations to the shader file
-    for (StringVector::iterator it = forwardDecl.begin(); it != endIt; ++it)
-    {
-        os << *it << ";\n";
+        os << "#include \"" << program->getDependency(i) << ".glsl\"" << std::endl;
     }
 }
-
 //-----------------------------------------------------------------------
 void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
 {
@@ -405,6 +283,11 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             if(paramContent == Parameter::SPC_POINTSPRITE_COORDINATE)
             {
                 pParam->_rename("gl_PointCoord");
+                continue;
+            }
+            else if(paramContent == Parameter::SPC_POSITION_PROJECTIVE_SPACE)
+            {
+                pParam->_rename("gl_FragCoord");
                 continue;
             }
 
@@ -430,8 +313,8 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             // according there content.
             pParam->_rename(mContentToPerVertexAttributes[paramContent]);
 
-            // After GLSL 1.40 attribute is deprecated
-            if (mGLSLVersion >= 140 || (mGLSLVersion > 100 && mIsGLSLES))
+            // After GLSL 1.20 attribute is deprecated
+            if (mGLSLVersion > 120 || (mGLSLVersion > 100 && mIsGLSLES))
             {
                 os << "in\t";
             }
@@ -440,15 +323,16 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 os << "attribute\t";
             }
 
-            // all uv texcoords passed by ogre are vec4
-            if (paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE1 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE2 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE3 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE4 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE5 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE6 ||
-                paramContent == Parameter::SPC_TEXTURE_COORDINATE7 )
+            // all uv texcoords passed by ogre are at least vec4
+            if ((paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE1 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE2 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE3 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE4 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE5 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE6 ||
+                 paramContent == Parameter::SPC_TEXTURE_COORDINATE7) &&
+                (pParam->getType() < GCT_FLOAT4))
             {
                 os << "vec4";
             }
@@ -534,9 +418,9 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
         else if(gpuType == GPT_FRAGMENT_PROGRAM &&
                 pParam->getSemantic() == Parameter::SPS_COLOR)
         {                   
-            // GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 130)
+            // GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 120)
             // Always add gl_FragColor as an output.  The name is for compatibility.
-            if(mGLSLVersion <= 130 || (mIsGLSLES && mGLSLVersion == 100))
+            if(mGLSLVersion <= 120 || (mIsGLSLES && mGLSLVersion == 100))
             {
                 pParam->_rename("gl_FragColor");
             }

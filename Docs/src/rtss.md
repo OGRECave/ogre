@@ -17,13 +17,30 @@ To modify the default lighting stage [see below](@ref rtss_custom_api). For more
 
 Here are the attributes you can use in a `rtshader_system` block of a .material script:
 
+- [transform_stage](#transform_stage)
 - [lighting_stage](#lighting_stage)
 - [fog_stage](#fog_stage)
 - [light_count](#light_count)
 - [triplanarTexturing](#triplanarTexturing)
 - [integrated_pssm4](#integrated_pssm4)
+- [hardware_skinning](#hardware_skinning)
 - [layered_blend](#layered_blend)
 - [source_modifier](#source_modifier)
+
+<a name="transform_stage"></a>
+
+## transform_stage
+
+Force a specific transform calculation
+@par
+Format: `transform_stage <type> [attrIndex]`
+@par
+Example: `transform_stage instanced 1`
+
+@param type either `ffp` or `instanced`
+@param coordinateIndex the start texcoord attribute index to read the instanced world matrix from
+
+@note `instanced` is supposed to be used with Ogre::InstanceManager::HWInstancingBasic
 
 <a name="lighting_stage"></a>
 
@@ -32,13 +49,17 @@ Here are the attributes you can use in a `rtshader_system` block of a .material 
 Force a specific lighting model.
 
 @par
-Format1: `lighting_stage <ffp|per_pixel> [normalised]`
+Format: `lighting_stage <ffp|per_pixel|normal_map|gbuffer> [normalised]`
 @par
 Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [samplerName]`
 @par
+Format3: `lighting_stage gbuffer <target_layout> [target_layout]`
+@par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
-@param normalised @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
+@param normalised with @c ffp or @c per_pixel @copybrief Ogre::RTShader::FFPLighting::setNormaliseEnabled @copydetails Ogre::RTShader::FFPLighting::setNormaliseEnabled
+@param texturename normal map to use with @c normal_map
+@param target_layout with @c gbuffer, this specifies the data to be written into one or two MRT targets. Possible values are @c depth, @c normal, @c viewpos, @c normal_viewdepth and @c diffuse_specular
 
 @see Ogre::RTShader::NormalMapLighting::NormalMapSpace
 @see @ref Samplers
@@ -86,6 +107,21 @@ Valid values are [0; 0.57] not bigger to avoid division by zero
 Integrated PSSM shadow receiver with 2 splits. Custom split points.
 @par
 Format: `integrated_pssm4 <znear> <sp0> <sp1> <zfar>`
+
+<a name="hardware_skinning"></a>
+
+## hardware_skinning
+Include skinning calculations for Skeletal Animation in the shader to move computations to the GPU
+@par
+Format: `hardware_skinning <max_bone_count> <max_weight_count> [type antipodality_check scale_shear]`
+@par
+Example: `hardware_skinning 24 2 dual_quaternion true false`
+
+@param type either `dual_quaternion` or `linear`
+@param antipodality_check Accurate antipodality handling for rotations > 180°
+@param scale_shear add scaling and shearing support to dual quaternion computation
+
+@note You can also use Ogre::RTShader::HardwareSkinningFactory::prepareEntityForSkinning to derive this information automatically.
 
 <a name="layered_blend"></a>
 

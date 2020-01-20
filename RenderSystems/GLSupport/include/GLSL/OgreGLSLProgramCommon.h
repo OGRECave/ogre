@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreGLSLShaderCommon.h"
 #include "OgreHardwareUniformBuffer.h"
 
+#include <array>
+
 namespace Ogre
 {
 /// Structure used to keep track of named uniforms in the linked program object
@@ -54,29 +56,15 @@ typedef std::vector<HardwareUniformBufferSharedPtr> GLUniformBufferList;
 typedef GLUniformBufferList::iterator GLUniformBufferIterator;
 typedef std::map<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> SharedParamsBufferMap;
 
+typedef  std::array<GLSLShaderCommon*, GPT_COUNT> GLShaderList;
+
 class GLSLProgramCommon
 {
 public:
-    GLSLProgramCommon(GLSLShaderCommon* vertexShader);
+    explicit GLSLProgramCommon(const GLShaderList& shaders);
     virtual ~GLSLProgramCommon() {}
 
     void extractLayoutQualifiers(void);
-
-    /** Sets whether the linked program includes the required instructions
-        to perform skeletal animation.
-        @remarks
-        If this is set to true, OGRE will not blend the geometry according to
-        skeletal animation, it will expect the vertex program to do it.
-    */
-    void setSkeletalAnimationIncluded(bool included) { mSkeletalAnimation = included; }
-
-    /** Returns whether the linked program includes the required instructions
-        to perform skeletal animation.
-        @remarks
-         If this returns true, OGRE will not blend the geometry according to
-         skeletal animation, it will expect the vertex program to do it.
-                                                                         */
-    bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
 
     /// Get the GL Handle for the program object
     uint getGLProgramHandle(void) const { return mGLProgramHandle; }
@@ -86,17 +74,12 @@ public:
     virtual void activate(void) = 0;
 
     /// query if the program is using the given shader
-    virtual bool isUsingShader(GLSLShaderCommon* shader) const = 0;
+    bool isUsingShader(GLSLShaderCommon* shader) const { return mShaders[shader->getType()] == shader; }
 
     /** Updates program object uniforms using data from GpuProgramParameters.
         Normally called by GLSLShader::bindParameters() just before rendering occurs.
     */
-    virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
-
-    /** Updates program object uniform blocks using data from GpuProgramParameters.
-        Normally called by GLRenderSystem::bindParameters() just before rendering occurs.
-    */
-    void updateUniformBlocks();
+    virtual void updateUniforms(GpuProgramParametersPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
 
     /** Get the fixed attribute bindings normally used by GL for a semantic. */
     static int32 getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
@@ -110,11 +93,9 @@ public:
 protected:
     /// Container of uniform references that are active in the program object
     GLUniformReferenceList mGLUniformReferences;
-    /// Map of shared parameter blocks to uniform buffers
-    SharedParamsBufferMap mSharedParamsBufferMap;
 
-    /// Linked vertex shader.
-    GLSLShaderCommon* mVertexShader;
+    /// Linked shaders
+    GLShaderList mShaders;
 
     /// Flag to indicate that uniform references have already been built
     bool mUniformRefsBuilt;
@@ -122,8 +103,6 @@ protected:
     uint mGLProgramHandle;
     /// Flag indicating that the program or pipeline object has been successfully linked
     int mLinked;
-    /// Flag indicating skeletal animation is being performed
-    bool mSkeletalAnimation;
     /// A value to define the case we didn't look for the attributes since the contractor
     static const int NULL_CUSTOM_ATTRIBUTES_INDEX = -2;
     /// A value to define the attribute has not been found (this is also the result when glGetAttribLocation fails)
@@ -134,6 +113,9 @@ protected:
 
     /// Compiles and links the vertex and fragment programs
     virtual void compileAndLink(void) = 0;
+
+    uint32 getCombinedHash();
+    String getCombinedName();
 
     static VertexElementSemantic getAttributeSemanticEnum(const String& type);
     static const char * getAttributeSemanticString(VertexElementSemantic semantic);

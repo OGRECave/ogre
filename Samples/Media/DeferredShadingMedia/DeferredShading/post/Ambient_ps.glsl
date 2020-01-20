@@ -23,8 +23,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	Post shader: Multipass, ambient (base) pass
 */
-
+#ifdef GL_ES
+#version 300 es
+#else
 #version 150
+#endif
 
 in vec2 oUv0;
 in vec3 oRay;
@@ -53,7 +56,7 @@ void main()
         discard;
 
 	// Calculate ambient colour of fragment
-	oColour = vec4(ambientColor * vec4(a1.rgb,0));
+	oColour = vec4(ambientColor * vec4(a0.rgb,0));
 
 	// Calculate depth of fragment;
 	vec3 viewPos = normalize(oRay) * farClipDistance * a1.w;

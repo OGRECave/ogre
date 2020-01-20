@@ -97,3 +97,8 @@ void FFP_Normalize(inout vec3 vIn)
 {
     vIn = normalize(vIn);
 }
+
+void FFP_Length(in vec3 vIn, out float vOut)
+{
+	vOut = length(vIn);
+}

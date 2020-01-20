@@ -439,36 +439,8 @@ void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
 
     // first find the vertex shader
     ShaderFunctionConstIterator itFunction ;
-    Function* vertexMain = NULL;
-    Function* pixelMain = NULL;
-
-    // find vertex shader main
-    {
-        const ShaderFunctionList& functionList = vsProgram->getFunctions();
-        for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
-        {
-            Function* curFunction = *itFunction;
-            if (curFunction->getFunctionType() == Function::FFT_VS_MAIN)
-            {
-                vertexMain = curFunction;
-                break;
-            }
-        }
-    }
-
-    // find pixel shader main
-    {
-        const ShaderFunctionList& functionList = psProgram->getFunctions();
-        for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
-        {
-            Function* curFunction = *itFunction;
-            if (curFunction->getFunctionType() == Function::FFT_PS_MAIN)
-            {
-                pixelMain = curFunction;
-                break;
-            }
-        }
-    }
+    Function* vertexMain = vsProgram->getEntryPointFunction();
+    Function* pixelMain = psProgram->getEntryPointFunction();;
 
     if(pixelMain)
     {

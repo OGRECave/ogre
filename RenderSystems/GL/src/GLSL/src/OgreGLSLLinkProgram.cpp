@@ -76,10 +76,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLLinkProgram::GLSLLinkProgram(GLSLProgram* vertexProgram, GLSLProgram* geometryProgram, GLSLProgram* fragmentProgram)
-        : GLSLProgramCommon(vertexProgram)
-        , mGeometryProgram(geometryProgram)
-        , mFragmentProgram(fragmentProgram)
+    GLSLLinkProgram::GLSLLinkProgram(const GLShaderList& shaders) : GLSLProgramCommon(shaders)
     {
         // Initialise uniform cache
         mUniformCache = new GLUniformCache();
@@ -109,17 +106,11 @@ namespace Ogre {
                 reportGLSLError( glErr, "GLSLLinkProgram::activate", "Error Creating GLSL Program Object", 0 );
             }
 
-            uint32 hash = 0;
-            GpuProgram* progs[] = {mVertexShader, mGeometryProgram, mFragmentProgram};
-            for(auto p : progs)
-            {
-                if(!p) continue;
-                hash = p->_getHash(hash);
-            }
+            uint32 hash = getCombinedHash();
 
             if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
                  GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(hash) &&
-                 !mGeometryProgram)
+                 !mShaders[GPT_GEOMETRY_PROGRAM])
             {
                 getMicrocodeFromCache(hash);
             }
@@ -189,6 +180,14 @@ namespace Ogre {
             if (attrib != -1)
             {
                 mValidAttributes.insert(a.attrib);
+
+                if(a.semantic != VES_TEXTURE_COORDINATES) continue;
+
+                // also enable next 4 attributes to allow matrix types in texcoord semantic
+                // might cause problems with mixing builtin and custom names,
+                // but then again you should not
+                for(int j = 0; j < 4; j++)
+                    mValidAttributes.insert(msCustomAttributes[i + j].attrib);
             }
         }
     }
@@ -205,17 +204,17 @@ namespace Ogre {
             const GpuConstantDefinitionMap* vertParams = 0;
             const GpuConstantDefinitionMap* fragParams = 0;
             const GpuConstantDefinitionMap* geomParams = 0;
-            if (mVertexShader)
+            if (mShaders[GPT_VERTEX_PROGRAM])
             {
-                vertParams = &(mVertexShader->getConstantDefinitions().map);
+                vertParams = &(mShaders[GPT_VERTEX_PROGRAM]->getConstantDefinitions().map);
             }
-            if (mGeometryProgram)
+            if (mShaders[GPT_GEOMETRY_PROGRAM])
             {
-                geomParams = &(mGeometryProgram->getConstantDefinitions().map);
+                geomParams = &(mShaders[GPT_GEOMETRY_PROGRAM]->getConstantDefinitions().map);
             }
-            if (mFragmentProgram)
+            if (mShaders[GPT_FRAGMENT_PROGRAM])
             {
-                fragParams = &(mFragmentProgram->getConstantDefinitions().map);
+                fragParams = &(mShaders[GPT_FRAGMENT_PROGRAM]->getConstantDefinitions().map);
             }
 
             GLSLLinkProgramManager::extractUniforms(
@@ -234,13 +233,7 @@ namespace Ogre {
         GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 
         // determine if we need to transpose matrices when binding
-        bool transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexShader && (!mVertexShader->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentProgram && (!mFragmentProgram->getColumnMajorMatrices())) ||
-            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryProgram && (!mGeometryProgram->getColumnMajorMatrices())))
-        {
-            transpose = GL_FALSE;
-        }
+        bool transpose = !mShaders[fromProgType] || mShaders[fromProgType]->getColumnMajorMatrices();
 
         for (;currentUniform != endUniform; ++currentUniform)
         {
@@ -312,21 +305,21 @@ namespace Ogre {
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix2x3fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_2X4:
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix2x4fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_3X2:
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix3x2fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_3X3:
@@ -337,21 +330,21 @@ namespace Ogre {
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix3x4fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_4X2:
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix4x2fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_4X3:
                         if (GLEW_VERSION_2_1)
                         {
                             glUniformMatrix4x3fv(currentUniform->mLocation, glArraySize, 
-                                transpose, params->getFloatPointer(def->physicalIndex));
+                                GL_FALSE, params->getFloatPointer(def->physicalIndex));
                         }
                         break;
                     case GCT_MATRIX_4X4:
@@ -400,35 +393,13 @@ namespace Ogre {
         } // end for
     }
     //-----------------------------------------------------------------------
-    Ogre::String GLSLLinkProgram::getCombinedName()
-    {
-        String name;
-        if (mVertexShader)
-        {
-            name += "Vertex Program:" ;
-            name += mVertexShader->getName();
-        }
-        if (mFragmentProgram)
-        {
-            name += " Fragment Program:" ;
-            name += mFragmentProgram->getName();
-        }
-        if (mGeometryProgram)
-        {
-            name += " Geometry Program:" ;
-            name += mGeometryProgram->getName();
-        }
-        return name;
-    }
-    //-----------------------------------------------------------------------
     void GLSLLinkProgram::compileAndLink()
     {
         uint32 hash = 0;
-        if (mVertexShader)
+        if (mShaders[GPT_VERTEX_PROGRAM])
         {
             // attach Vertex Program
-            mVertexShader->attachToProgramObject(mGLProgramHandle);
-            setSkeletalAnimationIncluded(mVertexShader->isSkeletalAnimationIncluded());
+            mShaders[GPT_VERTEX_PROGRAM]->attachToProgramObject(mGLProgramHandle);
 
             // Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
 
@@ -440,9 +411,9 @@ namespace Ogre {
             // until it is linked (chicken and egg!) we have to parse the source
 
             size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
-            const String& vpSource = mVertexShader->getSource();
+            const String& vpSource = mShaders[GPT_VERTEX_PROGRAM]->getSource();
             
-            hash = mVertexShader->_getHash(hash);
+            hash = mShaders[GPT_VERTEX_PROGRAM]->_getHash(hash);
             for (size_t i = 0; i < numAttribs; ++i)
             {
                 const CustomAttribute& a = msCustomAttributes[i];
@@ -476,32 +447,32 @@ namespace Ogre {
             }
         }
 
-        if (mGeometryProgram)
+        if (auto gshader = static_cast<GLSLProgram*>(mShaders[GPT_GEOMETRY_PROGRAM]))
         {
-            hash = mGeometryProgram->_getHash(hash);
+            hash = mShaders[GPT_GEOMETRY_PROGRAM]->_getHash(hash);
             // attach Geometry Program
-            mGeometryProgram->attachToProgramObject(mGLProgramHandle);
+            mShaders[GPT_GEOMETRY_PROGRAM]->attachToProgramObject(mGLProgramHandle);
 
             //Don't set adjacency flag. We handle it internally and expose "false"
 
-            RenderOperation::OperationType inputOperationType = mGeometryProgram->getInputOperationType();
+            RenderOperation::OperationType inputOperationType = gshader->getInputOperationType();
             glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_INPUT_TYPE_EXT,
                 getGLGeometryInputPrimitiveType(inputOperationType));
 
-            RenderOperation::OperationType outputOperationType = mGeometryProgram->getOutputOperationType();
+            RenderOperation::OperationType outputOperationType = gshader->getOutputOperationType();
 
             glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT,
                 getGLGeometryOutputPrimitiveType(outputOperationType));
 
             glProgramParameteriEXT(mGLProgramHandle, GL_GEOMETRY_VERTICES_OUT_EXT,
-                mGeometryProgram->getMaxOutputVertices());
+                gshader->getMaxOutputVertices());
         }
 
-        if (mFragmentProgram)
+        if (mShaders[GPT_FRAGMENT_PROGRAM])
         {
-            hash = mFragmentProgram->_getHash(hash);
+            hash = mShaders[GPT_FRAGMENT_PROGRAM]->_getHash(hash);
             // attach Fragment Program
-            mFragmentProgram->attachToProgramObject(mGLProgramHandle);
+            mShaders[GPT_FRAGMENT_PROGRAM]->attachToProgramObject(mGLProgramHandle);
         }
 
         

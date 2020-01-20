@@ -105,6 +105,8 @@ namespace Ogre {
         /// Check if the GL system has already been initialised
         bool mGLInitialised;
 
+        bool mSeparateShaderObjectsEnabled;
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		/// @copydoc RenderSystem::setDrawBuffer
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);

@@ -2,25 +2,13 @@
 vertex_program DeferredShading/Shadows/CasterVP unified
 {
 	delegate DeferredShading/Shadows/CasterVP_pCg
-	delegate DeferredShading/Shadows/CasterVP_pCg_sm4
 	delegate DeferredShading/Shadows/CasterVP_pGLSL
 	delegate DeferredShading/Shadows/CasterVP_pGLSLES
 }
-vertex_program DeferredShading/Shadows/CasterVP_pCg cg
+vertex_program DeferredShading/Shadows/CasterVP_pCg hlsl
 {
 	source ShadowCaster.cg
-	profiles vs_1_1 arbvp1
-	entry_point ShadowCasterVP
-	default_params
-	{
-		param_named_auto cWorldViewProj worldviewproj_matrix
-		param_named_auto cWorldView worldview_matrix
-	}
-}
-vertex_program DeferredShading/Shadows/CasterVP_pCg_sm4 cg
-{
-	source ShadowCaster_sm4.cg
-	profiles vs_4_0
+	target vs_2_0
 	entry_point ShadowCasterVP
 	default_params
 	{
@@ -31,7 +19,6 @@ vertex_program DeferredShading/Shadows/CasterVP_pCg_sm4 cg
 vertex_program DeferredShading/Shadows/CasterVP_pGLSL glsl
 {
 	source ShadowCaster_vp.glsl
-	syntax glsl150
 	default_params
 	{
 		param_named_auto cWorldViewProj worldviewproj_matrix
@@ -41,7 +28,7 @@ vertex_program DeferredShading/Shadows/CasterVP_pGLSL glsl
 
 vertex_program DeferredShading/Shadows/CasterVP_pGLSLES glsles
 {
-	source ShadowCaster_vp.glsles
+	source ShadowCaster_vp.glsl
 	syntax glsles
 	default_params
 	{
@@ -53,14 +40,13 @@ vertex_program DeferredShading/Shadows/CasterVP_pGLSLES glsles
 fragment_program DeferredShading/Shadows/CasterFP unified
 {
 	delegate DeferredShading/Shadows/CasterFP_pCg
-	delegate DeferredShading/Shadows/CasterFP_pCg_sm4
 	delegate DeferredShading/Shadows/CasterFP_pGLSL
 	delegate DeferredShading/Shadows/CasterFP_pGLSLES
 }
-fragment_program DeferredShading/Shadows/CasterFP_pCg cg
+fragment_program DeferredShading/Shadows/CasterFP_pCg hlsl
 {
 	source ShadowCaster.cg
-	profiles ps_2_0 arbfp1
+	target ps_2_0
 	entry_point ShadowCasterFP
 
 	default_params
@@ -68,24 +54,9 @@ fragment_program DeferredShading/Shadows/CasterFP_pCg cg
 		param_named_auto cFarDistance far_clip_distance
 	}
 }
-
-fragment_program DeferredShading/Shadows/CasterFP_pCg_sm4 cg
-{
-	source ShadowCaster_sm4.cg
-	profiles ps_4_0
-	entry_point ShadowCasterFP
-
-	default_params
-	{
-		param_named_auto cFarDistance far_clip_distance
-	}
-}
-
 fragment_program DeferredShading/Shadows/CasterFP_pGLSL glsl
 {
 	source ShadowCaster_fp.glsl
-	syntax glsl150
-
 	default_params
 	{
 		param_named_auto cFarDistance far_clip_distance
@@ -94,7 +65,7 @@ fragment_program DeferredShading/Shadows/CasterFP_pGLSL glsl
 
 fragment_program DeferredShading/Shadows/CasterFP_pGLSLES glsles
 {
-	source ShadowCaster_fp.glsles
+	source ShadowCaster_fp.glsl
 	syntax glsles
 
 	default_params

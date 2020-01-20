@@ -34,9 +34,9 @@ namespace Ogre {
         HardwareBufferManagerBase* mgr,
         size_t bufferSize,
         HardwareBuffer::Usage usage,
-        bool useShadowBuffer, const String& name)
+        bool useShadowBuffer, const String& name, GLenum target)
         : HardwareUniformBuffer(mgr, bufferSize, usage, useShadowBuffer, name),
-          mBuffer(GL_UNIFORM_BUFFER, mSizeInBytes, usage),
+          mBuffer(target, mSizeInBytes, usage),
           mBinding(0)
     {
     }
@@ -45,8 +45,8 @@ namespace Ogre {
     {
         mBinding = binding;
 
-        // Attach the entire buffer to the UBO binding index.
-        OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_UNIFORM_BUFFER, mBinding, getGLBufferId()));
+        // Attach the buffer to the binding index.
+        OGRE_CHECK_GL_ERROR(glBindBufferBase(mBuffer.getTarget(), mBinding, getGLBufferId()));
     }
 
     void GL3PlusHardwareUniformBuffer::readData(size_t offset, size_t length, void* pDest)

@@ -57,7 +57,7 @@ namespace Ogre
     {
     public:
         /// Constructor should only be used by GLSLESProgramPipelineManager
-        GLSLESProgramPipeline(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram);
+        explicit GLSLESProgramPipeline(const GLShaderList& shaders);
         virtual ~GLSLESProgramPipeline();
 
         /** Updates program pipeline object uniforms using data from GpuProgramParameters.
@@ -74,12 +74,6 @@ namespace Ogre
 #endif
 
     protected:
-        enum {
-            VERTEX_PROGRAM_LINKED = 1,
-            FRAGMENT_PROGRAM_LINKED = 2,
-            ALL_PROGRAMS_LINKED = 3
-        };
-
         /// Compiles and links the separate vertex and fragment programs
         virtual void compileAndLink(void);
 

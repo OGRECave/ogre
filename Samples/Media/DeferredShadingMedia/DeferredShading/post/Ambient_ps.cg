@@ -24,12 +24,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	Post shader: Multipass, ambient (base) pass
 */
 
-//GL and DX expect a different value
-arbfp1 float finalDepth(float4 p)
-{
-    // GL needs it in [0..1]
-    return (p.z / p.w) * 0.5 + 0.5;
-}
+
+#include "HLSL_SM4Support.hlsl"
+
+SAMPLER2D(Tex0, 0);
+SAMPLER2D(Tex1, 1);
 
 float finalDepth(float4 p)
 {
@@ -38,14 +37,13 @@ float finalDepth(float4 p)
 }
 
 void main(
+    float4 oPos: POSITION,
 	float2 texCoord: TEXCOORD0, 
 	float3 ray : TEXCOORD1,
 	
 	out float4 oColour : COLOR,
 	out float oDepth : DEPTH,
-	
-	uniform sampler Tex0: register(s0),
-	uniform sampler Tex1: register(s1),
+
 	uniform float4x4 proj,
 	uniform float4 ambientColor,
 	uniform float3 farCorner,

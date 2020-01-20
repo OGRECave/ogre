@@ -186,15 +186,24 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
         (weightCount != 0) && (weightCount <= 4) &&
         ((mCreator == NULL) || (boneCount <= mCreator->getMaxCalculableBoneCount()));
 
+    // This requires GLES3.0
+    if (ShaderGenerator::getSingleton().getTargetLanguage() == "glsles" &&
+        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es"))
+        doBoneCalculations = false;
+
     mActiveTechnique->setDoBoneCalculations(doBoneCalculations);
+    mActiveTechnique->setDoLightCalculations(srcPass->getLightingEnabled());
 
     if ((doBoneCalculations) && (mCreator))
     {
         //update the receiver and caster materials
         if (!dstPass->getParent()->getShadowCasterMaterial())
         {
-            dstPass->getParent()->setShadowCasterMaterial(
-                mCreator->getCustomShadowCasterMaterial(mSkinningType, weightCount - 1));
+            auto casterMat = mCreator->getCustomShadowCasterMaterial(mSkinningType, weightCount - 1);
+
+            // if the caster material itsefl uses RTSS hardware skinning
+            if(casterMat.get() != dstPass->getParent()->getParent())
+                dstPass->getParent()->setShadowCasterMaterial(casterMat);
         }
 
         if (!dstPass->getParent()->getShadowReceiverMaterial())
@@ -288,10 +297,12 @@ SubRenderState* HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
                 skinType = ST_LINEAR;
             }
         }
+        else
+            hasError = true;
 
         if (hasError == true)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, "Expected the format: hardware_skinning <bone count> <weight count> [skinning type] [correct antipodality handling] [scaling/shearing support]");
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
             return NULL;
         }
         else
@@ -411,6 +422,11 @@ const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(cons
 void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, SkinningType skinningType, 
                                bool correctAntidpodalityHandling, bool shearScale)
 {
+    // This requires GLES3.0
+    if (ShaderGenerator::getSingleton().getTargetLanguage() == "glsles" &&
+        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es"))
+        return;
+
     if (pEntity != NULL) 
     {
         size_t lodLevels = pEntity->getNumManualLodLevels() + 1;

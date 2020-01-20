@@ -68,15 +68,16 @@ namespace Ogre {
 
             PixelFormat format;
 
-        public:
-            String dataType() const
+            /// @deprecated do not use
+            OGRE_DEPRECATED String dataType() const
             {
                 return "ImageData";
             }
         };
 
-    public:
-        String getDataType() const
+
+        /// @deprecated do not use
+        OGRE_DEPRECATED String getDataType() const
         {
             return "ImageData";
         }

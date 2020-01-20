@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreSingleton.h"
-#include "OgreHardwareCounterBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreHardwareUniformBuffer.h"
 #include "OgreHardwareVertexBuffer.h"
@@ -275,7 +274,7 @@ namespace Ogre {
         @remarks The parameters (such as vertex size etc) are determined later
             and are allocated when needed.
         */
-        virtual RenderToVertexBufferSharedPtr createRenderToVertexBuffer() = 0;
+        virtual RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 
         /**
          * Create uniform buffer. This type of buffer allows the upload of shader constants once,
@@ -284,7 +283,7 @@ namespace Ogre {
          */
         virtual HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
                                     HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-                                    bool useShadowBuffer = false, const String& name = "") = 0;
+                                    bool useShadowBuffer = false, const String& name = "");
 
         /**
          * Create counter buffer.
@@ -292,7 +291,7 @@ namespace Ogre {
          */
         virtual HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                                    HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                                                                   bool useShadowBuffer = false, const String& name = "") = 0;
+                                                                   bool useShadowBuffer = false, const String& name = "");
 
         /** Creates a new vertex declaration. */
         VertexDeclaration* createVertexDeclaration(void);

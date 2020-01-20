@@ -37,31 +37,6 @@ namespace Ogre
     const unsigned int Matrix3::msSvdMaxIterations = 64;
 
     //-----------------------------------------------------------------------
-    Vector3 Matrix3::GetColumn (size_t iCol) const
-    {
-        assert( iCol < 3 );
-        return Vector3(m[0][iCol],m[1][iCol],
-            m[2][iCol]);
-    }
-    //-----------------------------------------------------------------------
-    void Matrix3::SetColumn(size_t iCol, const Vector3& vec)
-    {
-        assert( iCol < 3 );
-        m[0][iCol] = vec.x;
-        m[1][iCol] = vec.y;
-        m[2][iCol] = vec.z;
-
-    }
-    //-----------------------------------------------------------------------
-    void Matrix3::FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
-    {
-        SetColumn(0,xAxis);
-        SetColumn(1,yAxis);
-        SetColumn(2,zAxis);
-
-    }
-
-    //-----------------------------------------------------------------------
     bool Matrix3::operator== (const Matrix3& rkMatrix) const
     {
         for (size_t iRow = 0; iRow < 3; iRow++)
@@ -224,23 +199,6 @@ namespace Ogre
         Matrix3 kInverse = Matrix3::ZERO;
         Inverse(kInverse,fTolerance);
         return kInverse;
-    }
-    //-----------------------------------------------------------------------
-    Real Matrix3::Determinant () const
-    {
-        Real fCofactor00 = m[1][1]*m[2][2] -
-            m[1][2]*m[2][1];
-        Real fCofactor10 = m[1][2]*m[2][0] -
-            m[1][0]*m[2][2];
-        Real fCofactor20 = m[1][0]*m[2][1] -
-            m[1][1]*m[2][0];
-
-        Real fDet =
-            m[0][0]*fCofactor00 +
-            m[0][1]*fCofactor10 +
-            m[0][2]*fCofactor20;
-
-        return fDet;
     }
     //-----------------------------------------------------------------------
     void Matrix3::Bidiagonalize (Matrix3& kA, Matrix3& kL,
@@ -627,69 +585,6 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    void Matrix3::Orthonormalize ()
-    {
-        // Algorithm uses Gram-Schmidt orthogonalization.  If 'this' matrix is
-        // M = [m0|m1|m2], then orthonormal output matrix is Q = [q0|q1|q2],
-        //
-        //   q0 = m0/|m0|
-        //   q1 = (m1-(q0*m1)q0)/|m1-(q0*m1)q0|
-        //   q2 = (m2-(q0*m2)q0-(q1*m2)q1)/|m2-(q0*m2)q0-(q1*m2)q1|
-        //
-        // where |V| indicates length of vector V and A*B indicates dot
-        // product of vectors A and B.
-
-        // compute q0
-        Real fInvLength = Math::InvSqrt(m[0][0]*m[0][0]
-            + m[1][0]*m[1][0] +
-            m[2][0]*m[2][0]);
-
-        m[0][0] *= fInvLength;
-        m[1][0] *= fInvLength;
-        m[2][0] *= fInvLength;
-
-        // compute q1
-        Real fDot0 =
-            m[0][0]*m[0][1] +
-            m[1][0]*m[1][1] +
-            m[2][0]*m[2][1];
-
-        m[0][1] -= fDot0*m[0][0];
-        m[1][1] -= fDot0*m[1][0];
-        m[2][1] -= fDot0*m[2][0];
-
-        fInvLength = Math::InvSqrt(m[0][1]*m[0][1] +
-            m[1][1]*m[1][1] +
-            m[2][1]*m[2][1]);
-
-        m[0][1] *= fInvLength;
-        m[1][1] *= fInvLength;
-        m[2][1] *= fInvLength;
-
-        // compute q2
-        Real fDot1 =
-            m[0][1]*m[0][2] +
-            m[1][1]*m[1][2] +
-            m[2][1]*m[2][2];
-
-        fDot0 =
-            m[0][0]*m[0][2] +
-            m[1][0]*m[1][2] +
-            m[2][0]*m[2][2];
-
-        m[0][2] -= fDot0*m[0][0] + fDot1*m[0][1];
-        m[1][2] -= fDot0*m[1][0] + fDot1*m[1][1];
-        m[2][2] -= fDot0*m[2][0] + fDot1*m[2][1];
-
-        fInvLength = Math::InvSqrt(m[0][2]*m[0][2] +
-            m[1][2]*m[1][2] +
-            m[2][2]*m[2][2]);
-
-        m[0][2] *= fInvLength;
-        m[1][2] *= fInvLength;
-        m[2][2] *= fInvLength;
-    }
-    //-----------------------------------------------------------------------
     void Matrix3::QDUDecomposition (Matrix3& kQ,
         Vector3& kD, Vector3& kU) const
     {
@@ -721,45 +616,10 @@ namespace Ogre
         // U stores the entries U[0] = u01, U[1] = u02, U[2] = u12
 
         // build orthogonal matrix Q
-        Real fInvLength = Math::InvSqrt(m[0][0]*m[0][0] + m[1][0]*m[1][0] + m[2][0]*m[2][0]);
-
-        kQ[0][0] = m[0][0]*fInvLength;
-        kQ[1][0] = m[1][0]*fInvLength;
-        kQ[2][0] = m[2][0]*fInvLength;
-
-        Real fDot = kQ[0][0]*m[0][1] + kQ[1][0]*m[1][1] +
-            kQ[2][0]*m[2][1];
-        kQ[0][1] = m[0][1]-fDot*kQ[0][0];
-        kQ[1][1] = m[1][1]-fDot*kQ[1][0];
-        kQ[2][1] = m[2][1]-fDot*kQ[2][0];
-        fInvLength = Math::InvSqrt(kQ[0][1]*kQ[0][1] + kQ[1][1]*kQ[1][1] + kQ[2][1]*kQ[2][1]);
-        
-        kQ[0][1] *= fInvLength;
-        kQ[1][1] *= fInvLength;
-        kQ[2][1] *= fInvLength;
-
-        fDot = kQ[0][0]*m[0][2] + kQ[1][0]*m[1][2] +
-            kQ[2][0]*m[2][2];
-        kQ[0][2] = m[0][2]-fDot*kQ[0][0];
-        kQ[1][2] = m[1][2]-fDot*kQ[1][0];
-        kQ[2][2] = m[2][2]-fDot*kQ[2][0];
-        fDot = kQ[0][1]*m[0][2] + kQ[1][1]*m[1][2] +
-            kQ[2][1]*m[2][2];
-        kQ[0][2] -= fDot*kQ[0][1];
-        kQ[1][2] -= fDot*kQ[1][1];
-        kQ[2][2] -= fDot*kQ[2][1];
-        fInvLength = Math::InvSqrt(kQ[0][2]*kQ[0][2] + kQ[1][2]*kQ[1][2] + kQ[2][2]*kQ[2][2]);
-
-        kQ[0][2] *= fInvLength;
-        kQ[1][2] *= fInvLength;
-        kQ[2][2] *= fInvLength;
+        kQ = orthonormalised();
 
         // guarantee that orthogonal matrix has determinant 1 (no reflections)
-        Real fDet = kQ[0][0]*kQ[1][1]*kQ[2][2] + kQ[0][1]*kQ[1][2]*kQ[2][0] +
-            kQ[0][2]*kQ[1][0]*kQ[2][1] - kQ[0][2]*kQ[1][1]*kQ[2][0] -
-            kQ[0][1]*kQ[1][0]*kQ[2][2] - kQ[0][0]*kQ[1][2]*kQ[2][1];
-
-        if ( fDet < 0.0 )
+        if ( kQ.determinant() < 0.0 )
         {
             for (size_t iRow = 0; iRow < 3; iRow++)
                 for (size_t iCol = 0; iCol < 3; iCol++)
@@ -768,18 +628,12 @@ namespace Ogre
 
         // build "right" matrix R
         Matrix3 kR;
-        kR[0][0] = kQ[0][0]*m[0][0] + kQ[1][0]*m[1][0] +
-            kQ[2][0]*m[2][0];
-        kR[0][1] = kQ[0][0]*m[0][1] + kQ[1][0]*m[1][1] +
-            kQ[2][0]*m[2][1];
-        kR[1][1] = kQ[0][1]*m[0][1] + kQ[1][1]*m[1][1] +
-            kQ[2][1]*m[2][1];
-        kR[0][2] = kQ[0][0]*m[0][2] + kQ[1][0]*m[1][2] +
-            kQ[2][0]*m[2][2];
-        kR[1][2] = kQ[0][1]*m[0][2] + kQ[1][1]*m[1][2] +
-            kQ[2][1]*m[2][2];
-        kR[2][2] = kQ[0][2]*m[0][2] + kQ[1][2]*m[1][2] +
-            kQ[2][2]*m[2][2];
+        kR[0][0] = kQ.GetColumn(0).dotProduct(GetColumn(0));
+        kR[0][1] = kQ.GetColumn(0).dotProduct(GetColumn(1));
+        kR[0][2] = kQ.GetColumn(0).dotProduct(GetColumn(2));
+        kR[1][1] = kQ.GetColumn(1).dotProduct(GetColumn(1));
+        kR[1][2] = kQ.GetColumn(1).dotProduct(GetColumn(2));
+        kR[2][2] = kQ.GetColumn(2).dotProduct(GetColumn(2));
 
         // the scaling component
         kD[0] = kR[0][0];

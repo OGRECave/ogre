@@ -23,19 +23,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	Post shader: Debug, show normal channel
 */
-#version 150
-
-uniform sampler2D Tex0;
 uniform sampler2D Tex1;
 
-in vec2 oUv0;
-in vec2 projCoord;
-
-out vec4 fragColour;
+varying vec2 oUv0;
 
 void main()
 {
-	vec4 a1 = texture(Tex1, oUv0); // Attribute 1: Normal+depth
+	vec4 a1 = texture2D(Tex1, oUv0); // Attribute 1: Normal+depth
 
-    fragColour = vec4((a1.xyz+1)*0.5,0);
+    gl_FragColor = vec4((a1.xyz+1.0)*0.5,0.0);
 }

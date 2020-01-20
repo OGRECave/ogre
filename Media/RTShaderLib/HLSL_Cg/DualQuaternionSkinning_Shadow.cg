@@ -1,4 +1,4 @@
-float2x4 blendTwoWeights(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+float2x4 blendTwoWeights(float4 blendWgt, uint4 blendIdx, float2x4 dualQuaternions[24])
 {
 	float2x4 blendDQ = blendWgt.x*dualQuaternions[blendIdx.x];
 	blendDQ += blendWgt.y*dualQuaternions[blendIdx.y];
@@ -6,7 +6,7 @@ float2x4 blendTwoWeights(float4 blendWgt, float4 blendIdx, float2x4 dualQuaterni
 	return blendDQ;
 }
 
-float2x4 blendTwoWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+float2x4 blendTwoWeightsAntipod(float4 blendWgt, uint4 blendIdx, float2x4 dualQuaternions[24])
 {
 	float2x4 dq0 = dualQuaternions[blendIdx.x];
 	float2x4 dq1 = dualQuaternions[blendIdx.y];
@@ -21,7 +21,7 @@ float2x4 blendTwoWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQ
 	return blendDQ;
 }
 
-float2x4 blendThreeWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+float2x4 blendThreeWeightsAntipod(float4 blendWgt, uint4 blendIdx, float2x4 dualQuaternions[24])
 {
 	float2x4 dq0 = dualQuaternions[blendIdx.x];
 	float2x4 dq1 = dualQuaternions[blendIdx.y];
@@ -39,7 +39,7 @@ float2x4 blendThreeWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dua
 	return blendDQ;
 }
 
-float2x4 blendFourWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+float2x4 blendFourWeightsAntipod(float4 blendWgt, uint4 blendIdx, float2x4 dualQuaternions[24])
 {
 	float2x4 dq0 = dualQuaternions[blendIdx.x];
 	float2x4 dq1 = dualQuaternions[blendIdx.y];
@@ -91,202 +91,4 @@ float3x3 adjointTransposeMatrix(float3x3 M)
 
 	return atM;
 }
-
-void shadow_caster_dq_vs(
-	float4 position : POSITION,
-	out float4 oPosition : POSITION,
-	out float2 oDepthInfo : TEXCOORD0,
-	
-	uniform float4x4 wvpMatrix)
-{
-	// output position.
-	oPosition = mul(wvpMatrix, position);
-
-	// depth info for the fragment.
-	oDepthInfo.x = oPosition.z;
-	oDepthInfo.y = oPosition.w;
-}
-
-void shadow_caster_dq_ps(
-	in float4 colour : COLOR,
-	out float4 oColour : COLOR)
-{	
-	oColour = colour;
-}
-
-//Shadow caster pass
-void shadow_caster_dq_skinning_1weight_vs(
-	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
-	float4 blendWgt : BLENDWEIGHT,
-	
-	out float4 oPosition : POSITION,
-	out float4 colour    : COLOR,
-	// Support up to 24 bones of float3x4
-	// vs_1_1 only supports 96 params so more than this is not feasible
-	uniform float2x4 worldDualQuaternion2x4Array[24],
-	uniform float4x4 viewProjectionMatrix,
-	uniform float4   ambient)
-{
-	float2x4 blendDQ = blendWgt.x * worldDualQuaternion2x4Array[blendIdx.x];
-
-	float len = length(blendDQ[0]);
-	blendDQ /= len;
-
-	float3 blendPosition = calculateBlendPosition(position, blendDQ);
-
-	// view / projection
-	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
-	
-	colour = ambient;
-}
-
-void shadow_caster_dq_skinning_2weight_vs(
-	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
-	float4 blendWgt : BLENDWEIGHT,
-	
-	out float4 oPosition : POSITION,
-	out float4 colour    : COLOR,
-	// Support up to 24 bones of float3x4
-	// vs_1_1 only supports 96 params so more than this is not feasible
-	uniform float2x4 worldDualQuaternion2x4Array[24],
-	uniform float4x4 viewProjectionMatrix,
-	uniform float4   ambient)
-{
-	float2x4 blendDQ = blendTwoWeightsAntipod(blendWgt, blendIdx, worldDualQuaternion2x4Array);
-
-	float len = length(blendDQ[0]);
-	blendDQ /= len;
-
-	float3 blendPosition = calculateBlendPosition(position, blendDQ);
-
-	// view / projection
-	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
-	
-	colour = ambient;
-}
-
-void shadow_caster_dq_skinning_3weight_vs(
-	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
-	float4 blendWgt : BLENDWEIGHT,
-	
-	out float4 oPosition : POSITION,
-	out float4 colour    : COLOR,
-	// Support up to 24 bones of float3x4
-	// vs_1_1 only supports 96 params so more than this is not feasible
-	uniform float2x4 worldDualQuaternion2x4Array[24],
-	uniform float4x4 viewProjectionMatrix,
-	uniform float4   ambient)
-{
-	float2x4 blendDQ = blendThreeWeightsAntipod(blendWgt, blendIdx, worldDualQuaternion2x4Array);
-
-	float len = length(blendDQ[0]);
-	blendDQ /= len;
-
-	float3 blendPosition = calculateBlendPosition(position, blendDQ);
-
-	// view / projection
-	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
-	
-	colour = ambient;
-}
-
-void shadow_caster_dq_skinning_4weight_vs(
-	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
-	float4 blendWgt : BLENDWEIGHT,
-	
-	out float4 oPosition : POSITION,
-	out float4 colour    : COLOR,
-	// Support up to 24 bones of float3x4
-	// vs_1_1 only supports 96 params so more than this is not feasible
-	uniform float2x4 worldDualQuaternion2x4Array[24],
-	uniform float4x4 viewProjectionMatrix,
-	uniform float4   ambient)
-{
-	float2x4 blendDQ = blendFourWeightsAntipod(blendWgt, blendIdx, worldDualQuaternion2x4Array);
-
-	float len = length(blendDQ[0]);
-	blendDQ /= len;
-
-	float3 blendPosition = calculateBlendPosition(position, blendDQ);
-
-	// view / projection
-	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
-	
-	colour = ambient;
-}
-
-
-//Two-phase skinning shadow caster pass
-void shadow_caster_dq_skinning_1weight_twophase_vs(
-	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
-	float4 blendWgt : BLENDWEIGHT,
-	
-	out float4 oPosition : POSITION,
-	out float4 colour    : COLOR,
-	// Support up to 24 bones of float3x4
-	// vs_1_1 only supports 96 params so more than this is not feasible
-	uniform float2x4 worldDualQuaternion2x4Array[24],
-	uniform float3x4 scaleM[24],
-	uniform float4x4 viewProjectionMatrix,
-	uniform float4   ambient)
-{
-	//First phase - applies scaling and shearing:
-	float3x4 blendS = blendWgt.x*scaleM[blendIdx.x];
-		
-	float3 pass1_position = mul(blendS, position);
-
-	//Second phase
-	float2x4 blendDQ = blendWgt.x * worldDualQuaternion2x4Array[blendIdx.x];
-	
-	float len = length(blendDQ[0]);
-	blendDQ /= len;
-
-	float3 blendPosition = calculateBlendPosition(float4(pass1_position, 1.0), blendDQ);
-
-	// view / projection
-	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
-	
-	colour = ambient;
-}
-
-//Two-phase skinning shadow caster pass
-void shadow_caster_dq_skinning_2weight_twophase_vs(
-	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
-	float4 blendWgt : BLENDWEIGHT,
-	
-	out float4 oPosition : POSITION,
-	out float4 colour    : COLOR,
-	// Support up to 24 bones of float3x4
-	// vs_1_1 only supports 96 params so more than this is not feasible
-	uniform float2x4 worldDualQuaternion2x4Array[24],
-	uniform float3x4 scaleM[24],
-	uniform float4x4 viewProjectionMatrix,
-	uniform float4   ambient)
-{
-	//First phase - applies scaling and shearing:
-	float3x4 blendS = blendWgt.x*scaleM[blendIdx.x];
-	blendS += blendWgt.y*scaleM[blendIdx.y];	
-		
-	float3 pass1_position = mul(blendS, position);
-
-	//Second phase
-	float2x4 blendDQ = blendTwoWeightsAntipod(blendWgt, blendIdx, worldDualQuaternion2x4Array);
-	
-	float len = length(blendDQ[0]);
-	blendDQ /= len;
-
-	float3 blendPosition = calculateBlendPosition(float4(pass1_position, 1.0), blendDQ);
-
-	// view / projection
-	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
-	
-	colour = ambient;
-}
-
 

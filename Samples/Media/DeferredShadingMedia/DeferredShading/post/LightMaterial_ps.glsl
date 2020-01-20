@@ -31,7 +31,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 // Helper function section
 //////////////////////////////////////////////////////////////////////////////
+#ifdef GL_ES
+#version 300 es
+#else
 #version 150
+#endif
 
 void checkShadow(
     sampler2D shadowMap,
@@ -111,8 +115,8 @@ void main()
 #if LIGHT_TYPE != LIGHT_DIRECTIONAL
     vec4 normProjPos = oPos / oPos.w;
     // -1 is because generally +Y is down for textures but up for the screen
-    vec2 oUv0 = vec2(normProjPos.x, normProjPos.y * -1 * flip) * 0.5 + 0.5;
-    vec3 oRay = vec3(normProjPos.x, normProjPos.y * flip, 1) * farCorner;
+    vec2 oUv0 = vec2(normProjPos.x, normProjPos.y * -1.0 * flip) * 0.5 + 0.5;
+    vec3 oRay = vec3(normProjPos.x, normProjPos.y * flip, 1.0) * farCorner;
 #endif
     
     vec4 a0 = texture(Tex0, oUv0); // Attribute 0: Diffuse color+shininess
@@ -169,7 +173,7 @@ void main()
 #if LIGHT_TYPE == LIGHT_SPOT
     float spotlightAngle = clamp(dot(lightDir.xyz, -objToLightDir), 0.0, 1.0);
     float spotFalloff = clamp((spotlightAngle - spotParams.x) / (spotParams.y - spotParams.x), 0.0, 1.0);
-    total_light_contrib *= (1-spotFalloff);
+    total_light_contrib *= (1.0-spotFalloff);
 #endif
 
     fragColour = vec4(total_light_contrib*colour, 0.0);

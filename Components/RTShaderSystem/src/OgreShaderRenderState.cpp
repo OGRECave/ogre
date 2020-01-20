@@ -196,18 +196,8 @@ void TargetRenderState::createCpuPrograms()
     sortSubRenderStates();
 
     ProgramSet* programSet = createProgramSet();
-    std::unique_ptr<Program> vsProgram(new Program(GPT_VERTEX_PROGRAM));
-    std::unique_ptr<Program> psProgram(new Program(GPT_FRAGMENT_PROGRAM));
-
-    // Create entry point functions.
-    auto vsMainFunc = vsProgram->createFunction("main", "Vertex Program Entry point", Function::FFT_VS_MAIN);
-    vsProgram->setEntryPointFunction(vsMainFunc);
-
-    auto psMainFunc = psProgram->createFunction("main", "Pixel Program Entry point", Function::FFT_PS_MAIN);
-    psProgram->setEntryPointFunction(psMainFunc);
-
-    programSet->setCpuProgram(std::move(vsProgram));
-    programSet->setCpuProgram(std::move(psProgram));
+    programSet->setCpuProgram(std::unique_ptr<Program>(new Program(GPT_VERTEX_PROGRAM)));
+    programSet->setCpuProgram(std::unique_ptr<Program>(new Program(GPT_FRAGMENT_PROGRAM)));
 
     for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
     {

@@ -75,7 +75,6 @@ namespace Ogre {
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
 
-        virtual bool compile( bool checkErrors = false) = 0;
         virtual void attachToProgramObject(const uint programObject) = 0;
         virtual void detachFromProgramObject(const uint programObject) = 0;
 
@@ -90,18 +89,17 @@ namespace Ogre {
         /** Gets whether matrix packed in column-major order. */
         bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
 
-        /** Return the shader link status.
-            Only used for separable programs.
-        */
-        int isLinked(void) { return mLinked; }
+        /// Only used for separable programs.
+        virtual bool linkSeparable() { return false; }
 
-        /** Set the shader link status.
-            Only used for separable programs.
-        */
-        void setLinked(int flag) { mLinked = flag; }
+        /// reset link status of separable program
+        void resetLinked() { mLinked = 0; }
 
         /// Get the OGRE assigned shader ID.
         uint getShaderID(void) const { return mShaderID; }
+
+        /// If we are using program pipelines, the OpenGL program handle
+        uint getGLProgramHandle() const { return mGLProgramHandle; }
 
         /// Get the uniform cache for this shader
         GLUniformCache*    getUniformCache(){return &mUniformCache;}
@@ -117,14 +115,7 @@ namespace Ogre {
 
         String getResourceLogName() const;
 
-        /** Internal load implementation, must be implemented by subclasses.
-        */
-        void loadFromSource() { compile(true); }
-
         void prepareImpl(void);
-
-        /// Populate the passed parameters with name->index map
-        void populateParameterNames(GpuProgramParametersSharedPtr params);
 
         /// Attached Shader names
         String mAttachedShaderNames;
@@ -142,6 +133,11 @@ namespace Ogre {
 
         /// OGRE assigned shader ID.
         uint mShaderID;
+
+        /// GL handle for shader object.
+        uint mGLShaderHandle;
+        /// GL handle for program object the shader is bound to.
+        uint mGLProgramHandle;
 
         /// Pointer to the uniform cache for this shader
         GLUniformCache    mUniformCache;

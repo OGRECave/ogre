@@ -41,8 +41,8 @@
 
 namespace Ogre
 {
-    GLSLESProgramPipeline::GLSLESProgramPipeline(GLSLESProgram* vertexProgram, GLSLESProgram* fragmentProgram) :
-    GLSLESProgramCommon(vertexProgram, fragmentProgram) { }
+    GLSLESProgramPipeline::GLSLESProgramPipeline(const GLShaderList& shaders) :
+    GLSLESProgramCommon(shaders) { }
 
     GLSLESProgramPipeline::~GLSLESProgramPipeline()
     {
@@ -51,99 +51,39 @@ namespace Ogre
 
     void GLSLESProgramPipeline::compileAndLink()
     {
-        GLint linkStatus = 0;
-        
         OGRE_CHECK_GL_ERROR(glGenProgramPipelinesEXT(1, &mGLProgramHandle));
         //OGRE_CHECK_GL_ERROR(glBindProgramPipelineEXT(mGLProgramHandle));
 
-        uint32 vhash = 0, fhash = 0;
-
+        mLinked = true;
         // Compile and attach Vertex Program
-        if(getVertexProgram())
+        if(mShaders[GPT_VERTEX_PROGRAM])
         {
-            vhash = mVertexShader->_getHash();
-            if(getVertexProgram()->isLinked())
-            {
-                mLinked |= VERTEX_PROGRAM_LINKED;
-            }
-            else if (getMicrocodeFromCache(vhash, getVertexProgram()->createGLProgramHandle()))
-            {
-                getVertexProgram()->setLinked(true);
-                mLinked |= VERTEX_PROGRAM_LINKED;
-            }
-            else
-            {
-                GLuint programHandle = getVertexProgram()->getGLProgramHandle();
-
-                bindFixedAttributes( programHandle );
-
-                OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
-                getVertexProgram()->attachToProgramObject(programHandle);
-                OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
-                
-                if(linkStatus)
-                {
-                    getVertexProgram()->setLinked(linkStatus);
-                    mLinked |= VERTEX_PROGRAM_LINKED;
-                }
-
-                GLSLES::logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
-
-                setSkeletalAnimationIncluded(getVertexProgram()->isSkeletalAnimationIncluded());
-            }
+            mLinked = mLinked && mShaders[GPT_VERTEX_PROGRAM]->linkSeparable();
         }
         
         // Compile and attach Fragment Program
-        if(mFragmentProgram)
+        if(mShaders[GPT_FRAGMENT_PROGRAM])
         {
-            fhash = mFragmentProgram->_getHash();
-            if(mFragmentProgram->isLinked())
-            {
-                mLinked |= FRAGMENT_PROGRAM_LINKED;
-            }
-            else if (getMicrocodeFromCache(fhash, mFragmentProgram->createGLProgramHandle()))
-            {
-                mFragmentProgram->setLinked(true);
-                mLinked |= FRAGMENT_PROGRAM_LINKED;
-            }
-            else
-            {
-                GLuint programHandle = mFragmentProgram->getGLProgramHandle();
-                OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
-                mFragmentProgram->attachToProgramObject(programHandle);
-                OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
-
-                if(linkStatus)
-                {
-                    mFragmentProgram->setLinked(linkStatus);
-                    mLinked |= FRAGMENT_PROGRAM_LINKED;
-                }
-
-                GLSLES::logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
-            }
+            mLinked = mLinked && mShaders[GPT_FRAGMENT_PROGRAM]->linkSeparable();
         }
         
         if(mLinked)
         {
-            if(getVertexProgram() && getVertexProgram()->isLinked())
+            if(mShaders[GPT_VERTEX_PROGRAM])
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_VERTEX_SHADER_BIT_EXT, getVertexProgram()->getGLProgramHandle()));
-                _writeToCache(vhash, getVertexProgram()->getGLProgramHandle());
+                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_VERTEX_SHADER_BIT_EXT, mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle()));
             }
-            if(mFragmentProgram && mFragmentProgram->isLinked())
+            if(mShaders[GPT_FRAGMENT_PROGRAM])
             {
-                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_FRAGMENT_SHADER_BIT_EXT, mFragmentProgram->getGLProgramHandle()));
-                _writeToCache(fhash, mFragmentProgram->getGLProgramHandle());
+                OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramHandle, GL_FRAGMENT_SHADER_BIT_EXT, mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle()));
             }
 
             // Validate pipeline
             GLSLES::logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramHandle );
-            if(getVertexProgram() && mFragmentProgram && Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
+            if(mShaders[GPT_VERTEX_PROGRAM] && mShaders[GPT_FRAGMENT_PROGRAM] && Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_DEBUG))
             {
                 glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramHandle, 0,
-                             (getVertexProgram()->getName() + "/" + mFragmentProgram->getName()).c_str());
+                             (mShaders[GPT_VERTEX_PROGRAM]->getName() + "/" + mShaders[GPT_FRAGMENT_PROGRAM]->getName()).c_str());
             }
         }
     }
@@ -204,19 +144,17 @@ namespace Ogre
         {
             const GpuConstantDefinitionMap* vertParams = 0;
             const GpuConstantDefinitionMap* fragParams = 0;
-            if (getVertexProgram())
+            if (mShaders[GPT_VERTEX_PROGRAM])
             {
-                vertParams = &(getVertexProgram()->getConstantDefinitions().map);
-                GLSLESProgramManager::extractUniforms(getVertexProgram()->getGLProgramHandle(),
-                                                      vertParams, NULL, mGLUniformReferences,
-                                                      mSharedParamsBufferMap);
+                vertParams = &(mShaders[GPT_VERTEX_PROGRAM]->getConstantDefinitions().map);
+                GLSLESProgramManager::extractUniforms(mShaders[GPT_VERTEX_PROGRAM]->getGLProgramHandle(),
+                                                      vertParams, NULL, mGLUniformReferences);
             }
-            if (mFragmentProgram)
+            if (mShaders[GPT_FRAGMENT_PROGRAM])
             {
-                fragParams = &(mFragmentProgram->getConstantDefinitions().map);
-                GLSLESProgramManager::extractUniforms(mFragmentProgram->getGLProgramHandle(), NULL,
-                                                      fragParams, mGLUniformReferences,
-                                                      mSharedParamsBufferMap);
+                fragParams = &(mShaders[GPT_FRAGMENT_PROGRAM]->getConstantDefinitions().map);
+                GLSLESProgramManager::extractUniforms(mShaders[GPT_FRAGMENT_PROGRAM]->getGLProgramHandle(), NULL,
+                                                      fragParams, mGLUniformReferences);
             }
 
             mUniformRefsBuilt = true;
@@ -227,26 +165,13 @@ namespace Ogre
     void GLSLESProgramPipeline::updateUniforms(GpuProgramParametersSharedPtr params, 
                                            uint16 mask, GpuProgramType fromProgType)
     {
+        OgreAssert(mShaders[fromProgType], "invalid program type");
+        GLuint progID = mShaders[fromProgType]->getGLProgramHandle();
+        GLUniformCache* uniformCache = mShaders[fromProgType]->getUniformCache();
+
         // Iterate through uniform reference list and update uniform values
         GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
         GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
-        GLuint progID = 0;
-        GLUniformCache* uniformCache=0;
-        if(fromProgType == GPT_VERTEX_PROGRAM && getVertexProgram())
-        {
-            progID = getVertexProgram()->getGLProgramHandle();
-            uniformCache = getVertexProgram()->getUniformCache();
-        }
-        else if(fromProgType == GPT_FRAGMENT_PROGRAM && mFragmentProgram)
-        {
-            progID = mFragmentProgram->getGLProgramHandle();
-            uniformCache = mFragmentProgram->getUniformCache();
-        }
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "invalid program type");
-        }
-
         for (;currentUniform != endUniform; ++currentUniform)
         {
             // Only pull values from buffer it's supposed to be in (vertex or fragment)

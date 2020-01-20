@@ -750,38 +750,6 @@ material Examples/Ninja
 
 material Examples/Robot
 {
-	// Hardware skinning technique
-	technique
-	{
-		pass
-		{
-			vertex_program_ref Ogre/HardwareSkinningOneWeight
-			{
-				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-				param_named_auto viewProjectionMatrix viewproj_matrix
-				param_named_auto lightPos[0] light_position 0
-				param_named_auto lightPos[1] light_position 1
-				param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
-				param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
-				param_named_auto ambient ambient_light_colour
-
-			}
-			// alternate shadow caster program
-			shadow_caster_vertex_program_ref Ogre/HardwareSkinningOneWeightShadowCaster
-			{
-				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-				param_named_auto viewProjectionMatrix viewproj_matrix
-				param_named_auto ambient ambient_light_colour
-			}
-
-			texture_unit
-			{
-				texture r2skin.jpg
-			}
-		}
-	}
-
-	// Software blending technique
 	technique
 	{
 		pass
@@ -1059,7 +1027,6 @@ vertex_program Examples/GrassWaverVpGLSL glsl
     default_params
     {
         param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto camObjPos camera_position_object_space
         param_named_auto ambient ambient_light_colour
         param_named_auto objSpaceLight light_position_object_space 0
         param_named_auto lightColour light_diffuse_colour 0
@@ -1932,37 +1899,6 @@ material Examples/TudorHouse
 
 material jaiqua
 {
-	// Hardware skinning technique - no fragment program
-	technique
-	{
-		pass
-		{
-			vertex_program_ref Ogre/HardwareSkinningTwoWeights
-			{
-
-			}
-
-			fragment_program_ref Ogre/BasicFragmentPrograms/DiffuseOneTexture
-			{
-
-			}
-
-			// alternate shadow caster program
-			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
-			{
-				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-				param_named_auto viewProjectionMatrix viewproj_matrix
-				param_named_auto ambient ambient_light_colour
-			}
-
-			texture_unit
-			{
-				texture blue_jaiqua.jpg
-				tex_address_mode clamp
-			}
-		}
-	}
-	// Software blending technique
 	technique
 	{
 		pass
@@ -1971,6 +1907,15 @@ material jaiqua
 			{
 				texture blue_jaiqua.jpg
 				tex_address_mode clamp
+			}
+
+			rtshader_system
+			{
+				// In case the system uses the RTSS, the following line will ensure
+				// that hardware animation is used.
+				// Alternatively, you can derive this information programatically via
+				// HardwareSkinningFactory::prepareEntityForSkinning
+				hardware_skinning 38 2 dual_quaternion true false
 			}
 		}
 	}

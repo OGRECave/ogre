@@ -659,7 +659,7 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
 {
     if(!mBorderSampler)
     {
-        mBorderSampler = std::make_shared<Sampler>();
+        mBorderSampler = TextureManager::getSingleton().createSampler();
         mBorderSampler->setAddressingMode(TAM_BORDER);
         mBorderSampler->setBorderColour(ColourValue::White);
     }

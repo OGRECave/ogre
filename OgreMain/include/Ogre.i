@@ -87,6 +87,18 @@ JNIEnv* OgreJNIGetEnv() {
 }
 #endif
 
+#ifdef SWIGCSHARP
+  %apply void *VOID_INT_PTR {void *}
+
+  %typemap(csvarout) void * %{
+    get {
+	  global::System.IntPtr cPtr = $imcall;
+	  if (OgrePINVOKE.SWIGPendingException.Pending) throw OgrePINVOKE.SWIGPendingException.Retrieve();
+	  return cPtr;
+	}
+  %}
+#endif
+
 // convert c++ exceptions to language native exceptions
 %exception {
     try {
@@ -105,6 +117,18 @@ JNIEnv* OgreJNIGetEnv() {
 // connect operator<< to tp_repr
 %ignore ::operator<<;
 %feature("python:slot", "tp_repr", functype="reprfunc") *::__repr__;
+
+%ignore *::operator+;
+%rename(__add__) *::operator+;
+
+%ignore *::operator-;
+%rename(__sub__) *::operator-;
+
+%ignore *::operator*;
+%rename(__mul__) *::operator*;
+
+%ignore *::operator/;
+%rename(__div__) *::operator/;
 
 #ifdef SWIGJAVA
 #define REPRFUNC toString
@@ -279,6 +303,7 @@ ADD_REPR(Plane)
 %include "OgrePlaneBoundedVolume.h"
 // I/O
 %include "OgreConfigOptionMap.h"
+%template(ConfigOptionMap) std::map<Ogre::String, Ogre::ConfigOption>;
 %ignore Ogre::ConfigFile::load; // conflicting overloads
 %ignore Ogre::ConfigFile::getSettingsIterator; // deprecated
 %ignore Ogre::ConfigFile::getSectionIterator;
@@ -497,6 +522,12 @@ SHARED_PTR(Material);
 %include "OgreMaterialManager.h"
 %include "OgreRenderable.h"
 %include "OgreShadowCaster.h"
+%extend Ogre::MovableObject {
+  Entity* castEntity()
+  {
+    return dynamic_cast<Ogre::Entity*>($self);
+  }
+}
 %include "OgreMovableObject.h"
     %include "OgreBillboardChain.h"
         %include "OgreRibbonTrail.h"

@@ -27,8 +27,8 @@ VOut ssao_vs(VIn IN, uniform float4x4 wvp, uniform float3 farCorner)
     // convert to image space
     uv = (float2(uv.x, -uv.y) + 1.0) * 0.5;
     OUT.uv = uv;
-    // calculate the correct ray (modify XY parameters based on screen-space quad XY)
-    OUT.ray = farCorner * float3(sign(IN.p.xy), 1);
+    // ray towards frustum far corners
+    OUT.ray = IN.n;
     return OUT;
 }
 
@@ -38,14 +38,9 @@ float3 computeZ(float2 xy)
 }
 
 // for ps_3_0, we want to use tex2Dlod because it's faster
-ps_3_0 float4 TEX2DLOD(sampler2D map, float2 uv)
-{
-    return tex2Dlod(map, float4(uv.xy, 0, 0));
-}
-
 float4 TEX2DLOD(sampler2D map, float2 uv)
 {
-    return tex2D(map, uv);
+    return tex2Dlod(map, float4(uv.xy, 0, 0));
 }
 
 float4 ssao_ps(

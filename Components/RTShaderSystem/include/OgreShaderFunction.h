@@ -103,13 +103,11 @@ class _OgreRTSSExport Function : public RTShaderSystemAlloc
     friend ProgramManager;
 // Interface.
 public:
+    /// @deprecated do not use
     enum FunctionType
     {
-        // internal function (default)
         FFT_INTERNAL,
-        // Vertex program main
         FFT_VS_MAIN,
-        // Pixel shader main
         FFT_PS_MAIN
     };
 
@@ -261,8 +259,8 @@ public:
     /** Delete all output parameters from this function. */
     void deleteAllOutputParameters();
 
-    /** get function type. */
-    FunctionType getFunctionType() const;
+    /// @deprecated do not use
+    OGRE_DEPRECATED FunctionType getFunctionType() const;
 
 
 protected:

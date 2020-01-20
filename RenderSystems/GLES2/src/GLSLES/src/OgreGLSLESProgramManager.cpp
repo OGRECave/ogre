@@ -60,51 +60,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLSLESProgramManager::GLSLESProgramManager(void) : mActiveProgram(NULL)
     {
-        mActiveShader.fill(NULL);
-
-        // Fill in the relationship between type names and enums
-        mTypeEnumMap.emplace("float", GL_FLOAT);
-        mTypeEnumMap.emplace("vec2", GL_FLOAT_VEC2);
-        mTypeEnumMap.emplace("vec3", GL_FLOAT_VEC3);
-        mTypeEnumMap.emplace("vec4", GL_FLOAT_VEC4);
-        mTypeEnumMap.emplace("sampler2D", GL_SAMPLER_2D);
-        mTypeEnumMap.emplace("samplerCube", GL_SAMPLER_CUBE);
-        mTypeEnumMap.emplace("sampler2DShadow", GL_SAMPLER_2D_SHADOW_EXT);
-        mTypeEnumMap.emplace("samplerExternalOES", GL_SAMPLER_EXTERNAL_OES);
-        mTypeEnumMap.emplace("int", GL_INT);
-        mTypeEnumMap.emplace("ivec2", GL_INT_VEC2);
-        mTypeEnumMap.emplace("ivec3", GL_INT_VEC3);
-        mTypeEnumMap.emplace("ivec4", GL_INT_VEC4);
-        mTypeEnumMap.emplace("mat2", GL_FLOAT_MAT2);
-        mTypeEnumMap.emplace("mat3", GL_FLOAT_MAT3);
-        mTypeEnumMap.emplace("mat4", GL_FLOAT_MAT4);
-        mTypeEnumMap.emplace("sampler3D", GL_SAMPLER_3D_OES);
-        // GLES3 types
-        mTypeEnumMap.emplace("mat2x3", GL_FLOAT_MAT2x3);
-        mTypeEnumMap.emplace("mat3x2", GL_FLOAT_MAT3x2);
-        mTypeEnumMap.emplace("mat3x4", GL_FLOAT_MAT3x4);
-        mTypeEnumMap.emplace("mat4x3", GL_FLOAT_MAT4x3);
-        mTypeEnumMap.emplace("mat2x4", GL_FLOAT_MAT2x4);
-        mTypeEnumMap.emplace("mat4x2", GL_FLOAT_MAT4x2);
-        mTypeEnumMap.emplace("bvec2", GL_BOOL_VEC2);
-        mTypeEnumMap.emplace("bvec3", GL_BOOL_VEC3);
-        mTypeEnumMap.emplace("bvec4", GL_BOOL_VEC4);
-        mTypeEnumMap.emplace("uint", GL_UNSIGNED_INT);
-        mTypeEnumMap.emplace("uvec2", GL_UNSIGNED_INT_VEC2);
-        mTypeEnumMap.emplace("uvec3", GL_UNSIGNED_INT_VEC3);
-        mTypeEnumMap.emplace("uvec4", GL_UNSIGNED_INT_VEC4);
-        mTypeEnumMap.emplace("samplerCubeShadow", GL_SAMPLER_CUBE_SHADOW);
-        mTypeEnumMap.emplace("sampler2DArray", GL_SAMPLER_2D_ARRAY);
-        mTypeEnumMap.emplace("sampler2DArrayShadow", GL_SAMPLER_2D_ARRAY_SHADOW);
-        mTypeEnumMap.emplace("isampler2D", GL_INT_SAMPLER_2D);
-        mTypeEnumMap.emplace("isampler3D", GL_INT_SAMPLER_3D);
-        mTypeEnumMap.emplace("isamplerCube", GL_INT_SAMPLER_CUBE);
-        mTypeEnumMap.emplace("isampler2DArray", GL_INT_SAMPLER_2D_ARRAY);
-        mTypeEnumMap.emplace("usampler2D", GL_UNSIGNED_INT_SAMPLER_2D);
-        mTypeEnumMap.emplace("usampler3D", GL_UNSIGNED_INT_SAMPLER_3D);
-        mTypeEnumMap.emplace("usamplerCube", GL_UNSIGNED_INT_SAMPLER_CUBE);
-        mTypeEnumMap.emplace("usampler2DArray", GL_UNSIGNED_INT_SAMPLER_2D_ARRAY);
-
         
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -154,13 +109,11 @@ namespace Ogre {
                 if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(
                         RSC_SEPARATE_SHADER_OBJECTS))
                 {
-                    mActiveProgram =
-                        new GLSLESProgramPipeline(mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_FRAGMENT_PROGRAM]);
+                    mActiveProgram = new GLSLESProgramPipeline(mActiveShader);
                 }
                 else
                 {
-                    mActiveProgram =
-                        new GLSLESLinkProgram(mActiveShader[GPT_VERTEX_PROGRAM], mActiveShader[GPT_FRAGMENT_PROGRAM]);
+                    mActiveProgram = new GLSLESLinkProgram(mActiveShader);
                 }
 
                 mPrograms[activeKey] = mActiveProgram;
@@ -190,22 +143,6 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLESProgramCommon* GLSLESProgramManager::getByProgram(GLSLESProgram* gpuProgram)
-    {
-        for (ProgramIterator currentProgram = mPrograms.begin();
-            currentProgram != mPrograms.end(); ++currentProgram)
-        {
-            GLSLESProgramCommon* prgm = static_cast<GLSLESProgramCommon*>(currentProgram->second);
-            if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
-            {
-                return prgm;
-            }
-        }
-
-        return NULL;
-    }
-
-    //-----------------------------------------------------------------------
     bool GLSLESProgramManager::destroyLinkProgram(GLSLESProgramCommon* linkProgram)
     {
         for (ProgramIterator currentProgram = mPrograms.begin();
@@ -221,100 +158,6 @@ namespace Ogre {
         }
 
         return false;
-    }
-
-    //---------------------------------------------------------------------
-    void GLSLESProgramManager::convertGLUniformtoOgreType(GLenum gltype,
-        GpuConstantDefinition& defToUpdate)
-    {
-        // Decode uniform size and type
-        // Note GLSL ES never packs rows into float4's(from an API perspective anyway)
-        // therefore all values are tight in the buffer
-        switch (gltype)
-        {
-        case GL_FLOAT:
-            defToUpdate.constType = GCT_FLOAT1;
-            break;
-        case GL_FLOAT_VEC2:
-            defToUpdate.constType = GCT_FLOAT2;
-            break;
-        case GL_FLOAT_VEC3:
-            defToUpdate.constType = GCT_FLOAT3;
-            break;
-        case GL_FLOAT_VEC4:
-            defToUpdate.constType = GCT_FLOAT4;
-            break;
-        case GL_SAMPLER_3D:
-        case GL_INT_SAMPLER_3D:
-        case GL_UNSIGNED_INT_SAMPLER_3D:
-            defToUpdate.constType = GCT_SAMPLER3D;
-            break;
-        case GL_UNSIGNED_INT_SAMPLER_2D:
-        case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:
-        case GL_INT_SAMPLER_2D:
-        case GL_INT_SAMPLER_2D_ARRAY:
-        case GL_SAMPLER_2D_ARRAY:
-        case GL_SAMPLER_2D:
-            defToUpdate.constType = GCT_SAMPLER2D;
-            break;
-        case GL_SAMPLER_CUBE_SHADOW:
-        case GL_INT_SAMPLER_CUBE:
-        case GL_UNSIGNED_INT_SAMPLER_CUBE:
-        case GL_SAMPLER_CUBE:
-            defToUpdate.constType = GCT_SAMPLERCUBE;
-            break;
-        case GL_SAMPLER_2D_SHADOW_EXT:
-            defToUpdate.constType = GCT_SAMPLER2DSHADOW;
-            break;
-        case GL_SAMPLER_EXTERNAL_OES:
-            defToUpdate.constType = GCT_SAMPLER_EXTERNAL_OES;
-            break;
-        case GL_INT:
-            defToUpdate.constType = GCT_INT1;
-            break;
-        case GL_INT_VEC2:
-            defToUpdate.constType = GCT_INT2;
-            break;
-        case GL_INT_VEC3:
-            defToUpdate.constType = GCT_INT3;
-            break;
-        case GL_INT_VEC4:
-            defToUpdate.constType = GCT_INT4;
-            break;
-        case GL_FLOAT_MAT2:
-            defToUpdate.constType = GCT_MATRIX_2X2;
-            break;
-        case GL_FLOAT_MAT3:
-            defToUpdate.constType = GCT_MATRIX_3X3;
-            break;
-        case GL_FLOAT_MAT4:
-            defToUpdate.constType = GCT_MATRIX_4X4;
-            break;
-        case GL_FLOAT_MAT2x3:
-            defToUpdate.constType = GCT_MATRIX_2X3;
-            break;
-        case GL_FLOAT_MAT3x2:
-            defToUpdate.constType = GCT_MATRIX_3X2;
-            break;
-        case GL_FLOAT_MAT2x4:
-            defToUpdate.constType = GCT_MATRIX_2X4;
-            break;
-        case GL_FLOAT_MAT4x2:
-            defToUpdate.constType = GCT_MATRIX_4X2;
-            break;
-        case GL_FLOAT_MAT3x4:
-            defToUpdate.constType = GCT_MATRIX_3X4;
-            break;
-        case GL_FLOAT_MAT4x3:
-            defToUpdate.constType = GCT_MATRIX_4X3;
-            break;
-        default:
-            defToUpdate.constType = GCT_UNKNOWN;
-            break;
-        }
-
-        // GL doesn't pad
-        defToUpdate.elementSize = GpuConstantDefinition::getElementSize(defToUpdate.constType, false);
     }
 
     //---------------------------------------------------------------------
@@ -384,9 +227,9 @@ namespace Ogre {
 
     //---------------------------------------------------------------------
     void GLSLESProgramManager::extractUniforms(GLuint programObject,
-        const GpuConstantDefinitionMap* vertexConstantDefs, 
-        const GpuConstantDefinitionMap* fragmentConstantDefs,
-        GLUniformReferenceList& list, SharedParamsBufferMap& sharedParamsBufferMap)
+                                               const GpuConstantDefinitionMap* vertexConstantDefs,
+                                               const GpuConstantDefinitionMap* fragmentConstantDefs,
+                                               GLUniformReferenceList& list)
     {
         // Scan through the active uniforms and add them to the reference list
         GLint uniformCount = 0;

@@ -163,12 +163,11 @@ namespace Ogre {
                 newMaterialName += "?TexAlias(";
                 // Iterate deterministically over the aliases (always in the same
                 // order via std::map's sorted iteration nature).
-                AliasTextureIterator aliasIter = getAliasTextureIterator();
-                while( aliasIter.hasMoreElements() )
+                for( const auto& it : mTextureAliases )
                 {
-                    newMaterialName += aliasIter.peekNextKey();
+                    newMaterialName += it.first;
                     newMaterialName += "=";
-                    newMaterialName += aliasIter.getNext();
+                    newMaterialName += it.second;
                     newMaterialName += " ";
                 }
                 newMaterialName += ")";

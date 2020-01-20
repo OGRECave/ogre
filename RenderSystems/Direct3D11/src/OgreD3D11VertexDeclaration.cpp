@@ -96,8 +96,9 @@ namespace Ogre {
                 if (!found)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                                StringUtil::format("No VertexElement for semantic %s in shader %s found",
-                                                   inputDesc.SemanticName, boundVertexProgram->getName().c_str()));
+                                StringUtil::format("No VertexElement for semantic %s%d in shader %s found",
+                                                   inputDesc.SemanticName, inputDesc.SemanticIndex,
+                                                   boundVertexProgram->getName().c_str()));
                 }
 
                 D3D11_INPUT_ELEMENT_DESC elem = {};

@@ -48,8 +48,8 @@ namespace Ogre
         // Clear state
         if (mImmediateContext)
         {
-            mImmediateContext->Flush();
             mImmediateContext->ClearState();
+            mImmediateContext->Flush();
         }
 #if OGRE_D3D11_PROFILING
         mPerf.Reset();

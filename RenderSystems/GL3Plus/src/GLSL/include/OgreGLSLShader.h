@@ -42,35 +42,27 @@ namespace Ogre {
                    const String& name, ResourceHandle handle,
                    const String& group, bool isManual, ManualResourceLoader* loader);
 		~GLSLShader();
-		
-        GLuint getGLShaderHandle() const { return mGLShaderHandle; }
-        GLuint getGLProgramHandle();
+
         void attachToProgramObject(const GLuint programObject);
         void detachFromProgramObject(const GLuint programObject);
 
+        bool linkSeparable();
+
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
-
-        /// Compile source into shader object
-        bool compile( bool checkErrors = false);
-
     protected:
+        void loadFromSource();
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() const;
         /// Add boiler plate code and preprocessor extras, then
         /// submit shader source to OpenGL.
-        void submitSource();
+        virtual void compileSource();
 
-        // /// @copydoc Resource::loadImpl
-        // void loadImpl(void) {}
 
-    protected:
-        /// GL handle for shader object.
-        GLuint mGLShaderHandle;
-        /// GL handle for program object the shader is bound to.
-        GLuint mGLProgramHandle;
+        void extractUniforms() const;
+        void extractBufferBlocks(GLenum type) const;
     };
 }
 

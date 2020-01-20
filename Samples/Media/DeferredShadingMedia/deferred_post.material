@@ -51,7 +51,7 @@ material DeferredShading/Post/ShowNormal
 			fragment_program_ref DeferredShading/post/ShowNormal_ps
 			{
 			}
-			vertex_program_ref DeferredShading/post/vs
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 			texture_unit
@@ -80,7 +80,7 @@ material DeferredShading/Post/ShowDS
 			fragment_program_ref DeferredShading/post/ShowDS_ps
 			{
 			}
-			vertex_program_ref DeferredShading/post/vs
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 			texture_unit
@@ -110,7 +110,7 @@ material DeferredShading/Post/ShowColour
 			fragment_program_ref DeferredShading/post/ShowColour_ps
 			{
 			}
-			vertex_program_ref DeferredShading/post/vs
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 			texture_unit
@@ -140,7 +140,6 @@ material DeferredShading/Post/SimpleQuad
 			
             texture_unit
             {
-                texture white.bmp
                 filtering none
             }
 		}

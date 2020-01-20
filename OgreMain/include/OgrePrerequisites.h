@@ -117,7 +117,7 @@ namespace Ogre {
     class GpuProgram;
     class GpuProgramManager;
     class GpuProgramUsage;
-    class HardwareCounterBuffer;
+    class HardwareBuffer;
     class HardwareIndexBuffer;
     class HardwareOcclusionQuery;
     class HardwareUniformBuffer;
@@ -285,10 +285,11 @@ namespace Ogre {
     typedef SharedPtr<GpuSharedParameters> GpuSharedParametersPtr;
     typedef SharedPtr<GpuProgramParameters> GpuProgramParametersPtr;
     typedef GpuProgramParametersPtr GpuProgramParametersSharedPtr; //!< @deprecated
-    typedef SharedPtr<HardwareCounterBuffer> HardwareCounterBufferSharedPtr;
+    typedef SharedPtr<HardwareBuffer> HardwareBufferPtr;
     typedef SharedPtr<HardwareIndexBuffer> HardwareIndexBufferSharedPtr;
     typedef SharedPtr<HardwarePixelBuffer> HardwarePixelBufferSharedPtr;
     typedef SharedPtr<HardwareUniformBuffer> HardwareUniformBufferSharedPtr;
+    typedef HardwareUniformBufferSharedPtr HardwareCounterBufferSharedPtr;
     typedef SharedPtr<HardwareVertexBuffer> HardwareVertexBufferSharedPtr;
     typedef SharedPtr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
     typedef SharedPtr<Material> MaterialPtr;

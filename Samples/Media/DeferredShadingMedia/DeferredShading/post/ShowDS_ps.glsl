@@ -23,21 +23,16 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	Post shader: Debug, show depth and specularity channel
 */
-#version 150
-
 uniform sampler2D Tex0;
 uniform sampler2D Tex1;
 
-in vec2 oUv0;
-in vec2 projCoord;
-
-out vec4 fragColour;
+varying vec2 oUv0;
 
 void main()
 {
-	vec4 a0 = texture(Tex0, oUv0); // Attribute 0: Diffuse color+shininess
-	vec4 a1 = texture(Tex1, oUv0); // Attribute 1: Normal+depth
+	vec4 a0 = texture2D(Tex0, oUv0); // Attribute 0: Diffuse color+shininess
+	vec4 a1 = texture2D(Tex1, oUv0); // Attribute 1: Normal+depth
 
 	//Get the 3rd root of the depth to show up-close differences
-	fragColour = vec4(pow(a1.w,0.33), 0, a0.w, 0);
+	gl_FragColor = vec4(pow(a1.w,0.33), 0, a0.w, 0);
 }

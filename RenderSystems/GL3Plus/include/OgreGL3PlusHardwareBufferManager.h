@@ -63,17 +63,20 @@ namespace Ogre {
             HardwareIndexBuffer::IndexType itype, size_t numIndexes,
             HardwareBuffer::Usage usage, bool useShadowBuffer = false);
         /// Create a uniform buffer
-        HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                           bool useShadowBuffer, const String& name = "");
+        HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+                                                           bool useShadowBuffer = false, const String& name = "");
 
         /// Create a shader storage buffer.
-        HardwareUniformBufferSharedPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                                 bool useShadowBuffer, const String& name = "");
+        HardwareUniformBufferSharedPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+                                                                 bool useShadowBuffer = false, const String& name = "");
         /// Create a counter buffer
         HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                            bool useShadowBuffer, const String& name = "");
         /// Create a render to vertex buffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+
+        size_t getUniformBufferCount() { return mUniformBuffers.size(); }
+        size_t getShaderStorageBufferCount() { return mShaderStorageBuffers.size(); }
 
         /// Utility function to get the correct GL type based on VET's
         static GLenum getGLType(VertexElementType type);

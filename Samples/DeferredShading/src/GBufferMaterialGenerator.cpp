@@ -36,14 +36,11 @@ public:
     GBufferMaterialGeneratorImpl(const String& baseName) : 
       mBaseName(baseName)
       {
-          mIsSm4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-          mIsGLSL = (GpuProgramManager::getSingleton().isSyntaxSupported("glsl") || GpuProgramManager::getSingleton().isSyntaxSupported("glsles")) &&
-                    !(GpuProgramManager::getSingleton().isSyntaxSupported("vs_1_1") || GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1"));
+          mIsGLSL = GpuProgramManager::getSingleton().isSyntaxSupported("glsl") || GpuProgramManager::getSingleton().isSyntaxSupported("glsles");
       }
     
 protected:
     String mBaseName;
-    bool mIsSm4;
     bool mIsGLSL;
     virtual GpuProgramPtr generateVertexShader(MaterialGenerator::Perm permutation);
     virtual GpuProgramPtr generateFragmentShader(MaterialGenerator::Perm permutation);
@@ -184,14 +181,7 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
 
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            if(mIsSm4)
-            {
-                ss << " float3 iTangent : TANGENT," << std::endl;
-            }
-            else
-            {
-                ss << " float3 iTangent : TANGENT0," << std::endl;
-            }
+            ss << " float3 iTangent : TANGENT0," << std::endl;
         }
 
         //TODO : Skinning inputs
@@ -200,10 +190,6 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
 
 
         ss << " out float4 oPosition : " ;
-        if(mIsSm4)
-        {
-            ss << "SV_";
-        }
         ss << "POSITION," << std::endl;
     #ifdef WRITE_LINEAR_DEPTH
         ss << " out float3 oViewPos : TEXCOORD0," << std::endl;
@@ -261,17 +247,10 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
         // Create shader object
         HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(
             programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-            "cg", GPT_VERTEX_PROGRAM);
+            "hlsl", GPT_VERTEX_PROGRAM);
         ptrProgram->setSource(programSource);
         ptrProgram->setParameter("entry_point","ToGBufferVP");
-        if(mIsSm4)
-        {
-            ptrProgram->setParameter("profiles","vs_4_0");
-        }
-        else
-        {
-            ptrProgram->setParameter("profiles","vs_1_1 arbvp1");
-        }
+        ptrProgram->setParameter("target","vs_2_0");
 
         const GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
         params->setNamedAutoConstant("cWorldViewProj", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
@@ -369,13 +348,13 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         {
             ss << " vec3 texNormal = (" << textureFunc << "(sNormalMap, oUv0).rgb-0.5)*2.0;" << std::endl;
             ss << " mat3 normalRotation = mat3(oTangent, oBiNormal, oNormal);" << std::endl;
-            ss << outData << "[1].rgb = normalize(texNormal * normalRotation);" << std::endl;
+            ss << outData << "[1].rgb = normalize(normalRotation * texNormal);" << std::endl;
         }
         else
         {
             ss << outData << "[1].rgb = normalize(oNormal);" << std::endl;
         }
-        ss << outData << "[1].rgb = normalize(oNormal);" << std::endl;
+
 #ifdef WRITE_LINEAR_DEPTH
         ss << outData << "[1].a = length(oViewPos) / cFarDistance;" << std::endl;
 #else
@@ -436,11 +415,20 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
     }
     else
     {
-        ss << "void ToGBufferFP(" << std::endl;
-        if(mIsSm4)
+        ss << "#include \"HLSL_SM4Support.hlsl\"" << std::endl;
+
+        int samplerNum = 0;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "float4 oPosition : SV_POSITION," << std::endl;
+            ss << " SAMPLER2D(sNormalMap, " << samplerNum++ << ");" << std::endl;
         }
+        uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
+        for (uint32 i=0; i<numTextures; i++) {
+            ss << " SAMPLER2D(sTex" << i << ", " << samplerNum++ << ");" << std::endl;
+        }
+
+        ss << "void ToGBufferFP(" << std::endl;
+        ss << "float4 oPosition : POSITION," << std::endl;
 
     #ifdef WRITE_LINEAR_DEPTH
         ss << " float3 iViewPos : TEXCOORD0," << std::endl;
@@ -469,29 +457,6 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
 
         ss << std::endl;
 
-        int samplerNum = 0;
-        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
-        {
-            if(mIsSm4)
-            {
-                ss << " uniform sampler2D sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
-            }
-            else
-            {
-                ss << " uniform sampler sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
-            }
-        }
-        uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
-        for (uint32 i=0; i<numTextures; i++) {
-            if(mIsSm4)
-            {
-                ss << " uniform sampler2D sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
-            }
-            else
-            {
-                ss << " uniform sampler sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
-            }
-        }
         if (numTextures == 0 || permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
         {
             ss << " uniform float4 cDiffuseColour," << std::endl;
@@ -550,17 +515,10 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         // Create shader object
         HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(
             programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-            "cg", GPT_FRAGMENT_PROGRAM);
+            "hlsl", GPT_FRAGMENT_PROGRAM);
         ptrProgram->setSource(programSource);
         ptrProgram->setParameter("entry_point","ToGBufferFP");
-        if(mIsSm4)
-        {
-            ptrProgram->setParameter("profiles","ps_4_0");
-        }
-        else
-        {
-            ptrProgram->setParameter("profiles","ps_2_0 arbfp1");
-        }
+        ptrProgram->setParameter("target","ps_2_0");
 
         const GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
         params->setNamedAutoConstant("cSpecularity", GpuProgramParameters::ACT_SURFACE_SHININESS);

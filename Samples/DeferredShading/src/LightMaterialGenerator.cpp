@@ -90,13 +90,13 @@ public:
         // Create shader object
         HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(
             name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-            "cg", GPT_FRAGMENT_PROGRAM);
+            "hlsl", GPT_FRAGMENT_PROGRAM);
         ptrProgram->setSource(mMasterSource);
         ptrProgram->setParameter("entry_point","main");
-        ptrProgram->setParameter("profiles","ps_2_x arbfp1");
+        ptrProgram->setParameter("target","ps_2_a");
         // set up the preprocessor defines
         // Important to do this before any call to get parameters, i.e. before the program gets loaded
-        ptrProgram->setParameter("compile_arguments", getPPDefines(permutation));
+        ptrProgram->setParameter("preprocessor_defines", getPPDefines(permutation));
 
         setUpBaseParameters(ptrProgram->getDefaultParameters());
 
@@ -149,20 +149,20 @@ public:
             {
                 assert(false && "Permutation must have a light type");
             }
-            strPPD += "-DLIGHT_TYPE=LIGHT_" + lightType + " ";
+            strPPD += "LIGHT_TYPE=LIGHT_" + lightType;
 
             //Optional parameters
             if (permutation & LightMaterialGenerator::MI_SPECULAR)
             {
-                strPPD += "-DIS_SPECULAR ";
+                strPPD += ",IS_SPECULAR=1";
             }
             if (permutation & LightMaterialGenerator::MI_ATTENUATED)
             {
-                strPPD += "-DIS_ATTENUATED ";
+                strPPD += ",IS_ATTENUATED=1";
             }
             if (permutation & LightMaterialGenerator::MI_SHADOW_CASTER)
             {
-                strPPD += "-DIS_SHADOW_CASTER ";
+                strPPD += ",IS_SHADOW_CASTER=1";
             }
             return strPPD;
         }
@@ -241,13 +241,8 @@ public:
         /// Create shader
         if (mMasterSource.empty())
         {
-            DataStreamPtr ptrMasterSource;
-            if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
-                ptrMasterSource = ResourceGroupManager::getSingleton().openResource("LightMaterial_ps.glsles",
-                                                                                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-            else
-                ptrMasterSource = ResourceGroupManager::getSingleton().openResource("LightMaterial_ps.glsl",
-                                                                                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            DataStreamPtr ptrMasterSource =
+                ResourceGroupManager::getSingleton().openResource("LightMaterial_ps.glsl", RGN_DEFAULT);
 
             OgreAssert(ptrMasterSource, "could not find 'LightMaterial_ps'");
             mMasterSource = ptrMasterSource->getAsString();

@@ -34,8 +34,6 @@ THE SOFTWARE.
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLSLLinkProgram.h"
 
-#include <array>
-
 namespace Ogre {
 
     namespace GLSL {
@@ -44,12 +42,8 @@ namespace Ogre {
     {
 
     private:
-        /// Active shader objects defining the active program object.
-        std::array<GLSLProgram*, GPT_COUNT> mActiveGpuProgram;;
         GLSLLinkProgram* mActiveLinkProgram;
 
-        /// Use type to complete other information
-        void convertGLUniformtoOgreType(GLenum gltype, GpuConstantDefinition& defToUpdate);
         /// Find where the data for a specific uniform should come from, populate
         static bool completeParamSource(const String& paramName,
             const GpuConstantDefinitionMap* vertexConstantDefs, 

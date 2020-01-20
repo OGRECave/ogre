@@ -44,7 +44,7 @@ public:
 
     const String& getLanguage(void) const;
 protected:
-    void loadFromSource();
+    void compileSource();
 };
 
 class _OgreGL3PlusExport SPIRVShaderFactory: public HighLevelGpuProgramFactory

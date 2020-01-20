@@ -51,41 +51,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    GLSLLinkProgramManager::GLSLLinkProgramManager(void) : mActiveLinkProgram(NULL)
-    {
-        mActiveGpuProgram.fill(NULL);
-
-        // Fill in the relationship between type names and enums
-        mTypeEnumMap.emplace("float", GL_FLOAT);
-        mTypeEnumMap.emplace("vec2", GL_FLOAT_VEC2);
-        mTypeEnumMap.emplace("vec3", GL_FLOAT_VEC3);
-        mTypeEnumMap.emplace("vec4", GL_FLOAT_VEC4);
-        mTypeEnumMap.emplace("sampler1D", GL_SAMPLER_1D);
-        mTypeEnumMap.emplace("sampler2D", GL_SAMPLER_2D);
-        mTypeEnumMap.emplace("sampler3D", GL_SAMPLER_3D);
-        mTypeEnumMap.emplace("sampler2DArray", GL_SAMPLER_2D_ARRAY_EXT);
-        mTypeEnumMap.emplace("samplerCube", GL_SAMPLER_CUBE);
-        mTypeEnumMap.emplace("sampler1DShadow", GL_SAMPLER_1D_SHADOW);
-        mTypeEnumMap.emplace("sampler2DShadow", GL_SAMPLER_2D_SHADOW);
-        mTypeEnumMap.emplace("int", GL_INT);
-        mTypeEnumMap.emplace("ivec2", GL_INT_VEC2);
-        mTypeEnumMap.emplace("ivec3", GL_INT_VEC3);
-        mTypeEnumMap.emplace("ivec4", GL_INT_VEC4);
-        mTypeEnumMap.emplace("mat2", GL_FLOAT_MAT2);
-        mTypeEnumMap.emplace("mat3", GL_FLOAT_MAT3);
-        mTypeEnumMap.emplace("mat4", GL_FLOAT_MAT4);
-        // GL 2.1
-        mTypeEnumMap.emplace("mat2x2", GL_FLOAT_MAT2);
-        mTypeEnumMap.emplace("mat3x3", GL_FLOAT_MAT3);
-        mTypeEnumMap.emplace("mat4x4", GL_FLOAT_MAT4);
-        mTypeEnumMap.emplace("mat2x3", GL_FLOAT_MAT2x3);
-        mTypeEnumMap.emplace("mat3x2", GL_FLOAT_MAT3x2);
-        mTypeEnumMap.emplace("mat3x4", GL_FLOAT_MAT3x4);
-        mTypeEnumMap.emplace("mat4x3", GL_FLOAT_MAT4x3);
-        mTypeEnumMap.emplace("mat2x4", GL_FLOAT_MAT2x4);
-        mTypeEnumMap.emplace("mat4x2", GL_FLOAT_MAT4x2);
-
-    }
+    GLSLLinkProgramManager::GLSLLinkProgramManager(void) : mActiveLinkProgram(NULL) {}
 
     //-----------------------------------------------------------------------
     GLSLLinkProgramManager::~GLSLLinkProgramManager(void) {}
@@ -100,7 +66,7 @@ namespace Ogre {
         // no active link program so find one or make a new one
         // is there an active key?
         uint32 activeKey = 0;
-        for(auto shader : mActiveGpuProgram)
+        for(auto shader : mActiveShader)
         {
             if(!shader) continue;
             activeKey = HashCombine(activeKey, shader->getShaderID());
@@ -114,9 +80,7 @@ namespace Ogre {
             // program object not found for key so need to create it
             if (programFound == mPrograms.end())
             {
-                mActiveLinkProgram = new GLSLLinkProgram(mActiveGpuProgram[GPT_VERTEX_PROGRAM],
-                                                         mActiveGpuProgram[GPT_GEOMETRY_PROGRAM],
-                                                         mActiveGpuProgram[GPT_FRAGMENT_PROGRAM]);
+                mActiveLinkProgram = new GLSLLinkProgram(mActiveShader);
                 mPrograms[activeKey] = mActiveLinkProgram;
             }
             else
@@ -136,112 +100,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLLinkProgramManager::setActiveShader(GpuProgramType type, GLSLProgram* gpuProgram)
     {
-        if (gpuProgram != mActiveGpuProgram[type])
+        if (gpuProgram != mActiveShader[type])
         {
-            mActiveGpuProgram[type] = gpuProgram;
+            mActiveShader[type] = gpuProgram;
             // ActiveLinkProgram is no longer valid
             mActiveLinkProgram = NULL;
             // change back to fixed pipeline
             glUseProgramObjectARB(0);
         }
-    }
-
-    //---------------------------------------------------------------------
-    void GLSLLinkProgramManager::convertGLUniformtoOgreType(GLenum gltype,
-        GpuConstantDefinition& defToUpdate)
-    {
-        // decode uniform size and type
-        // Note GLSL never packs rows into float4's(from an API perspective anyway)
-        // therefore all values are tight in the buffer
-        switch (gltype)
-        {
-        case GL_FLOAT:
-            defToUpdate.constType = GCT_FLOAT1;
-            break;
-        case GL_FLOAT_VEC2:
-            defToUpdate.constType = GCT_FLOAT2;
-            break;
-
-        case GL_FLOAT_VEC3:
-            defToUpdate.constType = GCT_FLOAT3;
-            break;
-
-        case GL_FLOAT_VEC4:
-            defToUpdate.constType = GCT_FLOAT4;
-            break;
-        case GL_SAMPLER_1D:
-            // need to record samplers for GLSL
-            defToUpdate.constType = GCT_SAMPLER1D;
-            break;
-        case GL_SAMPLER_2D:
-        case GL_SAMPLER_2D_RECT_ARB:
-            defToUpdate.constType = GCT_SAMPLER2D;
-            break;
-        case GL_SAMPLER_2D_ARRAY_EXT:
-            defToUpdate.constType = GCT_SAMPLER2DARRAY;
-            break;
-        case GL_SAMPLER_3D:
-            defToUpdate.constType = GCT_SAMPLER3D;
-            break;
-        case GL_SAMPLER_CUBE:
-            defToUpdate.constType = GCT_SAMPLERCUBE;
-            break;
-        case GL_SAMPLER_1D_SHADOW:
-            defToUpdate.constType = GCT_SAMPLER1DSHADOW;
-            break;
-        case GL_SAMPLER_2D_SHADOW:
-        case GL_SAMPLER_2D_RECT_SHADOW_ARB:
-            defToUpdate.constType = GCT_SAMPLER2DSHADOW;
-            break;
-        case GL_INT:
-            defToUpdate.constType = GCT_INT1;
-            break;
-        case GL_INT_VEC2:
-            defToUpdate.constType = GCT_INT2;
-            break;
-        case GL_INT_VEC3:
-            defToUpdate.constType = GCT_INT3;
-            break;
-        case GL_INT_VEC4:
-            defToUpdate.constType = GCT_INT4;
-            break;
-        case GL_FLOAT_MAT2:
-            defToUpdate.constType = GCT_MATRIX_2X2;
-            break;
-        case GL_FLOAT_MAT3:
-            defToUpdate.constType = GCT_MATRIX_3X3;
-            break;
-        case GL_FLOAT_MAT4:
-            defToUpdate.constType = GCT_MATRIX_4X4;
-            break;
-        case GL_FLOAT_MAT2x3:
-            defToUpdate.constType = GCT_MATRIX_2X3;
-            break;
-        case GL_FLOAT_MAT3x2:
-            defToUpdate.constType = GCT_MATRIX_3X2;
-            break;
-        case GL_FLOAT_MAT2x4:
-            defToUpdate.constType = GCT_MATRIX_2X4;
-            break;
-        case GL_FLOAT_MAT4x2:
-            defToUpdate.constType = GCT_MATRIX_4X2;
-            break;
-        case GL_FLOAT_MAT3x4:
-            defToUpdate.constType = GCT_MATRIX_3X4;
-            break;
-        case GL_FLOAT_MAT4x3:
-            defToUpdate.constType = GCT_MATRIX_4X3;
-            break;
-        default:
-            defToUpdate.constType = GCT_UNKNOWN;
-            break;
-
-        }
-
-        // GL doesn't pad
-        defToUpdate.elementSize = GpuConstantDefinition::getElementSize(defToUpdate.constType, false);
-
-
     }
     //---------------------------------------------------------------------
     bool GLSLLinkProgramManager::completeParamSource(

@@ -63,7 +63,9 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 
     //input param
     mParamInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-    mParamInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
+
+    if(mDoLightCalculations)
+        mParamInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
     //mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);
     //mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
 
@@ -79,9 +81,6 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
     if (mDoBoneCalculations == true)
     {
         //input parameters
-        mParamInNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
-        //mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);
-        //mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
         mParamInIndices = vsMain->resolveInputParameter(Parameter::SPC_BLEND_INDICES);
         mParamInWeights = vsMain->resolveInputParameter(Parameter::SPC_BLEND_WEIGHTS);
         mParamInWorldMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, mBoneCount);
@@ -102,9 +101,9 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         if(mScalingShearingSupport)
         {
             mParamInScaleShearMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, mBoneCount);
-            mParamBlendS = vsMain->resolveLocalParameter("blendS", mParamInScaleShearMatrices->getType()); // will be transposed for GLSL
+            mParamBlendS = vsMain->resolveLocalParameter("blendS", GCT_MATRIX_3X4);
             mParamTempFloat3x3 = vsMain->resolveLocalParameter("TempVal3x3", GCT_MATRIX_3X3);
-            mParamTempFloat3x4 = vsMain->resolveLocalParameter("TempVal3x4", mParamInScaleShearMatrices->getType()); // will be transposed for GLSL
+            mParamTempFloat3x4 = vsMain->resolveLocalParameter("TempVal3x4", GCT_MATRIX_3X4);
         }
         
         mParamTempFloat2x4 = vsMain->resolveLocalParameter("TempVal2x4", GCT_MATRIX_2X4);
@@ -140,7 +139,8 @@ bool DualQuaternionSkinning::addFunctionInvocations(ProgramSet* programSet)
     addPositionCalculations(vsMain);
 
     //add functions to calculate normal and normal related data in world and object space
-    addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormalWorld);
+    if(mDoLightCalculations)
+        addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormalWorld);
     //addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
     //addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
 
@@ -180,8 +180,7 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
         for(int i = 0 ; i < getWeightCount() ; ++i)
         {
             // Build the dual quaternion matrix
-            stage.callFunction(
-                SGX_FUNC_BUILD_DUAL_QUATERNION_MATRIX,
+            stage.assign(
                 {In(mParamInWorldMatrices), At(mParamInIndices).mask(indexToMask(i)), Out(mParamTempFloat2x4)});
 
             //Adjust the podalities of the dual quaternions
@@ -202,6 +201,10 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain)
 
         //Update from object to projective space
         stage.callFunction(FFP_FUNC_TRANSFORM, mParamInViewProjMatrix, mParamTempFloat4, mParamOutPositionProj);
+
+        //update back the original position relative to the object
+        stage.callFunction(FFP_FUNC_TRANSFORM, mParamInInvWorldMatrix, mParamTempFloat4,
+                           mParamInPosition);
     }
     else
     {
@@ -267,8 +270,7 @@ void DualQuaternionSkinning::addIndexedPositionWeight(Function* vsMain, int inde
     auto stage = vsMain->getStage(FFP_VS_TRANSFORM);
 
     //multiply position with world matrix and put into temporary param
-    stage.callFunction(SGX_FUNC_BLEND_WEIGHT, In(mParamInWeights).mask(indexToMask(index)), pWorldMatrix,
-                       pPositionTempParameter);
+    stage.mul(In(mParamInWeights).mask(indexToMask(index)), pWorldMatrix, pPositionTempParameter);
 
     //check if on first iteration
     if (index == 0)

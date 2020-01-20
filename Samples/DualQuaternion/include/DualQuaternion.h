@@ -40,15 +40,6 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
     }
 
  protected:
-    StringVector getRequiredPlugins()
-    {
-        StringVector names;
-		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsl")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
-            names.push_back("Cg Program Manager");
-        return names;
-    }
-
     void setupContent()
     {
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)

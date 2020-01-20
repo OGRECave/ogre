@@ -32,8 +32,6 @@
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreGL3PlusHardwareUniformBuffer.h"
-#include "OgreGL3PlusHardwareShaderStorageBuffer.h"
-#include "OgreGL3PlusHardwareCounterBuffer.h"
 #include "OgreGLSLProgramCommon.h"
 #include "OgreGLSLShader.h"
 
@@ -65,23 +63,13 @@ namespace Ogre {
     class _OgreGL3PlusExport GLSLProgram : public GLSLProgramCommon
     {
     public:
-        void bindFixedAttributes(GLuint program);
+        static void bindFixedAttributes(GLuint program);
 
-        GLSLShader* getVertexShader() const { return static_cast<GLSLShader*>(mVertexShader); }
-        GLSLShader* getHullShader() const { return mHullShader; }
-        GLSLShader* getDomainShader() const { return mDomainShader; }
-        GLSLShader* getGeometryShader() const { return mGeometryShader; }
-        GLSLShader* getFragmentShader() const { return mFragmentShader; }
-        GLSLShader* getComputeShader() const { return mComputeShader; }
+        /// Get the the binary data of a program from the microcode cache
+        static bool getMicrocodeFromCache(uint32 id, GLuint programHandle);
 
-        bool isUsingShader(GLSLShaderCommon* shader) const
-        {
-            return mVertexShader == shader || (GLSLShaderCommon*)mGeometryShader == shader ||
-                   (GLSLShaderCommon*)mFragmentShader == shader ||
-                   (GLSLShaderCommon*)mHullShader == shader ||
-                   (GLSLShaderCommon*)mDomainShader == shader ||
-                   (GLSLShaderCommon*)mComputeShader == shader;
-        }
+        /// add the microcode to the cache
+        static void writeMicrocodeToCache(uint32 id, GLuint programHandle);
 
         virtual void updateAtomicCounters(GpuProgramParametersSharedPtr params, uint16 mask,
                                           GpuProgramType fromProgType) = 0;
@@ -89,34 +77,12 @@ namespace Ogre {
         void setTransformFeedbackVaryings(const std::vector<String>& nameStrings);
     protected:
         /// Constructor should only be used by GLSLMonolithicProgramManager and GLSLSeparableProgramManager
-        GLSLProgram(GLSLShader* vertexProgram,
-                    GLSLShader* hullProgram,
-                    GLSLShader* domainProgram,
-                    GLSLShader* geometryProgram,
-                    GLSLShader* fragmentProgram,
-                    GLSLShader* computeProgram);
+        GLSLProgram(const GLShaderList& shaders);
 
         /// Container of atomic counter uniform references that are active in the program object
         GLAtomicCounterReferenceList mGLAtomicCounterReferences;
         /// Container of counter buffer references that are active in the program object
         GLCounterBufferList mGLCounterBufferReferences;
-
-        /// Linked hull (control) shader.
-        GLSLShader* mHullShader;
-        /// Linked domain (evaluation) shader.
-        GLSLShader* mDomainShader;
-        /// Linked geometry shader.
-        GLSLShader* mGeometryShader;
-        /// Linked fragment shader.
-        GLSLShader* mFragmentShader;
-        /// Linked compute shader.
-        GLSLShader* mComputeShader;
-
-        uint32 getCombinedHash();
-
-        Ogre::String getCombinedName(void);
-        /// Get the the binary data of a program from the microcode cache
-        void getMicrocodeFromCache(uint32 id);
     };
 
 

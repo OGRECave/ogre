@@ -23,13 +23,19 @@ VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(const String& 
     return VertexElementSemantic(0);
 }
 
-GLSLProgramCommon::GLSLProgramCommon(GLSLShaderCommon* vertexShader)
-    : mVertexShader(vertexShader),
+GLSLProgramCommon::GLSLProgramCommon(const GLShaderList& shaders)
+    : mShaders(shaders),
       mUniformRefsBuilt(false),
       mGLProgramHandle(0),
-      mLinked(false),
-      mSkeletalAnimation(false)
+      mLinked(false)
 {
+    // compute shader presence means no other shaders are allowed
+    if(shaders[GPT_COMPUTE_PROGRAM])
+    {
+        mShaders.fill(NULL);
+        mShaders[GPT_COMPUTE_PROGRAM] = shaders[GPT_COMPUTE_PROGRAM];
+    }
+
     // init mCustomAttributesIndexes
     for (size_t i = 0; i < VES_COUNT; i++)
     {
@@ -61,12 +67,12 @@ void GLSLProgramCommon::extractLayoutQualifiers(void)
     // Format is:
     //      layout(location = 0) attribute vec4 vertex;
 
-    if (!mVertexShader)
+    if (!mShaders[GPT_VERTEX_PROGRAM])
     {
         return;
     }
 
-    String shaderSource = mVertexShader->getSource();
+    String shaderSource = mShaders[GPT_VERTEX_PROGRAM]->getSource();
     String::size_type currPos = shaderSource.find("layout");
     while (currPos != String::npos)
     {
@@ -240,64 +246,31 @@ int32 GLSLProgramCommon::getFixedAttributeIndex(VertexElementSemantic semantic, 
     return attributeIndex[semantic];
 }
 
-void GLSLProgramCommon::updateUniformBlocks()
+String GLSLProgramCommon::getCombinedName()
 {
-    //TODO Maybe move to GpuSharedParams?
-    //TODO Support uniform block arrays - need to figure how to do this via material.
+    StringStream ss;
 
-    // const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-
-    // Iterate through the list of uniform blocks and update them as needed.
-    for (const auto& currentPair : mSharedParamsBufferMap)
+    for(auto s : mShaders)
     {
-        // force const call to get*Pointer
-        const GpuSharedParameters* paramsPtr = currentPair.first.get();
-
-        if (!paramsPtr->isDirty()) continue;
-
-        //FIXME Possible buffer does not exist if no associated uniform block.
-        HardwareUniformBuffer* hwGlBuffer = currentPair.second.get();
-
-        //FIXME does not check if current progrtype, or if shared param is active
-
-        for (const auto& parami : paramsPtr->getConstantDefinitions().map)
+        if (s)
         {
-            const GpuConstantDefinition& param = parami.second;
-
-            BaseConstantType baseType = GpuConstantDefinition::getBaseType(param.constType);
-
-            // NOTE: the naming is backward. this is the logical index
-            size_t index =  param.physicalIndex;
-
-            const void* dataPtr;
-            switch (baseType)
-            {
-            case BCT_FLOAT:
-                dataPtr = paramsPtr->getFloatPointer(index);
-                break;
-            case BCT_UINT:
-            case BCT_BOOL:
-            case BCT_INT:
-                dataPtr = paramsPtr->getIntPointer(index);
-                break;
-            case BCT_DOUBLE:
-                dataPtr = paramsPtr->getDoublePointer(index);
-                break;
-            case BCT_SAMPLER:
-            case BCT_SUBROUTINE:
-                //TODO implement me!
-            default:
-                //TODO error handling
-                continue;
-            }
-
-            // in bytes
-            size_t length = param.arraySize * param.elementSize * 4;
-
-            // NOTE: the naming is backward. this is the physical offset in bytes
-            size_t offset = param.logicalIndex;
-            hwGlBuffer->writeData(offset, length, dataPtr);
+            ss << s->getName() << "\n";
         }
     }
+
+    return ss.str();
 }
+
+uint32 GLSLProgramCommon::getCombinedHash()
+{
+    uint32 hash = 0;
+
+    for (auto p : mShaders)
+    {
+        if(!p) continue;
+        hash = p->_getHash(hash);
+    }
+    return hash;
+}
+
 } /* namespace Ogre */

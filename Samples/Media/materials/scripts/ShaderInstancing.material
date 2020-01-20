@@ -3,364 +3,16 @@
 //Written by Matias N. Goldberg ("dark_sylinc")
 //---------------------------------------------------------------------------
 
-
-//--------------------------------------------------------------
-// GLSL Programs
-//--------------------------------------------------------------
-vertex_program Ogre/Instancing/ShaderBased_glsl_vs glsl
-{
-	source ShaderInstancing.vert
-	
-	preprocessor_defines DEPTH_SHADOWRECEIVER=1
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_glsl_vs glsl
-{
-	source ShaderInstancing.vert
-	preprocessor_defines DEPTH_SHADOWCASTER=1
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_glsl_vs glsl
-{
-	source ShaderInstancing.vert
-
-	preprocessor_defines ST_DUAL_QUATERNION,DEPTH_SHADOWRECEIVER=1
-
-	includes_skeletal_animation true
-
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_glsl_vs glsl
-{
-	source ShaderInstancing.vert
-
-	preprocessor_defines ST_DUAL_QUATERNION,DEPTH_SHADOWCASTER=1
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_glsl_vs glsl
-{
-	source ShaderInstancing.vert
-
-	preprocessor_defines ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS,DEPTH_SHADOWRECEIVER=1
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_glsl_vs glsl
-{
-	source ShaderInstancing.vert
-
-	preprocessor_defines ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS,DEPTH_SHADOWCASTER=1
-
-	includes_skeletal_animation true
-}
-
-//--------------------------------------------------------------
-// GLSL ES Programs
-//--------------------------------------------------------------
-vertex_program Ogre/Instancing/ShaderBased_glsles_vs glsles
-{
-	source ShaderInstancing.vert
-	
-	preprocessor_defines DEPTH_SHADOWRECEIVER=1
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_glsles_vs glsles
-{
-	source ShaderInstancing.vert
-	preprocessor_defines DEPTH_SHADOWCASTER=1
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_glsles_vs glsles
-{
-	source ShaderInstancing.vert
-
-	preprocessor_defines ST_DUAL_QUATERNION,DEPTH_SHADOWRECEIVER=1
-
-	includes_skeletal_animation true
-
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_glsles_vs glsles
-{
-	source ShaderInstancing.vert
-
-	preprocessor_defines ST_DUAL_QUATERNION,DEPTH_SHADOWCASTER=1
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_glsles_vs glsles
-{
-	source ShaderInstancing.vert
-
-	preprocessor_defines ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS,DEPTH_SHADOWRECEIVER=1
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_glsles_vs glsles
-{
-	source ShaderInstancing.vert
-
-	preprocessor_defines ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS,DEPTH_SHADOWCASTER=1
-
-	includes_skeletal_animation true
-}
-
-//--------------------------------------------------------------
-// hlsl Programs
-//--------------------------------------------------------------
-vertex_program Ogre/Instancing/ShaderBased_hlsl_vs hlsl
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	target vs_3_0
-
-	preprocessor_defines DEPTH_SHADOWRECEIVER
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_hlsl_vs hlsl
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	target vs_3_0
-	
-	preprocessor_defines DEPTH_SHADOWCASTER
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_hlsl_vs hlsl
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	target vs_3_0
-
-	preprocessor_defines DEPTH_SHADOWRECEIVER,ST_DUAL_QUATERNION
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_hlsl_vs hlsl
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	target vs_3_0
-	
-	preprocessor_defines DEPTH_SHADOWCASTER,ST_DUAL_QUATERNION
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_hlsl_vs hlsl
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	target vs_3_0
-
-	preprocessor_defines DEPTH_SHADOWRECEIVER,ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_hlsl_vs hlsl
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	target vs_3_0
-	
-	preprocessor_defines DEPTH_SHADOWCASTER,ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS
-
-	includes_skeletal_animation true
-}
-
-
-//--------------------------------------------------------------
-// CG Programs
-//--------------------------------------------------------------
-vertex_program Ogre/Instancing/ShaderBased_cg_vs cg
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	profiles  vs_3_0 vs_2_0 vp40
-
-	compile_arguments -DDEPTH_SHADOWRECEIVER
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_cg_vs cg
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	profiles  vs_3_0 vs_2_0 vp40
-	
-	compile_arguments -DDEPTH_SHADOWCASTER
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_cg_vs cg
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	profiles  vs_3_0 vs_2_0 vp40
-
-	compile_arguments -DDEPTH_SHADOWRECEIVER -DST_DUAL_QUATERNION
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_cg_vs cg
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	profiles  vs_3_0 vs_2_0 vp40
-	
-	compile_arguments -DDEPTH_SHADOWCASTER -DST_DUAL_QUATERNION
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_cg_vs cg
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	profiles  vs_3_0 vs_2_0 vp40
-
-	compile_arguments -DDEPTH_SHADOWRECEIVER -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
-
-	includes_skeletal_animation true
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_cg_vs cg
-{
-	source ShaderInstancing.cg
-	entry_point main_vs
-	profiles  vs_3_0 vs_2_0 vp40
-	
-	compile_arguments -DDEPTH_SHADOWCASTER -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
-
-	includes_skeletal_animation true
-}
-
-
-//--------------------------------------------------------------
-// Unified CG/GLSL Programs
-//--------------------------------------------------------------
-vertex_program Ogre/Instancing/ShaderBased_vs unified
-{
-	delegate Ogre/Instancing/ShaderBased_glsl_vs
-	delegate Ogre/Instancing/ShaderBased_glsles_vs
-	delegate Ogre/Instancing/ShaderBased_hlsl_vs
-	delegate Ogre/Instancing/ShaderBased_cg_vs
-
-	default_params
-	{
-		param_named_auto	viewProjMatrix				viewproj_matrix
-		param_named_auto	worldMatrix3x4Array			world_matrix_array_3x4
-		
-		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
-	}
-}
-
-vertex_program Ogre/Instancing/shadow_caster_vs unified
-{
-	delegate Ogre/Instancing/shadow_caster_glsl_vs
-	delegate Ogre/Instancing/shadow_caster_glsles_vs
-	delegate Ogre/Instancing/shadow_caster_hlsl_vs
-	delegate Ogre/Instancing/shadow_caster_cg_vs
-
-	default_params
-	{
-		param_named_auto	viewProjMatrix				viewproj_matrix
-		param_named_auto	worldMatrix3x4Array			world_matrix_array_3x4
-	}
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_vs unified
-{
-	delegate Ogre/Instancing/ShaderBased_dq_glsl_vs
-	delegate Ogre/Instancing/ShaderBased_dq_glsles_vs
-	delegate Ogre/Instancing/ShaderBased_dq_hlsl_vs
-	delegate Ogre/Instancing/ShaderBased_dq_cg_vs
-
-	default_params
-	{
-		param_named_auto	viewProjMatrix				viewproj_matrix
-		param_named_auto 	worldDualQuaternion2x4Array 		world_dualquaternion_array_2x4
-		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
-	}
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_vs unified
-{
-	delegate Ogre/Instancing/shadow_caster_dq_glsl_vs
-	delegate Ogre/Instancing/shadow_caster_dq_glsles_vs
-	delegate Ogre/Instancing/shadow_caster_dq_hlsl_vs
-	delegate Ogre/Instancing/shadow_caster_dq_cg_vs
-
-	default_params
-	{
-		param_named_auto	viewProjMatrix				viewproj_matrix
-		param_named_auto 	worldDualQuaternion2x4Array 		world_dualquaternion_array_2x4
-	}
-}
-
-vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_vs unified
-{
-	delegate Ogre/Instancing/ShaderBased_dq_two_weights_glsl_vs
-	delegate Ogre/Instancing/ShaderBased_dq_two_weights_glsles_vs
-	delegate Ogre/Instancing/ShaderBased_dq_two_weights_hlsl_vs
-	delegate Ogre/Instancing/ShaderBased_dq_two_weights_cg_vs
-
-	default_params
-	{
-		param_named_auto	viewProjMatrix				viewproj_matrix
-		param_named_auto 	worldDualQuaternion2x4Array 		world_dualquaternion_array_2x4
-		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
-	}
-}
-
-vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_vs unified
-{
-	delegate Ogre/Instancing/shadow_caster_dq_two_weights_glsl_vs
-	delegate Ogre/Instancing/shadow_caster_dq_two_weights_glsles_vs
-	delegate Ogre/Instancing/shadow_caster_dq_two_weights_hlsl_vs
-	delegate Ogre/Instancing/shadow_caster_dq_two_weights_cg_vs
-
-	default_params
-	{
-		param_named_auto	viewProjMatrix				viewproj_matrix
-		param_named_auto 	worldDualQuaternion2x4Array 		world_dualquaternion_array_2x4
-
-	}
-}
-
 material Examples/Instancing/ShaderBased/shadow_caster
 {
 	technique
 	{
 		pass
 		{
-			vertex_program_ref Ogre/Instancing/shadow_caster_vs
+			rtshader_system
 			{
-			}
-			fragment_program_ref Ogre/Instancing/shadow_caster_ps
-			{
+				lighting_stage gbuffer depth
+				hardware_skinning 70 1 linear false false
 			}
 		}
 	}
@@ -372,11 +24,10 @@ material Examples/Instancing/ShaderBased/shadow_caster_dq
 	{
 		pass
 		{
-			vertex_program_ref Ogre/Instancing/shadow_caster_dq_vs
+			rtshader_system
 			{
-			}
-			fragment_program_ref Ogre/Instancing/shadow_caster_ps
-			{
+				lighting_stage gbuffer depth
+				hardware_skinning 80 1 dual_quaternion true false
 			}
 		}
 	}
@@ -388,17 +39,16 @@ material Examples/Instancing/ShaderBased/shadow_caster_dq_two_weights
 	{
 		pass
 		{
-			vertex_program_ref Ogre/Instancing/shadow_caster_dq_two_weights_vs
+			rtshader_system
 			{
-			}
-			fragment_program_ref Ogre/Instancing/shadow_caster_ps
-			{
+				lighting_stage gbuffer depth
+				hardware_skinning 80 2 dual_quaternion true false
 			}
 		}
 	}
 }
 
-abstract material Examples/Instancing/ShaderBased
+material Examples/Instancing/RTSS/Robot
 {
 	technique
 	{
@@ -407,35 +57,21 @@ abstract material Examples/Instancing/ShaderBased
 		pass
 		{
 			specular	1 1 1 1 12.5
-			vertex_program_ref Ogre/Instancing/ShaderBased_vs
+
+			texture_unit
 			{
+				texture		r2skin.jpg
 			}
 
-			fragment_program_ref Ogre/Instancing_ps
+			rtshader_system
 			{
-			}
-
-			texture_unit Diffuse
-			{
-				texture_alias		DiffuseMap
-			}
-
-			texture_unit shadow0
-			{
-				content_type shadow
-				tex_address_mode border
-				tex_border_colour 1 1 1 1
+				hardware_skinning 70 1 linear false false
 			}
 		}
 	}
 }
 
-material Examples/Instancing/ShaderBased/Robot : Examples/Instancing/ShaderBased
-{
-	set_texture_alias	DiffuseMap	r2skin.jpg
-}
-
-abstract material Examples/Instancing/ShaderBased_dq
+material Examples/Instancing/RTSS/Robot_dq
 {
 	technique
 	{
@@ -444,35 +80,21 @@ abstract material Examples/Instancing/ShaderBased_dq
 		pass
 		{
 			specular	1 1 1 1 12.5
-			vertex_program_ref Ogre/Instancing/ShaderBased_dq_vs
+
+			texture_unit
 			{
+				texture		r2skin.jpg
 			}
 
-			fragment_program_ref Ogre/Instancing_ps
+			rtshader_system
 			{
-			}
-
-			texture_unit Diffuse
-			{
-				texture_alias		DiffuseMap
-			}
-
-			texture_unit shadow0
-			{
-				content_type shadow
-				tex_address_mode border
-				tex_border_colour 1 1 1 1
+				hardware_skinning 80 1 dual_quaternion true false
 			}
 		}
 	}
 }
 
-material Examples/Instancing/ShaderBased/Robot_dq : Examples/Instancing/ShaderBased_dq
-{
-	set_texture_alias	DiffuseMap	r2skin.jpg
-}
-
-abstract material Examples/Instancing/ShaderBased_dq_two_weights
+material Examples/Instancing/RTSS/spine_dq_two_weights
 {
 	technique
 	{
@@ -482,31 +104,16 @@ abstract material Examples/Instancing/ShaderBased_dq_two_weights
 		{
 			diffuse		0.3 0.3 0.3
 			specular	0.1 0.1 0.1 0.1 12.5
-			vertex_program_ref Ogre/Instancing/ShaderBased_dq_two_weights_vs
+
+			texture_unit
 			{
+				texture		circuit.dds
 			}
 
-			fragment_program_ref Ogre/Instancing_ps
+			rtshader_system
 			{
-			}
-
-			texture_unit Diffuse
-			{
-				texture_alias		DiffuseMap
-				tex_address_mode	clamp
-			}
-
-			texture_unit shadow0
-			{
-				content_type shadow
-				tex_address_mode border
-				tex_border_colour 1 1 1 1
+				hardware_skinning 80 2 dual_quaternion true false
 			}
 		}
 	}
-}
-
-material Examples/Instancing/ShaderBased/spine_dq_two_weights : Examples/Instancing/ShaderBased_dq_two_weights
-{
-	set_texture_alias	DiffuseMap	circuit.dds
 }

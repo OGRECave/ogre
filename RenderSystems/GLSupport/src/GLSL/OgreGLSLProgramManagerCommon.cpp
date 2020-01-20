@@ -33,6 +33,148 @@
 
 namespace Ogre {
 
+    GLSLProgramManagerCommon::GLSLProgramManagerCommon()
+    {
+        mActiveShader.fill(NULL);
+
+        // Fill in the relationship between type names and enums
+        mTypeEnumMap.emplace("float", GCT_FLOAT1);
+        mTypeEnumMap.emplace("vec2", GCT_FLOAT2);
+        mTypeEnumMap.emplace("vec3", GCT_FLOAT3);
+        mTypeEnumMap.emplace("vec4", GCT_FLOAT4);
+        mTypeEnumMap.emplace("sampler1D", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("sampler2D", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("sampler3D", GCT_SAMPLER3D);
+        mTypeEnumMap.emplace("samplerCube", GCT_SAMPLERCUBE);
+        mTypeEnumMap.emplace("sampler1DShadow", GCT_SAMPLER1DSHADOW);
+        mTypeEnumMap.emplace("sampler2DShadow", GCT_SAMPLER2DSHADOW);
+        mTypeEnumMap.emplace("int", GCT_INT1);
+        mTypeEnumMap.emplace("ivec2", GCT_INT2);
+        mTypeEnumMap.emplace("ivec3", GCT_INT3);
+        mTypeEnumMap.emplace("ivec4", GCT_INT4);
+        mTypeEnumMap.emplace("bool", GCT_BOOL1);
+        mTypeEnumMap.emplace("bvec2", GCT_BOOL2);
+        mTypeEnumMap.emplace("bvec3", GCT_BOOL3);
+        mTypeEnumMap.emplace("bvec4", GCT_BOOL4);
+        mTypeEnumMap.emplace("mat2", GCT_MATRIX_2X2);
+        mTypeEnumMap.emplace("mat3", GCT_MATRIX_3X3);
+        mTypeEnumMap.emplace("mat4", GCT_MATRIX_4X4);
+
+        // GLES2 ext
+        mTypeEnumMap.emplace("samplerExternalOES", GCT_SAMPLER_EXTERNAL_OES);
+
+        // GL 2.1
+        mTypeEnumMap.emplace("mat2x2", GCT_MATRIX_2X2);
+        mTypeEnumMap.emplace("mat3x3", GCT_MATRIX_3X3);
+        mTypeEnumMap.emplace("mat4x4", GCT_MATRIX_4X4);
+        mTypeEnumMap.emplace("mat2x3", GCT_MATRIX_2X3);
+        mTypeEnumMap.emplace("mat3x2", GCT_MATRIX_3X2);
+        mTypeEnumMap.emplace("mat3x4", GCT_MATRIX_3X4);
+        mTypeEnumMap.emplace("mat4x3", GCT_MATRIX_4X3);
+        mTypeEnumMap.emplace("mat2x4", GCT_MATRIX_2X4);
+        mTypeEnumMap.emplace("mat4x2", GCT_MATRIX_4X2);
+
+        // GL 3.0
+        mTypeEnumMap.emplace("uint", GCT_UINT1);
+        mTypeEnumMap.emplace("uvec2", GCT_UINT2);
+        mTypeEnumMap.emplace("uvec3", GCT_UINT3);
+        mTypeEnumMap.emplace("uvec4", GCT_UINT4);
+        mTypeEnumMap.emplace("samplerCubeShadow", GCT_SAMPLERCUBE);
+        mTypeEnumMap.emplace("sampler1DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("sampler2DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("sampler1DArrayShadow", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("sampler2DArrayShadow", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("isampler1D", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("isampler2D", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("isampler3D", GCT_SAMPLER3D);
+        mTypeEnumMap.emplace("isamplerCube", GCT_SAMPLERCUBE);
+        mTypeEnumMap.emplace("isampler1DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("isampler2DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("usampler1D", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("usampler2D", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("usampler3D", GCT_SAMPLER3D);
+        mTypeEnumMap.emplace("usamplerCube", GCT_SAMPLERCUBE);
+        mTypeEnumMap.emplace("usampler1DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("usampler2DArray", GCT_SAMPLER2DARRAY);
+
+        // GL 3.1
+        mTypeEnumMap.emplace("sampler2DRect", GCT_SAMPLERRECT);
+        mTypeEnumMap.emplace("sampler2DRectShadow", GCT_SAMPLERRECT);
+        mTypeEnumMap.emplace("isampler2DRect", GCT_SAMPLERRECT);
+        mTypeEnumMap.emplace("usampler2DRect", GCT_SAMPLERRECT);
+        mTypeEnumMap.emplace("samplerBuffer", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("isamplerBuffer", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("usamplerBuffer", GCT_SAMPLER1D);
+
+        // GL 3.2
+        mTypeEnumMap.emplace("sampler2DMS", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("isampler2DMS", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("usampler2DMS", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("sampler2DMSArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("isampler2DMSArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("usampler2DMSArray", GCT_SAMPLER2DARRAY);
+
+        // GL 4.0
+        mTypeEnumMap.emplace("double", GCT_DOUBLE1);
+        mTypeEnumMap.emplace("dmat2", GCT_MATRIX_DOUBLE_2X2);
+        mTypeEnumMap.emplace("dmat3", GCT_MATRIX_DOUBLE_3X3);
+        mTypeEnumMap.emplace("dmat4", GCT_MATRIX_DOUBLE_4X4);
+        mTypeEnumMap.emplace("dmat2x2", GCT_MATRIX_DOUBLE_2X2);
+        mTypeEnumMap.emplace("dmat3x3", GCT_MATRIX_DOUBLE_3X3);
+        mTypeEnumMap.emplace("dmat4x4", GCT_MATRIX_DOUBLE_4X4);
+        mTypeEnumMap.emplace("dmat2x3", GCT_MATRIX_DOUBLE_2X3);
+        mTypeEnumMap.emplace("dmat3x2", GCT_MATRIX_DOUBLE_3X2);
+        mTypeEnumMap.emplace("dmat3x4", GCT_MATRIX_DOUBLE_3X4);
+        mTypeEnumMap.emplace("dmat4x3", GCT_MATRIX_DOUBLE_4X3);
+        mTypeEnumMap.emplace("dmat2x4", GCT_MATRIX_DOUBLE_2X4);
+        mTypeEnumMap.emplace("dmat4x2", GCT_MATRIX_DOUBLE_4X2);
+        mTypeEnumMap.emplace("dvec2", GCT_DOUBLE2);
+        mTypeEnumMap.emplace("dvec3", GCT_DOUBLE3);
+        mTypeEnumMap.emplace("dvec4", GCT_DOUBLE4);
+        mTypeEnumMap.emplace("samplerCubeArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("samplerCubeArrayShadow", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("isamplerCubeArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("usamplerCubeArray", GCT_SAMPLER2DARRAY);
+
+        //TODO should image be its own type?
+        mTypeEnumMap.emplace("image1D", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("iimage1D", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("uimage1D", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("image2D", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("iimage2D", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("uimage2D", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("image3D", GCT_SAMPLER3D);
+        mTypeEnumMap.emplace("iimage3D", GCT_SAMPLER3D);
+        mTypeEnumMap.emplace("uimage3D", GCT_SAMPLER3D);
+        mTypeEnumMap.emplace("image2DRect", GCT_SAMPLERRECT);
+        mTypeEnumMap.emplace("iimage2DRect", GCT_SAMPLERRECT);
+        mTypeEnumMap.emplace("uimage2DRect", GCT_SAMPLERRECT);
+        mTypeEnumMap.emplace("imageCube", GCT_SAMPLERCUBE);
+        mTypeEnumMap.emplace("iimageCube", GCT_SAMPLERCUBE);
+        mTypeEnumMap.emplace("uimageCube", GCT_SAMPLERCUBE);
+        mTypeEnumMap.emplace("imageBuffer", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("iimageBuffer", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("uimageBuffer", GCT_SAMPLER1D);
+        mTypeEnumMap.emplace("image1DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("iimage1DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("uimage1DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("image2DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("iimage2DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("uimage2DArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("imageCubeArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("iimageCubeArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("uimageCubeArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("image2DMS", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("iimage2DMS", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("uimage2DMS", GCT_SAMPLER2D);
+        mTypeEnumMap.emplace("image2DMSArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("iimage2DMSArray", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("uimage2DMSArray", GCT_SAMPLER2DARRAY);
+
+        // GL 4.2
+        mTypeEnumMap.emplace("atomic_uint", GCT_UINT1); //TODO should be its own type?
+    }
+
     GLSLProgramManagerCommon::~GLSLProgramManagerCommon()
     {
         // iterate through map container and delete link programs
@@ -63,9 +205,8 @@ namespace Ogre {
         }
     }
 
-    void GLSLProgramManagerCommon::parseGLSLUniform(
-        String line, GpuNamedConstants& defs,
-        const String& filename, const GpuSharedParametersPtr& sharedParams)
+    void GLSLProgramManagerCommon::parseGLSLUniform(String line, GpuNamedConstants& defs,
+                                                    const String& filename)
     {
         GpuConstantDefinition def;
         String paramName = "";
@@ -87,7 +228,9 @@ namespace Ogre {
             StringToEnumMap::iterator typei = mTypeEnumMap.find(*i);
             if (typei != mTypeEnumMap.end())
             {
-                convertGLUniformtoOgreType(typei->second, def);
+                def.constType = typei->second;
+                // GL doesn't pad
+                def.elementSize = GpuConstantDefinition::getElementSize(def.constType, false);
             }
             else
             {
@@ -142,46 +285,30 @@ namespace Ogre {
                     break;
                 }
 
-                // Special handling for shared parameters
-                if(!sharedParams)
+                // Complete def and add
+                // increment physical buffer location
+                def.logicalIndex = 0; // not valid in GLSL
+                if (def.isFloat())
                 {
-                    // Complete def and add
-                    // increment physical buffer location
-                    def.logicalIndex = 0; // not valid in GLSL
-                    if (def.isFloat())
-                    {
-                        def.physicalIndex = defs.floatBufferSize;
-                        defs.floatBufferSize += def.arraySize * def.elementSize;
-                    }
-                    else if (def.isDouble())
-                    {
-                        def.physicalIndex = defs.doubleBufferSize;
-                        defs.doubleBufferSize += def.arraySize * def.elementSize;
-                    }
-                    else if (def.isInt() || def.isSampler() || def.isUnsignedInt() || def.isBool())
-                    {
-                        def.physicalIndex = defs.intBufferSize;
-                        defs.intBufferSize += def.arraySize * def.elementSize;
-                    }
-                    else
-                    {
-                        LogManager::getSingleton().logMessage("Could not parse type of GLSL Uniform: '"
-                                                              + line + "' in file " + filename);
-                    }
-                    defs.map.emplace(paramName, def);
-
-                    // Generate array accessors
-                    defs.generateConstantDefinitionArrayEntries(paramName, def);
+                    def.physicalIndex = defs.floatBufferSize;
+                    defs.floatBufferSize += def.arraySize * def.elementSize;
+                }
+                else if (def.isDouble())
+                {
+                    def.physicalIndex = defs.doubleBufferSize;
+                    defs.doubleBufferSize += def.arraySize * def.elementSize;
+                }
+                else if (def.isInt() || def.isSampler() || def.isUnsignedInt() || def.isBool())
+                {
+                    def.physicalIndex = defs.intBufferSize;
+                    defs.intBufferSize += def.arraySize * def.elementSize;
                 }
                 else
                 {
-                    const GpuConstantDefinitionMap& map = sharedParams->getConstantDefinitions().map;
-
-                    if(map.find(paramName) == map.end()) {
-                        // This constant doesn't exist so we'll create a new one
-                        sharedParams->addConstantDefinition(paramName, def.constType);
-                    }
+                    LogManager::getSingleton().logMessage("Could not parse type of GLSL Uniform: '"
+                                                          + line + "' in file " + filename);
                 }
+                defs.map.emplace(paramName, def);
             }
         }
     }
@@ -219,7 +346,6 @@ namespace Ogre {
             {
                 String::size_type endPos;
                 String typeString;
-                GpuSharedParametersPtr blockSharedParams;
 
                 // Check for a type. If there is one, then the semicolon is missing
                 // otherwise treat as if it is a uniform block
@@ -276,7 +402,7 @@ namespace Ogre {
                         break;
                     }
 
-                    parseGLSLUniform(src.substr(currPos, endPos - currPos), defs, filename, blockSharedParams);
+                    parseGLSLUniform(src.substr(currPos, endPos - currPos), defs, filename);
                 }
                 line = src.substr(currPos, endPos - currPos);
             } // not commented or a larger symbol

@@ -187,7 +187,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------------
-    bool GLSLProgram::compile(bool checkErrors)
+    void GLSLProgram::loadFromSource()
     {
         // only create a shader object if glsl is supported
         if (isSupported())
@@ -210,25 +210,22 @@ namespace Ogre {
             case GPT_HULL_PROGRAM:
                 break;
             }
-            mGLHandle = glCreateShaderObjectARB(shaderType);
+            mGLShaderHandle = glCreateShaderObjectARB(shaderType);
         }
 
         // Add preprocessor extras and main source
         if (!mSource.empty())
         {
             const char *source = mSource.c_str();
-            glShaderSourceARB(mGLHandle, 1, &source, NULL);
+            glShaderSourceARB(mGLShaderHandle, 1, &source, NULL);
         }
 
-        glCompileShaderARB(mGLHandle);
+        glCompileShaderARB(mGLShaderHandle);
         // check for compile errors
         int compiled = 0;
-        glGetObjectParameterivARB(mGLHandle, GL_OBJECT_COMPILE_STATUS_ARB, &compiled);
+        glGetObjectParameterivARB(mGLShaderHandle, GL_OBJECT_COMPILE_STATUS_ARB, &compiled);
 
-        if(!checkErrors)
-            return compiled == 1;
-
-        String compileInfo = getObjectInfo(mGLHandle);
+        String compileInfo = getObjectInfo(mGLShaderHandle);
 
         if (!compiled)
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, getResourceLogName() + " " + compileInfo, "compile");
@@ -236,16 +233,14 @@ namespace Ogre {
         // probably we have warnings
         if (!compileInfo.empty())
             LogManager::getSingleton().stream(LML_WARNING) << getResourceLogName() << " " << compileInfo;
-
-        return (compiled == 1);
     }
     //-----------------------------------------------------------------------
     void GLSLProgram::unloadHighLevelImpl(void)
     {
         if (isSupported())
         {
-            glDeleteObjectARB(mGLHandle);           
-            mGLHandle = 0;
+            glDeleteObjectARB(mGLShaderHandle);
+            mGLShaderHandle = 0;
 
             // destroy all programs using this shader
             GLSLLinkProgramManager::getSingletonPtr()->destroyAllByShader(this);
@@ -268,6 +263,9 @@ namespace Ogre {
 
         // Therefore instead, parse the source code manually and extract the uniforms
         createParameterMappingStructures(true);
+        mFloatLogicalToPhysical.reset();
+        mIntLogicalToPhysical.reset();
+
         GLSLLinkProgramManager::getSingleton().extractUniformsFromGLSL(
             mSource, *mConstantDefs, mName);
 
@@ -291,7 +289,6 @@ namespace Ogre {
         , mInputOperationType(RenderOperation::OT_TRIANGLE_LIST)
         , mOutputOperationType(RenderOperation::OT_TRIANGLE_LIST)
         , mMaxOutputVertices(3)
-        , mGLHandle(0)
     {
         // add parameter command "attach" to the material serializer dictionary
         if (createParamDictionary("GLSLProgram"))
@@ -334,7 +331,7 @@ namespace Ogre {
         {
             childShader->attachToProgramObject(programObject);
         }
-        glAttachObjectARB( programObject, mGLHandle );
+        glAttachObjectARB( programObject, mGLShaderHandle );
         GLenum glErr = glGetError();
         if(glErr != GL_NO_ERROR)
         {
@@ -346,7 +343,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void GLSLProgram::detachFromProgramObject( const GLhandleARB programObject )
     {
-        glDetachObjectARB(programObject, mGLHandle);
+        glDetachObjectARB(programObject, mGLShaderHandle);
 
         GLenum glErr = glGetError();
         if(glErr != GL_NO_ERROR)

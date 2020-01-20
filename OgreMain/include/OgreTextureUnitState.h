@@ -56,6 +56,7 @@ namespace Ogre {
             TextureAddressingMode u, v, w;
         };
 
+        /// must be created through TextureManager
         Sampler();
         virtual ~Sampler();
 
@@ -1071,20 +1072,7 @@ namespace Ogre {
         */
         const String& getTextureNameAlias(void) const { return mTextureNameAlias;}
 
-        /** Applies texture names to Texture Unit State with matching texture name aliases.
-            If no matching aliases are found then the TUS state does not change.
-
-            Cubic, 1d, 2d, and 3d textures are determined from current state of the Texture Unit.
-            Assumes animated frames are sequentially numbered in the name.
-            If matching texture aliases are found then true is returned.
-
-        @param aliasList
-            A map container of texture alias, texture name pairs.
-        @param apply
-            Set @c true to apply the texture aliases else just test to see if texture alias matches are found.
-        @return
-            True if matching texture aliases were found in the Texture Unit State.
-        */
+        /// @deprecated do not use
         bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true);
 
         /** Notify this object that its parent has changed. */

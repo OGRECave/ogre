@@ -128,8 +128,3 @@ void SGX_BuildDualQuaternionMatrix(in float4 r1, in float4 r2, out float2x4 vOut
 {
 	vOut = float2x4(r1, r2);
 }
-
-void SGX_BuildDualQuaternionMatrix(in float2x4 M, out float2x4 vOut)
-{
-	vOut = M;
-}

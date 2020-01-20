@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderSubRenderState.h"
+#include "OgreShaderParameter.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -73,9 +74,18 @@ public:
 
     bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
+    void setInstancingParams(bool enabled, int texCoordIndex)
+    {
+        mInstanced = enabled;
+        mTexCoordIndex = Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + texCoordIndex);
+    }
+
     static String Type;
 protected:
+    Parameter::Content mTexCoordIndex = Parameter::SPC_TEXTURE_COORDINATE0;
     bool mSetPointSize;
+    bool mInstanced = false;
+    bool mDoLightCalculations;
 };
 
 

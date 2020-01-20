@@ -174,6 +174,8 @@ Parameter::Parameter(GpuConstantType type, const String& name,
             const Content& content, size_t size) :
     mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size), mUsed(false)
 {
+    if (ShaderGenerator::getSingleton().getTargetLanguage()[0] == 'h' && mSemantic == SPS_BLEND_INDICES)
+        mType = GCT_UINT4;
 }
 
 //-----------------------------------------------------------------------
@@ -315,32 +317,6 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     mSize                = size;
 }
 
-/* transpose non-square uniform matrices for correct row-major > column-major mapping
- * this is actually the opposite of what we need to do, but we want to keep
- * the wrong indexing inside the shader so mat[0] returns the same data in both GLSL and HLSL
- * although it will be the first row in HLSL and the first column in GLSL
- */
-static GpuConstantType convertForUniform(GpuConstantType in)
-{
-    switch(in)
-    {
-    case GCT_MATRIX_2X3:
-        return GCT_MATRIX_3X2;
-    case GCT_MATRIX_2X4:
-        return GCT_MATRIX_4X2;
-    case GCT_MATRIX_3X2:
-        return GCT_MATRIX_2X3;
-    case GCT_MATRIX_3X4:
-        return GCT_MATRIX_4X3;
-    case GCT_MATRIX_4X2:
-        return GCT_MATRIX_2X4;
-    case GCT_MATRIX_4X3:
-        return GCT_MATRIX_3X4;
-    default:
-        return in;
-    }
-}
-
 //-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size)
 {
@@ -351,10 +327,6 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     if (nAutoConstantData != 0)
         mName += StringConverter::toString(nAutoConstantData);
     mType               = getGCType(parameterDef);
-
-    if (ShaderGenerator::getSingleton().getTargetLanguage()[0] == 'g')
-        mType = convertForUniform(mType);
-
     mSemantic           = SPS_UNKNOWN;
     mIndex              = -1;
     mContent            = SPC_UNKNOWN;
@@ -378,10 +350,6 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     if (nAutoConstantData != 0)
         mName += StringConverter::toString(nAutoConstantData);
     mType               = type;
-
-    if (ShaderGenerator::getSingleton().getTargetLanguage()[0] == 'g')
-        mType = convertForUniform(mType);
-
     mSemantic           = SPS_UNKNOWN;
     mIndex              = -1;
     mContent            = SPC_UNKNOWN;
@@ -414,11 +382,11 @@ void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInPosition(int index)
+ParameterPtr ParameterFactory::createInPosition(int index, Parameter::Content content)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iPos_" + StringConverter::toString(index), 
-        Parameter::SPS_POSITION, index, 
-        Parameter::SPC_POSITION_OBJECT_SPACE));
+    return std::make_shared<Parameter>(GCT_FLOAT4, "iPos_" + StringConverter::toString(index),
+                                       Parameter::SPS_POSITION, index,
+                                       content);
 }
 
 //-----------------------------------------------------------------------
@@ -519,24 +487,9 @@ ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index,
     switch (type)
     {
     case GCT_FLOAT1:
-        return createInTexcoord1(index, content);
-        
     case GCT_FLOAT2:
-        return createInTexcoord2(index, content);
-        
     case GCT_FLOAT3:
-        return createInTexcoord3(index, content);
-        
     case GCT_FLOAT4:
-        return createInTexcoord4(index, content);       
-    default:
-    case GCT_SAMPLER1D:
-    case GCT_SAMPLER2D:
-    case GCT_SAMPLER2DARRAY:
-    case GCT_SAMPLER3D:
-    case GCT_SAMPLERCUBE:
-    case GCT_SAMPLER1DSHADOW:
-    case GCT_SAMPLER2DSHADOW:
     case GCT_MATRIX_2X2:
     case GCT_MATRIX_2X3:
     case GCT_MATRIX_2X4:
@@ -554,6 +507,16 @@ ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index,
     case GCT_UINT2:
     case GCT_UINT3:
     case GCT_UINT4:
+        return std::make_shared<Parameter>(type, StringUtil::format("iTexcoord_%d", index),
+                                           Parameter::SPS_TEXTURE_COORDINATES, index, content);
+    default:
+    case GCT_SAMPLER1D:
+    case GCT_SAMPLER2D:
+    case GCT_SAMPLER2DARRAY:
+    case GCT_SAMPLER3D:
+    case GCT_SAMPLERCUBE:
+    case GCT_SAMPLER1DSHADOW:
+    case GCT_SAMPLER2DSHADOW:
     case GCT_UNKNOWN:
         break;
     }
@@ -567,17 +530,11 @@ ParameterPtr ParameterFactory::createOutTexcoord(GpuConstantType type, int index
     switch (type)
     {
     case GCT_FLOAT1:
-        return createOutTexcoord1(index, content);
-
     case GCT_FLOAT2:
-        return createOutTexcoord2(index, content);
-
     case GCT_FLOAT3:
-        return createOutTexcoord3(index, content);
-
     case GCT_FLOAT4:
-        return createOutTexcoord4(index, content);      
-    
+        return std::make_shared<Parameter>(type, StringUtil::format("oTexcoord_%d", index),
+                                           Parameter::SPS_TEXTURE_COORDINATES, index, content);
     default:
     case GCT_SAMPLER1D:
     case GCT_SAMPLER2D:

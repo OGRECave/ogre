@@ -51,14 +51,14 @@ There are a few differences between this and the assembler program - to begin wi
 
 Lastly, there is a final option called `compile_arguments`, where you can specify arguments exactly as you would to the cgc command-line compiler, should you wish to.
 
-# DirectX9 HLSL {#HLSL}
+# DirectX HLSL {#HLSL}
 
-DirectX9 HLSL has a very similar language syntax to Cg but is tied to the DirectX API. The only benefit over Cg is that it only requires the DirectX 9 render system plugin, not any additional plugins. Declaring a DirectX9 HLSL program is very similar to Cg. Here’s an example:
+DirectX HLSL has an almost identical language syntax to Cg but is tied to the DirectX API. The benefit over Cg is that it only requires the DirectX render system plugin, not any additional plugins. Declaring a DirectX HLSL program is very similar to Cg. Here’s an example:
 
 ```cpp
 vertex_program myHLSLVertexProgram hlsl
 {
-    source myHLSLVertexProgram.txt
+    source myHLSLVertexProgram.hlsl
     entry_point main
     target vs_2_0
 }
@@ -66,9 +66,9 @@ vertex_program myHLSLVertexProgram hlsl
 
 As you can see, the main syntax is almost identical, except that instead of `profiles` with a list of assembler formats, you have a `target` parameter which allows a single assembler target to be specified - obviously this has to be a DirectX assembler format syntax code.
 
-**Important Matrix Ordering Note:** One thing to bear in mind is that HLSL allows you to use 2 different ways to multiply a vector by a matrix - mul(v,m) or mul(m,v). The only difference between them is that the matrix is effectively transposed. You should use mul(m,v) with the matrices passed in from Ogre - this agrees with the shaders produced from tools like RenderMonkey, and is consistent with Cg too, but disagrees with the Dx9 SDK and FX Composer which use mul(v,m) - you will have to switch the parameters to mul() in those shaders.
-
-Note that if you use the float3x4 / matrix3x4 type in your shader, bound to an OGRE auto-definition (such as bone matrices) you should use the `column_major_matrices = false` option (discussed below) in your program definition. This is because OGRE passes float3x4 as row-major to save constant space (3 float4’s rather than 4 float4’s with only the top 3 values used) and this tells OGRE to pass all matrices like this, so that you can use mul(m,v) consistently for all calculations. OGRE will also to tell the shader to compile in row-major form (you don’t have to set the /Zpr compile option or \#pragma pack(row-major) option, OGRE does this for you). Note that passing bones in float4x3 form is not supported by OGRE, but you don’t need it given the above.
+@note One thing to bear in mind is that HLSL allows you to use 2 different ways to multiply a vector by a matrix - mul(v,m) or mul(m,v). The only difference between them is that the matrix is effectively transposed. You should use mul(m,v) with the matrices passed in from Ogre - this agrees with the shaders produced from tools like RenderMonkey, and is consistent with Cg too, but disagrees with the Dx9 SDK and FX Composer which use mul(v,m) - you will have to switch the parameters to mul() in those shaders.
+@note
+If you use the @c float3x4 / @c matrix3x4 type in your shader, bound to an OGRE auto-definition (such as bone matrices) you should use the `column_major_matrices = false` option (discussed below) in your program definition. This is because OGRE passes @c float3x4 as row-major to save constant space (3 float4’s rather than 4 float4’s with only the top 3 values used) and this tells OGRE to pass all matrices like this, so that you can use mul(m,v) consistently for all calculations. OGRE will also to tell the shader to compile in row-major form (you don’t have to set the `/Zpr` compile option or \#pragma pack(row-major) option, OGRE does this for you). Note that passing bones in float4x3 form is not supported by OGRE, but you don’t need it given the above.
 
 **Advanced options**<br>
 
@@ -97,35 +97,24 @@ vertex_program myGLSLVertexProgram glsl
 
 In GLSL, no entry point needs to be defined since it is always `main()` and there is no target definition since GLSL source is compiled into native GPU code and not intermediate assembly. 
 
-GLSL supports the use of modular shaders. This means you can write GLSL external functions that can be used in multiple shaders.
+For modularity %Ogre supports the non-standard `#include <something.glsl>` directive in GLSL. It also works with OpenGL ES and resembles what is available with HLSL and Cg.
 
-@note shader attachment is not supported by OpenGL ES. However OGRE allows you to use the \#include directive in GLSL shaders, which is independent of the backend.
+@deprecated The @c attach keyword for multi-module shaders is not supported on OpenGL ES and therefore deprecated in favor of the `#include` directive
 
 ```cpp
-vertex_program myExternalGLSLFunction1 glsl
+vertex_program myExternalGLSLFunction glsl
 {
-    source myExternalGLSLfunction1.vert
+    source myExternalGLSLfunction.vert
 }
 
-vertex_program myExternalGLSLFunction2 glsl
-{
-    source myExternalGLSLfunction2.vert
-}
-
-vertex_program myGLSLVertexProgram1 glsl
+vertex_program myGLSLVertexProgram glsl
 {
     source myGLSLfunction.vert
-    attach myExternalGLSLFunction1 myExternalGLSLFunction2
-}
-
-vertex_program myGLSLVertexProgram2 glsl
-{
-    source myGLSLfunction.vert
-    attach myExternalGLSLFunction1
+    attach myExternalGLSLFunction
 }
 ```
 
-External GLSL functions are attached to the program that needs them by using `attach` and including the names of all external programs required on the same line separated by spaces. This can be done for both vertex and fragment programs.
+The `attach` keyword allows creating GLSL shaders from multiple shader modules of the same type. The referencing shader has to forward-declare the functions it intends to use
 
 ## GLSL Texture Samplers {#GLSL-Texture-Samplers}
 
@@ -204,6 +193,10 @@ material exampleGLSLmatrixUniforms
   }
 }
 ```
+
+@note GLSL uses column-major storage by default, while %Ogre is using row-major storage. Furthermore, GLSL is using column-major addressing, while %Ogre and HLSL use row-major addressing.
+This means that `mat[0]` is the first column in GLSL, but the first row in HLSL and %Ogre. %Ogre takes care of transposing square matrices before uploading them with GLSL, so matrix-vector multiplication `M*v` just works and `mat[0]` will return the same data.
+However, with non-square matrices transposing would change their GLSL type from e.g. `mat2x4` (two columns, four rows) to `mat4x2` (two rows, four columns) and consequently what `mat[0]` would return. Therefore %Ogre just passes such matrices unchanged and you have to handle this case (notably in skinning) yourself by either transposing the matrix in the shader or column-wise access.
 
 ## Binding vertex attributes {#Binding-vertex-attributes}
 
@@ -449,7 +442,10 @@ Parameters can be specified using one of 4 commands as shown below. The same syn
 
 This command sets the value of an indexed parameter. 
 
-format: param\_indexed &lt;index&gt; &lt;type&gt; &lt;value&gt; example: param\_indexed 0 float4 10.0 0 0 0
+@par
+Format: param\_indexed &lt;index&gt; &lt;type&gt; &lt;value&gt;
+@par
+Example: param\_indexed 0 float4 10.0 0 0 0
 
 @param index
 simply a number representing the position in the parameter list which the value should be written, and you should derive this from your program definition. The index is relative to the way constants are stored on the card, which is in 4-element blocks. For example if you defined a float4 parameter at index 0, the next index would be 1. If you defined a matrix4x4 at index 0, the next usable index would be 4, since a 4x4 matrix takes up 4 indexes.
@@ -466,7 +462,10 @@ a space or tab-delimited list of values which can be converted into the type you
 
 This command tells Ogre to automatically update a given parameter with a derived value. This frees you from writing code to update program parameters every frame when they are always changing.
 
-format: param\_indexed\_auto &lt;index&gt; &lt;value\_code&gt; &lt;extra\_params&gt; example: param\_indexed\_auto 0 worldviewproj\_matrix
+@par
+Format: param\_indexed\_auto &lt;index&gt; &lt;value\_code&gt; &lt;extra\_params&gt;
+@par
+Example: param\_indexed\_auto 0 worldviewproj\_matrix
 
 @param index
 has the same meaning as [param\_indexed](#param_005findexed); note this time you do not have to specify the size of the parameter because the engine knows this already. In the example, the world/view/projection matrix is being used so this is implicitly a matrix4x4.
@@ -478,13 +477,24 @@ is one of Ogre::GpuProgramParameters::AutoConstantType without the `ACT_` prefix
 
 ## param\_named
 
-This is the same as param\_indexed, but uses a named parameter instead of an index. This can only be used with high-level programs which include parameter names; if you’re using an assembler program then you have no choice but to use indexes. Note that you can use indexed parameters for high-level programs too, but it is less portable since if you reorder your parameters in the high-level program the indexes will change. format: param\_named &lt;name&gt; &lt;type&gt; &lt;value&gt; example: param\_named shininess float4 10.0 0 0 0 The type is required because the program is not compiled and loaded when the material script is parsed, so at this stage we have no idea what types the parameters are. Programs are only loaded and compiled when they are used, to save memory.
+This is the same as param\_indexed, but uses a named parameter instead of an index. This can only be used with high-level programs which include parameter names; if you’re using an assembler program then you have no choice but to use indexes. Note that you can use indexed parameters for high-level programs too, but it is less portable since if you reorder your parameters in the high-level program the indexes will change.
+@par
+Format: param\_named &lt;name&gt; &lt;type&gt; &lt;value&gt;
+@par
+Example: param\_named shininess float4 10.0 0 0 0
+
+The type is required because the program is not compiled and loaded when the material script is parsed, so at this stage we have no idea what types the parameters are. Programs are only loaded and compiled when they are used, to save memory.
 
 <a name="param_005fnamed_005fauto"></a><a name="param_005fnamed_005fauto-1"></a>
 
 ## param\_named\_auto
 
-This is the named equivalent of param\_indexed\_auto, for use with high-level programs. Format: param\_named\_auto &lt;name&gt; &lt;value\_code&gt; &lt;extra\_params&gt; Example: param\_named\_auto worldViewProj WORLDVIEWPROJ\_MATRIX
+This is the named equivalent of param\_indexed\_auto, for use with high-level programs.
+
+@par
+Format: param\_named\_auto &lt;name&gt; &lt;value\_code&gt; &lt;extra\_params&gt;
+@par
+Example: param\_named\_auto worldViewProj worldviewproj\_matrix
 
 The allowed value codes and the meaning of extra\_params are detailed in [param\_indexed\_auto](#param_005findexed_005fauto).
 

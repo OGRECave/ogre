@@ -496,7 +496,7 @@ abstract material Examples/Instancing/HW_VTF
 
 			texture_unit Diffuse
 			{
-				texture_alias		DiffuseMap
+				texture		$DiffuseMap
 			}
 
 			texture_unit shadow0
@@ -517,7 +517,7 @@ abstract material Examples/Instancing/HW_VTF
 
 material Examples/Instancing/VTF/HW/Robot : Examples/Instancing/HW_VTF
 {
-	set_texture_alias	DiffuseMap	r2skin.jpg
+	set	$DiffuseMap	r2skin.jpg
 }
 
 abstract material Examples/Instancing/HW_VTF_dq
@@ -540,7 +540,7 @@ abstract material Examples/Instancing/HW_VTF_dq
 
 			texture_unit Diffuse
 			{
-				texture_alias		DiffuseMap
+				texture		$DiffuseMap
 			}
 
 			texture_unit shadow0
@@ -561,7 +561,7 @@ abstract material Examples/Instancing/HW_VTF_dq
 
 material Examples/Instancing/VTF/HW/Robot_dq : Examples/Instancing/HW_VTF_dq
 {
-	set_texture_alias	DiffuseMap	r2skin.jpg
+	set	$DiffuseMap	r2skin.jpg
 }
 
 abstract material Examples/Instancing/HW_VTF_dq_two_weights
@@ -587,7 +587,7 @@ abstract material Examples/Instancing/HW_VTF_dq_two_weights
 
 			texture_unit Diffuse
 			{
-				texture_alias		DiffuseMap
+				texture		$DiffuseMap
 				tex_address_mode clamp
 			}
 
@@ -609,5 +609,5 @@ abstract material Examples/Instancing/HW_VTF_dq_two_weights
 
 material Examples/Instancing/VTF/HW/spine_dq_two_weights : Examples/Instancing/HW_VTF_dq_two_weights
 {
-	set_texture_alias	DiffuseMap	circuit.dds
+	set	$DiffuseMap	circuit.dds
 }

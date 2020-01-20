@@ -2,27 +2,13 @@
 fragment_program DeferredShading/post/Ambient_ps unified
 {
 	delegate DeferredShading/post/Ambient_ps_pCg
-	delegate DeferredShading/post/Ambient_ps_pCg_sm4
 	delegate DeferredShading/post/Ambient_ps_pGLSL
 	delegate DeferredShading/post/Ambient_ps_pGLSLES
 }
-fragment_program DeferredShading/post/Ambient_ps_pCg cg
+fragment_program DeferredShading/post/Ambient_ps_pCg hlsl
 {
 	source Ambient_ps.cg
-	profiles ps_2_0 arbfp1
-	entry_point main
-	
-	default_params
-	{
-		param_named_auto ambientColor ambient_light_colour 0		
-		param_named_auto proj projection_matrix
-		param_named_auto farClipDistance far_clip_distance
-	}
-}
-fragment_program DeferredShading/post/Ambient_ps_pCg_sm4 cg
-{
-	source Ambient_ps_sm4.cg
-	profiles ps_4_0
+	target ps_2_0
 	entry_point main
 	
 	default_params
@@ -48,7 +34,7 @@ fragment_program DeferredShading/post/Ambient_ps_pGLSL glsl
 }
 fragment_program DeferredShading/post/Ambient_ps_pGLSLES glsles
 {
-	source Ambient_ps.glsles
+	source Ambient_ps.glsl
 	syntax glsles
 	
 	default_params
@@ -64,36 +50,27 @@ fragment_program DeferredShading/post/Ambient_ps_pGLSLES glsles
 // ShowNormal_ps
 fragment_program DeferredShading/post/ShowNormal_ps unified
 {
+    delegate DeferredShading/post/ShowNormal_ps_pGLSL
 	delegate DeferredShading/post/ShowNormal_ps_pCg
-	delegate DeferredShading/post/ShowNormal_ps_pCg_sm4
-	delegate DeferredShading/post/ShowNormal_ps_pGLSL
 	delegate DeferredShading/post/ShowNormal_ps_pGLSLES
 }
-fragment_program DeferredShading/post/ShowNormal_ps_pCg cg
+fragment_program DeferredShading/post/ShowNormal_ps_pCg hlsl
 {
 	source ShowNormal_ps.cg
-	profiles ps_2_0 arbfp1
-	entry_point main
-}
-fragment_program DeferredShading/post/ShowNormal_ps_pCg_sm4 cg
-{
-	source ShowNormal_ps_sm4.cg
-	profiles ps_4_0
+	target ps_2_0
 	entry_point main
 }
 fragment_program DeferredShading/post/ShowNormal_ps_pGLSL glsl
 {
 	source ShowNormal_ps.glsl
-	syntax glsl150
 	default_params
 	{
-        param_named Tex0 int 0
         param_named Tex1 int 1
     }
 }
 fragment_program DeferredShading/post/ShowNormal_ps_pGLSLES glsles
 {
-	source ShowNormal_ps.glsles
+	source ShowNormal_ps.glsl
 	syntax glsles
 	default_params
 	{
@@ -105,27 +82,19 @@ fragment_program DeferredShading/post/ShowNormal_ps_pGLSLES glsles
 // ShowDS_ps
 fragment_program DeferredShading/post/ShowDS_ps unified
 {
+    delegate DeferredShading/post/ShowDS_ps_pGLSL
 	delegate DeferredShading/post/ShowDS_ps_pCg
-	delegate DeferredShading/post/ShowDS_ps_pCg_sm4
-	delegate DeferredShading/post/ShowDS_ps_pGLSL
 	delegate DeferredShading/post/ShowDS_ps_pGLSLES
 }
-fragment_program DeferredShading/post/ShowDS_ps_pCg cg
+fragment_program DeferredShading/post/ShowDS_ps_pCg hlsl
 {
 	source ShowDS_ps.cg
-	profiles ps_2_0 arbfp1
-	entry_point main
-}
-fragment_program DeferredShading/post/ShowDS_ps_pCg_sm4 cg
-{
-	source ShowDS_ps_sm4.cg
-	profiles ps_4_0
+	target ps_2_0
 	entry_point main
 }
 fragment_program DeferredShading/post/ShowDS_ps_pGLSL glsl
 {
 	source ShowDS_ps.glsl
-	syntax glsl150
 	default_params
 	{
         param_named Tex0 int 0
@@ -134,7 +103,7 @@ fragment_program DeferredShading/post/ShowDS_ps_pGLSL glsl
 }
 fragment_program DeferredShading/post/ShowDS_ps_pGLSLES glsles
 {
-	source ShowDS_ps.glsles
+	source ShowDS_ps.glsl
 	syntax glsles
 	default_params
 	{
@@ -146,27 +115,19 @@ fragment_program DeferredShading/post/ShowDS_ps_pGLSLES glsles
 // ShowColour_ps
 fragment_program DeferredShading/post/ShowColour_ps unified
 {
+    delegate DeferredShading/post/ShowColour_ps_pGLSL
 	delegate DeferredShading/post/ShowColour_ps_pCg
-	delegate DeferredShading/post/ShowColour_ps_pCg_sm4
-	delegate DeferredShading/post/ShowColour_ps_pGLSL
 	delegate DeferredShading/post/ShowColour_ps_pGLSLES
 }
-fragment_program DeferredShading/post/ShowColour_ps_pCg cg
+fragment_program DeferredShading/post/ShowColour_ps_pCg hlsl
 {
 	source ShowColour_ps.cg
-	profiles ps_2_0 arbfp1
-	entry_point main
-}
-fragment_program DeferredShading/post/ShowColour_ps_pCg_sm4 cg
-{
-	source ShowColour_ps_sm4.cg
-	profiles ps_4_0
+	target ps_2_0
 	entry_point main
 }
 fragment_program DeferredShading/post/ShowColour_ps_pGLSL glsl
 {
 	source ShowColour_ps.glsl
-	syntax glsl150
 	default_params
 	{
         param_named Tex0 int 0
@@ -174,7 +135,7 @@ fragment_program DeferredShading/post/ShowColour_ps_pGLSL glsl
 }
 fragment_program DeferredShading/post/ShowColour_ps_pGLSLES glsles
 {
-	source ShowColour_ps.glsles
+	source ShowColour_ps.glsl
 	syntax glsles
 	default_params
 	{
@@ -186,27 +147,13 @@ fragment_program DeferredShading/post/ShowColour_ps_pGLSLES glsles
 vertex_program DeferredShading/post/LightMaterial_vs unified
 {
 	delegate DeferredShading/post/LightMaterial_vs_pCg
-	delegate DeferredShading/post/LightMaterial_vs_pCg_sm4
 	delegate DeferredShading/post/LightMaterial_vs_pGLSL
 	delegate DeferredShading/post/LightMaterial_vs_pGLSLES
 }
-vertex_program DeferredShading/post/LightMaterial_vs_pCg cg
+vertex_program DeferredShading/post/LightMaterial_vs_pCg hlsl
 {
 	source LightMaterial_vs.cg
-	profiles vs_1_1 arbvp1
-	entry_point main
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		//param_named_auto invProj inverse_projection_matrix
-		//param_named_auto vpWidth viewport_width
-		//param_named_auto vpHeight viewport_height
-	}
-}
-vertex_program DeferredShading/post/LightMaterial_vs_pCg_sm4 cg
-{
-	source LightMaterial_vs_sm4.cg
-	profiles vs_4_0
+	target vs_2_0
 	entry_point main
 	default_params
 	{
@@ -227,7 +174,7 @@ vertex_program DeferredShading/post/LightMaterial_vs_pGLSL glsl
 }
 vertex_program DeferredShading/post/LightMaterial_vs_pGLSLES glsles
 {
-	source LightMaterial_vs.glsles
+	source LightMaterial_vs.glsl
 	syntax glsles
 	default_params
 	{
@@ -239,26 +186,13 @@ vertex_program DeferredShading/post/LightMaterial_vs_pGLSLES glsles
 vertex_program DeferredShading/post/vs unified
 {
 	delegate DeferredShading/post/vs_pCg
-	delegate DeferredShading/post/vs_pCg_sm4
 	delegate DeferredShading/post/vs_pGLSL
 	delegate DeferredShading/post/vs_pGLSLES
 }
-vertex_program DeferredShading/post/vs_pCg cg
+vertex_program DeferredShading/post/vs_pCg hlsl
 {
 	source vs.cg
-	profiles vs_1_1 arbvp1
-	entry_point main
-	default_params
-	{
-		//param_named_auto invProj inverse_projection_matrix
-		param_named_auto flip render_target_flipping
-		param_named farCorner float3 1 1 1
-	}
-}
-vertex_program DeferredShading/post/vs_pCg_sm4 cg
-{
-	source vs_sm4.cg
-	profiles vs_4_0
+	target vs_2_0
 	entry_point main
 	default_params
 	{
@@ -279,7 +213,7 @@ vertex_program DeferredShading/post/vs_pGLSL glsl
 }
 vertex_program DeferredShading/post/vs_pGLSLES glsles
 {
-	source vs.glsles
+	source vs.glsl
 	syntax glsles
 	default_params
 	{

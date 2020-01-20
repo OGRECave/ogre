@@ -34,8 +34,6 @@
 #include "OgreGLSLProgram.h"
 #include "OgreGLSLExtSupport.h"
 
-#include <array>
-
 namespace Ogre {
 
     /** Ogre assumes that there are separate vertex and fragment
@@ -55,18 +53,11 @@ namespace Ogre {
     class _OgreGL3PlusExport GLSLProgramManager : public GLSLProgramManagerCommon, public Singleton<GLSLProgramManager>
     {
     protected:
-        /// Active shader objects defining the active program object.
-        std::array<GLSLShader*, GPT_COUNT> mActiveShader;
-
         /// active objects defining the active rendering gpu state
         GLSLProgram* mActiveProgram;
 
         GL3PlusRenderSystem* mRenderSystem;
 
-        /**  Convert GL uniform size and type to OGRE constant types
-             and associate uniform definitions together. */
-        void convertGLUniformtoOgreType(GLenum gltype,
-                                        GpuConstantDefinition& defToUpdate);
         /** Find the data source definition for a given uniform name
             and reference. Return true if found and pair the reference
             with its data source. */
@@ -107,8 +98,6 @@ namespace Ogre {
             const GpuConstantDefinitionMap* (&constantDefs)[6],
             GLUniformReferenceList& uniformList,
             GLAtomicCounterReferenceList& counterList,
-            SharedParamsBufferMap& sharedParamsBufferMap,
-            //GLShaderStorageBufferList& shaderStorageBufferList,
             GLCounterBufferList& counterBufferList);
 
         GL3PlusStateCacheManager* getStateCacheManager();
