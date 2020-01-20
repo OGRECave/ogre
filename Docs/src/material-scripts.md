@@ -922,11 +922,11 @@ Default: line_width 1
 
 # Texture Units {#Texture-Units}
 
-Here are the attributes you can use in a ’texture\_unit’ section of a .material script:
+Here are the attributes you can use in a @c texture_unit section of a .material script:
 
 <a name="Available-Texture-Layer-Attributes"></a>
 
-## Available Texture Layer Attributes
+## Available Texture Unit Attributes
 
 -   [texture\_alias](#texture_005falias)
 -   [texture](#texture)
@@ -949,9 +949,13 @@ Here are the attributes you can use in a ’texture\_unit’ section of a .mater
 -   [content\_type](#content_005ftype)
 -   [sampler_ref](#sampler_ref)
 
-Additionally you can use all attributes of @ref Samplers directly to implicitly create a Ogre::Sampler contained in this TextureUnit.
+@note Furthermore all attributes of @ref Samplers are available. Using any of them will create a new Ogre::Sampler local to the texture unit.
+This means that any changes you made to the Default Sampler e.g. via Ogre::MaterialManager::setDefaultTextureFiltering have no effect anymore.
+If several texture units share the same Sampler settings, you are encouraged to reference the same Sampler via [sampler_ref](#sampler_ref) for improved performance.
 
-You can also use a nested ’texture\_source’ section in order to use a special add-in as a source of texture data, See @ref External-Texture-Sources for details.
+You can also use nested section in order to use a special add-ins
+- @c texture_source as a source of texture data, see @ref External-Texture-Sources for details
+- @c rtshader_system for addtitional layer blending  options, see @ref rtss for details.
 
 <a name="Attribute-Descriptions-1"></a>
 
