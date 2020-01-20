@@ -95,11 +95,10 @@ namespace Ogre {
 
         if(pBuffer == 0)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Buffer: Out of memory",
-                        "GL3PlusHardwareBuffer::lock");
+            OGRE_EXCEPT(
+                Exception::ERR_INTERNAL_ERROR,
+                StringUtil::format("failed to lock %zu bytes at %zu of total %zu bytes", length, offset, mSizeInBytes));
         }
-
 
         // pBuffer is already offsetted in glMapBufferRange
         return pBuffer;
