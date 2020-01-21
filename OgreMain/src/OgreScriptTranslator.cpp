@@ -2366,6 +2366,7 @@ namespace Ogre{
         Pass *pass = getPass(compiler, node);
         if(!pass) return;
 
+        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line, node->cls);
         pass->setShadowCasterVertexProgram(node->name);
         if(pass->getShadowCasterVertexProgram()->isSupported())
         {
@@ -2379,6 +2380,7 @@ namespace Ogre{
         Pass *pass = getPass(compiler, node);
         if(!pass) return;
 
+        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line, node->cls);
         pass->setShadowCasterFragmentProgram(node->name);
         if(pass->getShadowCasterFragmentProgram()->isSupported())
         {
