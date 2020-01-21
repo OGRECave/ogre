@@ -60,7 +60,8 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
             }
 
-            if (!getMicrocodeFromCache(hash, mGLProgramHandle) )
+            mLinked = getMicrocodeFromCache(hash, mGLProgramHandle);
+            if (!mLinked)
             {
                 // Something must have changed since the program binaries
                 // were cached away. Fallback to source shader loading path,
