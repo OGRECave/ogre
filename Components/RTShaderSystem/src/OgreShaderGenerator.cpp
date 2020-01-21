@@ -649,9 +649,8 @@ void ShaderGenerator::removeSceneManager(SceneManager* sceneMgr)
         if (mActiveSceneMgr == sceneMgr) {
             mActiveSceneMgr = NULL;
 
-            // workaround for TextureUnit referencing a possibly deleted Frustum
-            removeAllShaderBasedTechniques("Ogre/TextureShadowReceiver",
-                    ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+            // force refresh global scene manager material
+            invalidateMaterial(DEFAULT_SCHEME_NAME, "Ogre/TextureShadowReceiver", RGN_INTERNAL);
         }
     }
 }
