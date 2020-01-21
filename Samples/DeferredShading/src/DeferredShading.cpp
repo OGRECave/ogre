@@ -39,6 +39,8 @@ same license as the rest of the engine.
 
 #include "SharedData.h"
 
+#include "OgreShaderExGBuffer.h"
+
 namespace Ogre
 {
     template<> SharedData* Singleton<SharedData>::msSingleton = 0;
@@ -176,6 +178,8 @@ void DeferredShadingSystem::createResources(void)
 {
     CompositorManager &compMan = CompositorManager::getSingleton();
 
+    RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
+
     //Hook up the compositor logic and scheme handlers.
     //This can theoretically happen in a loaded plugin, but in this case the demo contains the code.
     static bool firstTime = true;
@@ -186,8 +190,16 @@ void DeferredShadingSystem::createResources(void)
 
         compMan.registerCustomCompositionPass("DeferredLight", new DeferredLightCompositionPass);
 
+        rtShaderGen.createScheme("GBuffer");
+
         firstTime = false;
     }
+
+
+    RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState("GBuffer");
+    RTShader::GBuffer* subRenderState = rtShaderGen.createSubRenderState<RTShader::GBuffer>();
+    subRenderState->setOutBuffers({RTShader::GBuffer::TL_DIFFUSE_SPECULAR, RTShader::GBuffer::TL_NORMAL_VIEWDEPTH});
+    schemRenderState->addTemplateSubRenderState(subRenderState);
 
     mCompositorLogics["SSAOLogic"] = new SSAOLogic;
     compMan.registerCompositorLogic("SSAOLogic", mCompositorLogics["SSAOLogic"]);

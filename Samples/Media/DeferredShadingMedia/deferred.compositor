@@ -4,7 +4,8 @@ compositor DeferredShading/GBuffer
 {
 	technique
 	{
-		// temporary textures
+		// GBuffer textures
+		// PF_BYTE_RGBA would be sufficient for color, but D3D9 requires same bitdepth for all MRTs
 		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA chain_scope
 		
 		target mrt_output
