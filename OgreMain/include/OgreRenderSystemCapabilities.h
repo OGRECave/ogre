@@ -438,7 +438,8 @@ namespace Ogre
             mStencilBufferBitDepth = num;
         }
 
-        void setNumVertexBlendMatrices(ushort num)
+        /// @deprecated do not use
+        OGRE_DEPRECATED void setNumVertexBlendMatrices(ushort num)
         {
             mNumVertexBlendMatrices = num;
         }
@@ -487,9 +488,8 @@ namespace Ogre
             return mStencilBufferBitDepth;
         }
 
-        /** Returns the number of matrices available to hardware vertex 
-        blending for this rendering system. */
-        ushort getNumVertexBlendMatrices(void) const
+        /// @deprecated do not use
+        OGRE_DEPRECATED ushort getNumVertexBlendMatrices(void) const
         {
             return mNumVertexBlendMatrices;
         }
