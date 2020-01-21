@@ -272,7 +272,23 @@ namespace Ogre {
         /** return this material specific  shadow casting specific material
         */
         Ogre::MaterialPtr getShadowCasterMaterial() const;
-        /** set this material specific  shadow casting specific material
+        /** Sets the details of the material to use when rendering as a
+            shadow caster.
+            @remarks
+            Texture-based shadows require that the caster is rendered to a texture
+            in a solid colour (the shadow colour in the case of modulative texture
+            shadows). Whilst Ogre can arrange this for the fixed function
+            pipeline, passes which use vertex programs might need the vertex
+            programs still to run in order to preserve any deformation etc
+            that it does. However, lighting calculations must be a lot simpler,
+            with only the ambient colour being used (which the engine will ensure
+            is bound to the shadow colour).
+            @par
+            Therefore, it is up to implementors of vertex programs to provide an
+            alternative material which can be used to render the object
+            to a shadow texture. Do all the same vertex transforms, but set the
+            colour of the vertex to the ambient colour, as bound using the
+            standard auto parameter binding mechanism.
         */
         void setShadowCasterMaterial(Ogre::MaterialPtr val);
         /** set this material specific  shadow casting specific material
