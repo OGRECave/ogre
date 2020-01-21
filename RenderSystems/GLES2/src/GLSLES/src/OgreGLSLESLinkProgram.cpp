@@ -70,7 +70,8 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
 
             uint32 hash = getCombinedHash();
-            if (!getMicrocodeFromCache(hash, mGLProgramHandle))
+            mLinked = getMicrocodeFromCache(hash, mGLProgramHandle);
+            if (!mLinked)
             {
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
                 // Check CmdParams for each shader type to see if we should optimize
