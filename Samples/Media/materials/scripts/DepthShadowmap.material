@@ -333,29 +333,6 @@ material Ogre/DepthShadowmap/Caster/Float
     }
 }
 
-// Generic Shadow receiver material (floating point shadowmap)
-material Ogre/DepthShadowmap/Receiver/Float
-{
-	technique
-    {
-        pass 
-        {
-            vertex_program_ref Ogre/DepthShadowmap/ReceiverVP
-            {
-            }
-            fragment_program_ref Ogre/DepthShadowmap/ReceiverFP
-            {
-            }
-            texture_unit ShadowMap
-            {
-                tex_address_mode clamp
-                filtering none
-            }
-        }
-    }
-}
-
-
 // Specific receiver material for rockwall
 material Ogre/DepthShadowmap/Receiver/RockWall
 {
@@ -393,20 +370,19 @@ material Ogre/DepthShadowmap/Receiver/RockWall
 			vertex_program_ref Ogre/DepthShadowmap/ReceiverVP
 			{
 			}
-			shadow_receiver_vertex_program_ref Ogre/DepthShadowmap/ReceiverVP
-			{
-			}
 
 			// Fragment program
 			fragment_program_ref Ogre/DepthShadowmap/ReceiverFP
 			{
 			}
-			shadow_receiver_fragment_program_ref Ogre/DepthShadowmap/ReceiverFP
-			{
-			}
 
-			// shadowmap texture will be bound by code
-
+			// using integrated shadows
+            texture_unit
+            {
+                tex_address_mode clamp
+                filtering none
+				content_type shadow
+            }
 		}
 		
 		// Decal pass
@@ -469,34 +445,25 @@ material Ogre/DepthShadowmap/Receiver/Athene
 			vertex_program_ref Ogre/DepthShadowmap/NormalMapReceiverVP
 			{
 			}
-			shadow_receiver_vertex_program_ref Ogre/DepthShadowmap/NormalMapReceiverVP
-			{
-			}
 
 			// Fragment program
 			fragment_program_ref Ogre/DepthShadowmap/NormalMapReceiverFP
 			{
 			}
-			shadow_receiver_fragment_program_ref Ogre/DepthShadowmap/NormalMapReceiverFP
-			{
-			}
 
-			// shadowmap texture will be bound by code
+			// using integrated shadows
+            texture_unit
+            {
+                tex_address_mode clamp
+                filtering none
+				content_type shadow
+            }
 
 			// Base bump map
 			texture_unit
 			{
 				texture atheneNormalMap.png
-				colour_op replace
 			}
-			// Normalisation cube map
-			texture_unit
-			{
-				texture nm.png cubic
-				tex_coord_set 1
-				tex_address_mode clamp
-			}
-
 		}
 		
 		// Decal pass
@@ -521,24 +488,6 @@ material Ogre/DepthShadowmap/Receiver/Athene
 
 }
 
-
-
-// Specialisation to use PCF
-material Ogre/DepthShadowmap/Receiver/Float/PCF : Ogre/DepthShadowmap/Receiver/Float
-{
-	technique
-	{
-		pass
-		{
-			// override just receiver program 
-			fragment_program_ref Ogre/DepthShadowmap/ReceiverFPPCF
-			{
-			}
-			
-		}
-	}
-}
-
 // Specialisation to use PCF
 material Ogre/DepthShadowmap/Receiver/RockWall/PCF : Ogre/DepthShadowmap/Receiver/RockWall
 {
@@ -546,11 +495,10 @@ material Ogre/DepthShadowmap/Receiver/RockWall/PCF : Ogre/DepthShadowmap/Receive
 	{
 		pass lighting
 		{
-			// override just receiver program 
-			shadow_receiver_fragment_program_ref Ogre/DepthShadowmap/ReceiverFPPCF
+			// override just fragment program
+			fragment_program_ref Ogre/DepthShadowmap/ReceiverFPPCF
 			{
 			}
-			
 		}
 	}
 }
@@ -561,11 +509,10 @@ material Ogre/DepthShadowmap/Receiver/Athene/PCF : Ogre/DepthShadowmap/Receiver/
 	{
 		pass lighting
 		{
-			// override just receiver program 
-			shadow_receiver_fragment_program_ref Ogre/DepthShadowmap/NormalMapReceiverFPPCF
+			// override just fragment program
+			fragment_program_ref Ogre/DepthShadowmap/NormalMapReceiverFPPCF
 			{
 			}
-			
 		}
 	}
 }

@@ -597,6 +597,8 @@ protected:
             {
             case MAT_STANDARD:
                 mSceneMgr->setShadowTexturePixelFormat(PF_BYTE_RGBA);
+                mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE);
+
                 mSceneMgr->setShadowTextureCasterMaterial(MaterialPtr());
                 mSceneMgr->setShadowTextureReceiverMaterial(MaterialPtr());
                 mSceneMgr->setShadowTextureSelfShadow(false);   
@@ -606,11 +608,10 @@ protected:
                 break;
             case MAT_DEPTH_FLOAT:
                 mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
+                mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
                 mSceneMgr->setShadowTextureCasterMaterial(themat);
-                themat = MaterialManager::getSingleton().getByName(CUSTOM_RECEIVER_MATERIAL);
-                mSceneMgr->setShadowTextureReceiverMaterial(themat);
                 mSceneMgr->setShadowTextureSelfShadow(true);    
                 // Sort out base materials
                 pPlaneEnt->setMaterialName(CUSTOM_ROCKWALL_MATERIAL);
@@ -622,11 +623,13 @@ protected:
                 }
 
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_ROCKWALL_MATERIAL);
-                mCustomRockwallVparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverVertexProgramParameters();
-                mCustomRockwallFparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverFragmentProgramParameters();
+                themat->load();
+                mCustomRockwallVparams = themat->getBestTechnique()->getPass(1)->getVertexProgramParameters();
+                mCustomRockwallFparams = themat->getBestTechnique()->getPass(1)->getFragmentProgramParameters();
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL);
-                mCustomAtheneVparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverVertexProgramParameters();
-                mCustomAtheneFparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverFragmentProgramParameters();
+                themat->load();
+                mCustomAtheneVparams = themat->getBestTechnique()->getPass(1)->getVertexProgramParameters();
+                mCustomAtheneFparams = themat->getBestTechnique()->getPass(1)->getFragmentProgramParameters();
                 showSliders = true;
 
 
@@ -635,11 +638,10 @@ protected:
                 break;
             case MAT_DEPTH_FLOAT_PCF:
                 mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT32_R);
+                mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_CASTER_MATERIAL);
                 mSceneMgr->setShadowTextureCasterMaterial(themat);
-                themat = MaterialManager::getSingleton().getByName(CUSTOM_RECEIVER_MATERIAL + "/PCF");
-                mSceneMgr->setShadowTextureReceiverMaterial(themat);
                 mSceneMgr->setShadowTextureSelfShadow(true);    
                 // Sort out base materials
                 pPlaneEnt->setMaterialName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");
@@ -651,11 +653,13 @@ protected:
                 }
 
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");
-                mCustomRockwallVparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverVertexProgramParameters();
-                mCustomRockwallFparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverFragmentProgramParameters();
+                themat->load();
+                mCustomRockwallVparams = themat->getBestTechnique()->getPass(1)->getVertexProgramParameters();
+                mCustomRockwallFparams = themat->getBestTechnique()->getPass(1)->getFragmentProgramParameters();
                 themat = MaterialManager::getSingleton().getByName(CUSTOM_ATHENE_MATERIAL + "/PCF");
-                mCustomAtheneVparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverVertexProgramParameters();
-                mCustomAtheneFparams = themat->getTechnique(0)->getPass(1)->getShadowReceiverFragmentProgramParameters();
+                themat->load();
+                mCustomAtheneVparams = themat->getBestTechnique()->getPass(1)->getVertexProgramParameters();
+                mCustomAtheneFparams = themat->getBestTechnique()->getPass(1)->getFragmentProgramParameters();
                 showSliders = true;
 
                 // set the current params
