@@ -220,7 +220,7 @@ namespace Ogre
         */
         size_t getMaxOrBestNumInstancesPerBatch( const String &materialName, size_t suggestedSize, uint16 flags );
 
-        /** @copydoc SceneManager::createInstancedEntity */
+        /// Creates an InstancedEntity
         InstancedEntity* createInstancedEntity( const String &materialName );
 
         /** This function can be useful to improve CPU speed after having too many instances

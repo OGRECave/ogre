@@ -454,12 +454,12 @@ namespace Ogre {
         void initialiseAllResourceGroups(void);
 
         /** Prepares a resource group.
-        @remarks
+
             Prepares any created resources which are part of the named group.
             Note that resources must have already been created by calling
-            ResourceManager::createResource, or declared using #declareResource or
+            ResourceManager::createResource, or declared using declareResource() or
             in a script (such as .material and .overlay). The latter requires
-            that initialiseResourceGroup has been called. 
+            that initialiseResourceGroup() has been called.
         
             When this method is called, this class will callback any ResourceGroupListener
             which have been registered to update them on progress. 
@@ -474,12 +474,12 @@ namespace Ogre {
             bool prepareWorldGeom = true);
 
         /** Loads a resource group.
-        @remarks
+
             Loads any created resources which are part of the named group.
             Note that resources must have already been created by calling
-            ResourceManager::create, or declared using declareResource() or
+            ResourceManager::createResource, or declared using declareResource() or
             in a script (such as .material and .overlay). The latter requires
-            that initialiseResourceGroup has been called. 
+            that initialiseResourceGroup() has been called.
         
             When this method is called, this class will callback any ResourceGroupListeners
             which have been registered to update them on progress. 
@@ -494,12 +494,12 @@ namespace Ogre {
             bool loadWorldGeom = true);
 
         /** Unloads a resource group.
-        @remarks
+
             This method unloads all the resources that have been declared as
             being part of the named resource group. Note that these resources
             will still exist in their respective ResourceManager classes, but
             will be in an unloaded state. If you want to remove them entirely,
-            you should use clearResourceGroup or destroyResourceGroup.
+            you should use clearResourceGroup() or destroyResourceGroup().
         @param name The name to of the resource group to unload.
         @param reloadableOnly If set to true, only unload the resource that is
             reloadable. Because some resources isn't reloadable, they will be
@@ -511,8 +511,8 @@ namespace Ogre {
         void unloadResourceGroup(const String& name, bool reloadableOnly = true);
 
         /** Unload all resources which are not referenced by any other object.
-        @remarks
-            This method behaves like unloadResourceGroup, except that it only
+
+            This method behaves like unloadResourceGroup(), except that it only
             unloads resources in the group which are not in use, ie not referenced
             by other objects. This allows you to free up some memory selectively
             whilst still keeping the group around (and the resources present,

@@ -323,14 +323,18 @@ namespace Ogre {
         LinearControllerFunction(const std::vector<Real>& keys, const std::vector<Real>& values, Real frequency = 1, bool deltaInput = true);
 
         /** Constructor, requires keys and values of the function to interpolate
+
+            For simplicity and compatibility with the predefined ControllerValue classes the function domain must be [0,1].
+            However, you can use the frequency parameter to rescale the domain to a different range.
             @param
                 keys the x-values of the function sampling points. Value range is [0,1]. Must include at least the keys 0 and 1.
-            @remarks
-                for simplicity and compability with the predefined ControllerValue classes the function range is limited to [0,1].
-                However you can use the frequency parameter to rescale the input key values.
             @param
                 values the function values f(x) of the function. order must match keys
-            @remarks
+            @param frequency the speed of the evaluation in cycles per second
+            @param
+                deltaInput If true, signifies that the input will be a delta value such that the function should
+                 add it to an internal counter before calculating the output.
+            @note
                 there must be the same amount of keys and values
         */
         static ControllerFunctionRealPtr create(const std::vector<Real>& keys, const std::vector<Real>& values, Real frequency = 1, bool deltaInput = true)

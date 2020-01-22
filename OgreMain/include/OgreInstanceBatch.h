@@ -212,7 +212,7 @@ namespace Ogre
         /** Constructs all the data needed to use this batch, as well as the
             InstanceEntities. Placed here because in the constructor virtual
             tables may not have been yet filled.
-        @param baseSubMesh A sub mesh which the instances will be based upon from.
+        @param baseSubMesh A sub mesh which the instances will be based upon from
         @remarks
             Call this only ONCE. This is done automatically by Ogre::InstanceManager
             Caller is responsable for freeing buffers in this RenderOperation
@@ -231,6 +231,7 @@ namespace Ogre
             reference from Render Op.
             For example, Hardware based instancing uses it's own vertex buffer for the
             last source binding, but shares the other sources.
+        @param baseSubMesh A sub mesh which the instances will be based upon from
         @param renderOperation The RenderOp to reference.
         @remarks
             Caller is responsable for freeing buffers passed as input arguments

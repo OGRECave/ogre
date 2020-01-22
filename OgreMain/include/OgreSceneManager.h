@@ -874,17 +874,10 @@ namespace Ogre {
         /** Internal utility method for rendering a single object. 
         @remarks
             Assumes that the pass has already been set up.
-        @param rend The renderable to issue to the pipeline
-        @param pass The pass which is being used
+        @copydetail _injectRenderWithPass
         @param lightScissoringClipping If true, passes that have the getLightScissorEnabled
-            and/or getLightClipPlanesEnabled flags will cause calculation and setting of 
-            scissor rectangle and user clip planes. 
-        @param doLightIteration If true, this method will issue the renderable to
-            the pipeline possibly multiple times, if the pass indicates it should be
-            done once per light
-        @param manualLightList Only applicable if doLightIteration is false, this
-            method allows you to pass in a previously determined set of lights
-            which will be used for a single render of this object.
+        and/or getLightClipPlanesEnabled flags will cause calculation and setting of
+        scissor rectangle and user clip planes.
         */
         void renderSingleObject(Renderable* rend, const Pass* pass,
             bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList = 0);
@@ -3083,14 +3076,14 @@ namespace Ogre {
         @remarks
             Instancing is a way of batching up geometry into a much more 
             efficient form, but with some limitations, and still be able to move & animate it.
-            Please @see InstanceManager class documentation for full information.
+            Please see @ref InstanceManager class documentation for full information.
         @param customName Custom name for referencing. Must be unique
         @param meshName The mesh name the instances will be based upon
         @param groupName The resource name where the mesh lives
         @param technique Technique to use, which may be shader based, or hardware based.
         @param numInstancesPerBatch Suggested number of instances per batch. The actual number
         may end up being lower if the technique doesn't support having so many. It can't be zero
-        @param flags Flags to pass to the InstanceManager @see InstanceManagerFlags
+        @param flags Flags to pass to the InstanceManager see #InstanceManagerFlags
         @param subMeshIdx InstanceManager only supports using one submesh from the base mesh. This parameter
         says which submesh to pick (must be <= Mesh::getNumSubMeshes())
         @return The new InstanceManager instance
@@ -3138,13 +3131,14 @@ namespace Ogre {
                                                 size_t numInstancesPerBatch, uint16 flags=0,
                                                 unsigned short subMeshIdx=0 );
 
-        /** Creates an InstancedEntity based on an existing InstanceManager (@see createInstanceManager)
-        @remarks
-            * Return value may be null if the InstanceManger technique isn't supported
-            * Try to keep the number of entities with different materials <b>to a minimum</b>
-            * For more information @see InstancedManager @see InstancedBatch, @see InstancedEntity
-            * Alternatively you can call InstancedManager::createInstanceEntity using the returned
-            pointer from createInstanceManager
+        /** Creates an InstancedEntity based on an existing InstanceManager
+
+        - Return value may be null if the InstanceManger technique isn't supported
+        - Try to keep the number of entities with different materials <b>to a minimum</b>
+
+        Alternatively you can call @ref InstanceManager::createInstancedEntity using the returned
+        pointer from createInstanceManager()
+        @see InstanceBatch
         @param materialName Material name 
         @param managerName Name of the instance manager
         @return An InstancedEntity ready to be attached to a SceneNode
@@ -3301,9 +3295,16 @@ namespace Ogre {
         bool getFlipCullingOnNegativeScale() const { return mFlipCullingOnNegativeScale; }
 
         /** Render something as if it came from the current queue.
-            @param pass     Material pass to use for setting up this quad.
-            @param rend     Renderable to render
-            @param shadowDerivation Whether passes should be replaced with shadow caster / receiver passes
+        @param rend The renderable to issue to the pipeline
+        @param pass The pass which is being used
+        @param doLightIteration If true, this method will issue the renderable to
+            the pipeline possibly multiple times, if the pass indicates it should be
+            done once per light
+        @param manualLightList Only applicable if doLightIteration is false, this
+            method allows you to pass in a previously determined set of lights
+            which will be used for a single render of this object.
+        @param shadowDerivation If false, disables the derivation of shadow
+            passes from original passes
          */
         void _injectRenderWithPass(Pass *pass, Renderable *rend, bool shadowDerivation = true,
             bool doLightIteration = false, const LightList* manualLightList = 0);

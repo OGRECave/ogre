@@ -149,6 +149,10 @@ namespace Ogre {
         @param indexBuffer
             The index buffer to build the renderables into, 
             the current contents are assumed to be disposable.
+        @param indexBufferUsedSize
+            If the rest of buffer is enough than it would be locked with
+            HBL_NO_OVERWRITE semantic and indexBufferUsedSize would be increased,
+            otherwise HBL_DISCARD would be used and indexBufferUsedSize would be reset.
         @param extrudeVertices
             If @c true, this means this class should extrude
             the vertices of the back of the volume in software. If false, it
