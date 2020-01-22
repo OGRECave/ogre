@@ -342,16 +342,13 @@ namespace Ogre {
             
             /// Create the separate light cap if it doesn't already exists.
             void _createSeparateLightCap();
-            /// @copydoc ShadowRenderable::getWorldTransforms.
-            void getWorldTransforms(Matrix4* xform) const;
+            void getWorldTransforms(Matrix4* xform) const override;
             HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
             HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
             /// Rebind the source positions (for temp buffer users).
             void rebindPositionBuffer(const VertexData* vertexData, bool force);
-            /// @copydoc ShadowRenderable::isVisible.
-            bool isVisible(void) const;
-            /// @copydoc ShadowRenderable::rebindIndexBuffer.
-            virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
+            bool isVisible(void) const override;
+            virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) override;
         };
     public:
         /** Default destructor.
@@ -416,34 +413,22 @@ namespace Ogre {
         */
         void setMaterial(const MaterialPtr& material);
 
-        /** @copydoc MovableObject::_releaseManualHardwareResources */
-        void _releaseManualHardwareResources();
-        /** @copydoc MovableObject::_restoreManualHardwareResources */
-        void _restoreManualHardwareResources();
+        void _releaseManualHardwareResources() override;
+        void _restoreManualHardwareResources() override;
 
-        /** @copydoc MovableObject::_notifyCurrentCamera
-        */
-        void _notifyCurrentCamera(Camera* cam);
+        void _notifyCurrentCamera(Camera* cam) override;
 
-        /// @copydoc MovableObject::setRenderQueueGroup
-        void setRenderQueueGroup(uint8 queueID);
+        void setRenderQueueGroup(uint8 queueID) override;
 
-        /// @copydoc MovableObject::setRenderQueueGroupAndPriority
-        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority) override;
 
-        /** @copydoc MovableObject::getBoundingBox
-        */
-        const AxisAlignedBox& getBoundingBox(void) const;
+        const AxisAlignedBox& getBoundingBox(void) const override;
 
         /// Merge all the child object Bounds a return it.
         AxisAlignedBox getChildObjectsBoundingBox(void) const;
 
-        /** @copydoc MovableObject::_updateRenderQueue
-        */
-        void _updateRenderQueue(RenderQueue* queue);
-
-        /** @copydoc MovableObject::getMovableType */
-        const String& getMovableType(void) const;
+        void _updateRenderQueue(RenderQueue* queue) override;
+        const String& getMovableType(void) const override;
 
         /** For entities based on animated meshes, gets the AnimationState object for a single animation.
         @remarks
@@ -605,23 +590,17 @@ namespace Ogre {
         OGRE_DEPRECATED ChildObjectListIterator getAttachedObjectIterator(void);
         /** Gets an iterator to the list of objects attached to bones on this entity. */
         const ChildObjectList& getAttachedObjects() const { return mChildObjectList; }
-        /** @copydoc MovableObject::getBoundingRadius */
-        Real getBoundingRadius(void) const;
 
-        /** @copydoc MovableObject::getWorldBoundingBox */
-        const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
-        /** @copydoc MovableObject::getWorldBoundingSphere */
-        const Sphere& getWorldBoundingSphere(bool derive = false) const;
+        Real getBoundingRadius(void) const override;
+        const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const override;
+        const Sphere& getWorldBoundingSphere(bool derive = false) const override;
 
-        /** @copydoc ShadowCaster::getEdgeList */
-        EdgeData* getEdgeList(void);
-        /** @copydoc ShadowCaster::hasEdgeList */
-        bool hasEdgeList(void);
-        /** @copydoc ShadowCaster::getShadowVolumeRenderableIterator */
+        EdgeData* getEdgeList(void) override;
+        bool hasEdgeList(void) override;
         ShadowRenderableListIterator getShadowVolumeRenderableIterator(
             ShadowTechnique shadowTechnique, const Light* light,
             HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-            bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0);
+            bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0) override;
 
         /** Internal method for retrieving bone matrix information. */
         const Affine3* _getBoneMatrices(void) const { return mBoneMatrices;}
@@ -648,8 +627,7 @@ namespace Ogre {
         */
         bool isHardwareAnimationEnabled(void);
 
-        /** @copydoc MovableObject::_notifyAttached */
-        void _notifyAttached(Node* parent, bool isTagPoint = false);
+        void _notifyAttached(Node* parent, bool isTagPoint = false) override;
         /** Returns the number of requests that have been made for software animation
         @remarks
             If non-zero then software animation will be performed in updateAnimation
@@ -837,9 +815,7 @@ namespace Ogre {
         */
         void loadingComplete(Resource* res);
 
-        /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
+        void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false) override;
 
         /** Get the LOD strategy transformation of the mesh LOD factor. */
         Real _getMeshLodFactorTransformed() const;
