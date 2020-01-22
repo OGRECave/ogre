@@ -336,6 +336,7 @@ namespace Ogre {
             @remarks If this is called during a frame, it will be reading the results
             from the previous frame. Therefore, it is best to use this after the frame
             has ended.
+            @param profileName Must be unique and must not be an empty string
             @param limit A number between 0 and 1 representing the percentage of frame time
             @param greaterThan If true, this will return whether the limit is exceeded. Otherwise,
             it will return if the frame time has gone under this limit.

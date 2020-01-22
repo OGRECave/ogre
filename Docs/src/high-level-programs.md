@@ -97,9 +97,9 @@ vertex_program myGLSLVertexProgram glsl
 
 In GLSL, no entry point needs to be defined since it is always `main()` and there is no target definition since GLSL source is compiled into native GPU code and not intermediate assembly. 
 
-For modularity %Ogre supports the non-standard `#include <something.glsl>` directive in GLSL. It also works with OpenGL ES and resembles what is available with HLSL and Cg.
+For modularity %Ogre supports the non-standard <tt>\#include <something.glsl></tt> directive in GLSL. It also works with OpenGL ES and resembles what is available with HLSL and Cg.
 
-@deprecated The @c attach keyword for multi-module shaders is not supported on OpenGL ES and therefore deprecated in favor of the `#include` directive
+@deprecated The @c attach keyword for multi-module shaders is not supported on OpenGL ES and therefore deprecated in favor of the @c \#include directive
 
 ```cpp
 vertex_program myExternalGLSLFunction glsl
