@@ -30,7 +30,11 @@ void main()
 	// point on shadowmap
 	shadowUV = shadowUV / shadowUV.w;
 	float centerdepth = texture2D(shadowMap, shadowUV.xy).x;
-    
+
+#ifndef OGRE_REVERSED_Z
+	shadowUV.z = shadowUV.z * 0.5 + 0.5; // convert -1..1 to 0..1
+#endif
+
     // gradient calculation
   	float pixeloffset = inverseShadowmapSize;
     vec4 depths = vec4(
