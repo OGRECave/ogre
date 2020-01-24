@@ -317,25 +317,20 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      zpos += zinc * timeElapsed;
 
      // update vertex program parameters by binding a value to each renderable
-     StaticGeometry::RegionIterator regs =  mField->getRegionIterator();
-     while (regs.hasMoreElements())
+     for (const auto& reg : mField->getRegions())
      {
-         StaticGeometry::Region* reg = regs.getNext();
-
          // a little randomness
-         xpos += reg->getCentre().x * 0.001;
-         zpos += reg->getCentre().z * 0.001;
+         xpos += reg.second->getCentre().x * 0.001;
+         zpos += reg.second->getCentre().z * 0.001;
          offset.x = Math::Sin(xpos) * 4;
          offset.z = Math::Sin(zpos) * 4;
 
-         StaticGeometry::Region::LODIterator lods = reg->getLODIterator();
-         while (lods.hasMoreElements())
+         for (auto lod : reg.second->getLODBuckets())
          {
-             StaticGeometry::LODBucket::MaterialIterator mats = lods.getNext()->getMaterialIterator();
-             while (mats.hasMoreElements())
+             for (const auto& mb : lod->getMaterialBuckets())
              {
-                 StaticGeometry::MaterialBucket::GeometryIterator geoms = mats.getNext()->getGeometryIterator();
-                 while (geoms.hasMoreElements()) geoms.getNext()->setCustomParameter(999, offset);
+                 for (auto geom : mb.second->getGeometryList())
+                     geom->setCustomParameter(999, offset);
              }
          }
      }
