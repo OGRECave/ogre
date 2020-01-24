@@ -2018,7 +2018,7 @@ namespace Ogre
 
     //---------------------------------------------------------------------
     // TODO: Move this class to the right place.
-    class D3D11RenderOperationState : public Renderable::RenderSystemData
+    class D3D11RenderOperationState
     {
     public:
         ComPtr<ID3D11BlendState> mBlendState;
