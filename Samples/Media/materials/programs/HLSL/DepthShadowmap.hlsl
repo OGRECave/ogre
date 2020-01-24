@@ -2,34 +2,6 @@
    These particular ones are suitable for additive lighting models, and
    include 3 techniques to reduce depth fighting on self-shadowed surfaces,
    constant bias, gradient (slope-scale) bias, and a fuzzy shadow map comparison*/
-
-
-// Shadow caster vertex program.
-void casterVP(
-	float4 position			: POSITION,
-	out float4 outPos		: POSITION,
-	out float2 outDepth		: TEXCOORD0,
-
-	uniform float4x4 worldViewProj,
-	uniform float4 texelOffsets)
-{
-	outPos = mul(worldViewProj, position);
-	// fix pixel / texel alignment
-	outPos.xy += texelOffsets.zw * outPos.w;
-	outDepth = outPos.zw;
-}
-
-
-// Shadow caster fragment program for high-precision single-channel textures	
-void casterFP(
-	float2 depth			: TEXCOORD0,
-	out float4 result		: COLOR)
-{
-    float finalDepth = depth.x / depth.y;
-    result = float4(finalDepth, finalDepth, finalDepth, 1);
-}
-
-
 	
 void receiverVP(
 	float4 position		: POSITION,

@@ -31,7 +31,7 @@ using namespace OgreBites;
 
 // New depth shadowmapping
 String CUSTOM_ROCKWALL_MATERIAL("Ogre/DepthShadowmap/Receiver/RockWall");
-String CUSTOM_CASTER_MATERIAL("Ogre/DepthShadowmap/Caster/Float");
+String CUSTOM_CASTER_MATERIAL("PSSM/shadow_caster");
 String CUSTOM_RECEIVER_MATERIAL("Ogre/DepthShadowmap/Receiver/Float");
 String CUSTOM_ATHENE_MATERIAL("Ogre/DepthShadowmap/Receiver/Athene");
 
@@ -458,7 +458,7 @@ protected:
     {
         bool isStencil = mTechniqueMenu->getSelectionIndex() == 0;
         bool isAdditive = mLightingMenu->getSelectionIndex() == 0;
-        ShadowTechnique newTech = mCurrentShadowTechnique;
+        ShadowTechnique newTech = ShadowTechnique(mCurrentShadowTechnique & ~SHADOWDETAILTYPE_INTEGRATED);
 
         if (isStencil)
         {
@@ -600,7 +600,6 @@ protected:
                 mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE);
 
                 mSceneMgr->setShadowTextureCasterMaterial(MaterialPtr());
-                mSceneMgr->setShadowTextureReceiverMaterial(MaterialPtr());
                 mSceneMgr->setShadowTextureSelfShadow(false);   
                 
                 resetMaterials();

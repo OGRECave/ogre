@@ -1,22 +1,5 @@
 
 // ***-- Begin HLSL section --**
-
-vertex_program Ogre/DepthShadowmap/CasterVP_HLSL hlsl
-{
-    source DepthShadowmap.hlsl
-    entry_point casterVP
-    target vs_2_0
-}
-
-
-fragment_program Ogre/DepthShadowmap/CasterFP_HLSL hlsl
-{
-    source DepthShadowmap.hlsl
-    entry_point casterFP
-    target ps_2_0
-}
-
-
 vertex_program Ogre/DepthShadowmap/ReceiverVP_HLSL hlsl
 {
     source DepthShadowmap.hlsl
@@ -71,18 +54,6 @@ fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF_HLSL hlsl
 // **-- End HLSL Section --**
 
 // **-- Begin GLSL Section --**
-vertex_program Ogre/DepthShadowmap/CasterVP_GLSL glsl
-{
-    source DepthShadowmapCasterVp.glsl
-}
-
-
-fragment_program Ogre/DepthShadowmap/CasterFP_GLSL glsl
-{
-    source DepthShadowmapCasterFp.glsl
-}
-
-
 vertex_program Ogre/DepthShadowmap/ReceiverVP_GLSL glsl
 {
     source DepthShadowmapReceiverVp.glsl
@@ -137,20 +108,6 @@ fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF_GLSL glsl
 // **-- End GLSL Section --**
 
 // **-- Begin GLSL ES Section --**
-vertex_program Ogre/DepthShadowmap/CasterVP_GLSLES glsles
-{
-    source DepthShadowmapCasterVp.glsl
-	preprocessor_defines LINEAR_RANGE=0
-}
-
-
-fragment_program Ogre/DepthShadowmap/CasterFP_GLSLES glsles
-{
-    source DepthShadowmapCasterFp.glsl
-	preprocessor_defines LINEAR_RANGE=0
-}
-
-
 vertex_program Ogre/DepthShadowmap/ReceiverVP_GLSLES glsles
 {
     source DepthShadowmapReceiverVp.glsl
