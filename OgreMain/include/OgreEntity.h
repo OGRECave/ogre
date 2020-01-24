@@ -597,7 +597,7 @@ namespace Ogre {
 
         EdgeData* getEdgeList(void) override;
         bool hasEdgeList(void) override;
-        ShadowRenderableListIterator getShadowVolumeRenderableIterator(
+        const ShadowRenderableList& getShadowVolumeRenderableList(
             ShadowTechnique shadowTechnique, const Light* light,
             HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
             bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0) override;

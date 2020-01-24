@@ -1898,8 +1898,8 @@ namespace Ogre {
         return mMeshLodFactorTransformed;
     }
     //-----------------------------------------------------------------------
-    ShadowCaster::ShadowRenderableListIterator
-        Entity::getShadowVolumeRenderableIterator(
+    const ShadowCaster::ShadowRenderableList&
+        Entity::getShadowVolumeRenderableList(
         ShadowTechnique shadowTechnique, const Light* light,
         HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
         bool extrude, Real extrusionDistance, unsigned long flags)
@@ -1937,7 +1937,7 @@ namespace Ogre {
                             mAnimationState->copyMatchingState(targetState);
                     }
                 }
-                return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableIterator(
+                return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableList(
                     shadowTechnique, light, indexBuffer, indexBufferUsedSize,
                     extrude, extrusionDistance, flags);
             }
@@ -1978,7 +1978,7 @@ namespace Ogre {
         {
             // we can't get an edge list for some reason, return blank
             // really we shouldn't be able to get here, but this is a safeguard
-            return ShadowRenderableListIterator(mShadowRenderables.begin(), mShadowRenderables.end());
+            return mShadowRenderables;
         }
 
         // Init shadow renderable list if required
@@ -2076,7 +2076,7 @@ namespace Ogre {
             light, mShadowRenderables, flags);
 
 
-        return ShadowRenderableListIterator(mShadowRenderables.begin(), mShadowRenderables.end());
+        return mShadowRenderables;
     }
     //-----------------------------------------------------------------------
     const VertexData* Entity::findBlendedVertexData(const VertexData* orig)

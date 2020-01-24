@@ -410,7 +410,7 @@ namespace Ogre
         EdgeData* getEdgeList(void);
         bool hasEdgeList(void) override;
         /** Implement this method to enable stencil shadows. */
-        ShadowRenderableListIterator getShadowVolumeRenderableIterator(
+        const ShadowRenderableList& getShadowVolumeRenderableList(
             ShadowTechnique shadowTechnique, const Light* light, 
             HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
             bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);

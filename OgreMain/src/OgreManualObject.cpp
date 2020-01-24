@@ -948,8 +948,8 @@ namespace Ogre {
         return getEdgeList() != 0;
     }
     //-----------------------------------------------------------------------------
-    ShadowCaster::ShadowRenderableListIterator
-    ManualObject::getShadowVolumeRenderableIterator(
+    const ShadowCaster::ShadowRenderableList&
+    ManualObject::getShadowVolumeRenderableList(
         ShadowTechnique shadowTechnique, const Light* light,
         HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
         bool extrude, Real extrusionDistance, unsigned long flags)
@@ -959,8 +959,7 @@ namespace Ogre {
         EdgeData* edgeList = getEdgeList();
         if (!edgeList)
         {
-            return ShadowRenderableListIterator(
-                mShadowRenderables.begin(), mShadowRenderables.end());
+            return mShadowRenderables;
         }
 
         // Calculate the object space light details
@@ -1035,11 +1034,7 @@ namespace Ogre {
         generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize, 
             light, mShadowRenderables, flags);
 
-
-        return ShadowRenderableListIterator(
-            mShadowRenderables.begin(), mShadowRenderables.end());
-
-
+        return mShadowRenderables;
     }
     //-----------------------------------------------------------------------------
     //-----------------------------------------------------------------------------
