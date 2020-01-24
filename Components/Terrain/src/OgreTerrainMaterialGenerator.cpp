@@ -133,7 +133,7 @@ namespace Ogre
         // update
         mCompositeMapPlane->setMaterial(0, mat);
         TerrainGlobalOptions& globalopts = TerrainGlobalOptions::getSingleton();
-        mLightNode->setDirection(globalopts.getLightMapDirection());
+        mLightNode->setDirection(globalopts.getLightMapDirection(), Node::TS_WORLD);
         mCompositeMapLight->setDiffuseColour(globalopts.getCompositeMapDiffuse());
         mCompositeMapSM->setAmbientLight(globalopts.getCompositeMapAmbient());
 
