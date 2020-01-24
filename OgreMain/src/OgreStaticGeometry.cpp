@@ -1081,8 +1081,6 @@ namespace Ogre {
 
             if (stencilShadows)
             {
-                MaterialBucket::GeometryIterator geomIt =
-                    mat->getGeometryIterator();
                 // Check if we have vertex programs here
                 Technique* t = mat->getMaterial()->getBestTechnique();
                 if (t)
@@ -1097,10 +1095,8 @@ namespace Ogre {
                     }
                 }
 
-                while (geomIt.hasMoreElements())
+                for (GeometryBucket* geom : mat->getGeometryList())
                 {
-                    GeometryBucket* geom = geomIt.getNext();
-
                     // Check we're dealing with 16-bit indexes here
                     // Since stencil shadows can only deal with 16-bit
                     // More than that and stencil is probably too CPU-heavy
@@ -1178,9 +1174,7 @@ namespace Ogre {
         // We need to search the edge list for silhouette edges
         if (!mEdgeList)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "You enabled stencil shadows after the buid process!",
-                "StaticGeometry::LODBucket::getShadowVolumeRenderableIterator");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "You enabled stencil shadows after the buid process!");
         }
 
         // Init shadow renderable list if required

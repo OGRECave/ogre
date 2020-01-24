@@ -291,8 +291,10 @@ namespace Ogre {
             const MaterialPtr& getMaterial(void) const { return mMaterial; }
             /// Iterator over geometry
             typedef VectorIterator<GeometryBucketList> GeometryIterator;
-            /// Get an iterator over the contained geometry
-            GeometryIterator getGeometryIterator(void);
+            /// Get a list of the contained geometry
+            const GeometryBucketList& getGeometryList() const { return mGeometryBucketList; }
+            /// @deprecated use getGeometryList()
+            OGRE_DEPRECATED GeometryIterator getGeometryIterator(void);
             /// Get the current Technique
             Technique* getCurrentTechnique(void) const { return mTechnique; }
             /// Dump contents for diagnostics
@@ -365,7 +367,9 @@ namespace Ogre {
             /// Iterator over the materials in this LOD
             typedef MapIterator<MaterialBucketMap> MaterialIterator;
             /// Get an iterator over the materials in this LOD
-            MaterialIterator getMaterialIterator(void);
+            const MaterialBucketMap& getMaterialBuckets() const { return mMaterialBucketMap; }
+            /// @deprecated use getMaterialBuckets()
+            OGRE_DEPRECATED MaterialIterator getMaterialIterator(void);
             /// Dump contents for diagnostics
             void dump(std::ofstream& of) const;
             void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
@@ -455,8 +459,10 @@ namespace Ogre {
             uint32 getTypeFlags(void) const;
 
             typedef VectorIterator<LODBucketList> LODIterator;
-            /// Get an iterator over the LODs in this region
-            LODIterator getLODIterator(void);
+            /// @deprecated use getLODBuckets()
+            OGRE_DEPRECATED LODIterator getLODIterator(void);
+            /// Get an list of the LODs in this region
+            const LODBucketList& getLODBuckets() const { return mLodBucketList; }
             const ShadowRenderableList& getShadowVolumeRenderableList(
                 ShadowTechnique shadowTechnique, const Light* light, 
                 HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
@@ -760,8 +766,10 @@ namespace Ogre {
         
         /// Iterator for iterating over contained regions
         typedef MapIterator<RegionMap> RegionIterator;
-        /// Get an iterator over the regions in this geometry
-        RegionIterator getRegionIterator(void);
+        /// Get an list of the regions in this geometry
+        const RegionMap& getRegions() const { return mRegionMap; }
+        /// @deprecated use getRegions()
+        OGRE_DEPRECATED RegionIterator getRegionIterator(void);
 
         /** Dump the contents of this StaticGeometry to a file for diagnostic
             purposes.
