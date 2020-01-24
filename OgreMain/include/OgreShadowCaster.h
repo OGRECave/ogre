@@ -137,7 +137,7 @@ namespace Ogre {
         typedef std::vector<ShadowRenderable*> ShadowRenderableList;
         typedef VectorIterator<ShadowRenderableList> ShadowRenderableListIterator;
 
-        /** Gets an iterator over the renderables required to render the shadow volume. 
+        /** Gets an list of the renderables required to render the shadow volume.
         @remarks
             Shadowable geometry should ideally be designed such that there is only one
             ShadowRenderable required to render the the shadow; however this is not a necessary
@@ -162,10 +162,26 @@ namespace Ogre {
         @param flags
             Technique-specific flags, see ShadowRenderableFlags.
         */
+        virtual const ShadowRenderableList& getShadowVolumeRenderableList(ShadowTechnique shadowTechnique, const Light* light,
+                                                                   HardwareIndexBufferSharedPtr* indexBuffer,
+                                                                   size_t* indexBufferUsedSize, bool extrudeVertices,
+                                                                   Real extrusionDistance, unsigned long flags = 0)
+        {
+            static ShadowRenderableList tmp;
+            auto itw = getShadowVolumeRenderableIterator(shadowTechnique, light, indexBuffer, indexBufferUsedSize,
+                                                         extrudeVertices, extrusionDistance, flags);
+            return tmp = ShadowRenderableList(itw.begin(), itw.end());
+        }
+
+        /// @deprecated use getShadowVolumeRenderableList()
         virtual ShadowRenderableListIterator getShadowVolumeRenderableIterator(
-            ShadowTechnique shadowTechnique, const Light* light, 
+            ShadowTechnique shadowTechnique, const Light* light,
             HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-            bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 ) = 0;
+            bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 )
+        {
+            static ShadowRenderableList lst;
+            return ShadowRenderableListIterator(lst.begin(), lst.end());
+        }
 
         /** Common implementation of releasing shadow renderables.*/
         static void clearShadowRenderableList(ShadowRenderableList& shadowRenderables);

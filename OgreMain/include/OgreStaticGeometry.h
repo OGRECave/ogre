@@ -457,11 +457,10 @@ namespace Ogre {
             typedef VectorIterator<LODBucketList> LODIterator;
             /// Get an iterator over the LODs in this region
             LODIterator getLODIterator(void);
-            /// @copydoc ShadowCaster::getShadowVolumeRenderableIterator
-            ShadowRenderableListIterator getShadowVolumeRenderableIterator(
+            const ShadowRenderableList& getShadowVolumeRenderableList(
                 ShadowTechnique shadowTechnique, const Light* light, 
                 HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-                bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
+                bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 ) override;
             EdgeData* getEdgeList(void) override;
             bool hasEdgeList(void) override;
 

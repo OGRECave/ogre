@@ -873,8 +873,8 @@ namespace Ogre {
         return LODIterator(mLodBucketList.begin(), mLodBucketList.end());
     }
     //---------------------------------------------------------------------
-    ShadowCaster::ShadowRenderableListIterator
-    StaticGeometry::Region::getShadowVolumeRenderableIterator(
+    const ShadowCaster::ShadowRenderableList&
+    StaticGeometry::Region::getShadowVolumeRenderableList(
         ShadowTechnique shadowTechnique, const Light* light,
         HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
         bool extrude, Real extrusionDistance, unsigned long flags)
@@ -901,7 +901,7 @@ namespace Ogre {
             light, shadowRendList, flags);
 
 
-        return ShadowCaster::ShadowRenderableListIterator(shadowRendList.begin(), shadowRendList.end());
+        return shadowRendList;
 
     }
     //--------------------------------------------------------------------------

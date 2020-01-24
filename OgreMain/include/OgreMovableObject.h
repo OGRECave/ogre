@@ -506,7 +506,7 @@ namespace Ogre {
         /// Returns whether the object has a valid edge list.
         bool hasEdgeList(void) { return false; }
         /// Define a default implementation of method from ShadowCaster which implements no shadows
-        ShadowRenderableListIterator getShadowVolumeRenderableIterator(
+        const ShadowRenderableList& getShadowVolumeRenderableList(
             ShadowTechnique shadowTechnique, const Light* light, 
             HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
             bool extrudeVertices, Real extrusionDist, unsigned long flags = 0);

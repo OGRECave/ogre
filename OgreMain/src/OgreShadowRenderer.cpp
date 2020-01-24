@@ -1092,8 +1092,8 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
         }
 
         // Get shadow renderables
-        ShadowCaster::ShadowRenderableListIterator iShadowRenderables =
-            caster->getShadowVolumeRenderableIterator(mShadowTechnique,
+        const ShadowCaster::ShadowRenderableList& shadowRenderables =
+            caster->getShadowVolumeRenderableList(mShadowTechnique,
             light, &mShadowIndexBuffer, &mShadowIndexBufferUsedSize,
             extrudeInSoftware, extrudeDist, flags);
 
@@ -1101,13 +1101,13 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
         //  - if we have 2-sided stencil, one render with no culling
         //  - otherwise, 2 renders, one with each culling method and invert the ops
         setShadowVolumeStencilState(false, zfailAlgo, stencil2sided);
-        renderShadowVolumeObjects(iShadowRenderables, mShadowStencilPass, &lightList, flags,
+        renderShadowVolumeObjects(shadowRenderables, mShadowStencilPass, &lightList, flags,
             false, zfailAlgo, stencil2sided);
         if (!stencil2sided)
         {
             // Second pass
             setShadowVolumeStencilState(true, zfailAlgo, false);
-            renderShadowVolumeObjects(iShadowRenderables, mShadowStencilPass, &lightList, flags,
+            renderShadowVolumeObjects(shadowRenderables, mShadowStencilPass, &lightList, flags,
                 true, zfailAlgo, false);
         }
 
@@ -1122,7 +1122,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
                     "shadowColor", zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
             }
             mSceneManager->_setPass(mShadowDebugPass);
-            renderShadowVolumeObjects(iShadowRenderables, mShadowDebugPass, &lightList, flags,
+            renderShadowVolumeObjects(shadowRenderables, mShadowDebugPass, &lightList, flags,
                 true, false, false);
             mDestRenderSystem->setColourBlendState(disabled);
             mDestRenderSystem->_setDepthBufferFunction(CMPF_LESS);
@@ -1144,7 +1144,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
 
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::renderShadowVolumeObjects(ShadowCaster::ShadowRenderableListIterator iShadowRenderables,
+void SceneManager::ShadowRenderer::renderShadowVolumeObjects(const ShadowCaster::ShadowRenderableList& shadowRenderables,
                                              Pass* pass,
                                              const LightList *manualLightList,
                                              unsigned long flags,
@@ -1152,10 +1152,8 @@ void SceneManager::ShadowRenderer::renderShadowVolumeObjects(ShadowCaster::Shado
 {
     // ----- SHADOW VOLUME LOOP -----
     // Render all shadow renderables with same stencil operations
-    while (iShadowRenderables.hasMoreElements())
+    for (ShadowRenderable* sr : shadowRenderables)
     {
-        ShadowRenderable* sr = iShadowRenderables.getNext();
-
         // omit hidden renderables
         if (sr->isVisible())
         {

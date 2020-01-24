@@ -766,7 +766,7 @@ namespace Ogre {
             */
             void setShadowVolumeStencilState(bool secondpass, bool zfail, bool twosided);
             /** Render a set of shadow renderables. */
-            void renderShadowVolumeObjects(ShadowCaster::ShadowRenderableListIterator iShadowRenderables,
+            void renderShadowVolumeObjects(const ShadowCaster::ShadowRenderableList& shadowRenderables,
                 Pass* pass, const LightList *manualLightList, unsigned long flags,
                 bool secondpass, bool zfail, bool twosided);
 

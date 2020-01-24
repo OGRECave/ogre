@@ -361,13 +361,13 @@ namespace Ogre {
         return mLightList;
     }
     //-----------------------------------------------------------------------
-    ShadowCaster::ShadowRenderableListIterator MovableObject::getShadowVolumeRenderableIterator(
+    const ShadowCaster::ShadowRenderableList& MovableObject::getShadowVolumeRenderableList(
         ShadowTechnique shadowTechnique, const Light* light, 
         HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
         bool inExtrudeVertices, Real extrusionDist, unsigned long flags )
     {
         static ShadowRenderableList dummyList;
-        return ShadowRenderableListIterator(dummyList.begin(), dummyList.end());
+        return dummyList;
     }
     //-----------------------------------------------------------------------
     const AxisAlignedBox& MovableObject::getLightCapBounds(void) const
