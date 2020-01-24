@@ -63,12 +63,8 @@ namespace Ogre {
     class _OgreExport Renderable
     {
     public:
-        /** An internal class that should be used only by a render system for internal use 
-        @remarks
-            This class was created so a render system can associate internal data to this class.
-            The need for this class started when the DX10 render system needed to save state objects.
-        */
-        class RenderSystemData {}; 
+        /// @deprecated do not use
+        class RenderSystemData {};
         typedef SharedPtr<RenderSystemData> RenderSystemDataPtr;
         
     public:
@@ -387,19 +383,13 @@ namespace Ogre {
                 Any* pAny = 0) = 0;
         };
 
-        /** Gets RenderSystem private data
-        @remarks
-            This should only be used by a RenderSystem
-        */
-        const RenderSystemDataPtr& getRenderSystemData() const
+        /// @deprecated do not use
+        OGRE_DEPRECATED const RenderSystemDataPtr& getRenderSystemData() const
         { 
             return mRenderSystemData; 
         }
-        /** Sets RenderSystem private data
-        @remarks
-            This should only be used by a RenderSystem
-        */
-        void setRenderSystemData(RenderSystemDataPtr val) const
+        /// @deprecated do not use
+        OGRE_DEPRECATED void setRenderSystemData(RenderSystemDataPtr val) const
         { 
             mRenderSystemData = val; 
         }
