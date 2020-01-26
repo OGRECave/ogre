@@ -108,41 +108,21 @@ namespace Ogre
     {
         if(isLocked() || src->isLocked())
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Source and destination buffer may not be locked!",
-                "HardwarePixelBuffer::blit");
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Source and destination buffer may not be locked!");
         }
         if(src.get() == this)
         {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                "Source must not be the same object",
-                "HardwarePixelBuffer::blit" ) ;
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Source must not be the same object");
         }
-        const PixelBox &srclock = src->lock(srcBox, HBL_READ_ONLY);
 
-        LockOptions method = HBL_NORMAL;
-        if(dstBox.left == 0 && dstBox.top == 0 && dstBox.front == 0 &&
-           dstBox.right == mWidth && dstBox.bottom == mHeight &&
-           dstBox.back == mDepth)
+        LockOptions method = HBL_WRITE_ONLY;
+        if (dstBox.left == 0 && dstBox.top == 0 && dstBox.front == 0 && dstBox.right == mWidth &&
+            dstBox.bottom == mHeight && dstBox.back == mDepth)
             // Entire buffer -- we can discard the previous contents
             method = HBL_DISCARD;
-            
-        const PixelBox &dstlock = lock(dstBox, method);
-        if(dstlock.getWidth() != srclock.getWidth() ||
-            dstlock.getHeight() != srclock.getHeight() ||
-            dstlock.getDepth() != srclock.getDepth())
-        {
-            // Scaling desired
-            Image::scale(srclock, dstlock);
-        }
-        else
-        {
-            // No scaling needed
-            PixelUtil::bulkPixelConversion(srclock, dstlock);
-        }
 
+        src->blitToMemory(srcBox, lock(dstBox, method));
         unlock();
-        src->unlock();
     }
     //-----------------------------------------------------------------------------       
     void HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &src)
