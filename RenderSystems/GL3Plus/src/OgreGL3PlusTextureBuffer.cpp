@@ -377,11 +377,7 @@ namespace Ogre {
     {
         GL3PlusTextureBuffer *srct = static_cast<GL3PlusTextureBuffer *>(src.get());
         // Check for FBO support first
-        // Destination texture must be 1D, 2D, 3D, or Cube
-        // Source texture must be 1D, 2D or 3D
-        if ((srct->mTarget == GL_TEXTURE_1D || srct->mTarget == GL_TEXTURE_2D ||
-             srct->mTarget == GL_TEXTURE_RECTANGLE || srct->mTarget == GL_TEXTURE_3D) &&
-            mTarget != GL_TEXTURE_2D_ARRAY)
+        if (GLRTTManager::getSingleton().checkFormat(mFormat))
         {
             blitFromTexture(srct, srcBox, dstBox);
         }
@@ -391,21 +387,11 @@ namespace Ogre {
         }
     }
 
-
-    // Very fast texture-to-texture blitter and hardware bi/trilinear scaling implementation using FBO
-    // Destination texture must be 1D, 2D, 3D, or Cube
-    // Source texture must be 1D, 2D or 3D
-    // Supports compressed formats as both source and destination format, it will use the hardware DXT compressor
-    // if available.
-    // @author W.J. van der Laan
     void GL3PlusTextureBuffer::blitFromTexture(GL3PlusTextureBuffer *src, const Box &srcBox, const Box &dstBox)
     {
         //        std::cerr << "GL3PlusTextureBuffer::blitFromTexture " <<
         //        src->mTextureID << ":" << srcBox.left << "," << srcBox.top << "," << srcBox.right << "," << srcBox.bottom << " " <<
         //        mTextureID << ":" << dstBox.left << "," << dstBox.top << "," << dstBox.right << "," << dstBox.bottom << std::endl;
-        // Store reference to FBO manager
-        GL3PlusFBOManager *fboMan = static_cast<GL3PlusFBOManager *>(GL3PlusRTTManager::getSingletonPtr());
-
         GLenum filtering = GL_LINEAR;
 
         // Set filtering modes depending on the dimensions and source
@@ -421,76 +407,40 @@ namespace Ogre {
         GLint oldfb;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
-        // Set up temporary FBO
+        // Set up temporary FBOs
         GLuint tempFBO[2] = { 0, 0 };
-        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &tempFBO[0]));
-        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &tempFBO[1]));
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(2, tempFBO));
         mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, tempFBO[0] );
         mRenderSystem->_getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, tempFBO[1] );
-
-        TexturePtr tempTex;
-        if (!fboMan->checkFormat(mFormat))
-        {
-            // If target format not directly supported, create intermediate texture
-            tempTex = TextureManager::getSingleton().createManual(
-                "GLBlitFromTextureTMP", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D,
-                dstBox.getWidth(), dstBox.getHeight(), dstBox.getDepth(), 0,
-                fboMan->getSupportedAlternative(mFormat));
-
-            OGRE_CHECK_GL_ERROR(
-                glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                     static_pointer_cast<GL3PlusTexture>(tempTex)->getGLID(), 0));
-
-            OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
-
-            // Set viewport to size of destination slice
-            mRenderSystem->_getStateCacheManager()->setViewport(0, 0, dstBox.getWidth(), dstBox.getHeight());
-        }
-        else
-        {
-            // We are going to bind directly, so set viewport to size and position of destination slice
-            mRenderSystem->_getStateCacheManager()->setViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight());
-        }
 
         bool isDepth = PixelUtil::isDepth(mFormat);
 
         // Process each destination slice
         for(uint32 slice = dstBox.front; slice < dstBox.back; ++slice)
         {
-            if (!tempTex)
-            {
-                // Bind directly
-                bindToFramebuffer(isDepth ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0, slice);
-            }
+            // Bind directly
+            bindToFramebuffer(isDepth ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0, slice);
 
             OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
 
-            GLbitfield mask = GL_ZERO;
+            GLbitfield mask = 0;
 
             // Bind the appropriate source texture to the read framebuffer
+            src->_bindToFramebuffer(isDepth ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0, slice,
+                                    GL_READ_FRAMEBUFFER);
             if (isDepth)
             {
-                src->_bindToFramebuffer(GL_DEPTH_ATTACHMENT, slice, GL_READ_FRAMEBUFFER);
-
-                OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
-
-                mask |= GL_DEPTH_BUFFER_BIT;
-
                 // Depth framebuffer sources can only be blit with nearest filtering
                 filtering = GL_NEAREST;
+                mask |= GL_DEPTH_BUFFER_BIT;
             }
             else
             {
-                src->_bindToFramebuffer(GL_COLOR_ATTACHMENT0, slice, GL_READ_FRAMEBUFFER);
-
                 OGRE_CHECK_GL_ERROR(glReadBuffer(GL_COLOR_ATTACHMENT0));
-
                 mask |= GL_COLOR_BUFFER_BIT;
             }
 
             OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_READ_FRAMEBUFFER));
-
-            assert(mask != GL_ZERO);
 
             // Perform blit from the source texture bound to read framebuffer to
             // this texture bound to draw framebuffer using the pixel coorinates.
@@ -500,19 +450,13 @@ namespace Ogre {
                                                   mask, filtering));
         }
 
-        // Finish up
-        if (!tempTex)
-        {
-            // Generate mipmaps
-            if (mUsage & TU_AUTOMIPMAP)
-            {
-                mRenderSystem->_getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
-                OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
-            }
-        }
 
-        // Reset source texture to sane state
-        mRenderSystem->_getStateCacheManager()->bindGLTexture( src->mTarget, src->mTextureID );
+        // Generate mipmaps
+        if (mUsage & TU_AUTOMIPMAP)
+        {
+            mRenderSystem->_getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
+            OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
+        }
 
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(
             GL_DRAW_FRAMEBUFFER, isDepth ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, 0));
@@ -526,9 +470,6 @@ namespace Ogre {
         
         mRenderSystem->_getStateCacheManager()->deleteGLFrameBuffer(GL_FRAMEBUFFER, tempFBO[0]);
         mRenderSystem->_getStateCacheManager()->deleteGLFrameBuffer(GL_FRAMEBUFFER, tempFBO[1]);
-        
-        if(tempTex)
-            TextureManager::getSingleton().remove(tempTex);
     }
 
     void GL3PlusTextureBuffer::_bindToFramebuffer(GLenum attachment, uint32 zoffset, GLenum which)
