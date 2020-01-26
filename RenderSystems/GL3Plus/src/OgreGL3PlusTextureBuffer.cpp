@@ -379,13 +379,9 @@ namespace Ogre {
         // Check for FBO support first
         // Destination texture must be 1D, 2D, 3D, or Cube
         // Source texture must be 1D, 2D or 3D
-
-        // This does not seem to work for RTTs after the first update
-        // I have no idea why! For the moment, disable
-        if ((src->getUsage() & TU_RENDERTARGET) == 0 &&
-            (srct->mTarget == GL_TEXTURE_1D || srct->mTarget == GL_TEXTURE_2D
-             || srct->mTarget == GL_TEXTURE_RECTANGLE || srct->mTarget == GL_TEXTURE_3D)
-            && mTarget != GL_TEXTURE_2D_ARRAY)
+        if ((srct->mTarget == GL_TEXTURE_1D || srct->mTarget == GL_TEXTURE_2D ||
+             srct->mTarget == GL_TEXTURE_RECTANGLE || srct->mTarget == GL_TEXTURE_3D) &&
+            mTarget != GL_TEXTURE_2D_ARRAY)
         {
             blitFromTexture(srct, srcBox, dstBox);
         }

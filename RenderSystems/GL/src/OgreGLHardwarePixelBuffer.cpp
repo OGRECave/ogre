@@ -422,7 +422,7 @@ void GLTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Box &s
     
     // This does not seem to work for RTTs after the first update
     // I have no idea why! For the moment, disable 
-    if(GLEW_EXT_framebuffer_object && (src->getUsage() & TU_RENDERTARGET) == 0 &&
+    if(GLEW_EXT_framebuffer_object &&
         (srct->mTarget==GL_TEXTURE_1D||srct->mTarget==GL_TEXTURE_2D
          ||srct->mTarget==GL_TEXTURE_3D)&&mTarget!=GL_TEXTURE_2D_ARRAY_EXT)
     {
