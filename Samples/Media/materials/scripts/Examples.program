@@ -148,7 +148,6 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4 cg
 {
-    entry_point main
     source PassthroughFP_sm4.cg
     profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
@@ -156,7 +155,6 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4 cg
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpHLSL hlsl
 {
-    entry_point main
     source PassthroughFP_sm4.hlsl
     target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }

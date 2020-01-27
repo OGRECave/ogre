@@ -1208,6 +1208,7 @@ namespace Ogre {
 		ManualResourceLoader* loader, CGcontext context)
 		: HighLevelGpuProgram(creator, name, handle, group, isManual, loader),
 		mCgContext(context),
+        mEntryPoint("main"),
 		mSelectedCgProfile(CG_PROFILE_UNKNOWN), mCgArguments(0), mParametersMapSizeAsBuffer(0)
 	{
 		if (createParamDictionary("CgProgram"))

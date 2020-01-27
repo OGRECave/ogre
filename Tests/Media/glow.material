@@ -20,14 +20,12 @@ fragment_program glow_ps_glsles glsles
 vertex_program glow_vs_cg hlsl
 {
 	source vs_glow.cg
-	entry_point main
 	target vs_2_0
 }
 
 fragment_program glow_ps_cg hlsl
 {
 	source ps_glow.cg
-	entry_point main
 	target ps_2_0
 }
 

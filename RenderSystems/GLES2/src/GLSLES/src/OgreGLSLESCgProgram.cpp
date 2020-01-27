@@ -91,7 +91,7 @@ namespace Ogre {
     GLSLESCgProgram::GLSLESCgProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
-        : GLSLESProgram(creator, name, handle, group, isManual, loader) 
+        : GLSLESProgram(creator, name, handle, group, isManual, loader), mEntryPoint("main")
     {
 
         // Add parameter "entry_point" and "profiles" to the material serializer dictionary
