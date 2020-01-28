@@ -34,10 +34,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     D3D11HardwareUniformBuffer::D3D11HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, 
                                                 bool useShadowBuffer, const String& name, D3D11Device & device)
-        : HardwareUniformBuffer(mgr, sizeBytes, usage, useShadowBuffer, name)
+        : HardwareUniformBuffer(mgr, sizeBytes, usage, false /* see below */, name)
         , mBufferImpl(0)
           
     {
+        // ensure DefaultHardwareUniformBuffer was not created
+        assert(!mShadowBuffer);
+        mUseShadowBuffer = useShadowBuffer;
+
         // everything is done via internal generalisation
         mBufferImpl = new D3D11HardwareBuffer(D3D11HardwareBuffer::CONSTANT_BUFFER, 
                                             mSizeInBytes, mUsage, device, false, useShadowBuffer, false);
