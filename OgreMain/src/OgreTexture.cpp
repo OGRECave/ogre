@@ -89,7 +89,7 @@ namespace Ogre {
     //--------------------------------------------------------------------------    
     void Texture::loadImage( const Image &img )
     {
-
+        OgreAssert(img.getSize(), "cannot load empty image");
         LoadingState old = mLoadingState.load();
         if (old!=LOADSTATE_UNLOADED && old!=LOADSTATE_PREPARED) return;
 
