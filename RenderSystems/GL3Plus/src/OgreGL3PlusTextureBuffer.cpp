@@ -288,7 +288,7 @@ namespace Ogre {
                         "GL3PlusTextureBuffer::download");
 
         // Download data to PBO
-        GL3PlusHardwareBuffer buffer(GL_PIXEL_PACK_BUFFER, mSizeInBytes, mUsage);
+        GL3PlusHardwareBuffer buffer(GL_PIXEL_PACK_BUFFER, data.getConsecutiveSize(), HBU_DISCARDABLE);
 
         //        std::stringstream str;
         //        str << "GL3PlusHardwarePixelBuffer::download: " << mTextureID
@@ -329,7 +329,7 @@ namespace Ogre {
 
         // Copy to destination buffer
         if(data.isConsecutive())
-            buffer.readData(0, mSizeInBytes, data.getTopLeftFrontPixelPtr());
+            buffer.readData(0, data.getConsecutiveSize(), data.getTopLeftFrontPixelPtr());
         else
         {
             size_t srcOffset = 0, elemSizeInBytes = PixelUtil::getNumElemBytes(data.format);
