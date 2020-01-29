@@ -1,0 +1,1 @@
+Textures are CC0 from https://cc0textures.com/ adapted for Ogre

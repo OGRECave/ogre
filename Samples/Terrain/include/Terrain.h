@@ -538,17 +538,24 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         defaultimp.minBatchSize = 33;
         defaultimp.maxBatchSize = 65;
         //! [import_settings]
+
+        //! [tex_from_src]
+        Image combined;
+        combined.loadTwoImagesAsRGBA("Ground23_col.jpg", "Ground23_spec.png", "General");
+        TextureManager::getSingleton().loadImage("Ground23_diffspec", "General", combined);
+        //! [tex_from_src]
+
         //! [textures]
         defaultimp.layerList.resize(3);
-        defaultimp.layerList[0].worldSize = 100;
-        defaultimp.layerList[0].textureNames.push_back("grass_green-01_diffusespecular.dds");
-        defaultimp.layerList[0].textureNames.push_back("grass_green-01_normalheight.dds");
-        defaultimp.layerList[1].worldSize = 100;
-        defaultimp.layerList[1].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
-        defaultimp.layerList[1].textureNames.push_back("dirt_grayrocky_normalheight.dds");
-        defaultimp.layerList[2].worldSize = 200;
-        defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
-        defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+        defaultimp.layerList[0].worldSize = 200;
+        defaultimp.layerList[0].textureNames.push_back("Ground37_diffspec.dds");
+        defaultimp.layerList[0].textureNames.push_back("Ground37_normheight.dds");
+        defaultimp.layerList[1].worldSize = 200;
+        defaultimp.layerList[1].textureNames.push_back("Ground23_diffspec"); // loaded from memory
+        defaultimp.layerList[1].textureNames.push_back("Ground23_normheight.dds");
+        defaultimp.layerList[2].worldSize = 400;
+        defaultimp.layerList[2].textureNames.push_back("Rock20_diffspec.dds");
+        defaultimp.layerList[2].textureNames.push_back("Rock20_normheight.dds");
         //! [textures]
     }
 

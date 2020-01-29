@@ -15,10 +15,10 @@ Ignore the FPS stats in the screenshots. They were rendered on an ancient comput
 With older versions of %Ogre, we had to use the "Terrain Scene Manager" to render terrain in a scene. This is a separate SceneManager that runs alongside your other managers. The new Ogre Terrain Component doesn't require using a separate manager. Since Ogre 1.7 (Cthugha), there are two terrain components: Terrain and Paging. The Paging component is used optimize large terrains. It will be covered in later tutorials. This tutorial will focus largely on the Terrain component.
 
 To set up the terrain we will focus on two main classes:
-- Ogre::Terrain and
-- Ogre::TerrainGroup
+- Ogre::Terrain, representing one piece of terrain and
+- Ogre::TerrainGroup, holding a series of Terrain pieces.
 
-The Terrain class represents one chunk of terrain and the TerrainGroup holds a series of Terrain pieces. It is used for LOD (Level of Detail) rendering. LOD rendering reduces the resolution for terrain that is farther away from the camera. An individual Terrain object consists of tiles with a material mapped on to them. We will use a single TerrainGroup without paging. Paging will be covered in later tutorials.
+This separation is used for LOD (Level of Detail) rendering. LOD rendering reduces the resolution for terrain that is farther away from the camera. An individual Terrain object consists of tiles with a material mapped on to them. We will use a single TerrainGroup without paging. Paging will be covered in later tutorials.
 
 ## Setting Up the Camera
 Let's first set up our Camera. Add the following to the beginning of `setup`:
@@ -94,12 +94,14 @@ After that, we set each texture's `worldSize` and add them to the list.
 
 The texture's `worldSize` determines how big each splat of texture is going to be when applied to the terrain. A smaller value will increase the resolution of the rendered texture layer because each piece will be stretched less to fill in the terrain.
 
-The default material generator requires two textures per layer:
-1. a diffuse specular texture and
-2. a heightmap texture.
+The default material generator requires two textures maps per layer:
+1. one containing diffuse + specular data and
+2. another containing normal + displacement data.
 
-The textures used in the tutorial reside in the Samples directory of your SDK or source distribution. As of this writing, they are included in this directory: `Samples/Media/materials/textures/nvidia/`.
-Remember that Ogre will not automatically search subdirectories when loading resources, so you will have to add a line to your `resources.cfg` file telling it to include the nvidia directory, and, of course, you'll have to copy the actual textures into your project's media folder.
+It is recommended that you pre-merge your textures accordingly e.g. using [ImageMagick](https://imagemagick.org/). This way you save storage space and speed up loading.
+However if you want more flexibility, you can also make %Ogre combine the images at loading accordingly as shown below
+
+@snippet Samples/Terrain/include/Terrain.h tex_from_src
 
 ## Defining a terrain chunk {#bt3TerrainChunk}
 Now we will tackle our `defineTerrain` method. The first thing we do is ask the TerrainGroup to define a unique filename for this Terrain.
