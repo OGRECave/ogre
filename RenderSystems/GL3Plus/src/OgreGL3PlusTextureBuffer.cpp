@@ -281,9 +281,7 @@ namespace Ogre {
 
     void GL3PlusTextureBuffer::download(const PixelBox &data)
     {
-        if (data.getWidth() != getWidth() ||
-            data.getHeight() != getHeight() ||
-            data.getDepth() != getDepth())
+        if (data.getSize() != getSize())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL",
                         "GL3PlusTextureBuffer::download");
 
@@ -395,9 +393,7 @@ namespace Ogre {
         GLenum filtering = GL_LINEAR;
 
         // Set filtering modes depending on the dimensions and source
-        if (srcBox.getWidth()==dstBox.getWidth() &&
-            srcBox.getHeight()==dstBox.getHeight() &&
-            srcBox.getDepth()==dstBox.getDepth())
+        if (srcBox.getSize()==dstBox.getSize())
         {
             // Dimensions match -- use nearest filtering (fastest and pixel correct)
             filtering = GL_NEAREST;
@@ -504,8 +500,7 @@ namespace Ogre {
     {
         // Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case
         // the source dimensions match the destination ones, in which case no scaling is needed
-        if (src.getWidth() == dstBox.getWidth() && src.getHeight() == dstBox.getHeight() &&
-            src.getDepth() == dstBox.getDepth())
+        if (src.getSize() == dstBox.getSize())
         {
             GL3PlusHardwarePixelBuffer::blitFromMemory(src, dstBox);
             return;
@@ -522,7 +517,7 @@ namespace Ogre {
             src.getWidth(), src.getHeight(), src.getDepth(), 0, src.format);
 
         // Upload data to 0,0,0 in temporary texture
-        Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
+        Box tempTarget(src.getSize());
         tex->getBuffer()->blitFromMemory(src, tempTarget);
 
         // Blit from texture

@@ -273,9 +273,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox)
     {
-        if (srcBox.getWidth() != dstBox.getWidth()
-            || srcBox.getHeight() != dstBox.getHeight()
-            || srcBox.getDepth() != dstBox.getDepth())
+        if (srcBox.getSize() != dstBox.getSize())
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                 "D3D11 device cannot copy a subresource - source and dest size are not the same and they have to be the same in DX11.",
@@ -324,9 +322,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dst)
     {
-        if (src.getWidth() != dst.getWidth()
-            || src.getHeight() != dst.getHeight()
-            || src.getDepth() != dst.getDepth())
+        if (src.getSize() != dst.getSize())
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                 "D3D11 device cannot copy a subresource - source and dest size are not the same and they have to be the same in DX11.",

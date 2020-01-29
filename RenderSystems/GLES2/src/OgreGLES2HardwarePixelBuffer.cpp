@@ -64,9 +64,7 @@ namespace Ogre {
 
         PixelBox scaled;
 
-        if (src.getWidth() != dstBox.getWidth() ||
-            src.getHeight() != dstBox.getHeight() ||
-            src.getDepth() != dstBox.getDepth())
+        if (src.getSize() != dstBox.getSize())
         {
             // Scale to destination size.
             // This also does pixel format conversion if needed
@@ -101,12 +99,9 @@ namespace Ogre {
                         "GLES2HardwarePixelBuffer::blitToMemory");
         }
 
-        if (srcBox.left == 0 && srcBox.right == getWidth() &&
-            srcBox.top == 0 && srcBox.bottom == getHeight() &&
-            srcBox.front == 0 && srcBox.back == getDepth() &&
-            dst.getWidth() == getWidth() &&
-            dst.getHeight() == getHeight() &&
-            dst.getDepth() == getDepth() &&
+        if (srcBox.getOrigin() == Vector3i(0, 0 ,0) &&
+            srcBox.getSize() == getSize() &&
+            dst.getSize() == getSize() &&
             GLES2PixelUtil::getGLInternalFormat(dst.format) != 0)
         {
             // The direct case: the user wants the entire texture in a format supported by GL
@@ -119,9 +114,7 @@ namespace Ogre {
             allocateBuffer();
             // Download entire buffer
             download(mBuffer);
-            if(srcBox.getWidth() != dst.getWidth() ||
-                srcBox.getHeight() != dst.getHeight() ||
-                srcBox.getDepth() != dst.getDepth())
+            if(srcBox.getSize() != dst.getSize())
             {
                 // We need scaling
                 Image::scale(mBuffer.getSubVolume(srcBox), dst, Image::FILTER_BILINEAR);
@@ -363,9 +356,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void GLES2TextureBuffer::download(const PixelBox &data)
     {
-        if(data.getWidth() != getWidth() ||
-           data.getHeight() != getHeight() ||
-           data.getDepth() != getDepth())
+        if(data.getSize() != getSize())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL ES",
                         "GLES2TextureBuffer::download");
 
@@ -501,9 +492,7 @@ namespace Ogre {
         // the source dimensions match the destination ones, in which case no scaling is needed
         // FIXME: always uses software path, as blitFromTexture is not implemented
         if(true ||
-           (src.getWidth() == dstBox.getWidth() &&
-            src.getHeight() == dstBox.getHeight() &&
-            src.getDepth() == dstBox.getDepth()))
+           (src.getSize() == dstBox.getSize()))
         {
             GLES2HardwarePixelBuffer::blitFromMemory(src, dstBox);
             return;
@@ -520,8 +509,8 @@ namespace Ogre {
             src.getWidth(), src.getHeight(), src.getDepth(), MIP_UNLIMITED, src.format);
 
         // Upload data to 0,0,0 in temporary texture
-        Box tempTarget(0, 0, 0, tex->getWidth(), tex->getHeight(), tex->getDepth());
-        tex->getBuffer()->blitFromMemory(src, tempTarget);
+        Box tempTarget(src.getSize());
+        tex->getBuffer()->blitFromMemory(src);
 
         // Blit from texture
         blit(tex->getBuffer(), tempTarget, dstBox);

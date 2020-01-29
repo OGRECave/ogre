@@ -261,6 +261,8 @@ ADD_REPR(Radian)
 %ignore Ogre::Vector<3, Ogre::Real>::Vector(float, float);
 %ignore Ogre::Vector<3, Ogre::Real>::Vector(float, float, float, float);
 %ignore Ogre::Vector<3, Ogre::Real>::xyz;
+%ignore Ogre::Vector<3, int>::Vector(int, int, int, int);
+%ignore Ogre::Vector<3, int>::xyz;
 %ignore Ogre::Vector<4, Ogre::Real>::Vector(float, float);
 %ignore Ogre::Vector<4, Ogre::Real>::Vector(float, float, float);
 %include "OgreVector.h"
@@ -279,6 +281,10 @@ ADD_REPR(Vector)
 %template(VectorBase ## N) Ogre::VectorBase<N, Ogre::Real>;
 %template(Vector ## N) Ogre::Vector<N, Ogre::Real>;
 %enddef
+
+%ignore Ogre::VectorBase<3, int>::VectorBase;
+%template(VectorBase3i) Ogre::VectorBase<3, int>;
+%template(Vector3i) Ogre::Vector<3, int>;
 
 TPL_VECTOR(2)
 TPL_VECTOR(3)
