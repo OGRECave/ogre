@@ -138,8 +138,8 @@ namespace Ogre {
             }
             else
             {
-                ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
-                result = itGroup->second.emplace(res->getName(), res);
+                auto resgroup = mResourcesWithGroup.emplace(res->getGroup(), ResourceMap()).first;
+                result = resgroup->second.emplace(res->getName(), res);
             }
         }
 
