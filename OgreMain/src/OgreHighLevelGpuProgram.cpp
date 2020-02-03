@@ -318,16 +318,8 @@ namespace Ogre
             if (newLineBefore != String::npos && newLineBefore >= startMarker)
                 outSource.append(inSource.substr(startMarker, newLineBefore-startMarker+1));
 
-            size_t lineCount = 0;
-            size_t lineCountPos = 0;
-
-            // Count the line number of #include statement
-            lineCountPos = outSource.find('\n');
-            while(lineCountPos != String::npos)
-            {
-                lineCountPos = outSource.find('\n', lineCountPos+1);
-                lineCount++;
-            }
+            // Count the line number of #include statement, account for new line after the statement
+            size_t lineCount = std::count(inSource.begin(), inSource.begin() + newLineAfter, '\n') + 1;
 
             // use include filename if supported (cg) - else use include line as id (glsl)
             String incLineFilename = supportsFilename ? StringUtil::format(" \"%s\"", filename.c_str()) : StringUtil::format(" %zu", lineCount);
@@ -338,7 +330,7 @@ namespace Ogre
             outSource.append(resource->getAsString());
 
             // Add #line to the end of the included file to correct the line count
-            outSource.append("\n#line " + std::to_string(lineCount) + lineFilename + "\n");
+            outSource.append("\n#line " + std::to_string(lineCount) + lineFilename);
 
             startMarker = newLineAfter;
 
