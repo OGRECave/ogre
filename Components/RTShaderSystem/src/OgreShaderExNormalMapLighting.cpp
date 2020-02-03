@@ -177,7 +177,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     auto posContent = Parameter::SPC_POSTOCAMERA_OBJECT_SPACE;
 
     // Resolve input vertex shader tangent.
-    if (mNormalMapSpace == NMS_TANGENT)
+    if (mNormalMapSpace & NMS_TANGENT)
     {
         mVSInTangent = vsMain->resolveInputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
         
@@ -241,11 +241,11 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
     if(mLightParamsList.size() > 8)
         mLightParamsList.resize(8);
 
-    bool needViewPos = false;
+    bool needViewPos = mNormalMapSpace == NMS_PARALLAX;
 
-    auto lightDirContent = mNormalMapSpace == NMS_TANGENT ? Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE0
+    auto lightDirContent = mNormalMapSpace & NMS_TANGENT ? Parameter::SPC_LIGHTDIRECTION_TANGENT_SPACE0
                                                           : Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0;
-    auto lightPosContent = mNormalMapSpace == NMS_TANGENT ? Parameter::SPC_POSTOLIGHT_TANGENT_SPACE0
+    auto lightPosContent = mNormalMapSpace & NMS_TANGENT ? Parameter::SPC_POSTOLIGHT_TANGENT_SPACE0
                                                           : Parameter::SPC_POSITION_OBJECT_SPACE;
 
     // Resolve per light parameters.
@@ -263,7 +263,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
         case Light::LT_POINT:
             mLightParamsList[i].mPosition = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION, i);
             mLightParamsList[i].mVSOutToLightDir =
-                vsMain->resolveOutputParameter(Parameter::Content(lightPosContent + i));
+                vsMain->resolveOutputParameter(Parameter::Content(lightPosContent + i), GCT_FLOAT3);
             mLightParamsList[i].mToLight = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
 
             mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_ATTENUATION, i);
@@ -275,7 +275,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 
             mLightParamsList[i].mPosition = vsProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION, i);
             mLightParamsList[i].mVSOutToLightDir =
-                vsMain->resolveOutputParameter(Parameter::Content(lightPosContent + i));
+                vsMain->resolveOutputParameter(Parameter::Content(lightPosContent + i), GCT_FLOAT3);
             mLightParamsList[i].mToLight = psMain->resolveInputParameter(mLightParamsList[i].mVSOutToLightDir);
 
             mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_direction_obj_space");
@@ -341,6 +341,7 @@ bool NormalMapLighting::resolveDependencies(ProgramSet* programSet)
 
     psProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
+    psProgram->addDependency(SGX_LIB_NORMALMAP);
 
     return true;
 }
@@ -358,10 +359,24 @@ bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
 
     auto stage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
 
+    if (mNormalMapSpace == NMS_PARALLAX)
+    {
+        // TODO: use specificed scale and bias
+        stage.callFunction("SGX_Generate_Parallax_Texcoord", {In(mPSNormalMapSampler), In(mPSInTexcoord), In(mToView),
+                                                              In(Vector2(0.04, -0.02)), Out(mPSInTexcoord)});
+
+        // overwrite texcoord0 unconditionally, only one texcoord set is supported with parallax mapping
+        // we are before FFP_PS_TEXTURING, so the new value will be used
+        auto texcoord0 = psMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
+        stage.assign(mPSInTexcoord, texcoord0);
+    }
+
     // Add the normal fetch function invocation
     if(!mLightParamsList.empty())
+    {
         stage.callFunction(SGX_FUNC_FETCHNORMAL, mPSNormalMapSampler, mPSInTexcoord, mViewNormal);
-    
+    }
+
     // Add the global illumination functions.
     addPSGlobalIlluminationInvocation(stage);
 
@@ -381,7 +396,7 @@ bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
 void NormalMapLighting::addVSInvocation(const FunctionStageRef& stage)
 {
     // Construct TNB matrix.
-    if (mNormalMapSpace == NMS_TANGENT)
+    if (mNormalMapSpace & NMS_TANGENT)
     {
         stage.callFunction(SGX_FUNC_CONSTRUCT_TBNMATRIX, mVSInNormal, mVSInTangent, mVSTBNMatrix);
     }
@@ -407,13 +422,13 @@ void NormalMapLighting::addVSInvocation(const FunctionStageRef& stage)
         stage.callFunction(FFP_FUNC_TRANSFORM, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
 
         // Transform to tangent space.
-        if (mNormalMapSpace == NMS_TANGENT)
+        if (mNormalMapSpace & NMS_TANGENT)
         {
             stage.callFunction(FFP_FUNC_TRANSFORM, mVSTBNMatrix, mVSLocalDir, mVSOutViewPos);
         }
 
         // Output object space.
-        else if (mNormalMapSpace == NMS_OBJECT)
+        else if (mNormalMapSpace & NMS_OBJECT)
         {
             stage.assign(mVSLocalDir, mVSOutViewPos);
         }
@@ -434,13 +449,13 @@ void NormalMapLighting::addVSIlluminationInvocation(const LightParams* curLightP
         curLightParams->mVSOutDirection.get() != NULL)
     {
         // Transform to texture space.
-        if (mNormalMapSpace == NMS_TANGENT)
+        if (mNormalMapSpace & NMS_TANGENT)
         {
             stage.callFunction(FFP_FUNC_TRANSFORM, mVSTBNMatrix, In(curLightParams->mDirection).xyz(),
                                curLightParams->mVSOutDirection);
         }
         // Output object space.
-        else if (mNormalMapSpace == NMS_OBJECT)
+        else if (mNormalMapSpace & NMS_OBJECT)
         {
             stage.assign(In(curLightParams->mDirection).xyz(), curLightParams->mVSOutDirection);
         }
@@ -457,14 +472,14 @@ void NormalMapLighting::addVSIlluminationInvocation(const LightParams* curLightP
         stage.callFunction(FFP_FUNC_TRANSFORM, mWorldInvRotMatrix, mVSLocalDir, mVSLocalDir);
 
         // Transform to tangent space.      
-        if (mNormalMapSpace == NMS_TANGENT)
+        if (mNormalMapSpace & NMS_TANGENT)
         {
             stage.callFunction(FFP_FUNC_TRANSFORM, mVSTBNMatrix, mVSLocalDir,
                                curLightParams->mVSOutToLightDir);
         }
 
         // Output object space.
-        else if (mNormalMapSpace == NMS_OBJECT)
+        else if (mNormalMapSpace & NMS_OBJECT)
         {
             stage.assign(mVSLocalDir, curLightParams->mVSOutToLightDir);
         }
@@ -496,6 +511,9 @@ bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass
     normalMapTexture->setTextureName(mNormalMapTextureName);
     normalMapTexture->setSampler(mNormalMapSampler);
     mNormalMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
+
+    if(mNormalMapSpace == NMS_PARALLAX)
+        mSpecularEnable = true;
 
     return true;
 }
@@ -561,6 +579,11 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                     if (strValue == "object_space")
                     {
                         normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_OBJECT);
+                    }
+
+                    if (strValue == "parallax")
+                    {
+                        normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_PARALLAX);
                     }
                 }
 
