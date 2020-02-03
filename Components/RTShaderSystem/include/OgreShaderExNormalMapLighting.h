@@ -96,12 +96,6 @@ public:
     enum NormalMapSpace
     {
         /**
-        Normal map contains normal data in tangent space.
-        This is the default normal mapping behavior and it requires that the
-        target mesh will have valid tangents within its vertex data.
-         */
-        NMS_TANGENT,
-        /**
         Normal map contains normal data in object local space.
         This normal mapping technique has the advantages of better visualization results,
         lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
@@ -109,7 +103,20 @@ public:
         The main drawback of using this kind of normal map is that the target object must be static
         in terms of local space rotations and translations.
          */
-        NMS_OBJECT
+        NMS_OBJECT = 1,
+        /**
+        Normal map contains normal data in tangent space.
+        This is the default normal mapping behavior and it requires that the
+        target mesh will have valid tangents within its vertex data.
+         */
+        NMS_TANGENT = 2,
+        /**
+        Normal map contains normal data in parallax corrected tangent space
+        The restrictions of NMS_TANGENT apply. Additionally the alpha
+        channel of the normal texture is expected to contain height displacement data.
+        This is used for parallax corrected rendering.
+         */
+        NMS_PARALLAX = 6
     };
 
     /** 

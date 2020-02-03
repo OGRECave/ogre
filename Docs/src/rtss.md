@@ -51,7 +51,7 @@ Force a specific lighting model.
 @par
 Format: `lighting_stage <ffp|per_pixel|normal_map|gbuffer> [normalised]`
 @par
-Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space] [coordinateIndex] [samplerName]`
+Format2: `lighting_stage normal_map <texturename> [tangent_space|object_space|parallax] [coordinateIndex] [samplerName]`
 @par
 Format3: `lighting_stage gbuffer <target_layout> [target_layout]`
 @par
