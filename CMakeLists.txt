@@ -343,7 +343,7 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/Components/Overlay/src/imgui")
     set(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI FALSE CACHE BOOL "imgui not found" FORCE)
 endif()
 
-option(OGRE_BUILD_COMPONENT_HLMS "Build HLMS component" TRUE)
+option(OGRE_BUILD_COMPONENT_HLMS "Build HLMS component" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_BITES "Build OgreBites component" TRUE "OGRE_BUILD_COMPONENT_OVERLAY" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PYTHON "Build Python bindings" TRUE "NOT OGRE_STATIC" FALSE)
 if (NOT EMSCRIPTEN)
