@@ -46,6 +46,8 @@ THE SOFTWARE.
 #include "OgreSkeletonManager.h"
 #include "OgreCompositorManager.h"
 #include "OgreTextureManager.h"
+#include "OgreFileSystem.h"
+#include "OgreArchiveManager.h"
 
 #include <random>
 using std::minstd_rand;
@@ -234,6 +236,32 @@ TEST(Image, FlipV)
     // img.save(testPath+"/decal1vflip.png");
 
     ASSERT_TRUE(!memcmp(img.getData(), ref.getData(), ref.getSize()));
+
+    STBIImageCodec::shutdown();
+}
+
+TEST(Image, Combine)
+{
+    ResourceGroupManager mgr;
+    FileSystemArchiveFactory fs;
+    ArchiveManager amgr;
+    amgr.addArchiveFactory(&fs);
+    STBIImageCodec::startup();
+    ConfigFile cf;
+    cf.load(FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    mgr.addResourceLocation(cf.getSettings("General").begin()->second+"/materials/textures", fs.getType());
+    mgr.initialiseAllResourceGroups();
+
+    auto testPath = cf.getSettings("Tests").begin()->second;
+    Image ref;
+    ref.load(Root::openFileStream(testPath+"/rockwall_flare.png"), "png");
+
+    Image combined;
+    // pick 2 files that are the same size, alpha texture will be made greyscale
+    combined.loadTwoImagesAsRGBA("rockwall.tga", "flare.png", RGN_DEFAULT, PF_BYTE_RGBA);
+
+    // combined.save(testPath+"/rockwall_flare.png");
+    ASSERT_TRUE(!memcmp(combined.getData(), ref.getData(), ref.getSize()));
 
     STBIImageCodec::shutdown();
 }
