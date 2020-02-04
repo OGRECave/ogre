@@ -3,18 +3,8 @@ material Examples/OffsetMapping/Specular
 {
    technique
    {
-       // ambient / depth
-       pass
-       {
-           illumination_stage ambient
-           diffuse 0 0 0
-       }
-       // do the lighting and bump mapping with parallax pass 
        pass 
        {
-           illumination_stage per_light
-           iteration once_per_light point
-           scene_blend add
            specular 1 1 1 32
 
            // Base diffuse texture map 

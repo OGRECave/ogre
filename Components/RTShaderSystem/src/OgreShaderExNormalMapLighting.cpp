@@ -359,9 +359,9 @@ bool NormalMapLighting::addFunctionInvocations(ProgramSet* programSet)
 
     auto stage = psMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
 
-    if (mNormalMapSpace == NMS_PARALLAX)
+    if (!mLightParamsList.empty() && mNormalMapSpace == NMS_PARALLAX)
     {
-        // TODO: use specificed scale and bias
+        // TODO: user specificed scale and bias
         stage.callFunction("SGX_Generate_Parallax_Texcoord", {In(mPSNormalMapSampler), In(mPSInTexcoord), In(mToView),
                                                               In(Vector2(0.04, -0.02)), Out(mPSInTexcoord)});
 
