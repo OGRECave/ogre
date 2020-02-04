@@ -238,7 +238,7 @@ TEST(Image, FlipV)
     STBIImageCodec::shutdown();
 }
 
-struct TestResourceLoadingListener : public ResourceLoadingListener
+struct UsePreviousResourceLoadingListener : public ResourceLoadingListener
 {
     DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) { return DataStreamPtr(); }
     void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) {}
@@ -248,7 +248,7 @@ struct TestResourceLoadingListener : public ResourceLoadingListener
 typedef RootWithoutRenderSystemFixture ResourceLoading;
 TEST_F(ResourceLoading, CollsionUseExisting)
 {
-    TestResourceLoadingListener listener;
+    UsePreviousResourceLoadingListener listener;
     ResourceGroupManager::getSingleton().setLoadingListener(&listener);
 
     MaterialPtr mat = MaterialManager::getSingleton().create("Collision", "Tests");
@@ -271,6 +271,29 @@ TEST_F(ResourceLoading, CollsionUseExisting)
         "Collision", "Tests", "null", GPT_VERTEX_PROGRAM));
     EXPECT_FALSE(HighLevelGpuProgramManager::getSingleton().createProgram(
         "Collision", "Tests", "null", GPT_VERTEX_PROGRAM));
+}
+
+struct DeletePreviousResourceLoadingListener : public ResourceLoadingListener
+{
+    DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) { return DataStreamPtr(); }
+    void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) {}
+    bool resourceCollision(Resource* resource, ResourceManager* resourceManager)
+    {
+        resourceManager->remove(resource->getName(), resource->getGroup());
+        return true;
+    }
+};
+
+TEST_F(ResourceLoading, CollsionDeleteExisting)
+{
+    DeletePreviousResourceLoadingListener listener;
+    ResourceGroupManager::getSingleton().setLoadingListener(&listener);
+    ResourceGroupManager::getSingleton().createResourceGroup("EmptyGroup", false);
+
+    MaterialPtr mat = MaterialManager::getSingleton().create("Collision", "EmptyGroup");
+    EXPECT_TRUE(mat);
+    EXPECT_TRUE(MaterialManager::getSingleton().create("Collision", "EmptyGroup"));
+    EXPECT_TRUE(mat->clone("Collision"));
 }
 
 typedef RootWithoutRenderSystemFixture TextureTests;
