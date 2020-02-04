@@ -630,7 +630,7 @@ As at the time of writing (early Q3 2006), ATI do not support texture fetch in t
 @page Runtime-Shader-Generation Runtime Shader Generation 
 
 Writing shading programs is a common task when developing 3D based application. Most of the visual effects used by 3D based applications involve shader programs.
-Additionally with D3D11, support for fixed pipeline functionality was removed. Meaning you can only render objects using shaders.
+Additionally with D3D11/ GL3, support for fixed pipeline functionality was removed. Meaning you can only render objects using shaders.
 
 While @ref High-level-Programs offer you maximal control and flexibility over how your objects are rendered, writing and maintaining them is also a very time consuming task.
 
@@ -640,17 +640,63 @@ Instead %Ogre can also automatically generate shaders on the fly, based on objec
 * Reusable code - once you've written the shader extension you can use it anywhere due to its independent nature.
 * Custom shaders extension library - enjoy the shared library of effects created by the community. Unlike hand written shader code, which may require many adjustments to be plugged into your own shader code, using the extensions library requires minimum changes.
 
-You have the choice between two different systems, which are implemented as components. You can select the one you need (or disable both) at compile time.
+The system is implemented as a component, so you can enable/ disable it at compile time.
 
 * @subpage rtss <br />
 The RTSS is not another Uber shader with an exploding amount of @c \#ifdefs that make it increasingly difficult to add new functionality. 
 Instead, it manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
 These "effects" notable include full Fixed Function emulation. At the core these components are plain shader files providing a set of functions. The shaders are based on properties defined in @ref Material-Scripts.
-* @subpage hlms <br />
-This component allows you to manage shader variations of a specific shader template.
-This is a different take to the Uber shader management, but instead of using plain
-@c \#ifdefs it uses a custom, more powerful preprocessor language.
-Currently the HLMS can be only configured via a custom API and does not respect classical @ref Ogre::Material properties.
+
+# Uber shader tips
+
+In case, you are not conviced and want to go with your hand-rolled uber shader, here are some tips:
+
+1. %Ogre supports @c \#include directives universally - even with GLSL, so use them to split up your shader.
+2. There is the `HLSL_SM4Support.hlsl` helper which abstracts the differences between HLSL9/ Cg and HLSL SM4.
+
+Then you can have a shader skeleton like this:
+
+```cpp
+#ifdef USE_UV
+#include "parameters_uv.glsl"
+#endif
+#ifdef USE_SKINNING
+#include <parameters_skinning.glsl>
+#endif
+...
+
+void main()
+{
+#ifdef USE_UV
+    #include <transform_uv.glsl>
+#endif
+#ifdef USE_SKINNING
+    #include <transform_skinning.glsl>
+#endif
+#ifdef USE_TANGENT
+    #include <construct_tbn.glsl>
+#endif
+    ...
+    gl_Position = ...;
+}
+```
+
+then in the material file, you can instanciate it as:
+
+```cpp
+vertex_program TextureAndSkinning glsl
+{
+    source UberShader_vp.glsl
+    preprocessor_defines USE_UV,USE_SKINNING
+    default_params
+    {
+        ...
+    }
+}
+```
+and reference it with your materials.
+
+Incidentally, this is very similar to what the RTSS is doing internally. Except, you do not need the @c preprocessor_defines part, as it can derive automatically from the material what needs to be done.
 
 # Historical background
 
