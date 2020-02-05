@@ -395,10 +395,10 @@ option(OGRE_CONFIG_ENABLE_TBB_SCHEDULER "Enable TBB's scheduler initialisation/s
 cmake_dependent_option(OGRE_CONFIG_FILESYSTEM_UNICODE "paths expected to be in UTF-8 and wchar_t file IO routines are used" TRUE "MSVC" FALSE)
 # Customise what to install
 option(OGRE_INSTALL_CMAKE "Install CMake scripts." TRUE)
-option(OGRE_INSTALL_SAMPLES "Install Ogre demos." TRUE)
+cmake_dependent_option(OGRE_INSTALL_SAMPLES "Install Ogre demos." TRUE "OGRE_BUILD_SAMPLES" FALSE)
 option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." TRUE)
-option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
+cmake_dependent_option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE "OGRE_BUILD_SAMPLES" FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" TRUE "MSVC" FALSE)
 option(OGRE_PROFILING "Enable internal instrumentation." FALSE)
 set(OGRE_PROFILING_REMOTERY_PATH "" CACHE PATH "set this to Remotery/lib to use Remotery instead of the buildin profiler")
