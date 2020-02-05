@@ -101,11 +101,6 @@ if (OGRE_INSTALL_SAMPLES_SOURCE)
 	PATTERN "obj" EXCLUDE
 	PATTERN "scripts" EXCLUDE
   )
-  # install a new CMakeLists.txt file to allow building of samples
-  configure_file(${OGRE_TEMPLATES_DIR}/SDK_CMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/../CMakeLists.txt @ONLY)
-  configure_file(${OGRE_TEMPLATES_DIR}/SDK_Samples_CMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/../CMakeLists.txt DESTINATION ${OGRE_SAMPLES_DIR}/../)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt DESTINATION ${OGRE_SAMPLES_DIR})
 endif ()
 
 # Install sample headers, some people rely on these
