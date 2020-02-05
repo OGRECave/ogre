@@ -20,9 +20,13 @@
 #include "OgrePanelOverlayElement.h"
 #include "OgreTextAreaOverlayElement.h"
 
+%}
+#ifdef HAVE_IMGUI
+%{
 #include "imgui.h"
 #include "OgreImGuiOverlay.h"
 %}
+#endif
 
 %include std_string.i
 %include exception.i 
