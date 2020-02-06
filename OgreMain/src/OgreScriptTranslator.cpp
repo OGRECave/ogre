@@ -4078,10 +4078,10 @@ namespace Ogre{
                                         else
                                             params->setAutoConstant(index, def->acType);
                                     }
-                                    catch(...)
+                                    catch(Exception& e)
                                     {
                                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "setting of constant failed");
+                                                           e.getDescription());
                                     }
                                     break;
                                 case GpuProgramParameters::ACDT_INT:
@@ -4094,10 +4094,10 @@ namespace Ogre{
                                             else
                                                 params->setAutoConstant(index, def->acType, animParametricsCount++);
                                         }
-                                        catch(...)
+                                        catch(Exception& e)
                                         {
                                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "setting of constant failed");
+                                                               e.getDescription());
                                         }
                                     }
                                     else
