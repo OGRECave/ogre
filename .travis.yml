@@ -27,6 +27,7 @@ addons:
     - nvidia-cg-dev
     - libpugixml-dev
     - swig3.0
+    - mono-mcs
 before_script:
     - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew update && brew install freetype libzzip sdl2 pugixml ; fi
 osx_image: xcode8.3
