@@ -2245,22 +2245,20 @@ namespace Ogre {
         pushInnerChunk(mStream);
         {
             size_t vertexSize = calcPoseVertexSize(pose);
-            Pose::ConstVertexOffsetIterator vit = pose->getVertexOffsetIterator();
-            Pose::ConstNormalsIterator nit = pose->getNormalsIterator();
-            while (vit.hasMoreElements())
+            auto nit = pose->getNormals().begin();
+            for (const auto& it : pose->getVertexOffsets())
             {
-                uint32 vertexIndex = (uint32)vit.peekNextKey();
-                Vector3 offset = vit.getNext();
+                uint32 vertexIndex = (uint32)it.first;
                 writeChunkHeader(M_POSE_VERTEX, vertexSize);
                 // unsigned long vertexIndex
                 writeInts(&vertexIndex, 1);
                 // float xoffset, yoffset, zoffset
-                writeFloats(offset.ptr(), 3);
+                writeFloats(it.second.ptr(), 3);
                 if (includesNormals)
                 {
-                    Vector3 normal = nit.getNext();
                     // float xnormal, ynormal, znormal
-                    writeFloats(normal.ptr(), 3);
+                    writeFloats(nit->second.ptr(), 3);
+                    nit++;
                 }
             }
         }
@@ -3235,16 +3233,14 @@ namespace Ogre {
         writeShorts(&val, 1);
         pushInnerChunk(mStream);
         size_t vertexSize = calcPoseVertexSize();
-        Pose::ConstVertexOffsetIterator vit = pose->getVertexOffsetIterator();
-        while (vit.hasMoreElements())
+        for (const auto& it : pose->getVertexOffsets())
         {
-            uint32 vertexIndex = (uint32)vit.peekNextKey();
-            Vector3 offset = vit.getNext();
+            uint32 vertexIndex = (uint32)it.first;
             writeChunkHeader(M_POSE_VERTEX, vertexSize);
             // unsigned long vertexIndex
             writeInts(&vertexIndex, 1);
             // float xoffset, yoffset, zoffset
-            writeFloats(offset.ptr(), 3);
+            writeFloats(it.second.ptr(), 3);
         }
         popInnerChunk(mStream);
     }

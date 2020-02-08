@@ -473,9 +473,8 @@ namespace Ogre {
         void _notifySkeleton(SkeletonPtr& pSkel);
 
 
-        /** Gets an iterator for access all bone assignments. 
-        */
-        BoneAssignmentIterator getBoneAssignmentIterator(void);
+        /// @deprecated use getBoneAssignments
+        OGRE_DEPRECATED BoneAssignmentIterator getBoneAssignmentIterator(void);
 
         /** Gets a const reference to the list of bone assignments
         */

@@ -176,16 +176,15 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Skeleton link exported.");
 
             // Write bone assignments
-            Mesh::BoneAssignmentIterator bi = const_cast<Mesh*>(pMesh)->getBoneAssignmentIterator();
-            if (bi.hasMoreElements())
+            const auto& boneAssigns = pMesh->getBoneAssignments();
+            if (!boneAssigns.empty())
             {
                 LogManager::getSingleton().logMessage("Exporting shared geometry bone assignments...");
                 pugi::xml_node boneAssignNode = rootNode.append_child("boneassignments");
 
-                while (bi.hasMoreElements())
+                for (const auto& e : boneAssigns)
                 {
-                    const VertexBoneAssignment& assign = bi.getNext();
-                    writeBoneAssignment(boneAssignNode, &assign);
+                    writeBoneAssignment(boneAssignNode, &e.second);
                 }
 
                 LogManager::getSingleton().logMessage("Shared geometry bone assignments exported.");
@@ -351,14 +350,12 @@ namespace Ogre {
         // Bone assignments
         if (mMesh->hasSkeleton())
         {
-            SubMesh::BoneAssignmentIterator bi = const_cast<SubMesh*>(s)->getBoneAssignmentIterator();
             LogManager::getSingleton().logMessage("Exporting dedicated geometry bone assignments...");
 
             pugi::xml_node boneAssignNode = subMeshNode.append_child("boneassignments");
-            while (bi.hasMoreElements())
+            for (const auto& e : s->getBoneAssignments())
             {
-                const VertexBoneAssignment& assign = bi.getNext();
-                writeBoneAssignment(boneAssignNode, &assign);
+                writeBoneAssignment(boneAssignNode, &e.second);
             }
         }
         LogManager::getSingleton().logMessage("Dedicated geometry bone assignments exported.");
@@ -2030,27 +2027,26 @@ namespace Ogre {
             poseNode.append_attribute("name") = pose->getName().c_str();
             
             bool includesNormals = !pose->getNormals().empty();
-
-            Pose::ConstVertexOffsetIterator vit = pose->getVertexOffsetIterator();
-            Pose::ConstNormalsIterator nit = pose->getNormalsIterator();
-            while (vit.hasMoreElements())
+            auto nit = pose->getNormals().begin();
+            for (const auto& vit : pose->getVertexOffsets())
             {
                 pugi::xml_node poseOffsetElement = poseNode.append_child("poseoffset");
 
                 poseOffsetElement.append_attribute("index") =
-                    StringConverter::toString(vit.peekNextKey()).c_str();
+                    StringConverter::toString(vit.first).c_str();
 
-                Vector3 offset = vit.getNext();
+                const Vector3& offset = vit.second;
                 poseOffsetElement.append_attribute("x") = StringConverter::toString(offset.x).c_str();
                 poseOffsetElement.append_attribute("y") = StringConverter::toString(offset.y).c_str();
                 poseOffsetElement.append_attribute("z") = StringConverter::toString(offset.z).c_str();
                 
                 if (includesNormals)
                 {
-                    Vector3 normal = nit.getNext();
+                    const Vector3& normal = nit->second;
                     poseOffsetElement.append_attribute("nx") = StringConverter::toString(normal.x).c_str();
                     poseOffsetElement.append_attribute("ny") = StringConverter::toString(normal.y).c_str();
                     poseOffsetElement.append_attribute("nz") = StringConverter::toString(normal.z).c_str();
+                    nit++;
                 }
                 
                 
