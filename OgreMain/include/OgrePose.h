@@ -98,17 +98,17 @@ namespace Ogre {
         /** Clear all vertices. */
         void clearVertices(void);
 
-        /** Gets an iterator over all the vertex offsets. */
-        ConstVertexOffsetIterator getVertexOffsetIterator(void) const;
-        /** Gets an iterator over all the vertex offsets. */
-        VertexOffsetIterator getVertexOffsetIterator(void);
+        /// @deprecated use getVertexOffsets
+        OGRE_DEPRECATED ConstVertexOffsetIterator getVertexOffsetIterator(void) const;
+        /// @deprecated use getVertexOffsets
+        OGRE_DEPRECATED VertexOffsetIterator getVertexOffsetIterator(void);
         /** Gets a const reference to the vertex offsets. */
         const VertexOffsetMap& getVertexOffsets(void) const { return mVertexOffsetMap; }
 
-        /** Gets an iterator over all the vertex offsets. */
-        ConstNormalsIterator getNormalsIterator(void) const;
-        /** Gets an iterator over all the vertex offsets. */
-        NormalsIterator getNormalsIterator(void);
+        /// @deprecated use getNormals
+        OGRE_DEPRECATED ConstNormalsIterator getNormalsIterator(void) const;
+        /// @deprecated use getNormals
+        OGRE_DEPRECATED NormalsIterator getNormalsIterator(void);
         /** Gets a const reference to the vertex offsets. */
         const NormalsMap& getNormals(void) const { return mNormalsMap; }
 

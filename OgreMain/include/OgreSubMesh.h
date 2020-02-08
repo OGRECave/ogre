@@ -178,15 +178,12 @@ namespace Ogre {
         typedef std::multimap<size_t, VertexBoneAssignment> VertexBoneAssignmentList;
         typedef MapIterator<VertexBoneAssignmentList> BoneAssignmentIterator;
 
-        /** Gets an iterator for access all bone assignments. 
-        @remarks
-            Only valid if this SubMesh has dedicated geometry.
-        */
-        BoneAssignmentIterator getBoneAssignmentIterator(void);
+        /// @deprecated use getBoneAssignments
+        OGRE_DEPRECATED BoneAssignmentIterator getBoneAssignmentIterator(void);
 
         /** Gets a const reference to the list of bone assignments
         */
-        const VertexBoneAssignmentList& getBoneAssignments() { return mBoneAssignments; }
+        const VertexBoneAssignmentList& getBoneAssignments() const { return mBoneAssignments; }
 
 
         /** Must be called once to compile bone assignments into geometry buffer. */
