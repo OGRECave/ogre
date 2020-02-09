@@ -323,7 +323,7 @@ ENDMACRO(ADD_PRECOMPILED_HEADER)
 # Not needed by Xcode
 
 MACRO(GET_NATIVE_PRECOMPILED_HEADER _targetName)
-    if(CMAKE_GENERATOR MATCHES "^Visual.*$")
+    if(CMAKE_GENERATOR MATCHES "^Visual.*$" AND CMAKE_VERSION LESS "3.16")
         set(${_targetName}_pch ${CMAKE_CURRENT_BINARY_DIR}/${_targetName}_pch.cpp)
     endif()
 ENDMACRO(GET_NATIVE_PRECOMPILED_HEADER)
@@ -339,6 +339,8 @@ MACRO(ADD_NATIVE_PRECOMPILED_HEADER _targetName _input)
 
     if(NOT OGRE_ENABLE_PRECOMPILED_HEADERS)
         # do nothing
+    elseif(CMAKE_VERSION GREATER_EQUAL "3.16")
+        target_precompile_headers(${_targetName} PRIVATE ${_input})
     elseif(CMAKE_GENERATOR MATCHES "^Visual.*$")
 
         # Auto include the precompile (useful for moc processing, since the use of
