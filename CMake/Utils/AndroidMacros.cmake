@@ -63,9 +63,13 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     file(MAKE_DIRECTORY "${NDKOUT}/app/src/main/res")
 
     foreach(ACTIVITY_NAME ${MAIN_ACTIVITY} ${EXTRA_ACTIVITIES})
-        string(FIND ${ACTIVITY_NAME} "." DOT REVERSE)
-        math(EXPR DOT "${DOT} + 1")
-        string(SUBSTRING ${ACTIVITY_NAME} ${DOT} -1 LABEL)
+        if(EXTRA_ACTIVITIES)
+            string(FIND ${ACTIVITY_NAME} "." DOT REVERSE)
+            math(EXPR DOT "${DOT} + 1")
+            string(SUBSTRING ${ACTIVITY_NAME} ${DOT} -1 LABEL)
+        else()
+            set(LABEL ${ANDROID_MOD_NAME})
+        endif()
         set(ANDROID_ACTIVITIES "${ANDROID_ACTIVITIES}
         <activity android:name=\"${ACTIVITY_NAME}\"
         android:label=\"${LABEL}\"
