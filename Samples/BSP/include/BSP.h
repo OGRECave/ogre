@@ -98,15 +98,12 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         mCamera->setNearClipDistance(4);
         mCamera->setFarClipDistance(4000);
 
-        // set a random player starting point
-        ViewPoint vp = mSceneMgr->getSuggestedViewpoint(true);
-
         // Quake uses the Z axis as the up axis, so make necessary adjustments
         mCameraNode->setFixedYawAxis(true, Vector3::UNIT_Z);
         mCameraNode->pitch(Degree(90));
 
-        mCameraNode->setPosition(vp.position);
-        mCameraNode->rotate(vp.orientation);
+        // specific for this map
+        mCameraNode->setPosition(Vector3(0, 0, 340));
 
         mCameraMan->setTopSpeed(350);   // make the camera move a bit faster
     }
