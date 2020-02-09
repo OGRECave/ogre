@@ -4298,8 +4298,7 @@ namespace Ogre{
         // Must have a name
         if (obj->name.empty())
         {
-            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line,
-                               "shared_params must be given a name");
+            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
             return;
         }
 
@@ -4325,7 +4324,11 @@ namespace Ogre{
 
             PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
             if (prop->id != ID_SHARED_PARAM_NAMED)
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                   prop->name);
                 continue;
+            }
 
             if (prop->values.size() < 2)
             {
