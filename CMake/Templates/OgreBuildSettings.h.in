@@ -107,4 +107,6 @@ WARNING: Disabling this will make the samples unusable.
 
 #cmakedefine01 OGRE_NO_QUAD_BUFFER_STEREO
 
+#cmakedefine01 OGRE_NO_LOCALE_STRCONVERT
+
 #endif
