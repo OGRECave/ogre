@@ -127,8 +127,6 @@ if (APPLE)
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/resources.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/quakemap.cfg
-		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/tests.cfg
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_SOURCE_DIR}/Samples/Media

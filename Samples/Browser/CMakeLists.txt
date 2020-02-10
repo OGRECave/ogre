@@ -70,7 +70,6 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
 
         ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg
         ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/quakemap.cfg
         ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg
         ${PROJECT_BINARY_DIR}/inst/bin/tests.cfg
 
@@ -93,7 +92,6 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
         ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.png
         ${CMAKE_CURRENT_BINARY_DIR}/resources.cfg
         ${CMAKE_CURRENT_BINARY_DIR}/plugins.cfg
-        ${CMAKE_CURRENT_BINARY_DIR}/quakemap.cfg
         ${CMAKE_CURRENT_BINARY_DIR}/samples.cfg
         ${CMAKE_CURRENT_BINARY_DIR}/tests.cfg
     )
@@ -234,7 +232,6 @@ if (APPLE)
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/macosx/plugins.cfg   ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/macosx/resources.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/macosx/samples.cfg   ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/macosx/quakemap.cfg  ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_SOURCE_DIR}/Media                    ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		)
@@ -244,7 +241,6 @@ if (APPLE)
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/plugins.cfg 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/resources.cfg 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/samples.cfg   		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/quakemap.cfg  		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${PROJECT_SOURCE_DIR}/Samples/Media     		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		)

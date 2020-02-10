@@ -47,6 +47,9 @@ Zip=@OGRE_MEDIA_DIR_REL@/packs/DamagedHelmet.zip
 
 FileSystem=@OGRE_CORE_MEDIA_DIR@/HLMS
 
+[BSPWorld]
+Zip=@OGRE_MEDIA_DIR_REL@/packs/oa_rpg3dm2.pk3
+
 # Materials for visual tests
 [Tests]
 FileSystem=@OGRE_TEST_MEDIA_DIR_REL@
