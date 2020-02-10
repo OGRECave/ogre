@@ -215,6 +215,7 @@ namespace Ogre {
                 Pass* pass = passes[p];
                 _setPass(pass);
 
+                fireRenderSingleObject(NULL, pass, mAutoParamDataSource.get(), NULL, false);
                 updateGpuProgramParameters(pass);
                 mDestRenderSystem->_render(mRenderOp);
             } 
