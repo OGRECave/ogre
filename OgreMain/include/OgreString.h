@@ -46,8 +46,11 @@ THE SOFTWARE.
 #   define strnicmp strncasecmp
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN || \
+	(OGRE_PLATFORM == OGRE_PLATFORM_LINUX && OGRE_NO_LOCALE_STRCONVERT == 1)
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #   define locale_t int
+#endif
 #   define strtod_l(ptr, end, l) strtod(ptr, end)
 #   define strtoul_l(ptr, end, base, l) strtoul(ptr, end, base)
 #   define strtol_l(ptr, end, base, l) strtol(ptr, end, base)

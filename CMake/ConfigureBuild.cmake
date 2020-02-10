@@ -133,6 +133,13 @@ if(SDL2_FOUND OR EMSCRIPTEN)
     set(OGRE_BITES_HAVE_SDL 1)
 endif()
 
+# determine if strtol_l is supported
+include(CheckFunctionExists)
+CHECK_FUNCTION_EXISTS(strtol_l HAVE_STRTOL_L)
+if (NOT HAVE_STRTOL_L)
+  set(OGRE_NO_LOCALE_STRCONVERT 1)
+endif ()
+
 # generate OgreBuildSettings.h
 configure_file(${OGRE_TEMPLATES_DIR}/OgreComponents.h.in ${PROJECT_BINARY_DIR}/include/OgreComponents.h @ONLY)
 configure_file(${OGRE_TEMPLATES_DIR}/OgreBuildSettings.h.in ${PROJECT_BINARY_DIR}/include/OgreBuildSettings.h @ONLY)
