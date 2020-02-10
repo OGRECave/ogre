@@ -106,8 +106,6 @@ if (OGRE_BUILD_TESTS)
         ${OGRE_TEST_CONTENTS_PATH}/Resources/
         COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/samples.cfg
         ${OGRE_TEST_CONTENTS_PATH}/Resources/
-        COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/quakemap.cfg
-        ${OGRE_TEST_CONTENTS_PATH}/Resources/
         COMMAND ditto
         ${PROJECT_SOURCE_DIR}/Samples/Media/ ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/
         COMMAND ditto

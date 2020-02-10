@@ -124,7 +124,6 @@ if (MSVC AND OGRE_BUILD_SAMPLES)
 	set(OGRE_MEDIA_DIR_TMP ${OGRE_MEDIA_DIR_REL})
 	set(OGRE_MEDIA_DIR_REL "Media")
     configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${CMAKE_CURRENT_BINARY_DIR}/resources.cfg @ONLY)
-    configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${CMAKE_CURRENT_BINARY_DIR}/quakemap.cfg @ONLY)
 	# restore
 	set(OGRE_MEDIA_DIR_REL ${OGRE_MEDIA_DIR_TMP})
     add_custom_target(demo_installer 
