@@ -81,8 +81,6 @@ namespace Ogre {
         typedef std::map<Material*, std::vector<StaticFaceGroup*>, materialLess > MaterialFaceGroupMap;
         MaterialFaceGroupMap mMatFaceGroupMap;
 
-        RenderOperation mRenderOp;
-
         // Debugging features
         bool mShowNodeAABs;
         RenderOperation mAABGeometry;
@@ -97,12 +95,6 @@ namespace Ogre {
         /** Tags geometry in the leaf specified for later rendering. */
         void processVisibleLeaf(BspNode* leaf, Camera* cam, 
             VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters);
-
-        /** Caches a face group for imminent rendering. */
-        unsigned int cacheGeometry(unsigned int* pIndexes, const StaticFaceGroup* faceGroup);
-
-        /** Frees up allocated memory for geometry caches. */
-        void freeMemory(void);
 
         /** Adds a bounding box to draw if turned on. */
         void addBoundingBox(const AxisAlignedBox& aab, bool visible);

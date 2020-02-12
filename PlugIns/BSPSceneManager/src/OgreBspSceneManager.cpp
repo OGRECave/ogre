@@ -65,11 +65,7 @@ namespace Ogre {
         return BspSceneManagerFactory::FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------
-    BspSceneManager::~BspSceneManager()
-    {
-        freeMemory();
-        mLevel.reset();
-    }
+    BspSceneManager::~BspSceneManager() {}
     //-----------------------------------------------------------------------
     size_t BspSceneManager::estimateWorldGeometry(const String& filename)
     {
@@ -119,24 +115,6 @@ namespace Ogre {
         {
             setSkyDome(false, BLANKSTRING);
         }
-
-        // Init static render operation
-        mRenderOp.vertexData = mLevel->mVertexData;
-        // index data is per-frame
-        mRenderOp.indexData = OGRE_NEW IndexData();
-        mRenderOp.indexData->indexStart = 0;
-        mRenderOp.indexData->indexCount = 0;
-        // Create enough index space to render whole level
-        mRenderOp.indexData->indexBuffer = HardwareBufferManager::getSingleton()
-            .createIndexBuffer(
-                HardwareIndexBuffer::IT_32BIT, // always 32-bit
-                mLevel->mNumIndexes, 
-                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
-
-        mRenderOp.operationType = RenderOperation::OT_TRIANGLE_LIST;
-        mRenderOp.useIndexes = true;
-
-
     }
     //-----------------------------------------------------------------------
     void BspSceneManager::_findVisibleObjects(Camera* cam, 
@@ -173,51 +151,22 @@ namespace Ogre {
         if (!isRenderQueueToBeProcessed(mWorldGeometryRenderQueue))
             return;
 
-        // Cache vertex/face data first
-        std::vector<StaticFaceGroup*>::const_iterator faceGrpi;
-        static RenderOperation patchOp;
-        
-        mAutoParamDataSource->setCurrentRenderable(0);
-        // no world transform required
-        mAutoParamDataSource->setWorldMatrices(&Affine3::IDENTITY, 1);
-
         // For each material in turn, cache rendering data & render
         MaterialFaceGroupMap::const_iterator mati;
-
         for (mati = mMatFaceGroupMap.begin(); mati != mMatFaceGroupMap.end(); ++mati)
         {
             // Get Material
             Material* thisMaterial = mati->first;
             thisMaterial->touch();
-            // Empty existing cache
-            mRenderOp.indexData->indexCount = 0;
-            // lock index buffer ready to receive data
-            unsigned int* pIdx = static_cast<unsigned int*>(
-                mRenderOp.indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-
-            for (faceGrpi = mati->second.begin(); faceGrpi != mati->second.end(); ++faceGrpi)
-            {
-                // Cache each
-                unsigned int numelems = cacheGeometry(pIdx, *faceGrpi);
-                mRenderOp.indexData->indexCount += numelems;
-                pIdx += numelems;
-            }
-            // Unlock the buffer
-            mRenderOp.indexData->indexBuffer->unlock();
 
             // Skip if no faces to process (we're not doing flare types yet)
-            if (mRenderOp.indexData->indexCount == 0)
+            if (!mLevel->cacheGeometry(mati->second))
                 continue;
 
             const Technique::Passes& passes = thisMaterial->getBestTechnique ()->getPasses();
             for (size_t p = 0; p < passes.size(); p++)
             {
-                Pass* pass = passes[p];
-                _setPass(pass);
-
-                fireRenderSingleObject(NULL, pass, mAutoParamDataSource.get(), NULL, false);
-                updateGpuProgramParameters(pass);
-                mDestRenderSystem->_render(mRenderOp);
+                _injectRenderWithPass(passes[p], mLevel.get());
             } 
 
 
@@ -376,64 +325,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    unsigned int BspSceneManager::cacheGeometry(unsigned int* pIndexes, 
-        const StaticFaceGroup* faceGroup)
-    {
-        // Skip sky always
-        if (faceGroup->isSky)
-            return 0;
-
-        size_t idxStart, numIdx, vertexStart;
-
-        if (faceGroup->fType == FGT_FACE_LIST)
-        {
-            idxStart = faceGroup->elementStart;
-            numIdx = faceGroup->numElements;
-            vertexStart = faceGroup->vertexStart;
-        }
-        else if (faceGroup->fType == FGT_PATCH)
-        {
-
-            idxStart = faceGroup->patchSurf->getIndexOffset();
-            numIdx = faceGroup->patchSurf->getCurrentIndexCount();
-            vertexStart = faceGroup->patchSurf->getVertexOffset();
-        }
-        else
-        {
-            // Unsupported face type
-            return 0;
-        }
-
-
-        // Copy index data
-        unsigned int* pSrc = static_cast<unsigned int*>(
-            mLevel->mIndexes->lock(
-                idxStart * sizeof(unsigned int),
-                numIdx * sizeof(unsigned int), 
-                HardwareBuffer::HBL_READ_ONLY));
-        // Offset the indexes here
-        // we have to do this now rather than up-front because the 
-        // indexes are sometimes reused to address different vertex chunks
-        for (size_t elem = 0; elem < numIdx; ++elem)
-        {
-            *pIndexes++ = *pSrc++ + static_cast<unsigned int>(vertexStart);
-        }
-        mLevel->mIndexes->unlock();
-
-        // return number of elements
-        return static_cast<unsigned int>(numIdx);
-
-
-    }
-
-    //-----------------------------------------------------------------------
-    void BspSceneManager::freeMemory(void)
-    {
-        // no need to delete index buffer, will be handled by shared pointer
-        OGRE_DELETE mRenderOp.indexData;
-        mRenderOp.indexData = 0;
-    }
-    //-----------------------------------------------------------------------
     void BspSceneManager::showNodeBoxes(bool show)
     {
         mShowNodeAABs = show;
@@ -565,7 +456,6 @@ namespace Ogre {
     void BspSceneManager::clearScene(void)
     {
         SceneManager::clearScene();
-        freeMemory();
         // Clear level
         mLevel.reset();
     }
