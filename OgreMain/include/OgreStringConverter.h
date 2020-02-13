@@ -325,17 +325,11 @@ namespace Ogre {
         static bool isNumber(const String& val);
 
 
-		/** Converts a ColourBufferType to a String.
-		@remarks
-			String output format is "Back", "Back Left", "Back Right", etc.
-		*/
-		static String toString(ColourBufferType val);
+		/// @deprecated
+		OGRE_DEPRECATED static String toString(ColourBufferType val);
 
-		/** Converts a String to a ColourBufferType.
-		@remarks
-			String input format should be "Back", "Back Left", "Back Right", etc.
-		*/
-		static ColourBufferType parseColourBuffer(const String& val, ColourBufferType defaultValue = CBT_BACK);
+		/// @deprecated
+		OGRE_DEPRECATED static ColourBufferType parseColourBuffer(const String& val, ColourBufferType defaultValue = CBT_BACK);
 
 		/** Converts a StereoModeType to a String
 		@remarks
