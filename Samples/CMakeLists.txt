@@ -52,7 +52,7 @@ if (OGRE_BUILD_SAMPLES)
 
   file(GLOB SAMPLES_SOURCES ${PROJECT_SOURCE_DIR}/Samples/*/src/*.cpp)
 
-  set(BLACKLIST AtomicCounters Browser TerrainTessellation PCZTestApp)
+  set(BLACKLIST Browser TerrainTessellation PCZTestApp)
   foreach(FILTER_SAMPLE ${BLACKLIST})
     file(GLOB BLACKLIST_CPP ${PROJECT_SOURCE_DIR}/Samples/${FILTER_SAMPLE}/src/*.cpp)
     list(REMOVE_ITEM SAMPLES_SOURCES ${BLACKLIST_CPP})
