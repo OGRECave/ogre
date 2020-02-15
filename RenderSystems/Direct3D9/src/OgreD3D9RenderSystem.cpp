@@ -1496,9 +1496,7 @@ namespace Ogre
         for (uint ipf = static_cast<uint>(PF_L8); ipf < static_cast<uint>(PF_COUNT); ++ipf)
         {
             PixelFormat pf = (PixelFormat)ipf;
-
-            D3DFORMAT fmt = 
-                D3D9Mappings::_getPF(D3D9Mappings::_getClosestSupportedPF(pf));
+            D3DFORMAT fmt = D3D9Mappings::_getPF(pf);
 
             if (SUCCEEDED(mD3D->CheckDeviceFormat(
                 mActiveD3DDriver->getAdapterNumber(), D3DDEVTYPE_HAL, bbSurfDesc.Format, 
