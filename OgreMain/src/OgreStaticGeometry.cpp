@@ -1679,7 +1679,7 @@ namespace Ogre {
 
             // Also set up hardware W buffer if appropriate
             RenderSystem* rend = Root::getSingleton().getRenderSystem();
-            if (rend && rend->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM))
+            if (rend)
             {
                 buf = HardwareBufferManager::getSingleton().createVertexBuffer(
                     sizeof(float), mVertexData->vertexCount * 2,

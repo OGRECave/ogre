@@ -100,7 +100,6 @@ TEST_F(RenderSystemCapabilitiesTests,HasCapability)
     RenderSystemCapabilities rsc;
 
     // check that no caps (from 2 categories) are supported
-    EXPECT_TRUE(!rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
     EXPECT_TRUE(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
     EXPECT_TRUE(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
     EXPECT_TRUE(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
@@ -108,11 +107,9 @@ TEST_F(RenderSystemCapabilitiesTests,HasCapability)
     EXPECT_TRUE(!rsc.hasCapability(RSC_PBUFFER));
 
     // add support for few caps from each category
-    rsc.setCapability(RSC_FRAGMENT_PROGRAM);
     rsc.setCapability(RSC_TEXTURE_COMPRESSION);
 
     // check that the newly set caps are supported
-    EXPECT_TRUE(rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
     EXPECT_TRUE(rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
 
     // check that the non-set caps are NOT supported
@@ -359,8 +356,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     caps.setCapability(RSC_DOT3);
     caps.setCapability(RSC_HWSTENCIL);
 
-    caps.setCapability(RSC_VERTEX_PROGRAM);
-    caps.setCapability(RSC_FRAGMENT_PROGRAM);
     caps.setCapability(RSC_SCISSOR_TEST);
     caps.setCapability(RSC_TWO_SIDED_STENCIL);
     caps.setCapability(RSC_STENCIL_WRAP);
@@ -423,8 +418,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAllTrueCapabilities)
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tdot3 true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\thwstencil true") != lines.end());
 
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tvertex_program true") != lines.end());
-    EXPECT_TRUE(find(lines.begin(), lines.end(), "\tfragment_program true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tscissor_test true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\ttwo_sided_stencil true") != lines.end());
     EXPECT_TRUE(find(lines.begin(), lines.end(), "\tstencil_wrap true") != lines.end());
@@ -475,7 +468,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
 
     caps.setCapability(RSC_DOT3);
     caps.setCapability(RSC_HWSTENCIL);
-    caps.setCapability(RSC_FRAGMENT_PROGRAM);
     caps.setCapability(RSC_SCISSOR_TEST);
     caps.setCapability(RSC_TWO_SIDED_STENCIL);
     caps.setCapability(RSC_HWOCCLUSION);
@@ -551,8 +543,6 @@ TEST_F(RenderSystemCapabilitiesTests,WriteAndReadComplexCapabilities)
     EXPECT_EQ(caps.hasCapability(RSC_DOT3), caps2.hasCapability(RSC_DOT3));
     EXPECT_EQ(caps.hasCapability(RSC_HWSTENCIL), caps2.hasCapability(RSC_HWSTENCIL));
 
-    EXPECT_EQ(caps.hasCapability(RSC_VERTEX_PROGRAM), caps2.hasCapability(RSC_VERTEX_PROGRAM));
-    EXPECT_EQ(caps.hasCapability(RSC_FRAGMENT_PROGRAM), caps2.hasCapability(RSC_FRAGMENT_PROGRAM));
     EXPECT_EQ(caps.hasCapability(RSC_SCISSOR_TEST), caps2.hasCapability(RSC_SCISSOR_TEST));
     EXPECT_EQ(caps.hasCapability(RSC_TWO_SIDED_STENCIL), caps2.hasCapability(RSC_TWO_SIDED_STENCIL));
     EXPECT_EQ(caps.hasCapability(RSC_STENCIL_WRAP), caps2.hasCapability(RSC_STENCIL_WRAP));

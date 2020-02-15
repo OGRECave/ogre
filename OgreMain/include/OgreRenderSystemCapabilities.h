@@ -94,8 +94,10 @@ namespace Ogre
         /// Supports 32bit hardware index buffers
         RSC_32BIT_INDEX             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 8),
         /// Supports vertex programs (vertex shaders)
+        /// @deprecated All targetted APIs by Ogre support this feature
         RSC_VERTEX_PROGRAM          = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 9),
         /// Supports fragment programs (pixel shaders)
+        /// @deprecated All targetted APIs by Ogre support this feature
         RSC_FRAGMENT_PROGRAM        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 10),
         /// Supports performing a scissor test to exclude areas of the screen
 		/// @deprecated All targetted APIs by Ogre support this feature

@@ -33,12 +33,6 @@ public:
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
-        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
-                " programs, so you cannot run this sample. Sorry!", "FresnelSample::testCapabilities");
-        }
-
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&

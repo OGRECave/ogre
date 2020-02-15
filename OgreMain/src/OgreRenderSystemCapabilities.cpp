@@ -77,15 +77,14 @@ namespace Ogre {
             pLog->logMessage("   - Wrap stencil values: " +
                              StringConverter::toString(hasCapability(RSC_STENCIL_WRAP), true));
         }
-        pLog->logMessage(" * Vertex programs: " + StringConverter::toString(hasCapability(RSC_VERTEX_PROGRAM), true));
+        pLog->logMessage(" * Vertex programs: yes");
         pLog->logMessage("   - Number of floating-point constants: " +
                          StringConverter::toString(mVertexProgramConstantFloatCount));
         pLog->logMessage("   - Number of integer constants: " +
                          StringConverter::toString(mVertexProgramConstantIntCount));
         pLog->logMessage("   - Number of boolean constants: " +
                          StringConverter::toString(mVertexProgramConstantBoolCount));
-        pLog->logMessage(" * Fragment programs: " +
-                         StringConverter::toString(hasCapability(RSC_FRAGMENT_PROGRAM), true));
+        pLog->logMessage(" * Fragment programs: yes");
         pLog->logMessage("   - Number of floating-point constants: " +
                          StringConverter::toString(mFragmentProgramConstantFloatCount));
         pLog->logMessage("   - Number of integer constants: " +

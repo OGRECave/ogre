@@ -72,15 +72,6 @@ public:
 			"cursor and access widgets. Use WASD keys to move. You can increase/decrease terrains' LOD level using Page Up/Page Down."
 			"Use C to generate another random terrain";
 	}
-
-    void testCapabilities(const RenderSystemCapabilities* caps)
-	{
-        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
-        {
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
-                        "so you cannot run this sample. Sorry!", "Sample_EndlessWorld::testCapabilities");
-        }
-	}
     
 	StringVector getRequiredPlugins()
 	{

@@ -188,9 +188,7 @@ namespace Ogre
             Root::getSingleton().getRenderSystem()->getCapabilities();
 
         // Basic support check
-        if ((getType() == GPT_VERTEX_PROGRAM && !caps->hasCapability(RSC_VERTEX_PROGRAM)) ||
-            (getType() == GPT_GEOMETRY_PROGRAM && !caps->hasCapability(RSC_GEOMETRY_PROGRAM)) ||
-            (getType() == GPT_FRAGMENT_PROGRAM && !caps->hasCapability(RSC_FRAGMENT_PROGRAM)) ||
+        if ((getType() == GPT_GEOMETRY_PROGRAM && !caps->hasCapability(RSC_GEOMETRY_PROGRAM)) ||
             (getType() == GPT_DOMAIN_PROGRAM && !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM)) ||
             (getType() == GPT_HULL_PROGRAM && !caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM)) ||
             (getType() == GPT_COMPUTE_PROGRAM && !caps->hasCapability(RSC_COMPUTE_PROGRAM)))
