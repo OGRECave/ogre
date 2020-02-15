@@ -29,11 +29,6 @@ public:
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
-        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
-                " programs, so you cannot run this sample. Sorry!", "Sample_PNTrianglesTessellation::testCapabilities");
-        }
         if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tessellation shaders. Sorry!",

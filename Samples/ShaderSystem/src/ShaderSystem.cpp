@@ -1134,12 +1134,6 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps )
 {
-    if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !(caps->hasCapability(RSC_FRAGMENT_PROGRAM)))
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment programs, "
-            "so you cannot run this sample. Sorry!", "Sample_ShaderSystem::testCapabilities");
-    }
-
     // Check if D3D10 shader is supported - is so - then we are OK.
     if (GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0"))
     {

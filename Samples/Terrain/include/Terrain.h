@@ -68,15 +68,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mHeightUpdateRate = 1.0 / 20.0;
     }
 
-    void testCapabilities(const RenderSystemCapabilities* caps)
-    {
-        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
-                        "so you cannot run this sample. Sorry!", "Sample_Terrain::testCapabilities");
-        }
-    }
-
     StringVector getRequiredPlugins()
     {
         StringVector names;

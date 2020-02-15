@@ -693,13 +693,6 @@ void Sample_NewInstancing::sliderMoved( Slider* slider )
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::testCapabilities( const RenderSystemCapabilities* caps )
 {
-    if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and "
-            "fragment programs, so you cannot run this sample. Sorry!",
-            "NewInstancing::testCapabilities");
-    }
-
     if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
         !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es") &&
         !GpuProgramManager::getSingleton().isSyntaxSupported("fp40") &&

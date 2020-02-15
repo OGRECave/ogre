@@ -65,8 +65,6 @@ static void checkCaps(const Ogre::RenderSystemCapabilities* caps)
     EXPECT_EQ(caps->hasCapability(RSC_DOT3), true);
     EXPECT_EQ(caps->hasCapability(RSC_HWSTENCIL), true);
 
-    EXPECT_EQ(caps->hasCapability(RSC_VERTEX_PROGRAM), true);
-    EXPECT_EQ(caps->hasCapability(RSC_FRAGMENT_PROGRAM), true);
     EXPECT_EQ(caps->hasCapability(RSC_SCISSOR_TEST), true);
     EXPECT_EQ(caps->hasCapability(RSC_TWO_SIDED_STENCIL), true);
     EXPECT_EQ(caps->hasCapability(RSC_STENCIL_WRAP), true);
