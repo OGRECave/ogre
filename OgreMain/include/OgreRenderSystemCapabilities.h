@@ -87,8 +87,10 @@ namespace Ogre
         RSC_WIDE_LINES              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 4),
         /// Supports hardware stencil buffer
         RSC_HWSTENCIL               = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 5),
-        /// Supports atomic counter buffers
-        RSC_ATOMIC_COUNTERS         = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 6),
+        /// Supports read/write buffers with atomic counters (e.g. RWStructuredBuffer or SSBO)
+        RSC_READ_WRITE_BUFFERS      = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 6),
+        /// @deprecated check RSC_READ_WRITE_BUFFERS
+        RSC_ATOMIC_COUNTERS         = RSC_READ_WRITE_BUFFERS,
         /// Supports compressed textures in the ASTC format
         RSC_TEXTURE_COMPRESSION_ASTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 7),
         /// Supports 32bit hardware index buffers
