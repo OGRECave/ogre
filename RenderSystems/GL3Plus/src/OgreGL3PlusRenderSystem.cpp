@@ -320,9 +320,9 @@ namespace Ogre {
         // Check for non-power-of-2 texture support
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 
-        // Check for atomic counter support
-        if (hasMinGLVersion(4, 2) || checkExtension("GL_ARB_shader_atomic_counters"))
-            rsc->setCapability(RSC_ATOMIC_COUNTERS);
+        // Check for SSBO support
+        if (hasMinGLVersion(4, 3) || checkExtension("GL_ARB_shader_storage_buffer_object"))
+            rsc->setCapability(RSC_READ_WRITE_BUFFERS);
 
         // Scissor test is standard
         rsc->setCapability(RSC_SCISSOR_TEST);

@@ -194,8 +194,8 @@ namespace Ogre {
             pLog->logMessage("   - Vertex textures shared: " +
                              StringConverter::toString(mVertexTextureUnitsShared, true));
         }
-        pLog->logMessage(" * Atomic Counter Buffers: " +
-                         StringConverter::toString(hasCapability(RSC_ATOMIC_COUNTERS), true));
+        pLog->logMessage(" * Read/Write Buffers: " +
+                         StringConverter::toString(hasCapability(RSC_READ_WRITE_BUFFERS), true));
         pLog->logMessage(
             " * Hardware Occlusion Query: "
             + StringConverter::toString(hasCapability(RSC_HWOCCLUSION), true));

@@ -392,7 +392,7 @@ namespace Ogre
         addCapabilitiesMapping("point_extended_parameters", RSC_POINT_EXTENDED_PARAMETERS);
         addCapabilitiesMapping("vertex_texture_fetch", RSC_VERTEX_TEXTURE_FETCH);
         addCapabilitiesMapping("mipmap_lod_bias", RSC_MIPMAP_LOD_BIAS);
-        addCapabilitiesMapping("atomic_counters", RSC_ATOMIC_COUNTERS);
+        addCapabilitiesMapping("atomic_counters", RSC_READ_WRITE_BUFFERS);
         addCapabilitiesMapping("texture_compression", RSC_TEXTURE_COMPRESSION);
         addCapabilitiesMapping("texture_compression_dxt", RSC_TEXTURE_COMPRESSION_DXT);
         addCapabilitiesMapping("texture_compression_vtc", RSC_TEXTURE_COMPRESSION_VTC);
