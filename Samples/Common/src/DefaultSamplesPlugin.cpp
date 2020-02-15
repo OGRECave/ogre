@@ -28,6 +28,8 @@
 #include "DefaultSamplesPlugin.h"
 
 #include "OgreComponents.h"
+
+#include "AtomicCounters.h"
 #include "BezierPatch.h"
 #include "BSP.h"
 #include "CameraTrack.h"
@@ -92,6 +94,7 @@ using namespace OgreBites;
 
 DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugin")
 {
+    addSample(new Sample_AtomicCounters);
     addSample(new Sample_BezierPatch);
     addSample(new Sample_CameraTrack);
     addSample(new Sample_Character);

@@ -1,3 +1,8 @@
+shared_params CounterBuffer
+{
+    shared_param_named ac uint 0
+}
+
 fragment_program Ogre/RasterizationOrderFp glsl
 {
 	source RasterizationOrderFp.glsl
@@ -5,7 +10,7 @@ fragment_program Ogre/RasterizationOrderFp glsl
 	
 	default_params
 	{
-	    param_named ac uint 0
+	    shared_params_ref CounterBuffer
 	}
 }
 
@@ -15,14 +20,8 @@ material Example/RasterizationOrder
     {
 		pass
 		{
-			cull_hardware none
-			cull_software none
-			depth_func always_pass
-
-			fragment_program_ref Ogre/RasterizationOrderFp
-			{
-
-			}
+            vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified {}
+			fragment_program_ref Ogre/RasterizationOrderFp {}
 		}
 	}
 }
