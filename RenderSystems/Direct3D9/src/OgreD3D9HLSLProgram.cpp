@@ -649,24 +649,20 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::setTarget(const String& target)
     {
-        mTarget = "";
         std::vector<String> profiles = StringUtil::split(target, " ");
 
+        // find first supported format
         for(unsigned int i = 0 ; i < profiles.size() ; i++)
         {
             String & currentProfile = profiles[i];
             if(GpuProgramManager::getSingleton().isSyntaxSupported(currentProfile))
             {
                 mTarget = currentProfile;
-                break;
+                return;
             }
         }
 
-        if(mTarget == "")
-        {
-            LogManager::getSingleton().logMessage(
-                "Invalid target for D3D9 shader '" + mName + "' - '" + target + "'");
-        }
+        mTarget = profiles.front();
     }
 
     //-----------------------------------------------------------------------
