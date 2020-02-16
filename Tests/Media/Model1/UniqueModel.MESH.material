@@ -11,7 +11,6 @@ material UniqueMaterial
 
 			texture_unit
 			{
-				texture_alias diffuse
 				texture UniqueTexture.dds -1
 			}
 		}

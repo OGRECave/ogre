@@ -19,7 +19,6 @@ fragment_program SSAO/ShowDepth_fp_glsl glsl
 	default_params
 	{
 		param_named mrt1 int 0
-		param_named tex int 1
 	}
 }
 
