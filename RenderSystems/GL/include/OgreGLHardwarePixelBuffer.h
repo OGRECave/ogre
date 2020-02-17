@@ -85,7 +85,6 @@ namespace Ogre {
         GLenum mTarget;
         GLenum mFaceTarget; // same as mTarget in case of GL_TEXTURE_xD, but cubemap face for cubemaps
         GLuint mTextureID;
-        GLint mFace;
         GLint mLevel;
         bool mHwGamma;
 
