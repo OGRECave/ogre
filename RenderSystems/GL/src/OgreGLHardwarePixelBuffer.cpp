@@ -121,7 +121,7 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent
                                  GLint level, uint32 width, uint32 height, uint32 depth)
     : GLHardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
       mTarget(parent->getGLTextureTarget()), mFaceTarget(0), mTextureID(parent->getGLID()),
-      mFace(face), mLevel(level), mHwGamma(parent->isHardwareGammaEnabled()), mSliceTRT(0),
+      mLevel(level), mHwGamma(parent->isHardwareGammaEnabled()), mSliceTRT(0),
       mRenderSystem(renderSystem)
 {
     // Get face identifier

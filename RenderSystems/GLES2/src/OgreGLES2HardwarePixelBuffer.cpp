@@ -132,7 +132,7 @@ namespace Ogre {
     GLES2TextureBuffer::GLES2TextureBuffer(GLES2Texture* parent, GLint face, GLint level,
                                            GLint width, GLint height, GLint depth)
         : GLES2HardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
-          mTarget(parent->getGLES2TextureTarget()), mTextureID(parent->getGLID()), mFace(face),
+          mTarget(parent->getGLES2TextureTarget()), mTextureID(parent->getGLID()),
           mLevel(level)
     {
         // Get face identifier
@@ -151,7 +151,7 @@ namespace Ogre {
         // Log a message
         std::stringstream str;
         str << "GLES2HardwarePixelBuffer constructed for texture " << parent->getName()
-            << " id " << mTextureID << " face " << mFace << " level " << mLevel << ":"
+            << " id " << mTextureID << " face " << face << " level " << mLevel << ":"
             << " width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
             << " format=" << PixelUtil::getFormatName(mFormat);
         LogManager::getSingleton().logMessage(LML_NORMAL, str.str());

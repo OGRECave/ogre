@@ -79,7 +79,6 @@ namespace Ogre {
         // for cubemaps.
         GLenum mFaceTarget;
         GLuint mTextureID;
-        GLint mFace;
         GLint mLevel;
 
         typedef std::vector<RenderTexture*> SliceTRT;

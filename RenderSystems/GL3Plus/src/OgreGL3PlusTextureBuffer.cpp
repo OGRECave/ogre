@@ -50,7 +50,7 @@ namespace Ogre {
                                                GLint face, GLint level, uint32 width, uint32 height,
                                                uint32 depth)
         : GL3PlusHardwarePixelBuffer(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
-          mTarget(parent->getGL3PlusTextureTarget()), mTextureID(parent->getGLID()), mFace(face), mLevel(level), mSliceTRT(0)
+          mTarget(parent->getGL3PlusTextureTarget()), mTextureID(parent->getGLID()), mLevel(level), mSliceTRT(0)
     {
         // Get face identifier
         mFaceTarget = mTarget;
