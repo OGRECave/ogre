@@ -316,7 +316,7 @@ namespace Ogre {
         */
         const uchar * getData() const;       
 
-        /** Returns the size of the data buffer.
+        /** Returns the size of the data buffer in bytes
         */
         size_t getSize() const;
 

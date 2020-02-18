@@ -95,7 +95,13 @@ namespace Ogre {
                 the pixel format
         */
         virtual const PixelBox& lock(const Box& lockBox, LockOptions options);
-        /// @copydoc HardwareBuffer::lock
+        /** @copydoc HardwareBuffer::lock
+            @attention this method returns a pointer to the raw buffer storage, which is likely not what you
+           want. The RenderSystem is free to add padding, which you have to query from @ref getCurrentLock()
+           and apply during copying. Prefer #blitFromMemory, which correctly
+           handles copying in this case
+           @see @ref Updating-Pixel-Buffers
+         */
         virtual void* lock(size_t offset, size_t length, LockOptions options);
 
         /** Get the current locked region. This is the same value as returned
