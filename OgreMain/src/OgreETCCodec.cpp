@@ -130,22 +130,6 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    DataStreamPtr ETCCodec::encode(const MemoryDataStreamPtr& input,
-                                   const Codec::CodecDataPtr& pData) const
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "ETC encoding not supported",
-                    "ETCCodec::encode" ) ;
-    }
-    //---------------------------------------------------------------------
-    void ETCCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                const Codec::CodecDataPtr& pData) const
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "ETC encoding not supported",
-                    "ETCCodec::encodeToFile" ) ;
-    }
-    //---------------------------------------------------------------------
     Codec::DecodeResult ETCCodec::decode(const DataStreamPtr& stream) const
     {
         DecodeResult ret;
@@ -163,20 +147,6 @@ namespace Ogre {
     String ETCCodec::getType() const
     {
         return mType;
-    }
-    //---------------------------------------------------------------------
-    void ETCCodec::flipEndian(void * pData, size_t size, size_t count)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        Bitwise::bswapChunks(pData, size, count);
-#endif
-    }
-    //---------------------------------------------------------------------
-    void ETCCodec::flipEndian(void * pData, size_t size)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        Bitwise::bswapBuffer(pData, size);
-#endif
     }
     //---------------------------------------------------------------------
     String ETCCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const

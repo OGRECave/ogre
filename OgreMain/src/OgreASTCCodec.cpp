@@ -204,22 +204,6 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr ASTCCodec::encode(const MemoryDataStreamPtr& input, const Codec::CodecDataPtr& pData) const
-    {        
-		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "ASTC encoding not supported",
-                    "ASTCCodec::encode" ) ;
-    }
-    //---------------------------------------------------------------------
-    void ASTCCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                 const Codec::CodecDataPtr& pData) const
-    {
-		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "ASTC encoding not supported",
-                    "ASTCCodec::encodeToFile" ) ;
-	}
-
-    //---------------------------------------------------------------------
     Codec::DecodeResult ASTCCodec::decode(const DataStreamPtr& stream) const
     {
         DecodeResult ret;
@@ -322,29 +306,6 @@ namespace Ogre {
     String ASTCCodec::getType() const 
     {
         return mType;
-    }
-    //---------------------------------------------------------------------    
-    void ASTCCodec::flipEndian(void * pData, size_t size, size_t count) const
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		for(unsigned int index = 0; index < count; index++)
-        {
-            flipEndian((void *)((long)pData + (index * size)), size);
-        }
-#endif
-    }
-    //---------------------------------------------------------------------    
-    void ASTCCodec::flipEndian(void * pData, size_t size) const
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        char swapByte;
-        for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
-        {
-            swapByte = *(char *)((long)pData + byteIndex);
-            *(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
-            *(char *)((long)pData + size - byteIndex - 1) = swapByte;
-        }
-#endif
     }
     //---------------------------------------------------------------------    
 	String ASTCCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const

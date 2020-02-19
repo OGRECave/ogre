@@ -139,22 +139,6 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr PVRTCCodec::encode(const MemoryDataStreamPtr& input,
-                                     const Codec::CodecDataPtr& pData) const
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "PVRTC encoding not supported",
-                    "PVRTCCodec::encode" ) ;
-    }
-    //---------------------------------------------------------------------
-    void PVRTCCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                  const Codec::CodecDataPtr& pData) const
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "PVRTC encoding not supported",
-                    "PVRTCCodec::encodeToFile" ) ;
-    }
-    //---------------------------------------------------------------------
     Codec::DecodeResult PVRTCCodec::decode(const DataStreamPtr& stream) const
     {
         // Assume its a pvr 2 header
@@ -343,20 +327,6 @@ namespace Ogre {
     String PVRTCCodec::getType() const 
     {
         return mType;
-    }
-    //---------------------------------------------------------------------    
-    void PVRTCCodec::flipEndian(void * pData, size_t size, size_t count)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		Bitwise::bswapChunks(pData, size, count);
-#endif
-    }
-    //---------------------------------------------------------------------    
-    void PVRTCCodec::flipEndian(void * pData, size_t size)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        Bitwise::bswapBuffer(pData, size);
-#endif
     }
     //---------------------------------------------------------------------
     String PVRTCCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const

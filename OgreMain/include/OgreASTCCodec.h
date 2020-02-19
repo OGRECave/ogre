@@ -47,9 +47,6 @@ namespace Ogre {
     {
     protected:
         String mType;
-        
-        void flipEndian(void * pData, size_t size, size_t count) const;
-	    void flipEndian(void * pData, size_t size) const;
 
 		/// Single registered codec instance
         static ASTCCodec* msInstance;
@@ -58,10 +55,6 @@ namespace Ogre {
         ASTCCodec();
         virtual ~ASTCCodec() { }
 
-        /// @copydoc Codec::encode
-        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const;
-        /// @copydoc Codec::encodeToFile
-        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const;
         /// @copydoc Codec::decode
         DecodeResult decode(const DataStreamPtr& input) const;
 		/// @copydoc Codec::magicNumberToFileExt
@@ -73,7 +66,8 @@ namespace Ogre {
 		static void startup(void);
 		/// Static method to shutdown and unregister the ASTC codec
 		static void shutdown(void);
-        static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, int32 xdim, int32 ydim, PixelFormat fmt);
+		/// @deprecated use PixelFormat::getMemorySize
+        OGRE_DEPRECATED static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, int32 xdim, int32 ydim, PixelFormat fmt);
 
     private:
         void getClosestBlockDim2d(float targetBitrate, int *x, int *y) const;
