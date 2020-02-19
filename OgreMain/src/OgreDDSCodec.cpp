@@ -194,13 +194,6 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr DDSCodec::encode(const MemoryDataStreamPtr& input, const Codec::CodecDataPtr& pData) const
-    {        
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-            "DDS encoding not supported",
-            "DDSCodec::encode" ) ;
-    }
-    //---------------------------------------------------------------------
     void DDSCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
                                 const Codec::CodecDataPtr& pData) const
     {
@@ -1053,20 +1046,6 @@ namespace Ogre {
     String DDSCodec::getType() const 
     {
         return mType;
-    }
-    //---------------------------------------------------------------------    
-    void DDSCodec::flipEndian(void * pData, size_t size, size_t count)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		Bitwise::bswapChunks(pData, size, count);
-#endif
-    }
-    //---------------------------------------------------------------------    
-    void DDSCodec::flipEndian(void * pData, size_t size)
-    {
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        Bitwise::bswapBuffer(pData, size);
-#endif
     }
     //---------------------------------------------------------------------
     String DDSCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const

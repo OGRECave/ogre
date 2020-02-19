@@ -54,9 +54,6 @@ namespace Ogre {
     private:
         String mType;
 
-		static void flipEndian(void * pData, size_t size, size_t count);	// invokes Bitwise::bswapChunks() if OGRE_ENDIAN_BIG
-		static void flipEndian(void * pData, size_t size);					// invokes Bitwise::bswapBuffer() if OGRE_ENDIAN_BIG
-
         PixelFormat convertFourCCFormat(uint32 fourcc) const;
         PixelFormat convertDXToOgreFormat(uint32 fourcc) const;
         PixelFormat convertPixelFormat(uint32 rgbBits, uint32 rMask,
@@ -75,8 +72,6 @@ namespace Ogre {
         DDSCodec();
         virtual ~DDSCodec() { }
 
-        /// @copydoc Codec::encode
-        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const;
         /// @copydoc Codec::encodeToFile
         void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const;
         /// @copydoc Codec::decode

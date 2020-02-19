@@ -35,6 +35,17 @@ namespace Ogre {
     Codec::~Codec() {
     }
 
+    DataStreamPtr Codec::encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const
+    {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, getType() + " - encoding to memory not supported");
+        return DataStreamPtr();
+    }
+
+    void Codec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const
+    {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, getType() + " - encoding to file not supported");
+    }
+
     StringVector Codec::getExtensions(void)
     {
         StringVector result;
@@ -45,6 +56,13 @@ namespace Ogre {
             result.push_back(i->first);
         }
         return result;
+    }
+
+    void Codec::registerCodec(Codec* pCodec)
+    {
+        auto ret = msMapCodecs.emplace(pCodec->getType(), pCodec);
+        if (!ret.second)
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, pCodec->getType() + " already has a registered codec");
     }
 
     Codec* Codec::getCodec(const String& extension)

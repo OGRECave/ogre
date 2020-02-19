@@ -48,9 +48,6 @@ namespace Ogre {
     protected:
         String mType;
         
-		static void flipEndian(void * pData, size_t size, size_t count);	// invokes Bitwise::bswapChunks() if OGRE_ENDIAN_BIG
-		static void flipEndian(void * pData, size_t size);					// invokes Bitwise::bswapBuffer() if OGRE_ENDIAN_BIG
-
         /// Single registered codec instance
         static ETCCodec* msPKMInstance;
         static ETCCodec* msKTXInstance;
@@ -59,10 +56,6 @@ namespace Ogre {
         ETCCodec(const String &type);
         virtual ~ETCCodec() { }
 
-        /// @copydoc Codec::encode
-        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const;
-        /// @copydoc Codec::encodeToFile
-        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const;
         /// @copydoc Codec::decode
         DecodeResult decode(const DataStreamPtr& input) const;
         /// @copydoc Codec::magicNumberToFileExt

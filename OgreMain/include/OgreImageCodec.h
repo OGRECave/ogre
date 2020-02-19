@@ -46,6 +46,20 @@ namespace Ogre {
     */
     class _OgreExport ImageCodec : public Codec
     {
+    protected:
+        static void flipEndian(void* pData, size_t size, size_t count)
+        {
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+            Bitwise::bswapChunks(pData, size, count);
+#endif
+        }
+        static void flipEndian(void* pData, size_t size)
+        {
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+            Bitwise::bswapBuffer(pData, size);
+#endif
+        }
+
     public:
         virtual ~ImageCodec();
         /** Codec return class for images. Has information about the size and the
