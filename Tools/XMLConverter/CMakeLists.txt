@@ -24,10 +24,9 @@ set(SOURCE_FILES
 # allow override by cmake
 find_package(pugixml QUIET)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES} pugixml ${OGRE_MeshLodGenerator_LIBRARIES})
+target_include_directories(OgreXMLConverter PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(OgreXMLConverter OgreMain pugixml)
 
 if (APPLE)
     set_target_properties(OgreXMLConverter PROPERTIES

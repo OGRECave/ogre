@@ -6,24 +6,14 @@ media. For further info, visit http://www.ogre3d.org
 
 OgreXMLConverter
 ----------------
-Converts between the binary and XML formats for .mesh and .skeleton. Will also 
-allow you to generate LOD information if you are converting to the binary 
-format. This tool is necessary to convert from the XML to OGRE's native runtime
+Converts between the binary and XML formats for .mesh and .skeleton.
+This tool is necessary to convert from the XML to OGRE's native runtime
 format if your exporter produces XML. You can find the XML Schema for the .mesh
 and .skeleton formats in the Ogre source under Tools/XMLConverter/docs.
 
 Usage: OgreXMLConverter [options] sourcefile [destfile]
 
 Available options:
--i             = interactive mode - prompt for options
-(The next 4 options are only applicable when converting XML to Mesh)
--l lodlevels   = number of LOD levels
--d loddist     = distance increment to reduce LOD
--p lodpercent  = Percentage triangle reduction amount per LOD
--f lodnumtris  = Fixed vertex reduction per LOD
--e             = DON'T generate edge lists (for stencil shadows)
--r             = DON'T reorganise vertex buffers to OGRE recommended format.
--t             = Generate tangents (for normal mapping)
 -o             = DON'T optimise out redundant tracks & keyframes
 -d3d           = Prefer D3D packed colour formats (default on Windows)
 -gl            = Prefer GL packed colour formats (default on non-Windows)
@@ -39,8 +29,7 @@ destfile       = optional name of file to write to. If you don't
 
 Because the default behaviour is to convert binary to XML and vice versa, you 
 can simply drag files onto this converter and it will convert between the 2 
-formats, although you will not be able to use it to generate LOD levels this
-way.
+formats.
 
 OgreMeshUpgrade
 ---------------
