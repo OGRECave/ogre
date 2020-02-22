@@ -195,6 +195,7 @@ namespace Ogre {
         mMainContext = 0;
 
         mGLInitialised = false;
+        mEnableFixedPipeline = true;
 
         mCurrentLights = 0;
         mMinFilter = FO_LINEAR;
@@ -353,6 +354,19 @@ namespace Ogre {
         mTextureManager = new GLTextureManager(this);
     }
 
+    void GLRenderSystem::initConfigOptions()
+    {
+        GLRenderSystemCommon::initConfigOptions();
+
+        ConfigOption opt;
+        opt.name = "Fixed Pipeline Enabled";
+        opt.possibleValues = {"Yes", "No"};
+        opt.currentValue = opt.possibleValues[0];
+        opt.immutable = false;
+
+        mOptions[opt.name] = opt;
+    }
+
     RenderSystemCapabilities* GLRenderSystem::createRenderSystemCapabilities() const
     {
         RenderSystemCapabilities* rsc = new RenderSystemCapabilities();
@@ -376,8 +390,11 @@ namespace Ogre {
         else
             rsc->setVendor(GPU_UNKNOWN);
 
-        // Supports fixed-function
-        rsc->setCapability(RSC_FIXED_FUNCTION);
+        if (mEnableFixedPipeline)
+        {
+            // Supports fixed-function
+            rsc->setCapability(RSC_FIXED_FUNCTION);
+        }
 
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
 
@@ -1094,6 +1111,12 @@ namespace Ogre {
             const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
             StringVector tokens = StringUtil::split(shadingLangVersion, ". ");
             mNativeShadingLanguageVersion = (StringConverter::parseUnsignedInt(tokens[0]) * 100) + StringConverter::parseUnsignedInt(tokens[1]);
+
+            auto it = mOptions.find("Fixed Pipeline Enabled");
+            if (it != mOptions.end())
+            {
+                mEnableFixedPipeline = StringConverter::parseBool(it->second.currentValue);
+            }
 
             // Initialise GL after the first window has been created
             // TODO: fire this from emulation options, and don't duplicate Real and Current capabilities
@@ -3179,7 +3202,7 @@ namespace Ogre {
         bool isCustomAttrib = false;
         if (mCurrentVertexProgram)
         {
-            isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem.getIndex());
+            isCustomAttrib = !mEnableFixedPipeline || mCurrentVertexProgram->isAttributeValid(sem, elem.getIndex());
 
             if (hwGlBuffer->isInstanceData())
             {

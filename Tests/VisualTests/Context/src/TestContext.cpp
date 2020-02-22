@@ -506,9 +506,6 @@ bool TestContext::oneTimeConfig()
             rs->setConfigOption("FSAA", "2");
 
             try {
-                rs->setConfigOption("Fixed Pipeline Enabled", "No");
-            } catch(...) {}
-            try {
                 rs->setConfigOption("VSync", "No");
             } catch(...) {}
         }

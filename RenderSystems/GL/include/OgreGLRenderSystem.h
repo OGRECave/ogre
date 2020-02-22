@@ -127,6 +127,9 @@ namespace Ogre {
         std::vector<GLuint> mRenderAttribsBound;
         std::vector<GLuint> mRenderInstanceAttribsBound;
 
+        /// is fixed pipeline enabled
+        bool mEnableFixedPipeline;
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		/// @copydoc RenderSystem::setDrawBuffer
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
@@ -158,6 +161,8 @@ namespace Ogre {
         const String& getName(void) const;
 
         void _initialise() override;
+
+        void initConfigOptions() override;
 
         virtual RenderSystemCapabilities* createRenderSystemCapabilities() const;
 
