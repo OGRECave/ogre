@@ -66,7 +66,7 @@ fragment_program ssao_ps_pGLSLES glsles
 {
     source ssao_ps.glsl
     // will run on anything with GLSL 1.50 and up
-    syntax glsles
+    syntax glsl300es
 	default_params
 	{
         param_named geomMap int 0
@@ -103,7 +103,7 @@ fragment_program ssaoBlurX_ps_pGLSL glsl
 fragment_program ssaoBlurX_ps_pGLSLES glsles
 {
     source ssao_blurx_ps.glsl
-    syntax glsles
+    syntax glsl300es
     default_params
     {
         param_named_auto invTexSize inverse_texture_size 0
@@ -142,7 +142,7 @@ fragment_program ssaoBlurY_ps_pGLSL glsl
 fragment_program ssaoBlurY_ps_pGLSLES glsles
 {
     source ssao_blury_ps.glsl
-    syntax glsles
+    syntax glsl300es
     default_params
     {
         param_named_auto invTexSize inverse_texture_size 0

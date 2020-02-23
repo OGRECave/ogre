@@ -34,7 +34,7 @@ fragment_program DeferredShading/post/Ambient_ps_pGLSL glsl
 fragment_program DeferredShading/post/Ambient_ps_pGLSLES glsles
 {
 	source Ambient_ps.glsl
-	syntax glsles
+	syntax glsl300es
 	
 	default_params
 	{
