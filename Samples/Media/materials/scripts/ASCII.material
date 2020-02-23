@@ -34,7 +34,7 @@ fragment_program Ogre/Compositor/ASCIIFPGLSL glsl
 fragment_program Ogre/Compositor/ASCIIFPGLSLES glsles
 {
 	source ASCIIFP.glsles
-	syntax glsles
+	syntax glsl300es
 	
 	default_params
 	{

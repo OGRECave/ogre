@@ -810,6 +810,7 @@ vertex_program Examples/TextureArrayVSglsles glsles
 fragment_program Examples/TextureArrayPSglsles glsles
 {
 	source Example_TextureArrayPS.glsles
+	syntax glsl300es
 
 	default_params
 	{

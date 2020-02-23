@@ -30,6 +30,7 @@ fragment_program Ogre/Instancing/shadow_caster_glsl_ps glsl
 fragment_program Ogre/Instancing_glsles_ps glsles
 {
 	source Instancing.frag
+	syntax glsl300es
 
 	preprocessor_defines DEPTH_SHADOWRECEIVER=1
 

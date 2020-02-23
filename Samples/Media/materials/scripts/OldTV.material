@@ -20,7 +20,7 @@ fragment_program Ogre/Compositor/OldTV_FPGLSL glsl
 fragment_program Ogre/Compositor/OldTV_FPGLSLES glsles
 {
 	source OldTV.glsles
-	syntax glsles
+	syntax glsl300es
     default_params
 	{
    		param_named Image int 0

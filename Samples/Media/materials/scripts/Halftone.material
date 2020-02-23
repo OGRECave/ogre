@@ -32,7 +32,7 @@ fragment_program Ogre/Compositor/HalftoneFPGLSL glsl
 fragment_program Ogre/Compositor/HalftoneFPGLSLES glsles
 {
 	source HalftoneFP.glsles
-	syntax glsles
+	syntax glsl300es
 	
 	default_params
 	{
