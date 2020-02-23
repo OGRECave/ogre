@@ -321,6 +321,15 @@ namespace Ogre
                 m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
     }
 
+    inline Matrix3 Math::lookRotation(const Vector3& direction, const Vector3& yaw)
+    {
+        Matrix3 ret;
+        // cross twice to rederive, only direction is unaltered
+        const Vector3& xAxis = yaw.crossProduct(direction).normalisedCopy();
+        const Vector3& yAxis = direction.crossProduct(xAxis);
+        ret.FromAxes(xAxis, yAxis, direction);
+        return ret;
+    }
     /** @} */
     /** @} */
 }

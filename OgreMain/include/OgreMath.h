@@ -721,6 +721,12 @@ namespace Ogre
         static Affine3 makeViewMatrix(const Vector3& position, const Quaternion& orientation,
             const Affine3* reflectMatrix = 0);
 
+        /** Create a rotation matrix from direction and yaw
+        @param direction the direction to look in. Must be normalised.
+        @param yaw the yaw axis to use
+        */
+        static Matrix3 lookRotation(const Vector3& direction, const Vector3& yaw);
+
         /** This creates 'uniform' perspective projection matrix,
             which depth range [-1,1], right-handed rules
 

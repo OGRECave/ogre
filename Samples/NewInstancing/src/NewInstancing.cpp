@@ -501,7 +501,7 @@ void Sample_NewInstancing::moveUnits( float timeSinceLast )
             if( planeNormal != Vector3::ZERO )
             {
                 const Vector3 vDir( (*itor)->getOrientation().xAxis().normalisedCopy() );
-                (*itor)->setOrientation( lookAt( planeNormal.reflect( vDir ).normalisedCopy() ) );
+                (*itor)->setOrientation( lookAt( planeNormal.reflect( vDir ) ) );
                 (*itor)->setPosition( entityPos );
             }
 
@@ -549,7 +549,7 @@ void Sample_NewInstancing::moveUnits( float timeSinceLast )
             if( planeNormal != Vector3::ZERO )
             {
                 const Vector3 vDir(pEnt->getOrientation().xAxis().normalisedCopy() );
-                pEnt->setOrientation( lookAt( planeNormal.reflect( vDir ).normalisedCopy() ), false );
+                pEnt->setOrientation( lookAt( planeNormal.reflect( vDir ) ), false );
                 pEnt->setPosition( entityPos, false);
             }
 
@@ -564,16 +564,7 @@ void Sample_NewInstancing::moveUnits( float timeSinceLast )
 //------------------------------------------------------------------------------
 Quaternion Sample_NewInstancing::lookAt( const Vector3 &normDir )
 {
-    Quaternion retVal;
-    Vector3 xVec = Vector3::UNIT_Y.crossProduct( normDir );
-    xVec.normalise();
-
-    Vector3 yVec = normDir.crossProduct( xVec );
-    yVec.normalise();
-
-    retVal.FromAxes( xVec, yVec, normDir );
-
-    return retVal;
+    return Math::lookRotation(normDir.normalisedCopy(), Vector3::UNIT_Y);
 }
 
 //------------------------------------------------------------------------------

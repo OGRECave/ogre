@@ -3397,14 +3397,8 @@ void SceneManager::buildLightClip(const Light* l, PlaneList& planes)
             {
                 up = Vector3::UNIT_Z;
             }
-            // cross twice to rederive, only direction is unaltered
-            Vector3 right = dir.crossProduct(up);
-            right.normalise();
-            up = right.crossProduct(dir);
-            up.normalise();
-            // Derive quaternion from axes (negate dir since -Z)
-            Quaternion q;
-            q.FromAxes(right, up, -dir);
+            // Derive rotation from axes (negate dir since -Z)
+            Matrix3 q = Math::lookRotation(-dir, up);
 
             // derive pyramid corner vectors in world orientation
             Vector3 tl, tr, bl, br;

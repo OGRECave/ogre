@@ -387,16 +387,11 @@ namespace Ogre
     Affine3 FocusedShadowCameraSetup::buildViewMatrix(const Vector3& pos, const Vector3& dir,
         const Vector3& up) const
     {
-        Vector3 xN = dir.crossProduct(up);
-        xN.normalise();
-        Vector3 upN = xN.crossProduct(dir);
-        upN.normalise();
-
-        Affine3 m(xN.x,     xN.y,       xN.z,       -xN.dotProduct(pos),
-            upN.x,      upN.y,      upN.z,      -upN.dotProduct(pos),
-            -dir.x,     -dir.y, -dir.z, dir.dotProduct(pos));
-
-        return m;
+        Matrix3 Rt = Math::lookRotation(-dir, up).transpose();
+        Matrix4 m;
+        m = Rt;
+        m.setTrans(-Rt * pos);
+        return Affine3(m); // make sure projective part is identity
     }
     //-----------------------------------------------------------------------
     void FocusedShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
