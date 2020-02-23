@@ -47,7 +47,7 @@ void ThingRenderable::addTime(float t)
 void ThingRenderable::initialise()
 {
     // Fill array with randomly oriented quads
-    Vector3 ax, ay, az;
+    Vector3 ax, ay;
 
     Quaternion q;
     things.clear(); orbits.clear();
@@ -55,20 +55,11 @@ void ThingRenderable::initialise()
     {
         ax = Vector3(Math::SymmetricRandom(), Math::SymmetricRandom(), Math::SymmetricRandom());
         ay = Vector3(Math::SymmetricRandom(), Math::SymmetricRandom(), Math::SymmetricRandom());
-        az = ax.crossProduct(ay);
-        ay = az.crossProduct(ax);
-        ax.normalise(); ay.normalise(); az.normalise();
-        q.FromAxes(ax, ay, az);
-        //std::cerr << ax.dotProduct(ay) << " " << ay.dotProduct(az) << " " << az.dotProduct(ax) << std::endl;
-        things.push_back(q);
+        things.push_back(Math::lookRotation(ax.normalisedCopy(), ay));
         
         ax = Vector3(Math::SymmetricRandom(), Math::SymmetricRandom(), Math::SymmetricRandom());
         ay = Vector3(Math::SymmetricRandom(), Math::SymmetricRandom(), Math::SymmetricRandom());
-        az = ax.crossProduct(ay);
-        ay = az.crossProduct(ax);
-        ax.normalise(); ay.normalise(); az.normalise();
-        q.FromAxes(ax, ay, az);
-        orbits.push_back(q);
+        orbits.push_back(Math::lookRotation(ax.normalisedCopy(), ay));
     }
     
     // Create buffers

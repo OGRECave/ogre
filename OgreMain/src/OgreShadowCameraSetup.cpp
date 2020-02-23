@@ -103,14 +103,7 @@ namespace Ogre
                 // Use camera up
                 up = Vector3::UNIT_Z;
              }
-             // cross twice to rederive, only direction is unaltered
-             Vector3 left = dir.crossProduct(up);
-             left.normalise();
-             up = dir.crossProduct(left);
-             up.normalise();
-             // Derive rotation from axes
-             Matrix3 rot;
-             rot.FromAxes(left, up, dir);
+             Matrix3 rot = Math::lookRotation(dir, up);
 
              //convert world space camera position into light space
              Vector3 lightSpacePos = rot.transpose() * pos;
@@ -189,15 +182,7 @@ namespace Ogre
             // Use camera up
             up = Vector3::UNIT_Z;
         }
-        // cross twice to rederive, only direction is unaltered
-        Vector3 left = dir.crossProduct(up);
-        left.normalise();
-        up = dir.crossProduct(left);
-        up.normalise();
-        // Derive quaternion from axes
-        Quaternion q;
-        q.FromAxes(left, up, dir);
-        texCam->getParentNode()->setOrientation(q);
+        texCam->getParentNode()->setOrientation(Math::lookRotation(dir, up));
     }
 
 

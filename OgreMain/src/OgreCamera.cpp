@@ -172,16 +172,9 @@ namespace Ogre {
 
         Quaternion targetWorldOrientation;
 
-
         if( mYawFixed )
         {
-            Vector3 xVec = mYawFixedAxis.crossProduct( zAdjustVec );
-            xVec.normalise();
-
-            Vector3 yVec = zAdjustVec.crossProduct( xVec );
-            yVec.normalise();
-
-            targetWorldOrientation.FromAxes( xVec, yVec, zAdjustVec );
+            targetWorldOrientation = Math::lookRotation(zAdjustVec, mYawFixedAxis);
         }
         else
         {

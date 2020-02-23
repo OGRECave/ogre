@@ -399,12 +399,9 @@ namespace Ogre
             up = Vector3(1,0,0);
         else
             up = Vector3(0,1,0);
-        Vector3 xDir = up.crossProduct(zRow);
-        xDir.normalise();
-        up = zRow.crossProduct(xDir);
-        Affine3 rotation(xDir.x, up.x, zRow.x, 0.0,
-            xDir.y, up.y, zRow.y, 0.0,
-            xDir.z, up.z, zRow.z, 0.0);
+
+        Affine3 rotation = Affine3::IDENTITY;
+        rotation = Math::lookRotation(zRow, up);
         Matrix4 customProj = tempMatrix * rotation;
         Affine3 customView(rotation.transpose() * invTranslation);
         // note: now customProj * (0,0,0,1)^t = (0, 0, k, 0)^t for k some constant
