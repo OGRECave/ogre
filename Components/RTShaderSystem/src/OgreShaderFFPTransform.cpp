@@ -77,6 +77,11 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 
     bool isHLSL = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
 
+    // This requires GLES3.0
+    if (ShaderGenerator::getSingleton().getTargetLanguage() == "glsles" &&
+        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es"))
+        mInstanced = false;
+
     auto stage = vsEntry->getStage(FFP_VS_TRANSFORM);
     if(mInstanced)
     {
