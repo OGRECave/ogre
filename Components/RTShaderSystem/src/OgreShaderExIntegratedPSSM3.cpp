@@ -95,8 +95,9 @@ void IntegratedPSSM3::copyFrom(const SubRenderState& rhs)
 bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState, 
                                          Pass* srcPass, Pass* dstPass)
 {
-    if (srcPass->getLightingEnabled() == false ||
-        srcPass->getParent()->getParent()->getReceiveShadows() == false)
+    if (!srcPass->getLightingEnabled() ||
+        !srcPass->getParent()->getParent()->getReceiveShadows() ||
+        renderState->getLightCount().isZeroLength())
         return false;
 
     PixelFormat shadowTexFormat = PF_UNKNOWN;
