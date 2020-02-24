@@ -116,7 +116,7 @@ namespace {
 		if(asset)
 		{
 			off_t length = AAsset_getLength(asset);
-            stream.reset(new Ogre::MemoryDataStream(length, true, true));
+            stream = std::make_shared<MemoryDataStream>(filename, length, true, true);
 			memcpy(stream->getPtr(), AAsset_getBuffer(asset), length);
 			AAsset_close(asset);
 		}
