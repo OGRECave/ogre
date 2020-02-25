@@ -161,7 +161,17 @@ void TargetRenderState::acquirePrograms(Pass* pass)
 {
     createCpuPrograms();
 
-    ProgramManager::getSingleton().createGpuPrograms(mProgramSet.get());
+    try
+    {
+        ProgramManager::getSingleton().createGpuPrograms(mProgramSet.get());
+    }
+    catch(Ogre::Exception& e)
+    {
+        LogManager::getSingleton().logError(StringUtil::format("RTSS - creating GpuPrograms for pass %d of '%s' failed",
+                                                               pass->getIndex(),
+                                                               pass->getParent()->getParent()->getName().c_str()));
+        throw;
+    }
 
     for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
     {
