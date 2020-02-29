@@ -354,7 +354,11 @@ TEST(GpuSharedParameters, align)
     params.addConstantDefinition("b", GCT_FLOAT4);
     EXPECT_EQ(params.getConstantDefinition("b").logicalIndex, 16);
 
-    // 16 byte alignment
-    params.addConstantDefinition("c", GCT_MATRIX_4X4);
+    // break alignment again
+    params.addConstantDefinition("c", GCT_FLOAT1);
     EXPECT_EQ(params.getConstantDefinition("c").logicalIndex, 32);
+
+    // 16 byte alignment
+    params.addConstantDefinition("d", GCT_MATRIX_4X4);
+    EXPECT_EQ(params.getConstantDefinition("d").logicalIndex, 48);
 }
