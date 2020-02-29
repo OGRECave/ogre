@@ -468,9 +468,8 @@ namespace Ogre {
         */
         void addConstantDefinition(const String& name, GpuConstantType constType, size_t arraySize = 1);
 
-        /** Remove a constant definition from this shared set of parameters.
-         */
-        void removeConstantDefinition(const String& name);
+        /// @deprecated removing a constant requires a full rebuild due to changed alignments
+        OGRE_DEPRECATED void removeConstantDefinition(const String& name);
 
         /** Remove a constant definition from this shared set of parameters.
          */
