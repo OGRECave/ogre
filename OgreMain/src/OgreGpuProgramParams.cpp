@@ -386,13 +386,19 @@ namespace Ogre
         GpuConstantDefinition def;
         def.arraySize = arraySize;
         def.constType = constType;
-        // for compatibility we do not pad values to multiples of 4
-        // when it comes to arrays, user is responsible for creating matching defs
+        // here, we do not consider padding, but rather alignment
         def.elementSize = GpuConstantDefinition::getElementSize(constType, false);
 
-        // not used
-        def.logicalIndex = 0;
+        // abuse logical index to store offset
+        def.logicalIndex = (mFloatConstants.size() + mIntConstants.size()) * 4; // bytes
+        def.logicalIndex += mDoubleConstants.size() * 8;
         def.variability = (uint16)GPV_GLOBAL;
+
+        // we try to adhere to GLSL std140 packing rules
+        // handle alignment requirements
+        auto align_size = std::min<int>(def.elementSize == 3 ? 4 : def.elementSize, 4); // vec3 is 16 byte aligned, which is max
+        align_size *= 4; // bytes
+        def.logicalIndex = ((def.logicalIndex + align_size - 1) / align_size) * align_size; // integer ceil
 
         if (def.isFloat())
         {
@@ -428,7 +434,7 @@ namespace Ogre
         if (i != mNamedConstants.map.end())
         {
             GpuConstantDefinition& def = i->second;
-            bool isFloat = def.isFloat(); //TODO does a double check belong here too?
+            bool isFloat = def.isFloat();
             size_t numElems = def.elementSize * def.arraySize;
 
             for (GpuConstantDefinitionMap::iterator j = mNamedConstants.map.begin();
@@ -442,6 +448,7 @@ namespace Ogre
                      otherDef.physicalIndex > def.physicalIndex)
                 {
                     // adjust index
+                    otherDef.logicalIndex -= numElems;
                     otherDef.physicalIndex -= numElems;
                 }
             }
@@ -483,7 +490,6 @@ namespace Ogre
         if (!mDirty)
             return;
 
-        size_t offset = 0;
         for (const auto& parami : getConstantDefinitions().map)
         {
             const GpuConstantDefinition& param = parami.second;
@@ -512,15 +518,13 @@ namespace Ogre
 
             // in bytes
             size_t length = param.arraySize * param.elementSize * 4;
-            mHardwareBuffer->writeData(offset, length, dataPtr);
-            offset += length;
+            mHardwareBuffer->writeData(param.logicalIndex, length, dataPtr);
         }
     }
     void GpuSharedParameters::download()
     {
         OgreAssert(mHardwareBuffer, "not backed by a HardwareBuffer");
 
-        size_t offset = 0;
         for (const auto& parami : getConstantDefinitions().map)
         {
             const GpuConstantDefinition& param = parami.second;
@@ -549,8 +553,7 @@ namespace Ogre
 
             // in bytes
             size_t length = param.arraySize * param.elementSize * 4;
-            mHardwareBuffer->readData(offset, length, dataPtr);
-            offset += length;
+            mHardwareBuffer->readData(param.logicalIndex, length, dataPtr);
         }
     }
     //---------------------------------------------------------------------

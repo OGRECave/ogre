@@ -340,3 +340,21 @@ TEST_F(TextureTests, Blank)
     EXPECT_EQ(tus->getGamma(), 1.0f);
     EXPECT_EQ(tus->isHardwareGammaEnabled(), false);
 }
+
+TEST(GpuSharedParameters, align)
+{
+    Root root("");
+    GpuSharedParameters params("dummy");
+
+    // trivial case
+    params.addConstantDefinition("a", GCT_FLOAT1);
+    EXPECT_EQ(params.getConstantDefinition("a").logicalIndex, 0);
+
+    // 16 byte alignment
+    params.addConstantDefinition("b", GCT_FLOAT4);
+    EXPECT_EQ(params.getConstantDefinition("b").logicalIndex, 16);
+
+    // 16 byte alignment
+    params.addConstantDefinition("c", GCT_MATRIX_4X4);
+    EXPECT_EQ(params.getConstantDefinition("c").logicalIndex, 32);
+}
