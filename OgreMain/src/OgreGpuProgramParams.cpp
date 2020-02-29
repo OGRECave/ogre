@@ -358,7 +358,7 @@ namespace Ogre
     GpuSharedParameters::GpuSharedParameters(const String& name)
         :mName(name)
         , mFrameLastUpdated(Root::getSingleton().getNextFrameNumber())
-        , mVersion(0), mDirty(false)
+        , mVersion(0), mOffset(0), mDirty(false)
     {
 
     }
@@ -386,19 +386,20 @@ namespace Ogre
         GpuConstantDefinition def;
         def.arraySize = arraySize;
         def.constType = constType;
-        // here, we do not consider padding, but rather alignment
+
+		// here, we do not consider padding, but rather alignment
         def.elementSize = GpuConstantDefinition::getElementSize(constType, false);
 
-        // abuse logical index to store offset
-        def.logicalIndex = (mFloatConstants.size() + mIntConstants.size()) * 4; // bytes
-        def.logicalIndex += mDoubleConstants.size() * 8;
+		// we try to adhere to GLSL std140 packing rules
+		// handle alignment requirements
+		auto align_size = std::min<int>(def.elementSize == 3 ? 4 : def.elementSize, 4); // vec3 is 16 byte aligned, which is max
+		align_size *= 4; // bytes
+
+		// abuse logical index to store offset
+		def.logicalIndex = ((mOffset + align_size - 1) / align_size) * align_size; //integer call
         def.variability = (uint16)GPV_GLOBAL;
 
-        // we try to adhere to GLSL std140 packing rules
-        // handle alignment requirements
-        auto align_size = std::min<int>(def.elementSize == 3 ? 4 : def.elementSize, 4); // vec3 is 16 byte aligned, which is max
-        align_size *= 4; // bytes
-        def.logicalIndex = ((def.logicalIndex + align_size - 1) / align_size) * align_size; // integer ceil
+		mOffset = def.logicalIndex + align_size;
 
         if (def.isFloat())
         {
@@ -559,6 +560,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GpuSharedParameters::removeAllConstantDefinitions()
     {
+		mOffset = 0;
         mNamedConstants.map.clear();
         mNamedConstants.floatBufferSize = 0;
         mNamedConstants.doubleBufferSize = 0;

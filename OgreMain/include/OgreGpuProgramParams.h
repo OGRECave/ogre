@@ -451,6 +451,9 @@ namespace Ogre {
         /// Version number of the definitions in this buffer.
         unsigned long mVersion;
 
+		/// Accumulated offset used to calculate uniform location.
+		unsigned int mOffset;
+
         bool mDirty;
 
     public:
