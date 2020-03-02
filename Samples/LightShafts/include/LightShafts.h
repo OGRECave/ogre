@@ -65,7 +65,7 @@ public:
             mRotateKnot = !mRotateKnot;
             break;
         case 'n':
-            mCurrentCookie = (mCurrentCookie + 1) % 3;
+            mCurrentCookie = (mCurrentCookie + 1) % 4;
             mLightShaftsMat->getTechnique(0)->getPass(0)->getTextureUnitState(1)->setTextureName(
                 StringUtil::format("Cookie%d.png", mCurrentCookie));
             break;

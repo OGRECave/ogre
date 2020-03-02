@@ -58,6 +58,6 @@ void main_fp(
         float length_ = length(uLightPosition - vPosition);
         float atten  = 1.0 / (uAttenuation.y + uAttenuation.z*length_ + 20*uAttenuation.w*length_*length_);
 
-        oColor = float4(Cookie.rgb * Cookie.a * atten * noise , 1);
+        oColor = float4(Cookie.rgb * atten * noise , 1);
     }
 }
