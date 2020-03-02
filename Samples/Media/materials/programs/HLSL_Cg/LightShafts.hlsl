@@ -11,29 +11,30 @@ void main_vp(
     float4 iPosition	        : POSITION,
     // OUT
     out float4 oPosition		: POSITION,
-    out float3 oPosition_       : TEXCOORD0,
+    out float3 vPosition        : TEXCOORD0,
     out float4 oUV    		    : TEXCOORD1,
     // UNIFORM
-    uniform float4x4 uWorld,
+    uniform float4x4 uWorldView,
     uniform float4x4 uWorldViewProj,
-    uniform float4x4 uTexViewProj)
+    uniform float4x4 uTexWorldViewProj)
 {
     oPosition   = mul(uWorldViewProj, iPosition);
-    float4 wPos = mul(uWorld, iPosition);
-    oPosition_  = wPos.xyz;
-    oUV         = mul(uTexViewProj, wPos);
+    vPosition   = mul(uWorldView, iPosition).xyz;
+    oUV         = mul(uTexWorldViewProj, iPosition);
 }
+
+ps_2_0 float convertDepth(float d) { return d; }
+arbfp1 float convertDepth(float d) { return d * 0.5 + 0.5; }
 
 void main_fp(
     // IN
-    float3 iPosition        : TEXCOORD0,
+    float3 vPosition        : TEXCOORD0,
     float4 iUV    		    : TEXCOORD1,
     // OUT
     out float4 oColor		: COLOR,
     // UNIFORM
-    uniform float     uAttenuation,
+    uniform float4     uAttenuation,
     uniform float3    uLightPosition,
-    uniform float     uLightFarClipDistance,
     uniform sampler2D uDepthMap  : register(s0),
     uniform sampler2D uCookieMap : register(s1),
     uniform sampler2D uNoiseMap	 : register(s2),
@@ -43,52 +44,20 @@ void main_fp(
 
     float Depth  = tex2D(uDepthMap,  iUV.xy).r;
 
-    if (Depth < saturate( length(iPosition-uLightPosition) / uLightFarClipDistance ))
+    if (Depth < convertDepth(iUV.z))
     {
         oColor = float4(0,0,0,1);
     }
     else
     {
         float4 Cookie = tex2D(uCookieMap, iUV.xy);
-        Time *= 0.0225;
         float2 Noise  = float2(tex2D(uNoiseMap,  iUV.xy - Time).r,
                                tex2D(uNoiseMap,  iUV.xy + Time).g);
 
         float noise  = Noise.x * Noise.y;
-        float length_ = length(iPosition-uLightPosition)/uLightFarClipDistance;
-        float atten  = 0.25 + 1/(length_*length_);
+        float length_ = length(uLightPosition - vPosition);
+        float atten  = 1.0 / (uAttenuation.y + uAttenuation.z*length_ + 20*uAttenuation.w*length_*length_);
 
-        oColor = float4(Cookie.rgb * Cookie.a * atten * uAttenuation * noise , 1);
+        oColor = float4(Cookie.rgb * Cookie.a * atten * noise , 1);
     }
-}
-
-// --------------------- Depth material ------------------------
-
-void main_vp_depth(
-    // IN
-    float4 iPosition	        : POSITION,
-    // OUT
-    out float4 oPosition		: POSITION,
-    out float3 oPosition_       : TEXCOORD0,
-    // UNIFORM
-    uniform float4x4 uWorld,
-    uniform float4x4 uWorldViewProj)
-{
-    oPosition   = mul(uWorldViewProj, iPosition);
-    float4 wPos = mul(uWorld, iPosition);
-    oPosition_  = wPos.xyz;
-}
-
-void main_fp_depth(
-    // IN
-    float3 iPosition        : TEXCOORD0,
-    // OUT
-    out float4 oColor		: COLOR,
-    // UNIFORM
-    uniform float3    uLightPosition,
-    uniform float     uLightFarClipDistance)
-{
-    float depth = saturate( length(iPosition-uLightPosition) / uLightFarClipDistance );
-
-    oColor = float4(depth, depth, depth, 1);
 }
