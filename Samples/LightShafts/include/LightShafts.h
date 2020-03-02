@@ -102,6 +102,19 @@ public:
 
     void setupContent(void)
     {
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        // Make this viewport work with shader generator scheme.
+        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        RTShader::ShaderGenerator& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
+        RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        RTShader::SubRenderState* subRenderState = rtShaderGen.createSubRenderState<RTShader::IntegratedPSSM3>();
+        schemRenderState->addTemplateSubRenderState(subRenderState);
+#endif
+        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+        mSceneMgr->setShadowTextureSettings(256, 1, PF_FLOAT32_R);
+        mSceneMgr->setShadowTextureSelfShadow( true );
+        mSceneMgr->setShadowTextureCasterMaterial(MaterialManager::getSingleton().getByName("PSSM/shadow_caster"));
+
         auto statusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 200, {"Help"});
         statusPanel->setParamValue("Help", "H / F1");
 
@@ -122,6 +135,9 @@ public:
         mLight0->setDiffuseColour(0.9, 0.9, 0.9);
         mLight0->setSpecularColour(1, 1, 1);
         mLight0->setSpotlightRange(Degree(17.5f), Degree(22.5f));
+        mLight0->setShadowNearClipDistance(8);
+        mLight0->setShadowFarClipDistance(48);
+        mLight0->setAttenuation(48, 1.0, 0, 0.001);
 
         mLightShaftsMat = MaterialManager::getSingleton().getByName("LightShafts");
 
@@ -141,7 +157,7 @@ public:
         mLightCameraSN->attachObject(mBillboardSet);
 
         // Creating a RRT for depth/shadow map
-        createLightCameraRTT();
+        createLightCameraRTT(mLight0);
 
         // Create a rush of billboards according to the frustum of the camera(mLightCamera)
         // After it, we can use the lightcamera/billboards scenenode like a light projector
@@ -197,22 +213,17 @@ public:
         return true;
     }
 
-    void createLightCameraRTT()
+    void createLightCameraRTT(Light* light)
     {
-        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
-        mSceneMgr->setShadowTextureSettings(256, 1, PF_BYTE_RGBA);
-        mSceneMgr->setShadowTextureCasterMaterial(MaterialManager::getSingleton().getByName("LightShaftsDepth"));
-
-        // Creat a texture for use as rtt
+        // Create a texture for use as rtt
         TexturePtr LightCameraRTT = mSceneMgr->getShadowTexture(0);
         RenderTarget* RT_Texture = LightCameraRTT->getBuffer()->getRenderTarget();
 
         Viewport* RT_Texture_Viewport = RT_Texture->getViewport(0);
         mLightCamera = RT_Texture_Viewport->getCamera();
 
-        // Not forget to set near+far distance in materials
-        mLightCamera->setNearClipDistance(8);
-        mLightCamera->setFarClipDistance(40);
+        mSceneMgr->getShadowCameraSetup()->getShadowCamera(mSceneMgr, mCamera, RT_Texture_Viewport, light, mLightCamera,
+                                                           0);
 
         mLightCamera->setDebugDisplayEnabled(true);
     }
