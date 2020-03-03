@@ -381,11 +381,7 @@ namespace Ogre {
         /**
         @deprecated use setLayerArrayNames()
          */
-        OGRE_DEPRECATED void setCubicTextureName( const String* const names, bool forUVW = false )
-        {
-            setLayerArrayNames(TEX_TYPE_CUBE_MAP,
-                               std::vector<String>(names, names + 6));
-        }
+        OGRE_DEPRECATED void setCubicTextureName( const String* const names, bool forUVW = false );
 
         /**
         @deprecated use setTexture()

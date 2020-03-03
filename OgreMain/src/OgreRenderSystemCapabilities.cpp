@@ -31,6 +31,28 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    String DriverVersion::toString() const
+    {
+        StringStream str;
+        str << major << "." << minor << "." << release << "." << build;
+        return str.str();
+    }
+
+    void  DriverVersion::fromString(const String& versionString)
+    {
+        StringVector tokens = StringUtil::split(versionString, ".");
+        if(!tokens.empty())
+        {
+            major = StringConverter::parseInt(tokens[0]);
+            if (tokens.size() > 1)
+                minor = StringConverter::parseInt(tokens[1]);
+            if (tokens.size() > 2)
+                release = StringConverter::parseInt(tokens[2]);
+            if (tokens.size() > 3)
+                build = StringConverter::parseInt(tokens[3]);
+        }
+    }
+
     //-----------------------------------------------------------------------
     RenderSystemCapabilities::RenderSystemCapabilities()
         : mVendor(GPU_UNKNOWN)
@@ -53,6 +75,18 @@ namespace Ogre {
         // each rendersystem should enable these
         mCategoryRelevant[CAPS_CATEGORY_D3D9] = false;
         mCategoryRelevant[CAPS_CATEGORY_GL] = false;
+    }
+
+    void RenderSystemCapabilities::addShaderProfile(const String& profile) { mSupportedShaderProfiles.insert(profile); }
+
+    void RenderSystemCapabilities::removeShaderProfile(const String& profile)
+    {
+        mSupportedShaderProfiles.erase(profile);
+    }
+
+    bool RenderSystemCapabilities::isShaderProfileSupported(const String& profile) const
+    {
+        return (mSupportedShaderProfiles.end() != mSupportedShaderProfiles.find(profile));
     }
 
     //-----------------------------------------------------------------------

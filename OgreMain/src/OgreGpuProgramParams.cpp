@@ -188,6 +188,12 @@ namespace Ogre
 
     bool GpuNamedConstants::msGenerateAllConstantDefinitionArrayEntries = false;
 
+    GpuNamedConstants::GpuNamedConstants() : floatBufferSize(0), doubleBufferSize(0), intBufferSize(0) {}
+    GpuNamedConstants::~GpuNamedConstants() {}
+
+    GpuLogicalBufferStruct::GpuLogicalBufferStruct() : bufferSize(0) {}
+    GpuLogicalBufferStruct::~GpuLogicalBufferStruct() {}
+
     //---------------------------------------------------------------------
     void GpuNamedConstants::generateConstantDefinitionArrayEntries(
         const String& paramName, const GpuConstantDefinition& baseDef)
@@ -919,6 +925,8 @@ namespace Ogre
         , mActivePassIterationIndex(std::numeric_limits<size_t>::max())
     {
     }
+    GpuProgramParameters::~GpuProgramParameters() {}
+
     //-----------------------------------------------------------------------------
 
     GpuProgramParameters::GpuProgramParameters(const GpuProgramParameters& oth)

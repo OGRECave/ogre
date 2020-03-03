@@ -231,28 +231,8 @@ namespace Ogre
             major = minor = release = build = 0;
         }
 
-        String toString() const 
-        {
-            StringStream str;
-            str << major << "." << minor << "." << release << "." << build;
-            return str.str();
-        }
-
-        void fromString(const String& versionString)
-        {
-            StringVector tokens = StringUtil::split(versionString, ".");
-            if(!tokens.empty())
-            {
-                major = StringConverter::parseInt(tokens[0]);
-                if (tokens.size() > 1)
-                    minor = StringConverter::parseInt(tokens[1]);
-                if (tokens.size() > 2)
-                    release = StringConverter::parseInt(tokens[2]);
-                if (tokens.size() > 3)
-                    build = StringConverter::parseInt(tokens[3]);
-            }
-
-        }
+        String toString() const;
+        void fromString(const String& versionString);
     };
 
     /** Enumeration of GPU vendors. */
@@ -550,26 +530,15 @@ namespace Ogre
 
         /** Adds the profile to the list of supported profiles
         */
-        void addShaderProfile(const String& profile)
-        {
-            mSupportedShaderProfiles.insert(profile);
-
-        }
+        void addShaderProfile(const String& profile);
 
         /** Remove a given shader profile, if present.
         */
-        void removeShaderProfile(const String& profile)
-        {
-            mSupportedShaderProfiles.erase(profile);
-        }
+        void removeShaderProfile(const String& profile);
 
         /** Returns true if profile is in the list of supported profiles
         */
-        bool isShaderProfileSupported(const String& profile) const
-        {
-            return (mSupportedShaderProfiles.end() != mSupportedShaderProfiles.find(profile));
-        }
-
+        bool isShaderProfileSupported(const String& profile) const;
 
         /** Returns a set of all supported shader profiles
         * */

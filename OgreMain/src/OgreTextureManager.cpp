@@ -56,6 +56,27 @@ namespace Ogre {
         // subclasses should unregister with resource group manager
 
     }
+    SamplerPtr TextureManager::createSampler(const String& name)
+    {
+        SamplerPtr ret = _createSamplerImpl();
+        if(!name.empty())
+        {
+            OgreAssert(mNamedSamplers.find(name) == mNamedSamplers.end(),
+                       ("Sampler '" + name + "' already exists").c_str());
+            mNamedSamplers[name] = ret;
+        }
+        return ret;
+    }
+
+    /// retrieve an named sampler
+    const SamplerPtr& TextureManager::getSampler(const String& name) const
+    {
+        static SamplerPtr nullPtr;
+        auto it = mNamedSamplers.find(name);
+        if(it == mNamedSamplers.end())
+            return nullPtr;
+        return it->second;
+    }
     //-----------------------------------------------------------------------
     TexturePtr TextureManager::getByName(const String& name, const String& groupName)
     {

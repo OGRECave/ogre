@@ -410,6 +410,11 @@ namespace Ogre {
         }
     }
 
+    void TextureUnitState::setCubicTextureName(const String* const names, bool forUVW)
+    {
+        setLayerArrayNames(TEX_TYPE_CUBE_MAP, std::vector<String>(names, names + 6));
+    }
+
     //-----------------------------------------------------------------------
     void TextureUnitState::setAnimatedTextureName( const String& name, size_t numFrames, Real duration)
     {

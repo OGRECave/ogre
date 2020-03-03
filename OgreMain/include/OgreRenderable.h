@@ -229,47 +229,25 @@ namespace Ogre {
             two is performed by the ACT_CUSTOM entry, if that is used.
         @param value The value to associate.
         */
-        void setCustomParameter(size_t index, const Vector4& value) 
-        {
-            mCustomParameters[index] = value;
-        }
+        void setCustomParameter(size_t index, const Vector4& value);
 
         /** Removes a custom value which is associated with this Renderable at the given index.
         @param index Index of the parameter to remove.
             @see setCustomParameter for full details.
         */
-        void removeCustomParameter(size_t index)
-        {
-            mCustomParameters.erase(index);
-        }
+        void removeCustomParameter(size_t index);
 
         /** Checks whether a custom value is associated with this Renderable at the given index.
         @param index Index of the parameter to check for existence.
             @see setCustomParameter for full details.
         */
-        bool hasCustomParameter(size_t index) const
-        {
-            return mCustomParameters.find(index) != mCustomParameters.end();
-        }
+        bool hasCustomParameter(size_t index) const;
 
         /** Gets the custom value associated with this Renderable at the given index.
         @param index Index of the parameter to retrieve.
             @see setCustomParameter for full details.
         */
-        const Vector4& getCustomParameter(size_t index) const
-        {
-            CustomParameterMap::const_iterator i = mCustomParameters.find(index);
-            if (i != mCustomParameters.end())
-            {
-                return i->second;
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                    "Parameter at the given index was not found.",
-                    "Renderable::getCustomParameter");
-            }
-        }
+        const Vector4& getCustomParameter(size_t index) const;
 
         /** Update a custom GpuProgramParameters constant which is derived from 
             information only this Renderable knows.
@@ -295,17 +273,8 @@ namespace Ogre {
         @param params The parameters object which this method should call to 
             set the updated parameters.
         */
-        virtual void _updateCustomGpuParameter(
-            const GpuProgramParameters::AutoConstantEntry& constantEntry,
-            GpuProgramParameters* params) const
-        {
-            CustomParameterMap::const_iterator i = mCustomParameters.find(constantEntry.data);
-            if (i != mCustomParameters.end())
-            {
-                params->_writeRawConstant(constantEntry.physicalIndex, i->second, 
-                    constantEntry.elementCount);
-            }
-        }
+        virtual void _updateCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry,
+                                               GpuProgramParameters* params) const;
 
         /** Sets whether this renderable's chosen detail level can be
             overridden (downgraded) by the camera setting. 
