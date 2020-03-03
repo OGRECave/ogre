@@ -318,7 +318,8 @@ namespace Ogre {
         /// Map of parameter names to GpuConstantDefinition
         GpuConstantDefinitionMap map;
 
-        GpuNamedConstants() : floatBufferSize(0), doubleBufferSize(0), intBufferSize(0) {}
+        GpuNamedConstants();
+        ~GpuNamedConstants();
 
         /// @deprecated obsolete
         OGRE_DEPRECATED void generateConstantDefinitionArrayEntries(const String& paramName,
@@ -385,7 +386,8 @@ namespace Ogre {
         GpuLogicalIndexUseMap map;
         /// Shortcut to know the buffer size needs
         size_t bufferSize;
-    GpuLogicalBufferStruct() : bufferSize(0) {}
+        GpuLogicalBufferStruct();
+        ~GpuLogicalBufferStruct();
     };
 
     /** Definition of container that holds the current float constants.
@@ -1365,7 +1367,7 @@ namespace Ogre {
 
     public:
         GpuProgramParameters();
-        ~GpuProgramParameters() {}
+        ~GpuProgramParameters();
 
         /// Copy constructor
         GpuProgramParameters(const GpuProgramParameters& oth);

@@ -246,35 +246,10 @@ namespace Ogre {
         /** Internal method for creating a dictionary of animable value names 
             for the class, if it does not already exist.
         */
-        void createAnimableDictionary(void) const
-        {
-            if (msAnimableDictionary.find(getAnimableDictionaryName()) 
-                == msAnimableDictionary.end())
-            {
-                StringVector vec;
-                initialiseAnimableDictionary(vec);
-                msAnimableDictionary[getAnimableDictionaryName()] = vec;
-            }
-
-        }
+        void createAnimableDictionary(void) const;
     
         /// Get an updateable reference to animable value list
-        StringVector& _getAnimableValueNames(void)
-        {
-            AnimableDictionaryMap::iterator i = 
-                msAnimableDictionary.find(getAnimableDictionaryName());
-            if (i != msAnimableDictionary.end())
-            {
-                return i->second;
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                    "Animable value list not found for " + getAnimableDictionaryName(), 
-                    "AnimableObject::getAnimableValueNames");
-            }
-
-        }
+        StringVector& _getAnimableValueNames(void);
 
         /** Internal method for initialising dictionary; should be implemented by 
             subclasses wanting to expose animable parameters.
@@ -287,24 +262,7 @@ namespace Ogre {
         virtual ~AnimableObject() {}
 
         /** Gets a list of animable value names for this object. */
-        const StringVector& getAnimableValueNames(void) const
-        {
-            createAnimableDictionary();
-
-            AnimableDictionaryMap::iterator i = 
-                msAnimableDictionary.find(getAnimableDictionaryName());
-            if (i != msAnimableDictionary.end())
-            {
-                return i->second;
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                    "Animable value list not found for " + getAnimableDictionaryName(), 
-                    "AnimableObject::getAnimableValueNames");
-            }
-
-        }
+        const StringVector& getAnimableValueNames(void) const;
 
         /** Create a reference-counted AnimableValuePtr for the named value.
         @remarks

@@ -298,10 +298,7 @@ namespace Ogre {
          * @param targetAnimationState
          * @param addTime if true, increment time instead of setting to an absolute position
          */
-        static ControllerValueRealPtr create(AnimationState* targetAnimationState, bool addTime = false)
-        {
-            return std::make_shared<AnimationStateControllerValue>(targetAnimationState, addTime);
-        }
+        static ControllerValueRealPtr create(AnimationState* targetAnimationState, bool addTime = false);
 
         /** ControllerValue implementation. */
         Real getValue(void) const

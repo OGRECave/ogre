@@ -94,17 +94,9 @@ namespace Ogre {
         /** Copy constructor. Performs a copy of all stored UserAny. */
         UserObjectBindings(const UserObjectBindings& other);
 
-        UserObjectBindings& swap(UserObjectBindings& rhs)
-        {
-            std::swap(mAttributes, rhs.mAttributes);
-            return *this;
-        }
+        UserObjectBindings& swap(UserObjectBindings& rhs);
 
-        UserObjectBindings& operator=(const UserObjectBindings& rhs)
-        {
-            UserObjectBindings(rhs).swap(*this);
-            return *this;
-        }
+        UserObjectBindings& operator=(const UserObjectBindings& rhs);
 
     // Types.
     protected:

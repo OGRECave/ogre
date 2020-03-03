@@ -65,27 +65,10 @@ namespace Ogre {
         virtual ~TextureManager();
 
         /// create a new sampler
-        SamplerPtr createSampler(const String& name = BLANKSTRING)
-        {
-            SamplerPtr ret = _createSamplerImpl();
-            if(!name.empty())
-            {
-                OgreAssert(mNamedSamplers.find(name) == mNamedSamplers.end(),
-                           ("Sampler '" + name + "' already exists").c_str());
-                mNamedSamplers[name] = ret;
-            }
-            return ret;
-        }
+        SamplerPtr createSampler(const String& name = BLANKSTRING);
 
         /// retrieve an named sampler
-        const SamplerPtr& getSampler(const String& name) const
-        {
-            static SamplerPtr nullPtr;
-            auto it = mNamedSamplers.find(name);
-            if(it == mNamedSamplers.end())
-                return nullPtr;
-            return it->second;
-        }
+        const SamplerPtr& getSampler(const String& name) const;
 
         /// Create a new texture
         /// @copydetails ResourceManager::createResource

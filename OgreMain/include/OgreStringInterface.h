@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
-#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -96,44 +95,18 @@ namespace Ogre {
         ParamCommandMap mParamCommands;
 
         /** Retrieves the parameter command object for a named parameter. */
-        ParamCommand* getParamCommand(const String& name)
-        {
-            ParamCommandMap::iterator i = mParamCommands.find(name);
-            if (i != mParamCommands.end())
-            {
-                return i->second;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-        const ParamCommand* getParamCommand(const String& name) const
-        {
-            ParamCommandMap::const_iterator i = mParamCommands.find(name);
-            if (i != mParamCommands.end())
-            {
-                return i->second;
-            }
-            else
-            {
-                return 0;
-            }
-        }
+        ParamCommand* getParamCommand(const String& name);
+        const ParamCommand* getParamCommand(const String& name) const;
     public:
-        ParamDictionary()  {}
+        ParamDictionary();
+        ~ParamDictionary();
         /** Method for adding a parameter definition for this class. 
         @param paramDef A ParameterDef object defining the parameter
         @param paramCmd Pointer to a ParamCommand subclass to handle the getting / setting of this parameter.
             NB this class will not destroy this on shutdown, please ensure you do
 
         */
-        void addParameter(const ParameterDef& paramDef, ParamCommand* paramCmd)
-        {
-            mParamDefs.push_back(paramDef);
-            mParamCommands[paramDef.name] = paramCmd;
-        }
+        void addParameter(const ParameterDef& paramDef, ParamCommand* paramCmd);
         /** Retrieves a list of parameters valid for this object. 
         @return
             A reference to a static list of ParameterDef objects.
@@ -143,9 +116,6 @@ namespace Ogre {
         {
             return mParamDefs;
         }
-
-
-
     };
     typedef std::map<String, ParamDictionary> ParamDictionaryMap;
     
@@ -161,11 +131,6 @@ namespace Ogre {
     class _OgreExport StringInterface 
     {
     private:
-        OGRE_STATIC_MUTEX( msDictionaryMutex );
-
-        /// Dictionary of parameters
-        static ParamDictionaryMap msDictionary;
-
         /// Class name for this instance to be used as a lookup (must be initialised by subclasses)
         String mParamDictName;
         ParamDictionary* mParamDict;
@@ -181,25 +146,7 @@ namespace Ogre {
         @return
             true if a new dictionary was created, false if it was already there
         */
-        bool createParamDictionary(const String& className)
-        {
-            OGRE_LOCK_MUTEX( msDictionaryMutex );
-
-            ParamDictionaryMap::iterator it = msDictionary.find(className);
-
-            if ( it == msDictionary.end() )
-            {
-                mParamDict = &msDictionary.insert( std::make_pair( className, ParamDictionary() ) ).first->second;
-                mParamDictName = className;
-                return true;
-            }
-            else
-            {
-                mParamDict = &it->second;
-                mParamDictName = className;
-                return false;
-            }
-        }
+        bool createParamDictionary(const String& className);
 
     public:
         StringInterface() : mParamDict(NULL) { }
@@ -267,25 +214,7 @@ namespace Ogre {
         @return
             String value of parameter, blank if not found
         */
-        String getParameter(const String& name) const
-        {
-            // Get dictionary
-            const ParamDictionary* dict = getParamDictionary();
-
-            if (dict)
-            {
-                // Look up command object
-                const ParamCommand* cmd = dict->getParamCommand(name);
-
-                if (cmd)
-                {
-                    return cmd->doGet(this);
-                }
-            }
-
-            // Fallback
-            return "";
-        }
+        String getParameter(const String& name) const;
         /** Method for copying this object's parameters to another object.
         @remarks
             This method takes the values of all the object's parameters and tries to set the
@@ -298,26 +227,7 @@ namespace Ogre {
         @param dest Pointer to object to have it's parameters set the same as this object.
 
         */
-        void copyParametersTo(StringInterface* dest) const
-        {
-            // Get dictionary
-            const ParamDictionary* dict = getParamDictionary();
-
-            if (dict)
-            {
-                // Iterate through own parameters
-                ParameterList::const_iterator i;
-            
-                for (i = dict->mParamDefs.begin(); 
-                i != dict->mParamDefs.end(); ++i)
-                {
-                    dest->setParameter(i->name, getParameter(i->name));
-                }
-            }
-
-
-        }
-
+        void copyParametersTo(StringInterface* dest) const;
         /** Cleans up the static 'msDictionary' required to reset Ogre,
         otherwise the containers are left with invalid pointers, which will lead to a crash
         as soon as one of the ResourceManager implementers (e.g. MaterialManager) initializes.*/

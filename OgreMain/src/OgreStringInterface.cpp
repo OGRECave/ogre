@@ -26,11 +26,67 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
+#include "Threading/OgreThreadHeaders.h"
 
 namespace Ogre {
-    OGRE_STATIC_MUTEX_INSTANCE( StringInterface::msDictionaryMutex );
-    ParamDictionaryMap StringInterface::msDictionary;
+    OGRE_STATIC_MUTEX( msDictionaryMutex );
+    /// Dictionary of parameters
+    static ParamDictionaryMap msDictionary;
 
+    ParamDictionary::ParamDictionary() {}
+    ParamDictionary::~ParamDictionary() {}
+
+    ParamCommand* ParamDictionary::getParamCommand(const String& name)
+    {
+        ParamCommandMap::iterator i = mParamCommands.find(name);
+        if (i != mParamCommands.end())
+        {
+            return i->second;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    const ParamCommand* ParamDictionary::getParamCommand(const String& name) const
+    {
+        ParamCommandMap::const_iterator i = mParamCommands.find(name);
+        if (i != mParamCommands.end())
+        {
+            return i->second;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    void ParamDictionary::addParameter(const ParameterDef& paramDef, ParamCommand* paramCmd)
+    {
+        mParamDefs.push_back(paramDef);
+        mParamCommands[paramDef.name] = paramCmd;
+    }
+
+    bool StringInterface::createParamDictionary(const String& className)
+    {
+        OGRE_LOCK_MUTEX( msDictionaryMutex );
+
+        ParamDictionaryMap::iterator it = msDictionary.find(className);
+
+        if ( it == msDictionary.end() )
+        {
+            mParamDict = &msDictionary.insert( std::make_pair( className, ParamDictionary() ) ).first->second;
+            mParamDictName = className;
+            return true;
+        }
+        else
+        {
+            mParamDict = &it->second;
+            mParamDictName = className;
+            return false;
+        }
+    }
 
     const ParameterList& StringInterface::getParameters(void) const
     {
@@ -42,6 +98,26 @@ namespace Ogre {
         else
             return emptyList;
 
+    }
+
+    String StringInterface::getParameter(const String& name) const
+    {
+        // Get dictionary
+        const ParamDictionary* dict = getParamDictionary();
+
+        if (dict)
+        {
+            // Look up command object
+            const ParamCommand* cmd = dict->getParamCommand(name);
+
+            if (cmd)
+            {
+                return cmd->doGet(this);
+            }
+        }
+
+        // Fallback
+        return "";
     }
 
     bool StringInterface::setParameter(const String& name, const String& value)
@@ -72,6 +148,25 @@ namespace Ogre {
             setParameter(i->first, i->second);
         }
     }
+
+    void StringInterface::copyParametersTo(StringInterface* dest) const
+    {
+        // Get dictionary
+        const ParamDictionary* dict = getParamDictionary();
+
+        if (dict)
+        {
+            // Iterate through own parameters
+            ParameterList::const_iterator i;
+
+            for (i = dict->mParamDefs.begin();
+            i != dict->mParamDefs.end(); ++i)
+            {
+                dest->setParameter(i->name, getParameter(i->name));
+            }
+        }
+    }
+
     //-----------------------------------------------------------------------
     void StringInterface::cleanupDictionary ()
     {
