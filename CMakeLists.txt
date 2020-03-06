@@ -32,6 +32,14 @@ if(WIN32)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
+# use legacy swig mode
+if(POLICY CMP0078)
+  cmake_policy(SET CMP0078 OLD)
+endif()
+if(POLICY CMP0086)
+  cmake_policy(SET CMP0086 OLD)
+endif()
+
 if (APPLE AND NOT ANDROID)
   SET(CMAKE_SIZEOF_VOID_P 4)
   set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
