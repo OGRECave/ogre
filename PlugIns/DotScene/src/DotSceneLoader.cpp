@@ -1,9 +1,12 @@
 #include <Ogre.h>
-#include <OgreTerrain.h>
-#include <OgreTerrainGroup.h>
 #include <OgreDotSceneLoader.h>
 #include <OgreSceneLoaderManager.h>
 #include <OgreComponents.h>
+
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+#include <OgreTerrain.h>
+#include <OgreTerrainGroup.h>
+#endif
 
 #include <pugixml.hpp>
 
@@ -122,7 +125,7 @@ void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneN
     auto result = XMLDoc.load_buffer(stream->getAsString().c_str(), stream->size());
     if (!result)
     {
-        LogManager::getSingleton().stream(LML_CRITICAL) << "[DotSceneLoader] " << result.description();
+        LogManager::getSingleton().logError("DotSceneLoader - " + String(result.description()));
         return;
     }
 
@@ -132,7 +135,7 @@ void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneN
     // Validate the File
     if (!XMLRoot.attribute("formatVersion"))
     {
-        LogManager::getSingleton().logError("[DotSceneLoader] Invalid .scene File. Missing <scene formatVersion='x.y' >");
+        LogManager::getSingleton().logError("DotSceneLoader - Invalid .scene File. Missing <scene formatVersion='x.y' >");
         return;
     }
 
@@ -518,9 +521,9 @@ void DotSceneLoader::processLookTarget(pugi::xml_node& XMLNode, SceneNode* pPare
 
         pParent->lookAt(position, relativeTo, localDirection);
     }
-    catch (Exception& /*e*/)
+    catch (const Exception& e)
     {
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a look target!");
+        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
     }
 }
 
@@ -545,9 +548,9 @@ void DotSceneLoader::processTrackTarget(pugi::xml_node& XMLNode, SceneNode* pPar
         SceneNode* pTrackNode = mSceneMgr->getSceneNode(nodeName);
         pParent->setAutoTracking(true, pTrackNode, localDirection, offset);
     }
-    catch (Exception& /*e*/)
+    catch (const Exception& e)
     {
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Error processing a track target!");
+        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
     }
 }
 
@@ -569,9 +572,10 @@ void DotSceneLoader::processEntity(pugi::xml_node& XMLNode, SceneNode* pParent)
         if (auto material = XMLNode.attribute("material"))
             pEntity->setMaterialName(material.value());
     }
-    catch (Exception& /*e*/)
+    catch (const Exception& e)
     {
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Error loading an entity!", LML_CRITICAL);
+        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
+        return;
     }
 
     // Process userDataReference (?)
@@ -594,9 +598,9 @@ void DotSceneLoader::processParticleSystem(pugi::xml_node& XMLNode, SceneNode* p
         ParticleSystem* pParticles = mSceneMgr->createParticleSystem(name, templateName);
         pParent->attachObject(pParticles);
     }
-    catch (Exception& /*e*/)
+    catch (const Exception& e)
     {
-        LogManager::getSingleton().logMessage("[DotSceneLoader] Error creating a particle system!");
+        LogManager::getSingleton().logError("DotSceneLoader - " + e.getDescription());
     }
 }
 
