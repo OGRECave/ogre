@@ -322,6 +322,7 @@ namespace Ogre {
         // Make active
         setHidden(hidden);
 		mActive = true;
+        mVisible = true;
         mClosed = false;
         mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
         mWidth = _getPixelFromPoint(widthPt);
