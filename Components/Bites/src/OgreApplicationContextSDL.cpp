@@ -94,7 +94,12 @@ void ApplicationContextSDL::setWindowGrab(NativeWindowType* win, bool _grab)
     SDL_bool grab = SDL_bool(_grab);
 
     SDL_SetWindowGrab(win, grab);
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
+    // osx workaround: mouse motion events are gone otherwise
     SDL_SetRelativeMouseMode(grab);
+#else
+    SDL_ShowCursor(!grab);
+#endif
 }
 
 void ApplicationContextSDL::shutdown()
