@@ -141,15 +141,6 @@ void ApplicationContextSDL::pollEvents()
             break;
         }
     }
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    // hacky workaround for black window on OSX
-    for(const auto& win : mWindows)
-    {
-        SDL_SetWindowSize(win.native, win.render->getWidth(), win.render->getHeight());
-        win.render->windowMovedOrResized();
-    }
-#endif
 }
 
 }
