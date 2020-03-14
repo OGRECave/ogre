@@ -365,6 +365,7 @@ namespace Ogre {
                     "#define texture3D texture\n"
                     "#define textureCube texture\n"
                     "#define texture2DLod textureLod\n"
+                    "#define texture2DProj textureProj\n"
                     "#define textureCubeLod textureLod\n"
                     "#define shadow2DProj textureProj\n"
                     "#define gl_FragColor FragColor\n"
@@ -372,7 +373,8 @@ namespace Ogre {
             const char* prefixVp =
                     "#version 150\n"
                     "#define attribute in\n"
-                    "#define varying out\n";
+                    "#define varying out\n"
+                    "#define texture2D texture\n";
 
             mSource.insert(0, mType == GPT_FRAGMENT_PROGRAM ? prefixFp : prefixVp);
         }
