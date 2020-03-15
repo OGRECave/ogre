@@ -195,6 +195,11 @@ if (APPLE)
     endif(OGRE_SDK_BUILD)
   else()
 
+    set_target_properties(SampleBrowser
+      PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+      INSTALL_NAME_DIR "@executable_path/../Frameworks"
+    )
+
     include_directories(
         ${PROJECT_SOURCE_DIR}/RenderSystems/GL/include
         ${PROJECT_SOURCE_DIR}/RenderSystems/GL/include/OSX
