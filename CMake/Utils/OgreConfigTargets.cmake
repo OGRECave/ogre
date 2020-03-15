@@ -248,7 +248,7 @@ function(ogre_config_framework LIBNAME)
       # Set the INSTALL_PATH so that frameworks can be installed in the application package
       set_target_properties(${LIBNAME}
          PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-         INSTALL_NAME_DIR "@executable_path/../Frameworks"
+         INSTALL_NAME_DIR "@rpath"
       )
       set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES};${PLATFORM_HEADERS};" )
       set_target_properties(${LIBNAME} PROPERTIES RESOURCE "${RESOURCE_FILES}")
