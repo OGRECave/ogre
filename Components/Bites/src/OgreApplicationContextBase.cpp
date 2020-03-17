@@ -331,6 +331,15 @@ void ApplicationContextBase::_destroyWindow(const NativeWindowPair& win)
 
 void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t windowID) const
 {
+    Event scaled = event;
+    if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE && event.type == MOUSEMOTION)
+    {
+        // assumes all windows have the same scale
+        float viewScale = getRenderWindow()->getViewPointToPixelScale();
+        scaled.motion.x *= viewScale;
+        scaled.motion.y *= viewScale;
+    }
+
     for(InputListenerList::iterator it = mInputListeners.begin();
             it != mInputListeners.end(); ++it)
     {
@@ -356,7 +365,7 @@ void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t window
             l.mouseWheelRolled(event.wheel);
             break;
         case MOUSEMOTION:
-            l.mouseMoved(event.motion);
+            l.mouseMoved(scaled.motion);
             break;
         case FINGERDOWN:
             // for finger down we have to move the pointer first
