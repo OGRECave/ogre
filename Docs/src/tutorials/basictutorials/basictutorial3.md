@@ -23,29 +23,29 @@ This separation is used for LOD (Level of Detail) rendering. LOD rendering reduc
 ## Setting Up the Camera
 Let's first set up our Camera. Add the following to the beginning of `setup`:
 
-@snippet Samples/Terrain/include/Terrain.h camera_setup
+@snippet Samples/Simple/include/Terrain.h camera_setup
 
 This should look familiar from the previous tutorial.
 
-@snippet Samples/Terrain/include/Terrain.h camera_inf
+@snippet Samples/Simple/include/Terrain.h camera_inf
 
 The last thing we do is check to see if our current render system has the capability to handle an infinite far clip distance. If it does, then we set the far clip distance to zero (which means ''no'' far clipping).
 ## Setting Up a Light for Our Terrain
 The Terrain component can use a directional light to compute a lightmap. Let's add a Light for this purpose and add some ambient light to the scene while we're at it.
 
-@snippet Samples/Terrain/include/Terrain.h light
+@snippet Samples/Simple/include/Terrain.h light
 
 This was also covered in the previous tutorial if you're confused by any of it. The `normalise` method will make the vector's length equal to one while maintaining its direction. This is something that you will see a lot of when working with vectors. It is done to avoid extra factors showing up in calculations.
 ## Terrain loading overview {#bt3Overview}
 Now we'll get into the actual terrain setup. First, we create TerrainGlobalOptions.
 
-@snippet Samples/Terrain/include/Terrain.h global_opts
+@snippet Samples/Simple/include/Terrain.h global_opts
 
 This is a class that holds information for all of the terrains we might create - that is why they are called ''global'' options. It also provides a few getters and setters. There are also local options for each TerrainGroup that we will see later in this tutorial.
 
 Next we construct our TerrainGroup object. This will manage a grid of Terrains.
 
-@snippet Samples/Terrain/include/Terrain.h terrain_create
+@snippet Samples/Simple/include/Terrain.h terrain_create
 
 The TerrainGroup constructor takes the SceneManager as its first parameter. It then takes an alignment option, terrain size, and terrain world size. You can read the Ogre::TerrainGroup for more information. The `setFilenameConvention` allows us to choose how our terrain will be saved. Finally, we set the origin to be used for our terrain.
 
@@ -55,13 +55,13 @@ configureTerrainDefaults(light);
 ```
 The next thing we do is define our terrains and ask the TerrainGroup to load them all.
 
-@snippet Samples/Terrain/include/Terrain.h define_loop
+@snippet Samples/Simple/include/Terrain.h define_loop
 
 We are only using a single terrain, so the method will only be called once. The for loops are just for demonstration in our case. Again, we will fill in the `defineTerrain` method soon.
 
 We will now initialize the blend maps for our terrain.
 
-@snippet Samples/Terrain/include/Terrain.h init_blend
+@snippet Samples/Simple/include/Terrain.h init_blend
 
 We get a TerrainIterator from our TerrainGroup and then loop through any Terrain elements and initialize their blend maps - `initBlendMaps` will also be written soon. The `mTerrainsImported` variable will be set during the `configureTerrainDefaults` function when we complete it.
 
@@ -71,26 +71,26 @@ That completes our `createScene` method. Now we just have to complete all of the
 ## Terrain appearance {#bt3Appearance}
 The Ogre Terrain component has a large number of options that can be set to change how the terrain is rendered. To start out, we configure the level of detail as:
 
-@snippet Samples/Terrain/include/Terrain.h configure_lod
+@snippet Samples/Simple/include/Terrain.h configure_lod
 
 We are setting two global options here. The first call sets the largest error in pixels allowed between our ideal terrain and the mesh that is created to render it. A smaller number will mean a more accurate terrain, because it will require more vertices to reduce the error. The second call determines the distance at which Ogre will still apply our lightmap. If you increase this, then you will see Ogre apply lighting effects out to a farther distance.
 
 The next thing we'll do is pass our lighting information to our terrain.
 
-@snippet Samples/Terrain/include/Terrain.h composite_lighting
+@snippet Samples/Simple/include/Terrain.h composite_lighting
 
 In the first call, we are sure to call `getDerivedDirection`, because this will apply any transforms that are applied to our Light's direction by any SceneNode it may be attached to. Since our Light is attached to the root Node, this will be the same as calling `getDirection`, but the difference is important to know about. The next two calls should be pretty self-explanatory. We simply set the ambient light and diffuse color for our terrain to match our scene lighting.
 
 The next thing we do is get a reference to the import settings of our TerrainGroup and set some basic values.
 
-@snippet Samples/Terrain/include/Terrain.h import_settings
+@snippet Samples/Simple/include/Terrain.h import_settings
 
 We are not going to cover the exact meaning of these options in this tutorial, but you may have noticed that `terrainSize` and `worldSize` are set to match the global options we set in `createScene`. The `inputScale` determines how the heightmap image will be scaled up for the scene. We are using a somewhat large scale because our heightmap image has limited precision. You can use floating point raw heightmaps to avoid applying any input scaling, but these images usually require some data compression.
 
 The last step is adding the textures our terrain will use. First, we resize the list to hold three textures.
 After that, we set each texture's `worldSize` and add them to the list.
 
-@snippet Samples/Terrain/include/Terrain.h textures
+@snippet Samples/Simple/include/Terrain.h textures
 
 The texture's `worldSize` determines how big each splat of texture is going to be when applied to the terrain. A smaller value will increase the resolution of the rendered texture layer because each piece will be stretched less to fill in the terrain.
 
@@ -101,25 +101,25 @@ The default material generator requires two textures maps per layer:
 It is recommended that you pre-merge your textures accordingly e.g. using [ImageMagick](https://imagemagick.org/). This way you save storage space and speed up loading.
 However if you want more flexibility, you can also make %Ogre combine the images at loading accordingly as shown below
 
-@snippet Samples/Terrain/include/Terrain.h tex_from_src
+@snippet Samples/Simple/include/Terrain.h tex_from_src
 
 ## Defining a terrain chunk {#bt3TerrainChunk}
 Now we will tackle our `defineTerrain` method. The first thing we do is ask the TerrainGroup to define a unique filename for this Terrain.
 If it has already been generated, then we can call `TerrainGroup::defineTerrain` method to set up this grid location with the previously generated filename automatically. If it has not been generated, then we generate an image with `getTerrainImage` and then call a different overload of `TerrainGroup::defineTerrain` that takes a reference to our generated image. Finally, we set the `mTerrainsImported` flag to true.
 
-@snippet Samples/Terrain/include/Terrain.h define
+@snippet Samples/Simple/include/Terrain.h define
 
 You might have to look at this method for a little while to fully understand it. Make sure you notice that there are ''three'' different `defineTerrain` methods in use. One of them from TutorialApplication and two of them from TerrainGroup.
 ## Loading a heightmap {#bt3Heightmap}
 We need to write the helper function that was used by `defineTerrain` in the last step. This will load our `terrain.png` heightmap. Make sure it has been added to one of your resource loading paths. It is also included in the Ogre Samples directory.
 
-@snippet Samples/Terrain/include/Terrain.h heightmap
+@snippet Samples/Simple/include/Terrain.h heightmap
 
 Flipping is used to create seamless terrain so that unlimited terrain can be created using a single heightmap. If your terrain's heightmap is already seamless, then you don't need to use this trick. In our case, the flipping code is also useless, because we are using a 1x1 TerrainGroup. Flipping a 1x1 tile doesn't change anything. It is just for demonstration.
 ## Height based blending {#bt3Blendmap}
 Finally, we will finish up our configuration methods by completing the `initBlendMaps` method. This method will blend together the different layers we defined in `configureTerrainDefaults`. For now, you should pretty much view this method as a magic. The details will not be covered in this tutorial. Basically, the method blends the textures based on the height of the terrain at that point. This is not the only way of doing blending. It's a complicated topic and sits right at the verge between Ogre and the things it tries to abstract away.
 
-@snippet Samples/Terrain/include/Terrain.h blendmap
+@snippet Samples/Simple/include/Terrain.h blendmap
 
 ## Terrain Loading Label {#bt3LoadingLabel}
 
@@ -127,17 +127,17 @@ There are a number of things we will improve. We will add a label to the overlay
 
 First, we need to add a data member to private section of our Sample_Terrain header.
 
-@snippet Samples/Terrain/include/Terrain.h infolabel
+@snippet Samples/Simple/include/Terrain.h infolabel
 
 Let's construct this label in the `createFrameListener` method.
 
-@snippet Samples/Terrain/include/Terrain.h infolabel_create
+@snippet Samples/Simple/include/Terrain.h infolabel_create
 
 We use the TrayManager pointer that was defined in SdkSample to request the creation of a new label. This method takes a TrayLocation, a name for the label, a caption to display, and a width.
 
 Next we will add logic to `frameRenderingQueued` that tracks whether the terrain is still loading or not. We will also take care of saving our terrain after it has been loaded. Add the following to `frameRenderingQueued` right after the call to the parent method:
 
-@snippet Samples/Terrain/include/Terrain.h loading_label
+@snippet Samples/Simple/include/Terrain.h loading_label
 
 The first thing we do is determine if our terrain is still being built. If it is, then we add our Label to the tray and ask for it to be shown. Then we check to see if any new terrains have been imported. If they have, then we display text saying that the terrain is still being built. Otherwise we assume the textures are being updated.
 
