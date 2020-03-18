@@ -197,7 +197,7 @@ if (APPLE)
 
     set_target_properties(SampleBrowser
       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-      INSTALL_NAME_DIR "@executable_path/../Frameworks"
+      INSTALL_RPATH "@executable_path/../Frameworks"
     )
 
     include_directories(
