@@ -279,9 +279,12 @@ if (APPLE)
     )
 
     foreach(FWK ${FRAMEWORKS})
-	add_custom_command(TARGET SampleBrowser POST_BUILD
-        COMMAND ARGS if [ -d ${PROJECT_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/${FWK}.framework ]\; then ln -s -f ${PROJECT_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/${FWK}.framework ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/${FWK}.framework\; fi
-		)
+      if(TARGET ${FWK})
+        add_custom_command(TARGET SampleBrowser POST_BUILD
+          COMMAND ln -s -f
+          ${PROJECT_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/${FWK}.framework
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/${FWK}.framework)
+      endif()
     endforeach(FWK)
 
 	# Add links for the sample plugins
