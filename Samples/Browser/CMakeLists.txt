@@ -184,6 +184,7 @@ if (APPLE)
     )
     add_custom_command(TARGET SampleBrowser POST_BUILD
       COMMAND mkdir ARGS -p ${PROJECT_BINARY_DIR}/lib/$(CONFIGURATION)/
+      COMMAND ditto ${PROJECT_SOURCE_DIR}/Media ${OGRE_SAMPLE_CONTENTS_PATH}/Media
       COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Media ${OGRE_SAMPLE_CONTENTS_PATH}/Media
     )
   else()

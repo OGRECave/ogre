@@ -174,7 +174,7 @@ Building on Mac OS X for iOS OS
 
 To build Ogre for iOS, you need to specify the ios cross toolchain to cmake as
 
-    cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/ios.toolchain.xcode.cmake -G Xcode .
+    cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/ios.toolchain.xcode.cmake -DIOS_PLATFORM=SIMULATOR -G Xcode .
 
 
 Unfortunately, you will now have to do a few manual steps to
