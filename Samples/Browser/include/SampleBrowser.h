@@ -57,25 +57,6 @@
 #   endif
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#   ifdef __OBJC__
-#       import <UIKit/UIKit.h>
-#   endif
-
-namespace OgreBites
-{
-    class SampleBrowser;
-}
-
-@interface SampleBrowserGestureView : UIView
-{
-    OgreBites::SampleBrowser *mBrowser;
-}
-@property (assign) OgreBites::SampleBrowser *mBrowser;
-
-                   @end
-#endif
-
 namespace OgreBites
 {
     /*=============================================================================
@@ -1192,18 +1173,6 @@ namespace OgreBites
             mHiddenOverlays.clear();
         }
 
-        /*-----------------------------------------------------------------------------
-        | Get the name of the RTSS shader cache file
-          -----------------------------------------------------------------------------*/
-        virtual Ogre::String getShaderCacheFileName()
-        {
-#if OGRE_DEBUG_MODE
-            return "cache_d.bin";
-#else
-            return "cache.bin";
-#endif
-        }
-
         TrayManager* mTrayMgr;                      // SDK tray interface
         Ogre::StringVector mLoadedSamplePlugins;       // loaded sample plugins
         std::set<Ogre::String> mSampleCategories;      // sample categories
@@ -1229,50 +1198,5 @@ namespace OgreBites
         bool mGrabInput;
     };
 }
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-
-@implementation SampleBrowserGestureView
-
-@synthesize mBrowser;
-
-- (BOOL)canBecomeFirstResponder
-{
-    return YES;
-}
-
-- (void)dealloc {
-    [super dealloc];
-}
-
-- (void)motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event {
-    if(mBrowser && event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake)
-        mBrowser->motionBegan();
-
-    if ([super respondsToSelector:@selector(motionBegan:withEvent:)]) {
-        [super motionBegan:motion withEvent:event];
-    }
-}
-
-- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
-    if(mBrowser && event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake)
-        mBrowser->motionEnded();
-
-    if ([super respondsToSelector:@selector(motionEnded:withEvent:)]) {
-        [super motionEnded:motion withEvent:event];
-    }
-}
-
-- (void)motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent *)event {
-    if(mBrowser && event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake)
-        mBrowser->motionCancelled();
-
-    if ([super respondsToSelector:@selector(motionCancelled:withEvent:)]) {
-        [super motionCancelled:motion withEvent:event];
-    }
-}
-@end
-
-#endif
 
 #endif
