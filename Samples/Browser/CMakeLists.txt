@@ -182,41 +182,18 @@ if (APPLE)
       COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Common/misc/*.png ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND ditto ${PROJECT_BINARY_DIR}/bin/*.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
     )
-    if(OGRE_SDK_BUILD)
-	    add_custom_command(TARGET SampleBrowser POST_BUILD
-          COMMAND mkdir ARGS -p ${PROJECT_BINARY_DIR}/lib/$(CONFIGURATION)/
-	      COMMAND ditto ${PROJECT_BINARY_DIR}/Media ${OGRE_SAMPLE_CONTENTS_PATH}/Media
-	    )
-    else()
-        add_custom_command(TARGET SampleBrowser POST_BUILD
-          COMMAND mkdir ARGS -p ${PROJECT_BINARY_DIR}/lib/$(CONFIGURATION)/
-          COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Media ${OGRE_SAMPLE_CONTENTS_PATH}/Media
-        )
-    endif(OGRE_SDK_BUILD)
+    add_custom_command(TARGET SampleBrowser POST_BUILD
+      COMMAND mkdir ARGS -p ${PROJECT_BINARY_DIR}/lib/$(CONFIGURATION)/
+      COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Media ${OGRE_SAMPLE_CONTENTS_PATH}/Media
+    )
   else()
 
     set_target_properties(SampleBrowser
       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-      INSTALL_RPATH "@executable_path/../Frameworks"
+      INSTALL_RPATH "@executable_path/../Frameworks;${OGREDEPS_PATH}/lib"
     )
 
-    include_directories(
-        ${PROJECT_SOURCE_DIR}/RenderSystems/GL/include
-        ${PROJECT_SOURCE_DIR}/RenderSystems/GL/include/OSX
-        )
-
 	target_link_libraries(SampleBrowser ${OPENGL_gl_LIBRARY} ${CoreVideo_LIBRARIES})
-
-   set_target_properties(SampleBrowser PROPERTIES
-        LINK_FLAGS "-framework IOKit -framework Cocoa -framework Carbon -framework CoreVideo -framework ApplicationServices")
-
-    # Add the path where the Ogre framework was found, if it has been found somewhere
-    if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "" AND OGRE_SDK_BUILD)
-      set_target_properties(SampleBrowser PROPERTIES
-        COMPILE_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
-        LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH} -framework IOKit -framework Cocoa -framework Carbon -framework OpenGL -framework CoreVideo"
-      )
-    endif()
 	# also, symlink frameworks so .app is standalone
 	# NOTE: $(CONFIGURATION) is not resolvable at CMake run time, it's only 
 	# valid at build time (hence parenthesis rather than braces)
@@ -231,16 +208,6 @@ if (APPLE)
 		COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}                                             ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 		)
 	# now cfg files
-	if(OGRE_SDK_BUILD)
-	add_custom_command(TARGET SampleBrowser POST_BUILD
-		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
-		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/macosx/plugins.cfg   ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/macosx/resources.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/macosx/samples.cfg   ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${PROJECT_SOURCE_DIR}/Media                    ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
-		)
-	else()
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		COMMAND ln ARGS -s -f ${PROJECT_BINARY_DIR}/bin/plugins.cfg 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
@@ -249,7 +216,6 @@ if (APPLE)
 		COMMAND ln ARGS -s -f ${PROJECT_SOURCE_DIR}/Samples/Media     		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ditto ${PROJECT_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		)
-	endif()
 
 	# now plugins
 	add_custom_command(TARGET SampleBrowser POST_BUILD
