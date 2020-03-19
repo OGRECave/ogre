@@ -46,13 +46,20 @@ namespace Ogre {
     {
         GLint maxAttribs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumVertexAttributes();
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        // must query active attributes on OSX to avoid warning spam
+        OGRE_CHECK_GL_ERROR(glLinkProgram( program ));
+#endif
+
         size_t numAttribs = sizeof(msCustomAttributes) / sizeof(CustomAttribute);
         for (size_t i = 0; i < numAttribs; ++i)
         {
             const CustomAttribute& a = msCustomAttributes[i];
             if (a.attrib < maxAttribs)
             {
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                if(glGetAttribLocation(program, a.name) == -1) continue;
+#endif
                 OGRE_CHECK_GL_ERROR(glBindAttribLocation(program, a.attrib, a.name));
             }
         }
