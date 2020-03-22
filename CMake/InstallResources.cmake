@@ -203,6 +203,11 @@ if(WIN32 OR APPLE)
 else()
   set(OGRE_CMAKE_DIR "${OGRE_LIB_DIRECTORY}/OGRE/cmake")
 endif()
+if(WIN32)
+  set(OGRE_PLUGIN_DIR_CMAKE "bin")
+else()
+  set(OGRE_PLUGIN_DIR_CMAKE "lib/OGRE")
+endif()
 configure_package_config_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${PROJECT_BINARY_DIR}/cmake/OGREConfig.cmake
     INSTALL_DESTINATION ${OGRE_CMAKE_DIR}
     PATH_VARS CMAKE_INSTALL_PREFIX)
