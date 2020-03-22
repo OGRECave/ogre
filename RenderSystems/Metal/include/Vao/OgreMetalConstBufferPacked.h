@@ -30,11 +30,10 @@ THE SOFTWARE.
 #define _Ogre_MetalConstBufferPacked_H_
 
 #include "OgreMetalPrerequisites.h"
-#include "Vao/OgreConstBufferPacked.h"
 
 namespace Ogre
 {
-    class _OgreMetalExport MetalConstBufferPacked : public ConstBufferPacked
+    class _OgreMetalExport MetalConstBufferPacked
     {
         MetalDevice *mDevice;
 
@@ -42,7 +41,7 @@ namespace Ogre
         MetalConstBufferPacked( size_t internalBufferStartBytes, size_t numElements,
                                 uint32 bytesPerElement, uint32 numElementsPadding,
                                 BufferType bufferType, void *initialData, bool keepAsShadow,
-                                VaoManager *vaoManager, BufferInterface *bufferInterface,
+                                VaoManager *vaoManager, MetalBufferInterface *bufferInterface,
                                 MetalDevice *device );
         virtual ~MetalConstBufferPacked();
 

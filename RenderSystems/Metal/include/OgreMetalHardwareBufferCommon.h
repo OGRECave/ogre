@@ -34,8 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-namespace v1
-{
     /// Common buffer operations for most v1 buffer interfaces used in Metal
     /// This implementation treats:
     ///		Ignores STATIC and DYNAMIC bit in buffers
@@ -55,6 +53,7 @@ namespace v1
         uint32              mLastFrameUsed;
         uint32              mLastFrameGpuWrote;
 
+        StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload );
     public:
         MetalHardwareBufferCommon( size_t sizeBytes, HardwareBuffer::Usage usage, uint16 alignment,
                                    MetalDiscardBufferManager *discardBufferManager,
@@ -92,7 +91,6 @@ namespace v1
 
         size_t getSizeBytes(void) const         { return mSizeBytes; }
     };
-}
 }
 
 #endif

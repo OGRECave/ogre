@@ -65,6 +65,8 @@ namespace Ogre
         @autoreleasepool
         {
             mDevice = MTLCreateSystemDefaultDevice();
+            OgreAssert(mDevice, "Could not create Metal Device");
+
             mMainCommandQueue = [mDevice newCommandQueue];
             mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
             mBlitEncoder = 0;
@@ -121,7 +123,7 @@ namespace Ogre
         @autoreleasepool
         {
             mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
-#if OGRE_PROFILING == OGRE_PROFILING_REMOTERY
+#if OGRE_PROFILING
             _rmt_BindMetal( mCurrentCommandBuffer );
 #endif
         }

@@ -30,13 +30,12 @@ THE SOFTWARE.
 #define _Ogre_MetalUavBufferPacked_H_
 
 #include "OgreMetalPrerequisites.h"
-#include "Vao/OgreUavBufferPacked.h"
 
 namespace Ogre
 {
     class MetalBufferInterface;
 
-    class _OgreMetalExport MetalUavBufferPacked : public UavBufferPacked
+    class _OgreMetalExport MetalUavBufferPacked
     {
         MetalDevice *mDevice;
 

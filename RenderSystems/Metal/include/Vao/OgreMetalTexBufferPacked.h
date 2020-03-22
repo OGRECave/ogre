@@ -30,13 +30,12 @@ THE SOFTWARE.
 #define _Ogre_MetalTexBufferPacked_H_
 
 #include "OgreMetalPrerequisites.h"
-#include "Vao/OgreTexBufferPacked.h"
 
 namespace Ogre
 {
     class MetalBufferInterface;
 
-    class _OgreMetalExport MetalTexBufferPacked : public TexBufferPacked
+    class _OgreMetalExport MetalTexBufferPacked
     {
         MetalDevice *mDevice;
 

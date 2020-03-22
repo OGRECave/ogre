@@ -30,13 +30,12 @@ THE SOFTWARE.
 #define _Ogre_MetalVaoManager_H_
 
 #include "OgreMetalPrerequisites.h"
-#include "Vao/OgreVaoManager.h"
 
 #import <dispatch/dispatch.h>
 
 namespace Ogre
 {
-    class _OgreMetalExport MetalVaoManager : public VaoManager
+    class _OgreMetalExport MetalVaoManager
     {
     protected:
         enum VboFlag
@@ -79,8 +78,8 @@ namespace Ogre
             }
         };
 
-        typedef vector<Block>::type BlockVec;
-        typedef vector<StrideChanger>::type StrideChangerVec;
+        typedef std::vector<Block> BlockVec;
+        typedef std::vector<StrideChanger> StrideChangerVec;
 
     protected:
         struct Vbo
@@ -114,20 +113,22 @@ namespace Ogre
                 }
             };
 
-            typedef vector<VertexBinding>::type VertexBindingVec;
+            typedef std::vector<VertexBinding> VertexBindingVec;
 
             /// Not used anymore, however it's useful for sorting
             /// purposes in the RenderQueue (using the Vao's ID).
             OperationType operationType;
             VertexBindingVec    vertexBuffers;
             __unsafe_unretained id<MTLBuffer> indexBufferVbo;
+#if 0
             IndexBufferPacked::IndexType indexType;
+#endif
             //uint32              refCount;
         };
 
-        typedef vector<Vbo>::type VboVec;
-        typedef vector<Vao>::type VaoVec;
-        typedef map<VertexElement2Vec, Vbo>::type VboMap;
+        typedef std::vector<Vbo> VboVec;
+        typedef std::vector<Vao> VaoVec;
+        typedef std::map<VertexElement2Vec, Vbo> VboMap;
 
         VboVec  mVbos[MAX_VBO_FLAG];
         size_t  mDefaultPoolSize[MAX_VBO_FLAG];
@@ -216,6 +217,7 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer );
 
+#if 0
         virtual UavBufferPacked* createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
                                                       uint32 bindFlags,
                                                       void *initialData, bool keepAsShadow );
@@ -237,6 +239,7 @@ namespace Ogre
         VaoVec::iterator findVao( const VertexBufferPackedVec &vertexBuffers,
                                   IndexBufferPacked *indexBuffer,
                                   OperationType opType );
+#endif
         uint32 createVao( const Vao &vaoRef );
 
         static uint32 generateRenderQueueId( uint32 vaoName, uint32 uniqueVaoId );
@@ -257,8 +260,10 @@ namespace Ogre
         */
         virtual StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload );
 
+#if 0
         virtual AsyncTicketPtr createAsyncTicket( BufferPacked *creator, StagingBuffer *stagingBuffer,
                                                   size_t elementStart, size_t elementCount );
+#endif
 
         virtual void _update(void);
         void _notifyDeviceStalled(void);
@@ -285,6 +290,10 @@ namespace Ogre
         static dispatch_semaphore_t waitFor( dispatch_semaphore_t fenceName, MetalDevice *device );
 
         static uint32 getAttributeIndexFor( VertexElementSemantic semantic );
+
+        uint32 getFrameCount(void)          { return 0; }
+        uint8 getDynamicBufferMultiplier(void) const            { return 1; }
+        StagingBuffer* getStagingBuffer( size_t minSizeBytes, bool forUpload );
     };
 }
 

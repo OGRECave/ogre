@@ -31,12 +31,11 @@ THE SOFTWARE.
 
 #include "OgreMetalPrerequisites.h"
 
-#include "Vao/OgreMultiSourceVertexBufferPool.h"
 #include "Vao/OgreMetalVaoManager.h"
 
 namespace Ogre
 {
-    class _OgreMetalExport MetalMultiSourceVertexBufferPool : public MultiSourceVertexBufferPool
+    class _OgreMetalExport MetalMultiSourceVertexBufferPool
     {
         size_t mVboPoolIndex;
         id<MTLBuffer> mVboName;

@@ -31,8 +31,6 @@ THE SOFTWARE.
 
 #include "OgreMetalPrerequisites.h"
 
-#include "Vao/OgreStagingBuffer.h"
-
 #import <dispatch/dispatch.h>
 
 namespace Ogre
@@ -44,12 +42,63 @@ namespace Ogre
         In other words, a staging buffer is an intermediate buffer to transfer data between
         CPU & GPU
     */
-    class _OgreMetalExport MetalStagingBuffer : public StagingBuffer
+    class _OgreMetalExport MetalStagingBuffer
     {
+        struct Destination
+        {
+            /// Buffer where the contents of the staging buffer will be copied to after unmapping
+            BufferPacked *destination;
+
+            /// The offset in the destination buffer to copy to.
+            size_t dstOffset;
+
+            /// 0-started offset relative to the mapped region
+            size_t srcOffset;
+
+            /// Amount of bytes to copy
+            size_t length;
+
+            Destination( BufferPacked *_destination, size_t _dstOffset,
+                         size_t _srcOffset, size_t _length ) :
+                destination( _destination ),
+                dstOffset( _dstOffset ),
+                srcOffset( _srcOffset ),
+                length( _length )
+            {
+            }
+        };
+
+        struct Fence
+        {
+            size_t  start;
+            size_t  end;
+
+            Fence( size_t _start, size_t _end ) :
+                start( _start ), end( _end )
+            {
+                assert( _start <= _end );
+            }
+
+            bool overlaps( const Fence &fence ) const
+            {
+                return !( fence.end <= this->start || fence.start >= this->end );
+            }
+
+            size_t length(void) const { return end - start; }
+        };
+
     protected:
         id<MTLBuffer>   mVboName;
         void            *mMappedPtr;
         MetalDevice     *mDevice;
+
+        size_t  mInternalBufferStart;
+        size_t  mSizeBytes;
+        bool    mUploadOnly;
+
+        MappingState    mMappingState;
+        size_t          mMappingStart;
+        size_t          mMappingCount;
 
         /** How many bytes between the last fence and our current offset do we need to let
             through before we place another fence?
@@ -72,7 +121,7 @@ namespace Ogre
         //------------------------------------
         // Begin used for uploads
         //------------------------------------
-        typedef vector<MetalFence>::type MetalFenceVec;
+        typedef std::vector<MetalFence> MetalFenceVec;
         MetalFenceVec mFences;
 
         /// Regions of memory that were unmapped but haven't
@@ -104,7 +153,7 @@ namespace Ogre
         void waitIfNeeded(void);
 
         virtual void* mapImpl( size_t sizeBytes );
-        virtual void unmapImpl( const Destination *destinations, size_t numDestinations );
+        //virtual void unmapImpl( const Destination *destinations, size_t numDestinations );
 
         virtual const void* _mapForReadImpl( size_t offset, size_t sizeBytes );
 
@@ -119,15 +168,25 @@ namespace Ogre
         void cleanUnfencedHazards(void);
         void _notifyDeviceStalled(void);
 
-        void _unmapToV1( v1::MetalHardwareBufferCommon *hwBuffer, size_t lockStart, size_t lockSize );
+        void _unmapToV1( MetalHardwareBufferCommon *hwBuffer, size_t lockStart, size_t lockSize );
 
-        virtual bool canDownload( size_t length ) const;
-        virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
-        virtual void _cancelDownload( size_t offset, size_t sizeBytes );
-        virtual size_t _asyncDownloadV1( v1::MetalHardwareBufferCommon *source,
+        //virtual bool canDownload( size_t length ) const;
+        //virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
+        //virtual void _cancelDownload( size_t offset, size_t sizeBytes );
+        virtual size_t _asyncDownloadV1( MetalHardwareBufferCommon *source,
                                          size_t srcOffset, size_t srcLength );
 
         id<MTLBuffer> getBufferName(void) const     { return mVboName; }
+
+        void removeReferenceCount(void) {}
+        const void* _mapForRead( size_t offset, size_t sizeBytes );
+
+        /** Maps the given amount of bytes. May block if not ready.
+            @See uploadWillStall if you wish to know.
+        @remarks
+            Will throw if sizeBytes > this->getMaxSize()
+        */
+        void* map( size_t sizeBytes );
     };
 }
 

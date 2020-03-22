@@ -37,7 +37,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class _OgreMetalExport MetalAsyncTicket : public AsyncTicket
+    class _OgreMetalExport MetalAsyncTicket
     {
     protected:
         dispatch_semaphore_t    mFenceName;

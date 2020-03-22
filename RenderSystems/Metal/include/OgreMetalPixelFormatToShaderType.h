@@ -34,7 +34,7 @@ Copyright (c) 2000-2017 Torus Knot Software Ltd
 
 namespace Ogre
 {
-    class _OgreMetalExport MetalPixelFormatToShaderType : public PixelFormatToShaderType
+    class _OgreMetalExport MetalPixelFormatToShaderType
     {
     public:
         virtual const char* getPixelFormatType( PixelFormat pixelFormat ) const;

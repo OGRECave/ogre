@@ -31,14 +31,12 @@ THE SOFTWARE.
 
 #include "OgreMetalPrerequisites.h"
 
-#include "Vao/OgreBufferInterface.h"
-
 namespace Ogre
 {
     /** For Metal, all buffers can be treated with the same code.
         Hence most equivalent functionality is encapsulated here.
     */
-    class _OgreMetalExport MetalBufferInterface : public BufferInterface
+    class _OgreMetalExport MetalBufferInterface
     {
     protected:
         size_t          mVboPoolIdx;

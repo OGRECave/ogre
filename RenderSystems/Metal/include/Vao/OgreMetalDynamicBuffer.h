@@ -31,8 +31,6 @@ THE SOFTWARE.
 
 #include "OgreMetalPrerequisites.h"
 
-#include "Vao/OgreBufferPacked.h"
-
 namespace Ogre
 {
     /** Metal doesn't "map". You can directly access the unsynchronized contents
@@ -60,14 +58,14 @@ namespace Ogre
             MappedRange( size_t _start, size_t _count ) : start( _start ), count( _count ) {}
         };
 
-        typedef vector<MappedRange>::type MappedRangeVec;
+        typedef std::vector<MappedRange> MappedRangeVec;
 
         id<MTLBuffer>   mVboName;
         size_t          mVboSize;
         void            *mMappedPtr;
 
         MappedRangeVec mMappedRanges;
-        vector<size_t>::type mFreeRanges;
+        std::vector<size_t> mFreeRanges;
 
         size_t addMappedRange( size_t start, size_t count );
 

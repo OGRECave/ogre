@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre {
-namespace v1 {
     /// Specialisation of HardwareIndexBuffer for Metal
     class _OgreMetalExport MetalHardwareIndexBuffer : public HardwareIndexBuffer
     {
@@ -44,7 +43,7 @@ namespace v1 {
         virtual void unlockImpl(void);
 
     public:
-        MetalHardwareIndexBuffer( MetalHardwareBufferManagerBase *mgr, IndexType idxType,
+        MetalHardwareIndexBuffer( MetalHardwareBufferManager *mgr, IndexType idxType,
                                   size_t numIndexes, HardwareBuffer::Usage usage,
                                   bool useShadowBuffer );
         virtual ~MetalHardwareIndexBuffer();
@@ -64,8 +63,7 @@ namespace v1 {
 
         virtual void _updateFromShadow(void);
 
-        virtual void* getRenderSystemData(void);
+        MetalHardwareBufferCommon* getRenderSystemData(void);
     };
-}
 }
 #endif // __MetalHARDWAREINDEXBUFFER_H__

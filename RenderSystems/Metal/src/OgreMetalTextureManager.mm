@@ -29,7 +29,6 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalTextureManager.h"
 #include "OgreMetalTexture.h"
 #include "OgreMetalDepthTexture.h"
-#include "OgreMetalNullTexture.h"
 
 namespace Ogre
 {
@@ -58,13 +57,6 @@ namespace Ogre
                                                                                 createParams->end();
                 return new MetalDepthTexture( shareableDepthBuffer, this, name, handle, group,
                                               isManual, loader, mDevice );
-            }
-
-            NameValuePairList::const_iterator it = createParams->find( "SpecialFormat" );
-            if( it != createParams->end() && it->second == "PF_NULL" )
-            {
-                return new MetalNullTexture( this, name, handle, group,
-                                             isManual, loader, mDevice );
             }
         }
 

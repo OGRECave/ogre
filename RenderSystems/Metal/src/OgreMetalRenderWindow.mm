@@ -38,8 +38,8 @@ namespace Ogre
         MetalRenderTargetCommon( ownerDevice ),
         mMetalLayer( 0 ),
         mCurrentDrawable( 0 ),
-        mMsaaTex( 0 ),
-        mRenderSystem( renderSystem )
+        mMsaaTex( 0 )
+        // ,mRenderSystem( renderSystem )
     {
         mIsFullScreen = false;
         mActive = false;
@@ -139,7 +139,7 @@ namespace Ogre
             ViewportList::iterator end  = mViewportList.end();
             while( itor != end )
             {
-                (*itor)->_updateDimensions();
+                (*itor).second->_updateDimensions();
                 ++itor;
             }
         }
@@ -230,7 +230,7 @@ namespace Ogre
         NSRect frame;
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || 1 // TODO: fixme
         frame.origin.x = 0;
         frame.origin.y = 0;
         frame.size.width = mWidth;
@@ -326,7 +326,7 @@ namespace Ogre
         }
         else if( name == "UIView" )
         {
-            *static_cast<void**>(pData) = (void*)CFBridgingRetain( mMetalView );
+            *static_cast<void**>(pData) = const_cast<void*>((const void*)CFBridgingRetain( mMetalView ));
         }
         else
         {

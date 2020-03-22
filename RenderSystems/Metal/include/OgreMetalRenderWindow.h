@@ -52,7 +52,7 @@ namespace Ogre
         id                  mResizeObserver;
 #endif
 
-        MetalRenderSystem   *mRenderSystem;
+        //MetalRenderSystem   *mRenderSystem;
 
         inline void checkLayerSizeChanges(void);
     public:

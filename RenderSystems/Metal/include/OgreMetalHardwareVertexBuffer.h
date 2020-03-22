@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
-namespace v1 {
     /// Specialisation of HardwareVertexBuffer for Metal
     class _OgreMetalExport MetalHardwareVertexBuffer : public HardwareVertexBuffer
     {
@@ -44,7 +43,7 @@ namespace v1 {
         virtual void unlockImpl(void);
 
     public:
-        MetalHardwareVertexBuffer( MetalHardwareBufferManagerBase *mgr, size_t vertexSize,
+        MetalHardwareVertexBuffer( MetalHardwareBufferManager *mgr, size_t vertexSize,
                                    size_t numVertices, HardwareBuffer::Usage usage,
                                    bool useShadowBuffer );
         virtual ~MetalHardwareVertexBuffer();
@@ -64,8 +63,7 @@ namespace v1 {
 
         virtual void _updateFromShadow(void);
 
-        virtual void* getRenderSystemData(void);
+        MetalHardwareBufferCommon* getRenderSystemData(void);
     };
-}
 }
 #endif // __MetalHARDWAREVERTEXBUFFER_H__

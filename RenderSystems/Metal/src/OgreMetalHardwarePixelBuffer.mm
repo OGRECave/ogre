@@ -36,11 +36,10 @@ THE SOFTWARE.
 #import <Metal/MTLBlitCommandEncoder.h>
 
 namespace Ogre {
-namespace v1 {
     MetalHardwarePixelBuffer::MetalHardwarePixelBuffer( uint32 width, uint32 height,
                                                         uint32 depth, PixelFormat format,
                                                         bool hwGamma, HardwareBuffer::Usage usage )
-        : HardwarePixelBuffer(width, height, depth, format, hwGamma, usage, false, false),
+        : HardwarePixelBuffer(width, height, depth, format, usage, false, false),
           mBuffer(width, height, depth, format)
     {
     }
@@ -282,7 +281,7 @@ namespace v1 {
                                                                   mFormat, zoffset, mFace, fsaa, level,
                                                                   mHwGamma );
                 mSliceTRT.push_back(trt);
-                RenderTexture** val = &mSliceTRT[0];
+                // RenderTexture** val = &mSliceTRT[0];
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
             }
         }
@@ -330,7 +329,7 @@ namespace v1 {
             }
         }
 
-        NSUInteger rowPitch = data.rowPitchAlwaysBytes();
+        NSUInteger rowPitch = PixelUtil::getMemorySize(data.getWidth(), 1, 1, data.format);
 
         // PVR textures should have 0 row size and data size
         if( data.format == PF_PVRTC2_2BPP ||
@@ -413,6 +412,8 @@ namespace v1 {
                             bytesPerRow:rowPitch
                           bytesPerImage:bytesPerImage];
                 break;
+            default:
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unhandled case");
         }
 
 #if OGRE_DEBUG_MODE
@@ -508,10 +509,10 @@ namespace v1 {
     {
     }
     //-----------------------------------------------------------------------------------
-    void MetalTextureBuffer::blit( const v1::HardwarePixelBufferSharedPtr &src,
+    void MetalTextureBuffer::blit( const HardwarePixelBufferSharedPtr &src,
                                    const Box &srcBox, const Box &dstBox )
     {
-        MetalTextureBuffer *srct = static_cast<MetalTextureBuffer *>(src.getPointer());
+        MetalTextureBuffer *srct = static_cast<MetalTextureBuffer *>(src.get());
         // Destination texture must be 2D or Cube
         // Source texture must be 2D
         if(((src->getUsage() & TU_RENDERTARGET) == 0 && (srct->mTarget == MTLTextureType2D))
@@ -586,5 +587,4 @@ namespace v1 {
         assert(zoffset < mDepth);
         return mSliceTRT[zoffset];
     }
-}
 }

@@ -140,16 +140,12 @@ namespace Ogre
         /** Internal load implementation, must be implemented by subclasses.
         */
         void loadFromSource(void);
-        /** Internal method for creating a dummy low-level program for this
-        high-level program. Metal does not give access to the low level implementation of the
-        shader so this method creates an object sub-classed from MetalGpuProgram just to be
-        compatible with MetalRenderSystem.
-        */
-        void createLowLevelImpl(void);
+        /// noop
+        void createLowLevelImpl(void) {}
+        /// shortcut as we there is no low-level separation here
+        GpuProgram* _getBindingDelegate(void) { return this; }
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
-        /// Overridden from HighLevelGpuProgram
-        void unloadImpl(void);
 
         /// Populate the passed parameters with name->index map
         void populateParameterNames(GpuProgramParametersSharedPtr params);
@@ -171,10 +167,12 @@ namespace Ogre
         String mEntryPoint;
         String mTargetBufferName;
 
-        vector<GpuConstantDefinition>::type mConstantDefsSorted;
+        std::vector<GpuConstantDefinition> mConstantDefsSorted;
         uint32 mConstantsBytesToWrite;
 
         String mShaderReflectionPairHint;
+
+        bool mBuildParametersFromReflection;
     };
 }
 

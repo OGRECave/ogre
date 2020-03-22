@@ -42,7 +42,7 @@ namespace Ogre
                                         id<MTLTexture> depthTexture, id<MTLTexture> stencilTexture,
                                         MetalDevice *device ) :
         DepthBuffer( poolId, 0, width, height, fsaa, "",
-                     pixelFormat, isDepthTexture, _isManual, renderSystem ),
+                     _isManual ),
         mDepthAttachmentDesc( 0 ),
         mStencilAttachmentDesc( 0 ),
         mDevice( device )
@@ -70,18 +70,19 @@ namespace Ogre
         mStencilAttachmentDesc = 0;
     }
     //-----------------------------------------------------------------------------------
-    bool MetalDepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
+    bool MetalDepthBuffer::isCompatible( RenderTarget *renderTarget) const
     {
         //First check they belong to the same GPU device.
         MetalDevice *device = 0;
         renderTarget->getCustomAttribute( "MetalDevice", &device );
 
-        if( device == mDevice && renderTarget->getFormat() != PF_NULL &&
+        if( device == mDevice && renderTarget->suggestPixelFormat() != PF_UNKNOWN &&
             this->getWidth() == renderTarget->getWidth() &&
             this->getHeight() == renderTarget->getHeight() &&
-            this->getFsaa() == renderTarget->getFSAA() &&
-            mDepthTexture == renderTarget->prefersDepthTexture() &&
-            mFormat == renderTarget->getDesiredDepthBufferFormat() )
+            this->getFSAA() == renderTarget->getFSAA()// &&
+            // mDepthTexture == renderTarget->prefersDepthTexture() &&
+            // mFormat == renderTarget->getDesiredDepthBufferFormat()
+            )
         {
             return true;
         }

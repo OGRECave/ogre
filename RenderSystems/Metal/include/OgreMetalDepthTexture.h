@@ -66,8 +66,6 @@ namespace Ogre
         virtual void _autogenerateMipmaps(void) {}
     };
 
-namespace v1
-{
     class _OgreMetalExport MetalDepthPixelBuffer : public HardwarePixelBuffer
     {
     protected:
@@ -88,7 +86,6 @@ namespace v1
         virtual void blitToMemory( const Box &srcBox, const PixelBox &dst );
         virtual RenderTexture* getRenderTarget( size_t slice=0 );
     };
-}
 
     class _OgreMetalExport MetalDepthTextureTarget : public RenderTexture //MetalRenderTexture
     {
@@ -96,7 +93,7 @@ namespace v1
 
     public:
         MetalDepthTextureTarget( MetalDepthTexture *ultimateTextureOwner,
-                                   const String &name, v1::HardwarePixelBuffer *buffer,
+                                   const String &name, HardwarePixelBuffer *buffer,
                                    uint32 zoffset );
         virtual ~MetalDepthTextureTarget();
 
@@ -112,7 +109,7 @@ namespace v1
         virtual void setDepthBufferPool( uint16 poolId );
 
         /// Notifies the ultimate texture owner the buffer changed
-        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
+        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
         virtual void detachDepthBuffer(void);
 
         virtual void getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS],

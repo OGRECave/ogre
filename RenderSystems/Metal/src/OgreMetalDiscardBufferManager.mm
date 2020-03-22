@@ -29,8 +29,6 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalDiscardBufferManager.h"
 #include "OgreMetalRenderSystem.h"
 
-#include "Vao/OgreVaoManager.h"
-
 #import <Metal/MTLDevice.h>
 #import <Metal/MTLBuffer.h>
 #import <Metal/MTLBlitCommandEncoder.h>
@@ -135,7 +133,7 @@ namespace Ogre
             while( itor != end )
             {
                 mFreeBlocks.push_back( *itor );
-                MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
+                //MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
                 ++itor;
             }
 
@@ -155,7 +153,7 @@ namespace Ogre
         {
             //This block is safe now to put back into free blocks.
             mFreeBlocks.push_back( *itor );
-            MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
+            //MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
             ++itor;
         }
 
@@ -172,7 +170,7 @@ namespace Ogre
             {
                 //This block is safe now to put back into free blocks.
                 mFreeBlocks.push_back( *itor );
-                MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
+                //MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
                 ++itor;
             }
 

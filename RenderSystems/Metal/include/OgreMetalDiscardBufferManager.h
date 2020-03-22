@@ -35,7 +35,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 namespace Ogre
 {
     class MetalDiscardBuffer;
-    typedef vector<MetalDiscardBuffer*>::type MetalDiscardBufferVec;
+    typedef std::vector<MetalDiscardBuffer*> MetalDiscardBufferVec;
 
     /// Metal doesn't support "DISCARD" like D3D9/D3D11 (and OpenGL but often it's broken)
     /// where we requested to map a write-only buffer and the API would discard the previous
@@ -58,7 +58,7 @@ namespace Ogre
                 return this->lastFrameUsed < other.lastFrameUsed;
             }
         };
-        typedef vector<UnsafeBlock>::type UnsafeBlockVec;
+        typedef std::vector<UnsafeBlock> UnsafeBlockVec;
 
     private:
         id<MTLBuffer>   mBuffer;

@@ -37,6 +37,25 @@ THE SOFTWARE.
 #import <Metal/MTLComputePipeline.h>
 
 namespace Ogre {
+    static const uint32 VERTEX_ATTRIBUTE_INDEX[VES_COUNT] =
+    {
+        0,  // VES_POSITION - 1
+        3,  // VES_BLEND_WEIGHTS - 1
+        4,  // VES_BLEND_INDICES - 1
+        1,  // VES_NORMAL - 1
+        5,  // VES_DIFFUSE - 1
+        6,  // VES_SPECULAR - 1
+        7,  // VES_TEXTURE_COORDINATES - 1
+        //There are up to 8 VES_TEXTURE_COORDINATES. Occupy range [7; 15)
+        //Range [13; 15) overlaps with VES_BLEND_WEIGHTS2 & VES_BLEND_INDICES2
+        //Index 15 is reserved for draw ID.
+
+        //VES_BINORMAL would use slot 16. Since Binormal is rarely used, we don't support it.
+        //(slot 16 is where const buffers start)
+        ~0u,// VES_BINORMAL - 1
+        2,  // VES_TANGENT - 1
+    };
+
     //-----------------------------------------------------------------------
     MetalProgram::CmdPreprocessorDefines MetalProgram::msCmdPreprocessorDefines;
     MetalProgram::CmdEntryPoint MetalProgram::msCmdEntryPoint;
@@ -179,24 +198,20 @@ namespace Ogre {
             @"VES_TEXTURE_COORDINATES",
             @"VES_BINORMAL",
             @"VES_TANGENT",
-            @"VES_BLEND_WEIGHTS2",
-            @"VES_BLEND_INDICES2"
         };
         for( size_t i=0; i<VES_COUNT; ++i )
         {
             if( i + 1u != VES_BINORMAL )
             {
                 preprocessorMacros[names[i]] =
-                        [NSNumber numberWithUnsignedInt:MetalVaoManager::getAttributeIndexFor(
-                            static_cast<VertexElementSemantic>( i + 1u ) ) ];
+                        [NSNumber numberWithUnsignedInt:VERTEX_ATTRIBUTE_INDEX[i] ];
             }
         }
         for( uint32 i=0; i<8u; ++i )
         {
             NSString *key = [NSString stringWithFormat:@"VES_TEXTURE_COORDINATES%d", i];
             preprocessorMacros[key] =
-                    [NSNumber numberWithUnsignedInt:MetalVaoManager::getAttributeIndexFor(
-                        static_cast<VertexElementSemantic>( VES_TEXTURE_COORDINATES ) ) + i];
+                    [NSNumber numberWithUnsignedInt:VERTEX_ATTRIBUTE_INDEX[VES_TEXTURE_COORDINATES - 1] + i];
         }
         preprocessorMacros[@"CONST_SLOT_START"] =
                 [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
@@ -348,7 +363,7 @@ namespace Ogre {
         {
             GpuProgramPtr shader = GpuProgramManager::getSingleton().
                     getByName( mShaderReflectionPairHint );
-            if( shader.isNull() )
+            if( !shader )
             {
                 OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
                              "Shader reflection hint '" + mShaderReflectionPairHint +
@@ -436,17 +451,6 @@ namespace Ogre {
                     mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
                     mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
                 }
-                else if( def.isUnsignedInt() )
-                {
-                    def.physicalIndex = mUIntLogicalToPhysical->bufferSize;
-                    OGRE_LOCK_MUTEX(mUIntLogicalToPhysical->mutex);
-                        mUIntLogicalToPhysical->map.insert(
-                        GpuLogicalIndexUseMap::value_type(def.logicalIndex,
-                        GpuLogicalIndexUse(def.physicalIndex,
-                                           def.arraySize * def.elementSize, GPV_GLOBAL)));
-                    mUIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-                    mConstantDefs->uintBufferSize = mUIntLogicalToPhysical->bufferSize;
-                }
                 else
                 {
                     def.physicalIndex = mIntLogicalToPhysical->bufferSize;
@@ -509,17 +513,6 @@ namespace Ogre {
                     mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
                     mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
                 }
-                else if( def.isUnsignedInt() )
-                {
-                    def.physicalIndex = mUIntLogicalToPhysical->bufferSize;
-                    OGRE_LOCK_MUTEX(mUIntLogicalToPhysical->mutex);
-                        mUIntLogicalToPhysical->map.insert(
-                        GpuLogicalIndexUseMap::value_type(def.logicalIndex,
-                        GpuLogicalIndexUse(def.physicalIndex,
-                                           def.arraySize * def.elementSize, GPV_GLOBAL)));
-                    mUIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-                    mConstantDefs->uintBufferSize = mUIntLogicalToPhysical->bufferSize;
-                }
                 else
                 {
                     def.physicalIndex = mIntLogicalToPhysical->bufferSize;
@@ -541,31 +534,8 @@ namespace Ogre {
                                                            def.logicalIndex +
                                                            def.arraySize * def.elementSize *
                                                            sizeof(float) );
-
-                if( member.dataType == MTLDataTypeArray )
-                {
-                    // Now deal with arrays -> arrays[0]
-                    mConstantDefs->generateConstantDefinitionArrayEntries( varName, def );
-                }
             }
         }
-    }
-    //-----------------------------------------------------------------------
-    void MetalProgram::createLowLevelImpl(void)
-    {
-        mAssemblerProgram = GpuProgramPtr(this, SPFM_NONE);
-        if( !mCompiled )
-            compile(true);
-    }
-    //---------------------------------------------------------------------------
-    void MetalProgram::unloadImpl()
-    {
-        // We didn't create mAssemblerProgram through a manager, so override this
-        // implementation so that we don't try to remove it from one. Since getCreator()
-        // is used, it might target a different matching handle!
-        mAssemblerProgram.setNull();
-
-        unloadHighLevel();
     }
     //-----------------------------------------------------------------------
     void MetalProgram::unloadHighLevelImpl(void)
@@ -622,8 +592,8 @@ namespace Ogre {
     void MetalProgram::updateBuffers( const GpuProgramParametersSharedPtr &params,
                                       uint8 * RESTRICT_ALIAS dstData )
     {
-        vector<GpuConstantDefinition>::type::const_iterator itor = mConstantDefsSorted.begin();
-        vector<GpuConstantDefinition>::type::const_iterator end  = mConstantDefsSorted.end();
+        auto itor = mConstantDefsSorted.begin();
+        auto end  = mConstantDefsSorted.end();
 
         while( itor != end )
         {
@@ -632,8 +602,6 @@ namespace Ogre {
             void * RESTRICT_ALIAS src;
             if( def.isFloat() )
                 src = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
-            else if( def.isUnsignedInt() )
-                src = (void *)&(*(params->getUnsignedIntConstantList().begin() + def.physicalIndex));
             else
                 src = (void *)&(*(params->getIntConstantList().begin() + def.physicalIndex));
 

@@ -40,10 +40,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 namespace Ogre
 {
-    namespace v1
-    {
         class HardwareBufferManager;
-    }
 
     /**
        Implementation of Metal as a rendering system.
@@ -83,33 +80,36 @@ namespace Ogre
             }
         };
 
-        typedef vector<CachedDepthStencilState>::type CachedDepthStencilStateVec;
+        typedef std::vector<CachedDepthStencilState> CachedDepthStencilStateVec;
+
+        MTLRenderPipelineDescriptor *psd;
+        MTLDepthStencilDescriptor*    mDepthStencilDesc;
+        bool                        mDepthStencilDescChanged;
 
         bool mInitialized;
-        v1::HardwareBufferManager   *mHardwareBufferManager;
-        MetalGpuProgramManager      *mShaderManager;
+        HardwareBufferManager   *mHardwareBufferManager;
+        GpuProgramManager      *mShaderManager;
         MetalProgramFactory         *mMetalProgramFactory;
-
-        ConfigOptionMap mOptions;
 
         MetalPixelFormatToShaderType mPixelFormatToShaderType;
 
-        __unsafe_unretained id<MTLBuffer>   mIndirectBuffer;
-        unsigned char                       *mSwIndirectBufferPtr;
+        //__unsafe_unretained id<MTLBuffer>   mIndirectBuffer;
+        //unsigned char                       *mSwIndirectBufferPtr;
         CachedDepthStencilStateVec          mDepthStencilStates;
         MetalHlmsPso const                  *mPso;
-        HlmsComputePso const                *mComputePso;
 
         bool mStencilEnabled;
         uint32_t mStencilRefValue;
 
+        MetalVaoManager* mVaoManager;
+
         //For v1 rendering.
-        v1::IndexData       *mCurrentIndexBuffer;
-        v1::VertexData      *mCurrentVertexBuffer;
+        IndexData       *mCurrentIndexBuffer;
+        VertexData      *mCurrentVertexBuffer;
         MTLPrimitiveType    mCurrentPrimType;
 
         //TODO: AutoParamsBuffer probably belongs to MetalDevice (because it's per device?)
-        typedef vector<ConstBufferPacked*>::type ConstBufferPackedVec;
+        typedef std::vector<ConstBufferPacked*> ConstBufferPackedVec;
         ConstBufferPackedVec    mAutoParamsBuffer;
         size_t                  mAutoParamsBufferIdx;
         uint8                   *mCurrentAutoParamsBufferPtr;
@@ -131,8 +131,8 @@ namespace Ogre
         /// In range [0; 64]; note that a user may use
         /// mUavs[0] & mUavs[2] leaving mUavs[1] empty.
         /// and still mMaxUavIndexPlusOne = 3.
-        uint8           mMaxModifiedUavPlusOne;
-        bool            mUavsDirty;
+        // uint8           mMaxModifiedUavPlusOne;
+        // bool            mUavsDirty;
 
         uint8           mNumMRTs;
         MetalRenderTargetCommon     *mCurrentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
@@ -157,11 +157,11 @@ namespace Ogre
         MetalRenderSystem();
         virtual ~MetalRenderSystem();
 
+        void initConfigOptions();
         virtual void shutdown(void);
 
         virtual const String& getName(void) const;
         virtual const String& getFriendlyName(void) const;
-        virtual ConfigOptionMap& getConfigOptions(void) { return mOptions; }
         virtual void setConfigOption(const String &name, const String &value) {}
 
         virtual HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
@@ -170,10 +170,6 @@ namespace Ogre
 
         virtual RenderSystemCapabilities* createRenderSystemCapabilities(void) const;
 
-        virtual void reinitialise(void);
-
-        virtual RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
-
         virtual RenderWindow* _createRenderWindow( const String &name,
                                                    unsigned int width, unsigned int height,
                                                    bool fullScreen,
@@ -181,21 +177,7 @@ namespace Ogre
 
         virtual MultiRenderTarget* createMultiRenderTarget(const String & name);
 
-        virtual String getErrorDescription(long errorNumber) const;
-
-        virtual void _useLights(const LightList& lights, unsigned short limit);
-        virtual void _setWorldMatrix(const Matrix4 &m);
-        virtual void _setViewMatrix(const Matrix4 &m);
-        virtual void _setProjectionMatrix(const Matrix4 &m);
-
-        virtual void _setSurfaceParams( const ColourValue &ambient,
-                                const ColourValue &diffuse, const ColourValue &specular,
-                                const ColourValue &emissive, Real shininess,
-                                TrackVertexColourType tracking = TVC_NONE );
-        virtual void _setPointSpritesEnabled(bool enabled);
-        virtual void _setPointParameters(Real size, bool attenuationEnabled,
-            Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
-
+#if 0
         virtual void queueBindUAV( uint32 slot, TexturePtr texture,
                                            ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
                                            int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
@@ -213,23 +195,23 @@ namespace Ogre
         virtual void _setTextureCS( uint32 slot, bool enabled, Texture *texPtr );
         virtual void _setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock );
 
-        virtual void _setTexture(size_t unit, bool enabled,  Texture *texPtr);
-
-        virtual void _setTextureCoordSet(size_t unit, size_t index);
-        virtual void _setTextureCoordCalculation(size_t unit, TexCoordCalcMethod m,
-                                                 const Frustum* frustum = 0);
-        virtual void _setTextureBlendMode(size_t unit, const LayerBlendModeEx& bm);
-        virtual void _setTextureMatrix(size_t unit, const Matrix4& xform);
-
         virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer );
 
         virtual void _hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso );
         virtual void _hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *pso );
+#endif
 
-        virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget,
-                                                    bool exactMatchFormat );
+        virtual void _setTexture(size_t unit, bool enabled,  const TexturePtr& texPtr);
 
-        virtual void setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams );
+        virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget);
+
+        void setStencilCheckEnabled(bool enabled);
+        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, uint32 refValue = 0,
+                                    uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
+                                    StencilOperation stencilFailOp = SOP_KEEP,
+                                    StencilOperation depthFailOp = SOP_KEEP,
+                                    StencilOperation passOp = SOP_KEEP, bool twoSidedOperation = false,
+                                    bool readBackAsTexture = false);
 
         /// See VaoManager::waitForTailFrameToFinish
         virtual void _waitForTailFrameToFinish(void);
@@ -238,18 +220,30 @@ namespace Ogre
         virtual void _beginFrameOnce(void);
         virtual void _endFrameOnce(void);
 
-        virtual void _beginFrame(void);
         virtual void _endFrame(void);
+
+        void setScissorTest(bool enabled, const Rect& rect);
+
         virtual void _setViewport(Viewport *vp);
 
         virtual void _hlmsPipelineStateObjectCreated( HlmsPso *newPso );
+
+        void setColourBlendState(const ColourBlendState& state);
+#if 0
         virtual void _hlmsPipelineStateObjectDestroyed( HlmsPso *pso );
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
+#endif
+        void _setSampler( size_t texUnit, Sampler& s);
+        void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) {}
+        void _setTextureAddressingMode(size_t unit, const Sampler::UVWAddressingMode& uvw) {}
 
-        virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
-        virtual void _setPipelineStateObject( const HlmsPso *pso );
-        virtual void _setComputePso( const HlmsComputePso *pso );
+        void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL);
+
+        void _setCullingMode(CullingMode mode);
+        void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f);
+        //virtual void _setPipelineStateObject( const HlmsPso *pso );
+        //virtual void _setComputePso( const HlmsComputePso *pso );
 
         virtual VertexElementType getColourVertexElementType(void) const;
         virtual void _convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
@@ -265,6 +259,7 @@ namespace Ogre
         virtual void _applyObliqueDepthProjection( Matrix4& matrix, const Plane& plane,
                                                    bool forGpuProgram );
 
+#if 0
         virtual void _dispatch( const HlmsComputePso &pso );
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
@@ -277,12 +272,13 @@ namespace Ogre
         virtual void _setRenderOperation( const v1::CbRenderOp *cmd );
         virtual void _render( const v1::CbDrawCallIndexed *cmd );
         virtual void _render( const v1::CbDrawCallStrip *cmd );
-        virtual void _render( const v1::RenderOperation &op );
+#endif
+        void _setPolygonMode(PolygonMode) {}
+        void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage) {}
+        virtual void _render( const RenderOperation &op );
 
         virtual void bindGpuProgramParameters(GpuProgramType gptype,
-            GpuProgramParametersSharedPtr params, uint16 variabilityMask);
-        virtual void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
-
+            const GpuProgramParametersPtr& params, uint16 variabilityMask);
         virtual void clearFrameBuffer(unsigned int buffers,
             const ColourValue& colour = ColourValue::Black,
             Real depth = 1.0f, unsigned short stencil = 0);
@@ -293,7 +289,7 @@ namespace Ogre
         virtual Real getMinimumDepthInputValue(void);
         virtual Real getMaximumDepthInputValue(void);
 
-        virtual void _setRenderTarget(RenderTarget *target, uint8 viewportRenderTargetFlags);
+        virtual void _setRenderTarget(RenderTarget *target);
         virtual void _notifyCompositorNodeSwitchedRenderTarget( RenderTarget *previousTarget );
         virtual void preExtraThreadsStarted();
         virtual void postExtraThreadsStarted();
@@ -301,7 +297,7 @@ namespace Ogre
         virtual void unregisterThread();
         virtual unsigned int getDisplayMonitorCount() const     { return 1; }
 
-        virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const;
+        virtual const MetalPixelFormatToShaderType* getPixelFormatToShaderType(void) const;
 
         virtual void beginProfileEvent( const String &eventName );
         virtual void endProfileEvent( void );
@@ -312,14 +308,8 @@ namespace Ogre
         virtual void beginGPUSampleProfile( const String &name, uint32 *hashCache );
         virtual void endGPUSampleProfile( const String &name );
 
-        virtual bool hasAnisotropicMipMapFilter() const         { return true; }
-
-        virtual void setClipPlanesImpl(const PlaneList& clipPlanes);
         virtual void initialiseFromRenderSystemCapabilities( RenderSystemCapabilities* caps,
                                                              RenderTarget* primary );
-        virtual void updateCompositorManager( CompositorManager2 *compositorManager,
-                                              SceneManagerEnumerator &sceneManagers,
-                                              HlmsManager *hlmsManager );
 
         MetalDevice* getActiveDevice(void)                      { return mActiveDevice; }
         MetalProgramFactory* getMetalProgramFactory(void)       { return mMetalProgramFactory; }

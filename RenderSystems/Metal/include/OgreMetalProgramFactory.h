@@ -50,10 +50,10 @@ namespace Ogre
         /// Get the name of the language this factory creates programs for
         const String& getLanguage(void) const;
         /// Create an instance of MetalProgram
-        HighLevelGpuProgram* create(ResourceManager* creator,
+        GpuProgram* create(ResourceManager* creator,
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
-        void destroy(HighLevelGpuProgram* prog);
+        void destroy(GpuProgram* prog);
     };
 }
 
