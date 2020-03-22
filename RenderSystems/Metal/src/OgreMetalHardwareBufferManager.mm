@@ -32,15 +32,13 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreMetalDiscardBufferManager.h"
 
 namespace Ogre {
-namespace v1 {
-    MetalHardwareBufferManagerBase::MetalHardwareBufferManagerBase( MetalDevice *device,
-                                                                    VaoManager *vaoManager ) :
+    MetalHardwareBufferManager::MetalHardwareBufferManager( MetalDevice *device) :
         mDiscardBufferManager( 0 )
     {
-        mDiscardBufferManager = OGRE_NEW MetalDiscardBufferManager( device, vaoManager );
+        mDiscardBufferManager = OGRE_NEW MetalDiscardBufferManager( device );
     }
     //-----------------------------------------------------------------------------------
-    MetalHardwareBufferManagerBase::~MetalHardwareBufferManagerBase()
+    MetalHardwareBufferManager::~MetalHardwareBufferManager()
     {
         destroyAllDeclarations();
         destroyAllBindings();
@@ -49,7 +47,7 @@ namespace v1 {
         mDiscardBufferManager = 0;
     }
     //-----------------------------------------------------------------------------------
-    void MetalHardwareBufferManagerBase::_notifyDeviceStalled(void)
+    void MetalHardwareBufferManager::_notifyDeviceStalled(void)
     {
         {
             OGRE_LOCK_MUTEX(mVertexBuffersMutex);
@@ -80,7 +78,7 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------------------
     HardwareVertexBufferSharedPtr
-    MetalHardwareBufferManagerBase::createVertexBuffer( size_t vertexSize, size_t numVerts,
+    MetalHardwareBufferManager::createVertexBuffer( size_t vertexSize, size_t numVerts,
                                                         HardwareBuffer::Usage usage,
                                                         bool useShadowBuffer )
     {
@@ -94,7 +92,7 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------------------
     HardwareIndexBufferSharedPtr
-    MetalHardwareBufferManagerBase::createIndexBuffer( HardwareIndexBuffer::IndexType itype,
+    MetalHardwareBufferManager::createIndexBuffer( HardwareIndexBuffer::IndexType itype,
                                                        size_t numIndexes,
                                                        HardwareBuffer::Usage usage,
                                                        bool useShadowBuffer )
@@ -107,34 +105,4 @@ namespace v1 {
         }
         return HardwareIndexBufferSharedPtr(buf);
     }
-    //-----------------------------------------------------------------------------------
-    HardwareUniformBufferSharedPtr
-    MetalHardwareBufferManagerBase::createUniformBuffer( size_t sizeBytes,
-                                                         HardwareBuffer::Usage usage,
-                                                         bool useShadowBuffer,
-                                                         const String& name )
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "Use v2 interfaces.",
-                     "MetalHardwareBufferManagerBase::createUniformBuffer" );
-        return HardwareUniformBufferSharedPtr();
-    }
-    //-----------------------------------------------------------------------------------
-    HardwareCounterBufferSharedPtr
-    MetalHardwareBufferManagerBase::createCounterBuffer( size_t sizeBytes,
-                                                         HardwareBuffer::Usage usage,
-                                                         bool useShadowBuffer,
-                                                         const String& name )
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "Use v2 interfaces.",
-                     "MetalHardwareBufferManagerBase::createCounterBuffer" );
-    }
-    //-----------------------------------------------------------------------------------
-    RenderToVertexBufferSharedPtr MetalHardwareBufferManagerBase::createRenderToVertexBuffer(void)
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "Use v2 interfaces.",
-                     "MetalHardwareBufferManagerBase::createRenderToVertexBuffer" );
-        //return RenderToVertexBufferSharedPtr(new MetalRenderToVertexBuffer);
-        return RenderToVertexBufferSharedPtr();
-    }
-}
 }

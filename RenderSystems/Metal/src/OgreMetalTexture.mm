@@ -35,24 +35,15 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreMetalDepthTexture.h"
 #include "OgreMetalDepthBuffer.h"
+#include "OgreBitwise.h"
 
 #import "Metal/MTLBlitCommandEncoder.h"
 
 namespace Ogre
 {
-    static inline void doImageIO( const String &name, const String &group,
-                                  const String &ext,
-                                  vector<Image>::type &images,
-                                  Resource *r )
-    {
-        size_t imgIdx = images.size();
-        images.push_back(Image());
-
-        DataStreamPtr dstream =
-            ResourceGroupManager::getSingleton().openResource(
-                name, group, true, r);
-
-        images[imgIdx].load(dstream, ext);
+    static uint32 getMaxMipmapCount(uint32 w, uint32 h, uint32 d) {
+        // see ARB_texture_non_power_of_two
+        return Bitwise::mostSignificantBitSet(std::max(w, std::max(h, d)));
     }
 
     MetalTexture::MetalTexture( ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -106,7 +97,7 @@ namespace Ogre
         const MTLTextureType texTarget = getMetalTextureTarget();
 
         // Check requested number of mipmaps
-        const size_t maxMips = PixelUtil::getMaxMipmapCount( mWidth, mHeight,
+        const size_t maxMips = getMaxMipmapCount( mWidth, mHeight,
                                                              mTextureType == TEX_TYPE_3D ? mDepth : 1 );
 
         if( (PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0)) || mTextureType == TEX_TYPE_1D )
@@ -168,117 +159,6 @@ namespace Ogre
 
         createMetalTexResource();
         createSurfaceList();
-    }
-    //-----------------------------------------------------------------------------------
-    void MetalTexture::prepareImpl(void)
-    {
-        if( mFSAA < 1u )
-            mFSAA = 1u;
-
-        if( mUsage & TU_RENDERTARGET )
-            return;
-
-        String baseName, ext;
-        size_t pos = mName.find_last_of(".");
-        baseName = mName.substr(0, pos);
-
-        if (pos != String::npos)
-        {
-            ext = mName.substr(pos+1);
-        }
-
-        LoadedImages loadedImages = LoadedImages(new vector<Image>::type());
-
-        if( mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D ||
-            mTextureType == TEX_TYPE_2D_RECT ||
-            mTextureType == TEX_TYPE_2D_ARRAY || mTextureType == TEX_TYPE_3D )
-
-        {
-            doImageIO(mName, mGroup, ext, *loadedImages, this);
-
-            // If this is a volumetric texture set the texture type flag accordingly.
-            // If this is a cube map, set the texture type flag accordingly.
-            if ((*loadedImages)[0].hasFlag(IF_CUBEMAP))
-                mTextureType = TEX_TYPE_CUBE_MAP;
-
-            // If this is a volumetric texture set the texture type flag accordingly.
-            if((*loadedImages)[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
-                mTextureType = TEX_TYPE_3D;
-
-            // If PVRTC/ASTC and 0 custom mipmap disable auto mip generation
-            // and disable software mipmap creation
-            if (PixelUtil::isCompressed((*loadedImages)[0].getFormat()))
-            {
-                size_t imageMips = (*loadedImages)[0].getNumMipmaps();
-                if (imageMips == 0)
-                {
-                    mNumMipmaps = mNumRequestedMipmaps = imageMips;
-                    // Disable flag for auto mip generation
-                    mUsage &= ~TU_AUTOMIPMAP;
-                }
-            }
-        }
-        else if (mTextureType == TEX_TYPE_CUBE_MAP)
-        {
-            if(getSourceFileType() == "dds" || getSourceFileType() == "oitd")
-            {
-                // XX HACK there should be a better way to specify whether
-                // all faces are in the same file or not
-                doImageIO(mName, mGroup, ext, *loadedImages, this);
-            }
-            else
-            {
-                static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
-
-                for(size_t i = 0; i < 6; i++)
-                {
-                    String fullName = baseName + suffixes[i];
-                    if (!ext.empty())
-                        fullName = fullName + "." + ext;
-                    // find & load resource data intro stream to allow resource
-                    // group changes if required
-                    doImageIO(fullName, mGroup, ext, *loadedImages, this);
-                }
-            }
-        }
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                        "**** Unknown texture type ****",
-                        "MetalTexture::prepare");
-        }
-
-        mLoadedImages = loadedImages;
-    }
-    //-----------------------------------------------------------------------------------
-    void MetalTexture::unprepareImpl(void)
-    {
-        mLoadedImages.setNull();
-    }
-    //-----------------------------------------------------------------------------------
-    void MetalTexture::loadImpl(void)
-    {
-        if (mUsage & TU_RENDERTARGET)
-        {
-            createInternalResources();
-            return;
-        }
-
-        // Now the only copy is on the stack and will be cleaned in case of
-        // exceptions being thrown from _loadImages
-        LoadedImages loadedImages = mLoadedImages;
-        mLoadedImages.setNull();
-
-        // Call internal _loadImages, not loadImage since that's external and
-        // will determine load status etc again
-        ConstImagePtrList imagePtrs;
-
-        for (size_t i = 0; i < loadedImages->size(); ++i)
-        {
-            imagePtrs.push_back(&(*loadedImages)[i]);
-        }
-
-        _loadImages(imagePtrs);
 
         if( (mUsage & TU_AUTOMIPMAP) &&
             mNumRequestedMipmaps && mMipmapsHardwareGenerated )
@@ -287,10 +167,8 @@ namespace Ogre
             [blitEncoder generateMipmapsForTexture:mTexture];
         }
     }
-    //-----------------------------------------------------------------------------------
     void MetalTexture::freeInternalResourcesImpl(void)
     {
-        mSurfaceList.clear();
         mTexture = 0;
     }
     //-----------------------------------------------------------------------------------
@@ -315,37 +193,16 @@ namespace Ogre
 
             for (uint8 mip = 0; mip <= getNumMipmaps(); mip++)
             {
-                v1::MetalHardwarePixelBuffer *buf = OGRE_NEW v1::MetalTextureBuffer(
+                MetalHardwarePixelBuffer *buf = OGRE_NEW MetalTextureBuffer(
                             renderTexture, resolveTexture, mDevice, mName,
                             getMetalTextureTarget(), width, height, depth, mFormat,
                             static_cast<int32>(face), mip,
-                            static_cast<v1::HardwareBuffer::Usage>(mUsage),
+                            static_cast<HardwareBuffer::Usage>(mUsage),
                             mHwGamma, mFSAA );
 
-                mSurfaceList.push_back( v1::HardwarePixelBufferSharedPtr(buf) );
+                mSurfaceList.push_back( HardwarePixelBufferSharedPtr(buf) );
             }
         }
-    }
-    //-----------------------------------------------------------------------------------
-    v1::HardwarePixelBufferSharedPtr MetalTexture::getBuffer( size_t face, size_t mipmap )
-    {
-        if (face >= getNumFaces())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Face index out of range",
-                        "MetalTexture::getBuffer");
-        }
-
-        if (mipmap > mNumMipmaps)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Mipmap index out of range",
-                        "MetalTexture::getBuffer");
-        }
-
-        unsigned long idx = face * (mNumMipmaps + 1) + mipmap;
-        assert(idx < mSurfaceList.size());
-        return mSurfaceList[idx];
     }
     //-----------------------------------------------------------------------------------
     void MetalTexture::_autogenerateMipmaps(void)
@@ -353,7 +210,7 @@ namespace Ogre
         __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
         [blitEncoder generateMipmapsForTexture: mTexture];
 
-        mSurfaceList[0]->getRenderTarget()->_setMipmapsUpdated();
+        // mSurfaceList[0]->getRenderTarget()->_setMipmapsUpdated();
     }
     //-----------------------------------------------------------------------------------
     id<MTLTexture> MetalTexture::getTextureForSampling( MetalRenderSystem *renderSystem )
@@ -364,7 +221,7 @@ namespace Ogre
         {
         #if OGRE_DEBUG_MODE
             RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
-            if( PixelUtil::isDepth( renderTarget->getFormat() ) )
+            if( PixelUtil::isDepth( renderTarget->suggestPixelFormat() ) )
             {
                 assert( dynamic_cast<MetalDepthTextureTarget*>( renderTarget ) );
                 MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>(
@@ -381,7 +238,7 @@ namespace Ogre
 
             if( mFSAA > 1u )
             {
-                RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
+                //RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
                 //In metal, implicitly resolved textures are immediately resolved
                 //via MTLStoreActionMultisampleResolve, so we don't need to do
                 //anything for implicit resolves (it's already resolved and the
@@ -396,7 +253,7 @@ namespace Ogre
 //                    }
 //                }
 //                else if( renderTarget->isFsaaResolveDirty() )
-                if( !mFsaaExplicitResolve && renderTarget->isFsaaResolveDirty() )
+                //if( !mFsaaExplicitResolve && renderTarget->isFsaaResolveDirty() )
                 {
                     //Explicit resolves. Only use the
                     //Fsaa texture before it has been resolved
@@ -404,11 +261,11 @@ namespace Ogre
                 }
             }
 
-            if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET|TU_AUTOMIPMAP_AUTO)) ==
-                    (TU_AUTOMIPMAP|TU_RENDERTARGET|TU_AUTOMIPMAP_AUTO) )
+            if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET)) ==
+                    (TU_AUTOMIPMAP|TU_RENDERTARGET) )
             {
-                RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
-                if( renderTarget->isMipmapsDirty() )
+                // RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
+                // if( renderTarget->isMipmapsDirty() )
                     this->_autogenerateMipmaps();
             }
         }

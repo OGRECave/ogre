@@ -117,7 +117,7 @@ if (OGRE_BUILD_RENDERSYSTEM_GLES2)
 	set(_rendersystems "${_rendersystems}  + OpenGL ES2/ ES3\n")
 endif ()
 if (OGRE_BUILD_RENDERSYSTEM_METAL)
-	set(_rendersystems "${_rendersystems}  + Metal\n")
+	set(_rendersystems "${_rendersystems}  + Metal [EXPERIMENTAL]\n")
 endif ()
 
 if (DEFINED _rendersystems)

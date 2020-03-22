@@ -56,15 +56,6 @@ namespace Ogre
     class _OgreMetalExport MetalProgram : public HighLevelGpuProgram
     {
     public:
-
-        /// Command object for setting macro defines
-        class CmdPreprocessorDefines : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-
         /// Command object for setting entry point
         class CmdEntryPoint : public ParamCommand
         {
@@ -85,16 +76,6 @@ namespace Ogre
                       const String& group, bool isManual, ManualResourceLoader* loader,
                       MetalDevice *device );
         virtual ~MetalProgram();
-
-        /// Overridden
-        bool getPassTransformStates(void) const;
-        bool getPassSurfaceAndLightStates(void) const;
-        bool getPassFogStates(void) const;
-
-        /// Sets the preprocessor defines use to compile the program.
-        void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
-        /// Sets the preprocessor defines use to compile the program.
-        const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
 
         /** Sets the entry point for this program ie the first method called. */
         void setEntryPoint(const String& entryPoint) { mEntryPoint = entryPoint; }
@@ -129,27 +110,21 @@ namespace Ogre
         /// dstData must be able to hold at least getBufferRequiredSize
         void updateBuffers( const GpuProgramParametersSharedPtr &params,
                             uint8 * RESTRICT_ALIAS dstData );
-        NSUInteger getFunctionParamCount(void);
-        size_t getSharedParamCount(void);
 
+        static uint32 getAttributeIndex(VertexElementSemantic semantic);
     protected:
-        static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdEntryPoint msCmdEntryPoint;
         static CmdShaderReflectionPairHint msCmdShaderReflectionPairHint;
 
         /** Internal load implementation, must be implemented by subclasses.
         */
         void loadFromSource(void);
-        /** Internal method for creating a dummy low-level program for this
-        high-level program. Metal does not give access to the low level implementation of the
-        shader so this method creates an object sub-classed from MetalGpuProgram just to be
-        compatible with MetalRenderSystem.
-        */
-        void createLowLevelImpl(void);
+        /// noop
+        void createLowLevelImpl(void) {}
+        /// shortcut as we there is no low-level separation here
+        GpuProgram* _getBindingDelegate(void) { return this; }
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
-        /// Overridden from HighLevelGpuProgram
-        void unloadImpl(void);
 
         /// Populate the passed parameters with name->index map
         void populateParameterNames(GpuProgramParametersSharedPtr params);
@@ -167,11 +142,10 @@ namespace Ogre
         /// Flag indicating if shader object successfully compiled
         bool mCompiled;
         /// Preprocessor options
-        String mPreprocessorDefines;
         String mEntryPoint;
         String mTargetBufferName;
 
-        vector<GpuConstantDefinition>::type mConstantDefsSorted;
+        std::vector<GpuConstantDefinition> mConstantDefsSorted;
         uint32 mConstantsBytesToWrite;
 
         String mShaderReflectionPairHint;

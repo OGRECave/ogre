@@ -37,11 +37,11 @@ namespace Ogre
 {
     class MetalRenderTexture : public RenderTexture, public MetalRenderTargetCommon
     {
-        MetalRenderSystem   *mRenderSystem;
+        //MetalRenderSystem   *mRenderSystem;
 
     public:
         MetalRenderTexture( MetalDevice *ownerDevice, const String &name,
-                            v1::HardwarePixelBuffer *buffer,
+                            HardwarePixelBuffer *buffer,
                             __unsafe_unretained id<MTLTexture> renderTexture,
                             __unsafe_unretained id<MTLTexture> resolveTexture,
                             PixelFormat format, uint32 depthPlane, uint32 slice,

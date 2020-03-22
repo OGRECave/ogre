@@ -39,7 +39,7 @@ namespace Ogre
         mMetalLayer( 0 ),
         mCurrentDrawable( 0 ),
         mMsaaTex( 0 ),
-        mRenderSystem( renderSystem )
+        mContentScalingFactor(1)
     {
         mIsFullScreen = false;
         mActive = false;
@@ -78,10 +78,10 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderWindow::swapBuffers(void)
     {
-        assert( (mOwnerDevice->mFrameAborted ||
+        /*assert( (mOwnerDevice->mFrameAborted ||
                 mColourAttachmentDesc.loadAction != MTLLoadActionClear) &&
                 "A clear has been asked but no rendering command was "
-                "issued and Ogre didn't catch it." );
+                "issued and Ogre didn't catch it." );*/
 
         RenderWindow::swapBuffers();
 
@@ -139,7 +139,7 @@ namespace Ogre
             ViewportList::iterator end  = mViewportList.end();
             while( itor != end )
             {
-                (*itor)->_updateDimensions();
+                (*itor).second->_updateDimensions();
                 ++itor;
             }
         }
@@ -210,16 +210,14 @@ namespace Ogre
                 mHwGamma = StringConverter::parseBool( opt->second );
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-            opt = miscParams->find("macAPICocoaUseNSView");
+            opt = miscParams->find("externalWindowHandle");
             if( opt != end )
             {
-                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external plain NSView*");
-                opt = miscParams->find("parentWindowHandle");
-                NSView *nsview = (__bridge NSView*)reinterpret_cast<void*>(StringConverter::parseSizeT(opt->second));
-                assert( nsview &&
-                       "Unable to get a pointer to the parent NSView."
-                       "Was the 'parentWindowHandle' parameter set correctly in the call to createRenderWindow()?");
-                mWindow = [nsview window];
+                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external NSWindow*");
+                mWindow = (__bridge NSWindow*)reinterpret_cast<void*>(StringConverter::parseSizeT(opt->second));
+                assert( mWindow &&
+                       "Unable to get a pointer to the parent NSWindow."
+                       "Was the 'externalWindowHandle' parameter set correctly in the call to createRenderWindow()?");
             }
 #endif
         }
@@ -237,6 +235,7 @@ namespace Ogre
         frame.size.height = mHeight;
 #else
         frame = [mWindow.contentView bounds];
+        mContentScalingFactor = mWindow.backingScaleFactor;
 #endif
         mMetalView = [[OgreMetalView alloc] initWithFrame:frame];
 
@@ -326,7 +325,7 @@ namespace Ogre
         }
         else if( name == "UIView" )
         {
-            *static_cast<void**>(pData) = (void*)CFBridgingRetain( mMetalView );
+            *static_cast<void**>(pData) = const_cast<void*>((const void*)CFBridgingRetain( mMetalView ));
         }
         else
         {

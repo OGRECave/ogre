@@ -35,7 +35,6 @@ THE SOFTWARE.
 #import <Metal/MTLTexture.h>
 
 namespace Ogre {
-namespace v1 {
     class _OgreMetalExport MetalHardwarePixelBuffer : public HardwarePixelBuffer
     {
     protected:
@@ -49,6 +48,8 @@ namespace v1 {
         // depending on buffer usage
         PixelBox mBuffer;
         LockOptions mCurrentLockOptions;
+
+        bool mHwGamma;
 
         // Buffer allocation/freeage
         void allocateBuffer();
@@ -122,7 +123,7 @@ namespace v1 {
         void copyFromFramebuffer(size_t zoffset);
 
         /// @copydoc HardwarePixelBuffer::blit
-        void blit( const v1::HardwarePixelBufferSharedPtr &src,
+        void blit( const HardwarePixelBufferSharedPtr &src,
                    const Box &srcBox, const Box &dstBox );
         // Blitting implementation
         void blitFromTexture( MetalTextureBuffer *src, const Box &srcBox,
@@ -136,10 +137,9 @@ namespace v1 {
         int mFace;
         int mLevel;
 
-        typedef vector<RenderTexture*>::type SliceTRT;
+        typedef std::vector<RenderTexture*> SliceTRT;
         SliceTRT mSliceTRT;
     };
-}
 }
 
 #endif

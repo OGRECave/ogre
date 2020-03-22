@@ -100,34 +100,32 @@ namespace Ogre
 
         for (uint8 face = 0; face < getNumFaces(); face++)
         {
-            v1::HardwarePixelBuffer *buf = OGRE_NEW v1::MetalDepthPixelBuffer( this, mName,
+            HardwarePixelBuffer *buf = OGRE_NEW MetalDepthPixelBuffer( this, mName,
                                                                                mWidth, mHeight,
                                                                                mDepth, mFormat );
 
-            mSurfaceList.push_back( v1::HardwarePixelBufferSharedPtr(buf) );
+            mSurfaceList.push_back( HardwarePixelBufferSharedPtr(buf) );
         }
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
-namespace v1
-{
     MetalDepthPixelBuffer::MetalDepthPixelBuffer( MetalDepthTexture *parentTexture,
                                                       const String &baseName,
                                                       uint32 width, uint32 height,
                                                       uint32 depth, PixelFormat format ) :
-        HardwarePixelBuffer( width, height, depth, format, false,
+        HardwarePixelBuffer( width, height, depth, format,
                              HardwareBuffer::HBU_STATIC_WRITE_ONLY, false, false ),
         mDummyRenderTexture( 0 )
     {
         String name = "DepthTexture/" + StringConverter::toString((size_t)this) + "/" + baseName;
 
         mDummyRenderTexture = OGRE_NEW MetalDepthTextureTarget( parentTexture, name, this, 0 );
-        mDummyRenderTexture->setPreferDepthTexture( true );
-        mDummyRenderTexture->setDesiredDepthBufferFormat( format );
+        // mDummyRenderTexture->setPreferDepthTexture( true );
+        // mDummyRenderTexture->setDesiredDepthBufferFormat( format );
 
         RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
-        renderSystem->setDepthBufferFor( mDummyRenderTexture, true );
+        renderSystem->setDepthBufferFor( mDummyRenderTexture );
 
         //TODO: Should we do this?
         Root::getSingleton().getRenderSystem()->attachRenderTarget( *mDummyRenderTexture );
@@ -168,13 +166,12 @@ namespace v1
     {
         return mDummyRenderTexture;
     }
-}
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     MetalDepthTextureTarget::MetalDepthTextureTarget( MetalDepthTexture *ultimateTextureOwner,
                                                           const String &name,
-                                                          v1::HardwarePixelBuffer *buffer,
+                                                          HardwarePixelBuffer *buffer,
                                                           uint32 zoffset ) :
         RenderTexture( buffer, zoffset ),
         mUltimateTextureOwner( ultimateTextureOwner )
@@ -182,13 +179,13 @@ namespace v1
         mName = name;
         mWidth      = ultimateTextureOwner->getWidth();
         mHeight     = ultimateTextureOwner->getHeight();
-        mFormat     = ultimateTextureOwner->getFormat();
+        // mFormat     = ultimateTextureOwner->getFormat();
         mFSAA       = ultimateTextureOwner->getFSAA();
         mFSAAHint   = ultimateTextureOwner->getFSAAHint();
-        mFsaaResolveDirty = true; //Should be permanent true.
+        // mFsaaResolveDirty = true; //Should be permanent true.
 
         if( !ultimateTextureOwner->getShareableDepthBuffer() )
-            mDepthBufferPoolId = DepthBuffer::POOL_NON_SHAREABLE;
+            mDepthBufferPoolId = DepthBuffer::POOL_MANUAL_USAGE;
     }
     //-----------------------------------------------------------------------------------
     MetalDepthTextureTarget::~MetalDepthTextureTarget()
@@ -204,13 +201,13 @@ namespace v1
         if( oldPoolId != poolId )
         {
             RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
-            renderSystem->setDepthBufferFor( this, true );
+            renderSystem->setDepthBufferFor( this);
         }
     }
     //-----------------------------------------------------------------------------------
-    bool MetalDepthTextureTarget::attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch )
+    bool MetalDepthTextureTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
-        bool retVal = RenderTexture::attachDepthBuffer( depthBuffer, exactFormatMatch );
+        bool retVal = RenderTexture::attachDepthBuffer( depthBuffer);
 
         if( mDepthBuffer )
         {
@@ -234,7 +231,7 @@ namespace v1
     {
         for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
         {
-            outFormats[i] = PF_NULL;
+            outFormats[i] = PF_UNKNOWN;
             outHwGamma[i] = false;
         }
     }

@@ -29,10 +29,47 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalTextureManager.h"
 #include "OgreMetalTexture.h"
 #include "OgreMetalDepthTexture.h"
-#include "OgreMetalNullTexture.h"
+#include "OgreMetalMappings.h"
+#include "OgreMetalDevice.h"
 
 namespace Ogre
 {
+    id <MTLSamplerState> MetalSampler::getState()
+    {
+        if(!mDirty)
+            return mSampler;
+
+        MTLSamplerDescriptor *samplerDescriptor = [MTLSamplerDescriptor new];
+        samplerDescriptor.minFilter = MetalMappings::get( mMinFilter );
+        samplerDescriptor.magFilter = MetalMappings::get( mMagFilter );
+        samplerDescriptor.mipFilter = MetalMappings::getMipFilter( mMipFilter );
+        samplerDescriptor.maxAnisotropy = mMaxAniso;
+        samplerDescriptor.sAddressMode  = MetalMappings::get( mAddressMode.u );
+        samplerDescriptor.tAddressMode  = MetalMappings::get( mAddressMode.v );
+        samplerDescriptor.rAddressMode  = MetalMappings::get( mAddressMode.w );
+        samplerDescriptor.normalizedCoordinates = YES;
+        //samplerDescriptor.lodMinClamp   = newBlock->mMinLod;
+        //samplerDescriptor.lodMaxClamp   = newBlock->mMaxLod;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        const bool supportsCompareFunction =
+                [mDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily3_v1];
+#else
+        const bool supportsCompareFunction = true;
+#endif
+
+        if( supportsCompareFunction && mCompareEnabled )
+        {
+            samplerDescriptor.compareFunction = MetalMappings::get( mCompareFunc );
+        }
+
+        mSampler = [mDevice->mDevice newSamplerStateWithDescriptor:samplerDescriptor];
+
+        mDirty = false;
+
+        return mSampler;
+    }
+
     MetalTextureManager::MetalTextureManager( MetalDevice *device ) :
         TextureManager(),
         mDevice( device )
@@ -59,16 +96,14 @@ namespace Ogre
                 return new MetalDepthTexture( shareableDepthBuffer, this, name, handle, group,
                                               isManual, loader, mDevice );
             }
-
-            NameValuePairList::const_iterator it = createParams->find( "SpecialFormat" );
-            if( it != createParams->end() && it->second == "PF_NULL" )
-            {
-                return new MetalNullTexture( this, name, handle, group,
-                                             isManual, loader, mDevice );
-            }
         }
 
         return new MetalTexture( this, name, handle, group, isManual, loader, mDevice );
+    }
+
+    SamplerPtr MetalTextureManager::_createSamplerImpl()
+    {
+        return std::make_shared<MetalSampler>(mDevice);
     }
 
     PixelFormat MetalTextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)
@@ -78,12 +113,9 @@ namespace Ogre
         if( format == PF_B8G8R8 )
             return PF_X8B8G8R8;
 
-        return format;
-    }
+        if(MetalMappings::getPixelFormat( format, false ) != MTLPixelFormatInvalid)
+            return format;
 
-    bool MetalTextureManager::isHardwareFilteringSupported( TextureType ttype, PixelFormat format,
-                                                            int usage, bool preciseFormatOnly )
-    {
-        return true;
+        return PF_BYTE_RGBA;
     }
 }

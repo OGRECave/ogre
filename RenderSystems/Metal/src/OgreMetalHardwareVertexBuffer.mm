@@ -31,13 +31,12 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreMetalDiscardBufferManager.h"
 
 namespace Ogre {
-namespace v1 {
-    MetalHardwareVertexBuffer::MetalHardwareVertexBuffer( MetalHardwareBufferManagerBase *mgr,
+    MetalHardwareVertexBuffer::MetalHardwareVertexBuffer( MetalHardwareBufferManager *mgr,
                                                           size_t vertexSize,
                                                           size_t numVertices,
                                                           HardwareBuffer::Usage usage,
                                                           bool useShadowBuffer ) :
-        HardwareVertexBuffer( mgr, vertexSize, numVertices, usage, false, false ),
+        HardwareVertexBuffer( mgr, vertexSize, numVertices, usage, false, useShadowBuffer ),
         mMetalHardwareBufferCommon( mSizeInBytes, usage, 16, mgr->_getDiscardBufferManager(),
                                     mgr->_getDiscardBufferManager()->getDevice() )
     {
@@ -76,9 +75,7 @@ namespace v1 {
     {
         if( mUseShadowBuffer )
         {
-            void* srcData = mShadowBuffer->lock(offset, length, HBL_READ_ONLY);
-            memcpy(pDest, srcData, length);
-            mShadowBuffer->unlock();
+            mShadowBuffer->readData(offset, length, pDest);
         }
         else
         {
@@ -92,15 +89,10 @@ namespace v1 {
         // Update the shadow buffer
         if( mUseShadowBuffer )
         {
-            void* destData = mShadowBuffer->lock( offset, length,
-                                                  discardWholeBuffer ? HBL_DISCARD : HBL_NORMAL );
-            memcpy( destData, pSource, length );
-            mShadowBuffer->unlock();
+            mShadowBuffer->writeData(offset, length, pSource, discardWholeBuffer);
         }
 
-        mMetalHardwareBufferCommon.writeData( offset, length, pSource,
-                                              discardWholeBuffer ||
-                                              (offset == 0 && length == mSizeInBytes) );
+        mMetalHardwareBufferCommon.writeData(offset, length, pSource, discardWholeBuffer);
     }
     //-----------------------------------------------------------------------------------
     void MetalHardwareVertexBuffer::copyData( HardwareBuffer& srcBuffer, size_t srcOffset,
@@ -112,12 +104,10 @@ namespace v1 {
         }
         else
         {
-            MetalHardwareBufferCommon *metalBuffer = reinterpret_cast<MetalHardwareBufferCommon*>(
-                        srcBuffer.getRenderSystemData() );
-            mMetalHardwareBufferCommon.copyData( metalBuffer, srcOffset,
-                                                 dstOffset, length,
-                                                 discardWholeBuffer ||
-                                                 (dstOffset == 0 && length == mSizeInBytes) );
+            MetalHardwareBufferCommon* metalBuffer =
+                static_cast<MetalHardwareVertexBuffer&>(srcBuffer).getRenderSystemData();
+            mMetalHardwareBufferCommon.copyData(metalBuffer, srcOffset, dstOffset, length,
+                                                discardWholeBuffer);
         }
     }
     //-----------------------------------------------------------------------------------
@@ -125,19 +115,14 @@ namespace v1 {
     {
         if( mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate )
         {
-            const void *srcData = mShadowBuffer->lock( mLockStart, mLockSize, HBL_READ_ONLY );
-
-            const bool discardBuffer = mLockStart == 0 && mLockSize == mSizeInBytes;
-            mMetalHardwareBufferCommon.writeData( mLockStart, mLockSize, srcData, discardBuffer );
-
-            mShadowBuffer->unlock();
+            HardwareBufferLockGuard shadowLock(mShadowBuffer.get(), mLockStart, mLockSize, HBL_READ_ONLY);
+            mMetalHardwareBufferCommon.writeData(mLockStart, mLockSize, shadowLock.pData, false);
             mShadowUpdated = false;
         }
     }
     //-----------------------------------------------------------------------------------
-    void* MetalHardwareVertexBuffer::getRenderSystemData(void)
+    MetalHardwareBufferCommon* MetalHardwareVertexBuffer::getRenderSystemData(void)
     {
         return &mMetalHardwareBufferCommon;
     }
-}
 }

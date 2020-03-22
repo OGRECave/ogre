@@ -29,14 +29,12 @@ THE SOFTWARE.
 #include "OgreMetalHardwareBufferCommon.h"
 #include "OgreMetalDevice.h"
 #include "OgreMetalDiscardBufferManager.h"
-#include "Vao/OgreMetalStagingBuffer.h"
+#include "OgreMetalStagingBuffer.h"
 
 #import <Metal/MTLDevice.h>
 #import <Metal/MTLBlitCommandEncoder.h>
 
 namespace Ogre
-{
-namespace v1
 {
     MetalHardwareBufferCommon::MetalHardwareBufferCommon( size_t sizeBytes, HardwareBuffer::Usage usage,
                                                           uint16 alignment,
@@ -46,17 +44,18 @@ namespace v1
         mSizeBytes( sizeBytes ),
         mDevice( device ),
         mDiscardBuffer( 0 ),
-        mVaoManager( discardBufferMgr->getVaoManager() ),
         mStagingBuffer( 0 ),
         mLastFrameUsed( 0 ),
         mLastFrameGpuWrote( 0 )
     {
-        mLastFrameUsed = mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
+        // FIXME read write hazards not handled due to the following commented out
+        mLastFrameUsed = 0;//mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
         mLastFrameGpuWrote = mLastFrameUsed;
 
         MTLResourceOptions resourceOptions = 0;
 
-        if( usage & HardwareBuffer::HBU_WRITE_ONLY )
+        // FIXME always using shared storage for now. Using staging buffers leaks severly
+        if( usage & HardwareBuffer::HBU_WRITE_ONLY & 0)
         {
             resourceOptions |= MTLResourceStorageModePrivate;
             resourceOptions |= MTLResourceCPUCacheModeWriteCombined;
@@ -90,13 +89,13 @@ namespace v1
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::_notifyDeviceStalled(void)
     {
-        mLastFrameUsed      = mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
+        mLastFrameUsed      = 0;//mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
         mLastFrameGpuWrote  = mLastFrameUsed;
     }
     //-----------------------------------------------------------------------------------
     id<MTLBuffer> MetalHardwareBufferCommon::getBufferName( size_t &outOffset )
     {
-        mLastFrameUsed = mVaoManager->getFrameCount();
+        mLastFrameUsed = 0;//mVaoManager->getFrameCount();
         outOffset = 0;
         return !mDiscardBuffer ? mBuffer : mDiscardBuffer->getBufferName( outOffset );
     }
@@ -104,10 +103,35 @@ namespace v1
     id<MTLBuffer> MetalHardwareBufferCommon::getBufferNameForGpuWrite(void)
     {
         assert( !mDiscardBuffer && "Discardable buffers can't be written from GPU!" );
-        mLastFrameUsed      = mVaoManager->getFrameCount();
+        mLastFrameUsed      = 0;//mVaoManager->getFrameCount();
         mLastFrameGpuWrote  = mLastFrameUsed;
         return mBuffer;
     }
+
+    StagingBuffer* MetalHardwareBufferCommon::createStagingBuffer( size_t sizeBytes, bool forUpload )
+    {
+        sizeBytes = std::max<size_t>( sizeBytes, 4 * 1024 * 1024 );
+        sizeBytes = alignToNextMultiple( sizeBytes, 4u );
+
+        MTLResourceOptions resourceOptions = 0;
+
+        resourceOptions |= MTLResourceStorageModeShared;
+
+        if( forUpload )
+            resourceOptions |= MTLResourceCPUCacheModeWriteCombined;
+        else
+            resourceOptions |= MTLResourceCPUCacheModeDefaultCache;
+
+        id<MTLBuffer> bufferName = [mDevice->mDevice newBufferWithLength:sizeBytes
+                                                                         options:resourceOptions];
+
+        MetalStagingBuffer *stagingBuffer = OGRE_NEW MetalStagingBuffer( 0, sizeBytes, forUpload,
+                                                                         bufferName, mDevice );
+        //mRefedStagingBuffers[forUpload].push_back( stagingBuffer );
+
+        return stagingBuffer;
+    }
+
     //-----------------------------------------------------------------------------------
     void* MetalHardwareBufferCommon::lockImpl( size_t offset, size_t length,
                                                HardwareBuffer::LockOptions options,
@@ -122,8 +146,8 @@ namespace v1
 
         void *retPtr = 0;
 
-        const uint32 currentFrame       = mVaoManager->getFrameCount();
-        const uint32 bufferMultiplier   = mVaoManager->getDynamicBufferMultiplier();
+        const uint32 currentFrame       = 2;//mVaoManager->getFrameCount();
+        const uint32 bufferMultiplier   = 1;//mVaoManager->getDynamicBufferMultiplier();
 
         if( mDiscardBuffer )
         {
@@ -187,7 +211,7 @@ namespace v1
 
                 assert( !mStagingBuffer && "Invalid state, and mStagingBuffer will leak" );
 
-                mStagingBuffer = mVaoManager->getStagingBuffer( length, true );
+                mStagingBuffer = createStagingBuffer( length, true );
                 retPtr = mStagingBuffer->map( length );
             }
         }
@@ -202,8 +226,7 @@ namespace v1
 
         if( mStagingBuffer )
         {
-            static_cast<MetalStagingBuffer*>( mStagingBuffer )->_unmapToV1( this, lockStart, lockSize );
-            mStagingBuffer->removeReferenceCount();
+            mStagingBuffer->_unmapToV1( this, lockStart, lockSize );
             mStagingBuffer = 0;
         }
     }
@@ -215,8 +238,8 @@ namespace v1
         void const *srcData = 0;
         StagingBuffer *stagingBuffer = 0;
 
-        const uint32 currentFrame       = mVaoManager->getFrameCount();
-        const uint32 bufferMultiplier   = mVaoManager->getDynamicBufferMultiplier();
+        const uint32 currentFrame       = 0;//mVaoManager->getFrameCount();
+        const uint32 bufferMultiplier   = 1;//mVaoManager->getDynamicBufferMultiplier();
 
         if( mDiscardBuffer )
            {
@@ -234,9 +257,8 @@ namespace v1
             else
             {
                 //Reading from HBL_WRITE_ONLY.
-                stagingBuffer = mVaoManager->getStagingBuffer( length, false );
-                size_t stagingBufferOffset = static_cast<MetalStagingBuffer*>(
-                            stagingBuffer )->_asyncDownloadV1( this, offset, length );
+                stagingBuffer = createStagingBuffer( length, false );
+                size_t stagingBufferOffset = stagingBuffer ->_asyncDownloadV1( this, offset, length );
                 mDevice->stall();
                 srcData = stagingBuffer->_mapForRead( stagingBufferOffset, length );
                 offset = 0;
@@ -246,16 +268,16 @@ namespace v1
         srcData = static_cast<const void*>( static_cast<const uint8*>( srcData ) + offset );
 
         memcpy( pDest, srcData, length );
-
-        if( stagingBuffer )
-            stagingBuffer->removeReferenceCount();
     }
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::writeData( size_t offset, size_t length,
                                                const void* pSource,
                                                bool discardWholeBuffer )
     {
-        if( (discardWholeBuffer && mDiscardBuffer) || mBuffer.storageMode == MTLStorageModePrivate )
+        discardWholeBuffer = discardWholeBuffer || (offset == 0 && length == mSizeBytes);
+
+        // FIXME
+        if(true ||  (discardWholeBuffer && mDiscardBuffer) || mBuffer.storageMode == MTLStorageModePrivate)
         {
             //Fast path is through locking (it either discards or already uses a StagingBuffer).
             void *dstData = this->lockImpl( offset, length, HardwareBuffer::HBL_DISCARD, false );
@@ -265,17 +287,18 @@ namespace v1
         else
         {
             //Use a StagingBuffer to avoid blocking
-            StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( length, true );
+            StagingBuffer *stagingBuffer = createStagingBuffer( length, true );
             void *dstData = stagingBuffer->map( length );
             memcpy( dstData, pSource, length );
-            static_cast<MetalStagingBuffer*>( stagingBuffer )->_unmapToV1( this, offset, length );
-            stagingBuffer->removeReferenceCount();
+            stagingBuffer->_unmapToV1( this, offset, length );
         }
     }
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::copyData( MetalHardwareBufferCommon *srcBuffer, size_t srcOffset,
                                               size_t dstOffset, size_t length, bool discardWholeBuffer )
     {
+        discardWholeBuffer = discardWholeBuffer || (dstOffset == 0 && length == mSizeBytes);
+
         if( !this->mDiscardBuffer || srcBuffer->mBuffer.storageMode == MTLStorageModePrivate )
         {
             size_t srcOffsetStart = 0;
@@ -310,5 +333,4 @@ namespace v1
             srcBuffer->unlockImpl( srcOffset, length );
         }
     }
-}
 }

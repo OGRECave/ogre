@@ -141,6 +141,7 @@ if (OGRE_BUILD_TESTS)
         Codec_FreeImage
         RenderSystem_GL
         RenderSystem_GL3Plus
+        RenderSystem_Metal
       )
   
       foreach(FWK ${FRAMEWORKS})
