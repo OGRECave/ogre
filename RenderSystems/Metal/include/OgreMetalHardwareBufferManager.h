@@ -33,16 +33,15 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
-namespace v1 {
     /// Implementation of HardwareBufferManager for Metal.
-    class _OgreMetalExport MetalHardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreMetalExport MetalHardwareBufferManager : public HardwareBufferManager
     {
     protected:
         MetalDiscardBufferManager *mDiscardBufferManager;
 
     public:
-        MetalHardwareBufferManagerBase( MetalDevice *device, VaoManager *vaoManager );
-        virtual ~MetalHardwareBufferManagerBase();
+        MetalHardwareBufferManager( MetalDevice *device);
+        virtual ~MetalHardwareBufferManager();
 
         void _notifyDeviceStalled(void);
 
@@ -56,38 +55,7 @@ namespace v1 {
         virtual HardwareIndexBufferSharedPtr createIndexBuffer(
                 HardwareIndexBuffer::IndexType itype, size_t numIndexes,
                 HardwareBuffer::Usage usage, bool useShadowBuffer = false );
-
-        /// Create a uniform buffer
-        virtual HardwareUniformBufferSharedPtr createUniformBuffer( size_t sizeBytes,
-                                                                    HardwareBuffer::Usage usage,
-                                                                    bool useShadowBuffer,
-                                                                    const String& name = "");
-        /// Create a counter buffer
-        virtual HardwareCounterBufferSharedPtr createCounterBuffer( size_t sizeBytes,
-                                                                    HardwareBuffer::Usage usage,
-                                                                    bool useShadowBuffer,
-                                                                    const String& name = "" );
-        /// Create a render to vertex buffer
-        virtual RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
     };
-
-    /// MetalHardwareBufferManagerBase as a Singleton
-    class _OgreMetalExport MetalHardwareBufferManager : public HardwareBufferManager
-    {
-    public:
-        MetalHardwareBufferManager( MetalDevice *device, VaoManager *vaoManager ) :
-            HardwareBufferManager( OGRE_NEW MetalHardwareBufferManagerBase( device, vaoManager ) )
-        {
-        }
-        virtual ~MetalHardwareBufferManager()
-        {
-            OGRE_DELETE mImpl;
-        }
-
-        void _notifyDeviceStalled(void)
-                    { static_cast<MetalHardwareBufferManagerBase*>(mImpl)->_notifyDeviceStalled(); }
-    };
-}
 }
 
 #endif

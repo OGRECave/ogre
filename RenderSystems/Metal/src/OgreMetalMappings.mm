@@ -27,7 +27,6 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 */
 
 #include "OgreMetalMappings.h"
-#include "OgreHlmsDatablock.h"
 #include "OgreMetalDevice.h"
 
 namespace Ogre
@@ -39,7 +38,6 @@ namespace Ogre
         case PF_L8:                     return MTLPixelFormatR8Unorm;
         case PF_L16:                    return MTLPixelFormatR16Unorm;
         case PF_A8:                     return MTLPixelFormatA8Unorm;
-        case PF_A4L4:                   return MTLPixelFormatInvalid;
         case PF_BYTE_LA:                return MTLPixelFormatInvalid;
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         case PF_R5G6B5:                 return MTLPixelFormatB5G6R5Unorm;
@@ -80,7 +78,6 @@ namespace Ogre
         case PF_FLOAT32_RGBA:           return MTLPixelFormatRGBA32Float;
         case PF_FLOAT16_GR:             return MTLPixelFormatRG16Float;
         case PF_FLOAT32_GR:             return MTLPixelFormatRG32Float;
-        case PF_DEPTH_DEPRECATED:       return MTLPixelFormatInvalid;
         case PF_SHORT_RGBA:             return MTLPixelFormatRGBA16Snorm;
         case PF_SHORT_GR:               return MTLPixelFormatRG16Snorm;
         case PF_SHORT_RGB:              return MTLPixelFormatRGBA16Snorm;
@@ -126,7 +123,6 @@ namespace Ogre
         case PF_BC6H_UF16:              return MTLPixelFormatBC6H_RGBUfloat;
         case PF_BC6H_SF16:              return MTLPixelFormatBC6H_RGBFloat;
         case PF_BC7_UNORM:              return MTLPixelFormatBC7_RGBAUnorm;
-        case PF_BC7_UNORM_SRGB:         return MTLPixelFormatBC7_RGBAUnorm_sRGB;
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         case PF_R8:                     return !isGamma ? MTLPixelFormatR8Unorm : MTLPixelFormatR8Unorm_sRGB;
@@ -168,23 +164,9 @@ namespace Ogre
         case PF_ASTC_RGBA_10X10_LDR:    return MTLPixelFormatASTC_10x10_LDR;
         case PF_ASTC_RGBA_12X10_LDR:    return MTLPixelFormatASTC_12x10_LDR;
         case PF_ASTC_RGBA_12X12_LDR:    return MTLPixelFormatASTC_12x12_LDR;
-
-        case PF_ASTC_SRGB8A8_4X4_LDR:   return MTLPixelFormatASTC_4x4_sRGB;
-        case PF_ASTC_SRGB8A8_5X4_LDR:   return MTLPixelFormatASTC_5x4_sRGB;
-        case PF_ASTC_SRGB8A8_5X5_LDR:   return MTLPixelFormatASTC_5x5_sRGB;
-        case PF_ASTC_SRGB8A8_6X5_LDR:   return MTLPixelFormatASTC_6x5_sRGB;
-        case PF_ASTC_SRGB8A8_6X6_LDR:   return MTLPixelFormatASTC_6x6_sRGB;
-        case PF_ASTC_SRGB8A8_8X5_LDR:   return MTLPixelFormatASTC_8x5_sRGB;
-        case PF_ASTC_SRGB8A8_8X6_LDR:   return MTLPixelFormatASTC_8x6_sRGB;
-        case PF_ASTC_SRGB8A8_8X8_LDR:   return MTLPixelFormatASTC_8x8_sRGB;
-        case PF_ASTC_SRGB8A8_10X5_LDR:  return MTLPixelFormatASTC_10x5_sRGB;
-        case PF_ASTC_SRGB8A8_10X6_LDR:  return MTLPixelFormatASTC_10x6_sRGB;
-        case PF_ASTC_SRGB8A8_10X8_LDR:  return MTLPixelFormatASTC_10x8_sRGB;
-        case PF_ASTC_SRGB8A8_10X10_LDR: return MTLPixelFormatASTC_10x10_sRGB;
-        case PF_ASTC_SRGB8A8_12X10_LDR: return MTLPixelFormatASTC_12x10_sRGB;
-        case PF_ASTC_SRGB8A8_12X12_LDR: return MTLPixelFormatASTC_12x12_sRGB;
 #endif
 
+#if 0
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         case PF_D24_UNORM_S8_UINT:      return MTLPixelFormatDepth24Unorm_Stencil8;
         case PF_D24_UNORM_X8:           return MTLPixelFormatDepth24Unorm_Stencil8;
@@ -198,13 +180,15 @@ namespace Ogre
 #else
         case PF_D24_UNORM:              return MTLPixelFormatDepth32Float;
 #endif
-        case PF_D16_UNORM:              return MTLPixelFormatDepth32Float;
-        case PF_D32_FLOAT:              return MTLPixelFormatDepth32Float;
         case PF_D32_FLOAT_X24_S8_UINT:  return MTLPixelFormatDepth32Float_Stencil8;
         case PF_D32_FLOAT_X24_X8:       return MTLPixelFormatDepth32Float_Stencil8;
         case PF_X32_X24_S8_UINT:        return MTLPixelFormatStencil8;
+#endif
 
-        case PF_NULL:                   return MTLPixelFormatInvalid;
+        case PF_DEPTH16:              return MTLPixelFormatDepth32Float;
+        case PF_DEPTH32:              return MTLPixelFormatDepth32Float;
+        case PF_DEPTH32F:              return MTLPixelFormatDepth32Float;
+
         default:
         case PF_COUNT:                  return MTLPixelFormatInvalid;
         }
@@ -218,6 +202,7 @@ namespace Ogre
 
         switch( pf )
         {
+#if 0
         case PF_D24_UNORM_S8_UINT:
         case PF_D24_UNORM_X8:
         case PF_X24_S8_UINT:
@@ -238,9 +223,6 @@ namespace Ogre
             }
 #endif
             break;
-        case PF_D16_UNORM:
-            depthFormat = MTLPixelFormatDepth32Float;
-            break;
         case PF_D32_FLOAT:
         case PF_D32_FLOAT_X24_X8:
             depthFormat = MTLPixelFormatDepth32Float;
@@ -256,6 +238,12 @@ namespace Ogre
             break;
         case PF_X32_X24_S8_UINT:
             stencilFormat = MTLPixelFormatStencil8;
+            break;
+#endif
+        case PF_DEPTH16:
+        case PF_DEPTH32:
+        case PF_DEPTH32F:
+            depthFormat = MTLPixelFormatDepth32Float;
             break;
         default:
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
@@ -297,14 +285,6 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    MTLColorWriteMask MetalMappings::get( uint8 mask )
-    {
-        return ((mask & HlmsBlendblock::BlendChannelRed)   << (3u - 0u)) |
-               ((mask & HlmsBlendblock::BlendChannelGreen) << (2u - 1u)) |
-               ((mask & HlmsBlendblock::BlendChannelBlue)  >> (2u - 1u)) |
-               ((mask & HlmsBlendblock::BlendChannelAlpha) >> (3u - 0u));
-    }
-    //-----------------------------------------------------------------------------------
     MTLStencilOperation MetalMappings::get( StencilOperation op )
     {
         switch( op )
@@ -332,9 +312,6 @@ namespace Ogre
         case CMPF_NOT_EQUAL:            return MTLCompareFunctionNotEqual;
         case CMPF_GREATER_EQUAL:        return MTLCompareFunctionGreaterEqual;
         case CMPF_GREATER:              return MTLCompareFunctionGreater;
-        case NUM_COMPARE_FUNCTIONS:
-            assert( false ); //Should never hit.
-            return MTLCompareFunctionAlways;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -360,14 +337,14 @@ namespace Ogre
         case VET_UINT3:                 return MTLVertexFormatUInt3;
         case VET_UINT4:                 return MTLVertexFormatUInt4;
         case VET_BYTE4:                 return MTLVertexFormatChar4;
-        case VET_BYTE4_SNORM:           return MTLVertexFormatChar4Normalized;
+        //case VET_BYTE4_SNORM:           return MTLVertexFormatChar4Normalized;
         case VET_UBYTE4_NORM:           return MTLVertexFormatUChar4Normalized;
-        case VET_SHORT2_SNORM:          return MTLVertexFormatShort2Normalized;
-        case VET_SHORT4_SNORM:          return MTLVertexFormatShort4Normalized;
+        //case VET_SHORT2_SNORM:          return MTLVertexFormatShort2Normalized;
+        //case VET_SHORT4_SNORM:          return MTLVertexFormatShort4Normalized;
         case VET_USHORT2_NORM:          return MTLVertexFormatUShort2Normalized;
         case VET_USHORT4_NORM:          return MTLVertexFormatUShort4Normalized;
-        case VET_HALF2:                 return MTLVertexFormatHalf2;
-        case VET_HALF4:                 return MTLVertexFormatHalf4;
+        //case VET_HALF2:                 return MTLVertexFormatHalf2;
+        //case VET_HALF4:                 return MTLVertexFormatHalf4;
 
         case VET_COLOUR:
         case VET_COLOUR_ARGB:
@@ -378,8 +355,8 @@ namespace Ogre
         case VET_DOUBLE2:
         case VET_DOUBLE3:
         case VET_DOUBLE4:
-        case VET_USHORT1_DEPRECATED:
-        case VET_USHORT3_DEPRECATED:
+        case VET_USHORT1:
+        case VET_USHORT3:
         default:
             return MTLVertexFormatInvalid;
         }
@@ -496,6 +473,7 @@ namespace Ogre
         case MTLDataTypeBool2:          return MTLVertexFormatFloat2;
         case MTLDataTypeBool3:          return MTLVertexFormatFloat3;
         case MTLDataTypeBool4:          return MTLVertexFormatFloat4;
+        default: OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unhandled case");
         }
     }
     //-----------------------------------------------------------------------------------
@@ -575,6 +553,7 @@ namespace Ogre
         case MTLDataTypeBool2:          return GCT_BOOL2;
         case MTLDataTypeBool3:          return GCT_BOOL3;
         case MTLDataTypeBool4:          return GCT_BOOL4;
+        default: OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unhandled case");
         }
     }
 }

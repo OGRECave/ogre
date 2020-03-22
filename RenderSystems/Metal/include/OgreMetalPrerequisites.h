@@ -29,8 +29,11 @@ THE SOFTWARE.
 #define _OgreMetalPrerequisites_H_
 
 #include "OgrePrerequisites.h"
-
 #include "OgreLogManager.h"
+
+#include "OgreHardwareVertexBuffer.h"
+#include "OgreRenderOperation.h"
+#include "OgrePixelFormat.h"
 
 #ifdef __OBJC__
     @protocol MTLBlitCommandEncoder;
@@ -59,6 +62,9 @@ THE SOFTWARE.
 #define OGRE_METAL_CS_UAV_SLOT_START    8u
 #define OGRE_METAL_CS_TEX_SLOT_START    16u
 
+#define RESTRICT_ALIAS __restrict__
+#define RESTRICT_ALIAS_RETURN
+
 namespace Ogre
 {
     // Forward declarations
@@ -67,20 +73,88 @@ namespace Ogre
     class MetalDiscardBuffer;
     class MetalDiscardBufferManager;
     class MetalDynamicBuffer;
-    class MetalGpuProgramManager;
-    struct MetalHlmsPso;
     class MetalProgram;
     class MetalProgramFactory;
     class MetalStagingBuffer;
     class MetalRenderSystem;
     class MetalRenderTargetCommon;
-    class MetalVaoManager;
 
-    namespace v1
+    // forward compatibility defines
+    class MetalHardwareBufferCommon;
+    class MetalHardwareIndexBuffer;
+    class MetalHardwareVertexBuffer;
+    struct BufferPacked;
+
+    typedef MetalStagingBuffer StagingBuffer;
+
+    enum StagingStallType
     {
-        class MetalHardwareBufferCommon;
-        class MetalHardwareIndexBuffer;
-        class MetalHardwareVertexBuffer;
+        /// Next map will not stall.
+        STALL_NONE,
+
+        /// Next map call will cause a stall. We can't predict how long, but
+        /// on average should be small. You should consider doing something
+        /// else then try again.
+        STALL_PARTIAL,
+
+        /// The whole pipeline is brought to a stop. We have to wait for the GPU
+        /// to finish all operations issued so far. This can be very expensive.
+        /// Grab a different StagingBuffer.
+        STALL_FULL,
+
+        NUM_STALL_TYPES
+    };
+
+    enum MappingState
+    {
+        MS_UNMAPPED,
+        MS_MAPPED,
+        NUM_MAPPING_STATE
+    };
+
+    enum UnmapOptions
+    {
+        /// Unmaps all types of mapping, including persistent buffers.
+        UO_UNMAP_ALL,
+
+        /// When unmapping, unmap() will keep persistent buffers mapped.
+        /// Further calls to map will only do some error checking
+        UO_KEEP_PERSISTENT
+    };
+
+
+    /// Aligns the input 'offset' to the next multiple of 'alignment'.
+    /// Alignment can be any value except 0. Some examples:
+    ///
+    /// alignToNextMultiple( 0, 4 ) = 0;
+    /// alignToNextMultiple( 1, 4 ) = 4;
+    /// alignToNextMultiple( 2, 4 ) = 4;
+    /// alignToNextMultiple( 3, 4 ) = 4;
+    /// alignToNextMultiple( 4, 4 ) = 4;
+    /// alignToNextMultiple( 5, 4 ) = 8;
+    ///
+    /// alignToNextMultiple( 0, 3 ) = 0;
+    /// alignToNextMultiple( 1, 3 ) = 3;
+    inline size_t alignToNextMultiple( size_t offset, size_t alignment )
+    {
+        return ( (offset + alignment - 1u) / alignment ) * alignment;
+    }
+
+    /** Used for efficient removal in std::vector and std::deque (like an std::list)
+        However it assumes the order of elements in container is not important or
+        something external to the container holds the index of an element in it
+        (but still should be kept deterministically across machines)
+        Basically it swaps the iterator with the last iterator, and pops back
+        Returns the next iterator
+    */
+    template<typename T>
+    typename T::iterator efficientVectorRemove( T& container, typename T::iterator& iterator )
+    {
+        const size_t idx = iterator - container.begin();
+        *iterator = container.back();
+        container.pop_back();
+
+        return container.begin() + idx;
     }
 }
 

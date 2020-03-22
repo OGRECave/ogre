@@ -36,6 +36,7 @@ namespace Ogre
     {
     protected:
         MetalDevice *mOwnerDevice;
+        PixelFormat mFormat;
     public:
         MTLRenderPassColorAttachmentDescriptor *mColourAttachmentDesc;
 

@@ -47,18 +47,6 @@ namespace Ogre
         id<MTLTexture>  mMsaaTexture;
         MetalDevice     *mDevice;
 
-        /// Vector of pointers to subsurfaces
-        typedef vector<v1::HardwarePixelBufferSharedPtr>::type SurfaceList;
-        SurfaceList mSurfaceList;
-
-        /// Used to hold images between calls to prepare and load.
-        typedef SharedPtr< vector<Image>::type > LoadedImages;
-
-        /// Vector of images that were pulled from disk by
-        /// prepareLoad but have yet to be pushed into texture memory
-        /// by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
-        LoadedImages mLoadedImages;
-
         MTLTextureType getMetalTextureTarget(void) const;
         void createMetalTexResource(void);
         void createSurfaceList(void);
@@ -66,20 +54,13 @@ namespace Ogre
         virtual void createInternalResourcesImpl(void);
         virtual void freeInternalResourcesImpl(void);
 
-        /// Resource overloads
-        virtual void prepareImpl(void);
-        virtual void unprepareImpl(void);
-        virtual void loadImpl();
-
     public:
         MetalTexture( ResourceManager* creator, const String& name, ResourceHandle handle,
                       const String& group, bool isManual, ManualResourceLoader* loader,
                       MetalDevice *device );
         virtual ~MetalTexture();
 
-        virtual v1::HardwarePixelBufferSharedPtr getBuffer( size_t face, size_t mipmap );
-
-        virtual void _autogenerateMipmaps(void);
+        void _autogenerateMipmaps(void);
 
         id<MTLTexture> getTextureForSampling( MetalRenderSystem *renderSystem );
 

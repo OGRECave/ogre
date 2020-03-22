@@ -51,7 +51,7 @@ namespace Ogre
         virtual ~MetalDepthBuffer();
 
         /// @copydoc DepthBuffer::isCompatible
-        virtual bool isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const;
+        virtual bool isCompatible( RenderTarget *renderTarget) const;
 
         MetalDevice* getOwnerDevice(void) const     { return mDevice; }
 

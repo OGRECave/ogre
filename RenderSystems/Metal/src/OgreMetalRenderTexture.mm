@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     MetalRenderTexture::MetalRenderTexture( MetalDevice *ownerDevice, const String &name,
-                                            v1::HardwarePixelBuffer *buffer,
+                                            HardwarePixelBuffer *buffer,
                                             __unsafe_unretained id<MTLTexture> renderTexture,
                                             __unsafe_unretained id<MTLTexture> resolveTexture,
                                             PixelFormat format, uint32 depthPlane, uint32 slice,

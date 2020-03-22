@@ -50,14 +50,14 @@ namespace Ogre {
         return sLanguageName;
     }
     //-----------------------------------------------------------------------
-    HighLevelGpuProgram* MetalProgramFactory::create(ResourceManager* creator,
+    GpuProgram* MetalProgramFactory::create(ResourceManager* creator,
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
     {
         return OGRE_NEW MetalProgram(creator, name, handle, group, isManual, loader, mDevice);
     }
     //-----------------------------------------------------------------------
-    void MetalProgramFactory::destroy(HighLevelGpuProgram* prog)
+    void MetalProgramFactory::destroy(GpuProgram* prog)
     {
         OGRE_DELETE prog;
     }

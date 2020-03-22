@@ -29,18 +29,15 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalDiscardBufferManager.h"
 #include "OgreMetalRenderSystem.h"
 
-#include "Vao/OgreVaoManager.h"
-
 #import <Metal/MTLDevice.h>
 #import <Metal/MTLBuffer.h>
 #import <Metal/MTLBlitCommandEncoder.h>
 
 namespace Ogre
 {
-    MetalDiscardBufferManager::MetalDiscardBufferManager( MetalDevice *device, VaoManager *vaoManager ) :
+    MetalDiscardBufferManager::MetalDiscardBufferManager( MetalDevice *device) :
         mBuffer( 0 ),
-        mDevice( device ),
-        mVaoManager( vaoManager )
+        mDevice( device )
     {
         const size_t defaultCapacity = 4 * 1024 * 1024;
 
@@ -49,7 +46,7 @@ namespace Ogre
 
         mBuffer = [mDevice->mDevice newBufferWithLength:defaultCapacity options:resourceOptions];
         mBuffer.label = @"Discardable Buffer";
-        mFreeBlocks.push_back( MetalVaoManager::Block( 0, defaultCapacity ) );
+        mFreeBlocks.push_back( Block( 0, defaultCapacity ) );
     }
     //-------------------------------------------------------------------------
     MetalDiscardBufferManager::~MetalDiscardBufferManager()
@@ -87,7 +84,7 @@ namespace Ogre
             //except 'forDiscardBuffer' which we were told this data won't be used.
             __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
 
-            const uint32 currentFrame = mVaoManager->getFrameCount();
+            const uint32 currentFrame = 0;//mVaoManager->getFrameCount();
             MetalDiscardBufferVec::iterator itor = mDiscardBuffers.begin();
             MetalDiscardBufferVec::iterator end  = mDiscardBuffers.end();
 
@@ -105,7 +102,7 @@ namespace Ogre
                 }
                 else
                 {
-                    (*itor)->mLastFrameUsed = currentFrame - mVaoManager->getDynamicBufferMultiplier();
+                    (*itor)->mLastFrameUsed = 0;//currentFrame - mVaoManager->getDynamicBufferMultiplier();
                 }
 
                 ++itor;
@@ -125,7 +122,7 @@ namespace Ogre
 
         NSLog( @"DEBUG Pos2: Retain count is %ld", CFGetRetainCount( (__bridge CFTypeRef)oldBuffer ) );
 
-        mFreeBlocks.push_back( MetalVaoManager::Block( oldCapacity, newCapacity - oldCapacity ) );
+        mFreeBlocks.push_back( Block( oldCapacity, newCapacity - oldCapacity ) );
 
         {
             //All "unsafe" blocks are no longer unsafe, since we're using a new buffer.
@@ -135,7 +132,7 @@ namespace Ogre
             while( itor != end )
             {
                 mFreeBlocks.push_back( *itor );
-                MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
+                //MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
                 ++itor;
             }
 
@@ -145,8 +142,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalDiscardBufferManager::updateUnsafeBlocks(void)
     {
-        const uint32 currentFrame       = mVaoManager->getFrameCount();
-        const uint32 bufferMultiplier   = mVaoManager->getDynamicBufferMultiplier();
+        const uint32 currentFrame       = 0;//mVaoManager->getFrameCount();
+        const uint32 bufferMultiplier   = 1;//mVaoManager->getDynamicBufferMultiplier();
 
         UnsafeBlockVec::iterator itor = mUnsafeBlocks.begin();
         UnsafeBlockVec::iterator end  = mUnsafeBlocks.end();
@@ -155,7 +152,7 @@ namespace Ogre
         {
             //This block is safe now to put back into free blocks.
             mFreeBlocks.push_back( *itor );
-            MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
+            //MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
             ++itor;
         }
 
@@ -172,7 +169,7 @@ namespace Ogre
             {
                 //This block is safe now to put back into free blocks.
                 mFreeBlocks.push_back( *itor );
-                MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
+                //MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
                 ++itor;
             }
 
@@ -180,8 +177,8 @@ namespace Ogre
         }
 
         {
-            const uint32 currentFrame       = mVaoManager->getFrameCount();
-            const uint32 bufferMultiplier   = mVaoManager->getDynamicBufferMultiplier();
+            const uint32 currentFrame       = 0;//mVaoManager->getFrameCount();
+            const uint32 bufferMultiplier   = 1;//mVaoManager->getDynamicBufferMultiplier();
 
             MetalDiscardBufferVec::const_iterator itor = mDiscardBuffers.begin();
             MetalDiscardBufferVec::const_iterator end  = mDiscardBuffers.end();
@@ -201,12 +198,12 @@ namespace Ogre
 
         if( discardBuffer->mBuffer )
         {
-            if( mVaoManager->getFrameCount() - discardBuffer->mLastFrameUsed >=
-                mVaoManager->getDynamicBufferMultiplier() )
+            //if( mVaoManager->getFrameCount() - discardBuffer->mLastFrameUsed >=
+            //    mVaoManager->getDynamicBufferMultiplier() )
             {
                 return; //Current block the buffer owns is safe to reuse.
             }
-            else
+            // else
             {
                 //Release the block back into the pool (sorted by mLastFrameUsed)
                 UnsafeBlock unsafeBlock( discardBuffer->getBlockStart(),
@@ -222,10 +219,10 @@ namespace Ogre
         updateUnsafeBlocks();
 
         //Find smallest block.
-        MetalVaoManager::BlockVec::iterator itor = mFreeBlocks.begin();
-        MetalVaoManager::BlockVec::iterator end  = mFreeBlocks.end();
+        auto itor = mFreeBlocks.begin();
+        auto end = mFreeBlocks.end();
 
-        MetalVaoManager::BlockVec::iterator smallestBlock = end;
+        auto smallestBlock = end;
 
         while( itor != end )
         {
@@ -277,7 +274,7 @@ namespace Ogre
     {
         alignment = std::max<uint16>( 4u, alignment ); //Prevent alignments lower than 4 bytes.
         MetalDiscardBuffer *retVal = OGRE_NEW MetalDiscardBuffer( bufferSize, alignment,
-                                                                  mVaoManager, this );
+                                                                  this );
         mDiscardBuffers.push_back( retVal );
         _getBlock( retVal );
         retVal->mBuffer = mBuffer;
@@ -320,15 +317,13 @@ namespace Ogre
     //-------------------------------------------------------------------------
     //-------------------------------------------------------------------------
     MetalDiscardBuffer::MetalDiscardBuffer( size_t bufferSize, uint16 alignment,
-                                            VaoManager *vaoManager,
                                             MetalDiscardBufferManager *owner ) :
         mBuffer( 0 ),
         mBlockPrePadding( 0 ),
         mBufferOffset( 0 ),
         mBufferSize( bufferSize ),
         mAlignment( alignment ),
-        mLastFrameUsed( vaoManager->getFrameCount() - vaoManager->getDynamicBufferMultiplier() ),
-        mVaoManager( vaoManager ),
+        mLastFrameUsed( 0 ),
         mOwner( owner )
     {
         assert( alignment >= 4u );
@@ -351,7 +346,7 @@ namespace Ogre
     //-------------------------------------------------------------------------
     id<MTLBuffer> MetalDiscardBuffer::getBufferName( size_t &outOffset )
     {
-        mLastFrameUsed = mVaoManager->getFrameCount();
+        mLastFrameUsed = 0;//mVaoManager->getFrameCount();
         outOffset = mBufferOffset;
         return mBuffer;
     }

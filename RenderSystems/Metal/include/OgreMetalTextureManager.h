@@ -31,8 +31,20 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalPrerequisites.h"
 #include "OgreTextureManager.h"
 
+#import <Metal/MTLSampler.h>
+
 namespace Ogre
 {
+    class MetalSampler : public Sampler
+    {
+    public:
+        MetalSampler(MetalDevice *device) : mDevice(device) {}
+        id <MTLSamplerState> getState();
+    private:
+        id <MTLSamplerState> mSampler;
+        MetalDevice *mDevice;
+    };
+
     class MetalTextureManager : public TextureManager
     {
     protected:
@@ -43,17 +55,13 @@ namespace Ogre
             const String& group, bool isManual, ManualResourceLoader* loader,
             const NameValuePairList* createParams);
 
+        SamplerPtr _createSamplerImpl();
     public:
         MetalTextureManager( MetalDevice *device );
         virtual ~MetalTextureManager();
 
         /// @copydoc TextureManager::getNativeFormat
         virtual PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
-
-        /// @copydoc TextureManager::isHardwareFilteringSupported
-        virtual bool isHardwareFilteringSupported( TextureType ttype, PixelFormat format,
-                                                   int usage,
-                                                   bool preciseFormatOnly = false );
     };
 }
 

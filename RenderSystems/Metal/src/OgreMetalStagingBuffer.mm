@@ -26,9 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "Vao/OgreMetalStagingBuffer.h"
-#include "Vao/OgreMetalVaoManager.h"
-#include "Vao/OgreMetalBufferInterface.h"
+#include "OgreMetalStagingBuffer.h"
 
 #include "OgreMetalHardwareBufferCommon.h"
 #include "OgreMetalDevice.h"
@@ -40,16 +38,51 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    //-----------------------------------------------------------------------------------
+    const void* StagingBuffer::_mapForRead( size_t offset, size_t sizeBytes )
+    {
+        assert( !mUploadOnly );
+
+        if( mMappingState != MS_UNMAPPED )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Buffer already mapped!",
+                         "StagingBuffer::_mapForRead" );
+        }
+
+        mMappingState = MS_MAPPED;
+
+        return _mapForReadImpl( offset, sizeBytes );
+    }
+    void* StagingBuffer::map( size_t sizeBytes )
+    {
+        assert( mUploadOnly );
+
+        if( mMappingState != MS_UNMAPPED )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Buffer already mapped!",
+                         "StagingBuffer::map" );
+        }
+
+        // mapChecks( sizeBytes );
+        mMappingState = MS_MAPPED;
+        return mapImpl( sizeBytes );
+    }
+
     MetalStagingBuffer::MetalStagingBuffer( size_t internalBufferStart, size_t sizeBytes,
-                                            VaoManager *vaoManager, bool uploadOnly,
+                                            bool uploadOnly,
                                             id<MTLBuffer> vboName, MetalDevice *device ) :
-        StagingBuffer( internalBufferStart, sizeBytes, vaoManager, uploadOnly ),
         mVboName( vboName ),
         mMappedPtr( 0 ),
         mDevice( device ),
+        mMappingState( MS_UNMAPPED ),
+        mMappingStart( 0 ),
+        mMappingCount( 0 ),
         mFenceThreshold( sizeBytes / 4 ),
         mUnfencedBytes( 0 )
     {
+        mInternalBufferStart = internalBufferStart;
+        mSizeBytes = sizeBytes;
+        mUploadOnly = uploadOnly;
     }
     //-----------------------------------------------------------------------------------
     MetalStagingBuffer::~MetalStagingBuffer()
@@ -58,6 +91,9 @@ namespace Ogre
             wait( mFences.back().fenceName );
 
         deleteFences( mFences.begin(), mFences.end() );
+
+        [mVboName setPurgeableState:MTLPurgeableStateEmpty];
+        mVboName = 0;
     }
     //-----------------------------------------------------------------------------------
     void MetalStagingBuffer::addFence( size_t from, size_t to, bool forceFence )
@@ -208,45 +244,6 @@ namespace Ogre
         return mMappedPtr;
     }
     //-----------------------------------------------------------------------------------
-    void MetalStagingBuffer::unmapImpl( const Destination *destinations, size_t numDestinations )
-    {
-//        if( mUploadOnly )
-//        {
-//#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-//            NSRange range = NSMakeRange( mInternalBufferStart + mMappingStart, mMappingCount );
-//            [mVboName didModifyRange:range];
-//#endif
-//        }
-
-        mMappedPtr = 0;
-
-        for( size_t i=0; i<numDestinations; ++i )
-        {
-            const Destination &dst = destinations[i];
-
-            MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>(
-                                                        dst.destination->getBufferInterface() );
-
-            assert( dst.destination->getBufferType() == BT_DEFAULT );
-
-            const size_t dstOffset = dst.dstOffset + dst.destination->_getInternalBufferStart() *
-                                                            dst.destination->getBytesPerElement();
-
-            __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
-            [blitEncoder copyFromBuffer:mVboName
-                                        sourceOffset:mInternalBufferStart + mMappingStart + dst.srcOffset
-                                        toBuffer:bufferInterface->getVboName()
-                                        destinationOffset:dstOffset
-                                        size:alignToNextMultiple( dst.length, 4u )];
-        }
-
-        if( mUploadOnly )
-        {
-            //Add fence to this region (or at least, track the hazard).
-            addFence( mMappingStart, mMappingStart + mMappingCount - 1, false );
-        }
-    }
-    //-----------------------------------------------------------------------------------
     StagingStallType MetalStagingBuffer::uploadWillStall( size_t sizeBytes )
     {
         assert( mUploadOnly );
@@ -320,7 +317,7 @@ namespace Ogre
         mUnfencedBytes = 0;
     }
     //-----------------------------------------------------------------------------------
-    void MetalStagingBuffer::_unmapToV1( v1::MetalHardwareBufferCommon *hwBuffer,
+    void MetalStagingBuffer::_unmapToV1( MetalHardwareBufferCommon *hwBuffer,
                                          size_t lockStart, size_t lockSize )
     {
         assert( mUploadOnly );
@@ -367,62 +364,6 @@ namespace Ogre
     //  DOWNLOADS
     //
     //-----------------------------------------------------------------------------------
-    size_t MetalStagingBuffer::_asyncDownload( BufferPacked *source, size_t srcOffset,
-                                               size_t srcLength )
-    {
-        //Metal has alignment restrictions of 4 bytes for offset and size in copyFromBuffer
-        size_t freeRegionOffset = getFreeDownloadRegion( alignToNextMultiple( srcLength, 4u ) );
-
-        if( freeRegionOffset == (size_t)(-1) )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "Cannot download the request amount of " +
-                         StringConverter::toString( srcLength ) + " bytes to this staging buffer. "
-                         "Try another one (we're full of requests that haven't been read by CPU yet)",
-                         "MetalStagingBuffer::_asyncDownload" );
-        }
-
-        assert( !mUploadOnly );
-        assert( dynamic_cast<MetalBufferInterface*>( source->getBufferInterface() ) );
-        assert( (srcOffset + srcLength) <= source->getTotalSizeBytes() );
-
-        size_t extraOffset = 0;
-        if( srcOffset & 0x03 )
-        {
-            //Not multiple of 4. Backtrack to make it multiple of 4, then add this value
-            //to the return value so it gets correctly mapped in _mapForRead.
-            extraOffset = srcOffset & 0x03;
-            srcOffset -= extraOffset;
-        }
-
-        MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>(
-                                                            source->getBufferInterface() );
-
-        __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
-        [blitEncoder copyFromBuffer:bufferInterface->getVboName()
-                                    sourceOffset:source->_getFinalBufferStart() *
-                                        source->getBytesPerElement() + srcOffset
-                                    toBuffer:mVboName
-                                    destinationOffset:mInternalBufferStart + freeRegionOffset
-                                    size:alignToNextMultiple( srcLength, 4u )];
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        [blitEncoder synchronizeResource:mVboName];
-#endif
-
-        return freeRegionOffset + extraOffset;
-    }
-    //-----------------------------------------------------------------------------------
-    bool MetalStagingBuffer::canDownload( size_t length ) const
-    {
-        return StagingBuffer::canDownload( alignToNextMultiple( length, 4u ) );
-    }
-    //-----------------------------------------------------------------------------------
-    void MetalStagingBuffer::_cancelDownload( size_t offset, size_t sizeBytes )
-    {
-        //If offset isn't multiple of 4, we were making it go forward in
-        //_asyncDownload. We need to backgrack it so regions stay contiguous.
-        StagingBuffer::_cancelDownload( offset & ~size_t(0x03), sizeBytes );
-    }
     //-----------------------------------------------------------------------------------
     const void* MetalStagingBuffer::_mapForReadImpl( size_t offset, size_t sizeBytes )
     {
@@ -435,16 +376,16 @@ namespace Ogre
                 mInternalBufferStart + mMappingStart;
 
         //Put the mapped region back to our records as "available" for subsequent _asyncDownload
-        _cancelDownload( offset, sizeBytes );
+        //_cancelDownload( offset, sizeBytes );
 
         return mMappedPtr;
     }
     //-----------------------------------------------------------------------------------
-    size_t MetalStagingBuffer::_asyncDownloadV1( v1::MetalHardwareBufferCommon *source,
+    size_t MetalStagingBuffer::_asyncDownloadV1( MetalHardwareBufferCommon *source,
                                                  size_t srcOffset, size_t srcLength )
     {
         //Metal has alignment restrictions of 4 bytes for offset and size in copyFromBuffer
-        size_t freeRegionOffset = getFreeDownloadRegion( alignToNextMultiple( srcLength, 4u ) );
+        size_t freeRegionOffset = /*getFreeDownloadRegion*/( alignToNextMultiple( srcLength, 4u ) );
 
         if( freeRegionOffset == (size_t)(-1) )
         {

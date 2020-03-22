@@ -33,9 +33,8 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgrePixelFormat.h"
 #include "OgreBlendMode.h"
-#include "Vao/OgreVertexElements.h"
-#include "OgreHlmsSamplerblock.h"
 #include "OgreGpuProgramParams.h"
+#include "OgreRenderSystem.h"
 
 #import <Metal/MTLDepthStencil.h>
 #import <Metal/MTLPixelFormat.h>
@@ -54,8 +53,6 @@ namespace Ogre
                                            MTLPixelFormat &outDepth, MTLPixelFormat &outStencil );
         static MTLBlendFactor get( SceneBlendFactor op );
         static MTLBlendOperation get( SceneBlendOperation op );
-        /// @see HlmsBlendblock::BlendChannelMasks
-        static MTLColorWriteMask get( uint8 mask );
 
         static MTLStencilOperation get( StencilOperation op );
 
