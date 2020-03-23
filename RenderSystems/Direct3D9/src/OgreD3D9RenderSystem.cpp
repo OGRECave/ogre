@@ -3086,11 +3086,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_beginFrame()
     {
+        RenderSystem::_beginFrame();
+
         HRESULT hr;
-
-        if( !mActiveViewport )
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Cannot begin frame - no viewport selected.", "D3D9RenderSystem::_beginFrame" );
-
         if( FAILED( hr = getActiveD3D9Device()->BeginScene() ) )
         {
             String msg = DXGetErrorDescription(hr);
