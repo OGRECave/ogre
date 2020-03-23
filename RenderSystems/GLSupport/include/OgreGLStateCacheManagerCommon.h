@@ -96,11 +96,6 @@ namespace Ogre
     public:
         virtual ~GLStateCacheManagerCommon() {}
 
-        void getViewport(int* array) {
-            for (int i = 0; i < 4; ++i)
-                array[i] = mViewport[i];
-        }
-
         /** Gets the current colour mask setting.
          @return An array containing the mask in RGBA order.
          */

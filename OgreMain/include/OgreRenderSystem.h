@@ -616,7 +616,7 @@ namespace Ogre
         * Signifies the beginning of a frame, i.e. the start of rendering on a single viewport. Will occur
         * several times per complete frame if multiple viewports exist.
         */
-        virtual void _beginFrame(void) = 0;
+        virtual void _beginFrame();
         
         /// Dummy structure for render system contexts - implementing RenderSystems can extend
         /// as needed

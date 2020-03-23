@@ -106,9 +106,6 @@ namespace Ogre {
 
             // Mipmap count of the actual bounded texture
             size_t mCurTexMipCount;
-        
-            // Store scissor box
-            GLint mScissorBox[4];
 
         public:
             // Default constructor / destructor
@@ -156,8 +153,6 @@ namespace Ogre {
             void _setLineWidth(float width);
 
             void _setViewport(Viewport *vp);
-
-            void _beginFrame(void);
 
             void _endFrame(void);
 
