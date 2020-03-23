@@ -256,7 +256,6 @@ namespace Ogre
         void getCustomAttribute(const String& name, void* pData);
         // Low-level overridden members
         void setConfigOption( const String &name, const String &value );
-        void reinitialise();
         void shutdown();
         void validateDevice(bool forceDeviceElection = false);
         void handleDeviceLost();

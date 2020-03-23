@@ -688,13 +688,6 @@ namespace Ogre
         this->fireDeviceEvent(&mDevice, "DeviceCreated");
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::reinitialise()
-    {
-        LogManager::getSingleton().logMessage( "D3D11: Reinitializing" );
-        this->shutdown();
-    //  this->initialise( true );
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::shutdown()
     {
         RenderSystem::shutdown();
