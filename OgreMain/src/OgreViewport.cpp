@@ -332,13 +332,17 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
+    Rect Viewport::getActualDimensions() const
+    {
+        return Rect(mActLeft, mActTop, mActLeft + mActWidth, mActTop + mActHeight);
+    }
+
     void Viewport::getActualDimensions(int &left, int&top, int &width, int &height) const
     {
         left = mActLeft;
         top = mActTop;
         width = mActWidth;
         height = mActHeight;
-
     }
     //---------------------------------------------------------------------
     unsigned int Viewport::_getNumRenderedFaces(void) const

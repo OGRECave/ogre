@@ -189,7 +189,7 @@ namespace Ogre {
 
             void _render(const RenderOperation& op);
 
-            void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
+            void setScissorTest(bool enabled, const Rect& rect = Rect());
 
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,

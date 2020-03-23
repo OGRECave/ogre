@@ -1033,12 +1033,13 @@ namespace Ogre {
             mActiveViewport = vp;
             
             // Calculate the "lower-left" corner of the viewport
-            int x, y, w, h;
-            vp->getActualDimensions(x, y, w, h);
+            Rect vpRect = vp->getActualDimensions();
             if (!target->requiresTextureFlipping())
             {
                 // Convert "upper-left" corner to "lower-left"
-                y = target->getHeight() - h - y;
+                std::swap(vpRect.top, vpRect.bottom);
+                vpRect.top = target->getHeight() - vpRect.top;
+                vpRect.bottom = target->getHeight() - vpRect.bottom;
             }
             
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
@@ -1048,17 +1049,13 @@ namespace Ogre {
             if ((opt = mGLSupport->getConfigOptions().find("Orientation")) != end)
             {
                 String val = opt->second.currentValue;
-                String::size_type pos = val.find("Landscape");
-                
-                if (pos != String::npos)
+                if (val.find("Landscape") != String::npos)
                 {
-                    GLsizei temp = h;
-                    h = w;
-                    w = temp;
+                    std::swap(vpRect.right, vpRect.bottom);
                 }
             }
 #endif
-            mStateCacheManager->setViewport(x, y, w, h);
+            mStateCacheManager->setViewport(vpRect);
 
             vp->_clearUpdatedFlag();
         }
@@ -1484,9 +1481,7 @@ namespace Ogre {
         mRenderInstanceAttribsBound.clear();
     }
 
-    void GLES2RenderSystem::setScissorTest(bool enabled, size_t left,
-                                        size_t top, size_t right,
-                                        size_t bottom)
+    void GLES2RenderSystem::setScissorTest(bool enabled, const Rect& rect)
     {
         if (!enabled)
         {
@@ -1498,20 +1493,12 @@ namespace Ogre {
 
         // If request texture flipping, use "upper-left", otherwise use "lower-left"
         bool flipping = mActiveRenderTarget->requiresTextureFlipping();
+
         //  GL measures from the bottom, not the top
         long targetHeight = mActiveRenderTarget->getHeight();
-        // Calculate the "lower-left" corner of the viewport
-        int w, h, x, y;
-
+        long top = flipping ? rect.top : targetHeight - rect.bottom;
         // NB GL uses width / height rather than right / bottom
-        x = left;
-        if (flipping)
-            y = top;
-        else
-            y = targetHeight - bottom;
-        w = right - left;
-        h = bottom - top;
-        OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+        OGRE_CHECK_GL_ERROR(glScissor(rect.left, top, rect.width(), rect.height()));
     }
 
     void GLES2RenderSystem::clearFrameBuffer(unsigned int buffers,
@@ -1549,23 +1536,14 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glClearStencil(stencil));
         }
 
-        int x, y, w, h;
-        mActiveViewport->getActualDimensions(x, y, w, h);
-        bool needScissorBox = x != 0 || y != 0 || uint32(w) != mActiveRenderTarget->getWidth() ||
-                              uint32(h) != mActiveRenderTarget->getHeight();
+        Rect vpRect = mActiveViewport->getActualDimensions();
+        bool needScissorBox =
+            vpRect != Rect(0, 0, mActiveRenderTarget->getWidth(), mActiveRenderTarget->getHeight());
         if (needScissorBox)
         {
             // Should be enable scissor test due the clear region is
             // relied on scissor box bounds.
-            mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
-
-            if (!mActiveRenderTarget->requiresTextureFlipping())
-            {
-                // Convert "upper-left" corner to "lower-left"
-                y = mActiveRenderTarget->getHeight() - h - y;
-            }
-
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            setScissorTest(true, vpRect);
         }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -1578,7 +1556,7 @@ namespace Ogre {
         // Restore scissor test
         if (needScissorBox)
         {
-           mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
+            setScissorTest(false);
         }
 
         // Reset buffer write state

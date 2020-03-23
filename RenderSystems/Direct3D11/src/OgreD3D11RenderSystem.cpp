@@ -3178,14 +3178,13 @@ namespace Ogre
         setSubroutine(gptype, slotIdx, subroutineName);
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setScissorTest(bool enabled, size_t left, size_t top, size_t right,
-        size_t bottom)
+    void D3D11RenderSystem::setScissorTest(bool enabled, const Rect& rect)
     {
         mRasterizerDesc.ScissorEnable = enabled;
-        mScissorRect.left = static_cast<LONG>(left);
-        mScissorRect.top = static_cast<LONG>(top);
-        mScissorRect.right = static_cast<LONG>(right);
-        mScissorRect.bottom =static_cast<LONG>( bottom);
+        mScissorRect.left = rect.left;
+        mScissorRect.top = rect.top;
+        mScissorRect.right = rect.right;
+        mScissorRect.bottom = rect.bottom;
 
         mDevice.GetImmediateContext()->RSSetScissorRects(1, &mScissorRect);
         if (mDevice.isError())

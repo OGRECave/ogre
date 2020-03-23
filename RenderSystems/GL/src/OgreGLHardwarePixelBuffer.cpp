@@ -530,12 +530,12 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, c
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
             GL_TEXTURE_2D, static_pointer_cast<GLTexture>(tempTex)->getGLID(), 0);
         /// Set viewport to size of destination slice
-        mRenderSystem->_getStateCacheManager()->setViewport(0, 0, dstBox.getWidth(), dstBox.getHeight());
+        mRenderSystem->_getStateCacheManager()->setViewport(Rect(0, 0, dstBox.getWidth(), dstBox.getHeight()));
     }
     else
     {
         /// We are going to bind directly, so set viewport to size and position of destination slice
-        mRenderSystem->_getStateCacheManager()->setViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight());
+        mRenderSystem->_getStateCacheManager()->setViewport(Rect(dstBox.left, dstBox.top, dstBox.right, dstBox.bottom));
     }
     
     /// Process each destination slice
