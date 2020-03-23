@@ -3701,8 +3701,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::setScissorTest(bool enabled, size_t left, size_t top, size_t right,
-        size_t bottom)
+    void D3D9RenderSystem::setScissorTest(bool enabled, const Rect& _rect)
     {
         HRESULT hr;
         if (enabled)
@@ -3713,10 +3712,10 @@ namespace Ogre
                     "D3D9RenderSystem::setScissorTest");
             }
             RECT rect;
-            rect.left = static_cast<LONG>(left);
-            rect.top = static_cast<LONG>(top);
-            rect.bottom = static_cast<LONG>(bottom);
-            rect.right = static_cast<LONG>(right);
+            rect.left = _rect.left;
+            rect.top = _rect.top;
+            rect.bottom = _rect.bottom;
+            rect.right = _rect.right;
             if (FAILED(hr = getActiveD3D9Device()->SetScissorRect(&rect)))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set scissor rectangle; " + getErrorDescription(hr), 

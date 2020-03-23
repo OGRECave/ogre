@@ -3254,16 +3254,13 @@ ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* c
         finalRect.bottom > -1.0f || finalRect.top < 1.0f)
     {
         // Turn normalised device coordinates into pixels
-        int iLeft, iTop, iWidth, iHeight;
-        mCurrentViewport->getActualDimensions(iLeft, iTop, iWidth, iHeight);
-        size_t szLeft, szRight, szTop, szBottom;
+        Rect vp = mCurrentViewport->getActualDimensions();
 
-        szLeft = (size_t)(iLeft + ((finalRect.left + 1) * 0.5 * iWidth));
-        szRight = (size_t)(iLeft + ((finalRect.right + 1) * 0.5 * iWidth));
-        szTop = (size_t)(iTop + ((-finalRect.top + 1) * 0.5 * iHeight));
-        szBottom = (size_t)(iTop + ((-finalRect.bottom + 1) * 0.5 * iHeight));
-
-        mDestRenderSystem->setScissorTest(true, szLeft, szTop, szRight, szBottom);
+        Rect scissor(vp.left + ((finalRect.left + 1) * 0.5 * vp.width()),
+                     vp.top + ((-finalRect.top + 1) * 0.5 * vp.height()),
+                     vp.left + ((finalRect.right + 1) * 0.5 * vp.width()),
+                     vp.top + ((-finalRect.bottom + 1) * 0.5 * vp.height()));
+        mDestRenderSystem->setScissorTest(true, scissor);
 
         return CLIPPED_SOME;
     }

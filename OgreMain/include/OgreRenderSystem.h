@@ -930,11 +930,16 @@ namespace Ogre
         Not all systems support this method. Check the RenderSystemCapabilities for the
         RSC_SCISSOR_TEST capability to see if it is supported.
         @param enabled True to enable the scissor test, false to disable it.
-        @param left, top, right, bottom The location of the corners of the rectangle, expressed in
+        @param rect The location of the corners of the rectangle, expressed in
         <i>pixels</i>.
         */
-        virtual void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, 
-            size_t right = 800, size_t bottom = 600) = 0;
+        virtual void setScissorTest(bool enabled, const Rect& rect = Rect()) = 0;
+        /// @deprecated
+        OGRE_DEPRECATED void setScissorTest(bool enabled, size_t left, size_t top = 0,
+                                            size_t right = 800, size_t bottom = 600)
+        {
+            setScissorTest(enabled, Rect(left, top, right, bottom));
+        }
 
         /** Clears one or more frame buffers on the active render target. 
         @param buffers Combination of one or more elements of FrameBufferType

@@ -198,16 +198,11 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
             const ImDrawCmd* drawCmd = &draw_list->CmdBuffer[j];
 
             // Set scissoring
-            int scLeft = static_cast<int>(drawCmd->ClipRect.x); // Obtain bounds
-            int scTop = static_cast<int>(drawCmd->ClipRect.y);
-            int scRight = static_cast<int>(drawCmd->ClipRect.z);
-            int scBottom = static_cast<int>(drawCmd->ClipRect.w);
+            Rect scissor(drawCmd->ClipRect.x, drawCmd->ClipRect.y, drawCmd->ClipRect.z,
+                          drawCmd->ClipRect.w);
 
             // Clamp bounds to viewport dimensions
-            scLeft = Math::Clamp(scLeft, 0, vpWidth);
-            scRight = Math::Clamp(scRight, 0, vpWidth);
-            scTop = Math::Clamp(scTop, 0, vpHeight);
-            scBottom = Math::Clamp(scBottom, 0, vpHeight);
+            scissor = scissor.intersect(Rect(0, 0, vpWidth, vpHeight));
 
             if (drawCmd->TextureId)
             {
@@ -220,7 +215,7 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
                 }
             }
 
-            rsys->setScissorTest(true, scLeft, scTop, scRight, scBottom);
+            rsys->setScissorTest(true, scissor);
 
             // Render!
             mRenderOp.indexData->indexStart = startIdx;

@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreGLSupportPrerequisites.h"
+#include "OgreCommon.h"
 
 namespace Ogre
 {
@@ -77,7 +78,7 @@ namespace Ogre
         /// Stores the current stencil mask
         uint32 mStencilMask;
         /// Viewport origin and size
-        int mViewport[4];
+        Rect mViewport;
         /// A map of different buffer types and the currently bound buffer for each type
         BindBufferMap mActiveBufferMap;
         /// Stores the current face culling setting

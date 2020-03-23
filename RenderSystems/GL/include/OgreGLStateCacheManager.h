@@ -224,7 +224,7 @@ namespace Ogre
         void setPointSize(GLfloat size);
         void setPointParameters(const GLfloat* attenuation, float minSize = -1, float maxSize = -1);
 
-        void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
+        void setViewport(const Rect& r);
 
     };
 }

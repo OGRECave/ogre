@@ -242,7 +242,7 @@ namespace Ogre
 
         void setPointSize(GLfloat size);
 
-        void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
+        void setViewport(const Rect& r);
     };
 }
 
