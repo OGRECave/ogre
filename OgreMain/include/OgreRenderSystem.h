@@ -228,7 +228,7 @@ namespace Ogre
 
         /** Restart the renderer (normally following a change in settings).
         */
-        virtual void reinitialise(void) = 0;
+        void reinitialise(void);
 
         /** Shutdown the renderer and cleanup resources.
         */

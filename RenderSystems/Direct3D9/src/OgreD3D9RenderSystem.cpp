@@ -792,13 +792,6 @@ namespace Ogre
         LogManager::getSingleton().logMessage("***************************************");
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::reinitialise()
-    {
-        LogManager::getSingleton().logMessage( "D3D9 : Reinitialising" );
-        this->shutdown();
-        this->_initialise();
-    }
-    //---------------------------------------------------------------------
     void D3D9RenderSystem::shutdown()
     {
         RenderSystem::shutdown();

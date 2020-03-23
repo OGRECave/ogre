@@ -642,6 +642,12 @@ namespace Ogre {
         return mIsReverseDepthBufferEnabled;
     }
     //-----------------------------------------------------------------------
+    void RenderSystem::reinitialise()
+    {
+        shutdown();
+        _initialise();
+    }
+
     void RenderSystem::shutdown(void)
     {
         // Remove occlusion queries

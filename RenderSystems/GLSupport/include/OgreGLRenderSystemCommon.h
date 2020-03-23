@@ -132,12 +132,6 @@ namespace Ogre {
             return VET_COLOUR_ABGR;
         }
 
-        void reinitialise(void)
-        {
-            this->shutdown();
-            this->_initialise();
-        }
-
         void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool);
 
         /// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
