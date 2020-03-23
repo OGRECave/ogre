@@ -596,6 +596,11 @@ namespace Ogre {
 
         mDepthBufferPool.clear();
     }
+    void RenderSystem::_beginFrame(void)
+    {
+        if (!mActiveViewport)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Cannot begin frame - no viewport selected.");
+    }
     //-----------------------------------------------------------------------
     CullingMode RenderSystem::_getCullingMode(void) const
     {

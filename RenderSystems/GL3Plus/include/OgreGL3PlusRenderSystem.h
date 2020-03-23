@@ -78,12 +78,6 @@ namespace Ogre {
         /// Store last depth write state
         bool mDepthWrite;
 
-        /// Store last scissor enable state
-        bool mScissorsEnabled;
-
-        /// Store scissor box
-        int mScissorBox[4];
-
         /// Store last stencil mask state
         uint32 mStencilWriteMask;
 
@@ -175,8 +169,6 @@ namespace Ogre {
         void _setLineWidth(float width);
 
         void _setViewport(Viewport *vp);
-
-        void _beginFrame(void);
 
         void _endFrame(void);
 

@@ -91,11 +91,6 @@ namespace Ogre {
         uint32 mStencilWriteMask;
         /// Store last depth write state
         bool mDepthWrite;
-        /// Store last scissor enable state
-        bool mScissorsEnabled;
-
-        /// Store scissor box
-        int mScissorBox[4];
 
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;
@@ -233,8 +228,6 @@ namespace Ogre {
         void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage);
 
         void _setViewport(Viewport *vp);
-
-        void _beginFrame(void);
 
         void _endFrame(void);
 
