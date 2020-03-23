@@ -1948,13 +1948,6 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_beginFrame()
-    {
-    
-        if( !mActiveViewport )
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Cannot begin frame - no viewport selected.", "D3D11RenderSystem::_beginFrame" );
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_endFrame()
     {
     }
