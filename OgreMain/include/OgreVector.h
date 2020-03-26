@@ -301,7 +301,7 @@ namespace Ogre
         you interpret the values.
     */
     template<int dims, typename T>
-    class _OgreExport Vector : public VectorBase<dims, T>
+    class Vector : public VectorBase<dims, T>
     {
     public:
         using VectorBase<dims, T>::ptr;
