@@ -127,7 +127,6 @@ namespace Ogre {
     {
         mFormat = pf;
         mDesiredFormat = pf;
-        mSrcFormat = pf;
     }
     //--------------------------------------------------------------------------
     bool Texture::hasAlpha(void) const
@@ -191,16 +190,10 @@ namespace Ogre {
         mSrcWidth = mWidth = images[0]->getWidth();
         mSrcHeight = mHeight = images[0]->getHeight();
         mSrcDepth = mDepth = images[0]->getDepth();
+        mSrcFormat = images[0]->getFormat();
 
         if(!mLayerNames.empty() && mTextureType != TEX_TYPE_CUBE_MAP)
             mDepth = mLayerNames.size();
-
-        // Get source image format and adjust if required
-        mSrcFormat = images[0]->getFormat();
-        if (mTreatLuminanceAsAlpha && mSrcFormat == PF_L8)
-        {
-            mSrcFormat = PF_A8;
-        }
 
         if (mDesiredFormat != PF_UNKNOWN)
         {
@@ -308,7 +301,8 @@ namespace Ogre {
                 }
     
                 // Sets to treated format in case is difference
-                src.format = mSrcFormat;
+                if (mTreatLuminanceAsAlpha && src.format == PF_L8)
+                    src.format = PF_A8;
 
                 if(mGamma != 1.0f) {
                     // Apply gamma correction
