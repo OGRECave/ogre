@@ -579,7 +579,7 @@ namespace Ogre
 
         /// @deprecated use setColourBlendState
         virtual void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha,
-            SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD) = 0;
+            SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD) {}
 
         /** Sets the global alpha rejection approach for future renders.
         By default images are rendered regardless of texture alpha. This method lets you change that.
@@ -680,26 +680,14 @@ namespace Ogre
         */
         virtual void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL) = 0;
 
-        /** Sets whether or not the depth buffer check is performed before a pixel write.
-        @param enabled If true, the depth buffer is tested for each pixel and the frame buffer is only updated
-        if the depth function test succeeds. If false, no test is performed and pixels are always written.
-        */
-        virtual void _setDepthBufferCheckEnabled(bool enabled = true) = 0;
-        /** Sets whether or not the depth buffer is updated after a pixel write.
-        @param enabled If true, the depth buffer is updated with the depth of the new pixel if the depth test succeeds.
-        If false, the depth buffer is left unchanged even if a new pixel is written.
-        */
-        virtual void _setDepthBufferWriteEnabled(bool enabled = true) = 0;
-        /** Sets the comparison function for the depth buffer check.
-        Advanced use only - allows you to choose the function applied to compare the depth values of
-        new and existing pixels in the depth buffer. Only an issue if the deoth buffer check is enabled
-        (see _setDepthBufferCheckEnabled)
-        @param  func The comparison between the new depth and the existing depth which must return true
-        for the new pixel to be written.
-        */
-        virtual void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL) = 0;
+        /// @deprecated use _setDepthBufferParams
+        OGRE_DEPRECATED virtual void _setDepthBufferCheckEnabled(bool enabled = true) {}
+        /// @deprecated use _setDepthBufferParams
+        OGRE_DEPRECATED virtual void _setDepthBufferWriteEnabled(bool enabled = true) {}
+        /// @deprecated use _setDepthBufferParams
+        OGRE_DEPRECATED virtual void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL) {}
         /// @deprecated use setColourBlendState
-        virtual void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha) = 0;
+        virtual void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha) {}
         /** Sets the depth bias, NB you should use the Material version of this. 
         @remarks
         When polygons are coplanar, you can get problems with 'depth fighting' where
