@@ -51,14 +51,14 @@ namespace Ogre
             static_assert(dims > 1, "must have at least 2 dimensions");
             data[0] = _x; data[1] = _y;
         }
+        template<int N = dims, typename std::enable_if<(N > 2)>::type* = nullptr>
         VectorBase(T _x, T _y, T _z)
         {
-            static_assert(dims > 2, "must have at least 3 dimensions");
             data[0] = _x; data[1] = _y; data[2] = _z;
         }
+        template<int N = dims, typename std::enable_if<(N > 3)>::type* = nullptr>
         VectorBase(T _x, T _y, T _z, T _w)
         {
-            static_assert(dims > 3, "must have at least 4 dimensions");
             data[0] = _x; data[1] = _y; data[2] = _z; data[3] = _w;
         }
         T data[dims];
