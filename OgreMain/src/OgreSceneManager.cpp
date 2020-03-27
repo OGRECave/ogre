@@ -1137,9 +1137,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 
     // Set up non-texture related material settings
     // Depth buffer settings
-    mDestRenderSystem->_setDepthBufferFunction(pass->getDepthFunction());
-    mDestRenderSystem->_setDepthBufferCheckEnabled(pass->getDepthCheckEnabled());
-    mDestRenderSystem->_setDepthBufferWriteEnabled(pass->getDepthWriteEnabled());
+    mDestRenderSystem->_setDepthBufferParams(pass->getDepthCheckEnabled(), pass->getDepthWriteEnabled(),
+                                             pass->getDepthFunction());
     mDestRenderSystem->_setDepthBias(pass->getDepthBiasConstant(), pass->getDepthBiasSlopeScale());
     // Alpha-reject settings
     mDestRenderSystem->_setAlphaRejectSettings(pass->getAlphaRejectFunction(),

@@ -186,7 +186,6 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
             // Reset stencil params
             mDestRenderSystem->setStencilBufferParams();
             mDestRenderSystem->setStencilCheckEnabled(false);
-            mDestRenderSystem->_setDepthBufferParams();
 
             if (scissored == CLIPPED_SOME)
                 mSceneManager->resetScissor();
@@ -267,7 +266,6 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
             // Reset stencil params
             mDestRenderSystem->setStencilBufferParams();
             mDestRenderSystem->setStencilCheckEnabled(false);
-            mDestRenderSystem->_setDepthBufferParams();
         }
 
     }// for each light
@@ -1125,13 +1123,11 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
             renderShadowVolumeObjects(shadowRenderables, mShadowDebugPass, &lightList, flags,
                 true, false, false);
             mDestRenderSystem->setColourBlendState(disabled);
-            mDestRenderSystem->_setDepthBufferFunction(CMPF_LESS);
+            mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
         }
     }
 
-    // revert depth state
-    mDestRenderSystem->_setDepthBufferParams();
-
+    // revert stencil state
     mDestRenderSystem->setStencilCheckEnabled(false);
 
     mDestRenderSystem->unbindGpuProgram(GPT_VERTEX_PROGRAM);
@@ -1197,11 +1193,11 @@ void SceneManager::ShadowRenderer::renderShadowVolumeObjects(const ShadowCaster:
                     mDestRenderSystem->_setCullingMode(CULL_CLOCKWISE);
                     mSceneManager->mPassCullingMode = CULL_CLOCKWISE;
                     // must always fail depth check for front facing light caps
-                    mDestRenderSystem->_setDepthBufferFunction(CMPF_ALWAYS_FAIL);
+                    mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_ALWAYS_FAIL);
                     mSceneManager->renderSingleObject(lightCap, pass, false, false, manualLightList);
 
                     // reset depth function
-                    mDestRenderSystem->_setDepthBufferFunction(CMPF_LESS);
+                    mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
                     // reset culling mode
                     mDestRenderSystem->_setCullingMode(CULL_NONE);
                     mSceneManager->mPassCullingMode = CULL_NONE;
@@ -1214,11 +1210,11 @@ void SceneManager::ShadowRenderer::renderShadowVolumeObjects(const ShadowCaster:
                 else
                 {
                     // must always fail depth check for front facing light caps
-                    mDestRenderSystem->_setDepthBufferFunction(CMPF_ALWAYS_FAIL);
+                    mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_ALWAYS_FAIL);
                     mSceneManager->renderSingleObject(lightCap, pass, false, false, manualLightList);
 
                     // reset depth function
-                    mDestRenderSystem->_setDepthBufferFunction(CMPF_LESS);
+                    mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
                 }
             }
         }
