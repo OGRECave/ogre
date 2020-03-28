@@ -2736,9 +2736,15 @@ namespace Ogre{
                             ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, val);
                             compiler->_fireEvent(&evt, 0);
 
+                            if(isAlpha)
+                            {
+                                format = PF_A8;
+                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
+                                                   prop->line, "alpha. Use PF_A8 instead");
+                            }
+
                             mUnit->setTextureName(evt.mName, texType);
                             mUnit->setDesiredFormat(format);
-                            mUnit->setIsAlpha(isAlpha);
                             mUnit->setNumMipmaps(mipmaps);
                             mUnit->setHardwareGammaEnabled(sRGBRead);
                         }

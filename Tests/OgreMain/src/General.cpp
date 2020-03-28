@@ -336,7 +336,6 @@ TEST_F(TextureTests, Blank)
     EXPECT_EQ(tus->getNumMipmaps(), MIP_DEFAULT);
     EXPECT_EQ(tus->getDesiredFormat(), PF_UNKNOWN);
     EXPECT_EQ(tus->getFrameTextureName(0), "");
-    EXPECT_EQ(tus->getIsAlpha(), false);
     EXPECT_EQ(tus->getGamma(), 1.0f);
     EXPECT_EQ(tus->isHardwareGammaEnabled(), false);
 }
