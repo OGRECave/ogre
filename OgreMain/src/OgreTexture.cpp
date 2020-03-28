@@ -195,6 +195,9 @@ namespace Ogre {
         if(!mLayerNames.empty() && mTextureType != TEX_TYPE_CUBE_MAP)
             mDepth = mLayerNames.size();
 
+        if(mTreatLuminanceAsAlpha && mSrcFormat == PF_L8)
+            mDesiredFormat = PF_A8;
+
         if (mDesiredFormat != PF_UNKNOWN)
         {
             // If have desired format, use it
@@ -299,9 +302,9 @@ namespace Ogre {
                     // Load from faces of images[0]
                     src = images[0]->getPixelBox(i, mip);
                 }
-    
-                // Sets to treated format in case is difference
-                if (mTreatLuminanceAsAlpha && src.format == PF_L8)
+
+                // Allow reinterpreting luminance as alpha
+                if (mDesiredFormat == PF_A8 && (src.format == PF_L8 || src.format == PF_R8))
                     src.format = PF_A8;
 
                 if(mGamma != 1.0f) {
