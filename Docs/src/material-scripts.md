@@ -981,7 +981,7 @@ Setting the texture alias name is useful if this material is to be inherited by 
 
 Sets the name of the static texture image this layer will use.
 @par
-Format: texture &lt;texturename&gt; \[&lt;type&gt;\] \[unlimited | numMipMaps\] \[alpha\] \[&lt;PixelFormat&gt;\] \[gamma\]
+Format: texture &lt;texturename&gt; \[&lt;type&gt;\] \[unlimited | numMipMaps\] \[&lt;PixelFormat&gt;\] \[gamma\]
 @par
 Example: texture funkywall.jpg
 
@@ -1010,9 +1010,6 @@ Alternatively 1 cube texture can be used if supported by the texture format(DDS 
 
 @param numMipMaps
 specify the number of mipmaps to generate for this texture. The default is ’unlimited’ which means mips down to 1x1 size are generated. You can specify a fixed number (even 0) if you like instead. Note that if you use the same texture in many material scripts, the number of mipmaps generated will conform to the number specified in the first texture\_unit used to load the texture - so be consistent with your usage.
-
-@param alpha @copydoc Ogre::Texture::setTreatLuminanceAsAlpha
-Default: none
 
 @param PixelFormat
 specify the desired pixel format of the texture to create, which may be different to the pixel format of the texture file being loaded. Bear in mind that the final pixel format will be constrained by hardware capabilities so you may not get exactly what you ask for. 

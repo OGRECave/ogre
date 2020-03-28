@@ -548,11 +548,11 @@ namespace Ogre {
         */
         int getNumMipmaps(void) const;
 
-        /// @copydoc Texture::setTreatLuminanceAsAlpha
-        void setIsAlpha(bool isAlpha);
+        /// @deprecated use setDesiredFormat(PF_A8)
+        OGRE_DEPRECATED void setIsAlpha(bool isAlpha);
 
-        /// @copydoc Texture::getTreatLuminanceAsAlpha
-        bool getIsAlpha(void) const;
+        /// @deprecated do not use
+        OGRE_DEPRECATED bool getIsAlpha(void) const;
 
         /// @copydoc Texture::getGamma
         float getGamma() const;
