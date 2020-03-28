@@ -871,6 +871,9 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
             // This is required to pick up the correct shadow_caster_material and similar properties.
             shadowView->setMaterialScheme(vp->getMaterialScheme());
 
+            // Set the viewport visibility flags
+            shadowView->setVisibilityMask(vp->getVisibilityMask());
+
             // update shadow cam - light mapping
             ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
             assert(camLightIt != mShadowCamLightMapping.end());
