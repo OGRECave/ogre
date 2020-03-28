@@ -784,6 +784,49 @@ namespace Ogre {
             void setShadowTextureConfig(size_t shadowIndex, const ShadowTextureConfig& config);
             void setShadowTextureConfig(size_t shadowIndex, uint16 width, uint16 height, PixelFormat format,
                                         uint16 fsaa, uint16 depthBufferPoolId);
+
+            typedef std::vector<ShadowCaster*> ShadowCasterList;
+            ShadowCasterList mShadowCasterList;
+            std::unique_ptr<SphereSceneQuery> mShadowCasterSphereQuery;
+            std::unique_ptr<AxisAlignedBoxSceneQuery> mShadowCasterAABBQuery;
+
+            /// Inner class to use as callback for shadow caster scene query
+            class _OgreExport ShadowCasterSceneQueryListener : public SceneQueryListener, public SceneMgtAlloc
+            {
+            protected:
+                SceneManager* mSceneMgr;
+                ShadowCasterList* mCasterList;
+                bool mIsLightInFrustum;
+                const PlaneBoundedVolumeList* mLightClipVolumeList;
+                const Camera* mCamera;
+                const Light* mLight;
+                Real mFarDistSquared;
+            public:
+                ShadowCasterSceneQueryListener(SceneManager* sm) : mSceneMgr(sm),
+                    mCasterList(0), mIsLightInFrustum(false), mLightClipVolumeList(0),
+                    mCamera(0), mFarDistSquared(0) {}
+                // Prepare the listener for use with a set of parameters
+                void prepare(bool lightInFrustum, const PlaneBoundedVolumeList* lightClipVolumes,
+                             const Light* light, const Camera* cam, ShadowCasterList* casterList,
+                             Real farDistSquared)
+                {
+                    mCasterList = casterList;
+                    mIsLightInFrustum = lightInFrustum;
+                    mLightClipVolumeList = lightClipVolumes;
+                    mCamera = cam;
+                    mLight = light;
+                    mFarDistSquared = farDistSquared;
+                }
+                bool queryResult(MovableObject* object);
+                bool queryResult(SceneQuery::WorldFragment* fragment);
+            };
+
+            std::unique_ptr<ShadowCasterSceneQueryListener> mShadowCasterQueryListener;
+
+            /** Internal method for locating a list of shadow casters which
+                could be affecting the frustum for a given light.
+            */
+            const ShadowCasterList& findShadowCastersForLight(const Light* light, const Camera* camera);
         } mShadowRenderer;
 
         /** Internal method to validate whether a Pass should be allowed to render.
@@ -978,11 +1021,6 @@ namespace Ogre {
         void _resumeRendering(RenderContext* context);
 
     protected:
-        typedef std::vector<ShadowCaster*> ShadowCasterList;
-        ShadowCasterList mShadowCasterList;
-        std::unique_ptr<SphereSceneQuery> mShadowCasterSphereQuery;
-        std::unique_ptr<AxisAlignedBoxSceneQuery> mShadowCasterAABBQuery;
-
         /// Visibility mask used to show / hide objects
         uint32 mVisibilityMask;
         bool mFindVisibleObjects;
@@ -991,45 +1029,6 @@ namespace Ogre {
         /// Suppress shadows?
         bool mSuppressShadows;
 
-        /// Inner class to use as callback for shadow caster scene query
-        class _OgreExport ShadowCasterSceneQueryListener : public SceneQueryListener, public SceneMgtAlloc
-        {
-        protected:
-            SceneManager* mSceneMgr;
-            ShadowCasterList* mCasterList;
-            bool mIsLightInFrustum;
-            const PlaneBoundedVolumeList* mLightClipVolumeList;
-            const Camera* mCamera;
-            const Light* mLight;
-            Real mFarDistSquared;
-        public:
-            ShadowCasterSceneQueryListener(SceneManager* sm) : mSceneMgr(sm),
-                mCasterList(0), mIsLightInFrustum(false), mLightClipVolumeList(0), 
-                mCamera(0), mFarDistSquared(0) {}
-            // Prepare the listener for use with a set of parameters  
-            void prepare(bool lightInFrustum, 
-                const PlaneBoundedVolumeList* lightClipVolumes, 
-                const Light* light, const Camera* cam, ShadowCasterList* casterList, 
-                Real farDistSquared) 
-            {
-                mCasterList = casterList;
-                mIsLightInFrustum = lightInFrustum;
-                mLightClipVolumeList = lightClipVolumes;
-                mCamera = cam;
-                mLight = light;
-                mFarDistSquared = farDistSquared;
-            }
-            bool queryResult(MovableObject* object);
-            bool queryResult(SceneQuery::WorldFragment* fragment);
-        };
-
-        std::unique_ptr<ShadowCasterSceneQueryListener> mShadowCasterQueryListener;
-
-        /** Internal method for locating a list of shadow casters which
-            could be affecting the frustum for a given light.
-        */
-        const ShadowCasterList& findShadowCastersForLight(const Light* light,
-            const Camera* camera);
         /** Render a group in the ordinary way */
         void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
             QueuedRenderableCollection::OrganisationMode om);
