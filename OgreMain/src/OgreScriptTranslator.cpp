@@ -2719,10 +2719,14 @@ namespace Ogre{
                                         sRGBRead = true;
                                         break;
                                     default:
-                                        if(StringConverter::isNumber(atom->value))
-                                            mipmaps = StringConverter::parseInt(atom->value);
-                                        else
+                                        if(!StringConverter::parse(atom->value, mipmaps))
+                                        {
                                             format = PixelUtil::getFormatFromName(atom->value, true);
+
+                                            if (format == PF_UNKNOWN)
+                                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS,
+                                                                   prop->file, prop->line, atom->value);
+                                        }
                                     }
                                 }
                                 else
