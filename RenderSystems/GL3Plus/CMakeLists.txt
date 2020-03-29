@@ -30,12 +30,7 @@ target_include_directories(RenderSystem_GL3Plus PUBLIC
     PRIVATE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include>")
 
-if (APPLE)
-    set_target_properties(RenderSystem_GL3Plus PROPERTIES
-        LINK_FLAGS "-framework Cocoa -framework OpenGL")
-else()
-    target_include_directories(RenderSystem_GL3Plus PUBLIC ${OPENGL_INCLUDE_DIR})
-endif ()
+target_include_directories(RenderSystem_GL3Plus PUBLIC ${OPENGL_INCLUDE_DIR})
 
 ogre_config_framework(RenderSystem_GL3Plus)
 ogre_config_plugin(RenderSystem_GL3Plus)

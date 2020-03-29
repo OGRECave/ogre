@@ -90,8 +90,6 @@ if (OGRE_BUILD_TESTS)
       set_property(TARGET Test_Ogre PROPERTY MACOSX_BUNDLE TRUE)
       set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
       set(OGRE_TEST_CONTENTS_PATH ${PROJECT_BINARY_DIR}/bin/$(CONFIGURATION)/Test_Ogre.app/Contents)
-      set_target_properties(Test_Ogre PROPERTIES
-        LINK_FLAGS "-framework Carbon -framework Cocoa")
       add_custom_command(TARGET Test_Ogre POST_BUILD
         COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/CustomCapabilities
         COMMAND ditto
