@@ -56,7 +56,6 @@ elseif (APPLE)
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.mm"
     )
-    set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
   endif ()
 elseif(ANDROID)
   # required by OgrePlatformInformation.cpp
@@ -230,10 +229,6 @@ if (APPLE)
   if (APPLE_IOS)
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
   else ()
-    set_target_properties(OgreMain PROPERTIES
-        LINK_FLAGS "-framework IOKit -framework Cocoa -framework Carbon -framework OpenGL -framework CoreVideo"
-    )
-
     set(OGRE_OSX_BUILD_CONFIGURATION "$(PLATFORM_NAME)/$(CONFIGURATION)")
   
     if(OGRE_BUILD_LIBS_AS_FRAMEWORKS)

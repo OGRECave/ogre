@@ -10,10 +10,6 @@
 # Configure MeshUpgrader
 add_executable(OgreMeshUpgrader src/main.cpp)
 target_link_libraries(OgreMeshUpgrader OgreMain OgreMeshLodGenerator)
-if (APPLE)
-    set_target_properties(OgreMeshUpgrader PROPERTIES
-        LINK_FLAGS "-framework Carbon -framework Cocoa")
-endif ()
 if (OGRE_PROJECT_FOLDERS)
 	set_property(TARGET OgreMeshUpgrader PROPERTY FOLDER Tools)
 endif ()

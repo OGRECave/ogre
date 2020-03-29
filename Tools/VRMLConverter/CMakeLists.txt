@@ -16,10 +16,6 @@ add_executable(VRMLConverter ${HEADER_FILES} ${SOURCE_FILES})
 target_include_directories(VRMLConverter PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vrmllib/include)
 target_link_libraries(VRMLConverter OgreMain)
 
-if (APPLE)
-    set_target_properties(VRMLConverter PROPERTIES
-        LINK_FLAGS "-framework Carbon -framework Cocoa")
-endif ()
 if (OGRE_PROJECT_FOLDERS)
 	set_property(TARGET VRMLConverter PROPERTY FOLDER Tools)
 endif ()

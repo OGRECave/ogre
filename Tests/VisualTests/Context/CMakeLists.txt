@@ -109,8 +109,6 @@ if (APPLE)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ogre3d.\${PRODUCT_NAME:rfc1034identifier}")
     set_target_properties(TestContext PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-    set_target_properties(TestContext PROPERTIES
-        LINK_FLAGS "-framework IOKit -framework Cocoa -framework Carbon -framework OpenGL -framework CoreVideo")
 	set (OGRE_TESTCONTEXT_CONTENTS_PATH
 		${PROJECT_BINARY_DIR}/bin/$(CONFIGURATION)/TestContext.app/Contents)
 	add_custom_command(TARGET TestContext POST_BUILD
