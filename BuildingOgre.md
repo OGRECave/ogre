@@ -223,17 +223,6 @@ for OGRE_DEPENDENCIES_DIR, "Configure", should be no more errors, then press
 
 Select SampleBrowser as the start up project and run.
 
-Installing and building via vcpkg
-You can download and install ogre using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
-```
-git clone https://github.com/Microsoft/vcpkg.git
-cd vcpkg
-./bootstrap-vcpkg.sh
-./vcpkg integrate install
-vcpkg install ogre
-```
-The ogre port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
-
 ### Notes
 
 1. The code and generated CMake solution should be on local NTFS drive,
@@ -256,3 +245,15 @@ file .vmx and add the parameter: hypervisor.cpuid.v0 = "FALSE"
 All versions of Visual Studio 2012 have a window refresh issue when running
 in VMware and the window is maximized, the solution is just to change the
 size of the Visual Studio window to be less the the screen width and height.
+
+Installing and building via vcpkg
+---------------------------------
+You can download and install ogre using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+```
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.sh
+./vcpkg integrate install
+vcpkg install ogre
+```
+The ogre port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
