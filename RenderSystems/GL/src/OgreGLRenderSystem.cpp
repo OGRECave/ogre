@@ -972,13 +972,6 @@ namespace Ogre {
             caps->setNumMultiRenderTargets(1);
         }
 
-
-        Log* defaultLog = LogManager::getSingleton().getDefaultLog();
-        if (defaultLog)
-        {
-            caps->log(defaultLog);
-        }
-
         mGLInitialised = true;
     }
 

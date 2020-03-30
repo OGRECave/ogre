@@ -524,12 +524,6 @@ namespace Ogre {
         mRTTManager = new GL3PlusFBOManager(this);
         caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
-        Log* defaultLog = LogManager::getSingleton().getDefaultLog();
-        if (defaultLog)
-        {
-            caps->log(defaultLog);
-        }
-
         // Create the texture manager
         mTextureManager = new GL3PlusTextureManager(this);
 
