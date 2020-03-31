@@ -548,12 +548,6 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
         mRTTManager = new GLES2FBOManager();
 
-        Log* defaultLog = LogManager::getSingleton().getDefaultLog();
-        if (defaultLog)
-        {
-            caps->log(defaultLog);
-        }
-
         mGLInitialised = true;
     }
 

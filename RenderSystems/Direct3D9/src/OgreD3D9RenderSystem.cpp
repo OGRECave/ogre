@@ -1517,12 +1517,6 @@ namespace Ogre
         }
         if (caps->isShaderProfileSupported("hlsl"))
             HighLevelGpuProgramManager::getSingleton().addFactory(mHLSLProgramFactory);
-
-        Log* defaultLog = LogManager::getSingleton().getDefaultLog();
-        if (defaultLog)
-        {
-            caps->log(defaultLog);
-        }
     }
 
     //-----------------------------------------------------------------------

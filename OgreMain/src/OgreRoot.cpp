@@ -1271,22 +1271,21 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::oneTimePostWindowInit(void)
     {
-        if (!mFirstTimePostWindowInit)
-        {
-            // Background loader
-            mResourceBackgroundQueue->initialise();
-            mWorkQueue->startup();
-            // Initialise material manager
-            mMaterialManager->initialise();
-            // Init particle systems manager
-            mParticleManager->_initialise();
-            // Init mesh manager
-            MeshManager::getSingleton()._initialise();
-            // Init plugins - after window creation so rsys resources available
-            initialisePlugins();
-            mFirstTimePostWindowInit = true;
-        }
+        // log RenderSystem caps
+        mActiveRenderer->getCapabilities()->log(LogManager::getSingleton().getDefaultLog());
 
+        // Background loader
+        mResourceBackgroundQueue->initialise();
+        mWorkQueue->startup();
+        // Initialise material manager
+        mMaterialManager->initialise();
+        // Init particle systems manager
+        mParticleManager->_initialise();
+        // Init mesh manager
+        MeshManager::getSingleton()._initialise();
+        // Init plugins - after window creation so rsys resources available
+        initialisePlugins();
+        mFirstTimePostWindowInit = true;
     }
     //-----------------------------------------------------------------------
     bool Root::_updateAllRenderTargets(void)
