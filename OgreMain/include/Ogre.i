@@ -291,12 +291,31 @@ TPL_VECTOR(3)
 TPL_VECTOR(4)
 %include "OgreMatrix3.h"
 ADD_REPR(Matrix3)
+%extend Ogre::Matrix3
+{
+    Ogre::Vector3 operator*(const Ogre::Vector3& v) { return *$self * v; }
+}
 %ignore Ogre::TransformBaseReal::extract3x3Matrix; // deprecated
 %ignore Ogre::TransformBaseReal::extractQuaternion; // deprecated
 %ignore Ogre::Matrix4::concatenate; // deprecated
 %include "OgreMatrix4.h"
 ADD_REPR(Matrix4)
+%template(TransformBaseMatrix4) Ogre::TransformBase<4, Ogre::Real>;
+%extend Ogre::Matrix4
+{
+    Ogre::Vector4 operator*(const Ogre::Vector4& v) { return *$self * v; }
+    Ogre::Vector3 operator*(const Ogre::Vector3& v) { return *$self * v; }
+    Ogre::Matrix4 operator*(const Ogre::Matrix4& m) { return *$self * m; }
+    Ogre::Matrix4 operator+(const Ogre::Matrix4& m) { return *$self + m; }
+    Ogre::Matrix4 operator-(const Ogre::Matrix4& m) { return *$self - m; }
+}
 ADD_REPR(Affine3)
+%extend Ogre::Affine3
+{
+    Ogre::Vector4 operator*(const Ogre::Vector4& v) { return *$self * v; }
+    Ogre::Vector3 operator*(const Ogre::Vector3& v) { return *$self * v; }
+    Ogre::Affine3 operator*(const Ogre::Affine3& m) { return *$self * m; }
+}
 %include "OgreQuaternion.h"
 ADD_REPR(Quaternion)
 %include "OgreSimpleSpline.h"
