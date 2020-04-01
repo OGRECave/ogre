@@ -280,8 +280,6 @@ namespace Ogre
         void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
         void _setSampler(size_t unit, Sampler& sampler);
         void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
-        void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
-            SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD);
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         void _setViewport( Viewport *vp );
         void _endFrame(void);
@@ -289,7 +287,7 @@ namespace Ogre
         void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
         void _setDepthBufferCheckEnabled( bool enabled = true );
         bool _getDepthBufferCheckEnabled( void );
-        void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
+        void setColourBlendState(const ColourBlendState& state);
         void _setDepthBufferWriteEnabled(bool enabled = true);
         void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );
         void _setDepthBias(float constantBias, float slopeScaleBias);

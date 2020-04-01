@@ -267,9 +267,16 @@ namespace Ogre
         }
 
         /// @deprecated use setColourBlendState
-        OGRE_DEPRECATED void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD)
+        OGRE_DEPRECATED void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
+                                               SceneBlendOperation op = SBO_ADD)
         {
-            _setSeparateSceneBlending(sourceFactor, destFactor, sourceFactor, destFactor, op, op);
+            mCurrentBlend.sourceFactor = sourceFactor;
+            mCurrentBlend.destFactor = destFactor;
+            mCurrentBlend.sourceFactorAlpha = sourceFactor;
+            mCurrentBlend.destFactorAlpha = destFactor;
+            mCurrentBlend.operation = op;
+            mCurrentBlend.alphaOperation = op;
+            setColourBlendState(mCurrentBlend);
         }
 
         virtual void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 variabilityMask) {}
@@ -570,16 +577,22 @@ namespace Ogre
         virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) {}
 
         /// Sets the global blending factors for combining subsequent renders with the existing frame contents.
-        virtual void setColourBlendState(const ColourBlendState& state)
-        {
-            _setSeparateSceneBlending(state.sourceFactor, state.destFactor, state.sourceFactorAlpha,
-                                      state.destFactorAlpha, state.operation, state.alphaOperation);
-            _setColourBufferWriteEnabled(state.writeR, state.writeG, state.writeB, state.writeA);
-        }
+        virtual void setColourBlendState(const ColourBlendState& state) = 0;
 
         /// @deprecated use setColourBlendState
-        virtual void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha,
-            SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD) {}
+        OGRE_DEPRECATED void
+        _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
+                                  SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
+                                  SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD)
+        {
+            mCurrentBlend.sourceFactor = sourceFactor;
+            mCurrentBlend.destFactor = destFactor;
+            mCurrentBlend.sourceFactorAlpha = sourceFactorAlpha;
+            mCurrentBlend.destFactorAlpha = destFactorAlpha;
+            mCurrentBlend.operation = op;
+            mCurrentBlend.alphaOperation = alphaOp;
+            setColourBlendState(mCurrentBlend);
+        }
 
         /** Sets the global alpha rejection approach for future renders.
         By default images are rendered regardless of texture alpha. This method lets you change that.
@@ -687,7 +700,14 @@ namespace Ogre
         /// @deprecated use _setDepthBufferParams
         OGRE_DEPRECATED virtual void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL) {}
         /// @deprecated use setColourBlendState
-        virtual void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha) {}
+        OGRE_DEPRECATED void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
+        {
+            mCurrentBlend.writeR = red;
+            mCurrentBlend.writeG = green;
+            mCurrentBlend.writeB = blue;
+            mCurrentBlend.writeA = alpha;
+            setColourBlendState(mCurrentBlend);
+        }
         /** Sets the depth bias, NB you should use the Material version of this. 
         @remarks
         When polygons are coplanar, you can get problems with 'depth fighting' where
@@ -1258,6 +1278,7 @@ namespace Ogre
 
         virtual void initConfigOptions();
 
+        ColourBlendState mCurrentBlend;
         GpuProgramParametersSharedPtr mFixedFunctionParams;
 
         void initFixedFunctionParams();

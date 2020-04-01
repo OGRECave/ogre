@@ -931,74 +931,6 @@ namespace Ogre {
         return GL_ONE;
     }
 
-    void GLES2RenderSystem::_setSeparateSceneBlending(
-        SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
-        SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
-        SceneBlendOperation op, SceneBlendOperation alphaOp )
-    {
-        GLenum sourceBlend = getBlendMode(sourceFactor);
-        GLenum destBlend = getBlendMode(destFactor);
-        GLenum sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
-        GLenum destBlendAlpha = getBlendMode(destFactorAlpha);
-        
-        if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
-           sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
-        {
-            mStateCacheManager->setDisabled(GL_BLEND);
-        }
-        else
-        {
-            mStateCacheManager->setEnabled(GL_BLEND);
-            mStateCacheManager->setBlendFunc(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
-        }
-        
-        GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
-        
-        switch(op)
-        {
-            case SBO_ADD:
-                func = GL_FUNC_ADD;
-                break;
-            case SBO_SUBTRACT:
-                func = GL_FUNC_SUBTRACT;
-                break;
-            case SBO_REVERSE_SUBTRACT:
-                func = GL_FUNC_REVERSE_SUBTRACT;
-                break;
-            case SBO_MIN:
-                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
-                    func = GL_MIN_EXT;
-                break;
-            case SBO_MAX:
-                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
-                    func = GL_MAX_EXT;
-                break;
-        }
-        
-        switch(alphaOp)
-        {
-            case SBO_ADD:
-                alphaFunc = GL_FUNC_ADD;
-                break;
-            case SBO_SUBTRACT:
-                alphaFunc = GL_FUNC_SUBTRACT;
-                break;
-            case SBO_REVERSE_SUBTRACT:
-                alphaFunc = GL_FUNC_REVERSE_SUBTRACT;
-                break;
-            case SBO_MIN:
-                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
-                    alphaFunc = GL_MIN_EXT;
-                break;
-            case SBO_MAX:
-                if(hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax"))
-                    alphaFunc = GL_MAX_EXT;
-                break;
-        }
-        
-        mStateCacheManager->setBlendEquation(func, alphaFunc);
-    }
-
     void GLES2RenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
         if (getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
@@ -1165,10 +1097,44 @@ namespace Ogre {
             mStateCacheManager->setDisabled(GL_POLYGON_OFFSET_FILL);
         }
     }
-
-    void GLES2RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
+    static GLenum getBlendOp(SceneBlendOperation op, bool hasMinMax)
     {
-        mStateCacheManager->setColourMask(red, green, blue, alpha);
+        switch (op)
+        {
+        case SBO_ADD:
+            return GL_FUNC_ADD;
+        case SBO_SUBTRACT:
+            return GL_FUNC_SUBTRACT;
+        case SBO_REVERSE_SUBTRACT:
+            return GL_FUNC_REVERSE_SUBTRACT;
+        case SBO_MIN:
+            return hasMinMax ? GL_MIN : GL_FUNC_ADD;
+        case SBO_MAX:
+            return hasMinMax ? GL_MAX : GL_FUNC_ADD;
+        }
+        return GL_FUNC_ADD;
+    }
+    void GLES2RenderSystem::setColourBlendState(const ColourBlendState& state)
+    {
+        // record this
+        mCurrentBlend = state;
+
+        if (state.blendingEnabled())
+        {
+            mStateCacheManager->setEnabled(GL_BLEND);
+            mStateCacheManager->setBlendFunc(
+                getBlendMode(state.sourceFactor), getBlendMode(state.destFactor),
+                getBlendMode(state.sourceFactorAlpha), getBlendMode(state.destFactorAlpha));
+        }
+        else
+        {
+            mStateCacheManager->setDisabled(GL_BLEND);
+        }
+
+        bool hasMinMax = hasMinGLVersion(3, 0) || checkExtension("GL_EXT_blend_minmax");
+        mStateCacheManager->setBlendEquation(getBlendOp(state.operation, hasMinMax),
+                                             getBlendOp(state.alphaOperation, hasMinMax));
+        mStateCacheManager->setColourMask(state.writeR, state.writeG, state.writeB, state.writeA);
     }
 
     //---------------------------------------------------------------------

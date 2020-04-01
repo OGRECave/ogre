@@ -72,9 +72,6 @@ namespace Ogre {
 
         GLint mLargestSupportedAnisotropy;
 
-        /// Store last colour write state
-        bool mColourWrite[4];
-
         /// Store last depth write state
         bool mDepthWrite;
 
@@ -184,7 +181,7 @@ namespace Ogre {
 
         void _setDepthBias(float constantBias, float slopeScaleBias);
 
-        void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
+        void setColourBlendState(const ColourBlendState& state);
 
         void _setPolygonMode(PolygonMode level);
 
@@ -256,8 +253,6 @@ namespace Ogre {
         void unbindGpuProgram(GpuProgramType gptype);
         void bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask);
 
-        /// @copydoc RenderSystem::_setSeparateSceneBlending
-        void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
         /// @copydoc RenderSystem::_setAlphaRejectSettings
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         /// @copydoc RenderSystem::getDisplayMonitorCount

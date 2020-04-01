@@ -1630,29 +1630,6 @@ namespace Ogre
         mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op /*= SBO_ADD*/, SceneBlendOperation alphaOp /*= SBO_ADD*/ )
-    {
-        if( sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
-            sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
-        {
-            mBlendDesc.RenderTarget[0].BlendEnable = FALSE;
-        }
-        else
-        {
-            mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-            mBlendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(sourceFactor, false);
-            mBlendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(destFactor, false);
-            mBlendDesc.RenderTarget[0].BlendOp = D3D11Mappings::get(op) ;
-            mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactorAlpha, true);
-            mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactorAlpha, true);
-            mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(alphaOp) ;
-            mBlendDesc.AlphaToCoverageEnable = false;
-
-            mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
-        }
-        mBlendDescChanged = true;
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
     {
         mSceneAlphaRejectFunc   = func;
@@ -1722,20 +1699,41 @@ namespace Ogre
         mRasterizerDescChanged = true;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, 
-        bool blue, bool alpha)
+    void D3D11RenderSystem::setColourBlendState(const ColourBlendState& state)
     {
+        // record this
+        mCurrentBlend = state;
+
+        if (state.blendingEnabled())
+        {
+            mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
+            mBlendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(state.sourceFactor, false);
+            mBlendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(state.destFactor, false);
+            mBlendDesc.RenderTarget[0].BlendOp = D3D11Mappings::get(state.operation) ;
+            mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(state.sourceFactorAlpha, true);
+            mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(state.destFactorAlpha, true);
+            mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(state.alphaOperation) ;
+            mBlendDesc.AlphaToCoverageEnable = false;
+
+            mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
+        }
+        else
+        {
+            mBlendDesc.RenderTarget[0].BlendEnable = FALSE;
+        }
+
         UINT8 val = 0;
-        if (red) 
+        if (state.writeR)
             val |= D3D11_COLOR_WRITE_ENABLE_RED;
-        if (green)
+        if (state.writeG)
             val |= D3D11_COLOR_WRITE_ENABLE_GREEN;
-        if (blue)
+        if (state.writeB)
             val |= D3D11_COLOR_WRITE_ENABLE_BLUE;
-        if (alpha)
+        if (state.writeA)
             val |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
 
-        mBlendDesc.RenderTarget[0].RenderTargetWriteMask = val; 
+        mBlendDesc.RenderTarget[0].RenderTargetWriteMask = val;
+
         mBlendDescChanged = true;
     }
     //---------------------------------------------------------------------
