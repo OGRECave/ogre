@@ -146,7 +146,7 @@ namespace Ogre
         // Planes can never be manifold
         pMesh->setAutoBuildEdgeLists(false);
         // store parameters
-        MeshBuildParams params;
+        MeshBuildParams params = {};
         params.type = MBT_PLANE;
         params.plane = plane;
         params.width = width;
@@ -182,7 +182,7 @@ namespace Ogre
         // Planes can never be manifold
         pMesh->setAutoBuildEdgeLists(false);
         // store parameters
-        MeshBuildParams params;
+        MeshBuildParams params = {};
         params.type = MBT_CURVED_PLANE;
         params.plane = plane;
         params.width = width;
