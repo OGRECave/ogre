@@ -135,9 +135,7 @@ namespace OgreBites
 
                 try
                 {
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-                    s->setShaderGenerator(mShaderGenerator);
-#endif
+                    s->_setupTrays(mWindow);
                     SampleContext::runSample(s);
                 }
                 catch (Ogre::Exception& e)   // if failed to start, show error and fall back to menu

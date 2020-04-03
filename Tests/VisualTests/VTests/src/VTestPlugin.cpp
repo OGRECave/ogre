@@ -29,11 +29,13 @@ THE SOFTWARE.
 #include "VTestPlugin.h"
 #include "StencilShadowTest.h"
 #include "ParticleTest.h"
-#include "TransparencyTest.h"
-#include "TextureEffectsTest.h"
 #include "CubeMappingTest.h"
 #include "TextureBlitTest.h"
 #include "OgreResourceGroupManager.h"
+
+// samples as tests
+#include "TextureFX.h"
+#include "Transparency.h"
 
 VTestPlugin::VTestPlugin()
     :SamplePlugin("VTestPlugin")
@@ -43,8 +45,8 @@ VTestPlugin::VTestPlugin()
     addSample(new CubeMappingTest());
     addSample(new ParticleTest());
     addSample(new StencilShadowTest());
-    addSample(new TextureEffectsTest());
-    addSample(new TransparencyTest());
+    addSample(new Sample_TextureFX());
+    addSample(new Sample_Transparency());
 }
 //---------------------------------------------------------------------
 
