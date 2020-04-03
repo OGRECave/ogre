@@ -892,9 +892,12 @@ namespace Ogre {
         */
         void _unregisterResourceManager(const String& resourceType);
 
-        /** Get an iterator over the registered resource managers.
+        /** Get the registered resource managers.
         */
-        ResourceManagerIterator getResourceManagerIterator()
+        const ResourceManagerMap& getResourceManagers() const { return mResourceManagerMap; }
+
+        /// @deprecated use getResourceManagers()
+        OGRE_DEPRECATED ResourceManagerIterator getResourceManagerIterator()
         { return ResourceManagerIterator(
             mResourceManagerMap.begin(), mResourceManagerMap.end()); }
 
