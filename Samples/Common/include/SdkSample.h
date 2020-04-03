@@ -44,13 +44,6 @@ namespace OgreBites
     public:
         SdkSample()
         {
-            // so we don't have to worry about checking if these keys exist later
-            mInfo["Title"] = "Untitled";
-            mInfo["Description"] = "";
-            mInfo["Category"] = "Unsorted";
-            mInfo["Thumbnail"] = "";
-            mInfo["Help"] = "";
-
             mTrayMgr = 0;
             mCameraMan = 0;
             mCamera = 0;
