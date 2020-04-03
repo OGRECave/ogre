@@ -44,11 +44,8 @@ class VisualTest : public OgreBites::Sample
 
     VisualTest()
     {
-        mInfo["Title"] = "Untitled Test";
-        mInfo["Description"] = "";
         mInfo["Category"] = "Tests";
         mInfo["Thumbnail"] = "thumb_visual_tests.png";
-        mInfo["Help"] = "";
         Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
         if (!rgm.resourceGroupExists(TRANSIENT_RESOURCE_GROUP))
             rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP, true);

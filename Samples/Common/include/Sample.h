@@ -35,7 +35,7 @@
 
 #include "OgreFileSystemLayer.h"
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #   include "OgreRTShaderSystem.h"
 #endif //INCLUDE_RTSHADER_SYSTEM
 
@@ -59,16 +59,11 @@ namespace OgreBites
         {
             bool operator() (const Sample* a, const Sample* b) const
             {
-                auto aTitle = a->getInfo().find("Title");
-                auto bTitle = b->getInfo().find("Title");
-                
-                if (aTitle != a->getInfo().end() && bTitle != b->getInfo().end())
-                    return aTitle->second.compare(bTitle->second) < 0;
-                else return false;
+                return a->getInfo().at("Title") < b->getInfo().at("Title");
             }
         };
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Sample() : mShaderGenerator(0)
 #else
         Sample()
@@ -83,6 +78,13 @@ namespace OgreBites
 
             mFSLayer = 0;
             mOverlaySystem = 0;
+
+            // so we don't have to worry about checking if these keys exist later
+            mInfo["Title"] = "Untitled";
+            mInfo["Description"] = "";
+            mInfo["Category"] = "Unsorted";
+            mInfo["Thumbnail"] = "thumb_error.png";
+            mInfo["Help"] = "";
         }
 
         virtual ~Sample() {}
@@ -161,7 +163,7 @@ namespace OgreBites
             mResourcesLoaded = false;
             if (mSceneMgr) 
             {
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
                 mShaderGenerator->removeSceneManager(mSceneMgr);
 #endif
                 mSceneMgr->removeRenderQueueListener(mOverlaySystem);
@@ -225,7 +227,7 @@ namespace OgreBites
         virtual void createSceneManager()
         {
             mSceneMgr = Ogre::Root::getSingleton().createSceneManager();
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
             mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
             if(mOverlaySystem)
@@ -271,7 +273,7 @@ namespace OgreBites
         bool mDone;                       // flag to mark the end of the sample
         bool mResourcesLoaded;    // whether or not resources have been loaded
         bool mContentSetup;       // whether or not scene was created
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*            mShaderGenerator;           // The Shader generator instance.
     public:
         void setShaderGenerator(Ogre::RTShader::ShaderGenerator* shaderGenerator) 

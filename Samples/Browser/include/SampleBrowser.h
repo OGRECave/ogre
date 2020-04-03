@@ -416,10 +416,7 @@ namespace OgreBites
                         Ogre::MaterialPtr newMat = templateMat->clone(name);
 
                         Ogre::TextureUnitState* tus = newMat->getTechnique(0)->getPass(0)->getTextureUnitState(0);
-                        if (Ogre::ResourceGroupManager::getSingleton().resourceExists("Essential", info["Thumbnail"]))
-                            tus->setTextureName(info["Thumbnail"]);
-                        else
-                            tus->setTextureName("thumb_error.png");
+                        tus->setTextureName(info["Thumbnail"]);
 
                         // create sample thumbnail overlay
                         Ogre::BorderPanelOverlayElement* bp = (Ogre::BorderPanelOverlayElement*)
@@ -913,15 +910,6 @@ namespace OgreBites
                 for (SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
                 {
                     Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
-                    Ogre::NameValuePairList::iterator k;
-
-                    // give sample default title and category if none found
-                    k= info.find("Title");
-                    if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
-                    k = info.find("Category");
-                    if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
-                    k = info.find("Thumbnail");
-                    if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
 
                     mLoadedSamples.insert(*j);                    // add sample only after ensuring title for sorting
                     mSampleCategories.insert(info["Category"]);   // add sample category

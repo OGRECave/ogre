@@ -279,16 +279,6 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
             }
 
             mTests.push_back(*j);
-            Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
-            Ogre::NameValuePairList::iterator k;
-
-            // give sample default title and category if none found
-            k= info.find("Title");
-            if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
-            k = info.find("Category");
-            if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
-            k = info.find("Thumbnail");
-            if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
         }
     }
 
