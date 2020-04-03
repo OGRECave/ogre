@@ -15,16 +15,14 @@ set(HEADER_FILES
 
 set(SOURCE_FILES
     src/StencilShadowTest.cpp
-    src/TextureEffectsTest.cpp
     src/TextureBlitTest.cpp
     src/CubeMappingTest.cpp
-    src/TransparencyTest.cpp
     src/ParticleTest.cpp
     src/VTestPlugin.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/Samples/Common/include)
-include_directories(${PROJECT_SOURCE_DIR}/Samples/Browser/include)
+include_directories(${PROJECT_SOURCE_DIR}/Samples/Simple/include)
 include_directories(${PROJECT_SOURCE_DIR}/Tests/VisualTests/Common/include)
 
 add_library(VTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )

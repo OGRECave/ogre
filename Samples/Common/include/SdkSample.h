@@ -29,26 +29,20 @@
 #define __SdkSample_H__
 
 #include "Sample.h"
-#include "OgreTrays.h"
-#include "OgreCameraMan.h"
-#include "OgreAdvancedRenderControls.h"
 #include "Ogre.h"
+#include "OgreAdvancedRenderControls.h"
 
 namespace OgreBites
 {
     /*=============================================================================
     // Base SDK sample class. Includes default player camera and SDK trays.
     =============================================================================*/
-    class SdkSample : public Sample, public TrayListener
+    class SdkSample : public Sample
     {
     public:
         SdkSample()
         {
-            mTrayMgr = 0;
             mCameraMan = 0;
-            mCamera = 0;
-            mCameraNode = 0;
-            mViewport = 0;
             mControls = 0;
             mCursorWasVisible = false;
             mDragLook = false;
@@ -89,6 +83,8 @@ namespace OgreBites
 
         virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt)
         {
+            if(!mTrayMgr) return true;
+
             mTrayMgr->frameRendered(evt);
             mControls->frameRendered(evt);
 
@@ -195,31 +191,10 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
         {
-            // assign mRoot here in case Root was initialised after the Sample's constructor ran.
-            mRoot = Ogre::Root::getSingletonPtr();
-            mWindow = window;
-            mFSLayer = fsLayer;
-            mOverlaySystem = overlaySys;
+            Sample::_setup(window, fsLayer, overlaySys);
 
-            locateResources();
-            createSceneManager();
-            setupView();
-
-            mTrayMgr = new TrayManager("SampleControls", window, this);  // create a tray interface
-
-            loadResources();
-            mResourcesLoaded = true;
-
-            // show stats and logo and hide the cursor
-            mTrayMgr->showFrameStats(TL_BOTTOMLEFT);
-            mTrayMgr->showLogo(TL_BOTTOMRIGHT);
-            mTrayMgr->hideCursor();
-
-            mControls = new AdvancedRenderControls(mTrayMgr, mCamera);
-            setupContent();
-            mContentSetup = true;
-
-            mDone = false;
+            if(mTrayMgr)
+                mControls = new AdvancedRenderControls(mTrayMgr.get(), mCamera);
         }
 
         virtual void _shutdown()
@@ -227,8 +202,8 @@ namespace OgreBites
             Sample::_shutdown();
 
             delete mControls;
-            delete mTrayMgr;
-            delete mCameraMan;
+            mCameraMan.reset();
+            mTrayMgr.reset();
 
             // restore settings we may have changed, so as not to affect other samples
             Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_BILINEAR);
@@ -248,8 +223,6 @@ namespace OgreBites
             mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
             mCamera->setAutoAspectRatio(true);
             mCamera->setNearClipDistance(5);
-
-            mCameraMan = new CameraMan(mCameraNode);   // create a default camera controller
         }
 
         virtual void setDragLook(bool enabled)
@@ -305,11 +278,6 @@ namespace OgreBites
             w->getOverlayElement()->setMaterial(debugMat);
         }
 
-        Ogre::Viewport* mViewport;          // main viewport
-        Ogre::Camera* mCamera;              // main camera
-        Ogre::SceneNode* mCameraNode;       // camera node
-        TrayManager* mTrayMgr;           // tray interface manager
-        CameraMan* mCameraMan;           // basic camera controller
         AdvancedRenderControls* mControls; // sample details panel
         bool mCursorWasVisible;             // was cursor visible before dialog appeared
         bool mDragLook;                     // click and drag to free-look

@@ -51,13 +51,6 @@ class VisualTest : public OgreBites::Sample
             rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP, true);
     }
 
-    /** Adds a screenshot frame to the list - this should
-     *    be done during setup of the test. */
-    void addScreenshotFrame(unsigned int frame)
-    {
-        mScreenshotFrames.insert(frame);
-    }
-
     /** set up the camera and viewport */
     virtual void setupView()
     {
@@ -84,23 +77,6 @@ class VisualTest : public OgreBites::Sample
         mAnimStateList.clear();
     }
 
-    /** Returns whether or not a screenshot should be taken at the given frame */
-    virtual bool isScreenshotFrame(unsigned int frame)
-    {
-        if (mScreenshotFrames.empty())
-        {
-            mDone = true;
-        }
-        else if (frame == *(mScreenshotFrames.begin()))
-        {
-            mScreenshotFrames.erase(mScreenshotFrames.begin());
-            if (mScreenshotFrames.empty())
-                mDone = true;
-            return true;
-        }
-        return false;
-    }
-
     /** Default frame started callback, advances animations */
     virtual bool frameStarted(const Ogre::FrameEvent& evt)
     {
@@ -110,19 +86,8 @@ class VisualTest : public OgreBites::Sample
     }
 
  protected:
-
-    // a set of frame numbers at which to trigger screenshots
-    std::set<unsigned int> mScreenshotFrames;
-
     // a list of animation states to automatically update
     std::vector<Ogre::AnimationState*> mAnimStateList;
-
-    // The camera for this sample
-    Ogre::Camera* mCamera;
-    Ogre::SceneNode* mCameraNode;
-    // The viewport for this sample
-    Ogre::Viewport* mViewport;
-
 };
 
 #endif
