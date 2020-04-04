@@ -217,12 +217,9 @@ else()
   set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 endif()
 
-if(OGRE_GCC_VERSION VERSION_EQUAL 4.8 OR OGRE_GCC_VERSION VERSION_GREATER 4.8)
-	if(CMAKE_SYSTEM_NAME STREQUAL "Android") 
-	  list(APPEND LIBRARIES "atomic")
-	else()
-	  list(APPEND LIBRARIES "-latomic")
-	endif()
+if(CMAKE_COMPILER_IS_GNUCXX AND NOT OGRE_PLATFORM_X64)
+  # software 64bit atomic support
+  list(APPEND LIBRARIES "atomic")
 endif()
 
 if (APPLE)
