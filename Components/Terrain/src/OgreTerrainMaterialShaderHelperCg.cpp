@@ -115,7 +115,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void ShaderHelperCg::generateVpHeader(
+    void ShaderHelperCg::generateVertexProgramSource(
         const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
         outStream << 
@@ -273,6 +273,29 @@ namespace Ogre
 
         }   
 
+        outStream <<
+            "   oPos = mul(viewProjMatrix, worldPos);\n"
+            "   oUVMisc.xy = uv.xy;\n";
+
+        if (fog)
+        {
+            if (terrain->getSceneManager()->getFogMode() == FOG_LINEAR)
+            {
+                outStream <<
+                    "   fogVal = saturate((oPos.z - fogParams.y) * fogParams.w);\n";
+            }
+            else
+            {
+                outStream <<
+                    "   fogVal = 1 - saturate(1 / (exp(oPos.z * fogParams.x)));\n";
+            }
+        }
+
+        if (prof->isShadowingEnabled(tt, terrain))
+            generateVpDynamicShadows(prof, terrain, tt, outStream);
+
+        outStream <<
+            "}\n";
 
     }
 
@@ -485,12 +508,6 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void ShaderHelperCg::generateVpLayer(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream)
-    {
-        // nothing to do
-    }
-    //---------------------------------------------------------------------
     void ShaderHelperCg::generateFpLayer(
         const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream)
     {
@@ -558,38 +575,6 @@ namespace Ogre
         if (layer && prof->_isSM3Available())
             outStream << "  } // early-out blend value\n";
         */
-    }
-    //---------------------------------------------------------------------
-    void ShaderHelperCg::generateVpFooter(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
-    {
-
-        outStream << 
-            "   oPos = mul(viewProjMatrix, worldPos);\n"
-            "   oUVMisc.xy = uv.xy;\n";
-
-        bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
-        if (fog)
-        {
-            if (terrain->getSceneManager()->getFogMode() == FOG_LINEAR)
-            {
-                outStream <<
-                    "   fogVal = saturate((oPos.z - fogParams.y) * fogParams.w);\n";
-            }
-            else
-            {
-                outStream <<
-                    "   fogVal = 1 - saturate(1 / (exp(oPos.z * fogParams.x)));\n";
-            }
-        }
-        
-        if (prof->isShadowingEnabled(tt, terrain))
-            generateVpDynamicShadows(prof, terrain, tt, outStream);
-
-        outStream << 
-            "}\n";
-
-
     }
     //---------------------------------------------------------------------
     void ShaderHelperCg::generateFpFooter(

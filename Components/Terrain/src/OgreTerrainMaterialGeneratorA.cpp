@@ -461,24 +461,6 @@ namespace Ogre
         return ret;
     }
     //---------------------------------------------------------------------
-    void ShaderHelper::generateVertexProgramSource(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
-    {
-        generateVpHeader(prof, terrain, tt, outStream);
-
-        if (tt != LOW_LOD)
-        {
-            uint maxLayers = prof->getMaxLayers(terrain);
-            uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
-
-            for (uint i = 0; i < numLayers; ++i)
-                generateVpLayer(prof, terrain, tt, i, outStream);
-        }
-
-        generateVpFooter(prof, terrain, tt, outStream);
-
-    }
-    //---------------------------------------------------------------------
     void ShaderHelper::generateFragmentProgramSource(
         const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
