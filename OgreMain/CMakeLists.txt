@@ -217,11 +217,6 @@ else()
   set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT OGRE_PLATFORM_X64)
-  # software 64bit atomic support
-  list(APPEND LIBRARIES "atomic")
-endif()
-
 if (APPLE)
   if (APPLE_IOS)
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
