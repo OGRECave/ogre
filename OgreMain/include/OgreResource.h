@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    typedef unsigned long long int ResourceHandle;
+    typedef size_t ResourceHandle;
 
 
     // Forward declaration
