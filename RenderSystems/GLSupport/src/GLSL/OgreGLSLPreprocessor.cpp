@@ -210,15 +210,25 @@ namespace Ogre {
         for (; i < Args.size(); i++)
             cpp.Define (Args [i].String, Args [i].Length, "", 0);
 
-        // Now run the macro expansion through the supplimentary preprocessor
-        Token xt = cpp.Parse (Value);
+        Token xt;
+        // make sure that no one down the line sets Value.Allocated = 0
+        Token new_xt = Token(Token::TK_TEXT, Value.String, Value.Length);
+        bool first = true;
+        do {
+            xt = new_xt;
+            // Now run the macro expansion through the supplimentary preprocessor
+            new_xt = cpp.Parse (xt);
+
+            // Remove the extra macros we have defined, only needed once.
+            if (first) {
+                first = false;
+                for (int j = Args.size() - 1; j >= 0; j--)
+                    cpp.Undef (Args [j].String, Args [j].Length);
+            }
+            // Repeat until there is no more change between parses
+        } while (xt.String != new_xt.String);
 
         Expanding = false;
-
-        // Remove the extra macros we have defined
-        for (int j = Args.size() - 1; j >= 0; j--)
-            cpp.Undef (Args [j].String, Args [j].Length);
-
         std::swap(cpp.MacroList, iMacros);
 
         return xt;
@@ -412,6 +422,11 @@ namespace Ogre {
                     assert (t.Allocated == 0);
                     Source = t.String;
                     Line -= t.CountNL ();
+                }
+                // If a macro is defined with arguments but gets not "called" it should behave like normal text
+                if (args.size() == 0 && (t.Type != Token::TK_PUNCTUATION || t.String [0] != '('))
+                {
+                    return iToken;
                 }
             }
 

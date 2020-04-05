@@ -100,3 +100,77 @@ TEST(CPreprocessorTests, ElseIf)
     EXPECT_EQ(str, "value is 0");
     free(out);
 }
+
+TEST(CPreprocessorTests, MacroMacroArgument)
+{
+    CPreprocessor prep;
+    String src = "#define LEFT(left, right) (left)\n"
+                 "#define USE(a, b, F) F(a, b)\n"
+                 "USE(A, B, LEFT)";
+
+    size_t olen;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    String str(out, olen);
+    StringUtil::trim(str);
+    EXPECT_EQ(str, "(A)");
+    free(out);
+}
+
+TEST(CPreprocessorTests, MacroMacroArgumentAndExpansion)
+{
+    CPreprocessor prep;
+    String src = "#define RIGHT(left, right) (right)\n"
+                 "#define LEFT(left, right) (left)\n"
+                 "#define USE(a, b, F) F(a, b)\n"
+                 "USE(RIGHT(A, C), B, LEFT)";
+
+    size_t olen;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    String str(out, olen);
+    StringUtil::trim(str);
+    EXPECT_EQ(str, "((C))");
+    free(out);
+}
+
+TEST(CPreprocessorTests, MacroRecursion1)
+{
+    CPreprocessor prep;
+    String src = "#define U(b) (b,U(b),b)\n"
+                 "U(U)";
+
+    size_t olen;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    String str(out, olen);
+    StringUtil::trim(str);
+    EXPECT_EQ(str, "(U,U(U),U)");
+    free(out);
+}
+
+
+TEST(CPreprocessorTests, MacroRecursion2)
+{
+    CPreprocessor prep;
+    String src = "#define Z(b) (b,b,b)\n"
+                 "Z(Z+Z(1))";
+
+    size_t olen;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    String str(out, olen);
+    StringUtil::trim(str);
+    EXPECT_EQ(str, "(Z+(1,1,1),Z+(1,1,1),Z+(1,1,1))");
+    free(out);
+}
+
+TEST(CPreprocessorTests, MacroRecursion3)
+{
+    CPreprocessor prep;
+    String src = "#define Z(b) (b,b,b)\n"
+                 "Z(Z(Z(1)+Z(2)))";
+
+    size_t olen;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    String str(out, olen);
+    StringUtil::trim(str);
+    EXPECT_EQ(str, "(((1,1,1)+(2,2,2),(1,1,1)+(2,2,2),(1,1,1)+(2,2,2)),((1,1,1)+(2,2,2),(1,1,1)+(2,2,2),(1,1,1)+(2,2,2)),((1,1,1)+(2,2,2),(1,1,1)+(2,2,2),(1,1,1)+(2,2,2)))");
+    free(out);
+}
