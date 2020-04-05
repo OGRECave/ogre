@@ -87,7 +87,7 @@ namespace Ogre
     }
 
     //---------------------------------------------------------------------
-    void ShaderHelperGLSL::generateVpHeader(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
         int version = mIsGLES ? 100 : 120;
@@ -242,6 +242,29 @@ namespace Ogre
                     "    layerUV" << i << ".zw = " << " uv0.xy * uvMul_" << uvMulIdx << "." << getChannel(layer+1) << ";\n";
             }
         }
+
+        outStream <<
+            "    gl_Position = viewProjMatrix * worldPos;\n"
+            "    oUVMisc.xy = uv0.xy;\n";
+
+        if (fog)
+        {
+            if (terrain->getSceneManager()->getFogMode() == FOG_LINEAR)
+            {
+                outStream <<
+                    "    fogVal = clamp((gl_Position.z - fogParams.y) * fogParams.w, 0.0, 1.0);\n";
+            }
+            else
+            {
+                outStream <<
+                    "    fogVal = 1.0 - clamp(1.0 / (exp(gl_Position.z * fogParams.x)), 0.0, 1.0);\n";
+            }
+        }
+
+        if (prof->isShadowingEnabled(tt, terrain))
+            generateVpDynamicShadows(prof, terrain, tt, outStream);
+
+        outStream << "}\n";
     }
     //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
@@ -435,12 +458,6 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void ShaderHelperGLSL::generateVpLayer(const SM2Profile* prof, const Terrain* terrain,
-                                                                                  TechniqueType tt, uint layer, StringStream& outStream)
-    {
-        // nothing to do
-    }
-    //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateFpLayer(const SM2Profile* prof, const Terrain* terrain,
                                                                                   TechniqueType tt, uint layer, StringStream& outStream)
     {
@@ -506,34 +523,6 @@ namespace Ogre
          if (layer && prof->_isSM3Available())
          outStream << "  } // early-out blend value\n";
          */
-    }
-    //---------------------------------------------------------------------
-    void ShaderHelperGLSL::generateVpFooter(const SM2Profile* prof, const Terrain* terrain,
-                                                                                   TechniqueType tt, StringStream& outStream)
-    {
-        outStream <<
-            "    gl_Position = viewProjMatrix * worldPos;\n"
-            "    oUVMisc.xy = uv0.xy;\n";
-
-        bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
-        if (fog)
-        {
-            if (terrain->getSceneManager()->getFogMode() == FOG_LINEAR)
-            {
-                outStream <<
-                    "    fogVal = clamp((gl_Position.z - fogParams.y) * fogParams.w, 0.0, 1.0);\n";
-            }
-            else
-            {
-                outStream <<
-                    "    fogVal = 1.0 - clamp(1.0 / (exp(gl_Position.z * fogParams.x)), 0.0, 1.0);\n";
-            }
-        }
-
-        if (prof->isShadowingEnabled(tt, terrain))
-            generateVpDynamicShadows(prof, terrain, tt, outStream);
-
-        outStream << "}\n";
     }
     //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateFpFooter(const SM2Profile* prof, const Terrain* terrain,
