@@ -386,21 +386,19 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
         mSceneManager->mIlluminationStage = IRS_RENDER_RECEIVER_PASS;
 
         LightList::const_iterator i, iend;
-        ShadowTextureList::iterator si, siend;
         iend = mSceneManager->_getLightsAffectingFrustum().end();
-        siend = mShadowTextures.end();
-        for (i = mSceneManager->_getLightsAffectingFrustum().begin(), si = mShadowTextures.begin();
-            i != iend && si != siend; ++i)
+
+        size_t si = 0;
+        for (i = mSceneManager->_getLightsAffectingFrustum().begin();
+             i != iend && si < mShadowTextures.size(); ++i)
         {
             Light* l = *i;
 
             if (!l->getCastShadows())
                 continue;
 
-            // Store current shadow texture
-            const auto& currentShadowTexture = *si;
             // Get camera for current shadow texture
-            Camera *cam = currentShadowTexture->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
+            Camera *cam = mShadowTextures[si]->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
             // Hook up receiver texture
             Pass* targetPass = mShadowTextureCustomReceiverPass ?
                     mShadowTextureCustomReceiverPass : mShadowReceiverPass;
@@ -451,15 +449,10 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
                 targetPass = betterTechnique->getPass(0);
             }
 
-            targetPass->getTextureUnitState(0)->setTexture(currentShadowTexture);
-            // Hook up projection frustum if fixed-function, but also need to
-            // disable it explicitly for program pipeline.
             TextureUnitState* texUnit = targetPass->getTextureUnitState(0);
-            texUnit->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
             // clamp to border colour in case this is a custom material
             texUnit->setSampler(mBorderSampler);
-
-            mSceneManager->mAutoParamDataSource->setTextureProjector(cam, 0);
+            resolveShadowTexture(texUnit, si, 0);
 
             // Set lighting / blending modes
             targetPass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO);
@@ -474,7 +467,7 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
 
             ++si;
 
-        }// for each light
+        } // for each light
 
         mSceneManager->mIlluminationStage = IRS_NONE;
 
@@ -524,18 +517,12 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
         if (mSceneManager->mIlluminationStage == IRS_NONE)
         {
             // Iterate over lights, render masked
-            ShadowTextureList::iterator si, siend;
-            siend = mShadowTextures.end();
-            si = mShadowTextures.begin();
+            size_t si = 0;
 
             for (Light* l : mSceneManager->_getLightsAffectingFrustum())
             {
-                if (l->getCastShadows() && si != siend)
+                if (l->getCastShadows() && si < mShadowTextures.size())
                 {
-                    // Store current shadow texture
-                    const auto& currentShadowTexture = *si;
-                    // Get camera for current shadow texture
-                    Camera *cam = currentShadowTexture->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
                     // Hook up receiver texture
                     Pass* targetPass = mShadowTextureCustomReceiverPass ?
                         mShadowTextureCustomReceiverPass : mShadowReceiverPass;
@@ -546,14 +533,11 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
                         targetPass = betterTechnique->getPass(0);
                     }
 
-                    targetPass->getTextureUnitState(0)->setTexture(currentShadowTexture);
-                    // Hook up projection frustum if fixed-function, but also need to
-                    // disable it explicitly for program pipeline.
                     TextureUnitState* texUnit = targetPass->getTextureUnitState(0);
-                    texUnit->setProjectiveTexturing(!targetPass->hasVertexProgram(), cam);
                     // clamp to border colour in case this is a custom material
                     texUnit->setSampler(mBorderSampler);
-                    mSceneManager->mAutoParamDataSource->setTextureProjector(cam, 0);
+                    resolveShadowTexture(texUnit, si, 0);
+
                     // Remove any spot fader layer
                     if (targetPass->getNumTextureUnitStates() > 1 &&
                         targetPass->getTextureUnitState(1)->getTextureName() == "spot_shadow_fade.dds")
@@ -2153,6 +2137,30 @@ const TexturePtr& SceneManager::ShadowRenderer::getShadowTexture(size_t shadowIn
     ensureShadowTexturesCreated();
 
     return mShadowTextures[shadowIndex];
+}
+
+void SceneManager::ShadowRenderer::resolveShadowTexture(TextureUnitState* tu, size_t shadowIndex, size_t shadowTexUnitIndex) const
+{
+    Camera* cam = NULL;
+    TexturePtr shadowTex;
+    if (shadowIndex < mShadowTextures.size())
+    {
+        shadowTex = mShadowTextures[shadowIndex];
+        // Hook up projection frustum
+        cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
+        // Enable projective texturing if fixed-function, but also need to
+        // disable it explicitly for program pipeline.
+        tu->setProjectiveTexturing(!tu->getParent()->hasVertexProgram(), cam);
+    }
+    else
+    {
+        // Use fallback 'null' shadow texture
+        // no projection since all uniform colour anyway
+        shadowTex = mNullShadowTexture;
+        tu->setProjectiveTexturing(false);
+    }
+    mSceneManager->mAutoParamDataSource->setTextureProjector(cam, shadowTexUnitIndex);
+    tu->_setTexturePtr(shadowTex);
 }
 
 //---------------------------------------------------------------------

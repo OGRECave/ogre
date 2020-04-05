@@ -775,6 +775,9 @@ namespace Ogre {
             void setShadowIndexBufferSize(size_t size);
 
             const TexturePtr& getShadowTexture(size_t shadowIndex);
+
+            void resolveShadowTexture(TextureUnitState* tu, size_t shadowIndex, size_t shadowTexUnitIndex) const;
+
             void setShadowTextureSettings(uint16 size, uint16 count, PixelFormat fmt, uint16 fsaa,
                                           uint16 depthBufferPoolId);
             void setShadowTextureSize(unsigned short size);

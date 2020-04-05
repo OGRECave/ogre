@@ -1065,27 +1065,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             // if that's the case, we have to bind when lights are iterated
             // in renderSingleObject
 
-            TexturePtr shadowTex;
-            if (shadowTexIndex < mShadowRenderer.mShadowTextures.size())
-            {
-                shadowTex = getShadowTexture(shadowTexIndex);
-                // Hook up projection frustum
-                Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-                // Enable projective texturing if fixed-function, but also need to
-                // disable it explicitly for program pipeline.
-                pTex->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
-                mAutoParamDataSource->setTextureProjector(cam, shadowTexUnitIndex);
-            }
-            else
-            {
-                // Use fallback 'null' shadow texture
-                // no projection since all uniform colour anyway
-                shadowTex = mShadowRenderer.mNullShadowTexture;
-                pTex->setProjectiveTexturing(false);
-                mAutoParamDataSource->setTextureProjector(0, shadowTexUnitIndex);
-            }
-            pTex->_setTexturePtr(shadowTex);
-
+            mShadowRenderer.resolveShadowTexture(pTex, shadowTexIndex, shadowTexUnitIndex);
             ++shadowTexIndex;
             ++shadowTexUnitIndex;
         }
@@ -1093,8 +1073,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         {
             // Manually set texture projector for shaders if present
             // This won't get set any other way if using manual projection
-            TextureUnitState::EffectMap::const_iterator effi =
-                pTex->getEffects().find(TextureUnitState::ET_PROJECTIVE_TEXTURE);
+            auto effi = pTex->getEffects().find(TextureUnitState::ET_PROJECTIVE_TEXTURE);
             if (effi != pTex->getEffects().end())
             {
                 mAutoParamDataSource->setTextureProjector(effi->second.frustum, unit);
