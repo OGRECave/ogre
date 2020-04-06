@@ -219,7 +219,7 @@ namespace Ogre {
             }
 
             // Also add children
-            for (const auto& p : mChildren)
+            for (const auto& p : getChildren())
             {
                 // Give children Z-order 1 higher than this
                 p.second->_updateRenderQueue(queue);
