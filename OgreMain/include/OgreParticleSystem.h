@@ -347,13 +347,16 @@ namespace Ogre {
         */
         void _update(Real timeElapsed);
 
-        /** Returns an iterator for stepping through all particles in this system.
+        /** Returns all active particles in this system.
         @remarks
             This method is designed to be used by people providing new ParticleAffector subclasses,
             this is the easiest way to step through all the particles in a system and apply the
             changes the affector wants to make.
         */
-        ParticleIterator _getIterator(void);
+        const std::list<Particle*>& _getActiveParticles() { return mActiveParticles; }
+
+        /// @deprecated use _getActiveParticles()
+        OGRE_DEPRECATED ParticleIterator _getIterator(void);
 
         /** Sets the name of the material to be used for this billboard set.
         */
