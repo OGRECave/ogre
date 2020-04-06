@@ -69,7 +69,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::notifyDeviceRestored(D3D11Device* device)
     {
-        if(mIsManual)
+        if(isManuallyLoaded())
         {
             preLoadImpl();
             createInternalResourcesImpl();

@@ -264,7 +264,7 @@ namespace Ogre
     {               
         D3D9_DEVICE_ACCESS_CRITICAL_SECTION
         
-        if (mIsManual)
+        if (isManuallyLoaded())
         {
             preLoadImpl();
 

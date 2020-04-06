@@ -42,6 +42,21 @@ namespace Ogre
     Resource::~Resource() 
     { 
     }
+    Resource& Resource::operator=(const Resource& rhs)
+    {
+        mName = rhs.mName;
+        mGroup = rhs.mGroup;
+        mCreator = rhs.mCreator;
+        mIsManual = rhs.mIsManual;
+        mLoader = rhs.mLoader;
+        mHandle = rhs.mHandle;
+        mSize = rhs.mSize;
+
+        mLoadingState.store(rhs.mLoadingState.load());
+        mIsBackgroundLoaded = rhs.mIsBackgroundLoaded;
+
+        return *this;
+    }
     //-----------------------------------------------------------------------
     void Resource::escalateLoading()
     {

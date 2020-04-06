@@ -115,8 +115,8 @@ namespace Ogre {
         mLoadingState.store(LOADSTATE_LOADED);
 
         // Notify manager
-        if(mCreator)
-            mCreator->_notifyResourceLoaded(this);
+        if(getCreator())
+            getCreator()->_notifyResourceLoaded(this);
 
         // No deferred loading events since this method is not called in background
 
