@@ -91,7 +91,7 @@ namespace Ogre
     void PCZSceneNode::_update(bool updateChildren, bool parentHasChanged)
     {
         Node::_update(updateChildren, parentHasChanged);
-        if (mParent) _updateBounds(); // skip bound update if it's root scene node. Saves a lot of CPU.
+        if (getParent()) _updateBounds(); // skip bound update if it's root scene node. Saves a lot of CPU.
 
         mPrevPosition = mNewPosition;
         mNewPosition = mDerivedPosition;
@@ -223,12 +223,8 @@ namespace Ogre
                                           bool onlyShadowCasters, 
                                           VisibleObjectsBoundsInfo* visibleBounds )
     {
-        ObjectMap::iterator mit = mObjectsByName.begin();
-
-        while ( mit != mObjectsByName.end() )
+        for ( auto mo : getAttachedObjects() )
         {
-            MovableObject * mo = *mit;
-
             mo->_notifyCurrentCamera(cam);
             if ( mo->isVisible() &&
                 (!onlyShadowCasters || mo->getCastShadows()))
@@ -242,7 +238,6 @@ namespace Ogre
                                          cam);
                 }
             }
-            ++mit;
         }
     }
 

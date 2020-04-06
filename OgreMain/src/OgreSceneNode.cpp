@@ -84,9 +84,9 @@ namespace Ogre {
         {
             mIsInSceneGraph = inGraph;
             // Tell children
-            for (ChildNodeMap::iterator child = mChildren.begin(); child != mChildren.end(); ++child)
+            for (auto child : getChildren())
             {
-                SceneNode* sceneChild = static_cast<SceneNode*>(*child);
+                SceneNode* sceneChild = static_cast<SceneNode*>(child);
                 sceneChild->setInSceneGraph(inGraph);
             }
         }
@@ -246,10 +246,9 @@ namespace Ogre {
         }
 
         // Merge with children
-        ChildNodeMap::iterator child;
-        for (child = mChildren.begin(); child != mChildren.end(); ++child)
+        for (auto child : getChildren())
         {
-            SceneNode* sceneChild = static_cast<SceneNode*>(*child);
+            SceneNode* sceneChild = static_cast<SceneNode*>(child);
             mWorldAABB.merge(sceneChild->mWorldAABB);
         }
 
@@ -275,11 +274,9 @@ namespace Ogre {
 
         if (includeChildren)
         {
-            ChildNodeMap::iterator child, childend;
-            childend = mChildren.end();
-            for (child = mChildren.begin(); child != childend; ++child)
+            for (auto child : getChildren())
             {
-                SceneNode* sceneChild = static_cast<SceneNode*>(*child);
+                SceneNode* sceneChild = static_cast<SceneNode*>(child);
                 sceneChild->_findVisibleObjects(cam, queue, visibleBounds, includeChildren, 
                     displayNodes, onlyShadowCasters);
             }
@@ -327,9 +324,9 @@ namespace Ogre {
         Node::updateFromParentImpl();
 
         // Notify objects that it has been moved
-        for (ObjectMap::const_iterator i = mObjectsByName.begin(); i != mObjectsByName.end(); ++i)
+        for (auto o : mObjectsByName)
         {
-            (*i)->_notifyMoved();
+            o->_notifyMoved();
         }
     }
     //-----------------------------------------------------------------------
@@ -357,7 +354,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(unsigned short index)
     {
-        SceneNode* pChild = static_cast<SceneNode*>(mChildren[index]);
+        SceneNode* pChild = static_cast<SceneNode*>(getChildren()[index]);
         pChild->removeAndDestroyAllChildren();
 
         removeChild(index);
@@ -366,15 +363,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(SceneNode* child)
     {
-        removeAndDestroyChild(std::find(mChildren.begin(), mChildren.end(), child) - mChildren.begin());
+        removeAndDestroyChild(std::find(getChildren().begin(), getChildren().end(), child) -
+                              getChildren().begin());
     }
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyAllChildren(void)
     {
         // do not store iterators (invalidated by
         // SceneManager::destroySceneNode because it causes removal from parent)
-        while(!mChildren.empty()) {
-            SceneNode* sn = static_cast<SceneNode*>(*mChildren.begin());
+        while(!getChildren().empty()) {
+            SceneNode* sn = static_cast<SceneNode*>(getChildren().front());
             sn->removeAndDestroyAllChildren();
             sn->getCreator()->destroySceneNode(sn);
         }
@@ -473,11 +471,11 @@ namespace Ogre {
         switch (relativeTo)
         {
         case TS_PARENT:
-            if (mInheritOrientation)
+            if (getInheritOrientation())
             {
-                if (mParent)
+                if (getParent())
                 {
-                    targetDir = mParent->_getDerivedOrientation() * targetDir;
+                    targetDir = getParent()->_getDerivedOrientation() * targetDir;
                 }
             }
             break;
@@ -496,9 +494,9 @@ namespace Ogre {
             // Calculate the quaternion for rotate local Z to target direction
             Vector3 yawAxis = mYawFixedAxis;
 
-            if (mInheritOrientation && mParent)
+            if (getInheritOrientation() && getParent())
             {
-                yawAxis = mParent->_getDerivedOrientation() * yawAxis;
+                yawAxis = getParent()->_getDerivedOrientation() * yawAxis;
             }
 
             Quaternion unitZToTarget = Math::lookRotation(targetDir, yawAxis);
@@ -539,8 +537,8 @@ namespace Ogre {
         }
 
         // Set target orientation, transformed to parent space
-        if (mParent && mInheritOrientation)
-            setOrientation(mParent->_getDerivedOrientation().UnitInverse() * targetOrientation);
+        if (getParent() && getInheritOrientation())
+            setOrientation(getParent()->_getDerivedOrientation().UnitInverse() * targetOrientation);
         else
             setOrientation(targetOrientation);
     }
@@ -557,7 +555,7 @@ namespace Ogre {
             origin = _getDerivedPosition();
             break;
         case TS_PARENT:
-            origin = mPosition;
+            origin = getPosition();
             break;
         case TS_LOCAL:
             origin = Vector3::ZERO;
@@ -584,62 +582,50 @@ namespace Ogre {
         return static_cast<SceneNode*>(getParent());
     }
     //-----------------------------------------------------------------------
-    void SceneNode::setVisible(bool visible, bool cascade)
+    void SceneNode::setVisible(bool visible, bool cascade) const
     {
-        ObjectMap::iterator oi, oiend;
-        oiend = mObjectsByName.end();
-        for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
+        for (auto o : mObjectsByName)
         {
-            (*oi)->setVisible(visible);
+            o->setVisible(visible);
         }
 
         if (cascade)
         {
-            ChildNodeMap::iterator i, iend;
-            iend = mChildren.end();
-            for (i = mChildren.begin(); i != iend; ++i)
+            for (auto c : getChildren())
             {
-                static_cast<SceneNode*>(*i)->setVisible(visible, cascade);
+                static_cast<SceneNode*>(c)->setVisible(visible, cascade);
             }
         }
     }
     //-----------------------------------------------------------------------
-    void SceneNode::setDebugDisplayEnabled(bool enabled, bool cascade)
+    void SceneNode::setDebugDisplayEnabled(bool enabled, bool cascade) const
     {
-        ObjectMap::iterator oi, oiend;
-        oiend = mObjectsByName.end();
-        for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
+        for (auto o : mObjectsByName)
         {
-            (*oi)->setDebugDisplayEnabled(enabled);
+            o->setDebugDisplayEnabled(enabled);
         }
 
         if (cascade)
         {
-            ChildNodeMap::iterator i, iend;
-            iend = mChildren.end();
-            for (i = mChildren.begin(); i != iend; ++i)
+            for (auto c : getChildren())
             {
-                static_cast<SceneNode*>(*i)->setDebugDisplayEnabled(enabled, cascade);
+                static_cast<SceneNode*>(c)->setDebugDisplayEnabled(enabled, cascade);
             }
         }
     }
     //-----------------------------------------------------------------------
-    void SceneNode::flipVisibility(bool cascade)
+    void SceneNode::flipVisibility(bool cascade) const
     {
-        ObjectMap::iterator oi, oiend;
-        oiend = mObjectsByName.end();
-        for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
+        for (auto o : mObjectsByName)
         {
-            (*oi)->setVisible(!(*oi)->getVisible());
+            o->setVisible(!o->getVisible());
         }
 
         if (cascade)
         {
-            ChildNodeMap::iterator i, iend;
-            iend = mChildren.end();
-            for (i = mChildren.begin(); i != iend; ++i)
+            for (auto c : getChildren())
             {
-                static_cast<SceneNode*>((*i))->flipVisibility(cascade);
+                static_cast<SceneNode*>(c)->flipVisibility(cascade);
             }
         }
     }
