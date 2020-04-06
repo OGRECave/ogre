@@ -445,9 +445,8 @@ protected:
     void processParticles()
     {
         static int pindex = 0 ;
-        ParticleIterator pit = particleSystem->_getIterator() ;
-        while(!pit.end()) {
-            Particle *particle = pit.getNext();
+        for (auto particle : particleSystem->_getActiveParticles())
+        {
             Vector3 ppos = particle->mPosition;
             if (ppos.y<=0 && particle->mTimeToLive>0) { // hits the water!
                 // delete particle
