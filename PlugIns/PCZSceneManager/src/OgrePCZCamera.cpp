@@ -176,7 +176,7 @@ namespace Ogre
 
         // check against regular frustum planes
         bool visible_flag;
-        if (mCullFrustum)
+        if (getCullingFrustum())
         {
             // For each frustum plane, see if all points are on the negative side
             // If so, object is not visible
@@ -194,7 +194,7 @@ namespace Ogre
                 // we have to check each corner of the portal
                 for (int corner = 0; corner < 4; corner++)
                 {
-                    Plane::Side side = mCullFrustum->getFrustumPlane(plane).getSide(portal->getDerivedCorner(corner));
+                    Plane::Side side = getCullingFrustum()->getFrustumPlane(plane).getSide(portal->getDerivedCorner(corner));
                     if (side != Plane::NEGATIVE_SIDE)
                     {
                         visible_flag = true;

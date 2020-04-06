@@ -44,10 +44,8 @@ namespace Ogre {
             HardwareBuffer::Usage ibUsage,
             bool vbUseShadow, bool ibUseShadow) 
     {
-        mVertexBufferUsage = vbUsage;
-        mVertexBufferShadowBuffer = vbUseShadow;
-        mIndexBufferUsage = ibUsage;
-        mIndexBufferShadowBuffer = ibUseShadow;
+        setVertexBufferPolicy(vbUsage, vbUseShadow);
+        setIndexBufferPolicy(ibUsage, ibUseShadow);
 
         // Init patch builder
         // define the surface
@@ -95,8 +93,8 @@ namespace Ogre {
             createVertexBuffer(
                 mDeclaration->getVertexSize(0), 
                 sm->vertexData->vertexCount, 
-                mVertexBufferUsage, 
-                mVertexBufferShadowBuffer);
+                getVertexBufferUsage(),
+                isVertexBufferShadowed());
         sm->vertexData->vertexBufferBinding->setBinding(0, vbuf);
 
         // Set up index buffer
@@ -106,8 +104,8 @@ namespace Ogre {
             createIndexBuffer(
                 HardwareIndexBuffer::IT_16BIT, // only 16-bit indexes supported, patches shouldn't be bigger than that
                 sm->indexData->indexCount,
-                mIndexBufferUsage, 
-                mIndexBufferShadowBuffer);
+                getIndexBufferUsage(),
+                isIndexBufferShadowed());
         
         // Build patch
         mSurface.build(vbuf, 0, sm->indexData->indexBuffer, 0);
