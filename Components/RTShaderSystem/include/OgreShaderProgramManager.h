@@ -87,7 +87,7 @@ public:
     */
     void flushGpuProgramsCache();
 
-protected:
+private:
 
     //-----------------------------------------------------------------------------
     typedef std::map<String, GpuProgramPtr>            GpuProgramsMap;
@@ -107,8 +107,7 @@ protected:
     typedef ProgramProcessorMap::const_iterator         ProgramProcessorConstIterator;
     typedef std::vector<ProgramProcessor*>             ProgramProcessorList;
 
-    
-protected:
+
     /** Create default program processors. */
     void createDefaultProgramProcessors();
     
@@ -189,7 +188,6 @@ protected:
     /** Fix the input of the pixel shader to be the same as the output of the vertex shader */
     void synchronizePixelnToBeVertexOut(ProgramSet* programSet);
 
-protected:
     // Map between target language and shader program writer.                   
     ProgramWriterMap mProgramWritersMap;
     // Map between target language and shader program processor.    
@@ -203,7 +201,6 @@ protected:
     // The default program processors.
     ProgramProcessorList mDefaultProgramProcessors;
 
-private:
     friend class ProgramSet;
     friend class TargetRenderState;
     friend class ShaderGenerator;

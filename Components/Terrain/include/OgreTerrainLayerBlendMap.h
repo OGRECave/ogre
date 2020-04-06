@@ -60,7 +60,6 @@ namespace Ogre
     */
     class _OgreTerrainExport TerrainLayerBlendMap : public TerrainAlloc
     {
-    protected:
         Terrain* mParent;
         uint8 mLayerIdx;
         uint8 mChannel; // RGBA

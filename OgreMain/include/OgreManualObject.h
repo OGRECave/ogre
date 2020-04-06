@@ -643,7 +643,7 @@ namespace Ogre
             bool debugRenderables = false);
         
         
-    protected:
+    private:
         /// Dynamic?
         HardwareBuffer::Usage mBufferUsage;
         /// List of subsections

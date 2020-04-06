@@ -172,7 +172,7 @@ namespace Ogre
             mTerrainDefiner = terrainDefiner;
         }
 
-    protected:
+    private:
         TerrainGroup* mTerrainGroup;
         TerrainDefiner* mTerrainDefiner;
         std::list<PageID> mPagesInLoading;

@@ -106,7 +106,7 @@ namespace Ogre {
                         { (void)cam; }
 
         };
-    protected:
+    private:
         /// Is viewing window used.
         bool mWindowSet;
         /// Was viewing window changed.

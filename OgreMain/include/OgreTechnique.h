@@ -53,7 +53,7 @@ namespace Ogre {
     public:
         typedef std::vector<Pass*> Passes;
 
-    protected:
+    private:
         /// Illumination pass state type
         enum IlluminationPassesState
         {
@@ -142,7 +142,7 @@ namespace Ogre {
         };
         typedef std::vector<GPUVendorRule> GPUVendorRuleList;
         typedef std::vector<GPUDeviceNameRule> GPUDeviceNameRuleList;
-    protected:
+    private:
         GPUVendorRuleList mGPUVendorRules;
         GPUDeviceNameRuleList mGPUDeviceNameRules;
     public:

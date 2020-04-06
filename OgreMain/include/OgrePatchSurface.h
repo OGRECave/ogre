@@ -174,7 +174,7 @@ namespace Ogre {
         void notifyControlPointBufferDeallocated(void) { 
             mControlPointBuffer = 0;
         }
-    protected:
+    private:
         /// Vertex declaration describing the control point buffer
         VertexDeclaration* mDeclaration;
         /// Buffer containing the system-memory control points

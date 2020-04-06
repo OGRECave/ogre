@@ -52,7 +52,7 @@ namespace Ogre {
     */
     class _OgreExport LodStrategy : public LodAlloc
     {
-    protected:
+    private:
         /** Name of this strategy. */
         String mName;
 

@@ -587,7 +587,7 @@ namespace Ogre {
     */
     class _OgreExport MovableObjectFactory : public MovableAlloc
     {
-    protected:
+    private:
         /// Type flag, allocated if requested
         uint32 mTypeFlag;
 

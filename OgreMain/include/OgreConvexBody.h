@@ -54,7 +54,7 @@ namespace Ogre
     public:
         typedef std::vector< Polygon* >    PolygonList;
 
-    protected:
+    private:
         PolygonList mPolygons;
 
         // Static 'free list' of polygons to save reallocation, shared between all bodies
@@ -159,7 +159,7 @@ namespace Ogre
         static void _destroyPool();
 
 
-    protected:
+    private:
         /** Get a new polygon from the pool.
         */
         static Polygon* allocatePolygon();

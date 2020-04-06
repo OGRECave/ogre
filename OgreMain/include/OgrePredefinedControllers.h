@@ -50,7 +50,7 @@ namespace Ogre {
     */
     class _OgreExport FrameTimeControllerValue : public ControllerValue<Real>, public FrameListener
     {
-    protected:
+    private:
         Real mFrameTime;
         Real mTimeFactor;
         Real mElapsedTime;
@@ -79,7 +79,7 @@ namespace Ogre {
     */
     class _OgreExport TextureFrameControllerValue : public ControllerValue<Real>
     {
-    protected:
+    private:
         TextureUnitState* mTextureLayer;
     public:
         /// @deprecated use create()
@@ -109,7 +109,7 @@ namespace Ogre {
     */
     class _OgreExport TexCoordModifierControllerValue : public ControllerValue<Real>
     {
-    protected:
+    private:
         bool mTransU, mTransV;
         bool mScaleU, mScaleV;
         bool mRotate;
@@ -159,7 +159,7 @@ namespace Ogre {
     */
     class _OgreExport FloatGpuParameterControllerValue : public ControllerValue<Real>
     {
-    protected:
+    private:
         /// The parameters to access
         GpuProgramParametersSharedPtr mParams;
         /// The index of the parameter to be read or set
@@ -209,7 +209,7 @@ namespace Ogre {
     */
     class _OgreExport AnimationControllerFunction : public ControllerFunction<Real>
     {
-    protected:
+    private:
         Real mSeqTime;
         Real mTime;
     public:
@@ -240,7 +240,7 @@ namespace Ogre {
     */
     class _OgreExport ScaleControllerFunction : public ControllerFunction<Real>
     {
-    protected:
+    private:
         Real mScale;
     public:
         /// @deprecated use create()
@@ -276,7 +276,7 @@ namespace Ogre {
     */
     class _OgreExport WaveformControllerFunction : public ControllerFunction<Real>
     {
-    protected:
+    private:
         WaveformType mWaveType;
         Real mBase;
         Real mFrequency;

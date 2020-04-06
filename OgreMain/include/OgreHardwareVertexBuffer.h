@@ -174,7 +174,7 @@ namespace Ogre {
     */
     class _OgreExport VertexElement : public VertexDataAlloc
     {
-    protected:
+    private:
         /// The source vertex buffer, as bound to an index using VertexBufferBinding
         unsigned short mSource;
         /// Index of the item, only applicable for some elements like texture coords
@@ -488,7 +488,7 @@ namespace Ogre {
     public:
         /// Defines the vertex buffer bindings used as source for vertex declarations
         typedef std::map<unsigned short, HardwareVertexBufferSharedPtr> VertexBufferBindingMap;
-    protected:
+    private:
         VertexBufferBindingMap mBindingMap;
         mutable unsigned short mHighIndex;
     public:

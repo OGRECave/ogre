@@ -456,8 +456,7 @@ public:
     /// Default material scheme of the shader generator.
     static String DEFAULT_SCHEME_NAME;
 
-// Protected types.
-protected:
+private:
     class SGPass;
     class SGTechnique;
     class SGMaterial;
@@ -739,9 +738,6 @@ protected:
         FogMode mFogMode;
     };
 
-
-// Protected types.
-protected:
     //-----------------------------------------------------------------------------
     typedef std::map<String, SubRenderStateFactory*>       SubRenderStateFactoryMap;
     typedef SubRenderStateFactoryMap::iterator              SubRenderStateFactoryIterator;
@@ -754,7 +750,7 @@ protected:
 
     friend class SGRenderObjectListener;
     friend class SGSceneManagerListener;
-protected:
+
     /** Class default constructor */
     ShaderGenerator();
 
@@ -838,7 +834,7 @@ protected:
 
     /** Internal method that creates list of SGPass instances composing the given material. */
     SGPassList createSGPassList(Material* mat) const;
-protected:  
+
     // Auto mutex.
     OGRE_AUTO_MUTEX;
     // The active scene manager.
@@ -899,7 +895,7 @@ protected:
     bool mIsFinalizing;
 
     uint32 ID_RT_SHADER_SYSTEM;
-private:
+
     friend class SGPass;
     friend class FFPRenderStateBuilder;
     friend class SGScriptTranslatorManager;

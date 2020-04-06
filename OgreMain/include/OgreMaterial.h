@@ -96,7 +96,7 @@ namespace Ogre {
         typedef std::vector<Real> LodValueList;
         typedef ConstVectorIterator<LodValueList> LodValueIterator;
         typedef std::vector<Technique*> Techniques;
-    protected:
+    private:
 
 
         /** Internal method which sets the material up from the default settings.

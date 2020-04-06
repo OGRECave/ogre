@@ -71,7 +71,7 @@ namespace Ogre
         typedef std::map<String, MovableObjectFactory*> MovableObjectFactoryMap;
         typedef std::vector<DynLib*> PluginLibList;
         typedef std::vector<Plugin*> PluginInstanceList;
-    protected:
+    private:
         RenderSystemList mRenderers;
         RenderSystem* mActiveRenderer;
         String mVersion;
@@ -132,7 +132,7 @@ namespace Ogre
         bool mRemoveQueueStructuresOnClear;
         Real mDefaultMinPixelSize;
 
-    protected:
+    private:
         /// List of plugin DLLs loaded
         PluginLibList mPluginLibs;
         /// List of Plugin instances registered

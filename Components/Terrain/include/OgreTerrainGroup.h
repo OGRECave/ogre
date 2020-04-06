@@ -537,7 +537,7 @@ namespace Ogre
          */
         size_t getNumTerrainPrepareRequests() const;
 
-    protected:
+    private:
         typedef std::map<TerrainSlot*, WorkQueue::RequestID> TerrainPrepareRequestMap;
         SceneManager *mSceneManager;
         Terrain::Alignment mAlignment;

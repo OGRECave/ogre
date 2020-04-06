@@ -74,7 +74,7 @@ namespace Ogre {
     {
     public:
         typedef std::map<String, HighLevelGpuProgramFactory*> FactoryMap;
-    protected:
+    private:
         /// Factories capable of creating HighLevelGpuProgram instances
         FactoryMap mFactories;
 

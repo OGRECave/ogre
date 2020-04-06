@@ -103,7 +103,6 @@ namespace Ogre
     */
     class _OgrePagingExport Grid3DPageStrategyData : public PageStrategyData
     {
-    protected:
         /// Origin (world space)
         Vector3 mWorldOrigin;
         /// Origin (grid-aligned world space)

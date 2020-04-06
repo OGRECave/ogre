@@ -433,7 +433,7 @@ namespace Ogre
         bool getPagingOperationsEnabled() const { return mPagingEnabled; }
 
 
-    protected:
+    private:
 
         class EventRouter : public Camera::Listener, public FrameListener
         {

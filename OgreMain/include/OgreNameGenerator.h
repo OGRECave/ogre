@@ -45,7 +45,7 @@ namespace Ogre {
     /// Utility class to generate a sequentially numbered series of names
     class _OgreExport NameGenerator
     {
-    protected:
+    private:
         String mPrefix;
         unsigned long long int mNext;
         OGRE_AUTO_MUTEX;

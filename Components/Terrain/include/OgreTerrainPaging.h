@@ -107,7 +107,7 @@ namespace Ogre
             int32 minX = -10, int32 minY = -10, int32 maxX = 10, int32 maxY = 10, 
             const String& sectionName = BLANKSTRING, uint32 loadingIntervalMs = 900);
 
-    protected:
+    private:
         PageManager* mManager;
 
         class _OgreTerrainExport SectionFactory : public PagedWorldSectionFactory

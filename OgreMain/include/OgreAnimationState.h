@@ -169,7 +169,7 @@ namespace Ogre {
           assert(mBlendMask && mBlendMask->size() > boneHandle);
           return (*mBlendMask)[boneHandle];
       }
-    protected:
+    private:
         /// The blend mask (containing per bone weights)
         BoneBlendMask* mBlendMask;
 
@@ -268,7 +268,7 @@ namespace Ogre {
             return mEnabledAnimationStates;
         }
 
-    protected:
+    private:
         unsigned long mDirtyFrameNumber;
         AnimationStateMap mAnimationStates;
         EnabledAnimationStateList mEnabledAnimationStates;
@@ -285,7 +285,7 @@ namespace Ogre {
     */
     class _OgreExport AnimationStateControllerValue : public ControllerValue<Real>
     {
-    protected:
+    private:
         AnimationState* mTargetAnimationState;
         bool mAddTime;
     public:

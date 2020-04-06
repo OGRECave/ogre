@@ -63,7 +63,7 @@ namespace Ogre
     */
     class _OgreExport LogManager : public Singleton<LogManager>, public LogAlloc
     {
-    protected:
+    private:
         typedef std::map<String, Log*> LogList;
 
         /// A list of all the logs the manager can access

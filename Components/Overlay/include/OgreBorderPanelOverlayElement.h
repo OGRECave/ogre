@@ -248,7 +248,7 @@ namespace Ogre {
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
-    protected:
+    private:
         Real mLeftBorderSize;
         Real mRightBorderSize;
         Real mTopBorderSize;
@@ -311,7 +311,7 @@ namespace Ogre {
     */
     class _OgreOverlayExport BorderRenderable : public Renderable, public OverlayAlloc
     {
-    protected:
+    private:
         BorderPanelOverlayElement* mParent;
     public:
         /** Constructed with pointers to parent. */

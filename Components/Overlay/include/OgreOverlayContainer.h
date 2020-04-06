@@ -60,7 +60,7 @@ namespace Ogre {
         typedef MapIterator<ChildMap> ChildIterator;
         typedef std::map<String, OverlayContainer*> ChildContainerMap;
         typedef MapIterator<ChildContainerMap> ChildContainerIterator;
-    protected:
+    private:
         /// Map of all children
         ChildMap mChildren;
         /// Map of container children (subset of mChildren)

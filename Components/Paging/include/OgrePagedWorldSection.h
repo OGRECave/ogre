@@ -79,7 +79,7 @@ namespace Ogre
         PageMap mPages;
         PageProvider* mPageProvider;
         SceneManager* mSceneMgr;
-
+    private:
         /// Load data specific to a subtype of this class (if any)
         virtual void loadSubtypeData(StreamSerialiser& ser) {}
         virtual void saveSubtypeData(StreamSerialiser& ser) {}

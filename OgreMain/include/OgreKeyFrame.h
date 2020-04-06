@@ -93,7 +93,7 @@ namespace Ogre
 
         /** Clone a keyframe (internal use only) */
         KeyFrame* _clone(AnimationTrack* newParent) const;
-    protected:
+    private:
         AnyNumeric mValue;
     };
 
@@ -137,7 +137,7 @@ namespace Ogre
 
         /** Clone a keyframe (internal use only) */
         KeyFrame* _clone(AnimationTrack* newParent) const;
-    protected:
+    private:
         Vector3 mTranslate;
         Vector3 mScale;
         Quaternion mRotate;
@@ -171,7 +171,7 @@ namespace Ogre
         /** Clone a keyframe (internal use only) */
         KeyFrame* _clone(AnimationTrack* newParent) const;      
 
-    protected:
+    private:
         HardwareVertexBufferSharedPtr mBuffer;
 
     };
@@ -245,7 +245,7 @@ namespace Ogre
         
         void _applyBaseKeyFrame(const VertexPoseKeyFrame* base);
         
-    protected:
+    private:
         PoseRefList mPoseRefs;
 
     };

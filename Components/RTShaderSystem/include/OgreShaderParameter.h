@@ -592,7 +592,7 @@ public:
                                         mElementSize);
     }
 
-protected:
+private:
     // Is it auto constant real based parameter.
     bool mIsAutoConstantReal;
     // Is it auto constant int based parameter.

@@ -47,7 +47,7 @@ namespace Ogre {
     */
     class _OgreExport WireBoundingBox : public SimpleRenderable
     {
-    protected:
+    private:
         /** Override this method to prevent parent transforms (rotation,translation,scale)
         */
         void getWorldTransforms( Matrix4* xform ) const;

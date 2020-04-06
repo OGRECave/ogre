@@ -620,7 +620,7 @@ namespace Ogre {
 
         /// Override to return specific type flag
         uint32 getTypeFlags(void) const;
-    protected:
+    private:
 
         /// Command objects
         static CmdCull msCullCmd;

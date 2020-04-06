@@ -54,7 +54,6 @@ namespace Ogre
     */
     class _OgrePagingExport PageContentCollection : public PageAlloc
     {
-    protected:
         PageContentCollectionFactory* mCreator;
         Page* mParent;
     public:

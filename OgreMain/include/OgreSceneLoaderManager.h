@@ -56,7 +56,7 @@ namespace Ogre {
         /// @deprecated use @ref SceneNode::loadChildren instead
         OGRE_DEPRECATED static SceneLoaderManager* getSingletonPtr(void);
         
-    protected:
+    private:
         /// Struct for storing data about SceneLoaders internally
         struct SceneLoaderInfo
         {

@@ -161,7 +161,7 @@ namespace Ogre {
         /// Returns the current listener
         MeshSerializerListener *getListener();
         
-    protected:
+    private:
         typedef std::vector<MeshVersionData*> MeshVersionDataList;
         MeshVersionDataList mVersionData;
 

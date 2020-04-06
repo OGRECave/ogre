@@ -149,7 +149,7 @@ namespace Ogre
             bool getReceiveDynamicShadowsLowLod() const { return mLowLodShadows; }
 
             bool isShadowingEnabled(TechniqueType tt, const Terrain* terrain) const;
-        protected:
+        private:
             typedef StringStream stringstream;
 
             void addTechnique(const MaterialPtr& mat, const Terrain* terrain, TechniqueType tt);

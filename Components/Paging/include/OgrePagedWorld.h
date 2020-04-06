@@ -54,7 +54,6 @@ namespace Ogre
     */
     class _OgrePagingExport PagedWorld : public PageAlloc
     {
-    protected:
         String mName;
         PageManager* mManager;
         PageProvider* mPageProvider;
@@ -238,7 +237,7 @@ namespace Ogre
         _OgrePagingExport friend std::ostream& operator <<( std::ostream& o, const PagedWorld& p );
 
 
-    protected:
+    private:
         SectionMap mSections;
         NameGenerator mSectionNameGenerator;
     };

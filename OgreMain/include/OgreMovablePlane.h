@@ -53,7 +53,7 @@ namespace Ogre {
     */
     class _OgreExport MovablePlane : public Plane, public MovableObject
     {
-    protected:
+    private:
         mutable Plane mDerivedPlane;
         mutable Vector3 mLastTranslate;
         mutable Quaternion mLastRotate;

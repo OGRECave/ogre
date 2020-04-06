@@ -116,7 +116,6 @@ namespace Ogre
     */
     class _OgrePagingExport Grid2DPageStrategyData : public PageStrategyData
     {
-    protected:
         /// Orientation of the grid
         Grid2DMode mMode;
         /// Origin (world space)

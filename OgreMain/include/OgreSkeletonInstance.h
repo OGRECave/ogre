@@ -118,7 +118,7 @@ namespace Ogre {
         /// @copydoc Resource::getGroup
         const String& getGroup(void) const;
 
-    protected:
+    private:
         /// Pointer back to master Skeleton
         SkeletonPtr mSkeleton;
 

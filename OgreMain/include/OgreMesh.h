@@ -103,7 +103,7 @@ namespace Ogre {
         typedef std::vector<SubMesh*> SubMeshList;
         typedef std::vector<unsigned short> IndexMap;
 
-    protected:
+    private:
         /** A list of submeshes which make up this mesh.
             Each mesh is made up of 1 or more submeshes, which
             are each based on a single material and can have their
@@ -124,7 +124,7 @@ namespace Ogre {
         typedef std::unordered_map<String, ushort> SubMeshNameMap ;
 
         
-    protected:
+    private:
 
         DataStreamPtr mFreshFromDisk;
 

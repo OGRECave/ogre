@@ -51,7 +51,7 @@ namespace Ogre {
     /** Class representing a single particle instance. */
     class _OgreExport Particle : public FXAlloc
     {
-    protected:
+    private:
         /// Parent ParticleSystem
         ParticleSystem* mParentSystem;
         /// Additional visual data you might want to associate with the Particle

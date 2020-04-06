@@ -64,7 +64,7 @@ namespace Ogre {
         // Note no virtual functions for efficiency
         friend class Entity;
         friend class SceneManager;
-    protected:
+    private:
         /** Private constructor - don't allow creation by anybody else.
         */
         SubEntity(Entity* parent, SubMesh* subMeshBasis);

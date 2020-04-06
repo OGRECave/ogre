@@ -50,7 +50,7 @@ namespace Ogre
     */
     class _OgreExport TimeIndex
     {
-    protected:
+    private:
         /** The time position (in relation to the whole animation sequence)
         */
         Real mTimePos;
@@ -247,18 +247,15 @@ namespace Ogre
         unsigned short mHandle;
         Listener* mListener;
 
+        /// Internal method for clone implementation
+        virtual void populateClone(AnimationTrack* clone) const;
+    private:
         /// Map used to translate global keyframe time lower bound index to local lower bound index
         typedef std::vector<ushort> KeyFrameIndexMap;
         KeyFrameIndexMap mKeyFrameIndexMap;
 
         /// Create a keyframe implementation - must be overridden
         virtual KeyFrame* createKeyFrameImpl(Real time) = 0;
-
-        /// Internal method for clone implementation
-        virtual void populateClone(AnimationTrack* clone) const;
-        
-
-
     };
 
     /** Specialised AnimationTrack for dealing with generic animable values.
@@ -312,7 +309,7 @@ namespace Ogre
         NumericAnimationTrack* _clone(Animation* newParent) const;
 
 
-    protected:
+    private:
         /// Target to animate
         AnimableValuePtr mTargetAnim;
 
@@ -385,7 +382,7 @@ namespace Ogre
         
         void _applyBaseKeyFrame(const KeyFrame* base);
         
-    protected:
+    private:
         /// Specialised keyframe creation
         KeyFrame* createKeyFrameImpl(Real time);
         // Flag indicating we need to rebuild the splines next time
@@ -559,7 +556,7 @@ namespace Ogre
         
         void _applyBaseKeyFrame(const KeyFrame* base);
 
-    protected:
+    private:
         /// Animation type
         VertexAnimationType mAnimationType;
         /// Target to animate

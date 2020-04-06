@@ -60,7 +60,7 @@ namespace Ogre
         typedef std::vector<Real> SplitPointList;
         typedef std::vector<Real> OptimalAdjustFactorList;
 
-    protected:
+    private:
         uint mSplitCount;
         SplitPointList mSplitPoints;
         OptimalAdjustFactorList mOptimalAdjustFactors;

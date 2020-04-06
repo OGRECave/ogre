@@ -69,7 +69,7 @@ namespace Ogre {
         static SkeletonManager& getSingleton(void);
         /// @copydoc Singleton::getSingleton()
         static SkeletonManager* getSingletonPtr(void);
-    protected:
+    private:
 
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle, 

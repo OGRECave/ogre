@@ -590,7 +590,7 @@ namespace Ogre {
     */
     class _OgreExport GpuSharedParametersUsage : public GpuParamsAlloc
     {
-    protected:
+    private:
         GpuSharedParametersPtr mSharedParams;
         // Not a shared pointer since this is also parent
         GpuProgramParameters* mParams;
@@ -1299,7 +1299,7 @@ namespace Ogre {
         typedef std::unordered_map<size_t, String> SubroutineMap;
         typedef std::unordered_map<size_t, String>::const_iterator SubroutineIterator;
 
-    protected:
+    private:
         SubroutineMap mSubroutineMap;
 
         static AutoConstantDefinition AutoConstantDictionary[];

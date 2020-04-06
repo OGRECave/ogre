@@ -140,7 +140,7 @@ namespace Ogre {
                         }           
         };
 
-    protected:
+    private:
         /** Internal method for saving a program definition which has been
             built up.
         */

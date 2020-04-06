@@ -269,7 +269,7 @@ public:
     OGRE_DEPRECATED FunctionType getFunctionType() const;
 
 
-protected:
+private:
 
     static ParameterPtr _getParameterByName(const ShaderParameterList& parameterList, const String& name);
     static ParameterPtr _getParameterBySemantic(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
@@ -292,7 +292,6 @@ protected:
     /** Delete parameter from a given list */
     void deleteParameter(ShaderParameterList& parameterList, ParameterPtr parameter);
 
-protected:
     // Function name.
     String mName;
     // Function description.

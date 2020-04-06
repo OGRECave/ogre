@@ -376,7 +376,7 @@ namespace Ogre {
             /// @copydoc Singleton::getSingleton()
             static Profiler* getSingletonPtr(void);
 
-        protected:
+        private:
             friend class ProfileInstance;
 
             typedef std::vector<ProfileSessionListener*> TProfileSessionListener;

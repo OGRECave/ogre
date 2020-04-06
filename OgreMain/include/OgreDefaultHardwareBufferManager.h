@@ -46,7 +46,7 @@ namespace Ogre {
     /// Specialisation of HardwareBuffer for emulation
     class _OgreExport DefaultHardwareBuffer : public HardwareBuffer
     {
-    protected:
+    private:
         unsigned char* mData;
         void* lockImpl(size_t offset, size_t length, LockOptions options) override;
         void unlockImpl(void) override;
