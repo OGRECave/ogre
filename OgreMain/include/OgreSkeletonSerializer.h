@@ -106,7 +106,7 @@ namespace Ogre {
 
         // TODO: provide Cal3D importer?
 
-    protected:
+    private:
         
         void setWorkingVersion(SkeletonVersion ver);
         

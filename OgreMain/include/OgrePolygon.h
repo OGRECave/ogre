@@ -58,7 +58,7 @@ namespace Ogre
         typedef std::multimap<Vector3, Vector3>        EdgeMap;
         typedef std::pair< Vector3, Vector3>        Edge;
 
-    protected:
+    private:
         VertexList      mVertexList;
         mutable Vector3 mNormal;
         mutable bool    mIsNormalSet;

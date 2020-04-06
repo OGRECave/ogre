@@ -455,7 +455,7 @@ namespace Ogre {
         /// Static function to get an image type string from a stream via magic numbers
         static String getFileExtFromMagic(DataStreamPtr stream);
 
-    protected:
+    private:
         /// The width of the image in pixels
         uint32 mWidth;
         /// The height of the image in pixels

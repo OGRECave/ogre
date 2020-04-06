@@ -45,7 +45,7 @@ namespace Ogre {
     */
     class _OgreExport ASTCCodec : public ImageCodec
     {
-    protected:
+    private:
         String mType;
 
 		/// Single registered codec instance

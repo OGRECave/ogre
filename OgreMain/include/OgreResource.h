@@ -212,6 +212,8 @@ namespace Ogre {
         */
         virtual void unloadImpl(void) = 0;
 
+        /** Calculate the size of a resource; this will only be called after 'load' */
+        virtual size_t calculateSize(void) const;
     public:
         /** Standard constructor.
         @param creator Pointer to the ResourceManager that is creating this resource
@@ -454,10 +456,6 @@ namespace Ogre {
         yourself.
         */
         void _fireUnloadingComplete(void);
-
-        /** Calculate the size of a resource; this will only be called after 'load' */
-        virtual size_t calculateSize(void) const;
-
     };
 
     /** Interface describing a manual resource loader.

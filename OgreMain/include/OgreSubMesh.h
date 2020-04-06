@@ -242,7 +242,7 @@ namespace Ogre {
          */
         SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
 
-    protected:
+    private:
 
         /// the material this SubMesh uses.
         MaterialPtr mMaterial;

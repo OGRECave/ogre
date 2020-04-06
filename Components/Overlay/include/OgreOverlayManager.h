@@ -58,7 +58,7 @@ namespace Ogre {
         typedef std::map<String, Overlay*> OverlayMap;
         typedef std::map<String, OverlayElement*> ElementMap;
         typedef std::map<String, OverlayElementFactory*> FactoryMap;
-    protected:
+    private:
         OverlayMap mOverlayMap;
         StringVector mScriptPatterns;
 

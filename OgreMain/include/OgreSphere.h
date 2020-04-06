@@ -51,7 +51,7 @@ namespace Ogre {
     */
     class _OgreExport Sphere
     {
-    protected:
+    private:
         Real mRadius;
         Vector3 mCenter;
     public:

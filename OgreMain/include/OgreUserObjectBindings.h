@@ -99,7 +99,7 @@ namespace Ogre {
         UserObjectBindings& operator=(const UserObjectBindings& rhs);
 
     // Types.
-    protected:
+    private:
         typedef std::map<String, Any>          UserObjectsMap;
         typedef UserObjectsMap::iterator        UserObjectsMapIterator;
         typedef UserObjectsMap::const_iterator  UserObjectsMapConstIterator;

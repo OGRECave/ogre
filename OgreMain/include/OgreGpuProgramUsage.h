@@ -72,7 +72,7 @@ namespace Ogre
     */
     class _OgreExport GpuProgramUsage : public Resource::Listener, public PassAlloc
     {
-    protected:
+    private:
         GpuProgramType mType;
         Pass* mParent;
         /// The program link

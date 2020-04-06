@@ -195,7 +195,7 @@ public:
     /** Class destructor */
     ~Program();
 // Protected methods.
-protected:
+private:
 
     /** Class constructor.
     @param type The type of this program.
@@ -213,8 +213,7 @@ protected:
         
     /** Remove parameter from this program. */
     void removeParameter(UniformParameterPtr parameter);
-// Attributes.
-protected:
+
     // Program type. (Vertex, Fragment, Geometry).
     GpuProgramType mType;
     // Program uniform parameters.  
@@ -231,7 +230,6 @@ protected:
     bool mSkeletalAnimation;
     // Whether to pass matrices as column-major.
     bool mColumnMajorMatrices;
-private:
     friend class TargetRenderState;
 };
 

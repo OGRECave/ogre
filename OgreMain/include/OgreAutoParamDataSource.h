@@ -58,7 +58,7 @@ namespace Ogre {
     */
     class _OgreExport AutoParamDataSource : public SceneMgtAlloc
     {
-    protected:
+    private:
         const Light& getLight(size_t index) const;
         mutable Affine3 mWorldMatrix[256];
         mutable size_t mWorldMatrixCount;

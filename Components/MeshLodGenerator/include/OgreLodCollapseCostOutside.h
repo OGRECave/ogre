@@ -47,7 +47,7 @@ public:
     ~LodCollapseCostOutside();
     virtual void initCollapseCosts(LodData* data);
     virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge);
-protected:
+private:
 
     Real mOutsideWeight;
     Real mOutsideWalkAngle;

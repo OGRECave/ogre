@@ -225,7 +225,7 @@ namespace Ogre
             virtual Real getRandomUnit() = 0;
        };
 
-    protected:
+    private:
         /// Angle units used by the api
         static AngleUnit msAngleUnit;
 

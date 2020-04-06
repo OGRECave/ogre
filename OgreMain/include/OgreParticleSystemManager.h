@@ -79,7 +79,7 @@ namespace Ogre {
         typedef std::map<String, ParticleAffectorFactory*> ParticleAffectorFactoryMap;
         typedef std::map<String, ParticleEmitterFactory*> ParticleEmitterFactoryMap;
         typedef std::map<String, ParticleSystemRendererFactory*> ParticleSystemRendererFactoryMap;
-    protected:
+    private:
         OGRE_AUTO_MUTEX;
             
         /// Templates based on scripts
@@ -339,7 +339,7 @@ namespace Ogre {
     /** Factory object for creating ParticleSystem instances */
     class _OgreExport ParticleSystemFactory : public MovableObjectFactory
     {
-    protected:
+    private:
         MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params);
     public:
         ParticleSystemFactory() {}

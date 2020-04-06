@@ -156,7 +156,7 @@ namespace Ogre {
         */
         CompositorInstance* getNextInstance(CompositorInstance* curr, bool activeOnly = true);
 
-    protected:
+    private:
         /// Viewport affected by this CompositorChain
         Viewport *mViewport;
         

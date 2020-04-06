@@ -261,7 +261,7 @@ namespace Ogre
         /// Buffer binding used for holding delta values
         static unsigned short DELTA_BUFFER;
 
-    protected:
+    private:
         Terrain* mTerrain;
         TerrainQuadTreeNode* mParent;
         TerrainQuadTreeNode* mChildren[4];

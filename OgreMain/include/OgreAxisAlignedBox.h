@@ -61,7 +61,7 @@ namespace Ogre {
             EXTENT_FINITE,
             EXTENT_INFINITE
         };
-    protected:
+    private:
 
         Vector3 mMinimum;
         Vector3 mMaximum;

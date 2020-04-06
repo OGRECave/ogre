@@ -291,7 +291,7 @@ namespace Ogre
         static const Matrix3 ZERO;
         static const Matrix3 IDENTITY;
 
-    protected:
+    private:
         // support for eigensolver
         void Tridiagonal (Real afDiag[3], Real afSubDiag[3]);
         bool QLAlgorithm (Real afDiag[3], Real afSubDiag[3]);

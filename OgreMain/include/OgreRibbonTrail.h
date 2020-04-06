@@ -172,7 +172,7 @@ namespace Ogre {
 
         const String& getMovableType(void) const override;
 
-    protected:
+    private:
         /// List of nodes being trailed
         NodeList mNodeList;
         /// Mapping of nodes to chain segments

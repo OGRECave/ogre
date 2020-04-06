@@ -69,7 +69,7 @@ namespace Ogre {
     {
         friend class BillboardSet;
         friend class BillboardParticleRenderer;
-    protected:
+    private:
         bool mOwnDimensions;
         bool mUseTexcoordRect;
         uint16 mTexcoordIndex;      /// Index into the BillboardSet array of texture coordinates

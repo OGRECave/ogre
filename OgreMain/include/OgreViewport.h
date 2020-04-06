@@ -403,7 +403,7 @@ namespace Ogre {
 		/** Returns the current colour buffer type for this viewport.*/
 		ColourBufferType getDrawBuffer() const;
 
-    protected:
+    private:
         Camera* mCamera;
         RenderTarget* mTarget;
         /// Relative dimensions, irrespective of target dimensions (0..1)

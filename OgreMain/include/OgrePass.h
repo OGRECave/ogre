@@ -131,7 +131,7 @@ namespace Ogre {
         };
 
         typedef std::vector<TextureUnitState*> TextureUnitStates;
-    protected:
+    private:
         Technique* mParent;
         String mName; /// Optional name for the pass
         uint32 mHash; /// Pass hash

@@ -505,7 +505,7 @@ namespace Ogre {
         /** Retrieve the container of this animation. */
         AnimationContainer* getContainer();
         
-    protected:
+    private:
         /// Node tracks, indexed by handle
         NodeTrackList mNodeTrackList;
         /// Numeric tracks, indexed by handle

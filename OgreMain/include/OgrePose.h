@@ -131,7 +131,7 @@ namespace Ogre {
             way (only really useful for cloning holders of this class).
         */
         Pose* clone(void) const OGRE_NODISCARD;
-    protected:
+    private:
         /// Target geometry index
         ushort mTarget;
         /// Optional name

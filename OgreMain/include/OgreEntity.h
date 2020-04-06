@@ -86,7 +86,7 @@ namespace Ogre {
         typedef std::set<Entity*> EntitySet;
         typedef std::vector<std::pair<unsigned short, bool>> SchemeHardwareAnimMap;
         typedef std::vector<SubEntity*> SubEntityList;
-    protected:
+    private:
 
         /** Private constructor (instances cannot be created directly).
         */
@@ -309,7 +309,7 @@ namespace Ogre {
     public:
         /// Contains the child objects (attached to bones) indexed by name.
         typedef std::vector<MovableObject*> ChildObjectList;
-    protected:
+    private:
         ChildObjectList mChildObjectList;
 
 
@@ -873,7 +873,7 @@ namespace Ogre {
     /** Factory object for creating Entity instances */
     class _OgreExport EntityFactory : public MovableObjectFactory
     {
-    protected:
+    private:
         MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
     public:
         EntityFactory() {}

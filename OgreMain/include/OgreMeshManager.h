@@ -402,7 +402,7 @@ namespace Ogre {
         */
         MeshSerializerListener *getListener();
 
-    protected:
+    private:
 
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle, 

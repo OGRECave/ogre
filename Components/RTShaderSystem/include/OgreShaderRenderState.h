@@ -185,8 +185,7 @@ public:
 
     /// Key name for associating with a Pass instance.
     static const char* UserKey;
-// Protected methods
-protected:
+private:
     /** Bind the uniform parameters of a given CPU and GPU program set. */
     static void bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams);
 
@@ -205,8 +204,6 @@ protected:
     */
     ProgramSet* getProgramSet() { return mProgramSet.get(); }
     
-// Attributes.
-protected:
     // Tells if the list of the sub render states is sorted.
     bool mSubRenderStateSortValid;
     // The program set of this RenderState.

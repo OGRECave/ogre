@@ -568,7 +568,7 @@ namespace Ogre {
         */
         bool isInLightRange(const Ogre::AxisAlignedBox& container) const;
     
-    protected:
+    private:
         LightTypes mLightType;
 #ifdef OGRE_NODELESS_POSITIONING
         Vector3 mPosition;
@@ -622,7 +622,7 @@ namespace Ogre {
     /** Factory object for creating Light instances. */
     class _OgreExport LightFactory : public MovableObjectFactory
     {
-    protected:
+    private:
         MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params);
     public:
         LightFactory() {}

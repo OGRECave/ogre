@@ -127,7 +127,7 @@ namespace Ogre
         void needUpdate(bool forceParentUpdate = false);
 
 
-    protected:
+    private:
         /** See Node. */
         Node* createChildImpl(void);
         /** See Node. */

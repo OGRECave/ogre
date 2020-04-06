@@ -54,7 +54,7 @@ namespace Ogre {
     */
     class _OgreExport Codec : public CodecAlloc
     {
-    protected:
+    private:
         typedef std::map< String, Codec* > CodecList; 
         /** A map that contains all the registered codecs.
         */

@@ -83,7 +83,7 @@ namespace Ogre {
     */
     class _OgreExport DynLib : public DynLibAlloc
     {
-    protected:
+    private:
         String mName;
         /// Gets the last loading error
         String dynlibError(void);
@@ -120,7 +120,7 @@ namespace Ogre {
         */
         void* getSymbol( const String& strName ) const throw();
 
-    protected:
+    private:
 
         /// Handle to the loaded library.
         DYNLIB_HANDLE mInst;

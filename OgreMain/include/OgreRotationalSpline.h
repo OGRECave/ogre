@@ -116,7 +116,7 @@ namespace Ogre {
         */
         void recalcTangents(void);
 
-    protected:
+    private:
 
         bool mAutoCalc;
 

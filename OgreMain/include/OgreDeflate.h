@@ -67,7 +67,7 @@ namespace Ogre
             ZLib = 1,     /// 2 byte header, 4 byte footer with adler32 checksum, rfc1950
             GZip = 2,     /// 10 byte header, 8 byte footer with crc32 checksum and unpacked size, rfc1952
         };
-    protected:
+    private:
         DataStreamPtr mCompressedStream;
         DataStreamPtr mTmpWriteStream;
         String mTempFileName;

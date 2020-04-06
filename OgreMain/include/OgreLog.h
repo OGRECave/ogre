@@ -97,7 +97,7 @@ namespace Ogre {
     */
     class _OgreExport Log : public LogAlloc
     {
-    protected:
+    private:
         std::ofstream   mLog;
         LoggingLevel    mLogLevel;
         bool            mDebugOut;
@@ -195,7 +195,7 @@ namespace Ogre {
         */
         class _OgrePrivate Stream
         {
-        protected:
+        private:
             Log* mTarget;
             LogMessageLevel mLevel;
             bool mMaskDebug;

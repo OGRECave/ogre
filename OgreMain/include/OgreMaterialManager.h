@@ -124,7 +124,7 @@ namespace Ogre {
 			virtual bool beforeIlluminationPassesCleared(Technique* technique) { return false; }
         };
 
-    protected:
+    private:
         /// Default settings
         MaterialPtr mDefaultSettings;
 

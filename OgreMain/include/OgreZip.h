@@ -102,7 +102,7 @@ namespace Ogre {
     class APKZipArchiveFactory : public EmbeddedZipArchiveFactory
     {
         std::map<String, AAsset*> mOpenAssets;
-    protected:
+    private:
         AAssetManager* mAssetMgr;
     public:
         APKZipArchiveFactory(AAssetManager* assetMgr) : mAssetMgr(assetMgr) {}

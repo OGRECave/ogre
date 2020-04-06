@@ -428,8 +428,7 @@ namespace Ogre {
     */
     virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
 
-    /// @copydoc Resource::calculateSize
-    virtual size_t calculateSize(void) const;
+    size_t calculateSize(void) const override;
 
     /// internal method to get the microcode cache id
     uint32 _getHash(uint32 seed = 0) const;

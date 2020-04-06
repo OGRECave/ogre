@@ -85,7 +85,7 @@ namespace Ogre {
     class _OgreExport Skeleton : public Resource, public AnimationContainer
     {
         friend class SkeletonInstance;
-    protected:
+    private:
         /// Internal constructor for use by SkeletonInstance only
         Skeleton();
 
@@ -423,7 +423,7 @@ namespace Ogre {
         virtual void _buildMapBoneByName(const Skeleton* source,
             BoneHandleMap& boneHandleMap) const;
 
-    protected:
+    private:
         SkeletonAnimationBlendMode mBlendState;
         /// Storage of bones, indexed by bone handle
         BoneList mBoneList;

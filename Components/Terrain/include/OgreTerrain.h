@@ -587,7 +587,7 @@ namespace Ogre
             void warmStart(size_t numInstances, uint16 terrainSize, uint16 maxBatchSize, 
                 uint16 minBatchSize);
 
-        protected:
+        private:
             typedef std::list<HardwareVertexBufferSharedPtr> VBufList;
             VBufList mFreePosBufList;
             VBufList mFreeDeltaBufList;
@@ -1608,7 +1608,7 @@ namespace Ogre
         // background thread.
         OGRE_RW_MUTEX(mNeighbourMutex);
 
-    protected:
+    private:
         /** Gets the data size at a given LOD level.
         */
         uint getGeoDataSizeAtLod(uint16 lodLevel) const;

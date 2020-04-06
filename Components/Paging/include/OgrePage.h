@@ -51,7 +51,7 @@ namespace Ogre
     {
     public:
         typedef std::vector<PageContentCollection*> ContentCollectionList;
-    protected:
+    private:
         PageID mID;
         PagedWorldSection* mParent;
         unsigned long mFrameLastHeld;

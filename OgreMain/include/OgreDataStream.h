@@ -42,7 +42,7 @@ namespace Ogre {
     template <size_t cacheSize>
     class StaticCache
     {
-    protected:
+    private:
         /// Static buffer
         char mBuffer[cacheSize];
         
@@ -312,7 +312,7 @@ namespace Ogre {
     */
     class _OgreExport MemoryDataStream : public DataStream
     {
-    protected:
+    private:
         /// Pointer to the start of the data area
         uchar* mData;
         /// Pointer to the current position in the memory
@@ -479,7 +479,7 @@ namespace Ogre {
     */
     class _OgreExport FileStreamDataStream : public DataStream
     {
-    protected:
+    private:
         /// Reference to source stream (read)
         std::istream* mInStream;
         /// Reference to source file stream (read-only)
@@ -611,7 +611,7 @@ namespace Ogre {
     */
     class _OgreExport FileHandleDataStream : public DataStream
     {
-    protected:
+    private:
         FILE* mFileHandle;
     public:
         /// Create stream from a C file handle

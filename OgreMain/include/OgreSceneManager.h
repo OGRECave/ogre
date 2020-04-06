@@ -372,7 +372,7 @@ namespace Ogre {
         */
         class _OgreExport SceneMgrQueuedRenderableVisitor : public QueuedRenderableVisitor
         {
-        protected:
+        private:
             /// Pass that was actually used at the grouping level
             const Pass* mUsedPass;
         public:

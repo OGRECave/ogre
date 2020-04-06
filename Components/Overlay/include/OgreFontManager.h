@@ -79,7 +79,7 @@ namespace Ogre
         /// @copydoc Singleton::getSingleton()
         static FontManager* getSingletonPtr(void);
 
-    protected:
+    private:
 
         /// Internal methods
         Resource* createImpl(const String& name, ResourceHandle handle, 

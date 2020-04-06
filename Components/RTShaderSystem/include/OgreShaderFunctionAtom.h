@@ -286,7 +286,7 @@ public:
         bool operator()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
     };
 
-protected:
+private:
     FunctionInvocation() {}
 
     String mReturnType;

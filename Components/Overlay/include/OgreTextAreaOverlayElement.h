@@ -209,7 +209,7 @@ namespace Ogre
             void doSet( void* target, const String& val );
         };
 
-    protected:
+    private:
         /// The text alignment
         Alignment mAlignment;
 
