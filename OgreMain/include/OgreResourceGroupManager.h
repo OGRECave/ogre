@@ -213,14 +213,14 @@ namespace Ogre {
         virtual ~ResourceLoadingListener() {}
 
         /** This event is called when a resource beings loading. */
-        virtual DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) = 0;
+        virtual DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) { return NULL; }
 
         /** This event is called when a resource stream has been opened, but not processed yet. 
 
             You may alter the stream if you wish or alter the incoming pointer to point at
             another stream if you wish.
         */
-        virtual void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) = 0;
+        virtual void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) {}
 
         /** This event is called when a resource collides with another existing one in a resource manager
 
@@ -228,7 +228,7 @@ namespace Ogre {
             @param resourceManager the according resource manager 
             @return false to skip registration of the conflicting resource and continue using the previous instance.
           */
-        virtual bool resourceCollision(Resource *resource, ResourceManager *resourceManager) = 0;
+        virtual bool resourceCollision(Resource *resource, ResourceManager *resourceManager) { return true; }
     };
 
     /** This singleton class manages the list of resource groups, and notifying
