@@ -605,6 +605,9 @@ namespace Ogre {
                                 functionBody += "\n";
                                 line = stream->getLine();
                             }
+                            if (functionInvoc != NULL) {
+                                delete functionInvoc;
+                            }
                         }
                     }
                 }
