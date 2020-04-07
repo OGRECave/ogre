@@ -375,6 +375,8 @@ SHARED_PTR(FileHandleDataStream);
 %include "OgreRenderQueueListener.h"
 %feature("director") Ogre::RenderTargetListener;
 %include "OgreRenderTargetListener.h"
+%feature("director") Ogre::MeshSerializerListener;
+%feature("director") Ogre::ResourceLoadingListener;
 // More Data Types
 %include "OgreColourValue.h"
 ADD_REPR(ColourValue)
@@ -630,7 +632,6 @@ SHARED_PTR(Mesh);
 %include "OgrePatchSurface.h"
     SHARED_PTR(PatchMesh);
     %include "OgrePatchMesh.h"
-%feature("director") Ogre::MeshSerializerListener;
 %include "OgreMeshSerializer.h"
 %include "OgreMeshManager.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
