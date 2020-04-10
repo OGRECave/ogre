@@ -454,13 +454,11 @@ namespace Ogre {
         /// Debugging method
         void _dumpContents(const String& filename);
 
-        /** @copydoc Resource::loadImpl
-        */
-        void loadImpl(void);
+        void loadImpl() {}
+        void unloadImpl() { unprepareImpl(); }
 
-        /** @copydoc Resource::unloadImpl
-        */
-        void unloadImpl(void);
+        void prepareImpl(void);
+        void unprepareImpl(void);
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
 

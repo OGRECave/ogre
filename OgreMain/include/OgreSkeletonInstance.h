@@ -146,8 +146,8 @@ namespace Ogre {
         unsigned short mNextTagPointAutoHandle;
 
         void cloneBoneAndChildren(Bone* source, Bone* parent);
-        void loadImpl(void) override;
-        void unloadImpl(void) override;
+        void prepareImpl(void) override;
+        void unprepareImpl(void) override;
 
     };
     /** @} */
