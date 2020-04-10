@@ -137,7 +137,7 @@ namespace Ogre {
         }
     }
     //-------------------------------------------------------------------------
-    void SkeletonInstance::loadImpl(void)
+    void SkeletonInstance::prepareImpl(void)
     {
         mNextAutoHandle = mSkeleton->mNextAutoHandle;
         mNextTagPointAutoHandle = 0;
@@ -154,9 +154,9 @@ namespace Ogre {
         setBindingPose();
     }
     //-------------------------------------------------------------------------
-    void SkeletonInstance::unloadImpl(void)
+    void SkeletonInstance::unprepareImpl(void)
     {
-        Skeleton::unloadImpl();
+        Skeleton::unprepareImpl();
 
         // destroy TagPoints
         for (TagPointList::const_iterator it = mActiveTagPoints.begin(); it != mActiveTagPoints.end(); ++it)

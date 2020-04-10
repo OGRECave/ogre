@@ -48,4 +48,4 @@ The table below shows an overview what the prepared and loaded states mean for d
 | GpuProgram (HLSL) | read source and compiled microcode | uploaded to GPU and created buffers |
 | GpuProgram (GLSL) | read and preprocessed source | compiled and uploaded to GPU |
 | Compositor | - | compiled supported techniques and created textures |
-| Skeleton | - | read and parsed animation |
+| Skeleton | read and parsed animation | - |
