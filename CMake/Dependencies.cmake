@@ -291,7 +291,7 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
   macro_log_feature(SDL2_FOUND "SDL2" "Simple DirectMedia Library needed for input handling in samples" "https://www.libsdl.org/" FALSE "" "")
   if(SDL2_FOUND AND WIN32 AND NOT SDL2_BINARY)
     # fix linking static SDL2 on windows
-    set(SDL2_LIBRARY ${SDL2_LIBRARY} winmm.lib imm32.lib version.lib)
+    set(SDL2_LIBRARIES ${SDL2_LIBRARIES} winmm.lib imm32.lib version.lib)
   endif()
 endif()
 
