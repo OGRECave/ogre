@@ -35,13 +35,6 @@
 #include "OgreString.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "SampleBrowser_iOS.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#include "SampleBrowser_Android.h"
-
-namespace OgreBites {
-SampleBrowser OgreAndroidBridge::mBrowser;
-ndk_helper::PinchDetector OgreAndroidBridge::mPinchGesture;
-}
 #endif
 
 #include "SampleBrowser.h"
@@ -65,8 +58,6 @@ INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
 INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR cmdLine, INT) {
     int argc = __argc;
     char** argv = __argv;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-void android_main(struct android_app* state) {
 #else
 int main(int argc, char *argv[]) {
 #endif
@@ -75,9 +66,6 @@ int main(int argc, char *argv[]) {
     int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
     [pool release];
     return retVal;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    OgreBites::OgreAndroidBridge::init(state);
-    OgreBites::OgreAndroidBridge::go(state);
 #else
 
     try
