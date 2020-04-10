@@ -409,15 +409,12 @@ namespace Ogre {
         }
 
         // Write links
-        Skeleton::LinkedSkeletonAnimSourceIterator linkIt = 
-            pSkeleton->getLinkedSkeletonAnimationSourceIterator();
-        if (linkIt.hasMoreElements())
+        if (!pSkeleton->getLinkedSkeletonAnimationSources().empty())
         {
             LogManager::getSingleton().logMessage("Exporting animation links.");
             pugi::xml_node linksNode = rootNode.append_child("animationlinks");
-            while(linkIt.hasMoreElements())
+            for(const auto& link : pSkeleton->getLinkedSkeletonAnimationSources())
             {
-                const LinkedSkeletonAnimationSource& link = linkIt.getNext();
                 writeSkeletonAnimationLink(linksNode, link);
             }
         }
