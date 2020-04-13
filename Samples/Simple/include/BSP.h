@@ -68,10 +68,8 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         rgm.setWorldResourceGroupName(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
-    void setupView()
+    void setupContent()
     {
-        SdkSample::setupView();
-
         // modify camera for close work
         mCamera->setNearClipDistance(4);
         mCamera->setFarClipDistance(4000);
