@@ -425,7 +425,7 @@ namespace Ogre {
         int samples = 0;
         short frequency = 0;
         bool vsync = false;
-        ::EGLContext eglContext = 0;
+        ::EGLContext eglContext = NULL;
         int left = 0;
         int top  = 0;
 
@@ -567,7 +567,7 @@ namespace Ogre {
             createNativeWindow(left, top, width, height, title);
         }
 
-        mContext = createEGLContext();
+        mContext = createEGLContext(eglContext);
 
         // apply vsync settings. call setVSyncInterval first to avoid
         // setting vsync more than once.

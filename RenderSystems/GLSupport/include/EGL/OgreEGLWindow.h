@@ -51,8 +51,8 @@ namespace Ogre {
             ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, NativeWindowType win);
 
             virtual void switchFullScreen(bool fullscreen) = 0;
-            EGLContext * createEGLContext() const {
-                return new EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
+            EGLContext * createEGLContext(::EGLContext external = NULL) const {
+                return new EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface, external);
             }
 
             virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height) = 0;
