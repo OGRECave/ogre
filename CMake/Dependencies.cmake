@@ -298,7 +298,7 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
   endif()
   if(SDL2_FOUND AND WIN32 AND NOT SDL2_BINARY)
     # fix linking static SDL2 on windows
-    set_property(TARGET SDL2::SDL2 APPEND INTERFACE_LINK_LIBRARIES winmm.lib imm32.lib version.lib)
+    set_property(TARGET SDL2::SDL2 APPEND PROPERTY INTERFACE_LINK_LIBRARIES winmm.lib imm32.lib version.lib)
   endif()
 endif()
 
