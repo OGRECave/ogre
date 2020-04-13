@@ -227,7 +227,7 @@ namespace Ogre {
             mHwGamma = false;
         }
         
-        mContext = createEGLContext();
+        mContext = createEGLContext(eglContext);
         mContext->setCurrent();
         EMSCRIPTEN_RESULT result = emscripten_set_canvas_element_size(mCanvasSelector.c_str(), width, height);
         
