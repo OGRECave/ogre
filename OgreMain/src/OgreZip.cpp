@@ -746,6 +746,11 @@ namespace {
         ZipArchive * resZipArchive = OGRE_NEW ZipArchive(name, getType(), getEmbeddedZipIO());
         return resZipArchive;
     }
+    void EmbeddedZipArchiveFactory::destroyInstance(Archive* ptr)
+    {
+        removeEmbbeddedFile(ptr->getName());
+        ZipArchiveFactory::destroyInstance(ptr);
+    }
     //-----------------------------------------------------------------------
     const String& EmbeddedZipArchiveFactory::getType(void) const
     {

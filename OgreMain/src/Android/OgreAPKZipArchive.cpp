@@ -19,8 +19,14 @@ namespace Ogre{
         if(asset)
         {
             EmbeddedZipArchiveFactory::addEmbbeddedFile(apkName, (const Ogre::uint8*)AAsset_getBuffer(asset), AAsset_getLength(asset), 0);
+            mOpenAssets.emplace(apkName, asset);
         }
 
         return EmbeddedZipArchiveFactory::createInstance(apkName, readOnly);
+    }
+    void APKZipArchiveFactory::destroyInstance(Archive* ptr)
+    {
+        AAsset_close(mOpenAssets[ptr->getName()]);
+        EmbeddedZipArchiveFactory::destroyInstance(ptr);
     }
 }
