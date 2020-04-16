@@ -289,9 +289,16 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
   # find script does not work in cross compilation environment
   find_package(SDL2)
   macro_log_feature(SDL2_FOUND "SDL2" "Simple DirectMedia Library needed for input handling in samples" "https://www.libsdl.org/" FALSE "" "")
+  if(SDL2_FOUND AND NOT TARGET SDL2::SDL2)
+    add_library(SDL2::SDL2 INTERFACE IMPORTED)
+    set_target_properties(SDL2::SDL2 PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${SDL2_LIBRARIES}"
+    )
+  endif()
   if(SDL2_FOUND AND WIN32 AND NOT SDL2_BINARY)
     # fix linking static SDL2 on windows
-    set(SDL2_LIBRARY ${SDL2_LIBRARY} winmm.lib imm32.lib version.lib)
+    set_property(TARGET SDL2::SDL2 APPEND PROPERTY INTERFACE_LINK_LIBRARIES winmm.lib imm32.lib version.lib)
   endif()
 endif()
 
