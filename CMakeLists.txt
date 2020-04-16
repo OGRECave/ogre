@@ -206,12 +206,6 @@ else()
   test_big_endian(OGRE_TEST_BIG_ENDIAN)
 endif()
 
-# Add OgreMain include path
-if (APPLE_IOS)
-  # Set static early for proper dependency detection
-  set(OGRE_STATIC TRUE)
-endif()
-
 # definitions for samples
 set(OGRE_LIBRARIES OgreMain)
 set(OGRE_MeshLodGenerator_LIBRARIES OgreMeshLodGenerator)
@@ -353,10 +347,8 @@ endif()
 option(OGRE_BUILD_COMPONENT_HLMS "Build HLMS component" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_BITES "Build OgreBites component" TRUE "OGRE_BUILD_COMPONENT_OVERLAY" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PYTHON "Build Python bindings" TRUE "NOT OGRE_STATIC" FALSE)
-if (NOT EMSCRIPTEN)
-  option(OGRE_BUILD_COMPONENT_JAVA "Build Java (JNI) bindings" TRUE)
-endif()
-cmake_dependent_option(OGRE_BUILD_COMPONENT_CSHARP "Build Csharp bindings" TRUE "NOT ANDROID" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_JAVA "Build Java (JNI) bindings" TRUE "NOT OGRE_STATIC" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_CSHARP "Build Csharp bindings" TRUE "NOT OGRE_STATIC" FALSE)
 option(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM "Build RTShader System component" TRUE)
 cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_SHADERS "Build RTShader System FFP shaders" TRUE "OGRE_BUILD_COMPONENT_RTSHADERSYSTEM" FALSE)
 
@@ -422,9 +414,9 @@ endif ()
 # determine threading options
 include(PrepareThreadingOptions)
 
-# For Visual studio enable project folders by default.
+# Enable project folders by default if the IDE supportes them
 # Hide option from other compilers.
-if (MSVC)
+if (MSVC OR CMAKE_GENERATOR MATCHES Xcode)
 	option(OGRE_PROJECT_FOLDERS "Organize project into project folders." TRUE)
 endif ()
 
