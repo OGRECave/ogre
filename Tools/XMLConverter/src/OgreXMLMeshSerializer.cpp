@@ -693,6 +693,11 @@ namespace Ogre {
                 // we do not load any materials - so create a dummy here to just store the name
                 sm->setMaterial(MaterialManager::getSingleton().create(mat, RGN_DEFAULT));
             }
+            else
+            {
+                LogManager::getSingleton().logError(
+                    "empty material name encountered. This violates the specs and can lead to crashes.");
+            }
 
             // Read operation type
             bool readFaces = true;

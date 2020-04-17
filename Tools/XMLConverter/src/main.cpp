@@ -428,6 +428,14 @@ struct MaterialCreator : public MeshSerializerListener
 {
     void processMaterialName(Mesh *mesh, String *name)
     {
+        if (name->empty())
+        {
+            LogManager::getSingleton().logWarning("one of the SubMeshes is using an empty material name. "
+                                                  "This violates the specs and may lead to crashes.");
+            // here, we explicitly want to allow fixing that
+            return;
+        }
+
         // create material because we do not load any .material files
         MaterialManager::getSingleton().create(*name, mesh->getGroup());
     }
