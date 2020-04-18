@@ -128,19 +128,19 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
     message(STATUS "Building ZZIPlib")
     file(DOWNLOAD
-        https://github.com/gdraheim/zziplib/archive/develop.zip
-        ${PROJECT_BINARY_DIR}/zziplib-develop.tar.gz)
+        https://github.com/gdraheim/zziplib/archive/v0.13.71.tar.gz
+        ${PROJECT_BINARY_DIR}/zziplib-0.13.71.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf zziplib-develop.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        -E tar xf zziplib-0.13.71.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DZLIB_ROOT=${OGREDEPS_PATH}
         -DZZIPMMAPPED=OFF -DZZIPCOMPAT=OFF -DZZIPLIBTOOL=OFF -DZZIPFSEEKO=OFF -DZZIPWRAP=OFF -DZZIPSDL=OFF -DZZIPBINS=OFF -DZZIPTEST=OFF -DZZIPDOCS=OFF -DBASH=sh
         -DBUILD_STATIC_LIBS=TRUE
         -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-        ${PROJECT_BINARY_DIR}/zziplib-develop
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zziplib-develop)
+        ${PROJECT_BINARY_DIR}/zziplib-0.13.71
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zziplib-0.13.71)
     execute_process(COMMAND ${CMAKE_COMMAND} 
-        --build ${PROJECT_BINARY_DIR}/zziplib-develop ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/zziplib-0.13.71 ${BUILD_COMMAND_OPTS})
 
     message(STATUS "Building pugixml")
     file(DOWNLOAD
