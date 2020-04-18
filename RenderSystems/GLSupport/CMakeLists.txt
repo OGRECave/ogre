@@ -78,7 +78,8 @@ elseif (UNIX)
     file(GLOB PLATFORM_SOURCES "src/GLX/*.cpp")
 
     set(NATIVE_INCLUDES
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/GLX)
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/GLX
+        ${OPENGL_INCLUDE_DIR})
     
     set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${OPENGL_gl_LIBRARY})
   endif()

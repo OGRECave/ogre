@@ -30,6 +30,12 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#ifdef __FreeBSD__
+#undef bswap16
+#undef bswap32
+#undef bswap64
+#endif
+
 #ifndef __has_builtin
     // Compatibility with non-clang compilers
     #define __has_builtin(x) 0
