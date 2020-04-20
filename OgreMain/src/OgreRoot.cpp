@@ -959,6 +959,13 @@ namespace Ogre {
             pluginDir = baseDir + pluginDir;
         }
 
+        if(char* val = getenv("OGRE_PLUGIN_DIR"))
+        {
+            pluginDir = val;
+            LogManager::getSingleton().logMessage(
+                "setting PluginFolder from OGRE_PLUGIN_DIR environment variable");
+        }
+
         pluginDir = FileSystemLayer::resolveBundlePath(pluginDir);
 
         if (!pluginDir.empty() && *pluginDir.rbegin() != '/' && *pluginDir.rbegin() != '\\')
