@@ -103,7 +103,7 @@ namespace Ogre
 
         /** Copy geometry data from buffer to mHeightData/mDeltaData
           @param lodLevel A LOD level to work with
-          @param data Buffer which holds geometry data if separated form
+          @param data, dataSize Buffer which holds geometry data if separated form
           @remarks Data in buffer has to be both height and delta data. First half is height data.
                 Seconds half is delta data.
           */

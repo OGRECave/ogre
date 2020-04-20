@@ -1950,10 +1950,7 @@ namespace Ogre {
             Real tiling = 10, bool drawFirst = true, Real bow = 0, 
             int xsegments = 1, int ysegments = 1, 
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-        /** @copydoc setSkyPlane
-            @param
-                renderQueue The render queue to use when rendering this object
-        */        
+        /// @overload
         void _setSkyPlane(
             bool enable,
             const Plane& plane, const String& materialName, Real scale = 1000,
@@ -2019,10 +2016,7 @@ namespace Ogre {
             bool drawFirst = true, const Quaternion& orientation = Quaternion::IDENTITY,
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
-        /** @copydoc setSkyBox
-            @param
-                renderQueue The render queue to use when rendering this object
-        */
+        /// @overload
         void _setSkyBox(
             bool enable, const String& materialName, Real distance = 5000,
             uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY, const Quaternion& orientation = Quaternion::IDENTITY,
@@ -2094,6 +2088,7 @@ namespace Ogre {
                 You can use this parameter to rotate the sky if you want.
             @param groupName
                 The name of the resource group to which to assign the plane mesh.
+            @param xsegments, ysegments, ysegments_keep see @ref MeshManager::createCurvedIllusionPlane
                 */
         void setSkyDome(
             bool enable, const String& materialName, Real curvature = 10,
@@ -2102,10 +2097,7 @@ namespace Ogre {
             int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
-        /** @copydoc setSkyDome
-            @param
-                renderQueue The render queue to use when rendering this object
-                */        
+        /// @overload
         void _setSkyDome(
             bool enable, const String& materialName, Real curvature = 10,
             Real tiling = 8, Real distance = 4000, uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY,

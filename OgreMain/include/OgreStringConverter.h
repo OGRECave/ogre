@@ -115,7 +115,8 @@ namespace Ogre {
             unsigned short width, char fill = ' ',
             std::ios::fmtflags flags = std::ios::fmtflags(0));
 
-        /** Converts a boolean to a String. 
+        /** Converts a boolean to a String.
+        @param val
         @param yesNo If set to true, result is 'yes' or 'no' instead of 'true' or 'false'
         */
         static String toString(bool val, bool yesNo = false);

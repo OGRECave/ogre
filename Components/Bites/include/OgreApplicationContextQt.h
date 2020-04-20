@@ -35,12 +35,12 @@ public:
                  Ogre::NameValuePairList miscParams = Ogre::NameValuePairList()) override;
 
     /// @overload
-    NativeWindowPair createWindow(QWindow* widget,
+    NativeWindowPair createWindow(QWindow* window,
                                   Ogre::NameValuePairList miscParams = Ogre::NameValuePairList());
 
     /**
      * allows overriding the main (first) Window with a pre-created QWindow
-     * @param widget
+     * @param window
      */
     void injectMainWindow(QWindow* window)
     {

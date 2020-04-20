@@ -323,6 +323,8 @@ namespace Ogre
                 Root::createRenderWindow). The window will be
                 created based on the options currently set on the render
                 system.
+            @param windowTitle
+            @param customCapabilitiesConfig see #useCustomRenderSystemCapabilities
             @return
                 A pointer to the automatically created window, if
                 requested, otherwise <b>NULL</b>.

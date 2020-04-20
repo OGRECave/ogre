@@ -112,6 +112,16 @@ namespace Ogre {
             PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
 
         /** Prepares to loads a texture from a file.
+            @copydetails TextureManager::load
+            @param isAlpha deprecated: same as specifying #PF_A8 for @c desiredFormat
+        */
+        TexturePtr prepare(
+            const String& name, const String& group,
+            TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT,
+            Real gamma = 1.0f, bool isAlpha = false,
+            PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
+
+        /** Loads a texture from a file.
             @param
                 name The file to load, or a String identifier in some cases
             @param
@@ -125,8 +135,7 @@ namespace Ogre {
                 level, 1x1x1.
             @param
                 gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
-            @param 
-                isAlpha deprecated: same as specifying #PF_A8 for @c desiredFormat
+
             @param 
                 desiredFormat The format you would like to have used instead of
                 the format being based on the contents of the texture; the manager reserves
@@ -137,15 +146,6 @@ namespace Ogre {
                 to linear space when reading from this texture. Only applicable for 
                 8-bits per channel textures, will be ignored for other types. Has the advantage
                 over pre-applied gamma that the texture precision is maintained.
-        */
-        TexturePtr prepare(
-            const String& name, const String& group, 
-            TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
-            Real gamma = 1.0f, bool isAlpha = false,
-            PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
-
-        /** Loads a texture from a file.
-            @copydetails TextureManager::prepare
         */
         TexturePtr load(const String& name, const String& group, TextureType texType = TEX_TYPE_2D,
                         int numMipmaps = MIP_DEFAULT, Real gamma = 1.0f,

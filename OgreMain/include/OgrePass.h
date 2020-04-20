@@ -1265,6 +1265,8 @@ namespace Ogre {
             Only applicable to programmable passes, this sets the details of
             the program to use in this pass. The program will not be
             loaded until the parent Material is loaded.
+            @param prog The program. If this parameter is @c NULL, any program of the type in this pass is disabled.
+            @param type The type of program
             @param resetParams
             If true, this will create a fresh set of parameters from the
             new program being linked, so if you had previously set parameters
@@ -1274,11 +1276,7 @@ namespace Ogre {
             not just the names.
         */
         void setGpuProgram(GpuProgramType type, const GpuProgramPtr& prog, bool resetParams = true);
-        /** @overload
-            @param name The name of the program - this must have been
-            created using GpuProgramManager by the time that this Pass
-            is loaded. If this parameter is blank, any program of the type in this pass is disabled.
-        */
+        /// @overload
         void setGpuProgram(GpuProgramType type, const String& name, bool resetParams = true);
         /// @overload
         void setFragmentProgram(const String& name, bool resetParams = true);

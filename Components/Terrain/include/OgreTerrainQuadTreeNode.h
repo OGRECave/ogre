@@ -182,6 +182,7 @@ namespace Ogre
         void assignVertexData(uint16 treeDepthStart, uint16 treeDepthEnd, uint16 resolution, uint sz);
 
         /** Tell a node that it should use an anscestor's vertex data.
+        @param owner
         @param treeDepthEnd The end of the depth that should use this data (exclusive)
         @param resolution The resolution of the data to use
         */

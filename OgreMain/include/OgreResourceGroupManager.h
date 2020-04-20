@@ -649,12 +649,15 @@ namespace Ogre {
             pointing at the source of the data.
         @param resourceName The name of the resource to locate.
             Even if resource locations are added recursively, you
-            must provide a fully qualified name to this method. You 
+            must provide a fully qualified name to this method. You
             can find out the matching fully qualified names by using the
             find() method if you need to.
-        @param groupName The name of the resource group; this determines which 
-            locations are searched. 
-        @param resourceBeingLoaded Optional pointer to the resource being 
+        @param groupName The name of the resource group; this determines which
+            locations are searched.
+            If you're loading a @ref Resource using #RGN_AUTODETECT, you **must**
+            also provide the resourceBeingLoaded parameter to enable the
+            group membership to be changed
+        @param resourceBeingLoaded Optional pointer to the resource being
             loaded, which you should supply if you want
         @param throwOnFailure throw an exception. Returns nullptr otherwise
         @return Shared pointer to data stream containing the data, will be
@@ -670,12 +673,8 @@ namespace Ogre {
         }
 
         /** 
-            @param searchGroupsIfNotFound If true, if the resource is not found in 
-            the group specified, other groups will be searched. If you're
-            loading a real Resource using this option, you <strong>must</strong>
-            also provide the resourceBeingLoaded parameter to enable the 
-            group membership to be changed
-            @copydetails openResource
+            @overload
+            if the resource is not found in the group specified, other groups will be searched.
             @deprecated use AUTODETECT_RESOURCE_GROUP_NAME instead of searchGroupsIfNotFound
         */
         OGRE_DEPRECATED DataStreamPtr openResource(const String& resourceName,

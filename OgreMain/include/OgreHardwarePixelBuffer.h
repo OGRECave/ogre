@@ -98,7 +98,7 @@ namespace Ogre {
         /** @copydoc HardwareBuffer::lock
             @attention this method returns a pointer to the raw buffer storage, which is likely not what you
            want. The RenderSystem is free to add padding, which you have to query from @ref getCurrentLock()
-           and apply during copying. Prefer #blitFromMemory, which correctly
+           and apply during copying. Prefer @ref blitFromMemory, which correctly
            handles copying in this case
            @see @ref Updating-Pixel-Buffers
          */

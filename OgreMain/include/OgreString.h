@@ -116,9 +116,9 @@ namespace Ogre {
             @param str
             @param
             delims A list of delimiter characters to split by
-            @param
+            @par
             doubleDelims A list of double delimeters characters to tokenise by
-            @param
+            @par
             maxSplits The maximum number of splits to perform (0 for unlimited splits). If this
             parameters is > 0, the splitting process will stop after this many splits, left to right.
         */

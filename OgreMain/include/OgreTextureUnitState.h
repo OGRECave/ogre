@@ -413,7 +413,6 @@ namespace Ogre {
         void setAnimatedTextureName( const String& name, size_t numFrames, Real duration = 0 );
 
         /// @overload
-        /// @param names Pointer to array of names of the textures to use, in frame order.
         /// @deprecated use setAnimatedTextureName( const std::vector<String>&, Real )
         void setAnimatedTextureName( const String* const names, size_t numFrames, Real duration = 0 );
 
