@@ -468,6 +468,7 @@ namespace Ogre {
         @remarks
             Subclasses must override this method and create a subclass of Resource.
         @param name The unique name of the resource
+        @param handle The unique handle of the resource
         @param group The name of the resource group to attach this new resource to
         @param isManual Is this resource manually loaded? If so, you should really
             populate the loader parameter in order that the load process

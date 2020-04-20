@@ -414,6 +414,7 @@ namespace Ogre {
         This method adds a single element (positions, normals etc) at a given position in this
         vertex declaration. <b>Please read the information in VertexDeclaration about
         the importance of ordering and structure for compatibility with older D3D drivers</b>.
+        @param atPosition Position where the new element is inserted
         @param source The binding index of HardwareVertexBuffer which will provide the source for this element.
         See VertexBufferBinding for full information.
         @param offset The offset in bytes where this element is located in the buffer

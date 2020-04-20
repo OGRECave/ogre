@@ -65,8 +65,6 @@ public:
 
     /**
      * @brief Generates the Lod levels for a mesh.
-     *
-     * @param lodConfig Specification of the requested Lod levels.
      */
     virtual void generateLodLevels(LodConfig& lodConfig, LodCollapseCostPtr cost = LodCollapseCostPtr(), LodDataPtr data = LodDataPtr(), LodInputProviderPtr input = LodInputProviderPtr(), LodOutputProviderPtr output = LodOutputProviderPtr(), LodCollapserPtr collapser = LodCollapserPtr());
 

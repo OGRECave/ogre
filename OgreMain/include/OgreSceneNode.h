@@ -213,6 +213,7 @@ namespace Ogre {
             @param
                 displayNodes If true, the nodes themselves are rendered as a set of 3 axes as well
                     as the objects being rendered. For debugging purposes.
+            @param onlyShadowCasters
         */
         void _findVisibleObjects(Camera* cam, RenderQueue* queue,
             VisibleObjectsBoundsInfo* visibleBounds, 

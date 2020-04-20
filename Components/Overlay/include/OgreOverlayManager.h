@@ -152,6 +152,7 @@ namespace Ogre {
         allows plugins to register new types of component.
         @param typeName The type of element to create.
         @param instanceName The name to give the new instance.
+        @param isTemplate
         */
         OverlayElement* createOverlayElement(const String& typeName, const String& instanceName, bool isTemplate = false);
 

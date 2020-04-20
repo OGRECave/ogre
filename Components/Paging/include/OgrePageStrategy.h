@@ -97,7 +97,8 @@ namespace Ogre
             new pages. 
         @param cam Camera which is being used for rendering. Class should not
             rely on this pointer remaining valid permanently because no notification 
-            will be given when the camera is destroyed. 
+            will be given when the camera is destroyed.
+        @param section
         */
         virtual void notifyCamera(Camera* cam, PagedWorldSection* section) {}
 
