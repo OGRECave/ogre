@@ -27,6 +27,8 @@ addons:
     - nvidia-cg-dev
     - libpugixml-dev
     - swig3.0
+    - doxygen
+    - graphviz
     - mono-mcs # compile C# bindings
     - qtbase5-dev # QtOgreBites
 before_script:
@@ -63,6 +65,8 @@ script:
     # run unit tests
     - if [ $TEST ]; then build/bin/Test_Ogre ; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" -a "$IOS" != "TRUE" ]; then build/bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre ; fi
+    # doxygen warnings check
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cmake --build build --target OgreDoc && cat build/doxygen_warnings.log && test -s build/doxygen_warnings.log ; fi
     # XMLConverter works & validates
     - if [ $TEST ]; then build/bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && build/bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton ; fi
     - if [ $TEST ]; then python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml ; fi
