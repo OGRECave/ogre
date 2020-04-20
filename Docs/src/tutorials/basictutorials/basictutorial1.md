@@ -226,9 +226,9 @@ You can place these files the same directory as your executable or in any of [th
 
 ### plugins.cfg
 
-This file tells Ogre which plugins to load. You modify this file when you want to load a different set of plugins. It is often most useful to simply "comment out" lines instead of removing them, because you never know when a stroke of inspiration will mean you want to reload some unused plugins. Here is some sample content:
+This file tells %Ogre which plugins to load. You modify this file when you want to load a different set of plugins. It is often most useful to simply "comment out" lines instead of removing them, because you never know when a stroke of inspiration will mean you want to reload some unused plugins. Here is some sample content:
 
-```
+```py
 # Plugin=RenderSystem_Direct3D9
 # Plugin=RenderSystem_Direct3D10
 # Plugin=RenderSystem_Direct3D11
@@ -237,13 +237,17 @@ Plugin=RenderSystem_GL
 
 We have the three DirectX systems commented out, and an active line for OpenGL. On a windows system, you may have this reversed. You can see why it might be helpful not to delete unused lines, because then you have to try and remember whether it was RenderSystem_OpenGL or RenderSystem_GL.
 
-You can also decide where Ogre looks for plugins by changing the 'PluginFolder' variable. You can use both absolute and relative paths, but you cannot use environment variables like $(OGRE_HOME). For example, if you have built Ogre from source on a linux machine, then you will need a line like this at the beginning of your file:
+You can also decide where %Ogre looks for plugins by changing the @c PluginFolder variable. You can use both absolute and relative paths. Additionally, you can use the @c OGRE_PLUGIN_DIR environment variable to override the value of @c PluginFolder.
+
+For example, if you have built %Ogre from source on a linux machine, then you will need a line like this at the beginning of your file:
 
 ```
 PluginFolder=/usr/local/lib/OGRE
 ```
 
-By default, Ogre would have been looking in '/usr/lib/OGRE'. This is where it would be placed if you installed Ogre from a package manager. You may have to do something similar on Mac.
+By default, %Ogre would have been looking in the same directory where the @c plugins.cfg is located, which is sufficient on Windows. 
+
+@note %Ogre is aware whether your app is a bundle. Therefore a relative path like `Contents/Frameworks/` will be correctly resolved inside the app bundle on OSX.
 
 ### resources.cfg
 
