@@ -88,9 +88,6 @@ namespace Ogre {
         Real                    mTimeAdj[MAX_STAGES];
 
     };
-
-    /** @} */
-    /** @} */
 }
 
 

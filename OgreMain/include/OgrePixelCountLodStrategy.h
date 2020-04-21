@@ -74,8 +74,6 @@ namespace Ogre {
         /// @copydoc LodStrategy::isSorted
         virtual bool isSorted(const Mesh::LodValueList& values) const;
     };
-    /** @} */
-    /** @} */
 
     class _OgreExport AbsolutePixelCountLodStrategy : public PixelCountLodStrategyBase, public Singleton<AbsolutePixelCountLodStrategy>
     {
@@ -90,8 +88,6 @@ namespace Ogre {
         /// @copydoc Singleton::getSingleton()
         static AbsolutePixelCountLodStrategy* getSingletonPtr(void);
     };
-    /** @} */
-    /** @} */
 
     class _OgreExport ScreenRatioPixelCountLodStrategy : public PixelCountLodStrategyBase, public Singleton<ScreenRatioPixelCountLodStrategy>
     {
