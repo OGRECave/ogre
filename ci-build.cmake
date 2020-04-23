@@ -84,6 +84,12 @@ if(DEFINED ENV{ANDROID})
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
     set(BUILD_DEPS TRUE)
     
+    set(BINTRAY_VERSION "$ENV{TRAVIS_TAG}")
+    if("${BINTRAY_VERSION}" STREQUAL "")
+        set(BINTRAY_VERSION "master1")
+    endif()
+    configure_file(Other/bintray.json.in Other/bintray.json @ONLY)
+
     if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r17)
         message(STATUS "Downloading Android NDK")
         file(DOWNLOAD

@@ -23,6 +23,8 @@ branches:
 artifacts:
   - path: build/sdk
     name: ogre-sdk-master1-vc15-x64
+  - path: build/sdk
+    name: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64
 deploy:
 - provider: BinTray
   username: paroj
@@ -31,9 +33,25 @@ deploy:
   subject: ogrecave
   repo: ogre
   package: ogre-sdk-vc15-x64
+  artifact: ogre-sdk-master1-vc15-x64
   publish: true
   override: true
   version: master1
   on:
     branch: master
     APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
+    APPVEYOR_REPO_TAG: false
+- provider: BinTray
+  username: paroj
+  api_key:
+    secure: 4nFEwKApbHUf7UajsDt6Z7QOl3zzgEz6YbWGSGx5AiPxozWEQHEyGc6c9xE7utWE
+  subject: ogrecave
+  repo: ogre
+  package: ogre-sdk-vc15-x64
+  artifact: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64
+  publish: true
+  override: true
+  version: $(APPVEYOR_REPO_TAG_NAME)
+  on:
+    APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
+    APPVEYOR_REPO_TAG: true
