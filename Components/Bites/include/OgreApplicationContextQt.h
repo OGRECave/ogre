@@ -9,6 +9,12 @@
 #include <QObject>
 #include <QWindow>
 
+#if defined(OgreBitesQt_EXPORTS)
+#  define _OgreBitesQtExport Q_DECL_EXPORT
+#else
+#  define _OgreBitesQtExport Q_DECL_IMPORT
+#endif
+
 namespace OgreBites
 {
 
@@ -21,7 +27,7 @@ Specialization for connecting with Qt
 
 Assumes that Ogre Main loop is used for compatibility with other implementations.
  */
-class _OgreBitesExport ApplicationContextQt : public QObject, public ApplicationContextBase
+class _OgreBitesQtExport ApplicationContextQt : public QObject, public ApplicationContextBase
 {
     Q_OBJECT
 public:

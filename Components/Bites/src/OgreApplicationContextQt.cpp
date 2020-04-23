@@ -7,6 +7,8 @@
 
 #include "OgreApplicationContextQt.h"
 
+#include <cctype>
+
 #include "OgreRoot.h"
 #include "OgreRenderWindow.h"
 
