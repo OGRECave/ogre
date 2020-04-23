@@ -8,11 +8,12 @@ install:
  - cmd: cd %APPVEYOR_BUILD_FOLDER%
  - cmd: git submodule update --init --recursive
 build_script:
+ - set PATH=C:\Qt\5.12\msvc2017_64\bin;%PATH%
  - cmake -P ci-build.cmake
- - cmake --build build --config Release --target INSTALL
+ - cmake --build build --config RelWithDebInfo --target INSTALL
 test_script:
  - set PATH=%PATH%;build\gtest\lib
- - IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" build\bin\release\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
+ - IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" build\bin\RelWithDebInfo\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
 cache:
 - ogredeps -> CMake/Dependencies.cmake
 branches:

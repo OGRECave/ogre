@@ -38,11 +38,6 @@ endif()
 
 if(DEFINED ENV{APPVEYOR})
     set(CMAKE_BUILD_TYPE Release)
-    if("$ENV{APPVEYOR_BUILD_WORKER_IMAGE}" STREQUAL "Visual Studio 2017")
-        set(GENERATOR -G "Visual Studio 15")
-    else()
-        set(GENERATOR -G "Visual Studio 12")
-    endif()
     set(RENDERSYSTEMS
         -DOGRE_BUILD_RENDERSYSTEM_D3D9=TRUE
         -DOGRE_BUILD_RENDERSYSTEM_GL=TRUE
@@ -55,6 +50,15 @@ if(DEFINED ENV{APPVEYOR})
         "-DPYTHON_EXECUTABLE=C:\\Python37-x64\\python.exe"
         "-DPYTHON_LIBRARY=C:\\Python37-x64\\libs\\python37.lib"
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
+
+    if("$ENV{APPVEYOR_BUILD_WORKER_IMAGE}" STREQUAL "Visual Studio 2017")
+        set(GENERATOR -G "Visual Studio 15")
+        set(OTHER ${OTHER}
+            -DCMAKE_PREFIX_PATH="C:\\Qt\\5.12\\msvc2017_64"
+            -DQt5_DIR="C:\\Qt\\5.12\\msvc2017_64\\lib\\cmake\\Qt5")
+    else()
+        set(GENERATOR -G "Visual Studio 12")
+    endif()
 
     set(BUILD_DEPS TRUE)
     set(SWIG_EXECUTABLE "C:\\ProgramData\\chocolatey\\bin\\swig.exe")
