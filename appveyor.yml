@@ -20,10 +20,12 @@ branches:
   only:
     - master
     - stable
+after_build:
+  - IF "%APPVEYOR_REPO_TAG%" == "true" 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-vc15-x64.zip ./build/sdk/*
 artifacts:
   - path: build/sdk
     name: ogre-sdk-master1-vc15-x64
-  - path: build/sdk
+  - path: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64.zip
     name: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64
 deploy:
 - provider: BinTray
