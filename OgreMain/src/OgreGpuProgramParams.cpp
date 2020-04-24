@@ -398,10 +398,10 @@ namespace Ogre
 
 		// we try to adhere to GLSL std140 packing rules
 		// handle alignment requirements
-        auto align_size = std::min<int>(def.elementSize == 3 ? 4 : def.elementSize, 4); // vec3 is 16 byte aligned, which is max
+        size_t align_size = std::min<size_t>(def.elementSize == 3 ? 4 : def.elementSize, 4); // vec3 is 16 byte aligned, which is max
         align_size *= 4; // bytes
 
-        int nextAlignedOffset = ((mOffset + align_size - 1) / align_size) * align_size;
+        size_t nextAlignedOffset = ((mOffset + align_size - 1) / align_size) * align_size;
 
         // abuse logical index to store offset
         if (mOffset + align_size > nextAlignedOffset)
