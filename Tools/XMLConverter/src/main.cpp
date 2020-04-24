@@ -57,8 +57,7 @@ struct XmlOptions
     size_t mergeTexcoordToDestroy;
     bool optimiseAnimations;
     bool quietMode;
-    bool d3d;
-    bool gl;
+    VertexElementType colourElementType;
     Serializer::Endian endian;
 };
 
@@ -110,6 +109,12 @@ XmlOptions parseArgs(int numArgs, char **args)
     opts.optimiseAnimations = true;
     opts.quietMode = false;
     opts.endian = Serializer::ENDIAN_NATIVE;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+    opts.colourElementType = VET_COLOUR_ARGB;
+#else
+    opts.colourElementType = VET_COLOUR_ABGR;
+#endif
 
     // ignore program name
     char* source = 0;
@@ -214,17 +219,14 @@ XmlOptions parseArgs(int numArgs, char **args)
                 opts.endian = Serializer::ENDIAN_NATIVE;
         }
 
-        ui = unOpt.find("-d3d");
-        if (ui->second)
+        if (unOpt.find("-d3d")->second)
         {
-            opts.d3d = true;
+            opts.colourElementType = VET_COLOUR_ARGB;
         }
 
-        ui = unOpt.find("-gl");
-        if (ui->second)
+        if (unOpt.find("-gl")->second)
         {
-            opts.gl = true;
-            opts.d3d = false;
+            opts.colourElementType = VET_COLOUR_ABGR;
         }
 
     // Source / dest
@@ -354,13 +356,8 @@ void XMLToBinary(XmlOptions opts)
     {
         MeshPtr newMesh = MeshManager::getSingleton().createManual("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        VertexElementType colourElementType;
-        if (opts.d3d)
-            colourElementType = VET_COLOUR_ARGB;
-        else
-            colourElementType = VET_COLOUR_ABGR;
 
-        xmlMeshSerializer->importMesh(opts.source, colourElementType, newMesh.get());
+        xmlMeshSerializer->importMesh(opts.source, opts.colourElementType, newMesh.get());
 
         if( opts.mergeTexcoordResult != opts.mergeTexcoordToDestroy )
         {
