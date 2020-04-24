@@ -454,7 +454,7 @@ namespace Ogre {
         unsigned long mVersion;
 
 		/// Accumulated offset used to calculate uniform location.
-		unsigned int mOffset;
+		size_t mOffset;
 
         bool mDirty;
 
