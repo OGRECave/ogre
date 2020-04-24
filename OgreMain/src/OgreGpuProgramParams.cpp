@@ -415,7 +415,7 @@ namespace Ogre
 
         mOffset = def.logicalIndex + (def.constType == GCT_MATRIX_4X3 ? 16 : def.elementSize) * 4; // mat4x3 have a size of 64 bytes
 
-        def.variability = (uint16)GPV_GLOBAL;        
+        def.variability = (uint16)GPV_GLOBAL;
 
         if (def.isFloat())
         {
