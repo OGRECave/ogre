@@ -6,6 +6,7 @@ services:
 branches:
   only:
     - master
+    - /^v\d+\.\d+\.\d+$/
 addons:
   apt:
     sources:
@@ -91,4 +92,5 @@ deploy:
     skip_cleanup: true
     file: $TRAVIS_BUILD_DIR/Other/bintray.json
     on:
-      condition: $ANDROID
+      condition: $ANDROID && ($TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG)
+      all_branches: true
