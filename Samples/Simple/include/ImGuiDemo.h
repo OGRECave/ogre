@@ -54,7 +54,7 @@ public:
         */
 
         mImguiListener.reset(new ImGuiInputListener());
-        mListenerChain = InputListenerChain({mTrayMgr.get(), mImguiListener.get(), mCameraMan.get(), mControls});
+        mListenerChain = InputListenerChain({mTrayMgr.get(), mImguiListener.get(), mCameraMan.get()});
 
         mTrayMgr->showCursor();
         mCameraMan->setStyle(OgreBites::CS_ORBIT);
