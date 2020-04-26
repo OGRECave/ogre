@@ -179,13 +179,15 @@ namespace OgreBites
             if (!mLoadedSamples.empty() && mTitleLabel->getTrayLocation() != TL_NONE && (!mCurrentSample || mSamplePaused))
             {
                 // makes the carousel spin smoothly toward its right position
-                Ogre::Real carouselOffset = mSampleMenu->getSelectionIndex() - mCarouselPlace;
-                if ((carouselOffset <= 0.001) && (carouselOffset >= -0.001)) mCarouselPlace = mSampleMenu->getSelectionIndex();
-                else mCarouselPlace += carouselOffset * Ogre::Math::Clamp<Ogre::Real>(evt.timeSinceLastFrame * 15.0, -1.0, 1.0);
+                float carouselOffset = mSampleMenu->getSelectionIndex() - mCarouselPlace;
+                if (std::abs(carouselOffset) <= 0.001) mCarouselPlace = mSampleMenu->getSelectionIndex();
+                else mCarouselPlace += carouselOffset * Ogre::Math::Clamp<float>(evt.timeSinceLastFrame * 15.0, -1.0, 1.0);
 
                 // update the thumbnail positions based on carousel state
                 for (int i = 0; i < (int)mThumbs.size(); i++)
                 {
+                    if(carouselOffset == 0) break;
+
                     Ogre::Real thumbOffset = mCarouselPlace - i;
                     Ogre::Real phase = (thumbOffset / 2.0) - 2.8;
 
@@ -431,7 +433,7 @@ namespace OgreBites
                     }
                 }
 
-                mCarouselPlace = 0;  // reset carousel
+                mCarouselPlace = 0.001;  // reset carousel
 
                 mSampleMenu->setItems(sampleTitles);
                 if (mSampleMenu->getNumItems() != 0) itemSelected(mSampleMenu);
@@ -1034,6 +1036,8 @@ namespace OgreBites
                 mCategoryMenu->selectItem(0);
             else
                 itemSelected(mCategoryMenu);   // if there are no items, we can't select one, so manually invoke callback
+
+            mCarouselPlace = 0.001; // force redraw
         }
 
         /*-----------------------------------------------------------------------------
