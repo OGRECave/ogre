@@ -48,11 +48,9 @@ namespace Ogre {
             mOverlay->remove2D(this);
         }
 
-        OverlayContainer::ChildIterator ci = getChildIterator();
-        while (ci.hasMoreElements())
+        for (const auto& p : mChildren)
         {
-            OverlayElement* child = ci.getNext();
-            child->_notifyParent(0, 0);
+            p.second->_notifyParent(0, 0);
         }
     }
     //---------------------------------------------------------------------
@@ -207,10 +205,9 @@ namespace Ogre {
     {
         OverlayElement::_positionsOutOfDate();
 
-        ChildIterator it = getChildIterator();
-        while (it.hasMoreElements())
+        for (const auto& p : mChildren)
         {
-            it.getNext()->_positionsOutOfDate();
+            p.second->_positionsOutOfDate();
         }
     }
 
@@ -221,10 +218,9 @@ namespace Ogre {
         OverlayElement::_update();
 
         // Update children
-        ChildIterator it = getChildIterator();
-        while (it.hasMoreElements())
+        for (const auto& p : mChildren)
         {
-            it.getNext()->_update();
+            p.second->_update();
         }
     }
     //---------------------------------------------------------------------
@@ -235,11 +231,10 @@ namespace Ogre {
         newZOrder++; 
 
         // Update children
-        ChildIterator it = getChildIterator();
-        while (it.hasMoreElements())
+        for (const auto& p : mChildren)
         {
             // Children "consume" Z-order values, so keep track of them
-            newZOrder = it.getNext()->_notifyZOrder(newZOrder);
+            newZOrder = p.second->_notifyZOrder(newZOrder);
         }
 
         return newZOrder;
@@ -250,10 +245,9 @@ namespace Ogre {
         OverlayElement::_notifyWorldTransforms(xform);
 
         // Update children
-        ChildIterator it = getChildIterator();
-        while (it.hasMoreElements())
+        for (const auto& p : mChildren)
         {
-            it.getNext()->_notifyWorldTransforms(xform);
+            p.second->_notifyWorldTransforms(xform);
         }
     }
     //---------------------------------------------------------------------
@@ -262,10 +256,9 @@ namespace Ogre {
         OverlayElement::_notifyViewport();
 
         // Update children
-        ChildIterator it = getChildIterator();
-        while (it.hasMoreElements())
+        for (const auto& p : mChildren)
         {
-            it.getNext()->_notifyViewport();
+            p.second->_notifyViewport();
         }
     }
     //---------------------------------------------------------------------
@@ -274,11 +267,10 @@ namespace Ogre {
         OverlayElement::_notifyParent(parent, overlay);
 
         // Update children
-        ChildIterator it = getChildIterator();
-        while (it.hasMoreElements())
+        for (const auto& p : mChildren)
         {
             // Notify the children of the overlay 
-            it.getNext()->_notifyParent(this, overlay);
+            p.second->_notifyParent(this, overlay);
         }
     }
 
@@ -291,11 +283,10 @@ namespace Ogre {
             OverlayElement::_updateRenderQueue(queue);
 
             // Also add children
-            ChildIterator it = getChildIterator();
-            while (it.hasMoreElements())
+            for (const auto& p : mChildren)
             {
                 // Give children Z-order 1 higher than this
-                it.getNext()->_updateRenderQueue(queue);
+                p.second->_updateRenderQueue(queue);
             }
         }
 
@@ -314,10 +305,9 @@ namespace Ogre {
             ret = OverlayElement::findElementAt(x,y);   //default to the current container if no others are found
             if (ret && mChildrenProcessEvents)
             {
-                ChildIterator it = getChildIterator();
-                while (it.hasMoreElements())
+                for (const auto& p : mChildren)
                 {
-                    OverlayElement* currentOverlayElement = it.getNext();
+                    OverlayElement* currentOverlayElement = p.second;
                     if (currentOverlayElement->isVisible() && currentOverlayElement->isEnabled())
                     {
                         int z = currentOverlayElement->getZOrder();
@@ -343,10 +333,9 @@ namespace Ogre {
 
             if (templateOverlay->isContainer() && isContainer())
             {
-             OverlayContainer::ChildIterator it = static_cast<OverlayContainer*>(templateOverlay)->getChildIterator();
-             while (it.hasMoreElements())
+             for (const auto& p : static_cast<OverlayContainer*>(templateOverlay)->getChildren())
              {
-                 OverlayElement* oldChildElement = it.getNext();
+                 OverlayElement* oldChildElement = p.second;
                  if (oldChildElement->isCloneable())
                  {
                      OverlayElement* newChildElement = 
@@ -366,12 +355,11 @@ namespace Ogre {
 
         newContainer = static_cast<OverlayContainer*>(OverlayElement::clone(instanceName));
 
-          ChildIterator it = getChildIterator();
-          while (it.hasMoreElements())
-              {
-                    OverlayElement* oldChildElement = it.getNext();
-                    if (oldChildElement->isCloneable())
-                    {
+        for (const auto& p : mChildren)
+        {
+            OverlayElement* oldChildElement = p.second;
+            if (oldChildElement->isCloneable())
+            {
                 OverlayElement* newChildElement = oldChildElement->clone(instanceName);
                 newContainer->_addChild(newChildElement);
             }

@@ -201,7 +201,7 @@ namespace OgreBites
                     Ogre::Real scale = 1.0 / Ogre::Math::Pow((Ogre::Math::Abs(thumbOffset) + 1.0), 0.75);
 
                     Ogre::BorderPanelOverlayElement* frame =
-                        (Ogre::BorderPanelOverlayElement*)mThumbs[i]->getChildIterator().getNext();
+                        (Ogre::BorderPanelOverlayElement*)mThumbs[i]->getChildren().begin()->second;
 
                     mThumbs[i]->setDimensions(128.0 * scale, 96.0 * scale);
                     frame->setDimensions(mThumbs[i]->getWidth() + 16.0, mThumbs[i]->getHeight() + 16.0);
