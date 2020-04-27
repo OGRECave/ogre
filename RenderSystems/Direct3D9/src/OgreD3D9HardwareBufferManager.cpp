@@ -139,9 +139,4 @@ namespace Ogre {
     {
         return OGRE_NEW D3D9VertexDeclaration();
     }
-    //-----------------------------------------------------------------------
-    void D3D9HardwareBufferManager::destroyVertexDeclarationImpl(VertexDeclaration* decl)
-    {
-        OGRE_DELETE decl;
-    }
 }
