@@ -141,9 +141,4 @@ namespace Ogre {
 	{
 		return new D3D11VertexDeclaration(mlpD3DDevice);
 	}
-	//-----------------------------------------------------------------------
-	void D3D11HardwareBufferManager::destroyVertexDeclarationImpl(VertexDeclaration* decl)
-	{
-		delete decl;
-	}
 }

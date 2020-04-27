@@ -41,8 +41,6 @@ namespace Ogre {
 
         /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
         VertexDeclaration* createVertexDeclarationImpl(void);
-        /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
-        void destroyVertexDeclarationImpl(VertexDeclaration* decl);
 
     public:
         D3D11HardwareBufferManager(D3D11Device & device);

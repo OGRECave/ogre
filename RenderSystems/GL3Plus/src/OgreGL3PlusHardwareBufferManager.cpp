@@ -158,11 +158,6 @@ namespace Ogre {
         return OGRE_NEW GLVertexArrayObject();
     }
 
-    void GL3PlusHardwareBufferManager::destroyVertexDeclarationImpl(VertexDeclaration* decl)
-    {
-        OGRE_DELETE decl;
-    }
-
     GLenum GL3PlusHardwareBufferManager::getGLType(VertexElementType type)
     {
         switch(type)
