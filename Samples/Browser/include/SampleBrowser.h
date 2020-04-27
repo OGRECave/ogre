@@ -57,6 +57,8 @@
 #   endif
 #endif
 
+#define CAROUSEL_REDRAW_EPS 0.001
+
 namespace OgreBites
 {
     /*=============================================================================
@@ -180,7 +182,7 @@ namespace OgreBites
             {
                 // makes the carousel spin smoothly toward its right position
                 float carouselOffset = mSampleMenu->getSelectionIndex() - mCarouselPlace;
-                if (std::abs(carouselOffset) <= 0.001) mCarouselPlace = mSampleMenu->getSelectionIndex();
+                if (std::abs(carouselOffset) <= CAROUSEL_REDRAW_EPS) mCarouselPlace = mSampleMenu->getSelectionIndex();
                 else mCarouselPlace += carouselOffset * Ogre::Math::Clamp<float>(evt.timeSinceLastFrame * 15.0, -1.0, 1.0);
 
                 // update the thumbnail positions based on carousel state
@@ -342,6 +344,7 @@ namespace OgreBites
                 mTrayMgr->moveWidgetToTray("Quit", TL_RIGHT);
 #endif
 
+                mCarouselPlace += CAROUSEL_REDRAW_EPS;  // force redraw
                 windowResized(mWindow);
             }
             else if (b->getName() == "Apply")   // apply any changes made in the configuration screen
@@ -433,7 +436,7 @@ namespace OgreBites
                     }
                 }
 
-                mCarouselPlace = 0.001;  // reset carousel
+                mCarouselPlace = CAROUSEL_REDRAW_EPS;  // reset carousel
 
                 mSampleMenu->setItems(sampleTitles);
                 if (mSampleMenu->getNumItems() != 0) itemSelected(mSampleMenu);
@@ -1037,7 +1040,7 @@ namespace OgreBites
             else
                 itemSelected(mCategoryMenu);   // if there are no items, we can't select one, so manually invoke callback
 
-            mCarouselPlace = 0.001; // force redraw
+            mCarouselPlace = CAROUSEL_REDRAW_EPS; // force redraw
         }
 
         /*-----------------------------------------------------------------------------
