@@ -1591,43 +1591,7 @@ namespace Ogre
     {
         mSamplerStatesChanged = true;
 
-        const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
-        mTexStageDesc[unit].samplerDesc.AddressU = D3D11Mappings::get(uvw.u);
-        mTexStageDesc[unit].samplerDesc.AddressV = D3D11Mappings::get(uvw.v);
-        mTexStageDesc[unit].samplerDesc.AddressW = D3D11Mappings::get(uvw.w);
-        mTexStageDesc[unit].samplerDesc.MipLODBias = sampler.getMipmapBias();
-
-        if (uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER)
-        {
-            auto borderColour = (mIsReverseDepthBufferEnabled && sampler.getCompareEnabled())
-                                    ? ColourValue::White - sampler.getBorderColour()
-                                    : sampler.getBorderColour();
-            D3D11Mappings::get(borderColour, mTexStageDesc[unit].samplerDesc.BorderColor);
-        }
-
-        mTexStageDesc[unit].samplerDesc.MaxAnisotropy = sampler.getAnisotropy();
-
-        auto cmpFunc = sampler.getCompareFunction();
-        if(mIsReverseDepthBufferEnabled) cmpFunc = reverseCompareFunction(cmpFunc);
-        mTexStageDesc[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(cmpFunc);
-
-        FilterMinification[unit] = sampler.getFiltering(FT_MIN);
-        FilterMagnification[unit] = sampler.getFiltering(FT_MAG);
-        FilterMips[unit] = sampler.getFiltering(FT_MIP);
-
-        mTexStageDesc[unit].samplerDesc.Filter =
-            D3D11Mappings::get(FilterMinification[unit], FilterMagnification[unit], FilterMips[unit],
-                               sampler.getCompareEnabled());
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTextureAddressingMode( size_t stage, 
-        const Sampler::UVWAddressingMode& uvw )
-    {
-        // record the stage state
-        mTexStageDesc[stage].samplerDesc.AddressU = D3D11Mappings::get(uvw.u);
-        mTexStageDesc[stage].samplerDesc.AddressV = D3D11Mappings::get(uvw.v);
-        mTexStageDesc[stage].samplerDesc.AddressW = D3D11Mappings::get(uvw.w);
-        mSamplerStatesChanged = true;
+        mTexStageDesc[unit].pSampler = static_cast<D3D11Sampler&>(sampler).getState();
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
@@ -1781,30 +1745,6 @@ namespace Ogre
 		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
         mReadBackAsTexture = readBackAsTexture;
         mDepthStencilDescChanged = true;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, 
-        FilterOptions filter)
-    {
-        switch(ftype) {
-        case FT_MIN:
-            FilterMinification[unit] = filter;
-            break;
-        case FT_MAG:
-            FilterMagnification[unit] = filter;
-            break;
-        case FT_MIP:
-            FilterMips[unit] = filter;
-            break;
-        }
-
-        mTexStageDesc[unit].samplerDesc.Filter = D3D11Mappings::get(FilterMinification[unit], FilterMagnification[unit], FilterMips[unit],CompareEnabled);
-        mSamplerStatesChanged = true;
-    }
-    //---------------------------------------------------------------------
-    DWORD D3D11RenderSystem::_getCurrentAnisotropy(size_t unit)
-    {
-        return mTexStageDesc[unit].samplerDesc.MaxAnisotropy;;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setRenderTarget(RenderTarget *target)
@@ -2003,7 +1943,7 @@ namespace Ogre
         ComPtr<ID3D11RasterizerState> mRasterizer;
         ComPtr<ID3D11DepthStencilState> mDepthStencilState;
 
-        ComPtr<ID3D11SamplerState> mSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
+        ID3D11SamplerState* mSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
         size_t mSamplerStatesCount;
 
         ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS]; // note - not owning
@@ -2123,31 +2063,10 @@ namespace Ogre
                             
             for (size_t n = 0; n < numberOfSamplers; n++)
             {
-                ComPtr<ID3D11SamplerState> samplerState;
-                ID3D11ShaderResourceView *texture = NULL;
+                ID3D11SamplerState *sampler = NULL;
                 sD3DTextureStageDesc & stage = mTexStageDesc[n];
-                if(stage.used)
-                {
-                    texture = stage.pTex;
-
-                    stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n], FilterMips[n], false);
-                    stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
-                    stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
-                    stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
-                    stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-                    HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, samplerState.ReleaseAndGetAddressOf());
-                    if (FAILED(hr))
-                    {
-                        String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                            "Failed to create sampler state\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render" );
-                    }
-                
-                }
-                opState->mSamplerStates[n].Swap(samplerState);
-                opState->mTextures[n]       = texture;
+                opState->mSamplerStates[n]  = stage.used ? stage.pSampler : NULL;
+                opState->mTextures[n]       = stage.used ? stage.pTex : NULL;
             }
             for (size_t n = opState->mTexturesCount; n < OGRE_MAX_TEXTURE_LAYERS; n++)
 			{
@@ -2203,7 +2122,7 @@ namespace Ogre
             /// Pixel Shader binding
             {
                 {
-                    mDevice.GetImmediateContext()->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                    mDevice.GetImmediateContext()->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
@@ -2226,7 +2145,7 @@ namespace Ogre
             /// Vertex Shader binding
             if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2247,7 +2166,7 @@ namespace Ogre
             /// Geometry Shader binding
             if (mBoundGeometryProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->GSSetSamplers(0, opState->mSamplerStatesCount, opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->GSSetSamplers(0, opState->mSamplerStatesCount, opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2269,7 +2188,7 @@ namespace Ogre
             /// Compute Shader binding
             if (mBoundComputeProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2291,7 +2210,7 @@ namespace Ogre
             /// Hull Shader binding
             if (mBoundTessellationHullProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->HSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->HSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2313,7 +2232,7 @@ namespace Ogre
             /// Domain Shader binding
             if (mBoundTessellationDomainProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->DSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->DSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -3407,14 +3326,6 @@ namespace Ogre
 
         ZeroMemory( &mDepthStencilDesc, sizeof(mDepthStencilDesc));
         ZeroMemory( &mScissorRect, sizeof(mScissorRect));
-
-        // set filters to defaults
-        for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
-        {
-            FilterMinification[n] = FO_NONE;
-            FilterMagnification[n] = FO_NONE;
-            FilterMips[n] = FO_NONE;
-        }
 
         mPolygonMode = PM_SOLID;
         mRasterizerDesc.FillMode = D3D11Mappings::get(mPolygonMode);

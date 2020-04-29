@@ -33,6 +33,16 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
+    class _OgreD3D11Export D3D11Sampler : public Sampler
+    {
+    public:
+        D3D11Sampler(D3D11Device & device) : mDevice(device) {}
+        ID3D11SamplerState* getState();
+    private:
+        ComPtr<ID3D11SamplerState> mState;
+        D3D11Device & mDevice;
+    };
+
     class _OgreD3D11Export D3D11TextureManager : public TextureManager
     {
     protected:
@@ -41,6 +51,8 @@ namespace Ogre
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader, 
             const NameValuePairList* createParams);
+
+        SamplerPtr _createSamplerImpl();
 
     public:
         D3D11TextureManager( D3D11Device & device );

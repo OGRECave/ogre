@@ -60,6 +60,7 @@ namespace Ogre
         , protected D3D11DeviceResourceManager
     {
     private:
+	    friend class D3D11Sampler;
         Ogre::String mDriverName;    // it`s hint rather than hard requirement, could be ignored if empty or device removed
         D3D_DRIVER_TYPE mDriverType; // should be XXX_HARDWARE, XXX_SOFTWARE or XXX_WARP, never XXX_UNKNOWN or XXX_NULL
         D3D_FEATURE_LEVEL mFeatureLevel;
@@ -86,9 +87,6 @@ namespace Ogre
 
         void freeDevice(void);
         void createDevice();
-
-        /// return anisotropy level
-        DWORD _getCurrentAnisotropy(size_t unit);
         
         D3D11HardwareBufferManager* mHardwareBufferManager;
         GpuProgramManager* mGpuProgramManager;
@@ -126,11 +124,6 @@ namespace Ogre
         bool                        mDepthStencilDescChanged;
 
         PolygonMode mPolygonMode;
-
-        FilterOptions FilterMinification[OGRE_MAX_TEXTURE_LAYERS];
-        FilterOptions FilterMagnification[OGRE_MAX_TEXTURE_LAYERS];
-        FilterOptions FilterMips[OGRE_MAX_TEXTURE_LAYERS];
-        bool          CompareEnabled;
 
         D3D11_RECT mScissorRect;
         
@@ -172,7 +165,7 @@ namespace Ogre
 
             /// texture 
             ID3D11ShaderResourceView  *pTex;
-            D3D11_SAMPLER_DESC  samplerDesc;
+            ID3D11SamplerState    *pSampler;
             bool used;
         } mTexStageDesc[OGRE_MAX_TEXTURE_LAYERS];
 
@@ -279,7 +272,6 @@ namespace Ogre
         D3D11HLSLProgram* _getBoundComputeProgram() const;
         void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
         void _setSampler(size_t unit, Sampler& sampler);
-        void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         void _setViewport( Viewport *vp );
         void _endFrame(void);
@@ -293,7 +285,6 @@ namespace Ogre
         void _setDepthBias(float constantBias, float slopeScaleBias);
 		void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool forGpuProgram = false);
         void _setPolygonMode(PolygonMode level);
-        void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
         void setVertexDeclaration(VertexDeclaration* decl);
         void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
         void setVertexBufferBinding(VertexBufferBinding* binding);
