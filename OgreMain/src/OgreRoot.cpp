@@ -636,7 +636,9 @@ namespace Ogre {
     SceneManagerEnumerator::MetaDataIterator
     Root::getSceneManagerMetaDataIterator(void) const
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         return mSceneManagerEnum->getMetaDataIterator();
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     const SceneManagerEnumerator::MetaDataList&
@@ -668,7 +670,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SceneManagerEnumerator::SceneManagerIterator Root::getSceneManagerIterator(void)
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         return mSceneManagerEnum->getSceneManagerIterator();
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     const SceneManagerEnumerator::Instances& Root::getSceneManagers(void) const

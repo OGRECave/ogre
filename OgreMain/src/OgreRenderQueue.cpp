@@ -102,17 +102,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderQueue::clear(bool destroyPassMaps)
     {
-        // Clear the queues
-        SceneManagerEnumerator::SceneManagerIterator scnIt =
-            SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
-
         // Note: We clear dirty passes from all RenderQueues in all 
         // SceneManagers, because the following recalculation of pass hashes
         // also considers all RenderQueues and could become inconsistent, otherwise.
-        while (scnIt.hasMoreElements())
+        for (auto p : SceneManagerEnumerator::getSingleton().getSceneManagers())
         {
-            SceneManager* sceneMgr = scnIt.getNext();
-            RenderQueue* queue = sceneMgr->getRenderQueue();
+            RenderQueue* queue = p.second->getRenderQueue();
 
             for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
             {

@@ -192,7 +192,7 @@ namespace Ogre {
 		if (mDelegate)
 		{
 			mDelegate->setSource(mProgramString);
-			mDelegate->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
+
 			if (mSelectedCgProfile == CG_PROFILE_GLSLG)
 			{
 				// need to set input and output operations
@@ -486,8 +486,6 @@ namespace Ogre {
 					mType,
 					mSelectedProfile);
 			}
-			// Shader params need to be forwarded to low level implementation
-			mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
 		}
 	}
 	//-----------------------------------------------------------------------

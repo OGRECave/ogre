@@ -1099,7 +1099,9 @@ namespace Ogre {
     {
         String aliasName = readString(stream);
         String textureName = readString(stream);
+        OGRE_IGNORE_DEPRECATED_BEGIN
         sub->addTextureAlias(aliasName, textureName);
+        OGRE_IGNORE_DEPRECATED_END
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeSkeletonLink(const String& skelName)

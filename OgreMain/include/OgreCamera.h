@@ -304,11 +304,11 @@ namespace Ogre {
         /** Rotate the camera around an arbitrary axis.
         @deprecated attach to SceneNode and use SceneNode::rotate
         */
-        void rotate(const Vector3& axis, const Radian& angle);
+        OGRE_DEPRECATED void rotate(const Vector3& axis, const Radian& angle);
 
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::rotate
-        void rotate(const Quaternion& q);
+        OGRE_DEPRECATED void rotate(const Quaternion& q);
 
         /** Tells the camera whether to yaw around it's own local Y axis or a 
             fixed axis of choice.
