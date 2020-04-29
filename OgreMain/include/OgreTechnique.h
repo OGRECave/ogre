@@ -614,7 +614,7 @@ namespace Ogre {
         const String& getName(void) const { return mName; }
 
         /// @deprecated do not use
-        bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
+        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
 
 
         /** Add a rule which manually influences the support for this technique based

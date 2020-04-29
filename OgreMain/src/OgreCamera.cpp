@@ -255,7 +255,9 @@ namespace Ogre {
     {
         // Rotate around local Z axis
         Vector3 zAxis = mOrientation * Vector3::UNIT_Z;
+        OGRE_IGNORE_DEPRECATED_BEGIN
         rotate(zAxis, angle);
+        OGRE_IGNORE_DEPRECATED_END
 
         invalidateView();
     }
@@ -276,7 +278,9 @@ namespace Ogre {
             yAxis = mOrientation * Vector3::UNIT_Y;
         }
 
+        OGRE_IGNORE_DEPRECATED_BEGIN
         rotate(yAxis, angle);
+        OGRE_IGNORE_DEPRECATED_END
 
         invalidateView();
     }
@@ -286,7 +290,9 @@ namespace Ogre {
     {
         // Rotate around local X axis
         Vector3 xAxis = mOrientation * Vector3::UNIT_X;
+        OGRE_IGNORE_DEPRECATED_BEGIN
         rotate(xAxis, angle);
+        OGRE_IGNORE_DEPRECATED_END
 
         invalidateView();
 
@@ -297,7 +303,9 @@ namespace Ogre {
     {
         Quaternion q;
         q.FromAngleAxis(angle,axis);
+        OGRE_IGNORE_DEPRECATED_BEGIN
         rotate(q);
+        OGRE_IGNORE_DEPRECATED_END
     }
 
     //-----------------------------------------------------------------------

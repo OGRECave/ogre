@@ -647,7 +647,7 @@ namespace Ogre {
         }
         
         /// @deprecated do not use
-        bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
+        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
 
         /** Gets the compilation status of the material.
         @return True if the material needs recompilation.

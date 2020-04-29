@@ -1218,6 +1218,7 @@ namespace Ogre{
             }
         }
 
+        OGRE_IGNORE_DEPRECATED_BEGIN
         // Apply the texture aliases
         if(compiler->getListener())
         {
@@ -1226,6 +1227,7 @@ namespace Ogre{
         }
         mMaterial->applyTextureAliases(mTextureAliases);
         mTextureAliases.clear();
+        OGRE_IGNORE_DEPRECATED_END
     }
 
     /**************************************************************************
@@ -3628,8 +3630,10 @@ namespace Ogre{
         bool isHighLevel = language != "asm";
         CreateGpuProgramScriptCompilerEvent evt(obj->file, obj->name, compiler->getResourceGroup(), source, syntax,
                                                 gpt);
+        OGRE_IGNORE_DEPRECATED_BEGIN
         CreateHighLevelGpuProgramScriptCompilerEvent evtHL(obj->file, obj->name, compiler->getResourceGroup(), source,
                                                          language, gpt);
+        OGRE_IGNORE_DEPRECATED_END
         bool processed = compiler->_fireEvent(isHighLevel ? &evt : &evtHL, &prog);
         if(!processed)
         {
