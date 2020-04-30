@@ -799,7 +799,7 @@ namespace Ogre {
 			return HighLevelGpuProgram::isVertexTextureFetchRequired();
 	}
 	//-----------------------------------------------------------------------
-	GpuProgramParametersSharedPtr CgProgram::getDefaultParameters(void)
+	const GpuProgramParametersPtr& CgProgram::getDefaultParameters(void)
 	{
 		loadHighLevelSafe();
 		if (mDelegate)

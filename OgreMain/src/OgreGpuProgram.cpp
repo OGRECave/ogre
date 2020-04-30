@@ -326,7 +326,7 @@ namespace Ogre
         return ret;
     }
     //-----------------------------------------------------------------------------
-    GpuProgramParametersSharedPtr GpuProgram::getDefaultParameters(void)
+    const GpuProgramParametersPtr& GpuProgram::getDefaultParameters(void)
     {
         if (!mDefaultParams)
         {

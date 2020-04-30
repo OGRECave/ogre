@@ -158,7 +158,7 @@ namespace Ogre {
         bool isMorphAnimationIncluded(void) const;
         bool isPoseAnimationIncluded(void) const;
         bool isVertexTextureFetchRequired(void) const;
-        GpuProgramParametersSharedPtr getDefaultParameters(void);
+        const GpuProgramParametersPtr& getDefaultParameters(void) override;
         bool hasDefaultParameters(void) const;
         bool getPassSurfaceAndLightStates(void) const;
         bool getPassFogStates(void) const;
