@@ -298,7 +298,7 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
   endif()
 
   find_package(Qt5 COMPONENTS Core Gui)
-  macro_log_feature(PYTHONLIBS_FOUND "Qt" "optional integration with the Qt Library for window creation and input" "http://www.qt.io/" FALSE "" "")
+  macro_log_feature(Qt5_FOUND "Qt" "optional integration with the Qt Library for window creation and input" "http://www.qt.io/" FALSE "" "")
 endif()
 
 #######################################################################
