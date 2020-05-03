@@ -36,6 +36,16 @@ THE SOFTWARE.
 
 namespace Ogre {
     //---------------------------------------------------------------------
+    template<> OverlaySystem *Singleton<OverlaySystem>::msSingleton = 0;
+    OverlaySystem* OverlaySystem::getSingletonPtr()
+    {
+        return msSingleton;
+    }
+    OverlaySystem& OverlaySystem::getSingleton()
+    {
+        assert( msSingleton );  return ( *msSingleton );
+    }
+    //---------------------------------------------------------------------
     OverlaySystem::OverlaySystem()
     {
         RenderSystem::setSharedListener(this);

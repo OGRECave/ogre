@@ -54,7 +54,7 @@ namespace Ogre {
         instance as a RenderQueueListener in your scenemanager(s).
     */
     class _OgreOverlayExport OverlaySystem
-        : public OverlayAlloc
+        : public Singleton<OverlaySystem>
         , public Ogre::RenderQueueListener
         , public Ogre::RenderSystem::Listener
     {
@@ -69,6 +69,8 @@ namespace Ogre {
         /// @see RenderSystem::Listener
         virtual void eventOccurred(const String& eventName, const NameValuePairList* parameters);
 
+        static OverlaySystem& getSingleton();
+        static OverlaySystem* getSingletonPtr();
     private:
         OverlayManager* mOverlayManager;
         FontManager* mFontManager;
