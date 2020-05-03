@@ -46,8 +46,10 @@ using namespace std;
 
 %feature("autodoc", "1");
 %feature("director") *::Listener;
+#ifdef SWIGPYTHON
 // should be turned on globally if all renames are in place
 %feature("flatnested") Ogre::MaterialManager::Listener;
+#endif
 
 %ignore *::operator=;  // needs rename to wrap
 %ignore *::setUserAny; // deprecated
