@@ -947,7 +947,7 @@ namespace Ogre {
         }
         catch (Exception& e)
         {
-            LogManager::getSingleton().logMessage("automatic plugin loading disabled: "+e.getDescription());
+            LogManager::getSingleton().logError(e.getDescription()+" - skipping automatic plugin loading");
             return;
         }
 
