@@ -1,5 +1,3 @@
-find_package(SWIG 3.0.8)
-
 if(ANDROID)
 	set(JNI_FOUND TRUE)
 	add_library(cpufeatures STATIC ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)

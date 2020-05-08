@@ -280,6 +280,10 @@ find_package(PythonInterp)
 find_package(PythonLibs)
 macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from Python" "http://www.python.org/" FALSE "" "")
 
+# SWIG
+find_package(SWIG 3.0.8 QUIET)
+macro_log_feature(SWIG_FOUND "SWIG" "Language bindings (Python, Java, C#) for OGRE" "http://www.swig.org/" FALSE "" "")
+
 #######################################################################
 # Samples dependencies
 #######################################################################
@@ -287,7 +291,7 @@ macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from 
 # Find sdl2
 if(NOT ANDROID AND NOT EMSCRIPTEN)
   # find script does not work in cross compilation environment
-  find_package(SDL2)
+  find_package(SDL2 QUIET)
   macro_log_feature(SDL2_FOUND "SDL2" "Simple DirectMedia Library needed for input handling in samples" "https://www.libsdl.org/" FALSE "" "")
   if(SDL2_FOUND AND NOT TARGET SDL2::SDL2)
     add_library(SDL2::SDL2 INTERFACE IMPORTED)
@@ -297,7 +301,7 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
     )
   endif()
 
-  find_package(Qt5 COMPONENTS Core Gui)
+  find_package(Qt5 COMPONENTS Core Gui QUIET)
   macro_log_feature(Qt5_FOUND "Qt" "optional integration with the Qt Library for window creation and input" "http://www.qt.io/" FALSE "" "")
 endif()
 
@@ -305,7 +309,7 @@ endif()
 # Tools
 #######################################################################
 
-find_package(Doxygen)
+find_package(Doxygen QUIET)
 macro_log_feature(DOXYGEN_FOUND "Doxygen" "Tool for building API documentation" "http://doxygen.org" FALSE "" "")
 
 # Find Softimage SDK

@@ -1,5 +1,3 @@
-find_package(SWIG 3.0.8)
-
 if(NOT PYTHONLIBS_FOUND OR NOT SWIG_FOUND)
     set(OGRE_BUILD_COMPONENT_PYTHON OFF CACHE BOOL "" FORCE)
     message(WARNING "Python Component disabled because SWIG or Python was not found")

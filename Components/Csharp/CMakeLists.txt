@@ -1,5 +1,3 @@
-find_package(SWIG 3.0.8)
-
 if(NOT SWIG_FOUND)
     set(OGRE_BUILD_COMPONENT_CSHARP OFF CACHE BOOL "" FORCE)
     message(WARNING "Csharp Component disabled because SWIG or Csharp was not found")
