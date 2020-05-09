@@ -910,11 +910,6 @@ namespace Ogre {
         return mLodBucketList[mCurrentLod]->getEdgeList();
     }
     //--------------------------------------------------------------------------
-    bool StaticGeometry::Region::hasEdgeList(void)
-    {
-        return getEdgeList() != 0;
-    }
-    //--------------------------------------------------------------------------
     void StaticGeometry::Region::dump(std::ofstream& of) const
     {
         of << "Region " << mRegionID << std::endl;
