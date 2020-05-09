@@ -284,15 +284,10 @@ namespace Ogre {
         */
         void showBoundingBox(bool bShow) { mShowBoundingBox = bShow; }
 
-        /** Allows the overriding of the node's bounding box
-            over the SceneManager's bounding box setting.
-        @remarks
-            Use this to override the bounding box setting of the node.
-        */
-        void hideBoundingBox(bool bHide) { mHideBoundingBox = bHide; }
+        /// @deprecated this function will disappear with 1.13
+        OGRE_DEPRECATED void hideBoundingBox(bool bHide) { mHideBoundingBox = bHide; }
 
-        /** Add the bounding box to the rendering queue.
-        */
+        /// @deprecated this function will disappear with 1.13
         void _addBoundingBoxToQueue(RenderQueue* queue);
 
         /** This allows scene managers to determine if the node's bounding box
