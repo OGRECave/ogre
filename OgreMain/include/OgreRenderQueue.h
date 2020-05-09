@@ -76,7 +76,8 @@ namespace Ogre {
         RENDER_QUEUE_MAX = 105
     };
 
-    #define OGRE_RENDERABLE_DEFAULT_PRIORITY  100
+    /// @deprecated
+    #define OGRE_RENDERABLE_DEFAULT_PRIORITY  Ogre::Renderable::DEFAULT_PRIORITY
 
     /** Class to manage the scene object rendering queue.
         @remarks
