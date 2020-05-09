@@ -101,6 +101,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
     // create the auto param data source instance
     mAutoParamDataSource.reset(createAutoParamDataSource());
 
+    addListener(&mSkyRenderer);
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
@@ -1371,11 +1372,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
             firePostFindVisibleObjects(vp);
 
             mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
-        }
-        // Queue skies, if viewport seems it
-        if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
-        {
-            mSkyRenderer.queueSkiesForRendering(getRenderQueue(), camera);
         }
     } // end lock on scene graph mutex
 
