@@ -467,7 +467,7 @@ void SceneManager::SkyRenderer::queueSkiesForRendering(RenderQueue* queue, Camer
         && mSkyPlaneEntity && mSkyPlaneEntity->isVisible()
         && mSkyPlaneEntity->getSubEntity(0) && mSkyPlaneEntity->getSubEntity(0)->isVisible())
     {
-        queue->addRenderable(mSkyPlaneEntity->getSubEntity(0), mSkyPlaneRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
+        queue->addRenderable(mSkyPlaneEntity->getSubEntity(0), mSkyPlaneRenderQueue, Renderable::DEFAULT_PRIORITY);
     }
 
     if (mSkyBoxEnabled
@@ -484,7 +484,7 @@ void SceneManager::SkyRenderer::queueSkiesForRendering(RenderQueue* queue, Camer
                 && mSkyDomeEntity[plane]->getSubEntity(0) && mSkyDomeEntity[plane]->getSubEntity(0)->isVisible())
             {
                 queue->addRenderable(
-                    mSkyDomeEntity[plane]->getSubEntity(0), mSkyDomeRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
+                    mSkyDomeEntity[plane]->getSubEntity(0), mSkyDomeRenderQueue, Renderable::DEFAULT_PRIORITY);
             }
         }
     }
