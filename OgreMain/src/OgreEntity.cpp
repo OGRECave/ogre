@@ -1738,16 +1738,6 @@ namespace Ogre {
         return mMesh->getEdgeList(mMeshLodIndex);
     }
     //-----------------------------------------------------------------------
-    bool Entity::hasEdgeList(void)
-    {
-#if OGRE_NO_MESHLOD
-        unsigned short mMeshLodIndex = 0;
-#endif
-        // check if mesh has an edge list attached
-        // give mesh a chance to built it if scheduled
-        return (mMesh->getEdgeList(mMeshLodIndex) != NULL);
-    }
-    //-----------------------------------------------------------------------
     bool Entity::isHardwareAnimationEnabled(void)
     {
         //find whether the entity has hardware animation for the current active sceme

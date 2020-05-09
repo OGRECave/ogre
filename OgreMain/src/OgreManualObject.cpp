@@ -942,11 +942,6 @@ namespace Ogre {
         }
         return mEdgeList;
     }
-    //---------------------------------------------------------------------
-    bool ManualObject::hasEdgeList()
-    {
-        return getEdgeList() != 0;
-    }
     //-----------------------------------------------------------------------------
     const ShadowCaster::ShadowRenderableList&
     ManualObject::getShadowVolumeRenderableList(

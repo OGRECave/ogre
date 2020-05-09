@@ -407,8 +407,7 @@ namespace Ogre
         /** @copydoc MovableObject::_updateRenderQueue */
         void _updateRenderQueue(RenderQueue* queue);
         /** Implement this method to enable stencil shadows */
-        EdgeData* getEdgeList(void);
-        bool hasEdgeList(void) override;
+        EdgeData* getEdgeList(void) override;
         /** Implement this method to enable stencil shadows. */
         const ShadowRenderableList& getShadowVolumeRenderableList(
             ShadowTechnique shadowTechnique, const Light* light, 
