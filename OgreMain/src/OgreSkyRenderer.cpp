@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreEntity.h"
 #include "OgreSubEntity.h"
+#include "OgreViewport.h"
 
 namespace Ogre {
 SceneManager::SkyRenderer::SkyRenderer(SceneManager* owner) :
@@ -443,8 +444,16 @@ MeshPtr SceneManager::SkyRenderer::createSkydomePlane(
 
 }
 
-void SceneManager::SkyRenderer::queueSkiesForRendering(RenderQueue* queue, Camera* cam)
+void SceneManager::SkyRenderer::postFindVisibleObjects(SceneManager* source, IlluminationRenderStage irs,
+                                                       Viewport* vp)
 {
+    // Queue skies, if viewport seems it
+    if (!vp->getSkiesEnabled() || irs == IRS_RENDER_TO_TEXTURE)
+        return;
+
+    Camera* cam = vp->getCamera();
+    RenderQueue* queue = source->getRenderQueue();
+
     // Update nodes
     // Translate the box by the camera position (constant distance)
     if (mSkyPlaneNode)
@@ -489,5 +498,4 @@ void SceneManager::SkyRenderer::queueSkiesForRendering(RenderQueue* queue, Camer
         }
     }
 }
-
 }

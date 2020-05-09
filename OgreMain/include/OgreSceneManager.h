@@ -456,7 +456,7 @@ namespace Ogre {
         AutoTrackingSceneNodes mAutoTrackingSceneNodes;
 
         // Sky params
-        struct _OgreExport SkyRenderer
+        struct _OgreExport SkyRenderer : public Listener
         {
             SkyRenderer(SceneManager* owner);
 
@@ -509,7 +509,7 @@ namespace Ogre {
             /** Internal method for queueing the sky objects with the params as
                 previously set through setSkyBox, setSkyPlane and setSkyDome.
             */
-            void queueSkiesForRendering(RenderQueue* queue, Camera* cam);
+            void postFindVisibleObjects(SceneManager* source, IlluminationRenderStage irs, Viewport* vp);
 
             void clear();
 
@@ -1855,12 +1855,10 @@ namespace Ogre {
         */
         virtual void _renderScene(Camera* camera, Viewport* vp, bool includeOverlays);
 
-        /** Internal method for queueing the sky objects with the params as 
-            previously set through setSkyBox, setSkyPlane and setSkyDome.
-        */
-        void _queueSkiesForRendering(Camera* cam)
+        /// @deprecated do not use
+        OGRE_DEPRECATED void _queueSkiesForRendering(Camera* cam)
         {
-            mSkyRenderer.queueSkiesForRendering(getRenderQueue(), cam);
+            mSkyRenderer.postFindVisibleObjects(this, IRS_NONE, cam->getViewport());
         }
 
         /** Notifies the scene manager of its destination render system
