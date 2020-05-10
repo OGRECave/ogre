@@ -456,37 +456,13 @@ namespace Ogre {
         AutoTrackingSceneNodes mAutoTrackingSceneNodes;
 
         // Sky params
-        struct _OgreExport SkyRenderer : public Listener
+        class _OgreExport SkyRenderer : public Listener, public Node::Listener
         {
-            SkyRenderer(SceneManager* owner);
-
+        protected:
             SceneManager* mSceneManager;
-
-            // Sky plane
-            Entity* mSkyPlaneEntity;
-            Entity* mSkyDomeEntity[5];
-            std::unique_ptr<ManualObject> mSkyBoxObj;
-
-            SceneNode* mSkyPlaneNode;
-            SceneNode* mSkyDomeNode;
-            SceneNode* mSkyBoxNode;
-
-            // Sky plane
-            bool mSkyPlaneEnabled;
-            uint8 mSkyPlaneRenderQueue;
-            Plane mSkyPlane;
-            SkyPlaneGenParameters mSkyPlaneGenParameters;
-            // Sky box
-            bool mSkyBoxEnabled;
-            uint8 mSkyBoxRenderQueue;
-            Quaternion mSkyBoxOrientation;
-            SkyBoxGenParameters mSkyBoxGenParameters;
-            // Sky dome
-            bool mSkyDomeEnabled;
-            uint8 mSkyDomeRenderQueue;
-            Quaternion mSkyDomeOrientation;
-            SkyDomeGenParameters mSkyDomeGenParameters;
-
+            virtual void _updateRenderQueue(RenderQueue* queue) = 0;
+            void nodeDestroyed(const Node*);
+        public:
             enum BoxPlane
             {
                 BP_FRONT = 0,
@@ -497,35 +473,62 @@ namespace Ogre {
                 BP_DOWN = 5
             };
 
-            /* Internal utility method for creating the planes of a skydome.
-            */
+            SkyRenderer(SceneManager* owner);
+
+            SceneNode* mSceneNode;
+            bool mEnabled;
+
+            void setEnabled(bool enable);
+            void postFindVisibleObjects(SceneManager* source, IlluminationRenderStage irs, Viewport* vp);
+        };
+
+        class _OgreExport SkyPlaneRenderer : public SkyRenderer
+        {
+            Entity* mSkyPlaneEntity;
+            Plane mSkyPlane;
+            void _updateRenderQueue(RenderQueue* queue);
+        public:
+            SkyPlaneRenderer(SceneManager* owner) : SkyRenderer(owner), mSkyPlaneEntity(0) {}
+            SkyPlaneGenParameters mSkyPlaneGenParameters;
+            void setSkyPlane(bool enable, const Plane& plane, const String& materialName,
+                             Real scale, Real tiling, uint8 renderQueue, Real bow, int xsegments,
+                             int ysegments, const String& groupName);
+        } mSkyPlane;
+
+        class _OgreExport SkyBoxRenderer : public SkyRenderer
+        {
+            std::unique_ptr<ManualObject> mSkyBoxObj;
+
+            Quaternion mSkyBoxOrientation;
+            void _updateRenderQueue(RenderQueue* queue);
+        public:
+            SkyBoxRenderer(SceneManager* owner) : SkyRenderer(owner) {}
+            SkyBoxGenParameters mSkyBoxGenParameters;
+            void setSkyBox(bool enable, const String& materialName, Real distance,
+                           uint8 renderQueue, const Quaternion& orientation,
+                           const String& groupName);
+        } mSkyBox;
+
+        class _OgreExport SkyDomeRenderer : public SkyRenderer
+        {
+            std::array<Entity*, 5> mSkyDomeEntity;
+            Quaternion mSkyDomeOrientation;
+
             MeshPtr createSkydomePlane(
                 BoxPlane bp,
                 Real curvature, Real tiling, Real distance,
                 const Quaternion& orientation,
                 int xsegments, int ysegments, int ySegmentsToKeep,
                 const String& groupName);
-
-            /** Internal method for queueing the sky objects with the params as
-                previously set through setSkyBox, setSkyPlane and setSkyDome.
-            */
-            void postFindVisibleObjects(SceneManager* source, IlluminationRenderStage irs, Viewport* vp);
-
-            void clear();
-
-            void setSkyBox(bool enable, const String& materialName, Real distance,
-                           uint8 renderQueue, const Quaternion& orientation,
-                           const String& groupName);
-
-            void setSkyPlane(bool enable, const Plane& plane, const String& materialName,
-                             Real scale, Real tiling, uint8 renderQueue, Real bow, int xsegments,
-                             int ysegments, const String& groupName);
-
+            void _updateRenderQueue(RenderQueue* queue);
+        public:
+            SkyDomeRenderer(SceneManager* owner)  : SkyRenderer(owner) {}
+            SkyDomeGenParameters mSkyDomeGenParameters;
             void setSkyDome(bool enable, const String& materialName, Real curvature, Real tiling,
                             Real distance, uint8 renderQueue, const Quaternion& orientation,
                             int xsegments, int ysegments, int ysegments_keep,
                             const String& groupName);
-        } mSkyRenderer;
+        } mSkyDome;
 
         // Fog
         FogMode mFogMode;
@@ -1858,7 +1861,9 @@ namespace Ogre {
         /// @deprecated do not use
         OGRE_DEPRECATED void _queueSkiesForRendering(Camera* cam)
         {
-            mSkyRenderer.postFindVisibleObjects(this, IRS_NONE, cam->getViewport());
+            mSkyPlane.postFindVisibleObjects(this, IRS_NONE, cam->getViewport());
+            mSkyBox.postFindVisibleObjects(this, IRS_NONE, cam->getViewport());
+            mSkyDome.postFindVisibleObjects(this, IRS_NONE, cam->getViewport());
         }
 
         /** Notifies the scene manager of its destination render system
@@ -1957,16 +1962,16 @@ namespace Ogre {
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky plane' */
-        void setSkyPlaneEnabled(bool enable) { mSkyRenderer.mSkyPlaneEnabled = enable; }
+        void setSkyPlaneEnabled(bool enable) { mSkyPlane.setEnabled(enable); }
 
         /** Return whether a key plane is enabled */
-        bool isSkyPlaneEnabled(void) const { return mSkyRenderer.mSkyPlaneEnabled; }
+        bool isSkyPlaneEnabled(void) const { return mSkyPlane.mEnabled; }
 
         /** Get the sky plane node, if enabled. */
-        SceneNode* getSkyPlaneNode(void) const { return mSkyRenderer.mSkyPlaneNode; }
+        SceneNode* getSkyPlaneNode(void) const { return mSkyPlane.mSceneNode; }
 
         /** Get the parameters used to construct the SkyPlane, if any **/
-        const SkyPlaneGenParameters& getSkyPlaneGenParameters(void) const { return mSkyRenderer.mSkyPlaneGenParameters; }
+        const SkyPlaneGenParameters& getSkyPlaneGenParameters(void) const { return mSkyPlane.mSkyPlaneGenParameters; }
 
         /** Enables / disables a 'sky box' i.e. a 6-sided box at constant
             distance from the camera representing the sky.
@@ -2021,16 +2026,16 @@ namespace Ogre {
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky box' */
-        void setSkyBoxEnabled(bool enable) { mSkyRenderer.mSkyBoxEnabled = enable; }
+        void setSkyBoxEnabled(bool enable) { mSkyBox.setEnabled(enable); }
 
         /** Return whether a skybox is enabled */
-        bool isSkyBoxEnabled(void) const { return mSkyRenderer.mSkyBoxEnabled; }
+        bool isSkyBoxEnabled(void) const { return mSkyBox.mEnabled; }
 
         /** Get the skybox node, if enabled. */
-        SceneNode* getSkyBoxNode(void) const { return mSkyRenderer.mSkyBoxNode; }
+        SceneNode* getSkyBoxNode(void) const { return mSkyBox.mSceneNode; }
 
         /** Get the parameters used to generate the current SkyBox, if any */
-        const SkyBoxGenParameters& getSkyBoxGenParameters(void) const { return mSkyRenderer.mSkyBoxGenParameters; }
+        const SkyBoxGenParameters& getSkyBoxGenParameters(void) const { return mSkyBox.mSkyBoxGenParameters; }
 
         /** Enables / disables a 'sky dome' i.e. an illusion of a curved sky.
             @remarks
@@ -2104,16 +2109,16 @@ namespace Ogre {
             const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky dome' */
-        void setSkyDomeEnabled(bool enable) { mSkyRenderer.mSkyDomeEnabled = enable; }
+        void setSkyDomeEnabled(bool enable) { mSkyDome.setEnabled(enable); }
 
         /** Return whether a skydome is enabled */
-        bool isSkyDomeEnabled(void) const { return mSkyRenderer.mSkyDomeEnabled; }
+        bool isSkyDomeEnabled(void) const { return mSkyDome.mEnabled; }
 
         /** Get the sky dome node, if enabled. */
-        SceneNode* getSkyDomeNode(void) const { return mSkyRenderer.mSkyDomeNode; }
+        SceneNode* getSkyDomeNode(void) const { return mSkyDome.mSceneNode; }
 
         /** Get the parameters used to generate the current SkyDome, if any */
-        const SkyDomeGenParameters& getSkyDomeGenParameters(void) const { return mSkyRenderer.mSkyDomeGenParameters; }
+        const SkyDomeGenParameters& getSkyDomeGenParameters(void) const { return mSkyDome.mSkyDomeGenParameters; }
 
         /** Sets the fogging mode applied to the scene.
             @remarks
