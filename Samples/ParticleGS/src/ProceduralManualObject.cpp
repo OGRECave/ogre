@@ -39,7 +39,7 @@ namespace Ogre
         mParentSceneManager = manualObject->_getManager();
         if (mR2vbObject)
         {
-            mR2vbObject->setSourceRenderable(manualObject->getSection(0));
+            mR2vbObject->setSourceRenderable(manualObject->getSections()[0]);
         }
     }
     //-----------------------------------------------------------------------------
