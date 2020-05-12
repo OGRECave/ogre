@@ -1383,18 +1383,14 @@ namespace Ogre {
     }
 
 
-    void BillboardSet::setTextureCoords( Ogre::FloatRect const * coords, uint16 numCoords )
+    void BillboardSet::setTextureCoords(const std::vector<FloatRect>& coords)
     {
-      if( !numCoords || !coords ) {
+      if( coords.empty() ) {
         setTextureStacksAndSlices( 1, 1 );
         return;
       }
-      //  clear out any previous allocation (as vectors may not shrink)
-      TextureCoordSets().swap( mTextureCoords );
-      //  make room
-      mTextureCoords.resize( numCoords );
-      //  copy in data
-      std::copy( coords, coords+numCoords, &mTextureCoords.front() );
+
+      mTextureCoords = coords;
     }
 
     void BillboardSet::setTextureStacksAndSlices( uchar stacks, uchar slices )
