@@ -11,7 +11,7 @@ material triplanarReference
                 lighting_stage ffp
                 // Texturescale, Plateau-size (0 to 0.57, not bigger to avoid division by zero!), transition-speed
                 // Texture from x, from y, from z
-                triplanarTexturing 0.1 0.2 2.0 dirt_grayrocky_diffusespecular.dds grass_green-01_diffusespecular.dds growth_weirdfungus-03_diffusespecular.dds
+                triplanarTexturing 0.05 0.2 2.0 Rock20_diffspec.dds Ground37_diffspec.dds Ground23_col.jpg
             }
         }
     }
