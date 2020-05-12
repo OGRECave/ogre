@@ -35,16 +35,14 @@ namespace Ogre {
 #define TEMP_INITIAL_VERTEX_SIZE TEMP_VERTEXSIZE_GUESS * TEMP_INITIAL_SIZE
 #define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
     //-----------------------------------------------------------------------------
-    ManualObject::ManualObject(const String& name)
-        : MovableObject(name),
-          mDynamic(false), mCurrentSection(0), mCurrentUpdating(false), mFirstVertex(true),
-          mTempVertexPending(false),
-          mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
-          mTempIndexBuffer(0), mTempIndexSize(TEMP_INITIAL_INDEX_SIZE),
-          mDeclSize(0), mEstVertexCount(0), mEstIndexCount(0), mTexCoordIndex(0), 
-          mRadius(0), mAnyIndexed(false), mEdgeList(0), 
-          mUseIdentityProjection(false), mUseIdentityView(false), mKeepDeclarationOrder(false)
-    {
+ManualObject::ManualObject(const String& name)
+    : MovableObject(name), mBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY), mCurrentSection(0),
+      mCurrentUpdating(false), mFirstVertex(true), mTempVertexPending(false), mTempVertexBuffer(0),
+      mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE), mTempIndexBuffer(0),
+      mTempIndexSize(TEMP_INITIAL_INDEX_SIZE), mDeclSize(0), mEstVertexCount(0), mEstIndexCount(0),
+      mTexCoordIndex(0), mRadius(0), mAnyIndexed(false), mEdgeList(0), mUseIdentityProjection(false),
+      mUseIdentityView(false), mKeepDeclarationOrder(false)
+{
     }
     //-----------------------------------------------------------------------------
     ManualObject::~ManualObject()
@@ -230,11 +228,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void ManualObject::position(const Vector3& pos)
     {
-        position(pos.x, pos.y, pos.z);
-    }
-    //-----------------------------------------------------------------------------
-    void ManualObject::position(float x, float y, float z)
-    {
         if (!mCurrentSection)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -255,9 +248,7 @@ namespace Ogre {
                 ->addElement(0, mDeclSize, VET_FLOAT3, VES_POSITION).getSize();
         }
 
-        mTempVertex.position.x = x;
-        mTempVertex.position.y = y;
-        mTempVertex.position.z = z;
+        mTempVertex.position = pos;
 
         // update bounds
         mAABB.merge(mTempVertex.position);
@@ -271,11 +262,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void ManualObject::normal(const Vector3& norm)
     {
-        normal(norm.x, norm.y, norm.z);
-    }
-    //-----------------------------------------------------------------------------
-    void ManualObject::normal(float x, float y, float z)
-    {
         if (!mCurrentSection)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -288,18 +274,10 @@ namespace Ogre {
             mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
                 ->addElement(0, mDeclSize, VET_FLOAT3, VES_NORMAL).getSize();
         }
-        mTempVertex.normal.x = x;
-        mTempVertex.normal.y = y;
-        mTempVertex.normal.z = z;
+        mTempVertex.normal = norm;
     }
-
     //-----------------------------------------------------------------------------
     void ManualObject::tangent(const Vector3& tan)
-    {
-        tangent(tan.x, tan.y, tan.z);
-    }
-    //-----------------------------------------------------------------------------
-    void ManualObject::tangent(float x, float y, float z)
     {
         if (!mCurrentSection)
         {
@@ -313,9 +291,7 @@ namespace Ogre {
             mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
                 ->addElement(0, mDeclSize, VET_FLOAT3, VES_TANGENT).getSize();
         }
-        mTempVertex.tangent.x = x;
-        mTempVertex.tangent.y = y;
-        mTempVertex.tangent.z = z;
+        mTempVertex.tangent = tan;
     }
 
     //-----------------------------------------------------------------------------
@@ -383,7 +359,7 @@ namespace Ogre {
         ++mTexCoordIndex;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::textureCoord(float x, float y, float z, float w)
+    void ManualObject::textureCoord(const Vector4& xyzw)
     {
         if (!mCurrentSection)
         {
@@ -398,35 +374,12 @@ namespace Ogre {
                 ->addElement(0, mDeclSize, VET_FLOAT4, VES_TEXTURE_COORDINATES, mTexCoordIndex).getSize();
         }
         mTempVertex.texCoordDims[mTexCoordIndex] = 4;
-        mTempVertex.texCoord[mTexCoordIndex].x = x;
-        mTempVertex.texCoord[mTexCoordIndex].y = y;
-        mTempVertex.texCoord[mTexCoordIndex].z = z;
-        mTempVertex.texCoord[mTexCoordIndex].w = w;
+        mTempVertex.texCoord[mTexCoordIndex] = xyzw;
 
         ++mTexCoordIndex;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::textureCoord(const Vector2& uv)
-    {
-        textureCoord(uv.x, uv.y);
-    }
-    //-----------------------------------------------------------------------------
-    void ManualObject::textureCoord(const Vector3& uvw)
-    {
-        textureCoord(uvw.x, uvw.y, uvw.z);
-    }
-    //---------------------------------------------------------------------
-    void ManualObject::textureCoord(const Vector4& xyzw)
-    {
-        textureCoord(xyzw.x, xyzw.y, xyzw.z, xyzw.w);
-    }
-    //-----------------------------------------------------------------------------
     void ManualObject::colour(const ColourValue& col)
-    {
-        colour(col.r, col.g, col.b, col.a);
-    }
-    //-----------------------------------------------------------------------------
-    void ManualObject::colour(float r, float g, float b, float a)
     {
         if (!mCurrentSection)
         {
@@ -440,11 +393,7 @@ namespace Ogre {
             mDeclSize += mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
                 ->addElement(0, mDeclSize, VET_COLOUR, VES_DIFFUSE).getSize();
         }
-        mTempVertex.colour.r = r;
-        mTempVertex.colour.g = g;
-        mTempVertex.colour.b = b;
-        mTempVertex.colour.a = a;
-
+        mTempVertex.colour = col;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::index(uint32 idx)
@@ -700,26 +649,17 @@ namespace Ogre {
                 // to allow for user-configured growth area
                 size_t vertexCount = std::max(rop->vertexData->vertexCount, 
                     mEstVertexCount);
-                vbuf =
-                    HardwareBufferManager::getSingleton().createVertexBuffer(
-                        mDeclSize,
-                        vertexCount,
-                        mDynamic? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY : 
-                            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(mDeclSize, vertexCount,
+                                                                                mBufferUsage);
                 rop->vertexData->vertexBufferBinding->setBinding(0, vbuf);
             }
             if (ibufNeedsCreating)
             {
                 // Make the index buffer larger if estimated index count higher
                 // to allow for user-configured growth area
-                size_t indexCount = std::max(rop->indexData->indexCount, 
-                    mEstIndexCount);
-                rop->indexData->indexBuffer =
-                    HardwareBufferManager::getSingleton().createIndexBuffer(
-                        indexType,
-                        indexCount,
-                        mDynamic? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY : 
-                            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                size_t indexCount = std::max(rop->indexData->indexCount, mEstIndexCount);
+                rop->indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+                    indexType, indexCount, mBufferUsage);
             }
             // Write vertex data
             vbuf->writeData(
@@ -866,16 +806,6 @@ namespace Ogre {
     const String& ManualObject::getMovableType(void) const
     {
         return ManualObjectFactory::FACTORY_TYPE_NAME;
-    }
-    //-----------------------------------------------------------------------------
-    const AxisAlignedBox& ManualObject::getBoundingBox(void) const
-    {
-        return mAABB;
-    }
-    //-----------------------------------------------------------------------------
-    Real ManualObject::getBoundingRadius(void) const
-    {
-        return mRadius;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::_updateRenderQueue(RenderQueue* queue)
