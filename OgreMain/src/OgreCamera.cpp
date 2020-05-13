@@ -154,7 +154,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Camera::setDirection(Real x, Real y, Real z)
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         setDirection(Vector3(x,y,z));
+        OGRE_IGNORE_DEPRECATED_END
     }
 
     //-----------------------------------------------------------------------
@@ -240,14 +242,18 @@ namespace Ogre {
     void Camera::lookAt(const Vector3& targetPoint)
     {
         updateView();
+        OGRE_IGNORE_DEPRECATED_BEGIN
         this->setDirection(targetPoint - mRealPosition);
+        OGRE_IGNORE_DEPRECATED_END
     }
 
     //-----------------------------------------------------------------------
     void Camera::lookAt( Real x, Real y, Real z )
     {
         Vector3 vTemp( x, y, z );
+        OGRE_IGNORE_DEPRECATED_BEGIN
         this->lookAt(vTemp);
+        OGRE_IGNORE_DEPRECATED_END
     }
 
     //-----------------------------------------------------------------------
@@ -339,7 +345,9 @@ namespace Ogre {
         // NB assumes that all scene nodes have been updated
         if (mAutoTrackTarget)
         {
+            OGRE_IGNORE_DEPRECATED_BEGIN
             lookAt(mAutoTrackTarget->_getFullTransform() * mAutoTrackOffset);
+            OGRE_IGNORE_DEPRECATED_END
         }
     }
 
