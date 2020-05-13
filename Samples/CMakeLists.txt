@@ -44,7 +44,11 @@ if (OGRE_BUILD_SAMPLES)
 
   file(GLOB SAMPLES_SOURCES ${PROJECT_SOURCE_DIR}/Samples/*/src/*.cpp)
 
-  set(BLACKLIST Browser TerrainTessellation PCZTestApp)
+  set(BLACKLIST Browser TerrainTessellation)
+  if(NOT OGRE_BUILD_PLUGIN_PCZ)
+    list(APPEND BLACKLIST PCZTestApp)
+  endif()
+
   foreach(FILTER_SAMPLE ${BLACKLIST})
     file(GLOB BLACKLIST_CPP ${PROJECT_SOURCE_DIR}/Samples/${FILTER_SAMPLE}/src/*.cpp)
     list(REMOVE_ITEM SAMPLES_SOURCES ${BLACKLIST_CPP})
@@ -55,6 +59,11 @@ if (OGRE_BUILD_SAMPLES)
               ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/DefaultSamplesPlugin.cpp
               ${SAMPLES_SOURCES} ${SAMPLES_HEADERS})
   target_link_libraries(DefaultSamples OgreMain ${SAMPLE_DEPENDENCIES} OgreBites)
+
+  if(OGRE_BUILD_PLUGIN_PCZ)
+    target_link_libraries(DefaultSamples Plugin_PCZSceneManager)
+    target_compile_definitions(DefaultSamples PRIVATE -DHAVE_PCZ_PLUGIN)
+  endif()
 
   if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
     target_compile_definitions(DefaultSamples PRIVATE -DHAVE_IMGUI)

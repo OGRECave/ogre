@@ -208,12 +208,6 @@ endif()
 
 # definitions for samples
 set(OGRE_LIBRARIES OgreMain)
-set(OGRE_MeshLodGenerator_LIBRARIES OgreMeshLodGenerator)
-set(OGRE_Paging_LIBRARIES OgrePaging)
-set(OGRE_Terrain_LIBRARIES OgreTerrain)
-set(OGRE_Volume_LIBRARIES OgreVolume)
-set(OGRE_Plugin_PCZSceneManager_LIBRARIES Plugin_PCZSceneManager)
-set(OGRE_Plugin_OctreeZone_LIBRARIES Plugin_OctreeZone)
 
 # Specify build paths
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
