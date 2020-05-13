@@ -1,156 +1,72 @@
 /*
 -----------------------------------------------------------------------------
-This file based on the Example App framework from Ogre3d (www.ogre3d.org)
+This source file is part of OGRE
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
 
+Copyright (c) 2000-2014 Torus Knot Software Ltd
+Also see acknowledgements in Readme.html
 
+You may use this sample code for anything you like, it is not covered by the
+same license as the rest of the engine.
 -----------------------------------------------------------------------------
 */
 
-/**
-    \file 
-        PCZTestApp.h
-    \brief
-        Specialisation of OGRE's framework application to test/demo the
-        Portal Connected Zone (PCZ) Scene Manager Plugin.
-*/
+#include <SdkSample.h>
 
-#include "ExampleApplication.h" 
+#include <OgrePortal.h>
+#include <OgrePCZone.h>
+#include <OgreAntiPortal.h>
+#include <OgrePCZSceneQuery.h>
+
 #include "RoomObject.h"
-#include "OgreTerrainZone.h"
 
-PCZSceneNode * buildingNode;
-Vector3 buildingTranslate;
-RaySceneQuery* raySceneQuery = 0;
-MovableObject* targetMO = 0;
+using namespace Ogre;
+using namespace OgreBites;
 
-
-class PCZTestFrameListener : public ExampleFrameListener
+class Sample_PCZTest : public SdkSample
 {
+    PCZSceneNode * buildingNode;
+    Vector3 buildingTranslate;
+    RaySceneQuery* raySceneQuery;
+    MovableObject* targetMO;
 public:
-    PCZTestFrameListener(RenderWindow* win, Camera* cam) : ExampleFrameListener( win, cam )
+    Sample_PCZTest() : raySceneQuery(0), targetMO(0)
     {
-        mMoveSpeed = 15.0;
+        mInfo["Title"] = "PCZTest";
+        mInfo["Description"] = "Demonstrates use of the Portal Connected Zone(PCZ) Scene Manager Plugin.";
+        mInfo["Thumbnail"] = "thumb_pcz.png";
+        mInfo["Category"] = "Environment";
+        mInfo["Help"] = "Note that there is no collision detection and transitioning from zone to zone "
+                        "will only work correctly if the user moves the camera through the doorways (as "
+                        "opposed to going through the walls).";
     }
 
-    void moveCamera()
-    {
-        // Make all the spatial changes to the camera's scene node
-        // Note that YAW direction is around a fixed axis (freelook style) rather than a natural YAW
-        //(e.g. airplane)
-        mCamera->getParentSceneNode()->translate(mTranslateVector, Node::TS_LOCAL);
-        mCamera->getParentSceneNode()->pitch(mRotY);
-        mCamera->getParentSceneNode()->yaw(mRotX, Node::TS_WORLD);
-        buildingNode->translate(buildingTranslate, Node::TS_LOCAL);
-    }
-
-    bool frameRenderingQueued( const FrameEvent& evt )
-    {
-        if( ExampleFrameListener::frameRenderingQueued( evt ) == false )
-        return false;
-
-        buildingTranslate = Vector3(0,0,0);
-        if( mKeyboard->isKeyDown( OIS::KC_LBRACKET ) )
-        {
-            buildingTranslate = Vector3(0,-10,0);
-        }
-        if( mKeyboard->isKeyDown( OIS::KC_RBRACKET ) )
-        {
-            buildingTranslate = Vector3(0,10,0);
-        }
-
-        if( mKeyboard->isKeyDown( OIS::KC_LSHIFT ) ||
-            mKeyboard->isKeyDown( OIS::KC_RSHIFT ))
-        {
-            mMoveSpeed = 150;
-        }
-        else
-        {
-            mMoveSpeed = 15;
-        }
-
-        // test the ray scene query by showing bounding box of whatever the camera is pointing directly at 
-        // (takes furthest hit)
-        static Ray updateRay;
-        updateRay.setOrigin(mCamera->getParentSceneNode()->getPosition());
-        updateRay.setDirection(mCamera->getParentSceneNode()->getOrientation()*Vector3::NEGATIVE_UNIT_Z);
-        raySceneQuery->setRay(updateRay);
-        PCZone * zone = ((PCZSceneNode*)(mCamera->getParentSceneNode()))->getHomeZone();
-        ((PCZRaySceneQuery*)raySceneQuery)->setStartZone(zone);
-        ((PCZRaySceneQuery*)raySceneQuery)->setExcludeNode(mCamera->getParentSceneNode());
-        RaySceneQueryResult& qryResult = raySceneQuery->execute();
-        RaySceneQueryResult::iterator i = qryResult.begin();
-        if (i != qryResult.end())
-        {
-            RaySceneQueryResult::reverse_iterator ri = qryResult.rbegin();
-            MovableObject * mo = ri->movable;
-            if (targetMO != mo)
-            {
-                if (targetMO != 0)
-                {
-                    targetMO->getParentSceneNode()->showBoundingBox(false);
-                }
-                targetMO = mo;
-                targetMO->getParentSceneNode()->showBoundingBox(true);
-            }
-        }
-
-        return true;
-    }
-};
-
-class PCZTestApplication : public ExampleApplication
-{
-public:
-    PCZTestApplication() {}
-    ~PCZTestApplication() 
+    void cleanupContent()
     {
         delete raySceneQuery;
     }
 
-protected:
-    SceneNode * mCameraNode;
-
-    virtual void chooseSceneManager(void)
+    void createSceneManager(void)
     {
         // Create the SceneManager, in this case a generic one
-        mSceneMgr = mRoot->createSceneManager("PCZSceneManager", "PCZSceneManager");
+        mSceneMgr = mRoot->createSceneManager("PCZSceneManager");
         // initialize the scene manager using terrain as default zone
         String zoneTypeName = "ZoneType_Default";
-        String zoneFilename = "none";
         ((PCZSceneManager*)mSceneMgr)->init(zoneTypeName);
-        //mSceneMgr->showBoundingBoxes(true);
-    }
-    virtual void createFrameListener(void)
-    {
-        mFrameListener= new PCZTestFrameListener(mWindow, mCamera);
-        mRoot->addFrameListener(mFrameListener);
-    }
-    virtual void createCamera(void)
-    {
-        // Create the camera
-        mCamera = mSceneMgr->createCamera("PlayerCam");
 
-        // NEW: create a node for the camera and control that instead of camera directly.
-        // We do this because PCZSceneManager requires camera to have a node 
-        mCameraNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("PlayerCamNode");
-        // attach the camera to the node
-        mCameraNode->attachObject(mCamera);
-        // fix the yaw axis of the camera
-        mCameraNode->setFixedYawAxis(true);
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        mShaderGenerator->addSceneManager(mSceneMgr);
+#endif
 
-        mCamera->setNearClipDistance(2);
-        mCamera->setFarClipDistance( 1000 );
-        // set camera zone
-//      ((PCZSceneNode*)(mCameraNode))->setHomeZone(((PCZSceneManager*)(mSceneMgr))->getDefaultZone());
-
+        if(mOverlaySystem)
+            mSceneMgr->addRenderQueueListener(mOverlaySystem);
     }
+
     // utility function to create terrain zones easily
     PCZone * createTerrainZone(String & zoneName, String & terrain_cfg)
     {
         // load terrain into the terrain zone
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        terrain_cfg = mResourcePath + terrain_cfg;
-#endif
         PCZone * terrainZone = ((PCZSceneManager*)mSceneMgr)->createZone(String("ZoneType_Terrain"), zoneName);
         terrainZone->notifyCameraCreated(mCamera);
         ((PCZSceneManager*)mSceneMgr)->setZoneGeometry( zoneName, (PCZSceneNode*)mSceneMgr->getRootSceneNode(), terrain_cfg );
@@ -224,9 +140,11 @@ protected:
         return antiPortalNode;
     }
 
-    // Just override the mandatory create scene method
-    void createScene(void)
+    void setupContent(void)
     {
+        mCameraMan->setTopSpeed(15);
+        mCamera->setNearClipDistance(2);
+
         // Set ambient light
         mSceneMgr->setAmbientLight(ColourValue(0.25, 0.25, 0.25));
 
@@ -237,20 +155,18 @@ protected:
 
         // Create a light
         Light* l = mSceneMgr->createLight("MainLight");
-        l->setPosition(0,0,0); 
         l->setAttenuation(500, 0.5, 1.0, 0.0);
         // Accept default settings: point light, white diffuse, just set position
         // attach light to a scene node so the PCZSM can handle it properly (zone-wise)
-        // IMPORTANT: Lights (just like cameras) MUST be connected to a scene node!
         SceneNode * lightNode = mCameraNode->createChildSceneNode("light_Node");
-        lightNode->attachObject(l);      
+        lightNode->attachObject(l);
 
         // Fog
         // NB it's VERY important to set this before calling setWorldGeometry 
         // because the vertex program picked will be different
         ColourValue fadeColour(0.101, 0.125, 0.1836);
         mSceneMgr->setFog( FOG_LINEAR, fadeColour, .001, 500, 1000);
-        mWindow->getViewport(0)->setBackgroundColour(fadeColour);
+        mViewport->setBackgroundColour(fadeColour);
 
         // create a terrain zone
 //        String terrain_cfg("terrain.cfg");
@@ -340,8 +256,6 @@ protected:
 
         // Position camera in the center of the building
         mCameraNode->setPosition(buildingNode->getPosition());
-        // Look back along -Z
-        mCamera->lookAt(mCameraNode->_getDerivedPosition() + Vector3(0,0,-300));
         // Update bounds for camera
         mCameraNode->_updateBounds();
 
@@ -352,4 +266,52 @@ protected:
 
     }
 
+    /**
+        a simple Ray Scene query which highlights the 'furthest' object in
+        front of the camera (not very visible inside the castle since the room the
+        camera is in is usually what gets highlighted).  It's just a simple test of
+        ray scene queries. Scene Queries will (at least, should) traverse portals.
+     */
+    bool frameRenderingQueued( const FrameEvent& evt )
+    {
+        SdkSample::frameRenderingQueued(evt);
+#if 0
+        buildingTranslate = Vector3(0,0,0);
+        if( mKeyboard->isKeyDown( OIS::KC_LBRACKET ) )
+        {
+            buildingTranslate = Vector3(0,-10,0);
+        }
+        if( mKeyboard->isKeyDown( OIS::KC_RBRACKET ) )
+        {
+            buildingTranslate = Vector3(0,10,0);
+        }
+#endif
+        // test the ray scene query by showing bounding box of whatever the camera is pointing directly at
+        // (takes furthest hit)
+        static Ray updateRay;
+        updateRay.setOrigin(mCamera->getParentSceneNode()->getPosition());
+        updateRay.setDirection(mCamera->getParentSceneNode()->getOrientation()*Vector3::NEGATIVE_UNIT_Z);
+        raySceneQuery->setRay(updateRay);
+        PCZone * zone = ((PCZSceneNode*)(mCamera->getParentSceneNode()))->getHomeZone();
+        ((PCZRaySceneQuery*)raySceneQuery)->setStartZone(zone);
+        ((PCZRaySceneQuery*)raySceneQuery)->setExcludeNode(mCamera->getParentSceneNode());
+        RaySceneQueryResult& qryResult = raySceneQuery->execute();
+        RaySceneQueryResult::iterator i = qryResult.begin();
+        if (i != qryResult.end())
+        {
+            RaySceneQueryResult::reverse_iterator ri = qryResult.rbegin();
+            MovableObject * mo = ri->movable;
+            if (targetMO != mo)
+            {
+                if (targetMO != 0)
+                {
+                    targetMO->getParentSceneNode()->showBoundingBox(false);
+                }
+                targetMO = mo;
+                targetMO->getParentSceneNode()->showBoundingBox(true);
+            }
+        }
+
+        return true;
+    }
 };

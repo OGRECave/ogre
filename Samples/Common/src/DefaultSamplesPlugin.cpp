@@ -63,6 +63,9 @@
 #include "OceanDemo.h"
 #include "ParticleFX.h"
 #include "ParticleGS.h"
+#ifdef HAVE_PCZ_PLUGIN
+    #include "PCZTestApp.h"
+#endif
 #include "PBR.h"
 #include "PNTrianglesTessellation.h"
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
@@ -121,6 +124,9 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_LightShafts);
     addSample(new Sample_MeshLod);
     addSample(new Sample_ParticleFX);
+#ifdef HAVE_PCZ_PLUGIN
+    addSample(new Sample_PCZTest);
+#endif
     addSample(new Sample_ParticleGS);
     addSample(new Sample_Smoke);
 #endif // OGRE_PLATFORM_WINRT
