@@ -24,19 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-OgrePCPlane.h  -  Portal Culling Plane
-
-Specialized Plane that is customized for working with the PCZSceneManager. 
-Each Plane has a pointer to the Portal which was used to create it
-Portal Culling Planes are created from one side of a portal and the
-origin of a camera.
-   
------------------------------------------------------------------------------
-begin                : Mon Feb 26 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    :
------------------------------------------------------------------------------
 */
 
 #ifndef PC_PLANE_H
@@ -47,9 +34,21 @@ Code Style Update    :
 
 namespace Ogre
 {
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup PCZSceneManager
+    *  @{
+    */
     class PortalBase;
 
+    /** Portal Culling Plane
 
+        Specialized Plane that is customized for working with the PCZSceneManager.
+        Each Plane has a pointer to the Portal which was used to create it
+        Portal Culling Planes are created from one side of a portal and the
+        origin of a camera.
+     */
     class _OgrePCZPluginExport PCPlane : public Plane
     {
     public:
@@ -87,7 +86,8 @@ namespace Ogre
         ///Portal used to create this plane.
         PortalBase *mPortal;
     };
-
+    /** @} */
+    /** @} */
 }
 
 

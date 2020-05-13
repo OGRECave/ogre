@@ -24,14 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-OgrePCZoneFactory.h  -  PCZone Factory & Factory Manager
-
------------------------------------------------------------------------------
-begin                : Mon Apr 16 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    :
------------------------------------------------------------------------------
 */
 
 #ifndef PCZONE_FACTORY_H

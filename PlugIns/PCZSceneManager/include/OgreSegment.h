@@ -24,14 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-OgreSegment.h  -  3D Line Segment class for intersection testing in Ogre3D
-Some algorithms based off code from the Wild Magic library by Dave Eberly
------------------------------------------------------------------------------
-begin                : Mon Apr 02 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    : Apr 5, 2007
------------------------------------------------------------------------------
 */
 
 #ifndef SEGMENT_H
@@ -43,6 +35,10 @@ namespace Ogre
 {
     class Capsule;
 
+    /** 3D Line Segment class for intersection testing in Ogre3D
+
+        Some algorithms based off code from the Wild Magic library by Dave Eberly
+     */
     class Segment
     {
     public:

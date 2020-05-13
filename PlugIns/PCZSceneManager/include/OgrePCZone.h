@@ -24,28 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-PCZone.h  -  Portal Connected Zone (PCZone) header file.
------------------------------------------------------------------------------
-Portal Connected Zones are spatial constructs for partitioning space into cross
-connected zones.  Each zone is connected to other zones using Portal nodes.
-
-Zones contain references to nodes which touch them.  However, zones do not
-care how nodes are arranged hierarchically.  Whether or not a node is 
-referenced as being part of a zone is entirely determined by the user or
-by the node crossing a portal into or out-of the zone.
-
-Nodes can be referenced by several zones at once, but only one zone is
-considered the "home" zone of the node.  Home zone is determined by location
-of the centerpoint of the node.  Nodes can "touch" other zones if the node 
-BV intersects a portal (this is also called "visiting" a zone).  Nodes keep
-a pointer to their home zone and a list of references to zones they are 
-"visiting".
------------------------------------------------------------------------------
-begin                : Tue Feb 20 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    :
------------------------------------------------------------------------------
 */
 
 #ifndef PCZONE_H
@@ -56,6 +34,12 @@ Code Style Update    :
 
 namespace Ogre
 {
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup PCZSceneManager
+    *  @{
+    */
     class Portal;
     class AntiPortal;
     class PCZSceneNode;
@@ -76,6 +60,21 @@ namespace Ogre
     typedef std::map<String, SceneNode*> SceneNodeList;
 
     /** Portal-Connected Zone datastructure for managing scene nodes.
+
+        Portal Connected Zones are spatial constructs for partitioning space into cross
+        connected zones.  Each zone is connected to other zones using Portal nodes.
+
+        Zones contain references to nodes which touch them.  However, zones do not
+        care how nodes are arranged hierarchically.  Whether or not a node is
+        referenced as being part of a zone is entirely determined by the user or
+        by the node crossing a portal into or out-of the zone.
+
+        Nodes can be referenced by several zones at once, but only one zone is
+        considered the "home" zone of the node.  Home zone is determined by location
+        of the centerpoint of the node.  Nodes can "touch" other zones if the node
+        BV intersects a portal (this is also called "visiting" a zone).  Nodes keep
+        a pointer to their home zone and a list of references to zones they are
+        "visiting".
     */
 
     class _OgrePCZPluginExport PCZone : public SceneCtlAllocatedObject
@@ -306,7 +305,8 @@ namespace Ogre
         PCZSceneNode *  mAssociatedNode;
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif
