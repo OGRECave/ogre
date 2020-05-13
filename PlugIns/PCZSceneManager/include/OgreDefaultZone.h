@@ -24,15 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-DefaultZone.h  -  Default implementation of PCZone header file.
-
-Default Implementation of PCZone
------------------------------------------------------------------------------
-begin                : Tue Feb 20 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    :
------------------------------------------------------------------------------
 */
 
 #ifndef DEFAULTZONE_H

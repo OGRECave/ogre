@@ -24,14 +24,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-OgreCapsule.h  -  3D Line-Swept-Sphere class for intersection testing in Ogre3D
-Some algorithms based off code from the Wild Magic library by Dave Eberly
------------------------------------------------------------------------------
-begin                : Mon Apr 02 2007
-author               : Eric Cha
-email                : ericc@xenopi.com
-Code Style Update    :
------------------------------------------------------------------------------
 */
 
 #ifndef CAPSULE_H
@@ -41,7 +33,15 @@ Code Style Update    :
 
 namespace Ogre
 {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup PCZSceneManager
+    *  @{
+    */
+    /** 3D Line-Swept-Sphere class for intersection testing in Ogre3D
+        Some algorithms based off code from the Wild Magic library by Dave Eberly
+     */
     class Capsule
     {
     public:
@@ -63,6 +63,8 @@ namespace Ogre
         Segment mSegment;
         Real    mRadius;
     };
+    /** @} */
+    /** @} */
 }
 
 #endif //CAPSULE3_H
