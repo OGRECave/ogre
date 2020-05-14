@@ -2770,11 +2770,6 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    uint8 Terrain::getBlendTextureCount(uint8 numLayers) const
-    {
-        return ((numLayers - 2) / 4) + 1;
-    }
-    //---------------------------------------------------------------------
     uint8 Terrain::getBlendTextureCount() const
     {
         return (uint8)mBlendTextureList.size();
