@@ -365,7 +365,7 @@ const String& Compositor::getTextureInstanceName(const String& name, size_t mrtI
     return getTextureInstance(name, mrtIndex)->getName();
 }
 //-----------------------------------------------------------------------       
-TexturePtr Compositor::getTextureInstance(const String& name, size_t mrtIndex)
+const TexturePtr& Compositor::getTextureInstance(const String& name, size_t mrtIndex)
 {
     //Try simple texture
     GlobalTextureMap::iterator i = mGlobalTextures.find(name);

@@ -217,7 +217,7 @@ namespace Ogre {
         @return
             The texture pointer, corresponds to a real texture.
         */
-        TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
+        const TexturePtr& getTextureInstance(const String& name, size_t mrtIndex);
 
         /** Get the render target for a given render texture name. 
         @remarks
@@ -375,7 +375,7 @@ namespace Ogre {
         @param mrtIndex
             For MRTs, which attached surface to retrieve.
         */
-        const String &getSourceForTex(const String &name, size_t mrtIndex = 0);
+        const TexturePtr &getSourceForTex(const String &name, size_t mrtIndex = 0);
 
         /** Queue a render system operation.
         */

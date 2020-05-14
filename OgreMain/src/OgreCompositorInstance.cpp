@@ -431,7 +431,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
                     {
                         if(x < targetpass->getNumTextureUnitStates())
                         {
-                            targetpass->getTextureUnitState((ushort)x)->setTextureName(getSourceForTex(inp.name, inp.mrtIndex));
+                            targetpass->getTextureUnitState((ushort)x)->setTexture(getSourceForTex(inp.name, inp.mrtIndex));
                         } 
                         else
                         {
@@ -595,10 +595,10 @@ CompositorChain *CompositorInstance::getChain()
 const String& CompositorInstance::getTextureInstanceName(const String& name, 
                                                          size_t mrtIndex)
 {
-    return getSourceForTex(name, mrtIndex);
+    return getSourceForTex(name, mrtIndex)->getName();
 }
 //---------------------------------------------------------------------
-TexturePtr CompositorInstance::getTextureInstance(const String& name, size_t mrtIndex)
+const TexturePtr& CompositorInstance::getTextureInstance(const String& name, size_t mrtIndex)
 {
     // try simple textures first
     LocalTextureMap::iterator i = mLocalTextures.find(name);
@@ -615,7 +615,8 @@ TexturePtr CompositorInstance::getTextureInstance(const String& name, size_t mrt
     }
 
     // not present
-    return TexturePtr();
+    static TexturePtr nullPtr;
+    return nullPtr;
 
 }
 //-----------------------------------------------------------------------
@@ -1137,7 +1138,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
 
 }
 //-----------------------------------------------------------------------
-const String &CompositorInstance::getSourceForTex(const String &name, size_t mrtIndex)
+const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t mrtIndex)
 {
     CompositionTechnique::TextureDefinition* texDef = mTechnique->getTextureDefinition(name);
     if(texDef == 0)
@@ -1184,7 +1185,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
                     OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Referencing compositor that is later in the chain",
                         "CompositorInstance::getSourceForTex");
                 }
-                return refCompInst->getTextureInstanceName(texDef->refTexName, mrtIndex);
+                return refCompInst->getTextureInstance(texDef->refTexName, mrtIndex);
             }
             case CompositionTechnique::TS_GLOBAL:
             {
@@ -1195,7 +1196,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
                     OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
                         "CompositorInstance::getSourceForTex");
                 }
-                return refComp->getTextureInstanceName(texDef->refTexName, mrtIndex);
+                return refComp->getTextureInstance(texDef->refTexName, mrtIndex);
             }
             case CompositionTechnique::TS_LOCAL:
                 break; // handled by resolveTexReference
@@ -1209,7 +1210,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
         LocalTextureMap::iterator i = mLocalTextures.find(name);
         if(i != mLocalTextures.end())
         {
-            return i->second->getName();
+            return i->second;
         }
     }
     else
@@ -1218,7 +1219,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
         LocalTextureMap::iterator i = mLocalTextures.find(getMRTTexLocalName(name, mrtIndex));
         if (i != mLocalTextures.end())
         {
-            return i->second->getName();
+            return i->second;
         }
     }
     
