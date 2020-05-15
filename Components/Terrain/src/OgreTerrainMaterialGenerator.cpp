@@ -185,7 +185,7 @@ namespace Ogre
     void TerrainMaterialGenerator::Profile::updateCompositeMap(const Terrain* terrain, const Rect& rect)
     {
         // convert point-space rect into image space
-        size_t compSize = terrain->getCompositeMap()->getWidth();
+        long compSize = terrain->getCompositeMap()->getWidth();
         Rect imgRect;
         Vector3 inVec, outVec;
         inVec.x = rect.left;
@@ -199,11 +199,7 @@ namespace Ogre
         imgRect.right = outVec.x * (Real)compSize + 1; 
         imgRect.bottom = (1.0 - outVec.y) * compSize + 1;
 
-        imgRect.left = std::max(0L, imgRect.left);
-        imgRect.top = std::max(0L, imgRect.top);
-        imgRect.right = std::min((long)compSize, imgRect.right);
-        imgRect.bottom = std::min((long)compSize, imgRect.bottom);
-        
+        imgRect = imgRect.intersect({0, 0, compSize, compSize});
 
         mParent->_renderCompositeMap(
             compSize, imgRect, 
