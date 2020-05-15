@@ -147,14 +147,12 @@ protected:
     // True if the fog parameters should be taken from the pass.
     bool mPassOverrideParams;
 
-    // World view projection parameter.     
-    UniformParameterPtr mWorldViewProjMatrix;
     // Fog colour parameter.    
     UniformParameterPtr mFogColour;
     // Fog parameters program parameter.    
     UniformParameterPtr mFogParams;
-    // Vertex shader input position parameter.
-    ParameterPtr mVSInPos;
+    // Vertex shader output position parameter.
+    ParameterPtr mVSOutPos;
     // Vertex shader output fog colour parameter.
     ParameterPtr mVSOutFogFactor;
     // Pixel shader input fog factor.
