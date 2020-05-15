@@ -40,6 +40,6 @@ vec4 expand(vec4 v)
 vec4 lit(float NdotL, float NdotH, float m) {
     float ambient = 1.0;
     float diffuse = max(0.0, NdotL);
-    float specular = step(0.0, NdotL) * max(NdotH, 0.0);
+    float specular = step(0.0, NdotL) * max(pow(NdotH, m), 0.0);
     return vec4(ambient, diffuse, specular, 1.0);
 }
