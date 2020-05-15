@@ -69,17 +69,20 @@ The last thing we will do is make sure to cleanup any temporary resources that w
 
 That completes our `createScene` method. Now we just have to complete all of the methods we jumped over.
 ## Terrain appearance {#bt3Appearance}
-The Ogre Terrain component has a large number of options that can be set to change how the terrain is rendered. To start out, we configure the level of detail as:
+The %Ogre Terrain component has a large number of options that can be set to change how the terrain is rendered. To start out, we configure the level of detail (LOD). There are two LOD approaches in the Terrain component, one controlling the geometry and the other controlling the texture.
 
 @snippet Samples/Simple/include/Terrain.h configure_lod
 
-We are setting two global options here. The first call sets the largest error in pixels allowed between our ideal terrain and the mesh that is created to render it. A smaller number will mean a more accurate terrain, because it will require more vertices to reduce the error. The second call determines the distance at which Ogre will still apply our lightmap. If you increase this, then you will see Ogre apply lighting effects out to a farther distance.
+The first call sets the largest allowed error for geometry. It controls the distance in pixels allowed between our ideal terrain and the mesh that is created to render it. A smaller number will mean a more accurate terrain, because it will require more vertices to reduce the error.
 
-The next thing we'll do is pass our lighting information to our terrain.
+The second call determines the distance at which %Ogre will reduce the texture resolution. For this, %Ogre automatically creates a composite map, where the terrain textures, the blending textures and lighting information are "baked" together at a lower resolution. This way only a single texture lookup is needed when using the low LOD setting.
+If you increase the distance, then %Ogre will use the high LOD setting out to a farther distance, where it computes all lighting effects per-pixel.
+
+In order to generate composite map correctly, we have to pass our lighting information to the terrain.
 
 @snippet Samples/Simple/include/Terrain.h composite_lighting
 
-In the first call, we are sure to call `getDerivedDirection`, because this will apply any transforms that are applied to our Light's direction by any SceneNode it may be attached to. Since our Light is attached to the root Node, this will be the same as calling `getDirection`, but the difference is important to know about. The next two calls should be pretty self-explanatory. We simply set the ambient light and diffuse color for our terrain to match our scene lighting.
+In the first call, `getDerivedDirection` will apply all transforms by the parent SceneNodes to our Light's direction. The next two calls should be pretty self-explanatory. We simply set the ambient light and diffuse color for our terrain to match our scene lighting.
 
 The next thing we do is get a reference to the import settings of our TerrainGroup and set some basic values.
 
