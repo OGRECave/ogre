@@ -440,22 +440,20 @@ namespace Ogre
                 outStream << "    mat3 TBN = mat3(tangent, binormal, normal);\n";
 
                 // set up lighting result placeholders for interpolation
-                outStream << "    vec4 litRes, litResLayer;\n";
-                outStream << "    vec3 TSlightDir, TSeyeDir, TShalfAngle, TSnormal;\n";
+                outStream << "    vec3 TSnormal;\n";
                 if (prof->isLayerParallaxMappingEnabled())
                     outStream << "    float displacement;\n";
                 // move
-                outStream << "    TSlightDir = normalize(TBN * lightDir);\n";
-                outStream << "    TSeyeDir = normalize(TBN * eyeDir);\n";
+                outStream << "    lightDir = normalize(TBN * lightDir);\n";
+                outStream << "    eyeDir = normalize(TBN * eyeDir);\n";
             }
             else
             {
                 // simple per-pixel lighting with no normal mapping
                 outStream << "    lightDir = normalize(lightDir);\n";
                 outStream << "    eyeDir = normalize(eyeDir);\n";
-                outStream << "    vec3 halfAngle = normalize(lightDir + eyeDir);\n";
-                outStream << "    vec4 litRes = lit(dot(normal, lightDir), dot(normal, halfAngle), scaleBiasSpecular.z);\n";
             }
+            outStream << "    vec3 halfAngle = normalize(lightDir + eyeDir);\n";
         }
     }
     //---------------------------------------------------------------------
@@ -485,17 +483,16 @@ namespace Ogre
                 // modify UV - note we have to sample an extra time
                 outStream << "    displacement = texture2D(normtex" << layer << ", uv" << layer << ").a\n"
                              "        * scaleBiasSpecular.x + scaleBiasSpecular.y;\n";
-                outStream << "    uv" << layer << " += TSeyeDir.xy * displacement;\n";
+                outStream << "    uv" << layer << " += eyeDir.xy * displacement;\n";
             }
 
             // access TS normal map
             outStream << "    TSnormal = expand(texture2D(normtex" << layer << ", uv" << layer << ")).rgb;\n";
-            outStream << "    TShalfAngle = normalize(TSlightDir + TSeyeDir);\n";
-            outStream << "    litResLayer = lit(dot(TSnormal, TSlightDir), dot(TSnormal, TShalfAngle), scaleBiasSpecular.z);\n";
+
             if (!layer)
-                outStream << "    litRes = litResLayer;\n";
+                outStream << "    normal = TSnormal;\n";
             else
-                outStream << "    litRes = mix(litRes, litResLayer, " << blendWeightStr << ");\n";
+                outStream << "    normal += TSnormal * " << blendWeightStr << ";\n";
 
         }
 
@@ -562,6 +559,8 @@ namespace Ogre
             }
 
             // diffuse lighting
+            outStream << "    normal = normalize(normal);\n";
+            outStream << "    vec4 litRes = lit(dot(normal, lightDir), dot(normal, halfAngle), scaleBiasSpecular.z);\n";
             outStream << "    gl_FragColor.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
 
             // specular default
