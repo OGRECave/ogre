@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    class Rectangle2D;
     class Terrain;
 
     /** \addtogroup Optional
@@ -401,9 +402,8 @@ namespace Ogre
         unsigned int mDebugLevel;
         SceneManager* mCompositeMapSM;
         Camera* mCompositeMapCam;
-        SceneNode* mCamNode;
         Texture* mCompositeMapRTT; // deliberately holding this by raw pointer to avoid shutdown issues
-        ManualObject* mCompositeMapPlane;
+        Rectangle2D* mCompositeMapPlane;
         Light* mCompositeMapLight;
         SceneNode* mLightNode;
 
