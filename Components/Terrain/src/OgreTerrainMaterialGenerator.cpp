@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 #include "OgreRenderTexture.h"
 #include "OgreSceneNode.h"
+#include "OgreRectangle2D.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing
@@ -77,7 +78,6 @@ namespace Ogre
             Root::getSingleton().destroySceneManager(mCompositeMapSM);
             mCompositeMapSM = 0;
             mCompositeMapCam = 0;
-            mCamNode = 0;
             mCompositeMapPlane = 0;
             mCompositeMapLight = 0;
             mLightNode = 0;
@@ -91,16 +91,12 @@ namespace Ogre
         {
             // dedicated SceneManager
             mCompositeMapSM = Root::getSingleton().createSceneManager(DefaultSceneManagerFactory::FACTORY_TYPE_NAME);
-            float camDist = 100;
-            float halfCamDist = camDist * 0.5f;
             mCompositeMapCam = mCompositeMapSM->createCamera("cam");
-            mCamNode = mCompositeMapSM->getRootSceneNode()->createChildSceneNode(Vector3(0, 0, camDist));
-            mCamNode->lookAt(Vector3::ZERO, Node::TS_PARENT);
-            mCamNode->attachObject(mCompositeMapCam);
+            mCompositeMapSM->getRootSceneNode()->attachObject(mCompositeMapCam);
             mCompositeMapCam->setProjectionType(PT_ORTHOGRAPHIC);
-            mCompositeMapCam->setNearClipDistance(10);
-            mCompositeMapCam->setFarClipDistance(500);
-            mCompositeMapCam->setOrthoWindow(camDist, camDist);
+            mCompositeMapCam->setNearClipDistance(0.5);
+            mCompositeMapCam->setFarClipDistance(1.5);
+            mCompositeMapCam->setOrthoWindow(1, 1);
 
             // Just in case material relies on light auto params
             mCompositeMapLight = mCompositeMapSM->createLight();
@@ -114,24 +110,18 @@ namespace Ogre
 
 
             // set up scene
-            mCompositeMapPlane = mCompositeMapSM->createManualObject();
-            mCompositeMapPlane->begin(mat);
-            mCompositeMapPlane->position(-halfCamDist, halfCamDist, 0);
-            mCompositeMapPlane->textureCoord(0 - hOffset, 0 - vOffset);
-            mCompositeMapPlane->position(-halfCamDist, -halfCamDist, 0);
-            mCompositeMapPlane->textureCoord(0 - hOffset, 1 - vOffset);
-            mCompositeMapPlane->position(halfCamDist, -halfCamDist, 0);
-            mCompositeMapPlane->textureCoord(1 - hOffset, 1 - vOffset);
-            mCompositeMapPlane->position(halfCamDist, halfCamDist, 0);
-            mCompositeMapPlane->textureCoord(1 - hOffset, 0 - vOffset);
-            mCompositeMapPlane->quad(0, 1, 2, 3);
-            mCompositeMapPlane->end();
+            mCompositeMapPlane = new Rectangle2D(true);
+            mCompositeMapPlane->setCorners(-1, 1, 1, -1);
+            mCompositeMapPlane->setUVs({0 - hOffset, 0 - vOffset}, {0 - hOffset, 1 - vOffset},
+                                       {1 - hOffset, 0 - vOffset}, {1 - hOffset, 1 - vOffset});
+            mCompositeMapPlane->setBoundingBox(AxisAlignedBox::BOX_INFINITE);
+
             mCompositeMapSM->getRootSceneNode()->attachObject(mCompositeMapPlane);
 
         }
 
         // update
-        mCompositeMapPlane->setMaterial(0, mat);
+        mCompositeMapPlane->setMaterial(mat);
         TerrainGlobalOptions& globalopts = TerrainGlobalOptions::getSingleton();
         mLightNode->setDirection(globalopts.getLightMapDirection(), Node::TS_WORLD);
         mCompositeMapLight->setDiffuseColour(globalopts.getCompositeMapDiffuse());
