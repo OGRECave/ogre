@@ -525,11 +525,7 @@ namespace Ogre
             if (mVertexDataRecord)
             {
                 // Trim to our bounds
-                Rect updateRect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY);
-                updateRect.left = std::max(updateRect.left, rect.left);
-                updateRect.right = std::min(updateRect.right, rect.right);
-                updateRect.top = std::max(updateRect.top, rect.top);
-                updateRect.bottom = std::min(updateRect.bottom, rect.bottom);
+                Rect updateRect = rect.intersect(Rect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY));
 
                 // update the GPU buffer directly
                 // TODO: do we have no use for CPU vertex data after initial load?

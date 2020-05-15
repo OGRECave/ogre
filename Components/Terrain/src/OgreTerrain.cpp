@@ -327,9 +327,7 @@ namespace Ogre
             // we never reduce them (since that would require re-examining more samples)
             // Since we now save this data in the file though, we need to make sure we've
             // calculated the optimal
-            Rect rect;
-            rect.top = 0; rect.bottom = mSize;
-            rect.left = 0; rect.right = mSize;
+            Rect rect(0, 0, mSize, mSize);
             calculateHeightDeltas(rect);
             finaliseHeightDeltas(rect, false);
         }
@@ -926,9 +924,7 @@ namespace Ogre
         mQuadTree->prepare();
 
         // calculate entire terrain
-        Rect rect;
-        rect.top = 0; rect.bottom = mSize;
-        rect.left = 0; rect.right = mSize;
+        Rect rect(0, 0, mSize, mSize);
         calculateHeightDeltas(rect);
         finaliseHeightDeltas(rect, true);
 
@@ -1870,10 +1866,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::dirty()
     {
-        Rect rect;
-        rect.top = 0; rect.bottom = mSize;
-        rect.left = 0; rect.right = mSize;
-        dirtyRect(rect);
+        dirtyRect(Rect(0, 0, mSize, mSize));
     }
     //---------------------------------------------------------------------
     void Terrain::dirtyRect(const Rect& rect)
@@ -1904,10 +1897,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Terrain::dirtyLightmap()
     {
-        Rect rect;
-        rect.top = 0; rect.bottom = mSize;
-        rect.left = 0; rect.right = mSize;
-        dirtyLightmapRect(rect);
+        dirtyLightmapRect(Rect(0, 0, mSize, mSize));
     }
     //---------------------------------------------------------------------
     void Terrain::update(bool synchronous)
@@ -2090,12 +2080,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     Rect Terrain::calculateHeightDeltas(const Rect& rect)
     {
-        Rect clampedRect(rect);
-        clampedRect.left = std::max(0L, clampedRect.left);
-        clampedRect.top = std::max(0L, clampedRect.top);
-        clampedRect.right = std::min((long)mSize, clampedRect.right);
-        clampedRect.bottom = std::min((long)mSize, clampedRect.bottom);
-
+        Rect clampedRect = rect.intersect(Rect(0, 0, mSize, mSize));
         Rect finalRect(clampedRect);
 
         mQuadTree->preDeltaCalculation(clampedRect);
@@ -2249,12 +2234,7 @@ namespace Ogre
     void Terrain::finaliseHeightDeltas(const Rect& rect, bool cpuData)
     {
 
-        Rect clampedRect(rect);
-        clampedRect.left = std::max(0L, clampedRect.left);
-        clampedRect.top = std::max(0L, clampedRect.top);
-        clampedRect.right = std::min((long)mSize, clampedRect.right);
-        clampedRect.bottom = std::min((long)mSize, clampedRect.bottom);
-
+        Rect clampedRect = rect.intersect(Rect(0, 0, mSize, mSize));
         // min/max information
         mQuadTree->finaliseDeltaValues(clampedRect);
         // delta vertex data
@@ -3512,10 +3492,7 @@ namespace Ogre
         widenedRect.bottom = (long)(widenedRect.bottom * terrainToLightmapScale);
 
         // clamp 
-        widenedRect.left = std::max(0L, widenedRect.left);
-        widenedRect.top = std::max(0L, widenedRect.top);
-        widenedRect.right = std::min((long)mLightmapSizeActual, widenedRect.right);
-        widenedRect.bottom = std::min((long)mLightmapSizeActual, widenedRect.bottom);
+        widenedRect = widenedRect.intersect(Rect(0, 0, mLightmapSizeActual, mLightmapSizeActual));
 
         outFinalRect = widenedRect;
 
@@ -3614,10 +3591,7 @@ namespace Ogre
                 Rect widenedRect;
                 widenRectByVector(TerrainGlobalOptions::getSingleton().getLightMapDirection(), mCompositeMapDirtyRect, widenedRect);
                 // clamp
-                widenedRect.left = std::max(widenedRect.left, 0L);
-                widenedRect.top = std::max(widenedRect.top, 0L);
-                widenedRect.right = std::min(widenedRect.right, (long)mSize);
-                widenedRect.bottom = std::min(widenedRect.bottom, (long)mSize);
+                widenedRect = widenedRect.intersect(Rect(0, 0, mSize, mSize));
                 mMaterialGenerator->updateCompositeMap(this, widenedRect);  
             }
             else
