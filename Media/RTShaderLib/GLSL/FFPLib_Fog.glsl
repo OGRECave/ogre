@@ -46,12 +46,10 @@ THE SOFTWARE.
 
 
 //-----------------------------------------------------------------------------
-void FFP_VertexFog_Linear(in mat4 mWorldViewProj, 
-				  in vec4 pos, 				   
+void FFP_VertexFog_Linear(in vec4 vOutPos,
 				  in vec4 fogParams,				   
 				  out float oFogFactor)
 {
-	vec4 vOutPos  = mWorldViewProj * pos;
 	float distance  = abs(vOutPos.w);	
 	float fogFactor = (fogParams.z - distance) * fogParams.w;
 	
@@ -59,43 +57,28 @@ void FFP_VertexFog_Linear(in mat4 mWorldViewProj,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_VertexFog_Exp(in mat4 mWorldViewProj, 
-			     in vec4 pos, 				   
+void FFP_VertexFog_Exp(in vec4 vOutPos,
 			     in vec4 fogParams,				   
 			     out float oFogFactor)
 {
-	vec4 vOutPos  = mWorldViewProj * pos;
 	float distance  = abs(vOutPos.w);	
-	float exp       = distance*fogParams.x;
-	float fogFactor = 1.0 / pow(2.71828, exp);
+	float x       = distance*fogParams.x;
+	float fogFactor = 1.0 / exp(x);
 	
 	oFogFactor  = clamp(fogFactor, 0.0, 1.0);	
 }
 
 //-----------------------------------------------------------------------------
-void FFP_VertexFog_Exp2(in mat4 mWorldViewProj, 
-				   in vec4 pos, 				   
+void FFP_VertexFog_Exp2(in vec4 vOutPos,
 				   in vec4 fogParams,				   
 				   out float oFogFactor)
 {
-	vec4 vOutPos  = mWorldViewProj * pos;
 	float distance  = abs(vOutPos.w);	
-	float exp       = (distance*fogParams.x*distance*fogParams.x);
-	float fogFactor = 1.0 / pow(2.71828, exp);
+	float x       = (distance*fogParams.x*distance*fogParams.x);
+	float fogFactor = 1.0 / exp(x);
 	
 	oFogFactor  = clamp(fogFactor, 0.0, 1.0);	
 }
-
-
-//-----------------------------------------------------------------------------
-void FFP_PixelFog_Depth(in mat4 mWorldViewProj, 
-				   in vec4 pos, 				   				   				   
-				   out float oDepth)
-{
-	vec4 vOutPos  = mWorldViewProj * pos;
-	oDepth			= vOutPos.w;	
-}
-
 
 //-----------------------------------------------------------------------------
 void FFP_PixelFog_PositionDepth(in mat4 mWorld, 
@@ -130,8 +113,8 @@ void FFP_PixelFog_Exp(in float depth,
 				   out vec4 oColor)
 {
 	float distance  = abs(depth);	
-	float exp       = (distance*fogParams.x);
-	float fogFactor = clamp(1.0 / pow(2.71828, exp), 0.0, 1.0);
+	float x       = (distance*fogParams.x);
+	float fogFactor = clamp(1.0 / exp(x), 0.0, 1.0);
 	
 	oColor = mix(fogColor, baseColor, fogFactor);
 }
@@ -144,8 +127,8 @@ void FFP_PixelFog_Exp2(in float depth,
 				   out vec4 oColor)
 {
 	float distance  = abs(depth);	
-	float exp       = (distance*fogParams.x*distance*fogParams.x);
-	float fogFactor = clamp(1.0 / pow(2.71828, exp), 0.0, 1.0);
+	float x       = (distance*fogParams.x*distance*fogParams.x);
+	float fogFactor = clamp(1.0 / exp(x), 0.0, 1.0);
 	
 	oColor = mix(fogColor, baseColor, fogFactor);		
 }
