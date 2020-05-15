@@ -51,8 +51,16 @@ void SGX_ShadowPCF4(in sampler2D shadowMap, in vec4 shadowMapPos, in vec2 offset
 	vec2 uv = shadowMapPos.xy;
 	vec3 o = vec3(offset, -offset.x) * 0.3;
 
+	float depth = texture2D(shadowMap, uv.xy - o.xy).r;
+	if(depth >= 1.0)
+	{
+		// early out, if sampling behind far plane
+		c = 1.0;
+		return;
+	}
+
 	// Note: We using 2x2 PCF. Good enough and is a lot faster.
-	c =	 (shadowMapPos.z <= texture2D(shadowMap, uv.xy - o.xy).r) ? 1.0 : 0.0; // top left
+	c =	 (shadowMapPos.z <= depth) ? 1.0 : 0.0; // top left
 	c += (shadowMapPos.z <= texture2D(shadowMap, uv.xy + o.xy).r) ? 1.0 : 0.0; // bottom right
 	c += (shadowMapPos.z <= texture2D(shadowMap, uv.xy + o.zy).r) ? 1.0 : 0.0; // bottom left
 	c += (shadowMapPos.z <= texture2D(shadowMap, uv.xy - o.zy).r) ? 1.0 : 0.0; // top right
