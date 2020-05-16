@@ -96,7 +96,7 @@ namespace Ogre
             mCompositeMapCam->setProjectionType(PT_ORTHOGRAPHIC);
             mCompositeMapCam->setNearClipDistance(0.5);
             mCompositeMapCam->setFarClipDistance(1.5);
-            mCompositeMapCam->setOrthoWindow(1, 1);
+            mCompositeMapCam->setOrthoWindow(2, 2);
 
             // Just in case material relies on light auto params
             mCompositeMapLight = mCompositeMapSM->createLight();
