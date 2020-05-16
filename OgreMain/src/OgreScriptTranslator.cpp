@@ -2744,13 +2744,16 @@ namespace Ogre{
 
                             if(isAlpha)
                             {
-                                format = PF_A8;
+                                // format = PF_A8; should only be done, if src is luminance, which we dont know here
                                 compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
                                                    prop->line, "alpha. Use PF_A8 instead");
                             }
 
                             mUnit->setTextureName(evt.mName, texType);
                             mUnit->setDesiredFormat(format);
+                            OGRE_IGNORE_DEPRECATED_BEGIN
+                            mUnit->setIsAlpha(isAlpha);
+                            OGRE_IGNORE_DEPRECATED_END
                             mUnit->setNumMipmaps(mipmaps);
                             mUnit->setHardwareGammaEnabled(sRGBRead);
                         }
