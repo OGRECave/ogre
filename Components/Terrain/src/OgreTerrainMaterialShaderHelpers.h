@@ -42,7 +42,6 @@ namespace Ogre
     public:
         ShaderHelper(bool glsl) : mShadowSamplerStartHi(0), mShadowSamplerStartLo(0), mIsGLSL(glsl) {}
         virtual ~ShaderHelper() {}
-        bool isVertexCompressionSupported() { return !mIsGLSL; }
         virtual HighLevelGpuProgramPtr generateVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         virtual HighLevelGpuProgramPtr generateFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         virtual void updateParams(const SM2Profile* prof, const MaterialPtr& mat, const Terrain* terrain, bool compositeMap);
