@@ -2032,7 +2032,7 @@ namespace Ogre
                     break;
 
                 case ACT_FOG_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getFogColour());
+                    _writeRawConstant(i->physicalIndex, source->getFogColour(), i->elementCount);
                     break;
                 case ACT_FOG_PARAMS:
                     _writeRawConstant(i->physicalIndex, source->getFogParams(), i->elementCount);
