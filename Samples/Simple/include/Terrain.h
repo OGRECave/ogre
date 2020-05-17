@@ -722,11 +722,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTerrainGlobals = new Ogre::TerrainGlobalOptions();
         //! [global_opts]
 
-        // Bugfix for D3D11 Render System because of pixel format incompatibility when using
-        // vertex compression
-        if (Ogre::Root::getSingleton().getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem")
-            mTerrainGlobals->setUseVertexCompressionWhenAvailable(false);
-
         mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
         mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         mEditNode->attachObject(mEditMarker);
