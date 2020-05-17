@@ -119,7 +119,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool TerrainMaterialGeneratorA::SM2Profile::isVertexCompressionSupported() const
     {
-        return mShaderGen && mShaderGen->isVertexCompressionSupported();
+        return true;
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::setLayerNormalMappingEnabled(bool enabled)

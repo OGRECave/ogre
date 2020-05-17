@@ -103,8 +103,8 @@ namespace Ogre
         if (compression)
         {
             outStream <<
-                "attribute vec2 posIndex;\n"
-                "attribute float height;\n";
+                "attribute vec2 vertex;\n" // VES_POSITION
+                "attribute float uv0;\n"; // VES_TEXTURE_COORDINATES0
         }
         else
         {
@@ -184,8 +184,9 @@ namespace Ogre
         if (compression)
         {
             outStream <<
-                "    vec4 position = posIndexToObjectSpace * vec4(posIndex, height, 1);\n"
-                "    vec2 uv0 = vec2(posIndex.x * baseUVScale, 1.0 - (posIndex.y * baseUVScale));\n";
+                "    vec4 position = posIndexToObjectSpace * vec4(vertex, uv0, 1);\n"
+                "#define uv0 _uv0\n" // must not assign to uv0
+                "    vec2 uv0 = vec2(vertex.x * baseUVScale, 1.0 - (vertex.y * baseUVScale));\n";
         }
         outStream <<
             "    vec4 worldPos = worldMatrix * position;\n"
