@@ -1510,11 +1510,6 @@ namespace Ogre
         return errMsg;
     }
     //---------------------------------------------------------------------
-    VertexElementType D3D9RenderSystem::getColourVertexElementType() const
-    {
-        return VET_COLOUR_ARGB;
-    }
-    //---------------------------------------------------------------------
     void D3D9RenderSystem::_convertProjectionMatrix(const Matrix4& matrix,
         Matrix4& dest, bool forGpuProgram)
     {

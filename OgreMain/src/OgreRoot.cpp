@@ -1050,14 +1050,6 @@ namespace Ogre {
         return _openFileStream(filename, std::ios::in | std::ios::binary);
     }
     //-----------------------------------------------------------------------
-    void Root::convertColourValue(const ColourValue& colour, uint32* pDest)
-    {
-        assert(mActiveRenderer != 0);
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        mActiveRenderer->convertColourValue(colour, pDest);
-        OGRE_IGNORE_DEPRECATED_END
-    }
-    //-----------------------------------------------------------------------
     RenderWindow* Root::getAutoCreatedWindow(void)
     {
         return mAutoWindow;

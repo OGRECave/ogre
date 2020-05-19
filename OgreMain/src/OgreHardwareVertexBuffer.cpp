@@ -127,10 +127,6 @@ namespace Ogre {
     {
         switch(etype)
         {
-        case VET_COLOUR:
-        case VET_COLOUR_ABGR:
-        case VET_COLOUR_ARGB:
-            return sizeof(RGBA);
         case VET_FLOAT1:
             return sizeof(float);
         case VET_FLOAT2:
@@ -179,6 +175,7 @@ namespace Ogre {
         case VET_BYTE4_NORM:
         case VET_UBYTE4:
         case VET_UBYTE4_NORM:
+        case _DETAIL_SWAP_RB:
             return sizeof(char)*4;
         }
         return 0;
@@ -188,9 +185,6 @@ namespace Ogre {
     {
         switch (etype)
         {
-        case VET_COLOUR:
-        case VET_COLOUR_ABGR:
-        case VET_COLOUR_ARGB:
         case VET_FLOAT1:
         case VET_SHORT1:
         case VET_USHORT1:
@@ -226,6 +220,7 @@ namespace Ogre {
         case VET_UBYTE4:
         case VET_BYTE4_NORM:
         case VET_UBYTE4_NORM:
+        case _DETAIL_SWAP_RB:
             return 4;
         }
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid type", 
@@ -291,24 +286,7 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     VertexElementType VertexElement::getBestColourVertexElementType(void)
     {
-        // Use the current render system to determine if possible
-        if (Root::getSingletonPtr() && Root::getSingletonPtr()->getRenderSystem())
-        {
-            OGRE_IGNORE_DEPRECATED_BEGIN
-            return Root::getSingleton().getRenderSystem()->getColourVertexElementType();
-            OGRE_IGNORE_DEPRECATED_END
-        }
-        else
-        {
-            // We can't know the specific type right now, so pick a type
-            // based on platform
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-            return VET_COLOUR_ARGB; // prefer D3D format on windows
-#else
-            return VET_COLOUR_ABGR; // prefer GL format on everything else
-#endif
-
-        }
+        return VET_UBYTE4_NORM;
     }
     //--------------------------------------------------------------------------
     void VertexElement::convertColourValue(VertexElementType srcType, 
@@ -320,26 +298,6 @@ namespace Ogre {
         // Conversion between ARGB and ABGR is always a case of flipping R/B
         *ptr = 
            ((*ptr&0x00FF0000)>>16)|((*ptr&0x000000FF)<<16)|(*ptr&0xFF00FF00);               
-    }
-    //--------------------------------------------------------------------------
-    uint32 VertexElement::convertColourValue(const ColourValue& src, 
-        VertexElementType dst)
-    {
-        switch(dst)
-        {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        default:
-#endif
-        case VET_COLOUR_ARGB:
-            return src.getAsARGB();
-#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-        default:
-#endif
-        case VET_UBYTE4_NORM:
-        case VET_COLOUR_ABGR: 
-            return src.getAsBYTE();
-        };
-
     }
     //-----------------------------------------------------------------------------
     VertexElementType VertexElement::getBaseType(VertexElementType multiType)
@@ -366,12 +324,6 @@ namespace Ogre {
             case VET_UINT3:
             case VET_UINT4:
                 return VET_UINT1;
-            case VET_COLOUR:
-                return VET_COLOUR;
-            case VET_COLOUR_ABGR:
-                return VET_COLOUR_ABGR;
-            case VET_COLOUR_ARGB:
-                return VET_COLOUR_ARGB;
             case VET_SHORT1:
             case VET_SHORT2:
             case VET_SHORT3:
@@ -395,6 +347,7 @@ namespace Ogre {
             case VET_UBYTE4:
                 return VET_UBYTE4;
             case VET_UBYTE4_NORM:
+            case _DETAIL_SWAP_RB:
                 return VET_UBYTE4_NORM;
         };
         // To keep compiler happy

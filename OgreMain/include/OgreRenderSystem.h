@@ -793,12 +793,12 @@ namespace Ogre
         virtual unsigned int _getVertexCount(void) const;
 
         /// @deprecated use ColourValue::getAsBYTE()
-        OGRE_DEPRECATED void convertColourValue(const ColourValue& colour, uint32* pDest);
-        /// @deprecated assume VET_UBYTE4_NORM
-        OGRE_DEPRECATED virtual VertexElementType getColourVertexElementType(void) const
+        OGRE_DEPRECATED static void convertColourValue(const ColourValue& colour, uint32* pDest)
         {
-            return VET_COLOUR_ABGR;
+            *pDest = colour.getAsBYTE();
         }
+        /// @deprecated assume VET_UBYTE4_NORM
+        OGRE_DEPRECATED static VertexElementType getColourVertexElementType(void) { return VET_UBYTE4_NORM; }
 
         /** Converts a uniform projection matrix to suitable for this render system.
         @remarks

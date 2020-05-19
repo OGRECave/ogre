@@ -863,11 +863,7 @@ void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
          i != elemList.end(); ++i) {
         const VertexElement& elem = *i;
         switch (elem.getType()) {
-        case VET_COLOUR:
-            hasAmbiguousColour = true;
-            OGRE_FALLTHROUGH;
-        case VET_COLOUR_ABGR:
-        case VET_COLOUR_ARGB:
+        case _DETAIL_SWAP_RB:
             hasColour = true;
             originalType = elem.getType();
 
@@ -895,28 +891,6 @@ void resolveColourAmbiguities(Mesh* mesh)
     }
 
     String response;
-    if (hasAmbiguousColour) {
-        if (opts.srcColourFormatSet) {
-            originalType = opts.srcColourFormat;
-        } else {
-            // unknown input colour, have to ask
-            cout << "\nYour mesh has vertex colours but I don't know whether they were generated\n"
-                 << "using GL or D3D ordering. Please indicate which was used when the mesh was\n"
-                 << "created (type 'gl' or 'd3d').\n";
-            while (response.empty()) {
-                cin >> response;
-                StringUtil::toLowerCase(response);
-                if (response == "d3d") {
-                    originalType = VET_COLOUR_ARGB;
-                } else if (response == "gl") {
-                    originalType = VET_COLOUR_ABGR;
-                } else {
-                    cout << "Wrong answer!\n";
-                    response = "";
-                }
-            }
-        }
-    }
 
     // Ask what format we want to save in
     VertexElementType desiredType = VET_FLOAT1;

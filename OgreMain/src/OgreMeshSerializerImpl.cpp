@@ -711,8 +711,7 @@ namespace Ogre {
             // We don't know the source type if it's VET_COLOUR, but assume ARGB
             // since that's the most common. Won't get used unless the mesh is
             // ambiguous anyway, which will have been warned about in the log
-            dest->convertPackedColour(VET_COLOUR_ARGB,
-                VertexElement::getBestColourVertexElementType());
+            dest->convertPackedColour(VET_COLOUR_ARGB, VET_UBYTE4_NORM);
         }
     }
     //---------------------------------------------------------------------
@@ -759,7 +758,10 @@ namespace Ogre {
         readShorts(stream, &source, 1);
         // unsigned short type;     // VertexElementType
         readShorts(stream, &tmp, 1);
-        vType = static_cast<VertexElementType>(tmp);
+        if(tmp == 4 || tmp == 11)
+            vType = VET_UBYTE4_NORM;
+        else
+            vType = static_cast<VertexElementType>(tmp);
         // unsigned short semantic; // VertexElementSemantic
         readShorts(stream, &tmp, 1);
         vSemantic = static_cast<VertexElementSemantic>(tmp);
@@ -770,12 +772,11 @@ namespace Ogre {
 
         dest->vertexDeclaration->addElement(source, offset, vType, vSemantic, index);
 
-        if (vType == VET_COLOUR)
+        if (vType == _DETAIL_SWAP_RB)
         {
             LogManager::getSingleton().stream(LML_WARNING)
-                << "Warning: VET_COLOUR element type is deprecated, you should use "
-                << "one of the more specific types to indicate the byte order. "
-                << "Use OgreMeshUpgrade on " << pMesh->getName() << " as soon as possible. ";
+                << "Warning: VET_COLOUR_ARGB element type is deprecated and incurs conversion on load. "
+                << "Use OgreMeshUpgrader on '" << pMesh->getName() << "' as soon as possible.";
         }
 
     }
@@ -1661,11 +1662,7 @@ namespace Ogre {
                     case VET_UINT1:
                         typeSize = sizeof(unsigned int);
                         break;
-                    case VET_COLOUR:
-                    case VET_COLOUR_ABGR:
-                    case VET_COLOUR_ARGB:
-                        typeSize = sizeof(RGBA);
-                        break;
+                    case VET_UBYTE4_NORM:
                     case VET_UBYTE4:
                         typeSize = 0; // NO FLIPPING
                         break;
