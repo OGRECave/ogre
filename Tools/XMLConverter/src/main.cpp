@@ -109,12 +109,7 @@ XmlOptions parseArgs(int numArgs, char **args)
     opts.optimiseAnimations = true;
     opts.quietMode = false;
     opts.endian = Serializer::ENDIAN_NATIVE;
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-    opts.colourElementType = VET_COLOUR_ARGB;
-#else
-    opts.colourElementType = VET_COLOUR_ABGR;
-#endif
+    opts.colourElementType = VET_COLOUR;
 
     // ignore program name
     char* source = 0;
