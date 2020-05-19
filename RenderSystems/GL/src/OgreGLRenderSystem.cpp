@@ -3025,15 +3025,6 @@ namespace Ogre {
             GLboolean normalised = GL_FALSE;
             switch(elem.getType())
             {
-            case VET_COLOUR:
-            case VET_COLOUR_ABGR:
-            case VET_COLOUR_ARGB:
-                // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
-                // VertexElement::getTypeCount treats them as 1 (RGBA)
-                // Also need to normalise the fixed-point data
-                typeCount = 4;
-                normalised = GL_TRUE;
-                break;
             case VET_UBYTE4_NORM:
             case VET_SHORT2_NORM:
             case VET_USHORT2_NORM:

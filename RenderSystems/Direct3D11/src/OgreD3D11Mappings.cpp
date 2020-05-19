@@ -280,11 +280,6 @@ namespace Ogre
     {
         switch (vType)
         {
-        case VET_COLOUR:
-        case VET_COLOUR_ABGR:
-        case VET_COLOUR_ARGB:
-            return DXGI_FORMAT_R8G8B8A8_UNORM;
-
         // Float32
         case VET_FLOAT1:
             return DXGI_FORMAT_R32_FLOAT;

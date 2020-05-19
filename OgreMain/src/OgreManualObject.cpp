@@ -296,9 +296,7 @@ ManualObject::ManualObject(const String& name)
                 OgreAssert(elem.getSemantic() != VES_DIFFUSE, "must use VET_COLOUR");
                 elem.baseVertexPointerToElement(pBase, &pFloat);
                 break;
-            case VET_COLOUR:
-            case VET_COLOUR_ABGR:
-            case VET_COLOUR_ARGB:
+            case VET_UBYTE4_NORM:
                 OgreAssert(elem.getSemantic() == VES_DIFFUSE, "must use VES_DIFFUSE");
                 elem.baseVertexPointerToElement(pBase, &pRGBA);
                 break;
@@ -307,8 +305,6 @@ ManualObject::ManualObject(const String& name)
                 break;
             };
 
-
-            RenderSystem* rs;
             unsigned short dims;
             switch(elem.getSemantic())
             {
@@ -333,27 +329,7 @@ ManualObject::ManualObject(const String& name)
                     *pFloat++ = mTempVertex.texCoord[elem.getIndex()][t];
                 break;
             case VES_DIFFUSE:
-                rs = Root::getSingleton().getRenderSystem();
-                if (rs)
-                {
-                    OGRE_IGNORE_DEPRECATED_BEGIN
-                    rs->convertColourValue(mTempVertex.colour, pRGBA++);
-                    OGRE_IGNORE_DEPRECATED_END
-                }
-                else
-                {
-                    switch(elem.getType())
-                    {
-                        case VET_COLOUR_ABGR:
-                            *pRGBA++ = mTempVertex.colour.getAsABGR();
-                            break;
-                        case VET_COLOUR_ARGB:
-                            *pRGBA++ = mTempVertex.colour.getAsARGB();
-                            break;
-                        default:
-                            *pRGBA++ = mTempVertex.colour.getAsRGBA();
-                    }
-                }
+                *pRGBA++ = mTempVertex.colour.getAsABGR();
                 break;
             default:
                 OgreAssert(false, "invalid semantic");

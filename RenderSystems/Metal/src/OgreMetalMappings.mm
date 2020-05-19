@@ -346,11 +346,6 @@ namespace Ogre
         //case VET_HALF2:                 return MTLVertexFormatHalf2;
         //case VET_HALF4:                 return MTLVertexFormatHalf4;
 
-        case VET_COLOUR:
-        case VET_COLOUR_ARGB:
-        case VET_COLOUR_ABGR:
-            return MTLVertexFormatUChar4Normalized;
-
         case VET_DOUBLE1:
         case VET_DOUBLE2:
         case VET_DOUBLE3:

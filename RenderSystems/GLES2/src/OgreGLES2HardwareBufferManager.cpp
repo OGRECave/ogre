@@ -126,11 +126,9 @@ namespace Ogre {
             case VET_SHORT2_NORM:
             case VET_SHORT4_NORM:
                 return GL_SHORT;
-            case VET_COLOUR:
-            case VET_COLOUR_ABGR:
-            case VET_COLOUR_ARGB:
             case VET_UBYTE4:
             case VET_UBYTE4_NORM:
+            case _DETAIL_SWAP_RB:
                 return GL_UNSIGNED_BYTE;
             case VET_BYTE4:
             case VET_BYTE4_NORM:

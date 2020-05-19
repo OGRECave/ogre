@@ -564,18 +564,12 @@ namespace Ogre {
         closeGapsInBindings();
     }
     //-----------------------------------------------------------------------
-    void VertexData::convertPackedColour(
-        VertexElementType srcType, VertexElementType destType)
+    void VertexData::convertPackedColour(VertexElementType, VertexElementType destType)
     {
-        if (destType != VET_COLOUR_ABGR && destType != VET_COLOUR_ARGB && destType != VET_UBYTE4_NORM)
+        if (destType != VET_UBYTE4_NORM)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Invalid destType parameter", "VertexData::convertPackedColour");
-        }
-        if (srcType != VET_COLOUR_ABGR && srcType != VET_COLOUR_ARGB)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Invalid srcType parameter", "VertexData::convertPackedColour");
         }
 
         const VertexBufferBinding::VertexBufferBindingMap& bindMap = 
@@ -590,9 +584,7 @@ namespace Ogre {
             for (elemi = elems.begin(); elemi != elems.end(); ++elemi)
             {
                 VertexElement& elem = *elemi;
-                if (elem.getType() == VET_COLOUR || 
-                    ((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
-                    && elem.getType() != destType))
+                if (elem.getType() == _DETAIL_SWAP_RB)
                 {
                     conversionNeeded = true;
                 }
@@ -608,20 +600,11 @@ namespace Ogre {
                     for (elemi = elems.begin(); elemi != elems.end(); ++elemi)
                     {
                         VertexElement& elem = *elemi;
-                        VertexElementType currType = (elem.getType() == VET_COLOUR) ?
-                            srcType : elem.getType();
-
-                        // only rename, byte order is the same
-                        if(currType == VET_COLOUR_ABGR && destType == VET_UBYTE4_NORM)
-                            continue;
-
-                        if (elem.getType() == VET_COLOUR || 
-                            ((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
-                            && elem.getType() != destType))
+                        if (elem.getType() == _DETAIL_SWAP_RB)
                         {
                             uint32* pRGBA;
                             elem.baseVertexPointerToElement(pBase, &pRGBA);
-                            VertexElement::convertColourValue(currType, destType, pRGBA);
+                            VertexElement::convertColourValue(_DETAIL_SWAP_RB, destType, pRGBA);
                         }
                     }
                     pBase = static_cast<void*>(
@@ -637,9 +620,7 @@ namespace Ogre {
                 for (ai = allelems.begin(); ai != allelems.end(); ++ai, ++elemIndex)
                 {
                     const VertexElement& elem = *ai;
-                    if (elem.getType() == VET_COLOUR || 
-                        ((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
-                        && elem.getType() != destType))
+                    if (elem.getType() == _DETAIL_SWAP_RB)
                     {
                         vertexDeclaration->modifyElement(elemIndex, 
                             elem.getSource(), elem.getOffset(), destType, 

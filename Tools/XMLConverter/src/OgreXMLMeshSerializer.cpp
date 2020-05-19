@@ -443,9 +443,7 @@ namespace Ogre {
                         case VET_FLOAT4: 
                             type = "float4"; 
                             break;
-                        case VET_COLOUR: 
-                        case VET_COLOUR_ARGB: 
-                        case VET_COLOUR_ABGR: 
+                        case VET_UBYTE4_NORM:
                             type = "colour"; 
                             break;
                         case VET_SHORT1: 
@@ -530,7 +528,7 @@ namespace Ogre {
                         dataNode = vertexNode.append_child("colour_diffuse");
                         {
                             ColourValue cv;
-                            elem.getType() == VET_COLOUR_ARGB ? cv.setAsARGB(*pColour) : cv.setAsABGR(*pColour);
+                            elem.getType() == VET_COLOUR_ABGR ? cv.setAsABGR(*pColour) : cv.setAsARGB(*pColour);
                             dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
@@ -539,7 +537,7 @@ namespace Ogre {
                         dataNode = vertexNode.append_child("colour_specular");
                         {
                             ColourValue cv;
-                            elem.getType() == VET_COLOUR_ARGB ? cv.setAsARGB(*pColour) : cv.setAsABGR(*pColour);
+                            elem.getType() == VET_COLOUR_ABGR ? cv.setAsABGR(*pColour) : cv.setAsARGB(*pColour);
                             dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
@@ -593,7 +591,6 @@ namespace Ogre {
                             dataNode.append_attribute("x") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             break;
                         case VET_UBYTE4_NORM:
-                        case VET_COLOUR: case VET_COLOUR_ARGB: case VET_COLOUR_ABGR:
                             elem.baseVertexPointerToElement(pVert, &pColour);
                             {
                                 ColourValue cv;
@@ -965,11 +962,11 @@ namespace Ogre {
                         else if (!::strcmp(attrib,"ubyte4"))
                             vtype = VET_UBYTE4;
                         else if (!::strcmp(attrib,"colour"))
-                            vtype = VET_COLOUR;
+                            vtype = VET_UBYTE4_NORM;
                         else if (!::strcmp(attrib,"colour_argb"))
-                            vtype = VET_COLOUR_ARGB;
+                            vtype = _DETAIL_SWAP_RB;
                         else if (!::strcmp(attrib,"colour_abgr"))
-                            vtype = VET_COLOUR_ABGR;
+                            vtype = VET_UBYTE4_NORM;
                         else 
                         {
                             auto err = LogManager::getSingleton().stream(LML_CRITICAL);
@@ -1235,20 +1232,11 @@ namespace Ogre {
                             *pChar++ = static_cast<uint8>(0.5f + 255.0f * StringConverter::parseReal(xmlElem.attribute("x").value()));
                             break;
 
-                        case VET_COLOUR: 
+                        case VET_UBYTE4_NORM:
                             {
                                 elem.baseVertexPointerToElement(pVert, &pCol);
                                 ColourValue cv = StringConverter::parseColourValue(xmlElem.attribute("u").value());
-                                *pCol++ = VertexElement::convertColourValue(cv, mColourElementType);
-                            }
-                            break;
-
-                        case VET_COLOUR_ARGB:
-                        case VET_COLOUR_ABGR: 
-                            {
-                                elem.baseVertexPointerToElement(pVert, &pCol);
-                                ColourValue cv = StringConverter::parseColourValue(xmlElem.attribute("u").value());
-                                *pCol++ = VertexElement::convertColourValue(cv, elem.getType());
+                                *pCol++ = cv.getAsABGR();
                             }
                             break;
                         default:
