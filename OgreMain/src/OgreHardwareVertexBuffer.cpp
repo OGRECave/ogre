@@ -288,7 +288,9 @@ namespace Ogre {
         // Use the current render system to determine if possible
         if (Root::getSingletonPtr() && Root::getSingletonPtr()->getRenderSystem())
         {
+            OGRE_IGNORE_DEPRECATED_BEGIN
             return Root::getSingleton().getRenderSystem()->getColourVertexElementType();
+            OGRE_IGNORE_DEPRECATED_END
         }
         else
         {

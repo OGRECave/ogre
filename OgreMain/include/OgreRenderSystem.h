@@ -790,19 +790,13 @@ namespace Ogre
         /** Reports the number of vertices passed to the renderer since the last _beginGeometryCount call. */
         virtual unsigned int _getVertexCount(void) const;
 
-        /** Generates a packed data version of the passed in ColourValue suitable for
-        use as with this RenderSystem.
-        @remarks
-        Since different render systems have different colour data formats (eg
-        RGBA for GL, ARGB for D3D) this method allows you to use 1 method for all.
-        @param colour The colour to convert
-        @param pDest Pointer to location to put the result.
-        */
-        void convertColourValue(const ColourValue& colour, uint32* pDest);
-        /** Get the native VertexElementType for a compact 32-bit colour value
-        for this rendersystem.
-        */
-        virtual VertexElementType getColourVertexElementType(void) const = 0;
+        /// @deprecated use ColourValue::getAsABGR()
+        OGRE_DEPRECATED void convertColourValue(const ColourValue& colour, uint32* pDest);
+        /// @deprecated assume VET_UBYTE4_NORM
+        OGRE_DEPRECATED virtual VertexElementType getColourVertexElementType(void) const
+        {
+            return VET_COLOUR_ABGR;
+        }
 
         /** Converts a uniform projection matrix to suitable for this render system.
         @remarks
