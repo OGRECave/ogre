@@ -764,11 +764,6 @@ namespace Ogre
                                      clamp:0.0f];
     }
     //-------------------------------------------------------------------------
-    VertexElementType MetalRenderSystem::getColourVertexElementType(void) const
-    {
-        return VET_COLOUR_ARGB;
-    }
-    //-------------------------------------------------------------------------
     void MetalRenderSystem::_convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
                                                       bool forGpuProgram )
     {

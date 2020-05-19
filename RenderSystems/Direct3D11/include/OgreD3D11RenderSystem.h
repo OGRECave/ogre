@@ -253,7 +253,6 @@ namespace Ogre
         void validateDevice(bool forceDeviceElection = false);
         void handleDeviceLost();
         void destroyRenderTarget(const String& name);
-        VertexElementType getColourVertexElementType(void) const;
         void setStencilCheckEnabled(bool enabled);
         void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
             uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,

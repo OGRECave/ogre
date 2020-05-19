@@ -731,8 +731,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::convertColourValue(const ColourValue& colour, uint32* pDest)
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         *pDest = VertexElement::convertColourValue(colour, getColourVertexElementType());
-
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_render(const RenderOperation& op)

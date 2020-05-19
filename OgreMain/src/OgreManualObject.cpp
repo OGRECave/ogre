@@ -336,7 +336,9 @@ ManualObject::ManualObject(const String& name)
                 rs = Root::getSingleton().getRenderSystem();
                 if (rs)
                 {
+                    OGRE_IGNORE_DEPRECATED_BEGIN
                     rs->convertColourValue(mTempVertex.colour, pRGBA++);
+                    OGRE_IGNORE_DEPRECATED_END
                 }
                 else
                 {

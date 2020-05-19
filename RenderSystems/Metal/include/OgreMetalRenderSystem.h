@@ -143,7 +143,6 @@ namespace Ogre
         void _setCullingMode(CullingMode mode);
         void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f);
 
-        virtual VertexElementType getColourVertexElementType(void) const;
         virtual void _convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
                                                bool forGpuProgram = false);
         void _setPolygonMode(PolygonMode) {}
