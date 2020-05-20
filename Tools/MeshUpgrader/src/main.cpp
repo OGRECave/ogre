@@ -66,8 +66,9 @@ void help(void)
     cout << "-tm            = Split tangent vertices at UV mirror points" << endl;
     cout << "-tr            = Split tangent vertices where basis is rotated > 90 degrees" << endl;
     cout << "-r         = DON'T reorganise buffers to recommended format" << endl;
-    cout << "-d3d       = Convert to D3D colour formats" << endl;
-    cout << "-gl        = Convert to GL colour formats" << endl;
+    cout << "-d3d       = Convert to argb colour format" << endl;
+    cout << "-gl        = Convert to abgr colour format" << endl;
+    cout << "-byte      = Convert to byte colour format" << endl;
     cout << "-srcd3d    = Interpret ambiguous colours as D3D style" << endl;
     cout << "-srcgl     = Interpret ambiguous colours as GL style" << endl;
     cout << "-E endian  = Set endian mode 'big' 'little' or 'native' (default)" << endl;
@@ -171,6 +172,11 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     if (ui->second) {
         opts.destColourFormatSet = true;
         opts.destColourFormat = VET_COLOUR_ABGR;
+    }
+    ui = unOpts.find("-byte");
+    if (ui->second) {
+        opts.destColourFormatSet = true;
+        opts.destColourFormat = VET_UBYTE4_NORM;
     }
     ui = unOpts.find("-srcd3d");
     if (ui->second) {
@@ -1027,6 +1033,7 @@ int main(int numargs, char** args)
         unOptList["-r"] = false;
         unOptList["-gl"] = false;
         unOptList["-d3d"] = false;
+        unOptList["-byte"] = false;
         unOptList["-srcgl"] = false;
         unOptList["-srcd3d"] = false;
         unOptList["-autogen"] = false;
