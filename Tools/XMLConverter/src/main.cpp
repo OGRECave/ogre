@@ -82,8 +82,9 @@ void help(void)
     cout << "                 n0 and n1 must be in the same buffer source & adjacent" << endl;
     cout << "                 to each other for the merge to work." << endl;
     cout << "-o             = DON'T optimise out redundant tracks & keyframes" << endl;
-    cout << "-d3d           = Prefer D3D packed colour formats (default on Windows)" << endl;
-    cout << "-gl            = Prefer GL packed colour formats (default on non-Windows)" << endl;
+    cout << "-d3d           = Use packed argb colour format (default on Windows)" << endl;
+    cout << "-gl            = Use packed abgr colour format (default on non-Windows)" << endl;
+    cout << "-byte          = Use ubyte4 colour format (default since 1.13)" << endl;
     cout << "-E endian      = Set endian mode 'big' 'little' or 'native' (default)" << endl;
     cout << "-x num         = Generate no more than num eXtremes for every submesh (default 0)" << endl;
     cout << "-q             = Quiet mode, less output" << endl;
@@ -123,6 +124,7 @@ XmlOptions parseArgs(int numArgs, char **args)
     unOpt["-q"] = false;
     unOpt["-d3d"] = false;
     unOpt["-gl"] = false;
+    unOpt["-byte"] = false;
     unOpt["-h"] = false;
     unOpt["-v"] = false;
     binOpt["-E"] = "";
@@ -223,6 +225,11 @@ XmlOptions parseArgs(int numArgs, char **args)
         {
             opts.colourElementType = VET_COLOUR_ABGR;
         }
+
+    if (unOpt.find("-byte")->second)
+    {
+        opts.colourElementType = VET_UBYTE4_NORM;
+    }
 
     // Source / dest
     if (numArgs > startIndex)

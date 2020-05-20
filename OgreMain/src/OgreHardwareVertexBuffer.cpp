@@ -329,6 +329,7 @@ namespace Ogre {
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
         default:
 #endif
+        case VET_UBYTE4_NORM:
         case VET_COLOUR_ABGR: 
             return src.getAsABGR();
         };

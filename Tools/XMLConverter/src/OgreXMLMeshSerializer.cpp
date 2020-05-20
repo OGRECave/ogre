@@ -530,7 +530,7 @@ namespace Ogre {
                         dataNode = vertexNode.append_child("colour_diffuse");
                         {
                             ColourValue cv;
-                            elem.getType() == VET_COLOUR_ABGR ? cv.setAsABGR(*pColour) : cv.setAsARGB(*pColour);
+                            elem.getType() == VET_COLOUR_ARGB ? cv.setAsARGB(*pColour) : cv.setAsABGR(*pColour);
                             dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
@@ -539,7 +539,7 @@ namespace Ogre {
                         dataNode = vertexNode.append_child("colour_specular");
                         {
                             ColourValue cv;
-                            elem.getType() == VET_COLOUR_ABGR ? cv.setAsABGR(*pColour) : cv.setAsARGB(*pColour);
+                            elem.getType() == VET_COLOUR_ARGB ? cv.setAsARGB(*pColour) : cv.setAsABGR(*pColour);
                             dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
@@ -592,11 +592,12 @@ namespace Ogre {
                             dataNode.append_attribute("w") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             dataNode.append_attribute("x") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             break;
+                        case VET_UBYTE4_NORM:
                         case VET_COLOUR: case VET_COLOUR_ARGB: case VET_COLOUR_ABGR:
                             elem.baseVertexPointerToElement(pVert, &pColour);
                             {
                                 ColourValue cv;
-                                elem.getType() == VET_COLOUR_ABGR ? cv.setAsABGR(*pColour) : cv.setAsARGB(*pColour);
+                                elem.getType() == VET_COLOUR_ARGB ? cv.setAsARGB(*pColour) : cv.setAsABGR(*pColour);
                                 dataNode.append_attribute("u") = StringConverter::toString(cv).c_str();
                             }
                             break;
