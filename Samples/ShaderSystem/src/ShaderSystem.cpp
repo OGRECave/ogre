@@ -237,19 +237,6 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
     return SdkSample::frameRenderingQueued(evt);
 }
 
-
-//-----------------------------------------------------------------------
-//void Sample_ShaderSystem::setupView()
-//{ 
-//  // setup default viewport layout and camera
-//  mCamera = mSceneMgr->createCamera("MainCamera");
-//  mViewport = mWindow->addViewport(mCamera);
-//  mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
-//  mCamera->setNearClipDistance(5);
-//
-//  mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
-//}
-
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()
 {
@@ -281,6 +268,7 @@ void Sample_ShaderSystem::setupContent()
     pPlaneEnt->setCastShadows(false);
     mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0))->attachObject(pPlaneEnt);
 
+    mCamera->setNearClipDistance(30);
 
     // Load sample meshes and generate tangent vectors.
     for (int i=0; i < MESH_ARRAY_SIZE; ++i)
@@ -479,6 +467,7 @@ void Sample_ShaderSystem::setupUI()
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     mShadowMenu->addItem("PSSM 3");
+    mShadowMenu->addItem("PSSM debug");
 #endif
 
 
@@ -1050,9 +1039,10 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     // Integrated shadow PSSM with 3 splits.
-    else if (menuIndex == 1)
+    else if (menuIndex >= 1)
     {
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+        mSceneMgr->setShadowFarDistance(3000);
 
         // 3 textures per directional light
         mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
@@ -1081,8 +1071,8 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 
         // shadow camera setup
         PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
-        pssmSetup->calculateSplitPoints(3, 5, 3000);
-        pssmSetup->setSplitPadding(10);
+        pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
+        pssmSetup->setSplitPadding(mCamera->getNearClipDistance()*2);
         pssmSetup->setOptimalAdjustFactor(0, 2);
         pssmSetup->setOptimalAdjustFactor(1, 1);
         pssmSetup->setOptimalAdjustFactor(2, 0.5);
@@ -1092,6 +1082,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
     
         auto subRenderState = mShaderGenerator->createSubRenderState<RTShader::IntegratedPSSM3>();
         subRenderState->setSplitPoints(pssmSetup->getSplitPoints());
+        subRenderState->setDebug(menuIndex > 1);
         schemRenderState->addTemplateSubRenderState(subRenderState);        
     }
 #endif
