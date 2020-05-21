@@ -40,6 +40,7 @@ String IntegratedPSSM3::Type = "SGX_IntegratedPSSM3";
 IntegratedPSSM3::IntegratedPSSM3()
 {
     mUseTextureCompare = false;
+    mDebug = false;
     mShadowTextureParamsList.resize(1); // normal single texture depth shadowmapping
 }
 
@@ -78,6 +79,7 @@ void IntegratedPSSM3::copyFrom(const SubRenderState& rhs)
     const IntegratedPSSM3& rhsPssm= static_cast<const IntegratedPSSM3&>(rhs);
 
     mUseTextureCompare = rhsPssm.mUseTextureCompare;
+    mDebug = rhsPssm.mDebug;
     mShadowTextureParamsList.resize(rhsPssm.mShadowTextureParamsList.size());
 
     ShadowTextureParamsConstIterator itSrc = rhsPssm.mShadowTextureParamsList.begin();
@@ -228,6 +230,10 @@ bool IntegratedPSSM3::resolveDependencies(ProgramSet* programSet)
 {
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     psProgram->addDependency(SGX_LIB_INTEGRATEDPSSM);
+
+    // requires #include to work
+    if(mDebug && ShaderGenerator::getSingleton().getTargetLanguage() != "glsles")
+        psProgram->addPreprocessorDefines("DEBUG_PSSM");
 
     return true;
 }

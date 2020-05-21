@@ -4,7 +4,11 @@
 // Program Type: Vertex/Pixel shader
 // Language: CG
 //-----------------------------------------------------------------------------
-	
+
+#ifdef DEBUG_PSSM
+static float3 pssm_lod_info = float3(0, 0, 0);
+#endif
+
 //-----------------------------------------------------------------------------
 void SGX_ApplyShadowFactor_Diffuse(in float4 ambient, 
 					  in float4 lightSum, 
@@ -13,6 +17,9 @@ void SGX_ApplyShadowFactor_Diffuse(in float4 ambient,
 {
 	oLight.rgb = ambient.rgb + (lightSum.rgb - ambient.rgb) * fShadowFactor;
 	oLight.a   = lightSum.a;
+#ifdef DEBUG_PSSM
+	oLight.rgb += pssm_lod_info;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -29,14 +36,23 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 	if (fDepth  <= vSplitPoints.x)
 	{													
 		oShadowFactor = tex2Dproj(shadowMap0, lightPosition0).r;
+#ifdef DEBUG_PSSM
+        pssm_lod_info.r = 1.0;
+#endif
 	}
 	else if (fDepth <= vSplitPoints.y)
 	{											
 		oShadowFactor = tex2Dproj(shadowMap1, lightPosition1).r;
+#ifdef DEBUG_PSSM
+        pssm_lod_info.g = 1.0;
+#endif
 	}
 	else
 	{										
 		oShadowFactor = tex2Dproj(shadowMap2, lightPosition2).r;
+#ifdef DEBUG_PSSM
+        pssm_lod_info.b = 1.0;
+#endif
 	}
 }
 
@@ -84,13 +100,22 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
     if (fDepth  <= vSplitPoints.x)
     {
         SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0.xy, oShadowFactor);
+#ifdef DEBUG_PSSM
+        pssm_lod_info.r = 1.0;
+#endif
     }
     else if (fDepth <= vSplitPoints.y)
     {
         SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy, oShadowFactor);
+#ifdef DEBUG_PSSM
+        pssm_lod_info.g = 1.0;
+#endif
     }
     else
     {
         SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy, oShadowFactor);
+#ifdef DEBUG_PSSM
+        pssm_lod_info.b = 1.0;
+#endif
     }
 }
