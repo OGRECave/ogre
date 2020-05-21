@@ -434,9 +434,9 @@ namespace Ogre
                         break;
                 };
 
-                outStream << "    vec3 binormal = normalize(cross(tangent, normal));\n";
+                outStream << "    vec3 binormal = normalize(cross(normal, tangent));\n";
                 // note, now we need to re-cross to derive tangent again because it wasn't orthonormal
-                outStream << "    tangent = normalize(cross(normal, binormal));\n";
+                outStream << "    tangent = normalize(cross(binormal, normal));\n";
                 // derive final matrix
                 outStream << "    mat3 TBN = mat3(tangent[0], binormal[0], normal[0],"
                              "      tangent[1], binormal[1], normal[1],"
