@@ -51,10 +51,14 @@ SHARED_PTR(OverlayElement);
 %include "OgreOverlayElement.h"
 %include "OgreOverlayElementFactory.h"
 SHARED_PTR(OverlayContainer);
+%ignore Ogre::OverlayContainer::getChildIterator;
+%ignore Ogre::OverlayContainer::getChildContainerIterator;
 %include "OgreOverlayContainer.h"
 #ifdef SWIGPYTHON
 %factory(Ogre::OverlayElement* Ogre::OverlayManager::createOverlayElement, Ogre::OverlayContainer);
 #endif
+%ignore Ogre::OverlayManager::getTemplateIterator;
+%ignore Ogre::OverlayManager::getOverlayIterator;
 %include "OgreOverlayManager.h"
 SHARED_PTR(OverlaySystem);
 %include "OgreOverlaySystem.h"
