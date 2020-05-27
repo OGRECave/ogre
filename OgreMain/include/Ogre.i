@@ -8,7 +8,6 @@
 #include "OgreVertexBoneAssignment.h"
 #include "OgreCodec.h"
 #include "OgreZip.h"
-#include "OgreParticleIterator.h"
 #include "OgreParticleEmitterFactory.h"
 #include "OgreParticleAffectorFactory.h"
 #include "OgreUnifiedHighLevelGpuProgram.h"
@@ -246,7 +245,6 @@ ADD_REPR(TRect)
 %ignore Ogre::Any::destroy; // deprecated
 %ignore Ogre::Any::isEmpty; // deprecated
 %include "OgreAny.h"
-%include "OgreIteratorWrapper.h"
 %include "OgreMath.h"
 ADD_REPR(Degree)
 ADD_REPR(Radian)
@@ -362,7 +360,9 @@ SHARED_PTR(FileHandleDataStream);
 %ignore Ogre::ZipArchiveFactory; // private
 %ignore Ogre::ZipDataStream; // private
 %include "OgreZip.h"
+%ignore Ogre::ArchiveManager::getArchiveIterator;
 %include "OgreArchiveManager.h"
+%ignore Ogre::Codec::getCodecIterator;
 %include "OgreCodec.h"
 %include "OgreSerializer.h"
 %include "OgreScriptLoader.h"
@@ -394,6 +394,8 @@ ADD_REPR(ColourValue)
 %include "OgreRenderSystemCapabilities.h"
 %ignore Ogre::GpuProgramParameters::hasPassIterationNumber; // deprecated
 %ignore Ogre::GpuProgramParameters::getPassIterationNumberIndex; // deprecated
+%ignore Ogre::GpuProgramParameters::getConstantDefinitionIterator;
+%ignore Ogre::GpuSharedParameters::getConstantDefinitionIterator;
 %include "OgreGpuProgramParams.h"
 %include "OgreImage.h"
 %include "OgreBillboard.h"
@@ -401,7 +403,6 @@ ADD_REPR(ColourValue)
 %include "OgreHardwareOcclusionQuery.h"
 SHARED_PTR(HardwareBuffer);
 %include "OgreHardwareBuffer.h"
-%include "OgreParticleIterator.h"
 
 #ifdef SWIGPYTHON
 %ignore std::vector<Ogre::ParameterDef>::resize; // non default constructible
@@ -436,6 +437,8 @@ SHARED_PTR(StringInterface);
 %include "OgreControllerManager.h"
 %include "OgrePredefinedControllers.h"
 SHARED_PTR(Compositor);
+%ignore Ogre::Compositor::getTechniqueIterator;
+%ignore Ogre::Compositor::getSupportedTechniqueIterator;
 %include "OgreCompositor.h"
 %ignore Ogre::CompositionTechnique::getNumTextureDefinitions;
 %ignore Ogre::CompositionTechnique::getTextureDefinitionIterator;
@@ -470,6 +473,7 @@ SHARED_PTR(HardwareUniformBuffer);
 // managers
 %ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool, Resource*) const;
 %ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool) const;
+%ignore Ogre::ResourceGroupManager::getResourceManagerIterator;
 %include "OgreResourceGroupManager.h"
 #if SWIG_VERSION < 0x030012 || defined(SWIGJAVA)
 // conflicts with overloaded versions (GpuProgram, Texture)
@@ -478,6 +482,7 @@ SHARED_PTR(HardwareUniformBuffer);
 %ignore Ogre::ResourceManager::prepare;
 %ignore Ogre::ResourceManager::load;
 #endif
+%ignore Ogre::ResourceManager::getResourceIterator;
 %include "OgreResourceManager.h"
     // ambiguity as enums are just ints
     %ignore Ogre::TextureManager::createManual(const String&, const String&,TextureType,uint,uint,int,PixelFormat,int);
@@ -490,6 +495,8 @@ SHARED_PTR(UnifiedHighLevelGpuProgram);
 // animations
 %ignore Ogre::VertexPoseKeyFrame::getPoseReferenceIterator;
 %include "OgreKeyFrame.h"
+%ignore Ogre::Pose::getNormalsIterator;
+%ignore Ogre::Pose::getVertexOffsetIterator;
 %include "OgrePose.h"
 %include "OgreAnimationTrack.h"
 %ignore Ogre::AnimationStateSet::getAnimationStateIterator;
@@ -508,14 +515,19 @@ SHARED_PTR(UnifiedHighLevelGpuProgram);
 %}
 #endif
 %template(AnimationStateMap) std::map<Ogre::String, Ogre::AnimationState*>;
+%ignore Ogre::Animation::getVertexTrackIterator;
+%ignore Ogre::Animation::getNodeTrackIterator;
+%ignore Ogre::Animation::getNumericTrackIterator;
 %include "OgreAnimation.h"
 SHARED_PTR(Skeleton);
 // deprecated
 %ignore Ogre::Skeleton::getRootBone;
 %ignore Ogre::Skeleton::getRootBoneIterator;
 %ignore Ogre::Skeleton::getBoneIterator;
+%ignore Ogre::Skeleton::getLinkedSkeletonAnimationSourceIterator;
 %template(BoneList) std::vector<Ogre::Bone*>;
 %include "OgreSkeleton.h"
+    %ignore Ogre::SkeletonInstance::getLinkedSkeletonAnimationSourceIterator;
     SHARED_PTR(SkeletonInstance);
     %include "OgreSkeletonInstance.h"
 %include "OgreSkeletonManager.h"
@@ -539,6 +551,7 @@ SHARED_PTR(Material);
 %ignore Ogre::RenderSystem::_setWorldMatrix;
 %ignore Ogre::RenderSystem::_setViewMatrix;
 %ignore Ogre::RenderSystem::_setProjectionMatrix;
+%ignore Ogre::RenderSystem::getRenderTargetIterator;
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
 #ifdef SWIGJAVA
@@ -551,6 +564,7 @@ SHARED_PTR(Material);
 %rename(MaterialManager_Listener) Ogre::MaterialManager::Listener;
 %include "OgreMaterialManager.h"
 %include "OgreRenderable.h"
+%ignore Ogre::ShadowCaster::getShadowVolumeRenderableIterator;
 %include "OgreShadowCaster.h"
 %extend Ogre::MovableObject {
   Entity* castEntity()
@@ -560,6 +574,7 @@ SHARED_PTR(Material);
 }
 %include "OgreMovableObject.h"
     %include "OgreBillboardChain.h"
+        %ignore Ogre::RibbonTrail::getNodeIterator;
         %include "OgreRibbonTrail.h"
     %include "OgreBillboardSet.h"
     %include "OgreMovablePlane.h"
@@ -610,6 +625,7 @@ SHARED_PTR(Material);
     %include "OgreEntity.h"
     %include "OgreSubEntity.h"
     SHARED_PTR(ParticleSystem);
+    %ignore Ogre::ParticleSystem::_getIterator;
     %include "OgreParticleSystem.h"
     %include "OgreInstancedEntity.h"
     %include "OgreInstanceBatch.h"
@@ -617,7 +633,13 @@ SHARED_PTR(Material);
     %include "OgreSimpleRenderable.h"
         %include "OgreRectangle2D.h"
         %include "OgreWireBoundingBox.h"
+%ignore Ogre::ParticleSystemManager::getTemplateIterator;
+%ignore Ogre::ParticleSystemManager::getEmitterFactoryIterator;
+%ignore Ogre::ParticleSystemManager::getAffectorFactoryIterator;
+%ignore Ogre::ParticleSystemManager::getRendererFactoryIterator;
 %include "OgreParticleSystemManager.h"
+%ignore Ogre::InstanceManager::getInstanceBatchIterator;
+%ignore Ogre::InstanceManager::getInstanceBatchMapIterator;
 %include "OgreInstanceManager.h" 
 %include "OgreVertexBoneAssignment.h"
 // deprecated
@@ -625,11 +647,18 @@ SHARED_PTR(Material);
 %ignore Ogre::Mesh::getPoseCount;
 %ignore Ogre::Mesh::getPose;
 %ignore Ogre::Mesh::getPoseIterator;
+%ignore Ogre::Mesh::getBoneAssignmentIterator;
 %template(PoseList) std::vector<Ogre::Pose*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
 SHARED_PTR(Mesh);
 %include "OgreMesh.h"
+%ignore Ogre::SubMesh::getBoneAssignmentIterator;
+%ignore Ogre::SubMesh::getAliasTextureIterator;
 %include "OgreSubMesh.h"
+%ignore Ogre::StaticGeometry::getRegionIterator;
+%ignore Ogre::StaticGeometry::Region::getLODIterator;
+%ignore Ogre::StaticGeometry::MaterialBucket::getGeometryIterator;
+%ignore Ogre::StaticGeometry::LODBucket::getMaterialIterator;
 %include "OgreStaticGeometry.h"
 %include "OgrePatchSurface.h"
     SHARED_PTR(PatchMesh);
@@ -669,7 +698,9 @@ SHARED_PTR(Mesh);
 %ignore Ogre::CompositorChain::getCompositor;
 %ignore Ogre::CompositorChain::getCompositors;
 %include "OgreCompositorChain.h"
+%ignore Ogre::RenderQueueGroup::getIterator;
 %include "OgreRenderQueueSortingGrouping.h"
+%ignore Ogre::RenderQueueInvocationSequence::iterator;
 %include "OgreRenderQueueInvocation.h"
 %ignore Ogre::SceneManager::getCameraIterator; // deprecated
 %ignore Ogre::SceneManager::getAnimationIterator;
@@ -682,6 +713,8 @@ SHARED_PTR(Mesh);
 %include "OgreSceneManager.h"
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask);
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&);
+%ignore Ogre::SceneManagerEnumerator::getSceneManagerIterator;
+%ignore Ogre::SceneManagerEnumerator::getMetaDataIterator;
 %include "OgreSceneManagerEnumerator.h"
 %include "OgreConfigDialog.h"
 %template(RenderSystemList) std::vector<Ogre::RenderSystem*>;
