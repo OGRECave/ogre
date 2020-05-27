@@ -30,7 +30,7 @@ THE SOFTWARE.
 #define __Animation_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreAnimationTrack.h"
 #include "OgreAnimationState.h"
 #include "OgreHeaderPrefix.h"

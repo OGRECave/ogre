@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreTerrainPrerequisites.h"
 #include "OgreTerrain.h"
 #include "OgreWorkQueue.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreConfigFile.h"
 
 namespace Ogre

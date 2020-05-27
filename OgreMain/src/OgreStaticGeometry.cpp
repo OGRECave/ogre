@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreEntity.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreLodStrategy.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreSubEntity.h"
 
 namespace Ogre {

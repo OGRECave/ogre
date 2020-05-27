@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreInstanceBatchHW_VTF.h"
 #include "OgreInstanceBatchShader.h"
 #include "OgreInstanceBatchVTF.h"
-#include "OgreIteratorWrappers.h"
 
 namespace Ogre
 {

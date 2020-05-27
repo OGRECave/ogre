@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 #include "OgreRenderTarget.h"
 #include "OgreDepthBuffer.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHardwareOcclusionQuery.h"
 #include "OgreComponents.h"
 
