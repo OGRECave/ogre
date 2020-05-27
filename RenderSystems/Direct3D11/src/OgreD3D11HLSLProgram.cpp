@@ -1181,6 +1181,19 @@ namespace Ogre {
         mHullShader.Reset();
         mComputeShader.Reset();
         mConstantBuffer.Reset();
+
+        for(unsigned int i = 0 ; i < mSerStrings.size() ; i++)
+        {
+            delete mSerStrings[i];
+        }
+        mSerStrings.clear();
+        mD3d11ShaderInputParameters.clear();
+        mD3d11ShaderOutputParameters.clear();
+        mD3d11ShaderBufferDescs.clear();
+        mD3d11ShaderVariables.clear();
+        mD3d11ShaderVariableSubparts.clear();
+        mVarDescBuffer.clear();
+        mD3d11ShaderTypeDescs.clear();
     }
 
     //-----------------------------------------------------------------------
@@ -1484,11 +1497,6 @@ namespace Ogre {
         else
         {
             unloadHighLevel();
-        }
-
-        for(unsigned int i = 0 ; i < mSerStrings.size() ; i++)
-        {
-            delete mSerStrings[i];
         }
     }
     //-----------------------------------------------------------------------
