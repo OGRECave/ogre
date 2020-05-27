@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgrePCZPrerequisites.h"
 #include "OgreSingleton.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 
 namespace Ogre
 {

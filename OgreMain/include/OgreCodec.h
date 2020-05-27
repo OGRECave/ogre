@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define _Codec_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreStringVector.h"
 #include "OgreException.h"
 #include "OgreHeaderPrefix.h"

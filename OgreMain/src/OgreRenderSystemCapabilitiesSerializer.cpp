@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreRenderSystemCapabilities.h"
 
 namespace Ogre

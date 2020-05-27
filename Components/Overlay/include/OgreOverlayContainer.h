@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgreOverlayPrerequisites.h"
 #include "OgreOverlayElement.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 
 
 namespace Ogre {

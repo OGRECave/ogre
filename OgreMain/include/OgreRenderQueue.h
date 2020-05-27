@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreHeaderPrefix.h"
-#include "OgreIteratorWrappers.h"
 
 namespace Ogre {
 

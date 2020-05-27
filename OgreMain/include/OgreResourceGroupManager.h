@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreDataStream.h"
 #include "OgreArchive.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
 #include <ctime>
