@@ -50,7 +50,7 @@ namespace Ogre {
     class _OgreExport PixelCountLodStrategyBase : public LodStrategy
     {
     protected:
-        virtual Real getValueImpl(const MovableObject *movableObject, const Camera *camera) const = 0;
+        Real getValueImpl(const MovableObject *movableObject, const Camera *camera) const override;
 
     public:
         /** Default constructor. */
@@ -80,8 +80,9 @@ namespace Ogre {
     public:
         /** Default constructor. */
         AbsolutePixelCountLodStrategy();
+        ~AbsolutePixelCountLodStrategy();
 
-        Real getValueImpl(const MovableObject *movableObject, const Camera *camera) const;
+        Real getValueImpl(const MovableObject *movableObject, const Camera *camera) const override;
 
         /// @copydoc Singleton::getSingleton()
         static AbsolutePixelCountLodStrategy& getSingleton(void);
@@ -94,8 +95,7 @@ namespace Ogre {
     public:
         /** Default constructor. */
         ScreenRatioPixelCountLodStrategy();
-
-        Real getValueImpl(const MovableObject *movableObject, const Camera *camera) const;
+        ~ScreenRatioPixelCountLodStrategy();
 
         /// @copydoc Singleton::getSingleton()
         static ScreenRatioPixelCountLodStrategy& getSingleton(void);
