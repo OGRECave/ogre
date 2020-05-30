@@ -15,6 +15,7 @@
 #include "OgreConfigDialog.h"
 #include "OgreFileSystemLayer.h"
 #include "OgrePredefinedControllers.h"
+#include "OgrePixelCountLodStrategy.h"
 %}
 
 %include std_shared_ptr.i
@@ -366,7 +367,7 @@ SHARED_PTR(FileHandleDataStream);
 %include "OgreCodec.h"
 %include "OgreSerializer.h"
 %include "OgreScriptLoader.h"
-// Listeners 
+// Listeners
 %feature("director") Ogre::FrameListener;
 %include "OgreFrameListener.h"
 %feature("director") Ogre::LodListener;
@@ -665,6 +666,8 @@ SHARED_PTR(Mesh);
     %include "OgrePatchMesh.h"
 %include "OgreMeshSerializer.h"
 %include "OgreMeshManager.h"
+%include "OgreLodStrategy.h"
+%include "OgrePixelCountLodStrategy.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
 %ignore Ogre::Pass::hasSeparateSceneBlending;
 %ignore Ogre::Pass::hasSeparateSceneBlendingOperations;
