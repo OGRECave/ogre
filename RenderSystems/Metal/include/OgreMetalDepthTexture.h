@@ -99,9 +99,6 @@ namespace Ogre
 
         virtual bool requiresTextureFlipping(void) const        { return false; }
 
-        /// @copydoc RenderTarget::getForceDisableColourWrites
-        virtual bool getForceDisableColourWrites(void) const    { return true; }
-
         /// Depth buffers never resolve; only colour buffers do. (we need mFsaaResolveDirty to be always
         /// true so that the proper path is taken in MetalTexture::getGLID)
         virtual void setFsaaResolveDirty(void)  {}
