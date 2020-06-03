@@ -153,7 +153,7 @@ namespace Ogre
         const void* _mapForRead( size_t offset, size_t sizeBytes );
 
         /** Maps the given amount of bytes. May block if not ready.
-            @See uploadWillStall if you wish to know.
+            @see uploadWillStall if you wish to know.
         @remarks
             Will throw if sizeBytes > this->getMaxSize()
         */

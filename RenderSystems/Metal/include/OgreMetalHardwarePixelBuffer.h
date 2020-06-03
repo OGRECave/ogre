@@ -95,7 +95,6 @@ namespace Ogre {
                             bool writeGamma, uint fsaa );
         virtual ~MetalTextureBuffer();
 
-        /// @copydoc HardwarePixelBuffer::bindToFramebuffer
         virtual void bindToFramebuffer(uint32 attachment, size_t zoffset);
 
         /// @copydoc HardwarePixelBuffer::getRenderTarget
