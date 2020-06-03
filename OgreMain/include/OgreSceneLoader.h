@@ -9,7 +9,7 @@ namespace Ogre {
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup General
+    /** \addtogroup Scene
     *  @{
     */
     /** Abstract class for loading scenes from a file (DataStream).
