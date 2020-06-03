@@ -38,7 +38,7 @@ namespace Ogre {
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup General
+    /** \defgroup Script Script
     *  @{
     */
     /** Abstract class defining the interface used by classes which wish 

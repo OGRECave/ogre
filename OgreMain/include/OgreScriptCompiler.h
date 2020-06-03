@@ -42,7 +42,7 @@ namespace Ogre
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup General
+    /** \addtogroup Script
     *  @{
     */
     /** These enums hold the types of the concrete parsed nodes */
