@@ -56,7 +56,7 @@ protected:
     void addToProfile(Ogre::Real cost); /// Add the currently reduced last vertex to the profile with given cost.
 
     void moveCameraToPixelDistance(Ogre::Real pixels); /// Moves camera to the swapping distance of PixelCountLodStrategy with given pixels.
-    Ogre::Real getCameraDistance(); /// Returns the distance between camera and mesh in pixels.
+    Ogre::Real getCameraLODValue(); /// Returns the LOD value of mesh in pixels using the current camera
     void recreateEntity();
 
 
