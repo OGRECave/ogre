@@ -485,7 +485,7 @@ namespace Ogre {
         @remarks
             This number includes the original model.
         */
-        ushort getNumLodLevels(void) const;
+        ushort getNumLodLevels(void) const { return mNumLods; }
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
 
@@ -1016,7 +1016,7 @@ namespace Ogre {
 
         /** Value used by to determine when this LOD applies.
         @remarks
-            May be interpretted differently by different strategies.
+            May be interpreted differently by different strategies.
             Transformed from user-supplied values with LodStrategy::transformUserValue.
         */
         Real value;
