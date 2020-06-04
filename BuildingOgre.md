@@ -90,6 +90,7 @@ a list of build options. You can adjust the settings to your liking;
 particular component/ plugin from being built
 - `OGRE_CONFIG_XXX` on the other hand allows you to configure Core features e.g. threading or zip file support.
 - `OGRE_CONFIG_NODE_INHERIT_TRANSFORM` enables shearing and non-uniform scaling for Ogre::SceneNode. This requires slightly more storage and computation time.
+- `OGRE_CONFIG_ENABLE_MESHLOD` If enabled, LOD levels from *.mesh files are used to reduce triangle count. If disabled, they are skipped at loading. Reducing submesh size and entity size.
 - `OGRE_PROFILING` add profiling instrumentation the ogre library.
 - `OGRE_PROFILING_REMOTERY_PATH` if set, Remotery is used for profiling instead of the Ogre internal profiler.
 - `OGRE_ASSERT_MODE` allows you to to disable all runtime assertion exceptions or turn them into calls to `std::abort`.
