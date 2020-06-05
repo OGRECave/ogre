@@ -106,6 +106,18 @@ void ApplicationContextSDL::shutdown()
     }
 }
 
+Ogre::RenderWindow* _findWindow (const std::vector<NativeWindowPair>& windows, Uint32 windowID)
+{
+    for (auto& window : windows)
+    {
+        if (windowID != SDL_GetWindowID (window.native))
+            continue;
+        Ogre::RenderWindow* win = window.render;
+        return win;
+    }
+    return nullptr;
+}
+
 void ApplicationContextSDL::pollEvents()
 {
     if(mWindows.empty())
@@ -123,17 +135,23 @@ void ApplicationContextSDL::pollEvents()
             mRoot->queueEndRendering();
             break;
         case SDL_WINDOWEVENT:
-            if(event.window.event != SDL_WINDOWEVENT_RESIZED)
-                continue;
-
-            for(WindowList::iterator it = mWindows.begin(); it != mWindows.end(); ++it)
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED)
             {
-                if(event.window.windowID != SDL_GetWindowID(it->native))
-                    continue;
-
-                Ogre::RenderWindow* win = it->render;
-                win->windowMovedOrResized();
-                windowResized(win);
+                if (auto win = _findWindow(mWindows, event.window.windowID))
+                {
+                    win->windowMovedOrResized ();
+                    windowResized (win);
+                }
+            }
+            else if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+            {
+                if (auto win = _findWindow (mWindows, event.window.windowID))
+                    windowFocusLost (win);
+            }
+            else if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+            {
+                if (auto win = _findWindow (mWindows, event.window.windowID))
+                    windowFocusGained (win);
             }
             break;
         default:

@@ -129,6 +129,8 @@ namespace OgreBites
         virtual bool windowClosing(Ogre::RenderWindow* rw) { return true; }
         virtual void windowClosed(Ogre::RenderWindow* rw) {}
         virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
+        virtual void windowFocusGained (Ogre::RenderWindow* rw) {}
+        virtual void windowFocusLost (Ogre::RenderWindow* rw) {}
 
         /**
          * inspect the event and call one of the corresponding functions on the registered InputListener
