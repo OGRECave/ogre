@@ -691,6 +691,7 @@ INPUT                  = OgreMain/include \
                             Docs/src/tutorials/deferred.md \
                             Docs/src/tutorials/external_texture.md \
                             Docs/src/tutorials/manualmesh.md \
+                            Docs/src/tutorials/meshlod.md \
                             Docs/src/tutorials/numpy.md \
                             Docs/src/tutorials/profiler.md \
                             Docs/src/tutorials/background-resource.md \
