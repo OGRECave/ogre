@@ -23,9 +23,12 @@ public:
 
     bool frameStarted(const FrameEvent& e)
     {
-        ImGuiOverlay::NewFrame(e);
+        if(mWindow->isActive())
+        {
+            ImGuiOverlay::NewFrame(e);
 
-        ImGui::ShowDemoWindow();
+            ImGui::ShowDemoWindow();
+        }
 
         return SdkSample::frameStarted(e);
     }
