@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreCodec.h"
 #include "OgrePixelFormat.h"
+#include "OgreBitwise.h"
 
 namespace Ogre {
 
