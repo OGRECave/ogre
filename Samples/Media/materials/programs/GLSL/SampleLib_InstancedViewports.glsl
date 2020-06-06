@@ -88,7 +88,7 @@ void SGX_InstancedViewportsDiscardOutOfBounds(
     float maxM = max(boxedXY.x,boxedXY.y);
     if (maxM >= 0.5)
     {
-#ifdef FRAGMENT_PROG
+#ifdef OGRE_FRAGMENT_SHADER
         discard;
 #endif
     }

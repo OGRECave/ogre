@@ -156,7 +156,6 @@ bool ShaderExInstancedViewports::resolveDependencies(ProgramSet* programSet)
     
     psProgram->addDependency(FFP_LIB_COMMON);
     psProgram->addDependency(SGX_LIB_INSTANCED_VIEWPORTS);
-    psProgram->addPreprocessorDefines("FRAGMENT_PROG"); // needed for GLSL
     
     return true;
 }

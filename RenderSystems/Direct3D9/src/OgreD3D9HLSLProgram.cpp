@@ -151,20 +151,17 @@ namespace Ogre {
         String stringBuffer;
         std::vector<D3DXMACRO> defines;
         const D3DXMACRO* pDefines = 0;
-        if (!mPreprocessorDefines.empty())
+        stringBuffer = appendBuiltinDefines(mPreprocessorDefines);
+
+        for(const auto& def : parseDefines(stringBuffer))
         {
-            stringBuffer = mPreprocessorDefines;
-
-            for(const auto& def : parseDefines(stringBuffer))
-            {
-                defines.push_back({def.first, def.second});
-            }
-
-            // Add NULL terminator
-            defines.push_back({0, 0});
-
-            pDefines = &defines[0];
+            defines.push_back({def.first, def.second});
         }
+
+        // Add NULL terminator
+        defines.push_back({0, 0});
+
+        pDefines = &defines[0];
 
         // Populate compile flags
         DWORD compileFlags = 0;

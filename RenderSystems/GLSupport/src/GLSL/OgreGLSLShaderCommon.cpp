@@ -64,13 +64,7 @@ namespace Ogre {
         if(getLanguage() == "glsles")
             cpp.Define("GL_ES", 5, 1);
 
-        RenderSystem* renderSystem = Root::getSingleton().getRenderSystem();
-        if (renderSystem && renderSystem->isReverseDepthBufferEnabled())
-        {
-            cpp.Define("OGRE_REVERSED_Z", 15, 1);
-        }
-
-        String defines = mPreprocessorDefines;
+        String defines = appendBuiltinDefines(mPreprocessorDefines);
 
         for(const auto& def : parseDefines(defines))
         {

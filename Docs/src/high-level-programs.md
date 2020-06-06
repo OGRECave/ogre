@@ -30,7 +30,12 @@ Both GLSL and HLSL support using preprocessor definitions in your code - some ar
 preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 ```
 
-This way you can use the same source code but still include small variations, each one defined as a different Ogre program name but based on the same source code.
+This way you can use the same source code but still include small variations, each one defined as a different %Ogre program name but based on the same source code.
+
+Furthermore, %Ogre automatically sets the following defines for convenience:
+- The current shading language: e.g. @c OGRE_GLSL, @c OGRE_HLSL
+- The current shader type: e.g. @c OGRE_VERTEX_SHADER, @c OGRE_FRAGMENT_SHADER
+- Whether @ref reversed-depth is enabled: @c OGRE_REVERSED_Z
 
 @note on GLSL %Ogre pre-processes the source itself instead on relying on the driver implementation which is often buggy. This relaxes using @c \#ifdef directives compared to the standard - e.g. you can <tt>\#ifdef \#version</tt>. However this means that defines specified in GLSL extensions are not present.
 
