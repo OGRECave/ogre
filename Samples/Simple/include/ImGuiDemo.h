@@ -7,7 +7,7 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-class _OgreSampleClassExport Sample_ImGui : public SdkSample
+class _OgreSampleClassExport Sample_ImGui : public SdkSample, public RenderTargetListener
 {
     std::unique_ptr<ImGuiInputListener> mImguiListener;
     InputListenerChain mListenerChain;
@@ -21,16 +21,13 @@ public:
         mInfo["Thumbnail"] = "thumb_imgui.png";
     }
 
-    bool frameStarted(const FrameEvent& e)
+    void preViewportUpdate(const RenderTargetViewportEvent& evt)
     {
-        if(mWindow->isActive())
-        {
-            ImGuiOverlay::NewFrame(e);
+        if(!evt.source->getOverlaysEnabled()) return;
 
-            ImGui::ShowDemoWindow();
-        }
+        ImGuiOverlay::NewFrame();
 
-        return SdkSample::frameStarted(e);
+        ImGui::ShowDemoWindow();
     }
 
     bool keyPressed(const KeyboardEvent& evt) { return mListenerChain.keyPressed(evt); }
@@ -50,11 +47,12 @@ public:
 
         /*
             NOTE:
-            Custom apps will ASSERT on ImGuiOverlay::NewFrame(e) and not display any UI if they
+            Custom apps will ASSERT on ImGuiOverlay::NewFrame() and not display any UI if they
             have not registered the overlay system by calling mSceneMgr->addRenderQueueListener(mOverlaySystem).
             OgreBites::SampleBrowser does this on behalf of the ImGuiDemo but custom applications will need to
             call this themselves.  See ApplicationContextBase::createDummyScene().
         */
+        mWindow->addListener(this);
 
         mImguiListener.reset(new ImGuiInputListener());
         mListenerChain = InputListenerChain({mTrayMgr.get(), mImguiListener.get(), mCameraMan.get()});
