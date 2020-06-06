@@ -23,7 +23,8 @@ public:
     /// must be called before first show()
     ImFont* addFont(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT);
 
-    static void NewFrame(const FrameEvent& evt);
+    static void NewFrame();
+    OGRE_DEPRECATED static void NewFrame(const FrameEvent& evt) { NewFrame(); }
 
     void _findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp);
 
