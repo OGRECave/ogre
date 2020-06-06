@@ -181,12 +181,6 @@ namespace Ogre {
         macro.Name = "SHADER_MODEL_4";
         defines.push_back(macro);
 
-        if(Root::getSingleton().getRenderSystem()->isReverseDepthBufferEnabled())
-        {
-            macro.Name = "OGRE_REVERSED_Z";
-            defines.push_back(macro);
-        }
-
 		switch (this->mType)
 		{
 			case GPT_VERTEX_PROGRAM:
@@ -424,7 +418,7 @@ namespace Ogre {
         String stringBuffer;
         std::vector<D3D_SHADER_MACRO> defines;
         const D3D_SHADER_MACRO* pDefines = NULL;
-        getDefines(stringBuffer, defines, mPreprocessorDefines);
+        getDefines(stringBuffer, defines, appendBuiltinDefines(mPreprocessorDefines));
         pDefines = defines.empty() ? NULL : &defines[0];
 
 

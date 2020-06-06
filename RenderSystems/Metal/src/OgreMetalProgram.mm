@@ -120,7 +120,7 @@ namespace Ogre {
     void MetalProgram::parsePreprocessorDefinitions( NSMutableDictionary<NSString*,
                                                      NSObject*> *inOutMacros )
     {
-        String defines = mPreprocessorDefines;
+        String defines = appendBuiltinDefines(mPreprocessorDefines);
         for(auto def : parseDefines(defines))
         {
             NSString *key = [NSString stringWithUTF8String:def.first];

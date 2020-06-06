@@ -176,7 +176,9 @@ namespace Ogre
                     defines[pos] = '\0';
                     // No definition part, define as "1"
                     ++pos;
-                    ret.push_back({&defines[macro_name_start], "1"});
+
+                    if(defines[macro_name_start] != '\0') // e.g ",DEFINE" or "DEFINE,"
+                        ret.push_back({&defines[macro_name_start], "1"});
                 }
             }
             else
@@ -189,6 +191,27 @@ namespace Ogre
         }
 
         return ret;
+    }
+
+    String HighLevelGpuProgram::appendBuiltinDefines(String defines)
+    {
+        if(!defines.empty()) defines += ",";
+
+        // OGRE_HLSL, OGRE_GLSL etc.
+        String tmp = getLanguage();
+        StringUtil::toUpperCase(tmp);
+        defines += "OGRE_"+tmp;
+
+        // OGRE_VERTEX_SHADER, OGRE_FRAGMENT_SHADER
+        tmp = GpuProgram::getProgramTypeName(getType());
+        StringUtil::toUpperCase(tmp);
+        defines += ",OGRE_"+tmp+"_SHADER";
+
+        auto renderSystem = Root::getSingleton().getRenderSystem();
+        if(renderSystem && renderSystem->isReverseDepthBufferEnabled())
+            defines += ",OGRE_REVERSED_Z";
+
+        return defines;
     }
 
     //---------------------------------------------------------------------------
