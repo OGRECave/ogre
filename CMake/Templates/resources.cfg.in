@@ -43,8 +43,7 @@ Zip=@OGRE_MEDIA_DIR_REL@/volumeTerrain/volumeTerrainBig.zip
 
 FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
 FileSystem=@OGRE_MEDIA_DIR_REL@/PBR/filament
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/glTF2_IBL
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/filament
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/PBR
 Zip=@OGRE_MEDIA_DIR_REL@/packs/DamagedHelmet.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/filament_shaders.zip
 
