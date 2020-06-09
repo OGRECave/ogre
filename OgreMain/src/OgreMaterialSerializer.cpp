@@ -862,12 +862,14 @@ namespace Ogre
             // Fire write begin event.
             fireTextureUnitStateEvent(MSE_WRITE_BEGIN, skipWriting, pTex);
 
+            OGRE_IGNORE_DEPRECATED_BEGIN
             // texture_alias
             if (!pTex->getTextureNameAlias().empty() && pTex->getTextureNameAlias() != pTex->getName())
             {
                 writeAttribute(4, "texture_alias");
                 writeValue(quoteWord(pTex->getTextureNameAlias()));
             }
+            OGRE_IGNORE_DEPRECATED_END
 
             //texture name
             if (pTex->getNumFrames() == 1 && !pTex->getTextureName().empty())

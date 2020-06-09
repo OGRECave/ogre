@@ -2663,8 +2663,10 @@ namespace Ogre{
                 case ID_TEXTURE_ALIAS:
                     compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
                         "texture_alias. Use 'texture $variable'");
+                    OGRE_IGNORE_DEPRECATED_BEGIN
                     if(getValue(prop, compiler, sval))
                         mUnit->setTextureNameAlias(sval);
+                    OGRE_IGNORE_DEPRECATED_END
                     break;
                 case ID_TEXTURE:
                     if(prop->values.empty())

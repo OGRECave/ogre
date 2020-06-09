@@ -98,7 +98,7 @@ bool GBufferSchemeHandler::checkNormalMap(
     TextureUnitState* tus, GBufferSchemeHandler::PassProperties& props)
 {
     bool isNormal = false;
-    Ogre::String lowerCaseAlias = tus->getTextureNameAlias();
+    Ogre::String lowerCaseAlias = tus->getName();
     Ogre::StringUtil::toLowerCase(lowerCaseAlias);
     if (lowerCaseAlias.find(NORMAL_MAP_PATTERN) != Ogre::String::npos)
     {

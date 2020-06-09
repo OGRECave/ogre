@@ -1058,16 +1058,11 @@ namespace Ogre {
         /// Get the name of the Texture Unit State.
         const String& getName(void) const { return mName; }
 
-        /** Set the alias name used for texture frame names.
-        @param name
-            Can be any sequence of characters and does not have to be unique.
-        */
-        void setTextureNameAlias(const String& name);
-        /** Gets the Texture Name Alias of the Texture Unit.
-        */
-        const String& getTextureNameAlias(void) const { return mTextureNameAlias;}
-
-        /// @deprecated do not use
+        /// @deprecated use setName()
+        OGRE_DEPRECATED void setTextureNameAlias(const String& name);
+        /// @deprecated use getName()
+        OGRE_DEPRECATED const String& getTextureNameAlias(void) const { return mTextureNameAlias;}
+        /// @deprecated use setTextureName()
         OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true);
 
         /** Notify this object that its parent has changed. */

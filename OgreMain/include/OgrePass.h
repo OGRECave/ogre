@@ -1483,8 +1483,8 @@ namespace Ogre {
          */
         size_t getPassIterationCount(void) const { return mPassIterationCount; }
 
-        /// @deprecated do not use
-        bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
+        /// @deprecated use getTextureUnitState("alias")->setTextureName("texture.png") instead
+        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
 
         /** Sets whether or not this pass will be clipped by a scissor rectangle
             encompassing the lights that are being used in it.

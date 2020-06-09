@@ -210,10 +210,10 @@ TEST(MaterialSerializer, Basic)
     ASSERT_TRUE(mat2);
     EXPECT_EQ(mat2->getTechniques().size(), mat->getTechniques().size());
     EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getAmbient(), ColourValue::Green);
+    EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState(0)->getName(),
+              "Test TUS");
     EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState("Test TUS")->getContentType(),
               TextureUnitState::CONTENT_SHADOW);
-    EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState("Test TUS")->getTextureNameAlias(),
-              "Test TUS");
     EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState(1)->getTextureName(),
               "TextureName");
 }
