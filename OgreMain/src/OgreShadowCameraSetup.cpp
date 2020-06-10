@@ -50,7 +50,7 @@ namespace Ogre
         texCam->setCustomViewMatrix(false);
         texCam->setCustomProjectionMatrix(false);
         texCam->setNearClipDistance(light->_deriveShadowNearClipDistance(cam));
-        texCam->setFarClipDistance(light->_deriveShadowFarClipDistance(cam));
+        texCam->setFarClipDistance(light->_deriveShadowFarClipDistance());
 
         // get the shadow frustum's far distance
         Real shadowDist = light->getShadowFarDistance();
