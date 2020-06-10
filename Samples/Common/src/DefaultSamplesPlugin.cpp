@@ -38,6 +38,7 @@
 #include "Compositor.h"
 #include "Compute.h"
 #include "CubeMapping.h"
+#include "CSMShadows.h"
 #include "DeferredShadingDemo.h"
 #include "Dot3Bump.h"
 #include "DualQuaternion.h"
@@ -101,6 +102,7 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_BezierPatch);
     addSample(new Sample_CameraTrack);
     addSample(new Sample_Character);
+    addSample(new CSMShadows);
 #if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
     addSample(new Sample_DynTex);
     addSample(new Sample_FacialAnimation);

@@ -31,6 +31,7 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/PCZAppMedia
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts/SSAO
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/SSAO
 FileSystem=@OGRE_MEDIA_DIR_REL@/volumeTerrain
+FileSystem=@OGRE_MEDIA_DIR_REL@/CSMShadows
 Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemap.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemapsJS.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/dragon.zip
