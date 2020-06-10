@@ -1,0 +1,118 @@
+/*  Copyright 2010-2012 Matthew Paul Reid
+    This file is subject to the terms and conditions defined in
+    file 'License.txt', which is part of this source code package.
+*/
+
+uniform sampler2D diffuseTexture : register(s0);
+uniform sampler2D shadowTexture0 : register(s1);
+uniform sampler2D shadowTexture1 : register(s2);
+uniform sampler2D shadowTexture2 : register(s3);
+uniform sampler2D shadowTexture3 : register(s4);
+uniform sampler2D jitterMapUnit : register(s5);
+
+
+//#define DEBUG_CSM // enables cascade debug visualisation
+#define JITTER_SHADOWS // enables poisson disk jitter filtering
+
+arbfp1 float4 tex2D_inBranch(uniform sampler2D sampler, float2 texCoords)
+{
+    return tex2D(sampler, texCoords);
+}
+
+ps_3_0 float4 tex2D_inBranch(uniform sampler2D sampler, float2 texCoords)
+{
+    return tex2D(sampler, texCoords, 0, 0);
+}
+
+#ifdef JITTER_SHADOWS
+#include "DepthShadowMapReceiverJitter.h"
+#else
+#include "BasicShadowMapReceiver.h"
+#endif
+#include "CsmShadows.h"
+
+#define PACKED_VIEWMATRIX
+#ifdef PACKED_VIEWMATRIX
+uniform float4 texMatrixScaleBias1;
+uniform float4 texMatrixScaleBias2;
+uniform float4 texMatrixScaleBias3;
+#endif
+
+void main_vp
+(
+    float4 iPosition : POSITION,
+    float3 iNormal : NORMAL,
+    float4 iTexCoord0 : TEXCOORD0,
+    float4 iColor : COLOR0,
+
+    out float4 oPosition : POSITION,
+    out float4 oTexCoord0 : TEXCOORD0,
+    out float3 oNormal : TEXCOORD1,
+    out float4 oShadowLightspacePos0 : TEXCOORD2,
+
+    uniform float4x4 worldViewProj,
+    uniform float4x4 worldMat,
+    uniform float4x4 texMatrix0
+)
+{
+    oPosition = mul(worldViewProj, iPosition);
+    oTexCoord0 = iTexCoord0;
+    oNormal = normalize(mul(float3x3(worldMat), iNormal));
+
+    // Calculate vertex position in light space
+    float4 worldPos = mul(worldMat, iPosition);
+    oShadowLightspacePos0 = mul(texMatrix0, worldPos);
+
+    // Store vertex distance from camera for use in shadows
+    oTexCoord0.z = oPosition.z;
+}
+
+void main_fp
+(
+    float4 iTexCoord0 : TEXCOORD0,
+    float3 iNormal : TEXCOORD1,
+    float4 iShadowLightspacePos0 : TEXCOORD2,
+    out float4 oColor : COLOR0,
+
+    uniform float4 lightDirection,
+    uniform float4 ambientColor,
+    uniform float shadowFadeDist,
+    uniform float shadowMaxDist
+)
+{
+    float lDotN = dot(iNormal.xyz, -lightDirection.xyz);
+    half3 lambert = saturate(lDotN);
+
+    float4 iShadowLightspacePos1;
+    iShadowLightspacePos1.xyz = iShadowLightspacePos0.xyz + texMatrixScaleBias1.xyz;
+    iShadowLightspacePos1.xy *= texMatrixScaleBias1.w;
+
+    float4 iShadowLightspacePos2;
+    iShadowLightspacePos2.xyz = iShadowLightspacePos0.xyz + texMatrixScaleBias2.xyz;
+    iShadowLightspacePos2.xy *= texMatrixScaleBias2.w;
+
+    float4 iShadowLightspacePos3;
+    iShadowLightspacePos3.xyz = iShadowLightspacePos0.xyz + texMatrixScaleBias3.xyz;
+    iShadowLightspacePos3.xy *= texMatrixScaleBias3.w;
+
+    half shadow = getCsmShadowFactor(shadowTexture0, shadowTexture1, shadowTexture2, shadowTexture3,
+                                   iShadowLightspacePos0, iShadowLightspacePos1, iShadowLightspacePos2, iShadowLightspacePos3, lDotN);
+
+    // Fade out shadows near max distance
+    half weight = saturate(((iTexCoord0.z + shadowFadeDist) - shadowMaxDist) / shadowFadeDist);
+    shadow = lerp(shadow, 1, weight);
+
+    // Mask lambert by shadow
+    lambert *= shadow;
+
+    // Calculate total pixel brightness
+    float4 brightness = float4(ambientColor.rgb + lambert, 1);
+
+    //
+    oColor = tex2D(diffuseTexture, iTexCoord0.xy) * brightness;
+    oColor.a = 1;
+
+#ifdef DEBUG_CSM
+    oColor.rgb *= cascadeColor;
+#endif
+}
