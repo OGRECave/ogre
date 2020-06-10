@@ -768,7 +768,7 @@ namespace Ogre {
             return maincam->getNearClipDistance();
     }
     //---------------------------------------------------------------------
-    Real Light::_deriveShadowFarClipDistance(const Camera* maincam) const
+    Real Light::_deriveShadowFarClipDistance() const
     {
         if (mShadowFarClipDist >= 0)
             return mShadowFarClipDist;

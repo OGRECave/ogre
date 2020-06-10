@@ -469,10 +469,14 @@ namespace Ogre {
         */
         Real getShadowFarClipDistance() const { return mShadowFarClipDist; }
 
-        /** Derive a shadow camera far distance from either the light, or
-            from the main camera if the light doesn't have its own setting.
+        /** Derive a shadow camera far distance
         */
-        Real _deriveShadowFarClipDistance(const Camera* maincam) const;
+        Real _deriveShadowFarClipDistance() const;
+        /// @deprecated use _deriveShadowFarClipDistance()
+        OGRE_DEPRECATED Real _deriveShadowFarClipDistance(const Camera*) const
+        {
+            return _deriveShadowFarClipDistance();
+        }
 
         /// Set the camera which this light should be relative to, for camera-relative rendering
         void _setCameraRelative(Camera* cam);
