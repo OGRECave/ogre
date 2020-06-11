@@ -64,7 +64,7 @@ namespace Ogre
         const Camera& cam, const Light& light, Affine3 *out_view, Matrix4 *out_proj,
         Camera *out_cam) const
     {
-        // get the shadow frustum's far distance
+        // get the shadow far distance
         Real shadowDist = light.getShadowFarDistance();
         if (!shadowDist)
         {
