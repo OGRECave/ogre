@@ -10,6 +10,7 @@ shared_params SphericalHarmonicsEnvironment
 
 vertex_program PBR_filament_vs_glsl glsl
 {
+    syntax glsl330
     source pbr_filament.vert.glsl
     // HAS_DYNAMIC_LIGHTING will also handle HAS_DIRECTIONAL_LIGHTING
     preprocessor_defines HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,MATERIAL_HAS_NORMAL,HAS_DYNAMIC_LIGHTING,VERTEX_DOMAIN_OBJECT
@@ -35,6 +36,7 @@ vertex_program PBR_filament_vs_glsl glsl
 
 abstract fragment_program PBR_filament_base_fs_glsl glsl
 {
+    syntax glsl330
     source pbr_filament.frag.glsl
     // HAS_DYNAMIC_LIGHTING will also handle HAS_DIRECTIONAL_LIGHTING
     // preprocessor_defines HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,HAS_BASECOLORMAP,MATERIAL_HAS_NORMAL,HAS_METALROUGHNESSMAP,HAS_OCCLUSIONMAP,HAS_DYNAMIC_LIGHTING,LIGHT_COUNT=8u,MATERIAL_HAS_EMISSIVE,VERTEX_DOMAIN_OBJECT,MATERIAL_CAN_SKIP_LIGHTING
@@ -117,6 +119,7 @@ fragment_program PBR_filament_clear_coat_ior_change_fs_glsl glsl : PBR_filament_
 
 fragment_program PBR_filament_cloth_fs_glsl glsl
 {
+    syntax glsl330
     source pbr_filament.frag.glsl
     // HAS_DYNAMIC_LIGHTING will also handle HAS_DIRECTIONAL_LIGHTING
     preprocessor_defines HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,HAS_BASECOLORMAP,MATERIAL_HAS_NORMAL,HAS_OCCLUSIONMAP,HAS_DYNAMIC_LIGHTING,LIGHT_COUNT=8u,MATERIAL_HAS_EMISSIVE,VERTEX_DOMAIN_OBJECT,SHADING_MODEL_CLOTH,MATERIAL_CAN_SKIP_LIGHTING
