@@ -207,8 +207,6 @@ namespace Ogre
         @par
             This value represents the VERTICAL field-of-view. The horizontal field of view is calculated from
             this depending on the dimensions of the viewport (they will only be the same if the viewport is square).
-        @note
-            Setting the FOV overrides the value supplied for frustum::setNearClipPlane.
          */
         void setFOVy(const Radian& fovy);
 
