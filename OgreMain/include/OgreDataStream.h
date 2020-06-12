@@ -241,8 +241,7 @@ namespace Ogre {
             otherwise, it'll produce unexpected results.
         @param buf Reference to a buffer pointer
         @param maxCount The maximum length of data to be read, excluding the terminating character
-        @par
-            delim The delimiter to stop at
+        @param delim The delimiter to stop at
         @return The number of bytes read, excluding the terminating character
         */
         virtual size_t readLine(char* buf, size_t maxCount, const String& delim = "\n");
