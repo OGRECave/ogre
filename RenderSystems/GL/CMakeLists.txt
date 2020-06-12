@@ -24,6 +24,8 @@ if(UNIX)
       COMPILE_DEFINITIONS "register="
     )
   endforeach()
+  set_source_files_properties(src/atifs/src/Compiler2Pass.cpp
+      PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
 endif()
 
 # Remove test app file

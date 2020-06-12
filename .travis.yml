@@ -1,6 +1,6 @@
 language: cpp
 sudo: required
-dist: xenial
+dist: bionic
 services:
     - xvfb
 branches:
@@ -30,6 +30,7 @@ addons:
     - swig3.0
     - doxygen
     - graphviz
+    - texlive-binaries
     - mono-mcs # compile C# bindings
     - qtbase5-dev # QtOgreBites
 before_script:
