@@ -309,6 +309,7 @@ ADD_REPR(Matrix4)
     Ogre::Matrix4 operator*(const Ogre::Matrix4& m) { return *$self * m; }
     Ogre::Matrix4 operator+(const Ogre::Matrix4& m) { return *$self + m; }
     Ogre::Matrix4 operator-(const Ogre::Matrix4& m) { return *$self - m; }
+	Ogre::Real __getitem__(int row, int column) { return (*$self)[row][column]; }
 }
 ADD_REPR(Affine3)
 %extend Ogre::Affine3
