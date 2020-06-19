@@ -70,8 +70,8 @@ if(DEFINED ENV{ANDROID})
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
     set(CROSS
         -DANDROID_PLATFORM=android-16
-        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r17
-        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r17/build/cmake/android.toolchain.cmake
+        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r18b
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r18b/build/cmake/android.toolchain.cmake
         -DANDROID_ARM_NEON=TRUE
         -DANDROID_ABI=arm64-v8a)
 
@@ -95,10 +95,10 @@ if(DEFINED ENV{ANDROID})
     if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r17)
         message(STATUS "Downloading Android NDK")
         file(DOWNLOAD
-            http://dl.google.com/android/repository/android-ndk-r17-linux-x86_64.zip
-            ./android-ndk-r17-linux-x86_64.zip)
+            https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip
+            ./android-ndk-r18b-linux-x86_64.zip)
         message(STATUS "Extracting Android NDK")
-        execute_process(COMMAND unzip android-ndk-r17-linux-x86_64.zip OUTPUT_QUIET)
+        execute_process(COMMAND unzip android-ndk-r18b-linux-x86_64.zip OUTPUT_QUIET)
     endif()
 endif()
 
