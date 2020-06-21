@@ -61,6 +61,7 @@ class OctreeCamera;
 typedef std::list< WireBoundingBox * > BoxList;
 typedef std::list< unsigned long > ColorList;
 
+/// @cond DOXYGEN_GROUP_BUG
 /** Specialized SceneManager that divides the geometry into an octree in order to facilitate spatial queries.
 */
 
@@ -215,7 +216,7 @@ protected:
     Matrix4 mScaleFactor;
 
 };
-
+/// @endcond
 /// Factory for OctreeSceneManager
 class OctreeSceneManagerFactory : public SceneManagerFactory
 {

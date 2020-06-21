@@ -57,14 +57,13 @@ namespace Ogre {
         IS_UNKNOWN
     };
 
-    /** Class defining a single pass of a Technique (of a Material), i.e.
-        a single rendering call.
-        @remarks
+    /** Class defining a single pass of a Technique (of a Material): a single rendering call.
+
         Rendering can be repeated with many passes for more complex effects.
         Each pass is either a fixed-function pass (meaning it does not use
         a vertex or fragment program) or a programmable pass (meaning it does
         use either a vertex and fragment program, or both).
-        @par
+
         Programmable passes are complex to define, because they require custom
         programs and you have to set all constant inputs to the programs (like
         the position of lights, any base material colours you wish to use etc), but
@@ -248,35 +247,6 @@ namespace Ogre {
         /// Operator = overload
         Pass& operator=(const Pass& oth);
 
-        /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
-        bool isProgrammable(void) const
-        {
-            for (const auto& u : mProgramUsage)
-                if (u) return true;
-            return false;
-        }
-
-        /// Returns true if this pass uses a programmable vertex pipeline
-        bool hasVertexProgram(void) const { return hasGpuProgram(GPT_VERTEX_PROGRAM); }
-        /// Returns true if this pass uses a programmable fragment pipeline
-        bool hasFragmentProgram(void) const { return hasGpuProgram(GPT_FRAGMENT_PROGRAM); }
-        /// Returns true if this pass uses a programmable geometry pipeline
-        bool hasGeometryProgram(void) const { return hasGpuProgram(GPT_GEOMETRY_PROGRAM); }
-        /// Returns true if this pass uses a programmable tessellation control pipeline
-        bool hasTessellationHullProgram(void) const { return hasGpuProgram(GPT_HULL_PROGRAM); }
-        /// Returns true if this pass uses a programmable tessellation control pipeline
-        bool hasTessellationDomainProgram(void) const { return hasGpuProgram(GPT_DOMAIN_PROGRAM); }
-        /// Returns true if this pass uses a programmable compute pipeline
-        bool hasComputeProgram(void) const { return hasGpuProgram(GPT_COMPUTE_PROGRAM); }
-        /// Returns true if this pass uses a shadow caster vertex program
-        bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
-        /// Returns true if this pass uses a shadow caster fragment program
-        bool hasShadowCasterFragmentProgram(void) const { return mShadowCasterFragmentProgramUsage != NULL; }
-        /// Returns true if this pass uses a shadow receiver vertex program
-        bool hasShadowReceiverVertexProgram(void) const { return mShadowReceiverVertexProgramUsage != NULL; }
-        /// Returns true if this pass uses a shadow receiver fragment program
-        bool hasShadowReceiverFragmentProgram(void) const { return mShadowReceiverFragmentProgramUsage != NULL; }
-
         size_t calculateSize(void) const;
 
         /// Gets the index of this Pass in the parent Technique
@@ -290,6 +260,8 @@ namespace Ogre {
         /// Get the name of the pass
         const String& getName(void) const { return mName; }
 
+        /// @name Surface properties
+        /// @{
         /** Sets the ambient colour reflectance properties of this pass.
 
         This property determines how much ambient light (directionless global light) is
@@ -391,6 +363,55 @@ namespace Ogre {
          */
         void setVertexColourTracking(TrackVertexColourType tracking);
 
+        /** Gets the ambient colour reflectance of the pass.
+         */
+        const ColourValue& getAmbient(void) const;
+
+        /** Gets the diffuse colour reflectance of the pass.
+         */
+        const ColourValue& getDiffuse(void) const;
+
+        /** Gets the specular colour reflectance of the pass.
+         */
+        const ColourValue& getSpecular(void) const;
+
+        /** Gets the self illumination colour of the pass.
+         */
+        const ColourValue& getSelfIllumination(void) const;
+
+        /** Gets the self illumination colour of the pass.
+            @see
+            getSelfIllumination
+        */
+        const ColourValue& getEmissive(void) const
+        {
+            return getSelfIllumination();
+        }
+
+        /** Gets the 'shininess' property of the pass (affects specular highlights).
+         */
+        Real getShininess(void) const;
+
+        /** Gets which material properties follow the vertex colour
+         */
+        TrackVertexColourType getVertexColourTracking(void) const;
+
+        /** Sets whether or not dynamic lighting is enabled.
+
+            Turning dynamic lighting off makes any ambient, diffuse, specular, emissive and shading
+            properties for this pass redundant.
+            If lighting is turned off, all objects rendered using the pass will be fully lit.
+            When lighting is turned on, objects are lit according
+            to their vertex normals for diffuse and specular light, and globally for ambient and
+            emissive.
+        */
+        void setLightingEnabled(bool enabled);
+
+        /** Returns whether or not dynamic lighting is enabled.
+         */
+        bool getLightingEnabled(void) const;
+        /// @}
+
         /**
          * set the line width for this pass
          *
@@ -400,6 +421,8 @@ namespace Ogre {
         void setLineWidth(float width) { mLineWidth = width; }
         float getLineWidth() const { return mLineWidth; }
 
+        /// @name Point Sprites
+        /// @{
         /** Gets the point size of the pass.
             @remarks
             This property determines what point size is used to render a point
@@ -483,40 +506,12 @@ namespace Ogre {
             @remarks 0 indicates the max size supported by the card.
         */
         Real getPointMaxSize(void) const;
+        /// @}
 
-        /** Gets the ambient colour reflectance of the pass.
-         */
-        const ColourValue& getAmbient(void) const;
-
-        /** Gets the diffuse colour reflectance of the pass.
-         */
-        const ColourValue& getDiffuse(void) const;
-
-        /** Gets the specular colour reflectance of the pass.
-         */
-        const ColourValue& getSpecular(void) const;
-
-        /** Gets the self illumination colour of the pass.
-         */
-        const ColourValue& getSelfIllumination(void) const;
-
-        /** Gets the self illumination colour of the pass.
-            @see
-            getSelfIllumination
-        */
-        const ColourValue& getEmissive(void) const
-        {
-            return getSelfIllumination();
-        }
-
-        /** Gets the 'shininess' property of the pass (affects specular highlights).
-         */
-        Real getShininess(void) const;
-
-        /** Gets which material properties follow the vertex colour
-         */
-        TrackVertexColourType getVertexColourTracking(void) const;
-
+        typedef VectorIterator<TextureUnitStates> TextureUnitStateIterator;
+        typedef ConstVectorIterator<TextureUnitStates> ConstTextureUnitStateIterator;
+        /// @name Texture Units
+        /// @{
         /** Inserts a new TextureUnitState object into the Pass.
             @remarks
             This unit is is added on top of all previous units.
@@ -556,12 +551,10 @@ namespace Ogre {
         */
         unsigned short getTextureUnitStateIndex(const TextureUnitState* state) const;
 
-        typedef VectorIterator<TextureUnitStates> TextureUnitStateIterator;
         /** Get an iterator over the TextureUnitStates contained in this Pass.
          * @deprecated use getTextureUnitStates() */
         OGRE_DEPRECATED TextureUnitStateIterator getTextureUnitStateIterator(void);
 
-        typedef ConstVectorIterator<TextureUnitStates> ConstTextureUnitStateIterator;
         /** Get an iterator over the TextureUnitStates contained in this Pass.
          * @deprecated use getTextureUnitStates() */
         OGRE_DEPRECATED ConstTextureUnitStateIterator getTextureUnitStateIterator(void) const;
@@ -587,6 +580,40 @@ namespace Ogre {
             return static_cast<unsigned short>(mTextureUnitStates.size());
         }
 
+        /// @deprecated use getTextureUnitState("alias")->setTextureName("texture.png") instead
+        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
+
+        /** Gets the 'nth' texture which references the given content type.
+            @remarks
+            If the 'nth' texture unit which references the content type doesn't
+            exist, then this method returns an arbitrary high-value outside the
+            valid range to index texture units.
+        */
+        unsigned short _getTextureUnitWithContentTypeIndex(
+            TextureUnitState::ContentType contentType, unsigned short index) const;
+
+        /** Set texture filtering for every texture unit
+            @note
+            This property actually exists on the TextureUnitState class
+            For simplicity, this method allows you to set these properties for
+            every current TeextureUnitState, If you need more precision, retrieve the
+            TextureUnitState instance and set the property there.
+            @see TextureUnitState::setTextureFiltering
+        */
+        void setTextureFiltering(TextureFilterOptions filterType);
+        /** Sets the anisotropy level to be used for all textures.
+            @note
+            This property has been moved to the TextureUnitState class, which is accessible via the
+            Technique and Pass. For simplicity, this method allows you to set these properties for
+            every current TeextureUnitState, If you need more precision, retrieve the Technique,
+            Pass and TextureUnitState instances and set the property there.
+            @see TextureUnitState::setTextureAnisotropy
+        */
+        void setTextureAnisotropy(unsigned int maxAniso);
+        /// @}
+
+        /// @name Scene Blending
+        /// @{
         /** Sets the kind of blending this pass has with the existing contents of the scene.
 
             Whereas the texture blending operations seen in the TextureUnitState class are concerned with
@@ -689,9 +716,33 @@ namespace Ogre {
         /** Returns the current alpha blending operation */
         SceneBlendOperation getSceneBlendingOperationAlpha() const;
 
+        /** Sets whether or not colour buffer writing is enabled for this %Pass.
+
+            If colour writing is off no visible pixels are written to the screen during this pass.
+            You might think this is useless, but if you render with colour writing off, and with very
+            minimal other settings, you can use this pass to initialise the depth buffer before
+            subsequently rendering other passes which fill in the colour data. This can give you
+            significant performance boosts on some newer cards, especially when using complex
+            fragment programs, because if the depth check fails then the fragment program is never
+            run.
+        */
+        void setColourWriteEnabled(bool enabled);
+        /** Determines if colour buffer writing is enabled for this pass i.e. when at least one
+            colour channel is enabled for writing.
+         */
+        bool getColourWriteEnabled(void) const;
+
+        /// Sets which colour buffer channels are enabled for writing for this Pass
+        void setColourWriteEnabled(bool red, bool green, bool blue, bool alpha);
+        /// Determines which colour buffer channels are enabled for writing for this pass.
+        void getColourWriteEnabled(bool& red, bool& green, bool& blue, bool& alpha) const;
+        /// @}
+
         /** Returns true if this pass has some element of transparency. */
         bool isTransparent(void) const;
 
+        /// @name Depth Testing
+        /// @{
         /** Sets whether or not this pass renders with depth-buffer checking on or not.
 
             If depth-buffer checking is on, whenever a pixel is about to be written to the frame buffer
@@ -737,26 +788,46 @@ namespace Ogre {
         */
         CompareFunction getDepthFunction(void) const;
 
-        /** Sets whether or not colour buffer writing is enabled for this %Pass.
+        /** Sets the depth bias to be used for this material.
 
-            If colour writing is off no visible pixels are written to the screen during this pass.
-            You might think this is useless, but if you render with colour writing off, and with very
-            minimal other settings, you can use this pass to initialise the depth buffer before
-            subsequently rendering other passes which fill in the colour data. This can give you
-            significant performance boosts on some newer cards, especially when using complex
-            fragment programs, because if the depth check fails then the fragment program is never
-            run.
+            When polygons are coplanar, you can get problems with 'depth fighting' where
+            the pixels from the two polys compete for the same screen pixel. This is particularly
+            a problem for decals (polys attached to another surface to represent details such as
+            bulletholes etc.).
+
+            A way to combat this problem is to use a depth bias to adjust the depth buffer value
+            used for the decal such that it is slightly higher than the true value, ensuring that
+            the decal appears on top. There are two aspects to the biasing, a constant
+            bias value and a slope-relative biasing value, which varies according to the
+            maximum depth slope relative to the camera, ie:
+
+            $$finalBias = maxSlope * slopeScaleBias + constantBias$$
+
+            Slope scale biasing is relative to the angle of the polygon to the camera, which makes
+            for a more appropriate bias value, but this is ignored on some older hardware. Constant
+            biasing is expressed as a factor of the minimum depth value, so a value of 1 will nudge
+            the depth by one ’notch’ if you will.
+            @param constantBias The constant bias value
+            @param slopeScaleBias The slope-relative bias value
         */
-        void setColourWriteEnabled(bool enabled);
-        /** Determines if colour buffer writing is enabled for this pass i.e. when at least one
-            colour channel is enabled for writing.
-         */
-        bool getColourWriteEnabled(void) const;
+        void setDepthBias(float constantBias, float slopeScaleBias = 0.0f);
 
-        /// Sets which colour buffer channels are enabled for writing for this Pass
-        void setColourWriteEnabled(bool red, bool green, bool blue, bool alpha);
-        /// Determines which colour buffer channels are enabled for writing for this pass.
-        void getColourWriteEnabled(bool& red, bool& green, bool& blue, bool& alpha) const;
+        /** Retrieves the const depth bias value as set by setDepthBias. */
+        float getDepthBiasConstant(void) const;
+        /** Retrieves the slope-scale depth bias value as set by setDepthBias. */
+        float getDepthBiasSlopeScale(void) const;
+        /** Sets a factor which derives an additional depth bias from the number
+            of times a pass is iterated.
+            @remarks
+            The Final depth bias will be the constant depth bias as set through
+            setDepthBias, plus this value times the iteration number.
+        */
+        void setIterationDepthBias(float biasPerIteration);
+        /** Gets a factor which derives an additional depth bias from the number
+            of times a pass is iterated.
+        */
+        float getIterationDepthBias() const;
+        /// @}
 
         /** Sets the culling mode for this pass based on the 'vertex winding'.
             A typical way for the rendering engine to cull triangles is based on the 'vertex winding' of
@@ -801,52 +872,6 @@ namespace Ogre {
         */
         ManualCullingMode getManualCullingMode(void) const;
 
-        /** Sets whether or not dynamic lighting is enabled.
-
-            Turning dynamic lighting off makes any ambient, diffuse, specular, emissive and shading
-            properties for this pass redundant. 
-            If lighting is turned off, all objects rendered using the pass will be fully lit.
-            When lighting is turned on, objects are lit according
-            to their vertex normals for diffuse and specular light, and globally for ambient and
-            emissive.
-        */
-        void setLightingEnabled(bool enabled);
-
-        /** Returns whether or not dynamic lighting is enabled.
-         */
-        bool getLightingEnabled(void) const;
-
-        /** Sets the maximum number of lights to be used by this pass.
-            @remarks
-            During rendering, if lighting is enabled (or if the pass uses an automatic
-            program parameter based on a light) the engine will request the nearest lights
-            to the object being rendered in order to work out which ones to use. This
-            parameter sets the limit on the number of lights which should apply to objects
-            rendered with this pass.
-        */
-        void setMaxSimultaneousLights(unsigned short maxLights);
-        /** Gets the maximum number of lights to be used by this pass. */
-        unsigned short getMaxSimultaneousLights(void) const;
-
-        /** Sets the light index that this pass will start at in the light list.
-
-            Normally the lights passed to a pass will start from the beginning
-            of the light list for this object. This option allows you to make this
-            pass start from a higher light index, for example if one of your earlier
-            passes could deal with lights 0-3, and this pass dealt with lights 4+.
-            This option also has an interaction with pass iteration, in that
-            if you choose to iterate this pass per light too, the iteration will
-            only begin from light 4.
-        */
-        void setStartLight(unsigned short startLight);
-        /** Gets the light index that this pass will start at in the light list. */
-        unsigned short getStartLight(void) const;
-
-        /** Sets the light mask which can be matched to specific light flags to be handled by this pass */
-        void setLightMask(uint32 mask);
-        /** Gets the light mask controlling which lights are used for this pass */
-        uint32 getLightMask() const;
-
         /** Sets the type of light shading required
 
             When dynamic lighting is turned on, the effect is to generate colour values at each
@@ -887,6 +912,9 @@ namespace Ogre {
         {
             return mPolygonModeOverrideable;
         }
+
+        /// @name Fogging
+        /// @{
         /** Sets the fogging mode applied to this pass.
             @remarks
             Fogging is an effect that is applied as polys are rendered. Sometimes, you want
@@ -953,47 +981,10 @@ namespace Ogre {
             Only valid if getFogOverride is true.
         */
         Real getFogDensity(void) const;
+        /// @}
 
-        /** Sets the depth bias to be used for this material.
-
-            When polygons are coplanar, you can get problems with 'depth fighting' where
-            the pixels from the two polys compete for the same screen pixel. This is particularly
-            a problem for decals (polys attached to another surface to represent details such as
-            bulletholes etc.).
-
-            A way to combat this problem is to use a depth bias to adjust the depth buffer value
-            used for the decal such that it is slightly higher than the true value, ensuring that
-            the decal appears on top. There are two aspects to the biasing, a constant
-            bias value and a slope-relative biasing value, which varies according to the
-            maximum depth slope relative to the camera, ie:
-
-            $$finalBias = maxSlope * slopeScaleBias + constantBias$$
-
-            Slope scale biasing is relative to the angle of the polygon to the camera, which makes
-            for a more appropriate bias value, but this is ignored on some older hardware. Constant
-            biasing is expressed as a factor of the minimum depth value, so a value of 1 will nudge
-            the depth by one ’notch’ if you will.
-            @param constantBias The constant bias value
-            @param slopeScaleBias The slope-relative bias value
-        */
-        void setDepthBias(float constantBias, float slopeScaleBias = 0.0f);
-
-        /** Retrieves the const depth bias value as set by setDepthBias. */
-        float getDepthBiasConstant(void) const;
-        /** Retrieves the slope-scale depth bias value as set by setDepthBias. */
-        float getDepthBiasSlopeScale(void) const;
-        /** Sets a factor which derives an additional depth bias from the number
-            of times a pass is iterated.
-            @remarks
-            The Final depth bias will be the constant depth bias as set through
-            setDepthBias, plus this value times the iteration number.
-        */
-        void setIterationDepthBias(float biasPerIteration);
-        /** Gets a factor which derives an additional depth bias from the number
-            of times a pass is iterated.
-        */
-        float getIterationDepthBias() const;
-
+        /// @name Alpha Rejection
+        /// @{
         /** Sets the way the pass will have use alpha to totally reject pixels from the pipeline.
             @remarks
             The default is CMPF_ALWAYS_PASS i.e. alpha is not used to reject pixels.
@@ -1035,6 +1026,7 @@ namespace Ogre {
         /** Gets whether to use alpha to coverage (A2C) when blending alpha rejected values.
          */
         bool isAlphaToCoverageEnabled() const { return mAlphaToCoverageEnabled; }
+        /// @}
 
         /** Sets whether or not transparent sorting is enabled.
             @param enabled
@@ -1068,6 +1060,39 @@ namespace Ogre {
         /** Returns whether or not transparent sorting is forced.
          */
         bool getTransparentSortingForced(void) const;
+
+        /// @name Light Iteration
+        /// @{
+        /** Sets the maximum number of lights to be used by this pass.
+            @remarks
+            During rendering, if lighting is enabled (or if the pass uses an automatic
+            program parameter based on a light) the engine will request the nearest lights
+            to the object being rendered in order to work out which ones to use. This
+            parameter sets the limit on the number of lights which should apply to objects
+            rendered with this pass.
+        */
+        void setMaxSimultaneousLights(unsigned short maxLights);
+        /** Gets the maximum number of lights to be used by this pass. */
+        unsigned short getMaxSimultaneousLights(void) const;
+
+        /** Sets the light index that this pass will start at in the light list.
+
+            Normally the lights passed to a pass will start from the beginning
+            of the light list for this object. This option allows you to make this
+            pass start from a higher light index, for example if one of your earlier
+            passes could deal with lights 0-3, and this pass dealt with lights 4+.
+            This option also has an interaction with pass iteration, in that
+            if you choose to iterate this pass per light too, the iteration will
+            only begin from light 4.
+        */
+        void setStartLight(unsigned short startLight);
+        /** Gets the light index that this pass will start at in the light list. */
+        unsigned short getStartLight(void) const;
+
+        /** Sets the light mask which can be matched to specific light flags to be handled by this pass */
+        void setLightMask(uint32 mask);
+        /** Gets the light mask controlling which lights are used for this pass */
+        uint32 getLightMask() const;
 
         /** Sets whether or not this pass should iterate per light or number of
             lights which can affect the object being rendered.
@@ -1136,6 +1161,7 @@ namespace Ogre {
             iteration.
         */
         unsigned short getLightCountPerIteration(void) const;
+        /// @}
 
         /// Gets the parent Technique
         Technique* getParent(void) const { return mParent; }
@@ -1143,6 +1169,36 @@ namespace Ogre {
         /// Gets the resource group of the ultimate parent Material
         const String& getResourceGroup(void) const;
 
+        /// @name Gpu Programs
+        /// @{
+
+        /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
+        bool isProgrammable(void) const
+        {
+            for (const auto& u : mProgramUsage)
+                if (u) return true;
+            return false;
+        }
+        /// Returns true if this pass uses a programmable vertex pipeline
+        bool hasVertexProgram(void) const { return hasGpuProgram(GPT_VERTEX_PROGRAM); }
+        /// Returns true if this pass uses a programmable fragment pipeline
+        bool hasFragmentProgram(void) const { return hasGpuProgram(GPT_FRAGMENT_PROGRAM); }
+        /// Returns true if this pass uses a programmable geometry pipeline
+        bool hasGeometryProgram(void) const { return hasGpuProgram(GPT_GEOMETRY_PROGRAM); }
+        /// Returns true if this pass uses a programmable tessellation control pipeline
+        bool hasTessellationHullProgram(void) const { return hasGpuProgram(GPT_HULL_PROGRAM); }
+        /// Returns true if this pass uses a programmable tessellation control pipeline
+        bool hasTessellationDomainProgram(void) const { return hasGpuProgram(GPT_DOMAIN_PROGRAM); }
+        /// Returns true if this pass uses a programmable compute pipeline
+        bool hasComputeProgram(void) const { return hasGpuProgram(GPT_COMPUTE_PROGRAM); }
+        /// Returns true if this pass uses a shadow caster vertex program
+        bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
+        /// Returns true if this pass uses a shadow caster fragment program
+        bool hasShadowCasterFragmentProgram(void) const { return mShadowCasterFragmentProgramUsage != NULL; }
+        /// Returns true if this pass uses a shadow receiver vertex program
+        bool hasShadowReceiverVertexProgram(void) const { return mShadowReceiverVertexProgramUsage != NULL; }
+        /// Returns true if this pass uses a shadow receiver fragment program
+        bool hasShadowReceiverFragmentProgram(void) const { return mShadowReceiverFragmentProgramUsage != NULL; }
         /// Gets the Gpu program used by this pass, only available after _load()
         const GpuProgramPtr& getGpuProgram(GpuProgramType programType) const;
         /// @overload
@@ -1340,6 +1396,7 @@ namespace Ogre {
         GpuProgramParametersSharedPtr getTessellationDomainProgramParameters(void) const;
         /// @overload
         GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
+        /// @}
 
         /** Splits this Pass to one which can be handled in the number of
             texture units specified.
@@ -1393,33 +1450,6 @@ namespace Ogre {
         */
         void _updateAutoParams(const AutoParamDataSource* source, uint16 variabilityMask) const;
 
-        /** Gets the 'nth' texture which references the given content type.
-            @remarks
-            If the 'nth' texture unit which references the content type doesn't
-            exist, then this method returns an arbitrary high-value outside the
-            valid range to index texture units.
-        */
-        unsigned short _getTextureUnitWithContentTypeIndex(
-            TextureUnitState::ContentType contentType, unsigned short index) const;
-
-        /** Set texture filtering for every texture unit
-            @note
-            This property actually exists on the TextureUnitState class
-            For simplicity, this method allows you to set these properties for
-            every current TeextureUnitState, If you need more precision, retrieve the
-            TextureUnitState instance and set the property there.
-            @see TextureUnitState::setTextureFiltering
-        */
-        void setTextureFiltering(TextureFilterOptions filterType);
-        /** Sets the anisotropy level to be used for all textures.
-            @note
-            This property has been moved to the TextureUnitState class, which is accessible via the
-            Technique and Pass. For simplicity, this method allows you to set these properties for
-            every current TeextureUnitState, If you need more precision, retrieve the Technique,
-            Pass and TextureUnitState instances and set the property there.
-            @see TextureUnitState::setTextureAnisotropy
-        */
-        void setTextureAnisotropy(unsigned int maxAniso);
         /** If set to true, this forces normals to be normalised dynamically
             by the hardware for this pass.
 
@@ -1482,9 +1512,6 @@ namespace Ogre {
         /** Gets the pass iteration count value.
          */
         size_t getPassIterationCount(void) const { return mPassIterationCount; }
-
-        /// @deprecated use getTextureUnitState("alias")->setTextureName("texture.png") instead
-        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
 
         /** Sets whether or not this pass will be clipped by a scissor rectangle
             encompassing the lights that are being used in it.

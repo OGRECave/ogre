@@ -55,6 +55,7 @@ namespace Ogre {
         SceneManager* createInstance(const String& instanceName);
         void destroyInstance(SceneManager* instance);
     };
+    /// @cond DOXYGEN_GROUP_BUG
     /// Default scene manager
     class _OgreExport DefaultSceneManager : public SceneManager
     {
@@ -63,6 +64,7 @@ namespace Ogre {
         ~DefaultSceneManager();
         const String& getTypeName(void) const;
     };
+    /// @endcond
 
     /** Enumerates the SceneManager classes available to applications.
         @remarks
