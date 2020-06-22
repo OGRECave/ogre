@@ -44,7 +44,7 @@ namespace Ogre {
         // Override isManual, not applicable for Material (we always want to call loadImpl)
         if(isManual)
         {
-            LogManager::getSingleton().logMessage("Material " + name + 
+            LogManager::getSingleton().logWarning("Material " + name +
                 " was requested with isManual=true, but this is not applicable " 
                 "for materials; the flag has been reset to false");
         }
