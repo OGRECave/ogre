@@ -722,6 +722,8 @@ EXCLUDE_PATTERNS       = *UTF* \
                          */GLSupport/include/GLX/* \
                          */GLSupport/include/OSX/* \
                          */GLSupport/include/win32/* \
+                         */include/Threading/* \
+                         */OgreMemoryAllocatorConfig.h \
                          *EAGL* \
                          */RenderSystems/GLES/*
 
@@ -1205,8 +1207,14 @@ PREDEFINED             = OGRE_MEMORY_ALLOCATOR=1 \
                          RTSHADER_SYSTEM_BUILD_EXT_SHADERS \
                          OGRE_PLATFORM=10 \
                          OGRE_DEPRECATED= \
+                         OGRE_NODISCARD= \
+                         OGRE_NORETURN= \
+                         DECL_MALLOC= \
+                         OGRE_FORCE_INLINE=inline \
                          OGRE_NODELESS_POSITIONING= \
                          MANAGED_RESOURCE= \
+                         OGRE_AUTO_MUTEX= \
+                         OGRE_FORMAT_PRINTF=;// \
                          OGRE_RESOURCE_GROUP_INIT==RGN_DEFAULT \
                          protected=private
 
