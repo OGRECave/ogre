@@ -146,53 +146,37 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.recalcBounds = false;
     opts.targetVersion = MESH_VERSION_LATEST;
 
+    opts.suppressEdgeLists = unOpts["-e"];
+    opts.generateTangents = unOpts["-t"];
+    opts.tangentSplitMirrored = unOpts["-tm"];
+    opts.tangentSplitRotated = unOpts["-tr"];
+    opts.lodAutoconfigure = unOpts["-autogen"];
+    opts.interactive = unOpts["-i"];
+    opts.dontReorganise = unOpts["-r"];
 
-    UnaryOptionList::iterator ui = unOpts.find("-e");
-    opts.suppressEdgeLists = ui->second;
-    ui = unOpts.find("-t");
-    opts.generateTangents = ui->second;
-    ui = unOpts.find("-tm");
-    opts.tangentSplitMirrored = ui->second;
-    ui = unOpts.find("-tr");
-    opts.tangentSplitRotated = ui->second;
-
-    ui = unOpts.find("-autogen");
-    opts.lodAutoconfigure = ui->second;
-
-    ui = unOpts.find("-i");
-    opts.interactive = ui->second;
-    ui = unOpts.find("-r");
-    opts.dontReorganise = ui->second;
-    ui = unOpts.find("-d3d");
-    if (ui->second) {
+    if (unOpts["-d3d"]) {
         opts.destColourFormatSet = true;
         opts.destColourFormat = VET_COLOUR_ARGB;
     }
-    ui = unOpts.find("-gl");
-    if (ui->second) {
+    if (unOpts["-gl"]) {
         opts.destColourFormatSet = true;
         opts.destColourFormat = VET_COLOUR_ABGR;
     }
-    ui = unOpts.find("-byte");
-    if (ui->second) {
+    if (unOpts["-byte"]) {
         opts.destColourFormatSet = true;
         opts.destColourFormat = VET_UBYTE4_NORM;
     }
-    ui = unOpts.find("-srcd3d");
-    if (ui->second) {
+    if (unOpts["-srcd3d"]) {
         opts.srcColourFormatSet = true;
         opts.srcColourFormat = VET_COLOUR_ARGB;
     }
-    ui = unOpts.find("-srcgl");
-    if (ui->second) {
+    if (unOpts["-srcgl"]) {
         opts.srcColourFormatSet = true;
         opts.srcColourFormat = VET_COLOUR_ABGR;
     }
-    ui = unOpts.find("-b");
-    if (ui->second) {
+    if (unOpts["-b"]) {
         opts.recalcBounds = true;
     }
-
 
     BinaryOptionList::iterator bi = binOpts.find("-l");
     if (!bi->second.empty()) {
@@ -255,8 +239,8 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
         } else if (bi->second == "1.0") {
             opts.targetVersion = MESH_VERSION_1_0;
         } else {
-            logMgr->stream() << "Unrecognised target mesh version '" << bi->second << "'";          
-    }
+            logMgr->logError("Unrecognised target mesh version '" + bi->second + "'");
+        }
     }
     
 }
