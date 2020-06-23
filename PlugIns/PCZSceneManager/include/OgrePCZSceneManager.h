@@ -48,7 +48,6 @@ namespace Ogre
     typedef std::vector<SceneNode*> NodeList;
     typedef std::list<WireBoundingBox*> BoxList;
 
-    /// @cond DOXYGEN_GROUP_BUG
     /** Specialized SceneManager that uses Portal-Connected-Zones to divide the scene spatially.
     */
 
@@ -372,7 +371,6 @@ namespace Ogre
         /// Internal method for firing the pre caster texture shadows event
         virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
     };
-    /// @endcond
 
     /// Factory for PCZSceneManager
     class PCZSceneManagerFactory : public SceneManagerFactory

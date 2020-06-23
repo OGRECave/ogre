@@ -45,7 +45,6 @@ namespace Ogre {
     *  @{
     */
 
-    /// @cond DOXYGEN_GROUP_BUG
     /** Specialisation of the SceneManager class to deal with indoor scenes
         based on a BSP tree.
         This class refines the behaviour of the default SceneManager to manage
@@ -221,7 +220,6 @@ namespace Ogre {
             createIntersectionQuery(uint32 mask = 0xFFFFFFFF);
 
     };
-    /// @endcond
 
     /** BSP specialisation of IntersectionSceneQuery */
     class BspIntersectionSceneQuery : public DefaultIntersectionSceneQuery
