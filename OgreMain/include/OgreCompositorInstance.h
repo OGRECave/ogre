@@ -42,7 +42,6 @@ namespace Ogre {
     /** \addtogroup Effects
     *  @{
     */
-    const size_t RENDER_QUEUE_COUNT = RENDER_QUEUE_MAX+1;       
             
     /** An instance of a Compositor object for one Viewport. It is part of the CompositorChain
         for a Viewport.

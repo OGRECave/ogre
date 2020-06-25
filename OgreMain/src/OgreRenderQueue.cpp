@@ -109,7 +109,7 @@ namespace Ogre {
         {
             RenderQueue* queue = p.second->getRenderQueue();
 
-            for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+            for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
             {
                 if(queue->mGroups[i])
                     queue->mGroups[i]->clear(destroyPassMaps);
@@ -175,7 +175,7 @@ namespace Ogre {
     {
         mSplitPassesByLightingType = split;
 
-        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
         {
             if(mGroups[i])
                 mGroups[i]->setSplitPassesByLightingType(split);
@@ -191,7 +191,7 @@ namespace Ogre {
     {
         mSplitNoShadowPasses = split;
 
-        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
         {
             if(mGroups[i])
                 mGroups[i]->setSplitNoShadowPasses(split);
@@ -207,7 +207,7 @@ namespace Ogre {
     {
         mShadowCastersCannotBeReceivers = ind;
 
-        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
         {
             if(mGroups[i])
                 mGroups[i]->setShadowCastersCannotBeReceivers(ind);
@@ -221,7 +221,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderQueue::merge( const RenderQueue* rhs )
     {
-        for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+        for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
         {
             if(!rhs->mGroups[i])
                 continue;

@@ -1191,7 +1191,7 @@ void SceneManager::prepareRenderQueue(void)
 
             // Default all the queue groups that are there, new ones will be created
             // with defaults too
-            for (size_t i = 0; i < RENDER_QUEUE_MAX; ++i)
+            for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
             {
                 if(!q->_getQueueGroups()[i])
                     continue;
@@ -1689,7 +1689,7 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
     // Render each separate queue
     const RenderQueue::RenderQueueGroupMap& groups = getRenderQueue()->_getQueueGroups();
 
-    for (uint8 qId = 0; qId < RENDER_QUEUE_MAX; ++qId)
+    for (uint8 qId = 0; qId < RENDER_QUEUE_COUNT; ++qId)
     {
         if(!groups[qId])
             continue;
