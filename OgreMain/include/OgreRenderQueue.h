@@ -72,7 +72,8 @@ namespace Ogre {
         /// Use this queue for objects which must be rendered last e.g. overlays
         RENDER_QUEUE_OVERLAY = 100, 
         /// Final possible render queue, don't exceed this
-        RENDER_QUEUE_MAX = 105
+        RENDER_QUEUE_MAX = 105,
+        RENDER_QUEUE_COUNT
     };
 
     /// @deprecated
@@ -93,7 +94,7 @@ namespace Ogre {
     {
     public:
 
-        typedef std::unique_ptr<RenderQueueGroup> RenderQueueGroupMap[RENDER_QUEUE_MAX];
+        typedef std::unique_ptr<RenderQueueGroup> RenderQueueGroupMap[RENDER_QUEUE_COUNT];
 
         /** Class to listen in on items being added to the render queue. 
         @remarks
