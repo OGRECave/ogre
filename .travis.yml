@@ -29,8 +29,9 @@ addons:
     - libpugixml-dev
     - swig3.0
     - doxygen
-    - graphviz
     - texlive-binaries
+    - texlive-base
+    - graphviz
     - mono-mcs # compile C# bindings
     - qtbase5-dev # QtOgreBites
 before_script:
@@ -68,9 +69,8 @@ script:
     - if [ $TEST ]; then build/bin/Test_Ogre ; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" -a "$IOS" != "TRUE" ]; then build/bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre ; fi
     # doxygen warnings check
-    - if [ "$TRAVIS_OS_NAME" = "linux" -a "ANDROID" != "TRUE" ]; then echo HAVE_DOT = NO >> build/html.cfg ; fi
-    - if [ "$TRAVIS_OS_NAME" = "linux" -a "ANDROID" != "TRUE" ]; then cmake --build build --target OgreDoc > /dev/null && cat build/doxygen_warnings.log ; fi
-    # - if [ "$TRAVIS_OS_NAME" = "linux" -a "ANDROID" != "TRUE" ]; then test ! -s build/doxygen_warnings.log ; fi    # XMLConverter works & validates
+    - if [ "$TRAVIS_OS_NAME" = "linux" -a "$ANDROID" != "TRUE" ]; then cmake --build build --target OgreDoc > /dev/null && cat build/doxygen_warnings.log ; fi
+    - if [ "$TRAVIS_OS_NAME" = "linux" -a "$ANDROID" != "TRUE" ]; then test ! -s build/doxygen_warnings.log ; fi    # XMLConverter works & validates
     - if [ $TEST ]; then build/bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && build/bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton ; fi
     - if [ $TEST ]; then python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml ; fi
     # run visual tests
