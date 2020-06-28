@@ -141,8 +141,8 @@ namespace Ogre
         int getHResult() const { return hresult; }
 
         const String& getFullDescription(void) const {
-            StringStream ss(RenderingAPIException::getFullDescription());
-            ss << " HRESULT=" << hresult;
+            StringStream ss;
+            ss << RenderingAPIException::getFullDescription() << " HRESULT=0x" << std::hex << hresult;
             fullDesc = ss.str();
             return fullDesc;
         }
