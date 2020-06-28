@@ -337,7 +337,7 @@ namespace Ogre {
 
         String quoteWord(const String& val)
         {
-            if (val.find_first_of(" \t") != String::npos)
+            if (val.find_first_of("{}$: \t") != String::npos)
                 return ("\"" + val + "\"");
             else return val;
         }
