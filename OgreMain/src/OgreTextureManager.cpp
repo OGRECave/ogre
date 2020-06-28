@@ -191,11 +191,10 @@ namespace Ogre {
 
         OgreAssert(width && height && depth, "total size of texture must not be zero");
 
-        // Check for 3D texture support
-        const RenderSystemCapabilities* caps =
-            Root::getSingleton().getRenderSystem()->getCapabilities();
-        if (((texType == TEX_TYPE_3D) || (texType == TEX_TYPE_2D_ARRAY)) &&
-            !caps->hasCapability(RSC_TEXTURE_3D))
+        // Check for texture support
+        const auto caps = Root::getSingleton().getRenderSystem()->getCapabilities();
+        if (((texType == TEX_TYPE_3D) && !caps->hasCapability(RSC_TEXTURE_3D)) ||
+            ((texType == TEX_TYPE_2D_ARRAY) && !caps->hasCapability(RSC_TEXTURE_2D_ARRAY)))
             return ret;
 
         if (((usage & (int)TU_STATIC) != 0) && (!Root::getSingleton().getRenderSystem()->isStaticBufferLockable()))

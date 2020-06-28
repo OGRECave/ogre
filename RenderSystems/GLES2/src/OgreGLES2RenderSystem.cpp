@@ -445,6 +445,9 @@ namespace Ogre {
         if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_3D"))
             rsc->setCapability(RSC_TEXTURE_3D);
 
+        if(hasMinGLVersion(3, 0))
+            rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
+
         // ES 3 always supports NPOT textures
         if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_texture_npot") || checkExtension("GL_ARB_texture_non_power_of_two"))
         {

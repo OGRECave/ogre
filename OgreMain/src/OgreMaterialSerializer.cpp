@@ -885,6 +885,9 @@ namespace Ogre
                 case TEX_TYPE_2D:
                     // nothing, this is the default
                     break;
+                case TEX_TYPE_2D_ARRAY:
+                    writeValue("2darray");
+                    break;
                 case TEX_TYPE_3D:
                     writeValue("3d");
                     break;

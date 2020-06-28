@@ -330,6 +330,7 @@ namespace Ogre {
         // So are 1D & 3D textures
         rsc->setCapability(RSC_TEXTURE_1D);
         rsc->setCapability(RSC_TEXTURE_3D);
+        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
 
         // UBYTE4 always supported
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
