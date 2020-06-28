@@ -935,6 +935,7 @@ namespace Ogre
         rsc->setCapability(RSC_INFINITE_FAR_PLANE);
 
         rsc->setCapability(RSC_TEXTURE_3D);
+        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);

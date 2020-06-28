@@ -22,24 +22,13 @@ public:
 
 protected:
 
-    StringVector getRequiredPlugins()
-    {
-        StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
-            names.push_back("Cg Program Manager");
-        return names;
-    }
-
     void testCapabilities( const RenderSystemCapabilities* caps )
     {
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") && 
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("gp4fp"))
+        auto mat = MaterialManager::getSingleton().getByName("Examples/TextureArray");
+        mat->load();
+        if (mat->getSupportedTechniques().empty())
         {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
-                        "so you cannot run this sample. Sorry!", "TextureArray::testCapabilities");
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, mat->getUnsupportedTechniquesExplanation());
         }
     }
 

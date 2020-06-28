@@ -666,6 +666,9 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_1D);
         rsc->setCapability(RSC_TEXTURE_3D);
 
+        if(GLEW_VERSION_3_0 || GLEW_EXT_texture_array)
+            rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
+
         // Check for framebuffer object extension
         if(GLEW_EXT_framebuffer_object)
         {

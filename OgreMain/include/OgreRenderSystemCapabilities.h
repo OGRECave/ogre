@@ -190,6 +190,8 @@ namespace Ogre
         RSC_COMPUTE_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 23),
         /// Supports asynchronous hardware occlusion queries
         RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 24),
+        /// Supports 2D Texture Arrays
+        RSC_TEXTURE_2D_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 25),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

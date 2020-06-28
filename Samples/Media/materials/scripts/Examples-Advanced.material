@@ -765,11 +765,11 @@ material Examples/Athene/NormalMappedSpecular : Examples/BumpMapping/MultiLightS
 }
 
 
-vertex_program Examples/TextureArrayVScg cg
+vertex_program Examples/TextureArrayVScg hlsl
 {
 	source Example_TextureArrayVS.cg
 	entry_point textureArray_v
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
 	default_params
 	{
@@ -825,26 +825,8 @@ fragment_program Examples/TextureArrayPShlsl4 hlsl
 	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
-fragment_program Examples/TextureArrayPSasm asm
-{
-	source Example_TextureArrayPS.asm
-	syntax gp4fp
-}
-
 material Examples/TextureArray
 {
-	technique asm
-	{
-		pass
-		{
-			fragment_program_ref Examples/TextureArrayPSasm
-			{
-			}
-
-		}
-	}
-
-
 	technique HLSL4
 	{
 		pass
