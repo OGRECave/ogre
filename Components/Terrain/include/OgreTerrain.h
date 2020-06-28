@@ -45,7 +45,7 @@ namespace Ogre
     *  @{
     */
     /** \defgroup Terrain Terrain
-    *   Editable %Terrain System with LOD, serialization and \ref Paging support
+    *   Editable %Terrain System with LOD @cite de2000fast, serialization and \ref Paging support
     *  @{
     */
 
