@@ -49,7 +49,7 @@ class SampleApp(Bites.ApplicationContext, Bites.InputListener):
         rs = shadergen.getRenderState(RTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME)
         rs.addTemplateSubRenderState(shadergen.createSubRenderState(RTShader.cvar.PerPixelLighting_Type))
 
-        scn_mgr.setAmbientLight(Ogre.ColourValue(.1, .1, .1))
+        scn_mgr.setAmbientLight((.1, .1, .1))
 
         light = scn_mgr.createLight("MainLight")
         lightnode = scn_mgr.getRootSceneNode().createChildSceneNode()
@@ -72,7 +72,7 @@ class SampleApp(Bites.ApplicationContext, Bites.InputListener):
         self.addInputListener(self.ctrls)
 
         vp = self.getRenderWindow().addViewport(cam)
-        vp.setBackgroundColour(Ogre.ColourValue(.3, .3, .3))
+        vp.setBackgroundColour((.3, .3, .3))
 
         ent = scn_mgr.createEntity("Sinbad.mesh")
         node = scn_mgr.getRootSceneNode().createChildSceneNode()

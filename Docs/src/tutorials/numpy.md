@@ -23,7 +23,7 @@ For completeness we also create a small scene where we map the texture on a scre
 
 As the rectangle does not cover the full scene, we also set a background colour
 @snippet Samples/Python/numpy_sample.py py_to_primitive
-Here we use the normal python iterable unpacking. Again this is copying the data.
+Here, we use the normal python sequence protocol. Again this is copying the data.
 
 Finally we want to store the rendered image into a file. This time we manually allocate the memory with Ogre.MemoryDataStream to store the pixel values.
 

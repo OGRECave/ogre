@@ -48,8 +48,8 @@ def main():
     vp = win.addViewport(cam)
     
     ## [py_to_primitive]
-    gray = (0.3, 0.3, 0.3)
-    vp.setBackgroundColour(Ogre.ColourValue(*gray))
+    gray = np.array([0.3, 0.3, 0.3])
+    vp.setBackgroundColour(gray)
     ## [py_to_primitive]
 
     root.startRendering()
