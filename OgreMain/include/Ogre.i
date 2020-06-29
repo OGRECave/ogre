@@ -290,6 +290,44 @@ ADD_REPR(Vector)
 TPL_VECTOR(2)
 TPL_VECTOR(3)
 TPL_VECTOR(4)
+
+#ifdef SWIGPYTHON
+%define TYPEMAP_SEQUENCE_FOR(TYPE, LEN_CHECK)
+%typemap(in) const TYPE& (TYPE temp) {
+    void *argp = 0;
+    int res = SWIG_ConvertPtr($input, &argp, $descriptor, $disown);
+    if (SWIG_IsOK(res)) {
+        $1 = ($ltype)(argp);
+    } else {
+        if (!PySequence_Check($input)) {
+            SWIG_exception_fail(SWIG_TypeError, "Expected TYPE or sequence") ;
+        }
+        int len = PySequence_Length($input);
+        if (!(LEN_CHECK)) {
+            SWIG_exception_fail(SWIG_ValueError, "Size mismatch. Expected LEN_CHECK");
+        }
+        for (int i = 0; i < len; i++) {
+            PyObject *o = PySequence_GetItem($input, i);
+            if (!PyNumber_Check(o)) {
+                Py_XDECREF(o);
+                SWIG_exception_fail(SWIG_TypeError, "Sequence elements must be numbers");
+            }
+            temp.ptr()[i] = (float)PyFloat_AsDouble(o);
+            Py_DECREF(o);
+        }
+        $1 = &temp;
+    }
+}
+%typecheck(SWIG_TYPECHECK_POINTER) const TYPE& {
+    $1 = true; // actual check in the typemap
+}
+%enddef
+TYPEMAP_SEQUENCE_FOR(Ogre::Vector2, len == 2)
+TYPEMAP_SEQUENCE_FOR(Ogre::Vector3, len == 3)
+TYPEMAP_SEQUENCE_FOR(Ogre::Vector4, len == 4)
+TYPEMAP_SEQUENCE_FOR(Ogre::ColourValue, len >= 3 && len <= 4)
+#endif
+
 %include "OgreMatrix3.h"
 ADD_REPR(Matrix3)
 %extend Ogre::Matrix3

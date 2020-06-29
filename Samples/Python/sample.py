@@ -70,11 +70,11 @@ def main():
 
     camnode = scn_mgr.getRootSceneNode().createChildSceneNode()
     camnode.attachObject(cam)
-    camnode.lookAt(Ogre.Vector3(0, 0, -1), Ogre.Node.TS_WORLD)
+    camnode.lookAt((0, 0, -1), Ogre.Node.TS_WORLD)
     camnode.setPosition(0, 0, 15)
     
     vp = win.addViewport(cam)
-    vp.setBackgroundColour(Ogre.ColourValue(.3, .3, .3))
+    vp.setBackgroundColour((.3, .3, .3))
 
     ent = scn_mgr.createEntity("Sinbad.mesh")
     node = scn_mgr.getRootSceneNode().createChildSceneNode()
