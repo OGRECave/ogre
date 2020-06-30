@@ -292,6 +292,26 @@ TPL_VECTOR(3)
 TPL_VECTOR(4)
 
 #ifdef SWIGPYTHON
+%typemap(in) void*, Ogre::uchar* {
+    void* argp;
+    // always allow uchar* as thats how pixel data is usually passed around
+    int res = SWIG_ConvertPtr($input, &argp, $descriptor(Ogre::uchar*), $disown);
+    if (SWIG_IsOK(res)) {
+        $1 = ($ltype)(argp);
+    } else {
+        Py_buffer view;
+        res = PyObject_GetBuffer($input, &view, PyBUF_CONTIG);
+        if (res < 0) {
+            SWIG_fail;
+        }
+        PyBuffer_Release(&view);
+        $1 = ($ltype)view.buf;
+    }
+}
+%typecheck(SWIG_TYPECHECK_POINTER) void*, Ogre::uchar* {
+    $1 = true; // actual check in the typemap
+}
+
 %define TYPEMAP_SEQUENCE_FOR(TYPE, LEN_CHECK)
 %typemap(in) const TYPE& (TYPE temp) {
     void *argp = 0;
