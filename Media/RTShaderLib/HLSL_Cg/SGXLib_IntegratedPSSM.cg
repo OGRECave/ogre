@@ -24,14 +24,14 @@ void SGX_ApplyShadowFactor_Diffuse(in float4 ambient,
 
 //-----------------------------------------------------------------------------
 void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
-							in float4 vSplitPoints,							
-							in float4 lightPosition0,
-							in float4 lightPosition1,
-							in float4 lightPosition2,
-							in sampler2D shadowMap0,
-							in sampler2D shadowMap1,
-							in sampler2D shadowMap2,
-							out float oShadowFactor)
+                                in float4 vSplitPoints,
+                                in float4 lightPosition0,
+                                in sampler2D shadowMap0,
+                                in float4 lightPosition1,
+                                in sampler2D shadowMap1,
+                                in float4 lightPosition2,
+                                in sampler2D shadowMap2,
+                                out float oShadowFactor)
 {
 	if (fDepth  <= vSplitPoints.x)
 	{													
@@ -62,13 +62,9 @@ void SGX_ShadowPCF4(sampler2D shadowMap, float4 shadowMapPos, float2 offset, out
     float2 uv = shadowMapPos.xy;
     float3 o = float3(offset, -offset.x) * 0.3f;
 
-    float depth = tex2D(shadowMap, uv.xy - o.xy).r;
-	if(depth >= 1.0)
-	{
-		// early out, if sampling behind far plane
-		c = 1.0;
-		return;
-	}
+    // clamp depth value to near & far of current frustum
+    shadowMapPos.z = saturate(shadowMapPos.z);
+
     // Note: We using 2x2 PCF. Good enough and is a lot faster.
     c =  (shadowMapPos.z <= tex2D(shadowMap, uv.xy - o.xy).r) ? 1 : 0; // top left
     c += (shadowMapPos.z <= tex2D(shadowMap, uv.xy + o.xy).r) ? 1 : 0; // bottom right
@@ -87,33 +83,33 @@ void SGX_ShadowPCF4(sampler2D shadowMap, float4 shadowMapPos, out float c)
 void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
                             in float4 vSplitPoints,
                             in float4 lightPosition0,
-                            in float4 lightPosition1,
-                            in float4 lightPosition2,
                             in sampler2D shadowMap0,
+                            in float2 invShadowMapSize0,
+                            in float4 lightPosition1,
                             in sampler2D shadowMap1,
+                            in float2 invShadowMapSize1,
+                            in float4 lightPosition2,
                             in sampler2D shadowMap2,
-                            in float4 invShadowMapSize0,
-                            in float4 invShadowMapSize1,
-                            in float4 invShadowMapSize2,
+                            in float2 invShadowMapSize2,
                             out float oShadowFactor)
 {
     if (fDepth  <= vSplitPoints.x)
     {
-        SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0.xy, oShadowFactor);
+        SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0, oShadowFactor);
 #ifdef DEBUG_PSSM
         pssm_lod_info.r = 1.0;
 #endif
     }
     else if (fDepth <= vSplitPoints.y)
     {
-        SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy, oShadowFactor);
+        SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1, oShadowFactor);
 #ifdef DEBUG_PSSM
         pssm_lod_info.g = 1.0;
 #endif
     }
     else
     {
-        SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy, oShadowFactor);
+        SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2, oShadowFactor);
 #ifdef DEBUG_PSSM
         pssm_lod_info.b = 1.0;
 #endif
