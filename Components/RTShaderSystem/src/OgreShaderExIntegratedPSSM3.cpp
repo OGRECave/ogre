@@ -64,10 +64,10 @@ void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, const Pass* pass
 {
     Vector4 vSplitPoints;
 
-    vSplitPoints.x = mShadowTextureParamsList[0].mMaxRange;
-    vSplitPoints.y = mShadowTextureParamsList[1].mMaxRange;
-    vSplitPoints.z = 0.0;
-    vSplitPoints.w = 0.0;
+    for(size_t i = 0; i < mShadowTextureParamsList.size() - 1; i++)
+    {
+        vSplitPoints[i] = mShadowTextureParamsList[i].mMaxRange;
+    }
 
     mPSSplitPoints->setGpuParameter(vSplitPoints);
 
@@ -134,11 +134,7 @@ bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState,
 //-----------------------------------------------------------------------
 void IntegratedPSSM3::setSplitPoints(const SplitPointList& newSplitPoints)
 {
-    if (newSplitPoints.size() != 4)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                    "IntegratedPSSM3 sub render state requires 4 split points");
-    }
+    OgreAssert(newSplitPoints.size() <= 5, "at most 5 split points are supported");
 
     mShadowTextureParamsList.resize(newSplitPoints.size() - 1);
 
@@ -205,13 +201,8 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
         it->mPSInLightPosition = psMain->resolveInputParameter(it->mVSOutLightPosition);
         auto stype = mUseTextureCompare ? GCT_SAMPLER2DSHADOW : GCT_SAMPLER2D;
         it->mTextureSampler = psProgram->resolveParameter(stype, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");
-
-        if (!mUseTextureCompare)
-        {
-            it->mInvTextureSize = psProgram->resolveParameter(
-                GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE,
-                it->mTextureSamplerIndex);
-        }
+        it->mInvTextureSize = psProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE,
+                                                          it->mTextureSamplerIndex);
 
         ++lightIndex;
         ++it;
@@ -231,8 +222,14 @@ bool IntegratedPSSM3::resolveDependencies(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     psProgram->addDependency(SGX_LIB_INTEGRATEDPSSM);
 
+    psProgram->addPreprocessorDefines(
+        StringUtil::format("PSSM_NUM_SPLITS=%zu", mShadowTextureParamsList.size()));
+
     if(mDebug)
         psProgram->addPreprocessorDefines("DEBUG_PSSM");
+
+    if(mUseTextureCompare)
+        psProgram->addPreprocessorDefines("PSSM_SAMPLE_CMP");
 
     return true;
 }
@@ -281,21 +278,12 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
     Function* psMain = psProgram->getEntryPointFunction();
     auto stage = psMain->getStage(groupOrder);
 
-    if(mShadowTextureParamsList.size() != 3)
+    if(mShadowTextureParamsList.size() < 2)
     {
         ShadowTextureParams& splitParams0 = mShadowTextureParamsList[0];
-        if (mUseTextureCompare)
-        {
-            stage.callFunction("SGX_ShadowPCF4",
-                               {In(splitParams0.mTextureSampler), In(splitParams0.mPSInLightPosition),
-                                Out(mPSLocalShadowFactor)});
-        }
-        else
-        {
-            stage.callFunction("SGX_ShadowPCF4",
-                               {In(splitParams0.mTextureSampler), In(splitParams0.mPSInLightPosition),
-                                In(splitParams0.mInvTextureSize).xy(), Out(mPSLocalShadowFactor)});
-        }
+        stage.callFunction("SGX_ShadowPCF4",
+                           {In(splitParams0.mTextureSampler), In(splitParams0.mPSInLightPosition),
+                            In(splitParams0.mInvTextureSize).xy(), Out(mPSLocalShadowFactor)});
     }
     else
     {
@@ -305,8 +293,7 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
         {
             params.push_back(In(texp.mPSInLightPosition));
             params.push_back(In(texp.mTextureSampler));
-            if (!mUseTextureCompare)
-                params.push_back(In(texp.mInvTextureSize).xy());
+            params.push_back(In(texp.mInvTextureSize).xy());
         }
 
         params.push_back(Out(mPSLocalShadowFactor));
