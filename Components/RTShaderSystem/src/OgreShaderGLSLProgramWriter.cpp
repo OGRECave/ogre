@@ -110,6 +110,7 @@ const char* GLSLProgramWriter::getGL3CompatDefines()
     // Redefine texture functions to maintain reusability
     return "#define texture1D texture\n"
            "#define texture2D texture\n"
+           "#define shadow2D texture\n"
            "#define shadow2DProj textureProj\n"
            "#define texture3D texture\n"
            "#define textureCube texture\n"
