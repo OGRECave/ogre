@@ -101,8 +101,8 @@ void SGX_Atlas_Clamp(in float inpCoord, out float outCoord)
 
 void SGX_Atlas_Mirror(in float inpCoord, out float outCoord)
 {
-    outCoord = (inpCoord + 1) * 0.5;
-    outCoord = abs(fract(outCoord) * 2 - 1);
+    outCoord = (inpCoord + 1.0) * 0.5;
+    outCoord = abs(fract(outCoord) * 2.0 - 1.0);
 }
 
 
@@ -114,9 +114,9 @@ void SGX_Atlas_Border(in float inpCoord, out float outCoord)
 
     // If texcoord is in the [0, 1] range then check will equal 0,
     // otherwise it will equal the number 1 or greater.
-    float check = step(inpCoord, 0) + step(1, inpCoord);
+    float check = step(inpCoord, 0.0) + step(1.0, inpCoord);
 
     // Using the check value transport the value of the texcoord
     // beyond the [0, 1] range so it will receive the border color.
-    outCoord = abs(inpCoord) + check * 2;
+    outCoord = abs(inpCoord) + check * 2.0;
 }
