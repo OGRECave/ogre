@@ -4,9 +4,8 @@
 
 vertex_program Ogre/ShadowBlendVP_hlsl hlsl
 {
-    source ShadowBlend.cg
+    source ShadowBlend.vert
     target vs_2_0
-    entry_point ShadowBlend_vs
 }
 vertex_program Ogre/ShadowBlendVP_glsl glsl
 {
@@ -30,9 +29,8 @@ vertex_program Ogre/ShadowBlendVP unified
 
 fragment_program Ogre/ShadowBlendFP_hlsl hlsl
 {
-    source ShadowBlend.cg
+    source ShadowBlend.frag
     target ps_2_0
-    entry_point ShadowBlend_ps
 }
 fragment_program Ogre/ShadowBlendFP_glsles glsles
 {
@@ -51,9 +49,8 @@ fragment_program Ogre/ShadowBlendFP unified
 
 vertex_program Ogre/ShadowExtrudePointLight_hlsl hlsl
 {
-    source ShadowVolumeExtrude.cg
+    source ShadowExtrudePointLight.vert
     target vs_2_0
-    entry_point shadowVolumeExtrudePointLight_vp
 }
 vertex_program Ogre/ShadowExtrudePointLight_glsl glsl
 {
@@ -72,9 +69,8 @@ vertex_program Ogre/ShadowExtrudePointLight unified
 
 vertex_program Ogre/ShadowExtrudeDirLight_hlsl hlsl
 {
-    source ShadowVolumeExtrude.cg
+    source ShadowExtrudeDirLight.vert
     target vs_2_0
-    entry_point shadowVolumeExtrudeDirLight_vp
 }
 vertex_program Ogre/ShadowExtrudeDirLight_glsl glsl
 {
@@ -93,9 +89,8 @@ vertex_program Ogre/ShadowExtrudeDirLight unified
 
 vertex_program Ogre/ShadowExtrudePointLightFinite_hlsl hlsl
 {
-    source ShadowVolumeExtrude.cg
+    source ShadowExtrudePointLightFinite.vert
     target vs_2_0
-    entry_point shadowVolumeExtrudePointLightFinite_vp
 }
 vertex_program Ogre/ShadowExtrudePointLightFinite_glsl glsl
 {
@@ -114,9 +109,8 @@ vertex_program Ogre/ShadowExtrudePointLightFinite unified
 
 vertex_program Ogre/ShadowExtrudeDirLightFinite_hlsl hlsl
 {
-    source ShadowVolumeExtrude.cg
+    source ShadowExtrudeDirLightFinite.vert
     target vs_2_0
-    entry_point shadowVolumeExtrudeDirLightFinite_vp
 }
 vertex_program Ogre/ShadowExtrudeDirLightFinite_glsl glsl
 {
