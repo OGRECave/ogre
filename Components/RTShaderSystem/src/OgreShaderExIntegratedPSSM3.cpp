@@ -231,8 +231,7 @@ bool IntegratedPSSM3::resolveDependencies(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     psProgram->addDependency(SGX_LIB_INTEGRATEDPSSM);
 
-    // requires #include to work
-    if(mDebug && ShaderGenerator::getSingleton().getTargetLanguage() != "glsles")
+    if(mDebug)
         psProgram->addPreprocessorDefines("DEBUG_PSSM");
 
     return true;

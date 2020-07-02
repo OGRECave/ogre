@@ -74,44 +74,6 @@ public:
     virtual const String&   getTargetLanguage       () const { return TargetLanguage; }
 
     static String TargetLanguage;
-
-    protected:
-    typedef     std::map<FunctionInvocation, String>       FunctionMap;
-    typedef     std::vector<FunctionInvocation>            FunctionVector;
-    typedef     FunctionMap::const_iterator                 FunctionMapIterator;
-    typedef     GpuConstTypeToStringMap::const_iterator     GpuConstTypeToStringMapIterator;
-
-    // Protected methods.
-protected:
-
-    /** Cache functions of a dependency */
-    virtual void        cacheDependencyFunctions(const String & libName);
-
-
-    /** Create a FunctionInvocation object from a string taken out of a shader library. */
-    FunctionInvocation  *createInvocationFromString (const String & input);
-
-    void writeFunctionDeclaration(std::ostream& os, FunctionInvocation& func,
-                                  bool writeParamName = true);
-
-    /** Write the program dependencies. */
-    void                copyProgramDependencies    (std::ostream& os, Program* program);
-
-    String processOperand(Operand op, GpuProgramType gpuType);
-    
-    /** Check if a string matches one of the GLSL ES basic types */
-    bool                isBasicType(String &type);
-    
-    /** Search within a function body for non-builtin functions that a given function invocation depends on. */
-    void                discoverFunctionDependencies(const FunctionInvocation &invoc, FunctionVector &depVector);
-
-    // Attributes.
-protected:
-
-    FunctionMap                 mFunctionCacheMap;              // Map function invocation to body.  Used as a cache to reduce library file reads and for inlining
-    StringMap                   mDefinesMap;                    // Map of #defines and the function library that contains them
-
-    StringMap                   mCachedFunctionLibraries;       // Holds the cached function libraries
 };
 
 /** GLSL ES program writer factory implementation.
