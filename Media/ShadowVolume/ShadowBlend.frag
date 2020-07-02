@@ -1,5 +1,9 @@
+#include <OgreUnifiedShader.h>
+
 uniform vec4 shadowColor;
 
-void main() {
+ATTRIBUTES_BEGIN
+MAIN_DECLARATION
+{
     gl_FragColor = shadowColor;
 }
