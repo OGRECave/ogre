@@ -788,6 +788,11 @@ namespace Ogre
             return PF_FLOAT16_RGBA;
         case PF_FLOAT32_RGB:
             return PF_FLOAT32_RGBA;
+        case PF_DEPTH16:
+            return PF_L16;
+        case PF_DEPTH32:
+        case PF_DEPTH32F:
+            return PF_FLOAT32_R;
         case PF_UNKNOWN:
         default:
             return PF_A8R8G8B8;
