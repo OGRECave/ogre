@@ -74,18 +74,18 @@ namespace Ogre {
             return PF_BYTE_RGBA;
         }
 
-        // format not supported by GLES2: e.g. BGR
-        if(GLES2PixelUtil::getGLInternalFormat(format) == GL_NONE)
-        {
-            return PF_BYTE_RGBA;
-        }
-
         // Check if this is a valid rendertarget format
         if (usage & TU_RENDERTARGET)
         {
             /// Get closest supported alternative
             /// If mFormat is supported it's returned
             return GLRTTManager::getSingleton().getSupportedAlternative(format);
+        }
+
+        // format not supported by GLES2: e.g. BGR
+        if(GLES2PixelUtil::getGLInternalFormat(format) == GL_NONE)
+        {
+            return PF_BYTE_RGBA;
         }
 
         // Supported
