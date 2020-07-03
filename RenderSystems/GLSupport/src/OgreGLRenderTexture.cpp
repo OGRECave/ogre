@@ -109,26 +109,40 @@ namespace Ogre {
             return format;
         }
 
-        /// Find first alternative
-        PixelComponentType pct = PixelUtil::getComponentType(format);
-
-        switch (pct)
+        if(PixelUtil::isDepth(format))
         {
-        case PCT_BYTE:
-            format = PF_BYTE_RGBA; // native endian
-            break;
-        case PCT_SHORT:
-            format = PF_SHORT_RGBA;
-            break;
-        case PCT_FLOAT16:
-            format = PF_FLOAT16_RGBA;
-            break;
-        case PCT_FLOAT32:
-            format = PF_FLOAT32_RGBA;
-            break;
-        case PCT_COUNT:
-        default:
-            break;
+            switch (format)
+            {
+                default:
+                case PF_DEPTH16:
+                    format = PF_FLOAT16_R;
+                    break;
+                case PF_DEPTH32F:
+                case PF_DEPTH32:
+                    format = PF_FLOAT32_R;
+                    break;
+            }
+        }
+        else
+        {
+            /// Find first alternative
+            switch (PixelUtil::getComponentType(format))
+            {
+            case PCT_BYTE:
+                format = PF_BYTE_RGBA; // native endian
+                break;
+            case PCT_SHORT:
+                format = PF_SHORT_RGBA;
+                break;
+            case PCT_FLOAT16:
+                format = PF_FLOAT16_RGBA;
+                break;
+            case PCT_FLOAT32:
+                format = PF_FLOAT32_RGBA;
+                break;
+            default:
+                break;
+            }
         }
 
         if (checkFormat(format))

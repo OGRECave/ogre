@@ -76,17 +76,17 @@ namespace Ogre {
             return PF_BYTE_RGBA;
         }
         
-        if(GLPixelUtil::getGLInternalFormat(format) == GL_NONE)
-        {
-            return PF_BYTE_RGBA;
-        }
-
         // Check if this is a valid rendertarget format
         if( usage & TU_RENDERTARGET )
         {
             /// Get closest supported alternative
             /// If mFormat is supported it's returned
             return GLRTTManager::getSingleton().getSupportedAlternative(format);
+        }
+
+        if(GLPixelUtil::getGLInternalFormat(format) == GL_NONE)
+        {
+            return PF_BYTE_RGBA;
         }
 
         // Supported
