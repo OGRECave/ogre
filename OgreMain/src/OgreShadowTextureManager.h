@@ -68,7 +68,7 @@ namespace Ogre
         /** Populate an incoming list with shadow texture references as requested
             in the configuration list.
         */
-        virtual void getShadowTextures(const ShadowTextureConfigList& config, 
+        virtual void getShadowTextures(ShadowTextureConfigList& config,
             ShadowTextureList& listToPopulate);
 
         /** Get an appropriately defined 'null' texture, i.e. one which will always
