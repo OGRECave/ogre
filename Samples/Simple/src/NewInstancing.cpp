@@ -139,12 +139,12 @@ void Sample_NewInstancing::setupContent()
 
     if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") == String::npos)
     {
-        mSceneMgr->setShadowTextureConfig( 0, 2048, 2048, PF_FLOAT32_R );
+        mSceneMgr->setShadowTextureConfig( 0, 2048, 2048, PF_DEPTH16 );
     }
     else
     {
         // Use a smaller texture for GL ES 3.0
-        mSceneMgr->setShadowTextureConfig( 0, 512, 512, PF_FLOAT32_R );
+        mSceneMgr->setShadowTextureConfig( 0, 512, 512, PF_DEPTH16 );
     }
 
     mSceneMgr->setShadowCameraSetup( LiSPSMShadowCameraSetup::create() );
