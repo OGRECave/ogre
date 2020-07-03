@@ -71,16 +71,15 @@ namespace Ogre
         clear();
     }
     //---------------------------------------------------------------------
-    void ShadowTextureManager::getShadowTextures(const ShadowTextureConfigList& configList, 
+    void ShadowTextureManager::getShadowTextures(ShadowTextureConfigList& configList,
         ShadowTextureList& listToPopulate)
     {
         listToPopulate.clear();
 
         std::set<Texture*> usedTextures;
 
-        for (ShadowTextureConfigList::const_iterator c = configList.begin(); c != configList.end(); ++c)
+        for (ShadowTextureConfig& config : configList)
         {
-            const ShadowTextureConfig& config = *c;
             bool found = false;
             for (ShadowTextureList::iterator t = mTextureList.begin(); t != mTextureList.end(); ++t)
             {
@@ -111,6 +110,9 @@ namespace Ogre
                     TU_RENDERTARGET, NULL, false, config.fsaa);
                 // Ensure texture loaded
                 shadowTex->load();
+
+                // update with actual format, if the requested format is not supported
+                config.format = shadowTex->getFormat();
                 listToPopulate.push_back(shadowTex);
                 usedTextures.insert(shadowTex.get());
                 mTextureList.push_back(shadowTex);
