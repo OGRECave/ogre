@@ -283,6 +283,14 @@ namespace Ogre
         desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
         desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), _getTextureUsage());
 
+        if (PixelUtil::isDepth(mFormat))
+        {
+            desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
+            desc.Usage = D3D11_USAGE_DEFAULT;
+            desc.CPUAccessFlags        = 0;
+            desc.MiscFlags             = 0;
+        }
+
         if (this->getTextureType() == TEX_TYPE_CUBE_MAP)
         {
                 desc.ArraySize          = 6;
@@ -336,7 +344,7 @@ namespace Ogre
         mNumMipmaps = desc.MipLevels - 1;
         
         ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
-        mSRVDesc.Format = desc.Format;
+        mSRVDesc.Format = desc.Format == DXGI_FORMAT_R32_TYPELESS ? DXGI_FORMAT_R32_FLOAT : desc.Format;
         
         switch(this->getTextureType())
         {
@@ -578,11 +586,36 @@ namespace Ogre
         default:
             assert(false);
         }
-        OGRE_CHECK_DX_ERROR(mDevice->CreateRenderTargetView(pBackBuffer, &RTVDesc,
-                                                            mRenderTargetView.ReleaseAndGetAddressOf()));
+
+        if (!PixelUtil::isDepth(mBuffer->getFormat()))
+        {
+            OGRE_CHECK_DX_ERROR(mDevice->CreateRenderTargetView(pBackBuffer, &RTVDesc,
+                                                                mRenderTargetView.ReleaseAndGetAddressOf()));
+            return;
+        }
+
+        // also create DSV for depth textures
+        D3D11_TEXTURE2D_DESC BBDesc;
+        getSurface()->GetDesc(&BBDesc);
+
+        // Create the depth stencil view
+        D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
+        descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+        descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
+        descDSV.Flags = 0 /* D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL */;    // TODO: Allows bind depth buffer as depth view AND texture simultaneously.
+        descDSV.Texture2D.MipSlice = 0;
+
+        ID3D11DepthStencilView      *depthStencilView;
+        OGRE_CHECK_DX_ERROR(mDevice->CreateDepthStencilView(pBackBuffer, &descDSV, &depthStencilView ));
+
+        D3D11RenderSystem* rs = (D3D11RenderSystem*)Root::getSingleton().getRenderSystem();
+        mDepthBuffer =
+            new D3D11DepthBuffer(DepthBuffer::POOL_NO_DEPTH, rs, depthStencilView, mWidth, mHeight,
+                                 BBDesc.SampleDesc.Count, BBDesc.SampleDesc.Quality, true);
+        mDepthBuffer->_notifyRenderTargetAttached(this);
     }
 
-    uint D3D11RenderTexture::getNumberOfViews() const { return 1; }
+    uint D3D11RenderTexture::getNumberOfViews() const { return PixelUtil::isDepth(mBuffer->getFormat()) ? 0 : 1; }
 
     ID3D11Texture2D* D3D11RenderTexture::getSurface(uint index) const
     {
