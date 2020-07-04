@@ -74,14 +74,7 @@ namespace Ogre {
         cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
         cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         cbDesc.MiscFlags = 0;
-        HRESULT hr = mDevice->CreateBuffer( &cbDesc, NULL, mConstantBuffer.ReleaseAndGetAddressOf() );
-        if (FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "D3D11 device Cannot create constant buffer.\nError Description:" + errorDescription,
-                "D3D11HLSLProgram::createConstantBuffer");  
-        }
+        OGRE_CHECK_DX_ERROR(mDevice->CreateBuffer(&cbDesc, NULL, mConstantBuffer.ReleaseAndGetAddressOf()));
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::fixVariableNameFromCg(const ShaderVarWithPosInBuf& newVar)

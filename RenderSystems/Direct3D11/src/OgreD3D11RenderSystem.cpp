@@ -1242,14 +1242,8 @@ namespace Ogre
             descDepth.MiscFlags     |= D3D11_RESOURCE_MISC_TEXTURECUBE;
         }
 
-        HRESULT hr = mDevice->CreateTexture2D( &descDepth, NULL, pDepthStencil.ReleaseAndGetAddressOf() );
-        if( FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "Unable to create depth texture\nError Description:" + errorDescription,
-                "D3D11RenderSystem::_createDepthBufferFor");
-        }
+        OGRE_CHECK_DX_ERROR(
+            mDevice->CreateTexture2D(&descDepth, NULL, pDepthStencil.ReleaseAndGetAddressOf()));
 
         //
         // Create the View of the texture
@@ -1262,14 +1256,8 @@ namespace Ogre
             viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
             viewDesc.Texture2D.MostDetailedMip = 0;
             viewDesc.Texture2D.MipLevels = 1;
-            HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil.Get(), &viewDesc, mDSTResView.ReleaseAndGetAddressOf());
-            if( FAILED(hr) || mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Unable to create the view of the depth texture \nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_createDepthBufferFor");
-            }
+            OGRE_CHECK_DX_ERROR(mDevice->CreateShaderResourceView(pDepthStencil.Get(), &viewDesc,
+                                                                  mDSTResView.ReleaseAndGetAddressOf()));
         }
 
         // Create the depth stencil view
@@ -1287,14 +1275,8 @@ namespace Ogre
         }
                                                                                             // TODO: Decide how to expose this feature
         descDSV.Texture2D.MipSlice = 0;
-        hr = mDevice->CreateDepthStencilView( pDepthStencil.Get(), &descDSV, &depthStencilView );
-        if( FAILED(hr) )
-        {
-			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "Unable to create depth stencil view\nError Description:" + errorDescription,
-                "D3D11RenderSystem::_createDepthBufferFor");
-        }
+        OGRE_CHECK_DX_ERROR(
+            mDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &depthStencilView));
 
         //Create the abstract container
         D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this, depthStencilView,
@@ -1997,14 +1979,8 @@ namespace Ogre
             mBlendDescChanged = false;
             mBoundBlendState = 0;
 
-            HRESULT hr = mDevice->CreateBlendState(&mBlendDesc, opState->mBlendState.ReleaseAndGetAddressOf()) ;
-            if (FAILED(hr))
-            {
-				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create blend state\nError Description:" + errorDescription, 
-                    "D3D11RenderSystem::_render" );
-            }
+            OGRE_CHECK_DX_ERROR(
+                mDevice->CreateBlendState(&mBlendDesc, opState->mBlendState.ReleaseAndGetAddressOf()));
         }
         else
         {
@@ -2016,14 +1992,7 @@ namespace Ogre
 			mRasterizerDescChanged=false;
 			mBoundRasterizer = 0;
 
-            HRESULT hr = mDevice->CreateRasterizerState(&mRasterizerDesc, opState->mRasterizer.ReleaseAndGetAddressOf()) ;
-            if (FAILED(hr))
-            {
-				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create rasterizer state\nError Description:" + errorDescription, 
-                    "D3D11RenderSystem::_render" );
-            }
+            OGRE_CHECK_DX_ERROR(mDevice->CreateRasterizerState(&mRasterizerDesc, opState->mRasterizer.ReleaseAndGetAddressOf()));
         }
         else
         {
@@ -2035,14 +2004,7 @@ namespace Ogre
 			mBoundDepthStencilState = 0;
 			mDepthStencilDescChanged=false;
 
-            HRESULT hr = mDevice->CreateDepthStencilState(&mDepthStencilDesc, opState->mDepthStencilState.ReleaseAndGetAddressOf()) ;
-            if (FAILED(hr))
-            {
-				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create depth stencil state\nError Description:" + errorDescription, 
-                    "D3D11RenderSystem::_render" );
-            }
+            OGRE_CHECK_DX_ERROR(mDevice->CreateDepthStencilState(&mDepthStencilDesc, opState->mDepthStencilState.ReleaseAndGetAddressOf()));
         }
         else
 		{

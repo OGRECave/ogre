@@ -85,14 +85,7 @@ namespace Ogre {
 
         // TODO: we can explicitly initialise the buffer contents here if we like
         // not doing this since OGRE doesn't support this model yet
-        HRESULT hr = device->CreateBuffer( &mDesc, NULL, mlpD3DBuffer.ReleaseAndGetAddressOf() );
-        if (FAILED(hr) || mDevice.isError())
-        {
-            String msg = device.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "Cannot create D3D11 buffer: " + msg, 
-                "D3D11HardwareBuffer::D3D11HardwareBuffer");
-        }
+        OGRE_CHECK_DX_ERROR(device->CreateBuffer(&mDesc, NULL, mlpD3DBuffer.ReleaseAndGetAddressOf()));
 
         // Create shadow buffer
         if (mUseShadowBuffer)
@@ -116,14 +109,7 @@ namespace Ogre {
         {
             // need to realloc
             mDesc.ByteWidth = static_cast<UINT>(mSizeInBytes);
-            HRESULT hr = mDevice->CreateBuffer(&mDesc, 0, mlpD3DBuffer.ReleaseAndGetAddressOf());
-            if (FAILED(hr) || mDevice.isError())
-            {
-                String msg = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Cannot create D3D11 buffer: " + msg, 
-                    "D3D11HardwareBuffer::D3D11HardwareBuffer");
-            }
+            OGRE_CHECK_DX_ERROR(mDevice->CreateBuffer(&mDesc, 0, mlpD3DBuffer.ReleaseAndGetAddressOf()));
         }
 
 
@@ -164,14 +150,7 @@ namespace Ogre {
             void * pRet = NULL;
             D3D11_MAPPED_SUBRESOURCE mappedSubResource;
             mappedSubResource.pData = NULL;
-            HRESULT hr = mDevice.GetImmediateContext()->Map(mlpD3DBuffer.Get(), 0, mapType, 0, &mappedSubResource);
-            if (FAILED(hr) || mDevice.isError())
-            {
-                String msg = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Error calling Map: " + msg, 
-                    "D3D11HardwareBuffer::lockImpl");
-            }
+            OGRE_CHECK_DX_ERROR(mDevice.GetImmediateContext()->Map(mlpD3DBuffer.Get(), 0, mapType, 0, &mappedSubResource));
 
             pRet = static_cast<void*>(static_cast<char*>(mappedSubResource.pData) + offset);
 

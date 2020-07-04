@@ -1046,7 +1046,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 
         // 3 textures per directional light
         mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-        mSceneMgr->setShadowTextureSettings(512, 3, PF_DEPTH16);
+        mSceneMgr->setShadowTextureSettings(512, 4, PF_DEPTH16);
         mSceneMgr->setShadowTextureSelfShadow(true);
 
         // Leave only directional light.
@@ -1071,11 +1071,11 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 
         // shadow camera setup
         PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
-        pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
+        pssmSetup->calculateSplitPoints(2, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
         pssmSetup->setSplitPadding(mCamera->getNearClipDistance()*2);
         pssmSetup->setOptimalAdjustFactor(0, 2);
         pssmSetup->setOptimalAdjustFactor(1, 1);
-        pssmSetup->setOptimalAdjustFactor(2, 0.5);
+        //pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
         mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(pssmSetup));
 
