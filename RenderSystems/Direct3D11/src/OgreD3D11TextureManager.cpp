@@ -65,14 +65,7 @@ namespace Ogre
             D3D11Mappings::get(borderColour, desc.BorderColor);
         }
 
-        HRESULT hr = mDevice->CreateSamplerState(&desc, mState.ReleaseAndGetAddressOf());
-        if (FAILED(hr))
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "Failed to create sampler state\nError Description:" + errorDescription,
-                "D3D11Sampler::getState" );
-        }
+        OGRE_CHECK_DX_ERROR(mDevice->CreateSamplerState(&desc, mState.ReleaseAndGetAddressOf()));
 
         mDirty = false;
 

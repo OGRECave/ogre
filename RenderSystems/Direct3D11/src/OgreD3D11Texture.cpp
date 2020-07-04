@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11Mappings.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11RenderSystem.h"
+#include "OgreD3D11DepthBuffer.h"
 #include "OgreRoot.h"
 #include "OgreLogManager.h"
 #include "OgreException.h"
@@ -249,14 +250,11 @@ namespace Ogre
         mSRVDesc.Format = desc.Format;
         mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
         mSRVDesc.Texture1D.MipLevels = desc.MipLevels;
-        hr = (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) ? mDevice->CreateShaderResourceView(mp1DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf()) : S_FALSE;
-        if (FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
-                "D3D11Texture::_create1DTex");
-        }
+        OGRE_CHECK_DX_ERROR(
+            (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+                ? mDevice->CreateShaderResourceView(mp1DTex.Get(), &mSRVDesc,
+                                                    mpShaderResourceView.ReleaseAndGetAddressOf())
+                : S_FALSE);
 
         this->_setFinalAttributes(desc.Width, 1, 1, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
     }
@@ -380,14 +378,11 @@ namespace Ogre
             break;
         }
 
-        hr = (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) ? mDevice->CreateShaderResourceView(mp2DTex.Get(), &mSRVDesc,mpShaderResourceView.ReleaseAndGetAddressOf()) : S_FALSE;
-        if (FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
-                "D3D11Texture::_create2DTex");
-        }
+        OGRE_CHECK_DX_ERROR(
+            (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+                ? mDevice->CreateShaderResourceView(mp2DTex.Get(), &mSRVDesc,
+                                                    mpShaderResourceView.ReleaseAndGetAddressOf())
+                : S_FALSE);
 
         this->_setFinalAttributes(desc.Width, desc.Height, desc.ArraySize / getNumFaces(), D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
     }
@@ -449,14 +444,11 @@ namespace Ogre
         mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
         mSRVDesc.Texture3D.MostDetailedMip = 0;
         mSRVDesc.Texture3D.MipLevels = desc.MipLevels;
-        hr = (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) ? mDevice->CreateShaderResourceView(mp3DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf()) : S_FALSE;
-        if (FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
-                "D3D11Texture::_create3DTex");
-        }
+        OGRE_CHECK_DX_ERROR(
+            (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+                ? mDevice->CreateShaderResourceView(mp3DTex.Get(), &mSRVDesc,
+                                                    mpShaderResourceView.ReleaseAndGetAddressOf())
+                : S_FALSE);
 
         this->_setFinalAttributes(desc.Width, desc.Height, desc.Depth, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
     }
@@ -586,15 +578,8 @@ namespace Ogre
         default:
             assert(false);
         }
-        HRESULT hr = mDevice->CreateRenderTargetView(pBackBuffer, &RTVDesc, mRenderTargetView.ReleaseAndGetAddressOf());
-
-        if (FAILED(hr) || mDevice.isError())
-        {
-			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-				"Error creating Render Target View\nError Description:" + errorDescription,
-                "D3D11RenderTexture::rebind" );
-        }
+        OGRE_CHECK_DX_ERROR(mDevice->CreateRenderTargetView(pBackBuffer, &RTVDesc,
+                                                            mRenderTargetView.ReleaseAndGetAddressOf()));
     }
 
     uint D3D11RenderTexture::getNumberOfViews() const { return 1; }
