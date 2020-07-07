@@ -161,7 +161,7 @@ namespace Ogre
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
 
-        void convertVertexShaderCaps(RenderSystemCapabilities* rsc) const;
+        void convertVertexShaderCaps(RenderSystemCapabilities* rsc);
         void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
         bool checkVertexTextureFormats(D3D9RenderWindow* renderWindow) const;
         void detachRenderTargetImpl(const String& name);

@@ -33,7 +33,7 @@ preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 This way you can use the same source code but still include small variations, each one defined as a different %Ogre program name but based on the same source code.
 
 Furthermore, %Ogre automatically sets the following defines for convenience:
-- The current shading language: e.g. @c OGRE_GLSL, @c OGRE_HLSL
+- The current shading language and native version: e.g. @c OGRE_GLSL=120, @c OGRE_HLSL=3
 - The current shader type: e.g. @c OGRE_VERTEX_SHADER, @c OGRE_FRAGMENT_SHADER
 - Whether @ref reversed-depth is enabled: @c OGRE_REVERSED_Z
 

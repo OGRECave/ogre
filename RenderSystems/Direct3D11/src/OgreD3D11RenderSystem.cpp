@@ -806,6 +806,8 @@ namespace Ogre
 				mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);
 			mRealCapabilities = createRenderSystemCapabilities();
 
+            mNativeShadingLanguageVersion = 4;
+
 			// if we are using custom capabilities, then 
 			// mCurrentCapabilities has already been loaded
 			if (!mUseCustomCapabilities)
