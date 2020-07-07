@@ -1274,7 +1274,7 @@ namespace Ogre
         return rsc;
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::convertVertexShaderCaps(RenderSystemCapabilities* rsc) const
+    void D3D9RenderSystem::convertVertexShaderCaps(RenderSystemCapabilities* rsc)
     {
         ushort major = 0xFF;
         ushort minor = 0xFF;
@@ -1370,6 +1370,8 @@ namespace Ogre
             rsc->addShaderProfile("vs_1_1");
             rsc->setCapability(RSC_VERTEX_PROGRAM);
         }
+
+        mNativeShadingLanguageVersion = major;
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::convertPixelShaderCaps(RenderSystemCapabilities* rsc) const

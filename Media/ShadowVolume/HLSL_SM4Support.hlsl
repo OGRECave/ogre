@@ -2,7 +2,7 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at https://www.ogre3d.org/licensing.
 
-#ifdef SHADER_MODEL_4
+#if OGRE_HLSL >= 4
 
 // SM4 separates sampler into Texture and SamplerState
 
