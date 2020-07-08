@@ -48,17 +48,42 @@ namespace Ogre {
     *  @{
     */
     /** Representation of a dynamic light source in the scene.
-    @remarks
+
         Lights are added to the scene like any other object. They contain various
         parameters like type, attenuation (how light intensity fades with
         distance), colour etc.
-    @par
+
+        The light colour is computed based on the
+        [Direct3D Light Model](https://docs.microsoft.com/en-us/windows/win32/direct3d9/mathematics-of-lighting) as:
+
+        \f[ L_d = C_d \cdot p \cdot ( N \cdot L_{dir}) \cdot A \cdot S \f]
+        \f[ L_s = C_s \cdot p \cdot ( N \cdot H)^s \cdot A \cdot S \f]
+
+        where
+        \f[ A = \frac{1}{c + l \cdot d + q \cdot d^2} \f]
+        and only computed when attenuation is enabled,
+
+        \f[ S = \left[ \frac{\rho - cos(0.5 \cdot \phi)}{cos(0.5 \cdot \theta) - cos(0.5 \cdot \phi)} \right]^f \f]
+        and only computed with spotlights
+
+        - \f$C_d\f$ is the light diffuse colour
+        - \f$C_s\f$ is the light specular colour
+        - \f$p\f$ is the light power scale factor
+        - \f$s\f$ is the surface shininess
+        - \f$N\f$ is the current surface normal
+        - \f$L_{dir}\f$ is vector from the vertex position to the light (constant for directional lights)
+        - \f$H = normalised(L_{dir} + V)\f$, where V is the vector from the vertex position to the camera
+        - \f$c, l, q\f$ are the constant, linear and quadratic attenuation factors
+        - \f$d = |L_{dir}|\f$
+        - \f$\theta, \phi, f\f$ are the spotlight inner angle, outer angle and falloff
+        - \f$\rho = \langle L_{dir} , L_{dcs} \rangle \f$ where \f$L_{dcs}\f$ is the light direction in camera space
+
         The defaults when a light is created is pure white diffuse light, with no
         attenuation (does not decrease with distance) and a range of 1000 world units.
-    @par
+
         Lights are created by using the SceneManager::createLight method. They subsequently must be
         added to a SceneNode to orient them in the scene and to allow moving them.
-    @par
+
         Remember also that dynamic lights rely on modifying the colour of vertices based on the position of
         the light compared to an object's vertex normals. Dynamic lighting will only look good if the
         object being lit has a fair level of tessellation and the normals are properly set. This is particularly

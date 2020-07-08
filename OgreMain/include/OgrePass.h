@@ -59,10 +59,37 @@ namespace Ogre {
 
     /** Class defining a single pass of a Technique (of a Material): a single rendering call.
 
+        If a pass does not explicitly use a vertex or fragment shader, %Ogre will calculate
+        lighting based on the [Direct3D Light Model](https://docs.microsoft.com/en-us/windows/win32/direct3d9/mathematics-of-lighting) as:
+
+        If at least one shader is used, the pass is considered *programmable* and the lighting is
+        up to the shader.
+
         Rendering can be repeated with many passes for more complex effects.
-        Each pass is either a fixed-function pass (meaning it does not use
-        a vertex or fragment program) or a programmable pass (meaning it does
-        use either a vertex and fragment program, or both).
+
+        @copydetails setLightingEnabled
+
+        @par Lighting disabled
+
+        $$ passBase = C $$
+
+        where \f$C = (1, 1, 1)\f$ or a tracked vertex attribute if #TVC_DIFFUSE is set.
+
+        @par Lighting enabled
+
+        \f[ passBase = G_a \cdot C_a + \sum^N_i ( C_d \cdot L^{(i)}_d +  C_s \cdot L^{(i)}_s ) + C_e \f]
+
+        where
+        - \f$G_a\f$ is the ambient colour defined by the SceneManager
+        - \f$C_a\f$ is the pass ambient colour
+        - \f$C_e\f$ is the pass self-illumination colour or a tracked vertex attribute
+        - \f$N\f$ is the number of lights considered during light iteration
+        - \f$C_d\f$ is the pass diffuse colour or a tracked vertex attribute
+        - \f$C_s\f$ is the pass specular colour or a tracked vertex attribute
+        - \f$L_d^{(i)}\f$ is the (attenuated) diffuse colour of the i-th Light
+        - \f$L_s^{(i)}\f$ is the (attenuated) specular colour of the i-th Light
+
+        @par Programmable passes
 
         Programmable passes are complex to define, because they require custom
         programs and you have to set all constant inputs to the programs (like
