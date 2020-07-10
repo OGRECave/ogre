@@ -68,19 +68,31 @@ public:
 protected:
 
     void setupContent() override
-    {   
+    {
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        // add integrated depth shadows
+        auto& rtShaderGen = RTShader::ShaderGenerator::getSingleton();
+        auto schemRenderState = rtShaderGen.getRenderState(MSN_SHADERGEN);
+        schemRenderState->addTemplateSubRenderState(rtShaderGen.createSubRenderState(RTShader::SRS_INTEGRATED_PSSM3));
+
+        // Make this viewport work with shader generator scheme.
+        mViewport->setMaterialScheme(MSN_SHADERGEN);
+        // update scheme for FFP supporting rendersystems
+        MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());
+#endif
         // set background and some fog
         mViewport->setBackgroundColour(ColourValue(1.0f, 1.0f, 0.8f));
         mSceneMgr->setFog(Ogre::FOG_LINEAR, ColourValue(1.0f, 1.0f, 0.8f), 0, 15, 100);
 
         // set shadow properties
-        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
+        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+        mSceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
         mSceneMgr->setShadowColour(ColourValue(0.5, 0.5, 0.5));
         mSceneMgr->setShadowTextureSize(1024);
         mSceneMgr->setShadowTextureCount(1);
         mSceneMgr->setShadowDirLightTextureOffset(0);
         mSceneMgr->setShadowFarDistance(50);
-        mSceneMgr->setShadowCameraSetup(FocusedShadowCameraSetup::create());
+        mSceneMgr->setShadowCameraSetup(LiSPSMShadowCameraSetup::create());
 
         // disable default camera control so the character can do its own
         mCameraMan->setStyle(CS_MANUAL);
