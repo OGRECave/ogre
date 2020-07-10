@@ -1281,7 +1281,7 @@ void SceneManager::ShadowRenderer::setShadowTextureCasterMaterial(const Material
     else
     {
 
-        mShadowTextureCustomCasterPass = mat->getBestTechnique()->getPass(0);
+        mShadowTextureCustomCasterPass = mat->getTechnique(0)->getPass(0);
         if (mShadowTextureCustomCasterPass->hasVertexProgram())
         {
             // Save vertex program and params in case we have to swap them out
@@ -1762,9 +1762,8 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowCasterPass(const Pass* pas
             }
         }
 
-        // handle the case where there is no fixed pipeline support
-        if( retPass->getParent()->getParent()->getCompilationRequired() )
-            retPass->getParent()->getParent()->compile();
+        // give the RTSS a chance to generate a better technique
+        retPass->getParent()->getParent()->load();
 
         Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
         if( btech )
