@@ -1579,6 +1579,8 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
             mShadowCasterPlainBlackPass->setDiffuse(ColourValue::Black);
             mShadowCasterPlainBlackPass->setSelfIllumination(ColourValue::Black);
             mShadowCasterPlainBlackPass->setSpecular(ColourValue::Black);
+            // set depth bias in case this is used with PF_DEPTH
+            mShadowCasterPlainBlackPass->setDepthBias(-1, -1);
             // Override fog
             mShadowCasterPlainBlackPass->setFog(true, FOG_NONE);
             // no textures or anything else, we will bind vertex programs
