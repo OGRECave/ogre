@@ -166,21 +166,9 @@ fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF_GLSLES glsles
 // **-- Begin Unified Section --**
 vertex_program Ogre/DepthShadowmap/CasterVP unified
 {
-	delegate Ogre/DepthShadowmap/CasterVP_GLSL
-	delegate Ogre/DepthShadowmap/CasterVP_GLSLES
-	delegate Ogre/DepthShadowmap/CasterVP_HLSL
-
-	default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto texelOffsets texel_offsets
-    }
 }
 fragment_program Ogre/DepthShadowmap/CasterFP unified
 {
-	delegate Ogre/DepthShadowmap/CasterFP_GLSL
-	delegate Ogre/DepthShadowmap/CasterFP_GLSLES
-	delegate Ogre/DepthShadowmap/CasterFP_HLSL
 }
 vertex_program Ogre/DepthShadowmap/ReceiverVP unified
 {
