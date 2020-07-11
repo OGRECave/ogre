@@ -31,7 +31,8 @@ THE SOFTWARE.
 
 #include "OgreBuildSettings.h"
 
-#include "SdkSample.h"
+#include "Sample.h"
+#include "Ogre.h"
 
 // resource group that will be automatically unloaded after the close of the sample
 #define TRANSIENT_RESOURCE_GROUP "VisualTestTransient"
