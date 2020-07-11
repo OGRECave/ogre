@@ -808,9 +808,9 @@ namespace Ogre {
             ACT_SURFACE_EMISSIVE_COLOUR,
             /// Surface shininess, as set in Pass::setShininess
             ACT_SURFACE_SHININESS,
-            /// Surface alpha rejection value, not as set in Pass::setAlphaRejectionValue, but a
+            /// Surface alpha rejection value, not as set in @ref Pass::setAlphaRejectValue, but a
             /// floating number between 0.0f and 1.0f instead (255.0f /
-            /// Pass::getAlphaRejectionValue())
+            /// @ref Pass::getAlphaRejectValue())
             ACT_SURFACE_ALPHA_REJECTION_VALUE,
 
             /// The number of active light sources (better than gl_MaxLights)
