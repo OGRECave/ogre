@@ -1244,9 +1244,9 @@ namespace Ogre {
         bool hasGpuProgram(GpuProgramType programType) const;
 
         /// @deprecated use Ogre::Technique::setShadowCasterMaterial
-        void setShadowCasterVertexProgram(const String& name);
+        OGRE_DEPRECATED void setShadowCasterVertexProgram(const String& name);
         /// @deprecated use Ogre::Technique::setShadowCasterMaterial
-        void setShadowCasterVertexProgramParameters(GpuProgramParametersSharedPtr params);
+        OGRE_DEPRECATED void setShadowCasterVertexProgramParameters(GpuProgramParametersSharedPtr params);
         /// @deprecated use Ogre::Technique::getShadowCasterMaterial
         const String& getShadowCasterVertexProgramName(void) const;
         /// @deprecated use Ogre::Technique::getShadowCasterMaterial
@@ -1254,9 +1254,9 @@ namespace Ogre {
         /// @deprecated use Ogre::Technique::getShadowCasterMaterial
         const GpuProgramPtr& getShadowCasterVertexProgram(void) const;
         /// @deprecated use Ogre::Technique::setShadowCasterMaterial
-        void setShadowCasterFragmentProgram(const String& name);
+        OGRE_DEPRECATED void setShadowCasterFragmentProgram(const String& name);
         /// @deprecated use Ogre::Technique::setShadowCasterMaterial
-        void setShadowCasterFragmentProgramParameters(GpuProgramParametersSharedPtr params);
+        OGRE_DEPRECATED void setShadowCasterFragmentProgramParameters(GpuProgramParametersSharedPtr params);
         /// @deprecated use Ogre::Technique::getShadowCasterMaterial
         const String& getShadowCasterFragmentProgramName(void) const;
         /// @deprecated use Ogre::Technique::getShadowCasterMaterial
@@ -1265,13 +1265,13 @@ namespace Ogre {
         const GpuProgramPtr& getShadowCasterFragmentProgram(void) const;
 
         /// @deprecated use Ogre::Technique::setShadowReceiverMaterial
-        void setShadowReceiverVertexProgram(const String& name);
+        OGRE_DEPRECATED void setShadowReceiverVertexProgram(const String& name);
         /// @deprecated use Ogre::Technique::setShadowReceiverMaterial
-        void setShadowReceiverVertexProgramParameters(GpuProgramParametersSharedPtr params);
+        OGRE_DEPRECATED void setShadowReceiverVertexProgramParameters(GpuProgramParametersSharedPtr params);
         /// @deprecated use Ogre::Technique::setShadowReceiverMaterial
-        void setShadowReceiverFragmentProgram(const String& name);
+        OGRE_DEPRECATED void setShadowReceiverFragmentProgram(const String& name);
         /// @deprecated use Ogre::Technique::setShadowReceiverMaterial
-        void setShadowReceiverFragmentProgramParameters(GpuProgramParametersSharedPtr params);
+        OGRE_DEPRECATED void setShadowReceiverFragmentProgramParameters(GpuProgramParametersSharedPtr params);
 
         /// @deprecated use Ogre::Technique::getShadowReceiverMaterial
         const String& getShadowReceiverVertexProgramName(void) const;

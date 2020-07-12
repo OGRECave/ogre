@@ -2363,6 +2363,7 @@ namespace Ogre{
         }
     }
     //-------------------------------------------------------------------------
+    OGRE_IGNORE_DEPRECATED_BEGIN
     void PassTranslator::translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
         Pass *pass = getPass(compiler, node);
@@ -2422,7 +2423,7 @@ namespace Ogre{
             GpuProgramTranslator::translateProgramParameters(compiler, params, node);
         }
     }
-
+    OGRE_IGNORE_DEPRECATED_END
     /**************************************************************************
      * TextureUnitTranslator
      *************************************************************************/
