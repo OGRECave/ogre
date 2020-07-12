@@ -381,6 +381,8 @@ material Examples/BumpMapping/MultiLight
 {
 	technique
 	{
+		shadow_receiver_material Examples/BumpMapping/MultiLight/Rcv
+
 		// Base ambient pass
 		pass ambient
 		{
@@ -412,26 +414,11 @@ material Examples/BumpMapping/MultiLight
 			{
 				param_named_auto lightDiffuse light_diffuse_colour 0 
 			}
-
-			// texture shadow receiver program
-			shadow_receiver_vertex_program_ref Examples/BumpMapVPShadowRcv
-			{
-				param_named_auto lightPosition light_position_object_space 0
-				param_named_auto worldViewProj worldviewproj_matrix
-				param_named_auto worldMatrix world_matrix
-				param_named_auto texViewProj texture_viewproj_matrix
-			}
-			// Additive texture shadow receiver program
-			shadow_receiver_fragment_program_ref Examples/BumpMapFPShadowRcv
-			{
-				param_named_auto lightDiffuse light_diffuse_colour 0 
-			}
 			
 			// Base bump map
 			texture_unit normalmap
 			{
 				texture NMBumpsOut.png
-				colour_op replace
 			}
 		}
 		
@@ -444,6 +431,40 @@ material Examples/BumpMapping/MultiLight
 			texture_unit decalmap
 			{
 				texture RustedMetal.jpg 
+			}
+		}
+	}
+}
+
+material Examples/BumpMapping/MultiLight/Rcv
+{
+	technique
+	{
+		pass
+		{
+			scene_blend add
+
+			// texture shadow receiver program
+			vertex_program_ref Examples/BumpMapVPShadowRcv
+			{
+				param_named_auto lightPosition light_position_object_space 0
+				param_named_auto worldViewProj worldviewproj_matrix
+				param_named_auto worldMatrix world_matrix
+				param_named_auto texViewProj texture_viewproj_matrix
+			}
+			// Additive texture shadow receiver program
+			fragment_program_ref Examples/BumpMapFPShadowRcv
+			{
+				param_named_auto lightDiffuse light_diffuse_colour 0
+			}
+
+			texture_unit shadowmap
+			{
+				content_type shadow
+			}
+			texture_unit normalmap
+			{
+				texture NMBumpsOut.png
 			}
 		}
 	}

@@ -2398,6 +2398,8 @@ namespace Ogre{
         Pass *pass = getPass(compiler, node);
         if(!pass) return;
 
+        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
+                           node->cls + ". Use shadow_receiver_material instead");
         pass->setShadowReceiverVertexProgram(node->name);
         if(pass->getShadowReceiverVertexProgram()->isSupported())
         {
@@ -2411,6 +2413,8 @@ namespace Ogre{
         Pass *pass = getPass(compiler, node);
         if(!pass) return;
 
+        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
+                           node->cls + ". Use shadow_receiver_material instead");
         pass->setShadowReceiverFragmentProgram(node->name);
         if(pass->getShadowReceiverFragmentProgram()->isSupported())
         {
