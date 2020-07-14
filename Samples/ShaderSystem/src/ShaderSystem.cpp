@@ -171,7 +171,7 @@ void Sample_ShaderSystem::buttonHit( OgreBites::Button* b )
     }
 
     // Case the blend layer type modified.
-    else if (b->getName() == LAYERBLEND_BUTTON_NAME && mLayerBlendSubRS != NULL)
+    else if (b->getName() == LAYERBLEND_BUTTON_NAME && mLayerBlendSubRS)
     {   
         changeTextureLayerBlendMode();
         
@@ -322,21 +322,14 @@ void Sample_ShaderSystem::setupContent()
     childNode->attachObject(mLayeredBlendingEntity);
 
     // Grab the render state of the material.
-    RTShader::RenderState* renderState = mShaderGenerator->getRenderState(
-        RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending",
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 0);
+    auto renderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+                                                        "RTSS/LayeredBlending", RGN_INTERNAL, 0);
 
-    if (renderState != NULL)
+    if (renderState)
     {           
-        const SubRenderStateList& subRenderStateList = renderState->getTemplateSubRenderStateList();
-        SubRenderStateListConstIterator it = subRenderStateList.begin();
-        SubRenderStateListConstIterator itEnd = subRenderStateList.end();
-
         // Search for the texture layer blend sub state.
-        for (; it != itEnd; ++it)
+        for (auto curSubRenderState : renderState->getTemplateSubRenderStateList())
         {
-            SubRenderState* curSubRenderState = *it;
-
             if (curSubRenderState->getType() == LayeredBlending::Type)
             {
                 mLayerBlendSubRS = static_cast<LayeredBlending*>(curSubRenderState);
@@ -1297,8 +1290,7 @@ void Sample_ShaderSystem::changeTextureLayerBlendMode()
     
     mLayerBlendSubRS->setBlendMode(1, nextBlendMode);
     mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                                         "RTSS/LayeredBlending",
-                                         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                                         "RTSS/LayeredBlending", RGN_INTERNAL);
 
     // Update the caption.
     updateLayerBlendingCaption(nextBlendMode);
