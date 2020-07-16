@@ -50,9 +50,10 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
     }
 
     int flags = p.useFullScreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE;
+    int d = Ogre::StringConverter::parseInt(miscParams["monitorIndex"], 1) - 1;
     ret.native =
-        SDL_CreateWindow(p.name.c_str(), SDL_WINDOWPOS_UNDEFINED,
-                         SDL_WINDOWPOS_UNDEFINED, p.width, p.height, flags);
+        SDL_CreateWindow(p.name.c_str(), SDL_WINDOWPOS_UNDEFINED_DISPLAY(d),
+                         SDL_WINDOWPOS_UNDEFINED_DISPLAY(d), p.width, p.height, flags);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     SDL_GL_CreateContext(ret.native);
