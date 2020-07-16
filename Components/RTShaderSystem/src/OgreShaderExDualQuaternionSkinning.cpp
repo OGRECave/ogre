@@ -124,7 +124,8 @@ bool DualQuaternionSkinning::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
-    vsProgram->addDependency(SGX_LIB_DUAL_QUATERNION);
+    if(mDoBoneCalculations)
+        vsProgram->addDependency(SGX_LIB_DUAL_QUATERNION);
 
     return true;
 }
