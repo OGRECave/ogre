@@ -465,8 +465,9 @@ namespace Ogre {
         
         // No point sprites, so no size
         rsc->setMaxPointSize(0.f);
-        
-        if(hasMinGLVersion(3, 0) || checkExtension("GL_OES_vertex_array_object"))
+
+        if (hasMinGLVersion(3, 0) ||
+            (checkExtension("GL_OES_vertex_array_object") && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN))
             rsc->setCapability(RSC_VAO);
 
         if (hasMinGLVersion(3, 0) || checkExtension("GL_OES_get_program_binary"))
