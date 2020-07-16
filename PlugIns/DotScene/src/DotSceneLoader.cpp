@@ -12,6 +12,12 @@
 
 using namespace Ogre;
 
+#ifndef OGRE_BUILD_COMPONENT_TERRAIN
+namespace Ogre {
+    class TerrainGroup {}; // appease unique_ptr destructor
+}
+#endif
+
 namespace
 {
 String getAttrib(const pugi::xml_node& XMLNode, const String& attrib, const String& defaultValue = "")
