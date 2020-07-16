@@ -60,6 +60,7 @@ void FFP_Transform(in mat4 m,
 	vOut = (m * v).xyz;
 }
 
+#if !defined(OGRE_GLSLES) || OGRE_GLSLES > 100
 //-----------------------------------------------------------------------------
 void FFP_Transform(in mat3x4 m,
 				   in vec4 v,
@@ -78,6 +79,7 @@ void FFP_Transform(in mat3x4 m,
 {
 	vOut = v * mat3(m);
 }
+#endif
 
 //-----------------------------------------------------------------------------
 void FFP_Transform(in mat4 m, 
