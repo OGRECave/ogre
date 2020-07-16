@@ -220,6 +220,15 @@ namespace Ogre {
         if((opt = mOptions.find("Content Scaling Factor")) != end)
             miscParams["contentScalingFactor"] = opt->second.currentValue;
 
+        if((opt = mOptions.find("Rendering Device")) != end)
+        {
+            // try to parse "Monitor-NN-"
+            auto start = opt->second.currentValue.find('-') + 1;
+            auto len = opt->second.currentValue.find('-', start) - start;
+            if(start != String::npos)
+                miscParams["monitorIndex"] = opt->second.currentValue.substr(start, len);
+        }
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         if((opt = mOptions.find("Stereo Mode")) != end)
             miscParams["stereoMode"] = opt->second.currentValue;
