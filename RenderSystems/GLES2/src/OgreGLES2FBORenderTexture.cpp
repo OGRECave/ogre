@@ -307,6 +307,8 @@ namespace Ogre {
     */
     void GLES2FBOManager::detectFBOFormats()
     {
+        GLES2RenderSystem* rs = getGLES2RenderSystem();
+        bool hasGLES3 = rs->hasMinGLVersion(3, 0);
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         memset(mProps, 0, sizeof(mProps));
 
@@ -314,13 +316,16 @@ namespace Ogre {
         mProps[PF_A8B8G8R8].valid = true;
         FormatProperties::Mode mode = {1, 0};
         mProps[PF_A8B8G8R8].modes.push_back(mode);
+
+        if(hasGLES3)
+        {
+            mProps[PF_DEPTH16].valid = true;
+            mProps[PF_DEPTH16].modes.push_back(mode);
+        }
         LogManager::getSingleton().logMessage("[GLES2] : detectFBOFormats is disabled on this platform (due performance reasons)");
 #else
         // Try all formats, and report which ones work as target
-        GLES2RenderSystem* rs = getGLES2RenderSystem();
         GLuint fb = 0, tid = 0;
-
-        bool hasGLES3 = rs->hasMinGLVersion(3, 0);
 
         const size_t depthCount = hasGLES3 ? DEPTHFORMAT_COUNT : DEPTHFORMAT_COUNT - 1; // 32_8 is not available on GLES2
         const uchar stencilStep = hasGLES3 ? 3 : 1; // 1 and 4 bit not available on GLES3
