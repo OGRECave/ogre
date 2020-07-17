@@ -54,9 +54,7 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
         SDL_CreateWindow(p.name.c_str(), SDL_WINDOWPOS_UNDEFINED,
                          SDL_WINDOWPOS_UNDEFINED, p.width, p.height, flags);
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-    SDL_GL_CreateContext(ret.native);
-#else
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
     SDL_GetWindowWMInfo(ret.native, &wmInfo);
@@ -71,9 +69,9 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
     p.miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.cocoa.window));
 #endif
 
-    if(!mWindows.empty() || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
+    if(!mWindows.empty())
     {
-        // additional windows should reuse the context (also the first on emscripten)
+        // additional windows should reuse the context
         p.miscParams["currentGLContext"] = "true";
     }
 
