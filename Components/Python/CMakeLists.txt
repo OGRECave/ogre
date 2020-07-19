@@ -18,7 +18,7 @@ if (APPLE AND NOT ANDROID)
 endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
-    include_directories("${PROJECT_SOURCE_DIR}/Components/Overlay/src/imgui")
+    include_directories("${IMGUI_DIR}")
     list(APPEND CMAKE_SWIG_FLAGS -DHAVE_IMGUI -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 endif()
 
