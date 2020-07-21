@@ -292,17 +292,15 @@ namespace Ogre {
             rsc->getVendor() == GPU_INTEL;
 
         size_t versionPos = mSource.find("#version");
-        int shaderVersion = 100;
         size_t belowVersionPos = 0;
 
         if(versionPos != String::npos)
         {
-            shaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
             belowVersionPos = mSource.find('\n', versionPos) + 1;
         }
 
         // OSX driver only supports glsl150+ in core profile
-        bool shouldUpgradeToVersion150 = !rsc->isShaderProfileSupported("glsl130") && shaderVersion < 150;
+        bool shouldUpgradeToVersion150 = !rsc->isShaderProfileSupported("glsl130") && mShaderVersion < 150;
 
         // Add standard shader input and output blocks, if missing.
         // Assume blocks are missing if gl_Position is missing.
@@ -317,7 +315,7 @@ namespace Ogre {
                 String inBlock = "in gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\n"+clipDistDecl+"\n} gl_in[];\n\n";
                 String outBlock = "out gl_PerVertex\n{\nvec4 gl_Position;\nfloat gl_PointSize;\n"+clipDistDecl+"\n};\n\n";
 
-                if (shaderVersion >= 150 || shouldUpgradeToVersion150)
+                if (mShaderVersion >= 150 || shouldUpgradeToVersion150)
                 {
                     switch (mType)
                     {
@@ -343,7 +341,7 @@ namespace Ogre {
                         break;
                     }
                 }
-                else if(mType == GPT_VERTEX_PROGRAM && shaderVersion >= 130) // shaderVersion < 150, means we only have vertex shaders
+                else if(mType == GPT_VERTEX_PROGRAM && mShaderVersion >= 130) // shaderVersion < 150, means we only have vertex shaders
                 {
                 	// TODO: can we have SSO with GLSL < 130?
                     mSource.insert(belowVersionPos, "out vec4 gl_Position;\nout float gl_PointSize;\nout "+clipDistDecl+"\n\n");
