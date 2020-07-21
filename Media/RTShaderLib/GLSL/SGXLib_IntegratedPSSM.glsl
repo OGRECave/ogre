@@ -38,7 +38,7 @@ THE SOFTWARE.
 #endif
 
 #ifdef DEBUG_PSSM
-vec3 pssm_lod_info = vec3(0);
+STATIC vec3 pssm_lod_info = vec3(0.0, 0.0, 0.0);
 #endif
 
 //-----------------------------------------------------------------------------
@@ -58,7 +58,11 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, float depth)
 {
 #ifdef PSSM_SAMPLE_CMP
-	return vec4(shadow2D(shadowMap, vec3(uv, depth))).r;
+#	ifdef OGRE_GLSLES
+	return shadow2D(shadowMap, vec3(uv, depth));
+#	else
+	return shadow2D(shadowMap, vec3(uv, depth)).r;
+#	endif
 #else
 	return (depth <= texture2D(shadowMap, uv).r) ? 1.0 : 0.0;
 #endif
@@ -68,7 +72,7 @@ float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, float depth)
 void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in vec4 shadowMapPos, in vec2 invTexSize, out float c)
 {
 	shadowMapPos = shadowMapPos / shadowMapPos.w;
-#ifndef OGRE_REVERSED_Z
+#if !defined(OGRE_REVERSED_Z) && !defined(OGRE_HLSL)
 	shadowMapPos.z = shadowMapPos.z * 0.5 + 0.5; // convert -1..1 to 0..1
 #endif
 	vec2 uv = shadowMapPos.xy;

@@ -157,15 +157,16 @@ void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* progra
     os << "//-----------------------------------------------------------------------------" << std::endl;
     os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
+
     os << "#include <OgreUnifiedShader.h>" << std::endl;
 
     const auto& rgm = ResourceGroupManager::getSingleton();
 
     for (unsigned int i=0; i < program->getDependencyCount(); ++i)
     {
-        String curDependency = program->getDependency(i) + "." + getTargetLanguage();
-        if (!rgm.resourceExists(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, curDependency))
-            curDependency = program->getDependency(i) + ".cg"; // fall back to cg extension
+        String curDependency = program->getDependency(i) + ".cg";
+        if (!rgm.resourceExistsInAnyGroup(curDependency))
+            curDependency = program->getDependency(i) + ".glsl"; // fall back to glsl extension
 
         os << "#include \"" << curDependency << '\"' << std::endl;
     }

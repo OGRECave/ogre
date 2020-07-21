@@ -29,8 +29,9 @@ void SGX_TriplanarTexturing(in vec4 diffuse, in vec3 normal, in vec4 position, i
 {
 	vec3 blendWeights = abs(normalize(normal));
 	blendWeights = blendWeights - parameters.y;
-	blendWeights = pow(max(blendWeights, vec3(0)), vec3(parameters.z));
-	blendWeights /= vec3(blendWeights.x + blendWeights.y + blendWeights.z);
+	blendWeights = pow(max(blendWeights, vec3(0.0, 0.0, 0.0)), parameters.zzz);
+	float tot = (blendWeights.x + blendWeights.y + blendWeights.z);
+	blendWeights /= vec3(tot, tot, tot);
 	// Move the planar mapping a bit according to the normal length to avoid bad looking skirts.
 	float nLength = length(normal - 1.0);
 	vec2 coord1 = (position.yz + nLength) * parameters.x;
