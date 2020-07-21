@@ -150,7 +150,7 @@ namespace Ogre {
 
     void CPreprocessor::Token::SetValue (long iValue)
     {
-        char tmp [21];
+        static char tmp [21];
         int len = snprintf (tmp, sizeof (tmp), "%ld", iValue);
         Length = 0;
         Append (tmp, len);
@@ -1251,11 +1251,9 @@ namespace Ogre {
     }
 
 
-    void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen,
-                                long iMacroValue)
+    void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen)
     {
         MacroList.emplace_front(Token(Token::TK_KEYWORD, iMacroName, iMacroNameLen));
-        MacroList.front().Value.SetValue(iMacroValue);
     }
 
 
