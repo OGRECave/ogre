@@ -87,7 +87,7 @@ void FFP_PixelFog_PositionDepth(in mat4 mWorld,
 				   out vec3 oPosView,
 				   out float oDepth)
 {
-	vec4 vOutPos  = mWorld * pos;
+	vec4 vOutPos  = mul(mWorld, pos);
 	oPosView      = vOutPos.xyz - cameraPos;
 	oDepth        = length(oPosView);	
 }

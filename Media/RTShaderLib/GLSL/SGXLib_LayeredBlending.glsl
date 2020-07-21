@@ -16,7 +16,8 @@
 vec4 Desaturate(in vec3 color, in float Desaturation)
 {
 	vec3 grayXfer = vec3(0.3, 0.59, 0.11);
-	vec3 gray = vec3(dot(grayXfer, color));
+	float grayf = dot(grayXfer, color);
+	vec3 gray = vec3(grayf, grayf, grayf);
 	return vec4(mix(color, gray, Desaturation), 1.0);
 }
 
@@ -90,7 +91,7 @@ vec3 HSLToRGB(in vec3 hsl)
 	vec3 rgb;
 	
 	if (hsl.y == 0.0)
-		rgb = vec3(hsl.z); // Luminance
+		rgb = hsl.zzz; // Luminance
 	else
 	{
 		float f2;
@@ -129,7 +130,8 @@ vec3 ContrastSaturationBrightness(in vec3 color, in float brt, in float sat, in 
 	
 	vec3 AvgLumin = vec3(AvgLumR, AvgLumG, AvgLumB);
 	vec3 brtColor = color * brt;
-	vec3 intensity = vec3(dot(brtColor, LumCoeff));
+	float intensityf = dot(brtColor, LumCoeff);
+	vec3 intensity = vec3(intensityf, intensityf, intensityf);
 	vec3 satColor = mix(intensity, brtColor, sat);
 	vec3 conColor = mix(AvgLumin, satColor, con);
 	return conColor;

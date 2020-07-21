@@ -474,15 +474,16 @@ void ApplicationContextBase::locateResources()
 
     bool use_HLSL_Cg_shared = hasCgPlugin || Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("hlsl");
 
+    // unified shaders are written in GLSL dialect
+    rgm.addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
+
     // Add locations for supported shader languages
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
     {
-        rgm.addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
         rgm.addResourceLocation(arch + "/materials/programs/GLSLES", type, sec);
     }
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
     {
-        rgm.addResourceLocation(arch + "/materials/programs/GLSL", type, sec);
         rgm.addResourceLocation(arch + "/materials/programs/GLSL120", type, sec);
 
         if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
