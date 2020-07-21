@@ -61,7 +61,7 @@ namespace Ogre {
 
         // Define "predefined" macros.
         if(getLanguage() == "glsles")
-            cpp.Define("GL_ES", 5, 1);
+            cpp.Define("GL_ES", 5, "1", 1);
 
         size_t versionPos = mSource.find("#version");
         if(versionPos != String::npos)
