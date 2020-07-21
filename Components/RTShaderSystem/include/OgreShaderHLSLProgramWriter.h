@@ -54,8 +54,6 @@ public:
     */
     HLSLProgramWriter();
 
-    void writeProgramDependencies(std::ostream& os, Program* program);
-
     void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
 
     /** Class destructor */

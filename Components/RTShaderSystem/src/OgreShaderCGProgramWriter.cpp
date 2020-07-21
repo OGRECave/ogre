@@ -157,6 +157,7 @@ void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* progra
     os << "//-----------------------------------------------------------------------------" << std::endl;
     os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "#include <OgreUnifiedShader.h>" << std::endl;
 
     const auto& rgm = ResourceGroupManager::getSingleton();
 
