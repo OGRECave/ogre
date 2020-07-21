@@ -136,6 +136,7 @@ namespace Ogre {
 				args.push_back("dcls");
 			}
 		}
+		args.push_back("-DOGRE_CG");
 		// Now split args into that god-awful char** that Cg insists on
 		freeCgArgs();
 		mCgArguments = OGRE_ALLOC_T(char*, args.size() + 1, MEMCATEGORY_RESOURCE);

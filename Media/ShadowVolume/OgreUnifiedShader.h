@@ -6,7 +6,7 @@
 // - bgfx: https://github.com/bkaradzic/bgfx/blob/master/src/bgfx_shader.sh
 // - shiny: https://ogrecave.github.io/shiny/defining-materials-shaders.html
 
-#ifdef OGRE_HLSL
+#if defined(OGRE_HLSL) || defined(OGRE_CG)
 // HLSL
 #include "HLSL_SM4Support.hlsl"
 #define vec3 float3

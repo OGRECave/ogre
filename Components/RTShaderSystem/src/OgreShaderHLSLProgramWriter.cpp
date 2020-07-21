@@ -47,14 +47,6 @@ HLSLProgramWriter::HLSLProgramWriter()
     }
 }
 
-void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
-{
-    if(mIsShaderModel4 && program->getType() == GPT_FRAGMENT_PROGRAM)
-        os << "#include <HLSL_SM4Support.hlsl>" << std::endl;
-
-    CGProgramWriter::writeProgramDependencies(os, program);
-}
-
 void HLSLProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
 {
     if(!mIsShaderModel4 || !parameter->isSampler())
