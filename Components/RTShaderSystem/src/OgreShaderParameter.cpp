@@ -54,10 +54,8 @@ namespace RTShader {
         */
         virtual String toString () const
         {
-            const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
             StringStream str;
-            str << (!lang.empty() && lang[0] == 'g' ? "vec2(" : "float2(");
-            str << std::showpoint << mValue.x << "," << mValue.y << ")";
+            str << "vec2(" << std::showpoint << mValue.x << "," << mValue.y << ")";
             return str.str();
         }
     };
@@ -81,10 +79,8 @@ namespace RTShader {
         */
         virtual String toString () const
         {
-            const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
             StringStream str;
-            str << (!lang.empty() && lang[0] == 'g' ? "vec3(" : "float3(");
-            str << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << ")";
+            str << "vec3(" << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << ")";
             return str.str();
         }
     };
@@ -108,10 +104,8 @@ namespace RTShader {
         */
         virtual String toString () const
         {
-            const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
             StringStream str;
-            str << (!lang.empty() && lang[0] == 'g' ? "vec4(" : "float4(");
-            str << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << "," << mValue.w << ")";
+            str << "vec4(" << std::showpoint << mValue.x << "," << mValue.y << "," << mValue.z << "," << mValue.w << ")";
             return str.str();
         }
     };
