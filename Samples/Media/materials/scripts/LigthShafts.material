@@ -6,12 +6,38 @@
 
 // --------------------- Light shafts material ------------------------
 
-vertex_program LightShafts_VP cg
+vertex_program LightShafts_VP_GLSL glsl
 {
-    source LightShafts.hlsl
-    entry_point main_vp
-    profiles vs_2_0 arbvp1
+    source LightShafts.vert
+}
 
+vertex_program LightShafts_VP_HLSL hlsl
+{
+    source LightShafts.vert
+    target vs_2_0
+}
+
+fragment_program LightShafts_FP_GLSL glsl
+{
+    source LightShafts.frag
+    default_params
+    {
+        param_named uDepthMap int 0
+        param_named uCookieMap int 1
+        param_named uNoiseMap int 2
+    }
+}
+
+fragment_program LightShafts_FP_HLSL hlsl
+{
+    source LightShafts.frag
+    target ps_2_0
+}
+
+vertex_program LightShafts_VP unified
+{
+    delegate LightShafts_VP_GLSL
+    delegate LightShafts_VP_HLSL
     default_params
     {
         param_named_auto uWorldView worldview_matrix
@@ -20,11 +46,10 @@ vertex_program LightShafts_VP cg
     }
 }
 
-fragment_program LightShafts_FP cg
+fragment_program LightShafts_FP unified
 {
-    source LightShafts.hlsl
-    entry_point main_fp
-    profiles ps_2_0 arbfp1
+    delegate LightShafts_FP_GLSL
+    delegate LightShafts_FP_HLSL
 }
 
 material LightShafts
@@ -73,26 +98,4 @@ material LightShafts
             }
         }
     }
-}
-
-// --------------------- Depth material ------------------------
-
-vertex_program LightShaftsDepth_VP cg
-{
-    source LightShafts.hlsl
-    entry_point main_vp_depth
-    profiles vs_2_0 arbvp1
-
-    default_params
-    {
-        param_named_auto uWorldView worldview_matrix
-        param_named_auto uWorldViewProj worldviewproj_matrix
-    }
-}
-
-fragment_program LightShaftsDepth_FP cg
-{
-    source LightShafts.hlsl
-    entry_point main_fp_depth
-    profiles ps_2_0 arbfp1
 }

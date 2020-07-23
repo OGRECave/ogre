@@ -41,8 +41,6 @@ public:
                         "N - Change light cookie";
     }
 
-    StringVector getRequiredPlugins() { return {"Cg Program Manager"}; }
-
     bool frameStarted(const FrameEvent& e)
     {
         // Update light position
