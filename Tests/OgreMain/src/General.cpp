@@ -49,6 +49,8 @@ THE SOFTWARE.
 #include "OgreFileSystem.h"
 #include "OgreArchiveManager.h"
 
+#include "OgreHighLevelGpuProgram.h"
+
 #include <random>
 using std::minstd_rand;
 
@@ -356,4 +358,32 @@ TEST(GpuSharedParameters, align)
     // 16 byte alignment
     params.addConstantDefinition("d", GCT_MATRIX_4X4);
     EXPECT_EQ(params.getConstantDefinition("d").logicalIndex, 48);
+}
+
+typedef RootWithoutRenderSystemFixture HighLevelGpuProgramTest;
+TEST_F(HighLevelGpuProgramTest, resolveIncludes)
+{
+    auto mat = MaterialManager::getSingleton().create("Dummy", RGN_DEFAULT);
+
+    auto& rgm = ResourceGroupManager::getSingleton();
+    rgm.addResourceLocation(".", "FileSystem", RGN_DEFAULT, false, false);
+
+    // recursive inclusion
+    String bar = "World";
+    rgm.createResource("bar.cg", RGN_DEFAULT)->write(bar.c_str(), bar.size());
+    String foo = "Hello\n#include <bar.cg>\n";
+    rgm.createResource("foo.cg", RGN_DEFAULT)->write(foo.c_str(), foo.size());
+    const char* src = "#include <foo.cg>";
+
+    String res = HighLevelGpuProgram::_resolveIncludes(src, mat.get(), "main.cg");
+    rgm.deleteResource("foo.cg", RGN_DEFAULT);
+    rgm.deleteResource("bar.cg", RGN_DEFAULT);
+
+    String ref = "#line 1  \"foo.cg\"\n"
+                 "Hello\n"
+                 "#line 1  \"bar.cg\"\n"
+                 "World\n"
+                 "#line 2 \"foo.cg\"";
+
+    ASSERT_EQ(res.substr(0, ref.size()), ref);
 }
