@@ -2,7 +2,7 @@
 
 uniform vec4 shadowColor;
 
-ATTRIBUTES_BEGIN
+MAIN_PARAMETERS
 MAIN_DECLARATION
 {
     gl_FragColor = shadowColor;
