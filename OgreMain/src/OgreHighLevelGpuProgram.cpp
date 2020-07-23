@@ -304,10 +304,10 @@ namespace Ogre
             }
 
             // find following newline (or EOF)
-            size_t newLineAfter = inSource.find('\n', afterIncludePos);
+            size_t newLineAfter = std::min(inSource.find('\n', afterIncludePos), inSource.size());
             // find include file string container
-            String endDelimeter = "\"";
-            size_t startIt = inSource.find('\"', afterIncludePos);
+            char endDelimeter = '"';
+            size_t startIt = inSource.find('"', afterIncludePos);
             if (startIt == String::npos || startIt > newLineAfter)
             {
                 // try <>
@@ -320,15 +320,16 @@ namespace Ogre
                 }
                 else
                 {
-                    endDelimeter = ">";
+                    endDelimeter = '>';
                 }
             }
             size_t endIt = inSource.find(endDelimeter, startIt+1);
             if (endIt == String::npos || endIt <= startIt)
             {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Badly formed #include directive (expected " + endDelimeter +
-                                                               ") in file " + fileName + ": " +
-                                                               inSource.substr(includePos, newLineAfter - includePos));
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                            "Badly formed #include directive (expected " + String(1, endDelimeter) +
+                                ") in file " + fileName + ": " +
+                                inSource.substr(includePos, newLineAfter - includePos));
             }
 
             // extract filename
@@ -352,7 +353,8 @@ namespace Ogre
             // Add #line to the start of the included file to correct the line count)
             outSource.append("#line 1 " + incLineFilename + "\n");
 
-            outSource.append(resource->getAsString());
+            // recurse into include
+            outSource.append(_resolveIncludes(resource->getAsString(), resourceBeingLoaded, filename));
 
             // Add #line to the end of the included file to correct the line count
             outSource.append("\n#line " + std::to_string(lineCount) + lineFilename);
