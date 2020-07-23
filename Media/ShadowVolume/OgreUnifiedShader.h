@@ -3,8 +3,16 @@
 // of this distribution and at https://www.ogre3d.org/licensing.
 
 // greatly inspired by
-// - bgfx: https://github.com/bkaradzic/bgfx/blob/master/src/bgfx_shader.sh
 // - shiny: https://ogrecave.github.io/shiny/defining-materials-shaders.html
+// - bgfx: https://github.com/bkaradzic/bgfx/blob/master/src/bgfx_shader.sh
+
+// general usage:
+// MAIN_PARAMETERS
+// IN(vec4 vertex, POSITION)
+// MAIN_DECLARATION
+// {
+//     GLSL code here
+// }
 
 #if defined(OGRE_HLSL) || defined(OGRE_CG)
 // HLSL
@@ -37,15 +45,16 @@ mat3 mtxFromRows(vec3 a, vec3 b, vec3 c)
 
 #define STATIC static
 
-#define ATTRIBUTES_BEGIN void main(
+#define MAIN_PARAMETERS void main(
 
 #ifdef OGRE_VERTEX_SHADER
 #define MAIN_DECLARATION out float4 gl_Position : POSITION)
 #else
-#define MAIN_DECLARATION out float4 gl_FragColor : COLOR)
+#define MAIN_DECLARATION in float4 gl_FragCoord : POSITION, out float4 gl_FragColor : COLOR)
 #endif
 
-#define ATTRIBUTE(decl, sem) in decl : sem,
+#define IN(decl, sem) in decl : sem,
+#define OUT(decl, sem) out decl : sem,
 #else
 // GLSL
 #define SAMPLER1D(name, reg) sampler1D name
@@ -91,8 +100,14 @@ mat3 mtxFromRows(vec3 a, vec3 b, vec3 c)
 
 #define STATIC
 
-#define ATTRIBUTES_BEGIN
+#define MAIN_PARAMETERS
 #define MAIN_DECLARATION void main()
 
-#define ATTRIBUTE(decl, sem) attribute decl;
+#ifdef OGRE_VERTEX_SHADER
+#define IN(decl, sem) attribute decl;
+#define OUT(decl, sem) varying decl;
+#else
+#define IN(decl, sem) varying decl;
+#define OUT(decl, sem) out decl;
+#endif
 #endif
