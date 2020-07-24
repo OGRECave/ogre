@@ -440,7 +440,7 @@ namespace Ogre {
             compileFlags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
         }
 
-        const char* target = getCompatibleTarget().c_str();
+        const char* target = getCompatibleTarget();
 
         ComPtr<ID3DBlob> pMicroCode;
         ComPtr<ID3DBlob> errors;
@@ -1522,29 +1522,26 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    const String& D3D11HLSLProgram::getCompatibleTarget(void) const
+    const char* D3D11HLSLProgram::getCompatibleTarget(void) const
     {
-        static const String
-            vs_4_0           = "vs_4_0",
-            vs_4_0_level_9_3 = "vs_4_0_level_9_3",
-            vs_4_0_level_9_1 = "vs_4_0_level_9_1",
-            ps_4_0           = "ps_4_0",
-            ps_4_0_level_9_3 = "ps_4_0_level_9_3",
-            ps_4_0_level_9_1 = "ps_4_0_level_9_1";
+        if(mTarget.empty())
+        {
+            return mType == GPT_VERTEX_PROGRAM ? "vs_4_0_level_9_1" : "ps_4_0_level_9_1";
+        }
 
         if(mEnableBackwardsCompatibility)
         {
-            if(mTarget == "vs_2_0") return vs_4_0_level_9_1;
-            if(mTarget == "vs_2_a") return vs_4_0_level_9_3;
-            if(mTarget == "vs_3_0") return vs_4_0;
+            if(mTarget == "vs_2_0") return "vs_4_0_level_9_1";
+            if(mTarget == "vs_2_a") return "vs_4_0_level_9_3";
+            if(mTarget == "vs_3_0") return "vs_4_0";
 
-            if(mTarget == "ps_2_0") return ps_4_0_level_9_1;
-            if(mTarget == "ps_2_a") return ps_4_0_level_9_3;
-            if(mTarget == "ps_2_b") return ps_4_0_level_9_3;
-            if(mTarget == "ps_3_0") return ps_4_0;
+            if(mTarget == "ps_2_0") return "ps_4_0_level_9_1";
+            if(mTarget == "ps_2_a") return "ps_4_0_level_9_3";
+            if(mTarget == "ps_2_b") return "ps_4_0_level_9_3";
+            if(mTarget == "ps_3_0") return "ps_4_0";
         }
 
-        return mTarget;
+        return mTarget.c_str();
     }
     //-----------------------------------------------------------------------
     const String& D3D11HLSLProgram::getLanguage(void) const
