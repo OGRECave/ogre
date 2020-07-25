@@ -1133,8 +1133,9 @@ namespace Ogre {
         }
 
         bool success;
-
+        OGRE_IGNORE_DEPRECATED_BEGIN
         success = mActiveRenderer->_createRenderWindows(renderWindowDescriptions, createdWindows);
+        OGRE_IGNORE_DEPRECATED_END
         if(success && !mFirstTimePostWindowInit)
         {
             oneTimePostWindowInit();

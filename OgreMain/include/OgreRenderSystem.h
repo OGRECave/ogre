@@ -411,22 +411,8 @@ namespace Ogre
         virtual RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0);
 
-        /** Creates multiple rendering windows.     
-        @param
-        renderWindowDescriptions Array of structures containing the descriptions of each render window.
-        The structure's members are the same as the parameters of _createRenderWindow:
-        * name
-        * width
-        * height
-        * fullScreen
-        * miscParams
-        See _createRenderWindow for details about each member.      
-        @param
-        createdWindows This array will hold the created render windows.
-        @return
-        true on success.        
-        */
-        virtual bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+        /// @deprecated call _createRenderWindow multiple times
+        OGRE_DEPRECATED bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
             RenderWindowList& createdWindows);
 
         
