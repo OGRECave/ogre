@@ -833,38 +833,8 @@ namespace Ogre
     RenderWindow* D3D9RenderSystem::_createRenderWindow(const String &name, 
         unsigned int width, unsigned int height, bool fullScreen,
         const NameValuePairList *miscParams)
-    {       
-        // Log a message
-        StringStream ss;
-        ss << "D3D9RenderSystem::_createRenderWindow \"" << name << "\", " <<
-            width << "x" << height << " ";
-
-        if(fullScreen)
-            ss << "fullscreen ";
-        else
-            ss << "windowed ";
-
-        if(miscParams)
-        {
-            ss << " miscParams: ";
-            NameValuePairList::const_iterator it;
-            for(it=miscParams->begin(); it!=miscParams->end(); ++it)
-            {
-                ss << it->first << "=" << it->second << " ";
-            }
-            LogManager::getSingleton().logMessage(ss.str());
-        }
-
-        String msg;
-
-        // Make sure we don't already have a render target of the 
-        // same name as the one supplied
-        if( mRenderTargets.find( name ) != mRenderTargets.end() )
-        {
-            msg = "A render target of the same name '" + name + "' already "
-                "exists.  You cannot create a new window with this name.";
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "D3D9RenderSystem::_createRenderWindow" );
-        }
+    {
+        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         // Stereo driver must be created before device is created
