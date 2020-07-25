@@ -402,6 +402,19 @@ namespace Ogre {
             }                   
         }
 
+        // Simply call _createRenderWindow in a loop.
+        for (const auto& curRenderWindowDescription : renderWindowDescriptions)
+        {
+            RenderWindow* curWindow = NULL;
+            curWindow = _createRenderWindow(curRenderWindowDescription.name,
+                                            curRenderWindowDescription.width,
+                                            curRenderWindowDescription.height,
+                                            curRenderWindowDescription.useFullScreen,
+                                            &curRenderWindowDescription.miscParams);
+
+            createdWindows.push_back(curWindow);
+        }
+
         return true;
     }
 

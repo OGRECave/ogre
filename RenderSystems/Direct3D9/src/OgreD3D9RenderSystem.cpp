@@ -876,33 +876,7 @@ namespace Ogre
 #endif
 
         return renderWindow;
-    }   
-    //---------------------------------------------------------------------
-    bool D3D9RenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
-        RenderWindowList& createdWindows)
-    {
-        // Call base render system method.
-        if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
-            return false;
-
-        // Simply call _createRenderWindow in a loop.
-        for (size_t i = 0; i < renderWindowDescriptions.size(); ++i)
-        {
-            const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];            
-            RenderWindow* curWindow = NULL;
-
-            curWindow = _createRenderWindow(curRenderWindowDescription.name, 
-                curRenderWindowDescription.width, 
-                curRenderWindowDescription.height, 
-                curRenderWindowDescription.useFullScreen, 
-                &curRenderWindowDescription.miscParams);
-                            
-            createdWindows.push_back(curWindow);                                            
-        }
-        
-        return true;
     }
-
     //---------------------------------------------------------------------
     RenderSystemCapabilities* D3D9RenderSystem::updateRenderSystemCapabilities(D3D9RenderWindow* renderWindow)
     {           

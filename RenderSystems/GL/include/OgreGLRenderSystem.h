@@ -171,10 +171,6 @@ namespace Ogre {
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
                                           bool fullScreen, const NameValuePairList *miscParams = 0);
 
-        /// @copydoc RenderSystem::_createRenderWindows
-        bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
-                                  RenderWindowList& createdWindows);
-
         /// @copydoc RenderSystem::_createDepthBufferFor
         DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
         

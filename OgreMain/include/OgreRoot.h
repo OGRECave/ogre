@@ -590,9 +590,8 @@ namespace Ogre
                                       desc.useFullScreen, &desc.miscParams);
         }
 
-        /** @copydoc RenderSystem::_createRenderWindows
-        */
-        bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
+        /// @deprecated call createRenderWindow multiple times
+        OGRE_DEPRECATED bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
             RenderWindowList& createdWindows);
     
         /** Detaches a RenderTarget from the active render system
