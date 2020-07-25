@@ -409,7 +409,7 @@ namespace Ogre
         | maxDepthBufferSize | Positive integer (usually 0, 16, 24) | 16 | EGL_DEPTH_SIZE | Android Specific |
         */
         virtual RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
-            bool fullScreen, const NameValuePairList *miscParams = 0) = 0;
+            bool fullScreen, const NameValuePairList *miscParams = 0);
 
         /** Creates multiple rendering windows.     
         @param

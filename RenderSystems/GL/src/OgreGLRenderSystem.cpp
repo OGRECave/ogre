@@ -1064,31 +1064,7 @@ namespace Ogre {
                                                       unsigned int width, unsigned int height, bool fullScreen,
                                                       const NameValuePairList *miscParams)
     {
-        if (mRenderTargets.find(name) != mRenderTargets.end())
-        {
-            OGRE_EXCEPT(
-                Exception::ERR_INVALIDPARAMS,
-                "Window with name '" + name + "' already exists",
-                "GLRenderSystem::_createRenderWindow" );
-        }
-        // Log a message
-        StringStream ss;
-        ss << "GLRenderSystem::_createRenderWindow \"" << name << "\", " <<
-            width << "x" << height << " ";
-        if(fullScreen)
-            ss << "fullscreen ";
-        else
-            ss << "windowed ";
-        if(miscParams)
-        {
-            ss << " miscParams: ";
-            NameValuePairList::const_iterator it;
-            for(it=miscParams->begin(); it!=miscParams->end(); ++it)
-            {
-                ss << it->first << "=" << it->second << " ";
-            }
-            LogManager::getSingleton().logMessage(ss.str());
-        }
+        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
 
         // Create the window
         RenderWindow* win = mGLSupport->newWindow(name, width, height,

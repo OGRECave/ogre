@@ -316,6 +316,38 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------------------------------
+    RenderWindow* RenderSystem::_createRenderWindow(const String& name, unsigned int width,
+                                                    unsigned int height, bool fullScreen,
+                                                    const NameValuePairList* miscParams)
+    {
+        if (mRenderTargets.find(name) != mRenderTargets.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Window with name '" + name + "' already exists");
+        }
+
+        // Log a message
+        StringStream ss;
+        ss << "RenderSystem::_createRenderWindow \"" << name << "\", " <<
+            width << "x" << height << " ";
+        if (fullScreen)
+            ss << "fullscreen ";
+        else
+            ss << "windowed ";
+
+        if (miscParams)
+        {
+            ss << " miscParams: ";
+            NameValuePairList::const_iterator it;
+            for (const auto& p : *miscParams)
+            {
+                ss << p.first << "=" << p.second << " ";
+            }
+        }
+        LogManager::getSingleton().logMessage(ss.str());
+
+        return NULL;
+    }
+
     bool RenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
         RenderWindowList& createdWindows)
     {

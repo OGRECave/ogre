@@ -714,6 +714,7 @@ namespace Ogre
 		unsigned int width, unsigned int height, bool fullScreen,
 		const NameValuePairList *miscParams)
 	{
+        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
 
 		// Check we're not creating a secondary window when the primary
 		// was fullscreen
@@ -722,36 +723,6 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
 				"Cannot create secondary windows not in full screen when the primary is full screen",
 				"D3D11RenderSystem::_createRenderWindow");
-		}
-
-		// Log a message
-		StringStream ss;
-		ss << "D3D11RenderSystem::_createRenderWindow \"" << name << "\", " <<
-			width << "x" << height << " ";
-		if (fullScreen)
-			ss << "fullscreen ";
-		else
-			ss << "windowed ";
-		if (miscParams)
-		{
-			ss << " miscParams: ";
-			NameValuePairList::const_iterator it;
-			for (it = miscParams->begin(); it != miscParams->end(); ++it)
-			{
-				ss << it->first << "=" << it->second << " ";
-			}
-			LogManager::getSingleton().logMessage(ss.str());
-		}
-
-		String msg;
-
-		// Make sure we don't already have a render target of the 
-		// sam name as the one supplied
-		if (mRenderTargets.find(name) != mRenderTargets.end())
-		{
-			msg = "A render target of the same name '" + name + "' already "
-				"exists.  You cannot create a new window with this name.";
-			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, msg, "D3D11RenderSystem::_createRenderWindow");
 		}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

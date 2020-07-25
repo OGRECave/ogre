@@ -294,6 +294,7 @@ namespace Ogre
                                                          bool fullScreen,
                                                          const NameValuePairList *miscParams )
     {
+        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
         if( !mInitialized )
         {
             // enable debug layer
