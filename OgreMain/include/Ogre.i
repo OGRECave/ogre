@@ -399,6 +399,7 @@ ADD_REPR(Plane)
 #endif
 %include "OgreConfigFile.h"
 %feature("valuewrapper") Ogre::Log::Stream;
+%feature("director") Ogre::LogListener;
 %include "OgreLog.h"
 %include "OgreLogManager.h"
 #ifdef SWIGJAVA
