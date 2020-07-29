@@ -70,7 +70,7 @@ namespace Ogre {
         @param stream The destination stream
         @param endianMode The endian mode for the written file
         */
-        void exportMesh(const Mesh* pMesh, DataStreamPtr stream,
+        void exportMesh(const Mesh* pMesh, const DataStreamPtr stream,
             Endian endianMode = ENDIAN_NATIVE);
 
         /** Imports Mesh and (optionally) Material data from a .mesh file DataStream.
@@ -80,7 +80,7 @@ namespace Ogre {
         @param stream The DataStream holding the .mesh data. Must be initialised (pos at the start of the buffer).
         @param pDest Pointer to the Mesh object which will receive the data. Should be blank already.
         */
-        void importMesh(DataStreamPtr& stream, Mesh* pDest, MeshSerializerListener *listener);
+        void importMesh(const DataStreamPtr& stream, Mesh* pDest, MeshSerializerListener *listener);
 
     protected:
 
@@ -141,38 +141,38 @@ namespace Ogre {
         virtual size_t calcExtremesSize(const Mesh* pMesh);
         virtual size_t calcSubMeshExtremesSize(unsigned short idx, const SubMesh* s);
 
-        virtual void readTextureLayer(DataStreamPtr& stream, Mesh* pMesh, MaterialPtr& pMat);
-        virtual void readSubMeshNameTable(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
-        virtual void readSubMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
-        virtual void readSubMeshOperation(DataStreamPtr& stream, Mesh* pMesh, SubMesh* sub);
-        virtual void readSubMeshTextureAlias(DataStreamPtr& stream, Mesh* pMesh, SubMesh* sub);
-        virtual void readGeometry(DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
-        virtual void readGeometryVertexDeclaration(DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
-        virtual void readGeometryVertexElement(DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
-        virtual void readGeometryVertexBuffer(DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
+        virtual void readTextureLayer(const DataStreamPtr& stream, Mesh* pMesh, MaterialPtr& pMat);
+        virtual void readSubMeshNameTable(const DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readMesh(const DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
+        virtual void readSubMesh(const DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
+        virtual void readSubMeshOperation(const DataStreamPtr& stream, Mesh* pMesh, SubMesh* sub);
+        virtual void readSubMeshTextureAlias(const DataStreamPtr& stream, Mesh* pMesh, SubMesh* sub);
+        virtual void readGeometry(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
+        virtual void readGeometryVertexDeclaration(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
+        virtual void readGeometryVertexElement(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
+        virtual void readGeometryVertexBuffer(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
 
-        virtual void readSkeletonLink(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
-        virtual void readMeshBoneAssignment(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readSubMeshBoneAssignment(DataStreamPtr& stream, Mesh* pMesh, 
+        virtual void readSkeletonLink(const DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
+        virtual void readMeshBoneAssignment(const DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readSubMeshBoneAssignment(const DataStreamPtr& stream, Mesh* pMesh,
             SubMesh* sub);
-        virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readMeshLodLevel(const DataStreamPtr& stream, Mesh* pMesh);
 #if !OGRE_NO_MESHLOD
-        virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
-        virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+        virtual void readMeshLodUsageManual(const DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+        virtual void readMeshLodUsageGenerated(const DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
 #endif
-        virtual void readBoundsInfo(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readEdgeList(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readEdgeListLodInfo(DataStreamPtr& stream, EdgeData* edgeData);
-        virtual void readPoses(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readPose(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readAnimations(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readAnimation(DataStreamPtr& stream, Mesh* pMesh);
-        virtual void readAnimationTrack(DataStreamPtr& stream, Animation* anim, 
+        virtual void readBoundsInfo(const DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readEdgeList(const DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readEdgeListLodInfo(const DataStreamPtr& stream, EdgeData* edgeData);
+        virtual void readPoses(const DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readPose(const DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readAnimations(const DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readAnimation(const DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readAnimationTrack(const DataStreamPtr& stream, Animation* anim,
             Mesh* pMesh);
-        virtual void readMorphKeyFrame(DataStreamPtr& stream, Mesh* pMesh, VertexAnimationTrack* track);
-        virtual void readPoseKeyFrame(DataStreamPtr& stream, VertexAnimationTrack* track);
-        virtual void readExtremes(DataStreamPtr& stream, Mesh *pMesh);
+        virtual void readMorphKeyFrame(const DataStreamPtr& stream, Mesh* pMesh, VertexAnimationTrack* track);
+        virtual void readPoseKeyFrame(const DataStreamPtr& stream, VertexAnimationTrack* track);
+        virtual void readExtremes(const DataStreamPtr& stream, Mesh *pMesh);
 
 
         /// Flip an entire vertex buffer from little endian
@@ -213,11 +213,11 @@ namespace Ogre {
         virtual void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum);
         virtual void writeLodUsageManual(const MeshLodUsage& usage);
 
-        virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, 
+        virtual void readMeshLodUsageGenerated(const DataStreamPtr& stream, Mesh* pMesh,
             unsigned short lodNum, MeshLodUsage& usage);
-        virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+        virtual void readMeshLodUsageManual(const DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
 #endif
-        virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readMeshLodLevel(const DataStreamPtr& stream, Mesh* pMesh);
         virtual void enableValidation();
     };
 
@@ -231,9 +231,9 @@ namespace Ogre {
         ~MeshSerializerImpl_v1_41();
     protected:
         void writeMorphKeyframe(const VertexMorphKeyFrame* kf, size_t vertexCount);
-        void readMorphKeyFrame(DataStreamPtr& stream, Mesh* pMesh, VertexAnimationTrack* track);
+        void readMorphKeyFrame(const DataStreamPtr& stream, Mesh* pMesh, VertexAnimationTrack* track);
         void writePose(const Pose* pose);
-        void readPose(DataStreamPtr& stream, Mesh* pMesh);
+        void readPose(const DataStreamPtr& stream, Mesh* pMesh);
         size_t calcMorphKeyframeSize(const VertexMorphKeyFrame* kf, size_t vertexCount);
         size_t calcPoseSize(const Pose* pose);
         size_t calcPoseVertexSize(void);
@@ -250,7 +250,7 @@ namespace Ogre {
         ~MeshSerializerImpl_v1_4();
     protected:
         virtual size_t calcLodLevelSize(const Mesh* pMesh);
-        virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
+        virtual void readMeshLodLevel(const DataStreamPtr& stream, Mesh* pMesh);
 #if !OGRE_NO_MESHLOD
         virtual void writeLodLevel(const Mesh* pMesh);
         virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
@@ -266,7 +266,7 @@ namespace Ogre {
         MeshSerializerImpl_v1_3();
         ~MeshSerializerImpl_v1_3();
     protected:
-        virtual void readEdgeListLodInfo(DataStreamPtr& stream, EdgeData* edgeData);
+        virtual void readEdgeListLodInfo(const DataStreamPtr& stream, EdgeData* edgeData);
 
         /// Reorganise triangles of the edge list to group by vertex set
         virtual void reorganiseTriangles(EdgeData* edgeData);
@@ -285,15 +285,15 @@ namespace Ogre {
         MeshSerializerImpl_v1_2();
         ~MeshSerializerImpl_v1_2();
     protected:
-        virtual void readMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
-        virtual void readGeometry(DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
-        virtual void readGeometryPositions(unsigned short bindIdx, DataStreamPtr& stream, 
+        virtual void readMesh(const DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
+        virtual void readGeometry(const DataStreamPtr& stream, Mesh* pMesh, VertexData* dest);
+        virtual void readGeometryPositions(unsigned short bindIdx, const DataStreamPtr& stream,
             Mesh* pMesh, VertexData* dest);
-        virtual void readGeometryNormals(unsigned short bindIdx, DataStreamPtr& stream, 
+        virtual void readGeometryNormals(unsigned short bindIdx, const DataStreamPtr& stream,
             Mesh* pMesh, VertexData* dest);
-        virtual void readGeometryColours(unsigned short bindIdx, DataStreamPtr& stream, 
+        virtual void readGeometryColours(unsigned short bindIdx, const DataStreamPtr& stream,
             Mesh* pMesh, VertexData* dest);
-        virtual void readGeometryTexCoords(unsigned short bindIdx, DataStreamPtr& stream, 
+        virtual void readGeometryTexCoords(unsigned short bindIdx, const DataStreamPtr& stream,
             Mesh* pMesh, VertexData* dest, unsigned short set);
     };
 
@@ -306,7 +306,7 @@ namespace Ogre {
         MeshSerializerImpl_v1_1();
         ~MeshSerializerImpl_v1_1();
     protected:
-        void readGeometryTexCoords(unsigned short bindIdx, DataStreamPtr& stream, 
+        void readGeometryTexCoords(unsigned short bindIdx, const DataStreamPtr& stream,
             Mesh* pMesh, VertexData* dest, unsigned short set);
     };
 
