@@ -471,6 +471,9 @@ namespace Ogre {
 
         // The listener to pass to serializers
         MeshSerializerListener *mListener;
+
+    private:
+        std::unique_ptr<Codec> mMeshCodec;
     };
 
     /** @} */

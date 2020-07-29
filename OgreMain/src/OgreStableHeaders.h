@@ -49,6 +49,7 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 #include "OgreBone.h"
 #include "OgreCamera.h"
+#include "OgreCodec.h"
 #include "OgreColourValue.h"
 #include "OgreCommon.h"
 #include "OgreDataStream.h"

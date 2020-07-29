@@ -32,6 +32,19 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    struct MeshCodec : public Codec
+    {
+        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return ""; }
+        String getType() const { return "mesh"; }
+        void decode(const DataStreamPtr& input, const Any& output) const override
+        {
+            Mesh* dst = any_cast<Mesh*>(output);
+            MeshSerializer serializer;
+            serializer.setListener(MeshManager::getSingleton().getListener());
+            serializer.importMesh(input, dst);
+        }
+    };
+
     //-----------------------------------------------------------------------
     template<> MeshManager* Singleton<MeshManager>::msSingleton = 0;
     MeshManager* MeshManager::getSingletonPtr(void)
@@ -52,12 +65,16 @@ namespace Ogre
         mLoadOrder = 350.0f;
         mResourceType = "Mesh";
 
+        mMeshCodec.reset(new MeshCodec());
+        Codec::registerCodec(mMeshCodec.get());
+
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
 
     }
     //-----------------------------------------------------------------------
     MeshManager::~MeshManager()
     {
+        Codec::unregisterCodec(mMeshCodec.get());
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
     //-----------------------------------------------------------------------
