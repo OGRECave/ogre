@@ -55,12 +55,10 @@ namespace Ogre {
         PVRTCCodec();
         virtual ~PVRTCCodec() { }
 
-        /// @copydoc Codec::decode
-        DecodeResult decode(const DataStreamPtr& input) const;
-		/// @copydoc Codec::magicNumberToFileExt
-		String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
-        
-        virtual String getType() const;        
+        using ImageCodec::decode;
+        DecodeResult decode(const DataStreamPtr& input) const override;
+		String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
+        String getType() const override;
 
 		/// Static method to startup and register the PVRTC codec
 		static void startup(void);

@@ -35,13 +35,13 @@ namespace Ogre {
     Codec::~Codec() {
     }
 
-    DataStreamPtr Codec::encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const
+    DataStreamPtr Codec::encode(const Any& input) const
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, getType() + " - encoding to memory not supported");
         return DataStreamPtr();
     }
 
-    void Codec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const
+    void Codec::encodeToFile(const Any& input, const String& outFileName) const
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, getType() + " - encoding to file not supported");
     }
