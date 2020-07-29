@@ -72,14 +72,14 @@ namespace Ogre {
         DDSCodec();
         virtual ~DDSCodec() { }
 
-        /// @copydoc Codec::encodeToFile
-        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const;
-        /// @copydoc Codec::decode
-        DecodeResult decode(const DataStreamPtr& input) const;
-        /// @copydoc Codec::magicNumberToFileExt
-        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
-        
-        virtual String getType() const;        
+        using ImageCodec::decode;
+        using ImageCodec::encode;
+        using ImageCodec::encodeToFile;
+
+        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const override;
+        DecodeResult decode(const DataStreamPtr& input) const override;
+        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
+        String getType() const override;
 
         /// Static method to startup and register the DDS codec
         static void startup(void);
