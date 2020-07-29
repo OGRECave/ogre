@@ -91,25 +91,25 @@ namespace Ogre {
         void writeString(const String& string);
         void writeData(const void* const buf, size_t size, size_t count);
         
-        void readFileHeader(DataStreamPtr& stream);
-        unsigned short readChunk(DataStreamPtr& stream);
+        void readFileHeader(const DataStreamPtr& stream);
+        unsigned short readChunk(const DataStreamPtr& stream);
         
-        void readBools(DataStreamPtr& stream, bool* pDest, size_t count);
-        void readFloats(DataStreamPtr& stream, float* pDest, size_t count);
-        void readFloats(DataStreamPtr& stream, double* pDest, size_t count);
-        void readShorts(DataStreamPtr& stream, uint16* pDest, size_t count);
-        void readInts(DataStreamPtr& stream, uint32* pDest, size_t count);
-        void readObject(DataStreamPtr& stream, Vector3& pDest);
-        void readObject(DataStreamPtr& stream, Quaternion& pDest);
+        void readBools(const DataStreamPtr& stream, bool* pDest, size_t count);
+        void readFloats(const DataStreamPtr& stream, float* pDest, size_t count);
+        void readFloats(const DataStreamPtr& stream, double* pDest, size_t count);
+        void readShorts(const DataStreamPtr& stream, uint16* pDest, size_t count);
+        void readInts(const DataStreamPtr& stream, uint32* pDest, size_t count);
+        void readObject(const DataStreamPtr& stream, Vector3& pDest);
+        void readObject(const DataStreamPtr& stream, Quaternion& pDest);
 
-        String readString(DataStreamPtr& stream);
-        String readString(DataStreamPtr& stream, size_t numChars);
+        String readString(const DataStreamPtr& stream);
+        String readString(const DataStreamPtr& stream, size_t numChars);
         
         void flipToLittleEndian(void* pData, size_t size, size_t count = 1);
         void flipFromLittleEndian(void* pData, size_t size, size_t count = 1);
 
         /// Determine the endianness of the incoming stream compared to native
-        void determineEndianness(DataStreamPtr& stream);
+        void determineEndianness(const DataStreamPtr& stream);
         /// Determine the endianness to write with based on option
         void determineEndianness(Endian requestedEndian);
 
@@ -120,7 +120,7 @@ namespace Ogre {
 #endif
         void pushInnerChunk(const DataStreamPtr& stream);
         void popInnerChunk(const DataStreamPtr& stream);
-        void backpedalChunkHeader(DataStreamPtr& stream);
+        void backpedalChunkHeader(const DataStreamPtr& stream);
     };
     /** @} */
     /** @} */

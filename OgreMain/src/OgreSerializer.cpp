@@ -46,7 +46,7 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    void Serializer::determineEndianness(DataStreamPtr& stream)
+    void Serializer::determineEndianness(const DataStreamPtr& stream)
     {
         if (stream->tell() != 0)
         {
@@ -231,7 +231,7 @@ namespace Ogre {
         mStream->write(&terminator, 1);
     }
     //---------------------------------------------------------------------
-    void Serializer::readFileHeader(DataStreamPtr& stream)
+    void Serializer::readFileHeader(const DataStreamPtr& stream)
     {
         unsigned short headerID;
         
@@ -258,7 +258,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    unsigned short Serializer::readChunk(DataStreamPtr& stream)
+    unsigned short Serializer::readChunk(const DataStreamPtr& stream)
     {
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
         size_t pos = stream->tell();
@@ -278,19 +278,19 @@ namespace Ogre {
         return id;
     }
     //---------------------------------------------------------------------
-    void Serializer::readBools(DataStreamPtr& stream, bool* pDest, size_t count)
+    void Serializer::readBools(const DataStreamPtr& stream, bool* pDest, size_t count)
     {
         static_assert(sizeof(bool) == 1, "add conversion to char for your platform");
         stream->read(pDest, sizeof(bool) * count);
     }
     //---------------------------------------------------------------------
-    void Serializer::readFloats(DataStreamPtr& stream, float* pDest, size_t count)
+    void Serializer::readFloats(const DataStreamPtr& stream, float* pDest, size_t count)
     {
         stream->read(pDest, sizeof(float) * count);
         flipFromLittleEndian(pDest, sizeof(float), count);
     }
     //---------------------------------------------------------------------
-    void Serializer::readFloats(DataStreamPtr& stream, double* pDest, size_t count)
+    void Serializer::readFloats(const DataStreamPtr& stream, double* pDest, size_t count)
     {
         // Read from float, convert to double
         float* tmp = OGRE_ALLOC_T(float, count, MEMCATEGORY_GENERAL);
@@ -305,19 +305,19 @@ namespace Ogre {
         OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
     }
     //---------------------------------------------------------------------
-    void Serializer::readShorts(DataStreamPtr& stream, unsigned short* pDest, size_t count)
+    void Serializer::readShorts(const DataStreamPtr& stream, unsigned short* pDest, size_t count)
     {
         stream->read(pDest, sizeof(unsigned short) * count);
         flipFromLittleEndian(pDest, sizeof(unsigned short), count);
     }
     //---------------------------------------------------------------------
-    void Serializer::readInts(DataStreamPtr& stream, uint32* pDest, size_t count)
+    void Serializer::readInts(const DataStreamPtr& stream, uint32* pDest, size_t count)
     {
         stream->read(pDest, sizeof(uint32) * count);
         flipFromLittleEndian(pDest, sizeof(uint32), count);
     }
     //---------------------------------------------------------------------
-    String Serializer::readString(DataStreamPtr& stream, size_t numChars)
+    String Serializer::readString(const DataStreamPtr& stream, size_t numChars)
     {
         OgreAssert(numChars <= 255, "");
         char str[255];
@@ -326,7 +326,7 @@ namespace Ogre {
         return str;
     }
     //---------------------------------------------------------------------
-    String Serializer::readString(DataStreamPtr& stream)
+    String Serializer::readString(const DataStreamPtr& stream)
     {
         return stream->getLine(false);
     }
@@ -347,12 +347,12 @@ namespace Ogre {
         writeFloats(tmp, 4);
     }
     //---------------------------------------------------------------------
-    void Serializer::readObject(DataStreamPtr& stream, Vector3& pDest)
+    void Serializer::readObject(const DataStreamPtr& stream, Vector3& pDest)
     {
         readFloats(stream, pDest.ptr(), 3);
     }
     //---------------------------------------------------------------------
-    void Serializer::readObject(DataStreamPtr& stream, Quaternion& pDest)
+    void Serializer::readObject(const DataStreamPtr& stream, Quaternion& pDest)
     {
         float tmp[4];
         readFloats(stream, tmp, 4);
@@ -397,7 +397,7 @@ namespace Ogre {
         mChunkSizeStack.push_back(stream->tell());
 #endif
     }
-    void Serializer::backpedalChunkHeader(DataStreamPtr& stream)
+    void Serializer::backpedalChunkHeader(const DataStreamPtr& stream)
     {
         if (!stream->eof()){
             stream->skip(-(int)calcChunkHeaderSize());
