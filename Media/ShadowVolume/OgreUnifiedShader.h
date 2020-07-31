@@ -33,6 +33,8 @@
 
 #define mix lerp
 
+#define cross(a, b) cross(b, a)
+
 mat4 mtxFromRows(vec4 a, vec4 b, vec4 c, vec4 d)
 {
     return mat4(a, b, c, d);
@@ -41,6 +43,11 @@ mat4 mtxFromRows(vec4 a, vec4 b, vec4 c, vec4 d)
 mat3 mtxFromRows(vec3 a, vec3 b, vec3 c)
 {
     return mat3(a, b, c);
+}
+
+mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
+{
+    return transpose(mat3(a, b, c));
 }
 
 #define STATIC static
@@ -96,6 +103,11 @@ mat4 mtxFromRows(vec4 a, vec4 b, vec4 c, vec4 d)
 mat3 mtxFromRows(vec3 a, vec3 b, vec3 c)
 {
     return transpose(mat3(a, b, c));
+}
+
+mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
+{
+    return mat3(a, b, c);
 }
 
 #define STATIC
