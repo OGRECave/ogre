@@ -55,8 +55,7 @@ namespace Ogre {
         ASTCCodec();
         virtual ~ASTCCodec() { }
 
-		using ImageCodec::decode;
-        DecodeResult decode(const DataStreamPtr& input) const override;
+        void decode(const DataStreamPtr& input, const Any& output) const override;
 		String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
         String getType() const override;
 
@@ -64,9 +63,6 @@ namespace Ogre {
 		static void startup(void);
 		/// Static method to shutdown and unregister the ASTC codec
 		static void shutdown(void);
-		/// @deprecated use PixelFormat::getMemorySize
-        OGRE_DEPRECATED static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, int32 xdim, int32 ydim, PixelFormat fmt);
-
     private:
         void getClosestBlockDim2d(float targetBitrate, int *x, int *y) const;
         static void getClosestBlockDim3d(float targetBitrate, int *x, int *y, int *z);

@@ -57,10 +57,9 @@ EXRCodec::~EXRCodec()
     LogManager::getSingleton().logMessage("EXRCodec deinitialised");
 }
 
-Codec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
+void EXRCodec::decode(const DataStreamPtr& input, const Any& output) const
 {
-    ImageData * imgData = new ImageData;
-    MemoryDataStreamPtr output;
+    Image* image = any_cast<Image*>(output);
 
     try {
         // Make a mutable clone of input to be able to change file pointer
@@ -81,10 +80,10 @@ Codec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
             components = 4;
         
         // Allocate memory
-        output.reset(new MemoryDataStream(width*height*components*4));
+        MemoryDataStream buffer(width*height*components*4);
     
         // Construct frame buffer
-        uchar *pixels = output->getPtr();
+        uchar *pixels = buffer.getPtr();
         FrameBuffer frameBuffer;
         frameBuffer.insert("R",             // name
                     Slice (PixelType::FLOAT,       // type
@@ -111,25 +110,14 @@ Codec::DecodeResult EXRCodec::decode(const DataStreamPtr& input) const
       
         file.setFrameBuffer (frameBuffer);
         file.readPixels (dw.min.y, dw.max.y);
-    
-        imgData->format = components==3 ? PF_FLOAT32_RGB : PF_FLOAT32_RGBA;
-        imgData->width = width;
-        imgData->height = height;
-        imgData->depth = 1;
-        imgData->size = width*height*components*4;
-        imgData->num_mipmaps = 0;
-        imgData->flags = 0;
-    } catch (const std::exception &exc) {
-        delete imgData;
-        throw(Exception(Exception::ERR_INTERNAL_ERROR,
-            "OpenEXR Error",
-            exc.what()));
+
+        buffer.setFreeOnClose(false);
+        image->loadDynamicImage(buffer.getPtr(), width, height, 1, PF_FLOAT32_RGBA);
     }
-    
-    DecodeResult ret;
-    ret.first = output; 
-    ret.second = CodecDataPtr(imgData);
-    return ret;
+    catch (const std::exception& exc)
+    {
+        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, exc.what());
+    }
 }
 
 String EXRCodec::getType() const 

@@ -194,28 +194,24 @@ namespace Ogre {
     { 
     }
     //---------------------------------------------------------------------
-    void DDSCodec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName,
-                                const Codec::CodecDataPtr& pData) const
+    void DDSCodec::encodeToFile(const Any& input, const String& outFileName) const
     {
         // Unwrap codecDataPtr - data is cleaned by calling function
-        ImageData* imgData = static_cast<ImageData* >(pData.get());  
-
+        Image* image = any_cast<Image*>(input);
 
         // Check size for cube map faces
-        bool isCubeMap = (imgData->size == 
-            Image::calculateSize(imgData->num_mipmaps, 6, imgData->width, 
-            imgData->height, imgData->depth, imgData->format));
+        bool isCubeMap = image->hasFlag(IF_CUBEMAP);
 
         // Establish texture attributes
-        bool isVolume = (imgData->depth > 1);       
-        bool isFloat32r = (imgData->format == PF_FLOAT32_R);
-        bool isFloat16 = (imgData->format == PF_FLOAT16_RGBA);
-        bool isFloat32 = (imgData->format == PF_FLOAT32_RGBA);
+        bool isVolume = image->hasFlag(IF_3D_TEXTURE);
+        bool isFloat32r = (image->getFormat() == PF_FLOAT32_R);
+        bool isFloat16 = (image->getFormat() == PF_FLOAT16_RGBA);
+        bool isFloat32 = (image->getFormat() == PF_FLOAT32_RGBA);
         bool notImplemented = false;
         String notImplementedString = "";
 
         // Check for all the 'not implemented' conditions
-        if ((isVolume == true)&&(imgData->width != imgData->height))
+        if ((isVolume == true)&&(image->getWidth() != image->getHeight()))
         {
             // Square textures only
             notImplemented = true;
@@ -223,18 +219,18 @@ namespace Ogre {
         }
 
         uint32 size = 1;
-        while (size < imgData->width)
+        while (size < image->getWidth())
         {
             size <<= 1;
         }
-        if (size != imgData->width)
+        if (size != image->getWidth())
         {
             // Power two textures only
             notImplemented = true;
             notImplementedString += " non power two textures";
         }
 
-        switch(imgData->format)
+        switch(image->getFormat())
         {
         case PF_A8R8G8B8:
         case PF_X8R8G8B8:
@@ -282,7 +278,7 @@ namespace Ogre {
             bool flipRgbMasks = false;
 
             // Initalise the rgbBits flags
-            switch(imgData->format)
+            switch(image->getFormat())
             {
             case PF_A8B8G8R8:
                 flipRgbMasks = true;
@@ -318,7 +314,7 @@ namespace Ogre {
             }
 
             // Initalise the SizeOrPitch flags (power two textures for now)
-            ddsHeaderSizeOrPitch = static_cast<uint32>(ddsHeaderRgbBits * imgData->width);
+            ddsHeaderSizeOrPitch = static_cast<uint32>(ddsHeaderRgbBits * image->getWidth());
 
             // Initalise the caps flags
             ddsHeaderCaps1 = (isVolume||isCubeMap) ? DDSCAPS_COMPLEX|DDSCAPS_TEXTURE : DDSCAPS_TEXTURE;
@@ -334,18 +330,18 @@ namespace Ogre {
                     DDSCAPS2_CUBEMAP_POSITIVEZ|DDSCAPS2_CUBEMAP_NEGATIVEZ;
             }
 
-            if( imgData->num_mipmaps > 0 )
+            if( image->getNumMipmaps() > 0 )
                 ddsHeaderCaps1 |= DDSCAPS_MIPMAP;
 
             // Populate the DDS header information
             DDSHeader ddsHeader;
             ddsHeader.size = DDS_HEADER_SIZE;
             ddsHeader.flags = ddsHeaderFlags;       
-            ddsHeader.width = (uint32)imgData->width;
-            ddsHeader.height = (uint32)imgData->height;
-            ddsHeader.depth = (uint32)(isVolume ? imgData->depth : 0);
+            ddsHeader.width = image->getWidth();
+            ddsHeader.height = image->getHeight();
+            ddsHeader.depth = (uint32)(isVolume ? image->getDepth() : 0);
             ddsHeader.depth = (uint32)(isCubeMap ? 6 : ddsHeader.depth);
-            ddsHeader.mipMapCount = imgData->num_mipmaps + 1;
+            ddsHeader.mipMapCount = image->getNumMipmaps() + 1;
             ddsHeader.sizeOrPitch = ddsHeaderSizeOrPitch;
             for (uint32 reserved1=0; reserved1<11; reserved1++) // XXX nasty constant 11
             {
@@ -389,13 +385,13 @@ namespace Ogre {
             flipEndian(&ddsHeader, 4, sizeof(DDSHeader) / 4);
 
             char *tmpData = 0;
-            char const *dataPtr = (char const *)input->getPtr();
+            char const *dataPtr = (char const *)image->getData();
 
-            if( imgData->format == PF_B8G8R8 )
+            if( image->getFormat() == PF_B8G8R8 )
             {
-                PixelBox src( imgData->size / 3, 1, 1, PF_B8G8R8, input->getPtr() );
-                tmpData = new char[imgData->size];
-                PixelBox dst( imgData->size / 3, 1, 1, PF_R8G8B8, tmpData );
+                PixelBox src( image->getSize() / 3, 1, 1, PF_B8G8R8, image->getData() );
+                tmpData = new char[image->getSize()];
+                PixelBox dst( image->getSize() / 3, 1, 1, PF_R8G8B8, tmpData );
 
                 PixelUtil::bulkPixelConversion( src, dst );
 
@@ -410,7 +406,7 @@ namespace Ogre {
                 of.write((const char *)&ddsMagic, sizeof(uint32));
                 of.write((const char *)&ddsHeader, DDS_HEADER_SIZE);
                 // XXX flipEndian on each pixel chunk written unless isFloat32r ?
-                of.write(dataPtr, (uint32)imgData->size);
+                of.write(dataPtr, image->getSize());
                 of.close();
             }
             catch(...)
@@ -735,7 +731,7 @@ namespace Ogre {
             pCol[i].a = derivedAlphas[dw & 0x7];
     }
     //---------------------------------------------------------------------
-    Codec::DecodeResult DDSCodec::decode(const DataStreamPtr& stream) const
+    void DDSCodec::decode(const DataStreamPtr& stream, const Any& output) const
     {
         // Read 4 character code
         uint32 fileType;
@@ -767,35 +763,29 @@ namespace Ogre {
                 "DDS header size mismatch!", "DDSCodec::decode");
         }
 
-        ImageData* imgData = OGRE_NEW ImageData();
-        MemoryDataStreamPtr output;
+        Image* image = any_cast<Image*>(output);
 
-        imgData->depth = 1; // (deal with volume later)
-        imgData->width = header.width;
-        imgData->height = header.height;
+        uint _depth = 1; // (deal with volume later)
+        uint _width = header.width;
+        uint _height = header.height;
         size_t numFaces = 1; // assume one face until we know otherwise
+        uint num_mipmaps = 0;
+        PixelFormat format = PF_UNKNOWN;
 
         if (header.caps.caps1 & DDSCAPS_MIPMAP)
         {
-            imgData->num_mipmaps = static_cast<uint8>(header.mipMapCount - 1);
+            num_mipmaps = static_cast<uint8>(header.mipMapCount - 1);
         }
-        else
-        {
-            imgData->num_mipmaps = 0;
-        }
-        imgData->flags = 0;
 
         bool decompressDXT = false;
         // Figure out basic image type
         if (header.caps.caps2 & DDSCAPS2_CUBEMAP)
         {
-            imgData->flags |= IF_CUBEMAP;
             numFaces = 6;
         }
         else if (header.caps.caps2 & DDSCAPS2_VOLUME)
         {
-            imgData->flags |= IF_3D_TEXTURE;
-            imgData->depth = header.depth;
+            _depth = header.depth;
         }
         // Pixel format
         PixelFormat sourceFormat = PF_UNKNOWN;
@@ -828,10 +818,9 @@ namespace Ogre {
 
         if (PixelUtil::isCompressed(sourceFormat))
         {
-            if (Root::getSingleton().getRenderSystem() == NULL ||
-                !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT)
-                || (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP_COMPRESSED)
-                && !imgData->num_mipmaps))
+            auto rs = Root::getSingleton().getRenderSystem();
+            if (rs == NULL || !rs->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) ||
+                (!rs->getCapabilities()->hasCapability(RSC_AUTOMIPMAP_COMPRESSED) && !num_mipmaps))
             {
                 // We'll need to decompress
                 decompressDXT = true;
@@ -855,11 +844,11 @@ namespace Ogre {
                     // colour_0 <= colour_1 means transparency in DXT1
                     if (block.colour_0 <= block.colour_1)
                     {
-                        imgData->format = PF_BYTE_RGBA;
+                        format = PF_BYTE_RGBA;
                     }
                     else
                     {
-                        imgData->format = PF_BYTE_RGB;
+                        format = PF_BYTE_RGB;
                     }
                     break;
                 case PF_DXT2:
@@ -867,7 +856,7 @@ namespace Ogre {
                 case PF_DXT4:
                 case PF_DXT5:
                     // full alpha present, formats vary only in encoding 
-                    imgData->format = PF_BYTE_RGBA;
+                    format = PF_BYTE_RGBA;
                     break;
                 default:
                     // all other cases need no special format handling
@@ -877,39 +866,35 @@ namespace Ogre {
             else
             {
                 // Use original format
-                imgData->format = sourceFormat;
-                // Keep DXT data compressed
-                imgData->flags |= IF_COMPRESSED;
+                format = sourceFormat;
             }
         }
         else // not compressed
         {
             // Don't test against DDPF_RGB since greyscale DDS doesn't set this
             // just derive any other kind of format
-            imgData->format = sourceFormat;
+            format = sourceFormat;
         }
 
         // Calculate total size from number of mipmaps, faces and size
-        imgData->size = Image::calculateSize(imgData->num_mipmaps, numFaces, 
-            imgData->width, imgData->height, imgData->depth, imgData->format);
+        size_t size = Image::calculateSize(num_mipmaps, numFaces, _width, _height, _depth, format);
 
         // Bind output buffer
-        output.reset(OGRE_NEW MemoryDataStream(imgData->size));
-
+        MemoryDataStream buffer(size);
 
         // Now deal with the data
-        void* destPtr = output->getPtr();
+        void* destPtr = buffer.getPtr();
 
         // all mips for a face, then each face
         for(size_t i = 0; i < numFaces; ++i)
         {
-            uint32 width = imgData->width;
-            uint32 height = imgData->height;
-            uint32 depth = imgData->depth;
+            uint32 width = _width;
+            uint32 height = _height;
+            uint32 depth = _depth;
 
-            for(size_t mip = 0; mip <= imgData->num_mipmaps; ++mip)
+            for(size_t mip = 0; mip <= num_mipmaps; ++mip)
             {
-                size_t dstPitch = width * PixelUtil::getNumElemBytes(imgData->format);
+                size_t dstPitch = width * PixelUtil::getNumElemBytes(format);
                 
                 if (PixelUtil::isCompressed(sourceFormat))
                 {
@@ -921,7 +906,7 @@ namespace Ogre {
                         DXTExplicitAlphaBlock eAlpha;
                         // 4x4 block of decompressed colour
                         ColourValue tempColours[16];
-                        size_t destBpp = PixelUtil::getNumElemBytes(imgData->format);
+                        size_t destBpp = PixelUtil::getNumElemBytes(format);
 
                         // slices are done individually
                         for(size_t z = 0; z < depth; ++z)
@@ -971,8 +956,8 @@ namespace Ogre {
                                     {
                                         for (size_t bx = 0; bx < sx; ++bx)
                                         {
-                                            PixelUtil::packColour(tempColours[by*4+bx],
-                                                imgData->format, destPtr);
+                                            PixelUtil::packColour(tempColours[by * 4 + bx], format,
+                                                                  destPtr);
                                             destPtr = static_cast<void*>(
                                                 static_cast<uchar*>(destPtr) + destBpp);
                                         }
@@ -1007,7 +992,7 @@ namespace Ogre {
                     {
                         // load directly
                         // DDS format lies! sizeOrPitch is not always set for DXT!!
-                        size_t dxtSize = PixelUtil::getMemorySize(width, height, depth, imgData->format);
+                        size_t dxtSize = PixelUtil::getMemorySize(width, height, depth, format);
                         stream->read(destPtr, dxtSize);
                         destPtr = static_cast<void*>(static_cast<uchar*>(destPtr) + dxtSize);
                     }
@@ -1034,13 +1019,8 @@ namespace Ogre {
 
         }
 
-        DecodeResult ret;
-        ret.first = output;
-        ret.second = CodecDataPtr(imgData);
-        return ret;
-        
-
-
+        buffer.setFreeOnClose(false);
+        image->loadDynamicImage(buffer.getPtr(), _width, _height, _depth, format, true, numFaces, num_mipmaps);
     }
     //---------------------------------------------------------------------    
     String DDSCodec::getType() const 
