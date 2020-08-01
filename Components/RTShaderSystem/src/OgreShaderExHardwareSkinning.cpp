@@ -539,7 +539,7 @@ bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, 
 
             //update the data in the material and invalidate it in the RTShader system
             //do it will be regenerated
-            binding.setUserAny(HS_DATA_BIND_NAME, Any(data));
+            binding.setUserAny(HS_DATA_BIND_NAME, data);
 
             size_t schemeCount = ShaderGenerator::getSingleton().getRTShaderSchemeCount();
             for(size_t i = 0 ; i < schemeCount ; ++i)

@@ -381,7 +381,7 @@ namespace Ogre
             WorkQueue::RequestID id =
                 Root::getSingleton().getWorkQueue()->addRequest(
                     mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST,
-                    Any(req), 0, synchronous);
+                    req, 0, synchronous);
             if (!synchronous)
                 ret.first->second = id;
         }

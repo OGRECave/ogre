@@ -181,7 +181,7 @@ void TargetRenderState::acquirePrograms(Pass* pass)
         bindUniformParameters(mProgramSet->getCpuProgram(type), pass->getGpuProgramParameters(type));
     }
 
-    pass->getUserObjectBindings().setUserAny(UserKey, Any(this));
+    pass->getUserObjectBindings().setUserAny(UserKey, this);
 }
 
 

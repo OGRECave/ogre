@@ -335,7 +335,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Unable to save image file '" + filename + "' - invalid extension.");
 
-        pCodec->encodeToFile(Any(this), filename);
+        pCodec->encodeToFile(this, filename);
     }
     //---------------------------------------------------------------------
     DataStreamPtr Image::encode(const String& formatextension)
@@ -351,7 +351,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Unable to encode image data as '" + formatextension + "' - invalid extension.");
 
-        return pCodec->encode(Any(this));
+        return pCodec->encode(this);
     }
     //-----------------------------------------------------------------------------
     Image & Image::load(const DataStreamPtr& stream, const String& type )
@@ -381,7 +381,7 @@ namespace Ogre {
                             "Check it or specify format explicitly.");
         }
 
-        pCodec->decode(stream, Any(this));
+        pCodec->decode(stream, this);
 
         // compute the pixel size
         mPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( mFormat ));

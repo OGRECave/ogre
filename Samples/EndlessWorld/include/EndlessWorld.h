@@ -149,7 +149,7 @@ public:
 			}
 		}
 
-		mTerrainGroup->autoUpdateLodAll(false, Any( Real(HOLD_LOD_DISTANCE) ));
+		mTerrainGroup->autoUpdateLodAll(false, Real(HOLD_LOD_DISTANCE));
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent updates!
     }
 
