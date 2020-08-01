@@ -78,10 +78,8 @@ namespace Ogre {
             else
                 formats_str = "Supported formats are: " + StringConverter::toString(getExtensions()) + ".";
 
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Can not find codec for '" + extension + "' image format.\n" + 
-                formats_str,
-                "Codec::getCodec");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                        "Can not find codec for '" + extension + "' format.\n" + formats_str);
         }
 
         return i->second;

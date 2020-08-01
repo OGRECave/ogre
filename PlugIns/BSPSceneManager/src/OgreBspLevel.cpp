@@ -112,7 +112,7 @@ namespace Ogre {
         return mSkyCurvature;
     }
     //-----------------------------------------------------------------------
-    void BspLevel::load(DataStreamPtr& stream)
+    void BspLevel::load(const DataStreamPtr& stream)
     {
         // Use Quake3 file loader
         Quake3Level q3;
