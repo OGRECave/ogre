@@ -1,9 +1,5 @@
-#ifndef OGRE_HLSL
-#ifndef GL_ES
-#version 120
-#else
+#ifdef GL_ES
 #version 100
-#endif
 #endif
 
 #include <OgreUnifiedShader.h>
