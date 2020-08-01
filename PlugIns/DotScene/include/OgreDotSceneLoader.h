@@ -9,6 +9,7 @@
 #include <OgreSceneLoader.h>
 #include <OgreString.h>
 #include <OgrePlugin.h>
+#include <OgreCodec.h>
 
 namespace pugi
 {
@@ -77,8 +78,8 @@ class DotScenePlugin : public Plugin
     void initialise();
     void shutdown();
     void uninstall() {}
-protected:
-    SceneLoader* mDotSceneLoader;
+private:
+    Codec* mCodec;
 };
 } // namespace Ogre
 #endif // DOT_SCENELOADER_H

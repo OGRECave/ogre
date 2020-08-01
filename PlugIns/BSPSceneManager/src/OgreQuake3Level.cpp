@@ -46,7 +46,7 @@ namespace Ogre {
         initialise(true);
     }
     //-----------------------------------------------------------------------
-    void Quake3Level::loadFromStream(DataStreamPtr& stream)
+    void Quake3Level::loadFromStream(const DataStreamPtr& stream)
     {
         mChunk = MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(stream));
         initialise();
