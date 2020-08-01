@@ -1,6 +1,5 @@
 #ifndef OGRE_HLSL
 #ifndef GL_ES
-#version 120
 #ifdef USE_TEX_LOD
 #extension GL_ARB_shader_texture_lod : require  
 #endif
