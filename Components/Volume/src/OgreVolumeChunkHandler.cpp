@@ -73,7 +73,7 @@ namespace Volume {
     void ChunkHandler::addRequest(const ChunkRequest &req)
     {
         init();
-        mWQ->addRequest(mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST, Any(req));
+        mWQ->addRequest(mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST, req);
     }
     
     //-----------------------------------------------------------------------

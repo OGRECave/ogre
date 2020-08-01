@@ -507,7 +507,7 @@ void TextureAtlasSamplerFactory::setMaterialAtlasingAttributes(Ogre::Material* m
     if ((material) && (material->getNumTechniques()))
     {
         material->getTechnique(0)->getUserObjectBindings().setUserAny(c_RTAtlasKey, 
-            Ogre::Any(TextureAtlasAttib(mode, offset, autoAdjustBorders)));
+            TextureAtlasAttib(mode, offset, autoAdjustBorders));
     }
 }
 

@@ -1160,7 +1160,7 @@ namespace Ogre
 
         Root::getSingleton().getWorkQueue()->addRequest(
             mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
-            Any(req), 0, synchronous);
+            req, 0, synchronous);
     }
     //---------------------------------------------------------------------
     void Terrain::unload()
@@ -1975,7 +1975,7 @@ namespace Ogre
 
         Root::getSingleton().getWorkQueue()->addRequest(
             mWorkQueueChannel, WORKQUEUE_DERIVED_DATA_REQUEST, 
-            Any(req), 0, synchronous);
+            req, 0, synchronous);
 
     }
     //---------------------------------------------------------------------
@@ -3173,7 +3173,7 @@ namespace Ogre
         }
 
         ddres.terrain = ddr.terrain;
-        WorkQueue::Response* response = OGRE_NEW WorkQueue::Response(req, true, Any(ddres));
+        WorkQueue::Response* response = OGRE_NEW WorkQueue::Response(req, true, ddres);
         return response;
     }
     //---------------------------------------------------------------------
@@ -3264,7 +3264,7 @@ namespace Ogre
 				gmreq.startTime = currentTime + (gmreq.synchronous ? 0 : TERRAIN_GENERATE_MATERIAL_INTERVAL_MS);
                 Root::getSingleton().getWorkQueue()->addRequest(
                     mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
-                    Any(gmreq), 0, gmreq.synchronous);
+                    gmreq, 0, gmreq.synchronous);
                 return;
             }
             break;

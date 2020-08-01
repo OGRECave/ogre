@@ -429,7 +429,7 @@ namespace OgreBites
                         bp->setHorizontalAlignment(Ogre::GHA_RIGHT);
                         bp->setVerticalAlignment(Ogre::GVA_CENTER);
                         bp->setMaterialName(name);
-                        bp->getUserObjectBindings().setUserAny(Ogre::Any(*i));
+                        bp->getUserObjectBindings().setUserAny(*i);
                         mTrayMgr->getTraysLayer()->add2D(bp);
 
                         // add sample thumbnail and title

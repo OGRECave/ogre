@@ -234,7 +234,7 @@ namespace Ogre {
         auto codec = Codec::getCodec(strExt);
         OgreAssert(codec, ("No codec found to load "+mName).c_str());
 
-        codec->decode(data, Any(this));
+        codec->decode(data, this);
 
         /* check all submeshes to see if their materials should be
            updated.  If the submesh has texture aliases that match those

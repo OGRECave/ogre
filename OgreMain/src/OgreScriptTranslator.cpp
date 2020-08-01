@@ -1097,7 +1097,7 @@ namespace Ogre{
         }
 
         mMaterial->removeAllTechniques();
-        obj->context = Any(mMaterial);
+        obj->context = mMaterial;
         mMaterial->_notifyOrigin(obj->file);
 
         bool bval;
@@ -1245,7 +1245,7 @@ namespace Ogre{
         // Create the technique from the material
         Ogre::Material *material = Ogre::any_cast<Ogre::Material*>(obj->parent->context);
         mTechnique = material->createTechnique();
-        obj->context = Any(mTechnique);
+        obj->context = mTechnique;
 
         // Get the name of the technique
         if(!obj->name.empty())
@@ -1422,7 +1422,7 @@ namespace Ogre{
 
         Technique *technique = any_cast<Technique*>(obj->parent->context);
         mPass = technique->createPass();
-        obj->context = Any(mPass);
+        obj->context = mPass;
 
         // Get the name of the technique
         if(!obj->name.empty())
@@ -2626,7 +2626,7 @@ namespace Ogre{
 
         Pass *pass = any_cast<Pass*>(obj->parent->context);
         mUnit = pass->createTextureUnitState();
-        obj->context = Any(mUnit);
+        obj->context = mUnit;
 
         // Get the name of the technique
         if(!obj->name.empty())
@@ -3664,7 +3664,7 @@ namespace Ogre{
             return;
         }
 
-        obj->context = Any(prog);
+        obj->context = prog;
 
         prog->setMorphAnimationIncluded(false);
         prog->setPoseAnimationIncluded(0);
@@ -4507,7 +4507,7 @@ namespace Ogre{
         mSystem->removeAllEmitters();
         mSystem->removeAllAffectors();
 
-        obj->context = Any(mSystem);
+        obj->context = mSystem;
 
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -4753,7 +4753,7 @@ namespace Ogre{
         // Prepare the compositor
         mCompositor->removeAllTechniques();
         mCompositor->_notifyOrigin(obj->file);
-        obj->context = Any(mCompositor);
+        obj->context = mCompositor;
 
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -4783,7 +4783,7 @@ namespace Ogre{
 
         Compositor *compositor = any_cast<Compositor*>(obj->parent->context);
         mTechnique = compositor->createTechnique();
-        obj->context = Any(mTechnique);
+        obj->context = mTechnique;
 
         String sval;
 
@@ -5051,7 +5051,7 @@ namespace Ogre{
         {
             mTarget = technique->getOutputTargetPass();
         }
-        obj->context = Any(mTarget);
+        obj->context = mTarget;
 
         bool bval;
         Real fval;
@@ -5151,7 +5151,7 @@ namespace Ogre{
 
         CompositionTargetPass *target = any_cast<CompositionTargetPass*>(obj->parent->context);
         mPass = target->createPass(ptype);
-        obj->context = Any(mPass);
+        obj->context = mPass;
 
         if(mPass->getType() == CompositionPass::PT_RENDERCUSTOM) 
         {

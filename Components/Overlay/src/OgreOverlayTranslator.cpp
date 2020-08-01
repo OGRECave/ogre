@@ -189,7 +189,7 @@ void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
     }
 
     if(newElement->isContainer())
-        obj->context = Any((OverlayContainer*)newElement);
+        obj->context = (OverlayContainer*)newElement;
 
     String val;
     for (auto& c : obj->children)
@@ -238,7 +238,7 @@ void OverlayTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
     Overlay* overlay = OverlayManager::getSingleton().create(name);
     overlay->_notifyOrigin(obj->file);
 
-    obj->context = Any(overlay);
+    obj->context = overlay;
 
     for (auto& c : obj->children)
     {

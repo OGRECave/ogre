@@ -303,7 +303,7 @@ namespace Ogre {
             }
             resreq.result.error = false;
             ResourceResponse resresp(ResourcePtr(), resreq);
-            return OGRE_NEW WorkQueue::Response(req, true, Any(resresp));
+            return OGRE_NEW WorkQueue::Response(req, true, resresp);
         }
 
         ResourceManager* rm = 0;
@@ -376,7 +376,7 @@ namespace Ogre {
 
             // return error response
             ResourceResponse resresp(resource, resreq);
-            return OGRE_NEW WorkQueue::Response(req, false, Any(resresp), e.getFullDescription());
+            return OGRE_NEW WorkQueue::Response(req, false, resresp, e.getFullDescription());
         }
 
 
@@ -388,7 +388,7 @@ namespace Ogre {
         }
         resreq.result.error = false;
         ResourceResponse resresp(resource, resreq);
-        return OGRE_NEW WorkQueue::Response(req, true, Any(resresp));
+        return OGRE_NEW WorkQueue::Response(req, true, resresp);
 
     }
     //------------------------------------------------------------------------
