@@ -24,6 +24,7 @@ public:
     void preViewportUpdate(const RenderTargetViewportEvent& evt)
     {
         if(!evt.source->getOverlaysEnabled()) return;
+        if(!mTrayMgr->getTraysLayer()->isVisible()) return;
 
         ImGuiOverlay::NewFrame();
 
