@@ -70,4 +70,10 @@ public:
         SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         node->attachObject(ent);
     }
+
+    void cleanupContent()
+    {
+        OverlayManager::getSingleton().destroy("ImGuiOverlay");
+        mWindow->removeListener(this);
+    }
 };
