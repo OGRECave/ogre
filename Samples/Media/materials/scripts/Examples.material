@@ -1199,6 +1199,25 @@ vertex_program Examples/GrassWaverVp unified
 	delegate Examples/GrassWaverVpCg
 }
 
+material Examples/GrassBlades/Caster
+{
+    technique
+    {
+        pass
+        {
+            cull_hardware none
+            alpha_rejection greater 150
+            diffuse 0 0 0
+
+            texture_unit
+            {
+                tex_address_mode clamp
+                texture gras_02.png
+            }
+        }
+    }
+}
+
 material Examples/GrassBlades
 {
     transparency_casts_shadows on
@@ -1231,6 +1250,7 @@ material Examples/GrassBlades
     // fallback
     technique
     {
+        shadow_caster_material Examples/GrassBlades/Caster
         pass
         {
 			alpha_rejection greater 150
