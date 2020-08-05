@@ -230,6 +230,7 @@ if (APPLE_IOS)
   set(XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
   set(XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
+  set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
 elseif (ANDROID)
@@ -239,6 +240,7 @@ elseif (ANDROID)
   option(OGRE_BUILD_ANDROID_JNI_SAMPLE "Enable JNI Sample" FALSE)
 
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for Android" FORCE)
+  set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
 
   set(OGRE_BUILD_PLUGIN_PCZ FALSE CACHE BOOL "Disable pcz on Android" FORCE)
   set(OGRE_BUILD_TOOLS FALSE CACHE BOOL "Disable tools on Android" FORCE)
@@ -282,17 +284,6 @@ endif ()
 
 if(OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
   set(OGRE_CONFIG_ENABLE_MESHLOD TRUE CACHE BOOL "Forcing Mesh Lod" FORCE)
-endif()
-
-# Enable the PVRTC codec if OpenGL ES is being built
-if(OGRE_BUILD_RENDERSYSTEM_GLES2)
-  set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
-  set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL ES" FORCE)
-endif()
-
-# Enable the ETC codec if OpenGL 3+ is being built
-if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-  set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL 3+" FORCE)
 endif()
 
 # Find dependencies
@@ -374,7 +365,7 @@ option(OGRE_CONFIG_ENABLE_MESHLOD "Enable Mesh Lod." TRUE)
 option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
 option(OGRE_CONFIG_ENABLE_ETC "Build ETC codec." TRUE)
-option(OGRE_CONFIG_ENABLE_ASTC "Build ASTC codec." FALSE)
+option(OGRE_CONFIG_ENABLE_ASTC "Build ASTC codec." TRUE)
 option(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO "Enable stereoscopic 3D support" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you disable this option, you cannot use ZIP archives resource locations. The samples won't work." TRUE "ZZip_FOUND" FALSE)
 option(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE "Include Viewport orientation mode support." FALSE)
