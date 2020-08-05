@@ -284,6 +284,10 @@ macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from 
 find_package(SWIG 3.0.8 QUIET)
 macro_log_feature(SWIG_FOUND "SWIG" "Language bindings (Python, Java, C#) for OGRE" "http://www.swig.org/" FALSE "" "")
 
+# pugixml
+find_package(pugixml QUIET)
+macro_log_feature(pugixml_FOUND "pugixml" "Needed for XMLConverter and DotScene Plugin" "https://pugixml.org/" FALSE "" "")
+
 #######################################################################
 # Samples dependencies
 #######################################################################

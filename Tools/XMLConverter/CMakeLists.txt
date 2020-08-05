@@ -21,9 +21,6 @@ set(SOURCE_FILES
   src/OgreXMLSkeletonSerializer.cpp
 )
 
-# allow override by cmake
-find_package(pugixml QUIET)
-
 add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
 target_include_directories(OgreXMLConverter PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(OgreXMLConverter OgreMain pugixml)
