@@ -288,6 +288,10 @@ macro_log_feature(SWIG_FOUND "SWIG" "Language bindings (Python, Java, C#) for OG
 find_package(pugixml QUIET)
 macro_log_feature(pugixml_FOUND "pugixml" "Needed for XMLConverter and DotScene Plugin" "https://pugixml.org/" FALSE "" "")
 
+# Assimp
+find_package(ASSIMP QUIET)
+macro_log_feature(ASSIMP_FOUND "Assimp" "Needed for the AssimpLoader Plugin" "https://www.assimp.org/" FALSE "" "")
+
 #######################################################################
 # Samples dependencies
 #######################################################################
