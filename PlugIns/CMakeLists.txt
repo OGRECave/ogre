@@ -51,3 +51,7 @@ endif (OGRE_BUILD_PLUGIN_PCZ)
 if (OGRE_BUILD_PLUGIN_DOT_SCENE)
   add_subdirectory(DotScene)
 endif ()
+
+if (OGRE_BUILD_PLUGIN_ASSIMP)
+  add_subdirectory(Assimp)
+endif ()
