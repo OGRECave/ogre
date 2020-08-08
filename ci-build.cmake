@@ -105,7 +105,7 @@ endif()
 if("$ENV{TRAVIS_OS_NAME}" STREQUAL "linux" AND NOT DEFINED ENV{ANDROID})
     message(STATUS "Downloading Doxygen")
     file(DOWNLOAD
-        http://doxygen.nl/files/doxygen-1.8.17.linux.bin.tar.gz
+        https://downloads.sourceforge.net/project/doxygen/rel-1.8.17/doxygen-1.8.17.linux.bin.tar.gz
         ./doxygen-1.8.17.linux.bin.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf doxygen-1.8.17.linux.bin.tar.gz OUTPUT_QUIET)
     set(OTHER -DDOXYGEN_EXECUTABLE=${CMAKE_CURRENT_SOURCE_DIR}/doxygen-1.8.17/bin/doxygen)
