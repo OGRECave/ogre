@@ -60,11 +60,7 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
       COMPILE_FLAGS "-Wno-cast-qual")
   endif()
 
-  file(WRITE ${IMGUI_DIR}/imconfig.h
-    "#pragma once
-    #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-    #include <OgreOverlayPrerequisites.h>
-    #define IMGUI_API _OgreOverlayExport")
+  configure_file(${OGRE_TEMPLATES_DIR}/imconfig.h ${IMGUI_DIR}/imconfig.h COPYONLY)
 
   list(APPEND HEADER_FILES
     ${IMGUI_DIR}/imgui.h
