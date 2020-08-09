@@ -37,6 +37,11 @@ if(OGRE_BUILD_COMPONENT_OVERLAY)
 	list(APPEND SWIG_INPUT_MODULES ../Overlay/include/OgreOverlay.i)
 endif()
 
+if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+    include_directories("${IMGUI_DIR}")
+    list(APPEND CMAKE_SWIG_FLAGS -DHAVE_IMGUI -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
+endif()
+
 if(OGRE_BUILD_COMPONENT_BITES)
 	set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
 	list(APPEND SWIG_INPUT_MODULES ../Bites/include/OgreBites.i)
