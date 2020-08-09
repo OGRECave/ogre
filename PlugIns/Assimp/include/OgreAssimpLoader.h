@@ -87,7 +87,7 @@ public:
     bool load(const String& source, Mesh* mesh, SkeletonPtr& skeletonPtr,
               const Options& options = Options());
 
-    bool load(const DataStreamPtr& source, const String& type, Mesh* mesh, SkeletonPtr& skeletonPtr,
+    bool load(const DataStreamPtr& source, Mesh* mesh, SkeletonPtr& skeletonPtr,
               const Options& options = Options());
 
 private:

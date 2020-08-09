@@ -89,8 +89,6 @@ struct OgreIOStream : public Assimp::IOStream
     void Flush() {}
 };
 
-const char* MAGIC_FILENAME = "$__DataStream__$";
-
 struct OgreIOSystem : public Assimp::IOSystem
 {
     DataStreamPtr source;
@@ -101,20 +99,22 @@ struct OgreIOSystem : public Assimp::IOSystem
 
     bool Exists(const char* pFile) const
     {
-        if (String(pFile).find(MAGIC_FILENAME) != String::npos)
+        String file = StringUtil::normalizeFilePath(pFile, false);
+        if (file == source->getName())
             return true;
-        return ResourceGroupManager::getSingleton().resourceExists(_group, pFile);
+        return ResourceGroupManager::getSingleton().resourceExists(_group, file);
     }
     char getOsSeparator() const override { return '/'; }
 
     Assimp::IOStream* Open(const char* pFile, const char* pMode) override
     {
+        String file = StringUtil::normalizeFilePath(pFile, false);
         DataStreamPtr res;
-        if (String(pFile).find(MAGIC_FILENAME) != String::npos)
+        if (file == source->getName())
             res = source;
 
         if (!res)
-            res = ResourceGroupManager::getSingleton().openResource(pFile, _group, NULL, false);
+            res = ResourceGroupManager::getSingleton().openResource(file, _group, NULL, false);
 
         if (res)
         {
@@ -331,13 +331,12 @@ AssimpLoader::AssimpLoader()
 
 AssimpLoader::~AssimpLoader() {}
 
-bool AssimpLoader::load(const DataStreamPtr& source, const String& type, Mesh* mesh,
-                        SkeletonPtr& skeletonPtr, const Options& options)
+bool AssimpLoader::load(const DataStreamPtr& source, Mesh* mesh, SkeletonPtr& skeletonPtr,
+                        const Options& options)
 {
     Assimp::Importer importer;
     importer.SetIOHandler(new OgreIOSystem(source, mesh->getGroup()));
-    auto name = StringUtil::format("%s.%s", MAGIC_FILENAME, type.c_str());
-    _load(name.c_str(), importer, mesh, skeletonPtr, options);
+    _load(source->getName().c_str(), importer, mesh, skeletonPtr, options);
     return true;
 }
 
@@ -1226,7 +1225,7 @@ struct AssimpCodec : public Codec
         opts.params = AssimpLoader::LP_QUIET_MODE;
         SkeletonPtr skeleton;
         AssimpLoader loader;
-        loader.load(input, mType, dst, skeleton, opts);
+        loader.load(input, dst, skeleton, opts);
     }
 
     static void startup()
