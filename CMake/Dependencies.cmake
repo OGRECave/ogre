@@ -317,12 +317,22 @@ macro_log_feature(pugixml_FOUND "pugixml" "Needed for XMLConverter and DotScene 
 find_package(ASSIMP QUIET)
 macro_log_feature(ASSIMP_FOUND "Assimp" "Needed for the AssimpLoader Plugin" "https://www.assimp.org/" FALSE "" "")
 
-if(ASSIMP_FOUND AND NOT TARGET assimp::assimp)
-  add_library(assimp::assimp INTERFACE IMPORTED)
-  set_target_properties(assimp::assimp PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}"
-      INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES}"
-  )
+if(ASSIMP_FOUND)
+  # fixup horribly broken assimp cmake
+  if(NOT TARGET assimp::assimp)
+    # assimp 4.1 does not yet export target
+    add_library(assimp::assimp INTERFACE IMPORTED)
+    set_target_properties(assimp::assimp PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES}"
+    )
+  elseif(UNIX)
+    # 5.0 does but messes up paths on UNIX
+    set_target_properties(assimp::assimp PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES}"
+    )
+  endif()
 endif()
 
 #######################################################################
