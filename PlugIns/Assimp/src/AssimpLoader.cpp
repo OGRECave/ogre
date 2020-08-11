@@ -980,7 +980,8 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     aiVector3D* vec = mesh->mVertices;
     aiVector3D* norm = mesh->mNormals;
     aiVector3D* uv = mesh->mTextureCoords[0];
-    // aiColor4D *col = mesh->mColors[0];
+    aiVector3D* tang = mesh->mTangents;
+    aiColor4D *col = mesh->mColors[0];
 
     // We must create the vertex data, indicating how many vertices there will be
     submesh->useSharedVertices = false;
@@ -994,19 +995,16 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     size_t offset = 0;
     offset += declaration->addElement(source, offset, VET_FLOAT3, VES_POSITION).getSize();
 
-    // mLog->logMessage((std::format(" %d vertices ") % m->mNumVertices).str());
     if (!mQuietMode)
     {
-        LogManager::getSingleton().logMessage(StringConverter::toString(mesh->mNumVertices) + " vertices");
+        LogManager::getSingleton().logMessage(StringUtil::format("%d vertices", mesh->mNumVertices));
     }
     if (norm)
     {
         if (!mQuietMode)
         {
-            LogManager::getSingleton().logMessage(StringConverter::toString(mesh->mNumVertices) +
-                                                  " normals");
+            LogManager::getSingleton().logMessage(StringUtil::format("%d normals", mesh->mNumVertices));
         }
-        // mLog->logMessage((std::format(" %d normals ") % m->mNumVertices).str() );
         offset += declaration->addElement(source, offset, VET_FLOAT3, VES_NORMAL).getSize();
     }
 
@@ -1014,20 +1012,29 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     {
         if (!mQuietMode)
         {
-            LogManager::getSingleton().logMessage(StringConverter::toString(mesh->mNumVertices) + " uvs");
+            LogManager::getSingleton().logMessage(StringUtil::format("%d uvs", mesh->mNumVertices));
         }
-        // mLog->logMessage((std::format(" %d uvs ") % m->mNumVertices).str() );
         offset += declaration->addElement(source, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES).getSize();
     }
 
-    /*
+    if (tang)
+    {
+        if (!mQuietMode)
+        {
+            LogManager::getSingleton().logMessage(StringUtil::format("%d tangents", mesh->mNumVertices));
+        }
+        offset += declaration->addElement(source, offset, VET_FLOAT3, VES_TANGENT).getSize();
+    }
+
     if (col)
     {
-        LogManager::getSingleton().logMessage(StringConverter::toString(mesh->mNumVertices) + " colours");
-        //mLog->logMessage((std::format(" %d colours ") % m->mNumVertices).str() );
-        offset += declaration->addElement(source,offset,VET_FLOAT3,VES_DIFFUSE).getSize();
+        matptr->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);
+        if (!mQuietMode)
+        {
+            LogManager::getSingleton().logMessage(StringUtil::format("%d colours", mesh->mNumVertices));
+        }
+        offset += declaration->addElement(source, offset, VET_UBYTE4_NORM, VES_DIFFUSE).getSize();
     }
-    */
 
     // We create the hardware vertex buffer
     HardwareVertexBufferSharedPtr vbuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
@@ -1080,16 +1087,19 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
             uv++;
         }
 
-        /*
+        if(tang)
+        {
+            *vdata++ = tang->x;
+            *vdata++ = tang->y;
+            *vdata++ = tang->z;
+            tang++;
+        }
+
         if (col)
         {
-            *vdata++ = col->r;
-            *vdata++ = col->g;
-            *vdata++ = col->b;
-            *vdata++ = col->a;
+            PixelUtil::packColour(col->r, col->g, col->b, col->a, PF_BYTE_RGBA, vdata++);
             col++;
         }
-        */
     }
 
     vbuffer->unlock();
