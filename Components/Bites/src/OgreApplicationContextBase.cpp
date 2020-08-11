@@ -28,6 +28,13 @@ ApplicationContextBase::ApplicationContextBase(const Ogre::String& appName)
 {
     mAppName = appName;
     mFSLayer = new Ogre::FileSystemLayer(mAppName);
+
+    if (char* val = getenv("OGRE_CONFIG_DIR"))
+    {
+        Ogre::String configDir = Ogre::StringUtil::standardisePath(val);
+        mFSLayer->setConfigPaths({ configDir });
+    }
+
     mRoot = NULL;
     mOverlaySystem = NULL;
     mFirstRun = true;

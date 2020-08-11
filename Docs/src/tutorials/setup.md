@@ -68,7 +68,7 @@ On Windows however, you will have to either add the `sdk/bin` folder to `PATH` o
 
 Ogre uses several configuration files (\*.cfg). They control things like which plugins are loaded and where your application will search for resource files. We will briefly introduce you to each of these files. You'll slowly read more about them as you progress through the tutorials as well.
 
-You can place these files the same directory as your executable or in any of [the default lookup paths described here](@ref Ogre::FileSystemLayer::getConfigFilePath).
+You can place these files the same directory as your executable or in any of [the default lookup paths described here](@ref Ogre::FileSystemLayer::getConfigFilePath). Alternatively you can set the @c OGRE_CONFIG_DIR environment variable for the configuration file location. This overrides the step "executable path" in the default lookup order.
 
 @attention %Ogre must find @c plugins.cfg and @c resources.cfg to function properly. Later tutorials will cover more of their use.
 
