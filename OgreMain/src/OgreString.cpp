@@ -285,7 +285,7 @@ namespace Ogre {
         //The outer loop loops over directories
         while (indexSrc < pathLen)
         {       
-            if ((bufferSrc[indexSrc] == '\\') || (bufferSrc[indexSrc] == '/'))
+            if (indexSrc && ((bufferSrc[indexSrc] == '\\') || (bufferSrc[indexSrc] == '/')))
             {
                 //check if we have a directory delimiter if so skip it (we should already
                 //have written such a delimiter by this point
