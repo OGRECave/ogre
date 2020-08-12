@@ -3548,10 +3548,18 @@ namespace Ogre{
 
         // Get the language
         String language;
-        if(!getString(obj->values.front(), &language))
+        for(const auto& lnode : obj->values)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
-            return;
+            if(!getString(lnode, &language))
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
+                return;
+            }
+
+            if (language == "asm")
+                break; // always supported
+            if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(language))
+                break;
         }
 
         translateGpuProgram(compiler, obj, language);

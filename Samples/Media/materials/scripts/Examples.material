@@ -1551,12 +1551,7 @@ fragment_program Examples/ShowUV_pHLSL hlsl
 	target ps_2_0
 }
 
-fragment_program Examples/ShowUV_pGLSLES glsles
-{
-	source ShowUV.glsl
-}
-
-fragment_program Examples/ShowUV_pGLSL glsl
+fragment_program Examples/ShowUV_pGLSL glsl glsles
 {
 	source ShowUV.glsl
 }
@@ -1564,7 +1559,6 @@ fragment_program Examples/ShowUV_pGLSL glsl
 fragment_program Examples/ShowUV_p unified
 {
 	delegate Examples/ShowUV_pGLSL
-	delegate Examples/ShowUV_pGLSLES
 	delegate Examples/ShowUV_pHLSL
 	delegate Examples/ShowUV_pCg
 }
@@ -1582,12 +1576,7 @@ fragment_program Examples/ShowUVdir3D_pHLSL hlsl
 	target ps_2_0
 }
 
-fragment_program Examples/ShowUVdir3D_pGLSLES glsles
-{
-	source ShowUVdir3D.glsl
-}
-
-fragment_program Examples/ShowUVdir3D_pGLSL glsl
+fragment_program Examples/ShowUVdir3D_pGLSL glsl glsles
 {
 	source ShowUVdir3D.glsl
 }
@@ -1595,7 +1584,6 @@ fragment_program Examples/ShowUVdir3D_pGLSL glsl
 fragment_program Examples/ShowUVdir3D_p unified
 {
 	delegate Examples/ShowUVdir3D_pGLSL
-	delegate Examples/ShowUVdir3D_pGLSLES
 	delegate Examples/ShowUVdir3D_pHLSL
 	delegate Examples/ShowUVdir3D_pCg
 }
@@ -1622,16 +1610,7 @@ vertex_program Examples/ShowTangents_vHLSL hlsl
 	}
 }
 
-vertex_program Examples/ShowTangents_vGLSLES glsles
-{
-	source ShowTangents.glsl
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-vertex_program Examples/ShowTangents_vGLSL glsl
+vertex_program Examples/ShowTangents_vGLSL glsl glsles
 {
 	source ShowTangents.glsl
 	default_params
@@ -1643,7 +1622,6 @@ vertex_program Examples/ShowTangents_vGLSL glsl
 vertex_program Examples/ShowTangents_v unified
 {
 	delegate Examples/ShowTangents_vGLSL
-	delegate Examples/ShowTangents_vGLSLES
 	delegate Examples/ShowTangents_vHLSL
 	delegate Examples/ShowTangents_vCg
 }
@@ -1670,16 +1648,7 @@ vertex_program Examples/ShowNormals_vHLSL hlsl
 	}
 }
 
-vertex_program Examples/ShowNormals_vGLSLES glsles
-{
-	source ShowNormals.glsl
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-vertex_program Examples/ShowNormals_vGLSL glsl
+vertex_program Examples/ShowNormals_vGLSL glsl glsles
 {
 	source ShowNormals.glsl
 	default_params
@@ -1691,7 +1660,6 @@ vertex_program Examples/ShowNormals_vGLSL glsl
 vertex_program Examples/ShowNormals_v unified
 {
 	delegate Examples/ShowNormals_vGLSL
-	delegate Examples/ShowNormals_vGLSLES
 	delegate Examples/ShowNormals_vHLSL
 	delegate Examples/ShowNormals_vCg
 }
