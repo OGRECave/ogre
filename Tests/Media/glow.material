@@ -1,18 +1,8 @@
-vertex_program glow_vs_glsl glsl
+vertex_program glow_vs_glsl glsl glsles
 {
 	source vs_glow.glsl
 }
-fragment_program glow_ps_glsl glsl
-{
-	source ps_glow.glsl
-}
-
-vertex_program glow_vs_glsles glsles
-{
-	source vs_glow.glsl
-}
-
-fragment_program glow_ps_glsles glsles
+fragment_program glow_ps_glsl glsl glsles
 {
 	source ps_glow.glsl
 }
@@ -32,7 +22,6 @@ fragment_program glow_ps_cg hlsl
 vertex_program glow_vs unified
 {
 	delegate glow_vs_glsl
-	delegate glow_vs_glsles
 	delegate glow_vs_cg
 
     default_params
@@ -46,7 +35,6 @@ vertex_program glow_vs unified
 fragment_program glow_ps unified
 {
 	delegate glow_ps_glsl
-	delegate glow_ps_glsles
 	delegate glow_ps_cg
 }
 

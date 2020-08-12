@@ -19,7 +19,7 @@ fragment_program Ogre/Instancing_glsl_ps glsl
 	}
 }
 
-fragment_program Ogre/Instancing/shadow_caster_glsl_ps glsl
+fragment_program Ogre/Instancing/shadow_caster_glsl_ps glsl glsles
 {
     source pssmCasterFp.glsl
 }
@@ -39,11 +39,6 @@ fragment_program Ogre/Instancing_glsles_ps glsles
 		param_named			diffuseMap				int 0
 		param_named			shadowMap				int 1
 	}
-}
-
-fragment_program Ogre/Instancing/shadow_caster_glsles_ps glsles
-{
-    source pssmCasterFp.glsl
 }
 
 //--------------------------------------------------------------
@@ -120,7 +115,6 @@ fragment_program Ogre/Instancing_ps unified
 fragment_program Ogre/Instancing/shadow_caster_ps unified
 {
 	delegate Ogre/Instancing/shadow_caster_glsl_ps
-	delegate Ogre/Instancing/shadow_caster_glsles_ps
 	delegate Ogre/Instancing/shadow_caster_hlsl_ps
 	delegate Ogre/Instancing/shadow_caster_cg_ps
 }

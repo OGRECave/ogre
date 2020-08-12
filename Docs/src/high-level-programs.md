@@ -271,6 +271,20 @@ geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
 
 With GL3+ these values are specified using the `layout` modifier.
 
+# Multi-language Programs {#multi-language-programs}
+
+Basic programs, like the `example.frag` stated above, are compatible with GLSL and GLSLES. To avoid duplicating the whole
+program declaration, you can simply specify all the language types the program is compatible with as:
+
+```cpp
+fragment_program myFragmentShader glsl glsles
+{
+    source example.frag
+}
+```
+
+If you use the built-in defines like @c OGRE_HLSL, you can even write programs compatible with both HLSL and GLSL. In fact, you can use `#include <OgreUnifiedShader.h>` in the shader which provides cross-language macros to help with this.
+
 # Unified High-level Programs {#Unified-High_002dlevel-Programs}
 
 As mentioned above, it can often be useful to write both HLSL and GLSL programs to specifically target each platform, but if you do this via multiple material techniques this can cause a bloated material definition when the only difference is the program language. Well, there is another option. You can ’wrap’ multiple programs in a ’unified’ program definition, which will automatically choose one of a series of ’delegate’ programs depending on the rendersystem and hardware support.
