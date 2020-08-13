@@ -177,23 +177,9 @@ vertex_program Ogre/HardwareMorphAnimationHLSL hlsl
 }
 
 // Basic hardware morph animation (no normals)
-vertex_program Ogre/HardwareMorphAnimationGLSLES glsles
-{
-    source HardwareMorphAnimationVp.glsles
-
-    includes_morph_animation true
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto anim_t animation_parametric
-    }
-}
-
-// Basic hardware morph animation (no normals)
-vertex_program Ogre/HardwareMorphAnimationGLSL glsl
+vertex_program Ogre/HardwareMorphAnimationGLSL glsl glsles
 {
     source HardwareMorphAnimationVp.glsl
-    syntax glsl150
 
     includes_morph_animation true
     default_params
@@ -208,7 +194,6 @@ vertex_program Ogre/HardwareMorphAnimation unified
 	 delegate Ogre/HardwareMorphAnimationHLSL
     delegate Ogre/HardwareMorphAnimationCg
     delegate Ogre/HardwareMorphAnimationGLSL
-    delegate Ogre/HardwareMorphAnimationGLSLES
 }
 
 // Basic hardware pose animation supporting 2 active poses (no normals)
@@ -242,23 +227,9 @@ vertex_program Ogre/HardwarePoseAnimationHLSL hlsl
 }
 
 // Basic hardware pose animation supporting 2 active poses (no normals)
-vertex_program Ogre/HardwarePoseAnimationGLSLES glsles
-{
-    source HardwarePoseAnimationVp.glsles
-
-    includes_pose_animation 2
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto anim_t animation_parametric
-    }
-}
-
-// Basic hardware pose animation supporting 2 active poses (no normals)
-vertex_program Ogre/HardwarePoseAnimationGLSL glsl
+vertex_program Ogre/HardwarePoseAnimationGLSL glsl glsles
 {
     source HardwarePoseAnimationVp.glsl
-    syntax glsl150
 
     includes_pose_animation 2
     default_params
@@ -272,7 +243,6 @@ vertex_program Ogre/HardwarePoseAnimation unified
 	delegate Ogre/HardwarePoseAnimationHLSL
     delegate Ogre/HardwarePoseAnimationCg
     delegate Ogre/HardwarePoseAnimationGLSL
-    delegate Ogre/HardwarePoseAnimationGLSLES
 }
 
 // Basic hardware morph animation (with normals)
@@ -310,24 +280,9 @@ vertex_program Ogre/HardwareMorphAnimationWithNormalsHLSL hlsl
 }
 
 // Basic hardware morph animation (with normals)
-vertex_program Ogre/HardwareMorphAnimationWithNormalsGLSLES glsles
-{
-    source HardwareMorphAnimationWithNormalsVp.glsles
-
-    includes_morph_animation true
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto anim_t animation_parametric
-        param_named_auto objSpaceLightPos light_position_object_space 0
-        param_named_auto ambient ambient_light_colour
-    }
-}
-// Basic hardware morph animation (with normals)
-vertex_program Ogre/HardwareMorphAnimationWithNormalsGLSL glsl
+vertex_program Ogre/HardwareMorphAnimationWithNormalsGLSL glsl glsles
 {
     source HardwareMorphAnimationWithNormalsVp.glsl
-    syntax glsl150
 
     includes_morph_animation true
     default_params
@@ -344,7 +299,6 @@ vertex_program Ogre/HardwareMorphAnimationWithNormals unified
 	delegate Ogre/HardwareMorphAnimationWithNormalsHLSL
     delegate Ogre/HardwareMorphAnimationWithNormalsCg
     delegate Ogre/HardwareMorphAnimationWithNormalsGLSL
-    delegate Ogre/HardwareMorphAnimationWithNormalsGLSLES
 }
 
 // Basic hardware pose animation supporting 2 active poses (with normals)
@@ -382,25 +336,9 @@ vertex_program Ogre/HardwarePoseAnimationWithNormalsCg cg
 }
 
 // Basic hardware pose animation supporting 2 active poses (with normals)
-vertex_program Ogre/HardwarePoseAnimationWithNormalsGLSLES glsles
-{
-    source HardwarePoseAnimationWithNormalsVp.glsles
-
-    includes_pose_animation 2
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto anim_t animation_parametric
-        param_named_auto objSpaceLightPos light_position_object_space 0
-        param_named_auto ambient ambient_light_colour
-    }
-}
-
-// Basic hardware pose animation supporting 2 active poses (with normals)
-vertex_program Ogre/HardwarePoseAnimationWithNormalsGLSL glsl
+vertex_program Ogre/HardwarePoseAnimationWithNormalsGLSL glsl glsles
 {
     source HardwarePoseAnimationWithNormalsVp.glsl
-    syntax glsl150
 
     includes_pose_animation 2
     default_params
@@ -417,5 +355,4 @@ vertex_program Ogre/HardwarePoseAnimationWithNormals unified
 	delegate Ogre/HardwarePoseAnimationWithNormalsHLSL
     delegate Ogre/HardwarePoseAnimationWithNormalsCg
     delegate Ogre/HardwarePoseAnimationWithNormalsGLSL
-    delegate Ogre/HardwarePoseAnimationWithNormalsGLSLES
 }

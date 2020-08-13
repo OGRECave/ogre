@@ -31,32 +31,19 @@ fragment_program Fury/HeatVision/HeatCaster_HLSL_fp hlsl
    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
-vertex_program Fury/HeatVision/HeatCaster_GLSLES_vp glsles
-{
-   source HeatCasterVp.glsles
-}
-
-fragment_program Fury/HeatVision/HeatCaster_GLSLES_fp glsles
-{
-   source HeatCasterFp.glsles
-}
-
-vertex_program Fury/HeatVision/HeatCaster_GLSL_vp glsl
+vertex_program Fury/HeatVision/HeatCaster_GLSL_vp glsl glsles
 {
    source HeatCasterVp.glsl
-   syntax glsl150
 }
 
-fragment_program Fury/HeatVision/HeatCaster_GLSL_fp glsl
+fragment_program Fury/HeatVision/HeatCaster_GLSL_fp glsl glsles
 {
    source HeatCasterFp.glsl
-   syntax glsl150
 }
 
 vertex_program Fury/HeatVision/HeatCaster_vp unified
 {
     delegate Fury/HeatVision/HeatCaster_GLSL_vp
-    delegate Fury/HeatVision/HeatCaster_GLSLES_vp
 	delegate Fury/HeatVision/HeatCaster_HLSL_vp
     delegate Fury/HeatVision/HeatCaster_Cg_vp
 }
@@ -64,7 +51,6 @@ vertex_program Fury/HeatVision/HeatCaster_vp unified
 fragment_program Fury/HeatVision/HeatCaster_fp unified
 {
     delegate Fury/HeatVision/HeatCaster_GLSL_fp
-    delegate Fury/HeatVision/HeatCaster_GLSLES_fp
 	delegate Fury/HeatVision/HeatCaster_HLSL_fp
     delegate Fury/HeatVision/HeatCaster_Cg_fp
 }
@@ -122,32 +108,19 @@ fragment_program Fury/HeatVision/ColdCaster_HLSL_fp hlsl
    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
-vertex_program Fury/HeatVision/ColdCaster_GLSLES_vp glsles
-{
-   source ColdCasterVp.glsles
-}
-
-fragment_program Fury/HeatVision/ColdCaster_GLSLES_fp glsles
-{
-   source ColdCasterFp.glsles
-}
-
-vertex_program Fury/HeatVision/ColdCaster_GLSL_vp glsl
+vertex_program Fury/HeatVision/ColdCaster_GLSL_vp glsl glsles
 {
    source ColdCasterVp.glsl
-   syntax glsl150
 }
 
-fragment_program Fury/HeatVision/ColdCaster_GLSL_fp glsl
+fragment_program Fury/HeatVision/ColdCaster_GLSL_fp glsl glsles
 {
    source ColdCasterFp.glsl
-   syntax glsl150
 }
 
 vertex_program Fury/HeatVision/ColdCaster_vp unified
 {
     delegate Fury/HeatVision/ColdCaster_GLSL_vp
-    delegate Fury/HeatVision/ColdCaster_GLSLES_vp
 	delegate Fury/HeatVision/ColdCaster_HLSL_vp
     delegate Fury/HeatVision/ColdCaster_Cg_vp
 }
@@ -155,7 +128,6 @@ vertex_program Fury/HeatVision/ColdCaster_vp unified
 fragment_program Fury/HeatVision/ColdCaster_fp unified
 {
     delegate Fury/HeatVision/ColdCaster_GLSL_fp
-    delegate Fury/HeatVision/ColdCaster_GLSLES_fp
 	delegate Fury/HeatVision/ColdCaster_HLSL_fp
     delegate Fury/HeatVision/ColdCaster_Cg_fp
 }
@@ -199,21 +171,9 @@ fragment_program Fury/HeatVision/LightToHeat_HLSL_fp hlsl
    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
-fragment_program Fury/HeatVision/LightToHeat_GLSLES_fp glsles
-{
-   	source LightToHeatFp.glsles
-   	default_params
-   	{
-   		param_named Input int 0
-   		param_named NoiseMap int 1
-	   	param_named HeatLookup int 2
-   	}
-}
-
-fragment_program Fury/HeatVision/LightToHeat_GLSL_fp glsl
+fragment_program Fury/HeatVision/LightToHeat_GLSL_fp glsl glsles
 {
    	source LightToHeatFp.glsl
-    syntax glsl150
    	default_params
    	{
    		param_named Input int 0
@@ -225,7 +185,6 @@ fragment_program Fury/HeatVision/LightToHeat_GLSL_fp glsl
 fragment_program Fury/HeatVision/LightToHeat_fp unified
 {
     delegate Fury/HeatVision/LightToHeat_GLSL_fp
-    delegate Fury/HeatVision/LightToHeat_GLSLES_fp
 	delegate Fury/HeatVision/LightToHeat_HLSL_fp
     delegate Fury/HeatVision/LightToHeat_Cg_fp
 }
@@ -303,19 +262,9 @@ fragment_program Fury/HeatVision/Blur_HLSL_fp hlsl
    target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
-fragment_program Fury/HeatVision/Blur_GLSLES_fp glsles
-{
-  	source HeatBlurFp.glsles
-  	default_params
-  	{
-  		param_named Input int 0
-  	}
-}
-
-fragment_program Fury/HeatVision/Blur_GLSL_fp glsl
+fragment_program Fury/HeatVision/Blur_GLSL_fp glsl glsles
 {
   	source HeatBlurFp.glsl
-    syntax glsl150
   	default_params
   	{
   		param_named Input int 0
@@ -325,7 +274,6 @@ fragment_program Fury/HeatVision/Blur_GLSL_fp glsl
 fragment_program Fury/HeatVision/Blur_fp unified
 {
     delegate Fury/HeatVision/Blur_GLSL_fp
-    delegate Fury/HeatVision/Blur_GLSLES_fp
 	delegate Fury/HeatVision/Blur_HLSL_fp
     delegate Fury/HeatVision/Blur_Cg_fp
 }

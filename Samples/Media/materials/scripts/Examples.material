@@ -901,23 +901,6 @@ fragment_program Examples/GrassWaverReceiverFpCg cg
     }
 }
 
-vertex_program Examples/GrassWaverVpGLSLES glsles
-{
-	source GrassVp.glsles
-	profiles glsles
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto camObjPos camera_position_object_space
-        param_named_auto ambient ambient_light_colour
-        param_named_auto objSpaceLight light_position_object_space 0
-        param_named_auto lightColour light_diffuse_colour 0
-
-        param_named_auto offset custom 999
-    }
-  }
-
 vertex_program Examples/GrassWaverTexVpGLSLES glsles
 {
 	source GrassTexVp.glsles
@@ -1009,20 +992,9 @@ fragment_program Examples/GrassWaverReceiverFpGLSLES glsles
     }
 }
 
-fragment_program Examples/GrassWaverFpGLSLES glsles
-{
-	source GrassFp.glsles
-	profiles glsles
-    default_params
-    {
-        param_named diffuseMap int 0
-    }
-}
-
-vertex_program Examples/GrassWaverVpGLSL glsl
+vertex_program Examples/GrassWaverVpGLSL glsl glsles
 {
 	source GrassVp.glsl
-	syntax glsl150
 
     default_params
     {
@@ -1126,10 +1098,9 @@ fragment_program Examples/GrassWaverReceiverFpGLSL glsl
     }
 }
 
-fragment_program Examples/GrassWaverFpGLSL glsl
+fragment_program Examples/GrassWaverFpGLSL glsl glsles
 {
 	source GrassFp.glsl
-	syntax glsl150
     default_params
     {
         param_named diffuseMap int 0
@@ -1188,14 +1159,12 @@ vertex_program Examples/GrassWaverTexVp unified
 fragment_program Examples/GrassWaverFp unified
 {
 	delegate Examples/GrassWaverFpGLSL
-	delegate Examples/GrassWaverFpGLSLES
 	delegate Examples/GrassWaverFpCg
 }
 
 vertex_program Examples/GrassWaverVp unified
 {
 	delegate Examples/GrassWaverVpGLSL
-	delegate Examples/GrassWaverVpGLSLES
 	delegate Examples/GrassWaverVpCg
 }
 
