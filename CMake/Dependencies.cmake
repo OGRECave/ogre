@@ -321,10 +321,12 @@ if(ASSIMP_FOUND)
   # workaround horribly broken assimp cmake
   add_library(fix::assimp INTERFACE IMPORTED)
   set_target_properties(fix::assimp PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}"
       INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES}"
       INTERFACE_LINK_DIRECTORIES "${ASSIMP_LIBRARY_DIRS}"
   )
+  if(EXISTS "${ASSIMP_INCLUDE_DIRS}")
+    set_target_properties(fix::assimp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}")
+  endif()
 endif()
 
 #######################################################################
