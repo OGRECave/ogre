@@ -10,21 +10,9 @@ fragment_program Ogre/Compositor/Combine_Cg_fp cg
 	}
 }
 
-fragment_program Ogre/Compositor/Combine_GLSLES_fp glsles
-{
-	source Combine_fp.glsles
-	default_params
-	{
-		param_named blur float 0.8
-   		param_named RT int 0
-   		param_named Sum int 1
-	}
-}
-
-fragment_program Ogre/Compositor/Combine_GLSL_fp glsl
+fragment_program Ogre/Compositor/Combine_GLSL_fp glsl glsles
 {
 	source Combine_fp.glsl
-	syntax glsl150
 	default_params
 	{
 		param_named blur float 0.8
@@ -48,7 +36,6 @@ fragment_program Ogre/Compositor/Combine_HLSL_fp hlsl
 fragment_program Ogre/Compositor/Combine_fp unified
 {
 	delegate Ogre/Compositor/Combine_GLSL_fp
-	delegate Ogre/Compositor/Combine_GLSLES_fp
 	delegate Ogre/Compositor/Combine_HLSL_fp
 	delegate Ogre/Compositor/Combine_Cg_fp
 }
