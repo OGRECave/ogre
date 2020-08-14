@@ -3410,6 +3410,8 @@ namespace Ogre
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error calling SetPixelShader", "D3D9RenderSystem::bindGpuProgram");
             }
+            // disable FFP fog, as it gets still applied even in presence of shader. Matching other render-systems here.
+            hr = __SetRenderState(D3DRS_FOGENABLE, FALSE);
             break;
         };
 
