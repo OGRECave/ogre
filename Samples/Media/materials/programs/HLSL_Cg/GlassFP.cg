@@ -1,5 +1,7 @@
-sampler2D RT : register(s0);
-sampler2D NormalMap : register(s1);
+#include <HLSL_SM4Support.hlsl>
+
+SAMPLER2D(RT, 0);
+SAMPLER2D(NormalMap, 1);
 
 float4 main_ps(float4 pos : POSITION, float2 iTexCoord : TEXCOORD0) : COLOR
 {

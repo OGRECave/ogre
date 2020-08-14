@@ -1,5 +1,6 @@
 float4 Combine_fp
 (
+    in float4 posIn: POSITION ,
     in float2 texCoord: TEXCOORD0,
     
     uniform sampler2D RT : register(s0),

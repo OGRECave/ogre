@@ -1,8 +1,7 @@
-fragment_program Ogre/Compositor/Laplace_Cg_FP cg
+fragment_program Ogre/Compositor/Laplace_Cg_FP hlsl
 {
 	source LaplaceFP.cg
 	entry_point Laplace_ps
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 fragment_program Ogre/Compositor/Laplace_GLSL_FP glsl glsles
