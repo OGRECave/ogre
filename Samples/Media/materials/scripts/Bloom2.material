@@ -90,79 +90,33 @@ fragment_program BrightBloom2_ps20_hlsl hlsl
 }
 
 //------------------------
-//NVIDIA Cg Definitions
-//------------------------	
-//NV Cg Vertex Shader vs_1_1
-vertex_program Blur_vs11_cg cg
-{
-	source Blur_vs11.cg
-	profiles vs_1_1 arbvp1
-	entry_point main
-}
-
-//NV Cg HLSL Pixel Shader ps_2_0
-fragment_program BlurV_ps20_cg cg
-{
-	source BlurV_ps20.cg
-	profiles ps_2_0 arbfp1
-	entry_point main
-}
-fragment_program BlurH_ps20_cg cg
-{
-	source BlurH_ps20.cg
-	profiles ps_2_0 arbfp1
-	entry_point main
-}
-
-//NV Cg Pixel Shader ps_2_0
-fragment_program Bloom2_ps20_cg cg
-{
-	source Bloom2_ps20.cg
-	profiles ps_2_0 arbfp1
-	entry_point main
-}
-
-//NV Cg Pixel Shader ps_2_0
-fragment_program BrightBloom2_ps20_cg cg
-{
-	source BrightBloom2_ps20.cg
-	profiles ps_2_0 arbfp1
-	entry_point main
-}
-
-//------------------------
 //Unified Definitions
 //------------------------
 vertex_program Blur_vs unified
 {
 	delegate Blur_vs11_hlsl
 	delegate Blur_vs_glsl
-	delegate Blur_vs11_cg
 }
 
 fragment_program Bloom2_ps unified
 {
 	delegate Bloom2_ps20_hlsl
 	delegate Bloom2_ps20_glsl
-	delegate Bloom2_ps20_cg
 }
 fragment_program BlurV_ps unified
 {
 	delegate BlurV_ps20_hlsl
 	delegate BlurV_ps20_glsl
-	delegate BlurV_ps20_cg
 }
 fragment_program BlurH_ps unified
 {
 	delegate BlurH_ps20_hlsl
 	delegate BlurH_ps20_glsl
-	delegate BlurH_ps20_cg
 }
 fragment_program BrightBloom2_ps unified
 {
 	delegate BrightBloom2_ps20_hlsl
 	delegate BrightBloom2_ps20_glsl
-	delegate BrightBloom2_ps20_cg
 }
 
 

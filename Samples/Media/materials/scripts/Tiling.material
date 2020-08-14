@@ -1,8 +1,7 @@
-fragment_program Ogre/Compositor/Tiling_Cg_FP cg
+fragment_program Ogre/Compositor/Tiling_Cg_FP hlsl
 {
 	source TilingFP.cg
 	entry_point Tiling_ps
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 fragment_program Ogre/Compositor/Tiling_GLSL_FP glsl glsles

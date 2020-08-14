@@ -1,8 +1,7 @@
 //Cg Pixel Shader ps_2_0
-fragment_program Radial_Blur_Cg_ps cg
+fragment_program Radial_Blur_Cg_ps hlsl
 {
 	source Radial_Blur_FP.cg
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 fragment_program Radial_Blur_GLSL_ps glsl glsles

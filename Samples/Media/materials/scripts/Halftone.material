@@ -1,8 +1,7 @@
-fragment_program Ogre/Compositor/HalftoneFPCg cg
+fragment_program Ogre/Compositor/HalftoneFPCg hlsl
 {
 	source HalftoneFP.cg
 	entry_point Halftone_ps
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 	
 	default_params
 	{

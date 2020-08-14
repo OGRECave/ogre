@@ -5,13 +5,6 @@ fragment_program SSAO/ShowDepth_fp_hlsl hlsl
     target ps_2_a
 }
 
-fragment_program SSAO/ShowDepth_fp_cg cg
-{
-    source ShowDepth.cg
-    entry_point ShowDepth_fp
-    profiles ps_2_x arbfp1
-}
-
 fragment_program SSAO/ShowDepth_fp_glsl glsl
 {
 	source ShowDepthFP.glsl
@@ -26,7 +19,6 @@ fragment_program SSAO/ShowDepth_fp unified
 {
 	delegate SSAO/ShowDepth_fp_glsl 
 	delegate SSAO/ShowDepth_fp_hlsl 
-	delegate SSAO/ShowDepth_fp_cg
 }
 
 material SSAO/ShowDepth

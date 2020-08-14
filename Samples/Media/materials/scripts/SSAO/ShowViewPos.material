@@ -5,13 +5,6 @@ fragment_program SSAO/ShowViewPos_fp_hlsl hlsl
     target ps_2_0
 }
 
-fragment_program SSAO/ShowViewPos_fp_cg cg
-{
-    source ShowViewPos.cg
-    entry_point ShowViewPos_fp
-    profiles ps_2_0 arbfp1
-}
-
 fragment_program SSAO/ShowViewPos_fp_glsl glsl
 {
 	source ShowViewPosFP.glsl
@@ -26,7 +19,6 @@ fragment_program SSAO/ShowViewPos_fp unified
 {
 	delegate SSAO/ShowViewPos_fp_glsl 
 	delegate SSAO/ShowViewPos_fp_hlsl 
-	delegate SSAO/ShowViewPos_fp_cg
 }
 
 material SSAO/ShowViewPos
