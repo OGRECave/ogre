@@ -2,12 +2,12 @@
 
 SAMPLER2D(RT, 0);
 SAMPLER2D(SplotchesTx, 1);
-SAMPLER1D(Texture2, 2);
-SAMPLER1D(SepiaTx, 3);
+SAMPLER2D(Texture2, 2);
+SAMPLER2D(SepiaTx, 3);
 
 float2 calcSpriteAddr(float2 texCoord, float DirtFrequency1, float period)
 {
-   return texCoord + tex1D(Texture2, period  * DirtFrequency1).xy;
+   return texCoord + tex2D(Texture2, float2(period  * DirtFrequency1, 0)).xy;
 }
 
 float4 getSplotches(float2 spriteAddr)
@@ -44,7 +44,7 @@ float4 OldMovie_ps (float4 pos : POSITION,
    // randomly shift luminance
    lumi -= spriteAddr.x * lumiShift;
    // tone map luminance
-   base.rgb = tex1D(SepiaTx, lumi ).rgb;
+   base.rgb = tex2D(SepiaTx, float2(lumi, 0) ).rgb;
 
    // calc flicker speed
    float darken = frac(flicker * time_cycle_period);
