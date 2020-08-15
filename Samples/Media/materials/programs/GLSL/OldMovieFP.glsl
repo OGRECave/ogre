@@ -1,12 +1,9 @@
-#version 150
-
-in vec2 oUv0;
-out vec4 fragColour;
+varying vec2 oUv0;
 
 uniform sampler2D RT;
 uniform sampler2D SplotchesTx;
-uniform sampler1D Texture2;
-uniform sampler1D SepiaTx;
+uniform sampler2D Texture2;
+uniform sampler2D SepiaTx;
 uniform float time_cycle_period;
 uniform float flicker;
 uniform float DirtFrequency;
@@ -16,7 +13,7 @@ uniform float lumiShift;
 
 vec2 calcSpriteAddr(vec2 texCoord, float DirtFrequency1, float period)
 {
-   return texCoord + texture(Texture2, period * DirtFrequency1).xy;
+   return texCoord + texture2D(Texture2, vec2(period * DirtFrequency1, 0.0)).xy;
 }
 
 vec4 getSplotches(vec2 spriteAddr)
@@ -25,8 +22,7 @@ vec4 getSplotches(vec2 spriteAddr)
    spriteAddr = spriteAddr / 6.3;
    spriteAddr = spriteAddr - (spriteAddr / 33.3);
 
-//   return texture(SplotchesTx, spriteAddr);
-   return vec4(1.0) * texture(SplotchesTx, spriteAddr).r;
+   return texture2D(SplotchesTx, spriteAddr);
 }
 
 void main()
@@ -39,12 +35,12 @@ void main()
    vec4 specs = 1.0 - getSplotches(spriteAddr / 3.0);
 
    // convert color to base luminance
-   vec4 base = texture(RT, oUv0 + vec2(0.0, spriteAddr.y * frameJitter));
+   vec4 base = texture2D(RT, oUv0 + vec2(0.0, spriteAddr.y * frameJitter));
    float lumi = dot(base.rgb, luminance);
    // randomly shift luminance
    lumi -= spriteAddr.x * lumiShift;
    // tone map luminance
-   base.rgb = texture(SepiaTx, lumi).rgb;
+   base.rgb = texture2D(SepiaTx, vec2(lumi, 0.0)).rgb;
 
    // calc flicker speed
    float darken = fract(flicker * time_cycle_period);
@@ -52,5 +48,5 @@ void main()
    // we want darken to cycle between 0.6 and 1.0
    darken = abs(darken - 0.5) * 0.4 + 0.6;
    // composite dirt onto film
-   fragColour = base * splotches * darken + specs;
+   gl_FragColor = base * splotches * darken + specs;
 }
