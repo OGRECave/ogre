@@ -97,30 +97,7 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
 	mView[2][2] = -mView[2][2];
 	mView[3][2] = -mView[3][2];
 
-#ifdef GL_ES
-    mat4 matViewT;
-    matViewT[0][0] = mView[0][0];
-    matViewT[1][0] = mView[0][1];
-    matViewT[2][0] = mView[0][2];
-    matViewT[3][0] = mView[0][3];
-
-    matViewT[0][1] = mView[1][0];
-    matViewT[1][1] = mView[1][1];
-    matViewT[2][1] = mView[1][2];
-    matViewT[3][1] = mView[1][3];
-
-    matViewT[0][2] = mView[2][0];
-    matViewT[1][2] = mView[2][1];
-    matViewT[2][2] = mView[2][2];
-    matViewT[3][2] = mView[2][3];
-
-    matViewT[0][3] = mView[3][0];
-    matViewT[1][3] = mView[3][1];
-    matViewT[2][3] = mView[3][2];
-    matViewT[3][3] = mView[3][3];
-#else
 	mat4 matViewT = transpose(mView);
-#endif
 
 	vec3 vWorldNormal = (mat3(mWorldIT) * vNormal);
 	vec3 vViewNormal  = (mat3(mView) * vWorldNormal);

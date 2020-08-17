@@ -73,19 +73,8 @@ namespace Ogre {
 
         void updateFromParentImpl(void) const;
 
-        /** See Node. */
-        Node* createChildImpl(void);
-
-        /** See Node. */
-        Node* createChildImpl(const String& name);
-
         /** See Node */
         void setParent(Node* parent);
-
-        /** Internal method for setting whether the node is in the scene 
-            graph.
-        */
-        virtual void setInSceneGraph(bool inGraph);
 
         /// Auto tracking target
         SceneNode* mAutoTrackTarget;
@@ -110,9 +99,20 @@ namespace Ogre {
         bool mYawFixed : 1;
         /// Is this node a current part of the scene graph?
         bool mIsInSceneGraph : 1;
+    protected: // private in 1.13
         /// Flag that determines if the bounding box of the node should be displayed
         bool mShowBoundingBox : 1;
         bool mHideBoundingBox : 1;
+
+        /** Internal method for setting whether the node is in the scene
+            graph.
+        */
+        virtual void setInSceneGraph(bool inGraph);
+        /** See Node. */
+        Node* createChildImpl(void);
+
+        /** See Node. */
+        Node* createChildImpl(const String& name);
     public:
         /** Constructor, only to be called by the creator SceneManager.
         @remarks
@@ -213,6 +213,7 @@ namespace Ogre {
             @param
                 displayNodes If true, the nodes themselves are rendered as a set of 3 axes as well
                     as the objects being rendered. For debugging purposes.
+            @param onlyShadowCasters
         */
         void _findVisibleObjects(Camera* cam, RenderQueue* queue,
             VisibleObjectsBoundsInfo* visibleBounds, 
@@ -283,15 +284,10 @@ namespace Ogre {
         */
         void showBoundingBox(bool bShow) { mShowBoundingBox = bShow; }
 
-        /** Allows the overriding of the node's bounding box
-            over the SceneManager's bounding box setting.
-        @remarks
-            Use this to override the bounding box setting of the node.
-        */
-        void hideBoundingBox(bool bHide) { mHideBoundingBox = bHide; }
+        /// @deprecated this function will disappear with 1.13
+        OGRE_DEPRECATED void hideBoundingBox(bool bHide) { mHideBoundingBox = bHide; }
 
-        /** Add the bounding box to the rendering queue.
-        */
+        /// @deprecated this function will disappear with 1.13
         void _addBoundingBoxToQueue(RenderQueue* queue);
 
         /** This allows scene managers to determine if the node's bounding box
@@ -409,11 +405,11 @@ namespace Ogre {
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z,
             const Vector3& offset = Vector3::ZERO);
         /** Get the auto tracking target for this node, if any. */
-        SceneNode* getAutoTrackTarget(void) { return mAutoTrackTarget; }
+        SceneNode* getAutoTrackTarget(void) const { return mAutoTrackTarget; }
         /** Get the auto tracking offset for this node, if the node is auto tracking. */
-        const Vector3& getAutoTrackOffset(void) { return mAutoTrackOffset; }
+        const Vector3& getAutoTrackOffset(void) const { return mAutoTrackOffset; }
         /** Get the auto tracking local direction for this node, if it is auto tracking. */
-        const Vector3& getAutoTrackLocalDirection(void) { return mAutoTrackLocalDirection; }
+        const Vector3& getAutoTrackLocalDirection(void) const { return mAutoTrackLocalDirection; }
         /** Internal method used by OGRE to update auto-tracking cameras. */
         void _autoTrack(void);
         /** Gets the parent of this SceneNode. */
@@ -426,7 +422,7 @@ namespace Ogre {
         @param visible Whether the objects are to be made visible or invisible
         @param cascade If true, this setting cascades into child nodes too.
         */
-        void setVisible(bool visible, bool cascade = true);
+        void setVisible(bool visible, bool cascade = true) const;
         /** Inverts the visibility of all objects attached to this node.
         @remarks    
         This is a shortcut to calling setVisible(!isVisible()) on the objects attached
@@ -434,7 +430,7 @@ namespace Ogre {
         nodes. 
         @param cascade If true, this setting cascades into child nodes too.
         */
-        void flipVisibility(bool cascade = true);
+        void flipVisibility(bool cascade = true) const;
 
         /** Tells all objects attached to this node whether to display their
             debug information or not.
@@ -445,7 +441,7 @@ namespace Ogre {
         @param enabled Whether the objects are to display debug info or not
         @param cascade If true, this setting cascades into child nodes too.
         */
-        void setDebugDisplayEnabled(bool enabled, bool cascade = true);
+        void setDebugDisplayEnabled(bool enabled, bool cascade = true) const;
 
         /// As Node::getDebugRenderable, except scaling is automatically determined
         DebugRenderable* getDebugRenderable();

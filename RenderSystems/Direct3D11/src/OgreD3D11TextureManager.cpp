@@ -35,6 +35,42 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
+    ID3D11SamplerState* D3D11Sampler::getState()
+    {
+        if(!mDirty)
+            return mState.Get();
+
+        D3D11_SAMPLER_DESC  desc;
+
+        desc.Filter = D3D11Mappings::get(mMinFilter, mMagFilter, mMipFilter, mCompareEnabled);
+        desc.MaxAnisotropy = mMaxAniso;
+        desc.MipLODBias = static_cast<float>(Math::Clamp(mMipmapBias - 0.5, -16.00, 15.99));
+        desc.MinLOD = -D3D11_FLOAT32_MAX;
+        desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+        bool reversedZ = Root::getSingleton().getRenderSystem()->isReverseDepthBufferEnabled();
+        auto cmpFunc = mCompareFunc;
+        if(reversedZ)
+            cmpFunc = D3D11RenderSystem::reverseCompareFunction(cmpFunc);
+        desc.ComparisonFunc = D3D11Mappings::get(cmpFunc);
+
+        desc.AddressU = D3D11Mappings::get(mAddressMode.u);
+        desc.AddressV = D3D11Mappings::get(mAddressMode.v);
+        desc.AddressW = D3D11Mappings::get(mAddressMode.w);
+
+        if (mAddressMode.u == TAM_BORDER || mAddressMode.v == TAM_BORDER || mAddressMode.w == TAM_BORDER)
+        {
+            auto borderColour =
+                (reversedZ && mCompareEnabled) ? ColourValue::White - mBorderColour : mBorderColour;
+            D3D11Mappings::get(borderColour, desc.BorderColor);
+        }
+
+        OGRE_CHECK_DX_ERROR(mDevice->CreateSamplerState(&desc, mState.ReleaseAndGetAddressOf()));
+
+        mDirty = false;
+
+        return mState.Get();
+    }
     //---------------------------------------------------------------------
     D3D11TextureManager::D3D11TextureManager( D3D11Device & device ) : TextureManager(), mDevice (device)
     {
@@ -56,6 +92,10 @@ namespace Ogre
         ManualResourceLoader* loader, const NameValuePairList* createParams)
     {
         return new D3D11Texture(this, name, handle, group, isManual, loader, mDevice); 
+    }
+    SamplerPtr D3D11TextureManager::_createSamplerImpl()
+    {
+        return std::make_shared<D3D11Sampler>(mDevice);
     }
     //---------------------------------------------------------------------
     PixelFormat D3D11TextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)

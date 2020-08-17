@@ -35,13 +35,13 @@ namespace Ogre {
     Codec::~Codec() {
     }
 
-    DataStreamPtr Codec::encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const
+    DataStreamPtr Codec::encode(const Any& input) const
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, getType() + " - encoding to memory not supported");
         return DataStreamPtr();
     }
 
-    void Codec::encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const
+    void Codec::encodeToFile(const Any& input, const String& outFileName) const
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, getType() + " - encoding to file not supported");
     }
@@ -78,10 +78,8 @@ namespace Ogre {
             else
                 formats_str = "Supported formats are: " + StringConverter::toString(getExtensions()) + ".";
 
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Can not find codec for '" + extension + "' image format.\n" + 
-                formats_str,
-                "Codec::getCodec");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                        "Can not find codec for '" + extension + "' format.\n" + formats_str);
         }
 
         return i->second;

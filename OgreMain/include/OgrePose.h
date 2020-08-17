@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 #include "OgreHardwareVertexBuffer.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -109,8 +109,20 @@ namespace Ogre {
         OGRE_DEPRECATED ConstNormalsIterator getNormalsIterator(void) const;
         /// @deprecated use getNormals
         OGRE_DEPRECATED NormalsIterator getNormalsIterator(void);
-        /** Gets a const reference to the vertex offsets. */
+        /** Gets a const reference to the vertex normals */
         const NormalsMap& getNormals(void) const { return mNormalsMap; }
+
+        /** writable access to the vertex offsets for offline processing
+         *
+         * @attention does not invalidate the vertexbuffer
+         */
+        VertexOffsetMap& _getVertexOffsets() { return mVertexOffsetMap; }
+
+        /** writable access to the vertex normals for offline processing
+         *
+         * @attention does not invalidate the vertexbuffer
+         */
+        NormalsMap& _getNormals() { return mNormalsMap; }
 
         /** Get a hardware vertex buffer version of the vertex offsets. */
         const HardwareVertexBufferSharedPtr& _getHardwareVertexBuffer(const VertexData* origData) const;

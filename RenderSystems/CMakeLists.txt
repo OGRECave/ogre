@@ -63,3 +63,6 @@ if (OGRE_BUILD_RENDERSYSTEM_GLES2)
   endif()
 endif()
 
+if (OGRE_BUILD_RENDERSYSTEM_METAL)
+    add_subdirectory(Metal)
+endif()

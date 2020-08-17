@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __Compositor_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -125,7 +125,7 @@ namespace Ogre {
         @param mrtIndex If name identifies a MRT, which texture attachment to retrieve
         @return The texture pointer, corresponds to a real texture
         */
-        TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
+        const TexturePtr& getTextureInstance(const String& name, size_t mrtIndex);
 
         /** Get the render target for a given render texture name. 
         @remarks

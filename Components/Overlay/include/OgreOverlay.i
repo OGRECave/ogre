@@ -29,7 +29,10 @@
 #endif
 
 %include std_string.i
-%include exception.i 
+%include exception.i
+#ifdef SWIGPYTHON
+%include factory.i
+#endif
 %import "Ogre.i"
 
 #define _OgreOverlayExport
@@ -48,7 +51,14 @@ SHARED_PTR(OverlayElement);
 %include "OgreOverlayElement.h"
 %include "OgreOverlayElementFactory.h"
 SHARED_PTR(OverlayContainer);
+%ignore Ogre::OverlayContainer::getChildIterator;
+%ignore Ogre::OverlayContainer::getChildContainerIterator;
 %include "OgreOverlayContainer.h"
+#ifdef SWIGPYTHON
+%factory(Ogre::OverlayElement* Ogre::OverlayManager::createOverlayElement, Ogre::OverlayContainer);
+#endif
+%ignore Ogre::OverlayManager::getTemplateIterator;
+%ignore Ogre::OverlayManager::getOverlayIterator;
 %include "OgreOverlayManager.h"
 SHARED_PTR(OverlaySystem);
 %include "OgreOverlaySystem.h"

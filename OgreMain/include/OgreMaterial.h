@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreResource.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreCommon.h"
 #include "OgreColourValue.h"
 #include "OgreBlendMode.h"
@@ -189,6 +189,9 @@ namespace Ogre {
         /** Returns whether or not objects using this material be classified as opaque to the shadow caster system. */
         bool getTransparencyCastsShadows(void) const { return mTransparencyCastsShadows; }
 
+        typedef VectorIterator<Techniques> TechniqueIterator;
+        /// @name Techniques
+        /// @{
         /** Creates a new Technique for this Material.
         @remarks
             A Technique is a single way of rendering geometry in order to achieve the effect
@@ -218,7 +221,6 @@ namespace Ogre {
         void removeTechnique(unsigned short index);     
         /** Removes all the techniques in this Material. */
         void removeAllTechniques(void);
-        typedef VectorIterator<Techniques> TechniqueIterator;
         /** Get an iterator over the Techniques in this Material.
          * @deprecated use getTechniques() */
         OGRE_DEPRECATED TechniqueIterator getTechniqueIterator(void);
@@ -250,19 +252,6 @@ namespace Ogre {
         /** Gets a string explaining why any techniques are not supported. */
         const String& getUnsupportedTechniquesExplanation() const { return mUnsupportedReasons; }
 
-        /** Gets the number of levels-of-detail this material has in the 
-            given scheme, based on Technique::setLodIndex. 
-        @remarks
-            Note that this will not be up to date until the material has been compiled.
-        */
-        unsigned short getNumLodLevels(unsigned short schemeIndex) const;
-        /** Gets the number of levels-of-detail this material has in the 
-            given scheme, based on Technique::setLodIndex. 
-        @remarks
-            Note that this will not be up to date until the material has been compiled.
-        */
-        unsigned short getNumLodLevels(const String& schemeName) const;
-
         /** Gets the best supported technique. 
         @remarks
             This method returns the lowest-index supported Technique in this material
@@ -279,7 +268,7 @@ namespace Ogre {
             MaterialManager::Listener::handleSchemeNotFound as information.
         */
         Technique* getBestTechnique(unsigned short lodIndex = 0, const Renderable* rend = 0);
-
+        /// @}
 
         /** Creates a new copy of this material with the same settings but a new name.
         @param newName The name for the cloned material
@@ -312,11 +301,14 @@ namespace Ogre {
         */
         void compile(bool autoManageTextureUnits = true);
 
-        // -------------------------------------------------------------------------------
-        // The following methods are to make migration from previous versions simpler
-        // and to make code easier to write when dealing with simple materials
-        // They set the properties which have been moved to Pass for all Techniques and all Passes
+        /** @name Forwarded Pass Properties
 
+            The following methods are to make migration from previous versions simpler
+            and to make code easier to write when dealing with simple materials
+            They set the properties which have been moved to Pass for all Techniques and all Passes
+        */
+
+        /// @{
         /** Sets the point size properties for every Pass in every Technique.
         @note
             This property has been moved to the Pass class, which is accessible via the 
@@ -577,9 +569,27 @@ namespace Ogre {
         */
         void setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha);
 
+        /// @deprecated do not use
+        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
+        /// @}
+
         /** Tells the material that it needs recompilation. */
         void _notifyNeedsRecompile(void);
 
+        /// @name Level of Detail
+        /// @{
+        /** Gets the number of levels-of-detail this material has in the
+            given scheme, based on Technique::setLodIndex.
+        @remarks
+            Note that this will not be up to date until the material has been compiled.
+        */
+        unsigned short getNumLodLevels(unsigned short schemeIndex) const;
+        /** Gets the number of levels-of-detail this material has in the
+            given scheme, based on Technique::setLodIndex.
+        @remarks
+            Note that this will not be up to date until the material has been compiled.
+        */
+        unsigned short getNumLodLevels(const String& schemeName) const;
         /** Sets the distance at which level-of-detail (LOD) levels come into effect.
         @remarks
             You should only use this if you have assigned LOD indexes to the Technique
@@ -635,6 +645,7 @@ namespace Ogre {
         const LodStrategy *getLodStrategy() const;
         /** Set the LOD strategy used by this material. */
         void setLodStrategy(LodStrategy *lodStrategy);
+        /// @}
 
         /** @copydoc Resource::touch
         */
@@ -645,9 +656,6 @@ namespace Ogre {
             // call superclass
             Resource::touch();
         }
-        
-        /// @deprecated do not use
-        bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
 
         /** Gets the compilation status of the material.
         @return True if the material needs recompilation.

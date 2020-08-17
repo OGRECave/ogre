@@ -1251,7 +1251,7 @@ Format: scroll\_anim &lt;uSpeed&gt; &lt;vSpeed&gt;<br>
 @copybrief Ogre::TextureUnitState::setTextureRotate
 
 @par
-Format: rotate &lt;angle&gt;
+Format: rotate &lt;angle_in_deg&gt;
 
 @copydetails Ogre::TextureUnitState::setTextureRotate
 

@@ -43,9 +43,6 @@ namespace Ogre {
             GLES2RenderSystem* mRenderSystem;
             /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
             VertexDeclaration* createVertexDeclarationImpl(void);
-            /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
-            void destroyVertexDeclarationImpl(VertexDeclaration* decl);
-
         public:
             GLES2HardwareBufferManager();
             virtual ~GLES2HardwareBufferManager();

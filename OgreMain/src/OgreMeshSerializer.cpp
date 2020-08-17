@@ -155,7 +155,7 @@ namespace Ogre {
         impl->exportMesh(pMesh, stream, endianMode);
     }
     //---------------------------------------------------------------------
-    void MeshSerializer::importMesh(DataStreamPtr& stream, Mesh* pDest)
+    void MeshSerializer::importMesh(const DataStreamPtr& stream, Mesh* pDest)
     {
         determineEndianness(stream);
 

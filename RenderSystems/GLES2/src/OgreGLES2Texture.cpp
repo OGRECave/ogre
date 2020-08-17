@@ -359,7 +359,7 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2Texture::notifyOnContextLost()
     {
-        if (!mIsManual) 
+        if (!isManuallyLoaded())
         {
             freeInternalResources();
         }
@@ -372,7 +372,7 @@ namespace Ogre {
     
     void GLES2Texture::notifyOnContextReset()
     {
-        if (!mIsManual) 
+        if (!isManuallyLoaded())
         {
             reload();
         }

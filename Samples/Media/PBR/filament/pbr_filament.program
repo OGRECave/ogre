@@ -1,0 +1,197 @@
+shared_params SphericalHarmonicsSky
+{
+    shared_param_named frameUniforms.iblSH float3 [9] 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0
+}
+
+shared_params SphericalHarmonicsEnvironment
+{
+    shared_param_named frameUniforms.iblSH float3 [9] 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0 65504.0
+}
+
+vertex_program PBR_filament_vs_glsl glsl
+{
+    syntax glsl330
+    source pbr_filament.vert.glsl
+    // HAS_DYNAMIC_LIGHTING will also handle HAS_DIRECTIONAL_LIGHTING
+    preprocessor_defines HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,MATERIAL_HAS_NORMAL,HAS_DYNAMIC_LIGHTING,VERTEX_DOMAIN_OBJECT
+
+    default_params
+    {
+        // Only used when HAS_ATTRIBUTE_TANGENTS
+        param_named_auto objectUniforms.worldFromModelMatrix world_matrix
+        // param_named_auto objectUniforms.worldFromModelNormalMatrix normal_matrix
+        // If HAS_SKINNING_OR_MORPHING enabled then we need these
+        // param_named_auto objectUniforms.morphWeights animation_parametric
+        // param_named objectUniforms.morphingEnabled int 0
+        // param_named objectUniforms.skinningEnabled int 0
+        // Defined but not needed by the compiled code
+        // param_named_auto frameUniforms.viewFromWorldMatrix view_matrix
+        // param_named_auto frameUniforms.clipFromViewMatrix projection_matrix
+        // param_named_auto frameUniforms.worldFromViewMatrix inverse_view_matrix
+        // param_named_auto frameUniforms.viewFromClipMatrix inverse_projection_matrix
+        param_named_auto frameUniforms.clipFromWorldMatrix viewproj_matrix
+        // param_named_auto frameUniforms.worldFromClipMatrix inverse_viewproj_matrix
+    }
+}
+
+abstract fragment_program PBR_filament_base_fs_glsl glsl
+{
+    syntax glsl330
+    source pbr_filament.frag.glsl
+    // HAS_DYNAMIC_LIGHTING will also handle HAS_DIRECTIONAL_LIGHTING
+    // preprocessor_defines HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,HAS_BASECOLORMAP,MATERIAL_HAS_NORMAL,HAS_METALROUGHNESSMAP,HAS_OCCLUSIONMAP,HAS_DYNAMIC_LIGHTING,LIGHT_COUNT=8u,MATERIAL_HAS_EMISSIVE,VERTEX_DOMAIN_OBJECT,MATERIAL_CAN_SKIP_LIGHTING
+
+    default_params
+    {
+        // lighting parameters
+        param_named_auto u_lightSpotlightParams spotlight_params_array 8
+        param_named_auto u_lightPositionFalloff light_position_array 8
+        param_named_auto u_lightDirection       light_direction_array 8
+        param_named_auto u_lightColorIntensity  light_diffuse_colour_array 8
+
+        // GL sampler settings
+        param_named      u_BaseColorSampler         int 0
+        param_named      u_OcclusionSampler         int 1
+        // Only used when HAS_ATTRIBUTE_TANGENTS
+        param_named      u_NormalSampler            int 2
+        param_named      u_EmissiveSampler          int 3
+        param_named      u_MetallicRoughnessSampler int 4
+        param_named      light_iblDFG               int 5
+        param_named      light_iblSpecular          int 6
+
+        // Filament spherical harmonics, not used but needed by the shader.
+        // param_named      frameUniforms.iblSH        float27 65504.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+        // x = IBL max mip level (= numMipMaps - 1)
+        // y = IBL resolution
+        param_named      frameUniforms.iblMaxMipLevel       float2 4.0 256.0
+        param_named      frameUniforms.iblLuminance         float 1.0
+        // Only needed when HAS_REFRACTION
+        // param_named_auto frameUniforms.clipFromWorldMatrix  viewproj_matrix
+        // exposure = 1.0 / (pow(2.0, ev100) * 1.2)
+        param_named      frameUniforms.exposure             float 0.0000260416666666666666666
+        // This is only needed when using emissive! i.e. MATERIAL_HAS_EMISSIVE defined.
+        // Computes the camera's EV100 from exposure settings
+        // aperture in f-stops
+        // shutterSpeed in seconds
+        // sensitivity in ISO
+        // ev100 = log2((aperture * aperture) / shutterSpeed * 100.0 / sensitivity);
+        // Aperture: f/16
+        // Shutter speed: 1/125s
+        // ISO: 100
+        param_named      frameUniforms.ev100                float 14.965784284662087043610958288468
+        // param_named      u_anisotropy                       float 0.1
+        param_named_auto frameUniforms.cameraPosition       camera_position
+        shared_params_ref SphericalHarmonicsEnvironment
+    }
+}
+
+
+abstract fragment_program PBR_filament_base_ssao_fs_glsl glsl : PBR_filament_base_fs_glsl
+{
+    // preprocessor_defines += HAS_SSAO,MULTI_BOUNCE_AMBIENT_OCCLUSION=1,SPECULAR_AMBIENT_OCCLUSION=1
+    default_params
+    {
+        param_named      light_ssao                     int 7
+        param_named_auto frameUniforms.viewportWidth    inverse_viewport_width
+        param_named_auto frameUniforms.viewportHeight   inverse_viewport_height
+    }
+}
+
+fragment_program PBR_filament_fs_glsl glsl : PBR_filament_base_ssao_fs_glsl
+{
+    preprocessor_defines MULTI_BOUNCE_AMBIENT_OCCLUSION=1,SPECULAR_AMBIENT_OCCLUSION=1,HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,HAS_BASECOLORMAP,MATERIAL_HAS_NORMAL,HAS_METALROUGHNESSMAP,HAS_OCCLUSIONMAP,HAS_DYNAMIC_LIGHTING,LIGHT_COUNT=8u,MATERIAL_HAS_EMISSIVE,VERTEX_DOMAIN_OBJECT,MATERIAL_CAN_SKIP_LIGHTING
+}
+
+fragment_program PBR_NO_SSAO_filament_fs_glsl glsl : PBR_filament_base_fs_glsl
+{
+    preprocessor_defines MULTI_BOUNCE_AMBIENT_OCCLUSION=1,SPECULAR_AMBIENT_OCCLUSION=1,HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,HAS_BASECOLORMAP,MATERIAL_HAS_NORMAL,HAS_METALROUGHNESSMAP,HAS_OCCLUSIONMAP,HAS_DYNAMIC_LIGHTING,LIGHT_COUNT=8u,MATERIAL_HAS_EMISSIVE,VERTEX_DOMAIN_OBJECT,MATERIAL_CAN_SKIP_LIGHTING
+}
+
+fragment_program PBR_filament_clear_coat_fs_glsl glsl : PBR_filament_base_ssao_fs_glsl
+{
+    preprocessor_defines MATERIAL_HAS_CLEAR_COAT,HAS_SSAO,MULTI_BOUNCE_AMBIENT_OCCLUSION=1,SPECULAR_AMBIENT_OCCLUSION=1,HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,HAS_BASECOLORMAP,MATERIAL_HAS_NORMAL,HAS_METALROUGHNESSMAP,HAS_OCCLUSIONMAP,HAS_DYNAMIC_LIGHTING,LIGHT_COUNT=8u,MATERIAL_HAS_EMISSIVE,VERTEX_DOMAIN_OBJECT,MATERIAL_CAN_SKIP_LIGHTING
+}
+
+fragment_program PBR_filament_clear_coat_ior_change_fs_glsl glsl : PBR_filament_base_ssao_fs_glsl
+{
+    preprocessor_defines CLEAR_COAT_IOR_CHANGE,MATERIAL_HAS_CLEAR_COAT,HAS_SSAO,MULTI_BOUNCE_AMBIENT_OCCLUSION=1,SPECULAR_AMBIENT_OCCLUSION=1,HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,HAS_BASECOLORMAP,MATERIAL_HAS_NORMAL,HAS_METALROUGHNESSMAP,HAS_OCCLUSIONMAP,HAS_DYNAMIC_LIGHTING,LIGHT_COUNT=8u,MATERIAL_HAS_EMISSIVE,VERTEX_DOMAIN_OBJECT,MATERIAL_CAN_SKIP_LIGHTING
+}
+
+fragment_program PBR_filament_cloth_fs_glsl glsl
+{
+    syntax glsl330
+    source pbr_filament.frag.glsl
+    // HAS_DYNAMIC_LIGHTING will also handle HAS_DIRECTIONAL_LIGHTING
+    preprocessor_defines HAS_ATTRIBUTE_TANGENTS,HAS_ATTRIBUTE_COLOR,HAS_ATTRIBUTE_UV0,HAS_ATTRIBUTE_UV1,HAS_BASECOLORMAP,MATERIAL_HAS_NORMAL,HAS_OCCLUSIONMAP,HAS_DYNAMIC_LIGHTING,LIGHT_COUNT=8u,MATERIAL_HAS_EMISSIVE,VERTEX_DOMAIN_OBJECT,SHADING_MODEL_CLOTH,MATERIAL_CAN_SKIP_LIGHTING
+
+    default_params
+    {
+        // lighting parameters
+        param_named_auto u_lightSpotlightParams spotlight_params_array 8
+        param_named_auto u_lightPositionFalloff light_position_array 8
+        param_named_auto u_lightDirection       light_direction_array 8
+        param_named_auto u_lightColorIntensity  light_diffuse_colour_array 8
+
+        // GL sampler settings
+        param_named      u_BaseColorSampler         int 0
+        param_named      u_OcclusionSampler         int 1
+        // Only used when HAS_ATTRIBUTE_TANGENTS
+        param_named      u_NormalSampler            int 2
+        param_named      u_EmissiveSampler          int 3
+        param_named      light_iblDFG               int 4
+        param_named      light_iblSpecular          int 5
+
+        // Filament spherical harmonics, not used but needed by the shader.
+        // param_named      frameUniforms.iblSH        float27 65504.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+        // x = IBL max mip level
+        // y = IBL resolution
+        param_named      frameUniforms.iblMaxMipLevel       float2 7.0 128.0
+        param_named      frameUniforms.iblLuminance         float 1.0
+        // Only needed when HAS_REFRACTION
+        // param_named_auto frameUniforms.clipFromWorldMatrix  viewproj_matrix
+        // exposure = 1.0 / (pow(2.0, ev100) * 1.2)
+        param_named      frameUniforms.exposure             float 0.0000260416666666666666666
+        // This is only needed when using emissive! i.e. MATERIAL_HAS_EMISSIVE defined.
+        // Computes the camera's EV100 from exposure settings
+        // aperture in f-stops
+        // shutterSpeed in seconds
+        // sensitivity in ISO
+        // ev100 = log2((aperture * aperture) / shutterSpeed * 100.0 / sensitivity);
+        // Aperture: f/16
+        // Shutter speed: 1/125s
+        // ISO: 100
+        param_named      frameUniforms.ev100                float 14.965784284662087043610958288468
+        param_named_auto frameUniforms.cameraPosition       camera_position
+        shared_params_ref SphericalHarmonicsEnvironment
+    }
+}
+
+vertex_program PBR_filament_vs unified
+{
+    delegate PBR_filament_vs_glsl
+}
+
+fragment_program PBR_filament_fs unified
+{
+    delegate PBR_filament_fs_glsl
+}
+
+fragment_program PBR_NO_SSAO_filament_fs unified
+{
+    delegate PBR_NO_SSAO_filament_fs_glsl
+}
+
+fragment_program PBR_filament_clear_coat_fs unified
+{
+    delegate PBR_filament_clear_coat_fs_glsl
+}
+
+fragment_program PBR_filament_clear_coat_ior_change_fs unified
+{
+    delegate PBR_filament_clear_coat_ior_change_fs_glsl
+}
+
+fragment_program PBR_filament_cloth_fs unified
+{
+    delegate PBR_filament_fs_cloth_glsl
+}

@@ -1,5 +1,5 @@
+#ifndef OGRE_HLSL
 #ifndef GL_ES
-#version 120
 #ifdef USE_TEX_LOD
 #extension GL_ARB_shader_texture_lod : require  
 #endif
@@ -10,6 +10,10 @@
 #define textureCubeLod textureLodEXT
 precision highp float;
 #endif
+#endif
+
+#include <OgreUnifiedShader.h>
+
 // The MIT License
 // Copyright (c) 2016-2017 Mohamad Moneimne and Contributors
 //
@@ -30,27 +34,27 @@ uniform vec3 u_LightDirection;
 uniform vec3 u_LightColor;
 
 #ifdef USE_IBL
-uniform samplerCube u_DiffuseEnvSampler;
-uniform samplerCube u_SpecularEnvSampler;
-uniform sampler2D u_brdfLUT;
+uniform SAMPLERCUBE(u_DiffuseEnvSampler, 5);
+uniform SAMPLERCUBE(u_SpecularEnvSampler, 6);
+uniform SAMPLER2D(u_brdfLUT, 7);
 #endif
 
 #ifdef HAS_BASECOLORMAP
-uniform sampler2D u_BaseColorSampler;
+uniform SAMPLER2D(u_BaseColorSampler, 0);
 #endif
 #ifdef HAS_NORMALMAP
-uniform sampler2D u_NormalSampler;
+uniform SAMPLER2D(u_NormalSampler, 1);
 uniform float u_NormalScale;
 #endif
 #ifdef HAS_EMISSIVEMAP
-uniform sampler2D u_EmissiveSampler;
+uniform SAMPLER2D(u_EmissiveSampler, 2);
 uniform vec3 u_EmissiveFactor;
 #endif
 #ifdef HAS_METALROUGHNESSMAP
-uniform sampler2D u_MetallicRoughnessSampler;
+uniform SAMPLER2D(u_MetallicRoughnessSampler, 3);
 #endif
 #ifdef HAS_OCCLUSIONMAP
-uniform sampler2D u_OcclusionSampler;
+uniform SAMPLER2D(u_OcclusionSampler, 4);
 uniform float u_OcclusionStrength;
 #endif
 
@@ -63,18 +67,6 @@ uniform vec3 u_Camera;
 uniform vec4 u_ScaleDiffBaseMR;
 uniform vec4 u_ScaleFGDSpec;
 uniform vec4 u_ScaleIBLAmbient;
-
-varying vec3 v_Position;
-
-varying vec2 v_UV;
-
-#ifdef HAS_NORMALS
-#ifdef HAS_TANGENTS
-varying mat3 v_TBN;
-#else
-varying vec3 v_Normal;
-#endif
-#endif
 
 // Encapsulate the various inputs used by the various functions in the shading equation
 // We store values in this struct to simplify the integration of alternative implementations
@@ -95,14 +87,14 @@ struct PBRInfo
     vec3 specularColor;           // color contribution from specular lighting
 };
 
-const float M_PI = 3.141592653589793;
-const float c_MinRoughness = 0.04;
+STATIC const float M_PI = 3.141592653589793;
+STATIC const float c_MinRoughness = 0.04;
 
 vec4 SRGBtoLINEAR(vec4 srgbIn)
 {
     #ifdef MANUAL_SRGB
     #ifdef SRGB_FAST_APPROXIMATION
-    vec3 linOut = pow(srgbIn.xyz,vec3(2.2));
+    vec3 linOut = pow(srgbIn.xyz,vec3(2.2, 2.2, 2.2));
     #else //SRGB_FAST_APPROXIMATION
     vec3 bLess = step(vec3(0.04045),srgbIn.xyz);
     vec3 linOut = mix( srgbIn.xyz/vec3(12.92), pow((srgbIn.xyz+vec3(0.055))/vec3(1.055),vec3(2.4)), bLess );
@@ -115,7 +107,7 @@ vec4 SRGBtoLINEAR(vec4 srgbIn)
 
 // Find the normal for this fragment, pulling either from a predefined normal map
 // or from the interpolated mesh normal and tangent attributes.
-vec3 getNormal()
+vec3 getNormal(mat3 tbn, vec2 v_UV)
 {
     // Retrieve the tangent space matrix
 #ifndef HAS_TANGENTS
@@ -133,14 +125,12 @@ vec3 getNormal()
 
     t = normalize(t - ng * dot(ng, t));
     vec3 b = normalize(cross(ng, t));
-    mat3 tbn = mat3(t, b, ng);
-#else // HAS_TANGENTS
-    mat3 tbn = v_TBN;
+    tbn = mtxFromCols(t, b, ng);
 #endif
 
 #ifdef HAS_NORMALMAP
     vec3 n = texture2D(u_NormalSampler, v_UV).rgb;
-    n = normalize(tbn * ((2.0 * n - 1.0) * vec3(u_NormalScale, u_NormalScale, 1.0)));
+    n = normalize(mul(tbn, ((2.0 * n - 1.0) * vec3(u_NormalScale, u_NormalScale, 1.0))));
 #else
     vec3 n = tbn[2].xyz;
 #endif
@@ -217,7 +207,20 @@ float microfacetDistribution(PBRInfo pbrInputs)
     return roughnessSq / (M_PI * f * f);
 }
 
-void main()
+MAIN_PARAMETERS
+
+IN(vec3 v_Position, TEXCOORD0)
+IN(vec2 v_UV, TEXCOORD1)
+
+#ifdef HAS_NORMALS
+#ifdef HAS_TANGENTS
+IN(mat3 v_TBN, TEXCOORD2)
+#else
+IN(vec3 v_Normal, TEXCOORD2)
+#endif
+#endif
+
+MAIN_DECLARATION
 {
     // Metallic and Roughness material properties are packed together
     // In glTF, these factors can be specified by fixed scalar values
@@ -233,9 +236,12 @@ void main()
 #endif
     perceptualRoughness = clamp(perceptualRoughness, c_MinRoughness, 1.0);
     metallic = clamp(metallic, 0.0, 1.0);
+
+    PBRInfo pbrInputs;
+
     // Roughness is authored as perceptual roughness; as is convention,
     // convert to material roughness by squaring the perceptual roughness [2].
-    float alphaRoughness = perceptualRoughness * perceptualRoughness;
+    pbrInputs.alphaRoughness = perceptualRoughness * perceptualRoughness;
 
     // The albedo may be defined from a base texture or a flat color
 #ifdef HAS_BASECOLORMAP
@@ -244,8 +250,8 @@ void main()
     vec4 baseColor = u_BaseColorFactor;
 #endif
 
-    vec3 f0 = vec3(0.04);
-    vec3 diffuseColor = baseColor.rgb * (vec3(1.0) - f0);
+    vec3 f0 = vec3(0.04, 0.04, 0.04);
+    vec3 diffuseColor = baseColor.rgb * (vec3(1.0, 1.0, 1.0) - f0);
     diffuseColor *= 1.0 - metallic;
     vec3 specularColor = mix(f0, baseColor.rgb, metallic);
 
@@ -255,35 +261,31 @@ void main()
     // For typical incident reflectance range (between 4% to 100%) set the grazing reflectance to 100% for typical fresnel effect.
     // For very low reflectance range on highly diffuse objects (below 4%), incrementally reduce grazing reflecance to 0%.
     float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
-    vec3 specularEnvironmentR0 = specularColor.rgb;
-    vec3 specularEnvironmentR90 = vec3(1.0, 1.0, 1.0) * reflectance90;
 
-    vec3 n = getNormal();                             // normal at surface point
+    pbrInputs.reflectance0 = specularColor.rgb;
+    pbrInputs.reflectance90 = vec3(1.0, 1.0, 1.0) * reflectance90;
+
+    pbrInputs.perceptualRoughness = perceptualRoughness;
+    pbrInputs.metalness = metallic;
+    pbrInputs.diffuseColor = diffuseColor;
+    pbrInputs.specularColor = specularColor;
+
+#ifndef HAS_TANGENTS
+    mat3 tbn;
+    vec3 n = getNormal(tbn, v_UV);                             // normal at surface point
+#else
+    vec3 n = getNormal(v_TBN, v_UV);
+#endif
     vec3 v = normalize(u_Camera - v_Position);        // Vector from surface point to camera
     vec3 l = normalize(u_LightDirection);             // Vector from surface point to light
     vec3 h = normalize(l+v);                          // Half vector between both l and v
     vec3 reflection = -normalize(reflect(v, n));
 
-    float NdotL = clamp(dot(n, l), 0.001, 1.0);
-    float NdotV = abs(dot(n, v)) + 0.001;
-    float NdotH = clamp(dot(n, h), 0.0, 1.0);
-    float LdotH = clamp(dot(l, h), 0.0, 1.0);
-    float VdotH = clamp(dot(v, h), 0.0, 1.0);
-
-    PBRInfo pbrInputs = PBRInfo(
-        NdotL,
-        NdotV,
-        NdotH,
-        LdotH,
-        VdotH,
-        perceptualRoughness,
-        metallic,
-        specularEnvironmentR0,
-        specularEnvironmentR90,
-        alphaRoughness,
-        diffuseColor,
-        specularColor
-    );
+    pbrInputs.NdotL = clamp(dot(n, l), 0.001, 1.0);
+    pbrInputs.NdotV = abs(dot(n, v)) + 0.001;
+    pbrInputs.NdotH = clamp(dot(n, h), 0.0, 1.0);
+    pbrInputs.LdotH = clamp(dot(l, h), 0.0, 1.0);
+    pbrInputs.VdotH = clamp(dot(v, h), 0.0, 1.0);
 
     // Calculate the shading terms for the microfacet specular shading model
     vec3 F = specularReflection(pbrInputs);
@@ -292,8 +294,8 @@ void main()
 
     // Calculation of analytical lighting contribution
     vec3 diffuseContrib = (1.0 - F) * diffuse(pbrInputs);
-    vec3 specContrib = F * G * D / (4.0 * NdotL * NdotV);
-    vec3 color = NdotL * u_LightColor * (diffuseContrib + specContrib);
+    vec3 specContrib = F * G * D / (4.0 * pbrInputs.NdotL * pbrInputs.NdotV);
+    vec3 color = pbrInputs.NdotL * u_LightColor * (diffuseContrib + specContrib);
 
     // Calculate lighting contribution from image based lighting source (IBL)
 #ifdef USE_IBL
@@ -311,17 +313,5 @@ void main()
     color += emissive;
 #endif
 
-    // This section uses mix to override final color for reference app visualization
-    // of various parameters in the lighting equation.
-    color = mix(color, F, u_ScaleFGDSpec.x);
-    color = mix(color, vec3(G), u_ScaleFGDSpec.y);
-    color = mix(color, vec3(D), u_ScaleFGDSpec.z);
-    color = mix(color, specContrib, u_ScaleFGDSpec.w);
-
-    color = mix(color, diffuseContrib, u_ScaleDiffBaseMR.x);
-    color = mix(color, baseColor.rgb, u_ScaleDiffBaseMR.y);
-    color = mix(color, vec3(metallic), u_ScaleDiffBaseMR.z);
-    color = mix(color, vec3(perceptualRoughness), u_ScaleDiffBaseMR.w);
-
-    gl_FragColor = vec4(pow(color,vec3(1.0/2.2)), baseColor.a);
+    gl_FragColor = vec4(pow(color,vec3(1.0/2.2, 1.0/2.2, 1.0/2.2)), baseColor.a);
 }

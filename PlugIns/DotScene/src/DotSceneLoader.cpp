@@ -12,6 +12,12 @@
 
 using namespace Ogre;
 
+#ifndef OGRE_BUILD_COMPONENT_TERRAIN
+namespace Ogre {
+    class TerrainGroup {}; // appease unique_ptr destructor
+}
+#endif
+
 namespace
 {
 String getAttrib(const pugi::xml_node& XMLNode, const String& attrib, const String& defaultValue = "")
@@ -103,17 +109,25 @@ ColourValue parseColour(pugi::xml_node& XMLNode)
                        StringConverter::parseReal(XMLNode.attribute("b").value()),
                        XMLNode.attribute("a") != NULL ? StringConverter::parseReal(XMLNode.attribute("a").value()) : 1);
 }
+
+struct DotSceneCodec : public Codec
+{
+    String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return ""; }
+    String getType() const override { return "scene"; }
+    void decode(const DataStreamPtr& stream, const Any& output) const override
+    {
+        DataStreamPtr _stream(stream);
+        DotSceneLoader loader;
+        loader.load(_stream, ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
+                    any_cast<SceneNode*>(output));
+    }
+};
+
 } // namespace
 
-DotSceneLoader::DotSceneLoader() : mSceneMgr(0), mBackgroundColour(ColourValue::Black)
-{
-    SceneLoaderManager::getSingleton().registerSceneLoader("DotScene", {".scene"}, this);
-}
+DotSceneLoader::DotSceneLoader() : mSceneMgr(0), mBackgroundColour(ColourValue::Black) {}
 
-DotSceneLoader::~DotSceneLoader()
-{
-    SceneLoaderManager::getSingleton().unregisterSceneLoader("DotScene");
-}
+DotSceneLoader::~DotSceneLoader() {}
 
 void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneNode* rootNode)
 {
@@ -779,11 +793,13 @@ const Ogre::String& DotScenePlugin::getName() const {
 }
 
 void DotScenePlugin::initialise() {
-    mDotSceneLoader = new Ogre::DotSceneLoader();
+    mCodec = new DotSceneCodec();
+    Codec::registerCodec(mCodec);
 }
 
 void DotScenePlugin::shutdown() {
-    delete mDotSceneLoader;
+    Codec::unregisterCodec(mCodec);
+    delete mCodec;
 }
 
 #ifndef OGRE_STATIC_LIB

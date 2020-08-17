@@ -1,5 +1,3 @@
-find_package(SWIG 3.0.8)
-
 if(NOT PYTHONLIBS_FOUND OR NOT SWIG_FOUND)
     set(OGRE_BUILD_COMPONENT_PYTHON OFF CACHE BOOL "" FORCE)
     message(WARNING "Python Component disabled because SWIG or Python was not found")
@@ -20,7 +18,7 @@ if (APPLE AND NOT ANDROID)
 endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
-    include_directories("${PROJECT_SOURCE_DIR}/Components/Overlay/src/imgui")
+    include_directories("${IMGUI_DIR}")
     list(APPEND CMAKE_SWIG_FLAGS -DHAVE_IMGUI -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 endif()
 

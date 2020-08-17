@@ -162,10 +162,7 @@ namespace Ogre
         }
         else
         {
-            mDirtyBox.left = static_cast<uint32>(rect.left);
-            mDirtyBox.right = static_cast<uint32>(rect.right);
-            mDirtyBox.top = static_cast<uint32>(rect.top);
-            mDirtyBox.bottom = static_cast<uint32>(rect.bottom);
+            mDirtyBox = Box(rect);
             mDirty = true;
         }
     }

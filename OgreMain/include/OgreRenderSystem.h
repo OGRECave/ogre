@@ -91,6 +91,55 @@ namespace Ogre
         SOP_INVERT
     };
 
+    /** Describes the stencil buffer operation
+
+    The stencil buffer is used to mask out pixels in the render target, allowing
+    you to do effects like mirrors, cut-outs, stencil shadows and more. Each of
+    your batches of rendering is likely to ignore the stencil buffer,
+    update it with new values, or apply it to mask the output of the render.
+
+    The stencil test is:
+    $$(referenceValue\\,\\&\\,compareMask)\\;compareOp\\;(stencilBuffer\\,\\&\\,compareMask)$$
+
+    The result of this will cause one of 3 actions depending on whether
+    1. the stencil test fails
+    2. the stencil test succeeds but the depth buffer check fails
+    3. both depth buffer check and stencil test pass
+    */
+    struct _OgreExport StencilState
+    {
+        /// Comparison operator for the stencil test
+        CompareFunction compareOp;
+        /// The action to perform when the stencil check fails
+        StencilOperation stencilFailOp;
+        /// The action to perform when the stencil check passes, but the depth buffer check fails
+        StencilOperation depthFailOp;
+        /// The action to take when both the stencil and depth check pass
+        StencilOperation depthStencilPassOp;
+
+        /// The reference value used in the stencil comparison
+        uint32 referenceValue;
+        ///  The bitmask applied to both the stencil value and the reference value before comparison
+        uint32 compareMask;
+        /** The bitmask the controls which bits from stencilRefValue will be written to stencil buffer
+        (valid for operations such as SOP_REPLACE) */
+        uint32 writeMask;
+
+        /// Turns stencil buffer checking on or off
+        bool enabled : 1;
+        /** If set to true, then if you render both back and front faces
+        (you'll have to turn off culling) then these parameters will apply for front faces,
+        and the inverse of them will happen for back faces (keep remains the same)
+         */
+        bool twoSidedOperation : 1;
+
+        StencilState()
+            : compareOp(CMPF_LESS_EQUAL), stencilFailOp(SOP_KEEP), depthFailOp(SOP_KEEP),
+              depthStencilPassOp(SOP_KEEP), referenceValue(0), compareMask(0xFFFFFFFF),
+              writeMask(0xFFFFFFFF), enabled(false), twoSidedOperation(false)
+        {
+        }
+    };
 
     /** Defines the functionality of a 3D API
     @remarks
@@ -267,9 +316,16 @@ namespace Ogre
         }
 
         /// @deprecated use setColourBlendState
-        OGRE_DEPRECATED void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD)
+        OGRE_DEPRECATED void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
+                                               SceneBlendOperation op = SBO_ADD)
         {
-            _setSeparateSceneBlending(sourceFactor, destFactor, sourceFactor, destFactor, op, op);
+            mCurrentBlend.sourceFactor = sourceFactor;
+            mCurrentBlend.destFactor = destFactor;
+            mCurrentBlend.sourceFactorAlpha = sourceFactor;
+            mCurrentBlend.destFactorAlpha = destFactor;
+            mCurrentBlend.operation = op;
+            mCurrentBlend.alphaOperation = op;
+            setColourBlendState(mCurrentBlend);
         }
 
         virtual void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 variabilityMask) {}
@@ -353,24 +409,10 @@ namespace Ogre
         | maxDepthBufferSize | Positive integer (usually 0, 16, 24) | 16 | EGL_DEPTH_SIZE | Android Specific |
         */
         virtual RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
-            bool fullScreen, const NameValuePairList *miscParams = 0) = 0;
+            bool fullScreen, const NameValuePairList *miscParams = 0);
 
-        /** Creates multiple rendering windows.     
-        @param
-        renderWindowDescriptions Array of structures containing the descriptions of each render window.
-        The structure's members are the same as the parameters of _createRenderWindow:
-        * name
-        * width
-        * height
-        * fullScreen
-        * miscParams
-        See _createRenderWindow for details about each member.      
-        @param
-        createdWindows This array will hold the created render windows.
-        @return
-        true on success.        
-        */
-        virtual bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+        /// @deprecated call _createRenderWindow multiple times
+        OGRE_DEPRECATED bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
             RenderWindowList& createdWindows);
 
         
@@ -553,14 +595,14 @@ namespace Ogre
         virtual void _setTextureBlendMode(size_t unit, const LayerBlendModeEx& bm) {}
 
         /// @deprecated use _setSampler
-        virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
+        OGRE_DEPRECATED virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) {}
 
         /// @deprecated use _setSampler
         OGRE_DEPRECATED virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
             FilterOptions magFilter, FilterOptions mipFilter);
 
         /// @deprecated use _setSampler
-        OGRE_DEPRECATED virtual void _setTextureAddressingMode(size_t unit, const Sampler::UVWAddressingMode& uvw) = 0;
+        OGRE_DEPRECATED virtual void _setTextureAddressingMode(size_t unit, const Sampler::UVWAddressingMode& uvw) {}
 
         /** Sets the texture coordinate transformation matrix for a texture unit.
         @param unit Texture unit to affect
@@ -570,16 +612,22 @@ namespace Ogre
         virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) {}
 
         /// Sets the global blending factors for combining subsequent renders with the existing frame contents.
-        virtual void setColourBlendState(const ColourBlendState& state)
-        {
-            _setSeparateSceneBlending(state.sourceFactor, state.destFactor, state.sourceFactorAlpha,
-                                      state.destFactorAlpha, state.operation, state.alphaOperation);
-            _setColourBufferWriteEnabled(state.writeR, state.writeG, state.writeB, state.writeA);
-        }
+        virtual void setColourBlendState(const ColourBlendState& state) = 0;
 
         /// @deprecated use setColourBlendState
-        virtual void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha,
-            SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD) {}
+        OGRE_DEPRECATED void
+        _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
+                                  SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
+                                  SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD)
+        {
+            mCurrentBlend.sourceFactor = sourceFactor;
+            mCurrentBlend.destFactor = destFactor;
+            mCurrentBlend.sourceFactorAlpha = sourceFactorAlpha;
+            mCurrentBlend.destFactorAlpha = destFactorAlpha;
+            mCurrentBlend.operation = op;
+            mCurrentBlend.alphaOperation = alphaOp;
+            setColourBlendState(mCurrentBlend);
+        }
 
         /** Sets the global alpha rejection approach for future renders.
         By default images are rendered regardless of texture alpha. This method lets you change that.
@@ -687,7 +735,14 @@ namespace Ogre
         /// @deprecated use _setDepthBufferParams
         OGRE_DEPRECATED virtual void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL) {}
         /// @deprecated use setColourBlendState
-        virtual void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha) {}
+        OGRE_DEPRECATED void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
+        {
+            mCurrentBlend.writeR = red;
+            mCurrentBlend.writeG = green;
+            mCurrentBlend.writeB = blue;
+            mCurrentBlend.writeA = alpha;
+            setColourBlendState(mCurrentBlend);
+        }
         /** Sets the depth bias, NB you should use the Material version of this. 
         @remarks
         When polygons are coplanar, you can get problems with 'depth fighting' where
@@ -721,19 +776,13 @@ namespace Ogre
         /** Reports the number of vertices passed to the renderer since the last _beginGeometryCount call. */
         virtual unsigned int _getVertexCount(void) const;
 
-        /** Generates a packed data version of the passed in ColourValue suitable for
-        use as with this RenderSystem.
-        @remarks
-        Since different render systems have different colour data formats (eg
-        RGBA for GL, ARGB for D3D) this method allows you to use 1 method for all.
-        @param colour The colour to convert
-        @param pDest Pointer to location to put the result.
-        */
-        void convertColourValue(const ColourValue& colour, uint32* pDest);
-        /** Get the native VertexElementType for a compact 32-bit colour value
-        for this rendersystem.
-        */
-        virtual VertexElementType getColourVertexElementType(void) const = 0;
+        /// @deprecated use ColourValue::getAsABGR()
+        OGRE_DEPRECATED void convertColourValue(const ColourValue& colour, uint32* pDest);
+        /// @deprecated assume VET_UBYTE4_NORM
+        OGRE_DEPRECATED virtual VertexElementType getColourVertexElementType(void) const
+        {
+            return VET_COLOUR_ABGR;
+        }
 
         /** Converts a uniform projection matrix to suitable for this render system.
         @remarks
@@ -756,43 +805,16 @@ namespace Ogre
         virtual void setStencilCheckEnabled(bool enabled) = 0;
 
         /** This method allows you to set all the stencil buffer parameters in one call.
-        @remarks
-        The stencil buffer is used to mask out pixels in the render target, allowing
-        you to do effects like mirrors, cut-outs, stencil shadows and more. Each of
-        your batches of rendering is likely to ignore the stencil buffer, 
-        update it with new values, or apply it to mask the output of the render.
-        The stencil test is:<PRE>
-        (Reference Value & Mask) CompareFunction (Stencil Buffer Value & Mask)</PRE>
-        The result of this will cause one of 3 actions depending on whether the test fails,
-        succeeds but with the depth buffer check still failing, or succeeds with the
-        depth buffer check passing too.
-        @par
+
         Unlike other render states, stencilling is left for the application to turn
         on and off when it requires. This is because you are likely to want to change
         parameters between batches of arbitrary objects and control the ordering yourself.
-        In order to batch things this way, you'll want to use OGRE's separate render queue
-        groups (see RenderQueue) and register a RenderQueueListener to get notifications
+        In order to batch things this way, you'll want to use OGRE's Compositor stencil poass
+        or separate render queue groups and register a RenderQueueListener to get notifications
         between batches.
-        @par
-        There are individual state change methods for each of the parameters set using 
-        this method. 
-        Note that the default values in this method represent the defaults at system 
-        start up too.
-        @param func The comparison function applied.
-        @param refValue The reference value used in the comparison
-        @param compareMask The bitmask applied to both the stencil value and the reference value 
-        before comparison
-        @param writeMask The bitmask the controls which bits from refValue will be written to 
-        stencil buffer (valid for operations such as SOP_REPLACE).
-        the stencil
-        @param stencilFailOp The action to perform when the stencil check fails
-        @param depthFailOp The action to perform when the stencil check passes, but the
-        depth buffer check still fails
-        @param passOp The action to take when both the stencil and depth check pass.
-        @param twoSidedOperation If set to true, then if you render both back and front faces 
-        (you'll have to turn off culling) then these parameters will apply for front faces, 
-        and the inverse of them will happen for back faces (keep remains the same).
-        @param readBackAsTexture D3D11 specific
+
+        @see StencilState
+        @see RenderQueue
         */
         virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
             uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
@@ -801,6 +823,17 @@ namespace Ogre
             StencilOperation passOp = SOP_KEEP, 
             bool twoSidedOperation = false,
             bool readBackAsTexture = false) = 0;
+
+        /// @overload
+        void setStencilState(const StencilState& state)
+        {
+            setStencilCheckEnabled(state.enabled);
+            if (!state.enabled)
+                return;
+            setStencilBufferParams(state.compareOp, state.referenceValue, state.compareMask,
+                                   state.writeMask, state.stencilFailOp, state.depthFailOp,
+                                   state.depthStencilPassOp, state.twoSidedOperation);
+        }
 
         /** Sets whether or not normals are to be automatically normalised.
         @remarks
@@ -1258,6 +1291,7 @@ namespace Ogre
 
         virtual void initConfigOptions();
 
+        ColourBlendState mCurrentBlend;
         GpuProgramParametersSharedPtr mFixedFunctionParams;
 
         void initFixedFunctionParams();

@@ -1,0 +1,106 @@
+sampler PBRSampler
+{
+    filtering anisotropic
+    max_anisotropy 8
+}
+
+sampler PBRLUTSampler
+{
+    filtering none
+    tex_address_mode clamp
+}
+
+sampler PBRIBLSampler
+{
+    tex_address_mode clamp
+    filtering trilinear
+}
+
+sampler PBRSSAOSampler
+{
+    tex_address_mode clamp
+    filtering none
+}
+
+abstract material Filament
+{
+    set $Albedo white.png
+    set $AmbientOcclusion white.png
+    set $Normal normal_disabled.png
+    set $Emissive black.png
+    set $MetalRoughness white.png
+    set $BRDFLUT "DFG_Multiscatter_Cloth_LUT.dds 2d 0 PF_FLOAT16_RGB"
+    set $IBL_SPECULAR specular.jpg
+
+    technique
+    {
+        pass
+        {
+            // These are safe to override.
+            texture_unit Albedo
+            {
+                texture $Albedo
+                sampler_ref PBRSampler
+            }
+            texture_unit AmbientOcclusion
+            {
+                texture $AmbientOcclusion
+                tex_coord_set 1
+                sampler_ref PBRSampler
+            }
+            texture_unit Normal
+            {
+                texture $Normal
+                sampler_ref PBRSampler
+            }
+            texture_unit Emissive
+            {
+                texture $Emissive
+                sampler_ref PBRSampler
+            }
+            texture_unit MetalRoughness
+            {
+                texture $MetalRoughness
+                sampler_ref PBRSampler
+            }
+            // You should not override these.
+            texture_unit BRDFLUT
+            {
+                texture $BRDFLUT
+                sampler_ref PBRLUTSampler
+            }
+            texture_unit IBL_SPECULAR
+            {
+                texture $IBL_SPECULAR cubic
+                sampler_ref PBRIBLSampler
+            }
+            texture_unit SSAO
+            {
+                texture $AmbientOcclusion
+                tex_coord_set 1
+                sampler_ref PBRSampler
+            }
+            /*
+            texture_unit SSAO
+            {
+                content_type compositor SSAO/GBuffer blurred_occlusion 0
+                sampler_ref PBRSSAOSampler
+            }
+            */
+
+            vertex_program_ref PBR_filament_vs
+            {
+            }
+
+            fragment_program_ref PBR_filament_fs
+            {
+                // PBR parameters
+                param_named      u_BaseColorFactor          float4 1 1 1 1
+                param_named      u_NormalScale              float 1
+                param_named      u_EmissiveFactor           float3 1 1 1
+                param_named      u_MetallicRoughnessValues  float2 1 1
+                param_named      u_OcclusionStrength        float 1
+            }
+        }
+    }
+}

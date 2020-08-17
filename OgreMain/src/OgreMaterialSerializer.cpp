@@ -862,12 +862,14 @@ namespace Ogre
             // Fire write begin event.
             fireTextureUnitStateEvent(MSE_WRITE_BEGIN, skipWriting, pTex);
 
+            OGRE_IGNORE_DEPRECATED_BEGIN
             // texture_alias
             if (!pTex->getTextureNameAlias().empty() && pTex->getTextureNameAlias() != pTex->getName())
             {
                 writeAttribute(4, "texture_alias");
                 writeValue(quoteWord(pTex->getTextureNameAlias()));
             }
+            OGRE_IGNORE_DEPRECATED_END
 
             //texture name
             if (pTex->getNumFrames() == 1 && !pTex->getTextureName().empty())
@@ -882,6 +884,9 @@ namespace Ogre
                     break;
                 case TEX_TYPE_2D:
                     // nothing, this is the default
+                    break;
+                case TEX_TYPE_2D_ARRAY:
+                    writeValue("2darray");
                     break;
                 case TEX_TYPE_3D:
                     writeValue("3d");

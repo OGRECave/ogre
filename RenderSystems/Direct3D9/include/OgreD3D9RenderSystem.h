@@ -161,7 +161,7 @@ namespace Ogre
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
 
-        void convertVertexShaderCaps(RenderSystemCapabilities* rsc) const;
+        void convertVertexShaderCaps(RenderSystemCapabilities* rsc);
         void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
         bool checkVertexTextureFormats(D3D9RenderWindow* renderWindow) const;
         void detachRenderTargetImpl(const String& name);
@@ -210,10 +210,6 @@ namespace Ogre
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0);
         
-        /// @copydoc RenderSystem::_createRenderWindows
-        bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
-            RenderWindowList& createdWindows);
-
         /// @copydoc RenderSystem::_createDepthBufferFor
         DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
 
@@ -292,7 +288,6 @@ namespace Ogre
         void _setTextureBlendMode( size_t unit, const LayerBlendModeEx& bm );
         void _setTextureAddressingMode(size_t stage, const Sampler::UVWAddressingMode& uvw);
         void _setTextureMatrix( size_t unit, const Matrix4 &xform );
-        void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         void _setViewport( Viewport *vp );      
         void _beginFrame();
@@ -302,7 +297,7 @@ namespace Ogre
         void _setCullingMode( CullingMode mode );
         void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
         void _setDepthBufferCheckEnabled( bool enabled = true );
-        void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
+        void setColourBlendState(const ColourBlendState& state);
         void _setDepthBufferWriteEnabled(bool enabled = true);
         void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );
         void _setDepthBias(float constantBias, float slopeScaleBias);

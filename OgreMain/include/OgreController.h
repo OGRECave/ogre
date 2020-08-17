@@ -37,7 +37,7 @@ namespace Ogre {
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup General
+    /** \addtogroup Animation
     *  @{
     */
     

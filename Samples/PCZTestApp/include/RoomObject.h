@@ -1,17 +1,16 @@
-//
-//  Creates a "test" room (& building) for the PCZSceneManager.  The box-shaped room
-//  can have "doorways" (rectangular openings) in any of the 6 walls, but
-//  each doorway must have a separate portal object created for it (not
-//  done in this class).
-//
-//  Filename : RoomObject.h
-
 #ifndef _ROOM_OBJECT_H_
 #define _ROOM_OBJECT_H_
 
 #include "OgreSceneNode.h"
 #include "OgrePCZSceneManager.h"
+#include <OgrePCZSceneNode.h>
 
+/**
+  Creates a "test" room (& building) for the PCZSceneManager.  The box-shaped room
+  can have "doorways" (rectangular openings) in any of the 6 walls, but
+  each doorway must have a separate portal object created for it (not
+  done in this class).
+ */
 class RoomObject
 {
     enum RoomWalls

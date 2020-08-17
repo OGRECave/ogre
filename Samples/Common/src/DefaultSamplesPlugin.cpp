@@ -38,6 +38,7 @@
 #include "Compositor.h"
 #include "Compute.h"
 #include "CubeMapping.h"
+#include "CSMShadows.h"
 #include "DeferredShadingDemo.h"
 #include "Dot3Bump.h"
 #include "DualQuaternion.h"
@@ -63,6 +64,9 @@
 #include "OceanDemo.h"
 #include "ParticleFX.h"
 #include "ParticleGS.h"
+#ifdef HAVE_PCZ_PLUGIN
+    #include "PCZTestApp.h"
+#endif
 #include "PBR.h"
 #include "PNTrianglesTessellation.h"
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
@@ -98,6 +102,7 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_BezierPatch);
     addSample(new Sample_CameraTrack);
     addSample(new Sample_Character);
+    addSample(new CSMShadows);
 #if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
     addSample(new Sample_DynTex);
     addSample(new Sample_FacialAnimation);
@@ -121,6 +126,9 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_LightShafts);
     addSample(new Sample_MeshLod);
     addSample(new Sample_ParticleFX);
+#ifdef HAVE_PCZ_PLUGIN
+    addSample(new Sample_PCZTest);
+#endif
     addSample(new Sample_ParticleGS);
     addSample(new Sample_Smoke);
 #endif // OGRE_PLATFORM_WINRT

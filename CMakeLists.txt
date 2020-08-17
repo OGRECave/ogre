@@ -58,7 +58,7 @@ if (APPLE AND NOT ANDROID)
   add_definitions(-D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=0)
 endif ()
 
-project(OGRE VERSION 1.12.6)
+project(OGRE VERSION 1.12.9)
 
 # extra version info
 set(OGRE_VERSION_SUFFIX "")
@@ -206,20 +206,8 @@ else()
   test_big_endian(OGRE_TEST_BIG_ENDIAN)
 endif()
 
-# Add OgreMain include path
-if (APPLE_IOS)
-  # Set static early for proper dependency detection
-  set(OGRE_STATIC TRUE)
-endif()
-
 # definitions for samples
 set(OGRE_LIBRARIES OgreMain)
-set(OGRE_MeshLodGenerator_LIBRARIES OgreMeshLodGenerator)
-set(OGRE_Paging_LIBRARIES OgrePaging)
-set(OGRE_Terrain_LIBRARIES OgreTerrain)
-set(OGRE_Volume_LIBRARIES OgreVolume)
-set(OGRE_Plugin_PCZSceneManager_LIBRARIES Plugin_PCZSceneManager)
-set(OGRE_Plugin_OctreeZone_LIBRARIES Plugin_OctreeZone)
 
 # Specify build paths
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
@@ -242,6 +230,7 @@ if (APPLE_IOS)
   set(XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
   set(XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
+  set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
 elseif (ANDROID)
@@ -251,6 +240,7 @@ elseif (ANDROID)
   option(OGRE_BUILD_ANDROID_JNI_SAMPLE "Enable JNI Sample" FALSE)
 
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for Android" FORCE)
+  set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
 
   set(OGRE_BUILD_PLUGIN_PCZ FALSE CACHE BOOL "Disable pcz on Android" FORCE)
   set(OGRE_BUILD_TOOLS FALSE CACHE BOOL "Disable tools on Android" FORCE)
@@ -296,17 +286,6 @@ if(OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
   set(OGRE_CONFIG_ENABLE_MESHLOD TRUE CACHE BOOL "Forcing Mesh Lod" FORCE)
 endif()
 
-# Enable the PVRTC codec if OpenGL ES is being built
-if(OGRE_BUILD_RENDERSYSTEM_GLES2)
-  set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
-  set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL ES" FORCE)
-endif()
-
-# Enable the ETC codec if OpenGL 3+ is being built
-if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-  set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL 3+" FORCE)
-endif()
-
 # Find dependencies
 include(Dependencies)
 
@@ -316,7 +295,7 @@ include(Dependencies)
 
 # Customise what to build
 option(OGRE_STATIC "Static build" FALSE)
-cmake_dependent_option(OGRE_ENABLE_PRECOMPILED_HEADERS "Use precompiled headers to speed up build" TRUE "NOT MINGW" FALSE)
+cmake_dependent_option(OGRE_ENABLE_PRECOMPILED_HEADERS "Use precompiled headers to speed up build" TRUE "NOT MINGW; NOT EMSCRIPTEN" FALSE)
 set(OGRE_RESOURCEMANAGER_STRICT "2" CACHE STRING 
   "Make ResourceManager strict for faster operation. Possible values:
   0 - OFF search in all groups twice - for case sensitive and insensitive lookup [DEPRECATED]
@@ -332,6 +311,8 @@ cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSys
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL3PLUS "Build OpenGL 3+ RenderSystem" TRUE "OPENGL_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT APPLE_IOS;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_METAL "Build Metal RenderSystem" FALSE "APPLE" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLUGIN_ASSIMP "Build Open Asset Import plugin" TRUE "ASSIMP_FOUND" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)
@@ -346,17 +327,12 @@ cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND;NOT
 cmake_dependent_option(OGRE_BUILD_COMPONENT_OVERLAY "Build Overlay component" TRUE "FREETYPE_FOUND" FALSE)
 
 cmake_dependent_option(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI "Include dear imgui in Overlays" TRUE "OGRE_BUILD_COMPONENT_OVERLAY" FALSE)
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/Components/Overlay/src/imgui")
-    set(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI FALSE CACHE BOOL "imgui not found" FORCE)
-endif()
 
 option(OGRE_BUILD_COMPONENT_HLMS "Build HLMS component" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_BITES "Build OgreBites component" TRUE "OGRE_BUILD_COMPONENT_OVERLAY" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PYTHON "Build Python bindings" TRUE "NOT OGRE_STATIC" FALSE)
-if (NOT EMSCRIPTEN)
-  option(OGRE_BUILD_COMPONENT_JAVA "Build Java (JNI) bindings" TRUE)
-endif()
-cmake_dependent_option(OGRE_BUILD_COMPONENT_CSHARP "Build Csharp bindings" TRUE "NOT ANDROID" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_JAVA "Build Java (JNI) bindings" TRUE "NOT OGRE_STATIC OR ANDROID" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_CSHARP "Build Csharp bindings" TRUE "NOT OGRE_STATIC" FALSE)
 option(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM "Build RTShader System component" TRUE)
 cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_SHADERS "Build RTShader System FFP shaders" TRUE "OGRE_BUILD_COMPONENT_RTSHADERSYSTEM" FALSE)
 
@@ -390,7 +366,7 @@ option(OGRE_CONFIG_ENABLE_MESHLOD "Enable Mesh Lod." TRUE)
 option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
 option(OGRE_CONFIG_ENABLE_ETC "Build ETC codec." TRUE)
-option(OGRE_CONFIG_ENABLE_ASTC "Build ASTC codec." FALSE)
+option(OGRE_CONFIG_ENABLE_ASTC "Build ASTC codec." TRUE)
 option(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO "Enable stereoscopic 3D support" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you disable this option, you cannot use ZIP archives resource locations. The samples won't work." TRUE "ZZip_FOUND" FALSE)
 option(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE "Include Viewport orientation mode support." FALSE)
@@ -422,9 +398,9 @@ endif ()
 # determine threading options
 include(PrepareThreadingOptions)
 
-# For Visual studio enable project folders by default.
+# Enable project folders by default if the IDE supportes them
 # Hide option from other compilers.
-if (MSVC)
+if (MSVC OR CMAKE_GENERATOR MATCHES Xcode)
 	option(OGRE_PROJECT_FOLDERS "Organize project into project folders." TRUE)
 endif ()
 

@@ -35,11 +35,13 @@
 
 #include "OgreFileSystemLayer.h"
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #   include "OgreRTShaderSystem.h"
 #endif //INCLUDE_RTSHADER_SYSTEM
 
 #include "OgreInput.h"
+#include "OgreTrays.h"
+#include "OgreCameraMan.h"
 
 namespace OgreBites
 {
@@ -49,7 +51,7 @@ namespace OgreBites
     | Base class responsible for everything specific to one sample.
     | Designed to be subclassed for each sample.
     =============================================================================*/
-    class Sample : public InputListener, public Ogre::GeneralAllocatedObject
+    class Sample : public InputListener, public TrayListener, public Ogre::GeneralAllocatedObject
     {
     public:
         /*=============================================================================
@@ -57,18 +59,13 @@ namespace OgreBites
         =============================================================================*/
         struct Comparer
         {
-            bool operator() (const Sample* a, const Sample* b) const
+            bool operator()(const Sample* a, const Sample* b) const
             {
-                auto aTitle = a->getInfo().find("Title");
-                auto bTitle = b->getInfo().find("Title");
-                
-                if (aTitle != a->getInfo().end() && bTitle != b->getInfo().end())
-                    return aTitle->second.compare(bTitle->second) < 0;
-                else return false;
+                return a->getInfo().at("Title") < b->getInfo().at("Title");
             }
         };
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Sample() : mShaderGenerator(0)
 #else
         Sample()
@@ -81,8 +78,19 @@ namespace OgreBites
             mResourcesLoaded = false;
             mContentSetup = false;
 
+            mCamera = 0;
+            mCameraNode = 0;
+            mViewport = 0;
+
             mFSLayer = 0;
             mOverlaySystem = 0;
+
+            // so we don't have to worry about checking if these keys exist later
+            mInfo["Title"] = "Untitled";
+            mInfo["Description"] = "";
+            mInfo["Category"] = "Unsorted";
+            mInfo["Thumbnail"] = "thumb_error.png";
+            mInfo["Help"] = "";
         }
 
         virtual ~Sample() {}
@@ -103,19 +111,43 @@ namespace OgreBites
         | If this sample requires specific plugins to run, this method will be
         | used to return their names.
         -----------------------------------------------------------------------------*/
-        virtual Ogre::StringVector getRequiredPlugins()
+        virtual Ogre::StringVector getRequiredPlugins() { return Ogre::StringVector(); }
+
+        Ogre::SceneManager* getSceneManager() { return mSceneMgr; }
+        bool isDone() { return mDone; }
+
+        /** Adds a screenshot frame to the list - this should
+         *    be done during setup of the test. */
+        void addScreenshotFrame(int frame)
         {
-            return Ogre::StringVector();
+            mScreenshotFrames.insert(frame);
         }
 
-        Ogre::SceneManager* getSceneManager()
+        /** Returns whether or not a screenshot should be taken at the given frame */
+        virtual bool isScreenshotFrame(int frame)
         {
-            return mSceneMgr;
+            if (mScreenshotFrames.empty())
+            {
+                mDone = true;
+            }
+            else if (frame == *(mScreenshotFrames.begin()))
+            {
+                mScreenshotFrames.erase(mScreenshotFrames.begin());
+                if (mScreenshotFrames.empty())
+                    mDone = true;
+                return true;
+            }
+            return false;
         }
 
-        bool isDone()
+        // enable trays GUI for this sample
+        void _setupTrays(Ogre::RenderWindow* window)
         {
-            return mDone;
+            mTrayMgr.reset(new TrayManager("SampleControls", window, this));  // create a tray interface
+            // show stats and logo and hide the cursor
+            mTrayMgr->showFrameStats(TL_BOTTOMLEFT);
+            mTrayMgr->showLogo(TL_BOTTOMRIGHT);
+            mTrayMgr->hideCursor();
         }
 
         /*-----------------------------------------------------------------------------
@@ -123,8 +155,6 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
         {
-            // assign mRoot here in case Root was initialised after the Sample's constructor ran.
-            mRoot = Ogre::Root::getSingletonPtr();
             mOverlaySystem = overlaySys;
             mWindow = window;
 
@@ -133,6 +163,8 @@ namespace OgreBites
             locateResources();
             createSceneManager();
             setupView();
+
+            mCameraMan.reset(new CameraMan(mCameraNode));   // create a default camera controller
 
             loadResources();
             mResourcesLoaded = true;
@@ -146,7 +178,6 @@ namespace OgreBites
         | Shuts down a sample. Used by the SampleContext class. Do not call directly.
         -----------------------------------------------------------------------------*/
         virtual void _shutdown()
-
         {
             Ogre::ControllerManager::getSingleton().clearControllers();
 
@@ -161,7 +192,7 @@ namespace OgreBites
             mResourcesLoaded = false;
             if (mSceneMgr) 
             {
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
                 mShaderGenerator->removeSceneManager(mSceneMgr);
 #endif
                 mSceneMgr->removeRenderQueueListener(mOverlaySystem);
@@ -225,7 +256,7 @@ namespace OgreBites
         virtual void createSceneManager()
         {
             mSceneMgr = Ogre::Root::getSingleton().createSceneManager();
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
             mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
             if(mOverlaySystem)
@@ -253,12 +284,9 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void unloadResources()
         {
-            Ogre::ResourceGroupManager::ResourceManagerIterator resMgrs =
-            Ogre::ResourceGroupManager::getSingleton().getResourceManagerIterator();
-
-            while (resMgrs.hasMoreElements())
+            for (auto& it : Ogre::ResourceGroupManager::getSingleton().getResourceManagers())
             {
-                resMgrs.getNext()->unloadUnreferencedResources();
+                it.second->unloadUnreferencedResources();
             }
         }   
 
@@ -268,17 +296,29 @@ namespace OgreBites
         Ogre::FileSystemLayer* mFSLayer;          // file system abstraction layer
         Ogre::SceneManager* mSceneMgr;    // scene manager for this sample
         Ogre::NameValuePairList mInfo;    // custom sample info
-        bool mDone;                       // flag to mark the end of the sample
+
+        Ogre::Viewport* mViewport;          // main viewport
+        Ogre::Camera* mCamera;              // main camera
+        Ogre::SceneNode* mCameraNode;       // camera node
+
+        // SdkSample fields
+        std::unique_ptr<TrayManager> mTrayMgr;           // tray interface manager
+        std::unique_ptr<CameraMan> mCameraMan;           // basic camera controller
+
+        bool mDone;               // flag to mark the end of the sample
         bool mResourcesLoaded;    // whether or not resources have been loaded
         bool mContentSetup;       // whether or not scene was created
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*            mShaderGenerator;           // The Shader generator instance.
     public:
         void setShaderGenerator(Ogre::RTShader::ShaderGenerator* shaderGenerator) 
         { 
             mShaderGenerator = shaderGenerator;
-        };
+        }
 #endif
+    private:
+        // VisualTest fields
+        std::set<int> mScreenshotFrames;
     };
 
     typedef std::set<Sample*, Sample::Comparer> SampleSet;

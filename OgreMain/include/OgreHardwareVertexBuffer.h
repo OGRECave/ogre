@@ -122,17 +122,14 @@ namespace Ogre {
         VET_FLOAT2 = 1,
         VET_FLOAT3 = 2,
         VET_FLOAT4 = 3,
-        /// alias to more specific colour type - use the current rendersystem's colour packing
-        VET_COLOUR = 4,
+        VET_COLOUR = 4,  ///< @deprecated use VET_UBYTE4_NORM
         VET_SHORT1 = 5,  ///< @deprecated (see #VertexElementType note)
         VET_SHORT2 = 6,
         VET_SHORT3 = 7,  ///< @deprecated (see #VertexElementType note)
         VET_SHORT4 = 8,
         VET_UBYTE4 = 9,
-        /// D3D style compact colour
-        VET_COLOUR_ARGB = 10,
-        /// GL style compact colour
-        VET_COLOUR_ABGR = 11,
+        VET_COLOUR_ARGB = 10,  ///< @deprecated use VET_UBYTE4_NORM
+        VET_COLOUR_ABGR = 11,  ///< @deprecated use VET_UBYTE4_NORM
 
         // the following are not universally supported on all hardware:
         VET_DOUBLE1 = 12,
@@ -414,6 +411,7 @@ namespace Ogre {
         This method adds a single element (positions, normals etc) at a given position in this
         vertex declaration. <b>Please read the information in VertexDeclaration about
         the importance of ordering and structure for compatibility with older D3D drivers</b>.
+        @param atPosition Position where the new element is inserted
         @param source The binding index of HardwareVertexBuffer which will provide the source for this element.
         See VertexBufferBinding for full information.
         @param offset The offset in bytes where this element is located in the buffer

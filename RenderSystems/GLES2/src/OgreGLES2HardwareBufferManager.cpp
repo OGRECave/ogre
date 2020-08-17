@@ -110,12 +110,6 @@ namespace Ogre {
         return OGRE_NEW GLVertexArrayObject();
     }
 
-    void GLES2HardwareBufferManager::destroyVertexDeclarationImpl(VertexDeclaration* decl)
-    {
-        if(decl)
-            OGRE_DELETE decl;
-    }
-
     GLenum GLES2HardwareBufferManager::getGLType(VertexElementType type)
     {
         switch(type)

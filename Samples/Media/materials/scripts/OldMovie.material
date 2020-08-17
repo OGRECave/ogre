@@ -1,33 +1,12 @@
-fragment_program Ogre/Compositor/OldMovie_Cg_FP cg
-{
-	source OldMovieFP.cg
-	entry_point OldMovie_ps
-	profiles ps_2_0 arbfp1
-}
-
 fragment_program Ogre/Compositor/OldMovie_HLSL_FP hlsl
 {
 	source OldMovieFP.cg
 	entry_point OldMovie_ps
-	target ps_4_0
 }
 
-fragment_program Ogre/Compositor/OldMovie_GLSLES_FP glsles
-{
-	source OldMovieFP.glsles
-   	default_params
-   	{
-   		param_named RT int 0
-   		param_named SplotchesTx int 1
-	   	param_named Texture2 int 2
-	   	param_named SepiaTx int 3
-   	}
-}
-
-fragment_program Ogre/Compositor/OldMovie_GLSL_FP glsl
+fragment_program Ogre/Compositor/OldMovie_GLSL_FP glsl glsles
 {
 	source OldMovieFP.glsl
-	syntax glsl150
    	default_params
    	{
    		param_named RT int 0
@@ -40,9 +19,7 @@ fragment_program Ogre/Compositor/OldMovie_GLSL_FP glsl
 fragment_program Ogre/Compositor/OldMovieFP unified
 {
 	delegate Ogre/Compositor/OldMovie_GLSL_FP
-	delegate Ogre/Compositor/OldMovie_GLSLES_FP
 	delegate Ogre/Compositor/OldMovie_HLSL_FP
-	delegate Ogre/Compositor/OldMovie_Cg_FP
 }
 
 material Ogre/Compositor/OldMovie
@@ -80,7 +57,7 @@ material Ogre/Compositor/OldMovie
 
 			texture_unit SplotchesTx
 			{
-				texture 8x8PagesSplotches2.png 2d
+				texture 8x8PagesSplotches2.png
                 tex_coord_set 1
 				tex_address_mode wrap
 				filtering trilinear
@@ -88,7 +65,7 @@ material Ogre/Compositor/OldMovie
 
 			texture_unit
 			{
-				texture 1D_Noise.png 1d
+				texture 1D_Noise.png
                 tex_coord_set 2
 				tex_address_mode wrap
 				filtering point point none
@@ -97,7 +74,7 @@ material Ogre/Compositor/OldMovie
 
 			texture_unit SepiaTx
 			{
-				texture Sepia1D.tga 1d
+				texture Sepia1D.tga
                 tex_coord_set 3
 				tex_address_mode mirror
 				filtering point point none

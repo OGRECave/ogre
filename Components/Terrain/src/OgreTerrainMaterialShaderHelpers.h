@@ -42,7 +42,6 @@ namespace Ogre
     public:
         ShaderHelper(bool glsl) : mShadowSamplerStartHi(0), mShadowSamplerStartLo(0), mIsGLSL(glsl) {}
         virtual ~ShaderHelper() {}
-        bool isVertexCompressionSupported() { return !mIsGLSL; }
         virtual HighLevelGpuProgramPtr generateVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         virtual HighLevelGpuProgramPtr generateFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         virtual void updateParams(const SM2Profile* prof, const MaterialPtr& mat, const Terrain* terrain, bool compositeMap);
@@ -51,13 +50,10 @@ namespace Ogre
         virtual String getFragmentProgramName(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         virtual HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt) = 0;
         virtual HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt) = 0;
-        virtual void generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
+        virtual void generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream) = 0;
         virtual void generateFragmentProgramSource(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
-        virtual void generateVpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream) = 0;
         virtual void generateFpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream) = 0;
-        virtual void generateVpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream) = 0;
         virtual void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream) = 0;
-        virtual void generateVpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream) = 0;
         virtual void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream) = 0;
         virtual void defaultVpParams(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, const HighLevelGpuProgramPtr& prog);
         virtual void defaultFpParams(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, const HighLevelGpuProgramPtr& prog);
@@ -78,11 +74,9 @@ namespace Ogre
         bool mSM4Available;
         HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
-        void generateVpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
+        void generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         void generateFpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
-        void generateVpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream);
         void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream);
-        void generateVpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         uint generateVpDynamicShadowsParams(uint texCoordStart, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         void generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
@@ -99,11 +93,9 @@ namespace Ogre
         bool mIsGLES;
         HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
         HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
-        void generateVpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
+        void generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         void generateFpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
-        void generateVpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream);
         void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream);
-        void generateVpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         uint generateVpDynamicShadowsParams(uint texCoordStart, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         void generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);

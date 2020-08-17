@@ -20,11 +20,13 @@ public:
         mInfo["Description"] = "Demonstrates the use of transparent materials (or scene blending).";
         mInfo["Thumbnail"] = "thumb_trans.png";
         mInfo["Category"] = "Lighting";
+
+        addScreenshotFrame(25);
     }
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
-        Real theta = mRoot->getTimer()->getMilliseconds() / 1000.0f;
+        Real theta = ControllerManager::getSingleton().getElapsedTime();
 
         // this is the equation for a PQ torus knot
         Ogre::Real r = 28 * (2 + Math::Sin(theta * 3 / 2 + 0.2));

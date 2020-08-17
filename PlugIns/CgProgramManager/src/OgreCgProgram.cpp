@@ -136,6 +136,7 @@ namespace Ogre {
 				args.push_back("dcls");
 			}
 		}
+		args.push_back("-DOGRE_CG");
 		// Now split args into that god-awful char** that Cg insists on
 		freeCgArgs();
 		mCgArguments = OGRE_ALLOC_T(char*, args.size() + 1, MEMCATEGORY_RESOURCE);
@@ -192,7 +193,7 @@ namespace Ogre {
 		if (mDelegate)
 		{
 			mDelegate->setSource(mProgramString);
-			mDelegate->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
+
 			if (mSelectedCgProfile == CG_PROFILE_GLSLG)
 			{
 				// need to set input and output operations
@@ -486,8 +487,6 @@ namespace Ogre {
 					mType,
 					mSelectedProfile);
 			}
-			// Shader params need to be forwarded to low level implementation
-			mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -801,7 +800,7 @@ namespace Ogre {
 			return HighLevelGpuProgram::isVertexTextureFetchRequired();
 	}
 	//-----------------------------------------------------------------------
-	GpuProgramParametersSharedPtr CgProgram::getDefaultParameters(void)
+	const GpuProgramParametersPtr& CgProgram::getDefaultParameters(void)
 	{
 		loadHighLevelSafe();
 		if (mDelegate)

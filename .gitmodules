@@ -1,3 +1,0 @@
-[submodule "Components/Overlay/src/imgui"]
-	path = Components/Overlay/src/imgui
-	url = https://github.com/ocornut/imgui

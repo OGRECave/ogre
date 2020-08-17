@@ -1,0 +1,21 @@
+{
+    "package": {
+        "name": "ogre-sdk-android",
+        "repo": "ogre",
+        "subject": "ogrecave",
+        "vcs_url": "https://github.com/OGRECave/ogre/issues",
+        "licenses": ["MIT"]
+    },
+    "version": {
+        "name": "@BINTRAY_VERSION@",
+        "gpgSign": false
+    },
+    "files": [
+        {
+            "includePattern": "ogre-sdk-android-arm64-v8a.zip",
+            "uploadPattern": "/ogre-sdk-android-@BINTRAY_VERSION@-arm64-v8a.zip",
+            "matrixParams": {"override": 1 }
+        }
+    ],
+    "publish": true
+}

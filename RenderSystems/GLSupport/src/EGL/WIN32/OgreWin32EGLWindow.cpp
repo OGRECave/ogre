@@ -473,7 +473,7 @@ namespace Ogre {
             createNativeWindow(left, top, width, height, title);
         }
 
-        mContext = createEGLContext();
+        mContext = createEGLContext(eglContext);
         mContext->setCurrent();
         ::EGLSurface oldDrawableDraw = eglGetCurrentSurface(EGL_DRAW);
         ::EGLSurface oldDrawableRead = eglGetCurrentSurface(EGL_READ);

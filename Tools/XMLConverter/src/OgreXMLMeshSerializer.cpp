@@ -392,7 +392,7 @@ namespace Ogre {
             float* pFloat;
             uint16* pShort;
             uint8* pChar;
-            ARGB* pColour;
+            ABGR* pColour;
 
             pVert = static_cast<unsigned char*>(
                 vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
@@ -529,12 +529,8 @@ namespace Ogre {
                         elem.baseVertexPointerToElement(pVert, &pColour);
                         dataNode = vertexNode.append_child("colour_diffuse");
                         {
-                            ARGB rc = *pColour++;
                             ColourValue cv;
-                            cv.b = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.g = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.r = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.a = (rc & 0xFF) / 255.0f;
+                            elem.getType() == VET_COLOUR_ARGB ? cv.setAsARGB(*pColour) : cv.setAsABGR(*pColour);
                             dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
@@ -542,12 +538,8 @@ namespace Ogre {
                         elem.baseVertexPointerToElement(pVert, &pColour);
                         dataNode = vertexNode.append_child("colour_specular");
                         {
-                            ARGB rc = *pColour++;
                             ColourValue cv;
-                            cv.b = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.g = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.r = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                            cv.a = (rc & 0xFF) / 255.0f;
+                            elem.getType() == VET_COLOUR_ARGB ? cv.setAsARGB(*pColour) : cv.setAsABGR(*pColour);
                             dataNode.append_attribute("value") = StringConverter::toString(cv).c_str();
                         }
                         break;
@@ -600,15 +592,12 @@ namespace Ogre {
                             dataNode.append_attribute("w") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             dataNode.append_attribute("x") =  StringConverter::toString(*pShort++ / 65535.0f).c_str();
                             break;
+                        case VET_UBYTE4_NORM:
                         case VET_COLOUR: case VET_COLOUR_ARGB: case VET_COLOUR_ABGR:
                             elem.baseVertexPointerToElement(pVert, &pColour);
                             {
-                                ARGB rc = *pColour++;
                                 ColourValue cv;
-                                cv.b = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                                cv.g = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                                cv.r = (rc & 0xFF) / 255.0f;        rc >>= 8;
-                                cv.a = (rc & 0xFF) / 255.0f;
+                                elem.getType() == VET_COLOUR_ARGB ? cv.setAsARGB(*pColour) : cv.setAsABGR(*pColour);
                                 dataNode.append_attribute("u") = StringConverter::toString(cv).c_str();
                             }
                             break;
@@ -692,6 +681,11 @@ namespace Ogre {
             {
                 // we do not load any materials - so create a dummy here to just store the name
                 sm->setMaterial(MaterialManager::getSingleton().create(mat, RGN_DEFAULT));
+            }
+            else
+            {
+                LogManager::getSingleton().logError(
+                    "empty material name encountered. This violates the specs and can lead to crashes.");
             }
 
             // Read operation type

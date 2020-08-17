@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreCodec.h"
 #include "OgrePixelFormat.h"
+#include "OgreBitwise.h"
 
 namespace Ogre {
 
@@ -61,6 +62,14 @@ namespace Ogre {
         }
 
     public:
+        using Codec::decode;
+        using Codec::encode;
+        using Codec::encodeToFile;
+
+        void decode(const DataStreamPtr& input, const Any& output) const override;
+        DataStreamPtr encode(const Any& input) const override;
+        void encodeToFile(const Any& input, const String& outFileName) const override;
+
         virtual ~ImageCodec();
         /** Codec return class for images. Has information about the size and the
             pixel format of the image. */

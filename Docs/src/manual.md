@@ -311,10 +311,9 @@ Full documentation for each exporter is provided along with the exporter itself,
 
 # XMLConverter {#XMLConverter}
 
-The OgreXMLConverter tool can converter binary .mesh and .skeleton files to XML and back again - this is a very useful tool for debugging the contents of meshes, or for exchanging mesh data easily - many of the modeller mesh exporters export to XML because it is simpler to do, and OgreXMLConverter can then produce a binary from it. Other than simplicity, the other advantage is that OgreXMLConverter can generate additional information for the mesh, like bounding regions and level-of-detail reduction. 
+The OgreXMLConverter tool can converter binary .mesh and .skeleton files to XML and back again - this is a very useful tool for debugging the contents of meshes, or for exchanging mesh data easily - many of the modeller mesh exporters export to XML because it is simpler to do, and OgreXMLConverter can then produce a binary from it.
 
-Syntax:
-
+@par Syntax
 ```
 OgreXMLConverter [options] sourcefile [destfile] 
 ```
@@ -326,19 +325,20 @@ and the XML contents if the source is XML. For example
 test.mesh becomes test.xml, test.xml becomes test.mesh
 if the XML document root is mesh etc.
 
-When converting XML to .mesh, you will be prompted to (re)generate level-of-detail(LOD) information for the mesh - you can choose to skip this part if you wish, but doing it will allow you to make your mesh reduce in detail automatically when it is loaded into the engine. The engine uses a complex algorithm to determine the best parts of the mesh to reduce in detail depending on many factors such as the curvature of the surface, the edges of the mesh and seams at the edges of textures and smoothing groups - taking advantage of it is advised to make your meshes more scalable in real scenes.
-
-
-
 # MeshUpgrader {#MeshUpgrader}
 
-This tool is provided to allow you to upgrade your meshes when the binary format changes - sometimes we alter it to add new features and as such you need to keep your own assets up to date. This tools has a very simple syntax:
+This tool is provided to allow you to upgrade your meshes when the binary format changes - sometimes we alter it to add new features and as such you need to keep your own assets up to date.
+Furthermore, OgreMeshUpgrader can generate additional information for the mesh, like bounding regions and level-of-detail reduction.
 
+@par Syntax
 ```
 OgreMeshUpgrader [options] sourcefile [destfile]
 ```
 
-The OGRE release notes will notify you when this is necessary with a new release.
+@note
+The OGRE release notes will notify you when meshes should be upgraded with a new release.
+
+When specifying the `-i` option, you will be prompted to (re)generate level-of-detail(LOD) information for the mesh - you can choose to skip this part if you wish, but doing it will allow you to make your mesh reduce in detail automatically when it is loaded into the engine. The engine uses a complex algorithm to determine the best parts of the mesh to reduce in detail depending on many factors such as the curvature of the surface, the edges of the mesh and seams at the edges of textures and smoothing groups - taking advantage of it is advised to make your meshes more scalable in real scenes.
 
 @page Shadows Shadows
 

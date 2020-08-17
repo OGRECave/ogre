@@ -46,7 +46,7 @@ namespace Ogre
         Real getBoundingRadius(void) const
         { return mManualObject->getBoundingRadius(); }
         Real getSquaredViewDepth(const Ogre::Camera* cam) const
-        { return mManualObject->getSection(0)->getSquaredViewDepth(cam); }
+        { return mManualObject->getSections()[0]->getSquaredViewDepth(cam); }
 
     protected:
         ManualObject* mManualObject;

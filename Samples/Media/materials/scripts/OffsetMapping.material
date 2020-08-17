@@ -60,16 +60,7 @@ vertex_program Examples/OffsetMappingIntegratedShadowsVPhlsl hlsl
    entry_point integratedshadows_vp 
    target vs_2_0
 } 
-vertex_program Examples/OffsetMappingIntegratedShadowsVPglsl glsl 
-{ 
-   source OffsetMappingShadowsVp.glsl
-   default_params
-   {
-        param_named_auto worldViewProj worldviewproj_matrix 
-   }
-} 
-
-vertex_program Examples/OffsetMappingIntegratedShadowsVPglsles glsles
+vertex_program Examples/OffsetMappingIntegratedShadowsVPglsl glsl glsles
 { 
    source OffsetMappingShadowsVp.glsl
 } 
@@ -81,7 +72,7 @@ fragment_program Examples/OffsetMappingIntegratedShadowsFPhlsl hlsl
    entry_point integratedshadows_fp
    target ps_2_0
 } 
-fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl
+fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl glsles
 {
 	source OffsetMappingShadowsFp.glsl
 	default_params
@@ -93,31 +84,17 @@ fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl
 		param_named shadowMap2 int 3
 	}
 }
-fragment_program Examples/OffsetMappingIntegratedShadowsFPglsles glsles
-{
-	source OffsetMappingShadowsFp.glsl
-	default_params
-	{
-		// assign samplers as required by GLSL ES
-		param_named normalHeightMap int 0
-		param_named diffuseMap int 1
-		param_named shadowMap1 int 2
-		param_named shadowMap2 int 3
-	}
-}
 // Single-pass offset mapping with shadows
 vertex_program Examples/OffsetMappingIntegratedShadowsVP unified
 {
 	delegate Examples/OffsetMappingIntegratedShadowsVPhlsl
 	delegate Examples/OffsetMappingIntegratedShadowsVPglsl
-	delegate Examples/OffsetMappingIntegratedShadowsVPglsles
 }
 // Single-pass offset mapping with shadows
 fragment_program Examples/OffsetMappingIntegratedShadowsFP unified
 {
 	delegate Examples/OffsetMappingIntegratedShadowsFPhlsl
 	delegate Examples/OffsetMappingIntegratedShadowsFPglsl
-	delegate Examples/OffsetMappingIntegratedShadowsFPglsles
 }
 
 

@@ -49,6 +49,7 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 #include "OgreBone.h"
 #include "OgreCamera.h"
+#include "OgreCodec.h"
 #include "OgreColourValue.h"
 #include "OgreCommon.h"
 #include "OgreDataStream.h"
@@ -105,6 +106,16 @@ THE SOFTWARE.
 #include "OgreWireBoundingBox.h"
 #if OGRE_NO_ZIP_ARCHIVE == 0
 #   include "OgreZip.h"
+#endif
+
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#define OGRE_IGNORE_DEPRECATED_BEGIN __pragma(warning(push)) \
+    __pragma(warning(disable:4996))
+#define OGRE_IGNORE_DEPRECATED_END __pragma(warning(pop))
+#else
+#define OGRE_IGNORE_DEPRECATED_BEGIN _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define OGRE_IGNORE_DEPRECATED_END _Pragma("GCC diagnostic pop")
 #endif
 
 #endif 

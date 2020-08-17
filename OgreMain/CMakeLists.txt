@@ -54,8 +54,8 @@ elseif (APPLE)
   else ()
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/OSX")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.mm"
-    )
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.mm")
+    set(PLATFORM_LIBS "-framework CoreFoundation -framework Foundation")
   endif ()
 elseif(ANDROID)
   # required by OgrePlatformInformation.cpp
@@ -215,14 +215,6 @@ if(WIN32 AND MSVC10 AND CMAKE_CL_64)
                       )
 else()
   set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-endif()
-
-if(OGRE_GCC_VERSION VERSION_EQUAL 4.8 OR OGRE_GCC_VERSION VERSION_GREATER 4.8)
-	if(CMAKE_SYSTEM_NAME STREQUAL "Android") 
-	  list(APPEND LIBRARIES "atomic")
-	else()
-	  list(APPEND LIBRARIES "-latomic")
-	endif()
 endif()
 
 if (APPLE)

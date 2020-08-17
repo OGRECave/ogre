@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 #include "OgreRenderTarget.h"
 #include "OgreDepthBuffer.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHardwareOcclusionQuery.h"
 #include "OgreComponents.h"
 
@@ -221,6 +220,15 @@ namespace Ogre {
         if((opt = mOptions.find("Content Scaling Factor")) != end)
             miscParams["contentScalingFactor"] = opt->second.currentValue;
 
+        if((opt = mOptions.find("Rendering Device")) != end)
+        {
+            // try to parse "Monitor-NN-"
+            auto start = opt->second.currentValue.find('-') + 1;
+            auto len = opt->second.currentValue.find('-', start) - start;
+            if(start != String::npos)
+                miscParams["monitorIndex"] = opt->second.currentValue.substr(start, len);
+        }
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         if((opt = mOptions.find("Stereo Mode")) != end)
             miscParams["stereoMode"] = opt->second.currentValue;
@@ -308,6 +316,38 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------------------------------
+    RenderWindow* RenderSystem::_createRenderWindow(const String& name, unsigned int width,
+                                                    unsigned int height, bool fullScreen,
+                                                    const NameValuePairList* miscParams)
+    {
+        if (mRenderTargets.find(name) != mRenderTargets.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Window with name '" + name + "' already exists");
+        }
+
+        // Log a message
+        StringStream ss;
+        ss << "RenderSystem::_createRenderWindow \"" << name << "\", " <<
+            width << "x" << height << " ";
+        if (fullScreen)
+            ss << "fullscreen ";
+        else
+            ss << "windowed ";
+
+        if (miscParams)
+        {
+            ss << " miscParams: ";
+            NameValuePairList::const_iterator it;
+            for (const auto& p : *miscParams)
+            {
+                ss << p.first << "=" << p.second << " ";
+            }
+        }
+        LogManager::getSingleton().logMessage(ss.str());
+
+        return NULL;
+    }
+
     bool RenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
         RenderWindowList& createdWindows)
     {
@@ -360,6 +400,19 @@ namespace Ogre {
                     "Can not create mix of full screen and windowed rendering windows",
                     "RenderSystem::createRenderWindows");
             }                   
+        }
+
+        // Simply call _createRenderWindow in a loop.
+        for (const auto& curRenderWindowDescription : renderWindowDescriptions)
+        {
+            RenderWindow* curWindow = NULL;
+            curWindow = _createRenderWindow(curRenderWindowDescription.name,
+                                            curRenderWindowDescription.width,
+                                            curRenderWindowDescription.height,
+                                            curRenderWindowDescription.useFullScreen,
+                                            &curRenderWindowDescription.miscParams);
+
+            createdWindows.push_back(curWindow);
         }
 
         return true;
@@ -567,9 +620,11 @@ namespace Ogre {
     void RenderSystem::_setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
             FilterOptions magFilter, FilterOptions mipFilter)
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         _setTextureUnitFiltering(unit, FT_MIN, minFilter);
         _setTextureUnitFiltering(unit, FT_MAG, magFilter);
         _setTextureUnitFiltering(unit, FT_MIP, mipFilter);
+        OGRE_IGNORE_DEPRECATED_END
     }
     //---------------------------------------------------------------------
     void RenderSystem::_cleanupDepthBuffers( bool bCleanManualBuffers )
@@ -729,8 +784,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::convertColourValue(const ColourValue& colour, uint32* pDest)
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         *pDest = VertexElement::convertColourValue(colour, getColourVertexElementType());
-
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_render(const RenderOperation& op)

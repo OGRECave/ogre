@@ -145,26 +145,34 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    const String& D3D9HLSLProgram::getTarget() const
+    {
+        if(mTarget.empty())
+        {
+            static String vs_2_0 = "vs_2_0", ps_2_0 = "ps_2_0";
+            return mType == GPT_VERTEX_PROGRAM ? vs_2_0 : ps_2_0;
+        }
+
+        return mTarget;
+    }
+
     void D3D9HLSLProgram::compileMicrocode(void)
     {
         // Populate preprocessor defines
         String stringBuffer;
         std::vector<D3DXMACRO> defines;
         const D3DXMACRO* pDefines = 0;
-        if (!mPreprocessorDefines.empty())
+        stringBuffer = appendBuiltinDefines(mPreprocessorDefines);
+
+        for(const auto& def : parseDefines(stringBuffer))
         {
-            stringBuffer = mPreprocessorDefines;
-
-            for(const auto& def : parseDefines(stringBuffer))
-            {
-                defines.push_back({def.first, def.second});
-            }
-
-            // Add NULL terminator
-            defines.push_back({0, 0});
-
-            pDefines = &defines[0];
+            defines.push_back({def.first, def.second});
         }
+
+        // Add NULL terminator
+        defines.push_back({0, 0});
+
+        pDefines = &defines[0];
 
         // Populate compile flags
         DWORD compileFlags = 0;
@@ -215,7 +223,7 @@ namespace Ogre {
             pDefines,
             &includeHandler, 
             mEntryPoint.c_str(),
-            mTarget.c_str(),
+            getTarget().c_str(),
             compileFlags,
             &mMicroCode,
             &errors,
@@ -315,7 +323,7 @@ namespace Ogre {
                     mGroup,
                     "",// dummy source, since we'll be using microcode
                     mType, 
-                    mTarget);
+                    getTarget());
             static_cast<D3D9GpuProgram*>(mAssemblerProgram.get())->setExternalMicrocode(mMicroCode);
         }
 
@@ -633,7 +641,7 @@ namespace Ogre {
         if (mCompileError || !isRequiredCapabilitiesSupported())
             return false;
 
-        return GpuProgramManager::getSingleton().isSyntaxSupported(mTarget);
+        return GpuProgramManager::getSingleton().isSyntaxSupported(getTarget());
     }
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr D3D9HLSLProgram::createParameters(void)

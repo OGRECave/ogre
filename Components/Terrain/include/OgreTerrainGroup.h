@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreTerrainPrerequisites.h"
 #include "OgreTerrain.h"
 #include "OgreWorkQueue.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreConfigFile.h"
 
 namespace Ogre
@@ -246,15 +246,14 @@ namespace Ogre
 
         /** Load any terrain instances that have been defined but not loaded yet. 
         @param synchronous Whether we should force this to happen entirely in the
-            primary thread (default false, operations are threaded if possible)
+            primary thread
         */
         virtual void loadAllTerrains(bool synchronous = false);
         
         /** Load a specific terrain slot based on the definition that has already 
             been supplied.
         @param x, y The coordinates of the terrain slot relative to the centre slot (signed).
-        @param synchronous Whether we should force this to happen entirely in the
-            primary thread (default false, operations are threaded if possible)
+        @copydetails loadAllTerrains
         */
         virtual void loadTerrain(long x, long y, bool synchronous = false);
         
@@ -264,6 +263,7 @@ namespace Ogre
          * @attention not all of the legacy parameters/ parameter combinations are supported
          * @param cfgFilename .cfg file that specifices what textures/scale/mipmaps/etc to use.
          * @param x, y The coordinates of the terrain slot relative to the centre slot (signed).
+         * @copydetails loadAllTerrains
          */
         void loadLegacyTerrain(const String& cfgFilename, long x = 0, long y = 0, bool synchronous = true);
 

@@ -103,18 +103,8 @@ namespace Ogre {
     //* Creation / loading methods ********************************************
     void GLTexture::createInternalResourcesImpl(void)
     {
-        if (!GLEW_VERSION_2_0 && mTextureType == TEX_TYPE_2D_ARRAY)
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-                "2D texture arrays not supported before OpenGL 2.0", 
-                "GLTexture::createInternalResourcesImpl");
-
-        if (mTextureType == TEX_TYPE_EXTERNAL_OES) {
-            OGRE_EXCEPT(
-                Exception::ERR_RENDERINGAPI_ERROR,
-                "TEX_TYPE_EXTERNAL_OES is not available for openGL",
-                "GLTexture::createInternalResourcesImpl"
-            );
-        }
+        OgreAssert(mTextureType != TEX_TYPE_EXTERNAL_OES,
+                   "TEX_TYPE_EXTERNAL_OES is not available for openGL");
 
         // Convert to nearest power-of-two size if required
         mWidth = GLPixelUtil::optionalPO2(mWidth);      

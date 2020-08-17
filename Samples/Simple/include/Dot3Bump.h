@@ -24,29 +24,6 @@ public:
             "cursor and access widgets. Use WASD keys to move.";
     }
 
-    StringVector getRequiredPlugins()
-    {
-        StringVector names;
-        if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
-			names.push_back("Cg Program Manager");
-        return names;
-    }
-
-    void testCapabilities(const RenderSystemCapabilities* caps)
-    {
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl")   &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
-                "so you cannot run this sample. Sorry!", "Dot3BumpSample::testCapabilities");
-        }
-    }
-
     bool frameRenderingQueued(const FrameEvent& evt)
     {
         if (mMoveLights)
@@ -102,6 +79,11 @@ protected:
 
     void setupContent()
     {
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+        // Make this viewport work with shader generator scheme.
+        mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+#endif
+
         // create our main node to attach our entities to
         mObjectNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 
@@ -111,48 +93,6 @@ protected:
 
         mCameraMan->setStyle(CS_ORBIT);
         mCameraMan->setYawPitchDist(Radian(0), Radian(0), 500);
-    }
-
-
-
-    void loadResources()
-    {       
-#ifdef INCLUDE_RTSHADER_SYSTEM
-        Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
-        Ogre::StringVector::iterator itGroup = groupVector.begin();
-        Ogre::StringVector::iterator itGroupEnd = groupVector.end();
-        Ogre::String shaderCoreLibsPath;
-
-
-        for (; itGroup != itGroupEnd; ++itGroup)
-        {
-            Ogre::ResourceGroupManager::LocationList resLocationsList = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(*itGroup);
-            Ogre::ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
-            Ogre::ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
-            bool coreLibsFound = false;
-
-            // Find the location of the core shader libs
-            for (; it != itEnd; ++it)
-            {
-                if (it->archive->getName().find("RTShaderLib") != Ogre::String::npos)
-                {
-                    shaderCoreLibsPath = it->archive->getName() + "/";
-                    coreLibsFound = true;
-                    break;
-                }
-            }
-
-            // Core libs path found in the current group.
-            if (coreLibsFound) 
-                break; 
-        }
-            
-#endif
-    }
-
-    void unloadResources()
-    {
-
     }
 
     void setupModels()
@@ -274,14 +214,6 @@ protected:
         mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
 
         mMeshMenu->selectItem(0);  // select first mesh
-    }
-
-    void cleanupContent()
-    {
-        // clean up properly to avoid interfering with subsequent samples
-        for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
-            MeshManager::getSingleton().unload(it->first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        mPossibilities.clear();
     }
 
     std::map<String, StringVector> mPossibilities;

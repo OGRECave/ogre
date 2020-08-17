@@ -1,5 +1,3 @@
-find_package(SWIG 3.0.8)
-
 if(NOT SWIG_FOUND)
     set(OGRE_BUILD_COMPONENT_CSHARP OFF CACHE BOOL "" FORCE)
     message(WARNING "Csharp Component disabled because SWIG or Csharp was not found")
@@ -39,11 +37,12 @@ if(OGRE_BUILD_COMPONENT_OVERLAY)
 	list(APPEND SWIG_INPUT_MODULES ../Overlay/include/OgreOverlay.i)
 endif()
 
-if(OGRE_BUILD_COMPONENT_BITES)
-	if(SDL2_FOUND)
-		include_directories(${SDL2_INCLUDE_DIR})
-	endif()
+if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+    include_directories("${IMGUI_DIR}")
+    list(APPEND CMAKE_SWIG_FLAGS -DHAVE_IMGUI -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
+endif()
 
+if(OGRE_BUILD_COMPONENT_BITES)
 	set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
 	list(APPEND SWIG_INPUT_MODULES ../Bites/include/OgreBites.i)
 endif()

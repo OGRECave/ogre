@@ -622,9 +622,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             if (depthShadows)
             {
                 mSceneMgr->setShadowTextureCount(3);
-                mSceneMgr->setShadowTextureConfig(0, 2048, 2048, PF_FLOAT32_R);
-                mSceneMgr->setShadowTextureConfig(1, 1024, 1024, PF_FLOAT32_R);
-                mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_FLOAT32_R);
+                mSceneMgr->setShadowTextureConfig(0, 2048, 2048, PF_DEPTH16);
+                mSceneMgr->setShadowTextureConfig(1, 1024, 1024, PF_DEPTH16);
+                mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_DEPTH16);
                 mSceneMgr->setShadowTextureSelfShadow(true);
                 mSceneMgr->setShadowCasterRenderBackFaces(true);
 
@@ -721,11 +721,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         //! [global_opts]
         mTerrainGlobals = new Ogre::TerrainGlobalOptions();
         //! [global_opts]
-
-        // Bugfix for D3D11 Render System because of pixel format incompatibility when using
-        // vertex compression
-        if (Ogre::Root::getSingleton().getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem")
-            mTerrainGlobals->setUseVertexCompressionWhenAvailable(false);
 
         mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
         mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();

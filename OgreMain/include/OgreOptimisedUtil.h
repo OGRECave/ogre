@@ -120,6 +120,7 @@ namespace Ogre {
         @param numVertices Number of vertices to morph, which agree with
             the number in start, end and destination buffer. Bear in mind
             three floating-point values per vertex
+        @param morphNormals
         */
         virtual void softwareVertexMorph(
             Real t,

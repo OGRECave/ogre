@@ -1,20 +1,12 @@
-fragment_program Ogre/Compositor/Dither_Cg_FP cg
+fragment_program Ogre/Compositor/Dither_Cg_FP hlsl
 {
 	source DitherFP.cg
 	entry_point Dither_ps
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
-	
 }
 
-fragment_program Ogre/Compositor/Dither_GLSLES_FP glsles
-{
-	source DitherFP.glsles
-}
-
-fragment_program Ogre/Compositor/Dither_GLSL_FP glsl
+fragment_program Ogre/Compositor/Dither_GLSL_FP glsl glsles
 {
 	source DitherFP.glsl
-	syntax glsl150
     default_params
    	{
    		param_named RT int 0
@@ -25,7 +17,6 @@ fragment_program Ogre/Compositor/Dither_GLSL_FP glsl
 fragment_program Ogre/Compositor/DitherFP unified
 {
 	delegate Ogre/Compositor/Dither_GLSL_FP
-	delegate Ogre/Compositor/Dither_GLSLES_FP
 	delegate Ogre/Compositor/Dither_Cg_FP
 }
 

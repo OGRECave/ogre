@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgrePixelFormat.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -98,7 +98,7 @@ namespace Ogre {
         /** Get a local texture definition.
         @deprecated use getTextureDefinitions()
         */
-        TextureDefinition *getTextureDefinition(size_t idx);
+        OGRE_DEPRECATED TextureDefinition *getTextureDefinition(size_t idx);
         
         /** Get a local texture definition with a specific name.
         */

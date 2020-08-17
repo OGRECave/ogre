@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreDataStream.h"
 #include "OgreArchive.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 #include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
 #include <ctime>
@@ -213,14 +213,14 @@ namespace Ogre {
         virtual ~ResourceLoadingListener() {}
 
         /** This event is called when a resource beings loading. */
-        virtual DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) = 0;
+        virtual DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) { return NULL; }
 
         /** This event is called when a resource stream has been opened, but not processed yet. 
 
             You may alter the stream if you wish or alter the incoming pointer to point at
             another stream if you wish.
         */
-        virtual void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) = 0;
+        virtual void resourceStreamOpened(const String &name, const String &group, Resource *resource, DataStreamPtr& dataStream) {}
 
         /** This event is called when a resource collides with another existing one in a resource manager
 
@@ -228,7 +228,7 @@ namespace Ogre {
             @param resourceManager the according resource manager 
             @return false to skip registration of the conflicting resource and continue using the previous instance.
           */
-        virtual bool resourceCollision(Resource *resource, ResourceManager *resourceManager) = 0;
+        virtual bool resourceCollision(Resource *resource, ResourceManager *resourceManager) { return true; }
     };
 
     /** This singleton class manages the list of resource groups, and notifying
@@ -649,12 +649,15 @@ namespace Ogre {
             pointing at the source of the data.
         @param resourceName The name of the resource to locate.
             Even if resource locations are added recursively, you
-            must provide a fully qualified name to this method. You 
+            must provide a fully qualified name to this method. You
             can find out the matching fully qualified names by using the
             find() method if you need to.
-        @param groupName The name of the resource group; this determines which 
-            locations are searched. 
-        @param resourceBeingLoaded Optional pointer to the resource being 
+        @param groupName The name of the resource group; this determines which
+            locations are searched.
+            If you're loading a @ref Resource using #RGN_AUTODETECT, you **must**
+            also provide the resourceBeingLoaded parameter to enable the
+            group membership to be changed
+        @param resourceBeingLoaded Optional pointer to the resource being
             loaded, which you should supply if you want
         @param throwOnFailure throw an exception. Returns nullptr otherwise
         @return Shared pointer to data stream containing the data, will be
@@ -670,12 +673,8 @@ namespace Ogre {
         }
 
         /** 
-            @param searchGroupsIfNotFound If true, if the resource is not found in 
-            the group specified, other groups will be searched. If you're
-            loading a real Resource using this option, you <strong>must</strong>
-            also provide the resourceBeingLoaded parameter to enable the 
-            group membership to be changed
-            @copydetails openResource
+            @overload
+            if the resource is not found in the group specified, other groups will be searched.
             @deprecated use AUTODETECT_RESOURCE_GROUP_NAME instead of searchGroupsIfNotFound
         */
         OGRE_DEPRECATED DataStreamPtr openResource(const String& resourceName,
@@ -892,9 +891,12 @@ namespace Ogre {
         */
         void _unregisterResourceManager(const String& resourceType);
 
-        /** Get an iterator over the registered resource managers.
+        /** Get the registered resource managers.
         */
-        ResourceManagerIterator getResourceManagerIterator()
+        const ResourceManagerMap& getResourceManagers() const { return mResourceManagerMap; }
+
+        /// @deprecated use getResourceManagers()
+        OGRE_DEPRECATED ResourceManagerIterator getResourceManagerIterator()
         { return ResourceManagerIterator(
             mResourceManagerMap.begin(), mResourceManagerMap.end()); }
 

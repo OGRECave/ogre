@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgreOverlayPrerequisites.h"
 #include "OgreOverlayElement.h"
-#include "OgreIteratorWrappers.h"
+#include "OgreIteratorWrapper.h"
 
 
 namespace Ogre {
@@ -91,8 +91,11 @@ namespace Ogre {
         void _removeChild(OverlayElement* elem) { _removeChild(elem->getName()); }
         void _removeChild(const String& name);
 
-        /** Gets an object for iterating over all the children of this object. */
-        virtual ChildIterator getChildIterator(void);
+        /** Gets all the children of this object. */
+        const ChildMap& getChildren() const { return mChildren; }
+
+        /// @deprecated use getChildren(
+        OGRE_DEPRECATED virtual ChildIterator getChildIterator(void);
 
         /** Gets an iterator for just the container children of this object.
         @remarks

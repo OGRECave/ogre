@@ -42,16 +42,9 @@ HLSLProgramWriter::HLSLProgramWriter()
 
     if(mIsShaderModel4)
     {
-        mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "Texture2DArray";
+        mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "Sampler2DArray";
+        mGpuConstTypeMap[GCT_SAMPLER2DSHADOW] = "Sampler2DShadow";
     }
-}
-
-void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
-{
-    if(mIsShaderModel4 && program->getType() == GPT_FRAGMENT_PROGRAM)
-        os << "#include <HLSL_SM4Support.hlsl>" << std::endl;
-
-    CGProgramWriter::writeProgramDependencies(os, program);
 }
 
 void HLSLProgramWriter::writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter)
@@ -67,7 +60,6 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, const UniformPar
     case GCT_SAMPLER1D:
         os << "SAMPLER1D(";
         break;
-    case GCT_SAMPLER2DSHADOW:
     case GCT_SAMPLER2D:
         os << "SAMPLER2D(";
         break;
@@ -76,6 +68,12 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, const UniformPar
         break;
     case GCT_SAMPLERCUBE:
         os << "SAMPLERCUBE(";
+        break;
+    case GCT_SAMPLER2DSHADOW:
+        os << "SAMPLER2DSHADOW(";
+        break;
+    case GCT_SAMPLER2DARRAY:
+        os << "SAMPLER2DARRAY(";
         break;
     default:
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unsuppported sampler type");

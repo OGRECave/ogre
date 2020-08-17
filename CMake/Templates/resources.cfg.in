@@ -31,6 +31,7 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/PCZAppMedia
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts/SSAO
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/SSAO
 FileSystem=@OGRE_MEDIA_DIR_REL@/volumeTerrain
+FileSystem=@OGRE_MEDIA_DIR_REL@/CSMShadows
 Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemap.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemapsJS.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/dragon.zip
@@ -42,8 +43,10 @@ Zip=@OGRE_MEDIA_DIR_REL@/packs/skybox.zip
 Zip=@OGRE_MEDIA_DIR_REL@/volumeTerrain/volumeTerrainBig.zip
 
 FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/glTF2_IBL
+FileSystem=@OGRE_MEDIA_DIR_REL@/PBR/filament
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/PBR
 Zip=@OGRE_MEDIA_DIR_REL@/packs/DamagedHelmet.zip
+Zip=@OGRE_MEDIA_DIR_REL@/packs/filament_shaders.zip
 
 FileSystem=@OGRE_CORE_MEDIA_DIR@/HLMS
 

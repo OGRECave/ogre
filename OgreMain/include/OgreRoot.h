@@ -323,6 +323,8 @@ namespace Ogre
                 Root::createRenderWindow). The window will be
                 created based on the options currently set on the render
                 system.
+            @param windowTitle
+            @param customCapabilitiesConfig see #useCustomRenderSystemCapabilities
             @return
                 A pointer to the automatically created window, if
                 requested, otherwise <b>NULL</b>.
@@ -588,9 +590,8 @@ namespace Ogre
                                       desc.useFullScreen, &desc.miscParams);
         }
 
-        /** @copydoc RenderSystem::_createRenderWindows
-        */
-        bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
+        /// @deprecated call createRenderWindow multiple times
+        OGRE_DEPRECATED bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
             RenderWindowList& createdWindows);
     
         /** Detaches a RenderTarget from the active render system

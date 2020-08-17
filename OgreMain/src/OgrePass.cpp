@@ -514,11 +514,13 @@ namespace Ogre {
                     // This sprintf replaced a call to StringConverter::toString for performance reasons
                     state->setName( StringUtil::format("%lx", static_cast<long>(idx)));
                     
+                    OGRE_IGNORE_DEPRECATED_BEGIN
                     /** since the name was never set and a default one has been made, clear the alias name
                      so that when the texture unit name is set by the user, the alias name will be set to
                      that name
                     */
                     state->setTextureNameAlias(BLANKSTRING);
+                    OGRE_IGNORE_DEPRECATED_END
                 }
                 // Needs recompilation
                 mParent->_notifyNeedsRecompile();
@@ -1787,8 +1789,10 @@ namespace Ogre {
 
         for (i = mTextureUnitStates.begin(); i != iend; ++i)
         {
+            OGRE_IGNORE_DEPRECATED_BEGIN
             if ((*i)->applyTextureAliases(aliasList, apply))
                 testResult = true;
+            OGRE_IGNORE_DEPRECATED_END
         }
 
         return testResult;

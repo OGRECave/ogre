@@ -30,7 +30,12 @@ Both GLSL and HLSL support using preprocessor definitions in your code - some ar
 preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 ```
 
-This way you can use the same source code but still include small variations, each one defined as a different Ogre program name but based on the same source code.
+This way you can use the same source code but still include small variations, each one defined as a different %Ogre program name but based on the same source code.
+
+Furthermore, %Ogre automatically sets the following defines for convenience:
+- The current shading language and native version: e.g. @c OGRE_GLSL=120, @c OGRE_HLSL=3
+- The current shader type: e.g. @c OGRE_VERTEX_SHADER, @c OGRE_FRAGMENT_SHADER
+- Whether @ref reversed-depth is enabled: @c OGRE_REVERSED_Z
 
 @note on GLSL %Ogre pre-processes the source itself instead on relying on the driver implementation which is often buggy. This relaxes using @c \#ifdef directives compared to the standard - e.g. you can <tt>\#ifdef \#version</tt>. However this means that defines specified in GLSL extensions are not present.
 
@@ -265,6 +270,20 @@ geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
 ```
 
 With GL3+ these values are specified using the `layout` modifier.
+
+# Multi-language Programs {#multi-language-programs}
+
+Basic programs, like the `example.frag` stated above, are compatible with GLSL and GLSLES. To avoid duplicating the whole
+program declaration, you can simply specify all the language types the program is compatible with as:
+
+```cpp
+fragment_program myFragmentShader glsl glsles
+{
+    source example.frag
+}
+```
+
+If you use the built-in defines like @c OGRE_HLSL, you can even write programs compatible with both HLSL and GLSL. In fact, you can use `#include <OgreUnifiedShader.h>` in the shader which provides cross-language macros to help with this.
 
 # Unified High-level Programs {#Unified-High_002dlevel-Programs}
 
@@ -533,30 +552,52 @@ technique myShaderBasedTechnique
 }
 ```
 
-When rendering a shadow caster, Ogre will automatically use the alternate material. You can bind the same or different parameters to the program - the most important thing is that you bind **ambient\_light\_colour**, since this determines the colour of the shadow in modulative texture shadows. If you don’t supply an alternate material, Ogre will fall back on a fixed-function material which will not reflect any vertex deformation you do in your vertex or geometry programs.
+When rendering a shadow caster, Ogre will automatically use the alternate material. You can bind the same or different parameters to the program - the most important thing is that you bind @c *ambient_light_colour*, since this determines the colour of the shadow in modulative texture shadows. If you don’t supply an alternate material, Ogre will fall back on a fixed-function material which will not reflect any vertex deformation you do in your vertex or geometry programs.
 
-In addition, when rendering the shadow receivers with shadow textures, Ogre needs to project the shadow texture. It does this automatically in fixed function mode, but if the receivers use vertex programs, they need to have a shadow receiver program which does the usual vertex deformation, but also generates projective texture coordinates. The additional program linked into the pass like this:
+In addition, when rendering the shadow receivers with shadow textures, Ogre needs to project the shadow texture. It does this automatically in fixed function mode, but if the receivers use vertex programs, they need to have a shadow receiver material which does the usual vertex deformation, but also generates projective texture coordinates.
+
+@note At this point you can as well just extend your original program for @ref Integrated-Texture-Shadows. The only advantage of the technique below is that you can use the same material with and without shadow mapping.
+
+The alternative material is linked into the technique - similarly to the caster material - like:
 
 ```cpp
-shadow_receiver_vertex_program_ref myShadowReceiverVertexProgram
+technique myShaderBasedTechnique
 {
-    param_indexed_auto 0 worldviewproj_matrix
-    param_indexed_auto 4 texture_viewproj_matrix
+    shadow_receiver_material myShadowReceiverMaterial
+    ...
+}
+
+material myShadowReceiverMaterial
+{
+    ...
+    vertex_program_ref myShadowReceiverVertexProgram
+    {
+        param_indexed_auto 0 worldviewproj_matrix
+        param_indexed_auto 4 texture_worldviewproj_matrix
+    }
+    ...
 }
 ```
 
-For the purposes of writing this alternate program, there is an automatic parameter binding of ’texture\_viewproj\_matrix’ which provides the program with texture projection parameters. The vertex program should do it’s normal vertex processing, and generate texture coordinates using this matrix and place them in texture coord sets 0 and 1, since some shadow techniques use 2 texture units. The colour of the vertices output by this vertex program must always be white, so as not to affect the final colour of the rendered shadow. 
+For the purposes of writing the alternate program, there is an automatic parameter binding of @c texture_worldviewproj_matrix which provides the program with texture projection parameters. The vertex program should do it’s normal vertex processing, and generate texture coordinates using this matrix and place them in texture coord sets 0 and 1, since some shadow techniques use 2 texture units. The colour of the vertices output by this vertex program must always be white, so as not to affect the final colour of the rendered shadow.
 
-When using additive texture shadows, the shadow pass render is actually the lighting render, so if you perform any fragment program lighting you also need to pull in a custom fragment program. You use the shadow\_receiver\_fragment\_program\_ref for this:
+When using additive texture shadows, the @c shadow_receiver_material replaces the lighting render, so if you perform any fragment program lighting you also need to pull in a custom fragment program:
 
 ```cpp
-shadow_receiver_fragment_program_ref myShadowReceiverFragmentProgram
+pass
 {
-    param_named_auto lightDiffuse light_diffuse_colour 0 
+    fragment_program_ref myShadowReceiverFragmentProgram
+    {
+        param_named_auto lightDiffuse light_diffuse_colour 0
+    }
+    texture_unit
+    {
+        content_type shadow
+    }
 }
 ```
 
-You should pass the projected shadow coordinates from the custom vertex program. As for textures, texture unit 0 will always be the shadow texture. Any other textures which you bind in your pass will be carried across too, but will be moved up by 1 unit to make room for the shadow texture. Therefore your shadow receiver fragment program is likely to be the same as the bare lighting pass of your normal material, except that you insert an extra texture sampler at index 0, which you will use to adjust the result by (modulating diffuse and specular components).
+You should pass the projected shadow coordinates from the custom vertex program. As for textures, define a @c texture_unit with @c content_type @c shadow to pull the shadow texture. Your shadow receiver fragment program is likely to be the same as the bare lighting pass of your normal material, except that you insert an extra texture sampler for the shadow texture, which you will use to adjust the result by (modulating diffuse and specular components).
 
 # Skeletal Animation in Vertex Programs {#Skeletal-Animation-in-Vertex-Programs}
 

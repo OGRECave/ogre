@@ -50,9 +50,9 @@ namespace Ogre
         texCam->setCustomViewMatrix(false);
         texCam->setCustomProjectionMatrix(false);
         texCam->setNearClipDistance(light->_deriveShadowNearClipDistance(cam));
-        texCam->setFarClipDistance(light->_deriveShadowFarClipDistance(cam));
+        texCam->setFarClipDistance(light->_deriveShadowFarClipDistance());
 
-        // get the shadow frustum's far distance
+        // get the shadow far distance
         Real shadowDist = light->getShadowFarDistance();
         if (!shadowDist)
         {
@@ -64,6 +64,9 @@ namespace Ogre
         // Directional lights 
         if (light->getType() == Light::LT_DIRECTIONAL)
         {
+            // now we need the clip distance
+            if(auto farClip = texCam->getFarClipDistance())
+                shadowDist = farClip;
             // set up the shadow texture
             // Set ortho projection
             texCam->setProjectionType(PT_ORTHOGRAPHIC);

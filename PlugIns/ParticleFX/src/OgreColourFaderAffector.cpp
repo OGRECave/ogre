@@ -69,8 +69,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ColourFaderAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
-        ParticleIterator pi = pSystem->_getIterator();
-        Particle *p;
         float dr, dg, db, da;
 
         // Scale adjustments by time
@@ -79,9 +77,8 @@ namespace Ogre {
         db = mBlueAdj * timeElapsed;
         da = mAlphaAdj * timeElapsed;
 
-        while (!pi.end())
+        for (auto p : pSystem->_getActiveParticles())
         {
-            p = pi.getNext();
             applyAdjustWithClamp(&p->mColour.r, dr);
             applyAdjustWithClamp(&p->mColour.g, dg);
             applyAdjustWithClamp(&p->mColour.b, db);

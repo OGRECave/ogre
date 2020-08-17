@@ -166,12 +166,20 @@ namespace Ogre
         virtual void begin(const MaterialPtr& mat,
             RenderOperation::OperationType opType = RenderOperation::OT_TRIANGLE_LIST);
 
-        /** Use before defining geometry to indicate that you intend to update the
-            geometry regularly and want the internal structure to reflect that.
+        /** Use before defining geometry to indicate how you intend to update the
+            geometry.
         */
-        virtual void setDynamic(bool dyn) { mDynamic = dyn; }
+        void setBufferUsage(HardwareBuffer::Usage usage) { mBufferUsage = usage; }
+
+        /// @overload
+        void setDynamic(bool dyn)
+        {
+            mBufferUsage =
+                dyn ? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY : HardwareBuffer::HBU_STATIC_WRITE_ONLY;
+        }
+
         /** Gets whether this object is marked as dynamic */
-        virtual bool getDynamic() const { return mDynamic; }
+        bool getDynamic() const { return mBufferUsage & HardwareBuffer::HBU_DYNAMIC; }
 
         /** Start the definition of an update to a part of the object.
         @remarks
@@ -192,18 +200,51 @@ namespace Ogre
             after this are assumed to be adding more information (like normals or
             texture coordinates) to the last vertex started with position().
         */
-        virtual void position(const Vector3& pos);
+        void position(const Vector3& pos)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            if (mTempVertexPending)
+            {
+                // bake current vertex
+                copyTempVertexToBuffer();
+                mFirstVertex = false;
+            }
+
+            if (mFirstVertex && !mCurrentUpdating)
+            {
+                declareElement(VET_FLOAT3, VES_POSITION);
+            }
+
+            mTempVertex.position = pos;
+
+            // update bounds
+            mAABB.merge(mTempVertex.position);
+            mRadius = std::max(mRadius, mTempVertex.position.length());
+
+            // reset current texture coord
+            mTexCoordIndex = 0;
+
+            mTempVertexPending = true;
+        }
         /// @overload
-        virtual void position(float x, float y, float z);
+        void position(float x, float y, float z) { position({x, y, z}); }
 
         /** Add a vertex normal to the current vertex.
         @remarks
             Vertex normals are most often used for dynamic lighting, and 
             their components should be normalised.
         */
-        virtual void normal(const Vector3& norm);
+        void normal(const Vector3& norm)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            if (mFirstVertex && !mCurrentUpdating)
+            {
+                declareElement(VET_FLOAT3, VES_NORMAL);
+            }
+            mTempVertex.normal = norm;
+        }
         /// @overload
-        virtual void normal(float x, float y, float z);
+        void normal(float x, float y, float z)  { normal({x, y, z}); }
 
         /** Add a vertex tangent to the current vertex.
         @remarks
@@ -212,9 +253,18 @@ namespace Ogre
             Also, using tangent() you enable VES_TANGENT vertex semantic, which is not
             supported on old non-SM2 cards.
         */
-        virtual void tangent(const Vector3& tan);
+        void tangent(const Vector3& tan)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            if (mFirstVertex && !mCurrentUpdating)
+            {
+                declareElement(VET_FLOAT3, VES_TANGENT);
+            }
+            mTempVertex.tangent = tan;
+        }
+
         /// @overload
-        virtual void tangent(float x, float y, float z);
+        void tangent(float x, float y, float z)  { tangent({x, y, z}); }
 
         /** Add a texture coordinate to the current vertex.
         @remarks
@@ -224,25 +274,80 @@ namespace Ogre
             most common. There are several versions of this method for the 
             variations in number of dimensions.
         */
-        virtual void textureCoord(float u);
+        void textureCoord(float u)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            if (mFirstVertex && !mCurrentUpdating)
+            {
+                declareElement(VET_FLOAT1, VES_TEXTURE_COORDINATES);
+            }
+            mTempVertex.texCoordDims[mTexCoordIndex] = 1;
+            mTempVertex.texCoord[mTexCoordIndex].x = u;
+
+            ++mTexCoordIndex;
+        }
         /// @overload
-        virtual void textureCoord(float u, float v);
+        void textureCoord(float u, float v)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            if (mFirstVertex && !mCurrentUpdating)
+            {
+                declareElement(VET_FLOAT2, VES_TEXTURE_COORDINATES);
+            }
+            mTempVertex.texCoordDims[mTexCoordIndex] = 2;
+            mTempVertex.texCoord[mTexCoordIndex].x = u;
+            mTempVertex.texCoord[mTexCoordIndex].y = v;
+
+            ++mTexCoordIndex;
+        }
         /// @overload
-        virtual void textureCoord(float u, float v, float w);
+        void textureCoord(float u, float v, float w)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            if (mFirstVertex && !mCurrentUpdating)
+            {
+                declareElement(VET_FLOAT3, VES_TEXTURE_COORDINATES);
+            }
+            mTempVertex.texCoordDims[mTexCoordIndex] = 3;
+            mTempVertex.texCoord[mTexCoordIndex].x = u;
+            mTempVertex.texCoord[mTexCoordIndex].y = v;
+            mTempVertex.texCoord[mTexCoordIndex].z = w;
+
+            ++mTexCoordIndex;
+        }
         /// @overload
-        virtual void textureCoord(float x, float y, float z, float w);
+        void textureCoord(float x, float y, float z, float w) { textureCoord(Vector4(x, y, z, w)); }
         /// @overload
-        virtual void textureCoord(const Vector2& uv);
+        void textureCoord(const Vector2& uv) { textureCoord(uv.x, uv.y); }
         /// @overload
-        virtual void textureCoord(const Vector3& uvw);
+        void textureCoord(const Vector3& uvw) { textureCoord(uvw.x, uvw.y, uvw.z); }
         /// @@overload
-        virtual void textureCoord(const Vector4& xyzw);
+        void textureCoord(const Vector4& xyzw)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            if (mFirstVertex && !mCurrentUpdating)
+            {
+                declareElement(VET_FLOAT4, VES_TEXTURE_COORDINATES);
+            }
+            mTempVertex.texCoordDims[mTexCoordIndex] = 4;
+            mTempVertex.texCoord[mTexCoordIndex] = xyzw;
+
+            ++mTexCoordIndex;
+        }
 
         /** Add a vertex colour to a vertex.
         */
-        virtual void colour(const ColourValue& col);
+        void colour(const ColourValue& col)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            if (mFirstVertex && !mCurrentUpdating)
+            {
+                declareElement(VET_COLOUR, VES_DIFFUSE);
+            }
+            mTempVertex.colour = col;
+        }
         /// @overload
-        virtual void colour(float r, float g, float b, float a = 1.0f);
+        void colour(float r, float g, float b, float a = 1.0f) { colour(ColourValue(r, g, b, a)); };
 
         /** Add a vertex index to construct faces / lines / points via indexing
             rather than just by a simple list of vertices. 
@@ -255,7 +360,25 @@ namespace Ogre
             when required, if an index is > 65535.
         @param idx A vertex index from 0 to 4294967295. 
         */
-        virtual void index(uint32 idx);
+        void index(uint32 idx)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            mAnyIndexed = true;
+            if (idx >= 65536)
+                mCurrentSection->set32BitIndices(true);
+
+            // make sure we have index data
+            RenderOperation* rop = mCurrentSection->getRenderOperation();
+            if (!rop->indexData)
+            {
+                rop->indexData = OGRE_NEW IndexData();
+                rop->indexData->indexCount = 0;
+            }
+            rop->useIndexes = true;
+            resizeTempIndexBufferIfNeeded(++rop->indexData->indexCount);
+
+            mTempIndexBuffer[rop->indexData->indexCount - 1] = idx;
+        }
         /** Add a set of 3 vertex indices to construct a triangle; this is a
             shortcut to calling index() 3 times. It is only valid for triangle 
             lists.
@@ -264,7 +387,16 @@ namespace Ogre
             when required, if an index is > 65535.
         @param i1, i2, i3 3 vertex indices from 0 to 4294967295 defining a face.
         */
-        virtual void triangle(uint32 i1, uint32 i2, uint32 i3);
+        void triangle(uint32 i1, uint32 i2, uint32 i3)
+        {
+            OgreAssert(mCurrentSection, "You must call begin() before this method");
+            OgreAssert(mCurrentSection->getRenderOperation()->operationType ==
+                           RenderOperation::OT_TRIANGLE_LIST,
+                       "This method is only valid on triangle lists");
+            index(i1);
+            index(i2);
+            index(i3);
+        }
         /** Add a set of 4 vertex indices to construct a quad (out of 2 
             triangles); this is a shortcut to calling index() 6 times, 
             or triangle() twice. It's only valid for triangle list operations.
@@ -273,7 +405,13 @@ namespace Ogre
             when required, if an index is > 65535.
         @param i1, i2, i3, i4 4 vertex indices from 0 to 4294967295 defining a quad. 
         */
-        virtual void quad(uint32 i1, uint32 i2, uint32 i3, uint32 i4);
+        void quad(uint32 i1, uint32 i2, uint32 i3, uint32 i4)
+        {
+            // first tri
+            triangle(i1, i2, i3);
+            // second tri
+            triangle(i3, i4, i1);
+        }
 
         /// Get the number of vertices in the section currently being defined (returns 0 if no section is in progress).
         virtual size_t getCurrentVertexCount() const;
@@ -373,13 +511,17 @@ namespace Ogre
                 AxisAlignedBox::setInfinite */
         void setBoundingBox(const AxisAlignedBox& box) { mAABB = box; }
 
-        /** Gets a pointer to a ManualObjectSection, i.e. a part of a ManualObject.
+        /** Gets the list of ManualObjectSection, i.e. a part of a ManualObject.
         */
-        ManualObjectSection* getSection(unsigned int index) const;
+        const std::vector<ManualObjectSection*>& getSections() const { return mSectionList; }
 
-        /** Retrieves the number of ManualObjectSection objects making up this ManualObject.
-        */
-        unsigned int getNumSections(void) const;
+        /// @deprecated use getSections()
+        OGRE_DEPRECATED ManualObjectSection* getSection(unsigned int index) const;
+
+        /// @deprecated use getSections()
+        OGRE_DEPRECATED unsigned int getNumSections(void) const;
+
+
         /** Sets whether or not to keep the original declaration order when 
             queuing the renderables.
         @remarks
@@ -401,14 +543,13 @@ namespace Ogre
         /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;
         /** @copydoc MovableObject::getBoundingBox */
-        const AxisAlignedBox& getBoundingBox(void) const;
+        const AxisAlignedBox& getBoundingBox(void) const override { return mAABB; }
         /** @copydoc MovableObject::getBoundingRadius */
-        Real getBoundingRadius(void) const;
+        Real getBoundingRadius(void) const override { return mRadius; }
         /** @copydoc MovableObject::_updateRenderQueue */
         void _updateRenderQueue(RenderQueue* queue);
         /** Implement this method to enable stencil shadows */
-        EdgeData* getEdgeList(void);
-        bool hasEdgeList(void) override;
+        EdgeData* getEdgeList(void) override;
         /** Implement this method to enable stencil shadows. */
         const ShadowRenderableList& getShadowVolumeRenderableList(
             ShadowTechnique shadowTechnique, const Light* light, 
@@ -504,7 +645,7 @@ namespace Ogre
         
     protected:
         /// Dynamic?
-        bool mDynamic;
+        HardwareBuffer::Usage mBufferUsage;
         /// List of subsections
         SectionList mSectionList;
         /// Current section
@@ -571,6 +712,8 @@ namespace Ogre
         /// Copy current temp vertex into buffer
         virtual void copyTempVertexToBuffer(void);
 
+    private:
+        void declareElement(VertexElementType t, VertexElementSemantic s);
     };
 
 

@@ -87,7 +87,7 @@ namespace Ogre {
 
             @param inStream Stream containing Quake3 data
         */
-        void loadFromStream(DataStreamPtr& inStream);
+        void loadFromStream(const DataStreamPtr& inStream);
 
         /* Extracts the embedded lightmap texture data and loads them as textures.
            Calling this method makes the lightmap texture data embedded in

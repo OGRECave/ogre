@@ -55,6 +55,7 @@ namespace Ogre {
         SceneManager* createInstance(const String& instanceName);
         void destroyInstance(SceneManager* instance);
     };
+
     /// Default scene manager
     class _OgreExport DefaultSceneManager : public SceneManager
     {
@@ -142,7 +143,7 @@ namespace Ogre {
             providing some information about each one.
             @deprecated use getMetaData()
         */
-        MetaDataIterator getMetaDataIterator(void) const;
+        OGRE_DEPRECATED MetaDataIterator getMetaDataIterator(void) const;
 
         /** Create a SceneManager instance of a given type.
         @remarks
@@ -182,7 +183,7 @@ namespace Ogre {
         typedef MapIterator<Instances> SceneManagerIterator;
         /** Get an iterator over all the existing SceneManager instances.
         @deprecated use getSceneManagers() instead */
-        SceneManagerIterator getSceneManagerIterator(void);
+        OGRE_DEPRECATED SceneManagerIterator getSceneManagerIterator(void);
 
         /// Get all the existing SceneManager instances.
         const Instances& getSceneManagers() const;

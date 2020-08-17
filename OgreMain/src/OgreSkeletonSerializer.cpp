@@ -94,11 +94,8 @@ namespace Ogre {
         }
 
         // Write links
-        Skeleton::LinkedSkeletonAnimSourceIterator linkIt = 
-            pSkeleton->getLinkedSkeletonAnimationSourceIterator();
-        while(linkIt.hasMoreElements())
+        for(const auto& link : pSkeleton->getLinkedSkeletonAnimationSources())
         {
-            const LinkedSkeletonAnimationSource& link = linkIt.getNext();
             writeSkeletonAnimationLink(pSkeleton, link);
         }       
         popInnerChunk(stream);

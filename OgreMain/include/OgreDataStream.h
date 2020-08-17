@@ -273,7 +273,8 @@ namespace Ogre {
         @note
             If you used this function, you <b>must</b> open the stream in <b>binary mode</b>,
             otherwise, it'll produce unexpected results.
-        @param delim The delimiter(s) to stop at
+        @par
+            delim The delimiter(s) to stop at
         @return The number of bytes skipped
         */
         virtual size_t skipLine(const String& delim = "\n");

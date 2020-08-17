@@ -1,85 +1,16 @@
-// declare the vertex shader (CG for the language)
-vertex_program PSSM/shadow_caster_vsCg hlsl
-{
-	// source file
-	source pssm.cg
-	// will run on vertex shader 1.1+
-	target vs_2_0
-	// entry function
-	entry_point shadow_caster_vs
-}
-
-// declare the fragment shader (CG for the language)
-fragment_program PSSM/shadow_caster_psCg hlsl
-{
-	// source file
-	source pssm.cg
-	// will run on pixel shader 2.0+
-	target ps_2_0
-	// entry function
-	entry_point shadow_caster_ps
-}
-
-// declare the vertex shader (GLSL ES for the language)
-vertex_program PSSM/shadow_caster_vsGLSLES glsles
-{
-	// source file
-	source pssmCasterVp.glsl
-}
-
-// declare the fragment shader (GLSL ES for the language)
-fragment_program PSSM/shadow_caster_psGLSLES glsles
-{
-	// source file
-	source pssmCasterFp.glsl
-}
-
-// declare the vertex shader (GLSL for the language)
-vertex_program PSSM/shadow_caster_vsGLSL glsl
-{
-	// source file
-	source pssmCasterVp.glsl
-}
-
-// declare the fragment shader (GLSL for the language)
-fragment_program PSSM/shadow_caster_psGLSL glsl
-{
-	// source file
-	source pssmCasterFp.glsl
-}
-
-vertex_program PSSM/shadow_caster_vs unified
-{
-	delegate PSSM/shadow_caster_vsGLSL
-	delegate PSSM/shadow_caster_vsGLSLES
-	delegate PSSM/shadow_caster_vsCg
-
-	default_params
-	{
-		param_named_auto worldViewProjMatrix worldviewproj_matrix
-	}
-}
-
-fragment_program PSSM/shadow_caster_ps unified
-{
-	delegate PSSM/shadow_caster_psGLSL
-	delegate PSSM/shadow_caster_psGLSLES
-	delegate PSSM/shadow_caster_psCg
-}
-
 material PSSM/shadow_caster
 {
 	technique
 	{
-		// all this will do is write depth and depth² to red and green
+		// all this will do is write depth
 		pass
 		{
-			vertex_program_ref PSSM/shadow_caster_vs
-			{
-			}
+			fog_override true none
+			depth_bias -1 -1
 
-			fragment_program_ref PSSM/shadow_caster_ps
+			rtshader_system
 			{
+				lighting_stage gbuffer depth
 			}
 		}
 	}

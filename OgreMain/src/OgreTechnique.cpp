@@ -138,32 +138,31 @@ namespace Ogre {
 
                 // Check a few fixed-function options in texture layers
                 size_t texUnit = 0;
-                Pass::TextureUnitStates::const_iterator it;
-                for(it = currPass->getTextureUnitStates().begin(); it != currPass->getTextureUnitStates().end(); ++it)
+                for(const TextureUnitState* tex : currPass->getTextureUnitStates())
                 {
-                    TextureUnitState* tex = *it;
-                    // Any 3D textures? NB we make the assumption that any
-                    // card capable of running fragment programs can support
-                    // 3D textures, which has to be true, surely?
-                    if (((tex->getTextureType() == TEX_TYPE_3D) || (tex->getTextureType() == TEX_TYPE_2D_ARRAY)) &&
-                        !caps->hasCapability(RSC_TEXTURE_3D))
+                    String err;
+                    if ((tex->getTextureType() == TEX_TYPE_3D) && !caps->hasCapability(RSC_TEXTURE_3D))
                     {
-                        // Fail
-                        compileErrors << "Pass " << passNum <<
-                            " Tex " << texUnit <<
-                            ": Volume textures not supported by current environment."
-                            << std::endl;
-                        return false;
+                        err = "Volume textures";
                     }
-                    // Any Dot3 blending?
+
+                    if ((tex->getTextureType() == TEX_TYPE_2D_ARRAY) &&
+                        !caps->hasCapability(RSC_TEXTURE_2D_ARRAY))
+                    {
+                        err = "Array textures";
+                    }
+
                     if (tex->getColourBlendMode().operation == LBX_DOTPRODUCT &&
                         !caps->hasCapability(RSC_DOT3))
                     {
+                        err = "DOT3 blending";
+                    }
+
+                    if (!err.empty())
+                    {
                         // Fail
-                        compileErrors << "Pass " << passNum <<
-                            " Tex " << texUnit <<
-                            ": DOT3 blending not supported by current environment."
-                            << std::endl;
+                        compileErrors << "Pass " << passNum << " Tex " << texUnit << ": " << err
+                                      << " not supported by current environment.";
                         return false;
                     }
                     ++texUnit;
@@ -1207,8 +1206,10 @@ namespace Ogre {
 
         for(i = mPasses.begin(); i != iend; ++i)
         {
+            OGRE_IGNORE_DEPRECATED_BEGIN
             if ((*i)->applyTextureAliases(aliasList, apply))
                 testResult = true;
+            OGRE_IGNORE_DEPRECATED_END
         }
 
         return testResult;

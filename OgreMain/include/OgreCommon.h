@@ -727,6 +727,10 @@ namespace Ogre {
             {
                 assert(right >= left && bottom >= top && back >= front);
             }
+
+            /// @overload
+            template <typename T> explicit Box(const TRect<T>& r) : Box(r.left, r.top, r.right, r.bottom) {}
+
             /** Define a box from left, top, front, right, bottom and back
                 coordinates.
                 @param  l   x value of left edge

@@ -323,6 +323,11 @@ namespace Ogre {
             contextAttrs[0] = EGL_NONE;
         }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        // try WebGL2 context
+        contextAttrs[1] = 3;
+#endif
+
         ::EGLContext context = 0;
         if (!eglDisplay)
         {
@@ -334,6 +339,16 @@ namespace Ogre {
             context = eglCreateContext(eglDisplay, glconfig, 0, contextAttrs);
             EGL_CHECK_ERROR
         }
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        if (!context)
+        {
+            // fall back to WebGL
+            contextAttrs[1] = 2;
+            context = eglCreateContext(mGLDisplay, glconfig, shareList, contextAttrs);
+            EGL_CHECK_ERROR
+        }
+#endif
 
         if (!context)
         {

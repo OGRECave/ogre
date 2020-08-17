@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreRenderSystemCapabilities.h"
 
 namespace Ogre
@@ -386,6 +385,7 @@ namespace Ogre
         addCapabilitiesMapping("texture_float", RSC_TEXTURE_FLOAT);
         addCapabilitiesMapping("non_power_of_2_textures", RSC_NON_POWER_OF_2_TEXTURES);
         addCapabilitiesMapping("texture_3d", RSC_TEXTURE_3D);
+        addCapabilitiesMapping("texture_2d_array", RSC_TEXTURE_3D);
         addCapabilitiesMapping("texture_1d", RSC_TEXTURE_1D);
         addCapabilitiesMapping("point_sprites", RSC_POINT_SPRITES);
         addCapabilitiesMapping("wide_lines", RSC_WIDE_LINES);

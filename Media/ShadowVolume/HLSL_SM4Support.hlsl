@@ -2,7 +2,7 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at https://www.ogre3d.org/licensing.
 
-#ifdef SHADER_MODEL_4
+#if OGRE_HLSL >= 4
 
 // SM4 separates sampler into Texture and SamplerState
 
@@ -60,6 +60,31 @@ float4 tex2Dlod(Sampler2D s, float4 v) { return s.t.SampleLevel(s.s, v.xy, v.w);
     TextureCube name ## Tex : register(t ## reg);\
     SamplerState name ## State : register(s ## reg);\
     static SamplerCube name = {name ## Tex, name ## State}
+
+// the following are not available in D3D9, but provided for convenience
+struct Sampler2DShadow
+{
+    Texture2D t;
+    SamplerComparisonState s;
+};
+struct Sampler2DArray
+{
+    Texture2DArray t;
+    SamplerState s;
+};
+
+#define SAMPLER2DSHADOW(name, reg) \
+    Texture2D name ## Tex : register(t ## reg);\
+    SamplerComparisonState name ## State : register(s ## reg);\
+    static Sampler2DShadow name = {name ## Tex, name ## State}
+
+#define SAMPLER2DARRAY(name, reg) \
+    Texture2DArray name ## Tex : register(t ## reg);\
+    SamplerState name ## State : register(s ## reg);\
+    static Sampler2DShadow name = {name ## Tex, name ## State}
+
+float tex2Dcmp(Sampler2DShadow s, float3 v) { return s.t.SampleCmpLevelZero(s.s, v.xy, v.z); }
+float4 tex2DARRAY(Sampler2DArray s, float3 v) { return s.t.Sample(s.s, v); }
 #else
 
 #define SAMPLER1D(name, reg) sampler1D name : register(s ## reg)

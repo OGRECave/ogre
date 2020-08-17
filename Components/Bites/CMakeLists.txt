@@ -120,6 +120,7 @@ elseif(APPLE)
 elseif(UNIX)
   list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLXConfigDialog.cpp")
   list(APPEND DEPENDENCIES ${X11_X11_LIB} ${X11_Xt_LIB} ${XAW_LIBRARY})
+  set(NATIVE_INCLUDES ${X11_Xlib_INCLUDE_PATH})
   install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/GLX_backdrop.png" DESTINATION "share/OGRE/")
 endif()
 
@@ -137,6 +138,7 @@ if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
 endif ()
 target_include_directories(OgreBites PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+  "$<BUILD_INTERFACE:${NATIVE_INCLUDES}>"
   $<INSTALL_INTERFACE:include/OGRE/Bites>)
 
 if(OGRE_STATIC AND APPLE AND OGRE_BUILD_PLUGIN_CG)
@@ -145,8 +147,7 @@ if(OGRE_STATIC AND APPLE AND OGRE_BUILD_PLUGIN_CG)
 endif()
 
 if(SDL2_FOUND)
-  target_include_directories(OgreBites PRIVATE ${SDL2_INCLUDE_DIR})
-  target_link_libraries(OgreBites PRIVATE ${SDL2_LIBRARY})
+  target_link_libraries(OgreBites PRIVATE SDL2::SDL2)
 elseif(NOT EMSCRIPTEN)
   message(WARNING "SDL2 not found - no input handling and reduced window creation capabilites")
 endif()
@@ -154,6 +155,14 @@ endif()
 generate_export_header(OgreBites 
     EXPORT_MACRO_NAME _OgreBitesExport
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreBitesPrerequisites.h)
+
+if(Qt5_FOUND)
+  qt5_wrap_cpp(MOC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreApplicationContextQt.h")
+  add_library(OgreBitesQt ${OGRE_COMP_LIB_TYPE} ${MOC_SRC} "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreApplicationContextQt.cpp")
+  set_target_properties(OgreBitesQt PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
+  target_link_libraries(OgreBitesQt PUBLIC Qt5::Gui OgreBites)
+  ogre_config_component(OgreBitesQt)
+endif()
 
 # install 
 ogre_config_framework(OgreBites)

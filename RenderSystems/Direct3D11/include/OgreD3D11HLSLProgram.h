@@ -111,9 +111,6 @@ namespace Ogre {
         bool mErrorsInCompile;
         MicroCode mMicroCode;
         ComPtr<ID3D11Buffer> mConstantBuffer;
-        
-        D3D_SHADER_MACRO* mShaderMacros;
-        bool shaderMacroSet;
 
         D3D11Device & mDevice;
 
@@ -293,9 +290,7 @@ namespace Ogre {
         /** Gets the shader target to compile down to, e.g. 'vs_1_1'. */
         const String& getTarget(void) const { return mTarget; }
         /** Gets the shader target promoted to the first compatible, e.g. 'vs_4_0' or 'ps_4_0' if backward compatibility is enabled. */
-        const String& getCompatibleTarget(void) const;
-        /** Sets shader macros created manually*/
-        void setShaderMacros(D3D_SHADER_MACRO* shaderMacros);
+        const char* getCompatibleTarget(void) const;
 
         /** Sets whether matrix packing in column-major order. */ 
         void setColumnMajorMatrices(bool columnMajor) { mColumnMajorMatrices = columnMajor; }

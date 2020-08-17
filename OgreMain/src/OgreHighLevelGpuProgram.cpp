@@ -176,7 +176,9 @@ namespace Ogre
                     defines[pos] = '\0';
                     // No definition part, define as "1"
                     ++pos;
-                    ret.push_back({&defines[macro_name_start], "1"});
+
+                    if(defines[macro_name_start] != '\0') // e.g ",DEFINE" or "DEFINE,"
+                        ret.push_back({&defines[macro_name_start], "1"});
                 }
             }
             else
@@ -189,6 +191,29 @@ namespace Ogre
         }
 
         return ret;
+    }
+
+    String HighLevelGpuProgram::appendBuiltinDefines(String defines)
+    {
+        if(!defines.empty()) defines += ",";
+
+        auto renderSystem = Root::getSingleton().getRenderSystem();
+
+        // OGRE_HLSL, OGRE_GLSL etc.
+        String tmp = getLanguage();
+        StringUtil::toUpperCase(tmp);
+        auto ver = renderSystem ? renderSystem->getNativeShadingLanguageVersion() : 0;
+        defines += StringUtil::format("OGRE_%s=%d", tmp.c_str(), ver);
+
+        // OGRE_VERTEX_SHADER, OGRE_FRAGMENT_SHADER
+        tmp = GpuProgram::getProgramTypeName(getType());
+        StringUtil::toUpperCase(tmp);
+        defines += ",OGRE_"+tmp+"_SHADER";
+
+        if(renderSystem && renderSystem->isReverseDepthBufferEnabled())
+            defines += ",OGRE_REVERSED_Z";
+
+        return defines;
     }
 
     //---------------------------------------------------------------------------
@@ -279,10 +304,10 @@ namespace Ogre
             }
 
             // find following newline (or EOF)
-            size_t newLineAfter = inSource.find('\n', afterIncludePos);
+            size_t newLineAfter = std::min(inSource.find('\n', afterIncludePos), inSource.size());
             // find include file string container
-            String endDelimeter = "\"";
-            size_t startIt = inSource.find('\"', afterIncludePos);
+            char endDelimeter = '"';
+            size_t startIt = inSource.find('"', afterIncludePos);
             if (startIt == String::npos || startIt > newLineAfter)
             {
                 // try <>
@@ -295,15 +320,16 @@ namespace Ogre
                 }
                 else
                 {
-                    endDelimeter = ">";
+                    endDelimeter = '>';
                 }
             }
             size_t endIt = inSource.find(endDelimeter, startIt+1);
             if (endIt == String::npos || endIt <= startIt)
             {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Badly formed #include directive (expected " + endDelimeter +
-                                                               ") in file " + fileName + ": " +
-                                                               inSource.substr(includePos, newLineAfter - includePos));
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                            "Badly formed #include directive (expected " + String(1, endDelimeter) +
+                                ") in file " + fileName + ": " +
+                                inSource.substr(includePos, newLineAfter - includePos));
             }
 
             // extract filename
@@ -327,7 +353,8 @@ namespace Ogre
             // Add #line to the start of the included file to correct the line count)
             outSource.append("#line 1 " + incLineFilename + "\n");
 
-            outSource.append(resource->getAsString());
+            // recurse into include
+            outSource.append(_resolveIncludes(resource->getAsString(), resourceBeingLoaded, filename));
 
             // Add #line to the end of the included file to correct the line count
             outSource.append("\n#line " + std::to_string(lineCount) + lineFilename);

@@ -46,7 +46,7 @@ THE SOFTWARE.
 #include "PlayPenTestPlugin.h"
 #endif
 
-TestContext::TestContext(int argc, char** argv) : OgreBites::SampleContext(), mSuccess(true), mTimestep(0.01f), mCurrentTest(0), mBatch(0)
+TestContext::TestContext(int argc, char** argv) : OgreBites::SampleContext(), mSuccess(true), mTimestep(0.01f), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
@@ -279,16 +279,6 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
             }
 
             mTests.push_back(*j);
-            Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
-            Ogre::NameValuePairList::iterator k;
-
-            // give sample default title and category if none found
-            k= info.find("Title");
-            if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
-            k = info.find("Category");
-            if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
-            k = info.find("Thumbnail");
-            if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
         }
     }
 
@@ -303,6 +293,16 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
 }
 //-----------------------------------------------------------------------
 
+bool TestContext::frameRenderingQueued(const Ogre::FrameEvent& evt)
+{
+    // pass a fixed timestep along to the tests
+    Ogre::FrameEvent fixed_evt = Ogre::FrameEvent();
+    fixed_evt.timeSinceLastFrame = mTimestep;
+    fixed_evt.timeSinceLastEvent = mTimestep;
+
+    return mCurrentSample->frameRenderingQueued(fixed_evt);
+}
+
 bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
 {
     pollEvents();
@@ -312,17 +312,13 @@ bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
     fixed_evt.timeSinceLastFrame = mTimestep;
     fixed_evt.timeSinceLastEvent = mTimestep;
 
-    if (mCurrentTest) // if a test is running
+    if (mCurrentSample) // if a test is running
     {
         // track frame number for screenshot purposes
         ++mCurrentFrame;
 
         // regular update function
-        return mCurrentTest->frameStarted(fixed_evt);
-    }
-    else if (mCurrentSample) // if a generic sample is running
-    {
-        return mCurrentSample->frameStarted(evt);
+        return mCurrentSample->frameStarted(fixed_evt);
     }
     else
     {
@@ -340,21 +336,21 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
     fixed_evt.timeSinceLastFrame = mTimestep;
     fixed_evt.timeSinceLastEvent = mTimestep;
 
-    if (mCurrentTest) // if a test is running
+    if (mCurrentSample) // if a test is running
     {
-        if (mCurrentTest->isScreenshotFrame(mCurrentFrame))
+        if (mCurrentSample->isScreenshotFrame(mCurrentFrame))
         {
             // take a screenshot
             Ogre::String filename = mOutputDir + mBatch->name + "/" +
-                mCurrentTest->getInfo()["Title"] + "_" +
+                    mCurrentSample->getInfo()["Title"] + "_" +
                 Ogre::StringConverter::toString(mCurrentFrame) + ".png";
             // remember the name of the shot, for later comparison purposes
-            mBatch->images.push_back(mCurrentTest->getInfo()["Title"] + "_" +
+            mBatch->images.push_back(mCurrentSample->getInfo()["Title"] + "_" +
                                      Ogre::StringConverter::toString(mCurrentFrame));
             mWindow->writeContentsToFile(filename);
         }
 
-        if (mCurrentTest->isDone())
+        if (mCurrentSample->isDone())
         {
             // continue onto the next test
             runSample(0);
@@ -363,11 +359,7 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
         }
 
         // standard update function
-        return mCurrentTest->frameEnded(fixed_evt);
-    }
-    else if (mCurrentSample) // if a generic sample is running
-    {
-        return mCurrentSample->frameEnded(evt);
+        return mCurrentSample->frameEnded(fixed_evt);
     }
     else
     {
@@ -378,14 +370,10 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
 }
 //-----------------------------------------------------------------------
 
-void TestContext::runSample(OgreBites::Sample* s)
+void TestContext::runSample(OgreBites::Sample* sampleToRun)
 {
     // reset frame timing
-    Ogre::ControllerManager::getSingleton().setFrameDelay(0);
-    Ogre::ControllerManager::getSingleton().setTimeFactor(1.f);
     mCurrentFrame = 0;
-
-    OgreBites::Sample* sampleToRun = s;
 
     // If a valid test is passed, then run it
     // If null, grab the next one from the deque
@@ -396,26 +384,14 @@ void TestContext::runSample(OgreBites::Sample* s)
             sampleToRun = mTests.front();
     }
 
-    // Check if this is a VisualTest
-    mCurrentTest = static_cast<VisualTest*>(sampleToRun);
-
     // Set things up to be deterministic
-    if (mCurrentTest)
-    {
-        // Seed rand with a predictable value
-        srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
+    // Seed rand with a predictable value
+    srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
+    // Give a fixed timestep for particles and other time-dependent things in OGRE
+    Ogre::ControllerManager::getSingleton().setFrameDelay(mTimestep);
 
-        // Give a fixed timestep for particles and other time-dependent things in OGRE
-        Ogre::ControllerManager::getSingleton().setFrameDelay(mTimestep);
-        LogManager::getSingleton().logMessage("----- Running Visual Test " + mCurrentTest->getInfo()["Title"] + " -----");
-    }
-
-#ifdef INCLUDE_RTSHADER_SYSTEM
-    if (sampleToRun) {
-        sampleToRun->setShaderGenerator(mShaderGenerator);
-    }
-#endif
-
+    if(sampleToRun)
+        LogManager::getSingleton().logMessage("----- Running Visual Test " + sampleToRun->getInfo()["Title"] + " -----");
     SampleContext::runSample(sampleToRun);
 }
 //-----------------------------------------------------------------------

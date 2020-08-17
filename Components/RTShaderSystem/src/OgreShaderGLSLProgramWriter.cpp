@@ -110,6 +110,7 @@ const char* GLSLProgramWriter::getGL3CompatDefines()
     // Redefine texture functions to maintain reusability
     return "#define texture1D texture\n"
            "#define texture2D texture\n"
+           "#define shadow2D texture\n"
            "#define shadow2DProj textureProj\n"
            "#define texture3D texture\n"
            "#define textureCube texture\n"
@@ -258,6 +259,7 @@ void GLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* prog
     os << "//-----------------------------------------------------------------------------" << std::endl;
     os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "#include <OgreUnifiedShader.h>" << std::endl;
 
     for (unsigned int i=0; i < program->getDependencyCount(); ++i)
     {

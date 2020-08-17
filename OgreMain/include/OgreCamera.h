@@ -255,7 +255,7 @@ namespace Ogre {
 
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::setDirection
-        void setDirection(const Vector3& vec);
+        OGRE_DEPRECATED void setDirection(const Vector3& vec);
 
         /** Gets the camera's direction.
         @deprecated attach to SceneNode and use SceneNode::getOrientation().zAxis() * -1
@@ -281,7 +281,7 @@ namespace Ogre {
             targetPoint A vector specifying the look at point.
         @deprecated attach to SceneNode and use SceneNode::lookAt
         */
-        void lookAt( const Vector3& targetPoint );
+        OGRE_DEPRECATED void lookAt( const Vector3& targetPoint );
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::lookAt
         OGRE_DEPRECATED void lookAt(Real x, Real y, Real z);
@@ -304,11 +304,11 @@ namespace Ogre {
         /** Rotate the camera around an arbitrary axis.
         @deprecated attach to SceneNode and use SceneNode::rotate
         */
-        void rotate(const Vector3& axis, const Radian& angle);
+        OGRE_DEPRECATED void rotate(const Vector3& axis, const Radian& angle);
 
         /// @overload
         /// @deprecated attach to SceneNode and use SceneNode::rotate
-        void rotate(const Quaternion& q);
+        OGRE_DEPRECATED void rotate(const Quaternion& q);
 
         /** Tells the camera whether to yaw around it's own local Y axis or a 
             fixed axis of choice.
@@ -344,7 +344,7 @@ namespace Ogre {
         OGRE_DEPRECATED void setOrientation(const Quaternion& q);
 
         /** Internal method used by OGRE to update auto-tracking cameras. */
-        void _autoTrack(void);
+        OGRE_DEPRECATED void _autoTrack(void);
 
         /** Get the auto tracking target for this camera, if any. */
         OGRE_DEPRECATED SceneNode* getAutoTrackTarget(void) const { return mAutoTrackTarget; }

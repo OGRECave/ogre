@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreParticleEmitter.h"
 #include "OgreParticleAffector.h"
 #include "OgreParticle.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreParticleAffectorFactory.h"
 #include "OgreParticleSystemRenderer.h"
 #include "OgreControllerManager.h"

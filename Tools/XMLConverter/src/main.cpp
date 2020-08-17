@@ -57,10 +57,25 @@ struct XmlOptions
     size_t mergeTexcoordToDestroy;
     bool optimiseAnimations;
     bool quietMode;
-    bool d3d;
-    bool gl;
+    VertexElementType colourElementType;
     Serializer::Endian endian;
 };
+
+// Crappy globals
+// NB some of these are not directly used, but are required to
+//   instantiate the singletons used in the dlls
+LogManager* logMgr = 0;
+Math* mth = 0;
+LodStrategyManager *lodMgr = 0;
+MaterialManager* matMgr = 0;
+SkeletonManager* skelMgr = 0;
+MeshSerializer* meshSerializer = 0;
+XMLMeshSerializer* xmlMeshSerializer = 0;
+SkeletonSerializer* skeletonSerializer = 0;
+XMLSkeletonSerializer* xmlSkeletonSerializer = 0;
+DefaultHardwareBufferManager *bufferManager = 0;
+MeshManager* meshMgr = 0;
+ResourceGroupManager* rgm = 0;
 
 void print_version(void)
 {
@@ -83,8 +98,9 @@ void help(void)
     cout << "                 n0 and n1 must be in the same buffer source & adjacent" << endl;
     cout << "                 to each other for the merge to work." << endl;
     cout << "-o             = DON'T optimise out redundant tracks & keyframes" << endl;
-    cout << "-d3d           = Prefer D3D packed colour formats (default on Windows)" << endl;
-    cout << "-gl            = Prefer GL packed colour formats (default on non-Windows)" << endl;
+    cout << "-d3d           = Use packed argb colour format (default on Windows)" << endl;
+    cout << "-gl            = Use packed abgr colour format (default on non-Windows)" << endl;
+    cout << "-byte          = Use ubyte4 colour format (default since 1.13)" << endl;
     cout << "-E endian      = Set endian mode 'big' 'little' or 'native' (default)" << endl;
     cout << "-x num         = Generate no more than num eXtremes for every submesh (default 0)" << endl;
     cout << "-q             = Quiet mode, less output" << endl;
@@ -110,6 +126,7 @@ XmlOptions parseArgs(int numArgs, char **args)
     opts.optimiseAnimations = true;
     opts.quietMode = false;
     opts.endian = Serializer::ENDIAN_NATIVE;
+    opts.colourElementType = VET_COLOUR;
 
     // ignore program name
     char* source = 0;
@@ -123,6 +140,7 @@ XmlOptions parseArgs(int numArgs, char **args)
     unOpt["-q"] = false;
     unOpt["-d3d"] = false;
     unOpt["-gl"] = false;
+    unOpt["-byte"] = false;
     unOpt["-h"] = false;
     unOpt["-v"] = false;
     binOpt["-E"] = "";
@@ -131,101 +149,90 @@ XmlOptions parseArgs(int numArgs, char **args)
     binOpt["-merge"] = "0,0";
 
     int startIndex = findCommandLineOpts(numArgs, args, unOpt, binOpt);
-    UnaryOptionList::iterator ui;
-    BinaryOptionList::iterator bi;
 
-    ui = unOpt.find("-v");
-    if (ui->second)
+    if (unOpt["-v"])
     {
         print_version();
         exit(0);
     }
-
-    ui = unOpt.find("-h");
-    if (ui->second)
+    if (unOpt["-h"])
     {
         help();
         exit(1);
     }
-
-    ui = unOpt.find("-q");
-    if (ui->second)
+    if (unOpt["-q"])
     {
         opts.quietMode = true;
     }
+    if (unOpt["-o"])
+    {
+        opts.optimiseAnimations = false;
+    }
 
-        ui = unOpt.find("-o");
-        if (ui->second)
+    auto bi = binOpt.find("-merge");
+    if (!bi->second.empty())
+    {
+        String::size_type separator = bi->second.find_first_of( "," );
+        if( separator == String::npos )
         {
-            opts.optimiseAnimations = false;
+            //Input format was "-merge 2"
+            //Assume we want to merge 2 with 3
+            opts.mergeTexcoordResult    = StringConverter::parseInt( bi->second, 0 );
+            opts.mergeTexcoordToDestroy = opts.mergeTexcoordResult + 1;
         }
+        else if( separator + 1 < bi->second.size() )
+        {
+            //Input format was "-merge 1,2"
+            //We want to merge 1 with 2
+            opts.mergeTexcoordResult    = StringConverter::parseInt(
+                                                            bi->second.substr( 0, separator ), 0 );
+            opts.mergeTexcoordToDestroy = StringConverter::parseInt(
+                                                            bi->second.substr( separator+1,
+                                                            bi->second.size() ), 1 );
+        }
+    }
+    else
+    {
+        //Very rare to reach here.
+        //Input format was "-merge"
+        //Assume we want to merge 0 with 1
+        opts.mergeTexcoordResult = 0;
+        opts.mergeTexcoordResult = 1;
+    }
 
-        bi = binOpt.find("-merge");
-        if (!bi->second.empty())
-        {
-            String::size_type separator = bi->second.find_first_of( "," );
-            if( separator == String::npos )
-            {
-                //Input format was "-merge 2"
-                //Assume we want to merge 2 with 3
-                opts.mergeTexcoordResult    = StringConverter::parseInt( bi->second, 0 );
-                opts.mergeTexcoordToDestroy = opts.mergeTexcoordResult + 1;
-            }
-            else if( separator + 1 < bi->second.size() )
-            {
-                //Input format was "-merge 1,2"
-                //We want to merge 1 with 2
-                opts.mergeTexcoordResult    = StringConverter::parseInt(
-                                                                bi->second.substr( 0, separator ), 0 );
-                opts.mergeTexcoordToDestroy = StringConverter::parseInt(
-                                                                bi->second.substr( separator+1,
-                                                                bi->second.size() ), 1 );
-            }
-        }
+    bi = binOpt.find("-x");
+    if (!bi->second.empty())
+    {
+        opts.nuextremityPoints = StringConverter::parseInt(bi->second);
+    }
+
+    opts.logFile = binOpt["-log"];
+
+    bi = binOpt.find("-E");
+    if (!bi->second.empty())
+    {
+        if (bi->second == "big")
+            opts.endian = Serializer::ENDIAN_BIG;
+        else if (bi->second == "little")
+            opts.endian = Serializer::ENDIAN_LITTLE;
         else
-        {
-            //Very rare to reach here.
-            //Input format was "-merge"
-            //Assume we want to merge 0 with 1
-            opts.mergeTexcoordResult = 0;
-            opts.mergeTexcoordResult = 1;
-        }
+            opts.endian = Serializer::ENDIAN_NATIVE;
+    }
 
-        bi = binOpt.find("-x");
-        if (!bi->second.empty())
-        {
-            opts.nuextremityPoints = StringConverter::parseInt(bi->second);
-        }
+    if (unOpt["-d3d"])
+    {
+        opts.colourElementType = VET_COLOUR_ARGB;
+    }
 
-        bi = binOpt.find("-log");
-        if (!bi->second.empty())
-        {
-            opts.logFile = bi->second;
-        }
+    if (unOpt["-gl"])
+    {
+        opts.colourElementType = VET_COLOUR_ABGR;
+    }
 
-        bi = binOpt.find("-E");
-        if (!bi->second.empty())
-        {
-            if (bi->second == "big")
-                opts.endian = Serializer::ENDIAN_BIG;
-            else if (bi->second == "little")
-                opts.endian = Serializer::ENDIAN_LITTLE;
-            else 
-                opts.endian = Serializer::ENDIAN_NATIVE;
-        }
-
-        ui = unOpt.find("-d3d");
-        if (ui->second)
-        {
-            opts.d3d = true;
-        }
-
-        ui = unOpt.find("-gl");
-        if (ui->second)
-        {
-            opts.gl = true;
-            opts.d3d = false;
-        }
+    if (unOpt["-byte"])
+    {
+        opts.colourElementType = VET_UBYTE4_NORM;
+    }
 
     // Source / dest
     if (numArgs > startIndex)
@@ -233,15 +240,13 @@ XmlOptions parseArgs(int numArgs, char **args)
     if (numArgs > startIndex+1)
         dest = args[startIndex+1];
     if (numArgs > startIndex+2) {
-        cout << "Too many command-line arguments supplied - abort. " << endl;
-        help();
+        logMgr->logError("Too many command-line arguments supplied");
         exit(1);
     }
 
     if (!source)
     {
-        cout << "Missing source file - abort. " << endl;
-        help();
+        logMgr->logError("Missing source file");
         exit(1);
     }
     // Work out what kind of conversion this is
@@ -293,31 +298,14 @@ XmlOptions parseArgs(int numArgs, char **args)
     return opts;
 }
 
-// Crappy globals
-// NB some of these are not directly used, but are required to
-//   instantiate the singletons used in the dlls
-LogManager* logMgr = 0;
-Math* mth = 0;
-LodStrategyManager *lodMgr = 0;
-MaterialManager* matMgr = 0;
-SkeletonManager* skelMgr = 0;
-MeshSerializer* meshSerializer = 0;
-XMLMeshSerializer* xmlMeshSerializer = 0;
-SkeletonSerializer* skeletonSerializer = 0;
-XMLSkeletonSerializer* xmlSkeletonSerializer = 0;
-DefaultHardwareBufferManager *bufferManager = 0;
-MeshManager* meshMgr = 0;
-ResourceGroupManager* rgm = 0;
-
-
 void meshToXML(XmlOptions opts)
 {
     std::ifstream ifs;
     ifs.open(opts.source.c_str(), std::ios_base::in | std::ios_base::binary);
 
-    if (ifs.bad())
+    if (!ifs.good())
     {
-        cout << "Unable to load file " << opts.source << endl;
+        logMgr->logError("Unable to load file " + opts.source);
         exit(1);
     }
 
@@ -346,7 +334,7 @@ void XMLToBinary(XmlOptions opts)
     // Some double-parsing here but never mind
     if (!doc.load_file(opts.source.c_str()))
     {
-        cout << "Unable to open file " << opts.source << " - fatal error." << endl;
+        logMgr->logError("Unable to load file " + opts.source);
         exit (1);
     }
     pugi::xml_node root = doc.document_element();
@@ -354,13 +342,8 @@ void XMLToBinary(XmlOptions opts)
     {
         MeshPtr newMesh = MeshManager::getSingleton().createManual("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        VertexElementType colourElementType;
-        if (opts.d3d)
-            colourElementType = VET_COLOUR_ARGB;
-        else
-            colourElementType = VET_COLOUR_ABGR;
 
-        xmlMeshSerializer->importMesh(opts.source, colourElementType, newMesh.get());
+        xmlMeshSerializer->importMesh(opts.source, opts.colourElementType, newMesh.get());
 
         if( opts.mergeTexcoordResult != opts.mergeTexcoordToDestroy )
         {
@@ -404,9 +387,9 @@ void skeletonToXML(XmlOptions opts)
 
     std::ifstream ifs;
     ifs.open(opts.source.c_str(), std::ios_base::in | std::ios_base::binary);
-    if (ifs.bad())
+    if (!ifs.good())
     {
-        cout << "Unable to load file " << opts.source << endl;
+        logMgr->logError("Unable to load file " + opts.source);
         exit(1);
     }
 
@@ -428,6 +411,14 @@ struct MaterialCreator : public MeshSerializerListener
 {
     void processMaterialName(Mesh *mesh, String *name)
     {
+        if (name->empty())
+        {
+            LogManager::getSingleton().logWarning("one of the SubMeshes is using an empty material name. "
+                                                  "This violates the specs and may lead to crashes.");
+            // here, we explicitly want to allow fixing that
+            return;
+        }
+
         // create material because we do not load any .material files
         MaterialManager::getSingleton().create(*name, mesh->getGroup());
     }
@@ -492,7 +483,7 @@ int main(int numargs, char** args)
         }
         else
         {
-            cout << "Unknown input type.\n";
+            logMgr->logError("Unknown input type: " + opts.sourceExt);
             retCode = 1;
         }
 

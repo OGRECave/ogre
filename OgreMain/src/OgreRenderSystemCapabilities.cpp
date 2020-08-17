@@ -181,6 +181,7 @@ namespace Ogre {
             "   - Non-power-of-two: " + StringConverter::toString(hasCapability(RSC_NON_POWER_OF_2_TEXTURES), true) +
             (mNonPOW2TexturesLimited ? " (limited)" : ""));
         pLog->logMessage("   - 1D textures: " + StringConverter::toString(hasCapability(RSC_TEXTURE_1D), true));
+        pLog->logMessage("   - 2D array textures: " + StringConverter::toString(hasCapability(RSC_TEXTURE_2D_ARRAY), true));
         pLog->logMessage("   - 3D textures: " + StringConverter::toString(hasCapability(RSC_TEXTURE_3D), true));
         pLog->logMessage("   - Anisotropic filtering: " + StringConverter::toString(hasCapability(RSC_ANISOTROPY), true));
 

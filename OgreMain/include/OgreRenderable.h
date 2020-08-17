@@ -68,6 +68,11 @@ namespace Ogre {
         typedef SharedPtr<RenderSystemData> RenderSystemDataPtr;
         
     public:
+        enum
+        {
+            DEFAULT_PRIORITY = 100
+        };
+
         Renderable() : mPolygonModeOverrideable(true), mUseIdentityProjection(false), mUseIdentityView(false){}
         /** Virtual destructor needed as class has virtual methods. */
         virtual ~Renderable() {}

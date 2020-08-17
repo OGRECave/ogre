@@ -32,11 +32,9 @@ void Widget::nukeOverlayElement(Ogre::OverlayElement *element)
     if (container)
     {
         std::vector<Ogre::OverlayElement*> toDelete;
-
-        Ogre::OverlayContainer::ChildIterator children = container->getChildIterator();
-        while (children.hasMoreElements())
+        for (const auto& p : container->getChildren())
         {
-            toDelete.push_back(children.getNext());
+            toDelete.push_back(p.second);
         }
 
         for (unsigned int i = 0; i < toDelete.size(); i++)

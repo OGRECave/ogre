@@ -148,8 +148,6 @@ namespace Ogre {
 
         initConfigOptions();
 
-        mColourWrite[0] = mColourWrite[1] = mColourWrite[2] = mColourWrite[3] = true;
-
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
             // Dummy value
@@ -332,6 +330,7 @@ namespace Ogre {
         // So are 1D & 3D textures
         rsc->setCapability(RSC_TEXTURE_1D);
         rsc->setCapability(RSC_TEXTURE_3D);
+        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
 
         // UBYTE4 always supported
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
@@ -587,61 +586,10 @@ namespace Ogre {
         // RenderSystem::shutdown();
     }
 
-    bool GL3PlusRenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
-                                                   RenderWindowList& createdWindows)
-    {
-        // Call base render system method.
-        if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
-            return false;
-
-        // Simply call _createRenderWindow in a loop.
-        for (size_t i = 0; i < renderWindowDescriptions.size(); ++i)
-        {
-            const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];
-            RenderWindow* curWindow = NULL;
-
-            curWindow = _createRenderWindow(curRenderWindowDescription.name,
-                                            curRenderWindowDescription.width,
-                                            curRenderWindowDescription.height,
-                                            curRenderWindowDescription.useFullScreen,
-                                            &curRenderWindowDescription.miscParams);
-
-            createdWindows.push_back(curWindow);
-        }
-
-        return true;
-    }
-
     RenderWindow* GL3PlusRenderSystem::_createRenderWindow(const String &name, unsigned int width, unsigned int height,
                                                            bool fullScreen, const NameValuePairList *miscParams)
     {
-        if (mRenderTargets.find(name) != mRenderTargets.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Window with name '" + name + "' already exists",
-                        "GL3PlusRenderSystem::_createRenderWindow");
-        }
-
-        // Log a message
-        StringStream ss;
-        ss << "GL3PlusRenderSystem::_createRenderWindow \"" << name << "\", " <<
-            width << "x" << height << " ";
-        if (fullScreen)
-            ss << "fullscreen ";
-        else
-            ss << "windowed ";
-
-        if (miscParams)
-        {
-            ss << " miscParams: ";
-            NameValuePairList::const_iterator it;
-            for (it = miscParams->begin(); it != miscParams->end(); ++it)
-            {
-                ss << it->first << "=" << it->second << " ";
-            }
-
-            LogManager::getSingleton().logMessage(ss.str());
-        }
+        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
 
         // Create the window
         RenderWindow* win = mGLSupport->newWindow(name, width, height, fullScreen, miscParams);
@@ -872,70 +820,6 @@ namespace Ogre {
         return GL_ONE;
     }
 
-    void GL3PlusRenderSystem::_setSeparateSceneBlending(
-        SceneBlendFactor sourceFactor, SceneBlendFactor destFactor,
-        SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
-        SceneBlendOperation op, SceneBlendOperation alphaOp )
-    {
-        GLenum sourceBlend = getBlendMode(sourceFactor);
-        GLenum destBlend = getBlendMode(destFactor);
-        GLenum sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
-        GLenum destBlendAlpha = getBlendMode(destFactorAlpha);
-
-        if (sourceFactor == SBF_ONE && destFactor == SBF_ZERO &&
-            sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, false);
-        }
-        else
-        {
-            mStateCacheManager->setEnabled(GL_BLEND, true);
-            mStateCacheManager->setBlendFunc(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
-        }
-
-        GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
-
-        switch(op)
-        {
-        case SBO_ADD:
-            func = GL_FUNC_ADD;
-            break;
-        case SBO_SUBTRACT:
-            func = GL_FUNC_SUBTRACT;
-            break;
-        case SBO_REVERSE_SUBTRACT:
-            func = GL_FUNC_REVERSE_SUBTRACT;
-            break;
-        case SBO_MIN:
-            func = GL_MIN;
-            break;
-        case SBO_MAX:
-            func = GL_MAX;
-            break;
-        }
-
-        switch(alphaOp)
-        {
-        case SBO_ADD:
-            alphaFunc = GL_FUNC_ADD;
-            break;
-        case SBO_SUBTRACT:
-            alphaFunc = GL_FUNC_SUBTRACT;
-            break;
-        case SBO_REVERSE_SUBTRACT:
-            alphaFunc = GL_FUNC_REVERSE_SUBTRACT;
-            break;
-        case SBO_MIN:
-            alphaFunc = GL_MIN;
-            break;
-        case SBO_MAX:
-            alphaFunc = GL_MAX;
-            break;
-        }
-
-        mStateCacheManager->setBlendEquation(func, alphaFunc);
-    }
-
     void GL3PlusRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
         mStateCacheManager->setEnabled(GL_SAMPLE_ALPHA_TO_COVERAGE, (func != CMPF_ALWAYS_PASS) && alphaToCoverage);
@@ -1089,16 +973,42 @@ namespace Ogre {
             glPolygonOffset(-slopeScaleBias, -constantBias);
         }
     }
-
-    void GL3PlusRenderSystem::_setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
+    static GLenum getBlendOp(SceneBlendOperation op)
     {
-        mStateCacheManager->setColourMask(red, green, blue, alpha);
-
+        switch (op)
+        {
+        case SBO_ADD:
+            return GL_FUNC_ADD;
+        case SBO_SUBTRACT:
+            return GL_FUNC_SUBTRACT;
+        case SBO_REVERSE_SUBTRACT:
+            return GL_FUNC_REVERSE_SUBTRACT;
+        case SBO_MIN:
+            return GL_MIN;
+        case SBO_MAX:
+            return GL_MAX;
+        }
+        return GL_FUNC_ADD;
+    }
+    void GL3PlusRenderSystem::setColourBlendState(const ColourBlendState& state)
+    {
         // record this
-        mColourWrite[0] = red;
-        mColourWrite[1] = green;
-        mColourWrite[2] = blue;
-        mColourWrite[3] = alpha;
+        mCurrentBlend = state;
+
+        if (state.blendingEnabled())
+        {
+            mStateCacheManager->setEnabled(GL_BLEND, true);
+            mStateCacheManager->setBlendFunc(
+                getBlendMode(state.sourceFactor), getBlendMode(state.destFactor),
+                getBlendMode(state.sourceFactorAlpha), getBlendMode(state.destFactorAlpha));
+        }
+        else
+        {
+            mStateCacheManager->setEnabled(GL_BLEND, false);
+        }
+
+        mStateCacheManager->setBlendEquation(getBlendOp(state.operation), getBlendOp(state.alphaOperation));
+        mStateCacheManager->setColourMask(state.writeR, state.writeG, state.writeB, state.writeA);
     }
 
     HardwareOcclusionQuery* GL3PlusRenderSystem::createHardwareOcclusionQuery(void)
@@ -1494,8 +1404,8 @@ namespace Ogre {
                                                const ColourValue& colour,
                                                Real depth, unsigned short stencil)
     {
-        bool colourMask = !mColourWrite[0] || !mColourWrite[1] ||
-            !mColourWrite[2] || !mColourWrite[3];
+        bool colourMask =
+            !(mCurrentBlend.writeR && mCurrentBlend.writeG && mCurrentBlend.writeB && mCurrentBlend.writeA);
 
         GLbitfield flags = 0;
         if (buffers & FBT_COLOUR)
@@ -1560,7 +1470,8 @@ namespace Ogre {
 
         if (colourMask && (buffers & FBT_COLOUR))
         {
-            mStateCacheManager->setColourMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]);
+            mStateCacheManager->setColourMask(mCurrentBlend.writeR, mCurrentBlend.writeG,
+                                              mCurrentBlend.writeB, mCurrentBlend.writeA);
         }
 
         if (buffers & FBT_STENCIL)
@@ -1616,7 +1527,8 @@ namespace Ogre {
         // clearFrameBuffer would be wrong because the value we are recorded may be
         // difference with the really state stored in GL context.
         mStateCacheManager->setDepthMask(mDepthWrite);
-        mStateCacheManager->setColourMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]);
+        mStateCacheManager->setColourMask(mCurrentBlend.writeR, mCurrentBlend.writeG,
+                                          mCurrentBlend.writeB, mCurrentBlend.writeA);
         mStateCacheManager->setStencilMask(mStencilWriteMask);
     }
 

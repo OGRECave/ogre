@@ -49,7 +49,7 @@ namespace Ogre
     void LodWorkQueueWorker::addRequestToQueue( LodWorkQueueRequest* request )
     {
         WorkQueue* wq = Root::getSingleton().getWorkQueue();
-        wq->addRequest(mChannelID, 0, Any(request),0,false,true);
+        wq->addRequest(mChannelID, 0, request,0,false,true);
     }
 
     void LodWorkQueueWorker::addRequestToQueue( LodConfig& lodConfig, LodCollapseCostPtr& cost, LodDataPtr& data, LodInputProviderPtr& input, LodOutputProviderPtr& output, LodCollapserPtr& collapser )

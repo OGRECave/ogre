@@ -51,15 +51,7 @@ namespace Ogre {
         queryDesc.Query = D3D11_QUERY_OCCLUSION;
         queryDesc.MiscFlags = 0;
         // create the occlusion query
-        const HRESULT hr = mDevice->CreateQuery(&queryDesc, mQuery.ReleaseAndGetAddressOf());
-
-        if (FAILED(hr) || mDevice.isError()) 
-        {   
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_INTERNAL_ERROR, hr,
-                "Cannot allocate a Hardware query. This video card doesn't supports it, sorry.\nError Description:" + errorDescription, 
-                "D3D11HardwareOcclusionQuery::D3D11HardwareOcclusionQuery");
-        }
+        OGRE_CHECK_DX_ERROR(mDevice->CreateQuery(&queryDesc, mQuery.ReleaseAndGetAddressOf()));
     }
 
     /**

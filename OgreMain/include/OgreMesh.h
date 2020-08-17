@@ -362,6 +362,7 @@ namespace Ogre {
             update the bounds for you, because it cannot necessarily read vertex data back from 
             the vertex buffers which this mesh uses (they very well might be write-only, and even
             if they are not, reading data from a hardware buffer is a bottleneck).
+            @param bounds The axis-aligned bounding box for this mesh
             @param pad If true, a certain padding will be added to the bounding box to separate it from the mesh
         */
         void _setBounds(const AxisAlignedBox& bounds, bool pad = true);
@@ -484,7 +485,7 @@ namespace Ogre {
         @remarks
             This number includes the original model.
         */
-        ushort getNumLodLevels(void) const;
+        ushort getNumLodLevels(void) const { return mNumLods; }
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
 
@@ -1015,7 +1016,7 @@ namespace Ogre {
 
         /** Value used by to determine when this LOD applies.
         @remarks
-            May be interpretted differently by different strategies.
+            May be interpreted differently by different strategies.
             Transformed from user-supplied values with LodStrategy::transformUserValue.
         */
         Real value;

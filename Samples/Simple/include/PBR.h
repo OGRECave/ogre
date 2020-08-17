@@ -14,33 +14,24 @@ public:
     Sample_PBR()
     {
         mInfo["Title"] = "Physically Based Rendering";
-        mInfo["Description"] = "Shows how to do physically based rendering using the glTF2.0 reference shaders";
+        mInfo["Description"] = "Shows how to do physically based rendering using a custom material";
         mInfo["Thumbnail"] = "thumb_pbr.png";
         mInfo["Category"] = "Lighting";
     }
 
-    ~Sample_PBR()
-    {
-        
-    }
-
 protected:
     GpuProgramParametersSharedPtr mParams;
+    Entity* mEntity;
 
     void setupControls()
     {
         int gui_width = 250;
 
-        SelectMenu* objectType = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "term", "Term", gui_width, 9);
-        objectType->addItem("final");
-        objectType->addItem("fresnel (F)");
-        objectType->addItem("geometric (G)");
-        objectType->addItem("microfacet (D)");
-        objectType->addItem("specular (FGD)");
-        objectType->addItem("diffuse");
-        objectType->addItem("albedo");
-        objectType->addItem("metallic");
-        objectType->addItem("roughness");
+        SelectMenu* objectType = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "term", "Material", gui_width, 9);
+        objectType->addItem("glTF2 Shader");
+        objectType->addItem("RTSS Fallback");
+        if(GpuProgramManager::getSingleton().isSyntaxSupported("glsl330"))
+            objectType->addItem("Filament Shader");
         objectType->selectItem(0, false);
 
         mTrayMgr->createCheckBox(TL_TOPLEFT, "ibl", "Image Based Lighting", gui_width)->setChecked(true, false);
@@ -62,12 +53,17 @@ protected:
             ->createChildSceneNode(Vector3(4, 1, 6))
             ->attachObject(light);
 
-        Entity* ent = mSceneMgr->createEntity("DamagedHelmet", "DamagedHelmet.mesh");
-        ent->getMesh()->buildTangentVectors(); // enforce that we have tangent vectors
+        mEntity = mSceneMgr->createEntity("DamagedHelmet.mesh");
+
+        unsigned short src, dst;
+        if (!mEntity->getMesh()->suggestTangentVectorBuildParams(VES_TANGENT, src, dst))
+        {
+            // enforce that we have tangent vectors
+            mEntity->getMesh()->buildTangentVectors(VES_TANGENT, src, dst);
+        }
 
         SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        node->pitch(Degree(90));
-        node->attachObject(ent);
+        node->attachObject(mEntity);
 
         mViewport->setBackgroundColour(ColourValue(0.05, 0.05, 0.05));
 
@@ -77,14 +73,10 @@ protected:
 
     void itemSelected(SelectMenu* menu)
     {
-        Real mix[8] = {0};
+        static const char* materials[] = {"DamagedHelmet", "DamagedHelmet_FFP", "DamagedHelmet_Filament"};
         int n = menu->getSelectionIndex();
 
-        if (n > 0)
-            mix[n - 1] = 1;
-
-        mParams->setNamedConstant("u_ScaleFGDSpec", Vector4(mix));
-        mParams->setNamedConstant("u_ScaleDiffBaseMR", Vector4(mix + 4));
+        mEntity->setMaterialName(materials[n]);
     }
         
     void checkBoxToggled(CheckBox* box)

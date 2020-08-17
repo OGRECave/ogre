@@ -60,17 +60,18 @@ namespace Ogre {
         CPreprocessor cpp;
 
         // Define "predefined" macros.
-        // TODO: decide, should we define __VERSION__, and with what value.
         if(getLanguage() == "glsles")
-            cpp.Define("GL_ES", 5, 1);
+            cpp.Define("GL_ES", 5, "1", 1);
 
-        RenderSystem* renderSystem = Root::getSingleton().getRenderSystem();
-        if (renderSystem && renderSystem->isReverseDepthBufferEnabled())
+        size_t versionPos = mSource.find("#version");
+        if(versionPos != String::npos)
         {
-            cpp.Define("OGRE_REVERSED_Z", 15, 1);
+            mShaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
         }
+        String verStr = std::to_string(mShaderVersion);
+        cpp.Define("__VERSION__", 11, verStr.c_str(), verStr.size());
 
-        String defines = mPreprocessorDefines;
+        String defines = appendBuiltinDefines(mPreprocessorDefines);
 
         for(const auto& def : parseDefines(defines))
         {
@@ -102,6 +103,7 @@ namespace Ogre {
         , mShaderID(++mShaderCount) // Increase shader counter and use as ID
         , mGLShaderHandle(0)
         , mGLProgramHandle(0)
+        , mShaderVersion(100)
     {
     }
     //-----------------------------------------------------------------------

@@ -1723,7 +1723,7 @@ void ShaderGenerator::SGTechnique::buildTargetRenderState()
         
     // Create the destination technique and passes.
     mDstTechnique   = mSrcTechnique->getParent()->createTechnique();
-    mDstTechnique->getUserObjectBindings().setUserAny(SGTechnique::UserKey, Any(this));
+    mDstTechnique->getUserObjectBindings().setUserAny(SGTechnique::UserKey, this);
     *mDstTechnique  = *mSrcTechnique;
     mDstTechnique->setSchemeName(mDstTechniqueSchemeName);
     createSGPasses();

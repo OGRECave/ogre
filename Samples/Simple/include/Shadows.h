@@ -151,6 +151,9 @@ protected:
     // Just override the mandatory create scene method
     void setupContent(void)
     {
+        mCameraMan->setStyle(CS_ORBIT);
+        mCameraMan->setYawPitchDist(Degree(0), Degree(45), 400);
+
         // do this first so we generate edge lists
         if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_HWSTENCIL))
         {
@@ -308,9 +311,6 @@ protected:
 
         // incase infinite far distance is not supported
         mCamera->setFarClipDistance(100000);
-
-        mCameraMan->setStyle(CS_ORBIT);
-        mCameraMan->setYawPitchDist(Degree(0), Degree(45), 400);
     }
     
     virtual void cleanupContent()

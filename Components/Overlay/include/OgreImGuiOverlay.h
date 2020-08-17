@@ -23,7 +23,8 @@ public:
     /// must be called before first show()
     ImFont* addFont(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT);
 
-    static void NewFrame(const FrameEvent& evt);
+    static void NewFrame();
+    OGRE_DEPRECATED static void NewFrame(const FrameEvent& evt) { NewFrame(); }
 
     void _findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp);
 
@@ -58,8 +59,6 @@ private:
         Real getSquaredViewDepth(const Camera*) const { return 0; }
 
         void _update();
-
-        bool mConvertToBGR;
 
         Matrix4 mXform;
         RenderOperation mRenderOp;

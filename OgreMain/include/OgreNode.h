@@ -195,14 +195,7 @@ namespace Ogre {
             general sequence of updateFromParent (e.g. raising events)
         */
         virtual void updateFromParentImpl(void) const;
-
-
-        /** Internal method for creating a new child node - must be overridden per subclass. */
-        virtual Node* createChildImpl(void) = 0;
-
-        /** Internal method for creating a new child node - must be overridden per subclass. */
-        virtual Node* createChildImpl(const String& name) = 0;
-
+    protected: // private in 1.13
         /// The position to use as a base for keyframe animation
         Vector3 mInitialPosition;
         /// The orientation to use as a base for keyframe animation
@@ -221,6 +214,11 @@ namespace Ogre {
         typedef std::vector<Node*> QueuedUpdates;
         static QueuedUpdates msQueuedUpdates;
 
+        /** Internal method for creating a new child node - must be overridden per subclass. */
+        virtual Node* createChildImpl(void) = 0;
+
+        /** Internal method for creating a new child node - must be overridden per subclass. */
+        virtual Node* createChildImpl(const String& name) = 0;
     public:
         /// Constructor, should only be called by parent, not directly.
         Node();

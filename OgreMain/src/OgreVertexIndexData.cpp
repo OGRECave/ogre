@@ -581,7 +581,7 @@ namespace Ogre {
     void VertexData::convertPackedColour(
         VertexElementType srcType, VertexElementType destType)
     {
-        if (destType != VET_COLOUR_ABGR && destType != VET_COLOUR_ARGB)
+        if (destType != VET_COLOUR_ABGR && destType != VET_COLOUR_ARGB && destType != VET_UBYTE4_NORM)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Invalid destType parameter", "VertexData::convertPackedColour");
@@ -624,6 +624,11 @@ namespace Ogre {
                         VertexElement& elem = *elemi;
                         VertexElementType currType = (elem.getType() == VET_COLOUR) ?
                             srcType : elem.getType();
+
+                        // only rename, byte order is the same
+                        if(currType == VET_COLOUR_ABGR && destType == VET_UBYTE4_NORM)
+                            continue;
+
                         if (elem.getType() == VET_COLOUR || 
                             ((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
                             && elem.getType() != destType))

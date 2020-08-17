@@ -17,6 +17,8 @@ public:
         mInfo["Thumbnail"] = "thumb_texfx.png";
         mInfo["Category"] = "Unsorted";
         mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
+
+        addScreenshotFrame(50);
     }
 
 protected:
@@ -27,7 +29,11 @@ protected:
 
         // set our camera to orbit around the origin and show cursor
         mCameraMan->setStyle(CS_ORBIT);
-        mTrayMgr->showCursor();
+
+        if (mTrayMgr)
+        {
+            mTrayMgr->showCursor();
+        }
 
         // the names of the four materials we will use
         String matNames[] = {"Examples/OgreDance", "Examples/OgreParade", "Examples/OgreSpin", "Examples/OgreWobble"};

@@ -17,14 +17,8 @@ set (HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Samples/Common/include/SdkSample.h
 )
 
-set(SOURCE_FILES ${PROJECT_SOURCE_DIR}/Samples/Browser/src/SampleBrowser.cpp)
-
 # Get the list of configured samples
 get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
-
-if (APPLE_IOS)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
 
 if (APPLE AND APPLE_IOS)
   set(HEADER_FILES ${HEADER_FILES}
@@ -34,10 +28,7 @@ elseif (APPLE)
   set(HEADER_FILES ${HEADER_FILES}
 	${PROJECT_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns
   )
-elseif (ANDROID)
-  set(HEADER_FILES ${HEADER_FILES}
-    ${PROJECT_SOURCE_DIR}/Samples/Browser/include/SampleBrowser_Android.h)
-endif (APPLE AND APPLE_IOS)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 
@@ -120,10 +111,13 @@ if (ANDROID)
     add_ndk_native_app_glue_library()
 
     include_directories(${PROJECT_SOURCE_DIR}/RenderSystems/GLSupport/include)
-    set(SOURCE_FILES ${SOURCE_FILES} ${PROJECT_SOURCE_DIR}/Samples/Browser/src/gestureDetector.cpp)
+    set(SOURCE_FILES
+      ${PROJECT_SOURCE_DIR}/Samples/Browser/src/gestureDetector.cpp
+      ${PROJECT_SOURCE_DIR}/Samples/Browser/src/android_main.cpp)
 
     add_library(SampleBrowser SHARED ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 else()
+    set(SOURCE_FILES ${PROJECT_SOURCE_DIR}/Samples/Browser/src/main.cpp)
     add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 endif()
 
@@ -166,7 +160,7 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
 endif()
 
 if (APPLE)
-	set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+	set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 
 	# On OS X, create .app bundle
 	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE TRUE)
@@ -243,6 +237,7 @@ if (APPLE)
         Codec_FreeImage
         RenderSystem_GL
         RenderSystem_GL3Plus
+        RenderSystem_Metal
     )
 
     foreach(FWK ${FRAMEWORKS})

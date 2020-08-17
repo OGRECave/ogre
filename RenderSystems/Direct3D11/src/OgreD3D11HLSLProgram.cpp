@@ -74,14 +74,7 @@ namespace Ogre {
         cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
         cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         cbDesc.MiscFlags = 0;
-        HRESULT hr = mDevice->CreateBuffer( &cbDesc, NULL, mConstantBuffer.ReleaseAndGetAddressOf() );
-        if (FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "D3D11 device Cannot create constant buffer.\nError Description:" + errorDescription,
-                "D3D11HLSLProgram::createConstantBuffer");  
-        }
+        OGRE_CHECK_DX_ERROR(mDevice->CreateBuffer(&cbDesc, NULL, mConstantBuffer.ReleaseAndGetAddressOf()));
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::fixVariableNameFromCg(const ShaderVarWithPosInBuf& newVar)
@@ -180,12 +173,6 @@ namespace Ogre {
         // small but annoying differences that otherwise would require declaring separate programs.
         macro.Name = "SHADER_MODEL_4";
         defines.push_back(macro);
-
-        if(Root::getSingleton().getRenderSystem()->isReverseDepthBufferEnabled())
-        {
-            macro.Name = "OGRE_REVERSED_Z";
-            defines.push_back(macro);
-        }
 
 		switch (this->mType)
 		{
@@ -424,16 +411,8 @@ namespace Ogre {
         String stringBuffer;
         std::vector<D3D_SHADER_MACRO> defines;
         const D3D_SHADER_MACRO* pDefines = NULL;
-        if (!shaderMacroSet)
-        {
-            getDefines(stringBuffer, defines, mPreprocessorDefines);
-            pDefines = defines.empty() ? NULL : &defines[0];
-        }
-        else
-        {
-            pDefines =  mShaderMacros;
-            shaderMacroSet = false;
-        }
+        getDefines(stringBuffer, defines, appendBuiltinDefines(mPreprocessorDefines));
+        pDefines = defines.empty() ? NULL : &defines[0];
 
 
         UINT compileFlags=0;
@@ -461,7 +440,7 @@ namespace Ogre {
             compileFlags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
         }
 
-        const char* target = getCompatibleTarget().c_str();
+        const char* target = getCompatibleTarget();
 
         ComPtr<ID3DBlob> pMicroCode;
         ComPtr<ID3DBlob> errors;
@@ -1181,6 +1160,19 @@ namespace Ogre {
         mHullShader.Reset();
         mComputeShader.Reset();
         mConstantBuffer.Reset();
+
+        for(unsigned int i = 0 ; i < mSerStrings.size() ; i++)
+        {
+            delete mSerStrings[i];
+        }
+        mSerStrings.clear();
+        mD3d11ShaderInputParameters.clear();
+        mD3d11ShaderOutputParameters.clear();
+        mD3d11ShaderBufferDescs.clear();
+        mD3d11ShaderVariables.clear();
+        mD3d11ShaderVariableSubparts.clear();
+        mVarDescBuffer.clear();
+        mD3d11ShaderTypeDescs.clear();
     }
 
     //-----------------------------------------------------------------------
@@ -1443,7 +1435,7 @@ namespace Ogre {
         ManualResourceLoader* loader, D3D11Device & device)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
         , mEntryPoint("main"), mErrorsInCompile(false), mDevice(device), mConstantBufferSize(0)
-        , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false)
+        , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false)
     {
 #if SUPPORT_SM2_0_HLSL_SHADERS == 1
 		mEnableBackwardsCompatibility = true;
@@ -1484,11 +1476,6 @@ namespace Ogre {
         else
         {
             unloadHighLevel();
-        }
-
-        for(unsigned int i = 0 ; i < mSerStrings.size() ; i++)
-        {
-            delete mSerStrings[i];
         }
     }
     //-----------------------------------------------------------------------
@@ -1535,29 +1522,26 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    const String& D3D11HLSLProgram::getCompatibleTarget(void) const
+    const char* D3D11HLSLProgram::getCompatibleTarget(void) const
     {
-        static const String
-            vs_4_0           = "vs_4_0",
-            vs_4_0_level_9_3 = "vs_4_0_level_9_3",
-            vs_4_0_level_9_1 = "vs_4_0_level_9_1",
-            ps_4_0           = "ps_4_0",
-            ps_4_0_level_9_3 = "ps_4_0_level_9_3",
-            ps_4_0_level_9_1 = "ps_4_0_level_9_1";
+        if(mTarget.empty())
+        {
+            return mType == GPT_VERTEX_PROGRAM ? "vs_4_0_level_9_1" : "ps_4_0_level_9_1";
+        }
 
         if(mEnableBackwardsCompatibility)
         {
-            if(mTarget == "vs_2_0") return vs_4_0_level_9_1;
-            if(mTarget == "vs_2_a") return vs_4_0_level_9_3;
-            if(mTarget == "vs_3_0") return vs_4_0;
+            if(mTarget == "vs_2_0") return "vs_4_0_level_9_1";
+            if(mTarget == "vs_2_a") return "vs_4_0_level_9_3";
+            if(mTarget == "vs_3_0") return "vs_4_0";
 
-            if(mTarget == "ps_2_0") return ps_4_0_level_9_1;
-            if(mTarget == "ps_2_a") return ps_4_0_level_9_3;
-            if(mTarget == "ps_2_b") return ps_4_0_level_9_3;
-            if(mTarget == "ps_3_0") return ps_4_0;
+            if(mTarget == "ps_2_0") return "ps_4_0_level_9_1";
+            if(mTarget == "ps_2_a") return "ps_4_0_level_9_3";
+            if(mTarget == "ps_2_b") return "ps_4_0_level_9_3";
+            if(mTarget == "ps_3_0") return "ps_4_0";
         }
 
-        return mTarget;
+        return mTarget.c_str();
     }
     //-----------------------------------------------------------------------
     const String& D3D11HLSLProgram::getLanguage(void) const
@@ -2014,13 +1998,6 @@ namespace Ogre {
     { 
         assert(mMicroCode.size() > 0);
         return mMicroCode; 
-    }
-    //-----------------------------------------------------------------------------
-    void D3D11HLSLProgram::setShaderMacros(D3D_SHADER_MACRO* shaderMacros)
-    {
-        mShaderMacros = new D3D_SHADER_MACRO[7];
-        mShaderMacros = shaderMacros;
-        shaderMacroSet = true;
     }
     //-----------------------------------------------------------------------------
     unsigned int D3D11HLSLProgram::getNumInputs( void ) const

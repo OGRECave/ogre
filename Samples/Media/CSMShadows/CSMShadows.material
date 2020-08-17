@@ -1,0 +1,156 @@
+// CASTER pass
+vertex_program ShadowCasterVP cg
+{
+    source pssm.cg
+    entry_point shadow_caster_vs
+    profiles vs_3_0 arbvp1
+
+    default_params
+    {
+        param_named_auto worldViewProjMatrix worldviewproj_matrix
+    }
+}
+
+fragment_program ShadowCasterFP cg
+{
+    source pssm.cg
+    entry_point shadow_caster_ps
+    profiles ps_3_0 arbfp1
+}
+
+material CSMShadows/Caster
+{
+    technique
+    {
+        pass
+        {
+            vertex_program_ref ShadowCasterVP
+            {
+            }
+
+            fragment_program_ref ShadowCasterFP
+            {
+            }
+        }
+    }
+}
+
+// RECEIVER pass
+vertex_program ShadowReceiverVP cg
+{
+    source ShadowReceiver.cg
+    entry_point main_vp
+    profiles vs_3_0 arbvp1
+
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto worldMat world_matrix
+        param_named_auto texMatrix0 texture_viewproj_matrix 0
+    }
+}
+
+shared_params params_shadowMatrixScaleBias
+{
+    // filled by code
+}
+
+fragment_program ShadowReceiverFP cg
+{
+    source ShadowReceiver.cg
+    entry_point main_fp
+    profiles ps_3_0 arbfp1
+
+    default_params
+    {
+        param_named_auto lightDirection light_direction 0
+        param_named_auto ambientColor ambient_light_colour
+        param_named_auto shadowMapSize packed_texture_size 1
+
+        shared_params_ref params_shadowMatrixScaleBias
+
+        param_named fixedDepthBias float4 0.0005, 0.001, 0.001, 0.003;
+        param_named gradientScaleBias float4 0.0005, 0.001, 0.001, 0.003;
+        param_named shadowFadeDist float 500;
+        param_named shadowMaxDist float 6000;
+    }
+}
+
+material CSMShadows/Receiver
+{
+    technique
+    {
+        shadow_caster_material CSMShadows/Caster
+        pass
+        {
+
+            vertex_program_ref ShadowReceiverVP
+            {
+            }
+
+            fragment_program_ref ShadowReceiverFP
+            {
+            }
+
+            texture_unit Diffuse
+            {
+
+            }
+
+            texture_unit
+            {
+                content_type shadow
+                tex_address_mode clamp
+            }
+            texture_unit
+            {
+                content_type shadow
+                tex_address_mode clamp
+            }
+            texture_unit
+            {
+                content_type shadow
+                tex_address_mode clamp
+            }
+            texture_unit
+            {
+                content_type shadow
+                tex_address_mode clamp
+            }
+
+            texture_unit
+            {
+                texture KernelRotation.png
+                filtering none
+            }
+        }
+    }
+}
+
+material CSMShadows/Rockwall : CSMShadows/Receiver
+{
+    technique
+    {
+        pass
+        {
+            texture_unit Diffuse
+            {
+                texture rockwall.tga
+            }
+        }
+    }
+}
+
+material CSMShadows/Athene : CSMShadows/Receiver
+{
+    technique
+    {
+        pass
+        {
+            texture_unit Diffuse
+            {
+                texture egyptrockyfull.jpg
+            }
+        }
+    }
+}

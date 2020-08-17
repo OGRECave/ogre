@@ -44,12 +44,10 @@ namespace Ogre {
         EXRCodec();
         virtual ~EXRCodec();
 
-        /// @copydoc Codec::decode
-        DecodeResult decode(const DataStreamPtr& input) const;
-        /// @copydoc Codec::magicNumberToFileExt
-        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const;
-
-        String getType() const;
+        using ImageCodec::decode;
+        DecodeResult decode(const DataStreamPtr& input) const override;
+        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const override;
+        String getType() const override;
     };
     /** @} */
     /** @} */

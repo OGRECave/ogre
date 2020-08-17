@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreSkeletonManager.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreAnimation.h"
 #include "OgreAnimationState.h"
@@ -219,9 +218,6 @@ namespace Ogre {
     }
     void Mesh::loadImpl()
     {
-        MeshSerializer serializer;
-        serializer.setListener(MeshManager::getSingleton().getListener());
-
         // If the only copy is local on the stack, it will be cleaned
         // up reliably in case of exceptions, etc
         DataStreamPtr data(mFreshFromDisk);
@@ -233,7 +229,12 @@ namespace Ogre {
                         "Mesh::loadImpl()");
         }
 
-        serializer.importMesh(data, this);
+        String baseName, strExt;
+        StringUtil::splitBaseFilename(mName, baseName, strExt);
+        auto codec = Codec::getCodec(strExt);
+        OgreAssert(codec, ("No codec found to load "+mName).c_str());
+
+        codec->decode(data, this);
 
         /* check all submeshes to see if their materials should be
            updated.  If the submesh has texture aliases that match those
@@ -1114,11 +1115,6 @@ namespace Ogre {
     const String& Mesh::getSkeletonName(void) const
     {
         return mSkeletonName;
-    }
-    //---------------------------------------------------------------------
-    ushort Mesh::getNumLodLevels(void) const
-    {
-        return mNumLods;
     }
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const

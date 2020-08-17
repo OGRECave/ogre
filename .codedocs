@@ -123,7 +123,7 @@ ALWAYS_DETAILED_SEC    = YES
 # members were ordinary class members. Constructors, destructors and assignment
 # operators of the base classes will not be shown.
 
-INLINE_INHERITED_MEMB  = YES
+INLINE_INHERITED_MEMB  = NO
 
 # If the FULL_PATH_NAMES tag is set to YES then Doxygen will prepend the full
 # path before files name in the file list and in the header files. If set
@@ -420,7 +420,7 @@ HIDE_UNDOC_CLASSES     = NO
 # If set to NO (the default) these declarations will be included in the
 # documentation.
 
-HIDE_FRIEND_COMPOUNDS  = NO
+HIDE_FRIEND_COMPOUNDS  = YES
 
 # If the HIDE_IN_BODY_DOCS tag is set to YES, Doxygen will hide any
 # documentation blocks found inside the body of a function.
@@ -691,6 +691,7 @@ INPUT                  = OgreMain/include \
                             Docs/src/tutorials/deferred.md \
                             Docs/src/tutorials/external_texture.md \
                             Docs/src/tutorials/manualmesh.md \
+                            Docs/src/tutorials/meshlod.md \
                             Docs/src/tutorials/numpy.md \
                             Docs/src/tutorials/profiler.md \
                             Docs/src/tutorials/background-resource.md \
@@ -752,6 +753,8 @@ EXCLUDE_PATTERNS       = *UTF* \
                          */GLSupport/include/GLX/* \
                          */GLSupport/include/OSX/* \
                          */GLSupport/include/win32/* \
+                         */include/Threading/* \
+                         */OgreMemoryAllocatorConfig.h \
                          *EAGL* \
                          */RenderSystems/GLES/*
 
@@ -761,7 +764,7 @@ EXCLUDE_PATTERNS       = *UTF* \
 # wildcard * is used, a substring. Examples: ANamespace, AClass,
 # AClass::ANamespace, ANamespace::*Test
 
-EXCLUDE_SYMBOLS        =
+EXCLUDE_SYMBOLS        = Ogre::AllocatedObject Ogre::ParamCommand
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or
 # directories that contain example code fragments that are included (see
@@ -1233,8 +1236,14 @@ PREDEFINED             = OGRE_MEMORY_ALLOCATOR=1 \
                          RTSHADER_SYSTEM_BUILD_EXT_SHADERS \
                          OGRE_PLATFORM=10 \
                          OGRE_DEPRECATED= \
+                         OGRE_NODISCARD= \
+                         OGRE_NORETURN= \
+                         DECL_MALLOC= \
+                         OGRE_FORCE_INLINE=inline \
                          OGRE_NODELESS_POSITIONING= \
                          MANAGED_RESOURCE= \
+                         OGRE_AUTO_MUTEX= \
+                         OGRE_FORMAT_PRINTF=;// \
                          OGRE_RESOURCE_GROUP_INIT==RGN_DEFAULT \
                          protected=private
 

@@ -729,8 +729,6 @@ namespace Ogre {
 
         @param coords is a vector of texture coordinates (in UV space) to choose 
             from for each billboard created in the set.
-        @param numCoords is how many such coordinate rectangles there are to 
-            choose from.
         @remarks
             Set 'coords' to 0 and/or 'numCoords' to 0 to reset the texture coord 
             rects to the initial set of a single rectangle spanning 0 through 1 in 
@@ -739,7 +737,13 @@ namespace Ogre {
             BillboardSet::setTextureStacksAndSlices()
             Billboard::setTexcoordIndex()
         */
-        virtual void setTextureCoords( Ogre::FloatRect const * coords, uint16 numCoords );
+        void setTextureCoords(const std::vector<FloatRect>& coords);
+
+        /// @deprecated
+        OGRE_DEPRECATED void setTextureCoords(FloatRect const* coords, uint16 numCoords)
+        {
+            setTextureCoords(std::vector<FloatRect>(coords, coords + numCoords));
+        }
 
         /** setTextureStacksAndSlices() will generate texture coordinate rects as if the 
             texture for the billboard set contained 'stacks' rows of 'slices' 
@@ -762,7 +766,10 @@ namespace Ogre {
         @see
             BillboardSet::setTextureCoords()
         */
-        virtual Ogre::FloatRect const * getTextureCoords( uint16 * oNumCoords );
+        const std::vector<FloatRect>& getTextureCoords() const { return mTextureCoords; }
+
+        /// @deprecated
+        OGRE_DEPRECATED Ogre::FloatRect const * getTextureCoords( uint16 * oNumCoords );
 
         /** Set whether or not the BillboardSet will use point rendering
             rather than manually generated quads.

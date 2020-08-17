@@ -1,16 +1,17 @@
 language: cpp
 sudo: required
-dist: xenial
+dist: bionic
 services:
     - xvfb
 branches:
   only:
     - master
+    - /^v\d+\.\d+\.\d+$/
 addons:
   apt:
     sources:
-    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ xenial multiverse"
-    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ xenial-backports universe"
+    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ bionic multiverse"
+    - sourceline: "deb http://archive.ubuntu.com/ubuntu/ bionic-backports universe"
     packages:
     - cmake
     - libxaw7-dev
@@ -23,13 +24,19 @@ addons:
     - libgl1-mesa-dev
     - libglu1-mesa-dev # legacy GL RenderSystem only
     - python3-dev
-    - python3-lxml     # for validate script
+    - python3-lxml     # for xml validation script
     - nvidia-cg-dev
     - libpugixml-dev
     - swig3.0
-    - mono-mcs
+    - doxygen
+    - texlive-binaries
+    - texlive-base
+    - graphviz
+    - mono-mcs # compile C# bindings
+    - qtbase5-dev # QtOgreBites
+    - libassimp-dev
 before_script:
-    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew update && brew install freetype libzzip sdl2 pugixml ; fi
+    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew update && brew install libzzip sdl2 pugixml ; fi
 osx_image: xcode11.3
 env:
     - TEST=TRUE
@@ -62,7 +69,9 @@ script:
     # run unit tests
     - if [ $TEST ]; then build/bin/Test_Ogre ; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" -a "$IOS" != "TRUE" ]; then build/bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre ; fi
-    # XMLConverter works & validates
+    # doxygen warnings check
+    - if [ "$TRAVIS_OS_NAME" = "linux" -a "$ANDROID" != "TRUE" ]; then cmake --build build --target OgreDoc > /dev/null && cat build/doxygen_warnings.log ; fi
+    - if [ "$TRAVIS_OS_NAME" = "linux" -a "$ANDROID" != "TRUE" ]; then test ! -s build/doxygen_warnings.log ; fi    # XMLConverter works & validates
     - if [ $TEST ]; then build/bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && build/bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton ; fi
     - if [ $TEST ]; then python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml ; fi
     # run visual tests
@@ -85,4 +94,5 @@ deploy:
     skip_cleanup: true
     file: $TRAVIS_BUILD_DIR/Other/bintray.json
     on:
-      condition: $ANDROID
+      condition: $ANDROID && ($TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG)
+      all_branches: true

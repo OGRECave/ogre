@@ -54,7 +54,6 @@ void CGProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_FLOAT4] = "float4";
     mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler1D";
     mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
-    mGpuConstTypeMap[GCT_SAMPLER2DSHADOW] = "sampler2D";
     mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
     mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCUBE";
     mGpuConstTypeMap[GCT_MATRIX_2X2] = "float2x2";
@@ -159,13 +158,15 @@ void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* progra
     os << "//                         PROGRAM DEPENDENCIES" << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
 
+    os << "#include <OgreUnifiedShader.h>" << std::endl;
+
     const auto& rgm = ResourceGroupManager::getSingleton();
 
     for (unsigned int i=0; i < program->getDependencyCount(); ++i)
     {
-        String curDependency = program->getDependency(i) + "." + getTargetLanguage();
-        if (!rgm.resourceExists(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, curDependency))
-            curDependency = program->getDependency(i) + ".cg"; // fall back to cg extension
+        String curDependency = program->getDependency(i) + ".cg";
+        if (!rgm.resourceExistsInAnyGroup(curDependency))
+            curDependency = program->getDependency(i) + ".glsl"; // fall back to glsl extension
 
         os << "#include \"" << curDependency << '\"' << std::endl;
     }

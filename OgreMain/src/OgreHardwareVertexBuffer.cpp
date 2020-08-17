@@ -288,7 +288,9 @@ namespace Ogre {
         // Use the current render system to determine if possible
         if (Root::getSingletonPtr() && Root::getSingletonPtr()->getRenderSystem())
         {
+            OGRE_IGNORE_DEPRECATED_BEGIN
             return Root::getSingleton().getRenderSystem()->getColourVertexElementType();
+            OGRE_IGNORE_DEPRECATED_END
         }
         else
         {
@@ -327,6 +329,7 @@ namespace Ogre {
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
         default:
 #endif
+        case VET_UBYTE4_NORM:
         case VET_COLOUR_ABGR: 
             return src.getAsABGR();
         };

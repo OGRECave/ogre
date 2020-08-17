@@ -19,12 +19,21 @@ list(APPEND HEADER_FILES
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+  set(IMGUI_DIR "${PROJECT_BINARY_DIR}/imgui-1.77" CACHE PATH "")
+  if(NOT EXISTS ${IMGUI_DIR})
+    message(STATUS "Dowloading imgui")
+    file(DOWNLOAD
+        https://github.com/ocornut/imgui/archive/v1.77.tar.gz
+        ${PROJECT_BINARY_DIR}/imgui.tar.gz)
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        -E tar xf imgui.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+  endif()
   list(APPEND SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui_draw.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui_widgets.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui_demo.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/misc/freetype/imgui_freetype.cpp)
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/misc/freetype/imgui_freetype.cpp)
 else()
     list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreImGuiOverlay.cpp")
 endif()
@@ -40,26 +49,22 @@ target_include_directories(OgreOverlay PUBLIC
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
   target_include_directories(OgreOverlay PUBLIC
-    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/imgui>"
-    PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/misc/freetype>")
+    PUBLIC "$<BUILD_INTERFACE:${IMGUI_DIR}>"
+    PRIVATE "$<BUILD_INTERFACE:${IMGUI_DIR}/misc/freetype>")
 
   if(UNIX)
-    set_source_files_properties(src/imgui/misc/freetype/imgui_freetype.cpp PROPERTIES
+    set_source_files_properties(${IMGUI_DIR}/misc/freetype/imgui_freetype.cpp PROPERTIES
       COMPILE_FLAGS "-Wno-missing-declarations")
 
-    set_source_files_properties(src/imgui/imgui_widgets.cpp PROPERTIES
+    set_source_files_properties(${IMGUI_DIR}/imgui_widgets.cpp PROPERTIES
       COMPILE_FLAGS "-Wno-cast-qual")
   endif()
 
-  file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imconfig.h
-    "#pragma once
-    #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-    #include <OgreOverlayPrerequisites.h>
-    #define IMGUI_API _OgreOverlayExport")
+  configure_file(${OGRE_TEMPLATES_DIR}/imconfig.h ${IMGUI_DIR}/imconfig.h COPYONLY)
 
   list(APPEND HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imgui.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/imgui/imconfig.h)
+    ${IMGUI_DIR}/imgui.h
+    ${IMGUI_DIR}/imconfig.h)
 endif()
 
 generate_export_header(OgreOverlay 

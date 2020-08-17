@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreGLPrerequisites.h"
 #include "OgreGLStateCacheManagerCommon.h"
 #include "OgreStdHeaders.h"
-#include "OgreIteratorWrappers.h"
 
 namespace Ogre
 {
@@ -186,7 +185,6 @@ namespace Ogre
         void setStencilMask(GLuint mask);
 
         /** Enables a piece of OpenGL functionality.
-         @param flag The function to enable.
          */
         void setEnabled(GLenum flag, bool enabled);
 

@@ -636,7 +636,9 @@ namespace Ogre {
     SceneManagerEnumerator::MetaDataIterator
     Root::getSceneManagerMetaDataIterator(void) const
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         return mSceneManagerEnum->getMetaDataIterator();
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     const SceneManagerEnumerator::MetaDataList&
@@ -668,7 +670,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SceneManagerEnumerator::SceneManagerIterator Root::getSceneManagerIterator(void)
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         return mSceneManagerEnum->getSceneManagerIterator();
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     const SceneManagerEnumerator::Instances& Root::getSceneManagers(void) const
@@ -943,7 +947,7 @@ namespace Ogre {
         }
         catch (Exception& e)
         {
-            LogManager::getSingleton().logMessage("automatic plugin loading disabled: "+e.getDescription());
+            LogManager::getSingleton().logError(e.getDescription()+" - skipping automatic plugin loading");
             return;
         }
 
@@ -957,6 +961,13 @@ namespace Ogre {
             String baseDir, filename;
             StringUtil::splitFilename(pluginsfile, filename, baseDir);
             pluginDir = baseDir + pluginDir;
+        }
+
+        if(char* val = getenv("OGRE_PLUGIN_DIR"))
+        {
+            pluginDir = val;
+            LogManager::getSingleton().logMessage(
+                "setting PluginFolder from OGRE_PLUGIN_DIR environment variable");
         }
 
         pluginDir = FileSystemLayer::resolveBundlePath(pluginDir);
@@ -1066,7 +1077,9 @@ namespace Ogre {
     void Root::convertColourValue(const ColourValue& colour, uint32* pDest)
     {
         assert(mActiveRenderer != 0);
+        OGRE_IGNORE_DEPRECATED_BEGIN
         mActiveRenderer->convertColourValue(colour, pDest);
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     RenderWindow* Root::getAutoCreatedWindow(void)
@@ -1120,8 +1133,9 @@ namespace Ogre {
         }
 
         bool success;
-
+        OGRE_IGNORE_DEPRECATED_BEGIN
         success = mActiveRenderer->_createRenderWindows(renderWindowDescriptions, createdWindows);
+        OGRE_IGNORE_DEPRECATED_END
         if(success && !mFirstTimePostWindowInit)
         {
             oneTimePostWindowInit();

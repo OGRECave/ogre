@@ -87,7 +87,7 @@ namespace Ogre
     }
 
     //---------------------------------------------------------------------
-    void ShaderHelperGLSL::generateVpHeader(const SM2Profile* prof, const Terrain* terrain,
+    void ShaderHelperGLSL::generateVertexProgramSource(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
         int version = mIsGLES ? 100 : 120;
@@ -103,8 +103,8 @@ namespace Ogre
         if (compression)
         {
             outStream <<
-                "attribute vec2 posIndex;\n"
-                "attribute float height;\n";
+                "attribute vec2 vertex;\n" // VES_POSITION
+                "attribute float uv0;\n"; // VES_TEXTURE_COORDINATES0
         }
         else
         {
@@ -184,8 +184,9 @@ namespace Ogre
         if (compression)
         {
             outStream <<
-                "    vec4 position = posIndexToObjectSpace * vec4(posIndex, height, 1);\n"
-                "    vec2 uv0 = vec2(posIndex.x * baseUVScale, 1.0 - (posIndex.y * baseUVScale));\n";
+                "    vec4 position = posIndexToObjectSpace * vec4(vertex, uv0, 1);\n"
+                "#define uv0 _uv0\n" // must not assign to uv0
+                "    vec2 uv0 = vec2(vertex.x * baseUVScale, 1.0 - (vertex.y * baseUVScale));\n";
         }
         outStream <<
             "    vec4 worldPos = worldMatrix * position;\n"
@@ -242,6 +243,29 @@ namespace Ogre
                     "    layerUV" << i << ".zw = " << " uv0.xy * uvMul_" << uvMulIdx << "." << getChannel(layer+1) << ";\n";
             }
         }
+
+        outStream <<
+            "    gl_Position = viewProjMatrix * worldPos;\n"
+            "    oUVMisc.xy = uv0.xy;\n";
+
+        if (fog)
+        {
+            if (terrain->getSceneManager()->getFogMode() == FOG_LINEAR)
+            {
+                outStream <<
+                    "    fogVal = clamp((gl_Position.z - fogParams.y) * fogParams.w, 0.0, 1.0);\n";
+            }
+            else
+            {
+                outStream <<
+                    "    fogVal = 1.0 - clamp(1.0 / (exp(gl_Position.z * fogParams.x)), 0.0, 1.0);\n";
+            }
+        }
+
+        if (prof->isShadowingEnabled(tt, terrain))
+            generateVpDynamicShadows(prof, terrain, tt, outStream);
+
+        outStream << "}\n";
     }
     //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
@@ -270,7 +294,8 @@ namespace Ogre
 
         // UV's premultiplied, packed as xy/zw
         uint maxLayers = prof->getMaxLayers(terrain);
-        uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
+        uint numBlendTextures =
+            std::min<uint8>(Terrain::getBlendTextureCount(maxLayers), terrain->getBlendTextures().size());
         uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
         uint numUVSets = numLayers / 2;
         if (numLayers % 2)
@@ -409,36 +434,30 @@ namespace Ogre
                         break;
                 };
 
-                outStream << "    vec3 binormal = normalize(cross(tangent, normal));\n";
+                outStream << "    vec3 binormal = normalize(cross(normal, tangent));\n";
                 // note, now we need to re-cross to derive tangent again because it wasn't orthonormal
-                outStream << "    tangent = normalize(cross(normal, binormal));\n";
+                outStream << "    tangent = normalize(cross(binormal, normal));\n";
                 // derive final matrix
-                outStream << "    mat3 TBN = mat3(tangent, binormal, normal);\n";
+                outStream << "    mat3 TBN = mat3(tangent[0], binormal[0], normal[0],"
+                             "      tangent[1], binormal[1], normal[1],"
+                             "      tangent[2], binormal[2], normal[2]);\n";
 
                 // set up lighting result placeholders for interpolation
-                outStream << "    vec4 litRes, litResLayer;\n";
-                outStream << "    vec3 TSlightDir, TSeyeDir, TShalfAngle, TSnormal;\n";
+                outStream << "    vec3 TSnormal;\n";
                 if (prof->isLayerParallaxMappingEnabled())
                     outStream << "    float displacement;\n";
                 // move
-                outStream << "    TSlightDir = normalize(TBN * lightDir);\n";
-                outStream << "    TSeyeDir = normalize(TBN * eyeDir);\n";
+                outStream << "    lightDir = normalize(TBN * lightDir);\n";
+                outStream << "    eyeDir = normalize(TBN * eyeDir);\n";
             }
             else
             {
                 // simple per-pixel lighting with no normal mapping
                 outStream << "    lightDir = normalize(lightDir);\n";
                 outStream << "    eyeDir = normalize(eyeDir);\n";
-                outStream << "    vec3 halfAngle = normalize(lightDir + eyeDir);\n";
-                outStream << "    vec4 litRes = lit(dot(normal, lightDir), dot(normal, halfAngle), scaleBiasSpecular.z);\n";
             }
+            outStream << "    vec3 halfAngle = normalize(lightDir + eyeDir);\n";
         }
-    }
-    //---------------------------------------------------------------------
-    void ShaderHelperGLSL::generateVpLayer(const SM2Profile* prof, const Terrain* terrain,
-                                                                                  TechniqueType tt, uint layer, StringStream& outStream)
-    {
-        // nothing to do
     }
     //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateFpLayer(const SM2Profile* prof, const Terrain* terrain,
@@ -467,17 +486,16 @@ namespace Ogre
                 // modify UV - note we have to sample an extra time
                 outStream << "    displacement = texture2D(normtex" << layer << ", uv" << layer << ").a\n"
                              "        * scaleBiasSpecular.x + scaleBiasSpecular.y;\n";
-                outStream << "    uv" << layer << " += TSeyeDir.xy * displacement;\n";
+                outStream << "    uv" << layer << " += eyeDir.xy * displacement;\n";
             }
 
             // access TS normal map
             outStream << "    TSnormal = expand(texture2D(normtex" << layer << ", uv" << layer << ")).rgb;\n";
-            outStream << "    TShalfAngle = normalize(TSlightDir + TSeyeDir);\n";
-            outStream << "    litResLayer = lit(dot(TSnormal, TSlightDir), dot(TSnormal, TShalfAngle), scaleBiasSpecular.z);\n";
+
             if (!layer)
-                outStream << "    litRes = litResLayer;\n";
+                outStream << "    normal = TSnormal;\n";
             else
-                outStream << "    litRes = mix(litRes, litResLayer, " << blendWeightStr << ");\n";
+                outStream << "    normal += TSnormal * " << blendWeightStr << ";\n";
 
         }
 
@@ -506,34 +524,6 @@ namespace Ogre
          if (layer && prof->_isSM3Available())
          outStream << "  } // early-out blend value\n";
          */
-    }
-    //---------------------------------------------------------------------
-    void ShaderHelperGLSL::generateVpFooter(const SM2Profile* prof, const Terrain* terrain,
-                                                                                   TechniqueType tt, StringStream& outStream)
-    {
-        outStream <<
-            "    gl_Position = viewProjMatrix * worldPos;\n"
-            "    oUVMisc.xy = uv0.xy;\n";
-
-        bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
-        if (fog)
-        {
-            if (terrain->getSceneManager()->getFogMode() == FOG_LINEAR)
-            {
-                outStream <<
-                    "    fogVal = clamp((gl_Position.z - fogParams.y) * fogParams.w, 0.0, 1.0);\n";
-            }
-            else
-            {
-                outStream <<
-                    "    fogVal = 1.0 - clamp(1.0 / (exp(gl_Position.z * fogParams.x)), 0.0, 1.0);\n";
-            }
-        }
-
-        if (prof->isShadowingEnabled(tt, terrain))
-            generateVpDynamicShadows(prof, terrain, tt, outStream);
-
-        outStream << "}\n";
     }
     //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateFpFooter(const SM2Profile* prof, const Terrain* terrain,
@@ -572,6 +562,8 @@ namespace Ogre
             }
 
             // diffuse lighting
+            outStream << "    normal = normalize(normal);\n";
+            outStream << "    vec4 litRes = lit(dot(normal, lightDir), dot(normal, halfAngle), scaleBiasSpecular.z);\n";
             outStream << "    gl_FragColor.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
 
             // specular default

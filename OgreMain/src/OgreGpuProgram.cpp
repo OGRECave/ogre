@@ -326,7 +326,7 @@ namespace Ogre
         return ret;
     }
     //-----------------------------------------------------------------------------
-    GpuProgramParametersSharedPtr GpuProgram::getDefaultParameters(void)
+    const GpuProgramParametersPtr& GpuProgram::getDefaultParameters(void)
     {
         if (!mDefaultParams)
         {
@@ -410,30 +410,7 @@ namespace Ogre
     String GpuProgram::CmdType::doGet(const void* target) const
     {
         const GpuProgram* t = static_cast<const GpuProgram*>(target);
-        if (t->getType() == GPT_VERTEX_PROGRAM)
-        {
-            return "vertex_program";
-        }
-        else if (t->getType() == GPT_GEOMETRY_PROGRAM)
-        {
-            return "geometry_program";
-        }
-        else if (t->getType() == GPT_DOMAIN_PROGRAM)
-        {
-            return "domain_program";
-        }
-        else if (t->getType() == GPT_HULL_PROGRAM)
-        {
-            return "hull_program";
-        }
-        else if (t->getType() == GPT_COMPUTE_PROGRAM)
-        {
-            return "compute_program";
-        }
-        else
-        {
-            return "fragment_program";
-        }
+        return GpuProgram::getProgramTypeName(t->getType()) + "_program";
     }
     void GpuProgram::CmdType::doSet(void* target, const String& val)
     {

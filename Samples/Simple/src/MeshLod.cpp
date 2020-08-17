@@ -324,7 +324,7 @@ size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
 void Sample_MeshLod::addLodLevel()
 {
     LodLevel lvl(mWorkLevel);
-    lvl.distance = getCameraDistance();
+    lvl.distance = getCameraLODValue();
     Real distepsilon = lvl.distance + lvl.distance * 0.001;
     size_t i = 0;
     bool addLevel = true;
@@ -390,7 +390,7 @@ void Sample_MeshLod::removeInitialLodLevel()
     }
 }
 
-Real Sample_MeshLod::getCameraDistance()
+Real Sample_MeshLod::getCameraLODValue()
 {
     if(mLodConfig.mesh->getBoundingSphereRadius() != 0.0){
         return PixelCountLodStrategy::getSingleton().getValue(mMeshEntity, mCamera);
@@ -505,7 +505,7 @@ void Sample_MeshLod::addToProfile( Real cost )
 
 bool Sample_MeshLod::frameStarted( const FrameEvent& evt )
 {
-    mDistanceLabel->setCaption("Distance: " + StringConverter::toString(getCameraDistance()) + "px");
+    mDistanceLabel->setCaption(StringUtil::format("Pixel Count: %d px", int(getCameraLODValue())));
     return true;
 }
 

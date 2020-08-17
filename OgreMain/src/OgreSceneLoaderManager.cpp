@@ -3,6 +3,7 @@
 #include "OgreStringVector.h"
 #include "OgreRoot.h"
 #include "OgreLogManager.h"
+#include "OgreCodec.h"
 
 namespace Ogre {
 
@@ -122,10 +123,8 @@ void SceneLoaderManager::load(DataStreamPtr& stream, const String& groupName, Sc
         }
     }
     
-    OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-        String("no SceneLoader for extension \"") +
-        ext + String("\" was found"),
-        "SceneLoaderManager::load");
+    // getCodec will throw on failure
+    Codec::getCodec(ext.substr(1))->decode(stream, rootNode);
 }
 
 }

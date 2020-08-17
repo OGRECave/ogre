@@ -65,18 +65,16 @@ namespace Ogre {
         FreeImageCodec(const String &type, unsigned int fiType);
         virtual ~FreeImageCodec() { }
 
-        /// @copydoc Codec::encode
-        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const;
-        /// @copydoc Codec::encodeToFile
-        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const;
-        /// @copydoc Codec::decode
-        DecodeResult decode(const DataStreamPtr& input) const;
+        using ImageCodec::decode;
+        using ImageCodec::encode;
+        using ImageCodec::encodeToFile;
 
-        
-        virtual String getType() const;        
+        DataStreamPtr encode(const MemoryDataStreamPtr& input, const CodecDataPtr& pData) const override;
+        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const  override;
+        DecodeResult decode(const DataStreamPtr& input) const  override;
 
-        /// @copydoc Codec::magicNumberToFileExt
-        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
+        String getType() const override;
+        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
 
         /// Static method to startup FreeImage and register the FreeImage codecs
         _OgreFreeImageCodecExport static void startup(void);

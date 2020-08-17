@@ -65,7 +65,7 @@ namespace Ogre
         }
 
         template<typename ValueType>
-        explicit Any(const ValueType & value)
+        Any(const ValueType & value)
           : mContent(OGRE_NEW_T(holder<ValueType>, MEMCATEGORY_GENERAL)(value))
         {
         }

@@ -100,7 +100,7 @@ namespace Ogre {
         static size_t calculateLoadingStages(DataStreamPtr& stream);
 
         /** Load direct from stream */
-        void load(DataStreamPtr& stream);
+        void load(const DataStreamPtr& stream);
 
         /** Is sky enabled? */
         bool isSkyEnabled(void) const;

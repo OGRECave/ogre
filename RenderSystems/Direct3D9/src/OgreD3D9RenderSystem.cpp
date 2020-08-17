@@ -833,38 +833,8 @@ namespace Ogre
     RenderWindow* D3D9RenderSystem::_createRenderWindow(const String &name, 
         unsigned int width, unsigned int height, bool fullScreen,
         const NameValuePairList *miscParams)
-    {       
-        // Log a message
-        StringStream ss;
-        ss << "D3D9RenderSystem::_createRenderWindow \"" << name << "\", " <<
-            width << "x" << height << " ";
-
-        if(fullScreen)
-            ss << "fullscreen ";
-        else
-            ss << "windowed ";
-
-        if(miscParams)
-        {
-            ss << " miscParams: ";
-            NameValuePairList::const_iterator it;
-            for(it=miscParams->begin(); it!=miscParams->end(); ++it)
-            {
-                ss << it->first << "=" << it->second << " ";
-            }
-            LogManager::getSingleton().logMessage(ss.str());
-        }
-
-        String msg;
-
-        // Make sure we don't already have a render target of the 
-        // same name as the one supplied
-        if( mRenderTargets.find( name ) != mRenderTargets.end() )
-        {
-            msg = "A render target of the same name '" + name + "' already "
-                "exists.  You cannot create a new window with this name.";
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "D3D9RenderSystem::_createRenderWindow" );
-        }
+    {
+        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         // Stereo driver must be created before device is created
@@ -906,33 +876,7 @@ namespace Ogre
 #endif
 
         return renderWindow;
-    }   
-    //---------------------------------------------------------------------
-    bool D3D9RenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
-        RenderWindowList& createdWindows)
-    {
-        // Call base render system method.
-        if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
-            return false;
-
-        // Simply call _createRenderWindow in a loop.
-        for (size_t i = 0; i < renderWindowDescriptions.size(); ++i)
-        {
-            const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];            
-            RenderWindow* curWindow = NULL;
-
-            curWindow = _createRenderWindow(curRenderWindowDescription.name, 
-                curRenderWindowDescription.width, 
-                curRenderWindowDescription.height, 
-                curRenderWindowDescription.useFullScreen, 
-                &curRenderWindowDescription.miscParams);
-                            
-            createdWindows.push_back(curWindow);                                            
-        }
-        
-        return true;
     }
-
     //---------------------------------------------------------------------
     RenderSystemCapabilities* D3D9RenderSystem::updateRenderSystemCapabilities(D3D9RenderWindow* renderWindow)
     {           
@@ -1274,7 +1218,7 @@ namespace Ogre
         return rsc;
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::convertVertexShaderCaps(RenderSystemCapabilities* rsc) const
+    void D3D9RenderSystem::convertVertexShaderCaps(RenderSystemCapabilities* rsc)
     {
         ushort major = 0xFF;
         ushort minor = 0xFF;
@@ -1370,6 +1314,8 @@ namespace Ogre
             rsc->addShaderProfile("vs_1_1");
             rsc->setCapability(RSC_VERTEX_PROGRAM);
         }
+
+        mNativeShadingLanguageVersion = major;
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::convertPixelShaderCaps(RenderSystemCapabilities* rsc) const
@@ -2340,38 +2286,6 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
-        SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp )
-    {
-        HRESULT hr;
-        if( sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
-            sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
-        {
-            if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE)))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha blending option", "D3D9RenderSystem::_setSceneBlending" );
-        }
-        else
-        {
-            if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE)))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha blending option", "D3D9RenderSystem::_setSeperateSceneBlending" );
-            if (FAILED(hr = __SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, TRUE)))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set separate alpha blending option", "D3D9RenderSystem::_setSeperateSceneBlending" );
-            if( FAILED( hr = __SetRenderState( D3DRS_SRCBLEND, D3D9Mappings::get(sourceFactor) ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set source blend", "D3D9RenderSystem::_setSeperateSceneBlending" );
-            if( FAILED( hr = __SetRenderState( D3DRS_DESTBLEND, D3D9Mappings::get(destFactor) ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set destination blend", "D3D9RenderSystem::_setSeperateSceneBlending" );
-            if( FAILED( hr = __SetRenderState( D3DRS_SRCBLENDALPHA, D3D9Mappings::get(sourceFactorAlpha) ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha source blend", "D3D9RenderSystem::_setSeperateSceneBlending" );
-            if( FAILED( hr = __SetRenderState( D3DRS_DESTBLENDALPHA, D3D9Mappings::get(destFactorAlpha) ) ) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha destination blend", "D3D9RenderSystem::_setSeperateSceneBlending" );
-        }
-
-        if (FAILED(hr = __SetRenderState(D3DRS_BLENDOP, D3D9Mappings::get(op))))
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set scene blending operation option", "D3D9RenderSystem::_setSceneBlendingOperation" );
-        if (FAILED(hr = __SetRenderState(D3DRS_BLENDOPALPHA, D3D9Mappings::get(alphaOp))))
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha scene blending operation option", "D3D9RenderSystem::_setSceneBlendingOperation" );
-    }
-    //---------------------------------------------------------------------
     void D3D9RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
     {
         HRESULT hr;
@@ -2508,22 +2422,47 @@ namespace Ogre
             "D3D9RenderSystem::_setDepthBias");
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, 
-        bool blue, bool alpha)
+    void D3D9RenderSystem::setColourBlendState(const ColourBlendState& state)
     {
+        HRESULT hr;
+        if (state.blendingEnabled())
+        {
+            if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE)))
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha blending option");
+            if (FAILED(hr = __SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, TRUE)))
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set separate alpha blending option");
+            if( FAILED( hr = __SetRenderState( D3DRS_SRCBLEND, D3D9Mappings::get(state.sourceFactor) ) ) )
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set source blend" );
+            if( FAILED( hr = __SetRenderState( D3DRS_DESTBLEND, D3D9Mappings::get(state.destFactor) ) ) )
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set destination blend" );
+            if( FAILED( hr = __SetRenderState( D3DRS_SRCBLENDALPHA, D3D9Mappings::get(state.sourceFactorAlpha) ) ) )
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha source blend" );
+            if( FAILED( hr = __SetRenderState( D3DRS_DESTBLENDALPHA, D3D9Mappings::get(state.destFactorAlpha) ) ) )
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha destination blend" );
+        }
+        else
+        {
+            if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE)))
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha blending option" );
+        }
+
+        if (FAILED(hr = __SetRenderState(D3DRS_BLENDOP, D3D9Mappings::get(state.operation))))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set scene blending operation option");
+        if (FAILED(hr = __SetRenderState(D3DRS_BLENDOPALPHA, D3D9Mappings::get(state.alphaOperation))))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha scene blending operation option");
+
         DWORD val = 0;
-        if (red) 
+        if (state.writeR)
             val |= D3DCOLORWRITEENABLE_RED;
-        if (green)
+        if (state.writeG)
             val |= D3DCOLORWRITEENABLE_GREEN;
-        if (blue)
+        if (state.writeB)
             val |= D3DCOLORWRITEENABLE_BLUE;
-        if (alpha)
+        if (state.writeA)
             val |= D3DCOLORWRITEENABLE_ALPHA;
-        HRESULT hr = __SetRenderState(D3DRS_COLORWRITEENABLE, val); 
-        if (FAILED(hr))
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting colour write enable flags", 
-            "D3D9RenderSystem::_setColourBufferWriteEnabled");
+
+        if (FAILED(hr = __SetRenderState(D3DRS_COLORWRITEENABLE, val)))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting colour write enable flags");
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_setFog( FogMode mode)
@@ -3471,6 +3410,8 @@ namespace Ogre
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error calling SetPixelShader", "D3D9RenderSystem::bindGpuProgram");
             }
+            // disable FFP fog, as it gets still applied even in presence of shader. Matching other render-systems here.
+            hr = __SetRenderState(D3DRS_FOGENABLE, FALSE);
             break;
         };
 

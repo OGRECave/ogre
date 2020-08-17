@@ -714,6 +714,7 @@ namespace Ogre
 		unsigned int width, unsigned int height, bool fullScreen,
 		const NameValuePairList *miscParams)
 	{
+        RenderSystem::_createRenderWindow(name, width, height, fullScreen, miscParams);
 
 		// Check we're not creating a secondary window when the primary
 		// was fullscreen
@@ -722,36 +723,6 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
 				"Cannot create secondary windows not in full screen when the primary is full screen",
 				"D3D11RenderSystem::_createRenderWindow");
-		}
-
-		// Log a message
-		StringStream ss;
-		ss << "D3D11RenderSystem::_createRenderWindow \"" << name << "\", " <<
-			width << "x" << height << " ";
-		if (fullScreen)
-			ss << "fullscreen ";
-		else
-			ss << "windowed ";
-		if (miscParams)
-		{
-			ss << " miscParams: ";
-			NameValuePairList::const_iterator it;
-			for (it = miscParams->begin(); it != miscParams->end(); ++it)
-			{
-				ss << it->first << "=" << it->second << " ";
-			}
-			LogManager::getSingleton().logMessage(ss.str());
-		}
-
-		String msg;
-
-		// Make sure we don't already have a render target of the 
-		// sam name as the one supplied
-		if (mRenderTargets.find(name) != mRenderTargets.end())
-		{
-			msg = "A render target of the same name '" + name + "' already "
-				"exists.  You cannot create a new window with this name.";
-			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, msg, "D3D11RenderSystem::_createRenderWindow");
 		}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -805,6 +776,8 @@ namespace Ogre
 			if (mHLSLProgramFactory == NULL)
 				mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);
 			mRealCapabilities = createRenderSystemCapabilities();
+
+            mNativeShadingLanguageVersion = 4;
 
 			// if we are using custom capabilities, then 
 			// mCurrentCapabilities has already been loaded
@@ -935,6 +908,7 @@ namespace Ogre
         rsc->setCapability(RSC_INFINITE_FAR_PLANE);
 
         rsc->setCapability(RSC_TEXTURE_3D);
+        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
@@ -1241,14 +1215,8 @@ namespace Ogre
             descDepth.MiscFlags     |= D3D11_RESOURCE_MISC_TEXTURECUBE;
         }
 
-        HRESULT hr = mDevice->CreateTexture2D( &descDepth, NULL, pDepthStencil.ReleaseAndGetAddressOf() );
-        if( FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "Unable to create depth texture\nError Description:" + errorDescription,
-                "D3D11RenderSystem::_createDepthBufferFor");
-        }
+        OGRE_CHECK_DX_ERROR(
+            mDevice->CreateTexture2D(&descDepth, NULL, pDepthStencil.ReleaseAndGetAddressOf()));
 
         //
         // Create the View of the texture
@@ -1257,18 +1225,12 @@ namespace Ogre
         if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
         {
             D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-            viewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+            viewDesc.Format = isReverseDepthBufferEnabled() ? DXGI_FORMAT_R32_FLOAT : DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
             viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
             viewDesc.Texture2D.MostDetailedMip = 0;
             viewDesc.Texture2D.MipLevels = 1;
-            HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil.Get(), &viewDesc, mDSTResView.ReleaseAndGetAddressOf());
-            if( FAILED(hr) || mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Unable to create the view of the depth texture \nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_createDepthBufferFor");
-            }
+            OGRE_CHECK_DX_ERROR(mDevice->CreateShaderResourceView(pDepthStencil.Get(), &viewDesc,
+                                                                  mDSTResView.ReleaseAndGetAddressOf()));
         }
 
         // Create the depth stencil view
@@ -1282,18 +1244,12 @@ namespace Ogre
 
         if(isReverseDepthBufferEnabled())
         {
-            descDSV.Format            = DXGI_FORMAT_R32_FLOAT;
+            descDSV.Format            = DXGI_FORMAT_D32_FLOAT;
         }
                                                                                             // TODO: Decide how to expose this feature
         descDSV.Texture2D.MipSlice = 0;
-        hr = mDevice->CreateDepthStencilView( pDepthStencil.Get(), &descDSV, &depthStencilView );
-        if( FAILED(hr) )
-        {
-			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "Unable to create depth stencil view\nError Description:" + errorDescription,
-                "D3D11RenderSystem::_createDepthBufferFor");
-        }
+        OGRE_CHECK_DX_ERROR(
+            mDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &depthStencilView));
 
         //Create the abstract container
         D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this, depthStencilView,
@@ -1527,11 +1483,6 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    VertexElementType D3D11RenderSystem::getColourVertexElementType(void) const
-    {
-        return VET_COLOUR_ABGR;
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_convertProjectionMatrix(const Matrix4& matrix,
         Matrix4& dest, bool forGpuProgram)
     {
@@ -1591,66 +1542,7 @@ namespace Ogre
     {
         mSamplerStatesChanged = true;
 
-        const Sampler::UVWAddressingMode& uvw = sampler.getAddressingMode();
-        mTexStageDesc[unit].samplerDesc.AddressU = D3D11Mappings::get(uvw.u);
-        mTexStageDesc[unit].samplerDesc.AddressV = D3D11Mappings::get(uvw.v);
-        mTexStageDesc[unit].samplerDesc.AddressW = D3D11Mappings::get(uvw.w);
-        mTexStageDesc[unit].samplerDesc.MipLODBias = sampler.getMipmapBias();
-
-        if (uvw.u == TAM_BORDER || uvw.v == TAM_BORDER || uvw.w == TAM_BORDER)
-        {
-            auto borderColour = (mIsReverseDepthBufferEnabled && sampler.getCompareEnabled())
-                                    ? ColourValue::White - sampler.getBorderColour()
-                                    : sampler.getBorderColour();
-            D3D11Mappings::get(borderColour, mTexStageDesc[unit].samplerDesc.BorderColor);
-        }
-
-        mTexStageDesc[unit].samplerDesc.MaxAnisotropy = sampler.getAnisotropy();
-
-        auto cmpFunc = sampler.getCompareFunction();
-        if(mIsReverseDepthBufferEnabled) cmpFunc = reverseCompareFunction(cmpFunc);
-        mTexStageDesc[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(cmpFunc);
-
-        FilterMinification[unit] = sampler.getFiltering(FT_MIN);
-        FilterMagnification[unit] = sampler.getFiltering(FT_MAG);
-        FilterMips[unit] = sampler.getFiltering(FT_MIP);
-
-        mTexStageDesc[unit].samplerDesc.Filter =
-            D3D11Mappings::get(FilterMinification[unit], FilterMagnification[unit], FilterMips[unit],
-                               sampler.getCompareEnabled());
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTextureAddressingMode( size_t stage, 
-        const Sampler::UVWAddressingMode& uvw )
-    {
-        // record the stage state
-        mTexStageDesc[stage].samplerDesc.AddressU = D3D11Mappings::get(uvw.u);
-        mTexStageDesc[stage].samplerDesc.AddressV = D3D11Mappings::get(uvw.v);
-        mTexStageDesc[stage].samplerDesc.AddressW = D3D11Mappings::get(uvw.w);
-        mSamplerStatesChanged = true;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op /*= SBO_ADD*/, SceneBlendOperation alphaOp /*= SBO_ADD*/ )
-    {
-        if( sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
-            sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
-        {
-            mBlendDesc.RenderTarget[0].BlendEnable = FALSE;
-        }
-        else
-        {
-            mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-            mBlendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(sourceFactor, false);
-            mBlendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(destFactor, false);
-            mBlendDesc.RenderTarget[0].BlendOp = D3D11Mappings::get(op) ;
-            mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactorAlpha, true);
-            mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactorAlpha, true);
-            mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(alphaOp) ;
-            mBlendDesc.AlphaToCoverageEnable = false;
-
-            mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
-        }
-        mBlendDescChanged = true;
+        mTexStageDesc[unit].pSampler = static_cast<D3D11Sampler&>(sampler).getState();
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
@@ -1722,20 +1614,41 @@ namespace Ogre
         mRasterizerDescChanged = true;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, 
-        bool blue, bool alpha)
+    void D3D11RenderSystem::setColourBlendState(const ColourBlendState& state)
     {
+        // record this
+        mCurrentBlend = state;
+
+        if (state.blendingEnabled())
+        {
+            mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
+            mBlendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(state.sourceFactor, false);
+            mBlendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(state.destFactor, false);
+            mBlendDesc.RenderTarget[0].BlendOp = D3D11Mappings::get(state.operation) ;
+            mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(state.sourceFactorAlpha, true);
+            mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(state.destFactorAlpha, true);
+            mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(state.alphaOperation) ;
+            mBlendDesc.AlphaToCoverageEnable = false;
+
+            mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
+        }
+        else
+        {
+            mBlendDesc.RenderTarget[0].BlendEnable = FALSE;
+        }
+
         UINT8 val = 0;
-        if (red) 
+        if (state.writeR)
             val |= D3D11_COLOR_WRITE_ENABLE_RED;
-        if (green)
+        if (state.writeG)
             val |= D3D11_COLOR_WRITE_ENABLE_GREEN;
-        if (blue)
+        if (state.writeB)
             val |= D3D11_COLOR_WRITE_ENABLE_BLUE;
-        if (alpha)
+        if (state.writeA)
             val |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
 
-        mBlendDesc.RenderTarget[0].RenderTargetWriteMask = val; 
+        mBlendDesc.RenderTarget[0].RenderTargetWriteMask = val;
+
         mBlendDescChanged = true;
     }
     //---------------------------------------------------------------------
@@ -1783,30 +1696,6 @@ namespace Ogre
 		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
         mReadBackAsTexture = readBackAsTexture;
         mDepthStencilDescChanged = true;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, 
-        FilterOptions filter)
-    {
-        switch(ftype) {
-        case FT_MIN:
-            FilterMinification[unit] = filter;
-            break;
-        case FT_MAG:
-            FilterMagnification[unit] = filter;
-            break;
-        case FT_MIP:
-            FilterMips[unit] = filter;
-            break;
-        }
-
-        mTexStageDesc[unit].samplerDesc.Filter = D3D11Mappings::get(FilterMinification[unit], FilterMagnification[unit], FilterMips[unit],CompareEnabled);
-        mSamplerStatesChanged = true;
-    }
-    //---------------------------------------------------------------------
-    DWORD D3D11RenderSystem::_getCurrentAnisotropy(size_t unit)
-    {
-        return mTexStageDesc[unit].samplerDesc.MaxAnisotropy;;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setRenderTarget(RenderTarget *target)
@@ -2005,7 +1894,7 @@ namespace Ogre
         ComPtr<ID3D11RasterizerState> mRasterizer;
         ComPtr<ID3D11DepthStencilState> mDepthStencilState;
 
-        ComPtr<ID3D11SamplerState> mSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
+        ID3D11SamplerState* mSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
         size_t mSamplerStatesCount;
 
         ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS]; // note - not owning
@@ -2063,14 +1952,8 @@ namespace Ogre
             mBlendDescChanged = false;
             mBoundBlendState = 0;
 
-            HRESULT hr = mDevice->CreateBlendState(&mBlendDesc, opState->mBlendState.ReleaseAndGetAddressOf()) ;
-            if (FAILED(hr))
-            {
-				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create blend state\nError Description:" + errorDescription, 
-                    "D3D11RenderSystem::_render" );
-            }
+            OGRE_CHECK_DX_ERROR(
+                mDevice->CreateBlendState(&mBlendDesc, opState->mBlendState.ReleaseAndGetAddressOf()));
         }
         else
         {
@@ -2082,14 +1965,7 @@ namespace Ogre
 			mRasterizerDescChanged=false;
 			mBoundRasterizer = 0;
 
-            HRESULT hr = mDevice->CreateRasterizerState(&mRasterizerDesc, opState->mRasterizer.ReleaseAndGetAddressOf()) ;
-            if (FAILED(hr))
-            {
-				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create rasterizer state\nError Description:" + errorDescription, 
-                    "D3D11RenderSystem::_render" );
-            }
+            OGRE_CHECK_DX_ERROR(mDevice->CreateRasterizerState(&mRasterizerDesc, opState->mRasterizer.ReleaseAndGetAddressOf()));
         }
         else
         {
@@ -2101,14 +1977,7 @@ namespace Ogre
 			mBoundDepthStencilState = 0;
 			mDepthStencilDescChanged=false;
 
-            HRESULT hr = mDevice->CreateDepthStencilState(&mDepthStencilDesc, opState->mDepthStencilState.ReleaseAndGetAddressOf()) ;
-            if (FAILED(hr))
-            {
-				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create depth stencil state\nError Description:" + errorDescription, 
-                    "D3D11RenderSystem::_render" );
-            }
+            OGRE_CHECK_DX_ERROR(mDevice->CreateDepthStencilState(&mDepthStencilDesc, opState->mDepthStencilState.ReleaseAndGetAddressOf()));
         }
         else
 		{
@@ -2125,31 +1994,10 @@ namespace Ogre
                             
             for (size_t n = 0; n < numberOfSamplers; n++)
             {
-                ComPtr<ID3D11SamplerState> samplerState;
-                ID3D11ShaderResourceView *texture = NULL;
+                ID3D11SamplerState *sampler = NULL;
                 sD3DTextureStageDesc & stage = mTexStageDesc[n];
-                if(stage.used)
-                {
-                    texture = stage.pTex;
-
-                    stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n], FilterMips[n], false);
-                    stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
-                    stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
-                    stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
-                    stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-                    HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, samplerState.ReleaseAndGetAddressOf());
-                    if (FAILED(hr))
-                    {
-                        String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                            "Failed to create sampler state\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render" );
-                    }
-                
-                }
-                opState->mSamplerStates[n].Swap(samplerState);
-                opState->mTextures[n]       = texture;
+                opState->mSamplerStates[n]  = stage.used ? stage.pSampler : NULL;
+                opState->mTextures[n]       = stage.used ? stage.pTex : NULL;
             }
             for (size_t n = opState->mTexturesCount; n < OGRE_MAX_TEXTURE_LAYERS; n++)
 			{
@@ -2205,7 +2053,7 @@ namespace Ogre
             /// Pixel Shader binding
             {
                 {
-                    mDevice.GetImmediateContext()->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                    mDevice.GetImmediateContext()->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
@@ -2228,7 +2076,7 @@ namespace Ogre
             /// Vertex Shader binding
             if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2249,7 +2097,7 @@ namespace Ogre
             /// Geometry Shader binding
             if (mBoundGeometryProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->GSSetSamplers(0, opState->mSamplerStatesCount, opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->GSSetSamplers(0, opState->mSamplerStatesCount, opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2271,7 +2119,7 @@ namespace Ogre
             /// Compute Shader binding
             if (mBoundComputeProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2293,7 +2141,7 @@ namespace Ogre
             /// Hull Shader binding
             if (mBoundTessellationHullProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->HSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->HSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2315,7 +2163,7 @@ namespace Ogre
             /// Domain Shader binding
             if (mBoundTessellationDomainProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
-                mDevice.GetImmediateContext()->DSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates[0].GetAddressOf());
+                mDevice.GetImmediateContext()->DSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -3409,14 +3257,6 @@ namespace Ogre
 
         ZeroMemory( &mDepthStencilDesc, sizeof(mDepthStencilDesc));
         ZeroMemory( &mScissorRect, sizeof(mScissorRect));
-
-        // set filters to defaults
-        for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
-        {
-            FilterMinification[n] = FO_NONE;
-            FilterMagnification[n] = FO_NONE;
-            FilterMips[n] = FO_NONE;
-        }
 
         mPolygonMode = PM_SOLID;
         mRasterizerDesc.FillMode = D3D11Mappings::get(mPolygonMode);

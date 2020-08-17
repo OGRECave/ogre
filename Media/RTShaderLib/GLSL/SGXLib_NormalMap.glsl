@@ -38,18 +38,7 @@ void SGX_ConstructTBNMatrix(in vec3 vNormal,
 				   out mat3 vOut)
 {
 	vec3 vBinormal = cross(vNormal, vTangent);
-
-	vOut[0][0] = vTangent.x;
-	vOut[1][0] = vTangent.y;
-	vOut[2][0] = vTangent.z;
-
-	vOut[0][1] = vBinormal.x;
-	vOut[1][1] = vBinormal.y;
-	vOut[2][1] = vBinormal.z;
-
-	vOut[0][2] = vNormal.x;
-	vOut[1][2] = vNormal.y;
-	vOut[2][2] = vNormal.z;
+	vOut = mtxFromRows(vTangent, vBinormal, vNormal);
 }
 
 //-----------------------------------------------------------------------------

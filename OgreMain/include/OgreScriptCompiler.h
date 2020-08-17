@@ -42,7 +42,7 @@ namespace Ogre
     /** \addtogroup Core
     *  @{
     */
-    /** \addtogroup General
+    /** \addtogroup Script
     *  @{
     */
     /** These enums hold the types of the concrete parsed nodes */
@@ -459,7 +459,7 @@ namespace Ogre
     };
 
     /// @deprecated do not use
-    class _OgreExport PreApplyTextureAliasesScriptCompilerEvent : public ScriptCompilerEvent
+    class OGRE_DEPRECATED _OgreExport PreApplyTextureAliasesScriptCompilerEvent : public ScriptCompilerEvent
     {
     public:
         Material *mMaterial;
@@ -524,7 +524,7 @@ namespace Ogre
     };
 
     /// @deprecated use CreateGpuProgramScriptCompilerEvent
-    class _OgreExport CreateHighLevelGpuProgramScriptCompilerEvent : public CreateGpuProgramScriptCompilerEvent
+    class OGRE_DEPRECATED _OgreExport CreateHighLevelGpuProgramScriptCompilerEvent : public CreateGpuProgramScriptCompilerEvent
     {
     public:
         String mLanguage;

@@ -330,9 +330,9 @@ namespace Ogre {
     */
     virtual bool isVertexTextureFetchRequired(void) const { return mVertexTextureFetch; }
 
-    /// @deprecated
-    virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
-    /// @deprecated
+    /// @deprecated use OT_DETAIL_ADJACENCY_BIT
+    OGRE_DEPRECATED virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
+    /// @deprecated use OT_DETAIL_ADJACENCY_BIT
     virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
     /** Sets the number of process groups dispatched by this compute
         program.
@@ -353,7 +353,7 @@ namespace Ogre {
         the default parameters; thus users of the program need only change the parameters
         which are unique to their own usage of the program.
     */
-    virtual GpuProgramParametersSharedPtr getDefaultParameters(void);
+    virtual const GpuProgramParametersPtr& getDefaultParameters(void);
 
     /** Returns true if default parameters have been set up.
      */

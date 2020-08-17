@@ -570,13 +570,17 @@ namespace Ogre {
     void TextureUnitState::setIsAlpha(bool isAlpha)
     {
         OgreAssert(mFramePtrs[0], "frame must not be blank");
+        OGRE_IGNORE_DEPRECATED_BEGIN
         for(auto& frame : mFramePtrs)
             frame->setTreatLuminanceAsAlpha(isAlpha);
+        OGRE_IGNORE_DEPRECATED_END
     }
     //-----------------------------------------------------------------------
     bool TextureUnitState::getIsAlpha(void) const
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         return mFramePtrs[0] && mFramePtrs[0]->getTreatLuminanceAsAlpha();
+        OGRE_IGNORE_DEPRECATED_END
     }
     float TextureUnitState::getGamma() const
     {

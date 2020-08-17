@@ -212,16 +212,11 @@ namespace Ogre {
             */
             virtual void* lock(size_t offset, size_t length, LockOptions options)
             {
-                assert(!isLocked() && "Cannot lock this buffer, it is already locked!");
+                OgreAssert(!isLocked(), "Cannot lock this buffer: it is already locked");
+                OgreAssert((length + offset) <= mSizeInBytes, "Lock request out of bounds");
 
                 void* ret = NULL;
-                if ((length + offset) > mSizeInBytes)
-                {
-                    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Lock request out of bounds.",
-                        "HardwareBuffer::lock");
-                }
-                else if (mUseShadowBuffer)
+                if (mUseShadowBuffer)
                 {
                     if (options != HBL_READ_ONLY)
                     {
@@ -262,7 +257,7 @@ namespace Ogre {
             */
             virtual void unlock(void)
             {
-                assert(isLocked() && "Cannot unlock this buffer, it is not locked!");
+                OgreAssert(isLocked(), "Cannot unlock this buffer: it is not locked");
 
                 // If we used the shadow buffer this time...
                 if (mUseShadowBuffer && mShadowBuffer->isLocked())

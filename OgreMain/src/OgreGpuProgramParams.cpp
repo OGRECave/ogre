@@ -398,14 +398,24 @@ namespace Ogre
 
 		// we try to adhere to GLSL std140 packing rules
 		// handle alignment requirements
-		auto align_size = std::min<int>(def.elementSize == 3 ? 4 : def.elementSize, 4); // vec3 is 16 byte aligned, which is max
-		align_size *= 4; // bytes
+        size_t align_size = std::min<size_t>(def.elementSize == 3 ? 4 : def.elementSize, 4); // vec3 is 16 byte aligned, which is max
+        align_size *= 4; // bytes
 
-		// abuse logical index to store offset
-		def.logicalIndex = ((mOffset + align_size - 1) / align_size) * align_size; //integer call
+        size_t nextAlignedOffset = ((mOffset + align_size - 1) / align_size) * align_size;
+
+        // abuse logical index to store offset
+        if (mOffset + align_size > nextAlignedOffset)
+        {
+            def.logicalIndex = nextAlignedOffset;
+        }
+        else
+        {
+            def.logicalIndex = mOffset;
+        }
+
+        mOffset = def.logicalIndex + (def.constType == GCT_MATRIX_4X3 ? 16 : def.elementSize) * 4; // mat4x3 have a size of 64 bytes
+
         def.variability = (uint16)GPV_GLOBAL;
-
-		mOffset = def.logicalIndex + align_size;
 
         if (def.isFloat())
         {
@@ -2022,7 +2032,7 @@ namespace Ogre
                     break;
 
                 case ACT_FOG_COLOUR:
-                    _writeRawConstant(i->physicalIndex, source->getFogColour());
+                    _writeRawConstant(i->physicalIndex, source->getFogColour(), i->elementCount);
                     break;
                 case ACT_FOG_PARAMS:
                     _writeRawConstant(i->physicalIndex, source->getFogParams(), i->elementCount);

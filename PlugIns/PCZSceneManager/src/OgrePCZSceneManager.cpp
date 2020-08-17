@@ -445,8 +445,6 @@ namespace Ogre
         // Clear animations
         destroyAllAnimations();
 
-        mSkyRenderer.clear();
-
         // Clear render queue, empty completely
         if (mRenderQueue)
             mRenderQueue->clear(true);
@@ -489,17 +487,17 @@ namespace Ogre
     /* enable/disable sky rendering */
     void PCZSceneManager::enableSky(bool onoff)
     {
-        if (mSkyRenderer.mSkyBoxNode)
+        if (mSkyBox.mSceneNode)
         {
-            mSkyRenderer.mSkyBoxEnabled = onoff;
+            mSkyBox.setEnabled(onoff);
         }
-        else if (mSkyRenderer.mSkyDomeNode)
+        else if (mSkyDome.mSceneNode)
         {
-            mSkyRenderer.mSkyDomeEnabled = onoff;
+            mSkyDome.setEnabled(onoff);
         }
-        else if (mSkyRenderer.mSkyPlaneNode)
+        else if (mSkyPlane.mSceneNode)
         {
-            mSkyRenderer.mSkyPlaneEnabled = onoff;
+            mSkyPlane.setEnabled(onoff);
         }
     }
 
@@ -511,22 +509,22 @@ namespace Ogre
             // if no zone specified, use default zone
             zone = mDefaultZone;
         }
-        if (mSkyRenderer.mSkyBoxNode)
+        if (auto node = (PCZSceneNode*)mSkyBox.mSceneNode)
         {
-            ((PCZSceneNode*)mSkyRenderer.mSkyBoxNode)->setHomeZone(zone);
-            ((PCZSceneNode*)mSkyRenderer.mSkyBoxNode)->anchorToHomeZone(zone);
+            node->setHomeZone(zone);
+            node->anchorToHomeZone(zone);
             zone->setHasSky(true);
         }
-        if (mSkyRenderer.mSkyDomeNode)
+        if (auto node = (PCZSceneNode*)mSkyDome.mSceneNode)
         {
-            ((PCZSceneNode*)mSkyRenderer.mSkyDomeNode)->setHomeZone(zone);
-            ((PCZSceneNode*)mSkyRenderer.mSkyDomeNode)->anchorToHomeZone(zone);
+            node->setHomeZone(zone);
+            node->anchorToHomeZone(zone);
             zone->setHasSky(true);
         }
-        if (mSkyRenderer.mSkyPlaneNode)
+        if (auto node = (PCZSceneNode*)mSkyPlane.mSceneNode)
         {
-            ((PCZSceneNode*)mSkyRenderer.mSkyPlaneNode)->setHomeZone(zone);
-            ((PCZSceneNode*)mSkyRenderer.mSkyPlaneNode)->anchorToHomeZone(zone);
+            node->setHomeZone(zone);
+            node->anchorToHomeZone(zone);
             zone->setHasSky(true);
         }
         

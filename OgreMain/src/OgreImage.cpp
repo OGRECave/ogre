@@ -34,6 +34,65 @@ namespace Ogre {
     ImageCodec::~ImageCodec() {
     }
 
+    void ImageCodec::decode(const DataStreamPtr& input, const Any& output) const
+    {
+        OGRE_IGNORE_DEPRECATED_BEGIN
+        Codec::DecodeResult res = decode(input);
+        OGRE_IGNORE_DEPRECATED_END
+
+        auto pData = static_cast<ImageCodec::ImageData*>(res.second.get());
+
+        Image* dest = any_cast<Image*>(output);
+        dest->mWidth = pData->width;
+        dest->mHeight = pData->height;
+        dest->mDepth = pData->depth;
+        dest->mBufSize = pData->size;
+        dest->mNumMipmaps = pData->num_mipmaps;
+        dest->mFlags = pData->flags;
+        dest->mFormat = pData->format;
+        // Just use internal buffer of returned memory stream
+        dest->mBuffer = res.first->getPtr();
+        // Make sure stream does not delete
+        res.first->setFreeOnClose(false);
+    }
+
+    DataStreamPtr ImageCodec::encode(const Any& input) const
+    {
+        Image* src = any_cast<Image*>(input);
+
+        auto imgData = std::make_shared<ImageCodec::ImageData>();
+        imgData->format = src->getFormat();
+        imgData->height = src->getHeight();
+        imgData->width = src->getWidth();
+        imgData->depth = src->getDepth();
+        imgData->size = src->getSize();
+        imgData->num_mipmaps = src->getNumMipmaps();
+
+        // Wrap memory, be sure not to delete when stream destroyed
+        auto wrapper = std::make_shared<MemoryDataStream>(src->getData(), src->getSize(), false);
+        OGRE_IGNORE_DEPRECATED_BEGIN
+        return encode(wrapper, imgData);
+        OGRE_IGNORE_DEPRECATED_END
+    }
+    void ImageCodec::encodeToFile(const Any& input, const String& outFileName) const
+    {
+        Image* src = any_cast<Image*>(input);
+
+        auto imgData = std::make_shared<ImageCodec::ImageData>();
+        imgData->format = src->getFormat();
+        imgData->height = src->getHeight();
+        imgData->width = src->getWidth();
+        imgData->depth = src->getDepth();
+        imgData->size = src->getSize();
+		imgData->num_mipmaps = src->getNumMipmaps();
+
+        // Wrap memory, be sure not to delete when stream destroyed
+        auto wrapper = std::make_shared<MemoryDataStream>(src->getData(), src->getSize(), false);
+        OGRE_IGNORE_DEPRECATED_BEGIN
+        encodeToFile(wrapper, outFileName, imgData);
+        OGRE_IGNORE_DEPRECATED_END
+    }
+
     //-----------------------------------------------------------------------------
     Image::Image()
         : mWidth(0),
@@ -272,25 +331,11 @@ namespace Ogre {
             strExt += filename[++pos];
 
         Codec * pCodec = Codec::getCodec(strExt);
-        if( !pCodec )
-            OGRE_EXCEPT(
-            Exception::ERR_INVALIDPARAMS, 
-            "Unable to save image file '" + filename + "' - invalid extension.",
-            "Image::save" );
+        if (!pCodec)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Unable to save image file '" + filename + "' - invalid extension.");
 
-        ImageCodec::ImageData* imgData = OGRE_NEW ImageCodec::ImageData();
-        imgData->format = mFormat;
-        imgData->height = mHeight;
-        imgData->width = mWidth;
-        imgData->depth = mDepth;
-        imgData->size = mBufSize;
-		imgData->num_mipmaps = mNumMipmaps;
-        // Wrap in CodecDataPtr, this will delete
-        Codec::CodecDataPtr codeDataPtr(imgData);
-        // Wrap memory, be sure not to delete when stream destroyed
-        MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
-
-        pCodec->encodeToFile(wrapper, filename, codeDataPtr);
+        pCodec->encodeToFile(this, filename);
     }
     //---------------------------------------------------------------------
     DataStreamPtr Image::encode(const String& formatextension)
@@ -302,23 +347,11 @@ namespace Ogre {
         }
 
         Codec * pCodec = Codec::getCodec(formatextension);
-        if( !pCodec )
-            OGRE_EXCEPT(
-            Exception::ERR_INVALIDPARAMS, 
-            "Unable to encode image data as '" + formatextension + "' - invalid extension.",
-            "Image::encode" );
+        if (!pCodec)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Unable to encode image data as '" + formatextension + "' - invalid extension.");
 
-        ImageCodec::ImageData* imgData = OGRE_NEW ImageCodec::ImageData();
-        imgData->format = mFormat;
-        imgData->height = mHeight;
-        imgData->width = mWidth;
-        imgData->depth = mDepth;
-        // Wrap in CodecDataPtr, this will delete
-        Codec::CodecDataPtr codeDataPtr(imgData);
-        // Wrap memory, be sure not to delete when stream destroyed
-        MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
-
-        return pCodec->encode(wrapper, codeDataPtr);
+        return pCodec->encode(this);
     }
     //-----------------------------------------------------------------------------
     Image & Image::load(const DataStreamPtr& stream, const String& type )
@@ -342,33 +375,16 @@ namespace Ogre {
             stream->seek(0);
             pCodec = Codec::getCodec(magicBuf, magicLen);
 
-      if( !pCodec )
-        OGRE_EXCEPT(
-        Exception::ERR_INVALIDPARAMS, 
-        "Unable to load image: Image format is unknown. Unable to identify codec. "
-        "Check it or specify format explicitly.",
-        "Image::load" );
+            if (!pCodec)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "Unable to load image: Image format is unknown. Unable to identify codec. "
+                            "Check it or specify format explicitly.");
         }
 
-        Codec::DecodeResult res = pCodec->decode(stream);
+        pCodec->decode(stream, this);
 
-        ImageCodec::ImageData* pData = 
-            static_cast<ImageCodec::ImageData*>(res.second.get());
-
-        mWidth = pData->width;
-        mHeight = pData->height;
-        mDepth = pData->depth;
-        mBufSize = pData->size;
-        mNumMipmaps = pData->num_mipmaps;
-        mFlags = pData->flags;
-
-        // Get the format and compute the pixel size
-        mFormat = pData->format;
+        // compute the pixel size
         mPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( mFormat ));
-        // Just use internal buffer of returned memory stream
-        mBuffer = res.first->getPtr();
-        // Make sure stream does not delete
-        res.first->setFreeOnClose(false);
         // make sure we delete
         mAutoDelete = true;
 

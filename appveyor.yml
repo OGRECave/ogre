@@ -8,20 +8,25 @@ install:
  - cmd: cd %APPVEYOR_BUILD_FOLDER%
  - cmd: git submodule update --init --recursive
 build_script:
+ - set PATH=C:\Qt\5.12\msvc2017_64\bin;%PATH%
  - cmake -P ci-build.cmake
- - cmake --build build --config Release --target INSTALL
+ - cmake --build build --config RelWithDebInfo --target INSTALL
 test_script:
  - set PATH=%PATH%;build\gtest\lib
- - IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" build\bin\release\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
+ - IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" build\bin\RelWithDebInfo\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
 cache:
 - ogredeps -> CMake/Dependencies.cmake
 branches:
   only:
     - master
     - stable
+after_build:
+  - IF "%APPVEYOR_REPO_TAG%" == "true" 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-vc15-x64.zip ./build/sdk/*
 artifacts:
   - path: build/sdk
-    name: ogre-sdk-master1-vc15-x64
+    name: ogre-sdk-master2-vc15-x64
+  - path: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64.zip
+    name: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64
 deploy:
 - provider: BinTray
   username: paroj
@@ -30,9 +35,25 @@ deploy:
   subject: ogrecave
   repo: ogre
   package: ogre-sdk-vc15-x64
+  artifact: ogre-sdk-master2-vc15-x64
   publish: true
   override: true
-  version: master1
+  version: master2
   on:
     branch: master
     APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
+    APPVEYOR_REPO_TAG: false
+- provider: BinTray
+  username: paroj
+  api_key:
+    secure: 4nFEwKApbHUf7UajsDt6Z7QOl3zzgEz6YbWGSGx5AiPxozWEQHEyGc6c9xE7utWE
+  subject: ogrecave
+  repo: ogre
+  package: ogre-sdk-vc15-x64
+  artifact: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64
+  publish: true
+  override: true
+  version: $(APPVEYOR_REPO_TAG_NAME)
+  on:
+    APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
+    APPVEYOR_REPO_TAG: true

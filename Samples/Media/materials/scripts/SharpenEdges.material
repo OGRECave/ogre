@@ -1,34 +1,18 @@
-fragment_program Ogre/Compositor/SharpenEdgesFP_cg cg
+fragment_program Ogre/Compositor/SharpenEdgesFP_hlsl hlsl
 {
 	source SharpenEdgesFP.cg
     entry_point sharpenEdges_fp
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3  ps_2_0 arbfp1
 }
 
-fragment_program Ogre/Compositor/SharpenEdgesFP_ps_2_a hlsl
-{
-	source SharpenEdgesFP.cg
-    entry_point sharpenEdges_fp
-	target ps_2_a
-}
-
-fragment_program Ogre/Compositor/SharpenEdgesFP_glsles glsles
-{
-	source SharpenEdgesFP.glsles
-}
-
-fragment_program Ogre/Compositor/SharpenEdgesFP_glsl glsl
+fragment_program Ogre/Compositor/SharpenEdgesFP_glsl glsl glsles
 {
 	source SharpenEdgesFP.glsl
-	syntax glsl150
 }
 
 fragment_program Ogre/Compositor/SharpenEdgesFP unified
 {
-	delegate Ogre/Compositor/SharpenEdgesFP_ps_2_a
+	delegate Ogre/Compositor/SharpenEdgesFP_hlsl
 	delegate Ogre/Compositor/SharpenEdgesFP_glsl
-	delegate Ogre/Compositor/SharpenEdgesFP_glsles
-	delegate Ogre/Compositor/SharpenEdgesFP_cg
 
 	default_params
 	{
@@ -48,16 +32,10 @@ material Ogre/Compositor/SharpenEdges
 			depth_func always_pass
             polygon_mode_overrideable false
 
-			//DirectX 9.0 HLSL Vertex Shader vs_1_1
-			//vertex_program_ref PostFilters/SharpenEdgesVP
-			//{
-			//}
-
 			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}
 
-			//DirectX 9.0 HLSL Pixel Shader ps_2_0
 			fragment_program_ref Ogre/Compositor/SharpenEdgesFP
 			{
 			}

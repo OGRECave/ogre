@@ -32,8 +32,6 @@ THE SOFTWARE.
 #include "OgreSceneLoader.h"
 
 namespace Ogre {
-    class Quake3ShaderManager;
-
     /** \addtogroup Plugins
     *  @{
     */
@@ -42,7 +40,7 @@ namespace Ogre {
     */
     /** Manages the locating and loading of BSP-based indoor levels.
     */
-    class BspSceneLoader : public SceneLoader
+    class OGRE_DEPRECATED BspSceneLoader : public SceneLoader
     {
     public:
         BspSceneLoader();
@@ -52,11 +50,6 @@ namespace Ogre {
             Currently only supports loading of Quake3 .bsp files.
         */
         void load(DataStreamPtr& stream, const String& group, SceneNode *rootNode);
-
-    protected:
-        // Singleton managed by this class
-        Quake3ShaderManager *mShaderMgr;
-
     };
     /** @} */
     /** @} */

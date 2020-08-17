@@ -713,6 +713,8 @@ For passes of type ’stencil’, this section defines the stencil operation par
 @par
 Format: pass stencil { }
 
+@copydetails Ogre::StencilState
+
 Here are the attributes you can use in a ’stencil’ section of a .compositor script:
 
 -   [check](#compositor_005fstencil_005fcheck)
@@ -734,9 +736,8 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     ## comp\_func
 
-    Sets the function used to perform the following comparison: (ref\_value & mask) comp\_func (Stencil Buffer Value & mask)
+    Sets the function used to perform the stencil comparison.
 
-    What happens as a result of this comparison will be one of 3 actions on the stencil buffer, depending on whether the test fails, succeeds but with the depth buffer check still failing, or succeeds with the depth buffer check passing too. You set the actions in the [fail\_op](#compositor_005fstencil_005ffail_005fop), [depth\_fail\_op](#compositor_005fstencil_005fdepth_005ffail_005fop) and [pass\_op](#compositor_005fstencil_005fpass_005fop) respectively. If the stencil check fails, no colour or depth are written to the frame buffer. 
     @par
     Format: comp\_func (always\_fail | always\_pass | less | less\_equal | not\_equal | greater\_equal | greater)
     @par

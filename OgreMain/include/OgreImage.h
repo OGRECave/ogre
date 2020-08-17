@@ -59,6 +59,7 @@ namespace Ogre {
     */
     class _OgreExport Image : public ImageAlloc
     {
+    friend class ImageCodec;
     public:
         /** Standard constructor.
         */

@@ -1,8 +1,6 @@
 vertex_program HLSL4/OceanVS hlsl
 {
 	source oceanHLSL_Cg.vert
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1
-
 
 	default_params
 	{
@@ -16,7 +14,6 @@ vertex_program HLSL4/OceanVS hlsl
 fragment_program HLSL4/OceanFS hlsl
 {
 	source oceanHLSL_Cg.frag
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0
 }
 
 vertex_program GLSL/OceanVS glsl
@@ -43,39 +40,16 @@ fragment_program GLSL/OceanFS glsl
 	}
 }
 
-vertex_program Cg/OceanVS cg
-{
-	source oceanHLSL_Cg.vert
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
-
-	default_params
-	{
-		param_named_auto worldViewProj_matrix worldviewproj_matrix
-		param_named_auto eyePosition camera_position_object_space
-		param_named scale float3 0.012 0.005 0.03
-		param_named_auto time_0_X time_0_x 100.0
-	}
-}
-
-fragment_program Cg/OceanFS cg
-{
-	source oceanHLSL_Cg.frag
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
-
-}
-
 vertex_program Ogre/OceanVS unified
 {
 	delegate HLSL4/OceanVS
 	delegate GLSL/OceanVS
-	delegate Cg/OceanVS 
 }
 
 fragment_program Ogre/OceanFS unified
 {
 	delegate HLSL4/OceanFS
 	delegate GLSL/OceanFS
-	delegate Cg/OceanFS 
 }
 
 
@@ -117,30 +91,9 @@ material OceanHLSL_GLSL
 	}
 }
 
-vertex_program Cg/Ocean2VS cg
-{
-	source Ocean2HLSL_Cg.vert
-	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
-
-
-	default_params
-	{
-		param_named_auto WorldViewProj worldviewproj_matrix
-		param_named_auto eyePosition camera_position_object_space
-	}
-}
-
-fragment_program Cg/Ocean2FS cg
-{
-	source Ocean2HLSL_Cg.frag
-	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
-
-}
-
 vertex_program HLSL4/Ocean2VS hlsl
 {
 	source Ocean2HLSL_Cg.vert
-	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1
 
 	default_params
 	{
@@ -151,10 +104,9 @@ vertex_program HLSL4/Ocean2VS hlsl
 fragment_program HLSL4/Ocean2FS hlsl
 {
 	source Ocean2HLSL_Cg.frag
-	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0
 }
 
-vertex_program GLSL/Ocean2VS glsl
+vertex_program GLSL/Ocean2VS glsl glsles
 {
 	source Ocean2GLSL.vert
 	default_params
@@ -163,29 +115,10 @@ vertex_program GLSL/Ocean2VS glsl
 	}
 }
 
-fragment_program GLSL/Ocean2FS glsl
+fragment_program GLSL/Ocean2FS glsl glsles
 {
 	source Ocean2GLSL.frag
 	default_params
-   	{
-   		param_named NormalMap int 0
-   		param_named EnvironmentMap int 1
-   	}
-}
-
-vertex_program GLSLES/Ocean2VS glsles
-{
-	source Ocean2GLSL.vert
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-fragment_program GLSLES/Ocean2FS glsles
-{
-    source Ocean2GLSL.frag
-   	default_params
    	{
    		param_named NormalMap int 0
    		param_named EnvironmentMap int 1
@@ -196,16 +129,12 @@ vertex_program Ogre/Ocean2VS unified
 {
 	delegate HLSL4/Ocean2VS
 	delegate GLSL/Ocean2VS
-	delegate GLSLES/Ocean2VS
-	delegate Cg/Ocean2VS 
 }
 
 fragment_program Ogre/Ocean2FS unified
 {
 	delegate HLSL4/Ocean2FS
 	delegate GLSL/Ocean2FS
-	delegate GLSLES/Ocean2FS
-	delegate Cg/Ocean2FS 
 }
 
 material Ocean2_HLSL_GLSL
