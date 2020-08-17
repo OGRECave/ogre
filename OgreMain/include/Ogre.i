@@ -445,6 +445,10 @@ SHARED_PTR(FileHandleDataStream);
 ADD_REPR(ColourValue)
 %ignore Ogre::PixelUtil::getBNFExpressionOfPixelFormats;
 %include "OgrePixelFormat.h"
+%extend Ogre::PixelBox
+{
+    void* getData() { return $self->data; }
+}
 %include "OgreBlendMode.h"
 %include "OgreRay.h"
 %include "OgreSceneQuery.h"
