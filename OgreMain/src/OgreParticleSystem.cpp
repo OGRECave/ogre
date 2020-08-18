@@ -1012,8 +1012,10 @@ namespace Ogre {
             mRenderer->_notifyParticleCleared(mActiveParticles);
         }
 
-        // Move actives to free list
-        mFreeParticles.splice(mFreeParticles.end(), mActiveParticles);
+        // reset active and free lists
+        mActiveParticles.clear();
+        mFreeParticles.clear();
+        mFreeParticles.insert(mFreeParticles.end(), mParticlePool.begin(), mParticlePool.end());
 
         // Add active emitted emitters to free list
         addActiveEmittedEmittersToFreeList();
@@ -1051,11 +1053,9 @@ namespace Ogre {
         {
             this->increasePool(size);
 
-            for( size_t i = currSize; i < size; ++i )
-            {
-                // Add new items to the queue
-                mFreeParticles.push_back( mParticlePool[i] );
-            }
+            // Add new items to the queue
+            mFreeParticles.insert(mFreeParticles.end(), mParticlePool.begin() + currSize,
+                                  mParticlePool.end());
 
             // Tell the renderer, if already configured
             if (mRenderer && mIsRendererConfigured)
