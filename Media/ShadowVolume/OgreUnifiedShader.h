@@ -23,6 +23,7 @@
 #define mat3 float3x3
 #define mat4 float4x4
 
+#define texture1D tex1D
 #define texture2D tex2D
 #define texture3D tex3D
 #define textureCube texCUBE
