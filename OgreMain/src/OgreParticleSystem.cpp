@@ -591,15 +591,6 @@ namespace Ogre {
             // Increment time fragment
             timePoint += timeInc;
 
-            if (p->mParticleType == Particle::Emitter)
-            {
-                // If the particle is an emitter, the position on the emitter side must also be initialised
-                // Note, that position of the emitter becomes a position in worldspace if mLocalSpace is set 
-                // to false (will this become a problem?)
-                ParticleEmitter* pParticleEmitter = static_cast<ParticleEmitter*>(p);
-                pParticleEmitter->setPosition(p->mPosition);
-            }
-
             // Notify renderer
             mRenderer->_notifyParticleEmitted(p);
         }
@@ -610,15 +601,6 @@ namespace Ogre {
         for (auto pParticle : mActiveParticles)
         {
             pParticle->mPosition += (pParticle->mDirection * timeElapsed);
-
-            if (pParticle->mParticleType == Particle::Emitter)
-            {
-                // If it is an emitter, the emitter position must also be updated
-                // Note, that position of the emitter becomes a position in worldspace if mLocalSpace is set 
-                // to false (will this become a problem?)
-                auto pParticleEmitter = static_cast<ParticleEmitter*>(pParticle);
-                pParticleEmitter->setPosition(pParticle->mPosition);
-            }
         }
 
         // Notify renderer
