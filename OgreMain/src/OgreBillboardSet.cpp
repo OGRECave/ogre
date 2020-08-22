@@ -774,7 +774,7 @@ namespace Ogre {
 
         size_t offset = 0;
         offset += decl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
-        offset += decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE).getSize();
+        offset += decl->addElement(0, offset, VET_UBYTE4_NORM, VES_DIFFUSE).getSize();
         // Texture coords irrelevant when enabled point rendering (generated
         // in point sprite mode, and unused in standard point mode)
         if (!mPointRendering)
@@ -1092,8 +1092,7 @@ namespace Ogre {
     void BillboardSet::genVertices(
         const Vector3* const offsets, const Billboard& bb)
     {
-        RGBA colour;
-        Root::getSingleton().convertColourValue(bb.mColour, &colour);
+        RGBA colour = bb.mColour.getAsABGR();
         RGBA* pCol;
 
         // Texcoords

@@ -558,15 +558,8 @@ namespace Ogre
         static DataStreamPtr openFileStream(const String& filename,
                 const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-        /** Generates a packed data version of the passed in ColourValue suitable for
-            use with the current RenderSystem.
-        @remarks
-            Since different render systems have different colour data formats (eg
-            RGBA for GL, ARGB for D3D) this method allows you to use 1 method for all.
-        @param colour The colour to convert
-        @param pDest Pointer to location to put the result.
-        */
-        void convertColourValue(const ColourValue& colour, uint32* pDest);
+        /// @deprecated use ColourValue::getAsABGR()
+        OGRE_DEPRECATED void convertColourValue(const ColourValue& colour, uint32* pDest);
 
         /** Retrieves a pointer to the window that was created automatically
             @remarks
