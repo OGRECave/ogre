@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreBillboard.h"
 
 namespace Ogre {
-    String rendererTypeName = "billboard";
+    static String rendererTypeName = "billboard";
 
     //-----------------------------------------------------------------------
     BillboardParticleRenderer::CmdBillboardType BillboardParticleRenderer::msBillboardTypeCmd;
@@ -181,129 +181,6 @@ namespace Ogre {
 
         // Update the queue
         mBillboardSet->_updateRenderQueue(queue);
-    }
-    //---------------------------------------------------------------------
-    void BillboardParticleRenderer::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        mBillboardSet->visitRenderables(visitor, debugRenderables);
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_setMaterial(MaterialPtr& mat)
-    {
-        mBillboardSet->setMaterialName(mat->getName(), mat->getGroup());
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setBillboardType(BillboardType bbt)
-    {
-        mBillboardSet->setBillboardType(bbt);
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setUseAccurateFacing(bool acc)
-    {
-        mBillboardSet->setUseAccurateFacing(acc);
-    }
-    //-----------------------------------------------------------------------
-    bool BillboardParticleRenderer::getUseAccurateFacing(void) const
-    {
-        return mBillboardSet->getUseAccurateFacing();
-    }
-    //-----------------------------------------------------------------------
-    BillboardType BillboardParticleRenderer::getBillboardType(void) const
-    {
-        return mBillboardSet->getBillboardType();
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setBillboardRotationType(BillboardRotationType rotationType)
-    {
-        mBillboardSet->setBillboardRotationType(rotationType);
-    }
-    //-----------------------------------------------------------------------
-    BillboardRotationType BillboardParticleRenderer::getBillboardRotationType(void) const
-    {
-        return mBillboardSet->getBillboardRotationType();
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setCommonDirection(const Vector3& vec)
-    {
-        mBillboardSet->setCommonDirection(vec);
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& BillboardParticleRenderer::getCommonDirection(void) const
-    {
-        return mBillboardSet->getCommonDirection();
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setCommonUpVector(const Vector3& vec)
-    {
-        mBillboardSet->setCommonUpVector(vec);
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& BillboardParticleRenderer::getCommonUpVector(void) const
-    {
-        return mBillboardSet->getCommonUpVector();
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_notifyCurrentCamera(Camera* cam)
-    {
-        mBillboardSet->_notifyCurrentCamera(cam);
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_notifyParticleRotated(void)
-    {
-        mBillboardSet->_notifyBillboardRotated();
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_notifyDefaultDimensions(Real width, Real height)
-    {
-        mBillboardSet->setDefaultDimensions(width, height);
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_notifyParticleResized(void)
-    {
-        mBillboardSet->_notifyBillboardResized();
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_notifyParticleQuota(size_t quota)
-    {
-        mBillboardSet->setPoolSize(quota);
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_notifyAttached(Node* parent, bool isTagPoint)
-    {
-        mBillboardSet->_notifyAttached(parent, isTagPoint);
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setRenderQueueGroup(uint8 queueID)
-    {
-        assert(queueID <= RENDER_QUEUE_MAX && "Render queue out of range!");
-        mBillboardSet->setRenderQueueGroup(queueID);
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
-    {
-        assert(queueID <= RENDER_QUEUE_MAX && "Render queue out of range!");
-        mBillboardSet->setRenderQueueGroupAndPriority(queueID, priority);
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setKeepParticlesInLocalSpace(bool keepLocal)
-    {
-        mBillboardSet->setBillboardsInWorldSpace(!keepLocal);
-    }
-    //-----------------------------------------------------------------------
-    SortMode BillboardParticleRenderer::_getSortMode(void) const
-    {
-        return mBillboardSet->_getSortMode();
-    }
-    //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setPointRenderingEnabled(bool enabled)
-    {
-        mBillboardSet->setPointRenderingEnabled(enabled);
-    }
-    //-----------------------------------------------------------------------
-    bool BillboardParticleRenderer::isPointRenderingEnabled(void) const
-    {
-        return mBillboardSet->isPointRenderingEnabled();
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
