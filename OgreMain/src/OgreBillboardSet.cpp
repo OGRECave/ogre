@@ -155,20 +155,6 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    Billboard* BillboardSet::createBillboard(
-        Real x, Real y, Real z,
-        const ColourValue& colour )
-    {
-        return createBillboard( Vector3( x, y, z ), colour );
-    }
-
-    //-----------------------------------------------------------------------
-    int BillboardSet::getNumBillboards(void) const
-    {
-        return static_cast< int >( mActiveBillboards.size() );
-    }
-
-    //-----------------------------------------------------------------------
     void BillboardSet::clear()
     {
         // Move actives to free list
@@ -238,55 +224,6 @@ namespace Ogre {
 
         mFreeBillboards.splice(mFreeBillboards.end(), mActiveBillboards, it);
     }
-
-    //-----------------------------------------------------------------------
-    void BillboardSet::setBillboardOrigin( BillboardOrigin origin )
-    {
-        mOriginType = origin;
-    }
-
-    //-----------------------------------------------------------------------
-    BillboardOrigin BillboardSet::getBillboardOrigin(void) const
-    {
-        return mOriginType;
-    }
-
-    //-----------------------------------------------------------------------
-    void BillboardSet::setBillboardRotationType(BillboardRotationType rotationType)
-    {
-        mRotationType = rotationType;
-    }
-    //-----------------------------------------------------------------------
-    BillboardRotationType BillboardSet::getBillboardRotationType(void) const
-    {
-        return mRotationType;
-    }
-    //-----------------------------------------------------------------------
-    void BillboardSet::setDefaultDimensions( Real width, Real height )
-    {
-        mDefaultWidth = width;
-        mDefaultHeight = height;
-    }
-    //-----------------------------------------------------------------------
-    void BillboardSet::setDefaultWidth(Real width)
-    {
-        mDefaultWidth = width;
-    }
-    //-----------------------------------------------------------------------
-    Real BillboardSet::getDefaultWidth(void) const
-    {
-        return mDefaultWidth;
-    }
-    //-----------------------------------------------------------------------
-    void BillboardSet::setDefaultHeight(Real height)
-    {
-        mDefaultHeight = height;
-    }
-    //-----------------------------------------------------------------------
-    Real BillboardSet::getDefaultHeight(void) const
-    {
-        return mDefaultHeight;
-    }
     //-----------------------------------------------------------------------
     void BillboardSet::setMaterialName( const String& name , const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */ )
     {
@@ -300,12 +237,6 @@ namespace Ogre {
            already loaded anyway)
         */
         mMaterial->load();
-    }
-
-    //-----------------------------------------------------------------------
-    const String& BillboardSet::getMaterialName(void) const
-    {
-        return mMaterial->getName();
     }
 
     //-----------------------------------------------------------------------
@@ -578,11 +509,6 @@ namespace Ogre {
             mParentNode->needUpdate();
 
     }
-    //-----------------------------------------------------------------------
-    const AxisAlignedBox& BillboardSet::getBoundingBox(void) const
-    {
-        return mAABB;
-    }
 
     //-----------------------------------------------------------------------
     void BillboardSet::_updateRenderQueue(RenderQueue* queue)
@@ -620,12 +546,6 @@ namespace Ogre {
            queue->addRenderable(this);
         }
 
-    }
-
-    //-----------------------------------------------------------------------
-    const MaterialPtr& BillboardSet::getMaterial(void) const
-    {
-        return mMaterial;
     }
 
     void BillboardSet::setMaterial( const MaterialPtr& material )
@@ -684,30 +604,6 @@ namespace Ogre {
         {
             *xform = _getParentNodeFullTransform();
         }
-    }
-
-    //-----------------------------------------------------------------------
-    void BillboardSet::setAutoextend( bool autoextend )
-    {
-        mAutoExtendPool = autoextend;
-    }
-
-    //-----------------------------------------------------------------------
-    bool BillboardSet::getAutoextend(void) const
-    {
-        return mAutoExtendPool;
-    }
-
-    //-----------------------------------------------------------------------
-    void BillboardSet::setSortingEnabled( bool sortenable )
-    {
-        mSortingEnabled = sortenable;
-    }
-
-    //-----------------------------------------------------------------------
-    bool BillboardSet::getSortingEnabled(void) const
-    {
-        return mSortingEnabled;
     }
 
     //-----------------------------------------------------------------------
@@ -846,23 +742,6 @@ namespace Ogre {
 
         mBuffersCreated = false;
     }
-    //-----------------------------------------------------------------------
-    unsigned int BillboardSet::getPoolSize(void) const
-    {
-        return static_cast< unsigned int >( mBillboardPool.size() );
-    }
-
-    //-----------------------------------------------------------------------
-    void BillboardSet::_notifyBillboardResized(void)
-    {
-        mAllDefaultSize = false;
-    }
-
-    //-----------------------------------------------------------------------
-    void BillboardSet::_notifyBillboardRotated(void)
-    {
-        mAllDefaultRotation = false;
-    }
 
     //-----------------------------------------------------------------------
     void BillboardSet::getParametricOffsets(
@@ -933,16 +812,6 @@ namespace Ogre {
             bottom = 0.0f;
             break;
         }
-    }
-    //-----------------------------------------------------------------------
-    bool BillboardSet::getCullIndividually(void) const
-    {
-        return mCullIndividual;
-    }
-    //-----------------------------------------------------------------------
-    void BillboardSet::setCullIndividually(bool cullIndividual)
-    {
-        mCullIndividual = cullIndividual;
     }
     //-----------------------------------------------------------------------
     bool BillboardSet::billboardVisible(Camera* cam, const Billboard& bill)
@@ -1052,36 +921,6 @@ namespace Ogre {
             break;
         }
 
-    }
-    //-----------------------------------------------------------------------
-    void BillboardSet::setBillboardType(BillboardType bbt)
-    {
-        mBillboardType = bbt;
-    }
-    //-----------------------------------------------------------------------
-    BillboardType BillboardSet::getBillboardType(void) const
-    {
-        return mBillboardType;
-    }
-    //-----------------------------------------------------------------------
-    void BillboardSet::setCommonDirection(const Vector3& vec)
-    {
-        mCommonDirection = vec;
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& BillboardSet::getCommonDirection(void) const
-    {
-        return mCommonDirection;
-    }
-    //-----------------------------------------------------------------------
-    void BillboardSet::setCommonUpVector(const Vector3& vec)
-    {
-        mCommonUpVector = vec;
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& BillboardSet::getCommonUpVector(void) const
-    {
-        return mCommonUpVector;
     }
     //-----------------------------------------------------------------------
     uint32 BillboardSet::getTypeFlags(void) const
@@ -1360,11 +1199,6 @@ namespace Ogre {
     {
         assert(mParentNode);
         return mParentNode->getSquaredViewDepth(cam);
-    }
-    //-----------------------------------------------------------------------
-    Real BillboardSet::getBoundingRadius(void) const
-    {
-        return mBoundingRadius;
     }
     //-----------------------------------------------------------------------
     const LightList& BillboardSet::getLights(void) const

@@ -353,34 +353,15 @@ namespace Ogre {
             const Vector3& position,
             const ColourValue& colour = ColourValue::White );
 
-        /** Creates a new billboard and adds it to this set.
-        @remarks
-            Behaviour once the billboard pool has been exhausted depends on the
-            BillboardSet::setAutoextend option.
-        @param x
-            The @c x position of the new billboard relative to the center of the set
-        @param y
-            The @c y position of the new billboard relative to the center of the set
-        @param z
-            The @c z position of the new billboard relative to the center of the set
-        @param colour
-            Optional base colour of the billboard.
-        @return
-            On success, a pointer to a newly created Billboard is
-            returned.
-        @par
-            On failure (i.e. no more space and can't autoextend),
-            @c NULL is returned.
-        @see
-            BillboardSet::setAutoextend
-        */
-        Billboard* createBillboard(
-            Real x, Real y, Real z,
-            const ColourValue& colour = ColourValue::White );
+        /// @overload
+        Billboard* createBillboard(Real x, Real y, Real z, const ColourValue& colour = ColourValue::White)
+        {
+            return createBillboard(Vector3(x, y, z), colour);
+        }
 
         /** Returns the number of active billboards which currently make up this set.
         */
-        virtual int getNumBillboards(void) const;
+        int getNumBillboards(void) const { return static_cast<int>(mActiveBillboards.size()); }
 
         /** Tells the set whether to allow automatic extension of the pool of billboards.
         @remarks
@@ -397,24 +378,24 @@ namespace Ogre {
         @param autoextend
             @c true to double the pool every time it runs out, @c false to fail silently.
         */
-        virtual void setAutoextend(bool autoextend);
+        void setAutoextend(bool autoextend) { mAutoExtendPool = autoextend; }
 
         /** Returns true if the billboard pool automatically extends.
         @see
             BillboardSet::setAutoextend
         */
-        virtual bool getAutoextend(void) const;
+        bool getAutoextend(void) const { return mAutoExtendPool; }
 
         /** Enables sorting for this BillboardSet. (default: off)
         @param sortenable true to sort the billboards according to their distance to the camera
         */
-        virtual void setSortingEnabled(bool sortenable);
+        void setSortingEnabled(bool sortenable) { mSortingEnabled = sortenable; }
 
         /** Returns true if sorting of billboards is enabled based on their distance from the camera
         @see
             BillboardSet::setSortingEnabled
         */
-        virtual bool getSortingEnabled(void) const;
+        bool getSortingEnabled(void) const { return mSortingEnabled; }
 
         /** Adjusts the size of the pool of billboards available in this set.
         @remarks
@@ -434,8 +415,7 @@ namespace Ogre {
         @see
             BillboardSet::setAutoextend
         */
-        virtual unsigned int getPoolSize(void) const;
-
+        unsigned int getPoolSize() const { return static_cast<unsigned int>(mBillboardPool.size()); }
 
         /** Empties this set of all billboards.
         */
@@ -477,13 +457,13 @@ namespace Ogre {
         @param origin
             A member of the BillboardOrigin enum specifying the origin for all the billboards in this set.
         */
-        virtual void setBillboardOrigin(BillboardOrigin origin);
+        void setBillboardOrigin(BillboardOrigin origin) { mOriginType = origin; }
 
         /** Gets the point which acts as the origin point for all billboards in this set.
         @return
             A member of the BillboardOrigin enum specifying the origin for all the billboards in this set.
         */
-        virtual BillboardOrigin getBillboardOrigin(void) const;
+        BillboardOrigin getBillboardOrigin(void) const { return mOriginType; }
 
         /** Sets billboard rotation type.
         @remarks
@@ -494,13 +474,13 @@ namespace Ogre {
         @param rotationType
             A member of the BillboardRotationType enum specifying the rotation type for all the billboards in this set.
         */
-        virtual void setBillboardRotationType(BillboardRotationType rotationType);
+        void setBillboardRotationType(BillboardRotationType rotationType) { mRotationType = rotationType; }
 
         /** Sets billboard rotation type.
         @return
             A member of the BillboardRotationType enum specifying the rotation type for all the billboards in this set.
         */
-        virtual BillboardRotationType getBillboardRotationType(void) const;
+        BillboardRotationType getBillboardRotationType(void) const { return mRotationType; }
 
         /** Sets the default dimensions of the billboards in this set.
         @remarks
@@ -512,16 +492,20 @@ namespace Ogre {
         @param height
             The new default height for the billboards in this set.
         */
-        virtual void setDefaultDimensions(Real width, Real height);
+        void setDefaultDimensions(Real width, Real height)
+        {
+            mDefaultWidth = width;
+            mDefaultHeight = height;
+        }
 
         /** See setDefaultDimensions - this sets 1 component individually. */
-        virtual void setDefaultWidth(Real width);
+        void setDefaultWidth(Real width) { mDefaultWidth = width; }
         /** See setDefaultDimensions - this gets 1 component individually. */
-        virtual Real getDefaultWidth(void) const;
+        Real getDefaultWidth(void) const { return mDefaultWidth; }
         /** See setDefaultDimensions - this sets 1 component individually. */
-        virtual void setDefaultHeight(Real height);
+        void setDefaultHeight(Real height) { mDefaultHeight = height; }
         /** See setDefaultDimensions - this gets 1 component individually. */
-        virtual Real getDefaultHeight(void) const;
+        Real getDefaultHeight(void) const { return mDefaultHeight; }
 
         /** Sets the name of the material to be used for this billboard set.
         */
@@ -530,7 +514,7 @@ namespace Ogre {
         /** Sets the name of the material to be used for this billboard set.
         @return The name of the material that is used for this set.
         */
-        virtual const String& getMaterialName(void) const;
+        const String& getMaterialName(void) const { return mMaterial->getName(); }
 
         virtual void _notifyCurrentCamera(Camera* cam) override;
 
@@ -551,11 +535,10 @@ namespace Ogre {
         */
         void setBounds(const AxisAlignedBox& box, Real radius);
 
-
-        virtual const AxisAlignedBox& getBoundingBox(void) const override;
-        virtual Real getBoundingRadius(void) const override;
+        const AxisAlignedBox& getBoundingBox(void) const override { return mAABB; }
+        Real getBoundingRadius(void) const override { return mBoundingRadius; }
         virtual void _updateRenderQueue(RenderQueue* queue) override;
-        virtual const MaterialPtr& getMaterial(void) const override;
+        const MaterialPtr& getMaterial(void) const override { return mMaterial; }
 
         /** Sets the name of the material to be used for this billboard set.
         @param material
@@ -569,14 +552,14 @@ namespace Ogre {
 
         /** Internal callback used by Billboards to notify their parent that they have been resized.
         */
-        virtual void _notifyBillboardResized(void);
+        void _notifyBillboardResized(void) { mAllDefaultSize = false; }
 
         /** Internal callback used by Billboards to notify their parent that they have been rotated.
         */
-        virtual void _notifyBillboardRotated(void);
+        void _notifyBillboardRotated(void) { mAllDefaultRotation = false; }
 
         /** Returns whether or not billboards in this are tested individually for culling. */
-        virtual bool getCullIndividually(void) const;
+        bool getCullIndividually(void) const { return mCullIndividual; }
         /** Sets whether culling tests billboards in this individually as well as in a group.
         @remarks
             Billboard sets are always culled as a whole group, based on a bounding box which 
@@ -597,7 +580,7 @@ namespace Ogre {
         @param cullIndividual If true, each billboard is tested before being sent to the pipeline as well 
             as the whole set having to pass the coarse group bounding test.
         */
-        virtual void setCullIndividually(bool cullIndividual);
+        void setCullIndividually(bool cullIndividual) { mCullIndividual = cullIndividual; }
 
         /** Sets the type of billboard to render.
         @remarks
@@ -619,10 +602,10 @@ namespace Ogre {
             use double-side material (<b>cull_hardware node</b>) to ensure no billboard are culled.
         @param bbt The type of billboard to render
         */
-        virtual void setBillboardType(BillboardType bbt);
+        void setBillboardType(BillboardType bbt) { mBillboardType = bbt; }
 
         /** Returns the billboard type in use. */
-        virtual BillboardType getBillboardType(void) const;
+        BillboardType getBillboardType(void) const { return mBillboardType; }
 
         /** Use this to specify the common direction given to billboards of type BBT_ORIENTED_COMMON or BBT_PERPENDICULAR_COMMON.
         @remarks
@@ -638,10 +621,10 @@ namespace Ogre {
         @note
             The direction are use as is, never normalised in internal, user are supposed to normalise it himself.
         */
-        virtual void setCommonDirection(const Vector3& vec);
+        void setCommonDirection(const Vector3& vec) { mCommonDirection = vec; }
 
         /** Gets the common direction for all billboards (BBT_ORIENTED_COMMON) */
-        virtual const Vector3& getCommonDirection(void) const;
+        const Vector3& getCommonDirection(void) const { return mCommonDirection; }
 
         /** Use this to specify the common up-vector given to billboards of type BBT_PERPENDICULAR_SELF or BBT_PERPENDICULAR_COMMON.
         @remarks
@@ -657,11 +640,11 @@ namespace Ogre {
         @note
             The up-vector are use as is, never normalised in internal, user are supposed to normalise it himself.
         */
-        virtual void setCommonUpVector(const Vector3& vec);
+        void setCommonUpVector(const Vector3& vec) { mCommonUpVector = vec; }
 
         /** Gets the common up-vector for all billboards (BBT_PERPENDICULAR_SELF and BBT_PERPENDICULAR_COMMON) */
-        virtual const Vector3& getCommonUpVector(void) const;
-        
+        const Vector3& getCommonUpVector(void) const { return mCommonUpVector; }
+
         /** Sets whether or not billboards should use an 'accurate' facing model
             based on the vector from each billboard to the camera, rather than 
             an optimised version using just the camera direction.
