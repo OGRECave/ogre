@@ -95,7 +95,7 @@ namespace Ogre {
             // Texcoords
             decl->addElement(POS_TEX_BINDING, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
             // Colours - store these in a separate buffer because they change less often
-            decl->addElement(COLOUR_BINDING, 0, VET_COLOUR, VES_DIFFUSE);
+            decl->addElement(COLOUR_BINDING, 0, VET_UBYTE4_NORM, VES_DIFFUSE);
 
             mRenderOp.operationType = RenderOperation::OT_TRIANGLE_LIST;
             mRenderOp.useIndexes = false;
@@ -546,9 +546,8 @@ namespace Ogre {
     void TextAreaOverlayElement::updateColours(void)
     {
         // Convert to system-specific
-        RGBA topColour, bottomColour;
-        Root::getSingleton().convertColourValue(mColourTop, &topColour);
-        Root::getSingleton().convertColourValue(mColourBottom, &bottomColour);
+        RGBA topColour = mColourTop.getAsABGR();
+        RGBA bottomColour = mColourBottom.getAsABGR();
 
         HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(COLOUR_BINDING);

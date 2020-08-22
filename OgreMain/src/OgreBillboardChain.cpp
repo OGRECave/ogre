@@ -124,7 +124,7 @@ namespace Ogre {
 
             if (mUseVertexColour)
             {
-                offset += decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE).getSize();
+                offset += decl->addElement(0, offset, VET_UBYTE4_NORM, VES_DIFFUSE).getSize();
             }
 
             if (mUseTexCoords)
@@ -568,8 +568,7 @@ namespace Ogre {
                     if (mUseVertexColour)
                     {
                         RGBA* pCol = static_cast<RGBA*>(pBase);
-                        Root::getSingleton().convertColourValue(elem.colour, pCol);
-                        pCol++;
+                        *pCol++ = elem.colour.getAsABGR();
                         pBase = static_cast<void*>(pCol);
                     }
 
@@ -599,8 +598,7 @@ namespace Ogre {
                     if (mUseVertexColour)
                     {
                         RGBA* pCol = static_cast<RGBA*>(pBase);
-                        Root::getSingleton().convertColourValue(elem.colour, pCol);
-                        pCol++;
+                        *pCol++ = elem.colour.getAsABGR();
                         pBase = static_cast<void*>(pCol);
                     }
 
