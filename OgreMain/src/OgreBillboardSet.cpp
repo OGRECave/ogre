@@ -1329,11 +1329,4 @@ namespace Ogre {
         }
 
     }
-    //-----------------------------------------------------------------------
-    void BillboardSetFactory::destroyInstance( MovableObject* obj)
-    {
-        OGRE_DELETE obj;
-    }
-
-
 }
