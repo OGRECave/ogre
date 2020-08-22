@@ -136,7 +136,7 @@ namespace Ogre {
         const Vector3& getCommonDirection(void) const { return mBillboardSet->getCommonDirection(); }
         /// @copydoc BillboardSet::setCommonUpVector
         void setCommonUpVector(const Vector3& vec) { mBillboardSet->setCommonUpVector(vec); }
-        /// @copydoc BillboardSet::setCommonUpVector
+        /// @copydoc BillboardSet::getCommonUpVector
         const Vector3& getCommonUpVector(void) const { return mBillboardSet->getCommonUpVector(); }
         /// @copydoc BillboardSet::setPointRenderingEnabled
         void setPointRenderingEnabled(bool enabled) { mBillboardSet->setPointRenderingEnabled(enabled); }
