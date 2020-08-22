@@ -2517,11 +2517,4 @@ namespace Ogre {
         return OGRE_NEW Entity(name, pMesh);
 
     }
-    //-----------------------------------------------------------------------
-    void EntityFactory::destroyInstance( MovableObject* obj)
-    {
-        OGRE_DELETE obj;
-    }
-
-
 }

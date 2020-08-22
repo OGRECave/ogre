@@ -968,13 +968,4 @@ namespace Ogre {
 
         return light;
     }
-    //-----------------------------------------------------------------------
-    void LightFactory::destroyInstance( MovableObject* obj)
-    {
-        OGRE_DELETE obj;
-    }
-
-
-
-
 } // Namespace

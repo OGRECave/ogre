@@ -833,12 +833,6 @@ namespace Ogre {
         return OGRE_NEW BillboardChain(name, maxElements, numberOfChains, useTex, useCol, dynamic);
 
     }
-    //-----------------------------------------------------------------------
-    void BillboardChainFactory::destroyInstance( MovableObject* obj)
-    {
-        OGRE_DELETE  obj;
-    }
-
 }
 
 

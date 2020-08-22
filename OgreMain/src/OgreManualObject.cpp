@@ -939,12 +939,4 @@ ManualObject::ManualObject(const String& name)
     {
         return OGRE_NEW ManualObject(name);
     }
-    //-----------------------------------------------------------------------------
-    void ManualObjectFactory::destroyInstance( MovableObject* obj)
-    {
-        OGRE_DELETE obj;
-    }
-
-
-
 }

@@ -85,8 +85,6 @@ namespace Ogre
         const String& getType() const
         { return FACTORY_TYPE_NAME; }
 
-        void destroyInstance(MovableObject* obj);
-
         /** Return true here as we want to get a unique type flag. */
         bool requestTypeFlags() const
         { return true; }
