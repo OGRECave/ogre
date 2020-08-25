@@ -465,13 +465,10 @@ namespace Ogre {
 
         const String& getMovableType(void) const override;
 
-        /** Internal callback used by Particles to notify their parent that they have been resized.
-        */
-        virtual void _notifyParticleResized(void);
-
-        /** Internal callback used by Particles to notify their parent that they have been rotated.
-        */
-        virtual void _notifyParticleRotated(void);
+        /// @deprecated do not use
+        OGRE_DEPRECATED virtual void _notifyParticleResized() {}
+        /// @deprecated do not use
+        OGRE_DEPRECATED virtual void _notifyParticleRotated() {}
 
         /** Sets the default dimensions of the particles in this set.
             @remarks

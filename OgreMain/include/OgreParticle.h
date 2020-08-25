@@ -120,7 +120,7 @@ namespace Ogre {
         Real getOwnHeight(void) const { return mHeight; }
         
         /** Sets the current rotation */
-        void setRotation(const Radian& rad);
+        void setRotation(const Radian& rad) { mRotation = rad; }
 
         const Radian& getRotation(void) const { return mRotation; }
 

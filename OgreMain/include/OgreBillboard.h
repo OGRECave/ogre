@@ -108,7 +108,7 @@ namespace Ogre {
             @remarks
                 This rotation is relative to the center of the billboard.
         */
-        void setRotation(const Radian& rotation);
+        void setRotation(const Radian& rotation) { mRotation = rotation; }
 
         /** Set the position of the billboard.
             @remarks

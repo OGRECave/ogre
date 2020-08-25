@@ -61,19 +61,11 @@ namespace Ogre {
     {
     }
     //-----------------------------------------------------------------------
-    void Billboard::setRotation(const Radian& rotation)
-    {
-        mRotation = rotation;
-        if (mRotation != Radian(0))
-            mParentSet->_notifyBillboardRotated();
-    }
-    //-----------------------------------------------------------------------
     void Billboard::setDimensions(Real width, Real height)
     {
         mOwnDimensions = true;
         mWidth = width;
         mHeight = height;
-        mParentSet->_notifyBillboardResized();
     }
     //-----------------------------------------------------------------------
     void Billboard::setTexcoordIndex(uint16 texcoordIndex)

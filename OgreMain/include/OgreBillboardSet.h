@@ -132,9 +132,6 @@ namespace Ogre {
         /// Pointer to the material to use
         MaterialPtr mMaterial;
 
-        /// True if no billboards in this set have been resized - greater efficiency.
-        bool mAllDefaultSize;
-
         /// Flag indicating whether to autoextend pool
         bool mAutoExtendPool;
 
@@ -144,7 +141,6 @@ namespace Ogre {
         /// Use 'true' billboard to cam position facing, rather than camera direcion
         bool mAccurateFacing;
 
-        bool mAllDefaultRotation;
         bool mWorldSpace;
 
         typedef std::list<Billboard*> ActiveBillboardList;
@@ -255,7 +251,7 @@ namespace Ogre {
             Fills output array of 4 vectors with vector offsets
             from origin for left-top, right-top, left-bottom, right-bottom corners.
         */
-        void genVertOffsets(Real inleft, Real inright, Real intop, Real inbottom,
+        static void genVertOffsets(Real inleft, Real inright, Real intop, Real inbottom,
             Real width, Real height,
             const Vector3& x, const Vector3& y, Vector3* pDestVec);
 
@@ -550,13 +546,10 @@ namespace Ogre {
         virtual void getRenderOperation(RenderOperation& op) override;
         virtual void getWorldTransforms(Matrix4* xform) const override;
 
-        /** Internal callback used by Billboards to notify their parent that they have been resized.
-        */
-        void _notifyBillboardResized(void) { mAllDefaultSize = false; }
-
-        /** Internal callback used by Billboards to notify their parent that they have been rotated.
-        */
-        void _notifyBillboardRotated(void) { mAllDefaultRotation = false; }
+        /// @deprecated do not use
+        OGRE_DEPRECATED void _notifyBillboardResized() {}
+        /// @deprecated do not use
+        OGRE_DEPRECATED void _notifyBillboardRotated() {}
 
         /** Returns whether or not billboards in this are tested individually for culling. */
         bool getCullIndividually(void) const { return mCullIndividual; }

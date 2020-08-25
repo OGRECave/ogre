@@ -862,22 +862,6 @@ namespace Ogre {
         return ParticleSystemFactory::FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------
-    void ParticleSystem::_notifyParticleResized(void)
-    {
-        if (mRenderer)
-        {
-            mRenderer->_notifyParticleResized();
-        }
-    }
-    //-----------------------------------------------------------------------
-    void ParticleSystem::_notifyParticleRotated(void)
-    {
-        if (mRenderer)
-        {
-            mRenderer->_notifyParticleRotated();
-        }
-    }
-    //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultDimensions( Real width, Real height )
     {
         assert(width >= 0 && height >= 0 && "Particle dimensions can not be negative");
@@ -1105,7 +1089,9 @@ namespace Ogre {
         ParticlePool::iterator iend = mParticlePool.begin() + poolend;
         for (; i != iend; ++i)
         {
+            OGRE_IGNORE_DEPRECATED_BEGIN
             mRenderer->_destroyVisualData((*i)->getVisualData());
+            OGRE_IGNORE_DEPRECATED_END
             (*i)->_notifyVisualData(0);
         }
     }
