@@ -156,10 +156,6 @@ namespace Ogre {
         void _setMaterial(MaterialPtr& mat) { mBillboardSet->setMaterial(mat); }
         /// @copydoc ParticleSystemRenderer::_notifyCurrentCamera
         void _notifyCurrentCamera(Camera* cam) { mBillboardSet->_notifyCurrentCamera(cam); }
-        /// @copydoc ParticleSystemRenderer::_notifyParticleRotated
-        void _notifyParticleRotated() { mBillboardSet->_notifyBillboardRotated(); }
-        /// @copydoc ParticleSystemRenderer::_notifyParticleResized
-        void _notifyParticleResized() { mBillboardSet->_notifyBillboardResized(); }
         /// @copydoc ParticleSystemRenderer::_notifyParticleQuota
         void _notifyParticleQuota(size_t quota) { mBillboardSet->setPoolSize(quota); }
         /// @copydoc ParticleSystemRenderer::_notifyAttached

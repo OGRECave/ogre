@@ -41,11 +41,9 @@ namespace Ogre {
         mBoundingRadius(0.0f), 
         mOriginType( BBO_CENTER ),
         mRotationType( BBR_TEXCOORD ),
-        mAllDefaultSize( true ),
         mAutoExtendPool( true ),
         mSortingEnabled(false),
         mAccurateFacing(false),
-        mAllDefaultRotation(true),
         mWorldSpace(false),
         mCullIndividual( false ),
         mBillboardType(BBT_POINT),
@@ -74,11 +72,9 @@ namespace Ogre {
         mBoundingRadius(0.0f), 
         mOriginType( BBO_CENTER ),
         mRotationType( BBR_TEXCOORD ),
-        mAllDefaultSize( true ),
         mAutoExtendPool( true ),
         mSortingEnabled(false),
         mAccurateFacing(false),
-        mAllDefaultRotation(true),
         mWorldSpace(false),
         mCullIndividual( false ),
         mBillboardType(BBT_POINT),
@@ -400,52 +396,31 @@ namespace Ogre {
         if (!billboardVisible(mCurrentCamera, bb)) return;
 
         if (!mPointRendering &&
-            (mBillboardType == BBT_ORIENTED_SELF ||
-            mBillboardType == BBT_PERPENDICULAR_SELF ||
-            (mAccurateFacing && mBillboardType != BBT_PERPENDICULAR_COMMON)))
+            (mBillboardType == BBT_ORIENTED_SELF || mBillboardType == BBT_PERPENDICULAR_SELF ||
+             (mAccurateFacing && mBillboardType != BBT_PERPENDICULAR_COMMON)))
         {
             // Have to generate axes & offsets per billboard
             genBillboardAxes(&mCamX, &mCamY, &bb);
         }
 
-        // If they're all the same size or we're point rendering
-        if( mAllDefaultSize || mPointRendering)
+        if (!mPointRendering &&
+            (mBillboardType == BBT_ORIENTED_SELF || mBillboardType == BBT_PERPENDICULAR_SELF ||
+                bb.mOwnDimensions || (mAccurateFacing && mBillboardType != BBT_PERPENDICULAR_COMMON)))
         {
-            /* No per-billboard checking, just blast through.
-            Saves us an if clause every billboard which may
-            make a difference.
-            */
-
-            if (!mPointRendering &&
-                (mBillboardType == BBT_ORIENTED_SELF ||
-                mBillboardType == BBT_PERPENDICULAR_SELF ||
-                (mAccurateFacing && mBillboardType != BBT_PERPENDICULAR_COMMON)))
-            {
-                genVertOffsets(mLeftOff, mRightOff, mTopOff, mBottomOff,
-                    mDefaultWidth, mDefaultHeight, mCamX, mCamY, mVOffset);
-            }
+            // If it has own dimensions, or self-oriented, gen offsets
+            Vector3 vOwnOffset[4];
+            Real width = bb.mOwnDimensions ? bb.mWidth : mDefaultWidth;
+            Real height = bb.mOwnDimensions ? bb.mHeight : mDefaultHeight;
+            genVertOffsets(mLeftOff, mRightOff, mTopOff, mBottomOff,
+                width, height, mCamX, mCamY, vOwnOffset);
+            genVertices(vOwnOffset, bb);
+        }
+        else
+        {
+            // Use default dimension, already computed before the loop, for faster creation
             genVertices(mVOffset, bb);
         }
-        else // not all default size and not point rendering
-        {
-            Vector3 vOwnOffset[4];
-            // If it has own dimensions, or self-oriented, gen offsets
-            if (mBillboardType == BBT_ORIENTED_SELF ||
-                mBillboardType == BBT_PERPENDICULAR_SELF ||
-                bb.mOwnDimensions ||
-                (mAccurateFacing && mBillboardType != BBT_PERPENDICULAR_COMMON))
-            {
-                // Generate using own dimensions
-                genVertOffsets(mLeftOff, mRightOff, mTopOff, mBottomOff,
-                    bb.mWidth, bb.mHeight, mCamX, mCamY, vOwnOffset);
-                // Create vertex data
-                genVertices(vOwnOffset, bb);
-            }
-            else // Use default dimension, already computed before the loop, for faster creation
-            {
-                genVertices(mVOffset, bb);
-            }
-        }
+
         // Increment visibles
         mNumVisibleBillboards++;
     }
@@ -945,7 +920,7 @@ namespace Ogre {
             mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
             // No texture coords in point rendering
         }
-        else if (mAllDefaultRotation || bb.mRotation == Radian(0))
+        else if (bb.mRotation == Radian(0))
         {
             // Left-top
             // Positions
