@@ -28,13 +28,12 @@
 #define texture3D tex3D
 #define textureCube texCUBE
 #define shadow2D tex2Dcmp
+#define texture2DProj tex2Dproj
 
 #define samplerCube samplerCUBE
 #define sampler2DShadow Sampler2DShadow
 
 #define mix lerp
-
-#define cross(a, b) cross(b, a)
 
 mat4 mtxFromRows(vec4 a, vec4 b, vec4 c, vec4 d)
 {

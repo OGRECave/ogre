@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreTextureUnitState.h"
 #include "OgreGpuProgramManager.h"
-#include "OgreHighLevelGpuProgramManager.h"
 #include "OgreShadowCameraSetupPSSM.h"
 #include "OgreLogManager.h"
 #include "OgreHighLevelGpuProgram.h"
@@ -92,16 +91,7 @@ namespace Ogre
         , mDepthShadows(false)
         , mLowLodShadows(false)
     {
-        HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
-
-        if (hmgr.isLanguageSupported("glsl") || hmgr.isLanguageSupported("glsles"))
-        {
-            mShaderGen = OGRE_NEW ShaderHelperGLSL();
-        }
-        else if (hmgr.isLanguageSupported("cg") || hmgr.isLanguageSupported("hlsl"))
-        {
-            mShaderGen = OGRE_NEW ShaderHelperCg();
-        }
+        mShaderGen = OGRE_NEW ShaderHelperGLSL();
     }
     //---------------------------------------------------------------------
     TerrainMaterialGeneratorA::SM2Profile::~SM2Profile()
@@ -678,7 +668,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    String ShaderHelper::getChannel(uint idx)
+    const char* ShaderHelper::getChannel(uint idx)
     {
         uint rem = idx % 4;
         switch(rem)
