@@ -98,7 +98,7 @@ namespace Ogre {
         void removeFactory(HighLevelGpuProgramFactory* factory);
 
         /** Returns whether a given high-level language is supported. */
-        bool isLanguageSupported(const String& lang);
+        bool isLanguageSupported(const String& lang) const;
 
         /// Get a resource by name
         /// @see ResourceManager::getResourceByName
