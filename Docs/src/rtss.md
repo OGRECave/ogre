@@ -319,15 +319,17 @@ mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAM
 
 @note you can automate the shader generation process for all materials. First set the viewport scheme to the destination scheme of the RTSS shaders. Second register to the `Ogre::MaterialManager::Listener` implementing `handleSchemeNotFound()` - e.g. OgreBites::SGTechniqueResolverListener
 
-## Runtime shader generation {#rtssGenerate}
-During the application runtime the ShaderGenerator instance receives notifications on per frame basis from its target SceneManager.
+## Shader generation at runtime {#rtssGenerate}
+During the application runtime the @c ShaderGenerator instance receives notifications on per frame basis from its target @c SceneManager.
 At this point it checks the material scheme in use. In case the current scheme has representations in the manager, it executes its validate method.
-The SGScheme validation includes synchronization with scene light and fog settings. In case it is out of date it will rebuild all shader generated techniques.
-1. The first step is to loop over every SGTechnique associated with this SGScheme and build its RenderStates - one for each pass.
-2. The second step is to loop again on every SGTechnique and acquire a program set for each SGPass.
+The @c SGScheme validation includes synchronization with scene light and fog settings. In case it is out of date it will rebuild all shader generated techniques.
+1. The first step is to loop over every @c SGTechnique associated with this @c SGScheme and build its @c RenderStates - one for each pass.
+2. The second step is to loop again on every @c SGTechnique and acquire a program set for each @c SGPass.
 
-The actual acquiring process is done by the TargetRenderState that generates CPU program representation, send them to a matching ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
-The result of this entire process is that each technique associated with the SGScheme has vertex and pixel shaders applied to all its passes. These shaders are synchronized with scene lights and fog settings.
+@note The shaders are only automatically updated for lights and fog changes. If you change the source pass after initial shader creation, you must call Ogre::RTShader::ShaderGenerator::invalidateMaterial manually.
+
+The actual acquiring process is done by the @c TargetRenderState that generates CPU program representation, send them to a matching @c ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
+The result of this entire process is that each technique associated with the @c SGScheme has vertex and pixel shaders applied to all its passes. These shaders are synchronized with scene lights and fog settings.
 
 ![](RuntimeShaderGeneration.svg)
 
