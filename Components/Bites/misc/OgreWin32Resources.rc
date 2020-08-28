@@ -92,31 +92,25 @@ FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,205,253,60,14
     PUSHBUTTON      "&Cancel",IDCANCEL,267,253,60,14
-    LTEXT           "Rendering Subsystem:",IDC_OGRE_ICON,21,136,73,12
-    COMBOBOX        IDC_CBO_RENDERSYSTEM,95,134,219,57,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Rendering System Options",IDC_OPTFRAME,5,152,322,101
-    LISTBOX         IDC_LST_OPTIONS,13,163,310,68,LBS_NOINTEGRALHEIGHT | 
-                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Rendering Subsystem:",IDC_OGRE_ICON,21,76,73,12
+    COMBOBOX        IDC_CBO_RENDERSYSTEM,95,74,219,57,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Rendering System Options",IDC_OPTFRAME,5,96,322,157
+    LISTBOX         IDC_LST_OPTIONS,13,107,310,124,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     RTEXT           "[Click On An Option]:",IDC_LBL_OPTION,14,237,125,11
-    COMBOBOX        IDC_CBO_OPTION,143,235,180,94,CBS_DROPDOWNLIST | 
-                    WS_DISABLED | WS_VSCROLL | WS_TABSTOP
-    CONTROL         106,IDC_OGRE_ICON,"Static",SS_BITMAP,0,0,327,140
+    COMBOBOX        IDC_CBO_OPTION,143,235,180,94,CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    CONTROL         IDB_SPLASH,IDC_OGRE_ICON,"Static",SS_BITMAP,0,0,327,66
 END
 
-IDD_DLG_ERROR DIALOG  0, 0, 243, 178
+IDD_DLG_ERROR DIALOG 0, 0, 243, 178
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
 CAPTION "Error"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "&Close",IDOK,81,157,80,14
-    LTEXT           "The Ogre engine has encountered an error from which it cannot recover. The last message was:",
-                    IDC_OGRE_ICON,7,7,229,19
+    LTEXT           "The Ogre engine has encountered an error from which it cannot recover. The last message was:",IDC_OGRE_ICON,7,7,229,19
     LTEXT           "",IDC_ERRMSG,17,29,209,84,SS_SUNKEN
-    LTEXT           "If you cannot resolve this issue yourself, please report it through the web site at http://www.ogre3d.org.",
-                    IDC_OGRE_ICON,7,118,229,19
-    LTEXT           "If you report the error, please include details of your hardware setup, and attach a copy of the 'ogre.log' file which you will find in the local folder.",
-                    IDC_OGRE_ICON,7,138,229,17
+    LTEXT           "If you cannot resolve this issue yourself, please report it through the web site at http://www.ogre3d.org.",IDC_OGRE_ICON,7,118,229,19
+    LTEXT           "If you report the error, please include details of your hardware setup, and attach a copy of the 'ogre.log' file which you will find in the local folder.",IDC_OGRE_ICON,7,138,229,17
 END
 
 
