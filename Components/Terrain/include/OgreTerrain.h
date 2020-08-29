@@ -119,8 +119,7 @@ namespace Ogre
     <tr>
         <td>Packed blend texture data</td>
         <td>uint8*</td>
-        <td>layerCount-1 sets of blend texture data interleaved as either RGB or RGBA 
-            depending on layer count</td>
+        <td>layerCount-1 sets of blend texture data interleaved as RGBA</td>
     </tr>
     <tr>
         <td>Optional derived map data</td>
@@ -1675,7 +1674,6 @@ namespace Ogre
         void checkLayers(bool includeGPUResources);
         void checkDeclaration();
         void deriveUVMultipliers();
-        PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers) const;
 
         void updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, bool synchronous, uint8 typeMask);
 
