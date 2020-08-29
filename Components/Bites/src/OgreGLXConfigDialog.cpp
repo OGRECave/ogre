@@ -73,12 +73,12 @@ namespace OgreBites {
  */
 class GLXConfigurator {
     /* GUI constants */
-    static const int wWidth = 400;      // Width of window
-    static const int wHeight = 340;     // Height of window
+    static const int wWidth = 500;      // Width of window
+    static const int wHeight = 380;     // Height of window
     static const int col1x = 20;        // Starting x of column 1 (labels)
-    static const int col2x = 180;       // Starting x of column 2 (options)
-    static const int col1w = 150;       // Width of column 1 (labels)
-    static const int col2w = 200;       // Width of column 2 (options)
+    static const int col2x = 230;       // Starting x of column 2 (options)
+    static const int col1w = 200;       // Width of column 1 (labels)
+    static const int col2w = 250;       // Width of column 2 (options)
     static const int ystart = 105;      // Starting y of option table rows
     static const int rowh = 20;     // Height of one row in the option table
 
@@ -345,9 +345,9 @@ Pixmap GLXConfigurator::CreateBackdrop(Window rootWindow, int depth) {
 
         // Convert and copy image
         data = (unsigned char*)malloc(mWidth * mHeight * bpl); // Must be allocated with malloc
+        PixelBox dst(mWidth, mHeight, 1, bpl == 2 ? PF_B5G6R5 : PF_A8R8G8B8, data);
 
-        PixelBox dst(src, bpl == 2 ? PF_B5G6R5 : PF_A8R8G8B8, data );
-
+        memset(data, 0, dst.getConsecutiveSize());
         PixelUtil::bulkPixelConversion(src, dst);
     } catch(Exception &e) {
         // Could not find image; never mind
