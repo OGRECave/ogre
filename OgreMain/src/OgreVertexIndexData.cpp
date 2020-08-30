@@ -463,12 +463,9 @@ namespace Ogre {
             VertexDeclaration::VertexElementList destElems = newDeclaration->findElementsBySource(b);
             // Initialise with most restrictive version 
             // (not really a usable option, but these flags will be removed)
-            HardwareBuffer::Usage final = static_cast<HardwareBuffer::Usage>(
-                HardwareBuffer::HBU_STATIC_WRITE_ONLY | HardwareBuffer::HBU_DISCARDABLE);
-            VertexDeclaration::VertexElementList::iterator v;
-            for (v = destElems.begin(); v != destElems.end(); ++v)
+            int final = HardwareBuffer::HBU_STATIC_WRITE_ONLY | HardwareBuffer::HBU_DETAIL_DISCARDABLE;
+            for (VertexElement& destelem : destElems)
             {
-                VertexElement& destelem = *v;
                 // get source
                 const VertexElement* srcelem =
                     vertexDeclaration->findElementBySemantic(
@@ -480,27 +477,23 @@ namespace Ogre {
                 if (srcbuf->getUsage() & HardwareBuffer::HBU_DYNAMIC)
                 {
                     // remove static
-                    final = static_cast<HardwareBuffer::Usage>(
-                        final & ~HardwareBuffer::HBU_STATIC);
+                    final &= ~HardwareBuffer::HBU_STATIC;
                     // add dynamic
-                    final = static_cast<HardwareBuffer::Usage>(
-                        final | HardwareBuffer::HBU_DYNAMIC);
+                    final |= HardwareBuffer::HBU_DYNAMIC;
                 }
-                if (!(srcbuf->getUsage() & HardwareBuffer::HBU_WRITE_ONLY))
+                if (!(srcbuf->getUsage() & HBU_DETAIL_WRITE_ONLY))
                 {
                     // remove write only
-                    final = static_cast<HardwareBuffer::Usage>(
-                        final & ~HardwareBuffer::HBU_WRITE_ONLY);
+                    final &= ~HBU_DETAIL_WRITE_ONLY;
                 }
-                if (!(srcbuf->getUsage() & HardwareBuffer::HBU_DISCARDABLE))
+                if (!(srcbuf->getUsage() & HardwareBuffer::HBU_DETAIL_DISCARDABLE))
                 {
                     // remove discardable
-                    final = static_cast<HardwareBuffer::Usage>(
-                        final & ~HardwareBuffer::HBU_DISCARDABLE);
+                    final &= ~HardwareBuffer::HBU_DETAIL_DISCARDABLE;
                 }
                 
             }
-            usages.push_back(final);
+            usages.push_back(static_cast<HardwareBuffer::Usage>(final));
         }
         // Call specific method
         reorganiseBuffers(newDeclaration, usages, mgr);

@@ -233,8 +233,8 @@ namespace Ogre {
                 usage The kind of usage this texture is intended for. It 
                 is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY, 
                 TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
-                strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
-                update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
+                strongly advised to use HBU_GPU_ONLY wherever possible, if you need to
+                update regularly, consider HBU_CPU_TO_GPU.
             @param
                 loader If you intend the contents of the manual texture to be 
                 regularly updated, to the extent that you don't need to recover 

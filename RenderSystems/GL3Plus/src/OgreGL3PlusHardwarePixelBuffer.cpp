@@ -129,7 +129,7 @@ namespace Ogre {
         GLenum format, uint32 width, uint32 height, GLsizei numSamples)
         : GL3PlusHardwarePixelBuffer(
             width, height, 1,
-            GL3PlusPixelUtil::getClosestOGREFormat(format), HBU_WRITE_ONLY),
+            GL3PlusPixelUtil::getClosestOGREFormat(format), HBU_GPU_ONLY),
           mRenderbufferID(0)
     {
         mGLInternalFormat = format;

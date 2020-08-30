@@ -55,7 +55,7 @@ namespace Ogre
         MTLResourceOptions resourceOptions = 0;
 
         // FIXME always using shared storage for now. Using staging buffers leaks severly
-        if( usage & HardwareBuffer::HBU_WRITE_ONLY & 0)
+        if( usage & HBU_DETAIL_WRITE_ONLY & 0)
         {
             resourceOptions |= MTLResourceStorageModePrivate;
             resourceOptions |= MTLResourceCPUCacheModeWriteCombined;
@@ -65,7 +65,7 @@ namespace Ogre
             resourceOptions |= MTLResourceStorageModeShared;
         }
 
-        if( !(usage & HardwareBuffer::HBU_DISCARDABLE) )
+        if( !(usage & HardwareBuffer::HBU_DETAIL_DISCARDABLE) )
         {
             mBuffer = [mDevice->mDevice newBufferWithLength:alignToNextMultiple( sizeBytes, 4u )
                                                     options:resourceOptions];
