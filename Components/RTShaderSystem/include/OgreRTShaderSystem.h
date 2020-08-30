@@ -48,14 +48,10 @@ THE SOFTWARE.
 */
 /** \defgroup RTShader RTShaderSystem
 * Real Time Shader System: enables GPU program generation during the runtime of a process
-*  @{
-*/
-
-/**
-* The RT Shader System enables GPU program generation during the runtime of a process.
+*
 * The main interface to do that is the ShaderGenerator singleton.
 * A typical usage of this system would be to create shader based technique from an existing technique and
-* associate it with a destination scheme name. @see ShaderGenerator::createShaderBasedTechnique.
+* associate it with a destination scheme name (see ShaderGenerator::createShaderBasedTechnique).
 * The source technique must include only fixed function based passes, otherwise the method will fail.
 * Once this task accomplished, one may switch the scheme of the current viewport(s) he uses, to 
 * the scheme he associate previously, and then a technique based on the original one will be used but this
@@ -70,8 +66,6 @@ THE SOFTWARE.
 *   of being spread around many different materials and programs. 
 * 
 */
-
-/** @} */
 /** @} */
 
 #endif
