@@ -529,7 +529,7 @@ namespace Ogre {
     //********* GLES2RenderBuffer
     //----------------------------------------------------------------------------- 
     GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
-    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format), HBU_WRITE_ONLY)
+    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format), HBU_GPU_ONLY)
     {
         GLES2RenderSystem* rs = getGLES2RenderSystem();
 

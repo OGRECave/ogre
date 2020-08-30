@@ -67,7 +67,7 @@ void GLHardwarePixelBufferCommon::freeBuffer()
 PixelBox GLHardwarePixelBufferCommon::lockImpl(const Box& lockBox, LockOptions options)
 {
     allocateBuffer();
-    if (!((mUsage & HBU_WRITE_ONLY) || (options == HBL_DISCARD) || (options == HBL_WRITE_ONLY)))
+    if (!((mUsage & HBU_DETAIL_WRITE_ONLY) || (options == HBL_DISCARD) || (options == HBL_WRITE_ONLY)))
     {
         // Download the old contents of the texture
         download(mBuffer);

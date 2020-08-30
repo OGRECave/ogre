@@ -47,16 +47,16 @@ namespace Ogre {
      */
     enum TextureUsage
     {
-        /// same as HardwareBuffer::HBU_STATIC
-        TU_STATIC = HardwareBuffer::HBU_STATIC,
-        /// same as HardwareBuffer::HBU_DYNAMIC
-        TU_DYNAMIC = HardwareBuffer::HBU_DYNAMIC,
-        /// same as HardwareBuffer::HBU_WRITE_ONLY
-        TU_WRITE_ONLY = HardwareBuffer::HBU_WRITE_ONLY,
-        /// same as HardwareBuffer::HBU_STATIC_WRITE_ONLY
-        TU_STATIC_WRITE_ONLY = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
-        /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY
-        TU_DYNAMIC_WRITE_ONLY = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+        /// same as #HBU_GPU_TO_CPU
+        TU_STATIC = HBU_GPU_TO_CPU,
+        /// same as #HBU_CPU_ONLY
+        TU_DYNAMIC = HBU_CPU_ONLY,
+        /// same as #HBU_DETAIL_WRITE_ONLY
+        TU_WRITE_ONLY = HBU_DETAIL_WRITE_ONLY,
+        /// same as #HBU_GPU_ONLY
+        TU_STATIC_WRITE_ONLY = HBU_GPU_ONLY,
+        /// same as #HBU_CPU_TO_GPU
+        TU_DYNAMIC_WRITE_ONLY = HBU_CPU_TO_GPU,
         /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE
         TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
         /// Mipmaps will be automatically generated for this texture
@@ -73,7 +73,7 @@ namespace Ogre {
         /// Texture can be used as an UAV, but not as a regular texture.
         TU_UAV_NOT_SRV = TU_UAV | TU_NOT_SRV,
         /// Default to automatic mipmap generation static textures
-        TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY,
+        TU_DEFAULT = TU_AUTOMIPMAP | HBU_GPU_ONLY,
 
         // deprecated
         TU_NOTSHADERRESOURCE = TU_NOT_SRV

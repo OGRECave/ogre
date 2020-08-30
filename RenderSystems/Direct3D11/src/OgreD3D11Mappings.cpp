@@ -227,7 +227,7 @@ namespace Ogre
             // D3D debug runtime doesn't like you locking managed buffers readonly
             // when they were created with write-only (even though you CAN read
             // from the software backed version)
-            if (!(usage & HardwareBuffer::HBU_WRITE_ONLY))
+            if (!(usage & HBU_DETAIL_WRITE_ONLY))
                 ret = D3D11_MAP_READ;
 
         }

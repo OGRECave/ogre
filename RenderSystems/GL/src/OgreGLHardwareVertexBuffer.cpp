@@ -112,7 +112,7 @@ namespace Ogre {
                 glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
                     GLHardwareBufferManager::getGLUsage(mUsage));
             }
-            if (mUsage & HBU_WRITE_ONLY)
+            if (mUsage & HBU_DETAIL_WRITE_ONLY)
                 access = GL_WRITE_ONLY_ARB;
             else if (options == HBL_READ_ONLY)
                 access = GL_READ_ONLY_ARB;

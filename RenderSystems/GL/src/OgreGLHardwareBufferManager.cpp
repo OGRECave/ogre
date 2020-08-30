@@ -108,7 +108,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     GLenum GLHardwareBufferManager::getGLUsage(unsigned int usage)
     {
-        return  (usage & HardwareBuffer::HBU_DISCARDABLE) ? GL_STREAM_DRAW_ARB :
+        return  (usage & HardwareBuffer::HBU_DETAIL_DISCARDABLE) ? GL_STREAM_DRAW_ARB :
                 (usage & HardwareBuffer::HBU_STATIC) ? GL_STATIC_DRAW_ARB :
                 GL_DYNAMIC_DRAW_ARB;
     }

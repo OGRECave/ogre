@@ -68,7 +68,7 @@ namespace Ogre {
 
         bool writeOnly =
             options == HardwareBuffer::HBL_WRITE_ONLY ||
-            ((mUsage & HardwareBuffer::HBU_WRITE_ONLY) &&
+            ((mUsage & HBU_DETAIL_WRITE_ONLY) &&
              options != HardwareBuffer::HBL_READ_ONLY && options != HardwareBuffer::HBL_NORMAL);
 
         if (writeOnly)
@@ -165,7 +165,7 @@ namespace Ogre {
 
     GLenum GL3PlusHardwareBuffer::getGLUsage(uint32 usage)
     {
-        return  (usage & HardwareBuffer::HBU_DISCARDABLE) ? GL_STREAM_DRAW :
+        return  (usage & HardwareBuffer::HBU_DETAIL_DISCARDABLE) ? GL_STREAM_DRAW :
                 (usage & HardwareBuffer::HBU_STATIC) ? GL_STATIC_DRAW :
                 GL_DYNAMIC_DRAW;
     }

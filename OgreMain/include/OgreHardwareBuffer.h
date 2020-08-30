@@ -40,6 +40,41 @@ namespace Ogre {
     /** \addtogroup RenderSystem
     *  @{
     */
+    /// Enums describing buffer usage
+    enum HardwareBufferUsage
+    {
+        /** Memory mappable on host and cached
+         * @par Usage
+         * results of some computations, e.g. screen capture
+         */
+        HBU_GPU_TO_CPU = 1,
+        /** CPU (system) memory
+         * This is the least optimal buffer setting.
+         * @par Usage
+         * Staging copy of resources used as transfer source.
+         */
+        HBU_CPU_ONLY = 2,
+        /** Indicates the application will never read the contents of the buffer back,
+        it will only ever write data. Locking a buffer with this flag will ALWAYS
+        return a pointer to new, blank memory rather than the memory associated
+        with the contents of the buffer; this avoids DMA stalls because you can
+        write to a new memory area while the previous one is being used.
+
+        However, you may read from it’s shadow buffer if you set one up
+        */
+        HBU_DETAIL_WRITE_ONLY = 4,
+        /** Device-local GPU (video) memory. No need to be mappable on host.
+         * This is the optimal buffer usage setting.
+         * @par Usage
+         * Resources transferred from host once (immutable) - e.g. most textures, vertex buffers
+         */
+        HBU_GPU_ONLY = HBU_GPU_TO_CPU | HBU_DETAIL_WRITE_ONLY,
+        /** Mappable on host and preferably fast to access by GPU.
+         * @par Usage
+         * Resources written frequently by host (dynamic) - e.g. uniform buffers updated every frame
+         */
+        HBU_CPU_TO_GPU = HBU_CPU_ONLY | HBU_DETAIL_WRITE_ONLY,
+    };
     /** Abstract class defining common features of hardware buffers.
     @remarks
         A 'hardware buffer' is any area of memory held outside of core system ram,
@@ -75,61 +110,44 @@ namespace Ogre {
     {
 
         public:
-            /// Enums describing buffer usage; not mutually exclusive
-            enum Usage
+            typedef int Usage;
+            /// Rather use HardwareBufferUsage
+            enum UsageEnum
             {
-                /** Static buffer which the application rarely modifies once created. Modifying
-                the contents of this buffer will involve a performance hit.
-                */
-                HBU_STATIC = 1,
-                /** Indicates the application would like to modify this buffer with the CPU
-                fairly often.
-                Buffers created with this flag will typically end up in AGP memory rather
-                than video memory.
-
-                This is the least optimal buffer setting.
-                */
-                HBU_DYNAMIC = 2,
-                /** Indicates the application will never read the contents of the buffer back,
-                it will only ever write data. Locking a buffer with this flag will ALWAYS
-                return a pointer to new, blank memory rather than the memory associated
-                with the contents of the buffer; this avoids DMA stalls because you can
-                write to a new memory area while the previous one is being used.
-
-                However, you may read from it’s shadow buffer if you set one up
-                */
-                HBU_WRITE_ONLY = 4,
+                /// same as #HBU_GPU_TO_CPU
+                HBU_STATIC = HBU_GPU_TO_CPU,
+                /// same as #HBU_CPU_ONLY
+                HBU_DYNAMIC = HBU_CPU_ONLY,
+                /// @deprecated use #HBU_DETAIL_WRITE_ONLY
+                HBU_WRITE_ONLY = HBU_DETAIL_WRITE_ONLY,
                 /** Indicates that the application will be refilling the contents
                 of the buffer regularly (not just updating, but generating the
                 contents from scratch), and therefore does not mind if the contents
                 of the buffer are lost somehow and need to be recreated. This
                 allows and additional level of optimisation on the buffer.
                 This option only really makes sense when combined with
-                HBU_DYNAMIC_WRITE_ONLY.
+                #HBU_CPU_TO_GPU.
                 */
-                HBU_DISCARDABLE = 8,
-                /** Combination of HBU_STATIC and HBU_WRITE_ONLY
-                This is the optimal buffer usage setting.
-                */
-                HBU_STATIC_WRITE_ONLY = HBU_STATIC | HBU_WRITE_ONLY,
-                /** Combination of HBU_DYNAMIC and HBU_WRITE_ONLY. If you use
-                this, strongly consider using HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE
-                instead if you update the entire contents of the buffer very
-                regularly.
-                */
-                HBU_DYNAMIC_WRITE_ONLY = HBU_DYNAMIC | HBU_WRITE_ONLY,
-                /** Combination of HBU_DYNAMIC, HBU_WRITE_ONLY and HBU_DISCARDABLE
-                 This means that you expect to replace the entire contents of the buffer on an
-                 extremely regular basis, most likely every frame. By selecting this option, you
+                HBU_DETAIL_DISCARDABLE = 8,
+                /// @deprecated use HBU_DETAIL_DISCARDABLE
+                HBU_DISCARDABLE = HBU_DETAIL_DISCARDABLE,
+                /// same as #HBU_GPU_ONLY
+                HBU_STATIC_WRITE_ONLY = HBU_GPU_ONLY,
+                /// same as #HBU_CPU_TO_GPU
+                HBU_DYNAMIC_WRITE_ONLY = HBU_CPU_TO_GPU,
+                /** Indicates that the application replaces the entire contents of the buffer on an
+                 regular basis.
+                 Combination of #HBU_CPU_TO_GPU and #HBU_DETAIL_DISCARDABLE.
+
+                 By selecting this option, you
                  free the system up from having to be concerned about losing the existing contents
                  of the buffer at any time, because if it does lose them, you will be replacing them
-                 next frame anyway. On some platforms this can make a significant performance
+                 next frame anyway. On D3D9 this can make a significant performance
                  difference, so you should try to use this whenever you have a buffer you need to
                  update regularly. Note that if you create a buffer this way, you should use the
                  HBL_DISCARD flag when locking the contents of it for writing.
                  */
-                HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HBU_DYNAMIC_WRITE_ONLY | HBU_DISCARDABLE
-
+                HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HBU_CPU_TO_GPU | HBU_DETAIL_DISCARDABLE,
             };
             /// Locking options
             enum LockOptions

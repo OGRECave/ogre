@@ -163,6 +163,7 @@ JNIEnv* OgreJNIGetEnv() {
 #endif
 
 #ifdef SWIGCSHARP
+%ignore Ogre::HardwareBuffer::UsageEnum;
 %ignore Ogre::TextureUsage;
 %ignore Ogre::GpuConstantType;
 %ignore Ogre::Capabilities;

@@ -239,7 +239,7 @@ namespace Ogre {
             system memory rather than GPU or AGP memory. You should set this flag if you intend 
             to read data back from the vertex buffer, because reading data from a buffer
             in the GPU or AGP memory is very expensive, and is in fact impossible if you
-            specify HBU_WRITE_ONLY for the main buffer. If you use this option, all 
+            specify HBU_DETAIL_WRITE_ONLY for the main buffer. If you use this option, all
             reads and writes will be done to the shadow buffer, and the shadow buffer will
             be synchronised with the real buffer at an appropriate time.
         */
@@ -262,7 +262,7 @@ namespace Ogre {
             system memory rather than GPU or AGP memory. You should set this flag if you intend 
             to read data back from the index buffer, because reading data from a buffer
             in the GPU or AGP memory is very expensive, and is in fact impossible if you
-            specify HBU_WRITE_ONLY for the main buffer. If you use this option, all 
+            specify HBU_DETAIL_WRITE_ONLY for the main buffer. If you use this option, all
             reads and writes will be done to the shadow buffer, and the shadow buffer will
             be synchronised with the real buffer at an appropriate time.
         */

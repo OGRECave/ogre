@@ -59,7 +59,7 @@ namespace Ogre {
         // unmanaged buffers for speed (avoids write-through overhead)
         // Don't override if we use directX9EX, since then we don't have managed
         // pool. And creating non-write only default pool causes a performance warning. 
-        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DISCARDABLE) &&
+        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DETAIL_DISCARDABLE) &&
             !D3D9RenderSystem::isDirectX9Ex())
         {
             useShadowBuffer = false;
@@ -75,10 +75,10 @@ namespace Ogre {
         }
         //If we have write only buffers in DirectX9Ex we will turn on the discardable flag.
         //Otherwise Ogre will operates in far less framerate
-        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HardwareBuffer::HBU_WRITE_ONLY))
+        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HBU_DETAIL_WRITE_ONLY))
         {
             usage = (HardwareBuffer::Usage)
-                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DISCARDABLE);
+                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DETAIL_DISCARDABLE);
         }
 #endif
         D3D9HardwareVertexBuffer* vbuf = OGRE_NEW D3D9HardwareVertexBuffer(
@@ -103,7 +103,7 @@ namespace Ogre {
         // unmanaged buffers for speed (avoids write-through overhead)
         // Don't override if we use directX9EX, since then we don't have managed
         // pool. And creating non-write only default pool causes a performance warning. 
-        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DISCARDABLE) &&
+        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DETAIL_DISCARDABLE) &&
             !D3D9RenderSystem::isDirectX9Ex())
         {
             useShadowBuffer = false;
@@ -119,10 +119,10 @@ namespace Ogre {
         }
         //If we have write only buffers in DirectX9Ex we will turn on the discardable flag.
         //Otherwise Ogre will operates in far less framerate
-        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HardwareBuffer::HBU_WRITE_ONLY))
+        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HBU_DETAIL_WRITE_ONLY))
         {
             usage = (HardwareBuffer::Usage)
-                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DISCARDABLE);
+                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DETAIL_DISCARDABLE);
         }
 #endif
         D3D9HardwareIndexBuffer* idx = OGRE_NEW D3D9HardwareIndexBuffer(
