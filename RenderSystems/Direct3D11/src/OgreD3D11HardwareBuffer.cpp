@@ -35,8 +35,8 @@ namespace Ogre {
     D3D11HardwareBuffer::D3D11HardwareBuffer(
         BufferType btype, size_t sizeBytes,
         HardwareBuffer::Usage usage, D3D11Device & device, 
-        bool useSystemMemory, bool useShadowBuffer, bool streamOut)
-        : HardwareBuffer(usage, useSystemMemory,  useShadowBuffer),
+        bool useShadowBuffer, bool streamOut)
+        : HardwareBuffer(usage, false,  useShadowBuffer),
         mpTempStagingBuffer(0),
         mUseTempStagingBuffer(false),
         mBufferType(btype),
@@ -44,10 +44,10 @@ namespace Ogre {
     {
         mSizeInBytes = sizeBytes;
         mDesc.ByteWidth = static_cast<UINT>(sizeBytes);
-        mDesc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage); 
+        mDesc.CPUAccessFlags = 0;
         mDesc.MiscFlags = 0;
 
-        if (useSystemMemory)
+        if (usage == HBU_CPU_ONLY)
         {
             mDesc.Usage = D3D11_USAGE_STAGING;
             //A D3D11_USAGE_STAGING Resource cannot be bound to any parts of the graphics pipeline, so therefore cannot have any BindFlags bits set.
@@ -68,7 +68,7 @@ namespace Ogre {
             mDesc.BindFlags |= D3D11_BIND_STREAM_OUTPUT;
         }
 
-        if (!useSystemMemory && (usage & HardwareBuffer::HBU_DYNAMIC))
+        if (usage == HBU_CPU_TO_GPU)
         {
             // We want to be able to map this buffer
             mDesc.CPUAccessFlags |= D3D11_CPU_ACCESS_WRITE;
@@ -80,8 +80,6 @@ namespace Ogre {
         // which themselves cannot be used for input / output to the GPU. Thus
         // for any locks except write locks on dynamic resources, we have to use
         // temporary staging resources instead and use async copies.
-        // We use the 'useSystemMemory' option to indicate a staging resource
-
 
         // TODO: we can explicitly initialise the buffer contents here if we like
         // not doing this since OGRE doesn't support this model yet
@@ -91,7 +89,7 @@ namespace Ogre {
         if (mUseShadowBuffer)
         {
             mShadowBuffer.reset(new D3D11HardwareBuffer(mBufferType,
-                    mSizeInBytes, mUsage, mDevice, true, false, false));
+                    mSizeInBytes, HBU_CPU_ONLY, mDevice, false, false));
         }
 
     }
@@ -113,8 +111,7 @@ namespace Ogre {
         }
 
 
-        if (mSystemMemory ||
-            (mUsage & HardwareBuffer::HBU_DYNAMIC && 
+        if (mUsage == HBU_CPU_ONLY || (mUsage & HardwareBuffer::HBU_DYNAMIC &&
             (options == HardwareBuffer::HBL_DISCARD || options == HardwareBuffer::HBL_NO_OVERWRITE)))
         {
             // Staging (system memory) buffers or dynamic, write-only buffers 
@@ -129,12 +126,12 @@ namespace Ogre {
             {
             case HBL_DISCARD:
                 // To use D3D11_MAP_WRITE_DISCARD resource must have been created with write access and dynamic usage.
-                mapType = mSystemMemory ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_DISCARD;
+                mapType = mUsage == HBU_CPU_ONLY ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_DISCARD;
                 break;
             case HBL_NO_OVERWRITE:
                 // To use D3D11_MAP_WRITE_NO_OVERWRITE resource must have been created with write access.
-                // TODO: check (mSystemMemory aka D3D11_USAGE_STAGING => D3D11_MAP_WRITE_NO_OVERWRITE) combo - it`s not forbidden by MSDN
-                mapType = mSystemMemory ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_NO_OVERWRITE; 
+                // TODO: check (D3D11_USAGE_STAGING => D3D11_MAP_WRITE_NO_OVERWRITE) combo - it`s not forbidden by MSDN
+                mapType = mUsage == HBU_CPU_ONLY ? D3D11_MAP_WRITE : D3D11_MAP_WRITE_NO_OVERWRITE;
                 break;
             case HBL_NORMAL:
                 mapType = (mDesc.CPUAccessFlags & D3D11_CPU_ACCESS_READ) ? D3D11_MAP_READ_WRITE : D3D11_MAP_WRITE;
@@ -164,7 +161,7 @@ namespace Ogre {
             {
                 // create another buffer instance but use system memory
                 mpTempStagingBuffer = new D3D11HardwareBuffer(mBufferType, 
-                    mSizeInBytes, mUsage, mDevice, true, false, false);
+                    mSizeInBytes, HBU_CPU_ONLY, mDevice, false, false);
             }
 
             // schedule a copy to the staging
