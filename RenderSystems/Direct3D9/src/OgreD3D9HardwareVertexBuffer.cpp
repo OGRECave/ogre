@@ -39,8 +39,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     D3D9HardwareVertexBuffer::D3D9HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, 
         size_t numVertices, HardwareBuffer::Usage usage, 
-        bool useSystemMemory, bool useShadowBuffer)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, useSystemMemory, 
+        bool useShadowBuffer)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false,
         useShadowBuffer || 
         // Allocate the system memory buffer for restoring after device lost.
         (((usage & HBU_DETAIL_WRITE_ONLY) != 0) &&
@@ -51,12 +51,12 @@ namespace Ogre {
         D3DPOOL eResourcePool;
                
 #if OGRE_D3D_MANAGE_BUFFERS
-        eResourcePool = useSystemMemory? D3DPOOL_SYSTEMMEM : 
+        eResourcePool = usage == HBU_CPU_ONLY ? D3DPOOL_SYSTEMMEM :
             // If not system mem, use managed pool UNLESS buffer is discardable
             // if discardable, keeping the software backing is expensive
             ((usage & HardwareBuffer::HBU_DETAIL_DISCARDABLE) || (D3D9RenderSystem::isDirectX9Ex())) ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 #else
-        eResourcePool = useSystemMemory? D3DPOOL_SYSTEMMEM : D3DPOOL_DEFAULT;
+        eResourcePool = usage == HBU_CPU_ONLY ? D3DPOOL_SYSTEMMEM : D3DPOOL_DEFAULT;
 #endif              
 
         // Set the desired memory pool.
