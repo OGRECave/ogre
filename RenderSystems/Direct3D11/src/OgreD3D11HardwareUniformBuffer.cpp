@@ -44,7 +44,7 @@ namespace Ogre {
 
         // everything is done via internal generalisation
         mBufferImpl = new D3D11HardwareBuffer(D3D11HardwareBuffer::CONSTANT_BUFFER, 
-                                            mSizeInBytes, mUsage, device, false, useShadowBuffer, false);
+                                            mSizeInBytes, mUsage, device, useShadowBuffer, false);
 
     }
     //---------------------------------------------------------------------

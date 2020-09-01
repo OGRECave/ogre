@@ -55,7 +55,7 @@ namespace Ogre {
 	{
 		assert(numVerts > 0);
 		D3D11HardwareVertexBuffer* vbuf = new D3D11HardwareVertexBuffer(
-			this, vertexSize, numVerts, usage, mlpD3DDevice, false, useShadowBuffer, false);
+			this, vertexSize, numVerts, usage, mlpD3DDevice, useShadowBuffer, false);
 		{
 			OGRE_LOCK_MUTEX(mVertexBuffersMutex);
 			mVertexBuffers.insert(vbuf);
@@ -70,7 +70,7 @@ namespace Ogre {
 	{
 		assert(numVerts > 0);
 		D3D11HardwareVertexBuffer* vbuf = new D3D11HardwareVertexBuffer(
-			this, vertexSize, numVerts, usage, mlpD3DDevice, false, useShadowBuffer, true);
+			this, vertexSize, numVerts, usage, mlpD3DDevice, useShadowBuffer, true);
 		{
 			OGRE_LOCK_MUTEX(mVertexBuffersMutex);
 			mVertexBuffers.insert(vbuf);
@@ -85,7 +85,7 @@ namespace Ogre {
 	{
 		assert(numIndexes > 0);
 		D3D11HardwareIndexBuffer* idx = new D3D11HardwareIndexBuffer(
-			this, itype, numIndexes, usage, mlpD3DDevice, false, useShadowBuffer);
+			this, itype, numIndexes, usage, mlpD3DDevice, useShadowBuffer);
 		{
 			OGRE_LOCK_MUTEX(mIndexBuffersMutex);
 			mIndexBuffers.insert(idx);

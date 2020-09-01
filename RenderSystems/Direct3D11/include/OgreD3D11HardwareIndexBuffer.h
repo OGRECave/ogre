@@ -44,7 +44,7 @@ namespace Ogre {
 
     public:
         D3D11HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes, 
-            HardwareBuffer::Usage usage, D3D11Device & device, bool useSystemMem, bool useShadowBuffer);
+            HardwareBuffer::Usage usage, D3D11Device & device, bool useShadowBuffer);
         ~D3D11HardwareIndexBuffer();
 
         // override all data-gathering methods

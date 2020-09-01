@@ -44,7 +44,7 @@ namespace Ogre {
 
     public:
         D3D11HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
-            HardwareBuffer::Usage usage, D3D11Device & device, bool useSystemMem, bool useShadowBuffer, 
+            HardwareBuffer::Usage usage, D3D11Device & device, bool useShadowBuffer,
             bool streamOut);
         ~D3D11HardwareVertexBuffer();
 
