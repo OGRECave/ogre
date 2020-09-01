@@ -40,7 +40,7 @@ namespace Ogre {
   
     public:
         D3D9HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes, 
-            HardwareBuffer::Usage usage, bool useSystemMem, bool useShadowBuffer);
+            HardwareBuffer::Usage usage, bool useShadowBuffer);
         ~D3D9HardwareIndexBuffer();
         /** See HardwareBuffer. */
         void readData(size_t offset, size_t length, void* pDest);
