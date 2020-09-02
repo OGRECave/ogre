@@ -65,7 +65,7 @@ namespace Ogre
             resourceOptions |= MTLResourceStorageModeShared;
         }
 
-        if( !(usage & HardwareBuffer::HBU_DETAIL_DISCARDABLE) )
+        if( true )
         {
             mBuffer = [mDevice->mDevice newBufferWithLength:alignToNextMultiple( sizeBytes, 4u )
                                                     options:resourceOptions];

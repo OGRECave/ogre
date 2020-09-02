@@ -100,11 +100,6 @@ namespace Ogre
     typedef SharedPtr<D3D9HLSLProgram> D3D9HLSLProgramPtr;
     typedef SharedPtr<D3D9Texture>     D3D9TexturePtr;
 
-// Should we ask D3D to manage vertex/index buffers automatically?
-// Doing so avoids lost devices, but also has a performance impact
-// which is unacceptably bad when using very large buffers
-#define OGRE_D3D_MANAGE_BUFFERS 1
-
     //-------------------------------------------
     // Windows setttings
     //-------------------------------------------

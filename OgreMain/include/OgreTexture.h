@@ -57,8 +57,8 @@ namespace Ogre {
         TU_STATIC_WRITE_ONLY = HBU_GPU_ONLY,
         /// same as #HBU_CPU_TO_GPU
         TU_DYNAMIC_WRITE_ONLY = HBU_CPU_TO_GPU,
-        /// same as HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE
-        TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+        /// @deprecated do not use
+        TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HBU_CPU_TO_GPU,
         /// Mipmaps will be automatically generated for this texture
         TU_AUTOMIPMAP = 0x10,
         /** This texture will be a render target, i.e. used as a target for render to texture

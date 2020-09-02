@@ -52,35 +52,6 @@ namespace Ogre {
         bool useShadowBuffer)
     {
         assert (numVerts > 0);
-#if OGRE_D3D_MANAGE_BUFFERS
-        // Override shadow buffer setting; managed buffers are automatically
-        // backed by system memory
-        // Don't override shadow buffer if discardable, since then we use
-        // unmanaged buffers for speed (avoids write-through overhead)
-        // Don't override if we use directX9EX, since then we don't have managed
-        // pool. And creating non-write only default pool causes a performance warning. 
-        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DETAIL_DISCARDABLE) &&
-            !D3D9RenderSystem::isDirectX9Ex())
-        {
-            useShadowBuffer = false;
-            // Also drop any WRITE_ONLY so we can read direct
-            if (usage == HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY)
-            {
-                usage = HardwareBuffer::HBU_DYNAMIC;
-            }
-            else if (usage == HardwareBuffer::HBU_STATIC_WRITE_ONLY)
-            {
-                usage = HardwareBuffer::HBU_STATIC;
-            }
-        }
-        //If we have write only buffers in DirectX9Ex we will turn on the discardable flag.
-        //Otherwise Ogre will operates in far less framerate
-        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HBU_DETAIL_WRITE_ONLY))
-        {
-            usage = (HardwareBuffer::Usage)
-                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DETAIL_DISCARDABLE);
-        }
-#endif
         D3D9HardwareVertexBuffer* vbuf = OGRE_NEW D3D9HardwareVertexBuffer(
             this, vertexSize, numVerts, usage, useShadowBuffer);
         {
@@ -96,35 +67,6 @@ namespace Ogre {
         HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
         assert (numIndexes > 0);
-#if OGRE_D3D_MANAGE_BUFFERS
-        // Override shadow buffer setting; managed buffers are automatically
-        // backed by system memory
-        // Don't override shadow buffer if discardable, since then we use
-        // unmanaged buffers for speed (avoids write-through overhead)
-        // Don't override if we use directX9EX, since then we don't have managed
-        // pool. And creating non-write only default pool causes a performance warning. 
-        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DETAIL_DISCARDABLE) &&
-            !D3D9RenderSystem::isDirectX9Ex())
-        {
-            useShadowBuffer = false;
-            // Also drop any WRITE_ONLY so we can read direct
-            if (usage == HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY)
-            {
-                usage = HardwareBuffer::HBU_DYNAMIC;
-            }
-            else if (usage == HardwareBuffer::HBU_STATIC_WRITE_ONLY)
-            {
-                usage = HardwareBuffer::HBU_STATIC;
-            }
-        }
-        //If we have write only buffers in DirectX9Ex we will turn on the discardable flag.
-        //Otherwise Ogre will operates in far less framerate
-        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HBU_DETAIL_WRITE_ONLY))
-        {
-            usage = (HardwareBuffer::Usage)
-                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DETAIL_DISCARDABLE);
-        }
-#endif
         D3D9HardwareIndexBuffer* idx = OGRE_NEW D3D9HardwareIndexBuffer(
             this, itype, numIndexes, usage, useShadowBuffer);
         {
