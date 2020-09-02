@@ -286,7 +286,7 @@ namespace Ogre {
                         "GL3PlusTextureBuffer::download");
 
         // Download data to PBO
-        GL3PlusHardwareBuffer buffer(GL_PIXEL_PACK_BUFFER, data.getConsecutiveSize(), HBU_DETAIL_DISCARDABLE);
+        GL3PlusHardwareBuffer buffer(GL_PIXEL_PACK_BUFFER, data.getConsecutiveSize(), HBU_GPU_TO_CPU);
 
         //        std::stringstream str;
         //        str << "GL3PlusHardwarePixelBuffer::download: " << mTextureID
