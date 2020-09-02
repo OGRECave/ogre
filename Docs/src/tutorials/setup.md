@@ -85,7 +85,7 @@ Plugin=RenderSystem_GL
 
 We have the three DirectX systems commented out, and an active line for OpenGL. On a windows system, you may have this reversed. You can see why it might be helpful not to delete unused lines, because then you have to try and remember whether it was RenderSystem_OpenGL or RenderSystem_GL.
 
-You can also decide where %Ogre looks for plugins by changing the @c PluginFolder variable. You can use both absolute and relative paths. Additionally, you can use the @c OGRE_PLUGIN_DIR environment variable to override the value of @c PluginFolder.
+You can also decide where %Ogre looks for plugins by changing the @c PluginFolder variable. You can use both absolute and relative paths. Relative paths are resolved relative to the location of @c plugins.cfg. Additionally, you can use the @c OGRE_PLUGIN_DIR environment variable to override the value of @c PluginFolder.
 
 For example, if you have built %Ogre from source on a linux machine, then you will need a line like this at the beginning of your file:
 
@@ -99,7 +99,7 @@ By default, %Ogre would have been looking in the same directory where the @c plu
 
 ### resources.cfg
 
-This file contains a list of the directories %Ogre will use to search for resources. Resources include scripts, meshes, textures, GUI layouts, and others. You can also use both absolute and relative paths in this file, but you still cannot use environment variables. %Ogre will **not** search subdirectories, so you have to manually enter them. Here is an example:
+This file contains a list of the directories %Ogre will use to search for resources. Resources include scripts, meshes, textures, GUI layouts, and others. You can also use both absolute and relative paths in this file, but you still cannot use environment variables. Relative paths are resolved relative to the location of @c resources.cfg. %Ogre will **not** search subdirectories, so you have to manually enter them. Here is an example:
 
 ```
 [General]

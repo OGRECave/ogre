@@ -402,11 +402,12 @@ void ApplicationContextBase::locateResources()
     auto& rgm = Ogre::ResourceGroupManager::getSingleton();
     // load resource paths from config file
     Ogre::ConfigFile cf;
+    Ogre::String resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     Ogre::Archive* apk = Ogre::ArchiveManager::getSingleton().load("", "APKFileSystem", true);
-    cf.load(apk->open(mFSLayer->getConfigFilePath("resources.cfg")));
+    cf.load(apk->open(resourcesPath));
 #else
-    Ogre::String resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
+
     if (Ogre::FileSystemLayer::fileExists(resourcesPath) || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
     {
         cf.load(resourcesPath);
@@ -430,7 +431,18 @@ void ApplicationContextBase::locateResources()
         for (i = settings.begin(); i != settings.end(); i++)
         {
             type = i->first;
-            arch = Ogre::FileSystemLayer::resolveBundlePath(i->second);
+            arch = i->second;
+
+            Ogre::StringUtil::trim(arch);
+            if (arch.empty() || arch[0] == '.')
+            {
+                // resolve relative path with regards to configfile
+                Ogre::String baseDir, filename;
+                Ogre::StringUtil::splitFilename(resourcesPath, filename, baseDir);
+                arch = baseDir + arch;
+            }
+
+            arch = Ogre::FileSystemLayer::resolveBundlePath(arch);
 
             rgm.addResourceLocation(arch, type, sec);
         }
