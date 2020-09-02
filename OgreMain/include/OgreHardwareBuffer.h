@@ -120,34 +120,14 @@ namespace Ogre {
                 HBU_DYNAMIC = HBU_CPU_ONLY,
                 /// @deprecated use #HBU_DETAIL_WRITE_ONLY
                 HBU_WRITE_ONLY = HBU_DETAIL_WRITE_ONLY,
-                /** Indicates that the application will be refilling the contents
-                of the buffer regularly (not just updating, but generating the
-                contents from scratch), and therefore does not mind if the contents
-                of the buffer are lost somehow and need to be recreated. This
-                allows and additional level of optimisation on the buffer.
-                This option only really makes sense when combined with
-                #HBU_CPU_TO_GPU.
-                */
-                HBU_DETAIL_DISCARDABLE = 8,
-                /// @deprecated use HBU_DETAIL_DISCARDABLE
-                HBU_DISCARDABLE = HBU_DETAIL_DISCARDABLE,
+                /// @deprecated do not use
+                HBU_DISCARDABLE = 8,
                 /// same as #HBU_GPU_ONLY
                 HBU_STATIC_WRITE_ONLY = HBU_GPU_ONLY,
                 /// same as #HBU_CPU_TO_GPU
                 HBU_DYNAMIC_WRITE_ONLY = HBU_CPU_TO_GPU,
-                /** Indicates that the application replaces the entire contents of the buffer on an
-                 regular basis.
-                 Combination of #HBU_CPU_TO_GPU and #HBU_DETAIL_DISCARDABLE.
-
-                 By selecting this option, you
-                 free the system up from having to be concerned about losing the existing contents
-                 of the buffer at any time, because if it does lose them, you will be replacing them
-                 next frame anyway. On D3D9 this can make a significant performance
-                 difference, so you should try to use this whenever you have a buffer you need to
-                 update regularly. Note that if you create a buffer this way, you should use the
-                 HBL_DISCARD flag when locking the contents of it for writing.
-                 */
-                HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HBU_CPU_TO_GPU | HBU_DETAIL_DISCARDABLE,
+                /// @deprecated do not use
+                HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HBU_CPU_TO_GPU,
             };
             /// Locking options
             enum LockOptions

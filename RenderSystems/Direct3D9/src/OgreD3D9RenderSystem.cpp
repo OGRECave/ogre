@@ -430,7 +430,7 @@ namespace Ogre
         optMultiDeviceMemHint.name = "Multi device memory hint";
         optMultiDeviceMemHint.possibleValues.push_back("Use minimum system memory");
         optMultiDeviceMemHint.possibleValues.push_back("Auto hardware buffers management");
-        optMultiDeviceMemHint.currentValue = "Use minimum system memory";
+        optMultiDeviceMemHint.currentValue = optMultiDeviceMemHint.possibleValues[1];
         optMultiDeviceMemHint.immutable = false;
 
         optEnableFixedPipeline.name = "Fixed Pipeline Enabled";

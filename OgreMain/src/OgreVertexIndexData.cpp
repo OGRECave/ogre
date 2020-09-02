@@ -461,9 +461,8 @@ namespace Ogre {
         for (unsigned short b = 0; b <= newDeclaration->getMaxSource(); ++b)
         {
             VertexDeclaration::VertexElementList destElems = newDeclaration->findElementsBySource(b);
-            // Initialise with most restrictive version 
-            // (not really a usable option, but these flags will be removed)
-            int final = HardwareBuffer::HBU_STATIC_WRITE_ONLY | HardwareBuffer::HBU_DETAIL_DISCARDABLE;
+            // Initialise with most restrictive version
+            int final = HardwareBuffer::HBU_STATIC_WRITE_ONLY;
             for (VertexElement& destelem : destElems)
             {
                 // get source
@@ -486,12 +485,6 @@ namespace Ogre {
                     // remove write only
                     final &= ~HBU_DETAIL_WRITE_ONLY;
                 }
-                if (!(srcbuf->getUsage() & HardwareBuffer::HBU_DETAIL_DISCARDABLE))
-                {
-                    // remove discardable
-                    final &= ~HardwareBuffer::HBU_DETAIL_DISCARDABLE;
-                }
-                
             }
             usages.push_back(static_cast<HardwareBuffer::Usage>(final));
         }
