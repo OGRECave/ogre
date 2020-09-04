@@ -53,17 +53,17 @@ namespace Ogre {
     {
         // already handled by resize
         //emscripten_set_fullscreenchange_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::fullscreenCallback);
-        emscripten_set_webglcontextlost_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextLostCallback);
-        emscripten_set_webglcontextrestored_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextRestoredCallback);
-        emscripten_set_resize_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
+        emscripten_set_webglcontextlost_callback("#canvas", (void*)this, 1, &EmscriptenEGLWindow::contextLostCallback);
+        emscripten_set_webglcontextrestored_callback("#canvas", (void*)this, 1, &EmscriptenEGLWindow::contextRestoredCallback);
+        emscripten_set_resize_callback("#canvas", (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
     }
 
     EmscriptenEGLWindow::~EmscriptenEGLWindow()
     {
-        emscripten_set_fullscreenchange_callback(NULL, NULL, 0, NULL);
-        emscripten_set_resize_callback(NULL, NULL, 0, NULL);
-        emscripten_set_webglcontextlost_callback(NULL, NULL, 0, NULL);
-        emscripten_set_webglcontextrestored_callback(NULL, NULL, 0, NULL);
+        emscripten_set_fullscreenchange_callback("#canvas", NULL, 0, NULL);
+        emscripten_set_resize_callback("#canvas", NULL, 0, NULL);
+        emscripten_set_webglcontextlost_callback("#canvas", NULL, 0, NULL);
+        emscripten_set_webglcontextrestored_callback("#canvas", NULL, 0, NULL);
     }
 
     void EmscriptenEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
