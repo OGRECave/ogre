@@ -646,6 +646,7 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
         mBorderSampler = TextureManager::getSingleton().createSampler();
         mBorderSampler->setAddressingMode(TAM_BORDER);
         mBorderSampler->setBorderColour(ColourValue::White);
+        mBorderSampler->setFiltering(FT_MIP, FO_NONE); // we do not have mips. GLES2 is particularly picky here.
     }
 
     if (mShadowTextureConfigDirty)
@@ -1601,8 +1602,6 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
             mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
             // Don't set lighting and blending modes here, depends on additive / modulative
             TextureUnitState* t = mShadowReceiverPass->createTextureUnitState();
-            t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
-            t->setTextureFiltering(FT_MIP, FO_NONE); // we do not have mips. GLES2 is particularly picky here.
             t->setProjectiveTexturing(true, NULL); // will be set later, but the RTSS needs to know about this
         }
         else
