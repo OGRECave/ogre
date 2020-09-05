@@ -49,8 +49,6 @@ namespace Ogre {
     protected:
         ComPtr<ID3D11Buffer> mlpD3DBuffer;
         bool mUseTempStagingBuffer;
-        D3D11HardwareBuffer* mpTempStagingBuffer;
-        bool mStagingUploadNeeded;
         BufferType mBufferType;
         D3D11Device & mDevice;
         D3D11_BUFFER_DESC mDesc;

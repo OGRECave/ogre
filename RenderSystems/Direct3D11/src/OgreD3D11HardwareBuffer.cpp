@@ -37,7 +37,6 @@ namespace Ogre {
         HardwareBuffer::Usage usage, D3D11Device & device, 
         bool useShadowBuffer, bool streamOut)
         : HardwareBuffer(usage, false,  useShadowBuffer),
-        mpTempStagingBuffer(0),
         mUseTempStagingBuffer(false),
         mBufferType(btype),
         mDevice(device)
@@ -94,23 +93,11 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    D3D11HardwareBuffer::~D3D11HardwareBuffer()
-    {
-        SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
-        mShadowBuffer.reset();
-    }
+    D3D11HardwareBuffer::~D3D11HardwareBuffer() {}
     //---------------------------------------------------------------------
     void* D3D11HardwareBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
     {
-        if (length > mSizeInBytes)
-        {
-            // need to realloc
-            mDesc.ByteWidth = static_cast<UINT>(mSizeInBytes);
-            OGRE_CHECK_DX_ERROR(mDevice->CreateBuffer(&mDesc, 0, mlpD3DBuffer.ReleaseAndGetAddressOf()));
-        }
-
-
         if (mUsage == HBU_CPU_ONLY || (mUsage & HardwareBuffer::HBU_DYNAMIC &&
             (options == HardwareBuffer::HBL_DISCARD || options == HardwareBuffer::HBL_NO_OVERWRITE)))
         {
@@ -157,23 +144,20 @@ namespace Ogre {
         else
         {
             mUseTempStagingBuffer = true;
-            if (!mpTempStagingBuffer)
-            {
-                // create another buffer instance but use system memory
-                mpTempStagingBuffer = new D3D11HardwareBuffer(mBufferType, 
-                    mSizeInBytes, HBU_CPU_ONLY, mDevice, false, false);
-            }
+            OgreAssertDbg(!mShadowBuffer,
+                          "we should never arrive here, when already having a shadow buffer");
+            // create temporary shadow buffer
+            mShadowBuffer.reset(new D3D11HardwareBuffer(mBufferType,
+                    mSizeInBytes, HBU_CPU_ONLY, mDevice, false, false));
 
             // schedule a copy to the staging
             if (options != HBL_DISCARD)
-                mpTempStagingBuffer->copyData(*this, 0, 0, mSizeInBytes, true);
+                mShadowBuffer->copyData(*this, offset, offset, length, true);
 
             // register whether we'll need to upload on unlock
-            mStagingUploadNeeded = (options != HBL_READ_ONLY);
+            mShadowUpdated = (options != HBL_READ_ONLY);
 
-            return mpTempStagingBuffer->lock(offset, length, options);
-
-
+            return mShadowBuffer->lock(offset, length, options);
         }
     }
     //---------------------------------------------------------------------
@@ -185,16 +169,15 @@ namespace Ogre {
             mUseTempStagingBuffer = false;
 
             // ok, we locked the staging buffer
-            mpTempStagingBuffer->unlock();
+            mShadowBuffer->unlock();
 
             // copy data if needed
             // this is async but driver should keep reference
-            if (mStagingUploadNeeded)
-                copyData(*mpTempStagingBuffer, 0, 0, mSizeInBytes, true);
+            if (mShadowUpdated)
+                copyDataImpl(*mShadowBuffer, mLockStart, mLockStart, mLockSize, true);
 
             // delete
-            // not that efficient, but we should not be locking often
-            SAFE_DELETE(mpTempStagingBuffer);
+            mShadowBuffer.reset();
         }
         else
         {
