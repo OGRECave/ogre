@@ -44,8 +44,18 @@ namespace Ogre {
     /// Define a list of usage flags
     typedef std::vector<HardwareBuffer::Usage> BufferUsageList;
 
-
-    /** Summary class collecting together vertex source information. */
+    /** collects together all the vertex-related information used to render geometry.
+     *
+     * The RenderOperation requires a pointer to a VertexData object, and it is also used in Mesh and
+     * SubMesh to store the vertex positions, normals, texture coordinates etc. VertexData can either be
+     * used alone (in order to render unindexed geometry, where the stream of vertices defines the
+     * triangles), or in combination with IndexData where the triangles are defined by indexes which refer
+     * to the entries in VertexData.  It’s worth noting that you don’t necessarily have to use VertexData to
+     * store your applications geometry; all that is required is that you can build a VertexData structure
+     * when it comes to rendering. This is pretty easy since all of VertexData’s members are pointers, so
+     * you could maintain your vertex buffers and declarations in alternative structures if you like, so
+     * long as you can convert them for rendering.
+     */
     class _OgreExport VertexData : public VertexDataAlloc
     {
     private:
@@ -74,19 +84,19 @@ namespace Ogre {
         VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind);
         ~VertexData();
 
-        /** Declaration of the vertex to be used in this operation. 
-        @remarks Note that this is created for you on construction.
+        /** Declaration of the the format of the vertex input.
+        Note that this is created for you on construction.
         */
         VertexDeclaration* vertexDeclaration;
-        /** The vertex buffer bindings to be used. 
-        @remarks Note that this is created for you on construction.
+        /** Defines which vertex buffers are bound to which sources.
+        Note that this is created for you on construction.
         */
         VertexBufferBinding* vertexBufferBinding;
         /// Whether this class should delete the declaration and binding
         bool mDeleteDclBinding;
-        /// The base vertex index to start from
+        /// The position in the bound buffers to start reading vertex data from. This allows you to use a single buffer for many different renderables.
         size_t vertexStart;
-        /// The number of vertices used in this operation
+        /// The number of vertices to process in this particular rendering group
         size_t vertexCount;
 
 
