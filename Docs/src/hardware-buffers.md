@@ -78,24 +78,27 @@ This section covers specialised hardware buffers which contain vertex data. For 
 
 ## The VertexData class {#The-VertexData-class}
 
-The Ogre::VertexData class collects together all the vertex-related information used to render geometry. The new RenderOperation requires a pointer to a VertexData object, and it is also used in Mesh and SubMesh to store the vertex positions, normals, texture coordinates etc. VertexData can either be used alone (in order to render unindexed geometry, where the stream of vertices defines the triangles), or in combination with IndexData where the triangles are defined by indexes which refer to the entries in VertexData.  It’s worth noting that you don’t necessarily have to use VertexData to store your applications geometry; all that is required is that you can build a VertexData structure when it comes to rendering. This is pretty easy since all of VertexData’s members are pointers, so you could maintain your vertex buffers and declarations in alternative structures if you like, so long as you can convert them for rendering. The VertexData class has a number of important members:
+The Ogre::VertexData class @copybrief Ogre::VertexData
+@copydetails Ogre::VertexData
+The VertexData class has a number of important members:
 
 <dl compact="compact">
 <dt>vertexStart</dt> <dd>
-
-The position in the bound buffers to start reading vertex data from. This allows you to use a single buffer for many different renderables.
+@copybrief Ogre::VertexData::vertexStart
 
 </dd> <dt>vertexCount</dt> <dd>
-
-The number of vertices to process in this particular rendering group
+@copybrief Ogre::VertexData::vertexCount
 
 </dd> <dt>vertexDeclaration</dt> <dd>
 
-A pointer to a VertexDeclaration object which defines the format of the vertex input; note this is created for you by VertexData. See [Vertex Declarations](#Vertex-Declarations)
+@copybrief Ogre::VertexData::vertexDeclaration
+@copydetails Ogre::VertexData::vertexDeclaration
+See @ref Vertex-Declarations
 
 </dd> <dt>vertexBufferBinding</dt> <dd>
-
-A pointer to a VertexBufferBinding object which defines which vertex buffers are bound to which sources - again, this is created for you by VertexData. See [Vertex Buffer Bindings](#Vertex-Buffer-Bindings)
+@copybrief Ogre::VertexData::vertexBufferBinding
+@copydetails Ogre::VertexData::vertexBufferBinding
+See @ref Vertex-Buffer-Bindings
 
 </dd> </dl>
 
