@@ -12,14 +12,12 @@ The HardwareBufferManager class is the factory hub of all the objects in the new
 
 ```cpp
 Ogre::VertexDeclaration* decl = HardwareBufferManager::getSingleton().createVertexDeclaration();
-```
 
-```cpp
 Ogre::HardwareVertexBufferSharedPtr vbuf = 
     Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-        3*sizeof(Real), // size of one whole vertex
+        3*sizeof(float), // size of one whole vertex
         numVertices, // number of vertices
-        Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
+        Ogre::HBU_GPU_ONLY, // usage
         false); // no shadow buffer
 ```
 
@@ -27,13 +25,22 @@ Don’t worry about the details of the above, we’ll cover that in the later se
 
 # Buffer Usage {#Buffer-Usage}
 
-Because the memory in a hardware buffer is likely to be under significant contention during the rendering of a scene, the kind of access you need to the buffer over the time it is used is extremely important; whether you need to update the contents of the buffer regularly, whether you need to be able to read information back from it, these are all important factors to how the graphics card manages the buffer. The method and exact parameters used to create a buffer depends on whether you are creating an index or vertex buffer (See [Hardware Vertex Buffers](#Hardware-Vertex-Buffers) and See [Hardware Index Buffers](#Hardware-Index-Buffers)), however one creation parameter is common to them both - the ’usage’.  The most optimal type of hardware buffer is one which is not updated often, and is never read from. The usage parameter of createVertexBuffer or createIndexBuffer can be one of Ogre::HardwareBuffer::Usage.
+Because the memory in a hardware buffer is likely to be under significant contention during the rendering of a scene, the kind of access you need to the buffer over the time it is used is extremely important; whether you need to update the contents of the buffer regularly, whether you need to be able to read information back from it, these are all important factors to how the graphics card manages the buffer. The method and exact parameters used to create a buffer depends on whether you are creating an index or vertex buffer (See @ref Hardware-Vertex-Buffers and @ref Hardware-Index-Buffers), however one creation parameter is common to them both - the ’usage’.  The most optimal type of hardware buffer is one which is not updated often, and is never read from. The usage parameter of createVertexBuffer or createIndexBuffer can be one of Ogre::HardwareBufferUsage.
 
-Choosing the usage of your buffers carefully is important to getting optimal performance out of your geometry. If you have a situation where you need to update a vertex buffer often, consider whether you actually need to update **all** the parts of it, or just some. If it’s the latter, consider using more than one buffer, with only the data you need to modify in the HBU\_DYNAMIC buffer.  Always try to use the \_WRITE\_ONLY forms. This just means that you cannot read *directly* from the hardware buffer, which is good practice because reading from hardware buffers is very slow. If you really need to read data back, use a shadow buffer, described in the next section.
+Choosing the usage of your buffers carefully is important to getting optimal performance out of your geometry. If you have a situation where you need to update a vertex buffer often, consider whether you actually need to update **all** the parts of it, or just some. If it’s the latter, consider using more than one buffer, with only the data you need to modify in the HBU_CPU_TO_GPU buffer.  Always try to use the HBU_GPU_ONLY form. This just means that you cannot read *directly* from the hardware buffer, which is good practice because reading from hardware buffers is very slow. If you really need to read data back, use a shadow buffer, described in the next section.
+
+The following table shows how the descriptive usage names map to the legacy terminology used in older versions of %Ogre as well as rendering APIs like D3D11 and OpenGL.
+
+| Usage          | Legacy name |
+|----------------|-------------|
+| HBU_GPU_ONLY   | HBU_STATIC_WRITE_ONLY |
+| HBU_CPU_TO_GPU | HBU_DYNAMIC_WRITE_ONLY |
+| HBU_GPU_TO_CPU | HBU_STATIC  |
+| HBU_CPU_ONLY   | HBU_DYNAMIC |
 
 ## Shadow Buffers {#Shadow-Buffers}
 
-As discussed in the previous section, reading data back from a hardware buffer performs very badly. However, if you have a cast-iron need to read the contents of the vertex buffer, you should set the ’shadowBuffer’ parameter of createVertexBuffer or createIndexBuffer to ’true’. This causes the hardware buffer to be backed with a system memory copy, which you can read from with no more penalty than reading ordinary memory. The catch is that when you write data into this buffer, it will first update the system memory copy, then it will update the hardware buffer, as separate copying process - therefore this technique has an additional overhead when writing data. Don’t use it unless you really need it.
+As discussed in the previous section, reading data back from a hardware buffer performs very badly. However, if you have a cast-iron need to read the contents of the vertex buffer, you should set the 'shadowBuffer' parameter of @c createVertexBuffer or @c createIndexBuffer to @c true. This causes the hardware buffer to be backed with a 'staging' system-memory copy, which you can read from with no more penalty than reading ordinary memory. The catch is that when you write data into this buffer, it will first update the staging copy, then it will update the hardware buffer, as separate copying process - therefore this technique has an additional overhead when writing data. Don’t use it unless you really need it.
 
 ## Locking buffers {#Locking-buffers}
 
@@ -60,14 +67,14 @@ Once you have locked a buffer, you can use the pointer returned however you wish
 
 The interplay of usage mode on creation, and locking options when reading / updating is important for performance. Here’s some tips:
 
-1.  Aim for the ’perfect’ buffer by creating with HBU\_STATIC\_WRITE\_ONLY, with no shadow buffer, and locking all of it once only with HBL\_DISCARD to populate it. Never touch it again.
-2.  If you need to update a buffer regularly, you will have to compromise. Use HBU\_DYNAMIC\_WRITE\_ONLY when creating (still no shadow buffer), and use HBL\_DISCARD to lock the entire buffer, or if you can’t then use HBL\_NO\_OVERWRITE to lock parts of it.
-3.  If you really need to read data from the buffer, create it with a shadow buffer. Make sure you use HBL\_READ\_ONLY when locking for reading because it will avoid the upload normally associated with unlocking the buffer. You can also combine this with either of the 2 previous points, obviously try for static if you can - remember that the \_WRITE\_ONLY’ part refers to the hardware buffer so can be safely used with a shadow buffer you read from.
-4.  Split your vertex buffers up if you find that your usage patterns for different elements of the vertex are different. No point having one huge updatable buffer with all the vertex data in it, if all you need to update is the texture coordinates. Split that part out into it’s own buffer and make the rest HBU\_STATIC\_WRITE\_ONLY.
+1.  Aim for the ’perfect’ buffer by creating with HBU_GPU_ONLY, with no shadow buffer, and locking all of it once only with HBL\_DISCARD to populate it. Never touch it again.
+2.  If you need to update a buffer regularly, you will have to compromise. Use HBU_CPU_TO_GPU when creating (still no shadow buffer), and use HBL\_DISCARD to lock the entire buffer, or if you can’t then use HBL\_NO\_OVERWRITE to lock parts of it.
+3.  If you really need to read data from the buffer, create it with a shadow buffer. Make sure you use HBL\_READ\_ONLY when locking for reading because it will avoid the upload normally associated with unlocking the buffer. You can also combine this with either of the 2 previous points, obviously try for HBU_GPU_ONLY if you can - remember that the usage refers to the hardware buffer so can be safely used with a shadow buffer you read from.
+4.  Split your vertex buffers up if you find that your usage patterns for different elements of the vertex are different. No point having one huge updatable buffer with all the vertex data in it, if all you need to update is the texture coordinates. Split that part out into it’s own buffer and make the rest HBU_GPU_ONLY.
 
 # Hardware Vertex Buffers {#Hardware-Vertex-Buffers}
 
-This section covers specialised hardware buffers which contain vertex data. For a general discussion of hardware buffers, along with the rules for creating and locking them, see the [Hardware Buffers](#Hardware-Buffers) section.
+This section covers specialised hardware buffers which contain vertex data. For a general discussion of hardware buffers, along with the rules for creating and locking them, see the @ref Hardware-Buffers section.
 
 ## The VertexData class {#The-VertexData-class}
 
@@ -121,22 +128,6 @@ This parameter is only required when you supply more than one element of the sam
 
 You can repeat the call to addElement for as many elements as you have in your vertex input structures. There are also useful methods on VertexDeclaration for locating elements within a declaration - see the API reference for full details.
 
-## Important Considerations {#Important-Considerations}
-
-Whilst in theory you have completely full reign over the format of you vertices, in reality there are some restrictions. Older DirectX hardware imposes a fixed ordering on the elements which are pulled from each buffer; specifically any hardware prior to DirectX 9 may impose the following restrictions:
-
--   VertexElements should be added in the following order, and the order of the elements within any shared buffer should be as follows:
-    1.  Positions
-    2.  Blending weights
-    3.  Normals
-    4.  Diffuse colours
-    5.  Specular colours
-    6.  Texture coordinates (starting at 0, listed in order, with no gaps)
--   You must not have unused gaps in your buffers which are not referenced by any VertexElement
--   You must not cause the buffer & offset settings of 2 VertexElements to overlap
-
-OpenGL and DirectX 9 compatible hardware are not required to follow these strict limitations, so you might find, for example that if you broke these rules your application would run under OpenGL and under DirectX on recent cards, but it is not guaranteed to run on older hardware under DirectX unless you stick to the above rules. For this reason you’re advised to abide by them!
-
 ## Vertex Buffer Bindings {#Vertex-Buffer-Bindings}
 
 Vertex buffer bindings are about associating a vertex buffer with a source index used in [Vertex Declarations](#Vertex-Declarations).
@@ -148,9 +139,9 @@ Firstly, lets look at how you create a vertex buffer:
 ```cpp
 HardwareVertexBufferSharedPtr vbuf = 
     Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-        3*sizeof(Real), // size of one whole vertex
+        3*sizeof(float), // size of one whole vertex
         numVertices, // number of vertices
-        HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
+        Ogre::HBU_GPU_ONLY, // usage
         false); // no shadow buffer
 ```
 
@@ -192,27 +183,26 @@ This results in the vertex buffer you created earlier being bound to source inde
 The complexity of updating a vertex buffer entirely depends on how its contents are laid out. You can lock a buffer (See [Locking buffers](#Locking-buffers)), but how you write data into it vert much depends on what it contains. Lets start with a vert simple example. Lets say you have a buffer which only contains vertex positions, so it only contains sets of 3 floating point numbers per vertex. In this case, all you need to do to write data into it is:
 
 ```cpp
-Real* pReal = static_cast<Real*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+auto pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
 ```
 
 ... then you just write positions in chunks of 3 reals. If you have other floating point data in there, it’s a little more complex but the principle is largely the same, you just need to write alternate elements. But what if you have elements of different types, or you need to derive how to write the vertex data from the elements themselves? Well, there are some useful methods on the VertexElement class to help you out. Firstly, you lock the buffer but assign the result to a unsigned char\* rather than a specific type. Then, for each element which is sourcing from this buffer (which you can find out by calling VertexDeclaration::findElementsBySource) you call VertexElement::baseVertexPointerToElement. This offsets a pointer which points at the base of a vertex in a buffer to the beginning of the element in question, and allows you to use a pointer of the right type to boot. Here’s a full example:
 
 ```cpp
+// will automatically release the lock
+Ogre::HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_READ_ONLY);
 // Get base pointer
-unsigned char* pVert = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
-Real* pReal;
+auto pVert = static_cast<unsigned char*>(vbufLock.pData);
+float* pFloat;
 for (size_t v = 0; v < vertexCount; ++v)
 {
     // Get elements
-    VertexDeclaration::VertexElementList elems = decl->findElementsBySource(bufferIdx);
-    VertexDeclaration::VertexElementList::iterator i, iend;
-    for (i = elems.begin(); i != elems.end(); ++i)
+    for (VertexElement& elem : decl->findElementsBySource(bufferIdx))
     {
-        VertexElement& elem = *i;
         if (elem.getSemantic() == VES_POSITION)
         {
-            elem.baseVertexPointerToElement(pVert, &pReal);
-            // write position using pReal
+            elem.baseVertexPointerToElement(pVert, &pFloat);
+            // write position using pFloat
 
         }
         
@@ -222,7 +212,6 @@ for (size_t v = 0; v < vertexCount; ++v)
     }
     pVert += vbuf->getVertexSize();
 }
-vbuf->unlock();
 ```
 
 See the API docs for full details of all the helper methods on VertexDeclaration and VertexElement to assist you in manipulating vertex buffer data pointers.
@@ -259,7 +248,7 @@ HardwareIndexBufferSharedPtr ibuf = Ogre::HardwareBufferManager::getSingleton().
     createIndexBuffer(
         HardwareIndexBuffer::IT_16BIT, // type of index
         numIndexes, // number of indexes
-        HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
+        Ogre::HBU_GPU_ONLY, // usage
         false); // no shadow buffer 
 ```
 
@@ -318,21 +307,21 @@ ptex = Ogre::TextureManager::getSingleton().createManual(
     1, // Depth (Must be 1 for two dimensional textures)
     0, // No mipmaps
     PF_A8R8G8B8, // internal Pixel format
-    Ogre::TU_DYNAMIC_WRITE_ONLY // usage
+    Ogre::HBU_CPU_TO_GPU // usage
 );
 ```
 
 This example creates a texture named *MyManualTexture* in resource group *General*. It is a square *two dimensional* texture, with width 256 and height 256.
 
-The different texture types will be discussed in Ogre::TextureType. Pixel formats are summarised in [Pixel Formats](#Pixel-Formats).
+The different texture types will be discussed in Ogre::TextureType. Pixel formats are summarised in @ref Pixel-Formats.
 
-In addition to the hardware buffer usages as described in Ogre::HardwareBuffer::Usage there are some usage flags specific to textures: Ogre::TextureUsage.
+In addition to the hardware buffer usages as described in Ogre::HardwareBufferUsage there are some usage flags specific to textures: Ogre::TextureUsage.
 
 ## Getting a PixelBuffer {#Getting-a-PixelBuffer}
 
 A Texture can consist of multiple PixelBuffers, one for each combo if mipmap level and face number. To get a PixelBuffer from a Texture object the method Texture::getBuffer(face, mipmap) is used:
 
-*face* should be zero for non-cubemap textures. For cubemap textures it identifies the face to use, which is one of the cube faces described in See [Texture Types](#Texture-Types).
+*face* should be zero for non-cubemap textures. For cubemap textures it identifies the face to use, which is one of the cube faces described in See @ref Texture-Types.
 
 *mipmap* is zero for the zeroth mipmap level, one for the first mipmap level, and so on. On textures that have automatic mipmap generation (TU\_AUTOMIPMAP) only level 0 should be accessed, the rest will be taken care of by the rendering API.
 
