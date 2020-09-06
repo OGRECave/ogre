@@ -361,12 +361,32 @@ namespace Ogre {
         void sort(void);
 
         /** Remove any gaps in the source buffer list used by this declaration.
-        @remarks
+
             This is useful if you've modified a declaration and want to remove
             any gaps in the list of buffers being used. Note, however, that if this
             declaration is already being used with a VertexBufferBinding, you will
             need to alter that too. This method is mainly useful when reorganising
             buffers based on an altered declaration.
+
+            Whilst in theory you have completely full reign over the format of you vertices, in reality
+            there are some restrictions. D3D7 grade hardware imposes a fixed ordering on the elements which are
+            pulled from each buffer:
+
+            -   VertexElements should be added in the following order, and the order of the elements within any shared
+            buffer should be as follows:
+                1.  Positions
+                2.  Blending weights
+                3.  Normals
+                4.  Diffuse colours
+                5.  Specular colours
+                6.  Texture coordinates (starting at 0, listed in order, with no gaps)
+            -   You must not have unused gaps in your buffers which are not referenced by any VertexElement
+            -   You must not cause the buffer & offset settings of 2 VertexElements to overlap
+
+            OpenGL and D3D9 compatible hardware are not required to follow these strict limitations, so you might
+            find, for example that if you broke these rules your application would run under OpenGL and under DirectX on
+            recent cards, but it is not guaranteed to run on older hardware under DirectX unless you stick to the above
+            rules.
         @note
             This will also call sort()
         */
