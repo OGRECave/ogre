@@ -55,6 +55,46 @@ namespace Ogre {
 #define OGRE_ARCHITECTURE_32 1
 #define OGRE_ARCHITECTURE_64 2
 
+#define OGRE_CPU_UNKNOWN    0
+#define OGRE_CPU_X86        1
+#define OGRE_CPU_PPC        2
+#define OGRE_CPU_ARM        3
+#define OGRE_CPU_MIPS       4
+
+/* Find CPU type */
+#if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64)
+#   define OGRE_CPU OGRE_CPU_X86
+#elif defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC)
+#   define OGRE_CPU OGRE_CPU_PPC
+#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+#   define OGRE_CPU OGRE_CPU_ARM
+#elif defined(__mips__) || defined(__mips64) || defined(__mips64_) || defined(_M_MIPS)
+#   define OGRE_CPU OGRE_CPU_MIPS
+#else
+#   define OGRE_CPU OGRE_CPU_UNKNOWN
+#endif
+
+/* Find the arch type */
+#if defined(__x86_64__) || defined(_M_X64) || defined(_M_X64) || defined(_M_AMD64) \
+ || defined(__ppc64__) \
+ || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64) \
+ || defined(__mips64) || defined(__mips64_) \
+ || defined(__alpha__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__)
+#   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_64
+#else
+#   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_32
+#endif
+
+/* Determine CPU endian.
+   We were once in situation when XCode could produce mixed endian fat binary with x86 and ppc archs inside, so it's safer to sniff compiler macros too
+ */
+#if defined(OGRE_CONFIG_BIG_ENDIAN) || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#    define OGRE_ENDIAN OGRE_ENDIAN_BIG
+#else
+#    define OGRE_ENDIAN OGRE_ENDIAN_LITTLE
+#endif
+
+
 /* Finds the compiler type and version.
 */
 #if (defined( __WIN32__ ) || defined( _WIN32 )) && defined(__ANDROID__) // We are using NVTegra

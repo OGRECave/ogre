@@ -31,39 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 namespace Ogre {
-//
-// TODO: Puts following macros into OgrePlatform.h?
-//
-
-/* Initial CPU stuff to set.
-*/
-#define OGRE_CPU_UNKNOWN    0
-#define OGRE_CPU_X86        1
-#define OGRE_CPU_PPC        2
-#define OGRE_CPU_ARM        3
-#define OGRE_CPU_MIPS       4
-
-/* Find CPU type
-*/
-#if (defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))) || \
-    (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
-#   define OGRE_CPU OGRE_CPU_X86
-
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__BIG_ENDIAN__)
-#   define OGRE_CPU OGRE_CPU_PPC
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#   define OGRE_CPU OGRE_CPU_X86
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
-#   define OGRE_CPU OGRE_CPU_X86
-#elif defined(__arm__) || defined(_M_ARM) || defined(__arm64__) || defined(__aarch64__)
-#   define OGRE_CPU OGRE_CPU_ARM
-#elif defined(__mips64) || defined(__mips64_)
-#   define OGRE_CPU OGRE_CPU_MIPS
-#else
-#   define OGRE_CPU OGRE_CPU_UNKNOWN
-#endif
-
-/* Define whether or not Ogre compiled with SSE supports.
+/* Define whether or not Ogre compiled with SSE support.
 */
 #if   OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && OGRE_COMPILER == OGRE_COMPILER_MSVC
 #   define __OGRE_HAVE_SSE  1
