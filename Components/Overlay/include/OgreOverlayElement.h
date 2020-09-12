@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgreOverlayPrerequisites.h"
 #include "OgreRenderable.h"
-#include "OgreUTFString.h"
 #include "OgreStringInterface.h"
 #include "OgreColourValue.h"
 
@@ -46,7 +45,7 @@ namespace Ogre {
     *  @{
     */
 
-    typedef UTFString DisplayString;
+    typedef String DisplayString;
 
     /** Enum describing how the position / size of an element is to be recorded. 
     */
