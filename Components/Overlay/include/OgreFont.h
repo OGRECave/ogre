@@ -43,6 +43,10 @@ namespace Ogre
     /** \addtogroup Overlays
     *  @{
     */
+
+    /// decode UTF8 encoded bytestream to uint32 codepoints
+    _OgreOverlayExport std::vector<uint32> utftoc32(String str);
+
     /** Enumerates the types of Font usable in the engine. */
     enum FontType
     {
@@ -376,7 +380,7 @@ namespace Ogre
          * @param height character height in world units
          * @param colour text colour
          */
-        void putText(BillboardSet* bbs, const String& text, float height, const ColourValue& colour = ColourValue::White);
+        void putText(BillboardSet* bbs, String text, float height, const ColourValue& colour = ColourValue::White);
 
         /** Sets whether or not the colour of this font is antialiased as it is generated
             from a true type font.

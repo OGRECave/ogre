@@ -179,9 +179,10 @@ namespace Ogre {
             return;
         }
 
-        mFont->load(); // ensure glyph info is there
+        mFont->load();  // ensure glyph info is there
 
-        size_t charlen = mCaption.size();
+        auto decoded = utftoc32(mCaption);
+        size_t charlen = decoded.size();
         checkMemoryAllocation( charlen );
 
         mRenderOp.vertexData->vertexCount = charlen * 6;
@@ -202,17 +203,16 @@ namespace Ogre {
         }
 
         // Use iterator
-        DisplayString::iterator i, iend;
-        iend = mCaption.end();
+        auto iend = decoded.end();
         bool newLine = true;
-        for( i = mCaption.begin(); i != iend; ++i )
+        for( auto i = decoded.begin(); i != iend; ++i )
         {
             if( newLine )
             {
                 Real len = 0.0f;
-                for( DisplayString::iterator j = i; j != iend; j++ )
+                for( auto j = i; j != iend; j++ )
                 {
-                    Font::CodePoint character = j.getCharacter();
+                    Font::CodePoint character = *j;
                     if (character == UNICODE_CR
                         || character == UNICODE_NEL
                         || character == UNICODE_LF) 
@@ -237,7 +237,7 @@ namespace Ogre {
                 newLine = false;
             }
 
-            Font::CodePoint character = i.getCharacter();
+            Font::CodePoint character = *i;
             if (character == UNICODE_CR
                 || character == UNICODE_NEL
                 || character == UNICODE_LF)
@@ -251,9 +251,8 @@ namespace Ogre {
                 // consume CR/LF in one
                 if (character == UNICODE_CR)
                 {
-                    DisplayString::iterator peeki = i;
-                    peeki++;
-                    if (peeki != iend && peeki.getCharacter() == UNICODE_LF)
+                    auto peeki = i + 1;
+                    if (peeki != iend && *peeki == UNICODE_LF)
                     {
                         i = peeki; // skip both as one newline
                         // Also reduce tri count

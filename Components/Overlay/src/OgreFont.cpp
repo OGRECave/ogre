@@ -35,7 +35,7 @@ THE SOFTWARE
 #include "OgreTechnique.h"
 #include "OgreBitwise.h"
 
-#include "OgreUTFString.h"
+#include "utf8.h"
 #include "OgreBillboardSet.h"
 #include "OgreBillboard.h"
 
@@ -56,6 +56,26 @@ namespace Ogre
     Font::CmdSize Font::msSizeCmd;
     Font::CmdResolution Font::msResolutionCmd;
     Font::CmdCodePoints Font::msCodePointsCmd;
+
+    std::vector<uint32> utftoc32(String str)
+    {
+        std::vector<uint32> decoded;
+        decoded.reserve(str.size());
+
+        str.resize(str.size() + 3); // add padding for decoder
+        auto it = str.c_str();
+        auto end = str.c_str() + str.size() - 3;
+        while(it < end)
+        {
+            uint32 cpId;
+            int err = 0;
+            it = utf8_decode(it, &cpId, &err);
+            if(err)
+                continue;
+            decoded.push_back(cpId);
+        }
+        return decoded;
+    }
 
     //---------------------------------------------------------------------
     Font::Font(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -158,7 +178,7 @@ namespace Ogre
         mMaterial = mat;
     }
 
-    void Font::putText(BillboardSet* bbs, const String& text, float height, const ColourValue& colour)
+    void Font::putText(BillboardSet* bbs, String text, float height, const ColourValue& colour)
     {
         // ensure loaded
         load();
@@ -170,14 +190,22 @@ namespace Ogre
 
         float spaceWidth = mCodePointMap.find('0')->second.aspectRatio * height;
 
-        UTFString utfText = text;
+        text.resize(text.size() + 3); // add padding for decoder
+        auto it = text.c_str();
+        auto end = text.c_str() + text.size() - 3;
 
         const auto& bbox = bbs->getBoundingBox();
 
         float left = 0;
         float top = bbox == AxisAlignedBox::BOX_NULL ? 0 : bbox.getMinimum().y - height;
-        for (auto cpId : utfText)
+        while (it < end)
         {
+            uint32 cpId;
+            int err = 0;
+            it = utf8_decode(it, &cpId, &err);
+            if(err)
+                continue;
+
             if (cpId == ' ')
             {
                 left += spaceWidth;
