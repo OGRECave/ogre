@@ -363,8 +363,8 @@ namespace Ogre
                 if (ftResult)
                 {
                     // problem loading this glyph, continue
-                    LogManager::getSingleton().logMessage("Info: cannot load character " +
-                        StringConverter::toString(cp) + " in font " + mName, LML_CRITICAL);
+                    LogManager::getSingleton().logError(StringUtil::format(
+                        "Freetype could not load charcode %u in font %s", cp, mSource.c_str()));
                     continue;
                 }
 
@@ -375,8 +375,8 @@ namespace Ogre
                 if (!buffer)
                 {
                     // Yuck, FT didn't detect this but generated a null pointer!
-                    LogManager::getSingleton().logMessage("Info: Freetype returned null for character " +
-                        StringConverter::toString(cp) + " in font " + mName);
+                    LogManager::getSingleton().logWarning(StringUtil::format(
+                        "Freetype did not find charcode %u in font %s", cp, mSource.c_str()));
                     continue;
                 }
 
