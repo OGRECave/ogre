@@ -50,7 +50,7 @@ bool Alpha_Func(in int func, in float alphaRef, in float alphaValue)
 
 void FFP_Alpha_Test(in float func, in float alphaRef, in vec4 texel)
 {
-    bool pass = Alpha_Func(int(func), alphaRef, texel.a);
-    if (!pass)
+    bool pass_ = Alpha_Func(int(func), alphaRef, texel.a);
+    if (!pass_)
         discard;
 }
