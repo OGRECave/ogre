@@ -446,7 +446,7 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
     MeshPtr mesh = MeshManager::getSingleton().createManual(meshName, resourceGroupName, NULL);
     SubMesh* subMesh = mesh->createSubMesh();
 
-    std::vector<Real> vertexBuffer;
+    std::vector<float> vertexBuffer;
     std::vector<unsigned short> indexBuffer;
     // 3 position/triangle * 3 Real/position
     vertexBuffer.reserve(mHull.size() * 9);
@@ -454,8 +454,7 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
     indexBuffer.reserve(mHull.size() * 3);
     int id=0;
     // min & max position
-    Vector3 minBounds(std::numeric_limits<Real>::max(), std::numeric_limits<Real>::max(), std::numeric_limits<Real>::max());
-    Vector3 maxBounds(std::numeric_limits<Real>::min(), std::numeric_limits<Real>::min(), std::numeric_limits<Real>::min());
+    AxisAlignedBox bounds;
 
     for (size_t i = 0; i < mHull.size(); i++) {
         assert(!mHull[i].removed);
@@ -464,12 +463,7 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
             vertexBuffer.push_back(mHull[i].vertex[n]->position.x);
             vertexBuffer.push_back(mHull[i].vertex[n]->position.y);
             vertexBuffer.push_back(mHull[i].vertex[n]->position.z);
-            minBounds.x = std::min<Real>(minBounds.x, mHull[i].vertex[n]->position.x);
-            minBounds.y = std::min<Real>(minBounds.y, mHull[i].vertex[n]->position.y);
-            minBounds.z = std::min<Real>(minBounds.z, mHull[i].vertex[n]->position.z);
-            maxBounds.x = std::max<Real>(maxBounds.x, mHull[i].vertex[n]->position.x);
-            maxBounds.y = std::max<Real>(maxBounds.y, mHull[i].vertex[n]->position.y);
-            maxBounds.z = std::max<Real>(maxBounds.z, mHull[i].vertex[n]->position.z);
+            bounds.merge(mHull[i].vertex[n]->position);
         }
     }
 
@@ -512,8 +506,8 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
     subMesh->indexData->indexStart = 0;
 
     /// Set bounding information (for culling)
-    mesh->_setBounds(AxisAlignedBox(minBounds, maxBounds));
-    mesh->_setBoundingSphereRadius(maxBounds.distance(minBounds) / 2.0f);
+    mesh->_setBounds(bounds);
+    mesh->_setBoundingSphereRadius(bounds.getSize().length() / 2.0f);
 
     /// Set material to transparent blue
     subMesh->setMaterialName("Examples/TransparentBlue50");
