@@ -91,7 +91,7 @@ namespace Ogre {
         sm->vertexData->vertexStart = 0;
         sm->vertexData->vertexCount = mSurface.getRequiredVertexCount();
         sm->vertexData->vertexDeclaration = mDeclaration;
-        HardwareVertexBufferSharedPtr vbuf = HardwareBufferManager::getSingleton().
+        HardwareVertexBufferSharedPtr vbuf = getHardwareBufferManager()->
             createVertexBuffer(
                 mDeclaration->getVertexSize(0), 
                 sm->vertexData->vertexCount, 
@@ -102,7 +102,7 @@ namespace Ogre {
         // Set up index buffer
         sm->indexData->indexStart = 0;
         sm->indexData->indexCount = mSurface.getRequiredIndexCount();
-        sm->indexData->indexBuffer = HardwareBufferManager::getSingleton().
+        sm->indexData->indexBuffer = getHardwareBufferManager()->
             createIndexBuffer(
                 HardwareIndexBuffer::IT_16BIT, // only 16-bit indexes supported, patches shouldn't be bigger than that
                 sm->indexData->indexCount,
