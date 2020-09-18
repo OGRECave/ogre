@@ -830,8 +830,7 @@ ManualObject::ManualObject(const String& name)
     Real ManualObject::ManualObjectSection::getSquaredViewDepth(const Ogre::Camera *cam) const
     {
         Node* n = mParent->getParentNode();
-        assert(n);
-        return n->getSquaredViewDepth(cam);
+        return n ? n->getSquaredViewDepth(cam) : 0;
     }
     //-----------------------------------------------------------------------------
     const LightList& ManualObject::ManualObjectSection::getLights(void) const
