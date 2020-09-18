@@ -288,7 +288,7 @@ namespace Ogre {
         OGRE_DEPRECATED void hideBoundingBox(bool bHide) { mHideBoundingBox = bHide; }
 
         /// @deprecated this function will disappear with 1.13
-        void _addBoundingBoxToQueue(RenderQueue* queue);
+        OGRE_DEPRECATED void _addBoundingBoxToQueue(RenderQueue* queue);
 
         /** This allows scene managers to determine if the node's bounding box
             should be added to the rendering queue.
@@ -443,8 +443,8 @@ namespace Ogre {
         */
         void setDebugDisplayEnabled(bool enabled, bool cascade = true) const;
 
-        /// As Node::getDebugRenderable, except scaling is automatically determined
-        DebugRenderable* getDebugRenderable();
+        /// @deprecated use DefaultDebugDrawer::drawAxes
+        OGRE_DEPRECATED DebugRenderable* getDebugRenderable();
 
         /// @copydoc Node::getDebugRenderable
         using Node::getDebugRenderable;

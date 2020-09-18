@@ -629,12 +629,8 @@ void OctreeSceneManager::walkOctree( OctreeCamera *camera, RenderQueue *queue,
 
                 mVisible.push_back( sn );
 
-                if ( mDisplayNodes )
-                    queue -> addRenderable( sn->getDebugRenderable() );
-
-                // check if the scene manager or this node wants the bounding box shown.
-                if (sn->getShowBoundingBox() || mShowBoundingBoxes)
-                    sn->_addBoundingBoxToQueue(queue);
+                if (mDebugDrawer)
+                    mDebugDrawer->drawSceneNode(sn);
             }
 
             ++it;

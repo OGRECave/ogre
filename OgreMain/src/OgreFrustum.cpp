@@ -859,10 +859,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Frustum::_updateRenderQueue(RenderQueue* queue)
     {
-        if (mDebugDisplay)
+        if (mDebugDisplay && mManager && mManager->getDebugDrawer())
         {
-            // Add self 
-            queue->addRenderable(this);
+            // Add self
+            mManager->getDebugDrawer()->drawFrustum(this);
         }
     }
     //-----------------------------------------------------------------------

@@ -16,6 +16,7 @@
 #include "OgreFileSystemLayer.h"
 #include "OgrePredefinedControllers.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreDefaultDebugDrawer.h"
 %}
 
 %include std_shared_ptr.i
@@ -49,6 +50,7 @@ using namespace std;
 #ifdef SWIGPYTHON
 // should be turned on globally if all renames are in place
 %feature("flatnested") Ogre::MaterialManager::Listener;
+%feature("flatnested") Ogre::SceneManager::Listener;
 #endif
 
 %ignore *::operator=;  // needs rename to wrap
@@ -780,11 +782,13 @@ SHARED_PTR(Mesh);
 %ignore Ogre::SceneManager::getShadowTextureConfigIterator;
 %newobject Ogre::SceneManager::createRayQuery(const Ray&, uint32 mask);
 %newobject Ogre::SceneManager::createRayQuery(const Ray&);
+%rename(SceneManager_Listener) Ogre::SceneManager::Listener;
 %include "OgreSceneManager.h"
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask);
 %ignore Ogre::SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&);
 %ignore Ogre::SceneManagerEnumerator::getSceneManagerIterator;
 %ignore Ogre::SceneManagerEnumerator::getMetaDataIterator;
+%include "OgreDefaultDebugDrawer.h"
 %include "OgreSceneManagerEnumerator.h"
 %include "OgreConfigDialog.h"
 %template(RenderSystemList) std::vector<Ogre::RenderSystem*>;

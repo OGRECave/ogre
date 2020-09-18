@@ -852,6 +852,7 @@ namespace Ogre {
 
         /// Flag indicating whether SceneNodes will be rendered as a set of 3 axes
         bool mDisplayNodes;
+        std::unique_ptr<DebugDrawer> mDebugDrawer;
 
         /// Storage of animations, lookup by name
         AnimationList mAnimationsList;
@@ -1424,6 +1425,8 @@ namespace Ogre {
 
         /** Returns if all bounding boxes of scene nodes are to be displayed */
         bool getShowBoundingBoxes() const;
+
+        DebugDrawer* getDebugDrawer() { return mDebugDrawer.get(); }
         /// @}
 
         /** Prefab shapes available without loading a model.
@@ -3512,6 +3515,16 @@ namespace Ogre {
         IlluminationRenderStage _getCurrentRenderStage() {return mIlluminationStage;}
 
         const AutoParamDataSource* _getAutoParamDataSource() { return mAutoParamDataSource.get(); }
+    };
+
+    /// Interface for visualising debugging the SceneManager state
+    class _OgreExport DebugDrawer : public SceneManager::Listener
+    {
+    public:
+        virtual ~DebugDrawer() {}
+        virtual void drawSceneNode(const SceneNode* node) = 0;
+        virtual void drawBone(const Node* node) = 0;
+        virtual void drawFrustum(const Frustum* frust) = 0;
     };
 
     /** Default implementation of IntersectionSceneQuery. */

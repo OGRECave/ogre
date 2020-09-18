@@ -733,14 +733,9 @@ namespace Ogre
                         // add it to the list of visible nodes
                         visibleNodeList.push_back( sn );
                         // if we are displaying nodes, add the node renderable to the queue
-                        if ( displayNodes )
+                        if ( mPCZSM->getDebugDrawer() )
                         {
-                            queue -> addRenderable( sn->getDebugRenderable() );
-                        }
-                        // if the scene manager or the node wants the bounding box shown, add it to the queue
-                        if (sn->getShowBoundingBox() || showBoundingBoxes)
-                        {
-                            sn->_addBoundingBoxToQueue(queue);
+                            mPCZSM->getDebugDrawer()->drawSceneNode(sn);
                         }
                         // flag the node as being visible this frame
                         sn->setLastVisibleFrame(mLastVisibleFrame);
