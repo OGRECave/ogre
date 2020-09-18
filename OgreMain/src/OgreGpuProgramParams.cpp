@@ -291,7 +291,7 @@ namespace Ogre
         {
             OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
                         "Unable to write to stream " + stream->getName(),
-                        "GpuNamedConstantsSerializer::exportSkeleton");
+                        "GpuNamedConstantsSerializer::exportNamedConstants");
         }
 
         writeFileHeader();
