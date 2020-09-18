@@ -97,6 +97,7 @@ namespace Ogre {
     class ControllerManager;
     template <typename T> class ControllerValue;
     class DataStream;
+    class DebugDrawer;
     class DefaultWorkQueue;
     class Degree;
     class DepthBuffer;

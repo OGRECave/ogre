@@ -282,21 +282,10 @@ namespace Ogre {
             }
         }
 
-        if (displayNodes)
+        if (mCreator && mCreator->getDebugDrawer())
         {
-            // Include self in the render queue
-            queue->addRenderable(getDebugRenderable());
+            mCreator->getDebugDrawer()->drawSceneNode(this);
         }
-
-        // Check if the bounding box should be shown.
-        // See if our flag is set or if the scene manager flag is set.
-        if ( !mHideBoundingBox &&
-             (mShowBoundingBox || (mCreator && mCreator->getShowBoundingBoxes())) )
-        { 
-            _addBoundingBoxToQueue(queue);
-        }
-
-
     }
 
     Node::DebugRenderable* SceneNode::getDebugRenderable()
@@ -305,7 +294,9 @@ namespace Ogre {
         Real sz = std::min(hs.x, hs.y);
         sz = std::min(sz, hs.z);
         sz = std::max(sz, (Real)1.0);
+        OGRE_IGNORE_DEPRECATED_BEGIN
         return Node::getDebugRenderable(sz);
+        OGRE_IGNORE_DEPRECATED_END
     }
 
 

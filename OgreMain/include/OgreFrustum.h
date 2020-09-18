@@ -168,6 +168,7 @@ namespace Ogre
         mutable AxisAlignedBox mBoundingBox;
         mutable VertexData mVertexData;
 
+        ColourValue mDebugColour;
         MaterialPtr mMaterial;
         mutable Vector3 mWorldSpaceCorners[8];
 
@@ -478,8 +479,11 @@ namespace Ogre
         const String& getMovableType(void) const override;
         void _notifyCurrentCamera(Camera* cam) override;
 
-        /// material to use for debug display
-        void setMaterial(const MaterialPtr& mat);
+        /// @deprecated use setDebugColour
+        OGRE_DEPRECATED void setMaterial(const MaterialPtr& mat);
+
+        void setDebugColour(const ColourValue& col) { mDebugColour = col; }
+        const ColourValue& getDebugColour() const { return mDebugColour; }
 
         const MaterialPtr& getMaterial(void) const override;
         void getRenderOperation(RenderOperation& op) override;

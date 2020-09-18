@@ -716,25 +716,11 @@ namespace Ogre {
         // HACK to display bones
         // This won't work if the entity is not centered at the origin
         // TODO work out a way to allow bones to be rendered when Entity not centered
-        if (mDisplaySkeleton && hasSkeleton())
+        if (mDisplaySkeleton && hasSkeleton() && mManager && mManager->getDebugDrawer())
         {
-            int numBones = mSkeletonInstance->getNumBones();
-            for (unsigned short b = 0; b < numBones; ++b)
+            for (Bone* bone : mSkeletonInstance->getBones())
             {
-                Bone* bone = mSkeletonInstance->getBone(b);
-                if (mRenderQueuePrioritySet)
-                {
-                    assert(mRenderQueueIDSet == true);
-                    queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
-                }
-                else if(mRenderQueueIDSet)
-                {
-                    queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID);
-                } 
-                else 
-                {
-                    queue->addRenderable(bone->getDebugRenderable(1));
-                }
+                mManager->getDebugDrawer()->drawBone(bone);
             }
         }
     }

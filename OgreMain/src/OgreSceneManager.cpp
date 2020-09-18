@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreLodListener.h"
 #include "OgreUnifiedHighLevelGpuProgram.h"
+#include "OgreDefaultDebugDrawer.h"
 
 // This class implements the most basic scene manager
 
@@ -99,6 +100,9 @@ mGpuParamsDirty((uint16)GPV_ALL)
 
     // init shadow texture config
     setShadowTextureCount(1);
+
+    mDebugDrawer.reset(new DefaultDebugDrawer());
+    addListener(mDebugDrawer.get());
 
     // create the auto param data source instance
     mAutoParamDataSource.reset(createAutoParamDataSource());

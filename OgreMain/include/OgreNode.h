@@ -634,8 +634,8 @@ namespace Ogre {
         /** Called by children to notify their parent that they no longer need an update. */
         void cancelUpdate(Node* child);
 
-        /** Get a debug renderable for rendering the Node.  */
-        DebugRenderable* getDebugRenderable(Real scaling);
+        /// @deprecated use DefaultDebugDrawer::drawAxes
+        OGRE_DEPRECATED DebugRenderable* getDebugRenderable(Real scaling);
 
         /** Queue a 'needUpdate' call to a node safely.
         @remarks
