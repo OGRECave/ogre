@@ -110,9 +110,6 @@ namespace Ogre {
         /// Whether or not the minimum display size of objects should take effect for this camera
         bool mUseMinPixelSize;
 
-        /// Scene manager responsible for the scene
-        SceneManager *mSceneMgr;
-
         /// Derived orientation/position of the camera, including reflection
         mutable Quaternion mDerivedOrientation;
         mutable Vector3 mDerivedPosition;

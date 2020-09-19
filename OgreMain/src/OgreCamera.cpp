@@ -40,7 +40,6 @@ namespace Ogre {
         mAutoAspectRatio(false),
         mUseRenderingDistance(true),
         mUseMinPixelSize(false),
-        mSceneMgr(sm),
         mSceneDetail(PM_SOLID),
 #ifdef OGRE_NODELESS_POSITIONING
         mOrientation(Quaternion::IDENTITY),
@@ -81,7 +80,7 @@ namespace Ogre {
         mReflect = false;
 
         mVisible = false;
-
+        mManager = sm;
     }
 
     //-----------------------------------------------------------------------
@@ -96,7 +95,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SceneManager* Camera::getSceneManager(void) const
     {
-        return mSceneMgr;
+        return mManager;
     }
 
 
@@ -493,7 +492,7 @@ namespace Ogre {
         }
 
         //render scene
-        mSceneMgr->_renderScene(this, vp, includeOverlays);
+        mManager->_renderScene(this, vp, includeOverlays);
 
         // Listener list may have change
         listenersCopy = mListeners;
