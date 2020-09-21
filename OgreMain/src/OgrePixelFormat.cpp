@@ -688,9 +688,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void PixelUtil::bulkPixelConversion(const PixelBox &src, const PixelBox &dst)
     {
-        assert(src.getWidth() == dst.getWidth() &&
-               src.getHeight() == dst.getHeight() &&
-               src.getDepth() == dst.getDepth());
+        OgreAssert(src.getSize() == dst.getSize(), "src and dst must be of same size");
 
         // Check for compressed formats, we don't support decompression, compression or recoding
         if(PixelUtil::isCompressed(src.format) || PixelUtil::isCompressed(dst.format))
