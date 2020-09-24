@@ -283,7 +283,7 @@ namespace Ogre {
             /* Bytes per element */
             0,
             /* Flags */
-            PFF_COMPRESSED | PFF_HASALPHA,
+            PFF_COMPRESSED,
             /* Component type and count */
             PCT_BYTE, 3, // No alpha
             /* rbits, gbits, bbits, abits */
