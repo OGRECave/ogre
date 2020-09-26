@@ -35,8 +35,11 @@ addons:
     - mono-mcs # compile C# bindings
     - qtbase5-dev # QtOgreBites
     - libassimp-dev
-before_script:
-    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew update && brew install libzzip sdl2 pugixml ; fi
+  homebrew:
+    packages:
+    - libzzip
+    - sdl2
+    - pugixml
 osx_image: xcode11.3
 env:
     - TEST=TRUE
