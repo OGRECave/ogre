@@ -310,14 +310,12 @@ namespace Ogre {
                 if(mGamma != 1.0f) {
                     // Apply gamma correction
                     // Do not overwrite original image but do gamma correction in temporary buffer
-                    MemoryDataStream buf(src.getConsecutiveSize());
-
-                    PixelBox corrected = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), src.format, buf.getPtr());
+                    Image tmp(src.format, src.getWidth(), getHeight(), src.getDepth());
+                    PixelBox corrected = tmp.getPixelBox();
                     PixelUtil::bulkPixelConversion(src, corrected);
-                    
-                    Image::applyGamma(corrected.data, mGamma, corrected.getConsecutiveSize(),
-                        static_cast<uchar>(PixelUtil::getNumElemBits(src.format)));
-    
+
+                    Image::applyGamma(corrected.data, mGamma, tmp.getSize(), tmp.getBPP());
+
                     // Destination: entire texture. blitFromMemory does the scaling to
                     // a power of two for us when needed
                     buffer->blitFromMemory(corrected, dst);

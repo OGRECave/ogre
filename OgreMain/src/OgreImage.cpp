@@ -94,17 +94,28 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    Image::Image()
+    Image::Image(PixelFormat format, uint32 width, uint32 height, uint32 depth, uchar* buffer, bool autoDelete)
         : mWidth(0),
         mHeight(0),
         mDepth(0),
         mBufSize(0),
         mNumMipmaps(0),
         mFlags(0),
-        mFormat(PF_UNKNOWN),
+        mFormat(format),
         mBuffer( NULL ),
         mAutoDelete( true )
     {
+        if (format == PF_UNKNOWN)
+            return;
+
+        size_t size = calculateSize(0, 1,  width, height, depth, mFormat);
+
+        if (size == 0)
+            return;
+
+        if (!buffer)
+            buffer = OGRE_ALLOC_T(uchar, size, MEMCATEGORY_GENERAL);
+        loadDynamicImage(buffer, width, height, depth, format, autoDelete);
     }
 
     //-----------------------------------------------------------------------------
@@ -158,6 +169,23 @@ namespace Ogre {
         }
 
         return *this;
+    }
+
+    void Image::setTo(const ColourValue& col)
+    {
+        OgreAssert(mBuffer, "image is empty");
+        if(col == ColourValue::ZERO)
+        {
+            memset(mBuffer, 0, getSize());
+            return;
+        }
+
+        uchar rawCol[4 * sizeof(float)]; // max packed size currently is 4*float
+        PixelUtil::packColour(col, mFormat, rawCol);
+        for(size_t p = 0; p < mBufSize; p += mPixelSize)
+        {
+            memcpy(mBuffer + p, rawCol, mPixelSize);
+        }
     }
 
     //-----------------------------------------------------------------------------
@@ -408,19 +436,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
-    uchar* Image::getData()
-    {
-        return mBuffer;
-    }
-
-    //-----------------------------------------------------------------------------
-    const uchar* Image::getData() const
-    {
-        assert( mBuffer );
-        return mBuffer;
-    }
-
-    //-----------------------------------------------------------------------------
     size_t Image::getSize() const
     {
         return mBufSize;
@@ -511,11 +526,10 @@ namespace Ogre {
     void Image::resize(ushort width, ushort height, Filter filter)
     {
         OgreAssert(mAutoDelete, "resizing dynamic images is not supported");
-        assert(mDepth == 1);
+        OgreAssert(mDepth == 1, "only 2D formats supported");
 
         // reassign buffer to temp image, make sure auto-delete is true
-        Image temp;
-        temp.loadDynamicImage(mBuffer, mWidth, mHeight, 1, mFormat, true);
+        Image temp(mFormat, mWidth, mHeight, 1, mBuffer, true);
         // do not delete[] mBuffer!  temp will destroy it
 
         // set new dimensions, allocate new buffer
@@ -633,7 +647,7 @@ namespace Ogre {
     ColourValue Image::getColourAt(size_t x, size_t y, size_t z) const
     {
         ColourValue rval;
-        PixelUtil::unpackColour(&rval, mFormat, &mBuffer[mPixelSize * (z * mWidth * mHeight + mWidth * y + x)]);
+        PixelUtil::unpackColour(&rval, mFormat, getData(x, y, z));
         return rval;
     }
 
@@ -641,8 +655,7 @@ namespace Ogre {
     
     void Image::setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z)
     {
-        size_t pixelSize = PixelUtil::getNumElemBytes(getFormat());
-        PixelUtil::packColour(cv, getFormat(), &(getData())[pixelSize * (z * getWidth() * getHeight() + y * getWidth() + x)]);
+        PixelUtil::packColour(cv, mFormat, getData(x, y, z));
     }
 
     //-----------------------------------------------------------------------------    
