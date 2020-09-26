@@ -344,9 +344,7 @@ namespace Ogre {
             return mWarningTexture;
 
         // Generate warning texture
-        PixelBox pixels(8, 8, 1, PF_R5G6B5);
-        DataStreamPtr data(new MemoryDataStream(pixels.getConsecutiveSize()));
-        pixels.data = static_pointer_cast<MemoryDataStream>(data)->getPtr();
+        Image pixels(PF_R5G6B5, 8, 8);
 
         // Yellow/black stripes
         const ColourValue black(0, 0, 0), yellow(1, 1, 0);
@@ -358,8 +356,7 @@ namespace Ogre {
             }
         }
 
-        mWarningTexture = loadRawData("Warning", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                      data, pixels.getWidth(), pixels.getHeight(), pixels.format);
+        mWarningTexture = loadImage("Warning", RGN_INTERNAL, pixels);
 
         return mWarningTexture;
     }

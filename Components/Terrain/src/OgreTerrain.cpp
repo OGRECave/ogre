@@ -381,15 +381,13 @@ namespace Ogre
                     "on this hardware, which means the quality has been degraded");
             }
             stream.write(&mLayerBlendMapSizeActual);
-            uint8* tmpData = (uint8*)OGRE_MALLOC(mLayerBlendMapSizeActual * mLayerBlendMapSizeActual * 4, MEMCATEGORY_GENERAL);
+            Image tmp(PF_BYTE_RGBA, mLayerBlendMapSizeActual, mLayerBlendMapSizeActual);
             for (const auto& tex : mBlendTextureList)
             {
                 // Must blit back in CPU format!
-                PixelBox dst(mLayerBlendMapSizeActual, mLayerBlendMapSizeActual, 1, PF_BYTE_RGBA, tmpData);
-                tex->getBuffer()->blitToMemory(dst);
-                stream.write(tmpData, dst.getConsecutiveSize());
+                tex->getBuffer()->blitToMemory(tmp.getPixelBox());
+                stream.write(tmp.getData(), tmp.getSize());
             }
-            OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
         }
 
         // other data
@@ -407,11 +405,9 @@ namespace Ogre
 			}
 			else
 			{
-				uint8* tmpData = (uint8*)OGRE_MALLOC(mSize * mSize * 3, MEMCATEGORY_GENERAL);
-				PixelBox dst(mSize, mSize, 1, PF_BYTE_RGB, tmpData);
-				mTerrainNormalMap->getBuffer()->blitToMemory(dst);
-				stream.write(tmpData, mSize * mSize * 3);
-				OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+                Image tmp(PF_BYTE_RGB, mSize, mSize);
+				mTerrainNormalMap->getBuffer()->blitToMemory(tmp.getPixelBox());
+				stream.write(tmp.getData(), tmp.getSize());
 			}
 			stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 		}
@@ -874,14 +870,12 @@ namespace Ogre
             // convert image data to floats
             // Do this on a row-by-row basis, because we describe the terrain in
             // a bottom-up fashion (ie ascending world coords), while Image is top-down
-            unsigned char* pSrcBase = img->getData();
             for (size_t i = 0; i < mSize; ++i)
             {
                 size_t srcy = mSize - i - 1;
-                unsigned char* pSrc = pSrcBase + srcy * img->getRowSpan();
                 float* pDst = mHeightData + i * mSize;
-                PixelUtil::bulkPixelConversion(pSrc, img->getFormat(), 
-                    pDst, PF_FLOAT32_R, mSize);
+                PixelUtil::bulkPixelConversion(img->getData(0, srcy), img->getFormat(), pDst, PF_FLOAT32_R,
+                                               mSize);
             }
 
             if (!Math::RealEqual(importData.inputBias, 0.0) || !Math::RealEqual(importData.inputScale, 1.0))

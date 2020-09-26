@@ -62,10 +62,13 @@ namespace Ogre {
     friend class ImageCodec;
     public:
         /** Standard constructor.
-        */
-        Image();
+         *
+         * allocates a buffer of given size if buffer pointer is NULL.
+         */
+        Image(PixelFormat format = PF_UNKNOWN, uint32 width = 0, uint32 height = 0, uint32 depth = 1,
+              uchar* buffer = NULL, bool autoDelete = true);
         /** Copy-constructor - copies all the data from the target image.
-        */
+         */
         Image( const Image &img );
 
         /** Standard destructor.
@@ -75,6 +78,13 @@ namespace Ogre {
         /** Assignment operator - copies all the data from the target image.
         */
         Image & operator = ( const Image & img );
+
+        /**
+         * sets all pixels to the specified colour
+         *
+         * format conversion is performed as needed
+         */
+        void setTo(const ColourValue& col);
 
         /** Flips (mirrors) the image around the Y-axis. 
             @remarks
@@ -301,21 +311,25 @@ namespace Ogre {
         */
         DataStreamPtr encode(const String& formatextension);
 
-        /** Returns a pointer to the internal image buffer.
-        @remarks
-            Be careful with this method. You will almost certainly
-            prefer to use getPixelBox, especially with complex images
-            which include many faces or custom mipmaps.
-        */
-        uchar* getData(void);
+        /** Returns a pointer to the internal image buffer at the specified pixel location.
 
-        /** Returns a const pointer to the internal image buffer.
-        @remarks
             Be careful with this method. You will almost certainly
             prefer to use getPixelBox, especially with complex images
             which include many faces or custom mipmaps.
         */
-        const uchar * getData() const;       
+        uchar* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0)
+        {
+            assert((!mBuffer && (x + y + z) == 0) || (x < mWidth && y < mHeight && z < mDepth));
+            return mBuffer + mPixelSize * (z * mWidth * mHeight + mWidth * y + x);
+        }
+
+        /// @overload
+        const uchar* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0) const
+        {
+            assert(mBuffer);
+            assert(x < mWidth && y < mHeight && z < mDepth);
+            return mBuffer + mPixelSize * (z * mWidth * mHeight + mWidth * y + x);
+        }
 
         /** Returns the size of the data buffer in bytes
         */
