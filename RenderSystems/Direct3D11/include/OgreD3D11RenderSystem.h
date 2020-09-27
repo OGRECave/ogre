@@ -275,6 +275,7 @@ namespace Ogre
         void _setViewport( Viewport *vp );
         void _endFrame(void);
         void _setCullingMode( CullingMode mode );
+        void _setDepthClamp(bool enable);
         void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
         void _setDepthBufferCheckEnabled( bool enabled = true );
         bool _getDepthBufferCheckEnabled( void );

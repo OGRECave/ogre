@@ -337,6 +337,7 @@ namespace Ogre {
 
         // Infinite far plane always supported
         rsc->setCapability(RSC_INFINITE_FAR_PLANE);
+        rsc->setCapability(RSC_DEPTH_CLAMP);
 
         // Check for hardware occlusion support
         rsc->setCapability(RSC_HWOCCLUSION);
@@ -921,6 +922,11 @@ namespace Ogre {
 
         mStateCacheManager->setEnabled( GL_CULL_FACE, true );
         mStateCacheManager->setCullFace( cullMode );
+    }
+
+    void GL3PlusRenderSystem::_setDepthClamp(bool enable)
+    {
+        mStateCacheManager->setEnabled(GL_DEPTH_CLAMP, enable);
     }
 
     void GL3PlusRenderSystem::_setDepthBufferParams(bool depthTest, bool depthWrite, CompareFunction depthFunction)

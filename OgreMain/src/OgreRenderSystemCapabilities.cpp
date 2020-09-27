@@ -241,6 +241,9 @@ namespace Ogre {
             " * Infinite far plane projection: "
             + StringConverter::toString(hasCapability(RSC_INFINITE_FAR_PLANE), true));
         pLog->logMessage(
+            " * Depth clamping: "
+            + StringConverter::toString(hasCapability(RSC_DEPTH_CLAMP), true));
+        pLog->logMessage(
             " * Hardware render-to-texture: "
             + StringConverter::toString(hasCapability(RSC_HWRENDER_TO_TEXTURE), true));
         pLog->logMessage("   - Multiple Render Targets: " + StringConverter::toString(mNumMultiRenderTargets));

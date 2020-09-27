@@ -176,6 +176,13 @@ namespace Ogre
         rsc->setCapability(RSC_USER_CLIP_PLANES);
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
         rsc->setCapability(RSC_INFINITE_FAR_PLANE);
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        if( [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily4_v1] )
+#endif
+        {
+            rsc->setCapability(RSC_DEPTH_CLAMP);
+        }
+
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
         rsc->setNonPOW2TexturesLimited(false);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -730,6 +737,11 @@ namespace Ogre
         id <MTLSamplerState> sampler = static_cast<MetalSampler&>(s).getState();
         [mActiveRenderEncoder setVertexSamplerState:sampler atIndex: texUnit];
         [mActiveRenderEncoder setFragmentSamplerState:sampler atIndex: texUnit];
+    }
+
+    void MetalRenderSystem::_setDepthClamp(bool enable)
+    {
+        [mActiveRenderEncoder setDepthClipMode:enable ? MTLDepthClipModeClamp : MTLDepthClipModeClip];
     }
 
     void MetalRenderSystem::_setDepthBufferParams( bool depthTest, bool depthWrite, CompareFunction depthFunction )
