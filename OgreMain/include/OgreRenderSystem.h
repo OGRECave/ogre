@@ -767,6 +767,13 @@ namespace Ogre
         */
         virtual void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) = 0;
 
+        /**
+         * Clamp depth values to near and far plane rather than discarding
+         *
+         * Useful for "shadow caster pancaking" or with shadow volumes
+         */
+        virtual void _setDepthClamp(bool enable) {}
+
         /** The RenderSystem will keep a count of tris rendered, this resets the count. */
         virtual void _beginGeometryCount(void);
         /** Reports the number of tris rendered since the last _beginGeometryCount call. */

@@ -138,6 +138,7 @@ namespace Ogre
         void setColourBlendState(const ColourBlendState& state);
 
         void _setSampler( size_t texUnit, Sampler& s);
+        void _setDepthClamp(bool enable);
         void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL);
 
         void _setCullingMode(CullingMode mode);

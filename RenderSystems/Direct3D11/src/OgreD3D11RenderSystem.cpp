@@ -905,6 +905,7 @@ namespace Ogre
             break;
         }
 
+        rsc->setCapability(RSC_DEPTH_CLAMP);
         rsc->setCapability(RSC_INFINITE_FAR_PLANE);
 
         rsc->setCapability(RSC_TEXTURE_3D);
@@ -1562,6 +1563,11 @@ namespace Ogre
 					!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
 
 		mRasterizerDesc.CullMode = D3D11Mappings::get(mode, flip);
+        mRasterizerDescChanged = true;
+    }
+    void D3D11RenderSystem::_setDepthClamp(bool enable)
+    {
+        mRasterizerDesc.DepthClipEnable = !enable;
         mRasterizerDescChanged = true;
     }
     //---------------------------------------------------------------------

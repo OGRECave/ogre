@@ -192,6 +192,8 @@ namespace Ogre
         RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 24),
         /// Supports 2D Texture Arrays
         RSC_TEXTURE_2D_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 25),
+        /// Supports depth clamping
+        RSC_DEPTH_CLAMP = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
