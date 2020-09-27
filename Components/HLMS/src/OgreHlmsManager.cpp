@@ -55,7 +55,7 @@ namespace Ogre
 		// set all materials to dirty (IsUpToDate = false)
 		RenderableVector::iterator rendIt = mBindedRenderables.begin();
 		RenderableVector::iterator rendItEnd = mBindedRenderables.end();
-		for (; rendIt != rendItEnd; rendIt++)
+		for (; rendIt != rendItEnd; ++rendIt)
 		{
 			Renderable* rend = *rendIt;
 
@@ -69,7 +69,7 @@ namespace Ogre
 
 			HlmsMatBindingMap::iterator bindingIt = hlmsMatBindingMap->begin();
 			HlmsMatBindingMap::iterator bindingItEnd = hlmsMatBindingMap->end();
-			for (; bindingIt != bindingItEnd; bindingIt++)
+			for (; bindingIt != bindingItEnd; ++bindingIt)
 			{
 				bindingIt->second->IsDirty = true;
 			}
@@ -78,7 +78,7 @@ namespace Ogre
 		// itreate over all binded renderables
 		rendIt = mBindedRenderables.begin();
 		rendItEnd = mBindedRenderables.end();
-		for (; rendIt != rendItEnd; rendIt++)
+		for (; rendIt != rendItEnd; ++rendIt)
 		{
 			Renderable* rend = *rendIt;
 
@@ -92,7 +92,7 @@ namespace Ogre
 
 			HlmsMatBindingMap::iterator bindingIt = hlmsMatBindingMap->begin();
 			HlmsMatBindingMap::iterator bindingItEnd = hlmsMatBindingMap->end();
-			for (; bindingIt != bindingItEnd; bindingIt++)
+			for (; bindingIt != bindingItEnd; ++bindingIt)
 			{
 				String passName = bindingIt->first;
 				HlmsMaterialBase* hlmsMaterial = bindingIt->second;
@@ -232,7 +232,7 @@ namespace Ogre
 	{
 		RenderableVector::iterator bindingIt = mBindedRenderables.begin();
 		RenderableVector::iterator bindingItEnd = mBindedRenderables.end();
-		for (; bindingIt != bindingItEnd; bindingIt++)
+		for (; bindingIt != bindingItEnd; ++bindingIt)
 		{
 			Renderable* rend = *bindingIt;
 			HlmsMatBindingMap* hlmsMatMap = any_cast<HlmsMatBindingMap*>(rend->getUserObjectBindings().getUserAny(HLMS_KEY));

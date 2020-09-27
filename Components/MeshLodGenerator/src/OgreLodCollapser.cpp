@@ -55,7 +55,7 @@ namespace Ogre
         LodData::CollapseCostHeap::iterator itEnd = data->mCollapseCostHeap.end();
         while (it != itEnd) {
             assertValidVertex(data, it->second);
-            it++;
+            ++it;
         }
     }
 
@@ -64,7 +64,7 @@ namespace Ogre
         // Allows to find bugs in collapsing.
         LodData::VTriangles::iterator it = v->triangles.begin();
         LodData::VTriangles::iterator itEnd = v->triangles.end();
-        for (; it != itEnd; it++) {
+        for (; it != itEnd; ++it) {
             LodData::Triangle* t = *it;
             for (int i = 0; i < 3; i++) {
                 OgreAssert(t->vertex[i]->costHeapPosition != data->mCollapseCostHeap.end(), "");
@@ -87,12 +87,12 @@ namespace Ogre
         // This will OgreAssert if the dependencies inside computeEdgeCollapseCost changes.
         LodData::VEdges::iterator it = vertex->edges.begin();
         LodData::VEdges::iterator itEnd = vertex->edges.end();
-        for (; it != itEnd; it++) {
+        for (; it != itEnd; ++it) {
             OgreAssert(it->collapseCost == cost->computeEdgeCollapseCost(data, vertex, &*it), "");
             LodData::Vertex* neighbor = it->dst;
             LodData::VEdges::iterator it2 = neighbor->edges.begin();
             LodData::VEdges::iterator it2End = neighbor->edges.end();
-            for (; it2 != it2End; it2++) {
+            for (; it2 != it2End; ++it2) {
                 OgreAssert(it2->collapseCost == cost->computeEdgeCollapseCost(data, neighbor, &*it2), "");
             }
         }

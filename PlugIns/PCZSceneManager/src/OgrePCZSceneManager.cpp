@@ -65,7 +65,7 @@ namespace Ogre
         // delete ALL portals
         Portal * p;
         PortalList::iterator i = mPortals.begin();
-        for (i = mPortals.begin(); i != mPortals.end(); i++)
+        for (i = mPortals.begin(); i != mPortals.end(); ++i)
         {
             p = *i;
             OGRE_DELETE p;
@@ -94,7 +94,7 @@ namespace Ogre
         // delete ALL portals
         Portal * p;
         PortalList::iterator i = mPortals.begin();
-        for (i = mPortals.begin(); i != mPortals.end(); i++)
+        for (i = mPortals.begin(); i != mPortals.end(); ++i)
         {
             p = *i;
             OGRE_DELETE p;
@@ -174,7 +174,7 @@ namespace Ogre
                 mPortals.erase(it);
                 break;
             }
-            it++;
+            ++it;
         }
         if (thePortal)
         {
@@ -245,7 +245,7 @@ namespace Ogre
                 mAntiPortals.erase(it);
                 break;
             }
-            it++;
+            ++it;
         }
         if (thePortal)
         {
@@ -380,7 +380,7 @@ namespace Ogre
         // tell all the zones about the new camera
         ZoneMap::iterator i;
         PCZone * zone;
-        for (i = mZones.begin(); i != mZones.end(); i++)
+        for (i = mZones.begin(); i != mZones.end(); ++i)
         {
             zone = i->second;
             zone->notifyCameraCreated( c );
@@ -459,7 +459,7 @@ namespace Ogre
         // tell all the zones about the new WorldGeometryRenderQueue
         ZoneMap::iterator i;
         PCZone * zone;
-        for (i = mZones.begin(); i != mZones.end(); i++)
+        for (i = mZones.begin(); i != mZones.end(); ++i)
         {
             zone = i->second;
             zone->notifyWorldGeometryRenderQueue( qid );
@@ -474,7 +474,7 @@ namespace Ogre
         // notify all the zones that a scene render is starting
         ZoneMap::iterator i;
         PCZone * zone;
-        for (i = mZones.begin(); i != mZones.end(); i++)
+        for (i = mZones.begin(); i != mZones.end(); ++i)
         {
             zone = i->second;
             zone->notifyBeginRenderScene();
@@ -885,7 +885,7 @@ namespace Ogre
     {
         ZoneMap::iterator i;
         PCZone * zone;
-        for (i = mZones.begin(); i != mZones.end(); i++)
+        for (i = mZones.begin(); i != mZones.end(); ++i)
         {
             zone = i->second;
             if (zone->requiresZoneSpecificNodeData())
@@ -1118,14 +1118,14 @@ namespace Ogre
         PCZone* zone;
         iend = mZones.end();
         bool foundMatch;
-        for (i = mZones.begin(); i != iend; i++)
+        for (i = mZones.begin(); i != iend; ++i)
         {
             zone = i->second;
             // go through all the portals in the zone
             Portal* portal;
             PortalList::iterator pi, piend;
             piend = zone->mPortals.end();
-            for (pi = zone->mPortals.begin(); pi != piend; pi++)
+            for (pi = zone->mPortals.begin(); pi != piend; ++pi)
             {
                 portal = *pi;
                 //portal->updateDerivedValues();
@@ -1153,7 +1153,7 @@ namespace Ogre
                                 portal2->setTargetPortal(portal);
                             }
                         }
-                        j++;
+                        ++j;
                     }
                     if (foundMatch == false)
                     {
@@ -1240,7 +1240,7 @@ namespace Ogre
             // no start zone specified, so check all zones
             ZoneMap::iterator i;
             PCZone * zone;
-            for (i = mZones.begin(); i != mZones.end(); i++)
+            for (i = mZones.begin(); i != mZones.end(); ++i)
             {
                 zone = i->second;
                 zone->_findNodes( box, list, visitedPortals, false, false, exclude );
@@ -1264,7 +1264,7 @@ namespace Ogre
             // no start zone specified, so check all zones
             ZoneMap::iterator i;
             PCZone * zone;
-            for (i = mZones.begin(); i != mZones.end(); i++)
+            for (i = mZones.begin(); i != mZones.end(); ++i)
             {
                 zone = i->second;
                 zone->_findNodes( sphere, list, visitedPortals, false, false, exclude );
@@ -1288,7 +1288,7 @@ namespace Ogre
             // no start zone specified, so check all zones
             ZoneMap::iterator i;
             PCZone * zone;
-            for (i = mZones.begin(); i != mZones.end(); i++)
+            for (i = mZones.begin(); i != mZones.end(); ++i)
             {
                 zone = i->second;
                 zone->_findNodes( volume, list, visitedPortals, false, false, exclude );
@@ -1311,7 +1311,7 @@ namespace Ogre
         {
             ZoneMap::iterator i;
             PCZone * zone;
-            for (i = mZones.begin(); i != mZones.end(); i++)
+            for (i = mZones.begin(); i != mZones.end(); ++i)
             {
                 zone = i->second;
                 zone->_findNodes( r, list, visitedPortals, false, false, exclude );
@@ -1351,7 +1351,7 @@ namespace Ogre
         // send option to each zone
         ZoneMap::iterator i;
         PCZone * zone;
-        for (i = mZones.begin(); i != mZones.end(); i++)
+        for (i = mZones.begin(); i != mZones.end(); ++i)
         {
             zone = i->second;
              if (zone->setOption(key, val ) == true)
@@ -1440,7 +1440,7 @@ namespace Ogre
         while ( zoneIterator != mZones.end() )
         {
             (zoneIterator->second)->setPortalsUpdated(false);
-            zoneIterator++;
+            ++zoneIterator;
         }
     }
     //---------------------------------------------------------------------

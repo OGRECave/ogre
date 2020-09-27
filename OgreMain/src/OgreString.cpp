@@ -215,7 +215,7 @@ namespace Ogre {
     {
         String::iterator it = str.begin();
         *it = toupper(*it);
-        for (; it != str.end() - 1; it++)
+        for (; it != str.end() - 1; ++it)
         {
             if (*it == ' ') 
             {

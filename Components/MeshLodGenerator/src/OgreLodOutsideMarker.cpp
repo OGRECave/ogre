@@ -72,7 +72,7 @@ void LodOutsideMarker::initHull()
     mOutsideData.resize(mVertexListOrig.size());
     itOut = mOutsideData.begin();
     itOutEnd = mOutsideData.end();
-    for (; itOut != itOutEnd; itOut++) {
+    for (; itOut != itOutEnd; ++itOut) {
         // reset output variables
         itOut->isOuterWallVertex = false;
         itOut->isInsideHull = false;
@@ -86,7 +86,7 @@ void LodOutsideMarker::initHull()
         LodData::VertexList::iterator v, vEnd;
         v = mVertexListOrig.begin();
         vEnd = mVertexListOrig.end();
-        for (; v != vEnd; v++) {
+        for (; v != vEnd; ++v) {
             Vector3& pos = v->position;
             if (pos.y < miny) {
                 miny = pos.y;
@@ -102,7 +102,7 @@ void LodOutsideMarker::initHull()
         LodData::VertexList::iterator v, vEnd;
         v = mVertexListOrig.begin();
         vEnd = mVertexListOrig.end();
-        for (; v != vEnd; v++) {
+        for (; v != vEnd; ++v) {
             Real dist = vertex[0]->position.squaredDistance(v->position);
             if (dist > maxdist) {
                 maxdist = dist;
@@ -118,7 +118,7 @@ void LodOutsideMarker::initHull()
         LodData::VertexList::iterator v, vEnd;
         v = mVertexListOrig.begin();
         vEnd = mVertexListOrig.end();
-        for (; v != vEnd; v++) {
+        for (; v != vEnd; ++v) {
             Real dist = getPointToLineSqraredDistance(vertex[0], vertex[1], &*v);
             if (dist > maxdist) {
                 maxdist = dist;
@@ -136,7 +136,7 @@ void LodOutsideMarker::initHull()
         LodData::VertexList::iterator v, vEnd;
         v = mVertexListOrig.begin();
         vEnd = mVertexListOrig.end();
-        for (; v != vEnd; v++) {
+        for (; v != vEnd; ++v) {
             Real dist = std::abs(plane.getDistance(v->position));
             if (dist > maxdist) {
                 maxdist = dist;
@@ -203,7 +203,7 @@ LodOutsideMarker::CHVertex* LodOutsideMarker::getFurthestVertex(CHTriangle* tri)
     LodData::VertexList::iterator v, vEnd;
     v = mVertexListOrig.begin();
     vEnd = mVertexListOrig.end();
-    for (; v != vEnd; v++) {
+    for (; v != vEnd; ++v) {
         if (getOutsideData(&*v)->isInsideHull) {
             continue;
         }
@@ -236,7 +236,7 @@ void LodOutsideMarker::getVisibleTriangles( const CHVertex* target, CHTrianglePL
 
     CHTriangleList::iterator it = mHull.begin();
     CHTriangleList::iterator itEnd = mHull.end();
-    for (; it != itEnd; it++) {
+    for (; it != itEnd; ++it) {
         if (it->removed) {
             continue;
         }
@@ -354,7 +354,7 @@ void LodOutsideMarker::getHorizon( const CHTrianglePList& tri, CHEdgeList& horiz
     // Create edge list and remove triangles
     CHTrianglePList::const_iterator it2 = tri.begin();
     CHTrianglePList::const_iterator it2End = tri.end();
-    for (; it2 != it2End; it2++) {
+    for (; it2 != it2End; ++it2) {
         addEdge(horizon, (*it2)->vertex[0], (*it2)->vertex[1]);
         addEdge(horizon, (*it2)->vertex[1], (*it2)->vertex[2]);
         addEdge(horizon, (*it2)->vertex[2], (*it2)->vertex[0]);
@@ -392,7 +392,7 @@ void LodOutsideMarker::fillHorizon(CHEdgeList& horizon, CHVertex* target)
     tri.removed = false;
     CHEdgeList::iterator it = horizon.begin();
     CHEdgeList::iterator itEnd = horizon.end();
-    for (;it != itEnd; it++) {
+    for (;it != itEnd; ++it) {
         tri.vertex[0] = it->first;
         tri.vertex[1] = it->second;
         tri.computeNormal();
@@ -548,18 +548,18 @@ void LodOutsideMarker::markVertices()
     OutsideDataList::iterator v, vEnd;
     v = mOutsideData.begin();
     vEnd = mOutsideData.end();
-    for (;v != vEnd; v++) {
+    for (;v != vEnd; ++v) {
         v->isOuterWallVertex = false;
     }
     std::vector<CHVertex*> stack;
     CHTriangleList::iterator tri, triEnd;
     tri = mHull.begin();
     triEnd = mHull.end();
-    for (; tri != triEnd; tri++) {
+    for (; tri != triEnd; ++tri) {
         stack.clear();
         v = mOutsideData.begin();
         vEnd = mOutsideData.end();
-        for (;v != vEnd; v++) {
+        for (;v != vEnd; ++v) {
             v->isOuterWallVertexInPass = false;
         }
         addHullTriangleVertices(stack, &*tri);
@@ -569,7 +569,7 @@ void LodOutsideMarker::markVertices()
             LodData::VTriangles::iterator it, itEnd;
             it = vert->triangles.begin();
             itEnd = vert->triangles.end();
-            for (; it != itEnd; it++) {
+            for (; it != itEnd; ++it) {
                 if (tri->normal.dotProduct((*it)->normal) > mWalkAngle) {
                     addHullTriangleVertices(stack, *it);
                 }

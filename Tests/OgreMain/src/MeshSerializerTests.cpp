@@ -233,7 +233,7 @@ TEST_F(MeshSerializerTests,Mesh_Version_1_2)
         StringVector::iterator it, itEnd;
         it = meshes->begin();
         itEnd = meshes->end();
-        for (; it != itEnd; it++) {
+        for (; it != itEnd; ++it) {
             try {
                 mMesh = MeshManager::getSingleton().load(*it, groups[i]);
             }
@@ -257,7 +257,7 @@ TEST_F(MeshSerializerTests,Mesh_Version_1_2)
         meshes = ResourceGroupManager::getSingleton().findResourceNames(groups[i], "*.skeleton");
         it = meshes->begin();
         itEnd = meshes->end();
-        for (; it != itEnd; it++) {
+        for (; it != itEnd; ++it) {
             mSkeleton = SkeletonManager::getSingleton().load(*it, groups[i]);
             getResourceFullPath(mSkeleton, mSkeletonFullPath);
             if (!copyFile(mSkeletonFullPath + ".bak", mSkeletonFullPath)) {
@@ -469,7 +469,7 @@ void MeshSerializerTests::assertVertexDataClone(VertexData* a, VertexData* b, Me
             bindingIterator aIt = aBindings.begin();
             bindingIterator aEndIt = aBindings.end();
             bindingIterator bIt = bBindings.begin();
-            for (; aIt != aEndIt; aIt++, bIt++) {
+            for (; aIt != aEndIt; ++aIt, ++bIt) {
                 EXPECT_TRUE(aIt->first == bIt->first);
                 EXPECT_TRUE((aIt->second.get() == NULL) == (bIt->second.get() == NULL));
                 if (a) {
@@ -487,7 +487,7 @@ void MeshSerializerTests::assertVertexDataClone(VertexData* a, VertexData* b, Me
             bindingIterator aIt = aElements.begin();
             bindingIterator aEndIt = aElements.end();
             bindingIterator bIt;
-            for (; aIt != aEndIt; aIt++) {
+            for (; aIt != aEndIt; ++aIt) {
                 bIt = std::find(bElements.begin(), bElements.end(), *aIt);
                 EXPECT_TRUE(bIt != bElements.end());
 
@@ -529,7 +529,7 @@ void MeshSerializerTests::assertVertexDataClone(VertexData* a, VertexData* b, Me
             bindingIterator aIt = aAnimData.begin();
             bindingIterator aEndIt = aAnimData.end();
             bindingIterator bIt = bAnimData.begin();
-            for (; aIt != aEndIt; aIt++, bIt++) {
+            for (; aIt != aEndIt; ++aIt, ++bIt) {
                 EXPECT_TRUE(aIt->parametric == bIt->parametric);
                 EXPECT_TRUE(aIt->targetBufferIndex == bIt->targetBufferIndex);
             }
@@ -554,7 +554,7 @@ bool MeshSerializerTests::isHashMapClone(const std::unordered_map<K, V>& a, cons
     typename std::unordered_map<K, V>::const_iterator it, itFind, itEnd;
     it = a.begin();
     itEnd = a.end();
-    for (; it != itEnd; it++) {
+    for (; it != itEnd; ++it) {
         itFind = b.find(it->first);
         if (itFind == b.end() || itFind->second != it->second) {
             return false;
@@ -618,7 +618,7 @@ void MeshSerializerTests::getResourceFullPath(const ResourcePtr& resource, Strin
     FileInfoList::iterator it, itEnd;
     it = locPtr->begin();
     itEnd = locPtr->end();
-    for (; it != itEnd; it++) {
+    for (; it != itEnd; ++it) {
         if (stricmp(name.c_str(), it->filename.c_str()) == 0) {
             info = &*it;
             break;

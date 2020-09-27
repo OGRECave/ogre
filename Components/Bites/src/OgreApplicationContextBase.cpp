@@ -428,7 +428,7 @@ void ApplicationContextBase::locateResources()
         Ogre::ConfigFile::SettingsMultiMap::const_iterator i;
 
         // go through all resource paths
-        for (i = settings.begin(); i != settings.end(); i++)
+        for (i = settings.begin(); i != settings.end(); ++i)
         {
             type = i->first;
             arch = i->second;
@@ -541,7 +541,7 @@ void ApplicationContextBase::reconfigure(const Ogre::String &renderer, Ogre::Nam
     Ogre::RenderSystem* rs = mRoot->getRenderSystemByName(renderer);
 
     // set all given render system options
-    for (Ogre::NameValuePairList::iterator it = options.begin(); it != options.end(); it++)
+    for (Ogre::NameValuePairList::iterator it = options.begin(); it != options.end(); ++it)
     {
         rs->setConfigOption(it->first, it->second);
 

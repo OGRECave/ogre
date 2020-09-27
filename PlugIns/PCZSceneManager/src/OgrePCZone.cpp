@@ -75,7 +75,7 @@ namespace Ogre
         Portal* portal2;
         PortalList::iterator pi2, piend2;
         piend2 = mPortals.end();
-        for (pi2 = mPortals.begin(); pi2 != piend2; pi2++)
+        for (pi2 = mPortals.begin(); pi2 != piend2; ++pi2)
         {
             portal2 = *pi2;
             //portal2->updateDerivedValues();

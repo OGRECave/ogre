@@ -98,7 +98,7 @@ namespace Ogre
 							// Check to see if it is already in the list (to filter out refresh rates)
 							BOOL found = FALSE;
 							std::vector<D3D11VideoMode>::iterator it;
-							for (it = mModeList.begin(); it != mModeList.end(); it++)
+							for (it = mModeList.begin(); it != mModeList.end(); ++it)
 							{
 								DXGI_OUTPUT_DESC oldOutput = it->getDisplayMode();
 								DXGI_MODE_DESC oldDisp = it->getModeDesc();

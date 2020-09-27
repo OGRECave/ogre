@@ -936,7 +936,7 @@ namespace Ogre {
 #ifdef WCHAR_UTF16 // if we're already working in UTF-16, this is easy
         code_point tmp;
         std::wstring::const_iterator i, ie = wstr.end();
-        for ( i = wstr.begin(); i != ie; i++ ) {
+        for ( i = wstr.begin(); i != ie; ++i ) {
             tmp = static_cast<code_point>( *i );
             mData.push_back( tmp );
         }
@@ -944,7 +944,7 @@ namespace Ogre {
         code_point cp[3] = {0, 0, 0};
         unicode_char tmp;
         std::wstring::const_iterator i, ie = wstr.end();
-        for ( i = wstr.begin(); i != ie; i++ ) {
+        for ( i = wstr.begin(); i != ie; ++i ) {
             tmp = static_cast<unicode_char>( *i );
             size_t l = _utf32_to_utf16( tmp, cp );
             if ( l > 0 ) mData.push_back( cp[0] );
@@ -988,7 +988,7 @@ namespace Ogre {
         size_t utf16len;          // UTF-16 length
 
         std::string::const_iterator i, ie = str.end();
-        for ( i = str.begin(); i != ie; i++ ) {
+        for ( i = str.begin(); i != ie; ++i ) {
             utf8len = _utf8_char_length( static_cast<unsigned char>( *i ) ); // estimate bytes to load
             for ( size_t j = 0; j < utf8len; j++ ) { // load the needed UTF-8 bytes
                 utf8buf[j] = ( static_cast<unsigned char>( *( i + j ) ) ); // we don't increment 'i' here just in case the estimate is wrong (shouldn't happen, but we're being careful)
@@ -1917,8 +1917,8 @@ namespace Ogre {
                         throw invalid_data( "bad UTF-8 continuation byte" );
                 }
             }
-            length++;
-            i++;
+            ++length;
+            ++i;
         }
         return length;
     }

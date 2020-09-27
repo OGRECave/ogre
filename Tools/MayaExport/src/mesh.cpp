@@ -1343,7 +1343,7 @@ namespace OgreMayaExporter
             // Rationalise the bone assignements list
             pMesh->_rationaliseBoneAssignments(pMesh->sharedVertexData->vertexCount,vbas);
             // Add bone assignements to the mesh
-            for (Ogre::Mesh::VertexBoneAssignmentList::iterator bi = vbas.begin(); bi != vbas.end(); bi++)
+            for (Ogre::Mesh::VertexBoneAssignmentList::iterator bi = vbas.begin(); bi != vbas.end(); ++bi)
             {
                 pMesh->addBoneAssignment(bi->second);
             }

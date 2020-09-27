@@ -98,7 +98,7 @@ namespace Ogre
                 collapseEdge.normalise();
                 LodData::VEdges::iterator it = src->edges.begin();
                 LodData::VEdges::iterator itEnd = src->edges.end();
-                for (; it != itEnd; it++) {
+                for (; it != itEnd; ++it) {
                     LodData::Vertex* neighbor = it->dst;
                     if (neighbor != dst && it->refCount == 1) {
                         Vector3 otherBorderEdge = src->position - neighbor->position;
@@ -153,7 +153,7 @@ namespace Ogre
                     LodData::Vertex* otherSeam;
                     LodData::VEdges::iterator it = src->edges.begin();
                     LodData::VEdges::iterator itEnd = src->edges.end();
-                    for (; it != itEnd; it++) {
+                    for (; it != itEnd; ++it) {
                         LodData::Vertex* neighbor = it->dst;
                         if(neighbor->seam) {
                             seamNeighbors++;

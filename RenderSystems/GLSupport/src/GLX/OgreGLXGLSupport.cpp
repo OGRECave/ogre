@@ -369,7 +369,7 @@ namespace Ogre
         {
             std::map<int,int>::iterator it;
 
-            for (it = fields.begin(); it != fields.end(); it++)
+            for (it = fields.begin(); it != fields.end(); ++it)
             {
                 it->second = 0;
 
@@ -393,7 +393,7 @@ namespace Ogre
 
             std::map<int,int>::iterator it;
 
-            for (it = fields.begin(); it != fields.end(); it++)
+            for (it = fields.begin(); it != fields.end(); ++it)
             {
                 if (it->first != GLX_CONFIG_CAVEAT && fields[it->first] > alternative.fields[it->first])
                     return true;

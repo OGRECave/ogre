@@ -163,7 +163,7 @@ namespace Ogre
             return true;
 
         // if any zones affected by this light have updated portals, then this light needs updating too
-        for (ZoneList::iterator iter = affectedZonesList.begin() ; iter != affectedZonesList.end(); iter++)
+        for (ZoneList::iterator iter = affectedZonesList.begin() ; iter != affectedZonesList.end(); ++iter)
         { 
             if((*iter)->getPortalsUpdated()) return true;   // return immediately to prevent further iterating
         }

@@ -445,7 +445,7 @@ namespace Ogre
         Portal* portal;
         PortalList::iterator pi, piend;
         piend = mPortals.end();
-        for (pi = mPortals.begin(); pi != piend; pi++)
+        for (pi = mPortals.begin(); pi != piend; ++pi)
         {
             portal = *pi;
 
@@ -754,7 +754,7 @@ namespace Ogre
                                                             exclude);
                     }
                 }
-                pit++;
+                ++pit;
             }
         }
     }
@@ -848,7 +848,7 @@ namespace Ogre
                                                             exclude);
                     }
                 }
-                pit++;
+                ++pit;
             }
         }
 
@@ -943,7 +943,7 @@ namespace Ogre
                                                             exclude);
                     }
                 }
-                pit++;
+                ++pit;
             }
         }
 
@@ -1039,7 +1039,7 @@ namespace Ogre
                                                             exclude);
                     }
                 }
-                pit++;
+                ++pit;
             }
         }
 

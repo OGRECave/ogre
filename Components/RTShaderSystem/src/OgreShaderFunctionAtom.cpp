@@ -422,7 +422,7 @@ void AssignmentAtom::writeSourceCode(std::ostream& os, const String& targetLangu
     OperandVector::const_iterator outOp = mOperands.begin();
     // find the output operand
     while(outOp->getSemantic() != Operand::OPS_OUT)
-        outOp++;
+        ++outOp;
     writeOperands(os, outOp, mOperands.end());
     os << "\t=\t";
     writeOperands(os, mOperands.begin(), outOp);
@@ -441,7 +441,7 @@ void SampleTextureAtom::writeSourceCode(std::ostream& os, const String& targetLa
     OperandVector::const_iterator outOp = mOperands.begin();
     // find the output operand
     while(outOp->getSemantic() != Operand::OPS_OUT)
-        outOp++;
+        ++outOp;
     writeOperands(os, outOp, mOperands.end());
     os << "\t=\t";
 
@@ -485,12 +485,12 @@ void BinaryOpAtom::writeSourceCode(std::ostream& os, const String& targetLanguag
     // find the output operand
     OperandVector::const_iterator outOp = mOperands.begin();
     while(outOp->getSemantic() != Operand::OPS_OUT)
-        outOp++;
+        ++outOp;
 
     // find the second operand
     OperandVector::const_iterator secondOp = ++(mOperands.begin());
     while(outOp->getIndirectionLevel() != 0)
-        secondOp++;
+        ++secondOp;
 
     writeOperands(os, outOp, mOperands.end());
     os << "\t=\t";

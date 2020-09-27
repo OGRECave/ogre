@@ -209,7 +209,7 @@ namespace Ogre {
             if( newLine )
             {
                 Real len = 0.0f;
-                for( DisplayString::iterator j = i; j != iend; j++ )
+                for( DisplayString::iterator j = i; j != iend; ++j )
                 {
                     Font::CodePoint character = j.getCharacter();
                     if (character == UNICODE_CR
@@ -251,7 +251,7 @@ namespace Ogre {
                 if (character == UNICODE_CR)
                 {
                     DisplayString::iterator peeki = i;
-                    peeki++;
+                    ++peeki;
                     if (peeki != iend && peeki.getCharacter() == UNICODE_LF)
                     {
                         i = peeki; // skip both as one newline

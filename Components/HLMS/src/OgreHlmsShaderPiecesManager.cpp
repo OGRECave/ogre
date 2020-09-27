@@ -51,7 +51,7 @@ namespace Ogre
 			FileInfoList::iterator it = list->begin();
 			FileInfoList::iterator end = list->end();
 
-			for (; it != end; it++)
+			for (; it != end; ++it)
 			{
 				String name, ext;
 				StringUtil::splitBaseFilename(it->filename, name, ext);
@@ -90,7 +90,7 @@ namespace Ogre
             StringVector::iterator it = pieceFileNamesIt->second.begin();
             StringVector::iterator end = pieceFileNamesIt->second.end();
 
-            for (; it != end; it++)
+            for (; it != end; ++it)
             {
                 pieces.push_back(rgm.openResource(*it, mResorceGroup)->getAsString());
             }

@@ -278,7 +278,7 @@ bool GLXConfigurator::CreateWindow() {
 
     const RenderSystemList& renderers = Root::getSingleton().getAvailableRenderers();
     for (RenderSystemList::const_iterator pRend = renderers.begin();
-                    pRend != renderers.end(); pRend++) {
+                    pRend != renderers.end(); ++pRend) {
         // Create callback data
         mRendererCallbackData.push_back(RendererCallbackData(this, *pRend, mb1));
 
@@ -400,7 +400,7 @@ void GLXConfigurator::SetRenderer(RenderSystem *r) {
     mRenderer = r;
 
     // Destroy each widget of GUI of previously selected renderer
-    for(std::list<Widget>::iterator i=mRenderOptionWidgets.begin(); i!=mRenderOptionWidgets.end(); i++)
+    for(std::list<Widget>::iterator i=mRenderOptionWidgets.begin(); i!=mRenderOptionWidgets.end(); ++i)
         XtDestroyWidget(*i);
     mRenderOptionWidgets.clear();
     mConfigCallbackData.back();
@@ -411,7 +411,7 @@ void GLXConfigurator::SetRenderer(RenderSystem *r) {
     ConfigOptionMap options = mRenderer->getConfigOptions();
     // Process each option and create an optionmenu widget for it
     for (ConfigOptionMap::iterator it = options.begin();
-                    it != options.end(); it++) {
+                    it != options.end(); ++it) {
         // if the config option does not have any possible value, then skip it.
         // if we create a popup with zero entries, it will crash when you click
         // on it.
@@ -450,7 +450,7 @@ void GLXConfigurator::SetRenderer(RenderSystem *r) {
         // Process each choice
         StringVector::iterator opt_it;
         for (opt_it = it->second.possibleValues.begin();
-                        opt_it != it->second.possibleValues.end(); opt_it++) {
+                        opt_it != it->second.possibleValues.end(); ++opt_it) {
             // Create callback data
             mConfigCallbackData.push_back(ConfigCallbackData(this, it->second.name, *opt_it, mb1));
 

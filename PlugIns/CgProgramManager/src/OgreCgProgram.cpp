@@ -395,7 +395,7 @@ namespace Ogre {
 		// save params
 		GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
 		GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
-		for (; iter != iterE ; iter++)
+		for (; iter != iterE ; ++iter)
 		{
 			const String & paramName = iter->first;
 			const GpuConstantDefinition & def = iter->second;
@@ -899,7 +899,7 @@ namespace Ogre {
 
 		GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
 		GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
-		for (; iter != iterE ; iter++)
+		for (; iter != iterE ; ++iter)
 		{
 			GpuConstantDefinition def = iter->second;
 

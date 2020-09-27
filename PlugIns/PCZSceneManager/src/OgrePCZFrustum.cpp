@@ -70,7 +70,7 @@ namespace Ogre
         {
             PCPlane * plane = *pit;
             // go to next entry
-            pit++;
+            ++pit;
             //delete the entry in the list
             OGRE_DELETE_T(plane, PCPlane, MEMCATEGORY_SCENE_CONTROL);
         }
@@ -111,7 +111,7 @@ namespace Ogre
             {
                 return false;
             }
-            pit++;
+            ++pit;
         }
         return true;
     }
@@ -147,7 +147,7 @@ namespace Ogre
                     return false;
                 }
             }
-            pit++;
+            ++pit;
         }
         return true;
     }
@@ -175,7 +175,7 @@ namespace Ogre
             {
                 return false;
             }
-            pit++;
+            ++pit;
         }
         // if portal is of type AABB or Sphere, then use simple bound check against planes
         if (portal->getType() == PortalBase::PORTAL_TYPE_AABB)
@@ -255,7 +255,7 @@ namespace Ogre
                 // ALL corners on negative side therefore out of view
                 return false;
             }
-            pit++;
+            ++pit;
         }
         // no plane culled all the portal points and the norm
         // was facing the frustum, so this portal is visible
@@ -296,7 +296,7 @@ namespace Ogre
             {
                 return false;
             }
-            pit++;
+            ++pit;
         }
         return true;
     }
@@ -328,7 +328,7 @@ namespace Ogre
                 return false;
             }
 
-            pit++;
+            ++pit;
         }
         return true;
     }
@@ -354,7 +354,7 @@ namespace Ogre
             {
                 return false;
             }
-            pit++;
+            ++pit;
         }
         // if portal is of type AABB or Sphere, then use simple bound check against planes
         if (portal->getType() == PortalBase::PORTAL_TYPE_AABB)
@@ -405,7 +405,7 @@ namespace Ogre
                 Plane::Side side =plane->getSide(portal->getDerivedCorner(corner));
                 if (side == Plane::NEGATIVE_SIDE) return false;
             }
-            pit++;
+            ++pit;
         }
         // no plane culled all the portal points and the norm
         // was facing the frustum, so this portal is fully visible
@@ -461,7 +461,7 @@ namespace Ogre
                 all_inside = false;
                 break;
             }
-            pit++;
+            ++pit;
         }
 
         if ( all_inside )
@@ -535,7 +535,7 @@ namespace Ogre
                     visible = false;
                     break;
                 }
-                pit++;
+                ++pit;
             }
             if (visible)
             {
@@ -619,7 +619,7 @@ namespace Ogre
             }
             else
             {
-                pit++;
+                ++pit;
             }
         }
 
@@ -636,7 +636,7 @@ namespace Ogre
             // put the plane back in the reservoir
             mCullingPlaneReservoir.push_front(plane);
             // go to next entry
-            pit++;
+            ++pit;
         }
         mActiveCullingPlanes.clear();
     }

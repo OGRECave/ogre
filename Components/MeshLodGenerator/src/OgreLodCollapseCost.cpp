@@ -35,7 +35,7 @@ namespace Ogre
         data->mCollapseCostHeap.clear();
         LodData::VertexList::iterator it = data->mVertexList.begin();
         LodData::VertexList::iterator itEnd = data->mVertexList.end();
-        for (; it != itEnd; it++) {
+        for (; it != itEnd; ++it) {
             if (!it->edges.empty()) {
                 initVertexCollapseCost(data, &*it);
             } else {

@@ -153,7 +153,7 @@ namespace Ogre
             Material::LodValueList::const_iterator valueIt = pMat->getUserLodValues().begin();
             // Skip zero value
             if (!pMat->getUserLodValues().empty())
-                valueIt++;
+                ++valueIt;
             String attributeVal;
             while (valueIt != pMat->getUserLodValues().end())
             {

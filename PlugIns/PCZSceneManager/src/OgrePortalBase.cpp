@@ -523,7 +523,7 @@ bool PortalBase::intersects(const PlaneBoundedVolume& pbv)
                     {
                         return false;
                     }
-                    it++;
+                    ++it;
                 };
             }
             break;

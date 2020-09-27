@@ -804,7 +804,7 @@ namespace Ogre
                 overlayObject(*overrides[i].first,
                     static_cast<ObjectAbstractNode&>(**overrides[i].second));
                 insertPos = overrides[i].second;
-                insertPos++;
+                ++insertPos;
             }
             else
             {
@@ -1312,7 +1312,7 @@ namespace Ogre
             ConcreteNodeList::iterator iter = node->children.begin();
             impl->target = (*iter)->token;
 
-            iter++;
+            ++iter;
             impl->source = (*iter)->token;
 
             asn = AbstractNodePtr(impl);
@@ -1377,7 +1377,7 @@ namespace Ogre
             if(riter != node->children.rend())
             {
                 temp1 = *riter;
-                riter++;
+                ++riter;
             }
             if(riter != node->children.rend())
                 temp2 = *riter;

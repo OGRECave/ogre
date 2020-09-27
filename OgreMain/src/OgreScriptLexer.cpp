@@ -235,9 +235,9 @@ namespace Ogre {
 
             // Separate check for newlines just to track line numbers
             if(c == cr || (c == lf && lastc != cr))
-                line++;
+                ++line;
 
-            i++;
+            ++i;
         }
 
         // Check for valid exit states

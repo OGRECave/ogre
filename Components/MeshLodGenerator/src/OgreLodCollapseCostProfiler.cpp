@@ -75,7 +75,7 @@ namespace Ogre
         mHasProfile.resize(data->mVertexList.size(), false);
         LodProfile::iterator it = mProfile.begin();
         LodProfile::iterator itEnd = mProfile.end();
-        for(;it != itEnd;it++){
+        for(;it != itEnd;++it){
             LodData::Vertex v;
             v.position = it->src;
             LodData::UniqueVertexSet::iterator src = data->mUniqueVertexSet.find(&v);

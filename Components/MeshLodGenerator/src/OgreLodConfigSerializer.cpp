@@ -249,7 +249,7 @@ namespace Ogre
 
         LodConfig::LodLevelList::iterator it = mLodConfig->levels.begin();
         LodConfig::LodLevelList::iterator itEnd = mLodConfig->levels.end();
-        for(;it != itEnd; it++){
+        for(;it != itEnd; ++it){
             writeFloats(&it->distance, 1);
             writeInts((Ogre::uint32*)&it->reductionMethod, 1);
             writeFloats(&it->reductionValue, 1);
@@ -320,7 +320,7 @@ namespace Ogre
         writeInts(&size, 1);
         LodProfile::iterator it = mLodConfig->advanced.profile.begin();
         LodProfile::iterator itEnd = mLodConfig->advanced.profile.end();
-        for(;it != itEnd; it++){
+        for(;it != itEnd; ++it){
             writeObject(it->src);
             writeObject(it->dst);
             writeFloats(&it->cost, 1);

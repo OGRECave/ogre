@@ -89,7 +89,7 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
     StringVector::iterator it, itEnd;
     it = meshes->begin();
     itEnd = meshes->end();
-    for(; it != itEnd; it++){
+    for(; it != itEnd; ++it){
         models->addItem(*it);
     }
 
@@ -444,7 +444,7 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
     FileInfoList::iterator it, itEnd;
     it = locPtr->begin();
     itEnd = locPtr->end();
-    for (; it != itEnd; it++) {
+    for (; it != itEnd; ++it) {
         if (stricmp(name.c_str(), it->filename.c_str()) == 0) {
             info = &*it;
             break;

@@ -4398,7 +4398,7 @@ namespace Ogre{
                                            "invalid array size");
                         continue;
                     }
-                    arrayStart++;
+                    ++arrayStart;
                 }
             }
 
