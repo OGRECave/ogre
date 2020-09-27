@@ -114,7 +114,7 @@ namespace Ogre
         RSC_USER_CLIP_PLANES        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 15),
         /// Supports the VET_UBYTE4 vertex element type
         RSC_VERTEX_FORMAT_UBYTE4    = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 16),
-        /// Supports infinite far plane projection
+        /// @deprecated All targetted APIs by Ogre support this feature
         RSC_INFINITE_FAR_PLANE      = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 17),
         /// Supports hardware render-to-texture (bigger than framebuffer)
         RSC_HWRENDER_TO_TEXTURE     = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 18),

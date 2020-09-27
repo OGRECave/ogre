@@ -1109,19 +1109,7 @@ namespace Ogre
         // Non-vertex program capable hardware does not appear to support it
         if (rsc->hasCapability(RSC_VERTEX_PROGRAM))
         {
-            // GeForce4 Ti (and presumably GeForce3) does not
-            // render infinite projection properly, even though it does in GL
-            // So exclude all cards prior to the FX range from doing infinite
-            if (rsc->getVendor() != GPU_NVIDIA || // not nVidia
-                !((adapterID.DeviceId >= 0x200 && adapterID.DeviceId <= 0x20F) || //gf3
-                (adapterID.DeviceId >= 0x250 && adapterID.DeviceId <= 0x25F) || //gf4ti
-                (adapterID.DeviceId >= 0x280 && adapterID.DeviceId <= 0x28F) || //gf4ti
-                (adapterID.DeviceId >= 0x170 && adapterID.DeviceId <= 0x18F) || //gf4 go
-                (adapterID.DeviceId >= 0x280 && adapterID.DeviceId <= 0x28F)))  //gf4ti go
-            {
-                rsc->setCapability(RSC_INFINITE_FAR_PLANE);
-            }
-
+            rsc->setCapability(RSC_INFINITE_FAR_PLANE);
         }
     
         // We always support rendertextures bigger than the frame buffer
