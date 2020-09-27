@@ -64,8 +64,8 @@ void DefaultDebugDrawer::drawFrustum(const Frustum* frust)
         mLines.position(corner);
         mLines.colour(frust->getDebugColour());
     }
-    // see AxisAlignedBox::getAllCorners
-    int idx[] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 6, 1, 5, 2, 4, 3, 7};
+    // see ConvexBody::define
+    int idx[] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 2, 6, 1, 5, 0, 4, 3, 7};
     for (int i : idx)
         mLines.index(base + i);
 }
