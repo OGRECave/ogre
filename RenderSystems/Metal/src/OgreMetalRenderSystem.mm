@@ -764,6 +764,14 @@ namespace Ogre
                                      slopeScale:slopeScaleBias
                                      clamp:0.0f];
     }
+
+    void MetalRenderSystem::_setPolygonMode(PolygonMode level)
+    {
+        MTLTriangleFillMode fillMode =
+            level == PM_SOLID ? MTLTriangleFillModeFill : MTLTriangleFillModeLines;
+        [mActiveRenderEncoder setTriangleFillMode:fillMode];
+    }
+
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
                                                       bool forGpuProgram )
