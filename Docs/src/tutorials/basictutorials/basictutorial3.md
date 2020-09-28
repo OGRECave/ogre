@@ -29,7 +29,7 @@ This should look familiar from the previous tutorial.
 
 @snippet Samples/Simple/include/Terrain.h camera_inf
 
-The last thing we do is check to see if our current render system has the capability to handle an infinite far clip distance. If it does, then we set the far clip distance to zero (which means ''no'' far clipping).
+The last thing we do is to set the far clip distance to zero (which means ''no'' far clipping).
 ## Setting Up a Light for Our Terrain
 The Terrain component can use a directional light to compute a lightmap. Let's add a Light for this purpose and add some ambient light to the scene while we're at it.
 

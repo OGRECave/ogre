@@ -327,10 +327,7 @@ protected:
 		mCamera->setNearClipDistance(0.1);
 		mCamera->setFarClipDistance(50000);
 
-		if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE))
-        {
-            mCamera->setFarClipDistance(0);   // enable infinite far clip distance if we can
-        }
+		mCamera->setFarClipDistance(0);   // enable infinite far clip distance
 	}
 
 	void setupControls()

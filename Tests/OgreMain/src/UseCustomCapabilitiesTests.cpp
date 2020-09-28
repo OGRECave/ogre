@@ -62,17 +62,14 @@ static void checkCaps(const Ogre::RenderSystemCapabilities* caps)
     using namespace Ogre;
 
     EXPECT_EQ(caps->hasCapability(RSC_ANISOTROPY), true);
-    EXPECT_EQ(caps->hasCapability(RSC_DOT3), true);
     EXPECT_EQ(caps->hasCapability(RSC_HWSTENCIL), true);
 
-    EXPECT_EQ(caps->hasCapability(RSC_SCISSOR_TEST), true);
     EXPECT_EQ(caps->hasCapability(RSC_TWO_SIDED_STENCIL), true);
     EXPECT_EQ(caps->hasCapability(RSC_STENCIL_WRAP), true);
 
     EXPECT_EQ(caps->hasCapability(RSC_HWOCCLUSION), true);
     EXPECT_EQ(caps->hasCapability(RSC_USER_CLIP_PLANES), true);
     EXPECT_EQ(caps->hasCapability(RSC_VERTEX_FORMAT_UBYTE4), true);
-    EXPECT_EQ(caps->hasCapability(RSC_INFINITE_FAR_PLANE), true);
     EXPECT_EQ(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE), true);
     EXPECT_EQ(caps->hasCapability(RSC_TEXTURE_FLOAT), true);
 

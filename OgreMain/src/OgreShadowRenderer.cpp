@@ -934,8 +934,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
 
     // Do we have access to vertex programs?
     bool extrudeInSoftware = true;
-    bool finiteExtrude = !mShadowUseInfiniteFarPlane ||
-        !mDestRenderSystem->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE);
+    bool finiteExtrude = !mShadowUseInfiniteFarPlane;
     if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM))
     {
         extrudeInSoftware = false;

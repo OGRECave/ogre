@@ -954,9 +954,6 @@ namespace Ogre
         @remarks
         This method allows you to 'mask off' rendering in all but a given rectangular area
         as identified by the parameters to this method.
-        @note
-        Not all systems support this method. Check the RenderSystemCapabilities for the
-        RSC_SCISSOR_TEST capability to see if it is supported.
         @param enabled True to enable the scissor test, false to disable it.
         @param rect The location of the corners of the rectangle, expressed in
         <i>pixels</i>.

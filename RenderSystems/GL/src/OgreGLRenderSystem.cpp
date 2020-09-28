@@ -2287,8 +2287,7 @@ namespace Ogre {
             cmd = GL_INTERPOLATE;
             break;
         case LBX_DOTPRODUCT:
-            cmd = mCurrentCapabilities->hasCapability(RSC_DOT3)
-                ? GL_DOT3_RGB : GL_MODULATE;
+            cmd = GL_DOT3_RGB;
             break;
         default:
             cmd = 0;

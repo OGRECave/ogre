@@ -1242,8 +1242,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     // to prevent dark caps getting clipped
     if (isShadowTechniqueStencilBased() && 
         camera->getProjectionType() == PT_PERSPECTIVE &&
-        camera->getFarClipDistance() != 0 && 
-        mDestRenderSystem->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE) && 
+        camera->getFarClipDistance() != 0 &&
         mShadowRenderer.mShadowUseInfiniteFarPlane)
     {
         // infinite far distance
@@ -3055,9 +3054,6 @@ const RealRect& SceneManager::getLightScissorRect(Light* l, const Camera* cam)
 //---------------------------------------------------------------------
 ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* cam)
 {
-    if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_SCISSOR_TEST))
-        return CLIPPED_NONE;
-
     RealRect finalRect;
     // init (inverted since we want to grow from nothing)
     finalRect.left = finalRect.bottom = 1.0f;
@@ -3117,9 +3113,6 @@ void SceneManager::buildScissor(const Light* light, const Camera* cam, RealRect&
 //---------------------------------------------------------------------
 void SceneManager::resetScissor()
 {
-    if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_SCISSOR_TEST))
-        return;
-
     mDestRenderSystem->setScissorTest(false);
 }
 //---------------------------------------------------------------------
