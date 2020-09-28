@@ -112,7 +112,7 @@ namespace Ogre
         RSC_HWOCCLUSION             = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 14),
         /// Supports user clipping planes
         RSC_USER_CLIP_PLANES        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 15),
-        /// Supports the VET_UBYTE4 vertex element type
+        /// @deprecated All targetted APIs by Ogre support this feature
         RSC_VERTEX_FORMAT_UBYTE4    = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 16),
         /// @deprecated All targetted APIs by Ogre support this feature
         RSC_INFINITE_FAR_PLANE      = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 17),
