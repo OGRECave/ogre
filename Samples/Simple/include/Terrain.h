@@ -675,10 +675,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         //! [camera_setup]
 
         //! [camera_inf]
-        if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE))
-        {
-            mCamera->setFarClipDistance(0);   // enable infinite far clip distance if we can
-        }
+        mCamera->setFarClipDistance(0);   // enable infinite far clip distance
         //! [camera_inf]
     }
 

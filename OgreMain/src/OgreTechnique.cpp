@@ -152,12 +152,6 @@ namespace Ogre {
                         err = "Array textures";
                     }
 
-                    if (tex->getColourBlendMode().operation == LBX_DOTPRODUCT &&
-                        !caps->hasCapability(RSC_DOT3))
-                    {
-                        err = "DOT3 blending";
-                    }
-
                     if (!err.empty())
                     {
                         // Fail
