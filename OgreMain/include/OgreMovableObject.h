@@ -608,7 +608,7 @@ namespace Ogre {
             const String& name, SceneManager* manager, 
             const NameValuePairList* params = 0);
         /** Destroy an instance of the object */
-        void destroyInstance(MovableObject* obj) { delete obj; }
+        virtual void destroyInstance(MovableObject* obj) { delete obj; }
 
         /** Does this factory require the allocation of a 'type flag', used to 
             selectively include / exclude this type from scene queries?
