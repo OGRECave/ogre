@@ -114,6 +114,7 @@ namespace Ogre
         }
 
         outStream << "#include <OgreUnifiedShader.h>\n";
+        outStream << "#include <FFPLib_Fog.glsl>\n";
 
         outStream <<
             "uniform mat4 worldMatrix;\n"
@@ -280,13 +281,11 @@ namespace Ogre
         {
             if (terrain->getSceneManager()->getFogMode() == FOG_LINEAR)
             {
-                outStream <<
-                    "    fogVal = saturate((gl_Position.z - fogParams.y) * fogParams.w);\n";
+                outStream << "    FFP_VertexFog_Linear(gl_Position, fogParams, fogVal);\n";
             }
             else
             {
-                outStream <<
-                    "    fogVal = 1.0 - saturate(1.0 / (exp(gl_Position.z * fogParams.x)));\n";
+                outStream << "    FFP_VertexFog_Exp(gl_Position, fogParams, fogVal);\n";
             }
         }
 
@@ -313,6 +312,7 @@ namespace Ogre
         outStream << "#include <OgreUnifiedShader.h>\n";
         // helpers
         outStream << "#include <TerrainHelpers.glsl>\n";
+        outStream << "#include <SGXLib_PerPixelLighting.glsl>\n";
 
         if (prof->isShadowingEnabled(tt, terrain))
             generateFpDynamicShadowsHelpers(prof, terrain, tt, outStream);
@@ -595,37 +595,37 @@ namespace Ogre
                 generateFpDynamicShadows(prof, terrain, tt, outStream);
             }
 
-            // diffuse lighting
-            outStream << "    normal = normalize(normal);\n";
-            outStream << "    vec4 litRes = lit(dot(normal, lightDir), dot(normal, halfAngle), scaleBiasSpecular.z);\n";
-            outStream << "    gl_FragColor.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
-
             // specular default
             if (!prof->isLayerSpecularMappingEnabled())
                 outStream << "    specular = 1.0;\n";
 
             if (tt == RENDER_COMPOSITE_MAP)
             {
+                outStream << "    SGX_Light_Directional_Diffuse(normal, lightDir, diffuse, gl_FragColor.rgb);\n";
                 // Lighting embedded in alpha
-                outStream <<
-                    "    gl_FragColor.a = shadow;\n";
+                outStream << "    gl_FragColor.a = shadow;\n";
             }
             else
             {
+                outStream << "    vec3 specularCol = vec3(0,0,0);\n";
+                outStream << "    SGX_Light_Directional_DiffuseSpecular(normal, eyeDir, lightDir, lightDiffuseColour * diffuse, "
+                             "lightSpecularColour * specular, scaleBiasSpecular.z, gl_FragColor.rgb, specularCol);\n";
+
                 // Apply specular
-                outStream << "    gl_FragColor.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+                outStream << "    gl_FragColor.rgb += specularCol;\n";
 
                 if (prof->getParent()->getDebugLevel())
                 {
                     outStream << "    gl_FragColor.rg += lodInfo.xy;\n";
                 }
             }
+            outStream << "    gl_FragColor.rgb = gl_FragColor.rgb * shadow + ambient.rgb * diffuse;\n";
         }
 
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
         if (fog)
         {
-            outStream << "    gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColour, fogVal);\n";
+            outStream << "    gl_FragColor.rgb = mix(fogColour, gl_FragColor.rgb, fogVal);\n";
         }
 
         outStream << "}\n";
