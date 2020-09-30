@@ -36,10 +36,3 @@ vec4 expand(vec4 v)
 {
     return v * 2.0 - 1.0;
 }
-// From http://substance.io/zauner/porting-vvvv-hlsl-shaders-to-vvvvjs
-vec4 lit(float NdotL, float NdotH, float m) {
-    float ambient = 1.0;
-    float diffuse = max(0.0, NdotL);
-    float specular = step(0.0, NdotL) * max(pow(NdotH, m), 0.0);
-    return vec4(ambient, diffuse, specular, 1.0);
-}
