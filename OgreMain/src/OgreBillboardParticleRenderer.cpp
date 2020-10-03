@@ -171,7 +171,7 @@ namespace Ogre {
 
         // Only set bounds if there are any active particles
         if(currentParticles.size())
-            mBillboardSet->setBounds(aabb, Math::boundingRadiusFromAABB(aabb));
+            mBillboardSet->setBounds(aabb, Math::boundingRadiusFromAABBCentered(aabb));
 
         mBillboardSet->endBillboards();
 

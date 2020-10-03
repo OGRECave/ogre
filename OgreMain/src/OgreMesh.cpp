@@ -401,7 +401,7 @@ namespace Ogre {
     void Mesh::_setBounds(const AxisAlignedBox& bounds, bool pad)
     {
         mAABB = bounds;
-        mBoundRadius = Math::boundingRadiusFromAABB(mAABB);
+        mBoundRadius = Math::boundingRadiusFromAABBCentered(mAABB);
 
         if( mAABB.isFinite() )
         {

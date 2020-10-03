@@ -1099,7 +1099,7 @@ namespace Ogre {
     void ParticleSystem::setBounds(const AxisAlignedBox& aabb)
     {
         mAABB = aabb;
-        mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
+        mBoundingRadius = Math::boundingRadiusFromAABBCentered(mAABB);
 
     }
     //-----------------------------------------------------------------------

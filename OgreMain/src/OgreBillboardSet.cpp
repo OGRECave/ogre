@@ -145,7 +145,7 @@ namespace Ogre {
         mAABB.merge(newMin);
         mAABB.merge(newMax);
 
-        mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
+        mBoundingRadius = Math::boundingRadiusFromAABBCentered(mAABB);
 
         return newBill;
     }
@@ -469,7 +469,7 @@ namespace Ogre {
             Vector3 vecAdjust(adjust, adjust, adjust);
 
             mAABB.setExtents(mAABB.getMinimum() - vecAdjust, mAABB.getMaximum() + vecAdjust);
-            mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
+            mBoundingRadius = Math::boundingRadiusFromAABBCentered(mAABB);
         }
 
         if (mParentNode)
