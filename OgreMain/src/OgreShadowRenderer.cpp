@@ -2177,10 +2177,8 @@ bool SceneManager::ShadowRenderer::ShadowCasterSceneQueryListener::queryResult(
         if (mFarDistSquared)
         {
             // Check object is within the shadow far distance
-            Vector3 toObj = object->getParentNode()->_getDerivedPosition()
-                - mCamera->getDerivedPosition();
-            Real radius = object->getWorldBoundingSphere().getRadius();
-            Real dist =  toObj.squaredLength();
+            Real dist =  object->getParentNode()->getSquaredViewDepth(mCamera);
+            Real radius = object->getBoundingRadiusScaled();
             if (dist - (radius * radius) > mFarDistSquared)
             {
                 // skip, beyond max range
