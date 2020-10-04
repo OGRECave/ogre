@@ -261,6 +261,9 @@ namespace Ogre {
         */
         virtual Real getBoundingRadius(void) const = 0;
 
+        /// as getBoundingRadius, but with scaling applied
+        Real getBoundingRadiusScaled() const;
+
         /** Retrieves the axis-aligned bounding box for this object in world coordinates. */
         virtual const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const;
         /** Retrieves the worldspace bounding sphere for this object. */

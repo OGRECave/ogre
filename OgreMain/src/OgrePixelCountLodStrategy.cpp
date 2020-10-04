@@ -96,9 +96,7 @@ namespace Ogre {
     Real PixelCountLodStrategyBase::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
         // Get area of unprojected circle with object bounding radius
-        const Vector3& scl = movableObject->getParentNode()->_getDerivedScale();
-        Real factor = std::max(std::max(scl.x, scl.y), scl.z);
-        Real boundingArea = Math::PI * Math::Sqr(movableObject->getBoundingRadius() * factor);
+        Real boundingArea = Math::PI * Math::Sqr(movableObject->getBoundingRadiusScaled());
 
         // Base computation on projection type
         switch (camera->getProjectionType())
