@@ -57,7 +57,6 @@ namespace Ogre {
         mutable Plane mDerivedPlane;
         mutable Vector3 mLastTranslate;
         mutable Quaternion mLastRotate;
-        AxisAlignedBox mNullBB;
         mutable bool mDirty;
         static String msMovableType;
     public:
@@ -73,7 +72,7 @@ namespace Ogre {
         /// Overridden from MovableObject
         void _notifyCurrentCamera(Camera*) { /* don't care */ }
         /// Overridden from MovableObject
-        const AxisAlignedBox& getBoundingBox(void) const { return mNullBB; }
+        const AxisAlignedBox& getBoundingBox(void) const { return AxisAlignedBox::BOX_NULL; }
         /// Overridden from MovableObject
         Real getBoundingRadius(void) const { return 0.0f; }
         /// Overridden from MovableObject
