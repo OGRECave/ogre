@@ -201,14 +201,11 @@ namespace Ogre {
 
             if (cam->getUseRenderingDistance() && mUpperDistance > 0)
             {
-                Real rad = getBoundingRadius();
+                Real rad = getBoundingRadiusScaled();
                 Real squaredDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
 
-                const Vector3& scl = mParentNode->_getDerivedScale();
-                Real factor = std::max(std::max(scl.x, scl.y), scl.z);
-
                 // Max distance to still render
-                Real maxDist = mUpperDistance + rad * factor;
+                Real maxDist = mUpperDistance + rad;
                 if (squaredDepth > Math::Sqr(maxDist))
                 {
                     mBeyondFarDistance = true;
@@ -292,6 +289,14 @@ namespace Ogre {
         // fallback
         return Affine3::IDENTITY;
     }
+
+    Real MovableObject::getBoundingRadiusScaled() const
+    {
+        const Vector3& scl = mParentNode->_getDerivedScale();
+        Real factor = std::max(std::max(std::abs(scl.x), std::abs(scl.y)), std::abs(scl.z));
+        return getBoundingRadius() * factor;
+    }
+
     //-----------------------------------------------------------------------
     const AxisAlignedBox& MovableObject::getWorldBoundingBox(bool derive) const
     {
@@ -309,9 +314,7 @@ namespace Ogre {
     {
         if (derive)
         {
-            const Vector3& scl = mParentNode->_getDerivedScale();
-            Real factor = std::max(std::max(scl.x, scl.y), scl.z);
-            mWorldBoundingSphere.setRadius(getBoundingRadius() * factor);
+            mWorldBoundingSphere.setRadius(getBoundingRadiusScaled());
             mWorldBoundingSphere.setCenter(mParentNode->_getDerivedPosition());
         }
         return mWorldBoundingSphere;
@@ -347,10 +350,7 @@ namespace Ogre {
             {
                 mLightListUpdated = frame;
 
-                const Vector3& scl = mParentNode->_getDerivedScale();
-                Real factor = std::max(std::max(scl.x, scl.y), scl.z);
-
-                sn->findLights(mLightList, this->getBoundingRadius() * factor, this->getLightMask());
+                sn->findLights(mLightList, getBoundingRadiusScaled(), this->getLightMask());
             }
         }
         else
