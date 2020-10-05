@@ -1,87 +1,90 @@
 import Ogre
-import Ogre.RTShader
+from Ogre import RTShader, Overlay, Bites
 
-class SGResolver(Ogre.MaterialManager_Listener):
-    def __init__(self, shadergen):
-        Ogre.MaterialManager_Listener.__init__(self)
-        self.shadergen = shadergen
+class SampleApp(Bites.ApplicationContext, Bites.InputListener):
+    def __init__(self):
+        Bites.ApplicationContext.__init__(self, "PySample")
+        Bites.InputListener.__init__(self)
 
-    def handleSchemeNotFound(self, idx, name, mat, lod_idx, rend):
-        if name != Ogre.RTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME:
-            return None
+    def keyPressed(self, evt):
+        if evt.keysym.sym == Bites.SDLK_ESCAPE:
+            self.getRoot().queueEndRendering()
 
-        def_name = Ogre.cvar.MaterialManager_DEFAULT_SCHEME_NAME
-        succ = self.shadergen.createShaderBasedTechnique(mat, def_name, name)
+        return True
 
-        if not succ:
-            return None
+    def loadResources(self):
+        self.enableShaderCache()
 
-        self.shadergen.validateMaterial(name, mat.getName(), mat.getGroup())
+        # load essential resources for trays/ loading bar
+        Ogre.ResourceGroupManager.getSingleton().initialiseResourceGroup("Essential")
+        self.createDummyScene()
+        self.trays = Bites.TrayManager("Interface", self.getRenderWindow())
+        self.addInputListener(self.trays)
 
-        return mat.getTechnique(1)
+        # show loading progress
+        self.trays.showLoadingBar(1, 0)
+        ret = Bites.ApplicationContext.loadResources(self)
 
-def main():
-    root = Ogre.Root("plugins.cfg", "ogre.cfg", "")
+        # clean up
+        self.trays.hideLoadingBar()
+        self.destroyDummyScene()
+        return ret
 
-    cfg = Ogre.ConfigFile()
-    cfg.loadDirect("resources.cfg")
+    def setup(self):
+        Bites.ApplicationContext.setup(self)
+        self.addInputListener(self)
 
-    rgm = Ogre.ResourceGroupManager.getSingleton()
+        root = self.getRoot()
+        scn_mgr = root.createSceneManager()
 
-    for sec, settings in cfg.getSettingsBySection().items():
-        for kind, loc in settings.items():
-            rgm.addResourceLocation(loc, kind, sec)
+        shadergen = RTShader.ShaderGenerator.getSingleton()
+        shadergen.addSceneManager(scn_mgr)  # must be done before we do anything with the scene
 
-    arch = cfg.getSettings("General").values()[0]
-    rgm.addResourceLocation(arch + "/materials/programs/GLSL120", "FileSystem", "General")
-    arch += "/RTShaderLib"
-    rgm.addResourceLocation(arch + "/materials", "FileSystem", "General")
-    rgm.addResourceLocation(arch + "/GLSL", "FileSystem", "General")
+        # overlay/ trays
+        scn_mgr.addRenderQueueListener(self.getOverlaySystem())
+        self.trays.showFrameStats(Bites.TL_TOPRIGHT)
+        self.trays.refreshCursor()
 
-    if not root.restoreConfig():
-        root.showConfigDialog(None)
-        root.saveConfig()
+        # enable per pixel lighting
+        rs = shadergen.getRenderState(RTShader.ShaderGenerator.DEFAULT_SCHEME_NAME)
+        rs.addTemplateSubRenderState(shadergen.createSubRenderState(RTShader.PerPixelLighting.Type))
 
-    win = root.initialise(True)
+        scn_mgr.setAmbientLight((.1, .1, .1))
 
-    Ogre.RTShader.ShaderGenerator.initialize()
-    shadergen = Ogre.RTShader.ShaderGenerator.getSingleton()
+        light = scn_mgr.createLight("MainLight")
+        lightnode = scn_mgr.getRootSceneNode().createChildSceneNode()
+        lightnode.setPosition(0, 10, 15)
+        lightnode.attachObject(light)
 
-    sgres = SGResolver(shadergen)
-    Ogre.MaterialManager.getSingleton().addListener(sgres)
+        cam = scn_mgr.createCamera("myCam")
+        cam.setNearClipDistance(5)
+        cam.setAutoAspectRatio(True)
+        camnode = scn_mgr.getRootSceneNode().createChildSceneNode()
+        camnode.attachObject(cam)
 
-    rgm.initialiseAllResourceGroups()
+        self.camman = Bites.CameraMan(camnode)
+        self.camman.setStyle(Bites.CS_ORBIT)
+        self.camman.setYawPitchDist(Ogre.Radian(0), Ogre.Radian(0.3), 15)
+        self.addInputListener(self.camman)
 
-    rs = shadergen.getRenderState(Ogre.RTShader.cvar.ShaderGenerator_DEFAULT_SCHEME_NAME)
-    rs.addTemplateSubRenderState(shadergen.createSubRenderState(Ogre.RTShader.cvar.PerPixelLighting_Type));
+        # must keep a reference to ctrls so it does not get deleted
+        self.ctrls = Bites.AdvancedRenderControls(self.trays, cam)
+        self.addInputListener(self.ctrls)
 
-    scn_mgr = root.createSceneManager()
-    shadergen.addSceneManager(scn_mgr)
+        vp = self.getRenderWindow().addViewport(cam)
+        vp.setBackgroundColour((.3, .3, .3))
 
-    scn_mgr.setAmbientLight(Ogre.ColourValue(.1, .1, .1))
-
-    light = scn_mgr.createLight("MainLight")
-    lightnode = scn_mgr.getRootSceneNode().createChildSceneNode()
-    lightnode.setPosition(0, 10, 15)
-    lightnode.attachObject(light)
-
-    cam = scn_mgr.createCamera("myCam")
-    cam.setNearClipDistance(5)
-
-    camnode = scn_mgr.getRootSceneNode().createChildSceneNode()
-    camnode.attachObject(cam)
-    camnode.lookAt((0, 0, -1), Ogre.Node.TS_WORLD)
-    camnode.setPosition(0, 0, 15)
+        ent = scn_mgr.createEntity("Sinbad.mesh")
+        node = scn_mgr.getRootSceneNode().createChildSceneNode()
+        node.attachObject(ent)
     
-    vp = win.addViewport(cam)
-    vp.setBackgroundColour((.3, .3, .3))
-
-    ent = scn_mgr.createEntity("Sinbad.mesh")
-    node = scn_mgr.getRootSceneNode().createChildSceneNode()
-    node.attachObject(ent)
+    def shutdown(self):
+        # manually destroy in reverse creation order
+        del app.ctrls
+        del app.trays
     
-    while not root.endRenderingQueued():
-        root.renderOneFrame()
-
 if __name__ == "__main__":
-    main()
+    app = SampleApp()
+    app.initApp()
+    app.getRoot().startRendering()
+    app.closeApp()

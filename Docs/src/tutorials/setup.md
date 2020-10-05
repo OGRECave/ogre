@@ -47,7 +47,7 @@ finally we start everything as
 @snippet Samples/Tutorials/Bootstrap.cpp main
 @note You can find the full code of the above example at 
 * `Samples/Tutorials/Bootstrap.cpp` for C++
-* `Samples/Python/bites_sample.py` for Python
+* `Samples/Python/sample.py` for Python
 * `Samples/AndroidJNI/MainActivity.java` for Java (Android)
 * `Samples/Csharp/example.cs` for C\#
 
