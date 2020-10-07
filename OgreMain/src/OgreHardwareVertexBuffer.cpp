@@ -832,22 +832,4 @@ namespace Ogre {
         mBindingMap.swap(newBindingMap);
         mHighIndex = targetIndex;
     }
-    //-----------------------------------------------------------------------------
-    bool VertexBufferBinding::hasInstanceData() const
-    {
-        VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
-        iend = mBindingMap.end();
-        for (i = mBindingMap.begin(); i != iend; ++i)
-        {
-            if ( i->second->isInstanceData() )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-
-
 }
