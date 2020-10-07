@@ -84,7 +84,7 @@ namespace Ogre {
     public:
         
         typedef std::set<Entity*> EntitySet;
-        typedef std::map<unsigned short, bool> SchemeHardwareAnimMap;
+        typedef std::vector<std::pair<unsigned short, bool>> SchemeHardwareAnimMap;
         typedef std::vector<SubEntity*> SubEntityList;
     protected:
 

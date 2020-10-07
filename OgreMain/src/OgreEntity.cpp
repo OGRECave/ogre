@@ -1724,13 +1724,13 @@ namespace Ogre {
     {
         //find whether the entity has hardware animation for the current active sceme
         unsigned short schemeIndex = MaterialManager::getSingleton()._getActiveSchemeIndex();
-        SchemeHardwareAnimMap::iterator it = mSchemeHardwareAnim.find(schemeIndex);
-        if (it == mSchemeHardwareAnim.end())
+        for(const auto& p : mSchemeHardwareAnim)
         {
-            //evaluate the animation hardware value
-            it = mSchemeHardwareAnim.emplace(schemeIndex, calcVertexProcessing()).first;
+            if(p.first == schemeIndex) return p.second;
         }
-        return it->second;
+        bool ret = calcVertexProcessing();
+        mSchemeHardwareAnim.emplace_back(schemeIndex, ret);
+        return ret;
     }
 
     //-----------------------------------------------------------------------
