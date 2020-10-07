@@ -247,12 +247,12 @@ namespace Ogre {
         /** Internal method - returns the active scheme index.
         @see Technique::setSchemeName
         */
-        virtual unsigned short _getActiveSchemeIndex(void) const;
+        unsigned short _getActiveSchemeIndex(void) const { return mActiveSchemeIndex; }
 
         /** Returns the name of the active material scheme. 
         @see Technique::setSchemeName
         */
-        virtual const String& getActiveScheme(void) const;
+        const String& getActiveScheme(void) const { return mActiveSchemeName; }
         
         /** Sets the name of the active material scheme. 
         @see Technique::setSchemeName

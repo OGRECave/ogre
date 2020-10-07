@@ -191,16 +191,6 @@ namespace Ogre {
         return DEFAULT_SCHEME_NAME;
     }
     //-----------------------------------------------------------------------
-    unsigned short MaterialManager::_getActiveSchemeIndex(void) const
-    {
-        return mActiveSchemeIndex;
-    }
-    //-----------------------------------------------------------------------
-    const String& MaterialManager::getActiveScheme(void) const
-    {
-        return mActiveSchemeName;
-    }
-    //-----------------------------------------------------------------------
     void MaterialManager::setActiveScheme(const String& schemeName)
     {
         if (mActiveSchemeName != schemeName)

@@ -503,14 +503,6 @@ namespace Ogre {
         mRenderers.push_back(newRend);
     }
     //-----------------------------------------------------------------------
-    SceneManager* Root::_getCurrentSceneManager(void) const
-    {
-        if (mSceneManagerStack.empty())
-            return 0;
-        else
-            return mSceneManagerStack.back();
-    }
-    //-----------------------------------------------------------------------
     void Root::_pushCurrentSceneManager(SceneManager* sm)
     {
         mSceneManagerStack.push_back(sm);
