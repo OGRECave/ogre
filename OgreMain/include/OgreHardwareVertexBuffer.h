@@ -603,9 +603,13 @@ namespace Ogre {
         void closeGaps(BindingIndexMap& bindingIndexMap);
 
         /// Returns true if this binding has an element that contains instance data
-        bool hasInstanceData() const;
-
-
+        bool hasInstanceData() const
+        {
+            for (const auto& b : mBindingMap)
+                if (b.second->isInstanceData())
+                    return true;
+            return false;
+        }
     };
     /** @} */
     /** @} */
