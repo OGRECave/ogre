@@ -201,15 +201,15 @@ namespace Ogre {
         mEmitters.clear();
     }
     //-----------------------------------------------------------------------
-    ParticleAffector2* ParticleSystem::addAffector(const String& affectorType)
+    ParticleAffector* ParticleSystem::addAffector(const String& affectorType)
     {
-        ParticleAffector2* af = 
-            ParticleSystemManager2::getSingleton()._createAffector(affectorType, this);
+        ParticleAffector* af = 
+            ParticleSystemManager::getSingleton()._createAffector(affectorType, this);
         mAffectors.push_back(af);
         return af;
     }
     //-----------------------------------------------------------------------
-    ParticleAffector2* ParticleSystem::getAffector(unsigned short index) const
+    ParticleAffector* ParticleSystem::getAffector(unsigned short index) const
     {
         assert(index < mAffectors.size() && "Affector index out of bounds!");
         return mAffectors[index];
@@ -224,7 +224,7 @@ namespace Ogre {
     {
         assert(index < mAffectors.size() && "Affector index out of bounds!");
         ParticleAffectorList::iterator ai = mAffectors.begin() + index;
-        ParticleSystemManager2::getSingleton()._destroyAffector(*ai);
+        ParticleSystemManager::getSingleton()._destroyAffector(*ai);
         mAffectors.erase(ai);
     }
     //-----------------------------------------------------------------------
@@ -233,7 +233,7 @@ namespace Ogre {
         // DON'T delete directly, we don't know what heap these have been created on
         for (auto a : mAffectors)
         {
-            ParticleSystemManager2::getSingleton()._destroyAffector(a);
+            ParticleSystemManager::getSingleton()._destroyAffector(a);
         }
         mAffectors.clear();
     }
@@ -254,8 +254,8 @@ namespace Ogre {
         // Copy affectors
         for(unsigned short i = 0; i < rhs.getNumAffectors(); ++i)
         {
-            ParticleAffector2* rhsAf = rhs.getAffector(i);
-            ParticleAffector2* newAf = addAffector(rhsAf->getType());
+            ParticleAffector* rhsAf = rhs.getAffector(i);
+            ParticleAffector* newAf = addAffector(rhsAf->getType());
             rhsAf->copyParametersTo(newAf);
         }
         setParticleQuota(rhs.getParticleQuota());
@@ -1083,7 +1083,7 @@ namespace Ogre {
                     size_t oldSize = e.size();
                     for (size_t t = oldSize; t < maxNumberOfEmitters; ++t)
                     {
-                        clonedEmitter = ParticleSystemManager2::getSingleton()._createEmitter(emitter->getType(), this);
+                        clonedEmitter = ParticleSystemManager::getSingleton()._createEmitter(emitter->getType(), this);
                         emitter->copyParametersTo(clonedEmitter);
                         clonedEmitter->setEmitted(emitter->isEmitted()); // is always 'true' by the way, but just in case
                         clonedEmitter->_notifyOwner(this);
@@ -1142,7 +1142,7 @@ namespace Ogre {
         {
             for (ParticleEmitter* emitter : kv.second)
             {
-                ParticleSystemManager2::getSingleton()._destroyEmitter(emitter);
+                ParticleSystemManager::getSingleton()._destroyEmitter(emitter);
             }
             kv.second.clear();
         }
@@ -1316,14 +1316,14 @@ namespace Ogre {
             StringConverter::parseReal(val));
     }
    //-----------------------------------------------------------------------
-    ParticleAffector2::~ParticleAffector2() 
+    ParticleAffector::~ParticleAffector() 
     {
     }
     //-----------------------------------------------------------------------
     ParticleAffectorFactory2::~ParticleAffectorFactory2() 
     {
         // Destroy all affectors
-        std::vector<ParticleAffector2*>::iterator i;
+        std::vector<ParticleAffector*>::iterator i;
         for (i = mAffectors.begin(); i != mAffectors.end(); ++i)
         {
             OGRE_DELETE (*i);
@@ -1333,9 +1333,9 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void ParticleAffectorFactory2::destroyAffector(ParticleAffector2* e)
+    void ParticleAffectorFactory2::destroyAffector(ParticleAffector* e)
     {
-        std::vector<ParticleAffector2*>::iterator i;
+        std::vector<ParticleAffector*>::iterator i;
         for (i = mAffectors.begin(); i != mAffectors.end(); ++i)
         {
             if ((*i) == e)

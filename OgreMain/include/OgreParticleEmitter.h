@@ -59,7 +59,7 @@ namespace Ogre {
         the available types. It comes with some in-built, but allows plugins or applications to extend the emitter types available.
         This is done by subclassing ParticleEmitter to have the appropriate emission behaviour you want,
         and also creating a subclass of ParticleEmitterFactory which is responsible for creating instances 
-        of your new emitter type. You register this factory with the ParticleSystemManager2 using
+        of your new emitter type. You register this factory with the ParticleSystemManager using
         addEmitterFactory, and from then on emitters of this type can be created either from code or through
         text particle scripts by naming the type.
     @par

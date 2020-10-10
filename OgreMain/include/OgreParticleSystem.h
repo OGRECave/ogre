@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class ParticleAffector2;
+    class ParticleAffector;
     class ParticleEmitter;
     class ParticleSystemRenderer;
     class ParticleIterator2;
@@ -168,7 +168,7 @@ namespace Ogre {
         ParticleSystem();
         /** Creates a particle system with no emitters or affectors.
         @remarks
-            You should use the ParticleSystemManager2 to create particle systems rather than creating
+            You should use the ParticleSystemManager to create particle systems rather than creating
             them directly.
         */
         ParticleSystem(const String& name);
@@ -184,7 +184,7 @@ namespace Ogre {
             and the ParticleVisual instances they create.
         @param typeName String identifying the type of renderer to use; a new 
             instance of this type will be created; a factory must have been registered
-            with ParticleSystemManager2.
+            with ParticleSystemManager.
         */
         void setRenderer (ParticleSystemRenderer::Ptr&& renderer);
 
@@ -239,14 +239,14 @@ namespace Ogre {
         
         /** Adds an affector to this particle system.
         @remarks
-            Particles are modified over time in a particle system by affectors - see the ParticleAffector2
+            Particles are modified over time in a particle system by affectors - see the ParticleAffector
             class for more details.
         @param 
             affectorType String identifying the affector type to create. Affector types are defined
             by registering new factories with the manager - see ParticleAffectorFactory2 for more details.
             Affector types can be extended by OGRE, plugin authors or application developers.
         */
-        ParticleAffector2* addAffector(const String& affectorType);
+        ParticleAffector* addAffector(const String& affectorType);
 
         /** Retrieves an affector by it's index (zero-based).
         @remarks
@@ -257,7 +257,7 @@ namespace Ogre {
         @param
             index Zero-based index of the affector to retrieve.
         */
-        ParticleAffector2* getAffector(unsigned short index) const;
+        ParticleAffector* getAffector(unsigned short index) const;
 
         /** Returns the number of affectors for this particle system. */
         unsigned short getNumAffectors(void) const;
@@ -722,7 +722,7 @@ namespace Ogre {
         ActiveEmittedEmitterList mActiveEmittedEmitters;
 
         typedef std::vector<ParticleEmitter::Ptr> ParticleEmitterList;
-        typedef std::vector<ParticleAffector2*> ParticleAffectorList;
+        typedef std::vector<ParticleAffector*> ParticleAffectorList;
         
         /// List of particle emitters, ie sources of particles
         ParticleEmitterList mEmitters;
