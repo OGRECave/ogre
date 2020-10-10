@@ -720,7 +720,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    ParticleEmitterFactory2::~ParticleEmitterFactory2()
+    ParticleEmitterFactory::~ParticleEmitterFactory()
     {
         // Destroy all emitters
         std::vector<ParticleEmitter*>::iterator i;
@@ -733,7 +733,7 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void ParticleEmitterFactory2::destroyEmitter(ParticleEmitter* e)        
+    void ParticleEmitterFactory::destroyEmitter(ParticleEmitter* e)        
     {
         std::vector<ParticleEmitter*>::iterator i;
         for (i = mEmitters.begin(); i != mEmitters.end(); ++i)

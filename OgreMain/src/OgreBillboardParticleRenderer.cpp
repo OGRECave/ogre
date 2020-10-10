@@ -142,7 +142,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRenderer::_updateRenderQueue(RenderQueue* queue, 
-        std::list<Particle2*>& currentParticles, bool cullIndividually)
+        std::list<Particle*>& currentParticles, bool cullIndividually)
     {
         mBillboardSet->setCullIndividually(cullIndividually);
 
@@ -158,10 +158,10 @@ namespace Ogre {
         if (invert)
             invWorld = mBillboardSet->getParentSceneNode()->_getFullTransform().inverse();
 
-        for (std::list<Particle2*>::iterator i = currentParticles.begin();
+        for (std::list<Particle*>::iterator i = currentParticles.begin();
             i != currentParticles.end(); ++i)
         {
-            Particle2* p = *i;
+            Particle* p = *i;
             bb.mPosition = p->mPosition;
             Vector3 pos = p->mPosition;
 
@@ -262,18 +262,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    const String& BillboardParticleRendererFactory2::getType() const
+    const String& BillboardParticleRendererFactory::getType() const
     {
         return rendererTypeName;
     }
     //-----------------------------------------------------------------------
-    ParticleSystemRenderer* BillboardParticleRendererFactory2::createInstance( 
+    ParticleSystemRenderer* BillboardParticleRendererFactory::createInstance( 
         const String& name )
     {
         return OGRE_NEW BillboardParticleRenderer();
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRendererFactory2::destroyInstance( 
+    void BillboardParticleRendererFactory::destroyInstance( 
         ParticleSystemRenderer* inst)
     {
         OGRE_DELETE  inst;

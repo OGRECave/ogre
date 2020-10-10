@@ -52,7 +52,7 @@ namespace Ogre {
     ParticleSystem::CmdIterationInterval ParticleSystem::msIterationIntervalCmd;
     ParticleSystem::CmdNonvisibleTimeout ParticleSystem::msNonvisibleTimeoutCmd;
 
-    RadixSort<ParticleSystem::ActiveParticleList, Particle2*, float> ParticleSystem::mRadixSorter;
+    RadixSort<ParticleSystem::ActiveParticleList, Particle*, float> ParticleSystem::mRadixSorter;
 
     Real ParticleSystem::msDefaultIterationInterval = 0;
     Real ParticleSystem::msDefaultNonvisibleTimeout = 0;
@@ -541,15 +541,15 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Particle2* ParticleSystem::createEmitterParticle(const String& emitterName)
+    Particle* ParticleSystem::createEmitterParticle(const String& emitterName)
     {
         // Get the appropriate list and retrieve an emitter 
-        Particle2* p = 0;
+        Particle* p = 0;
         std::list<ParticleEmitter*>* fee = findFreeEmittedEmitter(emitterName);
         if (fee && !fee->empty())
         {
             p = fee->front();
-            p->mParticleType = Particle2::Emitter;
+            p->mParticleType = Particle::Emitter;
             fee->pop_front();
 //            mActiveParticles.push_back(p);
 
@@ -740,7 +740,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultDimensions( Real width, Real height )
     {
-        assert(width >= 0 && height >= 0 && "Particle2 dimensions can not be negative");
+        assert(width >= 0 && height >= 0 && "Particle dimensions can not be negative");
         mDefaultWidth = width;
         mDefaultHeight = height;
         if (mRenderer)
@@ -751,7 +751,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultWidth(Real width)
     {
-        assert(width >= 0 && "Particle2 dimensions can not be negative");
+        assert(width >= 0 && "Particle dimensions can not be negative");
         mDefaultWidth = width;
         if (mRenderer)
         {
@@ -766,7 +766,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultHeight(Real height)
     {
-        assert(height >= 0 && "Particle2 dimensions can not be negative");
+        assert(height >= 0 && "Particle dimensions can not be negative");
         mDefaultHeight = height;
         if (mRenderer)
         {
@@ -969,7 +969,7 @@ namespace Ogre {
         : sortDir(dir)
     {
     }
-    float ParticleSystem::SortByDirectionFunctor::operator()(Particle2* p) const
+    float ParticleSystem::SortByDirectionFunctor::operator()(Particle* p) const
     {
         return sortDir.dotProduct(p->mPosition);
     }
@@ -977,7 +977,7 @@ namespace Ogre {
         : sortPos(pos)
     {
     }
-    float ParticleSystem::SortByDistanceFunctor::operator()(Particle2* p) const
+    float ParticleSystem::SortByDistanceFunctor::operator()(Particle* p) const
     {
         // Sort descending by squared distance
         return - (sortPos - p->mPosition).squaredLength();

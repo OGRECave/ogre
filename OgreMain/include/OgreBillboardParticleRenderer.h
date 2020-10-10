@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __BillboardParticleRenderer2_H__
-#define __BillboardParticleRenderer2_H__
+#ifndef __BillboardParticleRenderer_H__
+#define __BillboardParticleRenderer_H__
 
 #include <memory>
 #include "OgrePrerequisites.h"
@@ -151,7 +151,7 @@ namespace Ogre {
         const String& getType(void) const;
         /// @copydoc ParticleSystemRenderer::_updateRenderQueue
         void _updateRenderQueue(RenderQueue* queue, 
-            std::list<Particle2*>& currentParticles, bool cullIndividually);
+            std::list<Particle*>& currentParticles, bool cullIndividually);
         virtual void _updateRenderQueue (RenderQueue* queue,
             Particles2& particles, bool cullIndividually) override;
         /// @copydoc ParticleSystemRenderer::visitRenderables
@@ -204,7 +204,7 @@ namespace Ogre {
 
     /** Factory class for BillboardParticleRenderer */
 /*
-    class BillboardParticleRendererFactory2 : public ParticleSystemRendererFactory2
+    class BillboardParticleRendererFactory : public ParticleSystemRendererFactory2
     {
     public:
         /// @copydoc FactoryObj::getType

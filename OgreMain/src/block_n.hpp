@@ -1,5 +1,5 @@
 /*
-	copyright (c) dark run studios.  all rights reserved.
+	copyright (c) dark rune studios.  all rights reserved.
 */
 #pragma once
 

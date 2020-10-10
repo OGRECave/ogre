@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ParticleEmitter2_H__
-#define __ParticleEmitter2_H__
+#ifndef __ParticleEmitter_H__
+#define __ParticleEmitter_H__
 
 #include "OgrePrerequisites.h"
 #include "OgreVector.h"
@@ -48,17 +48,17 @@ namespace Ogre {
     */
     /** Abstract class defining the interface to be implemented by particle emitters.
     @remarks
-        Particle2 emitters are the sources of particles in a particle system. 
+        Particle emitters are the sources of particles in a particle system. 
         This class defines the ParticleEmitter interface, and provides a basic implementation 
         for tasks which most emitters will do (these are of course overridable).
-        Particle2 emitters can be  grouped into types, e.g. 'point' emitters, 'box' emitters etc; each type will 
+        Particle emitters can be  grouped into types, e.g. 'point' emitters, 'box' emitters etc; each type will 
         create particles with a different starting point, direction and velocity (although
         within the types you can configure the ranges of these parameters). 
     @par
         Because there are so many types of emitters you could use, OGRE chooses not to dictate
         the available types. It comes with some in-built, but allows plugins or applications to extend the emitter types available.
         This is done by subclassing ParticleEmitter to have the appropriate emission behaviour you want,
-        and also creating a subclass of ParticleEmitterFactory2 which is responsible for creating instances 
+        and also creating a subclass of ParticleEmitterFactory which is responsible for creating instances 
         of your new emitter type. You register this factory with the ParticleSystemManager2 using
         addEmitterFactory, and from then on emitters of this type can be created either from code or through
         text particle scripts by naming the type.
@@ -381,7 +381,7 @@ namespace Ogre {
 
         /** Gets the number of particles which this emitter would like to emit based on the time elapsed.
         @remarks
-            For efficiency the emitter does not actually create new Particle2 instances (these are reused
+            For efficiency the emitter does not actually create new Particle instances (these are reused
             by the ParticleSystem as existing particles 'die'). The implementation for this method must
             return the number of particles the emitter would like to emit given the number of seconds which
             have elapsed (passed in as a parameter).
@@ -400,11 +400,11 @@ namespace Ogre {
         @param
             pParticle Pointer to a particle which must be initialised based on how this emitter
             starts particles. This is passed as a pointer rather than being created by the emitter so the
-            ParticleSystem can reuse Particle2 instances, and can also set defaults itself.
+            ParticleSystem can reuse Particle instances, and can also set defaults itself.
         */
         virtual void _initParticles (Particles2& particles, unsigned start, unsigned end) = 0;
 
-        virtual void _initParticle (Particle2* pParticle) {
+        virtual void _initParticle (Particle* pParticle) {
             // Initialise size in case it's been altered
             pParticle->resetDimensions ();
         }
