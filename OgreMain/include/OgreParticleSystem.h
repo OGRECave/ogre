@@ -25,8 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ParticleSystem_H__
-#define __ParticleSystem_H__
+#ifndef __ParticleSystem2_H__
+#define __ParticleSystem2_H__
+
+#include <memory>
 
 #include "OgrePrerequisites.h"
 
@@ -37,9 +39,18 @@ THE SOFTWARE.
 #include "OgreRadixSort.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreParticleSystemRenderer.h"
+#include "OgreParticleEmitter.h"
+#include "OgreParticles.h"
 
 
 namespace Ogre {
+
+    class ParticleAffector2;
+    class ParticleEmitter;
+    class ParticleSystemRenderer;
+    class ParticleIterator2;
+    class Particle2;
 
     /** \addtogroup Core
     *  @{
@@ -49,7 +60,7 @@ namespace Ogre {
     */
     /** Class defining particle system based special effects.
     @remarks
-        Particle systems are special effects generators which are based on a 
+        Particle2 systems are special effects generators which are based on a 
         number of moving points to create the impression of things like like 
         sparkles, smoke, blood spurts, dust etc.
     @par
@@ -57,12 +68,12 @@ namespace Ogre {
         with a shared local origin for emission. The visual aspect of the 
         particles is handled by a ParticleSystemRenderer instance.
     @par
-        Particle systems are created using the SceneManager, never directly.
+        Particle2 systems are created using the SceneManager, never directly.
         In addition, like all subclasses of MovableObject, the ParticleSystem 
         will only be considered for rendering once it has been attached to a 
         SceneNode. 
     */
-    class _OgreExport ParticleSystem : public StringInterface, public MovableObject
+    class ParticleSystem : public StringInterface, public MovableObject
     {
     public:
 
@@ -144,14 +155,25 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
+    public:
+
+        struct Destroyer { void operator () (ParticleSystem* s) { ParticleSystem::destroy (s); } };
+        using Ptr = std::unique_ptr<ParticleSystem, ParticleSystem::Destroyer>;
+        static ParticleSystem::Ptr create (const String& name);
+        static void destroy (ParticleSystem* s);
+
+    protected:
+
         /// Default constructor required for STL creation in manager
         ParticleSystem();
         /** Creates a particle system with no emitters or affectors.
         @remarks
-            You should use the ParticleSystemManager to create particle systems rather than creating
+            You should use the ParticleSystemManager2 to create particle systems rather than creating
             them directly.
         */
-        ParticleSystem(const String& name, const String& resourceGroupName);
+        ParticleSystem(const String& name);
+
+    public:
 
         virtual ~ParticleSystem();
 
@@ -162,14 +184,12 @@ namespace Ogre {
             and the ParticleVisual instances they create.
         @param typeName String identifying the type of renderer to use; a new 
             instance of this type will be created; a factory must have been registered
-            with ParticleSystemManager.
+            with ParticleSystemManager2.
         */
-        void setRenderer(const String& typeName);
+        void setRenderer (ParticleSystemRenderer::Ptr&& renderer);
 
         /** Gets the ParticleRenderer to be used to render this particle system. */
         ParticleSystemRenderer* getRenderer(void) const;
-        /** Gets the name of the ParticleRenderer to be used to render this particle system. */
-        const String& getRendererName(void) const;
 
         /** Adds an emitter to this particle system.
         @remarks
@@ -177,10 +197,10 @@ namespace Ogre {
             class for more details.
         @param 
             emitterType String identifying the emitter type to create. Emitter types are defined
-            by registering new factories with the manager - see ParticleEmitterFactory for more details.
+            by registering new factories with the manager - see ParticleEmitterFactory2 for more details.
             Emitter types can be extended by OGRE, plugin authors or application developers.
         */
-        ParticleEmitter* addEmitter(const String& emitterType);
+        Ogre::ParticleEmitter* addEmitter(Ogre::ParticleEmitter::Ptr&& emitter);
 
         /** Retrieves an emitter by it's index (zero-based).
         @remarks
@@ -219,14 +239,14 @@ namespace Ogre {
         
         /** Adds an affector to this particle system.
         @remarks
-            Particles are modified over time in a particle system by affectors - see the ParticleAffector
+            Particles are modified over time in a particle system by affectors - see the ParticleAffector2
             class for more details.
         @param 
             affectorType String identifying the affector type to create. Affector types are defined
-            by registering new factories with the manager - see ParticleAffectorFactory for more details.
+            by registering new factories with the manager - see ParticleAffectorFactory2 for more details.
             Affector types can be extended by OGRE, plugin authors or application developers.
         */
-        ParticleAffector* addAffector(const String& affectorType);
+        ParticleAffector2* addAffector(const String& affectorType);
 
         /** Retrieves an affector by it's index (zero-based).
         @remarks
@@ -237,7 +257,7 @@ namespace Ogre {
         @param
             index Zero-based index of the affector to retrieve.
         */
-        ParticleAffector* getAffector(unsigned short index) const;
+        ParticleAffector2* getAffector(unsigned short index) const;
 
         /** Returns the number of affectors for this particle system. */
         unsigned short getNumAffectors(void) const;
@@ -268,19 +288,6 @@ namespace Ogre {
         */
         size_t getNumParticles(void) const;
 
-        /** Manually add a particle to the system. 
-        @remarks
-            Instead of using an emitter, you can manually add a particle to the system.
-            You must initialise the returned particle instance immediately with the
-            'emission' state.
-        @note
-            There is no corresponding 'destroyParticle' method - if you want to dispose of a
-            particle manually (say, if you've used setSpeedFactor(0) to make particles live forever)
-            you should use getParticle() and modify it's timeToLive to zero, meaning that it will
-            get cleaned up in the next update.
-        */
-        Particle* createParticle(void);
-
         /** Manually add an emitter particle to the system. 
         @remarks
             The purpose of a particle emitter is to emit particles. Besides visual particles, also other other
@@ -290,15 +297,7 @@ namespace Ogre {
             emitting other emitters, which also emit emitters.
         @param emitterName The name of a particle emitter that must be emitted.
         */
-        Particle* createEmitterParticle(const String& emitterName);
-
-        /** Retrieve a particle from the system for manual tweaking.
-        @remarks
-            Normally you use an affector to alter particles in flight, but
-            for small manually controlled particle systems you might want to use
-            this method.
-        */
-        Particle* getParticle(size_t index);
+        Particle2* createEmitterParticle(const String& emitterName);
 
         /** Returns the maximum number of particles this system is allowed to have active at once.
         @remarks
@@ -308,7 +307,7 @@ namespace Ogre {
 
         /** Sets the maximum number of particles this system is allowed to have active at once.
         @remarks
-            Particle systems all have a particle quota, i.e. a maximum number of particles they are 
+            Particle2 systems all have a particle quota, i.e. a maximum number of particles they are 
             allowed to have active at a time. This allows the application to set a keep particle systems
             under control should they be affected by complex parameters which alter their emission rates
             etc. If a particle system reaches it's particle quota, none of the emitters will be able to 
@@ -327,7 +326,7 @@ namespace Ogre {
 
         /** Sets the maximum number of emitted emitters this system is allowed to have active at once.
         @remarks
-            Particle systems can have - besides a particle quota - also an emitted emitter quota.
+            Particle2 systems can have - besides a particle quota - also an emitted emitter quota.
         @param quota The maximum number of emitted emitters this system is allowed to have.
         */
         void setEmittedEmitterQuota(size_t quota);
@@ -347,25 +346,11 @@ namespace Ogre {
         */
         void _update(Real timeElapsed);
 
-        /** Returns all active particles in this system.
-        @remarks
-            This method is designed to be used by people providing new ParticleAffector subclasses,
-            this is the easiest way to step through all the particles in a system and apply the
-            changes the affector wants to make.
-        */
-        const std::list<Particle*>& _getActiveParticles() { return mActiveParticles; }
+        /** gets the name of the material to be used for this billboard get. */
+        virtual Ogre::MaterialPtr getMaterial () const;
 
-        /// @deprecated use _getActiveParticles()
-        OGRE_DEPRECATED ParticleIterator _getIterator(void);
-
-        /** Sets the name of the material to be used for this billboard set.
-        */
-        virtual void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
-
-        /** Sets the name of the material to be used for this billboard set.
-            @return The name of the material that is used for this set.
-        */
-        virtual const String& getMaterialName(void) const;
+        /** Sets the name of the material to be used for this billboard set. */
+        virtual void setMaterial (Ogre::MaterialPtr material);
 
         virtual void _notifyCurrentCamera(Camera* cam) override;
         void _notifyAttached(Node* parent, bool isTagPoint = false) override;
@@ -407,7 +392,7 @@ namespace Ogre {
 
         /** Sets a 'iteration interval' on this particle system.
         @remarks
-            The default Particle system update interval, based on elapsed frame time,
+            The default Particle2 system update interval, based on elapsed frame time,
             will cause different behavior between low frame-rate and high frame-rate. 
             By using this option, you can make the particle system update at
             a fixed interval, keeping the behavior the same no matter what frame-rate 
@@ -474,7 +459,7 @@ namespace Ogre {
             @remarks
                 All particles in a set are created with these default dimensions. The set will render most efficiently if
                 all the particles in the set are the default size. It is possible to alter the size of individual
-                particles at the expense of extra calculation. See the Particle class for more info.
+                particles at the expense of extra calculation. See the Particle2 class for more info.
             @param width
                 The new default width for the particles in this set. Must be non-negative!
             @param height
@@ -494,7 +479,7 @@ namespace Ogre {
         virtual bool getCullIndividually(void) const;
         /** Sets whether culling tests particles in this individually as well as in a group.
         @remarks
-            Particle sets are always culled as a whole group, based on a bounding box which 
+            Particle2 sets are always culled as a whole group, based on a bounding box which 
             encloses all particles in the set. For fairly localised sets, this is enough. However, you
             can optionally tell the set to also cull individual particles in the set, i.e. to test
             each individual particle before rendering. The default is not to do this.
@@ -513,8 +498,6 @@ namespace Ogre {
             as the whole set having to pass the coarse group bounding test.
         */
         virtual void setCullIndividually(bool cullIndividual);
-        /// Return the resource group to be used to load dependent resources
-        virtual const String& getResourceGroupName(void) const { return mResourceGroupName; }
         /** Get the origin of this particle system, e.g. a script file name.
         @remarks
             This property will only contain something if the creator of
@@ -642,8 +625,6 @@ namespace Ogre {
         Real mBoundsUpdateTime;
         Real mUpdateRemainTime;
 
-        /// Name of the resource group to use to load materials
-        String mResourceGroupName;
         /// Have we set the material etc on the renderer?
         bool mIsRendererConfigured;
         /// Pointer to the material to use
@@ -677,9 +658,9 @@ namespace Ogre {
         /// Used to control if the particle system should emit particles or not.
         bool mIsEmitting;
 
-        typedef std::list<Particle*> ActiveParticleList;
-        typedef std::list<Particle*> FreeParticleList;
-        typedef std::vector<Particle*> ParticlePool;
+        typedef std::list<Particle2*> ActiveParticleList;
+        typedef std::list<Particle2*> FreeParticleList;
+        typedef std::vector<Particle2*> ParticlePool;
 
         /** Sort by direction functor */
         struct SortByDirectionFunctor
@@ -688,7 +669,7 @@ namespace Ogre {
             Vector3 sortDir;
 
             SortByDirectionFunctor(const Vector3& dir);
-            float operator()(Particle* p) const;
+            float operator()(Particle2* p) const;
         };
 
         /** Sort by distance functor */
@@ -698,38 +679,18 @@ namespace Ogre {
             Vector3 sortPos;
 
             SortByDistanceFunctor(const Vector3& pos);
-            float operator()(Particle* p) const;
+            float operator()(Particle2* p) const;
         };
 
-        static RadixSort<ActiveParticleList, Particle*, float> mRadixSorter;
-
-        /** Active particle list.
-            @remarks
-                This is a linked list of pointers to particles in the particle pool.
-            @par
-                This allows very fast insertions and deletions from anywhere in 
-                the list to activate / deactivate particles as well as reuse of 
-                Particle instances in the pool without construction & destruction 
-                which avoids memory thrashing.
-        */
-        ActiveParticleList mActiveParticles;
-
-        /** Free particle queue.
-            @remarks
-                This contains a list of the particles free for use as new instances
-                as required by the set. Particle instances are preconstructed up 
-                to the estimated size in the mParticlePool vector and are 
-                referenced on this deque at startup. As they get used this list
-                reduces, as they get released back to to the set they get added
-                back to the list.
-        */
-        FreeParticleList mFreeParticles;
+        static RadixSort<ActiveParticleList, Particle2*, float> mRadixSorter;
 
         /** Pool of particle instances for use and reuse in the active particle list.
             @remarks
                 This vector will be preallocated with the estimated size of the set,and will extend as required.
         */
-        ParticlePool mParticlePool;
+//        ParticlePool mParticlePool;
+
+        Particles2 mParticles;
 
         typedef std::list<ParticleEmitter*> FreeEmittedEmitterList;
         typedef std::list<ParticleEmitter*> ActiveEmittedEmitterList;
@@ -760,8 +721,8 @@ namespace Ogre {
                 the list with active emitted emitters.        */
         ActiveEmittedEmitterList mActiveEmittedEmitters;
 
-        typedef std::vector<ParticleEmitter*> ParticleEmitterList;
-        typedef std::vector<ParticleAffector*> ParticleAffectorList;
+        typedef std::vector<ParticleEmitter::Ptr> ParticleEmitterList;
+        typedef std::vector<ParticleAffector2*> ParticleAffectorList;
         
         /// List of particle emitters, ie sources of particles
         ParticleEmitterList mEmitters;
@@ -769,7 +730,7 @@ namespace Ogre {
         ParticleAffectorList mAffectors;
 
         /// The renderer used to render this particle system
-        ParticleSystemRenderer* mRenderer;
+        ParticleSystemRenderer::Ptr mRenderer;
 
         /// Do we cull each particle individually?
         bool mCullIndividual;
@@ -777,9 +738,6 @@ namespace Ogre {
         /// The name of the type of renderer used to render this system
         String mRendererType;
         
-        /// The number of particles in the pool.
-        size_t mPoolSize;
-
         /// The number of emitted emitters in the pool.
         size_t mEmittedEmitterPoolSize;
 
@@ -810,9 +768,6 @@ namespace Ogre {
         /** Sort the particles in the system **/
         void _sortParticles(Camera* cam);
 
-        /** Resize the internal pool of particles. */
-        void increasePool(size_t size);
-
         /** Resize the internal pool of emitted emitters.
             @remarks
                 The pool consists of multiple vectors containing pointers to particle emitters. Increasing the 
@@ -828,11 +783,6 @@ namespace Ogre {
         /** Internal method to configure the renderer. */
         void configureRenderer(void);
 
-        /// Internal method for creating ParticleVisualData instances for the pool
-        void createVisualParticles(size_t poolstart, size_t poolend);
-        /// Internal method for destroying ParticleVisualData instances for the pool
-        void destroyVisualParticles(size_t poolstart, size_t poolend);
-
         /** Create a pool of emitted emitters and assign them to the free emitter list.
             @remarks
                 The emitters in the pool are grouped by name. This name is the name of the base emitter in the
@@ -840,7 +790,7 @@ namespace Ogre {
         */
         void initialiseEmittedEmitters(void);
 
-        /** Determine which emitters in the Particle Systems main emitter become a template for creating an
+        /** Determine which emitters in the Particle2 Systems main emitter become a template for creating an
             pool of emitters that can be emitted.
         */
         void initialiseEmittedEmitterPool(void);

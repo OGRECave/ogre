@@ -25,32 +25,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgrePointEmitter.h"
-#include "OgreParticle.h"
+#include "OgrePointEmitter2.h"
+#include "OgreParticle2.h"
 
 
 
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    PointEmitter::PointEmitter(ParticleSystem* psys)
-        :ParticleEmitter(psys)
+    PointEmitter2::PointEmitter2(ParticleSystem2* psys)
+        :ParticleEmitter2(psys)
     {
         mType = "Point";
         // Set up parameters
-        if (createParamDictionary("PointEmitter"))
+        if (createParamDictionary("PointEmitter2"))
         {
             addBaseParameters();
         }
         // No custom parameters
     }
     //-----------------------------------------------------------------------
-    void PointEmitter::_initParticle(Particle* pParticle)
+    void PointEmitter2::_initParticle(Particle2* pParticle)
     {
         // Very simple emitter, uses default implementations with no modification
 
         // Call superclass
-        ParticleEmitter::_initParticle(pParticle);
+        ParticleEmitter2::_initParticle(pParticle);
 
         // Point emitter emits from own position
         pParticle->mPosition = mPosition;
@@ -64,12 +64,33 @@ namespace Ogre {
         pParticle->mTimeToLive = pParticle->mTotalTimeToLive = genEmissionTTL();
         
     }
+
+    void PointEmitter2::_initParticles (Particles2& particles, unsigned start, unsigned end)
+    {
+        genEmissionTTLs (particles, start, end);
+        genEmissionTranslations (particles, start, end);
+        auto colors = particles.colors;
+        for (auto c = start; c < end; ++c)
+            genEmissionColour (colors[c]);
+    }
+
     //-----------------------------------------------------------------------
-    unsigned short PointEmitter::_getEmissionCount(Real timeElapsed)
+    unsigned short PointEmitter2::_getEmissionCount(Real timeElapsed)
     {
         // Use basic constant emission 
         return genConstantEmissionCount(timeElapsed);
     }
+
+    ParticleEmitter2::Ptr PointEmitter2::clone ()
+    {
+        return ParticleEmitter2::Ptr{ new PointEmitter2 (*this) };
+    }
+
+    ParticleEmitter2::Ptr PointEmitter2::create (ParticleSystem2* s)
+    {
+        return ParticleEmitter2::Ptr{ new PointEmitter2 (s) };
+    }
+
 }
 
 

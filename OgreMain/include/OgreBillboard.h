@@ -69,14 +69,13 @@ namespace Ogre {
     {
         friend class BillboardSet;
         friend class BillboardParticleRenderer;
-    protected:
+    public:
         bool mOwnDimensions;
         bool mUseTexcoordRect;
         uint16 mTexcoordIndex;      /// Index into the BillboardSet array of texture coordinates
         FloatRect mTexcoordRect;    /// Individual texture coordinates
         Real mWidth;
         Real mHeight;
-    public:
         // Note the intentional public access to main internal variables used at runtime
         // Forcing access via get/set would be too costly for 000's of billboards
         Vector3 mPosition;

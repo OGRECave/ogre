@@ -25,53 +25,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __PointEmitter2_H__
-#define __PointEmitter2_H__
-
-//#include "OgreParticleFXPrerequisites.h"
-#include "OgreParticleEmitter2.h"
 #include "OgreParticles2.h"
 
-namespace Ogre {
 
-    class ParticleSystem2;
-    class ParticleEmitter2;
-    class Particle2;
+namespace Ogre
+{
 
-    /** \addtogroup Plugins
-    *  @{
-    */
-    /** \addtogroup ParticleFX
-    *  @{
-    */
-    /** Particle2 emitter which emits particles from a single point.
-    @remarks
-        This basic particle emitter emits particles from a single point in space. The
-        initial direction of these particles can either be a single direction (i.e. a line),
-        a random scattering inside a cone, or a random scattering in all directions, 
-        depending the 'angle' parameter, which is the angle across which to scatter the 
-        particles either side of the base direction of the emitter. 
-    */
-    class PointEmitter2 : public ParticleEmitter2
+    Particles2::Particles2 () : size (0), active (0) {}
+    Particles2::~Particles2()
     {
+        block_delete_memcpyable (size, ttls);
+    }
 
-    protected:
-        PointEmitter2(ParticleSystem2* s);
+    void Particles2::resize (unsigned newsize)
+    {
+        block_resize_memcpyable (*this, size, newsize, &ttls, &translations, &rotations, &colors, &sizes);
+    }
 
-    public:
-        /** See ParticleEmitter2. */
-        void _initParticle(Particle2* pParticle);
+    void Particles2::swap (unsigned idx1, unsigned idx2)
+    {
+        block_swap (idx1, idx2, ttls, translations, rotations, colors, sizes);
+    }
 
-        virtual void _initParticles (Particles2& particles, unsigned start, unsigned end) override;
+    void Particles2::clear()
+    {
+        active = 0u;
+    }
 
-        /** See ParticleEmitter2. */
-        unsigned short _getEmissionCount(Real timeElapsed);
+    void Particles2::create (unsigned count, unsigned& start, unsigned& end)
+    {
+        start = active;
+        end = count + active;
+        if (end > size)
+            end = size;
+        active = end;
+    }
 
-        virtual ParticleEmitter2::Ptr clone () override;
-        static ParticleEmitter2::Ptr create (ParticleSystem2* s);
-    };
-    /** @} */
-    /** @} */
 }
-
-#endif

@@ -27,12 +27,30 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreBillboardParticleRenderer.h"
-#include "OgreParticle.h"
+#include "OgreBillboardParticleRenderer2.h"
+#include "OgreParticle2.h"
 #include "OgreBillboard.h"
 
 namespace Ogre {
     static String rendererTypeName = "billboard";
+
+    ParticleSystemRenderer::Ptr BillboardParticleRenderer::clone ()
+    {
+        auto cloned = new BillboardParticleRenderer ();
+        cloned->setBillboardType (this->getBillboardType ());
+        cloned->setBillboardOrigin (this->getBillboardOrigin ());
+        cloned->setBillboardRotationType (this->getBillboardRotationType ());
+        cloned->setCommonDirection (this->getCommonDirection ());
+        cloned->setCommonUpVector (this->getCommonUpVector ());
+        cloned->setPointRenderingEnabled (this->isPointRenderingEnabled ());
+        cloned->setUseAccurateFacing (this->getUseAccurateFacing ());
+        return ParticleSystemRenderer::Ptr{ cloned };
+    };
+
+    ParticleSystemRenderer::Ptr BillboardParticleRenderer::create ()
+    {
+        return ParticleSystemRenderer::Ptr{ new BillboardParticleRenderer () };
+    }
 
     //-----------------------------------------------------------------------
     BillboardParticleRenderer::CmdBillboardType BillboardParticleRenderer::msBillboardTypeCmd;
@@ -124,7 +142,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRenderer::_updateRenderQueue(RenderQueue* queue, 
-        std::list<Particle*>& currentParticles, bool cullIndividually)
+        std::list<Particle2*>& currentParticles, bool cullIndividually)
     {
         mBillboardSet->setCullIndividually(cullIndividually);
 
@@ -140,10 +158,10 @@ namespace Ogre {
         if (invert)
             invWorld = mBillboardSet->getParentSceneNode()->_getFullTransform().inverse();
 
-        for (std::list<Particle*>::iterator i = currentParticles.begin();
+        for (std::list<Particle2*>::iterator i = currentParticles.begin();
             i != currentParticles.end(); ++i)
         {
-            Particle* p = *i;
+            Particle2* p = *i;
             bb.mPosition = p->mPosition;
             Vector3 pos = p->mPosition;
 
@@ -170,7 +188,6 @@ namespace Ogre {
                 bb.mHeight = p->mHeight;
             }
             mBillboardSet->injectBillboard(bb);
-
         }
 
         // Only set bounds if there are any active particles
@@ -182,25 +199,87 @@ namespace Ogre {
         // Update the queue
         mBillboardSet->_updateRenderQueue(queue);
     }
+
+    //-----------------------------------------------------------------------
+    void BillboardParticleRenderer::_updateRenderQueue (RenderQueue* queue,
+        Particles2& particles, bool cullIndividually)
+    {
+        mBillboardSet->setCullIndividually (cullIndividually);
+
+        // Update billboard set geometry
+        Vector3 bboxMin = Math::POS_INFINITY * Vector3::UNIT_SCALE;
+        Vector3 bboxMax = Math::NEG_INFINITY * Vector3::UNIT_SCALE;
+        Real radius = 0.0f;
+        mBillboardSet->beginBillboards (particles.active);
+        Billboard bb;
+        Affine3 invWorld;
+
+        bool invert = mBillboardSet->getBillboardsInWorldSpace () && mBillboardSet->getParentSceneNode ();
+        if (invert)
+            invWorld = mBillboardSet->getParentSceneNode ()->_getFullTransform ().inverse ();
+
+        auto normalise = mBillboardSet->getBillboardType () == BBT_ORIENTED_SELF ||
+            mBillboardSet->getBillboardType () == BBT_PERPENDICULAR_SELF;
+        auto translations = particles.translations;
+        auto rotations = particles.rotations;
+        auto colors = particles.colors;
+        auto active = particles.active;
+        for (auto p = 0u; p < active; ++p)
+        {
+            auto& translation = translations[p];
+            bb.mPosition = translation.position;
+            Vector3 pos = translation.position;
+
+            if (invert)
+                pos = invWorld * pos;
+
+            bboxMin.makeFloor (pos);
+            bboxMax.makeCeil (pos);
+            radius = std::max (radius, translation.position.squaredLength ());
+            if (normalise)
+            {
+                // Normalise direction vector
+                bb.mDirection = translation.direction;
+                bb.mDirection.normalise ();
+            }
+            bb.mColour = colors[p];
+            bb.mRotation = rotations[p].angle;
+            mBillboardSet->injectBillboard (bb);
+        }
+
+        // Only set bounds if there are any active particles
+        if (active > 0)
+            mBillboardSet->setBounds (AxisAlignedBox (bboxMin, bboxMax), Math::Sqrt (radius));
+
+        mBillboardSet->endBillboards ();
+
+        // Update the queue
+        mBillboardSet->_updateRenderQueue (queue);
+    }
+
+
+    /*
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    const String& BillboardParticleRendererFactory::getType() const
+    const String& BillboardParticleRendererFactory2::getType() const
     {
         return rendererTypeName;
     }
     //-----------------------------------------------------------------------
-    ParticleSystemRenderer* BillboardParticleRendererFactory::createInstance( 
+    ParticleSystemRenderer* BillboardParticleRendererFactory2::createInstance( 
         const String& name )
     {
         return OGRE_NEW BillboardParticleRenderer();
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRendererFactory::destroyInstance( 
+    void BillboardParticleRendererFactory2::destroyInstance( 
         ParticleSystemRenderer* inst)
     {
         OGRE_DELETE  inst;
     }
+    */
+
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     String BillboardParticleRenderer::CmdBillboardType::doGet(const void* target) const

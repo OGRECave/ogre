@@ -58,7 +58,6 @@ namespace Ogre
     static EmitterCommands::CmdName msNameCmd;
     static EmitterCommands::CmdEmittedEmitter msEmittedEmitterCmd;
 
-
     //-----------------------------------------------------------------------
     ParticleEmitter::ParticleEmitter(ParticleSystem* psys)
       : mParent(psys),
@@ -87,10 +86,18 @@ namespace Ogre
         mEmittedEmitter = BLANKSTRING;
         mEmitted = false;
     }
+
     //-----------------------------------------------------------------------
     ParticleEmitter::~ParticleEmitter() 
     {
     }
+
+    // delete here so we use the module's heap
+    void Ogre::ParticleEmitter::destroy (ParticleEmitter* e)
+    {
+        delete e;
+    }
+
     //-----------------------------------------------------------------------
     void ParticleEmitter::setPosition(const Vector3& pos) 
     { 
@@ -231,6 +238,24 @@ namespace Ogre
     {
         mEmitted = emitted;
     }
+
+    void ParticleEmitter::genEmissionTranslations (Particles2& particles, unsigned start, unsigned end)
+    {
+        auto initialPosition = mPosition;
+        auto initialDirection = initialPosition - mDirPositionRef;
+        initialDirection.normalise ();
+        auto translations = particles.translations;
+        for (auto t = start; t < end; ++t)
+        {
+            auto& translation = translations[t];
+            translation.position = initialPosition;
+            auto direction = initialDirection;
+            genEmissionDirection (initialPosition, direction);
+            genEmissionVelocity (direction);
+            translation.direction = direction;
+        }
+    }
+
     //-----------------------------------------------------------------------
     void ParticleEmitter::genEmissionDirection( const Vector3 &particlePos, Vector3& destVector )
     {
@@ -300,6 +325,29 @@ namespace Ogre
             return mMinTTL;
         }
     }
+
+    void ParticleEmitter::genEmissionTTLs (Particles2& particles, unsigned start, unsigned end)
+    {
+        auto ttls = particles.ttls;
+
+        if (mMaxTTL != mMinTTL)
+        {
+            auto delta = (mMaxTTL - mMinTTL);
+            for (auto t = start; t < end; ++t)
+            {
+                auto& time = ttls[t];
+                time.remaining = time.total = mMinTTL + (Math::UnitRandom () * delta);
+            }
+            return;
+        }
+
+        for (auto t = start; t < end; ++t)
+        {
+            auto& time = ttls[t];
+            time.remaining = time.total = mMinTTL;
+        }
+    }
+
     //-----------------------------------------------------------------------
     unsigned short ParticleEmitter::genConstantEmissionCount(Real timeElapsed)
     {
@@ -364,6 +412,7 @@ namespace Ogre
             destColour = mColourRangeStart;
         }
     }
+
     //-----------------------------------------------------------------------
     void ParticleEmitter::addBaseParameters(void)    
     {
@@ -671,7 +720,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    ParticleEmitterFactory::~ParticleEmitterFactory()
+    ParticleEmitterFactory2::~ParticleEmitterFactory2()
     {
         // Destroy all emitters
         std::vector<ParticleEmitter*>::iterator i;
@@ -684,7 +733,7 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void ParticleEmitterFactory::destroyEmitter(ParticleEmitter* e)        
+    void ParticleEmitterFactory2::destroyEmitter(ParticleEmitter* e)        
     {
         std::vector<ParticleEmitter*>::iterator i;
         for (i = mEmitters.begin(); i != mEmitters.end(); ++i)

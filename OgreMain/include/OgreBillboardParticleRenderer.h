@@ -25,11 +25,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __BillboardParticleRenderer_H__
-#define __BillboardParticleRenderer_H__
+#ifndef __BillboardParticleRenderer2_H__
+#define __BillboardParticleRenderer2_H__
 
+#include <memory>
 #include "OgrePrerequisites.h"
-#include "OgreParticleSystemRenderer.h"
+#include "OgreParticleSystemRenderer2.h"
 #include "OgreBillboardSet.h"
 #include "OgreHeaderPrefix.h"
 
@@ -49,14 +50,17 @@ namespace Ogre {
         which will be passed to it automatically when the particle system itself
         does not understand them.
     */
-    class _OgreExport BillboardParticleRenderer : public ParticleSystemRenderer
+    class BillboardParticleRenderer : public ParticleSystemRenderer
     {
     protected:
         /// The billboard set that's doing the rendering
         BillboardSet* mBillboardSet;
-    public:
         BillboardParticleRenderer();
+    public:
         ~BillboardParticleRenderer();
+
+        virtual ParticleSystemRenderer::Ptr clone () override;
+        static ParticleSystemRenderer::Ptr create ();
 
         /** Command object for billboard type (see ParamCommand).*/
         class _OgrePrivate CmdBillboardType : public ParamCommand
@@ -147,7 +151,9 @@ namespace Ogre {
         const String& getType(void) const;
         /// @copydoc ParticleSystemRenderer::_updateRenderQueue
         void _updateRenderQueue(RenderQueue* queue, 
-            std::list<Particle*>& currentParticles, bool cullIndividually);
+            std::list<Particle2*>& currentParticles, bool cullIndividually);
+        virtual void _updateRenderQueue (RenderQueue* queue,
+            Particles2& particles, bool cullIndividually) override;
         /// @copydoc ParticleSystemRenderer::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false)
         {
@@ -194,12 +200,11 @@ namespace Ogre {
         static CmdCommonUpVector msCommonUpVectorCmd;
         static CmdPointRendering msPointRenderingCmd;
         static CmdAccurateFacing msAccurateFacingCmd;
-
-
     };
 
     /** Factory class for BillboardParticleRenderer */
-    class _OgreExport BillboardParticleRendererFactory : public ParticleSystemRendererFactory
+/*
+    class BillboardParticleRendererFactory2 : public ParticleSystemRendererFactory2
     {
     public:
         /// @copydoc FactoryObj::getType
@@ -209,6 +214,7 @@ namespace Ogre {
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance(ParticleSystemRenderer* ptr);
     };
+    */
     /** @} */
     /** @} */
 
