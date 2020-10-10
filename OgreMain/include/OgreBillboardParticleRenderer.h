@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include <memory>
 #include "OgrePrerequisites.h"
-#include "OgreParticleSystemRenderer2.h"
+#include "OgreParticleSystemRenderer.h"
 #include "OgreBillboardSet.h"
 #include "OgreHeaderPrefix.h"
 

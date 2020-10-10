@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreParticleAffector2.h"
 #include "OgreParticle2.h"
 #include "OgreParticleAffectorFactory2.h"
-#include "OgreParticleSystemRenderer2.h"
+#include "OgreParticleSystemRenderer.h"
 #include "OgreControllerManager.h"
 #include "OgreParticleIterator2.h"
 
