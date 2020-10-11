@@ -153,8 +153,6 @@ namespace Ogre {
         removeAllEmittedEmitters();
         removeAllAffectors();
 
-        // Deallocate all particles
-        destroyVisualParticles(0, mParticlePool.size());
         // Free pool items
         for (auto p : mParticlePool)
         {
@@ -628,13 +626,6 @@ namespace Ogre {
         {
             mParticlePool[i] = OGRE_NEW Particle();
         }
-
-        if (mIsRendererConfigured)
-        {
-            createVisualParticles(oldSize, size);
-        }
-
-
     }
     //-----------------------------------------------------------------------
     Particle* ParticleSystem::getParticle(size_t index) 
@@ -662,7 +653,7 @@ namespace Ogre {
     Particle* ParticleSystem::createEmitterParticle(const String& emitterName)
     {
         // Get the appropriate list and retrieve an emitter 
-        Particle* p = 0;
+        ParticleEmitter* p = 0;
         std::list<ParticleEmitter*>* fee = findFreeEmittedEmitter(emitterName);
         if (fee && !fee->empty())
         {
@@ -674,7 +665,7 @@ namespace Ogre {
             // Also add to mActiveEmittedEmitters. This is needed to traverse through all active emitters
             // that are emitted. Don't use mActiveParticles for that (although they are added to
             // mActiveParticles also), because it would take too long to traverse.
-            mActiveEmittedEmitters.push_back(static_cast<ParticleEmitter*>(p));
+            mActiveEmittedEmitters.push_back(p);
         }
 
         return p;
@@ -1012,7 +1003,6 @@ namespace Ogre {
         if (mRenderer)
         {
             // Destroy existing
-            destroyVisualParticles(0, mParticlePool.size());
             ParticleSystemManager::getSingleton()._destroyRenderer(mRenderer);
             mRenderer = 0;
         }
@@ -1049,7 +1039,6 @@ namespace Ogre {
             mRenderer->_notifyParticleQuota(mParticlePool.size());
             mRenderer->_notifyAttached(mParentNode, mParentIsTagPoint);
             mRenderer->_notifyDefaultDimensions(mDefaultWidth, mDefaultHeight);
-            createVisualParticles(0, mParticlePool.size());
             mMaterial->load();
             mRenderer->_setMaterial(mMaterial);
             if (mRenderQueueIDSet)
@@ -1084,30 +1073,6 @@ namespace Ogre {
     void ParticleSystem::setCullIndividually(bool cullIndividual)
     {
         mCullIndividual = cullIndividual;
-    }
-    //-----------------------------------------------------------------------
-    void ParticleSystem::createVisualParticles(size_t poolstart, size_t poolend)
-    {
-        ParticlePool::iterator i = mParticlePool.begin() + poolstart;
-        ParticlePool::iterator iend = mParticlePool.begin() + poolend;
-        for (; i != iend; ++i)
-        {
-            (*i)->_notifyOwner(this);
-            (*i)->_notifyVisualData(mRenderer->_createVisualData());
-        }
-    }
-    //-----------------------------------------------------------------------
-    void ParticleSystem::destroyVisualParticles(size_t poolstart, size_t poolend)
-    {
-        ParticlePool::iterator i = mParticlePool.begin() + poolstart;
-        ParticlePool::iterator iend = mParticlePool.begin() + poolend;
-        for (; i != iend; ++i)
-        {
-            OGRE_IGNORE_DEPRECATED_BEGIN
-            mRenderer->_destroyVisualData((*i)->getVisualData());
-            OGRE_IGNORE_DEPRECATED_END
-            (*i)->_notifyVisualData(0);
-        }
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::setBounds(const AxisAlignedBox& aabb)
@@ -1300,7 +1265,6 @@ namespace Ogre {
                         clonedEmitter = ParticleSystemManager::getSingleton()._createEmitter(emitter->getType(), this);
                         emitter->copyParametersTo(clonedEmitter);
                         clonedEmitter->setEmitted(emitter->isEmitted()); // is always 'true' by the way, but just in case
-                        clonedEmitter->_notifyOwner(this);
 
                         // Initially deactivate the emitted emitter if duration/repeat_delay are set
                         if (clonedEmitter->getDuration() > 0.0f && 

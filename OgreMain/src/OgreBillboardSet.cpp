@@ -133,7 +133,6 @@ namespace Ogre {
         newBill->setRotation(Radian(0));
         newBill->setTexcoordIndex(0);
         newBill->resetDimensions();
-        newBill->_notifyOwner(this);
 
         // Merge into bounds
         Real adjust = std::max(mDefaultWidth, mDefaultHeight);
