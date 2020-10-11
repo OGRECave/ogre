@@ -637,11 +637,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    ParticleIterator ParticleSystem::_getIterator(void)
-    {
-        return ParticleIterator(mActiveParticles.begin(), mActiveParticles.end());
-    }
-    //-----------------------------------------------------------------------
     Particle* ParticleSystem::getParticle(size_t index) 
     {
         assert (index < mActiveParticles.size() && "Index out of bounds!");

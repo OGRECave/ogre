@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreVector.h"
-#include "OgreParticleIterator.h"
 #include "OgreStringInterface.h"
 #include "OgreMovableObject.h"
 #include "OgreRadixSort.h"
@@ -354,9 +353,6 @@ namespace Ogre {
             changes the affector wants to make.
         */
         const std::list<Particle*>& _getActiveParticles() { return mActiveParticles; }
-
-        /// @deprecated use _getActiveParticles()
-        OGRE_DEPRECATED ParticleIterator _getIterator(void);
 
         /** Sets the name of the material to be used for this billboard set.
         */
