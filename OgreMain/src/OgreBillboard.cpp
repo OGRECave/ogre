@@ -40,8 +40,7 @@ namespace Ogre {
         mPosition(Vector3::ZERO),
         mDirection(Vector3::ZERO),        
         mColour(ColourValue::White),
-        mRotation(0),
-        mParentSet(0)
+        mRotation(0)
     {
     }
     //-----------------------------------------------------------------------
@@ -57,11 +56,10 @@ namespace Ogre {
         , mDirection(Vector3::ZERO)
         , mColour(colour)
         , mRotation(0)
-        , mParentSet(owner)
     {
     }
     //-----------------------------------------------------------------------
-    void Billboard::setDimensions(Real width, Real height)
+    void Billboard::setDimensions(float width, float height)
     {
         mOwnDimensions = true;
         mWidth = width;

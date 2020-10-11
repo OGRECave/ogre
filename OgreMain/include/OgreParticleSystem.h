@@ -824,11 +824,6 @@ namespace Ogre {
         /** Internal method to configure the renderer. */
         void configureRenderer(void);
 
-        /// Internal method for creating ParticleVisualData instances for the pool
-        void createVisualParticles(size_t poolstart, size_t poolend);
-        /// Internal method for destroying ParticleVisualData instances for the pool
-        void destroyVisualParticles(size_t poolstart, size_t poolend);
-
         /** Create a pool of emitted emitters and assign them to the free emitter list.
             @remarks
                 The emitters in the pool are grouped by name. This name is the name of the base emitter in the

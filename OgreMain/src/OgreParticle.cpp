@@ -33,17 +33,12 @@ THE SOFTWARE.
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-    void Particle::setDimensions(Real width, Real height)
+    void Particle::setDimensions(float width, float height)
     {
         assert(width >= 0 && height >= 0 && "Particle dimensions can not be negative");
         mOwnDimensions = true;
         mWidth = width;
         mHeight = height;
-    }
-    //-----------------------------------------------------------------------
-    void Particle::_notifyOwner(ParticleSystem* owner)
-    {
-        mParentSystem = owner;
     }
     //-----------------------------------------------------------------------
     void Particle::resetDimensions(void)

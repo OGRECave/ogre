@@ -74,8 +74,8 @@ namespace Ogre {
         bool mUseTexcoordRect;
         uint16 mTexcoordIndex;      /// Index into the BillboardSet array of texture coordinates
         FloatRect mTexcoordRect;    /// Individual texture coordinates
-        Real mWidth;
-        Real mHeight;
+        float mWidth;
+        float mHeight;
     public:
         // Note the intentional public access to main internal variables used at runtime
         // Forcing access via get/set would be too costly for 000's of billboards
@@ -84,7 +84,6 @@ namespace Ogre {
         Vector3 mDirection;
         ColourValue mColour;
         Radian mRotation;
-        BillboardSet* mParentSet;
 
         /** Default constructor.
         */
@@ -134,7 +133,7 @@ namespace Ogre {
                 this method unless you really need to have different billboard dimensions within the same set. Otherwise
                 just call the BillboardSet::setDefaultDimensions method instead.
         */
-        void setDimensions(Real width, Real height);
+        void setDimensions(float width, float height);
 
         /** Resets this Billboard to use the parent BillboardSet's dimensions instead of it's own. */
         void resetDimensions(void) { mOwnDimensions = false; }
@@ -158,14 +157,10 @@ namespace Ogre {
         bool hasOwnDimensions(void) const { return mOwnDimensions; }
 
         /** Retrieves the billboard's personal width, if hasOwnDimensions is true. */
-        Real getOwnWidth(void) const { return mWidth; }
+        float getOwnWidth(void) const { return mWidth; }
 
         /** Retrieves the billboard's personal height, if hasOwnDimensions is true. */
-        Real getOwnHeight(void) const { return mHeight; }
-
-        /** Internal method for notifying the billboard of it's owner.
-        */
-        void _notifyOwner(BillboardSet* owner) { mParentSet = owner; }
+        float getOwnHeight(void) const { return mHeight; }
 
         /** Returns true if this billboard use individual texture coordinate rect (i.e. if the 
             Billboard::setTexcoordRect method has been called for this instance), or returns
