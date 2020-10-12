@@ -83,11 +83,11 @@ namespace Ogre {
 
             if (particle_time <= mTimeAdj[0])
             {
-                p->mColour = mColourAdj[0];
+                p->mColour = mColourAdj[0].getAsBYTE();
             } else
             if (particle_time >= mTimeAdj[MAX_STAGES - 1])
             {
-                p->mColour = mColourAdj[MAX_STAGES-1];
+                p->mColour = mColourAdj[MAX_STAGES-1].getAsBYTE();
             } else
             {
                 for (int i=0;i<MAX_STAGES-1;i++)
@@ -97,7 +97,7 @@ namespace Ogre {
                         particle_time -= mTimeAdj[i];
                         particle_time /= (mTimeAdj[i+1]-mTimeAdj[i]);
 
-                        p->mColour = Math::lerp(mColourAdj[i], mColourAdj[i+1], particle_time);
+                        p->mColour = Math::lerp(mColourAdj[i], mColourAdj[i+1], particle_time).getAsBYTE();
                         break;
                     }
                 }

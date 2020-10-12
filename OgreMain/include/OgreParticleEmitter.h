@@ -155,7 +155,7 @@ namespace Ogre {
         virtual Real genEmissionTTL(void);
 
         /** Internal utility method for generating a colour for a particle. */
-        virtual void genEmissionColour(ColourValue& destColour);
+        virtual void genEmissionColour(RGBA& destColour);
 
         /** Internal utility method for generating an emission count based on a constant emission rate. */
         virtual unsigned short genConstantEmissionCount(Real timeElapsed);

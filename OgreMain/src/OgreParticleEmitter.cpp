@@ -355,17 +355,17 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void ParticleEmitter::genEmissionColour(ColourValue& destColour)
+    void ParticleEmitter::genEmissionColour(RGBA& destColour)
     {
         if (mColourRangeStart != mColourRangeEnd)
         {
             // Randomise
             ColourValue t(Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom());
-            destColour = mColourRangeStart + t * (mColourRangeEnd - mColourRangeStart);
+            destColour = (mColourRangeStart + t * (mColourRangeEnd - mColourRangeStart)).getAsBYTE();
         }
         else
         {
-            destColour = mColourRangeStart;
+            destColour = mColourRangeStart.getAsBYTE();
         }
     }
     //-----------------------------------------------------------------------
