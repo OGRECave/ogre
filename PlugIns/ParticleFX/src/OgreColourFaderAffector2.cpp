@@ -106,8 +106,9 @@ namespace Ogre {
 
         for (auto p : pSystem->_getActiveParticles())
         {
-            p->mColour += p->mTimeToLive > StateChangeVal ? dc1 : dc2;
-            p->mColour.saturate();
+            p->mColour = (ColourValue((uchar*)&p->mColour) + (p->mTimeToLive > StateChangeVal ? dc1 : dc2))
+                             .saturateCopy()
+                             .getAsBYTE();
         }
     }
     //-----------------------------------------------------------------------

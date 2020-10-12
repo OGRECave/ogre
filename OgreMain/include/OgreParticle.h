@@ -63,7 +63,7 @@ namespace Ogre {
         /// Direction (and speed) 
         Vector3 mDirection;
         /// Current colour
-        ColourValue mColour;
+        RGBA mColour;
         /// Time to live, number of seconds left of particles natural life
         float mTimeToLive;
         /// Total Time to live, number of seconds of particles natural life
@@ -81,7 +81,7 @@ namespace Ogre {
         Particle()
             : mWidth(0), mHeight(0),
             mRotation(0), mPosition(Vector3::ZERO), mDirection(Vector3::ZERO),
-            mColour(ColourValue::White), mTimeToLive(10), mTotalTimeToLive(10),
+            mColour(0xFFFFFFFF), mTimeToLive(10), mTotalTimeToLive(10),
             mRotationSpeed(0), mParticleType(Visual), mTexcoordIndex(0), mRandomTexcoordOffset(0), mOwnDimensions(false)
         {
         }

@@ -74,8 +74,7 @@ namespace Ogre {
 
         for (auto p : pSystem->_getActiveParticles())
         {
-            p->mColour += dc;
-            p->mColour.saturate();
+            p->mColour = (ColourValue((uchar*)&p->mColour) + dc).saturateCopy().getAsBYTE();
         }
     }
     //-----------------------------------------------------------------------

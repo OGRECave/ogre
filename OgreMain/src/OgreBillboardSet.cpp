@@ -837,7 +837,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::genPointVertices(const Billboard& bb)
     {
-        RGBA colour = bb.mColour.getAsBYTE();
+        RGBA colour = bb.mColour;
         // Single vertex per billboard, ignore offsets
         // position
         *mLockPtr++ = bb.mPosition.x;
@@ -849,7 +849,7 @@ namespace Ogre {
     }
     void BillboardSet::genQuadVertices(const Vector3* const offsets, const Billboard& bb)
     {
-        RGBA colour = bb.mColour.getAsBYTE();
+        RGBA colour = bb.mColour;
 
         // Texcoords
         assert( bb.mUseTexcoordRect || bb.mTexcoordIndex < mTextureCoords.size() );

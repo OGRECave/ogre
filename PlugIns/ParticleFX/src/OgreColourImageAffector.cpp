@@ -59,7 +59,7 @@ namespace Ogre {
             _loadImage();
         }
 
-        pParticle->mColour = mColourImage.getColourAt(0, 0, 0);
+        pParticle->mColour = mColourImage.getColourAt(0, 0, 0).getAsBYTE();
     
     }
     //-----------------------------------------------------------------------
@@ -87,11 +87,11 @@ namespace Ogre {
 
             if(index < 0)
             {
-                p->mColour = mColourImage.getColourAt(0, 0, 0);
+                p->mColour = mColourImage.getColourAt(0, 0, 0).getAsBYTE();
             }
             else if(index >= width) 
             {
-                p->mColour = mColourImage.getColourAt(width, 0, 0);
+                p->mColour = mColourImage.getColourAt(width, 0, 0).getAsBYTE();
             }
             else
             {
@@ -101,7 +101,7 @@ namespace Ogre {
                 ColourValue from=mColourImage.getColourAt(index, 0, 0),
                             to=mColourImage.getColourAt(index+1, 0, 0);
 
-                p->mColour = Math::lerp(from, to, fract);
+                p->mColour = Math::lerp(from, to, fract).getAsBYTE();
             }
         }
     }

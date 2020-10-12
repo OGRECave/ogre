@@ -82,7 +82,7 @@ namespace Ogre {
         Vector3 mPosition;
         /// Normalised direction vector
         Vector3 mDirection;
-        ColourValue mColour;
+        RGBA mColour;
         Radian mRotation;
 
         /** Default constructor.
@@ -143,11 +143,11 @@ namespace Ogre {
                 base colour of the material allowing more varied billboards. The default colour is white.
                 The tinting is effected using vertex colours.
         */
-        void setColour(const ColourValue& colour) { mColour = colour; }
+        void setColour(const ColourValue& colour) { mColour = colour.getAsBYTE(); }
 
         /** Gets the colour of this billboard.
         */
-        const ColourValue& getColour(void) const { return mColour; }
+        ColourValue getColour(void) const { return ColourValue((const uchar*)&mColour); }
 
         /** Returns true if this billboard deviates from the BillboardSet's default dimensions (i.e. if the
             Billboard::setDimensions method has been called for this instance).
