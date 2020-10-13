@@ -41,48 +41,6 @@ namespace Ogre {
     D3D9HLSLProgram::CmdAssemblerCode D3D9HLSLProgram::msCmdAssemblerCode;
     D3D9HLSLProgram::CmdBackwardsCompatibility D3D9HLSLProgram::msCmdBackwardsCompatibility;
 
-    class _OgreD3D9Export HLSLIncludeHandler : public ID3DXInclude
-    {
-    public:
-        HLSLIncludeHandler(Resource* sourceProgram) 
-            : mProgram(sourceProgram) {}
-        ~HLSLIncludeHandler() {}
-        
-        STDMETHOD(Open)(D3DXINCLUDE_TYPE IncludeType,
-            LPCSTR pFileName,
-            LPCVOID pParentData,
-            LPCVOID *ppData,
-            UINT *pByteLen
-            )
-        {
-            // find & load source code
-            DataStreamPtr stream = 
-                ResourceGroupManager::getSingleton().openResource(
-                String(pFileName), mProgram->getGroup(), true, mProgram);
-
-            String source = stream->getAsString();
-            // copy into separate c-string
-            // Note - must NOT copy the null terminator, otherwise this will terminate
-            // the entire program string!
-            *pByteLen = static_cast<UINT>(source.length());
-            char* pChar = OGRE_ALLOC_T(char, *pByteLen, MEMCATEGORY_RESOURCE);
-            memcpy(pChar, source.c_str(), *pByteLen);
-            *ppData = pChar;
-
-            return S_OK;
-        }
-
-        STDMETHOD(Close)(LPCVOID pData)
-        {           
-            OGRE_FREE(pData, MEMCATEGORY_RESOURCE);
-            return S_OK;
-        }
-    protected:
-        Resource* mProgram;
-
-
-    };
-
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::prepareImpl()
     {
@@ -211,8 +169,8 @@ namespace Ogre {
 
         LPD3DXBUFFER errors = 0;
 
-        // include handler
-        HLSLIncludeHandler includeHandler(this);
+        // handle includes
+        mSource = _resolveIncludes(mSource, this, mFilename, true);
 
         LPD3DXCONSTANTTABLE pConstTable;
 
@@ -221,7 +179,7 @@ namespace Ogre {
             mSource.c_str(),
             static_cast<UINT>(mSource.length()),
             pDefines,
-            &includeHandler, 
+            NULL,
             mEntryPoint.c_str(),
             getTarget().c_str(),
             compileFlags,
