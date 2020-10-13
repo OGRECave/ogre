@@ -317,7 +317,7 @@ namespace Ogre {
 		}
 		buildArgs();
 		// deal with includes
-		String sourceToUse = _resolveIncludes(mSource, this, mFilename);
+		String sourceToUse = _resolveIncludes(mSource, this, mFilename, true);
 
 		cgProgram = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(),
 			mSelectedCgProfile, mEntryPoint.c_str(), const_cast<const char**>(mCgArguments));
