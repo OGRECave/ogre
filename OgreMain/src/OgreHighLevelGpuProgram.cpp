@@ -260,7 +260,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    String HighLevelGpuProgram::_resolveIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName)
+    String HighLevelGpuProgram::_resolveIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName, bool supportsFilename)
     {
         String outSource;
         // output will be at least this big
@@ -269,7 +269,6 @@ namespace Ogre
         size_t startMarker = 0;
         size_t i = inSource.find("#include");
 
-        bool supportsFilename = StringUtil::endsWith(fileName, "cg");
         String lineFilename = supportsFilename ? StringUtil::format(" \"%s\"", fileName.c_str()) : " 0";
 
         while (i != String::npos)
@@ -354,7 +353,7 @@ namespace Ogre
             outSource.append("#line 1 " + incLineFilename + "\n");
 
             // recurse into include
-            outSource.append(_resolveIncludes(resource->getAsString(), resourceBeingLoaded, filename));
+            outSource.append(_resolveIncludes(resource->getAsString(), resourceBeingLoaded, filename, supportsFilename));
 
             // Add #line to the end of the included file to correct the line count
             outSource.append("\n#line " + std::to_string(lineCount) + lineFilename);

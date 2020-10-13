@@ -375,7 +375,7 @@ TEST_F(HighLevelGpuProgramTest, resolveIncludes)
     rgm.createResource("foo.cg", RGN_DEFAULT)->write(foo.c_str(), foo.size());
     const char* src = "#include <foo.cg>";
 
-    String res = HighLevelGpuProgram::_resolveIncludes(src, mat.get(), "main.cg");
+    String res = HighLevelGpuProgram::_resolveIncludes(src, mat.get(), "main.cg", true);
     rgm.deleteResource("foo.cg", RGN_DEFAULT);
     rgm.deleteResource("bar.cg", RGN_DEFAULT);
 

@@ -135,7 +135,7 @@ namespace Ogre {
         const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
 
         /// Scan the source for \#include and replace with contents from OGRE resources
-        static String _resolveIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
+        static String _resolveIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName, bool supportsFilename = false);
     };
     /** @} */
     /** @} */
