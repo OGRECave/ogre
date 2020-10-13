@@ -1,27 +1,29 @@
+#include "OgreUnifiedShader.h"
+
 struct RasterizerData
 {
-  float4 pos [[position]];
-  float2 uv;
+  vec4 pos [[position]];
+  vec2 uv;
 };
 
 struct Vertex
 {
-  float3 pos [[ attribute(0) ]];
-  float2 uv [[ attribute(8) ]];
+  IN(vec3 pos, POSITION);
+  IN(vec2 uv, TEXCOORD0);
 };
 
 struct Uniform
 {
-  metal::float4x4 mvpMtx;
-  metal::float4x4 texMtx;
+  mat4 mvpMtx;
+  mat4 texMtx;
 };
 
 vertex RasterizerData default_vp(Vertex in [[stage_in]],
                                  constant Uniform& u [[buffer(CONST_SLOT_START)]])
 {
   RasterizerData out;
-  out.pos = u.mvpMtx * float4(in.pos, 1);
-  out.uv = (u.texMtx * float4(in.uv,1,1)).xy;
+  out.pos = u.mvpMtx * vec4(in.pos, 1);
+  out.uv = (u.texMtx * vec4(in.uv,1,1)).xy;
   return out;
 }
 

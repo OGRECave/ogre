@@ -137,32 +137,7 @@ namespace Ogre {
         MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
         NSMutableDictionary<NSString *, NSObject *> *preprocessorMacros =
                 [NSMutableDictionary dictionary];
-        NSString *names[VES_COUNT] =
-        {
-            @"VES_POSITION",
-            @"VES_BLEND_WEIGHTS",
-            @"VES_BLEND_INDICES",
-            @"VES_NORMAL",
-            @"VES_DIFFUSE",
-            @"VES_SPECULAR",
-            @"VES_TEXTURE_COORDINATES",
-            @"VES_BINORMAL",
-            @"VES_TANGENT",
-        };
-        for( size_t i=0; i<VES_COUNT; ++i )
-        {
-            if( i + 1u != VES_BINORMAL )
-            {
-                preprocessorMacros[names[i]] =
-                        [NSNumber numberWithUnsignedInt:VERTEX_ATTRIBUTE_INDEX[i] ];
-            }
-        }
-        for( uint32 i=0; i<8u; ++i )
-        {
-            NSString *key = [NSString stringWithFormat:@"VES_TEXTURE_COORDINATES%d", i];
-            preprocessorMacros[key] =
-                    [NSNumber numberWithUnsignedInt:VERTEX_ATTRIBUTE_INDEX[VES_TEXTURE_COORDINATES - 1] + i];
-        }
+
         preprocessorMacros[@"CONST_SLOT_START"] =
                 [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
                     OGRE_METAL_CONST_SLOT_START : OGRE_METAL_CS_CONST_SLOT_START];
