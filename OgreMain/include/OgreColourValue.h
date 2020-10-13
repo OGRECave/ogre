@@ -75,36 +75,33 @@ namespace Ogre {
 
         float r,g,b,a;
 
-        /** Retrieves colour as RGBA.
-        */
+        /// @name conversions from/ to native-endian packed formats
+        /// @{
+
+        /// value packed as #PF_R8G8B8A8
         RGBA getAsRGBA(void) const;
 
-        /** Retrieves colour as ARGB.
-        */
+        /// value packed as #PF_A8R8G8B8
         ARGB getAsARGB(void) const;
 
-        /** Retrieves colour as BGRA.
-        */
+        /// value packed as #PF_B8G8R8A8
         BGRA getAsBGRA(void) const;
 
-        /** Retrieves colours as ABGR */
+        /// value packed as #PF_A8B8G8R8
         ABGR getAsABGR(void) const;
 
-        /** Sets colour as RGBA.
-        */
+        /// Set value from #PF_R8G8B8A8
         void setAsRGBA(RGBA val);
 
-        /** Sets colour as ARGB.
-        */
+        /// Set value from #PF_A8R8G8B8
         void setAsARGB(ARGB val);
 
-        /** Sets colour as BGRA.
-        */
+        /// Set value from #PF_B8G8R8A8
         void setAsBGRA(BGRA val);
 
-        /** Sets colour as ABGR.
-        */
+        /// Set value from #PF_A8B8G8R8
         void setAsABGR(ABGR val);
+        /// @}
 
         /** Clamps colour value to the range [0, 1].
         */

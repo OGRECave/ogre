@@ -424,12 +424,14 @@ Represents the negative z plane (back).
 
 ## Pixel Formats {#Pixel-Formats}
 
+@copydetails Ogre::PixelFormat
+
 A pixel format described the storage format of pixel data. It defines the way pixels are encoded in memory. The following classes of pixel formats (PF\_\*) are defined:
 
 <dl compact="compact">
 <dt>Native endian formats (PF\_A8R8G8B8 and other formats with bit counts)</dt> <dd>
 
-These are native endian (16, 24 and 32 bit) integers in memory. This means that an image with format PF\_A8R8G8B8 can be seen as an array of 32 bit integers, defined as 0xAARRGGBB in hexadecimal. The meaning of the letters is described below.
+These are native endian (16, 24 and 32 bit) integers in memory. The meaning of the letters is described below.
 
 </dd> <dt>Byte formats (PF\_BYTE\_\*)</dt> <dd>
 
