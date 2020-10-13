@@ -57,6 +57,14 @@ SHARED_PTR(OverlayElement);
   {
     return dynamic_cast<Ogre::OverlayContainer*>($self);
   }
+  Ogre::PanelOverlayElement* castPanelOverlayElement()
+  {
+    return dynamic_cast<Ogre::PanelOverlayElement*>($self);
+  }
+  Ogre::TextAreaOverlayElement* castTextAreaOverlayElement()
+  {
+    return dynamic_cast<Ogre::TextAreaOverlayElement*>($self);
+  }
 }
 %include "OgreOverlayElement.h"
 %include "OgreOverlayElementFactory.h"
