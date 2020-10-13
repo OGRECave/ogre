@@ -783,7 +783,7 @@ namespace Ogre
         /** Reports the number of vertices passed to the renderer since the last _beginGeometryCount call. */
         virtual unsigned int _getVertexCount(void) const;
 
-        /// @deprecated use ColourValue::getAsABGR()
+        /// @deprecated use ColourValue::getAsBYTE()
         OGRE_DEPRECATED void convertColourValue(const ColourValue& colour, uint32* pDest);
         /// @deprecated assume VET_UBYTE4_NORM
         OGRE_DEPRECATED virtual VertexElementType getColourVertexElementType(void) const

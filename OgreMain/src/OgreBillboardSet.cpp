@@ -889,7 +889,7 @@ namespace Ogre {
     void BillboardSet::genVertices(
         const Vector3* const offsets, const Billboard& bb)
     {
-        RGBA colour = bb.mColour.getAsABGR();
+        RGBA colour = bb.mColour.getAsBYTE();
         RGBA* pCol;
 
         // Texcoords
