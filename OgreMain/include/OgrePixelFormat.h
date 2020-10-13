@@ -41,10 +41,14 @@ namespace Ogre {
     */
     /** The pixel format used for images, textures, and render surfaces
      *
-     * @note the components are specified in "packed" native byte order.
-     * For PF_BYTE_* formats this means that platform endianess changes the order:
-     * e.g. Ogre::PF_BYTE_RGBA on little endian (x86) forms an integer as Ogre::PF_A8B8G8R8,
-     * while on big endian it "packs" as Ogre::PF_R8G8B8A8
+     * A pixel format described the storage format of pixel data. It defines the way pixels are encoded in memory.
+     * The components are specified in "packed" native byte order for native endian (16, 24 and 32 bit) integers.
+     * This means that a pixel with format Ogre::PF_A8R8G8B8 can be seen as a 32 bit integer, written as @c 0xAARRGGBB in hexadecimal
+     * on a little-endian (x86) machine or as @c 0xBBGGRRAA on a big-endian machine.
+     * The example above would be expressed with an array of bytes as `{0xBB, 0xGG, 0xRR, 0xAA}` on both machines.
+     * Therefore, one would use the Ogre::PF_BYTE_BGRA format when reading pixel data expressed in bytes.
+     * This format aliases to either Ogre::PF_A8B8G8R8 or Ogre::PF_R8G8B8A8
+     * depending on the machine endianess.
      */
     enum PixelFormat
     {
