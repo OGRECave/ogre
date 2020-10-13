@@ -331,7 +331,7 @@ namespace Ogre {
 #endif
         case VET_UBYTE4_NORM:
         case VET_COLOUR_ABGR: 
-            return src.getAsABGR();
+            return src.getAsBYTE();
         };
 
     }

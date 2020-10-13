@@ -568,7 +568,7 @@ namespace Ogre {
                     if (mUseVertexColour)
                     {
                         RGBA* pCol = static_cast<RGBA*>(pBase);
-                        *pCol++ = elem.colour.getAsABGR();
+                        *pCol++ = elem.colour.getAsBYTE();
                         pBase = static_cast<void*>(pCol);
                     }
 
@@ -598,7 +598,7 @@ namespace Ogre {
                     if (mUseVertexColour)
                     {
                         RGBA* pCol = static_cast<RGBA*>(pBase);
-                        *pCol++ = elem.colour.getAsABGR();
+                        *pCol++ = elem.colour.getAsBYTE();
                         pBase = static_cast<void*>(pCol);
                     }
 

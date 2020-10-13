@@ -70,6 +70,11 @@ namespace Ogre {
                     float alpha = 1.0f ) : r(red), g(green), b(blue), a(alpha)
         { }
 
+        explicit ColourValue(const uchar* byte) : r(byte[0]), g(byte[1]), b(byte[2]), a(byte[3])
+        {
+            *this /= 255;
+        }
+
         bool operator==(const ColourValue& rhs) const;
         bool operator!=(const ColourValue& rhs) const;
 
@@ -89,6 +94,16 @@ namespace Ogre {
 
         /// value packed as #PF_A8B8G8R8
         ABGR getAsABGR(void) const;
+
+        /// value packed as #PF_BYTE_RGBA
+        RGBA getAsBYTE() const
+        {
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+            return getAsRGBA();
+#else
+            return getAsABGR();
+#endif
+        }
 
         /// Set value from #PF_R8G8B8A8
         void setAsRGBA(RGBA val);
