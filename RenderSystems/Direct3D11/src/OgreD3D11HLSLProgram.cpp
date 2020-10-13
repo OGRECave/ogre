@@ -110,48 +110,6 @@ namespace Ogre {
         }
     }
 
-
-    class HLSLIncludeHandler : public ID3DInclude
-    {
-    public:
-        HLSLIncludeHandler(Resource* sourceProgram) 
-            : mProgram(sourceProgram) {}
-        ~HLSLIncludeHandler() {}
-
-        STDMETHOD(Open)(D3D_INCLUDE_TYPE IncludeType,
-            LPCSTR pFileName,
-            LPCVOID pParentData,
-            LPCVOID *ppData,
-            UINT *pByteLen
-            )
-        {
-            // find & load source code
-            DataStreamPtr stream = 
-                ResourceGroupManager::getSingleton().openResource(
-                String(pFileName), mProgram->getGroup(), true, mProgram);
-
-            String source = stream->getAsString();
-            // copy into separate c-string
-            // Note - must NOT copy the null terminator, otherwise this will terminate
-            // the entire program string!
-            *pByteLen = static_cast<UINT>(source.length());
-            char* pChar = new char[*pByteLen];
-            memcpy(pChar, source.c_str(), *pByteLen);
-            *ppData = pChar;
-
-            return S_OK;
-        }
-
-        STDMETHOD(Close)(LPCVOID pData)
-        {
-            char* pChar = (char*)pData;
-            delete [] pChar;
-            return S_OK;
-        }
-    protected:
-        Resource* mProgram;
-    };
-
     void D3D11HLSLProgram::getDefines(String& stringBuffer, std::vector<D3D_SHADER_MACRO>& defines, const String& definesString)
     {
         // Populate preprocessor defines
@@ -405,9 +363,6 @@ namespace Ogre {
 #else
 #pragma comment(lib, "d3dcompiler.lib")
 
-        // include handler
-        HLSLIncludeHandler includeHandler(this);
-
         String stringBuffer;
         std::vector<D3D_SHADER_MACRO> defines;
         const D3D_SHADER_MACRO* pDefines = NULL;
@@ -445,12 +400,15 @@ namespace Ogre {
         ComPtr<ID3DBlob> pMicroCode;
         ComPtr<ID3DBlob> errors;
 
+        // handle includes
+        mSource = _resolveIncludes(mSource, this, mFilename, true);
+
         HRESULT hr = D3DCompile(
             mSource.c_str(),      // [in] Pointer to the shader in memory. 
             mSource.size(),       // [in] Size of the shader in memory.  
             mFilename.c_str(),    // [in] Optional. You can use this parameter for strings that specify error messages.
             pDefines,             // [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D_SHADER_MACRO. If not used, set this to NULL. 
-            &includeHandler,      // [in] Optional. Pointer to an ID3DInclude Interface interface for handling include files. Setting this to NULL will cause a compile error if a shader contains a #include. 
+            NULL,                 // [in] Optional. Pointer to an ID3DInclude Interface interface for handling include files. Setting this to NULL will cause a compile error if a shader contains a #include.
             mEntryPoint.c_str(),  // [in] Name of the shader-entrypoint function where shader execution begins. 
             target,               // [in] A string that specifies the shader model; can be any profile in shader model 4 or higher. 
             compileFlags,         // [in] Effect compile flags - no D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY at the first try...
