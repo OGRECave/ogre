@@ -180,6 +180,9 @@ namespace Ogre {
 
         options.preprocessorMacros = preprocessorMacros;
 
+        // metal does not support runtime #includes. Also we want to use our Resource system
+        mSource = _resolveIncludes(mSource, this, mFilename, true);
+
         NSError *error;
         mLibrary = [mDevice->mDevice newLibraryWithSource:[NSString stringWithUTF8String:mSource.c_str()]
                                                   options:options
@@ -191,8 +194,8 @@ namespace Ogre {
             if( error )
                 errorDesc = [error localizedDescription].UTF8String;
 
-            LogManager::getSingleton().logMessage(
-                        "Metal SL Compiler Error in " + mName + ":\n" + errorDesc );
+            LogManager::getSingleton().logError(
+                        "Metal Compiler in " + mName + ":\n" + errorDesc );
         }
         else
         {
@@ -203,8 +206,8 @@ namespace Ogre {
                 String errorDesc;
                 if( error )
                     errorDesc = [error localizedDescription].UTF8String;
-                LogManager::getSingleton().logMessage(
-                            "Metal SL Compiler Warnings in " + mName + ":\n" + errorDesc );
+                LogManager::getSingleton().logWarning(
+                            "Metal SL Compiler in " + mName + ":\n" + errorDesc );
             }
         }
 
@@ -214,8 +217,8 @@ namespace Ogre {
         if( !mFunction )
         {
             mCompiled = false;
-            LogManager::getSingleton().logMessage(
-                        "Error retriving entry point '" + mEntryPoint + "' in shader " + mName );
+            LogManager::getSingleton().logError(
+                        "retriving entry point '" + mEntryPoint + "' in shader " + mName );
         }
 
         // Log a message that the shader compiled successfully.
