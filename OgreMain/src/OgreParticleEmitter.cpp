@@ -353,11 +353,8 @@ namespace Ogre
         if (mColourRangeStart != mColourRangeEnd)
         {
             // Randomise
-            //Real t = Math::UnitRandom();
-            destColour.r = mColourRangeStart.r + (Math::UnitRandom() * (mColourRangeEnd.r - mColourRangeStart.r));
-            destColour.g = mColourRangeStart.g + (Math::UnitRandom() * (mColourRangeEnd.g - mColourRangeStart.g));
-            destColour.b = mColourRangeStart.b + (Math::UnitRandom() * (mColourRangeEnd.b - mColourRangeStart.b));
-            destColour.a = mColourRangeStart.a + (Math::UnitRandom() * (mColourRangeEnd.a - mColourRangeStart.a));
+            ColourValue t(Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom());
+            destColour = mColourRangeStart + t * (mColourRangeEnd - mColourRangeStart);
         }
         else
         {

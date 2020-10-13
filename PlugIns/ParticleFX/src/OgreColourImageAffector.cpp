@@ -97,16 +97,11 @@ namespace Ogre {
             {
                 // Linear interpolation
                 const Real      fract       = float_index - (Real)index;
-                const Real      to_colour   = fract;
-                const Real      from_colour = 1.0f - to_colour;
              
                 ColourValue from=mColourImage.getColourAt(index, 0, 0),
                             to=mColourImage.getColourAt(index+1, 0, 0);
 
-                p->mColour.r = from.r*from_colour + to.r*to_colour;
-                p->mColour.g = from.g*from_colour + to.g*to_colour;
-                p->mColour.b = from.b*from_colour + to.b*to_colour;
-                p->mColour.a = from.a*from_colour + to.a*to_colour;
+                p->mColour = Math::lerp(from, to, fract);
             }
         }
     }
