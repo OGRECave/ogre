@@ -426,11 +426,9 @@ namespace Ogre
             }
             else
             {
-                uint8* tmpData = (uint8*)OGRE_MALLOC(mGlobalColourMapSize * mGlobalColourMapSize * 3, MEMCATEGORY_GENERAL);
-                PixelBox dst(mGlobalColourMapSize, mGlobalColourMapSize, 1, PF_BYTE_RGB, tmpData);
-                mColourMap->getBuffer()->blitToMemory(dst);
-                stream.write(tmpData, mGlobalColourMapSize * mGlobalColourMapSize * 3);
-                OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+                Image tmp(PF_BYTE_RGB, mGlobalColourMapSize, mGlobalColourMapSize);
+                mColourMap->getBuffer()->blitToMemory(tmp.getPixelBox());
+                stream.write(tmp.getData(), tmp.getSize());
             }
             stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 
@@ -450,11 +448,9 @@ namespace Ogre
             }
             else
             {
-                uint8* tmpData = (uint8*)OGRE_MALLOC(mLightmapSize * mLightmapSize, MEMCATEGORY_GENERAL);
-                PixelBox dst(mLightmapSize, mLightmapSize, 1, PF_L8, tmpData);
-                mLightmap->getBuffer()->blitToMemory(dst);
-                stream.write(tmpData, mLightmapSize * mLightmapSize);
-                OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+                Image tmp(PF_L8, mLightmapSize, mLightmapSize);
+                mLightmap->getBuffer()->blitToMemory(tmp.getPixelBox());
+                stream.write(tmp.getData(), tmp.getSize());
             }
             stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
         }
@@ -474,11 +470,9 @@ namespace Ogre
             else
             {
                 // composite map is 4 channel, 3x diffuse, 1x specular mask
-                uint8* tmpData = (uint8*)OGRE_MALLOC(mCompositeMapSize * mCompositeMapSize * 4, MEMCATEGORY_GENERAL);
-                PixelBox dst(mCompositeMapSize, mCompositeMapSize, 1, PF_BYTE_RGBA, tmpData);
-                mCompositeMap->getBuffer()->blitToMemory(dst);
-                stream.write(tmpData, mCompositeMapSize * mCompositeMapSize * 4);
-                OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+                Image tmp(PF_BYTE_RGBA, mCompositeMapSize, mCompositeMapSize);
+                mCompositeMap->getBuffer()->blitToMemory(tmp.getPixelBox());
+                stream.write(tmp.getData(), tmp.getSize());
             }
             stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
         }

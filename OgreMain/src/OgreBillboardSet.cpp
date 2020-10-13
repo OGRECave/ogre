@@ -446,10 +446,7 @@ namespace Ogre {
         }
         else
         {
-            Real maxSqLen = -1.0f;
-
-            Vector3 min(Math::POS_INFINITY, Math::POS_INFINITY, Math::POS_INFINITY);
-            Vector3 max(Math::NEG_INFINITY, Math::NEG_INFINITY, Math::NEG_INFINITY);
+            mAABB.setNull();
             ActiveBillboardList::iterator i, iend;
 
             iend = mActiveBillboards.end();
@@ -464,20 +461,15 @@ namespace Ogre {
                 // transform from world space to local space
                 if (invert)
                     pos = invWorld * pos;
-                min.makeFloor(pos);
-                max.makeCeil(pos);
 
-                maxSqLen = std::max(maxSqLen, pos.squaredLength());
+                mAABB.merge(pos);
             }
             // Adjust for billboard size
             Real adjust = std::max(mDefaultWidth, mDefaultHeight);
             Vector3 vecAdjust(adjust, adjust, adjust);
-            min -= vecAdjust;
-            max += vecAdjust;
 
-            mAABB.setExtents(min, max);
-            mBoundingRadius = Math::Sqrt(maxSqLen);
-
+            mAABB.setExtents(mAABB.getMinimum() - vecAdjust, mAABB.getMaximum() + vecAdjust);
+            mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
         }
 
         if (mParentNode)

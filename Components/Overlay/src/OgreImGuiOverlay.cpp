@@ -300,13 +300,13 @@ void ImGuiOverlay::ImGUIRenderable::updateVertexData(const ImVector<ImDrawVert>&
 {
     VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;
 
-    if (bind->getBindings().empty() || bind->getBuffer(0)->getNumVertices() != size_t(vtxBuf.size()))
+    if (bind->getBindings().empty() || bind->getBuffer(0)->getNumVertices() < size_t(vtxBuf.size()))
     {
         bind->setBinding(0, HardwareBufferManager::getSingleton().createVertexBuffer(
                                 sizeof(ImDrawVert), vtxBuf.size(), HBU_CPU_TO_GPU));
     }
     if (!mRenderOp.indexData->indexBuffer ||
-        mRenderOp.indexData->indexBuffer->getNumIndexes() != size_t(idxBuf.size()))
+        mRenderOp.indexData->indexBuffer->getNumIndexes() < size_t(idxBuf.size()))
     {
         mRenderOp.indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, idxBuf.size(), HBU_CPU_TO_GPU);

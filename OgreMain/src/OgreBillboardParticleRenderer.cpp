@@ -129,9 +129,7 @@ namespace Ogre {
         mBillboardSet->setCullIndividually(cullIndividually);
 
         // Update billboard set geometry
-        Vector3 bboxMin = Math::POS_INFINITY * Vector3::UNIT_SCALE;
-        Vector3 bboxMax = Math::NEG_INFINITY * Vector3::UNIT_SCALE;
-        Real radius = 0.0f;
+        AxisAlignedBox aabb;
         mBillboardSet->beginBillboards(currentParticles.size());
         Billboard bb;
         Affine3 invWorld;
@@ -150,9 +148,7 @@ namespace Ogre {
             if (invert)
                 pos = invWorld * pos;
 
-            bboxMin.makeFloor( pos );
-            bboxMax.makeCeil( pos );
-            radius = std::max( radius, p->mPosition.length() );
+            aabb.merge(pos);
 
             if (mBillboardSet->getBillboardType() == BBT_ORIENTED_SELF ||
                 mBillboardSet->getBillboardType() == BBT_PERPENDICULAR_SELF)
@@ -175,7 +171,7 @@ namespace Ogre {
 
         // Only set bounds if there are any active particles
         if(currentParticles.size())
-            mBillboardSet->setBounds( AxisAlignedBox( bboxMin, bboxMax ), radius );
+            mBillboardSet->setBounds(aabb, Math::boundingRadiusFromAABB(aabb));
 
         mBillboardSet->endBillboards();
 

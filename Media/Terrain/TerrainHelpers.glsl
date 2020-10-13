@@ -1,45 +1,42 @@
-// Simple PCF
-// Number of samples in one dimension (square for total samples)
-#define NUM_SHADOW_SAMPLES_1D 2.0
-#define SHADOW_FILTER_SCALE 1.0
-#define SHADOW_SAMPLES NUM_SHADOW_SAMPLES_1D*NUM_SHADOW_SAMPLES_1D
-
-float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize)
-{
-    // 4-sample PCF
-    float shadow = 0.0;
-    float offset = (NUM_SHADOW_SAMPLES_1D/2.0 - 0.5) * SHADOW_FILTER_SCALE;
-    uv /= uv.w;
-#ifndef OGRE_REVERSED_Z
-    uv.z = uv.z * 0.5 + 0.5; // convert -1..1 to 0..1
-#endif
-    for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE)
-        for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE)
-        {
-            vec2 newUV = uv.xy + vec2(x, y) * invShadowMapSize;
-            float depth = texture2D(shadowMap, newUV).x;
-            if (depth >= 1.0 || depth >= uv.z) // depth = 1.0 at PSSM end
-                shadow += 1.0;
-        }
-    shadow /= SHADOW_SAMPLES;
-#ifdef OGRE_REVERSED_Z
-    shadow = 1.0 - shadow;
-#endif
-    return shadow;
-}
-
 float calcSimpleShadow(sampler2D shadowMap, vec4 shadowMapPos)
 {
     return texture2DProj(shadowMap, shadowMapPos).x;
 }
+
+void calcPSSMSimpleShadow(float camDepth, vec4 pssmSplitPoints,
+    vec4 lsPos0, sampler2D shadowMap0,
+    #if PSSM_NUM_SPLITS > 2
+    vec4 lsPos1, sampler2D shadowMap1,
+    #endif
+    #if PSSM_NUM_SPLITS > 3
+    vec4 lsPos2, sampler2D shadowMap2,
+    #endif
+    vec4 lsPos3, sampler2D shadowMap3,
+    out float shadow)
+{
+    if (camDepth <= pssmSplitPoints.r)
+    {
+        shadow = calcSimpleShadow(shadowMap0, lsPos0);
+    }
+#if PSSM_NUM_SPLITS > 2
+    else if (camDepth <= pssmSplitPoints.g)
+    {
+        shadow = calcSimpleShadow(shadowMap1, lsPos1);
+    }
+#endif
+#if PSSM_NUM_SPLITS > 3
+    else if (camDepth <= pssmSplitPoints.b)
+    {
+        shadow = calcSimpleShadow(shadowMap2, lsPos2);
+    }
+#endif
+    else
+    {
+        shadow = calcSimpleShadow(shadowMap3, lsPos3);
+    }
+}
+
 vec4 expand(vec4 v)
 {
     return v * 2.0 - 1.0;
-}
-// From http://substance.io/zauner/porting-vvvv-hlsl-shaders-to-vvvvjs
-vec4 lit(float NdotL, float NdotH, float m) {
-    float ambient = 1.0;
-    float diffuse = max(0.0, NdotL);
-    float specular = step(0.0, NdotL) * max(pow(NdotH, m), 0.0);
-    return vec4(ambient, diffuse, specular, 1.0);
 }

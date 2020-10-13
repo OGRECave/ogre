@@ -89,6 +89,12 @@ namespace Ogre
             ret->unload();
         }
 
+        if (prof->getReceiveDynamicShadowsPSSM())
+        {
+            uint numShadowTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+            ret->setPreprocessorDefines(StringUtil::format("PSSM_NUM_SPLITS=%d", numShadowTextures));
+        }
+
         if(!mIsGLSL)
         {
             ret->setParameter("enable_backwards_compatibility", "true");
@@ -114,6 +120,7 @@ namespace Ogre
         }
 
         outStream << "#include <OgreUnifiedShader.h>\n";
+        outStream << "#include <FFPLib_Fog.glsl>\n";
 
         outStream <<
             "uniform mat4 worldMatrix;\n"
@@ -280,13 +287,11 @@ namespace Ogre
         {
             if (terrain->getSceneManager()->getFogMode() == FOG_LINEAR)
             {
-                outStream <<
-                    "    fogVal = saturate((gl_Position.z - fogParams.y) * fogParams.w);\n";
+                outStream << "    FFP_VertexFog_Linear(gl_Position, fogParams, fogVal);\n";
             }
             else
             {
-                outStream <<
-                    "    fogVal = 1.0 - saturate(1.0 / (exp(gl_Position.z * fogParams.x)));\n";
+                outStream << "    FFP_VertexFog_Exp(gl_Position, fogParams, fogVal);\n";
             }
         }
 
@@ -313,9 +318,8 @@ namespace Ogre
         outStream << "#include <OgreUnifiedShader.h>\n";
         // helpers
         outStream << "#include <TerrainHelpers.glsl>\n";
-
-        if (prof->isShadowingEnabled(tt, terrain))
-            generateFpDynamicShadowsHelpers(prof, terrain, tt, outStream);
+        outStream << "#include <SGXLib_PerPixelLighting.glsl>\n";
+        outStream << "#include <SGXLib_IntegratedPSSM.glsl>\n";
 
         // UV's premultiplied, packed as xy/zw
         uint maxLayers = prof->getMaxLayers(terrain);
@@ -595,106 +599,40 @@ namespace Ogre
                 generateFpDynamicShadows(prof, terrain, tt, outStream);
             }
 
-            // diffuse lighting
-            outStream << "    normal = normalize(normal);\n";
-            outStream << "    vec4 litRes = lit(dot(normal, lightDir), dot(normal, halfAngle), scaleBiasSpecular.z);\n";
-            outStream << "    gl_FragColor.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
-
             // specular default
             if (!prof->isLayerSpecularMappingEnabled())
                 outStream << "    specular = 1.0;\n";
 
             if (tt == RENDER_COMPOSITE_MAP)
             {
+                outStream << "    SGX_Light_Directional_Diffuse(normal, lightDir, diffuse, gl_FragColor.rgb);\n";
                 // Lighting embedded in alpha
-                outStream <<
-                    "    gl_FragColor.a = shadow;\n";
+                outStream << "    gl_FragColor.a = shadow;\n";
             }
             else
             {
+                outStream << "    vec3 specularCol = vec3(0,0,0);\n";
+                outStream << "    SGX_Light_Directional_DiffuseSpecular(normal, eyeDir, lightDir, lightDiffuseColour * diffuse, "
+                             "lightSpecularColour * specular, scaleBiasSpecular.z, gl_FragColor.rgb, specularCol);\n";
+
                 // Apply specular
-                outStream << "    gl_FragColor.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+                outStream << "    gl_FragColor.rgb += specularCol;\n";
 
                 if (prof->getParent()->getDebugLevel())
                 {
                     outStream << "    gl_FragColor.rg += lodInfo.xy;\n";
                 }
             }
+            outStream << "    gl_FragColor.rgb = gl_FragColor.rgb * shadow + ambient.rgb * diffuse;\n";
         }
 
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
         if (fog)
         {
-            outStream << "    gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColour, fogVal);\n";
+            outStream << "    gl_FragColor.rgb = mix(fogColour, gl_FragColor.rgb, fogVal);\n";
         }
 
         outStream << "}\n";
-    }
-    //---------------------------------------------------------------------
-    void ShaderHelperGLSL::generateFpDynamicShadowsHelpers(const SM2Profile* prof, const Terrain* terrain,
-                                                                                                  TechniqueType tt, StringStream& outStream)
-    {
-        if (prof->getReceiveDynamicShadowsPSSM())
-        {
-            uint numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
-
-            if (prof->getReceiveDynamicShadowsDepth())
-            {
-                outStream <<
-                    "float calcPSSMDepthShadow(";
-            }
-            else
-            {
-                outStream <<
-                    "float calcPSSMSimpleShadow(";
-            }
-
-            outStream << "\n    ";
-            for (uint i = 0; i < numTextures; ++i)
-                outStream << "sampler2D shadowMap" << i << ", ";
-            outStream << "\n    ";
-            for (uint i = 0; i < numTextures; ++i)
-                outStream << "vec4 lsPos" << i << ", ";
-            if (prof->getReceiveDynamicShadowsDepth())
-            {
-                outStream << "\n    ";
-                for (uint i = 0; i < numTextures; ++i)
-                    outStream << "float invShadowmapSize" << i << ", ";
-            }
-            outStream << "\n"
-                "    vec4 pssmSplitPoints, float camDepth) \n"
-                "    { \n"
-                "    float shadow; \n"
-                "    // calculate shadow \n";
-
-            for (uint i = 0; i < numTextures; ++i)
-            {
-                if (!i)
-                    outStream << "    if (camDepth <= pssmSplitPoints." << ShaderHelper::getChannel(i) << ") \n";
-                else if (i < numTextures - 1)
-                    outStream << "    else if (camDepth <= pssmSplitPoints." << ShaderHelper::getChannel(i) << ") \n";
-                else
-                    outStream << "    else \n";
-
-                outStream <<
-                    "    { \n";
-                if (prof->getReceiveDynamicShadowsDepth())
-                {
-                    outStream <<
-                        "        shadow = calcDepthShadow(shadowMap" << i << ", lsPos" << i << ", invShadowmapSize" << i << "); \n";
-                }
-                else
-                {
-                    outStream <<
-                        "        shadow = calcSimpleShadow(shadowMap" << i << ", lsPos" << i << "); \n";
-                }
-                outStream << "    } \n";
-            }
-
-            outStream <<
-                "    return shadow; \n"
-                "} \n\n\n";
-        }
     }
     //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain,
@@ -724,48 +662,44 @@ namespace Ogre
     void ShaderHelperGLSL::generateFpDynamicShadows(const SM2Profile* prof, const Terrain* terrain,
                                                                                            TechniqueType tt, StringStream& outStream)
     {
+        outStream << "    float rtshadow;";
         if (prof->getReceiveDynamicShadowsPSSM())
         {
             uint numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
-            outStream << 
-                "    float camDepth = oUVMisc.z;\n";
 
             if (prof->getReceiveDynamicShadowsDepth())
             {
                 outStream << 
-                    "    float rtshadow = calcPSSMDepthShadow(";
+                    "    SGX_ComputeShadowFactor_PSSM3(";
             }
             else
             {
                 outStream << 
-                    "    float rtshadow = calcPSSMSimpleShadow(";
+                    "    calcPSSMSimpleShadow(";
             }
+            outStream << "oUVMisc.z, pssmSplitPoints,\n        ";
             for (uint i = 0; i < numTextures; ++i)
-                outStream << "shadowMap" << i << ", ";
-            outStream << "\n        ";
-
-            for (uint i = 0; i < numTextures; ++i)
-                outStream << "oLightSpacePos" << i << ", ";
-            if (prof->getReceiveDynamicShadowsDepth())
             {
+                outStream << "oLightSpacePos" << i << ", ";
+                outStream << "shadowMap" << i << ", ";
+                if (prof->getReceiveDynamicShadowsDepth())
+                    outStream << "vec2_splat(inverseShadowmapSize" << i << "), ";
                 outStream << "\n        ";
-                for (uint i = 0; i < numTextures; ++i)
-                    outStream << "inverseShadowmapSize" << i << ", ";
             }
-            outStream << "\n" <<
-                "        pssmSplitPoints, camDepth);\n";
+
+            outStream << "        rtshadow);\n";
         }
         else
         {
             if (prof->getReceiveDynamicShadowsDepth())
             {
                 outStream <<
-                    "    float rtshadow = calcDepthShadow(shadowMap0, oLightSpacePos0, inverseShadowmapSize0);";
+                    "    SGX_ShadowPCF4(shadowMap0, oLightSpacePos0, vec2_splat(inverseShadowmapSize0), rtshadow);";
             }
             else
             {
                 outStream <<
-                    "    float rtshadow = calcSimpleShadow(shadowMap0, oLightSpacePos0);";
+                    "    rtshadow = calcSimpleShadow(shadowMap0, oLightSpacePos0);";
             }
         }
 

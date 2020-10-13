@@ -772,7 +772,7 @@ namespace Ogre
             This is only intended for internal use; it is only valid during the
             rendering of a frame.
         */
-        SceneManager* _getCurrentSceneManager(void) const;
+        SceneManager* _getCurrentSceneManager(void) const { return mSceneManagerStack.empty() ? NULL : mSceneManagerStack.back(); }
         /** Pushes the scene manager currently being used to render.
         @remarks
             This is only intended for internal use.

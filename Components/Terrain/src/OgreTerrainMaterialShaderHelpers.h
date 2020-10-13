@@ -79,7 +79,6 @@ namespace Ogre
         void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream);
         void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         void generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
-        void generateFpDynamicShadowsHelpers(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
         void generateFpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream);
     };
 }
