@@ -178,7 +178,7 @@ namespace OgreBites {
         [[mConfigWindow contentView] addSubview:mCancelButton];
 
         // Then the Ogre logo out of the framework bundle
-        mOgreLogo = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 295, 512, 220)];
+        mOgreLogo = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 395, 512, 120)];
         NSMutableString *logoPath = [[[NSBundle bundleForClass:[self class]] resourcePath] mutableCopy];
         [logoPath appendString:@"/ogrelogo.png"];
 
@@ -191,13 +191,13 @@ namespace OgreBites {
         [[mConfigWindow contentView] addSubview:mOgreLogo];
 
         // Popup menu for rendersystems.  On OS X this is always OpenGL
-        mRenderSystemsPopUp = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(168, 259, 327, 26) pullsDown:NO];
+        mRenderSystemsPopUp = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(168, 359, 327, 26) pullsDown:NO];
         [[mConfigWindow contentView] addSubview:mRenderSystemsPopUp];
 
         [mRenderSystemsPopUp setAction:@selector(renderSystemChanged:)];
         [mRenderSystemsPopUp setTarget:self];
 
-        NSTextField *renderSystemLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(18, 265, 148, 17)];
+        NSTextField *renderSystemLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(18, 365, 148, 17)];
         [renderSystemLabel setStringValue:NSLocalizedString(@"Rendering Subsystem", @"renderingSubsystemString")];
         [renderSystemLabel setEditable:NO];
         [renderSystemLabel setSelectable:NO];
@@ -208,7 +208,7 @@ namespace OgreBites {
         [renderSystemLabel release];
 
         // The pretty box to contain the table and options
-        NSBox *tableBox = [[NSBox alloc] initWithFrame:NSMakeRect(19, 54, 477, 203)];
+        NSBox *tableBox = [[NSBox alloc] initWithFrame:NSMakeRect(19, 54, 477, 303)];
         [tableBox setTitle:NSLocalizedString(@"Rendering System Options", @"optionsBoxString")];
         [tableBox setContentViewMargins:NSMakeSize(0, 0)];
         [tableBox setFocusRingType:NSFocusRingTypeNone];
@@ -230,7 +230,7 @@ namespace OgreBites {
         [column release];
 
         // Scroll view to hold the table in case the list grows some day
-        NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(22, 42, 439, 135)];
+        NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(22, 42, 439, 235)];
         [scrollView setBorderType:NSBezelBorder];
         [scrollView setAutoresizesSubviews:YES];
         [scrollView setAutohidesScrollers:YES];
@@ -271,7 +271,6 @@ namespace OgreBites {
 
 -(void) refreshConfigOptions
 {
-    printf("YOLO\n");
     NSMutableDictionary* dict = [NSMutableDictionary dictionary];
 
     // Get detected option values and add them to our config dictionary
