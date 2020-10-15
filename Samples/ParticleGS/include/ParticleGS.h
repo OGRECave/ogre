@@ -27,7 +27,6 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
 #ifdef LOG_GENERATED_BUFFER
     bool frameEnded(const FrameEvent& evt);
 #endif
-    Real demoTime;
     ProceduralManualObject* mParticleSystem;
     ProceduralManualObjectFactory *mProceduralManualObjectFactory;
 };

@@ -118,8 +118,8 @@ material Ogre/ParticleGS/Generate
 			geometry_program_ref Ogre/ParticleGS/GenerateGScg
 			{
 				param_named frameGravity float3 0 -0.1 0
-				param_named globalTime float 0.0
-				param_named elapsedTime float 0.1
+				param_named_auto globalTime time
+				param_named_auto elapsedTime frame_time
 				param_named secondsPerFirework float 0.3
 			}
 			
@@ -143,8 +143,8 @@ material Ogre/ParticleGS/Generate
 			geometry_program_ref Ogre/ParticleGS/GenerateGShlsl4
 			{
 				param_named frameGravity float3 0 -0.1 0
-				param_named globalTime float 0.0
-				param_named elapsedTime float 0.1
+				param_named_auto globalTime time
+				param_named_auto elapsedTime frame_time
 				param_named secondsPerFirework float 0.3
 			}
 			
@@ -171,8 +171,8 @@ material Ogre/ParticleGS/Generate
 			geometry_program_ref Ogre/ParticleGS/GenerateGSglsl
 			{
 			    param_named frameGravity float3 0 -0.1 0
-			    param_named globalTime float 0.0
-			    param_named elapsedTime float 0.1
+			    param_named_auto globalTime time
+			    param_named_auto elapsedTime frame_time
 			    param_named secondsPerFirework float 0.3
 			}
 			
