@@ -185,6 +185,8 @@ namespace Ogre {
             mFirstUpdate = false;
         }
 
+        r2vbPass->_updateAutoParams(sceneMgr->_getAutoParamDataSource(), GPV_GLOBAL);
+
         // size_t targetBufferIndex = mSourceBufferIndex == 0 ? 0 : 1;
 
         // Disable rasterization.

@@ -127,8 +127,6 @@ struct FireworkParticle
 
     void Sample_ParticleGS::setupContent(void)
     {
-        demoTime = 0;
-
         mCameraNode->setPosition(0,35,-100);
         mCameraNode->lookAt(Vector3(0,35,0), Node::TS_PARENT);
 
@@ -176,15 +174,7 @@ struct FireworkParticle
         GpuProgramParametersSharedPtr geomParams = mParticleSystem->
             getRenderToVertexBuffer()->getRenderToBufferMaterial()->
             getBestTechnique()->getPass(0)->getGeometryProgramParameters();
-        if (geomParams->_findNamedConstantDefinition("elapsedTime"))
-        {
-            geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
-        }
-        demoTime += evt.timeSinceLastFrame;
-        if (geomParams->_findNamedConstantDefinition("globalTime"))
-        {
-            geomParams->setNamedConstant("globalTime", demoTime);
-        }
+
         if (geomParams->_findNamedConstantDefinition("frameGravity"))
         {
             geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
