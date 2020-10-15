@@ -582,6 +582,8 @@ namespace Ogre
             break;
         case D3D11_SRV_DIMENSION_TEXTURE3D:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
+            RTVDesc.Texture3D.FirstWSlice = mZOffset;
+            RTVDesc.Texture3D.WSize = 1;
             break;
         default:
             assert(false);
