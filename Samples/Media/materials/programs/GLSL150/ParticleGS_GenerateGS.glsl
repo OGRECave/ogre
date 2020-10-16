@@ -47,7 +47,7 @@ out float oUv1; // Type
 out vec3 oUv2;  // Velocity
 
 uniform sampler1D randomTexture;
-uniform vec3 frameGravity;
+uniform vec3 gravity;
 uniform float globalTime;
 uniform float elapsedTime;
 uniform float secondsPerFirework;
@@ -205,6 +205,7 @@ void GSEmber2Handler( vec3 Pos, vec3 Vel, float Timer, float Type,
 
 void main()
 {
+    vec3 frameGravity = gravity * elapsedTime;
     if (FireworkData[0].Type == PT_LAUNCHER)
         GSLauncherHandler(FireworkData[0].Pos.xyz, FireworkData[0].Vel, FireworkData[0].Timer, FireworkData[0].Type,
                            elapsedTime, globalTime, randomTexture, secondsPerFirework);

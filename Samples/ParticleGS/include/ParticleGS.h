@@ -23,7 +23,6 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
     void testCapabilities(const RenderSystemCapabilities* caps);
     void setupContent(void);
     void cleanupContent();
-    bool frameStarted(const FrameEvent& evt);
 #ifdef LOG_GENERATED_BUFFER
     bool frameEnded(const FrameEvent& evt);
 #endif

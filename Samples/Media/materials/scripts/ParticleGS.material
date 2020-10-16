@@ -103,71 +103,35 @@ fragment_program Ogre/ParticleGS/DisplayPSglsl glsl
 	syntax glsl150
 }
 
+vertex_program Ogre/ParticleGS/GenerateVS unified
+{
+	delegate Ogre/ParticleGS/GenerateVSglsl
+	delegate Ogre/ParticleGS/GenerateVShlsl4
+	delegate Ogre/ParticleGS/GenerateVScg
+}
+
+geometry_program Ogre/ParticleGS/GenerateGS unified
+{
+	delegate Ogre/ParticleGS/GenerateGSglsl
+	delegate Ogre/ParticleGS/GenerateGShlsl4
+	delegate Ogre/ParticleGS/GenerateGScg
+}
+
 // Generate the particle system geometry.
 material Ogre/ParticleGS/Generate
 {
-	technique cg
+	technique
 	{
 		pass
 		{
-			vertex_program_ref Ogre/ParticleGS/GenerateVScg
+			vertex_program_ref Ogre/ParticleGS/GenerateVS
 			{
 				
 			}
 			
-			geometry_program_ref Ogre/ParticleGS/GenerateGScg
+			geometry_program_ref Ogre/ParticleGS/GenerateGS
 			{
-				param_named frameGravity float3 0 -0.1 0
-				param_named_auto globalTime time
-				param_named_auto elapsedTime frame_time
-				param_named secondsPerFirework float 0.3
-			}
-			
-			//This texture unit will be filled at runtime
-			texture_unit RandomTexture
-			{
-				tex_address_mode wrap
-				filtering none
-			}
-		}
-	}
-	technique hlsl4
-	{
-		pass
-		{
-			vertex_program_ref Ogre/ParticleGS/GenerateVShlsl4
-			{
-				
-			}
-			
-			geometry_program_ref Ogre/ParticleGS/GenerateGShlsl4
-			{
-				param_named frameGravity float3 0 -0.1 0
-				param_named_auto globalTime time
-				param_named_auto elapsedTime frame_time
-				param_named secondsPerFirework float 0.3
-			}
-			
-			//This texture unit will be filled at runtime
-			texture_unit RandomTexture
-			{
-				tex_address_mode wrap
-				filtering none
-			}
-		}
-	}
-	technique glsl
-	{
-		pass
-		{
-			vertex_program_ref Ogre/ParticleGS/GenerateVSglsl
-			{
-				
-			}
-			
-			geometry_program_ref Ogre/ParticleGS/GenerateGSglsl
-			{
-			    param_named frameGravity float3 0 -0.1 0
+			    param_named gravity float3 0 -9.8 0
 			    param_named_auto globalTime time
 			    param_named_auto elapsedTime frame_time
 			    param_named secondsPerFirework float 0.3

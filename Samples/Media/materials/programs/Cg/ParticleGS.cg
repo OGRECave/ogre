@@ -206,12 +206,13 @@ void GenerateParticles_GS(
 	AttribArray<float3> Vel : TEXCOORD2,
 	
 	uniform sampler1D randomTex : TEXUNIT0,
-	uniform float3 frameGravity,
+	uniform float3 gravity,
 	uniform float globalTime,
 	uniform float elapsedTime,
 	uniform float secondsPerFirework
 	)
 {
+    vec3 frameGravity = gravity * elapsedTime;
 	if( Type[0] == PT_LAUNCHER )
         GSLauncherHandler( Pos[0], Vel[0], Timer[0], Type[0], 
 							elapsedTime, globalTime, randomTex, secondsPerFirework);

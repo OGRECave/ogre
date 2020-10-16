@@ -223,13 +223,13 @@ VSParticleIn GenerateParticles_VS(VSParticleIn input)
 [maxvertexcount(64)]
 void GenerateParticles_GS(point VSParticleIn input[1], inout PointStream<VSParticleIn> ParticleOutputStream
 	, uniform Texture1D randomTex
-	, uniform float3 frameGravity
+	, uniform float3 gravity
 	, uniform float globalTime
 	, uniform float elapsedTime
 	, uniform float secondsPerFirework
 	)
 {
-
+    float3 frameGravity = gravity * elapsedTime;
 	if( input[0].type == PT_LAUNCHER )
         GSLauncherHandler( input[0], elapsedTime, globalTime, randomTex, secondsPerFirework, ParticleOutputStream);
 	else if ( input[0].type == PT_SHELL )
