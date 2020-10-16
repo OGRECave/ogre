@@ -174,7 +174,8 @@ namespace Ogre {
             break;
         };
 
-        if(mUsage == HBU_GPU_ONLY || mUsage == HBU_GPU_TO_CPU || options == HBL_READ_ONLY || options == HBL_NORMAL)
+        int usage = mUsage & 0xF; // drop TU_* flags
+        if(usage == HBU_GPU_ONLY || usage == HBU_GPU_TO_CPU || options == HBL_READ_ONLY || options == HBL_NORMAL)
             _mapstagingbuffer(flags, rval);
         else
             _map(mParentTexture->getTextureResource(), flags, rval);
@@ -219,8 +220,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::unlockImpl(void)
     {
-
-        if(mUsage == HBU_GPU_ONLY || mUsage == HBU_GPU_TO_CPU || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_READ_ONLY)
+        int usage = mUsage & 0xF; // drop TU_* flags
+        if(usage == HBU_GPU_ONLY || usage == HBU_GPU_TO_CPU || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_READ_ONLY)
         {
             _unmapstagingbuffer(mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY);
         }
