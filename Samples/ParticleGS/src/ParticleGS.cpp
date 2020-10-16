@@ -27,7 +27,6 @@ using namespace Ogre;
 using namespace OgreBites;
 
 namespace OgreBites {
-const Vector3 GRAVITY_VECTOR = Vector3(0, -9.8, 0);
 
 #ifdef LOG_GENERATED_BUFFER
 struct FireworkParticle
@@ -166,20 +165,6 @@ struct FireworkParticle
         mProceduralManualObjectFactory = 0;
 
         MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    }
-
-    bool Sample_ParticleGS::frameStarted(const FrameEvent& evt)
-    {
-        // Set shader parameters.
-        GpuProgramParametersSharedPtr geomParams = mParticleSystem->
-            getRenderToVertexBuffer()->getRenderToBufferMaterial()->
-            getBestTechnique()->getPass(0)->getGeometryProgramParameters();
-
-        if (geomParams->_findNamedConstantDefinition("frameGravity"))
-        {
-            geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
-        }
-        return SdkSample::frameStarted(evt);
     }
 
 #ifdef LOG_GENERATED_BUFFER
