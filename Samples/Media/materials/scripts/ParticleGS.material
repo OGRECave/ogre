@@ -154,9 +154,6 @@ material Ogre/ParticleGS/Generate
 				tex_address_mode wrap
 				filtering none
 			}
-			// This is needed if you render to a stream out buffer, otherwise DX 11 complains
-			depth_write off
-			depth_check off
 		}
 	}
 	technique glsl
