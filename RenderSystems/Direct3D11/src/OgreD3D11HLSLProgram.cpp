@@ -1393,7 +1393,7 @@ namespace Ogre {
         ManualResourceLoader* loader, D3D11Device & device)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
         , mEntryPoint("main"), mErrorsInCompile(false), mDevice(device), mConstantBufferSize(0)
-        , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false)
+        , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), mReinterpretingGS(false)
     {
 #if SUPPORT_SM2_0_HLSL_SHADERS == 1
 		mEnableBackwardsCompatibility = true;
@@ -1674,7 +1674,7 @@ namespace Ogre {
                     mD3d11ShaderOutputParameters.size(),
                     bufferStrides,
                     1,
-                    0,
+                    D3D11_SO_NO_RASTERIZED_STREAM,
                     mDevice.GetClassLinkage(),
                     mGeometryShader.ReleaseAndGetAddressOf());
 
