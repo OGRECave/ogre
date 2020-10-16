@@ -1608,6 +1608,7 @@ namespace Ogre {
         assert(mGeometryShader);
         unloadHighLevel();
         mReinterpretingGS = true;
+        prepareImpl();
         loadHighLevel();
         mReinterpretingGS = false;
     }
