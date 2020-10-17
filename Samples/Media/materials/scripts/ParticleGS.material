@@ -158,13 +158,12 @@ material Ogre/ParticleGS/Display
 			
 			vertex_program_ref Ogre/ParticleGS/DisplayVScg
 			{
-				
+				param_named_auto proj projection_matrix
+				param_named_auto worldView worldview_matrix
 			}
 			
 			geometry_program_ref Ogre/ParticleGS/DisplayGScg
 			{
-				param_named_auto inverseView inverse_view_matrix
-				param_named_auto worldViewProj worldviewproj_matrix
 			}
 			
 			fragment_program_ref Ogre/ParticleGS/DisplayPScg
@@ -189,13 +188,12 @@ material Ogre/ParticleGS/Display
 			
 			vertex_program_ref Ogre/ParticleGS/DisplayVShlsl4
 			{
-				
+				param_named_auto proj projection_matrix
+				param_named_auto worldView worldview_matrix
 			}
 			
 			geometry_program_ref Ogre/ParticleGS/DisplayGShlsl4
 			{
-				param_named_auto inverseView inverse_view_matrix
-				param_named_auto worldViewProj worldviewproj_matrix
 			}
 			
 			fragment_program_ref Ogre/ParticleGS/DisplayPShlsl4
