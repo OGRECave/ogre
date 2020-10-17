@@ -252,19 +252,6 @@ namespace Ogre {
         r = float(val32 & 0xFF) / 255.0f;
     }
     //---------------------------------------------------------------------
-    bool ColourValue::operator==(const ColourValue& rhs) const
-    {
-        return (r == rhs.r &&
-            g == rhs.g &&
-            b == rhs.b &&
-            a == rhs.a);
-    }
-    //---------------------------------------------------------------------
-    bool ColourValue::operator!=(const ColourValue& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    //---------------------------------------------------------------------
     void ColourValue::setHSB(float hue, float saturation, float brightness)
     {
         // wrap hue

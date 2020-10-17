@@ -75,8 +75,11 @@ namespace Ogre {
             *this /= 255;
         }
 
-        bool operator==(const ColourValue& rhs) const;
-        bool operator!=(const ColourValue& rhs) const;
+        bool operator==(const ColourValue& rhs) const
+        {
+            return (r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a);
+        }
+        bool operator!=(const ColourValue& rhs) const { return !(*this == rhs); }
 
         float r,g,b,a;
 
