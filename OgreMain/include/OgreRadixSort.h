@@ -242,19 +242,26 @@ namespace Ogre {
         @param func A functor which returns the value for comparison when given
             a container value
         */
-        template <class TFunction>
-        void sort(TContainer& container, TFunction func)
+        template <class TFunction> void sort(TContainer& container, TFunction func)
         {
-            if (container.empty())
+            sort(container.begin(), container.end(), func);
+        }
+
+        /// @overload
+        template <class TFunction>
+        void sort(ContainerIter dbegin, ContainerIter dend, TFunction func)
+        {
+            // Set up the sort areas
+            mSortSize = static_cast<int>(std::distance(dbegin, dend));
+
+            if (mSortSize == 0)
                 return;
 
-            // Set up the sort areas
-            mSortSize = static_cast<int>(container.size());
-            mSortArea1.resize(container.size());
-            mSortArea2.resize(container.size());
+            mSortArea1.resize(mSortSize);
+            mSortArea2.resize(mSortSize);
 
             // Copy data now (we need constant iterators for sorting)
-            mTmpContainer = container;
+            mTmpContainer.assign(dbegin, dend);
 
             mNumPasses = sizeof(TCompValueType);
 
@@ -313,8 +320,7 @@ namespace Ogre {
 
             // Copy everything back
             int c = 0;
-            for (i = container.begin(); 
-                i != container.end(); ++i, ++c)
+            for (i = dbegin; i != dend; ++i, ++c)
             {
                 *i = *((*mDest)[c].iter);
             }
