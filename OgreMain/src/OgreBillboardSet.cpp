@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     // Init statics
-    RadixSort<BillboardSet::ActiveBillboardList, Billboard*, float> BillboardSet::mRadixSorter;
+    RadixSort<BillboardSet::BillboardPool, Billboard*, float> BillboardSet::mRadixSorter;
 
     //-----------------------------------------------------------------------
     BillboardSet::BillboardSet() :
@@ -76,6 +76,7 @@ namespace Ogre {
         mSortingEnabled(false),
         mAccurateFacing(false),
         mWorldSpace(false),
+        mActiveBillboards(0),
         mCullIndividual( false ),
         mBillboardType(BBT_POINT),
         mCommonDirection(Ogre::Vector3::UNIT_Z),
@@ -112,7 +113,7 @@ namespace Ogre {
         const Vector3& position,
         const ColourValue& colour )
     {
-        if( mFreeBillboards.empty() )
+        if( mActiveBillboards == mBillboardPool.size() )
         {
             if( mAutoExtendPool )
             {
@@ -125,9 +126,7 @@ namespace Ogre {
         }
 
         // Get a new billboard
-        Billboard* newBill = mFreeBillboards.front();
-        mActiveBillboards.splice(
-            mActiveBillboards.end(), mFreeBillboards, mFreeBillboards.begin());
+        Billboard* newBill = mBillboardPool[mActiveBillboards++];
         newBill->setPosition(position);
         newBill->setColour(colour);
         newBill->mDirection = Vector3::ZERO;
@@ -153,72 +152,28 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::clear()
     {
-        // Move actives to free list
-        mFreeBillboards.splice(mFreeBillboards.end(), mActiveBillboards);
+        mActiveBillboards = 0;
     }
 
     //-----------------------------------------------------------------------
     Billboard* BillboardSet::getBillboard( unsigned int index ) const
     {
-        assert(
-            index < mActiveBillboards.size() &&
-            "Billboard index out of bounds." );
-
-        /* We can't access it directly, so we check whether it's in the first
-           or the second half, then we start either from the beginning or the
-           end of the list
-        */
-        ActiveBillboardList::const_iterator it;
-        if( index >= ( mActiveBillboards.size() >> 1 ) )
-        {
-            index = static_cast<unsigned int>(mActiveBillboards.size()) - index;
-            for( it = mActiveBillboards.end(); index; --index, --it );
-        }
-        else
-        {
-            for( it = mActiveBillboards.begin(); index; --index, ++it );
-        }
-
-        return *it;
+        assert(index < mActiveBillboards && "Billboard index out of bounds.");
+        return mBillboardPool[index];
     }
 
     //-----------------------------------------------------------------------
     void BillboardSet::removeBillboard(unsigned int index)
     {
-        assert(
-            index < mActiveBillboards.size() &&
-            "Billboard index out of bounds." );
-
-        /* We can't access it directly, so we check whether it's in the first
-           or the second half, then we start either from the beginning or the
-           end of the list.
-           We then remove the billboard form the 'used' list and add it to
-           the 'free' list.
-        */
-        ActiveBillboardList::iterator it;
-        if( index >= ( mActiveBillboards.size() >> 1 ) )
-        {
-            index = static_cast<unsigned int>(mActiveBillboards.size()) - index;
-            for( it = mActiveBillboards.end(); index; --index, --it );
-        }
-        else
-        {
-            for( it = mActiveBillboards.begin(); index; --index, ++it );
-        }
-
-        mFreeBillboards.splice(mFreeBillboards.end(), mActiveBillboards, it);
+        assert(index < mActiveBillboards && "Billboard isn't in the active list.");
+        std::swap(mBillboardPool[index], mBillboardPool[mActiveBillboards--]);
     }
 
     //-----------------------------------------------------------------------
     void BillboardSet::removeBillboard( Billboard* pBill )
     {
-        ActiveBillboardList::iterator it =
-            std::find(mActiveBillboards.begin(), mActiveBillboards.end(), pBill);
-        assert(
-            it != mActiveBillboards.end() &&
-            "Billboard isn't in the active list." );
-
-        mFreeBillboards.splice(mFreeBillboards.end(), mActiveBillboards, it);
+        auto it = std::find(mBillboardPool.begin(), mBillboardPool.end(), pBill);
+        removeBillboard(std::distance(mBillboardPool.begin(), it));
     }
     //-----------------------------------------------------------------------
     void BillboardSet::setMaterialName( const String& name , const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */ )
@@ -241,10 +196,12 @@ namespace Ogre {
         switch (_getSortMode())
         {
         case SM_DIRECTION:
-            mRadixSorter.sort(mActiveBillboards, SortByDirectionFunctor(-mCamDir));
+            mRadixSorter.sort(mBillboardPool.begin(), mBillboardPool.begin() + mActiveBillboards,
+                              SortByDirectionFunctor(-mCamDir));
             break;
         case SM_DISTANCE:
-            mRadixSorter.sort(mActiveBillboards, SortByDistanceFunctor(mCamPos));
+            mRadixSorter.sort(mBillboardPool.begin(), mBillboardPool.begin() + mActiveBillboards,
+                              SortByDistanceFunctor(mCamPos));
             break;
         }
     }
@@ -438,7 +395,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::_updateBounds(void)
     {
-        if (mActiveBillboards.empty())
+        if (mActiveBillboards == 0)
         {
             // No billboards, null bbox
             mAABB.setNull();
@@ -447,15 +404,13 @@ namespace Ogre {
         else
         {
             mAABB.setNull();
-            ActiveBillboardList::iterator i, iend;
-
-            iend = mActiveBillboards.end();
+            auto iend = mBillboardPool.begin() + mActiveBillboards;
             Affine3 invWorld;
             bool invert = mWorldSpace && getParentSceneNode();
             if (invert)
                 invWorld = getParentSceneNode()->_getFullTransform().inverse();
 
-            for (i = mActiveBillboards.begin(); i != iend; ++i)
+            for (auto i = mBillboardPool.begin(); i != iend; ++i)
             {
                 Vector3 pos = (*i)->getPosition();
                 // transform from world space to local space
@@ -488,11 +443,9 @@ namespace Ogre {
                 _sortBillboards(mCurrentCamera);
             }
 
-            beginBillboards(mActiveBillboards.size());
-            ActiveBillboardList::iterator it;
-            for(it = mActiveBillboards.begin();
-                it != mActiveBillboards.end();
-                ++it )
+            beginBillboards(mActiveBillboards);
+            auto iend = mBillboardPool.begin() + mActiveBillboards;
+            for (auto it = mBillboardPool.begin(); it != iend; ++it)
             {
                 injectBillboard(*(*it));
             }
@@ -576,12 +529,6 @@ namespace Ogre {
                 return;
 
             this->increasePool(size);
-
-            for( size_t i = currSize; i < size; ++i )
-            {
-                // Add new items to the queue
-                mFreeBillboards.push_back( mBillboardPool[i] );
-            }
         }
 
         mPoolSize = size;
@@ -803,7 +750,6 @@ namespace Ogre {
         size_t oldSize = mBillboardPool.size();
 
         // Increase size
-        mBillboardPool.reserve(size);
         mBillboardPool.resize(size);
 
         // Create new billboards

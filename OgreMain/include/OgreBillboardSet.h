@@ -143,30 +143,17 @@ namespace Ogre {
 
         bool mWorldSpace;
 
-        typedef std::list<Billboard*> ActiveBillboardList;
-        typedef std::list<Billboard*> FreeBillboardList;
         typedef std::vector<Billboard*> BillboardPool;
 
-        /** Active billboard list.
-        @remarks
-            This is a linked list of pointers to billboards in the billboard pool.
-        @par
-            This allows very fast insertions and deletions from anywhere in the list to activate / deactivate billboards
+        /** Active billboard count.
+
+            This allows very fast activation / deactivation of billboards
             (required for particle systems etc.) as well as reuse of Billboard instances in the pool
             without construction & destruction which avoids memory thrashing.
         */
-        ActiveBillboardList mActiveBillboards;
+        size_t mActiveBillboards;
 
-        /** Free billboard queue.
-        @remarks
-            This contains a list of the billboards free for use as new instances
-            as required by the set. Billboard instances are preconstructed up to the estimated size in the
-            mBillboardPool vector and are referenced on this deque at startup. As they get used this deque
-            reduces, as they get released back to to the set they get added back to the deque.
-        */
-        FreeBillboardList mFreeBillboards;
-
-        /** Pool of billboard instances for use and reuse in the active billboard list.
+        /** Pool of billboard instances for use and reuse.
         @remarks
             This vector will be preallocated with the estimated size of the set,and will extend as required.
         */
@@ -276,7 +263,7 @@ namespace Ogre {
             float operator()(Billboard* bill) const;
         };
 
-        static RadixSort<ActiveBillboardList, Billboard*, float> mRadixSorter;
+        static RadixSort<BillboardPool, Billboard*, float> mRadixSorter;
 
         /// Use point rendering?
         bool mPointRendering;
@@ -357,7 +344,7 @@ namespace Ogre {
 
         /** Returns the number of active billboards which currently make up this set.
         */
-        int getNumBillboards(void) const { return static_cast<int>(mActiveBillboards.size()); }
+        int getNumBillboards(void) const { return static_cast<int>(mActiveBillboards); }
 
         /** Tells the set whether to allow automatic extension of the pool of billboards.
         @remarks
@@ -418,8 +405,7 @@ namespace Ogre {
         virtual void clear();
 
         /** Returns a pointer to the billboard at the supplied index.
-        @note
-            This method requires linear time since the billboard list is a linked list.
+
         @param index
             The index of the billboard that is requested.
         @return
@@ -431,14 +417,10 @@ namespace Ogre {
         virtual Billboard* getBillboard(unsigned int index) const;
 
         /** Removes the billboard at the supplied index.
-        @note
-            This method requires linear time since the billboard list is a linked list.
         */
         virtual void removeBillboard(unsigned int index);
 
         /** Removes a billboard from the set.
-        @note
-            This version is more efficient than removing by index.
         */
         virtual void removeBillboard(Billboard* pBill);
 
