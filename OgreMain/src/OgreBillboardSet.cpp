@@ -836,7 +836,6 @@ namespace Ogre {
         const Vector3* const offsets, const Billboard& bb)
     {
         RGBA colour = bb.mColour.getAsBYTE();
-        RGBA* pCol;
 
         // Texcoords
         assert( bb.mUseTexcoordRect || bb.mTexcoordIndex < mTextureCoords.size() );
@@ -851,11 +850,7 @@ namespace Ogre {
             *mLockPtr++ = bb.mPosition.y;
             *mLockPtr++ = bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // No texture coords in point rendering
         }
         else if (bb.mRotation == Radian(0))
@@ -866,11 +861,7 @@ namespace Ogre {
             *mLockPtr++ = offsets[0].y + bb.mPosition.y;
             *mLockPtr++ = offsets[0].z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = r.left;
             *mLockPtr++ = r.top;
@@ -881,11 +872,7 @@ namespace Ogre {
             *mLockPtr++ = offsets[1].y + bb.mPosition.y;
             *mLockPtr++ = offsets[1].z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = r.right;
             *mLockPtr++ = r.top;
@@ -896,11 +883,7 @@ namespace Ogre {
             *mLockPtr++ = offsets[2].y + bb.mPosition.y;
             *mLockPtr++ = offsets[2].z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = r.left;
             *mLockPtr++ = r.bottom;
@@ -911,11 +894,7 @@ namespace Ogre {
             *mLockPtr++ = offsets[3].y + bb.mPosition.y;
             *mLockPtr++ = offsets[3].z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = r.right;
             *mLockPtr++ = r.bottom;
@@ -937,11 +916,7 @@ namespace Ogre {
             *mLockPtr++ = pt.y + bb.mPosition.y;
             *mLockPtr++ = pt.z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = r.left;
             *mLockPtr++ = r.top;
@@ -953,11 +928,7 @@ namespace Ogre {
             *mLockPtr++ = pt.y + bb.mPosition.y;
             *mLockPtr++ = pt.z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = r.right;
             *mLockPtr++ = r.top;
@@ -969,11 +940,7 @@ namespace Ogre {
             *mLockPtr++ = pt.y + bb.mPosition.y;
             *mLockPtr++ = pt.z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = r.left;
             *mLockPtr++ = r.bottom;
@@ -985,11 +952,7 @@ namespace Ogre {
             *mLockPtr++ = pt.y + bb.mPosition.y;
             *mLockPtr++ = pt.z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = r.right;
             *mLockPtr++ = r.bottom;
@@ -1015,11 +978,7 @@ namespace Ogre {
             *mLockPtr++ = offsets[0].y + bb.mPosition.y;
             *mLockPtr++ = offsets[0].z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = mid_u - cos_rot_w + sin_rot_h;
             *mLockPtr++ = mid_v - sin_rot_w - cos_rot_h;
@@ -1030,11 +989,7 @@ namespace Ogre {
             *mLockPtr++ = offsets[1].y + bb.mPosition.y;
             *mLockPtr++ = offsets[1].z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = mid_u + cos_rot_w + sin_rot_h;
             *mLockPtr++ = mid_v + sin_rot_w - cos_rot_h;
@@ -1045,11 +1000,7 @@ namespace Ogre {
             *mLockPtr++ = offsets[2].y + bb.mPosition.y;
             *mLockPtr++ = offsets[2].z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = mid_u - cos_rot_w - sin_rot_h;
             *mLockPtr++ = mid_v - sin_rot_w + cos_rot_h;
@@ -1060,11 +1011,7 @@ namespace Ogre {
             *mLockPtr++ = offsets[3].y + bb.mPosition.y;
             *mLockPtr++ = offsets[3].z + bb.mPosition.z;
             // Colour
-            // Convert float* to RGBA*
-            pCol = static_cast<RGBA*>(static_cast<void*>(mLockPtr));
-            *pCol++ = colour;
-            // Update lock pointer
-            mLockPtr = static_cast<float*>(static_cast<void*>(pCol));
+            memcpy(mLockPtr++, &colour, sizeof(RGBA));
             // Texture coords
             *mLockPtr++ = mid_u + cos_rot_w - sin_rot_h;
             *mLockPtr++ = mid_v + sin_rot_w + cos_rot_h;

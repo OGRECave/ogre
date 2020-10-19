@@ -517,7 +517,7 @@ namespace Ogre {
                     uint16 baseIdx = static_cast<uint16>((e + seg.start) * 2);
 
                     // Determine base pointer to vertex #1
-                    void* pBase = static_cast<void*>(
+                    float* pFloat = reinterpret_cast<float*>(
                         static_cast<char*>(vertexLock.pData) +
                             pBuffer->getVertexSize() * baseIdx);
 
@@ -557,24 +557,19 @@ namespace Ogre {
                     Vector3 pos0 = elem.position - vPerpendicular;
                     Vector3 pos1 = elem.position + vPerpendicular;
 
-                    float* pFloat = static_cast<float*>(pBase);
                     // pos1
                     *pFloat++ = pos0.x;
                     *pFloat++ = pos0.y;
                     *pFloat++ = pos0.z;
 
-                    pBase = static_cast<void*>(pFloat);
-
                     if (mUseVertexColour)
                     {
-                        RGBA* pCol = static_cast<RGBA*>(pBase);
-                        *pCol++ = elem.colour.getAsBYTE();
-                        pBase = static_cast<void*>(pCol);
+                        RGBA col = elem.colour.getAsBYTE();
+                        memcpy(pFloat++, &col, sizeof(RGBA));
                     }
 
                     if (mUseTexCoords)
                     {
-                        pFloat = static_cast<float*>(pBase);
                         if (mTexCoordDir == TCD_U)
                         {
                             *pFloat++ = elem.texCoord;
@@ -585,26 +580,21 @@ namespace Ogre {
                             *pFloat++ = mOtherTexCoordRange[0];
                             *pFloat++ = elem.texCoord;
                         }
-                        pBase = static_cast<void*>(pFloat);
                     }
 
                     // pos2
-                    pFloat = static_cast<float*>(pBase);
                     *pFloat++ = pos1.x;
                     *pFloat++ = pos1.y;
                     *pFloat++ = pos1.z;
-                    pBase = static_cast<void*>(pFloat);
 
                     if (mUseVertexColour)
                     {
-                        RGBA* pCol = static_cast<RGBA*>(pBase);
-                        *pCol++ = elem.colour.getAsBYTE();
-                        pBase = static_cast<void*>(pCol);
+                        RGBA col = elem.colour.getAsBYTE();
+                        memcpy(pFloat++, &col, sizeof(RGBA));
                     }
 
                     if (mUseTexCoords)
                     {
-                        pFloat = static_cast<float*>(pBase);
                         if (mTexCoordDir == TCD_U)
                         {
                             *pFloat++ = elem.texCoord;
