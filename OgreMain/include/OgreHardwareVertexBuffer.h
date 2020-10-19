@@ -246,76 +246,19 @@ namespace Ogre {
 
         }
         /** Adjusts a pointer to the base of a vertex to point at this element.
-        @remarks
-            This variant is for void pointers, passed as a parameter because we can't
+
+            Pointers are passed as a parameter because we can't
             rely on covariant return types.
         @param pBase Pointer to the start of a vertex in this buffer.
         @param pElem Pointer to a pointer which will be set to the start of this element.
         */
-        inline void baseVertexPointerToElement(void* pBase, void** pElem) const
+        template<typename T>
+        void baseVertexPointerToElement(void* pBase, T** pElem) const
         {
             // The only way we can do this is to cast to char* in order to use byte offset
-            // then cast back to void*.
-            *pElem = static_cast<void*>(
-                static_cast<unsigned char*>(pBase) + mOffset);
+            // then cast back to T*.
+            *pElem = reinterpret_cast<T*>(static_cast<char*>(pBase) + mOffset);
         }
-        /** Adjusts a pointer to the base of a vertex to point at this element.
-        @remarks
-            This variant is for float pointers, passed as a parameter because we can't
-            rely on covariant return types.
-        @param pBase Pointer to the start of a vertex in this buffer.
-        @param pElem Pointer to a pointer which will be set to the start of this element.
-        */
-        inline void baseVertexPointerToElement(void* pBase, float** pElem) const
-        {
-            // The only way we can do this is to cast to char* in order to use byte offset
-            // then cast back to float*. However we have to go via void* because casting
-            // directly is not allowed
-            *pElem = static_cast<float*>(
-                static_cast<void*>(
-                    static_cast<unsigned char*>(pBase) + mOffset));
-        }
-
-        /** Adjusts a pointer to the base of a vertex to point at this element.
-        @remarks
-            This variant is for RGBA pointers, passed as a parameter because we can't
-            rely on covariant return types.
-        @param pBase Pointer to the start of a vertex in this buffer.
-        @param pElem Pointer to a pointer which will be set to the start of this element.
-        */
-        inline void baseVertexPointerToElement(void* pBase, RGBA** pElem) const
-        {
-            *pElem = static_cast<RGBA*>(
-                static_cast<void*>(
-                    static_cast<unsigned char*>(pBase) + mOffset));
-        }
-        /** Adjusts a pointer to the base of a vertex to point at this element.
-        @remarks
-            This variant is for char pointers, passed as a parameter because we can't
-            rely on covariant return types.
-        @param pBase Pointer to the start of a vertex in this buffer.
-        @param pElem Pointer to a pointer which will be set to the start of this element.
-        */
-        inline void baseVertexPointerToElement(void* pBase, unsigned char** pElem) const
-        {
-            *pElem = static_cast<unsigned char*>(pBase) + mOffset;
-        }
-
-        /** Adjusts a pointer to the base of a vertex to point at this element.
-        @remarks
-        This variant is for ushort pointers, passed as a parameter because we can't
-        rely on covariant return types.
-        @param pBase Pointer to the start of a vertex in this buffer.
-        @param pElem Pointer to a pointer which will be set to the start of this element.
-        */
-        inline void baseVertexPointerToElement(void* pBase, unsigned short** pElem) const
-        {
-            *pElem = static_cast<unsigned short*>(
-                static_cast<void*>(
-                    static_cast<unsigned char*>(pBase) + mOffset));
-        }
-
-
     };
     /** This class declares the format of a set of vertex inputs, which
         can be issued to the rendering API through a RenderOperation.
