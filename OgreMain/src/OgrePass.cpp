@@ -337,8 +337,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Pass::setPointSpritesEnabled(bool enabled)
     {
-        if (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
-            return;
         mPointSpritesEnabled = enabled;
     }
     //-----------------------------------------------------------------------

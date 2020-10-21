@@ -555,6 +555,12 @@ bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* src
 {
     mIsPointSprite = srcPass->getPointSpritesEnabled();
 
+    if (auto rs = Root::getSingleton().getRenderSystem())
+    {
+        if (mIsPointSprite && !rs->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
+            return false;
+    }
+
     //count the number of texture units we need to process
     size_t validTexUnits = 0;
     for (const auto tu : srcPass->getTextureUnitStates())
