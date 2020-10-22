@@ -87,26 +87,30 @@ namespace Ogre {
 
     /// Vertex element semantics, used to identify the meaning of vertex buffer contents
     enum VertexElementSemantic {
-        /// Position, 3 reals per vertex
+        /// Position, typically VET_FLOAT3
         VES_POSITION = 1,
         /// Blending weights
         VES_BLEND_WEIGHTS = 2,
         /// Blending indices
         VES_BLEND_INDICES = 3,
-        /// Normal, 3 reals per vertex
+        /// Normal, typically VET_FLOAT3
         VES_NORMAL = 4,
-        /// Diffuse colours
-        VES_DIFFUSE = 5,
-        /// Specular colours
-        VES_SPECULAR = 6,
-        /// Texture coordinates
+        /// Colour, typically VET_UBYTE4
+        VES_COLOUR = 5,
+        /// Secondary colour. Generally free for custom data. Means specular with OpenGL FFP.
+        VES_COLOUR2 = 6,
+        /// Texture coordinates, typically VET_FLOAT2
         VES_TEXTURE_COORDINATES = 7,
         /// Binormal (Y axis if normal is Z)
         VES_BINORMAL = 8,
         /// Tangent (X axis if normal is Z)
         VES_TANGENT = 9,
         /// The  number of VertexElementSemantic elements (note - the first value VES_POSITION is 1) 
-        VES_COUNT = 9
+        VES_COUNT = 9,
+        /// @deprecated use VES_COLOUR
+        VES_DIFFUSE = VES_COLOUR,
+        /// @deprecated use VES_COLOUR2
+        VES_SPECULAR = VES_COLOUR2
     };
 
     /**
