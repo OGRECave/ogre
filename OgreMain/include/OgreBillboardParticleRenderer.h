@@ -186,6 +186,7 @@ namespace Ogre {
         /// Access BillboardSet in use
         BillboardSet* getBillboardSet(void) const { return mBillboardSet; }
 
+        void _notifyBoundingBox(const AxisAlignedBox& aabb) override;
     protected:
         static CmdBillboardType msBillboardTypeCmd;
         static CmdBillboardOrigin msBillboardOriginCmd;
@@ -194,8 +195,6 @@ namespace Ogre {
         static CmdCommonUpVector msCommonUpVectorCmd;
         static CmdPointRendering msPointRenderingCmd;
         static CmdAccurateFacing msAccurateFacingCmd;
-
-
     };
 
     /** Factory class for BillboardParticleRenderer */
