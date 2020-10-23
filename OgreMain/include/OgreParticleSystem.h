@@ -352,7 +352,7 @@ namespace Ogre {
             this is the easiest way to step through all the particles in a system and apply the
             changes the affector wants to make.
         */
-        const std::list<Particle*>& _getActiveParticles() { return mActiveParticles; }
+        const std::vector<Particle*>& _getActiveParticles() { return mActiveParticles; }
 
         /** Sets the name of the material to be used for this billboard set.
         */
@@ -673,8 +673,6 @@ namespace Ogre {
         /// Used to control if the particle system should emit particles or not.
         bool mIsEmitting;
 
-        typedef std::list<Particle*> ActiveParticleList;
-        typedef std::list<Particle*> FreeParticleList;
         typedef std::vector<Particle*> ParticlePool;
 
         /** Sort by direction functor */
@@ -697,7 +695,7 @@ namespace Ogre {
             float operator()(Particle* p) const;
         };
 
-        static RadixSort<ActiveParticleList, Particle*, float> mRadixSorter;
+        static RadixSort<ParticlePool, Particle*, float> mRadixSorter;
 
         /** Active particle list.
             @remarks
@@ -708,7 +706,7 @@ namespace Ogre {
                 Particle instances in the pool without construction & destruction 
                 which avoids memory thrashing.
         */
-        ActiveParticleList mActiveParticles;
+        ParticlePool mActiveParticles;
 
         /** Free particle queue.
             @remarks
@@ -719,7 +717,7 @@ namespace Ogre {
                 reduces, as they get released back to to the set they get added
                 back to the list.
         */
-        FreeParticleList mFreeParticles;
+        ParticlePool mFreeParticles;
 
         /** Pool of particle instances for use and reuse in the active particle list.
             @remarks

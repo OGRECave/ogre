@@ -49,7 +49,7 @@ namespace Ogre {
     ParticleSystem::CmdIterationInterval ParticleSystem::msIterationIntervalCmd;
     ParticleSystem::CmdNonvisibleTimeout ParticleSystem::msNonvisibleTimeoutCmd;
 
-    RadixSort<ParticleSystem::ActiveParticleList, Particle*, float> ParticleSystem::mRadixSorter;
+    RadixSort<ParticleSystem::ParticlePool, Particle*, float> ParticleSystem::mRadixSorter;
 
     Real ParticleSystem::msDefaultIterationInterval = 0;
     Real ParticleSystem::msDefaultNonvisibleTimeout = 0;
@@ -428,13 +428,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_expire(Real timeElapsed)
     {
-        ActiveParticleList::iterator i, itEnd;
         Particle* pParticle;
         ParticleEmitter* pParticleEmitter;
 
-        itEnd = mActiveParticles.end();
-
-        for (i = mActiveParticles.begin(); i != itEnd; )
+        for (auto i = mActiveParticles.begin(); i != mActiveParticles.end();)
         {
             pParticle = static_cast<Particle*>(*i);
             if (pParticle->mTimeToLive < timeElapsed)
@@ -445,8 +442,8 @@ namespace Ogre {
                 // Identify the particle type
                 if (pParticle->mParticleType == Particle::Visual)
                 {
-                    // Destroy this one
-                    mFreeParticles.splice(mFreeParticles.end(), mActiveParticles, i++);
+                    // add back to free list
+                    mFreeParticles.push_back(pParticle);
                 }
                 else
                 {
@@ -457,10 +454,11 @@ namespace Ogre {
 
                     // Also erase from mActiveEmittedEmitters
                     removeFromActiveEmittedEmitters (pParticleEmitter);
-
-                    // And erase from mActiveParticles
-                    i = mActiveParticles.erase( i );
                 }
+
+                // And erase from mActiveParticles
+                *i = mActiveParticles.back();
+                mActiveParticles.pop_back();
             }
             else
             {
@@ -631,9 +629,7 @@ namespace Ogre {
     Particle* ParticleSystem::getParticle(size_t index) 
     {
         assert (index < mActiveParticles.size() && "Index out of bounds!");
-        ActiveParticleList::iterator i = mActiveParticles.begin();
-        std::advance(i, index);
-        return *i;
+        return mActiveParticles[index];
     }
     //-----------------------------------------------------------------------
     Particle* ParticleSystem::createParticle(void)
@@ -642,8 +638,9 @@ namespace Ogre {
         if (!mFreeParticles.empty())
         {
             // Fast creation (don't use superclass since emitter will init)
-            p = mFreeParticles.front();
-            mActiveParticles.splice(mActiveParticles.end(), mFreeParticles, mFreeParticles.begin());
+            p = mFreeParticles.back();
+            mActiveParticles.push_back(p);
+            mFreeParticles.pop_back();
         }
 
         return p;
