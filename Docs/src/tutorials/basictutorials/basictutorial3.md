@@ -67,7 +67,7 @@ We get a TerrainIterator from our TerrainGroup and then loop through any Terrain
 
 The last thing we will do is make sure to cleanup any temporary resources that were created while configuring our terrain.
 
-That completes our `createScene` method. Now we just have to complete all of the methods we jumped over.
+That completes our `setupContent` method. Now we just have to complete all of the methods we jumped over.
 ## Terrain appearance {#bt3Appearance}
 The %Ogre Terrain component has a large number of options that can be set to change how the terrain is rendered. To start out, we configure the level of detail (LOD). There are two LOD approaches in the Terrain component, one controlling the geometry and the other controlling the texture.
 
@@ -88,7 +88,7 @@ The next thing we do is get a reference to the import settings of our TerrainGro
 
 @snippet Samples/Simple/include/Terrain.h import_settings
 
-We are not going to cover the exact meaning of these options in this tutorial, but you may have noticed that `terrainSize` and `worldSize` are set to match the global options we set in `createScene`. The `inputScale` determines how the heightmap image will be scaled up for the scene. We are using a somewhat large scale because our heightmap image has limited precision. You can use floating point raw heightmaps to avoid applying any input scaling, but these images usually require some data compression.
+We are not going to cover the exact meaning of these options in this tutorial. The `inputScale` determines how the heightmap image will be scaled up for the scene. We are using a somewhat large scale because our heightmap image is a 8bit grayscale bitmap, that is  normalised to the `[0; 1]` range on loading. You can use floating point raw heightmaps to avoid applying any input scaling and gain a higher precision, but such images require more storage and are not supported by common image viewers.
 
 The last step is adding the textures our terrain will use. First, we resize the list to hold three textures.
 After that, we set each texture's `worldSize` and add them to the list.
@@ -154,10 +154,10 @@ Compile and run your application again. You should now see a Label at the top of
 ## SkyBoxes
 A SkyBox is basically a huge textured cube that surrounds all of the objects in your scene. It is one of the methods for simulating a sky. We will need six textures to cover all of the interior faces of the SkyBox.
 
-It is very easy to include a SkyBox in your scene. Add the following to the end of `createScene`:
-```cpp
-mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
-```
+It is very easy to include a SkyBox in your scene. Add the following to the end of `setupContent`:
+
+@snippet Samples/Simple/include/Terrain.h skybox
+
 Compile and run your application. That's all there is to it. The SkyBox will look really grainy because we are using a rather low resolution collection of textures.
 
 The first parameter of this method determines whether or not to immediately enable the SkyBox. If you want to later disable the SkyBox you can call `mSceneMgr->setSkyBox(false, "")`. This disables the SkyBox.
@@ -170,7 +170,7 @@ Compile and run your application. Nothing has changed. This is because the fourt
 ```cpp
 mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox", 300, false);
 ```
-Compile and run your application again. This time you should definitely see something different. Only a small patch of terrain should exist below the camera. Move around and notice what is happening. The SkyBox is being rendered only 300 pixels away from the Camera and it is no longer being rendered before everything else. This means the SkyBox is drawn over terrain that is farther than 300 units away from the Camera.
+Compile and run your application again. This time you should definitely see something different. Only a small patch of terrain should exist below the camera. Move around and notice what is happening. The SkyBox is being rendered only 300 units away from the Camera and it is no longer being rendered before everything else. This means the SkyBox is drawn over terrain that is farther than 300 units away from the Camera.
 
 You can get a modest performance boost by not rendering the SkyBox first, but as you can see, you'll need to make sure not to cause strange problems like this when doing it. For the most part, leaving these additional parameters at their defaults is good enough. Although you may want to purposely use this strange culling behavior in your application. Try not to get to locked into how things are "supposed to work". If something catches your eye, then play around with it.
 ## SkyDomes
@@ -215,7 +215,7 @@ There are two basic types of fog in Ogre: linear and exponential. The difference
 ![](bt3_linear_exp_visual.png)
 
 ## Adding Fog to Our Scene
-We will first add linear fog to our scene. We need to make sure to set our Viewport's background color to our desired fog color. Add the following to `createScene` right ''before'' our code for setting up the terrain:
+We will first add linear fog to our scene. We need to make sure to set our Viewport's background color to our desired fog color. Add the following to `setupContent` right before our code for setting up the terrain:
 ```cpp
 Ogre::ColourValue fadeColour(0.9, 0.9, 0.9);
 mWindow->getViewport(0)->setBackgroundColour(fadeColour);
@@ -223,9 +223,9 @@ mWindow->getViewport(0)->setBackgroundColour(fadeColour);
 Make sure you add this before the terrain code otherwise it won't work. If you were using more than one Viewport, then you may have to iterate through them all by using Ogre::RenderTarget::getNumViewports.
 
 Now we can create the fog.
-```cpp
-mSceneMgr->setFog(Ogre::FOG_LINEAR, fadeColour, 0, 600, 900);
-```
+
+@snippet Samples/Simple/include/Terrain.h linear_fog
+
 The first parameter is the fog type. The second parameter is the color we used to set our Viewport's background color. The third parameter is not used for linear fog. The fourth and fifth parameters specify the beginning and the end of the range for the fog. In our example, the fog will begin at 600 units out from the Camera, and it will end at 900 units. The reason this is called linear fog is because the thickness increases between these two values in a linear fashion. Compile and run your application.
 
 The next type of fog is exponential fog. Like the picture suggests, exponential fog grows slowly at first and then gets dense very quickly. We do not set a range for this fog, instead we simply supply a desired density.

@@ -34,6 +34,8 @@ Also see acknowledgements in Readme.html
 #define TERRAIN_WORLD_SIZE 12000.0f
 #define TERRAIN_SIZE 513
 
+#define SHADOWS_IN_LOW_LOD_MATERIAL false
+
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -532,8 +534,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         // Configure default import settings for if we use imported image
         //! [import_settings]
         Ogre::Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
-        defaultimp.terrainSize = TERRAIN_SIZE;
-        defaultimp.worldSize = TERRAIN_WORLD_SIZE;
         defaultimp.inputScale = 600;
         defaultimp.minBatchSize = 33;
         defaultimp.maxBatchSize = 65;
@@ -575,14 +575,10 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
     void configureShadows(bool enabled, bool depthShadows)
     {
-        TerrainMaterialGeneratorA::SM2Profile* matProfile =
-            static_cast<TerrainMaterialGeneratorA::SM2Profile*>(mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
+        auto matProfile = static_cast<TerrainMaterialGeneratorA::SM2Profile*>(
+            mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
         matProfile->setReceiveDynamicShadowsEnabled(enabled);
-#ifdef SHADOWS_IN_LOW_LOD_MATERIAL
-        matProfile->setReceiveDynamicShadowsLowLod(true);
-#else
-        matProfile->setReceiveDynamicShadowsLowLod(false);
-#endif
+        matProfile->setReceiveDynamicShadowsLowLod(SHADOWS_IN_LOW_LOD_MATERIAL);
 
         RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
@@ -733,12 +729,15 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
         MaterialManager::getSingleton().setDefaultAnisotropy(7);
 
-        mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 10000, 25000);
+        ColourValue fadeColour(0.7, 0.7, 0.8);
+        //! [linear_fog]
+        mSceneMgr->setFog(Ogre::FOG_LINEAR, fadeColour, 0, 2000, 10000);
+        //! [linear_fog]
 
         LogManager::getSingleton().setLogDetail(LL_BOREME);
 
         //! [light]
-        Ogre::Light* l = mSceneMgr->createLight("tstLight");
+        Ogre::Light* l = mSceneMgr->createLight();
         l->setType(Ogre::Light::LT_DIRECTIONAL);
         l->setDiffuseColour(ColourValue::White);
         l->setSpecularColour(ColourValue(0.4, 0.4, 0.4));
@@ -821,8 +820,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         sn->attachObject(e);
         mHouseList.push_back(e);
 
+        //! [skybox]
         mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
-
+        //! [skybox]
 
     }
 
