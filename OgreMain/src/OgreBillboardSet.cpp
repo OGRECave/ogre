@@ -352,17 +352,24 @@ namespace Ogre {
         // Skip if not visible (NB always true if not bounds checking individual billboards)
         if (!billboardVisible(mCurrentCamera, bb)) return;
 
-        if (!mPointRendering &&
-            (mBillboardType == BBT_ORIENTED_SELF || mBillboardType == BBT_PERPENDICULAR_SELF ||
+        // Increment visibles
+        mNumVisibleBillboards++;
+
+        if(mPointRendering)
+        {
+            genPointVertices(bb);
+            return;
+        }
+
+        if ((mBillboardType == BBT_ORIENTED_SELF || mBillboardType == BBT_PERPENDICULAR_SELF ||
              (mAccurateFacing && mBillboardType != BBT_PERPENDICULAR_COMMON)))
         {
             // Have to generate axes & offsets per billboard
             genBillboardAxes(&mCamX, &mCamY, &bb);
         }
 
-        if (!mPointRendering &&
-            (mBillboardType == BBT_ORIENTED_SELF || mBillboardType == BBT_PERPENDICULAR_SELF ||
-                bb.mOwnDimensions || (mAccurateFacing && mBillboardType != BBT_PERPENDICULAR_COMMON)))
+        if ((mBillboardType == BBT_ORIENTED_SELF || mBillboardType == BBT_PERPENDICULAR_SELF ||
+             bb.mOwnDimensions || (mAccurateFacing && mBillboardType != BBT_PERPENDICULAR_COMMON)))
         {
             // If it has own dimensions, or self-oriented, gen offsets
             Vector3 vOwnOffset[4];
@@ -370,16 +377,13 @@ namespace Ogre {
             Real height = bb.mOwnDimensions ? bb.mHeight : mDefaultHeight;
             genVertOffsets(mLeftOff, mRightOff, mTopOff, mBottomOff,
                 width, height, mCamX, mCamY, vOwnOffset);
-            genVertices(vOwnOffset, bb);
+            genQuadVertices(vOwnOffset, bb);
         }
         else
         {
             // Use default dimension, already computed before the loop, for faster creation
-            genVertices(mVOffset, bb);
+            genQuadVertices(mVOffset, bb);
         }
-
-        // Increment visibles
-        mNumVisibleBillboards++;
     }
     //-----------------------------------------------------------------------
     void BillboardSet::endBillboards(void)
@@ -832,8 +836,19 @@ namespace Ogre {
         return SceneManager::FX_TYPE_MASK;
     }
     //-----------------------------------------------------------------------
-    void BillboardSet::genVertices(
-        const Vector3* const offsets, const Billboard& bb)
+    void BillboardSet::genPointVertices(const Billboard& bb)
+    {
+        RGBA colour = bb.mColour.getAsBYTE();
+        // Single vertex per billboard, ignore offsets
+        // position
+        *mLockPtr++ = bb.mPosition.x;
+        *mLockPtr++ = bb.mPosition.y;
+        *mLockPtr++ = bb.mPosition.z;
+        // Colour
+        memcpy(mLockPtr++, &colour, sizeof(RGBA));
+        // No texture coords in point rendering
+    }
+    void BillboardSet::genQuadVertices(const Vector3* const offsets, const Billboard& bb)
     {
         RGBA colour = bb.mColour.getAsBYTE();
 
@@ -842,18 +857,7 @@ namespace Ogre {
         const Ogre::FloatRect & r =
             bb.mUseTexcoordRect ? bb.mTexcoordRect : mTextureCoords[bb.mTexcoordIndex];
 
-        if (mPointRendering)
-        {
-            // Single vertex per billboard, ignore offsets
-            // position
-            *mLockPtr++ = bb.mPosition.x;
-            *mLockPtr++ = bb.mPosition.y;
-            *mLockPtr++ = bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // No texture coords in point rendering
-        }
-        else if (bb.mRotation == Radian(0))
+        if (bb.mRotation == Radian(0))
         {
             // Left-top
             // Positions
@@ -1016,7 +1020,6 @@ namespace Ogre {
             *mLockPtr++ = mid_u + cos_rot_w - sin_rot_h;
             *mLockPtr++ = mid_v + sin_rot_w + cos_rot_h;
         }
-
     }
     //-----------------------------------------------------------------------
     void BillboardSet::genVertOffsets(Real inleft, Real inright, Real intop, Real inbottom,

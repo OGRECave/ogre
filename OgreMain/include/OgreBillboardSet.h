@@ -229,7 +229,9 @@ namespace Ogre {
         @param offsets Array of 4 Vector3 offsets
         @param pBillboard Reference to billboard
         */
-        void genVertices(const Vector3* const offsets, const Billboard& pBillboard);
+        void genQuadVertices(const Vector3* const offsets, const Billboard& pBillboard);
+
+        void genPointVertices(const Billboard& pBillboard);
 
         /** Internal method generates vertex offsets.
         @remarks
