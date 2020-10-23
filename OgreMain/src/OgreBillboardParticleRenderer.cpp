@@ -143,7 +143,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRenderer::_updateRenderQueue(RenderQueue* queue, 
-        std::list<Particle*>& currentParticles, bool cullIndividually)
+        std::vector<Particle*>& currentParticles, bool cullIndividually)
     {
         mBillboardSet->setCullIndividually(cullIndividually);
 
@@ -151,8 +151,7 @@ namespace Ogre {
         mBillboardSet->beginBillboards(currentParticles.size());
         Billboard bb;
 
-        for (std::list<Particle*>::iterator i = currentParticles.begin();
-            i != currentParticles.end(); ++i)
+        for (auto i = currentParticles.begin(); i != currentParticles.end(); ++i)
         {
             Particle* p = *i;
             bb.mPosition = p->mPosition;
