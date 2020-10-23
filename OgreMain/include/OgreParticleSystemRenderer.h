@@ -127,6 +127,8 @@ namespace Ogre {
         virtual void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false) = 0;
 
+        /// Tells the Renderer about the ParticleSystem bounds
+        virtual void _notifyBoundingBox(const AxisAlignedBox& aabb) {}
     };
 
     /** Abstract class definition of a factory object for ParticleSystemRenderer. */

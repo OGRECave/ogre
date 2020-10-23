@@ -129,26 +129,14 @@ namespace Ogre {
         mBillboardSet->setCullIndividually(cullIndividually);
 
         // Update billboard set geometry
-        AxisAlignedBox aabb;
         mBillboardSet->beginBillboards(currentParticles.size());
         Billboard bb;
-        Affine3 invWorld;
-
-        bool invert = mBillboardSet->getBillboardsInWorldSpace() && mBillboardSet->getParentSceneNode();
-        if (invert)
-            invWorld = mBillboardSet->getParentSceneNode()->_getFullTransform().inverse();
 
         for (std::list<Particle*>::iterator i = currentParticles.begin();
             i != currentParticles.end(); ++i)
         {
             Particle* p = *i;
             bb.mPosition = p->mPosition;
-            Vector3 pos = p->mPosition;
-
-            if (invert)
-                pos = invWorld * pos;
-
-            aabb.merge(pos);
 
             if (mBillboardSet->getBillboardType() == BBT_ORIENTED_SELF ||
                 mBillboardSet->getBillboardType() == BBT_PERPENDICULAR_SELF)
@@ -166,17 +154,17 @@ namespace Ogre {
                 bb.mHeight = p->mHeight;
             }
             mBillboardSet->injectBillboard(bb);
-
         }
-
-        // Only set bounds if there are any active particles
-        if(currentParticles.size())
-            mBillboardSet->setBounds(aabb, Math::boundingRadiusFromAABB(aabb));
 
         mBillboardSet->endBillboards();
 
         // Update the queue
         mBillboardSet->_updateRenderQueue(queue);
+    }
+
+    void BillboardParticleRenderer::_notifyBoundingBox(const AxisAlignedBox& aabb)
+    {
+        mBillboardSet->setBounds(aabb, Math::boundingRadiusFromAABB(aabb));
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
