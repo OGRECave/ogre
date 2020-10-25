@@ -82,11 +82,8 @@ if(CMAKE_CROSSCOMPILING)
     endif()
 endif()
 
-set(OGREDEPS_SHARED TRUE)
-if(OGRE_STATIC OR MSVC)
-    # freetype does not like shared build on MSVC and it generally eases distribution there
-    set(OGREDEPS_SHARED FALSE)
-endif()
+# if we build our own deps, do it static as it generally eases distribution
+set(OGREDEPS_SHARED FALSE)
 
 set(BUILD_COMMAND_OPTS --target install --config ${CMAKE_BUILD_TYPE})
 
