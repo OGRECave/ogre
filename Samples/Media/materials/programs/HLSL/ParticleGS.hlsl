@@ -250,7 +250,7 @@ VSParticleDrawOut DisplayParticles_VS(VSParticleIn input,
     // Pass the point through
     //
     output.pos = mul(worldView, float4(input.pos,1));
-    output.radius = float2(1.5);
+    output.radius = float2(1.5, 1.5);
     
     //  
     // calculate the color
@@ -258,12 +258,12 @@ VSParticleDrawOut DisplayParticles_VS(VSParticleIn input,
     if( input.type == PT_LAUNCHER )
     {
         output.color = float4(1,0.1,0.1,1);
-        output.radius = float2(1.0);
+        output.radius = float2(1.0, 1.0);
     }
     else if( input.type == PT_SHELL )
     {
         output.color = float4(0.1,1,1,1);
-        output.radius = float2(1.0);
+        output.radius = float2(1.0, 1.0);
     }
     else if( input.type == PT_EMBER1 )
     {
