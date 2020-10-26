@@ -181,6 +181,8 @@ namespace OgreBites
         }
 
         virtual bool mouseWheelRolled(const MouseWheelEvent& evt) {
+            if(mTrayMgr->mouseWheelRolled(evt))
+                return true;
             mCameraMan->mouseWheelRolled(evt);
             return true;
         }

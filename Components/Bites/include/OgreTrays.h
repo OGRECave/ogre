@@ -1155,6 +1155,8 @@ namespace OgreBites
         */
         bool mouseMoved(const MouseMotionEvent& evt);
 
+        bool mouseWheelRolled(const MouseWheelEvent& evt);
+
     protected:
 
         /**
