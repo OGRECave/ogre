@@ -705,6 +705,9 @@ namespace OgreBites
          */
         virtual bool mouseWheelRolled(const MouseWheelEvent& evt)
         {
+            if(mTrayMgr->mouseWheelRolled(evt))
+                return true;
+
             if (isCurrentSamplePaused() && mTitleLabel->getTrayLocation() != TL_NONE &&
                 mSampleMenu->getNumItems() != 0)
             {
