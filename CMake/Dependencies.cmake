@@ -93,6 +93,7 @@ set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
   -G ${CMAKE_GENERATOR}
   -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
   -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+  -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # allow linking into a shared lib
   ${CROSS})
 
 # Set hardcoded path guesses for various platforms
@@ -167,8 +168,9 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-            -DWITH_PNG=OFF
-            -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE # tries to use it on iOS otherwise
+            -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE # disable third-party deps
+            -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
+            -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
             # workaround for broken iOS toolchain in freetype
             -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.10.1
             ${PROJECT_BINARY_DIR}/freetype-2.10.1
@@ -208,7 +210,6 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           -DASSIMP_NO_EXPORT=TRUE
           -DASSIMP_BUILD_OGRE_IMPORTER=OFF
           -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-          -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # this will be linked into a shared lib
           ${PROJECT_BINARY_DIR}/assimp-5.0.1
           WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.0.1)
       execute_process(COMMAND ${CMAKE_COMMAND}
