@@ -118,6 +118,16 @@ namespace Ogre {
         loadDynamicImage(buffer, width, height, depth, format, autoDelete);
     }
 
+    void Image::create(PixelFormat format, uint32 width, uint32 height, uint32 depth, uint32 numFaces,
+                       uint32 numMipMaps)
+    {
+        size_t size = calculateSize(0, 1, width, height, depth, format);
+        if (mBuffer && mBufSize == size)
+            return;
+
+        loadDynamicImage(new uchar[size], width, height, depth, format, true, numFaces, numMipMaps);
+    }
+
     //-----------------------------------------------------------------------------
     Image::Image( const Image &img )
         : mBuffer( NULL ),

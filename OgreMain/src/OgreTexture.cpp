@@ -424,41 +424,16 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Texture::convertToImage(Image& destImage, bool includeMipMaps)
     {
-
         uint32 numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
-        size_t dataSize = Image::calculateSize(numMips,
-            getNumFaces(), getWidth(), getHeight(), getDepth(), getFormat());
+        destImage.create(getFormat(), getWidth(), getHeight(), getDepth(), getNumFaces(), numMips);
 
-        void* pixData = OGRE_MALLOC(dataSize, Ogre::MEMCATEGORY_GENERAL);
-        // if there are multiple faces and mipmaps we must pack them into the data
-        // faces, then mips
-        void* currentPixData = pixData;
         for (size_t face = 0; face < getNumFaces(); ++face)
         {
-            uint32 width = getWidth();
-            uint32 height = getHeight();
-            uint32 depth = getDepth();
             for (uint32 mip = 0; mip < numMips; ++mip)
             {
-                size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
-
-                Ogre::PixelBox pixBox(width, height, depth, getFormat(), currentPixData);
-                getBuffer(face, mip)->blitToMemory(pixBox);
-
-                currentPixData = (void*)((char*)currentPixData + mipDataSize);
-
-                if(width != 1)
-                    width /= 2;
-                if(height != 1)
-                    height /= 2;
-                if(depth != 1)
-                    depth /= 2;
+                getBuffer(face, mip)->blitToMemory(destImage.getPixelBox(face, mip));
             }
         }
-
-        // load, and tell Image to delete the memory when it's done.
-        destImage.loadDynamicImage((Ogre::uchar*)pixData, getWidth(), getHeight(), getDepth(), getFormat(), true, 
-            getNumFaces(), numMips - 1);
     }
 
     //--------------------------------------------------------------------------
