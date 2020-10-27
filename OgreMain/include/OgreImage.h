@@ -71,6 +71,17 @@ namespace Ogre {
          */
         Image( const Image &img );
 
+        /**
+         * allocates a buffer of given size if needed
+         *
+         * - If the current allocation is equal to the requested size, this does nothing
+         * - Otherwise any current allocation is freed, and memory of specified size is allocated
+         *
+         * @see loadDynamicImage
+         */
+        void create(PixelFormat format, uint32 width, uint32 height, uint32 depth = 1, uint32 numFaces = 1,
+                    uint32 numMipMaps = 0);
+
         /** Standard destructor.
         */
         ~Image();
