@@ -1789,9 +1789,6 @@ namespace Ogre
 
         uint16 mLayerBlendMapSize;
         uint16 mLayerBlendMapSizeActual;
-        typedef std::vector<uint8*> BytePointerList;
-        /// Staging post for blend map data
-        BytePointerList mCpuBlendMapStorage;
         typedef std::vector<TexturePtr> TexturePtrList;
         TexturePtrList mBlendTextureList;
         TerrainLayerBlendMapList mLayerBlendMapList;
@@ -1799,17 +1796,14 @@ namespace Ogre
         uint16 mGlobalColourMapSize;
         bool mGlobalColourMapEnabled;
         TexturePtr mColourMap;
-        uint8* mCpuColourMapStorage;
 
         uint16 mLightmapSize;
         uint16 mLightmapSizeActual;
         TexturePtr mLightmap;
-        uint8* mCpuLightmapStorage;
 
         uint16 mCompositeMapSize;
         uint16 mCompositeMapSizeActual;
         TexturePtr mCompositeMap;
-        uint8* mCpuCompositeMapStorage;
         Rect mCompositeMapDirtyRect;
         unsigned long mCompositeMapUpdateCountdown;
         unsigned long mLastMillis;
@@ -1817,6 +1811,13 @@ namespace Ogre
         bool mCompositeMapDirtyRectLightmapUpdate;
         mutable MaterialPtr mCompositeMapMaterial;
 
+        /// staging images read in prepere
+        typedef std::vector<Image> ImageList;
+        ImageList mCpuBlendMapStorage;
+        Image mCpuColourMap;
+        Image mCpuLightmap;
+        Image mCpuCompositeMap;
+        Image mCpuTerrainNormalMap;
 
         static NameGenerator msBlendTextureGenerator;
         static NameGenerator msNormalMapNameGenerator;
@@ -1828,11 +1829,8 @@ namespace Ogre
         bool mLightMapRequired;
         bool mLightMapShadowsOnly;
         bool mCompositeMapRequired;
-        /// Texture storing normals for the whole terrrain
+        /// Texture storing normals for the whole terrain
         TexturePtr mTerrainNormalMap;
-
-        /// Pending data 
-        PixelBox* mCpuTerrainNormalMap;
 
         const Camera* mLastLODCamera;
         unsigned long mLastLODFrame;
