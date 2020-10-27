@@ -175,13 +175,10 @@ namespace Ogre
         , mLayerBlendMapSizeActual(0)
         , mGlobalColourMapSize(0)
         , mGlobalColourMapEnabled(false)
-        , mCpuColourMapStorage(0)
         , mLightmapSize(0)
         , mLightmapSizeActual(0)
-        , mCpuLightmapStorage(0)
         , mCompositeMapSize(0)
         , mCompositeMapSizeActual(0)
-        , mCpuCompositeMapStorage(0)
         , mCompositeMapDirtyRect(0, 0, 0, 0)
         , mCompositeMapUpdateCountdown(0)
         , mLastMillis(0)
@@ -191,7 +188,6 @@ namespace Ogre
         , mLightMapRequired(false)
         , mLightMapShadowsOnly(true)
         , mCompositeMapRequired(false)
-        , mCpuTerrainNormalMap(0)
         , mLastLODCamera(0)
         , mLastLODFrame(0)
         , mLastViewportHeight(0)
@@ -367,9 +363,7 @@ namespace Ogre
             int numBlendTex = getBlendTextureCount(numLayers);
             for (int i = 0; i < numBlendTex; ++i)
             {
-                size_t dataSz = 4 * mLayerBlendMapSize * mLayerBlendMapSize;
-                uint8* pData = mCpuBlendMapStorage[i];
-                stream.write(pData, dataSz);
+                stream.write(mCpuBlendMapStorage[i].getData(), mCpuBlendMapStorage[i].getSize());
             }
         }
         else
@@ -398,10 +392,10 @@ namespace Ogre
 			String normalDataType("normalmap");
 			stream.write(&normalDataType);
 			stream.write(&mSize);
-			if (mCpuTerrainNormalMap)
+			if (mCpuTerrainNormalMap.getData())
 			{
 				// save from CPU data if it's there, it means GPU data was never created
-				stream.write((uint8*)mCpuTerrainNormalMap->data, mSize * mSize * 3);
+				stream.write(mCpuTerrainNormalMap.getData(), mCpuTerrainNormalMap.getSize());
 			}
 			else
 			{
@@ -419,10 +413,10 @@ namespace Ogre
             String colourDataType("colourmap");
             stream.write(&colourDataType);
             stream.write(&mGlobalColourMapSize);
-            if (mCpuColourMapStorage)
+            if (mCpuColourMap.getData())
             {
                 // save from CPU data if it's there, it means GPU data was never created
-                stream.write(mCpuColourMapStorage, mGlobalColourMapSize * mGlobalColourMapSize * 3);
+                stream.write(mCpuColourMap.getData(), mCpuColourMap.getSize());
             }
             else
             {
@@ -441,10 +435,10 @@ namespace Ogre
             String lightmapDataType("lightmap");
             stream.write(&lightmapDataType);
             stream.write(&mLightmapSize);
-            if (mCpuLightmapStorage)
+            if (mCpuLightmap.getData())
             {
                 // save from CPU data if it's there, it means GPU data was never created
-                stream.write(mCpuLightmapStorage, mLightmapSize * mLightmapSize);
+                stream.write(mCpuLightmap.getData(), mCpuLightmap.getSize());
             }
             else
             {
@@ -462,10 +456,10 @@ namespace Ogre
             String compositeMapDataType("compositemap");
             stream.write(&compositeMapDataType);
             stream.write(&mCompositeMapSize);
-            if (mCpuCompositeMapStorage)
+            if (mCpuCompositeMap.getData())
             {
                 // save from CPU data if it's there, it means GPU data was never created
-                stream.write(mCpuCompositeMapStorage, mCompositeMapSize * mCompositeMapSize * 4);
+                stream.write(mCpuCompositeMap.getData(), mCpuCompositeMap.getSize());
             }
             else
             {
@@ -708,10 +702,8 @@ namespace Ogre
         int numBlendTex = getBlendTextureCount(numLayers);
         for (int i = 0; i < numBlendTex; ++i)
         {
-            size_t dataSz = 4 * mLayerBlendMapSize * mLayerBlendMapSize;
-            uint8* pData = (uint8*)OGRE_MALLOC(dataSz, MEMCATEGORY_RESOURCE);
-            stream.read(pData, dataSz);
-            mCpuBlendMapStorage.push_back(pData);
+            mCpuBlendMapStorage.emplace_back(PF_BYTE_RGBA, mLayerBlendMapSize, mLayerBlendMapSize);
+            stream.read(mCpuBlendMapStorage.back().getData(), mCpuBlendMapStorage.back().getSize());
         }
 
         // derived data
@@ -727,32 +719,30 @@ namespace Ogre
             if (name == "normalmap")
             {
                 mNormalMapRequired = true;
-                uint8* pData = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 3, MEMCATEGORY_GENERAL));
-                mCpuTerrainNormalMap = OGRE_NEW PixelBox(sz, sz, 1, PF_BYTE_RGB, pData);
-
-                stream.read(pData, sz * sz * 3);
+                mCpuTerrainNormalMap.create(PF_BYTE_RGB, sz, sz);
+                stream.read(mCpuTerrainNormalMap.getData(), mCpuTerrainNormalMap.getSize());
                 
             }
             else if (name == "colourmap")
             {
                 mGlobalColourMapEnabled = true;
                 mGlobalColourMapSize = sz;
-                mCpuColourMapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 3, MEMCATEGORY_GENERAL));
-                stream.read(mCpuColourMapStorage, sz * sz * 3);
+                mCpuColourMap.create(PF_BYTE_RGB, sz, sz);
+                stream.read(mCpuColourMap.getData(), mCpuColourMap.getSize());
             }
             else if (name == "lightmap")
             {
                 mLightMapRequired = true;
                 mLightmapSize = sz;
-                mCpuLightmapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz, MEMCATEGORY_GENERAL));
-                stream.read(mCpuLightmapStorage, sz * sz);
+                mCpuLightmap.create(PF_L8, sz, sz);
+                stream.read(mCpuLightmap.getData(), mCpuLightmap.getSize());
             }
             else if (name == "compositemap")
             {
                 mCompositeMapRequired = true;
                 mCompositeMapSize = sz;
-                mCpuCompositeMapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 4, MEMCATEGORY_GENERAL));
-                stream.read(mCpuCompositeMapStorage, sz * sz * 4);
+                mCpuCompositeMap.create(PF_BYTE_RGBA, sz, sz);
+                stream.read(mCpuCompositeMap.getData(), mCpuCompositeMap.getSize());
             }
 
             stream.readChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
@@ -1981,21 +1971,10 @@ namespace Ogre
         OGRE_DELETE mQuadTree;
         mQuadTree = 0;
 
-        if (mCpuTerrainNormalMap)
-        {
-            OGRE_FREE(mCpuTerrainNormalMap->data, MEMCATEGORY_GENERAL);
-            OGRE_DELETE mCpuTerrainNormalMap;
-            mCpuTerrainNormalMap = 0;
-        }
-
-        OGRE_FREE(mCpuColourMapStorage, MEMCATEGORY_GENERAL);
-        mCpuColourMapStorage = 0;
-
-        OGRE_FREE(mCpuLightmapStorage, MEMCATEGORY_GENERAL);
-        mCpuLightmapStorage = 0;
-
-        OGRE_FREE(mCpuCompositeMapStorage, MEMCATEGORY_GENERAL);
-        mCpuCompositeMapStorage = 0;
+        mCpuTerrainNormalMap.freeMemory();
+        mCpuColourMap.freeMemory();
+        mCpuLightmap.freeMemory();
+        mCpuCompositeMap.freeMemory();
     }
     //---------------------------------------------------------------------
     void Terrain::freeGPUResources()
@@ -2885,10 +2864,9 @@ namespace Ogre
             if (mCpuBlendMapStorage.size() > i)
             {
                 // Load blend data
-                PixelBox src(mLayerBlendMapSize, mLayerBlendMapSize, 1, PF_BYTE_RGBA, mCpuBlendMapStorage[i]);
-                mBlendTextureList[i]->getBuffer()->blitFromMemory(src);
+                mBlendTextureList[i]->getBuffer()->blitFromMemory(mCpuBlendMapStorage[i].getPixelBox());
                 // release CPU copy, don't need it anymore
-                OGRE_FREE(mCpuBlendMapStorage[i], MEMCATEGORY_RESOURCE);
+                mCpuBlendMapStorage[i].freeMemory();
             }
             else
             {
@@ -2929,14 +2907,11 @@ namespace Ogre
                 TEX_TYPE_2D, mSize, mSize, 1, 0, PF_BYTE_RGB, TU_STATIC);
 
             // Upload loaded normal data if present
-            if (mCpuTerrainNormalMap)
+            if (mCpuTerrainNormalMap.getData())
             {
-                mTerrainNormalMap->getBuffer()->blitFromMemory(*mCpuTerrainNormalMap);
-                OGRE_FREE(mCpuTerrainNormalMap->data, MEMCATEGORY_GENERAL);
-                OGRE_DELETE mCpuTerrainNormalMap;
-                mCpuTerrainNormalMap = 0;
+                mTerrainNormalMap->getBuffer()->blitFromMemory(mCpuTerrainNormalMap.getPixelBox());
+                mCpuTerrainNormalMap.freeMemory();
             }
-
         }
         else if (!mNormalMapRequired && mTerrainNormalMap)
         {
@@ -2950,11 +2925,6 @@ namespace Ogre
     void Terrain::freeTemporaryResources()
     {
         // CPU blend maps
-        for (BytePointerList::iterator i = mCpuBlendMapStorage.begin(); 
-            i != mCpuBlendMapStorage.end(); ++i)
-        {
-            OGRE_FREE(*i, MEMCATEGORY_RESOURCE);
-        }
         mCpuBlendMapStorage.clear();
 
         // Editable structures for blend layers (not needed at runtime,  only blend textures are)
@@ -3623,21 +3593,18 @@ namespace Ogre
                 TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, 
                 PF_BYTE_RGB, TU_AUTOMIPMAP|TU_STATIC);
 
-            if (mCpuColourMapStorage)
+            if (mCpuColourMap.getData())
             {
                 // Load cached data
-                PixelBox src(mGlobalColourMapSize, mGlobalColourMapSize, 1, PF_BYTE_RGB, mCpuColourMapStorage);
-                mColourMap->getBuffer()->blitFromMemory(src);
+                mColourMap->getBuffer()->blitFromMemory(mCpuColourMap.getPixelBox());
                 // release CPU copy, don't need it anymore
-                OGRE_FREE(mCpuColourMapStorage, MEMCATEGORY_RESOURCE);
-                mCpuColourMapStorage = 0;
-
+                mCpuColourMap.freeMemory();
             }
         }
         else if (!mGlobalColourMapEnabled && mColourMap)
         {
             // destroy
-            TextureManager::getSingleton().remove(mColourMap->getHandle());
+            TextureManager::getSingleton().remove(mColourMap);
             mColourMap.reset();
         }
 
@@ -3654,15 +3621,12 @@ namespace Ogre
 
             mLightmapSizeActual = mLightmap->getWidth();
 
-            if (mCpuLightmapStorage)
+            if (mCpuLightmap.getData())
             {
                 // Load cached data
-                PixelBox src(mLightmapSize, mLightmapSize, 1, PF_L8, mCpuLightmapStorage);
-                mLightmap->getBuffer()->blitFromMemory(src);
+                mLightmap->getBuffer()->blitFromMemory(mCpuLightmap.getPixelBox());
                 // release CPU copy, don't need it anymore
-                OGRE_FREE(mCpuLightmapStorage, MEMCATEGORY_RESOURCE);
-                mCpuLightmapStorage = 0;
-
+                mCpuLightmap.freeMemory();
             }
             else
             {
@@ -3678,7 +3642,7 @@ namespace Ogre
         else if (!mLightMapRequired && mLightmap)
         {
             // destroy
-            TextureManager::getSingleton().remove(mLightmap->getHandle());
+            TextureManager::getSingleton().remove(mLightmap);
             mLightmap.reset();
         }
 
@@ -3695,15 +3659,12 @@ namespace Ogre
 
             mCompositeMapSizeActual = mCompositeMap->getWidth();
 
-            if (mCpuCompositeMapStorage)
+            if (mCpuCompositeMap.getData())
             {
                 // Load cached data
-                PixelBox src(mCompositeMapSize, mCompositeMapSize, 1, PF_BYTE_RGBA, mCpuCompositeMapStorage);
-                mCompositeMap->getBuffer()->blitFromMemory(src);
+                mCompositeMap->getBuffer()->blitFromMemory(mCpuCompositeMap.getPixelBox());
                 // release CPU copy, don't need it anymore
-                OGRE_FREE(mCpuCompositeMapStorage, MEMCATEGORY_RESOURCE);
-                mCpuCompositeMapStorage = 0;
-
+                mCpuCompositeMap.freeMemory();
             }
             else
             {
@@ -3719,7 +3680,7 @@ namespace Ogre
         else if (!mCompositeMapRequired && mCompositeMap)
         {
             // destroy
-            TextureManager::getSingleton().remove(mCompositeMap->getHandle());
+            TextureManager::getSingleton().remove(mCompositeMap);
             mCompositeMap.reset();
         }
 
