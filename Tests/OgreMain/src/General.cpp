@@ -237,10 +237,31 @@ TEST(Image, FlipV)
 
     // img.save(testPath+"/decal1vflip.png");
 
+    STBIImageCodec::shutdown();
     ASSERT_TRUE(!memcmp(img.getData(), ref.getData(), ref.getSize()));
+}
+
+TEST(Image, Resize)
+{
+    ResourceGroupManager mgr;
+    STBIImageCodec::startup();
+    ConfigFile cf;
+    cf.load(FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    auto testPath = cf.getSettings("Tests").begin()->second;
+
+    Image ref;
+    ref.load(Root::openFileStream(testPath+"/decal1small.png"), "png");
+
+    Image img;
+    img.load(Root::openFileStream(testPath+"/decal1.png"), "png");
+    img.resize(128, 128);
+
+    //img.save(testPath+"/decal1small.png");
 
     STBIImageCodec::shutdown();
+    ASSERT_TRUE(!memcmp(img.getData(), ref.getData(), ref.getSize()));
 }
+
 
 TEST(Image, Combine)
 {
@@ -263,9 +284,8 @@ TEST(Image, Combine)
     combined.loadTwoImagesAsRGBA("rockwall.tga", "flare.png", RGN_DEFAULT, PF_BYTE_RGBA);
 
     // combined.save(testPath+"/rockwall_flare.png");
-    ASSERT_TRUE(!memcmp(combined.getData(), ref.getData(), ref.getSize()));
-
     STBIImageCodec::shutdown();
+    ASSERT_TRUE(!memcmp(combined.getData(), ref.getData(), ref.getSize()));
 }
 
 struct UsePreviousResourceLoadingListener : public ResourceLoadingListener
