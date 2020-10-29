@@ -7,6 +7,7 @@ particle_system Examples/Water/Rain
     quota           100
     // Make common direction straight down (faster than self oriented)
     billboard_type  oriented_common
+    billboard_origin bottom_center
     common_direction 0 -1 0
     
     // Area emitter
