@@ -166,13 +166,13 @@ namespace Ogre {
     void BillboardSet::removeBillboard(unsigned int index)
     {
         assert(index < mActiveBillboards && "Billboard isn't in the active list.");
-        std::swap(mBillboardPool[index], mBillboardPool[mActiveBillboards--]);
+        std::swap(mBillboardPool[index], mBillboardPool[--mActiveBillboards]);
     }
 
     //-----------------------------------------------------------------------
     void BillboardSet::removeBillboard( Billboard* pBill )
     {
-        auto it = std::find(mBillboardPool.begin(), mBillboardPool.end(), pBill);
+        auto it = std::find(mBillboardPool.begin(), mBillboardPool.begin() + mActiveBillboards, pBill);
         removeBillboard(std::distance(mBillboardPool.begin(), it));
     }
     //-----------------------------------------------------------------------
