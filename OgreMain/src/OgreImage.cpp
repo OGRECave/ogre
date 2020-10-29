@@ -540,14 +540,12 @@ namespace Ogre {
 
         // reassign buffer to temp image, make sure auto-delete is true
         Image temp(mFormat, mWidth, mHeight, 1, mBuffer, true);
+
         // do not delete[] mBuffer!  temp will destroy it
+        mBuffer = 0;
 
         // set new dimensions, allocate new buffer
-        mWidth = width;
-        mHeight = height;
-        mBufSize = PixelUtil::getMemorySize(mWidth, mHeight, 1, mFormat);
-        mBuffer = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
-        mNumMipmaps = 0; // Loses precomputed mipmaps
+        create(mFormat, width, height); // Loses precomputed mipmaps
 
         // scale the image from temp into our resized buffer
         Image::scale(temp.getPixelBox(), getPixelBox(), filter);
@@ -557,23 +555,18 @@ namespace Ogre {
     {
         assert(PixelUtil::isAccessible(src.format));
         assert(PixelUtil::isAccessible(scaled.format));
-        MemoryDataStreamPtr buf; // For auto-delete
-        PixelBox temp;
+        Image buf; // For auto-delete
+        // Assume no intermediate buffer needed
+        PixelBox temp = scaled;
         switch (filter) 
         {
         default:
         case FILTER_NEAREST:
-            if(src.format == scaled.format) 
-            {
-                // No intermediate buffer needed
-                temp = scaled;
-            }
-            else
+            if(src.format != scaled.format)
             {
                 // Allocate temporary buffer of destination size in source format 
-                temp = PixelBox(scaled.getWidth(), scaled.getHeight(), scaled.getDepth(), src.format);
-                buf.reset(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
-                temp.data = buf->getPtr();
+                buf.create(src.format, scaled.getWidth(), scaled.getHeight(), scaled.getDepth());
+                temp = buf.getPixelBox();
             }
             // super-optimized: no conversion
             switch (PixelUtil::getNumElemBytes(src.format)) 
@@ -606,17 +599,11 @@ namespace Ogre {
             case PF_R8G8B8A8: case PF_B8G8R8A8:
             case PF_A8B8G8R8: case PF_A8R8G8B8:
             case PF_X8B8G8R8: case PF_X8R8G8B8:
-                if(src.format == scaled.format) 
-                {
-                    // No intermediate buffer needed
-                    temp = scaled;
-                }
-                else
+                if(src.format != scaled.format)
                 {
                     // Allocate temp buffer of destination size in source format 
-                    temp = PixelBox(scaled.getWidth(), scaled.getHeight(), scaled.getDepth(), src.format);
-                    buf.reset(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
-                    temp.data = buf->getPtr();
+                    buf.create(src.format, scaled.getWidth(), scaled.getHeight(), scaled.getDepth());
+                    temp = buf.getPixelBox();
                 }
                 // super-optimized: byte-oriented math, no conversion
                 switch (PixelUtil::getNumElemBytes(src.format)) 
