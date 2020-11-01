@@ -121,11 +121,16 @@ namespace Ogre {
     void Image::create(PixelFormat format, uint32 width, uint32 height, uint32 depth, uint32 numFaces,
                        uint32 numMipMaps)
     {
-        size_t size = calculateSize(0, 1, width, height, depth, format);
-        if (mBuffer && mBufSize == size)
-            return;
+        size_t size = calculateSize(numMipMaps, numFaces, width, height, depth, format);
+        if (!mAutoDelete || !mBuffer || mBufSize != size)
+        {
+            freeMemory();
+            mBuffer = new uchar[size]; // allocate
+        }
 
-        loadDynamicImage(new uchar[size], width, height, depth, format, true, numFaces, numMipMaps);
+        // make sure freeMemory() does nothing, we set this true immediately after
+        mAutoDelete = false;
+        loadDynamicImage(mBuffer, width, height, depth, format, true, numFaces, numMipMaps);
     }
 
     //-----------------------------------------------------------------------------
@@ -155,27 +160,18 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    Image & Image::operator = ( const Image &img )
+    Image& Image::operator=(const Image& img)
     {
-        freeMemory();
-        mWidth = img.mWidth;
-        mHeight = img.mHeight;
-        mDepth = img.mDepth;
-        mFormat = img.mFormat;
-        mBufSize = img.mBufSize;
-        mFlags = img.mFlags;
-        mPixelSize = img.mPixelSize;
-        mNumMipmaps = img.mNumMipmaps;
-        mAutoDelete = img.mAutoDelete;
-        //Only create/copy when previous data was not dynamic data
-        if( img.mBuffer && mAutoDelete )
+        // Only create & copy when other data was owning
+        if (img.mBuffer && img.mAutoDelete)
         {
-            mBuffer = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
-            memcpy( mBuffer, img.mBuffer, mBufSize );
+            create(img.mFormat, img.mWidth, img.mHeight, img.mDepth, img.getNumFaces(), img.mNumMipmaps);
+            memcpy(mBuffer, img.mBuffer, mBufSize);
         }
         else
         {
-            mBuffer = img.mBuffer;
+            loadDynamicImage(img.mBuffer, img.mWidth, img.mHeight, img.mDepth, img.mFormat, false,
+                             img.getNumFaces(), img.mNumMipmaps);
         }
 
         return *this;
