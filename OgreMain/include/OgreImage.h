@@ -342,6 +342,18 @@ namespace Ogre {
             return mBuffer + mPixelSize * (z * mWidth * mHeight + mWidth * y + x);
         }
 
+        /// @overload
+        template <typename T> T* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0)
+        {
+            return reinterpret_cast<T*>(getData(x, y, z));
+        }
+
+        /// @overload
+        template <typename T> const T* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0) const
+        {
+            return reinterpret_cast<T*>(getData(x, y, z));
+        }
+
         /** Returns the size of the data buffer in bytes
         */
         size_t getSize() const;
