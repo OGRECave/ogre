@@ -955,6 +955,8 @@ namespace Ogre
         */
         void setWorldSize(Real newWorldSize);
 
+        /// @name Layers
+        /// @{
         /** Get the number of layers in this terrain. */
         uint8 getLayerCount() const { return static_cast<uint8>(mLayers.size()); }
 
@@ -1041,6 +1043,7 @@ namespace Ogre
             terrain is created.
         */
         uint16 getLayerBlendMapSize() const { return mLayerBlendMapSize; }
+        /// @}
 
         /** Get the requested size of lightmap for this terrain. 
         Note that where hardware limits this, the actual lightmap may be lower
@@ -1435,41 +1438,30 @@ namespace Ogre
         */
         std::pair<uint8,uint8> getLayerBlendTextureIndex(uint8 layerIndex) const;
 
-        /** Request internal implementation options for the terrain material to use, 
-            in this case vertex morphing information. 
-        The TerrainMaterialGenerator should call this method to specify the 
+        /** @name Internal implementation options for the terrain material
+
+        The TerrainMaterialGenerator should call this methods to specify the
         options it would like to use when creating a material. Not all the data
-        is guaranteed to be up to date on return from this method - for example som
+        is guaranteed to be up to date on return from this method - for example some
         maps may be generated in the background. However, on return from this method
         all the features that are requested will be referenceable by materials, the
         data may just take a few frames to be fully populated.
+        */
+        /// @{
+        /** Request vertex morphing information.
         @param morph Whether LOD morphing information is required to be calculated
         */
         void _setMorphRequired(bool morph) { mLodMorphRequired = morph; }
         /// Get whether LOD morphing is needed
         bool _getMorphRequired() const { return mLodMorphRequired; }
 
-        /** Request internal implementation options for the terrain material to use, 
-        in this case a terrain-wide normal map. 
-        The TerrainMaterialGenerator should call this method to specify the 
-        options it would like to use when creating a material. Not all the data
-        is guaranteed to be up to date on return from this method - for example some
-        maps may be generated in the background. However, on return from this method
-        all the features that are requested will be referenceable by materials, the
-        data may just take a few frames to be fully populated.
+        /** Request a terrain-wide normal map.
         @param normalMap Whether a terrain-wide normal map is requested. This is usually
             mutually exclusive with the lightmap option.
         */
         void _setNormalMapRequired(bool normalMap);
 
-        /** Request internal implementation options for the terrain material to use, 
-        in this case a terrain-wide normal map. 
-        The TerrainMaterialGenerator should call this method to specify the 
-        options it would like to use when creating a material. Not all the data
-        is guaranteed to be up to date on return from this method - for example some
-        maps may be generated in the background. However, on return from this method
-        all the features that are requested will be referenceable by materials, the
-        data may just take a few frames to be fully populated.
+        /** Request a terrain-wide light map.
         @param lightMap Whether a terrain-wide lightmap including precalculated 
             lighting is required (light direction in TerrainGlobalOptions)
         @param shadowsOnly If true, the lightmap contains only shadows, 
@@ -1477,25 +1469,20 @@ namespace Ogre
         */
         void _setLightMapRequired(bool lightMap, bool shadowsOnly = false);
 
-        /** Request internal implementation options for the terrain material to use, 
-        in this case a terrain-wide composite map. 
-        The TerrainMaterialGenerator should call this method to specify the 
-        options it would like to use when creating a material. Not all the data
-        is guaranteed to be up to date on return from this method - for example some
-        maps may be generated in the background. However, on return from this method
-        all the features that are requested will be referenceable by materials, the
-        data may just take a few frames to be fully populated.
-        @param compositeMap Whether a terrain-wide composite map is needed. A composite
-        map is a texture with all of the blending and lighting baked in, such that
+        /** Request a terrain-wide composite map.
+
+        A composite map is a texture with all of the blending and lighting baked in, such that
         at distance this texture can be used as an approximation of the multi-layer
         blended material. It is actually up to the material generator to render this
         composite map, because obviously precisely what it looks like depends on what
         the main material looks like. For this reason, the composite map is one piece
         of derived terrain data that is always calculated in the render thread, and
-        usually on the GPU. It is expected that if this option is requested, 
+        usually on the GPU. It is expected that if this option is requested,
         the material generator will use it to construct distant LOD techniques.
+        @param compositeMap Whether a terrain-wide composite map is needed.
         */
         void _setCompositeMapRequired(bool compositeMap);
+        /// @}
 
         /// Whether we're using vertex compression or not
         bool _getUseVertexCompression() const; 
