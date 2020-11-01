@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreTerrainPrerequisites.h"
 #include "OgreCommon.h"
 #include "OgreDataStream.h"
+#include "OgreImage.h"
 
 namespace Ogre
 {
@@ -67,7 +68,7 @@ namespace Ogre
         Box mDirtyBox;
         bool mDirty;
         HardwarePixelBuffer* mBuffer;
-        float* mData;
+        Image mData;
 
         void download();
         void upload();
