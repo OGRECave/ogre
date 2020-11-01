@@ -347,45 +347,20 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void Image::save(const String& filename)
     {
-        if( !mBuffer )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "No image data loaded", 
-                "Image::save");
-        }
+        OgreAssert(mBuffer, "No image data loaded");
 
-        String strExt;
-        size_t pos = filename.find_last_of('.');
-        if( pos == String::npos )
-            OGRE_EXCEPT(
-            Exception::ERR_INVALIDPARAMS, 
-            "Unable to save image file '" + filename + "' - invalid extension.",
-            "Image::save" );
+        String base, ext;
+        StringUtil::splitBaseFilename(filename, base, ext);
 
-        while( pos != filename.length() - 1 )
-            strExt += filename[++pos];
-
-        Codec * pCodec = Codec::getCodec(strExt);
-        if (!pCodec)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Unable to save image file '" + filename + "' - invalid extension.");
-
-        pCodec->encodeToFile(this, filename);
+        // getCodec throws when no codec is found
+        Codec::getCodec(ext)->encodeToFile(this, filename);
     }
     //---------------------------------------------------------------------
     DataStreamPtr Image::encode(const String& formatextension)
     {
-        if( !mBuffer )
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "No image data loaded", 
-                "Image::encode");
-        }
-
-        Codec * pCodec = Codec::getCodec(formatextension);
-        if (!pCodec)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Unable to encode image data as '" + formatextension + "' - invalid extension.");
-
-        return pCodec->encode(this);
+        OgreAssert(mBuffer, "No image data loaded");
+        // getCodec throws when no codec is found
+        return Codec::getCodec(formatextension)->encode(this);
     }
     //-----------------------------------------------------------------------------
     Image & Image::load(const DataStreamPtr& stream, const String& type )
