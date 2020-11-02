@@ -432,7 +432,7 @@ namespace Ogre {
         {
             FILTER_NEAREST,
             FILTER_LINEAR,
-            FILTER_BILINEAR,
+            FILTER_BILINEAR = FILTER_LINEAR,
             FILTER_BOX,
             FILTER_TRIANGLE,
             FILTER_BICUBIC

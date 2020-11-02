@@ -561,7 +561,6 @@ namespace Ogre {
             }
             break;
 
-        case FILTER_LINEAR:
         case FILTER_BILINEAR:
             switch (src.format) 
             {
