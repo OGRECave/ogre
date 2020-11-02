@@ -721,60 +721,21 @@ namespace Ogre {
     Image & Image::combineTwoImagesAsRGBA(const Image& rgb, const Image& alpha, PixelFormat fmt)
     {
         // the images should be the same size, have the same number of mipmaps
-        if (rgb.getWidth() != alpha.getWidth() ||
-            rgb.getHeight() != alpha.getHeight() ||
-            rgb.getDepth() != alpha.getDepth())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Images must be the same dimensions", "Image::combineTwoImagesAsRGBA");
-        }
-        if (rgb.getNumMipmaps() != alpha.getNumMipmaps() ||
-            rgb.getNumFaces() != alpha.getNumFaces())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Images must have the same number of surfaces (faces & mipmaps)", 
-                "Image::combineTwoImagesAsRGBA");
-        }
+        OgreAssert(rgb.getWidth() == alpha.getWidth() && rgb.getHeight() == alpha.getHeight() &&
+                       rgb.getDepth() == alpha.getDepth(),
+                   "Images must be the same dimensions");
+        OgreAssert(rgb.getNumMipmaps() == alpha.getNumMipmaps() && rgb.getNumFaces() == alpha.getNumFaces(),
+                   "Images must have the same number of surfaces (faces & mipmaps)");
+
         // Format check
-        if (PixelUtil::getComponentCount(fmt) != 4)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Target format must have 4 components", 
-                "Image::combineTwoImagesAsRGBA");
-        }
-        if (PixelUtil::isCompressed(fmt) || PixelUtil::isCompressed(rgb.getFormat()) 
-            || PixelUtil::isCompressed(alpha.getFormat()))
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Compressed formats are not supported in this method", 
-                "Image::combineTwoImagesAsRGBA");
-        }
+        OgreAssert(PixelUtil::getComponentCount(fmt) == 4, "Target format must have 4 components");
 
-        freeMemory();
+        OgreAssert(!(PixelUtil::isCompressed(fmt) || PixelUtil::isCompressed(rgb.getFormat()) ||
+                     PixelUtil::isCompressed(alpha.getFormat())),
+                   "Compressed formats are not supported in this method");
 
-        mWidth = rgb.getWidth();
-        mHeight = rgb.getHeight();
-        mDepth = rgb.getDepth();
-        mFormat = fmt;
-        mNumMipmaps = rgb.getNumMipmaps();
         size_t numFaces = rgb.getNumFaces();
-
-        // Set flags
-        mFlags = 0;
-        if (mDepth != 1)
-            mFlags |= IF_3D_TEXTURE;
-        if(numFaces == 6)
-            mFlags |= IF_CUBEMAP;
-
-        mBufSize = calculateSize(mNumMipmaps, numFaces, mWidth, mHeight, mDepth, mFormat);
-
-        mPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( mFormat ));
-
-        mBuffer = static_cast<uchar*>(OGRE_MALLOC(mBufSize, MEMCATEGORY_GENERAL));
-
-        // make sure we delete
-        mAutoDelete = true;
-
+        create(fmt, rgb.getWidth(), rgb.getHeight(), rgb.getDepth(), numFaces, rgb.getNumMipmaps());
 
         for (size_t face = 0; face < numFaces; ++face)
         {
@@ -807,17 +768,13 @@ namespace Ogre {
                             
                             psrcAlpha += PixelUtil::getNumElemBytes(alpha.getFormat());
                             pdst += PixelUtil::getNumElemBytes(mFormat);
-
                         }
                     }
                 }
-                
-
             }
         }
 
         return *this;
-
     }
     //---------------------------------------------------------------------
 
