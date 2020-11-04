@@ -119,7 +119,8 @@ namespace Ogre
         /// @deprecated use type() instead
         OGRE_DEPRECATED const std::type_info& getType() const { return type(); }
 
-        inline friend std::ostream& operator <<
+        /// @deprecated no longer supported
+        OGRE_DEPRECATED friend std::ostream& operator <<
             ( std::ostream& o, const Any& v )
         {
             if (v.mContent)
@@ -180,7 +181,7 @@ namespace Ogre
 
             virtual void writeToStream(std::ostream& o)
             {
-                o << held;
+                o << "Any::ValueType";
             }
 
 
