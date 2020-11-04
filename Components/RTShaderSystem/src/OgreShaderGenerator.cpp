@@ -1101,7 +1101,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 
         OGRE_LOCK_AUTO_MUTEX;
 
-        auto renderState = any_cast<TargetRenderState*>(passUserData);
+        auto renderState = any_cast<TargetRenderStatePtr>(passUserData);
         renderState->updateGpuProgramsParams(rend, pass, source, pLightList);        
     }   
 }
@@ -1493,12 +1493,12 @@ ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPas
 	mDstPass			= dstPass;
 	mStage				= stage;
     mCustomRenderState  = NULL;
-    mTargetRenderState  = NULL;
 }
 
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::~SGPass()
 {
+    mDstPass->getUserObjectBindings().eraseUserAny(TargetRenderState::UserKey);
 }
 
 //-----------------------------------------------------------------------------
@@ -1509,7 +1509,7 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     const RenderState* renderStateGlobal = ShaderGenerator::getSingleton().getRenderState(schemeName);
     
 
-    mTargetRenderState.reset(new TargetRenderState);
+    auto targetRenderState = std::make_shared<TargetRenderState>();
 
     // Set light properties.
     Vector3i lightCount(0, 0, 0);
@@ -1527,40 +1527,30 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     }
     
     
-    mTargetRenderState->setLightCount(lightCount);
+    targetRenderState->setLightCount(lightCount);
             
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
     // Build the FFP state. 
-    FFPRenderStateBuilder::buildRenderState(this, mTargetRenderState.get());
+    FFPRenderStateBuilder::buildRenderState(this, targetRenderState.get());
 #endif
 
 
     // Link the target render state with the custom render state of this pass if exists.
     if (mCustomRenderState != NULL)
     {
-        mTargetRenderState->link(*mCustomRenderState, mSrcPass, mDstPass);
+        targetRenderState->link(*mCustomRenderState, mSrcPass, mDstPass);
     }
 
     // Link the target render state with the scheme render state of the shader generator.
     if (renderStateGlobal != NULL)
     {
-        mTargetRenderState->link(*renderStateGlobal, mSrcPass, mDstPass);
-    }               
+        targetRenderState->link(*renderStateGlobal, mSrcPass, mDstPass);
+    }
+
+    targetRenderState->acquirePrograms(mDstPass);
+    mDstPass->getUserObjectBindings().setUserAny(TargetRenderState::UserKey, targetRenderState);
 }
 
-//-----------------------------------------------------------------------------
-void ShaderGenerator::SGPass::acquirePrograms()
-{
-    if(!mTargetRenderState) return;
-    mTargetRenderState->acquirePrograms(mDstPass);
-}
-
-//-----------------------------------------------------------------------------
-void ShaderGenerator::SGPass::releasePrograms()
-{
-    if(!mTargetRenderState) return;
-    mTargetRenderState->releasePrograms(mDstPass);
-}
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, const Technique* srcTechnique,
                                           const String& dstTechniqueSchemeName,
@@ -1642,12 +1632,8 @@ ShaderGenerator::SGTechnique::~SGTechnique()
     const String& materialName = mParent->getMaterialName();
     const String& groupName = mParent->getGroupName();
 
-    // Release CPU/GPU programs that associated with this technique passes.
-    // Needs the parent technique to still exist
-    for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
-    {
-        (*itPass)->releasePrograms();
-    }
+    // Destroy the passes.
+    destroySGPasses();
 
     if (MaterialManager::getSingleton().resourceExists(materialName, groupName))
     {
@@ -1674,9 +1660,6 @@ ShaderGenerator::SGTechnique::~SGTechnique()
             }       
         }
     }
-    
-    // Destroy the passes.
-    destroySGPasses();
 
     // Delete the custom render states of each pass if exist.
     for (unsigned int i=0; i < mCustomRenderStates.size(); ++i)
@@ -1738,14 +1721,6 @@ void ShaderGenerator::SGTechnique::buildTargetRenderState()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::SGTechnique::acquirePrograms()
-{
-	for(SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
-		if(!(*itPass)->isIlluminationPass())
-			(*itPass)->acquirePrograms();
-}
-
-//-----------------------------------------------------------------------------
 void ShaderGenerator::SGTechnique::buildIlluminationTargetRenderState()
 {
 	assert(mDstTechnique != NULL);
@@ -1760,14 +1735,6 @@ void ShaderGenerator::SGTechnique::buildIlluminationTargetRenderState()
 		if((*itPass)->isIlluminationPass())
 			(*itPass)->buildTargetRenderState();
 	}
-}
-
-//-----------------------------------------------------------------------------
-void ShaderGenerator::SGTechnique::acquireIlluminationPrograms()
-{
-	for(SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
-		if((*itPass)->isIlluminationPass())
-			(*itPass)->acquirePrograms();
 }
 
 //-----------------------------------------------------------------------------
@@ -1787,12 +1754,6 @@ void ShaderGenerator::SGTechnique::releasePrograms()
             }
         }
         mDstTechnique = NULL;
-    }
-
-    // Release CPU/GPU programs that associated with this technique passes.
-    for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
-    {
-        (*itPass)->releasePrograms();
     }
 
     // Destroy the passes.
@@ -1904,32 +1865,14 @@ void ShaderGenerator::SGScheme::validate()
     // The target scheme is up to date.
     if (mOutOfDate == false)
         return;
-    
-    SGTechniqueIterator itTech;
 
-    // Build render state for each technique.
-    for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
+    // Build render state for each technique and acquire GPU programs.
+    for (SGTechnique* curTechEntry : mTechniqueEntries)
     {
-        SGTechnique* curTechEntry = *itTech;
-
         if (curTechEntry->getBuildDestinationTechnique())
-            curTechEntry->buildTargetRenderState();     
-    }
+            curTechEntry->buildTargetRenderState();
 
-    // Acquire GPU programs for each technique.
-    for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
-    {
-        SGTechnique* curTechEntry = *itTech;
-        
-        if (curTechEntry->getBuildDestinationTechnique())
-            curTechEntry->acquirePrograms();        
-    }
-
-    // Turn off the build destination technique flag.
-    for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
-    {
-        SGTechnique* curTechEntry = *itTech;
-
+        // Turn off the build destination technique flag.
         curTechEntry->setBuildDestinationTechnique(false);
     }
     
@@ -1998,11 +1941,8 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName, const Strin
             ((doAutoDetect == true) || (curMat->getGroupName() == groupName)) &&
             (curTechEntry->getBuildDestinationTechnique()))
         {       
-            // Build render state for each technique.
+            // Build render state for each technique and Acquire the CPU/GPU programs.
             curTechEntry->buildTargetRenderState();
-
-            // Acquire the CPU/GPU programs.
-            curTechEntry->acquirePrograms();
 
             // Turn off the build destination technique flag.
             curTechEntry->setBuildDestinationTechnique(false);
@@ -2022,23 +1962,16 @@ bool ShaderGenerator::SGScheme::validateIlluminationPasses(const String& materia
 	// Synchronize with fog settings.
 	synchronizeWithFogSettings();
 
-
-	SGTechniqueIterator itTech;
-
 	// Find the desired technique.
 	bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-	for(itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
+	for(SGTechnique* curTechEntry : mTechniqueEntries)
 	{
-		SGTechnique* curTechEntry = *itTech;
 		const SGMaterial* curMat = curTechEntry->getParent();
 		if((curMat->getMaterialName() == materialName) &&
 			((doAutoDetect == true) || (curMat->getGroupName() == groupName)))
 		{
-			// Build render state for each technique.
+			// Build render state for each technique and Acquire the CPU/GPU programs.
 			curTechEntry->buildIlluminationTargetRenderState();
-
-			// Acquire the CPU/GPU programs.
-			curTechEntry->acquireIlluminationPrograms();
 
 			return true;
 		}
@@ -2071,9 +2004,8 @@ void ShaderGenerator::SGScheme::invalidate(const String& materialName, const Str
 
     // Find the desired technique.
     bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-    for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
+    for (SGTechnique* curTechEntry : mTechniqueEntries)
     {
-        SGTechnique* curTechEntry = *itTech;
         const SGMaterial* curMaterial = curTechEntry->getParent();
         if ((curMaterial->getMaterialName() == materialName) &&
             ((doAutoDetect == true) || (curMaterial->getGroupName() == groupName))) 
@@ -2089,14 +2021,10 @@ void ShaderGenerator::SGScheme::invalidate(const String& materialName, const Str
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGScheme::invalidate()
-{   
-    SGTechniqueIterator itTech;
-    
+{
     // Turn on the build destination technique flag of all techniques.
-    for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
+    for (SGTechnique* curTechEntry : mTechniqueEntries)
     {
-        SGTechnique* curTechEntry = *itTech;
-
         curTechEntry->setBuildDestinationTechnique(true);
     }
 

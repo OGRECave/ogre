@@ -137,6 +137,7 @@ public:
     
     /** Class default constructor. */
     TargetRenderState();
+    ~TargetRenderState();
 
     /** Link this target render state with the given render state.
     Only sub render states with execution order that don't exist in this render state will be added.    
@@ -202,13 +203,14 @@ protected:
     bool mSubRenderStateSortValid;
     // The program set of this RenderState.
     std::unique_ptr<ProgramSet> mProgramSet;
-    
+    Pass* mParent;
 
 private:
     friend class ProgramManager;
     friend class FFPRenderStateBuilder;
 };
 
+typedef std::shared_ptr<TargetRenderState> TargetRenderStatePtr;
 
 /** @} */
 /** @} */
