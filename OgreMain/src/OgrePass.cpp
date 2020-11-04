@@ -520,8 +520,7 @@ namespace Ogre {
                     state->setTextureNameAlias(BLANKSTRING);
                     OGRE_IGNORE_DEPRECATED_END
                 }
-                // Needs recompilation
-                mParent->_notifyNeedsRecompile();
+                _notifyNeedsRecompile();
                 _dirtyHash();
             }
             else
@@ -605,11 +604,7 @@ namespace Ogre {
         TextureUnitStates::iterator i = mTextureUnitStates.begin() + index;
         OGRE_DELETE *i;
         mTextureUnitStates.erase(i);
-        if (!mQueuedForDeletion)
-        {
-            // Needs recompilation
-            mParent->_notifyNeedsRecompile();
-        }
+        _notifyNeedsRecompile();
         _dirtyHash();
         mContentTypeLookupBuilt = false;
     }
@@ -624,11 +619,7 @@ namespace Ogre {
             OGRE_DELETE *i;
         }
         mTextureUnitStates.clear();
-        if (!mQueuedForDeletion)
-        {
-            // Needs recompilation
-            mParent->_notifyNeedsRecompile();
-        }
+        _notifyNeedsRecompile();
         _dirtyHash();
         mContentTypeLookupBuilt = false;
     }
@@ -1232,7 +1223,7 @@ namespace Ogre {
             programUsage->setProgram(program, resetParams);
         }
         // Needs recompilation
-        mParent->_notifyNeedsRecompile();
+        _notifyNeedsRecompile();
 
         if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_GPU_PROGRAM_CHANGE ) )
         {
@@ -1446,7 +1437,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Pass::_notifyNeedsRecompile(void)
     {
-        mParent->_notifyNeedsRecompile();
+        if (!mQueuedForDeletion)
+            mParent->_notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
     void Pass::setTextureFiltering(TextureFilterOptions filterType)
@@ -1565,8 +1557,7 @@ namespace Ogre {
             }
             mShadowCasterVertexProgramUsage->setProgramName(name);
         }
-        // Needs recompilation
-        mParent->_notifyNeedsRecompile();
+        _notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
     void Pass::setShadowCasterVertexProgramParameters(GpuProgramParametersSharedPtr params)
@@ -1619,8 +1610,7 @@ namespace Ogre {
             }
             mShadowCasterFragmentProgramUsage->setProgramName(name);
         }
-        // Needs recompilation
-        mParent->_notifyNeedsRecompile();
+        _notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
     void Pass::setShadowCasterFragmentProgramParameters(GpuProgramParametersSharedPtr params)
@@ -1679,8 +1669,7 @@ namespace Ogre {
             }
             mShadowReceiverVertexProgramUsage->setProgramName(name);
         }
-        // Needs recompilation
-        mParent->_notifyNeedsRecompile();
+        _notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
     void Pass::setShadowReceiverVertexProgramParameters(GpuProgramParametersSharedPtr params)
@@ -1733,8 +1722,7 @@ namespace Ogre {
             }
             mShadowReceiverFragmentProgramUsage->setProgramName(name);
         }
-        // Needs recompilation
-        mParent->_notifyNeedsRecompile();
+        _notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
     void Pass::setShadowReceiverFragmentProgramParameters(GpuProgramParametersSharedPtr params)
