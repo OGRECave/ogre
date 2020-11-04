@@ -481,14 +481,8 @@ protected:
 		SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass, IlluminationStage stage);
         ~SGPass();
     
-        /** Build the render state. */
+        /** Build the render state and acquire the CPU/GPU programs */
         void buildTargetRenderState();
-
-        /** Acquire the CPU/GPU programs for this pass. */
-        void acquirePrograms();
-
-        /** Release the CPU/GPU programs of this pass. */
-        void releasePrograms();
 
         /** Get source pass. */
         Pass* getSrcPass() { return mSrcPass; }
@@ -520,8 +514,6 @@ protected:
 		IlluminationStage mStage;
         // Custom render state.
         RenderState* mCustomRenderState;
-        // The compiled render state.
-        std::unique_ptr<TargetRenderState> mTargetRenderState;
     };
 
     
@@ -548,14 +540,8 @@ protected:
         /** Build the render state. */
         void buildTargetRenderState();
 
-        /** Acquire the CPU/GPU programs for this technique. */
-        void acquirePrograms();
-
 		/** Build the render state for illumination passes. */
 		void buildIlluminationTargetRenderState();
-
-		/** Acquire the CPU/GPU programs for illumination passes of this technique. */
-		void acquireIlluminationPrograms();
 
 		/** Destroy the illumination passes entries. */
 		void destroyIlluminationSGPasses();

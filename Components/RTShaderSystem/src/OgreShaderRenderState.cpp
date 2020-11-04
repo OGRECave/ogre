@@ -115,9 +115,12 @@ void RenderState::removeTemplateSubRenderState(SubRenderState* subRenderState)
 }
 
 //-----------------------------------------------------------------------
-TargetRenderState::TargetRenderState()
+TargetRenderState::TargetRenderState() : mSubRenderStateSortValid(false), mParent(nullptr) {}
+
+TargetRenderState::~TargetRenderState()
 {
-    mSubRenderStateSortValid = false;
+    if(mParent)
+        releasePrograms(mParent);
 }
 
 //-----------------------------------------------------------------------
@@ -181,7 +184,7 @@ void TargetRenderState::acquirePrograms(Pass* pass)
         bindUniformParameters(mProgramSet->getCpuProgram(type), pass->getGpuProgramParameters(type));
     }
 
-    pass->getUserObjectBindings().setUserAny(UserKey, this);
+    mParent = pass;
 }
 
 
@@ -196,8 +199,6 @@ void TargetRenderState::releasePrograms(Pass* pass)
     ProgramManager::getSingleton().releasePrograms(mProgramSet.get());
 
     mProgramSet.reset();
-
-    pass->getUserObjectBindings().eraseUserAny(UserKey);
 }
 
 //-----------------------------------------------------------------------

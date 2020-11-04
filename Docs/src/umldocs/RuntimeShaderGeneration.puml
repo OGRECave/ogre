@@ -6,16 +6,14 @@ activate SGScheme
 SGScheme -> SGScheme: syncWithScene
 SGScheme -> SGTechniqe: buildRenderState
 SGTechniqe -> SGPass: buildRenderState
+deactivate SGScheme
 activate SGPass
 SGPass -> TargetRenderState: << new >>
 loop globalRenderState
 SGPass -> TargetRenderState: addSubRenderState
 end
+SGPass -> TargetRenderState: acquirePrograms(Pass)
 deactivate SGPass
-SGScheme -> SGTechniqe: acquirePrograms
-deactivate SGScheme
-SGTechniqe -> SGPass: acquirePrograms
-SGPass -> TargetRenderState: acquirePrograms(dst)
 activate TargetRenderState
 TargetRenderState -> TargetRenderState: createCpuPrograms
 TargetRenderState -> ProgramManager: createGpuPrograms
