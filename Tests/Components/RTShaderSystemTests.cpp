@@ -101,12 +101,8 @@ TEST_F(RTShaderSystem, TargetRenderState)
     auto pass = mat->getTechniques()[0]->getPasses()[0];
 
     using namespace RTShader;
-    auto& shaderGen = ShaderGenerator::getSingleton();
-
     TargetRenderState targetRenderState;
-    targetRenderState.addSubRenderStateInstance(shaderGen.createSubRenderState<FFPTransform>());
-    targetRenderState.addSubRenderStateInstance(shaderGen.createSubRenderState<FFPColour>());
-
+    targetRenderState.link({FFPTransform::Type, FFPColour::Type}, pass, pass);
     targetRenderState.acquirePrograms(pass);
 
     EXPECT_TRUE(pass->hasGpuProgram(GPT_VERTEX_PROGRAM));
