@@ -188,10 +188,10 @@ bool AdvancedRenderControls::keyPressed(const KeyboardEvent& evt) {
 
         // Search the per pixel sub render state and remove it.
         else {
-            for (auto srs : schemRenderState->getTemplateSubRenderStateList()) {
+            for (auto srs : schemRenderState->getSubRenderStates()) {
                 // This is the per pixel sub render state -> remove it.
                 if (dynamic_cast<Ogre::RTShader::FFPLighting*>(srs)) {
-                    schemRenderState->removeTemplateSubRenderState(srs);
+                    schemRenderState->removeSubRenderState(srs);
                     break;
                 }
             }

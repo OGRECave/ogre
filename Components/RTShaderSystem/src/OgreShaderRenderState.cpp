@@ -88,7 +88,7 @@ void RenderState::addTemplateSubRenderState(SubRenderState* subRenderState)
         // and destroy the base sub render state.
         else if ((*it)->getType() == subRenderState->getType())
         {
-            removeTemplateSubRenderState(*it);
+            removeSubRenderState(*it);
             break;
         }
     }
@@ -101,17 +101,13 @@ void RenderState::addTemplateSubRenderState(SubRenderState* subRenderState)
 }
 
 //-----------------------------------------------------------------------
-void RenderState::removeTemplateSubRenderState(SubRenderState* subRenderState)
+void RenderState::removeSubRenderState(SubRenderState* subRenderState)
 {
-    for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
-    {
-        if ((*it) == subRenderState)
-        {
-            ShaderGenerator::getSingleton().destroySubRenderState(*it);
-            mSubRenderStateList.erase(it);
-            break;
-        }       
-    }
+    auto it = std::find(mSubRenderStateList.begin(), mSubRenderStateList.end(), subRenderState);
+    if(it == mSubRenderStateList.end()) return;
+
+    mSubRenderStateList.erase(it);
+    ShaderGenerator::getSingleton().destroySubRenderState(subRenderState);
 }
 
 //-----------------------------------------------------------------------
@@ -128,20 +124,6 @@ void TargetRenderState::addSubRenderStateInstance(SubRenderState* subRenderState
 {
     mSubRenderStateList.push_back(subRenderState);
     mSubRenderStateSortValid = false;
-}
-
-//-----------------------------------------------------------------------
-void TargetRenderState::removeSubRenderStateInstance(SubRenderState* subRenderState)
-{
-    for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
-    {
-        if ((*it) == subRenderState)
-        {
-            ShaderGenerator::getSingleton().destroySubRenderState(*it);
-            mSubRenderStateList.erase(it);
-            break;
-        }       
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -251,7 +233,7 @@ void TargetRenderState::link(const RenderState& rhs, Pass* srcPass, Pass* dstPas
     sortSubRenderStates();
 
     // Insert all custom sub render states. (I.E Not FFP sub render states).
-    const SubRenderStateList& subRenderStateList = rhs.getTemplateSubRenderStateList();
+    const SubRenderStateList& subRenderStateList = rhs.getSubRenderStates();
 
     for (SubRenderStateListConstIterator itSrc=subRenderStateList.begin(); itSrc != subRenderStateList.end(); ++itSrc)
     {

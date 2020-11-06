@@ -354,7 +354,7 @@ protected:
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
+        renderState->removeSubRenderState(mSrsHardwareSkinning);
 #endif
     }
 

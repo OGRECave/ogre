@@ -67,13 +67,19 @@ public:
     */
     void addTemplateSubRenderState(SubRenderState* subRenderState);
 
-    /** Remove a template sub render state from this render state.
+    /** Remove a sub render state from this render state.
     @param subRenderState The sub render state to remove.
     */
-    void removeTemplateSubRenderState(SubRenderState* subRenderState);
+    void removeSubRenderState(SubRenderState* subRenderState);
 
-    /** Get the list of the template sub render states composing this render state. */
-    const SubRenderStateList& getTemplateSubRenderStateList() const { return mSubRenderStateList; }
+    /// @deprecated use removeSubRenderState
+    OGRE_DEPRECATED void removeTemplateSubRenderState(SubRenderState* srs) { removeSubRenderState(srs); }
+
+    /// @deprecated use getSubRenderStates
+    OGRE_DEPRECATED const SubRenderStateList& getTemplateSubRenderStateList() const { return mSubRenderStateList; }
+
+    /** Get the list of the sub render states composing this render state. */
+    const SubRenderStateList& getSubRenderStates() const { return mSubRenderStateList; }
 
     /** 
     Set the light count per light type.
@@ -160,11 +166,9 @@ public:
     */
     void addSubRenderStateInstance(SubRenderState* subRenderState);
 
-    /** Remove sub render state from this render state.
-    @param subRenderState The sub render state to remove.
-    */
-    void removeSubRenderStateInstance(SubRenderState* subRenderState);
-    
+    /// @deprecated use removeSubRenderState
+    OGRE_DEPRECATED void removeSubRenderStateInstance(SubRenderState* srs) { removeSubRenderState(srs); }
+
     /** Acquire CPU/GPU programs set associated with the given render state and bind them to the pass.
     @param pass The pass to bind the programs to.
     */

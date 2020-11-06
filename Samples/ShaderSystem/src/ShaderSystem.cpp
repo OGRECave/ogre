@@ -328,7 +328,7 @@ void Sample_ShaderSystem::setupContent()
     if (renderState)
     {           
         // Search for the texture layer blend sub state.
-        for (auto curSubRenderState : renderState->getTemplateSubRenderStateList())
+        for (auto curSubRenderState : renderState->getSubRenderStates())
         {
             if (curSubRenderState->getType() == LayeredBlending::Type)
             {
@@ -577,7 +577,7 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 
         // Grab the scheme render state.
         RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        const SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
+        const SubRenderStateList& subRenderStateList = schemRenderState->getSubRenderStates();
         SubRenderStateListConstIterator it = subRenderStateList.begin();
         SubRenderStateListConstIterator itEnd = subRenderStateList.end();
         FFPFog* fogSubRenderState = NULL;
@@ -1009,12 +1009,12 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
         mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-        for (auto srs : schemRenderState->getTemplateSubRenderStateList())
+        for (auto srs : schemRenderState->getSubRenderStates())
         {
             // This is the pssm3 sub render state -> remove it.
             if (dynamic_cast<RTShader::IntegratedPSSM3*>(srs))
             {
-                schemRenderState->removeTemplateSubRenderState(srs);
+                schemRenderState->removeSubRenderState(srs);
                 break;
             }
         }
@@ -1465,7 +1465,7 @@ void Sample_ShaderSystem::destroyInstancedViewports()
     if (mInstancedViewportsSubRenderState)
     {
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        renderState->removeTemplateSubRenderState(mInstancedViewportsSubRenderState);
+        renderState->removeSubRenderState(mInstancedViewportsSubRenderState);
         mInstancedViewportsSubRenderState = NULL;
     }
 
