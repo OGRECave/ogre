@@ -306,6 +306,18 @@ void FFPFog::setFogProperties(FogMode fogMode,
     mFogParamsValue.w   = fogEnd != fogStart ? 1 / (fogEnd - fogStart) : 0; 
 }
 
+bool FFPFog::setParameter(const String& name, const String& value)
+{
+	if(name == "calc_mode")
+	{
+        CalcMode cm = value == "per_vertex" ? CM_PER_VERTEX : CM_PER_PIXEL;
+		setCalcMode(cm);
+		return true;
+	}
+
+	return false;
+}
+
 //-----------------------------------------------------------------------
 const String& FFPFogFactory::getType() const
 {
@@ -343,14 +355,7 @@ SubRenderState* FFPFogFactory::createInstance(ScriptCompiler* compiler,
                         return NULL;
                     }
 
-                    if (strValue == "per_vertex")
-                    {
-                        fogSubRenderState->setCalcMode(FFPFog::CM_PER_VERTEX);
-                    }
-                    else if (strValue == "per_pixel")
-                    {
-                        fogSubRenderState->setCalcMode(FFPFog::CM_PER_PIXEL);
-                    }
+                    fogSubRenderState->setParameter("calc_mode", strValue);
                 }
                 
                 return subRenderState;

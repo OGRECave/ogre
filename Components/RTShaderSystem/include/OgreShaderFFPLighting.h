@@ -88,6 +88,8 @@ public:
      */
     void setNormaliseEnabled(bool enable) { mNormalisedEnable = enable; }
 
+    bool setParameter(const String& name, const String& value) override;
+
     static String Type;
 
 // Protected types:

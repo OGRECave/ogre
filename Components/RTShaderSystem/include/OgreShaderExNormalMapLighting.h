@@ -154,6 +154,8 @@ public:
     /// set the normal map sampler
     void setNormalMapSampler(const SamplerPtr& sampler) { mNormalMapSampler = sampler; }
 
+    bool setParameter(const String& name, const String& value) override;
+
 // Protected methods
 protected:
     /** Resolve global lighting parameters */

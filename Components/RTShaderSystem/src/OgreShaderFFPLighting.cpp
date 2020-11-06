@@ -479,6 +479,17 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 	return true;
 }
 
+bool FFPLighting::setParameter(const String& name, const String& value)
+{
+	if(name == "normalise")
+	{
+		setNormaliseEnabled(StringConverter::parseBool(value));
+		return true;
+	}
+
+	return false;
+}
+
 //-----------------------------------------------------------------------
 void FFPLighting::setLightCount(const Vector3i& lightCount)
 {
