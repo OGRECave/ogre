@@ -582,12 +582,12 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-        for (auto srs : schemRenderState->getTemplateSubRenderStateList())
+        for (auto srs : schemRenderState->getSubRenderStates())
         {
             // This is the pssm3 sub render state -> remove it.
             if (dynamic_cast<RTShader::IntegratedPSSM3*>(srs))
             {
-                schemRenderState->removeTemplateSubRenderState(srs);
+                schemRenderState->removeSubRenderState(srs);
                 break;
             }
         }

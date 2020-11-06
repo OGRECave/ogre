@@ -1053,7 +1053,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
                         RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMaterialName, trueDstGroupName, pi);
 
                         const SubRenderStateList& srcSubRenderState = 
-                            srcRenderState->getTemplateSubRenderStateList();
+                            srcRenderState->getSubRenderStates();
 
                         SubRenderStateList::const_iterator itSubState = srcSubRenderState.begin(),
                             itSubStateEnd = srcSubRenderState.end();
@@ -1261,7 +1261,7 @@ void ShaderGenerator::serializePassAttributes(MaterialSerializer* ser, SGPass* p
     if (customRenderState != NULL)
     {
         // Write each of the sub-render states that composing the final render state.
-        const SubRenderStateList& subRenderStates = customRenderState->getTemplateSubRenderStateList();
+        const SubRenderStateList& subRenderStates = customRenderState->getSubRenderStates();
         SubRenderStateListConstIterator it      = subRenderStates.begin();
         SubRenderStateListConstIterator itEnd   = subRenderStates.end();
 
@@ -1306,7 +1306,7 @@ void ShaderGenerator::serializeTextureUnitStateAttributes(MaterialSerializer* se
         }
         
         // Write each of the sub-render states that composing the final render state.
-        const SubRenderStateList& subRenderStates = customRenderState->getTemplateSubRenderStateList();
+        const SubRenderStateList& subRenderStates = customRenderState->getSubRenderStates();
         SubRenderStateListConstIterator it      = subRenderStates.begin();
         SubRenderStateListConstIterator itEnd   = subRenderStates.end();
 
