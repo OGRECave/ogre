@@ -1415,6 +1415,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Pass::_dirtyHash(void)
     {
+        if (!mQueuedForDeletion)
+            return;
+
         Material* mat = mParent->getParent();
         if (mat->isLoading() || mat->isLoaded())
         {
