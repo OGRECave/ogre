@@ -145,13 +145,17 @@ public:
     TargetRenderState();
     ~TargetRenderState();
 
-    /** Link this target render state with the given render state.
-    Only sub render states with execution order that don't exist in this render state will be added.    
+    /** Add the SubRenderStates of the given render state as templates to this render state.
+    @note Only sub render states with non FFP execution order will be added.
     @param other The other render state to append to this state.
     @param srcPass The source pass that this render state is constructed from.
     @param dstPass The destination pass that constructed from this render state.
     */
     void link(const RenderState& other, Pass* srcPass, Pass* dstPass);
+
+    /** Add the SubRenderStates to this render state.
+     */
+    void link(const StringVector& srsTypes, Pass* srcPass, Pass* dstPass);
 
     /** Update the GPU programs constant parameters before a renderable is rendered.
     @param rend The renderable object that is going to be rendered.
