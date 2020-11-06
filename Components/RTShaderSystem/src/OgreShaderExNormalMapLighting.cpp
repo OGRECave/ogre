@@ -518,6 +518,45 @@ bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass
     return true;
 }
 
+bool NormalMapLighting::setParameter(const String& name, const String& value)
+{
+	if(name == "normalmap_space")
+	{
+        // Normal map defines normals in tangent space.
+        if (value == "tangent_space")
+        {
+            setNormalMapSpace(NMS_TANGENT);
+            return true;
+        }
+        // Normal map defines normals in object space.
+        if (value == "object_space")
+        {
+            setNormalMapSpace(NMS_OBJECT);
+            return true;
+        }
+        if (value == "parallax")
+        {
+            setNormalMapSpace(NMS_PARALLAX);
+            return true;
+        }
+		return false;
+	}
+
+	if(name == "texture")
+	{
+		setNormalMapTextureName(value);
+		return true;
+	}
+
+	if(name == "texcoord_index")
+	{
+		setNormaliseEnabled(StringConverter::parseBool(value));
+		return true;
+	}
+
+	return false;
+}
+
 //-----------------------------------------------------------------------
 const String& NormalMapLightingFactory::getType() const
 {
@@ -569,21 +608,10 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
                         return NULL;
                     }
 
-                    // Normal map defines normals in tangent space.
-                    if (strValue == "tangent_space")
+                    if(!normalMapSubRenderState->setParameter("normalmap_space", strValue))
                     {
-                        normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_TANGENT);
-                    }
-
-                    // Normal map defines normals in object space.
-                    if (strValue == "object_space")
-                    {
-                        normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_OBJECT);
-                    }
-
-                    if (strValue == "parallax")
-                    {
-                        normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_PARALLAX);
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return NULL;
                     }
                 }
 
