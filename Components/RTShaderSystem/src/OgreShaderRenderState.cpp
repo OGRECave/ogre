@@ -270,25 +270,35 @@ void TargetRenderState::link(const StringVector& srsTypes, Pass* srcPass, Pass* 
 }
 
 //-----------------------------------------------------------------------
-void TargetRenderState::link(const RenderState& rhs, Pass* srcPass, Pass* dstPass)
+void TargetRenderState::link(const RenderState& templateRS, Pass* srcPass, Pass* dstPass)
 {
-    for (auto srcSubRenderState : rhs.getSubRenderStates())
+    for (auto srcSubRenderState : templateRS.getSubRenderStates())
     {
-        // Insert all custom sub render states. (I.E Not FFP sub render states).
-        if (srcSubRenderState->getExecutionOrder() == FFP_TRANSFORM ||
-            srcSubRenderState->getExecutionOrder() == FFP_COLOUR ||
-            srcSubRenderState->getExecutionOrder() == FFP_LIGHTING ||
-            srcSubRenderState->getExecutionOrder() == FFP_TEXTURING ||
-            srcSubRenderState->getExecutionOrder() == FFP_FOG)
+        auto it = mSubRenderStateList.end();
+        switch (srcSubRenderState->getExecutionOrder())
         {
-            continue;
+        case FFP_TRANSFORM:
+        case FFP_COLOUR:
+        case FFP_LIGHTING:
+        case FFP_TEXTURING:
+        case FFP_FOG:
+            // Check if this FFP stage already exists.
+            it = std::find_if(mSubRenderStateList.begin(), mSubRenderStateList.end(),
+                              [srcSubRenderState](const SubRenderState* e) {
+                                  return srcSubRenderState->getExecutionOrder() == e->getExecutionOrder();
+                              });
+        default:
+            break;
         }
 
+        if(it != mSubRenderStateList.end())
+            continue;
+
         // Check if this type of sub render state already exists.
-        auto it = std::find_if(mSubRenderStateList.begin(), mSubRenderStateList.end(),
-                               [&srcSubRenderState](const SubRenderState* e) {
-                                   return srcSubRenderState->getType() == e->getType();
-                               });
+        it = std::find_if(mSubRenderStateList.begin(), mSubRenderStateList.end(),
+                          [srcSubRenderState](const SubRenderState* e) {
+                              return srcSubRenderState->getType() == e->getType();
+                          });
 
         if(it != mSubRenderStateList.end())
             continue;
