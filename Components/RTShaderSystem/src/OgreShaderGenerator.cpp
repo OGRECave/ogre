@@ -1528,12 +1528,6 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     
     
     targetRenderState->setLightCount(lightCount);
-            
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-    // Build the FFP state. 
-    FFPRenderStateBuilder::buildRenderState(this, targetRenderState.get());
-#endif
-
 
     // Link the target render state with the custom render state of this pass if exists.
     if (mCustomRenderState != NULL)
@@ -1546,6 +1540,11 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     {
         targetRenderState->link(*renderStateGlobal, mSrcPass, mDstPass);
     }
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+    // Build the FFP state.
+    FFPRenderStateBuilder::buildRenderState(this, targetRenderState.get());
+#endif
 
     targetRenderState->acquirePrograms(mDstPass);
     mDstPass->getUserObjectBindings().setUserAny(TargetRenderState::UserKey, targetRenderState);

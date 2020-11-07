@@ -147,11 +147,11 @@ public:
 
     /** Add the SubRenderStates of the given render state as templates to this render state.
     @note Only sub render states with non FFP execution order will be added.
-    @param other The other render state to append to this state.
+    @param templateRS The other render state to use as a template.
     @param srcPass The source pass that this render state is constructed from.
     @param dstPass The destination pass that constructed from this render state.
     */
-    void link(const RenderState& other, Pass* srcPass, Pass* dstPass);
+    void link(const RenderState& templateRS, Pass* srcPass, Pass* dstPass);
 
     /** Add the SubRenderStates to this render state.
      */

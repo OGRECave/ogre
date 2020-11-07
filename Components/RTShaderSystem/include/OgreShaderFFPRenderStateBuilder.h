@@ -57,18 +57,6 @@ public:
     @param renderState The target render state that will hold the given pass FFP representation.
     */
     static void buildRenderState(ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
-
-// Protected methods.
-protected:
-    /**
-    Internal method that builds FFP sub render state.
-    */
-    static void buildFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType,
-                                                 ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
-
-    /** Get custom FPP sub state of this pass. */
-    static SubRenderState* getCustomFFPSubState(ShaderGenerator::SGPass* sgPass, int subStateOrder);
-
 };
 
 
