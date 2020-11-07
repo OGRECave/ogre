@@ -120,49 +120,6 @@ void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, cons
         ShaderGenerator::getSingleton().destroySubRenderState(subRenderState);
     }
 }
-
-
-//-----------------------------------------------------------------------------
-void FFPRenderStateBuilder::resolveColourStageFlags( ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState )
-{
-    const SubRenderStateList& subRenderStateList = renderState->getSubRenderStates();
-    FFPColour* colourSubState = NULL;
-
-    // Find the colour sub state.
-    for (SubRenderStateListConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
-    {
-        SubRenderState* curSubRenderState = *it;
-
-        if (curSubRenderState->getType() == FFPColour::Type)
-        {
-            colourSubState = static_cast<FFPColour*>(curSubRenderState);
-            break;
-        }
-    }
-    
-    for (SubRenderStateListConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
-    {
-        SubRenderState* curSubRenderState = *it;
-
-        // Add vertex shader specular lighting output in case of specular enabled.
-        if (curSubRenderState->getType() == FFPLighting::Type && colourSubState != NULL)
-        {
-            colourSubState->addResolveStageMask(FFPColour::SF_VS_OUTPUT_DIFFUSE);
-
-            Pass* srcPass = sgPass->getSrcPass();
-
-            if (srcPass->getShininess() > 0.0 &&
-                srcPass->getSpecular() != ColourValue::Black)
-            {
-                colourSubState->addResolveStageMask(FFPColour::SF_VS_OUTPUT_SPECULAR);              
-            }   
-            break;
-        }
-    }
-}
-
-
-
 }
 }
 

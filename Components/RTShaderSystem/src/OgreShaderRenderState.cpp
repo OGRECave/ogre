@@ -183,10 +183,38 @@ void TargetRenderState::releasePrograms(Pass* pass)
     mProgramSet.reset();
 }
 
+/// we cannot resolve this at preAddToRenderState time as addition order is arbitrary
+static void fixupFFPLighting(TargetRenderState* renderState)
+{
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+    const SubRenderStateList& subRenderStateList = renderState->getSubRenderStates();
+    auto it = std::find_if(subRenderStateList.begin(), subRenderStateList.end(),
+                           [](const SubRenderState* e) { return e->getType() == FFPLighting::Type; });
+
+    if (it == subRenderStateList.end())
+        return;
+
+    auto ffpLighting = static_cast<FFPLighting*>(*it);
+
+    it = std::find_if(subRenderStateList.begin(), subRenderStateList.end(),
+                      [](const SubRenderState* e) { return e->getType() == FFPColour::Type; });
+
+    OgreAssert(it != subRenderStateList.end(), "FFPColour required");
+
+    auto ffpColour = static_cast<FFPColour*>(*it);
+    ffpColour->addResolveStageMask(FFPColour::SF_VS_OUTPUT_DIFFUSE);
+
+    if(ffpLighting->getSpecularEnable())
+        ffpColour->addResolveStageMask(FFPColour::SF_VS_OUTPUT_SPECULAR);
+#endif
+}
+
 //-----------------------------------------------------------------------
 void TargetRenderState::createCpuPrograms()
 {
     sortSubRenderStates();
+
+    fixupFFPLighting(this);
 
     ProgramSet* programSet = createProgramSet();
     programSet->setCpuProgram(std::unique_ptr<Program>(new Program(GPT_VERTEX_PROGRAM)));

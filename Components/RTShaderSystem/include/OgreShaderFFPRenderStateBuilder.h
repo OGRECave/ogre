@@ -66,11 +66,6 @@ protected:
     static void buildFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType,
                                                  ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
 
-    /**
-    Internal method that resolves the colour stage flags.
-    */
-    static void resolveColourStageFlags(ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
-
     /** Get custom FPP sub state of this pass. */
     static SubRenderState* getCustomFFPSubState(ShaderGenerator::SGPass* sgPass, int subStateOrder);
 
