@@ -92,6 +92,11 @@ public:
 
     static String Type;
 
+    /**
+    Get the specular component state.
+    */
+    bool getSpecularEnable() const    { return mSpecularEnable; }
+
 // Protected types:
 protected:
 
@@ -160,11 +165,6 @@ protected:
     @param enable Pass true to enable specular component computation.
     */
     void setSpecularEnable(bool enable) { mSpecularEnable = enable; }
-
-    /** 
-    Get the specular component state. 
-    */
-    bool getSpecularEnable() const    { return mSpecularEnable; }
 
     /** 
     @see SubRenderState::resolveParameters.
