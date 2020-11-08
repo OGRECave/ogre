@@ -35,8 +35,3 @@ void calcPSSMSimpleShadow(float camDepth, vec4 pssmSplitPoints,
         shadow = calcSimpleShadow(shadowMap3, lsPos3);
     }
 }
-
-vec4 expand(vec4 v)
-{
-    return v * 2.0 - 1.0;
-}
