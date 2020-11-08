@@ -64,6 +64,12 @@ namespace Ogre
             ret->unload();
         }
 
+        if (prof->getParent()->getDebugLevel())
+        {
+            ret->setPreprocessorDefines(
+                StringUtil::format("TERRAIN_DEBUG,NUM_LODS=%d", terrain->getNumLodLevels()));
+        }
+
         return ret;
     }
     //---------------------------------------------------------------------
@@ -121,6 +127,7 @@ namespace Ogre
 
         outStream << "#include <OgreUnifiedShader.h>\n";
         outStream << "#include <FFPLib_Fog.glsl>\n";
+        outStream << "#include <TerrainTransforms.glsl>\n";
 
         outStream <<
             "uniform mat4 worldMatrix;\n"
@@ -219,49 +226,24 @@ namespace Ogre
         if (compression)
         {
             outStream <<
-                "    vec4 position = mul(posIndexToObjectSpace, vec4(vertex, uv0, 1));\n"
-                "#define uv0 _uv0\n" // must not assign to uv0
-                "    vec2 uv0 = vec2(vertex.x * baseUVScale, 1.0 - (vertex.y * baseUVScale));\n";
+                "    vec2 _uv0; vec4 position;\n"
+                "    expandVertex(posIndexToObjectSpace, baseUVScale, vertex, uv0, position, _uv0);\n"
+                "#define uv0 _uv0\n"; // alias uv0 to _uv0
         }
         outStream <<
             "    vec4 worldPos = mul(worldMatrix, position);\n"
             "    oPosObj = position;\n";
 
+        // morph
         if (tt != RENDER_COMPOSITE_MAP)
         {
-            // determine whether to apply the LOD morph to this vertex
-            // we store the deltas against all vertices so we only want to apply
-            // the morph to the ones which would disappear. The target LOD which is
-            // being morphed to is stored in lodMorph.y, and the LOD at which
-            // the vertex should be morphed is stored in uv.w. If we subtract
-            // the former from the latter, and arrange to only morph if the
-            // result is negative (it will only be -1 in fact, since after that
-            // the vertex will never be indexed), we will achieve our aim.
-            // sign(vertexLOD - targetLOD) == -1 is to morph
-            outStream <<
-                "    float toMorph = -min(0.0, sign(delta.y - lodMorph.y));\n";
-            // this will either be 1 (morph) or 0 (don't morph)
-            if (prof->getParent()->getDebugLevel())
-            {
-                // x == LOD level (-1 since value is target level, we want to display actual)
-                outStream << "    lodInfo.x = (lodMorph.y - 1) / " << terrain->getNumLodLevels() << ";\n";
-                // y == LOD morph
-                outStream << "    lodInfo.y = toMorph * lodMorph.x;\n";
-            }
+            static char heightAxis[] = "yzx";
+            outStream << "    applyLODMorph(delta, lodMorph, worldPos."
+                      << heightAxis[terrain->getAlignment()];
 
-            // morph
-            switch (terrain->getAlignment())
-            {
-                case Terrain::ALIGN_X_Y:
-                    outStream << "    worldPos.z += delta.x * toMorph * lodMorph.x;\n";
-                    break;
-                case Terrain::ALIGN_X_Z:
-                    outStream << "    worldPos.y += delta.x * toMorph * lodMorph.x;\n";
-                    break;
-                case Terrain::ALIGN_Y_Z:
-                    outStream << "    worldPos.x += delta.x * toMorph * lodMorph.x;\n";
-                    break;
-            };
+            if (prof->getParent()->getDebugLevel())
+                outStream << ", lodInfo";
+            outStream << ");\n";
         }
 
         // generate UVs
@@ -442,7 +424,8 @@ namespace Ogre
         {
             outStream <<
                 // global normal
-                "    vec3 normal = expand(texture2D(globalNormal, uv)).rgb;\n";
+            "    vec3 normal;\n"
+            "    SGX_FetchNormal(globalNormal, uv, normal);\n";
         }
 
         outStream <<
@@ -534,7 +517,7 @@ namespace Ogre
             }
 
             // access TS normal map
-            outStream << "    TSnormal = expand(texture2D(normtex" << layer << ", uv" << layer << ")).rgb;\n";
+            outStream << StringUtil::format("    SGX_FetchNormal(normtex%d, uv%d, TSnormal);\n", layer, layer);
 
             if (!layer)
                 outStream << "    normal = TSnormal;\n";
@@ -617,13 +600,13 @@ namespace Ogre
 
                 // Apply specular
                 outStream << "    gl_FragColor.rgb += specularCol;\n";
-
-                if (prof->getParent()->getDebugLevel())
-                {
-                    outStream << "    gl_FragColor.rg += lodInfo.xy;\n";
-                }
             }
             outStream << "    gl_FragColor.rgb = gl_FragColor.rgb * shadow + ambient.rgb * diffuse;\n";
+        }
+
+        if (prof->getParent()->getDebugLevel())
+        {
+            outStream << "    gl_FragColor.rg += lodInfo.xy;\n";
         }
 
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
