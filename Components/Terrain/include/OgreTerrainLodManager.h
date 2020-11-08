@@ -70,7 +70,7 @@ namespace Ogre
             uint16 currentPreparedLod;
             uint16 currentLoadedLod;
             uint16 requestedLod;
-            _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const LoadLodRequest& r)
+            OGRE_DEPRECATED _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const LoadLodRequest& r)
             { return o; }
         };
 

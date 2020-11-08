@@ -134,7 +134,7 @@ namespace Ogre {
             Listener* listener;
             BackgroundProcessResult result;
 
-            friend std::ostream& operator<<(std::ostream& o, const ResourceRequest& r)
+            OGRE_DEPRECATED friend std::ostream& operator<<(std::ostream& o, const ResourceRequest& r)
             { (void)r; return o; }
         };
 
@@ -151,7 +151,7 @@ namespace Ogre {
             ResourcePtr resource;
             ResourceRequest request;
 
-            friend std::ostream& operator<<(std::ostream& o, const ResourceResponse& r)
+            OGRE_DEPRECATED friend std::ostream& operator<<(std::ostream& o, const ResourceResponse& r)
             { (void)r; return o; }
         };
 

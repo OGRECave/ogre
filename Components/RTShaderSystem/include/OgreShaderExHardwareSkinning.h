@@ -170,7 +170,7 @@ protected:
     SkinningType mSkinningType;
 };
 
-_OgreRTSSExport void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data);
+OGRE_DEPRECATED _OgreRTSSExport void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data);
 
 /** 
 A factory that enables creation of HardwareSkinning instances.

@@ -71,7 +71,7 @@ namespace Ogre
         struct PageRequest
         {
             Page* srcPage;
-            _OgrePagingExport friend std::ostream& operator<<(std::ostream& o, const PageRequest& r)
+            OGRE_DEPRECATED _OgrePagingExport friend std::ostream& operator<<(std::ostream& o, const PageRequest& r)
             { return o; }       
 
             PageRequest(Page* p): srcPage(p) {}
@@ -80,7 +80,7 @@ namespace Ogre
         {
             PageData* pageData;
 
-            _OgrePagingExport friend std::ostream& operator<<(std::ostream& o, const PageResponse& r)
+            OGRE_DEPRECATED _OgrePagingExport friend std::ostream& operator<<(std::ostream& o, const PageResponse& r)
             { return o; }       
 
             PageResponse() : pageData(0) {}
