@@ -503,9 +503,7 @@ namespace Ogre
 
         if (terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP)
         {
-            Matrix4 posIndexToObjectSpace;
-            terrain->getPointTransform(&posIndexToObjectSpace);
-            params->setNamedConstant("posIndexToObjectSpace", posIndexToObjectSpace);
+            params->setNamedConstant("posIndexToObjectSpace", terrain->getPointTransform());
         }
 
         
