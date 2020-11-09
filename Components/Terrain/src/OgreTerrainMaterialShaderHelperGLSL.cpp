@@ -143,14 +143,6 @@ namespace Ogre
                 "uniform mat4 posIndexToObjectSpace;\n"
                 "uniform float baseUVScale;\n";
         }
-        // uv multipliers
-        uint maxLayers = prof->getMaxLayers(terrain);
-        uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
-        uint numUVMultipliers = (numLayers / 4);
-        if (numLayers % 4)
-            ++numUVMultipliers;
-        for (uint i = 0; i < numUVMultipliers; ++i)
-            outStream << "uniform vec4 uvMul_" << i << ";\n";
 
         if (fog)
             outStream << "uniform vec4 fogParams;\n";
@@ -187,18 +179,6 @@ namespace Ogre
 
         uint texCoordSet = 1;
         outStream << "OUT(vec4 oUVMisc, TEXCOORD" << texCoordSet++ << ")\n"; // xy = uv, z = camDepth;
-
-        // layer UV's premultiplied, packed as xy/zw
-        uint numUVSets = numLayers / 2;
-        if (numLayers % 2)
-            ++numUVSets;
-        if (tt != LOW_LOD)
-        {
-            for (uint i = 0; i < numUVSets; ++i)
-            {
-                outStream << StringUtil::format("OUT(vec4 layerUV%d, TEXCOORD%d)\n", i, texCoordSet++);
-            }
-        }
 
         if (prof->getParent()->getDebugLevel() && tt != RENDER_COMPOSITE_MAP)
         {
@@ -244,21 +224,6 @@ namespace Ogre
             if (prof->getParent()->getDebugLevel())
                 outStream << ", lodInfo";
             outStream << ");\n";
-        }
-
-        // generate UVs
-        if (tt != LOW_LOD)
-        {
-            for (uint i = 0; i < numUVSets; ++i)
-            {
-                uint layer  =  i * 2;
-                uint uvMulIdx = layer / 4;
-
-                outStream <<
-                    "    layerUV" << i << ".xy = " << " uv0.xy * uvMul_" << uvMulIdx << "." << getChannel(layer) << ";\n";
-                outStream <<
-                    "    layerUV" << i << ".zw = " << " uv0.xy * uvMul_" << uvMulIdx << "." << getChannel(layer+1) << ";\n";
-            }
         }
 
         outStream <<
@@ -339,6 +304,11 @@ namespace Ogre
                 outStream << StringUtil::format("uniform SAMPLER2D(difftex%d, %d);\n", i, currentSamplerIdx++);
                 outStream << StringUtil::format("uniform SAMPLER2D(normtex%d, %d);\n", i, currentSamplerIdx++);
             }
+
+            // uv multipliers
+            uint numUVMultipliers = (numLayers + 3) / 4; // integer ceil
+            for (uint i = 0; i < numUVMultipliers; ++i)
+                outStream << "uniform vec4 uvMul_" << i << ";\n";
         }
 
         uint numShadowTextures = uint(prof->isShadowingEnabled(tt, terrain));
@@ -390,16 +360,6 @@ namespace Ogre
         uint texCoordSet = 1;
         outStream << "IN(vec4 oUVMisc, TEXCOORD" << texCoordSet++ << ")\n";
 
-        uint numUVSets = numLayers / 2;
-        if (numLayers % 2)
-            ++numUVSets;
-        if (tt != LOW_LOD)
-        {
-            for (uint i = 0; i < numUVSets; ++i)
-            {
-                outStream << StringUtil::format("IN(vec4 layerUV%d, TEXCOORD%d)\n", i, texCoordSet++);
-            }
-        }
         if (prof->getParent()->getDebugLevel() && tt != RENDER_COMPOSITE_MAP)
         {
             outStream << "IN(vec2 lodInfo, TEXCOORD" << texCoordSet++ << ")\n";
@@ -497,13 +457,12 @@ namespace Ogre
     void ShaderHelperGLSL::generateFpLayer(const SM2Profile* prof, const Terrain* terrain,
                                                                                   TechniqueType tt, uint layer, StringStream& outStream)
     {
-        uint uvIdx = layer / 2;
-        String uvChannels = (layer % 2) ? ".zw" : ".xy";
+        uint uvMulIdx = layer / 4;
         uint blendIdx = (layer-1) / 4;
         String blendWeightStr = StringUtil::format("blendTexVal%d.%s", blendIdx, getChannel(layer-1));
 
         // generate UV
-        outStream << "    vec2 uv" << layer << " = layerUV" << uvIdx << uvChannels << ";\n";
+        outStream << "    vec2 uv" << layer << " = uv * uvMul_" << uvMulIdx << "." << getChannel(layer) << ";\n";
 
         // calculate lighting here if normal mapping
         if (prof->isLayerNormalMappingEnabled())
