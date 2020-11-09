@@ -852,7 +852,10 @@ namespace Ogre
         /** Get a transform which converts Vector4(xindex, yindex, height, 1) into 
             an object-space position including scalings and alignment.
         */
-        void getPointTransform(Matrix4* outXform) const;
+        Affine3 getPointTransform() const;
+
+        /// @deprecated
+        OGRE_DEPRECATED void getPointTransform(Matrix4* outXform) const { *outXform = getPointTransform(); }
         /** Translate a vector from world space to local terrain space based on the alignment options.
         @param inVec The vector in basis space, where x/y represents the 
         terrain plane and z represents the up vector
