@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 #include "OgreTextureManager.h"
 
-#define FFP_FUNC_PIXELFOG_POSITION_DEPTH                        "FFP_PixelFog_PositionDepth"
 
 using namespace Ogre;
 using namespace RTShader;
@@ -121,60 +120,31 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
 
     // Resolve world view matrix.
     mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
-    if (mWorldMatrix.get() == NULL)
-        return false;
-    
     // Resolve world view matrix.
     mCameraPos = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
-    if (mCameraPos.get() == NULL)
-        return false;
-    
     // Resolve vertex shader input position.
     mVSInPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-    if (mVSInPos.get() == NULL)
-        return false;
 
-        // Resolve fog colour.
+    // Resolve fog colour.
     mFogColour = psMain->resolveLocalParameter(GCT_FLOAT4, "FogColor");
-    if (mFogColour.get() == NULL)
-        return false;
-        
+
     // Resolve pixel shader output diffuse color.
     mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
-    if (mPSOutDiffuse.get() == NULL)    
-        return false;
-    
+
     // Resolve fog params.      
     mFogParams = psProgram->resolveParameter(GCT_FLOAT4, "gFogParams");
-    if (mFogParams.get() == NULL)
-        return false;
 
     // Resolve vertex shader output depth.      
     mVSOutPosView = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
-    if (mVSOutPosView.get() == NULL)
-        return false;
-    
     // Resolve pixel shader input depth.
     mPSInPosView = psMain->resolveInputParameter(mVSOutPosView);
-    if (mPSInPosView.get() == NULL)
-        return false;       
-    
     // Resolve vertex shader output depth.      
     mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPC_DEPTH_VIEW_SPACE);
-    if (mVSOutDepth.get() == NULL)
-        return false;
-    
     // Resolve pixel shader input depth.
     mPSInDepth = psMain->resolveInputParameter(mVSOutDepth);
-    if (mPSInDepth.get() == NULL)
-        return false;       
-
     // Resolve texture sampler parameter.       
     mBackgroundTextureSampler = psProgram->resolveParameter(GCT_SAMPLERCUBE, "FogBackgroundSampler", mBackgroundSamplerIndex);
-    if (mBackgroundTextureSampler.get() == NULL)
-        return false;
-    
-        
+
     return true;
 }
 
@@ -208,7 +178,7 @@ bool RTShaderSRSTexturedFog::addFunctionInvocations(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
 
     vsMain->getStage(FFP_VS_FOG)
-        .callFunction(FFP_FUNC_PIXELFOG_POSITION_DEPTH,
+        .callFunction("FFP_PixelFog_PositionDepth",
                       {In(mWorldMatrix), In(mCameraPos), In(mVSInPos), Out(mVSOutPosView), Out(mVSOutDepth)});
 
     auto psStage = psMain->getStage(FFP_PS_FOG);
