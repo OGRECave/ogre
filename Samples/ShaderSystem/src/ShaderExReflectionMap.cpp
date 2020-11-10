@@ -112,22 +112,14 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
     // NOTE: We use the first texture coordinate hard coded here
     // You may want to parametrize this as well - just remember to add it to hash and copy methods. 
     mVSInMaskTexcoord = vsMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
-    if (mVSInMaskTexcoord.get() == 0)
-        return false;
-
     // Resolve vs output mask texture coordinates.
     mVSOutMaskTexcoord = vsMain->resolveOutputParameter(mVSInMaskTexcoord->getContent(), GCT_FLOAT2);
-    if (mVSOutMaskTexcoord.get() == 0)
-        return false;
-
     // Resolve ps input mask texture coordinates.
     mPSInMaskTexcoord = psMain->resolveInputParameter(mVSOutMaskTexcoord);
 
     // Resolve vs output reflection texture coordinates.
     mVSOutReflectionTexcoord = vsMain->resolveOutputParameter(
         Parameter::SPC_UNKNOWN, mReflectionMapType == TEX_TYPE_2D ? GCT_FLOAT2 : GCT_FLOAT3);
-    if (mVSOutReflectionTexcoord.get() == 0)
-        return false;
 
     // Resolve ps input reflection texture coordinates.
     mPSInReflectionTexcoord= psMain->resolveInputParameter(mVSOutReflectionTexcoord);
@@ -135,50 +127,25 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
 
     // Resolve world matrix.    
     mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
-    if (mWorldMatrix.get() == NULL)
-        return false;   
-
     // Resolve world inverse transpose matrix.  
     mWorldITMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX);
-    if (mWorldITMatrix.get() == NULL)
-        return false;   
-
-
     // Resolve view matrix.
     mViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEW_MATRIX);
-    if (mViewMatrix.get() == NULL)
-        return false;   
-
     // Resolve vertex position.
     mVSInputPos = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
-    if (mVSInputPos.get() == NULL)
-        return false;       
-
     // Resolve vertex normal.
     mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPC_NORMAL_OBJECT_SPACE);
-    if (mVSInputNormal.get() == NULL)
-        return false;       
-
     // Resolve mask texture sampler parameter.      
     mMaskMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "mask_sampler", mMaskMapSamplerIndex);
-    if (mMaskMapSampler.get() == NULL)
-        return false;
 
     // Resolve reflection texture sampler parameter.        
     mReflectionMapSampler = psProgram->resolveParameter(mReflectionMapType == TEX_TYPE_2D ? GCT_SAMPLER2D : GCT_SAMPLERCUBE, 
-        mReflectionMapSamplerIndex, (uint16)GPV_GLOBAL, "reflection_texture");
-    if (mReflectionMapSampler.get() == NULL)
-        return false;
+        "reflection_texture", mReflectionMapSamplerIndex);
 
     // Resolve reflection power parameter.      
     mReflectionPower = psProgram->resolveParameter(GCT_FLOAT1, "reflection_power");
-    if (mReflectionPower.get() == NULL)
-        return false;
-
     // Resolve ps output diffuse colour.
     mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
-    if (mPSOutDiffuse.get() == NULL)
-        return false;
 
     return true;
 }
