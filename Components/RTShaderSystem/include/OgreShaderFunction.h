@@ -180,7 +180,13 @@ public:
     @param type The type of the desired parameter.  
     Return parameter instance in case of that resolve operation succeeded.
     */
-    ParameterPtr resolveLocalParameter(const String& name, GpuConstantType type)
+    ParameterPtr resolveLocalParameter(GpuConstantType type, const String& name)
+    {
+        return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, name, type);
+    }
+
+    /// @deprecated
+    OGRE_DEPRECATED ParameterPtr resolveLocalParameter(const String& name, GpuConstantType type)
     {
         return resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, name, type);
     }

@@ -313,7 +313,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
     if (mPSOutDiffuse.get() == NULL)
         return false;
 
-    mPSTempDiffuseColour = psMain->resolveLocalParameter("lPerPixelDiffuse", GCT_FLOAT4);
+    mPSTempDiffuseColour = psMain->resolveLocalParameter(GCT_FLOAT4, "lPerPixelDiffuse");
     if (mPSTempDiffuseColour.get() == NULL)
         return false;
 
@@ -343,7 +343,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
                 return false;
         }
 
-        mPSTempSpecularColour = psMain->resolveLocalParameter("lPerPixelSpecular", GCT_FLOAT4);
+        mPSTempSpecularColour = psMain->resolveLocalParameter(GCT_FLOAT4, "lPerPixelSpecular");
         if (mPSTempSpecularColour.get() == NULL)
             return false;
 

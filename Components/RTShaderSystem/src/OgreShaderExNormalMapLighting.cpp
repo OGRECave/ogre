@@ -182,7 +182,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
         mVSInTangent = vsMain->resolveInputParameter(Parameter::SPC_TANGENT_OBJECT_SPACE);
         
         // Resolve local vertex shader TNB matrix.
-        mVSTBNMatrix = vsMain->resolveLocalParameter("lMatTBN", GCT_MATRIX_3X3);
+        mVSTBNMatrix = vsMain->resolveLocalParameter(GCT_MATRIX_3X3, "lMatTBN");
 
         normalContent = Parameter::SPC_NORMAL_TANGENT_SPACE;
         posContent = Parameter::SPC_POSTOCAMERA_TANGENT_SPACE;
@@ -217,7 +217,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 
         // Resolve camera position world space.
         mCamPosWorldSpace = vsProgram->resolveParameter(GpuProgramParameters::ACT_CAMERA_POSITION);
-        mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
+        mVSLocalDir = vsMain->resolveLocalParameter(GCT_FLOAT3, "lNormalMapTempDir");
         mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
         // Resolve world matrix.                
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
@@ -319,7 +319,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
     {
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
         // Resolve local dir.
-        mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
+        mVSLocalDir = vsMain->resolveLocalParameter(GCT_FLOAT3, "lNormalMapTempDir");
         mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE);
         mWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_MATRIX);
         // Resolve inverse world rotation matrix.
