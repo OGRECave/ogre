@@ -37,6 +37,11 @@ namespace Ogre
     class PSSMShadowCameraSetup;
     class ShaderHelper;
 
+    namespace RTShader
+    {
+    class RenderState;
+    }
+
     /** \addtogroup Optional
     *  @{
     */
@@ -57,9 +62,12 @@ namespace Ogre
     */
     class _OgreTerrainExport TerrainMaterialGeneratorA : public TerrainMaterialGenerator
     {
+        std::unique_ptr<RTShader::RenderState> mMainRenderState;
     public:
         TerrainMaterialGeneratorA();
         virtual ~TerrainMaterialGeneratorA();
+
+        RTShader::RenderState* getMainRenderState() const { return mMainRenderState.get(); }
 
         /** Shader model 2 profile target. 
         */
@@ -150,11 +158,6 @@ namespace Ogre
 
             bool isShadowingEnabled(TechniqueType tt, const Terrain* terrain) const;
         private:
-            typedef StringStream stringstream;
-
-            void addTechnique(const MaterialPtr& mat, const Terrain* terrain, TechniqueType tt);
-
-            ShaderHelper* mShaderGen;
             bool mLayerNormalMappingEnabled;
             bool mLayerParallaxMappingEnabled;
             bool mLayerSpecularMappingEnabled;

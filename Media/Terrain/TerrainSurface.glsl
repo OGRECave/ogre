@@ -20,6 +20,12 @@ void transformToTS(in vec3 TSnormal, in mat3 normalMatrix, inout vec3 normal)
     normal = mul(TBN, TSnormal);
 }
 
+void getShadowFactor(in sampler2D lightmap, in vec2 uv, inout float shadowFactor)
+{
+    float lmShadow = texture2D(lightmap, uv).x;
+    shadowFactor = min(shadowFactor, lmShadow);
+}
+
 void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
 #ifdef TERRAIN_PARALLAX_MAPPING
                     in vec3 viewPos, in vec2 scaleBias,
