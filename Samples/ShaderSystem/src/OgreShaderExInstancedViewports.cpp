@@ -106,10 +106,10 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
     // Resolve ps input position in projective space.
     mPSInPositionProjectiveSpace = psMain->resolveInputParameter(mVSOutPositionProjectiveSpace);
     // Resolve vertex shader uniform monitors count
-    mVSInMonitorsCount = vsProgram->resolveParameter(GCT_FLOAT2, -1, (uint16)GPV_GLOBAL, "monitorsCount");
+    mVSInMonitorsCount = vsProgram->resolveParameter(GCT_FLOAT2, "monitorsCount");
 
     // Resolve pixel shader uniform monitors count
-    mPSInMonitorsCount = psProgram->resolveParameter(GCT_FLOAT2, -1, (uint16)GPV_GLOBAL, "monitorsCount");
+    mPSInMonitorsCount = psProgram->resolveParameter(GCT_FLOAT2, "monitorsCount");
 
 
     // Resolve the current world & view matrices concatenated   

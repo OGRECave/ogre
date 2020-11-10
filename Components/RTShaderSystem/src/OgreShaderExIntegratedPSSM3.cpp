@@ -185,7 +185,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     mPSLocalShadowFactor = psMain->resolveLocalParameter("lShadowFactor", GCT_FLOAT1);
 
     // Resolve computed local shadow colour parameter.
-    mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "pssm_split_points");
+    mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, "pssm_split_points");
 
     // Get derived scene colour.
     mPSDerivedSceneColour = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
@@ -200,7 +200,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
         it->mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex));        
         it->mPSInLightPosition = psMain->resolveInputParameter(it->mVSOutLightPosition);
         auto stype = mUseTextureCompare ? GCT_SAMPLER2DSHADOW : GCT_SAMPLER2D;
-        it->mTextureSampler = psProgram->resolveParameter(stype, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");
+        it->mTextureSampler = psProgram->resolveParameter(stype, "shadow_map", it->mTextureSamplerIndex);
         it->mInvTextureSize = psProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE,
                                                           it->mTextureSamplerIndex);
 

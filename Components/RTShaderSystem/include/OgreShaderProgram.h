@@ -90,6 +90,12 @@ public:
     */
     UniformParameterPtr resolveParameter(GpuConstantType type, int index, uint16 variability, const String& suggestedName, size_t size = 0);
     
+    /// @overload
+    UniformParameterPtr resolveParameter(GpuConstantType type, const String& name, int index = -1)
+    {
+        return resolveParameter(type, index, GPV_GLOBAL, name);
+    }
+
     /** Resolve uniform auto constant parameter
     @param autoType The auto type of the desired parameter
     @param data The data to associate with the auto parameter. 

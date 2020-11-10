@@ -160,7 +160,7 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
         return false;       
 
     // Resolve mask texture sampler parameter.      
-    mMaskMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mMaskMapSamplerIndex, (uint16)GPV_GLOBAL, "mask_sampler");
+    mMaskMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "mask_sampler", mMaskMapSamplerIndex);
     if (mMaskMapSampler.get() == NULL)
         return false;
 
@@ -171,7 +171,7 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
         return false;
 
     // Resolve reflection power parameter.      
-    mReflectionPower = psProgram->resolveParameter(GCT_FLOAT1, -1, (uint16)GPV_GLOBAL, "reflection_power");
+    mReflectionPower = psProgram->resolveParameter(GCT_FLOAT1, "reflection_power");
     if (mReflectionPower.get() == NULL)
         return false;
 

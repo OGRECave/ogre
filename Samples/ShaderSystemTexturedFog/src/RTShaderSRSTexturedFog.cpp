@@ -145,7 +145,7 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
         return false;
     
     // Resolve fog params.      
-    mFogParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogParams");
+    mFogParams = psProgram->resolveParameter(GCT_FLOAT4, "gFogParams");
     if (mFogParams.get() == NULL)
         return false;
 
@@ -170,7 +170,7 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
         return false;       
 
     // Resolve texture sampler parameter.       
-    mBackgroundTextureSampler = psProgram->resolveParameter(GCT_SAMPLERCUBE, mBackgroundSamplerIndex, (uint16)GPV_GLOBAL, "FogBackgroundSampler");
+    mBackgroundTextureSampler = psProgram->resolveParameter(GCT_SAMPLERCUBE, "FogBackgroundSampler", mBackgroundSamplerIndex);
     if (mBackgroundTextureSampler.get() == NULL)
         return false;
     
