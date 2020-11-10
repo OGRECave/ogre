@@ -166,7 +166,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 
     groupOrder = (FFP_PS_SAMPLING + FFP_PS_TEXTURING) / 2;
 
-    ParameterPtr psAtlasTextureCoord = psMain->resolveLocalParameter("atlasCoord", GCT_FLOAT2);
+    ParameterPtr psAtlasTextureCoord = psMain->resolveLocalParameter(GCT_FLOAT2, "atlasCoord");
 
     for(ushort j = 0 ; j <  TAS_MAX_TEXTURES; ++j)
     {

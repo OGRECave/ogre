@@ -70,7 +70,7 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
     //mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
 
     //local param
-    mParamLocalBlendPosition = vsMain->resolveLocalParameter("BlendedPosition", GCT_FLOAT3);
+    mParamLocalBlendPosition = vsMain->resolveLocalParameter(GCT_FLOAT3, "BlendedPosition");
     mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPC_NORMAL_WORLD_SPACE);
     //mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);
     //mParamLocalBinormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_WORLD_SPACE, GCT_FLOAT3);
@@ -87,9 +87,9 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         mParamInInvWorldMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX);
         mParamInViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_VIEWPROJ_MATRIX);
         
-        mParamTempWorldMatrix = vsMain->resolveLocalParameter("worldMatrix", GCT_MATRIX_2X4);
-        mParamBlendDQ = vsMain->resolveLocalParameter("blendDQ", GCT_MATRIX_2X4);
-        mParamInitialDQ = vsMain->resolveLocalParameter("initialDQ", GCT_MATRIX_2X4);
+        mParamTempWorldMatrix = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "worldMatrix");
+        mParamBlendDQ = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "blendDQ");
+        mParamInitialDQ = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "initialDQ");
 
         if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
         {
@@ -101,14 +101,14 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
         if(mScalingShearingSupport)
         {
             mParamInScaleShearMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, mBoneCount);
-            mParamBlendS = vsMain->resolveLocalParameter("blendS", GCT_MATRIX_3X4);
-            mParamTempFloat3x3 = vsMain->resolveLocalParameter("TempVal3x3", GCT_MATRIX_3X3);
-            mParamTempFloat3x4 = vsMain->resolveLocalParameter("TempVal3x4", GCT_MATRIX_3X4);
+            mParamBlendS = vsMain->resolveLocalParameter(GCT_MATRIX_3X4, "blendS");
+            mParamTempFloat3x3 = vsMain->resolveLocalParameter(GCT_MATRIX_3X3, "TempVal3x3");
+            mParamTempFloat3x4 = vsMain->resolveLocalParameter(GCT_MATRIX_3X4, "TempVal3x4");
         }
         
-        mParamTempFloat2x4 = vsMain->resolveLocalParameter("TempVal2x4", GCT_MATRIX_2X4);
-        mParamTempFloat4 = vsMain->resolveLocalParameter("TempVal4", GCT_FLOAT4);
-        mParamTempFloat3 = vsMain->resolveLocalParameter("TempVal3", GCT_FLOAT3);
+        mParamTempFloat2x4 = vsMain->resolveLocalParameter(GCT_MATRIX_2X4, "TempVal2x4");
+        mParamTempFloat4 = vsMain->resolveLocalParameter(GCT_FLOAT4, "TempVal4");
+        mParamTempFloat3 = vsMain->resolveLocalParameter(GCT_FLOAT3, "TempVal3");
     }
     else
     {

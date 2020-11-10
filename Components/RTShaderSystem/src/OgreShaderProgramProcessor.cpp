@@ -622,7 +622,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
     for (unsigned int i=0; i < splitParams.size(); ++i)
     {
         ParameterPtr srcParameter   = splitParams[i];
-        ParameterPtr localParameter = func->resolveLocalParameter("lsplit_" + srcParameter->getName(), srcParameter->getType());
+        ParameterPtr localParameter = func->resolveLocalParameter(srcParameter->getType(), "lsplit_" + srcParameter->getName());
 
         localParamsMap[srcParameter.get()] = localParameter;        
     }   

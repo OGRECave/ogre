@@ -182,7 +182,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     }
     
     // Resolve computed local shadow colour parameter.
-    mPSLocalShadowFactor = psMain->resolveLocalParameter("lShadowFactor", GCT_FLOAT1);
+    mPSLocalShadowFactor = psMain->resolveLocalParameter(GCT_FLOAT1, "lShadowFactor");
 
     // Resolve computed local shadow colour parameter.
     mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, "pssm_split_points");
