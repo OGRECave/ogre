@@ -32,7 +32,7 @@ namespace Ogre {
 	namespace RTShader {
 
 		String FFPAlphaTest::Type = "FFP_Alpha_Test";
-		
+
 
 		//-----------------------------------------------------------------------
 		const Ogre::String& FFPAlphaTest::getType() const
@@ -46,12 +46,12 @@ namespace Ogre {
 		{
 			Program* psProgram  = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 			Function* psMain = psProgram->getEntryPointFunction();
-			  
+
 			mPSAlphaRef = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_ALPHA_REJECTION_VALUE);
-			mPSAlphaFunc = psProgram->resolveParameter(GCT_FLOAT1,-1, (uint16)GPV_GLOBAL, "gAlphaFunc");
-			
+			mPSAlphaFunc = psProgram->resolveParameter(GCT_FLOAT1, "gAlphaFunc");
+
 			mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
-			
+
 			return true;
 		}
 
@@ -64,9 +64,9 @@ namespace Ogre {
 			psProgram->addDependency(FFP_LIB_ALPHA_TEST);
 			return true;
 		}
-	
+
 		//-----------------------------------------------------------------------
-	
+
 		void FFPAlphaTest::copyFrom( const SubRenderState& rhs )
 		{
 

@@ -146,7 +146,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     
     // Resolve normal map texture sampler parameter.
     if(!mLightParamsList.empty())
-        mPSNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
+        mPSNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "gNormalMapSampler", mNormalMapSamplerIndex);
 
     // Get surface ambient colour if need to.
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
