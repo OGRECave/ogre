@@ -28,52 +28,37 @@ I’m not going to teach you OO here, that’s a subject for many other books, b
 
 In summary, here’s the benefits an object-oriented approach brings to OGRE:
 
-<dl compact="compact">
-<dt>Abstraction</dt> <dd>
 
+@par Abstraction
 Common interfaces hide the nuances between different implementations of 3D API and operating systems
 
-</dd> <dt>Encapsulation</dt> <dd>
-
+@par Encapsulation
 There is a lot of state management and context-specific actions to be done in a graphics engine - encapsulation allows me to put the code and data nearest to where it is used which makes the code cleaner and easier to understand, and more reliable because duplication is avoided
 
-</dd> <dt>Polymorphism</dt> <dd>
-
+@par Polymorphism
 The behaviour of methods changes depending on the type of object you are using, even if you only learn one interface, e.g. a class specialised for managing indoor levels behaves completely differently from the standard scene manager, but looks identical to other classes in the system and has the same methods called on it
-
-</dd> </dl>
-
-
 
 <a name="Multi_002deverything"></a> <a name="Multi_002deverything-1"></a>
 
 # Multi-everything
 
-I wanted to do more than create a 3D engine that ran on one 3D API, on one platform, with one type of scene (indoor levels are most popular). I wanted OGRE to be able to extend to any kind of scene (but yet still implement scene-specific optimisations under the surface), any platform and any 3D API.
+OGRE is more than a 3D engine that runs on one 3D API, on one platform, with one type of scene (indoor levels are most popular). OGRE is able to extend to any kind of scene (but yet still implements scene-specific optimisations under the surface), any platform and any 3D API.
 
 Therefore all the ’visible’ parts of OGRE are completely independent of platform, 3D API and scene type. There are no dependencies on Windows types, no assumptions about the type of scene you are creating, and the principles of the 3D aspects are based on core maths texts rather than one particular API implementation.
 
 Now of course somewhere OGRE has to get down to the nitty-gritty of the specifics of the platform, API and scene, but it does this in subclasses specially designed for the environment in question, but which still expose the same interface as the abstract versions.
 
-For example, there is a ’Win32Window’ class which handles all the details about rendering windows on a Win32 platform - however the application designer only has to manipulate it via the superclass interface ’RenderWindow’, which will be the same across all platforms.
+For example, there is a @c Win32Window class which handles all the details about rendering windows on a Win32 platform - however the application designer only has to manipulate it via the superclass interface Ogre::RenderWindow, which will be the same across all platforms.
 
-Similarly the ’SceneManager’ class looks after the arrangement of objects in the scene and their rendering sequence. Applications only have to use this interface, but there is a ’BspSceneManager’ class which optimises the scene management for indoor levels, meaning you get both performance and an easy to learn interface. All applications have to do is hint about the kind of scene they will be creating and let OGRE choose the most appropriate implementation - this is covered in a later tutorial.
+Similarly the Ogre::SceneManager class looks after the arrangement of objects in the scene and their rendering sequence. Applications only have to use this interface, but there is a Ogre::OctreeSceneManager class which optimises the scene management for outdoor levels, meaning you get both performance and an easy to learn interface. All applications have to do is hint about the kind of scene they will be creating and let OGRE choose the most appropriate implementation - this is covered in a later tutorial.
 
-OGRE’s object-oriented nature makes all this possible. Currently OGRE runs on Windows, Linux and Mac OSX using plugins to drive the underlying rendering API (currently Direct3D or OpenGL). Applications use OGRE at the abstract level, thus ensuring that they automatically operate on all platforms and rendering subsystems that OGRE provides without any need for platform or API specific code.
+OGRE’s object-oriented nature makes all this possible. Currently OGRE runs on different platforms using plugins to drive the underlying rendering API. Applications use OGRE at the abstract level, thus ensuring that they automatically operate on all platforms and rendering subsystems that OGRE provides without any need for platform or API specific code.
 
 @page The-Core-Objects The Core Objects
 
 @tableofcontents
 
 This tutorial gives you a quick summary of the core objects that you will use in OGRE and what they are used for.
-
-<a name="A-Word-About-Namespaces"></a>
-
-# A Word About Namespaces
-
-OGRE uses a C++ feature called namespaces. This lets you put classes, enums, structures, anything really within a ’namespace’ scope which is an easy way to prevent name clashes, i.e. situations where you have 2 things called the same thing. Since OGRE is designed to be used inside other applications, I wanted to be sure that name clashes would not be a problem. Some people prefix their classes/types with a short code because some compilers don’t support namespaces, but I chose to use them because they are the ’right’ way to do it. Sorry if you have a non-compliant compiler, but hey, the C++ standard has been defined for years, so compiler writers really have no excuse anymore. If your compiler doesn’t support namespaces then it’s probably because it’s sh\*t - get a better one. ;)
-
-This means every class, type etc should be prefixed with Ogre, e.g. Ogre::Camera, Ogre::Vector3 etc which means if elsewhere in your application you have used a Vector3 type you won’t get name clashes. To avoid lots of extra typing you can add a ’using namespace Ogre;’ statement to your code which means you don’t have to type the Ogre prefix unless there is ambiguity (in the situation where you have another definition with the same name).
 
 <a name="Overview-from-10_002c000-feet"></a>
 
@@ -85,20 +70,14 @@ At the very top of the diagram is the Root object. This is your ’way in’ to 
 
 The majority of rest of OGRE’s classes fall into one of 3 roles:
 
-<dl compact="compact">
-<dt>Scene Management</dt> <dd>
-
+@par Scene Management
 This is about the contents of your scene, how it’s structured, how it’s viewed from cameras, etc. Objects in this area are responsible for giving you a natural declarative interface to the world you’re building; i.e. you don’t tell OGRE "set these render states and then render 3 polygons", you tell it "I want an object here, here and here, with these materials on them, rendered from this view", and let it get on with it.
 
-</dd> <dt>Resource Management</dt> <dd>
-
+@par Resource Management
 All rendering needs resources, whether it’s geometry, textures, fonts, whatever. It’s important to manage the loading, re-use and unloading of these things carefully, so that’s what classes in this area do.
 
-</dd> <dt>Rendering</dt> <dd>
-
+@par Rendering
 Finally, there’s getting the visuals on the screen - this is about the lower-level end of the rendering pipeline, the specific rendering system API objects like buffers, render states and the like and pushing it all down the pipeline. Classes in the Scene Management subsystem use this to get their higher-level scene information onto the screen.
-
-</dd> </dl>
 
 You’ll notice that scattered around the edge are a number of plugins. OGRE is designed to be extended, and plugins are the usual way to go about it. Many of the classes in OGRE can be subclassed and extended, whether it’s changing the scene organisation through a custom SceneManager, adding a new render system implementation (e.g. Direct3D or OpenGL), or providing a way to load resources from another source (say from a web location or a database). Again this is just a small smattering of the kinds of things plugins can do, but as you can see they can plug in to almost any aspect of the system. This way, OGRE isn’t just a solution for one narrowly defined problem, it can extend to pretty much anything you need it to do.
 
