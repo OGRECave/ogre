@@ -133,7 +133,10 @@ namespace Ogre {
                 mParentTexture->getTextureResource(), subresource, &boxDx11);
         }
         else if(flags == D3D11_MAP_WRITE_DISCARD)
+        {
             flags = D3D11_MAP_WRITE; // stagingbuffer doesn't support discarding
+            mCurrentLockOptions = HBL_WRITE_ONLY;
+        }
 
         _map(mStagingBuffer.Get(), flags, box);
     }
@@ -174,6 +177,8 @@ namespace Ogre {
             break;
         };
 
+        mCurrentLockOptions = options;
+
         int usage = mUsage & 0xF; // drop TU_* flags
         if(usage == HBU_GPU_ONLY || usage == HBU_GPU_TO_CPU || options == HBL_READ_ONLY || options == HBL_NORMAL)
             _mapstagingbuffer(flags, rval);
@@ -182,7 +187,6 @@ namespace Ogre {
 
         // save without offset
         mCurrentLock = rval;
-        mCurrentLockOptions = options;
 
         return rval;
     }

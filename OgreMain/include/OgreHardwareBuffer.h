@@ -148,9 +148,8 @@ namespace Ogre {
                 possible when you are locking a buffer which was not created with a shadow buffer.
                 If you are using a shadow buffer it matters less, although with a shadow buffer it’s
                 preferable to lock the entire buffer at once, because that allows the shadow buffer
-                to use HBL_DISCARD when it uploads the updated contents to the real buffer. Only
-                allowed on buffers
-                created with the HBU_DYNAMIC flag.
+                to use HBL_DISCARD when it uploads the updated contents to the real buffer.
+                @note Only useful on buffers created with the HBU_CPU_TO_GPU flag.
                 */
                 HBL_DISCARD,
                 /** Lock the buffer for reading only. Not allowed in buffers which are created with
@@ -161,7 +160,7 @@ namespace Ogre {
                 /** As HBL_DISCARD, except the application guarantees not to overwrite any
                 region of the buffer which has already been used in this frame, can allow
                 some optimisation on some APIs.
-                This is only useful on buffers with no shadow buffer.*/
+                @note Only useful on buffers with no shadow buffer.*/
                 HBL_NO_OVERWRITE,
                 /** Lock the buffer for writing only.*/
                 HBL_WRITE_ONLY
