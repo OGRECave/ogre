@@ -58,6 +58,13 @@ class Importer;
 namespace Ogre
 {
 
+/** \addtogroup Plugins Plugins
+*  @{
+*/
+/** \defgroup AssimpCodec AssimpCodec
+* %Codec for loading geometry using the [Open-Asset-Importer](https://github.com/assimp/assimp)
+* @{
+*/
 class _OgreAssimpExport AssimpLoader
 {
 public:
@@ -141,6 +148,8 @@ public:
     void initialise() {}
     void shutdown() {}
 };
+/** @} */
+/** @} */
 } // namespace Ogre
 
 #endif // __AssimpLoader_h__

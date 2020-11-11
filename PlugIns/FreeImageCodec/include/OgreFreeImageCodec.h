@@ -38,16 +38,12 @@ struct FIBITMAP;
 
 namespace Ogre {
 
-    /** \addtogroup Core
+    /** \addtogroup Plugins Plugins
     *  @{
     */
-    /** \addtogroup Image
+    /** \defgroup FreeImageCodec FreeImageCodec
+    * %Codec specialized in images loaded using [FreeImage](https://freeimage.sourceforge.io/)
     *  @{
-    */
-    /** Codec specialized in images loaded using FreeImage.
-        @remarks
-            The users implementing subclasses of ImageCodec are required to return
-            a valid pointer to a ImageData class from the decode(...) function.
     */
     class FreeImageCodec : public ImageCodec
     {
