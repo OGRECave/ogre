@@ -9,3 +9,17 @@ void shadow_caster_ps(
 	float finalDepth = depth.x / depth.y;
 	oColour = float4(finalDepth, finalDepth, finalDepth, 1);
 }
+
+void shadow_caster_vs(
+	float4 position			: POSITION,
+
+	out float4 oPosition	: POSITION,
+	out float2 oDepth		: TEXCOORD0,
+
+	uniform float4x4 worldViewProjMatrix)
+{
+	oPosition = mul(worldViewProjMatrix, position);
+
+	// depth info for the fragment.
+	oDepth = oPosition.zw;
+}
