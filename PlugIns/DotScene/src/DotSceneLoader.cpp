@@ -284,9 +284,9 @@ void DotSceneLoader::processTerrainGroup(pugi::xml_node& XMLNode)
     terrainGlobalOptions->setMaxPixelError((Real)maxPixelError);
     terrainGlobalOptions->setCompositeMapDistance((Real)compositeMapDistance);
 
-    mTerrainGroup.reset(new TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, mapSize, worldSize));
-    mTerrainGroup->setOrigin(Vector3::ZERO);
-    mTerrainGroup->setResourceGroup(m_sGroupName);
+    auto terrainGroup = std::make_shared<TerrainGroup>(mSceneMgr, Terrain::ALIGN_X_Z, mapSize, worldSize);
+    terrainGroup->setOrigin(Vector3::ZERO);
+    terrainGroup->setResourceGroup(m_sGroupName);
 
     // Process terrain pages (*)
     for (auto pPageElement : XMLNode.children("terrain"))
@@ -294,11 +294,13 @@ void DotSceneLoader::processTerrainGroup(pugi::xml_node& XMLNode)
         int pageX = StringConverter::parseInt(pPageElement.attribute("x").value());
         int pageY = StringConverter::parseInt(pPageElement.attribute("y").value());
 
-        mTerrainGroup->defineTerrain(pageX, pageY, pPageElement.attribute("dataFile").value());
+        terrainGroup->defineTerrain(pageX, pageY, pPageElement.attribute("dataFile").value());
     }
-    mTerrainGroup->loadAllTerrains(true);
+    terrainGroup->loadAllTerrains(true);
 
-    mTerrainGroup->freeTemporaryResources();
+    terrainGroup->freeTemporaryResources();
+
+    mAttachNode->getUserObjectBindings().setUserAny("TerrainGroup", terrainGroup);
 #else
     OGRE_EXCEPT(Exception::ERR_INVALID_CALL, "recompile with Terrain component");
 #endif
