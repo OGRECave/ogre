@@ -123,6 +123,8 @@ void SceneLoaderManager::load(DataStreamPtr& stream, const String& groupName, Sc
         }
     }
     
+    // set resource group for the next call
+    ResourceGroupManager::getSingleton().setWorldResourceGroupName(groupName);
     // getCodec will throw on failure
     Codec::getCodec(ext.substr(1))->decode(stream, rootNode);
 }
