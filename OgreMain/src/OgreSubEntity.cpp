@@ -82,10 +82,8 @@ namespace Ogre {
         
         if (!mMaterialPtr)
         {
-            LogManager::getSingleton().logMessage("Can't assign material "  
-                " to SubEntity of '" + mParentEntity->getName() + "' because this "
-                "Material does not exist. Have you forgotten to define it in a "
-                ".material script?", LML_CRITICAL);
+            LogManager::getSingleton().logError("Can't assign nullptr material "
+                "to SubEntity of '" + mParentEntity->getName() + "'. Falling back to default");
             
             mMaterialPtr = MaterialManager::getSingleton().getDefaultMaterial();
         }

@@ -984,7 +984,17 @@ namespace Ogre {
         String materialName = readString(stream);
         if(listener)
             listener->processMaterialName(pMesh, &materialName);
-        sm->setMaterialName(materialName, pMesh->getGroup());
+        if (auto material = MaterialManager::getSingleton().getByName(materialName, pMesh->getGroup()))
+        {
+            sm->setMaterial(material);
+        }
+        else
+        {
+            LogManager::getSingleton().logWarning("Can't assign material '" + materialName +
+                "' to SubMesh of '" + pMesh->getName() + "' because this "
+                "Material does not exist in group '"+pMesh->getGroup()+"'. Have you forgotten to define it in a "
+                ".material script?");
+        }
 
         // bool useSharedVertices
         readBools(stream,&sm->useSharedVertices, 1);
