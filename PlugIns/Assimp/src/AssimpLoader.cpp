@@ -353,7 +353,6 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
 {
     uint32 flags = aiProcessPreset_TargetRealtime_Quality | aiProcess_TransformUVCoords | aiProcess_FlipUVs;
     importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", options.maxEdgeAngle);
-    importer.SetPropertyInteger("PP_SBP_REMOVE", aiPrimitiveType_LINE | aiPrimitiveType_POINT);
     const aiScene* scene = importer.ReadFile(name, flags);
 
     // If the import failed, report it
@@ -852,27 +851,32 @@ MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat)
                                                   String(szPath.data));
         }
     }
-    if (szPath.length < 1)
+
+    MaterialPtr omat;
+    if(szPath.length)
+    {
+        auto status = omatMgr->createOrRetrieve(ReplaceSpaces(szPath.data),
+                                                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        omat = static_pointer_cast<Material>(status.first);
+
+        if (!status.second)
+            return omat;
+
+        if (!mQuietMode)
+        {
+            LogManager::getSingleton().logMessage("Creating " + String(szPath.data));
+        }
+    }
+    else
     {
         if (!mQuietMode)
         {
             LogManager::getSingleton().logMessage("Unnamed material encountered...");
         }
-        szPath = String("dummyMat" + StringConverter::toString(dummyMatCount)).c_str();
-        dummyMatCount++;
+
+        omat = omatMgr->getDefaultMaterial(false)->clone("dummyMat" +
+                                                         StringConverter::toString(dummyMatCount++));
     }
-
-    if (!mQuietMode)
-    {
-        LogManager::getSingleton().logMessage("Creating " + String(szPath.data));
-    }
-
-    auto status = omatMgr->createOrRetrieve(ReplaceSpaces(szPath.data),
-                                            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    MaterialPtr omat = static_pointer_cast<Material>(status.first);
-
-    if (!status.second)
-        return omat;
 
     // ambient
     aiColor4D clr(1.0f, 1.0f, 1.0f, 1.0);
@@ -989,6 +993,20 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     submesh->vertexData->vertexStart = 0;
     submesh->vertexData->vertexCount = mesh->mNumVertices;
 
+    switch(mesh->mPrimitiveTypes)
+    {
+    default:
+    case aiPrimitiveType_TRIANGLE:
+        submesh->operationType = RenderOperation::OT_TRIANGLE_LIST;
+        break;
+    case aiPrimitiveType_LINE:
+        submesh->operationType = RenderOperation::OT_LINE_LIST;
+        break;
+    case aiPrimitiveType_POINT:
+        submesh->operationType = RenderOperation::OT_POINT_LIST;
+        break;
+    }
+
     // We must now declare what the vertex data contains
     VertexDeclaration* declaration = submesh->vertexData->vertexDeclaration;
     static const unsigned short source = 0;
@@ -1035,6 +1053,9 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
         }
         offset += declaration->addElement(source, offset, VET_UBYTE4_NORM, VES_DIFFUSE).getSize();
     }
+
+    // Finally we set a material to the submesh
+    submesh->setMaterial(matptr);
 
     // We create the hardware vertex buffer
     HardwareVertexBufferSharedPtr vbuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
@@ -1105,55 +1126,6 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     vbuffer->unlock();
     submesh->vertexData->vertexBufferBinding->setBinding(source, vbuffer);
 
-    if (!mQuietMode)
-    {
-        LogManager::getSingleton().logMessage(StringConverter::toString(mesh->mNumFaces) + " faces");
-    }
-    aiFace* faces = mesh->mFaces;
-
-    // Creates the index data
-    submesh->indexData->indexStart = 0;
-    submesh->indexData->indexCount = mesh->mNumFaces * 3;
-
-    if (mesh->mNumVertices >= 65536) // 32 bit index buffer
-    {
-        submesh->indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
-            HardwareIndexBuffer::IT_32BIT, submesh->indexData->indexCount,
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-
-        uint32* indexData =
-            static_cast<uint32*>(submesh->indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-
-        for (size_t i = 0; i < mesh->mNumFaces; ++i)
-        {
-            *indexData++ = faces->mIndices[0];
-            *indexData++ = faces->mIndices[1];
-            *indexData++ = faces->mIndices[2];
-
-            faces++;
-        }
-    }
-    else // 16 bit index buffer
-    {
-        submesh->indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
-            HardwareIndexBuffer::IT_16BIT, submesh->indexData->indexCount,
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-
-        uint16* indexData =
-            static_cast<uint16*>(submesh->indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-
-        for (size_t i = 0; i < mesh->mNumFaces; ++i)
-        {
-            *indexData++ = faces->mIndices[0];
-            *indexData++ = faces->mIndices[1];
-            *indexData++ = faces->mIndices[2];
-
-            faces++;
-        }
-    }
-
-    submesh->indexData->indexBuffer->unlock();
-
     // set bone weigths
     if (mesh->HasBones())
     {
@@ -1178,9 +1150,57 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
         }
     } // if mesh has bones
 
-    // Finally we set a material to the submesh
-    if (matptr)
-        submesh->setMaterialName(matptr->getName());
+    if(mesh->mNumFaces == 0)
+        return true;
+
+    if (!mQuietMode)
+    {
+        LogManager::getSingleton().logMessage(StringConverter::toString(mesh->mNumFaces) + " faces");
+    }
+
+    aiFace* faces = mesh->mFaces;
+    int faceSz = mesh->mPrimitiveTypes == aiPrimitiveType_LINE ? 2 : 3;
+
+    // Creates the index data
+    submesh->indexData->indexStart = 0;
+    submesh->indexData->indexCount = mesh->mNumFaces * faceSz;
+
+    if (mesh->mNumVertices >= 65536) // 32 bit index buffer
+    {
+        submesh->indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+            HardwareIndexBuffer::IT_32BIT, submesh->indexData->indexCount,
+            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+        uint32* indexData =
+            static_cast<uint32*>(submesh->indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+
+        for (size_t i = 0; i < mesh->mNumFaces; ++i)
+        {
+            for(int j = 0; j < faceSz; j++)
+                *indexData++ = faces->mIndices[j];
+
+            faces++;
+        }
+    }
+    else // 16 bit index buffer
+    {
+        submesh->indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+            HardwareIndexBuffer::IT_16BIT, submesh->indexData->indexCount,
+            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+        uint16* indexData =
+            static_cast<uint16*>(submesh->indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+
+        for (size_t i = 0; i < mesh->mNumFaces; ++i)
+        {
+            for(int j = 0; j < faceSz; j++)
+                *indexData++ = faces->mIndices[j];
+
+            faces++;
+        }
+    }
+
+    submesh->indexData->indexBuffer->unlock();
 
     return true;
 }
