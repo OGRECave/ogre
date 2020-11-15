@@ -84,6 +84,15 @@ namespace Ogre {
         };
         typedef std::vector<VideoMode>    VideoModes;
 
+        /**
+         Specific options:
+
+        | Key |  Default | Description |
+        |-----|---------------|---------|
+        | Reversed Z-Buffer | false | Use reverse depth buffer to improve depth precision (GL3+ only) |
+        | Separate Shader Objects | false | Compile shaders individually instad of using monolithic programs. Better introspection. Allows mixing GLSL and SPIRV shaders (GL3+ only)  |
+        | Fixed Pipeline Enabled | true | Use fixed function units where possible. Disable to test migration to shader-only pipeline (GL only) |
+        */
         void setConfigOption(const String &name, const String &value);
 
         virtual ~GLRenderSystemCommon() {}

@@ -203,19 +203,31 @@ namespace Ogre
         const ConfigOptionMap& getConfigOptions() const { return mOptions; }
 
         /** Sets an option for this API
-        @remarks
+
         Used to confirm the settings (normally chosen by the user) in
         order to make the renderer able to initialise with the settings as required.
-        This may be video mode, D3D driver, full screen / windowed etc.
+        This may initialise the @ref RenderWindowDescription or set some RenderSystem
+        specific paramters.
         Called automatically by the default configuration
         dialog, and by the restoration of saved settings.
         These settings are stored and only activated when
         RenderSystem::initialise or RenderSystem::reinitialise
         are called.
-        @par
+
         If using a custom configuration dialog, it is advised that the
         caller calls RenderSystem::getConfigOptions
         again, since some options can alter resulting from a selection.
+
+        Common options:
+
+        | Key |  Default | Description |
+        |-----|---------------|---------|
+        | Full Screen | false | Window full-screen flag |
+        | VSync | true | "vsync" in  @ref _createRenderWindow |
+        | sRGB Gamma Conversion | false | "gamma" in  @ref _createRenderWindow  |
+        | FSAA | 0 | "FSAA" in  @ref _createRenderWindow  |
+        | Video Mode | - | Window resolution |
+        | Display Frequency | - | "displayFrequency" in  @ref _createRenderWindow |
         @param
         name The name of the option to alter.
         @param

@@ -248,6 +248,17 @@ namespace Ogre
 
         void getCustomAttribute(const String& name, void* pData);
         // Low-level overridden members
+        /**
+         Specific options:
+
+        | Key |  Default | Description |
+        |-----|---------------|---------|
+        | Min Requested Feature Levels | 9.1 | Min D3D_FEATURE_LEVEL |
+        | Max Requested Feature Levels | 11.0 | Min D3D_FEATURE_LEVEL |
+        | Information Queue Exceptions Bottom Level | No information queue exceptions | Throw exception on message from validation layer |
+        | Driver type | Hardware | D3D_DRIVER_TYPE |
+        | Rendering Device | (default) |  |
+        */
         void setConfigOption( const String &name, const String &value );
         void shutdown();
         void validateDevice(bool forceDeviceElection = false);
