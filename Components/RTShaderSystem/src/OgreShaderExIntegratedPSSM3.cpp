@@ -159,7 +159,9 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
     
     // Get input position parameter.
-    mVSInPos = vsMain->getInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
+    mVSInPos = vsMain->getLocalParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
+    if(!mVSInPos)
+        mVSInPos = vsMain->getInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
     
     // Get output position parameter.
     mVSOutPos = vsMain->getOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
