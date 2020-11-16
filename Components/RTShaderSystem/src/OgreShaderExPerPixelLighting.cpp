@@ -114,7 +114,9 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
     {
         mOutSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR);
 
-        mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
+        mVSInPosition = vsMain->getLocalParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
+        if(!mVSInPosition)
+            mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
 
         mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
@@ -192,7 +194,8 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
     if (needViewPos)
     {
         mWorldViewMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
-        mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
+        if(!mVSInPosition)
+            mVSInPosition = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
         mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_VIEW_SPACE);
 
         mViewPos = psMain->resolveInputParameter(mVSOutViewPos);

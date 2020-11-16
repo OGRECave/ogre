@@ -142,6 +142,10 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
             if (textureUnitParams->mTextureMatrix.get() == NULL)
                 texCoordContent = Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet());
 
+            // assume already resolved
+            if(vsMain->getOutputParameter(texCoordContent, textureUnitParams->mVSInTextureCoordinateType))
+                break;
+
             textureUnitParams->mVSInputTexCoord = vsMain->resolveInputParameter(
                 Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 +
                                    textureUnitParams->mTextureUnitState->getTextureCoordSet()),
@@ -254,6 +258,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
     switch (textureUnitParams->mTexCoordCalcMethod)
     {
     case TEXCALC_NONE:
+        if(textureUnitParams->mVSInputTexCoord)
         stage.assign(textureUnitParams->mVSInputTexCoord, textureUnitParams->mVSOutputTexCoord);
         break;
     case TEXCALC_ENVIRONMENT_MAP:
