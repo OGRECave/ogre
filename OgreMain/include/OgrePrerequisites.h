@@ -38,6 +38,8 @@ namespace Ogre {
 
     #define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
 
+    #define OGRE_MIN_VERSION(MAJOR, MINOR, PATCH) OGRE_VERSION >= ((MAJOR << 16) | (MINOR << 8) | PATCH)
+
     // define the real number values to be used
     // default to use 'float' unless precompiler option set
     #if OGRE_DOUBLE_PRECISION == 1
