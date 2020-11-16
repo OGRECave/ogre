@@ -100,13 +100,6 @@ namespace Ogre {
 #if (defined( __WIN32__ ) || defined( _WIN32 )) && defined(__ANDROID__) // We are using NVTegra
 #   define OGRE_COMPILER OGRE_COMPILER_GNUC
 #   define OGRE_COMP_VER 470
-#elif defined( __GCCE__ )
-#   define OGRE_COMPILER OGRE_COMPILER_GCCE
-#   define OGRE_COMP_VER _MSC_VER
-//# include <staticlibinit_gcce.h> // This is a GCCE toolchain workaround needed when compiling with GCCE 
-#elif defined( __WINSCW__ )
-#   define OGRE_COMPILER OGRE_COMPILER_WINSCW
-#   define OGRE_COMP_VER _MSC_VER
 #elif defined( _MSC_VER )
 #   define OGRE_COMPILER OGRE_COMPILER_MSVC
 #   define OGRE_COMP_VER _MSC_VER

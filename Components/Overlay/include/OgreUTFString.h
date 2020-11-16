@@ -108,11 +108,9 @@ namespace Ogre {
 #if defined( __WIN32__ ) || defined( _WIN32 ) || !defined(ANDROID)
 #define WCHAR_UTF16 // All currently known Windows platforms utilize UTF-16 encoding in wchar_t
 #else // #if defined( __WIN32__ ) || defined( _WIN32 )
-#if OGRE_COMPILER != OGRE_COMPILER_GCCE
 #if WCHAR_MAX <= 0xFFFF // this is a last resort fall back test; WCHAR_MAX is defined in <wchar.h>
 #define WCHAR_UTF16 // best we can tell, wchar_t is not larger than 16-bit
 #endif // #if WCHAR_MAX <= 0xFFFF
-#endif
 #endif // #if defined( __WIN32__ ) || defined( _WIN32 )
 #endif // #ifdef __STDC_ISO_10646__
 
