@@ -266,7 +266,7 @@ aiVector3D getScale(aiNodeAnim* node_anim, KeyframesMap& keyframes, KeyframesMap
                     Real ticksPerSecond)
 {
     aiVectorKey* scaleKey = std::get<2>(it->second);
-    aiVector3D vect;
+    aiVector3D vect(1, 1, 1);
     if (scaleKey)
     {
         vect = scaleKey->mValue;
@@ -284,10 +284,10 @@ aiVector3D getScale(aiNodeAnim* node_anim, KeyframesMap& keyframes, KeyframesMap
         aiVectorKey* backKey = NULL;
 
         if (front != rend)
-            frontKey = std::get<0>(front->second);
+            frontKey = std::get<2>(front->second);
 
         if (back != end)
-            backKey = std::get<0>(back->second);
+            backKey = std::get<2>(back->second);
 
         // got 2 keys can interpolate
         if (frontKey && backKey)
