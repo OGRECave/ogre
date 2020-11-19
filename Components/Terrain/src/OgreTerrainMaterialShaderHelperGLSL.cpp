@@ -280,49 +280,38 @@ namespace Ogre
         uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
 
         uint currentSamplerIdx = 0;
-        if (tt == LOW_LOD)
+        outStream << StringUtil::format("uniform SAMPLER2D(globalNormal, %d);\n", currentSamplerIdx++);
+
+        if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
         {
-            // single composite map covers all the others below
-            outStream << StringUtil::format("uniform SAMPLER2D(compositeMap, %d);\n", currentSamplerIdx++);
+            outStream << StringUtil::format("uniform SAMPLER2D(globalColourMap, %d);\n", currentSamplerIdx++);
         }
-        else
+        if (prof->isLightmapEnabled())
         {
-            outStream << StringUtil::format("uniform SAMPLER2D(globalNormal, %d);\n", currentSamplerIdx++);
-
-            if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
-            {
-                outStream << StringUtil::format("uniform SAMPLER2D(globalColourMap, %d);\n", currentSamplerIdx++);
-            }
-            if (prof->isLightmapEnabled())
-            {
-                outStream << StringUtil::format("uniform SAMPLER2D(lightMap, %d);\n", currentSamplerIdx++);
-            }
-            // Blend textures - sampler definitions
-            for (uint i = 0; i < numBlendTextures; ++i)
-            {
-                outStream << StringUtil::format("uniform SAMPLER2D(blendTex%d, %d);\n", i, currentSamplerIdx++);
-            }
-
-            // Layer textures - sampler definitions & UV multipliers
-            for (uint i = 0; i < numLayers; ++i)
-            {
-                outStream << StringUtil::format("uniform SAMPLER2D(difftex%d, %d);\n", i, currentSamplerIdx++);
-                outStream << StringUtil::format("uniform SAMPLER2D(normtex%d, %d);\n", i, currentSamplerIdx++);
-            }
-
-            // uv multipliers
-            uint numUVMultipliers = (numLayers + 3) / 4; // integer ceil
-            for (uint i = 0; i < numUVMultipliers; ++i)
-                outStream << "uniform vec4 uvMul_" << i << ";\n";
+            outStream << StringUtil::format("uniform SAMPLER2D(lightMap, %d);\n", currentSamplerIdx++);
         }
+        // Blend textures - sampler definitions
+        for (uint i = 0; i < numBlendTextures; ++i)
+        {
+            outStream << StringUtil::format("uniform SAMPLER2D(blendTex%d, %d);\n", i, currentSamplerIdx++);
+        }
+
+        // Layer textures - sampler definitions & UV multipliers
+        for (uint i = 0; i < numLayers; ++i)
+        {
+            outStream << StringUtil::format("uniform SAMPLER2D(difftex%d, %d);\n", i, currentSamplerIdx++);
+            outStream << StringUtil::format("uniform SAMPLER2D(normtex%d, %d);\n", i, currentSamplerIdx++);
+        }
+
+        // uv multipliers
+        uint numUVMultipliers = (numLayers + 3) / 4; // integer ceil
+        for (uint i = 0; i < numUVMultipliers; ++i)
+            outStream << "uniform vec4 uvMul_" << i << ";\n";
 
         uint numShadowTextures = uint(prof->isShadowingEnabled(tt, terrain));
         if (numShadowTextures)
         {
-            if (tt == HIGH_LOD)
                 mShadowSamplerStartHi = currentSamplerIdx;
-            else if (tt == LOW_LOD)
-                mShadowSamplerStartLo = currentSamplerIdx;
 
             if (prof->getReceiveDynamicShadowsPSSM())
             {
@@ -382,13 +371,10 @@ namespace Ogre
             // base colour
             "    gl_FragColor = vec4(0,0,0,1);\n";
 
-        if (tt != LOW_LOD)
-        {
-            outStream <<
-                // global normal
-            "    vec3 normal;\n"
-            "    SGX_FetchNormal(globalNormal, uv, normal);\n";
-        }
+        outStream <<
+            // global normal
+        "    vec3 normal;\n"
+        "    SGX_FetchNormal(globalNormal, uv, normal);\n";
 
         outStream <<
             "    vec3 lightDir = \n"
@@ -399,61 +385,50 @@ namespace Ogre
             "    vec3 diffuse = vec3(0,0,0);\n"
             "    float specular = 0.0;\n";
 
-        if (tt == LOW_LOD)
+        // set up the blend values
+        for (uint i = 0; i < numBlendTextures; ++i)
         {
-            // we just do a single calculation from composite map
-            outStream <<
-                "    vec4 composite = texture2D(compositeMap, uv);\n"
-                "    diffuse = composite.rgb;\n";
-            // TODO - specular; we'll need normals for this!
+            outStream << "    vec4 blendTexVal" << i << " = texture2D(blendTex" << i << ", uv);\n";
+        }
+
+        if (prof->isLayerNormalMappingEnabled())
+        {
+            // derive the tangent space basis
+            // we do this in the pixel shader because we don't have per-vertex normals
+            // because of the LOD, we use a normal map
+            // tangent is always +x or -z in object space depending on alignment
+            switch(terrain->getAlignment())
+            {
+                case Terrain::ALIGN_X_Y:
+                case Terrain::ALIGN_X_Z:
+                    outStream << "    vec3 tangent = vec3(1, 0, 0);\n";
+                    break;
+                case Terrain::ALIGN_Y_Z:
+                    outStream << "    vec3 tangent = vec3(0, 0, -1);\n";
+                    break;
+            };
+
+            outStream << "    vec3 binormal = normalize(cross(tangent, normal));\n";
+            // note, now we need to re-cross to derive tangent again because it wasn't orthonormal
+            outStream << "    tangent = normalize(cross(normal, binormal));\n";
+            // derive final matrix
+            outStream << "    mat3 TBN = mtxFromRows(tangent, binormal, normal);\n";
+
+            // set up lighting result placeholders for interpolation
+            outStream << "    vec3 TSnormal;\n";
+            if (prof->isLayerParallaxMappingEnabled())
+                outStream << "    float displacement;\n";
+            // move
+            outStream << "    lightDir = normalize(mul(TBN, lightDir));\n";
+            outStream << "    eyeDir = normalize(mul(TBN, eyeDir));\n";
         }
         else
         {
-            // set up the blend values
-            for (uint i = 0; i < numBlendTextures; ++i)
-            {
-                outStream << "    vec4 blendTexVal" << i << " = texture2D(blendTex" << i << ", uv);\n";
-            }
-
-            if (prof->isLayerNormalMappingEnabled())
-            {
-                // derive the tangent space basis
-                // we do this in the pixel shader because we don't have per-vertex normals
-                // because of the LOD, we use a normal map
-                // tangent is always +x or -z in object space depending on alignment
-                switch(terrain->getAlignment())
-                {
-                    case Terrain::ALIGN_X_Y:
-                    case Terrain::ALIGN_X_Z:
-                        outStream << "    vec3 tangent = vec3(1, 0, 0);\n";
-                        break;
-                    case Terrain::ALIGN_Y_Z:
-                        outStream << "    vec3 tangent = vec3(0, 0, -1);\n";
-                        break;
-                };
-
-                outStream << "    vec3 binormal = normalize(cross(tangent, normal));\n";
-                // note, now we need to re-cross to derive tangent again because it wasn't orthonormal
-                outStream << "    tangent = normalize(cross(normal, binormal));\n";
-                // derive final matrix
-                outStream << "    mat3 TBN = mtxFromRows(tangent, binormal, normal);\n";
-
-                // set up lighting result placeholders for interpolation
-                outStream << "    vec3 TSnormal;\n";
-                if (prof->isLayerParallaxMappingEnabled())
-                    outStream << "    float displacement;\n";
-                // move
-                outStream << "    lightDir = normalize(mul(TBN, lightDir));\n";
-                outStream << "    eyeDir = normalize(mul(TBN, eyeDir));\n";
-            }
-            else
-            {
-                // simple per-pixel lighting with no normal mapping
-                outStream << "    lightDir = normalize(lightDir);\n";
-                outStream << "    eyeDir = normalize(eyeDir);\n";
-            }
-            outStream << "    vec3 halfAngle = normalize(lightDir + eyeDir);\n";
+            // simple per-pixel lighting with no normal mapping
+            outStream << "    lightDir = normalize(lightDir);\n";
+            outStream << "    eyeDir = normalize(eyeDir);\n";
         }
+        outStream << "    vec3 halfAngle = normalize(lightDir + eyeDir);\n";
     }
     //---------------------------------------------------------------------
     void ShaderHelperGLSL::generateFpLayer(const SM2Profile* prof, const Terrain* terrain,
@@ -511,59 +486,42 @@ namespace Ogre
     void ShaderHelperGLSL::generateFpFooter(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringStream& outStream)
     {
-        if (tt == LOW_LOD)
+        if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
         {
-            if (prof->isShadowingEnabled(tt, terrain))
-            {
-                generateFpDynamicShadows(prof, terrain, tt, outStream);
-                outStream <<
-                    "    gl_FragColor.rgb = diffuse * rtshadow;\n";
-            }
-            else
-            {
-                outStream <<
-                    "    gl_FragColor.rgb = diffuse;\n";
-            }
+            // sample colour map and apply to diffuse
+            outStream << "    diffuse *= texture2D(globalColourMap, uv).rgb;\n";
+        }
+        if (prof->isLightmapEnabled())
+        {
+            // sample lightmap
+            outStream << "    shadow = texture2D(lightMap, uv).r;\n";
+        }
+
+        if (prof->isShadowingEnabled(tt, terrain))
+        {
+            generateFpDynamicShadows(prof, terrain, tt, outStream);
+        }
+
+        // specular default
+        if (!prof->isLayerSpecularMappingEnabled())
+            outStream << "    specular = 1.0;\n";
+
+        if (tt == RENDER_COMPOSITE_MAP)
+        {
+            outStream << "    SGX_Light_Directional_Diffuse(normal, lightDir, diffuse, gl_FragColor.rgb);\n";
+            // Lighting embedded in alpha
+            outStream << "    gl_FragColor.a = shadow;\n";
         }
         else
         {
-            if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
-            {
-                // sample colour map and apply to diffuse
-                outStream << "    diffuse *= texture2D(globalColourMap, uv).rgb;\n";
-            }
-            if (prof->isLightmapEnabled())
-            {
-                // sample lightmap
-                outStream << "    shadow = texture2D(lightMap, uv).r;\n";
-            }
+            outStream << "    vec3 specularCol = vec3(0,0,0);\n";
+            outStream << "    SGX_Light_Directional_DiffuseSpecular(normal, eyeDir, lightDir, lightDiffuseColour * diffuse, "
+                            "lightSpecularColour * specular, scaleBiasSpecular.z, gl_FragColor.rgb, specularCol);\n";
 
-            if (prof->isShadowingEnabled(tt, terrain))
-            {
-                generateFpDynamicShadows(prof, terrain, tt, outStream);
-            }
-
-            // specular default
-            if (!prof->isLayerSpecularMappingEnabled())
-                outStream << "    specular = 1.0;\n";
-
-            if (tt == RENDER_COMPOSITE_MAP)
-            {
-                outStream << "    SGX_Light_Directional_Diffuse(normal, lightDir, diffuse, gl_FragColor.rgb);\n";
-                // Lighting embedded in alpha
-                outStream << "    gl_FragColor.a = shadow;\n";
-            }
-            else
-            {
-                outStream << "    vec3 specularCol = vec3(0,0,0);\n";
-                outStream << "    SGX_Light_Directional_DiffuseSpecular(normal, eyeDir, lightDir, lightDiffuseColour * diffuse, "
-                             "lightSpecularColour * specular, scaleBiasSpecular.z, gl_FragColor.rgb, specularCol);\n";
-
-                // Apply specular
-                outStream << "    gl_FragColor.rgb += specularCol;\n";
-            }
-            outStream << "    gl_FragColor.rgb = gl_FragColor.rgb * shadow + ambient.rgb * diffuse;\n";
+            // Apply specular
+            outStream << "    gl_FragColor.rgb += specularCol;\n";
         }
+        outStream << "    gl_FragColor.rgb = gl_FragColor.rgb * shadow + ambient.rgb * diffuse;\n";
 
         if (prof->getParent()->getDebugLevel())
         {

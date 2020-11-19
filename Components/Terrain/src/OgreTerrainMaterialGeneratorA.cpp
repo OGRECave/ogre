@@ -40,6 +40,10 @@ THE SOFTWARE.
 #include "OgreTerrainMaterialShaderHelpers.h"
 #include "OgreTextureManager.h"
 
+#include "OgreShaderGenerator.h"
+#include "OgreTerrainShaderTransform.h"
+#include "OgreShaderExIntegratedPSSM3.h"
+
 #include <fstream>
 #include <string>
 
@@ -259,22 +263,56 @@ namespace Ogre
         }
 
         addTechnique(mat, terrain, HIGH_LOD);
+        updateParams(mat, terrain);
 
         // LOD
         if(mCompositeMapEnabled)
         {
-            addTechnique(mat, terrain, LOW_LOD);
-            Material::LodValueList lodValues;
-            lodValues.push_back(TerrainGlobalOptions::getSingleton().getCompositeMapDistance());
-            mat->setLodLevels(lodValues);
-            Technique* lowLodTechnique = mat->getTechnique(1);
-            lowLodTechnique->setLodIndex(1);
+            static TerrainTransformFactory* factory = nullptr;
+            if(!factory)
+            {
+                factory = new TerrainTransformFactory;
+                RTShader::ShaderGenerator::getSingleton().addSubRenderStateFactory(factory);
+            }
+
+            Technique* tech = mat->createTechnique();
+            tech->setLodIndex(1);
+
+            Pass* pass = tech->createPass();
+            TextureUnitState* tu = pass->createTextureUnitState();
+            tu->setTexture(terrain->getCompositeMap());
+            tu->setTextureAddressingMode(TAM_CLAMP);
+
+            pass->getUserObjectBindings().setUserAny("Terrain", terrain);
+
+            using namespace RTShader;
+            auto lod1RenderState = std::make_shared<TargetRenderState>();
+            try
+            {
+                lod1RenderState->link({"TerrainTransform", "FFP_Colour", "FFP_Texturing", "FFP_Fog"}, pass, pass);
+                if(isShadowingEnabled(LOW_LOD, terrain))
+                {
+                    // light count needed to enable PSSM3
+                    lod1RenderState->setLightCount(Vector3i(0, 1, 0));
+                    auto pssm = ShaderGenerator::getSingleton().createSubRenderState<IntegratedPSSM3>();
+                    pssm->setSplitPoints(mPSSM->getSplitPoints());
+                    pssm->preAddToRenderState(lod1RenderState.get(), pass, pass);
+                    lod1RenderState->addSubRenderStateInstance(pssm);
+                }
+                lod1RenderState->acquirePrograms(pass);
+            }
+            catch(const Exception& e)
+            {
+                LogManager::getSingleton().logError(e.what());
+                return nullptr;
+            }
+
+            pass->getUserObjectBindings().setUserAny(TargetRenderState::UserKey, lod1RenderState);
+
+            mat->setLodLevels({TerrainGlobalOptions::getSingleton().getCompositeMapDistance()});
         }
 
-        updateParams(mat, terrain);
-
         return mat;
-
     }
     //---------------------------------------------------------------------
     MaterialPtr TerrainMaterialGeneratorA::SM2Profile::generateForCompositeMap(const Terrain* terrain)
@@ -368,17 +406,6 @@ namespace Ogre
             }
 
         }
-        else
-        {
-            // LOW_LOD textures
-            // composite map
-            TextureUnitState* tu = pass->createTextureUnitState();
-            tu->setTexture(terrain->getCompositeMap());
-            tu->setSampler(mapSampler);
-
-            // That's it!
-
-        }
 
         // Add shadow textures (always at the end)
         if (isShadowingEnabled(tt, terrain))
@@ -409,13 +436,16 @@ namespace Ogre
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::updateParams(const MaterialPtr& mat, const Terrain* terrain)
     {
-        mShaderGen->updateParams(this, mat, terrain, false);
-
+        Pass* p = mat->getTechnique(0)->getPass(0);
+        mShaderGen->updateVpParams(this, terrain, HIGH_LOD, p->getVertexProgramParameters());
+        mShaderGen->updateFpParams(this, terrain, HIGH_LOD, p->getFragmentProgramParameters());
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain)
     {
-        mShaderGen->updateParams(this, mat, terrain, true);
+        Pass* p = mat->getTechnique(0)->getPass(0);
+        mShaderGen->updateVpParams(this, terrain, RENDER_COMPOSITE_MAP, p->getVertexProgramParameters());
+        mShaderGen->updateFpParams(this, terrain, RENDER_COMPOSITE_MAP, p->getFragmentProgramParameters());
     }
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -542,7 +572,7 @@ namespace Ogre
 
             if (prof->getReceiveDynamicShadowsDepth())
             {
-                uint32 samplerOffset = (tt == HIGH_LOD) ? mShadowSamplerStartHi : mShadowSamplerStartLo;
+                uint32 samplerOffset = mShadowSamplerStartHi;
                 for (uint i = 0; i < numTextures; ++i)
                 {
                     params->setNamedAutoConstant("inverseShadowmapSize" + StringConverter::toString(i), 
@@ -602,30 +632,6 @@ namespace Ogre
                     if (prof->isShadowingEnabled(tt, terrain))
                         params->setNamedConstant("shadowMap" + StringConverter::toString(i), (int)numSamplers++);
                 }
-            }
-        }
-    }
-    //---------------------------------------------------------------------
-    void ShaderHelper::updateParams(
-        const SM2Profile* prof, const MaterialPtr& mat, const Terrain* terrain, bool compositeMap)
-    {
-        Pass* p = mat->getTechnique(0)->getPass(0);
-        if (compositeMap)
-        {
-            updateVpParams(prof, terrain, RENDER_COMPOSITE_MAP, p->getVertexProgramParameters());
-            updateFpParams(prof, terrain, RENDER_COMPOSITE_MAP, p->getFragmentProgramParameters());
-        }
-        else
-        {
-            // high lod
-            updateVpParams(prof, terrain, HIGH_LOD, p->getVertexProgramParameters());
-            updateFpParams(prof, terrain, HIGH_LOD, p->getFragmentProgramParameters());
-
-            if(prof->isCompositeMapEnabled())
-            {
-                // low lod
-                p = mat->getTechnique(1)->getPass(0);
-                updateVpParams(prof, terrain, LOW_LOD, p->getVertexProgramParameters());
             }
         }
     }
