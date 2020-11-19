@@ -39,11 +39,12 @@ endif ()
 # setup target
 add_library(OgreTerrain ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgreTerrain PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreTerrain PUBLIC OgreMain)
+target_link_libraries(OgreTerrain PUBLIC OgreMain OgreRTShaderSystem)
 
 target_include_directories(OgreTerrain PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-  $<INSTALL_INTERFACE:include/OGRE/Terrain>)
+  $<INSTALL_INTERFACE:include/OGRE/Terrain>
+  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 if (OGRE_BUILD_COMPONENT_PAGING)
 	target_link_libraries(OgreTerrain PUBLIC OgrePaging)
