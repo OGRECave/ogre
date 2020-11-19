@@ -120,15 +120,17 @@ namespace Ogre
         Camera* _cam = const_cast<Camera*>(cam);
         Real oldNear = _cam->getNearClipDistance();
         Real oldFar = _cam->getFarClipDistance();
+        Frustum* oldCull = _cam->getCullingFrustum();
         _cam->setNearClipDistance(nearDist);
         _cam->setFarClipDistance(farDist);
+        _cam->setCullingFrustum(NULL);
 
         LiSPSMShadowCameraSetup::getShadowCamera(sm, cam, vp, light, texCam, iteration);
 
         // restore near/far
         _cam->setNearClipDistance(oldNear);
         _cam->setFarClipDistance(oldFar);
-
+        _cam->setCullingFrustum(oldCull);
 
     }
 }
