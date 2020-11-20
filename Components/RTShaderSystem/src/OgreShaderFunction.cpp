@@ -34,11 +34,12 @@ static GpuConstantType typeFromContent(Parameter::Content content)
 {
     switch (content)
     {
+    case Parameter::SPC_BLEND_INDICES:
+        return GCT_UINT4;
     case Parameter::SPC_COLOR_DIFFUSE:
     case Parameter::SPC_COLOR_SPECULAR:
     case Parameter::SPC_POSITION_PROJECTIVE_SPACE:
     case Parameter::SPC_POSITION_OBJECT_SPACE:
-    case Parameter::SPC_BLEND_INDICES:
     case Parameter::SPC_BLEND_WEIGHTS:
     case Parameter::SPC_POSITION_LIGHT_SPACE0:
     case Parameter::SPC_POSITION_LIGHT_SPACE1:
@@ -285,7 +286,7 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
         break;
             
     case Parameter::SPS_BLEND_INDICES:
-		assert(type == GCT_FLOAT4);
+		assert(type == GCT_UINT4);
         param = ParameterFactory::createInIndices(index);
         break;
             

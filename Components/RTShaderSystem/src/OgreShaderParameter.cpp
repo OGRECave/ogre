@@ -168,8 +168,6 @@ Parameter::Parameter(GpuConstantType type, const String& name,
             const Content& content, size_t size) :
     mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size), mUsed(false)
 {
-    if (ShaderGenerator::getSingleton().getTargetLanguage()[0] == 'h' && mSemantic == SPS_BLEND_INDICES)
-        mType = GCT_UINT4;
 }
 
 //-----------------------------------------------------------------------
@@ -413,7 +411,7 @@ ParameterPtr ParameterFactory::createInWeights(int index)
 ParameterPtr ParameterFactory::createInIndices(int index)
 {
 	return ParameterPtr(OGRE_NEW Parameter(
-		GCT_FLOAT4
+		GCT_UINT4
 	, "iBlendIndices_" + StringConverter::toString(index), 
         Parameter::SPS_BLEND_INDICES, index, 
         Parameter::SPC_BLEND_INDICES));
