@@ -340,7 +340,11 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             }
             else
             {
-                os << mGpuConstTypeMap[pParam->getType()];
+                // the gl rendersystems only pass float attributes
+                GpuConstantType type = pParam->getType();
+                if(!GpuConstantDefinition::isFloat(type))
+                    type = GpuConstantType(type & ~GpuConstantDefinition::getBaseType(type));
+                os << mGpuConstTypeMap[type];
             }
             os << "\t"; 
             os << mContentToPerVertexAttributes[paramContent];
