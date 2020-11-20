@@ -5,7 +5,11 @@
 
 #include "InstancingVertexInterpolators.cg"
 
-#include "TerrainHelpers.cg"
+float calcDepthShadow(sampler2D shadowMap, float4 uv, float invShadowMapSize)
+{
+    uv /= uv.w;
+    return tex2D(shadowMap, uv.xy).x >= uv.z ? 1.0 : 0.0;
+}
 
 //---------------------------------------------
 //Main Pixel Shader
