@@ -165,7 +165,7 @@ public:
     const String& getShaderCachePath() const { return mShaderCachePath; }
 
     /** 
-    Flush the shader cache. This operation will cause all active sachems to be invalidated and will
+    Flush the shader cache. This operation will cause all active schemes to be invalidated and will
     destroy any CPU/GPU program that created by this shader generator.
     */
     void flushShaderCache();
