@@ -147,7 +147,7 @@ namespace OgreBites
          *
          * by default all shaders are generated to system memory.
          * Must be called before loadResources
-         * @param write
+         * @param write Whether to write out the generated shaders
          */
         void setRTSSWriteShadersToDisk(bool write);
 
