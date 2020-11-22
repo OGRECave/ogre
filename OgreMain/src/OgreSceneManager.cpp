@@ -364,7 +364,7 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
         // Calc squared distance
         lt->_calcTempSquareDist(position);
 
-        if (lt->getType() == Light::LT_DIRECTIONAL)
+        if (lt->getType() == Light::LT_DIRECTIONAL || (lt->getCastShadows() && isShadowTechniqueTextureBased()))
         {
             // Always included
             destList.push_back(lt);
