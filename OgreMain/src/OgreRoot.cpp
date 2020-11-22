@@ -1485,8 +1485,9 @@ namespace Ogre {
                 "No render system has been selected.", "Root::getDisplayMonitorCount");
         }
 
+        OGRE_IGNORE_DEPRECATED_BEGIN
         return mActiveRenderer->getDisplayMonitorCount();
-
+        OGRE_IGNORE_DEPRECATED_END
     }
     //---------------------------------------------------------------------
     void Root::setWorkQueue(WorkQueue* queue)

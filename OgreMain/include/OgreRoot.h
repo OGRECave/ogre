@@ -912,10 +912,8 @@ namespace Ogre
         /// @deprecated use getMovableObjectFactories
         OGRE_DEPRECATED MovableObjectFactoryIterator getMovableObjectFactoryIterator(void) const;
 
-        /**
-        * Gets the number of display monitors.
-        */
-        unsigned int getDisplayMonitorCount() const;
+        /// @deprecated do not use
+        OGRE_DEPRECATED unsigned int getDisplayMonitorCount() const;
 
         /** Get the WorkQueue for processing background tasks.
             You are free to add new requests and handlers to this queue to

@@ -2989,11 +2989,6 @@ namespace Ogre {
             }
         }
     }
-    //---------------------------------------------------------------------
-    unsigned int GLRenderSystem::getDisplayMonitorCount() const
-    {
-        return mGLSupport->getDisplayMonitorCount();
-    }
 
     //---------------------------------------------------------------------
     void GLRenderSystem::beginProfileEvent( const String &eventName )
