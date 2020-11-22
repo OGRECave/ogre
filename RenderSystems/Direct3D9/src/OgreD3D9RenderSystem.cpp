@@ -3884,26 +3884,6 @@ namespace Ogre
         return dsfmt;
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::registerThread()
-    {
-        // nothing to do - D3D9 shares rendering context already
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::unregisterThread()
-    {
-        // nothing to do - D3D9 shares rendering context already
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::preExtraThreadsStarted()
-    {
-        // nothing to do - D3D9 shares rendering context already
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::postExtraThreadsStarted()
-    {
-        // nothing to do - D3D9 shares rendering context already
-    }
-    //---------------------------------------------------------------------
     D3D9ResourceManager* D3D9RenderSystem::getResourceManager()
     {
         return msD3D9RenderSystem->mResourceManager;

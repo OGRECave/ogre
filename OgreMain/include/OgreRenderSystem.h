@@ -1127,13 +1127,13 @@ namespace Ogre
         Once this init sequence is completed the threads are independent but
         this startup sequence must be respected.
         */
-        virtual void preExtraThreadsStarted() = 0;
+        virtual void preExtraThreadsStarted() {}
 
         /** Tell the rendersystem to perform any tasks it needs to directly
         after other threads which might access the rendering API are registered.
         @see RenderSystem::preExtraThreadsStarted
         */
-        virtual void postExtraThreadsStarted() = 0;
+        virtual void postExtraThreadsStarted() {}
 
         /** Register the an additional thread which may make calls to rendersystem-related 
         objects.
@@ -1147,12 +1147,12 @@ namespace Ogre
         This method takes no parameters - it must be called from the thread being
         registered and that context is enough.
         */
-        virtual void registerThread() = 0;
+        virtual void registerThread() {}
 
         /** Unregister an additional thread which may make calls to rendersystem-related objects.
         @see RenderSystem::registerThread
         */
-        virtual void unregisterThread() = 0;
+        virtual void unregisterThread() {}
 
         /**
         * Gets the number of display monitors.

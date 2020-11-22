@@ -165,10 +165,6 @@ namespace Ogre
 
         virtual void _setRenderTarget(RenderTarget *target);
         virtual void _notifyCompositorNodeSwitchedRenderTarget( RenderTarget *previousTarget );
-        virtual void preExtraThreadsStarted();
-        virtual void postExtraThreadsStarted();
-        virtual void registerThread();
-        virtual void unregisterThread();
         virtual unsigned int getDisplayMonitorCount() const     { return 1; }
 
         virtual void beginProfileEvent( const String &eventName );

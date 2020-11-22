@@ -3140,26 +3140,6 @@ namespace Ogre
         return -1.0f;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::registerThread()
-    {
-        // nothing to do - D3D11 shares rendering context already
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::unregisterThread()
-    {
-        // nothing to do - D3D11 shares rendering context already
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::preExtraThreadsStarted()
-    {
-        // nothing to do - D3D11 shares rendering context already
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::postExtraThreadsStarted()
-    {
-        // nothing to do - D3D11 shares rendering context already
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::determineFSAASettings(uint fsaa, const String& fsaaHint, 
         DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings)
     {

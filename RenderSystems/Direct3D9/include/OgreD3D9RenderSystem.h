@@ -341,10 +341,6 @@ namespace Ogre
         Real getVerticalTexelOffset();
         Real getMinimumDepthInputValue();
         Real getMaximumDepthInputValue();
-        void registerThread();
-        void unregisterThread();
-        void preExtraThreadsStarted();
-        void postExtraThreadsStarted();     
                 
         /*
         Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
