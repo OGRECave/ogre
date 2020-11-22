@@ -237,8 +237,6 @@ namespace Ogre {
 
             /// @copydoc RenderSystem::_setAlphaRejectSettings
             void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
-            /// @copydoc RenderSystem::getDisplayMonitorCount
-            unsigned int getDisplayMonitorCount() const;
 
             void _destroyDepthBuffer(RenderTarget* pRenderWnd);
         

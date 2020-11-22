@@ -1843,11 +1843,6 @@ namespace Ogre {
         }
     }
 
-    unsigned int GLES2RenderSystem::getDisplayMonitorCount() const
-    {
-        return 1;
-    }
-
     //---------------------------------------------------------------------
     void GLES2RenderSystem::beginProfileEvent( const String &eventName )
     {

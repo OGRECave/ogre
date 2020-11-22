@@ -165,7 +165,6 @@ namespace Ogre
 
         virtual void _setRenderTarget(RenderTarget *target);
         virtual void _notifyCompositorNodeSwitchedRenderTarget( RenderTarget *previousTarget );
-        virtual unsigned int getDisplayMonitorCount() const     { return 1; }
 
         virtual void beginProfileEvent( const String &eventName );
         virtual void endProfileEvent( void );

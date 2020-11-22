@@ -295,9 +295,6 @@ namespace Ogre {
         void _unregisterContext(GLContext *context);
 
         GLStateCacheManager * _getStateCacheManager() { return mStateCacheManager; }
-
-        /// @copydoc RenderSystem::getDisplayMonitorCount
-        unsigned int getDisplayMonitorCount() const;
         
         /// @copydoc RenderSystem::beginProfileEvent
         virtual void beginProfileEvent( const String &eventName );

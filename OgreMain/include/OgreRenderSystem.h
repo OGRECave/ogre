@@ -1154,11 +1154,8 @@ namespace Ogre
         */
         virtual void unregisterThread() {}
 
-        /**
-        * Gets the number of display monitors.
-        @see Root::getDisplayMonitorCount
-        */
-        virtual unsigned int getDisplayMonitorCount() const = 0;
+        /// @deprecated do not use
+        OGRE_DEPRECATED virtual unsigned int getDisplayMonitorCount() const { return 1; }
 
         /**
         * This marks the beginning of an event for GPU profiling.

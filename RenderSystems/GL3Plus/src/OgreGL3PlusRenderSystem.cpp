@@ -1898,12 +1898,6 @@ namespace Ogre {
         // static_cast<GL3PlusTextureManager*>(mTextureManager)->bindImages();
     }
 
-    unsigned int GL3PlusRenderSystem::getDisplayMonitorCount() const
-    {
-        return mGLSupport->getDisplayMonitorCount();
-    }
-
-
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
         if (getCapabilities()->hasCapability(RSC_DEBUG))
