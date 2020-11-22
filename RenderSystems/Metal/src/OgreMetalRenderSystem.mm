@@ -1226,22 +1226,6 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
-    void MetalRenderSystem::preExtraThreadsStarted()
-    {
-    }
-    //-------------------------------------------------------------------------
-    void MetalRenderSystem::postExtraThreadsStarted()
-    {
-    }
-    //-------------------------------------------------------------------------
-    void MetalRenderSystem::registerThread()
-    {
-    }
-    //-------------------------------------------------------------------------
-    void MetalRenderSystem::unregisterThread()
-    {
-    }
-    //-------------------------------------------------------------------------
     void MetalRenderSystem::initGPUProfiling(void)
     {
 #if OGRE_PROFILING
