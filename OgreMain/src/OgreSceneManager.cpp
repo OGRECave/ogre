@@ -364,7 +364,7 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
         // Calc squared distance
         lt->_calcTempSquareDist(position);
 
-        if (lt->getType() == Light::LT_DIRECTIONAL || (lt->getCastShadows() && isShadowTechniqueIntegrated()))
+        if (lt->getType() == Light::LT_DIRECTIONAL)
         {
             // Always included
             destList.push_back(lt);
@@ -376,7 +376,7 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
             {
                 destList.push_back(lt);
             }
-        }
+      }
     }
 
     // Sort (stable to guarantee ordering on directional lights)
@@ -398,14 +398,14 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
         std::stable_sort(destList.begin(), destList.end(), lightLess());
     }
 
+    //Skip this, light indexes updated in findLightsAffectingFrustum
+
     // Now assign indexes in the list so they can be examined if needed
-    size_t lightIndex = 0;
-    for (LightList::iterator li = destList.begin(); li != destList.end(); ++li, ++lightIndex)
-    {
-        (*li)->_notifyIndexInFrame(lightIndex);
-    }
-
-
+    //size_t lightIndex = 0;
+    //for (LightList::iterator li = destList.begin(); li != destList.end(); ++li, ++lightIndex)
+    //{
+    //    (*li)->_notifyIndexInFrame(lightIndex);
+    //}
 }
 //-----------------------------------------------------------------------
 void SceneManager::_populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask) 
@@ -2203,7 +2203,42 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             {
                 pLightListToUse = &rendLightList;
             }
-            lightsLeft = 0;
+
+          if (isShadowTechniqueIntegrated() && mLightsDirtyCounter > 0) {
+            size_t shadowTexIndex = mShadowRenderer.getShadowTexIndex(lightIndex);
+            unsigned short numShadowTextureLights = 0;
+
+            for (const auto it : *pLightListToUse) {
+              // potentially need to update content_type shadow texunit
+              // corresponding to this light
+              size_t textureCountPerLight = mShadowRenderer.mShadowTextureCountPerType[it->getType()];
+              size_t textureCounterPerLight = 0;
+
+              for (size_t j = 0; j < textureCountPerLight && shadowTexIndex < mShadowRenderer.mShadowTextures.size(); ++j) {
+                // link the numShadowTextureLights'th shadow texture unit
+                ushort tuindex = pass->_getTextureUnitWithContentTypeIndex(TextureUnitState::CONTENT_SHADOW, numShadowTextureLights);
+                if (tuindex > pass->getNumTextureUnitStates()) break;
+
+                TextureUnitState *tu = pass->getTextureUnitState(tuindex);
+
+                //pick up correct shadow texture index by light's frame index + texture counter per light
+                const TexturePtr &shadowTex = mShadowRenderer.mShadowTextures[mShadowRenderer.mShadowTextureIndexLightList[it->_getIndexInFrame()] + textureCounterPerLight];
+                tu->_setTexturePtr(shadowTex);
+
+                Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
+                tu->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
+                mAutoParamDataSource->setTextureProjector(cam, numShadowTextureLights);
+                ++numShadowTextureLights;
+                ++shadowTexIndex;
+                ++textureCounterPerLight;
+                // Have to set TU on rendersystem right now, although
+                // autoparams will be set later
+                mDestRenderSystem->_setTextureUnitSettings(tuindex, *tu);
+              }
+            }
+          }
+
+          lightsLeft = 0;
         }
 
         // issue the render op
@@ -3024,7 +3059,14 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
         // Use swap instead of copy operator for efficiently
         mCachedLightInfos.swap(mTestLightInfos);
 
-        // notify light dirty, so all movable objects will re-populate
+        // Update light index in frame
+        size_t lightIndex = 0;
+        for (LightList::iterator li = mLightsAffectingFrustum.begin(); li != mLightsAffectingFrustum.end(); ++li, ++lightIndex)
+        {
+          (*li)->_notifyIndexInFrame(lightIndex);
+        }
+
+      // notify light dirty, so all movable objects will re-populate
         // their light list next time
         _notifyLightsDirty();
     }
