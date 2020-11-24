@@ -2211,6 +2211,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
                 for (const auto it : *pLightListToUse)
                 {
+                    if (!it->getCastShadows())
+                        continue;
+
                     // potentially need to update content_type shadow texunit
                     // corresponding to this light
                     size_t textureCountPerLight = mShadowRenderer.mShadowTextureCountPerType[it->getType()];
