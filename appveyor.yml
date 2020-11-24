@@ -2,18 +2,38 @@ platform: x64
 configuration: Release
 image:
  - Visual Studio 2017
- - Visual Studio 2013
+# - Visual Studio 2013
+ - Ubuntu2004
 install:
+ # whitespace sanity & bail out early
+ - sh: git diff --check $APPVEYOR_REPO_BRANCH
+ - cmd: git diff --check %APPVEYOR_REPO_BRANCH%
  - cmd: choco install swig -y --version 3.0.12 & exit 0
- - cmd: cd %APPVEYOR_BUILD_FOLDER%
- - cmd: git submodule update --init --recursive
+ - sh: sudo apt-get install -y libxaw7-dev libzzip-dev libxrandr-dev libfreetype6-dev libxt-dev libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libpugixml-dev libassimp-dev qtbase5-dev nvidia-cg-dev
+ - sh: sudo apt-get install -y swig3.0 mono-mcs python3-dev python3-lxml texlive-binaries texlive-base graphviz xvfb doxygen
+ - sh: sudo rm /usr/local/bin/doxygen
 build_script:
- - set PATH=C:\Qt\5.12\msvc2017_64\bin;%PATH%
+ - cmd: set PATH=C:\Qt\5.12\msvc2017_64\bin;%PATH%
+ - sh: export CC=gcc-7 CXX=g++-7
  - cmake -P ci-build.cmake
- - cmake --build build --config RelWithDebInfo --target INSTALL
+ - cmd: cmake --build build --config RelWithDebInfo --target INSTALL
+ - sh: cmake --build build -- -k -j 2
+ - sh: cmake --build build --target OgreDoc > /dev/null && cat build/doxygen_warnings.log
 test_script:
- - set PATH=%PATH%;build\gtest\lib
- - IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" build\bin\RelWithDebInfo\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
+ - cmd: set PATH=%PATH%;build\gtest\lib
+ - cmd: IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" build\bin\RelWithDebInfo\Test_Ogre.exe --gtest_filter=-MeshWithoutIndexDataTests*
+ # validate XMLConverter output
+ - sh: build/bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && build/bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton
+ - sh: python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml
+ # doxygen warnings check
+ - sh: test ! -s build/doxygen_warnings.log
+ # run unit tests
+ - sh: build/bin/Test_Ogre --gtest_filter=-PageCoreTests*:TerrainTests*
+ # run visual tests
+ - sh: Xvfb :99 -screen 0 1024x768x24 & export DISPLAY=:99
+ - sh: cd build/bin && ./TestContext -rs "OpenGL Rendering Subsystem"
+ # verify that the python modules are loadable
+ - sh: cd ../lib && python -c "import _Ogre; import _RTShader"
 cache:
 - ogredeps -> CMake/Dependencies.cmake
 branches:
@@ -21,7 +41,7 @@ branches:
     - master
     - stable
 after_build:
-  - IF "%APPVEYOR_REPO_TAG%" == "true" 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-vc15-x64.zip ./build/sdk/*
+  - cmd: IF "%APPVEYOR_REPO_TAG%" == "true" 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-vc15-x64.zip ./build/sdk/*
 artifacts:
   - path: build/sdk
     name: ogre-sdk-master2-vc15-x64
