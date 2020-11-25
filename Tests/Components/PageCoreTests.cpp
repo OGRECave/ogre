@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgrePageManager.h"
 #include "OgreGrid2DPageStrategy.h"
-#include "OgreFileSystemLayer.h"
 #include "OgreBuildSettings.h"
 
 
@@ -46,11 +45,6 @@ public:
     Root* mRoot;
     PageManager* mPageManager;
     SceneManager* mSceneMgr;
-    FileSystemLayer* mFSLayer;
-
-#ifdef OGRE_STATIC_LIB
-    OgreBites::StaticPluginLoader mStaticPluginLoader;
-#endif
 
     void SetUp();
     void TearDown();
@@ -60,15 +54,7 @@ public:
 //--------------------------------------------------------------------------
 void PageCoreTests::SetUp()
 {    
-    mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
-
-#ifdef OGRE_STATIC_LIB
-    mRoot = OGRE_NEW Root(BLANKSTRING);
-    mStaticPluginLoader.load();
-#else
-    String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
-    mRoot = OGRE_NEW Root(pluginsPath);
-#endif
+    mRoot = OGRE_NEW Root("");
 
     mPageManager = OGRE_NEW PageManager();
 
@@ -83,7 +69,6 @@ void PageCoreTests::TearDown()
 {
     OGRE_DELETE mPageManager;
     OGRE_DELETE mRoot;
-    OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 }
 //--------------------------------------------------------------------------
 TEST_F(PageCoreTests,SimpleCreateSaveLoadWorld)
