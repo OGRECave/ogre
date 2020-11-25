@@ -85,14 +85,8 @@ if(DEFINED ENV{ANDROID})
         -DOGRE_BUILD_ANDROID_JNI_SAMPLE=TRUE
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
     set(BUILD_DEPS TRUE)
-    
-    set(BINTRAY_VERSION "$ENV{TRAVIS_TAG}")
-    if("${BINTRAY_VERSION}" STREQUAL "")
-        set(BINTRAY_VERSION "master1")
-    endif()
-    configure_file(Other/bintray.json.in Other/bintray.json @ONLY)
 
-    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r17)
+    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r18b)
         message(STATUS "Downloading Android NDK")
         file(DOWNLOAD
             https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip
@@ -100,15 +94,6 @@ if(DEFINED ENV{ANDROID})
         message(STATUS "Extracting Android NDK")
         execute_process(COMMAND unzip android-ndk-r18b-linux-x86_64.zip OUTPUT_QUIET)
     endif()
-endif()
-
-if("$ENV{TRAVIS_OS_NAME}" STREQUAL "linux" AND NOT DEFINED ENV{ANDROID})
-    message(STATUS "Downloading Doxygen")
-    file(DOWNLOAD
-        https://downloads.sourceforge.net/project/doxygen/rel-1.8.17/doxygen-1.8.17.linux.bin.tar.gz
-        ./doxygen-1.8.17.linux.bin.tar.gz)
-    execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf doxygen-1.8.17.linux.bin.tar.gz OUTPUT_QUIET)
-    set(OTHER -DDOXYGEN_EXECUTABLE=${CMAKE_CURRENT_SOURCE_DIR}/doxygen-1.8.17/bin/doxygen)
 endif()
 
 file(MAKE_DIRECTORY build)
