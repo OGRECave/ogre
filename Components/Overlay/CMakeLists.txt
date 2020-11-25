@@ -58,6 +58,10 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
 
     set_source_files_properties(${IMGUI_DIR}/imgui_widgets.cpp PROPERTIES
       COMPILE_FLAGS "-Wno-cast-qual")
+    set_source_files_properties(${IMGUI_DIR}/imgui_draw.cpp PROPERTIES
+      COMPILE_FLAGS "-Wno-cast-qual")
+    set_source_files_properties(${IMGUI_DIR}/imgui.cpp PROPERTIES
+      COMPILE_FLAGS "-Wno-cast-qual")
   endif()
 
   configure_file(${OGRE_TEMPLATES_DIR}/imconfig.h ${IMGUI_DIR}/imconfig.h COPYONLY)
