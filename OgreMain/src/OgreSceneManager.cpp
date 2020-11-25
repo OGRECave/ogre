@@ -397,15 +397,6 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
     {
         std::stable_sort(destList.begin(), destList.end(), lightLess());
     }
-
-    //Skip this, light indexes updated in findLightsAffectingFrustum
-
-    // Now assign indexes in the list so they can be examined if needed
-    //size_t lightIndex = 0;
-    //for (LightList::iterator li = destList.begin(); li != destList.end(); ++li, ++lightIndex)
-    //{
-    //    (*li)->_notifyIndexInFrame(lightIndex);
-    //}
 }
 //-----------------------------------------------------------------------
 void SceneManager::_populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask) 
