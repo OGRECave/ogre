@@ -104,7 +104,7 @@ ImFont* ImGuiOverlay::addFont(const String& name, const String& group)
     }
 
     ImFontConfig cfg;
-    strncpy(cfg.Name, name.c_str(), 40);
+    strncpy(cfg.Name, name.c_str(), IM_ARRAYSIZE(cfg.Name) - 1);
     return io.Fonts->AddFontFromMemoryTTF(ttfchunk.getPtr(), ttfchunk.size(), font->getTrueTypeSize(), &cfg,
                                           cprangePtr);
 }
