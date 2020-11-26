@@ -104,6 +104,11 @@ namespace Ogre {
         }
         else
         {
+            if( mShadowBuffer )
+            {
+                mShadowBuffer->copyData( srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer );
+            }
+
             MetalHardwareBufferCommon* metalBuffer =
                 static_cast<MetalHardwareVertexBuffer&>(srcBuffer).getRenderSystemData();
             mMetalHardwareBufferCommon.copyData(metalBuffer, srcOffset, dstOffset, length,
