@@ -13,6 +13,8 @@ jobs:
         sudo apt-get install -y libxaw7-dev libzzip-dev libxrandr-dev libfreetype6-dev libxt-dev libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libpugixml-dev libassimp-dev qtbase5-dev nvidia-cg-dev
         sudo apt-get install -y swig3.0 mono-mcs python3-dev python3-lxml texlive-binaries texlive-base graphviz xvfb doxygen
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
     - name: Build
       run: |
         cmake -P ci-build.cmake
@@ -26,8 +28,6 @@ jobs:
         # doxygen warnings check
         cat build/doxygen_warnings.log
         test ! -s build/doxygen_warnings.log
-        # whitespaces
-        git diff --check $BASE_REF
         # run unit tests
         build/bin/Test_Ogre
         # run visual tests
@@ -38,8 +38,8 @@ jobs:
         # validate XMLConverter output
         build/bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && build/bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton
         python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml
-      env:
-        BASE_REF: ${{ github.base_ref }}
+        # check whitespace
+        git diff --check HEAD^
   android:
     runs-on: ubuntu-20.04
     steps:
