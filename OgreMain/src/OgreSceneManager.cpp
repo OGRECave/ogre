@@ -353,10 +353,11 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
     destList.clear();
     destList.reserve(candidateLights.size());
 
-    LightList::const_iterator it;
-    for (it = candidateLights.begin(); it != candidateLights.end(); ++it)
+    size_t lightIndex = 0;
+    size_t numShadowTextures = isShadowTechniqueTextureBased() ? getShadowTextureConfigList().size() : 0;
+
+    for (Light* lt : candidateLights)
     {
-        Light* lt = *it;
         // check whether or not this light is suppose to be taken into consideration for the current light mask set for this operation
         if(!(lt->getLightMask() & lightMask))
             continue; //skip this light
@@ -364,48 +365,29 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
         // Calc squared distance
         lt->_calcTempSquareDist(position);
 
-        if (lt->getType() == Light::LT_DIRECTIONAL)
+        // only add in-range lights, but ensure texture shadow casters are there
+        // note: in this case the first numShadowTextures canditate lights are casters
+        if (lightIndex++ < numShadowTextures || lt->isInLightRange(Sphere(position, radius)))
         {
-            // Always included
             destList.push_back(lt);
         }
-        else
-        {
-            // only add in-range lights
-            if (lt->isInLightRange(Sphere(position,radius)))
-            {
-                destList.push_back(lt);
-            }
-        }
     }
 
+    auto start = destList.begin();
+    // if we're using texture shadows, we actually want to use
+    // the first few lights unchanged from the frustum list, matching the
+    // texture shadows that were generated
+    // Thus we only allow object-relative sorting on the remainder of the list
+    std::advance(start, std::min(numShadowTextures, destList.size()));
     // Sort (stable to guarantee ordering on directional lights)
-    if (isShadowTechniqueTextureBased())
-    {
-        // Note that if we're using texture shadows, we actually want to use
-        // the first few lights unchanged from the frustum list, matching the
-        // texture shadows that were generated
-        // Thus we only allow object-relative sorting on the remainder of the list
-        if (destList.size() > getShadowTextureConfigList().size())
-        {
-            LightList::iterator start = destList.begin();
-            std::advance(start, getShadowTextureConfigList().size());
-            std::stable_sort(start, destList.end(), lightLess());
-        }
-    }
-    else
-    {
-        std::stable_sort(destList.begin(), destList.end(), lightLess());
-    }
+    std::stable_sort(start, destList.end(), lightLess());
 
     // Now assign indexes in the list so they can be examined if needed
-    size_t lightIndex = 0;
-    for (LightList::iterator li = destList.begin(); li != destList.end(); ++li, ++lightIndex)
+    lightIndex = 0;
+    for (auto lt : destList)
     {
-        (*li)->_notifyIndexInFrame(lightIndex);
+        lt->_notifyIndexInFrame(lightIndex++);
     }
-
-
 }
 //-----------------------------------------------------------------------
 void SceneManager::_populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask) 
