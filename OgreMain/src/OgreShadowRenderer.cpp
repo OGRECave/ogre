@@ -1280,7 +1280,7 @@ void SceneManager::ShadowRenderer::setShadowTextureCasterMaterial(const Material
     }
     else
     {
-
+        OgreAssert(!mat->getTechnique(0)->getPasses().empty(), "technique 0 has no passes");
         mShadowTextureCustomCasterPass = mat->getTechnique(0)->getPass(0);
         if (mShadowTextureCustomCasterPass->hasVertexProgram())
         {
