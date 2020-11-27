@@ -339,16 +339,16 @@ namespace Ogre {
 
             /** Hook to allow the listener to override the ordering of lights for
                 the entire frustum.
-            @remarks
+
                 Whilst ordinarily lights are sorted per rendered object 
-                (@see MovableObject::queryLights), texture shadows adds another issue
+                (@ref MovableObject::queryLights), texture shadows adds another issue
                 in that, given there is a finite number of shadow textures, we must
                 choose which lights to render texture shadows from based on the entire
                 frustum. These lights should always be listed first in every objects
                 own list, followed by any other lights which will not cast texture 
                 shadows (either because they have shadow casting off, or there aren't
                 enough shadow textures to service them).
-            @par
+
                 This hook allows you to override the detailed ordering of the lights
                 per frustum. The default ordering is shadow casters first (which you 
                 must also respect if you override this method), and ordered
@@ -1322,26 +1322,7 @@ namespace Ogre {
         */
         void _populateLightList(const Vector3& position, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
 
-        /** Populates a light list with an ordered set of the lights which are closest
-        to the position of the SceneNode given.
-        @remarks
-            Note that since directional lights have no position, they are always considered
-            closer than any point lights and as such will always take precedence.
-            This overloaded version will take the SceneNode's position and use the second method
-            to populate the list.
-        @par
-            The returned lights are those in the cached list of lights (i.e. those
-            returned by SceneManager::_getLightsAffectingFrustum) sorted by distance.
-        @par
-            The number of items in the list may exceed the maximum number of lights supported
-            by the renderer, but the extraneous ones will never be used. In fact the limit will
-            be imposed by Pass::getMaxSimultaneousLights.
-        @param sn The SceneNode for which to evaluate the list of lights
-        @param radius The bounding radius to test
-        @param destList List to be populated with ordered set of lights; will be cleared by
-            this method before population.
-        @param lightMask The mask with which to include / exclude lights
-        */
+        /// @overload
         void _populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
         /// @}
 
