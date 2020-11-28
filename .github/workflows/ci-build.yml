@@ -2,6 +2,7 @@ name: CI Build
 on: 
   push:
     branches: [master]
+    tags: ["v*"]
   pull_request:
     branches: [master]
 jobs:
@@ -57,16 +58,20 @@ jobs:
       env:
         ANDROID: true
     - name: zip SDK
-      run: cd build/OgreJNI && zip -qr ogre-sdk-android-master2-arm64-v8a.zip *
+      id: package
+      run: |
+        [[ $GITHUB_REF = refs/tags/* ]] && VERNAME=${GITHUB_REF##*/} || VERNAME="master2"
+        echo "::set-output name=ver::${VERNAME}"
+        cd build/OgreJNI && zip -qr ogre-sdk-android-${VERNAME}-arm64-v8a.zip *
     - uses: reznikmm/upload-bintray-action@v3
       with:
-        sourcePath: build/OgreJNI/ogre-sdk-android-master2-arm64-v8a.zip
+        sourcePath: build/OgreJNI/ogre-sdk-android-*-arm64-v8a.zip
         username: paroj
         apiKey: ${{ secrets.BINTRAY_API_KEY }}
         subject: ogrecave
         repository: ogre
         package: ogre-sdk-android
-        version: master2
+        version: ${{ steps.package.outputs.ver }}
         override: 1
   macos:
     runs-on: macos-10.15
