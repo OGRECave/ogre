@@ -2478,7 +2478,7 @@ void SceneManager::manualRender(RenderOperation* rend,
     if (doBeginEndFrame)
         mDestRenderSystem->_beginFrame();
 
-    _setPass(pass);
+    auto usedPass = _setPass(pass);
     mAutoParamDataSource->setCurrentRenderable(0);
     if (vp)
     {
@@ -2490,7 +2490,7 @@ void SceneManager::manualRender(RenderOperation* rend,
     dummyCam.setCustomViewMatrix(true, viewMatrix);
     dummyCam.setCustomProjectionMatrix(true, projMatrix);
     mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
-    updateGpuProgramParameters(pass);
+    updateGpuProgramParameters(usedPass);
     mDestRenderSystem->_render(*rend);
 
     if (doBeginEndFrame)
@@ -2509,7 +2509,7 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
     if (doBeginEndFrame)
         mDestRenderSystem->_beginFrame();
 
-    _setPass(pass);
+    auto usedPass = _setPass(pass);
     Camera dummyCam(BLANKSTRING, 0);
     dummyCam.setCustomViewMatrix(true, viewMatrix);
     dummyCam.setCustomProjectionMatrix(true, projMatrix);
@@ -2523,11 +2523,10 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
 
     mAutoParamDataSource->setCurrentSceneManager(this);
     mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
-    updateGpuProgramParameters(pass);
+
+    renderSingleObject(rend, usedPass, lightScissoringClipping, doLightIteration, manualLightList);
 
     mAutoParamDataSource->setCurrentCamera(oldCam, false);
-
-    renderSingleObject(rend, pass, lightScissoringClipping, doLightIteration, manualLightList);
 
     if (doBeginEndFrame)
         mDestRenderSystem->_endFrame();
