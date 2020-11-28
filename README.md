@@ -15,7 +15,7 @@ classes.
 
 | Build | Status |
 |-------|-----------------|
-| Ubuntu, OSX, Android, iOS | [![Build Status](https://travis-ci.com/OGRECave/ogre.svg?branch=master)](https://travis-ci.com/OGRECave/ogre) |
+| Linux, OSX, Android, iOS | [![CI Build](https://github.com/OGRECave/ogre/workflows/CI%20Build/badge.svg?branch=master)](https://github.com/OGRECave/ogre/actions?query=branch%3Amaster) |
 | MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
 
 ## Index Of Contents
