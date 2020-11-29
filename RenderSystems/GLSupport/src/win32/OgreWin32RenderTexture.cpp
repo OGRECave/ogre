@@ -38,14 +38,14 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-     Win32PBuffer::Win32PBuffer(PixelComponentType format, size_t width, size_t height):
+     Win32PBuffer::Win32PBuffer(PixelComponentType format, size_t width, size_t height, Win32GLSupport &glsupport):
         GLPBuffer(format, width, height),
         mContext(0)
     {
         createPBuffer();
 
         // Create context
-        mContext = new Win32Context(mHDC, mGlrc);
+        mContext = new Win32Context(mHDC, mGlrc, glsupport);
 #if 0
         if(mUseBind)
         {
