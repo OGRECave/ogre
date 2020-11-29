@@ -472,17 +472,8 @@ namespace Ogre {
         }
         if (mOwnsGLContext)
         {
-            mGlrc = wglCreateContext(mHDC);
-            if (!mGlrc)
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "wglCreateContext failed: " + translateWGLError(), "Win32Window::create");
-        }
-
-        if (old_context && old_context != mGlrc)
-        {
-            // Share lists with old context
-            if (!wglShareLists(old_context, mGlrc))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglShareLists() failed", " Win32Window::create");
+            // New context is shared with previous one
+            mGlrc = mGLSupport.createNewContext(mHDC, old_context);
         }
 
         if (!wglMakeCurrent(mHDC, mGlrc))
@@ -505,7 +496,7 @@ namespace Ogre {
         }
 
         // Create RenderSystem context
-        mContext = new Win32Context(mHDC, mGlrc);
+        mContext = new Win32Context(mHDC, mGlrc, mGLSupport);
 
         mActive = true;
         setHidden(hidden);

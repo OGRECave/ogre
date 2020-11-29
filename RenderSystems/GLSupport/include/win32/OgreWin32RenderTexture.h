@@ -37,7 +37,7 @@ namespace Ogre {
     class _OgreGLExport Win32PBuffer : public GLPBuffer
     {
     public:
-        Win32PBuffer(PixelComponentType format, size_t width, size_t height);
+        Win32PBuffer(PixelComponentType format, size_t width, size_t height, Win32GLSupport &glsupport);
         ~Win32PBuffer();
         
         GLContext *getContext() const { return mContext; }
