@@ -264,7 +264,7 @@ namespace Ogre {
     bool StringConverter::parse(const String& val, int64& ret)
     {
         char* end;
-        auto tmp = strtoll_l(val.c_str(), &end, 0, _numLocale);
+        int64 tmp = strtoll_l(val.c_str(), &end, 0, _numLocale);
         return assignValid(val.c_str() != end, tmp, ret);
     }
     //-----------------------------------------------------------------------
@@ -277,7 +277,7 @@ namespace Ogre {
     bool StringConverter::parse(const String& val, unsigned long long& ret)
     {
         char* end;
-        auto tmp = strtoull_l(val.c_str(), &end, 0, _numLocale);
+        unsigned long long tmp = strtoull_l(val.c_str(), &end, 0, _numLocale);
         return assignValid(val.c_str() != end, tmp, ret);
     }
     //-----------------------------------------------------------------------
