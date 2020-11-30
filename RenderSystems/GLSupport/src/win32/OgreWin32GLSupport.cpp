@@ -470,13 +470,11 @@ namespace Ogre {
 
         int profile;
         int minVersion;
-        int maxVersion = 5;
 
         switch(mContextProfile) {
         case CONTEXT_COMPATIBILITY:
             profile = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
             minVersion = 1;
-            maxVersion = 3; // requesting 3.1 might return 3.2 core profile
             break;
         case CONTEXT_ES:
             profile = WGL_CONTEXT_ES2_PROFILE_BIT_EXT;
@@ -489,7 +487,7 @@ namespace Ogre {
         }
 
         int context_attribs[] = {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, maxVersion,
+            WGL_CONTEXT_MAJOR_VERSION_ARB, minVersion,
             WGL_CONTEXT_MINOR_VERSION_ARB, 0,
             WGL_CONTEXT_PROFILE_MASK_ARB, profile,
             0
