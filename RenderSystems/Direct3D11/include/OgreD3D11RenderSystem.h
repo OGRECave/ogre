@@ -109,10 +109,6 @@ namespace Ogre
         bool checkVertexTextureFormats(void);
         void detachRenderTargetImpl(const String& name);
 
-        CompareFunction mSceneAlphaRejectFunc; // should be merged with - mBlendDesc
-        unsigned char mSceneAlphaRejectValue; // should be merged with - mBlendDesc
-        bool mSceneAlphaToCoverage;
-
         D3D11_BLEND_DESC    mBlendDesc;
         bool                mBlendDescChanged;
 

@@ -1551,9 +1551,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
     {
-        mSceneAlphaRejectFunc   = func;
-        mSceneAlphaRejectValue  = value;
-        mSceneAlphaToCoverage   = alphaToCoverage;
         mBlendDesc.AlphaToCoverageEnable = alphaToCoverage;
         mBlendDescChanged = true;
     }
