@@ -244,13 +244,6 @@ if (OGRE_COPY_DEPENDENCIES)
         endif ()
       endif()
     endif()
-    
-    if (OGRE_BUILD_RENDERSYSTEM_GLES2)	
-      copy_debug(libEGL.dll)
-      copy_debug(libGLESv2.dll)
-      copy_release(libEGL.dll)
-      copy_release(libGLESv2.dll)
-    endif ()
   endif ()
 
 endif ()
