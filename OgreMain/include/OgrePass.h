@@ -1017,9 +1017,8 @@ namespace Ogre {
             The default is CMPF_ALWAYS_PASS i.e. alpha is not used to reject pixels.
             @param func The comparison which must pass for the pixel to be written.
             @param value 1 byte value against which alpha values will be tested(0-255)
-            @param alphaToCoverageEnabled Whether to enable alpha to coverage support
-            @note
-            This option applies in both the fixed function and the programmable pipeline.
+            @param alphaToCoverageEnabled Whether to use alpha to coverage with MSAA.
+                   This option applies in both the fixed function and the programmable pipeline.
         */
         void setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverageEnabled = false);
 

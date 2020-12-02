@@ -784,6 +784,11 @@ namespace Ogre
         [mActiveRenderEncoder setTriangleFillMode:fillMode];
     }
 
+    void MetalRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
+    {
+        psd.alphaToCoverageEnabled = (func != CMPF_ALWAYS_PASS) && alphaToCoverage;
+    }
+
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
                                                       bool forGpuProgram )
