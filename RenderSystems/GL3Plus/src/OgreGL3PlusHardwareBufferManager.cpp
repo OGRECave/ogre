@@ -36,31 +36,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLVertexArrayObject.h"
 
 namespace Ogre {
-
-    // Scratch pool management (32 bit structure)
-    struct GL3PlusScratchBufferAlloc
-    {
-        /// Size in bytes
-        uint32 size: 31;
-        /// Free? (pack with size)
-        uint32 free: 1;
-    };
-#define SCRATCH_POOL_SIZE 1 * 1024 * 1024
-
     GL3PlusHardwareBufferManager::GL3PlusHardwareBufferManager()
-        : mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
-
         mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
-
-        // Init scratch pool
-        // TODO make it a configurable size?
-        // 32-bit aligned buffer
-        mScratchBufferPool = static_cast<char*>(OGRE_MALLOC_SIMD(SCRATCH_POOL_SIZE,
-                                                                  MEMCATEGORY_GEOMETRY));
-        GL3PlusScratchBufferAlloc* ptrAlloc = (GL3PlusScratchBufferAlloc*)mScratchBufferPool;
-        ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GL3PlusScratchBufferAlloc);
-        ptrAlloc->free = 1;
     }
 
     GL3PlusHardwareBufferManager::~GL3PlusHardwareBufferManager()
@@ -69,8 +47,6 @@ namespace Ogre {
 
         destroyAllDeclarations();
         destroyAllBindings();
-
-        OGRE_FREE_SIMD(mScratchBufferPool, MEMCATEGORY_GEOMETRY);
     }
 
     GL3PlusStateCacheManager * GL3PlusHardwareBufferManager::getStateCacheManager()
@@ -209,115 +185,5 @@ namespace Ogre {
 
         OgreAssert(false, "unknown Vertex Element Type");
         return 0;
-    }
-
-    void* GL3PlusHardwareBufferManager::allocateScratch(uint32 size)
-    {
-        // simple forward link search based on alloc sizes
-        // not that fast but the list should never get that long since not many
-        // locks at once (hopefully)
-        OGRE_LOCK_MUTEX(mScratchMutex);
-
-        // Alignment - round up the size to 32 bits
-        // control blocks are 32 bits too so this packs nicely
-        if (size % 4 != 0)
-        {
-            size += 4 - (size % 4);
-        }
-
-        uint32 bufferPos = 0;
-        while (bufferPos < SCRATCH_POOL_SIZE)
-        {
-            GL3PlusScratchBufferAlloc* pNext = (GL3PlusScratchBufferAlloc*)(mScratchBufferPool + bufferPos);
-            // Big enough?
-            if (pNext->free && pNext->size >= size)
-            {
-                // split? And enough space for control block
-                if(pNext->size > size + sizeof(GL3PlusScratchBufferAlloc))
-                {
-                    uint32 offset = (uint32)sizeof(GL3PlusScratchBufferAlloc) + size;
-
-                    GL3PlusScratchBufferAlloc* pSplitAlloc = (GL3PlusScratchBufferAlloc*)
-                        (mScratchBufferPool + bufferPos + offset);
-                    pSplitAlloc->free = 1;
-                    // split size is remainder minus new control block
-                    pSplitAlloc->size = pNext->size - size - sizeof(GL3PlusScratchBufferAlloc);
-
-                    // New size of current
-                    pNext->size = size;
-                }
-                // allocate and return
-                pNext->free = 0;
-
-                // return pointer just after this control block (++ will do that for us)
-                return ++pNext;
-            }
-
-            bufferPos += (uint32)sizeof(GL3PlusScratchBufferAlloc) + pNext->size;
-        }
-
-        // no available alloc
-        return 0;
-    }
-
-    void GL3PlusHardwareBufferManager::deallocateScratch(void* ptr)
-    {
-        OGRE_LOCK_MUTEX(mScratchMutex);
-
-        // Simple linear search dealloc
-        uint32 bufferPos = 0;
-        GL3PlusScratchBufferAlloc* pLast = 0;
-        while (bufferPos < SCRATCH_POOL_SIZE)
-        {
-            GL3PlusScratchBufferAlloc* pCurrent = (GL3PlusScratchBufferAlloc*)(mScratchBufferPool + bufferPos);
-
-            // Pointers match?
-            if ((mScratchBufferPool + bufferPos + sizeof(GL3PlusScratchBufferAlloc)) == ptr)
-            {
-                // dealloc
-                pCurrent->free = 1;
-                // merge with previous
-                if (pLast && pLast->free)
-                {
-                    // adjust buffer pos
-                    bufferPos -= (pLast->size + (uint32)sizeof(GL3PlusScratchBufferAlloc));
-                    // merge free space
-                    pLast->size += pCurrent->size + sizeof(GL3PlusScratchBufferAlloc);
-                    pCurrent = pLast;
-                }
-
-                // merge with next
-                uint32 offset = bufferPos + pCurrent->size + (uint32)sizeof(GL3PlusScratchBufferAlloc);
-                if (offset < SCRATCH_POOL_SIZE)
-                {
-                    GL3PlusScratchBufferAlloc* pNext = (GL3PlusScratchBufferAlloc*)(
-                        mScratchBufferPool + offset);
-                    if (pNext->free)
-                    {
-                        pCurrent->size += pNext->size + sizeof(GL3PlusScratchBufferAlloc);
-                    }
-                }
-
-                // done
-                return;
-            }
-
-            bufferPos += (uint32)sizeof(GL3PlusScratchBufferAlloc) + pCurrent->size;
-            pLast = pCurrent;
-
-        }
-
-        // Should never get here unless there's a corruption
-        assert(false && "Memory deallocation error");
-    }
-
-    size_t GL3PlusHardwareBufferManager::getGLMapBufferThreshold() const
-    {
-        return mMapBufferThreshold;
-    }
-
-    void GL3PlusHardwareBufferManager::setGLMapBufferThreshold( const size_t value )
-    {
-        mMapBufferThreshold = value;
     }
 }
