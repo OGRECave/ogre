@@ -82,7 +82,7 @@ if(DEFINED ENV{ANDROID})
 
     set(OTHER
         ${CROSS}
-        -DCMAKE_CXX_FLAGS=-Werror
+        -DCMAKE_CXX_FLAGS="-Werror -Wno-unused-command-line-argument"
         -DOGRE_BUILD_ANDROID_JNI_SAMPLE=TRUE
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
     set(BUILD_DEPS TRUE)
