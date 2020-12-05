@@ -232,6 +232,13 @@ namespace Ogre
         mEmitted = emitted;
     }
     //-----------------------------------------------------------------------
+    static float sampleSphereUniform(const float& maxAngle)
+    {
+        float cosMax = -std::cos(maxAngle) + 1; // for maxAngle = pi, cosMax = 2
+        // see https://corysimon.github.io/articles/uniformdistn-on-sphere/
+        return std::acos(1 - cosMax * Math::UnitRandom());
+    }
+
     void ParticleEmitter::genEmissionDirection( const Vector3 &particlePos, Vector3& destVector )
     {
         if( mUseDirPositionRef )
@@ -242,7 +249,7 @@ namespace Ogre
             if (mAngle != Radian(0))
             {
                 // Randomise angle
-                Radian angle = Math::UnitRandom() * mAngle;
+                Radian angle(sampleSphereUniform(mAngle.valueRadians()));
 
                 // Randomise direction
                 destVector = particleDir.randomDeviant( angle );
@@ -258,7 +265,7 @@ namespace Ogre
             if (mAngle != Radian(0))
             {
                 // Randomise angle
-                Radian angle = Math::UnitRandom() * mAngle;
+                Radian angle(sampleSphereUniform(mAngle.valueRadians()));
 
                 // Randomise direction
                 destVector = mDirection.randomDeviant(angle, mUp);
