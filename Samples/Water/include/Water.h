@@ -37,13 +37,6 @@ using namespace OgreBites;
 #define CIRCLE_SIZE 500.0
 #define CIRCLE_TIME 0.5f
 
-static FloatRect getTexRect(int frame)
-{
-    float x0 = (frame % 4) * 0.25 ;
-    float y0 = (frame / 4) * 0.25 ;
-    return FloatRect(x0, y0, x0 + 0.25, y0 + 0.25);
-}
-
 static void prepareCircleMaterial()
 {
     Image bmap(PF_L8, 256, 256);
@@ -179,10 +172,7 @@ protected:
         billboardSet->setCommonDirection(Vector3::UNIT_Y);
         billboardSet->setCommonUpVector(Vector3::UNIT_Z);
 
-        std::vector<FloatRect> frames;
-        for(int i = 0; i < 16; i++)
-            frames.push_back(getTexRect(i));
-        billboardSet->setTextureCoords(frames);
+        billboardSet->setTextureStacksAndSlices(4, 4);
 
         waterNode->attachObject(billboardSet);
 
@@ -274,7 +264,6 @@ protected:
                 if (y>COMPLEXITY-1) y=COMPLEXITY-1;
                 waterMesh->push(x,y,-h) ;
                 auto bb = billboardSet->createBillboard(x*(PLANE_SIZE/COMPLEXITY), 10, y*(PLANE_SIZE/COMPLEXITY));
-                bb->setTexcoordRect(getTexRect(0));
                 circles.push_back({bb, 0});
             }
         }
