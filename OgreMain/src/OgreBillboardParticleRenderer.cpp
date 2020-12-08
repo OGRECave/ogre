@@ -34,6 +34,17 @@ THE SOFTWARE.
 namespace Ogre {
     static String rendererTypeName = "billboard";
 
+    static class CmdStacksAndSlices : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const { return BLANKSTRING; }
+        void doSet(void* target, const String& val)
+        {
+            Vector2 tmp = StringConverter::parseVector2(val);
+            static_cast<BillboardParticleRenderer*>(target)->setTextureStacksAndSlices(tmp.x, tmp.y);
+        }
+    } msStacksAndSlicesCmd;
+
     //-----------------------------------------------------------------------
     BillboardParticleRenderer::CmdBillboardType BillboardParticleRenderer::msBillboardTypeCmd;
     BillboardParticleRenderer::CmdBillboardOrigin BillboardParticleRenderer::msBillboardOriginCmd;
@@ -101,6 +112,10 @@ namespace Ogre {
                 "Cannot be combined with point rendering.",
                 PT_BOOL),
                 &msAccurateFacingCmd);
+
+            dict->addParameter(ParameterDef("texture_sheet_size", "",
+                PT_UNSIGNED_INT),
+                &msStacksAndSlicesCmd);
         }
 
         // Create billboard set

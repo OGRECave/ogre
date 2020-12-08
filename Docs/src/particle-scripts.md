@@ -218,6 +218,12 @@ This sets whether or not the BillboardSet will use a slower but more accurate ca
 
 format: accurate\_facing on|off<br> default: accurate\_facing off<br>
 
+### texture_sheet_size
+
+format: texture_sheet_size &lt;stacks&gt; &lt;slices&gt;
+
+@copydetails Ogre::BillboardSet::setTextureStacksAndSlices
+
 # Particle Emitters {#Particle-Emitters}
 
 Particle emitters are classified by ’type’ e.g. ’Point’ emitters emit from a single point whilst ’Box’ emitters emit randomly from an area. New emitters can be added to Ogre by creating plugins. You add an emitter to a system by nesting another section within it, headed with the keyword ’emitter’ followed by the name of the type of emitter (case sensitive). Ogre currently supports ’Point’, ’Box’, ’Cylinder’, ’Ellipsoid’, ’HollowEllipsoid’ and ’Ring’ emitters.

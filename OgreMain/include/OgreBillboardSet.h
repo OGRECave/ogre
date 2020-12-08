@@ -714,18 +714,23 @@ namespace Ogre {
             setTextureCoords(std::vector<FloatRect>(coords, coords + numCoords));
         }
 
-        /** setTextureStacksAndSlices() will generate texture coordinate rects as if the 
-            texture for the billboard set contained 'stacks' rows of 'slices' 
-            images each, all equal size. Thus, if the texture size is 512x512 
-            and 'stacks' is 4 and 'slices' is 8, each sub-rectangle of the texture 
+        /** Generate texture coordinate rects for a tiled texture sheet
+
+            A texture sheet is a grid of images that can be used to create simple animations.
+            This method will generate the uv coordinates for the individual sub-rectangles.
+
+            These can then be addressed by Ogre::Billboard::setTexcoordIndex().
+
+            If the texture size is 512x512 and 'stacks' is 4 and 'slices' is 8, each sub-rectangle of the texture
             would be 128 texels tall and 64 texels wide.
-        @remarks
-            This function is short-hand for creating a regular set and calling 
-            setTextureCoords() yourself. The numbering used for Billboard::setTexcoordIndex() 
-            counts first across, then down, so top-left is 0, the one to the right 
+
+            The numbering counts first across, then down, so top-left is 0, the one to the right
             of that is 1, and the lower-right is stacks*slices-1.
-        @see
-            BillboardSet::setTextureCoords()
+
+            If you need more flexibility, you can use Ogre::BillboardSet::setTextureCoords() instead.
+
+            @param stacks number of vertical tiles (rows)
+            @param slices number of horizontal tiles (columns)
         */
         void setTextureStacksAndSlices( uchar stacks, uchar slices );
 
