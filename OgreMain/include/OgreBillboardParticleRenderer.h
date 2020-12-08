@@ -108,6 +108,12 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
+        /// @copydoc BillboardSet::setTextureStacksAndSlices
+        void setTextureStacksAndSlices(uchar stacks, uchar slices)
+        {
+            mBillboardSet->setTextureStacksAndSlices(stacks, slices);
+        }
+
         /// @copydoc BillboardSet::setBillboardType
         void setBillboardType(BillboardType bbt) { mBillboardSet->setBillboardType(bbt); }
         /// @copydoc BillboardSet::getBillboardType
