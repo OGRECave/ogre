@@ -644,12 +644,12 @@ namespace Ogre {
             more expensive, but more accurate version.
         @param acc True to use the slower but more accurate model. Default is false.
         */
-        virtual void setUseAccurateFacing(bool acc) { mAccurateFacing = acc; }
+        void setUseAccurateFacing(bool acc) { mAccurateFacing = acc; }
         /** Gets whether or not billboards use an 'accurate' facing model
             based on the vector from each billboard to the camera, rather than 
             an optimised version using just the camera direction.
         */
-        virtual bool getUseAccurateFacing(void) const { return mAccurateFacing; }
+        bool getUseAccurateFacing(void) const { return mAccurateFacing; }
 
 
         virtual const String& getMovableType(void) const override;
@@ -675,7 +675,7 @@ namespace Ogre {
             This is most useful when you are driving the billboard set from 
             an external data source.
         */
-        virtual void setBillboardsInWorldSpace(bool ws) { mWorldSpace = ws; }
+        void setBillboardsInWorldSpace(bool ws) { mWorldSpace = ws; }
 
         /** Gets whether billboards are treated as being in world space.
          */
@@ -727,7 +727,7 @@ namespace Ogre {
         @see
             BillboardSet::setTextureCoords()
         */
-        virtual void setTextureStacksAndSlices( uchar stacks, uchar slices );
+        void setTextureStacksAndSlices( uchar stacks, uchar slices );
 
         /** getTextureCoords() returns the current texture coordinate rects in 
             effect. By default, there is only one texture coordinate rect in the 
@@ -770,9 +770,8 @@ namespace Ogre {
         virtual void setPointRenderingEnabled(bool enabled);
 
         /** Returns whether point rendering is enabled. */
-        virtual bool isPointRenderingEnabled(void) const
-        { return mPointRendering; }
-        
+        bool isPointRenderingEnabled(void) const { return mPointRendering; }
+
         /// Override to return specific type flag
         uint32 getTypeFlags(void) const;
 
