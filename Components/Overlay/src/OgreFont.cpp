@@ -35,6 +35,10 @@ THE SOFTWARE
 #include "OgreTechnique.h"
 #include "OgreBitwise.h"
 
+#include "OgreUTFString.h"
+#include "OgreBillboardSet.h"
+#include "OgreBillboard.h"
+
 #define generic _generic    // keyword for C++/CX
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -163,6 +167,50 @@ namespace Ogre
     {
         mMaterial = mat;
     }
+
+    void Font::putText(BillboardSet* bbs, const String& text, float height, const ColourValue& colour)
+    {
+        // ensure loaded
+        load();
+        // configure Billboard for display
+        bbs->setMaterial(mMaterial);
+        bbs->setBillboardType(BBT_PERPENDICULAR_COMMON);
+        bbs->setBillboardOrigin(BBO_CENTER_LEFT);
+
+        float spaceWidth = mCodePointMap.find('0')->second.aspectRatio * height;
+
+        UTFString utfText = text;
+
+        float left = 0;
+        float top = 0;
+        for (auto cpId : utfText)
+        {
+            if (cpId == ' ')
+            {
+                left += spaceWidth;
+                continue;
+            }
+
+            if(cpId == '\n')
+            {
+                top -= height;
+                left = 0;
+                continue;
+            }
+
+            auto cp = mCodePointMap.find(cpId);
+            if (cp == mCodePointMap.end())
+                continue;
+
+            float width = cp->second.aspectRatio * height;
+            auto bb = bbs->createBillboard(Vector3(left, top, 0), colour);
+            bb->setDimensions(width, height);
+            bb->setTexcoordRect(cp->second.uvRect);
+
+            left += width;
+        }
+    }
+
     //---------------------------------------------------------------------
     void Font::loadImpl()
     {
@@ -194,7 +242,13 @@ namespace Ogre
         }
 
         // Make sure material is aware of colour per vertex.
-        mMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);
+        auto pass = mMaterial->getTechnique(0)->getPass(0);
+        pass->setVertexColourTracking(TVC_DIFFUSE);
+
+        // lighting and culling also do not make much sense
+        pass->setCullingMode(CULL_NONE);
+        pass->setLightingEnabled(false);
+
         // Clamp to avoid fuzzy edges
         texLayer->setTextureAddressingMode( TextureUnitState::TAM_CLAMP );
         // Allow min/mag filter, but no mip
