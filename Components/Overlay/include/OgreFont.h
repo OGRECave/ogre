@@ -31,9 +31,12 @@ THE SOFTWARE
 #include "OgreResource.h"
 #include "OgreCommon.h"
 #include "OgreSharedPtr.h"
+#include "OgreColourValue.h"
 
 namespace Ogre
 {
+    class BillboardSet;
+
     /** \addtogroup Optional
     *  @{
     */
@@ -375,14 +378,18 @@ namespace Ogre
         {
             return mMaterial;
         }
-        /** Gets the material generated for this font, as a weak reference. 
-        @remarks
-            This will only be valid after the Font has been loaded. 
-        */
-        inline const MaterialPtr& getMaterial()
-        {
-            return mMaterial;
-        }
+
+        /**
+         * Write a text into a BillboardSet for positioning in Space
+         *
+         * Text is laid out in the x-y plane, running into x+ and using y+ as up
+         * @param bbs the target BillboardSet
+         * @param text text to write
+         * @param height character height in world units
+         * @param colour text colour
+         */
+        void putText(BillboardSet* bbs, const String& text, float height, const ColourValue& colour = ColourValue::White);
+
         /** Sets whether or not the colour of this font is antialiased as it is generated
             from a true type font.
         @remarks
