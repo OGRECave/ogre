@@ -77,7 +77,7 @@ jobs:
     runs-on: macos-10.15
     steps:
     - name: Install Dependencies
-      run: brew install libzzip sdl2 pugixml
+      run: brew update && brew install libzzip sdl2 pugixml
     - uses: actions/checkout@v2
     - name: Build
       run: |
