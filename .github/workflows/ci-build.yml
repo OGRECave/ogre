@@ -86,7 +86,7 @@ jobs:
       env:
         TRAVIS_OS_NAME: osx
     - name: Test
-      run: build/bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre
+      run: build/bin/Debug/Test_Ogre.app/Contents/MacOS/Test_Ogre --gtest_filter=-UseCustomCapabilitiesTests*
   ios:
     runs-on: macos-10.15
     steps:
