@@ -343,21 +343,15 @@ namespace Ogre
 
         // Calculate maximum width, height and bearing
         size_t glyphCount = 0;
-        for (CodePointRangeList::const_iterator r = mCodePointRangeList.begin();
-            r != mCodePointRangeList.end(); ++r)
+        for (const CodePointRange& range : mCodePointRangeList)
         {
-            const CodePointRange& range = *r;
             for(CodePoint cp = range.first; cp <= range.second; ++cp, ++glyphCount)
             {
                 FT_Load_Char( face, cp, FT_LOAD_RENDER );
 
-                if( ( 2 * ( ((int)face->glyph->bitmap.rows) << 6 ) - face->glyph->metrics.horiBearingY ) > max_height )
-                    max_height = ( 2 * ( ((int)face->glyph->bitmap.rows) << 6 ) - face->glyph->metrics.horiBearingY );
-                if( face->glyph->metrics.horiBearingY > mTtfMaxBearingY )
-                    mTtfMaxBearingY = static_cast<int>(face->glyph->metrics.horiBearingY);
-
-                if( (face->glyph->advance.x >> 6 ) + ( face->glyph->metrics.horiBearingX >> 6 ) > max_width)
-                    max_width = (face->glyph->advance.x >> 6 ) + ( face->glyph->metrics.horiBearingX >> 6 );
+                max_height = std::max<FT_Pos>(2 * (face->glyph->bitmap.rows << 6) - face->glyph->metrics.horiBearingY, max_height);
+                mTtfMaxBearingY = std::max(int(face->glyph->metrics.horiBearingY), mTtfMaxBearingY);
+                max_width = std::max<FT_Pos>((face->glyph->advance.x >> 6) + (face->glyph->metrics.horiBearingX >> 6), max_width);
             }
 
         }
@@ -384,28 +378,13 @@ namespace Ogre
 
         Real textureAspect = (Real)finalWidth / (Real)finalHeight;
 
-        const size_t pixel_bytes = 2;
-        size_t data_width = finalWidth * pixel_bytes;
-        size_t data_size = finalWidth * finalHeight * pixel_bytes;
-
-        LogManager::getSingleton().logMessage("Font " + mName + " using texture size " +
-            StringConverter::toString(finalWidth) + "x" + StringConverter::toString(finalHeight));
-
-        DataStreamPtr memStream(OGRE_NEW MemoryDataStream(data_size));
-        uchar* imageData = static_cast<MemoryDataStream*>(memStream.get())->getPtr();
-
-        // Reset content (White, transparent)
-        for (size_t i = 0; i < data_size; i += pixel_bytes)
-        {
-            imageData[i + 0] = 0xFF; // luminance
-            imageData[i + 1] = 0x00; // alpha
-        }
+        Image img(PF_BYTE_LA, finalWidth, finalHeight);
+        // Reset content (transparent)
+        img.setTo(ColourValue::ZERO);
 
         size_t l = 0, m = 0;
-        for (CodePointRangeList::const_iterator r = mCodePointRangeList.begin();
-            r != mCodePointRangeList.end(); ++r)
+        for (const CodePointRange& range : mCodePointRangeList)
         {
-            const CodePointRange& range = *r;
             for(CodePoint cp = range.first; cp <= range.second; ++cp )
             {
                 FT_Error ftResult;
@@ -447,7 +426,7 @@ namespace Ogre
                 {
                     uchar* pSrc = face->glyph->bitmap.buffer + j * face->glyph->bitmap.pitch;
                     size_t row = j + m + y_bearing;
-                    uchar* pDest = &imageData[(row * data_width) + (l + x_bearing) * pixel_bytes];
+                    uchar* pDest = img.getData(l + x_bearing, row);
                     for(unsigned int k = 0; k < width; k++ )
                     {
                         if (mAntialiasColour)
@@ -478,18 +457,11 @@ namespace Ogre
                 l += (advance + mCharacterSpacer);
             }
         }
-        }
-
-        Image img;
-        img.loadRawData( memStream, finalWidth, finalHeight, 1, PF_BYTE_LA );
 
         Texture* tex = static_cast<Texture*>(res);
         // Call internal _loadImages, not loadImage since that's external and 
         // will determine load status etc again, and this is a manual loader inside load()
-        ConstImagePtrList imagePtrs;
-        imagePtrs.push_back(&img);
-        tex->_loadImages( imagePtrs );
-
+        tex->_loadImages({&img});
 
         FT_Done_FreeType(ftLibrary);
     }
