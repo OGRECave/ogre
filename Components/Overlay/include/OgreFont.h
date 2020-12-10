@@ -125,10 +125,6 @@ namespace Ogre
         /// Source of the font (either an image name or a truetype font)
         String mSource;
 
-        /** Add a gap between letters vertically and horizonally
-            prevents nasty artifacts caused by fonts atypically wide or tall characters. */
-        uint mCharacterSpacer;
-
         /// Size of the truetype font, in points
         Real mTtfSize;
         /// Resolution (dpi) of truetype font
@@ -218,19 +214,11 @@ namespace Ogre
         */
         const String& getSource(void) const;
 
-        /** Sets the spacing to allocate for font characters to overlap each other.
-        @param charSpacer The size of the character spacer, in points.  Increasing it
-            allows for more stretched-out fonts; decreasing it reduces memory and processing
-            time.  The default is "5".
-        */
-        void setCharacterSpacer(uint charSpacer);
+        /// @deprecated obsolete
+        OGRE_DEPRECATED void setCharacterSpacer(uint charSpacer) {}
  
-        /** Gets the spacing to allocate for font characters to overlap each other.
-        @remarks Returns the size of the character spacer, in points.  A higher value
-            allows for more stretched-out fonts.  A low value reduces memory and processing
-            time.  The default is "5".
-        */
-        uint getCharacterSpacer(void) const;
+        /// @deprecated obsolete
+        OGRE_DEPRECATED uint getCharacterSpacer(void) const { return 1; }
 
         /** Sets the size of a truetype font (only required for FT_TRUETYPE). 
         @param ttfSize The size of the font in points. Note that the

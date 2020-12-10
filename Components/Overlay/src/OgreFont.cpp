@@ -61,7 +61,7 @@ namespace Ogre
     Font::Font(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         :Resource (creator, name, handle, group, isManual, loader),
-        mType(FT_TRUETYPE), mCharacterSpacer(5), mTtfSize(0), mTtfResolution(0), mTtfMaxBearingY(0), mAntialiasColour(false)
+        mType(FT_TRUETYPE), mTtfSize(0), mTtfResolution(0), mTtfMaxBearingY(0), mAntialiasColour(false)
     {
 
         if (createParamDictionary("Font"))
@@ -116,11 +116,6 @@ namespace Ogre
         mTtfSize = ttfSize;
     }
     //---------------------------------------------------------------------
-    void Font::setCharacterSpacer(uint charSpacer)
-    {
-        mCharacterSpacer = charSpacer;
-    }
-    //---------------------------------------------------------------------
     void Font::setTrueTypeResolution(uint ttfResolution)
     {
         mTtfResolution = ttfResolution;
@@ -129,11 +124,6 @@ namespace Ogre
     const String& Font::getSource(void) const
     {
         return mSource;
-    }
-    //---------------------------------------------------------------------
-    uint Font::getCharacterSpacer(void) const
-    {
-        return mCharacterSpacer;
     }
     //---------------------------------------------------------------------
     Real Font::getTrueTypeSize(void) const
@@ -356,9 +346,10 @@ namespace Ogre
 
         }
 
+        uint char_spacer = 1;
+
         // Now work out how big our texture needs to be
-        size_t rawSize = (max_width + mCharacterSpacer) *
-                            ((max_height >> 6) + mCharacterSpacer) * glyphCount;
+        size_t rawSize = (max_width + char_spacer) * ((max_height >> 6) + char_spacer) * glyphCount;
 
         uint32 tex_side = static_cast<uint32>(Math::Sqrt((Real)rawSize));
         // Now round up to nearest power of two
@@ -412,22 +403,25 @@ namespace Ogre
                 // If at end of row
                 if( finalWidth - 1 < l + ( advance ) )
                 {
-                    m += ( max_height >> 6 ) + mCharacterSpacer;
+                    m += ( max_height >> 6 ) + char_spacer;
                     l = 0;
                 }
 
                 FT_Pos y_bearing = ( mTtfMaxBearingY >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
-                // attention: might be negative
                 FT_Pos x_bearing = face->glyph->metrics.horiBearingX >> 6;
 
+                // x_bearing might be negative
+                uint x_offset = std::max(0, int(x_bearing));
                 // width might be larger than advance
-                uint width = std::min(advance + mCharacterSpacer, face->glyph->bitmap.width);
+                uint start = x_offset - x_bearing; // case x_bearing is negative
+                uint width = std::min(face->glyph->bitmap.width - start, advance - x_offset);
+
                 for(unsigned int j = 0; j < face->glyph->bitmap.rows; j++ )
                 {
-                    uchar* pSrc = face->glyph->bitmap.buffer + j * face->glyph->bitmap.pitch;
+                    uchar* pSrc = face->glyph->bitmap.buffer + j * face->glyph->bitmap.pitch + start;
                     size_t row = j + m + y_bearing;
-                    uchar* pDest = img.getData(l + x_bearing, row);
-                    for(unsigned int k = 0; k < width; k++ )
+                    uchar* pDest = img.getData(l + x_offset, row);
+                    for(unsigned int k = 0; k < (width); k++ )
                     {
                         if (mAntialiasColour)
                         {
@@ -454,7 +448,7 @@ namespace Ogre
                     );
 
                 // Advance a column
-                l += (advance + mCharacterSpacer);
+                l += (advance + char_spacer);
             }
         }
 
@@ -505,14 +499,9 @@ namespace Ogre
     //-----------------------------------------------------------------------
     String Font::CmdCharSpacer::doGet(const void* target) const
     {
-        const Font* f = static_cast<const Font*>(target);
-        return StringUtil::format("%d", f->getCharacterSpacer());
+        return "1";
     }
-    void Font::CmdCharSpacer::doSet(void* target, const String& val)
-    {
-        Font* f = static_cast<Font*>(target);
-        f->setCharacterSpacer(atoi(val.c_str()));
-    }
+    void Font::CmdCharSpacer::doSet(void* target, const String& val) {}
     //-----------------------------------------------------------------------
     String Font::CmdSize::doGet(const void* target) const
     {
