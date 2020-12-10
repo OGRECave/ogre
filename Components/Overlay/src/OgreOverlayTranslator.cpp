@@ -124,6 +124,8 @@ void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
             }
         }
     }
+    else if(attrib == "character_spacer")
+        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, attrib);
     else if (prop->values.empty() || !getString(prop->values.front(), &val) ||
              !pFont->setParameter(attrib, val))
     {
