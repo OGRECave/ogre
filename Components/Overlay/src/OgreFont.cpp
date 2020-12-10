@@ -367,8 +367,6 @@ namespace Ogre
                             ((max_height >> 6) + mCharacterSpacer) * glyphCount;
 
         uint32 tex_side = static_cast<uint32>(Math::Sqrt((Real)rawSize));
-        // just in case the size might chop a glyph in half, add another glyph width/height
-        tex_side += std::max(max_width, (max_height>>6));
         // Now round up to nearest power of two
         uint32 roundUpSize = Bitwise::firstPO2From(tex_side);
 
@@ -422,11 +420,7 @@ namespace Ogre
                     continue;
                 }
 
-                FT_Pos advance = face->glyph->advance.x >> 6;
-
-                unsigned char* buffer = face->glyph->bitmap.buffer;
-
-                if (!buffer)
+                if (!face->glyph->bitmap.buffer)
                 {
                     // Yuck, FT didn't detect this but generated a null pointer!
                     LogManager::getSingleton().logWarning(StringUtil::format(
@@ -434,19 +428,32 @@ namespace Ogre
                     continue;
                 }
 
+                uint advance = face->glyph->advance.x >> 6;
+
+                // If at end of row
+                if( finalWidth - 1 < l + ( advance ) )
+                {
+                    m += ( max_height >> 6 ) + mCharacterSpacer;
+                    l = 0;
+                }
+
                 FT_Pos y_bearing = ( mTtfMaxBearingY >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
+                // attention: might be negative
                 FT_Pos x_bearing = face->glyph->metrics.horiBearingX >> 6;
 
+                // width might be larger than advance
+                uint width = std::min(advance + mCharacterSpacer, face->glyph->bitmap.width);
                 for(unsigned int j = 0; j < face->glyph->bitmap.rows; j++ )
                 {
+                    uchar* pSrc = face->glyph->bitmap.buffer + j * face->glyph->bitmap.pitch;
                     size_t row = j + m + y_bearing;
                     uchar* pDest = &imageData[(row * data_width) + (l + x_bearing) * pixel_bytes];
-                    for(unsigned int k = 0; k < face->glyph->bitmap.width; k++ )
+                    for(unsigned int k = 0; k < width; k++ )
                     {
                         if (mAntialiasColour)
                         {
                             // Use the same greyscale pixel for all components RGBA
-                            *pDest++= *buffer;
+                            *pDest++= *pSrc;
                         }
                         else
                         {
@@ -455,28 +462,22 @@ namespace Ogre
                             *pDest++= 0xFF;
                         }
                         // Always use the greyscale value for alpha
-                        *pDest++= *buffer++; 
+                        *pDest++= *pSrc++;
                     }
                 }
 
                 this->setGlyphTexCoords(cp,
                     (Real)l / (Real)finalWidth,  // u1
                     (Real)m / (Real)finalHeight,  // v1
-                    (Real)( l + ( face->glyph->advance.x >> 6 ) ) / (Real)finalWidth, // u2
+                    (Real)( l + advance ) / (Real)finalWidth, // u2
                     ( m + ( max_height >> 6 ) ) / (Real)finalHeight, // v2
                     textureAspect
                     );
 
                 // Advance a column
                 l += (advance + mCharacterSpacer);
-
-                // If at end of row
-                if( finalWidth - 1 < l + ( advance ) )
-                {
-                    m += ( max_height >> 6 ) + mCharacterSpacer;
-                    l = 0;
-                }
             }
+        }
         }
 
         Image img;
