@@ -166,13 +166,16 @@ namespace Ogre
         bbs->setMaterial(mMaterial);
         bbs->setBillboardType(BBT_PERPENDICULAR_COMMON);
         bbs->setBillboardOrigin(BBO_CENTER_LEFT);
+        bbs->setDefaultDimensions(0, 0);
 
         float spaceWidth = mCodePointMap.find('0')->second.aspectRatio * height;
 
         UTFString utfText = text;
 
+        const auto& bbox = bbs->getBoundingBox();
+
         float left = 0;
-        float top = 0;
+        float top = bbox == AxisAlignedBox::BOX_NULL ? 0 : bbox.getMinimum().y - height;
         for (auto cpId : utfText)
         {
             if (cpId == ' ')
@@ -214,21 +217,14 @@ namespace Ogre
                 "Error creating new material!", "Font::load" );
         }
 
-        TextureUnitState *texLayer;
-        bool blendByAlpha = true;
         if (mType == FT_TRUETYPE)
         {
             createTextureFromFont();
-            texLayer = mMaterial->getTechnique(0)->getPass(0)->getTextureUnitState(0);
-            // Always blend by alpha
-            blendByAlpha = true;
         }
         else
         {
             // Manually load since we need to load to get alpha
             mTexture = TextureManager::getSingleton().load(mSource, mGroup, TEX_TYPE_2D, 0);
-            blendByAlpha = mTexture->hasAlpha();
-            texLayer = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(mSource);
         }
 
         // Make sure material is aware of colour per vertex.
@@ -238,7 +234,11 @@ namespace Ogre
         // lighting and culling also do not make much sense
         pass->setCullingMode(CULL_NONE);
         pass->setLightingEnabled(false);
+        // font quads should not occlude things
+        pass->setDepthWriteEnabled(false);
 
+        TextureUnitState *texLayer = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState();
+        texLayer->setTexture(mTexture);
         // Clamp to avoid fuzzy edges
         texLayer->setTextureAddressingMode( TextureUnitState::TAM_CLAMP );
         // Allow min/mag filter, but no mip
@@ -246,7 +246,7 @@ namespace Ogre
 
 
         // Set up blending
-        if (blendByAlpha)
+        if (mTexture->hasAlpha())
         {
             mMaterial->setSceneBlending( SBT_TRANSPARENT_ALPHA );
         }
@@ -274,21 +274,12 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Font::createTextureFromFont(void)
     {
-
         // Just create the texture here, and point it at ourselves for when
         // it wants to (re)load for real
-        String texName = mName + "Texture";
-        // Create, setting isManual to true and passing self as loader
-        mTexture = TextureManager::getSingleton().create(
-            texName, mGroup, true, this);
+        mTexture = TextureManager::getSingleton().create(mName + "Texture", mGroup, true, this);
         mTexture->setTextureType(TEX_TYPE_2D);
         mTexture->setNumMipmaps(0);
         mTexture->load();
-
-        TextureUnitState* t = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState( texName );
-        // Allow min/mag filter, but no mip
-        t->setTextureFiltering(FO_LINEAR, FO_LINEAR, FO_NONE);
-
     }
     //---------------------------------------------------------------------
     void Font::loadResource(Resource* res)
