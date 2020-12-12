@@ -35,16 +35,16 @@ namespace Ogre
     const Real Math::PI = Real( 4.0 * atan( 1.0 ) );
     const Real Math::TWO_PI = Real( 2.0 * PI );
     const Real Math::HALF_PI = Real( 0.5 * PI );
-    const Real Math::fDeg2Rad = PI / Real(180.0);
-    const Real Math::fRad2Deg = Real(180.0) / PI;
+    const float Math::fDeg2Rad = PI / float(180.0);
+    const float Math::fRad2Deg = float(180.0) / PI;
     const Real Math::LOG2 = std::log(Real(2.0));
 
     int Math::mTrigTableSize;
    Math::AngleUnit Math::msAngleUnit;
 
-    Real  Math::mTrigTableFactor;
-    Real *Math::mSinTable = NULL;
-    Real *Math::mTanTable = NULL;
+    float  Math::mTrigTableFactor;
+    float *Math::mSinTable = NULL;
+    float *Math::mTanTable = NULL;
 
     Math::RandomValueProvider* Math::mRandProvider = NULL;
 
@@ -55,8 +55,8 @@ namespace Ogre
         mTrigTableSize = trigTableSize;
         mTrigTableFactor = mTrigTableSize / Math::TWO_PI;
 
-        mSinTable = OGRE_ALLOC_T(Real, mTrigTableSize, MEMCATEGORY_GENERAL);
-        mTanTable = OGRE_ALLOC_T(Real, mTrigTableSize, MEMCATEGORY_GENERAL);
+        mSinTable = OGRE_ALLOC_T(float, mTrigTableSize, MEMCATEGORY_GENERAL);
+        mTanTable = OGRE_ALLOC_T(float, mTrigTableSize, MEMCATEGORY_GENERAL);
 
         buildTrigTables();
     }
@@ -75,7 +75,7 @@ namespace Ogre
         // Could get away with building only PI sized Sin table but simpler this 
         // way. Who cares, it'll ony use an extra 8k of memory anyway and I like 
         // simplicity.
-        Real angle;
+        float angle;
         for (int i = 0; i < mTrigTableSize; ++i)
         {
             angle = Math::TWO_PI * i / Real(mTrigTableSize);
@@ -84,7 +84,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------   
-    Real Math::SinTable (Real fValue)
+    float Math::SinTable (float fValue)
     {
         // Convert range to index values, wrap if required
         int idx;
@@ -100,7 +100,7 @@ namespace Ogre
         return mSinTable[idx];
     }
     //-----------------------------------------------------------------------
-    Real Math::TanTable (Real fValue)
+    float Math::TanTable (float fValue)
     {
         // Convert range to index values, wrap if required
         int idx = int(fValue *= mTrigTableFactor) % mTrigTableSize;
@@ -161,7 +161,7 @@ namespace Ogre
        return msAngleUnit;
    }
     //-----------------------------------------------------------------------
-    Real Math::AngleUnitsToRadians(Real angleunits)
+    float Math::AngleUnitsToRadians(float angleunits)
     {
        if (msAngleUnit == AU_DEGREE)
            return angleunits * fDeg2Rad;
@@ -170,7 +170,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    Real Math::RadiansToAngleUnits(Real radians)
+    float Math::RadiansToAngleUnits(float radians)
     {
        if (msAngleUnit == AU_DEGREE)
            return radians * fRad2Deg;
@@ -179,7 +179,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    Real Math::AngleUnitsToDegrees(Real angleunits)
+    float Math::AngleUnitsToDegrees(float angleunits)
     {
        if (msAngleUnit == AU_RADIAN)
            return angleunits * fRad2Deg;
@@ -188,7 +188,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    Real Math::DegreesToAngleUnits(Real degrees)
+    float Math::DegreesToAngleUnits(float degrees)
     {
        if (msAngleUnit == AU_RADIAN)
            return degrees * fDeg2Rad;
