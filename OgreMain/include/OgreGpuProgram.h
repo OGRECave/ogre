@@ -334,14 +334,10 @@ namespace Ogre {
     OGRE_DEPRECATED virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
     /// @deprecated use OT_DETAIL_ADJACENCY_BIT
     virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
-    /** Sets the number of process groups dispatched by this compute
-        program.
-     */
-    virtual void setComputeGroupDimensions(Vector3 dimensions) { mComputeGroupDimensions = dimensions; }
-    /** Returns the number of process groups dispatched by this compute 
-        program.
-     */
-    virtual Vector3 getComputeGroupDimensions(void) const { return mComputeGroupDimensions; }
+    /// @deprecated obsolete
+    OGRE_DEPRECATED void setComputeGroupDimensions(Vector3 dimensions) { mComputeGroupDimensions = dimensions; }
+    /// @deprecated obsolete
+    OGRE_DEPRECATED Vector3 getComputeGroupDimensions(void) const { return mComputeGroupDimensions; }
 
     /** Get a reference to the default parameters which are to be used for all
         uses of this program.
