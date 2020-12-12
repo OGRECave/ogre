@@ -150,9 +150,9 @@ void DefaultDebugDrawer::drawSceneNode(const SceneNode* node)
     const auto& aabb = node->_getWorldAABB();
     if (mDrawType & DT_AXES)
     {
-        Vector3 hs = aabb.getHalfSize();
-        float sz = std::min(hs.x, hs.y);
-        sz = std::min(sz, hs.z);
+        Vector3f hs(aabb.getHalfSize());
+        float sz = std::min(hs[0], hs[1]);
+        sz = std::min(sz, hs[2]);
         sz = std::max(sz, 1.0f);
         drawAxes(node->_getFullTransform(), sz);
     }
