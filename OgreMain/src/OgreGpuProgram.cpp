@@ -520,6 +520,7 @@ namespace Ogre
         t->mNeedsAdjacencyInfo = StringConverter::parseBool(val);
     }
     //-----------------------------------------------------------------------
+    OGRE_IGNORE_DEPRECATED_BEGIN
     String GpuProgram::CmdComputeGroupDims::doGet(const void* target) const
     {
         const GpuProgram* t = static_cast<const GpuProgram*>(target);
@@ -530,5 +531,6 @@ namespace Ogre
         GpuProgram* t = static_cast<GpuProgram*>(target);
         t->setComputeGroupDimensions(StringConverter::parseVector3(val));
     }
+    OGRE_IGNORE_DEPRECATED_END
 }
 
