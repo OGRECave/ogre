@@ -87,11 +87,12 @@ namespace Ogre {
             setValue(Vector4(mBaseValueReal));
             break;
         case QUATERNION:
-            setValue(Quaternion(mBaseValueReal));
+            setValue(
+                Quaternion(mBaseValueReal[0], mBaseValueReal[1], mBaseValueReal[2], mBaseValueReal[3]));
             break;
         case COLOUR:
-            setValue(ColourValue(mBaseValueReal[0], mBaseValueReal[1], 
-                mBaseValueReal[2], mBaseValueReal[3]));
+            setValue(
+                ColourValue(mBaseValueReal[0], mBaseValueReal[1], mBaseValueReal[2], mBaseValueReal[3]));
             break;
         case DEGREE:
             setValue(Degree(mBaseValueReal[0]));
