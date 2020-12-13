@@ -77,7 +77,7 @@ namespace Ogre
         the same (relative) LOD index no matter where you are in the tree, therefore
         buffers can potentially be reused more easily.
     */
-    class _OgreTerrainExport TerrainQuadTreeNode : public TerrainAlloc
+    class _OgreTerrainExport TerrainQuadTreeNode : private Renderable, private MovableObject
     {
     public:
         /** Constructor.
@@ -261,8 +261,6 @@ namespace Ogre
         /// Buffer binding used for holding delta values
         static unsigned short DELTA_BUFFER;
 
-        /// Returns the internal renderable object for this node
-        Renderable *_getRenderable();
     protected:
         Terrain* mTerrain;
         TerrainQuadTreeNode* mParent;
@@ -331,62 +329,21 @@ namespace Ogre
             a SceneManager::Listener to precalculate which nodes will be displayed 
             when it comes to purely a LOD basis.
         */
-        class _OgreTerrainExport Movable : public MovableObject
-        {
-        protected:
-            TerrainQuadTreeNode* mParent;
-        public:
-            Movable(TerrainQuadTreeNode* parent);
-            virtual ~Movable();
-            
-            // necessary overrides
-            const String& getMovableType(void) const;
-            const AxisAlignedBox& getBoundingBox(void) const;
-            Real getBoundingRadius(void) const;
-            void _updateRenderQueue(RenderQueue* queue);
-            void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
-            bool isVisible(void) const;
-            uint32 getVisibilityFlags(void) const;
-            uint32 getQueryFlags(void) const;
-            bool getCastShadows(void) const;
-
-        };
-        Movable* mMovable;
-        friend class Movable;
         SceneNode* mLocalNode;
 
-        /// Hook to the render queue
-        class _OgreTerrainExport Rend : public Renderable, public TerrainAlloc
-        {
-        protected:
-            TerrainQuadTreeNode* mParent;
-        public:
-            Rend(TerrainQuadTreeNode* parent);
-            virtual ~Rend();
-
-            const MaterialPtr& getMaterial(void) const;
-            Technique* getTechnique(void) const;
-            void getRenderOperation(RenderOperation& op);
-            void getWorldTransforms(Matrix4* xform) const;
-            Real getSquaredViewDepth(const Camera* cam) const;
-            const LightList& getLights(void) const;
-            bool getCastsShadows(void) const;
-
-        };
-        Rend* mRend;
-        friend class Rend;
-
         // actual implementation of MovableObject methods
-        void updateRenderQueue(RenderQueue* queue);
+        bool isVisible(void) const override;
+        const String& getMovableType(void) const override;
+        void _updateRenderQueue(RenderQueue* queue);
         void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
         // actual implementations of Renderable methods
-        const MaterialPtr& getMaterial(void) const;
-        Technique* getTechnique(void) const;
-        void getRenderOperation(RenderOperation& op);
-        void getWorldTransforms(Matrix4* xform) const;
-        Real getSquaredViewDepth(const Camera* cam) const;
-        const LightList& getLights(void) const;
-        bool getCastsShadows(void) const;
+        const MaterialPtr& getMaterial(void) const override;
+        Technique* getTechnique(void) const override;
+        void getRenderOperation(RenderOperation& op) override;
+        void getWorldTransforms(Matrix4* xform) const override;
+        Real getSquaredViewDepth(const Camera* cam) const override;
+        const LightList& getLights(void) const override;
+        bool getCastsShadows(void) const override;
 
 
         const VertexDataRecord* getVertexDataRecord() const;
