@@ -414,7 +414,7 @@ namespace Ogre {
         void removeQueryFlags(uint32 flags) { mQueryFlags &= ~flags; }
         
         /// Returns the query flags relevant for this object
-        uint32 getQueryFlags(void) const { return mQueryFlags; }
+        virtual uint32 getQueryFlags(void) const { return mQueryFlags; }
 
         /** Set the default query flags for all future MovableObject instances.
         */
@@ -442,7 +442,7 @@ namespace Ogre {
         void removeVisibilityFlags(uint32 flags) { mVisibilityFlags &= ~flags; }
         
         /// Returns the visibility flags relevant for this object
-        uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
+        virtual uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
 
         /** Set the default visibility flags for all future MovableObject instances.
         */
