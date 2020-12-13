@@ -239,7 +239,7 @@ namespace Ogre
         if (!mQuadTree)
             return AxisAlignedBox::BOX_NULL;
         else
-            return mQuadTree->getAABB();
+            return mQuadTree->getBoundingBox();
     }
     //---------------------------------------------------------------------
     AxisAlignedBox Terrain::getWorldAABB() const

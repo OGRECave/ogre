@@ -556,7 +556,7 @@ namespace Ogre
                     mChildren[i]->updateVertexData(positions, deltas, rect, cpuData);
 
                     // merge bounds from children
-                    AxisAlignedBox childBox = mChildren[i]->getAABB();
+                    AxisAlignedBox childBox = mChildren[i]->getBoundingBox();
                     // this box is relative to child centre
                     Vector3 boxoffset = mChildren[i]->getLocalCentre() - getLocalCentre();
                     childBox.setMinimum(childBox.getMinimum() + boxoffset);
@@ -1499,7 +1499,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     const AxisAlignedBox& TerrainQuadTreeNode::Movable::getBoundingBox(void) const
     {
-        return mParent->getAABB();
+        return mParent->getBoundingBox();
     }
     //---------------------------------------------------------------------
     Real TerrainQuadTreeNode::Movable::getBoundingRadius(void) const
