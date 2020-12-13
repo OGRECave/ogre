@@ -104,10 +104,10 @@ namespace Ogre
         {
             // Get distance to this terrain node (to closest point of the box)
             // head towards centre of the box (note, box may not cover mLocalCentre because of height)
-            Vector3 dir(node->getAABB().getCenter() - localPos);
+            Vector3 dir(node->getBoundingBox().getCenter() - localPos);
             dir.normalise();
             Ray ray(localPos, dir);
-            std::pair<bool, Real> intersectRes = Math::intersects(ray, node->getAABB());
+            std::pair<bool, Real> intersectRes = Math::intersects(ray, node->getBoundingBox());
 
             // ray will always intersect, we just want the distance
             dist = intersectRes.second;

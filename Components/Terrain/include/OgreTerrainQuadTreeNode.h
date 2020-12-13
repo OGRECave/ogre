@@ -223,7 +223,10 @@ namespace Ogre
         bool pointIntersectsNode(long x, long y);
 
         /// Get the AABB (local coords) of this node
-        const AxisAlignedBox& getAABB() const;
+        const AxisAlignedBox& getBoundingBox(void) const { return mAABB; }
+
+        /// @deprecated use getBoundingBox
+        OGRE_DEPRECATED const AxisAlignedBox& getAABB() const;
         /// Get the bounding radius of this node
         Real getBoundingRadius() const;
         /// Get the local centre of this node, relative to parent terrain centre
