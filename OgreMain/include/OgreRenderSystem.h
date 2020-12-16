@@ -452,13 +452,6 @@ namespace Ogre
         */
         virtual RenderTarget * detachRenderTarget( const String &name );
 
-        /// Iterator over RenderTargets
-        typedef MapIterator<Ogre::RenderTargetMap> RenderTargetIterator;
-
-        /** Returns a specialised MapIterator over all render targets attached to the RenderSystem. */
-        RenderTargetIterator getRenderTargetIterator(void) {
-            return RenderTargetIterator( mRenderTargets.begin(), mRenderTargets.end() );
-        }
         /** Returns the global instance vertex buffer.
         */
         HardwareVertexBufferSharedPtr getGlobalInstanceVertexBuffer() const;

@@ -34,11 +34,14 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreController.h"
 #include "OgreControllerManager.h"
-#include "OgreIteratorWrapper.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+    template <typename T> class MapIterator;
+    template <typename T> class ConstMapIterator;
+    template <typename T> class ConstVectorIterator;
 
     /** \addtogroup Core
     *  @{

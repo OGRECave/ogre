@@ -162,26 +162,11 @@ namespace Ogre {
         @param flags
             Technique-specific flags, see ShadowRenderableFlags.
         */
-        virtual const ShadowRenderableList& getShadowVolumeRenderableList(ShadowTechnique shadowTechnique, const Light* light,
-                                                                   HardwareIndexBufferSharedPtr* indexBuffer,
-                                                                   size_t* indexBufferUsedSize, bool extrudeVertices,
-                                                                   Real extrusionDistance, unsigned long flags = 0)
-        {
-            static ShadowRenderableList tmp;
-            auto itw = getShadowVolumeRenderableIterator(shadowTechnique, light, indexBuffer, indexBufferUsedSize,
-                                                         extrudeVertices, extrusionDistance, flags);
-            return tmp = ShadowRenderableList(itw.begin(), itw.end());
-        }
-
-        /// @deprecated use getShadowVolumeRenderableList()
-        virtual ShadowRenderableListIterator getShadowVolumeRenderableIterator(
-            ShadowTechnique shadowTechnique, const Light* light,
-            HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-            bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 )
-        {
-            static ShadowRenderableList lst;
-            return ShadowRenderableListIterator(lst.begin(), lst.end());
-        }
+        virtual const ShadowRenderableList&
+        getShadowVolumeRenderableList(ShadowTechnique shadowTechnique, const Light* light,
+                                      HardwareIndexBufferSharedPtr* indexBuffer,
+                                      size_t* indexBufferUsedSize, bool extrudeVertices,
+                                      Real extrusionDistance, unsigned long flags = 0) = 0;
 
         /** Common implementation of releasing shadow renderables.*/
         static void clearShadowRenderableList(ShadowRenderableList& shadowRenderables);

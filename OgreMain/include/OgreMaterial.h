@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreResource.h"
-#include "OgreIteratorWrapper.h"
 #include "OgreCommon.h"
 #include "OgreColourValue.h"
 #include "OgreBlendMode.h"
@@ -42,6 +41,8 @@ namespace Ogre {
 
     // Forward declaration
     class LodStrategy;
+    template <typename T> class ConstVectorIterator;
+    template <typename T> class VectorIterator;
 
     /** \addtogroup Core
     *  @{

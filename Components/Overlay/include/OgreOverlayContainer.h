@@ -31,11 +31,10 @@ THE SOFTWARE.
 
 #include "OgreOverlayPrerequisites.h"
 #include "OgreOverlayElement.h"
-#include "OgreIteratorWrapper.h"
 
 
 namespace Ogre {
-
+    template <typename T> class MapIterator;
 
     /** \addtogroup Optional
     *  @{
