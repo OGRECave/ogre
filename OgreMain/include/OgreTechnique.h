@@ -207,13 +207,6 @@ namespace Ogre {
         const Passes& getPasses(void) const {
             return mPasses;
         }
-        /** Gets an iterator over the illumination-stage categorised passes.
-         * @deprecated use getIlluminationPasses() */
-        OGRE_DEPRECATED const IlluminationPassIterator getIlluminationPassIterator(void) {
-            getIlluminationPasses(); // refresh as needed
-            return IlluminationPassIterator(mIlluminationPasses.begin(),
-                mIlluminationPasses.end());
-        }
 
         /** Gets the illumination-stage categorised passes
          * @note triggers compilation if needed */

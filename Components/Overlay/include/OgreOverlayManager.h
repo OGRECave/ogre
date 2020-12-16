@@ -40,6 +40,7 @@ namespace Ogre {
     class OverlayContainer;
     class OverlayElement;
     class OverlayElementFactory;
+    template <typename T> class MapIterator;
 
     /** \addtogroup Optional
     *  @{
@@ -205,12 +206,6 @@ namespace Ogre {
 
         OverlayElement* createOverlayElementFromFactory(const String& typeName, const String& instanceName);
 
-        typedef MapIterator<ElementMap> TemplateIterator;
-        /** Returns an iterator over all templates in this manager.*/
-        TemplateIterator getTemplateIterator ()
-        {
-            return TemplateIterator (mTemplates.begin (), mTemplates.end ()) ;
-        }
         /* Returns whether the Element with the given name is a Template */
         bool isTemplate (String strName) const {
             return (mTemplates.find (strName) != mTemplates.end()) ;

@@ -493,18 +493,6 @@ namespace Ogre {
 
         const PriorityMap& getPriorityGroups() const { return mPriorityGroups; }
 
-        /// @deprecated use getPriorityGroups()
-        OGRE_DEPRECATED PriorityMapIterator getIterator(void)
-        {
-            return PriorityMapIterator(mPriorityGroups.begin(), mPriorityGroups.end());
-        }
-
-        /// @deprecated use getPriorityGroups()
-        OGRE_DEPRECATED ConstPriorityMapIterator getIterator(void) const
-        {
-            return ConstPriorityMapIterator(mPriorityGroups.begin(), mPriorityGroups.end());
-        }
-
         /** Add a renderable to this group, with the given priority. */
         void addRenderable(Renderable* pRend, Technique* pTech, ushort priority)
         {

@@ -38,6 +38,8 @@ namespace Ogre {
 
     // forward decl
     struct VisibleObjectsBoundsInfo;
+    template <typename T> class ConstVectorIterator;
+    template <typename T> class VectorIterator;
 
     /** \addtogroup Core
     *  @{
@@ -227,13 +229,9 @@ namespace Ogre {
         const AxisAlignedBox& _getWorldAABB(void) const { return mWorldAABB; }
 
         /// @deprecated use getAttachedObjects()
-        OGRE_DEPRECATED ObjectIterator getAttachedObjectIterator(void) {
-            return ObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
-        }
+        OGRE_DEPRECATED ObjectIterator getAttachedObjectIterator(void);
         /// @deprecated use getAttachedObjects()
-        OGRE_DEPRECATED ConstObjectIterator getAttachedObjectIterator(void) const {
-            return ConstObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
-        }
+        OGRE_DEPRECATED ConstObjectIterator getAttachedObjectIterator(void) const;
 
         /** The MovableObjects attached to this node
          *

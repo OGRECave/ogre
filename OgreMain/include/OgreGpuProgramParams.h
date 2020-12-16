@@ -31,7 +31,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 // Precompiler options
 #include "OgrePrerequisites.h"
 #include "OgreSharedPtr.h"
-#include "OgreIteratorWrapper.h"
 #include "OgreSerializer.h"
 #include "OgreAny.h"
 #include "Threading/OgreThreadHeaders.h"
@@ -39,6 +38,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre {
     struct TransformBaseReal;
+    template <typename T> class ConstMapIterator;
 
     /** \addtogroup Core
      *  @{
