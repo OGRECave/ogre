@@ -132,12 +132,11 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
     LightList lightList;
 
-    while (groupIt.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Sort the queue first
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
@@ -204,10 +203,9 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
     }// for each priority
 
     // Iterate again - variable name changed to appease gcc.
-    RenderQueueGroup::PriorityMapIterator groupIt2 = pGroup->getIterator();
-    while (groupIt2.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt2.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do unsorted transparents
         mSceneManager->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
@@ -233,11 +231,9 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
     interleaved as in the normal rendering loop.
     */
     // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
-
-    while (groupIt.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Sort the queue first
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
@@ -276,10 +272,9 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
     mSceneManager->setAmbientLight(currAmbient);
 
     // Iterate again - variable name changed to appease gcc.
-    RenderQueueGroup::PriorityMapIterator groupIt2 = pGroup->getIterator();
-    while (groupIt2.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt2.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do non-shadowable solids
         mSceneManager->renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, true, true);
@@ -288,10 +283,9 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
 
 
     // Iterate again - variable name changed to appease gcc.
-    RenderQueueGroup::PriorityMapIterator groupIt3 = pGroup->getIterator();
-    while (groupIt3.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt3.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do unsorted transparents
         mSceneManager->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
@@ -313,7 +307,6 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
     // _findVisibleObjects
 
     // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 
     // Override auto param ambient to force vertex programs and fixed function to
     ColourValue currAmbient = mSceneManager->getAmbientLight();
@@ -328,9 +321,9 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
         mSceneManager->setAmbientLight(mShadowColour);
     }
 
-    while (groupIt.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Sort the queue first
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
@@ -363,11 +356,9 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
     interleaved as in the normal rendering loop.
     */
     // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
-
-    while (groupIt.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Sort the queue first
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
@@ -474,10 +465,9 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
     }
 
     // Iterate again - variable name changed to appease gcc.
-    RenderQueueGroup::PriorityMapIterator groupIt3 = pGroup->getIterator();
-    while (groupIt3.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt3.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do unsorted transparents
         mSceneManager->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
@@ -493,12 +483,11 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
     LightList lightList;
 
-    while (groupIt.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Sort the queue first
         pPriorityGrp->sort(mSceneManager->mCameraInProgress);
@@ -596,10 +585,9 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
     }// for each priority
 
     // Iterate again - variable name changed to appease gcc.
-    RenderQueueGroup::PriorityMapIterator groupIt2 = pGroup->getIterator();
-    while (groupIt2.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt2.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do unsorted transparents
         mSceneManager->renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, true, true);
@@ -618,15 +606,14 @@ void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
     static LightList nullLightList;
 
     // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 
     // Override auto param ambient to force vertex programs to go full-bright
     ColourValue currAmbient = mSceneManager->getAmbientLight();
     mSceneManager->setAmbientLight(ColourValue::White);
 
-    while (groupIt.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Do solids, override light list incase any vertex programs use them
         mSceneManager->renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &nullLightList);
