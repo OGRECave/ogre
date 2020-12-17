@@ -341,11 +341,6 @@ namespace Ogre
         Real getVerticalTexelOffset();
         Real getMinimumDepthInputValue();
         Real getMaximumDepthInputValue();
-                
-        /*
-        Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
-        */
-        virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
 
 		bool IsActiveDeviceLost();
 

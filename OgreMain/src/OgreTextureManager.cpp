@@ -197,10 +197,6 @@ namespace Ogre {
             ((texType == TEX_TYPE_2D_ARRAY) && !caps->hasCapability(RSC_TEXTURE_2D_ARRAY)))
             return ret;
 
-        if (((usage & (int)TU_STATIC) != 0) && (!Root::getSingleton().getRenderSystem()->isStaticBufferLockable()))
-        {
-            usage = (usage & ~(int)TU_STATIC) | (int)TU_DYNAMIC;
-        }
         ret = create(name, group, true, loader);
 
         if(!ret)
