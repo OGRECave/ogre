@@ -491,14 +491,16 @@ namespace Ogre {
             }
         }
 
-        /** Get an iterator for browsing through child contents. */
-        PriorityMapIterator getIterator(void)
+        const PriorityMap& getPriorityGroups() const { return mPriorityGroups; }
+
+        /// @deprecated use getPriorityGroups()
+        OGRE_DEPRECATED PriorityMapIterator getIterator(void)
         {
             return PriorityMapIterator(mPriorityGroups.begin(), mPriorityGroups.end());
         }
 
-        /** Get a const iterator for browsing through child contents. */
-        ConstPriorityMapIterator getIterator(void) const
+        /// @deprecated use getPriorityGroups()
+        OGRE_DEPRECATED ConstPriorityMapIterator getIterator(void) const
         {
             return ConstPriorityMapIterator(mPriorityGroups.begin(), mPriorityGroups.end());
         }
@@ -673,12 +675,10 @@ namespace Ogre {
         */
         void merge( const RenderQueueGroup* rhs )
         {
-            ConstPriorityMapIterator it = rhs->getIterator();
-
-            while( it.hasMoreElements() )
+            for ( const auto pg : rhs->getPriorityGroups() )
             {
-                ushort priority = it.peekNextKey();
-                RenderPriorityGroup* pSrcPriorityGrp = it.getNext();
+                ushort priority = pg.first;
+                RenderPriorityGroup* pSrcPriorityGrp = pg.second;
                 RenderPriorityGroup* pDstPriorityGrp;
 
                 // Check if priority group is there
