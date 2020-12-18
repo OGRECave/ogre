@@ -366,9 +366,6 @@ PixelBox D3D9HardwarePixelBuffer::lockImpl(const Box &lockBox,  LockOptions opti
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "There are no resources attached to this pixel buffer !!",
             "D3D9HardwarePixelBuffer::lockImpl");   
     }
-    
-    mLockedBox = lockBox;
-    mCurrentLockOptions = options;
 
     BufferResources* bufferResources = mMapDeviceToBufferResources.begin()->second;
     

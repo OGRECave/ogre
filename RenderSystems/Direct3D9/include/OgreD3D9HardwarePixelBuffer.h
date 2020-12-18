@@ -71,9 +71,6 @@ namespace Ogre {
 
         // The owner texture if exists.
         D3D9Texture* mOwnerTexture;
-        
-        // The current lock flags of this surface.
-        LockOptions mCurrentLockOptions;
 
         // Device access mutex.
         OGRE_STATIC_MUTEX(msDeviceAccessMutex);

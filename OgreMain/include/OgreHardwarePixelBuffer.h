@@ -60,6 +60,7 @@ namespace Ogre {
         PixelFormat mFormat;
         /// Currently locked region (local coords)
         PixelBox mCurrentLock;
+        LockOptions mCurrentLockOptions;
         /// The current locked box of this surface (entire surface coords)
         Box mLockedBox;
 
