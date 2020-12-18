@@ -148,7 +148,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "DirectX does not allow locking of or directly writing to RenderTargets. Use blitFromMemory if you need the contents.",
             "D3D11HardwarePixelBuffer::lockImpl");  
 
-        mLockedBox = lockBox;
+
 
         // Set extents and format
         // Note that we do not carry over the left/top/front here, since the returned
@@ -176,8 +176,6 @@ namespace Ogre {
         default: 
             break;
         };
-
-        mCurrentLockOptions = options;
 
         int usage = mUsage & 0xF; // drop TU_* flags
         if(usage == HBU_GPU_ONLY || usage == HBU_GPU_TO_CPU || options == HBL_READ_ONLY || options == HBL_NORMAL)

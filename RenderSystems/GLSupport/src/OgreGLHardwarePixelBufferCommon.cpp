@@ -36,7 +36,6 @@ GLHardwarePixelBufferCommon::GLHardwarePixelBufferCommon(uint32 inWidth, uint32 
       mBuffer(inWidth, inHeight, inDepth, inFormat),
       mGLInternalFormat(0)
 {
-    mCurrentLockOptions = (LockOptions)0;
 }
 
 GLHardwarePixelBufferCommon::~GLHardwarePixelBufferCommon()
@@ -72,8 +71,6 @@ PixelBox GLHardwarePixelBufferCommon::lockImpl(const Box& lockBox, LockOptions o
         // Download the old contents of the texture
         download(mBuffer);
     }
-    mCurrentLockOptions = options;
-    mLockedBox = lockBox;
     return mBuffer.getSubVolume(lockBox);
 }
 
