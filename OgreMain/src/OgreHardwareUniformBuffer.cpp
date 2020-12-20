@@ -44,7 +44,7 @@ namespace Ogre {
         // Create a shadow buffer if required
         if (mUseShadowBuffer)
         {
-            mShadowBuffer.reset(new DefaultHardwareUniformBuffer(mMgr, sizeBytes, HardwareBuffer::HBU_DYNAMIC, false));
+            mShadowBuffer.reset(new DefaultBuffer(sizeBytes));
         }
     }
     

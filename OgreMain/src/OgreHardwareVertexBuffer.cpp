@@ -48,8 +48,7 @@ namespace Ogre {
         // Create a shadow buffer if required
         if (mUseShadowBuffer)
         {
-            mShadowBuffer.reset(new DefaultHardwareVertexBuffer(mMgr, mVertexSize,
-                    mNumVertices, HardwareBuffer::HBU_DYNAMIC));
+            mShadowBuffer.reset(new DefaultBuffer(mSizeInBytes));
         }
 
     }

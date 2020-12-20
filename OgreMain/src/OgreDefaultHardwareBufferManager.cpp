@@ -29,6 +29,39 @@ THE SOFTWARE.
 #include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre {
+    DefaultBuffer::DefaultBuffer(size_t sizeInBytes)
+        : Buffer(sizeInBytes, HBU_CPU_ONLY)
+    {
+        // Allocate aligned memory for better SIMD processing friendly.
+        mData = static_cast<unsigned char*>(AlignedMemory::allocate(mSizeInBytes));
+    }
+    //-----------------------------------------------------------------------
+    DefaultBuffer::~DefaultBuffer() { AlignedMemory::deallocate(mData); }
+    //-----------------------------------------------------------------------
+    void* DefaultBuffer::lockImpl(size_t offset, size_t length, LockOptions options) { return mData + offset; }
+    //-----------------------------------------------------------------------
+    void DefaultBuffer::unlockImpl() {}
+    //-----------------------------------------------------------------------
+    void* DefaultBuffer::lock(size_t offset, size_t length, LockOptions options)
+    {
+        mIsLocked = true;
+        return mData + offset;
+    }
+    void DefaultBuffer::unlock(void) { mIsLocked = false; }
+    //-----------------------------------------------------------------------
+    void DefaultBuffer::readData(size_t offset, size_t length, void* pDest)
+    {
+        assert((offset + length) <= mSizeInBytes);
+        memcpy(pDest, mData + offset, length);
+    }
+    //-----------------------------------------------------------------------
+    void DefaultBuffer::writeData(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer)
+    {
+        assert((offset + length) <= mSizeInBytes);
+        // ignore discard, memory is not guaranteed to be zeroised
+        memcpy(mData + offset, pSource, length);
+    }
+
 
     DefaultHardwareVertexBuffer::DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
                                                              HardwareBuffer::Usage usage)

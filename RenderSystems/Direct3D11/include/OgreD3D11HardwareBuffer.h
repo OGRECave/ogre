@@ -72,7 +72,7 @@ namespace Ogre {
         /** See HardwareBuffer. We perform a hardware copy here. */
         void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
             size_t dstOffset, size_t length, bool discardWholeBuffer = false);
-		void copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset,
+		void copyDataImpl(Buffer& srcBuffer, size_t srcOffset,
 			size_t dstOffset, size_t length, bool discardWholeBuffer = false);
 		/// Updates the real buffer from the shadow buffer, if required
 		virtual void _updateFromShadow(void);

@@ -56,8 +56,7 @@ namespace Ogre {
         // Create a shadow buffer if required
         if (mUseShadowBuffer)
         {
-            mShadowBuffer.reset(new DefaultHardwareIndexBuffer(mIndexType,
-                mNumIndexes, HardwareBuffer::HBU_DYNAMIC));
+            mShadowBuffer.reset(new DefaultBuffer(mSizeInBytes));
         }
 
 

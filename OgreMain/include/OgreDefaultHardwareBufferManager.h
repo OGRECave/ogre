@@ -43,6 +43,22 @@ namespace Ogre {
     *  @{
     */
 
+    /// Specialisation of Buffer using malloc e.g. for use as shadow buffer
+    class _OgreExport DefaultBuffer : public Buffer
+    {
+    protected:
+        unsigned char* mData;
+        void* lockImpl(size_t offset, size_t length, LockOptions options);
+        void unlockImpl(void);
+    public:
+        explicit DefaultBuffer(size_t sizeInBytes);
+        ~DefaultBuffer();
+        void readData(size_t offset, size_t length, void* pDest);
+        void writeData(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer = false);
+        void* lock(size_t offset, size_t length, LockOptions options);
+        void unlock(void);
+    };
+
     /// Specialisation of HardwareVertexBuffer for emulation
     class _OgreExport DefaultHardwareVertexBuffer : public HardwareVertexBuffer 
     {

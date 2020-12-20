@@ -196,7 +196,7 @@ namespace Ogre {
 		copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
 	}
 	//---------------------------------------------------------------------
-	void D3D11HardwareBuffer::copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset, 
+	void D3D11HardwareBuffer::copyDataImpl(Buffer& srcBuffer, size_t srcOffset,
 		size_t dstOffset, size_t length, bool discardWholeBuffer)
 	{
         // If we're copying same-size buffers in their entirety...
