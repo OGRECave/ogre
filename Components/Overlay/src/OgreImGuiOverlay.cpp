@@ -30,7 +30,7 @@ ImGuiOverlay::ImGuiOverlay() : Overlay("ImGuiOverlay")
 {
     ImGui::CreateContext();
     #ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
-    	ImPlot::CreateContext();
+	ImPlot::CreateContext();
     #endif
     ImGuiIO& io = ImGui::GetIO();
 
@@ -39,7 +39,7 @@ ImGuiOverlay::ImGuiOverlay() : Overlay("ImGuiOverlay")
 ImGuiOverlay::~ImGuiOverlay()
 {
     #ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
-    	ImPlot::DestroyContext();
+	ImPlot::DestroyContext();
     #endif
     ImGui::DestroyContext();
 }
