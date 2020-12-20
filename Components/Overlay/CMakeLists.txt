@@ -39,7 +39,6 @@ else()
 endif()
 if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
   set(IMGUI_PLOT_DIR "${PROJECT_BINARY_DIR}/implot-0.8" CACHE PATH "")
-  add_definitions(-DOGRE_BUILD_COMPONENT_IMGUI_IMPLOT=1)
   if(NOT EXISTS ${IMGUI_PLOT_DIR})
     message(STATUS "Downloading implot")
     file(DOWNLOAD https://codeload.github.com/epezent/implot/zip/v0.8  ${PROJECT_BINARY_DIR}/implot_v0.8.zip)
@@ -81,9 +80,8 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
 endif()
 
 if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
-  target_include_directories(OgreOverlay PUBLIC
-    PUBLIC "$<BUILD_INTERFACE:${IMGUI_PLOT_DIR}>")
-
+  target_include_directories(OgreOverlay PUBLIC PUBLIC "$<BUILD_INTERFACE:${IMGUI_PLOT_DIR}>")
+  add_compile_definitions(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT=1) 
   if(UNIX)
     set_source_files_properties(${IMGUI_PLOT_DIR}/implot_items.cpp  PROPERTIES
       COMPILE_FLAGS "-Wno-cast-qual")
