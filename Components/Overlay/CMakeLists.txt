@@ -42,11 +42,8 @@ if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
   add_definitions(-DOGRE_BUILD_COMPONENT_IMGUI_IMPLOT=1)
   if(NOT EXISTS ${IMGUI_PLOT_DIR})
     message(STATUS "Downloading implot")
-    file(DOWNLOAD
-    https://codeload.github.com/epezent/implot/zip/v0.8
-        ${PROJECT_BINARY_DIR}/implot_v0.8.zip)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -E  unzip -o implot_v0.8.zip WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    file(DOWNLOAD https://codeload.github.com/epezent/implot/zip/v0.8  ${PROJECT_BINARY_DIR}/implot_v0.8.zip)
+    execute_process(COMMAND ${CMAKE_COMMAND}  -E  7z  x -y implot_v0.8.zip WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
   endif()
   list(APPEND SOURCE_FILES ${IMGUI_PLOT_DIR}/implot_items.cpp  ${IMGUI_PLOT_DIR}/implot.cpp)
 endif()
@@ -94,8 +91,6 @@ if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
       COMPILE_FLAGS "-Wno-cast-qual")
 
   endif()
-
-  configure_file(${OGRE_TEMPLATES_DIR}/imconfig.h ${IMGUI_PLOT_DIR}/imconfig.h COPYONLY)
 
   list(APPEND HEADER_FILES
     ${IMGUI_PLOT_DIR}/implot.h
