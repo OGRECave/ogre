@@ -48,9 +48,7 @@ if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
     execute_process(COMMAND ${CMAKE_COMMAND}
         -E  unzip -o implot_v0.8.zip WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
   endif()
-  list(APPEND SOURCE_FILES
-    ${IMGUI_PLOT_DIR}/implot_items.cpp 
-    ${IMGUI_PLOT_DIR}/implot.cpp)
+  list(APPEND SOURCE_FILES ${IMGUI_PLOT_DIR}/implot_items.cpp  ${IMGUI_PLOT_DIR}/implot.cpp)
 endif()
 # setup target
 add_library(OgreOverlay ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
