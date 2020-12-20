@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreBitwise.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
+#include "OgreD3D9RenderSystem.h"
 
 namespace Ogre {
 
@@ -366,9 +366,6 @@ PixelBox D3D9HardwarePixelBuffer::lockImpl(const Box &lockBox,  LockOptions opti
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "There are no resources attached to this pixel buffer !!",
             "D3D9HardwarePixelBuffer::lockImpl");   
     }
-    
-    mLockedBox = lockBox;
-    mLockFlags = flags;
 
     BufferResources* bufferResources = mMapDeviceToBufferResources.begin()->second;
     
@@ -381,11 +378,18 @@ Ogre::PixelBox D3D9HardwarePixelBuffer::lockBuffer(BufferResources* bufferResour
                                                    const Box &lockBox, 
                                                    DWORD flags)
 {
+    if((mUsage & TU_STATIC) && D3D9RenderSystem::isDirectX9Ex())
+    {
+        mStagingBuffer.create(mFormat, lockBox.getWidth(), lockBox.getHeight(), lockBox.getDepth());
+        if(mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL)
+            HardwarePixelBuffer::blitToMemory(mStagingBuffer.getPixelBox());
+        return mStagingBuffer.getPixelBox();
+    }
+
     // Set extents and format
     // Note that we do not carry over the left/top/front here, since the returned
     // PixelBox will be re-based from the locking point onwards
     PixelBox rval(lockBox.getWidth(), lockBox.getHeight(), lockBox.getDepth(), mFormat);
-
 
     if (bufferResources->surface != NULL) 
     {
@@ -454,7 +458,9 @@ void D3D9HardwarePixelBuffer::unlockImpl(void)
     it = mMapDeviceToBufferResources.begin();
     ++it;
     while (it != mMapDeviceToBufferResources.end())
-    {           
+    {
+        if(mCurrentLockOptions == HBL_READ_ONLY) break; // not needed
+
         BufferResources* bufferResources = it->second;
         
         // Update duplicated buffer from the from the locked buffer content.                    
@@ -466,7 +472,10 @@ void D3D9HardwarePixelBuffer::unlockImpl(void)
     it = mMapDeviceToBufferResources.begin();                           
     unlockBuffer( it->second);      
     if(mDoMipmapGen)
-        _genMipmaps(it->second->mipTex);    
+        _genMipmaps(it->second->mipTex);
+
+    // in case we used this
+    mStagingBuffer.freeMemory();
 }
 
 //-----------------------------------------------------------------------------  

@@ -77,8 +77,6 @@ namespace Ogre {
             // Download the old contents of the texture
             download(mBuffer);
         }
-        mCurrentLockOptions = options;
-        mLockedBox = lockBox;
         return mBuffer.getSubVolume(lockBox);
     }
 

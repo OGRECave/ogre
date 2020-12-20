@@ -49,7 +49,6 @@ protected:
     // depending on buffer usage
     PixelBox mBuffer;
     uint32 mGLInternalFormat; // GL internal format
-    LockOptions mCurrentLockOptions;
 
     // Buffer allocation/freeage
     void allocateBuffer();

@@ -47,7 +47,6 @@ namespace Ogre {
         // Internal buffer; either on-card or in system memory, freed/allocated on demand
         // depending on buffer usage
         PixelBox mBuffer;
-        LockOptions mCurrentLockOptions;
 
         bool mHwGamma;
 

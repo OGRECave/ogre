@@ -1867,11 +1867,10 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
 {
     // Basic render loop
     // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 
-    while (groupIt.hasMoreElements())
+    for (const auto& pg : pGroup->getPriorityGroups())
     {
-        RenderPriorityGroup* pPriorityGrp = groupIt.getNext();
+        RenderPriorityGroup* pPriorityGrp = pg.second;
 
         // Sort the queue first
         pPriorityGrp->sort(mCameraInProgress);

@@ -38,7 +38,7 @@ namespace Ogre
             HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer):
         HardwareBuffer(usage, useSystemMemory, useShadowBuffer),
         mWidth(width), mHeight(height), mDepth(depth),
-        mFormat(format)
+        mFormat(format), mCurrentLockOptions()
     {
         // Default
         mRowPitch = mWidth;
@@ -78,6 +78,8 @@ namespace Ogre
         }
         else
         {
+            mCurrentLockOptions = options;
+            mLockedBox = lockBox;
             // Lock the real buffer if there is no shadow buffer 
             mCurrentLock = lockImpl(lockBox, options);
             mIsLocked = true;

@@ -52,8 +52,6 @@ namespace Ogre {
         const UINT mFace;
         const UINT mMipLevel;
 
-        LockOptions mCurrentLockOptions;
-
         /// Render targets
         typedef std::vector<RenderTexture*> SliceTRT;
         SliceTRT mSliceTRT;
