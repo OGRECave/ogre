@@ -37,7 +37,21 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
 else()
     list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreImGuiOverlay.cpp")
 endif()
-
+if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
+  set(IMGUI_PLOT_DIR "${PROJECT_BINARY_DIR}/implot-0.8" CACHE PATH "")
+  add_definitions(-DOGRE_BUILD_COMPONENT_IMGUI_IMPLOT=1)
+  if(NOT EXISTS ${IMGUI_PLOT_DIR})
+    message(STATUS "Downloading implot")
+    file(DOWNLOAD
+    https://codeload.github.com/epezent/implot/zip/v0.8
+        ${PROJECT_BINARY_DIR}/implot_v0.8.zip)
+    execute_process(COMMAND ${CMAKE_COMMAND}
+        -E  unzip -o implot_v0.8.zip WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+  endif()
+  list(APPEND SOURCE_FILES
+    ${IMGUI_PLOT_DIR}/implot_items.cpp 
+    ${IMGUI_PLOT_DIR}/implot.cpp)
+endif()
 # setup target
 add_library(OgreOverlay ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreOverlay PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
@@ -69,6 +83,25 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
   list(APPEND HEADER_FILES
     ${IMGUI_DIR}/imgui.h
     ${IMGUI_DIR}/imconfig.h)
+endif()
+
+if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
+  target_include_directories(OgreOverlay PUBLIC
+    PUBLIC "$<BUILD_INTERFACE:${IMGUI_PLOT_DIR}>")
+
+  if(UNIX)
+    set_source_files_properties(${IMGUI_PLOT_DIR}/implot_items.cpp  PROPERTIES
+      COMPILE_FLAGS "-Wno-cast-qual")
+    set_source_files_properties(${IMGUI_PLOT_DIR}/implot.cpp PROPERTIES
+      COMPILE_FLAGS "-Wno-cast-qual")
+
+  endif()
+
+  configure_file(${OGRE_TEMPLATES_DIR}/imconfig.h ${IMGUI_PLOT_DIR}/imconfig.h COPYONLY)
+
+  list(APPEND HEADER_FILES
+    ${IMGUI_PLOT_DIR}/implot.h
+    ${IMGUI_PLOT_DIR}/implot_internal.h)
 endif()
 
 generate_export_header(OgreOverlay 

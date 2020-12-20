@@ -11,6 +11,10 @@
 
 #include <imgui.h>
 
+#ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
+	#include <implot.h>
+#endif
+
 namespace Ogre
 {
 class _OgreOverlayExport ImGuiOverlay : public Overlay
