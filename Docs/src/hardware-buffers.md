@@ -1,6 +1,6 @@
 # Hardware Buffers {#Hardware-Buffers}
 
-Vertex buffers, index buffers and pixel buffers inherit most of their features from the HardwareBuffer class. The general premise with a hardware buffer is that it is an area of memory with which you can do whatever you like; there is no format (vertex or otherwise) associated with the buffer itself - that is entirely up to interpretation by the methods that use it - in that way, a HardwareBuffer is just like an area of memory you might allocate using ’malloc’ - the difference being that this memory is likely to be located in GPU or AGP memory.
+Vertex buffers, index buffers and pixel buffers inherit most of their features from the HardwareBuffer class. The general premise with a hardware buffer is that it is an area of memory with which you can do whatever you like; there is no format (vertex or otherwise) associated with the buffer itself - that is entirely up to interpretation by the methods that use it - in that way, a HardwareBuffer is just like an area of memory you might allocate using @c malloc - the difference being that this memory is likely to be located in GPU memory.
 
 @tableofcontents
 
