@@ -39,8 +39,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalMultiRenderTarget.h"
 
 #include "OgreMetalHardwareBufferManager.h"
-#include "OgreMetalHardwareIndexBuffer.h"
-#include "OgreMetalHardwareVertexBuffer.h"
+#include "OgreMetalHardwareBufferCommon.h"
 
 #include "OgreFrustum.h"
 #include "OgreViewport.h"
@@ -366,9 +365,8 @@ namespace Ogre
             // create const buffer to back VP (currently unused)
             if(auto sz = vpParams->getFloatConstantList().size())
             {
-                mAutoParamsBuffer.reset(new MetalHardwareBufferCommon(
-                    sz*sizeof(float),
-                    HardwareBuffer::HBU_STATIC_WRITE_ONLY, 4, NULL, &mDevice));
+                mAutoParamsBuffer.reset(new MetalHardwareBufferCommon(sz * sizeof(float), HBU_CPU_TO_GPU,
+                                                                      false, 4, NULL, &mDevice));
             }
         }
 
@@ -865,7 +863,7 @@ namespace Ogre
             vertexDescriptor.layouts[bufferIdx].stride = hwbuf->getVertexSize();
             vertexDescriptor.layouts[bufferIdx].stepFunction = MTLVertexStepFunctionPerVertex;
 
-            auto mtlbuf = static_cast<MetalHardwareVertexBuffer*>(hwbuf);
+            auto mtlbuf = hwbuf->_getImpl<MetalHardwareBufferCommon>();
             [mActiveRenderEncoder setVertexBuffer:mtlbuf->getBufferName(unused) offset:0 atIndex:bufferIdx];
         }
 
@@ -896,8 +894,7 @@ namespace Ogre
                 const size_t bytesPerIndexElement = mCurrentIndexBuffer->indexBuffer->getIndexSize();
 
                 size_t offsetStart;
-                MetalHardwareIndexBuffer *metalBuffer =
-                    static_cast<MetalHardwareIndexBuffer*>( mCurrentIndexBuffer->indexBuffer.get() );
+                auto metalBuffer = mCurrentIndexBuffer->indexBuffer->_getImpl<MetalHardwareBufferCommon>();
                 __unsafe_unretained id<MTLBuffer> indexBuffer = metalBuffer->getBufferName( offsetStart );
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS

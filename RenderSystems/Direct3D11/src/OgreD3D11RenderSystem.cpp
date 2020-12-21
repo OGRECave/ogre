@@ -39,8 +39,7 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreSceneManagerEnumerator.h"
 #include "OgreD3D11HardwareBufferManager.h"
-#include "OgreD3D11HardwareIndexBuffer.h"
-#include "OgreD3D11HardwareVertexBuffer.h"
+#include "OgreD3D11HardwareBuffer.h"
 #include "OgreD3D11VertexDeclaration.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreD3D11HLSLProgramFactory.h"
@@ -1864,13 +1863,12 @@ namespace Ogre
         iend = binds.end();
         for (i = binds.begin(); i != iend; ++i)
         {
-            const D3D11HardwareVertexBuffer* d3d11buf = 
-                static_cast<const D3D11HardwareVertexBuffer*>(i->second.get());
+            const D3D11HardwareBuffer* d3d11buf = i->second->_getImpl<D3D11HardwareBuffer>();
 
-            UINT stride = static_cast<UINT>(d3d11buf->getVertexSize());
+            UINT stride = static_cast<UINT>(i->second->getVertexSize());
             UINT offset = 0; // no stream offset, this is handled in _render instead
             UINT slot = static_cast<UINT>(i->first);
-            ID3D11Buffer * pVertexBuffers = d3d11buf->getD3DVertexBuffer();
+            ID3D11Buffer * pVertexBuffers = d3d11buf->getD3DBuffer();
             mDevice.GetImmediateContext()->IASetVertexBuffers(
                 slot, // The first input slot for binding.
                 1, // The number of vertex buffers in the array.
@@ -2413,9 +2411,8 @@ namespace Ogre
             //HRESULT hr;
             if( op.useIndexes  )
             {
-                D3D11HardwareIndexBuffer* d3dIdxBuf = 
-                    static_cast<D3D11HardwareIndexBuffer*>(op.indexData->indexBuffer.get());
-                mDevice.GetImmediateContext()->IASetIndexBuffer( d3dIdxBuf->getD3DIndexBuffer(), D3D11Mappings::getFormat(d3dIdxBuf->getType()), 0 );
+                auto d3dBuf = op.indexData->indexBuffer->_getImpl<D3D11HardwareBuffer>();
+                mDevice.GetImmediateContext()->IASetIndexBuffer( d3dBuf->getD3DBuffer(), D3D11Mappings::getFormat(op.indexData->indexBuffer->getType()), 0 );
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();

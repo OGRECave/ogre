@@ -85,7 +85,7 @@ namespace Ogre {
         OGRE_CHECK_DX_ERROR(device->CreateBuffer(&mDesc, NULL, mlpD3DBuffer.ReleaseAndGetAddressOf()));
 
         // Create shadow buffer
-        if (mUseShadowBuffer)
+        if (useShadowBuffer)
         {
             mShadowBuffer.reset(new D3D11HardwareBuffer(mBufferType,
                     mSizeInBytes, HBU_CPU_ONLY, mDevice, false, false));
@@ -143,6 +143,7 @@ namespace Ogre {
         }
         else
         {
+            mIsLocked = false; // locking staging buffer instead
             mUseTempStagingBuffer = true;
             OgreAssertDbg(!mShadowBuffer,
                           "we should never arrive here, when already having a shadow buffer");
@@ -163,40 +164,23 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void D3D11HardwareBuffer::unlockImpl(void)
     {
+        OgreAssertDbg(!mUseTempStagingBuffer, "should be handled by _updateFromShadow");
 
-        if (mUseTempStagingBuffer)
-        {
-            mUseTempStagingBuffer = false;
-
-            // ok, we locked the staging buffer
-            mShadowBuffer->unlock();
-
-            // copy data if needed
-            // this is async but driver should keep reference
-            if (mShadowUpdated)
-                copyDataImpl(*mShadowBuffer, mLockStart, mLockStart, mLockSize, true);
-
-            // delete
-            mShadowBuffer.reset();
-        }
-        else
-        {
-            // unmap
-            mDevice.GetImmediateContext()->Unmap(mlpD3DBuffer.Get(), 0);
-        }
+        // unmap
+        mDevice.GetImmediateContext()->Unmap(mlpD3DBuffer.Get(), 0);
     }
     //---------------------------------------------------------------------
     void D3D11HardwareBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
         size_t dstOffset, size_t length, bool discardWholeBuffer)
     {
-		if (mUseShadowBuffer)
+		if (mShadowBuffer)
 		{
-			static_cast<D3D11HardwareBuffer*>(mShadowBuffer.get())->copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+			mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
 		}
 		copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
 	}
 	//---------------------------------------------------------------------
-	void D3D11HardwareBuffer::copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset, 
+	void D3D11HardwareBuffer::copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset,
 		size_t dstOffset, size_t length, bool discardWholeBuffer)
 	{
         // If we're copying same-size buffers in their entirety...
@@ -238,11 +222,18 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void D3D11HardwareBuffer::_updateFromShadow(void)
 	{
-		if(mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
+		if(mShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
 		{
 			bool discardWholeBuffer = mLockStart == 0 && mLockSize == mSizeInBytes;
 			copyDataImpl(*mShadowBuffer, mLockStart, mLockStart, mLockSize, discardWholeBuffer);
 			mShadowUpdated = false;
+        }
+
+        if (mUseTempStagingBuffer)
+        {
+            // delete
+            mShadowBuffer.reset();
+            mUseTempStagingBuffer = false;
         }
     }
     //---------------------------------------------------------------------

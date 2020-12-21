@@ -81,8 +81,6 @@ namespace Ogre
 
     // forward compatibility defines
     class MetalHardwareBufferCommon;
-    class MetalHardwareIndexBuffer;
-    class MetalHardwareVertexBuffer;
     struct BufferPacked;
 
     typedef MetalStagingBuffer StagingBuffer;

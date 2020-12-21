@@ -41,11 +41,10 @@ namespace Ogre
     ///		Puts WRITE_ONLY in device memory and uses staging buffers to avoid blocking.
     ///			Use WRITE_ONLY when possible.
     ///		When DISCARDABLE bit is set, it uses MetalDiscardBuffer.
-    class _OgreMetalExport MetalHardwareBufferCommon
+    class _OgreMetalExport MetalHardwareBufferCommon : public HardwareBuffer
     {
     private:
         id<MTLBuffer>       mBuffer;
-        size_t              mSizeBytes;
         MetalDevice         *mDevice;
         MetalDiscardBuffer  *mDiscardBuffer;
         StagingBuffer       *mStagingBuffer;
@@ -54,9 +53,8 @@ namespace Ogre
 
         StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload );
     public:
-        MetalHardwareBufferCommon( size_t sizeBytes, HardwareBuffer::Usage usage, uint16 alignment,
-                                   MetalDiscardBufferManager *discardBufferManager,
-                                   MetalDevice *device );
+        MetalHardwareBufferCommon(size_t sizeBytes, Usage usage, bool useShadowBuffer, uint16 alignment,
+                                  MetalDiscardBufferManager* discardBufferManager, MetalDevice* device);
         virtual ~MetalHardwareBufferCommon();
 
         void _notifyDeviceStalled(void);
@@ -72,23 +70,20 @@ namespace Ogre
         id<MTLBuffer> getBufferName( size_t &outOffset );
         id<MTLBuffer> getBufferNameForGpuWrite(void);
 
-        /// @see HardwareBuffer.
-        void* lockImpl( size_t offset, size_t length,
-                        HardwareBuffer::LockOptions options, bool isLocked );
-        /// @see HardwareBuffer.
-        void unlockImpl( size_t lockStart, size_t lockSize );
+        void* lockImpl(size_t offset, size_t length, LockOptions options) override;
+        void unlockImpl() override;
 
-        /// @see HardwareBuffer.
-        void readData( size_t offset, size_t length, void* pDest );
+        void readData( size_t offset, size_t length, void* pDest ) override;
 
-        /// @see HardwareBuffer.
         void writeData( size_t offset, size_t length,
-                        const void* pSource, bool discardWholeBuffer = false );
-        /// @see HardwareBuffer.
-        void copyData( MetalHardwareBufferCommon *srcBuffer, size_t srcOffset,
-                       size_t dstOffset, size_t length, bool discardWholeBuffer = false );
+                        const void* pSource, bool discardWholeBuffer = false ) override;
 
-        size_t getSizeBytes(void) const         { return mSizeBytes; }
+        void writeDataImpl(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer);
+
+        void copyData( HardwareBuffer& srcBuffer, size_t srcOffset,
+                       size_t dstOffset, size_t length, bool discardWholeBuffer = false ) override;
+
+        void _updateFromShadow(void) override;
     };
 }
 

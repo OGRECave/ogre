@@ -30,26 +30,29 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRoot.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusStateCacheManager.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre {
 
-    GL3PlusHardwareBuffer::GL3PlusHardwareBuffer(GLenum target, size_t sizeInBytes, GLenum usage)
-    : mTarget(target), mSizeInBytes(sizeInBytes), mUsage(usage)
+    GL3PlusHardwareBuffer::GL3PlusHardwareBuffer(GLenum target, size_t sizeInBytes, uint32 usage, bool useShadowBuffer)
+    : HardwareBuffer(usage, false, useShadowBuffer), mTarget(target)
     {
+        mSizeInBytes = sizeInBytes;
         mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
 
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
         if (!mBufferId)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Cannot create GL vertex buffer",
-                        "GL3PlusHardwareBuffer::GL3PlusHardwareBuffer");
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Cannot create GL buffer");
         }
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
         OGRE_CHECK_GL_ERROR(glBufferData(mTarget, mSizeInBytes, NULL, getGLUsage(mUsage)));
 
-        //        std::cerr << "creating buffer = " << mBufferId << std::endl;
+        if (useShadowBuffer)
+        {
+            mShadowBuffer.reset(new DefaultHardwareBuffer(mSizeInBytes));
+        }
     }
 
     GL3PlusHardwareBuffer::~GL3PlusHardwareBuffer()
@@ -58,8 +61,7 @@ namespace Ogre {
             stateCacheManager->deleteGLBuffer(mTarget,mBufferId);
     }
 
-    void* GL3PlusHardwareBuffer::lockImpl(size_t offset, size_t length,
-                                          HardwareBuffer::LockOptions options)
+    void* GL3PlusHardwareBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
     {
         GLenum access = 0;
 
@@ -120,6 +122,12 @@ namespace Ogre {
 
     void GL3PlusHardwareBuffer::readData(size_t offset, size_t length, void* pDest)
     {
+        if (mShadowBuffer)
+        {
+            mShadowBuffer->readData(offset, length, pDest);
+            return;
+        }
+
         // get data from the real buffer
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
@@ -129,6 +137,17 @@ namespace Ogre {
     void GL3PlusHardwareBuffer::writeData(size_t offset, size_t length, const void* pSource,
                                           bool discardWholeBuffer)
     {
+        if (mShadowBuffer)
+        {
+            mShadowBuffer->writeData(offset, length, pSource, discardWholeBuffer);
+        }
+
+        writeDataImpl(offset, length, pSource, discardWholeBuffer);
+    }
+
+    void GL3PlusHardwareBuffer::writeDataImpl(size_t offset, size_t length, const void* pSource,
+                                              bool discardWholeBuffer)
+    {
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
         if (offset == 0 && length == mSizeInBytes)
@@ -137,7 +156,7 @@ namespace Ogre {
         }
         else
         {
-            if(discardWholeBuffer)
+            if (discardWholeBuffer)
             {
                 OGRE_CHECK_GL_ERROR(glBufferData(mTarget, mSizeInBytes, NULL, getGLUsage(mUsage)));
             }
@@ -146,15 +165,32 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusHardwareBuffer::copyData(GLuint srcBufferId, size_t srcOffset, size_t dstOffset,
+    void GL3PlusHardwareBuffer::_updateFromShadow(void)
+    {
+        if (mShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
+        {
+            HardwareBufferLockGuard shadowLock(mShadowBuffer.get(), mLockStart, mLockSize, HBL_READ_ONLY);
+            writeDataImpl(mLockStart, mLockSize, shadowLock.pData, false);
+
+            mShadowUpdated = false;
+        }
+    }
+
+    void GL3PlusHardwareBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, size_t dstOffset,
                                          size_t length, bool discardWholeBuffer)
     {
+        if (mShadowBuffer)
+        {
+            mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+        }
+
         // Zero out this(destination) buffer
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
         OGRE_CHECK_GL_ERROR(glBufferData(mTarget, length, 0, getGLUsage(mUsage)));
 
         // Do it the fast way.
-        mRenderSystem->_getStateCacheManager()->bindGLBuffer(GL_COPY_READ_BUFFER, srcBufferId);
+        mRenderSystem->_getStateCacheManager()->bindGLBuffer(
+            GL_COPY_READ_BUFFER, static_cast<GL3PlusHardwareBuffer&>(srcBuffer).getGLBufferId());
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(GL_COPY_WRITE_BUFFER, mBufferId);
 
         OGRE_CHECK_GL_ERROR(glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, srcOffset, dstOffset, length));
@@ -167,5 +203,13 @@ namespace Ogre {
     {
         return (usage == HBU_GPU_TO_CPU) ? GL_STATIC_READ
                                          : (usage == HBU_GPU_ONLY) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
+    }
+
+    void GL3PlusHardwareBuffer::setGLBufferBinding(GLint binding)
+    {
+        mBindingPoint = binding;
+
+        // Attach the buffer to the binding index.
+        OGRE_CHECK_GL_ERROR(glBindBufferBase(mTarget, mBindingPoint, mBufferId));
     }
 }

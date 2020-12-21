@@ -397,7 +397,7 @@ namespace Ogre
         }
 
         assert( !mUploadOnly );
-        assert( (srcOffset + srcLength) <= source->getSizeBytes() );
+        assert( (srcOffset + srcLength) <= source->getSizeInBytes() );
 
         size_t extraOffset = 0;
         if( srcOffset & 0x03 )

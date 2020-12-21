@@ -593,11 +593,11 @@ namespace Ogre {
                     hwGlBuffer = hbm.createShaderStorageBuffer(values[2]);
                 }
 
-                static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->setGLBufferBinding(int(binding));
+                hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->setGLBufferBinding(int(binding));
                 blockSharedParams->_setHardwareBuffer(hwGlBuffer);
             }
 
-            int binding = static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->getGLBufferBinding();
+            int binding = hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->getGLBufferBinding();
 
             if(type == GL_UNIFORM_BLOCK)
             {

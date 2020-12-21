@@ -46,12 +46,18 @@ namespace Ogre {
         mSizeInBytes = mVertexSize * numVertices;
 
         // Create a shadow buffer if required
-        if (mUseShadowBuffer)
+        if (useShadowBuffer)
         {
-            mShadowBuffer.reset(new DefaultHardwareVertexBuffer(mMgr, mVertexSize,
-                    mNumVertices, HardwareBuffer::HBU_DYNAMIC));
+            mShadowBuffer.reset(new DefaultHardwareBuffer(mSizeInBytes));
         }
 
+    }
+    HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,
+                                               size_t numVertices, HardwareBuffer* delegate)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, delegate->getUsage(), delegate->isSystemMemory(),
+                               false)
+    {
+        mDelegate.reset(delegate);
     }
     //-----------------------------------------------------------------------------
     HardwareVertexBuffer::~HardwareVertexBuffer()

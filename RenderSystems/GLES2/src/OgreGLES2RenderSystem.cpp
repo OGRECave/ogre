@@ -31,8 +31,7 @@ THE SOFTWARE.
 #include "OgreGLES2DepthBuffer.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2HardwareBufferManager.h"
-#include "OgreGLES2HardwareIndexBuffer.h"
-#include "OgreGLES2HardwareVertexBuffer.h"
+#include "OgreGLES2HardwareBuffer.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGLUtil.h"
 #include "OgreGLES2FBORenderTexture.h"
@@ -1306,7 +1305,7 @@ namespace Ogre {
         // as one shared vertex buffer could be rendered with several index buffers, from submeshes and/or LODs
         if (op.useIndexes)
             mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
+                op.indexData->indexBuffer->_getImpl<GLES2HardwareBuffer>()->getGLBufferId());
 
 
         if (getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA)
@@ -1911,7 +1910,7 @@ namespace Ogre {
         VertexElementSemantic sem = elem.getSemantic();
         unsigned short elemIndex = elem.getIndex();
 
-        const GLES2HardwareVertexBuffer* hwGlBuffer = static_cast<const GLES2HardwareVertexBuffer*>(vertexBuffer.get());
+        const GLES2HardwareBuffer* hwGlBuffer = vertexBuffer->_getImpl<GLES2HardwareBuffer>();
 
         mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER, hwGlBuffer->getGLBufferId());
         void* pBufferData = VBO_BUFFER_OFFSET(elem.getOffset() + vertexStart * vertexBuffer->getVertexSize());
@@ -1926,9 +1925,9 @@ namespace Ogre {
         {
             if (mCurrentVertexProgram)
             {
-                if (hwGlBuffer->isInstanceData())
+                if (vertexBuffer->isInstanceData())
                 {
-                    OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(hwGlBuffer->getInstanceDataStepRate())));
+                    OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(vertexBuffer->getInstanceDataStepRate())));
                     mRenderInstanceAttribsBound.push_back(attrib);
                 }
             }

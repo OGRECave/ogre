@@ -33,7 +33,6 @@
 #include "OgreGpuProgramManager.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLUniformCache.h"
-#include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreGLUtil.h"
 #include "OgreRoot.h"

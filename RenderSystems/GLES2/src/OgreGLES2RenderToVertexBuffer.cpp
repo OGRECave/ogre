@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreGLES2RenderToVertexBuffer.h"
 
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLES2HardwareVertexBuffer.h"
+#include "OgreGLES2HardwareBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
@@ -133,7 +133,7 @@ namespace Ogre {
             reallocateBuffer(targetBufferIndex);
         }
 
-        GLES2HardwareVertexBuffer* vertexBuffer = static_cast<GLES2HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
+        auto vertexBuffer = mVertexBuffers[targetBufferIndex]->_getImpl<GLES2HardwareBuffer>();
 /*        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             GLSLESProgramPipeline* programPipeline =
