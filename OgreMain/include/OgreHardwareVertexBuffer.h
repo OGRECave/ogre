@@ -60,7 +60,9 @@ namespace Ogre {
         public:
             /// Should be called by HardwareBufferManager
             HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
-                HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer);
+                                 Usage usage, bool useSystemMemory, bool useShadowBuffer);
+            HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
+                                 HardwareBuffer* delegate);
             ~HardwareVertexBuffer();
             /// Return the manager of this buffer, if any
             HardwareBufferManagerBase* getManager() const { return mMgr; }

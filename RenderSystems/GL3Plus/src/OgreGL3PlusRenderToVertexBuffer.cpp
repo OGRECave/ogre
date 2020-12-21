@@ -28,7 +28,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreGL3PlusRenderToVertexBuffer.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
@@ -212,7 +211,7 @@ namespace Ogre {
         //TODO add tessellation stages
 
         // Bind source vertex array + target tranform feedback buffer.
-        GL3PlusHardwareVertexBuffer* targetVertexBuffer = static_cast<GL3PlusHardwareVertexBuffer*>(mVertexBuffers[mTargetBufferIndex].get());
+        const GL3PlusHardwareBuffer* targetVertexBuffer = mVertexBuffers[mTargetBufferIndex]->_getImpl<GL3PlusHardwareBuffer>();
         // OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, VertexBuffer[mTargetBufferIndex]));
         OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, targetVertexBuffer->getGLBufferId()));
         // OGRE_CHECK_GL_ERROR(glBindVertexArray(VertexArray[mSourceBufferIndex]));

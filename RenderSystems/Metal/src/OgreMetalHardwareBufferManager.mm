@@ -27,8 +27,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreMetalHardwareBufferManager.h"
-#include "OgreMetalHardwareIndexBuffer.h"
-#include "OgreMetalHardwareVertexBuffer.h"
+#include "OgreMetalHardwareBufferCommon.h"
 #include "OgreMetalDiscardBufferManager.h"
 
 namespace Ogre {
@@ -56,7 +55,7 @@ namespace Ogre {
 
             while( itor != end )
             {
-                MetalHardwareVertexBuffer *hwBuffer = static_cast<MetalHardwareVertexBuffer*>( *itor );
+                auto hwBuffer = (*itor)->_getImpl<MetalHardwareBufferCommon>();
                 hwBuffer->_notifyDeviceStalled();
                 ++itor;
             }
@@ -68,7 +67,7 @@ namespace Ogre {
 
             while( itor != end )
             {
-                MetalHardwareIndexBuffer *hwBuffer = static_cast<MetalHardwareIndexBuffer*>( *itor );
+                auto hwBuffer = (*itor)->_getImpl<MetalHardwareBufferCommon>();
                 hwBuffer->_notifyDeviceStalled();
                 ++itor;
             }
@@ -82,13 +81,14 @@ namespace Ogre {
                                                         HardwareBuffer::Usage usage,
                                                         bool useShadowBuffer )
     {
-        MetalHardwareVertexBuffer* buf =
-            OGRE_NEW MetalHardwareVertexBuffer( this, vertexSize, numVerts, usage, useShadowBuffer );
+        auto impl = new MetalHardwareBufferCommon(vertexSize * numVerts, usage, useShadowBuffer, 4, mDiscardBufferManager,
+                                                  mDiscardBufferManager->getDevice());
+        auto buf = std::make_shared<HardwareVertexBuffer>(this, vertexSize, numVerts, impl);
         {
             OGRE_LOCK_MUTEX(mVertexBuffersMutex);
-            mVertexBuffers.insert(buf);
+            mVertexBuffers.insert(buf.get());
         }
-        return HardwareVertexBufferSharedPtr(buf);
+        return buf;
     }
     //-----------------------------------------------------------------------------------
     HardwareIndexBufferSharedPtr
@@ -97,12 +97,15 @@ namespace Ogre {
                                                        HardwareBuffer::Usage usage,
                                                        bool useShadowBuffer )
     {
-        MetalHardwareIndexBuffer* buf =
-            OGRE_NEW MetalHardwareIndexBuffer( this, itype, numIndexes, usage, useShadowBuffer );
+        auto indexSize = HardwareIndexBuffer::indexSize(itype);
+        auto impl = new MetalHardwareBufferCommon(indexSize * numIndexes, usage, useShadowBuffer, 4, mDiscardBufferManager,
+                                                  mDiscardBufferManager->getDevice());
+
+        auto buf = std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
         {
             OGRE_LOCK_MUTEX(mIndexBuffersMutex);
-            mIndexBuffers.insert(buf);
+            mIndexBuffers.insert(buf.get());
         }
-        return HardwareIndexBufferSharedPtr(buf);
+        return buf;
     }
 }

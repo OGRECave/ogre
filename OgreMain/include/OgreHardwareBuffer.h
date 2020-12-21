@@ -172,32 +172,34 @@ namespace Ogre {
             bool mIsLocked;
             size_t mLockStart;
             size_t mLockSize;
+            std::unique_ptr<HardwareBuffer> mDelegate;
             std::unique_ptr<HardwareBuffer> mShadowBuffer;
             bool mSystemMemory;
-            bool mUseShadowBuffer;
             bool mShadowUpdated;
             bool mSuppressHardwareUpdate;
             
             /// Internal implementation of lock()
-            virtual void* lockImpl(size_t offset, size_t length, LockOptions options) = 0;
+            virtual void* lockImpl(size_t offset, size_t length, LockOptions options)
+            {
+                return mDelegate->lock(offset, length, options);
+            }
             /// Internal implementation of unlock()
-            virtual void unlockImpl(void) = 0;
+            virtual void unlockImpl(void) { mDelegate->unlock(); }
 
-    public:
+        public:
             /// Constructor, to be called by HardwareBufferManager only
-            HardwareBuffer(Usage usage, bool systemMemory, bool useShadowBuffer) 
-                : mSizeInBytes(0), mUsage(usage), mIsLocked(false), mLockStart(0), mLockSize(0), mSystemMemory(systemMemory),
-                mUseShadowBuffer(useShadowBuffer), mShadowUpdated(false),
-                mSuppressHardwareUpdate(false) 
+            HardwareBuffer(Usage usage, bool systemMemory, bool useShadowBuffer)
+                : mSizeInBytes(0), mUsage(usage), mIsLocked(false), mLockStart(0), mLockSize(0),
+                  mSystemMemory(systemMemory), mShadowUpdated(false), mSuppressHardwareUpdate(false)
             {
                 // If use shadow buffer, upgrade to WRITE_ONLY on hardware side
-                if (useShadowBuffer && usage == HBU_DYNAMIC)
+                if (useShadowBuffer && usage == HBU_CPU_ONLY)
                 {
-                    mUsage = HBU_DYNAMIC_WRITE_ONLY;
+                    mUsage = HBU_CPU_TO_GPU;
                 }
-                else if (useShadowBuffer && usage == HBU_STATIC)
+                else if (useShadowBuffer && usage == HBU_GPU_TO_CPU)
                 {
-                    mUsage = HBU_STATIC_WRITE_ONLY;
+                    mUsage = HBU_GPU_ONLY;
                 }
             }
             virtual ~HardwareBuffer() {}
@@ -213,22 +215,19 @@ namespace Ogre {
                 OgreAssert((length + offset) <= mSizeInBytes, "Lock request out of bounds");
 
                 void* ret = NULL;
-                if (mUseShadowBuffer)
+                if (mShadowBuffer)
                 {
-                    if (options != HBL_READ_ONLY)
-                    {
-                        // we have to assume a read / write lock so we use the shadow buffer
-                        // and tag for sync on unlock()
-                        mShadowUpdated = true;
-                    }
+                    // we have to assume a read / write lock so we use the shadow buffer
+                    // and tag for sync on unlock()
+                    mShadowUpdated = (options != HBL_READ_ONLY);
 
                     ret = mShadowBuffer->lock(offset, length, options);
                 }
                 else
                 {
+                    mIsLocked = true;
                     // Lock the real buffer if there is no shadow buffer 
                     ret = lockImpl(offset, length, options);
-                    mIsLocked = true;
                 }
                 mLockStart = offset;
                 mLockSize = length;
@@ -252,12 +251,12 @@ namespace Ogre {
                 suffer from this problem, so if you want to be 100% sure your
                 data will not be lost, use the 'read' and 'write' forms instead.
             */
-            virtual void unlock(void)
+            void unlock(void)
             {
                 OgreAssert(isLocked(), "Cannot unlock this buffer: it is not locked");
 
                 // If we used the shadow buffer this time...
-                if (mUseShadowBuffer && mShadowBuffer->isLocked())
+                if (mShadowBuffer && mShadowBuffer->isLocked())
                 {
                     mShadowBuffer->unlock();
                     // Potentially update the 'real' buffer from the shadow buffer
@@ -278,7 +277,16 @@ namespace Ogre {
             @param pDest The area of memory in which to place the data, must be large enough to 
                 accommodate the data!
             */
-            virtual void readData(size_t offset, size_t length, void* pDest) = 0;
+            virtual void readData(size_t offset, size_t length, void* pDest)
+            {
+                if (mShadowBuffer)
+                {
+                    mShadowBuffer->readData(offset, length, pDest);
+                    return;
+                }
+
+                mDelegate->readData(offset, length, pDest);
+            }
             /** Writes data to the buffer from an area of system memory; note that you must
                 ensure that your buffer is big enough.
             @param offset The byte offset from the start of the buffer to start writing
@@ -288,7 +296,16 @@ namespace Ogre {
                 such that DMA stalls can be avoided; use if you can.
             */
             virtual void writeData(size_t offset, size_t length, const void* pSource,
-                    bool discardWholeBuffer = false) = 0;
+                                   bool discardWholeBuffer = false)
+            {
+                // Update the shadow buffer
+                if (mShadowBuffer)
+                {
+                    mShadowBuffer->writeData(offset, length, pSource, discardWholeBuffer);
+                }
+
+                mDelegate->writeData(offset, length, pSource, discardWholeBuffer);
+            }
 
             /** Copy data from another buffer into this one.
             @remarks
@@ -303,8 +320,13 @@ namespace Ogre {
             virtual void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
                 size_t dstOffset, size_t length, bool discardWholeBuffer = false)
             {
-                const void *srcData = srcBuffer.lock(
-                    srcOffset, length, HBL_READ_ONLY);
+                if(mDelegate && !srcBuffer.isSystemMemory())
+                {
+                    // GPU copy
+                    mDelegate->copyData(*srcBuffer.mDelegate, srcOffset, dstOffset, length, discardWholeBuffer);
+                    return;
+                }
+                const void* srcData = srcBuffer.lock(srcOffset, length, HBL_READ_ONLY);
                 this->writeData(dstOffset, length, srcData, discardWholeBuffer);
                 srcBuffer.unlock();
             }
@@ -314,7 +336,7 @@ namespace Ogre {
                 Normally these buffers should be of identical size, but if they're
                 not, the routine will use the smallest of the two sizes.
             */
-            virtual void copyData(HardwareBuffer& srcBuffer)
+            void copyData(HardwareBuffer& srcBuffer)
             {
                 size_t sz = std::min(getSizeInBytes(), srcBuffer.getSizeInBytes()); 
                 copyData(srcBuffer, 0, 0, sz, true);
@@ -323,20 +345,14 @@ namespace Ogre {
             /// Updates the real buffer from the shadow buffer, if required
             virtual void _updateFromShadow(void)
             {
-                if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
+                if (mShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
                 {
                     // Do this manually to avoid locking problems
-                    const void *srcData = mShadowBuffer->lockImpl(
-                        mLockStart, mLockSize, HBL_READ_ONLY);
+                    const void* srcData = mShadowBuffer->lockImpl(mLockStart, mLockSize, HBL_READ_ONLY);
                     // Lock with discard if the whole buffer was locked, otherwise w/o
-                    LockOptions lockOpt;
-                    if (mLockStart == 0 && mLockSize == mSizeInBytes)
-                        lockOpt = HBL_DISCARD;
-                    else
-                        lockOpt = HBL_WRITE_ONLY;
-                    
-                    void *destData = this->lockImpl(
-                        mLockStart, mLockSize, lockOpt);
+                    bool discardWholeBuffer = mLockStart == 0 && mLockSize == mSizeInBytes;
+                    LockOptions lockOpt = discardWholeBuffer ? HBL_DISCARD : HBL_WRITE_ONLY;
+                    void* destData = this->lockImpl(mLockStart, mLockSize, lockOpt);
                     // Copy shadow to real
                     memcpy(destData, srcData, mLockSize);
                     this->unlockImpl();
@@ -352,22 +368,25 @@ namespace Ogre {
             /// Returns whether this buffer is held in system memory
             bool isSystemMemory(void) const { return mSystemMemory; }
             /// Returns whether this buffer has a system memory shadow for quicker reading
-            bool hasShadowBuffer(void) const { return mUseShadowBuffer; }
+            bool hasShadowBuffer(void) const { return mShadowBuffer || (mDelegate && mDelegate->hasShadowBuffer()); }
             /// Returns whether or not this buffer is currently locked.
             bool isLocked(void) const { 
-                return mIsLocked || (mUseShadowBuffer && mShadowBuffer->isLocked()); 
+                return mIsLocked || (mShadowBuffer && mShadowBuffer->isLocked());
             }
             /// Pass true to suppress hardware upload of shadow buffer changes
             void suppressHardwareUpdate(bool suppress) {
                 mSuppressHardwareUpdate = suppress;
                 if (!suppress)
                     _updateFromShadow();
+
+                if(mDelegate)
+                    mDelegate->suppressHardwareUpdate(suppress);
             }
 
-
-
-
-            
+            template <typename T> T* _getImpl()
+            {
+                return static_cast<T*>(mDelegate.get());
+            }
     };
 
     /** Locking helper. Guaranteed unlocking even in case of exception. */

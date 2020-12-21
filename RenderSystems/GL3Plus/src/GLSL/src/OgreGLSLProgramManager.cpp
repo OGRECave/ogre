@@ -323,14 +323,13 @@ namespace Ogre {
 
                 auto binding = hbm.getUniformBufferCount();
                 hwGlBuffer = hbm.createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
-                static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->setGLBufferBinding(int(binding));
+                hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->setGLBufferBinding(int(binding));
 
                 blockSharedParams->_setHardwareBuffer(hwGlBuffer);
             }
 
             OGRE_CHECK_GL_ERROR(glUniformBlockBinding(
-                programObject, index,
-                static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->getGLBufferBinding()));
+                programObject, index, hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->getGLBufferBinding()));
         }
 
         // Now deal with shader storage blocks
@@ -362,14 +361,14 @@ namespace Ogre {
 
                     auto binding = hbm.getShaderStorageBufferCount();
                     hwGlBuffer = hbm.createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
-                    static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->setGLBufferBinding(binding);
+                    hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->setGLBufferBinding(binding);
 
                     blockSharedParams->_setHardwareBuffer(hwGlBuffer);
                 }
 
                 OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(
                     programObject, index,
-                    static_cast<GL3PlusHardwareUniformBuffer*>(hwGlBuffer.get())->getGLBufferBinding()));
+                    hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->getGLBufferBinding()));
             }
         }
 
@@ -394,7 +393,7 @@ namespace Ogre {
                 //TODO check parameters of this GL call
                 HardwareCounterBufferSharedPtr newCounterBuffer = HardwareBufferManager::getSingleton().createCounterBuffer(bufferSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
 
-                GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newCounterBuffer.get());
+                auto hwGlBuffer = newCounterBuffer->_getImpl<GL3PlusHardwareBuffer>();
                 hwGlBuffer->setGLBufferBinding(bufferBinding);
                 counterBufferList.push_back(newCounterBuffer);
             }

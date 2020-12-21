@@ -65,14 +65,6 @@ namespace Ogre {
     void* GLHardwareIndexBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
     {
-        if(mIsLocked)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                "Invalid attempt to lock an index buffer that has already been locked",
-                    "GLHardwareIndexBuffer::lock");
-        }
-
-        
         void* retPtr = 0;
 
         GLHardwareBufferManager* glBufManager = static_cast<GLHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
@@ -131,7 +123,6 @@ namespace Ogre {
             mLockedToScratch = false;
 
         }
-        mIsLocked = true;
         return retPtr;
     }
     //---------------------------------------------------------------------
@@ -164,14 +155,12 @@ namespace Ogre {
                     "GLHardwareIndexBuffer::unlock");
             }
         }
-
-        mIsLocked = false;
     }
     //---------------------------------------------------------------------
     void GLHardwareIndexBuffer::readData(size_t offset, size_t length, 
         void* pDest)
     {
-        if(mUseShadowBuffer)
+        if(mShadowBuffer)
         {
             mShadowBuffer->readData(offset, length, pDest);
         }
@@ -188,7 +177,7 @@ namespace Ogre {
         static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
 
         // Update the shadow buffer
-        if(mUseShadowBuffer)
+        if(mShadowBuffer)
         {
             mShadowBuffer->writeData(offset, length, pSource, discardWholeBuffer);
         }
@@ -213,7 +202,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLHardwareIndexBuffer::_updateFromShadow(void)
     {
-        if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
+        if (mShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
         {
             HardwareBufferLockGuard shadowLock(mShadowBuffer.get(), mLockStart, mLockSize, HBL_READ_ONLY);
 

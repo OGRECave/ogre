@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreD3D11HardwareBufferManager.h"
 #include "OgreD3D11RenderToVertexBuffer.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreD3D11HardwareVertexBuffer.h"
+#include "OgreD3D11HardwareBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
@@ -133,11 +133,11 @@ namespace Ogre {
         RenderSystem* targetRenderSystem = Root::getSingleton().getRenderSystem();
 
         //Draw the object
-        D3D11HardwareVertexBuffer* vertexBuffer = static_cast<D3D11HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
+        auto vertexBuffer = mVertexBuffers[targetBufferIndex]->_getImpl<D3D11HardwareBuffer>();
     
         UINT offset[1] = { 0 };
         ID3D11Buffer* iBuffer[1];
-        iBuffer[0] = vertexBuffer->getD3DVertexBuffer();
+        iBuffer[0] = vertexBuffer->getD3DBuffer();
         mDevice.GetImmediateContext()->SOSetTargets( 1, iBuffer, offset );
 
         if (r2vbPass->hasVertexProgram())

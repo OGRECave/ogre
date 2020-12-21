@@ -30,166 +30,38 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    DefaultHardwareVertexBuffer::DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
-                                                             HardwareBuffer::Usage usage)
-    : HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false) // always software, never shadowed
+    DefaultHardwareBuffer::DefaultHardwareBuffer(size_t sizeInBytes)
+    : HardwareBuffer(HBU_CPU_ONLY, true, false) // always software, never shadowed
     {
+        mSizeInBytes = sizeInBytes;
         // Allocate aligned memory for better SIMD processing friendly.
-        mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+        mData = (uchar*)AlignedMemory::allocate(mSizeInBytes);
     }
     //-----------------------------------------------------------------------
-    DefaultHardwareVertexBuffer::DefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
-        HardwareBuffer::Usage usage)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, true, false) // always software, never shadowed
+    DefaultHardwareBuffer::~DefaultHardwareBuffer()
     {
-        // Allocate aligned memory for better SIMD processing friendly.
-        mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+        AlignedMemory::deallocate(mData);
     }
     //-----------------------------------------------------------------------
-    DefaultHardwareVertexBuffer::~DefaultHardwareVertexBuffer()
-    {
-        OGRE_FREE_SIMD(mData, MEMCATEGORY_GEOMETRY);
-    }
-    //-----------------------------------------------------------------------
-    void* DefaultHardwareVertexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
+    void* DefaultHardwareBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
     {
         // Only for use internally, no 'locking' as such
         return mData + offset;
     }
     //-----------------------------------------------------------------------
-    void DefaultHardwareVertexBuffer::unlockImpl(void)
+    void DefaultHardwareBuffer::unlockImpl(void)
     {
         // Nothing to do
     }
     //-----------------------------------------------------------------------
-    void* DefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options)
-    {
-        mIsLocked = true;
-        return mData + offset;
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareVertexBuffer::unlock(void)
-    {
-        mIsLocked = false;
-        // Nothing to do
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareVertexBuffer::readData(size_t offset, size_t length, void* pDest)
+    void DefaultHardwareBuffer::readData(size_t offset, size_t length, void* pDest)
     {
         assert((offset + length) <= mSizeInBytes);
         memcpy(pDest, mData + offset, length);
     }
     //-----------------------------------------------------------------------
-    void DefaultHardwareVertexBuffer::writeData(size_t offset, size_t length, const void* pSource,
-            bool discardWholeBuffer)
-    {
-        assert((offset + length) <= mSizeInBytes);
-        // ignore discard, memory is not guaranteed to be zeroised
-        memcpy(mData + offset, pSource, length);
-
-    }
-    //-----------------------------------------------------------------------
-
-    DefaultHardwareIndexBuffer::DefaultHardwareIndexBuffer(IndexType idxType, 
-        size_t numIndexes, HardwareBuffer::Usage usage) 
-        : HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false) // always software, never shadowed
-    {
-        mData = OGRE_ALLOC_T(unsigned char, mSizeInBytes, MEMCATEGORY_GEOMETRY);
-    }
-    //-----------------------------------------------------------------------
-    DefaultHardwareIndexBuffer::~DefaultHardwareIndexBuffer()
-    {
-        OGRE_FREE(mData, MEMCATEGORY_GEOMETRY);
-    }
-    //-----------------------------------------------------------------------
-    void* DefaultHardwareIndexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
-    {
-        // Only for use internally, no 'locking' as such
-        return mData + offset;
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareIndexBuffer::unlockImpl(void)
-    {
-        // Nothing to do
-    }
-    //-----------------------------------------------------------------------
-    void* DefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options)
-    {
-        mIsLocked = true;
-        return mData + offset;
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareIndexBuffer::unlock(void)
-    {
-        mIsLocked = false;
-        // Nothing to do
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareIndexBuffer::readData(size_t offset, size_t length, void* pDest)
-    {
-        assert((offset + length) <= mSizeInBytes);
-        memcpy(pDest, mData + offset, length);
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareIndexBuffer::writeData(size_t offset, size_t length, const void* pSource,
-            bool discardWholeBuffer)
-    {
-        assert((offset + length) <= mSizeInBytes);
-        // ignore discard, memory is not guaranteed to be zeroised
-        memcpy(mData + offset, pSource, length);
-
-    }
-    //-----------------------------------------------------------------------
-    DefaultHardwareUniformBuffer::DefaultHardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-        : HardwareUniformBuffer(mgr, sizeBytes, usage, useShadowBuffer, name)
-    {
-        // Allocate aligned memory for better SIMD processing friendly.
-        mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
-    }
-    //-----------------------------------------------------------------------
-    DefaultHardwareUniformBuffer::~DefaultHardwareUniformBuffer()
-    {
-        OGRE_FREE_SIMD(mData, MEMCATEGORY_GEOMETRY);
-    }
-    //-----------------------------------------------------------------------
-    void* DefaultHardwareUniformBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
-    {
-        // Only for use internally, no 'locking' as such
-        return mData + offset;
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareUniformBuffer::unlockImpl(void)
-    {
-        // Nothing to do
-    }
-    /*
-    bool DefaultHardwareUniformBuffer::updateStructure(const Any& renderSystemInfo)
-    {
-        // Nothing to do
-        return true;
-    }
-    */
-    //-----------------------------------------------------------------------
-    void* DefaultHardwareUniformBuffer::lock(size_t offset, size_t length, LockOptions options)
-    {
-        mIsLocked = true;
-        return mData + offset;
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareUniformBuffer::unlock(void)
-    {
-        mIsLocked = false;
-        // Nothing to do
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareUniformBuffer::readData(size_t offset, size_t length, void* pDest)
-    {
-        assert((offset + length) <= mSizeInBytes);
-        memcpy(pDest, mData + offset, length);
-    }
-    //-----------------------------------------------------------------------
-    void DefaultHardwareUniformBuffer::writeData(size_t offset, size_t length, const void* pSource,
-            bool discardWholeBuffer)
+    void DefaultHardwareBuffer::writeData(size_t offset, size_t length, const void* pSource,
+                                          bool discardWholeBuffer)
     {
         assert((offset + length) <= mSizeInBytes);
         // ignore discard, memory is not guaranteed to be zeroised

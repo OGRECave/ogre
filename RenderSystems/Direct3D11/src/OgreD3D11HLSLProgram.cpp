@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreD3D11Mappings.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreD3D11HardwareUniformBuffer.h"
+#include "OgreD3D11HardwareBuffer.h"
 #include "OgreD3D11RenderSystem.h"
 #include "OgreStringConverter.h"
 
@@ -1844,7 +1844,7 @@ namespace Ogre {
                     }
                 }
 
-                return static_cast<D3D11HardwareUniformBuffer*>(it->mUniformBuffer.get())->getD3DConstantBuffer();
+                return it->mUniformBuffer->_getImpl<D3D11HardwareBuffer>()->getD3DBuffer();
             }
         }
 
@@ -1889,7 +1889,7 @@ namespace Ogre {
                 }
 
                 // Add buffer to list
-                buffers[numBuffers] = static_cast<D3D11HardwareUniformBuffer*>(it->mUniformBuffer.get())->getD3DConstantBuffer();
+                buffers[numBuffers] = it->mUniformBuffer->_getImpl<D3D11HardwareBuffer>()->getD3DBuffer();
                 // Increment number of buffers
                 numBuffers++;
             }

@@ -65,7 +65,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     const PixelBox& HardwarePixelBuffer::lock(const Box& lockBox, LockOptions options)
     {
-        if (mUseShadowBuffer)
+        if (mShadowBuffer)
         {
             if (options != HBL_READ_ONLY)
             {

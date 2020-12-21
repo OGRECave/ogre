@@ -32,35 +32,42 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 
 namespace Ogre {
-    class GL3PlusHardwareBuffer
+    class GL3PlusHardwareBuffer : public HardwareBuffer
     {
     private:
         GLenum mTarget;
-        size_t mSizeInBytes;
-        uint32 mUsage;
-
         GLuint mBufferId;
         GL3PlusRenderSystem* mRenderSystem;
 
+        // for UBO/ SSBO
+        GLint mBindingPoint;
+
         /// Utility function to get the correct GL usage based on HBU's
         static GLenum getGLUsage(uint32 usage);
-    public:
-        void* lockImpl(size_t offset, size_t length, HardwareBuffer::LockOptions options);
-        void unlockImpl();
 
-        GL3PlusHardwareBuffer(GLenum target, size_t sizeInBytes, uint32 usage);
+        void writeDataImpl(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer);
+    public:
+        void* lockImpl(size_t offset, size_t length, LockOptions options) override;
+        void unlockImpl() override;
+
+        GL3PlusHardwareBuffer(GLenum target, size_t sizeInBytes, uint32 usage, bool useShadowBuffer = false);
         ~GL3PlusHardwareBuffer();
 
-        void readData(size_t offset, size_t length, void* pDest);
+        void readData(size_t offset, size_t length, void* pDest) override;
 
-        void writeData(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer);
+        void writeData(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer) override;
 
-        void copyData(GLuint srcBufferId, size_t srcOffset, size_t dstOffset, size_t length,
-                      bool discardWholeBuffer);
+        void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, size_t dstOffset, size_t length,
+                      bool discardWholeBuffer) override;
+
+        void _updateFromShadow() override;
 
         GLuint getGLBufferId(void) const { return mBufferId; }
 
         GLenum getTarget() const { return mTarget; }
+
+        void setGLBufferBinding(GLint binding);
+        GLint getGLBufferBinding(void) const { return mBindingPoint; }
     };
 }
 #endif // __GL3PlusHARDWAREBUFFER_H__

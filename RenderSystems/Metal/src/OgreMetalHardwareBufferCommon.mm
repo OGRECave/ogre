@@ -30,24 +30,26 @@ THE SOFTWARE.
 #include "OgreMetalDevice.h"
 #include "OgreMetalDiscardBufferManager.h"
 #include "OgreMetalStagingBuffer.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 #import <Metal/MTLDevice.h>
 #import <Metal/MTLBlitCommandEncoder.h>
 
 namespace Ogre
 {
-    MetalHardwareBufferCommon::MetalHardwareBufferCommon( size_t sizeBytes, HardwareBuffer::Usage usage,
+    MetalHardwareBufferCommon::MetalHardwareBufferCommon( size_t sizeBytes, Usage usage, bool useShadowBuffer,
                                                           uint16 alignment,
                                                           MetalDiscardBufferManager *discardBufferMgr,
                                                           MetalDevice *device ) :
+        HardwareBuffer(usage, false, false),
         mBuffer( 0 ),
-        mSizeBytes( sizeBytes ),
         mDevice( device ),
         mDiscardBuffer( 0 ),
         mStagingBuffer( 0 ),
         mLastFrameUsed( 0 ),
         mLastFrameGpuWrote( 0 )
     {
+        mSizeInBytes = sizeBytes;
         // FIXME read write hazards not handled due to the following commented out
         mLastFrameUsed = 0;//mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
         mLastFrameGpuWrote = mLastFrameUsed;
@@ -73,6 +75,11 @@ namespace Ogre
         else
         {
             mDiscardBuffer = discardBufferMgr->createDiscardBuffer( sizeBytes, alignment );
+        }
+
+        if (useShadowBuffer)
+        {
+            mShadowBuffer.reset(new DefaultHardwareBuffer(mSizeInBytes));
         }
     }
     //-----------------------------------------------------------------------------------
@@ -133,17 +140,8 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------------------
-    void* MetalHardwareBufferCommon::lockImpl( size_t offset, size_t length,
-                                               HardwareBuffer::LockOptions options,
-                                               bool isLocked )
+    void* MetalHardwareBufferCommon::lockImpl( size_t offset, size_t length, LockOptions options)
     {
-        if( isLocked )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                         "Invalid attempt to lock a buffer that has already been locked",
-                         "MetalHardwareBufferCommon::lock" );
-        }
-
         void *retPtr = 0;
 
         const uint32 currentFrame       = 2;//mVaoManager->getFrameCount();
@@ -219,21 +217,27 @@ namespace Ogre
         return retPtr;
     }
     //-----------------------------------------------------------------------------------
-    void MetalHardwareBufferCommon::unlockImpl( size_t lockStart, size_t lockSize )
+    void MetalHardwareBufferCommon::unlockImpl()
     {
         if( mDiscardBuffer )
             mDiscardBuffer->unmap();
 
         if( mStagingBuffer )
         {
-            mStagingBuffer->_unmapToV1( this, lockStart, lockSize );
+            mStagingBuffer->_unmapToV1( this, mLockStart, mLockSize );
             mStagingBuffer = 0;
         }
     }
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::readData( size_t offset, size_t length, void* pDest )
     {
-        assert( (offset + length) <= mSizeBytes );
+        assert( (offset + length) <= mSizeInBytes );
+
+        if (mShadowBuffer)
+        {
+            mShadowBuffer->readData(offset, length, pDest);
+            return;
+        }
 
         void const *srcData = 0;
         StagingBuffer *stagingBuffer = 0;
@@ -270,19 +274,27 @@ namespace Ogre
         memcpy( pDest, srcData, length );
     }
     //-----------------------------------------------------------------------------------
-    void MetalHardwareBufferCommon::writeData( size_t offset, size_t length,
-                                               const void* pSource,
-                                               bool discardWholeBuffer )
+    void MetalHardwareBufferCommon::writeData(size_t offset, size_t length, const void* pSource,
+                                              bool discardWholeBuffer)
     {
-        discardWholeBuffer = discardWholeBuffer || (offset == 0 && length == mSizeBytes);
+        discardWholeBuffer = discardWholeBuffer || (offset == 0 && length == mSizeInBytes);
+        if (mShadowBuffer)
+        {
+            mShadowBuffer->writeData(offset, length, pSource, discardWholeBuffer);
+        }
 
+        writeDataImpl(offset, length, pSource, discardWholeBuffer);
+    }
+    void MetalHardwareBufferCommon::writeDataImpl(size_t offset, size_t length, const void* pSource,
+                                                  bool discardWholeBuffer)
+    {
         // FIXME
         if(true ||  (discardWholeBuffer && mDiscardBuffer) || mBuffer.storageMode == MTLStorageModePrivate)
         {
             //Fast path is through locking (it either discards or already uses a StagingBuffer).
-            void *dstData = this->lockImpl( offset, length, HardwareBuffer::HBL_DISCARD, false );
+            void *dstData = this->lockImpl( offset, length, HBL_DISCARD);
             memcpy( dstData, pSource, length );
-            this->unlockImpl( offset, length );
+            this->unlockImpl();
         }
         else
         {
@@ -294,10 +306,16 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void MetalHardwareBufferCommon::copyData( MetalHardwareBufferCommon *srcBuffer, size_t srcOffset,
+    void MetalHardwareBufferCommon::copyData( HardwareBuffer& _srcBuffer, size_t srcOffset,
                                               size_t dstOffset, size_t length, bool discardWholeBuffer )
     {
-        discardWholeBuffer = discardWholeBuffer || (dstOffset == 0 && length == mSizeBytes);
+        if (mShadowBuffer)
+        {
+            mShadowBuffer->copyData(_srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+        }
+
+        auto srcBuffer = static_cast<MetalHardwareBufferCommon*>(&_srcBuffer);
+        discardWholeBuffer = discardWholeBuffer || (dstOffset == 0 && length == mSizeInBytes);
 
         if( !this->mDiscardBuffer || srcBuffer->mBuffer.storageMode == MTLStorageModePrivate )
         {
@@ -323,14 +341,24 @@ namespace Ogre
             else
                 dstOption = HardwareBuffer::HBL_WRITE_ONLY;
 
-            const void *srcData = srcBuffer->lockImpl( srcOffset, length,
-                                                       HardwareBuffer::HBL_READ_ONLY, false );
-            void *dstData = this->lockImpl( dstOffset, length, dstOption, false );
+            const void *srcData = srcBuffer->lockImpl( srcOffset, length, HBL_READ_ONLY);
+            void *dstData = this->lockImpl( dstOffset, length, dstOption );
 
             memcpy( dstData, srcData, length );
 
-            this->unlockImpl( dstOffset, length );
-            srcBuffer->unlockImpl( srcOffset, length );
+            this->unlockImpl();
+            srcBuffer->unlockImpl();
+        }
+    }
+
+    //-----------------------------------------------------------------------------------
+    void MetalHardwareBufferCommon::_updateFromShadow(void)
+    {
+        if( mShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate )
+        {
+            HardwareBufferLockGuard shadowLock(mShadowBuffer.get(), mLockStart, mLockSize, HBL_READ_ONLY);
+            writeDataImpl(mLockStart, mLockSize, shadowLock.pData, false);
+            mShadowUpdated = false;
         }
     }
 }

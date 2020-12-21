@@ -30,13 +30,20 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2StateCacheManager.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre {
-    GLES2HardwareBuffer::GLES2HardwareBuffer(GLenum target, size_t sizeInBytes, GLenum usage)
-        : mTarget(target), mSizeInBytes(sizeInBytes), mUsage(usage)
+    GLES2HardwareBuffer::GLES2HardwareBuffer(GLenum target, size_t sizeInBytes, uint32 usage, bool useShadowBuffer)
+        : HardwareBuffer(usage, false, useShadowBuffer || HANDLE_CONTEXT_LOSS), mTarget(target)
     {
+        mSizeInBytes = sizeInBytes;
         mRenderSystem = static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
         createBuffer();
+
+        if (useShadowBuffer || HANDLE_CONTEXT_LOSS)
+        {
+            mShadowBuffer.reset(new DefaultHardwareBuffer(mSizeInBytes));
+        }
     }
 
     GLES2HardwareBuffer::~GLES2HardwareBuffer()
@@ -133,6 +140,12 @@ namespace Ogre {
 
     void GLES2HardwareBuffer::readData(size_t offset, size_t length, void* pDest)
     {
+        if (mShadowBuffer)
+        {
+            mShadowBuffer->readData(offset, length, pDest);
+            return;
+        }
+
         if(!OGRE_NO_GLES3_SUPPORT || mRenderSystem->checkExtension("GL_EXT_map_buffer_range"))
         {
             // Map the buffer range then copy out of it into our destination buffer
@@ -159,6 +172,17 @@ namespace Ogre {
     void GLES2HardwareBuffer::writeData(size_t offset, size_t length, const void* pSource,
                                         bool discardWholeBuffer)
     {
+        if (mShadowBuffer)
+        {
+            mShadowBuffer->writeData(offset, length, pSource, discardWholeBuffer);
+        }
+
+        writeDataImpl(offset, length, pSource, discardWholeBuffer);
+    }
+
+    void GLES2HardwareBuffer::writeDataImpl(size_t offset, size_t length, const void* pSource,
+                                        bool discardWholeBuffer)
+    {
         mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
         if (offset == 0 && length == mSizeInBytes)
@@ -176,26 +200,30 @@ namespace Ogre {
         }
     }
 
-    void GLES2HardwareBuffer::copyData(GLuint srcBufferId, size_t srcOffset, size_t dstOffset,
+    void GLES2HardwareBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, size_t dstOffset,
                                        size_t length, bool discardWholeBuffer)
     {
-#if OGRE_NO_GLES3_SUPPORT == 0
+        if(!mRenderSystem->hasMinGLVersion(3, 0))
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "GLES3 needed");
+
+        if (mShadowBuffer)
+        {
+            mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+        }
         // Zero out this(destination) buffer
         OGRE_CHECK_GL_ERROR(glBindBuffer(mTarget, mBufferId));
         OGRE_CHECK_GL_ERROR(glBufferData(mTarget, length, 0, getGLUsage(mUsage)));
         OGRE_CHECK_GL_ERROR(glBindBuffer(mTarget, 0));
 
         // Do it the fast way.
-        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, srcBufferId));
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER,
+                                         static_cast<GLES2HardwareBuffer&>(srcBuffer).getGLBufferId()));
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, mBufferId));
 
         OGRE_CHECK_GL_ERROR(glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, srcOffset, dstOffset, length));
 
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, 0));
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, 0));
-#else
-        OgreAssert(false, "GLES3 needed");
-#endif
     }
 
     GLenum GLES2HardwareBuffer::getGLUsage(unsigned int usage)
@@ -203,4 +231,37 @@ namespace Ogre {
         return (usage == HBU_GPU_TO_CPU) ? GL_STATIC_READ
                                          : (usage == HBU_GPU_ONLY) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
     }
+
+    void GLES2HardwareBuffer::_updateFromShadow(void)
+    {
+        if (mShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
+        {
+            HardwareBufferLockGuard shadowLock(mShadowBuffer.get(), mLockStart, mLockSize, HBL_READ_ONLY);
+            writeDataImpl(mLockStart, mLockSize, shadowLock.pData, false);
+
+            mShadowUpdated = false;
+        }
+    }
+
+    void GLES2HardwareBuffer::setGLBufferBinding(GLint binding)
+    {
+        mBindingPoint = binding;
+
+        // Attach the buffer to the UBO binding
+        OGRE_CHECK_GL_ERROR(glBindBufferBase(mTarget, mBindingPoint, mBufferId));
+    }
+
+#if HANDLE_CONTEXT_LOSS
+    void GLES2HardwareBuffer::notifyOnContextLost()
+    {
+        destroyBuffer();
+    }
+
+    void GLES2HardwareBuffer::notifyOnContextReset()
+    {
+        createBuffer();
+        mShadowUpdated = true;
+        _updateFromShadow();
+    }
+#endif
 }

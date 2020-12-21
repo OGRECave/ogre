@@ -27,9 +27,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreGL3PlusHardwareBufferManager.h"
-#include "OgreGL3PlusHardwareIndexBuffer.h"
-#include "OgreGL3PlusHardwareUniformBuffer.h"
-#include "OgreGL3PlusHardwareVertexBuffer.h"
+#include "OgreGL3PlusHardwareBuffer.h"
 #include "OgreGL3PlusRenderToVertexBuffer.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
@@ -67,13 +65,13 @@ namespace Ogre {
                                                          HardwareBuffer::Usage usage,
                                                          bool useShadowBuffer)
     {
-        GL3PlusHardwareVertexBuffer* buf =
-            OGRE_NEW GL3PlusHardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
+        auto impl = new GL3PlusHardwareBuffer(GL_ARRAY_BUFFER, vertexSize * numVerts, usage, useShadowBuffer);
+        auto buf = std::make_shared<HardwareVertexBuffer>(this, vertexSize, numVerts, impl);
         {
             OGRE_LOCK_MUTEX(mVertexBuffersMutex);
-            mVertexBuffers.insert(buf);
+            mVertexBuffers.insert(buf.get());
         }
-        return HardwareVertexBufferSharedPtr(buf);
+        return buf;
     }
 
     HardwareIndexBufferSharedPtr GL3PlusHardwareBufferManager::createIndexBuffer(HardwareIndexBuffer::IndexType itype,
@@ -81,47 +79,49 @@ namespace Ogre {
                                                                                      HardwareBuffer::Usage usage,
                                                                                      bool useShadowBuffer)
     {
-        GL3PlusHardwareIndexBuffer* buf =
-            new GL3PlusHardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
+        // Calculate the size of the indexes
+        auto indexSize = HardwareIndexBuffer::indexSize(itype);
+        auto impl = new GL3PlusHardwareBuffer(GL_ELEMENT_ARRAY_BUFFER, indexSize * numIndexes, usage, useShadowBuffer);
+
+        auto buf = std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
         {
             OGRE_LOCK_MUTEX(mIndexBuffersMutex);
-            mIndexBuffers.insert(buf);
+            mIndexBuffers.insert(buf.get());
         }
-        return HardwareIndexBufferSharedPtr(buf);
+        return buf;
     }
 
     HardwareUniformBufferSharedPtr GL3PlusHardwareBufferManager::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
-        HardwareUniformBuffer* buf =
-            new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, GL_UNIFORM_BUFFER);
+        auto impl = new GL3PlusHardwareBuffer(GL_UNIFORM_BUFFER, sizeBytes, usage, useShadowBuffer);
+        auto buf = std::make_shared<HardwareUniformBuffer>(this, impl);
         {
             OGRE_LOCK_MUTEX(mUniformBuffersMutex);
-            mUniformBuffers.insert(buf);
+            mUniformBuffers.insert(buf.get());
         }
-        return HardwareUniformBufferSharedPtr(buf);
+        return buf;
     }
 
     HardwareUniformBufferSharedPtr GL3PlusHardwareBufferManager::createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
-        HardwareUniformBuffer* buf =
-            new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, GL_SHADER_STORAGE_BUFFER);
+        auto impl = new GL3PlusHardwareBuffer(GL_SHADER_STORAGE_BUFFER, sizeBytes, usage, useShadowBuffer);
+        auto buf = std::make_shared<HardwareUniformBuffer>(this, impl);
         {
             OGRE_LOCK_MUTEX(mUniformBuffersMutex);
-            mShaderStorageBuffers.insert(buf);
+            mShaderStorageBuffers.insert(buf.get());
         }
-        return HardwareUniformBufferSharedPtr(buf);
+        return buf;
     }
 
     HardwareCounterBufferSharedPtr GL3PlusHardwareBufferManager::createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
     {
-        HardwareUniformBuffer* buf =
-                new GL3PlusHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, GL_ATOMIC_COUNTER_BUFFER);
-
+        auto impl = new GL3PlusHardwareBuffer(GL_ATOMIC_COUNTER_BUFFER, sizeBytes, usage, useShadowBuffer);
+        auto buf = std::make_shared<HardwareUniformBuffer>(this, impl);
         {
             OGRE_LOCK_MUTEX(mCounterBuffersMutex);
-            mCounterBuffers.insert(buf);
+            mCounterBuffers.insert(buf.get());
         }
-        return HardwareCounterBufferSharedPtr(buf);
+        return buf;
     }
 
     RenderToVertexBufferSharedPtr GL3PlusHardwareBufferManager::createRenderToVertexBuffer()

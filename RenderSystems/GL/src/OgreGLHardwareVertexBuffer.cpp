@@ -66,14 +66,6 @@ namespace Ogre {
     void* GLHardwareVertexBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
     {
-        if(mIsLocked)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Invalid attempt to lock an vertex buffer that has already been locked",
-                "GLHardwareVertexBuffer::lock");
-        }
-
-
         void* retPtr = 0;
 
         GLHardwareBufferManager* glBufManager = static_cast<GLHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
@@ -132,7 +124,7 @@ namespace Ogre {
 
             mLockedToScratch = false;
         }
-        mIsLocked = true;
+
         return retPtr;
     }
     //---------------------------------------------------------------------
@@ -164,14 +156,12 @@ namespace Ogre {
                     "GLHardwareVertexBuffer::unlock");
             }
         }
-
-        mIsLocked = false;
     }
     //---------------------------------------------------------------------
     void GLHardwareVertexBuffer::readData(size_t offset, size_t length, 
         void* pDest)
     {
-        if(mUseShadowBuffer)
+        if(mShadowBuffer)
         {
             mShadowBuffer->readData(offset, length, pDest);
         }
@@ -190,7 +180,7 @@ namespace Ogre {
         static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
 
         // Update the shadow buffer
-        if(mUseShadowBuffer)
+        if(mShadowBuffer)
         {
             mShadowBuffer->writeData(offset, length, pSource, discardWholeBuffer);
         }
@@ -215,7 +205,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLHardwareVertexBuffer::_updateFromShadow(void)
     {
-        if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
+        if (mShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
         {
             HardwareBufferLockGuard shadowLock(mShadowBuffer.get(), mLockStart, mLockSize, HBL_READ_ONLY);
 
