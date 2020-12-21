@@ -63,7 +63,7 @@ add_definitions(-DOGRE_GLPLUGIN_EXPORTS ${OGRE_VISIBILITY_FLAGS})
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile
 add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_SOURCE} ${NVPARSE_SOURCE} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL OgreMain OgreGLSupport ${OPENGL_gl_LIBRARY})
+target_link_libraries(RenderSystem_GL PUBLIC OgreMain ${OPENGL_gl_LIBRARY} PRIVATE OgreGLSupport)
 target_include_directories(RenderSystem_GL PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GL>)

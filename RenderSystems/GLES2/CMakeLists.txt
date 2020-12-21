@@ -59,7 +59,7 @@ endif ()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include)
 
 add_library(RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} ${GLSLES_FILES})
-target_link_libraries(RenderSystem_GLES2 OgreMain OgreGLSupport ${OPENGLES2_LIBRARIES} ${CMAKE_DL_LIBS})
+target_link_libraries(RenderSystem_GLES2 PUBLIC OgreMain ${OPENGLES2_LIBRARIES} ${CMAKE_DL_LIBS} PRIVATE OgreGLSupport)
 target_include_directories(RenderSystem_GLES2 PUBLIC 
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/RenderSystems/GLES2>)
