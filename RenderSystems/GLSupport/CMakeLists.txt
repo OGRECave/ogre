@@ -117,4 +117,6 @@ generate_export_header(OgreGLSupport
     EXPORT_MACRO_NAME _OgreGLExport
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreGLSupportPrerequisites.h)
 
-ogre_config_component(OgreGLSupport)
+if(OGRE_STATIC)
+  ogre_config_lib(OgreGLSupport TRUE)
+endif()
