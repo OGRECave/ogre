@@ -4,7 +4,7 @@
 
 This tutorial will focus on rendering terrain in a scene. We will cover the basic set up that needs to be done, and we will introduce the use of lighting with terrains. We will also give a brief introduction to simulating a sky using Skyboxes, Skydomes, and Skyplanes. Finally, we will explain how to add a fog effect to the scene.
 
-The full source for this tutorial can be found in samples directory **Samples/Terrain/include/Terrain.h**.
+The full source for this tutorial can be found in samples directory **Samples/Simple/include/Terrain.h**.
 
 @note Refer to @ref setup for instructions how set up an Ogre project and compile it successfully.
 
@@ -12,7 +12,7 @@ The full source for this tutorial can be found in samples directory **Samples/Te
 Ignore the FPS stats in the screenshots. They were rendered on an ancient computer.
 
 # An Introduction to Terrain {#tut_terrain}
-With older versions of %Ogre, we had to use the "Terrain Scene Manager" to render terrain in a scene. This is a separate SceneManager that runs alongside your other managers. The new Ogre Terrain Component doesn't require using a separate manager. Since Ogre 1.7 (Cthugha), there are two terrain components: Terrain and Paging. The Paging component is used optimize large terrains. It will be covered in later tutorials. This tutorial will focus largely on the Terrain component.
+With older versions of %Ogre, we had to use the "Terrain Scene Manager" to render terrain in a scene. This is a separate SceneManager that runs alongside your other managers. The new Ogre Terrain Component doesn't require using a separate manager. Since %Ogre 1.7, there are two terrain components: Terrain and Paging. The Paging component is used optimize large terrains. It will be covered in later tutorials. This tutorial will focus largely on the Terrain component.
 
 To set up the terrain we will focus on two main classes:
 - Ogre::Terrain, representing one piece of terrain and

@@ -4,7 +4,7 @@
 
 This tutorial will expand on the use of Lights in a scene and using them to cast shadows.
 
-The full source for this tutorial (BasicTutorial2.cpp) can be found in samples directory **Samples/Tutorials**.
+The full source for this tutorial can be found in samples directory **Samples/Tutorials/BasicTutorial2.cpp**.
 
 @note Refer to @ref setup for instructions how set up an Ogre project and compile it successfully.
 
@@ -16,8 +16,8 @@ aerial cutscene. Just like a SceneNode the Camera's position will be relative to
 is not a SceneNode (it actually inherits from the Frustum class), but for movement and rotation, you can treat it
 like a SceneNode.
 
-@note Starting from version 1.10 functionality related to rotate and translate camera are deprecated. 
-You should attach camera to Ogre::SceneNode and do all transformation with this node.
+@note Starting from version 1.10, directly rotating and translating the camera is deprecated.
+You should attach the camera to a Ogre::SceneNode and do all transformation with this node.
 
 # Creating a Camera {#bt2CreatingaCamera}
 We will now cover camera creation part which we just applied in previous tutorial. We remeber that now we need to have SceneNode for camera. The first step will be doing is creating that SceneNode and asking the SceneManager to create a new Camera. Add the following to create SceneNode and Camera:
