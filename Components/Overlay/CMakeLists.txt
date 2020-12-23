@@ -86,9 +86,7 @@ if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
     set_source_files_properties(${IMGUI_PLOT_DIR}/implot_items.cpp  PROPERTIES COMPILE_FLAGS "-Wno-cast-qual")
     set_source_files_properties(${IMGUI_PLOT_DIR}/implot.cpp PROPERTIES COMPILE_FLAGS "-Wno-cast-qual")
   endif()
-  list(APPEND HEADER_FILES
-    ${IMGUI_PLOT_DIR}/implot.h
-    ${IMGUI_PLOT_DIR}/implot_internal.h)
+list(APPEND HEADER_FILES ${IMGUI_PLOT_DIR}/implot.h ${IMGUI_PLOT_DIR}/implot_internal.h)
 endif()
 
 generate_export_header(OgreOverlay 
