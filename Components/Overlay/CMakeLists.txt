@@ -41,8 +41,8 @@ if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
   set(IMGUI_PLOT_DIR "${PROJECT_BINARY_DIR}/implot-0.8" CACHE PATH "")
   if(NOT EXISTS ${IMGUI_PLOT_DIR})
     message(STATUS "Downloading implot")
-    file(DOWNLOAD https://codeload.github.com/epezent/implot/zip/v0.8  ${PROJECT_BINARY_DIR}/implot_v0.8.zip)
-    execute_process(COMMAND ${CMAKE_COMMAND}  -E  7z  x -y implot_v0.8.zip WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    file(DOWNLOAD https://github.com/epezent/implot/archive/v0.8.tar.gz  ${PROJECT_BINARY_DIR}/implot_v0.8.tar.gz)
+    execute_process(COMMAND ${CMAKE_COMMAND}  -E  tar xf  implot_v0.8.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
   endif()
   list(APPEND SOURCE_FILES ${IMGUI_PLOT_DIR}/implot_items.cpp  ${IMGUI_PLOT_DIR}/implot.cpp)
 endif()
@@ -86,7 +86,6 @@ if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
     set_source_files_properties(${IMGUI_PLOT_DIR}/implot_items.cpp  PROPERTIES COMPILE_FLAGS "-Wno-cast-qual")
     set_source_files_properties(${IMGUI_PLOT_DIR}/implot.cpp PROPERTIES COMPILE_FLAGS "-Wno-cast-qual")
   endif()
-  
   list(APPEND HEADER_FILES
     ${IMGUI_PLOT_DIR}/implot.h
     ${IMGUI_PLOT_DIR}/implot_internal.h)
