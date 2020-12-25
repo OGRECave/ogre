@@ -331,6 +331,7 @@ namespace Ogre {
         mMaterial->load();
         // Set some prerequisites to be sure
         mMaterial->setLightingEnabled(false);
+        mMaterial->setReceiveShadows(false);
         mMaterial->setDepthCheckEnabled(false);
     }
 
