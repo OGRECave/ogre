@@ -58,7 +58,7 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
         if (!props.isDeferred)
         {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-            rtShaderGen.validateMaterial("NoGBuffer", originalMaterial->getName(), originalMaterial->getGroup());
+            rtShaderGen.validateMaterial("NoGBuffer", *originalMaterial);
 #else
             //Just copy the technique so it gets rendered regularly
             Pass* clonePass = noGBufferTech->createPass();
@@ -68,7 +68,7 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
         }
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-        rtShaderGen.validateMaterial("GBuffer", originalMaterial->getName(), originalMaterial->getGroup());
+        rtShaderGen.validateMaterial("GBuffer", *originalMaterial);
         // Grab the generated technique.
         for(Technique* curTech : originalMaterial->getTechniques())
         {

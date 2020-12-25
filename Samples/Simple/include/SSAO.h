@@ -65,7 +65,7 @@ public:
     SSAOGBufferSchemeHandler()
     {
         mGBufRefMat = Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
-        RTShader::ShaderGenerator::getSingleton().validateMaterial("GBuffer", "SSAO/GBuffer");
+        RTShader::ShaderGenerator::getSingleton().validateMaterial("GBuffer", *mGBufRefMat);
         mGBufRefMat->load();
     }
 

@@ -65,7 +65,7 @@ TEST_F(RTShaderSystem, createShaderBasedTechnique)
     EXPECT_TRUE(shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
 
     EXPECT_EQ(mat->getTechniques().size(), size_t(1));
-    shaderGen.validateMaterial("MyScheme", mat->getName(), mat->getGroup());
+    shaderGen.validateMaterial("MyScheme", *mat);
     EXPECT_EQ(mat->getTechniques().size(), size_t(2));
 
     auto newTech = mat->getTechniques()[1];
@@ -84,10 +84,10 @@ TEST_F(RTShaderSystem, MaterialSerializer)
 
     shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme");
 
-    auto rstate = shaderGen.getRenderState("MyScheme", "TestMat", RGN_DEFAULT, 0);
+    auto rstate = shaderGen.getRenderState("MyScheme", *mat);
     rstate->addTemplateSubRenderState(shaderGen.createSubRenderState<RTShader::FFPColour>());
 
-    shaderGen.validateMaterial("MyScheme", mat->getName(), mat->getGroup());
+    shaderGen.validateMaterial("MyScheme", *mat);
 
     MaterialSerializer ser;
     ser.addListener(shaderGen.getMaterialSerializerListener());

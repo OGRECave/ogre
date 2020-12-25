@@ -93,8 +93,7 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 
 
     //check if technique already created
-    techniqueCreated = shaderGenerator->hasShaderBasedTechnique(material->getName(), 
-        material->getGroup(),
+    techniqueCreated = shaderGenerator->hasShaderBasedTechnique(*material,
         technique->getSchemeName(), 
         dstTechniqueSchemeName);
     
@@ -112,9 +111,9 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
     if (techniqueCreated)
     {
         //Attempt to get the render state which might have been created by the pass parsing
-        mGeneratedRenderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, 
-                    material->getName(), material->getGroup(), pass->getIndex());
-    
+        mGeneratedRenderState =
+            shaderGenerator->getRenderState(dstTechniqueSchemeName, *material, pass->getIndex());
+
         // Go over all the render state properties.
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -189,8 +188,8 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
                         if (getVector(prop->values.begin(), prop->values.end(), lightCount, 3))
                         {
                             shaderGenerator->createScheme(dstTechniqueSchemeName);
-                            RenderState* renderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, 
-                                material->getName(), material->getGroup(), pass->getIndex());
+                            RenderState* renderState = shaderGenerator->getRenderState(
+                                dstTechniqueSchemeName, *material, pass->getIndex());
 
                             renderState->setLightCount(Vector3i(lightCount.data()));
                             renderState->setLightCountAutoUpdate(false);

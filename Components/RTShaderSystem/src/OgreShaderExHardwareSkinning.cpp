@@ -547,9 +547,7 @@ bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, 
                 //invalidate the material so it will be recreated with the correct
                 //amount of bones and weights
                 const String& schemeName = ShaderGenerator::getSingleton().getRTShaderScheme(i);
-                ShaderGenerator::getSingleton().invalidateMaterial(
-                    schemeName, pMaterial->getName(), pMaterial->getGroup());
-
+                ShaderGenerator::getSingleton().invalidateMaterial(schemeName, *pMaterial);
             }
 
         }
