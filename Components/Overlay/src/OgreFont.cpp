@@ -234,6 +234,7 @@ namespace Ogre
         // lighting and culling also do not make much sense
         pass->setCullingMode(CULL_NONE);
         pass->setLightingEnabled(false);
+        mMaterial->setReceiveShadows(false);
         // font quads should not occlude things
         pass->setDepthWriteEnabled(false);
 

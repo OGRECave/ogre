@@ -74,6 +74,7 @@ void ImGuiOverlay::ImGUIRenderable::createMaterial()
     mMaterial->load();
     mMaterial->setLightingEnabled(false);
     mMaterial->setDepthCheckEnabled(false);
+    mMaterial->setReceiveShadows(false);
 }
 
 ImFont* ImGuiOverlay::addFont(const String& name, const String& group)

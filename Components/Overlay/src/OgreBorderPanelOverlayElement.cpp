@@ -515,6 +515,7 @@ namespace Ogre {
         // Set some prerequisites to be sure
         mBorderMaterial->setLightingEnabled(false);
         mBorderMaterial->setDepthCheckEnabled(false);
+        mBorderMaterial->setReceiveShadows(false);
 
     }
     //---------------------------------------------------------------------
