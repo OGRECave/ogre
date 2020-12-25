@@ -98,9 +98,10 @@ public:
     /// sync our internal list if material gets dropped
     virtual void resourceRemove(const ResourcePtr& resource)
     {
-        if (!dynamic_cast<Material*>(resource.get()))
-            return;
-        mOwner->removeAllShaderBasedTechniques(resource->getName(), resource->getGroup());
+        if (auto mat = dynamic_cast<Material*>(resource.get()))
+        {
+            mOwner->removeAllShaderBasedTechniques(*mat);
+        }
     }
 
 protected:
@@ -716,14 +717,6 @@ const StringVector& ShaderGenerator::getShaderProfilesList(GpuProgramType type)
 }
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName, 
-                                              const String& srcTechniqueSchemeName, 
-                                              const String& dstTechniqueSchemeName) const
-{
-    return hasShaderBasedTechnique(materialName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-        srcTechniqueSchemeName, dstTechniqueSchemeName);
-}
-//-----------------------------------------------------------------------------
-bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName, 
                                                  const String& groupName, 
                                                  const String& srcTechniqueSchemeName, 
                                                  const String& dstTechniqueSchemeName) const
@@ -979,15 +972,22 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
 
     // Case the requested material belongs to different group and it is not AUTODETECT_RESOURCE_GROUP_NAME.
     if ((trueSrcGroupName != srcGroupName && srcGroupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME) ||
-        (trueSrcGroupName != dstGroupName && dstGroupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME))
+        (trueDstGroupName != dstGroupName && dstGroupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME))
     {
         return false;
     }
 
-    SGMaterialIterator itSrcMatEntry = findMaterialEntryIt(srcMaterialName, trueSrcGroupName);
+    return cloneShaderBasedTechniques(*srcMat, *dstMat);
+}
+
+bool ShaderGenerator::cloneShaderBasedTechniques(const Material& srcMat, Material& dstMat)
+{
+    if(&srcMat == &dstMat) return true; // nothing to do
+
+    SGMaterialIterator itSrcMatEntry = findMaterialEntryIt(srcMat.getName(), srcMat.getGroup());
 
     //remove any techniques in the destination material so the new techniques may be copied
-    removeAllShaderBasedTechniques(dstMaterialName, trueDstGroupName);
+    removeAllShaderBasedTechniques(dstMat);
     
     //
     //remove any techniques from the destination material which have RTSS associated schemes from
@@ -997,10 +997,8 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
 
     //first gather the techniques to remove
     std::set<unsigned short> schemesToRemove;
-    unsigned short techCount = srcMat->getNumTechniques();
-    for(unsigned short ti = 0 ; ti < techCount ; ++ti)
+    for(Technique* pSrcTech : srcMat.getTechniques())
     {
-        Technique* pSrcTech = srcMat->getTechnique(ti);
         Pass* pSrcPass = pSrcTech->getNumPasses() > 0 ? pSrcTech->getPass(0) : NULL;
         if (pSrcPass)
         {
@@ -1012,13 +1010,13 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
         }
     }
     //remove the techniques from the destination material
-    techCount = dstMat->getNumTechniques();
+    auto techCount = dstMat.getNumTechniques();
     for(unsigned short ti = techCount - 1 ; ti != (unsigned short)-1 ; --ti)
     {
-        Technique* pDstTech = dstMat->getTechnique(ti);
+        Technique* pDstTech = dstMat.getTechnique(ti);
         if (schemesToRemove.find(pDstTech->_getSchemeIndex()) != schemesToRemove.end())
         {
-            dstMat->removeTechnique(ti);
+            dstMat.removeTechnique(ti);
         }
     }
     
@@ -1040,7 +1038,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
             
             //for every technique in the source material create a shader based technique in the 
             //destination material
-            if (createShaderBasedTechnique(*dstMat, srcFromTechniqueScheme, srcToTechniqueScheme))
+            if (createShaderBasedTechnique(dstMat, srcFromTechniqueScheme, srcToTechniqueScheme))
             {
                 //check for custom render states in the source material
                 unsigned short passCount =  (*itTechEntry)->getSourceTechnique()->getNumPasses();
@@ -1050,7 +1048,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName,
                     {
                         //copy the custom render state from the source material to the destination material
                         RenderState* srcRenderState = (*itTechEntry)->getRenderState(pi);
-                        RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMaterialName, trueDstGroupName, pi);
+                        RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMat, pi);
 
                         const SubRenderStateList& srcSubRenderState = 
                             srcRenderState->getSubRenderStates();

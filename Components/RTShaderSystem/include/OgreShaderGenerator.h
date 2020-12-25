@@ -205,6 +205,12 @@ public:
      */
     RenderState* getRenderState(const String& schemeName, const String& materialName, const String& groupName, unsigned short passIndex);
 
+    /// @overload
+    RenderState* getRenderState(const String& schemeName, const Material& mat, uint16 passIndex = 0)
+    {
+        return getRenderState(schemeName, mat.getName(), mat.getGroup(), passIndex);
+    }
+
     /** 
     Add sub render state factory. Plugins or 3d party applications may implement sub classes of
     SubRenderState interface. Add the matching factory will allow the application to create instances 
@@ -254,16 +260,6 @@ public:
     */
     void destroySubRenderState(SubRenderState* subRenderState);
 
-
-    /** 
-    Checks if a shader based technique has been created for a given technique. 
-    Return true if exist. False if not.
-    @param materialName The source material name.
-    @param srcTechniqueSchemeName The source technique scheme name.
-    @param dstTechniqueSchemeName The destination shader based technique scheme name.
-    */
-    bool hasShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
-
     /**
      Checks if a shader based technique has been created for a given technique.
      Return true if exist. False if not.
@@ -273,6 +269,18 @@ public:
      @param dstTechniqueSchemeName The destination shader based technique scheme name.
      */
     bool hasShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
+
+    /// @overload
+    bool hasShaderBasedTechnique(const Material& mat, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const
+    {
+        return hasShaderBasedTechnique(mat.getName(), mat.getGroup(), srcTechniqueSchemeName, dstTechniqueSchemeName);
+    }
+
+    /// @deprecated
+    OGRE_DEPRECATED bool hasShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const
+    {
+        return hasShaderBasedTechnique(materialName, RGN_AUTODETECT, srcTechniqueSchemeName, dstTechniqueSchemeName);
+    }
 
     /**
     Create shader based technique from a given technique.
@@ -305,17 +313,24 @@ public:
     */
     bool removeAllShaderBasedTechniques(const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
+    /// @overload
+    bool removeAllShaderBasedTechniques(const Material& mat)
+    {
+        return removeAllShaderBasedTechniques(mat.getName(), mat.getGroup());
+    }
+
     /** 
     Clone all shader based techniques from one material to another.
     This function can be used in conjunction with the Material::clone() function to copy 
     both material properties and RTSS state from one material to another.
-    @param srcMaterialName The source material name.    
-    @param srcGroupName The source group name.  
-    @param dstMaterialName The destination material name.   
-    @param dstGroupName The destination group name. 
+    @param srcMat The source material
+    @param dstMat The destination material
     @return True if successful
     */
-    bool cloneShaderBasedTechniques(const String& srcMaterialName, 
+    bool cloneShaderBasedTechniques(const Material& srcMat, Material& dstMat);
+
+    /// @deprecated
+    OGRE_DEPRECATED bool cloneShaderBasedTechniques(const String& srcMaterialName,
         const String& srcGroupName, const String& dstMaterialName, const String& dstGroupName);
 
     /** 
@@ -352,6 +367,12 @@ public:
     */
     void invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
 
+    /// @overload
+    void invalidateMaterial(const String& schemeName, const Material& mat)
+    {
+        invalidateMaterial(schemeName, mat.getName(), mat.getGroup());
+    }
+
     /** 
     Validate specific material scheme. This action will generate shader programs for the technique of the
     given scheme name.
@@ -360,6 +381,12 @@ public:
     @param groupName The source group name. 
     */
     bool validateMaterial(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+
+    /// @overload
+    void validateMaterial(const String& schemeName, const Material& mat)
+    {
+        validateMaterial(schemeName, mat.getName(), mat.getGroup());
+    }
 
 	/**
 	Invalidate specific material scheme. This action will lead to shader regeneration of the technique belongs to the

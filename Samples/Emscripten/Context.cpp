@@ -102,7 +102,7 @@ void Context::destroyMaterials( const Ogre::String& resourceGroupID )
 
             if( resourceGroupID == material->getGroup())
             {
-                mShaderGenerator->removeAllShaderBasedTechniques( matName, material->getGroup() );
+                mShaderGenerator->removeAllShaderBasedTechniques( *material );
                 material->unload();
                 material.reset();
                 materialNamesToRemove.push_back( matName );

@@ -675,10 +675,8 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 
             // Grab the first pass render state. 
             // NOTE: For more complicated samples iterate over the passes and build each one of them as desired.
-            RTShader::RenderState* renderState =
-                mShaderGenerator->getRenderState(
-                    RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                    curMaterial->getName(), curMaterial->getGroup(), 0);
+            RTShader::RenderState* renderState = mShaderGenerator->getRenderState(
+                RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, *curMaterial);
 
             // Remove all sub render states.
             renderState->reset();
@@ -763,9 +761,8 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
             }
                                 
             // Invalidate this material in order to re-generate its shaders.
-            mShaderGenerator->invalidateMaterial(
-                RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                curMaterial->getName(), curMaterial->getGroup());
+            mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+                                                 *curMaterial);
         }
     }
 }
@@ -1099,7 +1096,7 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
     if (success)
     {
         // Force shader generation of the given material.
-        RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, materialName, materialPtr->getGroup());
+        RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, *materialPtr);
 
         // Grab the RTSS material serializer listener.
         MaterialSerializer::Listener* matRTSSListener = RTShader::ShaderGenerator::getSingleton().getMaterialSerializerListener();
