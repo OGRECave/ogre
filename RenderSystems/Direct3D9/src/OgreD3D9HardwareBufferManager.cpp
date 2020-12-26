@@ -27,8 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreD3D9RenderSystem.h"
 #include "OgreD3D9HardwareBufferManager.h"
-#include "OgreD3D9HardwareVertexBuffer.h"
-#include "OgreD3D9HardwareIndexBuffer.h"
+#include "OgreD3D9HardwareBuffer.h"
 #include "OgreD3D9VertexDeclaration.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -52,13 +51,13 @@ namespace Ogre {
         bool useShadowBuffer)
     {
         assert (numVerts > 0);
-        D3D9HardwareVertexBuffer* vbuf = OGRE_NEW D3D9HardwareVertexBuffer(
-            this, vertexSize, numVerts, usage, useShadowBuffer);
+		auto impl = new D3D9HardwareBuffer(D3DFMT_VERTEXDATA, vertexSize * numVerts, usage, useShadowBuffer);
+        auto buf = std::make_shared<HardwareVertexBuffer>(this, vertexSize, numVerts, impl);
         {
-                    OGRE_LOCK_MUTEX(mVertexBuffersMutex);
-            mVertexBuffers.insert(vbuf);
+            OGRE_LOCK_MUTEX(mVertexBuffersMutex);
+            mVertexBuffers.insert(buf.get());
         }
-        return HardwareVertexBufferSharedPtr(vbuf);
+        return buf;
     }
     //-----------------------------------------------------------------------
     HardwareIndexBufferSharedPtr 
@@ -67,13 +66,15 @@ namespace Ogre {
         HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
         assert (numIndexes > 0);
-        D3D9HardwareIndexBuffer* idx = OGRE_NEW D3D9HardwareIndexBuffer(
-            this, itype, numIndexes, usage, useShadowBuffer);
+        auto indexSize = HardwareIndexBuffer::indexSize(itype);
+        auto impl = new D3D9HardwareBuffer(D3D9Mappings::get(itype), indexSize * numIndexes, usage, useShadowBuffer);
+
+        auto buf = std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
         {
-                    OGRE_LOCK_MUTEX(mIndexBuffersMutex);
-            mIndexBuffers.insert(idx);
+            OGRE_LOCK_MUTEX(mIndexBuffersMutex);
+            mIndexBuffers.insert(buf.get());
         }
-        return HardwareIndexBufferSharedPtr(idx);
+        return buf;
             
     }
     //-----------------------------------------------------------------------

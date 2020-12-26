@@ -39,8 +39,7 @@ THE SOFTWARE.
 #include "OgreMath.h"
 #include "OgreViewport.h"
 #include "OgreD3D9HardwareBufferManager.h"
-#include "OgreD3D9HardwareIndexBuffer.h"
-#include "OgreD3D9HardwareVertexBuffer.h"
+#include "OgreD3D9HardwareBuffer.h"
 #include "OgreD3D9VertexDeclaration.h"
 #include "OgreD3D9GpuProgram.h"
 #include "OgreD3D9GpuProgramManager.h"
@@ -3115,8 +3114,7 @@ namespace Ogre
         iend = binds.end();
         for (i = binds.begin(); i != iend; ++i, ++source)
         {
-            D3D9HardwareVertexBuffer* d3d9buf = 
-                static_cast<D3D9HardwareVertexBuffer*>(i->second.get());
+            D3D9HardwareBuffer* d3d9buf = i->second->_getImpl<D3D9HardwareBuffer>();
 
             // Unbind gap sources
             for ( ; source < i->first; ++source)
@@ -3131,9 +3129,9 @@ namespace Ogre
 
             hr = getActiveD3D9Device()->SetStreamSource(
                     static_cast<UINT>(source),
-                    d3d9buf->getD3D9VertexBuffer(),
+                    (IDirect3DVertexBuffer9*)d3d9buf->getD3D9Resource(),
                     0, // no stream offset, this is handled in _render instead
-                    static_cast<UINT>(d3d9buf->getVertexSize()) // stride
+                    static_cast<UINT>(i->second->getVertexSize()) // stride
                     );
 
             if (FAILED(hr))
@@ -3145,9 +3143,9 @@ namespace Ogre
             // SetStreamSourceFreq
             if ( hasInstanceData ) 
             {
-                if ( d3d9buf->isInstanceData() )
+                if ( i->second->isInstanceData() )
                 {
-                    hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
+                    hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | i->second->getInstanceDataStepRate() );
                 }
                 else
                 {
@@ -3187,14 +3185,13 @@ namespace Ogre
                     "D3D9RenderSystem::setVertexBufferBinding");
             }
 
-            D3D9HardwareVertexBuffer * d3d9buf = 
-                static_cast<D3D9HardwareVertexBuffer*>(globalInstanceVertexBuffer.get());
+            D3D9HardwareBuffer* d3d9buf = globalInstanceVertexBuffer->_getImpl<D3D9HardwareBuffer>();
 
             hr = getActiveD3D9Device()->SetStreamSource(
                     static_cast<UINT>(source),
-                    d3d9buf->getD3D9VertexBuffer(),
+                    (IDirect3DVertexBuffer9*)d3d9buf->getD3D9Resource(),
                     0, // no stream offset, this is handled in _render instead
-                    static_cast<UINT>(d3d9buf->getVertexSize()) // stride
+                    static_cast<UINT>(i->second->getVertexSize()) // stride
                     );
 
             if (FAILED(hr))
@@ -3203,7 +3200,7 @@ namespace Ogre
                     "D3D9RenderSystem::setVertexBufferBinding");
             }
 
-            hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
+            hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | i->second->getInstanceDataStepRate() );
             if (FAILED(hr))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 stream source Freq", 
@@ -3306,9 +3303,8 @@ namespace Ogre
         HRESULT hr;
         if( op.useIndexes )
         {
-            D3D9HardwareIndexBuffer* d3dIdxBuf = 
-                static_cast<D3D9HardwareIndexBuffer*>(op.indexData->indexBuffer.get());
-            hr = getActiveD3D9Device()->SetIndices( d3dIdxBuf->getD3DIndexBuffer() );
+            D3D9HardwareBuffer* d3dIdxBuf = op.indexData->indexBuffer->_getImpl<D3D9HardwareBuffer>();
+            hr = getActiveD3D9Device()->SetIndices( (IDirect3DIndexBuffer9*)d3dIdxBuf->getD3D9Resource() );
             if (FAILED(hr))
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set index buffer", "D3D9RenderSystem::_render" );
