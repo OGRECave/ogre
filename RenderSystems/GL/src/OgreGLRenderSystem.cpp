@@ -34,8 +34,7 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "OgreCamera.h"
 #include "OgreGLTextureManager.h"
-#include "OgreGLHardwareVertexBuffer.h"
-#include "OgreGLHardwareIndexBuffer.h"
+#include "OgreGLHardwareBuffer.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreGLUtil.h"
 #include "OgreGLGpuProgram.h"
@@ -2472,8 +2471,7 @@ namespace Ogre {
         {
             void* pBufferData = 0;
             mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB,
-                            static_cast<GLHardwareIndexBuffer*>(
-                                op.indexData->indexBuffer.get())->getGLBufferId());
+                                op.indexData->indexBuffer->_getImpl<GLHardwareBuffer>()->getGLBufferId());
 
             pBufferData = VBO_BUFFER_OFFSET(
                 op.indexData->indexStart * op.indexData->indexBuffer->getIndexSize());
@@ -3018,7 +3016,7 @@ namespace Ogre {
                                                 const size_t vertexStart)
     {
         void* pBufferData = 0;
-        const GLHardwareVertexBuffer* hwGlBuffer = static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get());
+        const GLHardwareBuffer* hwGlBuffer = vertexBuffer->_getImpl<GLHardwareBuffer>();
 
         mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER_ARB, 
                         hwGlBuffer->getGLBufferId());
@@ -3037,10 +3035,10 @@ namespace Ogre {
         {
             isCustomAttrib = !mEnableFixedPipeline || mCurrentVertexProgram->isAttributeValid(sem, elem.getIndex());
 
-            if (hwGlBuffer->isInstanceData())
+            if (vertexBuffer->isInstanceData())
             {
                 GLint attrib = GLSLProgramCommon::getFixedAttributeIndex(sem, elem.getIndex());
-                glVertexAttribDivisorARB(attrib, hwGlBuffer->getInstanceDataStepRate() );
+                glVertexAttribDivisorARB(attrib, vertexBuffer->getInstanceDataStepRate() );
                 mRenderInstanceAttribsBound.push_back(attrib);
             }
         }

@@ -25,18 +25,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __GLHARDWAREINDEXBUFFER_H__
-#define __GLHARDWAREINDEXBUFFER_H__
+#ifndef __GLHARDWAREVERTEXBUFFER_H__
+#define __GLHARDWAREVERTEXBUFFER_H__
 
 #include "OgreGLPrerequisites.h"
-#include "OgreHardwareIndexBuffer.h"
+#include "OgreHardwareBuffer.h"
 
-namespace Ogre { 
+namespace Ogre {
 
-
-    class _OgreGLExport GLHardwareIndexBuffer : public HardwareIndexBuffer
+    /// Specialisation of HardwareVertexBuffer for OpenGL
+    class _OgreGLExport GLHardwareVertexBuffer : public HardwareBuffer
     {
     private:
+        GLenum mTarget;
         GLuint mBufferId;
         // Scratch buffer handling
         bool mLockedToScratch;
@@ -44,15 +45,16 @@ namespace Ogre {
         size_t mScratchSize;
         void* mScratchPtr;
         bool mScratchUploadOnUnlock;
+        GLRenderSystem* mRenderSystem;
+
     protected:
         /** See HardwareBuffer. */
         void* lockImpl(size_t offset, size_t length, LockOptions options);
         /** See HardwareBuffer. */
         void unlockImpl(void);
     public:
-        GLHardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes, 
-            HardwareBuffer::Usage usage, bool useShadowBuffer); 
-        ~GLHardwareIndexBuffer();
+        GLHardwareVertexBuffer(GLenum target, size_t sizeInBytes, Usage usage, bool useShadowBuffer);
+        ~GLHardwareVertexBuffer();
         /** See HardwareBuffer. */
         void readData(size_t offset, size_t length, void* pDest);
         /** See HardwareBuffer. */
@@ -63,8 +65,7 @@ namespace Ogre {
 
         GLuint getGLBufferId(void) const { return mBufferId; }
     };
+    typedef GLHardwareVertexBuffer GLHardwareBuffer;
 
 }
-
-#endif // __GLHARDWAREINDEXBUFFER_H__
-
+#endif // __GLHARDWAREVERTEXBUFFER_H__
