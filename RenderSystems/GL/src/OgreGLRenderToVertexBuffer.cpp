@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLRenderToVertexBuffer.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLHardwareVertexBuffer.h"
+#include "OgreGLHardwareBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
@@ -168,7 +168,7 @@ namespace Ogre {
             reallocateBuffer(targetBufferIndex);
         }
 
-        GLHardwareVertexBuffer* vertexBuffer = static_cast<GLHardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].get());
+        GLHardwareBuffer* vertexBuffer = mVertexBuffers[targetBufferIndex]->_getImpl<GLHardwareBuffer>();
         GLuint bufferId = vertexBuffer->getGLBufferId();
 
         //Bind the target buffer

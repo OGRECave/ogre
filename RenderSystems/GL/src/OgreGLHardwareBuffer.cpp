@@ -26,40 +26,42 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreGLHardwareBufferManager.h"
-#include "OgreGLHardwareVertexBuffer.h"
+#include "OgreGLHardwareBuffer.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreGLStateCacheManager.h"
+#include "OgreRoot.h"
+#include "OgreGLRenderSystem.h"
 
 namespace Ogre {
 
     //---------------------------------------------------------------------
-    GLHardwareVertexBuffer::GLHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, 
-        size_t numVertices, HardwareBuffer::Usage usage, bool useShadowBuffer)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer), mLockedToScratch(false),
+    GLHardwareVertexBuffer::GLHardwareVertexBuffer(GLenum target, size_t sizeInBytes,
+        Usage usage, bool useShadowBuffer)
+        : HardwareBuffer(usage, false, useShadowBuffer), mTarget(target), mLockedToScratch(false),
         mScratchOffset(0), mScratchSize(0), mScratchPtr(0), mScratchUploadOnUnlock(false)
     {
+        mSizeInBytes = sizeInBytes;
+        mRenderSystem = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+
         glGenBuffersARB( 1, &mBufferId );
 
         if (!mBufferId)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                "Cannot create GL vertex buffer", 
-                "GLHardwareVertexBuffer::GLHardwareVertexBuffer");
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Cannot create GL buffer");
         }
 
-        static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
+        mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
         // Initialise mapped buffer and set usage
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
-            GLHardwareBufferManager::getGLUsage(usage));
+        glBufferDataARB(mTarget, mSizeInBytes, NULL, GLHardwareBufferManager::getGLUsage(usage));
 
         //std::cerr << "creating vertex buffer = " << mBufferId << std::endl;
     }
     //---------------------------------------------------------------------
     GLHardwareVertexBuffer::~GLHardwareVertexBuffer()
     {
-        if(GLStateCacheManager* stateCacheManager = static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager())
+        if(GLStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
             stateCacheManager->deleteGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
     }
     //---------------------------------------------------------------------
@@ -96,13 +98,12 @@ namespace Ogre {
         {
             GLenum access = 0;
             // Use glMapBuffer
-            static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
+            mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
             // Use glMapBuffer
             if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE) // TODO: check possibility to use GL_MAP_UNSYNCHRONIZED_BIT for HBL_NO_OVERWRITE locking promise
             {
                 // Discard the buffer
-                glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
-                    GLHardwareBufferManager::getGLUsage(mUsage));
+                glBufferDataARB(mTarget, mSizeInBytes, NULL, GLHardwareBufferManager::getGLUsage(mUsage));
             }
             if (mUsage & HBU_DETAIL_WRITE_ONLY)
                 access = GL_WRITE_ONLY_ARB;
@@ -111,16 +112,14 @@ namespace Ogre {
             else
                 access = GL_READ_WRITE_ARB;
 
-            void* pBuffer = glMapBufferARB( GL_ARRAY_BUFFER_ARB, access);
+            void* pBuffer = glMapBufferARB( mTarget, access);
             if(pBuffer == 0)
             {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Vertex Buffer: Out of memory", "GLHardwareVertexBuffer::lock");
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer: Out of memory");
             }
 
             // return offsetted
-            retPtr = static_cast<void*>(
-                static_cast<unsigned char*>(pBuffer) + offset);
+            retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
 
             mLockedToScratch = false;
         }
@@ -147,13 +146,11 @@ namespace Ogre {
         }
         else
         {
-            static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
+            mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
-            if(!glUnmapBufferARB( GL_ARRAY_BUFFER_ARB ))
+            if(!glUnmapBufferARB( mTarget ))
             {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Buffer data corrupted, please reload", 
-                    "GLHardwareVertexBuffer::unlock");
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer data corrupted, please reload");
             }
         }
     }
@@ -168,7 +165,7 @@ namespace Ogre {
         else
         {
             // get data from the real buffer
-            static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
+            mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
             glGetBufferSubDataARB(GL_ARRAY_BUFFER_ARB, offset, length, pDest);
         }
@@ -177,7 +174,7 @@ namespace Ogre {
     void GLHardwareVertexBuffer::writeData(size_t offset, size_t length, 
             const void* pSource, bool discardWholeBuffer)
     {
-        static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
+        mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
         // Update the shadow buffer
         if(mShadowBuffer)
@@ -187,19 +184,19 @@ namespace Ogre {
 
         if (offset == 0 && length == mSizeInBytes)
         {
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, pSource, 
+            glBufferDataARB(mTarget, mSizeInBytes, pSource,
                 GLHardwareBufferManager::getGLUsage(mUsage));
         }
         else
         {
             if(discardWholeBuffer)
             {
-                glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
+                glBufferDataARB(mTarget, mSizeInBytes, NULL,
                     GLHardwareBufferManager::getGLUsage(mUsage));
             }
 
             // Now update the real buffer
-            glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, offset, length, pSource); 
+            glBufferSubDataARB(mTarget, offset, length, pSource);
         }
     }
     //---------------------------------------------------------------------
@@ -209,17 +206,17 @@ namespace Ogre {
         {
             HardwareBufferLockGuard shadowLock(mShadowBuffer.get(), mLockStart, mLockSize, HBL_READ_ONLY);
 
-            static_cast<GLHardwareBufferManager*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
+            mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
             // Update whole buffer if possible, otherwise normal
             if (mLockStart == 0 && mLockSize == mSizeInBytes)
             {
-                glBufferDataARB(GL_ARRAY_BUFFER_ARB, mSizeInBytes, shadowLock.pData,
+                glBufferDataARB(mTarget, mSizeInBytes, shadowLock.pData,
                     GLHardwareBufferManager::getGLUsage(mUsage));
             }
             else
             {
-                glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, mLockStart, mLockSize, shadowLock.pData);
+                glBufferSubDataARB(mTarget, mLockStart, mLockSize, shadowLock.pData);
             }
 
             mShadowUpdated = false;
