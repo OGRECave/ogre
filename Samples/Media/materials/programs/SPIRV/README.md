@@ -3,14 +3,14 @@ To compile these shaders install `glslangValidator` and run `compile.sh <shader>
 Then reference them in `BlackAndWhite.material` and `StdQuad_vp.program` by e.g. modifying the GLSL declaration as
 
 ```
-fragment_program Ogre/Compositor/B&W_GLSL_FP spirv
+fragment_program Ogre/Compositor/B&W_GLSL_FP gl_spirv
 {
     source GrayScale.frag.spv
 }
 
 ...
 
-vertex_program Ogre/Compositor/StdQuad_Tex2a_GLSL_vp spirv
+vertex_program Ogre/Compositor/StdQuad_Tex2a_GLSL_vp gl_spirv
 {
     source StdQuad_Tex2a_vp.vert.spv
     default_params
