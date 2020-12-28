@@ -52,7 +52,7 @@ SPIRVShader::~SPIRVShader()
 
 const String& SPIRVShader::getLanguage(void) const
 {
-    static String language = "spirv";
+    static String language = "gl_spirv";
     return language;
 }
 
@@ -74,7 +74,7 @@ SPIRVShaderFactory::~SPIRVShaderFactory()
 
 const String& SPIRVShaderFactory::getLanguage(void) const
 {
-    static String language = "spirv";
+    static String language = "gl_spirv";
     return language;
 }
 

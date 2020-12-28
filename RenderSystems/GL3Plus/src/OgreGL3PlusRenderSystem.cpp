@@ -386,7 +386,7 @@ namespace Ogre {
         }
 
         if (checkExtension("GL_ARB_gl_spirv") && rsc->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            rsc->addShaderProfile("spirv");
+            rsc->addShaderProfile("gl_spirv");
 
         // Mesa 11.2 does not behave according to spec and throws a "gl_Position redefined"
         if(rsc->getDeviceName().find("Mesa") != String::npos) {
