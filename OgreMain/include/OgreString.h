@@ -112,12 +112,12 @@ namespace Ogre {
         /** Returns a StringVector that contains all the substrings delimited
             by the characters in the passed <code>delims</code> argument,
             or in the <code>doubleDelims</code> argument, which is used to include (normal)
-            delimeters in the tokenised string. For example, "strings like this".
+            delimiters in the tokenised string. For example, "strings like this".
             @param str
             @param
             delims A list of delimiter characters to split by
             @param
-            doubleDelims A list of double delimeters characters to tokenise by
+            doubleDelims A list of double delimiters characters to tokenise by
             @param
             maxSplits The maximum number of splits to perform (0 for unlimited splits). If this
             parameters is > 0, the splitting process will stop after this many splits, left to right.

@@ -450,7 +450,7 @@ void Function::addInputParameter(ParameterPtr parameter)
     if (_getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",             
+            "Parameter <" + parameter->getName() + "> has equal semantic parameter in function <" + getName() + ">",
             "Function::addInputParameter" );
     }
 
@@ -464,7 +464,7 @@ void Function::addOutputParameter(ParameterPtr parameter)
     if (_getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",             
+            "Parameter <" + parameter->getName() + "> has equal semantic parameter in function <" + getName() + ">",
             "Function::addOutputParameter" );
     }
 
