@@ -7,7 +7,8 @@ This document describes the coding standards all developers are expected to adhe
 <ol>
     <li>All source files must begin with the standard OGRE copyright statement:    <pre>// This file is part of the OGRE project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
-// of this distribution and at https://www.ogre3d.org/licensing.</pre>
+// of this distribution and at https://www.ogre3d.org/licensing.
+// SPDX-License-Identifier: MIT</pre>
     </li>
     <li>All publicly visible classes should be declared in their own header file using the .h extension, placed in the `include` folder of the sub-project in question, and named after the class but prefixed with `Ogre` e.g. `OgreMyClass.h`. Only very tightly related classes should be declared in the same header file. </li>
     <li>Headers of private classes must be placed in the `src` folder of the sub-project in question</li>
@@ -33,11 +34,11 @@ This document describes the coding standards all developers are expected to adhe
             <li>Use overloaded methods not varargs.</li>
         </ul></li>
     <li>Minimum C++ compiler level is MSVC 12 (VS2013) or gcc 4.8. Compilers which do not support C++11 properly are not supported.</li>
-    <li>Use the <a href="https://en.wikipedia.org/wiki/Opaque_pointer#C++">PImpl idiom</a> to reduce dependencies between classes.</li>
-    <li>Always use <a href="https://www.cprogramming.com/tutorial/const_correctness.html">const-correctness</a>. Methods taking non-primitive types as parameters should generally take them as const references, methods returning non-primitive types should generally return them as const references. Declare all methods that do not modify internal state `const`. For lazy-update getter methods, declare the internal state which is lazy-updated `mutable`.</li>
-    <li>Prefer `protected` over `private` to encourage specialisation where appropriate</li>
+    <li>Use the <a href="https://en.cppreference.com/w/cpp/language/pimpl">PImpl idiom</a> to reduce dependencies between classes.</li>
+    <li>Always use <a href="https://isocpp.org/wiki/faq/const-correctness">const-correctness</a>. Methods taking non-primitive types as parameters should generally take them as const references, methods returning non-primitive types should generally return them as const references. Declare all methods that do not modify internal state `const`. For lazy-update getter methods, declare the internal state which is lazy-updated `mutable`.</li>
+    <li>Prefer `private` over `protected` to encourage encapsulation. Use public interfaces internally too.</li>
     <li>Always declare destructors `virtual` unless the class you are writing should not have any vtable (no other virtual methods).</li>
-    <li>Avoid non-const by-ref parameters unless you have no other option. We prefer not to have in/our parameters since they are less intuitive.</li>
+    <li>Avoid non-const by-ref parameters unless you have no other option. We prefer not to have inout parameters since they are less intuitive.</li>
 </ol>
 
 
@@ -72,6 +73,7 @@ This document describes the coding standards all developers are expected to adhe
 * By default use `OgreAssert`. This will generate an exception - even in release builds. 
 * For performance critical code resort to `OgreAssertDbg` that only fires in debug builds.
 * In public header files use the C `assert` macro to follow user-defined compilation flags.
+* Prefer `OGRE_EXCEPT` for runtime-conditions outside of developer control e.g. minimal required OpenGL Version. This allows building Ogre with no assertion for release.
     </li>
 </ol>
 
