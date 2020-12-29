@@ -161,7 +161,7 @@ namespace Ogre {
             // find following newline (or EOF)
             size_t newLineAfter = inSource.find("\n", afterRegisterPos);
             // find register file string container
-            String endDelimeter = "\"";
+            String endDelimiter = "\"";
             size_t startIt = inSource.find("\"", afterRegisterPos);
             if (startIt == String::npos || startIt > newLineAfter)
             {
@@ -176,14 +176,14 @@ namespace Ogre {
                 }
                 else
                 {
-                    endDelimeter = ")";
+                    endDelimiter = ")";
                 }
             }
-            size_t endIt = inSource.find(endDelimeter, startIt+1);
+            size_t endIt = inSource.find(endDelimiter, startIt+1);
             if (endIt == String::npos || endIt <= startIt)
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                    "Badly formed register directive (expected " + endDelimeter + ") in file "
+                    "Badly formed register directive (expected " + endDelimiter + ") in file "
                     + mFilename + ": " + inSource.substr(registerPos, newLineAfter-registerPos),
                     "GLSLESCgProgram::deleteRegisterFromCg");
             }

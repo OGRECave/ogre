@@ -300,7 +300,7 @@ namespace Ogre {
         /** Try to look up an existing vertex with the same information, or
             create a new one.
         @remarks
-            Note that we buid up the list of unique position indexes that are
+            Note that we build up the list of unique position indexes that are
             actually used by each ProtoSubMesh as we go. When new positions
             are found, they are added and a remap entry created to take account
             of the fact that there may be extra vertices created in between, or

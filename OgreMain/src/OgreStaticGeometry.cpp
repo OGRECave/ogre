@@ -1168,7 +1168,7 @@ namespace Ogre {
         // We need to search the edge list for silhouette edges
         if (!mEdgeList)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "You enabled stencil shadows after the buid process!");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "You enabled stencil shadows after the build process!");
         }
 
         // Init shadow renderable list if required

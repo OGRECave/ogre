@@ -305,7 +305,7 @@ namespace Ogre
             // find following newline (or EOF)
             size_t newLineAfter = std::min(inSource.find('\n', afterIncludePos), inSource.size());
             // find include file string container
-            char endDelimeter = '"';
+            char endDelimiter = '"';
             size_t startIt = inSource.find('"', afterIncludePos);
             if (startIt == String::npos || startIt > newLineAfter)
             {
@@ -319,14 +319,14 @@ namespace Ogre
                 }
                 else
                 {
-                    endDelimeter = '>';
+                    endDelimiter = '>';
                 }
             }
-            size_t endIt = inSource.find(endDelimeter, startIt+1);
+            size_t endIt = inSource.find(endDelimiter, startIt+1);
             if (endIt == String::npos || endIt <= startIt)
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                            "Badly formed #include directive (expected " + String(1, endDelimeter) +
+                            "Badly formed #include directive (expected " + String(1, endDelimiter) +
                                 ") in file " + fileName + ": " +
                                 inSource.substr(includePos, newLineAfter - includePos));
             }
