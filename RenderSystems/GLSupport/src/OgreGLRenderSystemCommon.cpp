@@ -127,11 +127,7 @@ namespace Ogre {
             return;
 
         optDisplayFrequency->second.possibleValues.clear();
-        if( !isFullscreen )
-        {
-            optDisplayFrequency->second.possibleValues.push_back( "N/A" );
-        }
-        else
+        if (isFullscreen)
         {
             for (const auto& mode : mGLSupport->getVideoModes())
             {
@@ -149,15 +145,13 @@ namespace Ogre {
             removeDuplicates(optDisplayFrequency->second.possibleValues);
         }
 
-        if (!optDisplayFrequency->second.possibleValues.empty())
+        if (optDisplayFrequency->second.possibleValues.empty())
         {
-            optDisplayFrequency->second.currentValue = optDisplayFrequency->second.possibleValues[0];
+            optDisplayFrequency->second.possibleValues.push_back("N/A");
+            optDisplayFrequency->second.immutable = true;
         }
-        else
-        {
-            optVideoMode->second.currentValue = mGLSupport->getVideoModes()[0].getDescription();
-            optDisplayFrequency->second.currentValue = StringConverter::toString(mGLSupport->getVideoModes()[0].refreshRate) + " Hz";
-        }
+
+        optDisplayFrequency->second.currentValue = optDisplayFrequency->second.possibleValues.front();
     }
 
     //-------------------------------------------------------------------------------------------------//
