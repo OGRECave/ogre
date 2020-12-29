@@ -1,9 +1,7 @@
-/*
- * Input.h
- *
- *  Created on: 05.12.2015
- *      Author: pavel
- */
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
+// SPDX-License-Identifier: MIT
 
 #ifndef BITES_SDL_INPUTMAPPING
 #define BITES_SDL_INPUTMAPPING

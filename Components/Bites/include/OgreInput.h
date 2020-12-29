@@ -1,9 +1,7 @@
-/*
- * Input.h
- *
- *  Created on: 05.12.2015
- *      Author: pavel
- */
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
+// SPDX-License-Identifier: MIT
 
 #ifndef SAMPLES_COMMON_INCLUDE_INPUT_H_
 #define SAMPLES_COMMON_INCLUDE_INPUT_H_
