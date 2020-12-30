@@ -239,7 +239,15 @@ namespace Ogre
 		// This flag is required in order to enable compatibility with Direct2D.
 		deviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif
-		if(OGRE_DEBUG_MODE && !IsWorkingUnderNsight() && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
+
+        auto it = mOptions.find("Debug Layer");
+        bool debugEnabled = false;
+        if (it != mOptions.end())
+        {
+            debugEnabled = StringConverter::parseBool(it->second.currentValue);
+        }
+
+		if(debugEnabled && !IsWorkingUnderNsight() && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
 		{
 			deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 		}
@@ -449,7 +457,14 @@ namespace Ogre
         opt.immutable = false;
 
         mOptions[opt.name] = opt;
-        
+
+        opt.name = "Debug Layer";
+        opt.possibleValues = {"Off", "On"};
+        opt.currentValue = opt.possibleValues[0];
+        opt.immutable = false;
+
+        mOptions[opt.name] = opt;
+
         refreshD3DSettings();
 
     }
