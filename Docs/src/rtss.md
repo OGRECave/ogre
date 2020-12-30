@@ -156,7 +156,7 @@ Example: `source_modifier src1_inverse_modulate custom 2`
 # System overview {#rtss_overview}
 
 The RTSS manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
-These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @ref SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, @ref SGX_FUNC_LIGHT_POINT_DIFFUSE.
+These "effects" include Fixed Function transformation and lighting. At the core these components are plain shader files providing a set of functions; e.g. @c SGX_Light_Directional_Diffuse(), @c SGX_Light_Point_Diffuse().
 
 Correctly ordering these functions, providing them with the right input values and interconnecting them is the main purpose of the RTSS.
 
@@ -179,12 +179,12 @@ void main() {
 	$FFP_VS_TEXTURING
 }
 ```
-and `$FFP_VS_TRANSFORM = [FFP_FUNC_TRANSFORM]`, `$FFP_VS_TEXTURING = [FFP_FUNC_TRANSFORM_TEXCOORD]`, it generates
+and `$FFP_VS_TRANSFORM = [FFP_Transform()]`, `$FFP_VS_TEXTURING = [FFP_TransformTexCoord()]`, it generates
 
 ```cpp
-// FORWARD DECLARATIONS
-void FFP_Transform(in mat4, in vec4, out vec4);
-void FFP_TransformTexCoord(in mat4, in vec2, out vec2);
+// PROGRAM DEPENDENCIES
+#include <FFPLib_Transform.glsl>
+#include <FFPLib_Texturing.glsl>
 // GLOBAL PARAMETERS
 uniform	mat4	worldviewproj_matrix;
 uniform	mat4	texture_matrix1;
@@ -391,7 +391,7 @@ Implementing the Ogre::RTShader::SubRenderStateFactory is much simpler and invol
 
 ## Tips for debugging shaders {#debugging}
 A couple of notes on debugging shaders coming from the RTSS:
-* Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory [OGRE_MEDIA_DIR](@ref cmake)`/RTShaderLib/cache`. This is important for 2 reasons:
+* Call OgreBites::ApplicationContext::setRTSSWriteShadersToDisk. This will cache the generated shaders onto the disk under the directory [WRITABLE_PATH](@ref Ogre::FileSystemLayer::getWritablePath)`/RTShaderLib/cache`. This is important for 2 reasons:
   * It will make compilation problems easier to detect.
   * Once a shader is written to the disk, as long as you don't change the code behind it, the same shader will be picked up in the next application run even if its content has changed. If you have compilation or visual problems with the shader you can try to manually tinker with it without compiling the code again and again.
 * Add a breakpoint in OgreShaderProgramManager.cpp at

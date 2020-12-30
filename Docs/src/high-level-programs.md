@@ -686,14 +686,15 @@ The system is implemented as a component, so you can enable/ disable it at compi
 * @subpage rtss <br />
 The RTSS is not another Uber shader with an exploding amount of @c \#ifdefs that make it increasingly difficult to add new functionality. 
 Instead, it manages a set of opaque isolated components (SubRenderStates) where each implements a specific effect.
-These "effects" notable include full Fixed Function emulation. At the core these components are plain shader files providing a set of functions. The shaders are based on properties defined in @ref Material-Scripts.
+These "effects" notably include full Fixed Function emulation. At the core these components are plain shader files providing a set of functions. The shaders are based on properties defined in @ref Material-Scripts.
 
 # Uber shader tips
 
 In case, you are not conviced and want to go with your hand-rolled uber shader, here are some tips:
 
 1. %Ogre supports @c \#include directives universally - even with GLSL, so use them to split up your shader.
-2. There is the `HLSL_SM4Support.hlsl` helper which abstracts the differences between HLSL9/ Cg and HLSL SM4.
+2. The `OgreUnifiedShader.h` header provides macros to map GLSL to HLSL and (to some extent) Metal. This allows you to write shader code once and use it for multiple rendersystems.
+3. The `HLSL_SM4Support.hlsl` helper allows mapping HLSL9/ Cg to HLSL SM4 (D3D11), if you only target D3D.
 
 Then you can have a shader skeleton like this:
 
