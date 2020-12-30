@@ -62,7 +62,7 @@ For an exhaustive list, see the [features page](http://www.ogre3d.org/about/feat
 - [Rigs of Rods - Soft Body Physics Simulator](https://rigsofrods.org/)
 - [Gazebo - Robot simulation](http://gazebosim.org/)
 - [ROS 3D visualization tool](http://wiki.ros.org/rviz)
-- [legged robotics RAISIM](https://github.com/leggedrobotics/raisimLib#examples)
+- [RAISIM](https://github.com/raisimTech/raisimOgre#news)
 
 **Closed Source**
 - [Hob](http://store.steampowered.com/app/404680/Hob/)
