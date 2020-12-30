@@ -61,8 +61,9 @@ For an exhaustive list, see the [features page](http://www.ogre3d.org/about/feat
 **Open Source**
 - [Rigs of Rods - Soft Body Physics Simulator](https://rigsofrods.org/)
 - [Gazebo - Robot simulation](http://gazebosim.org/)
+- [OpenCV OVIS visualization module](https://docs.opencv.org/master/d2/d17/group__ovis.html)
 - [ROS 3D visualization tool](http://wiki.ros.org/rviz)
-- [RAISIM](https://github.com/raisimTech/raisimOgre#news)
+- [RAISIM Physics](https://github.com/raisimTech/raisimOgre#news)
 
 **Closed Source**
 - [Hob](http://store.steampowered.com/app/404680/Hob/)
