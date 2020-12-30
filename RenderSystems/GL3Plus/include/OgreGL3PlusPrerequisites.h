@@ -99,7 +99,6 @@ namespace Ogre {
 #endif
 
 #define ENABLE_GL_CHECK 0
-#define ENABLE_GL_DEBUG_OUTPUT 0
 
 #if ENABLE_GL_CHECK
 #include "OgreStringVector.h"

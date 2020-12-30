@@ -69,7 +69,6 @@ extern "C" void glFlushRenderAPPLE();
 #define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
 #endif
 
-#if ENABLE_GL_DEBUG_OUTPUT
 static void APIENTRY GLDebugCallback(GLenum source,
                                      GLenum type,
                                      GLuint id,
@@ -78,46 +77,53 @@ static void APIENTRY GLDebugCallback(GLenum source,
                                      const GLchar* message,
                                      const GLvoid* userParam)
 {
-    char debSource[32] = {0}, debType[32] = {0}, debSev[32] = {0};
+    const char *debSource = "", *debType = "", *debSev = "";
+
+    auto lml = Ogre::LML_NORMAL;
 
     if (source == GL_DEBUG_SOURCE_API)
-        strcpy(debSource, "OpenGL");
+        debSource = "OpenGL";
     else if (source == GL_DEBUG_SOURCE_WINDOW_SYSTEM)
-        strcpy(debSource, "Windows");
+        debSource = "Windows";
     else if (source == GL_DEBUG_SOURCE_SHADER_COMPILER)
-        strcpy(debSource, "Shader Compiler");
+        debSource = "Shader Compiler";
     else if (source == GL_DEBUG_SOURCE_THIRD_PARTY)
-        strcpy(debSource, "Third Party");
+        debSource = "Third Party";
     else if (source == GL_DEBUG_SOURCE_APPLICATION)
-        strcpy(debSource, "Application");
+        debSource = "Application";
     else if (source == GL_DEBUG_SOURCE_OTHER)
-        strcpy(debSource, "Other");
+        debSource = "Other";
 
     if (type == GL_DEBUG_TYPE_ERROR)
-        strcpy(debType, "error");
+        debType = "error";
     else if (type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR)
-        strcpy(debType, "deprecated behavior");
+        debType = "deprecated behavior";
     else if (type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)
-        strcpy(debType, "undefined behavior");
+        debType = "undefined behavior";
     else if (type == GL_DEBUG_TYPE_PORTABILITY)
-        strcpy(debType, "portability");
+        debType = "portability";
     else if (type == GL_DEBUG_TYPE_PERFORMANCE)
-        strcpy(debType, "performance");
+        debType = "performance";
     else if (type == GL_DEBUG_TYPE_OTHER)
-        strcpy(debType, "message");
+        debType = "message";
 
     if (severity == GL_DEBUG_SEVERITY_HIGH)
     {
-        strcpy(debSev, "high");
+        debSev = "high";
+        lml = Ogre::LML_CRITICAL;
     }
     else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
-        strcpy(debSev, "medium");
+    {
+        debSev = "medium";
+        lml = Ogre::LML_WARNING;
+    }
     else if (severity == GL_DEBUG_SEVERITY_LOW)
-        strcpy(debSev, "low");
+        debSev = "low";
+    else if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+        debSev = "note";
 
-    Ogre::LogManager::getSingleton().stream() << debSource << ":" << debType << "(" << debSev << ") " << id << ": " << message;
+    Ogre::LogManager::getSingleton().stream(lml) << debSource << ":" << debType << "(" << debSev << ") - " << message;
 }
-#endif
 
 namespace Ogre {
 
@@ -198,6 +204,13 @@ namespace Ogre {
 
         opt.name = "Separate Shader Objects";
         opt.possibleValues = {"No", "Yes"};
+        opt.currentValue = opt.possibleValues[0];
+        opt.immutable = false;
+
+        mOptions[opt.name] = opt;
+
+        opt.name = "Debug Layer";
+        opt.possibleValues = {"Off", "On"};
         opt.currentValue = opt.possibleValues[0];
         opt.immutable = false;
 
@@ -1621,14 +1634,19 @@ namespace Ogre {
         // Set provoking vertex convention
         OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
 
-        if (getCapabilities()->hasCapability(RSC_DEBUG))
+        auto it = mOptions.find("Debug Layer");
+        bool debugEnabled = false;
+        if (it != mOptions.end())
         {
-#if ENABLE_GL_DEBUG_OUTPUT
+            debugEnabled = StringConverter::parseBool(it->second.currentValue);
+        }
+
+        if (debugEnabled && getCapabilities()->hasCapability(RSC_DEBUG))
+        {
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
             OGRE_CHECK_GL_ERROR(glDebugMessageCallbackARB(&GLDebugCallback, NULL));
-            OGRE_CHECK_GL_ERROR(glDebugMessageControlARB(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 0, NULL, GL_TRUE));
-#endif
+            OGRE_CHECK_GL_ERROR(glDebugMessageControlARB(GL_DEBUG_SOURCE_API, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE));
         }
 
         if(getCapabilities()->hasCapability(RSC_PRIMITIVE_RESTART))
