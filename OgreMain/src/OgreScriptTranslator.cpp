@@ -2349,12 +2349,6 @@ namespace Ogre{
         if(!pass) return;
 
         auto program = GpuProgramUsage::_getProgramByName(node->name, pass->getResourceGroup(), type);
-        if (!program) {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file,
-                               node->line, node->name);
-            return;
-        }
-
         pass->setGpuProgram(type, program);
         if(pass->getGpuProgram(type)->isSupported())
         {
