@@ -67,31 +67,9 @@ namespace Ogre
 
         if (!program)
         {
-            String progType = "fragment";
-            if (type == GPT_VERTEX_PROGRAM)
-            {
-                progType = "vertex";
-            }
-            else if (type == GPT_GEOMETRY_PROGRAM)
-            {
-                progType = "geometry";
-            }
-            else if (type == GPT_DOMAIN_PROGRAM)
-            {
-                progType = "domain";
-            }
-            else if (type == GPT_HULL_PROGRAM)
-            {
-                progType = "hull";
-            }
-            else if (type == GPT_COMPUTE_PROGRAM)
-            {
-                progType = "compute";
-            }
-
+            String progType = GpuProgram::getProgramTypeName(type);
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "Unable to locate " + progType + " program called " + name + ".",
-                "GpuProgramUsage::_getProgramByName");
+                        "Unable to locate " + progType + " program called " + name);
         }
 
         return program;
@@ -159,54 +137,12 @@ namespace Ogre
         // check type
         if (mProgram->isLoaded() && mProgram->getType() != mType)
         {
-            String myType = "fragment";
-            if (mType == GPT_VERTEX_PROGRAM)
-            {
-                myType = "vertex";
-            }
-            else if (mType == GPT_GEOMETRY_PROGRAM)
-            {
-                myType = "geometry";
-            }
-            else if (mType == GPT_DOMAIN_PROGRAM)
-            {
-                myType = "domain";
-            }
-            else if (mType == GPT_HULL_PROGRAM)
-            {
-                myType = "hull";
-            }
-            else if (mType == GPT_COMPUTE_PROGRAM)
-            {
-                myType = "compute";
-            }
-
-            String yourType = "fragment";
-            if (mProgram->getType() == GPT_VERTEX_PROGRAM)
-            {
-                yourType = "vertex";
-            }
-            else if (mProgram->getType() == GPT_GEOMETRY_PROGRAM)
-            {
-                yourType = "geometry";
-            }
-            else if (mProgram->getType() == GPT_DOMAIN_PROGRAM)
-            {
-                yourType = "domain";
-            }
-            else if (mProgram->getType() == GPT_HULL_PROGRAM)
-            {
-                yourType = "hull";
-            }
-            else if (mType == GPT_COMPUTE_PROGRAM)
-            {
-                yourType = "compute";
-            }
+            String myType = GpuProgram::getProgramTypeName(mType);
+            String yourType = GpuProgram::getProgramTypeName(mProgram->getType());
 
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
                 mProgram->getName() + " is a " + yourType + " program, but you are assigning it to a " 
-                + myType + " program slot. This is invalid.",
-                "GpuProgramUsage::setProgramName");
+                + myType + " program slot. This is invalid");
 
         }
     }
