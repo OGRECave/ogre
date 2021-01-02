@@ -439,6 +439,8 @@ namespace Ogre {
     virtual void loadFromSource(void) = 0;
 
     };
+
+    inline String to_string(const GpuProgramType& v) { return GpuProgram::getProgramTypeName(v); }
     /** @} */
     /** @} */
 }

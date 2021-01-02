@@ -850,6 +850,9 @@ namespace Ogre
 
     };
 
+    inline String to_string(GPUVendor v) { return RenderSystemCapabilities::vendorToString(v); }
+    inline String to_string(const DriverVersion& v) { return v.toString(); }
+
     /** @} */
     /** @} */
 } // namespace
