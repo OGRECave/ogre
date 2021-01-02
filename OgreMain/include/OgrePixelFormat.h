@@ -653,6 +653,8 @@ namespace Ogre {
          */
         static void bulkPixelVerticalFlip(const PixelBox &box);
     };
+
+    inline const String& to_string(PixelFormat v) { return PixelUtil::getFormatName(v); }
     /** @} */
     /** @} */
 
