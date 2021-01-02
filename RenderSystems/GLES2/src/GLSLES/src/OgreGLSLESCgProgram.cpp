@@ -108,10 +108,6 @@ namespace Ogre {
                 PT_STRING),&msCmdProfiles);
 
         }
-
-        // Manually assign language now since we use it immediately
-        mSyntaxCode = "cg";
-        
     }
     //---------------------------------------------------------------------------
     GLSLESCgProgram::~GLSLESCgProgram()

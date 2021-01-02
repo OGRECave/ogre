@@ -41,8 +41,6 @@ SPIRVShader::SPIRVShader(ResourceManager* creator, const String& name, ResourceH
     {
         setupBaseParamDictionary();
     }
-
-    mSyntaxCode = "spirv";
 }
 
 SPIRVShader::~SPIRVShader()

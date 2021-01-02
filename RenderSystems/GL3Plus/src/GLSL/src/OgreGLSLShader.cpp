@@ -259,9 +259,6 @@ namespace Ogre {
                 PT_BOOL), &msCmdColumnMajorMatrices);
         }
 
-        mType = GPT_VERTEX_PROGRAM; // default value, to be corrected after the constructor with GpuProgram::setType()
-        mSyntaxCode = "glsl" + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion());
-        
         // There is nothing to load
         mLoadFromFile = false;
     }

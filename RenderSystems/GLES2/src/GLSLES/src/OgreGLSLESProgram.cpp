@@ -65,9 +65,6 @@ namespace Ogre {
                                             PT_BOOL),&msCmdOptimisation);
 #endif
         }
-        // Manually assign language now since we use it immediately
-        mSyntaxCode = "glsles";
-
         // There is nothing to load
         mLoadFromFile = false;
     }
