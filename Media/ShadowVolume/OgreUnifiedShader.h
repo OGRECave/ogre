@@ -29,6 +29,7 @@
 #define textureCube texCUBE
 #define shadow2D tex2Dcmp
 #define texture2DProj tex2Dproj
+vec4 texture2DLod(sampler2D s, vec2 v, float lod) { return tex2Dlod(s, vec4(v.x, v.y, 0, lod)); }
 
 #define samplerCube samplerCUBE
 #define sampler2DShadow Sampler2DShadow
