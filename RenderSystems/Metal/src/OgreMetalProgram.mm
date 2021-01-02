@@ -89,9 +89,6 @@ namespace Ogre {
                                             PT_STRING),&msCmdShaderReflectionPairHint);
         }
         mTargetBufferName = "";
-
-        // Manually assign language now since we use it immediately
-        mSyntaxCode = "metal";
         mEntryPoint = "main";
     }
     //---------------------------------------------------------------------------
