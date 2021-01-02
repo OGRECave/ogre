@@ -2316,41 +2316,39 @@ namespace Ogre{
         }
     }
 
-    static Pass* getPass(ScriptCompiler* compiler, ObjectAbstractNode* node)
+    static GpuProgramPtr getProgram(ScriptCompiler* compiler, ObjectAbstractNode* node)
     {
         if(node->name.empty())
         {
             compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
-            return NULL;
+            return nullptr;
         }
 
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (!GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()))
-        {
-            //recheck with auto resource group
-            if (!GpuProgramManager::getSingleton().getByName(
-                    evt.mName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME))
-            {
-                compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file,
-                                   node->line, evt.mName);
-                return NULL;
-            }
-        }
+        auto& mgr = GpuProgramManager::getSingleton();
+        if (auto ret = mgr.getByName(evt.mName, compiler->getResourceGroup()))
+            return ret;
 
-        return any_cast<Pass*>(node->parent->context);
+        // recheck with auto resource group
+        if (auto ret = mgr.getByName(evt.mName, RGN_AUTODETECT))
+            return ret;
+
+        compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line,
+                           evt.mName);
+        return nullptr;
     }
 
     //-------------------------------------------------------------------------
     void PassTranslator::translateProgramRef(GpuProgramType type, ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
+        auto program = getProgram(compiler, node);
+        if(!program) return;
+        auto pass = any_cast<Pass*>(node->parent->context);
 
-        auto program = GpuProgramUsage::_getProgramByName(node->name, pass->getResourceGroup(), type);
         pass->setGpuProgram(type, program);
-        if(pass->getGpuProgram(type)->isSupported())
+        if(program->isSupported())
         {
             GpuProgramParametersSharedPtr params = pass->getGpuProgramParameters(type);
             GpuProgramTranslator::translateProgramParameters(compiler, params, node);
@@ -2360,8 +2358,9 @@ namespace Ogre{
     OGRE_IGNORE_DEPRECATED_BEGIN
     void PassTranslator::translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
+        auto program = getProgram(compiler, node);
+        if(!program) return;
+        auto pass = any_cast<Pass*>(node->parent->context);
 
         compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
                            node->cls + ". Use shadow_caster_material instead");
@@ -2375,8 +2374,9 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowCasterFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
+        auto program = getProgram(compiler, node);
+        if(!program) return;
+        auto pass = any_cast<Pass*>(node->parent->context);
 
         compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
                            node->cls + ". Use shadow_caster_material instead");
@@ -2390,8 +2390,9 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowReceiverVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
+        auto program = getProgram(compiler, node);
+        if(!program) return;
+        auto pass = any_cast<Pass*>(node->parent->context);
 
         compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
                            node->cls + ". Use shadow_receiver_material instead");
@@ -2405,8 +2406,9 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translateShadowReceiverFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
-        Pass *pass = getPass(compiler, node);
-        if(!pass) return;
+        auto program = getProgram(compiler, node);
+        if(!program) return;
+        auto pass = any_cast<Pass*>(node->parent->context);
 
         compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
                            node->cls + ". Use shadow_receiver_material instead");
