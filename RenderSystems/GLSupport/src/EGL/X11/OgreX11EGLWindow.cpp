@@ -332,20 +332,17 @@ namespace Ogre {
 
         if (width != 0 && height != 0)
         {
-            if (mIsTopLevel)
-            { 
-                XResizeWindow((Display*)mGLSupport->getNativeDisplay(), (Window)mWindow, width, height);
-            }
-            else
+            if (!mIsTopLevel)
             {
-                mWidth = width;
-                mHeight = height;
-
-                for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-                {
-                    (*it).second->_updateDimensions();
-                }
+                XResizeWindow(mGLSupport->getNativeDisplay(), mWindow, width, height);
+                XFlush(mGLSupport->getNativeDisplay());
             }
+
+            mWidth = width;
+            mHeight = height;
+
+            for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
+                (*it).second->_updateDimensions();
         }
     }
 
@@ -376,20 +373,7 @@ namespace Ogre {
             XGetWindowAttributes((Display*)mNativeDisplay, (Window)mWindow, &windowAttrib);
         }
 
-        if (mWidth == uint32(windowAttrib.width) && mHeight == uint32(windowAttrib.height))
-            return;
-
-        mWidth = windowAttrib.width;
-        mHeight = windowAttrib.height;
-
-        if(!mIsTopLevel)
-        {
-            XResizeWindow((Display*)mNativeDisplay, mWindow, mWidth, mHeight);
-            XFlush((Display*)mNativeDisplay);
-        }
-
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-            (*it).second->_updateDimensions();
+        resize(windowAttrib.width, windowAttrib.height);
     }
     void X11EGLWindow::switchFullScreen(bool fullscreen)
     { 

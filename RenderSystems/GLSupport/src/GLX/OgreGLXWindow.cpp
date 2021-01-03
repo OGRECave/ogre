@@ -651,20 +651,7 @@ namespace Ogre
             XGetWindowAttributes(xDisplay, mWindow, &windowAttrib);
         }
 
-        if (mWidth == (size_t)windowAttrib.width && mHeight == (size_t)windowAttrib.height)
-            return;
-
-        mWidth = windowAttrib.width;
-        mHeight = windowAttrib.height;
-
-        if(!mIsTopLevel)
-        {
-            XResizeWindow(xDisplay, mWindow, mWidth, mHeight);
-            XFlush(xDisplay);
-        }
-
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-            (*it).second->_updateDimensions();
+        resize(windowAttrib.width, windowAttrib.height);
     }
 
     //-------------------------------------------------------------------------------------------------//

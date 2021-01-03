@@ -277,7 +277,17 @@ namespace Ogre {
 
     void Win32EGLWindow::resize( unsigned int width, unsigned int height )
     {
+		// Case window resized.
+		if (width != mWidth || height != mHeight)
+		{
+			mWidth  = rc.right - rc.left;
+			mHeight = rc.bottom - rc.top;
 
+			// Notify viewports of resize
+			ViewportList::iterator it = mViewportList.begin();
+			while( it != mViewportList.end() )
+				(*it++).second->_updateDimensions();
+		}
     }
 
     void Win32EGLWindow::windowMovedOrResized()
@@ -315,17 +325,7 @@ namespace Ogre {
 		unsigned int width = rc.right - rc.left;
 		unsigned int height = rc.bottom - rc.top;
 
-		// Case window resized.
-		if (width != mWidth || height != mHeight)
-		{
-			mWidth  = rc.right - rc.left;
-			mHeight = rc.bottom - rc.top;
-
-			// Notify viewports of resize
-			ViewportList::iterator it = mViewportList.begin();
-			while( it != mViewportList.end() )
-				(*it++).second->_updateDimensions();			
-		}
+        resize(width, height);
     }
 
     void Win32EGLWindow::switchFullScreen( bool fullscreen )

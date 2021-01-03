@@ -139,7 +139,11 @@ LRESULT CALLBACK WindowEventUtilities::_WndProc(HWND hWnd, UINT uMsg, WPARAM wPa
         break;
     case WM_SIZE:
         //log->logMessage("WM_SIZE");
-        win->windowMovedOrResized();
+        {
+            UINT width = LOWORD(lParam);
+            UINT height = HIWORD(lParam);
+            win->resize(width, height);
+        }
         for(index = start; index != end; ++index)
             (index->second)->windowResized(win);
         break;
@@ -292,12 +296,11 @@ static void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
         break;
     }
     case ConfigureNotify:
-    {    
-        // This could be slightly more efficient if windowMovedOrResized took arguments:
+    {
         unsigned int oldWidth, oldHeight, oldDepth;
         int oldLeft, oldTop;
         win->getMetrics(oldWidth, oldHeight, oldDepth, oldLeft, oldTop);
-        win->windowMovedOrResized();
+        win->resize(event.xconfigurerequest.width, event.xconfigurerequest.height);
 
         unsigned int newWidth, newHeight, newDepth;
         int newLeft, newTop;

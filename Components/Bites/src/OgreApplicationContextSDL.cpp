@@ -136,7 +136,7 @@ void ApplicationContextSDL::pollEvents()
                     continue;
 
                 Ogre::RenderWindow* win = it->render;
-                win->windowMovedOrResized();
+                win->resize(event.window.data1, event.window.data2);
                 windowResized(win);
             }
             break;

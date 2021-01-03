@@ -77,41 +77,42 @@ namespace Ogre {
 
     void AndroidEGLWindow::resize(uint width, uint height)
     {
-        // cannot do this - query size instead
-        windowMovedOrResized();
+        width *= mScale;
+        height *= mScale;
+
+        if (!mActive || (mWidth == width && mHeight == height))
+            return;
+
+        mWidth = width;
+        mHeight = height;
+
+        // Notify viewports of resize
+        ViewportList::iterator it = mViewportList.begin();
+        while (it != mViewportList.end())
+            (*it++).second->_updateDimensions();
+
+        EGLint format;
+        eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
+        EGL_CHECK_ERROR
+
+        if (mScale != 1.0f)
+        {
+            ANativeWindow_setBuffersGeometry(mWindow, mWidth, mHeight, format);
+        }
+        else
+        {
+            ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+        }
     }
 
     void AndroidEGLWindow::windowMovedOrResized()
     {
         if(mActive)
-        {		
-            // When using GPU rendering for Android UI the os creates a context in the main thread
-            // Now we have 2 choices create OGRE in its own thread or set our context current before doing
-            // anything else. I put this code here because this function called before any rendering is done.
-            // Because the events for screen rotation / resizing did not worked on all devices it is the best way
-            // to query the correct dimensions.
-            mContext->setCurrent();
+        {
+            int nwidth = ANativeWindow_getWidth(mWindow);
+            int nheight = ANativeWindow_getHeight(mWindow);
 
-            int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
-            int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
-
-            if(mScale != 1.0f && (nwidth != int(mWidth) || nheight != int(mHeight)))
-            {
-                // update buffer geometry
-                EGLint format;
-                eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
-                EGL_CHECK_ERROR
-
-                ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
-            }
-
-            mWidth = nwidth;
-            mHeight = nheight;
-
-            // Notify viewports of resize
-            ViewportList::iterator it = mViewportList.begin();
-            while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();
+            resize(nwidth, nheight);
         }
     }
     

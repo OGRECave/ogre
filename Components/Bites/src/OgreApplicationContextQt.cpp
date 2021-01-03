@@ -235,7 +235,7 @@ namespace OgreBites
                     continue;
 
                 Ogre::RenderWindow* win = it->render;
-                win->windowMovedOrResized();
+                win->resize(w->width(), w->height());
                 windowResized(win);
             }
             break;
