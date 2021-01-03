@@ -63,6 +63,7 @@ TEST_F(RTShaderSystem, createShaderBasedTechnique)
     auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
 
     EXPECT_TRUE(shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+    shaderGen.getRenderState("MyScheme")->setLightCountAutoUpdate(false);
 
     EXPECT_EQ(mat->getTechniques().size(), size_t(1));
     shaderGen.validateMaterial("MyScheme", *mat);
@@ -83,6 +84,7 @@ TEST_F(RTShaderSystem, MaterialSerializer)
     auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
 
     shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme");
+    shaderGen.getRenderState("MyScheme")->setLightCountAutoUpdate(false);
 
     auto rstate = shaderGen.getRenderState("MyScheme", *mat);
     rstate->addTemplateSubRenderState(shaderGen.createSubRenderState<RTShader::FFPColour>());

@@ -1883,8 +1883,10 @@ void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
     SceneManager* sceneManager = ShaderGenerator::getSingleton().getActiveSceneManager();
     RenderState* curRenderState = getRenderState();
 
-    if (sceneManager != NULL && curRenderState->getLightCountAutoUpdate())
+    if (curRenderState->getLightCountAutoUpdate())
     {
+        OgreAssert(sceneManager, "no active SceneManager. Did you forget to call ShaderGenerator::addSceneManager?");
+
         const LightList& lightList =  sceneManager->_getLightsAffectingFrustum();
         
         Vector3i sceneLightCount(0, 0, 0);
