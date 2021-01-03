@@ -746,7 +746,10 @@ namespace Ogre {
 
     void Win32Window::resize(unsigned int width, unsigned int height)
     {
-        if (mHWnd && !mIsFullScreen)
+        if (!isVisible())
+            return;
+
+        if (!mIsExternal && !mIsFullScreen && width > 0 && height > 0)
         {
             RECT rc = { 0, 0, int(width), int(height) };
             AdjustWindowRect(&rc, getWindowStyle(mIsFullScreen), false);
@@ -754,12 +757,15 @@ namespace Ogre {
             height = rc.bottom - rc.top;
             SetWindowPos(mHWnd, 0, 0, 0, width, height,
                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+            return;
         }
+
+        updateWindowRect();
     }
 
     void Win32Window::windowMovedOrResized()
     {
-        if (!mHWnd || IsIconic(mHWnd))
+        if (!isVisible())
             return;
 
         updateWindowRect();     

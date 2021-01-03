@@ -124,9 +124,8 @@ namespace Ogre
         */
         virtual void resize(unsigned int widthPt, unsigned int heightPt) = 0;
 
-        /** Notify that the window has been resized
-        @remarks
-            You don't need to call this unless you created the window externally.
+        /** Query the current size and position from an external window handle.
+            @note most of the time you already know the size and should call @ref resize instead.
         */
         virtual void windowMovedOrResized() {}
 
