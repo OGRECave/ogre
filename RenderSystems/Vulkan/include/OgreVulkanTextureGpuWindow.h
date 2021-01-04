@@ -38,43 +38,31 @@ namespace Ogre
     class _OgreVulkanExport VulkanTextureGpuWindow : public VulkanTextureGpuRenderTarget
     {
         VulkanWindow *mWindow;
+        uint32 mCurrentImageIdx;
 
-        uint32 mCurrentSwapchainIdx;
-
-        virtual void createInternalResourcesImpl( void );
-        virtual void destroyInternalResourcesImpl( void );
+        virtual void createInternalResourcesImpl( void ) override;
+        virtual void freeInternalResourcesImpl( void ) override;
 
     public:
-        VulkanTextureGpuWindow( GpuPageOutStrategy::GpuPageOutStrategy pageOutStrategy,
-                                VaoManager *vaoManager, IdString name, uint32 textureFlags,
-                                TextureTypes::TextureTypes initialType,
-                                TextureGpuManager *textureManager, VulkanWindow *window );
+        VulkanTextureGpuWindow(String name, TextureType initialType, TextureManager* textureManager,
+                               VulkanWindow* window);
         virtual ~VulkanTextureGpuWindow();
 
-        virtual void setTextureType( TextureTypes::TextureTypes textureType );
+        virtual void setTextureType( TextureType textureType );
 
-        virtual void getSubsampleLocations( vector<Vector2>::type locations );
-
-        virtual void notifyDataIsReady( void );
-        virtual bool _isDataReadyImpl( void ) const;
+        bool isRenderWindowSpecific() const override { return true; }
 
         /// @copydoc VulkanWindow::getImageAcquiredSemaphore
         VkSemaphore getImageAcquiredSemaphore( void );
 
-        void _setCurrentSwapchain( VkImage image, uint32 swapchainIdx );
-        uint32 getCurrentSwapchainIdx( void ) const { return mCurrentSwapchainIdx; }
+        void _setCurrentImage( VkImage image, uint32 imageIdx );
+        uint32 getCurrentImageIdx( void ) const { return mCurrentImageIdx; }
 
-        VkImage getWindowFinalTextureName( size_t idx ) const;
-        size_t getWindowNumSurfaces( void ) const;
+        VulkanWindow* getWindow() const { return mWindow; }
 
-        virtual void swapBuffers( void );
-
-        virtual void getCustomAttribute( IdString name, void *pData );
-
-        virtual bool isOpenGLRenderWindow( void ) const;
+        virtual void getCustomAttribute( const String& name, void *pData );
 
         virtual void _setToDisplayDummyTexture( void );
-        virtual void _notifyTextureSlotChanged( const TexturePool *newPool, uint16 slice );
     };
 }  // namespace Ogre
 

@@ -32,8 +32,7 @@ THE SOFTWARE.
 #include "OgreVulkanPrerequisites.h"
 
 #include "OgreCommon.h"
-#include "OgrePixelFormatGpu.h"
-#include "OgreRenderPassDescriptor.h"
+#include "OgrePixelFormat.h"
 
 #include "vulkan/vulkan_core.h"
 
@@ -47,9 +46,18 @@ namespace Ogre
     /** \addtogroup Resources
      *  @{
      */
+    // forward compatibility defines
+    class VulkanRenderPassDescriptor;
+    struct VulkanFrameBufferDescKey;
 
-    struct VulkanFrameBufferDescKey : public FrameBufferDescKey
+    typedef VulkanRenderPassDescriptor RenderPassDescriptor;
+    typedef VulkanFrameBufferDescKey FrameBufferDescKey;
+
+    struct VulkanFrameBufferDescKey
     {
+        uint8             numColourEntries = 1;
+        VulkanTextureGpu* colour[1] = {};
+        VulkanTextureGpu* depth = 0;
         VulkanFrameBufferDescKey();
         VulkanFrameBufferDescKey( const RenderPassDescriptor &desc );
 
@@ -85,12 +93,22 @@ namespace Ogre
         VulkanFrameBufferDescValue();
     };
 
-    typedef map<VulkanFrameBufferDescKey, VulkanFrameBufferDescValue>::type VulkanFrameBufferDescMap;
-    typedef map<FrameBufferDescKey, VulkanFlushOnlyDescValue>::type VulkanFlushOnlyDescMap;
+    typedef std::map<VulkanFrameBufferDescKey, VulkanFrameBufferDescValue> VulkanFrameBufferDescMap;
+    typedef std::map<FrameBufferDescKey, VulkanFlushOnlyDescValue> VulkanFlushOnlyDescMap;
 
-    class _OgreVulkanExport VulkanRenderPassDescriptor : public RenderPassDescriptor
+    class _OgreVulkanExport VulkanRenderPassDescriptor
     {
-    protected:
+    public:
+        VulkanTextureGpu* mColour[1];
+        VulkanTextureGpu* mDepth;
+        uint8                   mNumColourEntries = 0;
+    private:
+        /// When true, beginRenderPassDescriptor & endRenderPassDescriptor won't actually
+        /// load/store this pass descriptor; but will still set the mCurrentRenderPassDescriptor
+        /// so we have required information by some passes.
+        /// Examples of these are stencil passes.
+        public: bool            mInformationOnly = false;
+
         // 1 per MRT
         // 1 per MRT MSAA resolve
         // 1 for Depth buffer
@@ -126,12 +144,8 @@ namespace Ogre
         void calculateSharedKey( void );
         void calculateSharedFlushOnlyKey( void );
 
-        static VkAttachmentLoadOp get( LoadAction::LoadAction action );
-        static VkAttachmentStoreOp get( StoreAction::StoreAction action, bool bResolveTarget );
         static VkClearColorValue getClearColour( const ColourValue &clearColour,
                                                  PixelFormatGpu pixelFormat );
-
-        void sanitizeMsaaResolve( size_t colourIdx );
         void setupColourAttachment( const size_t idx, VulkanFrameBufferDescValue &fboDesc,
                                     VkAttachmentDescription *attachments, uint32 &currAttachmIdx,
                                     VkAttachmentReference *colourAttachRefs,
@@ -142,15 +156,16 @@ namespace Ogre
         void setupFbo( VulkanFrameBufferDescValue &fboDesc );
         void releaseFbo( void );
         static void destroyFbo( VulkanQueue *queue, VulkanFrameBufferDescValue &fboDesc );
-
-        /// Returns a mask of RenderPassDescriptor::EntryTypes bits set that indicates
-        /// if 'other' wants to perform clears on colour, depth and/or stencil values.
-        /// If using MRT, each colour is evaluated independently (only the ones marked
-        /// as clear will be cleared).
-        uint32 checkForClearActions( VulkanRenderPassDescriptor *other ) const;
-        bool cannotInterruptRendering( void ) const;
-
     public:
+        enum {
+            All = 1,
+            Colour0 = All,
+            Depth = All,
+            Stencil = All
+        };
+
+        void checkWarnIfRtvWasFlushed( uint32 entriesToFlush ) {}
+
         VulkanRenderPassDescriptor( VulkanQueue *graphicsQueue, VulkanRenderSystem *renderSystem );
         virtual ~VulkanRenderPassDescriptor();
 

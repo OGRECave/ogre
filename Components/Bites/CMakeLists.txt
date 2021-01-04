@@ -78,6 +78,9 @@ if (OGRE_STATIC OR OGRE_BITES_STATIC_PLUGINS)
   if (OGRE_BUILD_RENDERSYSTEM_TINY)
     set(DEPENDENCIES ${DEPENDENCIES} RenderSystem_Tiny)
   endif ()
+  if (OGRE_BUILD_RENDERSYSTEM_VULKAN)
+    set(DEPENDENCIES ${DEPENDENCIES} RenderSystem_Vulkan)
+  endif ()
 endif ()
 
 # define header and source files for the library

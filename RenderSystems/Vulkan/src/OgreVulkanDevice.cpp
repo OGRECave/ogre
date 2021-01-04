@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgreVulkanRenderSystem.h"
 #include "OgreVulkanWindow.h"
-#include "Vao/OgreVulkanVaoManager.h"
 
 #include "OgreException.h"
 #include "OgreStringConverter.h"
@@ -49,7 +48,6 @@ namespace Ogre
         mPhysicalDevice( 0 ),
         mDevice( 0 ),
         mPresentQueue( 0 ),
-        mVaoManager( 0 ),
         mRenderSystem( renderSystem ),
         mSupportedStages( 0xFFFFFFFF )
     {
@@ -68,7 +66,7 @@ namespace Ogre
             destroyQueues( mTransferQueues );
 
             // Must be done externally (this' destructor has yet to free more Vulkan stuff)
-            // vkDestroyDevice( mDevice, 0 );
+            vkDestroyDevice( mDevice, 0 );
             mDevice = 0;
             mPhysicalDevice = 0;
         }
@@ -87,67 +85,40 @@ namespace Ogre
         queueArray.clear();
     }
     //-------------------------------------------------------------------------
-    VkDebugReportCallbackCreateInfoEXT VulkanDevice::addDebugCallback(
-        PFN_vkDebugReportCallbackEXT debugCallback, RenderSystem *renderSystem )
-    {
-        // This is info for a temp callback to use during CreateInstance.
-        // After the instance is created, we use the instance-based
-        // function to register the final callback.
-        VkDebugReportCallbackCreateInfoEXT dbgCreateInfoTemp;
-        makeVkStruct( dbgCreateInfoTemp, VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT );
-        dbgCreateInfoTemp.pfnCallback = debugCallback;
-        dbgCreateInfoTemp.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
-        dbgCreateInfoTemp.pUserData = renderSystem;
-        return dbgCreateInfoTemp;
-    }
-    //-------------------------------------------------------------------------
-    VkInstance VulkanDevice::createInstance( const String &appName, FastArray<const char *> &extensions,
+    VkInstance VulkanDevice::createInstance( FastArray<const char *> &extensions,
                                              FastArray<const char *> &layers,
-                                             PFN_vkDebugReportCallbackEXT debugCallback,
-                                             RenderSystem *renderSystem )
+                                             PFN_vkDebugReportCallbackEXT debugCallback)
     {
-        VkInstanceCreateInfo createInfo;
-        VkApplicationInfo appInfo;
-        memset( &createInfo, 0, sizeof( createInfo ) );
-        memset( &appInfo, 0, sizeof( appInfo ) );
+        VkInstanceCreateInfo createInfo = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
+        VkApplicationInfo appInfo = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
 
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        if( !appName.empty() )
-            appInfo.pApplicationName = appName.c_str();
         appInfo.pEngineName = "Ogre3D Vulkan Engine";
         appInfo.engineVersion = OGRE_VERSION;
-        appInfo.apiVersion = VK_MAKE_VERSION( 1, 0, 2 );
+        appInfo.apiVersion = VK_API_VERSION_1_0;
 
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo = &appInfo;
+        createInfo.enabledLayerCount = layers.size();
+        createInfo.ppEnabledLayerNames = layers.data();
 
-        createInfo.enabledLayerCount = static_cast<uint32>( layers.size() );
-        createInfo.ppEnabledLayerNames = layers.begin();
+        createInfo.enabledExtensionCount = extensions.size();
+        createInfo.ppEnabledExtensionNames = extensions.data();
 
-        extensions.push_back( VK_KHR_SURFACE_EXTENSION_NAME );
-
-        createInfo.enabledExtensionCount = static_cast<uint32>( extensions.size() );
-        createInfo.ppEnabledExtensionNames = extensions.begin();
-
-#if OGRE_DEBUG_MODE >= OGRE_DEBUG_HIGH
-        VkDebugReportCallbackCreateInfoEXT debugCb = addDebugCallback( debugCallback, renderSystem );
+#if 1 //OGRE_DEBUG_MODE
+        VkDebugReportCallbackCreateInfoEXT debugCb = {VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT};
+        debugCb.pfnCallback = debugCallback;
+        debugCb.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
         createInfo.pNext = &debugCb;
 #endif
 
         VkInstance instance;
-        VkResult result = vkCreateInstance( &createInfo, 0, &instance );
-        checkVkResult( result, "vkCreateInstance" );
-
+        OGRE_VK_CHECK(vkCreateInstance(&createInfo, 0, &instance));
         return instance;
     }
     //-------------------------------------------------------------------------
     void VulkanDevice::createPhysicalDevice( uint32 deviceIdx )
     {
-        VkResult result = VK_SUCCESS;
-
         uint32 numDevices = 0u;
-        result = vkEnumeratePhysicalDevices( mInstance, &numDevices, NULL );
-        checkVkResult( result, "vkEnumeratePhysicalDevices" );
+        OGRE_VK_CHECK(vkEnumeratePhysicalDevices(mInstance, &numDevices, NULL));
 
         if( numDevices == 0u )
         {
@@ -158,23 +129,19 @@ namespace Ogre
         const String numDevicesStr = StringConverter::toString( numDevices );
         String deviceIdsStr = StringConverter::toString( deviceIdx );
 
-        LogManager::getSingleton().logMessage( "[Vulkan] Found " + numDevicesStr + " devices" );
-
         if( deviceIdx >= numDevices )
         {
-            LogManager::getSingleton().logMessage( "[Vulkan] Requested device index " + deviceIdsStr +
+            LogManager::getSingleton().logWarning( "[Vulkan] Requested device index " + deviceIdsStr +
                                                    " but there's only " +
                                                    StringConverter::toString( numDevices ) + "devices" );
             deviceIdx = 0u;
             deviceIdsStr = "0";
         }
 
-        LogManager::getSingleton().logMessage( "[Vulkan] Selecting device " + deviceIdsStr );
+        LogManager::getSingleton().logMessage( "[Vulkan] Selecting device #" + deviceIdsStr );
 
-        FastArray<VkPhysicalDevice> pd;
-        pd.resize( numDevices );
-        result = vkEnumeratePhysicalDevices( mInstance, &numDevices, pd.begin() );
-        checkVkResult( result, "vkEnumeratePhysicalDevices" );
+        FastArray<VkPhysicalDevice> pd(numDevices);
+        OGRE_VK_CHECK(vkEnumeratePhysicalDevices(mInstance, &numDevices, pd.data()));
         mPhysicalDevice = pd[deviceIdx];
 
         vkGetPhysicalDeviceMemoryProperties( mPhysicalDevice, &mDeviceMemoryProperties );
@@ -255,9 +222,7 @@ namespace Ogre
         findComputeQueue( usedQueueCount, maxComputeQueues );
         findTransferQueue( usedQueueCount, maxTransferQueues );
 
-        VkDeviceQueueCreateInfo queueCi;
-        makeVkStruct( queueCi, VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO );
-
+        VkDeviceQueueCreateInfo queueCi = {VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
         for( size_t i = 0u; i < numQueueFamilies; ++i )
         {
             queueCi.queueFamilyIndex = static_cast<uint32>( i );
@@ -272,11 +237,7 @@ namespace Ogre
     {
         uint32 numQueues;
         vkGetPhysicalDeviceQueueFamilyProperties( mPhysicalDevice, &numQueues, NULL );
-        if( numQueues == 0u )
-        {
-            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Vulkan device is reporting 0 queues!",
-                         "VulkanDevice::createDevice" );
-        }
+        OgreAssert( numQueues > 0u, "No queues found" );
         mQueueProps.resize( numQueues );
         vkGetPhysicalDeviceQueueFamilyProperties( mPhysicalDevice, &numQueues, &mQueueProps[0] );
 
@@ -290,24 +251,22 @@ namespace Ogre
         for( size_t i = 0u; i < queueCreateInfo.size(); ++i )
         {
             queuePriorities[i].resize( queueCreateInfo[i].queueCount, 1.0f );
-            queueCreateInfo[i].pQueuePriorities = queuePriorities[i].begin();
+            queueCreateInfo[i].pQueuePriorities = queuePriorities[i].data();
         }
 
         extensions.push_back( VK_KHR_SWAPCHAIN_EXTENSION_NAME );
 
-        VkDeviceCreateInfo createInfo;
-        makeVkStruct( createInfo, VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO );
+        VkDeviceCreateInfo createInfo = {VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
 
         createInfo.enabledExtensionCount = static_cast<uint32>( extensions.size() );
-        createInfo.ppEnabledExtensionNames = extensions.begin();
+        createInfo.ppEnabledExtensionNames = extensions.data();
 
         createInfo.queueCreateInfoCount = static_cast<uint32>( queueCreateInfo.size() );
         createInfo.pQueueCreateInfos = &queueCreateInfo[0];
 
         createInfo.pEnabledFeatures = &mDeviceFeatures;
 
-        VkResult result = vkCreateDevice( mPhysicalDevice, &createInfo, NULL, &mDevice );
-        checkVkResult( result, "vkCreateDevice" );
+        OGRE_VK_CHECK(vkCreateDevice(mPhysicalDevice, &createInfo, NULL, &mDevice));
 
         initUtils( mDevice );
     }

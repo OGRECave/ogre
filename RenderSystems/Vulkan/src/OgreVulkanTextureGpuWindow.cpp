@@ -30,116 +30,69 @@ THE SOFTWARE.
 
 #include "OgreVulkanTextureGpuManager.h"
 #include "OgreVulkanWindow.h"
-
-#include "OgreTextureBox.h"
-#include "OgreTextureGpuListener.h"
-#include "OgreVector2.h"
-#include "OgreWindow.h"
-
-#include "Vao/OgreVaoManager.h"
+#include "OgreVector.h"
 
 #include "OgreException.h"
 
 namespace Ogre
 {
-    extern const IdString CustomAttributeIdString_GLCONTEXT;
+    extern const String CustomAttributeIdString_GLCONTEXT;
 
-    VulkanTextureGpuWindow::VulkanTextureGpuWindow(
-        GpuPageOutStrategy::GpuPageOutStrategy pageOutStrategy, VaoManager *vaoManager, IdString name,
-        uint32 textureFlags, TextureTypes::TextureTypes initialType, TextureGpuManager *textureManager,
+    VulkanTextureGpuWindow::VulkanTextureGpuWindow(String name,
+        TextureType initialType, TextureManager *textureManager,
         VulkanWindow *window ) :
-        VulkanTextureGpuRenderTarget( pageOutStrategy, vaoManager, name, textureFlags, initialType,
+        VulkanTextureGpuRenderTarget( name, initialType,
                                       textureManager ),
         mWindow( window ),
-        mCurrentSwapchainIdx( 0u )
+        mCurrentImageIdx( 0u )
     {
-        mTextureType = TextureTypes::Type2D;
+        mTextureType = TEX_TYPE_2D;
+        mNumMipmaps = 0;
     }
     //-----------------------------------------------------------------------------------
-    VulkanTextureGpuWindow::~VulkanTextureGpuWindow() { destroyInternalResourcesImpl(); }
+    VulkanTextureGpuWindow::~VulkanTextureGpuWindow() { unload(); }
     //-----------------------------------------------------------------------------------
     VkSemaphore VulkanTextureGpuWindow::getImageAcquiredSemaphore( void )
     {
         return mWindow->getImageAcquiredSemaphore();
     }
     //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::_setCurrentSwapchain( VkImage image, uint32 swapchainIdx )
+    void VulkanTextureGpuWindow::_setCurrentImage( VkImage image, uint32 imageIdx )
     {
         mFinalTextureName = image;
-        mCurrentSwapchainIdx = swapchainIdx;
-    }
-    //-----------------------------------------------------------------------------------
-    VkImage VulkanTextureGpuWindow::getWindowFinalTextureName( size_t idx ) const
-    {
-        return mWindow->getSwapchainImage( idx );
-    }
-    //-----------------------------------------------------------------------------------
-    size_t VulkanTextureGpuWindow::getWindowNumSurfaces( void ) const
-    {
-        return mWindow->getNumSwapchains();
+        mCurrentImageIdx = imageIdx;
     }
     //-----------------------------------------------------------------------------------
     void VulkanTextureGpuWindow::createInternalResourcesImpl( void )
     {
-        if( mSampleDescription.isMultisample() )
+        if( mFSAA > 1 )
             createMsaaSurface();
+
+        // create surface to handle download
+        auto buf = std::make_shared<VulkanHardwarePixelBuffer>(this, mWidth, mHeight, mDepth, 1);
+        mSurfaceList.push_back(buf);
+        mCurrLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        mNextLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     }
     //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::destroyInternalResourcesImpl( void )
+    void VulkanTextureGpuWindow::freeInternalResourcesImpl( void )
     {
         mFinalTextureName = 0;
         destroyMsaaSurface();
     }
     //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::notifyDataIsReady( void )
+    void VulkanTextureGpuWindow::getCustomAttribute( const String& name, void *pData )
     {
-        assert( mResidencyStatus == GpuResidency::Resident );
-        notifyAllListenersTextureChanged( TextureGpuListener::ReadyForRendering );
+        //if( name == "Window" )
+        //    *static_cast<Window **>( pData ) = mWindow;
     }
-    //-----------------------------------------------------------------------------------
-    bool VulkanTextureGpuWindow::_isDataReadyImpl( void ) const
-    {
-        return mResidencyStatus == GpuResidency::Resident;
-    }
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::swapBuffers( void ) { mWindow->swapBuffers(); }
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::getCustomAttribute( IdString name, void *pData )
-    {
-        if( name == "Window" )
-            *static_cast<Window **>( pData ) = mWindow;
-    }
-    //-----------------------------------------------------------------------------------
-    bool VulkanTextureGpuWindow::isOpenGLRenderWindow( void ) const { return true; }
     //-----------------------------------------------------------------------------------
     void VulkanTextureGpuWindow::_setToDisplayDummyTexture( void ) {}
     //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::_notifyTextureSlotChanged( const TexturePool *newPool, uint16 slice )
-    {
-        OGRE_EXCEPT( Exception::ERR_INVALID_CALL, "",
-                     "VulkanTextureGpuWindow::_notifyTextureSlotChanged" );
-    }
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::setTextureType( TextureTypes::TextureTypes textureType )
+    void VulkanTextureGpuWindow::setTextureType( TextureType textureType )
     {
         OGRE_EXCEPT( Exception::ERR_INVALID_CALL,
                      "You cannot call setTextureType if isRenderWindowSpecific is true",
                      "VulkanTextureGpuWindow::setTextureType" );
-    }
-    //-----------------------------------------------------------------------------------
-    void VulkanTextureGpuWindow::getSubsampleLocations( vector<Vector2>::type locations )
-    {
-        locations.reserve( mSampleDescription.getColourSamples() );
-        if( mSampleDescription.getColourSamples() <= 1u )
-        {
-            locations.push_back( Vector2( 0.0f, 0.0f ) );
-        }
-        else
-        {
-            assert( mSampleDescription.getMsaaPattern() != MsaaPatterns::Undefined );
-
-            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "",
-                         "VulkanTextureGpuWindow::getSubsampleLocations" );
-        }
     }
 }  // namespace Ogre

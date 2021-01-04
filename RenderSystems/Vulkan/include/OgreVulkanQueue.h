@@ -31,14 +31,16 @@ THE SOFTWARE.
 
 #include "OgreVulkanPrerequisites.h"
 
-#include "Vao/OgreBufferPacked.h"
-
 #include "vulkan/vulkan_core.h"
 
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
+    typedef std::vector<VkSemaphore> VkSemaphoreArray;
+    typedef std::vector<VkFence> VkFenceArray;
+    struct BufferPacked;
+
     class _OgreVulkanExport VulkanQueue
     {
     public:
@@ -56,6 +58,8 @@ namespace Ogre
             FastArray<VkCommandBuffer> mCommands;
             size_t mCurrentCmdIdx;
             FastArray<VkFence> mProtectingFences;
+
+            std::vector<std::pair<VkBuffer, VkDeviceMemory>> mBufferGraveyard;
         };
 
         enum EncoderState
@@ -81,6 +85,9 @@ namespace Ogre
         VulkanDevice *mOwnerDevice;
 
     protected:
+        const uint8 maxNumFrames = 1;
+        uint8 dynBufferFrame = 0;
+
         struct RefCountedFence
         {
             uint32 refCount;
@@ -104,7 +111,7 @@ namespace Ogre
         VkSemaphoreArray                mGpuSignalSemaphForCurrCmdBuff;
         // clang-format on
 
-        typedef map<VkFence, RefCountedFence>::type RefCountedFenceMap;
+        typedef std::map<VkFence, RefCountedFence> RefCountedFenceMap;
 
         VkFenceArray mAvailableFences;
         /// Fences which haven't been released.
@@ -117,7 +124,6 @@ namespace Ogre
     protected:
         FastArray<VkCommandBuffer> mPendingCmds;
 
-        VulkanVaoManager *mVaoManager;
         VulkanRenderSystem *mRenderSystem;
 
         VkFence mCurrentFence;
@@ -126,8 +132,8 @@ namespace Ogre
         /// then mCurrentFence can enter into the recycle pool
         uint32 mCurrentFenceRefCount;
 
-        typedef map<const BufferPacked *, bool>::type BufferPackedDownloadMap;
-        typedef map<VulkanTextureGpu *, bool>::type TextureGpuDownloadMap;
+        typedef std::map<const BufferPacked *, bool> BufferPackedDownloadMap;
+        typedef std::map<VulkanTextureGpu *, bool> TextureGpuDownloadMap;
 
         EncoderState mEncoderState;
         VkAccessFlags mCopyEndReadSrcBufferFlags;
@@ -200,7 +206,7 @@ namespace Ogre
         @param buffer
         @param texture
         */
-        void prepareForDownload( const BufferPacked *buffer, TextureGpu *texture );
+        void prepareForDownload( const BufferPacked *buffer, VulkanTextureGpu *texture );
 
     public:
         VulkanQueue();
@@ -210,6 +216,8 @@ namespace Ogre
 
         void init( VkDevice device, VkQueue queue, VulkanRenderSystem *renderSystem );
         void destroy( void );
+
+        void queueForDeletion(VkBuffer buffer, VkDeviceMemory memory);
 
     protected:
         void newCommandBuffer( void );
@@ -248,7 +256,7 @@ namespace Ogre
                 queue->getCopyEncoder( dst, dst, false );
             @endcode
         */
-        void getCopyEncoder( const BufferPacked *buffer, TextureGpu *texture, const bool bDownload );
+        void getCopyEncoder( const BufferPacked *buffer, VulkanTextureGpu *texture, const bool bDownload );
         void getCopyEncoderV1Buffer( const bool bDownload );
 
         void endCopyEncoder( void );
@@ -266,17 +274,11 @@ namespace Ogre
         /// this semaphore on to execute STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
         void addWindowToWaitFor( VkSemaphore imageAcquisitionSemaph );
 
-        /// If this function returns false, waiting on the fence would cause a deadlock since
-        /// it will never signal. You must call commitAndNextCommandBuffer before waiting.
-        bool isFenceFlushed( VkFence fence ) const;
-
         void _waitOnFrame( uint8 frameIdx );
         bool _isFrameFinished( uint8 frameIdx );
 
         void commitAndNextCommandBuffer(
             SubmissionType::SubmissionType submissionType = SubmissionType::FlushOnly );
-
-        VulkanVaoManager *getVaoManager( void ) { return mVaoManager; }
     };
 
 }  // namespace Ogre

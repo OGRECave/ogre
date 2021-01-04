@@ -59,4 +59,23 @@ namespace Ogre
         OGRE_DELETE mRenderSystem;
         mRenderSystem = 0;
     }
+
+#ifndef OGRE_STATIC_LIB
+    static VulkanPlugin *plugin;
+
+    extern "C" void _OgreVulkanExport dllStartPlugin(void);
+    extern "C" void _OgreVulkanExport dllStopPlugin(void);
+
+    extern "C" void _OgreVulkanExport dllStartPlugin( void )
+    {
+        plugin = OGRE_NEW VulkanPlugin();
+        Root::getSingleton().installPlugin( plugin );
+    }
+
+    extern "C" void _OgreVulkanExport dllStopPlugin( void )
+    {
+        Root::getSingleton().uninstallPlugin( plugin );
+        OGRE_DELETE plugin;
+    }
+#endif
 }  // namespace Ogre

@@ -9,28 +9,25 @@
 
 # Configure Vulkan RenderSystem build
 
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/SPIRV-Reflect/*.h")
-file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/SPIRV-Reflect/*.c")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 set( HEADER_FILES ${HEADER_FILES})
 set( SOURCE_FILES ${SOURCE_FILES})
 
-include_directories(
-  BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-include_directories( ${Vulkan_INCLUDE_DIRS} )
-
 add_library(RenderSystem_Vulkan ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_Vulkan OgreMain ${Vulkan_LIBRARIES})
 
-if( UNIX AND NOT ANDROID )
-	target_link_libraries(RenderSystem_Vulkan xcb-randr X11-xcb)
+if(WIN32)
+    target_include_directories(RenderSystem_Vulkan PRIVATE $ENV{VULKAN_SDK}/Include)
+    target_link_directories(RenderSystem_Vulkan PRIVATE $ENV{VULKAN_SDK}/Lib)
+    target_link_libraries(RenderSystem_Vulkan PUBLIC OgreMain PRIVATE vulkan-1)
+else()
+    target_link_libraries(RenderSystem_Vulkan PUBLIC OgreMain PRIVATE vulkan)
 endif()
 
-if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_Vulkan ${OGRE_THREAD_LIBRARIES})
-endif ()
+target_include_directories(RenderSystem_Vulkan PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    $<INSTALL_INTERFACE:include/OGRE/RenderSystems/Vulkan>)
 
 ogre_config_framework(RenderSystem_Vulkan)
 

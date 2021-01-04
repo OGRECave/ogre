@@ -31,94 +31,48 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreLogManager.h"
+#include "OgrePixelFormat.h"
+#include <vulkan/vulkan_core.h>
 
-#ifdef __MINGW32__
-#    ifndef UINT64_MAX
-#        define UINT64_MAX 0xffffffffffffffffULL /* 18446744073709551615ULL */
-#    endif
-#endif
-
-#if defined( __LP64__ ) || defined( _WIN64 ) || ( defined( __x86_64__ ) && !defined( __ILP32__ ) ) || \
-    defined( _M_X64 ) || defined( __ia64 ) || defined( _M_IA64 ) || defined( __aarch64__ ) || \
-    defined( __powerpc64__ )
-#    define OGRE_VK_NON_DISPATCHABLE_HANDLE( object ) typedef struct object##_T *object;
-#else
-#    define OGRE_VK_NON_DISPATCHABLE_HANDLE( object ) typedef uint64_t object;
-#endif
-
-typedef struct VkInstance_T *VkInstance;
-typedef struct VkPhysicalDevice_T *VkPhysicalDevice;
-typedef struct VkDevice_T *VkDevice;
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkDeviceMemory )
-typedef struct VkCommandBuffer_T *VkCommandBuffer;
-
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkBuffer )
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkBufferView )
-
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkSurfaceKHR )
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkSwapchainKHR )
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkImage )
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkSemaphore )
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkFence )
-
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkRenderPass )
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkFramebuffer )
-
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkShaderModule )
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkDescriptorSetLayout )
-
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkDescriptorPool )
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkDescriptorSet )
-
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkPipelineLayout )
-OGRE_VK_NON_DISPATCHABLE_HANDLE( VkPipeline )
-
-#undef OGRE_VK_NON_DISPATCHABLE_HANDLE
-
-struct VkPipelineShaderStageCreateInfo;
-
-#define OGRE_VULKAN_CONST_SLOT_START 16u
-#define OGRE_VULKAN_TEX_SLOT_START 24u
-#define OGRE_VULKAN_PARAMETER_SLOT 23u
-#define OGRE_VULKAN_UAV_SLOT_START 28u
-
-#define OGRE_VULKAN_CS_PARAMETER_SLOT 7u
-#define OGRE_VULKAN_CS_CONST_SLOT_START 0u
-#define OGRE_VULKAN_CS_UAV_SLOT_START 8u
-#define OGRE_VULKAN_CS_TEX_SLOT_START 16u
 
 namespace Ogre
 {
     // Forward declarations
-    class VulkanBufferInterface;
-    class VulkanCache;
     class VulkanDescriptorPool;
     struct VulkanDevice;
-    class VulkanDynamicBuffer;
-    struct VulkanGlobalBindingTable;
     class VulkanGpuProgramManager;
     class VulkanProgram;
     class VulkanProgramFactory;
     class VulkanQueue;
     class VulkanRenderSystem;
-    class VulkanRootLayout;
-    class VulkanStagingBuffer;
     class VulkanTextureGpu;
     class VulkanTextureGpuManager;
-    class VulkanVaoManager;
     class VulkanWindow;
-    class VulkanDiscardBuffer;
-    class VulkanDiscardBufferManager;
 
-    typedef FastArray<VkSemaphore> VkSemaphoreArray;
-    typedef FastArray<VkFence> VkFenceArray;
+    template <typename T>
+    using FastArray = std::vector<T>;
 
-    namespace v1
+    /// Aligns the input 'offset' to the next multiple of 'alignment'.
+    /// Alignment can be any value except 0. Some examples:
+    ///
+    /// alignToNextMultiple( 0, 4 ) = 0;
+    /// alignToNextMultiple( 1, 4 ) = 4;
+    /// alignToNextMultiple( 2, 4 ) = 4;
+    /// alignToNextMultiple( 3, 4 ) = 4;
+    /// alignToNextMultiple( 4, 4 ) = 4;
+    /// alignToNextMultiple( 5, 4 ) = 8;
+    ///
+    /// alignToNextMultiple( 0, 3 ) = 0;
+    /// alignToNextMultiple( 1, 3 ) = 3;
+    inline size_t alignToNextMultiple( size_t offset, size_t alignment )
     {
-        class VulkanHardwareBufferCommon;
-        class VulkanHardwareIndexBuffer;
-        class VulkanHardwareVertexBuffer;
-    }  // namespace v1
+        return ( (offset + alignment - 1u) / alignment ) * alignment;
+    }
+
+    class VulkanHardwareBuffer;
+
+    typedef Texture TextureGpu;
+    typedef PixelFormat PixelFormatGpu;
 
     namespace SubmissionType
     {
@@ -145,30 +99,20 @@ namespace Ogre
 
 }  // namespace Ogre
 
-#define OGRE_VK_EXCEPT( code, num, desc, src ) \
-    OGRE_EXCEPT( code, desc + ( "\nVkResult = " + vkResultToString( num ) ), src )
+#define OGRE_ASSERT_HIGH(x) OgreAssert((x), "high")
+#define OGRE_ASSERT_MEDIUM(x) OgreAssert((x), "medium")
+#define OGRE_ASSERT_LOW(x) OgreAssert((x), "low")
 
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#    define checkVkResult( result, functionName ) \
-        do \
-        { \
-            if( result != VK_SUCCESS ) \
-            { \
-                OGRE_VK_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, result, functionName " failed", \
-                                __FUNCSIG__ ); \
-            } \
-        } while( 0 )
-#else
-#    define checkVkResult( result, functionName ) \
-        do \
-        { \
-            if( result != VK_SUCCESS ) \
-            { \
-                OGRE_VK_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, result, functionName " failed", \
-                                __PRETTY_FUNCTION__ ); \
-            } \
-        } while( 0 )
-#endif
+#define OGRE_VK_CHECK(vkcall) \
+{ \
+    VkResult result = vkcall; \
+    if (result != VK_SUCCESS) \
+    { \
+        String vkfunc = #vkcall; \
+        vkfunc = vkfunc.substr(0, vkfunc.find('(')); \
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, vkfunc + " failed with " + vkResultToString(result)); \
+    } \
+}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #    if !defined( __MINGW32__ )
@@ -194,7 +138,7 @@ namespace Ogre
 #            define _OgreVulkanExport __declspec( dllimport )
 #        endif
 #    endif
-#elif defined( OGRE_GCC_VISIBILITY )
+#elif defined( RenderSystem_Vulkan_EXPORTS )
 #    define _OgreVulkanExport __attribute__( ( visibility( "default" ) ) )
 #else
 #    define _OgreVulkanExport

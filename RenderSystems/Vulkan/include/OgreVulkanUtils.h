@@ -30,46 +30,18 @@ THE SOFTWARE.
 
 #include "OgreVulkanPrerequisites.h"
 
-#include "OgrePixelFormatGpu.h"
 #include "OgreString.h"
-
-#include "SPIRV-Reflect/spirv_reflect.h"
 
 #include "vulkan/vulkan_core.h"
 
 namespace Ogre
 {
-    struct VulkanDevice;
     void initUtils( VkDevice device );
-
-    template <typename T>
-    void makeVkStruct( T &inOutStruct, VkStructureType structType )
-    {
-        memset( &inOutStruct, 0, sizeof( inOutStruct ) );
-        inOutStruct.sType = structType;
-    }
 
     String vkResultToString( VkResult result );
 
     void setObjectName( VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType,
                         const char *name );
-
-    PixelFormatGpu findSupportedFormat( VkPhysicalDevice physicalDevice,
-                                        const FastArray<PixelFormatGpu> &candidates,
-                                        VkImageTiling tiling, VkFormatFeatureFlags features );
-
-    uint32_t findMemoryType( VkPhysicalDeviceMemoryProperties &memProperties, uint32_t typeFilter,
-                             VkMemoryPropertyFlags properties );
-
-    inline VkDeviceSize alignMemory( size_t offset, const VkDeviceSize &alignment )
-    {
-        return ( ( offset + alignment - 1 ) / alignment ) * alignment;
-    }
-
-    String getSpirvReflectError( SpvReflectResult spirvReflectResult );
-
-    VkSampleCountFlagBits getMaxUsableSampleCount(
-        VkPhysicalDeviceProperties &physicalDeviceProperties, uint32 requestedSampleCount );
 }  // namespace Ogre
 
 #endif  //#ifndef _OgreVulkanPrerequisites_H_

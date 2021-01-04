@@ -27,31 +27,24 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreVulkanHardwareBufferManager.h"
-#include "OgreVulkanHardwareIndexBuffer.h"
-#include "OgreVulkanHardwareVertexBuffer.h"
-#include "OgreVulkanDiscardBufferManager.h"
+#include "OgreVulkanHardwareBuffer.h"
+
+#include <vulkan/vulkan_core.h>
 
 namespace Ogre
 {
-namespace v1
-{
-    VulkanHardwareBufferManagerBase::VulkanHardwareBufferManagerBase( VulkanDevice *device,
-                                                                    VaoManager *vaoManager ) :
-        mDiscardBufferManager( 0 )
+    VulkanHardwareBufferManager::VulkanHardwareBufferManager( VulkanDevice *device) :
+        mDevice( device )
     {
-        mDiscardBufferManager = OGRE_NEW VulkanDiscardBufferManager( device, vaoManager );
     }
     //-----------------------------------------------------------------------------------
-    VulkanHardwareBufferManagerBase::~VulkanHardwareBufferManagerBase()
+    VulkanHardwareBufferManager::~VulkanHardwareBufferManager()
     {
         destroyAllDeclarations();
         destroyAllBindings();
-
-        OGRE_DELETE mDiscardBufferManager;
-        mDiscardBufferManager = 0;
     }
     //-----------------------------------------------------------------------------------
-    void VulkanHardwareBufferManagerBase::_notifyDeviceStalled( void )
+    void VulkanHardwareBufferManager::_notifyDeviceStalled( void )
     {
         {
             OGRE_LOCK_MUTEX( mVertexBuffersMutex );
@@ -60,8 +53,7 @@ namespace v1
 
             while( itor != end )
             {
-                VulkanHardwareVertexBuffer *hwBuffer =
-                    static_cast<VulkanHardwareVertexBuffer *>( *itor );
+                auto hwBuffer = (*itor)->_getImpl<VulkanHardwareBuffer>();
                 hwBuffer->_notifyDeviceStalled();
                 ++itor;
             }
@@ -73,54 +65,46 @@ namespace v1
 
             while( itor != end )
             {
-                VulkanHardwareIndexBuffer *hwBuffer =
-                    static_cast<VulkanHardwareIndexBuffer *>( *itor );
+                auto hwBuffer = (*itor)->_getImpl<VulkanHardwareBuffer>();
                 hwBuffer->_notifyDeviceStalled();
                 ++itor;
             }
         }
-
-        mDiscardBufferManager->_notifyDeviceStalled();
     }
     //-----------------------------------------------------------------------------------
-    HardwareVertexBufferSharedPtr VulkanHardwareBufferManagerBase::createVertexBuffer(
+    HardwareVertexBufferSharedPtr VulkanHardwareBufferManager::createVertexBuffer(
         size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer )
     {
-        VulkanHardwareVertexBuffer *buf =
-            OGRE_NEW VulkanHardwareVertexBuffer( this, vertexSize, numVerts, usage, useShadowBuffer );
+        auto impl = new VulkanHardwareBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertexSize * numVerts, usage,
+                                             useShadowBuffer, mDevice);
+        auto buf = std::make_shared<HardwareVertexBuffer>(this, vertexSize, numVerts, impl);
         {
-            OGRE_LOCK_MUTEX( mVertexBuffersMutex );
-            mVertexBuffers.insert( buf );
+            OGRE_LOCK_MUTEX(mVertexBuffersMutex);
+            mVertexBuffers.insert(buf.get());
         }
-        return HardwareVertexBufferSharedPtr( buf );
+        return buf;
     }
     //-----------------------------------------------------------------------------------
-    HardwareIndexBufferSharedPtr VulkanHardwareBufferManagerBase::createIndexBuffer(
+    HardwareIndexBufferSharedPtr VulkanHardwareBufferManager::createIndexBuffer(
         HardwareIndexBuffer::IndexType itype, size_t numIndexes, HardwareBuffer::Usage usage,
         bool useShadowBuffer )
     {
-        VulkanHardwareIndexBuffer *buf =
-            OGRE_NEW VulkanHardwareIndexBuffer( this, itype, numIndexes, usage, useShadowBuffer );
+        auto indexSize = HardwareIndexBuffer::indexSize(itype);
+        auto impl = new VulkanHardwareBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, indexSize * numIndexes, usage,
+                                             useShadowBuffer, mDevice);
+
+        auto buf = std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
         {
-            OGRE_LOCK_MUTEX( mIndexBuffersMutex );
-            mIndexBuffers.insert( buf );
+            OGRE_LOCK_MUTEX(mIndexBuffersMutex);
+            //mIndexBuffers.insert(buf.get()); // TODO never deleted yet
         }
-        return HardwareIndexBufferSharedPtr( buf );
+        return buf;
     }
     //-----------------------------------------------------------------------------------
-    HardwareUniformBufferSharedPtr VulkanHardwareBufferManagerBase::createUniformBuffer(
-        size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String &name )
+    HardwareBufferPtr VulkanHardwareBufferManager::createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage,
+                                                                       bool useShadowBuffer)
     {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "Use v2 interfaces.",
-                     "VulkanHardwareBufferManagerBase::createUniformBuffer" );
-        return HardwareUniformBufferSharedPtr();
+        return std::make_shared<VulkanHardwareBuffer>(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeBytes, usage, false,
+                                                      mDevice);
     }
-    //-----------------------------------------------------------------------------------
-    HardwareCounterBufferSharedPtr VulkanHardwareBufferManagerBase::createCounterBuffer(
-        size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String &name )
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "Use v2 interfaces.",
-                     "VulkanHardwareBufferManagerBase::createCounterBuffer" );
-    }
-}  // namespace v1
 }  // namespace Ogre

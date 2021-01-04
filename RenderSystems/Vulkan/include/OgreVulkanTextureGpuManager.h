@@ -31,14 +31,12 @@ THE SOFTWARE.
 
 #include "OgreVulkanPrerequisites.h"
 
-#include "OgreTextureGpuManager.h"
+#include "OgreTextureManager.h"
 
 #include "OgreVulkanDevice.h"
 #include "OgreVulkanRenderSystem.h"
 
-#include "OgreDescriptorSetTexture.h"
-#include "OgreDescriptorSetUav.h"
-#include "OgreTextureGpu.h"
+#include "OgreVulkanTextureGpu.h"
 
 #include "OgreHeaderPrefix.h"
 
@@ -50,7 +48,22 @@ namespace Ogre
     /** \addtogroup Resources
      *  @{
      */
-    class _OgreVulkanExport VulkanTextureGpuManager : public TextureGpuManager
+
+    struct StagingTexture;
+    struct AsyncTextureTicket;
+
+    class VulkanSampler : public Sampler
+    {
+    public:
+        VulkanSampler(VkDevice device);
+        ~VulkanSampler();
+        VkSampler bind();
+    private:
+        VkDevice mDevice;
+        VkSampler mVkSampler;
+    };
+
+    class VulkanTextureGpuManager : public TextureManager
     {
     protected:
         struct BlankTexture
@@ -67,47 +80,25 @@ namespace Ogre
             VkImageView imageView;
         };
 
-        typedef map<DescriptorSetTexture2::TextureSlot, CachedView>::type CachedTex2ImageViewMap;
-        typedef map<DescriptorSetUav::TextureSlot, CachedView>::type CachedUavImageViewMap;
-
-        CachedTex2ImageViewMap mCachedTex;
-        CachedUavImageViewMap mCachedUavs;
-
         /// 4x4 texture for when we have nothing to display.
-        BlankTexture mBlankTexture[TextureTypes::Type3D + 1u];
+        BlankTexture mBlankTexture[TEX_TYPE_2D_ARRAY + 1];
 
         VulkanDevice *mDevice;
 
         bool mCanRestrictImageViewUsage;
 
-        virtual TextureGpu *createTextureImpl( GpuPageOutStrategy::GpuPageOutStrategy pageOutStrategy,
-                                               IdString name, uint32 textureFlags,
-                                               TextureTypes::TextureTypes initialType );
-        virtual StagingTexture *createStagingTextureImpl( uint32 width, uint32 height, uint32 depth,
-                                                          uint32 slices, PixelFormatGpu pixelFormat );
-        virtual void destroyStagingTextureImpl( StagingTexture *stagingTexture );
+        SamplerPtr _createSamplerImpl() override;
 
-        virtual AsyncTextureTicket *createAsyncTextureTicketImpl( uint32 width, uint32 height,
-                                                                  uint32 depthOrSlices,
-                                                                  TextureTypes::TextureTypes textureType,
-                                                                  PixelFormatGpu pixelFormatFamily );
+        Resource* createImpl(const String& name, ResourceHandle handle, const String& group, bool isManual,
+                             ManualResourceLoader* loader, const NameValuePairList* createParams);
 
+        PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
     public:
-        VulkanTextureGpuManager( VulkanVaoManager *vaoManager, RenderSystem *renderSystem,
-                                 VulkanDevice *device, bool bCanRestrictImageViewUsage );
+        VulkanTextureGpuManager(RenderSystem* renderSystem, VulkanDevice* device, bool bCanRestrictImageViewUsage);
         virtual ~VulkanTextureGpuManager();
 
-        TextureGpu *createTextureGpuWindow( VulkanWindow *window );
-        TextureGpu *createWindowDepthBuffer( void );
-
-        VkImage getBlankTextureVulkanName( TextureTypes::TextureTypes textureType ) const;
-        VkImageView getBlankTextureView( TextureTypes::TextureTypes textureType ) const;
-
-        VkImageView createView( const DescriptorSetTexture2::TextureSlot &texSlot );
-        void destroyView( DescriptorSetTexture2::TextureSlot texSlot, VkImageView imageView );
-
-        VkImageView createView( const DescriptorSetUav::TextureSlot &texSlot );
-        void destroyView( DescriptorSetUav::TextureSlot texSlot, VkImageView imageView );
+        VkImage getBlankTextureVulkanName( TextureType textureType ) const;
+        VkImageView getBlankTextureView( TextureType textureType ) const;
 
         VulkanDevice *getDevice() const { return mDevice; }
 

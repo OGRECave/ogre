@@ -29,184 +29,74 @@ THE SOFTWARE.
 #include "OgreVulkanDescriptorPool.h"
 
 #include "OgreVulkanDevice.h"
-#include "OgreVulkanRootLayout.h"
 #include "OgreVulkanUtils.h"
-#include "Vao/OgreVulkanVaoManager.h"
-
 #include "OgreException.h"
 
 #include "vulkan/vulkan_core.h"
 
 namespace Ogre
 {
-    VulkanDescriptorPool::VulkanDescriptorPool::Pool::Pool( size_t _capacity ) :
-        pool( VK_NULL_HANDLE ),
-        size( 0u ),
-        capacity( _capacity )
-    {
-    }
+    static const int MAX_POOL_CAPACITY = 50;
     //-------------------------------------------------------------------------
-    VulkanDescriptorPool::VulkanDescriptorPool( VulkanVaoManager *vaoManager,
-                                                const VulkanRootLayout *rootLayout, size_t setIdx,
-                                                const size_t capacity ) :
-        mCurrentCapacity( 0u ),
-        mCurrentPoolIdx( 0u ),
-        mLastFrameUsed( vaoManager->getFrameCount() - vaoManager->getDynamicBufferMultiplier() ),
-        mAdvanceFrameScheduled( false ),
-        mVaoManager( vaoManager )
+    VulkanDescriptorPool::VulkanDescriptorPool(const std::vector<VkDescriptorPoolSize>& poolSizes,
+                                               VkDescriptorSetLayout layout, VulkanDevice* device)
+        : mLayout(layout), mCurrentPoolIdx(0u), mDevice(device)
     {
-        const DescBindingRange *descBindingRanges = rootLayout->getDescBindingRanges( setIdx );
+        mPoolSizes = poolSizes;
 
-        size_t numPoolSizes = 0u;
-        for( size_t i = 0u; i < DescBindingTypes::NumDescBindingTypes; ++i )
-        {
-            if( descBindingRanges[i].isInUse() )
-                ++numPoolSizes;
-        }
+        for(auto& p : mPoolSizes)
+            p.descriptorCount *= MAX_POOL_CAPACITY;
 
-        mPoolSizes.resize( numPoolSizes );
-
-        size_t poolIdx = 0u;
-        for( size_t i = 0u; i < DescBindingTypes::NumDescBindingTypes; ++i )
-        {
-            if( descBindingRanges[i].isInUse() )
-            {
-                mPoolSizes[poolIdx].type = static_cast<VkDescriptorType>(
-                    toVkDescriptorType( static_cast<DescBindingTypes::DescBindingTypes>( i ) ) );
-                mPoolSizes[poolIdx].descriptorCount =
-                    static_cast<uint32>( descBindingRanges[i].getNumUsedSlots() );
-                ++poolIdx;
-            }
-        }
-
-        createNewPool( vaoManager->getDevice(), capacity );
+        createNewPool();
     }
     //-------------------------------------------------------------------------
     VulkanDescriptorPool::~VulkanDescriptorPool()
     {
-        OGRE_ASSERT_LOW( mPools.empty() && "Call deinitialize first!" );
-    }
-    //-------------------------------------------------------------------------
-    void VulkanDescriptorPool::deinitialize( VulkanDevice *device )
-    {
-        FastArray<Pool>::const_iterator itor = mPools.begin();
-        FastArray<Pool>::const_iterator endt = mPools.end();
-
-        while( itor != endt )
+        for(auto p : mPools)
         {
-            vkDestroyDescriptorPool( device->mDevice, itor->pool, 0 );
-            ++itor;
+            vkDestroyDescriptorPool(mDevice->mDevice, p, 0);
         }
         mPools.clear();
     }
     //-------------------------------------------------------------------------
-    void VulkanDescriptorPool::createNewPool( VulkanDevice *device )
+    void VulkanDescriptorPool::createNewPool()
     {
-        const size_t newCapacity = mCurrentCapacity + ( mCurrentCapacity >> 1u ) + 1u;
-        createNewPool( device, newCapacity );
-    }
-    //-------------------------------------------------------------------------
-    void VulkanDescriptorPool::createNewPool( VulkanDevice *device, const size_t newCapacity )
-    {
-        VkDescriptorPoolCreateInfo poolCi;
-        makeVkStruct( poolCi, VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO );
-
-        const size_t maxNumDescTypes = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT + 1u;
-        VkDescriptorPoolSize poolSizes[maxNumDescTypes];
-        OGRE_ASSERT_HIGH( mPoolSizes.size() < maxNumDescTypes );
-
-        const size_t numPoolSizes = mPoolSizes.size();
-        for( size_t i = 0u; i < numPoolSizes; ++i )
-        {
-            poolSizes[i] = mPoolSizes[i];
-            poolSizes[i].descriptorCount *= newCapacity;
-        }
-
-        // We do not set FREE_DESCRIPTOR_SET_BIT as we do not need to free individual descriptor sets
+        VkDescriptorPoolCreateInfo poolCi = {VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
         poolCi.flags = 0;
-        poolCi.poolSizeCount = static_cast<uint32>( numPoolSizes );
-        poolCi.pPoolSizes = poolSizes;
-        poolCi.maxSets = static_cast<uint32_t>( newCapacity - mCurrentCapacity );
-        mCurrentCapacity = newCapacity;
+        poolCi.poolSizeCount = mPoolSizes.size();
+        poolCi.pPoolSizes = mPoolSizes.data();
+        poolCi.maxSets = MAX_POOL_CAPACITY;
 
-        Pool pool( poolCi.maxSets );
+        mCurrentPoolIdx = mPools.size();
 
         // Create the Vulkan descriptor pool
-        VkResult result = vkCreateDescriptorPool( device->mDevice, &poolCi, 0, &pool.pool );
-        checkVkResult( result, "vkCreateDescriptorPool" );
-
-        mPools.push_back( pool );
-        mCurrentPoolIdx = mPools.size() - 1u;
+        VkDescriptorPool pool;
+        OGRE_VK_CHECK(vkCreateDescriptorPool( mDevice->mDevice, &poolCi, 0, &pool ));
+        mPools.push_back(pool);
+        mDescriptorsUsedPerPool.push_back(0);
     }
     //-------------------------------------------------------------------------
-    VkDescriptorSet VulkanDescriptorPool::allocate( VulkanDevice *device,
-                                                    VkDescriptorSetLayout setLayout )
+    VkDescriptorSet VulkanDescriptorPool::allocate()
     {
-        OGRE_ASSERT_HIGH( isAvailableInCurrentFrame() );
+        if(mDescriptorsUsedPerPool[mCurrentPoolIdx] == MAX_POOL_CAPACITY)
+            createNewPool();
 
-        if( !mAdvanceFrameScheduled )
-            reset( device );
-
-        while( mCurrentPoolIdx < mPools.size() && mPools[mCurrentPoolIdx].isFull() )
-            ++mCurrentPoolIdx;
-
-        if( mCurrentPoolIdx >= mPools.size() )
-            createNewPool( device );
-
-        Pool &pool = mPools[mCurrentPoolIdx];
-
-        VkDescriptorSetAllocateInfo allocInfo;
-        makeVkStruct( allocInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO );
-
-        allocInfo.descriptorPool = pool.pool;
+        VkDescriptorSetAllocateInfo allocInfo = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+        allocInfo.descriptorPool = mPools[mCurrentPoolIdx];
         allocInfo.descriptorSetCount = 1u;
-        allocInfo.pSetLayouts = &setLayout;
+        allocInfo.pSetLayouts = &mLayout;
 
         VkDescriptorSet handle = VK_NULL_HANDLE;
 
         // Allocate a new descriptor set from the current pool
-        VkResult result = vkAllocateDescriptorSets( device->mDevice, &allocInfo, &handle );
+        VkResult result = vkAllocateDescriptorSets( mDevice->mDevice, &allocInfo, &handle );
         if( result != VK_SUCCESS )
         {
-            LogManager::getSingleton().logMessage(
-                "ERROR: vkAllocateDescriptorSets failed! Out of Memory?", LML_CRITICAL );
+            LogManager::getSingleton().logError("vkAllocateDescriptorSets failed! Out of Memory?");
             return VK_NULL_HANDLE;
         }
 
-        if( !mAdvanceFrameScheduled )
-        {
-            mVaoManager->_schedulePoolAdvanceFrame( this );
-            mAdvanceFrameScheduled = true;
-        }
-
-        ++pool.size;
-
+        mDescriptorsUsedPerPool[mCurrentPoolIdx]++;
         return handle;
-    }
-    //-------------------------------------------------------------------------
-    void VulkanDescriptorPool::reset( VulkanDevice *device )
-    {
-        FastArray<Pool>::iterator itor = mPools.begin();
-        FastArray<Pool>::iterator endt = mPools.end();
-
-        while( itor != endt )
-        {
-            vkResetDescriptorPool( device->mDevice, itor->pool, 0 );
-            itor->size = 0u;
-            ++itor;
-        }
-
-        mCurrentPoolIdx = 0u;
-    }
-    //-------------------------------------------------------------------------
-    void VulkanDescriptorPool::_advanceFrame( void )
-    {
-        mLastFrameUsed = mVaoManager->getFrameCount();
-        mAdvanceFrameScheduled = false;
-    }
-    //-------------------------------------------------------------------------
-    bool VulkanDescriptorPool::isAvailableInCurrentFrame( void ) const
-    {
-        return mVaoManager->isFrameFinished( mLastFrameUsed );
     }
 }  // namespace Ogre
