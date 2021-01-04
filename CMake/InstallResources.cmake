@@ -212,7 +212,7 @@ endif()
 if(WIN32)
   set(OGRE_PLUGIN_DIR_CMAKE "bin")
 else()
-  set(OGRE_PLUGIN_DIR_CMAKE "lib/OGRE")
+  set(OGRE_PLUGIN_DIR_CMAKE "${OGRE_LIB_DIRECTORY}/OGRE")
 endif()
 configure_package_config_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${PROJECT_BINARY_DIR}/cmake/OGREConfig.cmake
     INSTALL_DESTINATION ${OGRE_CMAKE_DIR}
