@@ -331,7 +331,7 @@ cmake_dependent_option(OGRE_BUILD_COMPONENT_TERRAIN "Build Terrain component" TR
 cmake_dependent_option(OGRE_BUILD_COMPONENT_VOLUME "Build Volume component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PROPERTY "Build Property component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND;NOT APPLE_IOS;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
-cmake_dependent_option(OGRE_BUILD_PLUGIN_GLSLANG "Build glslang plugin" TRUE "SPIRV-Tools_FOUND" FALSE) # no way to determine whether glslang is present
+cmake_dependent_option(OGRE_BUILD_PLUGIN_GLSLANG "Build glslang plugin" TRUE "SPIRV-Tools_FOUND OR OGRE_BUILD_RENDERSYSTEM_VULKAN" FALSE) # no way to determine whether glslang is present
 option(OGRE_BUILD_COMPONENT_OVERLAY "Build Overlay component" TRUE)
 
 cmake_dependent_option(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI "Include dear imgui in Overlays" TRUE "OGRE_BUILD_COMPONENT_OVERLAY" FALSE)

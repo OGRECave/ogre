@@ -33,44 +33,55 @@ THE SOFTWARE.
 #include "OgreVulkanTextureGpuWindow.h"
 #include "OgreVulkanUtils.h"
 
-#include "Vao/OgreVulkanVaoManager.h"
-
 #include "OgreException.h"
-#include "OgrePixelFormatGpuUtils.h"
+#include "OgrePixelFormat.h"
 #include "OgreVulkanTextureGpuManager.h"
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreViewport.h"
 
 #include "vulkan/vulkan_core.h"
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#include <X11/Xlib-xcb.h>
+#include <xcb/randr.h>
+#include <xcb/xcb.h>
+#include "vulkan/vulkan_xcb.h"
+#endif
+
+#include "OgreDepthBuffer.h"
 
 #define TODO_handleSeparatePresentQueue
 
 namespace Ogre
 {
     VulkanWindow::VulkanWindow( const String &title, uint32 width, uint32 height, bool fullscreenMode ) :
-        Window( title, width, height, fullscreenMode ),
         mLowestLatencyVSync( false ),
         mHwGamma( false ),
         mClosed( false ),
         mDevice( 0 ),
+        mTexture( 0 ),
+        mDepthTexture( 0 ),
         mSurfaceKHR( 0 ),
         mSwapchain( 0 ),
-        mSwapchainSemaphore( 0 ),
+        mCurrentSemaphoreIndex( 0 ),
         mSwapchainStatus( SwapchainReleased ),
         mRebuildingSwapchain( false ),
         mSuboptimal( false )
+        mSurfaceTransform( VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR )
     {
-        mFocused = true;
+        mActive = true;
     }
     //-------------------------------------------------------------------------
-    VulkanWindow::~VulkanWindow() {}
+    VulkanWindow::~VulkanWindow()
+    {
+        destroy();
+    }
     //-------------------------------------------------------------------------
     void VulkanWindow::parseSharedParams( const NameValuePairList *miscParams )
     {
         NameValuePairList::const_iterator opt;
         NameValuePairList::const_iterator end = miscParams->end();
 
-        opt = miscParams->find( "title" );
-        if( opt != end )
-            mTitle = opt->second;
         opt = miscParams->find( "vsync" );
         if( opt != end )
             mVSync = StringConverter::parseBool( opt->second );
@@ -79,7 +90,7 @@ namespace Ogre
             mVSyncInterval = StringConverter::parseUnsignedInt( opt->second );
         opt = miscParams->find( "FSAA" );
         if( opt != end )
-            mRequestedSampleDescription.parseString( opt->second );
+            mFSAA = StringConverter::parseUnsignedInt(opt->second);
         opt = miscParams->find( "gamma" );
         if( opt != end )
             mHwGamma = StringConverter::parseBool( opt->second );
@@ -88,57 +99,43 @@ namespace Ogre
             mLowestLatencyVSync = opt->second == "Lowest Latency";
     }
     //-------------------------------------------------------------------------
-    PixelFormatGpu VulkanWindow::chooseSurfaceFormat( bool hwGamma )
+    PixelFormat VulkanWindow::chooseSurfaceFormat( bool hwGamma )
     {
         uint32 numFormats = 0u;
-        VkResult result = vkGetPhysicalDeviceSurfaceFormatsKHR( mDevice->mPhysicalDevice, mSurfaceKHR,
-                                                                &numFormats, 0 );
-        checkVkResult( result, "vkGetPhysicalDeviceSurfaceFormatsKHR" );
-        if( numFormats == 0 )
-        {
-            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                         "vkGetPhysicalDeviceSurfaceFormatsKHR returned 0 formats!",
-                         "VulkanWindow::chooseSurfaceFormat" );
-        }
+        OGRE_VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(mDevice->mPhysicalDevice, mSurfaceKHR, &numFormats, 0));
+        OgreAssert(numFormats > 0, "No surface formats found");
 
-        FastArray<VkSurfaceFormatKHR> formats;
-        formats.resize( numFormats );
-        result = vkGetPhysicalDeviceSurfaceFormatsKHR( mDevice->mPhysicalDevice, mSurfaceKHR,
-                                                       &numFormats, formats.begin() );
-        checkVkResult( result, "vkGetPhysicalDeviceSurfaceFormatsKHR" );
+        FastArray<VkSurfaceFormatKHR> formats(numFormats);
+        OGRE_VK_CHECK(
+            vkGetPhysicalDeviceSurfaceFormatsKHR(mDevice->mPhysicalDevice, mSurfaceKHR, &numFormats, formats.data()));
 
-        PixelFormatGpu pixelFormat = PFG_UNKNOWN;
-        for( size_t i = 0; i < numFormats && pixelFormat == PFG_UNKNOWN; ++i )
+        PixelFormatGpu pixelFormat = PF_UNKNOWN;
+        for( size_t i = 0; i < numFormats && pixelFormat == PF_UNKNOWN; ++i )
         {
             switch( formats[i].format )
             {
             case VK_FORMAT_R8G8B8A8_SRGB:
                 if( hwGamma )
-                    pixelFormat = PFG_RGBA8_UNORM_SRGB;
+                    pixelFormat = PF_A8B8G8R8;//_SRGB;
                 break;
             case VK_FORMAT_B8G8R8A8_SRGB:
                 if( hwGamma )
-                    pixelFormat = PFG_BGRA8_UNORM_SRGB;
+                    pixelFormat = PF_A8R8G8B8;//_SRGB;
                 break;
             case VK_FORMAT_R8G8B8A8_UNORM:
                 if( !hwGamma )
-                    pixelFormat = PFG_RGBA8_UNORM;
+                    pixelFormat = PF_A8B8G8R8;
                 break;
             case VK_FORMAT_B8G8R8A8_UNORM:
                 if( !hwGamma )
-                    pixelFormat = PFG_BGRA8_UNORM;
+                    pixelFormat = PF_A8R8G8B8;
                 break;
             default:
                 continue;
             }
         }
 
-        if( pixelFormat == PFG_UNKNOWN )
-        {
-            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Could not find a suitable Surface format",
-                         "VulkanWindow::chooseSurfaceFormat" );
-        }
-
+        OgreAssert(pixelFormat != PF_UNKNOWN, "No suitable surface format found");
         return pixelFormat;
     }
     //-------------------------------------------------------------------------
@@ -146,111 +143,71 @@ namespace Ogre
     {
         mSuboptimal = false;
 
+        mTexture->setWidth(mWidth);
+        mTexture->setHeight(mHeight);
+        mTexture->createInternalResources();
+
+        mDepthTexture->setWidth(mWidth);
+        mDepthTexture->setHeight(mHeight);
+        mDepthTexture->setNumMipmaps(0);
+        mDepthTexture->createInternalResources();
+
         VkSurfaceCapabilitiesKHR surfaceCaps;
-        VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR( mDevice->mPhysicalDevice,
-                                                                     mSurfaceKHR, &surfaceCaps );
-        checkVkResult( result, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR" );
+        OGRE_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mDevice->mPhysicalDevice, mSurfaceKHR, &surfaceCaps));
 
         // Swapchain may be smaller/bigger than requested
-        setFinalResolution( Math::Clamp( getWidth(), surfaceCaps.minImageExtent.width,
-                                         surfaceCaps.maxImageExtent.width ),
-                            Math::Clamp( getHeight(), surfaceCaps.minImageExtent.height,
-                                         surfaceCaps.maxImageExtent.height ) );
+        mWidth = Math::Clamp(mWidth, surfaceCaps.minImageExtent.width, surfaceCaps.maxImageExtent.width);
+        mHeight =
+            Math::Clamp(mHeight, surfaceCaps.minImageExtent.height, surfaceCaps.maxImageExtent.height);
 
         VkBool32 supported;
-        result = vkGetPhysicalDeviceSurfaceSupportKHR(
-            mDevice->mPhysicalDevice, mDevice->mGraphicsQueue.mFamilyIdx, mSurfaceKHR, &supported );
-        checkVkResult( result, "vkGetPhysicalDeviceSurfaceSupportKHR" );
-
-        if( !supported )
-        {
-            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                         "vkGetPhysicalDeviceSurfaceSupportKHR says our KHR Surface is unsupported!",
-                         "VulkanWindow::createSwapchain" );
-        }
+        OGRE_VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(mDevice->mPhysicalDevice, mDevice->mGraphicsQueue.mFamilyIdx,
+                                                           mSurfaceKHR, &supported));
+        OgreAssert(supported, "KHR Surface is unsupported");
 
         uint32 numPresentModes = 0u;
-        vkGetPhysicalDeviceSurfacePresentModesKHR( mDevice->mPhysicalDevice, mSurfaceKHR,
-                                                   &numPresentModes, 0 );
-        FastArray<VkPresentModeKHR> presentModes;
-        presentModes.resize( numPresentModes );
-        vkGetPhysicalDeviceSurfacePresentModesKHR( mDevice->mPhysicalDevice, mSurfaceKHR,
-                                                   &numPresentModes, presentModes.begin() );
-
-        // targetPresentModes[0] is the target, targetPresentModes[1] is the fallback
-        bool presentModesFound[2] = { false, false };
-        VkPresentModeKHR targetPresentModes[2];
-        targetPresentModes[0] = VK_PRESENT_MODE_IMMEDIATE_KHR;
-        targetPresentModes[1] = VK_PRESENT_MODE_FIFO_KHR;
-        if( mVSync )
-        {
-            targetPresentModes[0] =
-                mLowestLatencyVSync ? VK_PRESENT_MODE_MAILBOX_KHR : VK_PRESENT_MODE_FIFO_KHR;
-            targetPresentModes[1] =
-                mLowestLatencyVSync ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_MAILBOX_KHR;
-        }
+        vkGetPhysicalDeviceSurfacePresentModesKHR(mDevice->mPhysicalDevice, mSurfaceKHR, &numPresentModes, 0);
+        std::vector<VkPresentModeKHR> presentModes(numPresentModes);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(mDevice->mPhysicalDevice, mSurfaceKHR, &numPresentModes,
+                                                  presentModes.data());
 
         // FIFO is guaranteed to be present
         VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
-        for( size_t i = 0u; i < numPresentModes; ++i )
+
+        if (!mVSync &&
+            std::find(presentModes.begin(), presentModes.end(), VK_PRESENT_MODE_IMMEDIATE_KHR) != presentModes.end())
         {
-            if( presentModes[i] == targetPresentModes[0] )
-                presentModesFound[0] = true;
-            if( presentModes[i] == targetPresentModes[1] )
-                presentModesFound[1] = true;
+            presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
         }
 
-        const String c_presentModeStrs[] = { "IMMEDIATE_KHR",
-                                             "MAILBOX_KHR",
-                                             "FIFO_KHR",
-                                             "FIFO_RELAXED_KHR",
-                                             "SHARED_DEMAND_REFRESH_KHR",
-                                             "SHARED_CONTINUOUS_REFRESH_KHR" };
+        const char* c_presentModeStrs[] = {"IMMEDIATE_KHR",
+                                           "MAILBOX_KHR",
+                                           "FIFO_KHR",
+                                           "FIFO_RELAXED_KHR",
+                                           "SHARED_DEMAND_REFRESH_KHR",
+                                           "SHARED_CONTINUOUS_REFRESH_KHR"};
 
-        for( size_t i = 0u; i < 2u; ++i )
-        {
-            LogManager::getSingleton().logMessage( "Trying presentMode = " +
-                                                   c_presentModeStrs[targetPresentModes[i]] );
-            if( presentModesFound[i] )
-            {
-                presentMode = targetPresentModes[i];
-                break;
-            }
-            else
-            {
-                LogManager::getSingleton().logMessage( "PresentMode not available" );
-            }
-        }
-
-        LogManager::getSingleton().logMessage( "Chosen presentMode = " +
-                                               c_presentModeStrs[presentMode] );
+        LogManager::getSingleton().stream() << "[VulkanWindow] presentMode = " << c_presentModeStrs[presentMode];
 
         //-----------------------------
         // Create swapchain
         //-----------------------------
 
-        VaoManager *vaoManager = mDevice->mVaoManager;
+        // try to get triple buffering by default
+        // https://github.com/KhronosGroup/Vulkan-Samples/blob/master/samples/performance/swapchain_images/swapchain_images_tutorial.md
+        auto minImageCount = surfaceCaps.minImageCount + 1;
+        if (surfaceCaps.maxImageCount != 0u)
+            minImageCount = std::min(minImageCount, surfaceCaps.maxImageCount);
 
-        // We may sometimes have to wait on the driver to complete internal operations
-        // before we can acquire another image to render to.
-        // Therefore it is recommended to request at least one more image than the minimum.
-        // https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain
-        uint32 minImageCount =
-            std::max<uint32>( surfaceCaps.minImageCount, vaoManager->getDynamicBufferMultiplier() ) + 1;
-        if( surfaceCaps.maxImageCount != 0u )
-            minImageCount = std::min<uint32>( minImageCount, surfaceCaps.maxImageCount );
-
-        VkSwapchainCreateInfoKHR swapchainCreateInfo;
-        memset( &swapchainCreateInfo, 0, sizeof( swapchainCreateInfo ) );
-        swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        VkSwapchainCreateInfoKHR swapchainCreateInfo = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
         swapchainCreateInfo.surface = mSurfaceKHR;
         swapchainCreateInfo.minImageCount = minImageCount;
-        swapchainCreateInfo.imageFormat = VulkanMappings::get( mTexture->getPixelFormat() );
+        swapchainCreateInfo.imageFormat = VulkanMappings::get(mTexture->getFormat());
         swapchainCreateInfo.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
         swapchainCreateInfo.imageExtent.width = getWidth();
         swapchainCreateInfo.imageExtent.height = getHeight();
         swapchainCreateInfo.imageArrayLayers = 1u;
-        swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
         swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         swapchainCreateInfo.queueFamilyIndexCount = 0u;
         swapchainCreateInfo.pQueueFamilyIndices = 0;
@@ -262,130 +219,97 @@ namespace Ogre
             VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR,
             VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR,
         };
-        for( size_t i = 0; i < sizeof( compositeAlphaFlags ) / sizeof( compositeAlphaFlags[0] ); ++i )
+        for (auto flag : compositeAlphaFlags)
         {
-            if( surfaceCaps.supportedCompositeAlpha & compositeAlphaFlags[i] )
+            if (surfaceCaps.supportedCompositeAlpha & flag)
             {
-                swapchainCreateInfo.compositeAlpha = compositeAlphaFlags[i];
+                swapchainCreateInfo.compositeAlpha = flag;
                 break;
             }
         }
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-        if( surfaceCaps.currentTransform <= VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR )
-        {
-            // We will manually rotate by adapting our projection matrices (fastest)
-            // See https://arm-software.github.io/vulkan_best_practice_for_mobile_developers/samples/
-            // performance/surface_rotation/surface_rotation_tutorial.html
-            swapchainCreateInfo.preTransform = surfaceCaps.currentTransform;
 
-            OrientationMode orientationMode = OR_DEGREE_0;
-            switch( surfaceCaps.currentTransform )
-            {
-            case VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR:
-                orientationMode = OR_DEGREE_0;
-                break;
-            case VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR:
-                std::swap( swapchainCreateInfo.imageExtent.width,
-                           swapchainCreateInfo.imageExtent.height );
-                orientationMode = OR_DEGREE_270;
-                break;
-            case VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR:
-                orientationMode = OR_DEGREE_180;
-                break;
-            case VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR:
-                std::swap( swapchainCreateInfo.imageExtent.width,
-                           swapchainCreateInfo.imageExtent.height );
-                orientationMode = OR_DEGREE_90;
-                break;
-            default:
-                break;
-            }
-
-            mTexture->setOrientationMode( orientationMode );
-            if( mDepthBuffer )
-                mDepthBuffer->setOrientationMode( orientationMode );
-            if( mStencilBuffer )
-                mStencilBuffer->setOrientationMode( orientationMode );
-        }
-        else
+#if 0
+        // https://developer.android.com/games/optimize/vulkan-prerotation
+        mSurfaceTransform = surfaceCaps.currentTransform;
+        if (mSurfaceTransform & (VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR | VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR))
         {
-            // We do not support mirroring. Force Vulkan to do the flipping for us
-            // (could be slower if there is no dedicated HW for it on the phone)
-            swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-            mTexture->setOrientationMode( OR_DEGREE_0 );
-            if( mDepthBuffer )
-                mDepthBuffer->setOrientationMode( OR_DEGREE_0 );
-            if( mStencilBuffer )
-                mStencilBuffer->setOrientationMode( OR_DEGREE_0 );
+            std::swap(swapchainCreateInfo.imageExtent.width, swapchainCreateInfo.imageExtent.height);
+            std::swap(mWidth, mHeight);
         }
-#else
-        swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+        swapchainCreateInfo.preTransform = mSurfaceTransform;
+        LogManager::getSingleton().stream() << "[VulkanWindow] SurfaceTransform = " << mSurfaceTransform;
 #endif
+        swapchainCreateInfo.preTransform = mSurfaceTransform;
         swapchainCreateInfo.presentMode = presentMode;
-
-        LogManager::getSingleton().logMessage(
-            "surfaceCaps.currentTransform = " +
-            StringConverter::toString( surfaceCaps.currentTransform ) );
 
         //-----------------------------
         // Create swapchain images
         //-----------------------------
-
-        result = vkCreateSwapchainKHR( mDevice->mDevice, &swapchainCreateInfo, 0, &mSwapchain );
-        checkVkResult( result, "vkCreateSwapchainKHR" );
+        OGRE_VK_CHECK(vkCreateSwapchainKHR(mDevice->mDevice, &swapchainCreateInfo, 0, &mSwapchain));
 
         uint32 numSwapchainImages = 0u;
-        result = vkGetSwapchainImagesKHR( mDevice->mDevice, mSwapchain, &numSwapchainImages, NULL );
-        checkVkResult( result, "vkGetSwapchainImagesKHR" );
+        OGRE_VK_CHECK(vkGetSwapchainImagesKHR(mDevice->mDevice, mSwapchain, &numSwapchainImages, NULL));
 
         OGRE_ASSERT_LOW( numSwapchainImages > 0u );
 
         mSwapchainImages.resize( numSwapchainImages );
-        result = vkGetSwapchainImagesKHR( mDevice->mDevice, mSwapchain, &numSwapchainImages,
-                                          mSwapchainImages.begin() );
-        checkVkResult( result, "vkGetSwapchainImagesKHR" );
+        OGRE_VK_CHECK(
+            vkGetSwapchainImagesKHR(mDevice->mDevice, mSwapchain, &numSwapchainImages, mSwapchainImages.data()));
 
-        acquireNextSwapchain();
+        mSwapchainImageViews.resize(numSwapchainImages);
+        mImageReadySemaphores.resize(numSwapchainImages);
+        mRenderFinishedSemaphores.resize(numSwapchainImages);
 
-        if( mDepthBuffer )
-            mDepthBuffer->_transitionTo( GpuResidency::Resident, (uint8 *)0 );
-        if( mStencilBuffer && mStencilBuffer != mDepthBuffer )
-            mStencilBuffer->_transitionTo( GpuResidency::Resident, (uint8 *)0 );
+        VkSemaphoreCreateInfo semaphoreCreateInfo = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+        for (uint32 i = 0; i < numSwapchainImages; i++)
+        {
+            mSwapchainImageViews[i] = mTexture->_createView(0, 0, 0, 1u, mSwapchainImages[i]);
+            OGRE_VK_CHECK(vkCreateSemaphore(mDevice->mDevice, &semaphoreCreateInfo, 0, &mImageReadySemaphores[i]));
+            OGRE_VK_CHECK(vkCreateSemaphore(mDevice->mDevice, &semaphoreCreateInfo, 0, &mRenderFinishedSemaphores[i]));
+        }
+
+        acquireNextImage();
 
         mDevice->mRenderSystem->notifySwapchainCreated( this );
     }
     //-------------------------------------------------------------------------
     void VulkanWindow::destroySwapchain( void )
     {
+        mTexture->unload();
+        mDepthTexture->unload();
         mDevice->mRenderSystem->notifySwapchainDestroyed( this );
 
-        if( mSwapchainSemaphore )
+        for(auto iv : mSwapchainImageViews)
         {
-            mDevice->mVaoManager->notifySemaphoreUnused( mSwapchainSemaphore );
-            mSwapchainSemaphore = 0;
+            vkDestroyImageView(mDevice->mDevice, iv, 0);
         }
 
-        if( mSwapchain )
+        for(auto s : mImageReadySemaphores)
         {
-            vkDestroySwapchainKHR( mDevice->mDevice, mSwapchain, 0 );
-            mSwapchain = 0;
+            vkDestroySemaphore( mDevice->mDevice, s, 0 );
         }
+
+        for(auto s : mRenderFinishedSemaphores)
+        {
+            vkDestroySemaphore( mDevice->mDevice, s, 0 );
+        }
+
+        vkDestroySwapchainKHR(mDevice->mDevice, mSwapchain, 0);
+        mSwapchain = 0;
 
         mSwapchainStatus = SwapchainReleased;
     }
     //-------------------------------------------------------------------------
-    void VulkanWindow::acquireNextSwapchain( void )
+    void VulkanWindow::acquireNextImage( void )
     {
         OGRE_ASSERT_LOW( mSwapchainStatus == SwapchainReleased );
-        OGRE_ASSERT_MEDIUM( !mSwapchainSemaphore );
 
-        VulkanVaoManager *vaoManager = mDevice->mVaoManager;
+        mCurrentSemaphoreIndex = (mCurrentSemaphoreIndex + 1) % mImageReadySemaphores.size();
+        auto semaphore = mImageReadySemaphores[mCurrentSemaphoreIndex];
 
-        mSwapchainSemaphore = vaoManager->getAvailableSempaphore();
-
-        uint32 swapchainIdx = 0u;
-        VkResult result = vkAcquireNextImageKHR( mDevice->mDevice, mSwapchain, UINT64_MAX,
-                                                 mSwapchainSemaphore, VK_NULL_HANDLE, &swapchainIdx );
+        uint32 imageIdx = 0u;
+        VkResult result =
+            vkAcquireNextImageKHR(mDevice->mDevice, mSwapchain, UINT64_MAX, semaphore, VK_NULL_HANDLE, &imageIdx);
         if( result != VK_SUCCESS || mSuboptimal )
         {
             // Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE)
@@ -400,24 +324,52 @@ namespace Ogre
             }
             else
             {
-                LogManager::getSingleton().logMessage(
-                    "[VulkanWindow::acquireNextSwapchain] vkAcquireNextImageKHR failed VkResult = " +
-                    vkResultToString( result ) );
+                LogManager::getSingleton().logMessage("vkAcquireNextImageKHR failed VkResult = " +
+                                                      vkResultToString(result));
             }
         }
         else
         {
             mSwapchainStatus = SwapchainAcquired;
 
-            VulkanTextureGpuWindow *vulkanTexture = static_cast<VulkanTextureGpuWindow *>( mTexture );
-
-            vulkanTexture->_setCurrentSwapchain( mSwapchainImages[swapchainIdx], swapchainIdx );
+            mTexture->_setCurrentImage( mSwapchainImages[imageIdx], imageIdx );
         }
     }
+
+    void VulkanWindow::resize(uint width, uint height)
+    {
+        if (mClosed)
+            return;
+
+        if (mWidth == width && mHeight == height)
+            return;
+
+        if (width != 0 && height != 0)
+        {
+            mWidth = width;
+            mHeight = height;
+
+            // recreate swapchain
+            mDevice->stall();
+            destroySwapchain();
+            createSwapchain();
+
+            for (auto it : mViewportList)
+                it.second->_updateDimensions();
+        }
+    }
+
+    void VulkanWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
+    {
+        mTexture->getBuffer()->blitToMemory(src, dst);
+    }
+
     //-------------------------------------------------------------------------
     void VulkanWindow::destroy( void )
     {
         destroySwapchain();
+        delete mTexture;
+        delete mDepthTexture;
         if( mSurfaceKHR )
         {
             vkDestroySurfaceKHR( mDevice->mInstance, mSurfaceKHR, 0 );
@@ -431,11 +383,87 @@ namespace Ogre
         mDevice = device;
     }
     //-------------------------------------------------------------------------
-    void VulkanWindow::_initialize( TextureGpuManager *textureGpuManager )
+    void VulkanWindow::create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
+                              const NameValuePairList* miscParams)
     {
-        OGRE_EXCEPT( Exception::ERR_INVALID_CALL,
-                     "Call _initialize( TextureGpuManager*, const NameValuePairList * ) instead",
-                     "VulkanWindow::_initialize" );
+        mActive = true;
+        mVisible = true;
+        mClosed = false;
+        mHwGamma = false;
+        mWidth = width;
+        mHeight = height;
+        mFSAA = 1;
+
+        xcb_connection_t *mConnection;
+        xcb_screen_t *mScreen;
+        xcb_window_t mXcbWindow;
+
+        if( miscParams )
+        {
+            NameValuePairList::const_iterator opt;
+            NameValuePairList::const_iterator end = miscParams->end();
+
+            opt = miscParams->find( "externalWindowHandle" );
+            OgreAssert( opt != end,  "externalWindowHandle required" );
+            {
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+                Display *dpy = XOpenDisplay(NULL);
+                mConnection = XGetXCBConnection(dpy);
+                mXcbWindow = (xcb_window_t)StringConverter::parseSizeT( opt->second );
+
+                XWindowAttributes windowAttrib;
+                XGetWindowAttributes( dpy, mXcbWindow, &windowAttrib );
+
+                int scr = DefaultScreen( dpy );
+
+                const xcb_setup_t *setup = xcb_get_setup( mConnection );
+                xcb_screen_iterator_t iter = xcb_setup_roots_iterator( setup );
+                while( scr-- > 0 )
+                    xcb_screen_next( &iter );
+
+                mScreen = iter.data;
+#endif
+            }
+
+            parseSharedParams( miscParams );
+        }
+
+        PFN_vkGetPhysicalDeviceXcbPresentationSupportKHR get_xcb_presentation_support =
+            (PFN_vkGetPhysicalDeviceXcbPresentationSupportKHR)vkGetInstanceProcAddr(
+                mDevice->mInstance, "vkGetPhysicalDeviceXcbPresentationSupportKHR" );
+        PFN_vkCreateXcbSurfaceKHR create_xcb_surface = (PFN_vkCreateXcbSurfaceKHR)vkGetInstanceProcAddr(
+            mDevice->mInstance, "vkCreateXcbSurfaceKHR" );
+
+        if( !get_xcb_presentation_support( mDevice->mPhysicalDevice, mDevice->mGraphicsQueue.mFamilyIdx,
+                                           mConnection, mScreen->root_visual ) )
+        {
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, "Vulkan not supported on given X11 window",
+                         "VulkanXcbWindow::_initialize" );
+        }
+
+        VkXcbSurfaceCreateInfoKHR xcbSurfCreateInfo;
+        memset( &xcbSurfCreateInfo, 0, sizeof( xcbSurfCreateInfo ) );
+        xcbSurfCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+        xcbSurfCreateInfo.connection = mConnection;
+        xcbSurfCreateInfo.window = mXcbWindow;
+        create_xcb_surface( mDevice->mInstance, &xcbSurfCreateInfo, 0, &mSurfaceKHR );
+
+        auto texMgr = TextureManager::getSingletonPtr();
+        mTexture = new VulkanTextureGpuWindow("RenderWindow", TEX_TYPE_2D, texMgr, this);;
+        mTexture->setFormat(chooseSurfaceFormat(mHwGamma));
+        mTexture->setFSAA(mFSAA, "");
+
+        mDepthTexture = new VulkanTextureGpuRenderTarget("RenderWindow DepthBuffer", TEX_TYPE_2D, texMgr);
+        mDepthTexture->setFormat(PF_DEPTH32F);
+        mDepthTexture->setUsage(TU_RENDERTARGET);
+        mDepthTexture->setFSAA(mFSAA, "");
+#if 0
+        mStencilBuffer = 0;
+        if( PixelFormatGpuUtils::isStencil( mDepthBuffer->getPixelFormat() ) )
+            mStencilBuffer = mDepthBuffer;
+#endif
+
+        createSwapchain();
     }
     //-------------------------------------------------------------------------
     VkSemaphore VulkanWindow::getImageAcquiredSemaphore( void )
@@ -448,16 +476,22 @@ namespace Ogre
         // We assert because it may signify that something weird is going on: if user called
         // swapBuffers(), then he may expect to present everything that has been rendered
         // up until now, without including what came after the swapBuffers call.
-        OGRE_ASSERT_MEDIUM( mSwapchainStatus != SwapchainPendingSwap );
+        // TODO OGRE_ASSERT_MEDIUM( mSwapchainStatus != SwapchainPendingSwap );
 
         VkSemaphore retVal = 0;
         if( mSwapchainStatus == SwapchainAcquired )
         {
             mSwapchainStatus = SwapchainUsedInRendering;
-            retVal = mSwapchainSemaphore;
+            retVal = mImageReadySemaphores[mCurrentSemaphoreIndex];
         }
         return retVal;
     }
+
+    VkSemaphore VulkanWindow::getRenderFinishedSemaphore() const
+    {
+        return mRenderFinishedSemaphores[mCurrentSemaphoreIndex];
+    }
+
     //-------------------------------------------------------------------------
     bool VulkanWindow::isClosed( void ) const { return mClosed; }
     //-------------------------------------------------------------------------
@@ -474,17 +508,12 @@ namespace Ogre
         mVSync = vSync;
 
         destroySwapchain();
-
-        if( mDepthBuffer )
-            mDepthBuffer->_transitionTo( GpuResidency::OnStorage, (uint8 *)0 );
-        if( mStencilBuffer && mStencilBuffer != mDepthBuffer )
-            mStencilBuffer->_transitionTo( GpuResidency::OnStorage, (uint8 *)0 );
-
         createSwapchain();
     }
     //-------------------------------------------------------------------------
     void VulkanWindow::swapBuffers( void )
     {
+        mSwapchainStatus = SwapchainUsedInRendering;
         if( mSwapchainStatus == SwapchainAcquired || mSwapchainStatus == SwapchainPendingSwap )
         {
             // Ogre never rendered to this window. There's nothing to present.
@@ -495,21 +524,19 @@ namespace Ogre
 
         OGRE_ASSERT_LOW( mSwapchainStatus == SwapchainUsedInRendering );
 
-        OGRE_ASSERT_MEDIUM( mSwapchainSemaphore );
-        VulkanVaoManager *vaoManager = mDevice->mVaoManager;
-        vaoManager->notifyWaitSemaphoreSubmitted( mSwapchainSemaphore );
-        mSwapchainSemaphore = 0;
-
         mDevice->mGraphicsQueue.mWindowsPendingSwap.push_back( this );
         mSwapchainStatus = SwapchainPendingSwap;
+
+        //endRenderPassDescriptor( false );
+        mDevice->commitAndNextCommandBuffer( SubmissionType::EndFrameAndSwap );
     }
     //-------------------------------------------------------------------------
-    void VulkanWindow::_swapBuffers( VkSemaphore queueFinishSemaphore )
+    void VulkanWindow::_swapBuffers()
     {
         OGRE_ASSERT_LOW( mSwapchainStatus == SwapchainPendingSwap );
 
-        VulkanTextureGpuWindow *vulkanTexture = static_cast<VulkanTextureGpuWindow *>( mTexture );
-        const uint32 currentSwapchainIdx = vulkanTexture->getCurrentSwapchainIdx();
+        auto queueFinishSemaphore = getRenderFinishedSemaphore();
+        const uint32 currentImageIdx = mTexture->getCurrentImageIdx();
 
         TODO_handleSeparatePresentQueue;
         /*
@@ -530,16 +557,12 @@ namespace Ogre
             assert(!err);
         }*/
 
-        VkPresentInfoKHR present;
-        makeVkStruct( present, VK_STRUCTURE_TYPE_PRESENT_INFO_KHR );
+        VkPresentInfoKHR present = {VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
         present.swapchainCount = 1u;
         present.pSwapchains = &mSwapchain;
-        present.pImageIndices = &currentSwapchainIdx;
-        if( queueFinishSemaphore )
-        {
-            present.waitSemaphoreCount = 1u;
-            present.pWaitSemaphores = &queueFinishSemaphore;
-        }
+        present.pImageIndices = &currentImageIdx;
+        present.waitSemaphoreCount = 1u;
+        present.pWaitSemaphores = &queueFinishSemaphore;
 
         VkResult result = vkQueuePresentKHR( mDevice->mPresentQueue, &present );
 

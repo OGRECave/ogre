@@ -26,26 +26,44 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   -----------------------------------------------------------------------------
 */
 
-#include "OgreRoot.h"
-#include "OgreVulkanPlugin.h"
+#ifndef _OgreVulkanHardwareBufferCommon_H_
+#define _OgreVulkanHardwareBufferCommon_H_
 
-#ifndef OGRE_STATIC_LIB
+#include "OgreVulkanPrerequisites.h"
+
+#include "OgreHardwareBuffer.h"
 
 namespace Ogre
 {
-    static VulkanPlugin *plugin;
-
-    extern "C" void _OgreVulkanExport dllStartPlugin( void ) throw()
+    class VulkanHardwareBuffer : public HardwareBuffer
     {
-        plugin = OGRE_NEW VulkanPlugin();
-        Root::getSingleton().installPlugin( plugin );
-    }
+    private:
+        VkBuffer mBuffer;
+        VkDeviceMemory  mMemory;
+        VulkanDevice *mDevice;
+        uint32 mLastFrameUsed;
+        uint32 mLastFrameGpuWrote;
+    public:
+        VulkanHardwareBuffer(uint32 target, size_t sizeBytes, Usage usage, bool useShadowBuffer, VulkanDevice* device);
+        virtual ~VulkanHardwareBuffer();
 
-    extern "C" void _OgreVulkanExport dllStopPlugin( void )
-    {
-        Root::getSingleton().uninstallPlugin( plugin );
-        OGRE_DELETE plugin;
-    }
-}  // namespace Ogre
+        void _notifyDeviceStalled( void );
+
+        VkBuffer getVkBuffer();
+
+        void* lockImpl(size_t offset, size_t length, LockOptions options) override;
+        void unlockImpl() override;
+
+        void readData( size_t offset, size_t length, void *pDest ) override;
+
+        void writeData( size_t offset, size_t length, const void *pSource,
+                        bool discardWholeBuffer = false ) override;
+
+        void copyData( HardwareBuffer& srcBuffer, size_t srcOffset, size_t dstOffset,
+                       size_t length, bool discardWholeBuffer = false ) override;
+
+        void _updateFromShadow() override;
+    };
+}
 
 #endif

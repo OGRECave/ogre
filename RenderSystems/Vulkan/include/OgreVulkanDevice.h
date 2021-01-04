@@ -69,7 +69,6 @@ namespace Ogre
         VkPhysicalDeviceFeatures mDeviceFeatures;
         FastArray<VkQueueFamilyProperties> mQueueProps;
 
-        VulkanVaoManager *mVaoManager;
         VulkanRenderSystem *mRenderSystem;
 
         uint32 mSupportedStages;
@@ -87,15 +86,9 @@ namespace Ogre
         VulkanDevice( VkInstance instance, uint32 deviceIdx, VulkanRenderSystem *renderSystem );
         ~VulkanDevice();
 
-    protected:
-        static VkDebugReportCallbackCreateInfoEXT addDebugCallback(
-            PFN_vkDebugReportCallbackEXT debugCallback, RenderSystem *renderSystem );
-
-    public:
-        static VkInstance createInstance( const String &appName, FastArray<const char *> &extensions,
+        static VkInstance createInstance( FastArray<const char *> &extensions,
                                           FastArray<const char *> &layers,
-                                          PFN_vkDebugReportCallbackEXT debugCallback,
-                                          RenderSystem *renderSystem );
+                                          PFN_vkDebugReportCallbackEXT debugCallback );
 
         void createPhysicalDevice( uint32 deviceIdx );
 

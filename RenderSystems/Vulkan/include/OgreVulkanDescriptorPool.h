@@ -30,58 +30,30 @@ THE SOFTWARE.
 
 #include "OgreVulkanPrerequisites.h"
 
-struct VkDescriptorPoolSize;
-
 namespace Ogre
 {
     /**
     @brief The VulkanDescriptorPool class
         A VulkanDescriptorPool manages the pool of a single set (i.e. one VkDescriptorSetLayout)
-
-        It asks for a VulkanRootLayout pointer and the setIdx in order to gather all the data.
-
-        However it is not tied to a single VulkanRootLayout and
-        may be shared by multiple VulkanRootLayouts
     */
-    class _OgreVulkanExport VulkanDescriptorPool : public RenderSysAlloc
+    class VulkanDescriptorPool
     {
-        struct Pool
-        {
-            VkDescriptorPool pool;
-            size_t size;
-            size_t capacity;
-
-            Pool( size_t _capacity );
-            bool isFull( void ) const { return size == capacity; }
-        };
-
-        size_t mCurrentCapacity;
-        FastArray<Pool> mPools;
-        FastArray<VkDescriptorPoolSize> mPoolSizes;
+        std::vector<VkDescriptorPool> mPools;
+        std::vector<uint32> mDescriptorsUsedPerPool;
+        std::vector<VkDescriptorPoolSize> mPoolSizes;
+        VkDescriptorSetLayout mLayout;
 
         size_t mCurrentPoolIdx;
-        uint32 mLastFrameUsed;
 
-        bool mAdvanceFrameScheduled;
-        VulkanVaoManager *mVaoManager;
+        VulkanDevice *mDevice;
 
-        void createNewPool( VulkanDevice *device );
-        void createNewPool( VulkanDevice *device, const size_t newCapacity );
-
+        void createNewPool();
     public:
-        VulkanDescriptorPool( VulkanVaoManager *vaoManager, const VulkanRootLayout *rootLayout,
-                              size_t setIdx, const size_t capacity = 16u );
+        VulkanDescriptorPool(const std::vector<VkDescriptorPoolSize>& poolSizes, VkDescriptorSetLayout layout,
+                             VulkanDevice* device);
         ~VulkanDescriptorPool();
 
-        void deinitialize( VulkanDevice *device );
-
-        VkDescriptorSet allocate( VulkanDevice *device, VkDescriptorSetLayout setLayout );
-        void reset( VulkanDevice *device );
-
-        size_t getCurrentCapacity( void ) const { return mCurrentCapacity; }
-
-        void _advanceFrame( void );
-        bool isAvailableInCurrentFrame( void ) const;
+        VkDescriptorSet allocate();
     };
 }  // namespace Ogre
 

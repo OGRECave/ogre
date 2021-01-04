@@ -30,20 +30,18 @@ THE SOFTWARE.
 
 #include "OgreVulkanPrerequisites.h"
 
-#include "OgreWindow.h"
+#include "OgreRenderWindow.h"
+#include "OgreVulkanTextureGpuWindow.h"
+#include "vulkan/vulkan_core.h"
 
 namespace Ogre
 {
-    class VulkanWindow : public Window
+    class VulkanWindow : public RenderWindow
     {
     public:
-        enum Backend
-        {
-            BackendX11 = 1u << 0u
-        };
         enum SwapchainStatus
         {
-            /// We already called VulkanWindow::acquireNextSwapchain.
+            /// We already called VulkanWindow::acquireNextImage.
             ///
             /// Can only go into this state if we're coming from SwapchainReleased
             SwapchainAcquired,
@@ -66,44 +64,75 @@ namespace Ogre
         bool mHwGamma;
         bool mClosed;
 
+        bool mVisible;
+        bool mHidden;
+
+        bool mVSync;
+        int mVSyncInterval;
+
         VulkanDevice *mDevice;
+        VulkanTextureGpuWindow* mTexture;
+        VulkanTextureGpuRenderTarget* mDepthTexture;
 
         VkSurfaceKHR mSurfaceKHR;
         VkSwapchainKHR mSwapchain;
-        FastArray<VkImage> mSwapchainImages;
-        /// Note: We need a semaphore per frame, not per swapchain.
-        ///
+        std::vector<VkImage> mSwapchainImages;
+        std::vector<VkImageView> mSwapchainImageViews;
+
         /// Makes Queue execution wait until the acquired image is done presenting
-        VkSemaphore mSwapchainSemaphore;
+        std::vector<VkSemaphore> mImageReadySemaphores;
+        std::vector<VkSemaphore> mRenderFinishedSemaphores;
+        int mCurrentSemaphoreIndex;
         SwapchainStatus mSwapchainStatus;
         bool mRebuildingSwapchain;
         bool mSuboptimal;
 
         void parseSharedParams( const NameValuePairList *miscParams );
 
-        PixelFormatGpu chooseSurfaceFormat( bool hwGamma );
+        VkSurfaceTransformFlagBitsKHR mSurfaceTransform;
+
+        PixelFormat chooseSurfaceFormat( bool hwGamma );
         void createSwapchain( void );
         void destroySwapchain( void );
 
     public:
-        void acquireNextSwapchain( void );
+        void acquireNextImage( void );
 
     public:
         VulkanWindow( const String &title, uint32 width, uint32 height, bool fullscreenMode );
         virtual ~VulkanWindow();
 
+        VulkanTextureGpu* getTexture() { return mTexture; }
+        VulkanTextureGpu* getDepthTexture() { return mDepthTexture; }
+
+        VkSurfaceTransformFlagBitsKHR getSurfaceTransform() const { return mSurfaceTransform; }
+
         virtual void destroy( void );
 
+        virtual void reposition( int32 leftPt, int32 topPt ) {}
+
+        void setVisible( bool visible ) override { mVisible = visible; }
+        bool isVisible( void ) const override { return mVisible; }
+        void setHidden( bool hidden ) { mHidden = hidden; }
+        bool isHidden( void ) const { return mHidden; }
+
+        PixelFormat suggestPixelFormat() const { return mTexture->getFormat(); }
+        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer = FB_AUTO);
+        bool requiresTextureFlipping() const { return false; }
+
+        void resize(unsigned int widthPt, unsigned int heightPt) override;
+
         void _setDevice( VulkanDevice *device );
-        virtual void _initialize( TextureGpuManager *textureGpuManager );
-        virtual void _initialize( TextureGpuManager *textureGpuManager,
-                                  const NameValuePairList *miscParams ) = 0;
+
+        void create(const String& name, unsigned int widthPt, unsigned int heightPt, bool fullScreen,
+                    const NameValuePairList* miscParams);
 
         /// Returns null if getImageAcquiredSemaphore has already been called during this frame
         VkSemaphore getImageAcquiredSemaphore( void );
 
-        size_t getNumSwapchains( void ) const { return mSwapchainImages.size(); }
-        VkImage getSwapchainImage( size_t idx ) const { return mSwapchainImages[idx]; }
+        VkSemaphore getRenderFinishedSemaphore() const;
+
+        const std::vector<VkImageView>& getSwapchainImageViews() const { return mSwapchainImageViews; }
 
         virtual bool isClosed( void ) const;
 
@@ -119,7 +148,7 @@ namespace Ogre
         @param queueFinishSemaphore
             Makes our present request wait until the Queue is done executing before we can present
         */
-        void _swapBuffers( VkSemaphore queueFinishSemaphore );
+        void _swapBuffers();
     };
 }  // namespace Ogre
 

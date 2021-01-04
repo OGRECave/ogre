@@ -33,10 +33,9 @@ THE SOFTWARE.
 #include "OgreVulkanRenderSystem.h"
 #include "OgreVulkanTextureGpu.h"
 #include "OgreVulkanWindow.h"
-#include "Vao/OgreVulkanVaoManager.h"
 
 #include "OgreException.h"
-#include "OgrePixelFormatGpuUtils.h"
+#include "OgrePixelFormat.h"
 #include "OgreStringConverter.h"
 
 #include "OgreVulkanUtils.h"
@@ -56,7 +55,6 @@ namespace Ogre
         mQueue( 0 ),
         mCurrentCmdBuffer( 0 ),
         mOwnerDevice( 0 ),
-        mVaoManager( 0 ),
         mRenderSystem( 0 ),
         mCurrentFence( 0 ),
         mCurrentFenceRefCount( 0u ),
@@ -68,55 +66,7 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
-    VulkanQueue::~VulkanQueue()
-    {
-        if( mDevice )
-        {
-            vkDeviceWaitIdle( mDevice );
-
-            {
-                FastArray<PerFrameData>::iterator itor = mPerFrameData.begin();
-                FastArray<PerFrameData>::iterator endt = mPerFrameData.end();
-
-                while( itor != endt )
-                {
-                    VkFenceArray::const_iterator itFence = itor->mProtectingFences.begin();
-                    VkFenceArray::const_iterator enFence = itor->mProtectingFences.end();
-
-                    while( itFence != enFence )
-                        vkDestroyFence( mDevice, *itFence++, 0 );
-                    itor->mProtectingFences.clear();
-
-                    vkDestroyCommandPool( mDevice, itor->mCmdPool, 0 );
-                    itor->mCommands.clear();
-
-                    ++itor;
-                }
-            }
-            {
-                RefCountedFenceMap::const_iterator itor = mRefCountedFences.begin();
-                RefCountedFenceMap::const_iterator endt = mRefCountedFences.end();
-
-                while( itor != endt )
-                {
-                    // If recycleAfterRelease == false, then they were destroyed with mProtectingFences
-                    if( itor->second.recycleAfterRelease )
-                        vkDestroyFence( mDevice, itor->first, 0 );
-                    ++itor;
-                }
-
-                mRefCountedFences.clear();
-            }
-
-            VkFenceArray::const_iterator itor = mAvailableFences.begin();
-            VkFenceArray::const_iterator endt = mAvailableFences.end();
-
-            while( itor != endt )
-                vkDestroyFence( mDevice, *itor++, 0 );
-
-            mAvailableFences.clear();
-        }
-    }
+    VulkanQueue::~VulkanQueue() { destroy(); }
     //-------------------------------------------------------------------------
     VkFence VulkanQueue::getFence( void )
     {
@@ -128,10 +78,8 @@ namespace Ogre
         }
         else
         {
-            VkFenceCreateInfo fenceCi;
-            makeVkStruct( fenceCi, VK_STRUCTURE_TYPE_FENCE_CREATE_INFO );
-            VkResult result = vkCreateFence( mDevice, &fenceCi, 0, &retVal );
-            checkVkResult( result, "vkCreateFence" );
+            VkFenceCreateInfo fenceCi = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
+            OGRE_VK_CHECK(vkCreateFence( mDevice, &fenceCi, 0, &retVal ));
         }
         return retVal;
     }
@@ -190,13 +138,11 @@ namespace Ogre
         {
             VkCommandBuffer cmdBuffer;
 
-            VkCommandBufferAllocateInfo allocateInfo;
-            makeVkStruct( allocateInfo, VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO );
+            VkCommandBufferAllocateInfo allocateInfo = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};
             allocateInfo.commandPool = frameData.mCmdPool;
             allocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
             allocateInfo.commandBufferCount = 1u;
-            VkResult result = vkAllocateCommandBuffers( mDevice, &allocateInfo, &cmdBuffer );
-            checkVkResult( result, "vkAllocateCommandBuffers" );
+            OGRE_VK_CHECK(vkAllocateCommandBuffers( mDevice, &allocateInfo, &cmdBuffer ));
 
             frameData.mCommands.push_back( cmdBuffer );
         }
@@ -219,29 +165,20 @@ namespace Ogre
     {
         mDevice = device;
         mQueue = queue;
-        mVaoManager = static_cast<VulkanVaoManager *>( renderSystem->getVaoManager() );
         mRenderSystem = renderSystem;
-
-        const size_t maxNumFrames = mVaoManager->getDynamicBufferMultiplier();
-
-        VkDeviceQueueCreateInfo queueCreateInfo;
-        makeVkStruct( queueCreateInfo, VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO );
 
         // Create at least maxNumFrames fences, though we may need more
         mAvailableFences.resize( maxNumFrames );
 
-        VkFenceCreateInfo fenceCi;
-        makeVkStruct( fenceCi, VK_STRUCTURE_TYPE_FENCE_CREATE_INFO );
+        VkFenceCreateInfo fenceCi = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
         for( size_t i = 0; i < maxNumFrames; ++i )
         {
-            VkResult result = vkCreateFence( mDevice, &fenceCi, 0, &mAvailableFences[i] );
-            checkVkResult( result, "vkCreateFence" );
+            OGRE_VK_CHECK(vkCreateFence(mDevice, &fenceCi, 0, &mAvailableFences[i]));
         }
 
         // Create one cmd pool per thread (assume single threaded for now)
         mPerFrameData.resize( maxNumFrames );
-        VkCommandPoolCreateInfo cmdPoolCreateInfo;
-        makeVkStruct( cmdPoolCreateInfo, VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO );
+        VkCommandPoolCreateInfo cmdPoolCreateInfo = {VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
         cmdPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
         cmdPoolCreateInfo.queueFamilyIndex = mFamilyIdx;
 
@@ -251,16 +188,64 @@ namespace Ogre
         newCommandBuffer();
     }
 
-    void VulkanQueue::destroy() {}
+    void VulkanQueue::destroy()
+    {
+        if( mDevice )
+        {
+            vkDeviceWaitIdle( mDevice );
+
+            {
+                FastArray<PerFrameData>::iterator itor = mPerFrameData.begin();
+                FastArray<PerFrameData>::iterator endt = mPerFrameData.end();
+
+                while( itor != endt )
+                {
+                    VkFenceArray::const_iterator itFence = itor->mProtectingFences.begin();
+                    VkFenceArray::const_iterator enFence = itor->mProtectingFences.end();
+
+                    while( itFence != enFence )
+                        vkDestroyFence( mDevice, *itFence++, 0 );
+                    itor->mProtectingFences.clear();
+
+                    vkDestroyCommandPool( mDevice, itor->mCmdPool, 0 );
+                    itor->mCommands.clear();
+
+                    ++itor;
+                }
+            }
+            {
+                RefCountedFenceMap::const_iterator itor = mRefCountedFences.begin();
+                RefCountedFenceMap::const_iterator endt = mRefCountedFences.end();
+
+                while( itor != endt )
+                {
+                    // If recycleAfterRelease == false, then they were destroyed with mProtectingFences
+                    if( itor->second.recycleAfterRelease )
+                        vkDestroyFence( mDevice, itor->first, 0 );
+                    ++itor;
+                }
+
+                mRefCountedFences.clear();
+            }
+
+            VkFenceArray::const_iterator itor = mAvailableFences.begin();
+            VkFenceArray::const_iterator endt = mAvailableFences.end();
+
+            while( itor != endt )
+                vkDestroyFence( mDevice, *itor++, 0 );
+
+            mAvailableFences.clear();
+            mDevice = 0;
+        }
+    }
 
     //-------------------------------------------------------------------------
     void VulkanQueue::newCommandBuffer( void )
     {
-        const size_t currFrame = mVaoManager->waitForTailFrameToFinish();
-        mCurrentCmdBuffer = getCmdBuffer( currFrame );
+        _waitOnFrame(dynBufferFrame);
+        mCurrentCmdBuffer = getCmdBuffer( dynBufferFrame );
 
-        VkCommandBufferBeginInfo beginInfo;
-        makeVkStruct( beginInfo, VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO );
+        VkCommandBufferBeginInfo beginInfo = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
         vkBeginCommandBuffer( mCurrentCmdBuffer, &beginInfo );
     }
@@ -271,8 +256,7 @@ namespace Ogre
         {
             endAllEncoders();
 
-            VkResult result = vkEndCommandBuffer( mCurrentCmdBuffer );
-            checkVkResult( result, "vkEndCommandBuffer" );
+            OGRE_VK_CHECK(vkEndCommandBuffer( mCurrentCmdBuffer ));
 
             mPendingCmds.push_back( mCurrentCmdBuffer );
             mCurrentCmdBuffer = 0;
@@ -428,7 +412,7 @@ namespace Ogre
             BufferPackedDownloadMap::iterator it = mCopyDownloadBuffers.find( buffer );
 
             if( it == mCopyDownloadBuffers.end() )
-                bufferAccessFlags = VulkanMappings::get( buffer->getBufferPackedType() );
+                ;//bufferAccessFlags = VulkanMappings::get( buffer->getBufferPackedType() );
             else
             {
                 if( !it->second )
@@ -467,7 +451,7 @@ namespace Ogre
                     vkTexture->mCurrLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL )
                 {
                     OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                                 "Texture " + vkTexture->getNameStr() +
+                                 "Texture " + vkTexture->getName() +
                                      " is already in CopySrc or CopyDst layout, externally set. Perhaps "
                                      "you need to call RenderSystem::flushTextureCopyOperations",
                                  "VulkanQueue::prepareForUpload" );
@@ -517,11 +501,10 @@ namespace Ogre
             VkPipelineStageFlags srcStage = 0;
 
             uint32 numMemBarriers = 0u;
-            VkMemoryBarrier memBarrier;
+            VkMemoryBarrier memBarrier = {VK_STRUCTURE_TYPE_MEMORY_BARRIER};
             if( bNeedsBufferBarrier )
             {
                 // GPU must stop using this buffer before we can write into it
-                makeVkStruct( memBarrier, VK_STRUCTURE_TYPE_MEMORY_BARRIER );
                 memBarrier.srcAccessMask = bufferAccessFlags & c_srcValidAccessFlags;
                 memBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
@@ -569,7 +552,7 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
-    void VulkanQueue::prepareForDownload( const BufferPacked *buffer, TextureGpu *texture )
+    void VulkanQueue::prepareForDownload( const BufferPacked *buffer, VulkanTextureGpu *texture )
     {
         VkAccessFlags bufferAccessFlags = 0;
         VkPipelineStageFlags srcStage = 0;
@@ -581,7 +564,7 @@ namespace Ogre
 
             if( it == mCopyDownloadBuffers.end() )
             {
-                if( buffer->getBufferPackedType() == BP_TYPE_UAV )
+                if( /*buffer->getBufferPackedType() == BP_TYPE_UAV*/ 0 )
                 {
                     bufferAccessFlags = VK_ACCESS_SHADER_WRITE_BIT;
                     srcStage |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
@@ -628,7 +611,7 @@ namespace Ogre
                     vkTexture->mCurrLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL )
                 {
                     OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                                 "Texture " + vkTexture->getNameStr() +
+                                 "Texture " + vkTexture->getName() +
                                      " is already in CopySrc or CopyDst layout, externally set. Perhaps "
                                      "you need to call RenderSystem::flushTextureCopyOperations",
                                  "VulkanQueue::prepareForDownload" );
@@ -645,10 +628,10 @@ namespace Ogre
                                 VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
                 }
 
-                if( texture->isRenderToTexture() )
+                if( texture->getUsage() & TU_RENDERTARGET )
                 {
                     texAccessFlags |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-                    if( !PixelFormatGpuUtils::isDepth( texture->getPixelFormat() ) )
+                    if( !PixelUtil::isDepth( texture->getFormat() ) )
                     {
                         texAccessFlags |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
                         srcStage |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -696,10 +679,9 @@ namespace Ogre
         if( bNeedsBufferBarrier || bNeedsTexTransition )
         {
             uint32 numMemBarriers = 0u;
-            VkMemoryBarrier memBarrier;
+            VkMemoryBarrier memBarrier = {VK_STRUCTURE_TYPE_MEMORY_BARRIER};
             if( bNeedsBufferBarrier )
             {
-                makeVkStruct( memBarrier, VK_STRUCTURE_TYPE_MEMORY_BARRIER );
                 memBarrier.srcAccessMask = bufferAccessFlags & c_srcValidAccessFlags;
                 memBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
                 numMemBarriers = 1u;
@@ -736,7 +718,7 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
-    void VulkanQueue::getCopyEncoder( const BufferPacked *buffer, TextureGpu *texture,
+    void VulkanQueue::getCopyEncoder( const BufferPacked *buffer, VulkanTextureGpu *texture,
                                       const bool bDownload )
     {
         if( mEncoderState != EncoderCopyOpen )
@@ -782,8 +764,7 @@ namespace Ogre
             if( ( mCopyEndReadDstBufferFlags & bufferAccessFlags ) != bufferAccessFlags )
             {
                 uint32 numMemBarriers = 0u;
-                VkMemoryBarrier memBarrier;
-                makeVkStruct( memBarrier, VK_STRUCTURE_TYPE_MEMORY_BARRIER );
+                VkMemoryBarrier memBarrier = {VK_STRUCTURE_TYPE_MEMORY_BARRIER};
                 memBarrier.srcAccessMask = bufferAccessFlags & c_srcValidAccessFlags;
                 memBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
                 numMemBarriers = 1u;
@@ -813,10 +794,9 @@ namespace Ogre
             VkPipelineStageFlags dstStage = 0;
 
             uint32 numMemBarriers = 0u;
-            VkMemoryBarrier memBarrier;
+            VkMemoryBarrier memBarrier = {VK_STRUCTURE_TYPE_MEMORY_BARRIER};
             if( mCopyEndReadDstBufferFlags )
             {
-                makeVkStruct( memBarrier, VK_STRUCTURE_TYPE_MEMORY_BARRIER );
                 memBarrier.srcAccessMask = mCopyEndReadSrcBufferFlags & c_srcValidAccessFlags;
                 memBarrier.dstAccessMask = mCopyEndReadDstBufferFlags;
 
@@ -833,13 +813,13 @@ namespace Ogre
                 // doing is copying from read-only textures (rare)
                 dstStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
-#if OGRE_DEBUG_MODE >= OGRE_DEBUG_MEDIUM
+#if OGRE_DEBUG_MODE
                 FastArray<TextureGpu *>::const_iterator itor = mImageMemBarrierPtrs.begin();
                 FastArray<TextureGpu *>::const_iterator endt = mImageMemBarrierPtrs.end();
 
                 while( itor != endt )
                 {
-                    OGRE_ASSERT_MEDIUM( !( *itor )->isRenderToTexture() && !( *itor )->isUav() &&
+                    OgreAssert( (( *itor )->getUsage() & TU_RENDERTARGET) == 0/*&& !( *itor )->isUav()*/,
                                         "endCopyEncoder says nothing will wait on this texture(s) but "
                                         "we don't know if a subsequent stage will write to it" );
                     ++itor;
@@ -852,7 +832,7 @@ namespace Ogre
             vkCmdPipelineBarrier( mCurrentCmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT,
                                   dstStage & mOwnerDevice->mSupportedStages, 0, numMemBarriers,
                                   &memBarrier, 0u, 0, static_cast<uint32_t>( mImageMemBarriers.size() ),
-                                  mImageMemBarriers.begin() );
+                                  mImageMemBarriers.data() );
 
             mImageMemBarriers.clear();
             mImageMemBarrierPtrs.clear();
@@ -973,22 +953,28 @@ namespace Ogre
         mGpuWaitSemaphForCurrCmdBuff.push_back( imageAcquisitionSemaph );
     }
     //-------------------------------------------------------------------------
-    bool VulkanQueue::isFenceFlushed( VkFence fence ) const
+    void VulkanQueue::queueForDeletion(VkBuffer buffer, VkDeviceMemory memory)
     {
-        OGRE_ASSERT_MEDIUM( fence );
-        return fence != mCurrentFence;
+       mPerFrameData[dynBufferFrame].mBufferGraveyard.push_back({buffer, memory});
     }
-    //-------------------------------------------------------------------------
     void VulkanQueue::_waitOnFrame( uint8 frameIdx )
     {
         FastArray<VkFence> &fences = mPerFrameData[frameIdx].mProtectingFences;
 
-        if( !fences.empty() )
+        if( fences.empty() )
+            return;
+
+        const uint32 numFences = static_cast<uint32>( fences.size() );
+        vkWaitForFences( mDevice, numFences, &fences[0], VK_TRUE, UINT64_MAX );
+        recycleFences( fences );
+
+        // it is safe to free staging buffers now
+        for(auto bm : mPerFrameData[frameIdx].mBufferGraveyard)
         {
-            const uint32 numFences = static_cast<uint32>( fences.size() );
-            vkWaitForFences( mDevice, numFences, &fences[0], VK_TRUE, UINT64_MAX );
-            recycleFences( fences );
+            vkDestroyBuffer(mDevice, bm.first, nullptr);
+            vkFreeMemory(mDevice, bm.second, nullptr);
         }
+        mPerFrameData[frameIdx].mBufferGraveyard.clear();
     }
     //-------------------------------------------------------------------------
     bool VulkanQueue::_isFrameFinished( uint8 frameIdx )
@@ -999,10 +985,10 @@ namespace Ogre
         if( !fences.empty() )
         {
             const uint32 numFences = static_cast<uint32>( fences.size() );
-            VkResult result = vkWaitForFences( mDevice, numFences, &fences[0], VK_TRUE, 0u );
-            if( result != VK_TIMEOUT )
+            VkResult ret = vkWaitForFences( mDevice, numFences, &fences[0], VK_TRUE, 0u );
+            if( ret != VK_TIMEOUT )
             {
-                checkVkResult( result, "vkWaitForFences" );
+                OGRE_VK_CHECK(ret);
                 recycleFences( fences );
             }
             else
@@ -1025,31 +1011,27 @@ namespace Ogre
         if( mPendingCmds.empty() )
             return;
 
-        VkSubmitInfo submitInfo;
-        makeVkStruct( submitInfo, VK_STRUCTURE_TYPE_SUBMIT_INFO );
+        VkSubmitInfo submitInfo = {VK_STRUCTURE_TYPE_SUBMIT_INFO};
 
         if( !mGpuWaitSemaphForCurrCmdBuff.empty() )
         {
             // We need to wait on these semaphores so that rendering can
             // only happen start the swapchain is done presenting
-            submitInfo.waitSemaphoreCount =
-                static_cast<uint32>( mGpuWaitSemaphForCurrCmdBuff.size() );
-            submitInfo.pWaitSemaphores = mGpuWaitSemaphForCurrCmdBuff.begin();
-            submitInfo.pWaitDstStageMask = mGpuWaitFlags.begin();
+            submitInfo.waitSemaphoreCount = mGpuWaitSemaphForCurrCmdBuff.size();
+            submitInfo.pWaitSemaphores = mGpuWaitSemaphForCurrCmdBuff.data();
+            submitInfo.pWaitDstStageMask = mGpuWaitFlags.data();
         }
-
-        const size_t windowsSemaphStart = mGpuSignalSemaphForCurrCmdBuff.size();
-        size_t numWindowsPendingSwap = 0u;
 
         if( submissionType >= SubmissionType::NewFrameIdx )
         {
             if( submissionType >= SubmissionType::EndFrameAndSwap )
             {
-                // Get some semaphores so that presentation can wait for this job to finish rendering
+                // Get semaphores so that presentation can wait for this job to finish rendering
                 // (one for each window that will be swapped)
-                numWindowsPendingSwap = mWindowsPendingSwap.size();
-                mVaoManager->getAvailableSempaphores( mGpuSignalSemaphForCurrCmdBuff,
-                                                      numWindowsPendingSwap );
+                for (auto w : mWindowsPendingSwap)
+                {
+                    mGpuSignalSemaphForCurrCmdBuff.push_back(w->getRenderFinishedSemaphore());
+                }
             }
 
             if( !mGpuSignalSemaphForCurrCmdBuff.empty() )
@@ -1058,9 +1040,8 @@ namespace Ogre
                 // can only happen after we're done rendering (presentation may not be the
                 // only thing waiting for us though; thus we must set this with NewFrameIdx
                 // and not just with EndFrameAndSwap)
-                submitInfo.signalSemaphoreCount =
-                    static_cast<uint32>( mGpuSignalSemaphForCurrCmdBuff.size() );
-                submitInfo.pSignalSemaphores = mGpuSignalSemaphForCurrCmdBuff.begin();
+                submitInfo.signalSemaphoreCount = mGpuSignalSemaphForCurrCmdBuff.size();
+                submitInfo.pSignalSemaphores = mGpuSignalSemaphForCurrCmdBuff.data();
             }
         }
 
@@ -1068,15 +1049,16 @@ namespace Ogre
         {
             // Ensure mCurrentFence is not nullptr.
             // We *must* have a fence if we're advancing the frameIdx
+
             getCurrentFence();
         }
 
         // clang-format off
-        submitInfo.commandBufferCount   = static_cast<uint32>( mPendingCmds.size() );
-        submitInfo.pCommandBuffers      = &mPendingCmds[0];
+        submitInfo.commandBufferCount   = mPendingCmds.size();
+        submitInfo.pCommandBuffers      = mPendingCmds.data();
         // clang-format on
 
-        const uint8 dynBufferFrame = mVaoManager->waitForTailFrameToFinish();
+        _waitOnFrame(dynBufferFrame);
         VkFence fence = mCurrentFence;  // Note: mCurrentFence may be nullptr
 
         vkQueueSubmit( mQueue, 1u, &submitInfo, fence );
@@ -1098,27 +1080,23 @@ namespace Ogre
 
         if( submissionType >= SubmissionType::EndFrameAndSwap )
         {
-            for( size_t windowIdx = 0u; windowIdx < numWindowsPendingSwap; ++windowIdx )
-            {
-                VkSemaphore semaphore = mGpuSignalSemaphForCurrCmdBuff[windowsSemaphStart + windowIdx];
-                mWindowsPendingSwap[windowIdx]->_swapBuffers( semaphore );
-                mVaoManager->notifyWaitSemaphoreSubmitted( semaphore );
-            }
+            for (auto w : mWindowsPendingSwap)
+                w->_swapBuffers();
         }
 
         if( submissionType >= SubmissionType::NewFrameIdx )
         {
             mPerFrameData[dynBufferFrame].mCurrentCmdIdx = 0u;
-            mVaoManager->_notifyNewCommandBuffer();
+            dynBufferFrame = (dynBufferFrame + 1) % mPerFrameData.size();
         }
 
         newCommandBuffer();
 
         if( submissionType >= SubmissionType::EndFrameAndSwap )
         {
-            // acquireNextSwapchain must be called after newCommandBuffer()
-            for( size_t windowIdx = 0u; windowIdx < numWindowsPendingSwap; ++windowIdx )
-                mWindowsPendingSwap[windowIdx]->acquireNextSwapchain();
+            // acquireNextImage must be called after newCommandBuffer()
+            for (auto w : mWindowsPendingSwap)
+                w->acquireNextImage();
             mWindowsPendingSwap.clear();
 
             mGpuSignalSemaphForCurrCmdBuff.clear();

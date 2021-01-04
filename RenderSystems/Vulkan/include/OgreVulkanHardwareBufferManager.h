@@ -34,52 +34,25 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre
 {
-namespace v1
-{
-    class _OgreVulkanExport VulkanHardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreVulkanExport VulkanHardwareBufferManager : public HardwareBufferManager
     {
-    protected:
-        VulkanDiscardBufferManager *mDiscardBufferManager;
-
+        VulkanDevice *mDevice;;
+        OGRE_MUTEX(mIndexBuffersMutex);
+        IndexBufferList mIndexBuffers;
     public:
-        VulkanHardwareBufferManagerBase( VulkanDevice *device, VaoManager *vaoManager );
-        virtual ~VulkanHardwareBufferManagerBase();
+        VulkanHardwareBufferManager( VulkanDevice *device );
+        virtual ~VulkanHardwareBufferManager();
 
         void _notifyDeviceStalled( void );
 
-        VulkanDiscardBufferManager *_getDiscardBufferManager( void ) { return mDiscardBufferManager; }
-
-
-        virtual HardwareVertexBufferSharedPtr createVertexBuffer( size_t vertexSize, size_t numVerts,
+        HardwareVertexBufferSharedPtr createVertexBuffer( size_t vertexSize, size_t numVerts,
             HardwareBuffer::Usage usage, bool useShadowBuffer ) override;
-        virtual HardwareIndexBufferSharedPtr createIndexBuffer( HardwareIndexBuffer::IndexType itype,
+        HardwareIndexBufferSharedPtr createIndexBuffer( HardwareIndexBuffer::IndexType itype,
             size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer ) override;
-        virtual HardwareUniformBufferSharedPtr createUniformBuffer( size_t sizeBytes,
-            HardwareBuffer::Usage usage, bool useShadowBuffer, const String &name ) override;
-        virtual HardwareCounterBufferSharedPtr createCounterBuffer( size_t sizeBytes,
-            HardwareBuffer::Usage usage, bool useShadowBuffer, const String &name ) override;
+        HardwareBufferPtr createUniformBuffer(size_t sizeBytes,
+                                              HardwareBufferUsage usage = HBU_CPU_TO_GPU,
+                                              bool useShadowBuffer = false) override;
     };
-
-    class _OgreVulkanExport VulkanHardwareBufferManager : public HardwareBufferManager
-    {
-    public:
-        VulkanHardwareBufferManager( VulkanDevice *device, VaoManager *vaoManager ) :
-            HardwareBufferManager( OGRE_NEW VulkanHardwareBufferManagerBase( device, vaoManager ) )
-        {
-        }
-
-        virtual ~VulkanHardwareBufferManager()
-        {
-            OGRE_DELETE mImpl;
-        }
-
-        void _notifyDeviceStalled( void )
-        {
-            static_cast<VulkanHardwareBufferManagerBase *>( mImpl )->_notifyDeviceStalled();
-        }
-    };
-    
-}
 }
 
 #endif
