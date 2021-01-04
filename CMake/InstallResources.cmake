@@ -216,7 +216,7 @@ else()
 endif()
 configure_package_config_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${PROJECT_BINARY_DIR}/cmake/OGREConfig.cmake
     INSTALL_DESTINATION ${OGRE_CMAKE_DIR}
-    PATH_VARS CMAKE_INSTALL_PREFIX)
+    PATH_VARS OGRE_MEDIA_PATH OGRE_PLUGIN_DIR_CMAKE OGRE_CFG_INSTALL_PATH CMAKE_INSTALL_PREFIX)
 write_basic_package_version_file(
     ${PROJECT_BINARY_DIR}/cmake/OGREConfigVersion.cmake 
     VERSION ${OGRE_VERSION} 
