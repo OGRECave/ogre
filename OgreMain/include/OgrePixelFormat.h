@@ -213,7 +213,8 @@ namespace Ogre {
         /// 8-bit pixel format, all bits red.
         PF_R8,
         /// 16-bit pixel format, 8 bits red, 8 bits green.
-        PF_RG8,
+        PF_R8G8,
+        PF_RG8 = PF_R8G8,
         /// 8-bit pixel format, 8 bits red (signed normalised int).
         PF_R8_SNORM,
         /// 16-bit pixel format, 8 bits red (signed normalised int), 8 bits blue (signed normalised int).
