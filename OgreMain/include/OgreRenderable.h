@@ -198,10 +198,10 @@ namespace Ogre {
         */
         bool getUseIdentityView(void) const { return mUseIdentityView; }
 
-        /** Returns the camera-relative squared depth of this renderable.
-        @remarks
-            Used to sort transparent objects. Squared depth is used rather than
-            actual depth to avoid having to perform a square root on the result.
+        /** Returns the squared distance between the camera and this renderable.
+
+            Used to sort transparent objects. Squared distance is used
+            to avoid having to perform a square root on the result.
         */
         virtual Real getSquaredViewDepth(const Camera* cam) const = 0;
 
