@@ -728,9 +728,11 @@ namespace Ogre {
     Real Node::getSquaredViewDepth(const Camera* cam) const
     {
         Vector3 diff = _getDerivedPosition() - cam->getDerivedPosition();
+        Vector3 zAxis = cam->getDerivedDirection();
 
         // NB use squared length to avoid square root
-        return diff.squaredLength();
+        return cam->getDistanceFunction() == DF_EUCLIDEAN ? diff.squaredLength()
+                                                          : Math::Sqr(zAxis.dotProduct(diff));
     }
     //-----------------------------------------------------------------------
     void Node::needUpdate(bool forceParentUpdate)

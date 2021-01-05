@@ -52,7 +52,8 @@ namespace Ogre {
         mLastViewport(0),
         mCullFrustum(0),
         mLodCamera(0),
-        mPixelDisplayRatio(0)
+        mPixelDisplayRatio(0),
+        mDistanceFunc(DF_EUCLIDEAN)
     {
 
         // Reasonable defaults to camera params
