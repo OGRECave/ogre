@@ -729,7 +729,7 @@ namespace Ogre {
     {
         Vector3 diff = _getDerivedPosition() - cam->getDerivedPosition();
 
-        // NB use squared length rather than real depth to avoid square root
+        // NB use squared length to avoid square root
         return diff.squaredLength();
     }
     //-----------------------------------------------------------------------

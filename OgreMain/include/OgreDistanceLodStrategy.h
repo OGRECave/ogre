@@ -82,7 +82,7 @@ namespace Ogre {
         /// @copydoc LodStrategy::isSorted
         virtual bool isSorted(const Mesh::LodValueList& values) const;
 
-        /** Get the squared depth from camera to the LOD object */
+        /** Get the squared distance between the camera and the LOD object */
         virtual Real getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const = 0;
 
         /** Sets the reference view upon which the distances were based.

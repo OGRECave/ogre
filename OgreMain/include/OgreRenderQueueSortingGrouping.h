@@ -143,11 +143,11 @@ namespace Ogre {
             }
         };
         /// Comparator to order objects by descending camera distance
-        struct DepthSortDescendingLess
+        struct DistanceSortDescendingLess
         {
             const Camera* camera;
 
-            DepthSortDescendingLess(const Camera* cam)
+            DistanceSortDescendingLess(const Camera* cam)
                 : camera(cam)
             {
             }
@@ -161,18 +161,18 @@ namespace Ogre {
                 }
                 else
                 {
-                    // Different renderables, sort by depth
-                    Real adepth = a.renderable->getSquaredViewDepth(camera);
-                    Real bdepth = b.renderable->getSquaredViewDepth(camera);
-                    if (Math::RealEqual(adepth, bdepth))
+                    // Different renderables, sort by distance
+                    Real adist = a.renderable->getSquaredViewDepth(camera);
+                    Real bdist = b.renderable->getSquaredViewDepth(camera);
+                    if (Math::RealEqual(adist, bdist))
                     {
                         // Must return deterministic result, doesn't matter what
                         return a.pass < b.pass;
                     }
                     else
                     {
-                        // Sort DESCENDING by depth (i.e. far objects first)
-                        return (adepth > bdepth);
+                        // Sort DESCENDING by dist (i.e. far objects first)
+                        return (adist > bdist);
                     }
                 }
 

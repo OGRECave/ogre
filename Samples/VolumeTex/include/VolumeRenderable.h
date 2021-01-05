@@ -36,10 +36,7 @@ public:
      */
     Ogre::Real getBoundingRadius() const;
     
-    /**
-     * Returns the camera-relative squared depth of this renderable.
-     */
-    Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
+    Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const override;
 protected:
     void initialise();
 
