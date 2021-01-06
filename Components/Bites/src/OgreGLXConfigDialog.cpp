@@ -74,7 +74,7 @@ namespace OgreBites {
 class GLXConfigurator {
     /* GUI constants */
     static const int wWidth = 500;      // Width of window
-    static const int wHeight = 380;     // Height of window
+    static const int wHeight = 400;     // Height of window
     static const int col1x = 20;        // Starting x of column 1 (labels)
     static const int col2x = 230;       // Starting x of column 2 (options)
     static const int col1w = 200;       // Width of column 1 (labels)

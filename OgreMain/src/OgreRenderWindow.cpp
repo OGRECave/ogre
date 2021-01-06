@@ -31,7 +31,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     RenderWindow::RenderWindow()
-        : RenderTarget(), mIsFullScreen(false), mIsPrimary(false), mLeft(0), mTop(0)
+        : RenderTarget(), mIsFullScreen(false), mIsPrimary(false), mLeft(0), mTop(0), mVSyncInterval(1)
     {
         mAutoDeactivatedOnFocusChange = true;
     }

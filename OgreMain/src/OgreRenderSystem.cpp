@@ -1130,6 +1130,16 @@ namespace Ogre {
         optVSync.currentValue = optVSync.possibleValues[1];
         mOptions[optVSync.name] = optVSync;
 
+        ConfigOption optVSyncInterval;
+        optVSyncInterval.name = "VSync Interval";
+        optVSyncInterval.immutable = false;
+        optVSyncInterval.possibleValues.push_back("1");
+        optVSyncInterval.possibleValues.push_back("2");
+        optVSyncInterval.possibleValues.push_back("3");
+        optVSyncInterval.possibleValues.push_back("4");
+        optVSyncInterval.currentValue = optVSyncInterval.possibleValues[0];
+        mOptions[optVSyncInterval.name] = optVSyncInterval;
+
         ConfigOption optSRGB;
         optSRGB.name = "sRGB Gamma Conversion";
         optSRGB.immutable = false;

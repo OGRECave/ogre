@@ -383,14 +383,6 @@ namespace Ogre
                 optDevice.currentValue = driver->DriverDescription();
         }
 
-        optVSyncInterval.name = "VSync Interval";
-        optVSyncInterval.immutable = false;
-        optVSyncInterval.possibleValues.push_back( "1" );
-        optVSyncInterval.possibleValues.push_back( "2" );
-        optVSyncInterval.possibleValues.push_back( "3" );
-        optVSyncInterval.possibleValues.push_back( "4" );
-        optVSyncInterval.currentValue = "1";
-
 		optBackBufferCount.name = "Backbuffer Count";
 		optBackBufferCount.immutable = false;
 		optBackBufferCount.possibleValues.push_back( "Auto" );
@@ -437,7 +429,6 @@ namespace Ogre
         mOptions[optAllowDirectX9Ex.name] = optAllowDirectX9Ex;
         mOptions[optVideoMode.name] = optVideoMode;
         mOptions[optMultihead.name] = optMultihead;
-        mOptions[optVSyncInterval.name] = optVSyncInterval;
 		mOptions[optBackBufferCount.name] = optBackBufferCount;
         mOptions[optAA.name] = optAA;
         mOptions[optFPUMode.name] = optFPUMode;

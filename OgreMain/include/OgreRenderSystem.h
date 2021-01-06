@@ -224,6 +224,7 @@ namespace Ogre
         |-----|---------------|---------|
         | Full Screen | false | Window full-screen flag |
         | VSync | true | "vsync" in  @ref _createRenderWindow |
+        | VSync Interval | 1 | "vsyncInterval" in  @ref _createRenderWindow |
         | sRGB Gamma Conversion | false | "gamma" in  @ref _createRenderWindow  |
         | FSAA | 0 | "FSAA" in  @ref _createRenderWindow  |
         | Video Mode | - | Window resolution |

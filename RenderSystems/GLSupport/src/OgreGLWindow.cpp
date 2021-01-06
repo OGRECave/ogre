@@ -44,7 +44,6 @@ GLWindow::GLWindow() : mContext(0)
     mHidden = false;
     mVisible = false;
     mVSync = false;
-    mVSyncInterval = 1;
 }
 
 //-------------------------------------------------------------------------------------------------//

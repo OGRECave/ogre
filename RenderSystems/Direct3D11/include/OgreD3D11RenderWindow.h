@@ -130,7 +130,6 @@ namespace Ogre
         void setVSyncEnabled(bool vsync)                        { mVSync = vsync; }
         bool isVSyncEnabled() const                             { return mVSync || mUseFlipMode; }
         void setVSyncInterval(unsigned interval)                { mVSyncInterval = interval; }
-        unsigned getVSyncInterval() const                       { return mVSyncInterval; }
 
         void swapBuffers();
         void updateStats(void);
@@ -156,7 +155,6 @@ namespace Ogre
 
         bool                    mUseFlipMode;                   // Flag to determine if the swapchain flip model is enabled. Not supported before Win8.0, required for WinRT.
         bool                    mVSync;                         // mVSync assumed to be true if mUseFlipMode
-        unsigned                mVSyncInterval;                 // Used at least 1 if mUseFlipMode
 
         DXGI_FRAME_STATISTICS   mPreviousPresentStats;          // We save the previous present stats - so we can detect a "vblank miss"
         bool                    mPreviousPresentStatsIsValid;   // Does mLastPresentStats data is valid (it isn't if when you start or resize the window)
