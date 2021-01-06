@@ -174,7 +174,7 @@ namespace Ogre
 
         /** Returns the vertical sync interval. 
         */
-        virtual unsigned int getVSyncInterval() const { return 1; }
+        unsigned int getVSyncInterval() const { return mVSyncInterval; }
         
 
         /** Overridden from RenderTarget, flags invisible windows as inactive
@@ -230,6 +230,7 @@ namespace Ogre
         bool mAutoDeactivatedOnFocusChange;
         int mLeft;
         int mTop;
+        unsigned int mVSyncInterval;
         
         /** Indicates that this is the primary window. Only to be called by
             Ogre::Root

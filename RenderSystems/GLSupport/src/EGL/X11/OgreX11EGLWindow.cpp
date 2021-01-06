@@ -458,6 +458,9 @@ namespace Ogre {
                 vsync = StringConverter::parseBool(opt->second);
             }
 
+            if((opt = miscParams->find("vsyncInterval")) != end)
+                vsyncInterval = StringConverter::parseUnsignedInt(opt->second);
+
             if ((opt = miscParams->find("gamma")) != end)
             {
                 mHwGamma = StringConverter::parseBool(opt->second);

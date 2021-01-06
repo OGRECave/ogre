@@ -90,17 +90,7 @@ namespace Ogre {
         optColourDepth.name = "Colour Depth";
         optColourDepth.immutable = false;
 
-        ConfigOption optVSyncInterval;
-        optVSyncInterval.name = "VSync Interval";
-        optVSyncInterval.immutable = false;
-        optVSyncInterval.possibleValues.push_back( "1" );
-        optVSyncInterval.possibleValues.push_back( "2" );
-        optVSyncInterval.possibleValues.push_back( "3" );
-        optVSyncInterval.possibleValues.push_back( "4" );
-        optVSyncInterval.currentValue = "1";
-
         mOptions[optColourDepth.name] = optColourDepth;
-        mOptions[optVSyncInterval.name] = optVSyncInterval;
 
         return mOptions;
     }

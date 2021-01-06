@@ -46,7 +46,6 @@ namespace Ogre
 
         bool isVSyncEnabled() const { return mVSync; }
         void setVSyncInterval(unsigned int interval);
-        unsigned int getVSyncInterval() const { return mVSyncInterval; }
 
         void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
         bool requiresTextureFlipping() const { return false; }
@@ -60,7 +59,6 @@ namespace Ogre
         bool mIsExternal;
         bool mIsExternalGLControl;
         bool mVSync;
-        int mVSyncInterval;
 
         GLContext*   mContext;
     };
