@@ -116,10 +116,6 @@ namespace Ogre
 
         // set config options defaults
         initConfigOptions();
-
-        // fsaa options
-        mFSAAHint = "";
-        mFSAASamples = 0;
         
         // set stages desc. to defaults
         for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
@@ -334,7 +330,6 @@ namespace Ogre
         ConfigOption optAllowDirectX9Ex;
         ConfigOption optVideoMode;
         ConfigOption optMultihead;
-        ConfigOption optVSyncInterval;
 		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optFPUMode;
@@ -580,40 +575,6 @@ namespace Ogre
             else mMultiheadUse = mutAuto;
         }
 
-		if (name == "VSync Interval")
-		{
-			mVSyncInterval = StringConverter::parseUnsignedInt(value);
-		}
-
-		if( name == "VSync" )
-		{
-			if (value == "Yes")
-				mVSync = true;
-			else
-				mVSync = false;
-		}
-		
-        if( name == "FSAA" )
-        {
-            StringVector values = StringUtil::split(value, " ", 1);
-            mFSAASamples = StringConverter::parseUnsignedInt(values[0]);
-            if (values.size() > 1)
-                mFSAAHint = values[1];
-
-        }
-		
-		if (name == "Backbuffer Count")
-		{
-			if (value == "Auto")
-			{
-				mBackBufferCount = -1;
-			}
-			else
-			{
-				mBackBufferCount = StringConverter::parseUnsignedInt(value);
-			}
-		}
-
         if( name == "Allow NVPerfHUD" )
         {
             if (value == "Yes")
@@ -734,12 +695,6 @@ namespace Ogre
             return "Your DirectX driver name has changed since the last time you ran OGRE; "
                 "the 'Rendering Device' has been changed.";
         }
-
-		it = mOptions.find( "VSync" );
-		if( it->second.currentValue == "Yes" )
-			mVSync = true;
-		else
-			mVSync = false;
 
         return BLANKSTRING;
     }
