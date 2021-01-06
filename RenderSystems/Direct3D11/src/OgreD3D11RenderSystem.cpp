@@ -586,28 +586,16 @@ namespace Ogre
             // set maskable levels supported
             for (unsigned int n = 1; n <= D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; n++)
             {
-                HRESULT hr = device->CheckMultisampleQualityLevels(format, n, &numLevels);
-                if (SUCCEEDED(hr) && numLevels > 0)
-                {
-                    optFSAA->possibleValues.push_back(StringConverter::toString(n));
-
-                    // 8x could mean 8xCSAA, and we need other designation for 8xMSAA
-                    if(n == 8 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 8    // 8x CSAA
-                    || n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 16  // 16x CSAA
-                    || n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 8, &numLevels)) && numLevels > 16) // 16xQ CSAA
-                    {
-                        optFSAA->possibleValues.push_back(StringConverter::toString(n) + " [Quality]");
-                    }
-                }
-                else if(n == 16) // there could be case when 16xMSAA is not supported but 16xCSAA and may be 16xQ CSAA are supported
-                {
-                    bool csaa16x = SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 16;
-                    bool csaa16xQ = SUCCEEDED(device->CheckMultisampleQualityLevels(format, 8, &numLevels)) && numLevels > 16;
-                    if(csaa16x || csaa16xQ)
-                        optFSAA->possibleValues.push_back("16");
-                    if(csaa16x && csaa16xQ)
-                        optFSAA->possibleValues.push_back("16 [Quality]");
-                }
+                // new style enumeration, with AMD EQAA names. NVidia CSAA names are misleading
+                // see determineFSAASettings for references
+                if(n == 8 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 8)
+                    optFSAA->possibleValues.push_back("4f8"); // 8x CSAA
+                if(n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 16)
+                    optFSAA->possibleValues.push_back("4f16"); // 16x CSAA
+                if(n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 8, &numLevels)) && numLevels > 16)
+                    optFSAA->possibleValues.push_back("8f16"); // 16xQ CSAA
+                if (SUCCEEDED(device->CheckMultisampleQualityLevels(format, n, &numLevels)) && numLevels > 0)
+                    optFSAA->possibleValues.push_back(std::to_string(n)); // Nx MSAA
             }
         }
 
@@ -3142,14 +3130,16 @@ namespace Ogre
     void D3D11RenderSystem::determineFSAASettings(uint fsaa, const String& fsaaHint, 
         DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings)
     {
-        bool qualityHint = fsaa >= 8 && fsaaHint.find("Quality") != String::npos;
-        
-        // NVIDIA, AMD - prefer CSAA aka EQAA if available.
-        // see http://developer.nvidia.com/object/coverage-sampled-aa.html
-        // see http://developer.amd.com/wordpress/media/2012/10/EQAA%20Modes%20for%20AMD%20HD%206900%20Series%20Cards.pdf
+        // "4f8" -> hint = "f8"
+        bool useCSAA = !fsaaHint.empty() && fsaaHint.front() == 'f';
+        uint32 quality = 0;
+        if(useCSAA) StringConverter::parse(fsaaHint.substr(1), quality);
+
+        // NVIDIA, AMD - enable CSAA
+        // http://developer.download.nvidia.com/assets/gamedev/docs/CSAA_Tutorial.pdf
+        // http://developer.amd.com/wordpress/media/2012/10/EQAA%20Modes%20for%20AMD%20HD%206900%20Series%20Cards.pdf
 
         // Modes are sorted from high quality to low quality, CSAA aka EQAA are listed first
-        // Note, that max(Count, Quality) == FSAA level and (Count >= 8 && Quality != 0) == quality hint
         DXGI_SAMPLE_DESC presets[] = {
                 { 8, 16 }, // CSAA 16xQ, EQAA 8f16x
                 { 4, 16 }, // CSAA 16x,  EQAA 4f16x
@@ -3168,13 +3158,11 @@ namespace Ogre
                 { NULL },
         };
 
-        // Skip too HQ modes
+        // Find matching AA mode
         DXGI_SAMPLE_DESC* mode = presets;
         for(; mode->Count != 0; ++mode)
         {
-            unsigned modeFSAA = std::max(mode->Count, mode->Quality);
-            bool modeQuality = mode->Count >= 8 && mode->Quality != 0;
-            bool tooHQ = (modeFSAA > fsaa || modeFSAA == fsaa && modeQuality && !qualityHint);
+            bool tooHQ = (mode->Count > fsaa || mode->Quality > quality);
             if(!tooHQ)
                 break;
         }

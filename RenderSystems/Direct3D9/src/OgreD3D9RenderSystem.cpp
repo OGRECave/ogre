@@ -623,11 +623,11 @@ namespace Ogre
             D3D9VideoMode *videoMode = driver->getVideoModeList()->item(it->second.currentValue);
             if (videoMode)
             {
-                DWORD numLevels = 0;
                 bool bOK;
 
                 for (unsigned int n = (unsigned int)D3DMULTISAMPLE_2_SAMPLES; n <= (unsigned int)D3DMULTISAMPLE_16_SAMPLES; n++)
                 {
+                    DWORD numLevels = 2;
                     bOK = this->_checkMultiSampleQuality(
                         (D3DMULTISAMPLE_TYPE)n, 
                         &numLevels, 
@@ -637,9 +637,10 @@ namespace Ogre
                         TRUE);
                     if (bOK)
                     {
+                        // CSAA modes supported by both AMD and Nvidia
+                        if (n == 8 && numLevels > 2) optFSAA->possibleValues.push_back("4f8");
+                        if (n == 16 && numLevels > 2) optFSAA->possibleValues.push_back("8f16");
                         optFSAA->possibleValues.push_back(StringConverter::toString(n));
-                        if (n >= 8)
-                            optFSAA->possibleValues.push_back(StringConverter::toString(n) + " [Quality]");
                     }
                 }
 
@@ -3940,8 +3941,7 @@ namespace Ogre
         bool fullScreen, D3DMULTISAMPLE_TYPE *outMultisampleType, DWORD *outMultisampleQuality)
     {
         bool ok = false;
-        bool qualityHint = fsaaHint.find("Quality") != String::npos;
-        size_t origFSAA = fsaa;
+        bool useCSAA = !fsaaHint.empty() && fsaaHint.front() == 'f';
 
         D3D9DriverList* driverList = getDirect3DDrivers();
         D3D9Driver* deviceDriver = mActiveD3DDriver;
@@ -3958,47 +3958,30 @@ namespace Ogre
             }
         }
 
-        bool tryCSAA = false;
-        // NVIDIA, prefer CSAA if available for 8+
+        // http://developer.download.nvidia.com/assets/gamedev/docs/CSAA_Tutorial.pdf
+        // http://developer.amd.com/wordpress/media/2012/10/EQAA%20Modes%20for%20AMD%20HD%206900%20Series%20Cards.pdf
         // it would be tempting to use getCapabilities()->getVendor() == GPU_NVIDIA but
         // if this is the first window, caps will not be initialised yet
-        if (deviceDriver->getAdapterIdentifier().VendorId == 0x10DE && 
-            fsaa >= 8)
+        if (deviceDriver->getAdapterIdentifier().VendorId != 0x10DE &&
+            deviceDriver->getAdapterIdentifier().VendorId != 0x1002)
         {
-            tryCSAA  = true;
+            useCSAA  = false;
         }
 
         while (!ok)
         {
             // Deal with special cases
-            if (tryCSAA)
+            if (useCSAA)
             {
-                // see http://developer.nvidia.com/object/coverage-sampled-aa.html
                 switch(fsaa)
                 {
-                case 8:
-                    if (qualityHint)
-                    {
-                        *outMultisampleType = D3DMULTISAMPLE_8_SAMPLES;
-                        *outMultisampleQuality = 0;
-                    }
-                    else
-                    {
-                        *outMultisampleType = D3DMULTISAMPLE_4_SAMPLES;
-                        *outMultisampleQuality = 2;
-                    }
+                case 8: // 8f16
+                    *outMultisampleType = D3DMULTISAMPLE_8_SAMPLES;
+                    *outMultisampleQuality = 2;
                     break;
-                case 16:
-                    if (qualityHint)
-                    {
-                        *outMultisampleType = D3DMULTISAMPLE_8_SAMPLES;
-                        *outMultisampleQuality = 2;
-                    }
-                    else
-                    {
-                        *outMultisampleType = D3DMULTISAMPLE_4_SAMPLES;
-                        *outMultisampleQuality = 4;
-                    }
+                case 4: // 4f8
+                    *outMultisampleType = D3DMULTISAMPLE_4_SAMPLES;
+                    *outMultisampleQuality = 2;
                     break;
                 }
             }
@@ -4020,29 +4003,16 @@ namespace Ogre
                 &outQuality);
 
             if (SUCCEEDED(hr) && 
-                (!tryCSAA || outQuality > *outMultisampleQuality))
+                (!useCSAA || outQuality > *outMultisampleQuality))
             {
                 ok = true;
             }
             else
             {
                 // downgrade
-                if (tryCSAA && fsaa == 8)
+                if (useCSAA)
                 {
-                    // for CSAA, we'll try downgrading with quality mode at all samples.
-                    // then try without quality, then drop CSAA
-                    if (qualityHint)
-                    {
-                        // drop quality first
-                        qualityHint = false;
-                    }
-                    else
-                    {
-                        // drop CSAA entirely 
-                        tryCSAA = false;
-                    }
-                    // return to original requested samples
-                    fsaa = origFSAA;
+                    useCSAA = false;
                 }
                 else
                 {

@@ -196,10 +196,12 @@ namespace Ogre {
             miscParams.emplace("FSAA", std::to_string(fsaa));
 
             // D3D specific
-            String hint;
-            fsaaMode >> hint;
             if(!fsaaMode.eof())
+            {
+                String hint;
+                fsaaMode >> hint;
                 miscParams.emplace("FSAAHint", hint);
+            }
         }
 
         if((opt = mOptions.find("VSync")) != end)
