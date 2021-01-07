@@ -211,7 +211,7 @@ namespace Ogre
         Called automatically by the default configuration
         dialog, and by the restoration of saved settings.
         These settings are stored and only activated when
-        RenderSystem::initialise or RenderSystem::reinitialise
+        @ref RenderSystem::_initialise or @ref RenderSystem::reinitialise
         are called.
 
         If using a custom configuration dialog, it is advised that the
@@ -226,7 +226,7 @@ namespace Ogre
         | VSync | true | "vsync" in  @ref _createRenderWindow |
         | VSync Interval | 1 | "vsyncInterval" in  @ref _createRenderWindow |
         | sRGB Gamma Conversion | false | "gamma" in  @ref _createRenderWindow  |
-        | FSAA | 0 | "FSAA" in  @ref _createRenderWindow  |
+        | FSAA | 0 | concatenation of "FSAA" and "FSAAHint" as in  @ref _createRenderWindow  |
         | Video Mode | - | Window resolution |
         | Display Frequency | - | "displayFrequency" in  @ref _createRenderWindow |
         @param
@@ -399,7 +399,7 @@ namespace Ogre
         | minColourBufferSize | Positive integer (usually 16, 32) | 16 | Min total colour buffer size. See EGL_BUFFER_SIZE | OpenGL Specific |
         | windowProc | WNDPROC | DefWindowProc | function that processes window messages | Win 32 Specific |
         | colourDepth | 16, 32 | Desktop depth | Colour depth of the resulting rendering window; only applies if fullScreen | Win32 Specific |
-        | FSAAHint | Depends on RenderSystem and hardware. Currently supports:"Quality": on systems that have an option to prefer higher AA quality over speed, use it | Blank | Full screen antialiasing hint | Win32 Specific |
+        | FSAAHint | %RenderSystem specific. Currently enables EQAA/ CSAA mode on D3D: if you want 4f8x (8x CSAA), set FSAA=4 and this to "f8" | Blank | FSAA mode hint | D3D Specific |
         | outerDimensions | true, false | false | Whether the width/height is expressed as the size of the outer window, rather than the content area | Win32 Specific  |
         | monitorIndex | | -1 | | Win 32 Specific |
         | monitorHandle | | 0 (none) | | Win 32 Specific (OpenGL) |
@@ -411,7 +411,6 @@ namespace Ogre
         | externalViewHandle | UIView pointer as an integer | 0 | External view handle, for rendering OGRE render in an existing view | iOS Specific |
         | externalViewControllerHandle | UIViewController pointer as an integer | 0 | External view controller handle, for embedding OGRE in an existing view controller | iOS Specific |
         | externalSharegroup | EAGLSharegroup pointer as an integer | 0 | External sharegroup, used to shared GL resources between contexts | iOS Specific |
-        | MSAA | Positive integer (usually 0, 2, 4, 8, 16) | 0 | Full screen antialiasing factor | Android Specific |
         | CSAA | Positive integer (usually 0, 2, 4, 8, 16) | 0 | [Coverage sampling factor](https://www.khronos.org/registry/egl/extensions/NV/EGL_NV_coverage_sample.txt) | Android Specific |
         | maxColourBufferSize | Positive integer (usually 16, 32) | 32 | Max EGL_BUFFER_SIZE | Android Specific |
         | maxStencilBufferSize | Positive integer (usually 0, 8) | 0 | EGL_STENCIL_SIZE | Android Specific |
