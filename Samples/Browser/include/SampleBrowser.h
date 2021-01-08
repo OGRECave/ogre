@@ -662,6 +662,28 @@ namespace OgreBites
             return mousePressed(e);
         }
 
+        bool buttonPressed(const ButtonEvent& evt) override
+        {
+            KeyboardEvent e;
+            e.keysym.sym = 0;
+            switch (evt.button)
+            {
+            case 0:
+                e.keysym.sym = SDLK_RETURN;
+                break;
+            case 1:
+                e.keysym.sym = SDLK_ESCAPE;
+                break;
+            case 11:
+                e.keysym.sym = SDLK_UP;
+                break;
+            case 12:
+                e.keysym.sym = SDLK_DOWN;
+                break;
+            }
+            return keyPressed(e);
+        }
+
         /*-----------------------------------------------------------------------------
           | Extends pointerReleased to inject mouse release into tray manager.
           -----------------------------------------------------------------------------*/

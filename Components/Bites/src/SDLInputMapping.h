@@ -68,6 +68,21 @@ namespace {
             out.type = OgreBites::TEXTINPUT;
             out.text.chars = in.text.text;
             break;
+        case SDL_CONTROLLERAXISMOTION:
+            out.type = OgreBites::CONTROLLERAXISMOTION;
+            out.axis.which = in.caxis.which;
+            out.axis.axis = in.caxis.axis;
+            out.axis.value = in.caxis.value;
+            break;
+        case SDL_CONTROLLERBUTTONDOWN:
+            out.type = OgreBites::CONTROLLERBUTTONDOWN;
+            OGRE_FALLTHROUGH;
+        case SDL_CONTROLLERBUTTONUP:
+            if(!out.type)
+                out.type = OgreBites::CONTROLLERBUTTONUP;
+            out.cbutton.which = in.cbutton.which;
+            out.cbutton.button = in.cbutton.button;
+            break;
         }
 
         return out;

@@ -350,7 +350,8 @@ void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t window
     for(InputListenerList::iterator it = mInputListeners.begin();
             it != mInputListeners.end(); ++it)
     {
-        if(it->first != windowID) continue;
+        // gamepad events are not window specific
+        if(it->first != windowID && event.type <= TEXTINPUT) continue;
 
         InputListener& l = *it->second;
 
@@ -387,6 +388,15 @@ void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t window
             break;
         case TEXTINPUT:
             l.textInput(event.text);
+            break;
+        case CONTROLLERAXISMOTION:
+            l.axisMoved(event.axis);
+            break;
+        case CONTROLLERBUTTONDOWN:
+            l.buttonPressed(event.cbutton);
+            break;
+        case CONTROLLERBUTTONUP:
+            l.buttonReleased(event.cbutton);
             break;
         }
     }
