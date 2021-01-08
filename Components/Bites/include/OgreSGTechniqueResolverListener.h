@@ -32,16 +32,15 @@
 #include "OgreRTShaderSystem.h"
 #include "OgreMaterialManager.h"
 
+namespace OgreBites {
 /** \addtogroup Optional
 *  @{
 */
 /** \addtogroup Bites
 *  @{
 */
-namespace OgreBites {
-/** This class demonstrates basic usage of the RTShader system.
-    It sub class the material manager listener class and when a target scheme callback
-    is invoked with the shader generator scheme it tries to create an equivalent shader
+/** Default implementation of a Listener to use with the Ogre::RTShader system.
+    When a target scheme callback is invoked with the shader generator scheme it tries to create an equivalent shader
     based technique based on the default technique of the given material.
 */
 class _OgreBitesExport SGTechniqueResolverListener : public Ogre::MaterialManager::Listener {
@@ -65,6 +64,6 @@ public:
 protected:
     Ogre::RTShader::ShaderGenerator* mShaderGenerator; // The shader generator instance.
 };
+/** @} */
+/** @} */
 }
-/** @} */
-/** @} */

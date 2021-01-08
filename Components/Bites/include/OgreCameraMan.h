@@ -35,14 +35,14 @@
 
 #include "OgreInput.h"
 
-/** \addtogroup Optional
-*  @{
-*/
-/** \addtogroup Bites
-*  @{
-*/
 namespace OgreBites
 {
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Bites
+    *  @{
+    */
     enum CameraStyle   /// enumerator values for different styles of camera movement
     {
         CS_FREELOOK,
@@ -172,7 +172,7 @@ namespace OgreBites
         bool mFastMove;
         Ogre::Vector3 mOffset;
     };
+    /** @} */
+    /** @} */
 }
-/** @} */
-/** @} */
 #endif

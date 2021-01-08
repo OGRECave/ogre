@@ -13,14 +13,18 @@ namespace Ogre {
     struct FrameEvent;
 }
 
+namespace OgreBites {
+
 /** \addtogroup Optional
 *  @{
 */
 /** \addtogroup Bites
 *  @{
 */
-namespace OgreBites {
-
+/** @defgroup Input Input
+ * SDL2 inspired input abstraction layer providing basic events
+ * @{
+ */
 enum ButtonType {
     BUTTON_LEFT = 1,
     BUTTON_MIDDLE,
@@ -276,8 +280,9 @@ public:
         return false;
     }
 };
+/** @} */
+/** @} */
+/** @} */
 }
-/** @} */
-/** @} */
 
 #endif /* SAMPLES_COMMON_INCLUDE_INPUT_H_ */

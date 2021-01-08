@@ -11,6 +11,12 @@
 
 namespace OgreBites
 {
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Bites
+    *  @{
+    */
     /** Utility class for loading the plugins statically.
 
         When loading plugins statically, you are limited to loading plugins
@@ -26,6 +32,8 @@ namespace OgreBites
 
         void unload();
     };
+    /** @} */
+    /** @} */
 }
 
 #endif

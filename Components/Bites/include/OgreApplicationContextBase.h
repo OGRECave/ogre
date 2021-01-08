@@ -54,13 +54,6 @@ namespace Ogre {
 
 #include "OgreInput.h"
 
-/** \addtogroup Optional Optional Components
-*  @{
-*/
-/** \defgroup Bites Bites
-* reusable utilities for rapid prototyping
-*  @{
-*/
 namespace OgreBites
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -68,6 +61,14 @@ namespace OgreBites
 #else
     typedef SDL_Window NativeWindowType;
 #endif
+
+    /** \addtogroup Optional Optional Components
+    *  @{
+    */
+    /** \defgroup Bites Bites
+    * reusable utilities for rapid prototyping
+    *  @{
+    */
 
     /**
      * link between a renderwindow and a platform specific window
@@ -305,7 +306,8 @@ namespace OgreBites
         SGTechniqueResolverListener*       mMaterialMgrListener; // Shader generator material manager listener.
 #endif // INCLUDE_RTSHADER_SYSTEM
     };
+
+    /** @} */
+    /** @} */
 }
-/** @} */
-/** @} */
 #endif

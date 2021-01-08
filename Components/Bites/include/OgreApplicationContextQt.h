@@ -17,6 +17,12 @@
 
 namespace OgreBites
 {
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup Bites
+*  @{
+*/
 
 /**
 Specialization for connecting with Qt
@@ -82,7 +88,8 @@ private:
     QWindow* mWindowOverride;
     bool mQtEventLoop;
 };
-
+/** @} */
+/** @} */
 } /* namespace Ogre */
 
 #endif /* COMPONENTS_BITES_INCLUDE_OGREAPPLICATIONCONTEXTQT_H_ */

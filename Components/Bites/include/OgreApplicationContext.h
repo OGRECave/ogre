@@ -42,14 +42,14 @@
 
 #include "OgreInput.h"
 
-/** \addtogroup Optional
-*  @{
-*/
-/** \addtogroup Bites
-*  @{
-*/
 namespace OgreBites
 {
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Bites
+    *  @{
+    */
 
 #if OGRE_BITES_HAVE_SDL
     class _OgreBitesExport ApplicationContextSDL : public ApplicationContextBase
@@ -100,7 +100,7 @@ namespace OgreBites
 #else
     typedef ApplicationContextBase ApplicationContext;
 #endif
+    /** @} */
+    /** @} */
 }
-/** @} */
-/** @} */
 #endif
