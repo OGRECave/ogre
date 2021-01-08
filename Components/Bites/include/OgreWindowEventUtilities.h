@@ -44,14 +44,14 @@ THE SOFTWARE.
 #  include <windows.h>
 #endif
 
-/** \addtogroup Optional
-*  @{
-*/
-/** \addtogroup Bites
-*  @{
-*/
 namespace OgreBites
 {
+    /** \addtogroup Optional
+    *  @{
+    */
+    /** \addtogroup Bites
+    *  @{
+    */
     /**
         Callback class used to send out window events to client app
     */
@@ -110,7 +110,7 @@ namespace OgreBites
         Utility class to handle Window Messages
 
         This only provides a minimal implementation for moving/ resizing windows.
-        For input handling and proper platform integration rather use SDL2/ Qt/ whatever.
+        @note For input handling and proper platform integration rather use SDL2/ Qt/ whatever.
         @see ApplicationContext
     */
     class _OgreBitesExport WindowEventUtilities
@@ -166,9 +166,9 @@ namespace OgreBites
         static LRESULT CALLBACK _WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #endif
     };
+    /** @} */
+    /** @} */
 }
-/** @} */
-/** @} */
 
 namespace Ogre
 {
