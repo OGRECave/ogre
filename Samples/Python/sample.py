@@ -45,10 +45,6 @@ class SampleApp(Bites.ApplicationContext, Bites.InputListener):
         self.trays.showFrameStats(Bites.TL_TOPRIGHT)
         self.trays.refreshCursor()
 
-        # enable per pixel lighting
-        rs = shadergen.getRenderState(RTShader.ShaderGenerator.DEFAULT_SCHEME_NAME)
-        rs.addTemplateSubRenderState(shadergen.createSubRenderState(RTShader.PerPixelLighting.Type))
-
         scn_mgr.setAmbientLight((.1, .1, .1))
 
         light = scn_mgr.createLight("MainLight")
@@ -82,6 +78,7 @@ class SampleApp(Bites.ApplicationContext, Bites.InputListener):
         # manually destroy in reverse creation order
         del app.ctrls
         del app.trays
+        Ogre.Bites.ApplicationContext.shutdown(self)
     
 if __name__ == "__main__":
     app = SampleApp()
