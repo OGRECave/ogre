@@ -39,7 +39,7 @@ void CameraMan::setTarget(Ogre::SceneNode *target)
     mTarget = target;
 }
 
-void CameraMan::setYawPitchDist(Ogre::Radian yaw, Ogre::Radian pitch, Ogre::Real dist)
+void CameraMan::setYawPitchDist(const Ogre::Radian&  yaw, const Ogre::Radian& pitch, Ogre::Real dist)
 {
     OgreAssert(mTarget, "no target set");
 
