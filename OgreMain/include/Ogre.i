@@ -295,6 +295,26 @@ TPL_VECTOR(3)
 TPL_VECTOR(4)
 
 #ifdef SWIGPYTHON
+// enable implicit conversion from float to Radian
+%typemap(in) const Ogre::Radian& (float tmp) {
+    void *argp = 0;
+    int res = SWIG_ConvertPtr($input, &argp, $descriptor, $disown);
+    if (SWIG_IsOK(res)) {
+        $1 = ($ltype)(argp);
+    }
+    else {
+        res = SWIG_AsVal_float($input, &tmp);
+        $1 = (Ogre::Radian*)&tmp;
+
+        if (!SWIG_IsOK(res))
+            SWIG_exception_fail(SWIG_TypeError, "Expected float or Ogre::Radian");
+    }
+}
+// punch through overload resolution
+%typecheck(SWIG_TYPECHECK_POINTER) const Ogre::Radian& {
+    $1 = true; // actual check in the typemap
+}
+
 %typemap(in) void*, Ogre::uchar* {
     void* argp;
     // always allow uchar* as thats how pixel data is usually passed around

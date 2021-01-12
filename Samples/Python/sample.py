@@ -60,7 +60,7 @@ class SampleApp(Bites.ApplicationContext, Bites.InputListener):
 
         self.camman = Bites.CameraMan(camnode)
         self.camman.setStyle(Bites.CS_ORBIT)
-        self.camman.setYawPitchDist(Ogre.Radian(0), Ogre.Radian(0.3), 15)
+        self.camman.setYawPitchDist(0, 0.3, 15)
         self.addInputListener(self.camman)
 
         # must keep a reference to ctrls so it does not get deleted
