@@ -386,20 +386,14 @@ namespace Ogre {
         */
         virtual void setFSAA(uint fsaa, const String& fsaaHint) { }
 
-        /** RenderSystem specific interface for a RenderTarget;
-            this should be subclassed by RenderSystems.
-        */
+        /// @deprecated do not use
         class Impl
         {
         protected:
             ~Impl() { }
         };
-        /** Get rendersystem specific interface for this RenderTarget.
-            This is used by the RenderSystem to (un)bind this target, 
-            and to get specific information like surfaces
-            and framebuffer objects.
-        */
-        virtual Impl *_getImpl();
+        /// @deprecated do not use
+        OGRE_DEPRECATED virtual Impl *_getImpl();
 
         /** Method for manual management of rendering : fires 'preRenderTargetUpdate'
             and initialises statistics etc.
