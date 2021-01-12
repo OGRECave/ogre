@@ -252,7 +252,7 @@ namespace Ogre {
             @param fsaa The level of multisampling to use if this is a render target. Ignored
                 if usage does not include TU_RENDERTARGET or if the device does
                 not support it.
-            @param fsaaHint specify "Quality" to enable CSAA on D3D
+            @param fsaaHint @copybrief RenderTarget::getFSAAHint
         */
         virtual TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, uint depth, 
