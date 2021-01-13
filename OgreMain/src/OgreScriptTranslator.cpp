@@ -4098,6 +4098,12 @@ namespace Ogre{
                                 switch(def->dataType)
                                 {
                                 case GpuProgramParameters::ACDT_NONE:
+                                    if (i2 != prop->values.end())
+                                    {
+                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
+                                                           prop->line, "unexpected <extraInfo> parameter");
+                                    }
+
                                     // Set the auto constant
                                     try
                                     {
@@ -4156,7 +4162,7 @@ namespace Ogre{
                                             else
                                             {
                                                 compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                                   "extra parameters required by constant definition " + atom1->value);
+                                                                   "<extraInfo> parameter required by constant definition " + atom1->value);
                                             }
                                         }
                                         else
@@ -4198,7 +4204,7 @@ namespace Ogre{
                                             else
                                             {
                                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                   "invalid auto constant extra info parameter");
+                                                                   "invalid auto constant <extraInfo> parameter");
                                             }
                                         }
                                     }
@@ -4247,13 +4253,13 @@ namespace Ogre{
                                             else
                                             {
                                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                   "incorrect float argument definition in extra parameters");
+                                                                   "incorrect float argument definition in <extraInfo> parameter");
                                             }
                                         }
                                         else
                                         {
                                             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                               "extra parameters required by constant definition " + atom1->value);
+                                                               "<extraInfo> parameter required by constant definition " + atom1->value);
                                         }
                                     }
                                     break;

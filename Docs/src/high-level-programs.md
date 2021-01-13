@@ -485,14 +485,14 @@ a space or tab-delimited list of values which can be converted into the type you
 This command tells Ogre to automatically update a given parameter with a derived value. This frees you from writing code to update program parameters every frame when they are always changing.
 
 @par
-Format: param\_indexed\_auto &lt;index&gt; &lt;value\_code&gt; &lt;extra\_params&gt;
+Format: param\_indexed\_auto &lt;index&gt; &lt;autoConstType&gt; &lt;extraInfo&gt;
 @par
 Example: param\_indexed\_auto 0 worldviewproj\_matrix
 
 @param index
 has the same meaning as [param\_indexed](#param_005findexed); note this time you do not have to specify the size of the parameter because the engine knows this already. In the example, the world/view/projection matrix is being used so this is implicitly a matrix4x4.
 
-@param value_code
+@param autoConstType, extraInfo
 is one of Ogre::GpuProgramParameters::AutoConstantType without the `ACT_` prefix. E.g. `ACT_WORLD_MATRIX` becomes `world_matrix`.
 
  <a name="param_005fnamed"></a><a name="param_005fnamed-1"></a>
@@ -514,11 +514,11 @@ The type is required because the program is not compiled and loaded when the mat
 This is the named equivalent of param\_indexed\_auto, for use with high-level programs.
 
 @par
-Format: param\_named\_auto &lt;name&gt; &lt;value\_code&gt; &lt;extra\_params&gt;
+Format: param\_named\_auto &lt;name&gt; &lt;autoConstType&gt; &lt;extraInfo&gt;
 @par
 Example: param\_named\_auto worldViewProj worldviewproj\_matrix
 
-The allowed value codes and the meaning of extra\_params are detailed in [param\_indexed\_auto](#param_005findexed_005fauto).
+The allowed @c autoConstType and the meaning of @c extraInfo are detailed in [param\_indexed\_auto](#param_005findexed_005fauto).
 
 <a name="shared_005fparams_005fref"></a><a name="shared_005fparams_005fref-1"></a>
 
