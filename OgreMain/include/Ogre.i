@@ -210,6 +210,9 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore Ogre::Matrix4::operator[];
 %ignore Ogre::ColourValue::operator[];
 
+// connect __setitem__
+%feature("python:slot", "sq_ass_item", functype="ssizeobjargproc") *::__setitem__;
+
 // stringinterface internal
 %rename("$ignore", regextarget=1) "^Cmd+";
 
@@ -284,6 +287,10 @@ ADD_REPR(Vector)
 %ignore Ogre::VectorBase<N, Ogre::Real>::NEGATIVE_UNIT_Z;
 %template(VectorBase ## N) Ogre::VectorBase<N, Ogre::Real>;
 %template(Vector ## N) Ogre::Vector<N, Ogre::Real>;
+
+%extend Ogre::Vector<N, Ogre::Real> {
+    void __setitem__(int i, float v) { (*$self)[i] = v; }
+}
 %enddef
 
 %ignore Ogre::VectorBase<3, int>::VectorBase;
@@ -676,6 +683,7 @@ SHARED_PTR(Material);
     %include "OgreNode.h"
         %include "OgreBone.h"
         %ignore Ogre::SceneNode::getAttachedObjectIterator;
+        %template(NodeObjectMap) std::vector<Ogre::MovableObject*>;
         %include "OgreSceneNode.h"
     SHARED_PTR(ShadowCameraSetup);
     SHARED_PTR(DefaultShadowCameraSetup);
