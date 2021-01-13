@@ -102,7 +102,7 @@ fragment_program Ogre/Instancing_ps unified
 	default_params
 	{
 		param_named_auto	lightPosition		light_position			0
-		param_named_auto	cameraPosition		camera_position			0
+		param_named_auto	cameraPosition		camera_position
 		param_named_auto	lightAmbient		ambient_light_colour
 		param_named_auto	lightDiffuse		light_diffuse_colour	0
 		param_named_auto	lightSpecular		light_specular_colour	0

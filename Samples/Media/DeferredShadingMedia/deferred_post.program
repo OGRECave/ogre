@@ -12,7 +12,7 @@ fragment_program DeferredShading/post/Ambient_ps_pCg hlsl
 	
 	default_params
 	{
-		param_named_auto ambientColor ambient_light_colour 0		
+		param_named_auto ambientColor ambient_light_colour
 		param_named_auto proj projection_matrix
 		param_named_auto farClipDistance far_clip_distance
 	}
@@ -24,7 +24,7 @@ fragment_program DeferredShading/post/Ambient_ps_pGLSL glsl
 	
 	default_params
 	{
-		param_named_auto ambientColor ambient_light_colour 0		
+		param_named_auto ambientColor ambient_light_colour
 		param_named_auto proj projection_matrix
 		param_named_auto farClipDistance far_clip_distance
         param_named Tex0 int 0
@@ -38,7 +38,7 @@ fragment_program DeferredShading/post/Ambient_ps_pGLSLES glsles
 	
 	default_params
 	{
-		param_named_auto ambientColor ambient_light_colour 0		
+		param_named_auto ambientColor ambient_light_colour
 		param_named_auto proj projection_matrix
 		param_named_auto farClipDistance far_clip_distance
         param_named Tex0 int 0
