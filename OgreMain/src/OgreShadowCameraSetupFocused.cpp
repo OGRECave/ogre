@@ -245,7 +245,7 @@ namespace Ogre
         {
             // For directional lights, all we care about is projecting the receivers
             // backwards towards the light, clipped by the camera region
-            mBodyB.clip(receiverBB);
+            mBodyB.clip(receiverBB.intersection(sceneBB));
 
             // Also clip based on shadow far distance if appropriate
             Real farDist = light.getShadowFarDistance();
@@ -415,7 +415,6 @@ namespace Ogre
         const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
         AxisAlignedBox sceneBB = visInfo.aabb;
         AxisAlignedBox receiverAABB = sm->getVisibleObjectsBoundsInfo(cam).receiverAabb;
-        sceneBB.merge(receiverAABB);
         sceneBB.merge(cam->getDerivedPosition());
 
         // in case the sceneBB is empty (e.g. nothing visible to the cam) simply

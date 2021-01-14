@@ -228,7 +228,6 @@ namespace Ogre
         const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
         AxisAlignedBox sceneBB = visInfo.aabb;
         AxisAlignedBox receiverAABB = sm->getVisibleObjectsBoundsInfo(cam).receiverAabb;
-        sceneBB.merge(receiverAABB);
         sceneBB.merge(cam->getDerivedPosition());
 
         // in case the sceneBB is empty (e.g. nothing visible to the cam) simply
