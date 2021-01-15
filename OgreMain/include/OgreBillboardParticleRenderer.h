@@ -193,6 +193,8 @@ namespace Ogre {
         BillboardSet* getBillboardSet(void) const { return mBillboardSet; }
 
         void _notifyBoundingBox(const AxisAlignedBox& aabb) override;
+
+        void _notifyCastShadows(bool enabled) override { mBillboardSet->setCastShadows(enabled); }
     protected:
         static CmdBillboardType msBillboardTypeCmd;
         static CmdBillboardOrigin msBillboardOriginCmd;

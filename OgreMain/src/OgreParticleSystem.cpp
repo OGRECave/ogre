@@ -98,7 +98,7 @@ namespace Ogre {
 
         // Default to billboard renderer
         setRenderer("billboard");
-
+        mCastShadows = false;
     }
     //-----------------------------------------------------------------------
     ParticleSystem::ParticleSystem(const String& name, const String& resourceGroup)
@@ -136,6 +136,7 @@ namespace Ogre {
 
         // Default to billboard renderer
         setRenderer("billboard");
+        mCastShadows = false;
     }
     //-----------------------------------------------------------------------
     ParticleSystem::~ParticleSystem()
@@ -697,6 +698,7 @@ namespace Ogre {
     {
         if (mRenderer)
         {
+            mRenderer->_notifyCastShadows(mCastShadows);
             mRenderer->visitRenderables(visitor, debugRenderables);
         }
     }
