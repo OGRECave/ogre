@@ -83,6 +83,7 @@ namespace Ogre
     */
     class _OgreExport Frustum : public MovableObject, public Renderable
     {
+        bool getCastsShadows(void) const override { return getCastShadows(); }
     protected:
         /// Orthographic or perspective?
         ProjectionType mProjType;

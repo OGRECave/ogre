@@ -123,6 +123,8 @@ namespace Ogre {
         */
         BillboardSet();
 
+        bool getCastsShadows(void) const override { return getCastShadows(); }
+
         /// Bounds of all billboards in this set
         AxisAlignedBox mAABB;
         /// Bounding radius
