@@ -1143,7 +1143,9 @@ namespace Ogre {
     {
         if (mRenderer)
         {
-            SortMode sortMode = mRenderer->_getSortMode();
+            SortMode sortMode =
+                cam->getSortMode() == SM_DIRECTION ? SM_DIRECTION : mRenderer->_getSortMode();
+
             if (sortMode == SM_DIRECTION)
             {
                 Vector3 camDir = cam->getDerivedDirection();

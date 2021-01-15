@@ -306,12 +306,21 @@ namespace Ogre {
         TVC_EMISSIVE    = 0x8
     };
 
-    /** Sort mode for billboard-set and particle-system */
+    /** Function used compute the camera-distance for sorting objects */
     enum SortMode
     {
-        /** Sort by direction of the camera */
+
+        /** Sort by direction of the camera
+         *
+         * The distance along the camera view as in `cam->getDerivedDirection().dotProduct(diff)`
+         * Best for @ref PT_ORTHOGRAPHIC
+         */
         SM_DIRECTION,
-        /** Sort by distance from the camera */
+        /** Sort by distance from the camera
+         *
+         * The euclidean distance as in `diff.squaredLength()`
+         * Best for @ref PT_PERSPECTIVE
+         */
         SM_DISTANCE
     };
 
