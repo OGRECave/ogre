@@ -238,7 +238,7 @@ namespace Ogre {
         Real dist;
         if (!mSubMesh->extremityPoints.empty())
         {
-            bool euclidean = cam->getDistanceFunction() == DF_EUCLIDEAN;
+            bool euclidean = cam->getSortMode() == SM_DISTANCE;
             Vector3 zAxis = cam->getDerivedDirection();
             const Vector3 &cp = cam->getDerivedPosition();
             const Affine3 &l2w = mParentEntity->_getParentNodeFullTransform();

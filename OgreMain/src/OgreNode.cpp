@@ -731,8 +731,7 @@ namespace Ogre {
         Vector3 zAxis = cam->getDerivedDirection();
 
         // NB use squared length to avoid square root
-        return cam->getDistanceFunction() == DF_EUCLIDEAN ? diff.squaredLength()
-                                                          : Math::Sqr(zAxis.dotProduct(diff));
+        return cam->getSortMode() == SM_DISTANCE ? diff.squaredLength() : Math::Sqr(zAxis.dotProduct(diff));
     }
     //-----------------------------------------------------------------------
     void Node::needUpdate(bool forceParentUpdate)

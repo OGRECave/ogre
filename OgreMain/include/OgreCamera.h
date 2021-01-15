@@ -49,17 +49,6 @@ namespace Ogre {
     *  @{
     */
 
-    /** Distance functions used on `Vector3 diff = objPos - cameraPos` */
-    enum DistanceFunction : uint8
-    {
-        /// The euclidean distance as in `diff.squaredLength()`
-        /// Best for @ref PT_PERSPECTIVE
-        DF_EUCLIDEAN,
-        /// The distance along the camera view as in `cam->getDerivedDirection().dotProduct(diff)`
-        /// Best for @ref PT_ORTHOGRAPHIC
-        DF_CAMERA_DEPTH
-    };
-
     /** A viewpoint from which the scene will be rendered.
     @remarks
         OGRE renders scenes from a camera viewpoint into a buffer of
@@ -180,7 +169,7 @@ namespace Ogre {
         typedef std::vector<Listener*> ListenerList;
         ListenerList mListeners;
 
-        DistanceFunction mDistanceFunc;
+        SortMode mSortMode;
 
         // Internal functions for calcs
         bool isViewOutOfDate(void) const;
@@ -661,9 +650,9 @@ namespace Ogre {
         Real getPixelDisplayRatio() const { return mPixelDisplayRatio; }
 
         /// Set the function used to compute the camera-distance for sorting Renderables
-        void setDistanceFunction(DistanceFunction df) { mDistanceFunc = df; }
-        /// get the currently used @ref DistanceFunction
-        DistanceFunction getDistanceFunction() const { return mDistanceFunc; }
+        void setSortMode(SortMode sm) { mSortMode = sm; }
+        /// get the currently used @ref SortMode
+        SortMode getSortMode() const { return mSortMode; }
     };
     /** @} */
     /** @} */
