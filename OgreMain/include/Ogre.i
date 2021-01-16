@@ -8,6 +8,7 @@
 #include "OgreVertexBoneAssignment.h"
 #include "OgreCodec.h"
 #include "OgreZip.h"
+#include "OgreParticleSystemRenderer.h"
 #include "OgreParticleEmitterFactory.h"
 #include "OgreParticleAffectorFactory.h"
 #include "OgreUnifiedHighLevelGpuProgram.h"
@@ -722,6 +723,7 @@ SHARED_PTR(Material);
     %ignore Ogre::Entity::getAttachedObjectIterator;
     %include "OgreEntity.h"
     %include "OgreSubEntity.h"
+    %include "OgreParticleSystemRenderer.h"
     SHARED_PTR(ParticleSystem);
     %ignore Ogre::ParticleSystem::_getIterator;
     %include "OgreParticleSystem.h"
