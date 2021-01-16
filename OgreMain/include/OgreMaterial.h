@@ -272,11 +272,19 @@ namespace Ogre {
 
         /** Creates a new copy of this material with the same settings but a new name.
         @param newName The name for the cloned material
-        @param changeGroup If true, the resource group of the clone is changed
-        @param newGroup Only required if changeGroup is true; the new group to assign
+        @param newGroup
+            Optional name of the new group to assign the clone to;
+            if you leave this blank, the clone will be assigned to the same
+            group as this Material.
         */
-        MaterialPtr clone(const String& newName, bool changeGroup = false, 
-            const String& newGroup = BLANKSTRING) const;
+        MaterialPtr clone(const String& newName, const String& newGroup = BLANKSTRING) const;
+
+        /// @deprecated use clone(const String&, const String&)
+        OGRE_DEPRECATED MaterialPtr clone(const String& newName, bool changeGroup,
+                                          const String& newGroup = BLANKSTRING) const
+        {
+            return clone(newName, newGroup);
+        }
 
         /** Copies the details of this material into another, preserving the target's handle and name
         (unlike operator=) but copying everything else.
