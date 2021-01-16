@@ -968,7 +968,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
-        mMaterial = static_pointer_cast<Material>(MaterialManager::getSingleton().load(name, mResourceGroupName));
+        mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
+        OgreAssert(mMaterial, ("Could not find material " + name).c_str());
         if (mIsRendererConfigured)
         {
             mMaterial->load();
