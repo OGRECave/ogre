@@ -820,8 +820,11 @@ namespace Ogre {
 
             if (mLocalSpace)
             {
-                // Merge calculated box with current AABB to preserve any user-set AABB
-                mAABB.merge(mWorldAABB);
+                if (mBoundsAutoUpdate)
+                    mAABB = mWorldAABB;
+                else
+                    // Merge calculated box with current AABB to preserve any user-set AABB
+                    mAABB.merge(mWorldAABB);
             }
             else
             {
@@ -831,8 +834,11 @@ namespace Ogre {
                 AxisAlignedBox newAABB(mWorldAABB);
                 newAABB.transform(mParentNode->_getFullTransform().inverse());
 
-                // Merge calculated box with current AABB to preserve any user-set AABB
-                mAABB.merge(newAABB);
+                if (mBoundsAutoUpdate)
+                    mAABB = newAABB;
+                else
+                    // Merge calculated box with current AABB to preserve any user-set AABB
+                    mAABB.merge(newAABB);
             }
 
             mParentNode->needUpdate();
