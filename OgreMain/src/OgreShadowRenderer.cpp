@@ -1664,11 +1664,6 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowCasterPass(const Pass* pas
             }
         }
 
-        // Propagate culling modes
-        retPass->setCullingMode(pass->getCullingMode());
-        retPass->setManualCullingMode(pass->getManualCullingMode());
-
-
         // Does incoming pass have a custom shadow caster program?
         if (!pass->getShadowCasterVertexProgramName().empty())
         {
@@ -1757,6 +1752,10 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowCasterPass(const Pass* pas
         {
             retPass = btech->getPass(0);
         }
+
+        // Propagate culling modes
+        retPass->setCullingMode(pass->getCullingMode());
+        retPass->setManualCullingMode(pass->getManualCullingMode());
 
         return retPass;
     }
