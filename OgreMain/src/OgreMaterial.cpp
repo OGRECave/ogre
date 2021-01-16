@@ -171,11 +171,10 @@ namespace Ogre {
         return memSize;
     }
     //-----------------------------------------------------------------------
-    MaterialPtr Material::clone(const String& newName, bool changeGroup, 
-        const String& newGroup) const
+    MaterialPtr Material::clone(const String& newName, const String& newGroup) const
     {
         MaterialPtr newMat =
-            MaterialManager::getSingleton().create(newName, changeGroup ? newGroup : mGroup);
+            MaterialManager::getSingleton().create(newName, newGroup.empty() ? mGroup : newGroup);
 
         if(!newMat) // interception by collision handler
             return newMat;
@@ -185,7 +184,7 @@ namespace Ogre {
         // Assign values from this
         *newMat = *this;
         // Restore new group if required, will have been overridden by operator
-        if (changeGroup)
+        if (!newGroup.empty())
         {
             newMat->mGroup = newGroup;
         }
