@@ -279,7 +279,7 @@ namespace Ogre {
         void setPosition(const Vector3& pos);
 
         /// @overload
-        void setPosition(Real x, Real y, Real z);
+        void setPosition(Real x, Real y, Real z) { setPosition(Vector3(x, y, z)); }
 
         /** Gets the position of the node relative to it's parent.
         */
@@ -300,7 +300,7 @@ namespace Ogre {
         void setScale(const Vector3& scale);
 
         /// @overload
-        void setScale(Real x, Real y, Real z);
+        void setScale(Real x, Real y, Real z) { setScale(Vector3(x, y, z)); }
 
         /** Gets the scaling factor of this node.
         */
@@ -381,7 +381,10 @@ namespace Ogre {
         */
         void translate(const Vector3& d, TransformSpace relativeTo = TS_PARENT);
         /// @overload
-        void translate(Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT);
+        void translate(Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT)
+        {
+            translate(Vector3(x, y, z), relativeTo);
+        }
         /** Moves the node along arbitrary axes.
         @remarks
             This method translates the node by a vector which is relative to
@@ -401,25 +404,43 @@ namespace Ogre {
         @param relativeTo
             The space which this transform is relative to.
         */
-        void translate(const Matrix3& axes, const Vector3& move, TransformSpace relativeTo = TS_PARENT);
+        void translate(const Matrix3& axes, const Vector3& move, TransformSpace relativeTo = TS_PARENT)
+        {
+            translate(axes * move, relativeTo);
+        }
         /// @overload
-        void translate(const Matrix3& axes, Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT);
+        void translate(const Matrix3& axes, Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT)
+        {
+            translate(axes, Vector3(x, y, z), relativeTo);
+        }
 
         /** Rotate the node around the Z-axis.
         */
-        virtual void roll(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
+        virtual void roll(const Radian& angle, TransformSpace relativeTo = TS_LOCAL)
+        {
+            rotate(Quaternion(angle, Vector3::UNIT_Z), relativeTo);
+        }
 
         /** Rotate the node around the X-axis.
         */
-        virtual void pitch(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
+        virtual void pitch(const Radian& angle, TransformSpace relativeTo = TS_LOCAL)
+        {
+            rotate(Quaternion(angle, Vector3::UNIT_X), relativeTo);
+        }
 
         /** Rotate the node around the Y-axis.
         */
-        virtual void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
+        virtual void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL)
+        {
+            rotate(Quaternion(angle, Vector3::UNIT_Y), relativeTo);
+        }
 
         /** Rotate the node around an arbitrary axis.
         */
-        void rotate(const Vector3& axis, const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
+        void rotate(const Vector3& axis, const Radian& angle, TransformSpace relativeTo = TS_LOCAL)
+        {
+            rotate(Quaternion(angle, axis), relativeTo);
+        }
 
         /** Rotate the node around an aritrary axis using a Quarternion.
         */
