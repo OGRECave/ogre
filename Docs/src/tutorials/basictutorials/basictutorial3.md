@@ -120,7 +120,7 @@ We need to write the helper function that was used by `defineTerrain` in the las
 
 Flipping is used to create seamless terrain so that unlimited terrain can be created using a single heightmap. If your terrain's heightmap is already seamless, then you don't need to use this trick. In our case, the flipping code is also useless, because we are using a 1x1 TerrainGroup. Flipping a 1x1 tile doesn't change anything. It is just for demonstration.
 ## Height based blending {#bt3Blendmap}
-Finally, we will finish up our configuration methods by completing the `initBlendMaps` method. This method will blend together the different layers we defined in `configureTerrainDefaults`. For now, you should pretty much view this method as a magic. The details will not be covered in this tutorial. Basically, the method blends the textures based on the height of the terrain at that point. This is not the only way of doing blending. It's a complicated topic and sits right at the verge between Ogre and the things it tries to abstract away.
+Finally, we will finish up our configuration methods by completing the `initBlendMaps` method. This method sets up [texture-splatting](https://en.wikipedia.org/wiki/Texture_splatting) for the different layers we defined in `configureTerrainDefaults`. For now, you should pretty much view this method as a magic. The details will not be covered in this tutorial. Basically, the method blends the textures based on the height of the terrain at that point. This is not the only way of doing blending. It's a complicated topic and sits right at the verge between Ogre and the things it tries to abstract away.
 
 @snippet Samples/Simple/include/Terrain.h blendmap
 
