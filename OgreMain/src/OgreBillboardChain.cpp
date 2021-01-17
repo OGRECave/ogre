@@ -704,10 +704,10 @@ namespace Ogre {
 
         if (!mMaterial)
         {
-            LogManager::getSingleton().logMessage("Can't assign material " + name +
+            LogManager::getSingleton().logError("Can't assign material " + name +
                 " to BillboardChain " + mName + " because this "
                 "Material does not exist in group "+groupName+". Have you forgotten to define it in a "
-                ".material script?", LML_CRITICAL);
+                ".material script?");
             mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
         }
         // Ensure new material loaded (will not load again if already loaded)
