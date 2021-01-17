@@ -969,7 +969,14 @@ namespace Ogre {
     void ParticleSystem::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
         mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
-        OgreAssert(mMaterial, ("Could not find material " + name).c_str());
+        if (!mMaterial)
+        {
+            LogManager::getSingleton().logError("Can't assign material " + name +
+                " to ParticleSystem " + mName + " because this "
+                "Material does not exist in group "+groupName+". Have you forgotten to define it in a "
+                ".material script?");
+            mMaterial = MaterialManager::getSingleton().getDefaultMaterial(false);
+        }
         if (mIsRendererConfigured)
         {
             mMaterial->load();
