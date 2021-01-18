@@ -530,6 +530,7 @@ Ogre comes preconfigured with a few particle affectors. New ones can be added by
 -   [ColourImage Affector](#ColourImage-Affector)
 -   [DeflectorPlane Affector](#DeflectorPlane-Affector)
 -   [DirectionRandomiser Affector](#DirectionRandomiser-Affector)
+-   [TextureAnimator Affector](#TextureAnimator-Affector)
 
 ## Linear Force Affector {#Linear-Force-Affector}
 
@@ -799,3 +800,31 @@ The percentage of particles affected in each run of the affector.<br> example: s
 Determines whether the velocity of particles is unchanged.<br> example: keep\_velocity true<br> default: keep\_velocity false<br>
 
 </dd> </dl>
+
+## TextureAnimator Affector {#TextureAnimator-Affector}
+
+@copybrief Ogre::TextureAnimatorAffector
+Its extra attributes are:
+
+@par texcoord_start
+@copybrief Ogre::TextureAnimatorAffector::setTexcoordStart
+@par
+Default: texcoord_start 0
+
+@par texcoord_count
+@copybrief Ogre::TextureAnimatorAffector::setTexcoordCount
+@par
+Default: texcoord_count 0
+@copydetails Ogre::TextureAnimatorAffector::setTexcoordCount
+
+@par duration
+@copybrief Ogre::TextureAnimatorAffector::setDuration
+@par
+@copydetails Ogre::TextureAnimatorAffector::setDuration
+@par
+Default: duration 0
+
+@par random_offset
+@copybrief Ogre::TextureAnimatorAffector::useRandomStartOffset
+@par
+Default: random_offset false

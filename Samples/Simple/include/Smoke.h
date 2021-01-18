@@ -14,7 +14,7 @@ public:
     Sample_Smoke()
     {
         mInfo["Title"] = "Smoke";
-        mInfo["Description"] = "Demonstrates depth-sorting of particles in particle systems.";
+        mInfo["Description"] = "Demonstrates depth-sorting and texture-animation of particles.";
         mInfo["Thumbnail"] = "thumb_smoke.png";
         mInfo["Category"] = "Effects";
     }

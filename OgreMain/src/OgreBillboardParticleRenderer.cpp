@@ -37,7 +37,11 @@ namespace Ogre {
     static class CmdStacksAndSlices : public ParamCommand
     {
     public:
-        String doGet(const void* target) const { return BLANKSTRING; }
+        String doGet(const void* target) const
+        {
+            return StringConverter::toString(
+                static_cast<const BillboardParticleRenderer*>(target)->getTextureStacksAndSlices());
+        }
         void doSet(void* target, const String& val)
         {
             Vector2 tmp = StringConverter::parseVector2(val);
@@ -54,7 +58,7 @@ namespace Ogre {
     BillboardParticleRenderer::CmdPointRendering BillboardParticleRenderer::msPointRenderingCmd;
     BillboardParticleRenderer::CmdAccurateFacing BillboardParticleRenderer::msAccurateFacingCmd;
     //-----------------------------------------------------------------------
-    BillboardParticleRenderer::BillboardParticleRenderer()
+    BillboardParticleRenderer::BillboardParticleRenderer() : mStacksSlices(1, 1)
     {
         if (createParamDictionary("BillboardParticleRenderer"))
         {
@@ -162,6 +166,7 @@ namespace Ogre {
             }
             bb.mColour = p->mColour;
             bb.mRotation = p->mRotation;
+            bb.mTexcoordIndex = p->mTexcoordIndex;
             // Assign and compare at the same time
             if ((bb.mOwnDimensions = p->mOwnDimensions) == true)
             {

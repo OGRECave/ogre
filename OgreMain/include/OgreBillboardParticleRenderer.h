@@ -54,6 +54,7 @@ namespace Ogre {
     protected:
         /// The billboard set that's doing the rendering
         BillboardSet* mBillboardSet;
+        Vector2 mStacksSlices;
     public:
         BillboardParticleRenderer();
         ~BillboardParticleRenderer();
@@ -111,8 +112,11 @@ namespace Ogre {
         /// @copydoc BillboardSet::setTextureStacksAndSlices
         void setTextureStacksAndSlices(uchar stacks, uchar slices)
         {
+            mStacksSlices = Vector2(stacks, slices); // cache for get call
             mBillboardSet->setTextureStacksAndSlices(stacks, slices);
         }
+
+        const Vector2& getTextureStacksAndSlices() const { return mStacksSlices; }
 
         /// @copydoc BillboardSet::setBillboardType
         void setBillboardType(BillboardType bbt) { mBillboardSet->setBillboardType(bbt); }

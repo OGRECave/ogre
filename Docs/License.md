@@ -288,6 +288,7 @@ Licensed Under:</td>
     <li>
         <p>Battle Damaged Sci-fi Helmet - PBR by theblueturtle_, published under a Creative Commons Attribution-NonCommercial license</p>
     </li>
+    <li>
+        <p>Smoke15Frames.png by Beast, published under CC-0 https://opengameart.org/content/smoke-aura</p>
+    </li>
 </ul>
-
-<p>Copyright &copy; 2013 by The OGRE Team</p>
