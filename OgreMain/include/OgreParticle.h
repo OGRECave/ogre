@@ -58,7 +58,7 @@ namespace Ogre {
         ParticleVisualData* mVisual;
     public:
         /// Type of particle
-        enum ParticleType
+        enum ParticleType : uint8
         {
             Visual,
             Emitter
@@ -88,12 +88,15 @@ namespace Ogre {
         Radian mRotationSpeed;
         /// Determines the type of particle.
         ParticleType mParticleType;
+        /// Index into the array of texture coordinates @see BillboardSet::setTextureStacksAndSlices()
+        uint8 mTexcoordIndex;
+        uint8 mRandomTexcoordOffset;
 
         Particle()
             : mParentSystem(0), mVisual(0), mOwnDimensions(false), mWidth(0), mHeight(0),
             mRotation(0), mPosition(Vector3::ZERO), mDirection(Vector3::ZERO),
             mColour(ColourValue::White), mTimeToLive(10), mTotalTimeToLive(10),
-            mRotationSpeed(0), mParticleType(Visual)
+            mRotationSpeed(0), mParticleType(Visual), mTexcoordIndex(0), mRandomTexcoordOffset(0)
         {
         }
 
