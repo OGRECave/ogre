@@ -40,10 +40,7 @@ namespace Ogre {
     *  @{
     */
 
-    /** This plugin subclass of ParticleAffector allows you to alter the scale of particles.
-    @remarks
-        This class supplies the ParticleAffector implementation required to make the particle expand
-        or contract in mid-flight.
+    /** This affector scales particles in flight.
     */
     class _OgreParticleFXExport ScaleAffector : public ParticleAffector
     {

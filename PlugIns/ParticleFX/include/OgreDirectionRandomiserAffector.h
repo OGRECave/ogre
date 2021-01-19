@@ -40,14 +40,7 @@ namespace Ogre {
     /** \addtogroup ParticleFX
     *  @{
     */
-    /** This class defines a ParticleAffector which applies randomness to the movement of the particles.
-    @remarks
-        This affector (see ParticleAffector) applies randomness to the movement of the particles by
-        changing the direction vectors.
-    @par
-        The most important parameter to control the effect is randomness. It controls the range in which changes
-        are applied to each axis of the direction vector.
-        The parameter scope can be used to limit the effect to a certain percentage of the particles.
+    /** This affector applies randomness to the movement of the particles.
     */
     class _OgreParticleFXExport DirectionRandomiserAffector : public ParticleAffector
     {
@@ -83,11 +76,11 @@ namespace Ogre {
         void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
 
 
-        /** Sets the randomness to apply to the particles in a system. */
+        /** The amount of randomness to introduce in each axial direction. */
         void setRandomness(Real force);
-        /** Sets the scope (percentage of particles which are randomised). */
+        /** The percentage of particles affected in each run of the affector. */
         void setScope(Real force);
-        /** Set flag which detemines whether particle speed is changed. */
+        /** Determines whether the velocity of particles is unchanged. */
         void setKeepVelocity(bool keepVelocity);
 
         /** Gets the randomness to apply to the particles in a system. */
