@@ -228,7 +228,7 @@ format: texture_sheet_size &lt;stacks&gt; &lt;slices&gt;
 
 Particle emitters are classified by ’type’ e.g. ’Point’ emitters emit from a single point whilst ’Box’ emitters emit randomly from an area. New emitters can be added to Ogre by creating plugins. You add an emitter to a system by nesting another section within it, headed with the keyword ’emitter’ followed by the name of the type of emitter (case sensitive). Ogre currently supports ’Point’, ’Box’, ’Cylinder’, ’Ellipsoid’, ’HollowEllipsoid’ and ’Ring’ emitters.
 
-It is also possible to ’emit emitters’ - that is, have new emitters spawned based on the position of particles. See [Emitting Emitters](#Emitting-Emitters)
+It is also possible to ’emit emitters’ - that is, have new emitters spawned based on the position of particles. See @ref Emitting-Emitters
 
 <a name="Particle-Emitter-Universal-Attributes"></a>
 
@@ -255,11 +255,7 @@ It is also possible to ’emit emitters’ - that is, have new emitters spawned 
 -   [repeat\_delay\_min](#repeat_005fdelay_005fmin)
 -   [repeat\_delay\_max](#repeat_005fdelay_005fmax)
 
-
-
-See also: [Particle Scripts](#Particle-Scripts), [Particle Affectors](#Particle-Affectors)
-
-
+@see @ref Particle-Affectors
 
 <a name="Particle-Emitter-Attributes"></a> <a name="Particle-Emitter-Attributes-1"></a>
 
@@ -387,8 +383,6 @@ As repeat\_delay, except this sets a range of repeat delays and each time the em
 
 format: as repeat\_delay<br> example:<br>     repeat\_delay 2<br>     repeat\_delay 5<br> default: both 0<br> <br>
 
-See also: [Standard Particle Emitters](#Standard-Particle-Emitters), [Particle Scripts](#Particle-Scripts), [Particle Affectors](#Particle-Affectors)
-
 # Standard Particle Emitters {#Standard-Particle-Emitters}
 
 Ogre comes preconfigured with a few particle emitters. New ones can be added by creating plugins: see the Plugin\_ParticleFX project as an example of how you would do this (this is where these emitters are implemented).
@@ -402,7 +396,9 @@ Ogre comes preconfigured with a few particle emitters. New ones can be added by 
 
 ## Point Emitter {#Point-Emitter}
 
-This emitter emits particles from a single point, which is it’s position. This emitter has no additional attributes over an above the standard emitter attributes.
+@copybrief Ogre::PointEmitter
+
+This emitter has no additional attributes over an above the standard emitter attributes.
 
 To create a point emitter, include a section like this within your particle system script:
 
@@ -414,13 +410,11 @@ emitter Point
 }
 ```
 
-<br>
-
-Please note that the name of the emitter (’Point’) is case-sensitive.
-
 ## Box Emitter {#Box-Emitter}
 
-This emitter emits particles from a random location within a 3-dimensional box. It’s extra attributes are:
+@copybrief Ogre::BoxEmitter
+
+It’s extra attributes are:
 
 <dl compact="compact">
 <dt>width</dt> <dd>
@@ -448,7 +442,9 @@ emitter Box
 
 ## Cylinder Emitter {#Cylinder-Emitter}
 
-This emitter emits particles in a random direction from within a cylinder area, where the cylinder is oriented along the Z-axis. This emitter has exactly the same parameters as the [Box Emitter](#Box-Emitter) so there are no additional parameters to consider here - the width and height determine the shape of the cylinder along it’s axis (if they are different it is an ellipsoid cylinder), the depth determines the length of the cylinder.
+@copybrief Ogre::CylinderEmitter
+
+This emitter has exactly the same parameters as the [Box Emitter](#Box-Emitter) so there are no additional parameters to consider here - the width and height determine the shape of the cylinder along it’s axis (if they are different it is an ellipsoid cylinder), the depth determines the length of the cylinder.
 
 ## Ellipsoid Emitter {#Ellipsoid-Emitter}
 
@@ -456,7 +452,9 @@ This emitter emits particles from within an ellipsoid shaped area, i.e. a sphere
 
 ## Hollow Ellipsoid Emitter {#Hollow-Ellipsoid-Emitter}
 
-This emitter is just like [Ellipsoid Emitter](#Ellipsoid-Emitter) except that there is a hollow area in the center of the ellipsoid from which no particles are emitted. Therefore it has 3 extra parameters in order to define this area:
+This emitter is just like [Ellipsoid Emitter](#Ellipsoid-Emitter) except that there is a hollow area in the center of the ellipsoid from which no particles are emitted.
+
+Therefore it has 3 extra parameters in order to define this area:
 
 <dl compact="compact">
 <dt>inner\_width</dt> <dd>
@@ -492,7 +490,9 @@ See also: [Particle Scripts](#Particle-Scripts), [Particle Emitters](#Particle-E
 
 ## Emitting Emitters {#Emitting-Emitters}
 
-It is possible to spawn new emitters on the expiry of particles, for example to product ’firework’ style effects. This is controlled via the following directives:
+It is possible to spawn new emitters on the expiry of particles, for example to product ’firework’ style effects.
+
+This is controlled via the following directives:
 
 <dl compact="compact">
 <dt>emit\_emitter\_quota</dt> <dd>
@@ -511,11 +511,11 @@ This is an emitter-level parameter, and if specified, it means that when particl
 
 # Particle Affectors {#Particle-Affectors}
 
-Particle affectors modify particles over their lifetime. They are classified by ’type’ e.g. ’LinearForce’ affectors apply a force to all particles, whilst ’ColourFader’ affectors alter the colour of particles in flight. New affectors can be added to Ogre by creating plugins. You add an affector to a system by nesting another section within it, headed with the keyword ’affector’ followed by the name of the type of affector (case sensitive). Ogre currently supports ’LinearForce’ and ’ColourFader’ affectors.
+Particle affectors modify particles over their lifetime. They are classified by ’type’ e.g. ’LinearForce’ affectors apply a force to all particles, whilst ’ColourFader’ affectors alter the colour of particles in flight. New affectors can be added to Ogre by creating plugins. You add an affector to a system by nesting another section within it, headed with the keyword ’affector’ followed by the name of the type of affector (case sensitive).
 
 Particle affectors actually have no universal attributes; they are all specific to the type of affector.
 
-See also: [Standard Particle Affectors](#Standard-Particle-Affectors), [Particle Scripts](#Particle-Scripts), [Particle Emitters](#Particle-Emitters)
+@see @ref Particle-Emitters
 
 # Standard Particle Affectors {#Standard-Particle-Affectors}
 
@@ -534,7 +534,9 @@ Ogre comes preconfigured with a few particle affectors. New ones can be added by
 
 ## Linear Force Affector {#Linear-Force-Affector}
 
-This affector applies a force vector to all particles to modify their trajectory. Can be used for gravity, wind, or any other linear force. It’s extra attributes are:
+@copybrief Ogre::LinearForceAffector
+
+It’s extra attributes are:
 
 <dl compact="compact">
 <dt>force\_vector</dt> <dd>
@@ -565,11 +567,11 @@ affector LinearForce
 }
 ```
 
-Please note that the name of the affector type (’LinearForce’) is case-sensitive.
-
 ## ColourFader Affector {#ColourFader-Affector}
 
-This affector modifies the colour of particles in flight. It’s extra attributes are:
+@copybrief Ogre::ColourFaderAffector
+
+It’s extra attributes are:
 
 <dl compact="compact">
 <dt>red</dt> <dd>
@@ -653,7 +655,9 @@ affector ColourFader2
 
 ## Scaler Affector {#Scaler-Affector}
 
-This affector scales particles in flight. It’s extra attributes are:
+@copybrief Ogre::ScaleAffector
+
+It’s extra attributes are:
 
 <dl compact="compact">
 <dt>rate</dt> <dd>
@@ -673,7 +677,9 @@ affector Scaler
 
 ## Rotator Affector {#Rotator-Affector}
 
-This affector rotates particles in flight. This is done by rotating the texture. It’s extra attributes are:
+@copybrief Ogre::RotationAffector
+
+It’s extra attributes are:
 
 <dl compact="compact">
 <dt>rotation\_speed\_range\_start</dt> <dd>
@@ -705,7 +711,9 @@ affector Rotator
 
 ## ColourInterpolator Affector {#ColourInterpolator-Affector}
 
-Similar to the ColourFader and ColourFader2 Affectors, this affector modifies the colour of particles in flight, except it has a variable number of defined stages. It swaps the particle colour for several stages in the life of a particle and interpolates between them. It’s extra attributes are:
+Similar to the ColourFader and ColourFader2 Affectors, this affector modifies the colour of particles in flight, except it has a variable number of defined stages. It swaps the particle colour for several stages in the life of a particle and interpolates between them.
+
+It’s extra attributes are:
 
 <dl compact="compact">
 <dt>time0</dt> <dd>
@@ -745,7 +753,9 @@ affector ColourInterpolator
 
 ## ColourImage Affector {#ColourImage-Affector}
 
-This is another affector that modifies the colour of particles in flight, but instead of programmatically defining colours, the colours are taken from a specified image file. The range of colour values begins from the left side of the image and move to the right over the lifetime of the particle, therefore only the horizontal dimension of the image is used. Its extra attributes are:
+This is another affector that modifies the colour of particles in flight, but instead of programmatically defining colours, the colours are taken from a specified image file. The range of colour values begins from the left side of the image and move to the right over the lifetime of the particle, therefore only the horizontal dimension of the image is used.
+
+Its extra attributes are:
 
 <dl compact="compact">
 <dt>image</dt> <dd>
@@ -765,7 +775,9 @@ affector ColourImage
 
 ## DeflectorPlane Affector {#DeflectorPlane-Affector}
 
-This affector defines a plane which deflects particles which collide with it. The attributes are:
+@copybrief Ogre::DeflectorPlaneAffector
+
+The attributes are:
 
 <dl compact="compact">
 <dt>plane\_point</dt> <dd>
@@ -784,26 +796,29 @@ The amount of bouncing when a particle is deflected. 0 means no deflection and 1
 
 ## DirectionRandomiser Affector {#DirectionRandomiser-Affector}
 
-This affector applies randomness to the movement of the particles. Its extra attributes are:
+@copybrief Ogre::DirectionRandomiserAffector
 
-<dl compact="compact">
-<dt>randomness</dt> <dd>
+Its extra attributes are:
 
-The amount of randomness to introduce in each axial direction.<br> example: randomness 5<br> default: randomness 1<br>
+@par randomness
+@copybrief Ogre::DirectionRandomiserAffector::setRandomness
+@par
+Default: randomness 1
 
-</dd> <dt>scope</dt> <dd>
+@par scope
+@copybrief Ogre::DirectionRandomiserAffector::setScope
+@par
+Default: scope 1.0
 
-The percentage of particles affected in each run of the affector.<br> example: scope 0.5<br> default: scope 1.0<br>
-
-</dd> <dt>keep\_velocity</dt> <dd>
-
-Determines whether the velocity of particles is unchanged.<br> example: keep\_velocity true<br> default: keep\_velocity false<br>
-
-</dd> </dl>
+@par keep_velocity
+@copybrief Ogre::DirectionRandomiserAffector::setKeepVelocity
+@par
+Default: keep_velocity false
 
 ## TextureAnimator Affector {#TextureAnimator-Affector}
 
 @copybrief Ogre::TextureAnimatorAffector
+
 Its extra attributes are:
 
 @par texcoord_start

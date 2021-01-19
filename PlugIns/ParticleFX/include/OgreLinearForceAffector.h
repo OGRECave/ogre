@@ -40,9 +40,8 @@ namespace Ogre {
     /** \addtogroup ParticleFX
     *  @{
     */
-    /** This class defines a ParticleAffector which applies a linear force to particles in a system.
+    /** This affector applies a force vector to all particles to modify their trajectory. Can be used for gravity, wind, or any other linear force.
     @remarks
-        This affector (see ParticleAffector) applies a linear force, such as gravity, to a particle system.
         This force can be applied in 2 ways: by taking the average of the particle's current momentum and the 
         force vector, or by adding the force vector to the current particle's momentum. 
     @par

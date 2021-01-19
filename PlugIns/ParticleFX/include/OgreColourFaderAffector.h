@@ -40,10 +40,7 @@ namespace Ogre {
     *  @{
     */
 
-    /** This plugin subclass of ParticleAffector allows you to alter the colour of particles.
-    @remarks
-        This class supplies the ParticleAffector implementation required to modify the colour of
-        particle in mid-flight.
+    /** This affector modifies the colour of particles in flight.
     */
     class _OgreParticleFXExport ColourFaderAffector : public ParticleAffector
     {

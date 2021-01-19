@@ -40,13 +40,7 @@ namespace Ogre {
     /** \addtogroup ParticleFX
     *  @{
     */
-    /** This class defines a ParticleAffector which deflects particles.
-    @remarks
-        This affector (see ParticleAffector) offers a simple (and inaccurate) physical deflection.
-        All particles which hit the plane are reflected.
-    @par
-        The plane is defined by a point (plane_point) and the normal (plane_normal).
-        In addition it is possible to change the strength of the recoil by using the bounce parameter.
+    /** This affector defines a plane which deflects particles which collide with it.
     */
     class _OgreParticleFXExport DeflectorPlaneAffector : public ParticleAffector
     {
