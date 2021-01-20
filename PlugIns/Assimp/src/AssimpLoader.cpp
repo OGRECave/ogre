@@ -833,7 +833,7 @@ void AssimpLoader::grabBoneNamesFromNode(const aiScene* mScene, const aiNode* pN
     }
 }
 
-MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat)
+MaterialPtr AssimpLoader::createMaterial(const aiMaterial* mat, const Ogre::String &group)
 {
     static int dummyMatCount = 0;
 
@@ -855,8 +855,7 @@ MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat)
     MaterialPtr omat;
     if(szPath.length)
     {
-        auto status = omatMgr->createOrRetrieve(ReplaceSpaces(szPath.data),
-                                                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        auto status = omatMgr->createOrRetrieve(ReplaceSpaces(szPath.data), group);
         omat = static_pointer_cast<Material>(status.first);
 
         if (!status.second)
@@ -875,7 +874,7 @@ MaterialPtr AssimpLoader::createMaterial(int index, const aiMaterial* mat)
         }
 
         omat = omatMgr->getDefaultMaterial(false)->clone("dummyMat" +
-                                                         StringConverter::toString(dummyMatCount++));
+                                                         StringConverter::toString(dummyMatCount++), group);
     }
 
     // ambient
@@ -974,7 +973,7 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
         return false;
     }
 
-    MaterialPtr matptr = createMaterial(mesh->mMaterialIndex, mat);
+    MaterialPtr matptr = createMaterial(mat, mMesh->getGroup());
 
     // now begin the object definition
     // We create a submesh per material
