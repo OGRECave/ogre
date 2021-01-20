@@ -384,22 +384,22 @@ namespace Ogre {
         /// Fast access to NON-UPDATEABLE node track list
         const NodeTrackList& _getNodeTrackList(void) const;
 
-        /// Get non-updateable iterator over node tracks
-        NodeTrackIterator getNodeTrackIterator(void) const
+        /// @deprecated use _getNodeTrackList
+        OGRE_DEPRECATED NodeTrackIterator getNodeTrackIterator(void) const
         { return NodeTrackIterator(mNodeTrackList.begin(), mNodeTrackList.end()); }
         
         /// Fast access to NON-UPDATEABLE numeric track list
         const NumericTrackList& _getNumericTrackList(void) const;
 
-        /// Get non-updateable iterator over node tracks
-        NumericTrackIterator getNumericTrackIterator(void) const
+        /// @deprecated use _getNumericTrackList
+        OGRE_DEPRECATED NumericTrackIterator getNumericTrackIterator(void) const
         { return NumericTrackIterator(mNumericTrackList.begin(), mNumericTrackList.end()); }
 
         /// Fast access to NON-UPDATEABLE Vertex track list
         const VertexTrackList& _getVertexTrackList(void) const;
 
-        /// Get non-updateable iterator over node tracks
-        VertexTrackIterator getVertexTrackIterator(void) const
+        /// @deprecated use _getVertexTrackList
+        OGRE_DEPRECATED VertexTrackIterator getVertexTrackIterator(void) const
         { return VertexTrackIterator(mVertexTrackList.begin(), mVertexTrackList.end()); }
 
         /** Optimise an animation by removing unnecessary tracks and keyframes.

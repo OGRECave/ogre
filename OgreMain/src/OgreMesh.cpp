@@ -2228,15 +2228,12 @@ namespace Ogre {
 
         // Scan all animations and determine the type of animation tracks
         // relating to each vertex data
-        for(AnimationList::const_iterator ai = mAnimationsList.begin();
-            ai != mAnimationsList.end(); ++ai)
+        for(const auto& ai : mAnimationsList)
         {
-            Animation* anim = ai->second;
-            Animation::VertexTrackIterator vit = anim->getVertexTrackIterator();
-            while (vit.hasMoreElements())
+            for (const auto& vit : ai.second->_getVertexTrackList())
             {
-                VertexAnimationTrack* track = vit.getNext();
-                ushort handle = track->getHandle();
+                VertexAnimationTrack* track = vit.second;
+                ushort handle = vit.first;
                 if (handle == 0)
                 {
                     // shared data
