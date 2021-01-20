@@ -275,10 +275,9 @@ namespace Ogre {
         }
 
         // Write all tracks
-        Animation::NodeTrackIterator trackIt = anim->getNodeTrackIterator();
-        while(trackIt.hasMoreElements())
+        for (const auto& it : anim->_getNodeTrackList())
         {
-            writeAnimationTrack(pSkel, trackIt.getNext());
+            writeAnimationTrack(pSkel, it.second);
         }
         }
         popInnerChunk(mStream);
@@ -393,10 +392,9 @@ namespace Ogre {
         }
 
         // Nested animation tracks
-        Animation::NodeTrackIterator trackIt = pAnim->getNodeTrackIterator();
-        while(trackIt.hasMoreElements())
+        for (const auto& it : pAnim->_getNodeTrackList())
         {
-            size += calcAnimationTrackSize(pSkel, trackIt.getNext());
+            size += calcAnimationTrackSize(pSkel, it.second);
         }
 
         return size;

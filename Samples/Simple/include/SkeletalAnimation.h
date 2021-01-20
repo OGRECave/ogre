@@ -305,12 +305,10 @@ protected:
         // get the skeleton, animation, and the node track iterator
         SkeletonPtr skel = static_pointer_cast<Skeleton>(SkeletonManager::getSingleton().load("jaiqua.skeleton",
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
-        Animation* anim = skel->getAnimation("Sneak");
-        Animation::NodeTrackIterator tracks = anim->getNodeTrackIterator();
 
-        while (tracks.hasMoreElements())   // for every node track...
+        for (const auto& it : skel->getAnimation("Sneak")->_getNodeTrackList()) // for every node track...
         {
-            NodeAnimationTrack* track = tracks.getNext();
+            NodeAnimationTrack* track = it.second;
 
             // get the keyframe at the chopping point
             TransformKeyFrame oldKf(0, 0);

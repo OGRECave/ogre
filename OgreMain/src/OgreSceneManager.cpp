@@ -2439,19 +2439,15 @@ void SceneManager::_applySceneAnimations(void)
         Animation* anim = getAnimation(state->getAnimationName());
 
         // Reset any nodes involved
-        Animation::NodeTrackIterator nodeTrackIt = anim->getNodeTrackIterator();
-        while(nodeTrackIt.hasMoreElements())
+        for (const auto& it : anim->_getNodeTrackList())
         {
-            Node* nd = nodeTrackIt.getNext()->getAssociatedNode();
-            if (nd)
+            if (Node* nd = it.second->getAssociatedNode())
                 nd->resetToInitialState();
         }
 
-        Animation::NumericTrackIterator numTrackIt = anim->getNumericTrackIterator();
-        while(numTrackIt.hasMoreElements())
+        for (const auto& it : anim->_getNumericTrackList())
         {
-            const AnimableValuePtr& animPtr = numTrackIt.getNext()->getAssociatedAnimable();
-            if (animPtr)
+            if (const auto& animPtr = it.second->getAssociatedAnimable())
                 animPtr->resetToBaseValue();
         }
     }

@@ -547,10 +547,9 @@ namespace Ogre {
         // Write all tracks
         pugi::xml_node tracksNode = animNode.append_child("tracks");
 
-        Animation::NodeTrackIterator trackIt = anim->getNodeTrackIterator();
-        while (trackIt.hasMoreElements())
+        for (const auto& it : anim->_getNodeTrackList())
         {
-            writeAnimationTrack(tracksNode, trackIt.getNext());
+            writeAnimationTrack(tracksNode, it.second);
         }
 
     }

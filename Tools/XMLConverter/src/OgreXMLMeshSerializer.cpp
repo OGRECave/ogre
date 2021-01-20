@@ -2080,13 +2080,12 @@ namespace Ogre {
             }
             
             pugi::xml_node tracksNode = animNode.append_child("tracks");
-            Animation::VertexTrackIterator iter = anim->getVertexTrackIterator();
-            while(iter.hasMoreElements())
+            for (const auto& trackIt : anim->_getVertexTrackList())
             {
-                const VertexAnimationTrack* track = iter.getNext();
+                const VertexAnimationTrack* track = trackIt.second;
                 pugi::xml_node trackNode = tracksNode.append_child("track");
 
-                unsigned short targetID = track->getHandle();
+                unsigned short targetID = trackIt.first;
                 if (targetID == 0)
                 {
                     trackNode.append_attribute("target") = "mesh";
