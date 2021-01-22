@@ -310,17 +310,6 @@ namespace Ogre {
 
     };
 
-
-    /*
-    /// Specialises the SceneQuery class for querying within a pyramid. 
-    class _OgreExport PyramidSceneQuery : public RegionSceneQuery
-    {
-    public:
-        PyramidSceneQuery(SceneManager* mgr);
-        virtual ~PyramidSceneQuery();
-    };
-    */
-
     /** Alternative listener class for dealing with RaySceneQuery.
     @remarks
         Because the RaySceneQuery returns results in an extra bit of information, namely
