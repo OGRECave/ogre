@@ -2599,7 +2599,7 @@ namespace Ogre {
         */
         virtual RaySceneQuery* 
             createRayQuery(const Ray& ray, uint32 mask = 0xFFFFFFFF);
-        //PyramidSceneQuery* createPyramidQuery(const Pyramid& p, unsigned long mask = 0xFFFFFFFF);
+
         /** Creates an IntersectionSceneQuery for this scene manager. 
         @remarks
             This method creates a new instance of a query object for locating
