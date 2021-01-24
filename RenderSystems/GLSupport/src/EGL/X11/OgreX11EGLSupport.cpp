@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 #include "OgreX11EGLSupport.h"
 #include "OgreX11EGLWindow.h"
-#include "OgreX11EGLRenderTexture.h"
 
 #include "OgreGLUtil.h"
 

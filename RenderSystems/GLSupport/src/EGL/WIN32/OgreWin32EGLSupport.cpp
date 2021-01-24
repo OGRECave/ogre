@@ -107,11 +107,6 @@ namespace Ogre {
 //      return new Win32EGLWindow(support);
 //  }
 
-    /*GLESPBuffer* Win32EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
-    {
-        return new Win32EGLPBuffer(this, format, width, height);
-    }*/
-
     void Win32EGLSupport::switchMode( uint& width, uint& height, short& frequency )
     {
         //todo

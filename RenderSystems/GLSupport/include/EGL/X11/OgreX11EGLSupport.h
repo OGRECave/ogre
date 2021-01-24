@@ -55,9 +55,6 @@ namespace Ogre {
             X11EGLSupport(int profile);
             virtual ~X11EGLSupport();
 
-//          virtual GLPBuffer* createPBuffer(PixelComponentType format,
-//              size_t width, size_t height);
-
             virtual void switchMode(uint& width, uint& height, short& frequency);
             String getDisplayName(void);
 

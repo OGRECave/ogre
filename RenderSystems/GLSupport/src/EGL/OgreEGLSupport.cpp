@@ -402,4 +402,9 @@ namespace Ogre {
     {
         mGLDisplay = val;
     }
+
+    GLPBuffer* EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
+    {
+        return new EGLPBuffer(this, format, width, height);
+    }
 }
