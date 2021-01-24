@@ -31,28 +31,29 @@ THE SOFTWARE.
 #define __EGLRenderTexture_H__
 
 #include "OgrePrerequisites.h"
-//#include "OgreGLESPBuffer.h"
+#include "OgreGLPBuffer.h"
 #include "OgreEGLContext.h"
 #include "OgreEGLSupport.h"
-/*
+
 namespace Ogre
 {
-    class GLESContext;
+    class GLContext;
     class EGLSupport;
     class EGLContext;
 
-    class _OgrePrivate EGLPBuffer : public GLESPBuffer
+    class _OgrePrivate EGLPBuffer : public GLPBuffer
     {
         protected:
             EGLSupport*   mGLSupport;
+            EGLContext*   mContext;
             ::EGLDisplay mGlDisplay;
             ::EGLSurface mEglDrawable;
         public:
             EGLPBuffer(EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
-        void initEGLPBuffer();
             virtual ~EGLPBuffer();
 
+            GLContext *getContext() const { return mContext; }
     };
 }
-*/
+
 #endif

@@ -106,6 +106,8 @@ namespace Ogre {
                 return NULL;
             }
 
+            GLPBuffer* createPBuffer(PixelComponentType format, size_t width, size_t height) override;
+
             ::EGLConfig getGLConfigFromContext(::EGLContext context);
             ::EGLConfig getGLConfigFromDrawable(::EGLSurface drawable,
                                                 unsigned int *w, unsigned int *h);

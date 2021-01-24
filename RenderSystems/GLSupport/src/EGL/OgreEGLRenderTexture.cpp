@@ -27,7 +27,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#if 0
+#if 1
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
@@ -43,24 +43,14 @@ THE SOFTWARE.
 namespace Ogre {
     EGLPBuffer::EGLPBuffer(EGLSupport* glsupport, PixelComponentType format,
                            size_t width, size_t height)
-        : GLESPBuffer(format, width, height)
+        : GLPBuffer(format, width, height)
     {
+        mGLSupport = glsupport;
+        mGlDisplay = mGLSupport->getGLDisplay();
 
-    }
-
-    //Changed the constructor to a member function so that the
-    //native constructor would be called first. This member
-    //function is then called from the native constructor.
-    void EGLPBuffer::initEGLPBuffer()
-    {
-
-//  These are now initialized in the native constructors.
-//  mGLSupport = glsupport;
-//        mGlDisplay = mGLSupport->getGLDisplay();
         mEglDrawable = 0;
         ::EGLConfig glConfig = 0;
 
-        bool isFloat = false;
         int bits = 0;
 
         switch (mFormat)
@@ -90,7 +80,7 @@ namespace Ogre {
         }
 
         int minAttribs[] = {
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PBUFFER_BIT,
+            EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
             EGL_DEPTH_SIZE, 16,
             EGL_NONE
         };
@@ -106,15 +96,15 @@ namespace Ogre {
 
         int pBufferAttribs[] = {
             // First we specify the width of the surface...
-            EGL_WIDTH, mWidth,
+            EGL_WIDTH, (int)mWidth,
             // ...then the height of the surface...
-            EGL_HEIGHT, mHeight,
+            EGL_HEIGHT, (int)mHeight,
             /* ... then we specify the target for the texture
             that will be created when the pbuffer is created...*/
             EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
             /*..then the format of the texture that will be created
             when the pBuffer is bound to a texture...*/
-            EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGB,
+            EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
             // The final thing is EGL_NONE which signifies the end.
             EGL_NONE
         };
@@ -132,8 +122,8 @@ namespace Ogre {
                         "Unable to create Pbuffer",
                         "EGLPBuffer::EGLPBuffer");
         }
-        GLint glConfigID;
-        GLint iWidth, iHeight;
+        EGLint glConfigID;
+        EGLint iWidth, iHeight;
 
         eglGetConfigAttrib(mGlDisplay, glConfig, EGL_CONFIG_ID, &glConfigID);
         EGL_CHECK_ERROR;
@@ -147,11 +137,13 @@ namespace Ogre {
         LogManager::getSingleton().logMessage(LML_NORMAL, "EGLPBuffer::create used final dimensions " + StringConverter::toString(mWidth) + " x " + StringConverter::toString(mHeight));
         LogManager::getSingleton().logMessage("EGLPBuffer::create used FBConfigID " + StringConverter::toString(glConfigID));
 
+        mContext = new EGLContext(mGlDisplay, mGLSupport, glConfig, mEglDrawable, NULL);
     }
 
     EGLPBuffer::~EGLPBuffer()
     {
         eglDestroySurface(mGlDisplay, mEglDrawable);
+        delete mContext;
         LogManager::getSingleton().logMessage(LML_NORMAL, "EGLPBuffer::PBuffer destroyed");
     }
 
