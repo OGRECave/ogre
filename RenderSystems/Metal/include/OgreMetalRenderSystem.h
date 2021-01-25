@@ -101,8 +101,6 @@ namespace Ogre
 
         virtual HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
 
-        virtual String validateConfigOptions(void)  { return BLANKSTRING; }
-
         virtual RenderSystemCapabilities* createRenderSystemCapabilities(void) const;
 
         virtual RenderWindow* _createRenderWindow( const String &name,
