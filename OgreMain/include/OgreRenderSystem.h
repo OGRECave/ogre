@@ -252,7 +252,7 @@ namespace Ogre
         @note
         If the returned string is empty, there are no problems.
         */
-        virtual String validateConfigOptions(void) = 0;
+        virtual String validateConfigOptions(void) { return BLANKSTRING; }
 
         /** Start up the renderer using the settings selected (Or the defaults if none have been selected).
 
