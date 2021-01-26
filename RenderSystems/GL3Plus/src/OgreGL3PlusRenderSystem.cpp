@@ -588,7 +588,6 @@ namespace Ogre {
 
 
         mGLSupport->stop();
-        mStopRendering = true;
 
         // delete mTextureManager;
         // mTextureManager = 0;

@@ -57,9 +57,6 @@ namespace Ogre {
     class _OgreGLExport GLRenderSystem : public GLRenderSystemCommon
     {
     private:
-        /// Rendering loop control
-        bool mStopRendering;
-
         /// View matrix to set world against
         Matrix4 mViewMatrix;
         Matrix4 mWorldMatrix;
