@@ -156,8 +156,6 @@ namespace Ogre
             Real depth = 1.0f, unsigned short stencil = 0);
         virtual void discardFrameBuffer( unsigned int buffers );
 
-        virtual Real getHorizontalTexelOffset(void);
-        virtual Real getVerticalTexelOffset(void);
         virtual Real getMinimumDepthInputValue(void);
         virtual Real getMaximumDepthInputValue(void);
 
