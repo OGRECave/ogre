@@ -992,8 +992,9 @@ namespace Ogre
         implement generically. This method allows you to retrieve the offset
         required to map the origin of a texel to the origin of a pixel in
         the horizontal direction.
+        @note only non-zero with D3D9
         */
-        virtual Real getHorizontalTexelOffset(void) = 0;
+        virtual Real getHorizontalTexelOffset(void) { return 0.0f; }
         /** Returns the vertical texel offset value required for mapping 
         texel origins to pixel origins in this rendersystem.
         @remarks
@@ -1002,8 +1003,9 @@ namespace Ogre
         implement generically. This method allows you to retrieve the offset
         required to map the origin of a texel to the origin of a pixel in
         the vertical direction.
+        @note only non-zero with D3D9
         */
-        virtual Real getVerticalTexelOffset(void) = 0;
+        virtual Real getVerticalTexelOffset(void) { return 0.0f; }
 
         /** Gets the minimum (closest) depth value to be used when rendering
         using identity transforms.

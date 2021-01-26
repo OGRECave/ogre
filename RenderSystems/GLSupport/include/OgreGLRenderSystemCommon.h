@@ -130,8 +130,6 @@ namespace Ogre {
                                             const HardwareVertexBufferSharedPtr& vertexBuffer,
                                             const size_t vertexStart) = 0;
 
-        Real getHorizontalTexelOffset(void) { return 0.0; }               // No offset in GL
-        Real getVerticalTexelOffset(void) { return 0.0; }                 // No offset in GL
         Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]
         Real getMaximumDepthInputValue(void) { return 1.0f; }             // Range [-1.0f, 1.0f]
 
