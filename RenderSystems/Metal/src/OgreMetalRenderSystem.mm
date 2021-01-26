@@ -1072,16 +1072,6 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
-    Real MetalRenderSystem::getHorizontalTexelOffset(void)
-    {
-        return 0.0f;
-    }
-    //-------------------------------------------------------------------------
-    Real MetalRenderSystem::getVerticalTexelOffset(void)
-    {
-        return 0.0f;
-    }
-    //-------------------------------------------------------------------------
     Real MetalRenderSystem::getMinimumDepthInputValue(void)
     {
         return 0.0f;

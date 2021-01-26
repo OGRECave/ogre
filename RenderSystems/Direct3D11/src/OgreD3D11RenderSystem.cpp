@@ -3102,18 +3102,6 @@ namespace Ogre
         return ret;
     }
     //---------------------------------------------------------------------
-    Real D3D11RenderSystem::getHorizontalTexelOffset(void)
-    {
-        // D3D11 is now like GL
-        return 0.0f;
-    }
-    //---------------------------------------------------------------------
-    Real D3D11RenderSystem::getVerticalTexelOffset(void)
-    {
-        // D3D11 is now like GL
-        return 0.0f;
-    }
-    //---------------------------------------------------------------------
     Real D3D11RenderSystem::getMinimumDepthInputValue(void)
     {
         // Range [0.0f, 1.0f]
