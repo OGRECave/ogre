@@ -152,8 +152,7 @@ namespace Ogre {
     }
 
     GLRenderSystem::GLRenderSystem()
-    :   mStopRendering(false),
-        mFixedFunctionTextureUnits(0),
+    :   mFixedFunctionTextureUnits(0),
         mStencilWriteMask(0xFFFFFFFF),
         mDepthWrite(true),
         mUseAutoTextureMatrix(false),
@@ -1008,7 +1007,6 @@ namespace Ogre {
         mRTTManager = 0;
 
         mGLSupport->stop();
-        mStopRendering = true;
 
         delete mTextureManager;
         mTextureManager = 0;

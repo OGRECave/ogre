@@ -58,9 +58,6 @@ namespace Ogre {
     {
         friend class GL3PlusSampler;
     private:
-        /// Rendering loop control
-        bool mStopRendering;
-
         typedef std::unordered_map<GLenum, GLuint>  BindBufferMap;
 
         /// Last min & mip filtering options, so we can combine them
@@ -118,8 +115,6 @@ namespace Ogre {
         // Default constructor / destructor
         GL3PlusRenderSystem();
         ~GL3PlusRenderSystem();
-
-        friend class ShaderGeneratorTechniqueResolverListener;
 
         // ----------------------------------
         // Overridden RenderSystem functions

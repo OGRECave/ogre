@@ -111,8 +111,6 @@ namespace Ogre {
             // Default constructor / destructor
             GLES2RenderSystem();
             virtual ~GLES2RenderSystem();
-        
-            friend class ShaderGeneratorTechniqueResolverListener;
 
             // ----------------------------------
             // Overridden RenderSystem functions
