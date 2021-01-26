@@ -1337,14 +1337,6 @@ namespace Ogre {
 
             do
             {
-                // Update derived depth bias.
-                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
-                {
-                    _setDepthBias(mDerivedDepthBiasBase +
-                                  mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
-                                  mDerivedDepthBiasSlopeScale);
-                }
-
                 if (hasInstanceData)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstanced(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
@@ -1359,14 +1351,6 @@ namespace Ogre {
         {
             do
             {
-                // Update derived depth bias.
-                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
-                {
-                    _setDepthBias(mDerivedDepthBiasBase +
-                                  mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
-                                  mDerivedDepthBiasSlopeScale);
-                }
-
                 if (hasInstanceData)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(primType, 0, op.vertexData->vertexCount, numberOfInstances));

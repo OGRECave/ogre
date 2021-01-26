@@ -877,16 +877,6 @@ namespace Ogre
         {
             do
             {
-                // Update derived depth bias.
-                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
-                {
-                    [mActiveRenderEncoder setDepthBias:mDerivedDepthBiasBase +
-                                                       mDerivedDepthBiasMultiplier *
-                                                       mCurrentPassIterationNum
-                                            slopeScale:mDerivedDepthBiasSlopeScale
-                                                 clamp:0.0f];
-                }
-
                 const MTLIndexType indexType = static_cast<MTLIndexType>(
                             mCurrentIndexBuffer->indexBuffer->getType() );
 

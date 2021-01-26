@@ -876,6 +876,13 @@ namespace Ogre {
         if (mCurrentPassIterationCount <= 1)
             return false;
 
+        // Update derived depth bias
+        if (mDerivedDepthBias)
+        {
+            _setDepthBias(mDerivedDepthBiasBase + mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
+                          mDerivedDepthBiasSlopeScale);
+        }
+
         --mCurrentPassIterationCount;
         ++mCurrentPassIterationNum;
 
