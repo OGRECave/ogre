@@ -65,13 +65,13 @@ namespace Ogre {
     {
     public:
         DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, Usage usage)
-            : HardwareVertexBuffer(NULL, vertexSize, numVertices,
-                                   new DefaultHardwareBuffer(vertexSize * numVertices))
+            : DefaultHardwareVertexBuffer(NULL, vertexSize, numVertices, usage)
         {
         }
         DefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
                                     Usage usage)
-            : DefaultHardwareVertexBuffer(vertexSize, numVertices, usage)
+            : HardwareVertexBuffer(mgr, vertexSize, numVertices,
+                                   new DefaultHardwareBuffer(vertexSize * numVertices))
         {
         }
     };
