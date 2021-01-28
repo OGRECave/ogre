@@ -61,6 +61,9 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
     SDL_GetWindowWMInfo(ret.native, &wmInfo);
 #endif
 
+    // for tiny rendersystem
+    p.miscParams["sdlwin"] = Ogre::StringConverter::toString(size_t(ret.native));
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
     p.miscParams["parentWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.x11.window));
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
