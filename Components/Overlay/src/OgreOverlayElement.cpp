@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreOverlayContainer.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreOverlayElementCommands.h"
+#include "OgreTechnique.h"
+#include "OgreLogManager.h"
 
 namespace Ogre {
 
@@ -329,6 +331,15 @@ namespace Ogre {
             return;
 
         mMaterial->load();
+
+        auto dstPass = mMaterial->getTechnique(0)->getPass(0); // assume this is representative
+        if (dstPass->getLightingEnabled() || dstPass->getDepthCheckEnabled())
+        {
+            LogManager::getSingleton().logWarning(
+                "force-disabling 'lighting' and 'depth_check' of Material " + mat->getName() +
+                " for use with OverlayElement " + getName());
+        }
+
         // Set some prerequisites to be sure
         mMaterial->setLightingEnabled(false);
         mMaterial->setReceiveShadows(false);
