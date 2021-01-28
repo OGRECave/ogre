@@ -791,6 +791,8 @@ namespace OgreBites
 
             // create template material for sample thumbnails
             Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SdkTrays/SampleThumbnail", "Essential");
+            thumbMat->setLightingEnabled(false);
+            thumbMat->setDepthCheckEnabled(false);
             thumbMat->getTechnique(0)->getPass(0)->createTextureUnitState();
 
             setupWidgets();
