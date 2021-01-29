@@ -3,6 +3,7 @@
 OGRE drives many of its features through scripts in order to make it easier to set up. The scripts are simply plain text files which can be edited in any standard text editor, and modifying them immediately takes effect on your OGRE-based applications, without any need to recompile. This makes prototyping a lot faster. Here are the items that OGRE lets you script:
 
 - @subpage Material-Scripts
+- @subpage High-level-Programs
 - @subpage Compositor-Scripts
 - @subpage Particle-Scripts
 - @subpage Overlay-Scripts

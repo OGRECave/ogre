@@ -1,13 +1,45 @@
-# High-level Programs {#High-level-Programs}
+# GPU Program Scripts {#High-level-Programs}
 
-Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE currently supports 3 high-level program types, Cg ([Cg](#Cg)) (an API- and card-independent, high-level language which lets you write programs for both OpenGL and DirectX for lots of cards), DirectX 9 High-Level Shader Language ([HLSL](#HLSL)), and OpenGL Shader Language ([GLSL](#GLSL)). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem. Cg can be used with both, although experience has shown that more advanced programs, particularly fragment programs which perform a lot of texture fetches, can produce better code in the rendersystem-specific shader language. 
-
-One way to support both HLSL and GLSL is to include separate techniques in the material script, each one referencing separate programs. However, if the programs are basically the same, with the same parameters, and the techniques are complex this can bloat your material scripts with duplication fairly quickly. Instead, if the only difference is the language of the vertex & fragment program you can use OGRE’s [Unified High-level Programs](#Unified-High_002dlevel-Programs) to automatically pick a program suitable for your rendersystem whilst using a single technique.
+@anchor Declaring-Vertex_002fGeometry_002fFragment-Programs
 
 @tableofcontents
 
+In order [to use a vertex, geometry or fragment program in your materials](@ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.
 
-# Preprocessor definitions {#Preprocessor-definitions}
+The definition of a program can either be embedded in the .material script itself (in which case it must precede any references to it in the script), or if you wish to use the same program across multiple .material files, you can define it in an external .program script. You define the program in exactly the same way whether you use a .program script or a .material script, the only difference is that all .program scripts are guaranteed to have been parsed before **all** .material scripts, so you can guarantee that your program has been defined before any .material script that might use it. Just like .material scripts, .program scripts will be read from any location which is on your resource path, and you can define many programs in a single script.
+
+Vertex, geometry and fragment programs can be low-level (i.e. assembler code written to the specification of a given low level syntax such as vs\_1\_1 or arbfp1) or high-level such as DirectX HLSL and OpenGL GLSL. High level languages give you a number of advantages, such as being able to write more intuitive code, and possibly being able to target multiple architectures in a single program (for example, the same Cg program might be able to be used in both D3D and GL, whilst the equivalent low-level programs would require separate techniques, each targeting a different API). High-level programs also allow you to use named parameters instead of simply indexed ones, although parameters are not defined here, they are used in the Pass.
+
+Here is an example of a definition of a low-level vertex program:
+
+```cpp
+vertex_program myVertexProgram asm
+{
+    source myVertexProgram.asm
+    syntax vs_1_1
+}
+```
+
+As you can see, that’s very simple, and defining a fragment or geometry program is exactly the same, just with @c vertex_program replaced with @c fragment_program or @c geometry_program, respectively. You give the program a name in the header, followed by the word ’asm’ to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip programs which use an unsupportable syntax quickly, without loading the program first.
+
+# Default Program Parameters {#Default-Program-Parameters}
+
+While defining a vertex, geometry or fragment program, you can also specify the default parameters to be used for materials which use it, unless they specifically override them. You do this by including a nested ’default\_params’ section, like so:
+
+@snippet Samples/Media/materials/scripts/Examples-Advanced.material celshading_vp
+
+The syntax of the parameter definition is exactly the same as when you define parameters when using programs, See @ref Program-Parameter-Specification. Defining default parameters allows you to avoid rebinding common parameters repeatedly (clearly in the above example, all but ’shininess’ are unlikely to change between uses of the program) which makes your material declarations shorter.
+
+# High Level Programs
+
+Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE supports multiple high-level program types. Notably DirectX [HLSL](#HLSL), and OpenGL [GLSL](#GLSL). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem.
+
+One way to support both HLSL and GLSL is to include separate techniques in the material script, each one referencing separate programs. However, if the programs are basically the same, with the same parameters, and the techniques are complex this can bloat your material scripts with duplication fairly quickly. Instead, if the only difference is the language of the vertex & fragment program you can use OGRE’s [Unified High-level Programs](#Unified-High_002dlevel-Programs) to automatically pick a program suitable for your rendersystem whilst using a single technique.
+
+There is also [Cg](#Cg) which is deprecated, but allows to use the same Shader code across different APIs - although experience has shown that more advanced programs, particularly fragment programs which perform a lot of texture fetches, can produce better code in the rendersystem-specific shader language.
+The better alternative to Cg is to use @ref multi-language-programs with `OgreUnifiedShader.h`. This achieves the same goal as Cg, but uses only a few straightforward preprocessor macros.
+
+## Preprocessor definitions {#Preprocessor-definitions}
 
 Both GLSL and HLSL support using preprocessor definitions in your code - some are defined by the implementation, but you can also define your own, say in order to use the same source code for a few different variants of the same technique. In order to use this feature, include preprocessor conditions in your code, of the kind <tt>\#ifdef SYMBOL</tt>, <tt>\#if SYMBOL==2</tt> etc. Then in your program definition, use the `preprocessor_defines` option, following it with a string of definitions. Definitions are separated by `;` or `,` and may optionally have a `=` operator within them to specify a definition value. Those without an `=` will implicitly have a definition of 1. For example:
 
@@ -271,6 +303,66 @@ geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
 
 With GL3+ these values are specified using the `layout` modifier.
 
+# Assembler Shaders
+
+The current supported syntaxes are:
+
+<dl compact="compact">
+<dt>vs_*</dt> <dd>
+
+These is are the DirectX vertex shader assembler syntaxes.
+
+</dd> <dt>arbvp1</dt> <dd>
+
+This is the OpenGL standard assembler format for vertex programs. It’s roughly equivalent to DirectX vs\_1\_1.
+
+</dd> <dt>vp*</dt> <dd>
+
+These are nVidia-specific OpenGL vertex shader syntax which is a superset of vs_1_1_, that have otherwise no equivalent in OpenGL.
+
+</dd>
+<dt>ps_*</dt> <dd>
+
+DirectX pixel shader (i.e. fragment program) assembler syntax.
+@note for ATI 8500, 9000, 9100, 9200 hardware, these profiles can also be used in OpenGL. The ATI 8500 to 9200 do not support arbfp1 but do support atifs extension in OpenGL which is very similar in function to ps\_1\_4 in DirectX. Ogre has a built in ps\_1\_x to atifs compiler that is automatically invoked when ps\_1\_x is used in OpenGL on ATI hardware.
+
+</dd>
+<dt>arbfp1</dt> <dd>
+
+This is the OpenGL standard assembler format for fragment programs. It’s roughly equivalent to ps\_2\_0, which means that not all cards that support basic pixel shaders under DirectX support arbfp1 (for example neither the GeForce3 or GeForce4 support arbfp1, but they do support ps\_1\_1).
+
+</dd> <dt>fp20</dt> <dd>
+
+This is an nVidia-specific OpenGL fragment syntax which is a superset of ps 1.3. It allows you to use the [nvparse format](https://www.nvidia.com/attach/6400) for basic fragment programs. It actually uses NV\_texture\_shader and NV\_register\_combiners to provide functionality equivalent to DirectX’s ps\_1\_1 under GL, but only for nVidia cards. However, since ATI cards adopted arbfp1 a little earlier than nVidia, it is mainly nVidia cards like the GeForce3 and GeForce4 that this will be useful for.
+
+</dd> <dt>fp*</dt> <dd>
+
+Another nVidia-specific OpenGL fragment shader syntax.
+
+</dd>
+<dt>gpu\_gp, gp4\_gp</dt> <dd>
+
+An nVidia-specific OpenGL geometry shader syntax. <br> Supported cards: nVidia GeForce FX8 series<br>
+
+</dd> </dl>
+
+You can get a definitive list of the syntaxes supported by the current card by calling `Ogre::GpuProgramManager::getSupportedSyntax()`.
+
+## Specifying Named Constants {#Specifying-Named-Constants-for-Assembler-Shaders}
+
+Assembler shaders don’t have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - GpuNamedConstants which contains the named parameter mappings has a ’save’ method which you can use to write this data to disk, where you can reference it later using the manual\_named\_constants directive inside your assembler program declaration, e.g.
+
+```cpp
+vertex_program myVertexProgram asm
+{
+    source myVertexProgram.asm
+    syntax vs_1_1
+    manual_named_constants myVertexProgram.constants
+}
+```
+
+In this case myVertexProgram.constants has been created by calling `Ogre::GpuNamedConstants::save("myVertexProgram.constants");` sometime earlier as preparation, from the original high-level program. Once you’ve used this directive, you can use named parameters here even though the assembler program itself has no knowledge of them.
+
 # Multi-language Programs {#multi-language-programs}
 
 Basic programs, like the `example.frag` stated above, are compatible with GLSL and GLSLES. To avoid duplicating the whole
@@ -426,29 +518,7 @@ material SupportHLSLandGLSLwithUnified
 
 At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatically picks a real program to delegate to based on what’s supported on the current hardware / rendersystem. If none of the delegates are supported, the entire technique referencing the unified program is marked as unsupported and the next technique in the material is checked fro fallback, just like normal. As your materials get larger, and you find you need to support HLSL and GLSL specifically (or need to write multiple interface-compatible versions of a program for whatever other reason), unified programs can really help reduce duplication.
 
-# Using GPU Programs in a Pass {#Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass}
-
-Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (See @ref Declaring-Vertex_002fGeometry_002fFragment-Programs). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.
-
-As well as naming the program in question, you can also provide parameters to it. Here’s a simple example:
-
-```cpp
-vertex_program_ref myVertexProgram
-{
-    param_indexed_auto 0 worldviewproj_matrix
-    param_indexed      4 float4  10.0 0 0 0
-}
-```
-
-In this example, we bind a vertex program called ’myVertexProgram’ (which will be defined elsewhere) to the pass, and give it 2 parameters, one is an ’auto’ parameter, meaning we do not have to supply a value as such, just a recognised code (in this case it’s the world/view/projection matrix which is kept up to date automatically by Ogre). The second parameter is a manually specified parameter, a 4-element float. The indexes are described later.
-
-The syntax of the link to a vertex program and a fragment or geometry program are identical, the only difference is that ’fragment\_program\_ref’ and ’geometry\_program\_ref’ are used respectively instead of ’vertex\_program\_ref’.
-
-For many situations vertex, geometry and fragment programs are associated with each other in a pass but this is not cast in stone. You could have a vertex program that can be used by several different fragment programs. Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programmable vertex fixed function pipeline and then provide a fragment\_program\_ref in a pass i.e. there would be no vertex\_program\_ref section in the pass. The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline. You could also just have a vertex program that outputs to the fragment fixed function pipeline.
-
-The requirements to read from or write to the fixed function pipeline are similar between rendering API’s (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language. For HLSL (DirectX API) and associated asm consult MSDN at <http://msdn.microsoft.com/library/>. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at <http://www.opengl.org/registry/>. The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings. For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at <https://developer.nvidia.com/cg-toolkit>. For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.
-
-## Parameter specification {#Program-Parameter-Specification}
+# Parameter specification {#Program-Parameter-Specification}
 
 Parameters can be specified using one of 4 commands as shown below. The same syntax is used whether you are defining a parameter just for this particular use of the program, or when specifying the @ref Default-Program-Parameters. Parameters set in the specific use of the program override the defaults.
 
@@ -531,6 +601,29 @@ Format: shared\_params\_ref &lt;shared\_set\_name&gt;
 Example: shared\_params\_ref mySharedParams
 
 The only required parameter is a name, which must be the name of an already defined shared parameter set. All named parameters which are present in the program that are also present in the shared parameter set will be linked, and the shared parameters used as if you had defined them locally. This is dependent on the definitions (type and array size) matching between the shared set and the program.
+
+# Declaring Shared Parameters {#Declaring-Shared-Parameters}
+
+Often, not every parameter you want to pass to a shader is unique to that program, and perhaps you want to give the same value to a number of different programs, and a number of different materials using that program. Shared parameter sets allow you to define a ’holding area’ for shared parameters that can then be referenced when you need them in particular shaders, while keeping the definition of that value in one place. To define a set of shared parameters, you do this:
+
+```cpp
+shared_params YourSharedParamsName
+{
+    shared_param_named mySharedParam1 float4 0.1 0.2 0.3 0.4
+    ...
+}
+```
+
+As you can see, you need to use the keyword ’shared\_params’ and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the [param\_named](#param_005fnamed) syntax. The definition of these lines is:
+@par
+Format: shared\_param\_name &lt;param\_name&gt; &lt;param\_type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
+
+@param param_name must be unique within the set
+@param param_type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4.
+@param array_size allows you to define arrays of param\_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param\_type with whitespace).
+@param initial_values If you wish, you can also initialise the parameters by providing a list of values.
+
+Once you have defined the shared parameters, you can reference them inside default\_params and params blocks using [shared\_params\_ref](#shared_005fparams_005fref). You can also obtain a reference to them in your code via GpuProgramManager::getSharedParameters, and update the values for all instances using them.
 
 # Shadows and Vertex Programs {#Shadows-and-Vertex-Programs}
 
