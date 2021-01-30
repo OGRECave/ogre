@@ -29,13 +29,6 @@ THE SOFTWARE.
 #include "OgreD3D9Plugin.h"
 #include "OgreRoot.h"
 
-#ifdef __MINGW32__
-extern "C" {   
-#include "OgreMinGWSupport.h"
-void _chkstk();
-}   
-#endif
-
 namespace Ogre 
 {
     const String sPluginName = "D3D9 RenderSystem";
@@ -54,14 +47,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9Plugin::install()
     {
-        // When building with MinGW, we need to call dummy implementations
-        // of missing MinGW DirectX functions to make sure they are carried over
-        // in dynamic AND static builds
-#ifdef __MINGW32__
-    _chkstk();
-    __security_check_cookie((intptr_t)NULL);    
-#endif
-    
         // Create the DirectX 9 rendering api
 		HINSTANCE hInst = NULL;
 		#ifdef __MINGW32__

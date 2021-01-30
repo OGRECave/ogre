@@ -29,9 +29,6 @@ THE SOFTWARE.
 #define __D3D9PREREQUISITES_H__
 
 #include "OgrePrerequisites.h"
-#ifdef __MINGW32__
-#  include "OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
-#endif
 
 #include "Threading/OgreThreadHeaders.h"
 
