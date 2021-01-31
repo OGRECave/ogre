@@ -83,9 +83,6 @@ namespace Ogre {
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
             }
         }
-		
-		mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
-		
     }
     D3D11HardwarePixelBuffer::~D3D11HardwarePixelBuffer()
     {

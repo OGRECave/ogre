@@ -143,10 +143,6 @@ namespace Ogre {
         mGLInternalFormat =
             GLES2PixelUtil::getGLInternalFormat(mFormat, parent->isHardwareGammaEnabled());
 
-        mRowPitch = mWidth;
-        mSlicePitch = mHeight*mWidth;
-        mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
-
 #if OGRE_DEBUG_MODE
         // Log a message
         std::stringstream str;
