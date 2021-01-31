@@ -242,10 +242,6 @@ namespace Ogre {
         else
             mDepth = depth;
 
-        mRowPitch = mWidth;
-        mSlicePitch = mHeight * mWidth;
-        mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
-
 #if OGRE_DEBUG_MODE
         // Log a message
         std::stringstream str;

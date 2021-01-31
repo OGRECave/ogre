@@ -60,11 +60,6 @@ namespace Ogre {
         // Get format
         mGLInternalFormat = GL3PlusPixelUtil::getGLInternalFormat(mFormat, parent->isHardwareGammaEnabled());
 
-        // Default
-        mRowPitch = mWidth;
-        mSlicePitch = mHeight*mWidth;
-        mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
-
         // Log a message
         //        std::stringstream str;
         //        str << "GL3PlusHardwarePixelBuffer constructed for texture: " << mTextureID

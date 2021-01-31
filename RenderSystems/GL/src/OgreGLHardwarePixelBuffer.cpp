@@ -132,11 +132,6 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent
     // Get format
     mGLInternalFormat = GLPixelUtil::getGLInternalFormat(mFormat, mHwGamma);
     
-    // Default
-    mRowPitch = mWidth;
-    mSlicePitch = mHeight*mWidth;
-    mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
-    
     // Log a message
     /*
     std::stringstream str;
