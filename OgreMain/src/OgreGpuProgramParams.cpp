@@ -1770,7 +1770,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------
-    void GpuProgramParameters::setAutoConstant(size_t index, AutoConstantType acType, size_t extraInfo)
+    void GpuProgramParameters::setAutoConstant(size_t index, AutoConstantType acType, uint32 extraInfo)
     {
         // Get auto constant definition for sizing
         const AutoConstantDefinition* autoDef = getAutoConstantDefinition(acType);
@@ -1794,7 +1794,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------
     void GpuProgramParameters::_setRawAutoConstant(size_t physicalIndex,
-                                                   AutoConstantType acType, size_t extraInfo, uint16 variability, size_t elementSize)
+                                                   AutoConstantType acType, uint32 extraInfo, uint16 variability, uint8 elementSize)
     {
         // update existing index if it exists
         bool found = false;
@@ -1844,7 +1844,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------
     void GpuProgramParameters::_setRawAutoConstantReal(size_t physicalIndex,
-                                                       AutoConstantType acType, Real rData, uint16 variability, size_t elementSize)
+                                                       AutoConstantType acType, float rData, uint16 variability, uint8 elementSize)
     {
         // update existing index if it exists
         bool found = false;
