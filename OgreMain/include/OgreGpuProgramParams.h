@@ -1227,19 +1227,16 @@ namespace Ogre {
             ACDT_NONE,
             /// the auto constant requires data of type int
             ACDT_INT,
-            /// the auto constant requires data of type real (float or double)
+            /// the auto constant requires data of type float
             ACDT_REAL
-            // /// the auto constant requires data of type unsigned int
-            // ACDT_UINT,
         };
 
         /** Defines the base element type of the auto constant
          */
         enum ElementType {
             ET_INT,
-            // float or double, depending on 64-bit compiler flag
+            // float
             ET_REAL
-            // ET_UINT,
         };
 
         /** Structure defining an auto constant that's available for use in
@@ -1273,27 +1270,27 @@ namespace Ogre {
             AutoConstantType paramType;
             /// The target (physical) constant index
             size_t physicalIndex;
-            /** The number of elements per individual entry in this constant
-                Used in case people used packed elements smaller than 4 (e.g. GLSL)
-                and bind an auto which is 4-element packed to it */
-            size_t elementCount;
             /// Additional information to go with the parameter
             union{
-                size_t data;
-                Real fData;
+                uint32 data;
+                float fData;
             };
             /// The variability of this parameter (see GpuParamVariability)
             uint16 variability;
+            /** The number of elements per individual entry in this constant
+                Used in case people used packed elements smaller than 4 (e.g. GLSL)
+                and bind an auto which is 4-element packed to it */
+            uint8 elementCount;
 
-        AutoConstantEntry(AutoConstantType theType, size_t theIndex, size_t theData,
-                          uint16 theVariability, size_t theElemCount = 4)
-            : paramType(theType), physicalIndex(theIndex), elementCount(theElemCount),
-                data(theData), variability(theVariability) {}
+        AutoConstantEntry(AutoConstantType theType, size_t theIndex, uint32 theData,
+                          uint16 theVariability, uint8 theElemCount = 4)
+            : paramType(theType), physicalIndex(theIndex),
+                data(theData), variability(theVariability), elementCount(theElemCount) {}
 
-        AutoConstantEntry(AutoConstantType theType, size_t theIndex, Real theData,
-                          uint16 theVariability, size_t theElemCount = 4)
-            : paramType(theType), physicalIndex(theIndex), elementCount(theElemCount),
-                fData(theData), variability(theVariability) {}
+        AutoConstantEntry(AutoConstantType theType, size_t theIndex, float theData,
+                          uint16 theVariability, uint8 theElemCount = 4)
+            : paramType(theType), physicalIndex(theIndex),
+                fData(theData), variability(theVariability), elementCount(theElemCount) {}
 
         };
         // Auto parameter storage
@@ -1716,8 +1713,8 @@ namespace Ogre {
             @param acType The type of automatic constant to set
             @param extraInfo If the constant type needs more information (like a light index or array size) put it here.
         */
-        void setAutoConstant(size_t index, AutoConstantType acType, size_t extraInfo = 0);
-        void setAutoConstantReal(size_t index, AutoConstantType acType, Real rData);
+        void setAutoConstant(size_t index, AutoConstantType acType, uint32 extraInfo = 0);
+        void setAutoConstantReal(size_t index, AutoConstantType acType, float rData);
 
         /** Sets up a constant which will automatically be updated by the system.
             @remarks
@@ -1738,13 +1735,13 @@ namespace Ogre {
         /** As setAutoConstant, but sets up the auto constant directly against a
             physical buffer index.
         */
-        void _setRawAutoConstant(size_t physicalIndex, AutoConstantType acType, size_t extraInfo,
-                                 uint16 variability, size_t elementSize = 4);
+        void _setRawAutoConstant(size_t physicalIndex, AutoConstantType acType, uint32 extraInfo,
+                                 uint16 variability, uint8 elementSize = 4);
         /** As setAutoConstantReal, but sets up the auto constant directly against a
             physical buffer index.
         */
-        void _setRawAutoConstantReal(size_t physicalIndex, AutoConstantType acType, Real rData,
-                                     uint16 variability, size_t elementSize = 4);
+        void _setRawAutoConstantReal(size_t physicalIndex, AutoConstantType acType, float rData,
+                                     uint16 variability, uint8 elementSize = 4);
 
 
         /** Unbind an auto constant so that the constant is manually controlled again. */
