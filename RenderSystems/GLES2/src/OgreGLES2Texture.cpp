@@ -218,7 +218,7 @@ namespace Ogre {
                             break;
                         OGRE_FALLTHROUGH;
                     case TEX_TYPE_3D:
-                        glCompressedTexImage3DOES(getGLES2TextureTarget(), mip, format,
+                        glCompressedTexImage3DOES(texTarget, mip, format,
                             width, height, depth, 0, 
                             size, &tmpdata[0]);
                         break;
@@ -256,14 +256,12 @@ namespace Ogre {
                 case TEX_TYPE_1D:
                 case TEX_TYPE_2D:
                 case TEX_TYPE_2D_RECT:
-                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_2D, GLsizei(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height)));
-                    break;
                 case TEX_TYPE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLsizei(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height)));
+                    OGRE_CHECK_GL_ERROR(glTexStorage2D(texTarget, GLsizei(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height)));
                     break;
                 case TEX_TYPE_2D_ARRAY:
                 case TEX_TYPE_3D:
-                    OGRE_CHECK_GL_ERROR(glTexStorage3D(getGLES2TextureTarget(), GLsizei(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                    OGRE_CHECK_GL_ERROR(glTexStorage3D(texTarget, GLsizei(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height), GLsizei(depth)));
                     break;
                 case TEX_TYPE_EXTERNAL_OES:
                     // Not available for TEX_TYPE_EXTERNAL_OES
@@ -305,7 +303,7 @@ namespace Ogre {
                         break;
                     OGRE_FALLTHROUGH;
                 case TEX_TYPE_3D:
-                    OGRE_CHECK_GL_ERROR(glTexImage3DOES(getGLES2TextureTarget(),
+                    OGRE_CHECK_GL_ERROR(glTexImage3DOES(texTarget,
                                  mip,
                                  internalformat,
                                  width, height, depth,

@@ -242,16 +242,12 @@ namespace Ogre {
                     break;
                 case TEX_TYPE_2D:
                 case TEX_TYPE_2D_RECT:
-                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_2D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
-                    break;
                 case TEX_TYPE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
+                    OGRE_CHECK_GL_ERROR(glTexStorage2D(texTarget, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
                     break;
                 case TEX_TYPE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
-                    break;
                 case TEX_TYPE_3D:
-                    OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                    OGRE_CHECK_GL_ERROR(glTexStorage3D(texTarget, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
                     break;
                 case TEX_TYPE_EXTERNAL_OES:
                     OGRE_EXCEPT(
@@ -290,16 +286,8 @@ namespace Ogre {
                                                          originFormat, datatype, NULL));
                         break;
                     case TEX_TYPE_2D:
-                        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D,
-                                                         mip,
-                                                         format,
-                                                         width, height,
-                                                         0,
-                                                         originFormat,
-                                                         datatype, NULL));
-                        break;
                     case TEX_TYPE_2D_RECT:
-                        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_RECTANGLE,
+                        OGRE_CHECK_GL_ERROR(glTexImage2D(texTarget,
                                                          mip,
                                                          format,
                                                          width, height,
