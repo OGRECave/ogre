@@ -57,20 +57,6 @@ namespace Ogre {
     {
     }
 
-    void AndroidEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
-    {
-        // We don't have a native window.... but I think all android windows are origined
-        left = top = 0;
-    }
-
-    void AndroidEGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
-    {
-    }
-
-    void AndroidEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
-    {
-    }
-
     void AndroidEGLWindow::reposition( int left, int top )
     {
     }
@@ -211,8 +197,6 @@ namespace Ogre {
               mScale = 1.0f / Ogre::StringConverter::parseReal(opt->second);
             }
         }
-
-        initNativeCreatedWindow(miscParams);
 
         if (mEglSurface)
         {

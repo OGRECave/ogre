@@ -55,9 +55,6 @@ namespace Ogre {
                 return new EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface, external);
             }
 
-            virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height) = 0;
-            virtual void initNativeCreatedWindow(const NameValuePairList *miscParams) = 0;
-            virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title ) = 0;
             virtual void windowMovedOrResized() = 0;
     public:
             EGLWindow(EGLSupport* glsupport);

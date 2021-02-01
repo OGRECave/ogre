@@ -43,9 +43,9 @@ namespace Ogre {
         //it seems they are not used outside this class.
         Window mParentWindow;
         Window mExternalWindow;
-        virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
-        virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
-        virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
+        void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
+        void initNativeCreatedWindow(const NameValuePairList *miscParams);
+        void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
         virtual void reposition(int left, int top);
         virtual void resize(unsigned int width, unsigned int height);
         virtual void windowMovedOrResized();
