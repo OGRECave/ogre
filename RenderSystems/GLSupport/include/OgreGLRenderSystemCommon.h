@@ -52,7 +52,7 @@ namespace Ogre {
 
         // This contains the complete list of supported extensions
         std::set<String> mExtensionList;
-        String mVendor;
+        GPUVendor mVendor;
 
         /** Manager object for creating render textures.
             Direct render to texture via FBO is preferable

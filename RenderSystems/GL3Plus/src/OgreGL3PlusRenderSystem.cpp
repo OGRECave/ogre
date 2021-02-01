@@ -231,7 +231,7 @@ namespace Ogre {
         }
 
         rsc->setRenderSystemName(getName());
-        rsc->parseVendorFromString(mVendor);
+        rsc->setVendor(mVendor);
 
         // Check for hardware mipmapping support.
         rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
@@ -2059,7 +2059,7 @@ namespace Ogre {
         const GLubyte* pcVendor = glGetString(GL_VENDOR);
         String tmpStr = (const char*)pcVendor;
         LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
-        mVendor = tmpStr.substr(0, tmpStr.find(' '));
+        mVendor = RenderSystemCapabilities::vendorFromString(tmpStr.substr(0, tmpStr.find(' ')));
 
         // Get renderer
         const GLubyte* pcRenderer = glGetString(GL_RENDERER);
