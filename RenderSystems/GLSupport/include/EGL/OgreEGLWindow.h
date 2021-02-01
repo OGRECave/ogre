@@ -50,19 +50,24 @@ namespace Ogre {
 
             ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, NativeWindowType win);
 
-            virtual void switchFullScreen(bool fullscreen) = 0;
+            virtual void switchFullScreen(bool fullscreen) {}
             EGLContext * createEGLContext(::EGLContext external = NULL) const {
                 return new EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface, external);
             }
 
-            virtual void windowMovedOrResized() = 0;
+            virtual void windowMovedOrResized() {}
+
+            void finaliseWindow();
     public:
             EGLWindow(EGLSupport* glsupport);
             virtual ~EGLWindow();
 
-//      Moved create to native source because it has native calls in it.
-//            void create(const String& name, unsigned int width, unsigned int height,
-//                        bool fullScreen, const NameValuePairList *miscParams);
+            // default, PBuffer based, implementation
+            void create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
+                        const NameValuePairList* miscParams);
+
+            void reposition(int left, int top) {}
+            void resize(unsigned int width, unsigned int height) {}
 
             virtual void setFullscreen (bool fullscreen, uint width, uint height);
             void destroy(void);

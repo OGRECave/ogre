@@ -57,7 +57,6 @@ namespace Ogre {
         String mCanvasSelector;
         
     protected:
-        virtual void reposition(int left, int top);
         virtual void resize(unsigned int width, unsigned int height);
         virtual void windowMovedOrResized();
         virtual void switchFullScreen(bool fullscreen);

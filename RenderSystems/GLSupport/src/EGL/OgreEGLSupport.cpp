@@ -44,7 +44,7 @@ namespace Ogre {
 
     EGLSupport::EGLSupport(int profile)
         : GLNativeSupport(profile), mGLDisplay(0),
-          mNativeDisplay(0)
+          mNativeDisplay(EGL_DEFAULT_DISPLAY)
     {
     }
 
