@@ -377,21 +377,25 @@ namespace Ogre {
     void EGLSupport::initialiseExtensions() {
         assert (mGLDisplay);
 
-        const char* verStr = eglQueryString(mGLDisplay, EGL_VERSION);
-        LogManager::getSingleton().stream() << "EGL_VERSION = " << verStr;
+        const char* propStr = eglQueryString(mGLDisplay, EGL_VENDOR);
+        LogManager::getSingleton().stream() << "EGL_VENDOR = " << propStr;
 
-        const char* extensionsString;
-
-        // This is more realistic than using glXGetClientString:
-        extensionsString = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
-
-        LogManager::getSingleton().stream() << "EGL_EXTENSIONS = " << extensionsString;
+        propStr = eglQueryString(mGLDisplay, EGL_VERSION);
+        LogManager::getSingleton().stream() << "EGL_VERSION = " << propStr;
 
         StringStream ext;
+
+        // client extensions
+        propStr = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+        ext << propStr << " ";
+
+        // display extension
+        propStr = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
+        ext << propStr;
+
+        LogManager::getSingleton().stream() << "EGL_EXTENSIONS = " << ext.str();
+
         String instr;
-
-        ext << extensionsString;
-
         while(ext >> instr)
         {
             extensionList.insert(instr);
