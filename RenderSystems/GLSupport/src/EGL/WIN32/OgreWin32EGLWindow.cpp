@@ -260,11 +260,6 @@ namespace Ogre {
 
     }
 
-    void Win32EGLWindow::reposition( int left, int top )
-    {
-
-    }
-
     void Win32EGLWindow::resize( unsigned int width, unsigned int height )
     {
 		// Case window resized.
@@ -316,11 +311,6 @@ namespace Ogre {
 		unsigned int height = rc.bottom - rc.top;
 
         resize(width, height);
-    }
-
-    void Win32EGLWindow::switchFullScreen( bool fullscreen )
-    {
-
     }
 
     void Win32EGLWindow::create(const String& name, uint width, uint height,
@@ -461,24 +451,14 @@ namespace Ogre {
 
         mContext = createEGLContext(eglContext);
         mContext->setCurrent();
-        ::EGLSurface oldDrawableDraw = eglGetCurrentSurface(EGL_DRAW);
-        ::EGLSurface oldDrawableRead = eglGetCurrentSurface(EGL_READ);
-        ::EGLContext oldContext  = eglGetCurrentContext();
-
-        int glConfigID;
-
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_CONFIG_ID, &glConfigID);
-        LogManager::getSingleton().logMessage("EGLWindow::create used FBConfigID = " + StringConverter::toString(glConfigID));
 
         mName = name;
         mWidth = width;
         mHeight = height;
         mLeft = left;
         mTop = top;
-        mActive = true;
-        mVisible = true;
 
-        mClosed = false;
+        finaliseWindow();
     }
 
 }

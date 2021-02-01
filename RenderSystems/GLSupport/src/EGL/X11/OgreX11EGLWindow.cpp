@@ -559,27 +559,13 @@ namespace Ogre {
         setVSyncInterval(vsyncInterval);
         setVSyncEnabled(vsync);
 
-        int Rsz, Gsz, Bsz, Asz, fsaa;
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_RED_SIZE, &Rsz);
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_BLUE_SIZE, &Gsz);
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_GREEN_SIZE, &Bsz);
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_ALPHA_SIZE, &Asz);
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_SAMPLES, &fsaa);
-
-        LogManager::getSingleton().logMessage(
-            StringUtil::format("X11EGLWindow::create colourBufferSize=%d/%d/%d/%d gamma=%d FSAA=%d", Rsz,
-                               Bsz, Gsz, Asz, mHwGamma, fsaa));
-
         mName = name;
         mWidth = width;
         mHeight = height;
         mLeft = left;
         mTop = top;
-        mActive = true;
-        mVisible = true;
-        mFSAA = fsaa;
 
-        mClosed = false;
+        finaliseWindow();
     }
 
 }

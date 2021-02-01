@@ -66,10 +66,6 @@ namespace Ogre {
         emscripten_set_webglcontextrestored_callback("#canvas", NULL, 0, NULL);
     }
 
-    void EmscriptenEGLWindow::reposition( int left, int top )
-    {
-    }
-
     void EmscriptenEGLWindow::resize(uint width, uint height)
     {
         mWidth = width;

@@ -57,10 +57,6 @@ namespace Ogre {
     {
     }
 
-    void AndroidEGLWindow::reposition( int left, int top )
-    {
-    }
-
     void AndroidEGLWindow::resize(uint width, uint height)
     {
         width *= mScale;
@@ -100,11 +96,6 @@ namespace Ogre {
 
             resize(nwidth, nheight);
         }
-    }
-    
-    void AndroidEGLWindow::switchFullScreen(bool fullscreen)
-    {
-    
     }
     
     void AndroidEGLWindow::create(const String& name, uint width, uint height,

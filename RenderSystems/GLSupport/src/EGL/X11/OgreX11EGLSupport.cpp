@@ -55,7 +55,16 @@ namespace Ogre {
 
         int dummy;
 
-        if (XQueryExtension(mNativeDisplay, "RANDR", &dummy, &dummy, &dummy))
+        if(mNativeDisplay == EGL_DEFAULT_DISPLAY)
+        {
+            // fake video mode
+            mCurrentMode.width = 0;
+            mCurrentMode.height = 0;
+            mCurrentMode.refreshRate = 0;
+            mOriginalMode = mCurrentMode;
+            mVideoModes.push_back(mCurrentMode);
+        }
+        else if (XQueryExtension(mNativeDisplay, "RANDR", &dummy, &dummy, &dummy))
         {
             XRRScreenConfiguration *screenConfig;
 
@@ -145,13 +154,12 @@ namespace Ogre {
     {
         if (!mNativeDisplay)
         {
-        mNativeDisplay = (NativeDisplayType)XOpenDisplay(NULL);
+            mNativeDisplay = (NativeDisplayType)XOpenDisplay(NULL);
 
-            if (!mNativeDisplay)
+            if (mNativeDisplay == EGL_DEFAULT_DISPLAY)
             {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Couldn`t open X display",
-                            "X11EGLSupport::getXDisplay");
+                LogManager::getSingleton().logWarning("Couldn't open X display");
+                return mNativeDisplay;
             }
 
             mAtomDeleteWindow = XInternAtom((Display*)mNativeDisplay, "WM_DELETE_WINDOW", True);
@@ -252,7 +260,8 @@ namespace Ogre {
                                         bool fullScreen,
                                         const NameValuePairList *miscParams)
     {
-        EGLWindow* window = new X11EGLWindow(this);
+        EGLWindow* window =
+            mNativeDisplay == EGL_DEFAULT_DISPLAY ? new EGLWindow(this) : new X11EGLWindow(this);
         window->create(name, width, height, fullScreen, miscParams);
 
         return window;
