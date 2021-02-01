@@ -49,16 +49,6 @@ namespace Ogre {
         mNativeDisplay = glsupport->getNativeDisplay();
     }
 
-    void Win32EGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
-    {
-
-    }
-
-    void Win32EGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
-    {
-
-    }
-
     void Win32EGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
     {
         // destroy current window, if any
@@ -345,8 +335,6 @@ namespace Ogre {
         int left = 0;
         int top  = 0;
 
-        getLeftAndTopFromNativeWindow(left, top, width, height);
-
         mIsFullScreen = fullScreen;
 
         if (miscParams)
@@ -410,8 +398,6 @@ namespace Ogre {
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
             }
         }
-
-        initNativeCreatedWindow(miscParams);
 
         if (mEglSurface)
         {
