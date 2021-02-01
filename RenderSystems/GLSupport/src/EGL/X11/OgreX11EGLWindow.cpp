@@ -101,7 +101,6 @@ namespace Ogre {
 
     void X11EGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
     {
-        NativeDisplayType mNativeDisplay = mGLSupport->getNativeDisplay();
         left = DisplayWidth((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay))/2 - width/2;
         top  = DisplayHeight((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay))/2 - height/2;
     }
@@ -351,7 +350,6 @@ namespace Ogre {
         if (mClosed || !mWindow)
             return;
 
-        NativeDisplayType mNativeDisplay = mGLSupport->getNativeDisplay();
         XWindowAttributes windowAttrib;
 
         Window parent, root, *children;
@@ -379,7 +377,6 @@ namespace Ogre {
     { 
         if (mGLSupport->mAtomFullScreen != None)
         {
-            NativeDisplayType mNativeDisplay = mGLSupport->getNativeDisplay();
             XClientMessageEvent xMessage;
 
             xMessage.type = ClientMessage;
@@ -415,6 +412,7 @@ namespace Ogre {
 
         unsigned int vsyncInterval = 1;
 
+        mNativeDisplay = mGLSupport->getNativeDisplay();
         getLeftAndTopFromNativeWindow(left, top, width, height);
 
         mIsFullScreen = fullScreen;
