@@ -50,7 +50,7 @@ namespace Ogre {
     */
 
     /** A viewpoint from which the scene will be rendered.
-    @remarks
+
         OGRE renders scenes from a camera viewpoint into a buffer of
         some sort, normally a window or a texture (a subclass of
         RenderTarget). OGRE cameras support both perspective projection (the default,
@@ -63,10 +63,21 @@ namespace Ogre {
         one camera can point at a single render target if required,
         each rendering to a subset of the target, allowing split screen
         and picture-in-picture views.
-    @par
+
+        At render time, all Scene Objects will be transformed in the camera space,
+        which is defined as:
+        - \f$+x\f$ is right
+        - \f$+y\f$ is up
+        - \f$-z\f$ is away
+
         Cameras maintain their own aspect ratios, field of view, and frustum,
-        and project co-ordinates into a space measured from -1 to 1 in x and y,
-        and 0 to 1 in z. At render time, the camera will be rendering to a
+        and project co-ordinates into normalised device coordinates measured from -1 to 1 in x and y,
+        and 0 to 1 in z, where
+        - \f$+x\f$ is right
+        - \f$+y\f$ is up
+        - \f$+z\f$ is away
+
+        At render time, the camera will be rendering to a
         Viewport which will translate these parametric co-ordinates into real screen
         co-ordinates. Obviously it is advisable that the viewport has the same
         aspect ratio as the camera to avoid distortion (unless you want it!).
