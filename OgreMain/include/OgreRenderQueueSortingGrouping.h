@@ -675,7 +675,7 @@ namespace Ogre {
         */
         void merge( const RenderQueueGroup* rhs )
         {
-            for ( const auto pg : rhs->getPriorityGroups() )
+            for ( const auto& pg : rhs->getPriorityGroups() )
             {
                 ushort priority = pg.first;
                 RenderPriorityGroup* pSrcPriorityGrp = pg.second;
