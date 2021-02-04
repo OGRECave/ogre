@@ -199,8 +199,14 @@ void ApplicationContextBase::createRoot()
 
 bool ApplicationContextBase::oneTimeConfig()
 {
+    if(mRoot->getAvailableRenderers().empty())
+    {
+        Ogre::LogManager::getSingleton().logError("No RenderSystems available");
+        return false;
+    }
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
+    mRoot->setRenderSystem(mRoot->getAvailableRenderers().front());
 #else
     if (!mRoot->restoreConfig()) {
         return mRoot->showConfigDialog(OgreBites::getNativeConfigDialog());
