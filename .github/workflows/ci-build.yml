@@ -12,7 +12,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt update
-        sudo apt install -y libxaw7-dev libxrandr-dev libxt-dev \
+        sudo apt install -y libxrandr-dev \
           libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev \
           libzzip-dev libfreetype6-dev libpugixml-dev libassimp-dev qtbase5-dev nvidia-cg-dev \
           swig3.0 mono-mcs python3-dev \

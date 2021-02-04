@@ -43,11 +43,11 @@ For manually building the dependencies, please refer to the list below and get a
 
 On linux you additionally need the following system headers to build the GL & GLES2 RenderSystems (command for Ubuntu):
 
-    sudo apt-get install libgles2-mesa-dev libxt-dev libxaw7-dev
+    sudo apt-get install libgles2-mesa-dev
 
 furthermore we recommend installing the following optional packages
 
-    sudo apt-get install libsdl2-dev doxygen
+    sudo apt-get install libsdl2-dev libxt-dev libxaw7-dev doxygen
 
 these will enable input handling in the SampleBrowser and building the documentation.
 
