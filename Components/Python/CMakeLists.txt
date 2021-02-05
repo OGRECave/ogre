@@ -35,9 +35,16 @@ if(MSVC)
 else()
 	add_definitions(-Wno-cast-qual -Wno-shadow -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-but-set-variable -Wno-missing-declarations)
 endif()
-set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
+
 
 set(CMAKE_WARN_DEPRECATED OFF)
+
+set_source_files_properties(../../OgreMain/include/Core.i PROPERTIES CPLUSPLUS ON)
+swig_add_module(Core python ../../OgreMain/include/Core.i)
+swig_link_libraries(Core OgreMain ${PYTHON_LIBRARIES})
+ogre_python_module(Core)
+
+set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
 swig_add_module(Ogre python ../../OgreMain/include/Ogre.i)
 swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
 ogre_python_module(Ogre)
