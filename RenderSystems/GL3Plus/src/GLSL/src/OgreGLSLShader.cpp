@@ -517,32 +517,20 @@ namespace Ogre {
             // also allow index based referencing
             GpuLogicalIndexUse use;
 
-            if (def.isFloat())
+            if (def.isFloat() || def.isDouble() || def.isInt() || def.isUnsignedInt() || def.isBool())
             {
-                def.physicalIndex = mConstantDefs->floatBufferSize;
-                mConstantDefs->floatBufferSize += def.arraySize * def.elementSize;
+                def.physicalIndex = mConstantDefs->bufferSize*4;
+                mConstantDefs->bufferSize += def.arraySize * def.elementSize;
 
                 use.physicalIndex = def.physicalIndex;
                 use.currentSize = def.arraySize * def.elementSize;
-                mFloatLogicalToPhysical->map.emplace(def.logicalIndex, use);
+                mLogicalToPhysical->map.emplace(def.logicalIndex, use);
             }
-            else if (def.isDouble())
+            else if(def.isSampler())
             {
-                def.physicalIndex = mConstantDefs->doubleBufferSize;
-                mConstantDefs->doubleBufferSize += def.arraySize * def.elementSize;
-
-                use.physicalIndex = def.physicalIndex;
-                use.currentSize = def.arraySize * def.elementSize;
-                mDoubleLogicalToPhysical->map.emplace(def.logicalIndex, use);
-            }
-            else if (def.isInt() || def.isSampler() || def.isUnsignedInt() || def.isBool())
-            {
-                def.physicalIndex = mConstantDefs->intBufferSize;
-                mConstantDefs->intBufferSize += def.arraySize * def.elementSize;
-
-                use.physicalIndex = def.physicalIndex;
-                use.currentSize = def.arraySize * def.elementSize;
-                mIntLogicalToPhysical->map.emplace(def.logicalIndex, use);
+                def.physicalIndex = mConstantDefs->registerCount;
+                mConstantDefs->registerCount += def.arraySize * def.elementSize;
+                // no index based referencing
             }
             else
             {
@@ -620,8 +608,7 @@ namespace Ogre {
             return;
         }
 
-        mFloatLogicalToPhysical.reset();
-        mIntLogicalToPhysical.reset();
+        mLogicalToPhysical.reset();
 
         // We need an accurate list of all the uniforms in the shader, but we
         // can't get at them until we link all the shaders into a program object.

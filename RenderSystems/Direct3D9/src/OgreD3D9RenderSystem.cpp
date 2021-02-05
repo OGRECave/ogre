@@ -3376,15 +3376,14 @@ namespace Ogre
         }
 
         HRESULT hr;
-        GpuLogicalBufferStructPtr floatLogical = params->getFloatLogicalBufferStruct();
-        GpuLogicalBufferStructPtr intLogical = params->getIntLogicalBufferStruct();
+        GpuLogicalBufferStructPtr floatLogical = params->getLogicalBufferStruct();
 
         switch(gptype)
         {
         case GPT_VERTEX_PROGRAM:
             mActiveVertexGpuProgramParameters = params;
             {
-                            OGRE_LOCK_MUTEX(floatLogical->mutex);
+                    OGRE_LOCK_MUTEX(floatLogical->mutex);
 
                     for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
                         i != floatLogical->map.end(); ++i)
@@ -3392,50 +3391,32 @@ namespace Ogre
                         if (i->second.variability & variability)
                         {
                             size_t logicalIndex = i->first;
-                            const float* pFloat = params->getFloatPointer(i->second.physicalIndex);
                             size_t slotCount = i->second.currentSize / 4;
                             assert (i->second.currentSize % 4 == 0 && "Should not have any "
                                 "elements less than 4 wide for D3D9");
 
-                        if (FAILED(hr = getActiveD3D9Device()->SetVertexShaderConstantF(
-                            (UINT)logicalIndex, pFloat, (UINT)slotCount)))
+                            if(i->second.baseType == BCT_FLOAT)
                             {
-                                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                    "Unable to upload vertex shader float parameters", 
-                                    "D3D9RenderSystem::bindGpuProgramParameters");
+                                const float* pFloat = params->getFloatPointer(i->second.physicalIndex);
+                                hr = getActiveD3D9Device()->SetVertexShaderConstantF(
+                                    (UINT)logicalIndex, pFloat, (UINT)slotCount);
+                            }
+                            else
+                            {
+                                const int* pInt = params->getIntPointer(i->second.physicalIndex);
+                                hr = getActiveD3D9Device()->SetVertexShaderConstantI(
+                                        static_cast<UINT>(logicalIndex), pInt, static_cast<UINT>(slotCount));
+                            }
+
+                            if (FAILED(hr))
+                            {
+                                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                                            "Unable to upload vertex shader parameters");
                             }
                         }
 
                     }
-
             }
-            // bind ints
-            {
-                            OGRE_LOCK_MUTEX(intLogical->mutex);
-
-                    for (GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
-                        i != intLogical->map.end(); ++i)
-                    {
-                        if (i->second.variability & variability)
-                        {
-                            size_t logicalIndex = i->first;
-                            const int* pInt = params->getIntPointer(i->second.physicalIndex);
-                            size_t slotCount = i->second.currentSize / 4;
-                            assert (i->second.currentSize % 4 == 0 && "Should not have any "
-                                "elements less than 4 wide for D3D9");
-
-                        if (FAILED(hr = getActiveD3D9Device()->SetVertexShaderConstantI(
-                            static_cast<UINT>(logicalIndex), pInt, static_cast<UINT>(slotCount))))
-                            {
-                                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                    "Unable to upload vertex shader int parameters", 
-                                    "D3D9RenderSystem::bindGpuProgramParameters");
-                            }
-                        }
-                    }
-
-            }
-
             break;
         case GPT_FRAGMENT_PROGRAM:
             mActiveFragmentGpuProgramParameters = params;
@@ -3448,46 +3429,29 @@ namespace Ogre
                         if (i->second.variability & variability)
                         {
                             size_t logicalIndex = i->first;
-                            const float* pFloat = params->getFloatPointer(i->second.physicalIndex);
                             size_t slotCount = i->second.currentSize / 4;
                             assert (i->second.currentSize % 4 == 0 && "Should not have any "
                                 "elements less than 4 wide for D3D9");
 
-                        if (FAILED(hr = getActiveD3D9Device()->SetPixelShaderConstantF(
-                            static_cast<UINT>(logicalIndex), pFloat, static_cast<UINT>(slotCount))))
+                            if(i->second.baseType == BCT_FLOAT)
                             {
-                                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                    "Unable to upload pixel shader float parameters", 
-                                    "D3D9RenderSystem::bindGpuProgramParameters");
+                                const float* pFloat = params->getFloatPointer(i->second.physicalIndex);
+                                hr = getActiveD3D9Device()->SetPixelShaderConstantF(
+                                    (UINT)logicalIndex, pFloat, (UINT)slotCount);
+                            }
+                            else
+                            {
+                                const int* pInt = params->getIntPointer(i->second.physicalIndex);
+                                hr = getActiveD3D9Device()->SetPixelShaderConstantI(
+                                        static_cast<UINT>(logicalIndex), pInt, static_cast<UINT>(slotCount));
+                            }
+
+                            if (FAILED(hr))
+                            {
+                                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                                            "Unable to upload pixel shader parameters");
                             }
                         }
-                    }
-
-            }
-            // bind ints
-            {
-                            OGRE_LOCK_MUTEX(intLogical->mutex);
-
-                    for (GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
-                        i != intLogical->map.end(); ++i)
-                    {
-                        if (i->second.variability & variability)
-                        {
-                            size_t logicalIndex = i->first;
-                            const int* pInt = params->getIntPointer(i->second.physicalIndex);
-                            size_t slotCount = i->second.currentSize / 4;
-                            assert (i->second.currentSize % 4 == 0 && "Should not have any "
-                                "elements less than 4 wide for D3D9");
-
-                        if (FAILED(hr = getActiveD3D9Device()->SetPixelShaderConstantI(
-                            static_cast<UINT>(logicalIndex), pInt, static_cast<UINT>(slotCount))))
-                            {
-                                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                    "Unable to upload pixel shader int parameters", 
-                                    "D3D9RenderSystem::bindGpuProgramParameters");
-                            }
-                        }
-
                     }
 
             }

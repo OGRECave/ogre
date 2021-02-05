@@ -1086,23 +1086,18 @@ namespace Ogre {
             int paramIndex = def.logicalIndex;
             GpuLogicalBufferStruct* currentBuffer = NULL;
             size_t* currentBufferSize = NULL;
-            if (def.isFloat())
+            if (def.isFloat() || def.isInt() || def.isUnsignedInt())
             {
-                currentBuffer = mFloatLogicalToPhysical.get();
-                currentBufferSize = &mConstantDefs->floatBufferSize;
-            }
-            else if (def.isInt() || def.isUnsignedInt())
-            {
-                currentBuffer = mIntLogicalToPhysical.get();
-                currentBufferSize = &mConstantDefs->intBufferSize;
+                currentBuffer = mLogicalToPhysical.get();
+                currentBufferSize = &mConstantDefs->bufferSize;
             }
 
             if (currentBuffer != NULL && currentBufferSize != NULL)
             {
-                def.physicalIndex = currentBuffer->bufferSize;
+                def.physicalIndex = currentBuffer->bufferSize*4;
                 OGRE_LOCK_MUTEX(currentBuffer->mutex);
                 currentBuffer->map.emplace(
-                    paramIndex, GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
+                    paramIndex, GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL, BCT_UNKNOWN));
                 currentBuffer->bufferSize += def.arraySize * def.elementSize;
                 *currentBufferSize = currentBuffer->bufferSize;
             }
@@ -1755,7 +1750,6 @@ namespace Ogre {
                 HardwareBufferLockGuard uniformLock(it->mUniformBuffer, HardwareBuffer::HBL_DISCARD);
 
                 // Only iterate through parsed variables (getting size of list)
-                void* src = 0;
                 ShaderVarWithPosInBuf* iter = &(it->mShaderVars[0]);
                 unsigned int lSize = it->mShaderVars.size();
                 for (size_t i = 0 ; i < lSize; i++, iter++)
@@ -1765,13 +1759,10 @@ namespace Ogre {
                     // We must set every variable, even if it has not changed.
                     //if (def.variability & variabilityMask)
                     {
-                        if(def.isFloat())
+                        if (def.isFloat() || def.isInt() || def.isUnsignedInt())
                         {
-                            src = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
-                        }
-                        else if (def.isInt() || def.isUnsignedInt())
-                        {
-                            src = (void *)&(*(params->getIntConstantList().begin() + def.physicalIndex));
+                            auto src = params->getConstantList().data() + def.physicalIndex;
+                            memcpy( &(((char *)(uniformLock.pData))[iter->startOffset]), src , iter->size);
                         }
                         else
                         {
@@ -1779,10 +1770,6 @@ namespace Ogre {
                                         "Currently the only supported variables for Direct3D11 hlsl program are: 'float', 'int' and ' unsigned int'", 
                                         "D3D11HLSLProgram::getConstantBuffer");
                         }
-                        
-
-
-                        memcpy( &(((char *)(uniformLock.pData))[iter->startOffset]), src , iter->size);
                     }
                 }
 
@@ -1807,7 +1794,6 @@ namespace Ogre {
                 HardwareBufferLockGuard uniformLock(it->mUniformBuffer, HardwareBuffer::HBL_DISCARD);
 
                 // Only iterate through parsed variables (getting size of list)
-                void* src = 0;
                 ShaderVarWithPosInBuf* iter = &(it->mShaderVars[0]);
                 unsigned int lSize = it->mShaderVars.size();
                 for (size_t i = 0 ; i < lSize; i++, iter++)
@@ -1817,15 +1803,7 @@ namespace Ogre {
                     // We must set every variable, even if it has not changed.
                     //if (def.variability & variabilityMask)
                     {
-                        if(def.isFloat())
-                        {
-                            src = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
-                        }
-                        else
-                        {
-                            src = (void *)&(*(params->getIntConstantList().begin() + def.physicalIndex));
-                        }
-
+                        auto src = params->getConstantList().data() + def.physicalIndex;
                         memcpy( &(((char *)(uniformLock.pData))[iter->startOffset]), src , iter->size);
                     }
                 }

@@ -363,9 +363,9 @@ namespace Ogre
             vpParams->setNamedAutoConstant("mvpMtx", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
 
             // create const buffer to back VP (currently unused)
-            if(auto sz = vpParams->getFloatConstantList().size())
+            if(auto sz = vpParams->getConstantList().size())
             {
-                mAutoParamsBuffer.reset(new MetalHardwareBufferCommon(sz * sizeof(float), HBU_CPU_TO_GPU,
+                mAutoParamsBuffer.reset(new MetalHardwareBufferCommon(sz, HBU_CPU_TO_GPU,
                                                                       false, 4, NULL, &mDevice));
             }
         }
@@ -998,7 +998,7 @@ namespace Ogre
         // update const buffer
         #if 1
         [mActiveRenderEncoder setVertexBytes:params->getFloatPointer(0)
-            length:params->getFloatConstantList().size()*sizeof(float) atIndex:16];
+            length:params->getConstantList().size() atIndex:16];
         #else
         // TODO rather use this:
         size_t unused;

@@ -169,6 +169,7 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore Ogre::HardwareBuffer::UsageEnum;
 %ignore Ogre::TextureUsage;
 %ignore Ogre::GpuConstantType;
+%ignore Ogre::GpuProgramParameters::ElementType;
 %ignore Ogre::Capabilities;
 %typemap(csbase) Ogre::SceneManager::QueryTypeMask "uint";
 %csmethodmodifiers *::ToString "public override";

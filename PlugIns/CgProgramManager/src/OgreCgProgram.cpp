@@ -894,8 +894,7 @@ namespace Ogre {
 		if ( mProgramString.empty() )
 			return;
 
-		mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
-		mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
+		mConstantDefs->bufferSize = mLogicalToPhysical->bufferSize;
 
 		GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
 		GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
@@ -906,20 +905,10 @@ namespace Ogre {
 			mConstantDefs->map.emplace(iter->first, iter->second);
 
 			// Record logical / physical mapping
-			if (def.isFloat())
-			{
-							OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
-				mFloatLogicalToPhysical->map.emplace(def.logicalIndex,
-						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
-				mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-			}
-			else
-			{
-							OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
-				mIntLogicalToPhysical->map.emplace(def.logicalIndex,
-						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
-				mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-			}
+			OGRE_LOCK_MUTEX(mLogicalToPhysical->mutex);
+			mLogicalToPhysical->map.emplace(def.logicalIndex,
+					GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL, def.isFloat() ? BCT_FLOAT: BCT_INT));
+			mLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1008,14 +997,7 @@ namespace Ogre {
 					else
 					{
 						// base position on existing buffer contents
-						if (def.isFloat())
-						{
-							def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
-						}
-						else
-						{
-							def.physicalIndex = mIntLogicalToPhysical->bufferSize;
-						}
+						def.physicalIndex = mLogicalToPhysical->bufferSize*4;
 					}
 
 					def.logicalIndex = logicalIndex;
@@ -1028,20 +1010,10 @@ namespace Ogre {
 					}
 
 					// Record logical / physical mapping
-					if (def.isFloat())
-					{
-											OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
-						mFloatLogicalToPhysical->map.emplace(def.logicalIndex,
-								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
-						mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-					}
-					else
-					{
-											OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
-						mIntLogicalToPhysical->map.emplace(def.logicalIndex,
-								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL));
-						mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-					}
+					OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
+					mLogicalToPhysical->map.emplace(def.logicalIndex,
+							GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL, def.isFloat() ? BCT_FLOAT : BCT_INT));
+					mLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
 
 					break;
 				}
