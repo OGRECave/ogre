@@ -33,10 +33,9 @@ namespace Ogre {
         initConfigOptions();
 
         // create params
-        GpuLogicalBufferStructPtr nullPtr;
         GpuLogicalBufferStructPtr logicalBufferStruct(new GpuLogicalBufferStruct());
         mFixedFunctionParams.reset(new GpuProgramParameters);
-        mFixedFunctionParams->_setLogicalIndexes(logicalBufferStruct, nullPtr, nullPtr);
+        mFixedFunctionParams->_setLogicalIndexes(logicalBufferStruct);
         mFixedFunctionParams->setAutoConstant(0, GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
         mFixedFunctionParams->setAutoConstant(4, GpuProgramParameters::ACT_TEXTURE_MATRIX);
         mFixedFunctionParams->setAutoConstant(8, GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR);

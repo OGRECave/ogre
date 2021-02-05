@@ -84,7 +84,7 @@ void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pG
                 // Update variability in the float map.
                 if (gpuConstDef->isSampler() == false)
                 {
-                    GpuLogicalBufferStructPtr floatLogical = pGpuParams->getFloatLogicalBufferStruct();
+                    GpuLogicalBufferStructPtr floatLogical = pGpuParams->getLogicalBufferStruct();
                     if (floatLogical.get())
                     {
                         for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin(); i != floatLogical->map.end(); ++i)

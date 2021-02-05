@@ -1586,7 +1586,7 @@ namespace Ogre
         // This will represent the values which have been set
 
         // float params
-        GpuLogicalBufferStructPtr floatLogical = params->getFloatLogicalBufferStruct();
+        GpuLogicalBufferStructPtr floatLogical = params->getLogicalBufferStruct();
         if( floatLogical )
         {
             OGRE_LOCK_MUTEX(floatLogical->mutex);
@@ -1611,63 +1611,6 @@ namespace Ogre
                                          logicalUse.physicalIndex, logicalUse.currentSize,
                                          params, defaultParams, level, useMainBuffer);
             }
-        }
-
-        // double params
-        GpuLogicalBufferStructPtr doubleLogical = params->getDoubleLogicalBufferStruct();
-        if( doubleLogical )
-        {
-            OGRE_LOCK_MUTEX(doubleLogical->mutex);
-
-            for(GpuLogicalIndexUseMap::const_iterator i = doubleLogical->map.begin();
-                i != doubleLogical->map.end(); ++i)
-            {
-                size_t logicalIndex = i->first;
-                const GpuLogicalIndexUse& logicalUse = i->second;
-
-                const GpuProgramParameters::AutoConstantEntry* autoEntry =
-                    params->findDoubleAutoConstantEntry(logicalIndex);
-                const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
-                if (defaultParams)
-                {
-                    defaultAutoEntry = defaultParams->findDoubleAutoConstantEntry(logicalIndex);
-                }
-
-                writeGpuProgramParameter("param_indexed",
-                                         StringConverter::toString(logicalIndex), autoEntry,
-                                         defaultAutoEntry, false, true, false, false,
-                                         logicalUse.physicalIndex, logicalUse.currentSize,
-                                         params, defaultParams, level, useMainBuffer);
-            }
-        }
-
-        // int params
-        GpuLogicalBufferStructPtr intLogical = params->getIntLogicalBufferStruct();
-        if( intLogical )
-        {
-            OGRE_LOCK_MUTEX(intLogical->mutex);
-
-            for(GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
-                i != intLogical->map.end(); ++i)
-            {
-                size_t logicalIndex = i->first;
-                const GpuLogicalIndexUse& logicalUse = i->second;
-
-                const GpuProgramParameters::AutoConstantEntry* autoEntry = 
-                    params->findIntAutoConstantEntry(logicalIndex);
-                const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
-                if (defaultParams)
-                {
-                    defaultAutoEntry = defaultParams->findIntAutoConstantEntry(logicalIndex);
-                }
-
-                writeGpuProgramParameter("param_indexed", 
-                                         StringConverter::toString(logicalIndex), autoEntry, 
-                                         defaultAutoEntry, false, false, true, false,
-                                         logicalUse.physicalIndex, logicalUse.currentSize,
-                                         params, defaultParams, level, useMainBuffer);
-            }
-
         }
     }
     //-----------------------------------------------------------------------

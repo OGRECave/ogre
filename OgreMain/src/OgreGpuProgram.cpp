@@ -42,9 +42,6 @@ namespace Ogre
     GpuProgram::CmdManualNamedConstsFile GpuProgram::msManNamedConstsFileCmd;
     GpuProgram::CmdAdjacency GpuProgram::msAdjacencyCmd;
     GpuProgram::CmdComputeGroupDims GpuProgram::msComputeGroupDimsCmd;
-    
-
-    GpuLogicalBufferStructPtr GpuProgram::mBoolLogicalToPhysical;
 
     //-----------------------------------------------------------------------------
     GpuProgram::GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle, const String& group,
@@ -100,12 +97,6 @@ namespace Ogre
         size_t paramsSize = 0;
         if(mDefaultParams)
             paramsSize += mDefaultParams->calculateSize();
-        if(mFloatLogicalToPhysical)
-            paramsSize += mFloatLogicalToPhysical->bufferSize;
-        if(mDoubleLogicalToPhysical)
-            paramsSize += mDoubleLogicalToPhysical->bufferSize;
-        if(mIntLogicalToPhysical)
-            paramsSize += mIntLogicalToPhysical->bufferSize;
         if(mConstantDefs)
             paramsSize += mConstantDefs->calculateSize();
 
@@ -229,10 +220,8 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GpuProgram::createLogicalParameterMappingStructures(bool recreateIfExists) const
     {
-        if (recreateIfExists || !mFloatLogicalToPhysical)
-            mFloatLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
-        if (recreateIfExists || !mIntLogicalToPhysical)
-            mIntLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
+        if (recreateIfExists || !mLogicalToPhysical)
+            mLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
     }
     //---------------------------------------------------------------------
     void GpuProgram::createNamedParameterMappingStructures(bool recreateIfExists) const
@@ -252,10 +241,8 @@ namespace Ogre
         createParameterMappingStructures();
         *mConstantDefs.get() = namedConstants;
 
-        mFloatLogicalToPhysical->bufferSize = mConstantDefs->floatBufferSize;
-        mIntLogicalToPhysical->bufferSize = mConstantDefs->intBufferSize;
-        mFloatLogicalToPhysical->map.clear();
-        mIntLogicalToPhysical->map.clear();
+        mLogicalToPhysical->bufferSize = mConstantDefs->bufferSize;
+        mLogicalToPhysical->map.clear();
         // need to set up logical mappings too for some rendersystems
         for (GpuConstantDefinitionMap::const_iterator i = mConstantDefs->map.begin();
             i != mConstantDefs->map.end(); ++i)
@@ -265,16 +252,11 @@ namespace Ogre
             // only consider non-array entries
             if (name.find('[') == String::npos)
             {
-                GpuLogicalIndexUseMap::value_type val(def.logicalIndex, 
-                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, def.variability));
-                if (def.isFloat())
-                {
-                    mFloatLogicalToPhysical->map.emplace(val);
-                }
-                else
-                {
-                    mIntLogicalToPhysical->map.emplace(val);
-                }
+                GpuLogicalIndexUseMap::value_type val(
+                    def.logicalIndex,
+                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, def.variability,
+                                       GpuConstantDefinition::getBaseType(def.constType)));
+                mLogicalToPhysical->map.emplace(val);
             }
         }
 
@@ -316,8 +298,7 @@ namespace Ogre
             ret->_setNamedConstants(mConstantDefs);
         }
         // link shared logical / physical map for low-level use
-        ret->_setLogicalIndexes(mFloatLogicalToPhysical, mDoubleLogicalToPhysical,
-                                mIntLogicalToPhysical);
+        ret->_setLogicalIndexes(mLogicalToPhysical);
 
         // Copy in default parameters if present
         if (mDefaultParams)

@@ -92,7 +92,7 @@ namespace Ogre {
         /** Build the constant definition map, must be overridden.
         @note The implementation must fill in the (inherited) mConstantDefs field at a minimum, 
             and if the program requires that parameters are bound using logical 
-            parameter indexes then the mFloatLogicalToPhysical and mIntLogicalToPhysical
+            parameter indexes then the mLogicalToPhysical and mIntLogicalToPhysical
             maps must also be populated.
         */
         virtual void buildConstantDefinitions() const = 0;

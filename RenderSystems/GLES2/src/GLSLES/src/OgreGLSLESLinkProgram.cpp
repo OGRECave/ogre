@@ -199,33 +199,13 @@ namespace Ogre {
                 {
                     GLsizei glArraySize = (GLsizei)def->arraySize;
 
-                    bool shouldUpdate = true;
-
                     // this is a monolitic program so we can use the cache of any attached shader
                     GLUniformCache* uniformCache =  mShaders[GPT_VERTEX_PROGRAM]->getUniformCache();
-                    switch (def->constType)
-                    {
-                        case GCT_INT1:
-                        case GCT_INT2:
-                        case GCT_INT3:
-                        case GCT_INT4:
-                        case GCT_SAMPLER1D:
-                        case GCT_SAMPLER1DSHADOW:
-                        case GCT_SAMPLER2D:
-                        case GCT_SAMPLER2DSHADOW:
-                        case GCT_SAMPLER3D:
-                        case GCT_SAMPLERCUBE:
-                            shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation,
-                                                                       params->getIntPointer(def->physicalIndex),
-                                                                       static_cast<GLsizei>(def->elementSize * glArraySize * sizeof(int)));
-                            break;
-                        default:
-                            shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation,
-                                                                       params->getFloatPointer(def->physicalIndex),
-                                                                       static_cast<GLsizei>(def->elementSize * glArraySize * sizeof(float)));
-                            break;
-                    }
+                    void* val = def->isSampler() ? (void*)params->getRegPointer(def->physicalIndex)
+                                                 : (void*)params->getFloatPointer(def->physicalIndex);
 
+                    bool shouldUpdate = uniformCache->updateUniform(currentUniform->mLocation, val,
+                                                                    def->elementSize * glArraySize * 4);
                     if(!shouldUpdate)
                         continue;
 
@@ -294,7 +274,7 @@ namespace Ogre {
                         // Samplers handled like 1-element ints
                     case GCT_INT1:
                         OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize,
-                                                         (GLint*)params->getIntPointer(def->physicalIndex)));
+                                                         (GLint*)val));
                         break;
                     case GCT_INT2:
                         OGRE_CHECK_GL_ERROR(glUniform2iv(currentUniform->mLocation, glArraySize, 
