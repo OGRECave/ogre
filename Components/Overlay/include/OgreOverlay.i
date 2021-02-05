@@ -23,7 +23,6 @@
 %}
 #ifdef HAVE_IMGUI
 %{
-#include "imgui.h"
 #include "OgreImGuiOverlay.h"
 %}
 #endif
@@ -87,26 +86,5 @@ SHARED_PTR(TextAreaOverlayElement);
 %include "OgreTextAreaOverlayElement.h"
 
 #ifdef HAVE_IMGUI
-%include stdint.i
-%include typemaps.i
-
 %include "OgreImGuiOverlay.h"
-
-/// Imgui
-// ignore va list methods
-%ignore ImGui::TextV;
-%ignore ImGui::TextColoredV;
-%ignore ImGui::TextDisabledV;
-%ignore ImGui::TextWrappedV;
-%ignore ImGui::LabelTextV;
-%ignore ImGui::BulletTextV;
-%ignore ImGui::TreeNodeV;
-%ignore ImGui::TreeNodeExV;
-%ignore ImGui::SetTooltipV;
-%ignore ImGuiTextBuffer::appendfv;
-
-%apply bool* INOUT { bool* p_open };
-%apply float* INOUT { float* v };
-%apply int* INOUT { int* v };
-%include "imgui.h"
 #endif
