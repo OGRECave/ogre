@@ -46,6 +46,7 @@ CompositorInstance::CompositorInstance(CompositionTechnique *technique,
         mEnabled(false),
         mAlive(false)
 {
+    OgreAssert(mChain, "Undefined compositor chain");
     mEnabled = false;
     const String& logicName = mTechnique->getCompositorLogicName();
     if (!logicName.empty())
@@ -1031,14 +1032,11 @@ CompositorInstance::resolveTexReference(const CompositionTechnique::TextureDefin
     CompositionTechnique::TextureDefinition* refTexDef = 0;
 
     //Try chain first
-    if(mChain)
+    if (CompositorInstance* refCompInst = mChain->getCompositor(texDef->refCompName))
     {
-        CompositorInstance* refCompInst = mChain->getCompositor(texDef->refCompName);
-        if(!refCompInst)
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor");
-
-        refTexDef = refCompInst->getCompositor()->getSupportedTechnique(
-            refCompInst->getScheme())->getTextureDefinition(texDef->refTexName);
+        refTexDef = refCompInst->getCompositor()
+                        ->getSupportedTechnique(refCompInst->getScheme())
+                        ->getTextureDefinition(texDef->refTexName);
     }
 
     if(!refTexDef)
@@ -1049,6 +1047,10 @@ CompositorInstance::resolveTexReference(const CompositionTechnique::TextureDefin
         {
             refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(texDef->refTexName);
         }
+
+        if (refTexDef && refTexDef->scope != CompositionTechnique::TS_GLOBAL)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Referenced texture '" + texDef->refTexName + "' must have global scope");
     }
 
     if(!refTexDef)
@@ -1088,7 +1090,6 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
             {
                 //Find the instance and check if it is before us
                 CompositorInstance* refCompInst = 0;
-                OgreAssert(mChain, "Undefined compositor chain");
                 bool beforeMe = true;
                 for (CompositorInstance* nextCompInst : mChain->getCompositorInstances())
                 {
@@ -1158,7 +1159,6 @@ const TexturePtr &CompositorInstance::getSourceForTex(const String &name, size_t
             {
                 //Find the instance and check if it is before us
                 CompositorInstance* refCompInst = 0;
-                OgreAssert(mChain, "Undefined compositor chain");
                 bool beforeMe = true;
                 for (CompositorInstance* nextCompInst : mChain->getCompositorInstances())
                 {
