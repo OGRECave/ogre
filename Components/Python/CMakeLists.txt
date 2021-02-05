@@ -77,6 +77,13 @@ if(OGRE_BUILD_COMPONENT_TERRAIN)
     ogre_python_module(Terrain)
 endif()
 
+if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
+    set_source_files_properties(../Overlay/include/ImGui.i PROPERTIES CPLUSPLUS ON)
+    swig_add_module(ImGui python ../Overlay/include/ImGui.i)
+    swig_link_libraries(ImGui OgreOverlay ${PYTHON_LIBRARIES})
+    ogre_python_module(ImGui)
+endif()
+
 if(OGRE_BUILD_COMPONENT_BITES)    
     set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
     swig_add_module(Bites python ../Bites/include/OgreBites.i)
