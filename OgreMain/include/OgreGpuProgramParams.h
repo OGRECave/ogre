@@ -1488,7 +1488,11 @@ namespace Ogre {
         void setConstant(size_t index, const uint *val, size_t count);
         /// @}
 
-        /// @name Set constant by physical index
+        /** @name Set constant by physical index
+            You can use these methods if you have already derived the physical
+            constant buffer location, for a slight speed improvement over using
+            the named / logical index versions.
+        */
         /// @{
         /** Write a series of floating point values into the underlying float
             constant buffer at the given physical index.
@@ -1518,67 +1522,42 @@ namespace Ogre {
             @param count The number of ints to write
         */
         void _writeRawConstants(size_t physicalIndex, const uint* val, size_t count);
-        /** Write a 4-element floating-point parameter to the program directly to
+        /** Write a 4-element parameter to the program directly to
             the underlying constants buffer.
-            @note You can use these methods if you have already derived the physical
-            constant buffer location, for a slight speed improvement over using
-            the named / logical index versions.
             @param physicalIndex The physical buffer index at which to place the parameter
             @param vec The value to set
             @param count The number of floats to write; if for example
             the uniform constant 'slot' is smaller than a Vector4
         */
-        void _writeRawConstant(size_t physicalIndex, const Vector4f& vec,
-                               size_t count = 4);
-        /// @overload
-        void _writeRawConstant(size_t physicalIndex, const Vector<4, double>& vec,
-                               size_t count = 4);
-        /** Write a single floating-point parameter to the program.
-            @note You can use these methods if you have already derived the physical
-            constant buffer location, for a slight speed improvement over using
-            the named / logical index versions.
+        template <typename T>
+        void _writeRawConstant(size_t physicalIndex, const Vector<4, T>& vec, size_t count = 4)
+        {
+            // remember, raw content access uses raw float count rather than float4
+            // write either the number requested (for packed types) or up to 4
+            _writeRawConstants(physicalIndex, vec.ptr(), std::min(count, (size_t)4));
+        }
+        /** Write a single parameter to the program.
             @param physicalIndex The physical buffer index at which to place the parameter
             @param val The value to set
         */
-        void _writeRawConstant(size_t physicalIndex, Real val);
+        template<typename T>
+        void _writeRawConstant(size_t physicalIndex, T val)
+        {
+            _writeRawConstants(physicalIndex, &val, 1);
+        }
         /// @deprecated this will crash if count > 1
         OGRE_DEPRECATED void _writeRawConstant(size_t physicalIndex, Real val, size_t count);
-        /** Write a single integer parameter to the program.
-            @note You can use these methods if you have already derived the physical
-            constant buffer location, for a slight speed improvement over using
-            the named / logical index versions.
-            @param physicalIndex The physical buffer index at which to place the parameter
-            @param val The value to set
-        */
-        void _writeRawConstant(size_t physicalIndex, int val);
-        /** Write a single unsigned integer parameter to the program.
-            @note You can use these methods if you have already derived the physical
-            constant buffer location, for a slight speed improvement over using
-            the named / logical index versions.
-            @param physicalIndex The physical buffer index at which to place the parameter
-            @param val The value to set
-        */
-        void _writeRawConstant(size_t physicalIndex, uint val);
         /** Write a 3-element floating-point parameter to the program via Vector3.
-            @note You can use these methods if you have already derived the physical
-            constant buffer location, for a slight speed improvement over using
-            the named / logical index versions.
             @param physicalIndex The physical buffer index at which to place the parameter
             @param vec The value to set
         */
         void _writeRawConstant(size_t physicalIndex, const Vector3& vec);
         /** Write a 2-element floating-point parameter to the program via Vector2.
-            @note You can use these methods if you have already derived the physical
-            constant buffer location, for a slight speed improvement over using
-            the named / logical index versions.
             @param physicalIndex The physical buffer index at which to place the parameter
             @param vec The value to set
         */
         void _writeRawConstant(size_t physicalIndex, const Vector2& vec);
         /** Write a Matrix4 parameter to the program.
-            @note You can use these methods if you have already derived the physical
-            constant buffer location, for a slight speed improvement over using
-            the named / logical index versions.
             @param physicalIndex The physical buffer index at which to place the parameter
             @param m The value to set
             @param elementCount actual element count used with shader
@@ -1587,18 +1566,12 @@ namespace Ogre {
         /// @overload
         void _writeRawConstant(size_t physicalIndex, const Matrix3& m, size_t elementCount);
         /** Write a list of Matrix4 parameters to the program.
-            @note You can use these methods if you have already derived the physical
-            constant buffer location, for a slight speed improvement over using
-            the named / logical index versions.
             @param physicalIndex The physical buffer index at which to place the parameter
             @param m The value to set
             @param numEntries Number of Matrix4 entries
         */
         void _writeRawConstant(size_t physicalIndex, const TransformBaseReal* m, size_t numEntries);
         /** Write a ColourValue parameter to the program.
-            @note You can use these methods if you have already derived the physical
-            constant buffer location, for a slight speed improvement over using
-            the named / logical index versions.
             @param physicalIndex The physical buffer index at which to place the parameter
             @param colour The value to set
             @param count The number of floats to write; if for example
@@ -1623,12 +1596,8 @@ namespace Ogre {
         */
         void _readRawConstants(size_t physicalIndex, size_t count, int* dest);
 
-        /** Gets an iterator over the named GpuConstantDefinition instances as defined
-            by the program for which these parameters exist.
-            @note
-            Only available if this parameters object has named parameters.
-        */
-        GpuConstantDefinitionIterator getConstantDefinitionIterator(void) const;
+        /// @deprecated use getConstantDefinitions()
+        OGRE_DEPRECATED GpuConstantDefinitionIterator getConstantDefinitionIterator(void) const;
 
         /** Get a specific GpuConstantDefinition for a named parameter.
             @note

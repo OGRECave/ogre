@@ -1171,36 +1171,9 @@ namespace Ogre
         _writeRawConstants(physicalIndex, val, rawCount);
     }
     //-----------------------------------------------------------------------------
-    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Vector4f& vec,
-                                                 size_t count)
-    {
-        // remember, raw content access uses raw float count rather than float4
-        // write either the number requested (for packed types) or up to 4
-        _writeRawConstants(physicalIndex, vec.ptr(), std::min(count, (size_t)4));
-    }
-    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Vector<4, double>& vec, size_t count)
-    {
-        _writeRawConstants(physicalIndex, vec.ptr(), std::min(count, (size_t)4));
-    }
-    //-----------------------------------------------------------------------------
-    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, Real val)
-    {
-        _writeRawConstants(physicalIndex, &val, 1);
-    }
-    //-----------------------------------------------------------------------------
     void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, Real val, size_t count)
     {
         _writeRawConstants(physicalIndex, &val, count);
-    }
-    //-----------------------------------------------------------------------------
-    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, int val)
-    {
-        _writeRawConstants(physicalIndex, &val, 1);
-    }
-    //-----------------------------------------------------------------------------
-    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, uint val)
-    {
-        _writeRawConstants(physicalIndex, &val, 1);
     }
     //-----------------------------------------------------------------------------
     void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Vector3& vec)

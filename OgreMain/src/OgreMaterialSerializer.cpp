@@ -1552,13 +1552,11 @@ namespace Ogre
         GpuProgramParameters* defaultParams, unsigned short level,
         const bool useMainBuffer)
     {
-        GpuConstantDefinitionIterator constIt = params->getConstantDefinitionIterator();
-        while(constIt.hasMoreElements())
+        for(auto& it : params->getConstantDefinitions().map)
         {
             // get the constant definition
-            const String& paramName = constIt.peekNextKey();
-            const GpuConstantDefinition& def =
-                constIt.getNext();
+            const String& paramName = it.first;
+            const GpuConstantDefinition& def = it.second;
 
             // get any auto-link
             const GpuProgramParameters::AutoConstantEntry* autoEntry = 

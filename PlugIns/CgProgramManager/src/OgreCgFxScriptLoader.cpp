@@ -2915,12 +2915,10 @@ namespace Ogre {
     {
         CGeffect cgEffect = cgGetTechniqueEffect(cgGetPassTechnique(cgPass));
 
-        GpuConstantDefinitionIterator constIt = ogreProgramParameters->getConstantDefinitionIterator();
-        while(constIt.hasMoreElements())
+        for(auto& it : ogreProgramParameters->getConstantDefinitions().map)
         {
             // get the constant definition
-            const String& ogreParamName = constIt.peekNextKey();
-            constIt.getNext();
+            const String& ogreParamName =it.first;
 
             CGparameter cgParameter = cgGetNamedEffectParameter(cgEffect, ogreParamName.c_str());
             // try to find it without case
