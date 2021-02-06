@@ -2810,16 +2810,6 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------------
-    void GpuProgramParameters::setConstantFromTime(size_t index, Real factor)
-    {
-        setAutoConstantReal(index, ACT_TIME, factor);
-    }
-    //---------------------------------------------------------------------------
-    void GpuProgramParameters::setNamedConstantFromTime(const String& name, Real factor)
-    {
-        setNamedAutoConstantReal(name, ACT_TIME, factor);
-    }
-    //---------------------------------------------------------------------------
     GpuProgramParameters::AutoConstantEntry* GpuProgramParameters::getAutoConstantEntry(const size_t index)
     {
         if (index < mAutoConstants.size())
