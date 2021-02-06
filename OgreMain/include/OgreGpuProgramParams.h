@@ -1747,11 +1747,11 @@ namespace Ogre {
         /** Unbind an auto constant so that the constant is manually controlled again. */
         void clearAutoConstant(size_t index);
 
-        /** Sets a named parameter up to track a derivation of the current time.
-            @param index The index of the parameter
-            @param factor The amount by which to scale the time value
-        */
-        void setConstantFromTime(size_t index, Real factor);
+        /// @deprecated use ACT_TIME directly
+        OGRE_DEPRECATED void setConstantFromTime(size_t index, Real factor)
+        {
+            setAutoConstantReal(index, ACT_TIME, factor);
+        }
 
         /** Clears all the existing automatic constants. */
         void clearAutoConstants(void);
@@ -1848,14 +1848,11 @@ namespace Ogre {
         */
         void setNamedAutoConstant(const String& name, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2);
 
-        /** Sets a named parameter up to track a derivation of the current time.
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param factor The amount by which to scale the time value
-        */
-        void setNamedConstantFromTime(const String& name, Real factor);
+        /// @deprecated use ACT_TIME directly
+        void setNamedConstantFromTime(const String& name, Real factor)
+        {
+            setNamedAutoConstantReal(name, ACT_TIME, factor);
+        }
 
         /** Unbind an auto constant so that the constant is manually controlled again. */
         void clearNamedAutoConstant(const String& name);
