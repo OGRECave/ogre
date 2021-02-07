@@ -343,7 +343,7 @@ namespace Ogre {
                             oldChildElement->getTypeName(), 
                             mName+"/"+oldChildElement->getName());
                      newChildElement->copyFromTemplate(oldChildElement);
-                     addChild(static_cast<OverlayContainer*>(newChildElement));
+                     addChild(newChildElement);
                  }
              }
         }
