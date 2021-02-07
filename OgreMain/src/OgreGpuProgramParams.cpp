@@ -1590,7 +1590,7 @@ namespace Ogre
             }
         }
 
-        if (indexUse)
+        if (indexUse && requestedSize)
             indexUse->variability = variability;
 
         return indexUse;
@@ -2714,9 +2714,7 @@ namespace Ogre
         {
             def->variability = deriveVariability(acType);
             // make sure we also set variability on the logical index map
-            GpuLogicalIndexUse* indexUse = _getFloatConstantLogicalIndexUse(def->logicalIndex, def->elementSize * def->arraySize, def->variability);
-            if (indexUse)
-                indexUse->variability = def->variability;
+            _getFloatConstantLogicalIndexUse(def->logicalIndex, def->elementSize * def->arraySize, def->variability);
             _setRawAutoConstant(withArrayOffset(def, name), acType, extraInfo, def->variability, def->elementSize);
         }
 
@@ -2732,9 +2730,7 @@ namespace Ogre
         {
             def->variability = deriveVariability(acType);
             // make sure we also set variability on the logical index map
-            GpuLogicalIndexUse* indexUse = _getFloatConstantLogicalIndexUse(def->logicalIndex, def->elementSize * def->arraySize, def->variability);
-            if (indexUse)
-                indexUse->variability = def->variability;
+            _getFloatConstantLogicalIndexUse(def->logicalIndex, def->elementSize * def->arraySize, def->variability);
             _setRawAutoConstantReal(withArrayOffset(def, name), acType, rData, def->variability, def->elementSize);
         }
     }
