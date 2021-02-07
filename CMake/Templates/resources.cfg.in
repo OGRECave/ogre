@@ -18,6 +18,12 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/thumbnails
 [General]
 # Bites uses the next entry to discover the platform shaders
 FileSystem=@OGRE_MEDIA_DIR_REL@
+
+# PBR media must come before the scripts that reference it
+FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
+FileSystem=@OGRE_MEDIA_DIR_REL@/PBR/filament
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/PBR
+
 FileSystem=@OGRE_MEDIA_DIR_REL@/fonts
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts
@@ -42,9 +48,6 @@ Zip=@OGRE_MEDIA_DIR_REL@/packs/Sinbad.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/skybox.zip
 Zip=@OGRE_MEDIA_DIR_REL@/volumeTerrain/volumeTerrainBig.zip
 
-FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
-FileSystem=@OGRE_MEDIA_DIR_REL@/PBR/filament
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/PBR
 Zip=@OGRE_MEDIA_DIR_REL@/packs/DamagedHelmet.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/filament_shaders.zip
 
