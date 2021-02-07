@@ -459,26 +459,28 @@ namespace Ogre {
         HGLRC glrc = NULL;
 
         int profile;
-        int minVersion;
+        int majorVersion;
+        int minorVersion = 0;
 
         switch(mContextProfile) {
         case CONTEXT_COMPATIBILITY:
             profile = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
-            minVersion = 1;
+            majorVersion = 1;
             break;
         case CONTEXT_ES:
             profile = WGL_CONTEXT_ES2_PROFILE_BIT_EXT;
-            minVersion = 2;
+            majorVersion = 2;
             break;
         default:
             profile = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
-            minVersion = 3;
+            majorVersion = 3;
+            minorVersion = 3; // 3.1 would be sufficient per spec, but we need 3.3 anyway..
             break;
         }
 
         int context_attribs[] = {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, minVersion,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+            WGL_CONTEXT_MAJOR_VERSION_ARB, majorVersion,
+            WGL_CONTEXT_MINOR_VERSION_ARB, minorVersion,
             WGL_CONTEXT_PROFILE_MASK_ARB, profile,
             0
         };

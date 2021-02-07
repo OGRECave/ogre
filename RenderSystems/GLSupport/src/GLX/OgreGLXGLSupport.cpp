@@ -529,26 +529,28 @@ namespace Ogre
         ::GLXContext glxContext = NULL;
 
         int profile;
-        int minVersion;
+        int majorVersion;
+        int minorVersion = 0;
 
         switch(mContextProfile) {
         case CONTEXT_COMPATIBILITY:
             profile = GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
-            minVersion = 1;
+            majorVersion = 1;
             break;
         case CONTEXT_ES:
             profile = GLX_CONTEXT_ES2_PROFILE_BIT_EXT;
-            minVersion = 2;
+            majorVersion = 2;
             break;
         default:
             profile = GLX_CONTEXT_CORE_PROFILE_BIT_ARB;
-            minVersion = 3;
+            majorVersion = 3;
+            minorVersion = 3; // 3.1 would be sufficient per spec, but we need 3.3 anyway..
             break;
         }
 
         int context_attribs[] = {
-                GLX_CONTEXT_MAJOR_VERSION_ARB, minVersion,
-                GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+                GLX_CONTEXT_MAJOR_VERSION_ARB, majorVersion,
+                GLX_CONTEXT_MINOR_VERSION_ARB, minorVersion,
                 GLX_CONTEXT_PROFILE_MASK_ARB, profile,
                 None
         };
