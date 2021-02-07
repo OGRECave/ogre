@@ -1792,30 +1792,6 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------------
-    void GpuProgramParameters::setAutoConstant(size_t index, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2)
-    {
-        size_t extraInfo = (size_t)extraInfo1 | ((size_t)extraInfo2) << 16;
-
-        // Get auto constant definition for sizing
-        const AutoConstantDefinition* autoDef = getAutoConstantDefinition(acType);
-
-        if(!autoDef)
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No constant definition found for type " +
-                        StringConverter::toString(acType),
-                        "GpuProgramParameters::setAutoConstant");
-
-        // round up to nearest multiple of 4
-        size_t sz = autoDef->elementCount;
-        if (sz % 4 > 0)
-        {
-            sz += 4 - (sz % 4);
-        }
-
-        GpuLogicalIndexUse* indexUse = _getFloatConstantLogicalIndexUse(index, sz, deriveVariability(acType));
-
-        _setRawAutoConstant(indexUse->physicalIndex, acType, extraInfo, indexUse->variability, sz);
-    }
-    //-----------------------------------------------------------------------------
     void GpuProgramParameters::_setRawAutoConstantReal(size_t physicalIndex,
                                                        AutoConstantType acType, float rData, uint16 variability, uint8 elementSize)
     {
@@ -2760,26 +2736,6 @@ namespace Ogre
             if (indexUse)
                 indexUse->variability = def->variability;
             _setRawAutoConstantReal(withArrayOffset(def, name), acType, rData, def->variability, def->elementSize);
-        }
-    }
-    //---------------------------------------------------------------------------
-    void GpuProgramParameters::setNamedAutoConstant(const String& name,
-                                                    AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2)
-    {
-        size_t extraInfo = (size_t)extraInfo1 | ((size_t)extraInfo2) << 16;
-
-        // look up, and throw an exception if we're not ignoring missing
-        const GpuConstantDefinition* def =
-            _findNamedConstantDefinition(name, !mIgnoreMissingParams);
-        if (def)
-        {
-            def->variability = deriveVariability(acType);
-            // make sure we also set variability on the logical index map
-            GpuLogicalIndexUse* indexUse = _getFloatConstantLogicalIndexUse(def->logicalIndex, def->elementSize * def->arraySize, def->variability);
-            if (indexUse)
-                indexUse->variability = def->variability;
-
-            _setRawAutoConstant(withArrayOffset(def, name), acType, extraInfo, def->variability, def->elementSize);
         }
     }
     //---------------------------------------------------------------------------

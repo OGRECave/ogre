@@ -1683,23 +1683,13 @@ namespace Ogre {
             @param extraInfo If the constant type needs more information (like a light index or array size) put it here.
         */
         void setAutoConstant(size_t index, AutoConstantType acType, uint32 extraInfo = 0);
+        /// @overload
         void setAutoConstantReal(size_t index, AutoConstantType acType, float rData);
-
-        /** Sets up a constant which will automatically be updated by the system.
-            @remarks
-            Vertex and fragment programs often need parameters which are to do with the
-            current render state, or particular values which may very well change over time,
-            and often between objects which are being rendered. This feature allows you
-            to set up a certain number of predefined parameter mappings that are kept up to
-            date for you.
-            @param index The location in the constant list to place this updated constant every time
-            it is changed. Note that because of the nature of the types, we know how big the
-            parameter details will be so you don't need to set that like you do for manual constants.
-            @param acType The type of automatic constant to set
-            @param extraInfo1 The first extra parameter required by the auto constant type
-            @param extraInfo2 The first extra parameter required by the auto constant type
-        */
-        void setAutoConstant(size_t index, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2);
+        /// @overload
+        void setAutoConstant(size_t index, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2)
+        {
+            setAutoConstant(index, acType, (size_t)extraInfo1 | ((size_t)extraInfo2) << 16);
+        }
 
         /** As setAutoConstant, but sets up the auto constant directly against a
             physical buffer index.
@@ -1798,24 +1788,13 @@ namespace Ogre {
             @param extraInfo If the constant type needs more information (like a light index) put it here.
         */
         void setNamedAutoConstant(const String& name, AutoConstantType acType, size_t extraInfo = 0);
+        /// @overload
         void setNamedAutoConstantReal(const String& name, AutoConstantType acType, Real rData);
-
-        /** Sets up a constant which will automatically be updated by the system.
-            @remarks
-            Vertex and fragment programs often need parameters which are to do with the
-            current render state, or particular values which may very well change over time,
-            and often between objects which are being rendered. This feature allows you
-            to set up a certain number of predefined parameter mappings that are kept up to
-            date for you.
-            @note
-            This named option will only work if you are using a parameters object created
-            from a high-level program (HighLevelGpuProgram).
-            @param name The name of the parameter
-            @param acType The type of automatic constant to set
-            @param extraInfo1 The first extra info required by this auto constant type
-            @param extraInfo2 The first extra info required by this auto constant type
-        */
-        void setNamedAutoConstant(const String& name, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2);
+        /// @overload
+        void setNamedAutoConstant(const String& name, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2)
+        {
+            setNamedAutoConstant(name, acType, (size_t)extraInfo1 | ((size_t)extraInfo2) << 16);
+        }
 
         /// @deprecated use ACT_TIME directly
         void setNamedConstantFromTime(const String& name, Real factor)
