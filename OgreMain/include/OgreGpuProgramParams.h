@@ -526,20 +526,17 @@ namespace Ogre {
          */
         const GpuNamedConstants& getConstantDefinitions() const;
 
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, Real val) */
-        void setNamedConstant(const String& name, Real val);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, int val) */
-        void setNamedConstant(const String& name, int val);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, uint val) */
-        void setNamedConstant(const String& name, uint val);
-        // /* @copydoc GpuProgramParameters::setNamedConstant(const String& name, bool val) */
-        // void setNamedConstant(const String& name, bool val);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector4& vec) */
-        void setNamedConstant(const String& name, const Vector4& vec);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector3& vec) */
-        void setNamedConstant(const String& name, const Vector3& vec);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector2& vec) */
-        void setNamedConstant(const String& name, const Vector2& vec);
+        /** @copydoc GpuProgramParameters::setNamedConstant(const String&, Real) */
+        template <typename T> void setNamedConstant(const String& name, T val)
+        {
+            setNamedConstant(name, &val, 1);
+        }
+        /// @overload
+        template <int dims, typename T>
+        void setNamedConstant(const String& name, const Vector<dims, T>& vec)
+        {
+            setNamedConstant(name, vec.ptr(), dims);
+        }
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4& m) */
         void setNamedConstant(const String& name, const Matrix4& m);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries) */
@@ -1522,19 +1519,17 @@ namespace Ogre {
             @param count The number of ints to write
         */
         void _writeRawConstants(size_t physicalIndex, const uint* val, size_t count);
-        /** Write a 4-element parameter to the program directly to
+        /** Write a Vector parameter to the program directly to
             the underlying constants buffer.
             @param physicalIndex The physical buffer index at which to place the parameter
             @param vec The value to set
             @param count The number of floats to write; if for example
             the uniform constant 'slot' is smaller than a Vector4
         */
-        template <typename T>
-        void _writeRawConstant(size_t physicalIndex, const Vector<4, T>& vec, size_t count = 4)
+        template <int dims, typename T>
+        void _writeRawConstant(size_t physicalIndex, const Vector<dims, T>& vec, size_t count = dims)
         {
-            // remember, raw content access uses raw float count rather than float4
-            // write either the number requested (for packed types) or up to 4
-            _writeRawConstants(physicalIndex, vec.ptr(), std::min(count, (size_t)4));
+            _writeRawConstants(physicalIndex, vec.ptr(), std::min(count, (size_t)dims));
         }
         /** Write a single parameter to the program.
             @param physicalIndex The physical buffer index at which to place the parameter
@@ -1547,16 +1542,6 @@ namespace Ogre {
         }
         /// @deprecated this will crash if count > 1
         OGRE_DEPRECATED void _writeRawConstant(size_t physicalIndex, Real val, size_t count);
-        /** Write a 3-element floating-point parameter to the program via Vector3.
-            @param physicalIndex The physical buffer index at which to place the parameter
-            @param vec The value to set
-        */
-        void _writeRawConstant(size_t physicalIndex, const Vector3& vec);
-        /** Write a 2-element floating-point parameter to the program via Vector2.
-            @param physicalIndex The physical buffer index at which to place the parameter
-            @param vec The value to set
-        */
-        void _writeRawConstant(size_t physicalIndex, const Vector2& vec);
         /** Write a Matrix4 parameter to the program.
             @param physicalIndex The physical buffer index at which to place the parameter
             @param m The value to set
