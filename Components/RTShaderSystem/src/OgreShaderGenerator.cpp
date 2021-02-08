@@ -364,9 +364,7 @@ void ShaderGenerator::_destroy()
     // Remove all scene managers.   
     while (mSceneManagerMap.empty() == false)
     {
-        SceneManagerIterator itSceneMgr    = mSceneManagerMap.begin();
-
-        removeSceneManager(itSceneMgr->second);
+        removeSceneManager(*mSceneManagerMap.begin());
     }
 
     mRenderObjectListener.reset();
@@ -610,10 +608,8 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName,
 //-----------------------------------------------------------------------------
 void ShaderGenerator::addSceneManager(SceneManager* sceneMgr)
 {
-    // Make sure this scene manager not exists in the map.
-    SceneManagerIterator itFind = mSceneManagerMap.find(sceneMgr->getName());
-    
-    if (itFind != mSceneManagerMap.end())
+    // Make sure this scene manager not exists in the set.
+    if (!mSceneManagerMap.insert(sceneMgr).second)
         return;
 
     if (!mRenderObjectListener)
@@ -626,8 +622,6 @@ void ShaderGenerator::addSceneManager(SceneManager* sceneMgr)
     
     sceneMgr->addListener(mSceneManagerListener.get());
 
-    mSceneManagerMap[sceneMgr->getName()] = sceneMgr;
-
     // Update the active scene manager.
     if (mActiveSceneMgr == NULL)
         mActiveSceneMgr = sceneMgr;
@@ -637,12 +631,12 @@ void ShaderGenerator::addSceneManager(SceneManager* sceneMgr)
 void ShaderGenerator::removeSceneManager(SceneManager* sceneMgr)
 {
     // Make sure this scene manager exists in the map.
-    SceneManagerIterator itFind = mSceneManagerMap.find(sceneMgr->getName());
+    SceneManagerIterator itFind = mSceneManagerMap.find(sceneMgr);
     
     if (itFind != mSceneManagerMap.end())
     {
-        itFind->second->removeRenderObjectListener(mRenderObjectListener.get());
-        itFind->second->removeListener(mSceneManagerListener.get());
+        (*itFind)->removeRenderObjectListener(mRenderObjectListener.get());
+        (*itFind)->removeListener(mSceneManagerListener.get());
 
         mSceneManagerMap.erase(itFind);
 
