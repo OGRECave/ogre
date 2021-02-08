@@ -17,7 +17,7 @@ jobs:
           libzzip-dev libfreetype6-dev libpugixml-dev libassimp-dev qtbase5-dev \
           nvidia-cg-dev glslang-dev spirv-tools \
           swig3.0 mono-mcs python3-dev \
-          python3-lxml texlive-binaries texlive-base graphviz xvfb doxygen g++-7
+          python3-lxml texlive-binaries texlive-base graphviz doxygen g++-7
     - uses: actions/checkout@v2
       with:
         fetch-depth: 2
@@ -37,7 +37,7 @@ jobs:
         # run unit tests
         build/bin/Test_Ogre
         # run visual tests
-        cd build/bin && xvfb-run -a -s "-screen 0 1024x768x24" ./TestContext -rs "OpenGL 3+ Rendering Subsystem"
+        cd build/bin && ./TestContext -rs "OpenGL 3+ Rendering Subsystem"
         # verify that the python modules are loadable
         cd ../lib && python -c "import _Ogre; import _RTShader"
         cd ../../
