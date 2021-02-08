@@ -608,36 +608,6 @@ namespace Ogre
         return mNamedConstants;
     }
     //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, Real val)
-    {
-        setNamedConstant(name, &val, 1);
-    }
-    //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, int val)
-    {
-        setNamedConstant(name, &val, 1);
-    }
-    //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, uint val)
-    {
-        setNamedConstant(name, &val, 1);
-    }
-    //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const Vector4& vec)
-    {
-        setNamedConstant(name, vec.ptr(), 4);
-    }
-    //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const Vector3& vec)
-    {
-        setNamedConstant(name, vec.ptr(), 3);
-    }
-    //---------------------------------------------------------------------
-    void GpuSharedParameters::setNamedConstant(const String& name, const Vector2& vec)
-    {
-        setNamedConstant(name, vec.ptr(), 2);
-    }
-    //---------------------------------------------------------------------
     void GpuSharedParameters::setNamedConstant(const String& name, const Matrix4& m)
     {
         setNamedConstant(name, m[0], 16);
@@ -1174,16 +1144,6 @@ namespace Ogre
     void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, Real val, size_t count)
     {
         _writeRawConstants(physicalIndex, &val, count);
-    }
-    //-----------------------------------------------------------------------------
-    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Vector3& vec)
-    {
-        _writeRawConstants(physicalIndex, vec.ptr(), 3);
-    }
-    //-----------------------------------------------------------------------------
-    void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Vector2& vec)
-    {
-        _writeRawConstants(physicalIndex, vec.ptr(), 2);
     }
     //-----------------------------------------------------------------------------
     void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Matrix4& m, size_t elementCount)
