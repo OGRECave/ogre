@@ -750,7 +750,7 @@ protected:
     typedef SubRenderStateFactoryMap::const_iterator        SubRenderStateFactoryConstIterator;
 
     //-----------------------------------------------------------------------------
-    typedef std::map<String, SceneManager*>                SceneManagerMap;
+    typedef std::set<SceneManager*>                         SceneManagerMap;
     typedef SceneManagerMap::iterator                       SceneManagerIterator;
     typedef SceneManagerMap::const_iterator                 SceneManagerConstIterator;
 
