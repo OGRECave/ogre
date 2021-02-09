@@ -108,38 +108,6 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OGRE_DEP_SEARCH_PATH})
 set(CMAKE_FRAMEWORK_PATH ${CMAKE_FRAMEWORK_PATH} ${OGRE_DEP_SEARCH_PATH})
 
 if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
-    if(MSVC OR EMSCRIPTEN OR MINGW) # other platforms ship zlib
-        message(STATUS "Building zlib")
-        file(DOWNLOAD 
-            http://zlib.net/zlib-1.2.11.tar.gz
-            ${PROJECT_BINARY_DIR}/zlib-1.2.11.tar.gz 
-            EXPECTED_MD5 1c9f62f0778697a09d36121ead88e08e)
-        execute_process(COMMAND ${CMAKE_COMMAND} 
-            -E tar xf zlib-1.2.11.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-        execute_process(COMMAND ${BUILD_COMMAND_COMMON}
-            -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-            ${PROJECT_BINARY_DIR}/zlib-1.2.11
-            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zlib-1.2.11)
-        execute_process(COMMAND ${CMAKE_COMMAND} 
-            --build ${PROJECT_BINARY_DIR}/zlib-1.2.11 ${BUILD_COMMAND_OPTS})
-    endif()
-
-    message(STATUS "Building ZZIPlib")
-    file(DOWNLOAD
-        https://github.com/gdraheim/zziplib/archive/v0.13.71.tar.gz
-        ${PROJECT_BINARY_DIR}/zziplib-0.13.71.tar.gz)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf zziplib-0.13.71.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-    execute_process(COMMAND ${BUILD_COMMAND_COMMON}
-        -DZLIB_ROOT=${OGREDEPS_PATH}
-        -DZZIPMMAPPED=OFF -DZZIPCOMPAT=OFF -DZZIPLIBTOOL=OFF -DZZIPFSEEKO=OFF -DZZIPWRAP=OFF -DZZIPSDL=OFF -DZZIPBINS=OFF -DZZIPTEST=OFF -DZZIPDOCS=OFF -DBASH=sh
-        -DBUILD_STATIC_LIBS=TRUE
-        -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-        ${PROJECT_BINARY_DIR}/zziplib-0.13.71
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zziplib-0.13.71)
-    execute_process(COMMAND ${CMAKE_COMMAND} 
-        --build ${PROJECT_BINARY_DIR}/zziplib-0.13.71 ${BUILD_COMMAND_OPTS})
-
     message(STATUS "Building pugixml")
     file(DOWNLOAD
         https://github.com/zeux/pugixml/releases/download/v1.10/pugixml-1.10.tar.gz
@@ -197,6 +165,20 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     endif()
 
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
+      message(STATUS "Building zlib") # only needed for Assimp
+      file(DOWNLOAD
+          http://zlib.net/zlib-1.2.11.tar.gz
+          ${PROJECT_BINARY_DIR}/zlib-1.2.11.tar.gz
+          EXPECTED_MD5 1c9f62f0778697a09d36121ead88e08e)
+      execute_process(COMMAND ${CMAKE_COMMAND}
+          -E tar xf zlib-1.2.11.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+      execute_process(COMMAND ${BUILD_COMMAND_COMMON}
+          -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
+          ${PROJECT_BINARY_DIR}/zlib-1.2.11
+          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zlib-1.2.11)
+      execute_process(COMMAND ${CMAKE_COMMAND}
+          --build ${PROJECT_BINARY_DIR}/zlib-1.2.11 ${BUILD_COMMAND_OPTS})
+
       message(STATUS "Building Assimp")
       file(DOWNLOAD
           https://github.com/assimp/assimp/archive/v5.0.1.tar.gz
@@ -224,16 +206,6 @@ endif()
 #######################################################################
 # Core dependencies
 #######################################################################
-
-# Find zlib
-find_package(ZLIB)
-macro_log_feature(ZLIB_FOUND "zlib" "Simple data compression library" "http://www.zlib.net" FALSE "" "")
-
-if (ZLIB_FOUND)
-  # Find zziplib
-  find_package(ZZip)
-  macro_log_feature(ZZip_FOUND "zziplib" "Extract data from zip archives" "http://zziplib.sourceforge.net" FALSE "" "")
-endif ()
 
 # Find FreeImage
 find_package(FreeImage)
@@ -310,6 +282,10 @@ macro_log_feature(SWIG_FOUND "SWIG" "Language bindings (Python, Java, C#) for OG
 # pugixml
 find_package(pugixml QUIET)
 macro_log_feature(pugixml_FOUND "pugixml" "Needed for XMLConverter and DotScene Plugin" "https://pugixml.org/" FALSE "" "")
+
+# Find zlib
+find_package(ZLIB)
+macro_log_feature(ZLIB_FOUND "zlib" "Simple data compression library" "http://www.zlib.net" FALSE "" "")
 
 # Assimp
 find_package(ASSIMP QUIET)
