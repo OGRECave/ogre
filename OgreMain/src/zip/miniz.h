@@ -513,6 +513,9 @@ int mz_deflateInit2(mz_streamp pStream, int level, int method, int window_bits,
 // calling mz_deflateEnd() followed by mz_deflateInit()/mz_deflateInit2().
 int mz_deflateReset(mz_streamp pStream);
 
+/// BACKPORT from 2.1:
+int mz_inflateReset(mz_streamp pStream);
+
 // mz_deflate() compresses the input to output, consuming as much of the input
 // and producing as much output as possible. Parameters:
 //   pStream is the stream to read from and write to. You must initialize/update
@@ -659,6 +662,7 @@ typedef void *const voidpc;
 #define compressBound mz_compressBound
 #define inflateInit mz_inflateInit
 #define inflateInit2 mz_inflateInit2
+#define inflateReset mz_inflateReset
 #define inflate mz_inflate
 #define inflateEnd mz_inflateEnd
 #define uncompress mz_uncompress
@@ -1664,6 +1668,33 @@ int mz_inflateInit2(mz_streamp pStream, int window_bits) {
   pDecomp->m_window_bits = window_bits;
 
   return MZ_OK;
+}
+
+/* BACKPORT from 2.1: */
+int mz_inflateReset(mz_streamp pStream)
+{
+    inflate_state *pDecomp;
+    if (!pStream)
+        return MZ_STREAM_ERROR;
+
+    pStream->data_type = 0;
+    pStream->adler = 0;
+    pStream->msg = NULL;
+    pStream->total_in = 0;
+    pStream->total_out = 0;
+    pStream->reserved = 0;
+
+    pDecomp = (inflate_state *)pStream->state;
+
+    tinfl_init(&pDecomp->m_decomp);
+    pDecomp->m_dict_ofs = 0;
+    pDecomp->m_dict_avail = 0;
+    pDecomp->m_last_status = TINFL_STATUS_NEEDS_MORE_INPUT;
+    pDecomp->m_first_call = 1;
+    pDecomp->m_has_flushed = 0;
+    /* pDecomp->m_window_bits = window_bits */;
+
+    return MZ_OK;
 }
 
 int mz_inflateInit(mz_streamp pStream) {
