@@ -27,7 +27,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   # workaround gcc5 bug on Ubuntu 16.04 regarding __builtin_cpu_supports
   target_link_libraries(Codec_STBI PRIVATE gcc)
 endif()
-if(OGRE_CONFIG_ENABLE_ZIP)
+
+if(ZLIB_FOUND)
+  target_compile_definitions(Codec_STBI PRIVATE HAVE_ZLIB)
   target_link_libraries(Codec_STBI PRIVATE ZLIB::ZLIB)
 endif()
 

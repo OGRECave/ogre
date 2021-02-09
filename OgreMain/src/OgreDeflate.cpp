@@ -34,12 +34,13 @@
 #include "macUtils.h"
 #endif
 
-#include <zlib.h>
+#define MINIZ_HEADER_FILE_ONLY
+#include <miniz.h>
 
 namespace Ogre
 {
     // memory implementations
-    static void* OgreZalloc(void* opaque, unsigned int items, unsigned int size)
+    static void* OgreZalloc(void* opaque, size_t items, size_t size)
     {
         return OGRE_MALLOC(items * size, MEMCATEGORY_GENERAL);
     }

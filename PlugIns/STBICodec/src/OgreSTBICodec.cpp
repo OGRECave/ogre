@@ -41,7 +41,7 @@ THE SOFTWARE.
 #define STB_IMAGE_STATIC
 #include "stbi/stb_image.h"
 
-#if OGRE_NO_ZIP_ARCHIVE == 0
+#ifdef HAVE_ZLIB
 #include <zlib.h>
 static Ogre::uchar* custom_zlib_compress(Ogre::uchar* data, int data_len, int* out_len, int /*quality*/)
 {

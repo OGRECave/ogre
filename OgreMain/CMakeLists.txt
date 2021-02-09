@@ -158,17 +158,13 @@ if (OGRE_CONFIG_ENABLE_ASTC)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_ZIP)
-  include_directories("${ZZip_INCLUDE_DIRS}")
+  include_directories(src/zip)
   list(APPEND HEADER_FILES include/OgreZip.h)
-  list(APPEND SOURCE_FILES src/OgreZip.cpp)
+  list(APPEND SOURCE_FILES src/OgreZip.cpp src/zip/zip.c)
 
   if(ANDROID)
-    ADD_DEFINITIONS(-DZZIP_OMIT_CONFIG_H)
     list(APPEND PLATFORM_SOURCE_FILES src/Android/OgreAPKZipArchive.cpp)
   endif()
-
-  list(APPEND LIBRARIES "${ZZip_LIBRARIES}")
-  list(APPEND LIBRARIES ZLIB::ZLIB)
 endif ()
 
 if(OGRE_CONFIG_FILESYSTEM_UNICODE)
@@ -250,7 +246,7 @@ endif ()
 target_link_libraries(OgreMain PUBLIC ${PLATFORM_LIBS} PRIVATE ${LIBRARIES} ${CMAKE_DL_LIBS})
 
 # specify a precompiled header to use
-add_native_precompiled_header(OgreMain "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h")
+add_native_precompiled_header(OgreMain "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h>")
 
 # install OgreMain
 ogre_config_lib(OgreMain TRUE)
