@@ -351,7 +351,7 @@ namespace Ogre {
         /// @overload
         template <typename T> const T* getData(uint32 x = 0, uint32 y = 0, uint32 z = 0) const
         {
-            return reinterpret_cast<T*>(getData(x, y, z));
+            return reinterpret_cast<const T*>(getData(x, y, z));
         }
 
         /** Returns the size of the data buffer in bytes
