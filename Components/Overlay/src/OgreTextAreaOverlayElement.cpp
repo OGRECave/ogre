@@ -180,6 +180,8 @@ namespace Ogre {
             return;
         }
 
+        mFont->load(); // ensure glyph info is there
+
         size_t charlen = mCaption.size();
         checkMemoryAllocation( charlen );
 
@@ -271,8 +273,9 @@ namespace Ogre {
                 continue;
             }
 
-            Real horiz_height = mFont->getGlyphAspectRatio(character) * mViewportAspectCoef ;
-            const Font::UVRect& uvRect = mFont->getGlyphTexCoords(character);
+            const auto& glyphInfo = mFont->getGlyphInfo(character);
+            Real horiz_height = glyphInfo.aspectRatio * mViewportAspectCoef ;
+            const Font::UVRect& uvRect = glyphInfo.uvRect;
 
             // each vert is (x, y, z, u, v)
             //-------------------------------------------------------------------------------------
