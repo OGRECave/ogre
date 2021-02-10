@@ -199,7 +199,7 @@ namespace Ogre {
         // Derive space with from a number 0
         if(mSpaceWidth == 0)
         {
-            mSpaceWidth = mFont->getGlyphAspectRatio(UNICODE_ZERO) * mCharHeight;
+            mSpaceWidth = mFont->getGlyphInfo(UNICODE_ZERO).advance * mCharHeight;
         }
 
         // Use iterator
@@ -225,7 +225,7 @@ namespace Ogre {
                     }
                     else 
                     {
-                        len += mFont->getGlyphAspectRatio(character) * mCharHeight * 2.0f * mViewportAspectCoef;
+                        len += mFont->getGlyphInfo(character).advance * mCharHeight * 2.0f * mViewportAspectCoef;
                     }
                 }
 
@@ -274,6 +274,8 @@ namespace Ogre {
             const auto& glyphInfo = mFont->getGlyphInfo(character);
             Real horiz_height = glyphInfo.aspectRatio * mViewportAspectCoef ;
             const Font::UVRect& uvRect = glyphInfo.uvRect;
+
+            left += glyphInfo.bearing * mCharHeight * 2 * mViewportAspectCoef;
 
             // each vert is (x, y, z, u, v)
             //-------------------------------------------------------------------------------------
@@ -338,6 +340,10 @@ namespace Ogre {
 
             // Go back up with top
             top += mCharHeight * 2.0f;
+
+            // advance
+            left -= horiz_height  * mCharHeight * 2.0f;
+            left += (glyphInfo.advance  - glyphInfo.bearing) * mCharHeight * 2.0f * mViewportAspectCoef;
 
             float currentWidth = (left + 1)/2 - _getDerivedLeft();
             if (currentWidth > largestWidth)

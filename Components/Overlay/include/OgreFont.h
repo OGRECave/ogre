@@ -32,6 +32,7 @@ THE SOFTWARE
 #include "OgreCommon.h"
 #include "OgreSharedPtr.h"
 #include "OgreColourValue.h"
+#include "OgreException.h"
 
 namespace Ogre
 {
@@ -56,6 +57,19 @@ namespace Ogre
         FT_IMAGE = 2
     };
 
+
+    /// Information about the position and size of a glyph in a texture
+    struct GlyphInfo
+    {
+        typedef uint32 CodePoint;
+        typedef FloatRect UVRect;
+
+        CodePoint codePoint;
+        UVRect uvRect;
+        float aspectRatio; // width/ height
+        float bearing; // bearingX/ height
+        float advance; // advanceX/ height
+    };
 
     /** Class representing a font in the system.
     @remarks
@@ -138,21 +152,8 @@ namespace Ogre
 
 
     public:
-        typedef Ogre::uint32 CodePoint;
-        typedef Ogre::FloatRect UVRect;
-        /// Information about the position and size of a glyph in a texture
-        struct GlyphInfo 
-        {
-            CodePoint codePoint;
-            UVRect uvRect;
-            Real aspectRatio;
-
-            GlyphInfo(CodePoint id, const UVRect& rect, Real aspect)
-                : codePoint(id), uvRect(rect), aspectRatio(aspect)
-            {
-
-            }
-        };
+        typedef GlyphInfo::CodePoint CodePoint;
+        typedef GlyphInfo::UVRect UVRect;
         /// A range of code points, inclusive on both ends
         typedef std::pair<CodePoint, CodePoint> CodePointRange;
         typedef std::vector<CodePointRange> CodePointRangeList;
@@ -266,19 +267,7 @@ namespace Ogre
             @return A rectangle with the UV coordinates, or null UVs if the
                 code point was not present
         */
-        inline const UVRect& getGlyphTexCoords(CodePoint id) const
-        {
-            CodePointMap::const_iterator i = mCodePointMap.find(id);
-            if (i != mCodePointMap.end())
-            {
-                return i->second.uvRect;
-            }
-            else
-            {
-                static UVRect nullRect(0.0, 0.0, 0.0, 0.0);
-                return nullRect;
-            }
-        }
+        const UVRect& getGlyphTexCoords(CodePoint id) const { return getGlyphInfo(id).uvRect; }
 
         /** Sets the texture coordinates of a glyph.
         @remarks
@@ -287,42 +276,22 @@ namespace Ogre
             Also sets the aspect ratio (width / height) of this character. textureAspect
             is the width/height of the texture (may be non-square)
         */
-        inline void setGlyphTexCoords(CodePoint id, Real u1, Real v1, Real u2, Real v2, Real textureAspect)
+        void setGlyphInfoFromTexCoords(CodePoint id, const UVRect& rect, float textureAspect = 1.0)
         {
-            CodePointMap::iterator i = mCodePointMap.find(id);
-            if (i != mCodePointMap.end())
-            {
-                i->second.uvRect.left = u1;
-                i->second.uvRect.top = v1;
-                i->second.uvRect.right = u2;
-                i->second.uvRect.bottom = v2;
-                i->second.aspectRatio = textureAspect * (u2 - u1)  / (v2 - v1);
-            }
-            else
-            {
-                mCodePointMap.emplace(id, GlyphInfo(id, UVRect(u1, v1, u2, v2), textureAspect * (u2 - u1) / (v2 - v1)));
-            }
+            auto glyphAspect = textureAspect * rect.width()  / rect.height();
+            setGlyphInfo({id, rect, glyphAspect, 0, glyphAspect});
+        }
 
-        }
+        void setGlyphInfo(const GlyphInfo& info) { mCodePointMap[info.codePoint] = info; }
+
         /** Gets the aspect ratio (width / height) of this character. */
-        inline Real getGlyphAspectRatio(CodePoint id) const
-        {
-            CodePointMap::const_iterator i = mCodePointMap.find(id);
-            if (i != mCodePointMap.end())
-            {
-                return i->second.aspectRatio;
-            }
-            else
-            {
-                return 1.0;
-            }
-        }
+        float getGlyphAspectRatio(CodePoint id) const { return getGlyphInfo(id).aspectRatio; }
         /** Sets the aspect ratio (width / height) of this character.
         @remarks
             You only need to call this if you're setting up a font loaded from a 
             texture manually.
         */
-        inline void setGlyphAspectRatio(CodePoint id, Real ratio)
+        void setGlyphAspectRatio(CodePoint id, Real ratio)
         {
             CodePointMap::iterator i = mCodePointMap.find(id);
             if (i != mCodePointMap.end())
@@ -334,7 +303,16 @@ namespace Ogre
         /** Gets the information available for a glyph corresponding to a
             given code point, or throws an exception if it doesn't exist;
         */
-        const GlyphInfo& getGlyphInfo(CodePoint id) const;
+        const GlyphInfo& getGlyphInfo(CodePoint id) const
+        {
+            CodePointMap::const_iterator i = mCodePointMap.find(id);
+            if (i == mCodePointMap.end())
+            {
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                            StringUtil::format("Code point %d not found in font %s", id, mName.c_str()));
+            }
+            return i->second;
+        }
 
         /** Adds a range of code points to the list of code point ranges to generate
             glyphs for, if this is a truetype based font.
