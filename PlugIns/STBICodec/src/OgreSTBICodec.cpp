@@ -159,10 +159,9 @@ namespace Ogre {
         MemoryDataStreamPtr data = static_pointer_cast<MemoryDataStream>(encode(input, pData));
         std::ofstream f(outFileName.c_str(), std::ios::out | std::ios::binary);
 
-        if(!f.is_open()) {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "could not open file",
-                        "STBIImageCodec::encodeToFile" ) ;
+        if (!f.is_open())
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "could not open file " + outFileName);
         }
 
         f.write((char*)data->getPtr(), data->size());
