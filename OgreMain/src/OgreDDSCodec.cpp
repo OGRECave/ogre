@@ -210,6 +210,7 @@ namespace Ogre {
         bool isVolume = (imgData->depth > 1);       
         bool isFloat32r = (imgData->format == PF_FLOAT32_R);
         bool isFloat16 = (imgData->format == PF_FLOAT16_RGBA);
+        bool isFloat16r = (imgData->format == PF_FLOAT16_R);
         bool isFloat32 = (imgData->format == PF_FLOAT32_RGBA);
         bool notImplemented = false;
         String notImplementedString = "";
@@ -219,7 +220,7 @@ namespace Ogre {
         {
             // Square textures only
             notImplemented = true;
-            notImplementedString += " non square textures";
+            notImplementedString += "non square textures";
         }
 
         uint32 size = 1;
@@ -231,7 +232,7 @@ namespace Ogre {
         {
             // Power two textures only
             notImplemented = true;
-            notImplementedString += " non power two textures";
+            notImplementedString += "non power two textures";
         }
 
         switch(imgData->format)
@@ -243,13 +244,14 @@ namespace Ogre {
         case PF_X8B8G8R8:
         case PF_B8G8R8:
         case PF_FLOAT32_R:
+        case PF_FLOAT16_R:
         case PF_FLOAT16_RGBA:
         case PF_FLOAT32_RGBA:
             break;
         default:
             // No crazy FOURCC or 565 et al. file formats at this stage
             notImplemented = true;
-            notImplementedString = " unsupported pixel format";
+            notImplementedString = PixelUtil::getFormatName(imgData->format);
             break;
         }       
 
@@ -259,8 +261,7 @@ namespace Ogre {
         if (notImplemented)
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                "DDS encoding for" + notImplementedString + " not supported",
-                "DDSCodec::encodeToFile" ) ;
+                        "DDS encoding for " + notImplementedString + " not supported");
         }
         else
         {
@@ -303,6 +304,9 @@ namespace Ogre {
                 break;
             case PF_FLOAT32_R:
                 ddsHeaderRgbBits = 32;
+                break;
+            case PF_FLOAT16_R:
+                ddsHeaderRgbBits = 16;
                 break;
             case PF_FLOAT16_RGBA:
                 ddsHeaderRgbBits = 16 * 4;
@@ -355,9 +359,12 @@ namespace Ogre {
 
             ddsHeader.pixelFormat.size = DDS_PIXELFORMAT_SIZE;
             ddsHeader.pixelFormat.flags = (hasAlpha) ? DDPF_RGB|DDPF_ALPHAPIXELS : DDPF_RGB;
-            ddsHeader.pixelFormat.flags = (isFloat32r || isFloat16 || isFloat32) ? DDPF_FOURCC : ddsHeader.pixelFormat.flags;
+            ddsHeader.pixelFormat.flags = (isFloat32r || isFloat16r || isFloat16 || isFloat32) ? DDPF_FOURCC : ddsHeader.pixelFormat.flags;
             if (isFloat32r) {
                 ddsHeader.pixelFormat.fourCC = D3DFMT_R32F;
+            }
+            else if (isFloat16r) {
+                ddsHeader.pixelFormat.fourCC = D3DFMT_R16F;
             }
             else if (isFloat16) {
                 ddsHeader.pixelFormat.fourCC = D3DFMT_A16B16G16R16F;
@@ -371,10 +378,10 @@ namespace Ogre {
             ddsHeader.pixelFormat.rgbBits = ddsHeaderRgbBits;
 
             ddsHeader.pixelFormat.alphaMask = (hasAlpha)   ? 0xFF000000 : 0x00000000;
-            ddsHeader.pixelFormat.alphaMask = (isFloat32r) ? 0x00000000 : ddsHeader.pixelFormat.alphaMask;
-            ddsHeader.pixelFormat.redMask   = (isFloat32r) ? 0xFFFFFFFF :0x00FF0000;
-            ddsHeader.pixelFormat.greenMask = (isFloat32r) ? 0x00000000 :0x0000FF00;
-            ddsHeader.pixelFormat.blueMask  = (isFloat32r) ? 0x00000000 :0x000000FF;
+            ddsHeader.pixelFormat.alphaMask = (isFloat32r || isFloat16r) ? 0x00000000 : ddsHeader.pixelFormat.alphaMask;
+            ddsHeader.pixelFormat.redMask   = (isFloat32r || isFloat16r) ? 0xFFFFFFFF :0x00FF0000;
+            ddsHeader.pixelFormat.greenMask = (isFloat32r || isFloat16r) ? 0x00000000 :0x0000FF00;
+            ddsHeader.pixelFormat.blueMask  = (isFloat32r || isFloat16r) ? 0x00000000 :0x000000FF;
 
             if( flipRgbMasks )
                 std::swap( ddsHeader.pixelFormat.redMask, ddsHeader.pixelFormat.blueMask );
