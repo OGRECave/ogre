@@ -30,7 +30,6 @@ THE SOFTWARE
 #include "OgreTexture.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreException.h"
 #include "OgreTextureUnitState.h"
 #include "OgreTechnique.h"
 #include "OgreBitwise.h"
@@ -161,18 +160,6 @@ namespace Ogre
         return mTtfMaxBearingY;
     }
     //---------------------------------------------------------------------
-    const Font::GlyphInfo& Font::getGlyphInfo(CodePoint id) const
-    {
-        CodePointMap::const_iterator i = mCodePointMap.find(id);
-        if (i == mCodePointMap.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Code point " + StringConverter::toString(id) + " not found in font "
-                + mName, "Font::getGlyphInfo");
-        }
-        return i->second;
-    }
-    //---------------------------------------------------------------------
     void Font::_setMaterial(const MaterialPtr &mat)
     {
         mMaterial = mat;
@@ -188,7 +175,7 @@ namespace Ogre
         bbs->setBillboardOrigin(BBO_CENTER_LEFT);
         bbs->setDefaultDimensions(0, 0);
 
-        float spaceWidth = mCodePointMap.find('0')->second.aspectRatio * height;
+        float spaceWidth = mCodePointMap.find('0')->second.advance * height;
 
         text.resize(text.size() + 3); // add padding for decoder
         auto it = text.c_str();
@@ -223,12 +210,13 @@ namespace Ogre
             if (cp == mCodePointMap.end())
                 continue;
 
-            float width = cp->second.aspectRatio * height;
+            left += cp->second.bearing * height;
+
             auto bb = bbs->createBillboard(Vector3(left, top, 0), colour);
-            bb->setDimensions(width, height);
+            bb->setDimensions(cp->second.aspectRatio * height, height);
             bb->setTexcoordRect(cp->second.uvRect);
 
-            left += width;
+            left += (cp->second.advance - cp->second.bearing) * height;
         }
     }
 
@@ -361,7 +349,7 @@ namespace Ogre
 
                 max_height = std::max<FT_Pos>(2 * (face->glyph->bitmap.rows << 6) - face->glyph->metrics.horiBearingY, max_height);
                 mTtfMaxBearingY = std::max(int(face->glyph->metrics.horiBearingY), mTtfMaxBearingY);
-                max_width = std::max<FT_Pos>((face->glyph->advance.x >> 6) + (face->glyph->metrics.horiBearingX >> 6), max_width);
+                max_width = std::max<FT_Pos>(face->glyph->bitmap.width, max_width);
             }
 
         }
@@ -419,9 +407,10 @@ namespace Ogre
                 }
 
                 uint advance = face->glyph->advance.x >> 6;
+                uint width = face->glyph->bitmap.width;
 
                 // If at end of row
-                if( finalWidth - 1 < l + ( advance ) )
+                if( finalWidth - 1 < l + width )
                 {
                     m += ( max_height >> 6 ) + char_spacer;
                     l = 0;
@@ -430,18 +419,12 @@ namespace Ogre
                 FT_Pos y_bearing = ( mTtfMaxBearingY >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
                 FT_Pos x_bearing = face->glyph->metrics.horiBearingX >> 6;
 
-                // x_bearing might be negative
-                uint x_offset = std::max(0, int(x_bearing));
-                // width might be larger than advance
-                uint start = x_offset - x_bearing; // case x_bearing is negative
-                uint width = std::min(face->glyph->bitmap.width - start, advance - x_offset);
-
                 for(unsigned int j = 0; j < face->glyph->bitmap.rows; j++ )
                 {
-                    uchar* pSrc = face->glyph->bitmap.buffer + j * face->glyph->bitmap.pitch + start;
+                    uchar* pSrc = face->glyph->bitmap.buffer + j * face->glyph->bitmap.pitch;
                     size_t row = j + m + y_bearing;
-                    uchar* pDest = img.getData(l + x_offset, row);
-                    for(unsigned int k = 0; k < (width); k++ )
+                    uchar* pDest = img.getData(l, row);
+                    for(unsigned int k = 0; k < width; k++ )
                     {
                         if (mAntialiasColour)
                         {
@@ -459,16 +442,16 @@ namespace Ogre
                     }
                 }
 
-                this->setGlyphTexCoords(cp,
-                    (Real)l / (Real)finalWidth,  // u1
-                    (Real)m / (Real)finalHeight,  // v1
-                    (Real)( l + advance ) / (Real)finalWidth, // u2
-                    ( m + ( max_height >> 6 ) ) / (Real)finalHeight, // v2
-                    textureAspect
-                    );
+                UVRect uvs((Real)l / (Real)finalWidth,                   // u1
+                           (Real)m / (Real)finalHeight,                  // v1
+                           (Real)(l + width) / (Real)finalWidth,         // u2
+                           (m + (max_height >> 6)) / (Real)finalHeight); // v2
+                this->setGlyphInfo({cp, uvs, textureAspect * uvs.width() / uvs.height(),
+                                    float(x_bearing) / (max_height >> 6),
+                                    float(advance) / (max_height >> 6)});
 
                 // Advance a column
-                l += (advance + char_spacer);
+                l += (width + char_spacer);
             }
         }
 
