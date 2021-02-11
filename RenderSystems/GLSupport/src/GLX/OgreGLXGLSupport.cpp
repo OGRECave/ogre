@@ -117,7 +117,8 @@ namespace Ogre
                 XRRFreeScreenConfigInfo(screenConfig);
             }
         }
-        else
+
+        if(mVideoModes.empty())
         {
             mCurrentMode.width = DisplayWidth(mXDisplay, DefaultScreen(mXDisplay));
             mCurrentMode.height = DisplayHeight(mXDisplay, DefaultScreen(mXDisplay));
