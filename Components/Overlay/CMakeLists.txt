@@ -32,8 +32,10 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
     ${IMGUI_DIR}/imgui.cpp
     ${IMGUI_DIR}/imgui_draw.cpp
     ${IMGUI_DIR}/imgui_widgets.cpp
-    ${IMGUI_DIR}/imgui_demo.cpp
-    ${IMGUI_DIR}/misc/freetype/imgui_freetype.cpp)
+    ${IMGUI_DIR}/imgui_demo.cpp)
+  if(FREETYPE_FOUND)
+    list(APPEND SOURCE_FILES ${IMGUI_DIR}/misc/freetype/imgui_freetype.cpp)
+  endif()
 else()
     list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreImGuiOverlay.cpp")
 endif()
@@ -41,11 +43,19 @@ endif()
 # setup target
 add_library(OgreOverlay ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreOverlay PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreOverlay PUBLIC OgreMain PRIVATE ${FREETYPE_LIBRARIES})
+target_link_libraries(OgreOverlay PUBLIC OgreMain)
 target_include_directories(OgreOverlay PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-  $<INSTALL_INTERFACE:include/OGRE/Overlay>
-  PRIVATE ${FREETYPE_INCLUDE_DIRS})
+  $<INSTALL_INTERFACE:include/OGRE/Overlay>)
+
+if(FREETYPE_FOUND)
+  target_compile_definitions(OgreOverlay PRIVATE HAVE_FREETYPE)
+  target_link_libraries(OgreOverlay PRIVATE ${FREETYPE_LIBRARIES})
+  target_include_directories(OgreOverlay PRIVATE ${FREETYPE_INCLUDE_DIRS})
+elseif(UNIX)
+  set_source_files_properties(src/OgreFont.cpp PROPERTIES
+    COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function")
+endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
   target_include_directories(OgreOverlay PUBLIC

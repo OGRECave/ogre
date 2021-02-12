@@ -116,8 +116,9 @@ void ImGuiOverlay::ImGUIRenderable::createFontTexture()
     ImGuiIO& io = ImGui::GetIO();
     if (io.Fonts->Fonts.empty())
         io.Fonts->AddFontDefault();
+#ifdef HAVE_FREETYPE
     ImGuiFreeType::BuildFontAtlas(io.Fonts, 0);
-
+#endif
     unsigned char* pixels;
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
