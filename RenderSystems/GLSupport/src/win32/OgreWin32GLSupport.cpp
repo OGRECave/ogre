@@ -36,9 +36,13 @@
 #include "OgreWin32Window.h"
 #include "OgreGLUtil.h"
 
+#include <GL/gl.h>
 #include <GL/wglext.h>
 
 static PFNWGLCREATECONTEXTATTRIBSARBPROC _wglCreateContextAttribsARB = 0;
+
+static int glMajorMax = 0;
+static int glMinorMax = 0;
 
 namespace Ogre {
     GLNativeSupport* getGLSupport(int profile)
@@ -303,6 +307,11 @@ namespace Ogre {
             // if wglMakeCurrent fails, wglGetProcAddress will return null
             wglMakeCurrent(hdc, hrc);
 
+            // the default context is created with maximum version
+            // use GL3 query type, as it is the only consumer
+            glGetIntegerv(0x821B, &glMajorMax);
+            glGetIntegerv(0x821C, &glMinorMax);
+
             _wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)
                 wglGetProcAddress("wglCreateContextAttribsARB");
 
@@ -473,8 +482,8 @@ namespace Ogre {
             break;
         default:
             profile = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
-            majorVersion = 3;
-            minorVersion = 3; // 3.1 would be sufficient per spec, but we need 3.3 anyway..
+            majorVersion = std::max(glMajorMax, 3);
+            minorVersion = std::max(glMinorMax, 3); // 3.1 would be sufficient per spec, but we need 3.3 anyway..
             break;
         }
 
