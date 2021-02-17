@@ -1,3 +1,4 @@
+
 # DotScene Overview
 
 DotScene (aka .scene) is just a standardized XML file format.
@@ -42,4 +43,46 @@ To add logic properties to the scene you can use the `<userData>` node as follow
         <property data="1.0" name="mass_radius" type="float" />
     </userData>
 </entity>
+```
+
+## How to use DotScene
+In recent OGRE3D versions DotScene has been incorporated into the main OGRE repo and made into a Plugin.
+So it has to be loaded in `plugins.cfg`, add the following line:
+```
+Plugin=Plugin_DotScene
+```
+Also, it is required to complie against the library (in a similar fashion to OgreBites) located in: `OgreSDK\ogre-1.12.11\lib\OGRE`
+
+Include the header `#include <OgreDotSceneLoader.h>
+`, located in: `OgreSDK\ogre-1.12.11\include\OGRE\Plugins\DotScene`
+
+And to use the library , create a DataStream and pass it to the loader:
+```
+Ogre::String groupName = "Scene";
+Ogre::String filename = "myScene.scene";
+Ogre::SceneNode attachmentNode = mSceneMgr->getRootSceneNode();
+
+Ogre::DataStreamPtr stream(Ogre::Root::openFileStream(filename, groupName));
+
+Ogre::DotSceneLoader *loader = new Ogre::DotSceneLoader();
+loader->load(stream, groupName, attachmentNode );
+```
+
+## How to use DotScene (DEPRECATED)
+This method is deprecated, but it is simpler and might be useful for someone who is still using older versions of OGRE3D.
+
+Load the plugin (in `plugins.cfg`, add the following line):
+```
+Plugin=Plugin_DotScene
+```
+Include the header `#include <OgreSceneLoaderManager.h>
+`
+
+And to use the library , just call the loader from the Singleton:
+```
+Ogre::String filename = "myScene.scene";
+Ogre::String groupName = "Scene";
+Ogre::SceneNode attachmentNode = mSceneMgr->getRootSceneNode();
+
+Ogre::SceneLoaderManager::getSingletonPtr()->load(filename,  groupName, attachmentNode );
 ```
