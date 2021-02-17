@@ -307,7 +307,14 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot restore D3D9 buffer: " + msg);
         }
 
-        hr = static_cast<IDirect3DVertexBuffer9*>(bufferResources->mBuffer)->GetDesc(&mBufferDesc);
+        if(mType = D3DFMT_VERTEXDATA)
+        {
+            hr = static_cast<IDirect3DVertexBuffer9*>(bufferResources->mBuffer)->GetDesc(&mBufferDesc);
+        }
+        else
+        {
+            hr = static_cast<IDirect3DIndexBuffer9*>(bufferResources->mBuffer)->GetDesc((D3DINDEXBUFFER_DESC*)&mBufferDesc);
+        }
         if (FAILED(hr))
         {
             String msg = DXGetErrorDescription(hr);
