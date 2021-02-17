@@ -530,15 +530,19 @@ namespace Ogre
         VertexBufferBinding *bind = mVData->vertexBufferBinding;
 
         // Get the incoming UV element
-        const VertexElement* uvElem = dcl->findElementBySemantic(
-            VES_TEXTURE_COORDINATES, sourceTexCoordSet);
+        const auto* uvElem = dcl->findElementBySemantic(VES_TEXTURE_COORDINATES, sourceTexCoordSet);
 
         if (!uvElem || uvElem->getType() != VET_FLOAT2)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "No 2D texture coordinates with selected index, cannot calculate tangents.",
-                "TangentSpaceCalc::build");
+                        "No 2D texture coordinates with selected index, cannot calculate tangents");
         }
+
+        // find a normal buffer
+        const auto* normElem = dcl->findElementBySemantic(VES_NORMAL);
+        if (!normElem)
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                        "No vertex normals found, cannot calculate tangents");
 
         HardwareVertexBufferSharedPtr uvBuf, posBuf, normBuf;
         unsigned char *pUvBase, *pPosBase, *pNormBase;
@@ -568,12 +572,6 @@ namespace Ogre
             // offset for vertex start
             pPosBase += mVData->vertexStart * posInc;
         }
-        // find a normal buffer
-        const VertexElement *normElem = dcl->findElementBySemantic(VES_NORMAL);
-        if (!normElem)
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-            "No vertex normals found", 
-            "TangentSpaceCalc::build");
 
         if (normElem->getSource() == uvElem->getSource())
         {
