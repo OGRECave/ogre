@@ -150,7 +150,7 @@ namespace Ogre
         /** Called when we you use a mesh which has shared vertices, the function creates separate
             vertex/index buffers and also recreates the bone assignments.
         */
-        void unshareVertices(const Ogre::MeshPtr &mesh);
+        static void unshareVertices(const Ogre::MeshPtr &mesh);
 
     public:
         InstanceManager( const String &customName, SceneManager *sceneManager,

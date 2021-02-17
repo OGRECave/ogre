@@ -630,6 +630,12 @@ namespace Ogre
         delete mesh->sharedVertexData;
         mesh->sharedVertexData = NULL;
         mesh->clearBoneAssignments();
+
+        if( mesh->isEdgeListBuilt() )
+        {
+            mesh->freeEdgeList();
+            mesh->buildEdgeList();
+        }
     }
     //-----------------------------------------------------------------------
     InstanceManager::InstanceBatchIterator InstanceManager::getInstanceBatchIterator( const String &materialName ) const
