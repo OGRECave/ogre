@@ -44,8 +44,13 @@ To add logic properties to the scene you can use the `<userData>` node as follow
 </entity>
 ```
 
+On the C++ side, these are acessible via e.g.
+```cpp
+mSceneMgr->getEntity("Cube")->getUserObjectBindings().getUserAny("mass");
+```
+
 ## How to use DotScene
-In recent OGRE3D versions DotScene has been incorporated into the main OGRE repo and made into a Plugin.
+In recent OGRE versions DotScene has been incorporated into the main OGRE repo as a Plugin.
 So it has to be loaded as another OGRE Plugin.
 
 In `plugins.cfg`, add the following line:
@@ -53,25 +58,22 @@ In `plugins.cfg`, add the following line:
 Plugin=Plugin_DotScene
 ```
 
-Include the header `#include <Ogre.h>`, located in: `OgreSDK\ogre-1.12.11\include\OGRE`
-
-And to use the library , create a DataStream and pass it to `Ogre::Codec`:
-```
-Ogre::String groupName = "Scene";
-Ogre::String filename = "myScene.scene";
+To use the Plugin, create a DataStream and pass it to `Ogre::Codec` as:
+```cpp
+Ogre::String groupName = "MyGroup";
 Ogre::SceneNode attachmentNode = mSceneMgr->getRootSceneNode();
 
-Ogre::DataStreamPtr stream(Ogre::Root::openFileStream(filename, groupName));
+auto stream = Ogre::Root::openFileStream("myScene.scene", groupName);
 
-Ogre::ResourceGroupManager::getSingletonPtr()->setWorldResourceGroupName(groupName);
+Ogre::ResourceGroupManager::getSingleton().setWorldResourceGroupName(groupName);
 Ogre::Codec::getCodec("scene")->decode(stream, mSceneMgr->getRootSceneNode());
 ```
+
+`Codec` is now a central registry for encoding/decoding data.
+Previously it was only used for Images, but now it also handles Meshes and Scenes.
 
 If there is a TerrainGroup defined in the .scene file, you can get it by:
 ```
 attachmentNode->getUserObjectBindings().getUserAny("TerrainGroup");
 ```
-The type is std::shared_ptr<Ogre::TerrainGroup>, hence the attachmentNode owns it and will take it down on destruction.
-
-The Codec is now a central registry for encoding/decoding data.
-Previously it was only used for Images, but now it also handles Meshes and Scenes.
+The type is `std::shared_ptr<Ogre::TerrainGroup>`, hence `attachmentNode` owns it and will take it down on destruction.
