@@ -307,7 +307,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot restore D3D9 buffer: " + msg);
         }
 
-        if(mType = D3DFMT_VERTEXDATA)
+        if(mType == D3DFMT_VERTEXDATA)
         {
             hr = static_cast<IDirect3DVertexBuffer9*>(bufferResources->mBuffer)->GetDesc(&mBufferDesc);
         }
@@ -405,7 +405,7 @@ namespace Ogre {
 
 
         // Lock the buffer.
-        if(mType = D3DFMT_VERTEXDATA)
+        if(mType == D3DFMT_VERTEXDATA)
         {
             hr = static_cast<IDirect3DVertexBuffer9*>(bufferResources->mBuffer)->Lock(
                 static_cast<UINT>(offset),
@@ -437,7 +437,7 @@ namespace Ogre {
         HRESULT hr;
 
         // Unlock the buffer.
-        if(mType = D3DFMT_VERTEXDATA)
+        if(mType == D3DFMT_VERTEXDATA)
         {
             hr = static_cast<IDirect3DVertexBuffer9*>(bufferResources->mBuffer)->Unlock();
         }
