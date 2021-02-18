@@ -47,16 +47,16 @@ To add logic properties to the scene you can use the `<userData>` node as follow
 
 ## How to use DotScene
 In recent OGRE3D versions DotScene has been incorporated into the main OGRE repo and made into a Plugin.
-So it has to be loaded in `plugins.cfg`, add the following line:
+So it has to be loaded as another OGRE Plugin.
+
+In `plugins.cfg`, add the following line:
 ```
 Plugin=Plugin_DotScene
 ```
-Also, it is required to complie against the library (in a similar fashion to OgreBites) located in: `OgreSDK\ogre-1.12.11\lib\OGRE`
 
-Include the header `#include <OgreDotSceneLoader.h>
-`, located in: `OgreSDK\ogre-1.12.11\include\OGRE\Plugins\DotScene`
+Include the header `#include <OgreDotSceneLoader.h>`, located in: `OgreSDK\ogre-1.12.11\include\OGRE\Plugins\DotScene`
 
-And to use the library , create a DataStream and pass it to the loader:
+And to use the library , create a DataStream and pass it to `Ogre::Codec`:
 ```
 Ogre::String groupName = "Scene";
 Ogre::String filename = "myScene.scene";
@@ -64,25 +64,15 @@ Ogre::SceneNode attachmentNode = mSceneMgr->getRootSceneNode();
 
 Ogre::DataStreamPtr stream(Ogre::Root::openFileStream(filename, groupName));
 
-Ogre::DotSceneLoader *loader = new Ogre::DotSceneLoader();
-loader->load(stream, groupName, attachmentNode );
+Ogre::ResourceGroupManager::getSingletonPtr()->setWorldResourceGroupName(groupName);
+Ogre::Codec::getCodec("scene")->decode(stream, mSceneMgr->getRootSceneNode());
 ```
 
-## How to use DotScene (DEPRECATED)
-This method is deprecated, but it is simpler and might be useful for someone who is still using older versions of OGRE3D.
+If there is a TerrainGroup defined in the .scene file, you can get it by:
+```
+attachmentNode->getUserObjectBindings().getUserAny("TerrainGroup");
+```
+The type is std::shared_ptr<Ogre::TerrainGroup>, hence the attachmentNode owns it and will take it down on destruction.
 
-Load the plugin (in `plugins.cfg`, add the following line):
-```
-Plugin=Plugin_DotScene
-```
-Include the header `#include <OgreSceneLoaderManager.h>
-`
-
-And to use the library , just call the loader from the Singleton:
-```
-Ogre::String filename = "myScene.scene";
-Ogre::String groupName = "Scene";
-Ogre::SceneNode attachmentNode = mSceneMgr->getRootSceneNode();
-
-Ogre::SceneLoaderManager::getSingletonPtr()->load(filename,  groupName, attachmentNode );
-```
+The Codec is now a central registry for encoding/decoding data. 
+Previously it was only used for Images, but now it also handles Meshes and Scenes.
