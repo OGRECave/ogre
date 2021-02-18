@@ -1,4 +1,3 @@
-
 # DotScene Overview
 
 DotScene (aka .scene) is just a standardized XML file format.
@@ -54,7 +53,7 @@ In `plugins.cfg`, add the following line:
 Plugin=Plugin_DotScene
 ```
 
-Include the header `#include <OgreDotSceneLoader.h>`, located in: `OgreSDK\ogre-1.12.11\include\OGRE\Plugins\DotScene`
+Include the header `#include <Ogre.h>`, located in: `OgreSDK\ogre-1.12.11\include\OGRE`
 
 And to use the library , create a DataStream and pass it to `Ogre::Codec`:
 ```
@@ -74,5 +73,5 @@ attachmentNode->getUserObjectBindings().getUserAny("TerrainGroup");
 ```
 The type is std::shared_ptr<Ogre::TerrainGroup>, hence the attachmentNode owns it and will take it down on destruction.
 
-The Codec is now a central registry for encoding/decoding data. 
+The Codec is now a central registry for encoding/decoding data.
 Previously it was only used for Images, but now it also handles Meshes and Scenes.
