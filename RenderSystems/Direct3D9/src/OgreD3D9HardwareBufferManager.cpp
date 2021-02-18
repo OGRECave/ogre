@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    D3D9HardwareBufferManager::D3D9HardwareBufferManager()
+    D3D9HardwareBufferManager::D3D9HardwareBufferManager() : mAutoHardwareBufferManagement(false)
     {
     }
     //-----------------------------------------------------------------------
@@ -51,7 +51,10 @@ namespace Ogre {
         bool useShadowBuffer)
     {
         assert (numVerts > 0);
-		auto impl = new D3D9HardwareBuffer(D3DFMT_VERTEXDATA, vertexSize * numVerts, usage, useShadowBuffer);
+        // Allocate the system memory buffer for restoring after device lost.
+        useShadowBuffer = useShadowBuffer || ((usage & HBU_DETAIL_WRITE_ONLY) && mAutoHardwareBufferManagement);
+
+        auto impl = new D3D9HardwareBuffer(D3DFMT_VERTEXDATA, vertexSize * numVerts, usage, useShadowBuffer);
         auto buf = std::make_shared<HardwareVertexBuffer>(this, vertexSize, numVerts, impl);
         {
             OGRE_LOCK_MUTEX(mVertexBuffersMutex);
@@ -66,6 +69,9 @@ namespace Ogre {
         HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
         assert (numIndexes > 0);
+        // Allocate the system memory buffer for restoring after device lost.
+        useShadowBuffer = useShadowBuffer || ((usage & HBU_DETAIL_WRITE_ONLY) && mAutoHardwareBufferManagement);
+
         auto indexSize = HardwareIndexBuffer::indexSize(itype);
         auto impl = new D3D9HardwareBuffer(D3D9Mappings::get(itype), indexSize * numIndexes, usage, useShadowBuffer);
 

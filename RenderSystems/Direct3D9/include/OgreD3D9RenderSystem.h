@@ -92,6 +92,8 @@ namespace Ogre
 
         bool mEnableFixedPipeline;
 
+        bool mAutoHardwareBufferManagement;
+
         /// structure holding texture unit settings for every stage
         struct sD3DTextureStageDesc
         {

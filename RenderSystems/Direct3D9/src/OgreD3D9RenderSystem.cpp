@@ -92,6 +92,7 @@ namespace Ogre
         mDeviceManager = NULL;  
         mPerStageConstantSupport = false;
         mEnableFixedPipeline = true;
+        mAutoHardwareBufferManagement = false;
 
 		for(int i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
 		{
@@ -590,9 +591,9 @@ namespace Ogre
         if (name == "Multi device memory hint")
         {
             if (value == "Use minimum system memory")
-                mResourceManager->setAutoHardwareBufferManagement(false);
+                mAutoHardwareBufferManagement = false;
             else if (value == "Auto hardware buffers management")
-                mResourceManager->setAutoHardwareBufferManagement(true);
+                mAutoHardwareBufferManagement = true;
         }       
 
         if (name == "Fixed Pipeline Enabled")
@@ -726,6 +727,7 @@ namespace Ogre
 
         // Also create hardware buffer manager      
         mHardwareBufferManager = OGRE_NEW D3D9HardwareBufferManager();
+        mHardwareBufferManager->setAutoHardwareBufferManagement(mAutoHardwareBufferManagement);
 
         // Create the GPU program manager       
         mGpuProgramManager = OGRE_NEW D3D9GpuProgramManager();
