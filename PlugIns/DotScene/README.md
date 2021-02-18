@@ -58,15 +58,15 @@ In `plugins.cfg`, add the following line:
 Plugin=Plugin_DotScene
 ```
 
-To use the Plugin, create a DataStream and pass it to `Ogre::Codec` as:
+To use the Plugin, create a DataStream and pass it to `Codec` as:
 ```cpp
-Ogre::String groupName = "MyGroup";
-Ogre::SceneNode attachmentNode = mSceneMgr->getRootSceneNode();
+auto groupName = "MyGroup";
+auto attachmentNode = mSceneMgr->getRootSceneNode();
 
-auto stream = Ogre::Root::openFileStream("myScene.scene", groupName);
+auto stream = Root::openFileStream("myScene.scene", groupName);
 
-Ogre::ResourceGroupManager::getSingleton().setWorldResourceGroupName(groupName);
-Ogre::Codec::getCodec("scene")->decode(stream, mSceneMgr->getRootSceneNode());
+ResourceGroupManager::getSingleton().setWorldResourceGroupName(groupName);
+Codec::getCodec("scene")->decode(stream, mSceneMgr->getRootSceneNode());
 ```
 
 `Codec` is now a central registry for encoding/decoding data.
