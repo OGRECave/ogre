@@ -37,7 +37,6 @@ namespace Ogre
     {
         mResourceCreationPolicy = RCP_CREATE_ON_ALL_DEVICES;
         mDeviceAccessLockCount = 0;
-        mAutoHardwareBufferManagement = false;
     }
 
     //-----------------------------------------------------------------------

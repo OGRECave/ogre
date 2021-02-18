@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreD3D9Device.h"
 #include "OgreD3D9ResourceManager.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre {
 
@@ -40,11 +41,7 @@ namespace Ogre {
     D3D9HardwareBuffer::D3D9HardwareBuffer(D3DFORMAT type, size_t sizeInBytes,
         Usage usage,
         bool useShadowBuffer)
-        : HardwareBuffer(usage, false,
-        useShadowBuffer || 
-        // Allocate the system memory buffer for restoring after device lost.
-        (((usage & HBU_DETAIL_WRITE_ONLY) != 0) &&
-            D3D9RenderSystem::getResourceManager()->getAutoHardwareBufferManagement()))
+        : HardwareBuffer(usage, false, useShadowBuffer)
     {
         mType = type;
         mSizeInBytes = sizeInBytes;
@@ -63,7 +60,12 @@ namespace Ogre {
             IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
 
             createBuffer(d3d9Device, mBufferDesc.Pool, false);
-        }                       
+        }
+
+        if (useShadowBuffer)
+        {
+            mShadowBuffer.reset(new DefaultHardwareBuffer(mSizeInBytes));
+        }
     }
     //---------------------------------------------------------------------
     D3D9HardwareBuffer::~D3D9HardwareBuffer()
