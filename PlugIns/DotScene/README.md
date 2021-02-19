@@ -43,3 +43,37 @@ To add logic properties to the scene you can use the `<userData>` node as follow
     </userData>
 </entity>
 ```
+
+On the C++ side, these are acessible via e.g.
+```cpp
+mSceneMgr->getEntity("Cube")->getUserObjectBindings().getUserAny("mass");
+```
+
+## How to use DotScene
+In recent OGRE versions DotScene has been incorporated into the main OGRE repo as a Plugin.
+So it has to be loaded as another OGRE Plugin.
+
+In `plugins.cfg`, add the following line:
+```
+Plugin=Plugin_DotScene
+```
+
+To use the Plugin, create a DataStream and pass it to `Codec` as:
+```cpp
+auto groupName = "MyGroup";
+auto attachmentNode = mSceneMgr->getRootSceneNode();
+
+auto stream = Root::openFileStream("myScene.scene", groupName);
+
+ResourceGroupManager::getSingleton().setWorldResourceGroupName(groupName);
+Codec::getCodec("scene")->decode(stream, mSceneMgr->getRootSceneNode());
+```
+
+`Codec` is now a central registry for encoding/decoding data.
+Previously it was only used for Images, but now it also handles Meshes and Scenes.
+
+If there is a TerrainGroup defined in the .scene file, you can get it by:
+```
+attachmentNode->getUserObjectBindings().getUserAny("TerrainGroup");
+```
+The type is `std::shared_ptr<Ogre::TerrainGroup>`, hence `attachmentNode` owns it and will take it down on destruction.
