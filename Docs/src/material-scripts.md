@@ -741,9 +741,16 @@ Default: max\_lights 8<br>
 
 Sets whether or not this pass is iterated, i.e. issued more than once.
 @par
-Format 1: iteration &lt;once | once\_per\_light&gt; \[lightType\] Format 2: iteration &lt;number&gt; \[&lt;per\_light&gt; \[lightType\]\] 
+Format 1: iteration &lt;once | once\_per\_light&gt; \[lightType\]
+
 @par
-Format 3: iteration &lt;number&gt; \[&lt;per\_n\_lights&gt; &lt;num\_lights&gt; \[lightType\]\] Examples:
+Format 2: iteration &lt;number&gt; \[&lt;per\_light&gt; \[lightType\]
+
+@par
+Format 3: iteration &lt;number&gt; \[&lt;per\_n\_lights&gt; &lt;num\_lights&gt; \[lightType\]
+
+@par
+Examples:
 
 <dl compact="compact">
 <dt>iteration once</dt> <dd>
