@@ -1699,32 +1699,6 @@ namespace Ogre {
         /// @{
         /** Sets the source of the 'world' geometry, i.e. the large, mainly static geometry
             making up the world e.g. rooms, landscape etc.
-            This function can be called before setWorldGeometry in a background thread, do to
-            some slow tasks (e.g. IO) that do not involve the backend render system.
-            @remarks
-                Depending on the type of SceneManager (subclasses will be specialised
-                for particular world geometry types) you have requested via the Root or
-                SceneManagerEnumerator classes, you can pass a filename to this method and it
-                will attempt to load the world-level geometry for use. If you try to load
-                an inappropriate type of world data an exception will be thrown. The default
-                SceneManager cannot handle any sort of world geometry and so will always
-                throw an exception. However subclasses like BspSceneManager can load
-                particular types of world geometry e.g. "q3dm1.bsp".
-
-        */
-        virtual void prepareWorldGeometry(const String& filename);
-
-        /** @overload
-            @param stream Data stream containing data to load
-            @param typeName String identifying the type of world geometry
-                contained in the stream - not required if this manager only 
-                supports one type of world geometry.
-        */
-        virtual void prepareWorldGeometry(DataStreamPtr& stream, 
-            const String& typeName = BLANKSTRING);
-
-        /** Sets the source of the 'world' geometry, i.e. the large, mainly static geometry
-            making up the world e.g. rooms, landscape etc.
             @remarks
                 Depending on the type of SceneManager (subclasses will be specialised
                 for particular world geometry types) you have requested via the Root or
@@ -1753,7 +1727,7 @@ namespace Ogre {
             custom world geometry that can take some time to load. They should
             return from this method a count of the number of stages of progress
             they can report on whilst loading. During real loading (setWorldGeometry),
-            they should call ResourceGroupManager::_notifyWorldGeometryProgress exactly
+            they should call ResourceGroupManager::_notifyCustomStage* exactly
             that number of times when loading the geometry for real.
         @note 
             The default is to return 0, ie to not report progress. 

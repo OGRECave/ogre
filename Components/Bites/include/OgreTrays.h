@@ -1119,13 +1119,13 @@ namespace OgreBites
             windowUpdate();
         }
 
-        void worldGeometryStageStarted(const Ogre::String& description)
+        void customStageStarted(const Ogre::String& description)
         {
             mLoadBar->setComment(description);
             windowUpdate();
         }
 
-        void worldGeometryStageEnded()
+        void customStageEnded()
         {
             mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
             windowUpdate();

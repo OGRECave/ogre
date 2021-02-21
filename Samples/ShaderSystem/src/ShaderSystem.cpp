@@ -1142,7 +1142,7 @@ void Sample_ShaderSystem::createPrivateResourceGroup()
     rgm.createResourceGroup(SAMPLE_MATERIAL_GROUP, false);
     rgm.addResourceLocation(mExportMaterialPath, "FileSystem", SAMPLE_MATERIAL_GROUP);      
     rgm.initialiseResourceGroup(SAMPLE_MATERIAL_GROUP);
-    rgm.loadResourceGroup(SAMPLE_MATERIAL_GROUP, true);
+    rgm.loadResourceGroup(SAMPLE_MATERIAL_GROUP);
 }
 
 //-----------------------------------------------------------------------
