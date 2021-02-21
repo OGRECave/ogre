@@ -53,9 +53,11 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
 
         // associate the world geometry with the world resource group, and then load the group
         ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
-        rgm.linkWorldGeometryToResourceGroup(rgm.getWorldResourceGroupName(), "maps/oa_rpg3dm2.bsp", mSceneMgr);
-        rgm.initialiseResourceGroup(rgm.getWorldResourceGroupName());
-        rgm.loadResourceGroup(rgm.getWorldResourceGroupName(), false);
+        rgm.setCustomStagesForResourceGroup("BSPWorld", mSceneMgr->estimateWorldGeometry("maps/oa_rpg3dm2.bsp"));
+        rgm.initialiseResourceGroup("BSPWorld");
+        rgm.loadResourceGroup("BSPWorld");
+        // one would register a ResourceGroupListener for this, if we were not to call it right away
+        mSceneMgr->setWorldGeometry("maps/oa_rpg3dm2.bsp");
 
         mTrayMgr->hideLoadingBar();
     }

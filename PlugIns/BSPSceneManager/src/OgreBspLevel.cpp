@@ -207,14 +207,14 @@ namespace Ogre {
         MaterialManager& mm = MaterialManager::getSingleton();
         ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
 
-        rgm._notifyWorldGeometryStageStarted("Parsing entities");
+        rgm._notifyCustomStageStarted("Parsing entities");
         loadEntities(q3lvl);
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
         // Extract lightmaps into textures
-        rgm._notifyWorldGeometryStageStarted("Extracting lightmaps");
+        rgm._notifyCustomStageStarted("Extracting lightmaps");
         q3lvl.extractLightmaps();
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
         //-----------------------------------------------------------------------
         // Vertices
@@ -233,12 +233,12 @@ namespace Ogre {
 
         // Build initial patches - we need to know how big the vertex buffer needs to be
         // to accommodate the subdivision
-        rgm._notifyWorldGeometryStageStarted("Initialising patches");
+        rgm._notifyCustomStageStarted("Initialising patches");
         initQuake3Patches(q3lvl, decl);
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
         /// Create the vertex buffer, allow space for patches
-        rgm._notifyWorldGeometryStageStarted("Setting up vertex data");
+        rgm._notifyCustomStageStarted("Setting up vertex data");
         HardwareVertexBufferSharedPtr vbuf = HardwareBufferManager::getSingleton()
             .createVertexBuffer(
                 sizeof(BspVertex), 
@@ -262,12 +262,12 @@ namespace Ogre {
         // Set other data
         mRenderOp.vertexData->vertexStart = 0;
         mRenderOp.vertexData->vertexCount = q3lvl.mNumVertices + mPatchVertexCount;
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
         //-----------------------------------------------------------------------
         // Faces
         // --------
-        rgm._notifyWorldGeometryStageStarted("Setting up face data");
+        rgm._notifyCustomStageStarted("Setting up face data");
         mNumLeafFaceGroups = q3lvl.mNumLeafFaces;
         mLeafFaceGroups = OGRE_ALLOC_T(int, mNumLeafFaceGroups, MEMCATEGORY_GEOMETRY);
         memcpy(mLeafFaceGroups, q3lvl.mLeafFaces, sizeof(int)*mNumLeafFaceGroups);
@@ -287,12 +287,12 @@ namespace Ogre {
         mRenderOp.indexData = OGRE_NEW IndexData();
         mRenderOp.indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_32BIT, numIndexes, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
         // now build patch information
-        rgm._notifyWorldGeometryStageStarted("Building patches");
+        rgm._notifyCustomStageStarted("Building patches");
         buildQuake3Patches(q3lvl.mNumVertices, q3lvl.mNumElements);
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
         //-----------------------------------------------------------------------
         // Create materials for shaders
@@ -328,12 +328,12 @@ namespace Ogre {
                 ++progressCount;
                 StringStream str;
                 str << "Loading materials (phase " << progressCount << ")"; 
-                rgm._notifyWorldGeometryStageStarted(str.str());
+                rgm._notifyCustomStageStarted(str.str());
             }
             else if (progressCountdown == 0)
             {
                 // stage report
-                rgm._notifyWorldGeometryStageEnded();
+                rgm._notifyCustomStageEnded();
                 progressCountdown = NUM_FACES_PER_PROGRESS_REPORT + 1; 
 
             }
@@ -490,7 +490,7 @@ namespace Ogre {
 
         }
         // final stage report
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
         //-----------------------------------------------------------------------
         // Nodes
@@ -514,12 +514,12 @@ namespace Ogre {
                 ++progressCount;
                 StringStream str;
                 str << "Loading nodes (phase " << progressCount << ")"; 
-                    rgm._notifyWorldGeometryStageStarted(str.str());
+                    rgm._notifyCustomStageStarted(str.str());
             }
             else if (progressCountdown == 0)
             {
                 // stage report
-                rgm._notifyWorldGeometryStageEnded();
+                rgm._notifyCustomStageEnded();
                 progressCountdown = NUM_NODES_PER_PROGRESS_REPORT + 1; 
 
             }
@@ -571,7 +571,7 @@ namespace Ogre {
 
         }
         // final stage report
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
         //-----------------------------------------------------------------------
         // Brushes
@@ -590,12 +590,12 @@ namespace Ogre {
                 ++progressCount;
                 StringStream str;
                 str << "Loading brushes (phase " << progressCount << ")"; 
-                    rgm._notifyWorldGeometryStageStarted(str.str());
+                    rgm._notifyCustomStageStarted(str.str());
             }
             else if (progressCountdown == 0)
             {
                 // stage report
-                rgm._notifyWorldGeometryStageEnded();
+                rgm._notifyCustomStageEnded();
                 progressCountdown = NUM_BRUSHES_PER_PROGRESS_REPORT + 1; 
 
             }
@@ -630,7 +630,7 @@ namespace Ogre {
 
         }
         // final stage report
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
 
 
@@ -647,12 +647,12 @@ namespace Ogre {
                 ++progressCount;
                 StringStream str;
                 str << "Loading leaves (phase " << progressCount << ")"; 
-                    rgm._notifyWorldGeometryStageStarted(str.str());
+                    rgm._notifyCustomStageStarted(str.str());
             }
             else if (progressCountdown == 0)
             {
                 // stage report
-                rgm._notifyWorldGeometryStageEnded();
+                rgm._notifyCustomStageEnded();
                 progressCountdown = NUM_LEAVES_PER_PROGRESS_REPORT + 1; 
 
             }
@@ -699,18 +699,18 @@ namespace Ogre {
 
         }
         // final stage report
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
 
 
         // Vis - just copy
         // final stage report
-        rgm._notifyWorldGeometryStageStarted("Copying Vis data");
+        rgm._notifyCustomStageStarted("Copying Vis data");
         mVisData.numClusters = q3lvl.mVis->cluster_count;
         mVisData.rowLength = q3lvl.mVis->row_size;
         mVisData.tableData = OGRE_ALLOC_T(unsigned char, q3lvl.mVis->row_size * q3lvl.mVis->cluster_count, MEMCATEGORY_GEOMETRY);
         memcpy(mVisData.tableData, q3lvl.mVis->data, q3lvl.mVis->row_size * q3lvl.mVis->cluster_count);
-        rgm._notifyWorldGeometryStageEnded();
+        rgm._notifyCustomStageEnded();
 
 
 

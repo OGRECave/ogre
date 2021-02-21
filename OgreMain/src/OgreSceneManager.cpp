@@ -1434,24 +1434,6 @@ void SceneManager::_restoreManualHardwareResources()
     }
 }
 //-----------------------------------------------------------------------
-void SceneManager::prepareWorldGeometry(const String& filename)
-{
-    // This default implementation cannot handle world geometry
-    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-        "World geometry is not supported by the generic SceneManager.",
-        "SceneManager::prepareWorldGeometry");
-}
-//-----------------------------------------------------------------------
-void SceneManager::prepareWorldGeometry(DataStreamPtr& stream, 
-    const String& typeName)
-{
-    // This default implementation cannot handle world geometry
-    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-        "World geometry is not supported by the generic SceneManager.",
-        "SceneManager::prepareWorldGeometry");
-}
-
-//-----------------------------------------------------------------------
 void SceneManager::setWorldGeometry(const String& filename)
 {
     // This default implementation cannot handle world geometry

@@ -92,7 +92,7 @@ namespace Ogre {
         grp->groupStatus = ResourceGroup::UNINITIALSED;
         grp->name = name;
         grp->inGlobalPool = inGlobalPool;
-        grp->worldGeometrySceneManager = 0;
+        grp->customStageCount = 0;
 
         OGRE_LOCK_AUTO_MUTEX;
         mResourceGroupMap.emplace(name, grp);
@@ -154,12 +154,9 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::prepareResourceGroup(const String& name, 
-        bool prepareMainResources, bool prepareWorldGeom)
+    void ResourceGroupManager::prepareResourceGroup(const String& name)
     {
-        LogManager::getSingleton().stream()
-            << "Preparing resource group '" << name << "' - Resources: "
-            << prepareMainResources << " World Geometry: " << prepareWorldGeom;
+        LogManager::getSingleton().stream() << "Preparing resource group '" << name << "'";
         // load all created resources
         ResourceGroup* grp = getResourceGroup(name);
         if (!grp)
@@ -177,69 +174,49 @@ namespace Ogre {
         // Count up resources for starting event
         ResourceGroup::LoadResourceOrderMap::iterator oi;
         size_t resourceCount = 0;
-        if (prepareMainResources)
+        for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
         {
-            for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
-            {
-                resourceCount += oi->second.size();
-            }
-        }
-        // Estimate world geometry size
-        if (grp->worldGeometrySceneManager && prepareWorldGeom)
-        {
-            resourceCount += 
-                grp->worldGeometrySceneManager->estimateWorldGeometry(
-                    grp->worldGeometry);
+            resourceCount += oi->second.size();
         }
 
         fireResourceGroupPrepareStarted(name, resourceCount);
 
         // Now load for real
-        if (prepareMainResources)
+        for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
         {
-            for (oi = grp->loadResourceOrderMap.begin(); 
-                oi != grp->loadResourceOrderMap.end(); ++oi)
+            size_t n = 0;
+            LoadUnloadResourceList::iterator l = oi->second.begin();
+            while (l != oi->second.end())
             {
-                size_t n = 0;
-                LoadUnloadResourceList::iterator l = oi->second.begin();
-                while (l != oi->second.end())
+                ResourcePtr res = *l;
+
+                // Fire resource events no matter whether resource needs preparing
+                // or not. This ensures that the number of callbacks
+                // matches the number originally estimated, which is important
+                // for progress bars.
+                fireResourcePrepareStarted(res);
+
+                // If preparing one of these resources cascade-prepares another resource,
+                // the list will get longer! But these should be prepared immediately
+                // Call prepare regardless, already prepared or loaded resources will be skipped
+                res->prepare();
+
+                fireResourcePrepareEnded();
+
+                ++n;
+
+                // Did the resource change group? if so, our iterator will have
+                // been invalidated
+                if (res->getGroup() != name)
                 {
-                    ResourcePtr res = *l;
-
-                    // Fire resource events no matter whether resource needs preparing
-                    // or not. This ensures that the number of callbacks
-                    // matches the number originally estimated, which is important
-                    // for progress bars.
-                    fireResourcePrepareStarted(res);
-
-                    // If preparing one of these resources cascade-prepares another resource, 
-                    // the list will get longer! But these should be prepared immediately
-                    // Call prepare regardless, already prepared or loaded resources will be skipped
-                    res->prepare();
-
-                    fireResourcePrepareEnded();
-
-                    ++n;
-
-                    // Did the resource change group? if so, our iterator will have
-                    // been invalidated
-                    if (res->getGroup() != name)
-                    {
-                        l = oi->second.begin();
-                        std::advance(l, n);
-                    }
-                    else
-                    {
-                        ++l;
-                    }
+                    l = oi->second.begin();
+                    std::advance(l, n);
+                }
+                else
+                {
+                    ++l;
                 }
             }
-        }
-        // Load World Geometry
-        if (grp->worldGeometrySceneManager && prepareWorldGeom)
-        {
-            grp->worldGeometrySceneManager->prepareWorldGeometry(
-                grp->worldGeometry);
         }
         fireResourceGroupPrepareEnded(name);
 
@@ -249,12 +226,9 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("Finished preparing resource group " + name);
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::loadResourceGroup(const String& name, 
-        bool loadMainResources, bool loadWorldGeom)
+    void ResourceGroupManager::loadResourceGroup(const String& name)
     {
-        LogManager::getSingleton().stream()
-            << "Loading resource group '" << name << "' - Resources: "
-            << loadMainResources << " World Geometry: " << loadWorldGeom;
+        LogManager::getSingleton().stream() << "Loading resource group '" << name << "'";
         // load all created resources
         ResourceGroup* grp = getResourceGroup(name);
         if (!grp)
@@ -271,70 +245,50 @@ namespace Ogre {
 
         // Count up resources for starting event
         ResourceGroup::LoadResourceOrderMap::iterator oi;
-        size_t resourceCount = 0;
-        if (loadMainResources)
+        size_t resourceCount = grp->customStageCount;
+        for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
         {
-            for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
-            {
-                resourceCount += oi->second.size();
-            }
-        }
-        // Estimate world geometry size
-        if (grp->worldGeometrySceneManager && loadWorldGeom)
-        {
-            resourceCount += 
-                grp->worldGeometrySceneManager->estimateWorldGeometry(
-                    grp->worldGeometry);
+            resourceCount += oi->second.size();
         }
 
         fireResourceGroupLoadStarted(name, resourceCount);
 
         // Now load for real
-        if (loadMainResources)
+        for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
         {
-            for (oi = grp->loadResourceOrderMap.begin(); 
-                oi != grp->loadResourceOrderMap.end(); ++oi)
+            size_t n = 0;
+            LoadUnloadResourceList::iterator l = oi->second.begin();
+            while (l != oi->second.end())
             {
-                size_t n = 0;
-                LoadUnloadResourceList::iterator l = oi->second.begin();
-                while (l != oi->second.end())
+                ResourcePtr res = *l;
+
+                // Fire resource events no matter whether resource is already
+                // loaded or not. This ensures that the number of callbacks
+                // matches the number originally estimated, which is important
+                // for progress bars.
+                fireResourceLoadStarted(res);
+
+                // If loading one of these resources cascade-loads another resource,
+                // the list will get longer! But these should be loaded immediately
+                // Call load regardless, already loaded resources will be skipped
+                res->load();
+
+                fireResourceLoadEnded();
+
+                ++n;
+
+                // Did the resource change group? if so, our iterator will have
+                // been invalidated
+                if (res->getGroup() != name)
                 {
-                    ResourcePtr res = *l;
-
-                    // Fire resource events no matter whether resource is already
-                    // loaded or not. This ensures that the number of callbacks
-                    // matches the number originally estimated, which is important
-                    // for progress bars.
-                    fireResourceLoadStarted(res);
-
-                    // If loading one of these resources cascade-loads another resource, 
-                    // the list will get longer! But these should be loaded immediately
-                    // Call load regardless, already loaded resources will be skipped
-                    res->load();
-
-                    fireResourceLoadEnded();
-
-                    ++n;
-
-                    // Did the resource change group? if so, our iterator will have
-                    // been invalidated
-                    if (res->getGroup() != name)
-                    {
-                        l = oi->second.begin();
-                        std::advance(l, n);
-                    }
-                    else
-                    {
-                        ++l;
-                    }
+                    l = oi->second.begin();
+                    std::advance(l, n);
+                }
+                else
+                {
+                    ++l;
                 }
             }
-        }
-        // Load World Geometry
-        if (grp->worldGeometrySceneManager && loadWorldGeom)
-        {
-            grp->worldGeometrySceneManager->setWorldGeometry(
-                grp->worldGeometry);
         }
         fireResourceGroupLoadEnded(name);
 
@@ -1334,23 +1288,23 @@ namespace Ogre {
             }
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::_notifyWorldGeometryStageStarted(const String& desc) const
+    void ResourceGroupManager::_notifyCustomStageStarted(const String& desc) const
     {
         OGRE_LOCK_AUTO_MUTEX;
         for (ResourceGroupListenerList::const_iterator l = mResourceGroupListenerList.begin();
             l != mResourceGroupListenerList.end(); ++l)
         {
-            (*l)->worldGeometryStageStarted(desc);
+            (*l)->customStageStarted(desc);
         }
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::_notifyWorldGeometryStageEnded(void) const
+    void ResourceGroupManager::_notifyCustomStageEnded(void) const
     {
         OGRE_LOCK_AUTO_MUTEX;
             for (ResourceGroupListenerList::const_iterator l = mResourceGroupListenerList.begin();
                 l != mResourceGroupListenerList.end(); ++l)
             {
-                (*l)->worldGeometryStageEnded();
+                (*l)->customStageEnded();
             }
     }
     //-----------------------------------------------------------------------
@@ -1728,36 +1682,30 @@ namespace Ogre {
         return vec;
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::linkWorldGeometryToResourceGroup(const String& group, 
-        const String& worldGeometry, SceneManager* sceneManager)
+    void ResourceGroupManager::setCustomStagesForResourceGroup(const String& group, uint32 stageCount)
     {
         ResourceGroup* grp = getResourceGroup(group);
         if (!grp)
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + group + "'", 
-                "ResourceGroupManager::linkWorldGeometryToResourceGroup");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                        "Cannot locate a resource group called '" + group + "'");
         }
 
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-
-        grp->worldGeometry = worldGeometry;
-        grp->worldGeometrySceneManager = sceneManager;
+        grp->customStageCount = stageCount;
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::unlinkWorldGeometryFromResourceGroup(const String& group)
+    uint32 ResourceGroupManager::getCustomStagesForResourceGroup(const String& group)
     {
         ResourceGroup* grp = getResourceGroup(group);
         if (!grp)
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot locate a resource group called '" + group + "'", 
-                "ResourceGroupManager::unlinkWorldGeometryFromResourceGroup");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                        "Cannot locate a resource group called '" + group + "'");
         }
 
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-        grp->worldGeometry = BLANKSTRING;
-        grp->worldGeometrySceneManager = 0;
+        return grp->customStageCount;
     }
     //-----------------------------------------------------------------------
     bool ResourceGroupManager::isResourceGroupInGlobalPool(const String& name) const

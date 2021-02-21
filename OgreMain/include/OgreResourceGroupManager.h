@@ -87,8 +87,8 @@ namespace Ogre {
         <li>resourceGroupLoadStarted</li>
         <li>resourceLoadStarted (*)</li>
         <li>resourceLoadEnded (*)</li>
-        <li>worldGeometryStageStarted (*)</li>
-        <li>worldGeometryStageEnded (*)</li>
+        <li>customStageStarted (*)</li>
+        <li>customStageEnded (*)</li>
         <li>resourceGroupLoadEnded</li>
         <li>resourceGroupPrepareStarted</li>
         <li>resourcePrepareStarted (*)</li>
@@ -153,7 +153,7 @@ namespace Ogre {
         /** This event is fired  when a resource group begins loading.
         @param groupName The name of the group being loaded
         @param resourceCount The number of resources which will be loaded, including
-            a number of stages required to load any linked world geometry
+            a number of custom stages required to load anything else
         */
         virtual void resourceGroupLoadStarted(const String& groupName, size_t resourceCount) {}
         /** This event is fired when a declared resource is about to be loaded. 
@@ -163,17 +163,17 @@ namespace Ogre {
         /** This event is fired when the resource has been loaded. 
         */
         virtual void resourceLoadEnded(void) {}
-        /** This event is fired when a stage of loading linked world geometry 
+        /** This event is fired when a custom loading stage
             is about to start. The number of stages required will have been 
             included in the resourceCount passed in resourceGroupLoadStarted.
-        @param description Text description of what was just loaded
+        @param description Text description of what is about to be done
         */
-        virtual void worldGeometryStageStarted(const String& description){}
-        /** This event is fired when a stage of loading linked world geometry 
+        virtual void customStageStarted(const String& description){}
+        /** This event is fired when a custom loading stage
             has been completed. The number of stages required will have been 
             included in the resourceCount passed in resourceGroupLoadStarted.
         */
-        virtual void worldGeometryStageEnded(void) {}
+        virtual void customStageEnded(void) {}
         /** This event is fired when a resource group finished loading. */
         virtual void resourceGroupLoadEnded(const String& groupName) {}
         /** This event is fired when a resource was just created.
@@ -319,10 +319,7 @@ namespace Ogre {
             // (e.g. skeletons and materials before meshes)
             typedef std::map<Real, LoadUnloadResourceList> LoadResourceOrderMap;
             LoadResourceOrderMap loadResourceOrderMap;
-            /// Linked world geometry, as passed to setWorldGeometry
-            String worldGeometry;
-            /// Scene manager to use with linked world geometry
-            SceneManager* worldGeometrySceneManager;
+            uint32 customStageCount;
             // in global pool flag - if true the resource will be loaded even a different   group was requested in the load method as a parameter.
             bool inGlobalPool;
 
@@ -451,14 +448,8 @@ namespace Ogre {
             When this method is called, this class will callback any ResourceGroupListener
             which have been registered to update them on progress. 
         @param name The name of the resource group to prepare.
-        @param prepareMainResources If true, prepares normal resources associated 
-            with the group (you might want to set this to false if you wanted
-            to just prepare world geometry in bulk)
-        @param prepareWorldGeom If true, prepares any linked world geometry
-            @see #linkWorldGeometryToResourceGroup
         */
-        void prepareResourceGroup(const String& name, bool prepareMainResources = true, 
-            bool prepareWorldGeom = true);
+        void prepareResourceGroup(const String& name);
 
         /** Loads a resource group.
 
@@ -471,14 +462,8 @@ namespace Ogre {
             When this method is called, this class will callback any ResourceGroupListeners
             which have been registered to update them on progress. 
         @param name The name of the resource group to load.
-        @param loadMainResources If true, loads normal resources associated 
-            with the group (you might want to set this to false if you wanted
-            to just load world geometry in bulk)
-        @param loadWorldGeom If true, loads any linked world geometry
-            @see #linkWorldGeometryToResourceGroup
         */
-        void loadResourceGroup(const String& name, bool loadMainResources = true, 
-            bool loadWorldGeom = true);
+        void loadResourceGroup(const String& name);
 
         /** Unloads a resource group.
 
@@ -824,27 +809,18 @@ namespace Ogre {
         /// Gets the resource group that 'world' resources will use.
         const String& getWorldResourceGroupName(void) const { return mWorldGroupName; }
 
-        /** Associates some world geometry with a resource group, causing it to 
-            be loaded / unloaded with the resource group.
-        @remarks
-            You would use this method to essentially defer a call to 
-            SceneManager::setWorldGeometry to the time when the resource group
-            is loaded. The advantage of this is that compatible scene managers 
-            will include the estimate of the number of loading stages for that
-            world geometry when the resource group begins loading, allowing you
-            to include that in a loading progress report. 
-        @param group The name of the resource group
-        @param worldGeometry The parameter which should be passed to setWorldGeometry
-        @param sceneManager The SceneManager which should be called
-        */
-        void linkWorldGeometryToResourceGroup(const String& group, 
-            const String& worldGeometry, SceneManager* sceneManager);
+        /** Declare the number custom loading stages for a resource group
 
-        /** Clear any link to world geometry from a resource group.
-        @remarks
-            Basically undoes a previous call to #linkWorldGeometryToResourceGroup.
+        This allows you to include them in a loading progress report.
+        @param group The name of the resource group
+        @param stageCount The number of extra stages
+        @see #addResourceGroupListener
+        @see #_notifyCustomStageStarted
+        @see #_notifyCustomStageEnded
         */
-        void unlinkWorldGeometryFromResourceGroup(const String& group);
+        void setCustomStagesForResourceGroup(const String& group, uint32 stageCount);
+
+        uint32 getCustomStagesForResourceGroup(const String& group);
 
             /** Checks the status of a resource group.
         @remarks
@@ -928,22 +904,18 @@ namespace Ogre {
         */
         void _notifyAllResourcesRemoved(ResourceManager* manager) const;
 
-        /** Notify this manager that one stage of world geometry loading has been 
-            started.
-        @remarks
-            Custom SceneManagers which load custom world geometry should call this 
-            method the number of times equal to the value they return from 
-            SceneManager::estimateWorldGeometry while loading their geometry.
+        /** Notify this manager that one custom loading stage has been started
+
+        User code should call this method the number of times equal to the value declared
+        in #setCustomStagesForResourceGroup.
         */
-        void _notifyWorldGeometryStageStarted(const String& description) const;
-        /** Notify this manager that one stage of world geometry loading has been 
-            completed.
-        @remarks
-            Custom SceneManagers which load custom world geometry should call this 
-            method the number of times equal to the value they return from 
-            SceneManager::estimateWorldGeometry while loading their geometry.
+        void _notifyCustomStageStarted(const String& description) const;
+        /** Notify this manager that one custom loading stage has been completed
+
+        User code should call this method the number of times equal to the value declared
+        #setCustomStagesForResourceGroup.
         */
-        void _notifyWorldGeometryStageEnded(void) const;
+        void _notifyCustomStageEnded(void) const;
 
         /** Get a list of the currently defined resource groups. 
         @note This method intentionally returns a copy rather than a reference in
