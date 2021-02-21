@@ -63,13 +63,16 @@ namespace Ogre {
     /** Structure containing the configuration for one shadow texture. */
     struct ShadowTextureConfig
     {
+        TextureType type;
         unsigned int width;
         unsigned int height;
         PixelFormat format;
         unsigned int fsaa;
         uint16      depthBufferPoolId;
 
-        ShadowTextureConfig() : width(512), height(512), format(PF_X8R8G8B8), fsaa(0), depthBufferPoolId(1) {}
+        ShadowTextureConfig()
+            : type(TEX_TYPE_2D), width(512), height(512), format(PF_X8R8G8B8), fsaa(0), depthBufferPoolId(1)
+        {}
     };
 
     typedef std::vector<ShadowTextureConfig> ShadowTextureConfigList;
