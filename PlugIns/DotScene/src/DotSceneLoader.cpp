@@ -74,7 +74,7 @@ Quaternion parseQuaternion(const pugi::xml_node& XMLNode)
         axis.z = StringConverter::parseReal(XMLNode.attribute("axisZ").value());
         Real angle = StringConverter::parseReal(XMLNode.attribute("angle").value());
 
-        orientation.FromAngleAxis(Angle(angle), axis);
+        orientation.FromAngleAxis(Radian(angle), axis);
     }
     else if (XMLNode.attribute("angleX"))
     {
@@ -751,7 +751,7 @@ void DotSceneLoader::processLightRange(pugi::xml_node& XMLNode, Light* pLight)
     Real falloff = getAttribReal(XMLNode, "falloff", 1.0);
 
     // Setup the light range
-    pLight->setSpotlightRange(Angle(inner), Angle(outer), falloff);
+    pLight->setSpotlightRange(Radian(inner), Radian(outer), falloff);
 }
 
 void DotSceneLoader::processLightAttenuation(pugi::xml_node& XMLNode, Light* pLight)
