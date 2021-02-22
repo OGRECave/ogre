@@ -159,6 +159,7 @@ namespace Ogre {
     void EGLWindow::create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                            const NameValuePairList* miscParams)
     {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         int samples = 0;
 
         if (miscParams)
@@ -208,6 +209,7 @@ namespace Ogre {
         mHeight = height;
 
         finaliseWindow();
+#endif
     }
 
     ::EGLSurface EGLWindow::createSurfaceFromWindow(::EGLDisplay display,

@@ -36,7 +36,9 @@ THE SOFTWARE.
 
 #include "OgreEGLSupport.h"
 #include "OgreEGLWindow.h"
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
 #include "OgreEGLRenderTexture.h"
+#endif
 
 
 namespace Ogre {
@@ -409,6 +411,10 @@ namespace Ogre {
 
     GLPBuffer* EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        return nullptr;
+#else
         return new EGLPBuffer(this, format, width, height);
+#endif
     }
 }
