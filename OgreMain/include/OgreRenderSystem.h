@@ -824,7 +824,7 @@ namespace Ogre
         Unlike other render states, stencilling is left for the application to turn
         on and off when it requires. This is because you are likely to want to change
         parameters between batches of arbitrary objects and control the ordering yourself.
-        In order to batch things this way, you'll want to use OGRE's Compositor stencil poass
+        In order to batch things this way, you'll want to use OGRE's Compositor stencil pass
         or separate render queue groups and register a RenderQueueListener to get notifications
         between batches.
 
