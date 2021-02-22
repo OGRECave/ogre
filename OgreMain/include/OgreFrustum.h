@@ -229,7 +229,7 @@ namespace Ogre
          */
         void setNearClipDistance(Real nearDist);
 
-        /** Sets the position of the near clipping plane.
+        /** Retrieves the distance from the frustum to the near clipping plane.
         */
         Real getNearClipDistance(void) const;
 
