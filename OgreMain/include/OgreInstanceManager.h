@@ -50,7 +50,7 @@ namespace Ogre
         This class takes care of managing batches automatically, so that more are created when
         needed, and reuse existing ones as much as possible; thus the user doesn't have to worry
         of managing all those low level issues.
-        @see InstanceBatch & @see InstancedEntity for more information.
+        See @ref InstanceBatch and see @ref InstancedEntity for more information.
 
     @remarks
         Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
