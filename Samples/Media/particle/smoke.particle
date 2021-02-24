@@ -27,7 +27,7 @@ particle_system Examples/Smoke
 	affector TextureAnimator
 	{
 		texcoord_count 15
-		duration 1
+		duration 4
 		random_offset true
 	}
 

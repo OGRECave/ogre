@@ -107,7 +107,7 @@ public:
         {
             float particle_time = 1.0f - (p->mTimeToLive / p->mTotalTimeToLive);
 
-            float speed = mDuration ? (p->mTimeToLive / mDuration) : 1.0f;
+            float speed = mDuration ? (p->mTotalTimeToLive / mDuration) : 1.0f;
             uint8 idx = uint8(particle_time * speed * mTexcoordCount + p->mRandomTexcoordOffset) % mTexcoordCount;
 
             p->mTexcoordIndex = idx + mTexcoordStart;
