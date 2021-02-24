@@ -198,7 +198,9 @@ namespace Ogre {
                         compileErrors << "Pass " << passNum <<
                             ": " << GpuProgram::getProgramTypeName(programType) + " program " << program->getName()
                             << " cannot be used - ";
-                        if (program->hasCompileError())
+                        if (program->hasCompileError() && program->getSource().empty())
+                            compileErrors << "resource not found.";
+                        else if (program->hasCompileError())
                             compileErrors << "compile error.";
                         else
                             compileErrors << "not supported.";
