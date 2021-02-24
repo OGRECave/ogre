@@ -92,7 +92,7 @@ namespace Ogre
                 deleg = GpuProgramManager::getSingleton().getByName(dn, RGN_AUTODETECT);
 
             // Silently ignore missing links
-            if(!deleg || !deleg->isSupported())
+            if(!deleg || (!deleg->isSupported() && !deleg->hasCompileError()))
                 continue;
 
             if (deleg->getType() != getType())
@@ -188,7 +188,7 @@ namespace Ogre
     bool UnifiedHighLevelGpuProgram::isSupported(void) const
     {
         // Supported if one of the delegates is
-        return _getDelegate().get() != 0;
+        return _getDelegate() && _getDelegate()->isSupported();
     }
     //-----------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::isSkeletalAnimationIncluded(void) const

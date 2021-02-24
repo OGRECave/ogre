@@ -242,7 +242,7 @@ namespace Ogre {
     /** Gets the name of the file used as source for this program. */
     const String& getSourceFile(void) const { return mFilename; }
     /** Gets the assembler source for this program. */
-    const String& getSource(void) const { return mSource; }
+    virtual const String& getSource(void) const { return mSource; }
     /// Set the program type (only valid before load)
     void setType(GpuProgramType t);
     /// Get the program type

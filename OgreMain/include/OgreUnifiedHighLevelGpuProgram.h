@@ -129,7 +129,12 @@ namespace Ogre {
 
         /** @copydoc GpuProgram::isSupported */
         bool isSupported(void) const;
-        
+
+        const String& getSource(void) const override
+        {
+            return _getDelegate() ? _getDelegate()->getSource() : BLANKSTRING;
+        }
+
         /** @copydoc GpuProgram::isSkeletalAnimationIncluded */
         bool isSkeletalAnimationIncluded(void) const;
 
