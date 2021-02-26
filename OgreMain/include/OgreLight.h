@@ -309,7 +309,7 @@ namespace Ogre {
         */
         void setPowerScale(Real power);
 
-        /** Returns the scaling factor which indicates the relative power of a 
+        /** Returns the scaling factor which indicates the relative power of a
             light.
         */
         Real getPowerScale(void) const;
@@ -419,7 +419,7 @@ namespace Ogre {
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);
 
-        /** Returns the index at which this light is in the current render. 
+        /** Returns the index at which this light is in the current render.
         @remarks
             Lights will be present in the in a list for every renderable,
             detected and sorted appropriately, and sometimes it's useful to know 
