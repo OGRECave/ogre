@@ -356,6 +356,8 @@ namespace Ogre {
         /** Create local rendertextures and other resources. Builds mLocalTextures.
         */
         void createResources(bool forResizeOnly);
+
+        void setupRenderTarget(RenderTarget* target, uint16 depthBufferId);
         
         /** Destroy local rendertextures and other resources.
         */

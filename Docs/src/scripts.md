@@ -326,21 +326,22 @@ Techniques can have the following nested elements:
 
 This declares a render texture for use in subsequent @ref Compositor-Target-Passes.
 @par
-Format: texture &lt;Name&gt; &lt;Width&gt; &lt;Height&gt; &lt;Pixel_Format&gt; \[&lt;MRT Pixel_Format2&gt;\] \[&lt;MRT Pixel_FormatN&gt;\] \[pooled\] \[gamma\] \[no\_fsaa\] \[depth\_pool &lt;poolId&gt;\] \[&lt;scope&gt;\]
+Format: texture &lt;name&gt; &lt;width&gt; &lt;height&gt; &lt;PixelFormat&gt; \[&lt;MRT Pixel_Format2&gt;\] \[&lt;MRT Pixel_FormatN&gt;\] \[pooled\] \[gamma\] \[no\_fsaa\] \[depth\_pool &lt;poolId&gt;\] \[&lt;scope&gt;\] \[&lt;cubic&gt;\]
 
-@param Name
+@param name
 A name to give the render texture, which must be unique within this compositor. This name is used to reference the texture in @ref Compositor-Target-Passes, when the texture is rendered to, and in @ref Compositor-Passes, when the texture is used as input to a material rendering a fullscreen quad.
 
-@param Width
-@param Height 
+@param width
+@param height
 @parblock
 The dimensions of the render texture. You can either specify a fixed width and height, or you can request that the texture is based on the physical dimensions of the viewport to which the compositor is attached. The options for the latter are either of
-- @c target_width and @c target_height
-- @c target_width_scaled &lt;factor&gt; and @c target_height_scaled &lt;factor&gt;
-
-where ’factor’ is the amount by which you wish to multiply the size of the main target to derive the dimensions.
+<ul>
+<li> @c target_width and @c target_height
+<li> @c target_width_scaled &lt;factor&gt; and @c target_height_scaled &lt;factor&gt;
+</ul>
+where &lt;factor&gt; is the amount by which you wish to multiply the size of the main target to derive the dimensions.
 @endparblock
-@param Pixel_Format
+@param PixelFormat
 The pixel format of the render texture. This affects how much memory it will take, what colour channels will be available, and what precision you will have within those channels.
 See Ogre::PixelFormat. You can in fact repeat this element if you wish. If you do so, that means that this render texture becomes a Multiple Render Target (MRT), when the GPU writes to multiple textures at once.
 
@@ -362,6 +363,9 @@ If present, this directive sets the scope for the texture for being accessed by 
 1. @c local_scope (which is also the default) means that only the compositor defining the texture can access it. 
 2. @c chain_scope means that the compositors after this compositor in the chain can reference its textures, and 
 3. @c global_scope means that the entire application can access the texture. This directive also affects the creation of the textures (global textures are created once and thus can’t be used with the pooled directive, and can’t rely on viewport size).
+
+@param cubic
+This texture is of type Ogre::TEX_TYPE_CUBE_MAP - i.e. made up of 6 2D textures which are pasted around the inside of a cube.
 
 @par
 Example: texture rt0 512 512 PF\_R8G8B8A8
@@ -478,11 +482,11 @@ Default: only\_initial off
 
 ## visibility\_mask
 
-Sets the visibility mask for any render\_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to Ogre::Viewport::setVisibilityMask.
+Sets the visibility mask for any render\_scene passes performed in this target pass. This is a bitmask (specified as decimal or hex) and maps to Ogre::Viewport::setVisibilityMask.
 @par
 Format: visibility\_mask &lt;mask&gt;
 @par
-Default: visibility\_mask 4294967295
+Default: visibility\_mask 0xFFFFFFFF
 
 <a name="compositor_005flod_005fbias"></a><a name="lod_005fbias"></a>
 

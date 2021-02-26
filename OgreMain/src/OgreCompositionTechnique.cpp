@@ -207,7 +207,7 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
             if(acceptTextureDegradation)
             {
                 // Don't care about exact format so long as something is supported
-                if(texMgr.getNativeFormat(TEX_TYPE_2D, *pfi, TU_RENDERTARGET) == PF_UNKNOWN)
+                if(texMgr.getNativeFormat(td->type, *pfi, TU_RENDERTARGET) == PF_UNKNOWN)
                 {
                     return false;
                 }
@@ -215,7 +215,7 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
             else
             {
                 // Need a format which is the same number of bits to pass
-                if (!texMgr.isEquivalentFormatSupported(TEX_TYPE_2D, *pfi, TU_RENDERTARGET))
+                if (!texMgr.isEquivalentFormatSupported(td->type, *pfi, TU_RENDERTARGET))
                 {
                     return false;
                 }
@@ -226,13 +226,13 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
         if( !Root::getSingleton().getRenderSystem()->getCapabilities()->
             hasCapability( RSC_MRT_DIFFERENT_BIT_DEPTHS ) && !td->formatList.empty() )
         {
-            PixelFormat nativeFormat = texMgr.getNativeFormat( TEX_TYPE_2D, td->formatList.front(),
+            PixelFormat nativeFormat = texMgr.getNativeFormat( td->type, td->formatList.front(),
                                                                 TU_RENDERTARGET );
             size_t nativeBits = PixelUtil::getNumElemBits( nativeFormat );
             for( PixelFormatList::iterator pfi = td->formatList.begin()+1;
                     pfi != td->formatList.end(); ++pfi )
             {
-                PixelFormat nativeTmp = texMgr.getNativeFormat( TEX_TYPE_2D, *pfi, TU_RENDERTARGET );
+                PixelFormat nativeTmp = texMgr.getNativeFormat( td->type, *pfi, TU_RENDERTARGET );
                 if( PixelUtil::getNumElemBits( nativeTmp ) != nativeBits )
                 {
                     return false;

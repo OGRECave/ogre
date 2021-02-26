@@ -96,7 +96,7 @@ void CompositorChain::createOriginalScene()
                 }
                 pass render_scene
                 {
-                    visibility_mask FFFFFFFF
+                    visibility_mask 0xFFFFFFFF
                     render_queues SKIES_EARLY SKIES_LATE
                 }
             }

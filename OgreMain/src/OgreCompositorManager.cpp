@@ -224,7 +224,7 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
     const String& localName,
     uint32 w, uint32 h, PixelFormat f, uint aa, const String& aaHint, bool srgb,
     CompositorManager::UniqueTextureSet& texturesAssigned, 
-    CompositorInstance* inst, CompositionTechnique::TextureScope scope)
+    CompositorInstance* inst, CompositionTechnique::TextureScope scope, TextureType type)
 {
     if (scope == CompositionTechnique::TS_GLOBAL) 
     {
@@ -233,7 +233,7 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
             "CompositorManager::getPooledTexture");
     }
 
-    TextureDef def(w, h, f, aa, aaHint, srgb);
+    TextureDef def(w, h, type, f, aa, aaHint, srgb);
 
     if (scope == CompositionTechnique::TS_CHAIN)
     {
