@@ -4828,6 +4828,7 @@ namespace Ogre{
                         bool pooled = false;
                         bool hwGammaWrite = false;
                         bool fsaa = true;
+                        auto type = TEX_TYPE_2D;
                         uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
                         CompositionTechnique::TextureScope scope = CompositionTechnique::TS_LOCAL;
                         Ogre::PixelFormatList formats;
@@ -4892,6 +4893,9 @@ namespace Ogre{
                                 break;
                             case ID_POOLED:
                                 pooled = true;
+                                break;
+                            case ID_CUBIC:
+                                type = TEX_TYPE_CUBE_MAP;
                                 break;
                             case ID_SCOPE_LOCAL:
                                 scope = CompositionTechnique::TS_LOCAL;
@@ -4972,6 +4976,7 @@ namespace Ogre{
                         CompositionTechnique::TextureDefinition *def = mTechnique->createTextureDefinition(atom0->value);
                         def->width = width;
                         def->height = height;
+                        def->type = type;
                         def->widthFactor = widthFactor;
                         def->heightFactor = heightFactor;
                         def->formatList = formats;
