@@ -206,7 +206,7 @@ namespace Ogre {
         */
         float getAttenuationQuadric(void) const { return mAttenuation[3]; }
 
-        /// get all attenuation params as (range, constant, linear, quadratic)
+        /// Returns all the attenuation params as (range, constant, linear, quadratic)
         const Vector4f& getAttenuation() const { return mAttenuation; }
 
 #ifdef OGRE_NODELESS_POSITIONING
@@ -294,7 +294,7 @@ namespace Ogre {
         */
         void setSpotlightNearClipDistance(Real nearClip) { mSpotNearClip = nearClip; }
         
-        /** Get the near clip plane distance to be used by spotlights that use light
+        /** Returns the near clip plane distance to be used by spotlights that use light
             clipping.
         */
         Real getSpotlightNearClipDistance() const { return mSpotNearClip; }
@@ -309,7 +309,7 @@ namespace Ogre {
         */
         void setPowerScale(Real power);
 
-        /** Set the scaling factor which indicates the relative power of a 
+        /** Returns the scaling factor which indicates the relative power of a
             light.
         */
         Real getPowerScale(void) const;
@@ -360,7 +360,7 @@ namespace Ogre {
         /** @copydoc MovableObject::getBoundingRadius */
         Real getBoundingRadius(void) const { return 0; /* not visible */ }
 
-        /** Gets the details of this light as a 4D vector.
+        /** Returns the details of this light as a 4D vector.
         @remarks
             Getting details of a light as a 4D vector can be useful for
             doing general calculations between different light types; for
@@ -419,7 +419,7 @@ namespace Ogre {
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);
 
-        /** Gets the index at which this light is in the current render. 
+        /** Returns the index at which this light is in the current render.
         @remarks
             Lights will be present in the in a list for every renderable,
             detected and sorted appropriately, and sometimes it's useful to know 
@@ -443,7 +443,7 @@ namespace Ogre {
         /** Tells the light to use the shadow far distance of the SceneManager
         */
         void resetShadowFarDistance(void);
-        /** Gets the maximum distance away from the camera that shadows
+        /** Returns the maximum distance away from the camera that shadows
             by this light will be visible.
         */
         Real getShadowFarDistance(void) const;
@@ -456,7 +456,7 @@ namespace Ogre {
         */
         void setShadowNearClipDistance(Real nearClip) { mShadowNearClipDist = nearClip; }
 
-        /** Get the near clip plane distance to be used by the shadow camera, if
+        /** Returns the near clip plane distance to be used by the shadow camera, if
             this light casts texture shadows.
         @remarks
             May be zero if the light doesn't have it's own near distance set;
@@ -480,7 +480,7 @@ namespace Ogre {
         */
         void setShadowFarClipDistance(Real farClip) { mShadowFarClipDist = farClip; }
 
-        /** Get the far clip plane distance to be used by the shadow camera, if
+        /** Returns the far clip plane distance to be used by the shadow camera, if
             this light casts texture shadows.
         @remarks
             May be zero if the light doesn't have it's own far distance set;
@@ -519,7 +519,7 @@ namespace Ogre {
         */
         void setCustomParameter(uint16 index, const Vector4& value);
 
-        /** Gets the custom value associated with this Light at the given index.
+        /** Returns the custom value associated with this Light at the given index.
         @param index Index of the parameter to retrieve
         @see setCustomParameter for full details.
         */
