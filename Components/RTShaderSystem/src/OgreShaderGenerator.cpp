@@ -1709,6 +1709,9 @@ void ShaderGenerator::SGTechnique::buildTargetRenderState()
 		assert(!(*itPass)->isIlluminationPass()); // this is not so important, but intended to be so here.
         (*itPass)->buildTargetRenderState();
     }
+
+    // Turn off the build destination technique flag.
+    mBuildDstTechnique = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1862,9 +1865,6 @@ void ShaderGenerator::SGScheme::validate()
     {
         if (curTechEntry->getBuildDestinationTechnique())
             curTechEntry->buildTargetRenderState();
-
-        // Turn off the build destination technique flag.
-        curTechEntry->setBuildDestinationTechnique(false);
     }
     
     // Mark this scheme as up to date.
@@ -1936,9 +1936,6 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName, const Strin
         {       
             // Build render state for each technique and Acquire the CPU/GPU programs.
             curTechEntry->buildTargetRenderState();
-
-            // Turn off the build destination technique flag.
-            curTechEntry->setBuildDestinationTechnique(false);
 
 			return true;
         }                   
