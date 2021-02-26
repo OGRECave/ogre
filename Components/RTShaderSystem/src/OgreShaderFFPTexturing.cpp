@@ -613,7 +613,7 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
     curParams.mTextureSamplerIndex = index;
     curParams.mTextureUnitState    = textureUnitState;
 
-    bool isGLES2 = Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos;
+    bool isGLES2 = ShaderGenerator::getSingleton().getTargetLanguage() == "glsles";
 
     switch (curParams.mTextureUnitState->getTextureType())
     {
@@ -651,6 +651,14 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
 
      curParams.mVSOutTextureCoordinateType = curParams.mVSInTextureCoordinateType;
      curParams.mTexCoordCalcMethod = getTexCalcMethod(curParams.mTextureUnitState);
+
+    // let TexCalcMethod override texture type, as it might be wrong for
+    // content_type shadow & content_type compositor
+    if (curParams.mTexCoordCalcMethod == TEXCALC_ENVIRONMENT_MAP_REFLECTION)
+    {
+        curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;
+        curParams.mTextureSamplerType = GCT_SAMPLERCUBE;
+    }
 
      if (curParams.mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
          curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;    
