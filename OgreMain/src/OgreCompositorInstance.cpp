@@ -485,7 +485,7 @@ void CompositorInstance::_compileTargetOperations(CompiledState &compiledState)
     /// Texture targets
     for (CompositionTargetPass *target : mTechnique->getTargetPasses())
     {        
-        TargetOperation ts(getTargetForTex(target->getOutputName()));
+        TargetOperation ts(getTargetForTex(target->getOutputName(), target->getOutputSlice()));
         /// Set "only initial" flag, visibilityMask and lodBias according to CompositionTargetPass.
         ts.onlyInitial = target->getOnlyInitial();
         ts.visibilityMask = target->getVisibilityMask();
@@ -1019,9 +1019,9 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
     CompositorManager::getSingleton().freePooledTextures(true);
 }
 //---------------------------------------------------------------------
-RenderTarget* CompositorInstance::getRenderTarget(const String& name)
+RenderTarget* CompositorInstance::getRenderTarget(const String& name, int slice)
 {
-    return getTargetForTex(name);
+    return getTargetForTex(name, slice);
 }
 
 CompositionTechnique::TextureDefinition*
@@ -1067,12 +1067,12 @@ CompositorInstance::resolveTexReference(const CompositionTechnique::TextureDefin
 }
 
 //-----------------------------------------------------------------------
-RenderTarget *CompositorInstance::getTargetForTex(const String &name)
+RenderTarget *CompositorInstance::getTargetForTex(const String &name, int slice)
 {
     // try simple texture
     LocalTextureMap::iterator i = mLocalTextures.find(name);
     if(i != mLocalTextures.end())
-        return i->second->getBuffer()->getRenderTarget();
+        return i->second->getBuffer(slice)->getRenderTarget();
 
     // try MRTs
     LocalMRTMap::iterator mi = mLocalMRTs.find(name);
@@ -1117,7 +1117,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
                     OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Referencing compositor that is later in the chain",
                         "CompositorInstance::getTargetForTex");
                 }
-                return refCompInst->getRenderTarget(texDef->refTexName);
+                return refCompInst->getRenderTarget(texDef->refTexName, slice);
             }
             case CompositionTechnique::TS_GLOBAL:
             {
@@ -1128,7 +1128,7 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
                     OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
                         "CompositorInstance::getTargetForTex");
                 }
-                return refComp->getRenderTarget(texDef->refTexName);
+                return refComp->getRenderTarget(texDef->refTexName, slice);
             }
             case CompositionTechnique::TS_LOCAL:
                 break; // handled by resolveTexReference

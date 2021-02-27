@@ -386,12 +386,12 @@ const TexturePtr& Compositor::getTextureInstance(const String& name, size_t mrtI
         
 }
 //---------------------------------------------------------------------
-RenderTarget* Compositor::getRenderTarget(const String& name)
+RenderTarget* Compositor::getRenderTarget(const String& name, int slice)
 {
     // try simple texture
     GlobalTextureMap::iterator i = mGlobalTextures.find(name);
     if(i != mGlobalTextures.end())
-        return i->second->getBuffer()->getRenderTarget();
+        return i->second->getBuffer(slice)->getRenderTarget();
 
     // try MRTs
     GlobalMRTMap::iterator mi = mGlobalMRTs.find(name);

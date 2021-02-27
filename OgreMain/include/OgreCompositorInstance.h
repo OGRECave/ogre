@@ -224,7 +224,7 @@ namespace Ogre {
             targets manually or any other modifications, the compositor instance 
             is in charge of this.
         */
-        RenderTarget* getRenderTarget(const String& name);
+        RenderTarget* getRenderTarget(const String& name, int slice = 0);
 
        
         /** Recursively collect target states (except for final Pass).
@@ -368,7 +368,7 @@ namespace Ogre {
 
         /** Get RenderTarget for a named local texture.
         */
-        RenderTarget *getTargetForTex(const String &name);
+        RenderTarget *getTargetForTex(const String &name, int slice);
         
         /** Get source texture name for a named local texture.
         @param name

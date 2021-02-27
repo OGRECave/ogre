@@ -133,7 +133,7 @@ namespace Ogre {
             targets manually or any other modifications, the compositor instance 
             is in charge of this.
         */
-        RenderTarget* getRenderTarget(const String& name);
+        RenderTarget* getRenderTarget(const String& name, int slice = 0);
 
     protected:
         /// @copydoc Resource::loadImpl
