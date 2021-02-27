@@ -850,7 +850,7 @@ namespace Ogre
             while(parent && parent->type == ANT_OBJECT)
             {
                 ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
-                if(obj->id == ID_COMPOSITOR)
+                if(obj->id == ID_TARGET || obj->id == ID_TARGET_OUTPUT)
                     return true;
                 parent = obj->parent;
             }
