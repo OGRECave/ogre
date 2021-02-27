@@ -277,6 +277,19 @@ void CompositorChain::setCompositorEnabled(size_t position, bool state)
     inst->setEnabled(state);
 }
 //-----------------------------------------------------------------------
+static const Quaternion& getCubemapRotation(int i)
+{
+    static const Quaternion CubemapRotations[6] = {
+        Quaternion(Degree(-90), Vector3::UNIT_Y), //+X
+        Quaternion(Degree(90), Vector3::UNIT_Y),  //-X
+        Quaternion(Degree(90), Vector3::UNIT_X),  //+Y
+        Quaternion(Degree(-90), Vector3::UNIT_X), //-Y
+        Quaternion::IDENTITY,                     //+Z
+        Quaternion(Degree(180), Vector3::UNIT_Y)  //-Z
+    };
+
+    return CubemapRotations[i];
+}
 void CompositorChain::preRenderTargetUpdate(const RenderTargetEvent& evt)
 {
     /// Compile if state is dirty
@@ -302,17 +315,30 @@ void CompositorChain::preRenderTargetUpdate(const RenderTargetEvent& evt)
     }
 
     /// Iterate over compiled state
-    CompositorInstance::CompiledState::iterator i;
-    for(i=mCompiledState.begin(); i!=mCompiledState.end(); ++i)
+    for(auto& op : mCompiledState)
     {
         /// Skip if this is a target that should only be initialised initially
-        if(i->onlyInitial && i->hasBeenRendered)
+        if(op.onlyInitial && op.hasBeenRendered)
             continue;
-        i->hasBeenRendered = true;
+        op.hasBeenRendered = true;
+
+        auto vp = op.target->getViewport(0);
+        if (!op.cameraOverride.empty())
+        {
+            SceneManager *sm = cam->getSceneManager();
+            cam = sm->getCamera(op.cameraOverride);
+            vp->setCamera(cam);
+        }
+
+        if (op.alignCameraToFace > -1)
+        {
+            cam->getParentSceneNode()->setOrientation(getCubemapRotation(op.alignCameraToFace));
+        }
+
         /// Setup and render
-        preTargetOperation(*i, i->target->getViewport(0), cam);
-        i->target->update();
-        postTargetOperation(*i, i->target->getViewport(0), cam);
+        preTargetOperation(op, vp, cam);
+        op.target->update();
+        postTargetOperation(op, vp, cam);
     }
 }
 //-----------------------------------------------------------------------

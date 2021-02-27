@@ -571,6 +571,7 @@ Here are the attributes you can use in a ’pass’ section of a .compositor scr
 -   [thread_groups](#thread_groups)
 -   [material\_scheme](#compositor_005fpass_005fmaterial_005fscheme)
 -   [quad_normals](#quad_normals)
+-   [camera](#camera)
 
 <a name="material"></a><a name="material-1"></a>
 
@@ -667,6 +668,19 @@ Format: quad_normals &lt;camera_far_corners_world_space|camera_far_corners_view_
 @par
 Default: None
 
+<a name="camera"></a>
+
+## camera
+
+Use a camera different from the output Viewport for rendering the scene into this target. Very useful for reflection effects like mirrors or water. The camera will be searched by name in the currently active scene and must be created prior to activating the compositor.
+
+The optional parameter @c align_to_face automatically rotates the camera towards the target cubemap face, when rendering to a cubic texture.
+
+@par
+Format: camera &lt;name&gt; [&lt;align_to_face&gt;]
+@par
+Default: None
+
 ## clear {#Clear-Section}
 
 For passes of type ’clear’, this section defines the buffer clearing parameters.  
@@ -681,7 +695,7 @@ Here are the attributes you can use in a ’clear’ section of a .compositor sc
 -   [depth\_value](#compositor_005fclear_005fdepth_005fvalue)
 -   [stencil\_value](#compositor_005fclear_005fstencil_005fvalue) <a name="compositor_005fclear_005fbuffers"></a><a name="buffers"></a>
 
-    ## buffers
+    ### buffers
 
     Sets the buffers cleared by this pass.
 
@@ -692,7 +706,7 @@ Here are the attributes you can use in a ’clear’ section of a .compositor sc
 
     <a name="compositor_005fclear_005fcolour_005fvalue"></a><a name="colour_005fvalue"></a>
 
-    ## colour\_value
+    ### colour\_value
 
     Set the colour used to fill the colour buffer by this pass, if the colour buffer is being cleared
     @par
@@ -704,7 +718,7 @@ Here are the attributes you can use in a ’clear’ section of a .compositor sc
 
     <a name="compositor_005fclear_005fdepth_005fvalue"></a><a name="depth_005fvalue"></a>
 
-    ## depth\_value
+    ### depth\_value
 
     Set the depth value used to fill the depth buffer by this pass, if the depth buffer is being cleared
     @par
@@ -714,7 +728,7 @@ Here are the attributes you can use in a ’clear’ section of a .compositor sc
 
     <a name="compositor_005fclear_005fstencil_005fvalue"></a><a name="stencil_005fvalue"></a>
 
-    ## stencil\_value
+    ### stencil\_value
 
     Set the stencil value used to fill the stencil buffer by this pass, if the stencil buffer is being cleared
     @par
@@ -742,7 +756,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 -   [pass\_op](#compositor_005fstencil_005fpass_005fop)
 -   [two\_sided](#compositor_005fstencil_005ftwo_005fsided) <a name="compositor_005fstencil_005fcheck"></a><a name="check"></a>
 
-    ## check
+    ### check
 
     Enables or disables the stencil check, thus enabling the use of the rest of the features in this section. The rest of the options in this section do nothing if the stencil check is off. 
     @par
@@ -750,7 +764,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     <a name="compositor_005fstencil_005fcomp_005ffunc"></a><a name="comp_005ffunc"></a>
 
-    ## comp\_func
+    ### comp\_func
 
     Sets the function used to perform the stencil comparison.
 
@@ -761,7 +775,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     <a name="compositor_005fstencil_005fref_005fvalue"></a><a name="ref_005fvalue"></a>
 
-    ## ref\_value
+    ### ref\_value
 
     Sets the reference value used to compare with the stencil buffer as described in [comp\_func](#compositor_005fstencil_005fcomp_005ffunc). 
     @par
@@ -771,7 +785,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     <a name="compositor_005fstencil_005fmask"></a><a name="mask"></a>
 
-    ## mask
+    ### mask
 
     Sets the mask used to compare with the stencil buffer as described in [comp\_func](#compositor_005fstencil_005fcomp_005ffunc). 
     @par
@@ -781,7 +795,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     <a name="compositor_005fstencil_005ffail_005fop"></a><a name="fail_005fop"></a>
 
-    ## fail\_op
+    ### fail\_op
 
     Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) and depth comparison is that both fail. 
     @par
@@ -824,7 +838,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     </dd> </dl> <a name="compositor_005fstencil_005fdepth_005ffail_005fop"></a><a name="depth_005ffail_005fop"></a>
 
-    ## depth\_fail\_op
+    ### depth\_fail\_op
 
     Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) passes but the depth comparison fails. 
 
@@ -835,7 +849,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     <a name="compositor_005fstencil_005fpass_005fop"></a><a name="pass_005fop"></a>
 
-    ## pass\_op
+    ### pass\_op
 
     Sets what to do with the stencil buffer value if the result of the stencil comparison ([comp\_func](#compositor_005fstencil_005fcomp_005ffunc)) and the depth comparison pass.  
     @par
@@ -845,7 +859,7 @@ Here are the attributes you can use in a ’stencil’ section of a .compositor 
 
     <a name="compositor_005fstencil_005ftwo_005fsided"></a><a name="two_005fsided"></a>
 
-    ## two\_sided
+    ### two\_sided
 
     Enables or disables two-sided stencil operations, which means the inverse of the operations applies to back-facing polygons.
     @par

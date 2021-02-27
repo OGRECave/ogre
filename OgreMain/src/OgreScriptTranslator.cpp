@@ -5139,7 +5139,7 @@ namespace Ogre{
         // The name is the type of the pass
         if(obj->values.empty() || obj->values.front()->type != ANT_ATOM)
         {
-            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, obj->file, obj->line);
+            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, obj->file, obj->line, "pass type missing");
             return;
         }
 
@@ -5387,6 +5387,30 @@ namespace Ogre{
                         else
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_CAMERA:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    else if (prop->values.size() > 2)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    else
+                    {
+                        if (!getValue(prop->values.front(), sval))
+                            return;
+                        mPass->setCameraName(sval);
+                        if (prop->values.back()->type == ANT_ATOM &&
+                            static_cast<AtomAbstractNode*>(prop->values.back().get())->id ==
+                                ID_ALIGN_TO_FACE)
+                        {
+                            mPass->setAlignCameraToFace(true);
                         }
                     }
                     break;

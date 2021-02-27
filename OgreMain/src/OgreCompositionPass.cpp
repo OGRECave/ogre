@@ -46,7 +46,8 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mQuadCornerModified(false),
     mQuad(-1, 1, 1, -1),
     mQuadFarCorners(false),
-    mQuadFarCornersViewSpace(false)
+    mQuadFarCornersViewSpace(false),
+    mAlignCameraToFace(false)
 {
 }
 //-----------------------------------------------------------------------

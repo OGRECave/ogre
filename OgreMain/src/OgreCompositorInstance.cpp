@@ -380,6 +380,9 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, const Compos
                     OGRE_NEW RSRestoreSchemeOperation(setSchemeOperation));
             }
 
+            finalState.cameraOverride = pass->getCameraName();
+            finalState.alignCameraToFace = pass->getAlignCameraToFace() ? target->getOutputSlice() : -1;
+
             finalState.findVisibleObjects = true;
 
             break;
