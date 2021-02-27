@@ -21,27 +21,13 @@ public:
         mInfo["Category"] = "Unsorted";
     }
 
-    StringVector getRequiredPlugins()
-    {
-        StringVector names;
-		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
-            names.push_back("Cg Program Manager");
-        return names;
-    }
-
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_1_4") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsles") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+        auto mat = MaterialManager::getSingleton().getByName("Examples/FresnelReflectionRefraction");
+        mat->load();
+        if (mat->getSupportedTechniques().empty())
         {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support advanced fragment"
-                " programs, so you cannot run this sample. Sorry!", "FresnelSample::testCapabilities");
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, mat->getUnsupportedTechniquesExplanation());
         }
     }
 
@@ -106,34 +92,12 @@ protected:
 
     void setupWater()
     {
-        mCamera->setAutoAspectRatio(false);
-        // create our reflection & refraction render textures, and setup their render targets
-        for (unsigned int i = 0; i < 2; i++)
-        {
-            TexturePtr tex = TextureManager::getSingleton().createManual(i == 0 ? "refraction" : "reflection",
-                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 512, 512, 0, PF_R8G8B8, TU_RENDERTARGET);
+        auto compositor = CompositorManager::getSingleton().addCompositor(mViewport, "Fresnel");
+        CompositorManager::getSingleton().setCompositorEnabled(mViewport, "Fresnel", true);
 
-            MaterialManager::getSingleton()
-                .getByName("Examples/FresnelReflectionRefraction", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
-                ->getTechnique(0)
-                ->getPass(0)
-                ->getTextureUnitState(tex->getName())
-                ->setTexture(tex);
+        // toggle reflection in camera
+        compositor->getRenderTarget("reflection")->addListener(this);
 
-            RenderTarget* rtt = tex->getBuffer()->getRenderTarget();
-            Viewport* vp = rtt->addViewport(mCamera);
-
-            // for refraction, only render submerged entities
-            // for reflection, only render surface entities
-            vp->setVisibilityMask(i == 0 ? SUBMERGED_MASK : SURFACE_MASK);
-            vp->setOverlaysEnabled(false);
-
-            // toggle reflection in camera
-            if(i == 1) rtt->addListener(this);
-
-            if (i == 0) mRefractionTarget = rtt;
-            else mReflectionTarget = rtt;
-        }
         mCamera->setAutoAspectRatio(true);
         // create our water plane mesh
         mWaterPlane = Plane(Vector3::UNIT_Y, 0);
@@ -255,8 +219,6 @@ protected:
         mFishSplines.clear();
 
         MeshManager::getSingleton().remove("water", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        TextureManager::getSingleton().remove("refraction", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        TextureManager::getSingleton().remove("reflection", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     const unsigned int NUM_FISH;
@@ -265,8 +227,6 @@ protected:
     const Real FISH_SCALE;
     std::vector<Entity*> mSurfaceEnts;
     std::vector<Entity*> mSubmergedEnts;
-    RenderTarget* mRefractionTarget;
-    RenderTarget* mReflectionTarget;
     Plane mWaterPlane;
     Entity* mWater;
     std::vector<SceneNode*> mFishNodes;

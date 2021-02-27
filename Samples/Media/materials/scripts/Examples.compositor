@@ -836,3 +836,26 @@ compositor CubeMap
         }
     }
 }
+
+compositor Fresnel
+{
+    technique
+    {
+        texture reflection 512 512 PF_BYTE_RGB
+        texture refraction 512 512 PF_BYTE_RGB
+        target reflection
+        {
+            visibility_mask 0x00F // SURFACE objects
+            input previous
+        }
+        target refraction
+        {
+            visibility_mask 0x0F0 // SUBMERGED objects
+            input previous
+        }
+        target_output
+        {
+            input previous
+        }
+    }
+}
