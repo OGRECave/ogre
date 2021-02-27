@@ -69,7 +69,11 @@ namespace Ogre {
         void setOutputName(const String &out);
         /** Get output local texture name */
         const String &getOutputName() const;
-        
+
+        /// sets the slice of output texture
+        void setOutputSlice(int slice) { mOutputSlice = slice; }
+        int getOutputSlice() const { return mOutputSlice; }
+
         /** Set "only initial" flag. This makes that this target pass is only executed initially 
             after the effect has been enabled.
         */
@@ -119,7 +123,7 @@ namespace Ogre {
         /** Get the scene LOD bias used by this pass 
         */
         float getLodBias();
-        
+
         /** Create a new pass, and return a pointer to it.
         */
         CompositionPass *createPass(CompositionPass::PassType type = CompositionPass::PT_RENDERQUAD);
@@ -175,6 +179,8 @@ namespace Ogre {
         String mMaterialScheme;
         /// Shadows option
         bool mShadowsEnabled;
+        /// Output Slice
+        int mOutputSlice;
     };
 
     /** @} */

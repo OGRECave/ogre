@@ -38,7 +38,8 @@ CompositionTargetPass::CompositionTargetPass(CompositionTechnique *parent):
     mVisibilityMask(0xFFFFFFFF),
     mLodBias(1.0f),
     mMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME), 
-    mShadowsEnabled(true)
+    mShadowsEnabled(true),
+    mOutputSlice(0)
 {
     if (Root::getSingleton().getRenderSystem())
     {

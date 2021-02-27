@@ -5055,11 +5055,18 @@ namespace Ogre{
         if(obj->id == ID_TARGET)
         {
             mTarget = technique->createTargetPass();
-            if(!obj->name.empty())
+            if(obj->name.empty())
             {
-                String name = obj->name;
+                compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
+                return;
+            }
+            mTarget->setOutputName(obj->name);
 
-                mTarget->setOutputName(name);
+            if(!obj->values.empty())
+            {
+                int val;
+                if(getInt(obj->values.front(), &val))
+                    mTarget->setOutputSlice(val);
             }
         }
         else if(obj->id == ID_TARGET_OUTPUT)
