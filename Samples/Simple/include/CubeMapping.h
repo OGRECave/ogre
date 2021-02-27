@@ -26,17 +26,6 @@ public:
         return SdkSample::frameRenderingQueued(evt);      // don't forget the parent updates!
     }
 
-    void preRenderTargetUpdate(const RenderTargetEvent& evt)
-    {
-        // point the camera in the right direction based on which face of the cubemap this is
-        mCubeCameraNode->setOrientation(Quaternion::IDENTITY);
-        if (evt.source == mTargets[0]) mCubeCameraNode->yaw(Degree(-90));
-        else if (evt.source == mTargets[1]) mCubeCameraNode->yaw(Degree(90));
-        else if (evt.source == mTargets[2]) mCubeCameraNode->pitch(Degree(90));
-        else if (evt.source == mTargets[3]) mCubeCameraNode->pitch(Degree(-90));
-        else if (evt.source == mTargets[5]) mCubeCameraNode->yaw(Degree(180));
-    }
-
 protected:
 
     void setupContent()
@@ -85,54 +74,25 @@ protected:
 
     void createCubeMap()
     {
+        // use compositors for easy referencing in material
+        CompositorManager::getSingleton().addCompositor(mViewport, "CubeMap");
+        CompositorManager::getSingleton().setCompositorEnabled(mViewport, "CubeMap", true);
+
         // create the camera used to render to our cubemap
         Camera* cubeCamera = mSceneMgr->createCamera("CubeMapCamera");
         cubeCamera->setFOVy(Degree(90));
         cubeCamera->setAspectRatio(1);
         cubeCamera->setNearClipDistance(5);
 
-        mCubeCameraNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        mCubeCameraNode->attachObject(cubeCamera);
-        mCubeCameraNode->setFixedYawAxis(false);
-
-        // create our dynamic cube map texture
-        TexturePtr tex = TextureManager::getSingleton().createManual("dyncubemap",
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_CUBE_MAP, 128, 128, 0, PF_R8G8B8, TU_RENDERTARGET);
-
-        MaterialManager::getSingleton()
-            .getByName("Examples/DynamicCubeMap", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
-            ->getTechnique(0)
-            ->getPass(0)
-            ->getTextureUnitState(0)
-            ->setTexture(tex);
-
-        // assign our camera to all 6 render targets of the texture (1 for each direction)
-        for (unsigned int i = 0; i < 6; i++)
-        {
-            mTargets[i] = tex->getBuffer(i)->getRenderTarget();
-            Viewport* vp = mTargets[i]->addViewport(cubeCamera);
-            vp->setVisibilityMask(0xF0);
-            vp->setOverlaysEnabled(false);
-            mTargets[i]->addListener(this);
-        }
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(cubeCamera);
     }
 
     void cleanupContent()
     {
-		for (unsigned int i = 0; i < 6; i++)
-		{
-			mTargets[i]->removeAllViewports();
-			mTargets[i]->removeListener(this);
-		}
-			
-		//mSceneMgr->destroyCamera(mCubeCamera);
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        TextureManager::getSingleton().remove("dyncubemap", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     Entity* mHead;
-    SceneNode* mCubeCameraNode;
-    RenderTarget* mTargets[6];
     SceneNode* mPivot;
     AnimationState* mFishSwim;
 };

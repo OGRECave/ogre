@@ -327,6 +327,7 @@ material Examples/DynamicCubeMap
 		{
 			texture_unit
 			{
+				content_type compositor CubeMap tex
 				tex_address_mode clamp
 				env_map cubic_reflection
 			}
