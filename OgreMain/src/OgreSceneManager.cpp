@@ -1067,28 +1067,17 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)
         {
             CompositorChain* currentChain = _getActiveCompositorChain();
-            if (!currentChain)
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                    "A pass that wishes to reference a compositor texture "
-                    "attempted to render in a pipeline without a compositor",
-                    "SceneManager::_setPass");
-            }
-            CompositorInstance* refComp = currentChain->getCompositor(pTex->getReferencedCompositorName());
-            if (refComp == 0)
-            {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                    "Invalid compositor content_type compositor name",
-                    "SceneManager::_setPass");
-            }
-            TexturePtr refTex = refComp->getTextureInstance(pTex->getReferencedTextureName(),
-                                                            pTex->getReferencedMRTIndex());
-            if (!refTex)
-            {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                    "Invalid compositor content_type texture name",
-                    "SceneManager::_setPass");
-            }
+            OgreAssert(currentChain, "A pass that wishes to reference a compositor texture "
+                                     "attempted to render in a pipeline without a compositor");
+            auto compName = pTex->getReferencedCompositorName();
+            CompositorInstance* refComp = currentChain->getCompositor(compName);
+            OgreAssert(refComp,
+                       ("Current CompositorChain does not contain compositor named " + compName).c_str());
+
+            auto texName = pTex->getReferencedTextureName();
+            TexturePtr refTex = refComp->getTextureInstance(texName, pTex->getReferencedMRTIndex());
+
+            OgreAssert(refTex, ("Compositor " + compName + " does not declare texture " + texName).c_str());
             pTex->_setTexturePtr(refTex);
         }
         mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
