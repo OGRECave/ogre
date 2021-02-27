@@ -870,6 +870,8 @@ namespace Ogre
         ID_THREAD_GROUPS,
         ID_RENDER_CUSTOM,
         ID_AUTO,
+        ID_CAMERA,
+        ID_ALIGN_TO_FACE,
 
         ID_END_BUILTIN_IDS
     };

@@ -117,12 +117,12 @@ namespace Ogre {
             TargetOperation()
             { 
             }
-            TargetOperation(RenderTarget *inTarget):
-                target(inTarget), currentQueueGroupID(0), visibilityMask(0xFFFFFFFF),
-                lodBias(1.0f),
-                onlyInitial(false), hasBeenRendered(false), findVisibleObjects(false), 
-                materialScheme(MaterialManager::DEFAULT_SCHEME_NAME), shadowsEnabled(true)
-            { 
+            TargetOperation(RenderTarget* inTarget)
+                : target(inTarget), currentQueueGroupID(0), visibilityMask(0xFFFFFFFF), lodBias(1.0f),
+                  onlyInitial(false), hasBeenRendered(false), findVisibleObjects(false),
+                  materialScheme(MaterialManager::DEFAULT_SCHEME_NAME), shadowsEnabled(true),
+                  alignCameraToFace(-1)
+            {
             }
             /// Target
             RenderTarget *target;
@@ -163,6 +163,9 @@ namespace Ogre {
             String materialScheme;
             /** Whether shadows will be enabled */
             bool shadowsEnabled;
+
+            String cameraOverride;
+            int alignCameraToFace;
         };
         typedef std::vector<TargetOperation> CompiledState;
         

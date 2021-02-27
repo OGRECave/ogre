@@ -1263,6 +1263,8 @@ namespace Ogre
         mIds["thread_groups"] = ID_THREAD_GROUPS;
         mIds["render_custom"] = ID_RENDER_CUSTOM;
         mIds["auto"] = ID_AUTO;
+        mIds["camera"] = ID_CAMERA;
+        mIds["align_to_face"] = ID_ALIGN_TO_FACE;
 
 		mLargestRegisteredWordId = ID_END_BUILTIN_IDS;
 	}
