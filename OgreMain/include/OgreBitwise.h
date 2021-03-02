@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#ifdef __FreeBSD__
+#ifdef bswap16
 #undef bswap16
 #undef bswap32
 #undef bswap64
