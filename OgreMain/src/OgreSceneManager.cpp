@@ -1265,40 +1265,29 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
             // Locate any lights which could be affecting the frustum
             findLightsAffectingFrustum(camera);
 
-            // Are we using any shadows at all?
-            if (isShadowTechniqueInUse() && vp->getShadowsEnabled())
+            // Prepare shadow textures if texture shadow based shadowing
+            // technique in use
+            if (isShadowTechniqueTextureBased() && vp->getShadowsEnabled())
             {
-                // Prepare shadow textures if texture shadow based shadowing
-                // technique in use
-                if (isShadowTechniqueTextureBased())
-                {
-                    OgreProfileGroup("prepareShadowTextures", OGREPROF_GENERAL);
+                OgreProfileGroup("prepareShadowTextures", OGREPROF_GENERAL);
 
-                    // *******
-                    // WARNING
-                    // *******
-                    // This call will result in re-entrant calls to this method
-                    // therefore anything which comes before this is NOT 
-                    // guaranteed persistent. Make sure that anything which 
-                    // MUST be specific to this camera / target is done 
-                    // AFTER THIS POINT
-                    prepareShadowTextures(camera, vp);
-                    // reset the cameras & viewport because of the re-entrant call
-                    mCameraInProgress = camera;
-                    mCurrentViewport = vp;
-                }
+                // *******
+                // WARNING
+                // *******
+                // This call will result in re-entrant calls to this method
+                // therefore anything which comes before this is NOT
+                // guaranteed persistent. Make sure that anything which
+                // MUST be specific to this camera / target is done
+                // AFTER THIS POINT
+                prepareShadowTextures(camera, vp);
+                // reset the cameras & viewport because of the re-entrant call
+                mCameraInProgress = camera;
+                mCurrentViewport = vp;
             }
         }
 
         // Invert vertex winding?
-        if (camera->isReflected())
-        {
-            mDestRenderSystem->setInvertVertexWinding(true);
-        }
-        else
-        {
-            mDestRenderSystem->setInvertVertexWinding(false);
-        }
+        mDestRenderSystem->setInvertVertexWinding(camera->isReflected());
 
         // Set the viewport - this is deliberately after the shadow texture update
         setViewport(vp);
