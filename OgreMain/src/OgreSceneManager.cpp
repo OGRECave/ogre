@@ -1370,6 +1370,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     // Notify camera of vis batches
     camera->_notifyRenderedBatches(mDestRenderSystem->_getBatchCount());
 
+    _popActiveMaterialScheme(vp->getMaterialScheme());
     Root::getSingleton()._popCurrentSceneManager(this);
 }
 //-----------------------------------------------------------------------
@@ -2469,6 +2470,8 @@ void SceneManager::manualRender(RenderOperation* rend,
     if (doBeginEndFrame)
         mDestRenderSystem->_endFrame();
 
+    if (vp)
+        _popActiveMaterialScheme(vp->getMaterialScheme());
 }
 //---------------------------------------------------------------------
 void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp,
@@ -2504,6 +2507,8 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
     if (doBeginEndFrame)
         mDestRenderSystem->_endFrame();
 
+    if (vp)
+        _popActiveMaterialScheme(vp->getMaterialScheme());
 }
 //---------------------------------------------------------------------
 void SceneManager::resetViewProjMode()
@@ -2743,7 +2748,25 @@ void SceneManager::setViewport(Viewport* vp)
     // Set viewport in render system
     mDestRenderSystem->_setViewport(vp);
     // Set the active material scheme for this viewport
-    MaterialManager::getSingleton().setActiveScheme(vp->getMaterialScheme());
+    _pushActiveMaterialScheme(vp->getMaterialScheme());
+}
+//---------------------------------------------------------------------
+void SceneManager::_pushActiveMaterialScheme(const String& scheme)
+{
+    if (mActiveMaterialSchemeStack.empty())
+        mActiveMaterialSchemeStack.push_back(MaterialManager::getSingleton().getActiveScheme());
+
+    mActiveMaterialSchemeStack.push_back(scheme);
+    MaterialManager::getSingleton().setActiveScheme(scheme);
+}
+//---------------------------------------------------------------------
+void SceneManager::_popActiveMaterialScheme(const String& scheme)
+{
+    assert(!mActiveMaterialSchemeStack.empty() && mActiveMaterialSchemeStack.back() == scheme && "Mismatched push/pop of active material scheme");
+    mActiveMaterialSchemeStack.pop_back();
+
+    if (!mActiveMaterialSchemeStack.empty())
+        MaterialManager::getSingleton().setActiveScheme(mActiveMaterialSchemeStack.back());
 }
 //---------------------------------------------------------------------
 void SceneManager::showBoundingBoxes(bool bShow) 
@@ -3308,6 +3331,7 @@ SceneManager::RenderContext* SceneManager::_pauseRendering()
 
     context->rsContext = mDestRenderSystem->_pauseFrame();
     mRenderQueue = 0;
+    _popActiveMaterialScheme(mCurrentViewport->getMaterialScheme());
     return context;
 }
 //---------------------------------------------------------------------

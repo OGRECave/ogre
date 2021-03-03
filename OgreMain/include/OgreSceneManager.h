@@ -908,6 +908,10 @@ namespace Ogre {
         void fireSceneManagerDestroyed();
         /** Internal method for setting the destination viewport for the next render. */
         void setViewport(Viewport *vp);
+        /** Internal method for storing current material scheme and using the one provided for current render. */
+        void _pushActiveMaterialScheme(const String& scheme);
+        /** Internal method for restoring material scheme before current render. */
+        void _popActiveMaterialScheme(const String& scheme);
 
         /** Flag that indicates if all of the scene node's bounding boxes should be shown as a wireframe. */
         bool mShowBoundingBoxes;      
@@ -944,6 +948,8 @@ namespace Ogre {
 
         CompositorChain* mActiveCompositorChain;
         bool mLateMaterialResolving;
+        typedef std::deque<String> ActiveMaterialSchemeStack;
+        ActiveMaterialSchemeStack mActiveMaterialSchemeStack;
 
         IlluminationRenderStage mIlluminationStage;
 
