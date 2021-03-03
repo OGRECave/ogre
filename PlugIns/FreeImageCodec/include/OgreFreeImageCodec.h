@@ -78,7 +78,7 @@ namespace Ogre {
         _OgreFreeImageCodecExport static void shutdown(void);
     };
 
-    class FreeImagePlugin : public Plugin
+    class _OgreFreeImageCodecExport FreeImagePlugin : public Plugin
     {
     public:
         const String& getName() const;

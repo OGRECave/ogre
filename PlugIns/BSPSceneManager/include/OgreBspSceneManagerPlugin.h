@@ -37,7 +37,7 @@ namespace Ogre
     class Quake3ShaderManager;
 
     /** Plugin instance for BSPSceneManager */
-    class BspSceneManagerPlugin : public Plugin
+    class _OgreBspPluginExport BspSceneManagerPlugin : public Plugin
     {
     public:
         BspSceneManagerPlugin();

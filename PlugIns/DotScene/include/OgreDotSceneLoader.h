@@ -66,7 +66,7 @@ protected:
     Ogre::ColourValue mBackgroundColour;
 };
 
-class DotScenePlugin : public Plugin
+class _OgreDotScenePluginExport DotScenePlugin : public Plugin
 {
     const String& getName() const;
 

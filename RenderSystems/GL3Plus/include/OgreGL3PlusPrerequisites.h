@@ -75,22 +75,6 @@ namespace Ogre {
 #define _CRT_SECURE_NO_DEPRECATE
 #endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
-#   ifdef RenderSystem_GL3Plus_EXPORTS
-#       define _OgreGL3PlusExport __declspec(dllexport)
-#   else
-#       if defined( __MINGW32__ )
-#           define _OgreGL3PlusExport
-#       else
-#           define _OgreGL3PlusExport __declspec(dllimport)
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#    define _OgreGL3PlusExport  __attribute__ ((visibility("default")))
-#else
-#    define _OgreGL3PlusExport
-#endif
-
 // Convenience macro from ARB_vertex_buffer_object spec
 #define GL_BUFFER_OFFSET(i) ((char *)(i))
 
@@ -127,5 +111,7 @@ namespace Ogre {
 #else
 #   define OGRE_CHECK_GL_ERROR(glFunc) { glFunc; }
 #endif
+
+#include "OgreGL3PlusExports.h"
 
 #endif //#ifndef __GL3PlusPrerequisites_H__
