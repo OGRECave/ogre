@@ -433,7 +433,7 @@ mark_as_advanced(
 ###################################################################
 include(ConfigureBuild)
 
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY}")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY}")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ###################################################################
