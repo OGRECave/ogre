@@ -331,7 +331,7 @@ cmake_dependent_option(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI "Include dear imgui in
 
 option(OGRE_BUILD_COMPONENT_HLMS "Build HLMS component" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_BITES "Build OgreBites component" TRUE "OGRE_BUILD_COMPONENT_OVERLAY" FALSE)
-cmake_dependent_option(OGRE_BUILD_COMPONENT_PYTHON "Build Python bindings" TRUE "NOT ANDROID" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_PYTHON "Build Python bindings" TRUE "NOT OGRE_STATIC" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_JAVA "Build Java (JNI) bindings" TRUE "NOT OGRE_STATIC OR ANDROID" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_CSHARP "Build Csharp bindings" TRUE "NOT OGRE_STATIC" FALSE)
 option(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM "Build RTShader System component" TRUE)
@@ -403,11 +403,6 @@ include(PrepareThreadingOptions)
 if (MSVC OR CMAKE_GENERATOR MATCHES Xcode)
 	option(OGRE_PROJECT_FOLDERS "Organize project into project folders." TRUE)
 endif ()
-
-if(OGRE_BUILD_COMPONENT_PYTHON AND OGRE_STATIC)
-  # must do it here so it propagates to all targets
-  set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-endif()
 
 # hide advanced options
 mark_as_advanced(
