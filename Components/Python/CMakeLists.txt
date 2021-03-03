@@ -37,6 +37,11 @@ else()
 endif()
 set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
 
+if(UNIX AND NOT APPLE)
+    # weakly link libpython on Linux to allow relocation
+    set(PYTHON_LIBRARIES "")
+endif()
+
 set(CMAKE_WARN_DEPRECATED OFF)
 swig_add_module(Ogre python ../../OgreMain/include/Ogre.i)
 swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
