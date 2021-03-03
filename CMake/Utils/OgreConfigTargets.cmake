@@ -277,8 +277,7 @@ function(ogre_config_plugin PLUGINNAME)
       set_target_properties(${PLUGINNAME} PROPERTIES PREFIX "")
     endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   endif (OGRE_STATIC)
-  # export only if static
-  ogre_install_target(${PLUGINNAME} ${OGRE_PLUGIN_PATH} ${OGRE_STATIC})
+  ogre_install_target(${PLUGINNAME} ${OGRE_PLUGIN_PATH} TRUE)
 
   if (OGRE_INSTALL_PDB)
     # install debug pdb files

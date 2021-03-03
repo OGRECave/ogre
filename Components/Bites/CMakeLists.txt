@@ -26,7 +26,7 @@ if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
   mark_as_advanced(XAW_LIBRARY)
 endif ()
 
-if (OGRE_STATIC)
+if (OGRE_STATIC OR OGRE_BITES_STATIC_PLUGINS)
   # Link to all enabled plugins
   if (OGRE_BUILD_PLUGIN_OCTREE)
     set(DEPENDENCIES ${DEPENDENCIES} Plugin_OctreeSceneManager)
@@ -149,6 +149,10 @@ target_include_directories(OgreBites PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<BUILD_INTERFACE:${NATIVE_INCLUDES}>"
   $<INSTALL_INTERFACE:include/OGRE/Bites>)
+
+if (OGRE_STATIC OR OGRE_BITES_STATIC_PLUGINS)
+  target_compile_definitions(OgreBites PRIVATE OGRE_BITES_STATIC_PLUGINS)
+endif()
 
 if(OGRE_STATIC AND APPLE AND OGRE_BUILD_PLUGIN_CG)
   # workaround so the Cg framework is found in the above condition

@@ -84,7 +84,7 @@ void ApplicationContextBase::closeApp()
         mRoot = NULL;
     }
 
-#ifdef OGRE_STATIC_LIB
+#ifdef OGRE_BITES_STATIC_PLUGINS
     mStaticPluginLoader.unload();
 #endif
 }
@@ -178,7 +178,7 @@ void ApplicationContextBase::createRoot()
     mRoot = OGRE_NEW Ogre::Root("");
 #else
     Ogre::String pluginsPath;
-#   ifndef OGRE_STATIC_LIB
+#   ifndef OGRE_BITES_STATIC_PLUGINS
     pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
 
     if (!Ogre::FileSystemLayer::fileExists(pluginsPath))
@@ -191,7 +191,7 @@ void ApplicationContextBase::createRoot()
                                 mFSLayer->getWritablePath("ogre.log"));
 #endif
 
-#ifdef OGRE_STATIC_LIB
+#ifdef OGRE_BITES_STATIC_PLUGINS
     mStaticPluginLoader.load();
 #endif
     mOverlaySystem = OGRE_NEW Ogre::OverlaySystem();
