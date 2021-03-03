@@ -42,7 +42,7 @@
     #endif
 #endif
 
-#ifdef OGRE_STATIC_LIB
+#ifdef OGRE_BITES_STATIC_PLUGINS
 // Static plugin headers
 #ifdef OGRE_STATIC_CgProgramManager
 #  include "OgreCgPlugin.h"
@@ -97,7 +97,7 @@
 void OgreBites::StaticPluginLoader::load()
 {
     using namespace Ogre;
-#ifdef OGRE_STATIC_LIB
+#ifdef OGRE_BITES_STATIC_PLUGINS
     Plugin* plugin = NULL;
 #ifdef OGRE_STATIC_GL
     plugin = OGRE_NEW GLPlugin();
