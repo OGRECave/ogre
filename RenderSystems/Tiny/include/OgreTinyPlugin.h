@@ -6,11 +6,12 @@
 #define __TinyPlugin_H__
 
 #include "OgrePlugin.h"
+#include "OgreTinyExports.h"
 
 namespace Ogre
 {
 /** Plugin instance for Tiny Manager */
-class TinyPlugin : public Plugin
+class _OgreTinyExport TinyPlugin : public Plugin
 {
 public:
     TinyPlugin();

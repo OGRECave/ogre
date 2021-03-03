@@ -10,6 +10,7 @@
 # Configure OpenGL 3+ RenderSystem build
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+list(APPEND HEADER_FILES ${PROJECT_BINARY_DIR}/include/OgreGL3PlusExports.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/gl3w.c")
 
@@ -31,6 +32,10 @@ target_include_directories(RenderSystem_GL3Plus PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include>")
 
 target_include_directories(RenderSystem_GL3Plus PUBLIC ${OPENGL_INCLUDE_DIR})
+
+generate_export_header(RenderSystem_GL3Plus
+    EXPORT_MACRO_NAME _OgreGL3PlusExport
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreGL3PlusExports.h)
 
 ogre_config_framework(RenderSystem_GL3Plus)
 ogre_config_plugin(RenderSystem_GL3Plus)

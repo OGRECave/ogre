@@ -8,6 +8,7 @@
 #-------------------------------------------------------------------
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+list(APPEND HEADER_FILES ${PROJECT_BINARY_DIR}/include/OgreTinyExports.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_definitions(${OGRE_VISIBILITY_FLAGS})

@@ -70,7 +70,7 @@ namespace Ogre {
         _OgreSTBICodecExport static void shutdown(void);
     };
 
-    class STBIPlugin : public Plugin
+    class _OgreSTBICodecExport STBIPlugin : public Plugin
     {
     public:
         const String& getName() const;

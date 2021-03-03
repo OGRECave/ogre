@@ -139,7 +139,7 @@ private:
     Real mAnimationSpeedModifier;
 };
 
-class AssimpPlugin : public Plugin
+class _OgreAssimpExport AssimpPlugin : public Plugin
 {
 public:
     const String& getName() const;
