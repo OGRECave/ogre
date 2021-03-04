@@ -119,8 +119,7 @@ namespace Ogre
         std::unique_ptr<RenderSystemCapabilitiesManager> mRenderSystemCapabilitiesManager;
 
         std::unique_ptr<SceneManagerEnumerator> mSceneManagerEnum;
-        typedef std::deque<SceneManager*> SceneManagerStack;
-        SceneManagerStack mSceneManagerStack;
+        SceneManager* mCurrentSceneManager;
 
         std::unique_ptr<ShadowTextureManager> mShadowTextureManager;
 
@@ -772,17 +771,17 @@ namespace Ogre
             This is only intended for internal use; it is only valid during the
             rendering of a frame.
         */
-        SceneManager* _getCurrentSceneManager(void) const { return mSceneManagerStack.empty() ? NULL : mSceneManagerStack.back(); }
-        /** Pushes the scene manager currently being used to render.
+        SceneManager* _getCurrentSceneManager(void) const { return mCurrentSceneManager; }
+        /** Sets the scene manager currently being used to render.
         @remarks
             This is only intended for internal use.
         */
-        void _pushCurrentSceneManager(SceneManager* sm);
-        /** Pops the scene manager currently being used to render.
-        @remarks
-        This is only intended for internal use.
-        */
-        void _popCurrentSceneManager(SceneManager* sm);
+        void _setCurrentSceneManager(SceneManager* sm) { mCurrentSceneManager = sm; }
+
+        /// @deprecated do not use
+        OGRE_DEPRECATED void _pushCurrentSceneManager(SceneManager* sm) {}
+        /// @deprecated do not use
+        OGRE_DEPRECATED void _popCurrentSceneManager(SceneManager* sm) {}
 
         /** Internal method used for updating all RenderTarget objects (windows, 
             renderable textures etc) which are set to auto-update.
