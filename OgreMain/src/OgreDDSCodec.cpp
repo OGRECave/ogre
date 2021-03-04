@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre {
     // Internal DDS structure definitions
-#define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
-    
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #pragma pack (push, 1)
 #else
