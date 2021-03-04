@@ -108,6 +108,8 @@ THE SOFTWARE.
 #   include "OgreZip.h"
 #endif
 
+#define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
+
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #define OGRE_IGNORE_DEPRECATED_BEGIN __pragma(warning(push)) \
     __pragma(warning(disable:4996))

@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreETCCodec.h"
 #include "OgreImage.h"
 
-#define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
 #define KTX_ENDIAN_REF      (0x04030201)
 #define KTX_ENDIAN_REF_REV  (0x01020304)
 
