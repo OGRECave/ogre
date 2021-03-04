@@ -98,6 +98,7 @@ namespace Ogre {
     Root::Root(const String& pluginFileName, const String& configFileName,
         const String& logFileName)
       : mQueuedEnd(false)
+      , mCurrentSceneManager(NULL)
       , mNextFrame(0)
       , mFrameSmoothingTime(0.0f)
       , mRemoveQueueStructuresOnClear(false)
@@ -501,18 +502,6 @@ namespace Ogre {
     void Root::addRenderSystem(RenderSystem *newRend)
     {
         mRenderers.push_back(newRend);
-    }
-    //-----------------------------------------------------------------------
-    void Root::_pushCurrentSceneManager(SceneManager* sm)
-    {
-        mSceneManagerStack.push_back(sm);
-    }
-    //-----------------------------------------------------------------------
-    void Root::_popCurrentSceneManager(SceneManager* sm)
-    {
-        assert (_getCurrentSceneManager() == sm && "Mismatched push/pop of SceneManager");
-
-        mSceneManagerStack.pop_back();
     }
     //-----------------------------------------------------------------------
     RenderSystem* Root::getRenderSystem(void)

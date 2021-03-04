@@ -1188,7 +1188,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     assert(camera);
     OgreProfileGroup(camera->getName(), OGREPROF_GENERAL);
 
-    Root::getSingleton()._pushCurrentSceneManager(this);
+    auto prevSceneManager = Root::getSingleton()._getCurrentSceneManager();
+    Root::getSingleton()._setCurrentSceneManager(this);
     mActiveQueuedRenderableVisitor->targetSceneMgr = this;
     mAutoParamDataSource->setCurrentSceneManager(this);
 
@@ -1370,7 +1371,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     // Notify camera of vis batches
     camera->_notifyRenderedBatches(mDestRenderSystem->_getBatchCount());
 
-    Root::getSingleton()._popCurrentSceneManager(this);
+    Root::getSingleton()._setCurrentSceneManager(prevSceneManager);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
