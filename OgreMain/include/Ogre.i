@@ -494,6 +494,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::GpuProgramParameters::getPassIterationNumberIndex; // deprecated
 %ignore Ogre::GpuProgramParameters::getConstantDefinitionIterator;
 %ignore Ogre::GpuSharedParameters::getConstantDefinitionIterator;
+SHARED_PTR(GpuProgramParameters);
 %include "OgreGpuProgramParams.h"
 %include "OgreImage.h"
 %include "OgreBillboard.h"
