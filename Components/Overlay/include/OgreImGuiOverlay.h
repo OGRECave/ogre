@@ -13,9 +13,6 @@
 #ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
 	#include <implot.h>
 #endif
-#ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
-	#include <implot.h>
-#endif
 
 namespace Ogre
 {
