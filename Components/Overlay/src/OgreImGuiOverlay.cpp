@@ -4,9 +4,6 @@
 
 #include <imgui.h>
 #include <imgui_freetype.h>
-#ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
-	#include <implot.h>
-#endif
 #include <OgreImGuiOverlay.h>
 #include <OgreHardwareBufferManager.h>
 #include <OgreHardwarePixelBuffer.h>
@@ -36,6 +33,12 @@ ImGuiOverlay::ImGuiOverlay() : Overlay("ImGuiOverlay")
 
     io.BackendPlatformName = "OGRE";
 }
+#ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
+ImPlotContext* ImGuiOverlay::get_implot(void){
+
+return ImPlot::GetCurrentContext();
+}
+#endif
 ImGuiOverlay::~ImGuiOverlay()
 {
     #ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
