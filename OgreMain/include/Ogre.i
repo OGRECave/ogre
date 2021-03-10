@@ -290,7 +290,7 @@ ADD_REPR(Vector)
 %template(Vector ## N) Ogre::Vector<N, Ogre::Real>;
 
 %extend Ogre::Vector<N, Ogre::Real> {
-    void __setitem__(int i, float v) { (*$self)[i] = v; }
+    void __setitem__(uint i, float v) { (*$self)[i] = v; }
 }
 %enddef
 
@@ -301,6 +301,23 @@ ADD_REPR(Vector)
 TPL_VECTOR(2)
 TPL_VECTOR(3)
 TPL_VECTOR(4)
+
+#ifdef SWIGCSHARP
+%define CS_VECTOR_OPS(N)
+%extend Ogre::Vector<N, Ogre::Real> {
+    %proxycode %{
+    public static Vector ## N operator+(Vector ## N lhs, Vector ## N rhs) { return lhs.__add__(rhs); }
+    public static Vector ## N operator-(Vector ## N lhs, Vector ## N rhs) { return lhs.__sub__(rhs); }
+    public static Vector ## N operator*(Vector ## N lhs, Vector ## N rhs) { return lhs.__mul__(rhs); }
+    public static Vector ## N operator/(Vector ## N lhs, Vector ## N rhs) { return lhs.__div__(rhs); }
+    public float this[uint i] { get { return __getitem__(i); } set { __setitem__(i, value); } }
+    %}
+}
+%enddef
+CS_VECTOR_OPS(2);
+CS_VECTOR_OPS(3);
+CS_VECTOR_OPS(4);
+#endif
 
 #ifdef SWIGPYTHON
 // enable implicit conversion from float to Radian
