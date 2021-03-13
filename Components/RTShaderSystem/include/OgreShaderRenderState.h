@@ -195,7 +195,7 @@ protected:
     
     /** Create CPU programs that represent this render state.   
     */
-    void createCpuPrograms();
+    void createCpuPrograms(const String& desc);
 
     /** Create the program set of this render state.
     */

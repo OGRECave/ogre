@@ -66,7 +66,6 @@ void ProgramWriter::writeFunctionTitle(std::ostream& os, Function* function)
 {
     os << "//-----------------------------------------------------------------------------" << std::endl;
     os << "// Function Name: " <<  function->getName() << std::endl;
-    os << "// Function Desc: " <<  function->getDescription() << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
 }
 

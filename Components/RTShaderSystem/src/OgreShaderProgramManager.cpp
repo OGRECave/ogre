@@ -278,14 +278,16 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 
     // Generate program name.
     String programName = generateHash(source, shaderProgram->getPreprocessorDefines());
-
+    const char* programType = " ";
     if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
     {
         programName += "_VS";
+        programType = " vertex shader ";
     }
     else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
     {
         programName += "_FS";
+        programType = " fragment shader ";
     }
 
     // Try to get program by name.
@@ -294,6 +296,12 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
             programName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 
     if(pGpuProgram) {
+        if (!cachePath.empty())
+            LogManager::getSingleton().logMessage(shaderProgram->getEntryPointFunction()->getDescription()
+                + programType
+                + "cached as "
+                + programName
+                );
         return static_pointer_cast<GpuProgram>(pGpuProgram);
     }
 
@@ -313,6 +321,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
         programFile.open(programFileName.c_str());
 
         // Case we have to write the program to a file.
+        const char* loadStore;
         if (!programFile)
         {
             std::ofstream outFile(programFileName.c_str());
@@ -322,6 +331,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 
             outFile << source;
             outFile.close();
+            loadStore = "stored to ";
         }
         else
         {
@@ -329,7 +339,14 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
             StringStream buffer;
             programFile >> buffer.rdbuf();
             source = buffer.str();
+            loadStore = "loaded from ";
         }
+
+        LogManager::getSingleton().logMessage(shaderProgram->getEntryPointFunction()->getDescription()
+            + programType
+            + loadStore
+            + programFileName
+            );
     }
 
     pGpuProgram->setSource(source);

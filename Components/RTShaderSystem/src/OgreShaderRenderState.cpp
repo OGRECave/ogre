@@ -144,7 +144,10 @@ void TargetRenderState::bindUniformParameters(Program* pCpuProgram, const GpuPro
 
 void TargetRenderState::acquirePrograms(Pass* pass)
 {
-    createCpuPrograms();
+    auto desc = StringUtil::format("pass %d of '%s'",
+        pass->getIndex(),
+        pass->getParent()->getParent()->getName().c_str());
+    createCpuPrograms(desc);
 
     try
     {
@@ -152,9 +155,7 @@ void TargetRenderState::acquirePrograms(Pass* pass)
     }
     catch(Ogre::Exception& e)
     {
-        LogManager::getSingleton().logError(StringUtil::format("RTSS - creating GpuPrograms for pass %d of '%s' failed",
-                                                               pass->getIndex(),
-                                                               pass->getParent()->getParent()->getName().c_str()));
+        LogManager::getSingleton().logError(StringUtil::format("RTSS - creating GpuPrograms for %s failed", desc.c_str());
         throw;
     }
 
@@ -210,15 +211,15 @@ static void fixupFFPLighting(TargetRenderState* renderState)
 }
 
 //-----------------------------------------------------------------------
-void TargetRenderState::createCpuPrograms()
+void TargetRenderState::createCpuPrograms(const String& desc)
 {
     sortSubRenderStates();
 
     fixupFFPLighting(this);
 
     ProgramSet* programSet = createProgramSet();
-    programSet->setCpuProgram(std::unique_ptr<Program>(new Program(GPT_VERTEX_PROGRAM)));
-    programSet->setCpuProgram(std::unique_ptr<Program>(new Program(GPT_FRAGMENT_PROGRAM)));
+    programSet->setCpuProgram(std::unique_ptr<Program>(new Program(GPT_VERTEX_PROGRAM, desc)));
+    programSet->setCpuProgram(std::unique_ptr<Program>(new Program(GPT_FRAGMENT_PROGRAM, desc)));
 
     for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
     {

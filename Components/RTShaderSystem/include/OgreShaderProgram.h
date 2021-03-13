@@ -200,7 +200,7 @@ protected:
     /** Class constructor.
     @param type The type of this program.
     */
-    Program(GpuProgramType type);
+    Program(GpuProgramType type, const String& desc = String());
 
     /** Destroy all parameters of this program. */
     void destroyParameters();

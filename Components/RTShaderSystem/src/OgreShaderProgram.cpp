@@ -31,11 +31,11 @@ namespace Ogre {
 namespace RTShader {
 
 //-----------------------------------------------------------------------------
-Program::Program(GpuProgramType type)
+Program::Program(GpuProgramType type, const String& desc)
 {
     mType               = type;
     // all programs must have an entry point, nobody cares about FFT
-    mEntryPointFunction = new Function("main", "", Function::FFT_VS_MAIN);
+    mEntryPointFunction = new Function("main", desc, Function::FFT_VS_MAIN);
     mSkeletalAnimation  = false;
     mColumnMajorMatrices = true;
 
