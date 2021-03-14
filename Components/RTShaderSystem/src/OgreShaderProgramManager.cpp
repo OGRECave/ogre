@@ -278,16 +278,13 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 
     // Generate program name.
     String programName = generateHash(source, shaderProgram->getPreprocessorDefines());
-    const char* programType = " ";
     if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
     {
         programName += "_VS";
-        programType = " vertex shader ";
     }
     else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
     {
         programName += "_FS";
-        programType = " fragment shader ";
     }
 
     // Try to get program by name.
@@ -298,8 +295,8 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     if(pGpuProgram) {
         if (!cachePath.empty())
             LogManager::getSingleton().logMessage(shaderProgram->getEntryPointFunction()->getDescription()
-                + programType
-                + "cached as "
+                + ' ' + to_string(shaderProgram->getType())
+                + " shader cached as "
                 + programName
                 );
         return static_pointer_cast<GpuProgram>(pGpuProgram);
@@ -343,7 +340,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
         }
 
         LogManager::getSingleton().logMessage(shaderProgram->getEntryPointFunction()->getDescription()
-            + programType
+            + ' ' + to_string(shaderProgram->getType()) + " shader "
             + loadStore
             + programFileName
             );
