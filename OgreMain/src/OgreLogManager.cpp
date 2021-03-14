@@ -151,7 +151,18 @@ namespace Ogre {
         OGRE_LOCK_AUTO_MUTEX;
         if (mDefaultLog)
         {
+            OGRE_IGNORE_DEPRECATED_BEGIN
             mDefaultLog->setLogDetail(ll);
+            OGRE_IGNORE_DEPRECATED_END
+        }
+    }
+    //-----------------------------------------------------------------------
+    void LogManager::setMinLogLevel(LogMessageLevel lml)
+    {
+        OGRE_LOCK_AUTO_MUTEX;
+        if (mDefaultLog)
+        {
+            mDefaultLog->setMinLogLevel(lml);
         }
     }
     //---------------------------------------------------------------------

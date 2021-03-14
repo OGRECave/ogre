@@ -734,7 +734,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mSceneMgr->setFog(Ogre::FOG_LINEAR, fadeColour, 0, 2000, 10000);
         //! [linear_fog]
 
-        LogManager::getSingleton().setLogDetail(LL_BOREME);
+        LogManager::getSingleton().setMinLogLevel(LML_TRIVIAL);
 
         //! [light]
         Ogre::Light* l = mSceneMgr->createLight();

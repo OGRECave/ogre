@@ -89,10 +89,11 @@ namespace Ogre {
 
 
     /**
-    @remarks
-         Log class for writing debug/log data to files.
-    @note
-        <br>Should not be used directly, but trough the LogManager class.
+        Log class for writing debug/log data to files.
+
+        You can control the default log level through the `OGRE_MIN_LOGLEVEL` environment variable.
+        Here, the value 1 corresponds to #LML_TRIVIAL etc.
+        @note Should not be used directly, but trough the LogManager class.
     */
     class _OgreExport Log : public LogAlloc
     {
@@ -146,11 +147,10 @@ namespace Ogre {
             Enable or disable outputting log messages to the debugger.
         */
         void setDebugOutputEnabled(bool debugOutput);
-        /**
-        @remarks
-            Sets the level of the log detail.
-        */
-        void setLogDetail(LoggingLevel ll);
+        /// @deprecated use setMinLogLevel()
+        OGRE_DEPRECATED void setLogDetail(LoggingLevel ll);
+        /// set the minimal #LogMessageLevel for a message to be logged
+        void setMinLogLevel(LogMessageLevel lml);
         /**
         @remarks
             Enable or disable time stamps.
