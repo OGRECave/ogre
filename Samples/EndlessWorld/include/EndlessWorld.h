@@ -385,7 +385,7 @@ protected:
 
 		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 4000, 10000);
 
-		LogManager::getSingleton().setLogDetail(LL_BOREME);
+		LogManager::getSingleton().setMinLogLevel(LML_TRIVIAL);
 
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);

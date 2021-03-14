@@ -134,9 +134,10 @@ namespace Ogre
         Log::Stream stream(LogMessageLevel lml = LML_NORMAL, 
             bool maskDebug = false);
 
-        /** Sets the level of detail of the default log.
-        */
-        void setLogDetail(LoggingLevel ll);
+        /// @deprecated use setMinLogLevel()
+        OGRE_DEPRECATED void setLogDetail(LoggingLevel ll);
+        /// sets the minimal #LogMessageLevel for the default log
+        void setMinLogLevel(LogMessageLevel lml);
         /// @copydoc Singleton::getSingleton()
         static LogManager& getSingleton(void);
         /// @copydoc Singleton::getSingleton()

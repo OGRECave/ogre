@@ -67,9 +67,14 @@ namespace Ogre
         }
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+        char* val = getenv("OGRE_MIN_LOGLEVEL");
+        int min_lml;
+        if(val && StringConverter::parse(val, min_lml))
+            setMinLogLevel(LogMessageLevel(min_lml));
+
         if(mDebugOut)
         {
-            char* val = getenv("TERM");
+            val = getenv("TERM");
             mTermHasColours = val && String(val).find("xterm") != String::npos;
         }
 #endif
@@ -163,6 +168,12 @@ namespace Ogre
     {
         OGRE_LOCK_AUTO_MUTEX;
         mLogLevel = ll;
+    }
+
+    void Log::setMinLogLevel(LogMessageLevel lml)
+    {
+        OGRE_LOCK_AUTO_MUTEX;
+        mLogLevel = LoggingLevel(std::max(OGRE_LOG_THRESHOLD - lml, 1));
     }
 
     //-----------------------------------------------------------------------
