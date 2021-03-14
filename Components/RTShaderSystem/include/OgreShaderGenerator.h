@@ -146,10 +146,8 @@ public:
     */
     const String& getShaderProfiles(GpuProgramType type) const;
 
-    /** 
-    Get the output shader target profiles as list of strings.
-    */
-    const StringVector& getShaderProfilesList(GpuProgramType type);
+    /// @deprecated use getShaderProfiles()
+    OGRE_DEPRECATED const StringVector& getShaderProfilesList(GpuProgramType type);
 
     /** 
     Set the output shader cache path. Generated shader code will be written to this path.

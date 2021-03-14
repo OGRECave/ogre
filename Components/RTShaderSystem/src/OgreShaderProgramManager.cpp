@@ -246,7 +246,6 @@ void ProgramManager::createGpuPrograms(ProgramSet* programSet)
     {
         auto gpuProgram = createGpuProgram(programSet->getCpuProgram(type), programWriter, language,
                                            ShaderGenerator::getSingleton().getShaderProfiles(type),
-                                           ShaderGenerator::getSingleton().getShaderProfilesList(type),
                                            ShaderGenerator::getSingleton().getShaderCachePath());
 
         OgreAssert(gpuProgram, "gpu program could not be created");
@@ -267,7 +266,6 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
                                                ProgramWriter* programWriter,
                                                const String& language,
                                                const String& profiles,
-                                               const StringVector& profilesList,
                                                const String& cachePath)
 {
     stringstream sourceCodeStringStream;
@@ -338,24 +336,13 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 
     if (language == "hlsl")
     {
-        // HLSL program requires specific target profile settings - we have to split the profile string.
-        StringVector::const_iterator it = profilesList.begin();
-        StringVector::const_iterator itEnd = profilesList.end();
-        
-        for (; it != itEnd; ++it)
-        {
-            if (GpuProgramManager::getSingleton().isSyntaxSupported(*it))
-            {
-                pGpuProgram->setParameter("target", *it);
-                break;
-            }
-        }
-
+        pGpuProgram->setParameter("target", profiles);
         pGpuProgram->setParameter("enable_backwards_compatibility", "true");
         pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
     }
-    
-    pGpuProgram->setParameter("profiles", profiles);
+    else if (language == "cg")
+        pGpuProgram->setParameter("profiles", profiles);
+
     pGpuProgram->load();
 
     // Case an error occurred.

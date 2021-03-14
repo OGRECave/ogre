@@ -159,7 +159,6 @@ protected:
         ProgramWriter* programWriter,
         const String& language,
         const String& profiles,
-        const StringVector& profilesList,
         const String& cachePath);
 
     /** 
