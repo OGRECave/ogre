@@ -259,13 +259,11 @@ public:
         {
             ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                                   "glsles", GPT_FRAGMENT_PROGRAM);
-            ptrProgram->setParameter("profiles", "glsles");
         }
         else
         {
             ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                                   "glsl", GPT_FRAGMENT_PROGRAM);
-            ptrProgram->setParameter("profiles", "glsl150");
         }
         ptrProgram->setSource(mMasterSource);
         // set up the preprocessor defines
