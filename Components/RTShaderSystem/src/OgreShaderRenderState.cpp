@@ -155,7 +155,7 @@ void TargetRenderState::acquirePrograms(Pass* pass)
     }
     catch(Ogre::Exception& e)
     {
-        LogManager::getSingleton().logError(StringUtil::format("RTSS - creating GpuPrograms for %s failed", desc.c_str());
+        LogManager::getSingleton().logError(StringUtil::format("RTSS - creating GpuPrograms for %s failed", desc.c_str()));
         throw;
     }
 
