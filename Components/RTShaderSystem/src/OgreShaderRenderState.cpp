@@ -146,20 +146,30 @@ void TargetRenderState::acquirePrograms(Pass* pass)
 {
     createCpuPrograms();
 
+    const char* matName = pass->getParent()->getParent()->getName().c_str();
+
     try
     {
         ProgramManager::getSingleton().createGpuPrograms(mProgramSet.get());
     }
     catch(Ogre::Exception& e)
     {
-        LogManager::getSingleton().logError(StringUtil::format("RTSS - creating GpuPrograms for pass %d of '%s' failed",
-                                                               pass->getIndex(),
-                                                               pass->getParent()->getParent()->getName().c_str()));
+        LogManager::getSingleton().logError(StringUtil::format(
+            "RTSS - creating GpuPrograms for pass %d of '%s' failed", pass->getIndex(), matName));
         throw;
     }
 
+    bool logProgramNames = !ShaderGenerator::getSingleton().getShaderCachePath().empty();
+
     for(auto type : {GPT_VERTEX_PROGRAM, GPT_FRAGMENT_PROGRAM})
     {
+        if (logProgramNames)
+        {
+            LogManager::getSingleton().logMessage(StringUtil::format(
+                "RTSS: using %s for Pass %d of '%s'", mProgramSet->getGpuProgram(type)->getName().c_str(),
+                pass->getIndex(), matName));
+        }
+
         // Bind the created GPU programs to the target pass.
         pass->setGpuProgram(type, mProgramSet->getGpuProgram(type));
         // Bind uniform parameters to pass parameters.
