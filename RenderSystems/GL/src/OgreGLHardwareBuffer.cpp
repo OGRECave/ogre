@@ -62,7 +62,7 @@ namespace Ogre {
     GLHardwareVertexBuffer::~GLHardwareVertexBuffer()
     {
         if(GLStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())
-            stateCacheManager->deleteGLBuffer(GL_ARRAY_BUFFER_ARB, mBufferId);
+            stateCacheManager->deleteGLBuffer(mTarget, mBufferId);
     }
     //---------------------------------------------------------------------
     void* GLHardwareVertexBuffer::lockImpl(size_t offset, 
@@ -167,7 +167,7 @@ namespace Ogre {
             // get data from the real buffer
             mRenderSystem->_getStateCacheManager()->bindGLBuffer(mTarget, mBufferId);
 
-            glGetBufferSubDataARB(GL_ARRAY_BUFFER_ARB, offset, length, pDest);
+            glGetBufferSubDataARB(mTarget, offset, length, pDest);
         }
     }
     //---------------------------------------------------------------------
