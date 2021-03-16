@@ -87,6 +87,7 @@ namespace Ogre {
     void HardwareBufferManagerBase::destroyVertexDeclaration(VertexDeclaration* decl)
     {
         OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);
+        OgreAssertDbg(mVertexDeclarations.find(decl) != mVertexDeclarations.end(), "unknown decl");
         mVertexDeclarations.erase(decl);
         destroyVertexDeclarationImpl(decl);
     }
@@ -101,7 +102,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void HardwareBufferManagerBase::destroyVertexBufferBinding(VertexBufferBinding* binding)
     {
-            OGRE_LOCK_MUTEX(mVertexBufferBindingsMutex);
+        OGRE_LOCK_MUTEX(mVertexBufferBindingsMutex);
+        OgreAssertDbg(mVertexBufferBindings.find(binding) != mVertexBufferBindings.end(),
+                      "unknown binding");
         mVertexBufferBindings.erase(binding);
         destroyVertexBufferBindingImpl(binding);
     }
