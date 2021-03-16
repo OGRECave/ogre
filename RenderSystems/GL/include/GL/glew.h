@@ -1171,8 +1171,7 @@ GLAPI void GLAPIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei heigh
 #endif /* GL_VERSION_1_1 */
 
 /* ---------------------------------- GLU ---------------------------------- */
-
-#ifndef GLEW_NO_GLU
+#if 0 //ndef GLEW_NO_GLU
 /* this is where we can safely include GLU */
 #  if defined(__APPLE__) && defined(__MACH__)
 #    include <OpenGL/glu.h>
