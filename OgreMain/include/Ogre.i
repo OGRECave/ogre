@@ -772,7 +772,7 @@ SHARED_PTR(Material);
 %define %standard_byref_params(unsigned short)
        %apply unsigned short& OUTPUT { unsigned short& outSourceCoordSet, unsigned short& outIndex };
 %enddef
-%standard_byref_params(unsigned short)
+%apply unsigned short& OUTPUT { unsigned short& outSourceCoordSet, unsigned short& outIndex };
 SHARED_PTR(Mesh);
 %include "OgreMesh.h"
 %ignore Ogre::SubMesh::getBoneAssignmentIterator;
