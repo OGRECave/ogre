@@ -769,6 +769,16 @@ SHARED_PTR(Material);
 %ignore Ogre::Mesh::getBoneAssignmentIterator;
 %template(PoseList) std::vector<Ogre::Pose*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
+%include "typemaps.i"
+%define %standard_byref_params(TYPE)
+
+       %apply TYPE& INOUT { TYPE& };
+
+       %apply TYPE& OUTPUT { TYPE& outSourceCoordSet };
+       %apply TYPE& OUTPUT { TYPE& outIndex };
+
+%enddef
+%standard_byref_params(unsigned short)
 SHARED_PTR(Mesh);
 %include "OgreMesh.h"
 %ignore Ogre::SubMesh::getBoneAssignmentIterator;
