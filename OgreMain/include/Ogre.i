@@ -765,7 +765,7 @@ SHARED_PTR(Material);
 %ignore Ogre::Mesh::getSubMeshIterator;
 %ignore Ogre::Mesh::getPoseCount;
 %ignore Ogre::Mesh::getPose;
-%ignore Ogre::Mesh::getPoseIterator;''
+%ignore Ogre::Mesh::getPoseIterator;
 %ignore Ogre::Mesh::getBoneAssignmentIterator;
 %template(PoseList) std::vector<Ogre::Pose*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
