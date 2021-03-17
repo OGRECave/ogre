@@ -714,7 +714,7 @@ SHARED_PTR(Material);
         SHARED_PTR(PlaneOptimalShadowCameraSetup);
         %include "OgreShadowCameraSetupPlaneOptimal.h"
         SHARED_PTR(PSSMShadowCameraSetup);
-        %include "OgreShadowCameraSetupPSSM.h"  
+        %include "OgreShadowCameraSetupPSSM.h"
             %template(SplitPointList) std::vector<Ogre::Real>;
     %ignore Ogre::Frustum::getFrustumExtents(Real&, Real& ,Real& ,Real&) const;
     %include "OgreFrustum.h"
