@@ -770,7 +770,6 @@ SHARED_PTR(Material);
 %template(PoseList) std::vector<Ogre::Pose*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
 %define %standard_byref_params(unsigned short)
-       %apply Ogre::Mesh& INOUT { unsigned short& };
        %apply unsigned short& OUTPUT { unsigned short& outSourceCoordSet, unsigned short& outIndex };
 %enddef
 %standard_byref_params(unsigned short)
