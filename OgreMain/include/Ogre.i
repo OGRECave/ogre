@@ -769,8 +769,6 @@ SHARED_PTR(Material);
 %ignore Ogre::Mesh::getBoneAssignmentIterator;
 %template(PoseList) std::vector<Ogre::Pose*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
-       %apply unsigned short& OUTPUT { unsigned short& outSourceCoordSet, unsigned short& outIndex };
-%enddef
 %apply unsigned short& OUTPUT { unsigned short& outSourceCoordSet, unsigned short& outIndex };
 SHARED_PTR(Mesh);
 %include "OgreMesh.h"
