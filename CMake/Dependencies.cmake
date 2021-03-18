@@ -189,7 +189,9 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         execute_process(COMMAND ${CMAKE_COMMAND}
             -E make_directory ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
-            -DSDL_STATIC=FALSE
+            -DSDL_STATIC=TRUE
+            -DSDL_STATIC_PIC=TRUE
+            -DSDL_SHARED=FALSE
             ${PROJECT_BINARY_DIR}/SDL2-2.0.14
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${CMAKE_COMMAND}
@@ -336,12 +338,24 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
   # find script does not work in cross compilation environment
   find_package(SDL2 QUIET)
   macro_log_feature(SDL2_FOUND "SDL2" "Simple DirectMedia Library needed for input handling in samples" "https://www.libsdl.org/" FALSE "" "")
-  if(SDL2_FOUND AND NOT TARGET SDL2::SDL2)
-    add_library(SDL2::SDL2 INTERFACE IMPORTED)
-    set_target_properties(SDL2::SDL2 PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES "${SDL2_LIBRARIES}"
-    )
+  if(SDL2_FOUND)
+    if(TARGET SDL2::SDL2-static)
+      set_target_properties(SDL2::SDL2-static PROPERTIES IMPORTED_GLOBAL TRUE)
+      add_library(SDL2::SDL2 ALIAS SDL2::SDL2-static)
+      if(UNIX)
+        # leaks -Wl,--no-undefined
+        set_target_properties(SDL2::SDL2-static PROPERTIES
+          IMPORTED_LINK_INTERFACE_LIBRARIES_RELWITHDEBINFO ""
+          IMPORTED_LINK_INTERFACE_LIBRARIES_DEBUG ""
+          IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE "")
+      endif()
+    elseif(NOT TARGET SDL2::SDL2)
+      add_library(SDL2::SDL2 INTERFACE IMPORTED)
+      set_target_properties(SDL2::SDL2 PROPERTIES
+          INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
+          INTERFACE_LINK_LIBRARIES "${SDL2_LIBRARIES}"
+      )
+    endif()
   endif()
 
   find_package(Qt5 COMPONENTS Core Gui QUIET)
