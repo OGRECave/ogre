@@ -373,6 +373,3 @@ if (EXISTS "${PROJECT_SOURCE_DIR}/Dependencies/CMakeLists.txt")
 elseif (EXISTS "${PROJECT_SOURCE_DIR}/ogredeps/CMakeLists.txt")
   add_subdirectory(ogredeps)
 endif ()
-
-# provide option to install dependencies on Windows
-include(InstallDependencies)
