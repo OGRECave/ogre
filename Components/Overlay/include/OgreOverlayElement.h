@@ -211,36 +211,35 @@ namespace Ogre {
         virtual void setEnabled(bool b);
 
 
-        /** Sets the dimensions of this element in relation to the screen (1.0 = screen width/height). */
+        /** Sets the dimensions of this element in relation to the current #GuiMetricsMode. */
         void setDimensions(Real width, Real height);
 
-        /** Sets the position of the top-left corner of the element, relative to the screen size
-        (1.0 = screen width / height) */
+        /** Sets the position of the top-left corner in relation to the current #GuiMetricsMode (where 0 = top). */
         void setPosition(Real left, Real top);
 
-        /** Sets the width of this element in relation to the screen (where 1.0 = screen width) */
+        /** Sets the width of this element in relation to the current #GuiMetricsMode. */
         void setWidth(Real width);
-        /** Gets the width of this element in relation to the screen (where 1.0 = screen width) */
+        /** Gets the width of this element in relation to the current #GuiMetricsMode. */
         Real getWidth(void) const;
 
-        /** Sets the height of this element in relation to the screen (where 1.0 = screen height) */
+        /** Sets the height of this element in relation to the current #GuiMetricsMode. */
         void setHeight(Real height);
-        /** Gets the height of this element in relation to the screen (where 1.0 = screen height) */
+        /** Gets the height of this element in relation to the current #GuiMetricsMode. */
         Real getHeight(void) const;
 
-        /** Sets the left of this element in relation to the screen (where 0 = far left, 1.0 = far right) */
+        /** Sets the left of this element in relation to the current #GuiMetricsMode. */
         void setLeft(Real left);
-        /** Gets the left of this element in relation to the screen (where 0 = far left, 1.0 = far right)  */
+        /** Gets the left of this element in relation to the current #GuiMetricsMode. */
         Real getLeft(void) const;
 
-        /** Sets the top of this element in relation to the screen (where 0 = top, 1.0 = bottom) */
+        /** Sets the top of this element in relation to the current #GuiMetricsMode (where 0 = top). */
         void setTop(Real Top);
-        /** Gets the top of this element in relation to the screen (where 0 = top, 1.0 = bottom)  */
+        /** Gets the top of this element in relation to the current #GuiMetricsMode (where 0 = top). */
         Real getTop(void) const;
 
         /** Gets the left of this element in relation to the screen (where 0 = far left, 1.0 = far right)  */
         Real _getLeft(void) const { return mLeft; }
-        /** Gets the top of this element in relation to the screen (where 0 = far left, 1.0 = far right)  */
+        /** Gets the top of this element in relation to the screen (where 0 = far top, 1.0 = far bottom)  */
         Real _getTop(void) const { return mTop; }
         /** Gets the width of this element in relation to the screen (where 1.0 = screen width)  */
         Real _getWidth(void) const { return mWidth; }
@@ -248,15 +247,15 @@ namespace Ogre {
         Real _getHeight(void) const { return mHeight; }
         /** Sets the left of this element in relation to the screen (where 1.0 = screen width) */
         void _setLeft(Real left);
-        /** Sets the top of this element in relation to the screen (where 1.0 = screen width) */
+        /** Sets the top of this element in relation to the screen (where 1.0 = screen height) */
         void _setTop(Real top);
         /** Sets the width of this element in relation to the screen (where 1.0 = screen width) */
         void _setWidth(Real width);
-        /** Sets the height of this element in relation to the screen (where 1.0 = screen width) */
+        /** Sets the height of this element in relation to the screen (where 1.0 = screen height) */
         void _setHeight(Real height);
-        /** Sets the left and top of this element in relation to the screen (where 1.0 = screen width) */
+        /** Sets the left and top of this element in relation to the screen (where 1.0 = screen width/height) */
         void _setPosition(Real left, Real top);
-        /** Sets the width and height of this element in relation to the screen (where 1.0 = screen width) */
+        /** Sets the width and height of this element in relation to the screen (where 1.0 = screen width/height) */
         void _setDimensions(Real width, Real height);
 
         /** Gets the name of the material this element uses. */
