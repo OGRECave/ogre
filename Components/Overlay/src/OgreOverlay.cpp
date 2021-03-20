@@ -116,6 +116,11 @@ namespace Ogre {
         mVisible = false;
     }
     //---------------------------------------------------------------------
+    void Overlay::setVisible(bool visible)
+    {
+        mVisible = visible;
+    }
+    //---------------------------------------------------------------------
     void Overlay::initialise(void)
     {
         OverlayContainerList::iterator i, iend;
