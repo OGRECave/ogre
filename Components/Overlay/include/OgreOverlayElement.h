@@ -204,6 +204,9 @@ namespace Ogre {
         /** Hides this element if it was visible. */
         virtual void hide(void);
 
+        /** Shows or hides this element. */
+        virtual void setVisible(bool visible);
+
         /** Returns whether or not the element is visible. */
         bool isVisible(void) const;
 

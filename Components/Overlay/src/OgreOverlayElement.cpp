@@ -118,6 +118,11 @@ namespace Ogre {
         mVisible = false;
     }
     //---------------------------------------------------------------------
+    void OverlayElement::setVisible(bool visible)
+    {
+        mVisible = visible;
+    }
+    //---------------------------------------------------------------------
     bool OverlayElement::isVisible(void) const
     {
         return mVisible;

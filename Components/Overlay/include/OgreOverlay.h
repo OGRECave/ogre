@@ -136,6 +136,9 @@ namespace Ogre {
         /** Hides the overlay if it was visible. */
         void hide(void);
 
+        /** Shows or hides this overlay. */
+        void setVisible(bool visible);
+
         /** Adds a 2D 'container' to the overlay.
         @remarks
             Containers are created and managed using the OverlayManager. A container
