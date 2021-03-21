@@ -117,7 +117,7 @@ namespace Ogre
         // use application path as first config search path
         mConfigPaths.push_back(appPath + '/');
         // then search inside ../share/OGRE
-        mConfigPaths.push_back(appPath + "/../share/OGRE/");
+        mConfigPaths.push_back(StringUtil::normalizeFilePath(appPath + "/../share/OGRE/", false));
         // then try system wide /etc
         mConfigPaths.push_back("/etc/OGRE/");
     }
