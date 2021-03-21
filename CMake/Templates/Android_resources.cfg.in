@@ -16,7 +16,6 @@ APKFileSystem=/thumbnails
 [General]
 # Bites uses the next entry to discover the platform shaders
 APKFileSystem=/
-APKFileSystem=/fonts
 APKFileSystem=/materials/programs
 APKFileSystem=/materials/scripts
 APKFileSystem=/materials/textures
