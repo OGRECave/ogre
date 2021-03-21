@@ -118,6 +118,10 @@ namespace Ogre
         mConfigPaths.push_back(appPath + '/');
         // then search inside ../share/OGRE
         mConfigPaths.push_back(StringUtil::normalizeFilePath(appPath + "/../share/OGRE/", false));
+
+        // XDG_DATA_HOME (used by PIP)
+        if(const char* home = getenv("HOME"))
+            mConfigPaths.push_back(String(home)+"/.local/share/OGRE/");
         // then try system wide /etc
         mConfigPaths.push_back("/etc/OGRE/");
     }
