@@ -460,6 +460,12 @@ void ApplicationContextBase::locateResources()
 
             arch = Ogre::FileSystemLayer::resolveBundlePath(arch);
 
+            if((type == "Zip" || type == "FileSystem") && !Ogre::FileSystemLayer::fileExists(arch))
+            {
+                Ogre::LogManager::getSingleton().logWarning("resource location '"+arch+"' does not exist - skipping");
+                continue;
+            }
+
             rgm.addResourceLocation(arch, type, sec);
         }
     }
