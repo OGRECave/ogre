@@ -195,23 +195,23 @@ namespace Ogre {
         virtual void _restoreManualHardwareResources() {}
 
         /** Gets the name of this overlay. */
-        const String& getName(void) const;
+        const String& getName(void) const { return mName; }
 
 
         /** Shows this element if it was hidden. */
-        virtual void show(void);
+        void show(void) { setVisible(true); }
 
         /** Hides this element if it was visible. */
-        virtual void hide(void);
+        void hide(void) { setVisible(false); }
 
         /** Shows or hides this element. */
-        virtual void setVisible(bool visible);
+        void setVisible(bool visible) { mVisible = visible; }
 
         /** Returns whether or not the element is visible. */
-        bool isVisible(void) const;
+        bool isVisible(void) const { return mVisible; }
 
-        bool isEnabled() const;
-        virtual void setEnabled(bool b);
+        bool isEnabled() const { return mEnabled; }
+        void setEnabled(bool b) { mEnabled = b; }
 
 
         /** Sets the dimensions of this element in relation to the current #GuiMetricsMode. */
@@ -359,7 +359,7 @@ namespace Ogre {
         */
         virtual void setCaption(const DisplayString& text);
         /** Gets the caption for this element. */
-        virtual const DisplayString& getCaption(void) const;
+        const DisplayString& getCaption(void) const { return mCaption; }
         /** Sets the colour on elements that support it. 
         @remarks
         This property doesn't do something on all elements, just those that support it.
@@ -383,7 +383,7 @@ namespace Ogre {
         */
         virtual void setMetricsMode(GuiMetricsMode gmm);
         /** Retrieves the current settings of how the element metrics are interpreted. */
-        virtual GuiMetricsMode getMetricsMode(void) const;
+        GuiMetricsMode getMetricsMode(void) const { return mMetricsMode; }
         /** Sets the horizontal origin for this element.
         @remarks
         By default, the horizontal origin for a OverlayElement is the left edge of the parent container
@@ -401,7 +401,7 @@ namespace Ogre {
         */
         virtual void setHorizontalAlignment(GuiHorizontalAlignment gha);
         /** Gets the horizontal alignment for this element. */
-        virtual GuiHorizontalAlignment getHorizontalAlignment(void) const;
+        GuiHorizontalAlignment getHorizontalAlignment(void) const { return mHorzAlign; }
         /** Sets the vertical origin for this element. 
         @remarks
         By default, the vertical origin for a OverlayElement is the top edge of the parent container
@@ -419,7 +419,7 @@ namespace Ogre {
         */
         virtual void setVerticalAlignment(GuiVerticalAlignment gva);
         /** Gets the vertical alignment for this element. */
-        virtual GuiVerticalAlignment getVerticalAlignment(void) const;
+        GuiVerticalAlignment getVerticalAlignment(void) const { return mVertAlign; }
 
 
 
@@ -433,29 +433,21 @@ namespace Ogre {
         /**
         * returns false as this class is not a container type 
         */
-        inline virtual bool isContainer() const
-        { return false; }
-
-        inline virtual bool isKeyEnabled() const
-        { return false; }
-
-        inline virtual bool isCloneable() const
-        { return mCloneable; }
-
-        inline virtual void setCloneable(bool c)
-        { mCloneable = c; }
+        virtual bool isContainer() const { return false; }
+        virtual bool isKeyEnabled() const { return false; }
+        bool isCloneable() const { return mCloneable; }
+        void setCloneable(bool c) { mCloneable = c; }
 
         /**
         * Returns the parent container.
         */
-        OverlayContainer* getParent() ;
+        OverlayContainer* getParent() { return mParent; }
         void _setParent(OverlayContainer* parent) { mParent = parent; }
 
         /**
         * Returns the zOrder of the element
         */
-        inline ushort getZOrder() const
-        { return mZOrder; }
+        ushort getZOrder() const { return mZOrder; }
 
         /** Overridden from Renderable */
         Real getSquaredViewDepth(const Camera* cam) const 
@@ -476,9 +468,7 @@ namespace Ogre {
         virtual OverlayElement* clone(const String& instanceName);
 
         /// Returns the SourceTemplate for this element
-        const OverlayElement* getSourceTemplate () const {
-          return mSourceTemplate ;
-        }
+        const OverlayElement* getSourceTemplate() const { return mSourceTemplate; }
     };
 
 
