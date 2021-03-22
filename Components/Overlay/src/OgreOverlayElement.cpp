@@ -103,31 +103,6 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    const String& OverlayElement::getName(void) const
-    {
-        return mName;
-    }
-    //---------------------------------------------------------------------
-    void OverlayElement::show(void)
-    {
-        mVisible = true;
-    }
-    //---------------------------------------------------------------------
-    void OverlayElement::hide(void)
-    {
-        mVisible = false;
-    }
-    //---------------------------------------------------------------------
-    void OverlayElement::setVisible(bool visible)
-    {
-        mVisible = visible;
-    }
-    //---------------------------------------------------------------------
-    bool OverlayElement::isVisible(void) const
-    {
-        return mVisible;
-    }
-    //---------------------------------------------------------------------
     void OverlayElement::setDimensions(Real width, Real height)
     {
         if (mMetricsMode != GMM_RELATIVE)
@@ -714,11 +689,6 @@ namespace Ogre {
         _positionsOutOfDate();
     }
     //-----------------------------------------------------------------------
-    const DisplayString& OverlayElement::getCaption() const
-    {
-        return mCaption;
-    }
-    //-----------------------------------------------------------------------
     void OverlayElement::setColour(const ColourValue& col)
     {
         mColour = col;
@@ -798,31 +768,16 @@ namespace Ogre {
         _positionsOutOfDate();
     }
     //-----------------------------------------------------------------------
-    GuiMetricsMode OverlayElement::getMetricsMode(void) const
-    {
-        return mMetricsMode;
-    }
-    //-----------------------------------------------------------------------
     void OverlayElement::setHorizontalAlignment(GuiHorizontalAlignment gha)
     {
         mHorzAlign = gha;
         _positionsOutOfDate();
     }
     //-----------------------------------------------------------------------
-    GuiHorizontalAlignment OverlayElement::getHorizontalAlignment(void) const
-    {
-        return mHorzAlign;
-    }
-    //-----------------------------------------------------------------------
     void OverlayElement::setVerticalAlignment(GuiVerticalAlignment gva)
     {
         mVertAlign = gva;
         _positionsOutOfDate();
-    }
-    //-----------------------------------------------------------------------
-    GuiVerticalAlignment OverlayElement::getVerticalAlignment(void) const
-    {
-        return mVertAlign;
     }
     //-----------------------------------------------------------------------    
     bool OverlayElement::contains(Real x, Real y) const
@@ -838,11 +793,6 @@ namespace Ogre {
             ret = this;
         }
         return ret;
-    }
-    //-----------------------------------------------------------------------
-    OverlayContainer* OverlayElement::getParent() 
-    { 
-        return mParent;     
     }
     //-----------------------------------------------------------------------
     void OverlayElement::copyFromTemplate(OverlayElement* templateOverlay)
@@ -861,16 +811,6 @@ namespace Ogre {
         copyParametersTo(newElement);
 
         return newElement;
-    }
-    //-----------------------------------------------------------------------
-    bool OverlayElement::isEnabled() const
-    { 
-        return mEnabled;
-    }
-    //-----------------------------------------------------------------------
-    void OverlayElement::setEnabled(bool b) 
-    {
-        mEnabled = b;
     }
     //-----------------------------------------------------------------------
 
