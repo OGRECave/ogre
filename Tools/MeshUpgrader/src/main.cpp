@@ -969,8 +969,14 @@ struct MaterialCreator : public MeshSerializerListener
 {
     void processMaterialName(Mesh *mesh, String *name)
     {
-        // create material because we do not load any .material files
-        MaterialManager::getSingleton().createOrRetrieve(*name, mesh->getGroup());
+		if(name->empty()) {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "The provided mesh file has an empty material name. See https://ogrecave.github.io/ogre/api/latest/_mesh-_tools.html#Exporters");
+		}
+        else {
+            // create material because we do not load any .material files
+            MaterialManager::getSingleton().createOrRetrieve(*name, mesh->getGroup());
+        }
     }
 
     void processSkeletonName(Mesh *mesh, String *name) {}
@@ -1167,7 +1173,7 @@ int main(int numargs, char** args)
     }
     catch (Exception& e)
     {
-        cout << "Exception caught: " << e.getDescription();
+        cout << "Exception caught: " << e.getDescription() << std::endl;
         retCode = 1;
     }
 
