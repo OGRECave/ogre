@@ -1,5 +1,8 @@
 platform: x64
 configuration: Release
+environment:
+  CS_APIKEY:
+    secure: XiSyqXBlbnIqawfinZqXimatuEdpYsI38+HK2TgvuUGHQEoeFHA62700/EhFJ4M1
 image:
  - Visual Studio 2017
  - Visual Studio 2013
@@ -22,6 +25,9 @@ branches:
     - stable
 after_build:
   - IF "%APPVEYOR_REPO_TAG%" == "true" 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-vc15-x64.zip ./build/sdk/*
+  - IF NOT "%APPVEYOR_REPO_TAG%" == "true" 7z a ogre-sdk-master-vc15-x64.zip ./build/sdk/*
+  - pip install --upgrade cloudsmith-cli
+  - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" IF NOT "%APPVEYOR_REPO_TAG%" == "true" IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" cloudsmith push raw ogrecave/ogre ogre-sdk-master-vc15-x64.zip --republish -k %CS_APIKEY%
 artifacts:
   - path: build/sdk
     name: ogre-sdk-master2-vc15-x64
