@@ -416,7 +416,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
         String response;
         while (response.empty()) {
             displayVertexBuffers(elemList);
-            cout << "Really reorganise the vertex buffers this way? ";
+            cout << "Really reorganise the vertex buffers this way? (y/n) ";
             cin >> response;
             StringUtil::toLowerCase(response);
             if (response == "y") {
@@ -512,7 +512,7 @@ void vertexBufferReorg(Mesh& mesh)
     if (opts.interactive) {
 
         // Check to see whether we would like to reorganise vertex buffers
-        std::cout << "\nWould you like to reorganise the vertex buffers for this mesh? ";
+        std::cout << "\nWould you like to reorganise the vertex buffers for this mesh? (y/n) ";
         while (response.empty()) {
             cin >> response;
             StringUtil::toLowerCase(response);
@@ -669,7 +669,7 @@ void buildLod(MeshPtr& mesh)
     if (askLodDtls) {
         do {
             std::cout <<
-            "\nDo you want to (m)anually configure or (a)utoconfigure it?\nautoconfigure=no more questions asked!(m/a) ";
+            "\nDo you want to (m)anually configure or (a)utoconfigure it?\nautoconfigure=no more questions asked! (m/a) ";
             cin >> response;
             StringUtil::toLowerCase(response);
             if (response == "a") {
@@ -699,7 +699,7 @@ void buildLod(MeshPtr& mesh)
             size_t vertexCount = 0;
             do {
                 cout <<
-                "\nWhat unit of reduction would you like to use(fixed=constant vertex number; proportional=percentage):" <<
+                "\nWhat unit of reduction would you like to use(fixed=constant vertex number; proportional=percentage): " <<
                 "\n(f)ixed or (p)roportional? ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
@@ -716,7 +716,7 @@ void buildLod(MeshPtr& mesh)
 
             numLod = 0;
             while (numLod < 1 || numLod > 99) {
-                cout << "\nHow many extra LOD levels would you like to generate? (1-99)";
+                cout << "\nHow many extra LOD levels would you like to generate? (1-99) ";
                 cin >> response;
                 numLod = StringConverter::parseInt(response);
             }
@@ -724,7 +724,7 @@ void buildLod(MeshPtr& mesh)
             Real minDistance = lodConfig.strategy->getBaseValue();
             for (int iLod = 0; iLod < numLod; ++iLod) {
                 do {
-                    cout << "\nShould LOD" << (iLod + 1) << " be a (m)anual or (g)enerated LOD level? (m/g)";
+                    cout << "\nShould LOD" << (iLod + 1) << " be a (m)anual or (g)enerated LOD level? (m/g) ";
                     cin >> response;
                     StringUtil::toLowerCase(response);
                     if (response == "m") {
@@ -982,7 +982,7 @@ int main(int numargs, char** args)
     try
     {
         logMgr = new LogManager();
-        logMgr->createLog("OgreMeshUpgrade.log", true);
+        logMgr->createLog("OgreMeshUpgrader.log", true);
         rgm = new ResourceGroupManager();
         mth = new Math();
         lodMgr = new LodStrategyManager();
@@ -1033,15 +1033,15 @@ int main(int numargs, char** args)
 
         FILE* pFile = fopen( source.c_str(), "rb" );
         if (!pFile) {
-            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, 
-                "File " + source + " not found.", "OgreMeshUpgrade");
+            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+                "File " + source + " not found.", "OgreMeshUpgrader");
         }
         stat( source.c_str(), &tagStat );
         MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
         size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
         if (result != size_t(tagStat.st_size))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Unexpected error while reading file " + source, "OgreMeshUpgrade");
+                "Unexpected error while reading file " + source, "OgreMeshUpgrader");
         fclose( pFile );
 
         MeshPtr meshPtr = MeshManager::getSingleton().createManual("conversion",
