@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreD3D9RenderSystem.h"
 
+#include <d3dx9.h>
+
 namespace Ogre {
 
     OGRE_STATIC_MUTEX_INSTANCE(D3D9HardwarePixelBuffer::msDeviceAccessMutex);

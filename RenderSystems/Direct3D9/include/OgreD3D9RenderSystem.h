@@ -166,7 +166,7 @@ namespace Ogre
         /// Saved last view matrix
         Matrix4 mViewMatrix;
 
-        D3DXMATRIX mDxViewMat, mDxProjMat, mDxWorldMat;
+        D3DMATRIX mDxViewMat, mDxProjMat, mDxWorldMat;
     
         typedef std::vector<D3D9RenderWindow*> D3D9RenderWindowList;
         // List of additional windows after the first (swap chains)

@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreD3D9RenderSystem.h"
 
+#include <d3dx9.h>
+
 namespace Ogre 
 {
     D3D9TextureManager::D3D9TextureManager() : TextureManager()

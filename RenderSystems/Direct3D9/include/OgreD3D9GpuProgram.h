@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreD3D9Resource.h"
 
+#include <d3dx9.h>
+
 namespace Ogre {
 
     /** Direct3D implementation of a few things common to low-level vertex & fragment programs. */

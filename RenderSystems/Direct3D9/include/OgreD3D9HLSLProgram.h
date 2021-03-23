@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreD3D9Prerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
 
+#include <d3dx9.h>
+
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to provide support for D3D9 
         High-Level Shader Language (HLSL).
