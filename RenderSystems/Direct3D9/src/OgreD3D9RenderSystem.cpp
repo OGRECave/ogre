@@ -53,6 +53,8 @@ THE SOFTWARE.
 #include "OgreD3D9ResourceManager.h"
 #include "OgreD3D9DepthBuffer.h"
 
+#include <d3dx9.h>
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D9StereoDriverBridge.h"
 #endif
@@ -172,16 +174,16 @@ namespace Ogre
                     setProjectionMatrix(Matrix4(ptr));
                     break;
                 case GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR:
-                    material.Ambient = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3]);
+                    material.Ambient = D3DCOLORVALUE{ ptr[0], ptr[1], ptr[2], ptr[3]};
                     break;
                 case GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR:
-                    material.Diffuse = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3] );
+                    material.Diffuse = D3DCOLORVALUE{ ptr[0], ptr[1], ptr[2], ptr[3]};
                     break;
                 case GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR:
-                    material.Specular = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3]);
+                    material.Specular = D3DCOLORVALUE{ ptr[0], ptr[1], ptr[2], ptr[3]};
                     break;
                 case GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR:
-                    material.Emissive = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3]);
+                    material.Emissive = D3DCOLORVALUE{ ptr[0], ptr[1], ptr[2], ptr[3]};
                     break;
                 case GpuProgramParameters::ACT_SURFACE_SHININESS:
                     material.Power = ptr[0];
@@ -216,16 +218,16 @@ namespace Ogre
                     break;
                 case GpuProgramParameters::ACT_LIGHT_POSITION:
                     d3dLight.Type = ptr[3] ? D3DLIGHT_POINT : D3DLIGHT_DIRECTIONAL;
-                    d3dLight.Position = D3DXVECTOR3( ptr[0], ptr[1], ptr[2] );
+                    d3dLight.Position = D3DVECTOR{ ptr[0], ptr[1], ptr[2] };
                     break;
                 case GpuProgramParameters::ACT_LIGHT_DIRECTION:
-                    d3dLight.Direction = D3DXVECTOR3( ptr[0], ptr[1], ptr[2] );
+                    d3dLight.Direction = D3DVECTOR{ ptr[0], ptr[1], ptr[2] };
                     break;
                 case GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR:
-                    d3dLight.Diffuse = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3] );
+                    d3dLight.Diffuse = D3DCOLORVALUE{ ptr[0], ptr[1], ptr[2], ptr[3] };
                     break;
                 case GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR:
-                    d3dLight.Specular = D3DXCOLOR( ptr[0], ptr[1], ptr[2], ptr[3] );
+                    d3dLight.Specular = D3DCOLORVALUE{ ptr[0], ptr[1], ptr[2], ptr[3] };
                     break;
                 case GpuProgramParameters::ACT_LIGHT_ATTENUATION:
                     d3dLight.Range = ptr[0];
@@ -1884,7 +1886,6 @@ namespace Ogre
     void D3D9RenderSystem::_setTextureMatrix( size_t stage, const Matrix4& xForm )
     {
         HRESULT hr;
-        D3DXMATRIX d3dMat; // the matrix we'll maybe apply
         Matrix4 newMat = xForm; // the matrix we'll apply after conv. to D3D format
         // Cache texcoord calc method to register
         TexCoordCalcMethod autoTexCoordType = mTexStageDesc[stage].autoTexCoordType;
@@ -1982,12 +1983,12 @@ namespace Ogre
             newMat[2][3] = -newMat[2][3];
         }
 
-        // convert our matrix to D3D format
-        d3dMat = D3D9Mappings::makeD3DXMatrix(newMat);
-
         // set the matrix if it's not the identity
-        if (!D3DXMatrixIsIdentity(&d3dMat))
+        if (newMat != Matrix4::IDENTITY)
         {
+            // convert our matrix to D3D format
+            D3DMATRIX d3dMat = D3D9Mappings::makeD3DXMatrix(newMat);
+
             /* It's seems D3D automatically add a texture coordinate with value 1,
             and fill up the remaining texture coordinates with 0 for the input
             texture coordinates before pass to texture coordinate transformation.
@@ -2116,7 +2117,7 @@ namespace Ogre
         // set manual factor if required by operation
         if (bm.operation == LBX_BLEND_MANUAL)
         {
-            hr = __SetRenderState( D3DRS_TEXTUREFACTOR, D3DXCOLOR(0.0, 0.0, 0.0,  bm.factor) );
+            hr = __SetRenderState( D3DRS_TEXTUREFACTOR, D3DCOLOR_COLORVALUE(0.0, 0.0, 0.0,  bm.factor) );
             if (FAILED(hr))
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set manual factor", "D3D9RenderSystem::_setTextureBlendMode" );
         }
@@ -2129,13 +2130,13 @@ namespace Ogre
         if( bm.blendType == LBT_COLOUR )
         {
             tss = D3DTSS_COLORARG1;
-            manualD3D = D3DXCOLOR( bm.colourArg1.r, bm.colourArg1.g, bm.colourArg1.b, bm.colourArg1.a );
+            manualD3D = D3DCOLOR_COLORVALUE( bm.colourArg1.r, bm.colourArg1.g, bm.colourArg1.b, bm.colourArg1.a );
             mManualBlendColours[stage][0] = bm.colourArg1;
         }
         else if( bm.blendType == LBT_ALPHA )
         {
             tss = D3DTSS_ALPHAARG1;
-            manualD3D = D3DXCOLOR( mManualBlendColours[stage][0].r, 
+            manualD3D = D3DCOLOR_COLORVALUE( mManualBlendColours[stage][0].r,
                 mManualBlendColours[stage][0].g, 
                 mManualBlendColours[stage][0].b, bm.alphaArg1 );
         }
@@ -2169,13 +2170,13 @@ namespace Ogre
         if( bm.blendType == LBT_COLOUR )
         {
             tss = D3DTSS_COLORARG2;
-            manualD3D = D3DXCOLOR( bm.colourArg2.r, bm.colourArg2.g, bm.colourArg2.b, bm.colourArg2.a );
+            manualD3D = D3DCOLOR_COLORVALUE( bm.colourArg2.r, bm.colourArg2.g, bm.colourArg2.b, bm.colourArg2.a );
             mManualBlendColours[stage][1] = bm.colourArg2;
         }
         else if( bm.blendType == LBT_ALPHA )
         {
             tss = D3DTSS_ALPHAARG2;
-            manualD3D = D3DXCOLOR( mManualBlendColours[stage][1].r, 
+            manualD3D = D3DCOLOR_COLORVALUE( mManualBlendColours[stage][1].r,
                 mManualBlendColours[stage][1].g, 
                 mManualBlendColours[stage][1].b, 
                 bm.alphaArg2 );
@@ -3531,7 +3532,7 @@ namespace Ogre
                 // programmable clips in clip space (ugh)
                 // must transform worldspace planes by view/proj
                 D3DXMATRIX xform;
-                D3DXMatrixMultiply(&xform, &mDxViewMat, &mDxProjMat);
+                D3DXMatrixMultiply(&xform, (D3DXMATRIX*)&mDxViewMat, (D3DXMATRIX*)&mDxProjMat);
                 D3DXMatrixInverse(&xform, NULL, &xform);
                 D3DXMatrixTranspose(&xform, &xform);
                 D3DXPlaneTransform(&dx9ClipPlane, &dx9ClipPlane, &xform);

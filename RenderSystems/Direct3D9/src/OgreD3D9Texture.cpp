@@ -39,6 +39,8 @@ THE SOFTWARE.
 #include "OgreD3D9DeviceManager.h"
 #include "OgreD3D9ResourceManager.h"
 
+#include <d3dx9.h>
+
 namespace Ogre 
 {
     /****************************************************************************************/
