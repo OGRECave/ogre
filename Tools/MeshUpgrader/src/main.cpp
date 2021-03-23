@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-
 #include "Ogre.h"
 #include "OgreMeshSerializer.h"
 #include "OgreSkeletonSerializer.h"
@@ -104,9 +103,7 @@ struct UpgradeOptions {
     Serializer::Endian endian;
     bool recalcBounds;
     MeshVersion targetVersion;
-
 };
-
 
 // Crappy globals
 // NB some of these are not directly used, but are required to
@@ -194,7 +191,6 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
         opts.usePercent = true;
     }
 
-
     bi = binOpts.find("-f");
     if (!bi->second.empty()) {
         opts.lodFixed = StringConverter::parseInt(bi->second);
@@ -209,23 +205,25 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
             opts.endian = Serializer::ENDIAN_LITTLE;
         } else {
             opts.endian = Serializer::ENDIAN_NATIVE;
+		}
     }
-    }
+
     bi = binOpts.find("-td");
     if (!bi->second.empty()) {
         if (bi->second == "uvw") {
             opts.tangentSemantic = VES_TEXTURE_COORDINATES;
         } else { // if (bi->second == "tangent"), or anything else
             opts.tangentSemantic = VES_TANGENT;
+		}
     }
-    }
+
     bi = binOpts.find("-ts");
     if (!bi->second.empty()) {
         if (bi->second == "4") {
             opts.tangentUseParity = true;
+		}
     }
-    }
-    
+
     bi = binOpts.find("-V");
     if (!bi->second.empty()) {
         if (bi->second == "1.10") {
@@ -242,7 +240,6 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
             logMgr->logError("Unrecognised target mesh version '" + bi->second + "'");
         }
     }
-    
 }
 
 String describeSemantic(VertexElementSemantic sem)
@@ -277,6 +274,7 @@ String describeSemantic(VertexElementSemantic sem)
     }
     return "";
 }
+
 void displayVertexBuffers(VertexDeclaration::VertexElementList& elemList)
 {
     // Iterate per buffer
@@ -291,12 +289,12 @@ void displayVertexBuffers(VertexDeclaration::VertexElementList& elemList)
         }
         cout << "   - Element " << elemNum++ << ": " << describeSemantic(i->getSemantic());
         if (i->getSemantic() == VES_TEXTURE_COORDINATES) {
-            cout << " (index " << i->getIndex() << ")"; 
+            cout << " (index " << i->getIndex() << ")";
         }
         cout << endl;
-
     }
 }
+
 // Sort routine for VertexElement
 bool vertexElementLess(const VertexElement& e1, const VertexElement& e2)
 {
@@ -316,9 +314,10 @@ bool vertexElementLess(const VertexElement& e1, const VertexElement& e2)
     }
     return false;
 }
+
 void copyElems(VertexDeclaration* decl, VertexDeclaration::VertexElementList* elemList)
 {
-    
+
     elemList->clear();
     const VertexDeclaration::VertexElementList& origElems = decl->getElements();
     VertexDeclaration::VertexElementList::const_iterator i, iend;
@@ -328,6 +327,7 @@ void copyElems(VertexDeclaration* decl, VertexDeclaration::VertexElementList* el
     }
     elemList->sort(VertexDeclaration::vertexElementLess);
 }
+
 // Utility function to allow the user to modify the layout of vertex buffers.
 void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, VertexData* vertexData)
 {
@@ -370,19 +370,18 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                             movei->getSemantic(), movei->getIndex());
                         elemList.sort(vertexElementLess);
                         anyChanges = true;
-                                
+
                     }
                 }
             } else if (response == "a") {
                 // Automatic
-                VertexDeclaration* newDcl = 
+                VertexDeclaration* newDcl =
                     vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
-                        mesh.hasSkeleton(), mesh.hasVertexAnimation(), 
+                        mesh.hasSkeleton(), mesh.hasVertexAnimation(),
                         sm ? sm->getVertexAnimationIncludesNormals() : mesh.getSharedVertexDataAnimationIncludesNormals());
                 copyElems(newDcl, &elemList);
                 HardwareBufferManager::getSingleton().destroyVertexDeclaration(newDcl);
                 anyChanges = true;
-
             } else if (response == "d") {
                 String moveResp;
                 cout << "Which element do you want to delete (type number): ";
@@ -410,7 +409,6 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                 std::cout << "Wrong answer!\n";
                 response = "";
             }
-            
         }
     }
 
@@ -451,11 +449,9 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                 response = "";
             }
         }
-        
     }
-        
-
 }
+
 // Utility function to allow the user to modify the layout of vertex buffers.
 void reorganiseVertexBuffers(Mesh& mesh)
 {
@@ -467,7 +463,7 @@ void reorganiseVertexBuffers(Mesh& mesh)
             reorganiseVertexBuffers("Shared Geometry", mesh, 0, mesh.sharedVertexData);
         } else {
             // Automatic
-            VertexDeclaration* newDcl = 
+            VertexDeclaration* newDcl =
                 mesh.sharedVertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                 mesh.hasSkeleton(), mesh.hasVertexAnimation(), mesh.getSharedVertexDataAnimationIncludesNormals());
             if (*newDcl != *(mesh.sharedVertexData->vertexDeclaration)) {
@@ -478,7 +474,6 @@ void reorganiseVertexBuffers(Mesh& mesh)
                 }
                 mesh.sharedVertexData->reorganiseBuffers(newDcl, bufferUsages);
             }
-
         }
     }
 
@@ -494,7 +489,7 @@ void reorganiseVertexBuffers(Mesh& mesh)
                 const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;
 
                 // Automatic
-                VertexDeclaration* newDcl = 
+                VertexDeclaration* newDcl =
                     sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                     mesh.hasSkeleton(), hasVertexAnim, sm->getVertexAnimationIncludesNormals() );
                 if (*newDcl != *(sm->vertexData->vertexDeclaration)) {
@@ -505,12 +500,10 @@ void reorganiseVertexBuffers(Mesh& mesh)
                     }
                     sm->vertexData->reorganiseBuffers(newDcl, bufferUsages);
                 }
-                
             }
         }
     }
 }
-
 
 void vertexBufferReorg(Mesh& mesh)
 {
@@ -535,14 +528,13 @@ void vertexBufferReorg(Mesh& mesh)
     } else if (!opts.dontReorganise) {
                 reorganiseVertexBuffers(mesh);
             }
-
 }
 
 void recalcBounds(const VertexData* vdata, AxisAlignedBox& aabb, Real& radius)
 {
-    const VertexElement* posElem = 
+    const VertexElement* posElem =
         vdata->vertexDeclaration->findElementBySemantic(VES_POSITION);
-    
+
     const HardwareVertexBufferSharedPtr buf = vdata->vertexBufferBinding->getBuffer(
         posElem->getSource());
     void* pBase = buf->lock(HardwareBuffer::HBL_READ_ONLY);
@@ -550,17 +542,15 @@ void recalcBounds(const VertexData* vdata, AxisAlignedBox& aabb, Real& radius)
     for (size_t v = 0; v < vdata->vertexCount; ++v) {
         float* pFloat;
         posElem->baseVertexPointerToElement(pBase, &pFloat);
-        
+
         Vector3 pos(pFloat[0], pFloat[1], pFloat[2]);
         aabb.merge(pos);
         radius = std::max(radius, pos.length());
 
         pBase = static_cast<void*>(static_cast<char*>(pBase) + buf->getVertexSize());
-
     }
 
     buf->unlock();
-
 }
 
 void recalcBounds(Mesh* mesh)
@@ -609,6 +599,7 @@ void printLodConfig(const LodConfig& lodConfig)
         (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName);
     }
 }
+
 size_t getUniqueVertexCount(MeshPtr mesh)
 {
 
@@ -621,6 +612,7 @@ size_t getUniqueVertexCount(MeshPtr mesh)
     MeshLodGenerator().generateLodLevels(lodConfig);
     return lodConfig.levels[0].outUniqueVertexCount;
 }
+
 void buildLod(MeshPtr& mesh)
 {
     String response;
@@ -850,7 +842,6 @@ void buildLod(MeshPtr& mesh)
     }
     printLodConfig(lodConfig);
 
-
     cout << "\n\nGenerating LOD levels...";
     gen.generateLodLevels(lodConfig);
     cout << "success\n";
@@ -877,7 +868,6 @@ void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
             ;
         }
     }
-
 }
 
 void resolveColourAmbiguities(Mesh* mesh)
@@ -949,7 +939,6 @@ void resolveColourAmbiguities(Mesh* mesh)
                 return;
             }
         }
-
     }
 
     if (mesh->sharedVertexData && hasColour) {
@@ -961,8 +950,6 @@ void resolveColourAmbiguities(Mesh* mesh)
             sm->vertexData->convertPackedColour(originalType, desiredType);
         }
     }
-
-
 }
 
 struct MaterialCreator : public MeshSerializerListener
@@ -992,7 +979,7 @@ int main(int numargs, char** args)
     }
 
     int retCode = 0;
-    try 
+    try
     {
         logMgr = new LogManager();
         logMgr->createLog("OgreMeshUpgrade.log", true);
@@ -1011,7 +998,6 @@ int main(int numargs, char** args)
         // don't pad during upgrade
         meshMgr->setBoundsPaddingFactor(0.0f);
 
-        
         UnaryOptionList unOptList;
         BinaryOptionList binOptList;
 
@@ -1041,7 +1027,6 @@ int main(int numargs, char** args)
         parseOpts(unOptList, binOptList);
 
         String source(args[startIdx]);
-
 
         // Load the mesh
         struct stat tagStat;
@@ -1080,7 +1065,7 @@ int main(int numargs, char** args)
 
         // Deal with VET_COLOUR ambiguities
         resolveColourAmbiguities(mesh);
-        
+
         buildLod(meshPtr);
 
         if (opts.interactive) {
@@ -1109,7 +1094,7 @@ int main(int numargs, char** args)
                 cout << "success\n";
             } else {
                 mesh->freeEdgeList();
-        }
+			}
         }
         if (opts.interactive) {
             do {
@@ -1157,26 +1142,23 @@ int main(int numargs, char** args)
             if (opts.generateTangents) {
                 cout << "\nGenerating tangent vectors....";
                 mesh->buildTangentVectors(opts.tangentSemantic, srcTex, destTex,
-                    opts.tangentSplitMirrored, opts.tangentSplitRotated, 
+                    opts.tangentSplitMirrored, opts.tangentSplitRotated,
                     opts.tangentUseParity);
                 cout << "success" << std::endl;
             }
         }
-
 
         if (opts.recalcBounds) {
             recalcBounds(mesh);
         }
 
         meshSerializer->exportMesh(mesh, dest, opts.targetVersion, opts.endian);
-    
     }
     catch (Exception& e)
     {
         cout << "Exception caught: " << e.getDescription() << std::endl;
         retCode = 1;
     }
-
 
     delete meshMgr;
     delete skeletonSerializer;
@@ -1189,5 +1171,4 @@ int main(int numargs, char** args)
     delete logMgr;
 
     return retCode;
-
 }
