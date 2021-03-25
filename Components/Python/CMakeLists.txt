@@ -10,6 +10,10 @@ include(${SWIG_USE_FILE})
 
 set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/Ogre/)
 
+if(SKBUILD)
+    set(PYTHON_SITE_PACKAGES Ogre/)
+endif()
+
 set(CMAKE_SWIG_FLAGS -w401,314 -builtin)
 
 if (APPLE AND NOT ANDROID)

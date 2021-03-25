@@ -179,7 +179,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             --build ${PROJECT_BINARY_DIR}/freetype-2.10.1/objs ${BUILD_COMMAND_OPTS})
     endif()
 
-    if(MSVC OR MINGW) # other platforms dont need this
+    if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
         message(STATUS "Building SDL2")
         file(DOWNLOAD
             https://libsdl.org/release/SDL2-2.0.14.tar.gz
@@ -196,7 +196,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             --build ${PROJECT_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
     endif()
 
-    if(MSVC OR MINGW) # other platforms dont need this
+    if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
       message(STATUS "Building Assimp")
       file(DOWNLOAD
           https://github.com/assimp/assimp/archive/v5.0.1.tar.gz
