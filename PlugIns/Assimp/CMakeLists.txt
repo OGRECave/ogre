@@ -8,7 +8,11 @@ target_include_directories(Codec_Assimp PUBLIC
 target_link_libraries(Codec_Assimp PUBLIC OgreMain PRIVATE fix::assimp)
 if(OGRE_BUILD_DEPENDENCIES)
     # hack to get our CI build going, despite horribly broken assimp cmake
-    target_link_libraries(Codec_Assimp PRIVATE ZLIB::ZLIB ${OGREDEPS_PATH}/lib/IrrXML.lib)
+    if(UNIX)
+        target_link_libraries(Codec_Assimp PUBLIC ZLIB::ZLIB ${OGREDEPS_PATH}/lib/libIrrXML.a)
+    else()
+        target_link_libraries(Codec_Assimp PRIVATE ZLIB::ZLIB ${OGREDEPS_PATH}/lib/IrrXML.lib)
+    endif()
 endif()
 
 ogre_config_framework(Codec_Assimp)
