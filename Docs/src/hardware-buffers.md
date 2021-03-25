@@ -290,58 +290,25 @@ You can then write to the buffer using the usual pointer semantics, just remembe
 
 Hardware Pixel Buffers are a special kind of buffer that stores graphical data in graphics card memory, generally for use as textures. Pixel buffers can represent a one dimensional, two dimensional or three dimensional image. A texture can consist of a multiple of these buffers.
 
-In contrary to vertex and index buffers, pixel buffers are not constructed directly. When creating a texture, the necessary pixel buffers to hold its data are constructed automatically.
+In contrary to vertex and index buffers, pixel buffers are not constructed directly. When creating @ref Textures, the necessary pixel buffers to hold the data are constructed automatically.
 
-## Textures {#Textures}
+## Pixel boxes {#Pixel-boxes}
 
-A texture is an image that can be applied onto the surface of a three dimensional model. In Ogre, textures are represented by the Texture resource class.
+All methods in Ogre that take or return raw image data return a Ogre::PixelBox object.
 
-### Creating a texture {#Creating-a-texture}
+A PixelBox is a primitive describing a volume (3D), image (2D) or line (1D) of pixels in CPU memory. It describes the location and data format of a region of memory used for image data, but does not do any memory management in itself.
 
-Textures are created through the TextureManager. In most cases they are created from image files directly by the Ogre resource system. If you are reading this, you most probably want to create a texture manually so that you can provide it with image data yourself. This is done through TextureManager::createManual:
+Inside the memory pointed to by the *data* member of a pixel box, pixels are stored as a succession of "depth" slices (in Z), each containing "height" rows (Y) of "width" pixels (X).
 
-```cpp
-ptex = Ogre::TextureManager::getSingleton().createManual(
-    "MyManualTexture", // Name of texture
-    "General", // Name of resource group in which the texture should be created
-    Ogre::TEX_TYPE_2D, // Texture type
-    256, // Width
-    256, // Height
-    1, // Depth (Must be 1 for two dimensional textures)
-    0, // No mipmaps
-    PF_A8R8G8B8, // internal Pixel format
-    Ogre::HBU_CPU_TO_GPU // usage
-);
-```
-
-This example creates a texture named *MyManualTexture* in resource group *General*. It is a square *two dimensional* texture, with width 256 and height 256.
-
-The different texture types will be discussed in Ogre::TextureType. Pixel formats are summarised in @ref Pixel-Formats.
-
-In addition to the hardware buffer usages as described in Ogre::HardwareBufferUsage there are some usage flags specific to textures: Ogre::TextureUsage.
-
-## Getting a PixelBuffer {#Getting-a-PixelBuffer}
-
-A Texture can consist of multiple PixelBuffers, one for each combo if mipmap level and face number. To get a PixelBuffer from a Texture object the method Texture::getBuffer(face, mipmap) is used:
-
-*face* should be zero for non-cubemap textures. For cubemap textures it identifies the face to use, which is one of the cube faces described in See @ref Texture-Types.
-
-*mipmap* is zero for the zeroth mipmap level, one for the first mipmap level, and so on. On textures that have automatic mipmap generation (TU\_AUTOMIPMAP) only level 0 should be accessed, the rest will be taken care of by the rendering API.
-
-A simple example of using getBuffer is
-
-```cpp
-// Get the PixelBuffer for face 0, mipmap 0.
-HardwarePixelBufferSharedPtr ptr = tex->getBuffer(0,0);
-```
+Dimensions that are not used must be 1. For example, a one dimensional image will have extents (width,1,1). A two dimensional image has extents (width,height,1).
 
 ## Updating Pixel Buffers {#Updating-Pixel-Buffers}
 
 Pixel Buffers can be updated in two different ways; a simple, convenient way and a more difficult (but in some cases faster) method. Both methods make use of Ogre::PixelBox objects to represent image data in memory.
 
-## Blit from memory {#blitFromMemory}
+### Blit from memory {#blitFromMemory}
 
-The easy method to get an image into a PixelBuffer is by using HardwarePixelBuffer::blitFromMemory. This takes a PixelBox object and does all necessary pixel format conversion and scaling for you. For example, to create a manual texture and load an image into it, all you have to do is
+The easy method to get an image into a PixelBuffer is by using Ogre::HardwarePixelBuffer::blitFromMemory. This takes a PixelBox object and does all necessary pixel format conversion and scaling for you. For example, to create a manual texture and load an image into it, all you have to do is
 
 ```cpp
 // Manually loads an image and puts the contents in a manually created texture
@@ -358,7 +325,7 @@ TexturePtr tex = Ogre::TextureManager::getSingleton().createManual(
 tex->getBuffer(0,0)->blitFromMemory(img.getPixelBox(0,0));
 ```
 
-## Direct memory locking {#Direct-memory-locking}
+### Direct memory locking {#Direct-memory-locking}
 
 A more advanced method to transfer image data from and to a PixelBuffer is to use locking. By locking a PixelBuffer you can directly access its contents in whatever the internal format of the buffer inside the GPU is.
 
@@ -387,40 +354,71 @@ for(size_t y=0; y<height; ++y)
 buffer->unlock();
 ```
 
-## Texture Types {#Texture-Types}
 
-There are several types of textures supported by current hardware (see Ogre::TextureType), the first three only differ in the amount of dimensions they have (one, two or three).
+# Textures {#Textures}
+
+A texture is an image that can be applied onto the surface of a three dimensional model. In %Ogre, textures are represented by the Ogre::Texture resource class.
+
+## Creating a texture {#Creating-a-texture}
+
+Textures are created through the TextureManager. In most cases they are created from image files directly by the Ogre resource system. If you are reading this, you most probably want to create a texture manually so that you can provide it with image data yourself. This is done through Ogre::TextureManager::createManual:
+
+```cpp
+tex = Ogre::TextureManager::getSingleton().createManual(
+    "MyManualTexture", // Name of texture
+    "General", // Name of resource group in which the texture should be created
+    Ogre::TEX_TYPE_2D, // Texture type
+    256, // Width
+    256, // Height
+    1, // Depth (Must be 1 for two dimensional textures)
+    0, // No mipmaps
+    PF_A8R8G8B8, // internal Pixel format hint
+    Ogre::HBU_CPU_TO_GPU // usage
+);
+```
+
+This example creates a texture named *MyManualTexture* in resource group *General*. It is a square *two dimensional* texture, with width 256 and height 256.
+
+The available texture types are specified in Ogre::TextureType. Pixel formats are summarised in @ref Pixel-Formats. Note, the format specified here is only a hint. If the hardware does not support the requested format, you will get the closest supported alternative format as returned by Ogre::TextureManager::getNativeFormat.
+
+In addition to the hardware buffer usages as described in Ogre::HardwareBufferUsage there are some usage flags specific to textures defined in Ogre::TextureUsage.
+
+## Getting a PixelBuffer {#Getting-a-PixelBuffer}
+
+A Texture can consist of multiple @ref Hardware-Pixel-Buffers, one for each combo if mipmap level and face number. To get a PixelBuffer from a Texture object the method Ogre::Texture::getBuffer is used:
+
+*face* should be zero for non-cubemap textures. For @ref Cube-map-textures it identifies which one of the cube faces to use.
+
+*mipmap* is zero for the zeroth mipmap level, one for the first mipmap level, and so on. On textures that have automatic mipmap generation (TU\_AUTOMIPMAP) only level 0 should be accessed, the rest will be taken care of by the rendering API.
+
+A simple example of using getBuffer is
+
+```cpp
+// Get the PixelBuffer for face 0, mipmap 0.
+HardwarePixelBufferSharedPtr ptr = tex->getBuffer(0,0);
+```
 
 ## Cube map textures {#Cube-map-textures}
 
 The cube map texture type (Ogre::TEX_TYPE_CUBE_MAP) is a different beast from the others; a cube map texture represents a series of six two dimensional images addressed by 3D texture coordinates.
 
-<dl compact="compact">
-<dt>+X (face 0)</dt> <dd>
-
+@par +X (face 0)
 Represents the positive x plane (right).
 
-</dd> <dt>-X (face 1)</dt> <dd>
-
+@par -X (face 1)
 Represents the negative x plane (left).
 
-</dd> <dt>+Y (face 2)</dt> <dd>
-
+@par +Y (face 2)
 Represents the positive y plane (top).
 
-</dd> <dt>-Y (face 3)</dt> <dd>
-
+@par -Y (face 3)
 Represents the negative y plane (bottom).
 
-</dd> <dt>+Z (face 4)</dt> <dd>
-
+@par +Z (face 4)
 Represents the positive z plane (front).
 
-</dd> <dt>-Z (face 5)</dt> <dd>
-
+@par -Z (face 5)
 Represents the negative z plane (back).
-
-</dd> </dl>
 
 ## Pixel Formats {#Pixel-Formats}
 
@@ -428,119 +426,46 @@ Represents the negative z plane (back).
 
 A pixel format described the storage format of pixel data. It defines the way pixels are encoded in memory. The following classes of pixel formats (PF\_\*) are defined:
 
-<dl compact="compact">
-<dt>Native endian formats (PF\_A8R8G8B8 and other formats with bit counts)</dt> <dd>
-
+@par Native endian formats (PF\_A8R8G8B8 and other formats with bit counts)
 These are native endian (16, 24 and 32 bit) integers in memory. The meaning of the letters is described below.
 
-</dd> <dt>Byte formats (PF\_BYTE\_\*)</dt> <dd>
-
+@par Byte formats (PF\_BYTE\_\*)
 These formats have one byte per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF\_BYTE\_RGBA consists of blocks of four bytes, one for red, one for green, one for blue, one for alpha.
 
-</dd> <dt>Short formats (PF\_SHORT\_\*)</dt> <dd>
-
+@par Short formats (PF\_SHORT\_\*)
 These formats have one unsigned short (16 bit integer) per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF\_SHORT\_RGBA consists of blocks of four 16 bit integers, one for red, one for green, one for blue, one for alpha.
 
-</dd> <dt>Float16 formats (PF\_FLOAT16\_\*)</dt> <dd>
-
+@par Float16 formats (PF\_FLOAT16\_\*)
 These formats have one 16 bit floating point number per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF\_FLOAT16\_RGBA consists of blocks of four 16 bit floats, one for red, one for green, one for blue, one for alpha. The 16 bit floats, also called half float) are very similar to the IEEE single-precision floating-point standard of the 32 bits floats, except that they have only 5 exponent bits and 10 mantissa. Note that there is no standard C++ data type or CPU support to work with these efficiently, but GPUs can calculate with these much more efficiently than with 32 bit floats.
 
-</dd> <dt>Float32 formats (PF\_FLOAT32\_\*)</dt> <dd>
-
+@par Float32 formats (PF\_FLOAT32\_\*)
 These formats have one 32 bit floating point number per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF\_FLOAT32\_RGBA consists of blocks of four 32 bit floats, one for red, one for green, one for blue, one for alpha. The C++ data type for these 32 bits floats is just "float".
 
-</dd> <dt>Compressed formats (PF\_DXT\[1-5\])</dt> <dd>
-
+@par Compressed formats (PF\_DXT\[1-5\])
 S3TC compressed texture formats, [a good description can be found at Wikipedia](http://en.wikipedia.org/wiki/S3TC)
-
-</dd> </dl>
-
-## Colour channels {#Colour-channels}
-
-The meaning of the channels R,G,B,A,L and X is defined as
-
-<dl compact="compact">
-<dt>R</dt> <dd>
-
-Red colour component, usually ranging from 0.0 (no red) to 1.0 (full red).
-
-</dd> <dt>G</dt> <dd>
-
-Green colour component, usually ranging from 0.0 (no green) to 1.0 (full green).
-
-</dd> <dt>B</dt> <dd>
-
-Blue colour component, usually ranging from 0.0 (no blue) to 1.0 (full blue).
-
-</dd> <dt>A</dt> <dd>
-
-Alpha component, usually ranging from 0.0 (entire transparent) to 1.0 (opaque).
-
-</dd> <dt>L</dt> <dd>
-
-Luminance component, usually ranging from 0.0 (black) to 1.0 (white). The luminance component is duplicated in the R, G, and B channels to achieve a greyscale image.
-
-</dd> <dt>X</dt> <dd>
-
-This component is completely ignored.
-
-</dd> </dl>
-
-If none of red, green and blue components, or luminance is defined in a format, these default to 0. For the alpha channel this is different; if no alpha is defined, it defaults to 1.
-
-## List of pixel formats {#Complete-list-of-pixel-formats}
-
-This pixel formats supported by the current version of Ogre are
-
-<dl compact="compact">
-<dt>Byte formats</dt> <dd>
-
-PF\_BYTE\_RGB, PF\_BYTE\_BGR, PF\_BYTE\_BGRA, PF\_BYTE\_RGBA, PF\_BYTE\_L, PF\_BYTE\_LA, PF\_BYTE\_A
-
-</dd> <dt>Short formats</dt> <dd>
-
-PF\_SHORT\_RGBA
-
-</dd> <dt>Float16 formats</dt> <dd>
-
-PF\_FLOAT16\_R, PF\_FLOAT16\_RGB, PF\_FLOAT16\_RGBA
-
-</dd> <dt>Float32 formats</dt> <dd>
-
-PF\_FLOAT32\_R, PF\_FLOAT32\_RGB, PF\_FLOAT32\_RGBA
-
-</dd> <dt>8 bit native endian formats</dt> <dd>
-
-PF\_L8, PF\_A8, PF\_A4L4, PF\_R3G3B2
-
-</dd> <dt>16 bit native endian formats</dt> <dd>
-
-PF\_L16, PF\_R5G6B5, PF\_B5G6R5, PF\_A4R4G4B4, PF\_A1R5G5B5
-
-</dd> <dt>24 bit native endian formats</dt> <dd>
-
-PF\_R8G8B8, PF\_B8G8R8
-
-</dd> <dt>32 bit native endian formats</dt> <dd>
-
-PF\_A8R8G8B8, PF\_A8B8G8R8, PF\_B8G8R8A8, PF\_R8G8B8A8, PF\_X8R8G8B8, PF\_X8B8G8R8, PF\_A2R10G10B10 PF\_A2B10G10R10
-
-</dd> <dt>Compressed formats</dt> <dd>
-
-PF\_DXT1, PF\_DXT2, PF\_DXT3, PF\_DXT4, PF\_DXT5
-
-</dd> </dl>
 
 For a complete list see Ogre::PixelFormat.
 
-## Pixel boxes {#Pixel-boxes}
+### Colour channels {#Colour-channels}
 
-All methods in Ogre that take or return raw image data return a Ogre::PixelBox object.
+The meaning of the channels R,G,B,A,L and X is defined as
 
-A PixelBox is a primitive describing a volume (3D), image (2D) or line (1D) of pixels in CPU memory. It describes the location and data format of a region of memory used for image data, but does not do any memory management in itself.
+@par R
+Red colour component, usually ranging from 0.0 (no red) to 1.0 (full red).
 
-Inside the memory pointed to by the *data* member of a pixel box, pixels are stored as a succession of "depth" slices (in Z), each containing "height" rows (Y) of "width" pixels (X).
+@par G
+Green colour component, usually ranging from 0.0 (no green) to 1.0 (full green).
 
-Dimensions that are not used must be 1. For example, a one dimensional image will have extents (width,1,1). A two dimensional image has extents (width,height,1).
+@par B
+Blue colour component, usually ranging from 0.0 (no blue) to 1.0 (full blue).
 
-For more information about the members consult the API documentation Ogre::PixelBox.
+@par A
+Alpha component, usually ranging from 0.0 (entire transparent) to 1.0 (opaque).
+
+@par L
+Luminance component, usually ranging from 0.0 (black) to 1.0 (white). The luminance component is duplicated in the R, G, and B channels to achieve a greyscale image.
+
+@par X
+This component is completely ignored.
+
+If none of red, green and blue components, or luminance is defined in a format, these default to 0. For the alpha channel this is different; if no alpha is defined, it defaults to 1.
