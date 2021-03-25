@@ -339,7 +339,7 @@ MACRO(ADD_NATIVE_PRECOMPILED_HEADER _targetName _input)
 
     if(NOT OGRE_ENABLE_PRECOMPILED_HEADERS)
         # do nothing
-    elseif(CMAKE_VERSION GREATER_EQUAL "3.16")
+    elseif(NOT CMAKE_VERSION VERSION_LESS "3.16")
         target_precompile_headers(${_targetName} PRIVATE ${_input})
     elseif(CMAKE_GENERATOR MATCHES "^Visual.*$")
 
