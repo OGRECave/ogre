@@ -437,7 +437,7 @@ Format: target\_output { }
 
 The contents of both are identical, the only real difference is that you can only have a single target\_output entry, whilst you can have many target entries. 
 
-Note, that the target entry can refer to a cubemap texture. Therefore, it takes an optional _decimal_ slice parameter that specifies which face you want to render on. The order is +X, -X, +Y, -Y, +Z, -Z. The default is 0, hence +X.
+Note, the target entry can refer to @ref Cube-map-textures. Therefore, it takes an optional _decimal_ slice parameter that specifies which face you want to render on. The default is 0, hence +X.
 
 Here are the attributes you can use in a ’target’ or ’target\_output’ section of a .compositor script:
 
