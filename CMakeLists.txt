@@ -388,6 +388,7 @@ option(OGRE_PROFILING "Enable internal instrumentation." FALSE)
 set(OGRE_PROFILING_REMOTERY_PATH "" CACHE PATH "set this to Remotery/lib to use Remotery instead of the buildin profiler")
 cmake_dependent_option(OGRE_CONFIG_STATIC_LINK_CRT "Statically link the MS CRT dlls (msvcrt)" FALSE "MSVC" FALSE)
 set(OGRE_LIB_DIRECTORY "lib${LIB_SUFFIX}" CACHE STRING "Install path for libraries, e.g. 'lib64' on some 64-bit Linux distros.")
+set(OGRE_BIN_DIRECTORY "bin" CACHE STRING "Install path for binaries")
 
 cmake_dependent_option(OGRE_INSTALL_VSPROPS "Install Visual Studio Property Page." FALSE "MSVC" FALSE)
 if (OGRE_INSTALL_VSPROPS)
@@ -428,6 +429,7 @@ mark_as_advanced(
   OGRE_PROFILING
   OGRE_CONFIG_STATIC_LINK_CRT
   OGRE_LIB_DIRECTORY
+  OGRE_BIN_DIRECTORY
 )
 
 ###################################################################

@@ -103,7 +103,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
     endif()
 
     if (EXISTS ${OGRE_DEP_DIR}/bin/)
-        install(DIRECTORY ${OGRE_DEP_DIR}/bin/ DESTINATION bin)
+      install(DIRECTORY ${OGRE_DEP_DIR}/bin/ DESTINATION ${OGRE_BIN_DIRECTORY})
     endif ()
   endif ()
     
