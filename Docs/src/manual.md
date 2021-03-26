@@ -285,7 +285,16 @@ If you’re creating non-animated meshes, then you do not need to be concerned w
 
 Full documentation for each exporter is provided along with the exporter itself, and there is a [selection of the currently supported modelling tools at OGRECave](https://github.com/OGRECave).
 
+## A Note About empty Material Names
 
+It is highly recommended for any mesh files to have a material name set, otherwise most mesh tools will fail with an exception.
+Even if they don't, the exception will happen deep inside the render-loop which is way harder to debug  (unless you set the material programmatically).
+
+To set a material name for the mesh, you have these options:
+
+ - Re-export the mesh from your preferred DCC (Digital Content Creator) exporter, making sure that a material has been assigned.
+ - Edit the mesh.xml file to set a material name and reprocess the xml with OgreXMLConverter.
+ - Edit the mesh file with MeshMagick [MeshMagick](https://github.com/OGRECave/meshmagick) to set a material name
 
 # XMLConverter {#XMLConverter}
 
