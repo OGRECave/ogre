@@ -122,23 +122,14 @@ namespace Ogre
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         // try to determine the application's path
         String appPath = getModulePath(false);
-        if (appPath.empty())
-        {
-            // fall back to current working dir
-            appPath = ".";
-        }
-
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
         Ogre::String appPath;
-        if(!widePathToOgreString(appPath, Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data()))
-        {
-            // fallback to current working dir
-            appPath = ".";
-        }
+        widePathToOgreString(appPath, Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data());
 #endif
 
         // use application path as config search path
-        mConfigPaths.push_back(appPath + '\\');
+        if (!appPath.empty())
+            mConfigPaths.push_back(appPath + '\\');
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         // look relative to the DLL according to PIP structure
         mConfigPaths.push_back(StringUtil::normalizeFilePath(getModulePath(true)+"/../../../bin/"));

@@ -107,17 +107,12 @@ namespace Ogre
             Ogre::String::size_type pos = appPath.rfind('/');
             if (pos != Ogre::String::npos)
                 appPath.erase(pos);
-        }
-        else
-        {
-            // couldn't find actual executable path, assume current working dir
-            appPath = ".";
-        }
 
-        // use application path as first config search path
-        mConfigPaths.push_back(appPath + '/');
-        // then search inside ../share/OGRE
-        mConfigPaths.push_back(StringUtil::normalizeFilePath(appPath + "/../share/OGRE/", false));
+            // use application path as first config search path
+            mConfigPaths.push_back(appPath + '/');
+            // then search inside ../share/OGRE
+            mConfigPaths.push_back(StringUtil::normalizeFilePath(appPath + "/../share/OGRE/", false));
+        }
 
         // XDG_DATA_HOME (used by PIP)
         if(const char* home = getenv("HOME"))
