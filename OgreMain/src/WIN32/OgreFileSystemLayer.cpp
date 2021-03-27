@@ -63,20 +63,25 @@ namespace Ogre
         WideCharToMultiByte(codepage, 0 /* Use default flags */, wpath, wlength, &dest[0], (int)dest.size(), NULL, NULL);
         return true;
     }
-    String FileSystemLayer::resolveBundlePath(String path)
+
+    static String getModulePath(bool dllpath)
     {
-        return path;
-    }
-    void FileSystemLayer::getConfigPaths()
-    {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        // try to determine the application's path
+        HMODULE hm = NULL;
+
+        // get path of this DLL
+        if (dllpath && !GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                                              GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                                          (LPCSTR)&getModulePath, &hm))
+        {
+            return "";
+        }
+
         DWORD bufsize = 256;
         char* resolved = 0;
         do
         {
             char* buf = OGRE_ALLOC_T(char, bufsize, Ogre::MEMCATEGORY_GENERAL);
-            DWORD retval = GetModuleFileName(NULL, buf, bufsize);
+            DWORD retval = GetModuleFileName(hm, buf, bufsize);
             if (retval == 0)
             {
                 // failed
@@ -97,17 +102,27 @@ namespace Ogre
             }
         } while (!resolved);
 
-        Ogre::String appPath = resolved;
-        if (resolved)
-            OGRE_FREE(resolved, Ogre::MEMCATEGORY_GENERAL);
-        if (!appPath.empty())
-        {
-            // need to strip the application filename from the path
-            Ogre::String::size_type pos = appPath.rfind('\\');
-            if (pos != Ogre::String::npos)
-                appPath.erase(pos);
-        }
-        else
+        String ret = resolved;
+        OGRE_FREE(resolved, Ogre::MEMCATEGORY_GENERAL);
+
+        // need to strip the module filename from the path
+        String::size_type pos = ret.rfind('\\');
+        if (pos != String::npos)
+            ret.erase(pos);
+
+        return ret;
+    }
+
+    String FileSystemLayer::resolveBundlePath(String path)
+    {
+        return path;
+    }
+    void FileSystemLayer::getConfigPaths()
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        // try to determine the application's path
+        String appPath = getModulePath(false);
+        if (appPath.empty())
         {
             // fall back to current working dir
             appPath = ".";
@@ -124,6 +139,10 @@ namespace Ogre
 
         // use application path as config search path
         mConfigPaths.push_back(appPath + '\\');
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        // look relative to the DLL according to PIP structure
+        mConfigPaths.push_back(StringUtil::normalizeFilePath(getModulePath(true)+"/../../../bin/"));
+#endif
     }
     //---------------------------------------------------------------------
     void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
