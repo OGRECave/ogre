@@ -63,9 +63,8 @@ namespace Ogre
 
          The search order is
          1. Subdirectory in user Home (see @ref getWritablePath)
-         2. Executable path
-         3. Special system-wide config paths (only on Linux)
-         4. Current working directory
+         2. OS dependant config-paths
+         3. Current working directory
 
          @param filename The config file name (without path)
          @return The full path to the config file
@@ -80,9 +79,9 @@ namespace Ogre
                 return path;
             
             // 2. in the config file search paths
-            for (size_t i = 0; i < mConfigPaths.size(); ++i)
+            for (const String& cpath : mConfigPaths)
             {
-                path = mConfigPaths[i] + filename;
+                path = cpath + filename;
                 if (fileExists(path))
                     return path;
             }
