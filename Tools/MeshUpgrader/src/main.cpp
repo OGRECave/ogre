@@ -360,8 +360,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                     int eindex = StringConverter::parseInt(moveResp);
                     VertexDeclaration::VertexElementList::iterator movei = elemList.begin();
                     std::advance(movei, eindex);
-                    cout << endl << "Move element " << eindex << "(" + describeSemantic(movei->getSemantic()) <<
-                    ") to which buffer: ";
+                    cout << endl << "Move element " << eindex << "(" + describeSemantic(movei->getSemantic()) << ") to which buffer: ";
                     cin >> moveResp;
                     if (!moveResp.empty()) {
                         int bindex = StringConverter::parseInt(moveResp);
@@ -390,7 +389,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                     int eindex = StringConverter::parseInt(moveResp);
                     VertexDeclaration::VertexElementList::iterator movei = elemList.begin();
                     std::advance(movei, eindex);
-                    cout << std::endl << "Delete element " << eindex << "(" + describeSemantic(movei->getSemantic()) << ")?: ";
+                    cout << endl << "Delete element " << eindex << "(" + describeSemantic(movei->getSemantic()) << ")?: ";
                     cin >> moveResp;
                     StringUtil::toLowerCase(moveResp);
                     if (moveResp == "y") {
@@ -406,7 +405,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                 // finish
                 finish = true;
             } else {
-                std::cout << "Wrong answer!\n";
+                cout << "Wrong answer!\n";
                 response = "";
             }
         }
@@ -445,7 +444,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
             } else if (response == "n") {
                 // do nothing
             } else {
-                std::cout << "Wrong answer!\n";
+                cout << "Wrong answer!\n";
                 response = "";
             }
         }
@@ -512,7 +511,7 @@ void vertexBufferReorg(Mesh& mesh)
     if (opts.interactive) {
 
         // Check to see whether we would like to reorganise vertex buffers
-        std::cout << "\nWould you like to reorganise the vertex buffers for this mesh? (y/n) ";
+        cout << "\nWould you like to reorganise the vertex buffers for this mesh? (y/n) ";
         while (response.empty()) {
             cin >> response;
             StringUtil::toLowerCase(response);
@@ -521,7 +520,7 @@ void vertexBufferReorg(Mesh& mesh)
             } else if (response == "n") {
                 // Do nothing
             } else {
-                std::cout << "Wrong answer!\n";
+                cout << "Wrong answer!\n";
                 response = "";
             }
         }
@@ -623,8 +622,8 @@ void buildLod(MeshPtr& mesh)
     if (genLod) { // otherwise only ask if not specified on command line
         if (mesh->getNumLodLevels() > 1) {
             do {
-                std::cout << "\nMesh already contains level-of-detail information.\n"
-                             "Do you want to: (u)se it, (r)eplace it, or (d)rop it? ";
+                cout << "\nMesh already contains level-of-detail information.\n"
+                     << "Do you want to: (u)se it, (r)eplace it, or (d)rop it? ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "u") {
@@ -637,13 +636,13 @@ void buildLod(MeshPtr& mesh)
                 } else if (response == "r") {
                     genLod = true;
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
         } else if (askLodDtls) {
             do {
-                std::cout << "\nWould you like to generate level-of-detail information? (y/n) ";
+                cout << "\nWould you like to generate level-of-detail information? (y/n) ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "n") {
@@ -651,7 +650,7 @@ void buildLod(MeshPtr& mesh)
                 } else if (response == "y") {
                     genLod = true;
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
@@ -668,8 +667,7 @@ void buildLod(MeshPtr& mesh)
     lodConfig.strategy = DistanceLodBoxStrategy::getSingletonPtr();
     if (askLodDtls) {
         do {
-            std::cout <<
-            "\nDo you want to (m)anually configure or (a)utoconfigure it?\nautoconfigure=no more questions asked! (m/a) ";
+            cout << "\nDo you want to (m)anually configure or (a)utoconfigure it?\nautoconfigure=no more questions asked! (m/a) ";
             cin >> response;
             StringUtil::toLowerCase(response);
             if (response == "a") {
@@ -677,13 +675,13 @@ void buildLod(MeshPtr& mesh)
             } else if (response == "m") {
                 opts.lodAutoconfigure = false;
             } else {
-                std::cout << "Wrong answer!\n";
+                cout << "Wrong answer!\n";
                 response = "";
             }
         } while (response == "");
         if (!opts.lodAutoconfigure) {
             do {
-                std::cout << "\nDo you want to use (p)ixels or (d)istance to determine where the LOD activates? (p/d) ";
+                cout << "\nDo you want to use (p)ixels or (d)istance to determine where the LOD activates? (p/d) ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "p") {
@@ -691,16 +689,15 @@ void buildLod(MeshPtr& mesh)
                 } else if (response == "d") {
                     lodConfig.strategy = DistanceLodBoxStrategy::getSingletonPtr();
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
             LodLevel lodLevel;
             size_t vertexCount = 0;
             do {
-                cout <<
-                "\nWhat unit of reduction would you like to use(fixed=constant vertex number; proportional=percentage): " <<
-                "\n(f)ixed or (p)roportional? ";
+                cout << "\nWhat unit of reduction would you like to use(fixed=constant vertex number; proportional=percentage): "
+                     << "\n(f)ixed or (p)roportional? ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "f") {
@@ -709,7 +706,7 @@ void buildLod(MeshPtr& mesh)
                 } else if (response == "p") {
                     lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
@@ -769,7 +766,7 @@ void buildLod(MeshPtr& mesh)
                         }
 
                     } else {
-                        std::cout << "Wrong answer!\n";
+                        cout << "Wrong answer!\n";
                         response = "";
                     }
                 } while (response == "");
@@ -802,13 +799,13 @@ void buildLod(MeshPtr& mesh)
                 }
                 minDistance = lodLevel.distance;
                 cout << "\nLOD" << (iLod + 1) << " level summary:";
-                cout << "\n    lodLevel.distance=" << lodLevel.distance;
+                cout << "\n - lodLevel.distance=" << lodLevel.distance;
                 String reductionMethod =
                     ((lodLevel.reductionMethod == LodLevel::VRM_PROPORTIONAL) ? "VRM_PROPORTIONAL" : "VRM_CONSTANT");
-                cout << "\n    lodLevel.reductionMethod=" << (lodLevel.manualMeshName.empty() ? reductionMethod : "N/A");
-                cout << "\n    lodLevel.reductionValue=" <<
+                cout << "\n - lodLevel.reductionMethod=" << (lodLevel.manualMeshName.empty() ? reductionMethod : "N/A");
+                cout << "\n - lodLevel.reductionValue=" <<
                 (lodLevel.manualMeshName.empty() ? StringConverter::toString(lodLevel.reductionValue) : "N/A");
-                cout << "\n    lodLevel.manualMeshName=" << (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName);
+                cout << "\n - lodLevel.manualMeshName=" << (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName);
                 lodConfig.levels.push_back(lodLevel);
             }
         }
@@ -892,9 +889,9 @@ void resolveColourAmbiguities(Mesh* mesh)
             originalType = opts.srcColourFormat;
         } else {
             // unknown input colour, have to ask
-            std::cout   << "\nYour mesh has vertex colours but I don't know whether they were generated\n"
-                        << "using GL or D3D ordering. Please indicate which was used when the mesh was\n"
-                        << "created (type 'gl' or 'd3d').\n";
+            cout << "\nYour mesh has vertex colours but I don't know whether they were generated\n"
+                 << "using GL or D3D ordering. Please indicate which was used when the mesh was\n"
+                 << "created (type 'gl' or 'd3d').\n";
             while (response.empty()) {
                 cin >> response;
                 StringUtil::toLowerCase(response);
@@ -903,7 +900,7 @@ void resolveColourAmbiguities(Mesh* mesh)
                 } else if (response == "gl") {
                     originalType = VET_COLOUR_ABGR;
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             }
@@ -919,9 +916,9 @@ void resolveColourAmbiguities(Mesh* mesh)
             if (opts.interactive) {
 
                 response = "";
-                std::cout   << "\nYour mesh has vertex colours, which can be stored in one of two layouts,\n"
-                            << "each of which will be slightly faster to load in a different render system.\n"
-                            << "Do you want to prefer Direct3D (d3d) or OpenGL (gl)?\n";
+                cout << "\nYour mesh has vertex colours, which can be stored in one of two layouts,\n"
+                     << "each of which will be slightly faster to load in a different render system.\n"
+                     << "Do you want to prefer Direct3D (d3d) or OpenGL (gl)?\n";
                 while (response.empty()) {
                     cin >> response;
                     StringUtil::toLowerCase(response);
@@ -930,7 +927,7 @@ void resolveColourAmbiguities(Mesh* mesh)
                     } else if (response == "gl") {
                         desiredType = VET_COLOUR_ABGR;
                     } else {
-                        std::cout << "Wrong answer!\n";
+                        cout << "Wrong answer!\n";
                         response = "";
                     }
                 }
@@ -1070,19 +1067,19 @@ int main(int numargs, char** args)
 
         if (opts.interactive) {
             do {
-                std::cout << "\nWould you like to (b)uild/(r)emove/(k)eep Edge lists? (b/r/k) ";
+                cout << "\nWould you like to (b)uild/(r)emove/(k)eep Edge lists? (b/r/k) ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "k") {
                     // Do nothing
                 } else if (response == "b") {
-                    cout << "\nGenerating edge lists...";
+                    cout << "\nGenerating edge lists..." << endl;
                     mesh->buildEdgeList();
-                    cout << "success\n";
+                    cout << "\nGenerating edge lists... success" << endl;
                 } else if (response == "r") {
                     mesh->freeEdgeList();
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
@@ -1098,7 +1095,7 @@ int main(int numargs, char** args)
         }
         if (opts.interactive) {
             do {
-                std::cout << "\nWould you like to (g)enerate/(k)eep tangent buffer? (g/k) ";
+                cout << "\nWould you like to (g)enerate/(k)eep tangent buffer? (g/k) ";
                 cin >> response;
                 StringUtil::toLowerCase(response);
                 if (response == "k") {
@@ -1106,7 +1103,7 @@ int main(int numargs, char** args)
                 } else if (response == "g") {
                     opts.generateTangents = true;
                 } else {
-                    std::cout << "Wrong answer!\n";
+                    cout << "Wrong answer!\n";
                     response = "";
                 }
             } while (response == "");
@@ -1118,9 +1115,9 @@ int main(int numargs, char** args)
             if (existing) {
                 if (opts.interactive) {
                     do {
-                    std::cout << "\nThis mesh appears to already have a set of tangents, " <<
-                        "which would suggest tangent vectors have already been calculated. Do you really " <<
-                        "want to generate new tangent vectors (may duplicate)? (y/n) ";
+                        cout << "\nThis mesh appears to already have a set of tangents, "
+                             << "which would suggest tangent vectors have already been calculated. Do you really "
+                             << "want to generate new tangent vectors (may duplicate)? (y/n) ";
                         cin >> response;
                         StringUtil::toLowerCase(response);
                         if (response == "y") {
@@ -1128,7 +1125,7 @@ int main(int numargs, char** args)
                         } else if (response == "n") {
                             opts.generateTangents = false;
                         } else {
-                            std::cout << "Wrong answer!\n";
+                            cout << "Wrong answer!\n";
                             response = "";
                         }
 
@@ -1156,7 +1153,7 @@ int main(int numargs, char** args)
     }
     catch (Exception& e)
     {
-        cout << "Exception caught: " << e.getDescription() << std::endl;
+        cout << " !!! Exception caught: " << e.getDescription() << endl;
         retCode = 1;
     }
 
