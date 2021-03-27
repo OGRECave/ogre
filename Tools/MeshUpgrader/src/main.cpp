@@ -74,6 +74,7 @@ void help(void)
     cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
     cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
     cout << "             Options are: 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
+    cout << "-log filename  = name of the log file (default: 'OgreMeshUpgrader.log')" << endl;
     cout << "sourcefile = name of file to convert" << endl;
     cout << "destfile   = optional name of file to write to. If you don't" << endl;
     cout << "             specify this OGRE overwrites the existing file." << endl;
@@ -103,6 +104,7 @@ struct UpgradeOptions {
     Serializer::Endian endian;
     bool recalcBounds;
     MeshVersion targetVersion;
+    String logFile;
 };
 
 // Crappy globals
@@ -122,6 +124,7 @@ UpgradeOptions opts;
 
 void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
 {
+    // Defaults
     opts.interactive = false;
     opts.suppressEdgeLists = false;
     opts.generateTangents = false;
@@ -151,6 +154,7 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.interactive = unOpts["-i"];
     opts.dontReorganise = unOpts["-r"];
 
+    // Unary options (true/false options that don't take a parameter)
     if (unOpts["-d3d"]) {
         opts.destColourFormatSet = true;
         opts.destColourFormat = VET_COLOUR_ARGB;
@@ -175,9 +179,15 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
         opts.recalcBounds = true;
     }
 
+    // Binary options (options that take a parameter)
     BinaryOptionList::iterator bi = binOpts.find("-l");
     if (!bi->second.empty()) {
         opts.numLods = StringConverter::parseInt(bi->second);
+    }
+
+    bi = binOpts.find("-log");
+    if (!bi->second.empty()) {
+        opts.logFile = binOpts["-log"];
     }
 
     bi = binOpts.find("-d");
@@ -573,8 +583,8 @@ void recalcBounds(Mesh* mesh)
 
 void printLodConfig(const LodConfig& lodConfig)
 {
-    cout << "\n\nLOD config summary:";
-    cout << "\n  lodConfig.strategy=" << lodConfig.strategy->getName();
+    logMgr->logMessage("LOD config summary:");
+    logMgr->logMessage(" - lodConfig.strategy=" + lodConfig.strategy->getName());
     String reductionMethod("Unknown");
     if (lodConfig.levels[0].reductionMethod == LodLevel::VRM_PROPORTIONAL) {
         reductionMethod = "VRM_PROPORTIONAL";
@@ -589,13 +599,14 @@ void printLodConfig(const LodConfig& lodConfig)
     }
     for (unsigned short i = 0; i < lodConfig.levels.size(); i++) {
         const LodLevel& lodLevel = lodConfig.levels[i];
-        cout << "\n  lodConfig.levels[" << i << "].distance=" << lodLevel.distance << distQuantity;
-        cout << "\n  lodConfig.levels[" << i << "].reductionMethod=" <<
-        (lodLevel.manualMeshName.empty() ? reductionMethod : "N/A");
-        cout << "\n  lodConfig.levels[" << i << "].reductionValue=" <<
-        (lodLevel.manualMeshName.empty() ? StringConverter::toString(lodLevel.reductionValue) : "N/A");
-        cout << "\n  lodConfig.levels[" << i << "].manualMeshName=" <<
-        (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName);
+        logMgr->logMessage(" - lodConfig.levels[" + StringConverter::toString(i) + "].distance=" +
+                           StringConverter::toString(lodLevel.distance) + distQuantity);
+        logMgr->logMessage(" - lodConfig.levels[" + StringConverter::toString(i) + "].reductionMethod=" +
+                           (lodLevel.manualMeshName.empty() ? reductionMethod : "N/A"));
+        logMgr->logMessage(" - lodConfig.levels[" + StringConverter::toString(i) + "].reductionValue=" +
+                           (lodLevel.manualMeshName.empty() ? StringConverter::toString(lodLevel.reductionValue) : "N/A"));
+        logMgr->logMessage(" - lodConfig.levels[" + StringConverter::toString(i) + "].manualMeshName=" +
+                           (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName));
     }
 }
 
@@ -839,9 +850,9 @@ void buildLod(MeshPtr& mesh)
     }
     printLodConfig(lodConfig);
 
-    cout << "\n\nGenerating LOD levels...";
+    logMgr->logMessage("Generating LOD levels...");
     gen.generateLodLevels(lodConfig);
-    cout << "success\n";
+    logMgr->logMessage("Generating LOD levels... success");
 }
 
 void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
@@ -979,21 +990,9 @@ int main(int numargs, char** args)
     try
     {
         logMgr = new LogManager();
-        logMgr->createLog("OgreMeshUpgrader.log", true);
-        rgm = new ResourceGroupManager();
-        mth = new Math();
-        lodMgr = new LodStrategyManager();
-        matMgr = new MaterialManager();
-        matMgr->initialise();
-        skelMgr = new SkeletonManager();
-        meshSerializer = new MeshSerializer();
-        MaterialCreator matCreator;
-        meshSerializer->setListener(&matCreator);
-        skeletonSerializer = new SkeletonSerializer();
-        bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
-        meshMgr = new MeshManager();
-        // don't pad during upgrade
-        meshMgr->setBoundsPaddingFactor(0.0f);
+        //logMgr->createLog("OgreMeshUpgrader.log", true);
+        // this log catches output from the parseArgs call and routes it to stdout only
+        logMgr->createLog("Temporary log", false, true, true);
 
         UnaryOptionList unOptList;
         BinaryOptionList binOptList;
@@ -1019,11 +1018,33 @@ int main(int numargs, char** args)
         binOptList["-td"] = "";
         binOptList["-ts"] = "";
         binOptList["-V"] = "";
+        binOptList["-log"] = "OgreMeshUpgrader.log";
 
         int startIdx = findCommandLineOpts(numargs, args, unOptList, binOptList);
         parseOpts(unOptList, binOptList);
 
+        // use the log specified by the cmdline params
+        logMgr->setDefaultLog(logMgr->createLog(opts.logFile, true, true));
+
+        // get rid of the temporary log as we use the new log now
+        logMgr->destroyLog("Temporary log");
+
         String source(args[startIdx]);
+
+        rgm = new ResourceGroupManager();
+        mth = new Math();
+        lodMgr = new LodStrategyManager();
+        matMgr = new MaterialManager();
+        matMgr->initialise();
+        skelMgr = new SkeletonManager();
+        meshSerializer = new MeshSerializer();
+        MaterialCreator matCreator;
+        meshSerializer->setListener(&matCreator);
+        skeletonSerializer = new SkeletonSerializer();
+        bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
+        meshMgr = new MeshManager();
+        // don't pad during upgrade
+        meshMgr->setBoundsPaddingFactor(0.0f);
 
         // Load the mesh
         struct stat tagStat;
@@ -1086,9 +1107,9 @@ int main(int numargs, char** args)
         } else {
         // Make sure we generate edge lists, provided they are not deliberately disabled
             if (!opts.suppressEdgeLists) {
-                cout << "\nGenerating edge lists...";
+                logMgr->logMessage("Generating edge lists...");
                 mesh->buildEdgeList();
-                cout << "success\n";
+                logMgr->logMessage("Generating edge lists... success");
             } else {
                 mesh->freeEdgeList();
 			}
@@ -1137,11 +1158,11 @@ int main(int numargs, char** args)
 
             }
             if (opts.generateTangents) {
-                cout << "\nGenerating tangent vectors....";
+                logMgr->logMessage("Generating tangent vectors...");
                 mesh->buildTangentVectors(opts.tangentSemantic, srcTex, destTex,
                     opts.tangentSplitMirrored, opts.tangentSplitRotated,
                     opts.tangentUseParity);
-                cout << "success" << std::endl;
+                logMgr->logMessage("Generating tangent vectors... success");
             }
         }
 
