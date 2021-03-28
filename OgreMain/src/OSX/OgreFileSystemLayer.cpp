@@ -28,6 +28,7 @@
 #include "OgreFileSystemLayer.h"
 #include "macUtils.h"
 #include <pwd.h>
+#include <dlfcn.h>
 
 namespace Ogre
 {
@@ -43,6 +44,19 @@ namespace Ogre
     {
         mConfigPaths.push_back(Ogre::macBundlePath() + "/Contents/Resources/");
         mConfigPaths.push_back(Ogre::macBundlePath() + "/");
+
+        Dl_info info;
+        if (dladdr((const void*)macBundlePath, &info))
+        {
+            String base(info.dli_fname);
+            // need to strip the module filename from the path
+            String::size_type pos = base.rfind('/');
+            if (pos != String::npos)
+                base.erase(pos);
+
+            // look relative to the dylib according to PIP structure
+            mConfigPaths.push_back(StringUtil::normalizeFilePath(base+"/../../../../bin/"));
+        }
     }
     //---------------------------------------------------------------------
     void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
