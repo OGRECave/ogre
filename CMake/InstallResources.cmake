@@ -24,7 +24,7 @@ elseif (APPLE)
     set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
     set(OGRE_TEST_MEDIA_DIR_REL "../../Tests/${OGRE_MEDIA_PATH}")
   else()
-    set(OGRE_MEDIA_DIR_REL "${CMAKE_INSTALL_PREFIX}/${OGRE_MEDIA_PATH}")
+    set(OGRE_MEDIA_DIR_REL "../${OGRE_MEDIA_PATH}")
     set(OGRE_TEST_MEDIA_DIR_REL "${CMAKE_INSTALL_PREFIX}/Tests/Media")
   endif()
   # these are resolved relative to the app bundle
