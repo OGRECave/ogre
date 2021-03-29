@@ -37,8 +37,10 @@ else()
 endif()
 set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
 
-if(UNIX AND NOT APPLE)
-    # weakly link libpython on Linux to allow relocation
+# weakly link libpython on Unix to allow relocation
+if(APPLE)
+    set(PYTHON_LIBRARIES "-Wl,-undefined,dynamic_lookup")
+elseif(UNIX)
     set(PYTHON_LIBRARIES "")
 endif()
 
