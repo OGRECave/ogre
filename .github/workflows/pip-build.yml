@@ -1,0 +1,52 @@
+name: PIP packages
+on:
+  push:
+    tags: ["v*"]
+env:
+  TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+  TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+jobs:
+  linux:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Docker Image
+      run: docker build SDK -t pypi38
+    - name: Build
+      run: |
+        docker run --rm -v `pwd`:/workspace -w /workspace pypi38
+        f=`ls *.whl`
+        mv $f ${f/linux/manylinux2014}
+        pip3 install twine
+        python -m twine upload --repository pypi *.whl
+  windows:
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.1
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install Dependencies
+      run: choco install swig -y # need swig 4+ for python 3.8
+    - name: Build
+      run: |
+        pip install setuptools wheel twine
+        pip wheel . --verbose
+        python -m twine upload --repository pypi *.whl
+  macos:
+    runs-on: macos-10.15
+    steps:
+    - name: Install Dependencies
+      run: brew update && brew install swig
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Build
+      run: |
+        pip install setuptools wheel twine
+        pip wheel . --verbose
+        python -m twine upload --repository pypi *.whl
