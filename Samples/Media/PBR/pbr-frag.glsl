@@ -1,6 +1,6 @@
 #ifndef OGRE_HLSL
 #ifndef GL_ES
-#ifdef USE_TEX_LOD
+#if defined(USE_TEX_LOD) && __VERSION__ < 150
 #extension GL_ARB_shader_texture_lod : require  
 #endif
 #else
