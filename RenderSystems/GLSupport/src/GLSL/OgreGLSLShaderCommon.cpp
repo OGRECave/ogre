@@ -69,6 +69,14 @@ namespace Ogre {
             mShaderVersion = StringConverter::parseInt(mSource.substr(versionPos+9, 3));
         }
         String verStr = std::to_string(mShaderVersion);
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        auto rsc = Root::getSingleton().getRenderSystem()->getCapabilities();
+        // OSX driver only supports glsl150+ in core profile, GL3+ will auto-upgrade code
+        if(mShaderVersion < 150 && getLanguage() == "glsl" && rsc->isShaderProfileSupported("glsl150"))
+            verStr = "150";
+#endif
+
         cpp.Define("__VERSION__", 11, verStr.c_str(), verStr.size());
 
         String defines = appendBuiltinDefines(mPreprocessorDefines);
