@@ -57,8 +57,8 @@ namespace Ogre {
             if (it == mArchFactories.end())
             {
                 // Factory not found
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot find an archive factory "
-                    "to deal with archive of type " + archiveType, "ArchiveManager::load");
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                            "Cannot find an ArchiveFactory for type '" + archiveType + "'");
             }
 
             pArch = it->second->createInstance(filename, readOnly);
@@ -89,7 +89,7 @@ namespace Ogre {
             i->second->unload();
             // Find factory to destroy. An archive factory created this file, it should still be there!
             ArchiveFactoryMap::iterator fit = mArchFactories.find(i->second->getType());
-            assert( fit != mArchFactories.end() && "Cannot find an archive factory "
+            assert( fit != mArchFactories.end() && "Cannot find an ArchiveFactory "
                     "to deal with archive this type" );
             fit->second->destroyInstance(i->second);
             mArchives.erase(i);
@@ -115,7 +115,7 @@ namespace Ogre {
             arch->unload();
             // Find factory to destroy. An archive factory created this file, it should still be there!
             ArchiveFactoryMap::iterator fit = mArchFactories.find(arch->getType());
-            assert( fit != mArchFactories.end() && "Cannot find an archive factory "
+            assert( fit != mArchFactories.end() && "Cannot find an ArchiveFactory "
                     "to deal with archive this type" );
             fit->second->destroyInstance(arch);
             
@@ -127,7 +127,7 @@ namespace Ogre {
     void ArchiveManager::addArchiveFactory(ArchiveFactory* factory)
     {
         mArchFactories.emplace(factory->getType(), factory);
-        LogManager::getSingleton().logMessage("ArchiveFactory for archive type " +     factory->getType() + " registered.");
+        LogManager::getSingleton().logMessage("ArchiveFactory for type '" + factory->getType() + "' registered");
     }
 
 }
