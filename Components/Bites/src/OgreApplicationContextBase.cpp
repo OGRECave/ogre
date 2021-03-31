@@ -426,6 +426,7 @@ void ApplicationContextBase::locateResources()
 
     if (Ogre::FileSystemLayer::fileExists(resourcesPath) || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
     {
+        Ogre::LogManager::getSingleton().logMessage("Parsing '"+resourcesPath+"'");
         cf.load(resourcesPath);
     }
     else
