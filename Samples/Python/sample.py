@@ -1,87 +1,65 @@
 import Ogre
-from Ogre import RTShader, Overlay, Bites
+import Ogre.Bites
+import Ogre.RTShader
 
-class SampleApp(Bites.ApplicationContext, Bites.InputListener):
+class KeyListener(Ogre.Bites.InputListener):
     def __init__(self):
-        Bites.ApplicationContext.__init__(self, "PySample")
-        Bites.InputListener.__init__(self)
+        Ogre.Bites.InputListener.__init__(self)
 
     def keyPressed(self, evt):
-        if evt.keysym.sym == Bites.SDLK_ESCAPE:
-            self.getRoot().queueEndRendering()
+        if evt.keysym.sym == Ogre.Bites.SDLK_ESCAPE:
+            Ogre.Root.getSingleton().queueEndRendering()
 
         return True
 
-    def loadResources(self):
-        self.enableShaderCache()
+def main():
+    ctx = Ogre.Bites.ApplicationContext("PySample")
 
-        # load essential resources for trays/ loading bar
-        Ogre.ResourceGroupManager.getSingleton().initialiseResourceGroup("Essential")
-        self.createDummyScene()
-        self.trays = Bites.TrayManager("Interface", self.getRenderWindow())
-        self.addInputListener(self.trays)
+    ctx.initApp()
 
-        # show loading progress
-        self.trays.showLoadingBar(1, 0)
-        ret = Bites.ApplicationContext.loadResources(self)
+    # register for input events
+    klistener = KeyListener() # must keep a reference around
+    ctx.addInputListener(klistener)
 
-        # clean up
-        self.trays.hideLoadingBar()
-        self.destroyDummyScene()
-        return ret
+    root = ctx.getRoot()
+    scn_mgr = root.createSceneManager()
 
-    def setup(self):
-        Bites.ApplicationContext.setup(self)
-        self.addInputListener(self)
+    shadergen = Ogre.RTShader.ShaderGenerator.getSingleton()
+    shadergen.addSceneManager(scn_mgr)  # must be done before we do anything with the scene
 
-        root = self.getRoot()
-        scn_mgr = root.createSceneManager()
+    # without light we would just get a black screen
+    scn_mgr.setAmbientLight((.1, .1, .1))
 
-        shadergen = RTShader.ShaderGenerator.getSingleton()
-        shadergen.addSceneManager(scn_mgr)  # must be done before we do anything with the scene
+    light = scn_mgr.createLight("MainLight")
+    lightnode = scn_mgr.getRootSceneNode().createChildSceneNode()
+    lightnode.setPosition(0, 10, 15)
+    lightnode.attachObject(light)
 
-        # overlay/ trays
-        scn_mgr.addRenderQueueListener(self.getOverlaySystem())
-        self.trays.showFrameStats(Bites.TL_TOPRIGHT)
-        self.trays.refreshCursor()
+    # create the camera
+    cam = scn_mgr.createCamera("myCam")
+    cam.setNearClipDistance(5)
+    cam.setAutoAspectRatio(True)
+    camnode = scn_mgr.getRootSceneNode().createChildSceneNode()
+    camnode.attachObject(cam)
 
-        scn_mgr.setAmbientLight((.1, .1, .1))
+    # map input events to camera controls
+    camman = Ogre.Bites.CameraMan(camnode)
+    camman.setStyle(Ogre.Bites.CS_ORBIT)
+    camman.setYawPitchDist(0, 0.3, 15)
+    ctx.addInputListener(camman)
 
-        light = scn_mgr.createLight("MainLight")
-        lightnode = scn_mgr.getRootSceneNode().createChildSceneNode()
-        lightnode.setPosition(0, 10, 15)
-        lightnode.attachObject(light)
+    # and tell it to render into the main window
+    vp = ctx.getRenderWindow().addViewport(cam)
+    vp.setBackgroundColour((.3, .3, .3))
 
-        cam = scn_mgr.createCamera("myCam")
-        cam.setNearClipDistance(5)
-        cam.setAutoAspectRatio(True)
-        camnode = scn_mgr.getRootSceneNode().createChildSceneNode()
-        camnode.attachObject(cam)
+    # finally something to render
+    ent = scn_mgr.createEntity("Sinbad.mesh")
+    node = scn_mgr.getRootSceneNode().createChildSceneNode()
+    node.attachObject(ent)
 
-        self.camman = Bites.CameraMan(camnode)
-        self.camman.setStyle(Bites.CS_ORBIT)
-        self.camman.setYawPitchDist(0, 0.3, 15)
-        self.addInputListener(self.camman)
+    root.startRendering() # blocks until queueEndRendering is called
 
-        # must keep a reference to ctrls so it does not get deleted
-        self.ctrls = Bites.AdvancedRenderControls(self.trays, cam)
-        self.addInputListener(self.ctrls)
+    ctx.closeApp()
 
-        vp = self.getRenderWindow().addViewport(cam)
-        vp.setBackgroundColour((.3, .3, .3))
-
-        ent = scn_mgr.createEntity("Sinbad.mesh")
-        node = scn_mgr.getRootSceneNode().createChildSceneNode()
-        node.attachObject(ent)
-    
-    def shutdown(self):
-        # manually destroy in reverse creation order
-        del app.ctrls
-        del app.trays
-        Ogre.Bites.ApplicationContext.shutdown(self)
-    
 if __name__ == "__main__":
-    app = SampleApp()
-    app.initApp()
-    app.getRoot().startRendering()
-    app.closeApp()
+    main()
