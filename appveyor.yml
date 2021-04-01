@@ -24,42 +24,10 @@ branches:
     - master
     - stable
 after_build:
-  - IF "%APPVEYOR_REPO_TAG%" == "true" 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-vc15-x64.zip ./build/sdk/*
-  - IF NOT "%APPVEYOR_REPO_TAG%" == "true" 7z a ogre-sdk-master-vc15-x64.zip ./build/sdk/*
+  - IF NOT "%APPVEYOR_REPO_TAG%" == "true" set APPVEYOR_REPO_TAG_NAME=master
+  - 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-vc15-x64.zip ./build/sdk/*
   - pip install --upgrade cloudsmith-cli
-  - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" IF NOT "%APPVEYOR_REPO_TAG%" == "true" IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" cloudsmith push raw ogrecave/ogre ogre-sdk-master-vc15-x64.zip --republish -k %CS_APIKEY%
+  - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" cloudsmith push raw ogrecave/ogre ogre-sdk-master-vc15-x64.zip --republish -k %CS_APIKEY%
 artifacts:
-  - path: build/sdk
-    name: ogre-sdk-master2-vc15-x64
-  - path: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64.zip
-    name: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64
-deploy:
-- provider: BinTray
-  username: paroj
-  api_key:
-    secure: 4nFEwKApbHUf7UajsDt6Z7QOl3zzgEz6YbWGSGx5AiPxozWEQHEyGc6c9xE7utWE
-  subject: ogrecave
-  repo: ogre
-  package: ogre-sdk-vc15-x64
-  artifact: ogre-sdk-master2-vc15-x64
-  publish: true
-  override: true
-  version: master2
-  on:
-    branch: master
-    APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
-    APPVEYOR_REPO_TAG: false
-- provider: BinTray
-  username: paroj
-  api_key:
-    secure: 4nFEwKApbHUf7UajsDt6Z7QOl3zzgEz6YbWGSGx5AiPxozWEQHEyGc6c9xE7utWE
-  subject: ogrecave
-  repo: ogre
-  package: ogre-sdk-vc15-x64
-  artifact: ogre-sdk-$(APPVEYOR_REPO_TAG_NAME)-vc15-x64
-  publish: true
-  override: true
-  version: $(APPVEYOR_REPO_TAG_NAME)
-  on:
-    APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
-    APPVEYOR_REPO_TAG: true
+  - path: ogre-sdk-master-vc15-x64.zip
+    name: ogre-sdk-master-vc15-x64
