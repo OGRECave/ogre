@@ -6,7 +6,7 @@
 
 // --------------------- Light shafts material ------------------------
 
-vertex_program LightShafts_VP_GLSL glsl
+vertex_program LightShafts_VP_GLSL glsl glsles
 {
     source LightShafts.vert
 }
@@ -17,7 +17,7 @@ vertex_program LightShafts_VP_HLSL hlsl
     target vs_2_0
 }
 
-fragment_program LightShafts_FP_GLSL glsl
+fragment_program LightShafts_FP_GLSL glsl glsles
 {
     source LightShafts.frag
     default_params
