@@ -688,6 +688,12 @@ SHARED_PTR(Material);
     return dynamic_cast<Ogre::Entity*>($self);
   }
 }
+%extend Ogre::Node {
+  SceneNode* castSceneNode()
+  {
+    return dynamic_cast<Ogre::SceneNode*>($self);
+  }
+}
 %include "OgreMovableObject.h"
     %include "OgreBillboardChain.h"
         %ignore Ogre::RibbonTrail::getNodeIterator;
@@ -699,6 +705,7 @@ SHARED_PTR(Material);
     %ignore Ogre::Light::getDirection;
     %include "OgreLight.h"
     %ignore Ogre::Node::getChildIterator;
+    %template(ChildNodeList) std::vector<Ogre::Node*>;
     %include "OgreNode.h"
         %include "OgreBone.h"
         %ignore Ogre::SceneNode::getAttachedObjectIterator;
