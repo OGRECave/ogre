@@ -12,7 +12,7 @@ namespace Ogre {
     /** \addtogroup Resources
     *  @{
     */
-    /// @deprecated migrate to Codec API
+    /// @deprecated use @ref SceneNode::loadChildren instead
     class _OgreExport SceneLoaderManager : public Singleton<SceneLoaderManager>
     {
     public:
@@ -51,9 +51,9 @@ namespace Ogre {
         */
         void load(DataStreamPtr& stream, const String& groupName, SceneNode *rootNode);
         
-        /// @deprecated migrate to Codec API
+        /// @deprecated use @ref SceneNode::loadChildren instead
         OGRE_DEPRECATED static SceneLoaderManager& getSingleton(void);
-        /// @deprecated migrate to Codec API
+        /// @deprecated use @ref SceneNode::loadChildren instead
         OGRE_DEPRECATED static SceneLoaderManager* getSingletonPtr(void);
         
     protected:
