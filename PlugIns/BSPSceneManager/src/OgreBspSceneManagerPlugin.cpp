@@ -45,6 +45,7 @@ namespace {
             BspSceneManager* mgr = dynamic_cast<BspSceneManager*>(rootNode->getCreator());
 
             OgreAssert(mgr, "only loading into a BspSceneManager supported");
+            OgreAssert(mgr->getRootSceneNode() == rootNode, "BspCodec only supports loading into RootSceneNode");
 
             mgr->setLevel(BspLevelPtr()); // clear
 

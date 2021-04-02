@@ -371,6 +371,17 @@ namespace Ogre {
         mChildren.clear();
         needUpdate();
     }
+    void SceneNode::loadChildren(const String& filename)
+    {
+        String baseName, strExt;
+        StringUtil::splitBaseFilename(filename, baseName, strExt);
+        auto codec = Codec::getCodec(strExt);
+        OgreAssert(codec, ("No codec found to load "+filename).c_str());
+
+        auto stream = Root::openFileStream(
+            filename, ResourceGroupManager::getSingleton().getWorldResourceGroupName());
+        codec->decode(stream, this);
+    }
     //-----------------------------------------------------------------------
     SceneNode* SceneNode::createChildSceneNode(const Vector3& inTranslate, 
         const Quaternion& inRotate)

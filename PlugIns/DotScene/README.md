@@ -2,7 +2,7 @@
 
 DotScene (aka .scene) is just a standardized XML file format.
 
-This file format is meant to be used to set up a scene in [Ogre](http://www.ogre3d.org/). It is useful for any type of application/ game. Editors can export to .scene format, and apps can load the format.
+This file format is meant to be used to set up a scene or scene-part. It is useful for any type of application/ game. Editors can export to .scene format, and apps can load the format.
 
 Besides Ogre, the [jMonkeyEngine](http://jmonkeyengine.org/) also supports loading .scene files.
 
@@ -50,30 +50,24 @@ mSceneMgr->getEntity("Cube")->getUserObjectBindings().getUserAny("mass");
 ```
 
 ## How to use DotScene
-In recent OGRE versions DotScene has been incorporated into the main OGRE repo as a Plugin.
-So it has to be loaded as another OGRE Plugin.
+To use DotScene it has to be loaded as another OGRE Plugin.
 
 In `plugins.cfg`, add the following line:
-```
+```ini
 Plugin=Plugin_DotScene
 ```
 
-To use the Plugin, create a DataStream and pass it to `Codec` as:
+The Plugin will be then automatically used when you call `SceneNode::loadChildren()` like
 ```cpp
-auto groupName = "MyGroup";
-auto attachmentNode = mSceneMgr->getRootSceneNode();
+SceneNode* attachmentNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 
-auto stream = Root::openFileStream("myScene.scene", groupName);
-
-ResourceGroupManager::getSingleton().setWorldResourceGroupName(groupName);
-Codec::getCodec("scene")->decode(stream, mSceneMgr->getRootSceneNode());
+// set the desired resource group first
+ResourceGroupManager::getSingleton().setWorldResourceGroupName("MyGroup");
+attachmentNode->loadChildren("myScene.scene");
 ```
-
-`Codec` is now a central registry for encoding/decoding data.
-Previously it was only used for Images, but now it also handles Meshes and Scenes.
 
 If there is a TerrainGroup defined in the .scene file, you can get it by:
-```
+```cpp
 attachmentNode->getUserObjectBindings().getUserAny("TerrainGroup");
 ```
 The type is `std::shared_ptr<Ogre::TerrainGroup>`, hence `attachmentNode` owns it and will take it down on destruction.

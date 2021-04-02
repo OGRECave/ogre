@@ -278,6 +278,15 @@ namespace Ogre {
         */
         void removeAndDestroyAllChildren(void);
 
+        /**
+         * Load a scene from a file as children of this node
+         *
+         * The file and any referenced resources will be searched in @ref ResourceGroupManager::getWorldResourceGroupName
+         * Depending on the type of SceneManager you can load different scene file-formats.
+         * @param filename source file containing the scene structure
+         */
+        void loadChildren(const String& filename);
+
         /** Allows the showing of the node's bounding box.
         @remarks
             Use this to show or hide the bounding box of the node.
