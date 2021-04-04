@@ -30,9 +30,9 @@ public:
     OGRE_DEPRECATED static void NewFrame(const FrameEvent& evt) { NewFrame(); }
 
     void _findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp);
-    #ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
-    	ImPlotContext* get_implot(void);
-    #endif
+#ifdef OGRE_BUILD_COMPONENT_IMGUI_IMPLOT
+	ImPlotContext* get_implot(void);
+#endif
 private:
     void initialise();
 
