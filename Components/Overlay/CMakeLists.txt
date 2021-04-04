@@ -81,7 +81,7 @@ endif()
 
 if(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT)
   target_include_directories(OgreOverlay PUBLIC PUBLIC "$<BUILD_INTERFACE:${IMGUI_PLOT_DIR}>")
-  add_compile_definitions(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT=1) 
+  add_compile_definitions(OGRE_BUILD_COMPONENT_IMGUI_IMPLOT=1)
   if(UNIX)
     set_source_files_properties(${IMGUI_PLOT_DIR}/implot_items.cpp  PROPERTIES COMPILE_FLAGS "-Wno-cast-qual")
     set_source_files_properties(${IMGUI_PLOT_DIR}/implot.cpp PROPERTIES COMPILE_FLAGS "-Wno-cast-qual")
