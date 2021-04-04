@@ -471,7 +471,7 @@ namespace Ogre {
         Frustum::invalidateFrustum();
     }
     //-----------------------------------------------------------------------
-    void Camera::_renderScene(Viewport *vp, bool includeOverlays)
+    void Camera::_renderScene(Viewport *vp)
     {
         OgreProfileBeginGPUEvent(getName());
 
@@ -493,7 +493,7 @@ namespace Ogre {
         }
 
         //render scene
-        mManager->_renderScene(this, vp, includeOverlays);
+        mManager->_renderScene(this, vp);
 
         // Listener list may have change
         listenersCopy = mListeners;
