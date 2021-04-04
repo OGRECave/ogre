@@ -136,6 +136,19 @@ void Sample_Compositor::setupContent(void)
 #endif
 }
 
+static bool blacklisted(const String& name)
+{
+    const char* blacklist[] = {"Ogre/Scene/", "DeferredShading", "SSAO", "TestMRT", "Compute", "Fresnel", "CubeMap"};
+
+    for(auto it : blacklist)
+    {
+        if(name.find(it) == 0)
+            return true;
+    }
+
+    return false;
+}
+
 void Sample_Compositor::registerCompositors(void)
 {
     Ogre::Viewport *vp = mViewport;
@@ -149,20 +162,9 @@ void Sample_Compositor::registerCompositors(void)
     {
         Ogre::ResourcePtr resource = resourceIterator.getNext();
         const Ogre::String& compositorName = resource->getName();
-        // Don't add base Ogre/Scene compositor to view
-        if (Ogre::StringUtil::startsWith(compositorName, "Ogre/Scene/", false))
-            continue;
-        // Don't add the deferred shading compositors, thats a different demo.
-        if (Ogre::StringUtil::startsWith(compositorName, "DeferredShading", false))
-            continue;
-        // Don't add the SSAO compositors, thats a different demo.
-        if (Ogre::StringUtil::startsWith(compositorName, "SSAO", false))
-            continue;
-        // Don't add the TestMRT compositor, it needs extra scene setup so doesn't currently work.
-        if (Ogre::StringUtil::startsWith(compositorName, "TestMRT", false))
-            continue;
-        // Don't add the Compute compositors, thats a different demo.
-        if (Ogre::StringUtil::startsWith(compositorName, "Compute", false))
+
+        // Don't add blacklisted compositor to view
+        if (blacklisted(compositorName))
             continue;
 
         mCompositorNames.push_back(compositorName);
