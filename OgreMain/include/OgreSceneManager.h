@@ -1899,9 +1899,9 @@ namespace Ogre {
             @param camera Pointer to a camera from whose viewpoint the scene is to
                 be rendered.
             @param vp The target viewport
-            @param includeOverlays Whether or not overlay objects should be rendered
+            @param includeOverlays unused
         */
-        virtual void _renderScene(Camera* camera, Viewport* vp, bool includeOverlays);
+        virtual void _renderScene(Camera* camera, Viewport* vp, bool includeOverlays = true);
 
         /** Notifies the scene manager of its destination render system
             @remarks

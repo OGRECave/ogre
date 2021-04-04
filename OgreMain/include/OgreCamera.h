@@ -391,9 +391,11 @@ namespace Ogre {
 #endif
         /** Tells the Camera to contact the SceneManager to render from it's viewpoint.
         @param vp The viewport to render to
-        @param includeOverlays Whether or not any overlay objects should be included
         */
-        void _renderScene(Viewport *vp, bool includeOverlays);
+        void _renderScene(Viewport *vp);
+
+        /// @deprecated do not use
+        OGRE_DEPRECATED void _renderScene(Viewport *vp, bool unused) { _renderScene(vp); }
 
         /** Function for outputting to a stream.
         */

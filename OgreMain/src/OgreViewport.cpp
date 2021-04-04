@@ -215,7 +215,7 @@ namespace Ogre {
                 mCamera->_notifyViewport(this);
 
             // Tell Camera to render into me
-            mCamera->_renderScene(this, mShowOverlays);
+            mCamera->_renderScene(this);
         }
     }
     //---------------------------------------------------------------------
