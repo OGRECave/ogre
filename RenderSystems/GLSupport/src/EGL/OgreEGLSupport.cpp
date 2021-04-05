@@ -389,7 +389,8 @@ namespace Ogre {
 
         // client extensions
         propStr = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-        ext << propStr << " ";
+        if(propStr) // NULL = failure case
+            ext << propStr << " ";
 
         // display extension
         propStr = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
