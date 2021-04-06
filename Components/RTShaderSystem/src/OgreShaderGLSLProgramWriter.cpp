@@ -432,6 +432,8 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             }
             else
             {
+                if (mGLSLVersion >= 150)
+                    os << "layout(location = " << pParam->getIndex() << ") ";
                 os << "out vec4\t" << pParam->getName() << ";" << std::endl;
             }
         }
