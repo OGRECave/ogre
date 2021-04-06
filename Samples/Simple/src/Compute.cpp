@@ -28,12 +28,7 @@ namespace OgreBites {
 
     void Sample_Compute::testCapabilities(const RenderSystemCapabilities* caps)
     {
-        if (!caps->hasCapability(RSC_COMPUTE_PROGRAM))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support compute programs, "
-                        "so you cannot run this sample. Sorry!",
-                        "Sample_Compute::testCapabilities");
-        }
+        requireMaterial("Compute/Compositor");
     }
 
     // Just override the mandatory create scene method

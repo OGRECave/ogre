@@ -72,16 +72,6 @@ public:
 			"cursor and access widgets. Use WASD keys to move. You can increase/decrease terrains' LOD level using Page Up/Page Down."
 			"Use C to generate another random terrain";
 	}
-    
-	StringVector getRequiredPlugins()
-	{
-		StringVector names;
-		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
-            names.push_back("Cg Program Manager");
-		return names;
-	}
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {

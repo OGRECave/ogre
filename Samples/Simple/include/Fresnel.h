@@ -23,12 +23,7 @@ public:
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
-        auto mat = MaterialManager::getSingleton().getByName("Examples/FresnelReflectionRefraction");
-        mat->load();
-        if (mat->getSupportedTechniques().empty())
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, mat->getUnsupportedTechniquesExplanation());
-        }
+        requireMaterial("Examples/FresnelReflectionRefraction");
     }
 
     bool frameRenderingQueued(const FrameEvent &evt)

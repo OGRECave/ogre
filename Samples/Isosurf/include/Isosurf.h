@@ -15,7 +15,6 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
 
  public:
     Sample_Isosurf();
-    StringVector getRequiredPlugins();
     void testCapabilities(const RenderSystemCapabilities* caps);
     void setupContent(void);
     void cleanupContent();

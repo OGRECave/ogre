@@ -161,11 +161,6 @@ public:
         mMeshes.clear();
     }
     
-    StringVector getRequiredPlugins()
-    {
-        return StringVector();
-    }
-    
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
 		if (StringUtil::startsWith(caps->getRenderSystemName(), "OpenGL ES"))

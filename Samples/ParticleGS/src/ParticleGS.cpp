@@ -110,18 +110,7 @@ struct FireworkParticle
 
     void Sample_ParticleGS::testCapabilities(const RenderSystemCapabilities* caps)
     {
-        if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support geometry programs, "
-                        "so you cannot run this sample. Sorry!",
-                        "Sample_ParticleGS::createScene");
-        }
-        if (!caps->hasCapability(RSC_HWRENDER_TO_VERTEX_BUFFER))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support render to vertex buffers, "
-                        "so you cannot run this sample. Sorry!",
-                        "Sample_ParticleGS::createScene");
-        }
+        requireMaterial("Ogre/ParticleGS/Generate");
     }
 
     void Sample_ParticleGS::setupContent(void)

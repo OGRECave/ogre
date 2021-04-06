@@ -1115,25 +1115,10 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps )
 {
-    // Check if D3D10 shader is supported - is so - then we are OK.
-    if (GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0"))
-    {
+    if(RTShader::ShaderGenerator::getSingleton().getTargetLanguage() != "null")
         return;
-    }
 
-    // Check if GLSL type shaders are supported - is so - then we are OK.
-    if (GpuProgramManager::getSingleton().isSyntaxSupported("glsles") ||
-        GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
-    {
-        return;
-    }
-
-    if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
-        !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0"))
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support shader model 2, "
-            "so you cannot run this sample. Sorry!", "Sample_ShaderSystem::testCapabilities");
-    }
+    OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "RTSS not supported on your system");
 }
 
 //-----------------------------------------------------------------------

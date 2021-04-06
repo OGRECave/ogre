@@ -18,14 +18,9 @@ public:
         mInfo["Category"] = "Lighting";
     }
 
-    StringVector getRequiredPlugins()
+    void testCapabilities(const RenderSystemCapabilities* caps)
     {
-        StringVector names;
-		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150")
-		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
-            names.push_back("Cg Program Manager");
-        return names;
+        requireMaterial("Examples/CelShading");
     }
 
     bool frameRenderingQueued(const FrameEvent& evt)

@@ -35,13 +35,7 @@ public:
 
     void testCapabilities(const Ogre::RenderSystemCapabilities* caps)
     {
-        auto mat = MaterialManager::getSingleton().getByName("CSMShadows/Rockwall");
-        OgreAssert(mat, "required material not found");
-        mat->load();
-        if (mat->getSupportedTechniques().empty())
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, mat->getUnsupportedTechniquesExplanation());
-        }
+        requireMaterial("CSMShadows/Rockwall");
     }
 
     void setupContent()
