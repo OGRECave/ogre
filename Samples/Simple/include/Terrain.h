@@ -70,16 +70,6 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mHeightUpdateRate = 1.0 / 20.0;
     }
 
-    StringVector getRequiredPlugins()
-    {
-        StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
-            names.push_back("Cg Program Manager");
-        return names;
-    }
-
     void doTerrainModify(Terrain* terrain, const Vector3& centrepos, Real timeElapsed)
     {
         Vector3 tsPos;

@@ -33,11 +33,7 @@ class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
-        if (!caps->hasCapability(RSC_READ_WRITE_BUFFERS))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support atomic counters, "
-                        "so you cannot run this sample. Sorry!");
-        }
+        requireMaterial("Example/RasterizationOrder");
     }
 
     bool frameEnded(const FrameEvent& evt)

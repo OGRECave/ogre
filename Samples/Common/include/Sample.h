@@ -42,6 +42,7 @@
 #include "OgreInput.h"
 #include "OgreTrays.h"
 #include "OgreCameraMan.h"
+#include "OgreMaterialManager.h"
 
 namespace OgreBites
 {
@@ -106,6 +107,24 @@ namespace OgreBites
         | this sample. Signal a failure by throwing an exception.
         -----------------------------------------------------------------------------*/
         virtual void testCapabilities(const Ogre::RenderSystemCapabilities* caps) {}
+
+        void requireMaterial(const Ogre::String& name)
+        {
+            Ogre::StringStream err;
+            err << "Material: " << name << " ";
+            auto mat = Ogre::MaterialManager::getSingleton().getByName(name);
+            if(!mat)
+            {
+                err << "not found";
+                OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED, err.str());
+            }
+            mat->load();
+            if (mat->getSupportedTechniques().empty())
+            {
+                err << mat->getUnsupportedTechniquesExplanation();
+                OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED, err.str());
+            }
+        }
 
         /*-----------------------------------------------------------------------------
         | If this sample requires specific plugins to run, this method will be

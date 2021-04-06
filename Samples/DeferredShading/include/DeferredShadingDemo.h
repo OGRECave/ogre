@@ -242,13 +242,7 @@ protected:
                         "DeferredShading::testCapabilities");
         }
 
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("hlsl") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support advanced vertex"
-                        " programs, so you cannot run this sample. Sorry!", "DeferredShading::testCapabilities");
-        }
+        requireMaterial("DeferredShading/AmbientLight");
     }
 
     // Just override the mandatory create scene method
