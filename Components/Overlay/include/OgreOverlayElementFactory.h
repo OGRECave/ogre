@@ -72,39 +72,33 @@ namespace Ogre {
     class _OgreOverlayExport PanelOverlayElementFactory: public OverlayElementFactory
     {
     public:
-        /** See OverlayElementFactory */
-        OverlayElement* createOverlayElement(const String& instanceName)
+        OverlayElement* createOverlayElement(const String& instanceName) override
         {
             return OGRE_NEW PanelOverlayElement(instanceName);
         }
-        /** See OverlayElementFactory */
-        virtual const String& getTypeName(void) const;
+        const String& getTypeName(void) const override;
     };
 
     /** Factory for creating BorderPanelOverlayElement instances. */
     class _OgreOverlayExport BorderPanelOverlayElementFactory: public OverlayElementFactory
     {
     public:
-        /** See OverlayElementFactory */
-        OverlayElement* createOverlayElement(const String& instanceName)
+        OverlayElement* createOverlayElement(const String& instanceName) override
         {
             return OGRE_NEW BorderPanelOverlayElement(instanceName);
         }
-        /** See OverlayElementFactory */
-        virtual const String& getTypeName(void) const;
+        const String& getTypeName(void) const override;
     };
 
     /** Factory for creating TextAreaOverlayElement instances. */
     class _OgreOverlayExport TextAreaOverlayElementFactory: public OverlayElementFactory
     {
     public:
-        /** See OverlayElementFactory */
-        OverlayElement* createOverlayElement(const String& instanceName)
+        OverlayElement* createOverlayElement(const String& instanceName) override
         {
             return OGRE_NEW TextAreaOverlayElement(instanceName);
         }
-        /** See OverlayElementFactory */
-        virtual const String& getTypeName(void) const;
+        const String& getTypeName(void) const override;
     };
     /** @} */
     /** @} */

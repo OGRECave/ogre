@@ -3516,8 +3516,7 @@ namespace Ogre {
         DefaultIntersectionSceneQuery(SceneManager* creator);
         ~DefaultIntersectionSceneQuery();
 
-        /** See IntersectionSceneQuery. */
-        void execute(IntersectionSceneQueryListener* listener);
+        void execute(IntersectionSceneQueryListener* listener) override;
     };
 
     /** Default implementation of RaySceneQuery. */
@@ -3527,8 +3526,7 @@ namespace Ogre {
         DefaultRaySceneQuery(SceneManager* creator);
         ~DefaultRaySceneQuery();
 
-        /** See RayScenQuery. */
-        void execute(RaySceneQueryListener* listener);
+        void execute(RaySceneQueryListener* listener) override;
     };
     /** Default implementation of SphereSceneQuery. */
     class _OgreExport DefaultSphereSceneQuery : public SphereSceneQuery
@@ -3537,8 +3535,7 @@ namespace Ogre {
         DefaultSphereSceneQuery(SceneManager* creator);
         ~DefaultSphereSceneQuery();
 
-        /** See SceneQuery. */
-        void execute(SceneQueryListener* listener);
+        void execute(SceneQueryListener* listener) override;
     };
     /** Default implementation of PlaneBoundedVolumeListSceneQuery. */
     class _OgreExport DefaultPlaneBoundedVolumeListSceneQuery : public PlaneBoundedVolumeListSceneQuery
@@ -3547,8 +3544,7 @@ namespace Ogre {
         DefaultPlaneBoundedVolumeListSceneQuery(SceneManager* creator);
         ~DefaultPlaneBoundedVolumeListSceneQuery();
 
-        /** See SceneQuery. */
-        void execute(SceneQueryListener* listener);
+        void execute(SceneQueryListener* listener) override;
     };
     /** Default implementation of AxisAlignedBoxSceneQuery. */
     class _OgreExport DefaultAxisAlignedBoxSceneQuery : public AxisAlignedBoxSceneQuery
@@ -3557,8 +3553,7 @@ namespace Ogre {
         DefaultAxisAlignedBoxSceneQuery(SceneManager* creator);
         ~DefaultAxisAlignedBoxSceneQuery();
 
-        /** See RayScenQuery. */
-        void execute(SceneQueryListener* listener);
+        void execute(SceneQueryListener* listener) override;
     };
     
 

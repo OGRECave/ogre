@@ -72,8 +72,7 @@ namespace Ogre {
         /// Default constructor
         DirectionRandomiserAffector(ParticleSystem* psys);
 
-        /** See ParticleAffector. */
-        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
+        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed) override;
 
 
         /** The amount of randomness to introduce in each axial direction. */

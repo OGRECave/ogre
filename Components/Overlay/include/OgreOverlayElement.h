@@ -282,13 +282,11 @@ namespace Ogre {
 
 
         // --- Renderable Overrides ---
-        /** See Renderable */
-        const MaterialPtr& getMaterial(void) const;
+        const MaterialPtr& getMaterial(void) const override;
 
         // NB getRenderOperation not implemented, still abstract here
 
-        /** See Renderable */
-        void getWorldTransforms(Matrix4* xform) const;
+        void getWorldTransforms(Matrix4* xform) const override;
 
         /** Tell the object to recalculate */
         virtual void _positionsOutOfDate(void);

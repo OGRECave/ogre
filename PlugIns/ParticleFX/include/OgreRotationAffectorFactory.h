@@ -37,11 +37,9 @@ namespace Ogre {
     /** Factory class for RotationAffector. */
     class _OgreParticleFXExport RotationAffectorFactory : public ParticleAffectorFactory
     {
-        /** See ParticleAffectorFactory */
-        String getName() const { return "Rotator"; }
+        String getName() const override { return "Rotator"; }
 
-        /** See ParticleAffectorFactory */
-        ParticleAffector* createAffector(ParticleSystem* psys)
+        ParticleAffector* createAffector(ParticleSystem* psys) override
         {
             ParticleAffector* p = OGRE_NEW RotationAffector(psys);
             mAffectors.push_back(p);

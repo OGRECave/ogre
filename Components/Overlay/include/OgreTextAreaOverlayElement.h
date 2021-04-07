@@ -79,12 +79,9 @@ namespace Ogre
             return mFont;
         }
 
-        /** See OverlayElement. */
-        virtual const String& getTypeName(void) const;
-        /** See Renderable. */
-        const MaterialPtr& getMaterial(void) const;
-        /** See Renderable. */
-        void getRenderOperation(RenderOperation& op);
+        virtual const String& getTypeName(void) const override;
+        const MaterialPtr& getMaterial(void) const override;
+        void getRenderOperation(RenderOperation& op) override;
 
         /** Sets the colour of the text. 
         @remarks

@@ -50,15 +50,9 @@ namespace Ogre {
     public:
         PointEmitter(ParticleSystem* psys);
 
-        /** See ParticleEmitter. */
-        void _initParticle(Particle* pParticle);
+        void _initParticle(Particle* pParticle) override;
 
-        /** See ParticleEmitter. */
-        unsigned short _getEmissionCount(Real timeElapsed);
-
-
-
-
+        unsigned short _getEmissionCount(Real timeElapsed) override;
     };
     /** @} */
     /** @} */

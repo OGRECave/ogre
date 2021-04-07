@@ -37,11 +37,9 @@ namespace Ogre {
     /** Factory class for LinearForceAffector. */
     class _OgreParticleFXExport LinearForceAffectorFactory : public ParticleAffectorFactory
     {
-        /** See ParticleAffectorFactory */
-        String getName() const { return "LinearForce"; }
+        String getName() const override { return "LinearForce"; }
 
-        /** See ParticleAffectorFactory */
-        ParticleAffector* createAffector(ParticleSystem* psys)
+        ParticleAffector* createAffector(ParticleSystem* psys) override
         {
             ParticleAffector* p = OGRE_NEW LinearForceAffector(psys);
             mAffectors.push_back(p);

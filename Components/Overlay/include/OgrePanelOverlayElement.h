@@ -99,10 +99,8 @@ namespace Ogre {
         /** Returns whether this panel is transparent. */
         bool isTransparent(void) const;
 
-        /** See OverlayElement. */
-        virtual const String& getTypeName(void) const;
-        /** See Renderable. */
-        void getRenderOperation(RenderOperation& op);
+        const String& getTypeName(void) const override;
+        void getRenderOperation(RenderOperation& op) override;
         /** Overridden from OverlayContainer */
         void _updateRenderQueue(RenderQueue* queue);
 

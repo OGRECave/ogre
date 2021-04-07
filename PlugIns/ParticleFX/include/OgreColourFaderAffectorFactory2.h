@@ -37,11 +37,9 @@ namespace Ogre {
     /** Factory class for ColourFaderAffector. */
     class _OgreParticleFXExport ColourFaderAffectorFactory2 : public ParticleAffectorFactory
     {
-        /** See ParticleAffectorFactory */
-        String getName() const { return "ColourFader2"; }
+        String getName() const override { return "ColourFader2"; }
 
-        /** See ParticleAffectorFactory */
-        ParticleAffector* createAffector(ParticleSystem* psys)
+        ParticleAffector* createAffector(ParticleSystem* psys) override
         {
             ParticleAffector* p = OGRE_NEW ColourFaderAffector2(psys);
             mAffectors.push_back(p);

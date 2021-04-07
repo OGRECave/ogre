@@ -72,8 +72,7 @@ namespace Ogre {
         /// Default constructor
         DeflectorPlaneAffector(ParticleSystem* psys);
 
-        /** See ParticleAffector. */
-        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
+        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed) override;
 
         /** Sets the plane point of the deflector plane. */
         void setPlanePoint(const Vector3& pos);

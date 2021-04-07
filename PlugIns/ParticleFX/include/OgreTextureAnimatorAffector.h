@@ -64,11 +64,9 @@ namespace Ogre {
     /** Factory class for TextureAnimatorAffector. */
     class _OgreParticleFXExport TextureAnimatorAffectorFactory : public ParticleAffectorFactory
     {
-        /** See ParticleAffectorFactory */
-        String getName() const { return "TextureAnimator"; }
+        String getName() const override { return "TextureAnimator"; }
 
-        /** See ParticleAffectorFactory */
-        ParticleAffector* createAffector(ParticleSystem* psys)
+        ParticleAffector* createAffector(ParticleSystem* psys) override
         {
             ParticleAffector* p = OGRE_NEW TextureAnimatorAffector(psys);
             mAffectors.push_back(p);

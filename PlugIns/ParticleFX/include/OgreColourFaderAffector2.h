@@ -120,8 +120,7 @@ namespace Ogre {
         /** Default constructor. */
         ColourFaderAffector2(ParticleSystem* psys);
 
-        /** See ParticleAffector. */
-        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
+        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed) override;
 
         /** Sets the colour adjustment to be made per second to particles. 
         @param red, green, blue, alpha
