@@ -69,7 +69,7 @@ namespace Ogre {
 
         HollowEllipsoidEmitter(ParticleSystem* psys);
 
-        void _initParticle(Particle* pParticle);
+        void _initParticle(Particle* pParticle) override;
 
         /** Sets the size of the clear space inside the area from where NO particles are emitted.
         @param x,y,z

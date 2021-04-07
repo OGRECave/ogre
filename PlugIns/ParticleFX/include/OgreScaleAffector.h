@@ -57,8 +57,7 @@ namespace Ogre {
         /** Default constructor. */
         ScaleAffector(ParticleSystem* psys);
 
-        /** See ParticleAffector. */
-        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
+        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed) override;
 
         /** Sets the scale adjustment to be made per second to particles. 
         @param rate

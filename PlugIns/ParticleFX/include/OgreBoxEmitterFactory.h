@@ -44,13 +44,8 @@ namespace Ogre {
     protected:
 
     public:
-        /** See ParticleEmitterFactory */
-        String getName() const
-        { 
-            return "Box"; 
-        }
+        String getName() const override { return "Box"; }
 
-        /** See ParticleEmitterFactory */
         ParticleEmitter* createEmitter(ParticleSystem* psys) 
         {
             ParticleEmitter* emit = OGRE_NEW BoxEmitter(psys);

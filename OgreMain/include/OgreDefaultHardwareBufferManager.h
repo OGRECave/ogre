@@ -48,17 +48,13 @@ namespace Ogre {
     {
     protected:
         unsigned char* mData;
-        /** See HardwareBuffer. */
-        void* lockImpl(size_t offset, size_t length, LockOptions options);
-        /** See HardwareBuffer. */
-        void unlockImpl(void);
+        void* lockImpl(size_t offset, size_t length, LockOptions options) override;
+        void unlockImpl(void) override;
     public:
         DefaultHardwareBuffer(size_t sizeInBytes);
         ~DefaultHardwareBuffer();
-        /** See HardwareBuffer. */
-        void readData(size_t offset, size_t length, void* pDest);
-        /** See HardwareBuffer. */
-        void writeData(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer = false);
+        void readData(size_t offset, size_t length, void* pDest) override;
+        void writeData(size_t offset, size_t length, const void* pSource, bool discardWholeBuffer = false) override;
     };
 
     class _OgreExport DefaultHardwareVertexBuffer : public HardwareVertexBuffer

@@ -81,8 +81,7 @@ namespace Ogre {
         /// Default constructor
         LinearForceAffector(ParticleSystem* psys);
 
-        /** See ParticleAffector. */
-        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
+        void _affectParticles(ParticleSystem* pSystem, Real timeElapsed) override;
 
 
         /** Sets the force vector to apply to the particles in a system. */

@@ -37,11 +37,9 @@ namespace Ogre {
     /** Factory class for DirectionRandomiserAffector. */
     class _OgreParticleFXExport DirectionRandomiserAffectorFactory : public ParticleAffectorFactory
     {
-        /** See ParticleAffectorFactory */
-        String getName() const { return "DirectionRandomiser"; }
+        String getName() const override { return "DirectionRandomiser"; }
 
-        /** See ParticleAffectorFactory */
-        ParticleAffector* createAffector(ParticleSystem* psys)
+        ParticleAffector* createAffector(ParticleSystem* psys) override
         {
             ParticleAffector* p = OGRE_NEW DirectionRandomiserAffector(psys);
             mAffectors.push_back(p);
