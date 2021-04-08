@@ -111,6 +111,7 @@ public class AndroidTextureOES extends Activity {
                 TextureType.TEX_TYPE_EXTERNAL_OES,
                 1080,
                 1920,
+                1,
                 0,
                 PixelFormat.PF_UNKNOWN
         );
