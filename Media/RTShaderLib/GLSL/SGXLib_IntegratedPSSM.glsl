@@ -58,10 +58,10 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, float depth)
 {
 #ifdef PSSM_SAMPLE_CMP
-#	ifdef OGRE_GLSLES
-	return shadow2D(shadowMap, vec3(uv, depth));
-#	else
+#	if defined(OGRE_GLSL) && OGRE_GLSL < 130
 	return shadow2D(shadowMap, vec3(uv, depth)).r;
+#	else
+	return texture(shadowMap, vec3(uv, depth));
 #	endif
 #else
 	return (depth <= texture2D(shadowMap, uv).r) ? 1.0 : 0.0;
