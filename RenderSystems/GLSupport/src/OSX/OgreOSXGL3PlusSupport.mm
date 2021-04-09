@@ -69,8 +69,6 @@ ConfigOptionMap OSXGLSupport::getConfigOptions()
 
     optContentScalingFactor.name = "Content Scaling Factor";
     optContentScalingFactor.possibleValues.push_back( "1.0" );
-    optContentScalingFactor.possibleValues.push_back( "1.33" );
-    optContentScalingFactor.possibleValues.push_back( "1.5" );
     optContentScalingFactor.possibleValues.push_back( "2.0" );
     optContentScalingFactor.currentValue = StringConverter::toString((float)[NSScreen mainScreen].backingScaleFactor);
     optContentScalingFactor.immutable = false;
