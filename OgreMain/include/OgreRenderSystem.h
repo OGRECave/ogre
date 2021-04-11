@@ -229,6 +229,7 @@ namespace Ogre
         | FSAA | 0 | concatenation of "FSAA" and "FSAAHint" as in  @ref _createRenderWindow  |
         | Video Mode | - | Window resolution |
         | Display Frequency | - | "displayFrequency" in  @ref _createRenderWindow |
+        | Content Scaling Factor | 1.0 | "contentScalingFactor" in  @ref _createRenderWindow |
         @param
         name The name of the option to alter.
         @param
