@@ -51,6 +51,9 @@ protected:
     void processParticleSystem(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
     void processBillboardSet(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
     void processPlane(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
+    void processNodeAnimations(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
+    void processNodeAnimation(pugi::xml_node& XMLNode, Ogre::SceneNode* pParent);
+    void processKeyframe(pugi::xml_node& XMLNode, Ogre::NodeAnimationTrack* pTrack);
 
     void processFog(pugi::xml_node& XMLNode);
     void processSkyBox(pugi::xml_node& XMLNode);
