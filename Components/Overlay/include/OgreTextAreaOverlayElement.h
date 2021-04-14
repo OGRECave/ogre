@@ -237,7 +237,6 @@ namespace Ogre
         FontPtr mFont;
         Real mCharHeight;
         ushort mPixelCharHeight;
-        bool mSpaceWidthOverridden;
         Real mSpaceWidth;
         ushort mPixelSpaceWidth;
         size_t mAllocSize;
