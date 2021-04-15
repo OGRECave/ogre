@@ -145,16 +145,13 @@ namespace Ogre
         int hresult;
     public:
         D3D11RenderingAPIException(int hr, const String& inDescription, const String& inSource, const char* inFile, long inLine)
-            : RenderingAPIException(hr, inDescription, inSource, inFile, inLine), hresult(hr) {}
+            : RenderingAPIException(hr, inDescription, inSource, inFile, inLine), hresult(hr) {
+            StringStream ss;
+            ss << fullDesc << " HRESULT=0x" << std::hex << hresult;
+            fullDesc = ss.str();
+        }
 
         int getHResult() const { return hresult; }
-
-        const String& getFullDescription(void) const {
-            StringStream ss;
-            ss << RenderingAPIException::getFullDescription() << " HRESULT=0x" << std::hex << hresult;
-            fullDesc = ss.str();
-            return fullDesc;
-        }
     };
 }
 #endif

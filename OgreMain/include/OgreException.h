@@ -99,7 +99,7 @@ namespace Ogre {
         String description;
         String source;
         const char* file;
-        mutable String fullDesc; // storage for char* returned by what()
+        String fullDesc; // storage for char* returned by what()
     public:
         /** Static definitions of error codes.
             @todo
@@ -145,7 +145,7 @@ namespace Ogre {
                 the place in which OGRE found the problem, and a text
                 description from the 3D rendering library, if available.
         */
-        virtual const String& getFullDescription(void) const;
+        const String& getFullDescription(void) const { return fullDesc; }
 
         /** Gets the source function.
         */
@@ -166,7 +166,7 @@ namespace Ogre {
         const String &getDescription(void) const { return description; }
 
         /// Override std::exception::what
-        const char* what() const throw() { return getFullDescription().c_str(); }
+        const char* what() const throw() { return fullDesc.c_str(); }
         
     };
 
