@@ -113,7 +113,7 @@ on MacOS.
 
 If you rather want to trigger the build form a console, then cd to your build directory and call the appropriate make program as
 
-    cmake --build . --config release
+    cmake --build . --config Release
 
 to start the build process.
 
@@ -132,9 +132,9 @@ Installing
 Once the build is complete, you can optionally have the build system
 copy the built libraries and headers to a clean location. We recommend
 you do this step as it will make it easier to use Ogre in your projects.
-In Visual Studio, just select and build the target *INSTALL*. When using the command line with MSVC, type:
+In Visual Studio, just select and build the target *INSTALL*. When using the command line, type:
 
-    cmake --build . --config release --target INSTALL
+    cmake --build . --config Release --target install
 
 For Makefile based generators, type:
 
