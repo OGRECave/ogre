@@ -474,10 +474,13 @@ namespace Ogre
         typedef MapIterator<TerrainSlotMap> TerrainIterator;
         typedef ConstMapIterator<TerrainSlotMap> ConstTerrainIterator;
 
-        /// Get an iterator over the defined terrains.
-        TerrainIterator getTerrainIterator();
-        /// Get an iterator over the defined terrains (const)
-        ConstTerrainIterator getTerrainIterator() const;
+        /// @deprecated use getTerrainSlots()
+        OGRE_DEPRECATED TerrainIterator getTerrainIterator();
+        /// @deprecated use getTerrainSlots()
+        OGRE_DEPRECATED ConstTerrainIterator getTerrainIterator() const;
+
+        /// Get the defined terrains
+        const TerrainSlotMap& getTerrainSlots() const { return mTerrainSlots; }
 
         /// WorkQueue::RequestHandler override
         bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);

@@ -295,14 +295,12 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         case SDLK_F10:
             // dump
             {
-                TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-                while (ti.hasMoreElements())
+                for (const auto& ti : mTerrainGroup->getTerrainSlots())
                 {
-                    Ogre::uint32 tkey = ti.peekNextKey();
-                    TerrainGroup::TerrainSlot* ts = ti.getNext();
+                    TerrainGroup::TerrainSlot* ts = ti.second;
                     if (ts->instance && ts->instance->isLoaded())
                     {
-                        ts->instance->_dumpTextures("terrain_" + StringConverter::toString(tkey), ".png");
+                        ts->instance->_dumpTextures("terrain_" + std::to_string(ti.first), ".png");
                     }
                 }
             }
@@ -770,11 +768,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         //! [init_blend]
         if (mTerrainsImported)
         {
-            TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-            while(ti.hasMoreElements())
+            for (const auto& ti : mTerrainGroup->getTerrainSlots())
             {
-                Terrain* t = ti.getNext()->instance;
-                initBlendMaps(t);
+                initBlendMaps(ti.second->instance);
             }
         }
 

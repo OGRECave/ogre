@@ -110,10 +110,9 @@ public:
 			}
 			mLodStatusLabelList.clear();
 
-			TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-			while(ti.hasMoreElements())
+			for (const auto& ti : mTerrainGroup->getTerrainSlots())
 			{
-				Terrain* t = ti.getNext()->instance;
+				Terrain* t = ti.second->instance;
 				if (!t)
 					continue;
 
@@ -151,11 +150,9 @@ public:
 		case SDLK_PAGEUP:
 			{
 				mAutoBox->setChecked(false);
-				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-				while(ti.hasMoreElements())
+				for (const auto& ti : mTerrainGroup->getTerrainSlots())
 				{
-					Terrain* t = ti.getNext()->instance;
-					if (t)
+					if(Terrain* t = ti.second->instance)
 						t->increaseLodLevel();
 				}
 			}
@@ -163,11 +160,9 @@ public:
 		case SDLK_PAGEDOWN:
 			{
 				mAutoBox->setChecked(false);
-				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-				while(ti.hasMoreElements())
+				for (const auto& ti : mTerrainGroup->getTerrainSlots())
 				{
-					Terrain* t = ti.getNext()->instance;
-					if (t)
+					if(Terrain* t = ti.second->instance)
 						t->decreaseLodLevel();
 				}
 			}
@@ -180,13 +175,10 @@ public:
 				mPerlinNoiseTerrainGenerator->randomize();
 
 				// reload all terrains
-				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
-				while(ti.hasMoreElements())
+				for (const auto& ti : mTerrainGroup->getTerrainSlots())
 				{
-					TerrainGroup::TerrainSlot* slot = ti.getNext();
-					PageID pageID = mTerrainGroup->packIndex( slot->x, slot->y );
-					mTerrainPagedWorldSection->unloadPage(pageID);
-					mTerrainPagedWorldSection->loadPage(pageID);
+					mTerrainPagedWorldSection->unloadPage(ti.first);
+					mTerrainPagedWorldSection->loadPage(ti.first);
 				}
 			}
 			break;
