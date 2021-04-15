@@ -70,6 +70,13 @@ if(OGRE_BUILD_COMPONENT_OVERLAY)
     ogre_python_module(Overlay)
 endif()
 
+if(OGRE_BUILD_COMPONENT_TERRAIN)
+	set_source_files_properties(../Terrain/include/OgreTerrain.i PROPERTIES CPLUSPLUS ON)
+    swig_add_module(Terrain python ../Terrain/include/OgreTerrain.i)
+    swig_link_libraries(Terrain OgreTerrain ${PYTHON_LIBRARIES})
+    ogre_python_module(Terrain)
+endif()
+
 if(OGRE_BUILD_COMPONENT_BITES)    
     set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
     swig_add_module(Bites python ../Bites/include/OgreBites.i)
