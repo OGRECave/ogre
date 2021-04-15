@@ -6,6 +6,7 @@
 %{
 /* Includes the header in the wrapper code */
 #include "Ogre.h"
+#include "OgreDefaultDebugDrawer.h"
 #include "OgreTerrainLayerBlendMap.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrain.h"
@@ -15,6 +16,7 @@
 %}
 
 %include std_string.i
+%include std_vector.i
 %include exception.i
 %import "Ogre.i"
 
@@ -33,7 +35,8 @@
 %template(TerrainRayResult) std::pair<bool, Ogre::Vector3>;
 %include "OgreTerrain.h"
 
-%ignore Ogre::TerrainGroup::getTerrainIterator;
+%ignore Ogre::TerrainGroup::rayIntersects;
+%ignore Ogre::TerrainGroup::getTerrainIterator; // deprecated
 %include "OgreTerrainGroup.h"
 
 %include "OgreTerrainLodManager.h"
