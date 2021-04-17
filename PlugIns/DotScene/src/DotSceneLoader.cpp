@@ -206,6 +206,8 @@ void DotSceneLoader::processScene(pugi::xml_node& XMLRoot)
 
 void DotSceneLoader::processNodes(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Nodes...", LML_TRIVIAL);
+
     // Process node (*)
     for (auto pElement : XMLNode.children("node"))
     {
@@ -241,6 +243,8 @@ void DotSceneLoader::processExternals(pugi::xml_node& XMLNode)
 
 void DotSceneLoader::processEnvironment(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Environment...", LML_TRIVIAL);
+
     // Process camera (?)
     if (auto pElement = XMLNode.child("camera"))
         processCamera(pElement);
@@ -273,6 +277,8 @@ void DotSceneLoader::processEnvironment(pugi::xml_node& XMLNode)
 void DotSceneLoader::processTerrainGroup(pugi::xml_node& XMLNode)
 {
 #ifdef OGRE_BUILD_COMPONENT_TERRAIN
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Terrain Group...", LML_TRIVIAL);
+
     Real worldSize = getAttribReal(XMLNode, "worldSize");
     int mapSize = StringConverter::parseInt(XMLNode.attribute("size").value());
     int compositeMapDistance = StringConverter::parseInt(XMLNode.attribute("tuningCompositeMapDistance").value());
@@ -310,6 +316,8 @@ void DotSceneLoader::processLight(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     // Process attributes
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Light: " + name, LML_TRIVIAL);
 
     // Create the light
     Light* pLight = mSceneMgr->createLight(name);
@@ -357,6 +365,9 @@ void DotSceneLoader::processCamera(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     // Process attributes
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Camera: " + name, LML_TRIVIAL);
+
     // Real fov = getAttribReal(XMLNode, "fov", 45);
     Real aspectRatio = getAttribReal(XMLNode, "aspectRatio", 1.3333);
     String projectionType = getAttrib(XMLNode, "projectionType", "perspective");
@@ -402,6 +413,8 @@ void DotSceneLoader::processNode(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     // Construct the node's name
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Node: " + name, LML_TRIVIAL);
 
     // Create the scene node
     SceneNode* pNode;
@@ -498,6 +511,10 @@ void DotSceneLoader::processNode(pugi::xml_node& XMLNode, SceneNode* pParent)
     // Process userDataReference (?)
     if (auto pElement = XMLNode.child("userData"))
         processUserData(pElement, pNode->getUserObjectBindings());
+
+    // Process node animations (?)
+    if (auto pElement = XMLNode.child("animations"))
+        processNodeAnimations(pElement, pNode);
 }
 
 void DotSceneLoader::processLookTarget(pugi::xml_node& XMLNode, SceneNode* pParent)
@@ -506,6 +523,8 @@ void DotSceneLoader::processLookTarget(pugi::xml_node& XMLNode, SceneNode* pPare
 
     // Process attributes
     String nodeName = getAttrib(XMLNode, "nodeName");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Look Target, nodeName: " + nodeName, LML_TRIVIAL);
 
     Node::TransformSpace relativeTo = Node::TS_PARENT;
     String sValue = getAttrib(XMLNode, "relativeTo");
@@ -548,6 +567,8 @@ void DotSceneLoader::processTrackTarget(pugi::xml_node& XMLNode, SceneNode* pPar
     // Process attributes
     String nodeName = getAttrib(XMLNode, "nodeName");
 
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Track Target, nodeName: " + nodeName, LML_TRIVIAL);
+
     // Process localDirection (?)
     Vector3 localDirection = Vector3::NEGATIVE_UNIT_Z;
     if (auto pElement = XMLNode.child("localDirection"))
@@ -574,6 +595,9 @@ void DotSceneLoader::processEntity(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     // Process attributes
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Entity: " + name, LML_TRIVIAL);
+
     String meshFile = getAttrib(XMLNode, "meshFile");
     bool castShadows = getAttribBool(XMLNode, "castShadows", true);
 
@@ -603,6 +627,9 @@ void DotSceneLoader::processParticleSystem(pugi::xml_node& XMLNode, SceneNode* p
 {
     // Process attributes
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Particle System: " + name, LML_TRIVIAL);
+
     String templateName = getAttrib(XMLNode, "template");
 
     if (templateName.empty())
@@ -628,6 +655,9 @@ void DotSceneLoader::processBillboardSet(pugi::xml_node& XMLNode, SceneNode* pPa
 void DotSceneLoader::processPlane(pugi::xml_node& XMLNode, SceneNode* pParent)
 {
     String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Plane: " + name, LML_TRIVIAL);
+
     Real distance = getAttribReal(XMLNode, "distance");
     Real width = getAttribReal(XMLNode, "width");
     Real height = getAttribReal(XMLNode, "height");
@@ -654,6 +684,8 @@ void DotSceneLoader::processPlane(pugi::xml_node& XMLNode, SceneNode* pParent)
 
 void DotSceneLoader::processFog(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Fog...", LML_TRIVIAL);
+
     // Process attributes
     Real expDensity = getAttribReal(XMLNode, "density", 0.001);
     Real linearStart = getAttribReal(XMLNode, "start", 0.0);
@@ -684,6 +716,8 @@ void DotSceneLoader::processFog(pugi::xml_node& XMLNode)
 
 void DotSceneLoader::processSkyBox(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing SkyBox...", LML_TRIVIAL);
+
     // Process attributes
     String material = getAttrib(XMLNode, "material", "BaseWhite");
     Real distance = getAttribReal(XMLNode, "distance", 5000);
@@ -704,6 +738,8 @@ void DotSceneLoader::processSkyBox(pugi::xml_node& XMLNode)
 
 void DotSceneLoader::processSkyDome(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing SkyDome...", LML_TRIVIAL);
+
     // Process attributes
     String material = XMLNode.attribute("material").value();
     Real curvature = getAttribReal(XMLNode, "curvature", 10);
@@ -725,6 +761,8 @@ void DotSceneLoader::processSkyDome(pugi::xml_node& XMLNode)
 
 void DotSceneLoader::processSkyPlane(pugi::xml_node& XMLNode)
 {
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing SkyPlane...", LML_TRIVIAL);
+
     // Process attributes
     String material = getAttrib(XMLNode, "material");
     Real planeX = getAttribReal(XMLNode, "planeX", 0);
@@ -786,6 +824,96 @@ void DotSceneLoader::processUserData(pugi::xml_node& XMLNode, UserObjectBindings
             value = data;
 
         userData.setUserAny(name, value);
+    }
+}
+
+void DotSceneLoader::processNodeAnimations(pugi::xml_node& XMLNode, SceneNode* pParent)
+{
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Node Animations for SceneNode: " + pParent->getName(), LML_TRIVIAL);
+
+    // Process node animations (*)
+    for (auto pElement : XMLNode.children("animation"))
+    {
+        processNodeAnimation(pElement, pParent);
+    }
+}
+
+void DotSceneLoader::processNodeAnimation(pugi::xml_node& XMLNode, SceneNode* pParent)
+{
+    // Process node animation (*)
+
+    // Construct the animation name
+    String name = getAttrib(XMLNode, "name");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Node Animation: " + name, LML_TRIVIAL);
+
+    Real length = getAttribReal(XMLNode, "length");
+
+    Animation* anim = mSceneMgr->createAnimation(name, length);
+
+    bool enable = getAttribBool(XMLNode, "enable", false);
+    bool loop = getAttribBool(XMLNode, "loop", false);
+
+    String interpolationMode = getAttrib(XMLNode, "interpolationMode");
+
+    if (interpolationMode == "linear")
+        anim->setInterpolationMode(Animation::IM_LINEAR);
+    else if (interpolationMode == "spline")
+        anim->setInterpolationMode(Animation::IM_SPLINE);
+    else
+        LogManager::getSingleton().logError("DotSceneLoader - Invalid interpolationMode: " + interpolationMode);
+
+    String rotationInterpolationMode = getAttrib(XMLNode, "rotationInterpolationMode");
+
+    if (rotationInterpolationMode == "linear")
+        anim->setRotationInterpolationMode(Animation::RIM_LINEAR);
+    else if (rotationInterpolationMode == "spherical")
+        anim->setRotationInterpolationMode(Animation::RIM_SPHERICAL);
+    else
+        LogManager::getSingleton().logError("DotSceneLoader - Invalid rotationInterpolationMode: " + rotationInterpolationMode);
+
+    // create a track to animate the camera's node
+    NodeAnimationTrack* track = anim->createNodeTrack(0, pParent);
+
+    // Process keyframes (*)
+    for (auto pElement : XMLNode.children("keyframe"))
+    {
+        processKeyframe(pElement, track);
+    }
+
+    // create a new animation state to track this
+    auto animState = mSceneMgr->createAnimationState(name);
+    animState->setEnabled(enable);
+    animState->setLoop(loop);
+}
+
+void DotSceneLoader::processKeyframe(pugi::xml_node& XMLNode, NodeAnimationTrack* pTrack)
+{
+    // Process node animation keyframe (*)
+    Real time = getAttribReal(XMLNode, "time");
+
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Keyframe: " + StringConverter::toString(time), LML_TRIVIAL);
+
+    auto keyframe = pTrack->createNodeKeyFrame(time);
+
+    // Process translation (?)
+    if (auto pElement = XMLNode.child("position")) {
+        Vector3 translation = parseVector3(pElement);
+        keyframe->setTranslate(translation);
+    }
+
+    // Process rotation (?)
+    //Quaternion rotation = Quaternion::IDENTITY;
+    if (auto pElement = XMLNode.child("rotation")) {
+        Quaternion rotation = parseQuaternion(pElement);
+        keyframe->setRotation(rotation);
+    }
+
+    // Process scale (?)
+    //Vector3 scale = parseVector3(XMLNode.child("scale"));
+    if (auto pElement = XMLNode.child("scale")) {
+        Vector3 scale = parseVector3(pElement);
+        keyframe->setScale(scale);
     }
 }
 
