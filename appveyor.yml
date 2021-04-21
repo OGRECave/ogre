@@ -27,7 +27,7 @@ after_build:
   - IF NOT "%APPVEYOR_REPO_TAG%" == "true" set APPVEYOR_REPO_TAG_NAME=master
   - 7z a ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-vc15-x64.zip ./build/sdk/*
   - pip install --upgrade cloudsmith-cli
-  - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" cloudsmith push raw ogrecave/ogre ogre-sdk-master-vc15-x64.zip --republish -k %CS_APIKEY%
+  - IF "%APPVEYOR_PULL_REQUEST_NUMBER%" == "" IF "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" cloudsmith push raw ogrecave/ogre ogre-sdk-%APPVEYOR_REPO_TAG_NAME%-vc15-x64.zip --republish -k %CS_APIKEY%
 artifacts:
   - path: ogre-sdk-master-vc15-x64.zip
     name: ogre-sdk-master-vc15-x64
