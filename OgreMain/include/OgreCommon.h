@@ -35,8 +35,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    typedef _StringBase String;
-
     /** \addtogroup Core
     *  @{
     */

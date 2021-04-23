@@ -35,8 +35,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    typedef _StringBase String;
-
     /** Template version of cache based on static array.
      'cacheSize' defines size of cache in bytes. */
     template <size_t cacheSize>
