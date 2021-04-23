@@ -75,6 +75,7 @@ THE SOFTWARE.
 #   include <d3dcompiler.h>
 #endif
  
+ #include <sstream>
 
 namespace Ogre
 {

@@ -268,7 +268,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
                                                const String& profiles,
                                                const String& cachePath)
 {
-    stringstream sourceCodeStringStream;
+    std::stringstream sourceCodeStringStream;
 
     // Generate source code.
     programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);

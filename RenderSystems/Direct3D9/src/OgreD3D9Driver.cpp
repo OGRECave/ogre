@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "OgreD3D9VideoModeList.h"
 #include "OgreD3D9VideoMode.h"
 
+#include <sstream>
+
 namespace Ogre
 {   
     D3D9Driver::D3D9Driver()

@@ -34,6 +34,9 @@ THE SOFTWARE.
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
+#include <fstream>
+#include <sstream>
+
 namespace Ogre {
 
     /** \addtogroup Core

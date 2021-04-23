@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreMatrix4.h"
 
 #include <functional>
+#include <sstream>
 
 /** \addtogroup Optional
 *  @{

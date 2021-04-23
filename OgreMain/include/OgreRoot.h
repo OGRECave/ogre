@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreSceneManagerEnumerator.h"
 
 #include <exception>
+#include <deque>
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

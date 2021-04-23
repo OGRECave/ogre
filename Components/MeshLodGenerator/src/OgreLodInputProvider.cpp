@@ -31,7 +31,7 @@
 namespace Ogre
 {
     
-    void LodInputProvider::printTriangle(LodData::Triangle* triangle, stringstream& str)
+    void LodInputProvider::printTriangle(LodData::Triangle* triangle, std::ostream& str)
 {
     for (int i = 0; i < 3; i++) {
         str << (i + 1) << ". vertex position: ("
@@ -73,7 +73,7 @@ void LodInputProvider::addTriangleToEdges(LodData* data, LodData::Triangle* tria
         LodData::Triangle* duplicate = isDuplicateTriangle(triangle);
         if (duplicate != NULL) {
 #if OGRE_DEBUG_MODE
-            stringstream str;
+            std::stringstream str;
             str << "In " << data->mMeshName << " duplicate triangle found." << std::endl;
             str << "Triangle " << LodData::getVectorIDFromPointer(data->mTriangleList, triangle) << " positions:" << std::endl;
             printTriangle(triangle, str);
