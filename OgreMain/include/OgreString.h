@@ -31,41 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreHeaderPrefix.h"
 
-// A quick define to overcome different names for the same function
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#   define locale_t _locale_t
-#   define strtod_l _strtod_l
-#   define strtoul_l _strtoul_l
-#   define strtol_l _strtol_l
-#   define strtoull_l _strtoull_l
-#   define strtoll_l _strtoll_l
-#   define stricmp _stricmp
-#   define strnicmp _strnicmp
-#else
-#   define stricmp strcasecmp
-#   define strnicmp strncasecmp
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN || \
-	(OGRE_PLATFORM == OGRE_PLATFORM_LINUX && OGRE_NO_LOCALE_STRCONVERT == 1)
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-#   define locale_t int
-#endif
-#   define strtod_l(ptr, end, l) strtod(ptr, end)
-#   define strtoul_l(ptr, end, base, l) strtoul(ptr, end, base)
-#   define strtol_l(ptr, end, base, l) strtol(ptr, end, base)
-#   define strtoull_l(ptr, end, base, l) strtoull(ptr, end, base)
-#   define strtoll_l(ptr, end, base, l) strtoll(ptr, end, base)
-#endif
-
-// If compiling with make on macOS, these headers need to be included to get
-// definitions of locale_t, strtod_l, etc...
-// See: http://www.unix.com/man-page/osx/3/strtod_l/
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#   include <stdlib.h>
-#   include <xlocale.h>
-#endif
-
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
 #define OGRE_FORMAT_PRINTF(string_idx, first_to_check) __attribute__ ((format (printf, string_idx, first_to_check)))
 #else

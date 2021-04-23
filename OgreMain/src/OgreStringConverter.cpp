@@ -27,6 +27,24 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
+// A quick define to overcome different names for the same function
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#   define strtod_l _strtod_l
+#   define strtoul_l _strtoul_l
+#   define strtol_l _strtol_l
+#   define strtoull_l _strtoull_l
+#   define strtoll_l _strtoll_l
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN || \
+	(OGRE_PLATFORM == OGRE_PLATFORM_LINUX && OGRE_NO_LOCALE_STRCONVERT == 1)
+#   define strtod_l(ptr, end, l) strtod(ptr, end)
+#   define strtoul_l(ptr, end, base, l) strtoul(ptr, end, base)
+#   define strtol_l(ptr, end, base, l) strtol(ptr, end, base)
+#   define strtoull_l(ptr, end, base, l) strtoull(ptr, end, base)
+#   define strtoll_l(ptr, end, base, l) strtoll(ptr, end, base)
+#endif
+
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && !defined(__MINGW32__)
 #   define LC_NUMERIC_MASK LC_NUMERIC
 #   define newlocale(cat, loc, base) _create_locale(cat, loc)
