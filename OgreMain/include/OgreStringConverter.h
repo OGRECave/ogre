@@ -36,6 +36,20 @@ THE SOFTWARE.
 #include "OgreMatrix4.h"
 #include "OgreVector.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#   define locale_t _locale_t
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#   define locale_t int
+#endif
+
+// If compiling with make on macOS, these headers need to be included to get
+// definitions of locale_t, strtod_l, etc...
+// See: http://www.unix.com/man-page/osx/3/strtod_l/
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#   include <stdlib.h>
+#   include <xlocale.h>
+#endif
+
 namespace Ogre {
 
     /** \addtogroup Core

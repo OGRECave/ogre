@@ -445,7 +445,7 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
     it = locPtr->begin();
     itEnd = locPtr->end();
     for (; it != itEnd; it++) {
-        if (stricmp(name.c_str(), it->filename.c_str()) == 0) {
+        if (StringUtil::startsWith(name, it->filename)) {
             info = &*it;
             break;
         }

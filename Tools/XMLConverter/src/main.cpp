@@ -338,7 +338,7 @@ void XMLToBinary(XmlOptions opts)
         exit (1);
     }
     pugi::xml_node root = doc.document_element();
-    if (!stricmp(root.name(), "mesh"))
+    if (StringUtil::startsWith("mesh", root.name()))
     {
         MeshPtr newMesh = MeshManager::getSingleton().createManual("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -365,7 +365,7 @@ void XMLToBinary(XmlOptions opts)
         MeshManager::getSingleton().remove("conversion",
                                            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
-    else if (!stricmp(root.name(), "skeleton"))
+    else if (StringUtil::startsWith("skeleton", root.name()))
     {
         SkeletonPtr newSkel = SkeletonManager::getSingleton().create("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
