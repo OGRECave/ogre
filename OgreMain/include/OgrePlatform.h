@@ -44,10 +44,7 @@ namespace Ogre {
     
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
-#define OGRE_COMPILER_BORL 3
-#define OGRE_COMPILER_WINSCW 4
-#define OGRE_COMPILER_GCCE 5
-#define OGRE_COMPILER_CLANG 6
+#define OGRE_COMPILER_CLANG 3
 
 #define OGRE_ENDIAN_LITTLE 1
 #define OGRE_ENDIAN_BIG 2
@@ -113,10 +110,6 @@ namespace Ogre {
 #   define OGRE_COMP_VER (((__GNUC__)*100) + \
         (__GNUC_MINOR__*10) + \
         __GNUC_PATCHLEVEL__)
-#elif defined( __BORLANDC__ )
-#   define OGRE_COMPILER OGRE_COMPILER_BORL
-#   define OGRE_COMP_VER __BCPLUSPLUS__
-#   define __FUNCTION__ __FUNC__ 
 #else
 #   pragma error "No known compiler. Abort! Abort!"
 
