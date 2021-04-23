@@ -61,15 +61,8 @@ namespace Ogre {
                 msColourCmd[i].mIndex   = i;
                 msTimeCmd[i].mIndex     = i;
 
-                StringStream stage;
-                stage << i;
-                String  colour_title    = String("colour") + stage.str();
-                String  time_title      = String("time") + stage.str();
-                String  colour_descr    = String("Stage ") + stage.str() + String(" colour.");
-                String  time_descr      = String("Stage ") + stage.str() + String(" time.");
-
-                dict->addParameter(ParameterDef(colour_title, colour_descr, PT_COLOURVALUE), &msColourCmd[i]);
-                dict->addParameter(ParameterDef(time_title,   time_descr,   PT_REAL),        &msTimeCmd[i]);
+                dict->addParameter(StringUtil::format("colour%d", i), &msColourCmd[i]);
+                dict->addParameter(StringUtil::format("time%d", i), &msTimeCmd[i]);
             }
         }
     }

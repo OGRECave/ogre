@@ -43,7 +43,7 @@ namespace Ogre {
     *  @{
     */
 
-    /// List of parameter types available
+    /// @deprecated do not use
     enum ParameterType
     {
         PT_BOOL,
@@ -62,16 +62,15 @@ namespace Ogre {
         PT_COLOURVALUE
     };
 
-    /// Definition of a parameter supported by a StringInterface class, for introspection
+    /// @deprecated directly pass parameter name
     class _OgreExport ParameterDef
     {
     public:
         String name;
-        ParameterType paramType;
-        ParameterDef(const String& newName, const String& newDescription, ParameterType newType)
-            : name(newName), paramType(newType) {}
+        ParameterDef(const String& newName, const String& = "", ParameterType = PT_INT)
+            : name(newName) {}
     };
-    typedef std::vector<ParameterDef> ParameterList;
+    typedef std::vector<String> ParameterList;
 
     /** Abstract class which is command object which gets/sets parameters.*/
     class _OgreExport ParamCommand
@@ -133,12 +132,18 @@ namespace Ogre {
         ParamDictionary();
         ~ParamDictionary();
         /** Method for adding a parameter definition for this class. 
-        @param paramDef A ParameterDef object defining the parameter
+        @param name The name of the parameter
         @param paramCmd Pointer to a ParamCommand subclass to handle the getting / setting of this parameter.
             NB this class will not destroy this on shutdown, please ensure you do
 
         */
-        void addParameter(const ParameterDef& paramDef, ParamCommand* paramCmd);
+        void addParameter(const String& name, ParamCommand* paramCmd);
+
+        /// @deprecated do not use
+        void addParameter(const ParameterDef& def, ParamCommand* paramCmd)
+        {
+            addParameter(def.name, paramCmd);
+        }
         /** Retrieves a list of parameters valid for this object. 
         @return
             A reference to a static list of ParameterDef objects.
