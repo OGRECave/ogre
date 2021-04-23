@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreConfig.h"
 #include "OgreExports.h"
 
-namespace Ogre {
 /* Initial platform/compiler-related stuff to set.
 */
 #define OGRE_PLATFORM_WIN32 1
@@ -276,21 +275,17 @@ namespace Ogre {
 #define DECL_MALLOC __attribute__ ((malloc))
 #endif
 
-// Integer formats of fixed bit width
-typedef unsigned int uint32;
-typedef unsigned short uint16;
-typedef unsigned char uint8;
-typedef int int32;
-typedef short int16;
-typedef signed char int8;
-// define uint64 type
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-    typedef unsigned __int64 uint64;
-    typedef __int64 int64;
-#else
-    typedef unsigned long long uint64;
-    typedef long long int64;
-#endif
+#include <stdint.h>
+
+namespace Ogre {
+typedef uint32_t uint32;
+typedef uint16_t uint16;
+typedef uint8_t uint8;
+typedef uint64_t uint64;
+typedef int32_t int32;
+typedef int16_t int16;
+typedef int8_t int8;
+typedef int64_t int64;
 }
 
 #endif
