@@ -1890,41 +1890,32 @@ namespace Ogre
                 writeAttribute(1, "source", false);
                 writeValue(quoteWord(program->getSourceFile()), false);
                 // write special parameters based on language
-                const ParameterList& params = program->getParameters();
-                ParameterList::const_iterator currentParam = params.begin();
-                ParameterList::const_iterator endParam = params.end();
-
-                while (currentParam != endParam)
+                for (const auto& name : program->getParameters())
                 {
-                    if (currentParam->name != "type" &&
-                        currentParam->name != "assemble_code" &&
-                        currentParam->name != "micro_code" &&
-                        currentParam->name != "external_micro_code")
+                    if (name != "type" &&
+                        name != "assemble_code" &&
+                        name != "micro_code" &&
+                        name != "external_micro_code")
                     {
-                        String paramstr = program->getParameter(currentParam->name);
-                        if ((currentParam->name == "includes_skeletal_animation")
-                            && (paramstr == "false"))
+                        String paramstr = program->getParameter(name);
+                        if ((name == "includes_skeletal_animation") && (paramstr == "false"))
                             paramstr.clear();
-                        if ((currentParam->name == "includes_morph_animation")
-                            && (paramstr == "false"))
+                        if ((name == "includes_morph_animation") && (paramstr == "false"))
                             paramstr.clear();
-                        if ((currentParam->name == "includes_pose_animation")
-                            && (paramstr == "0"))
+                        if ((name == "includes_pose_animation") && (paramstr == "0"))
                             paramstr.clear();
-                        if ((currentParam->name == "uses_vertex_texture_fetch")
-                            && (paramstr == "false"))
+                        if ((name == "uses_vertex_texture_fetch") && (paramstr == "false"))
                             paramstr.clear();
 
-                        if ((language != "asm") && (currentParam->name == "syntax"))
+                        if ((language != "asm") && (name == "syntax"))
                             paramstr.clear();
 
                         if (!paramstr.empty())
                         {
-                            writeAttribute(1, currentParam->name, false);
+                            writeAttribute(1, name, false);
                             writeValue(paramstr, false);
                         }
                     }
-                    ++currentParam;
                 }
 
                 // write default parameters

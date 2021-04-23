@@ -62,10 +62,10 @@ namespace Ogre {
         }
     }
 
-    void ParamDictionary::addParameter(const ParameterDef& paramDef, ParamCommand* paramCmd)
+    void ParamDictionary::addParameter(const String& name, ParamCommand* paramCmd)
     {
-        mParamDefs.push_back(paramDef);
-        mParamCommands[paramDef.name] = paramCmd;
+        mParamDefs.push_back(name);
+        mParamCommands[name] = paramCmd;
     }
 
     bool StringInterface::createParamDictionary(const String& className)
@@ -152,17 +152,12 @@ namespace Ogre {
     void StringInterface::copyParametersTo(StringInterface* dest) const
     {
         // Get dictionary
-        const ParamDictionary* dict = getParamDictionary();
-
-        if (dict)
+        if (const ParamDictionary* dict = getParamDictionary())
         {
             // Iterate through own parameters
-            ParameterList::const_iterator i;
-
-            for (i = dict->mParamDefs.begin();
-            i != dict->mParamDefs.end(); ++i)
+            for (const auto& name : dict->mParamDefs)
             {
-                dest->setParameter(i->name, getParameter(i->name));
+                dest->setParameter(name, getParameter(name));
             }
         }
     }
