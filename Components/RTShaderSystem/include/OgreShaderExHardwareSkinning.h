@@ -170,8 +170,6 @@ protected:
     SkinningType mSkinningType;
 };
 
-OGRE_DEPRECATED _OgreRTSSExport void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data);
-
 /** 
 A factory that enables creation of HardwareSkinning instances.
 @remarks Sub class of SubRenderStateFactory

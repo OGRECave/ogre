@@ -360,8 +360,6 @@ private:
     TextureAtlasAttib mDefaultAtlasAttrib;
 };
 
-OGRE_DEPRECATED _OgreRTSSExport void operator<<(std::ostream& o, const TextureAtlasSamplerFactory::TextureAtlasAttib& tai);
-
 /** @} */
 /** @} */
 

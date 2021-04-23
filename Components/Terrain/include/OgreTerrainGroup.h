@@ -569,8 +569,6 @@ namespace Ogre
         {
             TerrainSlot* slot;
             TerrainGroup* origin;
-            OGRE_DEPRECATED _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const LoadRequest& r)
-            { return o; }       
         };
         
 

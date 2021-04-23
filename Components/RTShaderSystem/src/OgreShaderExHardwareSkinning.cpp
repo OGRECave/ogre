@@ -144,17 +144,6 @@ void HardwareSkinning::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data)
-{
-    o << data.isValid;
-    o << data.maxBoneCount;
-    o << data.maxWeightCount;
-    o << data.skinningType;
-    o << data.correctAntipodalityHandling;
-    o << data.scalingShearingSupport;
-}
-
-//-----------------------------------------------------------------------
 bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
     bool isValid = true;

@@ -44,12 +44,6 @@ template<> RTShader::TextureAtlasSamplerFactory* Singleton<RTShader::TextureAtla
 
 namespace RTShader {
 
-
-void operator<<(std::ostream& o, const TextureAtlasSamplerFactory::TextureAtlasAttib& tai)
-{
-    o << tai.autoBorderAdjust << tai.positionMode << tai.positionOffset;
-}
-
 const TextureAtlasTablePtr c_BlankAtlasTable;
 const String c_ParamTexel("texel_");
 String TextureAtlasSampler::Type = "SGX_TextureAtlasSampler";
