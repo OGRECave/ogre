@@ -1732,8 +1732,6 @@ namespace Ogre
             uint8 typeMask;
             Rect dirtyRect;
             Rect lightmapExtraDirtyRect;
-            OGRE_DEPRECATED _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataRequest& r)
-            { return o; }       
         };
 
         /// A data holder for communicating with the background derived data update
@@ -1751,8 +1749,6 @@ namespace Ogre
             /// All CPU-side data, independent of textures; to be blitted in main thread
             PixelBox* normalMapBox;
             PixelBox* lightMapBox;
-            OGRE_DEPRECATED _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataResponse& r)
-            { return o; }       
         };
 
         enum GenerateMaterialStage{
@@ -1766,8 +1762,6 @@ namespace Ogre
             unsigned long startTime;
             GenerateMaterialStage stage;
             bool synchronous;
-            OGRE_DEPRECATED _OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const GenerateMaterialRequest& r)
-            { return o; }       
         };
 
         String mMaterialName;

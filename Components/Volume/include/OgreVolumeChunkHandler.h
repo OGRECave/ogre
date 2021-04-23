@@ -78,9 +78,6 @@ namespace Volume {
 
         /// Whether this is an update of an existing tree
         bool isUpdate;
-
-        OGRE_DEPRECATED _OgreVolumeExport friend std::ostream& operator<<(std::ostream& o, const ChunkRequest& r)
-        { return o; }
     } ChunkRequest;
     
     /** Handles the WorkQueue management of the chunks.
