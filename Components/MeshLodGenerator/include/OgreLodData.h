@@ -35,6 +35,8 @@
 #include "OgreVector.h"
 #include "OgreHeaderPrefix.h"
 
+#include <unordered_set>
+
 #ifndef MESHLOD_QUALITY
 /// MESHLOD_QUALITY=1 is fastest processing time.
 /// MESHLOD_QUALITY=2 is balanced performance/quality (default)

@@ -6,6 +6,8 @@
 #include "OgreGLSLProgramCommon.h"
 #include "OgreStringConverter.h"
 
+#include <sstream>
+
 namespace Ogre
 {
 VertexElementSemantic GLSLProgramCommon::getAttributeSemanticEnum(const String& type)

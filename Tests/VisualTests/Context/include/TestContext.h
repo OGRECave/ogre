@@ -33,12 +33,14 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "SampleContext.h"
 #include "SamplePlugin.h"
 
-#include <iostream> // for Apple
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && defined(__OBJC__)
+#include <iostream>
+#import <UIKit/UIKit.h>
+#import <QuartzCore/QuartzCore.h>
+#endif
 
 class TestBatch;
 using namespace Ogre;
-
-typedef std::map<String, OgreBites::SamplePlugin *> PluginMap;
 
 /** The common environment that all of the tests run in */
 class TestContext : public OgreBites::SampleContext
@@ -102,6 +104,7 @@ class TestContext : public OgreBites::SampleContext
     }
 
  protected:
+    typedef std::map<String, OgreBites::SamplePlugin *> PluginMap;
     bool mSuccess;
 
     /// The timestep
@@ -157,9 +160,6 @@ class TestContext : public OgreBites::SampleContext
 };
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && defined(__OBJC__)
-#import <UIKit/UIKit.h>
-#import <QuartzCore/QuartzCore.h>
-
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {
     TestContext *tc;

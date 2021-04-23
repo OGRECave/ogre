@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
 
+#include <deque>
+
 namespace Ogre 
 {
     /** \addtogroup Core

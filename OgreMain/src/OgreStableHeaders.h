@@ -35,6 +35,11 @@ THE SOFTWARE.
 #ifndef __OgreStableHeaders__
 #define __OgreStableHeaders__
 
+extern "C" {
+#   include <sys/types.h>
+#   include <sys/stat.h>
+}
+
 #include "OgreConfig.h"
 #include "OgreExports.h"
 #include "OgrePrerequisites.h"

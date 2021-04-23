@@ -37,6 +37,8 @@
 #include "OgreLogManager.h"
 #include "OgreHeaderPrefix.h"
 
+#include <sstream>
+
 namespace Ogre
 {
 
@@ -81,7 +83,7 @@ protected:
             }
             if (tri->isMalformed()) {
 #if OGRE_DEBUG_MODE
-                stringstream str;
+                std::stringstream str;
                 str << "In " << data->mMeshName << " malformed triangle found with ID: " << LodData::getVectorIDFromPointer(data->mTriangleList, tri) << ". " <<
                 std::endl;
                 printTriangle(tri, str);

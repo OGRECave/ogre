@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
+#include <deque>
+
 namespace Ogre
 {
     /** \addtogroup Core

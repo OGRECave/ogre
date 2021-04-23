@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreCgProgram.h"
 
+#include <sstream>
+
 namespace Ogre {
 
     //---------------------------------------------------------------------

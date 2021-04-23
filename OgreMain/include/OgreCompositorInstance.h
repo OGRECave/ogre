@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreCompositionTechnique.h"
 #include "OgreHeaderPrefix.h"
 
+#include <bitset>
+
 namespace Ogre {
 
     /** \addtogroup Core

@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreSkeleton.h"
 #include "OgreKeyFrame.h"
 
+#include <fstream>
 
 //#define I_HAVE_LOT_OF_FREE_TIME
 

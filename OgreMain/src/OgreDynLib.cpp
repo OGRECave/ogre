@@ -54,6 +54,10 @@ THE SOFTWARE.
 #   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #  include <windows.h>
+#else
+extern "C" {
+#   include <dlfcn.h>
+}
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
@@ -69,11 +73,12 @@ static std::wstring stringToWstring(const std::string& s)
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "macUtils.h"
+extern "C" {
+#   include <unistd.h>
+#   include <sys/param.h>
+#   include <CoreFoundation/CoreFoundation.h>
+}
 #endif
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#   include <dlfcn.h>
-#endif
-
 
 namespace Ogre {
 
