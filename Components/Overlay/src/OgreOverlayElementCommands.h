@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreOverlayPrerequisites.h"
 #include "OgreStringInterface.h"
 
+#include "OgreOverlayElement.h"
+
 namespace Ogre  {
 
     /** \addtogroup Optional
@@ -41,34 +43,18 @@ namespace Ogre  {
     */
 
     namespace OverlayElementCommands {
-        /// Command object for OverlayElement  - see ParamCommand 
-        class CmdLeft : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for OverlayElement  - see ParamCommand 
-        class CmdTop : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for OverlayElement  - see ParamCommand 
-        class CmdWidth : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for OverlayElement  - see ParamCommand 
-        class CmdHeight : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
+    typedef SimpleParamCommand<OverlayElement, Real, &OverlayElement::getLeft, &OverlayElement::setLeft>
+        CmdLeft;
+
+    typedef SimpleParamCommand<OverlayElement, Real, &OverlayElement::getTop, &OverlayElement::setTop>
+        CmdTop;
+
+    typedef SimpleParamCommand<OverlayElement, Real, &OverlayElement::getWidth, &OverlayElement::setWidth>
+        CmdWidth;
+
+    typedef SimpleParamCommand<OverlayElement, Real, &OverlayElement::getHeight, &OverlayElement::setHeight>
+        CmdHeight;
+
         /// Command object for OverlayElement  - see ParamCommand 
         class CmdMaterial : public ParamCommand
         {

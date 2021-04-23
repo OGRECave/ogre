@@ -37,49 +37,6 @@ namespace Ogre {
     namespace OverlayElementCommands {
 
         //-----------------------------------------------------------------------
-        String CmdLeft::doGet(const void* target) const
-        {
-            return StringConverter::toString(
-                static_cast<const OverlayElement*>(target)->getLeft() );
-        }
-        void CmdLeft::doSet(void* target, const String& val)
-        {
-            Real r = StringConverter::parseReal(val);
-            static_cast<OverlayElement*>(target)->setLeft(r);
-        }
-        //-----------------------------------------------------------------------
-        String CmdTop::doGet(const void* target) const
-        {
-            return StringConverter::toString(
-                static_cast<const OverlayElement*>(target)->getTop() );
-        }
-        void CmdTop::doSet(void* target, const String& val)
-        {
-            Real r = StringConverter::parseReal(val);
-            static_cast<OverlayElement*>(target)->setTop(r);
-        }
-        //-----------------------------------------------------------------------
-        String CmdWidth::doGet(const void* target) const
-        {
-            return StringConverter::toString(
-                static_cast<const OverlayElement*>(target)->getWidth() );
-        }
-        void CmdWidth::doSet(void* target, const String& val)
-        {
-            Real r = StringConverter::parseReal(val);
-            static_cast<OverlayElement*>(target)->setWidth(r);
-        }
-        //-----------------------------------------------------------------------
-        String CmdHeight::doGet(const void* target) const
-        {
-            return StringConverter::toString(
-                static_cast<const OverlayElement*>(target)->getHeight() );
-        }
-        void CmdHeight::doSet(void* target, const String& val)
-        {
-            Real r = StringConverter::parseReal(val);
-            static_cast<OverlayElement*>(target)->setHeight(r);
-        }
         //-----------------------------------------------------------------------
         String CmdMaterial::doGet(const void* target) const
         {
