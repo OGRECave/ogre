@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre {
 
@@ -82,6 +83,37 @@ namespace Ogre {
         virtual ~ParamCommand() { }
     };
     typedef std::map<String, ParamCommand* > ParamCommandMap;
+
+#ifndef SWIG
+    /** Generic ParamCommand implementation
+     stores pointers to the class getter and setter functions */
+    template <typename _Class, typename Param, Param (_Class::*getter)() const, void (_Class::*setter)(Param)>
+    class SimpleParamCommand : public ParamCommand {
+    public:
+        String doGet(const void* target) const {
+            return StringConverter::toString((static_cast<const _Class*>(target)->*getter)());
+        }
+
+        void doSet(void* target, const String& val) {
+            typename std::decay<Param>::type tmp;
+            StringConverter::parse(val, tmp);
+            (static_cast<_Class*>(target)->*setter)(tmp);
+        }
+    };
+
+    /// specialization for strings
+    template <typename _Class, const String& (_Class::*getter)() const, void (_Class::*setter)(const String&)>
+    class SimpleParamCommand<_Class, const String&, getter, setter> : public ParamCommand {
+    public:
+        String doGet(const void* target) const {
+            return (static_cast<const _Class*>(target)->*getter)();
+        }
+
+        void doSet(void* target, const String& val) {
+            (static_cast<_Class*>(target)->*setter)(val);
+        }
+    };
+#endif
 
     /** Class to hold a dictionary of parameters for a single class. */
     class _OgreExport ParamDictionary
