@@ -308,12 +308,8 @@ settings have been made.
 
 namespace Ogre
 {
-    typedef std::string _StringBase;
-    typedef std::basic_stringstream<char,std::char_traits<char>,std::allocator<char> > _StringStreamBase;
-
-    typedef _StringBase String;
-    typedef _StringStreamBase StringStream;
-    typedef StringStream stringstream;
+    typedef std::string String;
+    typedef std::stringstream StringStream;
 
     template <typename T, size_t Alignment = OGRE_SIMD_ALIGNMENT>
     using aligned_vector = std::vector<T, AlignedAllocator<T, Alignment>>;
