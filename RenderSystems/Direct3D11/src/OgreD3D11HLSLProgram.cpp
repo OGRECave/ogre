@@ -39,12 +39,6 @@ THE SOFTWARE.
 #include "OgreD3D11RenderSystem.h"
 #include "OgreStringConverter.h"
 
-#define  HLSL_PROGRAM_DEFINE_VS "HLSL_VS"
-#define  HLSL_PROGRAM_DEFINE_PS "HLSL_PS"
-#define  HLSL_PROGRAM_DEFINE_GS "HLSL_GS"
-#define  HLSL_PROGRAM_DEFINE_HS "HLSL_HS"
-#define  HLSL_PROGRAM_DEFINE_CS "HLSL_CS"
-#define  HLSL_PROGRAM_DEFINE_DS "HLSL_DS"
 namespace Ogre {
     //-----------------------------------------------------------------------
     D3D11HLSLProgram::CmdEntryPoint D3D11HLSLProgram::msCmdEntryPoint;
@@ -109,60 +103,6 @@ namespace Ogre {
             newVar.name.erase(0,1);
         }
     }
-
-    void D3D11HLSLProgram::getDefines(String& stringBuffer, std::vector<D3D_SHADER_MACRO>& defines, const String& definesString)
-    {
-        // Populate preprocessor defines
-        stringBuffer = definesString;
-
-        defines.clear();
-
-        for(const auto& def : parseDefines(stringBuffer))
-        {
-            defines.push_back({def.first, def.second});
-        }
-
-        //Add D3D11 define to all program, compiled with D3D11 RenderSystem
-        D3D_SHADER_MACRO macro = {"D3D11","1"};
-        defines.push_back(macro);       
-		
-        // Using different texture sampling instructions, tex2D for D3D9 and SampleXxx for D3D11,
-        // declaring type of BLENDINDICES as float4 for D3D9 but as uint4 for D3D11 -  all those
-        // small but annoying differences that otherwise would require declaring separate programs.
-        macro.Name = "SHADER_MODEL_4";
-        defines.push_back(macro);
-
-		switch (this->mType)
-		{
-			case GPT_VERTEX_PROGRAM:
-				macro.Name = HLSL_PROGRAM_DEFINE_VS;
-			break;
-			case GPT_FRAGMENT_PROGRAM:
-				macro.Name = HLSL_PROGRAM_DEFINE_PS;
-			break;
-			case GPT_GEOMETRY_PROGRAM:
-				macro.Name = HLSL_PROGRAM_DEFINE_GS;
-			break;
-			case GPT_DOMAIN_PROGRAM:
-				macro.Name = HLSL_PROGRAM_DEFINE_DS;
-			break;
-			case GPT_HULL_PROGRAM:
-				macro.Name = HLSL_PROGRAM_DEFINE_HS;
-			break;
-			case GPT_COMPUTE_PROGRAM:
-				macro.Name = HLSL_PROGRAM_DEFINE_CS;
-			break;
-			default:
-				OGRE_EXCEPT(Exception::ERR_INVALID_STATE,"Could not find a compatible HLSL program type",
-					"D3D11HLSLProgram::getDefines");
-		}
-		defines.push_back(macro);
-		
-        // Add NULL terminator
-        macro.Name = 0;
-        macro.Definition = 0;
-        defines.push_back(macro);
-    }       
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::prepareImpl()
     {
@@ -363,12 +303,14 @@ namespace Ogre {
 #else
 #pragma comment(lib, "d3dcompiler.lib")
 
-        String stringBuffer;
+        String stringBuffer = appendBuiltinDefines(mPreprocessorDefines);
         std::vector<D3D_SHADER_MACRO> defines;
-        const D3D_SHADER_MACRO* pDefines = NULL;
-        getDefines(stringBuffer, defines, appendBuiltinDefines(mPreprocessorDefines));
-        pDefines = defines.empty() ? NULL : &defines[0];
-
+        for(const auto& def : parseDefines(stringBuffer))
+        {
+            defines.push_back({def.first, def.second});
+        }
+        // Add NULL terminator
+        defines.push_back({0, 0});
 
         UINT compileFlags=0;
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
@@ -407,7 +349,7 @@ namespace Ogre {
             mSource.c_str(),      // [in] Pointer to the shader in memory. 
             mSource.size(),       // [in] Size of the shader in memory.  
             mFilename.c_str(),    // [in] Optional. You can use this parameter for strings that specify error messages.
-            pDefines,             // [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D_SHADER_MACRO. If not used, set this to NULL. 
+            defines.data(),       // [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D_SHADER_MACRO. If not used, set this to NULL.
             NULL,                 // [in] Optional. Pointer to an ID3DInclude Interface interface for handling include files. Setting this to NULL will cause a compile error if a shader contains a #include.
             mEntryPoint.c_str(),  // [in] Name of the shader-entrypoint function where shader execution begins. 
             target,               // [in] A string that specifies the shader model; can be any profile in shader model 4 or higher. 
