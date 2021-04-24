@@ -315,7 +315,6 @@ namespace Ogre
         ConfigOption optVideoMode;
 		ConfigOption optBackBufferCount;
         ConfigOption optAA;
-        ConfigOption optFPUMode;
         ConfigOption optNVPerfHUD;
         ConfigOption optMinFeatureLevels;
         ConfigOption optMaxFeatureLevels;
@@ -348,17 +347,6 @@ namespace Ogre
         optAA.immutable = false;
         optAA.possibleValues.push_back( "None" );
         optAA.currentValue = "None";
-
-        optFPUMode.name = "Floating-point mode";
-#if OGRE_DOUBLE_PRECISION
-        optFPUMode.currentValue = "Consistent";
-#else
-        optFPUMode.currentValue = "Fastest";
-#endif
-        optFPUMode.possibleValues.clear();
-        optFPUMode.possibleValues.push_back("Fastest");
-        optFPUMode.possibleValues.push_back("Consistent");
-        optFPUMode.immutable = false;
 
         optNVPerfHUD.currentValue = "No";
         optNVPerfHUD.immutable = false;
@@ -431,7 +419,6 @@ namespace Ogre
         mOptions[optDevice.name] = optDevice;
         mOptions[optVideoMode.name] = optVideoMode;
         mOptions[optAA.name] = optAA;
-        mOptions[optFPUMode.name] = optFPUMode;
         mOptions[optNVPerfHUD.name] = optNVPerfHUD;
         mOptions[optMinFeatureLevels.name] = optMinFeatureLevels;
         mOptions[optMaxFeatureLevels.name] = optMaxFeatureLevels;
