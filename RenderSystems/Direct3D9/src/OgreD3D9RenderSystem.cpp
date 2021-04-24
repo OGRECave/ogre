@@ -333,7 +333,6 @@ namespace Ogre
         ConfigOption optAllowDirectX9Ex;
         ConfigOption optVideoMode;
         ConfigOption optMultihead;
-		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optFPUMode;
         ConfigOption optNVPerfHUD;
@@ -386,13 +385,6 @@ namespace Ogre
                 optDevice.currentValue = driver->DriverDescription();
         }
 
-		optBackBufferCount.name = "Backbuffer Count";
-		optBackBufferCount.immutable = false;
-		optBackBufferCount.possibleValues.push_back( "Auto" );
-		optBackBufferCount.possibleValues.push_back( "1" );
-		optBackBufferCount.possibleValues.push_back( "2" );
-		optBackBufferCount.currentValue = "Auto";
-
         optAA.name = "FSAA";
         optAA.immutable = false;
         optAA.possibleValues.push_back( "None" );
@@ -432,7 +424,6 @@ namespace Ogre
         mOptions[optAllowDirectX9Ex.name] = optAllowDirectX9Ex;
         mOptions[optVideoMode.name] = optVideoMode;
         mOptions[optMultihead.name] = optMultihead;
-		mOptions[optBackBufferCount.name] = optBackBufferCount;
         mOptions[optAA.name] = optAA;
         mOptions[optFPUMode.name] = optFPUMode;
         mOptions[optNVPerfHUD.name] = optNVPerfHUD;

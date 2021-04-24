@@ -313,7 +313,6 @@ namespace Ogre
 
         ConfigOption optDevice;
         ConfigOption optVideoMode;
-		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optNVPerfHUD;
         ConfigOption optMinFeatureLevels;
@@ -335,13 +334,6 @@ namespace Ogre
         optVideoMode.name = "Video Mode";
         optVideoMode.currentValue = "800 x 600 @ 32-bit colour";
         optVideoMode.immutable = false;
-
-		optBackBufferCount.name = "Backbuffer Count";
-		optBackBufferCount.immutable = false;
-		optBackBufferCount.possibleValues.push_back( "Auto" );
-		optBackBufferCount.possibleValues.push_back( "1" );
-		optBackBufferCount.possibleValues.push_back( "2" );
-		optBackBufferCount.currentValue = "Auto";
 
         optAA.name = "FSAA";
         optAA.immutable = false;
@@ -424,8 +416,6 @@ namespace Ogre
         mOptions[optMaxFeatureLevels.name] = optMaxFeatureLevels;
         mOptions[optExceptionsErrorLevel.name] = optExceptionsErrorLevel;
         mOptions[optDriverType.name] = optDriverType;
-
-		mOptions[optBackBufferCount.name] = optBackBufferCount;
 
         ConfigOption opt;
         opt.name = "Reversed Z-Buffer";
