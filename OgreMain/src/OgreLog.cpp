@@ -36,6 +36,9 @@ THE SOFTWARE.
 #   endif
 #endif
 
+// LogMessageLevel + LoggingLevel > OGRE_LOG_THRESHOLD = message logged
+#define OGRE_LOG_THRESHOLD 4
+
 namespace {
     const char* RED = "\x1b[31;1m";
     const char* YELLOW = "\x1b[33;1m";
@@ -46,7 +49,7 @@ namespace Ogre
 {
     //-----------------------------------------------------------------------
     Log::Log( const String& name, bool debuggerOutput, bool suppressFile ) : 
-        mLogLevel(LL_NORMAL), mDebugOut(debuggerOutput),
+        mLogLevel(LML_NORMAL), mDebugOut(debuggerOutput),
         mSuppressFile(suppressFile), mTimeStamp(true), mLogName(name), mTermHasColours(false)
     {
         if (!mSuppressFile)
@@ -93,7 +96,7 @@ namespace Ogre
     void Log::logMessage( const String& message, LogMessageLevel lml, bool maskDebug )
     {
         OGRE_LOCK_AUTO_MUTEX;
-        if ((mLogLevel + lml) >= OGRE_LOG_THRESHOLD)
+        if (lml >= mLogLevel)
         {
             bool skipThisMessage = false;
             for( mtLogListener::iterator i = mListeners.begin(); i != mListeners.end(); ++i )
@@ -167,13 +170,13 @@ namespace Ogre
     void Log::setLogDetail(LoggingLevel ll)
     {
         OGRE_LOCK_AUTO_MUTEX;
-        mLogLevel = ll;
+        mLogLevel = LogMessageLevel(OGRE_LOG_THRESHOLD - ll);
     }
 
     void Log::setMinLogLevel(LogMessageLevel lml)
     {
         OGRE_LOCK_AUTO_MUTEX;
-        mLogLevel = LoggingLevel(std::max(OGRE_LOG_THRESHOLD - lml, 1));
+        mLogLevel = lml;
     }
 
     //-----------------------------------------------------------------------

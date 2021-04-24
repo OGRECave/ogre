@@ -45,11 +45,8 @@ namespace Ogre {
     /** \addtogroup General
     *  @{
     */
-    // LogMessageLevel + LoggingLevel > OGRE_LOG_THRESHOLD = message logged
-    #define OGRE_LOG_THRESHOLD 4
 
-    /** The level of detail to which the log will go into.
-    */
+    /// @deprecated use LogMessageLevel instead
     enum LoggingLevel
     {
         LL_LOW = 1,
@@ -102,7 +99,7 @@ namespace Ogre {
     {
     private:
         std::ofstream   mLog;
-        LoggingLevel    mLogLevel;
+        LogMessageLevel mLogLevel;
         bool            mDebugOut;
         bool            mSuppressFile;
         bool            mTimeStamp;
@@ -161,7 +158,7 @@ namespace Ogre {
         void setTimeStampEnabled(bool timeStamp);
         /** Gets the level of the log detail.
         */
-        LoggingLevel getLogDetail() const { return mLogLevel; }
+        LogMessageLevel getMinLogLevel() const { return mLogLevel; }
         /**
         @remarks
             Register a listener to this log
