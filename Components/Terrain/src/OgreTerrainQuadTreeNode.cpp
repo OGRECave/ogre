@@ -47,7 +47,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     TerrainQuadTreeNode::TerrainQuadTreeNode(Terrain* terrain, 
         TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size, 
-        uint16 lod, uint16 depth, uint16 quadrant)
+        uint16 lod, uint16 depth)
         : mTerrain(terrain)
         , mParent(parent)
         , mOffsetX(xoff)
@@ -57,7 +57,6 @@ namespace Ogre
         , mSize(size)
         , mBaseLod(lod)
         , mDepth(depth)
-        , mQuadrant(quadrant)
         , mBoundingRadius(0)
         , mCurrentLod(-1)
         , mMaterialLodIndex(0)
@@ -75,10 +74,10 @@ namespace Ogre
             uint16 childLod = lod - 1; // LOD levels decrease down the tree (higher detail)
             uint16 childDepth = depth + 1;
             // create children
-            mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize, childLod, childDepth, 0);
-            mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize, childLod, childDepth, 1);
-            mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize, childLod, childDepth, 2);
-            mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize, childLod, childDepth, 3);
+            mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize, childLod, childDepth);
+            mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize, childLod, childDepth);
+            mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize, childLod, childDepth);
+            mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize, childLod, childDepth);
 
             LodLevel* ll = OGRE_NEW LodLevel();
             // non-leaf nodes always render with minBatchSize vertices
