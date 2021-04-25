@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePlugin.h"
 #include "OgreBspSceneManager.h"
-#include "OgreBspSceneLoader.h"
 
 namespace Ogre
 {

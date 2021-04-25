@@ -6,7 +6,6 @@
 #include <OgreColourValue.h>
 #include <OgreQuaternion.h>
 #include <OgreResourceGroupManager.h>
-#include <OgreSceneLoader.h>
 #include <OgreString.h>
 #include <OgrePlugin.h>
 #include <OgreCodec.h>
@@ -22,7 +21,7 @@ namespace Ogre
 class SceneManager;
 class SceneNode;
 
-class _OgreDotScenePluginExport DotSceneLoader : public Ogre::SceneLoader
+class _OgreDotScenePluginExport DotSceneLoader
 {
 public:
     DotSceneLoader();
