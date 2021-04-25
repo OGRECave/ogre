@@ -63,10 +63,6 @@ namespace Ogre {
         CompositorManager();
         virtual ~CompositorManager();
 
-        Resource* createImpl(const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader,
-            const NameValuePairList* params) override;
-
         /** Initialises the Compositor manager, which also triggers it to
             parse all available .compositor scripts. */
         void initialise(void);
@@ -196,6 +192,10 @@ namespace Ogre {
         static CompositorManager* getSingletonPtr(void);
     
     private:
+        Resource* createImpl(const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader,
+            const NameValuePairList* params) override;
+
         typedef std::map<const Viewport*, CompositorChain*> Chains;
         Chains mChains;
 
