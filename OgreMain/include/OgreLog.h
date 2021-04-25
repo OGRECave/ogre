@@ -212,13 +212,9 @@ namespace Ogre {
             {
 
             }
-            // copy constructor
-            Stream(const Stream& rhs) 
-                : mTarget(rhs.mTarget), mLevel(rhs.mLevel), mMaskDebug(rhs.mMaskDebug)
-            {
-                // explicit copy of stream required, gcc doesn't like implicit
-                mCache.str(rhs.mCache.str());
-            } 
+            // move constructor
+            Stream(Stream&& rhs) = default;
+
             ~Stream()
             {
                 // flush on destroy
