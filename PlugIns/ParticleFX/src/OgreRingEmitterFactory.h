@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -25,28 +25,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ColourFaderAffectorFactory2_H__
-#define __ColourFaderAffectorFactory2_H__
+// Original author: Tels <http://bloodgate.com>, released as public domain
+#ifndef __RingEmitterFactory_H__
+#define __RingEmitterFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
-#include "OgreParticleAffectorFactory.h"
-#include "OgreColourFaderAffector2.h"
+#include "OgreParticleEmitterFactory.h"
+#include "OgreRingEmitter.h"
+
 
 namespace Ogre {
 
-    /** Factory class for ColourFaderAffector. */
-    class _OgreParticleFXExport ColourFaderAffectorFactory2 : public ParticleAffectorFactory
+    /** Factory class for particle emitter of type "Ring".
+    @remarks
+        Creates instances of RingEmitter to be used in particle systems. 
+    */
+    class RingEmitterFactory : public ParticleEmitterFactory
     {
-        String getName() const override { return "ColourFader2"; }
+    protected:
 
-        ParticleAffector* createAffector(ParticleSystem* psys) override
+    public:
+        String getName() const override { return "Ring"; }
+
+        ParticleEmitter* createEmitter(ParticleSystem* psys) override
         {
-            ParticleAffector* p = OGRE_NEW ColourFaderAffector2(psys);
-            mAffectors.push_back(p);
-            return p;
+            ParticleEmitter* emit = OGRE_NEW RingEmitter(psys);
+            mEmitters.push_back(emit);
+            return emit;
         }
-    };
 
+    };
 
 }
 

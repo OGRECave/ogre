@@ -25,23 +25,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __DeflectorPlaneAffectorFactory_H__
-#define __DeflectorPlaneAffectorFactory_H__
+#ifndef __ColourFaderAffectorFactory2_H__
+#define __ColourFaderAffectorFactory2_H__
 
 #include "OgreParticleFXPrerequisites.h"
 #include "OgreParticleAffectorFactory.h"
-#include "OgreDeflectorPlaneAffector.h"
+#include "OgreColourFaderAffector2.h"
 
 namespace Ogre {
 
-    /** Factory class for DeflectorPlaneAffector. */
-    class _OgreParticleFXExport DeflectorPlaneAffectorFactory : public ParticleAffectorFactory
+    /** Factory class for ColourFaderAffector. */
+    class ColourFaderAffectorFactory2 : public ParticleAffectorFactory
     {
-        String getName() const override { return "DeflectorPlane"; }
+        String getName() const override { return "ColourFader2"; }
 
         ParticleAffector* createAffector(ParticleSystem* psys) override
         {
-            ParticleAffector* p = OGRE_NEW DeflectorPlaneAffector(psys);
+            ParticleAffector* p = OGRE_NEW ColourFaderAffector2(psys);
             mAffectors.push_back(p);
             return p;
         }

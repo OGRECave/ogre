@@ -39,7 +39,7 @@ namespace Ogre {
     @remarks
         Creates instances of BoxEmitter to be used in particle systems. 
     */
-    class _OgreParticleFXExport BoxEmitterFactory : public ParticleEmitterFactory
+    class BoxEmitterFactory : public ParticleEmitterFactory
     {
     protected:
 

@@ -25,30 +25,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __LinearForceAffectorFactory_H__
-#define __LinearForceAffectorFactory_H__
+#ifndef __DirectionRandomiserAffectorFactory_H__
+#define __DirectionRandomiserAffectorFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
 #include "OgreParticleAffectorFactory.h"
-#include "OgreLinearForceAffector.h"
+#include "OgreDirectionRandomiserAffector.h"
 
 namespace Ogre {
 
-    /** Factory class for LinearForceAffector. */
-    class _OgreParticleFXExport LinearForceAffectorFactory : public ParticleAffectorFactory
+    /** Factory class for DirectionRandomiserAffector. */
+    class DirectionRandomiserAffectorFactory : public ParticleAffectorFactory
     {
-        String getName() const override { return "LinearForce"; }
+        String getName() const override { return "DirectionRandomiser"; }
 
         ParticleAffector* createAffector(ParticleSystem* psys) override
         {
-            ParticleAffector* p = OGRE_NEW LinearForceAffector(psys);
+            ParticleAffector* p = OGRE_NEW DirectionRandomiserAffector(psys);
             mAffectors.push_back(p);
             return p;
         }
     };
 
-
 }
 
 #endif
-
