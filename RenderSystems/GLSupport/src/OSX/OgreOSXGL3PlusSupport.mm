@@ -52,16 +52,7 @@ ConfigOptionMap OSXGLSupport::getConfigOptions()
 {
 	ConfigOptionMap mOptions;
 	ConfigOption optBitDepth;
-	ConfigOption optHiddenWindow;
     ConfigOption optContentScalingFactor;
-
-    // Hidden window setting possibilities
-	optHiddenWindow.name = "hidden";
-	optHiddenWindow.possibleValues.push_back( "Yes" );
-	optHiddenWindow.possibleValues.push_back( "No" );
-	optHiddenWindow.currentValue = "No";
-	optHiddenWindow.immutable = false;
-	mOptions[optHiddenWindow.name] = optHiddenWindow;
 
 	optBitDepth.name = "Colour Depth";
 	optBitDepth.currentValue = "32";
