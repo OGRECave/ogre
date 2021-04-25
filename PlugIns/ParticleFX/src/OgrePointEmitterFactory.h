@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -25,31 +25,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-// Original author: Tels <http://bloodgate.com>, released as public domain
-#ifndef __EllipsoidEmitterFactory_H__
-#define __EllipsoidEmitterFactory_H__
+#ifndef __PointEmitterFactory_H__
+#define __PointEmitterFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
 #include "OgreParticleEmitterFactory.h"
-#include "OgreEllipsoidEmitter.h"
+#include "OgrePointEmitter.h"
 
 
 namespace Ogre {
 
-    /** Factory class for particle emitter of type "Ellipsoid".
+    /** Factory class for particle emitter of type "Point".
     @remarks
-        Creates instances of EllipsoidEmitter to be used in particle systems. 
+        Creates instances of PointEmitter to be used in particle systems. 
     */
-    class _OgreParticleFXExport EllipsoidEmitterFactory : public ParticleEmitterFactory
+    class PointEmitterFactory : public ParticleEmitterFactory
     {
     protected:
 
     public:
-        String getName() const override { return "Ellipsoid"; }
+        String getName() const override { return "Point"; }
 
         ParticleEmitter* createEmitter(ParticleSystem* psys) override
         {
-            ParticleEmitter* emit = OGRE_NEW EllipsoidEmitter(psys);
+            ParticleEmitter* emit = OGRE_NEW PointEmitter(psys);
             mEmitters.push_back(emit);
             return emit;
         }

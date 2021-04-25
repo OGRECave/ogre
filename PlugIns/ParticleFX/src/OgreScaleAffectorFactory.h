@@ -25,23 +25,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ColourImageAffectorFactory_H__
-#define __ColourImageAffectorFactory_H__
+#ifndef __ScaleAffectorFactory_H__
+#define __ScaleAffectorFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
 #include "OgreParticleAffectorFactory.h"
-#include "OgreColourImageAffector.h"
+#include "OgreScaleAffector.h"
 
 namespace Ogre {
 
-    /** Factory class for ColourImageAffector. */
-    class _OgreParticleFXExport ColourImageAffectorFactory : public ParticleAffectorFactory
+    /** Factory class for ScaleAffector. */
+    class ScaleAffectorFactory : public ParticleAffectorFactory
     {
-        String getName() const override { return "ColourImage"; }
+        String getName() const override { return "Scaler"; }
 
         ParticleAffector* createAffector(ParticleSystem* psys) override
         {
-            ParticleAffector* p = OGRE_NEW ColourImageAffector(psys);
+            ParticleAffector* p = OGRE_NEW ScaleAffector(psys);
             mAffectors.push_back(p);
             return p;
         }

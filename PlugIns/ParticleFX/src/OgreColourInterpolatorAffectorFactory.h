@@ -35,7 +35,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Factory class for ColourInterpolatorAffector. */
-    class _OgreParticleFXExport ColourInterpolatorAffectorFactory : public ParticleAffectorFactory
+    class ColourInterpolatorAffectorFactory : public ParticleAffectorFactory
     {
         String getName() const override { return "ColourInterpolator"; }
 

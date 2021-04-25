@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -25,28 +25,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __RotationAffectorFactory_H__
-#define __RotationAffectorFactory_H__
+// Original author: Tels <http://bloodgate.com>, released as public domain
+#ifndef __CylinderEmitterFactory_H__
+#define __CylinderEmitterFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
-#include "OgreParticleAffectorFactory.h"
-#include "OgreRotationAffector.h"
+#include "OgreParticleEmitterFactory.h"
+#include "OgreCylinderEmitter.h"
+
 
 namespace Ogre {
 
-    /** Factory class for RotationAffector. */
-    class _OgreParticleFXExport RotationAffectorFactory : public ParticleAffectorFactory
+    /** Factory class for particle emitter of type "Cylinder".
+    @remarks
+        Creates instances of CylinderEmitter to be used in particle systems. 
+    */
+    class CylinderEmitterFactory : public ParticleEmitterFactory
     {
-        String getName() const override { return "Rotator"; }
+    protected:
 
-        ParticleAffector* createAffector(ParticleSystem* psys) override
+    public:
+        String getName() const override { return "Cylinder"; }
+
+        ParticleEmitter* createEmitter(ParticleSystem* psys) override
         {
-            ParticleAffector* p = OGRE_NEW RotationAffector(psys);
-            mAffectors.push_back(p);
-            return p;
+            ParticleEmitter* emit = OGRE_NEW CylinderEmitter(psys);
+            mEmitters.push_back(emit);
+            return emit;
         }
-    };
 
+    };
 
 }
 

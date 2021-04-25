@@ -25,35 +25,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __PointEmitterFactory_H__
-#define __PointEmitterFactory_H__
+#ifndef __ColourImageAffectorFactory_H__
+#define __ColourImageAffectorFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
-#include "OgreParticleEmitterFactory.h"
-#include "OgrePointEmitter.h"
-
+#include "OgreParticleAffectorFactory.h"
+#include "OgreColourImageAffector.h"
 
 namespace Ogre {
 
-    /** Factory class for particle emitter of type "Point".
-    @remarks
-        Creates instances of PointEmitter to be used in particle systems. 
-    */
-    class _OgreParticleFXExport PointEmitterFactory : public ParticleEmitterFactory
+    /** Factory class for ColourImageAffector. */
+    class ColourImageAffectorFactory : public ParticleAffectorFactory
     {
-    protected:
+        String getName() const override { return "ColourImage"; }
 
-    public:
-        String getName() const override { return "Point"; }
-
-        ParticleEmitter* createEmitter(ParticleSystem* psys) override
+        ParticleAffector* createAffector(ParticleSystem* psys) override
         {
-            ParticleEmitter* emit = OGRE_NEW PointEmitter(psys);
-            mEmitters.push_back(emit);
-            return emit;
+            ParticleAffector* p = OGRE_NEW ColourImageAffector(psys);
+            mAffectors.push_back(p);
+            return p;
         }
-
     };
+
 
 }
 

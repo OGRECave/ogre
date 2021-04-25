@@ -26,30 +26,30 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 // Original author: Tels <http://bloodgate.com>, released as public domain
-#ifndef __CylinderEmitterFactory_H__
-#define __CylinderEmitterFactory_H__
+#ifndef __HollowEllipsoidEmitterFactory_H__
+#define __HollowEllipsoidEmitterFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
 #include "OgreParticleEmitterFactory.h"
-#include "OgreCylinderEmitter.h"
+#include "OgreHollowEllipsoidEmitter.h"
 
 
 namespace Ogre {
 
-    /** Factory class for particle emitter of type "Cylinder".
+    /** Factory class for particle emitter of type "HollowEllipsoid".
     @remarks
-        Creates instances of CylinderEmitter to be used in particle systems. 
+        Creates instances of HollowEllipsoidEmitter to be used in particle systems. 
     */
-    class _OgreParticleFXExport CylinderEmitterFactory : public ParticleEmitterFactory
+    class HollowEllipsoidEmitterFactory : public ParticleEmitterFactory
     {
     protected:
 
     public:
-        String getName() const override { return "Cylinder"; }
+        String getName() const override { return "HollowEllipsoid"; }
 
-        ParticleEmitter* createEmitter(ParticleSystem* psys) override
+        ParticleEmitter* createEmitter(ParticleSystem* psys) 
         {
-            ParticleEmitter* emit = OGRE_NEW CylinderEmitter(psys);
+            ParticleEmitter* emit = OGRE_NEW HollowEllipsoidEmitter(psys);
             mEmitters.push_back(emit);
             return emit;
         }

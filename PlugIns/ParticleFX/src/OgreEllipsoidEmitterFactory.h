@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -25,28 +25,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ColourFaderAffectorFactory_H__
-#define __ColourFaderAffectorFactory_H__
+// Original author: Tels <http://bloodgate.com>, released as public domain
+#ifndef __EllipsoidEmitterFactory_H__
+#define __EllipsoidEmitterFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
-#include "OgreParticleAffectorFactory.h"
-#include "OgreColourFaderAffector.h"
+#include "OgreParticleEmitterFactory.h"
+#include "OgreEllipsoidEmitter.h"
+
 
 namespace Ogre {
 
-    /** Factory class for ColourFaderAffector. */
-    class _OgreParticleFXExport ColourFaderAffectorFactory : public ParticleAffectorFactory
+    /** Factory class for particle emitter of type "Ellipsoid".
+    @remarks
+        Creates instances of EllipsoidEmitter to be used in particle systems. 
+    */
+    class EllipsoidEmitterFactory : public ParticleEmitterFactory
     {
-        String getName() const override { return "ColourFader"; }
+    protected:
 
-        ParticleAffector* createAffector(ParticleSystem* psys) override
+    public:
+        String getName() const override { return "Ellipsoid"; }
+
+        ParticleEmitter* createEmitter(ParticleSystem* psys) override
         {
-            ParticleAffector* p = OGRE_NEW ColourFaderAffector(psys);
-            mAffectors.push_back(p);
-            return p;
+            ParticleEmitter* emit = OGRE_NEW EllipsoidEmitter(psys);
+            mEmitters.push_back(emit);
+            return emit;
         }
-    };
 
+    };
 
 }
 

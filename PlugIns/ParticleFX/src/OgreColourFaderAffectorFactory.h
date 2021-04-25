@@ -25,28 +25,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __DirectionRandomiserAffectorFactory_H__
-#define __DirectionRandomiserAffectorFactory_H__
+#ifndef __ColourFaderAffectorFactory_H__
+#define __ColourFaderAffectorFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
 #include "OgreParticleAffectorFactory.h"
-#include "OgreDirectionRandomiserAffector.h"
+#include "OgreColourFaderAffector.h"
 
 namespace Ogre {
 
-    /** Factory class for DirectionRandomiserAffector. */
-    class _OgreParticleFXExport DirectionRandomiserAffectorFactory : public ParticleAffectorFactory
+    /** Factory class for ColourFaderAffector. */
+    class ColourFaderAffectorFactory : public ParticleAffectorFactory
     {
-        String getName() const override { return "DirectionRandomiser"; }
+        String getName() const override { return "ColourFader"; }
 
         ParticleAffector* createAffector(ParticleSystem* psys) override
         {
-            ParticleAffector* p = OGRE_NEW DirectionRandomiserAffector(psys);
+            ParticleAffector* p = OGRE_NEW ColourFaderAffector(psys);
             mAffectors.push_back(p);
             return p;
         }
     };
 
+
 }
 
 #endif
+

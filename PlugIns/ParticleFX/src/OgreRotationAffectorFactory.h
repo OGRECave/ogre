@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -25,36 +25,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-// Original author: Tels <http://bloodgate.com>, released as public domain
-#ifndef __HollowEllipsoidEmitterFactory_H__
-#define __HollowEllipsoidEmitterFactory_H__
+#ifndef __RotationAffectorFactory_H__
+#define __RotationAffectorFactory_H__
 
 #include "OgreParticleFXPrerequisites.h"
-#include "OgreParticleEmitterFactory.h"
-#include "OgreHollowEllipsoidEmitter.h"
-
+#include "OgreParticleAffectorFactory.h"
+#include "OgreRotationAffector.h"
 
 namespace Ogre {
 
-    /** Factory class for particle emitter of type "HollowEllipsoid".
-    @remarks
-        Creates instances of HollowEllipsoidEmitter to be used in particle systems. 
-    */
-    class _OgreParticleFXExport HollowEllipsoidEmitterFactory : public ParticleEmitterFactory
+    /** Factory class for RotationAffector. */
+    class RotationAffectorFactory : public ParticleAffectorFactory
     {
-    protected:
+        String getName() const override { return "Rotator"; }
 
-    public:
-        String getName() const override { return "HollowEllipsoid"; }
-
-        ParticleEmitter* createEmitter(ParticleSystem* psys) 
+        ParticleAffector* createAffector(ParticleSystem* psys) override
         {
-            ParticleEmitter* emit = OGRE_NEW HollowEllipsoidEmitter(psys);
-            mEmitters.push_back(emit);
-            return emit;
+            ParticleAffector* p = OGRE_NEW RotationAffector(psys);
+            mAffectors.push_back(p);
+            return p;
         }
-
     };
+
 
 }
 
