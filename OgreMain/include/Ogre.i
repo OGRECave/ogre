@@ -446,9 +446,11 @@ ADD_REPR(Plane)
 %template(SettingsMultiMap) std::multimap<Ogre::String, Ogre::String>;
 #endif
 %include "OgreConfigFile.h"
-%feature("valuewrapper") Ogre::Log::Stream;
+%ignore Ogre::Log::Stream; // not useful in bindings
+%ignore Ogre::Log::stream;
 %feature("director") Ogre::LogListener;
 %include "OgreLog.h"
+%ignore Ogre::LogManager::stream; // not useful in bindings
 %include "OgreLogManager.h"
 #ifdef SWIGJAVA
 // conflicts with SWIG interal func
