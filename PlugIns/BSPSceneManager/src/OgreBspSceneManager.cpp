@@ -43,7 +43,6 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreMaterialManager.h"
-#include "OgreSceneLoaderManager.h"
 #include "OgreCodec.h"
 #include "OgreRoot.h"
 

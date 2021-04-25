@@ -1,6 +1,5 @@
 #include <Ogre.h>
 #include <OgreDotSceneLoader.h>
-#include <OgreSceneLoaderManager.h>
 #include <OgreComponents.h>
 
 #ifdef OGRE_BUILD_COMPONENT_TERRAIN

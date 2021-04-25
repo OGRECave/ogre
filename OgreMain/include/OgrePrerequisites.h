@@ -208,7 +208,6 @@ namespace Ogre {
     class Root;
     class SceneManager;
     class SceneManagerEnumerator;
-    class SceneLoaderManager;
     class SceneNode;
     class SceneQuery;
     class SceneQueryListener;

@@ -50,7 +50,6 @@ THE SOFTWARE.
 #include "OgreFrameListener.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreFileSystemLayer.h"
-#include "OgreSceneLoaderManager.h"
 
 #if OGRE_NO_DDS_CODEC == 0
 #include "OgreDDSCodec.h"
@@ -204,7 +203,6 @@ namespace Ogre {
         mExternalTextureSourceManager.reset(new ExternalTextureSourceManager());
         mCompositorManager.reset(new CompositorManager());
         mCompilerManager.reset(new ScriptCompilerManager());
-        mSceneLoaderManager.reset(new SceneLoaderManager());
 
         // Auto window
         mAutoWindow = 0;
