@@ -442,15 +442,16 @@ namespace Ogre {
             void freeInternalResourcesImpl() override {}
             void loadImpl() override {}
         };
-    public:
-        bool isHardwareFilteringSupported(TextureType, PixelFormat, int, bool) override { return false; }
-        PixelFormat getNativeFormat(TextureType, PixelFormat, int) override { return PF_UNKNOWN; }
 
         Resource* createImpl(const String& name, ResourceHandle handle, const String& group, bool,
                              ManualResourceLoader*, const NameValuePairList*) override
         {
             return new NullTexture(this, name, handle, group);
         }
+
+    public:
+        bool isHardwareFilteringSupported(TextureType, PixelFormat, int, bool) override { return false; }
+        PixelFormat getNativeFormat(TextureType, PixelFormat, int) override { return PF_UNKNOWN; }
     };
     /** @} */
     /** @} */
