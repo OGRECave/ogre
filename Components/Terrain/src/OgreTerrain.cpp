@@ -758,7 +758,7 @@ namespace Ogre
         }
 
         // Create & load quadtree
-        mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+        mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0);
         mQuadTree->prepare(stream);
 
         // stop uncompressing
@@ -890,7 +890,7 @@ namespace Ogre
         mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
         memset(mDeltaData, 0, sizeof(float) * numVertices);
 
-        mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+        mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0);
         mQuadTree->prepare();
 
         // calculate entire terrain
@@ -4487,7 +4487,7 @@ namespace Ogre
             mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
             memset(mDeltaData, 0, sizeof(float) * numVertices);
 
-            mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+            mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0);
             mQuadTree->prepare();
 
             // calculate entire terrain
