@@ -279,8 +279,6 @@ namespace OgreBites {
     const ConfigOptionMap& opts = rs->getConfigOptions();
     for (ConfigOptionMap::const_iterator pOpt = opts.begin(); pOpt != opts.end(); ++pOpt)
     {
-        if(pOpt->first == "hidden") continue;
-
         NSString* key = [[NSString alloc] initWithCString:pOpt->first.c_str()];
         NSMutableArray* values = [[NSMutableArray alloc] initWithCapacity:10];
         for(uint i = 0; i < pOpt->second.possibleValues.size(); i++)
