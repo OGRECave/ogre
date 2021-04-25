@@ -31,11 +31,12 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreMatrix4.h"
-#include "OgreRenderable.h"
 #include "OgreUserObjectBindings.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+    template <typename T> class VectorIterator;
+    template <typename T> class ConstVectorIterator;
 
     /** \addtogroup Core
     *  @{
@@ -92,26 +93,6 @@ namespace Ogre {
             virtual void nodeAttached(const Node*) {}
             /** Node has been detached from a parent */
             virtual void nodeDetached(const Node*) {}
-        };
-
-        /** Inner class for displaying debug renderable for Node. */
-        class _OgreExport DebugRenderable : public Renderable, public NodeAlloc
-        {
-        protected:
-            Node* mParent;
-            MeshPtr mMeshPtr;
-            MaterialPtr mMat;
-            Real mScaling;
-        public:
-            DebugRenderable(Node* parent);
-            ~DebugRenderable();
-            const MaterialPtr& getMaterial(void) const;
-            void getRenderOperation(RenderOperation& op);
-            void getWorldTransforms(Matrix4* xform) const;
-            Real getSquaredViewDepth(const Camera* cam) const;
-            const LightList& getLights(void) const;
-            void setScaling(Real s) { mScaling = s; }
-
         };
 
     protected:
@@ -205,8 +186,6 @@ namespace Ogre {
 
         /** Node listener - only one allowed (no list) for size & performance reasons. */
         Listener* mListener;
-
-        std::unique_ptr<DebugRenderable> mDebug;
 
         /// User objects binding.
         UserObjectBindings mUserObjectBindings;
@@ -654,9 +633,6 @@ namespace Ogre {
         void requestUpdate(Node* child, bool forceParentUpdate = false);
         /** Called by children to notify their parent that they no longer need an update. */
         void cancelUpdate(Node* child);
-
-        /// @deprecated use DefaultDebugDrawer::drawAxes
-        OGRE_DEPRECATED DebugRenderable* getDebugRenderable(Real scaling);
 
         /** Queue a 'needUpdate' call to a node safely.
         @remarks

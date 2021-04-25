@@ -295,18 +295,6 @@ namespace Ogre {
         return ConstObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
     }
 
-    Node::DebugRenderable* SceneNode::getDebugRenderable()
-    {
-        Vector3 hs = mWorldAABB.getHalfSize();
-        Real sz = std::min(hs.x, hs.y);
-        sz = std::min(sz, hs.z);
-        sz = std::max(sz, (Real)1.0);
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        return Node::getDebugRenderable(sz);
-        OGRE_IGNORE_DEPRECATED_END
-    }
-
-
     void SceneNode::_addBoundingBoxToQueue(RenderQueue* queue) {
         // Create a WireBoundingBox if needed.
         if (!mWireBoundingBox) {

@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define _SceneNode_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreCommon.h"
 
 #include "OgreNode.h"
 #include "OgreAxisAlignedBox.h"
@@ -449,13 +450,6 @@ namespace Ogre {
         @param cascade If true, this setting cascades into child nodes too.
         */
         void setDebugDisplayEnabled(bool enabled, bool cascade = true) const;
-
-        /// @deprecated use DefaultDebugDrawer::drawAxes
-        OGRE_DEPRECATED DebugRenderable* getDebugRenderable();
-
-        /// @copydoc Node::getDebugRenderable
-        using Node::getDebugRenderable;
-
     };
     /** @} */
     /** @} */
