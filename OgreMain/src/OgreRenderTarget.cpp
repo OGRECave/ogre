@@ -553,11 +553,6 @@ namespace Ogre {
         return mStereoEnabled;
     }
     //-----------------------------------------------------------------------
-    RenderTarget::Impl *RenderTarget::_getImpl()
-    {
-        return 0;
-    }
-    //-----------------------------------------------------------------------
     void RenderTarget::update(bool swap)
     {
         OgreProfileBeginGPUEvent(getName());

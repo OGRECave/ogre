@@ -386,15 +386,6 @@ namespace Ogre {
         */
         virtual void setFSAA(uint fsaa, const String& fsaaHint) { }
 
-        /// @deprecated do not use
-        class Impl
-        {
-        protected:
-            ~Impl() { }
-        };
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual Impl *_getImpl();
-
         /** Method for manual management of rendering : fires 'preRenderTargetUpdate'
             and initialises statistics etc.
         @remarks 

@@ -777,11 +777,6 @@ namespace Ogre
         */
         void _setCurrentSceneManager(SceneManager* sm) { mCurrentSceneManager = sm; }
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED void _pushCurrentSceneManager(SceneManager* sm) {}
-        /// @deprecated do not use
-        OGRE_DEPRECATED void _popCurrentSceneManager(SceneManager* sm) {}
-
         /** Internal method used for updating all RenderTarget objects (windows, 
             renderable textures etc) which are set to auto-update.
         @remarks

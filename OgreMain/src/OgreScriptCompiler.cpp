@@ -370,65 +370,6 @@ namespace Ogre
         return mErrors.empty();
     }
 
-    AbstractNodeListPtr ScriptCompiler::_generateAST(const String &str, const String &source, bool doImports, bool doObjects, bool doVariables)
-    {
-        // Clear the past errors
-        mErrors.clear();
-
-        ConcreteNodeListPtr cst = ScriptParser::parse(ScriptLexer::tokenize(str, source), source);
-
-        // Call the listener to intercept CST
-        if(mListener)
-            mListener->preConversion(this, cst);
-
-        // Convert our nodes to an AST
-        AbstractNodeListPtr ast = convertToAST(*cst);
-
-        if(ast && doImports)
-            processImports(*ast);
-        if(ast && doObjects)
-            processObjects(*ast, *ast);
-        if(ast && doVariables)
-            processVariables(*ast);
-
-        return ast;
-    }
-
-    bool ScriptCompiler::_compile(AbstractNodeListPtr nodes, const String &group, bool doImports, bool doObjects, bool doVariables)
-    {
-        // Set up the compilation context
-        mGroup = group;
-
-        // Clear the past errors
-        mErrors.clear();
-
-        // Clear the environment
-        mEnv.clear();
-
-        // Processes the imports for this script
-        if(doImports)
-            processImports(*nodes);
-        // Process object inheritance
-        if(doObjects)
-            processObjects(*nodes, *nodes);
-        // Process variable expansion
-        if(doVariables)
-            processVariables(*nodes);
-
-        // Translate the nodes
-        for(AbstractNodeList::iterator i = nodes->begin(); i != nodes->end(); ++i)
-        {
-            //logAST(0, *i);
-            if((*i)->type == ANT_OBJECT && static_cast<ObjectAbstractNode*>((*i).get())->abstract)
-                continue;
-            ScriptTranslator *translator = ScriptCompilerManager::getSingleton().getTranslator(*i);
-            if(translator)
-                translator->translate(this, *i);
-        }
-
-        return mErrors.empty();
-    }
-
     void ScriptCompiler::addError(uint32 code, const Ogre::String &file, int line, const String &msg)
     {
         if(mListener)

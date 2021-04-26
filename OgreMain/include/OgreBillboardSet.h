@@ -544,11 +544,6 @@ namespace Ogre {
         virtual void getRenderOperation(RenderOperation& op) override;
         virtual void getWorldTransforms(Matrix4* xform) const override;
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED void _notifyBillboardResized() {}
-        /// @deprecated do not use
-        OGRE_DEPRECATED void _notifyBillboardRotated() {}
-
         /** Returns whether or not billboards in this are tested individually for culling. */
         bool getCullIndividually(void) const { return mCullIndividual; }
         /** Sets whether culling tests billboards in this individually as well as in a group.

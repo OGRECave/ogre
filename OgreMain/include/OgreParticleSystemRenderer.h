@@ -71,10 +71,6 @@ namespace Ogre {
         virtual void _notifyCurrentCamera(Camera* cam) = 0;
         /** Delegated to by ParticleSystem::_notifyAttached */
         virtual void _notifyAttached(Node* parent, bool isTagPoint = false) = 0;
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual void _notifyParticleRotated(void) {}
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual void _notifyParticleResized(void) {}
         /** Tells the renderer that the particle quota has changed */
         virtual void _notifyParticleQuota(size_t quota) = 0;
         /** Tells the renderer that the particle default size has changed */
