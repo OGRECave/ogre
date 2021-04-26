@@ -74,7 +74,7 @@ namespace Ogre
         return OGRE_NEW Font(this, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------
-    FontPtr FontManager::getByName(const String& name, const String& groupName)
+    FontPtr FontManager::getByName(const String& name, const String& groupName) const
     {
         return static_pointer_cast<Font>(getResourceByName(name, groupName));
     }

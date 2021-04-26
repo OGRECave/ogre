@@ -88,7 +88,7 @@ CompositorPtr CompositorManager::create (const String& name, const String& group
     return static_pointer_cast<Compositor>(createResource(name,group,isManual,loader,createParams));
 }
 //-----------------------------------------------------------------------
-CompositorPtr CompositorManager::getByName(const String& name, const String& groupName)
+CompositorPtr CompositorManager::getByName(const String& name, const String& groupName) const
 {
     return static_pointer_cast<Compositor>(getResourceByName(name, groupName));
 }

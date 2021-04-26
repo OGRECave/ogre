@@ -80,7 +80,7 @@ namespace Ogre {
 
         /// Get a resource by name
         /// @see GpuProgramManager::getResourceByName
-        GpuProgramPtr getByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT, bool preferHighLevelPrograms = true);
+        GpuProgramPtr getByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT, bool preferHighLevelPrograms = true) const;
 
 
         /** Loads a GPU program from a file of assembly. 
@@ -176,10 +176,10 @@ namespace Ogre {
         @param preferHighLevelPrograms If set to true (the default), high level programs will be
             returned in preference to low-level programs.
         */
-        ResourcePtr getResourceByName(const String& name, const String& group, bool preferHighLevelPrograms);
+        ResourcePtr getResourceByName(const String& name, const String& group, bool preferHighLevelPrograms) const;
 
         /// @overload
-        ResourcePtr getResourceByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT);
+        ResourcePtr getResourceByName(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT) const override;
 
         /** Create a new set of shared parameters, which can be used across many 
             GpuProgramParameters objects of different structures.

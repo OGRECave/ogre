@@ -78,7 +78,7 @@ namespace Ogre
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
     //-----------------------------------------------------------------------
-    MeshPtr MeshManager::getByName(const String& name, const String& groupName)
+    MeshPtr MeshManager::getByName(const String& name, const String& groupName) const
     {
         return static_pointer_cast<Mesh>(getResourceByName(name, groupName));
     }

@@ -49,7 +49,7 @@ namespace Ogre
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
     }
     //-----------------------------------------------------------------------
-    SkeletonPtr SkeletonManager::getByName(const String& name, const String& groupName)
+    SkeletonPtr SkeletonManager::getByName(const String& name, const String& groupName) const
     {
         return static_pointer_cast<Skeleton>(getResourceByName(name, groupName));
     }

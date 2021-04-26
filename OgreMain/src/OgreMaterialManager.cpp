@@ -88,7 +88,7 @@ namespace Ogre {
         return static_pointer_cast<Material>(createResource(name,group,isManual,loader,createParams));
     }
     //-----------------------------------------------------------------------
-    MaterialPtr MaterialManager::getByName(const String& name, const String& groupName)
+    MaterialPtr MaterialManager::getByName(const String& name, const String& groupName) const
     {
         return static_pointer_cast<Material>(getResourceByName(name, groupName));
     }
