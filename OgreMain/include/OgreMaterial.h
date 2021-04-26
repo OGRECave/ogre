@@ -577,9 +577,6 @@ namespace Ogre {
         @see Pass::setSeparateSceneBlending
         */
         void setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha);
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
         /// @}
 
         /** Tells the material that it needs recompilation. */

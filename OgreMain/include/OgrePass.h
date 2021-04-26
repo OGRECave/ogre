@@ -607,9 +607,6 @@ namespace Ogre {
             return static_cast<unsigned short>(mTextureUnitStates.size());
         }
 
-        /// @deprecated use getTextureUnitState("alias")->setTextureName("texture.png") instead
-        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true) const;
-
         /** Gets the 'nth' texture which references the given content type.
             @remarks
             If the 'nth' texture unit which references the content type doesn't

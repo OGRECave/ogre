@@ -126,70 +126,9 @@ namespace Ogre {
         mTextureAliases[aliasName] = textureName;
     }
     //---------------------------------------------------------------------
-    void SubMesh::removeTextureAlias(const String& aliasName)
-    {
-        mTextureAliases.erase(aliasName);
-    }
-    //---------------------------------------------------------------------
     void SubMesh::removeAllTextureAliases(void)
     {
         mTextureAliases.clear();
-    }
-    //---------------------------------------------------------------------
-    bool SubMesh::updateMaterialUsingTextureAliases(void)
-    {
-        bool newMaterialCreated = false;
-        // if submesh has texture aliases
-        // ask the material manager if the current submesh material exists
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        if (hasTextureAliases() && mMaterial)
-        {
-            // get the current submesh material
-            const String& materialName = mMaterial->getName();
-            // get test result for if change will occur when the texture aliases are applied
-            if (mMaterial->applyTextureAliases(mTextureAliases, false))
-            {
-                Ogre::String newMaterialName;
-
-                // If this material was already derived from another material
-                // due to aliasing, let's strip off the aliasing suffix and
-                // generate a new one using our current aliasing table.
-
-                Ogre::String::size_type pos = materialName.find("?TexAlias(", 0);
-                if( pos != Ogre::String::npos )
-                    newMaterialName = materialName.substr(0, pos);
-                else
-                    newMaterialName = materialName;
-
-                newMaterialName += "?TexAlias(";
-                // Iterate deterministically over the aliases (always in the same
-                // order via std::map's sorted iteration nature).
-                for( const auto& it : mTextureAliases )
-                {
-                    newMaterialName += it.first;
-                    newMaterialName += "=";
-                    newMaterialName += it.second;
-                    newMaterialName += " ";
-                }
-                newMaterialName += ")";
-                    
-                // Reuse the material if it's already been created. This decreases batch
-                // count and keeps material explosion under control.
-                MaterialPtr newMaterial = MaterialManager::getSingleton().getByName(newMaterialName, mMaterial->getGroup());
-                if(!newMaterial)
-                {
-                    newMaterial = mMaterial->clone(newMaterialName);
-                    // apply texture aliases to new material
-                    newMaterial->applyTextureAliases(mTextureAliases);
-                }
-                // place new material name in submesh
-                mMaterial = newMaterial;
-                newMaterialCreated = true;
-            }
-        }
-        OGRE_IGNORE_DEPRECATED_END
-
-        return newMaterialCreated;
     }
     //---------------------------------------------------------------------
     void SubMesh::removeLodLevels(void)

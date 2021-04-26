@@ -1268,48 +1268,6 @@ namespace Ogre {
     void TextureUnitState::setName(const String& name)
     {
         mName = name;
-        if (mTextureNameAlias.empty())
-            mTextureNameAlias = mName;
-    }
-
-    //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureNameAlias(const String& name)
-    {
-        mTextureNameAlias = name;
-    }
-
-    //-----------------------------------------------------------------------
-    bool TextureUnitState::applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply)
-    {
-        bool testResult = false;
-        // if TUS has an alias see if its in the alias container
-        if (!mTextureNameAlias.empty())
-        {
-            AliasTextureNamePairList::const_iterator aliasEntry =
-                aliasList.find(mTextureNameAlias);
-
-            if (aliasEntry != aliasList.end())
-            {
-                // match was found so change the texture name in mFrames
-                testResult = true;
-
-                if (apply)
-                {
-                    // currently assumes animated frames are sequentially numbered
-                    // cubic, 1d, 2d, and 3d textures are determined from current TUS state
-                    
-                    // if more than one frame then assume animated frames
-                    if (mFramePtrs.size() > 1)
-                        setAnimatedTextureName(aliasEntry->second,
-                            static_cast<unsigned int>(mFramePtrs.size()), mAnimDuration);
-                    else
-                        setTextureName(aliasEntry->second, getTextureType());
-                }
-                
-            }
-        }
-
-        return testResult;
     }
     //-----------------------------------------------------------------------------
     void TextureUnitState::_notifyParent(Pass* parent)

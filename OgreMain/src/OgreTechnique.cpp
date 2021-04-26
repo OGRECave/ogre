@@ -1191,25 +1191,6 @@ namespace Ogre {
     {
         return mParent->getGroup();
     }
-
-    //-----------------------------------------------------------------------
-    bool Technique::applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply) const
-    {
-        // iterate through passes and apply texture alias
-        Passes::const_iterator i, iend;
-        iend = mPasses.end();
-        bool testResult = false;
-
-        for(i = mPasses.begin(); i != iend; ++i)
-        {
-            OGRE_IGNORE_DEPRECATED_BEGIN
-            if ((*i)->applyTextureAliases(aliasList, apply))
-                testResult = true;
-            OGRE_IGNORE_DEPRECATED_END
-        }
-
-        return testResult;
-    }
     //-----------------------------------------------------------------------
     Ogre::MaterialPtr  Technique::getShadowCasterMaterial() const 
     { 
