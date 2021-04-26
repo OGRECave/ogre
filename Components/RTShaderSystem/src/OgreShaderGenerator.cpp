@@ -1990,8 +1990,6 @@ void ShaderGenerator::SGScheme::invalidateIlluminationPasses(const String& mater
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGScheme::invalidate(const String& materialName, const String& groupName)
 {
-    SGTechniqueIterator itTech;
-
     // Find the desired technique.
     bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
     for (SGTechnique* curTechEntry : mTechniqueEntries)
