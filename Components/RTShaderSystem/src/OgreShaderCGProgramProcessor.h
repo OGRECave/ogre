@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderHLSLProgramProcessor_
-#define _ShaderHLSLProgramProcessor_
+#ifndef _ShaderCGProgramProcessor_
+#define _ShaderCGProgramProcessor_
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreShaderProgramProcessor.h"
@@ -43,33 +43,34 @@ namespace RTShader {
 
 /** CG Language program processor class.
 */
-class _OgreRTSSExport HLSLProgramProcessor : public ProgramProcessor
+class CGProgramProcessor : public ProgramProcessor
 {
 
-    // Interface.
+// Interface.
 public: 
 
     /** Class constructor.
     */
-    HLSLProgramProcessor();
+    CGProgramProcessor();
 
     /** Class destructor */
-    virtual ~HLSLProgramProcessor();
+    virtual ~CGProgramProcessor();
 
     /** Return the target language of this processor. */
     virtual const String& getTargetLanguage() const { return TargetLanguage; }
-
+    
     /** 
     @see ProgramProcessor::preCreateGpuPrograms
     */
     virtual bool preCreateGpuPrograms(ProgramSet* programSet);
+ 
     /** 
     @see ProgramProcessor::postCreateGpuPrograms
     */
     virtual bool postCreateGpuPrograms(ProgramSet* programSet);
 
     static String TargetLanguage;
-
+    
 };
 
 
