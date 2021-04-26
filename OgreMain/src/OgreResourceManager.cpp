@@ -357,7 +357,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    ResourcePtr ResourceManager::getResourceByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
+    ResourcePtr ResourceManager::getResourceByName(const String& name, const String& groupName) const
     {
         OGRE_LOCK_AUTO_MUTEX;
 
@@ -366,7 +366,7 @@ namespace Ogre {
 
         if(isGlobal)
         {
-            ResourceMap::iterator it = mResources.find(name);
+            auto it = mResources.find(name);
             if( it != mResources.end())
             {
                 return it->second;
@@ -376,11 +376,11 @@ namespace Ogre {
         // look in all grouped pools
         if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
         {
-            ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
-            ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
+            auto iter = mResourcesWithGroup.begin();
+            auto iterE = mResourcesWithGroup.end();
             for ( ; iter != iterE ; ++iter )
             {
-                ResourceMap::iterator resMapIt = iter->second.find(name);
+                auto resMapIt = iter->second.find(name);
 
                 if( resMapIt != iter->second.end())
                 {
@@ -391,10 +391,10 @@ namespace Ogre {
         else if (!isGlobal)
         {
             // look in the grouped pool
-            ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(groupName);
+            auto itGroup = mResourcesWithGroup.find(groupName);
             if( itGroup != mResourcesWithGroup.end())
             {
-                ResourceMap::iterator it = itGroup->second.find(name);
+                auto it = itGroup->second.find(name);
 
                 if( it != itGroup->second.end())
                 {
@@ -415,10 +415,10 @@ namespace Ogre {
         return ResourcePtr();
     }
     //-----------------------------------------------------------------------
-    ResourcePtr ResourceManager::getByHandle(ResourceHandle handle)
+    ResourcePtr ResourceManager::getByHandle(ResourceHandle handle) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-        ResourceHandleMap::iterator it = mResourcesByHandle.find(handle);
+        auto it = mResourcesByHandle.find(handle);
         return it == mResourcesByHandle.end() ? ResourcePtr() : it->second;
     }
     //-----------------------------------------------------------------------

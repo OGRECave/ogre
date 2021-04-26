@@ -76,7 +76,7 @@ namespace Ogre {
                             bool isManual = false, ManualResourceLoader* loader = 0,
                             const NameValuePairList* createParams = 0);
         /// @copydoc ResourceManager::getResourceByName
-        TexturePtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+        TexturePtr getByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT) const;
 
         using ResourceManager::createOrRetrieve;
 

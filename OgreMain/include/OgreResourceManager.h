@@ -316,19 +316,19 @@ namespace Ogre {
 
         /** Retrieves a pointer to a resource by name, or null if the resource does not exist.
         */
-        virtual ResourcePtr getResourceByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+        virtual ResourcePtr getResourceByName(const String& name, const String& groupName OGRE_RESOURCE_GROUP_INIT) const;
 
         /** Retrieves a pointer to a resource by handle, or null if the resource does not exist.
         */
-        virtual ResourcePtr getByHandle(ResourceHandle handle);
+        virtual ResourcePtr getByHandle(ResourceHandle handle) const;
         
         /// Returns whether the named resource exists in this manager
-        bool resourceExists(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT)
+        bool resourceExists(const String& name, const String& group OGRE_RESOURCE_GROUP_INIT) const
         {
             return getResourceByName(name, group).get() != 0;
         }
         /// Returns whether a resource with the given handle exists in this manager
-        bool resourceExists(ResourceHandle handle)
+        bool resourceExists(ResourceHandle handle) const
         {
             return getByHandle(handle).get() != 0;
         }

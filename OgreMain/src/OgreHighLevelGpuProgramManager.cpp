@@ -161,7 +161,7 @@ namespace Ogre {
             group, isManual, loader);
     }
     //-----------------------------------------------------------------------
-    HighLevelGpuProgramPtr HighLevelGpuProgramManager::getByName(const String& name, const String& groupName)
+    HighLevelGpuProgramPtr HighLevelGpuProgramManager::getByName(const String& name, const String& groupName) const
     {
         return static_pointer_cast<HighLevelGpuProgram>(getResourceByName(name, groupName));
     }

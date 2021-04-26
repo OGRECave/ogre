@@ -78,7 +78,7 @@ namespace Ogre {
         return it->second;
     }
     //-----------------------------------------------------------------------
-    TexturePtr TextureManager::getByName(const String& name, const String& groupName)
+    TexturePtr TextureManager::getByName(const String& name, const String& groupName) const
     {
         return static_pointer_cast<Texture>(getResourceByName(name, groupName));
     }
