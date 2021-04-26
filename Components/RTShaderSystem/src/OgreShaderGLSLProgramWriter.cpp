@@ -144,9 +144,6 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
             "GLSLProgramWriter::writeSourceCode" );
     }
 
-    const ShaderFunctionList& functionList = program->getFunctions();
-    ShaderFunctionConstIterator itFunction;
-
     const UniformParameterList& parameterList = program->getParameters();
     UniformParameterConstIterator itUniformParam = parameterList.begin();
     
@@ -171,85 +168,81 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     }
     os << std::endl;            
 
-    // Write program function(s).
-    for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
+    Function* curFunction = program->getMain();
+    const ShaderParameterList& inParams = curFunction->getInputParameters();
+
+    writeFunctionTitle(os, curFunction);
+
+    // Write inout params and fill mInputToGLStatesMap
+    writeInputParameters(os, curFunction, gpuType);
+    writeOutParameters(os, curFunction, gpuType);
+
+    // The function name must always main.
+    os << "void main(void) {" << std::endl;
+
+    // Write local parameters.
+    const ShaderParameterList& localParams = curFunction->getLocalParameters();
+    ShaderParameterConstIterator itParam = localParams.begin();
+    ShaderParameterConstIterator itParamEnd = localParams.end();
+
+    for (; itParam != itParamEnd; ++itParam)
     {
-        Function* curFunction = *itFunction;
-        const ShaderParameterList& inParams = curFunction->getInputParameters();
+        os << "\t";
+        writeLocalParameter(os, *itParam);
+        os << ";" << std::endl;
+    }
+    os << std::endl;
 
-        writeFunctionTitle(os, curFunction);
-        
-        // Write inout params and fill mInputToGLStatesMap
-        writeInputParameters(os, curFunction, gpuType);
-        writeOutParameters(os, curFunction, gpuType);
-                    
-        // The function name must always main.
-        os << "void main(void) {" << std::endl;
-
-        // Write local parameters.
-        const ShaderParameterList& localParams = curFunction->getLocalParameters();
-        ShaderParameterConstIterator itParam = localParams.begin();
-        ShaderParameterConstIterator itParamEnd = localParams.end();
-
-        for (; itParam != itParamEnd; ++itParam)
+    for (const auto& pFuncInvoc : curFunction->getAtomInstances())
+    {
+        for (auto& operand : pFuncInvoc->getOperandList())
         {
-            os << "\t";
-            writeLocalParameter(os, *itParam);          
-            os << ";" << std::endl;                     
-        }
-        os << std::endl;            
+            const ParameterPtr& param = operand.getParameter();
+            Operand::OpSemantic opSemantic = operand.getSemantic();
 
-        for (const auto& pFuncInvoc : curFunction->getAtomInstances())
-        {
-            for (auto& operand : pFuncInvoc->getOperandList())
+            bool isInputParam =
+                std::find(inParams.begin(), inParams.end(), param) != inParams.end();
+
+            if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
             {
-                const ParameterPtr& param = operand.getParameter();
-                Operand::OpSemantic opSemantic = operand.getSemantic();
+                // Check if we write to an input variable because they are only readable
+                // Well, actually "attribute" were writable in GLSL < 120, but we dont care here
+                bool doLocalRename = isInputParam;
 
-                bool isInputParam =
-                    std::find(inParams.begin(), inParams.end(), param) != inParams.end();
-
-                if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
+                // If its not a varying param check if a uniform is written
+                if (!doLocalRename)
                 {
-                    // Check if we write to an input variable because they are only readable
-                    // Well, actually "attribute" were writable in GLSL < 120, but we dont care here
-                    bool doLocalRename = isInputParam;
-
-                    // If its not a varying param check if a uniform is written
-                    if (!doLocalRename)
-                    {
-                        doLocalRename = std::find(parameterList.begin(), parameterList.end(),
-                                                  param) != parameterList.end();
-                    }
-
-                    // now we check if we already declared a redirector var
-                    if(doLocalRename && mLocalRenames.find(param->getName()) == mLocalRenames.end())
-                    {
-                        // Declare the copy variable and assign the original
-                        String newVar = "local_" + param->getName();
-                        os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << param->getName() << ";" << std::endl;
-
-                        // From now on we replace it automatic
-                        param->_rename(newVar, true);
-                        mLocalRenames.insert(newVar);
-                    }
+                    doLocalRename = std::find(parameterList.begin(), parameterList.end(),
+                                                param) != parameterList.end();
                 }
 
-                // Now that every texcoord is a vec4 (passed as vertex attributes) we
-                // have to swizzle them according the desired type.
-                if (gpuType == GPT_VERTEX_PROGRAM && isInputParam &&
-                    param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
+                // now we check if we already declared a redirector var
+                if(doLocalRename && mLocalRenames.find(param->getName()) == mLocalRenames.end())
                 {
-                    operand.setMaskToParamType();
+                    // Declare the copy variable and assign the original
+                    String newVar = "local_" + param->getName();
+                    os << "\t" << mGpuConstTypeMap[param->getType()] << " " << newVar << " = " << param->getName() << ";" << std::endl;
+
+                    // From now on we replace it automatic
+                    param->_rename(newVar, true);
+                    mLocalRenames.insert(newVar);
                 }
             }
 
-            os << "\t";
-            pFuncInvoc->writeSourceCode(os, getTargetLanguage());
-            os << std::endl;
+            // Now that every texcoord is a vec4 (passed as vertex attributes) we
+            // have to swizzle them according the desired type.
+            if (gpuType == GPT_VERTEX_PROGRAM && isInputParam &&
+                param->getSemantic() == Parameter::SPS_TEXTURE_COORDINATES)
+            {
+                operand.setMaskToParamType();
+            }
         }
-        os << "}" << std::endl;
+
+        os << "\t";
+        pFuncInvoc->writeSourceCode(os, getTargetLanguage());
+        os << std::endl;
     }
+    os << "}" << std::endl;
     os << std::endl;
 }
 

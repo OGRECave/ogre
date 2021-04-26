@@ -182,11 +182,10 @@ void FunctionStageRef::binaryOp(char op, const std::vector<Operand>& params) con
 }
 
 //-----------------------------------------------------------------------------
-Function::Function(const String& name, const String& desc, const FunctionType functionType)
+Function::Function(const String& name, const String& desc)
 {
     mName           = name;
     mDescription    = desc;
-    mFunctionType   = functionType;
 }
 
 //-----------------------------------------------------------------------------
@@ -637,12 +636,6 @@ const FunctionAtomInstanceList& Function::getAtomInstances()
     }
 
     return mSortedAtomInstances;
-}
-
-//-----------------------------------------------------------------------------
-Ogre::RTShader::Function::FunctionType Function::getFunctionType() const
-{
-    return mFunctionType;
 }
 
 }
