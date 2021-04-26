@@ -25,21 +25,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __ShaderProgramWriterCG_H__
-#define __ShaderProgramWriterCG_H__
+#ifndef __ShaderProgramWriterHLSL_H__
+#define __ShaderProgramWriterHLSL_H__
 
-#include "OgreShaderPrerequisites.h"
 #include "OgreShaderProgramWriterManager.h"
-#include "OgreShaderProgramWriter.h"
+#include "OgreShaderCGProgramWriter.h"
 #include "OgreShaderParameter.h"
 
 namespace Ogre {
-namespace RTShader {
-
-    class Function;
-    class FunctionAtom;
-    class Program;
-
+    namespace RTShader {
 /** \addtogroup Optional
 *  @{
 */
@@ -47,26 +41,23 @@ namespace RTShader {
 *  @{
 */
 
-/** CG target language writer implementation.
+/** HLSL target language writer implementation.
 @see ProgramWriter.
 */
-class _OgreRTSSExport CGProgramWriter : public ProgramWriter
+class HLSLProgramWriter : public CGProgramWriter
 {
-
-// Interface.
+    bool mIsShaderModel4;
+    // Interface.
 public:
 
     /** Class constructor. 
     */
-    CGProgramWriter();
+    HLSLProgramWriter();
+
+    void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
 
     /** Class destructor */
-    virtual ~CGProgramWriter();
-
-    /** 
-    @see ProgramWriter::writeSourceCode.
-    */
-    virtual void writeSourceCode(std::ostream& os, Program* program);
+    virtual ~HLSLProgramWriter();
 
     /** 
     @see ProgramWriter::getTargetLanguage.
@@ -74,54 +65,16 @@ public:
     virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
     static String TargetLanguage;
-
-// Protected methods.
-protected:
-
-    /** Initialize string maps. */
-    void initializeStringMaps();
-
-    /** Write the program dependencies. */
-    virtual void writeProgramDependencies(std::ostream& os, Program* program);
-    
-    /** Write a uniform parameter. */
-    virtual void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
-
-    /** Write a function parameter. */
-    void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
-
-    /** Write a local parameter. */
-    void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
-
-    /** Write a function declaration. */
-    void writeFunctionDeclaration(std::ostream& os, Function* function);
-
-    /** Write function atom instance. */
-    void writeAtomInstance(std::ostream& os, FunctionAtom* atom);
-
-
-protected:
-    typedef std::map<GpuConstantType, const char*> GpuConstTypeToStringMap;
-    typedef std::map<Parameter::Semantic, const char*> ParamSemanticToStringMap;
-
-// Attributes.
-protected:
-    // Map between GPU constant type to string value.
-    GpuConstTypeToStringMap mGpuConstTypeMap;
-    // Map between parameter semantic to string value.
-    ParamSemanticToStringMap mParamSemanticMap;
 };
 
-/** CG program writer factory implementation.
+/** HLSL program writer factory implementation.
 @see ProgramWriterFactory
 */
-class _OgreRTSSExport ShaderProgramWriterCGFactory : public ProgramWriterFactory
+class ShaderProgramWriterHLSLFactory : public ProgramWriterFactory
 {
 public:
-    ShaderProgramWriterCGFactory() : mLanguage("cg")
-    {
-    }
-    virtual ~ShaderProgramWriterCGFactory() {}
+    ShaderProgramWriterHLSLFactory() : mLanguage("hlsl") {}
+    virtual ~ShaderProgramWriterHLSLFactory() {}
 
     /** 
     @see ProgramWriterFactory::getTargetLanguage
@@ -136,13 +89,14 @@ public:
     */
     virtual ProgramWriter* create(void)
     {
-        return OGRE_NEW CGProgramWriter();
+        return OGRE_NEW HLSLProgramWriter();
     }
 
 private:
     String mLanguage;
 
 };
+
 
 /** @} */
 /** @} */

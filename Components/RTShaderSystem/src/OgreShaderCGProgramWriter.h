@@ -2,9 +2,10 @@
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -24,18 +25,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderProgramWriterGLSL_
-#define _ShaderProgramWriterGLSL_
+#ifndef __ShaderProgramWriterCG_H__
+#define __ShaderProgramWriterCG_H__
 
+#include "OgreShaderPrerequisites.h"
 #include "OgreShaderProgramWriterManager.h"
 #include "OgreShaderProgramWriter.h"
 #include "OgreShaderParameter.h"
-#include "OgreStringVector.h"
 
 namespace Ogre {
 namespace RTShader {
 
     class Function;
+    class FunctionAtom;
     class Program;
 
 /** \addtogroup Optional
@@ -45,21 +47,21 @@ namespace RTShader {
 *  @{
 */
 
-/** GLSL target language writer implementation.
+/** CG target language writer implementation.
 @see ProgramWriter.
 */
-class _OgreRTSSExport GLSLProgramWriter : public ProgramWriter
+class CGProgramWriter : public ProgramWriter
 {
-    // Interface.
+
+// Interface.
 public:
 
     /** Class constructor. 
     */
-    GLSLProgramWriter();
+    CGProgramWriter();
 
     /** Class destructor */
-    virtual ~GLSLProgramWriter();
-
+    virtual ~CGProgramWriter();
 
     /** 
     @see ProgramWriter::writeSourceCode.
@@ -73,61 +75,53 @@ public:
 
     static String TargetLanguage;
 
-    static const char* getGL3CompatDefines();
-
-    // Protected methods.
+// Protected methods.
 protected:
-
-    void writeMainSourceCode(std::ostream& os, Program* program);
 
     /** Initialize string maps. */
     void initializeStringMaps();
 
+    /** Write the program dependencies. */
+    virtual void writeProgramDependencies(std::ostream& os, Program* program);
+    
+    /** Write a uniform parameter. */
+    virtual void writeUniformParameter(std::ostream& os, const UniformParameterPtr& parameter);
+
+    /** Write a function parameter. */
+    void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
+
     /** Write a local parameter. */
     void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
 
-    /** Write the program dependencies. */
-    void writeProgramDependencies(std::ostream& os, Program* program);
+    /** Write a function declaration. */
+    void writeFunctionDeclaration(std::ostream& os, Function* function);
 
-    /** Write the input params of the function */
-    void writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
-    
-    /** Write the output params of the function */
-    void writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
+    /** Write function atom instance. */
+    void writeAtomInstance(std::ostream& os, FunctionAtom* atom);
+
 
 protected:
-    typedef std::map<GpuConstantType, const char*>     GpuConstTypeToStringMap;
+    typedef std::map<GpuConstantType, const char*> GpuConstTypeToStringMap;
     typedef std::map<Parameter::Semantic, const char*> ParamSemanticToStringMap;
-    typedef std::map<Parameter::Content, const char*>  ParamContentToStringMap;
-    typedef std::map<String, String>                   StringMap;
 
-    // Attributes.
+// Attributes.
 protected:
     // Map between GPU constant type to string value.
     GpuConstTypeToStringMap mGpuConstTypeMap;
     // Map between parameter semantic to string value.
     ParamSemanticToStringMap mParamSemanticMap;
-
-    std::set<String> mLocalRenames;
-
-    // Map parameter content to vertex attributes 
-    ParamContentToStringMap mContentToPerVertexAttributes;
-    // Holds the current glsl version
-    int mGLSLVersion;
-    // set by derived class
-    bool mIsGLSLES;
 };
 
-/** GLSL program writer factory implementation.
+/** CG program writer factory implementation.
 @see ProgramWriterFactory
 */
-class _OgreRTSSExport ShaderProgramWriterGLSLFactory : public ProgramWriterFactory
+class ShaderProgramWriterCGFactory : public ProgramWriterFactory
 {
 public:
-    ShaderProgramWriterGLSLFactory() : mLanguage("glsl")
+    ShaderProgramWriterCGFactory() : mLanguage("cg")
     {
     }
-    virtual ~ShaderProgramWriterGLSLFactory() {}
+    virtual ~ShaderProgramWriterCGFactory() {}
 
     /** 
     @see ProgramWriterFactory::getTargetLanguage
@@ -142,7 +136,7 @@ public:
     */
     virtual ProgramWriter* create(void)
     {
-        return OGRE_NEW GLSLProgramWriter();
+        return OGRE_NEW CGProgramWriter();
     }
 
 private:
@@ -152,7 +146,6 @@ private:
 
 /** @} */
 /** @} */
-
 }
 }
 

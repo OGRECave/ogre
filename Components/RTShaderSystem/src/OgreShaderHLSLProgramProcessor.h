@@ -24,12 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderGLSLProgramProcessor_
-#define _ShaderGLSLProgramProcessor_
+#ifndef _ShaderHLSLProgramProcessor_
+#define _ShaderHLSLProgramProcessor_
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreShaderProgramProcessor.h"
-#include "OgreStringVector.h"
+
 
 namespace Ogre {
 namespace RTShader {
@@ -41,20 +41,20 @@ namespace RTShader {
 *  @{
 */
 
-/** GLSL Language program processor class.
+/** CG Language program processor class.
 */
-class _OgreRTSSExport GLSLProgramProcessor : public ProgramProcessor
+class HLSLProgramProcessor : public ProgramProcessor
 {
 
-// Interface.
+    // Interface.
 public: 
 
     /** Class constructor.
     */
-    GLSLProgramProcessor();
+    HLSLProgramProcessor();
 
     /** Class destructor */
-    virtual ~GLSLProgramProcessor();
+    virtual ~HLSLProgramProcessor();
 
     /** Return the target language of this processor. */
     virtual const String& getTargetLanguage() const { return TargetLanguage; }
@@ -63,22 +63,12 @@ public:
     @see ProgramProcessor::preCreateGpuPrograms
     */
     virtual bool preCreateGpuPrograms(ProgramSet* programSet);
-
     /** 
     @see ProgramProcessor::postCreateGpuPrograms
     */
     virtual bool postCreateGpuPrograms(ProgramSet* programSet);
 
-
-private:
-
-    /** Bind texture samplers. */
-    void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
-
     static String TargetLanguage;
-
-    // The list of created library shaders.
-    StringVector mLibraryPrograms;
 
 };
 
