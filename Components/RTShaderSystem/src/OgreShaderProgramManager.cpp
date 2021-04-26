@@ -425,7 +425,6 @@ void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     // first find the vertex shader
-    ShaderFunctionConstIterator itFunction ;
     Function* vertexMain = vsProgram->getEntryPointFunction();
     Function* pixelMain = psProgram->getEntryPointFunction();;
 
