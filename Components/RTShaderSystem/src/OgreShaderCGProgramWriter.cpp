@@ -89,9 +89,6 @@ void CGProgramWriter::initializeStringMaps()
 //-----------------------------------------------------------------------
 void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
-    const ShaderFunctionList& functionList = program->getFunctions();
-    ShaderFunctionConstIterator itFunction;
-
     const UniformParameterList& parameterList = program->getParameters();
     UniformParameterConstIterator itUniformParam = parameterList.begin();
 
@@ -114,39 +111,35 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     }
     os << std::endl;
 
-    // Write program function(s).
-    for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
+
+    Function* curFunction = program->getMain();
+
+    writeFunctionTitle(os, curFunction);
+    writeFunctionDeclaration(os, curFunction);
+
+    os << "{" << std::endl;
+
+    // Write local parameters.
+    const ShaderParameterList& localParams = curFunction->getLocalParameters();
+    ShaderParameterConstIterator itParam;
+
+    for (itParam=localParams.begin();  itParam != localParams.end(); ++itParam)
     {
-        Function* curFunction = *itFunction;
-
-        writeFunctionTitle(os, curFunction);
-        writeFunctionDeclaration(os, curFunction);
-
-        os << "{" << std::endl;
-
-        // Write local parameters.
-        const ShaderParameterList& localParams = curFunction->getLocalParameters();
-        ShaderParameterConstIterator itParam; 
-
-        for (itParam=localParams.begin();  itParam != localParams.end(); ++itParam)
-        {
-            os << "\t";
-            writeLocalParameter(os, *itParam);          
-            os << ";" << std::endl;                     
-        }
-
-        const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-        FunctionAtomInstanceConstIterator itAtom;
-
-        for (itAtom=atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
-        {           
-            writeAtomInstance(os, *itAtom);
-        }
-
-
-        os << "}" << std::endl;
+        os << "\t";
+        writeLocalParameter(os, *itParam);
+        os << ";" << std::endl;
     }
 
+    const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
+    FunctionAtomInstanceConstIterator itAtom;
+
+    for (itAtom=atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
+    {
+        writeAtomInstance(os, *itAtom);
+    }
+
+
+    os << "}" << std::endl;
     os << std::endl;
 }
 

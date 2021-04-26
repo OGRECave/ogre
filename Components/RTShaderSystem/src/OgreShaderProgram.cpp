@@ -34,12 +34,10 @@ namespace RTShader {
 Program::Program(GpuProgramType type)
 {
     mType               = type;
-    // all programs must have an entry point, nobody cares about FFT
-    mEntryPointFunction = new Function("main", "", Function::FFT_VS_MAIN);
+    // all programs must have an entry point
+    mEntryPointFunction = new Function("main", "");
     mSkeletalAnimation  = false;
     mColumnMajorMatrices = true;
-
-    mFunctions.push_back(mEntryPointFunction);
 }
 
 //-----------------------------------------------------------------------------
@@ -47,25 +45,13 @@ Program::~Program()
 {
     destroyParameters();
 
-    destroyFunctions();
+    delete mEntryPointFunction;
 }
 
 //-----------------------------------------------------------------------------
 void Program::destroyParameters()
 {
     mParameters.clear();
-}
-
-//-----------------------------------------------------------------------------
-void Program::destroyFunctions()
-{
-    ShaderFunctionIterator it;
-
-    for (it = mFunctions.begin(); it != mFunctions.end(); ++it)
-    {
-        OGRE_DELETE *it;
-    }
-    mFunctions.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -327,41 +313,6 @@ UniformParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoCo
     }
 
     return UniformParameterPtr();
-}
-
-//-----------------------------------------------------------------------------
-Function* Program::createFunction(const String& name, const String& desc, const Function::FunctionType functionType)
-{
-    Function* shaderFunction;
-
-    shaderFunction = getFunctionByName(name);
-    if (shaderFunction != NULL)
-    {
-        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Function " + name + " already declared in program.", 
-            "Program::createFunction" );
-    }
-
-    shaderFunction = OGRE_NEW Function(name, desc, functionType);
-    mFunctions.push_back(shaderFunction);
-
-    return shaderFunction;
-}
-
-//-----------------------------------------------------------------------------
-Function* Program::getFunctionByName(const String& name)
-{
-    ShaderFunctionIterator it;
-
-    for (it = mFunctions.begin(); it != mFunctions.end(); ++it)
-    {
-        if ((*it)->getName() == name)
-        {
-            return *it;
-        }
-    }
-
-    return NULL;
 }
 
 //-----------------------------------------------------------------------------

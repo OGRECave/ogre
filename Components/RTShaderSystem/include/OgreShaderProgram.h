@@ -126,18 +126,6 @@ public:
     */
     const UniformParameterList& getParameters() const { return mParameters; };
 
-    /// @deprecated do not use
-    OGRE_DEPRECATED Function* createFunction(const String& name, const String& desc, const Function::FunctionType functionType);
-
-    /// @deprecated do not use
-    Function* getFunctionByName(const String& name);
-
-    /// @deprecated do not use
-    const ShaderFunctionList& getFunctions() const { return mFunctions; };
-
-    /// @deprecated do not use
-    OGRE_DEPRECATED void setEntryPointFunction(Function* function) { mEntryPointFunction = function; }
-
     /// @deprecated use getMain()
     Function* getEntryPointFunction()                    { return mEntryPointFunction; }
 
@@ -205,9 +193,6 @@ private:
     /** Destroy all parameters of this program. */
     void destroyParameters();
 
-    /** Destroy all functions of this program. */
-    void destroyFunctions();
-
     /** Add parameter to this program. */
     void addParameter(UniformParameterPtr parameter);
         
@@ -218,8 +203,6 @@ private:
     GpuProgramType mType;
     // Program uniform parameters.  
     UniformParameterList mParameters;
-    // Function list.
-    ShaderFunctionList mFunctions;
     // Entry point function for this program.   
     Function* mEntryPointFunction;
     // Program dependencies.

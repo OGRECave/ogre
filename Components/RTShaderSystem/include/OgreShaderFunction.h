@@ -103,14 +103,6 @@ class _OgreRTSSExport Function : public RTShaderSystemAlloc
     friend ProgramManager;
 // Interface.
 public:
-    /// @deprecated do not use
-    enum FunctionType
-    {
-        FFT_INTERNAL,
-        FFT_VS_MAIN,
-        FFT_PS_MAIN
-    };
-
     /** Get the name of this function */
     const String& getName() const { return mName; }
 
@@ -265,10 +257,6 @@ public:
     /** Delete all output parameters from this function. */
     void deleteAllOutputParameters();
 
-    /// @deprecated do not use
-    OGRE_DEPRECATED FunctionType getFunctionType() const;
-
-
 private:
 
     static ParameterPtr _getParameterByName(const ShaderParameterList& parameterList, const String& name);
@@ -281,7 +269,7 @@ private:
     @param desc The description of this function.
     @remarks This class is allocated via an instance of Program class. 
     */
-    Function(const String& name, const String& desc, const FunctionType functionType);
+    Function(const String& name, const String& desc);
 
     /** Class destructor */
     ~Function();
@@ -305,9 +293,6 @@ private:
     // Atom instances composing this function.
     std::map<size_t, FunctionAtomInstanceList> mAtomInstances;
     FunctionAtomInstanceList mSortedAtomInstances;
-    // Function type
-    FunctionType mFunctionType;
-    
 private:
     friend class Program;
 };
