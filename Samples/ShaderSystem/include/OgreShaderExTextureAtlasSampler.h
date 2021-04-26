@@ -41,7 +41,7 @@ namespace RTShader {
 /** \addtogroup RTShader
 *  @{
 */
-struct _OgreRTSSExport TextureAtlasRecord
+struct TextureAtlasRecord
 {
     TextureAtlasRecord(const String & texOriginalName, const String & texAtlasName, 
                        const float texPosU, const float texPosV, const float texWidth, const float texHeight,
@@ -126,7 +126,7 @@ There are 3 ways to handle this issue, each with it's own limitations:
 
 You can use the NVidia "Texture Atlas Tools" to create the texture. 
 */
-class _OgreRTSSExport TextureAtlasSampler : public SubRenderState
+class TextureAtlasSampler : public SubRenderState
 {
 public:
 
@@ -209,7 +209,7 @@ protected:
 A factory that enables creation of TextureAtlasSampler instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class _OgreRTSSExport TextureAtlasSamplerFactory : public SubRenderStateFactory, public Singleton<TextureAtlasSamplerFactory>
+class TextureAtlasSamplerFactory : public SubRenderStateFactory, public Singleton<TextureAtlasSamplerFactory>
 {
 public:
     enum IndexPositionMode
