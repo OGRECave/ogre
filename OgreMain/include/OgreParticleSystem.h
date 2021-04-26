@@ -461,11 +461,6 @@ namespace Ogre {
 
         const String& getMovableType(void) const override;
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual void _notifyParticleResized() {}
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual void _notifyParticleRotated() {}
-
         /** Sets the default dimensions of the particles in this set.
             @remarks
                 All particles in a set are created with these default dimensions. The set will render most efficiently if

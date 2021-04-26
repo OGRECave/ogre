@@ -262,9 +262,6 @@ namespace Ogre
         */
         virtual void _initialise();
 
-        /// @deprecated assume true
-        OGRE_DEPRECATED virtual bool isStaticBufferLockable() const { return true; }
-
         /** Query the real capabilities of the GPU and driver in the RenderSystem*/
         virtual RenderSystemCapabilities* createRenderSystemCapabilities() const = 0;
  

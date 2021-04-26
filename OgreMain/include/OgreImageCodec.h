@@ -90,20 +90,7 @@ namespace Ogre {
             uint flags;
 
             PixelFormat format;
-
-            /// @deprecated do not use
-            OGRE_DEPRECATED String dataType() const
-            {
-                return "ImageData";
-            }
         };
-
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED String getDataType() const
-        {
-            return "ImageData";
-        }
     };
 
     /** @} */

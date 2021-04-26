@@ -63,11 +63,6 @@ namespace Ogre {
     class _OgreExport Renderable
     {
     public:
-        /// @deprecated do not use
-        class RenderSystemData {};
-        typedef SharedPtr<RenderSystemData> RenderSystemDataPtr;
-        
-    public:
         enum
         {
             DEFAULT_PRIORITY = 100
@@ -357,18 +352,6 @@ namespace Ogre {
                 Any* pAny = 0) = 0;
         };
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED const RenderSystemDataPtr& getRenderSystemData() const
-        { 
-            return mRenderSystemData; 
-        }
-        /// @deprecated do not use
-        OGRE_DEPRECATED void setRenderSystemData(RenderSystemDataPtr val) const
-        { 
-            mRenderSystemData = val; 
-        }
-
-
     protected:
         typedef std::map<size_t, Vector4> CustomParameterMap;
         CustomParameterMap mCustomParameters;
@@ -376,7 +359,6 @@ namespace Ogre {
         bool mUseIdentityProjection;
         bool mUseIdentityView;
         UserObjectBindings mUserObjectBindings;      /// User objects binding.
-        mutable RenderSystemDataPtr mRenderSystemData;/// This should be used only by a render system for internal use
     };
 
     /** @} */

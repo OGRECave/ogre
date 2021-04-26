@@ -159,10 +159,5 @@ namespace Ogre {
             mChildObject->_notifyMoved();
         }
     }
-    //-----------------------------------------------------------------------------
-    const LightList& TagPoint::getLights(void) const
-    {
-        return mParentEntity->queryLights();
-    }
 
 }

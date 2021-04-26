@@ -99,10 +99,6 @@ namespace Ogre  {
         void needUpdate(bool forceParentUpdate = false) override;
         /** Overridden from Node in order to include parent Entity transform. */
         void updateFromParentImpl(void) const override;
-        /// @deprecated do not use
-        OGRE_DEPRECATED const LightList& getLights(void) const;
-
-
 
     private:
         Entity *mParentEntity;
