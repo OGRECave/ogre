@@ -206,6 +206,7 @@ protected:
     bool                                mPerPixelFogEnable;     // When true the RTSS will do per pixel fog calculations.
     bool                                mSpecularEnable;        // The current specular state.  
     RTShader::SubRenderStateFactory*    mReflectionMapFactory;  // The custom reflection map shader extension factory.
+    RTShader::SubRenderStateFactory*    mTextureAtlasFactory;
     RTShader::SubRenderState*           mInstancedViewportsSubRenderState;// todo - doc
     bool                                mInstancedViewportsEnable;      // todo - doc
     InfiniteFrustum                     mInfiniteFrustum;               // todo - doc

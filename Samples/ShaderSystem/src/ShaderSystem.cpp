@@ -58,6 +58,7 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
                     ;
     mPointLightNode = NULL;
     mReflectionMapFactory = NULL;
+    mTextureAtlasFactory = NULL;
     mInstancedViewportsEnable = false;
     mInstancedViewportsSubRenderState = NULL;
     mInstancedViewportsFactory = NULL;
@@ -1102,6 +1103,9 @@ void Sample_ShaderSystem::loadResources()
     mReflectionMapFactory = OGRE_NEW ShaderExReflectionMapFactory;
     mShaderGenerator->addSubRenderStateFactory(mReflectionMapFactory);
 
+    mTextureAtlasFactory = OGRE_NEW TextureAtlasSamplerFactory;
+    mShaderGenerator->addSubRenderStateFactory(mTextureAtlasFactory);
+
     createPrivateResourceGroup();
 }
 
@@ -1134,6 +1138,14 @@ void Sample_ShaderSystem::unloadResources()
         mShaderGenerator->removeSubRenderStateFactory(mReflectionMapFactory);
         OGRE_DELETE mReflectionMapFactory;
         mReflectionMapFactory = NULL;
+    }
+
+    if (mTextureAtlasFactory != NULL)
+    {
+        mTextureAtlasFactory->destroyAllInstances();
+        mShaderGenerator->removeSubRenderStateFactory(mTextureAtlasFactory);
+        OGRE_DELETE mTextureAtlasFactory;
+        mTextureAtlasFactory = NULL;
     }
 }
 

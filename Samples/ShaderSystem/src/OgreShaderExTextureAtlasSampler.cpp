@@ -24,9 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreShaderPrecompiledHeaders.h"
+#include "OgreShaderExTextureAtlasSampler.h"
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#include "OgreShaderFFPRenderState.h"
+#include "OgreShaderProgram.h"
+#include "OgreShaderParameter.h"
+#include "OgreShaderProgramSet.h"
+#include "OgreLogManager.h"
+#include "OgreTechnique.h"
 
 #define SGX_LIB_TEXTURE_ATLAS "SGXLib_TextureAtlas"
 

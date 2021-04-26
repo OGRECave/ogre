@@ -274,10 +274,6 @@ void ShaderGenerator::createBuiltinSRSFactories()
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
     }
-
-    curFactory = OGRE_NEW TextureAtlasSamplerFactory;
-    addSubRenderStateFactory(curFactory);
-    mBuiltinSRSFactories.push_back(curFactory);
     
     curFactory = OGRE_NEW TriplanarTexturingFactory;
     addSubRenderStateFactory(curFactory);
