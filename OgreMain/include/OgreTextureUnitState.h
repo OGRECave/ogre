@@ -1059,11 +1059,9 @@ namespace Ogre {
         const String& getName(void) const { return mName; }
 
         /// @deprecated use setName()
-        OGRE_DEPRECATED void setTextureNameAlias(const String& name);
+        OGRE_DEPRECATED void setTextureNameAlias(const String& name) { setName(name); }
         /// @deprecated use getName()
-        OGRE_DEPRECATED const String& getTextureNameAlias(void) const { return mTextureNameAlias;}
-        /// @deprecated use setTextureName()
-        OGRE_DEPRECATED bool applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply = true);
+        OGRE_DEPRECATED const String& getTextureNameAlias(void) const { return getName();}
 
         /** Notify this object that its parent has changed. */
         void _notifyParent(Pass* parent);

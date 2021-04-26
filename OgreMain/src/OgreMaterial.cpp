@@ -785,25 +785,6 @@ namespace Ogre {
     {
         return LodValueIterator(mUserLodValues.begin(), mUserLodValues.end());
     }
-
-    //-----------------------------------------------------------------------
-    bool Material::applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply) const
-    {
-        // iterate through all techniques and apply texture aliases
-        Techniques::const_iterator i, iend;
-        iend = mTechniques.end();
-        bool testResult = false;
-
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            OGRE_IGNORE_DEPRECATED_BEGIN
-            if ((*i)->applyTextureAliases(aliasList, apply))
-                testResult = true;
-            OGRE_IGNORE_DEPRECATED_END
-        }
-
-        return testResult;
-    }
     //---------------------------------------------------------------------
     const LodStrategy *Material::getLodStrategy() const
     {

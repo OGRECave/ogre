@@ -933,18 +933,6 @@ namespace Ogre {
             0 means the shared vertex data, 1+ means a submesh vertex data (index+1)
         */
         VertexData* getVertexDataByTrackHandle(unsigned short handle);
-        /** Iterates through all submeshes and requests them 
-            to apply their texture aliases to the material they use.
-        @remarks
-            The submesh will only apply texture aliases to the material if matching
-            texture alias names are found in the material.  If a match is found, the
-            submesh will automatically clone the original material and then apply its
-            texture to the new material.
-        @par
-            This method is normally called by the protected method loadImpl when a 
-            mesh if first loaded.
-        */
-        void updateMaterialForAllSubMeshes(void);
 
         /** Internal method which, if animation types have not been determined,
             scans any vertex animations and determines the type for each set of

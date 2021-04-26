@@ -47,6 +47,27 @@ THE SOFTWARE.
 #include "OgreGpuProgramUsage.h"
 
 namespace Ogre{
+    static void applyTextureAliases(const Material* mat, const NameValuePairList& aliasList)
+    {
+        for (auto t : mat->getTechniques())
+        {
+            for (auto p : t->getPasses())
+            {
+                for (auto tus : p->getTextureUnitStates())
+                {
+                    auto aliasIt = aliasList.find(tus->getName());
+                    if (aliasIt == aliasList.end())
+                        continue;
+
+                    if (tus->getNumFrames())
+                        tus->setAnimatedTextureName(aliasIt->second, tus->getNumFrames(),
+                                                    tus->getAnimationDuration());
+                    else
+                        tus->setTextureName(aliasIt->second, tus->getTextureType());
+                }
+            }
+        }
+    }
 
     static GpuProgramType translateIDToGpuProgramType(uint32 id)
     {
@@ -1225,9 +1246,9 @@ namespace Ogre{
             PreApplyTextureAliasesScriptCompilerEvent locEvt(mMaterial, &mTextureAliases);
             compiler->_fireEvent(&locEvt, 0);
         }
-        mMaterial->applyTextureAliases(mTextureAliases);
-        mTextureAliases.clear();
         OGRE_IGNORE_DEPRECATED_END
+        applyTextureAliases(mMaterial, mTextureAliases);
+        mTextureAliases.clear();
     }
 
     /**************************************************************************

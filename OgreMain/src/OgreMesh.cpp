@@ -235,13 +235,6 @@ namespace Ogre {
         OgreAssert(codec, ("No codec found to load "+mName).c_str());
 
         codec->decode(data, this);
-
-        /* check all submeshes to see if their materials should be
-           updated.  If the submesh has texture aliases that match those
-           found in the current material then a new material is created using
-           the textures from the submesh.
-        */
-        updateMaterialForAllSubMeshes();
     }
 
     //-----------------------------------------------------------------------
@@ -2486,17 +2479,6 @@ namespace Ogre {
     const PoseList& Mesh::getPoseList(void) const
     {
         return mPoseList;
-    }
-    //---------------------------------------------------------------------
-    void Mesh::updateMaterialForAllSubMeshes(void)
-    {
-        // iterate through each sub mesh and request the submesh to update its material
-        std::vector<SubMesh*>::iterator subi;
-        for (subi = mSubMeshList.begin(); subi != mSubMeshList.end(); ++subi)
-        {
-            (*subi)->updateMaterialUsingTextureAliases();
-        }
-
     }
     //---------------------------------------------------------------------
     const LodStrategy *Mesh::getLodStrategy() const

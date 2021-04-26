@@ -1767,26 +1767,6 @@ namespace Ogre {
     {
         return mParent->getResourceGroup();
     }
-
-    //-----------------------------------------------------------------------
-    bool Pass::applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply) const
-    {
-        // iterate through each texture unit state and apply the texture alias if it applies
-        TextureUnitStates::const_iterator i, iend;
-        iend = mTextureUnitStates.end();
-        bool testResult = false;
-
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
-        {
-            OGRE_IGNORE_DEPRECATED_BEGIN
-            if ((*i)->applyTextureAliases(aliasList, apply))
-                testResult = true;
-            OGRE_IGNORE_DEPRECATED_END
-        }
-
-        return testResult;
-
-    }
     //-----------------------------------------------------------------------
     unsigned short Pass::_getTextureUnitWithContentTypeIndex(
         TextureUnitState::ContentType contentType, unsigned short index) const
