@@ -155,7 +155,6 @@ void ProgramManager::createDefaultProgramProcessors()
 {
     // Add standard shader processors
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-    mDefaultProgramProcessors.push_back(OGRE_NEW CGProgramProcessor);
     mDefaultProgramProcessors.push_back(OGRE_NEW GLSLProgramProcessor);
     mDefaultProgramProcessors.push_back(OGRE_NEW HLSLProgramProcessor);
 #endif

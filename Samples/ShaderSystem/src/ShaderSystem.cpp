@@ -148,10 +148,6 @@ void Sample_ShaderSystem::itemSelected(SelectMenu* menu)
 
         applyShadowType(curShadowTypeIndex);        
     }
-    else if(menu == mLanguageMenu)
-    {
-        ShaderGenerator::getSingletonPtr()->setTargetLanguage(menu->getSelectedItem());     
-    }
 }
 
 //-----------------------------------------------------------------------
@@ -398,30 +394,8 @@ void Sample_ShaderSystem::setupContent()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupUI()
 {
-    // Create language selection 
-    mLanguageMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "LangMode", "Language", 220, 120, 10);   
-
-    // Use GLSL ES in case of OpenGL ES 2 render system.
-    if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
-    {
-        mLanguageMenu->addItem("glsles");
-        mShaderGenerator->setTargetLanguage("glsles");      
-    }
-    
-    // Use GLSL in case of OpenGL render system.
-    else if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL") != String::npos)
-    {
-        mLanguageMenu->addItem("glsl");
-        mShaderGenerator->setTargetLanguage("glsl");        
-    }
-
-    // Use HLSL in case of D3D9 render system.
-    else if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("Direct3D9") != String::npos)
-    {
-        mLanguageMenu->addItem("hlsl");
-        mShaderGenerator->setTargetLanguage("hlsl");                
-    }
-    mLanguageMenu->addItem("cg");
+    // Create language label
+    mLanguage = mTrayMgr->createLabel(TL_TOPLEFT, "Language", "Language: "+mShaderGenerator->getTargetLanguage(), 220);
 
     // create check boxes to toggle lights. 
     mDirLightCheckBox = mTrayMgr->createCheckBox(TL_TOPLEFT, DIRECTIONAL_LIGHT_NAME, "Directional Light", 220);
