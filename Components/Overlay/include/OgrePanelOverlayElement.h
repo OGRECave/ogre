@@ -104,28 +104,6 @@ namespace Ogre {
         /** Overridden from OverlayContainer */
         void _updateRenderQueue(RenderQueue* queue);
 
-
-        /** Command object for specifying tiling (see ParamCommand).*/
-        class _OgrePrivate CmdTiling : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying transparency (see ParamCommand).*/
-        class _OgrePrivate CmdTransparent : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying UV coordinates (see ParamCommand).*/
-        class _OgrePrivate CmdUVCoords : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
     protected:
         /// Flag indicating if this panel should be visual or just group things
         bool mTransparent;
@@ -147,12 +125,6 @@ namespace Ogre {
         void addBaseParameters(void);
 
         static String msTypeName;
-
-        // Command objects
-        static CmdTiling msCmdTiling;
-        static CmdTransparent msCmdTransparent;
-        static CmdUVCoords msCmdUVCoords;
-
     };
     /** @} */
     /** @} */

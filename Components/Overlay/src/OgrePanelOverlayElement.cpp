@@ -36,9 +36,31 @@ THE SOFTWARE.
 namespace Ogre {
     //---------------------------------------------------------------------
     String PanelOverlayElement::msTypeName = "Panel";
-    PanelOverlayElement::CmdTiling PanelOverlayElement::msCmdTiling;
-    PanelOverlayElement::CmdTransparent PanelOverlayElement::msCmdTransparent;
-    PanelOverlayElement::CmdUVCoords PanelOverlayElement::msCmdUVCoords;
+    /** Command object for specifying tiling (see ParamCommand).*/
+    class _OgrePrivate CmdTiling : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    /** Command object for specifying transparency (see ParamCommand).*/
+    class _OgrePrivate CmdTransparent : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    /** Command object for specifying UV coordinates (see ParamCommand).*/
+    class _OgrePrivate CmdUVCoords : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    // Command objects
+    static CmdTiling msCmdTiling;
+    static CmdTransparent msCmdTransparent;
+    static CmdUVCoords msCmdUVCoords;
     //---------------------------------------------------------------------
     // vertex buffer bindings, set at compile time (we could look these up but no point)
     #define POSITION_BINDING 0
@@ -391,7 +413,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     // Command objects
     //-----------------------------------------------------------------------
-    String PanelOverlayElement::CmdTiling::doGet(const void* target) const
+    String CmdTiling::doGet(const void* target) const
     {
         // NB only returns 1st layer tiling
         String ret = "0 " + StringConverter::toString(
@@ -400,7 +422,7 @@ namespace Ogre {
             static_cast<const PanelOverlayElement*>(target)->getTileY() );
         return ret;
     }
-    void PanelOverlayElement::CmdTiling::doSet(void* target, const String& val)
+    void CmdTiling::doSet(void* target, const String& val)
     {
         // 3 params: <layer> <x_tile> <y_tile>
         // Param count is validated higher up
@@ -412,18 +434,18 @@ namespace Ogre {
         static_cast<PanelOverlayElement*>(target)->setTiling(x_tile, y_tile, layer);
     }
     //-----------------------------------------------------------------------
-    String PanelOverlayElement::CmdTransparent::doGet(const void* target) const
+    String CmdTransparent::doGet(const void* target) const
     {
         return StringConverter::toString(
             static_cast<const PanelOverlayElement*>(target)->isTransparent() );
     }
-    void PanelOverlayElement::CmdTransparent::doSet(void* target, const String& val)
+    void CmdTransparent::doSet(void* target, const String& val)
     {
         static_cast<PanelOverlayElement*>(target)->setTransparent(
             StringConverter::parseBool(val));
     }
     //-----------------------------------------------------------------------
-    String PanelOverlayElement::CmdUVCoords::doGet(const void* target) const
+    String CmdUVCoords::doGet(const void* target) const
     {
         Real u1, v1, u2, v2;
 
@@ -434,7 +456,7 @@ namespace Ogre {
 
         return ret;
     }
-    void PanelOverlayElement::CmdUVCoords::doSet(void* target, const String& val)
+    void CmdUVCoords::doSet(void* target, const String& val)
     {
         std::vector<String> vec = StringUtil::split(val);
 

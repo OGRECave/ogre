@@ -87,56 +87,6 @@ namespace Ogre
     class _OgreOverlayExport Font : public Resource, public ManualResourceLoader
     {
     protected:
-        /// Command object for Font - see ParamCommand 
-        class _OgreOverlayExport CmdType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for Font - see ParamCommand 
-        class _OgreOverlayExport CmdSource : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        class _OgreOverlayExport CmdCharSpacer : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for Font - see ParamCommand 
-        class _OgreOverlayExport CmdSize : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for Font - see ParamCommand 
-        class _OgreOverlayExport CmdResolution : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /// Command object for Font - see ParamCommand 
-        class _OgreOverlayExport CmdCodePoints : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-
-        // Command object for setting / getting parameters
-        static CmdType msTypeCmd;
-        static CmdSource msSourceCmd;
-        static CmdCharSpacer msCharacterSpacerCmd;
-        static CmdSize msSizeCmd;
-        static CmdResolution msResolutionCmd;
-        static CmdCodePoints msCodePointsCmd;
-
         /// The type of font
         FontType mType;
 

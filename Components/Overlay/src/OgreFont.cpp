@@ -53,12 +53,52 @@ THE SOFTWARE
 namespace Ogre
 {
     //---------------------------------------------------------------------
-    Font::CmdType Font::msTypeCmd;
-    Font::CmdSource Font::msSourceCmd;
-    Font::CmdCharSpacer Font::msCharacterSpacerCmd;
-    Font::CmdSize Font::msSizeCmd;
-    Font::CmdResolution Font::msResolutionCmd;
-    Font::CmdCodePoints Font::msCodePointsCmd;
+    namespace {
+    class CmdType : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    class CmdSource : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    class CmdCharSpacer : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    class CmdSize : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    class CmdResolution : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    class CmdCodePoints : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+
+    // Command object for setting / getting parameters
+    static CmdType msTypeCmd;
+    static CmdSource msSourceCmd;
+    static CmdCharSpacer msCharacterSpacerCmd;
+    static CmdSize msSizeCmd;
+    static CmdResolution msResolutionCmd;
+    static CmdCodePoints msCodePointsCmd;
+    }
 
     std::vector<uint32> utftoc32(String str)
     {
@@ -518,7 +558,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    String Font::CmdType::doGet(const void* target) const
+    String CmdType::doGet(const void* target) const
     {
         const Font* f = static_cast<const Font*>(target);
         if (f->getType() == FT_TRUETYPE)
@@ -530,7 +570,7 @@ namespace Ogre
             return "image";
         }
     }
-    void Font::CmdType::doSet(void* target, const String& val)
+    void CmdType::doSet(void* target, const String& val)
     {
         Font* f = static_cast<Font*>(target);
         if (val == "truetype")
@@ -543,57 +583,56 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    String Font::CmdSource::doGet(const void* target) const
+    String CmdSource::doGet(const void* target) const
     {
         const Font* f = static_cast<const Font*>(target);
         return f->getSource();
     }
-    void Font::CmdSource::doSet(void* target, const String& val)
+    void CmdSource::doSet(void* target, const String& val)
     {
         Font* f = static_cast<Font*>(target);
         f->setSource(val);
     }
     //-----------------------------------------------------------------------
-    String Font::CmdCharSpacer::doGet(const void* target) const
+    String CmdCharSpacer::doGet(const void* target) const
     {
         return "1";
     }
-    void Font::CmdCharSpacer::doSet(void* target, const String& val) {}
+    void CmdCharSpacer::doSet(void* target, const String& val) {}
     //-----------------------------------------------------------------------
-    String Font::CmdSize::doGet(const void* target) const
+    String CmdSize::doGet(const void* target) const
     {
         const Font* f = static_cast<const Font*>(target);
         return StringConverter::toString(f->getTrueTypeSize());
     }
-    void Font::CmdSize::doSet(void* target, const String& val)
+    void CmdSize::doSet(void* target, const String& val)
     {
         Font* f = static_cast<Font*>(target);
         f->setTrueTypeSize(StringConverter::parseReal(val));
     }
     //-----------------------------------------------------------------------
-    String Font::CmdResolution::doGet(const void* target) const
+    String CmdResolution::doGet(const void* target) const
     {
         const Font* f = static_cast<const Font*>(target);
         return StringConverter::toString(f->getTrueTypeResolution());
     }
-    void Font::CmdResolution::doSet(void* target, const String& val)
+    void CmdResolution::doSet(void* target, const String& val)
     {
         Font* f = static_cast<Font*>(target);
         f->setTrueTypeResolution(StringConverter::parseUnsignedInt(val));
     }
     //-----------------------------------------------------------------------
-    String Font::CmdCodePoints::doGet(const void* target) const
+    String CmdCodePoints::doGet(const void* target) const
     {
         const Font* f = static_cast<const Font*>(target);
-        const CodePointRangeList& rangeList = f->getCodePointRangeList();
         StringStream str;
-        for (CodePointRangeList::const_iterator i = rangeList.begin(); i != rangeList.end(); ++i)
+        for (const auto& i : f->getCodePointRangeList())
         {
-            str << i->first << "-" << i->second << " ";
+            str << i.first << "-" << i.second << " ";
         }
         return str.str();
     }
-    void Font::CmdCodePoints::doSet(void* target, const String& val)
+    void CmdCodePoints::doSet(void* target, const String& val)
     {
         // Format is "code_points start1-end1 start2-end2"
         Font* f = static_cast<Font*>(target);
@@ -605,9 +644,8 @@ namespace Ogre
             StringVector itemVec = StringUtil::split(item, "-");
             if (itemVec.size() == 2)
             {
-                f->addCodePointRange(CodePointRange(
-                    StringConverter::parseUnsignedInt(itemVec[0]),
-                    StringConverter::parseUnsignedInt(itemVec[1])));
+                f->addCodePointRange({StringConverter::parseUnsignedInt(itemVec[0]),
+                                      StringConverter::parseUnsignedInt(itemVec[1])});
             }
         }
     }
