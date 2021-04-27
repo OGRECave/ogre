@@ -14,9 +14,8 @@ APKFileSystem=/thumbnails
 # Rarely used resources should be separately loaded by the
 # samples which require them.
 [General]
-# Bites uses the next entry to discover the platform shaders
-APKFileSystem=/
-APKFileSystem=/materials/programs
+APKFileSystem=/materials/programs/GLSL
+APKFileSystem=/materials/programs/GLSLES
 APKFileSystem=/materials/scripts
 APKFileSystem=/materials/textures
 APKFileSystem=/materials/textures/glTF2_IBL

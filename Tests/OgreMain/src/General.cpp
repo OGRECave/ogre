@@ -272,7 +272,7 @@ TEST(Image, Combine)
     STBIImageCodec::startup();
     ConfigFile cf;
     cf.load(FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
-    mgr.addResourceLocation(cf.getSettings("General").begin()->second+"/materials/textures", fs.getType());
+    mgr.addResourceLocation(cf.getSettings("General").begin()->second+"/../materials/textures", fs.getType());
     mgr.initialiseAllResourceGroups();
 
     auto testPath = cf.getSettings("Tests").begin()->second;
