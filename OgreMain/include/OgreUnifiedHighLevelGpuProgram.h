@@ -64,20 +64,10 @@ namespace Ogre {
         static std::map<String,int> mLanguagePriorities;
 
     public:
-        /// Command object for setting delegate (can set more than once)
-        class CmdDelegate : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-
         static void setPriority(String shaderLanguage,int priority);
         static int  getPriority(String shaderLanguage);
 
     protected:
-        static CmdDelegate msCmdDelegate;
-
         /// Ordered list of potential delegates
         StringVector mDelegateNames;
         /// The chosen delegate
