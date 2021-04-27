@@ -81,7 +81,6 @@ THE SOFTWARE.
 #include "OgreShaderExTriplanarTexturing.h"
 #include "OgreShaderExGBuffer.h"
 
-#include "OgreShaderCGProgramProcessor.h"
 #include "OgreShaderHLSLProgramProcessor.h"
 #include "OgreShaderGLSLProgramProcessor.h"
 #include "OgreShaderGLSLESProgramProcessor.h"
