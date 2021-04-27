@@ -32,7 +32,14 @@ THE SOFTWARE.
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-    UnifiedHighLevelGpuProgram::CmdDelegate UnifiedHighLevelGpuProgram::msCmdDelegate;
+    /// Command object for setting delegate (can set more than once)
+    class CmdDelegate : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    static CmdDelegate msCmdDelegate;
     static const String sLanguage = "unified";
     std::map<String,int> UnifiedHighLevelGpuProgram::mLanguagePriorities;
 
@@ -416,13 +423,13 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    String UnifiedHighLevelGpuProgram::CmdDelegate::doGet(const void* target) const
+    String CmdDelegate::doGet(const void* target) const
     {
         // Can't do this (not one delegate), shouldn't matter
         return BLANKSTRING;
     }
     //-----------------------------------------------------------------------
-    void UnifiedHighLevelGpuProgram::CmdDelegate::doSet(void* target, const String& val)
+    void CmdDelegate::doSet(void* target, const String& val)
     {
         static_cast<UnifiedHighLevelGpuProgram*>(target)->addDelegateProgram(val);
     }

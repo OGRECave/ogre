@@ -59,56 +59,6 @@ namespace Ogre {
         BillboardParticleRenderer();
         ~BillboardParticleRenderer();
 
-        /** Command object for billboard type (see ParamCommand).*/
-        class _OgrePrivate CmdBillboardType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for billboard origin (see ParamCommand).*/
-        class _OgrePrivate CmdBillboardOrigin : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for billboard rotation type (see ParamCommand).*/
-        class _OgrePrivate CmdBillboardRotationType : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for common direction (see ParamCommand).*/
-        class _OgrePrivate CmdCommonDirection : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for common up-vector (see ParamCommand).*/
-        class _OgrePrivate CmdCommonUpVector : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for point rendering (see ParamCommand).*/
-        class _OgrePrivate CmdPointRendering : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for accurate facing(see ParamCommand).*/
-        class _OgrePrivate CmdAccurateFacing : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-
         /// @copydoc BillboardSet::setTextureStacksAndSlices
         void setTextureStacksAndSlices(uchar stacks, uchar slices)
         {
@@ -199,14 +149,6 @@ namespace Ogre {
         void _notifyBoundingBox(const AxisAlignedBox& aabb) override;
 
         void _notifyCastShadows(bool enabled) override { mBillboardSet->setCastShadows(enabled); }
-    protected:
-        static CmdBillboardType msBillboardTypeCmd;
-        static CmdBillboardOrigin msBillboardOriginCmd;
-        static CmdBillboardRotationType msBillboardRotationTypeCmd;
-        static CmdCommonDirection msCommonDirectionCmd;
-        static CmdCommonUpVector msCommonUpVectorCmd;
-        static CmdPointRendering msPointRenderingCmd;
-        static CmdAccurateFacing msAccurateFacingCmd;
     };
 
     /** Factory class for BillboardParticleRenderer */

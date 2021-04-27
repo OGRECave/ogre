@@ -64,85 +64,6 @@ namespace Ogre {
     class _OgreExport ParticleSystem : public StringInterface, public MovableObject
     {
     public:
-
-        /** Command object for quota (see ParamCommand).*/
-        class _OgrePrivate CmdQuota : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for emittedEmitterQuota (see ParamCommand).*/
-        class _OgrePrivate CmdEmittedEmitterQuota : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for material (see ParamCommand).*/
-        class _OgrePrivate CmdMaterial : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for cull_each (see ParamCommand).*/
-        class _OgrePrivate CmdCull : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for particle_width (see ParamCommand).*/
-        class _OgrePrivate CmdWidth : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for particle_height (see ParamCommand).*/
-        class _OgrePrivate CmdHeight : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for renderer (see ParamCommand).*/
-        class _OgrePrivate CmdRenderer : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for sorting (see ParamCommand).*/
-        class CmdSorted : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for local space (see ParamCommand).*/
-        class CmdLocalSpace : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for iteration interval(see ParamCommand).*/
-        class CmdIterationInterval : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for nonvisible timeout (see ParamCommand).*/
-        class CmdNonvisibleTimeout : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-
         /// Default constructor required for STL creation in manager
         ParticleSystem();
         /** Creates a particle system with no emitters or affectors.
@@ -612,21 +533,6 @@ namespace Ogre {
         /// Override to return specific type flag
         uint32 getTypeFlags(void) const;
     private:
-
-        /// Command objects
-        static CmdCull msCullCmd;
-        static CmdHeight msHeightCmd;
-        static CmdMaterial msMaterialCmd;
-        static CmdQuota msQuotaCmd;
-        static CmdEmittedEmitterQuota msEmittedEmitterQuotaCmd;
-        static CmdWidth msWidthCmd;
-        static CmdRenderer msRendererCmd;
-        static CmdSorted msSortedCmd;
-        static CmdLocalSpace msLocalSpaceCmd;
-        static CmdIterationInterval msIterationIntervalCmd;
-        static CmdNonvisibleTimeout msNonvisibleTimeoutCmd;
-
-
         AxisAlignedBox mAABB;
         Real mBoundingRadius;
         bool mBoundsAutoUpdate;

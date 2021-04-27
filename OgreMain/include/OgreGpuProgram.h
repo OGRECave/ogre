@@ -70,71 +70,6 @@ namespace Ogre {
     class _OgreExport GpuProgram : public Resource
     {
     protected:
-        /// Command object - see ParamCommand
-        class _OgreExport CmdType : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdSyntax : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdSkeletal : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdMorph : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdPose : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdVTF : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdManualNamedConstsFile : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdAdjacency : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    class _OgreExport CmdComputeGroupDims : public ParamCommand
-    {
-    public:
-        String doGet(const void* target) const;
-        void doSet(void* target, const String& val);
-    };
-    // Command object for setting / getting parameters
-    static CmdType msTypeCmd;
-    static CmdSyntax msSyntaxCmd;
-    static CmdSkeletal msSkeletalCmd;
-    static CmdMorph msMorphCmd;
-    static CmdPose msPoseCmd;
-    static CmdVTF msVTFCmd;
-    static CmdManualNamedConstsFile msManNamedConstsFileCmd;
-    static CmdAdjacency msAdjacencyCmd;
-    static CmdComputeGroupDims msComputeGroupDimsCmd;
     /// The name of the file to load source from (may be blank)
     String mFilename;
     /// The assembler source of the program (may be blank until file loaded)
@@ -157,8 +92,6 @@ namespace Ogre {
     bool mCompileError;
     /// Does this (vertex) program include pose animation (count of number of poses supported)
     ushort mPoseAnimation;
-    /// The number of process groups dispatched by this (compute) program.
-    Vector3 mComputeGroupDimensions;
     /// The default parameters for use with this object
     GpuProgramParametersSharedPtr mDefaultParams;
     /** Record of logical to physical buffer maps. Mandatory for low-level
@@ -328,10 +261,6 @@ namespace Ogre {
     OGRE_DEPRECATED virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
     /// @deprecated use OT_DETAIL_ADJACENCY_BIT
     virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
-    /// @deprecated obsolete
-    OGRE_DEPRECATED void setComputeGroupDimensions(Vector3 dimensions) { mComputeGroupDimensions = dimensions; }
-    /// @deprecated obsolete
-    OGRE_DEPRECATED Vector3 getComputeGroupDimensions(void) const { return mComputeGroupDimensions; }
 
     /** Get a reference to the default parameters which are to be used for all
         uses of this program.

@@ -40,12 +40,38 @@ email                : pjcast@yahoo.com
 
 namespace Ogre
 {
-    //String interface commands for setting some basic commands
-    ExternalTextureSource::CmdInputFileName ExternalTextureSource::msCmdInputFile;
-    ExternalTextureSource::CmdFPS           ExternalTextureSource::msCmdFramesPerSecond;
-    ExternalTextureSource::CmdPlayMode      ExternalTextureSource::msCmdPlayMode;
-    ExternalTextureSource::CmdTecPassState  ExternalTextureSource::msCmdTecPassState;
-
+    //------------------------------------------------------------------------------//
+    /* Command objects for specifying some base features                            */
+    /* Any Plugins wishing to add more specific params to "ExternalTextureSourcePlugins"*/
+    /* dictionary, feel free to do so, that's why this is here                      */
+    class _OgrePrivate CmdInputFileName : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    class _OgrePrivate CmdFPS : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    class _OgrePrivate CmdPlayMode : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    class _OgrePrivate CmdTecPassState : public ParamCommand
+    {
+    public:
+        String doGet(const void* target) const;
+        void doSet(void* target, const String& val);
+    };
+    static CmdInputFileName msCmdInputFile;     /// Command for setting input file name
+    static CmdFPS msCmdFramesPerSecond;         /// Command for setting frames per second
+    static CmdPlayMode msCmdPlayMode;           /// Command for setting play mode
+    static CmdTecPassState msCmdTecPassState;   /// Command for setting the technique, pass, & state level
     //---------------------------------------------------------------------------------------//
 
     ExternalTextureSource::ExternalTextureSource() : mTechniqueLevel(0), mPassLevel(0), mStateLevel(0)
@@ -75,45 +101,45 @@ namespace Ogre
             dict->addParameter(ParameterDef("filename", 
                 "A source for the texture effect (only certain plugins require this)"
                 , PT_STRING),
-                &ExternalTextureSource::msCmdInputFile);
+                &msCmdInputFile);
             dict->addParameter(ParameterDef("frames_per_second", 
                 "How fast should playback be (only certain plugins use this)"
                 , PT_INT),
-                &ExternalTextureSource::msCmdFramesPerSecond);
+                &msCmdFramesPerSecond);
             dict->addParameter(ParameterDef("play_mode", 
                 "How the playback starts(only certain plugins use this)"
                 , PT_STRING),
-                &ExternalTextureSource::msCmdPlayMode);
+                &msCmdPlayMode);
             dict->addParameter(ParameterDef("set_T_P_S", 
                 "Set the technique, pass, and state level of this texture_unit (eg. 0 0 0 )"
                 , PT_STRING),
-                &ExternalTextureSource::msCmdTecPassState);
+                &msCmdTecPassState);
         }
     }
 
     //---------------------------------------------------------------------------------------//
     //*** String Interface Command Class Definitions *****************************************/
-    String ExternalTextureSource::CmdInputFileName::doGet(const void* target) const
+    String CmdInputFileName::doGet(const void* target) const
     {
         return static_cast<const ExternalTextureSource*>(target)->getInputName();
     }
-    void ExternalTextureSource::CmdInputFileName::doSet(void* target, const String& val)
+    void CmdInputFileName::doSet(void* target, const String& val)
     {
         static_cast<ExternalTextureSource*>(target)->setInputName( val );
     }
     
     //------------------------------------------------------------------------------//
-    String ExternalTextureSource::CmdFPS::doGet(const void* target) const
+    String CmdFPS::doGet(const void* target) const
     {
         return StringConverter::toString(
             static_cast<const ExternalTextureSource*>(target)->getFPS() );
     }
-    void ExternalTextureSource::CmdFPS::doSet(void* target, const String& val)
+    void CmdFPS::doSet(void* target, const String& val)
     {
         static_cast<ExternalTextureSource*>(target)->setFPS(StringConverter::parseInt(val));
     }
     //------------------------------------------------------------------------------//
-    String ExternalTextureSource::CmdPlayMode::doGet(const void* target) const
+    String CmdPlayMode::doGet(const void* target) const
     {
         eTexturePlayMode eMode = static_cast<const ExternalTextureSource*>(target)->getPlayMode();
         String val;
@@ -136,7 +162,7 @@ namespace Ogre
 
         return val;
     }
-    void ExternalTextureSource::CmdPlayMode::doSet(void* target, const String& val)
+    void CmdPlayMode::doSet(void* target, const String& val)
     {
         eTexturePlayMode eMode = TextureEffectPause;
 
@@ -151,7 +177,7 @@ namespace Ogre
     }
 
     //------------------------------------------------------------------------------//
-    String ExternalTextureSource::CmdTecPassState::doGet(const void* target) const
+    String CmdTecPassState::doGet(const void* target) const
     {
         int t = 0, p = 0, s = 0;
 
@@ -164,7 +190,7 @@ namespace Ogre
         return ret;         
     }
 
-    void ExternalTextureSource::CmdTecPassState::doSet(void* target, const String& val)
+    void CmdTecPassState::doSet(void* target, const String& val)
     {
         int t = 0, p = 0, s = 0;
 
