@@ -432,10 +432,7 @@ namespace Ogre {
         {
             FILTER_NEAREST,
             FILTER_LINEAR,
-            FILTER_BILINEAR = FILTER_LINEAR,
-            FILTER_BOX,
-            FILTER_TRIANGLE,
-            FILTER_BICUBIC
+            FILTER_BILINEAR = FILTER_LINEAR
         };
         /** Scale a 1D, 2D or 3D image volume. 
             @param  src         PixelBox containing the source pointer, dimensions and format
