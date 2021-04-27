@@ -60,14 +60,6 @@ namespace Ogre {
     */
     class _OgreExport UnifiedHighLevelGpuProgram : public GpuProgram
     {
-    private:
-        static std::map<String,int> mLanguagePriorities;
-
-    public:
-        static void setPriority(String shaderLanguage,int priority);
-        static int  getPriority(String shaderLanguage);
-
-    protected:
         /// Ordered list of potential delegates
         StringVector mDelegateNames;
         /// The chosen delegate
