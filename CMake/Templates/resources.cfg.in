@@ -16,15 +16,20 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/thumbnails
 # Rarely used resources should be separately loaded by the
 # samples which require them.
 [General]
-# Bites uses the next entry to discover the platform shaders
-FileSystem=@OGRE_MEDIA_DIR_REL@
-
 # PBR media must come before the scripts that reference it
 FileSystem=@OGRE_MEDIA_DIR_REL@/PBR
 FileSystem=@OGRE_MEDIA_DIR_REL@/PBR/filament
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/PBR
 
-FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL120
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL150
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSL400
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/GLSLES
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/SPIRV
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/Cg
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/HLSL
+FileSystem=@OGRE_MEDIA_DIR_REL@/materials/programs/HLSL_Cg
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/scripts
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures
 FileSystem=@OGRE_MEDIA_DIR_REL@/materials/textures/terrain
