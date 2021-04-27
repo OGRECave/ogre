@@ -408,10 +408,10 @@ namespace Ogre
         optNVPerfHUD.possibleValues.push_back( "No" );
 
         // Multiple device memory usage hint.
-        optMultiDeviceMemHint.name = "Multi device memory hint";
-        optMultiDeviceMemHint.possibleValues.push_back("Use minimum system memory");
-        optMultiDeviceMemHint.possibleValues.push_back("Auto hardware buffers management");
-        optMultiDeviceMemHint.currentValue = optMultiDeviceMemHint.possibleValues[1];
+        optMultiDeviceMemHint.name = "Auto hardware buffer management";
+        optMultiDeviceMemHint.possibleValues.push_back("Yes");
+        optMultiDeviceMemHint.possibleValues.push_back("No");
+        optMultiDeviceMemHint.currentValue = optMultiDeviceMemHint.possibleValues[0];
         optMultiDeviceMemHint.immutable = false;
 
         optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
@@ -581,12 +581,9 @@ namespace Ogre
                 mResourceManager->setCreationPolicy(RCP_CREATE_ON_ALL_DEVICES);     
         }
 
-        if (name == "Multi device memory hint")
+        if (name == "Auto hardware buffer management")
         {
-            if (value == "Use minimum system memory")
-                mAutoHardwareBufferManagement = false;
-            else if (value == "Auto hardware buffers management")
-                mAutoHardwareBufferManagement = true;
+            StringConverter::parse(value, mAutoHardwareBufferManagement);
         }       
 
         if (name == "Fixed Pipeline Enabled")
