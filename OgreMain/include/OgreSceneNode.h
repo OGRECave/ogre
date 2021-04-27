@@ -377,11 +377,11 @@ namespace Ogre {
         direction of the node, usually -Z
         */
         void setDirection(Real x, Real y, Real z,
-            TransformSpace relativeTo = TS_LOCAL, 
+            TransformSpace relativeTo = TS_PARENT,
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z);
 
         /// @overload
-        void setDirection(const Vector3& vec, TransformSpace relativeTo = TS_LOCAL,
+        void setDirection(const Vector3& vec, TransformSpace relativeTo = TS_PARENT,
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z);
         /** Points the local -Z direction of this node at a point in space.
         @param targetPoint A vector specifying the look at point.
