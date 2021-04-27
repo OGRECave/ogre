@@ -427,7 +427,7 @@ namespace Ogre {
 
         /** Returns the width and height of the texture in the given frame.
         */
-        std::pair< size_t, size_t > getTextureDimensions( unsigned int frame = 0 ) const;
+        std::pair<uint32, uint32> getTextureDimensions(unsigned int frame = 0) const;
 
         /** Changes the active frame in an animated or multi-image texture.
 
