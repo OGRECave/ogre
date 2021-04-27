@@ -68,11 +68,11 @@ if (OGRE_CONFIG_THREADS)
 
 endif()
 
-set(OGRE_ASSERT_MODE 1 CACHE STRING 
-	"Enable Ogre asserts and exceptions. Possible values:
+set(OGRE_ASSERT_MODE 2 CACHE STRING
+	"Enable Ogre asserts. Possible values:
 	0 - Standard asserts in debug builds, nothing in release builds.
 	1 - Standard asserts in debug builds, exceptions in release builds.
-	2 - Exceptions in debug builds, exceptions in release builds."
+	2 - Exceptions in debug & release builds."
 )
 set_property(CACHE OGRE_ASSERT_MODE PROPERTY STRINGS 0 1 2)
 
