@@ -41,21 +41,7 @@ namespace Ogre
     };
     static CmdDelegate msCmdDelegate;
     static const String sLanguage = "unified";
-    std::map<String,int> UnifiedHighLevelGpuProgram::mLanguagePriorities;
 
-    int UnifiedHighLevelGpuProgram::getPriority(String shaderLanguage)
-    {
-        std::map<String,int>::iterator it = mLanguagePriorities.find(shaderLanguage);
-        if (it == mLanguagePriorities.end())
-            return -1;
-        else 
-            return (*it).second;
-    }
-
-    void UnifiedHighLevelGpuProgram::setPriority(String shaderLanguage,int priority)
-    {
-        mLanguagePriorities[shaderLanguage] = priority;
-    }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     UnifiedHighLevelGpuProgram::UnifiedHighLevelGpuProgram(
@@ -87,9 +73,6 @@ namespace Ogre
 
         mChosenDelegate.reset();
 
-        GpuProgramPtr tmpDelegate;
-        int tmpPriority = -1;
-
         for (const String& dn : mDelegateNames)
         {
             GpuProgramPtr deleg = GpuProgramManager::getSingleton().getByName(dn, mGroup);
@@ -109,16 +92,9 @@ namespace Ogre
                 continue;
             }
 
-            int priority = getPriority(deleg->getLanguage());
-            //Find the delegate with the highest prioriry
-            if (priority >= tmpPriority)
-            {
-                tmpDelegate = deleg;
-                tmpPriority = priority;
-            }
+            mChosenDelegate = deleg;
+            break;
         }
-
-        mChosenDelegate = tmpDelegate;
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& UnifiedHighLevelGpuProgram::_getDelegate() const
