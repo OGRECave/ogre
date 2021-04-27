@@ -490,7 +490,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    std::pair< size_t, size_t > TextureUnitState::getTextureDimensions( unsigned int frame ) const
+    std::pair<uint32, uint32> TextureUnitState::getTextureDimensions(unsigned int frame) const
     {
         
         TexturePtr tex = _getTexturePtr(frame);
@@ -498,7 +498,7 @@ namespace Ogre {
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find texture " + StringConverter::toString(frame),
             "TextureUnitState::getTextureDimensions" );
 
-        return std::pair< size_t, size_t >( tex->getWidth(), tex->getHeight() );
+        return {tex->getWidth(), tex->getHeight()};
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setCurrentFrame(unsigned int frameNumber)
