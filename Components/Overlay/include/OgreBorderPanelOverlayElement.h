@@ -176,78 +176,6 @@ namespace Ogre {
 
         /** @copydoc OverlayElement::_update */
         void _update(void);
-
-
-        /** Command object for specifying border sizes (see ParamCommand).*/
-        class _OgrePrivate CmdBorderSize : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying the Material for the border (see ParamCommand).*/
-        class _OgrePrivate CmdBorderMaterial : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying texture coordinates for the border (see ParamCommand).*/
-        class _OgrePrivate CmdBorderLeftUV : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying texture coordinates for the border (see ParamCommand).*/
-        class _OgrePrivate CmdBorderTopUV : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying texture coordinates for the border (see ParamCommand).*/
-        class _OgrePrivate CmdBorderRightUV : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying texture coordinates for the border (see ParamCommand).*/
-        class _OgrePrivate CmdBorderBottomUV : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying texture coordinates for the border (see ParamCommand).*/
-        class _OgrePrivate CmdBorderTopLeftUV : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying texture coordinates for the border (see ParamCommand).*/
-        class _OgrePrivate CmdBorderBottomLeftUV : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying texture coordinates for the border (see ParamCommand).*/
-        class _OgrePrivate CmdBorderBottomRightUV : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
-        /** Command object for specifying texture coordinates for the border (see ParamCommand).*/
-        class _OgrePrivate CmdBorderTopRightUV : public ParamCommand
-        {
-        public:
-            String doGet(const void* target) const;
-            void doSet(void* target, const String& val);
-        };
     private:
         Real mLeftBorderSize;
         Real mRightBorderSize;
@@ -288,18 +216,6 @@ namespace Ogre {
             BCELL_BOTTOM_RIGHT = 7
         };
         String getCellUVString(BorderCellIndex idx) const;
-
-        // Command objects
-        static CmdBorderSize msCmdBorderSize;
-        static CmdBorderMaterial msCmdBorderMaterial;
-        static CmdBorderLeftUV msCmdBorderLeftUV;
-        static CmdBorderTopUV msCmdBorderTopUV;
-        static CmdBorderBottomUV msCmdBorderBottomUV;
-        static CmdBorderRightUV msCmdBorderRightUV;
-        static CmdBorderTopLeftUV msCmdBorderTopLeftUV;
-        static CmdBorderBottomLeftUV msCmdBorderBottomLeftUV;
-        static CmdBorderTopRightUV msCmdBorderTopRightUV;
-        static CmdBorderBottomRightUV msCmdBorderBottomRightUV;
 
         BorderRenderable* mBorderRenderable;
     };

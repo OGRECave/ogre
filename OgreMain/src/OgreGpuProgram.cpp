@@ -33,6 +33,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     //-----------------------------------------------------------------------------
+    namespace {
     /// Command object - see ParamCommand
     class CmdType : public ParamCommand
     {
@@ -91,6 +92,7 @@ namespace Ogre
     static CmdVTF msVTFCmd;
     static CmdManualNamedConstsFile msManNamedConstsFileCmd;
     static CmdAdjacency msAdjacencyCmd;
+    }
 
     //-----------------------------------------------------------------------------
     GpuProgram::GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle, const String& group,

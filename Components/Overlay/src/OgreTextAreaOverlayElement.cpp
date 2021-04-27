@@ -41,13 +41,63 @@ namespace Ogre {
 #define DEFAULT_INITIAL_CHARS 12
     //---------------------------------------------------------------------
     String TextAreaOverlayElement::msTypeName = "TextArea";
-    TextAreaOverlayElement::CmdCharHeight TextAreaOverlayElement::msCmdCharHeight;
-    TextAreaOverlayElement::CmdSpaceWidth TextAreaOverlayElement::msCmdSpaceWidth;
-    TextAreaOverlayElement::CmdFontName TextAreaOverlayElement::msCmdFontName;
-    TextAreaOverlayElement::CmdColour TextAreaOverlayElement::msCmdColour;
-    TextAreaOverlayElement::CmdColourBottom TextAreaOverlayElement::msCmdColourBottom;
-    TextAreaOverlayElement::CmdColourTop TextAreaOverlayElement::msCmdColourTop;
-    TextAreaOverlayElement::CmdAlignment TextAreaOverlayElement::msCmdAlignment;
+    //-----------------------------------------------------------------------------------------
+    class _OgrePrivate CmdCaption : public ParamCommand
+    {
+    public:
+        String doGet( const void* target ) const;
+        void doSet( void* target, const String& val );
+    };
+    class _OgrePrivate CmdCharHeight : public ParamCommand
+    {
+    public:
+        String doGet( const void* target ) const;
+        void doSet( void* target, const String& val );
+    };
+    class _OgrePrivate CmdSpaceWidth : public ParamCommand
+    {
+    public:
+        String doGet( const void* target ) const;
+        void doSet( void* target, const String& val );
+    };
+    class _OgrePrivate CmdFontName : public ParamCommand
+    {
+    public:
+        String doGet( const void* target ) const;
+        void doSet( void* target, const String& val );
+    };
+    class _OgrePrivate CmdColourTop : public ParamCommand
+    {
+    public:
+        String doGet( const void* target ) const;
+        void doSet( void* target, const String& val );
+    };
+    class _OgrePrivate CmdColourBottom : public ParamCommand
+    {
+    public:
+        String doGet( const void* target ) const;
+        void doSet( void* target, const String& val );
+    };
+    class _OgrePrivate CmdColour : public ParamCommand
+    {
+    public:
+        String doGet( const void* target ) const;
+        void doSet( void* target, const String& val );
+    };
+    class _OgrePrivate CmdAlignment : public ParamCommand
+    {
+    public:
+        String doGet( const void* target ) const;
+        void doSet( void* target, const String& val );
+    };
+    // Command objects
+    static CmdCharHeight msCmdCharHeight;
+    static CmdSpaceWidth msCmdSpaceWidth;
+    static CmdFontName msCmdFontName;
+    static CmdColour msCmdColour;
+    static CmdColourTop msCmdColourTop;
+    static CmdColourBottom msCmdColourBottom;
+    static CmdAlignment msCmdAlignment;
     //---------------------------------------------------------------------
     #define POS_TEX_BINDING 0
     #define COLOUR_BINDING 1
@@ -648,12 +698,12 @@ namespace Ogre {
     //---------------------------------------------------------------------------------------------
     // Char height command object
     //
-    String TextAreaOverlayElement::CmdCharHeight::doGet( const void* target ) const
+    String CmdCharHeight::doGet( const void* target ) const
     {
         return StringConverter::toString( 
             static_cast< const TextAreaOverlayElement* >( target )->getCharHeight() );
     }
-    void TextAreaOverlayElement::CmdCharHeight::doSet( void* target, const String& val )
+    void CmdCharHeight::doSet( void* target, const String& val )
     {
         static_cast< TextAreaOverlayElement* >( target )->setCharHeight( 
             StringConverter::parseReal( val ) );
@@ -661,12 +711,12 @@ namespace Ogre {
     //---------------------------------------------------------------------------------------------
     // Space width command object
     //
-    String TextAreaOverlayElement::CmdSpaceWidth::doGet( const void* target ) const
+    String CmdSpaceWidth::doGet( const void* target ) const
     {
         return StringConverter::toString( 
             static_cast< const TextAreaOverlayElement* >( target )->getSpaceWidth() );
     }
-    void TextAreaOverlayElement::CmdSpaceWidth::doSet( void* target, const String& val )
+    void CmdSpaceWidth::doSet( void* target, const String& val )
     {
         static_cast< TextAreaOverlayElement* >( target )->setSpaceWidth( 
             StringConverter::parseReal( val ) );
@@ -676,11 +726,11 @@ namespace Ogre {
     //---------------------------------------------------------------------------------------------
     // Font name command object
     //
-    String TextAreaOverlayElement::CmdFontName::doGet( const void* target ) const
+    String CmdFontName::doGet( const void* target ) const
     {
         return static_cast< const TextAreaOverlayElement* >( target )->getFont()->getName();
     }
-    void TextAreaOverlayElement::CmdFontName::doSet( void* target, const String& val )
+    void CmdFontName::doSet( void* target, const String& val )
     {
         static_cast< TextAreaOverlayElement* >( target )->setFontName( val );
     }
@@ -688,12 +738,12 @@ namespace Ogre {
     //---------------------------------------------------------------------------------------------
     // Colour command object
     //
-    String TextAreaOverlayElement::CmdColour::doGet( const void* target ) const
+    String CmdColour::doGet( const void* target ) const
     {
         return StringConverter::toString (
             static_cast< const TextAreaOverlayElement* >( target )->getColour());
     }
-    void TextAreaOverlayElement::CmdColour::doSet( void* target, const String& val )
+    void CmdColour::doSet( void* target, const String& val )
     {
         static_cast< TextAreaOverlayElement* >( target )->setColour( 
             StringConverter::parseColourValue(val) );
@@ -703,12 +753,12 @@ namespace Ogre {
     //---------------------------------------------------------------------------------------------
     // Top colour command object
     //
-    String TextAreaOverlayElement::CmdColourTop::doGet( const void* target ) const
+    String CmdColourTop::doGet( const void* target ) const
     {
         return StringConverter::toString (
             static_cast< const TextAreaOverlayElement* >( target )->getColourTop());
     }
-    void TextAreaOverlayElement::CmdColourTop::doSet( void* target, const String& val )
+    void CmdColourTop::doSet( void* target, const String& val )
     {
         static_cast< TextAreaOverlayElement* >( target )->setColourTop( 
             StringConverter::parseColourValue(val) );
@@ -718,12 +768,12 @@ namespace Ogre {
     //---------------------------------------------------------------------------------------------
     // Bottom colour command object
     //
-    String TextAreaOverlayElement::CmdColourBottom::doGet( const void* target ) const
+    String CmdColourBottom::doGet( const void* target ) const
     {
         return StringConverter::toString (
             static_cast< const TextAreaOverlayElement* >( target )->getColourBottom());
     }
-    void TextAreaOverlayElement::CmdColourBottom::doSet( void* target, const String& val )
+    void CmdColourBottom::doSet( void* target, const String& val )
     {
         static_cast< TextAreaOverlayElement* >( target )->setColourBottom( 
             StringConverter::parseColourValue(val) );
@@ -733,35 +783,35 @@ namespace Ogre {
     //---------------------------------------------------------------------------------------------
     // Alignment command object
     //
-    String TextAreaOverlayElement::CmdAlignment::doGet( const void* target ) const
+    String CmdAlignment::doGet( const void* target ) const
     {
-        Alignment align = static_cast< const TextAreaOverlayElement* >( target )->getAlignment();
+        TextAreaOverlayElement::Alignment align = static_cast< const TextAreaOverlayElement* >( target )->getAlignment();
         switch (align)
         {
-            case Left:
+            case TextAreaOverlayElement::Left:
                 return "left";
-            case Center:
+            case TextAreaOverlayElement::Center:
                 return "center";
-            case Right:
+            case TextAreaOverlayElement::Right:
                 return "right";
                 
         }
         // To keep compiler happy
         return "left";
     }
-    void TextAreaOverlayElement::CmdAlignment::doSet( void* target, const String& val )
+    void CmdAlignment::doSet( void* target, const String& val )
     {
         if (val == "center")
         {
-            static_cast< TextAreaOverlayElement* >( target )->setAlignment(Center);
+            static_cast< TextAreaOverlayElement* >( target )->setAlignment(TextAreaOverlayElement::Center);
         }
         else if (val == "right")
         {
-            static_cast< TextAreaOverlayElement* >( target )->setAlignment(Right);
+            static_cast< TextAreaOverlayElement* >( target )->setAlignment(TextAreaOverlayElement::Right);
         }
         else
         {
-            static_cast< TextAreaOverlayElement* >( target )->setAlignment(Left);
+            static_cast< TextAreaOverlayElement* >( target )->setAlignment(TextAreaOverlayElement::Left);
         }
     }
     //---------------------------------------------------------------------------------------------
