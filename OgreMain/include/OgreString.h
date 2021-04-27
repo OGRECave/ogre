@@ -132,7 +132,7 @@ namespace Ogre {
             @param init The file path to normalize.
             @param makeLowerCase If true, transforms all characters in the string to lowercase.
         */
-        static String normalizeFilePath(const String& init, bool makeLowerCase = true);
+        static String normalizeFilePath(const String& init, bool makeLowerCase = false);
 
 
         /** Method for splitting a fully qualified filename into the base name
