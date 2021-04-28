@@ -563,11 +563,18 @@ namespace Ogre
         PFNGLXCREATECONTEXTATTRIBSARBPROC _glXCreateContextAttribsARB;
         _glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)getProcAddress("glXCreateContextAttribsARB");
 
-        ctxErrorOccurred = false;
-
         if(_glXCreateContextAttribsARB)
         {
-            glxContext = _glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
+            // find maximal supported context version
+            context_attribs[1] = 4;
+            context_attribs[3] = 6;
+            while(!glxContext && (context_attribs[1] >= majorVersion && context_attribs[3] >= minorVersion))
+            {
+                ctxErrorOccurred = false;
+                glxContext = _glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
+                context_attribs[1] -= context_attribs[3] == 0; // only decrement if minor == 0
+                context_attribs[3] = (context_attribs[3] - 1 + 7) % 7; // decrement: -1 -> 6
+            }
         }
         else
         {
