@@ -58,19 +58,6 @@ namespace Ogre {
             loadFromSource();
     }
     //-----------------------------------------------------------------------
-    void D3D11HLSLProgram::createConstantBuffer(const UINT ByteWidth)
-    {
-
-        // Create a constant buffer
-        D3D11_BUFFER_DESC cbDesc;
-        cbDesc.ByteWidth = ByteWidth;
-        cbDesc.Usage = D3D11_USAGE_DYNAMIC;
-        cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-        cbDesc.MiscFlags = 0;
-        OGRE_CHECK_DX_ERROR(mDevice->CreateBuffer(&cbDesc, NULL, mConstantBuffer.ReleaseAndGetAddressOf()));
-    }
-    //-----------------------------------------------------------------------
     void D3D11HLSLProgram::fixVariableNameFromCg(const ShaderVarWithPosInBuf& newVar)
     {
         String varForSearch = String(" :  : ") + newVar.name;
@@ -385,7 +372,6 @@ namespace Ogre {
 #endif
         if (FAILED(hr))
         {
-            mErrorsInCompile = true;
             String message = "Cannot compile D3D11 high-level shader " + mName + " Errors:\n" +
                 static_cast<const char*>(errors ? errors->GetBufferPointer() : "<null>");
 			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
@@ -1059,7 +1045,6 @@ namespace Ogre {
         mDomainShader.Reset();
         mHullShader.Reset();
         mComputeShader.Reset();
-        mConstantBuffer.Reset();
 
         for(unsigned int i = 0 ; i < mSerStrings.size() ; i++)
         {
@@ -1294,7 +1279,7 @@ namespace Ogre {
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, D3D11Device & device)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
-        , mEntryPoint("main"), mErrorsInCompile(false), mDevice(device), mConstantBufferSize(0)
+        , mEntryPoint("main"), mDevice(device), mConstantBufferSize(0)
         , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), mReinterpretingGS(false)
     {
 #if SUPPORT_SM2_0_HLSL_SHADERS == 1
@@ -1324,7 +1309,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     D3D11HLSLProgram::~D3D11HLSLProgram()
     {
-        //mConstantBuffer.Reset();
         mBufferInfoMap.clear();
 
         // have to call this here rather than in Resource destructor
