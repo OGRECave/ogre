@@ -50,8 +50,6 @@ def main():
         "-DOGRE_BUILD_PLUGIN_PCZ=OFF",
         # not yet wrapped components
         "-DOGRE_BUILD_COMPONENT_MESHLODGENERATOR=OFF",
-        "-DOGRE_BUILD_COMPONENT_PAGING=OFF",
-        "-DOGRE_BUILD_COMPONENT_TERRAIN=OFF",
         "-DOGRE_BUILD_COMPONENT_VOLUME=OFF"
     ]
 
