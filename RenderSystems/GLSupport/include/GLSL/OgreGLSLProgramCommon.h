@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreConfig.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreGLSLShaderCommon.h"
-#include "OgreHardwareUniformBuffer.h"
 
 #include <array>
 
@@ -51,10 +50,6 @@ struct GLUniformReference
 };
 typedef std::vector<GLUniformReference> GLUniformReferenceList;
 typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
-
-typedef std::vector<HardwareUniformBufferSharedPtr> GLUniformBufferList;
-typedef GLUniformBufferList::iterator GLUniformBufferIterator;
-typedef std::map<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> SharedParamsBufferMap;
 
 typedef  std::array<GLSLShaderCommon*, GPT_COUNT> GLShaderList;
 

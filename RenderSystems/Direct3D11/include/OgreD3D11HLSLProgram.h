@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreD3D11DeviceResource.h"
 #include "OgreHighLevelGpuProgram.h"
-#include "OgreHardwareUniformBuffer.h"
 
 
 namespace Ogre {
@@ -150,7 +149,7 @@ namespace Ogre {
             static _StringHash mHash;
             unsigned int mIdx;
             String mName;
-            mutable HardwareUniformBufferSharedPtr mUniformBuffer;
+            mutable HardwareBufferPtr mUniformBuffer;
             mutable ShaderVars mShaderVars;
                 
             // Default constructor

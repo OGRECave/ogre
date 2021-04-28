@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 #include "OgreSingleton.h"
 #include "OgreHardwareIndexBuffer.h"
-#include "OgreHardwareUniformBuffer.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
@@ -281,17 +280,9 @@ namespace Ogre {
          * and sharing between shader stages or even shaders from another materials. 
          * The update shall be triggered by GpuProgramParameters, if is dirty
          */
-        virtual HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
-                                    HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-                                    bool useShadowBuffer = false, const String& name = "");
-
-        /**
-         * Create counter buffer.
-         * The update shall be triggered by GpuProgramParameters, if is dirty
-         */
-        virtual HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
-                                                                   HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                                                                   bool useShadowBuffer = false, const String& name = "");
+        virtual HardwareBufferPtr createUniformBuffer(size_t sizeBytes,
+                                                      HardwareBufferUsage usage = HBU_CPU_TO_GPU,
+                                                      bool useShadowBuffer = false);
 
         /** Creates a new vertex declaration. */
         VertexDeclaration* createVertexDeclaration(void);
@@ -410,10 +401,6 @@ namespace Ogre {
         void _notifyVertexBufferDestroyed(HardwareVertexBuffer* buf);
         /// Notification that a hardware index buffer has been destroyed.
         void _notifyIndexBufferDestroyed(HardwareIndexBuffer* buf);
-        /// Notification that at hardware uniform buffer has been destroyed
-        void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf);
-        /// Notification that at hardware counter buffer has been destroyed
-        void _notifyCounterBufferDestroyed(HardwareCounterBuffer* buf);
     };
 
     /** Singleton wrapper for hardware buffer manager. */

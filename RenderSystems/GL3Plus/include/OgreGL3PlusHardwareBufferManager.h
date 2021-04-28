@@ -54,15 +54,16 @@ namespace Ogre {
             HardwareIndexBuffer::IndexType itype, size_t numIndexes,
             HardwareBuffer::Usage usage, bool useShadowBuffer = false);
         /// Create a uniform buffer
-        HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                                                           bool useShadowBuffer = false, const String& name = "");
+        HardwareBufferPtr createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage = HBU_CPU_TO_GPU,
+                                              bool useShadowBuffer = false) override;
 
         /// Create a shader storage buffer.
-        HardwareUniformBufferSharedPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                                                                 bool useShadowBuffer = false, const String& name = "");
+        HardwareBufferPtr createShaderStorageBuffer(size_t sizeBytes,
+                                                    HardwareBufferUsage usage = HBU_CPU_TO_GPU,
+                                                    bool useShadowBuffer = false);
         /// Create a counter buffer
-        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                           bool useShadowBuffer, const String& name = "");
+        HardwareBufferPtr createCounterBuffer(size_t sizeBytes, HardwareBufferUsage usage = HBU_GPU_ONLY,
+                                              bool useShadowBuffer = false);
         /// Create a render to vertex buffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 

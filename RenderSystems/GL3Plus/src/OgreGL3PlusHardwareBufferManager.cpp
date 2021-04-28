@@ -91,10 +91,10 @@ namespace Ogre {
         return buf;
     }
 
-    HardwareUniformBufferSharedPtr GL3PlusHardwareBufferManager::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+    HardwareBufferPtr GL3PlusHardwareBufferManager::createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage, bool useShadowBuffer)
     {
         auto impl = new GL3PlusHardwareBuffer(GL_UNIFORM_BUFFER, sizeBytes, usage, useShadowBuffer);
-        auto buf = std::make_shared<HardwareUniformBuffer>(this, impl);
+        auto buf = HardwareBufferPtr(impl);
         {
             OGRE_LOCK_MUTEX(mUniformBuffersMutex);
             mUniformBuffers.insert(buf.get());
@@ -102,10 +102,10 @@ namespace Ogre {
         return buf;
     }
 
-    HardwareUniformBufferSharedPtr GL3PlusHardwareBufferManager::createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+    HardwareBufferPtr GL3PlusHardwareBufferManager::createShaderStorageBuffer(size_t sizeBytes, HardwareBufferUsage usage, bool useShadowBuffer)
     {
         auto impl = new GL3PlusHardwareBuffer(GL_SHADER_STORAGE_BUFFER, sizeBytes, usage, useShadowBuffer);
-        auto buf = std::make_shared<HardwareUniformBuffer>(this, impl);
+        auto buf = HardwareBufferPtr(impl);
         {
             OGRE_LOCK_MUTEX(mUniformBuffersMutex);
             mShaderStorageBuffers.insert(buf.get());
@@ -113,10 +113,10 @@ namespace Ogre {
         return buf;
     }
 
-    HardwareCounterBufferSharedPtr GL3PlusHardwareBufferManager::createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+    HardwareBufferPtr GL3PlusHardwareBufferManager::createCounterBuffer(size_t sizeBytes, HardwareBufferUsage usage, bool useShadowBuffer)
     {
         auto impl = new GL3PlusHardwareBuffer(GL_ATOMIC_COUNTER_BUFFER, sizeBytes, usage, useShadowBuffer);
-        auto buf = std::make_shared<HardwareUniformBuffer>(this, impl);
+        auto buf = HardwareBufferPtr(impl);
         {
             OGRE_LOCK_MUTEX(mCounterBuffersMutex);
             mCounterBuffers.insert(buf.get());

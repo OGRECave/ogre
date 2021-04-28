@@ -93,18 +93,10 @@ namespace Ogre {
         DefaultHardwareIndexBuffer* ib = OGRE_NEW DefaultHardwareIndexBuffer(itype, numIndexes, usage);
         return HardwareIndexBufferSharedPtr(ib);
     }
-    HardwareUniformBufferSharedPtr 
-        DefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, 
-                                    HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+    HardwareBufferPtr DefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes,
+                                                                            HardwareBufferUsage usage,
+                                                                            bool useShadowBuffer)
     {
-        DefaultHardwareUniformBuffer* ub = OGRE_NEW DefaultHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer);
-        return HardwareUniformBufferSharedPtr(ub);
-    }
-    HardwareCounterBufferSharedPtr
-    DefaultHardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
-                                                          HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-    {
-        DefaultHardwareUniformBuffer* ub = OGRE_NEW DefaultHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer);
-        return HardwareCounterBufferSharedPtr(ub);
+        return HardwareBufferPtr(new DefaultHardwareBuffer(sizeBytes));
     }
 }

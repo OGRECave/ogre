@@ -31,7 +31,6 @@
 #include "OgreGLES2Prerequisites.h"
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
-#include "OgreHardwareUniformBuffer.h"
 #include "OgreGLUniformCache.h"
 #include "OgreGLSLProgramCommon.h"
 #include "OgreGLSLESProgram.h"

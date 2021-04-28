@@ -57,9 +57,8 @@ namespace Ogre {
         /// @copydoc HardwareBufferManager::createRenderToVertexBuffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
         /// @copydoc HardwareBufferManager::createUniformBuffer
-        HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
-                                    HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-                                    bool useShadowBuffer = false, const String& name = "");
+        HardwareBufferPtr createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage = HBU_CPU_TO_GPU,
+                                              bool useShadowBuffer = false) override;
     };
 
     typedef D3D11HardwareBufferManager D3D11HardwareBufferManagerBase;
