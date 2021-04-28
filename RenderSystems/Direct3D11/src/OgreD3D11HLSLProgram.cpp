@@ -58,39 +58,6 @@ namespace Ogre {
             loadFromSource();
     }
     //-----------------------------------------------------------------------
-    void D3D11HLSLProgram::fixVariableNameFromCg(const ShaderVarWithPosInBuf& newVar)
-    {
-        String varForSearch = String(" :  : ") + newVar.name;
-        size_t startPosOfVarOrgNameInSource = 0;
-        size_t endPosOfVarOrgNameInSource = mSource.find(varForSearch + " ");
-        if(endPosOfVarOrgNameInSource == -1)
-        {
-            endPosOfVarOrgNameInSource = mSource.find(varForSearch + "[");
-        }
-        if(endPosOfVarOrgNameInSource != -1)
-        {
-            // find space before var;
-            for (size_t i = endPosOfVarOrgNameInSource - 1 ; i > 0 ; i-- )
-            {
-                if (mSource[i] == ' ')
-                {
-                    startPosOfVarOrgNameInSource = i + 1;
-                    break;
-                }
-            }
-            if (startPosOfVarOrgNameInSource > 0)
-            {
-                newVar.name = mSource.substr(startPosOfVarOrgNameInSource, endPosOfVarOrgNameInSource - startPosOfVarOrgNameInSource);
-            }
-        }
-
-        // hack for cg parameter with strange prefix
-        if (newVar.name.size() > 0 && newVar.name[0] == '_')
-        {
-            newVar.name.erase(0,1);
-        }
-    }
-    //-----------------------------------------------------------------------
     void D3D11HLSLProgram::prepareImpl()
     {
         HighLevelGpuProgram::prepareImpl();
@@ -891,6 +858,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::analizeMicrocode()
     {
+        getConstantDefinitions();
+        auto& params = *mConstantDefs;
+
         UINT bufferCount = 0;
         UINT pointerCount = 0;
         UINT typeCount = 0;
@@ -972,17 +942,16 @@ namespace Ogre {
                                     const UINT parentOffset = mVarDescBuffer[bufferCount - 1].StartOffset;
                                     for(UINT m = 0; m < mD3d11ShaderTypeDescs[typeCount-1].Members; m++)
                                     {
-                                        ShaderVarWithPosInBuf newVar;
-                                        newVar.name = mVarDescBuffer[bufferCount - 1].Name;
-                                        newVar.name += "."; 
-                                        newVar.name += mMemberTypeName[nameCount++].Name;
-                                        newVar.size = mMemberTypeDesc[memberCount].Rows * mMemberTypeDesc[memberCount].Columns * 
+                                        String name = mVarDescBuffer[bufferCount-1].Name;
+                                        name += ".";
+                                        name += mMemberTypeName[nameCount++].Name;
+
+                                        auto& def = params.map[name];
+                                        /*newVar.size = mMemberTypeDesc[memberCount].Rows * mMemberTypeDesc[memberCount].Columns *
                                                                     (mMemberTypeDesc[memberCount].Type == D3D_SVT_FLOAT ||
-                                                                        mMemberTypeDesc[memberCount].Type == D3D_SVT_INT ? 4 : 1);
-                                        newVar.startOffset = parentOffset + mMemberTypeDesc[memberCount].Offset;
+                                                                        mMemberTypeDesc[memberCount].Type == D3D_SVT_INT ? 4 : 1);*/
+                                        def.physicalIndex = parentOffset + mMemberTypeDesc[memberCount].Offset;
                                         memberCount++;
-                                        fixVariableNameFromCg(newVar);
-                                        it->mShaderVars.push_back(newVar);
                                     }
                                 }
                                 break;
@@ -993,13 +962,8 @@ namespace Ogre {
                             case D3D_SVC_MATRIX_ROWS:
                             case D3D_SVC_MATRIX_COLUMNS:
                                 {
-                                    ShaderVarWithPosInBuf newVar;
-                                    newVar.name = mVarDescBuffer[bufferCount-1].Name;
-                                    newVar.size = mVarDescBuffer[bufferCount-1].Size;
-                                    newVar.startOffset = mVarDescBuffer[bufferCount-1].StartOffset;
-
-                                    fixVariableNameFromCg(newVar);
-                                    it->mShaderVars.push_back(newVar);
+                                    auto& name = mVarDescBuffer[bufferCount-1].Name;
+                                    params.map[name].physicalIndex = mVarDescBuffer[bufferCount-1].StartOffset;
                                 }
                                 break;
                             };
@@ -1688,45 +1652,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     ID3D11Buffer* D3D11HLSLProgram::getConstantBuffer(GpuProgramParametersSharedPtr params, uint16 variabilityMask)
     {
+        if(mBufferInfoMap.empty())
+            return NULL;
         // Update the Constant Buffer
+        BufferInfoIterator it = mBufferInfoMap.begin();
         
-		if(!mBufferInfoMap.empty())
-        {
-			BufferInfoIterator it = mBufferInfoMap.begin();
-            
-            if (it->mUniformBuffer)
-            {
-                HardwareBufferLockGuard uniformLock(it->mUniformBuffer, HardwareBuffer::HBL_DISCARD);
+        OgreAssert(it->mUniformBuffer, "no uniform buffer");
+        OgreAssert(it->mUniformBuffer->getSizeInBytes() <= params->getConstantList().size(), "wrong buffer size");
+        it->mUniformBuffer->writeData(0, it->mUniformBuffer->getSizeInBytes(), params->getConstantList().data(), true);
 
-                // Only iterate through parsed variables (getting size of list)
-                ShaderVarWithPosInBuf* iter = &(it->mShaderVars[0]);
-                unsigned int lSize = it->mShaderVars.size();
-                for (size_t i = 0 ; i < lSize; i++, iter++)
-                {
-                    const GpuConstantDefinition& def = params->getConstantDefinition(iter->name);
-                    // Since we are mapping with write discard, contents of the buffer are undefined.
-                    // We must set every variable, even if it has not changed.
-                    //if (def.variability & variabilityMask)
-                    {
-                        if (def.isFloat() || def.isInt() || def.isUnsignedInt())
-                        {
-                            auto src = params->getConstantList().data() + def.physicalIndex;
-                            memcpy( &(((char *)(uniformLock.pData))[iter->startOffset]), src , iter->size);
-                        }
-                        else
-                        {
-                            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-                                        "Currently the only supported variables for Direct3D11 hlsl program are: 'float', 'int' and ' unsigned int'", 
-                                        "D3D11HLSLProgram::getConstantBuffer");
-                        }
-                    }
-                }
-
-                return static_cast<D3D11HardwareBuffer*>(it->mUniformBuffer.get())->getD3DBuffer();
-            }
-        }
-
-        return NULL;
+        return static_cast<D3D11HardwareBuffer*>(it->mUniformBuffer.get())->getD3DBuffer();
     }
     //-----------------------------------------------------------------------------
     void D3D11HLSLProgram::getConstantBuffers(ID3D11Buffer** buffers, unsigned int& numBuffers,
@@ -1738,45 +1673,13 @@ namespace Ogre {
         BufferInfoIterator end = mBufferInfoMap.end();
         while (it != end)
         {
-            if (it->mUniformBuffer)
-            {
-                HardwareBufferLockGuard uniformLock(it->mUniformBuffer, HardwareBuffer::HBL_DISCARD);
+            OgreAssert (it->mUniformBuffer, "no uniform buffer");
+            it->mUniformBuffer->writeData(0, params->getConstantList().size(), params->getConstantList().data(), true);
 
-                // Only iterate through parsed variables (getting size of list)
-                ShaderVarWithPosInBuf* iter = &(it->mShaderVars[0]);
-                unsigned int lSize = it->mShaderVars.size();
-                for (size_t i = 0 ; i < lSize; i++, iter++)
-                {
-                    const GpuConstantDefinition& def = params->getConstantDefinition(iter->name);
-                    // Since we are mapping with write discard, contents of the buffer are undefined.
-                    // We must set every variable, even if it has not changed.
-                    //if (def.variability & variabilityMask)
-                    {
-                        auto src = params->getConstantList().data() + def.physicalIndex;
-                        memcpy( &(((char *)(uniformLock.pData))[iter->startOffset]), src , iter->size);
-                    }
-                }
-
-                // Add buffer to list
-                buffers[numBuffers] = static_cast<D3D11HardwareBuffer*>(it->mUniformBuffer.get())->getD3DBuffer();
-                // Increment number of buffers
-                numBuffers++;
-            }
-        }
-
-        // Update class instances
-        SlotIterator sit = mSlotMap.begin();
-        SlotIterator send = mSlotMap.end();
-        while (sit != send)
-        {
-            // Get constant name
-            const GpuConstantDefinition& def = params->getConstantDefinition(sit->first);
-
-            // Set to correct slot
-            //classes[sit->second] = 
-            
-            // Increment class count
-            numClasses++;
+            // Add buffer to list
+            buffers[numBuffers] = static_cast<D3D11HardwareBuffer*>(it->mUniformBuffer.get())->getD3DBuffer();
+            // Increment number of buffers
+            numBuffers++;
         }
     }
     //-----------------------------------------------------------------------------

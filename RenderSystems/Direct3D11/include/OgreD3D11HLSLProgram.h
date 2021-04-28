@@ -113,29 +113,6 @@ namespace Ogre {
         ComPtr<ID3D11DomainShader> mDomainShader;
         ComPtr<ID3D11HullShader> mHullShader;
         ComPtr<ID3D11ComputeShader> mComputeShader;
-
-        struct ShaderVarWithPosInBuf
-        {
-            mutable String name;
-            size_t size;
-            size_t startOffset;
-            
-            ShaderVarWithPosInBuf& operator=(const ShaderVarWithPosInBuf& var)
-            {
-                name = var.name;
-                size = var.size;
-                startOffset = var.startOffset;
-                return *this;
-            }
-        };
-        typedef std::vector<ShaderVarWithPosInBuf> ShaderVars;
-        typedef ShaderVars::iterator ShaderVarsIter;
-        typedef ShaderVars::const_iterator ShaderVarsConstIter; 
-
-        // A hack for cg to get the "original name" of the var in the "auto comments"
-        // that cg adds to the hlsl 4 output. This is to solve the issue that
-        // in some cases cg changes the name of the var to a new name.
-        void fixVariableNameFromCg(const ShaderVarWithPosInBuf& newVar);
         
         // HACK: Multi-index emulation container to store constant buffer information by index and name at same time
         // using tips from http://www.boost.org/doc/libs/1_35_0/libs/multi_index/doc/performance.html
@@ -143,11 +120,9 @@ namespace Ogre {
 #define INVALID_IDX (unsigned int)-1
         struct BufferInfo
         {
-            static _StringHash mHash;
             unsigned int mIdx;
             String mName;
             mutable HardwareBufferPtr mUniformBuffer;
-            mutable ShaderVars mShaderVars;
                 
             // Default constructor
             BufferInfo() : mIdx(0), mName("") { mUniformBuffer.reset(); }
@@ -162,7 +137,6 @@ namespace Ogre {
                 : mIdx(info.mIdx)
                 , mName(info.mName)
                 , mUniformBuffer(info.mUniformBuffer)
-                , mShaderVars(info.mShaderVars)
             {
 
             }
@@ -173,7 +147,6 @@ namespace Ogre {
                 this->mIdx = info.mIdx;
                 this->mName = info.mName;
                 mUniformBuffer = info.mUniformBuffer;
-                mShaderVars = info.mShaderVars;
                 return *this;
             }
             
