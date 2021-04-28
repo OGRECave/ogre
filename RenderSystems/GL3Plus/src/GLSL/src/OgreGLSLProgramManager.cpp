@@ -322,14 +322,14 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
 
                 auto binding = hbm.getUniformBufferCount();
-                hwGlBuffer = hbm.createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
-                hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->setGLBufferBinding(int(binding));
+                hwGlBuffer = hbm.createUniformBuffer(blockSize);
+                static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->setGLBufferBinding(int(binding));
 
                 blockSharedParams->_setHardwareBuffer(hwGlBuffer);
             }
 
             OGRE_CHECK_GL_ERROR(glUniformBlockBinding(
-                programObject, index, hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->getGLBufferBinding()));
+                programObject, index, static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->getGLBufferBinding()));
         }
 
         // Now deal with shader storage blocks
@@ -360,15 +360,15 @@ namespace Ogre {
                     //TODO Implement shared param access param in materials (R, W, R+W)
 
                     auto binding = hbm.getShaderStorageBufferCount();
-                    hwGlBuffer = hbm.createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
-                    hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->setGLBufferBinding(binding);
+                    hwGlBuffer = hbm.createShaderStorageBuffer(blockSize);
+                    static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->setGLBufferBinding(binding);
 
                     blockSharedParams->_setHardwareBuffer(hwGlBuffer);
                 }
 
                 OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(
                     programObject, index,
-                    hwGlBuffer->_getImpl<GL3PlusHardwareBuffer>()->getGLBufferBinding()));
+                    static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->getGLBufferBinding()));
             }
         }
 
@@ -391,9 +391,9 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_DATA_SIZE, &bufferSize));
                 OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_BINDING, &bufferBinding));
                 //TODO check parameters of this GL call
-                HardwareCounterBufferSharedPtr newCounterBuffer = HardwareBufferManager::getSingleton().createCounterBuffer(bufferSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
+                auto newCounterBuffer = hbm.createCounterBuffer(bufferSize);
 
-                auto hwGlBuffer = newCounterBuffer->_getImpl<GL3PlusHardwareBuffer>();
+                auto hwGlBuffer = static_cast<GL3PlusHardwareBuffer*>(newCounterBuffer.get());
                 hwGlBuffer->setGLBufferBinding(bufferBinding);
                 counterBufferList.push_back(newCounterBuffer);
             }

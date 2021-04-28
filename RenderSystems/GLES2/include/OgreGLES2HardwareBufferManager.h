@@ -55,11 +55,9 @@ namespace Ogre {
                 HardwareBuffer::Usage usage, bool useShadowBuffer = false);
             /// Create a render to vertex buffer
             RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
-            HardwareUniformBufferSharedPtr
-            createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "");
             /// Create a uniform buffer
-            HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                               bool useShadowBuffer, size_t binding, const String& name = "");
+            HardwareBufferPtr createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage,
+                                                  bool useShadowBuffer) override;
             /// Utility function to get the correct GL type based on VET's
             static GLenum getGLType(VertexElementType type);
 

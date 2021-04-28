@@ -961,8 +961,7 @@ namespace Ogre {
                     // Guard to create uniform buffer only once
                     if (!it->mUniformBuffer)
                     {
-                        HardwareUniformBufferSharedPtr uBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
-                        it->mUniformBuffer = HardwareUniformBufferSharedPtr(uBuffer);
+                        it->mUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size);
                     }
                     else
                     {
@@ -1739,7 +1738,7 @@ namespace Ogre {
                     }
                 }
 
-                return it->mUniformBuffer->_getImpl<D3D11HardwareBuffer>()->getD3DBuffer();
+                return static_cast<D3D11HardwareBuffer*>(it->mUniformBuffer.get())->getD3DBuffer();
             }
         }
 
@@ -1775,7 +1774,7 @@ namespace Ogre {
                 }
 
                 // Add buffer to list
-                buffers[numBuffers] = it->mUniformBuffer->_getImpl<D3D11HardwareBuffer>()->getD3DBuffer();
+                buffers[numBuffers] = static_cast<D3D11HardwareBuffer*>(it->mUniformBuffer.get())->getD3DBuffer();
                 // Increment number of buffers
                 numBuffers++;
             }

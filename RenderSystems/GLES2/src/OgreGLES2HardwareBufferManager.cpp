@@ -162,7 +162,7 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    HardwareUniformBufferSharedPtr GLES2HardwareBufferManager::createUniformBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name )
+    HardwareBufferPtr GLES2HardwareBufferManager::createUniformBuffer( size_t sizeBytes, HardwareBufferUsage usage, bool useShadowBuffer)
     {
         if (!mRenderSystem->hasMinGLVersion(3, 0))
         {
@@ -170,7 +170,7 @@ namespace Ogre {
         }
 
         auto impl = new GLES2HardwareBuffer(GL_UNIFORM_BUFFER, sizeBytes, usage, useShadowBuffer);
-        auto buf = std::make_shared<HardwareUniformBuffer>(this, impl);
+        auto buf = HardwareBufferPtr(impl);
         {
             OGRE_LOCK_MUTEX(mUniformBuffersMutex);
             mUniformBuffers.insert(buf.get());

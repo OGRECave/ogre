@@ -570,6 +570,7 @@ SHARED_PTR(Compositor);
 %ignore Ogre::CompositionTargetPass::getPassIterator;
 %include "OgreCompositionTargetPass.h"
 %include "OgreResourceBackgroundQueue.h"
+SHARED_PTR(HardwareBuffer);
 SHARED_PTR(HardwareVertexBuffer);
 #ifdef SWIGPYTHON
 %template(VertexElementList) std::list<Ogre::VertexElement>;
@@ -582,10 +583,6 @@ SHARED_PTR(HardwarePixelBuffer);
 %ignore Ogre::HardwarePixelBuffer::lock;  // duplicate definition
 #endif
 %include "OgreHardwarePixelBuffer.h"
-SHARED_PTR(HardwareCounterBuffer);
-%include "OgreHardwareCounterBuffer.h"
-SHARED_PTR(HardwareUniformBuffer);
-%include "OgreHardwareUniformBuffer.h"
 %ignore Ogre::HardwareBufferManagerBase::_forceReleaseBufferCopies(HardwareVertexBuffer* sourceBuffer);
 %include "OgreHardwareBufferManager.h"
 %include "OgreVertexIndexData.h"

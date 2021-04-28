@@ -389,6 +389,9 @@ namespace Ogre {
             }
     };
 
+    typedef HardwareBuffer HardwareCounterBuffer;
+    typedef HardwareBuffer HardwareUniformBuffer;
+
     /** Locking helper. Guaranteed unlocking even in case of exception. */
     struct HardwareBufferLockGuard
     {

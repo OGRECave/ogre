@@ -102,8 +102,8 @@ namespace Ogre {
 		return RenderToVertexBufferSharedPtr(new D3D11RenderToVertexBuffer(mlpD3DDevice, this));
 	}
 	//-----------------------------------------------------------------------
-	HardwareUniformBufferSharedPtr
-		D3D11HardwareBufferManager::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+	HardwareBufferPtr
+		D3D11HardwareBufferManager::createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage, bool useShadowBuffer)
 	{
 		assert(sizeBytes > 0);
 		/*
@@ -130,7 +130,7 @@ namespace Ogre {
 		{*/
 		auto impl = new D3D11HardwareBuffer(D3D11HardwareBuffer::CONSTANT_BUFFER,
 										sizeBytes, usage, mlpD3DDevice, useShadowBuffer, false);
-		auto buf = std::make_shared<HardwareUniformBuffer>(this, impl);
+		auto buf = HardwareBufferPtr(impl);
 		{
 			OGRE_LOCK_MUTEX(mUniformBuffersMutex);
 			mUniformBuffers.insert(buf.get());
