@@ -93,8 +93,6 @@ namespace Ogre {
         void createLowLevelImpl(void) {}
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
-        /// Populate the passed parameters with name->index map, must be overridden
-        void populateParameterNames(GpuProgramParametersSharedPtr params);
 
         // Recursive utility method for populateParameterNames
         void processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType);

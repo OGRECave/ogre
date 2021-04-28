@@ -443,12 +443,6 @@ namespace Ogre {
         mCompiled = false;
     }
     //-----------------------------------------------------------------------
-    void MetalProgram::populateParameterNames(GpuProgramParametersSharedPtr params)
-    {
-        getConstantDefinitions();
-        params->_setNamedConstants(mConstantDefs);
-    }
-    //-----------------------------------------------------------------------
     void MetalProgram::buildConstantDefinitions(void) const
     {
         if( mType == GPT_FRAGMENT_PROGRAM && mShaderReflectionPairHint.empty() )
@@ -476,6 +470,8 @@ namespace Ogre {
         {
             const_cast<MetalProgram*>(this)->analyzeComputeParameters();
         }
+
+        mLogicalToPhysical.reset(); // disallow access by index for now
     }
     //-----------------------------------------------------------------------
     uint32 MetalProgram::getBufferRequiredSize(void) const

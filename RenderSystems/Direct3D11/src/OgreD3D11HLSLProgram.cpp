@@ -1112,39 +1112,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-
-    void D3D11HLSLProgram::populateParameterNames(GpuProgramParametersSharedPtr params)
-    {
-        // Call superclass method
-        HighLevelGpuProgram::populateParameterNames(params);
-        
-        /*
-        // Construct uniform buffers for shared parameters, if any
-        // Also, construct uniform buffers for non-shared parameters (will be hosted inside program)
-        const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-        GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
-        for (it = sharedParams.begin(); it != end; ++it)
-        {
-            ID3D11ShaderReflectionConstantBuffer* bufferInfo = mIShaderReflection->GetConstantBufferByName(it->getName().c_str());
-            if (!bufferInfo)
-            {
-
-            }
-
-            D3D11_SHADER_BUFFER_DESC bufferDesc;
-            bufferInfo->GetDesc(&bufferDesc);
-
-            HardwareUniformBufferSharedPtr uniformBuffer = 
-                        HardwareBufferManager::getSingleton()
-                                              .createUniformBuffer(bufferDesc.Size, 
-                                                                   HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-                                                                   false, it->getName());
-            it->_setRenderSystemData(Any(uniformBuffer));
-        }
-        */
-
-    }
-    //-----------------------------------------------------------------------
     void D3D11HLSLProgram::processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType)
     {
         D3D11_SHADER_TYPE_DESC varRefTypeDesc;
