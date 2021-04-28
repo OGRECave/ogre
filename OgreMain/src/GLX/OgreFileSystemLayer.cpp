@@ -80,7 +80,8 @@ namespace Ogre
     {
         // With Ubuntu snaps absolute paths are relative to the snap package.
         char* env_SNAP = getenv("SNAP");
-        if(env_SNAP && !path.empty() && path[0] == '/') // only adjust absolute dirs
+        if (env_SNAP && !path.empty() && path[0] == '/' && // only adjust absolute dirs
+            !StringUtil::startsWith(path, "/snap")) // not a snap path already
             path = env_SNAP + path;
 
         return path;
