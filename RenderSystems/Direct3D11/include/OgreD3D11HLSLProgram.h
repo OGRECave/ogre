@@ -235,14 +235,14 @@ namespace Ogre {
 
         struct GpuConstantDefinitionWithName : GpuConstantDefinition
         {
-            LPCSTR                  Name;          
+            String                  Name;
         };
         typedef std::vector<GpuConstantDefinitionWithName> D3d11ShaderVariableSubparts;
         typedef D3d11ShaderVariableSubparts::iterator D3d11ShaderVariableSubpartsIter; 
 
         struct MemberTypeName
         {
-            LPCSTR                  Name;           
+            String                  Name;
         };
 
         std::vector<String *> mSerStrings;

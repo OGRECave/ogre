@@ -172,6 +172,15 @@ namespace Ogre {
     }                                                       \
         }
 
+#define READ_NAME2(member) {                                 \
+    uint16 length = 0;                                      \
+    cacheMicrocode->read(&length, sizeof(uint16));          \
+    if(length > 0)                                          \
+    {                                                       \
+        curItem.member.resize(length);                           \
+        cacheMicrocode->read(&(curItem.member[0]), length);      \
+    }                                                       \
+        }
 
         uint32 microCodeSize = 0;
         cacheMicrocode->read(&microCodeSize, sizeof(uint32));
@@ -219,7 +228,7 @@ namespace Ogre {
         READ_END
 
         READ_START(mD3d11ShaderVariableSubparts, GpuConstantDefinitionWithName)
-        READ_NAME(Name)
+        READ_NAME2(Name)
         READ_ENUM(constType, GpuConstantType)
         READ_UINT(physicalIndex)
         READ_UINT(logicalIndex)
@@ -281,7 +290,7 @@ namespace Ogre {
         READ_END
 
         READ_START(mMemberTypeName, MemberTypeName)
-        READ_NAME(Name)
+        READ_NAME2(Name)
         READ_END
 
         uint16 mInterfaceSlotsSize = 0;
@@ -539,11 +548,7 @@ namespace Ogre {
                                     D3D11_SHADER_TYPE_DESC varTypeDesc;
                                     ID3D11ShaderReflectionType* varType = varRef->GetType();
                                     varType->GetDesc(&varTypeDesc);
-                                    if(varTypeDesc.Name == NULL)
-                                    {
-                                        mSerStrings.push_back(new String());
-                                    }
-                                    else
+                                    if(varTypeDesc.Name)
                                     {
                                         String * name = new String(varTypeDesc.Name);
                                         mSerStrings.push_back(name);
@@ -569,11 +574,7 @@ namespace Ogre {
                                                 mMemberTypeDesc.push_back(memberTypeDesc);
                                             }
                                             {
-                                                String * name = new String(varType->GetMemberTypeName(m));
-                                                mSerStrings.push_back(name);
-                                                MemberTypeName memberTypeName;
-                                                memberTypeName.Name = &(*name)[0];
-                                                mMemberTypeName.push_back(memberTypeName);
+                                                mMemberTypeName.push_back({varType->GetMemberTypeName(m)});
                                             }
                                             
                                         }
@@ -612,13 +613,13 @@ namespace Ogre {
                 GET_SIZE_OF_NAMES(inputNamesSize, mD3d11ShaderInputParameters, SemanticName);
                 GET_SIZE_OF_NAMES(outputNamesSize, mD3d11ShaderOutputParameters, SemanticName);
                 GET_SIZE_OF_NAMES(varNamesSize, mD3d11ShaderVariables, Name);
-                GET_SIZE_OF_NAMES(varSubpartSize, mD3d11ShaderVariableSubparts, Name);
+                GET_SIZE_OF_NAMES(varSubpartSize, mD3d11ShaderVariableSubparts, Name.c_str());
                 GET_SIZE_OF_NAMES(d3d11ShaderBufferDescsSize, mD3d11ShaderBufferDescs, Name);
                 GET_SIZE_OF_NAMES(varDescBufferSize, mVarDescBuffer, Name);
                 GET_SIZE_OF_NAMES(varDescPointerSize, mVarDescPointer, Name);
                 GET_SIZE_OF_NAMES(d3d11ShaderTypeDescsSize, mD3d11ShaderTypeDescs, Name);
                 GET_SIZE_OF_NAMES(memberTypeDescSize, mMemberTypeDesc, Name);
-                GET_SIZE_OF_NAMES(memberTypeNameSize, mMemberTypeName, Name);
+                GET_SIZE_OF_NAMES(memberTypeNameSize, mMemberTypeName, Name.c_str());
 
                 int sizeOfData =   sizeof(uint32) +  mMicroCode.size()
                                  + sizeof(uint32) // mConstantBufferSize
@@ -822,7 +823,7 @@ namespace Ogre {
                 WRITE_END
 
                 WRITE_START(mD3d11ShaderVariableSubparts, GpuConstantDefinitionWithName)
-                WRITE_NAME(Name)
+                WRITE_NAME(Name.c_str())
                 WRITE_ENUM(constType, GpuConstantType)
                 WRITE_UINT(physicalIndex)
                 WRITE_UINT(logicalIndex)
@@ -884,7 +885,7 @@ namespace Ogre {
                 WRITE_END
 
                 WRITE_START(mMemberTypeName, MemberTypeName)
-                WRITE_NAME(Name)
+                WRITE_NAME(Name.c_str())
                 WRITE_END
 
                 uint16 mInterfaceSlotsSize = (uint16)mInterfaceSlots.size();
@@ -1156,9 +1157,7 @@ namespace Ogre {
                 || varRefTypeDesc.Type == D3D_SVT_BOOL)
             {
                 GpuConstantDefinitionWithName def;
-                String * name = new String(prefix + paramName);
-                mSerStrings.push_back(name);
-                def.Name = &(*name)[0]; 
+                def.Name = prefix + paramName;
 
                 GpuConstantDefinitionWithName* prev_def = mD3d11ShaderVariableSubparts.empty() ? NULL : &mD3d11ShaderVariableSubparts.back();
                 def.logicalIndex = prev_def ? prev_def->logicalIndex + prev_def->elementSize / 4 : 0;
