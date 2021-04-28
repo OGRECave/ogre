@@ -246,14 +246,6 @@ namespace Ogre {
             GLSLLinkProgramManager::getSingletonPtr()->destroyAllByShader(this);
         }
     }
-
-    //-----------------------------------------------------------------------
-    void GLSLProgram::populateParameterNames(GpuProgramParametersSharedPtr params)
-    {
-        getConstantDefinitions();
-        params->_setNamedConstants(mConstantDefs);
-        // Don't set logical / physical maps here, as we can't access parameters by logical index in GLHL.
-    }
     //-----------------------------------------------------------------------
     void GLSLProgram::buildConstantDefinitions() const
     {
