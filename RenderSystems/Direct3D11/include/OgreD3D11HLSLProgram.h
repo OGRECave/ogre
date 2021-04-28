@@ -103,9 +103,7 @@ namespace Ogre {
         bool mColumnMajorMatrices;
         bool mEnableBackwardsCompatibility;
 
-        bool mErrorsInCompile;
         MicroCode mMicroCode;
-        ComPtr<ID3D11Buffer> mConstantBuffer;
 
         D3D11Device & mDevice;
 
@@ -138,7 +136,6 @@ namespace Ogre {
         // that cg adds to the hlsl 4 output. This is to solve the issue that
         // in some cases cg changes the name of the var to a new name.
         void fixVariableNameFromCg(const ShaderVarWithPosInBuf& newVar);
-        //ShaderVars mShaderVars;
         
         // HACK: Multi-index emulation container to store constant buffer information by index and name at same time
         // using tips from http://www.boost.org/doc/libs/1_35_0/libs/multi_index/doc/performance.html
@@ -254,7 +251,6 @@ namespace Ogre {
         UINT mConstantBufferSize;
         UINT mConstantBufferNr;
         UINT mNumSlots;
-        ShaderVars mShaderVars;
         D3d11ShaderParameters mD3d11ShaderInputParameters;
         D3d11ShaderParameters mD3d11ShaderOutputParameters;
         D3d11ShaderVariables mD3d11ShaderVariables;
@@ -267,7 +263,6 @@ namespace Ogre {
         MemberTypeNames mMemberTypeName;
         InterfaceSlots mInterfaceSlots;
 
-        void createConstantBuffer(const UINT ByteWidth);
         void analizeMicrocode();
         void getMicrocodeFromCache(uint32 id);
         void compileMicrocode(void);
