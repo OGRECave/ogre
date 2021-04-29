@@ -319,29 +319,16 @@ namespace Ogre {
         GpuNamedConstants();
         ~GpuNamedConstants();
 
-        /// @deprecated obsolete
-        OGRE_DEPRECATED void generateConstantDefinitionArrayEntries(const String& paramName,
-                                                    const GpuConstantDefinition& baseDef);
-
-        /// @deprecated obsolete
-        OGRE_DEPRECATED static bool getGenerateAllConstantDefinitionArrayEntries();
-
-        /// @deprecated obsolete
-        OGRE_DEPRECATED static void setGenerateAllConstantDefinitionArrayEntries(bool generateAll);
-
-        /** Saves constant definitions to a file, compatible with GpuProgram::setManualNamedConstantsFile.
-            @see GpuProgram::setManualNamedConstantsFile
-        */
+        /** Saves constant definitions to a file
+         * compatible with @ref GpuProgram::setManualNamedConstantsFile.
+         */
         void save(const String& filename) const;
-        /** Loads constant definitions from a stream, compatible with GpuProgram::setManualNamedConstantsFile.
-            @see GpuProgram::setManualNamedConstantsFile
-        */
+        /** Loads constant definitions from a stream
+         * compatible with @ref GpuProgram::setManualNamedConstantsFile.
+         */
         void load(DataStreamPtr& stream);
 
         size_t calculateSize(void) const;
-
-    protected:
-        static bool msGenerateAllConstantDefinitionArrayEntries;
     };
 
     /// Simple class for loading / saving GpuNamedConstants
