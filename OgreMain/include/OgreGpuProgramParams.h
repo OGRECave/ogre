@@ -414,7 +414,7 @@ namespace Ogre {
         HardwareBufferPtr mHardwareBuffer;
 
         /// Version number of the definitions in this buffer.
-        unsigned long mVersion;
+        uint32 mVersion;
 
 		/// Accumulated offset used to calculate uniform location.
 		size_t mOffset;
@@ -446,7 +446,7 @@ namespace Ogre {
         /** Get the version number of this shared parameter set, can be used to identify when
             changes have occurred.
         */
-        unsigned long getVersion() const { return mVersion; }
+        uint32 getVersion() const { return mVersion; }
 
         /** Calculate the expected size of the shared parameter buffer based
             on constant definition data types.
@@ -557,7 +557,7 @@ namespace Ogre {
         CopyDataList mCopyDataList;
 
         /// Version of shared params we based the copydata on
-        unsigned long mCopyDataVersion;
+        uint32 mCopyDataVersion;
 
         void initCopyData();
 
