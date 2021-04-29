@@ -447,71 +447,12 @@ namespace Ogre
         if (!mDirty)
             return;
 
-        for (const auto& parami : getConstantDefinitions().map)
-        {
-            const GpuConstantDefinition& param = parami.second;
-
-            const void* dataPtr;
-            switch (GpuConstantDefinition::getBaseType(param.constType))
-            {
-            case BCT_FLOAT:
-                dataPtr = getFloatPointer(param.physicalIndex);
-                break;
-            case BCT_UINT:
-            case BCT_BOOL:
-            case BCT_INT:
-                dataPtr = getIntPointer(param.physicalIndex);
-                break;
-            case BCT_DOUBLE:
-                dataPtr = getDoublePointer(param.physicalIndex);
-                break;
-            case BCT_SAMPLER:
-            case BCT_SUBROUTINE:
-                //TODO implement me!
-            default:
-                //TODO error handling
-                continue;
-            }
-
-            // in bytes
-            size_t length = param.arraySize * param.elementSize * 4;
-            mHardwareBuffer->writeData(param.logicalIndex, length, dataPtr);
-        }
+        mHardwareBuffer->writeData(0, mConstants.size(), mConstants.data());
     }
     void GpuSharedParameters::download()
     {
         OgreAssert(mHardwareBuffer, "not backed by a HardwareBuffer");
-
-        for (const auto& parami : getConstantDefinitions().map)
-        {
-            const GpuConstantDefinition& param = parami.second;
-
-            void* dataPtr;
-            switch (GpuConstantDefinition::getBaseType(param.constType))
-            {
-            case BCT_FLOAT:
-                dataPtr = &mConstants[param.physicalIndex];
-                break;
-            case BCT_UINT:
-            case BCT_BOOL:
-            case BCT_INT:
-                dataPtr = &mConstants[param.physicalIndex];
-                break;
-            case BCT_DOUBLE:
-                dataPtr = &mConstants[param.physicalIndex];
-                break;
-            case BCT_SAMPLER:
-            case BCT_SUBROUTINE:
-                //TODO implement me!
-            default:
-                //TODO error handling
-                continue;
-            }
-
-            // in bytes
-            size_t length = param.arraySize * param.elementSize * 4;
-            mHardwareBuffer->readData(param.logicalIndex, length, dataPtr);
-        }
+        mHardwareBuffer->readData(0, mConstants.size(), mConstants.data());
     }
     //---------------------------------------------------------------------
     void GpuSharedParameters::removeAllConstantDefinitions()
