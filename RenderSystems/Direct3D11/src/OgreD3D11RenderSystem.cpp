@@ -74,6 +74,13 @@ THE SOFTWARE.
 #include <dxgi1_3.h> // for IDXGIDevice3::Trim
 #endif
 
+#define CHECK_DEVICE_ERROR(errmsg) \
+if (mDevice.isError()) \
+{ \
+    String desc = mDevice.getErrorDescription(); \
+    throw RenderingAPIException(0, "D3D11 device cannot " errmsg "\nError Description: "+desc, __FUNCTION__, __FILE__, __LINE__); \
+}
+
 namespace Ogre 
 {
     HRESULT WINAPI D3D11CreateDeviceN(
@@ -1680,15 +1687,7 @@ namespace Ogre
         {
             // we need to clear the state 
             mDevice.GetImmediateContext()->ClearState();
-
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot Clear State\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_setRenderTarget");
-            }
-
+            CHECK_DEVICE_ERROR("Clear State");
             _setRenderTargetViews();
         }
     }
@@ -1734,13 +1733,7 @@ namespace Ogre
                 pRTView,
                 depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
 
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set render target\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_setRenderTargetViews");
-            }
+            CHECK_DEVICE_ERROR("set render target");
         }
     }
     //---------------------------------------------------------------------
@@ -1781,13 +1774,7 @@ namespace Ogre
             d3dvp.MaxDepth = 1.0f;
 
             mDevice.GetImmediateContext()->RSSetViewports(1, &d3dvp);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set viewports\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_setViewport");
-            }
+            CHECK_DEVICE_ERROR("set viewports");
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			D3D11RenderWindowBase* d3d11Window = dynamic_cast<D3D11RenderWindowBase*>(target);
@@ -1847,13 +1834,7 @@ namespace Ogre
                 &offset 
                 );
 
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set vertex buffers\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::setVertexBufferBinding");
-            }
+            CHECK_DEVICE_ERROR("set vertex buffers");
         }
 
         mLastVertexSourceCount = binds.size();      
@@ -1983,13 +1964,7 @@ namespace Ogre
         {
             mBoundBlendState = opState->mBlendState ;
             mDevice.GetImmediateContext()->OMSetBlendState(opState->mBlendState.Get(), 0, 0xffffffff); // TODO - find out where to get the parameters
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set blend state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set blend state");
         }
 
         if (opState->mRasterizer != mBoundRasterizer)
@@ -1997,13 +1972,7 @@ namespace Ogre
             mBoundRasterizer = opState->mRasterizer ;
 
             mDevice.GetImmediateContext()->RSSetState(opState->mRasterizer.Get());
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set rasterizer state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set rasterizer state");
         }
         
 
@@ -2012,148 +1981,61 @@ namespace Ogre
             mBoundDepthStencilState = opState->mDepthStencilState ;
 
             mDevice.GetImmediateContext()->OMSetDepthStencilState(opState->mDepthStencilState.Get(), mStencilRef);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set depth stencil state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set depth stencil state");
         }
 
         if (mSamplerStatesChanged && opState->mSamplerStatesCount > 0 ) //  if the NumSamplers is 0, the operation effectively does nothing.
         {
             mSamplerStatesChanged = false; // now it's time to set it to false
             /// Pixel Shader binding
-            {
-                {
-                    mDevice.GetImmediateContext()->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
-                }
-
-                mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-            }
+            mDevice.GetImmediateContext()->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
+            CHECK_DEVICE_ERROR("set pixel shader samplers");
+            mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+            CHECK_DEVICE_ERROR("set pixel shader resources");
             
             /// Vertex Shader binding
             if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
                 mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
+                CHECK_DEVICE_ERROR("set vertex shader samplers");
                 mDevice.GetImmediateContext()->VSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
+                CHECK_DEVICE_ERROR("set vertex shader resources");
             }
 
             /// Geometry Shader binding
             if (mBoundGeometryProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
                 mDevice.GetImmediateContext()->GSSetSamplers(0, opState->mSamplerStatesCount, opState->mSamplerStates);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set geometry shader samplers\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-
+                CHECK_DEVICE_ERROR("set geometry shader samplers");
                 mDevice.GetImmediateContext()->GSSetShaderResources(0, opState->mTexturesCount, &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set geometry shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
+                CHECK_DEVICE_ERROR("set geometry shader resources");
             }
 
             /// Compute Shader binding
             if (mBoundComputeProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
                 mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set compute shader samplers\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-
+                CHECK_DEVICE_ERROR("set compute shader samplers");
                 mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set compute shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
+                CHECK_DEVICE_ERROR("set compute shader resources");
             }
 
             /// Hull Shader binding
             if (mBoundTessellationHullProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
                 mDevice.GetImmediateContext()->HSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set hull shader samplers\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-
+                CHECK_DEVICE_ERROR("set hull shader samplers");
                 mDevice.GetImmediateContext()->HSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set hull shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
+                CHECK_DEVICE_ERROR("set hull shader resources");
             }
             
             /// Domain Shader binding
             if (mBoundTessellationDomainProgram && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
             {
                 mDevice.GetImmediateContext()->DSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set domain shader samplers\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-
+                CHECK_DEVICE_ERROR("set domain shader samplers");
                 mDevice.GetImmediateContext()->DSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set domain shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
+                CHECK_DEVICE_ERROR("set domain shader resources");
             }
         }
 
@@ -2187,14 +2069,7 @@ namespace Ogre
                 "D3D11RenderSystem::_render"); }
         }
 
-        if (mDevice.isError())
-        {
-            // this will never happen but we want to be consistent with the error checks... 
-            String errorDescription = mDevice.getErrorDescription();
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "D3D11 device cannot set geometry shader to null\nError Description:" + errorDescription,
-                "D3D11RenderSystem::_render");
-        }
+        CHECK_DEVICE_ERROR("set geometry shader to null");
 
         // Defer program bind to here because we must bind shader class instances,
         // and this can only be made in SetShader calls.
@@ -2204,78 +2079,42 @@ namespace Ogre
             mDevice.GetImmediateContext()->VSSetShader(mBoundVertexProgram->getVertexShader(), 
                                                        mClassInstances[GPT_VERTEX_PROGRAM], 
                                                        mNumClassInstances[GPT_VERTEX_PROGRAM]);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set vertex shader\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set vertex shader");
         }
         if (mBoundFragmentProgram)
         {
             mDevice.GetImmediateContext()->PSSetShader(mBoundFragmentProgram->getPixelShader(),
                                                        mClassInstances[GPT_FRAGMENT_PROGRAM], 
                                                        mNumClassInstances[GPT_FRAGMENT_PROGRAM]);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set pixel shader\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set pixel shader");
         }
         if (mBoundGeometryProgram)
         {
             mDevice.GetImmediateContext()->GSSetShader(mBoundGeometryProgram->getGeometryShader(),
                                                        mClassInstances[GPT_GEOMETRY_PROGRAM], 
                                                        mNumClassInstances[GPT_GEOMETRY_PROGRAM]);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set geometry shader\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set geometry shader");
         }
         if (mBoundTessellationHullProgram)
         {
             mDevice.GetImmediateContext()->HSSetShader(mBoundTessellationHullProgram->getHullShader(),
                                                        mClassInstances[GPT_HULL_PROGRAM], 
                                                        mNumClassInstances[GPT_HULL_PROGRAM]);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set hull shader\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set hull shader");
         }
         if (mBoundTessellationDomainProgram)
         {
             mDevice.GetImmediateContext()->DSSetShader(mBoundTessellationDomainProgram->getDomainShader(),
                                                        mClassInstances[GPT_DOMAIN_PROGRAM], 
                                                        mNumClassInstances[GPT_DOMAIN_PROGRAM]);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set domain shader\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set domain shader");
         }
         if (mBoundComputeProgram)
         {
             mDevice.GetImmediateContext()->CSSetShader(mBoundComputeProgram->getComputeShader(),
                                                        mClassInstances[GPT_COMPUTE_PROGRAM], 
                                                        mNumClassInstances[GPT_COMPUTE_PROGRAM]);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set compute shader\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set compute shader");
         }
 
 
@@ -2383,23 +2222,11 @@ namespace Ogre
             {
                 auto d3dBuf = op.indexData->indexBuffer->_getImpl<D3D11HardwareBuffer>();
                 mDevice.GetImmediateContext()->IASetIndexBuffer( d3dBuf->getD3DBuffer(), D3D11Mappings::getFormat(op.indexData->indexBuffer->getType()), 0 );
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set index buffer\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
+                CHECK_DEVICE_ERROR("set index buffer");
             }
 
             mDevice.GetImmediateContext()->IASetPrimitiveTopology( primType );
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set primitive topology\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
+            CHECK_DEVICE_ERROR("set primitive topology");
 
             do
             {
@@ -2497,96 +2324,31 @@ namespace Ogre
             {
                 // get the shader
                 mBoundVertexProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*              ID3D11VertexShader * vsShaderToSet = mBoundVertexProgram->getVertexShader();
-
-                // set the shader
-                mDevice.GetImmediateContext()->VSSetShader(vsShaderToSet, NULL, 0);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set vertex shader\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::bindGpuProgram");
-                }*/     
             }
             break;
         case GPT_FRAGMENT_PROGRAM:
             {
                 mBoundFragmentProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*              ID3D11PixelShader* psShaderToSet = mBoundFragmentProgram->getPixelShader();
-
-                mDevice.GetImmediateContext()->PSSetShader(psShaderToSet, NULL, 0);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set fragment shader\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::bindGpuProgram");
-                }*/     
             }
             break;
         case GPT_GEOMETRY_PROGRAM:
             {
                 mBoundGeometryProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*              ID3D11GeometryShader* gsShaderToSet = mBoundGeometryProgram->getGeometryShader();
-
-                mDevice.GetImmediateContext()->GSSetShader(gsShaderToSet, NULL, 0);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set geometry shader\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::bindGpuProgram");
-                }*/     
-
             }
             break;
         case GPT_HULL_PROGRAM:
             {
                 mBoundTessellationHullProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*              ID3D11HullShader* gsShaderToSet = mBoundTessellationHullProgram->getHullShader();
-
-                mDevice.GetImmediateContext()->HSSetShader(gsShaderToSet, NULL, 0);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set hull shader\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::bindGpuProgram");
-                }       */
-
             }
             break;
         case GPT_DOMAIN_PROGRAM:
             {
                 mBoundTessellationDomainProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*              ID3D11DomainShader* gsShaderToSet = mBoundTessellationDomainProgram->getDomainShader();
-
-                mDevice.GetImmediateContext()->DSSetShader(gsShaderToSet, NULL, 0);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set domain shader\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::bindGpuProgram");
-                }*/     
-
             }
             break;
         case GPT_COMPUTE_PROGRAM:
             {
                 mBoundComputeProgram = static_cast<D3D11HLSLProgram*>(prg);
-/*              ID3D11ComputeShader* gsShaderToSet = mBoundComputeProgram->getComputeShader();
-
-                mDevice.GetImmediateContext()->CSSetShader(gsShaderToSet, NULL, 0);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set compute shader\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::bindGpuProgram");
-                }*/     
-
             }
             break;
         };
@@ -2667,39 +2429,21 @@ namespace Ogre
         {
         case GPT_VERTEX_PROGRAM:
             {
-                //  if (params->getAutoConstantCount() > 0)
-                //{
                 if (mBoundVertexProgram)
                 {
                     pBuffers[0] = mBoundVertexProgram->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->VSSetConstantBuffers( 0, 1, pBuffers );
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set vertex shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                    CHECK_DEVICE_ERROR("set vertex shader constant buffers");
                 }
             }
             break;
         case GPT_FRAGMENT_PROGRAM:
             {
-                //if (params->getAutoConstantCount() > 0)
-                //{
                 if (mBoundFragmentProgram)
                 {
                     pBuffers[0] = mBoundFragmentProgram->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->PSSetConstantBuffers( 0, 1, pBuffers );
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set fragment shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                    CHECK_DEVICE_ERROR("set fragment shader constant buffers");
                 }
             }
             break;
@@ -2709,14 +2453,7 @@ namespace Ogre
                 {
                     pBuffers[0] = mBoundGeometryProgram->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->GSSetConstantBuffers( 0, 1, pBuffers );
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set Geometry shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                    CHECK_DEVICE_ERROR("set Geometry shader constant buffers");
                 }
             }
             break;
@@ -2726,14 +2463,7 @@ namespace Ogre
                 {
                     pBuffers[0] = mBoundTessellationHullProgram->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->HSSetConstantBuffers( 0, 1, pBuffers );
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set Hull shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                    CHECK_DEVICE_ERROR("set Hull shader constant buffers");
                 }
             }
             break;
@@ -2743,14 +2473,7 @@ namespace Ogre
                 {
                     pBuffers[0] = mBoundTessellationDomainProgram->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->DSSetConstantBuffers( 0, 1, pBuffers );
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set Domain shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                    CHECK_DEVICE_ERROR("set Domain shader constant buffers");
                 }
             }
             break;
@@ -2760,14 +2483,7 @@ namespace Ogre
                 {
                     pBuffers[0] = mBoundComputeProgram->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->CSSetConstantBuffers( 0, 1, pBuffers );
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set Compute shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                    CHECK_DEVICE_ERROR("set Compute shader constant buffers");
                 }
             }
             break;
@@ -2888,13 +2604,7 @@ namespace Ogre
         mScissorRect.bottom = rect.bottom;
 
         mDevice.GetImmediateContext()->RSSetScissorRects(1, &mScissorRect);
-        if (mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription();
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "D3D11 device cannot set scissor rects\nError Description:" + errorDescription,
-                "D3D11RenderSystem::setScissorTest");
-        }   
+        CHECK_DEVICE_ERROR("set scissor rects");
         mRasterizerDescChanged=true;
     }
     //---------------------------------------------------------------------
