@@ -444,8 +444,7 @@ namespace Ogre {
                     for(unsigned int i = 0; i < constantBufferDesc.Variables ; i++)
                     {
                         D3D11_SHADER_VARIABLE_DESC & curVar = mD3d11ShaderVariables[i];
-                        ID3D11ShaderReflectionVariable* varRef;
-                        varRef = shaderReflectionConstantBuffer->GetVariableByIndex(i);
+                        auto varRef = shaderReflectionConstantBuffer->GetVariableByIndex(i);
                         HRESULT hr = varRef->GetDesc(&curVar);
                         if (FAILED(hr))
                         {
@@ -458,11 +457,9 @@ namespace Ogre {
                         mSerStrings.push_back(name);
                         curVar.Name = &(*name)[0]; 
 
-                        ID3D11ShaderReflectionType* varRefType;
-                        varRefType = varRef->GetType();
-
                         // Recursively descend through the structure levels
-                        processParamElement( "", curVar.Name, varRefType);
+                        if(v == 0) // but only for main buffer
+                            processParamElement( "", *name, varRef->GetType());
                     }
 
                     switch (constantBufferDesc.Type)
@@ -911,18 +908,29 @@ namespace Ogre {
             case D3D_CT_CBUFFER:
             case D3D_CT_TBUFFER:
                 {
-                    // Insert buffer info
-                    BufferInfoIterator it = mBufferInfoMap.insert(BufferInfo(0, mD3d11ShaderBufferDescs[b].Name)).first;
-
-                    // Guard to create uniform buffer only once
-                    if (!it->mUniformBuffer)
+                    String cb_name = mD3d11ShaderBufferDescs[b].Name;
+                    bool isDefault = false;
+                    if(cb_name == "$Globals" || cb_name == "$Params")
                     {
-                        it->mUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size);
+                        if(mDefaultBuffer)
+                            LogManager::getSingleton().logError("D3D11 - both $Globals and $Params cbuffers present. Dropping "+cb_name);
+                        else
+                        {
+                            mDefaultBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size);
+                            isDefault = true;
+                        }
                     }
                     else
                     {
-                        assert (it->mUniformBuffer->getSizeInBytes() == mD3d11ShaderBufferDescs[b].Size);
+                        auto blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(cb_name);
+
+                        auto cbuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size);
+                        blockSharedParams->_setHardwareBuffer(cbuffer);
+                        mBufferInfoMap[cb_name] = b;
                     }
+
+                    if(!isDefault)
+                        continue; // only record default buffer variables
 
                     // Now, parse variables for this buffer
                     for(unsigned int i = 0; i < mD3d11ShaderBufferDescs[b].Variables ; i++)
@@ -1061,7 +1069,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void D3D11HLSLProgram::processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType)
+    void D3D11HLSLProgram::processParamElement(String prefix, String paramName, ID3D11ShaderReflectionType* varRefType)
     {
         D3D11_SHADER_TYPE_DESC varRefTypeDesc;
         HRESULT hr = varRefType->GetDesc(&varRefTypeDesc);
@@ -1075,7 +1083,6 @@ namespace Ogre {
                 "D3D11HLSLProgram::processParamElement");
         }
 
-        String paramName = pName;
         // trim the odd '$' which appears at the start of the names in HLSL
         if (paramName.at(0) == '$' || paramName.at(0) == '_')
             paramName.erase(paramName.begin());
@@ -1650,37 +1657,37 @@ namespace Ogre {
         return it->second;
     }
     //-----------------------------------------------------------------------------
-    ID3D11Buffer* D3D11HLSLProgram::getConstantBuffer(GpuProgramParametersSharedPtr params, uint16 variabilityMask)
+    std::vector<ID3D11Buffer*> D3D11HLSLProgram::getConstantBuffers(const GpuProgramParametersPtr& params)
     {
-        if(mBufferInfoMap.empty())
-            return NULL;
-        // Update the Constant Buffer
-        BufferInfoIterator it = mBufferInfoMap.begin();
-        
-        OgreAssert(it->mUniformBuffer, "no uniform buffer");
-        OgreAssert(it->mUniformBuffer->getSizeInBytes() <= params->getConstantList().size(), "wrong buffer size");
-        it->mUniformBuffer->writeData(0, it->mUniformBuffer->getSizeInBytes(), params->getConstantList().data(), true);
-
-        return static_cast<D3D11HardwareBuffer*>(it->mUniformBuffer.get())->getD3DBuffer();
-    }
-    //-----------------------------------------------------------------------------
-    void D3D11HLSLProgram::getConstantBuffers(ID3D11Buffer** buffers, unsigned int& numBuffers,
-                                              ID3D11ClassInstance** classes, unsigned int& numClasses,
-                                              GpuProgramParametersSharedPtr params, uint16 variabilityMask)
-    {
-        // Update the Constant Buffers
-        BufferInfoIterator it = mBufferInfoMap.begin();
-        BufferInfoIterator end = mBufferInfoMap.end();
-        while (it != end)
+        std::vector<ID3D11Buffer*> buffers;
+        if(mDefaultBuffer)
         {
-            OgreAssert (it->mUniformBuffer, "no uniform buffer");
-            it->mUniformBuffer->writeData(0, params->getConstantList().size(), params->getConstantList().data(), true);
+            OgreAssert(mDefaultBuffer->getSizeInBytes() <= params->getConstantList().size(), "unexpected buffer size");
+            mDefaultBuffer->writeData(0, mDefaultBuffer->getSizeInBytes(), params->getConstantList().data(), true);
 
-            // Add buffer to list
-            buffers[numBuffers] = static_cast<D3D11HardwareBuffer*>(it->mUniformBuffer.get())->getD3DBuffer();
-            // Increment number of buffers
-            numBuffers++;
+            buffers.push_back(static_cast<D3D11HardwareBuffer*>(mDefaultBuffer.get())->getD3DBuffer());
         }
+        else
+        {
+            buffers.push_back(NULL);
+        }
+
+        for (const auto& usage : params->getSharedParameters())
+        {
+            if(const auto& buf = usage.getSharedParams()->_getHardwareBuffer())
+            {
+                // hardware baked cbuffer
+                auto it = mBufferInfoMap.find(usage.getName());
+                if(it == mBufferInfoMap.end())
+                    continue; // TODO: error?
+
+                size_t slot = it->second;
+                buffers.resize(std::max(slot + 1, buffers.size()));
+                buffers[slot] = static_cast<D3D11HardwareBuffer*>(buf.get())->getD3DBuffer();
+            }
+        }
+
+        return buffers;
     }
     //-----------------------------------------------------------------------------
     ID3D11VertexShader* D3D11HLSLProgram::getVertexShader(void) const 

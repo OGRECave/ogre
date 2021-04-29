@@ -2416,23 +2416,19 @@ namespace Ogre
     {
         if (mask & (uint16)GPV_GLOBAL)
         {
-            // TODO: Dx11 supports shared constant buffers, so use them
-            // check the match to constant buffers & use rendersystem data hooks to store
-            // for now, just copy
-            params->_copySharedParams();
+            params->_updateSharedParams();
         }
 
         // Do everything here in Dx11, since deal with via buffers anyway so number of calls
         // is actually the same whether we categorise the updates or not
-        ID3D11Buffer* pBuffers[1] ;
         switch(gptype)
         {
         case GPT_VERTEX_PROGRAM:
             {
                 if (mBoundVertexProgram)
                 {
-                    pBuffers[0] = mBoundVertexProgram->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->VSSetConstantBuffers( 0, 1, pBuffers );
+                    auto buffers = mBoundVertexProgram->getConstantBuffers(params);
+                    mDevice.GetImmediateContext()->VSSetConstantBuffers( 0, buffers.size(), buffers.data());
                     CHECK_DEVICE_ERROR("set vertex shader constant buffers");
                 }
             }
@@ -2441,8 +2437,8 @@ namespace Ogre
             {
                 if (mBoundFragmentProgram)
                 {
-                    pBuffers[0] = mBoundFragmentProgram->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->PSSetConstantBuffers( 0, 1, pBuffers );
+                    auto buffers = mBoundFragmentProgram->getConstantBuffers(params);
+                    mDevice.GetImmediateContext()->PSSetConstantBuffers( 0, buffers.size(), buffers.data());
                     CHECK_DEVICE_ERROR("set fragment shader constant buffers");
                 }
             }
@@ -2451,8 +2447,8 @@ namespace Ogre
             {
                 if (mBoundGeometryProgram)
                 {
-                    pBuffers[0] = mBoundGeometryProgram->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->GSSetConstantBuffers( 0, 1, pBuffers );
+                    auto buffers = mBoundGeometryProgram->getConstantBuffers(params);
+                    mDevice.GetImmediateContext()->GSSetConstantBuffers( 0, buffers.size(), buffers.data());
                     CHECK_DEVICE_ERROR("set Geometry shader constant buffers");
                 }
             }
@@ -2461,8 +2457,8 @@ namespace Ogre
             {
                 if (mBoundTessellationHullProgram)
                 {
-                    pBuffers[0] = mBoundTessellationHullProgram->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->HSSetConstantBuffers( 0, 1, pBuffers );
+                    auto buffers = mBoundTessellationHullProgram->getConstantBuffers(params);
+                    mDevice.GetImmediateContext()->HSSetConstantBuffers( 0, buffers.size(), buffers.data());
                     CHECK_DEVICE_ERROR("set Hull shader constant buffers");
                 }
             }
@@ -2471,8 +2467,8 @@ namespace Ogre
             {
                 if (mBoundTessellationDomainProgram)
                 {
-                    pBuffers[0] = mBoundTessellationDomainProgram->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->DSSetConstantBuffers( 0, 1, pBuffers );
+                    auto buffers = mBoundTessellationDomainProgram->getConstantBuffers(params);
+                    mDevice.GetImmediateContext()->DSSetConstantBuffers( 0, buffers.size(), buffers.data());
                     CHECK_DEVICE_ERROR("set Domain shader constant buffers");
                 }
             }
@@ -2481,8 +2477,8 @@ namespace Ogre
             {
                 if (mBoundComputeProgram)
                 {
-                    pBuffers[0] = mBoundComputeProgram->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->CSSetConstantBuffers( 0, 1, pBuffers );
+                    auto buffers = mBoundComputeProgram->getConstantBuffers(params);
+                    mDevice.GetImmediateContext()->CSSetConstantBuffers( 0, buffers.size(), buffers.data());
                     CHECK_DEVICE_ERROR("set Compute shader constant buffers");
                 }
             }
