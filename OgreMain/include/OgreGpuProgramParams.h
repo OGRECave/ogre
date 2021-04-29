@@ -410,13 +410,8 @@ namespace Ogre {
         /// List of constant values.
         ConstantList mConstants;
 
-        /// Optional data the rendersystem might want to store.
-        mutable Any mRenderSystemData;
         /// Optional rendersystem backed storage
         HardwareBufferPtr mHardwareBuffer;
-
-        /// Not used when copying data, but might be useful to RS using shared buffers.
-        size_t mFrameLastUpdated;
 
         /// Version number of the definitions in this buffer.
         unsigned long mVersion;
@@ -480,9 +475,6 @@ namespace Ogre {
         */
         void _markDirty();
 
-        /// Get the frame in which this shared parameter set was last updated
-        size_t getFrameLastUpdated() const { return mFrameLastUpdated; }
-
         /// @deprecated use getConstantDefinitions()
         OGRE_DEPRECATED GpuConstantDefinitionIterator getConstantDefinitionIterator(void) const;
 
@@ -533,10 +525,6 @@ namespace Ogre {
         const uint* getUnsignedIntPointer(size_t pos) const { return (const uint*)&mConstants[pos]; }
         /// Get a reference to the list of constants
         const ConstantList& getConstantList() const { return mConstants; }
-        /// @deprecated use _setHardwareBuffer
-        OGRE_DEPRECATED void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
-        /// @deprecated use _getHardwareBuffer
-        OGRE_DEPRECATED const Any& _getRenderSystemData() const { return mRenderSystemData; }
         /** Internal method that the RenderSystem might use to store optional data. */
         void _setHardwareBuffer(const HardwareBufferPtr& data) { mHardwareBuffer = data; }
         /** Internal method that the RenderSystem might use to store optional data. */
@@ -568,9 +556,6 @@ namespace Ogre {
 
         CopyDataList mCopyDataList;
 
-        // Optional data the rendersystem might want to store
-        mutable Any mRenderSystemData;
-
         /// Version of shared params we based the copydata on
         unsigned long mCopyDataVersion;
 
@@ -596,13 +581,6 @@ namespace Ogre {
 
         GpuSharedParametersPtr getSharedParams() const { return mSharedParams; }
         GpuProgramParameters* getTargetParams() const { return mParams; }
-
-        /// @deprecated use GpuSharedParameters::_setHardwareBuffer
-        OGRE_DEPRECATED void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
-        /// @deprecated use GpuSharedParameters::_getHardwareBuffer
-        OGRE_DEPRECATED const Any& _getRenderSystemData() const { return mRenderSystemData; }
-
-
     };
 
     /** Collects together the program parameters used for a GpuProgram.
