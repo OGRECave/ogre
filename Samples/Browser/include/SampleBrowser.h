@@ -575,12 +575,8 @@ namespace OgreBites
             {
                 // Make sure we use the window size as originally requested, NOT the
                 // current window size (which may have altered to fit desktop)
-                auto opti = mRoot->getRenderSystem()->getConfigOptions().find(
-                    "Video Mode");
-                Ogre::StringVector vmopts = Ogre::StringUtil::split(opti->second.currentValue, " x");
-                unsigned int w = Ogre::StringConverter::parseUnsignedInt(vmopts[0]);
-                unsigned int h = Ogre::StringConverter::parseUnsignedInt(vmopts[1]);
-                mWindow->setFullscreen(!mWindow->isFullScreen(), w, h);
+                auto desc = mRoot->getRenderSystem()->getRenderWindowDescription();
+                mWindow->setFullscreen(!mWindow->isFullScreen(), desc.width, desc.height);
             }
             else if(key == SDLK_F11 || key == SDLK_F12) // Decrease and increase FSAA level on the fly
             {
