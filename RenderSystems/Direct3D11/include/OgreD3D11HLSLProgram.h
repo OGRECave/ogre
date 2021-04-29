@@ -94,7 +94,7 @@ namespace Ogre {
         void unloadHighLevelImpl(void);
 
         // Recursive utility method for populateParameterNames
-        void processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType);
+        void processParamElement(String prefix, String paramName, ID3D11ShaderReflectionType* varRefType);
 
         void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const;
 
@@ -114,79 +114,10 @@ namespace Ogre {
         ComPtr<ID3D11HullShader> mHullShader;
         ComPtr<ID3D11ComputeShader> mComputeShader;
         
-        // HACK: Multi-index emulation container to store constant buffer information by index and name at same time
-        // using tips from http://www.boost.org/doc/libs/1_35_0/libs/multi_index/doc/performance.html
-        // and http://cnx.org/content/m35767/1.2/
-#define INVALID_IDX (unsigned int)-1
-        struct BufferInfo
-        {
-            unsigned int mIdx;
-            String mName;
-            mutable HardwareBufferPtr mUniformBuffer;
-                
-            // Default constructor
-            BufferInfo() : mIdx(0), mName("") { mUniformBuffer.reset(); }
-            BufferInfo(unsigned int index, const String& name)
-                : mIdx(index), mName(name)
-            {
-                mUniformBuffer.reset();
-            }
-            
-            // Copy constructor
-            BufferInfo(const BufferInfo& info) 
-                : mIdx(info.mIdx)
-                , mName(info.mName)
-                , mUniformBuffer(info.mUniformBuffer)
-            {
-
-            }
-
-            // Copy operator
-            BufferInfo& operator=(const BufferInfo& info)
-            {
-                this->mIdx = info.mIdx;
-                this->mName = info.mName;
-                mUniformBuffer = info.mUniformBuffer;
-                return *this;
-            }
-            
-            // Constructors and operators used for search
-            BufferInfo(unsigned int index) : mIdx(index), mName("") { }
-            BufferInfo(const String& name) : mIdx(INVALID_IDX), mName(name) { }
-            BufferInfo& operator=(unsigned int index) { this->mIdx = index; return *this; }
-            BufferInfo& operator=(const String& name) { this->mName = name; return *this; } 
-            
-            bool operator==(const BufferInfo& other) const
-            {
-                return mName == other.mName && mIdx == other.mIdx;
-            }
-            bool operator<(const BufferInfo& other) const
-            {
-                if (mIdx == INVALID_IDX || other.mIdx == INVALID_IDX) 
-                {
-                    return mName < other.mName;
-                }
-                else if (mName == "" || other.mName == "")
-                {
-                    return mIdx < other.mIdx;
-                }
-                else 
-                {
-                    if (mName == other.mName)
-                    {
-                        return mIdx < other.mIdx;
-                    }
-                    else
-                    {
-                        return mName < other.mName;
-                    }
-                }
-            }
-        };
+        HardwareBufferPtr mDefaultBuffer; // for $Globals OR $Params
 
         // Make sure that objects have index and name, or some search will fail
-        typedef std::set<BufferInfo> BufferInfoMap;
-        typedef std::set<BufferInfo>::iterator BufferInfoIterator;
+        typedef std::map<String, int> BufferInfoMap;
         BufferInfoMap mBufferInfoMap;
 
         // Map to store interface slot position. 
@@ -279,11 +210,7 @@ namespace Ogre {
         ID3D11ComputeShader* getComputeShader(void) const;
         const MicroCode &  getMicroCode(void) const;  
 
-        ID3D11Buffer* getConstantBuffer(GpuProgramParametersSharedPtr params, uint16 variabilityMask);
-
-        void getConstantBuffers(ID3D11Buffer** buffers, unsigned int& numBuffers,
-                                ID3D11ClassInstance** classes, unsigned int& numInstances,
-                                GpuProgramParametersSharedPtr params, uint16 variabilityMask);
+        std::vector<ID3D11Buffer*> getConstantBuffers(const GpuProgramParametersPtr& params);
 
         // Get slot for a specific interface
         unsigned int getSubroutineSlot(const String& subroutineSlotName) const;
