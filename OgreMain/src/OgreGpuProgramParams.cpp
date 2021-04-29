@@ -186,55 +186,12 @@ namespace Ogre
         AutoConstantDefinition(ACT_POINT_PARAMS,                    "point_params",                   4, ET_REAL, ACDT_NONE),
     };
 
-    bool GpuNamedConstants::msGenerateAllConstantDefinitionArrayEntries = false;
-
     GpuNamedConstants::GpuNamedConstants() : bufferSize(0), registerCount(0) {}
     GpuNamedConstants::~GpuNamedConstants() {}
 
     GpuLogicalBufferStruct::GpuLogicalBufferStruct() : bufferSize(0) {}
     GpuLogicalBufferStruct::~GpuLogicalBufferStruct() {}
 
-    //---------------------------------------------------------------------
-    void GpuNamedConstants::generateConstantDefinitionArrayEntries(
-        const String& paramName, const GpuConstantDefinition& baseDef)
-    {
-        // Copy definition for use with arrays
-        GpuConstantDefinition arrayDef = baseDef;
-        arrayDef.arraySize = 1;
-        String arrayName;
-
-        // Add parameters for array accessors
-        // [0] will refer to the same location, [1+] will increment
-        // only populate others individually up to 16 array slots so as not to get out of hand,
-        // unless the system has been explicitly configured to allow all the parameters to be added
-
-        // paramName[0] version will always exist
-        size_t maxArrayIndex = 1;
-        if (baseDef.arraySize <= 16 || msGenerateAllConstantDefinitionArrayEntries)
-            maxArrayIndex = baseDef.arraySize;
-
-        for (size_t i = 0; i < maxArrayIndex; i++)
-        {
-            arrayName = paramName + "[" + StringConverter::toString(i) + "]";
-            map.emplace(arrayName, arrayDef);
-            // increment location
-            arrayDef.physicalIndex += arrayDef.elementSize;
-        }
-        // note no increment of buffer sizes since this is shared with main array def
-
-    }
-
-    //---------------------------------------------------------------------
-    bool GpuNamedConstants::getGenerateAllConstantDefinitionArrayEntries()
-    {
-        return msGenerateAllConstantDefinitionArrayEntries;
-    }
-
-    //---------------------------------------------------------------------
-    void GpuNamedConstants::setGenerateAllConstantDefinitionArrayEntries(bool generateAll)
-    {
-        msGenerateAllConstantDefinitionArrayEntries = generateAll;
-    }
     //---------------------------------------------------------------------
     //  GpuNamedConstants methods
     //---------------------------------------------------------------------
