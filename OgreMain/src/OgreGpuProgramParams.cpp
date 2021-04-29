@@ -320,7 +320,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     GpuSharedParameters::GpuSharedParameters(const String& name)
         :mName(name)
-        , mFrameLastUpdated(Root::getSingleton().getNextFrameNumber())
         , mVersion(0), mOffset(0), mDirty(false)
     {
 
@@ -625,7 +624,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GpuSharedParameters::_markDirty()
     {
-        mFrameLastUpdated = Root::getSingleton().getNextFrameNumber();
         mDirty = true;
     }
     
