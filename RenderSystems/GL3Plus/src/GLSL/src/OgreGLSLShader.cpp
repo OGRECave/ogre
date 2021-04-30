@@ -476,7 +476,7 @@ namespace Ogre {
         mLinked = 0;
     }
 
-    void GLSLShader::extractUniforms() const
+    void GLSLShader::extractUniforms(int block) const
     {
         GLint numUniforms = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(mGLProgramHandle, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms));
@@ -488,8 +488,8 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(
                 glGetProgramResourceiv(mGLProgramHandle, GL_UNIFORM, unif, 5, properties, 5, NULL, values));
 
-            // Skip any uniforms that are in a block and atomic_uints
-            if (values[0] != -1 || values[3] == -1)
+            // Skip any uniforms that are in a different block or atomic_uints
+            if (values[0] != block || (block == -1 && values[3] == -1))
                 continue;
 
             GpuConstantDefinition def;
@@ -522,9 +522,12 @@ namespace Ogre {
                 def.physicalIndex = mConstantDefs->bufferSize*4;
                 mConstantDefs->bufferSize += def.arraySize * def.elementSize;
 
-                use.physicalIndex = def.physicalIndex;
-                use.currentSize = def.arraySize * def.elementSize;
-                mLogicalToPhysical->map.emplace(def.logicalIndex, use);
+                if (values[3] != -1)
+                {
+                    use.physicalIndex = def.physicalIndex;
+                    use.currentSize = def.arraySize * def.elementSize;
+                    mLogicalToPhysical->map.emplace(def.logicalIndex, use);
+                }
             }
             else if(def.isSampler())
             {
@@ -546,6 +549,8 @@ namespace Ogre {
         GLint numBlocks = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(mGLProgramHandle, type, GL_ACTIVE_RESOURCES, &numBlocks));
 
+        auto& hbm = static_cast<GL3PlusHardwareBufferManager&>(HardwareBufferManager::getSingleton());
+
         const GLenum blockProperties[3] = {GL_NUM_ACTIVE_VARIABLES, GL_NAME_LENGTH, GL_BUFFER_DATA_SIZE};
         for(int blockIdx = 0; blockIdx < numBlocks; ++blockIdx)
         {
@@ -559,17 +564,24 @@ namespace Ogre {
                                                          values[1], NULL, &nameData[0]));
             String name(nameData.begin(), nameData.end() - 1);
 
+            if (name == "OgreUniforms") // default buffer
+            {
+                extractUniforms(blockIdx);
+                mDefaultBuffer = hbm.createUniformBuffer(values[2]);
+                static_cast<GL3PlusHardwareBuffer*>(mDefaultBuffer.get())->setGLBufferBinding(0);
+                OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, blockIdx, 0));
+                continue;
+            }
+
             auto blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(name);
 
             HardwareBufferPtr hwGlBuffer = blockSharedParams->_getHardwareBuffer();
             if(!hwGlBuffer)
             {
-                auto& hbm = static_cast<GL3PlusHardwareBufferManager&>(HardwareBufferManager::getSingleton());
-
                 size_t binding = 0;
                 if(type == GL_UNIFORM_BLOCK)
                 {
-                    binding = hbm.getUniformBufferCount();
+                    binding = hbm.getUniformBufferCount() + 1; // binding 0 reserved for defaultbuffer
                     hwGlBuffer = hbm.createUniformBuffer(values[2]);
                 }
                 else

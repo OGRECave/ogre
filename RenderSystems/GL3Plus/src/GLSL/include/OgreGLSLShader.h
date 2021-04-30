@@ -48,6 +48,8 @@ namespace Ogre {
 
         bool linkSeparable();
 
+        const HardwareBufferPtr& getDefaultBuffer() const { return mDefaultBuffer; }
+
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
     protected:
@@ -60,9 +62,11 @@ namespace Ogre {
         /// submit shader source to OpenGL.
         virtual void compileSource();
 
-
-        void extractUniforms() const;
+        /// @param block uniform block to consider. -1 for non-UBO uniforms
+        void extractUniforms(int block = -1) const;
         void extractBufferBlocks(GLenum type) const;
+
+        mutable HardwareBufferPtr mDefaultBuffer;
     };
 }
 
