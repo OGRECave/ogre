@@ -106,19 +106,14 @@ namespace Ogre {
     class _OgreExport HardwareBufferManagerBase : public BufferAlloc
     {
     protected:
-        /** WARNING: The following two members should place before all other members.
+        /** WARNING: The following member should place before all other members.
             Members destruct order is very important here, because destructing other
             members will cause notify back to this class, and then will access to this
             two members.
         */
         typedef std::set<HardwareVertexBuffer*> VertexBufferList;
         typedef std::set<HardwareIndexBuffer*> IndexBufferList;
-        typedef std::set<HardwareUniformBuffer*> UniformBufferList;
-        typedef std::set<HardwareCounterBuffer*> CounterBufferList;
         VertexBufferList mVertexBuffers;
-        IndexBufferList mIndexBuffers;
-        UniformBufferList mUniformBuffers;
-        CounterBufferList mCounterBuffers;
 
 
         typedef std::set<VertexDeclaration*> VertexDeclarationList;
@@ -128,9 +123,6 @@ namespace Ogre {
 
         // Mutexes
         OGRE_MUTEX(mVertexBuffersMutex);
-        OGRE_MUTEX(mIndexBuffersMutex);
-        OGRE_MUTEX(mUniformBuffersMutex);
-        OGRE_MUTEX(mCounterBuffersMutex);
         OGRE_MUTEX(mVertexDeclarationsMutex);
         OGRE_MUTEX(mVertexBufferBindingsMutex);
 
@@ -399,8 +391,6 @@ namespace Ogre {
 
         /// Notification that a hardware vertex buffer has been destroyed.
         void _notifyVertexBufferDestroyed(HardwareVertexBuffer* buf);
-        /// Notification that a hardware index buffer has been destroyed.
-        void _notifyIndexBufferDestroyed(HardwareIndexBuffer* buf);
     };
 
     /** Singleton wrapper for hardware buffer manager. */

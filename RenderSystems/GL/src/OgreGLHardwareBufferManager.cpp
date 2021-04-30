@@ -94,12 +94,7 @@ namespace Ogre {
         auto indexSize = HardwareIndexBuffer::indexSize(itype);
         auto impl = new GLHardwareBuffer(GL_ELEMENT_ARRAY_BUFFER, indexSize * numIndexes, usage, useShadowBuffer);
 
-        auto buf = std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
-        {
-            OGRE_LOCK_MUTEX(mIndexBuffersMutex);
-            mIndexBuffers.insert(buf.get());
-        }
-        return buf;
+        return std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
     }
     //---------------------------------------------------------------------
     RenderToVertexBufferSharedPtr 
