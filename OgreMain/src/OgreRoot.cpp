@@ -386,6 +386,7 @@ namespace Ogre {
             return false;
         }
 
+        bool optionError = false;
         ConfigFile::SettingsBySection_::const_iterator seci;
         for(seci = cfg.getSettingsBySection().begin(); seci != cfg.getSettingsBySection().end(); ++seci) {
             const ConfigFile::SettingsMultiMap& settings = seci->second;
@@ -398,10 +399,18 @@ namespace Ogre {
                 continue;
             }
 
-            ConfigFile::SettingsMultiMap::const_iterator i;
-            for (i = settings.begin(); i != settings.end(); ++i)
+            for (auto p : settings)
             {
-                rs->setConfigOption(i->first, i->second);
+                try
+                {
+                    rs->setConfigOption(p.first, p.second);
+                }
+                catch(const InvalidParametersException& e)
+                {
+                    LogManager::getSingleton().logError(e.getDescription());
+                    optionError = true;
+                    continue;
+                }
             }
         }
 
@@ -419,14 +428,14 @@ namespace Ogre {
         setRenderSystem(rs);
 
         // Successful load
-        return true;
-
+        return !optionError;
     }
 
     //-----------------------------------------------------------------------
     bool Root::showConfigDialog(ConfigDialog* dialog) {
         if(dialog) {
-            restoreConfig();
+            if(!mActiveRenderer)
+                restoreConfig();
 
             if (dialog->display()) {
                 saveConfig();
