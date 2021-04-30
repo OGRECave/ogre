@@ -910,10 +910,10 @@ namespace Ogre {
                 {
                     String cb_name = mD3d11ShaderBufferDescs[b].Name;
                     bool isDefault = false;
-                    if(cb_name == "$Globals" || cb_name == "$Params")
+                    if(cb_name == "$Globals" || cb_name == "$Params" || cb_name == "OgreUniforms")
                     {
                         if(mDefaultBuffer)
-                            LogManager::getSingleton().logError("D3D11 - both $Globals and $Params cbuffers present. Dropping "+cb_name);
+                            LogManager::getSingleton().logError(mName+" - default cbuffer already exists. Ignoring "+cb_name);
                         else
                         {
                             mDefaultBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size);
