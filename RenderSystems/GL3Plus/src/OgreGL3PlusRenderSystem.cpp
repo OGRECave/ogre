@@ -204,7 +204,7 @@ namespace Ogre {
 
         opt.name = "Separate Shader Objects";
         opt.possibleValues = {"No", "Yes"};
-        opt.currentValue = opt.possibleValues[0];
+        opt.currentValue = opt.possibleValues[1];
         opt.immutable = false;
 
         mOptions[opt.name] = opt;
