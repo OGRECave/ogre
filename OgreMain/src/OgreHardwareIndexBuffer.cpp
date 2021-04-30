@@ -71,10 +71,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     HardwareIndexBuffer::~HardwareIndexBuffer()
     {
-        if (mMgr)
-        {
-            mMgr->_notifyIndexBufferDestroyed(this);
-        }
     }
 
 }

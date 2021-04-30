@@ -75,13 +75,7 @@ namespace Ogre {
         auto indexSize = HardwareIndexBuffer::indexSize(itype);
         auto impl = new D3D9HardwareBuffer(D3D9Mappings::get(itype), indexSize * numIndexes, usage, useShadowBuffer);
 
-        auto buf = std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
-        {
-            OGRE_LOCK_MUTEX(mIndexBuffersMutex);
-            mIndexBuffers.insert(buf.get());
-        }
-        return buf;
-            
+        return std::make_shared<HardwareIndexBuffer>(this, itype, numIndexes, impl);
     }
     //-----------------------------------------------------------------------
     VertexDeclaration* D3D9HardwareBufferManager::createVertexDeclarationImpl(void)

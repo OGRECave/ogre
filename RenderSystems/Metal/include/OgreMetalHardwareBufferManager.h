@@ -39,6 +39,8 @@ namespace Ogre {
     protected:
         MetalDiscardBufferManager *mDiscardBufferManager;
 
+        OGRE_MUTEX(mIndexBuffersMutex);
+        IndexBufferList mIndexBuffers;
     public:
         MetalHardwareBufferManager( MetalDevice *device);
         virtual ~MetalHardwareBufferManager();

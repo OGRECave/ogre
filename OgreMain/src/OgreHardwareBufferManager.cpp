@@ -61,13 +61,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     HardwareBufferManagerBase::~HardwareBufferManagerBase()
     {
-        // Clear vertex/index buffer list first, avoid destroyed notify do
-        // unnecessary work, and we'll destroy everything here.
-        mVertexBuffers.clear();
-        mIndexBuffers.clear();
-        mUniformBuffers.clear();
-        mCounterBuffers.clear();
-
         // Destroy everything
         destroyAllDeclarations();
         destroyAllBindings();
@@ -394,17 +387,6 @@ namespace Ogre {
             // release vertex buffer copies
             mVertexBuffers.erase(i);
             _forceReleaseBufferCopies(buf);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void HardwareBufferManagerBase::_notifyIndexBufferDestroyed(HardwareIndexBuffer* buf)
-    {
-            OGRE_LOCK_MUTEX(mIndexBuffersMutex);
-
-        IndexBufferList::iterator i = mIndexBuffers.find(buf);
-        if (i != mIndexBuffers.end())
-        {
-            mIndexBuffers.erase(i);
         }
     }
     RenderToVertexBufferSharedPtr HardwareBufferManagerBase::createRenderToVertexBuffer()

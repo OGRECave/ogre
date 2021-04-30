@@ -40,7 +40,8 @@ namespace Ogre {
     protected:
         GL3PlusRenderSystem* mRenderSystem;
 
-        UniformBufferList mShaderStorageBuffers;
+        size_t mUniformBufferCount;
+        size_t mShaderStorageBufferCount;
 
         VertexDeclaration* createVertexDeclarationImpl(void);
     public:
@@ -67,8 +68,8 @@ namespace Ogre {
         /// Create a render to vertex buffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 
-        size_t getUniformBufferCount() { return mUniformBuffers.size(); }
-        size_t getShaderStorageBufferCount() { return mShaderStorageBuffers.size(); }
+        size_t getUniformBufferCount() { return mUniformBufferCount; }
+        size_t getShaderStorageBufferCount() { return mShaderStorageBufferCount; }
 
         /// Utility function to get the correct GL type based on VET's
         static GLenum getGLType(VertexElementType type);
