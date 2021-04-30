@@ -118,6 +118,14 @@ namespace Ogre
         GLuint progID = mShaders[fromProgType]->getGLProgramHandle();
         GLUniformCache* uniformCache = mShaders[fromProgType]->getUniformCache();
 
+        bool usesUBO = false;
+        if(const auto& ubo = static_cast<GLSLShader*>(mShaders[fromProgType])->getDefaultBuffer())
+        {
+            // we ignore ma
+            ubo->writeData(0, ubo->getSizeInBytes(), params->getConstantList().data(), true);
+            usesUBO = true;
+        }
+
         // Iterate through uniform reference list and update uniform values
         for (const auto& it : params->getConstantDefinitions().map)
         {
@@ -126,6 +134,9 @@ namespace Ogre
                 continue;
 
             GLsizei glArraySize = (GLsizei)def->arraySize;
+
+            if(usesUBO && !def->isSampler())
+                continue; // already handled above
 
             void* val = def->isSampler() ? (void*)params->getRegPointer(def->physicalIndex)
                                          : (void*)params->getFloatPointer(def->physicalIndex);
