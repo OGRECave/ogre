@@ -159,9 +159,7 @@ namespace Ogre {
     {
         ConfigOptionMap::iterator option = mOptions.find(name);
         if (option == mOptions.end()) {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Option named " + name + " does not exist.",
-                        "GLNativeSupport::setConfigOption");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Option named '" + name + "' does not exist.");
         }
         option->second.currentValue = value;
 
