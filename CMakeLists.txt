@@ -382,7 +382,6 @@ option(OGRE_INSTALL_CMAKE "Install CMake scripts." TRUE)
 cmake_dependent_option(OGRE_INSTALL_SAMPLES "Install Ogre demos." TRUE "OGRE_BUILD_SAMPLES" FALSE)
 option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." TRUE)
-cmake_dependent_option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE "OGRE_BUILD_SAMPLES" FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" TRUE "MSVC" FALSE)
 option(OGRE_PROFILING "Enable internal instrumentation." FALSE)
 set(OGRE_PROFILING_REMOTERY_PATH "" CACHE PATH "set this to Remotery/lib to use Remotery instead of the buildin profiler")
@@ -425,7 +424,6 @@ mark_as_advanced(
   OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT
   OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER
   OGRE_CONFIG_ENABLE_TBB_SCHEDULER
-  OGRE_INSTALL_SAMPLES_SOURCE
   OGRE_PROFILING
   OGRE_CONFIG_STATIC_LINK_CRT
   OGRE_LIB_DIRECTORY
@@ -496,7 +494,7 @@ add_subdirectory(Docs)
 # Install sample media files
 install(DIRECTORY Media/ShadowVolume DESTINATION "${OGRE_MEDIA_PATH}/")
 install(DIRECTORY Media/RTShaderLib DESTINATION "${OGRE_MEDIA_PATH}/")
-if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
+if (OGRE_INSTALL_SAMPLES)
   install(DIRECTORY Samples/Media/ DESTINATION ${OGRE_MEDIA_PATH})
 endif ()
 
