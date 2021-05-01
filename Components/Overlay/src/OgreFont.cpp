@@ -550,7 +550,6 @@ namespace Ogre
 #ifdef HAVE_FREETYPE
         FT_Done_FreeType(ftLibrary);
 #endif
-        img.save(mSource+".stb.png");
         Texture* tex = static_cast<Texture*>(res);
         // Call internal _loadImages, not loadImage since that's external and 
         // will determine load status etc again, and this is a manual loader inside load()
