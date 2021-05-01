@@ -12,7 +12,7 @@
 # Add platform specific settings
 
 if(EGL_FOUND)
-  option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" FALSE)
+  cmake_dependent_option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" TRUE "NOT WIN32" FALSE)
 endif()
 
 if(ANDROID)

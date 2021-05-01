@@ -304,7 +304,7 @@ set(OGRE_RESOURCEMANAGER_STRICT "2" CACHE STRING
   ")
 set_property(CACHE OGRE_RESOURCEMANAGER_STRICT PROPERTY STRINGS 0 1 2)
 
-option(OGRE_NODELESS_POSITIONING "use Lights and Cameras without attaching them to nodes [DEPRECATED]" TRUE)
+option(OGRE_NODELESS_POSITIONING "use Lights and Cameras without attaching them to nodes [DEPRECATED]" FALSE)
 
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX9_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem" TRUE "WIN32;DirectX11_FOUND OR WINDOWS_STORE OR WINDOWS_PHONE" FALSE)
