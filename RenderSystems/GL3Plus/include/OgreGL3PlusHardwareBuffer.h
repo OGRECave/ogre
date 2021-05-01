@@ -68,6 +68,7 @@ namespace Ogre {
 
         void setGLBufferBinding(GLint binding);
         GLint getGLBufferBinding(void) const { return mBindingPoint; }
+        void bind() { setGLBufferBinding(mBindingPoint); }
     };
 }
 #endif // __GL3PlusHARDWAREBUFFER_H__

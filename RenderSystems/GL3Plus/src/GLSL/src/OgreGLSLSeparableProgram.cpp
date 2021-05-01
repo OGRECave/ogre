@@ -123,6 +123,7 @@ namespace Ogre
         {
             // we ignore ma
             ubo->writeData(0, ubo->getSizeInBytes(), params->getConstantList().data(), true);
+            static_cast<GL3PlusHardwareBuffer*>(ubo.get())->bind();
             usesUBO = true;
         }
 
