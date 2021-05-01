@@ -481,12 +481,12 @@ namespace Ogre {
         GLint numUniforms = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(mGLProgramHandle, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms));
 
-        const GLenum properties[5] = {GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION, GL_ARRAY_SIZE};
+        const GLenum properties[6] = {GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION, GL_ARRAY_SIZE, GL_OFFSET};
         for (int unif = 0; unif < numUniforms; ++unif)
         {
-            GLint values[5];
+            GLint values[6];
             OGRE_CHECK_GL_ERROR(
-                glGetProgramResourceiv(mGLProgramHandle, GL_UNIFORM, unif, 5, properties, 5, NULL, values));
+                glGetProgramResourceiv(mGLProgramHandle, GL_UNIFORM, unif, 6, properties, 6, NULL, values));
 
             // Skip any uniforms that are in a different block or atomic_uints
             if (values[0] != block || (block == -1 && values[3] == -1))
@@ -519,7 +519,7 @@ namespace Ogre {
 
             if (def.isFloat() || def.isDouble() || def.isInt() || def.isUnsignedInt() || def.isBool())
             {
-                def.physicalIndex = mConstantDefs->bufferSize*4;
+                def.physicalIndex = block > -1 ? values[5] : mConstantDefs->bufferSize * 4;
                 mConstantDefs->bufferSize += def.arraySize * def.elementSize;
 
                 if (values[3] != -1)
@@ -567,9 +567,14 @@ namespace Ogre {
             if (name == "OgreUniforms") // default buffer
             {
                 extractUniforms(blockIdx);
+                int binding = int(mType);
+                if (binding > 1)
+                    LogManager::getSingleton().logWarning(
+                        mName + " - using a UBO in this shader type will alias with shared_params");
+
                 mDefaultBuffer = hbm.createUniformBuffer(values[2]);
-                static_cast<GL3PlusHardwareBuffer*>(mDefaultBuffer.get())->setGLBufferBinding(0);
-                OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, blockIdx, 0));
+                static_cast<GL3PlusHardwareBuffer*>(mDefaultBuffer.get())->setGLBufferBinding(binding);
+                OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, blockIdx, binding));
                 continue;
             }
 
@@ -581,7 +586,7 @@ namespace Ogre {
                 size_t binding = 0;
                 if(type == GL_UNIFORM_BLOCK)
                 {
-                    binding = hbm.getUniformBufferCount() + 1; // binding 0 reserved for defaultbuffer
+                    binding = hbm.getUniformBufferCount() + 2; // slots 0 & 1 are reserved for defaultbuffer
                     hwGlBuffer = hbm.createUniformBuffer(values[2]);
                 }
                 else
