@@ -29,10 +29,6 @@ THE SOFTWARE.
 #include "RootWithoutRenderSystemFixture.h"
 #include "OgreShaderGenerator.h"
 #include "OgreShaderProgramManager.h"
-
-#include "OgreShaderFFPTransform.h"
-#include "OgreShaderFFPColour.h"
-
 #include "OgreShaderFunctionAtom.h"
 
 using namespace Ogre;
@@ -87,7 +83,7 @@ TEST_F(RTShaderSystem, MaterialSerializer)
     shaderGen.getRenderState("MyScheme")->setLightCountAutoUpdate(false);
 
     auto rstate = shaderGen.getRenderState("MyScheme", *mat);
-    rstate->addTemplateSubRenderState(shaderGen.createSubRenderState<RTShader::FFPColour>());
+    rstate->addTemplateSubRenderState(shaderGen.createSubRenderState("FFP_Colour"));
 
     shaderGen.validateMaterial("MyScheme", *mat);
 
@@ -104,7 +100,7 @@ TEST_F(RTShaderSystem, TargetRenderState)
 
     using namespace RTShader;
     TargetRenderState targetRenderState;
-    targetRenderState.link({FFPTransform::Type, FFPColour::Type}, pass, pass);
+    targetRenderState.link({"FFP_Transform", "FFP_Colour"}, pass, pass);
     targetRenderState.acquirePrograms(pass);
 
     EXPECT_TRUE(pass->hasGpuProgram(GPT_VERTEX_PROGRAM));
