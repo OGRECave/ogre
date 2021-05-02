@@ -27,6 +27,8 @@ THE SOFTWARE.
 #include "OgreShaderPrecompiledHeaders.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
+#define SGX_FUNC_TRIPLANAR_TEXTURING "SGX_TriplanarTexturing"
+
 namespace Ogre {
 namespace RTShader {
 
@@ -105,7 +107,7 @@ namespace RTShader {
         vsStage.assign(mVSInPosition, mVSOutPosition);
 
         psMain->getStage(FFP_PS_TEXTURING)
-            .callFunction(SGX_FUNC_TRIPLANAR_TEXTURING,
+            .callFunction("SGX_TriplanarTexturing",
                           {In(mPSInDiffuse), In(mPSInNormal), In(mPSInPosition), In(mSamplerFromX),
                            In(mSamplerFromY), In(mSamplerFromZ), In(mPSTPParams), Out(mPSOutDiffuse)});
 

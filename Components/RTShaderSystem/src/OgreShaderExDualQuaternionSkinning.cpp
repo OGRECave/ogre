@@ -30,6 +30,12 @@ THE SOFTWARE.
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #define HS_DATA_BIND_NAME "HS_SRS_DATA"
 
+#define SGX_LIB_DUAL_QUATERNION                 "SGXLib_DualQuaternion"
+#define SGX_FUNC_ANTIPODALITY_ADJUSTMENT        "SGX_AntipodalityAdjustment"
+#define SGX_FUNC_CALCULATE_BLEND_POSITION       "SGX_CalculateBlendPosition"
+#define SGX_FUNC_CALCULATE_BLEND_NORMAL         "SGX_CalculateBlendNormal"
+#define SGX_FUNC_NORMALIZE_DUAL_QUATERNION      "SGX_NormalizeDualQuaternion"
+#define SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX       "SGX_AdjointTransposeMatrix"
 
 namespace Ogre {
 

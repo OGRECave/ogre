@@ -43,10 +43,6 @@ namespace RTShader {
 *  @{
 */
 
-#define SGX_LIB_NORMALMAP                           "SGXLib_NormalMap"
-#define SGX_FUNC_CONSTRUCT_TBNMATRIX                "SGX_ConstructTBNMatrix"
-#define SGX_FUNC_FETCHNORMAL                        "SGX_FetchNormal"
-
 /** Normal Map Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */

@@ -31,8 +31,6 @@ THE SOFTWARE.
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderSubRenderState.h"
 
-#define SGX_FUNC_TRIPLANAR_TEXTURING "SGX_TriplanarTexturing"
-
 namespace Ogre {
 namespace RTShader {
 

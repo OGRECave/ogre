@@ -188,13 +188,13 @@ bool RTShaderSRSTexturedFog::addFunctionInvocations(ProgramSet* programSet)
     switch (mFogMode)
     {
     case FOG_LINEAR:
-        fogFunc = FFP_FUNC_PIXELFOG_LINEAR;
+        fogFunc = "FFP_PixelFog_Linear";
         break;
     case FOG_EXP:
-        fogFunc = FFP_FUNC_PIXELFOG_EXP;
+        fogFunc = "FFP_PixelFog_Exp";
         break;
     case FOG_EXP2:
-        fogFunc = FFP_FUNC_PIXELFOG_EXP2;
+        fogFunc = "FFP_PixelFog_Exp2";
         break;
     case FOG_NONE:
        break;

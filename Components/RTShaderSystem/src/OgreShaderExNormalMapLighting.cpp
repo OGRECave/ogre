@@ -27,6 +27,10 @@ THE SOFTWARE.
 #include "OgreShaderPrecompiledHeaders.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
+#define SGX_LIB_NORMALMAP                           "SGXLib_NormalMap"
+#define SGX_FUNC_CONSTRUCT_TBNMATRIX                "SGX_ConstructTBNMatrix"
+#define SGX_FUNC_FETCHNORMAL                        "SGX_FetchNormal"
+
 namespace Ogre {
 namespace RTShader {
 
