@@ -44,7 +44,7 @@ namespace RTShader {
 /** Colour sub render state implementation of the Fixed Function Pipeline.
 Derives from SubRenderState class.
 */
-class _OgreRTSSExport FFPColour : public SubRenderState
+class FFPColour : public SubRenderState
 {
 public:
 
@@ -141,7 +141,7 @@ protected:
 A factory that enables creation of FFPColour instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class _OgreRTSSExport FFPColourFactory : public SubRenderStateFactory
+class FFPColourFactory : public SubRenderStateFactory
 {
 public:
 

@@ -555,16 +555,16 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
         const SubRenderStateList& subRenderStateList = schemRenderState->getSubRenderStates();
         SubRenderStateListConstIterator it = subRenderStateList.begin();
         SubRenderStateListConstIterator itEnd = subRenderStateList.end();
-        FFPFog* fogSubRenderState = NULL;
+        SubRenderState* fogSubRenderState = NULL;
         
         // Search for the fog sub state.
         for (; it != itEnd; ++it)
         {
             SubRenderState* curSubRenderState = *it;
 
-            if (curSubRenderState->getType() == FFPFog::Type)
+            if (curSubRenderState->getType() == "FFP_Fog")
             {
-                fogSubRenderState = static_cast<FFPFog*>(curSubRenderState);
+                fogSubRenderState = curSubRenderState;
                 break;
             }
         }
@@ -572,20 +572,13 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
         // Create the fog sub render state if need to.
         if (fogSubRenderState == NULL)
         {           
-            fogSubRenderState = mShaderGenerator->createSubRenderState<FFPFog>();
+            fogSubRenderState = mShaderGenerator->createSubRenderState("FFP_Fog");
             schemRenderState->addTemplateSubRenderState(fogSubRenderState);
         }
             
         
         // Select the desired fog calculation mode.
-        if (mPerPixelFogEnable)
-        {
-            fogSubRenderState->setCalcMode(FFPFog::CM_PER_PIXEL);
-        }
-        else
-        {
-            fogSubRenderState->setCalcMode(FFPFog::CM_PER_VERTEX);
-        }
+        fogSubRenderState->setParameter("calc_mode", mPerPixelFogEnable ? "per_pixel" : "per_vertex");
 
         // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
         mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
