@@ -600,7 +600,7 @@ Format: shared\_params\_ref &lt;shared\_set\_name&gt;
 @par
 Example: shared\_params\_ref mySharedParams
 
-The only required parameter is a name, which must be the name of an already defined shared parameter set. All named parameters which are present in the program that are also present in the shared parameter set will be linked, and the shared parameters used as if you had defined them locally. This is dependent on the definitions (type and array size) matching between the shared set and the program.
+The only required parameter is a name, which must be the name of an already defined shared parameter set. All named parameters which are present in both the program and the shared parameter set will be linked, and the shared parameters values will be used.
 
 # Declaring Shared Parameters {#Declaring-Shared-Parameters}
 
@@ -616,14 +616,34 @@ shared_params YourSharedParamsName
 
 As you can see, you need to use the keyword ’shared\_params’ and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the [param\_named](#param_005fnamed) syntax. The definition of these lines is:
 @par
-Format: shared\_param\_name &lt;param\_name&gt; &lt;param\_type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
+Format: shared\_param\_named &lt;param\_name&gt; &lt;param\_type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
 
 @param param_name must be unique within the set
 @param param_type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4.
 @param array_size allows you to define arrays of param\_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param\_type with whitespace).
 @param initial_values If you wish, you can also initialise the parameters by providing a list of values.
 
-Once you have defined the shared parameters, you can reference them inside default\_params and params blocks using [shared\_params\_ref](#shared_005fparams_005fref). You can also obtain a reference to them in your code via GpuProgramManager::getSharedParameters, and update the values for all instances using them.
+Once you have defined the shared parameters, you can reference them inside default\_params and params blocks using [shared\_params\_ref](#shared_005fparams_005fref). You can also obtain a reference to them in your code via Ogre::GpuProgramManager::getSharedParameters, and update the values for all instances using them.
+
+## Hardware Support
+
+Furthermore, shared_params can be mapped to hardware buffers, if supported by the RenderSystem. To enable this, you have to provide a matching declaration in your shader.
+
+For HLSL, that would be a constant buffer defined as
+```cpp
+cbuffer YourSharedParamsName
+{
+    float4 mySharedParam1;
+}
+```
+
+and for GLSL a uniform block defined as
+```cpp
+layout(std140, row_major) uniform YourSharedParamsName
+{
+    vec4 mySharedParam1;
+};
+```
 
 # Shadows and Vertex Programs {#Shadows-and-Vertex-Programs}
 
