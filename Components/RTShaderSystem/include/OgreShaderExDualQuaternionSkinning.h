@@ -42,17 +42,6 @@ namespace RTShader {
 *  @{
 */
 
-#define SGX_LIB_DUAL_QUATERNION                 "SGXLib_DualQuaternion"
-/// @deprecated obsolete
-#define SGX_FUNC_BLEND_WEIGHT                   "SGX_BlendWeight"
-#define SGX_FUNC_ANTIPODALITY_ADJUSTMENT        "SGX_AntipodalityAdjustment"
-#define SGX_FUNC_CALCULATE_BLEND_POSITION       "SGX_CalculateBlendPosition"
-#define SGX_FUNC_CALCULATE_BLEND_NORMAL         "SGX_CalculateBlendNormal"
-#define SGX_FUNC_NORMALIZE_DUAL_QUATERNION      "SGX_NormalizeDualQuaternion"
-#define SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX       "SGX_AdjointTransposeMatrix"
-/// @deprecated obsolete
-#define SGX_FUNC_BUILD_DUAL_QUATERNION_MATRIX   "SGX_BuildDualQuaternionMatrix"
-
 /** Implement a sub render state which performs dual quaternion hardware skinning.
     This sub render state uses bone matrices converted to dual quaternions and adds calculations
     to transform the points and normals using their associated dual quaternions.

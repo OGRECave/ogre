@@ -198,13 +198,13 @@ bool ShaderExReflectionMap::addVSInvocations( const FunctionStageRef& stage )
     // Output reflection texture coordinates.
     if (mReflectionMapType == TEX_TYPE_2D)
     {
-        stage.callFunction(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,
+        stage.callFunction("FFP_GenerateTexCoord_EnvMap_Sphere",
                            {In(mWorldITMatrix), In(mViewMatrix), In(mVSInputNormal), Out(mVSOutReflectionTexcoord)});
     }
     else
     {
         stage.callFunction(
-            FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,
+            "FFP_GenerateTexCoord_EnvMap_Reflect",
             {In(mWorldMatrix), In(mWorldITMatrix), In(mViewMatrix), In(mVSInputNormal), In(mVSInputPos), Out(mVSOutReflectionTexcoord)});
     }
     

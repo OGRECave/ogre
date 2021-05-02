@@ -28,6 +28,10 @@ THE SOFTWARE.
 #include "OgreShaderPrecompiledHeaders.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
+#define SGX_LIB_INTEGRATEDPSSM                      "SGXLib_IntegratedPSSM"
+#define SGX_FUNC_COMPUTE_SHADOW_COLOUR3             "SGX_ComputeShadowFactor_PSSM3"
+#define SGX_FUNC_APPLYSHADOWFACTOR_DIFFUSE          "SGX_ApplyShadowFactor_Diffuse"
+
 namespace Ogre {
 namespace RTShader {
 
