@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderExLinearSkinning_
-#define _ShaderExLinearSkinning_
+#ifndef _ShaderExDualQuaternionSkinning_
+#define _ShaderExDualQuaternionSkinning_
 
 #include "OgreShaderPrerequisites.h"
 
@@ -42,16 +42,16 @@ namespace RTShader {
 *  @{
 */
 
-/** Implement a sub render state which performs hardware skinning.
-Meaning, this sub render states adds calculations which multiply
-the points and normals by their assigned bone matricies.
+/** Implement a sub render state which performs dual quaternion hardware skinning.
+    This sub render state uses bone matrices converted to dual quaternions and adds calculations
+    to transform the points and normals using their associated dual quaternions.
 */
-class _OgreRTSSExport LinearSkinning : public HardwareSkinningTechnique
+class DualQuaternionSkinning : public HardwareSkinningTechnique
 {
 // Interface.
 public:
     /** Class default constructor */
-    LinearSkinning();
+    DualQuaternionSkinning();
 
     /**
     @see SubRenderState::resolveParameters.
@@ -68,26 +68,46 @@ public:
     */
     virtual bool addFunctionInvocations(ProgramSet* programSet);
 
+// Protected methods
 protected:
     /** Adds functions to calculate position data in world, object and projective space */
     void addPositionCalculations(Function* vsMain);
 
-    /** Adds the weight of a given position for a given index */
-    void addIndexedPositionWeight(Function* vsMain, int index);
+    /** Adjusts the sign of a dual quaternion depending on its orientation to the root dual quaternion */
+    void adjustForCorrectAntipodality(Function* vsMain, int index, const ParameterPtr& pTempWorldMatrix);
 
+    /** Adds the weight of a given position for a given index
+    @param pPositionTempParameter
+        Requires a temp parameter with a matrix the same size of pPositionRelatedParam
+    */
+    void addIndexedPositionWeight(Function* vsMain, int index, ParameterPtr& pWorldMatrix,
+                                  ParameterPtr& pPositionTempParameter, ParameterPtr& pPositionRelatedOutputParam);
+    
     /** Adds the calculations for calculating a normal related element */
     void addNormalRelatedCalculations(Function* vsMain,
-                        ParameterPtr& pNormalRelatedParam,
-                        ParameterPtr& pNormalWorldRelatedParam);
+                                      ParameterPtr& pNormalRelatedParam,
+                                      ParameterPtr& pNormalWorldRelatedParam);
 
-    /** Adds the weight of a given normal related parameter for a given index */
-    void addIndexedNormalRelatedWeight(Function* vsMain, ParameterPtr& pNormalRelatedParam,
-                        ParameterPtr& pNormalWorldRelatedParam,
-                        int index);
+protected:
+    UniformParameterPtr mParamInScaleShearMatrices;
+    ParameterPtr mParamLocalBlendPosition;
+    ParameterPtr mParamBlendS;
+    ParameterPtr mParamBlendDQ;
+    ParameterPtr mParamInitialDQ;
+    ParameterPtr mParamTempWorldMatrix;
+
+    ParameterPtr mParamTempFloat2x4;
+    ParameterPtr mParamTempFloat3x3;
+    ParameterPtr mParamTempFloat3x4;
+    
+    ParameterPtr mParamIndex1;
+    ParameterPtr mParamIndex2;
+
 };
 
-}
-}
+} // namespace RTShader
+} // namespace Ogre
 
-#endif
-#endif
+#endif // RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#endif // _ShaderExDualQuaternionSkinning_
+
