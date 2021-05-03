@@ -468,8 +468,7 @@ namespace Ogre {
 
 
     public:
-        RenderQueueGroup(RenderQueue* parent,
-            bool splitPassesByLightingType,
+        RenderQueueGroup(bool splitPassesByLightingType,
             bool splitNoShadowPasses,
             bool shadowCastersNotReceivers) 
             : mSplitPassesByLightingType(splitPassesByLightingType)
