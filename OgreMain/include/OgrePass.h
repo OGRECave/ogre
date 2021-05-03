@@ -252,7 +252,7 @@ namespace Ogre {
 
     public:
         typedef std::set<Pass*> PassSet;
-    protected:
+    private:
         /// List of Passes whose hashes need recalculating
         static PassSet msDirtyHashList;
         /// The place where passes go to die
@@ -1631,7 +1631,7 @@ namespace Ogre {
             @see UserObjectBindings::setUserAny.
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
-     protected:
+     private:
         std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType);
         const std::unique_ptr<GpuProgramUsage>& getProgramUsage(GpuProgramType programType) const;
     };

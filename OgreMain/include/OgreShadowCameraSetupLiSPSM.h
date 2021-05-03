@@ -97,7 +97,6 @@ namespace Ogre
     */
     class _OgreExport LiSPSMShadowCameraSetup : public FocusedShadowCameraSetup
     {
-    protected:
         /// Warp factor adjustment
         Real mOptAdjustFactor;
         /// Use simple nopt derivation?

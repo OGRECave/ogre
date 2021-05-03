@@ -80,7 +80,7 @@ namespace Ogre {
         /// @copydoc Singleton::getSingleton()
         static RenderSystemCapabilitiesManager* getSingletonPtr(void);
 
-    protected:
+    private:
 
         RenderSystemCapabilitiesSerializer* mSerializer;
 

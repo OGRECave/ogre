@@ -122,7 +122,7 @@ namespace Ogre {
             OM_SORT_ASCENDING = 6
         };
 
-    protected:
+    private:
         /// Comparator to order pass groups
         struct PassGroupLess
         {
@@ -309,7 +309,7 @@ namespace Ogre {
     */
     class _OgreExport RenderPriorityGroup : public RenderQueueAlloc
     {
-    protected:
+    private:
 
         /// Parent queue group
         RenderQueueGroup* mParent;
@@ -455,8 +455,7 @@ namespace Ogre {
         typedef std::map<ushort, RenderPriorityGroup*, std::less<ushort> > PriorityMap;
         typedef MapIterator<PriorityMap> PriorityMapIterator;
         typedef ConstMapIterator<PriorityMap> ConstPriorityMapIterator;
-    protected:
-        RenderQueue* mParent;
+    private:
         bool mSplitPassesByLightingType;
         bool mSplitNoShadowPasses;
         bool mShadowCastersNotReceivers;
@@ -473,8 +472,7 @@ namespace Ogre {
             bool splitPassesByLightingType,
             bool splitNoShadowPasses,
             bool shadowCastersNotReceivers) 
-            : mParent(parent)
-            , mSplitPassesByLightingType(splitPassesByLightingType)
+            : mSplitPassesByLightingType(splitPassesByLightingType)
             , mSplitNoShadowPasses(splitNoShadowPasses)
             , mShadowCastersNotReceivers(shadowCastersNotReceivers)
             , mShadowsEnabled(true)

@@ -436,7 +436,6 @@ namespace Ogre {
         */
         class _OgreExport ResourcePool : public Pool<ResourcePtr>, public ResourceAlloc
         {
-        protected:
             String mName;
         public:
             ResourcePool(const String& name);

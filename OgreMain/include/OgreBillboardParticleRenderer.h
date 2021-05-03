@@ -51,7 +51,6 @@ namespace Ogre {
     */
     class _OgreExport BillboardParticleRenderer : public ParticleSystemRenderer
     {
-    protected:
         /// The billboard set that's doing the rendering
         BillboardSet* mBillboardSet;
         Vector2 mStacksSlices;

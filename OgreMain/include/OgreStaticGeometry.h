@@ -189,7 +189,6 @@ namespace Ogre {
         */
         class _OgreExport GeometryBucket :  public Renderable,  public BatchedGeometryAlloc
         {
-        protected:
             /// Geometry which has been queued up pre-build (not for deallocation)
             QueuedGeometryList mQueuedGeometry;
             /// Pointer to parent bucket
@@ -256,7 +255,7 @@ namespace Ogre {
         public:
             /// list of Geometry Buckets in this region
             typedef std::vector<GeometryBucket*> GeometryBucketList;
-        protected:
+        private:
             /// Pointer to parent LODBucket
             LODBucket* mParent;
             /// Material being used
@@ -311,11 +310,10 @@ namespace Ogre {
         public:
             /// Lookup of Material Buckets in this region
             typedef std::map<String, MaterialBucket*> MaterialBucketMap;
-        protected:
+        private:
             /** Nested class to allow shadows. */
-            class _OgreExport LODShadowRenderable : public ShadowRenderable
+            class LODShadowRenderable : public ShadowRenderable
             {
-            protected:
                 LODBucket* mParent;
                 // Shared link to position buffer
                 HardwareVertexBufferSharedPtr mPositionBuffer;
@@ -397,7 +395,7 @@ namespace Ogre {
         public:
             /// list of LOD Buckets in this region
             typedef std::vector<LODBucket*> LODBucketList;
-        protected:
+        private:
             /// Parent static geometry
             StaticGeometry* mParent;
             /// Scene manager link
@@ -424,8 +422,6 @@ namespace Ogre {
             LODBucketList mLodBucketList;
             /// List of lights for this region
             mutable LightList mLightList;
-            /// The last frame that this light list was updated in
-            mutable ulong mLightListUpdated;
             /// LOD strategy reference
             const LodStrategy *mLodStrategy;
             /// Current camera
@@ -484,11 +480,10 @@ namespace Ogre {
             and region 1023 ends at mOrigin + (mRegionDimensions.x * 512).
         */
         typedef std::map<uint32, Region*> RegionMap;
-    protected:
+    private:
         // General state & settings
         SceneManager* mOwner;
         String mName;
-        bool mBuilt;
         Real mUpperDistance;
         Real mSquaredUpperDistance;
         bool mCastShadows;

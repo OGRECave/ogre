@@ -1085,7 +1085,7 @@ namespace Ogre {
 
         /// return a sampler local to this TUS instead of the shared global one
         const SamplerPtr& _getLocalSampler();
-protected:
+private:
         // State
         /// The current animation frame.
         unsigned int mCurrentFrame;

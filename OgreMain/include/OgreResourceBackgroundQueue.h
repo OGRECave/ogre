@@ -105,7 +105,7 @@ namespace Ogre {
 
         };
 
-    protected:
+    private:
 
         uint16 mWorkQueueChannel;
         /** Enumerates the type of requests */

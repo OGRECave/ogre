@@ -51,7 +51,7 @@ namespace Ogre {
                 IT_32BIT
             };
 
-        protected:
+        private:
             IndexType mIndexType;
             HardwareBufferManagerBase* mMgr;
             size_t mNumIndexes;

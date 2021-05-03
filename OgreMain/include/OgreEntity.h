@@ -319,9 +319,8 @@ namespace Ogre {
         ShadowRenderableList mShadowRenderables;
 
         /** Nested class to allow entity shadows. */
-        class _OgreExport EntityShadowRenderable : public ShadowRenderable
+        class EntityShadowRenderable : public ShadowRenderable
         {
-        protected:
             Entity* mParent;
             /// Shared link to position buffer.
             HardwareVertexBufferSharedPtr mPositionBuffer;
