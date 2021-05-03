@@ -82,21 +82,16 @@ namespace Ogre {
         DefaultHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize, 
         size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
-        DefaultHardwareVertexBuffer* vb = OGRE_NEW DefaultHardwareVertexBuffer(this, vertexSize, numVerts, usage);
-        return HardwareVertexBufferSharedPtr(vb);
+        return std::make_shared<HardwareVertexBuffer>(this, vertexSize, numVerts,
+                                                      new DefaultHardwareBuffer(vertexSize * numVerts));
     }
     //-----------------------------------------------------------------------
     HardwareIndexBufferSharedPtr 
         DefaultHardwareBufferManagerBase::createIndexBuffer(HardwareIndexBuffer::IndexType itype, 
         size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
-        DefaultHardwareIndexBuffer* ib = OGRE_NEW DefaultHardwareIndexBuffer(itype, numIndexes, usage);
-        return HardwareIndexBufferSharedPtr(ib);
-    }
-    HardwareBufferPtr DefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes,
-                                                                            HardwareBufferUsage usage,
-                                                                            bool useShadowBuffer)
-    {
-        return HardwareBufferPtr(new DefaultHardwareBuffer(sizeBytes));
+        return std::make_shared<HardwareIndexBuffer>(
+            this, itype, numIndexes,
+            new DefaultHardwareBuffer(HardwareIndexBuffer::indexSize(itype) * numIndexes));
     }
 }
