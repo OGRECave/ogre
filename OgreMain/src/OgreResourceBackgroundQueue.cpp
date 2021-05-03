@@ -43,7 +43,43 @@ namespace Ogre {
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
-    //-----------------------------------------------------------------------   
+    //-----------------------------------------------------------------------
+    /** Enumerates the type of requests */
+    enum RequestType
+    {
+        RT_INITIALISE_GROUP = 0,
+        RT_INITIALISE_ALL_GROUPS = 1,
+        RT_PREPARE_GROUP = 2,
+        RT_PREPARE_RESOURCE = 3,
+        RT_LOAD_GROUP = 4,
+        RT_LOAD_RESOURCE = 5,
+        RT_UNLOAD_GROUP = 6,
+        RT_UNLOAD_RESOURCE = 7
+    };
+    /** Encapsulates a queued request for the background queue */
+    struct ResourceRequest
+    {
+        RequestType type;
+        String resourceName;
+        ResourceHandle resourceHandle;
+        String resourceType;
+        String groupName;
+        bool isManual;
+        ManualResourceLoader* loader;
+        NameValuePairList* loadParams;
+        ResourceBackgroundQueue::Listener* listener;
+        BackgroundProcessResult result;
+    };
+    /// Struct that holds details of queued notifications
+    struct ResourceResponse
+    {
+        ResourceResponse(ResourcePtr r, const ResourceRequest& req)
+            : resource(r), request(req)
+        {}
+
+        ResourcePtr resource;
+        ResourceRequest request;
+    };
     //------------------------------------------------------------------------
     ResourceBackgroundQueue::ResourceBackgroundQueue() : mWorkQueueChannel(0)
     {
