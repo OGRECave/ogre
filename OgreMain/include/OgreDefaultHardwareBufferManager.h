@@ -61,13 +61,8 @@ namespace Ogre {
     class _OgreExport DefaultHardwareVertexBuffer : public HardwareVertexBuffer
     {
     public:
-        DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, Usage usage)
-            : DefaultHardwareVertexBuffer(NULL, vertexSize, numVertices, usage)
-        {
-        }
-        DefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
-                                    Usage usage)
-            : HardwareVertexBuffer(mgr, vertexSize, numVertices,
+        DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, Usage = HBU_CPU_ONLY)
+            : HardwareVertexBuffer(NULL, vertexSize, numVertices,
                                    new DefaultHardwareBuffer(vertexSize * numVertices))
         {
         }
@@ -76,7 +71,7 @@ namespace Ogre {
     class _OgreExport DefaultHardwareIndexBuffer : public HardwareIndexBuffer
     {
     public:
-        DefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, Usage usage)
+        DefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, Usage = HBU_CPU_ONLY)
             : HardwareIndexBuffer(NULL, idxType, numIndexes,
                                   new DefaultHardwareBuffer(indexSize(idxType) * numIndexes))
         {
@@ -104,8 +99,11 @@ namespace Ogre {
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
                 HardwareBuffer::Usage usage, bool useShadowBuffer = false) override;
         /// Create a hardware uniform buffer
-        HardwareBufferPtr createUniformBuffer(size_t sizeBytes, HardwareBufferUsage usage = HBU_CPU_TO_GPU,
-                                              bool useShadowBuffer = false) override;
+        HardwareBufferPtr createUniformBuffer(size_t sizeBytes, HardwareBufferUsage = HBU_CPU_ONLY,
+                                              bool = false) override
+        {
+            return std::make_shared<DefaultHardwareBuffer>(sizeBytes);
+        }
     };
 
     /// DefaultHardwareBufferManager as a Singleton
