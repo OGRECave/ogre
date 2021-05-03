@@ -58,7 +58,9 @@ namespace Ogre {
         BackgroundProcessResult() : error(false) {}
     };
 
-    
+
+    struct ResourceRequest;
+
     /** This class is used to perform Resource operations in a
         background thread. 
     @remarks
@@ -108,52 +110,9 @@ namespace Ogre {
     private:
 
         uint16 mWorkQueueChannel;
-        /** Enumerates the type of requests */
-        enum RequestType
-        {
-            RT_INITIALISE_GROUP = 0,
-            RT_INITIALISE_ALL_GROUPS = 1,
-            RT_PREPARE_GROUP = 2,
-            RT_PREPARE_RESOURCE = 3,
-            RT_LOAD_GROUP = 4,
-            RT_LOAD_RESOURCE = 5,
-            RT_UNLOAD_GROUP = 6,
-            RT_UNLOAD_RESOURCE = 7
-        };
-        /** Encapsulates a queued request for the background queue */
-        struct ResourceRequest
-        {
-            RequestType type;
-            String resourceName;
-            ResourceHandle resourceHandle;
-            String resourceType;
-            String groupName;
-            bool isManual; 
-            ManualResourceLoader* loader;
-            NameValuePairList* loadParams;
-            Listener* listener;
-            BackgroundProcessResult result;
-
-            OGRE_DEPRECATED friend std::ostream& operator<<(std::ostream& o, const ResourceRequest& r)
-            { (void)r; return o; }
-        };
 
         typedef std::set<BackgroundProcessTicket> OutstandingRequestSet;   
         OutstandingRequestSet mOutstandingRequestSet;
-
-        /// Struct that holds details of queued notifications
-        struct ResourceResponse
-        {
-            ResourceResponse(ResourcePtr r, const ResourceRequest& req)
-                : resource(r), request(req)
-            {}
-
-            ResourcePtr resource;
-            ResourceRequest request;
-
-            OGRE_DEPRECATED friend std::ostream& operator<<(std::ostream& o, const ResourceResponse& r)
-            { (void)r; return o; }
-        };
 
         BackgroundProcessTicket addRequest(ResourceRequest& req);
 
