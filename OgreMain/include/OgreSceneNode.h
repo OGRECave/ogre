@@ -102,7 +102,7 @@ namespace Ogre {
         bool mYawFixed : 1;
         /// Is this node a current part of the scene graph?
         bool mIsInSceneGraph : 1;
-    protected: // private in 1.13
+    private: // private in 1.13
         /// Flag that determines if the bounding box of the node should be displayed
         bool mShowBoundingBox : 1;
         bool mHideBoundingBox : 1;

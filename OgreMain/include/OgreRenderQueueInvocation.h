@@ -65,7 +65,6 @@ namespace Ogre {
     */
     class _OgreExport RenderQueueInvocation : public RenderQueueAlloc
     {
-    protected:
         /// Target queue group
         uint8 mRenderQueueGroupID;
         /// Invocation identifier - used in listeners
@@ -172,7 +171,6 @@ namespace Ogre {
     */
     class _OgreExport RenderQueueInvocationSequence : public RenderQueueAlloc
     {
-    protected:
         String mName;
         RenderQueueInvocationList mInvocations;
     public:

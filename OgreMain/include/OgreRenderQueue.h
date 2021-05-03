@@ -129,7 +129,7 @@ namespace Ogre {
             virtual bool renderableQueued(Renderable* rend, uint8 groupID, 
                 ushort priority, Technique** ppTech, RenderQueue* pQueue) = 0;
         };
-    protected:
+    private:
         RenderQueueGroupMap mGroups;
         /// The current default queue group
         uint8 mDefaultQueueGroup;

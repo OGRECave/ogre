@@ -400,7 +400,6 @@ namespace Ogre {
     */
     class _OgreExport GpuSharedParameters : public GpuParamsAlloc
     {
-    protected:
         /// Name of the shared parameter set.
         String mName;
 

@@ -47,8 +47,6 @@ namespace Ogre {
     /** Specialisation of HardwareBuffer for a vertex buffer. */
     class _OgreExport HardwareVertexBuffer : public HardwareBuffer
     {
-        protected:
-
             bool mIsInstanceData;
             HardwareBufferManagerBase* mMgr;
             size_t mNumVertices;

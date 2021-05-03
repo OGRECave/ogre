@@ -43,7 +43,6 @@ namespace Ogre {
     StaticGeometry::StaticGeometry(SceneManager* owner, const String& name):
         mOwner(owner),
         mName(name),
-        mBuilt(false),
         mUpperDistance(0.0f),
         mSquaredUpperDistance(0.0f),
         mCastShadows(false),

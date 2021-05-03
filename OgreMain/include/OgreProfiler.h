@@ -463,7 +463,7 @@ namespace Ogre {
         }
         ~Profile() { Profiler::getSingleton().endProfile(mName, mGroupID); }
 
-    protected:
+    private:
         /// The name of this profile
         String mName;
         /// The group ID

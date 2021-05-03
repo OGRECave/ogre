@@ -61,7 +61,7 @@ namespace Ogre {
         */
         void parseScript(DataStreamPtr& stream);
 
-    protected:
+    private:
         void write(const RenderSystemCapabilities* caps, const String &name, std::ostream &file);
 
         enum CapabilityKeywordType {UNDEFINED_CAPABILITY_TYPE = 0, SET_STRING_METHOD, SET_INT_METHOD, SET_BOOL_METHOD, SET_REAL_METHOD,

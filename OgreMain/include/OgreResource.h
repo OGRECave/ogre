@@ -151,7 +151,7 @@ namespace Ogre {
         String mOrigin;
         /// Optional manual loader; if provided, data is loaded from here instead of a file
         ManualResourceLoader* mLoader;
-    protected: // private in 1.13
+    private:
         /// State count, the number of times this resource has changed state
         size_t mStateCount;
 

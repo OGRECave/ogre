@@ -151,7 +151,7 @@ namespace Ogre {
             BLT_AUTOMATIC_RELEASE
         };
 
-    protected:
+    private:
         /** Struct holding details of a license to use a temporary shared buffer. */
         class _OgrePrivate VertexBufferLicense
         {

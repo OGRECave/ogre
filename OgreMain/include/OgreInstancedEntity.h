@@ -83,7 +83,7 @@ namespace Ogre
         friend class InstanceBatchHW;
         friend class InstanceBatchHW_VTF;
         friend class BaseInstanceBatchVTF;
-    protected:
+    private:
         typedef TransformBase<3, float>        Matrix3x4f;
         uint16 mInstanceId; //Note it may change after defragmenting!
         bool mInUse;

@@ -176,7 +176,7 @@ namespace Ogre {
             general sequence of updateFromParent (e.g. raising events)
         */
         virtual void updateFromParentImpl(void) const;
-    protected: // private in 1.13
+    private:
         /// The position to use as a base for keyframe animation
         Vector3 mInitialPosition;
         /// The orientation to use as a base for keyframe animation

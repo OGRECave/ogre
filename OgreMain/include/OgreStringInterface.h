@@ -118,7 +118,6 @@ namespace Ogre {
     class _OgreExport ParamDictionary
     {
         friend class StringInterface;
-    protected:
         /// Definitions of parameters
         ParameterList mParamDefs;
 

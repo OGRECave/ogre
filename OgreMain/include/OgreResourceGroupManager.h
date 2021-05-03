@@ -267,7 +267,7 @@ namespace Ogre {
         /// List of possible file locations
         typedef std::vector<ResourceLocation> LocationList;
 
-    protected:
+    private:
         /// Map of resource types (strings) to ResourceManagers, used to notify them to load / unload group contents
         ResourceManagerMap mResourceManagerMap;
 
