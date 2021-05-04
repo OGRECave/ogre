@@ -1015,6 +1015,7 @@ namespace Ogre
         // We always support compression, D3DX will decompress if device does not support
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
+        rsc->setCapability(RSC_AUTOMIPMAP_COMPRESSED);
             
         convertVertexShaderCaps(rsc);
         convertPixelShaderCaps(rsc);
