@@ -25,10 +25,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __OgreETCCodec_H__
-#define __OgreETCCodec_H__
+#ifndef __OgreDDSCodec_H__
+#define __OgreDDSCodec_H__
 
 #include "OgreImageCodec.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -38,42 +39,60 @@ namespace Ogre {
     *  @{
     */
 
-    /** Codec specialized in loading ETC (Ericsson Texture Compression) images.
+    // Forward declarations
+    struct DXTColourBlock;
+    struct DXTExplicitAlphaBlock;
+    struct DXTInterpolatedAlphaBlock;
+
+    /** Codec specialized in loading DDS (Direct Draw Surface) images.
     @remarks
-        We implement our own codec here since we need to be able to keep ETC
+        We implement our own codec here since we need to be able to keep DXT
         data compressed if the card supports it.
     */
-    class _OgreExport ETCCodec : public ImageCodec
+    class DDSCodec : public ImageCodec
     {
     private:
         String mType;
-        
-        /// Single registered codec instance
-        static ETCCodec* msPKMInstance;
-        static ETCCodec* msKTXInstance;
 
+        PixelFormat convertFourCCFormat(uint32 fourcc) const;
+        PixelFormat convertDXToOgreFormat(uint32 fourcc) const;
+        PixelFormat convertPixelFormat(uint32 rgbBits, uint32 rMask,
+            uint32 gMask, uint32 bMask, uint32 aMask) const;
+
+        /// Unpack DXT colours into array of 16 colour values
+        void unpackDXTColour(PixelFormat pf, const DXTColourBlock& block, ColourValue* pCol) const;
+        /// Unpack DXT alphas into array of 16 colour values
+        void unpackDXTAlpha(const DXTExplicitAlphaBlock& block, ColourValue* pCol) const;
+        /// Unpack DXT alphas into array of 16 colour values
+        void unpackDXTAlpha(const DXTInterpolatedAlphaBlock& block, ColourValue* pCol) const;
+
+        /// Single registered codec instance
+        static DDSCodec* msInstance;
     public:
-        ETCCodec(const String &type);
-        virtual ~ETCCodec() { }
+        DDSCodec();
+        virtual ~DDSCodec() { }
 
         using ImageCodec::decode;
+        using ImageCodec::encode;
+        using ImageCodec::encodeToFile;
+
+        void encodeToFile(const MemoryDataStreamPtr& input, const String& outFileName, const CodecDataPtr& pData) const override;
         DecodeResult decode(const DataStreamPtr& input) const override;
         String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
         String getType() const override;
 
-        /// Static method to startup and register the ETC codec
+        /// Static method to startup and register the DDS codec
         static void startup(void);
-        /// Static method to shutdown and unregister the ETC codec
+        /// Static method to shutdown and unregister the DDS codec
         static void shutdown(void);
-    private:
-        bool decodePKM(const DataStreamPtr& input, DecodeResult& result) const;
-        bool decodeKTX(const DataStreamPtr& input, DecodeResult& result) const;
 
     };
     /** @} */
     /** @} */
 
 } // namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif
 
