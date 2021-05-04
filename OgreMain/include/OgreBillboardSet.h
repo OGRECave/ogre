@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
-#include "OgreRadixSort.h"
 #include "OgreCommon.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreHeaderPrefix.h"
@@ -275,8 +274,6 @@ namespace Ogre {
             SortByDistanceFunctor(const Vector3& pos);
             float operator()(Billboard* bill) const;
         };
-
-        static RadixSort<BillboardPool, Billboard*, float> mRadixSorter;
 
         /// Use point rendering?
         bool mPointRendering;

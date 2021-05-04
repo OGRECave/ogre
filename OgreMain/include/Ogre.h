@@ -91,7 +91,6 @@ THE SOFTWARE.
 #include "OgrePatchMesh.h"
 #include "OgrePatchSurface.h"
 #include "OgreProfiler.h"
-#include "OgreRadixSort.h"
 #include "OgreRenderQueueInvocation.h"
 #include "OgreRenderQueueListener.h"
 #include "OgreRenderObjectListener.h"

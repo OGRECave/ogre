@@ -126,8 +126,6 @@ namespace Ogre {
     static CmdIterationInterval msIterationIntervalCmd;
     static CmdNonvisibleTimeout msNonvisibleTimeoutCmd;
 
-    RadixSort<ParticleSystem::ParticlePool, Particle*, float> ParticleSystem::mRadixSorter;
-
     Real ParticleSystem::msDefaultIterationInterval = 0;
     Real ParticleSystem::msDefaultNonvisibleTimeout = 0;
 
@@ -1191,6 +1189,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::_sortParticles(Camera* cam)
     {
+        static RadixSort<ParticlePool, Particle*, float> mRadixSorter;
         if (mRenderer)
         {
             SortMode sortMode =

@@ -82,6 +82,7 @@ extern "C" {
 #include "OgrePlatformInformation.h"
 #include "OgreProfiler.h"
 #include "OgreQuaternion.h"
+#include "OgreRadixSort.h"
 #include "OgreRay.h"
 #include "OgreRenderSystem.h"
 #include "OgreResourceGroupManager.h"

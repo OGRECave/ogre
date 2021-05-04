@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreVector.h"
 #include "OgreStringInterface.h"
 #include "OgreMovableObject.h"
-#include "OgreRadixSort.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreHeaderPrefix.h"
 
@@ -595,8 +594,6 @@ namespace Ogre {
             SortByDistanceFunctor(const Vector3& pos);
             float operator()(Particle* p) const;
         };
-
-        static RadixSort<ParticlePool, Particle*, float> mRadixSorter;
 
         /** Active particle list.
             @remarks
