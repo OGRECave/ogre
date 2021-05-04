@@ -43,7 +43,7 @@ namespace Ogre {
 		We implement our own codec here since we need to be able to keep ASTC
 		data compressed if the card supports it.
     */
-    class _OgreExport ASTCCodec : public ImageCodec
+    class ASTCCodec : public ImageCodec
     {
     private:
         String mType;
@@ -64,8 +64,6 @@ namespace Ogre {
 		static void startup(void);
 		/// Static method to shutdown and unregister the ASTC codec
 		static void shutdown(void);
-		/// @deprecated use PixelFormat::getMemorySize
-        OGRE_DEPRECATED static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, int32 xdim, int32 ydim, PixelFormat fmt);
 
     private:
         void getClosestBlockDim2d(float targetBitrate, int *x, int *y) const;

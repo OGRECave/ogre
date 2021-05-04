@@ -138,23 +138,20 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_DDS)
-  list(APPEND HEADER_FILES include/OgreDDSCodec.h)
-  list(APPEND SOURCE_FILES src/OgreDDSCodec.cpp)
+  list(APPEND SOURCE_FILES src/OgreDDSCodec.cpp src/OgreDDSCodec.h)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_PVRTC)
-  list(APPEND HEADER_FILES include/OgrePVRTCCodec.h)
-  list(APPEND SOURCE_FILES src/OgrePVRTCCodec.cpp)
+  list(APPEND HEADER_FILES )
+  list(APPEND SOURCE_FILES src/OgrePVRTCCodec.cpp src/OgrePVRTCCodec.h)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_ETC)
-  list(APPEND HEADER_FILES include/OgreETCCodec.h)
-  list(APPEND SOURCE_FILES src/OgreETCCodec.cpp)
+  list(APPEND SOURCE_FILES src/OgreETCCodec.cpp src/OgreETCCodec.h)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_ASTC)
-  list(APPEND HEADER_FILES include/OgreASTCCodec.h)
-  list(APPEND SOURCE_FILES src/OgreASTCCodec.cpp)
+  list(APPEND SOURCE_FILES src/OgreASTCCodec.cpp src/OgreASTCCodec.h)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_ZIP)

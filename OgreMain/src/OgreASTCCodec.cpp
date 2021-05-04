@@ -158,22 +158,6 @@ namespace Ogre {
             }
         }
     }
-
-    size_t ASTCCodec::getMemorySize( uint32 width, uint32 height, uint32 depth,
-                                     int32 xdim, int32 ydim, PixelFormat fmt )
-    {
-        float bitrate = getBitrateForPixelFormat(fmt);
-        int32 zdim = 1;
-        if(depth > 1)
-        {
-            getClosestBlockDim3d(bitrate, &xdim, &ydim, &zdim);
-        }
-        int xblocks = (width + xdim - 1) / xdim;
-        int yblocks = (height + ydim - 1) / ydim;
-        int zblocks = (depth + zdim - 1) / zdim;
-        return xblocks * yblocks * zblocks * 16;
-    }
-
 	//---------------------------------------------------------------------
 	ASTCCodec* ASTCCodec::msInstance = 0;
 	//---------------------------------------------------------------------

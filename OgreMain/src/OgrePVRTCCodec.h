@@ -43,7 +43,7 @@ namespace Ogre {
 		We implement our own codec here since we need to be able to keep PVRTC
 		data compressed if the card supports it.
     */
-    class _OgreExport PVRTCCodec : public ImageCodec
+    class PVRTCCodec : public ImageCodec
     {
     private:
         String mType;
