@@ -29,13 +29,71 @@ THE SOFTWARE.
 #include "OgreRenderQueueSortingGrouping.h"
 
 namespace Ogre {
-    // Init statics
-    RadixSort<QueuedRenderableCollection::RenderablePassList,
-        RenderablePass, uint32> QueuedRenderableCollection::msRadixSorter1;
-    RadixSort<QueuedRenderableCollection::RenderablePassList,
-        RenderablePass, float> QueuedRenderableCollection::msRadixSorter2;
+namespace {
+    /// Comparator to order objects by descending camera distance
+    struct DistanceSortDescendingLess
+    {
+        const Camera* camera;
 
+        DistanceSortDescendingLess(const Camera* cam)
+            : camera(cam)
+        {
+        }
 
+        bool operator()(const RenderablePass& a, const RenderablePass& b) const
+        {
+            if (a.renderable == b.renderable)
+            {
+                // Same renderable, sort by pass hash
+                return a.pass->getHash() < b.pass->getHash();
+            }
+            else
+            {
+                // Different renderables, sort by distance
+                Real adist = a.renderable->getSquaredViewDepth(camera);
+                Real bdist = b.renderable->getSquaredViewDepth(camera);
+                if (Math::RealEqual(adist, bdist))
+                {
+                    // Must return deterministic result, doesn't matter what
+                    return a.pass < b.pass;
+                }
+                else
+                {
+                    // Sort DESCENDING by dist (i.e. far objects first)
+                    return (adist > bdist);
+                }
+            }
+
+        }
+    };
+
+    /// Functor for accessing sort value 1 for radix sort (Pass)
+    struct RadixSortFunctorPass
+    {
+        uint32 operator()(const RenderablePass& p) const
+        {
+            return p.pass->getHash();
+        }
+    };
+
+    /// Functor for descending sort value 2 for radix sort (distance)
+    struct RadixSortFunctorDistance
+    {
+        const Camera* camera;
+
+        RadixSortFunctorDistance(const Camera* cam)
+            : camera(cam)
+        {
+        }
+
+        float operator()(const RenderablePass& p) const
+        {
+            // Sort DESCENDING by depth (ie far objects first), use negative distance
+            // here because radix sorter always dealing with accessing sort
+            return static_cast<float>(- p.renderable->getSquaredViewDepth(camera));
+        }
+    };
+}
     //-----------------------------------------------------------------------
     RenderPriorityGroup::RenderPriorityGroup(RenderQueueGroup* parent, 
             bool splitPassesByLightingType,
@@ -305,6 +363,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void QueuedRenderableCollection::sort(const Camera* cam)
     {
+        /// Radix sorter for accessing sort value 1 (Pass)
+        static RadixSort<RenderablePassList, RenderablePass, uint32> msRadixSorter1;
+        /// Radix sorter for sort value 2 (distance)
+        static RadixSort<RenderablePassList, RenderablePass, float> msRadixSorter2;
+
         // ascending and descending sort both set bit 1
         // We always sort descending, because the only difference is in the
         // acceptVisitor method, where we iterate in reverse in ascending mode

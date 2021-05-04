@@ -33,9 +33,6 @@ THE SOFTWARE.
 #include <algorithm>
 
 namespace Ogre {
-    // Init statics
-    RadixSort<BillboardSet::BillboardPool, Billboard*, float> BillboardSet::mRadixSorter;
-
     //-----------------------------------------------------------------------
     BillboardSet::BillboardSet() :
         mBoundingRadius(0.0f), 
@@ -192,6 +189,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::_sortBillboards( Camera* cam)
     {
+        static RadixSort<BillboardPool, Billboard*, float> mRadixSorter;
+
         switch (_getSortMode())
         {
         case SM_DIRECTION:
