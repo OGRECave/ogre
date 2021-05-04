@@ -13,52 +13,13 @@
 
 # OGRE_DEPENDENCIES_DIR can be used to specify a single base
 # folder where the required dependencies may be found.
-set(OGRE_DEPENDENCIES_DIR "" CACHE PATH "Path to prebuilt OGRE dependencies")
-option(OGRE_BUILD_DEPENDENCIES "automatically build Ogre Dependencies (freetype, zzip)" TRUE)
+set(OGRE_DEPENDENCIES_DIR "${PROJECT_BINARY_DIR}/Dependencies" CACHE PATH "Path to prebuilt OGRE dependencies")
+option(OGRE_BUILD_DEPENDENCIES "automatically build Ogre Dependencies (SDL2, pugixml)" TRUE)
 
-include(FindPkgMacros)
-getenv_path(OGRE_DEPENDENCIES_DIR)
-if(OGRE_BUILD_PLATFORM_EMSCRIPTEN)
-  set(OGRE_DEP_SEARCH_PATH
-    ${OGRE_DEPENDENCIES_DIR}
-    ${EMSCRIPTEN_ROOT_PATH}/system
-    ${ENV_OGRE_DEPENDENCIES_DIR}
-    "${PROJECT_BINARY_DIR}/EmscriptenDependencies"
-    "${PROJECT_SOURCE_DIR}/EmscriptenDependencies"
-    "${PROJECT_BINARY_DIR}/../EmscriptenDependencies"
-    "${PROJECT_SOURCE_DIR}/../EmscriptenDependencies"
-  )
-elseif(APPLE_IOS)
-  set(OGRE_DEP_SEARCH_PATH 
-    ${OGRE_DEPENDENCIES_DIR}
-    ${ENV_OGRE_DEPENDENCIES_DIR}
-    "${PROJECT_BINARY_DIR}/iOSDependencies"
-    "${PROJECT_SOURCE_DIR}/iOSDependencies"
-    "${PROJECT_BINARY_DIR}/../iOSDependencies"
-    "${PROJECT_SOURCE_DIR}/../iOSDependencies"
-  )
-elseif(OGRE_BUILD_PLATFORM_ANDROID)
-  set(OGRE_DEP_SEARCH_PATH 
-    ${OGRE_DEPENDENCIES_DIR}
-    ${ENV_OGRE_DEPENDENCIES_DIR}
-    "${PROJECT_BINARY_DIR}/AndroidDependencies"
-    "${PROJECT_SOURCE_DIR}/AndroidDependencies"
-    "${PROJECT_BINARY_DIR}/../AndroidDependencies"
-    "${PROJECT_SOURCE_DIR}/../AndroidDependencies"
-  )
-else()
-  set(OGRE_DEP_SEARCH_PATH 
-    ${OGRE_DEPENDENCIES_DIR}
-    ${ENV_OGRE_DEPENDENCIES_DIR}
-    "${PROJECT_BINARY_DIR}/Dependencies"
-    "${PROJECT_SOURCE_DIR}/Dependencies"
-    "${PROJECT_BINARY_DIR}/../Dependencies"
-    "${PROJECT_SOURCE_DIR}/../Dependencies"
-  )
-endif()
+message(STATUS "DEPENDENCIES_DIR: ${OGRE_DEPENDENCIES_DIR}")
 
-message(STATUS "Search path: ${OGRE_DEP_SEARCH_PATH}")
-list(GET OGRE_DEP_SEARCH_PATH 0 OGREDEPS_PATH)
+set(OGREDEPS_PATH "${OGRE_DEPENDENCIES_DIR}")
+set(OGRE_DEP_SEARCH_PATH "${OGRE_DEPENDENCIES_DIR}")
 
 if(CMAKE_CROSSCOMPILING)
     set(CMAKE_FIND_ROOT_PATH ${OGREDEPS_PATH} "${CMAKE_FIND_ROOT_PATH}")
@@ -334,18 +295,3 @@ macro_log_feature(DOXYGEN_FOUND "Doxygen" "Tool for building API documentation" 
 # Find Softimage SDK
 find_package(Softimage)
 macro_log_feature(Softimage_FOUND "Softimage" "Softimage SDK needed for building XSIExporter" FALSE "6.0" "")
-
-#######################################################################
-# Tests
-#######################################################################
-
-# now see if we have a buildable Dependencies package in
-# the source tree. If so, include that, and it will take care of
-# setting everything up, including overriding any of the above
-# findings.
-set(OGREDEPS_RUNTIME_OUTPUT ${OGRE_RUNTIME_OUTPUT})
-if (EXISTS "${PROJECT_SOURCE_DIR}/Dependencies/CMakeLists.txt")
-  add_subdirectory(Dependencies)
-elseif (EXISTS "${PROJECT_SOURCE_DIR}/ogredeps/CMakeLists.txt")
-  add_subdirectory(ogredeps)
-endif ()
