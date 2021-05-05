@@ -835,9 +835,7 @@ namespace {
         if (PixelUtil::isCompressed(sourceFormat))
         {
             if (Root::getSingleton().getRenderSystem() == NULL ||
-                !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT)
-                || (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP_COMPRESSED)
-                && !imgData->num_mipmaps))
+                !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT))
             {
                 // We'll need to decompress
                 decompressDXT = true;
