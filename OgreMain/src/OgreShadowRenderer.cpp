@@ -1664,86 +1664,6 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowCasterPass(const Pass* pas
             }
         }
 
-        // Does incoming pass have a custom shadow caster program?
-        if (!pass->getShadowCasterVertexProgramName().empty())
-        {
-            // Have to merge the shadow caster vertex program in
-            retPass->setVertexProgram(
-                pass->getShadowCasterVertexProgramName(), false);
-            const GpuProgramPtr& prg = retPass->getVertexProgram();
-            // Load this program if not done already
-            if (!prg->isLoaded())
-                prg->load();
-            // Copy params
-            retPass->setVertexProgramParameters(
-                pass->getShadowCasterVertexProgramParameters());
-            // Also have to hack the light autoparams, that is done later
-        }
-        else
-        {
-            if (retPass == mShadowTextureCustomCasterPass)
-            {
-                // reset vp?
-                if (mShadowTextureCustomCasterPass->getVertexProgramName() !=
-                    mShadowTextureCustomCasterVertexProgram)
-                {
-                    mShadowTextureCustomCasterPass->setVertexProgram(
-                        mShadowTextureCustomCasterVertexProgram, false);
-                    if(mShadowTextureCustomCasterPass->hasVertexProgram())
-                    {
-                        mShadowTextureCustomCasterPass->setVertexProgramParameters(
-                            mShadowTextureCustomCasterVPParams);
-
-                    }
-
-                }
-
-            }
-            else
-            {
-                // Standard shadow caster pass, reset to no vp
-                retPass->setVertexProgram(BLANKSTRING);
-            }
-        }
-
-        if (!pass->getShadowCasterFragmentProgramName().empty())
-        {
-            // Have to merge the shadow caster fragment program in
-            retPass->setFragmentProgram(
-                                      pass->getShadowCasterFragmentProgramName(), false);
-            const GpuProgramPtr& prg = retPass->getFragmentProgram();
-            // Load this program if not done already
-            if (!prg->isLoaded())
-                prg->load();
-            // Copy params
-            retPass->setFragmentProgramParameters(
-                                                pass->getShadowCasterFragmentProgramParameters());
-            // Also have to hack the light autoparams, that is done later
-        }
-        else
-        {
-            if (retPass == mShadowTextureCustomCasterPass)
-            {
-                // reset fp?
-                if (mShadowTextureCustomCasterPass->getFragmentProgramName() !=
-                    mShadowTextureCustomCasterFragmentProgram)
-                {
-                    mShadowTextureCustomCasterPass->setFragmentProgram(
-                                                                     mShadowTextureCustomCasterFragmentProgram, false);
-                    if(mShadowTextureCustomCasterPass->hasFragmentProgram())
-                    {
-                        mShadowTextureCustomCasterPass->setFragmentProgramParameters(
-                                                                                   mShadowTextureCustomCasterFPParams);
-                    }
-                }
-            }
-            else
-            {
-                // Standard shadow caster pass, reset to no fp
-                retPass->setFragmentProgram(BLANKSTRING);
-            }
-        }
-
         // give the RTSS a chance to generate a better technique
         retPass->getParent()->getParent()->load();
 
@@ -1778,48 +1698,6 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
         }
 
         retPass = mShadowTextureCustomReceiverPass ? mShadowTextureCustomReceiverPass : mShadowReceiverPass;
-
-        // Does incoming pass have a custom shadow receiver program?
-        if (!pass->getShadowReceiverVertexProgramName().empty())
-        {
-            // Have to merge the shadow receiver vertex program in
-            retPass->setVertexProgram(
-                pass->getShadowReceiverVertexProgramName(), false);
-            const GpuProgramPtr& prg = retPass->getVertexProgram();
-            // Load this program if not done already
-            if (!prg->isLoaded())
-                prg->load();
-            // Copy params
-            retPass->setVertexProgramParameters(
-                pass->getShadowReceiverVertexProgramParameters());
-            // Also have to hack the light autoparams, that is done later
-        }
-        else
-        {
-            if (mShadowTextureCustomReceiverPass && retPass == mShadowTextureCustomReceiverPass)
-            {
-                // reset vp?
-                if (mShadowTextureCustomReceiverPass->getVertexProgramName() !=
-                    mShadowTextureCustomReceiverVertexProgram)
-                {
-                    mShadowTextureCustomReceiverPass->setVertexProgram(
-                        mShadowTextureCustomReceiverVertexProgram, false);
-                    if(mShadowTextureCustomReceiverPass->hasVertexProgram())
-                    {
-                        mShadowTextureCustomReceiverPass->setVertexProgramParameters(
-                            mShadowTextureCustomReceiverVPParams);
-
-                    }
-
-                }
-
-            }
-            else
-            {
-                // Standard shadow receiver pass, reset to no vp
-                retPass->setVertexProgram(BLANKSTRING);
-            }
-        }
 
         unsigned short keepTUCount;
         // If additive, need lighting parameters & standard programs
@@ -1864,65 +1742,6 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
         {
             // need to keep spotlight fade etc
             keepTUCount = retPass->getNumTextureUnitStates();
-        }
-
-
-        // Will also need fragment programs since this is a complex light setup
-        if (!pass->getShadowReceiverFragmentProgramName().empty())
-        {
-            // Have to merge the shadow receiver vertex program in
-            retPass->setFragmentProgram(
-                pass->getShadowReceiverFragmentProgramName(), false);
-            const GpuProgramPtr& prg = retPass->getFragmentProgram();
-            // Load this program if not done already
-            if (!prg->isLoaded())
-                prg->load();
-            // Copy params
-            retPass->setFragmentProgramParameters(
-                pass->getShadowReceiverFragmentProgramParameters());
-
-            // Did we bind a shadow vertex program?
-            if (pass->hasVertexProgram() && !retPass->hasVertexProgram())
-            {
-                // We didn't bind a receiver-specific program, so bind the original
-                retPass->setVertexProgram(pass->getVertexProgramName(), false);
-                const GpuProgramPtr& prog = retPass->getVertexProgram();
-                // Load this program if required
-                if (!prog->isLoaded())
-                    prog->load();
-                // Copy params
-                retPass->setVertexProgramParameters(
-                    pass->getVertexProgramParameters());
-
-            }
-        }
-        else
-        {
-            // Reset any merged fragment programs from last time
-            if (retPass == mShadowTextureCustomReceiverPass)
-            {
-                // reset fp?
-                if (mShadowTextureCustomReceiverPass->getFragmentProgramName() !=
-                    mShadowTextureCustomReceiverFragmentProgram)
-                {
-                    mShadowTextureCustomReceiverPass->setFragmentProgram(
-                        mShadowTextureCustomReceiverFragmentProgram, false);
-                    if(mShadowTextureCustomReceiverPass->hasFragmentProgram())
-                    {
-                        mShadowTextureCustomReceiverPass->setFragmentProgramParameters(
-                            mShadowTextureCustomReceiverFPParams);
-
-                    }
-
-                }
-
-            }
-            else
-            {
-                // Standard shadow receiver pass, reset to no fp
-                retPass->setFragmentProgram(BLANKSTRING);
-            }
-
         }
 
         // Remove any extra texture units

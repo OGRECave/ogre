@@ -773,21 +773,6 @@ namespace Ogre
                 writeGeometryProgramRef(pPass);
             }
 
-            if (pPass->hasShadowCasterVertexProgram())
-            {
-                writeShadowCasterVertexProgramRef(pPass);
-            }
-
-            if (pPass->hasShadowReceiverVertexProgram())
-            {
-                writeShadowReceiverVertexProgramRef(pPass);
-            }
-
-            if (pPass->hasShadowReceiverFragmentProgram())
-            {
-                writeShadowReceiverFragmentProgramRef(pPass);
-            }
-
             // Nested texture layers
             Pass::TextureUnitStates::const_iterator it;
             for(it = pPass->getTextureUnitStates().begin(); it != pPass->getTextureUnitStates().end(); ++it)
@@ -1454,30 +1439,6 @@ namespace Ogre
     {
         writeGpuProgramRef("tesselation_domain_program_ref",
             pPass->getTessellationDomainProgram(), pPass->getTessellationDomainProgramParameters());
-    }
-    //-----------------------------------------------------------------------
-    void MaterialSerializer::writeShadowCasterVertexProgramRef(const Pass* pPass)
-    {
-        writeGpuProgramRef("shadow_caster_vertex_program_ref",
-            pPass->getShadowCasterVertexProgram(), pPass->getShadowCasterVertexProgramParameters());
-    }
-    //-----------------------------------------------------------------------
-    void MaterialSerializer::writeShadowCasterFragmentProgramRef(const Pass* pPass)
-    {
-        writeGpuProgramRef("shadow_caster_fragment_program_ref",
-            pPass->getShadowCasterFragmentProgram(), pPass->getShadowCasterFragmentProgramParameters());
-    }
-    //-----------------------------------------------------------------------
-    void MaterialSerializer::writeShadowReceiverVertexProgramRef(const Pass* pPass)
-    {
-        writeGpuProgramRef("shadow_receiver_vertex_program_ref",
-            pPass->getShadowReceiverVertexProgram(), pPass->getShadowReceiverVertexProgramParameters());
-    }
-    //-----------------------------------------------------------------------
-    void MaterialSerializer::writeShadowReceiverFragmentProgramRef(const Pass* pPass)
-    {
-        writeGpuProgramRef("shadow_receiver_fragment_program_ref",
-            pPass->getShadowReceiverFragmentProgram(), pPass->getShadowReceiverFragmentProgramParameters());
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGeometryProgramRef(const Pass* pPass)
