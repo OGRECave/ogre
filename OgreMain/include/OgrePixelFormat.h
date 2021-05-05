@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
+#include "OgreColourValue.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -582,7 +583,10 @@ namespace Ogre {
             @param pf       Pixelformat in which to write the colour
             @param dest     Destination memory location
         */
-        static void packColour(const ColourValue &colour, const PixelFormat pf,  void* dest);
+        static void packColour(const ColourValue& colour, const PixelFormat pf, void* dest)
+        {
+            packColour(colour.r, colour.g, colour.b, colour.a, pf, dest);
+        }
         /** Pack a colour value to memory
             @param r,g,b,a  The four colour components, range 0.0f to 1.0f
                             (an exception to this case exists for floating point pixel
@@ -591,13 +595,7 @@ namespace Ogre {
             @param dest     Destination memory location
         */
         static void packColour(const uint8 r, const uint8 g, const uint8 b, const uint8 a, const PixelFormat pf,  void* dest);
-         /** Pack a colour value to memory
-            @param r,g,b,a  The four colour components, range 0.0f to 1.0f
-                            (an exception to this case exists for floating point pixel
-                            formats, which don't clamp to 0.0f..1.0f)
-            @param pf       Pixelformat in which to write the colour
-            @param dest     Destination memory location
-        */
+        /// @overload
         static void packColour(const float r, const float g, const float b, const float a, const PixelFormat pf,  void* dest);
 
         /** Unpack a colour value from memory
@@ -605,28 +603,27 @@ namespace Ogre {
             @param pf       Pixelformat in which to read the colour
             @param src      Source memory location
         */
-        static void unpackColour(ColourValue *colour, PixelFormat pf,  const void* src);
+        static void unpackColour(ColourValue& colour, PixelFormat pf, const void* src)
+        {
+            unpackColour(&colour.r, &colour.g, &colour.b, &colour.a, pf, src);
+        }
+        /// @overload
+        static void unpackColour(ColourValue* colour, PixelFormat pf, const void* src)
+        {
+            unpackColour(&colour->r, &colour->g, &colour->b, &colour->a, pf, src);
+        }
         /** Unpack a colour value from memory
-            @param r        The red channel is returned here (as byte)
-            @param g        The blue channel is returned here (as byte)
-            @param b        The green channel is returned here (as byte)
-            @param a        The alpha channel is returned here (as byte)
-            @param pf       Pixelformat in which to read the colour
-            @param src      Source memory location
-            @remarks    This function returns the colour components in 8 bit precision,
-                this will lose precision when coming from PF_A2R10G10B10 or floating
-                point formats.  
-        */
-        static void unpackColour(uint8 *r, uint8 *g, uint8 *b, uint8 *a, PixelFormat pf,  const void* src);
-        /** Unpack a colour value from memory
-            @param r        The red channel is returned here (as float)
-            @param g        The blue channel is returned here (as float)
-            @param b        The green channel is returned here (as float)
-            @param a        The alpha channel is returned here (as float)
+            @param r,g,b,a  The four colour channels are returned here
             @param pf       Pixelformat in which to read the colour
             @param src      Source memory location
         */
         static void unpackColour(float *r, float *g, float *b, float *a, PixelFormat pf,  const void* src); 
+        /** @overload
+            @note This function returns the colour components in 8 bit precision,
+                this will lose precision when coming from #PF_A2R10G10B10 or floating
+                point formats.
+        */
+        static void unpackColour(uint8 *r, uint8 *g, uint8 *b, uint8 *a, PixelFormat pf,  const void* src);
         
         /** Convert consecutive pixels from one format to another. No dithering or filtering is being done. 
             Converting from RGB to luminance takes the R channel.  In case the source and destination format match,
@@ -637,7 +634,10 @@ namespace Ogre {
             @param  dstFormat   Pixel format of destination region
             @param  count       The number of pixels to convert
          */
-        static void bulkPixelConversion(void *src, PixelFormat srcFormat, void *dst, PixelFormat dstFormat, unsigned int count);
+        static void bulkPixelConversion(void *src, PixelFormat srcFormat, void *dst, PixelFormat dstFormat, unsigned int count)
+        {
+            bulkPixelConversion(PixelBox(count, 1, 1, srcFormat, src), PixelBox(count, 1, 1, dstFormat, dst));
+        }
 
         /** Convert pixels from one format to another. No dithering or filtering is being done. Converting
             from RGB to luminance takes the R channel. 
