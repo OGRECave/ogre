@@ -2306,16 +2306,16 @@ namespace Ogre{
                     translateProgramRef(getProgramType(child->id), compiler, child);
                     break;
                 case ID_SHADOW_CASTER_VERTEX_PROGRAM_REF:
-                    translateShadowCasterVertexProgramRef(compiler, child);
+                    translateShadowCasterProgramRef(GPT_VERTEX_PROGRAM, compiler, child);
                     break;
                 case ID_SHADOW_CASTER_FRAGMENT_PROGRAM_REF:
-                    translateShadowCasterFragmentProgramRef(compiler, child);
+                    translateShadowCasterProgramRef(GPT_FRAGMENT_PROGRAM, compiler, child);
                     break;
                 case ID_SHADOW_RECEIVER_VERTEX_PROGRAM_REF:
-                    translateShadowReceiverVertexProgramRef(compiler, child);
+                    translateShadowReceiverProgramRef(GPT_VERTEX_PROGRAM, compiler, child);
                     break;
                 case ID_SHADOW_RECEIVER_FRAGMENT_PROGRAM_REF:
-                    translateShadowReceiverFragmentProgramRef(compiler, child);
+                    translateShadowReceiverProgramRef(GPT_FRAGMENT_PROGRAM, compiler, child);
                     break;
                 default:
                     processNode(compiler, *i);
@@ -2376,8 +2376,7 @@ namespace Ogre{
         }
     }
     //-------------------------------------------------------------------------
-    OGRE_IGNORE_DEPRECATED_BEGIN
-    void PassTranslator::translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
+    void PassTranslator::translateShadowCasterProgramRef(GpuProgramType type, ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
         auto program = getProgram(compiler, node);
         if(!program) return;
@@ -2385,47 +2384,26 @@ namespace Ogre{
 
         compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
                            node->cls + ". Use shadow_caster_material instead");
-        pass->setShadowCasterVertexProgram(node->name);
-        if(pass->getShadowCasterVertexProgram()->isSupported())
-        {
-            GpuProgramParametersSharedPtr params = pass->getShadowCasterVertexProgramParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, params, node);
-        }
-    }
-    //-------------------------------------------------------------------------
-    void PassTranslator::translateShadowCasterFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
-    {
-        auto program = getProgram(compiler, node);
-        if(!program) return;
-        auto pass = any_cast<Pass*>(node->parent->context);
 
-        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
-                           node->cls + ". Use shadow_caster_material instead");
-        pass->setShadowCasterFragmentProgram(node->name);
-        if(pass->getShadowCasterFragmentProgram()->isSupported())
+        auto caster_mat = pass->getParent()->getShadowCasterMaterial();
+        if(!caster_mat)
         {
-            GpuProgramParametersSharedPtr params = pass->getShadowCasterFragmentProgramParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, params, node);
+            auto src_mat = pass->getParent()->getParent();
+            // only first pass of this will be used
+            caster_mat = src_mat->clone(src_mat->getName()+"/CasterFallback");
+            pass->getParent()->setShadowCasterMaterial(caster_mat);
         }
-    }
-    //-------------------------------------------------------------------------
-    void PassTranslator::translateShadowReceiverVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
-    {
-        auto program = getProgram(compiler, node);
-        if(!program) return;
-        auto pass = any_cast<Pass*>(node->parent->context);
+        auto caster_pass = caster_mat->getTechnique(0)->getPass(0);
 
-        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
-                           node->cls + ". Use shadow_receiver_material instead");
-        pass->setShadowReceiverVertexProgram(node->name);
-        if(pass->getShadowReceiverVertexProgram()->isSupported())
+        caster_pass->setGpuProgram(type, program);
+        if(program->isSupported())
         {
-            GpuProgramParametersSharedPtr params = pass->getShadowReceiverVertexProgramParameters();
+            GpuProgramParametersSharedPtr params = caster_pass->getGpuProgramParameters(type);
             GpuProgramTranslator::translateProgramParameters(compiler, params, node);
         }
     }
     //-------------------------------------------------------------------------
-    void PassTranslator::translateShadowReceiverFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
+    void PassTranslator::translateShadowReceiverProgramRef(GpuProgramType type,ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
         auto program = getProgram(compiler, node);
         if(!program) return;
@@ -2433,14 +2411,24 @@ namespace Ogre{
 
         compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, node->file, node->line,
                            node->cls + ". Use shadow_receiver_material instead");
-        pass->setShadowReceiverFragmentProgram(node->name);
-        if(pass->getShadowReceiverFragmentProgram()->isSupported())
+
+        auto receiver_mat = pass->getParent()->getShadowReceiverMaterial();
+        if(!receiver_mat)
         {
-            GpuProgramParametersSharedPtr params = pass->getShadowReceiverFragmentProgramParameters();
+            auto src_mat = pass->getParent()->getParent();
+            // only first pass of this will be used
+            receiver_mat = src_mat->clone(src_mat->getName()+"/ReceiverFallback");
+            pass->getParent()->setShadowReceiverMaterial(receiver_mat);
+        }
+        auto receiver_pass = receiver_mat->getTechnique(0)->getPass(0);
+
+        receiver_pass->setGpuProgram(type, program);
+        if(program->isSupported())
+        {
+            GpuProgramParametersSharedPtr params = receiver_pass->getGpuProgramParameters(type);
             GpuProgramTranslator::translateProgramParameters(compiler, params, node);
         }
     }
-    OGRE_IGNORE_DEPRECATED_END
     /**************************************************************************
      * TextureUnitTranslator
      *************************************************************************/
