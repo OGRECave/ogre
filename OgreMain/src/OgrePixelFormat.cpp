@@ -425,11 +425,6 @@ namespace Ogre {
     /*************************************************************************
     * Pixel packing/unpacking utilities
     */
-    void PixelUtil::packColour(const ColourValue &colour, const PixelFormat pf,  void* dest)
-    {
-        packColour(colour.r, colour.g, colour.b, colour.a, pf, dest);
-    }
-    //-----------------------------------------------------------------------
     void PixelUtil::packColour(const uint8 r, const uint8 g, const uint8 b, const uint8 a, const PixelFormat pf,  void* dest)
     {
         const PixelFormatDescription &des = getDescriptionFor(pf);
@@ -534,11 +529,6 @@ namespace Ogre {
                 break;
             }
         }
-    }
-    //-----------------------------------------------------------------------
-    void PixelUtil::unpackColour(ColourValue *colour, PixelFormat pf,  const void* src)
-    {
-        unpackColour(&colour->r, &colour->g, &colour->b, &colour->a, pf, src);
     }
     //-----------------------------------------------------------------------
     void PixelUtil::unpackColour(uint8 *r, uint8 *g, uint8 *b, uint8 *a, PixelFormat pf,  const void* src)
@@ -677,15 +667,6 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     /* Convert pixels from one format to another */
-    void PixelUtil::bulkPixelConversion(void *srcp, PixelFormat srcFormat,
-        void *destp, PixelFormat dstFormat, unsigned int count)
-    {
-        PixelBox src(count, 1, 1, srcFormat, srcp),
-                 dst(count, 1, 1, dstFormat, destp);
-
-        bulkPixelConversion(src, dst);
-    }
-    //-----------------------------------------------------------------------
     void PixelUtil::bulkPixelConversion(const PixelBox &src, const PixelBox &dst)
     {
         OgreAssert(src.getSize() == dst.getSize(), "src and dst must be of same size");
