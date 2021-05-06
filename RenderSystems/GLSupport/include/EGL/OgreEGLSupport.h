@@ -82,8 +82,7 @@ namespace Ogre {
 
             EGLint mEGLMajor, mEGLMinor;
 
-            //virtual EGLWindow* createEGLWindow( EGLSupport * support) = 0;
-
+            bool hasEGL15;
             void initialiseExtensions();
         public:
             EGLSupport(int profile);

@@ -40,13 +40,17 @@ THE SOFTWARE.
 #include "OgreEGLRenderTexture.h"
 #endif
 
+#ifndef EGL_VERSION_1_5
+#define EGL_CONTEXT_MAJOR_VERSION EGL_CONTEXT_CLIENT_VERSION
+#define EGL_CONTEXT_MINOR_VERSION EGL_NONE
+#endif
 
 namespace Ogre {
 
 
     EGLSupport::EGLSupport(int profile)
         : GLNativeSupport(profile), mGLDisplay(0),
-          mNativeDisplay(EGL_DEFAULT_DISPLAY)
+          mNativeDisplay(EGL_DEFAULT_DISPLAY), hasEGL15(false)
     {
     }
 
@@ -309,52 +313,55 @@ namespace Ogre {
                                               ::EGLContext shareList) const 
     {
         EGLint contextAttrs[] = {
-            EGL_CONTEXT_CLIENT_VERSION, 2,
+            EGL_CONTEXT_MAJOR_VERSION, 3,
+            EGL_CONTEXT_MINOR_VERSION, 2,
+            EGL_NONE, EGL_NONE,
             EGL_NONE
         };
 
         if(mContextProfile != CONTEXT_ES) {
             if (!eglBindAPI(EGL_OPENGL_API))
             {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Couldn`t initialize API ",
-                        "EGLSupport::getGLDisplay");
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Could not bind GL API");
             }
             EGL_CHECK_ERROR
+            contextAttrs[1] = 4;
+            contextAttrs[3] = 6;
 
-            contextAttrs[0] = EGL_NONE;
-        }
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        // try WebGL2 context
-        contextAttrs[1] = 3;
+#ifdef EGL_VERSION_1_5
+            contextAttrs[4] = EGL_CONTEXT_OPENGL_PROFILE_MASK;
+            contextAttrs[5] = EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT;
+            if(mContextProfile == CONTEXT_COMPATIBILITY)
+            {
+                contextAttrs[1] = 3; // MESA 20.2.6 always gives us core if we request 4.x
+                contextAttrs[3] = 0;
+                contextAttrs[5] = EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT;
+            }
 #endif
-
-        ::EGLContext context = 0;
-        if (!eglDisplay)
-        {
-            context = eglCreateContext(mGLDisplay, glconfig, shareList, contextAttrs);
-            EGL_CHECK_ERROR
-        }
-        else
-        {
-            context = eglCreateContext(eglDisplay, glconfig, 0, contextAttrs);
-            EGL_CHECK_ERROR
         }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        if(!hasEGL15)
+        {
+            contextAttrs[2] = EGL_NONE; // skips following attributes
+            contextAttrs[3] = 0;
+        }
+
+        ::EGLContext context = (::EGLContext)0;
+
+        // find maximal supported context version
+        while(!context && (contextAttrs[1] >= 1))
+        {
+            context = eglCreateContext(eglDisplay, glconfig, shareList, contextAttrs);
+            EGL_CHECK_ERROR
+            contextAttrs[1] -= contextAttrs[3] == 0; // only decrement if minor == 0
+
+            if(hasEGL15)
+                contextAttrs[3] = (contextAttrs[3] - 1 + 7) % 7; // decrement: -1 -> 6
+        }
+
         if (!context)
         {
-            // fall back to WebGL
-            contextAttrs[1] = 2;
-            context = eglCreateContext(mGLDisplay, glconfig, shareList, contextAttrs);
-            EGL_CHECK_ERROR
-        }
-#endif
-
-        if (!context)
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to create New context");
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to create EGL context");
             return 0;
         }
 
@@ -384,6 +391,8 @@ namespace Ogre {
 
         propStr = eglQueryString(mGLDisplay, EGL_VERSION);
         LogManager::getSingleton().stream() << "EGL_VERSION = " << propStr;
+
+        hasEGL15 = String(propStr).find("1.5") != String::npos;
 
         StringStream ext;
 
