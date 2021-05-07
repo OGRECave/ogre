@@ -301,13 +301,15 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
             
     // Add texture sampling code.
     ParameterPtr texel = psMain->resolveLocalParameter(GCT_FLOAT4, c_ParamTexelEx + StringConverter::toString(textureUnitParams->mTextureSamplerIndex));
-    addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
     // Build colour argument for source1.
     source1 = getPSArgument(texel, colourBlend.source1, colourBlend.colourArg1, colourBlend.alphaArg1, false);
 
     // Build colour argument for source2.
     source2 = getPSArgument(texel, colourBlend.source2, colourBlend.colourArg2, colourBlend.alphaArg2, false);
+
+    if(source1 == texel || source2 == texel || colourBlend.operation == LBX_BLEND_TEXTURE_ALPHA)
+        addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
     bool needDifferentAlphaBlend = false;
     if (alphaBlend.operation != colourBlend.operation ||
@@ -333,6 +335,9 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 
         // Build alpha argument for source2.
         source2 = getPSArgument(texel, alphaBlend.source2, alphaBlend.colourArg2, alphaBlend.alphaArg2, true);
+
+        if(source1 == texel || source2 == texel || alphaBlend.operation == LBX_BLEND_TEXTURE_ALPHA)
+            addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING);
 
         // Build alpha blend
         addPSBlendInvocations(psMain, source1, source2, texel,
