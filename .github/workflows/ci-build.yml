@@ -36,7 +36,7 @@ jobs:
         # run unit tests
         build/bin/Test_Ogre
         # run visual tests
-        cd build/bin && xvfb-run -a -s "-screen 0 1024x768x24" ./TestContext -rs "OpenGL Rendering Subsystem"
+        cd build/bin && xvfb-run -a -s "-screen 0 1024x768x24" ./TestContext -rs "OpenGL 3+ Rendering Subsystem"
         # verify that the python modules are loadable
         cd ../lib && python -c "import _Ogre; import _RTShader"
         cd ../../
