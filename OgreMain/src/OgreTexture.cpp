@@ -209,12 +209,12 @@ namespace Ogre {
             mFormat = PixelUtil::getFormatForBitDepths(mSrcFormat, mDesiredIntegerBitDepth, mDesiredFloatBitDepth);
         }
 
-        // The custom mipmaps in the image have priority over everything
+        // The custom mipmaps in the image clamp the request
         uint32 imageMips = images[0]->getNumMipmaps();
 
         if(imageMips > 0)
         {
-            mNumMipmaps = mNumRequestedMipmaps = images[0]->getNumMipmaps();
+            mNumMipmaps = mNumRequestedMipmaps = std::min(mNumRequestedMipmaps, imageMips);
             // Disable flag for auto mip generation
             mUsage &= ~TU_AUTOMIPMAP;
         }
