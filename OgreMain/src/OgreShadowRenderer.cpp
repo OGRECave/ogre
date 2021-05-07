@@ -1557,6 +1557,7 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
             matPlainBlack = MaterialManager::getSingleton().create(
                 "Ogre/TextureShadowCaster",
                 ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+            matPlainBlack->setReceiveShadows(false);
             mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
             // Lighting has to be on, because we need shadow coloured objects
             // Note that because we can't predict vertex programs, we'll have to
