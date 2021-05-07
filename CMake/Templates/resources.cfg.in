@@ -46,7 +46,6 @@ Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemap.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemapsJS.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/dragon.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/fresneldemo.zip
-Zip=@OGRE_MEDIA_DIR_REL@/packs/ogretestmap.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/ogredance.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/Sinbad.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/skybox.zip
@@ -59,6 +58,7 @@ FileSystem=@OGRE_CORE_MEDIA_DIR@/HLMS
 
 [BSPWorld]
 Zip=@OGRE_MEDIA_DIR_REL@/packs/oa_rpg3dm2.pk3
+Zip=@OGRE_MEDIA_DIR_REL@/packs/ogretestmap.zip
 
 # Materials for visual tests
 [Tests]
