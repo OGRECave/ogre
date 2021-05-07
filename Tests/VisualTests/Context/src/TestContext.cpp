@@ -465,13 +465,16 @@ bool TestContext::oneTimeConfig()
         mRoot->setRenderSystem(mRoot->getRenderSystemByName(mRenderSystemName));
     }
     else if(!restore) {
-        // just select the first available render system
-        const RenderSystemList lstRend = Root::getSingleton().getAvailableRenderers();
-        RenderSystemList::const_iterator pRend = lstRend.begin();
+        RenderSystem* rs = NULL;
 
-        mRoot->setRenderSystem(pRend != lstRend.end() ? *pRend : NULL);
+        const auto& allRS = Root::getSingleton().getAvailableRenderers();
 
-        RenderSystem* rs = mRoot->getRenderSystem();
+        if(mRenderSystemName != "SAVED")
+            rs = mRoot->getRenderSystemByName(mRenderSystemName);
+        else if(!allRS.empty())
+            rs = allRS.front(); // just select the first available
+
+        mRoot->setRenderSystem(rs);
 
         if(rs) {
             // set sane defaults
