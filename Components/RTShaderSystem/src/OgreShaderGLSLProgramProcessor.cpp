@@ -87,15 +87,11 @@ bool GLSLProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
 void GLSLProgramProcessor::bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
 {
     GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
-    const UniformParameterList& progParams = pCpuProgram->getParameters();
-    UniformParameterConstIterator itParams;
 
     // Bind the samplers.
-    for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
+    for (const auto& pCurParam : pCpuProgram->getParameters())
     {
-        const UniformParameterPtr pCurParam = *itParams;
-        
-        if (pCurParam->isSampler())
+        if (pCurParam->isSampler() && pCurParam->isUsed())
         {       
             pGpuParams->setNamedConstant(pCurParam->getName(), pCurParam->getIndex());                      
         }       
