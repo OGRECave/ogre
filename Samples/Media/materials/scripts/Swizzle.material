@@ -60,8 +60,8 @@ vertex_program Ogre/GPTest/Swizzle/VP unified
 
 geometry_program Ogre/GPTest/Swizzle/GP unified
 {
-	delegate Ogre/GPTest/Swizzle/GP_GLSL_120
 	delegate Ogre/GPTest/Swizzle/GP_GLSL_150
+	delegate Ogre/GPTest/Swizzle/GP_GLSL_120
 
         default_params
 	{
