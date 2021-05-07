@@ -148,6 +148,10 @@ void DefaultDebugDrawer::drawBone(const Node* node)
 void DefaultDebugDrawer::drawSceneNode(const SceneNode* node)
 {
     const auto& aabb = node->_getWorldAABB();
+    //Skip all bounding boxes that are infinite.
+    if (aabb.isInfinite()) {
+        return;
+    }
     if (mDrawType & DT_AXES)
     {
         Vector3f hs(aabb.getHalfSize());
