@@ -499,15 +499,13 @@ namespace Ogre
     void TerrainQuadTreeNode::updateVertexData(bool positions, bool deltas, 
         const Rect& rect, bool cpuData)
     {
-        if (rect.left <= mBoundaryX || rect.right > mOffsetX
-            || rect.top <= mBoundaryY || rect.bottom > mOffsetY)
+        //Check that we really intersect the dirty rect. This avoid assertion errors further down the line.
+        Rect updateRect = rect.intersect(Rect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY));
+        if (!updateRect.isNull())
         {
             // Do we have vertex data?
             if (mVertexDataRecord)
             {
-                // Trim to our bounds
-                Rect updateRect = rect.intersect(Rect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY));
-
                 // update the GPU buffer directly
                 // TODO: do we have no use for CPU vertex data after initial load?
                 // if so, destroy it to free RAM, this should be fast enough to 
