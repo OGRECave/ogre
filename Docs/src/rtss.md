@@ -7,7 +7,7 @@ For fixed function function properties, the RTSS will read the standard `pass` a
 
 For instance, the FFP only allows per-vertex lighting. To request per-pixel lighting, you would add the following block to a pass:
 
-@snippet Media/RTShaderLib/materials/RTShaderSystem.material rtss_per_pixel
+@snippet Samples/Media/materials/scripts/RTShaderSystem.material rtss_per_pixel
 
 To modify the default lighting stage [see below](@ref rtss_custom_api). For more examples see `Media/RTShaderLib/materials/RTShaderSystem.material`.
 
