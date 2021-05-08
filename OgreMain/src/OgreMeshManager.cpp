@@ -86,7 +86,6 @@ namespace Ogre
     void MeshManager::_initialise(void)
     {
         // Create prefab objects
-        createManual("Ogre/Debug/AxesMesh", RGN_INTERNAL, &mPrefabLoader);
         createManual("Prefab_Sphere", RGN_INTERNAL, &mPrefabLoader);
         createManual("Prefab_Cube", RGN_INTERNAL, &mPrefabLoader);
         // Planes can never be manifold
