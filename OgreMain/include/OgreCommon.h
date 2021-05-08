@@ -653,6 +653,15 @@ namespace Ogre {
               return *this;
 
           }
+
+          /**
+           * Returns the intersection of the two rectangles.
+           *
+           * Note that the rectangles extend downwards. I.e. a valid box will
+           * have "right > left" and "bottom > top".
+           * @param rhs Another rectangle.
+           * @return The intersection of the two rectangles. Zero size if they don't intersect.
+           */
           TRect intersect(const TRect& rhs) const
           {
               TRect ret;
