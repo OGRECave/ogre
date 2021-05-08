@@ -169,19 +169,16 @@ namespace Ogre
         protected:
             TerrainMaterialGenerator* mParent;
             String mName;
-            String mDesc;
         public:
-            Profile(TerrainMaterialGenerator* parent, const String& name, const String& desc)
-                : mParent(parent), mName(name), mDesc(desc) {}
+            Profile(TerrainMaterialGenerator* parent, const String& name, const String& = "")
+                : mParent(parent), mName(name) {}
             Profile(const Profile& prof) 
-                : mParent(prof.mParent), mName(prof.mName), mDesc(prof.mDesc) {}
+                : mParent(prof.mParent), mName(prof.mName) {}
             virtual ~Profile() {}
             /// Get the generator which owns this profile
             TerrainMaterialGenerator* getParent() const { return mParent; }
             /// Get the name of this profile
             const String& getName() const { return mName; }
-            /// @deprecated do not use
-            OGRE_DEPRECATED const String& getDescription() const { return mDesc; }
             /// Compressed vertex format supported?
             virtual bool isVertexCompressionSupported() const = 0;      
             /// Generate / reuse a material for the terrain
