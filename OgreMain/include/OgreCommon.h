@@ -640,6 +640,8 @@ namespace Ogre {
           }
           TRect & merge(const TRect& rhs)
           {
+              assert(right >= left && bottom >= top);
+              assert(rhs.right >= rhs.left && rhs.bottom >= rhs.top);
               if (isNull())
               {
                   *this = rhs;
@@ -666,6 +668,8 @@ namespace Ogre {
            */
           TRect intersect(const TRect& rhs) const
           {
+              assert(right >= left && bottom >= top);
+              assert(rhs.right >= rhs.left && rhs.bottom >= rhs.top);
               TRect ret;
               if (isNull() || rhs.isNull())
               {
