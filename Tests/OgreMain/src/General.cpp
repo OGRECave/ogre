@@ -407,3 +407,21 @@ TEST_F(HighLevelGpuProgramTest, resolveIncludes)
 
     ASSERT_EQ(res.substr(0, ref.size()), ref);
 }
+
+TEST(Math, TriangleRayIntersection)
+{
+    Vector3 tri[3] = {{-1, 0, 0}, {1, 0, 0}, {0, 1, 0}};
+    auto ray = Ray({0, 0.5, 1}, {0, 0, -1});
+
+    EXPECT_TRUE(Math::intersects(ray, tri[0], tri[1], tri[2], true, true).first);
+    EXPECT_TRUE(Math::intersects(ray, tri[0], tri[1], tri[2], true, false).first);
+    EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], false, true).first);
+    EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], false, false).first);
+
+    ray = Ray({0, 0.5, -1}, {0, 0, 1});
+
+    EXPECT_TRUE(Math::intersects(ray, tri[0], tri[1], tri[2], true, true).first);
+    EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], true, false).first);
+    EXPECT_TRUE(Math::intersects(ray, tri[0], tri[1], tri[2], false, true).first);
+    EXPECT_FALSE(Math::intersects(ray, tri[0], tri[1], tri[2], false, false).first);
+}

@@ -612,29 +612,7 @@ namespace Ogre
         static bool intersects(const Ray& ray, const AxisAlignedBox& box,
             Real* d1, Real* d2);
 
-        /** Ray / triangle intersection, returns boolean result and distance.
-        @param ray
-            The ray.
-        @param a
-            The triangle's first vertex.
-        @param b
-            The triangle's second vertex.
-        @param c
-            The triangle's third vertex.
-        @param normal
-            The triangle plane's normal (passed in rather than calculated
-            on demand since the caller may already have it), doesn't need
-            normalised since we don't care.
-        @param positiveSide
-            Intersect with "positive side" of the triangle
-        @param negativeSide
-            Intersect with "negative side" of the triangle
-        */
-        static RayTestResult intersects(const Ray& ray, const Vector3& a,
-            const Vector3& b, const Vector3& c, const Vector3& normal,
-            bool positiveSide = true, bool negativeSide = true);
-
-        /** Ray / triangle intersection, returns boolean result and distance.
+        /** Ray / triangle intersection @cite moller1997fast, returns boolean result and distance.
         @param ray
             The ray.
         @param a
@@ -644,13 +622,21 @@ namespace Ogre
         @param c
             The triangle's third vertex.
         @param positiveSide
-            Intersect with "positive side" of the triangle
+            Intersect with "positive side" of the triangle (as determined by vertex winding)
         @param negativeSide
-            Intersect with "negative side" of the triangle
+            Intersect with "negative side" of the triangle (as determined by vertex winding)
         */
         static RayTestResult intersects(const Ray& ray, const Vector3& a,
             const Vector3& b, const Vector3& c,
             bool positiveSide = true, bool negativeSide = true);
+
+        /// @deprecated normal parameter is not used any more
+        OGRE_DEPRECATED static RayTestResult intersects(const Ray& ray, const Vector3& a, const Vector3& b,
+                                                        const Vector3& c, const Vector3& normal,
+                                                        bool positiveSide = true, bool negativeSide = true)
+        {
+            return intersects(ray, a, b, c, positiveSide, negativeSide);
+        }
 
         /** Sphere / box intersection test. */
         static bool intersects(const Sphere& sphere, const AxisAlignedBox& box);
