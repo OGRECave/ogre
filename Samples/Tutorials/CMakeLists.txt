@@ -5,8 +5,8 @@ project(OgreTutorialsSample)
 set(CMAKE_CXX_STANDARD 11)
 
 ## [discover_ogre]
-# specify which version and components you need
-find_package(OGRE 1.11 REQUIRED COMPONENTS Bites RTShaderSystem)
+# specify which components you need. The CONFIG flag makes sure you get OGRE 1.x
+find_package(OGRE REQUIRED COMPONENTS Bites RTShaderSystem CONFIG)
 
 # copy resource.cfg next to our binaries where OGRE looks for it
 file(COPY ${OGRE_CONFIG_DIR}/resources.cfg DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
