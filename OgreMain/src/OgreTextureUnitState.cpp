@@ -120,7 +120,6 @@ namespace Ogre {
     TextureUnitState::TextureUnitState(Pass* parent)
         : mCurrentFrame(0)
         , mAnimDuration(0)
-        , mCubic(false)
         , mTextureCoordSetIndex(0)
         , mTextureLoadFailed(false)
         , mGamma(1)
@@ -164,7 +163,6 @@ namespace Ogre {
     TextureUnitState::TextureUnitState( Pass* parent, const String& texName, unsigned int texCoordSet)
         : mCurrentFrame(0)
         , mAnimDuration(0)
-        , mCubic(false)
         , mTextureCoordSetIndex(0)
         , mTextureLoadFailed(false)
         , mGamma(1)
@@ -218,7 +216,6 @@ namespace Ogre {
         mName    = oth.mName;
         mEffects = oth.mEffects;
 
-        mTextureNameAlias = oth.mTextureNameAlias;
         mCompositorRefName = oth.mCompositorRefName;
         mCompositorRefTexName = oth.mCompositorRefTexName;
         // Can't sharing controllers with other TUS, reset to null to avoid potential bug.
@@ -290,7 +287,6 @@ namespace Ogre {
         mFramePtrs[0] = texPtr;
 
         mCurrentFrame = 0;
-        mCubic = texPtr->getTextureType() == TEX_TYPE_CUBE_MAP;
 
         // Load immediately ?
         if (isLoaded())
@@ -323,16 +319,6 @@ namespace Ogre {
     TextureUnitState::ContentType TextureUnitState::getContentType(void) const
     {
         return mContentType;
-    }
-    //-----------------------------------------------------------------------
-    bool TextureUnitState::isCubic(void) const
-    {
-        return mCubic;
-    }
-    //-----------------------------------------------------------------------
-    bool TextureUnitState::is3D(void) const
-    {
-        return getTextureType() == TEX_TYPE_CUBE_MAP;
     }
     //-----------------------------------------------------------------------
     TextureType TextureUnitState::getTextureType(void) const
@@ -439,7 +425,6 @@ namespace Ogre {
         mFramePtrs.resize(numFrames);
         mAnimDuration = duration;
         mCurrentFrame = 0;
-        mCubic = false;
 
         for (unsigned int i = 0; i < mFramePtrs.size(); ++i)
         {
@@ -573,13 +558,6 @@ namespace Ogre {
         OGRE_IGNORE_DEPRECATED_BEGIN
         for(auto& frame : mFramePtrs)
             frame->setTreatLuminanceAsAlpha(isAlpha);
-        OGRE_IGNORE_DEPRECATED_END
-    }
-    //-----------------------------------------------------------------------
-    bool TextureUnitState::getIsAlpha(void) const
-    {
-        OGRE_IGNORE_DEPRECATED_BEGIN
-        return mFramePtrs[0] && mFramePtrs[0]->getTreatLuminanceAsAlpha();
         OGRE_IGNORE_DEPRECATED_END
     }
     float TextureUnitState::getGamma() const

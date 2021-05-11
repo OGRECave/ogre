@@ -379,9 +379,6 @@ namespace Ogre {
         /// @deprecated use setFormat(PF_A8)
         OGRE_DEPRECATED void setTreatLuminanceAsAlpha(bool asAlpha);
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED bool getTreatLuminanceAsAlpha(void) const;
-
         /** Return the number of faces this texture has. This will be 6 for a cubemap
             texture and 1 for a 1D, 2D or 3D one.
         */
