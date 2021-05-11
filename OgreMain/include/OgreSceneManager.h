@@ -1899,14 +1899,6 @@ namespace Ogre {
 
         /// @name Sky Rendering
         /// @{
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED void _queueSkiesForRendering(Camera* cam)
-        {
-            mSkyPlane.postFindVisibleObjects(this, IRS_NONE, cam->getViewport());
-            mSkyBox.postFindVisibleObjects(this, IRS_NONE, cam->getViewport());
-            mSkyDome.postFindVisibleObjects(this, IRS_NONE, cam->getViewport());
-        }
         /** Enables / disables a 'sky plane' i.e. a plane at constant
             distance from the camera representing the sky.
             @remarks

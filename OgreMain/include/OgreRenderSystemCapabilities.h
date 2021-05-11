@@ -284,8 +284,6 @@ namespace Ogre
         ushort mNumTextureUnits;
         /// The stencil buffer bit depth
         ushort mStencilBufferBitDepth;
-        /// The number of matrices available for hardware blending
-        ushort mNumVertexBlendMatrices;
         /// Stores the capabilities flags.
         int mCapabilities[CAPS_CATEGORY_COUNT];
         /// Which categories are relevant
@@ -426,12 +424,6 @@ namespace Ogre
             mStencilBufferBitDepth = num;
         }
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED void setNumVertexBlendMatrices(ushort num)
-        {
-            mNumVertexBlendMatrices = num;
-        }
-
         /// The number of simultaneous render targets supported
         void setNumMultiRenderTargets(ushort num)
         {
@@ -474,12 +466,6 @@ namespace Ogre
         ushort getStencilBufferBitDepth(void) const
         {
             return mStencilBufferBitDepth;
-        }
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED ushort getNumVertexBlendMatrices(void) const
-        {
-            return mNumVertexBlendMatrices;
         }
 
         /// The number of simultaneous render targets supported

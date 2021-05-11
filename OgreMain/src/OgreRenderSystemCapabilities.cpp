@@ -58,7 +58,6 @@ namespace Ogre {
         : mVendor(GPU_UNKNOWN)
         , mNumTextureUnits(0)
         , mStencilBufferBitDepth(0)
-        , mNumVertexBlendMatrices(0)
         , mNumMultiRenderTargets(1)
         , mNonPOW2TexturesLimited(false)
         , mMaxSupportedAnisotropy(0)
