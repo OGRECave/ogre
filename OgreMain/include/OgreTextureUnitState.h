@@ -747,9 +747,6 @@ namespace Ogre {
             effect of darkening the textures - for this reason there are brightening operations
             like Ogre::LBX_MODULATE_X2. See the Ogre::LayerBlendOperation and Ogre::LayerBlendSource enumerated
             types for full details.
-        @note
-            Because of the limitations on some underlying APIs (Direct3D included)
-            the Ogre::LBS_TEXTURE argument can only be used as the first argument, not the second.
 
             The final 3 parameters are only required if you decide to pass values manually
             into the operation, i.e. you want one or more of the inputs to the colour calculation
