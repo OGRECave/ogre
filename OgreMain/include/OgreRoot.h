@@ -380,7 +380,7 @@ namespace Ogre
             const String& instanceName = BLANKSTRING);
 
         /// @copydoc SceneManagerEnumerator::createSceneManager(SceneTypeMask, const String&)
-        OGRE_DEPRECATED SceneManager* createSceneManager(SceneTypeMask typeMask,
+        OGRE_DEPRECATED SceneManager* createSceneManager(uint16 typeMask,
             const String& instanceName = BLANKSTRING)
         { return createSceneManager(DefaultSceneManagerFactory::FACTORY_TYPE_NAME, instanceName); }
 
