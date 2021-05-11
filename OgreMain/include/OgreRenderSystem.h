@@ -903,8 +903,6 @@ namespace Ogre
         virtual void bindGpuProgramParameters(GpuProgramType gptype, 
             const GpuProgramParametersPtr& params, uint16 variabilityMask) = 0;
 
-        /// @deprecated do not use
-        OGRE_DEPRECATED virtual void bindGpuProgramPassIterationParameters(GpuProgramType gptype) {}
         /** Unbinds GpuPrograms of a given GpuProgramType.
         @remarks
         This returns the pipeline to fixed-function processing for this type.

@@ -339,13 +339,6 @@ namespace Ogre {
         /** Checks the String is a valid number value. */
         static bool isNumber(const String& val);
 
-
-		/// @deprecated
-		OGRE_DEPRECATED static String toString(ColourBufferType val);
-
-		/// @deprecated
-		OGRE_DEPRECATED static ColourBufferType parseColourBuffer(const String& val, ColourBufferType defaultValue = CBT_BACK);
-
 		/** Converts a StereoModeType to a String
 		@remarks
 			String output format is "None", "Frame Sequential", etc.
