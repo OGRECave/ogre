@@ -81,8 +81,6 @@ namespace Ogre {
 
         /// Auto tracking target
         SceneNode* mAutoTrackTarget;
-        /// Pointer to a Wire Bounding Box for this Node
-        std::unique_ptr<WireBoundingBox> mWireBoundingBox;
 
         /** Index in the vector holding this node reference. Used for O(1) removals.
 
@@ -105,7 +103,6 @@ namespace Ogre {
     private: // private in 1.13
         /// Flag that determines if the bounding box of the node should be displayed
         bool mShowBoundingBox : 1;
-        bool mHideBoundingBox : 1;
 
         /** Internal method for setting whether the node is in the scene
             graph.
@@ -291,12 +288,6 @@ namespace Ogre {
             Use this to show or hide the bounding box of the node.
         */
         void showBoundingBox(bool bShow) { mShowBoundingBox = bShow; }
-
-        /// @deprecated this function will disappear with 1.13
-        OGRE_DEPRECATED void hideBoundingBox(bool bHide) { mHideBoundingBox = bHide; }
-
-        /// @deprecated this function will disappear with 1.13
-        OGRE_DEPRECATED void _addBoundingBoxToQueue(RenderQueue* queue);
 
         /** This allows scene managers to determine if the node's bounding box
             should be added to the rendering queue.
