@@ -81,6 +81,17 @@ namespace Ogre
         typedef typename std::multimap<K, V, P>::iterator iterator;
         typedef typename std::multimap<K, V, P>::const_iterator const_iterator;
     };
+
+    /// Bitmask containing scene types
+    typedef uint16 SceneTypeMask;
+    enum SceneType
+    {
+        ST_GENERIC = 1,
+        ST_EXTERIOR_CLOSE = 2,
+        ST_EXTERIOR_FAR = 4,
+        ST_EXTERIOR_REAL_FAR = 8,
+        ST_INTERIOR = 16
+    };
     /** @} */
     /** @} */
 } // Ogre

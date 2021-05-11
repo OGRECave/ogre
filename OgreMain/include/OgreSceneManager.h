@@ -3521,20 +3521,6 @@ namespace Ogre {
 
         void execute(SceneQueryListener* listener) override;
     };
-    
-
-    /// Bitmask containing scene types
-    typedef uint16 SceneTypeMask;
-
-    /// @deprecated do not use
-    enum OGRE_DEPRECATED SceneType
-    {
-        ST_GENERIC = 1,
-        ST_EXTERIOR_CLOSE = 2,
-        ST_EXTERIOR_FAR = 4,
-        ST_EXTERIOR_REAL_FAR = 8,
-        ST_INTERIOR = 16
-    };
 
     /** Structure containing information about a scene manager. */
     struct SceneManagerMetaData
