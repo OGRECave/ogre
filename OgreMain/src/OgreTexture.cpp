@@ -165,11 +165,6 @@ namespace Ogre {
         mTreatLuminanceAsAlpha = asAlpha;
     }
     //--------------------------------------------------------------------------
-    bool Texture::getTreatLuminanceAsAlpha(void) const
-    {
-        return mTreatLuminanceAsAlpha;
-    }
-    //--------------------------------------------------------------------------
     size_t Texture::calculateSize(void) const
     {
         return getNumFaces() * PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);

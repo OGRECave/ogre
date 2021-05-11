@@ -525,10 +525,10 @@ namespace Ogre {
         ContentType getContentType(void) const;
 
         /// @deprecated use getTextureType()
-        OGRE_DEPRECATED bool isCubic(void) const;
+        OGRE_DEPRECATED bool isCubic(void) const { return getTextureType() == TEX_TYPE_CUBE_MAP; }
 
         /// @deprecated use getTextureType()
-        OGRE_DEPRECATED bool is3D(void) const;
+        OGRE_DEPRECATED bool is3D(void) const { return getTextureType() == TEX_TYPE_CUBE_MAP; }
 
         /** Returns the type of this texture.
         */
@@ -549,9 +549,6 @@ namespace Ogre {
 
         /// @deprecated use setDesiredFormat(PF_A8)
         OGRE_DEPRECATED void setIsAlpha(bool isAlpha);
-
-        /// @deprecated do not use
-        OGRE_DEPRECATED bool getIsAlpha(void) const;
 
         /// @copydoc Texture::getGamma
         float getGamma() const;
@@ -1089,7 +1086,6 @@ private:
 
         /// Duration of animation in seconds.
         Real mAnimDuration;
-        bool mCubic; /// Is this a series of 6 2D textures to make up a cube?
 
         unsigned int mTextureCoordSetIndex;
 
@@ -1121,7 +1117,6 @@ private:
         mutable std::vector<TexturePtr> mFramePtrs; // must at least contain a single nullptr
         SamplerPtr mSampler;
         String mName;               ///< Optional name for the TUS.
-        String mTextureNameAlias;   ///< Optional alias for texture frames.
         EffectMap mEffects;
         /// The data that references the compositor.
         String mCompositorRefName;
