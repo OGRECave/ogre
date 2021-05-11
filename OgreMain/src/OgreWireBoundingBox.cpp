@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
+#include "OgreWireBoundingBox.h"
 
 namespace Ogre {
     #define POSITION_BINDING 0

@@ -41,7 +41,6 @@ namespace Ogre {
         , mYawFixed(false)
         , mIsInSceneGraph(false)
         , mShowBoundingBox(false)
-        , mHideBoundingBox(false)
     {
         needUpdate();
     }
@@ -293,15 +292,6 @@ namespace Ogre {
     }
     SceneNode::ConstObjectIterator SceneNode::getAttachedObjectIterator(void) const {
         return ConstObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
-    }
-
-    void SceneNode::_addBoundingBoxToQueue(RenderQueue* queue) {
-        // Create a WireBoundingBox if needed.
-        if (!mWireBoundingBox) {
-            mWireBoundingBox.reset(new WireBoundingBox());
-        }
-        mWireBoundingBox->setupBoundingBox(mWorldAABB);
-        queue->addRenderable(mWireBoundingBox.get());
     }
 
     //-----------------------------------------------------------------------
