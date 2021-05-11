@@ -26,9 +26,8 @@ file(COPY
 
 file(COPY
     "${CMAKE_SOURCE_DIR}/Media/RTShaderLib/GLSL"
-    "${CMAKE_SOURCE_DIR}/Media/RTShaderLib/materials"
     DESTINATION "${MEDIA_DIR}/RTShaderLib/")
 
 file(COPY
-    "${CMAKE_SOURCE_DIR}/Media/ShadowVolume"
+    "${CMAKE_SOURCE_DIR}/Media/Main"
     DESTINATION "${MEDIA_DIR}/")
