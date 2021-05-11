@@ -1287,7 +1287,8 @@ void SceneManager::ShadowRenderer::setShadowTextureReceiverMaterial(const Materi
     }
     else
     {
-        mShadowTextureCustomReceiverPass = mat->getBestTechnique()->getPass(0);
+        OgreAssert(!mat->getTechnique(0)->getPasses().empty(), "technique 0 has no passes");
+        mShadowTextureCustomReceiverPass = mat->getTechnique(0)->getPass(0);
     }
 }
 //---------------------------------------------------------------------
@@ -1710,11 +1711,8 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
             retPass->removeTextureUnitState(keepTUCount);
         }
 
-        retPass->_load();
-
-        // handle the case where there is no fixed pipeline support
-        if( retPass->getParent()->getParent()->getCompilationRequired() )
-            retPass->getParent()->getParent()->compile();
+        // give the RTSS a chance to generate a better technique
+        retPass->getParent()->getParent()->load();
 
         Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
         if( btech )
