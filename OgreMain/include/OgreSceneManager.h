@@ -648,14 +648,6 @@ namespace Ogre {
 
             Pass* mShadowTextureCustomCasterPass;
             Pass* mShadowTextureCustomReceiverPass;
-            String mShadowTextureCustomCasterVertexProgram;
-            String mShadowTextureCustomCasterFragmentProgram;
-            String mShadowTextureCustomReceiverVertexProgram;
-            String mShadowTextureCustomReceiverFragmentProgram;
-            GpuProgramParametersSharedPtr mShadowTextureCustomCasterVPParams;
-            GpuProgramParametersSharedPtr mShadowTextureCustomCasterFPParams;
-            GpuProgramParametersSharedPtr mShadowTextureCustomReceiverVPParams;
-            GpuProgramParametersSharedPtr mShadowTextureCustomReceiverFPParams;
 
             SamplerPtr mBorderSampler;
 

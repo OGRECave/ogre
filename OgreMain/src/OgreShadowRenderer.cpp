@@ -1269,22 +1269,6 @@ void SceneManager::ShadowRenderer::setShadowTextureCasterMaterial(const Material
     {
         OgreAssert(!mat->getTechnique(0)->getPasses().empty(), "technique 0 has no passes");
         mShadowTextureCustomCasterPass = mat->getTechnique(0)->getPass(0);
-        if (mShadowTextureCustomCasterPass->hasVertexProgram())
-        {
-            // Save vertex program and params in case we have to swap them out
-            mShadowTextureCustomCasterVertexProgram =
-                mShadowTextureCustomCasterPass->getVertexProgramName();
-            mShadowTextureCustomCasterVPParams =
-                mShadowTextureCustomCasterPass->getVertexProgramParameters();
-        }
-        if (mShadowTextureCustomCasterPass->hasFragmentProgram())
-        {
-            // Save fragment program and params in case we have to swap them out
-            mShadowTextureCustomCasterFragmentProgram =
-            mShadowTextureCustomCasterPass->getFragmentProgramName();
-            mShadowTextureCustomCasterFPParams =
-            mShadowTextureCustomCasterPass->getFragmentProgramParameters();
-        }
     }
 }
 //---------------------------------------------------------------------
@@ -1303,32 +1287,7 @@ void SceneManager::ShadowRenderer::setShadowTextureReceiverMaterial(const Materi
     }
     else
     {
-
         mShadowTextureCustomReceiverPass = mat->getBestTechnique()->getPass(0);
-        if (mShadowTextureCustomReceiverPass->hasVertexProgram())
-        {
-            // Save vertex program and params in case we have to swap them out
-            mShadowTextureCustomReceiverVertexProgram =
-                mShadowTextureCustomReceiverPass->getVertexProgramName();
-            mShadowTextureCustomReceiverVPParams =
-                mShadowTextureCustomReceiverPass->getVertexProgramParameters();
-        }
-        else
-        {
-            mShadowTextureCustomReceiverVertexProgram = BLANKSTRING;
-        }
-        if (mShadowTextureCustomReceiverPass->hasFragmentProgram())
-        {
-            // Save fragment program and params in case we have to swap them out
-            mShadowTextureCustomReceiverFragmentProgram =
-                mShadowTextureCustomReceiverPass->getFragmentProgramName();
-            mShadowTextureCustomReceiverFPParams =
-                mShadowTextureCustomReceiverPass->getFragmentProgramParameters();
-        }
-        else
-        {
-            mShadowTextureCustomReceiverFragmentProgram = BLANKSTRING;
-        }
     }
 }
 //---------------------------------------------------------------------
