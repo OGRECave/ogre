@@ -165,9 +165,6 @@ bool FFPFog::resolveDependencies(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 {
-    if (mFogMode == FOG_NONE)
-        return true;
-
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
@@ -288,7 +285,7 @@ bool FFPFog::preAddToRenderState(const RenderState* renderState, Pass* srcPass, 
     // Override scene fog since it will happen in shader.
     dstPass->setFog(true, FOG_NONE, newFogColour, newFogDensity, newFogStart, newFogEnd);   
 
-    return true;
+    return mFogMode != FOG_NONE;
 }
 
 //-----------------------------------------------------------------------
